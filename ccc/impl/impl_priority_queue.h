@@ -22,7 +22,7 @@ struct ccc_pq_elem_
 struct ccc_pq_
 {
     struct ccc_pq_elem_ *root_;
-    ptrdiff_t sz_;
+    size_t sz_;
     size_t pq_elem_offset_;
     size_t elem_sz_;
     ccc_alloc_fn *alloc_;

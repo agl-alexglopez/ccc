@@ -58,8 +58,8 @@ struct hrm_query_
     ccc_threeway_cmp last_cmp_;
     union
     {
-        ptrdiff_t found_;
-        ptrdiff_t parent_;
+        size_t found_;
+        size_t parent_;
     };
 };
 
@@ -69,27 +69,27 @@ static enum hrm_branch_ const reverse_inorder_traversal = L;
 static enum hrm_branch_ const mindir = L;
 static enum hrm_branch_ const maxdir = R;
 
-static ptrdiff_t const single_tree_node = 2;
+static size_t const single_tree_node = 2;
 
 /*==============================  Prototypes   ==============================*/
 
 /* Returning the user struct type with stored offsets. */
-static void insert(struct ccc_hromap_ *hrm, ptrdiff_t parent_i,
-                   ccc_threeway_cmp last_cmp, ptrdiff_t elem_i);
+static void insert(struct ccc_hromap_ *hrm, size_t parent_i,
+                   ccc_threeway_cmp last_cmp, size_t elem_i);
 static void *struct_base(struct ccc_hromap_ const *,
                          struct ccc_hromap_elem_ const *);
-static ptrdiff_t maybe_alloc_insert(struct ccc_hromap_ *hrm, ptrdiff_t parent,
-                                    ccc_threeway_cmp last_cmp,
-                                    struct ccc_hromap_elem_ *elem);
-static ptrdiff_t remove_fixup(struct ccc_hromap_ *t, ptrdiff_t remove);
-static void *base_at(struct ccc_hromap_ const *, ptrdiff_t);
-static ptrdiff_t alloc_slot(struct ccc_hromap_ *t);
+static size_t maybe_alloc_insert(struct ccc_hromap_ *hrm, size_t parent,
+                                 ccc_threeway_cmp last_cmp,
+                                 struct ccc_hromap_elem_ *elem);
+static size_t remove_fixup(struct ccc_hromap_ *t, size_t remove);
+static void *base_at(struct ccc_hromap_ const *, size_t);
+static size_t alloc_slot(struct ccc_hromap_ *t);
 /* Returning the user key with stored offsets. */
 static void *key_from_node(struct ccc_hromap_ const *t,
                            struct ccc_hromap_elem_ const *);
-static void *key_at(struct ccc_hromap_ const *t, ptrdiff_t i);
+static void *key_at(struct ccc_hromap_ const *t, size_t i);
 /* Returning the internal elem type with stored offsets. */
-static struct ccc_hromap_elem_ *at(struct ccc_hromap_ const *, ptrdiff_t);
+static struct ccc_hromap_elem_ *at(struct ccc_hromap_ const *, size_t);
 static struct ccc_hromap_elem_ *elem_in_slot(struct ccc_hromap_ const *t,
                                              void const *slot);
 /* Returning the internal query helper to aid in handle handling. */
@@ -102,61 +102,57 @@ static struct ccc_range_u_ equal_range(struct ccc_hromap_ const *, void const *,
                                        void const *, enum hrm_branch_);
 /* Returning threeway comparison with user callback. */
 static ccc_threeway_cmp cmp_elems(struct ccc_hromap_ const *hrm,
-                                  void const *key, ptrdiff_t node,
+                                  void const *key, size_t node,
                                   ccc_key_cmp_fn *fn);
 /* Returning read only indices for tree nodes. */
-static ptrdiff_t sibling_of(struct ccc_hromap_ const *t, ptrdiff_t x);
-static ptrdiff_t next(struct ccc_hromap_ const *t, ptrdiff_t n,
-                      enum hrm_branch_ traversal);
-static ptrdiff_t min_max_from(struct ccc_hromap_ const *t, ptrdiff_t start,
-                              enum hrm_branch_ dir);
-static ptrdiff_t branch_i(struct ccc_hromap_ const *t, ptrdiff_t parent,
-                          enum hrm_branch_ dir);
-static ptrdiff_t parent_i(struct ccc_hromap_ const *t, ptrdiff_t child);
-static ptrdiff_t index_of(struct ccc_hromap_ const *t,
-                          struct ccc_hromap_elem_ const *elem);
+static size_t sibling_of(struct ccc_hromap_ const *t, size_t x);
+static size_t next(struct ccc_hromap_ const *t, size_t n,
+                   enum hrm_branch_ traversal);
+static size_t min_max_from(struct ccc_hromap_ const *t, size_t start,
+                           enum hrm_branch_ dir);
+static size_t branch_i(struct ccc_hromap_ const *t, size_t parent,
+                       enum hrm_branch_ dir);
+static size_t parent_i(struct ccc_hromap_ const *t, size_t child);
+static size_t index_of(struct ccc_hromap_ const *t,
+                       struct ccc_hromap_elem_ const *elem);
 /* Returning references to index fields for tree nodes. */
-static ptrdiff_t *branch_r(struct ccc_hromap_ const *t, ptrdiff_t node,
-                           enum hrm_branch_ branch);
-static ptrdiff_t *parent_r(struct ccc_hromap_ const *t, ptrdiff_t node);
+static size_t *branch_r(struct ccc_hromap_ const *t, size_t node,
+                        enum hrm_branch_ branch);
+static size_t *parent_r(struct ccc_hromap_ const *t, size_t node);
 /* Returning WAVL tree status. */
-static ccc_tribool is_0_child(struct ccc_hromap_ const *, ptrdiff_t p,
-                              ptrdiff_t x);
-static ccc_tribool is_1_child(struct ccc_hromap_ const *, ptrdiff_t p,
-                              ptrdiff_t x);
-static ccc_tribool is_2_child(struct ccc_hromap_ const *, ptrdiff_t p,
-                              ptrdiff_t x);
-static ccc_tribool is_3_child(struct ccc_hromap_ const *, ptrdiff_t p,
-                              ptrdiff_t x);
-static ccc_tribool is_01_parent(struct ccc_hromap_ const *, ptrdiff_t x,
-                                ptrdiff_t p, ptrdiff_t y);
-static ccc_tribool is_11_parent(struct ccc_hromap_ const *, ptrdiff_t x,
-                                ptrdiff_t p, ptrdiff_t y);
-static ccc_tribool is_02_parent(struct ccc_hromap_ const *, ptrdiff_t x,
-                                ptrdiff_t p, ptrdiff_t y);
-static ccc_tribool is_22_parent(struct ccc_hromap_ const *, ptrdiff_t x,
-                                ptrdiff_t p, ptrdiff_t y);
-static ccc_tribool is_leaf(struct ccc_hromap_ const *t, ptrdiff_t x);
-static uint8_t parity(struct ccc_hromap_ const *t, ptrdiff_t node);
+static ccc_tribool is_0_child(struct ccc_hromap_ const *, size_t p, size_t x);
+static ccc_tribool is_1_child(struct ccc_hromap_ const *, size_t p, size_t x);
+static ccc_tribool is_2_child(struct ccc_hromap_ const *, size_t p, size_t x);
+static ccc_tribool is_3_child(struct ccc_hromap_ const *, size_t p, size_t x);
+static ccc_tribool is_01_parent(struct ccc_hromap_ const *, size_t x, size_t p,
+                                size_t y);
+static ccc_tribool is_11_parent(struct ccc_hromap_ const *, size_t x, size_t p,
+                                size_t y);
+static ccc_tribool is_02_parent(struct ccc_hromap_ const *, size_t x, size_t p,
+                                size_t y);
+static ccc_tribool is_22_parent(struct ccc_hromap_ const *, size_t x, size_t p,
+                                size_t y);
+static ccc_tribool is_leaf(struct ccc_hromap_ const *t, size_t x);
+static uint8_t parity(struct ccc_hromap_ const *t, size_t node);
 static ccc_tribool validate(struct ccc_hromap_ const *hrm);
 /* Returning void and maintaining the WAVL tree. */
 static void init_node(struct ccc_hromap_elem_ *e);
-static void insert_fixup(struct ccc_hromap_ *t, ptrdiff_t z, ptrdiff_t x);
-static void rebalance_3_child(struct ccc_hromap_ *t, ptrdiff_t z, ptrdiff_t x);
-static void transplant(struct ccc_hromap_ *t, ptrdiff_t remove,
-                       ptrdiff_t replacement);
-static void promote(struct ccc_hromap_ const *t, ptrdiff_t x);
-static void demote(struct ccc_hromap_ const *t, ptrdiff_t x);
-static void double_promote(struct ccc_hromap_ const *t, ptrdiff_t x);
-static void double_demote(struct ccc_hromap_ const *t, ptrdiff_t x);
+static void insert_fixup(struct ccc_hromap_ *t, size_t z, size_t x);
+static void rebalance_3_child(struct ccc_hromap_ *t, size_t z, size_t x);
+static void transplant(struct ccc_hromap_ *t, size_t remove,
+                       size_t replacement);
+static void promote(struct ccc_hromap_ const *t, size_t x);
+static void demote(struct ccc_hromap_ const *t, size_t x);
+static void double_promote(struct ccc_hromap_ const *t, size_t x);
+static void double_demote(struct ccc_hromap_ const *t, size_t x);
 
-static void rotate(struct ccc_hromap_ *t, ptrdiff_t z, ptrdiff_t x, ptrdiff_t y,
+static void rotate(struct ccc_hromap_ *t, size_t z, size_t x, size_t y,
                    enum hrm_branch_ dir);
-static void double_rotate(struct ccc_hromap_ *t, ptrdiff_t z, ptrdiff_t x,
-                          ptrdiff_t y, enum hrm_branch_ dir);
+static void double_rotate(struct ccc_hromap_ *t, size_t z, size_t x, size_t y,
+                          enum hrm_branch_ dir);
 /* Returning void as miscellaneous helpers. */
 static void swap(char tmp[], void *a, void *b, size_t elem_sz);
-static ptrdiff_t max(ptrdiff_t, ptrdiff_t);
+static size_t max(size_t, size_t);
 
 /*==============================  Interface    ==============================*/
 
@@ -208,11 +204,11 @@ ccc_hrm_swap_handle(ccc_handle_realtime_ordered_map *const hrm,
         *out_handle = *elem_in_slot(hrm, slot);
         void *const user_struct = struct_base(hrm, out_handle);
         void *const tmp = ccc_buf_at(&hrm->buf_, 0);
-        swap(tmp, user_struct, slot, ccc_buf_elem_size(&hrm->buf_));
+        swap(tmp, user_struct, slot, ccc_buf_elem_size(&hrm->buf_).count);
         elem_in_slot(hrm, tmp)->parity_ = 1;
         return (ccc_handle){{.i_ = q.found_, .stats_ = CCC_ENTRY_OCCUPIED}};
     }
-    ptrdiff_t const i
+    size_t const i
         = maybe_alloc_insert(hrm, q.parent_, q.last_cmp_, out_handle);
     if (!i)
     {
@@ -234,7 +230,7 @@ ccc_hrm_try_insert(ccc_handle_realtime_ordered_map *const hrm,
     {
         return (ccc_handle){{.i_ = q.found_, .stats_ = CCC_ENTRY_OCCUPIED}};
     }
-    ptrdiff_t const i
+    size_t const i
         = maybe_alloc_insert(hrm, q.parent_, q.last_cmp_, key_val_handle);
     if (!i)
     {
@@ -260,7 +256,7 @@ ccc_hrm_insert_or_assign(ccc_handle_realtime_ordered_map *const hrm,
                             struct_base(hrm, key_val_handle));
         return (ccc_handle){{.i_ = q.found_, .stats_ = CCC_ENTRY_OCCUPIED}};
     }
-    ptrdiff_t const i
+    size_t const i
         = maybe_alloc_insert(hrm, q.parent_, q.last_cmp_, key_val_handle);
     if (!i)
     {
@@ -297,7 +293,7 @@ ccc_hrm_and_modify_aux(ccc_hromap_handle *const h, ccc_update_fn *const fn,
 ccc_handle_i
 ccc_hrm_or_insert(ccc_hromap_handle const *const h, ccc_hromap_elem *const elem)
 {
-    if (!h || !elem || h->impl_.handle_.i_ < 0)
+    if (!h || !elem)
     {
         return 0;
     }
@@ -313,7 +309,7 @@ ccc_handle_i
 ccc_hrm_insert_handle(ccc_hromap_handle const *const h,
                       ccc_hromap_elem *const elem)
 {
-    if (!h || !elem || h->impl_.handle_.i_ < 0)
+    if (!h || !elem)
     {
         return 0;
     }
@@ -324,7 +320,8 @@ ccc_hrm_insert_handle(ccc_hromap_handle const *const h,
         void const *const e_base = struct_base(h->impl_.hrm_, elem);
         if (slot != e_base)
         {
-            (void)memcpy(slot, e_base, ccc_buf_elem_size(&h->impl_.hrm_->buf_));
+            (void)memcpy(slot, e_base,
+                         ccc_buf_elem_size(&h->impl_.hrm_->buf_).count);
         }
         return h->impl_.handle_.i_;
     }
@@ -347,13 +344,13 @@ ccc_hrm_handle(ccc_handle_realtime_ordered_map const *const hrm,
 ccc_handle
 ccc_hrm_remove_handle(ccc_hromap_handle const *const h)
 {
-    if (!h || h->impl_.handle_.i_ < 0)
+    if (!h)
     {
         return (ccc_handle){{.stats_ = CCC_ENTRY_ARG_ERROR}};
     }
     if (h->impl_.handle_.stats_ == CCC_ENTRY_OCCUPIED)
     {
-        ptrdiff_t const ret = remove_fixup(h->impl_.hrm_, h->impl_.handle_.i_);
+        size_t const ret = remove_fixup(h->impl_.hrm_, h->impl_.handle_.i_);
         return (ccc_handle){{.i_ = ret, .stats_ = CCC_ENTRY_OCCUPIED}};
     }
     return (ccc_handle){{.i_ = 0, .stats_ = CCC_ENTRY_VACANT}};
@@ -372,13 +369,13 @@ ccc_hrm_remove(ccc_handle_realtime_ordered_map *const hrm,
     {
         return (ccc_handle){{.i_ = 0, .stats_ = CCC_ENTRY_VACANT}};
     }
-    ptrdiff_t const removed = remove_fixup(hrm, q.found_);
+    size_t const removed = remove_fixup(hrm, q.found_);
     assert(removed);
     void *const user_struct = struct_base(hrm, out_handle);
     void const *const r = ccc_buf_at(&hrm->buf_, removed);
     if (user_struct != r)
     {
-        (void)memcpy(user_struct, r, ccc_buf_elem_size(&hrm->buf_));
+        (void)memcpy(user_struct, r, ccc_buf_elem_size(&hrm->buf_).count);
     }
     return (ccc_handle){{.i_ = 0, .stats_ = CCC_ENTRY_OCCUPIED}};
 }
@@ -450,26 +447,32 @@ ccc_hrm_is_empty(ccc_handle_realtime_ordered_map const *const hrm)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    return !ccc_hrm_size(hrm);
+    return !ccc_hrm_size(hrm).count;
 }
 
-ptrdiff_t
+ccc_ucount
 ccc_hrm_size(ccc_handle_realtime_ordered_map const *const hrm)
 {
     if (!hrm)
     {
-        return 0;
+        return (ccc_ucount){.error = CCC_RESULT_ARG_ERROR};
     }
-    ptrdiff_t const sz = ccc_buf_size(&hrm->buf_);
-    return !sz ? sz : sz - 1;
+    ccc_ucount sz = ccc_buf_size(&hrm->buf_);
+    if (sz.error || !sz.count)
+    {
+        return sz;
+    }
+    /* The root slot is occupied at 0 but don't don't tell user. */
+    --sz.count;
+    return sz;
 }
 
-ptrdiff_t
+ccc_ucount
 ccc_hrm_capacity(ccc_handle_realtime_ordered_map const *const hrm)
 {
     if (!hrm)
     {
-        return 0;
+        return (ccc_ucount){.error = CCC_RESULT_ARG_ERROR};
     }
     return ccc_buf_capacity(&hrm->buf_);
 }
@@ -487,7 +490,7 @@ ccc_hrm_begin(ccc_handle_realtime_ordered_map const *const hrm)
     {
         return NULL;
     }
-    ptrdiff_t const n = min_max_from(hrm, hrm->root_, mindir);
+    size_t const n = min_max_from(hrm, hrm->root_, mindir);
     return base_at(hrm, n);
 }
 
@@ -498,7 +501,7 @@ ccc_hrm_rbegin(ccc_handle_realtime_ordered_map const *const hrm)
     {
         return NULL;
     }
-    ptrdiff_t const n = min_max_from(hrm, hrm->root_, maxdir);
+    size_t const n = min_max_from(hrm, hrm->root_, maxdir);
     return base_at(hrm, n);
 }
 
@@ -510,7 +513,7 @@ ccc_hrm_next(ccc_handle_realtime_ordered_map const *const hrm,
     {
         return NULL;
     }
-    ptrdiff_t const n = next(hrm, index_of(hrm, e), inorder_traversal);
+    size_t const n = next(hrm, index_of(hrm, e), inorder_traversal);
     return base_at(hrm, n);
 }
 
@@ -522,7 +525,7 @@ ccc_hrm_rnext(ccc_handle_realtime_ordered_map const *const hrm,
     {
         return NULL;
     }
-    ptrdiff_t const n = next(hrm, index_of(hrm, e), reverse_inorder_traversal);
+    size_t const n = next(hrm, index_of(hrm, e), reverse_inorder_traversal);
     return base_at(hrm, n);
 }
 
@@ -561,7 +564,7 @@ ccc_hrm_copy(ccc_handle_realtime_ordered_map *const dst,
        memory in case it has already been allocated. Alloc will remain the
        same as in dst initialization because that controls permission. */
     void *const dst_mem = dst->buf_.mem_;
-    ptrdiff_t const dst_cap = dst->buf_.capacity_;
+    size_t const dst_cap = dst->buf_.capacity_;
     ccc_alloc_fn *const dst_alloc = dst->buf_.alloc_;
     *dst = *src;
     dst->buf_.mem_ = dst_mem;
@@ -605,7 +608,7 @@ ccc_hrm_clear(ccc_handle_realtime_ordered_map *const hrm,
     }
     while (!ccc_hrm_is_empty(hrm))
     {
-        ptrdiff_t const i = remove_fixup(hrm, hrm->root_);
+        size_t const i = remove_fixup(hrm, hrm->root_);
         assert(i);
         fn((ccc_user_type){.user_type = ccc_buf_at(&hrm->buf_, i),
                            .aux = hrm->buf_.aux_});
@@ -630,7 +633,7 @@ ccc_hrm_clear_and_free(ccc_handle_realtime_ordered_map *const hrm,
     }
     while (!ccc_hrm_is_empty(hrm))
     {
-        ptrdiff_t const i = remove_fixup(hrm, hrm->root_);
+        size_t const i = remove_fixup(hrm, hrm->root_);
         assert(i);
         fn((ccc_user_type){.user_type = ccc_buf_at(&hrm->buf_, i),
                            .aux = hrm->buf_.aux_});
@@ -652,13 +655,9 @@ ccc_hrm_validate(ccc_handle_realtime_ordered_map const *const hrm)
 /*========================  Private Interface  ==============================*/
 
 void
-ccc_impl_hrm_insert(struct ccc_hromap_ *const hrm, ptrdiff_t const parent_i,
-                    ccc_threeway_cmp const last_cmp, ptrdiff_t const elem_i)
+ccc_impl_hrm_insert(struct ccc_hromap_ *const hrm, size_t const parent_i,
+                    ccc_threeway_cmp const last_cmp, size_t const elem_i)
 {
-    if (parent_i < 0 || elem_i < 0)
-    {
-        return;
-    }
     insert(hrm, parent_i, last_cmp, elem_i);
 }
 
@@ -669,26 +668,18 @@ ccc_impl_hrm_handle(struct ccc_hromap_ const *const hrm, void const *const key)
 }
 
 void *
-ccc_impl_hrm_key_at(struct ccc_hromap_ const *const hrm, ptrdiff_t const slot)
+ccc_impl_hrm_key_at(struct ccc_hromap_ const *const hrm, size_t const slot)
 {
-    if (slot < 0)
-    {
-        return NULL;
-    }
     return key_at(hrm, slot);
 }
 
 struct ccc_hromap_elem_ *
-ccc_impl_hrm_elem_at(struct ccc_hromap_ const *hrm, ptrdiff_t const i)
+ccc_impl_hrm_elem_at(struct ccc_hromap_ const *hrm, size_t const i)
 {
-    if (i < 0)
-    {
-        return NULL;
-    }
     return at(hrm, i);
 }
 
-ptrdiff_t
+size_t
 ccc_impl_hrm_alloc_slot(struct ccc_hromap_ *const hrm)
 {
     return alloc_slot(hrm);
@@ -696,14 +687,14 @@ ccc_impl_hrm_alloc_slot(struct ccc_hromap_ *const hrm)
 
 /*==========================  Static Helpers   ==============================*/
 
-static ptrdiff_t
-maybe_alloc_insert(struct ccc_hromap_ *const hrm, ptrdiff_t const parent,
+static size_t
+maybe_alloc_insert(struct ccc_hromap_ *const hrm, size_t const parent,
                    ccc_threeway_cmp const last_cmp,
                    struct ccc_hromap_elem_ *const elem)
 {
     /* The end sentinel node will always be at 0. This also means once
        initialized the internal size for implementer is always at least 1. */
-    ptrdiff_t const node = alloc_slot(hrm);
+    size_t const node = alloc_slot(hrm);
     if (!node)
     {
         return 0;
@@ -714,12 +705,12 @@ maybe_alloc_insert(struct ccc_hromap_ *const hrm, ptrdiff_t const parent,
 }
 
 static void
-insert(struct ccc_hromap_ *const hrm, ptrdiff_t const parent_i,
-       ccc_threeway_cmp const last_cmp, ptrdiff_t const elem_i)
+insert(struct ccc_hromap_ *const hrm, size_t const parent_i,
+       ccc_threeway_cmp const last_cmp, size_t const elem_i)
 {
     struct ccc_hromap_elem_ *elem = at(hrm, elem_i);
     init_node(elem);
-    if (ccc_buf_size(&hrm->buf_) == single_tree_node)
+    if (ccc_buf_size(&hrm->buf_).count == single_tree_node)
     {
         hrm->root_ = elem_i;
         return;
@@ -759,7 +750,7 @@ handle(struct ccc_hromap_ const *const hrm, void const *const key)
 static struct hrm_query_
 find(struct ccc_hromap_ const *const hrm, void const *const key)
 {
-    ptrdiff_t parent = 0;
+    size_t parent = 0;
     struct hrm_query_ q = {.last_cmp_ = CCC_CMP_ERROR, .found_ = hrm->root_};
     for (; q.found_; parent = q.found_,
                      q.found_ = branch_i(hrm, q.found_, CCC_GRT == q.last_cmp_))
@@ -775,8 +766,8 @@ find(struct ccc_hromap_ const *const hrm, void const *const key)
     return q;
 }
 
-static ptrdiff_t
-next(struct ccc_hromap_ const *const t, ptrdiff_t n,
+static size_t
+next(struct ccc_hromap_ const *const t, size_t n,
      enum hrm_branch_ const traversal)
 {
     if (!n)
@@ -794,7 +785,7 @@ next(struct ccc_hromap_ const *const t, ptrdiff_t n,
         return n;
     }
     /* This is how to return internal nodes on the way back up from a leaf. */
-    ptrdiff_t p = parent_i(t, n);
+    size_t p = parent_i(t, n);
     for (; p && branch_i(t, p, !traversal) != n; n = p, p = parent_i(t, p))
     {}
     return p;
@@ -825,8 +816,8 @@ equal_range(struct ccc_hromap_ const *const t, void const *const begin_key,
     };
 }
 
-static ptrdiff_t
-min_max_from(struct ccc_hromap_ const *const t, ptrdiff_t start,
+static size_t
+min_max_from(struct ccc_hromap_ const *const t, size_t start,
              enum hrm_branch_ const dir)
 {
     if (!start)
@@ -840,20 +831,20 @@ min_max_from(struct ccc_hromap_ const *const t, ptrdiff_t start,
 
 static inline ccc_threeway_cmp
 cmp_elems(struct ccc_hromap_ const *const hrm, void const *const key,
-          ptrdiff_t const node, ccc_key_cmp_fn *const fn)
+          size_t const node, ccc_key_cmp_fn *const fn)
 {
     return fn((ccc_key_cmp){.key_lhs = key,
                             .user_type_rhs = base_at(hrm, node),
                             .aux = hrm->buf_.aux_});
 }
 
-static ptrdiff_t
+static size_t
 alloc_slot(struct ccc_hromap_ *const t)
 {
     /* The end sentinel node will always be at 0. This also means once
        initialized the internal size for implementer is always at least 1. */
-    ptrdiff_t const old_sz = ccc_buf_size(&t->buf_);
-    ptrdiff_t old_cap = ccc_buf_capacity(&t->buf_);
+    size_t const old_sz = ccc_buf_size(&t->buf_).count;
+    size_t old_cap = ccc_buf_capacity(&t->buf_).count;
     if (!old_sz || old_sz == old_cap)
     {
         assert(!t->free_list_);
@@ -865,9 +856,9 @@ alloc_slot(struct ccc_hromap_ *const t)
             return 0;
         }
         old_cap = old_sz ? old_cap : 0;
-        ptrdiff_t const new_cap = ccc_buf_capacity(&t->buf_);
-        ptrdiff_t prev = 0;
-        for (ptrdiff_t i = new_cap - 1; i > 0 && i >= old_cap; prev = i, --i)
+        size_t const new_cap = ccc_buf_capacity(&t->buf_).count;
+        size_t prev = 0;
+        for (size_t i = new_cap - 1; i > 0 && i >= old_cap; prev = i, --i)
         {
             at(t, i)->parity_ = IN_FREE_LIST;
             at(t, i)->next_free_ = prev;
@@ -883,7 +874,7 @@ alloc_slot(struct ccc_hromap_ *const t)
     {
         return 0;
     }
-    ptrdiff_t const slot = t->free_list_;
+    size_t const slot = t->free_list_;
     t->free_list_ = at(t, slot)->next_free_;
     return slot;
 }
@@ -909,53 +900,53 @@ swap(char tmp[const], void *const a, void *const b, size_t const elem_sz)
 }
 
 static inline struct ccc_hromap_elem_ *
-at(struct ccc_hromap_ const *const t, ptrdiff_t const i)
+at(struct ccc_hromap_ const *const t, size_t const i)
 {
     return elem_in_slot(t, ccc_buf_at(&t->buf_, i));
 }
 
-static inline ptrdiff_t
-branch_i(struct ccc_hromap_ const *const t, ptrdiff_t const parent,
+static inline size_t
+branch_i(struct ccc_hromap_ const *const t, size_t const parent,
          enum hrm_branch_ const dir)
 {
     return elem_in_slot(t, ccc_buf_at(&t->buf_, parent))->branch_[dir];
 }
 
-static inline ptrdiff_t
-parent_i(struct ccc_hromap_ const *const t, ptrdiff_t const child)
+static inline size_t
+parent_i(struct ccc_hromap_ const *const t, size_t const child)
 {
     return elem_in_slot(t, ccc_buf_at(&t->buf_, child))->parent_;
 }
 
-static inline ptrdiff_t
+static inline size_t
 index_of(struct ccc_hromap_ const *const t,
          struct ccc_hromap_elem_ const *const elem)
 {
-    return ccc_buf_i(&t->buf_, struct_base(t, elem));
+    return ccc_buf_i(&t->buf_, struct_base(t, elem)).count;
 }
 
 static inline uint8_t
-parity(struct ccc_hromap_ const *t, ptrdiff_t const node)
+parity(struct ccc_hromap_ const *t, size_t const node)
 {
     return elem_in_slot(t, ccc_buf_at(&t->buf_, node))->parity_;
 }
 
-static inline ptrdiff_t *
-branch_r(struct ccc_hromap_ const *t, ptrdiff_t const node,
+static inline size_t *
+branch_r(struct ccc_hromap_ const *t, size_t const node,
          enum hrm_branch_ const branch)
 {
     return &elem_in_slot(t, ccc_buf_at(&t->buf_, node))->branch_[branch];
 }
 
-static inline ptrdiff_t *
-parent_r(struct ccc_hromap_ const *t, ptrdiff_t const node)
+static inline size_t *
+parent_r(struct ccc_hromap_ const *t, size_t const node)
 {
 
     return &elem_in_slot(t, ccc_buf_at(&t->buf_, node))->parent_;
 }
 
 static inline void *
-base_at(struct ccc_hromap_ const *const hrm, ptrdiff_t const i)
+base_at(struct ccc_hromap_ const *const hrm, size_t const i)
 {
     return ccc_buf_at(&hrm->buf_, i);
 }
@@ -982,7 +973,7 @@ key_from_node(struct ccc_hromap_ const *const t,
 }
 
 static inline void *
-key_at(struct ccc_hromap_ const *const t, ptrdiff_t const i)
+key_at(struct ccc_hromap_ const *const t, size_t const i)
 {
     return (char *)ccc_buf_at(&t->buf_, i) + t->key_offset_;
 }
@@ -990,7 +981,7 @@ key_at(struct ccc_hromap_ const *const t, ptrdiff_t const i)
 /*=======================   WAVL Tree Maintenance   =========================*/
 
 static void
-insert_fixup(struct ccc_hromap_ *const t, ptrdiff_t z, ptrdiff_t x)
+insert_fixup(struct ccc_hromap_ *const t, size_t z, size_t x)
 {
     do
     {
@@ -1010,7 +1001,7 @@ insert_fixup(struct ccc_hromap_ *const t, ptrdiff_t z, ptrdiff_t x)
     assert(x);
     assert(is_0_child(t, z, x));
     enum hrm_branch_ const p_to_x_dir = branch_i(t, z, R) == x;
-    ptrdiff_t const y = branch_i(t, x, !p_to_x_dir);
+    size_t const y = branch_i(t, x, !p_to_x_dir);
     if (!y || is_2_child(t, z, y))
     {
         rotate(t, z, x, y, !p_to_x_dir);
@@ -1026,12 +1017,12 @@ insert_fixup(struct ccc_hromap_ *const t, ptrdiff_t z, ptrdiff_t x)
     }
 }
 
-static ptrdiff_t
-remove_fixup(struct ccc_hromap_ *const t, ptrdiff_t const remove)
+static size_t
+remove_fixup(struct ccc_hromap_ *const t, size_t const remove)
 {
-    ptrdiff_t y = 0;
-    ptrdiff_t x = 0;
-    ptrdiff_t p = 0;
+    size_t y = 0;
+    size_t x = 0;
+    size_t p = 0;
     ccc_tribool two_child = CCC_FALSE;
     if (!branch_i(t, remove, R) || !branch_i(t, remove, L))
     {
@@ -1094,8 +1085,8 @@ remove_fixup(struct ccc_hromap_ *const t, ptrdiff_t const remove)
 }
 
 static void
-transplant(struct ccc_hromap_ *const t, ptrdiff_t const remove,
-           ptrdiff_t const replacement)
+transplant(struct ccc_hromap_ *const t, size_t const remove,
+           size_t const replacement)
 {
     assert(remove);
     assert(replacement);
@@ -1106,7 +1097,7 @@ transplant(struct ccc_hromap_ *const t, ptrdiff_t const remove,
     }
     else
     {
-        ptrdiff_t const p = parent_i(t, remove);
+        size_t const p = parent_i(t, remove);
         *branch_r(t, p, branch_i(t, p, R) == remove) = replacement;
     }
     struct ccc_hromap_elem_ *const remove_r = at(t, remove);
@@ -1119,14 +1110,14 @@ transplant(struct ccc_hromap_ *const t, ptrdiff_t const remove,
 }
 
 static void
-rebalance_3_child(struct ccc_hromap_ *const t, ptrdiff_t z, ptrdiff_t x)
+rebalance_3_child(struct ccc_hromap_ *const t, size_t z, size_t x)
 {
     assert(z);
     ccc_tribool made_3_child = CCC_FALSE;
     do
     {
-        ptrdiff_t const g = parent_i(t, z);
-        ptrdiff_t const y = branch_i(t, z, branch_i(t, z, L) == x);
+        size_t const g = parent_i(t, z);
+        size_t const y = branch_i(t, z, branch_i(t, z, L) == x);
         made_3_child = is_2_child(t, g, z);
         if (is_2_child(t, z, y))
         {
@@ -1141,7 +1132,7 @@ rebalance_3_child(struct ccc_hromap_ *const t, ptrdiff_t z, ptrdiff_t x)
         {
             assert(is_3_child(t, z, x));
             enum hrm_branch_ const z_to_x_dir = branch_i(t, z, R) == x;
-            ptrdiff_t const w = branch_i(t, y, !z_to_x_dir);
+            size_t const w = branch_i(t, y, !z_to_x_dir);
             if (is_1_child(t, y, w))
             {
                 rotate(t, z, y, branch_i(t, y, z_to_x_dir), z_to_x_dir);
@@ -1154,7 +1145,7 @@ rebalance_3_child(struct ccc_hromap_ *const t, ptrdiff_t z, ptrdiff_t x)
             }
             else /* w is a 2-child and v will be a 1-child. */
             {
-                ptrdiff_t const v = branch_i(t, y, z_to_x_dir);
+                size_t const v = branch_i(t, y, z_to_x_dir);
                 assert(is_2_child(t, y, w));
                 assert(is_1_child(t, y, v));
                 double_rotate(t, z, y, v, !z_to_x_dir);
@@ -1197,13 +1188,13 @@ and uppercase are arbitrary subtrees.
        │              │
        B              B */
 static void
-rotate(struct ccc_hromap_ *const t, ptrdiff_t const z, ptrdiff_t const x,
-       ptrdiff_t const y, enum hrm_branch_ const dir)
+rotate(struct ccc_hromap_ *const t, size_t const z, size_t const x,
+       size_t const y, enum hrm_branch_ const dir)
 {
     assert(z);
     struct ccc_hromap_elem_ *const z_r = at(t, z);
     struct ccc_hromap_elem_ *const x_r = at(t, x);
-    ptrdiff_t const g = parent_i(t, z);
+    size_t const g = parent_i(t, z);
     x_r->parent_ = g;
     if (!g)
     {
@@ -1232,14 +1223,14 @@ Lowercase are nodes and uppercase are arbitrary subtrees.
      ╭─┴─╮
      B   C */
 static void
-double_rotate(struct ccc_hromap_ *const t, ptrdiff_t const z, ptrdiff_t const x,
-              ptrdiff_t const y, enum hrm_branch_ const dir)
+double_rotate(struct ccc_hromap_ *const t, size_t const z, size_t const x,
+              size_t const y, enum hrm_branch_ const dir)
 {
     assert(z && x && y);
     struct ccc_hromap_elem_ *const z_r = at(t, z);
     struct ccc_hromap_elem_ *const x_r = at(t, x);
     struct ccc_hromap_elem_ *const y_r = at(t, y);
-    ptrdiff_t const g = z_r->parent_;
+    size_t const g = z_r->parent_;
     y_r->parent_ = g;
     if (!g)
     {
@@ -1266,8 +1257,7 @@ double_rotate(struct ccc_hromap_ *const t, ptrdiff_t const z, ptrdiff_t const x,
       0╭─╯
        x */
 [[maybe_unused]] static inline ccc_tribool
-is_0_child(struct ccc_hromap_ const *const t, ptrdiff_t const p,
-           ptrdiff_t const x)
+is_0_child(struct ccc_hromap_ const *const t, size_t const p, size_t const x)
 {
     return p && parity(t, p) == parity(t, x);
 }
@@ -1277,8 +1267,7 @@ is_0_child(struct ccc_hromap_ const *const t, ptrdiff_t const p,
       1╭─╯
        x */
 static inline ccc_tribool
-is_1_child(struct ccc_hromap_ const *const t, ptrdiff_t const p,
-           ptrdiff_t const x)
+is_1_child(struct ccc_hromap_ const *const t, size_t const p, size_t const x)
 {
     return p && parity(t, p) != parity(t, x);
 }
@@ -1288,8 +1277,7 @@ is_1_child(struct ccc_hromap_ const *const t, ptrdiff_t const p,
       2╭─╯
        x */
 static inline ccc_tribool
-is_2_child(struct ccc_hromap_ const *const t, ptrdiff_t const p,
-           ptrdiff_t const x)
+is_2_child(struct ccc_hromap_ const *const t, size_t const p, size_t const x)
 {
     return p && parity(t, p) == parity(t, x);
 }
@@ -1299,8 +1287,7 @@ is_2_child(struct ccc_hromap_ const *const t, ptrdiff_t const p,
       3╭─╯
        x */
 [[maybe_unused]] static inline ccc_tribool
-is_3_child(struct ccc_hromap_ const *const t, ptrdiff_t const p,
-           ptrdiff_t const x)
+is_3_child(struct ccc_hromap_ const *const t, size_t const p, size_t const x)
 {
     return p && parity(t, p) != parity(t, x);
 }
@@ -1311,8 +1298,8 @@ is_3_child(struct ccc_hromap_ const *const t, ptrdiff_t const p,
       0╭─┴─╮1
        x   y */
 static inline ccc_tribool
-is_01_parent(struct ccc_hromap_ const *const t, ptrdiff_t const x,
-             ptrdiff_t const p, ptrdiff_t const y)
+is_01_parent(struct ccc_hromap_ const *const t, size_t const x, size_t const p,
+             size_t const y)
 {
     assert(p);
     return (!parity(t, x) && !parity(t, p) && parity(t, y))
@@ -1325,8 +1312,8 @@ is_01_parent(struct ccc_hromap_ const *const t, ptrdiff_t const x,
       1╭─┴─╮1
        x   y */
 static inline ccc_tribool
-is_11_parent(struct ccc_hromap_ const *const t, ptrdiff_t const x,
-             ptrdiff_t const p, ptrdiff_t const y)
+is_11_parent(struct ccc_hromap_ const *const t, size_t const x, size_t const p,
+             size_t const y)
 {
     assert(p);
     return (!parity(t, x) && parity(t, p) && !parity(t, y))
@@ -1339,8 +1326,8 @@ is_11_parent(struct ccc_hromap_ const *const t, ptrdiff_t const x,
       0╭─┴─╮2
        x   y */
 static inline ccc_tribool
-is_02_parent(struct ccc_hromap_ const *const t, ptrdiff_t const x,
-             ptrdiff_t const p, ptrdiff_t const y)
+is_02_parent(struct ccc_hromap_ const *const t, size_t const x, size_t const p,
+             size_t const y)
 {
     assert(p);
     return (parity(t, x) == parity(t, p)) && (parity(t, p) == parity(t, y));
@@ -1355,15 +1342,15 @@ is_02_parent(struct ccc_hromap_ const *const t, ptrdiff_t const x,
       2╭─┴─╮2
        x   y */
 static inline ccc_tribool
-is_22_parent(struct ccc_hromap_ const *const t, ptrdiff_t const x,
-             ptrdiff_t const p, ptrdiff_t const y)
+is_22_parent(struct ccc_hromap_ const *const t, size_t const x, size_t const p,
+             size_t const y)
 {
     assert(p);
     return (parity(t, x) == parity(t, p)) && (parity(t, p) == parity(t, y));
 }
 
 static inline void
-promote(struct ccc_hromap_ const *const t, ptrdiff_t const x)
+promote(struct ccc_hromap_ const *const t, size_t const x)
 {
     if (x)
     {
@@ -1372,7 +1359,7 @@ promote(struct ccc_hromap_ const *const t, ptrdiff_t const x)
 }
 
 static inline void
-demote(struct ccc_hromap_ const *const t, ptrdiff_t const x)
+demote(struct ccc_hromap_ const *const t, size_t const x)
 {
     promote(t, x);
 }
@@ -1380,32 +1367,32 @@ demote(struct ccc_hromap_ const *const t, ptrdiff_t const x)
 /* Parity based ranks mean this is no-op but leave in case implementation ever
    changes. Also, makes clear what sections of code are trying to do. */
 static inline void
-double_promote(struct ccc_hromap_ const *const, ptrdiff_t const)
+double_promote(struct ccc_hromap_ const *const, size_t const)
 {}
 
 /* Parity based ranks mean this is no-op but leave in case implementation ever
    changes. Also, makes clear what sections of code are trying to do. */
 static inline void
-double_demote(struct ccc_hromap_ const *const, ptrdiff_t const)
+double_demote(struct ccc_hromap_ const *const, size_t const)
 {}
 
 static inline ccc_tribool
-is_leaf(struct ccc_hromap_ const *const t, ptrdiff_t const x)
+is_leaf(struct ccc_hromap_ const *const t, size_t const x)
 {
     return !branch_i(t, x, L) && !branch_i(t, x, R);
 }
 
-static inline ptrdiff_t
-sibling_of(struct ccc_hromap_ const *const t, ptrdiff_t const x)
+static inline size_t
+sibling_of(struct ccc_hromap_ const *const t, size_t const x)
 {
-    ptrdiff_t const p = parent_i(t, x);
+    size_t const p = parent_i(t, x);
     assert(p);
     /* We want the sibling so we need the truthy value to be opposite of x. */
     return at(t, p)->branch_[branch_i(t, p, L) == x];
 }
 
-static inline ptrdiff_t
-max(ptrdiff_t const a, ptrdiff_t const b)
+static inline size_t
+max(size_t const a, size_t const b)
 {
     return a > b ? a : b;
 }
@@ -1417,13 +1404,13 @@ max(ptrdiff_t const a, ptrdiff_t const b)
 /** @private */
 struct tree_range_
 {
-    ptrdiff_t low;
-    ptrdiff_t root;
-    ptrdiff_t high;
+    size_t low;
+    size_t root;
+    size_t high;
 };
 
-static ptrdiff_t
-recursive_size(struct ccc_hromap_ const *const t, ptrdiff_t const r)
+static size_t
+recursive_size(struct ccc_hromap_ const *const t, size_t const r)
 {
     if (!r)
     {
@@ -1459,8 +1446,8 @@ are_subtrees_valid(struct ccc_hromap_ const *t, struct tree_range_ const r)
 }
 
 static ccc_tribool
-is_storing_parent(struct ccc_hromap_ const *const t, ptrdiff_t const p,
-                  ptrdiff_t const root)
+is_storing_parent(struct ccc_hromap_ const *const t, size_t const p,
+                  size_t const root)
 {
     if (!root)
     {
@@ -1477,25 +1464,26 @@ is_storing_parent(struct ccc_hromap_ const *const t, ptrdiff_t const p,
 static ccc_tribool
 is_free_list_valid(struct ccc_hromap_ const *const t)
 {
-    if (!ccc_buf_size(&t->buf_))
+    if (!ccc_buf_size(&t->buf_).count)
     {
         return CCC_TRUE;
     }
-    ptrdiff_t list_check1 = 0;
-    for (ptrdiff_t i = 0; i < ccc_buf_capacity(&t->buf_); ++i)
+    size_t list_check1 = 0;
+    for (size_t i = 0; i < ccc_buf_capacity(&t->buf_).count; ++i)
     {
         if (at(t, i)->parity_ == IN_FREE_LIST)
         {
             ++list_check1;
         }
     }
-    if (list_check1 + ccc_buf_size(&t->buf_) != ccc_buf_capacity(&t->buf_))
+    if (list_check1 + ccc_buf_size(&t->buf_).count
+        != ccc_buf_capacity(&t->buf_).count)
     {
         return CCC_FALSE;
     }
-    ptrdiff_t list_check2 = 0;
-    for (ptrdiff_t cur = t->free_list_;
-         cur && list_check2 < ccc_buf_capacity(&t->buf_);
+    size_t list_check2 = 0;
+    for (size_t cur = t->free_list_;
+         cur && list_check2 < ccc_buf_capacity(&t->buf_).count;
          cur = at(t, cur)->next_free_, ++list_check2)
     {}
     return list_check2 == list_check1;
@@ -1512,8 +1500,8 @@ validate(struct ccc_hromap_ const *const hrm)
     {
         return CCC_FALSE;
     }
-    ptrdiff_t const size = recursive_size(hrm, hrm->root_);
-    if (size && size != ccc_buf_size(&hrm->buf_) - 1)
+    size_t const size = recursive_size(hrm, hrm->root_);
+    if (size && size != ccc_buf_size(&hrm->buf_).count - 1)
     {
         return CCC_FALSE;
     }

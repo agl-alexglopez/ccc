@@ -15,16 +15,16 @@ CHECK_BEGIN_STATIC_FN(omap_test_prime_shuffle)
 {
     ccc_ordered_map s
         = ccc_om_init(s, struct val, elem, key, id_cmp, NULL, NULL);
-    ptrdiff_t const size = 50;
-    ptrdiff_t const prime = 53;
-    ptrdiff_t const less = 10;
+    size_t const size = 50;
+    size_t const prime = 53;
+    size_t const less = 10;
     /* We want the tree to have a smattering of duplicates so
        reduce the shuffle range so it will repeat some values. */
-    ptrdiff_t shuffled_index = prime % (size - less);
+    size_t shuffled_index = prime % (size - less);
     struct val vals[50];
     bool repeats[50];
     memset(repeats, false, sizeof(bool) * size);
-    for (ptrdiff_t i = 0; i < size; ++i)
+    for (size_t i = 0; i < size; ++i)
     {
         vals[i].val = (int)shuffled_index;
         vals[i].key = (int)shuffled_index;
@@ -35,8 +35,8 @@ CHECK_BEGIN_STATIC_FN(omap_test_prime_shuffle)
         CHECK(validate(&s), true);
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
-    CHECK(ccc_om_size(&s) < size, true);
-    for (ptrdiff_t i = 0; i < size; ++i)
+    CHECK(ccc_om_size(&s).count < size, true);
+    for (size_t i = 0; i < size; ++i)
     {
         CHECK(occupied(remove_entry_r(entry_r(&s, &vals[i].key))) || repeats[i],
               true);
@@ -49,18 +49,18 @@ CHECK_BEGIN_STATIC_FN(omap_test_insert_erase_shuffled)
 {
     ccc_ordered_map s
         = ccc_om_init(s, struct val, elem, key, id_cmp, NULL, NULL);
-    ptrdiff_t const size = 50;
+    size_t const size = 50;
     int const prime = 53;
     struct val vals[50];
     CHECK(insert_shuffled(&s, vals, size, prime), PASS);
     int sorted_check[50];
     CHECK(inorder_fill(sorted_check, size, &s), size);
-    for (ptrdiff_t i = 0; i < size; ++i)
+    for (size_t i = 0; i < size; ++i)
     {
         CHECK(vals[i].key, sorted_check[i]);
     }
     /* Now let's delete everything with no errors. */
-    for (ptrdiff_t i = 0; i < size; ++i)
+    for (size_t i = 0; i < size; ++i)
     {
         struct val *v = unwrap(remove_r(&s, &vals[i].elem));
         CHECK(v != NULL, true);

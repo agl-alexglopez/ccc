@@ -171,7 +171,7 @@ occur if reallocation is required to fit all elements but reallocation fails.
 Note that this version of heapify copies elements from the input array. If an
 in place heapify is required use the initializer version of this method. */
 ccc_result ccc_fpq_heapify(ccc_flat_priority_queue *fpq, void *input_array,
-                           ptrdiff_t input_n, size_t input_elem_size);
+                           size_t input_n, size_t input_elem_size);
 
 /** @brief Order n elements of the underlying fpq buffer as an fpq.
 @param [in] fpq a pointer to the flat priority queue.
@@ -182,14 +182,14 @@ fpq is NULL or n is larger than the initialized capacity of the fpq.
 This is another method to order a heap that already has all the elements one
 needs sorted. The underlying buffer will be interpreted to have n valid elements
 starting at index 0 to index n - 1. */
-ccc_result ccc_fpq_heapify_inplace(ccc_flat_priority_queue *fpq, ptrdiff_t n);
+ccc_result ccc_fpq_heapify_inplace(ccc_flat_priority_queue *fpq, size_t n);
 
 /** @brief Many allocate memory for the fpq.
 @param [in] fpq a pointer to the priority queue.
 @param [in] new_capacity the desired capacity for the fpq.
 @param [in] fn the allocation function. May be the same as used on init.
 @return OK if allocation was successful or a memory error on failure. */
-ccc_result ccc_fpq_alloc(ccc_flat_priority_queue *fpq, ptrdiff_t new_capacity,
+ccc_result ccc_fpq_alloc(ccc_flat_priority_queue *fpq, size_t new_capacity,
                          ccc_alloc_fn *fn);
 
 /** @brief Pushes element pointed to at e into fpq. O(lgN).
@@ -368,12 +368,12 @@ Obtain state from the container. */
 /** @brief Returns the size of the fpq representing active slots.
 @param [in] fpq a pointer to the flat priority queue.
 @return the size of the fpq or -1 if fpq is NULL. */
-[[nodiscard]] ptrdiff_t ccc_fpq_size(ccc_flat_priority_queue const *fpq);
+[[nodiscard]] ccc_ucount ccc_fpq_size(ccc_flat_priority_queue const *fpq);
 
 /** @brief Returns the capacity of the fpq representing total possible slots.
 @param [in] fpq a pointer to the flat priority queue.
 @return the capacity of the fpq or -1 if fpq is NULL. */
-[[nodiscard]] ptrdiff_t ccc_fpq_capacity(ccc_flat_priority_queue const *fpq);
+[[nodiscard]] ccc_ucount ccc_fpq_capacity(ccc_flat_priority_queue const *fpq);
 
 /** @brief Return a pointer to the base of the backing array. O(1).
 @param [in] fpq a pointer to the priority queue.

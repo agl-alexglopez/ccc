@@ -166,21 +166,20 @@ static perf_fn const perf_tests[] = {
     test_dynamic_insert_remove,  test_successful_find_time,
     test_fixed_insert,           test_dynamic_insert,
 };
-static ptrdiff_t const num_tests
-    = (ptrdiff_t)(sizeof(perf_tests) / sizeof(perf_tests[0]));
+static size_t const num_tests
+    = (size_t)(sizeof(perf_tests) / sizeof(perf_tests[0]));
 
-static void iota_keys(int *keys, ptrdiff_t n_keys, int start_key);
+static void iota_keys(int *keys, size_t n_keys, int start_key);
 static void *malloc_or_exit(size_t bytes);
-static bool add_overflow(int a, int b);
 static uint64_t hash_int_to_u64(int key);
 static uint64_t hash_key(ccc_user_key k);
-static ptrdiff_t n_with_load_factor(ptrdiff_t n);
+static size_t n_with_load_factor(size_t n);
 
 int
 main()
 {
     random_seed(time(NULL));
-    for (ptrdiff_t i = 0; i < num_tests; ++i)
+    for (size_t i = 0; i < num_tests; ++i)
     {
         perf_tests[i]();
     }
@@ -778,16 +777,16 @@ test_unsuccessful_find_time(void)
 /** Generates a random sequence of int keys from [start, n) on the heap. It is
 the user's responsibility to free the memory. */
 static void
-iota_keys(int *const keys, ptrdiff_t n_keys, int const start_key)
+iota_keys(int *const keys, size_t n_keys, int const start_key)
 {
-    if (n_keys < 0 || (start_key > 0 && add_overflow((int)n_keys, start_key)))
+    if (n_keys + start_key < n_keys || n_keys + start_key > INT_MAX)
     {
         (void)fprintf(stderr, "iota range exceeds range of int.\n");
         exit(1);
     }
-    for (int i = 0, key = start_key; i < n_keys; ++i, ++key)
+    for (size_t i = 0, key = start_key; i < n_keys; ++i, ++key)
     {
-        keys[i] = key;
+        keys[i] = (int)key;
     }
 }
 
@@ -801,12 +800,6 @@ malloc_or_exit(size_t bytes)
         exit(1);
     }
     return mem;
-}
-
-static inline bool
-add_overflow(int const a, int const b)
-{
-    return INT_MAX - b < a;
 }
 
 static uint64_t
@@ -828,8 +821,8 @@ hash_int_to_u64(int const key)
 /** If we pre-allocate the tables we want to test the algorithms for now under
 favorable load factors so just make it roughly 50%. This can be tuned and
 tested more later. */
-static inline ptrdiff_t
-n_with_load_factor(ptrdiff_t const n)
+static inline size_t
+n_with_load_factor(size_t const n)
 {
     return n * 3;
 }

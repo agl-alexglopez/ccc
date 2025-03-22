@@ -12,7 +12,7 @@ CHECK_BEGIN_STATIC_FN(fdeq_test_insert_three)
 {
     flat_double_ended_queue q = fdeq_init((int[3]){}, NULL, NULL, 3);
     CHECK(create_queue(&q, 3, (int[3]){0, 1, 2}), PASS);
-    CHECK(size(&q), 3);
+    CHECK(size(&q).count, 3);
     CHECK_END_FN();
 }
 
@@ -39,11 +39,11 @@ CHECK_BEGIN_STATIC_FN(fdeq_test_insert_overwrite_three)
 {
     flat_double_ended_queue q = fdeq_init((int[3]){}, NULL, NULL, 3);
     CHECK(create_queue(&q, 3, (int[3]){0, 1, 2}), PASS);
-    CHECK(size(&q), 3);
+    CHECK(size(&q).count, 3);
     (void)fdeq_push_back_range(&q, 3, (int[3]){3, 4, 5});
     CHECK(validate(&q), true);
     CHECK(check_order(&q, 3, (int[3]){3, 4, 5}), PASS);
-    CHECK(size(&q), 3);
+    CHECK(size(&q).count, 3);
     int *v = front(&q);
     CHECK(v == NULL, false);
     CHECK(*v, 3);
@@ -59,7 +59,7 @@ CHECK_BEGIN_STATIC_FN(fdeq_test_insert_overwrite_three)
     v = back(&q);
     CHECK(v == NULL, false);
     CHECK(*v, 8);
-    CHECK(size(&q), 3);
+    CHECK(size(&q).count, 3);
     (void)fdeq_push_back_range(&q, 2, (int[2]){9, 10});
     CHECK(validate(&q), true);
     CHECK(check_order(&q, 3, (int[3]){8, 9, 10}), PASS);
@@ -78,7 +78,7 @@ CHECK_BEGIN_STATIC_FN(fdeq_test_insert_overwrite_three)
     v = back(&q);
     CHECK(v == NULL, false);
     CHECK(*v, 8);
-    CHECK(size(&q), 3);
+    CHECK(size(&q).count, 3);
     CHECK_END_FN();
 }
 

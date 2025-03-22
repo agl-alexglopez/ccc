@@ -22,23 +22,23 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_erase)
     ccc_handle ent = swap_handle(&hh, &query.e);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent) != 0, true);
-    CHECK(size(&hh), 1);
+    CHECK(size(&hh).count, 1);
     ent = ccc_remove(&hh, &query.e);
     CHECK(occupied(&ent), true);
     struct val *v = hhm_at(&hh, unwrap(&ent));
     CHECK(v == NULL, true);
     CHECK(query.key, 137);
     CHECK(query.val, 99);
-    CHECK(size(&hh), 0);
+    CHECK(size(&hh).count, 0);
     query.key = 101;
     ent = ccc_remove(&hh, &query.e);
     CHECK(occupied(&ent), false);
-    CHECK(size(&hh), 0);
+    CHECK(size(&hh).count, 0);
     ccc_hhm_insert_handle_w(handle_r(&hh, &(int){137}),
                             (struct val){.key = 137, .val = 99});
-    CHECK(size(&hh), 1);
+    CHECK(size(&hh).count, 1);
     CHECK(occupied(remove_handle_r(handle_r(&hh, &(int){137}))), true);
-    CHECK(size(&hh), 0);
+    CHECK(size(&hh).count, 0);
     CHECK_END_FN();
 }
 
@@ -49,7 +49,7 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_shuffle_insert_erase)
                    std_alloc, NULL, 0);
 
     int const to_insert = 100;
-    int const larger_prime = (int)hhm_next_prime(to_insert);
+    int const larger_prime = (int)hhm_next_prime(to_insert).count;
     for (int i = 0, shuffle = larger_prime % to_insert; i < to_insert;
          ++i, shuffle = (shuffle + larger_prime) % to_insert)
     {
@@ -63,8 +63,8 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_shuffle_insert_erase)
         bool const valid = validate(&h);
         CHECK(valid, true);
     }
-    CHECK(size(&h), to_insert);
-    ptrdiff_t cur_size = size(&h);
+    CHECK(size(&h).count, to_insert);
+    size_t cur_size = size(&h).count;
     int i = 0;
     while (!is_empty(&h) && cur_size)
     {
@@ -83,10 +83,10 @@ CHECK_BEGIN_STATIC_FN(hhmap_test_shuffle_insert_erase)
         }
         --cur_size;
         ++i;
-        CHECK(size(&h), cur_size);
+        CHECK(size(&h).count, cur_size);
         CHECK(validate(&h), true);
     }
-    CHECK(size(&h), 0);
+    CHECK(size(&h).count, 0);
     CHECK_END_FN(hhm_clear_and_free(&h, NULL););
 }
 

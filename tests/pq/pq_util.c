@@ -24,32 +24,31 @@ val_update(ccc_user_type const u)
 }
 
 CHECK_BEGIN_FN(insert_shuffled, ccc_priority_queue *ppq, struct val vals[],
-               ptrdiff_t const size, int const larger_prime)
+               size_t const size, int const larger_prime)
 {
     /* Math magic ahead so that we iterate over every index
        eventually but in a shuffled order. Not necessarily
        random but a repeatable sequence that makes it
        easier to debug if something goes wrong. Think
        of the prime number as a random seed, kind of. */
-    ptrdiff_t shuffled_index = larger_prime % size;
-    for (ptrdiff_t i = 0; i < size; ++i)
+    size_t shuffled_index = larger_prime % size;
+    for (size_t i = 0; i < size; ++i)
     {
         vals[shuffled_index].val = (int)shuffled_index;
         (void)push(ppq, &vals[shuffled_index].elem);
-        CHECK(size(ppq), i + 1);
+        CHECK(size(ppq).count, i + 1);
         CHECK(validate(ppq), true);
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
-    CHECK(size(ppq), size);
+    CHECK(size(ppq).count, size);
     CHECK_END_FN();
 }
 
 /* Iterative inorder traversal to check the heap is sorted. */
-CHECK_BEGIN_FN(inorder_fill, int vals[], ptrdiff_t size,
-               ccc_priority_queue *ppq)
+CHECK_BEGIN_FN(inorder_fill, int vals[], size_t size, ccc_priority_queue *ppq)
 {
-    CHECK(size(ppq), size);
-    ptrdiff_t i = 0;
+    CHECK(size(ppq).count, size);
+    size_t i = 0;
     ccc_priority_queue copy
         = ccc_pq_init(struct val, elem, ccc_pq_order(ppq), val_cmp, NULL, NULL);
     while (!is_empty(ppq))

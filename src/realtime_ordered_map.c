@@ -489,10 +489,14 @@ ccc_rom_equal_rrange(ccc_realtime_ordered_map const *const rom,
         equal_range(rom, rbegin_key, rend_key, reverse_inorder_traversal)};
 }
 
-ptrdiff_t
+ccc_ucount
 ccc_rom_size(ccc_realtime_ordered_map const *const rom)
 {
-    return rom ? rom->sz_ : 0;
+    if (!rom)
+    {
+        return (ccc_ucount){.error = CCC_RESULT_ARG_ERROR};
+    }
+    return (ccc_ucount){.count = rom->sz_};
 }
 
 ccc_tribool
@@ -1223,7 +1227,7 @@ struct tree_range_
     struct ccc_romap_elem_ const *high;
 };
 
-static ptrdiff_t
+static size_t
 recursive_size(struct ccc_romap_ const *const rom,
                struct ccc_romap_elem_ const *const r)
 {

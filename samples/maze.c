@@ -232,9 +232,10 @@ animate_maze(struct maze *maze)
     fill_maze_with_walls(maze);
     clear_and_flush_maze(maze);
 
-    size_t const cap
+    ccc_ucount const cap
         = hhm_next_prime((((size_t)maze->rows * maze->cols) / 2) + 1);
-    size_t bytes = cap * sizeof(struct prim_cell);
+    assert(!cap.error);
+    size_t bytes = cap.count * sizeof(struct prim_cell);
     /* The priority queue will have its elements in the slots of the hash map
        for each prim cell. No allocation permission so pushing and popping is
        harmless to any other data structures or fields of the struct. */
@@ -245,7 +246,7 @@ animate_maze(struct maze *maze)
        cannot resize which would invalidate the priority queue. */
     handle_hash_map costs
         = hhm_init((struct prim_cell *)malloc(bytes), map_elem, cell,
-                   point_hash_fn, prim_cell_eq, NULL, NULL, cap);
+                   point_hash_fn, prim_cell_eq, NULL, NULL, cap.count);
     assert(hhm_data(&costs) != NULL);
     struct point s = rand_point(maze);
     handle_i first = hhm_insert_handle_w(

@@ -27,11 +27,11 @@ CHECK_BEGIN_STATIC_FN(homap_test_copy_no_alloc)
     (void)swap_handle(&src, &(struct val){.id = 0}.elem);
     (void)swap_handle(&src, &(struct val){.id = 1, .val = 1}.elem);
     (void)swap_handle(&src, &(struct val){.id = 2, .val = 2}.elem);
-    CHECK(size(&src), 3);
+    CHECK(size(&src).count, 3);
     CHECK(is_empty(&dst), true);
     ccc_result res = hom_copy(&dst, &src, NULL);
     CHECK(res, CCC_RESULT_OK);
-    CHECK(size(&dst), size(&src));
+    CHECK(size(&dst).count, size(&src).count);
     for (int i = 0; i < 3; ++i)
     {
         struct val src_v = {.id = i};
@@ -56,7 +56,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_copy_no_alloc_fail)
     (void)swap_handle(&src, &(struct val){.id = 0}.elem);
     (void)swap_handle(&src, &(struct val){.id = 1, .val = 1}.elem);
     (void)swap_handle(&src, &(struct val){.id = 2, .val = 2}.elem);
-    CHECK(size(&src), 3);
+    CHECK(size(&src).count, 3);
     CHECK(is_empty(&dst), true);
     ccc_result res = hom_copy(&dst, &src, NULL);
     CHECK(res != CCC_RESULT_OK, true);
@@ -72,11 +72,11 @@ CHECK_BEGIN_STATIC_FN(homap_test_copy_alloc)
     (void)swap_handle(&src, &(struct val){.id = 0}.elem);
     (void)swap_handle(&src, &(struct val){.id = 1, .val = 1}.elem);
     (void)swap_handle(&src, &(struct val){.id = 2, .val = 2}.elem);
-    CHECK(size(&src), 3);
+    CHECK(size(&src).count, 3);
     CHECK(is_empty(&dst), true);
     ccc_result res = hom_copy(&dst, &src, std_alloc);
     CHECK(res, CCC_RESULT_OK);
-    CHECK(size(&dst), size(&src));
+    CHECK(size(&dst).count, size(&src).count);
     for (int i = 0; i < 3; ++i)
     {
         struct val src_v = {.id = i};
@@ -104,7 +104,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_copy_alloc_fail)
     (void)swap_handle(&src, &(struct val){.id = 0}.elem);
     (void)swap_handle(&src, &(struct val){.id = 1, .val = 1}.elem);
     (void)swap_handle(&src, &(struct val){.id = 2, .val = 2}.elem);
-    CHECK(size(&src), 3);
+    CHECK(size(&src).count, 3);
     CHECK(is_empty(&dst), true);
     ccc_result res = hom_copy(&dst, &src, NULL);
     CHECK(res != CCC_RESULT_OK, true);
