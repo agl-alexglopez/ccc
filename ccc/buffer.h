@@ -199,7 +199,7 @@ size of the buffer. */
 @param [in] buf the pointer to the buffer.
 @param [in] slot the pointer to the element stored in the buffer.
 @return the index if the slot provided is within the capacity range of the
-buffer, otherwise -1. */
+buffer, otherwise an argument error is set. */
 [[nodiscard]] ccc_ucount ccc_buf_i(ccc_buffer const *buf, void const *slot);
 
 /** @brief return the final element in the buffer according the current size.
@@ -357,7 +357,8 @@ ccc_result ccc_buf_size_set(ccc_buffer *buf, size_t n);
 /** @brief return the current capacity of total possible slots.
 @param [in] buf the pointer to the buffer.
 @return the total number of elements the can be stored in the buffer. This
-value remains the same until a resize occurs. -1 if buf is NULL. */
+value remains the same until a resize occurs. An argument error is set if buf is
+NULL. */
 [[nodiscard]] ccc_ucount ccc_buf_capacity(ccc_buffer const *buf);
 
 /** @brief the size of the type being stored contiguously in the buffer.
@@ -368,7 +369,8 @@ because a zero sized object is not possible for a buffer. */
 
 /** @brief obtain the size of the buffer representing active slots.
 @param [in] buf the pointer to the buffer.
-@return the quantity of elements stored in the buffer. -1 if buf is NULL.
+@return the quantity of elements stored in the buffer. An argument error is set
+if buf is NULL.
 
 Note that size must be less than or equal to capacity. */
 [[nodiscard]] ccc_ucount ccc_buf_size(ccc_buffer const *buf);

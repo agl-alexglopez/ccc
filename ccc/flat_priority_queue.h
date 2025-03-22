@@ -367,12 +367,12 @@ Obtain state from the container. */
 
 /** @brief Returns the size of the fpq representing active slots.
 @param [in] fpq a pointer to the flat priority queue.
-@return the size of the fpq or -1 if fpq is NULL. */
+@return the size of the fpq or an argument error is set if fpq is NULL. */
 [[nodiscard]] ccc_ucount ccc_fpq_size(ccc_flat_priority_queue const *fpq);
 
 /** @brief Returns the capacity of the fpq representing total possible slots.
 @param [in] fpq a pointer to the flat priority queue.
-@return the capacity of the fpq or -1 if fpq is NULL. */
+@return the capacity of the fpq or an argument error is set if fpq is NULL. */
 [[nodiscard]] ccc_ucount ccc_fpq_capacity(ccc_flat_priority_queue const *fpq);
 
 /** @brief Return a pointer to the base of the backing array. O(1).
