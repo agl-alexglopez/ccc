@@ -165,9 +165,9 @@ else
 }
 ```
 
-Errors follow truthy and falsey principles. The index i can be used as valid if
-there is no error status (error is CCC_RESULT_OK = 0). Any non-zero error
-indicates the index i is invalid. */
+Full string explanations of the exact ccc_result error types can be provided via
+the ccc_result_msg function if the enum itself does not provide sufficient
+explanation. */
 typedef struct
 {
     /** The error that occurred indicated by a status. 0 (falsey) means OK. */
