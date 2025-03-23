@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['traits_2eh_0',['traits.h',['../traits_8h.html',1,'']]],
-  ['types_2eh_1',['types.h',['../types_8h.html',1,'']]]
+  ['singly_5flinked_5flist_2eh_0',['singly_linked_list.h',['../singly__linked__list_8h.html',1,'']]]
 ];

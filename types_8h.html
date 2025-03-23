@@ -151,6 +151,9 @@ This graph shows which files directly or indirectly include this file:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Data Structures</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structccc__ucount.html">ccc_ucount</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A type for returning an unsigned integer from a container for counting. Intended to count sizes, capacities, and 0-based indices.  <a href="structccc__ucount.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structccc__cmp.html">ccc_cmp</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">An element comparison helper.  <a href="structccc__cmp.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -173,24 +176,25 @@ Data Structures</h2></td></tr>
  }</td></tr>
 <tr class="memdesc:a80a7915df3bc36e01a3a0775eebc0938"><td class="mdescLeft">&#160;</td><td class="mdescRight">A three state boolean to allow for an error state. Error is -1, False is 0, and True is 1.  <a href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">More...</a><br /></td></tr>
 <tr class="separator:a80a7915df3bc36e01a3a0775eebc0938"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1493dc76581f8c71eb96202fb1671ae1"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a> { <br />
-&#160;&#160;<a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1afbd97cad5eb71401d7341ce5039ceb55">CCC_RESULT_OK</a> = 0
-, <a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1affee78d55817c7a0d5106e55ab66107f">CCC_RESULT_NO_ALLOC</a>
-, <a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1a162b1930618f98fd111ae5a46ddb6b29">CCC_RESULT_MEM_ERROR</a>
-, <a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1a0b3ff9dd93c87ee61e2202f76d1c2ec3">CCC_RESULT_ARG_ERROR</a>
+<tr class="memitem:a51d6f078a83d667aff5016609d9146ef"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> : uint8_t { <br />
+&#160;&#160;<a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146efafbd97cad5eb71401d7341ce5039ceb55">CCC_RESULT_OK</a> = 0
+, <a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146efadf254e921f5ceb57b494b0ab2205602e">CCC_RESULT_FAIL</a>
+, <a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146efaffee78d55817c7a0d5106e55ab66107f">CCC_RESULT_NO_ALLOC</a>
+, <a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146efa162b1930618f98fd111ae5a46ddb6b29">CCC_RESULT_MEM_ERROR</a>
 , <br />
-&#160;&#160;<a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1ac252acd054776d456a9c120df6952c28">CCC_RESULT_SIZE</a>
+&#160;&#160;<a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146efa0b3ff9dd93c87ee61e2202f76d1c2ec3">CCC_RESULT_ARG_ERROR</a>
+, <a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146efac252acd054776d456a9c120df6952c28">CCC_RESULT_SIZE</a>
 <br />
  }</td></tr>
-<tr class="memdesc:a1493dc76581f8c71eb96202fb1671ae1"><td class="mdescLeft">&#160;</td><td class="mdescRight">A result of actions on containers.  <a href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">More...</a><br /></td></tr>
-<tr class="separator:a1493dc76581f8c71eb96202fb1671ae1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9958f3004414182c457c71289303ae57"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a9958f3004414182c457c71289303ae57">ccc_threeway_cmp</a> { <a class="el" href="types_8h.html#a9958f3004414182c457c71289303ae57a813ea7b9e526748af7efa9a83da12ee8">CCC_LES</a> = -1
-, <a class="el" href="types_8h.html#a9958f3004414182c457c71289303ae57a0ab42c7e0b59a46006cbb959269db825">CCC_EQL</a>
-, <a class="el" href="types_8h.html#a9958f3004414182c457c71289303ae57a60a4aec1f589eaad4a9e922d90501dce">CCC_GRT</a>
-, <a class="el" href="types_8h.html#a9958f3004414182c457c71289303ae57aeb06615eaca93d73f4086fed1fcd524c">CCC_CMP_ERROR</a>
+<tr class="memdesc:a51d6f078a83d667aff5016609d9146ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">A result of actions on containers.  <a href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">More...</a><br /></td></tr>
+<tr class="separator:a51d6f078a83d667aff5016609d9146ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afa7f5d9756840807860490d28e345955"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#afa7f5d9756840807860490d28e345955">ccc_threeway_cmp</a> : int8_t { <a class="el" href="types_8h.html#afa7f5d9756840807860490d28e345955a813ea7b9e526748af7efa9a83da12ee8">CCC_LES</a> = -1
+, <a class="el" href="types_8h.html#afa7f5d9756840807860490d28e345955a0ab42c7e0b59a46006cbb959269db825">CCC_EQL</a>
+, <a class="el" href="types_8h.html#afa7f5d9756840807860490d28e345955a60a4aec1f589eaad4a9e922d90501dce">CCC_GRT</a>
+, <a class="el" href="types_8h.html#afa7f5d9756840807860490d28e345955aeb06615eaca93d73f4086fed1fcd524c">CCC_CMP_ERROR</a>
  }</td></tr>
-<tr class="memdesc:a9958f3004414182c457c71289303ae57"><td class="mdescLeft">&#160;</td><td class="mdescRight">A three-way comparison for comparison functions.  <a href="types_8h.html#a9958f3004414182c457c71289303ae57">More...</a><br /></td></tr>
-<tr class="separator:a9958f3004414182c457c71289303ae57"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memdesc:afa7f5d9756840807860490d28e345955"><td class="mdescLeft">&#160;</td><td class="mdescRight">A three-way comparison for comparison functions.  <a href="types_8h.html#afa7f5d9756840807860490d28e345955">More...</a><br /></td></tr>
+<tr class="separator:afa7f5d9756840807860490d28e345955"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3bf43522fb22e6e499ea327fecf35c55"><td class="memItemLeft" align="right" valign="top">typedef union ccc_range_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a3bf43522fb22e6e499ea327fecf35c55">ccc_range</a></td></tr>
 <tr class="memdesc:a3bf43522fb22e6e499ea327fecf35c55"><td class="mdescLeft">&#160;</td><td class="mdescRight">The result of a range query on iterable containers.  <br /></td></tr>
 <tr class="separator:a3bf43522fb22e6e499ea327fecf35c55"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -206,16 +210,16 @@ Data Structures</h2></td></tr>
 <tr class="memitem:a3802af9257ee4d2f9df5409bae63f0a7"><td class="memItemLeft" align="right" valign="top">typedef union ccc_handle_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a3802af9257ee4d2f9df5409bae63f0a7">ccc_handle</a></td></tr>
 <tr class="memdesc:a3802af9257ee4d2f9df5409bae63f0a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">An Occupied or Vacant handle to a flat searchable container entry.  <br /></td></tr>
 <tr class="separator:a3802af9257ee4d2f9df5409bae63f0a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a76289e01c10817251a059f5aeac79fa5"><td class="memItemLeft" align="right" valign="top">typedef ptrdiff_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a76289e01c10817251a059f5aeac79fa5">ccc_handle_i</a></td></tr>
-<tr class="memdesc:a76289e01c10817251a059f5aeac79fa5"><td class="mdescLeft">&#160;</td><td class="mdescRight">A stable index to user data in a container that uses a flat array as the underlying storage method.  <br /></td></tr>
-<tr class="separator:a76289e01c10817251a059f5aeac79fa5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a39d707127c6bb25cb76587203582743c"><td class="memItemLeft" align="right" valign="top">typedef size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a39d707127c6bb25cb76587203582743c">ccc_handle_i</a></td></tr>
+<tr class="memdesc:a39d707127c6bb25cb76587203582743c"><td class="mdescLeft">&#160;</td><td class="mdescRight">A stable index to user data in a container that uses a flat array as the underlying storage method.  <br /></td></tr>
+<tr class="separator:a39d707127c6bb25cb76587203582743c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a546d4339d75e7b144c85d3e54a841c1b"><td class="memItemLeft" align="right" valign="top">typedef enum ccc_entry_status_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a546d4339d75e7b144c85d3e54a841c1b">ccc_handle_status</a></td></tr>
 <tr class="memdesc:a546d4339d75e7b144c85d3e54a841c1b"><td class="mdescLeft">&#160;</td><td class="mdescRight">The status monitoring and handle state once it is obtained.  <br /></td></tr>
 <tr class="separator:a546d4339d75e7b144c85d3e54a841c1b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8be6e2d1b150a5b77b2eba5ae85764f2"><td class="memItemLeft" align="right" valign="top">typedef void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a>(void *ptr, size_t size, void *aux)</td></tr>
 <tr class="memdesc:a8be6e2d1b150a5b77b2eba5ae85764f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">An allocation function at the core of all containers.  <br /></td></tr>
 <tr class="separator:a8be6e2d1b150a5b77b2eba5ae85764f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a78ab7f61b1a36b2f31c2289bd6236231"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="types_8h.html#a9958f3004414182c457c71289303ae57">ccc_threeway_cmp</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a78ab7f61b1a36b2f31c2289bd6236231">ccc_cmp_fn</a>(<a class="el" href="structccc__cmp.html">ccc_cmp</a>)</td></tr>
+<tr class="memitem:a78ab7f61b1a36b2f31c2289bd6236231"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="types_8h.html#afa7f5d9756840807860490d28e345955">ccc_threeway_cmp</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a78ab7f61b1a36b2f31c2289bd6236231">ccc_cmp_fn</a>(<a class="el" href="structccc__cmp.html">ccc_cmp</a>)</td></tr>
 <tr class="memdesc:a78ab7f61b1a36b2f31c2289bd6236231"><td class="mdescLeft">&#160;</td><td class="mdescRight">A callback function for comparing two elements in a container.  <br /></td></tr>
 <tr class="separator:a78ab7f61b1a36b2f31c2289bd6236231"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a15cf33ea819ae97e1cfdcaf1d55a99b0"><td class="memItemLeft" align="right" valign="top">typedef void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a15cf33ea819ae97e1cfdcaf1d55a99b0">ccc_update_fn</a>(<a class="el" href="structccc__user__type.html">ccc_user_type</a>)</td></tr>
@@ -227,7 +231,7 @@ Data Structures</h2></td></tr>
 <tr class="memitem:aa9748f72f95727528cdc40d9e9672a0f"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#aa9748f72f95727528cdc40d9e9672a0f">ccc_key_eq_fn</a>(<a class="el" href="structccc__key__cmp.html">ccc_key_cmp</a>)</td></tr>
 <tr class="memdesc:aa9748f72f95727528cdc40d9e9672a0f"><td class="mdescLeft">&#160;</td><td class="mdescRight">A callback function to determining equality between two stored keys.  <br /></td></tr>
 <tr class="separator:aa9748f72f95727528cdc40d9e9672a0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8097dd574e739c360d2fa2d3e5de70db"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="types_8h.html#a9958f3004414182c457c71289303ae57">ccc_threeway_cmp</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a8097dd574e739c360d2fa2d3e5de70db">ccc_key_cmp_fn</a>(<a class="el" href="structccc__key__cmp.html">ccc_key_cmp</a>)</td></tr>
+<tr class="memitem:a8097dd574e739c360d2fa2d3e5de70db"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="types_8h.html#afa7f5d9756840807860490d28e345955">ccc_threeway_cmp</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a8097dd574e739c360d2fa2d3e5de70db">ccc_key_cmp_fn</a>(<a class="el" href="structccc__key__cmp.html">ccc_key_cmp</a>)</td></tr>
 <tr class="memdesc:a8097dd574e739c360d2fa2d3e5de70db"><td class="mdescLeft">&#160;</td><td class="mdescRight">A callback function for three-way comparing two stored keys.  <br /></td></tr>
 <tr class="separator:a8097dd574e739c360d2fa2d3e5de70db"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0c4ef0c8c3c49edd91423242e6f3a09e"><td class="memItemLeft" align="right" valign="top">typedef uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a0c4ef0c8c3c49edd91423242e6f3a09e">ccc_hash_fn</a>(<a class="el" href="structccc__user__key.html">ccc_user_key</a> to_hash)</td></tr>
@@ -258,7 +262,7 @@ Data Structures</h2></td></tr>
 <tr class="memitem:a44a8e92eafb1e9f3e1b10827ccd89a36"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a44a8e92eafb1e9f3e1b10827ccd89a36">ccc_handle_input_error</a> (<a class="el" href="types_8h.html#a3802af9257ee4d2f9df5409bae63f0a7">ccc_handle</a> const *e)</td></tr>
 <tr class="memdesc:a44a8e92eafb1e9f3e1b10827ccd89a36"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determine if an input error has occurred for a function that generates an handle.  <br /></td></tr>
 <tr class="separator:a44a8e92eafb1e9f3e1b10827ccd89a36"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a65515660962ba0e6e82a63a8b80eade9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a76289e01c10817251a059f5aeac79fa5">ccc_handle_i</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a65515660962ba0e6e82a63a8b80eade9">ccc_handle_unwrap</a> (<a class="el" href="types_8h.html#a3802af9257ee4d2f9df5409bae63f0a7">ccc_handle</a> const *e)</td></tr>
+<tr class="memitem:a65515660962ba0e6e82a63a8b80eade9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a39d707127c6bb25cb76587203582743c">ccc_handle_i</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a65515660962ba0e6e82a63a8b80eade9">ccc_handle_unwrap</a> (<a class="el" href="types_8h.html#a3802af9257ee4d2f9df5409bae63f0a7">ccc_handle</a> const *e)</td></tr>
 <tr class="memdesc:a65515660962ba0e6e82a63a8b80eade9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unwraps the provided handle providing a reference to the user type obtained from the operation that provides the handle.  <br /></td></tr>
 <tr class="separator:a65515660962ba0e6e82a63a8b80eade9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -281,7 +285,7 @@ Data Structures</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Status Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Functions for obtaining more descriptive status information. </p>
 </td></tr>
-<tr class="memitem:a0e9964d90c381797ba6ce9d76ad1f63a"><td class="memItemLeft" align="right" valign="top">char const *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a0e9964d90c381797ba6ce9d76ad1f63a">ccc_result_msg</a> (<a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a> res)</td></tr>
+<tr class="memitem:a0e9964d90c381797ba6ce9d76ad1f63a"><td class="memItemLeft" align="right" valign="top">char const *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a0e9964d90c381797ba6ce9d76ad1f63a">ccc_result_msg</a> (<a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> res)</td></tr>
 <tr class="memdesc:a0e9964d90c381797ba6ce9d76ad1f63a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain a string message with a description of the error returned from a container operation, possible causes, and possible fixes to such error.  <br /></td></tr>
 <tr class="separator:a0e9964d90c381797ba6ce9d76ad1f63a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae903680190e65b29c45401e76e9fcf85"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a8d823fb6d9cdbebc760e8cde231ed859">ccc_entry_status</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#ae903680190e65b29c45401e76e9fcf85">ccc_get_entry_status</a> (<a class="el" href="types_8h.html#a70feefd55fafc84e06d2f2a1dfd4f389">ccc_entry</a> const *e)</td></tr>
@@ -352,7 +356,7 @@ Data Structures</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="types_8h.html#a9958f3004414182c457c71289303ae57">ccc_threeway_cmp</a> ccc_cmp_fn(<a class="el" href="structccc__cmp.html">ccc_cmp</a>)</td>
+          <td class="memname">typedef <a class="el" href="types_8h.html#afa7f5d9756840807860490d28e345955">ccc_threeway_cmp</a> ccc_cmp_fn(<a class="el" href="structccc__cmp.html">ccc_cmp</a>)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -430,14 +434,14 @@ Data Structures</h2></td></tr>
 
 </div>
 </div>
-<a id="a76289e01c10817251a059f5aeac79fa5" name="a76289e01c10817251a059f5aeac79fa5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a76289e01c10817251a059f5aeac79fa5">&#9670;&#160;</a></span>ccc_handle_i</h2>
+<a id="a39d707127c6bb25cb76587203582743c" name="a39d707127c6bb25cb76587203582743c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a39d707127c6bb25cb76587203582743c">&#9670;&#160;</a></span>ccc_handle_i</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef ptrdiff_t <a class="el" href="types_8h.html#a76289e01c10817251a059f5aeac79fa5">ccc_handle_i</a></td>
+          <td class="memname">typedef size_t <a class="el" href="types_8h.html#a39d707127c6bb25cb76587203582743c">ccc_handle_i</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -489,7 +493,7 @@ Data Structures</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="types_8h.html#a9958f3004414182c457c71289303ae57">ccc_threeway_cmp</a> ccc_key_cmp_fn(<a class="el" href="structccc__key__cmp.html">ccc_key_cmp</a>)</td>
+          <td class="memname">typedef <a class="el" href="types_8h.html#afa7f5d9756840807860490d28e345955">ccc_threeway_cmp</a> ccc_key_cmp_fn(<a class="el" href="structccc__key__cmp.html">ccc_key_cmp</a>)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -568,14 +572,14 @@ Data Structures</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Enumeration Type Documentation</h2>
-<a id="a1493dc76581f8c71eb96202fb1671ae1" name="a1493dc76581f8c71eb96202fb1671ae1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1493dc76581f8c71eb96202fb1671ae1">&#9670;&#160;</a></span>ccc_result</h2>
+<a id="a51d6f078a83d667aff5016609d9146ef" name="a51d6f078a83d667aff5016609d9146ef"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a51d6f078a83d667aff5016609d9146ef">&#9670;&#160;</a></span>ccc_result</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">enum <a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a></td>
+          <td class="memname">enum <a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> : uint8_t</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -583,28 +587,30 @@ Data Structures</h2></td></tr>
 <p>A result of actions on containers. </p>
 <p>A result indicates the status of the requested operation. Each container provides status messages according to the result type returned from a operation that uses this type. </p>
 <table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a1493dc76581f8c71eb96202fb1671ae1afbd97cad5eb71401d7341ce5039ceb55" name="a1493dc76581f8c71eb96202fb1671ae1afbd97cad5eb71401d7341ce5039ceb55"></a>CCC_RESULT_OK&#160;</td><td class="fielddoc"><p>The operation has occurred without error. </p>
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a51d6f078a83d667aff5016609d9146efafbd97cad5eb71401d7341ce5039ceb55" name="a51d6f078a83d667aff5016609d9146efafbd97cad5eb71401d7341ce5039ceb55"></a>CCC_RESULT_OK&#160;</td><td class="fielddoc"><p>The operation has occurred successfully. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a1493dc76581f8c71eb96202fb1671ae1affee78d55817c7a0d5106e55ab66107f" name="a1493dc76581f8c71eb96202fb1671ae1affee78d55817c7a0d5106e55ab66107f"></a>CCC_RESULT_NO_ALLOC&#160;</td><td class="fielddoc"><p>Memory is needed but the container lacks allocation permission. </p>
+<tr><td class="fieldname"><a id="a51d6f078a83d667aff5016609d9146efadf254e921f5ceb57b494b0ab2205602e" name="a51d6f078a83d667aff5016609d9146efadf254e921f5ceb57b494b0ab2205602e"></a>CCC_RESULT_FAIL&#160;</td><td class="fielddoc"><p>An operation ran but could not return the intended result. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a1493dc76581f8c71eb96202fb1671ae1a162b1930618f98fd111ae5a46ddb6b29" name="a1493dc76581f8c71eb96202fb1671ae1a162b1930618f98fd111ae5a46ddb6b29"></a>CCC_RESULT_MEM_ERROR&#160;</td><td class="fielddoc"><p>The container has allocation permission, but allocation failed. </p>
+<tr><td class="fieldname"><a id="a51d6f078a83d667aff5016609d9146efaffee78d55817c7a0d5106e55ab66107f" name="a51d6f078a83d667aff5016609d9146efaffee78d55817c7a0d5106e55ab66107f"></a>CCC_RESULT_NO_ALLOC&#160;</td><td class="fielddoc"><p>Memory is needed but the container lacks allocation permission. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a1493dc76581f8c71eb96202fb1671ae1a0b3ff9dd93c87ee61e2202f76d1c2ec3" name="a1493dc76581f8c71eb96202fb1671ae1a0b3ff9dd93c87ee61e2202f76d1c2ec3"></a>CCC_RESULT_ARG_ERROR&#160;</td><td class="fielddoc"><p>Bad arguments have been provided to an operation. </p>
+<tr><td class="fieldname"><a id="a51d6f078a83d667aff5016609d9146efa162b1930618f98fd111ae5a46ddb6b29" name="a51d6f078a83d667aff5016609d9146efa162b1930618f98fd111ae5a46ddb6b29"></a>CCC_RESULT_MEM_ERROR&#160;</td><td class="fielddoc"><p>The container has allocation permission, but allocation failed. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a1493dc76581f8c71eb96202fb1671ae1ac252acd054776d456a9c120df6952c28" name="a1493dc76581f8c71eb96202fb1671ae1ac252acd054776d456a9c120df6952c28"></a>CCC_RESULT_SIZE&#160;</td><td class="fielddoc"><p>Internal helper, never returned to user. Always last result. </p>
+<tr><td class="fieldname"><a id="a51d6f078a83d667aff5016609d9146efa0b3ff9dd93c87ee61e2202f76d1c2ec3" name="a51d6f078a83d667aff5016609d9146efa0b3ff9dd93c87ee61e2202f76d1c2ec3"></a>CCC_RESULT_ARG_ERROR&#160;</td><td class="fielddoc"><p>Bad arguments have been provided and operation returned early. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a51d6f078a83d667aff5016609d9146efac252acd054776d456a9c120df6952c28" name="a51d6f078a83d667aff5016609d9146efac252acd054776d456a9c120df6952c28"></a>CCC_RESULT_SIZE&#160;</td><td class="fielddoc"><p>Internal helper, never returned to user. Always last result. </p>
 </td></tr>
 </table>
 
 </div>
 </div>
-<a id="a9958f3004414182c457c71289303ae57" name="a9958f3004414182c457c71289303ae57"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9958f3004414182c457c71289303ae57">&#9670;&#160;</a></span>ccc_threeway_cmp</h2>
+<a id="afa7f5d9756840807860490d28e345955" name="afa7f5d9756840807860490d28e345955"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afa7f5d9756840807860490d28e345955">&#9670;&#160;</a></span>ccc_threeway_cmp</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">enum <a class="el" href="types_8h.html#a9958f3004414182c457c71289303ae57">ccc_threeway_cmp</a></td>
+          <td class="memname">enum <a class="el" href="types_8h.html#afa7f5d9756840807860490d28e345955">ccc_threeway_cmp</a> : int8_t</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -612,13 +618,13 @@ Data Structures</h2></td></tr>
 <p>A three-way comparison for comparison functions. </p>
 <p>A C style three way comparison value (e.g. ((a &gt; b) - (a &lt; b))). CCC_LES if left hand side is less than right hand side, CCC_EQL if they are equal, and CCC_GRT if left hand side is greater than right hand side. </p>
 <table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a9958f3004414182c457c71289303ae57a813ea7b9e526748af7efa9a83da12ee8" name="a9958f3004414182c457c71289303ae57a813ea7b9e526748af7efa9a83da12ee8"></a>CCC_LES&#160;</td><td class="fielddoc"><p>The left hand side is less than the right hand side. </p>
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="afa7f5d9756840807860490d28e345955a813ea7b9e526748af7efa9a83da12ee8" name="afa7f5d9756840807860490d28e345955a813ea7b9e526748af7efa9a83da12ee8"></a>CCC_LES&#160;</td><td class="fielddoc"><p>The left hand side is less than the right hand side. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a9958f3004414182c457c71289303ae57a0ab42c7e0b59a46006cbb959269db825" name="a9958f3004414182c457c71289303ae57a0ab42c7e0b59a46006cbb959269db825"></a>CCC_EQL&#160;</td><td class="fielddoc"><p>The left hand side and right hand side are equal. </p>
+<tr><td class="fieldname"><a id="afa7f5d9756840807860490d28e345955a0ab42c7e0b59a46006cbb959269db825" name="afa7f5d9756840807860490d28e345955a0ab42c7e0b59a46006cbb959269db825"></a>CCC_EQL&#160;</td><td class="fielddoc"><p>The left hand side and right hand side are equal. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a9958f3004414182c457c71289303ae57a60a4aec1f589eaad4a9e922d90501dce" name="a9958f3004414182c457c71289303ae57a60a4aec1f589eaad4a9e922d90501dce"></a>CCC_GRT&#160;</td><td class="fielddoc"><p>The left hand side is greater than the right hand side. </p>
+<tr><td class="fieldname"><a id="afa7f5d9756840807860490d28e345955a60a4aec1f589eaad4a9e922d90501dce" name="afa7f5d9756840807860490d28e345955a60a4aec1f589eaad4a9e922d90501dce"></a>CCC_GRT&#160;</td><td class="fielddoc"><p>The left hand side is greater than the right hand side. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a9958f3004414182c457c71289303ae57aeb06615eaca93d73f4086fed1fcd524c" name="a9958f3004414182c457c71289303ae57aeb06615eaca93d73f4086fed1fcd524c"></a>CCC_CMP_ERROR&#160;</td><td class="fielddoc"><p>Comparison is not possible or other error has occurred. </p>
+<tr><td class="fieldname"><a id="afa7f5d9756840807860490d28e345955aeb06615eaca93d73f4086fed1fcd524c" name="afa7f5d9756840807860490d28e345955aeb06615eaca93d73f4086fed1fcd524c"></a>CCC_CMP_ERROR&#160;</td><td class="fielddoc"><p>Comparison is not possible or other error has occurred. </p>
 </td></tr>
 </table>
 
@@ -1014,7 +1020,7 @@ Data Structures</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a76289e01c10817251a059f5aeac79fa5">ccc_handle_i</a> ccc_handle_unwrap </td>
+          <td class="memname"><a class="el" href="types_8h.html#a39d707127c6bb25cb76587203582743c">ccc_handle_i</a> ccc_handle_unwrap </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="types_8h.html#a3802af9257ee4d2f9df5409bae63f0a7">ccc_handle</a> const *&#160;</td>
           <td class="paramname"><em>e</em></td><td>)</td>
@@ -1100,7 +1106,7 @@ Data Structures</h2></td></tr>
         <tr>
           <td class="memname">char const  * ccc_result_msg </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td>
           <td class="paramname"><em>res</em></td><td>)</td>
           <td></td>
         </tr>

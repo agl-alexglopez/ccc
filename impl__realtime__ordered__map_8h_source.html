@@ -114,7 +114,7 @@ $(document).ready(function(){initNavTree('impl__realtime__ordered__map_8h_source
 <div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>{</div>
 <div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>    <span class="keyword">struct </span>ccc_romap_elem_ *root_;</div>
 <div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>    <span class="keyword">struct </span>ccc_romap_elem_ end_;</div>
-<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>    ptrdiff_t sz_;</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>    <span class="keywordtype">size_t</span> sz_;</div>
 <div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>    <span class="keywordtype">size_t</span> key_offset_;</div>
 <div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>    <span class="keywordtype">size_t</span> node_elem_offset_;</div>
 <div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>    <span class="keywordtype">size_t</span> elem_sz_;</div>
@@ -126,7 +126,7 @@ $(document).ready(function(){initNavTree('impl__realtime__ordered__map_8h_source
 <div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span><span class="keyword">struct </span>ccc_rtree_entry_</div>
 <div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>{</div>
 <div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>    <span class="keyword">struct </span>ccc_romap_ *rom_;</div>
-<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>    <a class="code hl_enumeration" href="types_8h.html#a9958f3004414182c457c71289303ae57">ccc_threeway_cmp</a> last_cmp_;</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>    <a class="code hl_enumeration" href="types_8h.html#afa7f5d9756840807860490d28e345955">ccc_threeway_cmp</a> last_cmp_;</div>
 <div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>    <span class="keyword">struct </span>ccc_ent_ entry_;</div>
 <div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>};</div>
 <div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span> </div>
@@ -144,7 +144,7 @@ $(document).ready(function(){initNavTree('impl__realtime__ordered__map_8h_source
 <div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>                                           <span class="keywordtype">void</span> <span class="keyword">const</span> *key);</div>
 <div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span><span class="keywordtype">void</span> *ccc_impl_rom_insert(<span class="keyword">struct</span> ccc_romap_ *rom,</div>
 <div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>                          <span class="keyword">struct</span> ccc_romap_elem_ *parent,</div>
-<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>                          <a class="code hl_enumeration" href="types_8h.html#a9958f3004414182c457c71289303ae57">ccc_threeway_cmp</a> last_cmp,</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>                          <a class="code hl_enumeration" href="types_8h.html#afa7f5d9756840807860490d28e345955">ccc_threeway_cmp</a> last_cmp,</div>
 <div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>                          <span class="keyword">struct</span> ccc_romap_elem_ *out_handle);</div>
 <div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span> </div>
 <div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span><span class="comment">/*==========================   Initialization     ===========================*/</span></div>
@@ -368,9 +368,9 @@ $(document).ready(function(){initNavTree('impl__realtime__ordered__map_8h_source
 <div class="line"><a id="l00293" name="l00293"></a><span class="lineno">  293</span><span class="comment">/* NOLINTEND(readability-identifier-naming) */</span></div>
 <div class="line"><a id="l00294" name="l00294"></a><span class="lineno">  294</span> </div>
 <div class="line"><a id="l00295" name="l00295"></a><span class="lineno">  295</span><span class="preprocessor">#endif </span><span class="comment">/* CCC_IMPL_REALTIME__ORDERED_MAP_H */</span><span class="preprocessor"></span></div>
-<div class="ttc" id="atypes_8h_html_a8097dd574e739c360d2fa2d3e5de70db"><div class="ttname"><a href="types_8h.html#a8097dd574e739c360d2fa2d3e5de70db">ccc_key_cmp_fn</a></div><div class="ttdeci">ccc_threeway_cmp ccc_key_cmp_fn(ccc_key_cmp)</div><div class="ttdoc">A callback function for three-way comparing two stored keys.</div><div class="ttdef"><b>Definition:</b> types.h:301</div></div>
-<div class="ttc" id="atypes_8h_html_a8be6e2d1b150a5b77b2eba5ae85764f2"><div class="ttname"><a href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a></div><div class="ttdeci">void * ccc_alloc_fn(void *ptr, size_t size, void *aux)</div><div class="ttdoc">An allocation function at the core of all containers.</div><div class="ttdef"><b>Definition:</b> types.h:251</div></div>
-<div class="ttc" id="atypes_8h_html_a9958f3004414182c457c71289303ae57"><div class="ttname"><a href="types_8h.html#a9958f3004414182c457c71289303ae57">ccc_threeway_cmp</a></div><div class="ttdeci">ccc_threeway_cmp</div><div class="ttdoc">A three-way comparison for comparison functions.</div><div class="ttdef"><b>Definition:</b> types.h:136</div></div>
+<div class="ttc" id="atypes_8h_html_a8097dd574e739c360d2fa2d3e5de70db"><div class="ttname"><a href="types_8h.html#a8097dd574e739c360d2fa2d3e5de70db">ccc_key_cmp_fn</a></div><div class="ttdeci">ccc_threeway_cmp ccc_key_cmp_fn(ccc_key_cmp)</div><div class="ttdoc">A callback function for three-way comparing two stored keys.</div><div class="ttdef"><b>Definition:</b> types.h:333</div></div>
+<div class="ttc" id="atypes_8h_html_a8be6e2d1b150a5b77b2eba5ae85764f2"><div class="ttname"><a href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a></div><div class="ttdeci">void * ccc_alloc_fn(void *ptr, size_t size, void *aux)</div><div class="ttdoc">An allocation function at the core of all containers.</div><div class="ttdef"><b>Definition:</b> types.h:283</div></div>
+<div class="ttc" id="atypes_8h_html_afa7f5d9756840807860490d28e345955"><div class="ttname"><a href="types_8h.html#afa7f5d9756840807860490d28e345955">ccc_threeway_cmp</a></div><div class="ttdeci">ccc_threeway_cmp</div><div class="ttdoc">A three-way comparison for comparison functions.</div><div class="ttdef"><b>Definition:</b> types.h:138</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

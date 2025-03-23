@@ -106,11 +106,11 @@ $(document).ready(function(){initNavTree('impl__handle__realtime__ordered__map_8
 <div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span> </div>
 <div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="keyword">struct </span>ccc_hromap_elem_</div>
 <div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>{</div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>    ptrdiff_t branch_[2]; </div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>    <span class="keywordtype">size_t</span> branch_[2]; </div>
 <div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>    <span class="keyword">union</span></div>
 <div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>    {</div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>        ptrdiff_t parent_;    </div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>        ptrdiff_t next_free_; </div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>        <span class="keywordtype">size_t</span> parent_;    </div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>        <span class="keywordtype">size_t</span> next_free_; </div>
 <div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>    };</div>
 <div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>    uint8_t parity_; </div>
 <div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>};</div>
@@ -118,8 +118,8 @@ $(document).ready(function(){initNavTree('impl__handle__realtime__ordered__map_8
 <div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span><span class="keyword">struct </span>ccc_hromap_</div>
 <div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>{</div>
 <div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>    <a class="code hl_typedef" href="buffer_8h.html#a7d8dfe1437e87b31e7f5522d85080aba">ccc_buffer</a> buf_;          </div>
-<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>    ptrdiff_t root_;          </div>
-<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>    ptrdiff_t free_list_;     </div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>    <span class="keywordtype">size_t</span> root_;             </div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>    <span class="keywordtype">size_t</span> free_list_;        </div>
 <div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>    <span class="keywordtype">size_t</span> key_offset_;       </div>
 <div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>    <span class="keywordtype">size_t</span> node_elem_offset_; </div>
 <div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>    <a class="code hl_typedef" href="types_8h.html#a8097dd574e739c360d2fa2d3e5de70db">ccc_key_cmp_fn</a> *cmp_;     </div>
@@ -128,7 +128,7 @@ $(document).ready(function(){initNavTree('impl__handle__realtime__ordered__map_8
 <div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span><span class="keyword">struct </span>ccc_hrtree_handle_</div>
 <div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>{</div>
 <div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>    <span class="keyword">struct </span>ccc_hromap_ *hrm_;   </div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>    <a class="code hl_enumeration" href="types_8h.html#a9958f3004414182c457c71289303ae57">ccc_threeway_cmp</a> last_cmp_; </div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>    <a class="code hl_enumeration" href="types_8h.html#afa7f5d9756840807860490d28e345955">ccc_threeway_cmp</a> last_cmp_; </div>
 <div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>    <span class="keyword">struct </span>ccc_handl_ handle_;  </div>
 <div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>};</div>
 <div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span> </div>
@@ -139,14 +139,14 @@ $(document).ready(function(){initNavTree('impl__handle__realtime__ordered__map_8
 <div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span> </div>
 <div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span><span class="comment">/*========================  Private Interface  ==============================*/</span></div>
 <div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span> </div>
-<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span><span class="keywordtype">void</span> *ccc_impl_hrm_key_at(<span class="keyword">struct</span> ccc_hromap_ <span class="keyword">const</span> *hrm, ptrdiff_t slot);</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span><span class="keywordtype">void</span> *ccc_impl_hrm_key_at(<span class="keyword">struct</span> ccc_hromap_ <span class="keyword">const</span> *hrm, <span class="keywordtype">size_t</span> slot);</div>
 <div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span><span class="keyword">struct </span>ccc_hromap_elem_ *ccc_impl_hrm_elem_at(<span class="keyword">struct</span> ccc_hromap_ <span class="keyword">const</span> *hrm,</div>
-<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>                                              ptrdiff_t i);</div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>                                              <span class="keywordtype">size_t</span> i);</div>
 <div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span><span class="keyword">struct </span>ccc_hrtree_handle_ ccc_impl_hrm_handle(struct ccc_hromap_ const *hrm,</div>
 <div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>                                              <span class="keywordtype">void</span> <span class="keyword">const</span> *key);</div>
-<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span><span class="keywordtype">void</span> ccc_impl_hrm_insert(<span class="keyword">struct</span> ccc_hromap_ *hrm, ptrdiff_t parent_i,</div>
-<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>                         <a class="code hl_enumeration" href="types_8h.html#a9958f3004414182c457c71289303ae57">ccc_threeway_cmp</a> last_cmp, ptrdiff_t elem_i);</div>
-<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>ptrdiff_t ccc_impl_hrm_alloc_slot(<span class="keyword">struct</span> ccc_hromap_ *hrm);</div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span><span class="keywordtype">void</span> ccc_impl_hrm_insert(<span class="keyword">struct</span> ccc_hromap_ *hrm, <span class="keywordtype">size_t</span> parent_i,</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>                         <a class="code hl_enumeration" href="types_8h.html#afa7f5d9756840807860490d28e345955">ccc_threeway_cmp</a> last_cmp, <span class="keywordtype">size_t</span> elem_i);</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span><span class="keywordtype">size_t</span> ccc_impl_hrm_alloc_slot(<span class="keyword">struct</span> ccc_hromap_ *hrm);</div>
 <div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span> </div>
 <div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span><span class="comment">/*=========================      Initialization     =========================*/</span></div>
 <div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span> </div>
@@ -369,8 +369,8 @@ $(document).ready(function(){initNavTree('impl__handle__realtime__ordered__map_8
 <div class="line"><a id="l00301" name="l00301"></a><span class="lineno">  301</span> </div>
 <div class="line"><a id="l00302" name="l00302"></a><span class="lineno">  302</span><span class="preprocessor">#endif </span><span class="comment">/* IMPL_HANDLE_REALTIME_ORDERED_MAP_H */</span><span class="preprocessor"></span></div>
 <div class="ttc" id="abuffer_8h_html_a7d8dfe1437e87b31e7f5522d85080aba"><div class="ttname"><a href="buffer_8h.html#a7d8dfe1437e87b31e7f5522d85080aba">ccc_buffer</a></div><div class="ttdeci">struct ccc_buf_ ccc_buffer</div><div class="ttdoc">A contiguous block of storage for elements of the same type.</div><div class="ttdef"><b>Definition:</b> buffer.h:50</div></div>
-<div class="ttc" id="atypes_8h_html_a8097dd574e739c360d2fa2d3e5de70db"><div class="ttname"><a href="types_8h.html#a8097dd574e739c360d2fa2d3e5de70db">ccc_key_cmp_fn</a></div><div class="ttdeci">ccc_threeway_cmp ccc_key_cmp_fn(ccc_key_cmp)</div><div class="ttdoc">A callback function for three-way comparing two stored keys.</div><div class="ttdef"><b>Definition:</b> types.h:301</div></div>
-<div class="ttc" id="atypes_8h_html_a9958f3004414182c457c71289303ae57"><div class="ttname"><a href="types_8h.html#a9958f3004414182c457c71289303ae57">ccc_threeway_cmp</a></div><div class="ttdeci">ccc_threeway_cmp</div><div class="ttdoc">A three-way comparison for comparison functions.</div><div class="ttdef"><b>Definition:</b> types.h:136</div></div>
+<div class="ttc" id="atypes_8h_html_a8097dd574e739c360d2fa2d3e5de70db"><div class="ttname"><a href="types_8h.html#a8097dd574e739c360d2fa2d3e5de70db">ccc_key_cmp_fn</a></div><div class="ttdeci">ccc_threeway_cmp ccc_key_cmp_fn(ccc_key_cmp)</div><div class="ttdoc">A callback function for three-way comparing two stored keys.</div><div class="ttdef"><b>Definition:</b> types.h:333</div></div>
+<div class="ttc" id="atypes_8h_html_afa7f5d9756840807860490d28e345955"><div class="ttname"><a href="types_8h.html#afa7f5d9756840807860490d28e345955">ccc_threeway_cmp</a></div><div class="ttdeci">ccc_threeway_cmp</div><div class="ttdoc">A three-way comparison for comparison functions.</div><div class="ttdef"><b>Definition:</b> types.h:138</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

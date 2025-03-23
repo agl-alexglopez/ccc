@@ -18,7 +18,7 @@ var singly__linked__list_8h =
     [ "ccc_sll_next", "singly__linked__list_8h.html#ab4724b83877b5582774c6f5d138edf6a", null ],
     [ "ccc_sll_pop_front", "singly__linked__list_8h.html#a2924476c4e07b64703ba579e9126ff7b", null ],
     [ "ccc_sll_push_front", "singly__linked__list_8h.html#a20652f3d5f4e73dd77b3490c7534a54b", null ],
-    [ "ccc_sll_size", "singly__linked__list_8h.html#a7ba7890c8f514248e56ffaf4ada0b01d", null ],
+    [ "ccc_sll_size", "singly__linked__list_8h.html#a69a89032d3cb969e8a83fc46f9bffc86", null ],
     [ "ccc_sll_splice", "singly__linked__list_8h.html#afbf05230243224dbf4d344e852f1cce9", null ],
     [ "ccc_sll_splice_range", "singly__linked__list_8h.html#a0a78d6739651c7609a0dc73b7e367062", null ],
     [ "ccc_sll_validate", "singly__linked__list_8h.html#a3c21cb36d9902c7db16a4ecf8c23a6e7", null ]

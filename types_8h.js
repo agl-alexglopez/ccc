@@ -1,5 +1,6 @@
 var types_8h =
 [
+    [ "ccc_ucount", "structccc__ucount.html", "structccc__ucount" ],
     [ "ccc_cmp", "structccc__cmp.html", "structccc__cmp" ],
     [ "ccc_key_cmp", "structccc__key__cmp.html", "structccc__key__cmp" ],
     [ "ccc_user_type", "structccc__user__type.html", "structccc__user__type" ],
@@ -10,7 +11,7 @@ var types_8h =
     [ "ccc_entry", "types_8h.html#a70feefd55fafc84e06d2f2a1dfd4f389", null ],
     [ "ccc_entry_status", "types_8h.html#a8d823fb6d9cdbebc760e8cde231ed859", null ],
     [ "ccc_handle", "types_8h.html#a3802af9257ee4d2f9df5409bae63f0a7", null ],
-    [ "ccc_handle_i", "types_8h.html#a76289e01c10817251a059f5aeac79fa5", null ],
+    [ "ccc_handle_i", "types_8h.html#a39d707127c6bb25cb76587203582743c", null ],
     [ "ccc_handle_status", "types_8h.html#a546d4339d75e7b144c85d3e54a841c1b", null ],
     [ "ccc_hash_fn", "types_8h.html#a0c4ef0c8c3c49edd91423242e6f3a09e", null ],
     [ "ccc_key_cmp_fn", "types_8h.html#a8097dd574e739c360d2fa2d3e5de70db", null ],
@@ -18,18 +19,19 @@ var types_8h =
     [ "ccc_range", "types_8h.html#a3bf43522fb22e6e499ea327fecf35c55", null ],
     [ "ccc_rrange", "types_8h.html#abbe513ff2fb6678559bcbe22e5faca65", null ],
     [ "ccc_update_fn", "types_8h.html#a15cf33ea819ae97e1cfdcaf1d55a99b0", null ],
-    [ "ccc_result", "types_8h.html#a1493dc76581f8c71eb96202fb1671ae1", [
-      [ "CCC_RESULT_OK", "types_8h.html#a1493dc76581f8c71eb96202fb1671ae1afbd97cad5eb71401d7341ce5039ceb55", null ],
-      [ "CCC_RESULT_NO_ALLOC", "types_8h.html#a1493dc76581f8c71eb96202fb1671ae1affee78d55817c7a0d5106e55ab66107f", null ],
-      [ "CCC_RESULT_MEM_ERROR", "types_8h.html#a1493dc76581f8c71eb96202fb1671ae1a162b1930618f98fd111ae5a46ddb6b29", null ],
-      [ "CCC_RESULT_ARG_ERROR", "types_8h.html#a1493dc76581f8c71eb96202fb1671ae1a0b3ff9dd93c87ee61e2202f76d1c2ec3", null ],
-      [ "CCC_RESULT_SIZE", "types_8h.html#a1493dc76581f8c71eb96202fb1671ae1ac252acd054776d456a9c120df6952c28", null ]
+    [ "ccc_result", "types_8h.html#a51d6f078a83d667aff5016609d9146ef", [
+      [ "CCC_RESULT_OK", "types_8h.html#a51d6f078a83d667aff5016609d9146efafbd97cad5eb71401d7341ce5039ceb55", null ],
+      [ "CCC_RESULT_FAIL", "types_8h.html#a51d6f078a83d667aff5016609d9146efadf254e921f5ceb57b494b0ab2205602e", null ],
+      [ "CCC_RESULT_NO_ALLOC", "types_8h.html#a51d6f078a83d667aff5016609d9146efaffee78d55817c7a0d5106e55ab66107f", null ],
+      [ "CCC_RESULT_MEM_ERROR", "types_8h.html#a51d6f078a83d667aff5016609d9146efa162b1930618f98fd111ae5a46ddb6b29", null ],
+      [ "CCC_RESULT_ARG_ERROR", "types_8h.html#a51d6f078a83d667aff5016609d9146efa0b3ff9dd93c87ee61e2202f76d1c2ec3", null ],
+      [ "CCC_RESULT_SIZE", "types_8h.html#a51d6f078a83d667aff5016609d9146efac252acd054776d456a9c120df6952c28", null ]
     ] ],
-    [ "ccc_threeway_cmp", "types_8h.html#a9958f3004414182c457c71289303ae57", [
-      [ "CCC_LES", "types_8h.html#a9958f3004414182c457c71289303ae57a813ea7b9e526748af7efa9a83da12ee8", null ],
-      [ "CCC_EQL", "types_8h.html#a9958f3004414182c457c71289303ae57a0ab42c7e0b59a46006cbb959269db825", null ],
-      [ "CCC_GRT", "types_8h.html#a9958f3004414182c457c71289303ae57a60a4aec1f589eaad4a9e922d90501dce", null ],
-      [ "CCC_CMP_ERROR", "types_8h.html#a9958f3004414182c457c71289303ae57aeb06615eaca93d73f4086fed1fcd524c", null ]
+    [ "ccc_threeway_cmp", "types_8h.html#afa7f5d9756840807860490d28e345955", [
+      [ "CCC_LES", "types_8h.html#afa7f5d9756840807860490d28e345955a813ea7b9e526748af7efa9a83da12ee8", null ],
+      [ "CCC_EQL", "types_8h.html#afa7f5d9756840807860490d28e345955a0ab42c7e0b59a46006cbb959269db825", null ],
+      [ "CCC_GRT", "types_8h.html#afa7f5d9756840807860490d28e345955a60a4aec1f589eaad4a9e922d90501dce", null ],
+      [ "CCC_CMP_ERROR", "types_8h.html#afa7f5d9756840807860490d28e345955aeb06615eaca93d73f4086fed1fcd524c", null ]
     ] ],
     [ "ccc_tribool", "types_8h.html#a80a7915df3bc36e01a3a0775eebc0938", [
       [ "CCC_TRIBOOL_ERROR", "types_8h.html#a80a7915df3bc36e01a3a0775eebc0938a0623aa032ce1d7c2a903cbda6cd39187", null ],

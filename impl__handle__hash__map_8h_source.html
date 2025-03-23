@@ -112,7 +112,7 @@ $(document).ready(function(){initNavTree('impl__handle__hash__map_8h_source.html
 <div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span><span class="keyword">struct </span>ccc_hhmap_elem_</div>
 <div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>{</div>
 <div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>    uint64_t hash_;</div>
-<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>    ptrdiff_t slot_i_;</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>    <span class="keywordtype">size_t</span> slot_i_;</div>
 <div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>};</div>
 <div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span> </div>
 <div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span><span class="keyword">struct </span>ccc_hhmap_</div>
@@ -138,14 +138,14 @@ $(document).ready(function(){initNavTree('impl__handle__hash__map_8h_source.html
 <div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span> </div>
 <div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span><span class="comment">/*======================       Private Interface    =========================*/</span></div>
 <div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span> </div>
-<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span><a class="code hl_typedef" href="types_8h.html#a76289e01c10817251a059f5aeac79fa5">ccc_handle_i</a> ccc_impl_hhm_insert_meta(<span class="keyword">struct</span> ccc_hhmap_ *h, uint64_t hash,</div>
-<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>                                      ptrdiff_t cur_i);</div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span><a class="code hl_typedef" href="types_8h.html#a39d707127c6bb25cb76587203582743c">ccc_handle_i</a> ccc_impl_hhm_insert_meta(<span class="keyword">struct</span> ccc_hhmap_ *h, uint64_t hash,</div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>                                      <span class="keywordtype">size_t</span> cur_i);</div>
 <div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span><span class="keyword">struct </span>ccc_hhash_handle_ ccc_impl_hhm_handle(struct ccc_hhmap_ *h,</div>
 <div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>                                             <span class="keywordtype">void</span> <span class="keyword">const</span> *key);</div>
-<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span><span class="keywordtype">void</span> *ccc_impl_hhm_key_at(<span class="keyword">struct</span> ccc_hhmap_ <span class="keyword">const</span> *h, ptrdiff_t i);</div>
-<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>uint64_t *ccc_impl_hhm_hash_at(<span class="keyword">struct</span> ccc_hhmap_ <span class="keyword">const</span> *h, ptrdiff_t i);</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span><span class="keywordtype">void</span> *ccc_impl_hhm_key_at(<span class="keyword">struct</span> ccc_hhmap_ <span class="keyword">const</span> *h, <span class="keywordtype">size_t</span> i);</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>uint64_t *ccc_impl_hhm_hash_at(<span class="keyword">struct</span> ccc_hhmap_ <span class="keyword">const</span> *h, <span class="keywordtype">size_t</span> i);</div>
 <div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span><span class="keyword">struct </span>ccc_hhmap_elem_ *ccc_impl_hhm_elem_at(<span class="keyword">struct</span> ccc_hhmap_ <span class="keyword">const</span> *h,</div>
-<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>                                             ptrdiff_t i);</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>                                             <span class="keywordtype">size_t</span> i);</div>
 <div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span> </div>
 <div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span><span class="comment">/*======================    Macro Implementations     =======================*/</span></div>
 <div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span> </div>
@@ -166,7 +166,7 @@ $(document).ready(function(){initNavTree('impl__handle__hash__map_8h_source.html
 <div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span> </div>
 <div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span><span class="preprocessor">#define ccc_impl_hhm_swaps(swap_handle, lazy_key_value...)                     \</span></div>
 <div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span><span class="preprocessor">    (__extension__({                                                           \</span></div>
-<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span><span class="preprocessor">        ptrdiff_t hhm_i_ = (swap_handle)-&gt;handle_.i_;                          \</span></div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span><span class="preprocessor">        size_t hhm_i_ = (swap_handle)-&gt;handle_.i_;                             \</span></div>
 <div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span><span class="preprocessor">        struct ccc_hhmap_elem_ *hhm_elem_                                      \</span></div>
 <div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span><span class="preprocessor">            = ccc_impl_hhm_elem_at((swap_handle)-&gt;h_, hhm_i_);                 \</span></div>
 <div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span><span class="preprocessor">        if (hhm_elem_-&gt;hash_ == CCC_HHM_EMPTY)                                 \</span></div>
@@ -402,9 +402,9 @@ $(document).ready(function(){initNavTree('impl__handle__hash__map_8h_source.html
 <div class="line"><a id="l00340" name="l00340"></a><span class="lineno">  340</span> </div>
 <div class="line"><a id="l00341" name="l00341"></a><span class="lineno">  341</span><span class="preprocessor">#endif </span><span class="comment">/* CCC_IMPL_HANDLE_HASH_MAP_H */</span><span class="preprocessor"></span></div>
 <div class="ttc" id="abuffer_8h_html_a7d8dfe1437e87b31e7f5522d85080aba"><div class="ttname"><a href="buffer_8h.html#a7d8dfe1437e87b31e7f5522d85080aba">ccc_buffer</a></div><div class="ttdeci">struct ccc_buf_ ccc_buffer</div><div class="ttdoc">A contiguous block of storage for elements of the same type.</div><div class="ttdef"><b>Definition:</b> buffer.h:50</div></div>
-<div class="ttc" id="atypes_8h_html_a0c4ef0c8c3c49edd91423242e6f3a09e"><div class="ttname"><a href="types_8h.html#a0c4ef0c8c3c49edd91423242e6f3a09e">ccc_hash_fn</a></div><div class="ttdeci">uint64_t ccc_hash_fn(ccc_user_key to_hash)</div><div class="ttdoc">A callback function to hash the key type used in a container.</div><div class="ttdef"><b>Definition:</b> types.h:307</div></div>
-<div class="ttc" id="atypes_8h_html_a76289e01c10817251a059f5aeac79fa5"><div class="ttname"><a href="types_8h.html#a76289e01c10817251a059f5aeac79fa5">ccc_handle_i</a></div><div class="ttdeci">ptrdiff_t ccc_handle_i</div><div class="ttdoc">A stable index to user data in a container that uses a flat array as the underlying storage method.</div><div class="ttdef"><b>Definition:</b> types.h:78</div></div>
-<div class="ttc" id="atypes_8h_html_aa9748f72f95727528cdc40d9e9672a0f"><div class="ttname"><a href="types_8h.html#aa9748f72f95727528cdc40d9e9672a0f">ccc_key_eq_fn</a></div><div class="ttdeci">ccc_tribool ccc_key_eq_fn(ccc_key_cmp)</div><div class="ttdoc">A callback function to determining equality between two stored keys.</div><div class="ttdef"><b>Definition:</b> types.h:294</div></div>
+<div class="ttc" id="atypes_8h_html_a0c4ef0c8c3c49edd91423242e6f3a09e"><div class="ttname"><a href="types_8h.html#a0c4ef0c8c3c49edd91423242e6f3a09e">ccc_hash_fn</a></div><div class="ttdeci">uint64_t ccc_hash_fn(ccc_user_key to_hash)</div><div class="ttdoc">A callback function to hash the key type used in a container.</div><div class="ttdef"><b>Definition:</b> types.h:339</div></div>
+<div class="ttc" id="atypes_8h_html_a39d707127c6bb25cb76587203582743c"><div class="ttname"><a href="types_8h.html#a39d707127c6bb25cb76587203582743c">ccc_handle_i</a></div><div class="ttdeci">size_t ccc_handle_i</div><div class="ttdoc">A stable index to user data in a container that uses a flat array as the underlying storage method.</div><div class="ttdef"><b>Definition:</b> types.h:78</div></div>
+<div class="ttc" id="atypes_8h_html_aa9748f72f95727528cdc40d9e9672a0f"><div class="ttname"><a href="types_8h.html#aa9748f72f95727528cdc40d9e9672a0f">ccc_key_eq_fn</a></div><div class="ttdeci">ccc_tribool ccc_key_eq_fn(ccc_key_cmp)</div><div class="ttdoc">A callback function to determining equality between two stored keys.</div><div class="ttdef"><b>Definition:</b> types.h:326</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

@@ -39,7 +39,7 @@ var ordered__map_8h =
     [ "ccc_om_remove_entry", "ordered__map_8h.html#af5dca5e6fb2c76ab960b64b4a1bfec9b", null ],
     [ "ccc_om_rend", "ordered__map_8h.html#a29368f1e1b994e651944b6b8af91b6f3", null ],
     [ "ccc_om_rnext", "ordered__map_8h.html#a3445d6c77b955cfa167451bce0c4b6f6", null ],
-    [ "ccc_om_size", "ordered__map_8h.html#a6baf022181f74bf0a22859c80c0a8cc0", null ],
+    [ "ccc_om_size", "ordered__map_8h.html#a35750d263680c0e4a6c18bcd18e921fb", null ],
     [ "ccc_om_swap_entry", "ordered__map_8h.html#ad9696efa20e34d7207e2cd68f45a2c35", null ],
     [ "ccc_om_try_insert", "ordered__map_8h.html#a045be328ffa0c57713f35148fe53bc57", null ],
     [ "ccc_om_unwrap", "ordered__map_8h.html#a79150aec716cb6b3fc214e902e80bd46", null ],

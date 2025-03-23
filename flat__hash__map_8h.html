@@ -130,7 +130,7 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memitem:a1b4c379aff04eb239f15349f58d17b50"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a1b4c379aff04eb239f15349f58d17b50">ccc_fhm_init</a>(memory_ptr,  fhash_elem_field,  key_field,  hash_fn,  key_eq_fn,  alloc_fn,  aux_data,  capacity)</td></tr>
 <tr class="memdesc:a1b4c379aff04eb239f15349f58d17b50"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a map with a buffer of types at compile time or runtime.  <br /></td></tr>
 <tr class="separator:a1b4c379aff04eb239f15349f58d17b50"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7940f9fa1e22af3e8090fca1d5ae4767"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a7940f9fa1e22af3e8090fca1d5ae4767">ccc_fhm_copy</a> (<a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> *dst, <a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> const *src, <a class="el" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a> *fn)</td></tr>
+<tr class="memitem:a7940f9fa1e22af3e8090fca1d5ae4767"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a7940f9fa1e22af3e8090fca1d5ae4767">ccc_fhm_copy</a> (<a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> *dst, <a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> const *src, <a class="el" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a> *fn)</td></tr>
 <tr class="memdesc:a7940f9fa1e22af3e8090fca1d5ae4767"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy the map at source to destination.  <br /></td></tr>
 <tr class="separator:a7940f9fa1e22af3e8090fca1d5ae4767"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -239,10 +239,10 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Deallocation Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Destroy the container. </p>
 </td></tr>
-<tr class="memitem:a9780e594ae08d8bf0b6b6764a40cfde5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a9780e594ae08d8bf0b6b6764a40cfde5">ccc_fhm_clear</a> (<a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> *h, <a class="el" href="types_8h.html#aa2bb6262f220473dc47f4c73711a6ec5">ccc_destructor_fn</a> *fn)</td></tr>
+<tr class="memitem:a9780e594ae08d8bf0b6b6764a40cfde5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a9780e594ae08d8bf0b6b6764a40cfde5">ccc_fhm_clear</a> (<a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> *h, <a class="el" href="types_8h.html#aa2bb6262f220473dc47f4c73711a6ec5">ccc_destructor_fn</a> *fn)</td></tr>
 <tr class="memdesc:a9780e594ae08d8bf0b6b6764a40cfde5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Frees all slots in the table for use without affecting capacity.  <br /></td></tr>
 <tr class="separator:a9780e594ae08d8bf0b6b6764a40cfde5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a400afaaa4b1e374dd1eb01bd1f9428f5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a400afaaa4b1e374dd1eb01bd1f9428f5">ccc_fhm_clear_and_free</a> (<a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> *h, <a class="el" href="types_8h.html#aa2bb6262f220473dc47f4c73711a6ec5">ccc_destructor_fn</a> *fn)</td></tr>
+<tr class="memitem:a400afaaa4b1e374dd1eb01bd1f9428f5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a400afaaa4b1e374dd1eb01bd1f9428f5">ccc_fhm_clear_and_free</a> (<a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> *h, <a class="el" href="types_8h.html#aa2bb6262f220473dc47f4c73711a6ec5">ccc_destructor_fn</a> *fn)</td></tr>
 <tr class="memdesc:a400afaaa4b1e374dd1eb01bd1f9428f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Frees all slots in the table and frees the underlying buffer.  <br /></td></tr>
 <tr class="separator:a400afaaa4b1e374dd1eb01bd1f9428f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -265,15 +265,15 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memitem:a42427fab615a1366b09a518931c73434"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a42427fab615a1366b09a518931c73434">ccc_fhm_is_empty</a> (<a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> const *h)</td></tr>
 <tr class="memdesc:a42427fab615a1366b09a518931c73434"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size status of the table.  <br /></td></tr>
 <tr class="separator:a42427fab615a1366b09a518931c73434"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad3e27b1c38fb078c0954c5fe4dae94d4"><td class="memItemLeft" align="right" valign="top">ptrdiff_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#ad3e27b1c38fb078c0954c5fe4dae94d4">ccc_fhm_size</a> (<a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> const *h)</td></tr>
-<tr class="memdesc:ad3e27b1c38fb078c0954c5fe4dae94d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size of the table representing active slots.  <br /></td></tr>
-<tr class="separator:ad3e27b1c38fb078c0954c5fe4dae94d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac92b49727f23ba4afe7c38eb672b1c3d"><td class="memItemLeft" align="right" valign="top">ptrdiff_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#ac92b49727f23ba4afe7c38eb672b1c3d">ccc_fhm_next_prime</a> (ptrdiff_t n)</td></tr>
-<tr class="memdesc:ac92b49727f23ba4afe7c38eb672b1c3d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Helper to find a prime number if needed.  <br /></td></tr>
-<tr class="separator:ac92b49727f23ba4afe7c38eb672b1c3d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a09b0c6c89a6c8d04907518fda040a19e"><td class="memItemLeft" align="right" valign="top">ptrdiff_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a09b0c6c89a6c8d04907518fda040a19e">ccc_fhm_capacity</a> (<a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> const *h)</td></tr>
-<tr class="memdesc:a09b0c6c89a6c8d04907518fda040a19e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the full capacity of the backing storage.  <br /></td></tr>
-<tr class="separator:a09b0c6c89a6c8d04907518fda040a19e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7e48bf928c47a2a974d5ca7e98e51aad"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a7e48bf928c47a2a974d5ca7e98e51aad">ccc_fhm_size</a> (<a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> const *h)</td></tr>
+<tr class="memdesc:a7e48bf928c47a2a974d5ca7e98e51aad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size of the table representing active slots.  <br /></td></tr>
+<tr class="separator:a7e48bf928c47a2a974d5ca7e98e51aad"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a14204213a0f8812e7f8fd602200f422a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a14204213a0f8812e7f8fd602200f422a">ccc_fhm_next_prime</a> (size_t n)</td></tr>
+<tr class="memdesc:a14204213a0f8812e7f8fd602200f422a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Helper to find a prime number if needed.  <br /></td></tr>
+<tr class="separator:a14204213a0f8812e7f8fd602200f422a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac09ee8b33c9f3e2d98d010185557e070"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#ac09ee8b33c9f3e2d98d010185557e070">ccc_fhm_capacity</a> (<a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> const *h)</td></tr>
+<tr class="memdesc:ac09ee8b33c9f3e2d98d010185557e070"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the full capacity of the backing storage.  <br /></td></tr>
+<tr class="separator:ac09ee8b33c9f3e2d98d010185557e070"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afa2b797b90c223882d91781d56f3351e"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#afa2b797b90c223882d91781d56f3351e">ccc_fhm_data</a> (<a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> const *h)</td></tr>
 <tr class="memdesc:afa2b797b90c223882d91781d56f3351e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a reference to the base of backing array. O(1).  <br /></td></tr>
 <tr class="separator:afa2b797b90c223882d91781d56f3351e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1046,14 +1046,14 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="a09b0c6c89a6c8d04907518fda040a19e" name="a09b0c6c89a6c8d04907518fda040a19e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a09b0c6c89a6c8d04907518fda040a19e">&#9670;&#160;</a></span>ccc_fhm_capacity()</h2>
+<a id="ac09ee8b33c9f3e2d98d010185557e070" name="ac09ee8b33c9f3e2d98d010185557e070"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac09ee8b33c9f3e2d98d010185557e070">&#9670;&#160;</a></span>ccc_fhm_capacity()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">ptrdiff_t ccc_fhm_capacity </td>
+          <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_fhm_capacity </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> const *&#160;</td>
           <td class="paramname"><em>h</em></td><td>)</td>
@@ -1069,7 +1069,7 @@ This graph shows which files directly or indirectly include this file:</div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the capacity of the map or -1 if h is NULL. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the capacity of the map or an argument error is set if h is NULL. </dd></dl>
 
 </div>
 </div>
@@ -1080,7 +1080,7 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a> ccc_fhm_clear </td>
+          <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_fhm_clear </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> *&#160;</td>
           <td class="paramname"><em>h</em>, </td>
@@ -1118,7 +1118,7 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a> ccc_fhm_clear_and_free </td>
+          <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_fhm_clear_and_free </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> *&#160;</td>
           <td class="paramname"><em>h</em>, </td>
@@ -1194,7 +1194,7 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a> ccc_fhm_copy </td>
+          <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_fhm_copy </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> *&#160;</td>
           <td class="paramname"><em>dst</em>, </td>
@@ -1246,8 +1246,8 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="line"><span class="keyword">static</span> flat_hash_map dst</div>
 <div class="line">    = fhm_init((<span class="keyword">static</span> <span class="keyword">struct</span> val[13]){}, e, key, fhmap_int_to_u64,</div>
 <div class="line">               fhmap_id_eq, NULL, NULL, 13);</div>
-<div class="line"><a class="code hl_enumeration" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a> res = fhm_copy(&amp;dst, &amp;src, NULL);</div>
-<div class="ttc" id="atypes_8h_html_a1493dc76581f8c71eb96202fb1671ae1"><div class="ttname"><a href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a></div><div class="ttdeci">ccc_result</div><div class="ttdoc">A result of actions on containers.</div><div class="ttdef"><b>Definition:</b> types.h:117</div></div>
+<div class="line"><a class="code hl_enumeration" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> res = fhm_copy(&amp;dst, &amp;src, NULL);</div>
+<div class="ttc" id="atypes_8h_html_a51d6f078a83d667aff5016609d9146ef"><div class="ttname"><a href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a></div><div class="ttdeci">ccc_result</div><div class="ttdoc">A result of actions on containers.</div><div class="ttdef"><b>Definition:</b> types.h:117</div></div>
 </div><!-- fragment --><p>The above requires dst capacity be greater than or equal to src capacity. Here is memory management handed over to the copy function.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_HASH_MAP_USING_NAMESPACE_CCC</span></div>
 <div class="line"><span class="keyword">struct </span>val</div>
@@ -1263,7 +1263,7 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="line"><span class="keyword">static</span> flat_hash_map dst</div>
 <div class="line">    = fhm_init((<span class="keyword">struct</span> val*)NULL, e, key, fhmap_int_to_u64, fhmap_id_eq,</div>
 <div class="line">               NULL, NULL, 0);</div>
-<div class="line"><a class="code hl_enumeration" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a> res = fhm_copy(&amp;dst, &amp;src, std_alloc);</div>
+<div class="line"><a class="code hl_enumeration" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> res = fhm_copy(&amp;dst, &amp;src, std_alloc);</div>
 </div><!-- fragment --><p>The above allows dst to have a capacity less than that of the src as long as copy has been provided an allocation function to resize dst. Note that this would still work if copying to a destination that the user wants as a fixed size map.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_HASH_MAP_USING_NAMESPACE_CCC</span></div>
 <div class="line"><span class="keyword">struct </span>val</div>
@@ -1279,7 +1279,7 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="line"><span class="keyword">static</span> flat_hash_map dst</div>
 <div class="line">    = fhm_init((<span class="keyword">struct</span> val*)NULL, e, key, fhmap_int_to_u64, fhmap_id_eq,</div>
 <div class="line">               NULL, NULL, 0);</div>
-<div class="line"><a class="code hl_enumeration" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a> res = fhm_copy(&amp;dst, &amp;src, std_alloc);</div>
+<div class="line"><a class="code hl_enumeration" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> res = fhm_copy(&amp;dst, &amp;src, std_alloc);</div>
 </div><!-- fragment --><p>The above sets up dst with fixed size while src is a dynamic map. Because an allocation function is provided, the dst is resized once for the copy and retains its fixed size after the copy is complete. This would require the user to manually free the underlying buffer at dst eventually if this method is used. Usually it is better to allocate the memory explicitly before the copy if copying between maps without allocation permission.</p>
 <p>These options allow users to stay consistent across containers with their memory management strategies. </p>
 
@@ -1622,16 +1622,16 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="ac92b49727f23ba4afe7c38eb672b1c3d" name="ac92b49727f23ba4afe7c38eb672b1c3d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac92b49727f23ba4afe7c38eb672b1c3d">&#9670;&#160;</a></span>ccc_fhm_next_prime()</h2>
+<a id="a14204213a0f8812e7f8fd602200f422a" name="a14204213a0f8812e7f8fd602200f422a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a14204213a0f8812e7f8fd602200f422a">&#9670;&#160;</a></span>ccc_fhm_next_prime()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">ptrdiff_t ccc_fhm_next_prime </td>
+          <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_fhm_next_prime </td>
           <td>(</td>
-          <td class="paramtype">ptrdiff_t&#160;</td>
+          <td class="paramtype">size_t&#160;</td>
           <td class="paramname"><em>n</em></td><td>)</td>
           <td></td>
         </tr>
@@ -1782,14 +1782,14 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="ad3e27b1c38fb078c0954c5fe4dae94d4" name="ad3e27b1c38fb078c0954c5fe4dae94d4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad3e27b1c38fb078c0954c5fe4dae94d4">&#9670;&#160;</a></span>ccc_fhm_size()</h2>
+<a id="a7e48bf928c47a2a974d5ca7e98e51aad" name="a7e48bf928c47a2a974d5ca7e98e51aad"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7e48bf928c47a2a974d5ca7e98e51aad">&#9670;&#160;</a></span>ccc_fhm_size()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">ptrdiff_t ccc_fhm_size </td>
+          <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_fhm_size </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> const *&#160;</td>
           <td class="paramname"><em>h</em></td><td>)</td>
@@ -1805,7 +1805,7 @@ This graph shows which files directly or indirectly include this file:</div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the size of the map or -1 if h is NULL. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the size of the map or an argument error is set if h is NULL. </dd></dl>
 
 </div>
 </div>

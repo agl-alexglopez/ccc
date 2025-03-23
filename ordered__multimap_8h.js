@@ -43,7 +43,7 @@ var ordered__multimap_8h =
     [ "ccc_omm_remove_entry", "ordered__multimap_8h.html#a9ae4bdac07cf7c71c7cf5f67d7e7064d", null ],
     [ "ccc_omm_rend", "ordered__multimap_8h.html#a681598607b150e97a02957a4b64fdadb", null ],
     [ "ccc_omm_rnext", "ordered__multimap_8h.html#a1941cffa5bf8db8a2eb153c320e0a5be", null ],
-    [ "ccc_omm_size", "ordered__multimap_8h.html#a5fbea131995ea6313e2d4605a711569f", null ],
+    [ "ccc_omm_size", "ordered__multimap_8h.html#a8c00336b8ed2319a72e964f166b19e0a", null ],
     [ "ccc_omm_swap_entry", "ordered__multimap_8h.html#a9c9762b1829080b63eeeb15c1708bf63", null ],
     [ "ccc_omm_try_insert", "ordered__multimap_8h.html#a9e43551d709dfd5300936783bbc92e32", null ],
     [ "ccc_omm_unwrap", "ordered__multimap_8h.html#acf6b118b83a25331821664a38fc12666", null ],

@@ -257,10 +257,10 @@ N).  <br /></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Push and Pop Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>An interface to enhance the priority queue capabilities of a multimap. </p>
 </td></tr>
-<tr class="memitem:ad5808788286dbf7b29238feb25279427"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#ad5808788286dbf7b29238feb25279427">ccc_omm_pop_max</a> (<a class="el" href="ordered__multimap_8h.html#a4b628da74816b31db9f9de347f80acb5">ccc_ordered_multimap</a> *mm)</td></tr>
+<tr class="memitem:ad5808788286dbf7b29238feb25279427"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#ad5808788286dbf7b29238feb25279427">ccc_omm_pop_max</a> (<a class="el" href="ordered__multimap_8h.html#a4b628da74816b31db9f9de347f80acb5">ccc_ordered_multimap</a> *mm)</td></tr>
 <tr class="memdesc:ad5808788286dbf7b29238feb25279427"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pops the oldest maximum key value user type from the map. Elements are stored in ascending order, smallest as defined by the comparison function is min and largest is max. Amortized O(lg N).  <br /></td></tr>
 <tr class="separator:ad5808788286dbf7b29238feb25279427"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab705e30e50374c6127d0e22e60d177d8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#ab705e30e50374c6127d0e22e60d177d8">ccc_omm_pop_min</a> (<a class="el" href="ordered__multimap_8h.html#a4b628da74816b31db9f9de347f80acb5">ccc_ordered_multimap</a> *mm)</td></tr>
+<tr class="memitem:ab705e30e50374c6127d0e22e60d177d8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#ab705e30e50374c6127d0e22e60d177d8">ccc_omm_pop_min</a> (<a class="el" href="ordered__multimap_8h.html#a4b628da74816b31db9f9de347f80acb5">ccc_ordered_multimap</a> *mm)</td></tr>
 <tr class="memdesc:ab705e30e50374c6127d0e22e60d177d8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pops the oldest minimum element from the map. Elements are stored in ascending order, smallest as defined by the comparison function is min and largest is max. Amortized O(lg N).  <br /></td></tr>
 <tr class="separator:ab705e30e50374c6127d0e22e60d177d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a66717e7a67dc331ec1db7ff041439abb"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#a66717e7a67dc331ec1db7ff041439abb">ccc_omm_max</a> (<a class="el" href="ordered__multimap_8h.html#a4b628da74816b31db9f9de347f80acb5">ccc_ordered_multimap</a> *mm)</td></tr>
@@ -285,7 +285,7 @@ N).  <br /></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Deallocation Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Deallocate the container. </p>
 </td></tr>
-<tr class="memitem:ae82b53c6b679358bb217f58dd46c5ee6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#ae82b53c6b679358bb217f58dd46c5ee6">ccc_omm_clear</a> (<a class="el" href="ordered__multimap_8h.html#a4b628da74816b31db9f9de347f80acb5">ccc_ordered_multimap</a> *mm, <a class="el" href="types_8h.html#aa2bb6262f220473dc47f4c73711a6ec5">ccc_destructor_fn</a> *destructor)</td></tr>
+<tr class="memitem:ae82b53c6b679358bb217f58dd46c5ee6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#ae82b53c6b679358bb217f58dd46c5ee6">ccc_omm_clear</a> (<a class="el" href="ordered__multimap_8h.html#a4b628da74816b31db9f9de347f80acb5">ccc_ordered_multimap</a> *mm, <a class="el" href="types_8h.html#aa2bb6262f220473dc47f4c73711a6ec5">ccc_destructor_fn</a> *destructor)</td></tr>
 <tr class="memdesc:ae82b53c6b679358bb217f58dd46c5ee6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pops every element from the map calling destructor if destructor is non-NULL. O(N).  <br /></td></tr>
 <tr class="separator:ae82b53c6b679358bb217f58dd46c5ee6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -295,9 +295,9 @@ N).  <br /></td></tr>
 <tr class="memitem:af9fa4dab99e4146082dc5d19f44f6af1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#af9fa4dab99e4146082dc5d19f44f6af1">ccc_omm_is_empty</a> (<a class="el" href="ordered__multimap_8h.html#a4b628da74816b31db9f9de347f80acb5">ccc_ordered_multimap</a> const *mm)</td></tr>
 <tr class="memdesc:af9fa4dab99e4146082dc5d19f44f6af1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if the multimap is empty. O(1).  <br /></td></tr>
 <tr class="separator:af9fa4dab99e4146082dc5d19f44f6af1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5fbea131995ea6313e2d4605a711569f"><td class="memItemLeft" align="right" valign="top">ptrdiff_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#a5fbea131995ea6313e2d4605a711569f">ccc_omm_size</a> (<a class="el" href="ordered__multimap_8h.html#a4b628da74816b31db9f9de347f80acb5">ccc_ordered_multimap</a> const *mm)</td></tr>
-<tr class="memdesc:a5fbea131995ea6313e2d4605a711569f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size of the multimap. O(1).  <br /></td></tr>
-<tr class="separator:a5fbea131995ea6313e2d4605a711569f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8c00336b8ed2319a72e964f166b19e0a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#a8c00336b8ed2319a72e964f166b19e0a">ccc_omm_size</a> (<a class="el" href="ordered__multimap_8h.html#a4b628da74816b31db9f9de347f80acb5">ccc_ordered_multimap</a> const *mm)</td></tr>
+<tr class="memdesc:a8c00336b8ed2319a72e964f166b19e0a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size of the multimap. O(1).  <br /></td></tr>
+<tr class="separator:a8c00336b8ed2319a72e964f166b19e0a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5965c868804f6b7cbf52204ed42ebaad"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#a5965c868804f6b7cbf52204ed42ebaad">ccc_omm_validate</a> (<a class="el" href="ordered__multimap_8h.html#a4b628da74816b31db9f9de347f80acb5">ccc_ordered_multimap</a> const *mm)</td></tr>
 <tr class="memdesc:a5965c868804f6b7cbf52204ed42ebaad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if the multimap is empty.  <br /></td></tr>
 <tr class="separator:a5965c868804f6b7cbf52204ed42ebaad"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -931,7 +931,7 @@ N).  <br /></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a> ccc_omm_clear </td>
+          <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_omm_clear </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="ordered__multimap_8h.html#a4b628da74816b31db9f9de347f80acb5">ccc_ordered_multimap</a> *&#160;</td>
           <td class="paramname"><em>mm</em>, </td>
@@ -1703,7 +1703,7 @@ N). </p>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a> ccc_omm_pop_max </td>
+          <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_omm_pop_max </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="ordered__multimap_8h.html#a4b628da74816b31db9f9de347f80acb5">ccc_ordered_multimap</a> *&#160;</td>
           <td class="paramname"><em>mm</em></td><td>)</td>
@@ -1731,7 +1731,7 @@ N). </p>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a> ccc_omm_pop_min </td>
+          <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_omm_pop_min </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="ordered__multimap_8h.html#a4b628da74816b31db9f9de347f80acb5">ccc_ordered_multimap</a> *&#160;</td>
           <td class="paramname"><em>mm</em></td><td>)</td>
@@ -1912,14 +1912,14 @@ N). </p>
 
 </div>
 </div>
-<a id="a5fbea131995ea6313e2d4605a711569f" name="a5fbea131995ea6313e2d4605a711569f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5fbea131995ea6313e2d4605a711569f">&#9670;&#160;</a></span>ccc_omm_size()</h2>
+<a id="a8c00336b8ed2319a72e964f166b19e0a" name="a8c00336b8ed2319a72e964f166b19e0a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8c00336b8ed2319a72e964f166b19e0a">&#9670;&#160;</a></span>ccc_omm_size()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">ptrdiff_t ccc_omm_size </td>
+          <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_omm_size </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="ordered__multimap_8h.html#a4b628da74816b31db9f9de347f80acb5">ccc_ordered_multimap</a> const *&#160;</td>
           <td class="paramname"><em>mm</em></td><td>)</td>
@@ -1935,7 +1935,7 @@ N). </p>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the size of the container or -1 if mm is NULL. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the size of the container or an argument error is set if mm is NULL. </dd></dl>
 
 </div>
 </div>

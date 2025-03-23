@@ -130,7 +130,7 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memitem:a5f6c51ae30c8f0cae6e1b05466008784"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a5f6c51ae30c8f0cae6e1b05466008784">ccc_fdeq_init</a>(mem_ptr,  alloc_fn,  aux_data,  capacity,  optional_size...)&#160;&#160;&#160;    ccc_impl_fdeq_init(mem_ptr, alloc_fn, aux_data, capacity, optional_size)</td></tr>
 <tr class="memdesc:a5f6c51ae30c8f0cae6e1b05466008784"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the fdeq with memory and allocation permission.  <br /></td></tr>
 <tr class="separator:a5f6c51ae30c8f0cae6e1b05466008784"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7164375cce93f29179ed077fb7ede7db"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a7164375cce93f29179ed077fb7ede7db">ccc_fdeq_copy</a> (<a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> *dst, <a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> const *src, <a class="el" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a> *fn)</td></tr>
+<tr class="memitem:a7164375cce93f29179ed077fb7ede7db"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a7164375cce93f29179ed077fb7ede7db">ccc_fdeq_copy</a> (<a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> *dst, <a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> const *src, <a class="el" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a> *fn)</td></tr>
 <tr class="memdesc:a7164375cce93f29179ed077fb7ede7db"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy the fdeq from src to newly initialized dst.  <br /></td></tr>
 <tr class="separator:a7164375cce93f29179ed077fb7ede7db"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -146,22 +146,22 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memitem:aa352727365879daa6510133a768cc628"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#aa352727365879daa6510133a768cc628">ccc_fdeq_push_back</a> (<a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> *fdeq, void const *elem)</td></tr>
 <tr class="memdesc:aa352727365879daa6510133a768cc628"><td class="mdescLeft">&#160;</td><td class="mdescRight">Push the user type to the back of the fdeq. O(1) if no allocation permission amortized O(1) if allocation permission is given and a resize is required.  <br /></td></tr>
 <tr class="separator:aa352727365879daa6510133a768cc628"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac455d39939c99b8a3360f012cd9ec573"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#ac455d39939c99b8a3360f012cd9ec573">ccc_fdeq_push_back_range</a> (<a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> *fdeq, ptrdiff_t n, void const *elems)</td></tr>
-<tr class="memdesc:ac455d39939c99b8a3360f012cd9ec573"><td class="mdescLeft">&#160;</td><td class="mdescRight">Push the range of user types to the back of the fdeq. O(N).  <br /></td></tr>
-<tr class="separator:ac455d39939c99b8a3360f012cd9ec573"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2d8c8988041f24a63d46defee8db29bd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a2d8c8988041f24a63d46defee8db29bd">ccc_fdeq_push_back_range</a> (<a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> *fdeq, size_t n, void const *elems)</td></tr>
+<tr class="memdesc:a2d8c8988041f24a63d46defee8db29bd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Push the range of user types to the back of the fdeq. O(N).  <br /></td></tr>
+<tr class="separator:a2d8c8988041f24a63d46defee8db29bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6e8aa8edc1a18d945b8bdd664709e7a2"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a6e8aa8edc1a18d945b8bdd664709e7a2">ccc_fdeq_push_front</a> (<a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> *fdeq, void const *elem)</td></tr>
 <tr class="memdesc:a6e8aa8edc1a18d945b8bdd664709e7a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Push the user type to the front of the fdeq. O(1) if no allocation permission amortized O(1) if allocation permission is given and a resize is required.  <br /></td></tr>
 <tr class="separator:a6e8aa8edc1a18d945b8bdd664709e7a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8c8c5dbd20b05c22a4c381c30e197e9e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a8c8c5dbd20b05c22a4c381c30e197e9e">ccc_fdeq_push_front_range</a> (<a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> *fdeq, ptrdiff_t n, void const *elems)</td></tr>
-<tr class="memdesc:a8c8c5dbd20b05c22a4c381c30e197e9e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Push the range of user types to the front of the fdeq. O(N).  <br /></td></tr>
-<tr class="separator:a8c8c5dbd20b05c22a4c381c30e197e9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a73b6dc19d97541e387e35d061dd20384"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a73b6dc19d97541e387e35d061dd20384">ccc_fdeq_insert_range</a> (<a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> *fdeq, void *pos, ptrdiff_t n, void const *elems)</td></tr>
-<tr class="memdesc:a73b6dc19d97541e387e35d061dd20384"><td class="mdescLeft">&#160;</td><td class="mdescRight">Push the range of user types before pos of the fdeq. O(N).  <br /></td></tr>
-<tr class="separator:a73b6dc19d97541e387e35d061dd20384"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae1122093b9e142bbc81f56d09e2d5331"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#ae1122093b9e142bbc81f56d09e2d5331">ccc_fdeq_pop_front</a> (<a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> *fdeq)</td></tr>
+<tr class="memitem:a5d271eca7745f9da989409b337afb5b7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a5d271eca7745f9da989409b337afb5b7">ccc_fdeq_push_front_range</a> (<a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> *fdeq, size_t n, void const *elems)</td></tr>
+<tr class="memdesc:a5d271eca7745f9da989409b337afb5b7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Push the range of user types to the front of the fdeq. O(N).  <br /></td></tr>
+<tr class="separator:a5d271eca7745f9da989409b337afb5b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3637efae168143b1068575dbf07cec8f"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a3637efae168143b1068575dbf07cec8f">ccc_fdeq_insert_range</a> (<a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> *fdeq, void *pos, size_t n, void const *elems)</td></tr>
+<tr class="memdesc:a3637efae168143b1068575dbf07cec8f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Push the range of user types before pos of the fdeq. O(N).  <br /></td></tr>
+<tr class="separator:a3637efae168143b1068575dbf07cec8f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae1122093b9e142bbc81f56d09e2d5331"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#ae1122093b9e142bbc81f56d09e2d5331">ccc_fdeq_pop_front</a> (<a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> *fdeq)</td></tr>
 <tr class="memdesc:ae1122093b9e142bbc81f56d09e2d5331"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pop an element from the front of the fdeq. O(1).  <br /></td></tr>
 <tr class="separator:ae1122093b9e142bbc81f56d09e2d5331"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a60e38bd6dacaf6204fa8de34c7732789"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a60e38bd6dacaf6204fa8de34c7732789">ccc_fdeq_pop_back</a> (<a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> *fdeq)</td></tr>
+<tr class="memitem:a60e38bd6dacaf6204fa8de34c7732789"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a60e38bd6dacaf6204fa8de34c7732789">ccc_fdeq_pop_back</a> (<a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> *fdeq)</td></tr>
 <tr class="memdesc:a60e38bd6dacaf6204fa8de34c7732789"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pop an element from the back of the fdeq. O(1).  <br /></td></tr>
 <tr class="separator:a60e38bd6dacaf6204fa8de34c7732789"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -175,10 +175,10 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Deallocation Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Destroy the container. </p>
 </td></tr>
-<tr class="memitem:a1b352898bcc66874d9808fd58e4dab5b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a1b352898bcc66874d9808fd58e4dab5b">ccc_fdeq_clear</a> (<a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> *fdeq, <a class="el" href="types_8h.html#aa2bb6262f220473dc47f4c73711a6ec5">ccc_destructor_fn</a> *destructor)</td></tr>
+<tr class="memitem:a1b352898bcc66874d9808fd58e4dab5b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a1b352898bcc66874d9808fd58e4dab5b">ccc_fdeq_clear</a> (<a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> *fdeq, <a class="el" href="types_8h.html#aa2bb6262f220473dc47f4c73711a6ec5">ccc_destructor_fn</a> *destructor)</td></tr>
 <tr class="memdesc:a1b352898bcc66874d9808fd58e4dab5b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set size of fdeq to 0 and call destructor on each element if needed. O(1) if no destructor is provided, else O(N).  <br /></td></tr>
 <tr class="separator:a1b352898bcc66874d9808fd58e4dab5b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a661112e9f407ddf187a70ecc2ee2ace9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a661112e9f407ddf187a70ecc2ee2ace9">ccc_fdeq_clear_and_free</a> (<a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> *fdeq, <a class="el" href="types_8h.html#aa2bb6262f220473dc47f4c73711a6ec5">ccc_destructor_fn</a> *destructor)</td></tr>
+<tr class="memitem:a661112e9f407ddf187a70ecc2ee2ace9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a661112e9f407ddf187a70ecc2ee2ace9">ccc_fdeq_clear_and_free</a> (<a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> *fdeq, <a class="el" href="types_8h.html#aa2bb6262f220473dc47f4c73711a6ec5">ccc_destructor_fn</a> *destructor)</td></tr>
 <tr class="memdesc:a661112e9f407ddf187a70ecc2ee2ace9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set size of fdeq to 0 and call destructor on each element if needed. Free the underlying buffer setting the capacity to 0. O(1) if no destructor is provided, else O(N).  <br /></td></tr>
 <tr class="separator:a661112e9f407ddf187a70ecc2ee2ace9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -203,9 +203,9 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memitem:a91d5c7871381b4bd11eae774ad999962"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a91d5c7871381b4bd11eae774ad999962">ccc_fdeq_rend</a> (<a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> const *fdeq)</td></tr>
 <tr class="memdesc:a91d5c7871381b4bd11eae774ad999962"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a pointer to the start element. It may not be accessed. O(1).  <br /></td></tr>
 <tr class="separator:a91d5c7871381b4bd11eae774ad999962"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8ba3c0a0d8694934430fa15a5db4db0a"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a8ba3c0a0d8694934430fa15a5db4db0a">ccc_fdeq_at</a> (<a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> const *fdeq, ptrdiff_t i)</td></tr>
-<tr class="memdesc:a8ba3c0a0d8694934430fa15a5db4db0a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a reference to the element at index position i. O(1).  <br /></td></tr>
-<tr class="separator:a8ba3c0a0d8694934430fa15a5db4db0a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4caa4193f1547f8cdf5289935aa2da6a"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a4caa4193f1547f8cdf5289935aa2da6a">ccc_fdeq_at</a> (<a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> const *fdeq, size_t i)</td></tr>
+<tr class="memdesc:a4caa4193f1547f8cdf5289935aa2da6a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a reference to the element at index position i. O(1).  <br /></td></tr>
+<tr class="separator:a4caa4193f1547f8cdf5289935aa2da6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a88d9f08549c2ce4edf9d575caccb3fb4"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a88d9f08549c2ce4edf9d575caccb3fb4">ccc_fdeq_front</a> (<a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> const *fdeq)</td></tr>
 <tr class="memdesc:a88d9f08549c2ce4edf9d575caccb3fb4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a reference to the front of the fdeq. O(1).  <br /></td></tr>
 <tr class="separator:a88d9f08549c2ce4edf9d575caccb3fb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -215,12 +215,12 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memitem:a891865ef2a715297974c2def5671d5bb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a891865ef2a715297974c2def5671d5bb">ccc_fdeq_is_empty</a> (<a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> const *fdeq)</td></tr>
 <tr class="memdesc:a891865ef2a715297974c2def5671d5bb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return true if the size of the fdeq is 0. O(1).  <br /></td></tr>
 <tr class="separator:a891865ef2a715297974c2def5671d5bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a45a546c943675e55cef060fc3076148b"><td class="memItemLeft" align="right" valign="top">ptrdiff_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a45a546c943675e55cef060fc3076148b">ccc_fdeq_size</a> (<a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> const *fdeq)</td></tr>
-<tr class="memdesc:a45a546c943675e55cef060fc3076148b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the size of the fdeq representing active slots. O(1).  <br /></td></tr>
-<tr class="separator:a45a546c943675e55cef060fc3076148b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a90c0768d561f8795f14e9dfaa813480d"><td class="memItemLeft" align="right" valign="top">ptrdiff_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a90c0768d561f8795f14e9dfaa813480d">ccc_fdeq_capacity</a> (<a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> const *fdeq)</td></tr>
-<tr class="memdesc:a90c0768d561f8795f14e9dfaa813480d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the capacity representing total possible slots. O(1).  <br /></td></tr>
-<tr class="separator:a90c0768d561f8795f14e9dfaa813480d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5204b7da6c5f33c0fb68d00db4516600"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a5204b7da6c5f33c0fb68d00db4516600">ccc_fdeq_size</a> (<a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> const *fdeq)</td></tr>
+<tr class="memdesc:a5204b7da6c5f33c0fb68d00db4516600"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the size of the fdeq representing active slots. O(1).  <br /></td></tr>
+<tr class="separator:a5204b7da6c5f33c0fb68d00db4516600"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adadb60693f86fd0157f1b7795a948cbb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#adadb60693f86fd0157f1b7795a948cbb">ccc_fdeq_capacity</a> (<a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> const *fdeq)</td></tr>
+<tr class="memdesc:adadb60693f86fd0157f1b7795a948cbb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the capacity representing total possible slots. O(1).  <br /></td></tr>
+<tr class="separator:adadb60693f86fd0157f1b7795a948cbb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab49f9096ecd1127d3f8501613ab45602"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#ab49f9096ecd1127d3f8501613ab45602">ccc_fdeq_data</a> (<a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> const *fdeq)</td></tr>
 <tr class="memdesc:ab49f9096ecd1127d3f8501613ab45602"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a reference to the base of backing array. O(1).  <br /></td></tr>
 <tr class="separator:ab49f9096ecd1127d3f8501613ab45602"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -392,8 +392,8 @@ This graph shows which files directly or indirectly include this file:</div>
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="a8ba3c0a0d8694934430fa15a5db4db0a" name="a8ba3c0a0d8694934430fa15a5db4db0a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8ba3c0a0d8694934430fa15a5db4db0a">&#9670;&#160;</a></span>ccc_fdeq_at()</h2>
+<a id="a4caa4193f1547f8cdf5289935aa2da6a" name="a4caa4193f1547f8cdf5289935aa2da6a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4caa4193f1547f8cdf5289935aa2da6a">&#9670;&#160;</a></span>ccc_fdeq_at()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -407,7 +407,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">ptrdiff_t&#160;</td>
+          <td class="paramtype">size_t&#160;</td>
           <td class="paramname"><em>i</em>&#160;</td>
         </tr>
         <tr>
@@ -485,14 +485,14 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="a90c0768d561f8795f14e9dfaa813480d" name="a90c0768d561f8795f14e9dfaa813480d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a90c0768d561f8795f14e9dfaa813480d">&#9670;&#160;</a></span>ccc_fdeq_capacity()</h2>
+<a id="adadb60693f86fd0157f1b7795a948cbb" name="adadb60693f86fd0157f1b7795a948cbb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adadb60693f86fd0157f1b7795a948cbb">&#9670;&#160;</a></span>ccc_fdeq_capacity()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">ptrdiff_t ccc_fdeq_capacity </td>
+          <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_fdeq_capacity </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> const *&#160;</td>
           <td class="paramname"><em>fdeq</em></td><td>)</td>
@@ -508,7 +508,7 @@ This graph shows which files directly or indirectly include this file:</div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the capacity of the fdeq or -1 if fdeq is NULL. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the capacity of the fdeq or an argument error is set if fdeq is NULL. </dd></dl>
 
 </div>
 </div>
@@ -519,7 +519,7 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a> ccc_fdeq_clear </td>
+          <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_fdeq_clear </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> *&#160;</td>
           <td class="paramname"><em>fdeq</em>, </td>
@@ -557,7 +557,7 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a> ccc_fdeq_clear_and_free </td>
+          <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_fdeq_clear_and_free </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> *&#160;</td>
           <td class="paramname"><em>fdeq</em>, </td>
@@ -595,7 +595,7 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a> ccc_fdeq_copy </td>
+          <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_fdeq_copy </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> *&#160;</td>
           <td class="paramname"><em>dst</em>, </td>
@@ -638,21 +638,21 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="line"><span class="keywordtype">int</span> *new_mem = malloc(<span class="keyword">sizeof</span>(<span class="keywordtype">int</span>) * fdeq_capacity(&amp;src));</div>
 <div class="line">flat_double_ended_queue dst</div>
 <div class="line">    = fdeq_init(new_mem, NULL, NULL, fdeq_capacity(&amp;src));</div>
-<div class="line"><a class="code hl_enumeration" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a> res = fdeq_copy(&amp;dst, &amp;src, NULL);</div>
-<div class="ttc" id="atypes_8h_html_a1493dc76581f8c71eb96202fb1671ae1"><div class="ttname"><a href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a></div><div class="ttdeci">ccc_result</div><div class="ttdoc">A result of actions on containers.</div><div class="ttdef"><b>Definition:</b> types.h:117</div></div>
+<div class="line"><a class="code hl_enumeration" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> res = fdeq_copy(&amp;dst, &amp;src, NULL);</div>
+<div class="ttc" id="atypes_8h_html_a51d6f078a83d667aff5016609d9146ef"><div class="ttname"><a href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a></div><div class="ttdeci">ccc_result</div><div class="ttdoc">A result of actions on containers.</div><div class="ttdef"><b>Definition:</b> types.h:117</div></div>
 </div><!-- fragment --><p>The above requires dst capacity be greater than or equal to src capacity. Here is memory management handed over to the copy function.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC</span></div>
 <div class="line">flat_double_ended_queue src = fdeq_init((<span class="keywordtype">int</span> *)NULL, std_alloc, NULL, 0);</div>
-<div class="line">(void)<a class="code hl_function" href="flat__double__ended__queue_8h.html#ac455d39939c99b8a3360f012cd9ec573">ccc_fdeq_push_back_range</a>(&amp;src, 5, (<span class="keywordtype">int</span>[5]){0,1,2,3,4});</div>
+<div class="line">(void)<a class="code hl_function" href="flat__double__ended__queue_8h.html#a2d8c8988041f24a63d46defee8db29bd">ccc_fdeq_push_back_range</a>(&amp;src, 5, (<span class="keywordtype">int</span>[5]){0,1,2,3,4});</div>
 <div class="line">flat_double_ended_queue dst = fdeq_init((<span class="keywordtype">int</span> *)NULL, std_alloc, NULL, 0);</div>
-<div class="line"><a class="code hl_enumeration" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a> res = fdeq_copy(&amp;dst, &amp;src, std_alloc);</div>
-<div class="ttc" id="aflat__double__ended__queue_8h_html_ac455d39939c99b8a3360f012cd9ec573"><div class="ttname"><a href="flat__double__ended__queue_8h.html#ac455d39939c99b8a3360f012cd9ec573">ccc_fdeq_push_back_range</a></div><div class="ttdeci">ccc_result ccc_fdeq_push_back_range(ccc_flat_double_ended_queue *fdeq, ptrdiff_t n, void const *elems)</div><div class="ttdoc">Push the range of user types to the back of the fdeq. O(N).</div></div>
+<div class="line"><a class="code hl_enumeration" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> res = fdeq_copy(&amp;dst, &amp;src, std_alloc);</div>
+<div class="ttc" id="aflat__double__ended__queue_8h_html_a2d8c8988041f24a63d46defee8db29bd"><div class="ttname"><a href="flat__double__ended__queue_8h.html#a2d8c8988041f24a63d46defee8db29bd">ccc_fdeq_push_back_range</a></div><div class="ttdeci">ccc_result ccc_fdeq_push_back_range(ccc_flat_double_ended_queue *fdeq, size_t n, void const *elems)</div><div class="ttdoc">Push the range of user types to the back of the fdeq. O(N).</div></div>
 </div><!-- fragment --><p>The above allows dst to have a capacity less than that of the src as long as copy has been provided an allocation function to resize dst. Note that this would still work if copying to a destination that the user wants as a fixed size fdeq (ring buffer).</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC</span></div>
 <div class="line">flat_double_ended_queue src = fdeq_init((<span class="keywordtype">int</span> *)NULL, std_alloc, NULL, 0);</div>
-<div class="line">(void)<a class="code hl_function" href="flat__double__ended__queue_8h.html#ac455d39939c99b8a3360f012cd9ec573">ccc_fdeq_push_back_range</a>(&amp;src, 5, (<span class="keywordtype">int</span>[5]){0,1,2,3,4});</div>
+<div class="line">(void)<a class="code hl_function" href="flat__double__ended__queue_8h.html#a2d8c8988041f24a63d46defee8db29bd">ccc_fdeq_push_back_range</a>(&amp;src, 5, (<span class="keywordtype">int</span>[5]){0,1,2,3,4});</div>
 <div class="line">flat_double_ended_queue dst = fdeq_init((<span class="keywordtype">int</span> *)NULL, NULL, NULL, 0);</div>
-<div class="line"><a class="code hl_enumeration" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a> res = fdeq_copy(&amp;dst, &amp;src, std_alloc);</div>
+<div class="line"><a class="code hl_enumeration" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> res = fdeq_copy(&amp;dst, &amp;src, std_alloc);</div>
 </div><!-- fragment --><p>The above sets up dst as a ring buffer while src is a dynamic fdeq. Because an allocation function is provided, the dst is resized once for the copy and retains its fixed size after the copy is complete. This would require the user to manually free the underlying buffer at dst eventually if this method is used. Usually it is better to allocate the memory explicitly before the copy if copying between ring buffers.</p>
 <p>These options allow users to stay consistent across containers with their memory management strategies. </p>
 
@@ -742,8 +742,8 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="a73b6dc19d97541e387e35d061dd20384" name="a73b6dc19d97541e387e35d061dd20384"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a73b6dc19d97541e387e35d061dd20384">&#9670;&#160;</a></span>ccc_fdeq_insert_range()</h2>
+<a id="a3637efae168143b1068575dbf07cec8f" name="a3637efae168143b1068575dbf07cec8f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3637efae168143b1068575dbf07cec8f">&#9670;&#160;</a></span>ccc_fdeq_insert_range()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -763,7 +763,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">ptrdiff_t&#160;</td>
+          <td class="paramtype">size_t&#160;</td>
           <td class="paramname"><em>n</em>, </td>
         </tr>
         <tr>
@@ -878,7 +878,7 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a> ccc_fdeq_pop_back </td>
+          <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_fdeq_pop_back </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> *&#160;</td>
           <td class="paramname"><em>fdeq</em></td><td>)</td>
@@ -905,7 +905,7 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a> ccc_fdeq_pop_front </td>
+          <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_fdeq_pop_front </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> *&#160;</td>
           <td class="paramname"><em>fdeq</em></td><td>)</td>
@@ -963,14 +963,14 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="ac455d39939c99b8a3360f012cd9ec573" name="ac455d39939c99b8a3360f012cd9ec573"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac455d39939c99b8a3360f012cd9ec573">&#9670;&#160;</a></span>ccc_fdeq_push_back_range()</h2>
+<a id="a2d8c8988041f24a63d46defee8db29bd" name="a2d8c8988041f24a63d46defee8db29bd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2d8c8988041f24a63d46defee8db29bd">&#9670;&#160;</a></span>ccc_fdeq_push_back_range()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a> ccc_fdeq_push_back_range </td>
+          <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_fdeq_push_back_range </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> *&#160;</td>
           <td class="paramname"><em>fdeq</em>, </td>
@@ -978,7 +978,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">ptrdiff_t&#160;</td>
+          <td class="paramtype">size_t&#160;</td>
           <td class="paramname"><em>n</em>, </td>
         </tr>
         <tr>
@@ -1047,14 +1047,14 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="a8c8c5dbd20b05c22a4c381c30e197e9e" name="a8c8c5dbd20b05c22a4c381c30e197e9e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8c8c5dbd20b05c22a4c381c30e197e9e">&#9670;&#160;</a></span>ccc_fdeq_push_front_range()</h2>
+<a id="a5d271eca7745f9da989409b337afb5b7" name="a5d271eca7745f9da989409b337afb5b7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5d271eca7745f9da989409b337afb5b7">&#9670;&#160;</a></span>ccc_fdeq_push_front_range()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a1493dc76581f8c71eb96202fb1671ae1">ccc_result</a> ccc_fdeq_push_front_range </td>
+          <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_fdeq_push_front_range </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> *&#160;</td>
           <td class="paramname"><em>fdeq</em>, </td>
@@ -1062,7 +1062,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">ptrdiff_t&#160;</td>
+          <td class="paramtype">size_t&#160;</td>
           <td class="paramname"><em>n</em>, </td>
         </tr>
         <tr>
@@ -1185,14 +1185,14 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="a45a546c943675e55cef060fc3076148b" name="a45a546c943675e55cef060fc3076148b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a45a546c943675e55cef060fc3076148b">&#9670;&#160;</a></span>ccc_fdeq_size()</h2>
+<a id="a5204b7da6c5f33c0fb68d00db4516600" name="a5204b7da6c5f33c0fb68d00db4516600"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5204b7da6c5f33c0fb68d00db4516600">&#9670;&#160;</a></span>ccc_fdeq_size()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">ptrdiff_t ccc_fdeq_size </td>
+          <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_fdeq_size </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> const *&#160;</td>
           <td class="paramname"><em>fdeq</em></td><td>)</td>
@@ -1208,7 +1208,7 @@ This graph shows which files directly or indirectly include this file:</div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the size of the fdeq or -1 if fdeq is NULL. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the size of the fdeq or an argument error is set if fdeq is NULL. </dd></dl>
 
 </div>
 </div>
