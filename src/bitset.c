@@ -1538,7 +1538,7 @@ countr_0(ccc_bitblock_ const b)
 {
     static_assert(BITBLOCK_MSB < ALL_BITS_ON);
     static_assert(sizeof(ccc_bitblock_) == sizeof(unsigned));
-    return b ? __builtin_ctz(b) : BLOCK_BITS;
+    return b ? (unsigned)__builtin_ctz(b) : BLOCK_BITS;
 }
 
 static inline unsigned
@@ -1546,7 +1546,7 @@ countl_0(ccc_bitblock_ const b)
 {
     static_assert(BITBLOCK_MSB < ALL_BITS_ON);
     static_assert(sizeof(ccc_bitblock_) == sizeof(unsigned));
-    return b ? __builtin_clz(b) : BLOCK_BITS;
+    return b ? (unsigned)__builtin_clz(b) : BLOCK_BITS;
 }
 
 #else /* !defined(__GNUC__) && !defined(__clang__) */
