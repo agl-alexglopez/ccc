@@ -9,7 +9,10 @@
 #include "impl/impl_flat_priority_queue.h"
 #include "types.h"
 
-static size_t const swap_space = 1;
+enum : size_t
+{
+    SWAP_SPACE = 1,
+};
 
 /*=====================      Prototypes      ================================*/
 
@@ -77,7 +80,7 @@ ccc_fpq_push(ccc_flat_priority_queue *const fpq, void const *const e)
     {
         return NULL;
     }
-    if (fpq->buf_.sz_ + swap_space >= fpq->buf_.capacity_)
+    if (fpq->buf_.sz_ + SWAP_SPACE >= fpq->buf_.capacity_)
     {
         ccc_result const extra_space = ccc_buf_alloc(
             &fpq->buf_, fpq->buf_.capacity_ * 2, fpq->buf_.alloc_);

@@ -12,13 +12,16 @@ based operations over the set. */
 #include "impl/impl_bitset.h"
 #include "types.h"
 
-/* @private How many total bits that fit in a ccc_bitblock_. */
-#define BLOCK_BITS (sizeof(ccc_bitblock_) * CHAR_BIT)
-/* @private A mask of a ccc_bitblock_ with all bits on. */
-#define ALL_BITS_ON ((ccc_bitblock_)~0)
-/* @private The Most Significant Bit of a ccc_bitblock_ turned on to 1. */
-#define BITBLOCK_MSB                                                           \
-    (((ccc_bitblock_)1) << (((sizeof(ccc_bitblock_) * CHAR_BIT)) - 1))
+enum : ccc_bitblock_
+{
+    /* @private How many total bits that fit in a ccc_bitblock_. */
+    BLOCK_BITS = (sizeof(ccc_bitblock_) * CHAR_BIT),
+    /* @private A mask of a ccc_bitblock_ with all bits on. */
+    ALL_BITS_ON = ((ccc_bitblock_)~0),
+    /* @private The Most Significant Bit of a ccc_bitblock_ turned on to 1. */
+    BITBLOCK_MSB
+    = (((ccc_bitblock_)1) << (((sizeof(ccc_bitblock_) * CHAR_BIT)) - 1)),
+};
 
 /** @private An index within a block. A block is bounded to some number of bits
 as determined by the type used for each block. */

@@ -57,8 +57,11 @@ struct romap_query_
     };
 };
 
-static enum romap_link_ const inorder_traversal = R;
-static enum romap_link_ const reverse_inorder_traversal = L;
+enum
+{
+    INORDER_TRAVERSAL = R,
+    REVERSE_INORDER_TRAVERSAL = L,
+};
 
 /*==============================  Prototypes   ==============================*/
 
@@ -422,7 +425,7 @@ ccc_rom_next(ccc_realtime_ordered_map const *const rom,
     {
         return NULL;
     }
-    struct ccc_romap_elem_ const *const n = next(rom, e, inorder_traversal);
+    struct ccc_romap_elem_ const *const n = next(rom, e, INORDER_TRAVERSAL);
     if (n == &rom->end_)
     {
         return NULL;
@@ -462,7 +465,7 @@ ccc_rom_rnext(ccc_realtime_ordered_map const *const rom,
         return NULL;
     }
     struct ccc_romap_elem_ const *const n
-        = next(rom, e, reverse_inorder_traversal);
+        = next(rom, e, REVERSE_INORDER_TRAVERSAL);
     return (n == &rom->end_) ? NULL : struct_base(rom, n);
 }
 
@@ -474,7 +477,7 @@ ccc_rom_equal_range(ccc_realtime_ordered_map const *const rom,
     {
         return (ccc_range){};
     }
-    return (ccc_range){equal_range(rom, begin_key, end_key, inorder_traversal)};
+    return (ccc_range){equal_range(rom, begin_key, end_key, INORDER_TRAVERSAL)};
 }
 
 ccc_rrange
@@ -486,7 +489,7 @@ ccc_rom_equal_rrange(ccc_realtime_ordered_map const *const rom,
         return (ccc_rrange){};
     }
     return (ccc_rrange){
-        equal_range(rom, rbegin_key, rend_key, reverse_inorder_traversal)};
+        equal_range(rom, rbegin_key, rend_key, REVERSE_INORDER_TRAVERSAL)};
 }
 
 ccc_ucount

@@ -19,8 +19,6 @@ implementation is based on the following source.
 #include "ordered_multimap.h"
 #include "types.h"
 
-#define LR 2
-
 /** @private Instead of thinking about left and right consider only links in
 the abstract sense. Put them in an array and then flip this enum and left and
 right code paths can be united into one */
@@ -38,8 +36,12 @@ enum list_link_
     N = 1
 };
 
-static enum tree_link_ const inorder_traversal = R;
-static enum tree_link_ const reverse_inorder_traversal = L;
+enum
+{
+    LR = 2,
+    INORDER_TRAVERSAL = R,
+    REVERSE_INORDER_TRAVERSAL = L,
+};
 
 /* =======================        Prototypes         ====================== */
 
@@ -372,7 +374,7 @@ ccc_omm_next(ccc_ordered_multimap const *const mm,
         return NULL;
     }
     struct ccc_ommap_elem_ const *const n
-        = multimap_next(mm, iter_handle, reverse_inorder_traversal);
+        = multimap_next(mm, iter_handle, REVERSE_INORDER_TRAVERSAL);
     return n == &mm->end_ ? NULL : struct_base(mm, n);
 }
 
@@ -385,7 +387,7 @@ ccc_omm_rnext(ccc_ordered_multimap const *const mm,
         return NULL;
     }
     struct ccc_ommap_elem_ const *const n
-        = multimap_next(mm, iter_handle, inorder_traversal);
+        = multimap_next(mm, iter_handle, INORDER_TRAVERSAL);
     return n == &mm->end_ ? NULL : struct_base(mm, n);
 }
 
@@ -410,7 +412,7 @@ ccc_omm_equal_range(ccc_ordered_multimap *const mm, void const *const begin_key,
         return (ccc_range){};
     }
     return (ccc_range){
-        equal_range(mm, begin_key, end_key, reverse_inorder_traversal)};
+        equal_range(mm, begin_key, end_key, REVERSE_INORDER_TRAVERSAL)};
 }
 
 ccc_rrange
@@ -422,7 +424,7 @@ ccc_omm_equal_rrange(ccc_ordered_multimap *const mm,
         return (ccc_rrange){};
     }
     return (ccc_rrange){
-        equal_range(mm, rbegin_key, rend_key, inorder_traversal)};
+        equal_range(mm, rbegin_key, rend_key, INORDER_TRAVERSAL)};
 }
 
 void *

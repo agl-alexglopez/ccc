@@ -102,15 +102,18 @@ static size_t const primes[] = {
     17617221824571301183U,
 };
 
-#define PRIMES_SIZE (sizeof(primes) / sizeof(primes[0]))
+enum : size_t
+{
+    PRIMES_SIZE = (sizeof(primes) / sizeof(primes[0])),
+    LAST_SWAP_SLOT = 1,
+    NUM_SWAP_SLOTS = 2,
+};
 
 /* Some claim that Robin Hood tables can support a much higher load factor. I
    would not be so sure. The primary clustering effect in these types of
    tables can quickly rise. Mitigating with a lower load factor and prime
    table sizes is a decent approach. Measure. */
 static double const load_factor = 0.8;
-static size_t const last_swap_slot = 1;
-static size_t const num_swap_slots = 2;
 
 /*=========================   Prototypes   ==================================*/
 
@@ -193,7 +196,7 @@ ccc_hhm_size(ccc_handle_hash_map const *const h)
     {
         return sz;
     }
-    sz.count -= num_swap_slots;
+    sz.count -= NUM_SWAP_SLOTS;
     return sz;
 }
 
@@ -588,7 +591,7 @@ ccc_hhm_copy(ccc_handle_hash_map *const dst,
                      src->buf_.capacity_ * src->buf_.elem_sz_);
         return CCC_RESULT_OK;
     }
-    dst->buf_.sz_ = num_swap_slots;
+    dst->buf_.sz_ = NUM_SWAP_SLOTS;
     for (size_t i = 0; i < dst->buf_.capacity_; ++i)
     {
         struct ccc_hhmap_elem_ *const e = elem_at(dst, i);
@@ -998,7 +1001,7 @@ maybe_resize(struct ccc_hhmap_ *const h)
 {
     size_t const h_cap = h->buf_.capacity_;
     size_t const elem_sz = h->buf_.elem_sz_;
-    if (h_cap && h->buf_.sz_ < num_swap_slots)
+    if (h_cap && h->buf_.sz_ < NUM_SWAP_SLOTS)
     {
 
         for (size_t i = 0; i < h_cap; ++i)
@@ -1007,7 +1010,7 @@ maybe_resize(struct ccc_hhmap_ *const h)
             struct ccc_hhmap_elem_ *const e = elem_at(h, i);
             e->slot_i_ = i;
         }
-        (void)ccc_buf_size_set(&h->buf_, num_swap_slots);
+        (void)ccc_buf_size_set(&h->buf_, NUM_SWAP_SLOTS);
     }
     if (h_cap && (double)(h->buf_.sz_) / (double)h_cap <= load_factor)
     {
@@ -1043,7 +1046,7 @@ maybe_resize(struct ccc_hhmap_ *const h)
         e->hash_ = CCC_HHM_EMPTY;
         e->slot_i_ = i;
     }
-    (void)ccc_buf_size_set(&new_hash.buf_, num_swap_slots);
+    (void)ccc_buf_size_set(&new_hash.buf_, NUM_SWAP_SLOTS);
     /* Run Robin Hood on the hash but instead of copying data to the chosen
        slot, link to the existing data at the old handle. */
     size_t allocated_slots = 0;
@@ -1201,19 +1204,19 @@ key_at(struct ccc_hhmap_ const *const h, size_t const i)
 static inline size_t
 distance(size_t const capacity, size_t const i, size_t const j)
 {
-    return i < j ? (capacity - j) + i - num_swap_slots : i - j;
+    return i < j ? (capacity - j) + i - NUM_SWAP_SLOTS : i - j;
 }
 
 static inline size_t
 increment(size_t const capacity, size_t const i)
 {
-    return (i + 1) >= capacity ? last_swap_slot + 1 : i + 1;
+    return (i + 1) >= capacity ? LAST_SWAP_SLOT + 1 : i + 1;
 }
 
 static inline size_t
 decrement(size_t const capacity, size_t const i)
 {
-    return i <= num_swap_slots ? capacity - 1 : i - 1;
+    return i <= NUM_SWAP_SLOTS ? capacity - 1 : i - 1;
 }
 
 static inline void *
@@ -1271,7 +1274,7 @@ to_i(size_t const capacity, uint64_t hash)
 #else
     hash %= capacity;
 #endif
-    return (size_t)hash <= last_swap_slot ? last_swap_slot + 1 : (size_t)hash;
+    return (size_t)hash <= LAST_SWAP_SLOT ? LAST_SWAP_SLOT + 1 : (size_t)hash;
 }
 
 /** The following Apache License applies only to the above function. This

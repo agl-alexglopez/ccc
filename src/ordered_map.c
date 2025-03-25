@@ -18,8 +18,6 @@ based on the following source.
 #include "ordered_map.h"
 #include "types.h"
 
-#define LR 2
-
 /** @private Instead of thinking about left and right consider only links
     in the abstract sense. Put them in an array and then flip
     this enum and left and right code paths can be united into one */
@@ -29,8 +27,12 @@ typedef enum
     R,
 } om_branch_;
 
-static om_branch_ const inorder_traversal = R;
-static om_branch_ const reverse_inorder_traversal = L;
+enum
+{
+    LR = 2,
+    INORDER_TRAVERSAL = R,
+    REVERSE_INORDER_TRAVERSAL = L,
+};
 
 /* Container entry return value. */
 
@@ -382,7 +384,7 @@ ccc_om_next(ccc_ordered_map const *const om, ccc_omap_elem const *const e)
     {
         return NULL;
     }
-    struct ccc_omap_elem_ const *n = next(om, e, inorder_traversal);
+    struct ccc_omap_elem_ const *n = next(om, e, INORDER_TRAVERSAL);
     return n == &om->end_ ? NULL : struct_base(om, n);
 }
 
@@ -393,7 +395,7 @@ ccc_om_rnext(ccc_ordered_map const *const om, ccc_omap_elem const *const e)
     {
         return NULL;
     }
-    struct ccc_omap_elem_ const *n = next(om, e, reverse_inorder_traversal);
+    struct ccc_omap_elem_ const *n = next(om, e, REVERSE_INORDER_TRAVERSAL);
     return n == &om->end_ ? NULL : struct_base(om, n);
 }
 
@@ -405,7 +407,7 @@ ccc_om_equal_range(ccc_ordered_map *const om, void const *const begin_key,
     {
         return (ccc_range){};
     }
-    return (ccc_range){equal_range(om, begin_key, end_key, inorder_traversal)};
+    return (ccc_range){equal_range(om, begin_key, end_key, INORDER_TRAVERSAL)};
 }
 
 ccc_rrange
@@ -418,7 +420,7 @@ ccc_om_equal_rrange(ccc_ordered_map *const om, void const *const rbegin_key,
         return (ccc_rrange){};
     }
     return (ccc_rrange){
-        equal_range(om, rbegin_key, rend_key, reverse_inorder_traversal)};
+        equal_range(om, rbegin_key, rend_key, REVERSE_INORDER_TRAVERSAL)};
 }
 
 ccc_result

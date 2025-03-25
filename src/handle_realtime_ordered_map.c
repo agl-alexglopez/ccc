@@ -63,13 +63,14 @@ struct hrm_query_
     };
 };
 
-static enum hrm_branch_ const inorder_traversal = R;
-static enum hrm_branch_ const reverse_inorder_traversal = L;
-
-static enum hrm_branch_ const mindir = L;
-static enum hrm_branch_ const maxdir = R;
-
-static size_t const single_tree_node = 2;
+enum
+{
+    INORDER_TRAVERSAL = R,
+    REVERSE_INORDER_TRAVERSAL = L,
+    MINDIR = L,
+    MAXDIR = R,
+    SINGLE_TREE_NODE = 2,
+};
 
 /*==============================  Prototypes   ==============================*/
 
@@ -387,7 +388,7 @@ ccc_hrm_equal_range(ccc_handle_realtime_ordered_map const *const hrm,
     {
         return (ccc_range){};
     }
-    return (ccc_range){equal_range(hrm, begin_key, end_key, inorder_traversal)};
+    return (ccc_range){equal_range(hrm, begin_key, end_key, INORDER_TRAVERSAL)};
 }
 
 ccc_rrange
@@ -399,7 +400,7 @@ ccc_hrm_equal_rrange(ccc_handle_realtime_ordered_map const *const hrm,
         return (ccc_rrange){};
     }
     return (ccc_rrange){
-        equal_range(hrm, rbegin_key, rend_key, reverse_inorder_traversal)};
+        equal_range(hrm, rbegin_key, rend_key, REVERSE_INORDER_TRAVERSAL)};
 }
 
 ccc_handle_i
@@ -489,7 +490,7 @@ ccc_hrm_begin(ccc_handle_realtime_ordered_map const *const hrm)
     {
         return NULL;
     }
-    size_t const n = min_max_from(hrm, hrm->root_, mindir);
+    size_t const n = min_max_from(hrm, hrm->root_, MINDIR);
     return base_at(hrm, n);
 }
 
@@ -500,7 +501,7 @@ ccc_hrm_rbegin(ccc_handle_realtime_ordered_map const *const hrm)
     {
         return NULL;
     }
-    size_t const n = min_max_from(hrm, hrm->root_, maxdir);
+    size_t const n = min_max_from(hrm, hrm->root_, MAXDIR);
     return base_at(hrm, n);
 }
 
@@ -512,7 +513,7 @@ ccc_hrm_next(ccc_handle_realtime_ordered_map const *const hrm,
     {
         return NULL;
     }
-    size_t const n = next(hrm, index_of(hrm, e), inorder_traversal);
+    size_t const n = next(hrm, index_of(hrm, e), INORDER_TRAVERSAL);
     return base_at(hrm, n);
 }
 
@@ -524,7 +525,7 @@ ccc_hrm_rnext(ccc_handle_realtime_ordered_map const *const hrm,
     {
         return NULL;
     }
-    size_t const n = next(hrm, index_of(hrm, e), reverse_inorder_traversal);
+    size_t const n = next(hrm, index_of(hrm, e), REVERSE_INORDER_TRAVERSAL);
     return base_at(hrm, n);
 }
 
@@ -709,7 +710,7 @@ insert(struct ccc_hromap_ *const hrm, size_t const parent_i,
 {
     struct ccc_hromap_elem_ *elem = at(hrm, elem_i);
     init_node(elem);
-    if (hrm->buf_.sz_ == single_tree_node)
+    if (hrm->buf_.sz_ == SINGLE_TREE_NODE)
     {
         hrm->root_ = elem_i;
         return;
@@ -1038,7 +1039,7 @@ remove_fixup(struct ccc_hromap_ *const t, size_t const remove)
     }
     else
     {
-        y = min_max_from(t, branch_i(t, remove, R), mindir);
+        y = min_max_from(t, branch_i(t, remove, R), MINDIR);
         p = parent_i(t, y);
         x = branch_i(t, y, !branch_i(t, y, L));
         *parent_r(t, x) = parent_i(t, y);

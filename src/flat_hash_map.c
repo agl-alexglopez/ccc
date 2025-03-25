@@ -122,15 +122,19 @@ static size_t const primes[] = {
     10815445968671840317U,
     17617221824571301183U,
 };
-#define PRIMES_SIZE ((size_t)(sizeof(primes) / sizeof(primes[0])))
+
+enum : size_t
+{
+    PRIMES_SIZE = ((sizeof(primes) / sizeof(primes[0]))),
+    LAST_SWAP_SLOT = 1,
+    NUM_SWAP_SLOTS = 2,
+};
 
 /* Some claim that Robin Hood tables can support a much higher load factor. I
 would not be so sure. The primary clustering effect in these types of tables can
 quickly rise. Try to mitigate with a lower load factor and prime table sizes.
 Measure. */
 static double const load_factor = 0.8;
-static size_t const last_swap_slot = 1;
-static size_t const num_swap_slots = 2;
 
 /*=========================   Prototypes   ==================================*/
 
@@ -194,7 +198,7 @@ ccc_fhm_size(ccc_flat_hash_map const *const h)
     {
         return sz;
     }
-    sz.count -= num_swap_slots;
+    sz.count -= NUM_SWAP_SLOTS;
     return sz;
 }
 
@@ -540,7 +544,7 @@ ccc_fhm_copy(ccc_flat_hash_map *const dst, ccc_flat_hash_map const *const src,
                      src->buf_.capacity_ * src->buf_.elem_sz_);
         return CCC_RESULT_OK;
     }
-    dst->buf_.sz_ = num_swap_slots;
+    dst->buf_.sz_ = NUM_SWAP_SLOTS;
     for (void *slot = ccc_buf_begin(&src->buf_);
          slot != ccc_buf_capacity_end(&src->buf_);
          slot = ccc_buf_next(&src->buf_, slot))
@@ -867,11 +871,11 @@ erase(struct ccc_fhmap_ *const h, void *const e)
 static ccc_result
 maybe_resize(struct ccc_fhmap_ *const h)
 {
-    if (unlikely(h->buf_.capacity_ && h->buf_.sz_ < num_swap_slots))
+    if (unlikely(h->buf_.capacity_ && h->buf_.sz_ < NUM_SWAP_SLOTS))
     {
         (void)memset(h->buf_.mem_, CCC_FHM_EMPTY,
                      h->buf_.capacity_ * h->buf_.elem_sz_);
-        (void)ccc_buf_size_set(&h->buf_, num_swap_slots);
+        (void)ccc_buf_size_set(&h->buf_, NUM_SWAP_SLOTS);
     }
     if (h->buf_.capacity_
         && (double)(h->buf_.sz_) / (double)h->buf_.capacity_ <= load_factor)
@@ -900,7 +904,7 @@ maybe_resize(struct ccc_fhmap_ *const h)
        0 in this new array. */
     (void)memset(ccc_buf_begin(&new_hash.buf_), CCC_FHM_EMPTY,
                  new_hash.buf_.capacity_ * new_hash.buf_.elem_sz_);
-    (void)ccc_buf_size_set(&new_hash.buf_, num_swap_slots);
+    (void)ccc_buf_size_set(&new_hash.buf_, NUM_SWAP_SLOTS);
     for (void *slot = ccc_buf_begin(&h->buf_);
          slot != ccc_buf_capacity_end(&h->buf_);
          slot = ccc_buf_next(&h->buf_, slot))
@@ -969,19 +973,19 @@ key_in_slot(struct ccc_fhmap_ const *const h, void const *const slot)
 static inline size_t
 distance(size_t const capacity, size_t const i, size_t const j)
 {
-    return i < j ? (capacity - j) + i - num_swap_slots : i - j;
+    return i < j ? (capacity - j) + i - NUM_SWAP_SLOTS : i - j;
 }
 
 static inline size_t
 increment(size_t const capacity, size_t const i)
 {
-    return (i + 1) >= capacity ? last_swap_slot + 1 : i + 1;
+    return (i + 1) >= capacity ? LAST_SWAP_SLOT + 1 : i + 1;
 }
 
 static inline size_t
 decrement(size_t const capacity, size_t const i)
 {
-    return i <= num_swap_slots ? capacity - 1 : i - 1;
+    return i <= NUM_SWAP_SLOTS ? capacity - 1 : i - 1;
 }
 
 static inline void *
@@ -1021,7 +1025,7 @@ to_i(size_t const capacity, uint64_t hash)
 #else
     hash %= capacity;
 #endif
-    return (size_t)hash <= last_swap_slot ? last_swap_slot + 1 : (size_t)hash;
+    return (size_t)hash <= LAST_SWAP_SLOT ? LAST_SWAP_SLOT + 1 : (size_t)hash;
 }
 
 /** The following Apache License applies only to the above function. This
