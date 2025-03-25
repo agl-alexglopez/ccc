@@ -20,7 +20,10 @@ based on the following source.
 #include "types.h"
 
 /** @private */
-#define LR 2
+enum
+{
+    LR = 2
+};
 
 /** @private */
 enum hom_branch_
@@ -29,11 +32,14 @@ enum hom_branch_
     R,
 };
 
-static enum hom_branch_ const inorder_traversal = R;
-static enum hom_branch_ const reverse_inorder_traversal = L;
+enum
+{
+    INORDER_TRAVERSAL = R,
+    REVERSE_INORDER_TRAVERSAL = L,
+    EMPTY_TREE = 2,
+};
 
 /* Buffer allocates before insert. "Empty" has nil 0th slot and one more. */
-static size_t const empty_tree = 2;
 
 /*==============================  Prototypes   ==============================*/
 
@@ -421,7 +427,7 @@ ccc_hom_next(ccc_handle_ordered_map const *const hom,
     {
         return NULL;
     }
-    size_t const n = next(hom, index_of(hom, e), inorder_traversal);
+    size_t const n = next(hom, index_of(hom, e), INORDER_TRAVERSAL);
     return base_at(hom, n);
 }
 
@@ -433,7 +439,7 @@ ccc_hom_rnext(ccc_handle_ordered_map const *const hom,
     {
         return NULL;
     }
-    size_t const n = next(hom, index_of(hom, e), reverse_inorder_traversal);
+    size_t const n = next(hom, index_of(hom, e), REVERSE_INORDER_TRAVERSAL);
     return base_at(hom, n);
 }
 
@@ -471,7 +477,7 @@ ccc_hom_equal_range(ccc_handle_ordered_map *const hom,
     {
         return (ccc_range){};
     }
-    return (ccc_range){equal_range(hom, begin_key, end_key, inorder_traversal)};
+    return (ccc_range){equal_range(hom, begin_key, end_key, INORDER_TRAVERSAL)};
 }
 
 ccc_rrange
@@ -484,7 +490,7 @@ ccc_hom_equal_rrange(ccc_handle_ordered_map *const hom,
         return (ccc_rrange){};
     }
     return (ccc_rrange){
-        equal_range(hom, rbegin_key, rend_key, reverse_inorder_traversal)};
+        equal_range(hom, rbegin_key, rend_key, REVERSE_INORDER_TRAVERSAL)};
 }
 
 ccc_result
@@ -691,7 +697,7 @@ insert(struct ccc_homap_ *const t, size_t const n)
 {
     struct ccc_homap_elem_ *const node = at(t, n);
     init_node(node);
-    if (t->buf_.sz_ == empty_tree)
+    if (t->buf_.sz_ == EMPTY_TREE)
     {
         t->root_ = n;
         return;
