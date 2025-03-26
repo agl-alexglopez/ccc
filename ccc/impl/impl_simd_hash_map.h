@@ -48,10 +48,10 @@ array must be rounded up */
                                        capacity)                               \
     typedef struct                                                             \
     {                                                                          \
+        key_val_type_name data[capacity];                                      \
         ccc_shm_meta                                                           \
             meta[(((capacity) + ((capacity) - 1)) / CCC_SHM_GROUP_SIZE)        \
                  + CCC_SHM_GROUP_SIZE];                                        \
-        key_val_type_name data[capacity];                                      \
     }(fixed_map_type_name);
 
 struct simd_hash_map_
