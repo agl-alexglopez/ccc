@@ -27,6 +27,7 @@ typedef struct
 enum
 {
     GROUP_BYTES = sizeof(group),
+    INDEX_MASK_MSB = 0x8000,
 };
 
 alignas(16) static const ccc_shm_meta empty_group[GROUP_BYTES] = {
@@ -51,6 +52,7 @@ typedef struct
 enum
 {
     GROUP_BYTES = sizeof(group),
+    INDEX_MASK_MSBYTE = 0xFF00000000000000,
 };
 
 alignas(8) static const ccc_shm_meta empty_group[GROUP_BYTES] = {
@@ -66,16 +68,218 @@ enum : uint8_t
     LOWER_7_BITS_MASK = 0x7F,
 };
 
+struct triangular_seq
+{
+    size_t i;
+    size_t stride;
+};
+
+/*===========================   Prototypes   ================================*/
+
+static struct ccc_shash_entry_ container_entry(struct ccc_shmap_ *h,
+                                               void const *key);
+static struct ccc_handl_ handle(struct ccc_shmap_ *h, void const *key,
+                                uint64_t hash);
+static struct ccc_handl_ find_handle(struct ccc_shmap_ *h, void const *key,
+                                     uint64_t hash);
+ccc_result maybe_rehash(struct ccc_shmap_ *h);
+
+static ccc_tribool is_index_on(index_mask m);
+static size_t lowest_on_index(index_mask m);
+static size_t trailing_zeros(index_mask m);
+static size_t leading_zeros(index_mask m);
+static size_t next_index(index_mask *m);
+static ccc_tribool is_full(ccc_shm_meta m);
+static ccc_tribool is_constant(ccc_shm_meta m);
+static ccc_tribool is_empty_constant(ccc_shm_meta m);
+static ccc_shm_meta to_meta(uint64_t hash);
+static group load_group(ccc_shm_meta *src);
+static void store_group(ccc_shm_meta *dst, group const *src);
+static index_mask match_meta(group const *g, ccc_shm_meta m);
+static index_mask match_empty(group const *g);
+static index_mask match_empty_or_deleted(group const *g);
+static index_mask match_full(group const *g);
+static group make_deleted_empty_and_full_deleted(group const *g);
+
+/*===========================    Interface   ================================*/
+
+ccc_shmap_entry
+ccc_shm_entry(ccc_simd_hash_map *h, void const *key)
+{
+    if (!h || !key)
+    {
+        return (ccc_shmap_entry){{.handle_ = {.stats_ = CCC_ENTRY_ARG_ERROR}}};
+    }
+    return (ccc_shmap_entry){container_entry(h, key)};
+}
+
+/*=========================   Static Internals   ============================*/
+
+static struct ccc_shash_entry_
+container_entry(struct ccc_shmap_ *const h, void const *const key)
+{
+    uint64_t const hash = h->hash_fn_((ccc_user_key){key, h->aux_});
+    return (struct ccc_shash_entry_){
+        .h_ = (struct ccc_shmap_ *)h,
+        .meta_ = to_meta(hash),
+        .handle_ = handle(h, key, hash),
+    };
+}
+
+static struct ccc_handl_
+handle(struct ccc_shmap_ *const h, void const *const key, uint64_t const hash)
+{
+    ccc_entry_status upcoming_insertion_error = 0;
+    if (maybe_rehash(h) != CCC_RESULT_OK)
+    {
+        upcoming_insertion_error = CCC_ENTRY_INSERT_ERROR;
+    }
+    struct ccc_handl_ res = find_handle(h, key, hash);
+    res.stats_ |= upcoming_insertion_error;
+    return res;
+}
+
+/* Finds the specified hash or first available slot where the hash could be
+inserted. If the element does not exist and a non-occupied slot is returned
+that slot will have been the first empty or deleted slot encountered in the
+probe sequence. This function assumes an empty slot exists in the table. */
+static struct ccc_handl_
+find_handle(struct ccc_shmap_ *h, void const *key, uint64_t const hash)
+{
+    ccc_shm_meta const meta = to_meta(hash);
+    size_t const mask = h->mask_;
+    struct triangular_seq seq = {.i = hash & mask, .stride = 0};
+    ccc_ucount empty_or_deleted = {.error = CCC_RESULT_FAIL};
+    do
+    {
+        group const g = load_group(&h->meta_[seq.i]);
+        index_mask m = match_meta(&g, meta);
+        for (size_t i_match = lowest_on_index(m); i_match != CCC_SHM_GROUP_SIZE;
+             i_match = next_index(&m))
+        {
+            i_match = (seq.i + i_match) & mask;
+            void const *const data = h->meta_ - ((i_match + 1) * h->elem_sz_);
+            if (h->eq_fn_((ccc_key_cmp){
+                    .key_lhs = key, .user_type_rhs = data, .aux = h->aux_}))
+            {
+                return (struct ccc_handl_){.i_ = i_match,
+                                           .stats_ = CCC_ENTRY_OCCUPIED};
+            }
+        }
+        if (empty_or_deleted.error)
+        {
+            size_t const i_take = lowest_on_index(match_empty_or_deleted(&g));
+            if (i_take != CCC_SHM_GROUP_SIZE)
+            {
+                empty_or_deleted.count = (seq.i + i_take) & mask;
+                empty_or_deleted.error = CCC_RESULT_OK;
+            }
+        }
+        if (is_index_on(match_empty(&g)))
+        {
+            return (struct ccc_handl_){.i_ = empty_or_deleted.count,
+                                       .stats_ = CCC_ENTRY_VACANT};
+        }
+        seq.stride += CCC_SHM_GROUP_SIZE;
+        seq.i += seq.stride;
+        seq.i &= mask;
+    } while (1);
+}
+
+/*=====================   Intrinsics and Generics   =========================*/
+
 /** Below are the implementations of the SIMD or bitwise operations needed to
 run a search on multiple entries in the hash table simultaneously. For now,
 the only container that will use these operations is this one so there is no
 need to break out different headers and sources and clutter the src directory.
 x86 is the only platform that gets the full benefit of SIMD. Apple and all
 other platforms will get a portable implementation due to concerns over NEON
-speed of vectorized instructions. */
+speed of vectorized instructions. However, loading up groups into a uint64_t is
+still good and counts as SIMD just not the type that uses cpu vector lanes. */
 
 /* We can vectorize for x86 only. */
 #if defined(__x86_64) && defined(__SSE2__)
+
+/*====================  Bit Counting for Index Mask   =======================*/
+
+#    if defined(__GNUC__) || defined(__clang__)
+
+static inline unsigned
+countr_0(index_mask const m)
+{
+    return m.v ? __builtin_ctz(m.v) : CCC_SHM_GROUP_SIZE;
+}
+
+static inline unsigned
+countl_0(index_mask const m)
+{
+    return m.v ? __builtin_clz(m.v) : CCC_SHM_GROUP_SIZE;
+}
+
+#    else /* !defined(__GNUC__) && !defined(__clang__) */
+
+static inline unsigned
+countr_0(index_mask m)
+{
+    if (!m.v)
+    {
+        return CCC_SHM_GROUP_SIZE;
+    }
+    unsigned cnt = 0;
+    for (; m.v; cnt += !!(m.v & 1U), m.v >>= 1U)
+    {}
+    return cnt;
+}
+
+static inline unsigned
+countl_0(index_mask m)
+{
+    if (!m.v)
+    {
+        return CCC_SHM_GROUP_SIZE;
+    }
+    unsigned cnt = 0;
+    for (; !(m.v & INDEX_MASK_MSB); ++cnt, m.v <<= 1U)
+    {}
+    return cnt;
+}
+
+#    endif /* defined(__GNUC__) || defined(__clang__) */
+
+/*========================  Index Mask Implementations   ====================*/
+
+static inline ccc_tribool
+is_index_on(index_mask const m)
+{
+    return m.v != 0;
+}
+
+static inline size_t
+lowest_on_index(index_mask const m)
+{
+    return countr_0(m);
+}
+
+static inline size_t
+trailing_zeros(index_mask const m)
+{
+    return countr_0(m);
+}
+
+static inline size_t
+leading_zeros(index_mask const m)
+{
+    return countl_0(m);
+}
+
+static inline size_t
+next_index(index_mask *const m)
+{
+    assert(m);
+    size_t const index = lowest_on_index(*m);
+    m->v &= (m->v - 1);
+    return index;
+}
 
 /*========================  Metadata Implementations   ======================*/
 
@@ -101,7 +305,7 @@ is_empty_constant(ccc_shm_meta const m)
 static inline ccc_shm_meta
 to_meta(uint64_t const hash)
 {
-    return (ccc_shm_meta){(hash >> ((sizeof(uint64_t) * CHAR_BIT) - 7))
+    return (ccc_shm_meta){(hash >> ((sizeof(hash) * CHAR_BIT) - 7))
                           & LOWER_7_BITS_MASK};
 }
 
