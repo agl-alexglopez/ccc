@@ -80,9 +80,11 @@ static struct ccc_shash_entry_ container_entry(struct ccc_shmap_ *h,
                                                void const *key);
 static struct ccc_handl_ handle(struct ccc_shmap_ *h, void const *key,
                                 uint64_t hash);
-static struct ccc_handl_ find_handle(struct ccc_shmap_ *h, void const *key,
-                                     uint64_t hash);
-ccc_result maybe_rehash(struct ccc_shmap_ *h);
+static struct ccc_handl_ find_key_or_slot(struct ccc_shmap_ const *h,
+                                          void const *key, uint64_t hash);
+static ccc_ucount find_key(struct ccc_shmap_ const *h, void const *key,
+                           uint64_t hash);
+static ccc_result maybe_rehash(struct ccc_shmap_ *h);
 
 static ccc_tribool is_index_on(index_mask m);
 static size_t lowest_on_index(index_mask m);
@@ -100,6 +102,8 @@ static index_mask match_empty(group const *g);
 static index_mask match_empty_or_deleted(group const *g);
 static index_mask match_full(group const *g);
 static group make_deleted_empty_and_full_deleted(group const *g);
+static unsigned countr_0(index_mask m);
+static unsigned countl_0(index_mask m);
 
 /*===========================    Interface   ================================*/
 
@@ -130,11 +134,18 @@ static struct ccc_handl_
 handle(struct ccc_shmap_ *const h, void const *const key, uint64_t const hash)
 {
     ccc_entry_status upcoming_insertion_error = 0;
-    if (maybe_rehash(h) != CCC_RESULT_OK)
+    switch (maybe_rehash(h))
     {
+    case CCC_RESULT_OK:
+        break;
+    case CCC_RESULT_ARG_ERROR:
+        return (struct ccc_handl_){.stats_ = CCC_ENTRY_ARG_ERROR};
+        break;
+    default:
         upcoming_insertion_error = CCC_ENTRY_INSERT_ERROR;
-    }
-    struct ccc_handl_ res = find_handle(h, key, hash);
+        break;
+    };
+    struct ccc_handl_ res = find_key_or_slot(h, key, hash);
     res.stats_ |= upcoming_insertion_error;
     return res;
 }
@@ -144,7 +155,8 @@ inserted. If the element does not exist and a non-occupied slot is returned
 that slot will have been the first empty or deleted slot encountered in the
 probe sequence. This function assumes an empty slot exists in the table. */
 static struct ccc_handl_
-find_handle(struct ccc_shmap_ *h, void const *key, uint64_t const hash)
+find_key_or_slot(struct ccc_shmap_ const *const h, void const *const key,
+                 uint64_t const hash)
 {
     ccc_shm_meta const meta = to_meta(hash);
     size_t const mask = h->mask_;
@@ -186,6 +198,84 @@ find_handle(struct ccc_shmap_ *h, void const *key, uint64_t const hash)
     } while (1);
 }
 
+/* Finds key or quits when first empty slot is encountered after a group fails
+to match. This function is better when a simple lookup is needed as a few
+branches and loads of groups are omitted compared to the search with intention
+to insert or remove. A successful search returns the index with an OK status
+while a failed search indicates a failure error. */
+static ccc_ucount
+find_key(struct ccc_shmap_ const *const h, void const *const key,
+         uint64_t const hash)
+{
+    ccc_shm_meta const meta = to_meta(hash);
+    size_t const mask = h->mask_;
+    struct triangular_seq seq = {.i = hash & mask, .stride = 0};
+    do
+    {
+        group const g = load_group(&h->meta_[seq.i]);
+        index_mask m = match_meta(&g, meta);
+        for (size_t i_match = lowest_on_index(m); i_match != CCC_SHM_GROUP_SIZE;
+             i_match = next_index(&m))
+        {
+            i_match = (seq.i + i_match) & mask;
+            void const *const data = h->meta_ - ((i_match + 1) * h->elem_sz_);
+            if (h->eq_fn_((ccc_key_cmp){
+                    .key_lhs = key, .user_type_rhs = data, .aux = h->aux_}))
+            {
+                return (ccc_ucount){.count = i_match};
+            }
+        }
+        if (is_index_on(match_empty(&g)))
+        {
+            return (ccc_ucount){.error = CCC_RESULT_FAIL};
+        }
+        seq.stride += CCC_SHM_GROUP_SIZE;
+        seq.i += seq.stride;
+        seq.i &= mask;
+    } while (1);
+}
+
+static ccc_result
+maybe_rehash(struct ccc_shmap_ *const h)
+{
+    if (!h->mask_ && !h->alloc_fn_)
+    {
+        return CCC_RESULT_NO_ALLOC;
+    }
+    if (!h->init_)
+    {
+        if (h->mask_)
+        {
+            if (h->mask_ + 1 < CCC_SHM_GROUP_SIZE
+                || ((h->mask_ + 1) & h->mask_) != 0)
+            {
+                return CCC_RESULT_ARG_ERROR;
+            }
+            if (h->meta_)
+            {
+                (void)memset(h->meta_, CCC_SHM_EMPTY,
+                             (h->mask_ + 1) + CCC_SHM_GROUP_SIZE);
+            }
+        }
+        h->init_ = CCC_TRUE;
+    }
+    if (!h->mask_)
+    {
+        size_t const total_bytes
+            = (CCC_SHM_GROUP_SIZE * h->elem_sz_) + (CCC_SHM_GROUP_SIZE * 2UL);
+        void *const buf = h->alloc_fn_(NULL, total_bytes, h->aux_);
+        if (!buf)
+        {
+            return CCC_RESULT_MEM_ERROR;
+        }
+        h->mask_ = CCC_SHM_GROUP_SIZE - 1;
+        h->data_ = buf;
+        h->meta_ = (ccc_shm_meta *)(((char *)buf + total_bytes)
+                                    - (CCC_SHM_GROUP_SIZE * 2UL));
+        (void)memset(h->meta_, CCC_SHM_EMPTY, (CCC_SHM_GROUP_SIZE * 2UL));
+    }
+}
+
 /*=====================   Intrinsics and Generics   =========================*/
 
 /** Below are the implementations of the SIMD or bitwise operations needed to
@@ -195,56 +285,10 @@ need to break out different headers and sources and clutter the src directory.
 x86 is the only platform that gets the full benefit of SIMD. Apple and all
 other platforms will get a portable implementation due to concerns over NEON
 speed of vectorized instructions. However, loading up groups into a uint64_t is
-still good and counts as SIMD just not the type that uses cpu vector lanes. */
+still good and counts as SIMD just not the type that uses CPU vector lanes. */
 
 /* We can vectorize for x86 only. */
 #if defined(__x86_64) && defined(__SSE2__)
-
-/*====================  Bit Counting for Index Mask   =======================*/
-
-#    if defined(__GNUC__) || defined(__clang__)
-
-static inline unsigned
-countr_0(index_mask const m)
-{
-    return m.v ? __builtin_ctz(m.v) : CCC_SHM_GROUP_SIZE;
-}
-
-static inline unsigned
-countl_0(index_mask const m)
-{
-    return m.v ? __builtin_clz(m.v) : CCC_SHM_GROUP_SIZE;
-}
-
-#    else /* !defined(__GNUC__) && !defined(__clang__) */
-
-static inline unsigned
-countr_0(index_mask m)
-{
-    if (!m.v)
-    {
-        return CCC_SHM_GROUP_SIZE;
-    }
-    unsigned cnt = 0;
-    for (; m.v; cnt += !!(m.v & 1U), m.v >>= 1U)
-    {}
-    return cnt;
-}
-
-static inline unsigned
-countl_0(index_mask m)
-{
-    if (!m.v)
-    {
-        return CCC_SHM_GROUP_SIZE;
-    }
-    unsigned cnt = 0;
-    for (; !(m.v & INDEX_MASK_MSB); ++cnt, m.v <<= 1U)
-    {}
-    return cnt;
-}
-
-#    endif /* defined(__GNUC__) || defined(__clang__) */
 
 /*========================  Index Mask Implementations   ====================*/
 
@@ -359,6 +403,52 @@ make_deleted_empty_and_full_deleted(group const *const g)
     return (group){
         _mm_or_si128(match_constants, _mm_set1_epi8((int8_t)CCC_SHM_DELETED))};
 }
+
+/*====================  Bit Counting for Index Mask   =======================*/
+
+#    if defined(__GNUC__) || defined(__clang__)
+
+static inline unsigned
+countr_0(index_mask const m)
+{
+    return m.v ? __builtin_ctz(m.v) : CCC_SHM_GROUP_SIZE;
+}
+
+static inline unsigned
+countl_0(index_mask const m)
+{
+    return m.v ? __builtin_clz(m.v) : CCC_SHM_GROUP_SIZE;
+}
+
+#    else /* !defined(__GNUC__) && !defined(__clang__) */
+
+static inline unsigned
+countr_0(index_mask m)
+{
+    if (!m.v)
+    {
+        return CCC_SHM_GROUP_SIZE;
+    }
+    unsigned cnt = 0;
+    for (; m.v; cnt += !!(m.v & 1U), m.v >>= 1U)
+    {}
+    return cnt;
+}
+
+static inline unsigned
+countl_0(index_mask m)
+{
+    if (!m.v)
+    {
+        return CCC_SHM_GROUP_SIZE;
+    }
+    unsigned cnt = 0;
+    for (; !(m.v & INDEX_MASK_MSB); ++cnt, m.v <<= 1U)
+    {}
+    return cnt;
+}
+
+#    endif /* defined(__GNUC__) || defined(__clang__) */
 
 #else
 #endif /* defined(__x86_64) && defined(__SSE2__) */

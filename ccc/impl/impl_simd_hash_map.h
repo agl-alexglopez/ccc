@@ -49,14 +49,16 @@ map is allowed to allocate it will take care of aligning pointers appropriately.
 In the fixed size case we rely on the user defining a fixed size type. In either
 case the arrays are in one contiguous allocation but split as follows:
 
+(N == mask_ == capacity - 1) Where capacity is a required power of 2.
                         *
-|Pad|D_N|...|D_2|D_1|D_0|M_0|M_1|M_2|...|M_N|S_0|...|S_N
+|Pad|D_N|...|D_2|D_1|D_0|M_0|M_1|M_2|...|M_N|R_0|...|R_N
                         ^                   ^
                         |                   |
-                   Shared base      Start of Sentinel group to support
-                   address of       a group load that starts at M_N. This
-                   Data and Meta.   means S_N is never loaded or stored
-                   arrays.          during group operations.
+                   Shared base      Start of Replica of first group to support
+                   address of       a group load that starts at M_N as well as
+                   Data and Meta.   erase and inserts. This means R_N is never
+                   arrays.          needed but duplicated for branchless ops.
+                   arrays.
 
 The Data array has a reverse layout so that indices will be found as a
 subtracted address offset from the shared base location. Individual elements are
@@ -71,8 +73,8 @@ struct ccc_shmap_
     ccc_shm_meta *meta_;     /** Metadata array on byte following data_[0]. */
     size_t sz_;              /** The number of user active slots. */
     size_t avail_;           /** Track to know when rehashing is needed. */
-    size_t cap_;             /** Number of mapped slots from meta->data. */
     size_t mask_;            /** The mask for power of two table sizing. */
+    ccc_tribool init_;       /** One-time flag to lazily initialize table. */
     size_t elem_sz_;         /** Size of each user data element being stored. */
     size_t key_offset_;      /** The location of the key field in user type. */
     ccc_key_eq_fn *eq_fn_;   /** The user callback for equality comparison. */
@@ -116,11 +118,11 @@ array must be rounded up */
         .data_ = (data_ptr),                                                   \
         .meta_ = (meta_ptr),                                                   \
         .sz_ = 0,                                                              \
-        .avail_ = (capacity),                                                  \
-        .cap_ = (capacity),                                                    \
-        .mask_ = ((capacity) - 1),                                             \
+        .avail_ = (((capacity) / 8) * 7),                                      \
+        .mask_ = (((capacity) > 0) ? ((capacity) - 1) : 0),                    \
+        .init_ = CCC_FALSE,                                                    \
         .elem_sz_ = sizeof(*(data_ptr)),                                       \
-        .key_offset_ = offsetof(*(memory_ptr), key_field),                     \
+        .key_offset_ = offsetof(*(data_ptr), key_field),                       \
         .hash_fn_ = (hash_fn),                                                 \
         .alloc_fn_ = (alloc_fn),                                               \
         .aux_ = (aux_data),                                                    \
