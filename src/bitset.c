@@ -1555,7 +1555,7 @@ countl_0(ccc_bitblock_ const b)
 #else /* !defined(__GNUC__) && !defined(__clang__) */
 
 static inline unsigned
-popcount(ccc_bitblock_ const b)
+popcount(ccc_bitblock_ b)
 {
     unsigned cnt = 0;
     for (; b; cnt += !!(b & 1U), b >>= 1U)
@@ -1564,7 +1564,7 @@ popcount(ccc_bitblock_ const b)
 }
 
 static inline unsigned
-countr_0(ccc_bitblock_ const b)
+countr_0(ccc_bitblock_ b)
 {
     if (!b)
     {
@@ -1577,7 +1577,7 @@ countr_0(ccc_bitblock_ const b)
 }
 
 static inline unsigned
-countl_0(ccc_bitblock_ const b)
+countl_0(ccc_bitblock_ b)
 {
     if (!b)
     {
