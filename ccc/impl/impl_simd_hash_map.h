@@ -1,8 +1,11 @@
 #ifndef CCC_IMPL_SIMD_HASH_MAP_H
 #define CCC_IMPL_SIMD_HASH_MAP_H
 
+/** @cond */
+#include <assert.h>
 #include <stddef.h>
 #include <stdint.h>
+/** @endcond */
 
 #include "../types.h"
 #include "impl_types.h"
@@ -28,12 +31,21 @@ typedef struct
         CCC_SHM_EMPTY = 0xFF,
     } v;
 } ccc_shm_meta;
+static_assert(sizeof(ccc_shm_meta) == sizeof(uint8_t),
+              "meta must wrap a byte in a struct without padding for better "
+              "optimizations and no strict-aliasing exceptions.");
+static_assert(
+    (CCC_SHM_DELETED | CCC_SHM_EMPTY) == (uint8_t)~0,
+    "all bits must be accounted for across deleted and empty status.");
+static_assert(
+    (CCC_SHM_DELETED ^ CCC_SHM_EMPTY) == 0x7F,
+    "only empty should have lsb on and 7 bits are available for hash");
 
 /** @private Vectorized group scanning allows more parallel scans but a
 fallback of 8 is good for a portable implementation that will use the widest
 word on a platform for group scanning. Right now, this lib targets 64-bit so
-that means uint64_t is widest default integer widely supported. That width is
-still valid on 32-bit but probably very slow due to emulation. */
+that means uint64_t is widest default integer widely supported. That width
+is still valid on 32-bit but probably very slow due to emulation. */
 enum
 {
 #if defined(__x86_64) && defined(__SSE2__)
@@ -110,7 +122,23 @@ array must be rounded up */
         ccc_shm_meta                                                           \
             meta[(((capacity) + ((capacity) - 1)) / CCC_SHM_GROUP_SIZE)        \
                  + CCC_SHM_GROUP_SIZE];                                        \
-    }(fixed_map_type_name);
+    }(fixed_map_type_name);                                                    \
+    static_assert(sizeof((fixed_map_type_name){}.data) != 0,                   \
+                  "fixed size map must have capacity greater than "            \
+                  "0.");                                                       \
+    static_assert((sizeof((fixed_map_type_name){}.data)                        \
+                   / sizeof((fixed_map_type_name){}.data[0]))                  \
+                      >= CCC_SHM_GROUP_SIZE,                                   \
+                  "fixed size map must have capacity >= "                      \
+                  "CCC_SHM_GROUP_SIZE (8 or 16 depending on platform).");      \
+    static_assert(((sizeof((fixed_map_type_name){}.data)                       \
+                    / sizeof((fixed_map_type_name){}.data[0]))                 \
+                   & ((sizeof((fixed_map_type_name){}.data)                    \
+                       / sizeof((fixed_map_type_name){}.data[0]))              \
+                      - 1))                                                    \
+                      == 0,                                                    \
+                  "fixed size map must be a power of 2 capacity (32, 64, "     \
+                  "128, 256, etc.).");
 
 #define ccc_impl_shm_init(data_ptr, meta_ptr, key_field, hash_fn, key_eq_fn,   \
                           alloc_fn, aux_data, capacity)                        \

@@ -8,6 +8,14 @@
 #include "simd_hash_map.h"
 #include "types.h"
 
+#if defined(__GNUC__) || defined(__clang__)
+#    define unlikely(expr) __builtin_expect(!!(expr), 0)
+#    define likely(expr) __builtin_expect(!!(expr), 1)
+#else
+#    define unlikely(expr) expr
+#    define likely(expr) expr
+#endif
+
 /* Can we vectorize? Single field unions are guaranteed by the standard to have
 no padding even though some claim single field structs get the same benefit,
 trivially. However, not guaranteed by the standard so use unions instead */
@@ -85,6 +93,8 @@ static struct ccc_handl_ find_key_or_slot(struct ccc_shmap_ const *h,
 static ccc_ucount find_key(struct ccc_shmap_ const *h, void const *key,
                            uint64_t hash);
 static ccc_result maybe_rehash(struct ccc_shmap_ *h);
+static void insert(struct ccc_shmap_ *h, void const *key_val_type,
+                   ccc_shm_meta m, size_t i);
 
 static ccc_tribool is_index_on(index_mask m);
 static size_t lowest_on_index(index_mask m);
@@ -108,13 +118,38 @@ static unsigned countl_0(index_mask m);
 /*===========================    Interface   ================================*/
 
 ccc_shmap_entry
-ccc_shm_entry(ccc_simd_hash_map *h, void const *key)
+ccc_shm_entry(ccc_simd_hash_map *const h, void const *const key)
 {
-    if (!h || !key)
+    if (unlikely(!h || !key))
     {
         return (ccc_shmap_entry){{.handle_ = {.stats_ = CCC_ENTRY_ARG_ERROR}}};
     }
     return (ccc_shmap_entry){container_entry(h, key)};
+}
+
+void *
+ccc_shm_insert_entry(ccc_shmap_entry *const e, void const *key_val_type)
+{
+
+    if (unlikely(!e || !key_val_type))
+    {
+        return NULL;
+    }
+    if (e->impl_.handle_.stats_ & CCC_ENTRY_OCCUPIED)
+    {
+        void *const slot
+            = e->impl_.h_->meta_
+              - (e->impl_.h_->elem_sz_ * (e->impl_.handle_.i_ + 1));
+        (void)memcpy(slot, key_val_type, e->impl_.h_->elem_sz_);
+        return slot;
+    }
+    if (e->impl_.handle_.stats_ & CCC_ENTRY_INSERT_ERROR)
+    {
+        return NULL;
+    }
+    insert(e->impl_.h_, key_val_type, e->impl_.meta_, e->impl_.handle_.i_);
+    return e->impl_.h_->meta_
+           - (e->impl_.h_->elem_sz_ * (e->impl_.handle_.i_ + 1));
 }
 
 /*=========================   Static Internals   ============================*/
@@ -148,6 +183,18 @@ handle(struct ccc_shmap_ *const h, void const *const key, uint64_t const hash)
     struct ccc_handl_ res = find_key_or_slot(h, key, hash);
     res.stats_ |= upcoming_insertion_error;
     return res;
+}
+
+static void
+insert(struct ccc_shmap_ *const h, void const *const key_val_type,
+       ccc_shm_meta const m, size_t const i)
+{
+    h->avail_ -= is_empty_constant(h->meta_[i]);
+    ++h->sz_;
+    size_t const replica_byte
+        = ((i - CCC_SHM_GROUP_SIZE) & h->mask_) + CCC_SHM_GROUP_SIZE;
+    h->meta_[i] = m;
+    h->meta_[replica_byte] = m;
 }
 
 /* Finds the specified hash or first available slot where the hash could be
