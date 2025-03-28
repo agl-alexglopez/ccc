@@ -285,7 +285,8 @@ need to break out different headers and sources and clutter the src directory.
 x86 is the only platform that gets the full benefit of SIMD. Apple and all
 other platforms will get a portable implementation due to concerns over NEON
 speed of vectorized instructions. However, loading up groups into a uint64_t is
-still good and counts as SIMD just not the type that uses CPU vector lanes. */
+still good and for simultaneous operations just not the type that uses CPU
+vector lanes for a single instruction. */
 
 /* We can vectorize for x86 only. */
 #if defined(__x86_64) && defined(__SSE2__)
