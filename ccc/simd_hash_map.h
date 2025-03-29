@@ -19,7 +19,8 @@ typedef struct ccc_shmap_ ccc_simd_hash_map;
 
 [[nodiscard]] ccc_shmap_entry ccc_shm_entry(ccc_simd_hash_map *h,
                                             void const *key);
-[[nodiscard]] void *ccc_shm_insert_entry(ccc_shmap_entry *e,
+[[nodiscard]] void *ccc_shm_insert_entry(ccc_shmap_entry const *e,
                                          void const *key_val_type);
+[[nodiscard]] ccc_entry ccc_shm_remove_entry(ccc_shmap_entry const *e);
 
 #endif /* CCC_SIMD_HASH_MAP_H */
