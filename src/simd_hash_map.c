@@ -39,13 +39,6 @@ enum
     INDEX_MASK_MSB = 0x8000,
 };
 
-alignas(16) static const ccc_shm_meta empty_group[GROUP_BYTES] = {
-    {CCC_SHM_EMPTY}, {CCC_SHM_EMPTY}, {CCC_SHM_EMPTY}, {CCC_SHM_EMPTY},
-    {CCC_SHM_EMPTY}, {CCC_SHM_EMPTY}, {CCC_SHM_EMPTY}, {CCC_SHM_EMPTY},
-    {CCC_SHM_EMPTY}, {CCC_SHM_EMPTY}, {CCC_SHM_EMPTY}, {CCC_SHM_EMPTY},
-    {CCC_SHM_EMPTY}, {CCC_SHM_EMPTY}, {CCC_SHM_EMPTY}, {CCC_SHM_EMPTY},
-};
-
 #else
 #    include <stdint.h>
 typedef struct
@@ -64,10 +57,6 @@ enum
     INDEX_MASK_MSBYTE = 0xFF00000000000000,
 };
 
-alignas(8) static const ccc_shm_meta empty_group[GROUP_BYTES] = {
-    {CCC_SHM_EMPTY}, {CCC_SHM_EMPTY}, {CCC_SHM_EMPTY}, {CCC_SHM_EMPTY},
-    {CCC_SHM_EMPTY}, {CCC_SHM_EMPTY}, {CCC_SHM_EMPTY}, {CCC_SHM_EMPTY},
-};
 #endif /* defined(__x86_64) && defined(__SSE2__) */
 
 enum : uint8_t
@@ -137,7 +126,7 @@ ccc_shm_entry(ccc_simd_hash_map *const h, void const *const key)
 }
 
 void *
-ccc_shm_insert_entry(ccc_shmap_entry *const e, void const *key_val_type)
+ccc_shm_insert_entry(ccc_shmap_entry const *const e, void const *key_val_type)
 {
 
     if (unlikely(!e || !key_val_type))
@@ -156,6 +145,22 @@ ccc_shm_insert_entry(ccc_shmap_entry *const e, void const *key_val_type)
     }
     insert(e->impl_.h_, key_val_type, e->impl_.meta_, e->impl_.handle_.i_);
     return data_at(e->impl_.h_, e->impl_.handle_.i_);
+}
+
+ccc_entry
+ccc_shm_remove_entry(ccc_shmap_entry const *const e)
+{
+    if (unlikely(!e))
+    {
+        return (ccc_entry){{.stats_ = CCC_ENTRY_ARG_ERROR}};
+    }
+    if (e->impl_.handle_.stats_ != CCC_ENTRY_OCCUPIED)
+    {
+        return (ccc_entry){{.stats_ = CCC_ENTRY_VACANT}};
+    }
+    erase(e->impl_.h_, e->impl_.handle_.i_);
+    return (ccc_entry){{.e_ = data_at(e->impl_.h_, e->impl_.handle_.i_),
+                        .stats_ = CCC_ENTRY_OCCUPIED}};
 }
 
 /*=========================   Static Internals   ============================*/
