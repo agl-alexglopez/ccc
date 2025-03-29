@@ -62,13 +62,13 @@ In the fixed size case we rely on the user defining a fixed size type. In either
 case the arrays are in one contiguous allocation but split as follows:
 
 (N == mask_ == capacity - 1) Where capacity is a required power of 2.
-                        *
-|Pad|D_N|...|D_2|D_1|D_0|M_0|M_1|M_2|...|M_N|R_0|...|R_N
-                        ^                   ^
-                        |                   |
-                   Shared base      Start of Replica of first group to support
-                   address of       a group load that starts at M_N as well as
-                   Data and Meta.   erase and inserts. This means R_N is never
+                         *
+|Swap|D_N|...|D_2|D_1|D_0|M_0|M_1|M_2|...|M_N|R_0|...|R_N
+ ^                       ^                   ^
+ |                       |                   |
+Swap slot for      Shared base      Start of Replica of first group to support
+in place           address of       a group load that starts at M_N as well as
+rehashing          Data and Meta.   erase and inserts. This means R_N is never
                    arrays.          needed but duplicated for branchless ops.
                    arrays.
 
@@ -116,29 +116,21 @@ should be fine as they are likely to only declare one or two. The metadata
 array must be rounded up */
 #define ccc_impl_shm_declare_fixed_map(fixed_map_type_name, key_val_type_name, \
                                        capacity)                               \
+    static_assert((capacity) != 0,                                             \
+                  "fixed size map must have capacity greater than 0.");        \
+    static_assert((capacity) >= CCC_SHM_GROUP_SIZE,                            \
+                  "fixed size map must have capacity >= CCC_SHM_GROUP_SIZE "   \
+                  "(8 or 16 depending on platform).");                         \
+    static_assert(((capacity) & ((capacity) - 1)) == 0,                        \
+                  "fixed size map must be a power of 2 capacity (32, 64, "     \
+                  "128, 256, etc.).");                                         \
     typedef struct                                                             \
     {                                                                          \
-        key_val_type_name data[capacity];                                      \
+        key_val_type_name data[(capacity) + 1];                                \
         ccc_shm_meta                                                           \
             meta[(((capacity) + ((capacity) - 1)) / CCC_SHM_GROUP_SIZE)        \
                  + CCC_SHM_GROUP_SIZE];                                        \
-    }(fixed_map_type_name);                                                    \
-    static_assert(sizeof((fixed_map_type_name){}.data) != 0,                   \
-                  "fixed size map must have capacity greater than "            \
-                  "0.");                                                       \
-    static_assert((sizeof((fixed_map_type_name){}.data)                        \
-                   / sizeof((fixed_map_type_name){}.data[0]))                  \
-                      >= CCC_SHM_GROUP_SIZE,                                   \
-                  "fixed size map must have capacity >= "                      \
-                  "CCC_SHM_GROUP_SIZE (8 or 16 depending on platform).");      \
-    static_assert(((sizeof((fixed_map_type_name){}.data)                       \
-                    / sizeof((fixed_map_type_name){}.data[0]))                 \
-                   & ((sizeof((fixed_map_type_name){}.data)                    \
-                       / sizeof((fixed_map_type_name){}.data[0]))              \
-                      - 1))                                                    \
-                      == 0,                                                    \
-                  "fixed size map must be a power of 2 capacity (32, 64, "     \
-                  "128, 256, etc.).");
+    }(fixed_map_type_name);
 
 #define ccc_impl_shm_init(data_ptr, meta_ptr, key_field, hash_fn, key_eq_fn,   \
                           alloc_fn, aux_data, capacity)                        \
