@@ -115,6 +115,24 @@ static unsigned countl_0(index_mask m);
 
 /*===========================    Interface   ================================*/
 
+ccc_tribool
+ccc_shm_contains(ccc_simd_hash_map *const h, void const *const key)
+{
+    if (unlikely(!h || !key))
+    {
+        return CCC_TRIBOOL_ERROR;
+    }
+    if (unlikely(!h->init_ || !h->sz_))
+    {
+        return CCC_FALSE;
+    }
+    return CCC_RESULT_OK
+           == find_key(
+                  h, key,
+                  h->hash_fn_((ccc_user_key){.user_key = key, .aux = h->aux_}))
+                  .error;
+}
+
 ccc_shmap_entry
 ccc_shm_entry(ccc_simd_hash_map *const h, void const *const key)
 {
@@ -515,7 +533,7 @@ data_at(struct ccc_shmap_ const *const h, size_t const i)
 }
 
 static inline void
-swap(char tmp[const], void *a, void *b, size_t ab_size)
+swap(char tmp[const], void *const a, void *const b, size_t const ab_size)
 {
     if (unlikely(!a || !b || a == b))
     {
@@ -701,5 +719,10 @@ countl_0(index_mask m)
 
 #    endif /* defined(__GNUC__) || defined(__clang__) */
 
-#else
+#else /* !defined(__x86_64) || !defined(__SSE2__) */
+
+/* What follows is the generic portable implementation when high width SIMD
+can't be achieved. For now this means NEON on Apple defaults to generic but
+this will likely change in the future as NEON improves. */
+
 #endif /* defined(__x86_64) && defined(__SSE2__) */

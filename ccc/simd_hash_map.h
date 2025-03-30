@@ -17,6 +17,8 @@ typedef struct ccc_shmap_ ccc_simd_hash_map;
     ccc_impl_shm_init(data_ptr, meta_ptr, key_field, hash_fn, key_eq_fn,       \
                       alloc_fn, aux_data, capacity)
 
+[[nodiscard]] ccc_tribool ccc_shm_contains(ccc_simd_hash_map *h,
+                                           void const *key);
 [[nodiscard]] ccc_shmap_entry ccc_shm_entry(ccc_simd_hash_map *h,
                                             void const *key);
 [[nodiscard]] void *ccc_shm_insert_entry(ccc_shmap_entry const *e,
