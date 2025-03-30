@@ -39,6 +39,11 @@ enum
     INDEX_MASK_MSB = 0x8000,
 };
 
+enum : size_t
+{
+    SIZE_T_MSB = 0x1000000000000000,
+};
+
 #else
 #    include <stdint.h>
 typedef struct
@@ -83,12 +88,12 @@ static struct ccc_handl_ find_key_or_slot(struct ccc_shmap_ const *h,
 static ccc_ucount find_key(struct ccc_shmap_ const *h, void const *key,
                            uint64_t hash);
 static size_t find_known_insert_slot(struct ccc_shmap_ const *h, uint64_t hash);
-static ccc_result maybe_rehash(struct ccc_shmap_ *h);
+static ccc_result maybe_rehash(struct ccc_shmap_ *h, size_t to_add);
 static void insert(struct ccc_shmap_ *h, void const *key_val_type,
                    ccc_shm_meta m, size_t i);
 static void erase(struct ccc_shmap_ *h, size_t i);
 static void rehash_in_place(struct ccc_shmap_ *h);
-static ccc_result rehash_resize(struct ccc_shmap_ *h);
+static ccc_result rehash_resize(struct ccc_shmap_ *h, size_t to_add);
 static void *key_at(struct ccc_shmap_ const *h, size_t i);
 static void *data_at(struct ccc_shmap_ const *h, size_t i);
 static void swap(char tmp[const], void *a, void *b, size_t ab_size);
@@ -112,6 +117,8 @@ static index_mask match_full(group g);
 static group make_deleted_empty_and_full_deleted(group g);
 static unsigned countr_0(index_mask m);
 static unsigned countl_0(index_mask m);
+static unsigned countl_0_size_t(size_t n);
+static size_t next_power_of_two(size_t n);
 
 /*===========================    Interface   ================================*/
 
@@ -198,7 +205,7 @@ static struct ccc_handl_
 handle(struct ccc_shmap_ *const h, void const *const key, uint64_t const hash)
 {
     ccc_entry_status upcoming_insertion_error = 0;
-    switch (maybe_rehash(h))
+    switch (maybe_rehash(h, 1))
     {
     case CCC_RESULT_OK:
         break;
@@ -329,6 +336,8 @@ find_key(struct ccc_shmap_ const *const h, void const *const key,
     } while (1);
 }
 
+/* Finds an insert slot or loops forever. The caller of this function must know
+that there is an available empty or deleted slot in the table. */
 static size_t
 find_known_insert_slot(struct ccc_shmap_ const *const h, uint64_t const hash)
 {
@@ -349,17 +358,23 @@ find_known_insert_slot(struct ccc_shmap_ const *const h, uint64_t const hash)
 }
 
 static ccc_result
-maybe_rehash(struct ccc_shmap_ *const h)
+maybe_rehash(struct ccc_shmap_ *const h, size_t const to_add)
 {
     if (unlikely(!h->mask_ && !h->alloc_fn_))
     {
         return CCC_RESULT_NO_ALLOC;
     }
+    size_t const required_cap
+        = next_power_of_two(((h->mask_ + 1 + to_add) * 8) / 7);
+    if (required_cap < (h->mask_ + 1))
+    {
+        return CCC_RESULT_MEM_ERROR;
+    }
     if (unlikely(!h->init_))
     {
         if (h->mask_)
         {
-            if (!h->meta_)
+            if (!h->meta_ || required_cap > h->mask_ + 1)
             {
                 return CCC_RESULT_MEM_ERROR;
             }
@@ -375,8 +390,8 @@ maybe_rehash(struct ccc_shmap_ *const h)
     }
     if (unlikely(!h->mask_))
     {
-        size_t const total_bytes = ((CCC_SHM_GROUP_SIZE + 1) * h->elem_sz_)
-                                   + (CCC_SHM_GROUP_SIZE * 2UL);
+        size_t const total_bytes
+            = ((required_cap + 1) * h->elem_sz_) + (CCC_SHM_GROUP_SIZE * 2UL);
         void *const buf = h->alloc_fn_(NULL, total_bytes, h->aux_);
         if (!buf)
         {
@@ -386,18 +401,18 @@ maybe_rehash(struct ccc_shmap_ *const h)
         h->data_ = buf;
         h->avail_ = CCC_SHM_GROUP_SIZE;
         h->meta_ = (ccc_shm_meta *)(((char *)buf + total_bytes)
-                                    - (CCC_SHM_GROUP_SIZE * 2UL));
+                                    - (required_cap + CCC_SHM_GROUP_SIZE));
         (void)memset(h->meta_, CCC_SHM_EMPTY, (CCC_SHM_GROUP_SIZE * 2UL));
     }
     if (likely(h->avail_))
     {
         return CCC_RESULT_OK;
     }
-    size_t const allowed_cap = ((h->mask_ + 1) / 8) * 7;
-    if (h->alloc_fn_ && (h->sz_ + 1) > allowed_cap / 2)
+    size_t const current_cap = ((h->mask_ + 1) / 8) * 7;
+    if (h->alloc_fn_ && (h->sz_ + to_add) > current_cap / 2)
     {
         assert(h->alloc_fn_);
-        return rehash_resize(h);
+        return rehash_resize(h, to_add);
     }
     rehash_in_place(h);
     return CCC_RESULT_OK;
@@ -443,7 +458,7 @@ rehash_in_place(struct ccc_shmap_ *const h)
             if (group_a == group_b)
             {
                 set_meta(h, hash_meta, i);
-                break; /* continues outer loop. */
+                break; /* continues outer loop */
             }
             ccc_shm_meta const prev = h->meta_[new_slot];
             set_meta(h, hash_meta, new_slot);
@@ -451,7 +466,7 @@ rehash_in_place(struct ccc_shmap_ *const h)
             {
                 set_meta(h, (ccc_shm_meta){CCC_SHM_EMPTY}, i);
                 (void)memcpy(data_at(h, new_slot), data_at(h, i), h->elem_sz_);
-                break; /* continues outer loop. */
+                break; /* continues outer loop */
             }
             assert(prev.v == CCC_SHM_DELETED);
             swap(h->data_, data_at(h, i), data_at(h, new_slot), h->elem_sz_);
@@ -461,19 +476,18 @@ rehash_in_place(struct ccc_shmap_ *const h)
 }
 
 static ccc_result
-rehash_resize(struct ccc_shmap_ *const h)
+rehash_resize(struct ccc_shmap_ *const h, size_t const to_add)
 {
     assert(((h->mask_ + 1) & h->mask_) == 0);
-    size_t const new_pow2_cap = (h->mask_ + 1) << 1;
-    assert((new_pow2_cap & (new_pow2_cap - 1)) == 0);
+    size_t const new_pow2_cap = next_power_of_two(h->mask_ + 1 + to_add) << 1;
     if (new_pow2_cap < (h->mask_ + 1))
     {
         return CCC_RESULT_MEM_ERROR;
     }
     size_t const prev_bytes
         = ((h->mask_ + 2) * h->elem_sz_) + (h->mask_ + 1 + CCC_SHM_GROUP_SIZE);
-    size_t const total_bytes
-        = ((new_pow2_cap + 1) * h->elem_sz_) + (new_pow2_cap * 2);
+    size_t const total_bytes = ((new_pow2_cap + 1) * h->elem_sz_)
+                               + (new_pow2_cap + CCC_SHM_GROUP_SIZE);
     if (total_bytes < prev_bytes)
     {
         return CCC_RESULT_MEM_ERROR;
@@ -542,6 +556,12 @@ swap(char tmp[const], void *const a, void *const b, size_t const ab_size)
     (void)memcpy(tmp, a, ab_size);
     (void)memcpy(a, b, ab_size);
     (void)memcpy(b, tmp, ab_size);
+}
+
+static inline size_t
+next_power_of_two(size_t const n)
+{
+    return n <= 1 ? n : (SIZE_MAX >> countl_0_size_t(n - 1)) + 1;
 }
 
 /*=====================   Intrinsics and Generics   =========================*/
@@ -689,6 +709,13 @@ countl_0(index_mask const m)
     return m.v ? __builtin_clz(m.v) : CCC_SHM_GROUP_SIZE;
 }
 
+static inline unsigned
+countl_0_size_t(size_t const n)
+{
+    static_assert(sizeof(size_t) == sizeof(unsigned long));
+    return n ? __builtin_clzl(n) : sizeof(size_t) * CHAR_BIT;
+}
+
 #    else /* !defined(__GNUC__) && !defined(__clang__) */
 
 static inline unsigned
@@ -713,6 +740,19 @@ countl_0(index_mask m)
     }
     unsigned cnt = 0;
     for (; !(m.v & INDEX_MASK_MSB); ++cnt, m.v <<= 1U)
+    {}
+    return cnt;
+}
+
+static inline unsigned
+countl_0_size_t(size_t n)
+{
+    if (!n)
+    {
+        return sizeof(size_t) * CHAR_BIT;
+    }
+    unsigned cnt = 0;
+    for (; !(n & SIZE_T_MSB); ++cnt, n <<= 1U)
     {}
     return cnt;
 }
