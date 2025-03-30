@@ -364,17 +364,16 @@ maybe_rehash(struct ccc_shmap_ *const h, size_t const to_add)
     {
         return CCC_RESULT_NO_ALLOC;
     }
-    size_t const required_cap
-        = next_power_of_two(((h->mask_ + 1 + to_add) * 8) / 7);
-    if (required_cap < (h->mask_ + 1))
+    size_t required_cap = ((h->sz_ + to_add) * 8) / 7;
+    if ((required_cap & (required_cap - 1)) != 0)
     {
-        return CCC_RESULT_MEM_ERROR;
+        required_cap = next_power_of_two(required_cap);
     }
     if (unlikely(!h->init_))
     {
         if (h->mask_)
         {
-            if (!h->meta_ || required_cap > h->mask_ + 1)
+            if (!h->meta_ || h->mask_ + 1 < required_cap)
             {
                 return CCC_RESULT_MEM_ERROR;
             }
@@ -390,19 +389,20 @@ maybe_rehash(struct ccc_shmap_ *const h, size_t const to_add)
     }
     if (unlikely(!h->mask_))
     {
-        size_t const total_bytes
-            = ((required_cap + 1) * h->elem_sz_) + (CCC_SHM_GROUP_SIZE * 2UL);
+        size_t const total_bytes = ((required_cap + 1) * h->elem_sz_)
+                                   + (required_cap + CCC_SHM_GROUP_SIZE);
         void *const buf = h->alloc_fn_(NULL, total_bytes, h->aux_);
         if (!buf)
         {
             return CCC_RESULT_MEM_ERROR;
         }
-        h->mask_ = CCC_SHM_GROUP_SIZE - 1;
+        h->mask_ = required_cap - 1;
         h->data_ = buf;
-        h->avail_ = CCC_SHM_GROUP_SIZE;
+        h->avail_ = (required_cap / 8) * 7;
         h->meta_ = (ccc_shm_meta *)(((char *)buf + total_bytes)
                                     - (required_cap + CCC_SHM_GROUP_SIZE));
-        (void)memset(h->meta_, CCC_SHM_EMPTY, (CCC_SHM_GROUP_SIZE * 2UL));
+        (void)memset(h->meta_, CCC_SHM_EMPTY,
+                     required_cap + CCC_SHM_GROUP_SIZE);
     }
     if (likely(h->avail_))
     {
