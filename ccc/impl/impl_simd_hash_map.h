@@ -41,6 +41,10 @@ static_assert(
     (CCC_SHM_DELETED ^ CCC_SHM_EMPTY) == 0x7F,
     "only empty should have lsb on and 7 bits are available for hash");
 
+/* TODO: Come up with better system. For now, uncomment to define a preprocessor
+directive to force generics. */
+// #define CCC_SIMD_GENERIC
+
 /** @private Vectorized group scanning allows more parallel scans but a
 fallback of 8 is good for a portable implementation that will use the widest
 word on a platform for group scanning. Right now, this lib targets 64-bit so
@@ -48,7 +52,7 @@ that means uint64_t is widest default integer widely supported. That width
 is still valid on 32-bit but probably very slow due to emulation. */
 enum
 {
-#if defined(__x86_64) && defined(__SSE2__)
+#if defined(__x86_64) && defined(__SSE2__) && !defined(CCC_SIMD_GENERIC)
     CCC_SHM_GROUP_SIZE = 16,
 #else
     CCC_SHM_GROUP_SIZE = 8,

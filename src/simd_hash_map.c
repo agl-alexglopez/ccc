@@ -20,7 +20,7 @@
 /* Can we vectorize? Single field unions are guaranteed by the standard to have
 no padding even though some claim single field structs get the same benefit,
 trivially. However, not guaranteed by the standard so use unions instead */
-#if defined(__x86_64) && defined(__SSE2__)
+#if defined(__x86_64) && defined(__SSE2__) && !defined(CCC_SIMD_GENERIC)
 #    include <immintrin.h>
 
 typedef struct
@@ -33,15 +33,9 @@ typedef struct
     uint16_t v;
 } index_mask;
 
-enum
+enum : typeof((index_mask){}.v)
 {
-    GROUP_BYTES = sizeof(group),
     INDEX_MASK_MSB = 0x8000,
-};
-
-enum : size_t
-{
-    SIZE_T_MSB = 0x1000000000000000,
 };
 
 #else
@@ -56,19 +50,33 @@ typedef struct
     typeof((group){}.v) v;
 } index_mask;
 
-enum
+enum : typeof((index_mask){}.v)
 {
-    GROUP_BYTES = sizeof(group),
     INDEX_MASK_MSBYTE = 0xFF00000000000000,
 };
 
-#endif /* defined(__x86_64) && defined(__SSE2__) */
+enum : typeof((group){}.v)
+{
+    GROUP_LSB = 0x101010101010101,
+    GROUP_DELETED = 0x8080808080808080,
+};
+
+#endif /* defined(__x86_64) && defined(__SSE2__) &&                            \
+          !defined(CCC_SHM_GENERIC)*/
+
+enum : size_t
+{
+    GROUP_BYTES = sizeof(group),
+    GROUP_BITS = GROUP_BYTES * CHAR_BIT,
+    SIZE_T_MSB = 0x1000000000000000,
+};
 
 enum : uint8_t
 {
     META_MSB = 0x80,
     META_LSB = 0x1,
     LOWER_7_BITS_MASK = 0x7F,
+    META_BITS = sizeof(ccc_shm_meta) * CHAR_BIT,
 };
 
 struct triangular_seq
@@ -108,7 +116,7 @@ static ccc_tribool is_full(ccc_shm_meta m);
 static ccc_tribool is_constant(ccc_shm_meta m);
 static ccc_tribool is_empty_constant(ccc_shm_meta m);
 static ccc_shm_meta to_meta(uint64_t hash);
-static group load_group(ccc_shm_meta *src);
+static group load_group(ccc_shm_meta const *src);
 static void store_group(ccc_shm_meta *dst, group src);
 static index_mask match_meta(group g, ccc_shm_meta m);
 static index_mask match_empty(group g);
@@ -532,6 +540,32 @@ set_meta(struct ccc_shmap_ *const h, ccc_shm_meta const m, size_t const i)
     h->meta_[replica_byte] = m;
 }
 
+static inline ccc_tribool
+is_full(ccc_shm_meta const m)
+{
+    return (m.v & CCC_SHM_DELETED) == 0;
+}
+
+static inline ccc_tribool
+is_constant(ccc_shm_meta const m)
+{
+    return (m.v & META_MSB) != 0;
+}
+
+static inline ccc_tribool
+is_empty_constant(ccc_shm_meta const m)
+{
+    assert(is_constant(m));
+    return (m.v & META_LSB) != 0;
+}
+
+static inline ccc_shm_meta
+to_meta(uint64_t const hash)
+{
+    return (ccc_shm_meta){(hash >> ((sizeof(hash) * CHAR_BIT) - 7))
+                          & LOWER_7_BITS_MASK};
+}
+
 static inline void *
 key_at(struct ccc_shmap_ const *const h, size_t const i)
 {
@@ -573,11 +607,11 @@ need to break out different headers and sources and clutter the src directory.
 x86 is the only platform that gets the full benefit of SIMD. Apple and all
 other platforms will get a portable implementation due to concerns over NEON
 speed of vectorized instructions. However, loading up groups into a uint64_t is
-still good and for simultaneous operations just not the type that uses CPU
+still good and counts simultaneous operations just not the type that uses CPU
 vector lanes for a single instruction. */
 
 /* We can vectorize for x86 only. */
-#if defined(__x86_64) && defined(__SSE2__)
+#if defined(__x86_64) && defined(__SSE2__) && !defined(CCC_SIMD_GENERIC)
 
 /*========================  Index Mask Implementations   ====================*/
 
@@ -614,38 +648,10 @@ next_index(index_mask *const m)
     return index;
 }
 
-/*========================  Metadata Implementations   ======================*/
-
-static inline ccc_tribool
-is_full(ccc_shm_meta const m)
-{
-    return (m.v & CCC_SHM_DELETED) == 0;
-}
-
-static inline ccc_tribool
-is_constant(ccc_shm_meta const m)
-{
-    return (m.v & META_MSB) != 0;
-}
-
-static inline ccc_tribool
-is_empty_constant(ccc_shm_meta const m)
-{
-    assert(is_constant(m));
-    return (m.v & META_LSB) != 0;
-}
-
-static inline ccc_shm_meta
-to_meta(uint64_t const hash)
-{
-    return (ccc_shm_meta){(hash >> ((sizeof(hash) * CHAR_BIT) - 7))
-                          & LOWER_7_BITS_MASK};
-}
-
 /*=========================  Group Implementations   ========================*/
 
 static inline group
-load_group(ccc_shm_meta *const src)
+load_group(ccc_shm_meta const *const src)
 {
     return (group){_mm_load_si128((__m128i *)&src->v)};
 }
@@ -695,7 +701,10 @@ make_deleted_empty_and_full_deleted(group const g)
 
 /*====================  Bit Counting for Index Mask   =======================*/
 
-#    if defined(__GNUC__) || defined(__clang__)
+#    if defined(__has_builtin) && __has_builtin(__builtin_ctz)                 \
+        && __has_builtin(__builtin_clz) && __has_builtin(__builtin_clzl)
+
+static_assert(sizeof((index_mask){}.v) <= sizeof(unsigned));
 
 static inline unsigned
 countr_0(index_mask const m)
@@ -706,7 +715,7 @@ countr_0(index_mask const m)
 static inline unsigned
 countl_0(index_mask const m)
 {
-    return m.v ? __builtin_clz(m.v) : CCC_SHM_GROUP_SIZE;
+    return m.v ? __builtin_clz(m.v << CCC_SHM_GROUP_SIZE) : CCC_SHM_GROUP_SIZE;
 }
 
 static inline unsigned
@@ -716,7 +725,8 @@ countl_0_size_t(size_t const n)
     return n ? __builtin_clzl(n) : sizeof(size_t) * CHAR_BIT;
 }
 
-#    else /* !defined(__GNUC__) && !defined(__clang__) */
+#    else /* !defined(__has_builtin) || !__has_builtin(__builtin_ctz)          \
+        || !__has_builtin(__builtin_clz) || !__has_builtin(__builtin_clzl) */
 
 static inline unsigned
 countr_0(index_mask m)
@@ -738,6 +748,7 @@ countl_0(index_mask m)
     {
         return CCC_SHM_GROUP_SIZE;
     }
+    m.v <<= CCC_SHM_GROUP_SIZE;
     unsigned cnt = 0;
     for (; !(m.v & INDEX_MASK_MSB); ++cnt, m.v <<= 1U)
     {}
@@ -757,12 +768,206 @@ countl_0_size_t(size_t n)
     return cnt;
 }
 
-#    endif /* defined(__GNUC__) || defined(__clang__) */
+#    endif /* defined(__has_builtin) && __has_builtin(__builtin_ctz)           \
+        && __has_builtin(__builtin_clz) && __has_builtin(__builtin_clzl) */
 
-#else /* !defined(__x86_64) || !defined(__SSE2__) */
+#else /* !defined(__x86_64) || !defined(__SSE2__) ||                           \
+         !defined(CCC_SIMD_GENERIC) */
 
 /* What follows is the generic portable implementation when high width SIMD
 can't be achieved. For now this means NEON on Apple defaults to generic but
 this will likely change in the future as NEON improves. */
+
+/*==========================    Bit Helpers    ==============================*/
+
+#    if defined(__has_builtin) && __has_builtin(__builtin_ctzl)                \
+        && __has_builtin(__builtin_clzl)
+
+static_assert(sizeof((index_mask){}.v) == sizeof(long));
+
+static inline unsigned
+countr_0(index_mask const m)
+{
+    return m.v ? __builtin_ctzl(m.v) / CCC_SHM_GROUP_SIZE : CCC_SHM_GROUP_SIZE;
+}
+
+static inline unsigned
+countl_0(index_mask const m)
+{
+    return m.v ? __builtin_clzl(m.v) / CCC_SHM_GROUP_SIZE : CCC_SHM_GROUP_SIZE;
+}
+
+static inline unsigned
+countl_0_size_t(size_t const n)
+{
+    static_assert(sizeof(size_t) == sizeof(unsigned long));
+    return n ? __builtin_clzl(n) : sizeof(size_t) * CHAR_BIT;
+}
+
+#    else /* defined(__has_builtin) && __has_builtin(__builtin_ctzl) &&        \
+             __has_builtin(__builtin_clzl) */
+
+static inline unsigned
+countr_0(index_mask m)
+{
+    if (!m.v)
+    {
+        return CCC_SHM_GROUP_SIZE;
+    }
+    unsigned cnt = 0;
+    for (; m.v; cnt += !!(m.v & 1U), m.v >>= 1U)
+    {}
+    return cnt / CCC_SHM_GROUP_SIZE;
+}
+
+static inline unsigned
+countl_0(index_mask m)
+{
+    if (!m.v)
+    {
+        return CCC_SHM_GROUP_SIZE;
+    }
+    unsigned cnt = 0;
+    for (; !(m.v & INDEX_MASK_MSB); ++cnt, m.v <<= 1U)
+    {}
+    return cnt / CCC_SHM_GROUP_SIZE;
+}
+
+static inline unsigned
+countl_0_size_t(size_t n)
+{
+    if (!n)
+    {
+        return sizeof(size_t) * CHAR_BIT;
+    }
+    unsigned cnt = 0;
+    for (; !(n & SIZE_T_MSB); ++cnt, n <<= 1U)
+    {}
+    return cnt;
+}
+
+#    endif /* !defined(__has_builtin) || !__has_builtin(__builtin_ctzl) ||     \
+              !__has_builtin(__builtin_clzl) */
+
+/* Returns 1 aka true if platform is little endian otherwise false for big
+endian. */
+static inline int
+is_little_endian(void)
+{
+    unsigned int x = 1;
+    char *c = (char *)&x;
+    return (int)*c;
+}
+
+static inline index_mask
+to_little_endian(index_mask m)
+{
+    if (is_little_endian())
+    {
+        return m;
+    }
+#    if defined(__has_builtin) && __has_builtin(__builtin_bswap64)
+    m.v = __builtin_bswap64(m.v);
+#    else
+    m.v = (m.v & 0x00000000FFFFFFFF) << 32 | (m.v & 0xFFFFFFFF00000000) >> 32;
+    m.v = (m.v & 0x0000FFFF0000FFFF) << 16 | (m.v & 0xFFFF0000FFFF0000) >> 16;
+    m.v = (m.v & 0x00FF00FF00FF00FF) << 8 | (m.v & 0xFF00FF00FF00FF00) >> 8;
+#    endif
+    return m;
+}
+
+/*========================  Index Mask Implementations   ====================*/
+
+static inline ccc_tribool
+is_index_on(index_mask const m)
+{
+    return m.v != 0;
+}
+
+static inline size_t
+lowest_on_index(index_mask const m)
+{
+    return countr_0(m);
+}
+
+static inline size_t
+trailing_zeros(index_mask const m)
+{
+    return countr_0(m);
+}
+
+static inline size_t
+leading_zeros(index_mask const m)
+{
+    return countl_0(m);
+}
+
+static inline size_t
+next_index(index_mask *const m)
+{
+    assert(m);
+    size_t const index = lowest_on_index(*m);
+    m->v &= (m->v - 1);
+    return index;
+}
+
+/*=========================  Group Implementations   ========================*/
+
+static inline group
+load_group(ccc_shm_meta const *const src)
+{
+    group g;
+    (void)memcpy(&g, src, sizeof(g));
+    return g;
+}
+
+static inline void
+store_group(ccc_shm_meta *const dst, group const src)
+{
+    (void)memcpy(dst, &src, sizeof(src));
+}
+
+static inline index_mask
+match_meta(group g, ccc_shm_meta const m)
+{
+    group const cmp = {g.v
+                       ^ ((((typeof(g.v))m.v) << (META_BITS * 7UL))
+                          | (((typeof(g.v))m.v) << (META_BITS * 6UL))
+                          | (((typeof(g.v))m.v) << (META_BITS * 5UL))
+                          | (((typeof(g.v))m.v) << (META_BITS * 4UL))
+                          | (((typeof(g.v))m.v) << (META_BITS * 3UL))
+                          | (((typeof(g.v))m.v) << (META_BITS * 2UL))
+                          | (((typeof(g.v))m.v) << META_BITS) | m.v)};
+    return to_little_endian(
+        (index_mask){(cmp.v - GROUP_LSB) & ~cmp.v & GROUP_DELETED});
+}
+
+static inline index_mask
+match_empty(group const g)
+{
+    return to_little_endian((index_mask){g.v & (g.v << 1) & GROUP_DELETED});
+}
+
+static inline index_mask
+match_empty_or_deleted(group const g)
+{
+    return to_little_endian((index_mask){g.v & GROUP_DELETED});
+}
+
+static inline index_mask
+match_full(group const g)
+{
+    index_mask res = match_empty_or_deleted(g);
+    res.v = ~res.v;
+    return res;
+}
+
+static inline group
+make_deleted_empty_and_full_deleted(group g)
+{
+    g.v = ~g.v & GROUP_DELETED;
+    g.v = ~g.v + (g.v >> (META_BITS - 1));
+    return g;
+}
 
 #endif /* defined(__x86_64) && defined(__SSE2__) */
