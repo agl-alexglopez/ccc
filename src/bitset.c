@@ -1525,7 +1525,8 @@ min(size_t a, size_t b)
     return a < b ? a : b;
 }
 
-#if defined(__GNUC__) || defined(__clang__)
+#if defined(__has_builtin) && __has_builtin(__builtin_ctz)                     \
+    && __has_builtin(__builtin_clz) && __has_builtin(__builtin_popcount)
 
 static inline unsigned
 popcount(ccc_bitblock_ const b)
@@ -1552,13 +1553,14 @@ countl_0(ccc_bitblock_ const b)
     return b ? (unsigned)__builtin_clz(b) : BLOCK_BITS;
 }
 
-#else /* !defined(__GNUC__) && !defined(__clang__) */
+#else /* !defined(__has_builtin) || !__has_builtin(__builtin_ctz)              \
+    || !__has_builtin(__builtin_clz) || !__has_builtin(__builtin_popcount) */
 
 static inline unsigned
 popcount(ccc_bitblock_ b)
 {
     unsigned cnt = 0;
-    for (; b; cnt += !!(b & 1U), b >>= 1U)
+    for (; b; cnt += ((b & 1U) != 0), b >>= 1U)
     {}
     return cnt;
 }
@@ -1571,7 +1573,7 @@ countr_0(ccc_bitblock_ b)
         return BLOCK_BITS;
     }
     unsigned cnt = 0;
-    for (; !(b & 1U); ++cnt, b >>= 1U)
+    for (; (b & 1U) == 0; ++cnt, b >>= 1U)
     {}
     return cnt;
 }
@@ -1584,9 +1586,10 @@ countl_0(ccc_bitblock_ b)
         return BLOCK_BITS;
     }
     unsigned cnt = 0;
-    for (; !(b & BITBLOCK_MSB); ++cnt, b <<= 1U)
+    for (; (b & BITBLOCK_MSB) == 0; ++cnt, b <<= 1U)
     {}
     return cnt;
 }
 
-#endif /* defined(__GNUC__) || defined(__clang__) */
+#endif /* defined(__has_builtin) && __has_builtin(__builtin_ctz)               \
+    && __has_builtin(__builtin_clz) && __has_builtin(__builtin_popcount) */
