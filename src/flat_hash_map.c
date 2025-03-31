@@ -132,7 +132,7 @@ static size_t next_power_of_two(size_t n);
 /*===========================    Interface   ================================*/
 
 ccc_tribool
-ccc_fhm_contains(ccc_flat_hash_map *const h, void const *const key)
+ccc_fhm_contains(ccc_flat_hash_map const *const h, void const *const key)
 {
     if (unlikely(!h || !key))
     {
