@@ -3,6 +3,7 @@
 #include <limits.h>
 #include <stdalign.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 #include "flat_hash_map.h"
@@ -39,7 +40,7 @@ enum : typeof((index_mask){}.v)
 };
 
 #else
-#    include <stdint.h>
+
 typedef struct
 {
     uint64_t v;
@@ -52,7 +53,7 @@ typedef struct
 
 enum : typeof((index_mask){}.v)
 {
-    INDEX_MASK_MSBYTE = 0xFF00000000000000,
+    INDEX_MASK_MSB = 0x8000000000000000,
 };
 
 enum : typeof((group){}.v)
@@ -707,13 +708,22 @@ static_assert(sizeof((index_mask){}.v) <= sizeof(unsigned));
 static inline unsigned
 countr_0(index_mask const m)
 {
+    /* Even though the mask is implicitly widened to int width there is
+       guaranteed to be a 1 bit between bit index 0 and CCC_FHM_GROUP_SIZE - 1
+       if the builtin is called. */
     return m.v ? __builtin_ctz(m.v) : CCC_FHM_GROUP_SIZE;
 }
 
 static inline unsigned
 countl_0(index_mask const m)
 {
-    return m.v ? __builtin_clz(m.v << CCC_FHM_GROUP_SIZE) : CCC_FHM_GROUP_SIZE;
+    /* In the simd version the index mask is only a uint16_t so the number of
+       leading zeros would be inaccurate due to widening. There is only a
+       builtin for leading and trailing zeros for int width as smallest. */
+    static_assert(sizeof(m.v) * 2 == sizeof(unsigned));
+    static_assert(CCC_FHM_GROUP_SIZE * 2UL == sizeof(unsigned) * CHAR_BIT);
+    return m.v ? __builtin_clz(((unsigned)m.v) << CCC_FHM_GROUP_SIZE)
+               : CCC_FHM_GROUP_SIZE;
 }
 
 static inline unsigned
@@ -734,7 +744,7 @@ countr_0(index_mask m)
         return CCC_FHM_GROUP_SIZE;
     }
     unsigned cnt = 0;
-    for (; m.v; cnt += !!(m.v & 1U), m.v >>= 1U)
+    for (; m.v; cnt += ((m.v & 1U) == 0), m.v >>= 1U)
     {}
     return cnt;
 }
@@ -746,9 +756,9 @@ countl_0(index_mask m)
     {
         return CCC_FHM_GROUP_SIZE;
     }
-    m.v <<= CCC_FHM_GROUP_SIZE;
+    unsigned mv = (unsigned)m.v << CCC_FHM_GROUP_SIZE;
     unsigned cnt = 0;
-    for (; !(m.v & INDEX_MASK_MSB); ++cnt, m.v <<= 1U)
+    for (; (mv & (INDEX_MASK_MSB << CCC_FHM_GROUP_SIZE)) == 0; ++cnt, mv <<= 1U)
     {}
     return cnt;
 }
@@ -813,7 +823,7 @@ countr_0(index_mask m)
         return CCC_FHM_GROUP_SIZE;
     }
     unsigned cnt = 0;
-    for (; m.v; cnt += !!(m.v & 1U), m.v >>= 1U)
+    for (; m.v; cnt += ((m.v & 1U) == 0), m.v >>= 1U)
     {}
     return cnt / CCC_FHM_GROUP_SIZE;
 }
@@ -826,7 +836,7 @@ countl_0(index_mask m)
         return CCC_FHM_GROUP_SIZE;
     }
     unsigned cnt = 0;
-    for (; !(m.v & INDEX_MASK_MSB); ++cnt, m.v <<= 1U)
+    for (; (m.v & INDEX_MASK_MSB) == 0; ++cnt, m.v <<= 1U)
     {}
     return cnt / CCC_FHM_GROUP_SIZE;
 }
@@ -839,7 +849,7 @@ countl_0_size_t(size_t n)
         return sizeof(size_t) * CHAR_BIT;
     }
     unsigned cnt = 0;
-    for (; !(n & SIZE_T_MSB); ++cnt, n <<= 1U)
+    for (; (n & SIZE_T_MSB) == 0; ++cnt, n <<= 1U)
     {}
     return cnt;
 }
