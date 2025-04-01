@@ -17,6 +17,9 @@ typedef struct ccc_fhmap_ ccc_flat_hash_map;
     ccc_impl_fhm_init(data_ptr, tag_ptr, key_field, hash_fn, key_eq_fn,        \
                       alloc_fn, aux_data, capacity)
 
+ccc_result ccc_fhm_copy(ccc_flat_hash_map *dst, ccc_flat_hash_map const *src,
+                        ccc_alloc_fn *fn);
+
 [[nodiscard]] ccc_tribool ccc_fhm_contains(ccc_flat_hash_map const *h,
                                            void const *key);
 [[nodiscard]] ccc_fhmap_entry ccc_fhm_entry(ccc_flat_hash_map *h,
