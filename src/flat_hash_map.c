@@ -18,9 +18,8 @@
 #    define likely(expr) expr
 #endif
 
-/* Can we vectorize? Single field unions are guaranteed by the standard to have
-no padding even though some claim single field structs get the same benefit,
-trivially. However, not guaranteed by the standard so use unions instead */
+/* Can we vectorize instructions? Also it is possible to specify we want a
+portable implementation. Consider exposing to user in header docs. */
 #if defined(__x86_64) && defined(__SSE2__) && !defined(CCC_FHM_PORTABLE)
 #    include <immintrin.h>
 
@@ -128,6 +127,7 @@ static unsigned countr_0(index_mask m);
 static unsigned countl_0(index_mask m);
 static unsigned countl_0_size_t(size_t n);
 static size_t next_power_of_two(size_t n);
+static ccc_tribool is_power_of_two(size_t n);
 
 /*===========================    Interface   ================================*/
 
@@ -195,6 +195,85 @@ ccc_fhm_remove_entry(ccc_fhmap_entry const *const e)
     erase(e->impl_.h_, e->impl_.handle_.i_);
     return (ccc_entry){{.e_ = data_at(e->impl_.h_, e->impl_.handle_.i_),
                         .stats_ = CCC_ENTRY_OCCUPIED}};
+}
+
+ccc_result
+ccc_fhm_copy(ccc_flat_hash_map *const dst, ccc_flat_hash_map const *const src,
+             ccc_alloc_fn *const fn)
+{
+    if (!dst || !src || src == dst
+        || (src->mask_ && !is_power_of_two(src->mask_ + 1)))
+    {
+        return CCC_RESULT_ARG_ERROR;
+    }
+    if (dst->mask_ < src->mask_ && !fn)
+    {
+        return CCC_RESULT_NO_ALLOC;
+    }
+    /* The destination could be messed up in a variety of ways that make it
+       incompatible with src. Overwrite everything and save what we need from
+       dst for a smooth copy over. */
+    void *const dst_data = dst->data_;
+    void *const dst_tag = dst->tag_;
+    size_t const dst_mask = dst->mask_;
+    size_t const dst_avail = dst->avail_;
+    ccc_tribool const dst_init = dst->init_;
+    ccc_alloc_fn *const dst_alloc = dst->alloc_fn_;
+    *dst = *src;
+    dst->data_ = dst_data;
+    dst->tag_ = dst_tag;
+    dst->mask_ = dst_mask;
+    dst->avail_ = dst_avail;
+    dst->init_ = dst_init;
+    dst->alloc_fn_ = dst_alloc;
+    if (!src->mask_ || !src->init_)
+    {
+        return CCC_RESULT_OK;
+    }
+    size_t const src_bytes = ((src->mask_ + 2) * src->elem_sz_)
+                             + ((src->mask_ + 1) + CCC_FHM_GROUP_SIZE);
+    if (dst->mask_ < src->mask_)
+    {
+        void *const new_mem = dst->alloc_fn_(dst->data_, src_bytes, dst->aux_);
+        if (!new_mem)
+        {
+            return CCC_RESULT_MEM_ERROR;
+        }
+        dst->tag_ = (ccc_fhm_tag *)(((char *)new_mem + src_bytes)
+                                    - (src->mask_ + 1) - CCC_FHM_GROUP_SIZE);
+        dst->data_ = new_mem;
+        dst->mask_ = src->mask_;
+    }
+    if (!dst->data_ || !src->data_)
+    {
+        return CCC_RESULT_ARG_ERROR;
+    }
+    (void)memset(dst->tag_, CCC_FHM_EMPTY,
+                 (dst->mask_ + 1) + CCC_FHM_GROUP_SIZE);
+    dst->avail_ = ((dst->mask_ + 1) / 8) * 7;
+    dst->sz_ = 0;
+    dst->init_ = CCC_TRUE;
+    if (dst->mask_ == src->mask_)
+    {
+        (void)memcpy(dst->data_, src->data_, src_bytes);
+        dst->avail_ = src->avail_;
+        dst->sz_ = src->sz_;
+        return CCC_RESULT_OK;
+    }
+    for (size_t i = 0; i < (src->mask_ + 1); ++i)
+    {
+        if (is_full(src->tag_[i]))
+        {
+            uint64_t const hash = src->hash_fn_(
+                (ccc_user_key){.user_key = key_at(src, i), .aux = src->aux_});
+            size_t const new_i = find_known_insert_slot(dst, hash);
+            set_tag(dst, to_tag(hash), new_i);
+            (void)memcpy(data_at(dst, new_i), data_at(src, i), dst->elem_sz_);
+        }
+    }
+    dst->avail_ -= src->sz_;
+    dst->sz_ = src->sz_;
+    return CCC_RESULT_OK;
 }
 
 /*=========================   Static Internals   ============================*/
@@ -373,7 +452,7 @@ maybe_rehash(struct ccc_fhmap_ *const h, size_t const to_add)
         return CCC_RESULT_NO_ALLOC;
     }
     size_t required_cap = ((h->sz_ + to_add) * 8) / 7;
-    if ((required_cap & (required_cap - 1)) != 0)
+    if (!is_power_of_two(required_cap))
     {
         required_cap = next_power_of_two(required_cap);
     }
@@ -386,7 +465,7 @@ maybe_rehash(struct ccc_fhmap_ *const h, size_t const to_add)
                 return CCC_RESULT_MEM_ERROR;
             }
             if (h->mask_ + 1 < CCC_FHM_GROUP_SIZE
-                || ((h->mask_ + 1) & h->mask_) != 0)
+                || !is_power_of_two(h->mask_ + 1))
             {
                 return CCC_RESULT_ARG_ERROR;
             }
@@ -459,10 +538,13 @@ rehash_in_place(struct ccc_fhmap_ *const h)
             ccc_fhm_tag const hash_tag = to_tag(hash);
             size_t const new_slot = find_known_insert_slot(h, hash);
             size_t const hash_pos = (hash & mask);
-            size_t const group_a = ((i - hash_pos) & mask) / CCC_FHM_GROUP_SIZE;
-            size_t const group_b
-                = ((new_slot - hash_pos) & mask) / CCC_FHM_GROUP_SIZE;
-            if (group_a == group_b)
+            /* No point relocating when scanning works by groups and the probe
+               sequence would place us in this group anyway. This is a valid
+               position because imagine if such a placement occurred during
+               the normal insertion algorithm due to some combination of
+               occupied, deleted, and empty slots. */
+            if ((((i - hash_pos) & mask) / CCC_FHM_GROUP_SIZE)
+                == (((new_slot - hash_pos) & mask) / CCC_FHM_GROUP_SIZE))
             {
                 set_tag(h, hash_tag, i);
                 break; /* continues outer loop */
@@ -475,6 +557,9 @@ rehash_in_place(struct ccc_fhmap_ *const h)
                 (void)memcpy(data_at(h, new_slot), data_at(h, i), h->elem_sz_);
                 break; /* continues outer loop */
             }
+            /* The other slots data has been swapped and we rehash every
+               element for this algorithm so there is no need to write its
+               tag to this slot. It's data is in correct location already. */
             assert(prev.v == CCC_FHM_DELETED);
             swap(h->data_, data_at(h, i), data_at(h, new_slot), h->elem_sz_);
         } while (1);
@@ -595,6 +680,12 @@ static inline size_t
 next_power_of_two(size_t const n)
 {
     return n <= 1 ? n : (SIZE_MAX >> countl_0_size_t(n - 1)) + 1;
+}
+
+static inline ccc_tribool
+is_power_of_two(size_t const n)
+{
+    return n && ((n & (n - 1)) == 0);
 }
 
 /*=====================   Intrinsics and Generics   =========================*/

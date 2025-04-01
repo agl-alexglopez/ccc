@@ -85,18 +85,30 @@ address from the 0th data element because it's size is only a byte meaning a
 shared base address is possible with no alignment issues. */
 struct ccc_fhmap_
 {
-    void *data_;             /** Reversed user type data array. */
-    ccc_fhm_tag *tag_;       /** Tagdata array on byte following data_[0]. */
-    size_t sz_;              /** The number of user active slots. */
-    size_t avail_;           /** Track to know when rehashing is needed. */
-    size_t mask_;            /** The mask for power of two table sizing. */
-    ccc_tribool init_;       /** One-time flag to lazily initialize table. */
-    size_t elem_sz_;         /** Size of each user data element being stored. */
-    size_t key_offset_;      /** The location of the key field in user type. */
-    ccc_key_eq_fn *eq_fn_;   /** The user callback for equality comparison. */
-    ccc_hash_fn *hash_fn_;   /** The hash function provided by user. */
-    ccc_alloc_fn *alloc_fn_; /** The allocation function, if any. */
-    void *aux_;              /** Auxiliary data, if any. */
+    /** Reversed user type data array. */
+    void *data_;
+    /** Tagdata array on byte following data(0). */
+    ccc_fhm_tag *tag_;
+    /** The number of user active slots. */
+    size_t sz_;
+    /** Track to know when rehashing is needed. */
+    size_t avail_;
+    /** The mask for power of two table sizing. */
+    size_t mask_;
+    /** One-time flag to lazily initialize table. */
+    ccc_tribool init_;
+    /** Size of each user data element being stored. */
+    size_t elem_sz_;
+    /** The location of the key field in user type. */
+    size_t key_offset_;
+    /** The user callback for equality comparison. */
+    ccc_key_eq_fn *eq_fn_;
+    /** The hash function provided by user. */
+    ccc_hash_fn *hash_fn_;
+    /** The allocation function, if any. */
+    ccc_alloc_fn *alloc_fn_;
+    /** Auxiliary data, if any. */
+    void *aux_;
 };
 
 /** @private */
