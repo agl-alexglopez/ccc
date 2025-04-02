@@ -105,6 +105,11 @@ static ccc_result rehash_resize(struct ccc_fhmap_ *h, size_t to_add);
 static void *key_at(struct ccc_fhmap_ const *h, size_t i);
 static void *data_at(struct ccc_fhmap_ const *h, size_t i);
 static void swap(char tmp[const], void *a, void *b, size_t ab_size);
+static void *key_in_slot(struct ccc_fhmap_ const *h, void const *slot);
+static void *swap_slot(struct ccc_fhmap_ const *h);
+static ccc_ucount data_i(struct ccc_fhmap_ const *h, void const *data_slot);
+static size_t mask_to_total_bytes(struct ccc_fhmap_ const *h, size_t mask);
+static size_t mask_to_tag_bytes(size_t mask);
 
 static void set_tag(struct ccc_fhmap_ *h, ccc_fhm_tag m, size_t i);
 static ccc_tribool is_index_on(index_mask m);
@@ -132,6 +137,36 @@ static ccc_tribool is_power_of_two(size_t n);
 /*===========================    Interface   ================================*/
 
 ccc_tribool
+ccc_fhm_is_empty(ccc_flat_hash_map const *const h)
+{
+    if (unlikely(!h))
+    {
+        return CCC_TRIBOOL_ERROR;
+    }
+    return !h->sz_;
+}
+
+ccc_ucount
+ccc_fhm_size(ccc_flat_hash_map const *const h)
+{
+    if (!h)
+    {
+        return (ccc_ucount){.error = CCC_RESULT_ARG_ERROR};
+    }
+    return (ccc_ucount){.count = h->sz_};
+}
+
+ccc_ucount
+ccc_fhm_capacity(ccc_flat_hash_map const *const h)
+{
+    if (!h)
+    {
+        return (ccc_ucount){.error = CCC_RESULT_ARG_ERROR};
+    }
+    return (ccc_ucount){.count = h->mask_ + 1};
+}
+
+ccc_tribool
 ccc_fhm_contains(ccc_flat_hash_map const *const h, void const *const key)
 {
     if (unlikely(!h || !key))
@@ -149,6 +184,22 @@ ccc_fhm_contains(ccc_flat_hash_map const *const h, void const *const key)
                   .error;
 }
 
+void *
+ccc_fhm_get_key_val(ccc_flat_hash_map const *const h, void const *const key)
+{
+    if (unlikely(!h || !key || !h->init_ || !h->sz_))
+    {
+        return NULL;
+    }
+    ccc_ucount const i = find_key(
+        h, key, h->hash_fn_((ccc_user_key){.user_key = key, .aux = h->aux_}));
+    if (i.error)
+    {
+        return NULL;
+    }
+    return data_at(h, i.count);
+}
+
 ccc_fhmap_entry
 ccc_fhm_entry(ccc_flat_hash_map *const h, void const *const key)
 {
@@ -157,6 +208,26 @@ ccc_fhm_entry(ccc_flat_hash_map *const h, void const *const key)
         return (ccc_fhmap_entry){{.handle_ = {.stats_ = CCC_ENTRY_ARG_ERROR}}};
     }
     return (ccc_fhmap_entry){container_entry(h, key)};
+}
+
+void *
+ccc_fhm_or_insert(ccc_fhmap_entry const *const e, void const *key_val_type)
+{
+
+    if (unlikely(!e || !key_val_type))
+    {
+        return NULL;
+    }
+    if (e->impl_.handle_.stats_ & CCC_ENTRY_OCCUPIED)
+    {
+        return data_at(e->impl_.h_, e->impl_.handle_.i_);
+    }
+    if (e->impl_.handle_.stats_ & CCC_ENTRY_INSERT_ERROR)
+    {
+        return NULL;
+    }
+    insert(e->impl_.h_, key_val_type, e->impl_.tag_, e->impl_.handle_.i_);
+    return data_at(e->impl_.h_, e->impl_.handle_.i_);
 }
 
 void *
@@ -193,8 +264,272 @@ ccc_fhm_remove_entry(ccc_fhmap_entry const *const e)
         return (ccc_entry){{.stats_ = CCC_ENTRY_VACANT}};
     }
     erase(e->impl_.h_, e->impl_.handle_.i_);
-    return (ccc_entry){{.e_ = data_at(e->impl_.h_, e->impl_.handle_.i_),
-                        .stats_ = CCC_ENTRY_OCCUPIED}};
+    return (ccc_entry){{.stats_ = CCC_ENTRY_OCCUPIED}};
+}
+
+ccc_fhmap_entry *
+ccc_fhm_and_modify(ccc_fhmap_entry *const e, ccc_update_fn *const fn)
+{
+    if (e && fn && (e->impl_.handle_.stats_ & CCC_ENTRY_OCCUPIED) != 0)
+    {
+        fn((ccc_user_type){data_at(e->impl_.h_, e->impl_.handle_.i_), NULL});
+    }
+    return e;
+}
+
+ccc_fhmap_entry *
+ccc_fhm_and_modify_aux(ccc_fhmap_entry *const e, ccc_update_fn *const fn,
+                       void *const aux)
+{
+    if (e && fn && (e->impl_.handle_.stats_ & CCC_ENTRY_OCCUPIED) != 0)
+    {
+        fn((ccc_user_type){data_at(e->impl_.h_, e->impl_.handle_.i_), aux});
+    }
+    return e;
+}
+
+ccc_entry
+ccc_fhm_swap_entry(ccc_flat_hash_map *const h, void *const key_val_type_output)
+{
+    if (unlikely(!h || !key_val_type_output))
+    {
+        return (ccc_entry){{.stats_ = CCC_ENTRY_ARG_ERROR}};
+    }
+    void *const key = key_in_slot(h, key_val_type_output);
+    struct ccc_fhash_entry_ ent = container_entry(h, key);
+    if (ent.handle_.stats_ & CCC_ENTRY_OCCUPIED)
+    {
+        swap(swap_slot(h), data_at(h, ent.handle_.i_), key_val_type_output,
+             h->elem_sz_);
+        return (ccc_entry){
+            {.e_ = key_val_type_output, .stats_ = CCC_ENTRY_OCCUPIED}};
+    }
+    if (ent.handle_.stats_ & CCC_ENTRY_INSERT_ERROR)
+    {
+        return (ccc_entry){{.stats_ = CCC_ENTRY_INSERT_ERROR}};
+    }
+    insert(ent.h_, key_val_type_output, ent.tag_, ent.handle_.i_);
+    return (ccc_entry){
+        {.e_ = data_at(h, ent.handle_.i_), .stats_ = CCC_ENTRY_VACANT}};
+}
+
+ccc_entry
+ccc_fhm_try_insert(ccc_flat_hash_map *const h, void *const key_val_type)
+{
+    if (unlikely(!h || !key_val_type))
+    {
+        return (ccc_entry){{.stats_ = CCC_ENTRY_ARG_ERROR}};
+    }
+    void *const key = key_in_slot(h, key_val_type);
+    struct ccc_fhash_entry_ ent = container_entry(h, key);
+    if (ent.handle_.stats_ & CCC_ENTRY_OCCUPIED)
+    {
+        return (ccc_entry){
+            {.e_ = data_at(h, ent.handle_.i_), .stats_ = CCC_ENTRY_OCCUPIED}};
+    }
+    if (ent.handle_.stats_ & CCC_ENTRY_INSERT_ERROR)
+    {
+        return (ccc_entry){{.stats_ = CCC_ENTRY_INSERT_ERROR}};
+    }
+    insert(ent.h_, key_val_type, ent.tag_, ent.handle_.i_);
+    return (ccc_entry){
+        {.e_ = data_at(h, ent.handle_.i_), .stats_ = CCC_ENTRY_VACANT}};
+}
+
+ccc_entry
+ccc_fhm_insert_or_assign(ccc_flat_hash_map *const h, void *const key_val_type)
+{
+    if (unlikely(!h || !key_val_type))
+    {
+        return (ccc_entry){{.stats_ = CCC_ENTRY_ARG_ERROR}};
+    }
+    void *const key = key_in_slot(h, key_val_type);
+    struct ccc_fhash_entry_ ent = container_entry(h, key);
+    if (ent.handle_.stats_ & CCC_ENTRY_OCCUPIED)
+    {
+        (void)memcpy(data_at(h, ent.handle_.i_), key_val_type, h->elem_sz_);
+        return (ccc_entry){
+            {.e_ = data_at(h, ent.handle_.i_), .stats_ = CCC_ENTRY_OCCUPIED}};
+    }
+    if (ent.handle_.stats_ & CCC_ENTRY_INSERT_ERROR)
+    {
+        return (ccc_entry){{.stats_ = CCC_ENTRY_INSERT_ERROR}};
+    }
+    insert(ent.h_, key_val_type, ent.tag_, ent.handle_.i_);
+    return (ccc_entry){
+        {.e_ = data_at(h, ent.handle_.i_), .stats_ = CCC_ENTRY_VACANT}};
+}
+
+ccc_entry
+ccc_fhm_remove(ccc_flat_hash_map *const h, void *const key_val_type_output)
+{
+    if (unlikely(!h || !key_val_type_output))
+    {
+        return (ccc_entry){{.stats_ = CCC_ENTRY_ARG_ERROR}};
+    }
+    void *const key = key_in_slot(h, key_val_type_output);
+    ccc_ucount const index = find_key(
+        h, key, h->hash_fn_((ccc_user_key){.user_key = key, .aux = h->aux_}));
+    if (index.error)
+    {
+        return (ccc_entry){{.stats_ = CCC_ENTRY_VACANT}};
+    }
+    (void)memcpy(key_val_type_output, data_at(h, index.count), h->elem_sz_);
+    erase(h, index.count);
+    return (ccc_entry){
+        {.e_ = key_val_type_output, .stats_ = CCC_ENTRY_OCCUPIED}};
+}
+
+void *
+ccc_fhm_begin(ccc_flat_hash_map const *const h)
+{
+    if (unlikely(!h || !h->mask_ || !h->init_ || !h->mask_ || !h->sz_))
+    {
+        return NULL;
+    }
+    for (size_t i = 0; i < (h->mask_ + 1); ++i)
+    {
+        if (is_full(h->tag_[i]))
+        {
+            return data_at(h, i);
+        }
+    }
+    return NULL;
+}
+
+void *
+ccc_fhm_next(ccc_flat_hash_map const *const h, void *const key_val_type_iter)
+{
+    if (unlikely(!h || !key_val_type_iter || !h->mask_ || !h->init_ || !h->sz_))
+    {
+        return NULL;
+    }
+    ccc_ucount i = data_i(h, key_val_type_iter);
+    if (i.error)
+    {
+        return NULL;
+    }
+    for (; i.count < (h->mask_ + 1); ++i.count)
+    {
+        if (is_full(h->tag_[i.count]))
+        {
+            return data_at(h, i.count);
+        }
+    }
+    return NULL;
+}
+
+void *
+ccc_fhm_end(ccc_flat_hash_map const *const)
+{
+    return NULL;
+}
+
+void *
+ccc_fhm_unwrap(ccc_fhmap_entry const *const e)
+{
+    if (unlikely(!e) || !(e->impl_.handle_.stats_ & CCC_ENTRY_OCCUPIED))
+    {
+        return NULL;
+    }
+    return data_at(e->impl_.h_, e->impl_.handle_.i_);
+}
+
+ccc_result
+ccc_fhm_clear(ccc_flat_hash_map *const h, ccc_destructor_fn *const fn)
+{
+    if (unlikely(!h))
+    {
+        return CCC_RESULT_ARG_ERROR;
+    }
+    if (!fn)
+    {
+        if (unlikely(!h->init_ || !h->mask_ || !h->tag_))
+        {
+            return CCC_RESULT_OK;
+        }
+        (void)memset(h->tag_, CCC_FHM_EMPTY, mask_to_tag_bytes(h->mask_));
+        h->avail_ = ((h->mask_ + 1) / 8) * 7;
+        h->sz_ = 0;
+    }
+    for (size_t i = 0; i < (h->mask_ + 1); ++i)
+    {
+        if (is_full(h->tag_[i]))
+        {
+            fn((ccc_user_type){.user_type = data_at(h, i), .aux = h->aux_});
+        }
+    }
+    (void)memset(h->tag_, CCC_FHM_EMPTY, mask_to_tag_bytes(h->mask_));
+    h->avail_ = ((h->mask_ + 1) / 8) * 7;
+    h->sz_ = 0;
+    return CCC_RESULT_OK;
+}
+
+ccc_result
+ccc_fhm_clear_and_free(ccc_flat_hash_map *const h, ccc_destructor_fn *const fn)
+{
+    if (unlikely(!h || !h->data_))
+    {
+        return CCC_RESULT_ARG_ERROR;
+    }
+    if (!h->alloc_fn_)
+    {
+        (void)ccc_fhm_clear(h, fn);
+        return CCC_RESULT_NO_ALLOC;
+    }
+    if (fn)
+    {
+        for (size_t i = 0; i < (h->mask_ + 1); ++i)
+        {
+            if (is_full(h->tag_[i]))
+            {
+                fn((ccc_user_type){.user_type = data_at(h, i), .aux = h->aux_});
+            }
+        }
+    }
+    h->avail_ = 0;
+    h->mask_ = 0;
+    h->init_ = CCC_FALSE;
+    h->sz_ = 0;
+    h->tag_ = NULL;
+    h->data_ = h->alloc_fn_(h->data_, 0, h->aux_);
+    return CCC_RESULT_OK;
+}
+
+ccc_tribool
+ccc_fhm_occupied(ccc_fhmap_entry const *const e)
+{
+    if (unlikely(!e))
+    {
+        return CCC_TRIBOOL_ERROR;
+    }
+    return (e->impl_.handle_.stats_ & CCC_ENTRY_OCCUPIED) != 0;
+}
+
+ccc_tribool
+ccc_fhm_insert_error(ccc_fhmap_entry const *const e)
+{
+    if (unlikely(!e))
+    {
+        return CCC_TRIBOOL_ERROR;
+    }
+    return (e->impl_.handle_.stats_ & CCC_ENTRY_INSERT_ERROR) != 0;
+}
+
+ccc_handle_status
+ccc_fhm_handle_status(ccc_fhmap_entry const *const e)
+{
+    if (unlikely(!e))
+    {
+        return CCC_ENTRY_ARG_ERROR;
+    }
+    return e->impl_.handle_.stats_;
+}
+
+void *
+ccc_fhm_data(ccc_flat_hash_map const *h)
+{
+    return h ? h->data_ : NULL;
 }
 
 ccc_result
@@ -469,15 +804,13 @@ maybe_rehash(struct ccc_fhmap_ *const h, size_t const to_add)
             {
                 return CCC_RESULT_ARG_ERROR;
             }
-            (void)memset(h->tag_, CCC_FHM_EMPTY,
-                         (h->mask_ + 1) + CCC_FHM_GROUP_SIZE);
+            (void)memset(h->tag_, CCC_FHM_EMPTY, mask_to_tag_bytes(h->mask_));
         }
         h->init_ = CCC_TRUE;
     }
     if (unlikely(!h->mask_))
     {
-        size_t const total_bytes = ((required_cap + 1) * h->elem_sz_)
-                                   + (required_cap + CCC_FHM_GROUP_SIZE);
+        size_t const total_bytes = mask_to_total_bytes(h, required_cap - 1);
         void *const buf = h->alloc_fn_(NULL, total_bytes, h->aux_);
         if (!buf)
         {
@@ -487,8 +820,9 @@ maybe_rehash(struct ccc_fhmap_ *const h, size_t const to_add)
         h->data_ = buf;
         h->avail_ = (required_cap / 8) * 7;
         h->tag_ = (ccc_fhm_tag *)(((char *)buf + total_bytes)
-                                  - (required_cap + CCC_FHM_GROUP_SIZE));
-        (void)memset(h->tag_, CCC_FHM_EMPTY, required_cap + CCC_FHM_GROUP_SIZE);
+                                  - mask_to_tag_bytes(required_cap - 1));
+        (void)memset(h->tag_, CCC_FHM_EMPTY,
+                     mask_to_tag_bytes(required_cap - 1));
     }
     if (likely(h->avail_))
     {
@@ -576,10 +910,8 @@ rehash_resize(struct ccc_fhmap_ *const h, size_t const to_add)
     {
         return CCC_RESULT_MEM_ERROR;
     }
-    size_t const prev_bytes
-        = ((h->mask_ + 2) * h->elem_sz_) + (h->mask_ + 1 + CCC_FHM_GROUP_SIZE);
-    size_t const total_bytes = ((new_pow2_cap + 1) * h->elem_sz_)
-                               + (new_pow2_cap + CCC_FHM_GROUP_SIZE);
+    size_t const prev_bytes = mask_to_total_bytes(h, h->mask_);
+    size_t const total_bytes = mask_to_total_bytes(h, new_pow2_cap - 1);
     if (total_bytes < prev_bytes)
     {
         return CCC_RESULT_MEM_ERROR;
@@ -596,7 +928,8 @@ rehash_resize(struct ccc_fhmap_ *const h, size_t const to_add)
     new_h.tag_ = (ccc_fhm_tag *)(((char *)new_buf + total_bytes) - new_pow2_cap
                                  - CCC_FHM_GROUP_SIZE);
     new_h.data_ = new_buf;
-    (void)memset(new_h.tag_, CCC_FHM_EMPTY, new_pow2_cap + CCC_FHM_GROUP_SIZE);
+    (void)memset(new_h.tag_, CCC_FHM_EMPTY,
+                 mask_to_tag_bytes(new_pow2_cap - 1));
     for (size_t i = 0; i < (h->mask_ + 1); ++i)
     {
         if (is_full(h->tag_[i]))
@@ -664,6 +997,24 @@ data_at(struct ccc_fhmap_ const *const h, size_t const i)
     return h->tag_ - ((i + 1) * h->elem_sz_);
 }
 
+static inline ccc_ucount
+data_i(struct ccc_fhmap_ const *const h, void const *const data_slot)
+{
+    if ((char *)data_slot >= (char *)h->tag_
+        || (char *)data_slot <= (char *)h->data_)
+    {
+        return (ccc_ucount){.error = CCC_RESULT_ARG_ERROR};
+    }
+    return (ccc_ucount){.count
+                        = ((char *)h->tag_ - (char *)data_slot) / h->elem_sz_};
+}
+
+static inline void *
+swap_slot(struct ccc_fhmap_ const *h)
+{
+    return h->data_;
+}
+
 static inline void
 swap(char tmp[const], void *const a, void *const b, size_t const ab_size)
 {
@@ -676,6 +1027,12 @@ swap(char tmp[const], void *const a, void *const b, size_t const ab_size)
     (void)memcpy(b, tmp, ab_size);
 }
 
+static inline void *
+key_in_slot(struct ccc_fhmap_ const *const h, void const *const slot)
+{
+    return (char *)slot + h->key_offset_;
+}
+
 static inline size_t
 next_power_of_two(size_t const n)
 {
@@ -686,6 +1043,34 @@ static inline ccc_tribool
 is_power_of_two(size_t const n)
 {
     return n && ((n & (n - 1)) == 0);
+}
+
+/** Returns the total bytes used by the map in the contiguous allocation. This
+includes the bytes for the user data array (swap slot included) and the tag
+array. The tag array also has an duplicate group at the end that must be
+counted. */
+static inline size_t
+mask_to_total_bytes(struct ccc_fhmap_ const *const h, size_t const mask)
+{
+    if (!h->init_ || !mask)
+    {
+        return 0;
+    }
+    /* Add two to mask at first due to swap slot. */
+    return ((mask + 2) * h->elem_sz_) + ((mask + 1) + CCC_FHM_GROUP_SIZE);
+}
+
+/** Returns the bytes needed for the tag metadata array. This includes the
+bytes for the duplicate group that is at the end of the tag array. */
+static inline size_t
+mask_to_tag_bytes(size_t const mask)
+{
+    static_assert(sizeof(ccc_fhm_tag) == sizeof(uint8_t));
+    if (!mask)
+    {
+        return 0;
+    }
+    return mask + 1 + CCC_FHM_GROUP_SIZE;
 }
 
 /*=====================   Intrinsics and Generics   =========================*/
