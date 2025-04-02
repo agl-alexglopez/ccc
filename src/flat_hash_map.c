@@ -1,5 +1,4 @@
 #include <assert.h>
-#include <emmintrin.h>
 #include <limits.h>
 #include <stdalign.h>
 #include <stddef.h>
