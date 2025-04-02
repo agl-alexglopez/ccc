@@ -26,23 +26,82 @@ ccc_result ccc_fhm_copy(ccc_flat_hash_map *dst, ccc_flat_hash_map const *src,
                                         void const *key);
 [[nodiscard]] ccc_fhmap_entry ccc_fhm_entry(ccc_flat_hash_map *h,
                                             void const *key);
+
+#define ccc_fhm_entry_r(map_ptr, key_ptr)                                      \
+    &(ccc_fhmap_entry)                                                         \
+    {                                                                          \
+        ccc_fhm_entry(map_ptr, key_ptr).impl_                                  \
+    }
+
 [[nodiscard]] void *ccc_fhm_or_insert(ccc_fhmap_entry const *e,
                                       void const *key_val_type);
+
+#define ccc_fhm_or_insert_w(map_entry_ptr, lazy_key_value...)                  \
+    ccc_impl_fhm_or_insert_w(map_entry_ptr, lazy_key_value)
+
 [[nodiscard]] void *ccc_fhm_insert_entry(ccc_fhmap_entry const *e,
                                          void const *key_val_type);
+
+#define ccc_fhm_insert_entry_w(map_entry_ptr, lazy_key_value...)               \
+    ccc_impl_fhm_insert_entry_w(map_entry_ptr, lazy_key_value)
+
 [[nodiscard]] ccc_entry ccc_fhm_remove_entry(ccc_fhmap_entry const *e);
+
+#define ccc_fhm_remove_entry_r(map_entry_ptr)                                  \
+    &(ccc_entry)                                                               \
+    {                                                                          \
+        ccc_fhm_remove_entry(map_entry_ptr).impl_                              \
+    }
+
 [[nodiscard]] ccc_fhmap_entry *ccc_fhm_and_modify(ccc_fhmap_entry *e,
                                                   ccc_update_fn *fn);
 [[nodiscard]] ccc_fhmap_entry *
 ccc_fhm_and_modify_aux(ccc_fhmap_entry *e, ccc_update_fn *fn, void *aux);
+
+#define ccc_fhm_and_modify_w(map_entry_ptr, type_name, closure_over_T...)      \
+    ccc_impl_fhm_and_modify_w(map_entry_ptr, type_name, closure_over_T)
+
 [[nodiscard]]
 ccc_entry ccc_fhm_swap_entry(ccc_flat_hash_map *h, void *key_val_type_output);
+
+#define ccc_fhm_swap_entry_r(map_ptr, key_val_type_ptr)                        \
+    &(ccc_entry)                                                               \
+    {                                                                          \
+        ccc_fhm_swap_entry(map_ptr, key_val_type_ptr).impl_                    \
+    }
+
 [[nodiscard]]
 ccc_entry ccc_fhm_try_insert(ccc_flat_hash_map *h, void *key_val_type);
+
+#define ccc_fhm_try_insert_r(map_ptr, key_val_type_ptr)                        \
+    &(ccc_entry)                                                               \
+    {                                                                          \
+        ccc_fhm_try_insert(map_ptr, key_val_type_ptr).impl_                    \
+    }
+
+#define ccc_fhm_try_insert_w(map_ptr, key_val_type_ptr...)                     \
+    ccc_impl_fhm_try_insert_w(map_ptr, key_val_type_ptr)
+
 [[nodiscard]]
 ccc_entry ccc_fhm_insert_or_assign(ccc_flat_hash_map *h, void *key_val_type);
+
+#define ccc_fhm_insert_or_assign_r(map_ptr, key_val_type_ptr)                  \
+    &(ccc_entry)                                                               \
+    {                                                                          \
+        ccc_fhm_insert_or_assign(map_ptr, key_val_type_ptr).impl_              \
+    }
+
+#define ccc_fhm_insert_or_assign_w(map_ptr, key_val_type_ptr...)               \
+    ccc_impl_fhm_insert_or_assign_w(map_ptr, key_val_type_ptr)
+
 [[nodiscard]] ccc_entry ccc_fhm_remove(ccc_flat_hash_map *h,
                                        void *key_val_type_output);
+
+#define ccc_fhm_remove_r(map_ptr, key_val_type_output_ptr)                     \
+    &(ccc_entry)                                                               \
+    {                                                                          \
+        ccc_fhm_remove(map_ptr, key_val_type_output_ptr).impl_                 \
+    }
 
 [[nodiscard]] void *ccc_fhm_begin(ccc_flat_hash_map const *h);
 [[nodiscard]] void *ccc_fhm_next(ccc_flat_hash_map const *h,

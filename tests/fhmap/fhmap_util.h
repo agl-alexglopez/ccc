@@ -1,7 +1,6 @@
 #ifndef CCC_FHMAP_UTIL_H
 #define CCC_FHMAP_UTIL_H
 
-#include "flat_hash_map.h"
 #include "types.h"
 
 #include <stdint.h>
@@ -10,7 +9,6 @@ struct val
 {
     int key;
     int val;
-    ccc_fhmap_elem e;
 };
 
 uint64_t fhmap_int_zero(ccc_user_key);

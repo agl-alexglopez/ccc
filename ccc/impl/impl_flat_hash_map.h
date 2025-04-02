@@ -125,6 +125,16 @@ union ccc_fhmap_entry_
     struct ccc_fhash_entry_ impl_;
 };
 
+/*======================     Private Interface      =========================*/
+
+void ccc_impl_fhm_insert(struct ccc_fhmap_ *h, void const *key_val_type,
+                         ccc_fhm_tag m, size_t i);
+void ccc_impl_fhm_erase(struct ccc_fhmap_ *h, size_t i);
+void *ccc_impl_fhm_data_at(struct ccc_fhmap_ const *h, size_t i);
+void ccc_impl_fhm_set_insert(struct ccc_fhash_entry_ const *e);
+
+/*======================    Macro Implementations   =========================*/
+
 /** @private Helps the user declare a type for a fixed size map. They can then
 use this type when they want a hash map as global, static global, or stack
 local. They would need to define their fixed size type every time but that
@@ -162,5 +172,147 @@ array must be rounded up */
         .alloc_fn_ = (alloc_fn),                                               \
         .aux_ = (aux_data),                                                    \
     }
+
+/*========================    Construct In Place    =========================*/
+
+#define ccc_impl_fhm_and_modify_w(flat_hash_map_entry_ptr, type_name,          \
+                                  closure_over_T...)                           \
+    (__extension__({                                                           \
+        __auto_type fhm_mod_ent_ptr_ = (flat_hash_map_entry_ptr);              \
+        struct ccc_fhash_entry_ fhm_mod_with_ent_                              \
+            = {.handle_ = {.stats_ = CCC_ENTRY_ARG_ERROR}};                    \
+        if (fhm_mod_ent_ptr_)                                                  \
+        {                                                                      \
+            fhm_mod_with_ent_ = fhm_mod_ent_ptr_->impl_;                       \
+            if (fhm_mod_with_ent_.handle_.stats_ & CCC_ENTRY_OCCUPIED)         \
+            {                                                                  \
+                type_name *const T = ccc_impl_fhm_data_at(                     \
+                    fhm_mod_with_ent_.h_, fhm_mod_with_ent_.handle_.i_);       \
+                if (T)                                                         \
+                {                                                              \
+                    closure_over_T                                             \
+                }                                                              \
+            }                                                                  \
+        }                                                                      \
+        fhm_mod_with_ent_;                                                     \
+    }))
+
+/** @private */
+#define ccc_impl_fhm_or_insert_w(flat_hash_map_entry_ptr, lazy_key_value...)   \
+    (__extension__({                                                           \
+        __auto_type fhm_or_ins_ent_ptr_ = (flat_hash_map_entry_ptr);           \
+        typeof(lazy_key_value) *fhm_or_ins_res_ = NULL;                        \
+        if (fhm_or_ins_ent_ptr_)                                               \
+        {                                                                      \
+            struct ccc_fhash_entry_ *fhm_or_ins_entry_                         \
+                = &fhm_or_ins_ent_ptr_->impl_;                                 \
+            if (!(fhm_or_ins_entry_->handle_.stats_ & CCC_ENTRY_INSERT_ERROR)) \
+            {                                                                  \
+                fhm_or_ins_res_ = ccc_impl_fhm_data_at(                        \
+                    fhm_or_ins_ent_ptr_, fhm_or_ins_entry_->handle_.i_);       \
+                if (fhm_or_ins_entry_->handle_.stats_ == CCC_ENTRY_VACANT)     \
+                {                                                              \
+                    *fhm_or_ins_res_ = lazy_key_value;                         \
+                    ccc_impl_fhm_set_insert(fhm_or_ins_entry_);                \
+                }                                                              \
+            }                                                                  \
+        }                                                                      \
+        fhm_or_ins_res_;                                                       \
+    }))
+
+#define ccc_impl_fhm_insert_entry_w(flat_hash_map_entry_ptr,                   \
+                                    lazy_key_value...)                         \
+    (__extension__({                                                           \
+        __auto_type fhm_ins_ent_ptr_ = (flat_hash_map_entry_ptr);              \
+        typeof(lazy_key_value) *fhm_ins_ent_res_ = NULL;                       \
+        if (fhm_ins_ent_ptr_)                                                  \
+        {                                                                      \
+            struct ccc_fhash_entry_ *fhm_ins_entry_                            \
+                = &fhm_ins_ent_ptr_->impl_;                                    \
+            if (!(fhm_ins_entry_->handle_.stats_ & CCC_ENTRY_INSERT_ERROR))    \
+            {                                                                  \
+                fhm_ins_ent_res_ = ccc_impl_fhm_data_at(                       \
+                    fhm_ins_ent_ptr_, fhm_ins_entry_->handle_.i_);             \
+                *fhm_ins_ent_res_ = lazy_key_value;                            \
+                ccc_impl_fhm_set_insert(fhm_ins_entry_);                       \
+            }                                                                  \
+        }                                                                      \
+        fhm_ins_ent_res_;                                                      \
+    }))
+
+/** @private */
+#define ccc_impl_fhm_try_insert_w(flat_hash_map_ptr, key, lazy_value...)       \
+    (__extension__({                                                           \
+        struct ccc_fhmap_ *flat_hash_map_ptr_ = (flat_hash_map_ptr);           \
+        struct ccc_ent_ fhm_try_insert_res_ = {.stats_ = CCC_ENTRY_ARG_ERROR}; \
+        if (flat_hash_map_ptr_)                                                \
+        {                                                                      \
+            __auto_type fhm_key_ = key;                                        \
+            struct ccc_fhash_entry_ fhm_try_ins_ent_                           \
+                = ccc_impl_fhm_entry(flat_hash_map_ptr_, (void *)&fhm_key_);   \
+            if ((fhm_try_ins_ent_.handle_.stats_ & CCC_ENTRY_OCCUPIED)         \
+                || (fhm_try_ins_ent_.handle_.stats_ & CCC_ENTRY_INSERT_ERROR)) \
+            {                                                                  \
+                fhm_try_insert_res_ = (struct ccc_ent_){                       \
+                    .e_ = ccc_impl_fhm_data_at(fhm_try_ins_ent_.h_,            \
+                                               fhm_try_ins_ent_.handle_.i_),   \
+                    .stats_ = fhm_try_ins_ent_.handle_.stats_,                 \
+                };                                                             \
+            }                                                                  \
+            else                                                               \
+            {                                                                  \
+                fhm_try_insert_res_ = (struct ccc_ent_){                       \
+                    .e_ = ccc_impl_fhm_data_at(fhm_try_ins_ent_.h_,            \
+                                               fhm_try_ins_ent_.handle_.i_),   \
+                    .stats_ = CCC_ENTRY_VACANT,                                \
+                };                                                             \
+                *((typeof(lazy_value) *)fhm_try_insert_res_.e_) = lazy_value;  \
+                ccc_impl_fhm_set_insert(&fhm_try_ins_ent_);                    \
+            }                                                                  \
+        }                                                                      \
+        fhm_try_insert_res_;                                                   \
+    }))
+
+/** @private */
+#define ccc_impl_fhm_insert_or_assign_w(flat_hash_map_ptr, key, lazy_value...) \
+    (__extension__({                                                           \
+        struct ccc_fhmap_ *flat_hash_map_ptr_ = (flat_hash_map_ptr);           \
+        struct ccc_ent_ fhm_insert_or_assign_res_                              \
+            = {.stats_ = CCC_ENTRY_ARG_ERROR};                                 \
+        if (flat_hash_map_ptr_)                                                \
+        {                                                                      \
+            __auto_type fhm_key_ = key;                                        \
+            struct ccc_fhash_entry_ fhm_ins_or_assign_ent_                     \
+                = ccc_impl_fhm_entry(flat_hash_map_ptr_, (void *)&fhm_key_);   \
+            if (fhm_ins_or_assign_ent_.handle_.stats_ & CCC_ENTRY_OCCUPIED)    \
+            {                                                                  \
+                fhm_insert_or_assign_res_ = (struct ccc_ent_){                 \
+                    .e_                                                        \
+                    = ccc_impl_fhm_data_at(fhm_ins_or_assign_ent_.h_,          \
+                                           fhm_ins_or_assign_ent_.handle_.i_), \
+                    .stats_ = fhm_ins_or_assign_ent_.handle_.stats_,           \
+                };                                                             \
+            }                                                                  \
+            else if (fhm_ins_or_assign_ent_.handle_.stats_                     \
+                     & CCC_ENTRY_INSERT_ERROR)                                 \
+            {                                                                  \
+                fhm_insert_or_assign_res_.e_ = NULL;                           \
+                fhm_insert_or_assign_res_.stats_ = CCC_ENTRY_INSERT_ERROR;     \
+            }                                                                  \
+            else                                                               \
+            {                                                                  \
+                fhm_insert_or_assign_res_ = (struct ccc_ent_){                 \
+                    .e_                                                        \
+                    = ccc_impl_fhm_data_at(fhm_ins_or_assign_ent_.h_,          \
+                                           fhm_ins_or_assign_ent_.handle_.i_), \
+                    .stats_ = CCC_ENTRY_VACANT,                                \
+                };                                                             \
+                *((typeof(lazy_value) *)fhm_insert_or_assign_res_.e_)          \
+                    = lazy_value;                                              \
+                ccc_impl_fhm_set_insert(&fhm_ins_or_assign_ent_);              \
+            }                                                                  \
+        }                                                                      \
+        fhm_insert_or_assign_res_;                                             \
+    }))
 
 #endif /* CCC_IMPL_FLAT_HASH_MAP_H */
