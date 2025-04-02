@@ -86,6 +86,7 @@ struct triangular_seq
 
 /*===========================   Prototypes   ================================*/
 
+static void swap(char tmp[const], void *a, void *b, size_t ab_size);
 static struct ccc_fhash_entry_ container_entry(struct ccc_fhmap_ *h,
                                                void const *key);
 static struct ccc_handl_ handle(struct ccc_fhmap_ *h, void const *key,
@@ -103,12 +104,12 @@ static void rehash_in_place(struct ccc_fhmap_ *h);
 static ccc_result rehash_resize(struct ccc_fhmap_ *h, size_t to_add);
 static void *key_at(struct ccc_fhmap_ const *h, size_t i);
 static void *data_at(struct ccc_fhmap_ const *h, size_t i);
-static void swap(char tmp[const], void *a, void *b, size_t ab_size);
 static void *key_in_slot(struct ccc_fhmap_ const *h, void const *slot);
 static void *swap_slot(struct ccc_fhmap_ const *h);
 static ccc_ucount data_i(struct ccc_fhmap_ const *h, void const *data_slot);
 static size_t mask_to_total_bytes(size_t elem_size, size_t mask);
 static size_t mask_to_tag_bytes(size_t mask);
+static void set_insert(struct ccc_fhmap_ *h, ccc_fhm_tag m, size_t i);
 
 static void set_tag(struct ccc_fhmap_ *h, ccc_fhm_tag m, size_t i);
 static ccc_tribool is_index_on(index_mask m);
@@ -610,8 +611,46 @@ ccc_fhm_copy(ccc_flat_hash_map *const dst, ccc_flat_hash_map const *const src,
     return CCC_RESULT_OK;
 }
 
+/*======================     Private Interface      =========================*/
+
+struct ccc_fhash_entry_
+ccc_impl_fhm_entry(struct ccc_fhmap_ *const h, void const *const key)
+{
+    return container_entry(h, key);
+}
+
+void
+ccc_impl_fhm_insert(struct ccc_fhmap_ *h, void const *key_val_type,
+                    ccc_fhm_tag m, size_t i)
+{
+    insert(h, key_val_type, m, i);
+}
+
+void
+ccc_impl_fhm_erase(struct ccc_fhmap_ *h, size_t i)
+{
+    erase(h, i);
+}
+
+void *
+ccc_impl_fhm_data_at(struct ccc_fhmap_ const *const h, size_t const i)
+{
+    return data_at(h, i);
+}
+
+void
+ccc_impl_fhm_set_insert(struct ccc_fhash_entry_ const *const e)
+{
+    return set_insert(e->h_, e->tag_, e->handle_.i_);
+}
+
 /*=========================   Static Internals   ============================*/
 
+/** Returns the container entry prepared for further insertion, removal, or
+searched queries. This entry gives a reference to the associated map and any
+metadata and location info necessary for future actions. If this entry was
+obtained in hopes of insertions but insertion will cause an error. A status
+flag in the handle field will indicate the error. */
 static struct ccc_fhash_entry_
 container_entry(struct ccc_fhmap_ *const h, void const *const key)
 {
@@ -647,12 +686,18 @@ static void
 insert(struct ccc_fhmap_ *const h, void const *const key_val_type,
        ccc_fhm_tag const m, size_t const i)
 {
+    set_insert(h, m, i);
+    (void)memcpy(data_at(h, i), key_val_type, h->elem_sz_);
+}
+
+static inline void
+set_insert(struct ccc_fhmap_ *const h, ccc_fhm_tag const m, size_t const i)
+{
     assert(i <= h->mask_);
     assert((m.v & TAG_MSB) == 0);
     h->avail_ -= is_empty_constant(h->tag_[i]);
     ++h->sz_;
     set_tag(h, m, i);
-    (void)memcpy(data_at(h, i), key_val_type, h->elem_sz_);
 }
 
 static void
@@ -672,7 +717,7 @@ erase(struct ccc_fhmap_ *const h, size_t const i)
     set_tag(h, m, i);
 }
 
-/* Finds the specified hash or first available slot where the hash could be
+/** Finds the specified hash or first available slot where the hash could be
 inserted. If the element does not exist and a non-occupied slot is returned
 that slot will have been the first empty or deleted slot encountered in the
 probe sequence. This function assumes an empty slot exists in the table. */
@@ -720,7 +765,7 @@ find_key_or_slot(struct ccc_fhmap_ const *const h, void const *const key,
     } while (1);
 }
 
-/* Finds key or quits when first empty slot is encountered after a group fails
+/** Finds key or quits when first empty slot is encountered after a group fails
 to match. This function is better when a simple lookup is needed as a few
 branches and loads of groups are omitted compared to the search with intention
 to insert or remove. A successful search returns the index with an OK status
@@ -757,7 +802,7 @@ find_key(struct ccc_fhmap_ const *const h, void const *const key,
     } while (1);
 }
 
-/* Finds an insert slot or loops forever. The caller of this function must know
+/** Finds an insert slot or loops forever. The caller of this function must know
 that there is an available empty or deleted slot in the table. */
 static size_t
 find_known_insert_slot(struct ccc_fhmap_ const *const h, uint64_t const hash)

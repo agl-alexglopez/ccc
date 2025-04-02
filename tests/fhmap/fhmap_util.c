@@ -5,7 +5,7 @@
 #include <stdint.h>
 
 uint64_t
-fhmap_int_zero([[maybe_unused]] ccc_user_key const n)
+fhmap_int_zero(ccc_user_key const)
 {
     return 0;
 }
