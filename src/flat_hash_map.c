@@ -108,7 +108,7 @@ static void swap(char tmp[const], void *a, void *b, size_t ab_size);
 static void *key_in_slot(struct ccc_fhmap_ const *h, void const *slot);
 static void *swap_slot(struct ccc_fhmap_ const *h);
 static ccc_ucount data_i(struct ccc_fhmap_ const *h, void const *data_slot);
-static size_t mask_to_total_bytes(struct ccc_fhmap_ const *h, size_t mask);
+static size_t mask_to_total_bytes(size_t elem_size, size_t mask);
 static size_t mask_to_tag_bytes(size_t mask);
 
 static void set_tag(struct ccc_fhmap_ *h, ccc_fhm_tag m, size_t i);
@@ -810,7 +810,8 @@ maybe_rehash(struct ccc_fhmap_ *const h, size_t const to_add)
     }
     if (unlikely(!h->mask_))
     {
-        size_t const total_bytes = mask_to_total_bytes(h, required_cap - 1);
+        size_t const total_bytes
+            = mask_to_total_bytes(h->elem_sz_, required_cap - 1);
         void *const buf = h->alloc_fn_(NULL, total_bytes, h->aux_);
         if (!buf)
         {
@@ -910,8 +911,9 @@ rehash_resize(struct ccc_fhmap_ *const h, size_t const to_add)
     {
         return CCC_RESULT_MEM_ERROR;
     }
-    size_t const prev_bytes = mask_to_total_bytes(h, h->mask_);
-    size_t const total_bytes = mask_to_total_bytes(h, new_pow2_cap - 1);
+    size_t const prev_bytes = mask_to_total_bytes(h->elem_sz_, h->mask_);
+    size_t const total_bytes
+        = mask_to_total_bytes(h->elem_sz_, new_pow2_cap - 1);
     if (total_bytes < prev_bytes)
     {
         return CCC_RESULT_MEM_ERROR;
@@ -1050,14 +1052,14 @@ includes the bytes for the user data array (swap slot included) and the tag
 array. The tag array also has an duplicate group at the end that must be
 counted. */
 static inline size_t
-mask_to_total_bytes(struct ccc_fhmap_ const *const h, size_t const mask)
+mask_to_total_bytes(size_t const elem_size, size_t const mask)
 {
-    if (!h->init_ || !mask)
+    if (!elem_size || !mask)
     {
         return 0;
     }
     /* Add two to mask at first due to swap slot. */
-    return ((mask + 2) * h->elem_sz_) + ((mask + 1) + CCC_FHM_GROUP_SIZE);
+    return ((mask + 2) * elem_size) + ((mask + 1) + CCC_FHM_GROUP_SIZE);
 }
 
 /** Returns the bytes needed for the tag metadata array. This includes the
