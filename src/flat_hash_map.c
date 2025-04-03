@@ -158,6 +158,7 @@ static size_t mask_to_tag_bytes(size_t mask);
 static size_t mask_to_data_bytes(size_t elem_size, size_t mask);
 static void set_insert(struct ccc_fhmap_ *h, ccc_fhm_tag m, size_t i);
 static size_t mask_to_load_factor_cap(size_t mask);
+static size_t max(size_t a, size_t b);
 
 static void set_tag(struct ccc_fhmap_ *h, ccc_fhm_tag m, size_t i);
 static ccc_tribool is_index_on(index_mask m);
@@ -614,8 +615,7 @@ ccc_fhm_copy(ccc_flat_hash_map *const dst, ccc_flat_hash_map const *const src,
     {
         return CCC_RESULT_OK;
     }
-    size_t const src_bytes = ((src->mask_ + 2) * src->elem_sz_)
-                             + ((src->mask_ + 1) + CCC_FHM_GROUP_SIZE);
+    size_t const src_bytes = mask_to_total_bytes(src->elem_sz_, src->mask_);
     if (dst->mask_ < src->mask_)
     {
         void *const new_mem = dst->alloc_fn_(dst->data_, src_bytes, dst->aux_);
@@ -634,8 +634,7 @@ ccc_fhm_copy(ccc_flat_hash_map *const dst, ccc_flat_hash_map const *const src,
     {
         return CCC_RESULT_ARG_ERROR;
     }
-    (void)memset(dst->tag_, CCC_FHM_EMPTY,
-                 (dst->mask_ + 1) + CCC_FHM_GROUP_SIZE);
+    (void)memset(dst->tag_, CCC_FHM_EMPTY, mask_to_tag_bytes(dst->mask_));
     dst->avail_ = mask_to_load_factor_cap(dst->mask_);
     dst->sz_ = 0;
     dst->init_ = CCC_TRUE;
@@ -662,27 +661,27 @@ ccc_fhm_copy(ccc_flat_hash_map *const dst, ccc_flat_hash_map const *const src,
     return CCC_RESULT_OK;
 }
 
-ccc_result
+ccc_tribool
 ccc_fhm_validate(ccc_flat_hash_map const *const h)
 {
     if (!h)
     {
-        return CCC_RESULT_ARG_ERROR;
+        return CCC_TRIBOOL_ERROR;
     }
     /* We initialized the metadata array of 0 capacity table? Not possible. */
     if (h->init_ && !h->mask_)
     {
-        return CCC_RESULT_FAIL;
+        return CCC_FALSE;
     }
     /* No point checking invariants when lazy init hasn't happened yet. */
     if (!h->init_ || !h->mask_)
     {
-        return CCC_RESULT_OK;
+        return CCC_TRUE;
     }
     /* We are initialized, these need to point to the array positions. */
     if (!h->tag_ || !h->data_)
     {
-        return CCC_RESULT_FAIL;
+        return CCC_FALSE;
     }
     /* Exceeded allowable load factor when determining available and size. */
     /* The replica group should be in sync. */
@@ -691,7 +690,7 @@ ccc_fhm_validate(ccc_flat_hash_map const *const h)
     {
         if (h->tag_[original].v != h->tag_[clone].v)
         {
-            return CCC_RESULT_FAIL;
+            return CCC_FALSE;
         }
     }
     size_t occupied = 0;
@@ -703,7 +702,7 @@ ccc_fhm_validate(ccc_flat_hash_map const *const h)
         /* If we are a special constant there are only two possible values. */
         if (is_constant(t) && t.v != CCC_FHM_DELETED && t.v != CCC_FHM_EMPTY)
         {
-            return CCC_RESULT_FAIL;
+            return CCC_FALSE;
         }
         if (t.v == CCC_FHM_EMPTY)
         {
@@ -720,7 +719,7 @@ ccc_fhm_validate(ccc_flat_hash_map const *const h)
                     .v
                 != t.v)
             {
-                return CCC_RESULT_FAIL;
+                return CCC_FALSE;
             }
             ++occupied;
         }
@@ -728,9 +727,9 @@ ccc_fhm_validate(ccc_flat_hash_map const *const h)
     if (occupied != h->sz_ || avail != h->avail_
         || occupied + avail + deleted != h->mask_ + 1)
     {
-        return CCC_RESULT_FAIL;
+        return CCC_FALSE;
     }
-    return CCC_RESULT_OK;
+    return CCC_TRUE;
 }
 
 /*======================     Private Interface      =========================*/
@@ -976,6 +975,7 @@ maybe_rehash(struct ccc_fhmap_ *const h, size_t const to_add)
     }
     if (unlikely(!h->mask_))
     {
+        required_cap = max(required_cap, CCC_FHM_GROUP_SIZE);
         size_t const total_bytes
             = mask_to_total_bytes(h->elem_sz_, required_cap - 1);
         void *const buf = h->alloc_fn_(NULL, total_bytes, h->aux_);
@@ -986,10 +986,10 @@ maybe_rehash(struct ccc_fhmap_ *const h, size_t const to_add)
         h->mask_ = required_cap - 1;
         h->data_ = buf;
         h->avail_ = mask_to_load_factor_cap(h->mask_);
-        h->tag_ = (ccc_fhm_tag *)(((char *)buf + total_bytes)
-                                  - mask_to_tag_bytes(required_cap - 1));
-        (void)memset(h->tag_, CCC_FHM_EMPTY,
-                     mask_to_tag_bytes(required_cap - 1));
+        /* Static assertions at top of file ensure this is correct. */
+        h->tag_ = (ccc_fhm_tag *)((char *)buf
+                                  + mask_to_data_bytes(h->elem_sz_, h->mask_));
+        (void)memset(h->tag_, CCC_FHM_EMPTY, mask_to_tag_bytes(h->mask_));
     }
     if (likely(h->avail_))
     {
@@ -1257,6 +1257,12 @@ mask_to_data_bytes(size_t elem_size, size_t const mask)
     return elem_size * (mask + 2);
 }
 
+static inline size_t
+max(size_t const a, size_t const b)
+{
+    return a > b ? a : b;
+}
+
 /*=====================   Intrinsics and Generics   =========================*/
 
 /** Below are the implementations of the SIMD or bitwise operations needed to
@@ -1312,13 +1318,13 @@ next_index(index_mask *const m)
 static inline group
 load_group(ccc_fhm_tag const *const src)
 {
-    return (group){_mm_load_si128((__m128i *)&src->v)};
+    return (group){_mm_loadu_si128((__m128i *)src)};
 }
 
 static inline void
 store_group(ccc_fhm_tag *const dst, group const src)
 {
-    _mm_store_si128((__m128i *)&dst->v, src.v);
+    _mm_storeu_si128((__m128i *)dst, src.v);
 }
 
 static inline index_mask
