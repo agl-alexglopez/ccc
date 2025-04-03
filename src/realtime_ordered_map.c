@@ -43,6 +43,9 @@ enum romap_link_
     R,
 };
 
+#define INORDER_TRAVERSAL R
+#define REVERSE_INORDER_TRAVERSAL L
+
 /** @private This will utilize safe type punning in C. Both union fields have
 the same type and when obtaining an entry we either have the desired element
 or its parent. Preserving the known parent is what makes the Entry Interface
@@ -55,12 +58,6 @@ struct romap_query_
         struct ccc_romap_elem_ *found_;
         struct ccc_romap_elem_ *parent_;
     };
-};
-
-enum
-{
-    INORDER_TRAVERSAL = R,
-    REVERSE_INORDER_TRAVERSAL = L,
 };
 
 /*==============================  Prototypes   ==============================*/

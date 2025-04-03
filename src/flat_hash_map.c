@@ -1205,7 +1205,12 @@ key_in_slot(struct ccc_fhmap_ const *const h, void const *const slot)
 static inline size_t
 next_power_of_two(size_t const n)
 {
-    return n <= 1 ? n : (SIZE_MAX >> countl_0_size_t(n - 1)) + 1;
+    if (n <= 1)
+    {
+        return n + 1;
+    }
+    unsigned const shifts = countl_0_size_t(n - 1);
+    return shifts >= sizeof(size_t) * CHAR_BIT ? 0 : (SIZE_MAX >> shifts) + 1;
 }
 
 static inline ccc_tribool

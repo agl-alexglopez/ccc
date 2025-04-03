@@ -36,11 +36,12 @@ enum list_link_
     N = 1
 };
 
+#define INORDER_TRAVERSAL R
+#define REVERSE_INORDER_TRAVERSAL L
+
 enum
 {
     LR = 2,
-    INORDER_TRAVERSAL = R,
-    REVERSE_INORDER_TRAVERSAL = L,
 };
 
 /* =======================        Prototypes         ====================== */
