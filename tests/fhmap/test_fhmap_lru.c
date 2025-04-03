@@ -96,7 +96,7 @@ enum : size_t
     CAP = 3,
 };
 
-static_assert((size_t)CAP < (size_t)SMALL_FIXED_CAP);
+static_assert(CAP * 1UL < SMALL_FIXED_CAP * 1UL);
 
 static small_fixed_map map_mem;
 

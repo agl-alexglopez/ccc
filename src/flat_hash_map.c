@@ -19,7 +19,9 @@
 #endif
 
 /** @private The following test should ensure some safety in assumptions we make
-when the user defines a fixed size map type. */
+when the user defines a fixed size map type. This is just a small type that
+will remain internal to this translation unit and offers a type that needs
+padding due to field sizes. */
 struct internal_data_and_tag_layout_test
 {
     struct
@@ -33,30 +35,38 @@ struct internal_data_and_tag_layout_test
 some memory layout assumptions. This should be sufficient and the assumptions
 will hold if the user happens to allocate a fixed size map on the stack. */
 static struct internal_data_and_tag_layout_test test_layout_allocation;
-/* The size of the valuable user data and tags should be what we expect. No
-hidden padding should violate our mental model of the bytes occupied by
-contiguous user data and metadata tags. We don't care about padding after the
-tag array which may very well exist. */
+/* The size of the user data and tags should be what we expect. No hidden
+padding should violate our mental model of the bytes occupied by contiguous user
+data and metadata tags. We don't care about padding after the tag array which
+may very well exist. The continuity from the base of the user data to the start
+of the tags array is the most important aspect for fixed size maps.
+
+Over index the tag array to get the end address for pointer differences. The
+0th element in an array at the start of a struct is guaranteed to start at the
+first byte of the struct with no padding BEFORE this first element. */
 static_assert((char *)&test_layout_allocation.tag[2]
                   - (char *)&test_layout_allocation.type_with_padding_data[0]
               == ((sizeof(test_layout_allocation.type_with_padding_data[0]) * 3)
-                  + sizeof(ccc_fhm_tag) * (2)));
+                  + sizeof(ccc_fhm_tag) * 2));
 /* We must ensure that the tags array starts at the exact next byte boundary
 after the user data type. This is required due to how we access tags and user
-data via index. Data is accessed with pointer subtraction from the tags[0]
+data via indexing. Data is accessed with pointer subtraction from the tags
 array. The tags array 0th element is the shared base for both arrays.
 
-Data indexes backwards and tags indexes forward. Here we index too far for our
-type with padding to ensure the next assertion will hold when we index from
-the shared tags base address and subtract to find user data. */
+Data has decreasing indices and tags have ascending indices. Here we index too
+far for our type with padding to ensure the next assertion will hold when we
+index from the shared tags base address and subtract to find user data. */
 static_assert((char *)&test_layout_allocation.type_with_padding_data[3]
               == (char *)&test_layout_allocation.tag);
 /* Here is an example of how we access user data slots. We take whatever the
 index is of the tag element and add one. Then we subtract the bytes needed to
 access this user data slot. We add one because our shared base index is at the
-next byte boundary AFTER the final user data element. We also always have
-an extra allocation of the user type at the start of the data array for swapping
-purposes. */
+next byte boundary AFTER the final user data element (consider the error of
+subtracting 0 from the tag array for the 0th array element!).
+
+We also always have an extra allocation of the user type at the start of the
+data array for swapping purposes because variable length arrays are banned and
+allocation might not be permitted. */
 static_assert(
     (char *)(test_layout_allocation.tag
              - ((1 + 1)
@@ -1562,7 +1572,7 @@ lowest_on_index(index_mask const m)
     return countr_0(m);
 }
 
-static inline size_t
+[[maybe_unused]] static inline size_t
 trailing_zeros(index_mask const m)
 {
     return countr_0(m);
@@ -1626,7 +1636,7 @@ match_empty_or_deleted(group const g)
     return to_little_endian((index_mask){g.v & GROUP_DELETED});
 }
 
-static inline index_mask
+[[maybe_unused]] static inline index_mask
 match_full(group const g)
 {
     index_mask res = match_empty_or_deleted(g);
