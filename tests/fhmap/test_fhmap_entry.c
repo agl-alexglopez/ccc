@@ -71,7 +71,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_validate)
     ccc_entry ent = swap_entry(&fh, &(struct val){.key = -1, .val = -1});
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), false);
-    CHECK(unwrap(&ent), NULL);
+    CHECK(unwrap(&ent) != NULL, true);
     CHECK(size(&fh).count, 1);
     ent = swap_entry(&fh, &(struct val){.key = -1, .val = -1});
     CHECK(validate(&fh), true);
@@ -93,7 +93,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert)
     ccc_entry ent = swap_entry(&fh, &(struct val){.key = -1, .val = -1});
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), false);
-    CHECK(unwrap(&ent), NULL);
+    CHECK(unwrap(&ent) != NULL, true);
     CHECK(size(&fh).count, 1);
     ent = swap_entry(&fh, &(struct val){.key = -1, .val = -1});
     CHECK(validate(&fh), true);
@@ -111,7 +111,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert)
     ent = swap_entry(&fh, &(struct val){.key = i, .val = i});
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), false);
-    CHECK(unwrap(&ent), NULL);
+    CHECK(unwrap(&ent) != NULL, true);
     CHECK(size(&fh).count, i + 2);
     ent = swap_entry(&fh, &(struct val){.key = i, .val = i});
     CHECK(validate(&fh), true);
@@ -129,7 +129,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert)
     ent = swap_entry(&fh, &(struct val){.key = i, .val = i});
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), false);
-    CHECK(unwrap(&ent), NULL);
+    CHECK(unwrap(&ent) != NULL, true);
     CHECK(size(&fh).count, i + 2);
     ent = swap_entry(&fh, &(struct val){.key = i, .val = i});
     CHECK(validate(&fh), true);
@@ -156,7 +156,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_remove)
     ent = swap_entry(&fh, &(struct val){.key = -1, .val = -1});
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), false);
-    CHECK(unwrap(&ent), NULL);
+    CHECK(unwrap(&ent) != NULL, true);
     CHECK(size(&fh).count, 1);
     ent = ccc_remove(&fh, &(struct val){.key = -1, .val = -1});
     CHECK(validate(&fh), true);
@@ -178,7 +178,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_remove)
     ent = swap_entry(&fh, &(struct val){.key = i, .val = i});
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), false);
-    CHECK(unwrap(&ent), NULL);
+    CHECK(unwrap(&ent) != NULL, true);
     CHECK(size(&fh).count, i + 1);
     ent = ccc_remove(&fh, &(struct val){.key = i, .val = i});
     CHECK(validate(&fh), true);
@@ -199,7 +199,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_remove)
     ent = swap_entry(&fh, &(struct val){.key = i, .val = i});
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), false);
-    CHECK(unwrap(&ent), NULL);
+    CHECK(unwrap(&ent) != NULL, true);
     CHECK(size(&fh).count, i + 1);
     ent = ccc_remove(&fh, &(struct val){.key = i, .val = i});
     CHECK(validate(&fh), true);
