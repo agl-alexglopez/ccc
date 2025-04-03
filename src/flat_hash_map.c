@@ -641,13 +641,6 @@ ccc_fhm_copy(ccc_flat_hash_map *const dst, ccc_flat_hash_map const *const src,
     dst->avail_ = mask_to_load_factor_cap(dst->mask_);
     dst->sz_ = 0;
     dst->init_ = CCC_TRUE;
-    if (dst->mask_ == src->mask_)
-    {
-        (void)memcpy(dst->data_, src->data_, src_bytes);
-        dst->avail_ = src->avail_;
-        dst->sz_ = src->sz_;
-        return CCC_RESULT_OK;
-    }
     for (size_t i = 0; i < (src->mask_ + 1); ++i)
     {
         if (is_full(src->tag_[i]))
