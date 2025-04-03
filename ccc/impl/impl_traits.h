@@ -80,7 +80,7 @@
         ccc_flat_hash_map                                                      \
             *: &(ccc_entry){ccc_fhm_try_insert(                                \
                                 (ccc_flat_hash_map *)container_ptr,            \
-                                (ccc_fhmap_elem *)try_insert_args)             \
+                                (void *)try_insert_args)                       \
                                 .impl_},                                       \
         ccc_ordered_map                                                        \
             *: &(                                                              \
@@ -130,7 +130,7 @@
         ccc_flat_hash_map                                                      \
             *: &(ccc_entry){ccc_fhm_insert_or_assign(                          \
                                 (ccc_flat_hash_map *)container_ptr,            \
-                                (ccc_fhmap_elem *)insert_or_assign_args)       \
+                                (void *)insert_or_assign_args)                 \
                                 .impl_},                                       \
         ccc_ordered_map                                                        \
             *: &(ccc_entry){ccc_om_insert_or_assign(                           \
@@ -181,9 +181,9 @@
                                                key_val_container_handle_ptr)   \
                                 .impl_},                                       \
         ccc_flat_hash_map                                                      \
-            *: &(ccc_entry){ccc_fhm_remove((ccc_flat_hash_map *)container_ptr, \
-                                           (ccc_fhmap_elem *)                  \
-                                               key_val_container_handle_ptr)   \
+            *: &(ccc_entry){ccc_fhm_remove(                                    \
+                                (ccc_flat_hash_map *)container_ptr,            \
+                                (void *)key_val_container_handle_ptr)          \
                                 .impl_},                                       \
         ccc_ordered_map                                                        \
             *: &(ccc_entry){ccc_om_remove(                                     \

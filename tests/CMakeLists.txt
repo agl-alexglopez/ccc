@@ -425,7 +425,6 @@ macro(add_perf_test TEST_NAME)
 endmacro()
 
 add_perf_test(pq_perf)
-add_perf_test(hmap_perf)
 
 ####################  Final Target   ##############################
 # Create a custom target that will depend on all targets in the subdirectory

@@ -7,6 +7,7 @@
 
 #include "flat_hash_map.h"
 #include "impl/impl_flat_hash_map.h"
+#include "impl/impl_types.h"
 #include "types.h"
 
 #if defined(__GNUC__) || defined(__clang__)
@@ -451,6 +452,7 @@ ccc_fhm_clear(ccc_flat_hash_map *const h, ccc_destructor_fn *const fn)
         (void)memset(h->tag_, CCC_FHM_EMPTY, mask_to_tag_bytes(h->mask_));
         h->avail_ = ((h->mask_ + 1) / 8) * 7;
         h->sz_ = 0;
+        return CCC_RESULT_OK;
     }
     for (size_t i = 0; i < (h->mask_ + 1); ++i)
     {
@@ -1096,8 +1098,10 @@ is_empty_constant(ccc_fhm_tag const m)
 static inline ccc_fhm_tag
 to_tag(uint64_t const hash)
 {
+    /* NOLINTBEGIN(clang-analyzer-optin.core.EnumCastOutOfRange) */
     return (ccc_fhm_tag){(hash >> ((sizeof(hash) * CHAR_BIT) - 7))
                          & LOWER_7_BITS_MASK};
+    /* NOLINTEND(clang-analyzer-optin.core.EnumCastOutOfRange) */
 }
 
 static inline void *
@@ -1219,7 +1223,7 @@ lowest_on_index(index_mask const m)
     return countr_0(m);
 }
 
-static inline size_t
+[[maybe_unused]] static inline size_t
 trailing_zeros(index_mask const m)
 {
     return countr_0(m);
@@ -1274,7 +1278,7 @@ match_empty_or_deleted(group const g)
     return (index_mask){_mm_movemask_epi8(g.v)};
 }
 
-static inline index_mask
+[[maybe_unused]] static inline index_mask
 match_full(group const g)
 {
     index_mask m = match_empty_or_deleted(g);

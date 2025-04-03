@@ -10,6 +10,8 @@
 #include "../types.h"
 #include "impl_types.h"
 
+/* NOLINTBEGIN(readability-identifier-naming) */
+
 /** @private An array of this enum will be in the tagdata array. Same idea as
 Rust's Hashbrown table. The only value not represented by these fields is the
 following:
@@ -127,6 +129,8 @@ union ccc_fhmap_entry_
 
 /*======================     Private Interface      =========================*/
 
+struct ccc_fhash_entry_ ccc_impl_fhm_entry(struct ccc_fhmap_ *h,
+                                           void const *key);
 void ccc_impl_fhm_insert(struct ccc_fhmap_ *h, void const *key_val_type,
                          ccc_fhm_tag m, size_t i);
 void ccc_impl_fhm_erase(struct ccc_fhmap_ *h, size_t i);
@@ -171,6 +175,7 @@ array must be rounded up */
         .init_ = CCC_FALSE,                                                    \
         .elem_sz_ = sizeof(*(data_ptr)),                                       \
         .key_offset_ = offsetof(typeof(*(data_ptr)), key_field),               \
+        .eq_fn_ = (key_eq_fn),                                                 \
         .hash_fn_ = (hash_fn),                                                 \
         .alloc_fn_ = (alloc_fn),                                               \
         .aux_ = (aux_data),                                                    \
@@ -212,7 +217,7 @@ array must be rounded up */
             if (!(fhm_or_ins_entry_->handle_.stats_ & CCC_ENTRY_INSERT_ERROR)) \
             {                                                                  \
                 fhm_or_ins_res_ = ccc_impl_fhm_data_at(                        \
-                    fhm_or_ins_ent_ptr_, fhm_or_ins_entry_->handle_.i_);       \
+                    fhm_or_ins_entry_->h_, fhm_or_ins_entry_->handle_.i_);     \
                 if (fhm_or_ins_entry_->handle_.stats_ == CCC_ENTRY_VACANT)     \
                 {                                                              \
                     *fhm_or_ins_res_ = lazy_key_value;                         \
@@ -235,7 +240,7 @@ array must be rounded up */
             if (!(fhm_ins_entry_->handle_.stats_ & CCC_ENTRY_INSERT_ERROR))    \
             {                                                                  \
                 fhm_ins_ent_res_ = ccc_impl_fhm_data_at(                       \
-                    fhm_ins_ent_ptr_, fhm_ins_entry_->handle_.i_);             \
+                    fhm_ins_entry_->h_, fhm_ins_entry_->handle_.i_);           \
                 *fhm_ins_ent_res_ = lazy_key_value;                            \
                 ccc_impl_fhm_set_insert(fhm_ins_entry_);                       \
             }                                                                  \
@@ -317,5 +322,7 @@ array must be rounded up */
         }                                                                      \
         fhm_insert_or_assign_res_;                                             \
     }))
+
+/* NOLINTEND(readability-identifier-naming) */
 
 #endif /* CCC_IMPL_FLAT_HASH_MAP_H */

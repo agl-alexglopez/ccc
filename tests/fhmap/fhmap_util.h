@@ -4,6 +4,7 @@
 #include "flat_hash_map.h"
 #include "types.h"
 
+#include <stddef.h>
 #include <stdint.h>
 
 struct val

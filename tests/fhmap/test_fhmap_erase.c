@@ -13,16 +13,16 @@
 
 CHECK_BEGIN_STATIC_FN(fhmap_test_erase)
 {
-    ccc_flat_hash_map fh = fhm_init((struct val[10]){}, e, key, fhmap_int_zero,
-                                    fhmap_id_eq, NULL, NULL, 10);
-
+    small_fixed_map s;
+    ccc_flat_hash_map fh = fhm_init(s.data, s.tag, key, fhmap_int_zero,
+                                    fhmap_id_eq, NULL, NULL, SMALL_FIXED_CAP);
     struct val query = {.key = 137, .val = 99};
     /* Nothing was there before so nothing is in the entry. */
-    ccc_entry ent = swap_entry(&fh, &query.e);
+    ccc_entry ent = swap_entry(&fh, &query);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
     CHECK(size(&fh).count, 1);
-    ent = ccc_remove(&fh, &query.e);
+    ent = ccc_remove(&fh, &query);
     CHECK(occupied(&ent), true);
     struct val *v = unwrap(&ent);
     CHECK(v != NULL, true);
@@ -30,7 +30,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_erase)
     CHECK(v->val, 99);
     CHECK(size(&fh).count, 0);
     query.key = 101;
-    ent = ccc_remove(&fh, &query.e);
+    ent = ccc_remove(&fh, &query);
     CHECK(occupied(&ent), false);
     CHECK(size(&fh).count, 0);
     ccc_fhm_insert_entry_w(entry_r(&fh, &(int){137}),
@@ -43,11 +43,12 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_erase)
 
 CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_insert_erase)
 {
-    ccc_flat_hash_map h = fhm_init((struct val *)NULL, e, key, fhmap_int_to_u64,
-                                   fhmap_id_eq, std_alloc, NULL, 0);
+    ccc_flat_hash_map h
+        = fhm_init((struct val *)NULL, NULL, key, fhmap_int_to_u64, fhmap_id_eq,
+                   std_alloc, NULL, 0);
 
     int const to_insert = 100;
-    int const larger_prime = (int)fhm_next_prime(to_insert).count;
+    int const larger_prime = 101;
     for (int i = 0, shuffle = larger_prime % to_insert; i < to_insert;
          ++i, shuffle = (shuffle + larger_prime) % to_insert)
     {
@@ -67,7 +68,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_insert_erase)
         if (i % 2)
         {
             struct val const *const old_val
-                = unwrap(remove_r(&h, &(struct val){.key = i}.e));
+                = unwrap(remove_r(&h, &(struct val){.key = i}));
             CHECK(old_val != NULL, true);
             CHECK(old_val->key, i);
         }

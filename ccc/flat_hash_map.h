@@ -62,7 +62,10 @@ ccc_result ccc_fhm_copy(ccc_flat_hash_map *dst, ccc_flat_hash_map const *src,
 ccc_fhm_and_modify_aux(ccc_fhmap_entry *e, ccc_update_fn *fn, void *aux);
 
 #define ccc_fhm_and_modify_w(map_entry_ptr, type_name, closure_over_T...)      \
-    ccc_impl_fhm_and_modify_w(map_entry_ptr, type_name, closure_over_T)
+    &(ccc_fhmap_entry)                                                         \
+    {                                                                          \
+        ccc_impl_fhm_and_modify_w(map_entry_ptr, type_name, closure_over_T)    \
+    }
 
 [[nodiscard]]
 ccc_entry ccc_fhm_swap_entry(ccc_flat_hash_map *h, void *key_val_type_output);
@@ -83,7 +86,10 @@ ccc_entry ccc_fhm_try_insert(ccc_flat_hash_map *h, void *key_val_type);
     }
 
 #define ccc_fhm_try_insert_w(map_ptr, key_val_type_ptr...)                     \
-    ccc_impl_fhm_try_insert_w(map_ptr, key_val_type_ptr)
+    &(ccc_entry)                                                               \
+    {                                                                          \
+        ccc_impl_fhm_try_insert_w(map_ptr, key_val_type_ptr)                   \
+    }
 
 [[nodiscard]]
 ccc_entry ccc_fhm_insert_or_assign(ccc_flat_hash_map *h, void *key_val_type);
@@ -95,7 +101,10 @@ ccc_entry ccc_fhm_insert_or_assign(ccc_flat_hash_map *h, void *key_val_type);
     }
 
 #define ccc_fhm_insert_or_assign_w(map_ptr, key_val_type_ptr...)               \
-    ccc_impl_fhm_insert_or_assign_w(map_ptr, key_val_type_ptr)
+    &(ccc_entry)                                                               \
+    {                                                                          \
+        ccc_impl_fhm_insert_or_assign_w(map_ptr, key_val_type_ptr)             \
+    }
 
 [[nodiscard]] ccc_entry ccc_fhm_remove(ccc_flat_hash_map *h,
                                        void *key_val_type_output);

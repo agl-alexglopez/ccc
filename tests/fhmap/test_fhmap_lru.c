@@ -37,7 +37,6 @@ struct lru_lookup
 {
     int key;
     struct key_val *kv_in_list;
-    ccc_fhmap_elem hash_elem;
 };
 
 enum lru_call
@@ -92,10 +91,14 @@ lru_head(struct lru_cache *const lru)
     return dll_front(&lru->l);
 }
 
-#define CAP 3
-#define PRIME_FHASH_SIZE 11
-static struct lru_lookup map_buf[PRIME_FHASH_SIZE];
-static_assert(PRIME_FHASH_SIZE > CAP);
+enum : size_t
+{
+    CAP = 3,
+};
+
+static_assert(CAP < SMALL_FIXED_CAP);
+
+static small_fixed_map map_mem;
 
 /* This is a good opportunity to test the static initialization capabilities
    of the hash table and list. */
@@ -103,8 +106,8 @@ static struct lru_cache lru_cache = {
     .cap = CAP,
     .l = dll_init(lru_cache.l, struct key_val, list_elem, cmp_by_key, std_alloc,
                   NULL),
-    .fh = fhm_init(map_buf, hash_elem, key, fhmap_int_to_u64, lru_lookup_cmp,
-                   NULL, NULL, sizeof(map_buf) / sizeof(map_buf[0])),
+    .fh = fhm_init(map_mem.data, map_mem.tag, key, fhmap_int_to_u64,
+                   lru_lookup_cmp, NULL, NULL, SMALL_FIXED_CAP),
 };
 
 CHECK_BEGIN_STATIC_FN(lru_put, struct lru_cache *const lru, int const key,
@@ -123,7 +126,7 @@ CHECK_BEGIN_STATIC_FN(lru_put, struct lru_cache *const lru, int const key,
     else
     {
         struct lru_lookup *const new
-            = insert_entry(ent, &(struct lru_lookup){.key = key}.hash_elem);
+            = insert_entry(ent, &(struct lru_lookup){.key = key});
         CHECK(new == NULL, false);
         new->kv_in_list = dll_emplace_front(
             &lru->l, (struct key_val){.key = key, .val = val});
