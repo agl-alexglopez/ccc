@@ -172,6 +172,8 @@ static ccc_tribool is_empty_constant(ccc_fhm_tag m);
 static ccc_fhm_tag to_tag(uint64_t hash);
 static group load_group(ccc_fhm_tag const *src);
 static void store_group(ccc_fhm_tag *dst, group src);
+static group load_group_aligned(ccc_fhm_tag const *src);
+static void store_group_aligned(ccc_fhm_tag *dst, group src);
 static index_mask match_tag(group g, ccc_fhm_tag m);
 static index_mask match_empty(group g);
 static index_mask match_empty_or_deleted(group g);
@@ -1013,8 +1015,8 @@ rehash_in_place(struct ccc_fhmap_ *const h)
     size_t const allowed_cap = mask_to_load_factor_cap(mask);
     for (size_t i = 0; i < mask + 1; i += CCC_FHM_GROUP_SIZE)
     {
-        store_group(&h->tag_[i], make_deleted_empty_and_full_deleted(
-                                     load_group(&h->tag_[i])));
+        store_group_aligned(&h->tag_[i], make_deleted_empty_and_full_deleted(
+                                             load_group_aligned(&h->tag_[i])));
     }
     (void)memcpy(h->tag_ + (mask + 1), h->tag_, CCC_FHM_GROUP_SIZE);
     for (size_t i = 0; i < mask + 1; ++i)
@@ -1321,10 +1323,24 @@ load_group(ccc_fhm_tag const *const src)
     return (group){_mm_loadu_si128((__m128i *)src)};
 }
 
-static inline void
+[[maybe_unused]] static inline void
 store_group(ccc_fhm_tag *const dst, group const src)
 {
     _mm_storeu_si128((__m128i *)dst, src.v);
+}
+
+static inline group
+load_group_aligned(ccc_fhm_tag const *const src)
+{
+    assert(((uintptr_t)src & (sizeof((group){}.v) - 1)) == 0);
+    return (group){_mm_load_si128((__m128i *)src)};
+}
+
+static inline void
+store_group_aligned(ccc_fhm_tag *const dst, group const src)
+{
+    assert(((uintptr_t)dst & (sizeof((group){}.v) - 1)) == 0);
+    _mm_store_si128((__m128i *)dst, src.v);
 }
 
 static inline index_mask
@@ -1595,10 +1611,22 @@ load_group(ccc_fhm_tag const *const src)
     return g;
 }
 
-static inline void
+static inline group
+load_group_aligned(ccc_fhm_tag const *const src)
+{
+    return load_group(src);
+}
+
+[[maybe_unused]] static inline void
 store_group(ccc_fhm_tag *const dst, group const src)
 {
     (void)memcpy(dst, &src, sizeof(src));
+}
+
+static inline void
+store_group_aligned(ccc_fhm_tag *const dst, group const src)
+{
+    store_group(dst, src);
 }
 
 static inline index_mask
