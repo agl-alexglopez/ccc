@@ -415,6 +415,10 @@ ccc_fhm_remove(ccc_flat_hash_map *const h, void *const key_val_type_output)
     {
         return (ccc_entry){{.stats_ = CCC_ENTRY_ARG_ERROR}};
     }
+    if (unlikely(!h->init_ || !h->sz_))
+    {
+        return (ccc_entry){{.stats_ = CCC_ENTRY_VACANT}};
+    }
     void *const key = key_in_slot(h, key_val_type_output);
     ccc_ucount const index = find_key(
         h, key, h->hash_fn_((ccc_user_key){.user_key = key, .aux = h->aux_}));

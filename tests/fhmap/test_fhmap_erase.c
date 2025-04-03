@@ -20,7 +20,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_erase)
     /* Nothing was there before so nothing is in the entry. */
     ccc_entry ent = swap_entry(&fh, &query);
     CHECK(occupied(&ent), false);
-    CHECK(unwrap(&ent), NULL);
+    CHECK(unwrap(&ent) != NULL, true);
     CHECK(size(&fh).count, 1);
     ent = ccc_remove(&fh, &query);
     CHECK(occupied(&ent), true);
