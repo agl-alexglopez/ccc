@@ -1098,10 +1098,8 @@ is_empty_constant(ccc_fhm_tag const m)
 static inline ccc_fhm_tag
 to_tag(uint64_t const hash)
 {
-    /* NOLINTBEGIN(clang-analyzer-optin.core.EnumCastOutOfRange) */
     return (ccc_fhm_tag){(hash >> ((sizeof(hash) * CHAR_BIT) - 7))
                          & LOWER_7_BITS_MASK};
-    /* NOLINTEND(clang-analyzer-optin.core.EnumCastOutOfRange) */
 }
 
 static inline void *

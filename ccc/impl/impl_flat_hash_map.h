@@ -12,26 +12,32 @@
 
 /* NOLINTBEGIN(readability-identifier-naming) */
 
-/** @private An array of this enum will be in the tagdata array. Same idea as
-Rust's Hashbrown table. The only value not represented by these fields is the
-following:
+/** @private Range of constants specified as special for this hash table. Same
+general design as Rust Hashbrown table. Importantly, we know these are special
+constants because the most significant bit is on and then empty can be easily
+distinguished from deleted by the least significant bit. */
+enum : uint8_t
+{
+    CCC_FHM_DELETED = 0x80,
+    CCC_FHM_EMPTY = 0xFF,
+};
+
+/** @private An array of this byte will be in the tag array. Same idea as
+Rust's Hashbrown table. The only value not represented by the above constants is
+the following:
 
 OCCUPIED: 0b0???????
 
 In this case (?) represents any 7 bits kept from the upper 7 bits of the
 original hash code to signify an occupied slot. We know this slot is taken
 because the Most Significant Bit is zero, something that is not true of any
-other state. Wrapped in a struct to avoid strict-aliasing exceptions that are
-granted to uint8_t (usually unsigned char) and int8_t (usually char) when passed
-to functions as pointers. Maybe nets performance gain but depends on
+other state. Wrap a byte in a struct to avoid strict-aliasing exceptions that
+are granted to uint8_t (usually unsigned char) and int8_t (usually char) when
+passed to functions as pointers. Maybe nets performance gain but depends on
 aggressiveness of compiler. */
 typedef struct
 {
-    enum : uint8_t
-    {
-        CCC_FHM_DELETED = 0x80,
-        CCC_FHM_EMPTY = 0xFF,
-    } v;
+    uint8_t v;
 } ccc_fhm_tag;
 static_assert(sizeof(ccc_fhm_tag) == sizeof(uint8_t),
               "tag must wrap a byte in a struct without padding for better "
@@ -142,8 +148,10 @@ void ccc_impl_fhm_set_insert(struct ccc_fhash_entry_ const *e);
 /** @private Helps the user declare a type for a fixed size map. They can then
 use this type when they want a hash map as global, static global, or stack
 local. They would need to define their fixed size type every time but that
-should be fine as they are likely to only declare one or two. The tagdata
-array must be rounded up */
+should be fine as they are likely to only declare one or two. They would likely
+only have a one fixed size map per translation unit if they are using these
+capabilities. They control the name of the type so they can organize types as
+they wish. */
 #define ccc_impl_fhm_declare_fixed_map(fixed_map_type_name, key_val_type_name, \
                                        capacity)                               \
     static_assert((capacity) != 0,                                             \
@@ -160,9 +168,22 @@ array must be rounded up */
         ccc_fhm_tag tag[(capacity) + CCC_FHM_GROUP_SIZE];                      \
     }(fixed_map_type_name);
 
+/** @private If the user does not want to remember the capacity they chose
+for their type or make mistakes this macro offers consistent calculation of
+total capacity (aka buckets) of the map. This is not the capacity that is
+limited by load factor. */
 #define ccc_impl_fhm_fixed_capacity(fixed_map_type_name)                       \
     (sizeof((fixed_map_type_name){}.tag) - CCC_FHM_GROUP_SIZE)
 
+/** @private Initializing is tricky due to variety of sources of memory we must
+support. To make it easier we allow the user to pass data and tag arrays as
+two separate pointers even though they are in the same contiguous allocation.
+This could lead to some errors but we will have to make the user facing header
+documentation abundantly clear about what we expect and why.
+
+We will not support being passed a dynamically allocated array at runtime.
+Instead we will expose a reserve() interface to allow the user to specify a
+fixed size map when they don't know exactly the size needed until runtime. */
 #define ccc_impl_fhm_init(data_ptr, tag_ptr, key_field, hash_fn, key_eq_fn,    \
                           alloc_fn, aux_data, capacity)                        \
     {                                                                          \
