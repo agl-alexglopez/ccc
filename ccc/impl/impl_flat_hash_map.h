@@ -153,9 +153,11 @@ array must be rounded up */
     typedef struct                                                             \
     {                                                                          \
         key_val_type_name data[(capacity) + 1];                                \
-        ccc_fhm_tag tag[(((capacity) + ((capacity) - 1)) / CCC_FHM_GROUP_SIZE) \
-                        + CCC_FHM_GROUP_SIZE];                                 \
+        ccc_fhm_tag tag[(capacity) + CCC_FHM_GROUP_SIZE];                      \
     }(fixed_map_type_name);
+
+#define ccc_impl_fhm_fixed_capacity(fixed_map_type_name)                       \
+    (sizeof((fixed_map_type_name){}.tag) - CCC_FHM_GROUP_SIZE)
 
 #define ccc_impl_fhm_init(data_ptr, tag_ptr, key_field, hash_fn, key_eq_fn,    \
                           alloc_fn, aux_data, capacity)                        \
@@ -163,11 +165,12 @@ array must be rounded up */
         .data_ = (data_ptr),                                                   \
         .tag_ = (tag_ptr),                                                     \
         .sz_ = 0,                                                              \
-        .avail_ = (((capacity) / 8) * 7),                                      \
-        .mask_ = (((capacity) > 0) ? ((capacity) - 1) : 0),                    \
+        .avail_ = (((capacity) / (size_t)8) * (size_t)7),                      \
+        .mask_                                                                 \
+        = (((capacity) > (size_t)0) ? ((capacity) - (size_t)1) : (size_t)0),   \
         .init_ = CCC_FALSE,                                                    \
         .elem_sz_ = sizeof(*(data_ptr)),                                       \
-        .key_offset_ = offsetof(*(data_ptr), key_field),                       \
+        .key_offset_ = offsetof(typeof(*(data_ptr)), key_field),               \
         .hash_fn_ = (hash_fn),                                                 \
         .alloc_fn_ = (alloc_fn),                                               \
         .aux_ = (aux_data),                                                    \

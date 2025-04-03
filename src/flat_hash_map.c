@@ -611,6 +611,77 @@ ccc_fhm_copy(ccc_flat_hash_map *const dst, ccc_flat_hash_map const *const src,
     return CCC_RESULT_OK;
 }
 
+ccc_result
+ccc_fhm_validate(ccc_flat_hash_map const *const h)
+{
+    if (!h)
+    {
+        return CCC_RESULT_ARG_ERROR;
+    }
+    /* We initialized the metadata array of 0 capacity table? Not possible. */
+    if (h->init_ && !h->mask_)
+    {
+        return CCC_RESULT_FAIL;
+    }
+    /* No point checking invariants when lazy init hasn't happened yet. */
+    if (!h->init_ || !h->mask_)
+    {
+        return CCC_RESULT_OK;
+    }
+    /* We are initialized, these need to point to the array positions. */
+    if (!h->tag_ || !h->data_)
+    {
+        return CCC_RESULT_FAIL;
+    }
+    /* Exceeded allowable load factor when determining available and size. */
+    /* The replica group should be in sync. */
+    for (size_t original = 0, clone = (h->mask_ + 1);
+         original < CCC_FHM_GROUP_SIZE; ++original, ++clone)
+    {
+        if (h->tag_[original].v != h->tag_[clone].v)
+        {
+            return CCC_RESULT_FAIL;
+        }
+    }
+    size_t occupied = 0;
+    size_t avail = 0;
+    size_t deleted = 0;
+    for (size_t i = 0; i < (h->mask_ + 1); ++i)
+    {
+        ccc_fhm_tag const t = h->tag_[i];
+        /* If we are a special constant there are only two possible values. */
+        if (is_constant(t) && t.v != CCC_FHM_DELETED && t.v != CCC_FHM_EMPTY)
+        {
+            return CCC_RESULT_FAIL;
+        }
+        if (t.v == CCC_FHM_EMPTY)
+        {
+            ++avail;
+        }
+        else if (t.v == CCC_FHM_DELETED)
+        {
+            ++deleted;
+        }
+        else if (is_full(t))
+        {
+            if (to_tag(h->hash_fn_((ccc_user_key){.user_key = data_at(h, i),
+                                                  .aux = h->aux_}))
+                    .v
+                != t.v)
+            {
+                return CCC_RESULT_FAIL;
+            }
+            ++occupied;
+        }
+    }
+    if (occupied != h->sz_ || avail != h->avail_
+        || occupied + avail + deleted != h->mask_ + 1)
+    {
+        return CCC_RESULT_FAIL;
+    }
+    return CCC_RESULT_OK;
+}
+
 /*======================     Private Interface      =========================*/
 
 struct ccc_fhash_entry_
