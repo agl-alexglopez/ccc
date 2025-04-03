@@ -27,11 +27,12 @@ typedef enum
     R,
 } om_branch_;
 
+#define INORDER_TRAVERSAL R
+#define REVERSE_INORDER_TRAVERSAL L
+
 enum
 {
     LR = 2,
-    INORDER_TRAVERSAL = R,
-    REVERSE_INORDER_TRAVERSAL = L,
 };
 
 /* Container entry return value. */

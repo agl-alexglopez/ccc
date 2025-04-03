@@ -32,10 +32,11 @@ enum hom_branch_
     R,
 };
 
+#define INORDER_TRAVERSAL R
+#define REVERSE_INORDER_TRAVERSAL L
+
 enum
 {
-    INORDER_TRAVERSAL = R,
-    REVERSE_INORDER_TRAVERSAL = L,
     EMPTY_TREE = 2,
 };
 

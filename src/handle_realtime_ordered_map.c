@@ -63,12 +63,13 @@ struct hrm_query_
     };
 };
 
+#define INORDER_TRAVERSAL R
+#define REVERSE_INORDER_TRAVERSAL L
+#define MINDIR L
+#define MAXDIR R
+
 enum
 {
-    INORDER_TRAVERSAL = R,
-    REVERSE_INORDER_TRAVERSAL = L,
-    MINDIR = L,
-    MAXDIR = R,
     SINGLE_TREE_NODE = 2,
 };
 
