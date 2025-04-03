@@ -168,17 +168,14 @@ static size_t leading_zeros(index_mask m);
 static size_t next_index(index_mask *m);
 static ccc_tribool is_full(ccc_fhm_tag m);
 static ccc_tribool is_constant(ccc_fhm_tag m);
-static ccc_tribool is_empty_constant(ccc_fhm_tag m);
 static ccc_fhm_tag to_tag(uint64_t hash);
 static group load_group(ccc_fhm_tag const *src);
 static void store_group(ccc_fhm_tag *dst, group src);
-static group load_group_aligned(ccc_fhm_tag const *src);
-static void store_group_aligned(ccc_fhm_tag *dst, group src);
 static index_mask match_tag(group g, ccc_fhm_tag m);
 static index_mask match_empty(group g);
 static index_mask match_empty_or_deleted(group g);
 static index_mask match_full(group g);
-static group make_deleted_empty_and_full_deleted(group g);
+static group make_constants_empty_and_full_deleted(group g);
 static unsigned countr_0(index_mask m);
 static unsigned countl_0(index_mask m);
 static unsigned countl_0_size_t(size_t n);
@@ -726,8 +723,10 @@ ccc_fhm_validate(ccc_flat_hash_map const *const h)
             ++occupied;
         }
     }
-    if (occupied != h->sz_ || avail != h->avail_
-        || occupied + avail + deleted != h->mask_ + 1)
+    if (occupied != h->sz_ || occupied + avail + deleted != h->mask_ + 1
+        || mask_to_load_factor_cap(occupied + avail + deleted) - occupied
+                   - deleted
+               != h->avail_)
     {
         return CCC_FALSE;
     }
@@ -759,6 +758,12 @@ void *
 ccc_impl_fhm_data_at(struct ccc_fhmap_ const *const h, size_t const i)
 {
     return data_at(h, i);
+}
+
+void *
+ccc_impl_fhm_key_at(struct ccc_fhmap_ const *const h, size_t const i)
+{
+    return key_at(h, i);
 }
 
 void
@@ -818,7 +823,7 @@ set_insert(struct ccc_fhmap_ *const h, ccc_fhm_tag const m, size_t const i)
 {
     assert(i <= h->mask_);
     assert((m.v & TAG_MSB) == 0);
-    h->avail_ -= is_empty_constant(h->tag_[i]);
+    h->avail_ -= (h->tag_[i].v == CCC_FHM_EMPTY);
     ++h->sz_;
     set_tag(h, m, i);
 }
@@ -938,7 +943,7 @@ find_known_insert_slot(struct ccc_fhmap_ const *const h, uint64_t const hash)
             match_empty_or_deleted(load_group(&h->tag_[seq.i])));
         if (likely(i != CCC_FHM_GROUP_SIZE))
         {
-            return i;
+            return (seq.i + i) & mask;
         }
         seq.stride += CCC_FHM_GROUP_SIZE;
         seq.i += seq.stride;
@@ -953,16 +958,16 @@ maybe_rehash(struct ccc_fhmap_ *const h, size_t const to_add)
     {
         return CCC_RESULT_NO_ALLOC;
     }
-    size_t required_cap = ((h->sz_ + to_add) * 8) / 7;
-    if (!is_power_of_two(required_cap))
+    size_t required_total_cap = ((h->sz_ + to_add) * 8) / 7;
+    if (!is_power_of_two(required_total_cap))
     {
-        required_cap = next_power_of_two(required_cap);
+        required_total_cap = next_power_of_two(required_total_cap);
     }
     if (unlikely(!h->init_))
     {
         if (h->mask_)
         {
-            if (!h->tag_ || h->mask_ + 1 < required_cap)
+            if (!h->tag_ || h->mask_ + 1 < required_total_cap)
             {
                 return CCC_RESULT_MEM_ERROR;
             }
@@ -977,15 +982,15 @@ maybe_rehash(struct ccc_fhmap_ *const h, size_t const to_add)
     }
     if (unlikely(!h->mask_))
     {
-        required_cap = max(required_cap, CCC_FHM_GROUP_SIZE);
+        required_total_cap = max(required_total_cap, CCC_FHM_GROUP_SIZE);
         size_t const total_bytes
-            = mask_to_total_bytes(h->elem_sz_, required_cap - 1);
+            = mask_to_total_bytes(h->elem_sz_, required_total_cap - 1);
         void *const buf = h->alloc_fn_(NULL, total_bytes, h->aux_);
         if (!buf)
         {
             return CCC_RESULT_MEM_ERROR;
         }
-        h->mask_ = required_cap - 1;
+        h->mask_ = required_total_cap - 1;
         h->data_ = buf;
         h->avail_ = mask_to_load_factor_cap(h->mask_);
         /* Static assertions at top of file ensure this is correct. */
@@ -997,11 +1002,15 @@ maybe_rehash(struct ccc_fhmap_ *const h, size_t const to_add)
     {
         return CCC_RESULT_OK;
     }
-    size_t const current_cap = mask_to_load_factor_cap(h->mask_);
-    if (h->alloc_fn_ && (h->sz_ + to_add) > current_cap / 2)
+    size_t const current_total_cap = h->mask_ + 1;
+    if (h->alloc_fn_ && (h->sz_ + to_add) > current_total_cap / 2)
     {
         assert(h->alloc_fn_);
         return rehash_resize(h, to_add);
+    }
+    if (h->sz_ == mask_to_load_factor_cap(h->mask_))
+    {
+        return CCC_RESULT_NO_ALLOC;
     }
     rehash_in_place(h);
     return CCC_RESULT_OK;
@@ -1015,18 +1024,10 @@ rehash_in_place(struct ccc_fhmap_ *const h)
     size_t const allowed_cap = mask_to_load_factor_cap(mask);
     for (size_t i = 0; i < mask + 1; i += CCC_FHM_GROUP_SIZE)
     {
-        store_group_aligned(&h->tag_[i], make_deleted_empty_and_full_deleted(
-                                             load_group_aligned(&h->tag_[i])));
+        store_group(&h->tag_[i], make_constants_empty_and_full_deleted(
+                                     load_group(&h->tag_[i])));
     }
     (void)memcpy(h->tag_ + (mask + 1), h->tag_, CCC_FHM_GROUP_SIZE);
-    for (size_t i = 0; i < mask + 1; ++i)
-    {
-        if (h->tag_[i].v == CCC_FHM_DELETED)
-        {
-            set_tag(h, (ccc_fhm_tag){CCC_FHM_EMPTY}, i);
-            --h->sz_;
-        }
-    }
     h->avail_ = allowed_cap - h->sz_;
     for (size_t i = 0; i < mask + 1; ++i)
     {
@@ -1095,13 +1096,12 @@ rehash_resize(struct ccc_fhmap_ *const h, size_t const to_add)
     new_h.sz_ = 0;
     new_h.mask_ = new_pow2_cap - 1;
     new_h.avail_ = mask_to_load_factor_cap(new_h.mask_);
+    new_h.data_ = new_buf;
     /* Our static assertions at start of file guarantee this is correct. */
     new_h.tag_
         = (ccc_fhm_tag *)((char *)new_buf
                           + mask_to_data_bytes(new_h.elem_sz_, new_h.mask_));
-    new_h.data_ = new_buf;
-    (void)memset(new_h.tag_, CCC_FHM_EMPTY,
-                 mask_to_tag_bytes(new_pow2_cap - 1));
+    (void)memset(new_h.tag_, CCC_FHM_EMPTY, mask_to_tag_bytes(new_h.mask_));
     for (size_t i = 0; i < (h->mask_ + 1); ++i)
     {
         if (is_full(h->tag_[i]))
@@ -1132,20 +1132,13 @@ set_tag(struct ccc_fhmap_ *const h, ccc_fhm_tag const m, size_t const i)
 static inline ccc_tribool
 is_full(ccc_fhm_tag const m)
 {
-    return (m.v & CCC_FHM_DELETED) == 0;
+    return (m.v & TAG_MSB) == 0;
 }
 
 static inline ccc_tribool
 is_constant(ccc_fhm_tag const m)
 {
     return (m.v & TAG_MSB) != 0;
-}
-
-static inline ccc_tribool
-is_empty_constant(ccc_fhm_tag const m)
-{
-    assert(is_constant(m));
-    return (m.v & TAG_LSB) != 0;
 }
 
 static inline ccc_fhm_tag
@@ -1323,24 +1316,10 @@ load_group(ccc_fhm_tag const *const src)
     return (group){_mm_loadu_si128((__m128i *)src)};
 }
 
-[[maybe_unused]] static inline void
+static inline void
 store_group(ccc_fhm_tag *const dst, group const src)
 {
     _mm_storeu_si128((__m128i *)dst, src.v);
-}
-
-static inline group
-load_group_aligned(ccc_fhm_tag const *const src)
-{
-    assert(((uintptr_t)src & (sizeof((group){}.v) - 1)) == 0);
-    return (group){_mm_load_si128((__m128i *)src)};
-}
-
-static inline void
-store_group_aligned(ccc_fhm_tag *const dst, group const src)
-{
-    assert(((uintptr_t)dst & (sizeof((group){}.v) - 1)) == 0);
-    _mm_store_si128((__m128i *)dst, src.v);
 }
 
 static inline index_mask
@@ -1372,7 +1351,7 @@ match_full(group const g)
 }
 
 static inline group
-make_deleted_empty_and_full_deleted(group const g)
+make_constants_empty_and_full_deleted(group const g)
 {
     __m128i const zero = _mm_setzero_si128();
     __m128i const match_constants = _mm_cmpgt_epi8(zero, g.v);
@@ -1611,22 +1590,10 @@ load_group(ccc_fhm_tag const *const src)
     return g;
 }
 
-static inline group
-load_group_aligned(ccc_fhm_tag const *const src)
-{
-    return load_group(src);
-}
-
-[[maybe_unused]] static inline void
+static inline void
 store_group(ccc_fhm_tag *const dst, group const src)
 {
     (void)memcpy(dst, &src, sizeof(src));
-}
-
-static inline void
-store_group_aligned(ccc_fhm_tag *const dst, group const src)
-{
-    store_group(dst, src);
 }
 
 static inline index_mask
@@ -1665,7 +1632,7 @@ match_full(group const g)
 }
 
 static inline group
-make_deleted_empty_and_full_deleted(group g)
+make_constants_empty_and_full_deleted(group g)
 {
     g.v = ~g.v & GROUP_DELETED;
     g.v = ~g.v + (g.v >> (TAG_BITS - 1));

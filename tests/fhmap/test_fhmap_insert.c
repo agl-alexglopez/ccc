@@ -20,7 +20,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert)
     /* Nothing was there before so nothing is in the entry. */
     ccc_entry ent = swap_entry(&fh, &(struct val){.key = 137, .val = 99});
     CHECK(occupied(&ent), false);
-    CHECK(unwrap(&ent), NULL);
+    CHECK(unwrap(&ent) != NULL, true);
     CHECK(size(&fh).count, 1);
     CHECK_END_FN();
 }
@@ -79,7 +79,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert_overwrite)
     struct val q = {.key = 137, .val = 99};
     ccc_entry ent = swap_entry(&fh, &q);
     CHECK(occupied(&ent), false);
-    CHECK(unwrap(&ent), NULL);
+    CHECK(unwrap(&ent) != NULL, true);
 
     struct val const *v = unwrap(entry_r(&fh, &q.key));
     CHECK(v != NULL, true);
@@ -112,7 +112,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert_then_bad_ideas)
     struct val q = {.key = 137, .val = 99};
     ccc_entry ent = swap_entry(&fh, &q);
     CHECK(occupied(&ent), false);
-    CHECK(unwrap(&ent), NULL);
+    CHECK(unwrap(&ent) != NULL, true);
     struct val const *v = unwrap(entry_r(&fh, &q.key));
     CHECK(v != NULL, true);
     CHECK(v->val, 99);
@@ -391,6 +391,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_resize)
         CHECK(in_table != NULL, true);
         CHECK(in_table->val, shuffled_index);
     }
+    CHECK(size(&fh).count, to_insert);
     CHECK(fhm_clear_and_free(&fh, NULL), CCC_RESULT_OK);
     CHECK_END_FN();
 }

@@ -141,6 +141,7 @@ void ccc_impl_fhm_insert(struct ccc_fhmap_ *h, void const *key_val_type,
                          ccc_fhm_tag m, size_t i);
 void ccc_impl_fhm_erase(struct ccc_fhmap_ *h, size_t i);
 void *ccc_impl_fhm_data_at(struct ccc_fhmap_ const *h, size_t i);
+void *ccc_impl_fhm_key_at(struct ccc_fhmap_ const *h, size_t i);
 void ccc_impl_fhm_set_insert(struct ccc_fhash_entry_ const *e);
 
 /*======================    Macro Implementations   =========================*/
@@ -263,7 +264,10 @@ fixed size map when they don't know exactly the size needed until runtime. */
                 fhm_ins_ent_res_ = ccc_impl_fhm_data_at(                       \
                     fhm_ins_entry_->h_, fhm_ins_entry_->handle_.i_);           \
                 *fhm_ins_ent_res_ = lazy_key_value;                            \
-                ccc_impl_fhm_set_insert(fhm_ins_entry_);                       \
+                if (fhm_ins_entry_->handle_.stats_ == CCC_ENTRY_VACANT)        \
+                {                                                              \
+                    ccc_impl_fhm_set_insert(fhm_ins_entry_);                   \
+                }                                                              \
             }                                                                  \
         }                                                                      \
         fhm_ins_ent_res_;                                                      \
@@ -296,6 +300,9 @@ fixed size map when they don't know exactly the size needed until runtime. */
                     .stats_ = CCC_ENTRY_VACANT,                                \
                 };                                                             \
                 *((typeof(lazy_value) *)fhm_try_insert_res_.e_) = lazy_value;  \
+                *((typeof(fhm_key_) *)ccc_impl_fhm_key_at(                     \
+                    fhm_try_ins_ent_.h_, fhm_try_ins_ent_.handle_.i_))         \
+                    = fhm_key_;                                                \
                 ccc_impl_fhm_set_insert(&fhm_try_ins_ent_);                    \
             }                                                                  \
         }                                                                      \
@@ -310,10 +317,12 @@ fixed size map when they don't know exactly the size needed until runtime. */
             = {.stats_ = CCC_ENTRY_ARG_ERROR};                                 \
         if (flat_hash_map_ptr_)                                                \
         {                                                                      \
+            fhm_insert_or_assign_res_.stats_ = CCC_ENTRY_INSERT_ERROR;         \
             __auto_type fhm_key_ = key;                                        \
             struct ccc_fhash_entry_ fhm_ins_or_assign_ent_                     \
                 = ccc_impl_fhm_entry(flat_hash_map_ptr_, (void *)&fhm_key_);   \
-            if (fhm_ins_or_assign_ent_.handle_.stats_ & CCC_ENTRY_OCCUPIED)    \
+            if (!(fhm_ins_or_assign_ent_.handle_.stats_                        \
+                  & CCC_ENTRY_INSERT_ERROR))                                   \
             {                                                                  \
                 fhm_insert_or_assign_res_ = (struct ccc_ent_){                 \
                     .e_                                                        \
@@ -321,24 +330,16 @@ fixed size map when they don't know exactly the size needed until runtime. */
                                            fhm_ins_or_assign_ent_.handle_.i_), \
                     .stats_ = fhm_ins_or_assign_ent_.handle_.stats_,           \
                 };                                                             \
-            }                                                                  \
-            else if (fhm_ins_or_assign_ent_.handle_.stats_                     \
-                     & CCC_ENTRY_INSERT_ERROR)                                 \
-            {                                                                  \
-                fhm_insert_or_assign_res_.e_ = NULL;                           \
-                fhm_insert_or_assign_res_.stats_ = CCC_ENTRY_INSERT_ERROR;     \
-            }                                                                  \
-            else                                                               \
-            {                                                                  \
-                fhm_insert_or_assign_res_ = (struct ccc_ent_){                 \
-                    .e_                                                        \
-                    = ccc_impl_fhm_data_at(fhm_ins_or_assign_ent_.h_,          \
-                                           fhm_ins_or_assign_ent_.handle_.i_), \
-                    .stats_ = CCC_ENTRY_VACANT,                                \
-                };                                                             \
                 *((typeof(lazy_value) *)fhm_insert_or_assign_res_.e_)          \
                     = lazy_value;                                              \
-                ccc_impl_fhm_set_insert(&fhm_ins_or_assign_ent_);              \
+                *((typeof(fhm_key_) *)ccc_impl_fhm_key_at(                     \
+                    fhm_ins_or_assign_ent_.h_,                                 \
+                    fhm_ins_or_assign_ent_.handle_.i_))                        \
+                    = fhm_key_;                                                \
+                if (fhm_ins_or_assign_ent_.handle_.stats_ == CCC_ENTRY_VACANT) \
+                {                                                              \
+                    ccc_impl_fhm_set_insert(&fhm_ins_or_assign_ent_);          \
+                }                                                              \
             }                                                                  \
         }                                                                      \
         fhm_insert_or_assign_res_;                                             \
