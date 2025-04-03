@@ -122,7 +122,7 @@ ccc_entry ccc_fhm_insert_or_assign(ccc_flat_hash_map *h, void *key_val_type);
 
 ccc_result ccc_fhm_clear(ccc_flat_hash_map *h, ccc_destructor_fn *fn);
 ccc_result ccc_fhm_clear_and_free(ccc_flat_hash_map *h, ccc_destructor_fn *fn);
-[[nodiscard]] ccc_result ccc_fhm_validate(ccc_flat_hash_map const *h);
+[[nodiscard]] ccc_tribool ccc_fhm_validate(ccc_flat_hash_map const *h);
 
 [[nodiscard]] void *ccc_fhm_unwrap(ccc_fhmap_entry const *e);
 [[nodiscard]] ccc_tribool ccc_fhm_occupied(ccc_fhmap_entry const *e);
