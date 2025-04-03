@@ -910,9 +910,10 @@ find_key(struct ccc_fhmap_ const *const h, void const *const key,
              i_match = next_index(&m))
         {
             i_match = (seq.i + i_match) & mask;
-            if (h->eq_fn_((ccc_key_cmp){.key_lhs = key,
-                                        .user_type_rhs = data_at(h, i_match),
-                                        .aux = h->aux_}))
+            if (likely(h->eq_fn_(
+                    (ccc_key_cmp){.key_lhs = key,
+                                  .user_type_rhs = data_at(h, i_match),
+                                  .aux = h->aux_})))
             {
                 return (ccc_ucount){.count = i_match};
             }
