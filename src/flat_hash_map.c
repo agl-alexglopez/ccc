@@ -18,6 +18,51 @@
 #    define likely(expr) expr
 #endif
 
+/** @private The following test should ensure some safety in assumptions we make
+when the user defines a fixed size map type. */
+struct internal_data_and_tag_layout_test
+{
+    struct
+    {
+        size_t s;
+        uint8_t u;
+    } type_with_padding_data[3];
+    ccc_fhm_tag tag[2];
+};
+/* The type must actually get an allocation on the given platform to validate
+some memory layout assumptions. This should be sufficient and the assumptions
+will hold if the user happens to allocate a fixed size map on the stack. */
+static struct internal_data_and_tag_layout_test test_layout_allocation;
+/* The size of the valuable user data and tags should be what we expect. No
+hidden padding should violate our mental model of the bytes occupied by
+contiguous user data and metadata tags. We don't care about padding after the
+tag array which may very well exist. */
+static_assert((char *)&test_layout_allocation.tag[2]
+                  - (char *)&test_layout_allocation.type_with_padding_data[0]
+              == ((sizeof(test_layout_allocation.type_with_padding_data[0]) * 3)
+                  + sizeof(ccc_fhm_tag) * (2)));
+/* We must ensure that the tags array starts at the exact next byte boundary
+after the user data type. This is required due to how we access tags and user
+data via index. Data is accessed with pointer subtraction from the tags[0]
+array. The tags array 0th element is the shared base for both arrays.
+
+Data indexes backwards and tags indexes forward. Here we index too far for our
+type with padding to ensure the next assertion will hold when we index from
+the shared tags base address and subtract to find user data. */
+static_assert((char *)&test_layout_allocation.type_with_padding_data[3]
+              == (char *)&test_layout_allocation.tag);
+/* Here is an example of how we access user data slots. We take whatever the
+index is of the tag element and add one. Then we subtract the bytes needed to
+access this user data slot. We add one because our shared base index is at the
+next byte boundary AFTER the final user data element. We also always have
+an extra allocation of the user type at the start of the data array for swapping
+purposes. */
+static_assert(
+    (char *)(test_layout_allocation.tag
+             - ((1 + 1)
+                * sizeof(test_layout_allocation.type_with_padding_data[0])))
+    == (char *)&test_layout_allocation.type_with_padding_data[1]);
+
 /* Can we vectorize instructions? Also it is possible to specify we want a
 portable implementation. Consider exposing to user in header docs. */
 #if defined(__x86_64) && defined(__SSE2__) && !defined(CCC_FHM_PORTABLE)
@@ -110,7 +155,9 @@ static void *swap_slot(struct ccc_fhmap_ const *h);
 static ccc_ucount data_i(struct ccc_fhmap_ const *h, void const *data_slot);
 static size_t mask_to_total_bytes(size_t elem_size, size_t mask);
 static size_t mask_to_tag_bytes(size_t mask);
+static size_t mask_to_data_bytes(size_t elem_size, size_t mask);
 static void set_insert(struct ccc_fhmap_ *h, ccc_fhm_tag m, size_t i);
+static size_t mask_to_load_factor_cap(size_t mask);
 
 static void set_tag(struct ccc_fhmap_ *h, ccc_fhm_tag m, size_t i);
 static ccc_tribool is_index_on(index_mask m);
@@ -450,7 +497,7 @@ ccc_fhm_clear(ccc_flat_hash_map *const h, ccc_destructor_fn *const fn)
             return CCC_RESULT_OK;
         }
         (void)memset(h->tag_, CCC_FHM_EMPTY, mask_to_tag_bytes(h->mask_));
-        h->avail_ = ((h->mask_ + 1) / 8) * 7;
+        h->avail_ = mask_to_load_factor_cap(h->mask_);
         h->sz_ = 0;
         return CCC_RESULT_OK;
     }
@@ -462,7 +509,7 @@ ccc_fhm_clear(ccc_flat_hash_map *const h, ccc_destructor_fn *const fn)
         }
     }
     (void)memset(h->tag_, CCC_FHM_EMPTY, mask_to_tag_bytes(h->mask_));
-    h->avail_ = ((h->mask_ + 1) / 8) * 7;
+    h->avail_ = mask_to_load_factor_cap(h->mask_);
     h->sz_ = 0;
     return CCC_RESULT_OK;
 }
@@ -576,9 +623,11 @@ ccc_fhm_copy(ccc_flat_hash_map *const dst, ccc_flat_hash_map const *const src,
         {
             return CCC_RESULT_MEM_ERROR;
         }
-        dst->tag_ = (ccc_fhm_tag *)(((char *)new_mem + src_bytes)
-                                    - (src->mask_ + 1) - CCC_FHM_GROUP_SIZE);
         dst->data_ = new_mem;
+        /* Static assertions at top of file ensure this is correct. */
+        dst->tag_
+            = (ccc_fhm_tag *)((char *)new_mem
+                              + mask_to_data_bytes(src->elem_sz_, src->mask_));
         dst->mask_ = src->mask_;
     }
     if (!dst->data_ || !src->data_)
@@ -587,7 +636,7 @@ ccc_fhm_copy(ccc_flat_hash_map *const dst, ccc_flat_hash_map const *const src,
     }
     (void)memset(dst->tag_, CCC_FHM_EMPTY,
                  (dst->mask_ + 1) + CCC_FHM_GROUP_SIZE);
-    dst->avail_ = ((dst->mask_ + 1) / 8) * 7;
+    dst->avail_ = mask_to_load_factor_cap(dst->mask_);
     dst->sz_ = 0;
     dst->init_ = CCC_TRUE;
     if (dst->mask_ == src->mask_)
@@ -936,7 +985,7 @@ maybe_rehash(struct ccc_fhmap_ *const h, size_t const to_add)
         }
         h->mask_ = required_cap - 1;
         h->data_ = buf;
-        h->avail_ = (required_cap / 8) * 7;
+        h->avail_ = mask_to_load_factor_cap(h->mask_);
         h->tag_ = (ccc_fhm_tag *)(((char *)buf + total_bytes)
                                   - mask_to_tag_bytes(required_cap - 1));
         (void)memset(h->tag_, CCC_FHM_EMPTY,
@@ -946,7 +995,7 @@ maybe_rehash(struct ccc_fhmap_ *const h, size_t const to_add)
     {
         return CCC_RESULT_OK;
     }
-    size_t const current_cap = ((h->mask_ + 1) / 8) * 7;
+    size_t const current_cap = mask_to_load_factor_cap(h->mask_);
     if (h->alloc_fn_ && (h->sz_ + to_add) > current_cap / 2)
     {
         assert(h->alloc_fn_);
@@ -961,7 +1010,7 @@ rehash_in_place(struct ccc_fhmap_ *const h)
 {
     assert((h->mask_ + 1) % CCC_FHM_GROUP_SIZE == 0);
     size_t const mask = h->mask_;
-    size_t const allowed_cap = ((mask + 1) / 8) * 7;
+    size_t const allowed_cap = mask_to_load_factor_cap(mask);
     for (size_t i = 0; i < mask + 1; i += CCC_FHM_GROUP_SIZE)
     {
         store_group(&h->tag_[i], make_deleted_empty_and_full_deleted(
@@ -1042,10 +1091,12 @@ rehash_resize(struct ccc_fhmap_ *const h, size_t const to_add)
     }
     struct ccc_fhmap_ new_h = *h;
     new_h.sz_ = 0;
-    new_h.avail_ = (new_pow2_cap / 8) * 7;
     new_h.mask_ = new_pow2_cap - 1;
-    new_h.tag_ = (ccc_fhm_tag *)(((char *)new_buf + total_bytes) - new_pow2_cap
-                                 - CCC_FHM_GROUP_SIZE);
+    new_h.avail_ = mask_to_load_factor_cap(new_h.mask_);
+    /* Our static assertions at start of file guarantee this is correct. */
+    new_h.tag_
+        = (ccc_fhm_tag *)((char *)new_buf
+                          + mask_to_data_bytes(new_h.elem_sz_, new_h.mask_));
     new_h.data_ = new_buf;
     (void)memset(new_h.tag_, CCC_FHM_EMPTY,
                  mask_to_tag_bytes(new_pow2_cap - 1));
@@ -1190,6 +1241,20 @@ mask_to_tag_bytes(size_t const mask)
         return 0;
     }
     return mask + 1 + CCC_FHM_GROUP_SIZE;
+}
+
+static inline size_t
+mask_to_load_factor_cap(size_t const mask)
+{
+    return ((mask + 1) / 8) * 7;
+}
+
+static inline size_t
+mask_to_data_bytes(size_t elem_size, size_t const mask)
+{
+    /* Add two because there is always a bonus user data type at the 0th index
+       of the data array for swapping purposes. */
+    return elem_size * (mask + 2);
 }
 
 /*=====================   Intrinsics and Generics   =========================*/
