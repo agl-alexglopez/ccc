@@ -95,7 +95,6 @@ struct point
 
 struct path_backtrack_cell
 {
-    fhmap_elem elem;
     struct point current;
     struct point parent;
 };
@@ -411,7 +410,7 @@ static bool
 found_dst(struct graph *const graph, struct vertex *const src)
 {
     flat_hash_map parent_map
-        = fhm_init((struct path_backtrack_cell *)NULL, elem, current,
+        = fhm_init((struct path_backtrack_cell *)NULL, NULL, current,
                    hash_parent_cells, eq_parent_cells, std_alloc, NULL, 0);
     flat_double_ended_queue bfs
         = fdeq_init((struct point *)NULL, std_alloc, NULL, 0);
@@ -438,7 +437,7 @@ found_dst(struct graph *const graph, struct vertex *const src)
                 if (src->name != nv->name && vertex_degree(nv) < MAX_DEGREE
                     && !has_edge_with(src, nv->name))
                 {
-                    entry const in = insert_or_assign(&parent_map, &push.elem);
+                    entry const in = insert_or_assign(&parent_map, &push);
                     prog_assert(!insert_error(&in));
                     edge_construct(graph, &parent_map, src, nv);
                     dst_connection = true;
@@ -446,7 +445,7 @@ found_dst(struct graph *const graph, struct vertex *const src)
                 }
             }
             if (!is_path_cell(next_cell)
-                && !occupied(try_insert_r(&parent_map, &push.elem)))
+                && !occupied(try_insert_r(&parent_map, &push)))
             {
                 struct point const *const n = push_back(&bfs, &next);
                 prog_assert(n);
