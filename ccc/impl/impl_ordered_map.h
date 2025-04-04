@@ -38,6 +38,7 @@ struct ccc_otree_entry_
     struct ccc_ent_ entry_;
 };
 
+/** @private */
 union ccc_omap_entry_
 {
     struct ccc_otree_entry_ impl_;
