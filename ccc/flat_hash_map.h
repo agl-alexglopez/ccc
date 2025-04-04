@@ -63,6 +63,7 @@ segment. Does not return a value.
 @param [in] key_val_type_name the type the user plans to store in the map. It
 may have a key and value field as well as any additional fields. For set-like
 behavior, wrap a field in a struct/union (e.g. `union int_elem {int e;};`).
+@param [in] capacity the power of two capacity for the map.
 @warning the capacity must be a power of two greater than 8 or 16, depending on
 the platform (e.g. 16, 32, 64, etc.).
 
@@ -331,7 +332,7 @@ to subsequent calls in the Entry Interface.*/
                                             void const *key);
 
 /** @brief Obtains an entry for the provided key in the table for future use.
-@param [in] flat_hash_map_ptr the hash table to be searched.
+@param [in] map_ptr the hash table to be searched.
 @param [in] key_ptr the key used to search the table matching the stored key
 type.
 @return a compound literal reference to a specialized hash entry for use with
@@ -375,7 +376,7 @@ ccc_update object will be passed to the update function callback. */
 ccc_fhm_and_modify_aux(ccc_fhmap_entry *e, ccc_update_fn *fn, void *aux);
 
 /** @brief Modify an Occupied entry with a closure over user type T.
-@param [in] flat_hash_map_entry_ptr a pointer to the obtained entry.
+@param [in] map_entry_ptr a pointer to the obtained entry.
 @param [in] type_name the name of the user type stored in the container.
 @param [in] closure_over_T the code to be run on the reference to user type T,
 if Occupied. This may be a semicolon separated list of statements to execute on
@@ -419,7 +420,7 @@ to resize because no allocation function is provided. */
                                       void const *key_val_type);
 
 /** @brief lazily insert the desired key value into the entry if it is Vacant.
-@param [in] flat_hash_map_entry_ptr a pointer to the obtained entry.
+@param [in] map_entry_ptr a pointer to the obtained entry.
 @param [in] lazy_key_value the compound literal to construct in place if the
 entry is Vacant.
 @return a reference to the unwrapped user type in the entry, either the
@@ -447,7 +448,7 @@ or a search error NULL is returned. Otherwise insertion should not fail. */
                                          void const *key_val_type);
 
 /** @brief write the contents of the compound literal lazy_key_value to a slot.
-@param [in] flat_hash_map_entry_ptr a pointer to the obtained entry.
+@param [in] map_entry_ptr a pointer to the obtained entry.
 @param [in] lazy_key_value the compound literal to write to a new slot.
 @return a reference to the newly inserted or overwritten user type. NULL is
 returned if resizing is required but fails or is not allowed. */
@@ -456,7 +457,7 @@ returned if resizing is required but fails or is not allowed. */
 
 /** @brief Invariantly inserts the key value wrapping out_handle.
 @param [in] h the pointer to the flat hash map.
-@param [out] key_val_type the complete key and value type to be inserted.
+@param [out] key_val_type_output the complete key and value type to be inserted.
 @return an entry. If Vacant, no prior element with key existed and entry may be
 unwrapped to view the new insertion in the table. If Occupied the old value is
 written to key_val_type_output and may be unwrapped to view. If more space is
@@ -468,8 +469,8 @@ and wraps it in an entry to provide information about the old value. */
 ccc_entry ccc_fhm_swap_entry(ccc_flat_hash_map *h, void *key_val_type_output);
 
 /** @brief Invariantly inserts the key value wrapping out_handle.
-@param [in] h the pointer to the flat hash map.
-@param [out] key_val_type the complete key and value type to be inserted.
+@param [in] map_ptr the pointer to the flat hash map.
+@param [out] key_val_type_ptr the complete key and value type to be inserted.
 @return a compound literal reference to an entry. If Vacant, no prior element
 with key existed and entry may be unwrapped to view the new insertion in the
 table. If Occupied the old value is written to key_val_type_output and may be
@@ -491,7 +492,7 @@ was removed. If Vacant, no prior entry existed to be removed. */
 [[nodiscard]] ccc_entry ccc_fhm_remove_entry(ccc_fhmap_entry const *e);
 
 /** @brief Remove the entry from the table if Occupied.
-@param [in] flat_hash_map_entry_ptr a pointer to the table entry.
+@param [in] map_entry_ptr a pointer to the table entry.
 @return a compound liter to an entry containing NULL. If Occupied an entry in
 the table existed and was removed. If Vacant, no prior entry existed to be
 removed. */
@@ -514,7 +515,7 @@ any subsequent insertions or deletions invalidate this reference. */
 ccc_entry ccc_fhm_try_insert(ccc_flat_hash_map *h, void *key_val_type);
 
 /** @brief Attempts to insert the key value wrapping key_val_handle_ptr.
-@param [in] flat_hash_map_ptr the pointer to the flat hash map.
+@param [in] map_ptr the pointer to the flat hash map.
 @param [in] key_val_type_ptr the complete key and value type to be inserted.
 @return a compound literal reference to the entry. If Occupied, the entry
 contains a reference to the key value user type in the table and may be
@@ -530,7 +531,7 @@ any subsequent insertions or deletions invalidate this reference. */
     }
 
 /** @brief lazily insert lazy_value into the map at key if key is absent.
-@param [in] flat_hash_map_ptr a pointer to the flat hash map.
+@param [in] map_ptr a pointer to the flat hash map.
 @param [in] key the direct key r-value.
 @param [in] lazy_value the compound literal specifying the value.
 @return a compound literal reference to the entry of the existing or newly
@@ -562,7 +563,7 @@ the information regarding its presence is helpful. */
 ccc_entry ccc_fhm_insert_or_assign(ccc_flat_hash_map *h, void *key_val_type);
 
 /** @brief Invariantly inserts or overwrites a user struct into the table.
-@param [in] flat_hash_map_ptr a pointer to the flat hash map.
+@param [in] map_ptr a pointer to the flat hash map.
 @param [in] key_val_type_ptr the complete key and value type to be inserted.
 @return a compound literal reference to the entry. If Occupied an entry was
 overwritten by the new key value. If Vacant no prior table entry existed.
@@ -576,7 +577,7 @@ the information regarding its presence is helpful. */
     }
 
 /** @brief Inserts a new key value pair or overwrites the existing entry.
-@param [in] flat_hash_map_ptr the pointer to the flat hash map.
+@param [in] map_ptr the pointer to the flat hash map.
 @param [in] key the key to be searched in the table.
 @param [in] lazy_value the compound literal specifying the value.
 @return a compound literal reference to the entry of the existing or newly
@@ -610,7 +611,7 @@ and wraps it in an entry to provide information about the old value. */
 
 /** @brief Removes the key value in the map storing the old value, if present,
 in the struct containing out_handle_ptr provided by the user.
-@param [in] flat_hash_map_ptr the pointer to the flat hash map.
+@param [in] map_ptr the pointer to the flat hash map.
 @param [out] key_val_type_output_ptr the complete key and value type to be
 removed
 @return a compound literal reference to the removed entry. If Occupied it may
