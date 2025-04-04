@@ -152,12 +152,14 @@ static struct ccc_handl_ find_key_or_slot(struct ccc_fhmap_ const *h,
 static ccc_ucount find_key(struct ccc_fhmap_ const *h, void const *key,
                            uint64_t hash);
 static size_t find_known_insert_slot(struct ccc_fhmap_ const *h, uint64_t hash);
-static ccc_result maybe_rehash(struct ccc_fhmap_ *h, size_t to_add);
+static ccc_result maybe_rehash(struct ccc_fhmap_ *h, size_t to_add,
+                               ccc_alloc_fn);
 static void insert(struct ccc_fhmap_ *h, void const *key_val_type,
                    ccc_fhm_tag m, size_t i);
 static void erase(struct ccc_fhmap_ *h, size_t i);
 static void rehash_in_place(struct ccc_fhmap_ *h);
-static ccc_result rehash_resize(struct ccc_fhmap_ *h, size_t to_add);
+static ccc_result rehash_resize(struct ccc_fhmap_ *h, size_t to_add,
+                                ccc_alloc_fn);
 static void *key_at(struct ccc_fhmap_ const *h, size_t i);
 static void *data_at(struct ccc_fhmap_ const *h, size_t i);
 static void *key_in_slot(struct ccc_fhmap_ const *h, void const *slot);
@@ -460,7 +462,8 @@ ccc_fhm_begin(ccc_flat_hash_map const *const h)
 }
 
 void *
-ccc_fhm_next(ccc_flat_hash_map const *const h, void *const key_val_type_iter)
+ccc_fhm_next(ccc_flat_hash_map const *const h,
+             void const *const key_val_type_iter)
 {
     if (unlikely(!h || !key_val_type_iter || !h->mask_ || !h->init_ || !h->sz_))
     {
@@ -667,6 +670,17 @@ ccc_fhm_copy(ccc_flat_hash_map *const dst, ccc_flat_hash_map const *const src,
     return CCC_RESULT_OK;
 }
 
+ccc_result
+ccc_fhm_reserve(ccc_flat_hash_map *const h, size_t const to_add,
+                ccc_alloc_fn *const fn)
+{
+    if (unlikely(!h || !to_add))
+    {
+        return CCC_RESULT_ARG_ERROR;
+    }
+    return maybe_rehash(h, to_add, fn);
+}
+
 ccc_tribool
 ccc_fhm_validate(ccc_flat_hash_map const *const h)
 {
@@ -801,7 +815,7 @@ static struct ccc_handl_
 handle(struct ccc_fhmap_ *const h, void const *const key, uint64_t const hash)
 {
     ccc_entry_status upcoming_insertion_error = 0;
-    switch (maybe_rehash(h, 1))
+    switch (maybe_rehash(h, 1, h->alloc_fn_))
     {
     case CCC_RESULT_OK:
         break;
@@ -960,9 +974,10 @@ find_known_insert_slot(struct ccc_fhmap_ const *const h, uint64_t const hash)
 }
 
 static ccc_result
-maybe_rehash(struct ccc_fhmap_ *const h, size_t const to_add)
+maybe_rehash(struct ccc_fhmap_ *const h, size_t const to_add,
+             ccc_alloc_fn *const fn)
 {
-    if (unlikely(!h->mask_ && !h->alloc_fn_))
+    if (unlikely(!h->mask_ && !fn))
     {
         return CCC_RESULT_NO_ALLOC;
     }
@@ -993,7 +1008,7 @@ maybe_rehash(struct ccc_fhmap_ *const h, size_t const to_add)
         required_total_cap = max(required_total_cap, CCC_FHM_GROUP_SIZE);
         size_t const total_bytes
             = mask_to_total_bytes(h->elem_sz_, required_total_cap - 1);
-        void *const buf = h->alloc_fn_(NULL, total_bytes, h->aux_);
+        void *const buf = fn(NULL, total_bytes, h->aux_);
         if (!buf)
         {
             return CCC_RESULT_MEM_ERROR;
@@ -1011,10 +1026,9 @@ maybe_rehash(struct ccc_fhmap_ *const h, size_t const to_add)
         return CCC_RESULT_OK;
     }
     size_t const current_total_cap = h->mask_ + 1;
-    if (h->alloc_fn_ && (h->sz_ + to_add) > current_total_cap / 2)
+    if (fn && (h->sz_ + to_add) > current_total_cap / 2)
     {
-        assert(h->alloc_fn_);
-        return rehash_resize(h, to_add);
+        return rehash_resize(h, to_add, fn);
     }
     if (h->sz_ == mask_to_load_factor_cap(h->mask_))
     {
@@ -1080,7 +1094,8 @@ rehash_in_place(struct ccc_fhmap_ *const h)
 }
 
 static ccc_result
-rehash_resize(struct ccc_fhmap_ *const h, size_t const to_add)
+rehash_resize(struct ccc_fhmap_ *const h, size_t const to_add,
+              ccc_alloc_fn *const fn)
 {
     assert(((h->mask_ + 1) & h->mask_) == 0);
     size_t const new_pow2_cap = next_power_of_two(h->mask_ + 1 + to_add) << 1;
@@ -1095,7 +1110,7 @@ rehash_resize(struct ccc_fhmap_ *const h, size_t const to_add)
     {
         return CCC_RESULT_MEM_ERROR;
     }
-    void *const new_buf = h->alloc_fn_(NULL, total_bytes, h->aux_);
+    void *const new_buf = fn(NULL, total_bytes, h->aux_);
     if (!new_buf)
     {
         return CCC_RESULT_MEM_ERROR;
@@ -1123,7 +1138,7 @@ rehash_resize(struct ccc_fhmap_ *const h, size_t const to_add)
     }
     new_h.avail_ -= h->sz_;
     new_h.sz_ = h->sz_;
-    (void)h->alloc_fn_(h->data_, 0, h->aux_);
+    (void)fn(h->data_, 0, h->aux_);
     *h = new_h;
     return CCC_RESULT_OK;
 }
