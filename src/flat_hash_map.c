@@ -10,13 +10,14 @@
 #include "impl/impl_types.h"
 #include "types.h"
 
-#if defined(__GNUC__) || defined(__clang__)
+/** Maybe the compiler can give us better performance in key paths. */
+#if defined(__has_builtin) && __has_builtin(__builtin_expect)
 #    define unlikely(expr) __builtin_expect(!!(expr), 0)
 #    define likely(expr) __builtin_expect(!!(expr), 1)
-#else
+#else /* !defined(__has_builtin) || !__has_builtin(__builtin_expect) */
 #    define unlikely(expr) expr
 #    define likely(expr) expr
-#endif
+#endif /* defined(__has_builtin) && __has_builtin(__builtin_expect) */
 
 /** @private The following test should ensure some safety in assumptions we make
 when the user defines a fixed size map type. This is just a small type that
