@@ -44,10 +44,14 @@ of the tags array is the most important aspect for fixed size maps.
 Over index the tag array to get the end address for pointer differences. The
 0th element in an array at the start of a struct is guaranteed to start at the
 first byte of the struct with no padding BEFORE this first element. */
-static_assert((char *)&test_layout_allocation.tag[2]
-                  - (char *)&test_layout_allocation.type_with_padding_data[0]
-              == ((sizeof(test_layout_allocation.type_with_padding_data[0]) * 3)
-                  + sizeof(ccc_fhm_tag) * 2));
+static_assert(
+    (char *)&test_layout_allocation.tag[2]
+            - (char *)&test_layout_allocation.type_with_padding_data[0]
+        == ((sizeof(test_layout_allocation.type_with_padding_data[0]) * 3)
+            + sizeof(ccc_fhm_tag) * 2),
+    "The size in bytes of the contiguous user data to tag array must be what "
+    "we would expect with no padding that will interfere with pointer "
+    "arithmetic.");
 /* We must ensure that the tags array starts at the exact next byte boundary
 after the user data type. This is required due to how we access tags and user
 data via indexing. Data is accessed with pointer subtraction from the tags
@@ -57,7 +61,9 @@ Data has decreasing indices and tags have ascending indices. Here we index too
 far for our type with padding to ensure the next assertion will hold when we
 index from the shared tags base address and subtract to find user data. */
 static_assert((char *)&test_layout_allocation.type_with_padding_data[3]
-              == (char *)&test_layout_allocation.tag);
+                  == (char *)&test_layout_allocation.tag,
+              "The start of the tag array must align perfectly with the next "
+              "byte past the final user data element.");
 /* Here is an example of how we access user data slots. We take whatever the
 index is of the tag element and add one. Then we subtract the bytes needed to
 access this user data slot. We add one because our shared base index is at the
@@ -71,7 +77,9 @@ static_assert(
     (char *)(test_layout_allocation.tag
              - ((1 + 1)
                 * sizeof(test_layout_allocation.type_with_padding_data[0])))
-    == (char *)&test_layout_allocation.type_with_padding_data[1]);
+        == (char *)&test_layout_allocation.type_with_padding_data[1],
+    "With a perfectly aligned shared user data and tag array base address "
+    "pointer subtraction for user data must work as expected.");
 
 /* Can we vectorize instructions? Also it is possible to specify we want a
 portable implementation. Consider exposing to user in header docs. */
@@ -88,7 +96,7 @@ typedef struct
     uint16_t v;
 } index_mask;
 
-enum : typeof((index_mask){}.v)
+enum : uint16_t
 {
     INDEX_MASK_MSB = 0x8000,
 };
@@ -116,22 +124,18 @@ enum : typeof((group){}.v)
     GROUP_DELETED = 0x8080808080808080,
 };
 
+enum : uint8_t
+{
+    TAG_BITS = sizeof(ccc_fhm_tag) * CHAR_BIT,
+};
+
 #endif /* defined(__x86_64) && defined(__SSE2__) &&                            \
           !defined(CCC_FHM_GENERIC)*/
-
-enum : size_t
-{
-    GROUP_BYTES = sizeof(group),
-    GROUP_BITS = GROUP_BYTES * CHAR_BIT,
-    SIZE_T_MSB = 0x1000000000000000,
-};
 
 enum : uint8_t
 {
     TAG_MSB = 0x80,
-    TAG_LSB = 0x1,
     LOWER_7_BITS_MASK = 0x7F,
-    TAG_BITS = sizeof(ccc_fhm_tag) * CHAR_BIT,
 };
 
 struct triangular_seq
@@ -175,7 +179,6 @@ static size_t max(size_t a, size_t b);
 static void set_tag(struct ccc_fhmap_ *h, ccc_fhm_tag m, size_t i);
 static ccc_tribool is_index_on(index_mask m);
 static size_t lowest_on_index(index_mask m);
-static size_t trailing_zeros(index_mask m);
 static size_t leading_zeros(index_mask m);
 static size_t next_index(index_mask *m);
 static ccc_tribool is_full(ccc_fhm_tag m);
@@ -186,7 +189,6 @@ static void store_group(ccc_fhm_tag *dst, group src);
 static index_mask match_tag(group g, ccc_fhm_tag m);
 static index_mask match_empty(group g);
 static index_mask match_empty_or_deleted(group g);
-static index_mask match_full(group g);
 static group make_constants_empty_and_full_deleted(group g);
 static unsigned countr_0(index_mask m);
 static unsigned countl_0(index_mask m);
@@ -973,6 +975,12 @@ find_known_insert_slot(struct ccc_fhmap_ const *const h, uint64_t const hash)
     } while (1);
 }
 
+/** Accepts the map, elements to add, and an allocation function if resizing
+may be needed. While containers normally remember their own allocation
+permissions, this function may be called in a variety of scenarios; one of which
+is when the user wants to reserve the necessary space dynamically at runtime
+but only once and for a container that is not given permission to resize
+arbitrarily. */
 static ccc_result
 maybe_rehash(struct ccc_fhmap_ *const h, size_t const to_add,
              ccc_alloc_fn *const fn)
@@ -1266,12 +1274,21 @@ mask_to_tag_bytes(size_t const mask)
     return mask + 1 + CCC_FHM_GROUP_SIZE;
 }
 
+/** Returns the capacity count that is available with a current load factor of
+87.5% percent. The returned count is the maximum allowable capacity that can
+store user tags and data before the load factor is reached. The total capacity
+of the table is (mask + 1) which is not the capacity that this function
+calculates. For example, if (mask + 1 = 64), then this function returns 56. */
 static inline size_t
 mask_to_load_factor_cap(size_t const mask)
 {
     return ((mask + 1) / 8) * 7;
 }
 
+/** Returns the number of bytes taken by the user data array. This includes the
+extra swap slot provided at the start of the array. This swap slot is never
+accounted for in load factor or capacity calculations but must be remembered in
+cases like this for resizing and allocation purposes. */
 static inline size_t
 mask_to_data_bytes(size_t elem_size, size_t const mask)
 {
@@ -1295,38 +1312,39 @@ need to break out different headers and sources and clutter the src directory.
 x86 is the only platform that gets the full benefit of SIMD. Apple and all
 other platforms will get a portable implementation due to concerns over NEON
 speed of vectorized instructions. However, loading up groups into a uint64_t is
-still good and counts simultaneous operations just not the type that uses CPU
+still good and counts as simultaneous operations just not the type that uses CPU
 vector lanes for a single instruction. */
-
-/* We can vectorize for x86 only. */
-#if defined(__x86_64) && defined(__SSE2__) && !defined(CCC_FHM_PORTABLE)
 
 /*========================  Index Mask Implementations   ====================*/
 
+/** Returns true if any index is on in the mask otherwise false. */
 static inline ccc_tribool
 is_index_on(index_mask const m)
 {
     return m.v != 0;
 }
 
+/** Returns the 0 based lowest on index, or the bit width of the index mask
+if no lowest index is found. The user must interpret this index in the context
+of the probe sequence because it can only be 0 to index mask bit width. */
 static inline size_t
 lowest_on_index(index_mask const m)
 {
     return countr_0(m);
 }
 
-[[maybe_unused]] static inline size_t
-trailing_zeros(index_mask const m)
-{
-    return countr_0(m);
-}
-
+/** Counts the leading zeros in an index mask. Leading zeros are those starting
+at the most significant bit. */
 static inline size_t
 leading_zeros(index_mask const m)
 {
     return countl_0(m);
 }
 
+/** A function to aid in iterating over on bits/indices in an index mask. The
+function returns the 0-based next on index and then adjusts the mask
+appropriately for future iteration by removing the lowest on index bit. If no
+on bits are found the width of the mask is returned and iteration should end. */
 static inline size_t
 next_index(index_mask *const m)
 {
@@ -1336,33 +1354,81 @@ next_index(index_mask *const m)
     return index;
 }
 
+/** We can vectorize for x86 only. There is portable flag so we can manually
+test both implementation. */
+#if defined(__x86_64) && defined(__SSE2__) && !defined(CCC_FHM_PORTABLE)
+
 /*=========================  Group Implementations   ========================*/
 
+/** Loads a group starting at src into a 128 bit vector. This is an unaligned
+load and the user must ensure the load will not go off then end of the tag
+array. */
 static inline group
 load_group(ccc_fhm_tag const *const src)
 {
     return (group){_mm_loadu_si128((__m128i *)src)};
 }
 
+/** Stores the src group to dst. The store is unaligned and the user must ensure
+the store will not go off the end of the tag array. */
 static inline void
 store_group(ccc_fhm_tag *const dst, group const src)
 {
     _mm_storeu_si128((__m128i *)dst, src.v);
 }
 
+/** Returns an index mask with all on bits if the tag at that index in group g
+matched the provided tag m. If no indices matched this will be a 0 index mask.
+
+Here is the process to help understand the dense intrinsics.
+
+1. Load the query tag into a 128 bit vector. For example m = 0x73:
+
+0x73|0x73|0x73|0x73|0x73|0x73|0x73|0x73|0x73|0x73|0x73|0x73|0x73|0x73|0x73|0x73
+
+2. g holds a 128 bit vector of 16 tags. Compare and return match masks.
+
+0x73|0x73|0x73|0x73|0x73|0x73|0x73|0x73|0x73|0x73|0x73|0x73|0x73|0x73|0x73|0x73
+0x79|0x33|0x21|0x73|0x45|0x55|0x12|0x54|0x11|0x44|0x73|0xFF|0xFF|0xFF|0xFF|0xFF
+                │                                  │
+0x00|0x00|0x00|0xFF|0x00|0x00|0x00|0x00|0x00|0x00|0xFF|0x00|0x00|0x00|0x00|0x00
+
+3. Matches are 0xFF. Mismatches are 0x00. Compress result to a uint16_t.
+
+0x00|0x00|0x00|0xFF|0x00|0x00|0x00|0x00|0x00|0x00|0xFF|0x00|0x00|0x00|0x00|0x00
+     ┌──────────┘                                  │
+     │      ┌──────────────────────────────────────┘
+0x0001000000100000
+
+4. Return the result as an index mask.
+
+(index_mask){0x0001000000100000}
+
+With a good hash function it is very likely that the first match will be the
+hashed data and the full comparison will evaluate to true. Note that this
+method forces the call of the user provided comparison callback function on
+every match so an efficient comparison is beneficial. */
 static inline index_mask
 match_tag(group const g, ccc_fhm_tag const m)
 {
+
     return (index_mask){
         _mm_movemask_epi8(_mm_cmpeq_epi8(g.v, _mm_set1_epi8((int8_t)m.v)))};
 }
 
+/** Returns 0 based index mask with every bit on representing those tags in
+group g that are the empty special constant. The user must interpret this 0
+based index in the context of the probe sequence. */
 static inline index_mask
 match_empty(group const g)
 {
     return match_tag(g, (ccc_fhm_tag){CCC_FHM_EMPTY});
 }
 
+/** Returns a 0 based index mask with every bit on representing those tags
+in the group that are the special constant empty or deleted. These are easy
+to find because they are the one tags in a group with the most significant
+bit on. */
 static inline index_mask
 match_empty_or_deleted(group const g)
 {
@@ -1370,14 +1436,10 @@ match_empty_or_deleted(group const g)
     return (index_mask){_mm_movemask_epi8(g.v)};
 }
 
-[[maybe_unused]] static inline index_mask
-match_full(group const g)
-{
-    index_mask m = match_empty_or_deleted(g);
-    m.v = ~m.v;
-    return m;
-}
-
+/** Converts the empty and deleted constants all CCC_FHM_EMPTY and the full
+tags representing hashed user data CCC_FHM_DELETED. Making the hashed data
+deleted is OK because it will only turn on the previously unused most
+significant bit. This does not affect user hashed data. */
 static inline group
 make_constants_empty_and_full_deleted(group const g)
 {
@@ -1392,25 +1454,26 @@ make_constants_empty_and_full_deleted(group const g)
 #    if defined(__has_builtin) && __has_builtin(__builtin_ctz)                 \
         && __has_builtin(__builtin_clz) && __has_builtin(__builtin_clzl)
 
-static_assert(sizeof((index_mask){}.v) <= sizeof(unsigned));
+static_assert(sizeof((index_mask){}.v) <= sizeof(unsigned),
+              "An index mask is expected to be smaller than an unsigned due to "
+              "available builtins on the given platform.");
 
 static inline unsigned
 countr_0(index_mask const m)
 {
-    /* Even though the mask is implicitly widened to int width there is
-       guaranteed to be a 1 bit between bit index 0 and CCC_FHM_GROUP_SIZE - 1
-       if the builtin is called. */
+    static_assert(__builtin_ctz(0x8000) == CCC_FHM_GROUP_SIZE - 1,
+                  "Counting trailing zeros will always result in a valid mask "
+                  "based on index_mask width if the mask is not 0, even though "
+                  "m is implicitly widened to an int.");
     return m.v ? __builtin_ctz(m.v) : CCC_FHM_GROUP_SIZE;
 }
 
 static inline unsigned
 countl_0(index_mask const m)
 {
-    /* In the simd version the index mask is only a uint16_t so the number of
-       leading zeros would be inaccurate due to widening. There is only a
-       builtin for leading and trailing zeros for int width as smallest. */
-    static_assert(sizeof(m.v) * 2 == sizeof(unsigned));
-    static_assert(CCC_FHM_GROUP_SIZE * 2UL == sizeof(unsigned) * CHAR_BIT);
+    static_assert(sizeof(m.v) * 2UL == sizeof(unsigned),
+                  "An index_mask will be implicitly widened to exactly twice "
+                  "its width if non-zero due to builtin functions available.");
     return m.v ? __builtin_clz(((unsigned)m.v) << CCC_FHM_GROUP_SIZE)
                : CCC_FHM_GROUP_SIZE;
 }
@@ -1418,7 +1481,9 @@ countl_0(index_mask const m)
 static inline unsigned
 countl_0_size_t(size_t const n)
 {
-    static_assert(sizeof(size_t) == sizeof(unsigned long));
+    static_assert(sizeof(size_t) == sizeof(unsigned long),
+                  "Ensure the available builtin works for the platform defined "
+                  "size of a size_t.");
     return n ? __builtin_clzl(n) : sizeof(size_t) * CHAR_BIT;
 }
 
@@ -1473,7 +1538,9 @@ countl_0_size_t(size_t n)
 
 /* What follows is the generic portable implementation when high width SIMD
 can't be achieved. For now this means NEON on Apple defaults to generic but
-this will likely change in the future as NEON improves. */
+this will likely change in the future as NEON improves. Counting zeros also
+is slightly different with the portable version requiring some thought given
+to group size and tag size. */
 
 /*==========================    Bit Helpers    ==============================*/
 
@@ -1546,8 +1613,7 @@ countl_0_size_t(size_t n)
 #    endif /* !defined(__has_builtin) || !__has_builtin(__builtin_ctzl) ||     \
               !__has_builtin(__builtin_clzl) */
 
-/* Returns 1 aka true if platform is little endian otherwise false for big
-endian. */
+/* Returns 1=true if platform is little endian, else false for big endian. */
 static inline int
 is_little_endian(void)
 {
@@ -1571,41 +1637,6 @@ to_little_endian(index_mask m)
     m.v = (m.v & 0x00FF00FF00FF00FF) << 8 | (m.v & 0xFF00FF00FF00FF00) >> 8;
 #    endif
     return m;
-}
-
-/*========================  Index Mask Implementations   ====================*/
-
-static inline ccc_tribool
-is_index_on(index_mask const m)
-{
-    return m.v != 0;
-}
-
-static inline size_t
-lowest_on_index(index_mask const m)
-{
-    return countr_0(m);
-}
-
-[[maybe_unused]] static inline size_t
-trailing_zeros(index_mask const m)
-{
-    return countr_0(m);
-}
-
-static inline size_t
-leading_zeros(index_mask const m)
-{
-    return countl_0(m);
-}
-
-static inline size_t
-next_index(index_mask *const m)
-{
-    assert(m);
-    size_t const index = lowest_on_index(*m);
-    m->v &= (m->v - 1);
-    return index;
 }
 
 /*=========================  Group Implementations   ========================*/
@@ -1649,14 +1680,6 @@ static inline index_mask
 match_empty_or_deleted(group const g)
 {
     return to_little_endian((index_mask){g.v & GROUP_DELETED});
-}
-
-[[maybe_unused]] static inline index_mask
-match_full(group const g)
-{
-    index_mask res = match_empty_or_deleted(g);
-    res.v = ~res.v;
-    return res;
 }
 
 static inline group

@@ -12,13 +12,21 @@
 
 /* NOLINTBEGIN(readability-identifier-naming) */
 
+/* TODO: Come up with better system. For now, uncomment to define a preprocessor
+directive to force generics. */
+// #define CCC_FHM_PORTABLE
+
 /** @private Range of constants specified as special for this hash table. Same
 general design as Rust Hashbrown table. Importantly, we know these are special
 constants because the most significant bit is on and then empty can be easily
 distinguished from deleted by the least significant bit. */
 enum : uint8_t
 {
+    /** Deleted is applied when a removed value in a group must signal to a
+    probe sequence to continue searching for a match or empty to stop. */
     CCC_FHM_DELETED = 0x80,
+    /** Empty is the starting tag value and applied when other empties are in a
+    group upon removal. */
     CCC_FHM_EMPTY = 0xFF,
 };
 
@@ -37,6 +45,7 @@ passed to functions as pointers. Maybe nets performance gain but depends on
 aggressiveness of compiler. */
 typedef struct
 {
+    /** Can be set to DELETED or EMPTY or an arbitrary hash 0b0???????. */
     uint8_t v;
 } ccc_fhm_tag;
 static_assert(sizeof(ccc_fhm_tag) == sizeof(uint8_t),
@@ -49,10 +58,6 @@ static_assert(
     (CCC_FHM_DELETED ^ CCC_FHM_EMPTY) == 0x7F,
     "only empty should have lsb on and 7 bits are available for hash");
 
-/* TODO: Come up with better system. For now, uncomment to define a preprocessor
-directive to force generics. */
-// #define CCC_FHM_PORTABLE
-
 /** @private Vectorized group scanning allows more parallel scans but a
 fallback of 8 is good for a portable implementation that will use the widest
 word on a platform for group scanning. Right now, this lib targets 64-bit so
@@ -61,8 +66,10 @@ is still valid on 32-bit but probably very slow due to emulation. */
 enum
 {
 #if defined(__x86_64) && defined(__SSE2__) && !defined(CCC_FHM_PORTABLE)
+    /** A group of tags that can be loaded into a 128 bit vector. */
     CCC_FHM_GROUP_SIZE = 16,
 #else
+    /** A group of tags that can be loded into a 64 bit integer. */
     CCC_FHM_GROUP_SIZE = 8,
 #endif /* defined(__x86_64) && defined(__SSE2__) */
 };
@@ -73,24 +80,24 @@ map is allowed to allocate it will take care of aligning pointers appropriately.
 In the fixed size case we rely on the user defining a fixed size type. In either
 case the arrays are in one contiguous allocation but split as follows:
 
-(N == mask_ == capacity - 1) Where capacity is a required power of 2.
-                         *
-|Swap|D_N|...|D_2|D_1|D_0|T_0|T_1|T_2|...|T_N|R_0|...|R_N
- ^                       ^                   ^
- |                       |                   |
-Swap slot for      Shared base      Start of Replica of first group to support
-in place           address of       a group load that starts at T_N as well as
-rehashing          Data and Tag.    erase and inserts. This means R_N is never
-                   arrays.          needed but duplicated for branchless ops.
-                   arrays.
+(N == capacity - 1) Where capacity is a required power of 2. (G == group size).
+┌────┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┐
+│Swap│D_N│...│D_1│D_0│T_0│T_1│...│T_N│R_0│R_1│...│R_G│
+└─┬──┴───┴───┴───┴───┼───┴───┴───┴───┼───┴───┴───┴───┘
+┌─┴───────────┐ ┌────┴────────┐ ┌────┴─────────────────────────────────────┐
+│Swap slot for│ │Shared base  │ │Start of replica of first group to support│
+│in place     │ │address of   │ │a group load that starts at T_N as well as│
+│rehashing.   │ │Data and Tag.│ │erase and inserts. This means R_G is never│
+│Size = 1 data│ │arrays.      │ │needed but duplicated for branchless ops. │
+└─────────────┘ └─────────────┘ └──────────────────────────────────────────┘
 
 The Data array has a reverse layout so that indices will be found as a
 subtracted address offset from the shared base location. Individual elements are
 still written into the slots in a normal fashion--such that functions like
 memcpy work normally--we simply count backwards from the shared base.The
-tagdata array ascends normally. The tagdata is located on the next byte
-address from the 0th data element because it's size is only a byte meaning a
-shared base address is possible with no alignment issues. */
+tag array ascends normally. The tag array is located on the next byte address
+from the 0th data element because it's size is only a byte meaning a shared base
+address is possible with no alignment issues. */
 struct ccc_fhmap_
 {
     /** Reversed user type data array. */
@@ -119,20 +126,31 @@ struct ccc_fhmap_
     void *aux_;
 };
 
-/** @private */
+/** @private A struct for containing all relevant information for a query
+into one object so that passing to future functions is cleaner. */
 struct ccc_fhash_entry_
 {
+    /** The map associated with this entry. */
     struct ccc_fhmap_ *h_;
+    /** The saved tag from the current query hash value. */
     ccc_fhm_tag tag_;
+    /** The location and status of the query index, occupied, vacant, etc. */
     struct ccc_handl_ handle_;
 };
 
-/** @private */
+/** @private A simple wrapper for an entry that allows us to return a compound
+literal reference. All interface functions accept pointers to entries and
+a functional chain of calls is not possible with return by value. The interface
+can then return `&(union ccc_fhmap_entry_){function_call(...).impl_}` which is
+a compound literal reference in C23. */
 union ccc_fhmap_entry_
 {
     struct ccc_fhash_entry_ impl_;
 };
 
+/** While the private interface functions are not strictly necessary containing
+the logic of interacting with the map to the src implementation makes reasoning
+and debugging the macros easier. It also cuts down on repeated logic. */
 /*======================     Private Interface      =========================*/
 
 struct ccc_fhash_entry_ ccc_impl_fhm_entry(struct ccc_fhmap_ *h,
@@ -205,6 +223,9 @@ fixed size map when they don't know exactly the size needed until runtime. */
 
 /*========================    Construct In Place    =========================*/
 
+/** @private A fairly good approximation of closures given C23 capabilities.
+The user facing docs clarify that T is a correctly typed reference to the
+desired data if occupied. */
 #define ccc_impl_fhm_and_modify_w(flat_hash_map_entry_ptr, type_name,          \
                                   closure_over_T...)                           \
     (__extension__({                                                           \
@@ -227,7 +248,10 @@ fixed size map when they don't know exactly the size needed until runtime. */
         fhm_mod_with_ent_;                                                     \
     }))
 
-/** @private */
+/** @private The or insert method is unique in that it directly returns a
+reference to the inserted data rather than a entry with a status. This is
+because it should not fail. If NULL is returned the user knows there is a
+problem. */
 #define ccc_impl_fhm_or_insert_w(flat_hash_map_entry_ptr, lazy_key_value...)   \
     (__extension__({                                                           \
         __auto_type fhm_or_ins_ent_ptr_ = (flat_hash_map_entry_ptr);           \
@@ -250,6 +274,8 @@ fixed size map when they don't know exactly the size needed until runtime. */
         fhm_or_ins_res_;                                                       \
     }))
 
+/** @private Insert entry also should not fail and therefore returns a reference
+directly. This is similar to insert or assign where overwriting may occur. */
 #define ccc_impl_fhm_insert_entry_w(flat_hash_map_entry_ptr,                   \
                                     lazy_key_value...)                         \
     (__extension__({                                                           \
@@ -273,7 +299,9 @@ fixed size map when they don't know exactly the size needed until runtime. */
         fhm_ins_ent_res_;                                                      \
     }))
 
-/** @private */
+/** @private Because this function does not start with an entry it has the
+option to give user more information and therefore returns an entry.
+Importantly, this function makes sure the key is in sync with key in table. */
 #define ccc_impl_fhm_try_insert_w(flat_hash_map_ptr, key, lazy_value...)       \
     (__extension__({                                                           \
         struct ccc_fhmap_ *flat_hash_map_ptr_ = (flat_hash_map_ptr);           \
@@ -309,7 +337,10 @@ fixed size map when they don't know exactly the size needed until runtime. */
         fhm_try_insert_res_;                                                   \
     }))
 
-/** @private */
+/** @private Because this function does not start with an entry it has the
+option to give user more information and therefore returns an entry.
+Importantly, this function makes sure the key is in sync with key in table.
+Similar to insert entry this will overwrite. */
 #define ccc_impl_fhm_insert_or_assign_w(flat_hash_map_ptr, key, lazy_value...) \
     (__extension__({                                                           \
         struct ccc_fhmap_ *flat_hash_map_ptr_ = (flat_hash_map_ptr);           \
