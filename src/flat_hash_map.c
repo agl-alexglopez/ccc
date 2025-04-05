@@ -120,8 +120,9 @@ enum : typeof((index_mask){}.v)
 
 enum : typeof((group){}.v)
 {
-    GROUP_LSB = 0x101010101010101,
-    GROUP_DELETED = 0x8080808080808080,
+    INDEX_MASK_LSBS = 0x101010101010101,
+    INDEX_MASK_MSBS = 0x8080808080808080,
+    INDEX_MASK_OFF_BITS = 0x7F7F7F7F7F7F7F7F,
 };
 
 enum : uint8_t
@@ -1641,6 +1642,7 @@ to_little_endian(index_mask m)
 
 /*=========================  Group Implementations   ========================*/
 
+/** Loads tags into a group without violating strict aliasing. */
 static inline group
 load_group(ccc_fhm_tag const *const src)
 {
@@ -1649,15 +1651,27 @@ load_group(ccc_fhm_tag const *const src)
     return g;
 }
 
+/** Stores a group back into the tag array without violating strict aliasing. */
 static inline void
 store_group(ccc_fhm_tag *const dst, group const src)
 {
     (void)memcpy(dst, &src, sizeof(src));
 }
 
+/** Returns an index mask indicating all tags in the group which may have the
+given value. The index mask will only have the most significant bit on within
+the byte representing the tag for the match. This function may return a false
+positive in certain cases where the tag in the group differs from the searched
+value only in its lowest bit. This is fine because:
+- This never happens for `EMPTY` and `DELETED`, only full entries.
+- The check for key equality will catch these.
+- This only happens if there is at least 1 true match.
+- The chance of this happening is very low (< 1% chance per byte). */
 static inline index_mask
 match_tag(group g, ccc_fhm_tag const m)
 {
+    /* This algorithm is derived from:
+       https://graphics.stanford.edu/~seander/bithacks.html##ValueInWord */
     group const cmp = {g.v
                        ^ ((((typeof(g.v))m.v) << (TAG_BITS * 7UL))
                           | (((typeof(g.v))m.v) << (TAG_BITS * 6UL))
@@ -1666,26 +1680,40 @@ match_tag(group g, ccc_fhm_tag const m)
                           | (((typeof(g.v))m.v) << (TAG_BITS * 3UL))
                           | (((typeof(g.v))m.v) << (TAG_BITS * 2UL))
                           | (((typeof(g.v))m.v) << TAG_BITS) | m.v)};
-    return to_little_endian(
-        (index_mask){(cmp.v - GROUP_LSB) & ~cmp.v & GROUP_DELETED});
+    index_mask const res = to_little_endian(
+        (index_mask){(cmp.v - INDEX_MASK_LSBS) & ~cmp.v & INDEX_MASK_MSBS});
+    assert((res.v & INDEX_MASK_OFF_BITS) == 0
+           && "For bit counting and iteration purposes only one bit in every "
+              "byte will indicate a match for a tag has occurred");
+    return res;
 }
 
+/** Returns an index mask with the most significant bit in every byte on if
+that tag in g is empty. */
 static inline index_mask
 match_empty(group const g)
 {
-    return to_little_endian((index_mask){g.v & (g.v << 1) & GROUP_DELETED});
+    /* EMPTY has all bits on and DELETED has the most significant bit on so
+       EMPTY must have the top 2 bits on. Make sure the mask is only MSB's. */
+    return to_little_endian((index_mask){g.v & (g.v << 1) & INDEX_MASK_MSBS});
 }
 
+/** Returns an index mask with the most significant bit in every byte on if
+that tag in g is empty or deleted. This is found by the most significant bit. */
 static inline index_mask
 match_empty_or_deleted(group const g)
 {
-    return to_little_endian((index_mask){g.v & GROUP_DELETED});
+    return to_little_endian((index_mask){g.v & INDEX_MASK_MSBS});
 }
 
+/** Converts the empty and deleted constants all CCC_FHM_EMPTY and the full
+tags representing hashed user data CCC_FHM_DELETED. Making the hashed data
+deleted is OK because it will only turn on the previously unused most
+significant bit. This does not affect user hashed data. */
 static inline group
 make_constants_empty_and_full_deleted(group g)
 {
-    g.v = ~g.v & GROUP_DELETED;
+    g.v = ~g.v & INDEX_MASK_MSBS;
     g.v = ~g.v + (g.v >> (TAG_BITS - 1));
     return g;
 }
