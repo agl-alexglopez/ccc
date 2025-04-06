@@ -5,6 +5,7 @@
 #include "checkers.h"
 #include "fhmap_util.h"
 #include "flat_hash_map.h"
+#include "random.h"
 #include "traits.h"
 #include "types.h"
 
@@ -86,8 +87,75 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_insert_erase)
     CHECK_END_FN(fhm_clear_and_free(&h, NULL););
 }
 
+CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_erase_fixed)
+{
+    standard_fixed_map mem;
+    ccc_flat_hash_map h
+        = fhm_init(mem.data, mem.tag, key, fhmap_int_to_u64, fhmap_id_eq, NULL,
+                   NULL, fhm_fixed_capacity(standard_fixed_map));
+    int to_insert[1024];
+    iota(to_insert, 1024, 0);
+    rand_shuffle(sizeof(int), to_insert, 1024, &(int){});
+    int inserted = 0;
+    for (; inserted < 1024; ++inserted)
+    {
+        struct val const *const v = unwrap(fhm_insert_or_assign_w(
+            &h, to_insert[inserted], (struct val){.val = inserted}));
+        if (!v)
+        {
+            break;
+        }
+        CHECK(v->key, to_insert[inserted]);
+        CHECK(v->val, inserted);
+        CHECK(validate(&h), true);
+    }
+    size_t const full_size = size(&h).count;
+    size_t cur_size = size(&h).count;
+    int i = 0;
+    for (; i < inserted; ++i)
+    {
+        CHECK(contains(&h, &to_insert[i]), true);
+        ccc_entry removed = remove_entry(entry_r(&h, &to_insert[i]));
+        CHECK(occupied(&removed), true);
+        CHECK(validate(&h), true);
+    }
+    i = 0;
+    for (; i < inserted; ++i)
+    {
+        struct val const *const v = unwrap(
+            fhm_insert_or_assign_w(&h, &to_insert[i], (struct val){.val = i}));
+        CHECK(v != NULL, true);
+        CHECK(validate(&h), true);
+    }
+    CHECK(full_size, cur_size);
+    i = 0;
+    while (!is_empty(&h) && cur_size)
+    {
+        CHECK(contains(&h, &to_insert[i]), true);
+        if (i % 2)
+        {
+            struct val const *const old_val
+                = unwrap(remove_r(&h, &(struct val){.key = to_insert[i]}));
+            CHECK(old_val != NULL, true);
+            CHECK(old_val->key, to_insert[i]);
+        }
+        else
+        {
+            ccc_entry removed = remove_entry(entry_r(&h, &to_insert[i]));
+            CHECK(occupied(&removed), true);
+        }
+        --cur_size;
+        ++i;
+        CHECK(size(&h).count, cur_size);
+        CHECK(validate(&h), true);
+    }
+    CHECK(size(&h).count, 0);
+    CHECK_END_FN();
+}
+
 int
 main()
 {
-    return CHECK_RUN(fhmap_test_erase(), fhmap_test_shuffle_insert_erase());
+    return CHECK_RUN(fhmap_test_erase(), fhmap_test_shuffle_insert_erase(),
+                     fhmap_test_shuffle_erase_fixed());
 }
