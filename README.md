@@ -6,8 +6,8 @@ The C Container Collection offers a variety of containers for C programmers who 
 
 The following are required for install:
 
-- GCC or Clang supporting C23.
-    - 100% coverage of C23 is not required. For example, at the time of writing Clang 19.1.1 and GCC 14.2 have all features used in this collection covered, but older versions of each compiler may work as well.
+- GCC or Clang supporting `C23`.
+    - 100% coverage of `C23` is not required. For example, at the time of writing Clang 19.1.1 and GCC 14.2 have all features used in this collection covered, but older versions of each compiler may work as well.
 - CMake >= 3.23.
 - Read [INSTALL.md](INSTALL.md).
 
@@ -1517,7 +1517,7 @@ make rtest
 - Why not header only? Readability, maintainability, and update ability, for changing implementations in the source files. If the user wants to explore the implementation everything should be easily understandable. This can also be helpful if the user wants to fork and change a data structure to fit their needs. Smaller object size and easier modular compilation is also nice.
 - Why not opaque pointers and true implementation hiding? This is not possible in C if the user is in charge of memory. The container types must be complete if the user wishes to store them on the stack or data segment. I try to present a clean interface.
 - Why flat maps? Mostly experimenting. Flat maps track the tree structure through indices not pointers. This makes the data structure copyable, relocatable, serializable, or writable to disk at the cost of pointer stability in most cases. This can also make logging and recording program state easier.
-- Why C23? It is a great standard that helps with some initialization and macro ideas implemented in the library. Clang covers all of the features used on many platforms. Newer gcc versions also have them covered.
+- Why `C23`? It is a great standard that helps with some initialization and macro ideas implemented in the library. Clang covers all of the features used on many platforms. Newer gcc versions also have them covered.
 
 ## Related
 
