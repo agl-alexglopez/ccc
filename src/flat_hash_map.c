@@ -217,6 +217,7 @@ static void set_tag(struct ccc_fhmap_ *h, ccc_fhm_tag m, size_t i);
 static ccc_tribool is_index_on(index_mask m);
 static size_t lowest_on_index(index_mask m);
 static size_t leading_zeros(index_mask m);
+static size_t trailing_zeros(index_mask m);
 static size_t next_index(index_mask *m);
 static ccc_tribool is_full(ccc_fhm_tag m);
 static ccc_tribool is_constant(ccc_fhm_tag m);
@@ -227,9 +228,9 @@ static index_mask match_tag(group g, ccc_fhm_tag m);
 static index_mask match_empty(group g);
 static index_mask match_empty_or_deleted(group g);
 static group make_constants_empty_and_full_deleted(group g);
-static unsigned countr_0(index_mask m);
-static unsigned countl_0(index_mask m);
-static unsigned countl_0_size_t(size_t n);
+static unsigned ctz(index_mask m);
+static unsigned clz(index_mask m);
+static unsigned clz_size_t(size_t n);
 static size_t next_power_of_two(size_t n);
 static ccc_tribool is_power_of_two(size_t n);
 
@@ -897,10 +898,11 @@ erase(struct ccc_fhmap_ *const h, size_t const i)
     index_mask const i_before_empty
         = match_empty(load_group(&h->tag_[i_before]));
     index_mask const i_empty = match_empty(load_group(&h->tag_[i]));
-    ccc_fhm_tag const m = leading_zeros(i_before_empty) + leading_zeros(i_empty)
-                                  >= CCC_FHM_GROUP_SIZE
-                              ? (ccc_fhm_tag){CCC_FHM_DELETED}
-                              : (ccc_fhm_tag){CCC_FHM_EMPTY};
+    ccc_fhm_tag const m
+        = leading_zeros(i_before_empty) + trailing_zeros(i_empty)
+                  >= CCC_FHM_GROUP_SIZE
+              ? (ccc_fhm_tag){CCC_FHM_DELETED}
+              : (ccc_fhm_tag){CCC_FHM_EMPTY};
     h->avail_ += (m.v == CCC_FHM_EMPTY);
     --h->sz_;
     set_tag(h, m, i);
@@ -1089,14 +1091,12 @@ rehash_in_place(struct ccc_fhmap_ *const h)
 {
     assert((h->mask_ + 1) % CCC_FHM_GROUP_SIZE == 0);
     size_t const mask = h->mask_;
-    size_t const allowed_cap = mask_to_load_factor_cap(mask);
     for (size_t i = 0; i < mask + 1; i += CCC_FHM_GROUP_SIZE)
     {
         store_group(&h->tag_[i], make_constants_empty_and_full_deleted(
                                      load_group(&h->tag_[i])));
     }
     (void)memcpy(h->tag_ + (mask + 1), h->tag_, CCC_FHM_GROUP_SIZE);
-    h->avail_ = allowed_cap - h->sz_;
     for (size_t i = 0; i < mask + 1; ++i)
     {
         if (h->tag_[i].v != CCC_FHM_DELETED)
@@ -1107,23 +1107,23 @@ rehash_in_place(struct ccc_fhmap_ *const h)
         {
             uint64_t const hash = h->hash_fn_(
                 (ccc_user_key){.user_key = key_at(h, i), .aux = h->aux_});
-            ccc_fhm_tag const hash_tag = to_tag(hash);
             size_t const new_slot = find_known_insert_slot(h, hash);
-            size_t const hash_pos = (hash & mask);
+            size_t const ideal_pos = (hash & mask);
+            ccc_fhm_tag const hash_tag = to_tag(hash);
             /* No point relocating when scanning works by groups and the probe
                sequence would place us in this group anyway. This is a valid
                position because imagine if such a placement occurred during
                the normal insertion algorithm due to some combination of
                occupied, deleted, and empty slots. */
-            if ((((i - hash_pos) & mask) / CCC_FHM_GROUP_SIZE)
-                == (((new_slot - hash_pos) & mask) / CCC_FHM_GROUP_SIZE))
+            if ((((i - ideal_pos) & mask) / CCC_FHM_GROUP_SIZE)
+                == (((new_slot - ideal_pos) & mask) / CCC_FHM_GROUP_SIZE))
             {
                 set_tag(h, hash_tag, i);
                 break; /* continues outer loop */
             }
-            ccc_fhm_tag const prev = h->tag_[new_slot];
+            ccc_fhm_tag const occupant = h->tag_[new_slot];
             set_tag(h, hash_tag, new_slot);
-            if (prev.v == CCC_FHM_EMPTY)
+            if (occupant.v == CCC_FHM_EMPTY)
             {
                 set_tag(h, (ccc_fhm_tag){CCC_FHM_EMPTY}, i);
                 (void)memcpy(data_at(h, new_slot), data_at(h, i), h->elem_sz_);
@@ -1132,12 +1132,12 @@ rehash_in_place(struct ccc_fhmap_ *const h)
             /* The other slots data has been swapped and we rehash every
                element for this algorithm so there is no need to write its
                tag to this slot. It's data is in correct location already. */
-            assert(prev.v == CCC_FHM_DELETED);
+            assert(occupant.v == CCC_FHM_DELETED);
             swap(swap_slot(h), data_at(h, i), data_at(h, new_slot),
                  h->elem_sz_);
         } while (1);
     }
-    h->avail_ = allowed_cap - h->sz_;
+    h->avail_ = mask_to_load_factor_cap(mask) - h->sz_;
 }
 
 static ccc_result
@@ -1247,7 +1247,7 @@ next_power_of_two(size_t const n)
     {
         return n + 1;
     }
-    unsigned const shifts = countl_0_size_t(n - 1);
+    unsigned const shifts = clz_size_t(n - 1);
     return shifts >= sizeof(size_t) * CHAR_BIT ? 0 : (SIZE_MAX >> shifts) + 1;
 }
 
@@ -1371,7 +1371,7 @@ of the probe sequence because it can only be 0 to index mask bit width. */
 static inline size_t
 lowest_on_index(index_mask const m)
 {
-    return countr_0(m);
+    return ctz(m);
 }
 
 /** Counts the leading zeros in an index mask. Leading zeros are those starting
@@ -1379,7 +1379,15 @@ at the most significant bit. */
 static inline size_t
 leading_zeros(index_mask const m)
 {
-    return countl_0(m);
+    return clz(m);
+}
+
+/** Counts the trailing zeros in an index mask. Trailing zeros are those
+starting at the least significant bit. */
+static inline size_t
+trailing_zeros(index_mask const m)
+{
+    return ctz(m);
 }
 
 /** A function to aid in iterating over on bits/indices in an index mask. The
@@ -1500,7 +1508,7 @@ static_assert(sizeof((index_mask){}.v) <= sizeof(unsigned),
               "available builtins on the given platform.");
 
 static inline unsigned
-countr_0(index_mask const m)
+ctz(index_mask const m)
 {
     static_assert(__builtin_ctz(0x8000) == CCC_FHM_GROUP_SIZE - 1,
                   "Counting trailing zeros will always result in a valid mask "
@@ -1510,7 +1518,7 @@ countr_0(index_mask const m)
 }
 
 static inline unsigned
-countl_0(index_mask const m)
+clz(index_mask const m)
 {
     static_assert(sizeof(m.v) * 2UL == sizeof(unsigned),
                   "An index_mask will be implicitly widened to exactly twice "
@@ -1520,7 +1528,7 @@ countl_0(index_mask const m)
 }
 
 static inline unsigned
-countl_0_size_t(size_t const n)
+clz_size_t(size_t const n)
 {
     static_assert(sizeof(size_t) == sizeof(unsigned long),
                   "Ensure the available builtin works for the platform defined "
@@ -1538,7 +1546,7 @@ enum : uint16_t
 };
 
 static inline unsigned
-countr_0(index_mask m)
+ctz(index_mask m)
 {
     if (!m.v)
     {
@@ -1551,7 +1559,7 @@ countr_0(index_mask m)
 }
 
 static inline unsigned
-countl_0(index_mask m)
+clz(index_mask m)
 {
     if (!m.v)
     {
@@ -1565,7 +1573,7 @@ countl_0(index_mask m)
 }
 
 static inline unsigned
-countl_0_size_t(size_t n)
+clz_size_t(size_t n)
 {
     if (!n)
     {
@@ -1705,19 +1713,19 @@ make_constants_empty_and_full_deleted(group g)
 static_assert(sizeof((index_mask){}.v) == sizeof(long));
 
 static inline unsigned
-countr_0(index_mask const m)
+ctz(index_mask const m)
 {
     return m.v ? __builtin_ctzl(m.v) / CCC_FHM_GROUP_SIZE : CCC_FHM_GROUP_SIZE;
 }
 
 static inline unsigned
-countl_0(index_mask const m)
+clz(index_mask const m)
 {
     return m.v ? __builtin_clzl(m.v) / CCC_FHM_GROUP_SIZE : CCC_FHM_GROUP_SIZE;
 }
 
 static inline unsigned
-countl_0_size_t(size_t const n)
+clz_size_t(size_t const n)
 {
     static_assert(sizeof(size_t) == sizeof(unsigned long));
     return n ? __builtin_clzl(n) : sizeof(size_t) * CHAR_BIT;
@@ -1733,7 +1741,7 @@ enum : typeof((index_mask){}.v)
 };
 
 static inline unsigned
-countr_0(index_mask m)
+ctz(index_mask m)
 {
     if (!m.v)
     {
@@ -1746,7 +1754,7 @@ countr_0(index_mask m)
 }
 
 static inline unsigned
-countl_0(index_mask m)
+clz(index_mask m)
 {
     if (!m.v)
     {
@@ -1759,7 +1767,7 @@ countl_0(index_mask m)
 }
 
 static inline unsigned
-countl_0_size_t(size_t n)
+clz_size_t(size_t n)
 {
     if (!n)
     {
