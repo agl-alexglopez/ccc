@@ -175,9 +175,9 @@ visit every group in a power of 2 capacity hash table. Here is a popular proof:
 https://fgiesen.wordpress.com/2015/02/22/triangular-numbers-mod-2n/ */
 struct triangular_seq
 {
-    /** The index this triangular sequence probe step has placed us on. */
+    /** @private The index this probe step has placed us on. */
     size_t i;
-    /** The triangular numbers. Stride increases by group size. */
+    /** @private The triangular numbers. Stride increases by group size. */
     size_t stride;
 };
 
@@ -1663,7 +1663,7 @@ match_tag(group g, ccc_fhm_tag const m)
         (index_mask){(cmp.v - INDEX_MASK_LSBS) & ~cmp.v & INDEX_MASK_MSBS});
     assert((res.v & INDEX_MASK_OFF_BITS) == 0
            && "For bit counting and iteration purposes only one bit in every "
-              "byte will indicate a match for a tag has occurred");
+              "byte will indicate a match for a tag has occurred.");
     return res;
 }
 
