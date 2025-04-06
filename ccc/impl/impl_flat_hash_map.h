@@ -16,25 +16,13 @@
 directive to force generics. */
 // #define CCC_FHM_PORTABLE
 
-/** @private Range of constants specified as special for this hash table. Same
-general design as Rust Hashbrown table. Importantly, we know these are special
-constants because the most significant bit is on and then empty can be easily
-distinguished from deleted by the least significant bit. */
-enum : uint8_t
-{
-    /** Deleted is applied when a removed value in a group must signal to a
-    probe sequence to continue searching for a match or empty to stop. */
-    CCC_FHM_DELETED = 0x80,
-    /** Empty is the starting tag value and applied when other empties are in a
-    group upon removal. */
-    CCC_FHM_EMPTY = 0xFF,
-};
-
 /** @private An array of this byte will be in the tag array. Same idea as
-Rust's Hashbrown table. The only value not represented by the above constants is
+Rust's Hashbrown table. The only value not represented by constants is
 the following:
 
-OCCUPIED: 0b0???????
+DELETED  = 0b10000000
+EMPTY    = 0x11111111
+OCCUPIED = 0b0???????
 
 In this case (?) represents any 7 bits kept from the upper 7 bits of the
 original hash code to signify an occupied slot. We know this slot is taken
@@ -48,15 +36,6 @@ typedef struct
     /** Can be set to DELETED or EMPTY or an arbitrary hash 0b0???????. */
     uint8_t v;
 } ccc_fhm_tag;
-static_assert(sizeof(ccc_fhm_tag) == sizeof(uint8_t),
-              "tag must wrap a byte in a struct without padding for better "
-              "optimizations and no strict-aliasing exceptions.");
-static_assert(
-    (CCC_FHM_DELETED | CCC_FHM_EMPTY) == (uint8_t)~0,
-    "all bits must be accounted for across deleted and empty status.");
-static_assert(
-    (CCC_FHM_DELETED ^ CCC_FHM_EMPTY) == 0x7F,
-    "only empty should have lsb on and 7 bits are available for hash");
 
 /** @private Vectorized group scanning allows more parallel scans but a
 fallback of 8 is good for a portable implementation that will use the widest

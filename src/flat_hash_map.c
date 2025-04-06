@@ -19,6 +19,29 @@
 #    define likely(expr) expr
 #endif /* defined(__has_builtin) && __has_builtin(__builtin_expect) */
 
+/** @private Range of constants specified as special for this hash table. Same
+general design as Rust Hashbrown table. Importantly, we know these are special
+constants because the most significant bit is on and then empty can be easily
+distinguished from deleted by the least significant bit. */
+enum : uint8_t
+{
+    /** @private Deleted is applied when a removed value in a group must signal
+    to a probe sequence to continue searching for a match or empty to stop. */
+    CCC_FHM_DELETED = 0x80,
+    /** @private Empty is the starting tag value and applied when other empties
+    are in a group upon removal. */
+    CCC_FHM_EMPTY = 0xFF,
+};
+static_assert(sizeof(ccc_fhm_tag) == sizeof(uint8_t),
+              "tag must wrap a byte in a struct without padding for better "
+              "optimizations and no strict-aliasing exceptions.");
+static_assert(
+    (CCC_FHM_DELETED | CCC_FHM_EMPTY) == (uint8_t)~0,
+    "all bits must be accounted for across deleted and empty status.");
+static_assert(
+    (CCC_FHM_DELETED ^ CCC_FHM_EMPTY) == 0x7F,
+    "only empty should have lsb on and 7 bits are available for hash");
+
 /** @private The following test should ensure some safety in assumptions we make
 when the user defines a fixed size map type. This is just a small type that
 will remain internal to this translation unit and offers a type that needs
@@ -101,38 +124,38 @@ typedef struct
     uint16_t v;
 } index_mask;
 
-enum : uint16_t
-{
-    /** @private A bit of the mask used for portable 0 counting. */
-    INDEX_MASK_MSB = 0x8000,
-};
-
 #else
 
+/** @privat The 8 byte word for managing multiple simultaneous equality checks.
+In contrast to SIMD this group size is the same as the index mask. */
 typedef struct
 {
+    /** @private 64 bits allows 8 tags to be checked at once. */
     uint64_t v;
 } group;
 
+/** @private The index mask is the same size as the group because only the most
+significant bit in a byte within the mask will be on to indicate the result of
+various queries such as matching a tag, empty, or constant. */
 typedef struct
 {
+    /** @private The index mask is the same as a group with MSB on. */
     typeof((group){}.v) v;
 } index_mask;
 
-enum : typeof((index_mask){}.v)
-{
-    INDEX_MASK_MSB = 0x8000000000000000,
-};
-
 enum : typeof((group){}.v)
 {
+    /** @private LSB tag bits used for byte and word level masking. */
     INDEX_MASK_LSBS = 0x101010101010101,
+    /** @private MSB tag bits used for byte and word level masking. */
     INDEX_MASK_MSBS = 0x8080808080808080,
+    /** @private Debug mode check for bits that must be off in index mask. */
     INDEX_MASK_OFF_BITS = 0x7F7F7F7F7F7F7F7F,
 };
 
 enum : uint8_t
 {
+    /** @private Bits in a tag used to help in creating a group of one tag. */
     TAG_BITS = sizeof(ccc_fhm_tag) * CHAR_BIT,
 };
 
@@ -141,13 +164,20 @@ enum : uint8_t
 
 enum : uint8_t
 {
+    /** @private Used to verify if tag is constant or hash data. */
     TAG_MSB = 0x80,
+    /** @private Used to create a one byte fingerprint of user hash. */
     LOWER_7_BITS_MASK = 0x7F,
 };
 
+/** @private A triangular sequence of numbers is a probing sequence that will
+visit every group in a power of 2 capacity hash table. Here is a popular proof:
+https://fgiesen.wordpress.com/2015/02/22/triangular-numbers-mod-2n/ */
 struct triangular_seq
 {
+    /** The index this triangular sequence probe step has placed us on. */
     size_t i;
+    /** The triangular numbers. Stride increases by group size. */
     size_t stride;
 };
 
@@ -708,11 +738,10 @@ ccc_fhm_validate(ccc_flat_hash_map const *const h)
         return CCC_TRUE;
     }
     /* We are initialized, these need to point to the array positions. */
-    if (!h->tag_ || !h->data_)
+    if (!h->data_ || !h->tag_)
     {
         return CCC_FALSE;
     }
-    /* Exceeded allowable load factor when determining available and size. */
     /* The replica group should be in sync. */
     for (size_t original = 0, clone = (h->mask_ + 1);
          original < CCC_FHM_GROUP_SIZE; ++original, ++clone)
@@ -753,6 +782,7 @@ ccc_fhm_validate(ccc_flat_hash_map const *const h)
             ++occupied;
         }
     }
+    /* Do our tags agree with our manually tracked and set state? */
     if (occupied != h->sz_ || occupied + avail + deleted != h->mask_ + 1
         || mask_to_load_factor_cap(occupied + avail + deleted) - occupied
                    - deleted
@@ -796,6 +826,7 @@ ccc_impl_fhm_key_at(struct ccc_fhmap_ const *const h, size_t const i)
     return key_at(h, i);
 }
 
+/* This is needed to help the macros only set a new insert conditionally. */
 void
 ccc_impl_fhm_set_insert(struct ccc_fhash_entry_ const *const e)
 {
@@ -840,7 +871,7 @@ handle(struct ccc_fhmap_ *const h, void const *const key, uint64_t const hash)
     return res;
 }
 
-static void
+static inline void
 insert(struct ccc_fhmap_ *const h, void const *const key_val_type,
        ccc_fhm_tag const m, size_t const i)
 {
@@ -858,7 +889,7 @@ set_insert(struct ccc_fhmap_ *const h, ccc_fhm_tag const m, size_t const i)
     set_tag(h, m, i);
 }
 
-static void
+static inline void
 erase(struct ccc_fhmap_ *const h, size_t const i)
 {
     assert(i <= h->mask_);
@@ -1159,34 +1190,6 @@ rehash_resize(struct ccc_fhmap_ *const h, size_t const to_add,
     return CCC_RESULT_OK;
 }
 
-static inline void
-set_tag(struct ccc_fhmap_ *const h, ccc_fhm_tag const m, size_t const i)
-{
-    size_t const replica_byte
-        = ((i - CCC_FHM_GROUP_SIZE) & h->mask_) + CCC_FHM_GROUP_SIZE;
-    h->tag_[i] = m;
-    h->tag_[replica_byte] = m;
-}
-
-static inline ccc_tribool
-is_full(ccc_fhm_tag const m)
-{
-    return (m.v & TAG_MSB) == 0;
-}
-
-static inline ccc_tribool
-is_constant(ccc_fhm_tag const m)
-{
-    return (m.v & TAG_MSB) != 0;
-}
-
-static inline ccc_fhm_tag
-to_tag(uint64_t const hash)
-{
-    return (ccc_fhm_tag){(hash >> ((sizeof(hash) * CHAR_BIT) - 7))
-                         & LOWER_7_BITS_MASK};
-}
-
 static inline void *
 key_at(struct ccc_fhmap_ const *const h, size_t const i)
 {
@@ -1323,6 +1326,36 @@ speed of vectorized instructions. However, loading up groups into a uint64_t is
 still good and counts as simultaneous operations just not the type that uses CPU
 vector lanes for a single instruction. */
 
+/*========================   Tag Implementations    =========================*/
+
+static inline void
+set_tag(struct ccc_fhmap_ *const h, ccc_fhm_tag const m, size_t const i)
+{
+    size_t const replica_byte
+        = ((i - CCC_FHM_GROUP_SIZE) & h->mask_) + CCC_FHM_GROUP_SIZE;
+    h->tag_[i] = m;
+    h->tag_[replica_byte] = m;
+}
+
+static inline ccc_tribool
+is_full(ccc_fhm_tag const m)
+{
+    return (m.v & TAG_MSB) == 0;
+}
+
+static inline ccc_tribool
+is_constant(ccc_fhm_tag const m)
+{
+    return (m.v & TAG_MSB) != 0;
+}
+
+static inline ccc_fhm_tag
+to_tag(uint64_t const hash)
+{
+    return (ccc_fhm_tag){(hash >> ((sizeof(hash) * CHAR_BIT) - 7))
+                         & LOWER_7_BITS_MASK};
+}
+
 /*========================  Index Mask Implementations   ====================*/
 
 /** Returns true if any index is on in the mask otherwise false. */
@@ -1362,8 +1395,8 @@ next_index(index_mask *const m)
     return index;
 }
 
-/** We can vectorize for x86 only. There is portable flag so we can manually
-test both implementation. */
+/** We have abstracted at much as we can before this point. Now implementations
+will need to vary based on availability of vectorized instructions. */
 #if defined(__x86_64) && defined(__SSE2__) && !defined(CCC_FHM_PORTABLE)
 
 /*=========================  Group Implementations   ========================*/
@@ -1385,23 +1418,23 @@ store_group(ccc_fhm_tag *const dst, group const src)
     _mm_storeu_si128((__m128i *)dst, src.v);
 }
 
-/** Returns an index mask with all on bits if the tag at that index in group g
-matched the provided tag m. If no indices matched this will be a 0 index mask.
+/** Returns an index mask with a bit on if the tag at that index in group g
+matches the provided tag m. If no indices matched this will be a 0 index mask.
 
 Here is the process to help understand the dense intrinsics.
 
-1. Load the query tag into a 128 bit vector. For example m = 0x73:
+1. Load the tag into a 128 bit vector (_mm_set1_epi8). For example m = 0x73:
 
 0x73|0x73|0x73|0x73|0x73|0x73|0x73|0x73|0x73|0x73|0x73|0x73|0x73|0x73|0x73|0x73
 
-2. g holds a 128 bit vector of 16 tags. Compare and return match masks.
+2. g holds 16 tags from tag array. Find matches (_mm_cmpeq_epi8).
 
 0x73|0x73|0x73|0x73|0x73|0x73|0x73|0x73|0x73|0x73|0x73|0x73|0x73|0x73|0x73|0x73
 0x79|0x33|0x21|0x73|0x45|0x55|0x12|0x54|0x11|0x44|0x73|0xFF|0xFF|0xFF|0xFF|0xFF
                 │                                  │
 0x00|0x00|0x00|0xFF|0x00|0x00|0x00|0x00|0x00|0x00|0xFF|0x00|0x00|0x00|0x00|0x00
 
-3. Matches are 0xFF. Mismatches are 0x00. Compress result to a uint16_t.
+3. Compress most significant bit of each byte to a uint16_t (_mm_movemask_epi8)
 
 0x00|0x00|0x00|0xFF|0x00|0x00|0x00|0x00|0x00|0x00|0xFF|0x00|0x00|0x00|0x00|0x00
      ┌──────────┘                                  │
@@ -1414,8 +1447,8 @@ Here is the process to help understand the dense intrinsics.
 
 With a good hash function it is very likely that the first match will be the
 hashed data and the full comparison will evaluate to true. Note that this
-method forces the call of the user provided comparison callback function on
-every match so an efficient comparison is beneficial. */
+method inevitably forces a call to the comparison callback function on every
+match so an efficient comparison is beneficial. */
 static inline index_mask
 match_tag(group const g, ccc_fhm_tag const m)
 {
@@ -1498,6 +1531,12 @@ countl_0_size_t(size_t const n)
 #    else /* !defined(__has_builtin) || !__has_builtin(__builtin_ctz)          \
         || !__has_builtin(__builtin_clz) || !__has_builtin(__builtin_clzl) */
 
+enum : uint16_t
+{
+    /** @private A bit of the mask used for portable 0 counting. */
+    INDEX_MASK_MSB = 0x8000,
+};
+
 static inline unsigned
 countr_0(index_mask m)
 {
@@ -1550,76 +1589,7 @@ this will likely change in the future as NEON improves. Counting zeros also
 is slightly different with the portable version requiring some thought given
 to group size and tag size. */
 
-/*==========================    Bit Helpers    ==============================*/
-
-#    if defined(__has_builtin) && __has_builtin(__builtin_ctzl)                \
-        && __has_builtin(__builtin_clzl)
-
-static_assert(sizeof((index_mask){}.v) == sizeof(long));
-
-static inline unsigned
-countr_0(index_mask const m)
-{
-    return m.v ? __builtin_ctzl(m.v) / CCC_FHM_GROUP_SIZE : CCC_FHM_GROUP_SIZE;
-}
-
-static inline unsigned
-countl_0(index_mask const m)
-{
-    return m.v ? __builtin_clzl(m.v) / CCC_FHM_GROUP_SIZE : CCC_FHM_GROUP_SIZE;
-}
-
-static inline unsigned
-countl_0_size_t(size_t const n)
-{
-    static_assert(sizeof(size_t) == sizeof(unsigned long));
-    return n ? __builtin_clzl(n) : sizeof(size_t) * CHAR_BIT;
-}
-
-#    else /* defined(__has_builtin) && __has_builtin(__builtin_ctzl) &&        \
-             __has_builtin(__builtin_clzl) */
-
-static inline unsigned
-countr_0(index_mask m)
-{
-    if (!m.v)
-    {
-        return CCC_FHM_GROUP_SIZE;
-    }
-    unsigned cnt = 0;
-    for (; m.v; cnt += ((m.v & 1U) == 0), m.v >>= 1U)
-    {}
-    return cnt / CCC_FHM_GROUP_SIZE;
-}
-
-static inline unsigned
-countl_0(index_mask m)
-{
-    if (!m.v)
-    {
-        return CCC_FHM_GROUP_SIZE;
-    }
-    unsigned cnt = 0;
-    for (; (m.v & INDEX_MASK_MSB) == 0; ++cnt, m.v <<= 1U)
-    {}
-    return cnt / CCC_FHM_GROUP_SIZE;
-}
-
-static inline unsigned
-countl_0_size_t(size_t n)
-{
-    if (!n)
-    {
-        return sizeof(size_t) * CHAR_BIT;
-    }
-    unsigned cnt = 0;
-    for (; (n & SIZE_T_MSB) == 0; ++cnt, n <<= 1U)
-    {}
-    return cnt;
-}
-
-#    endif /* !defined(__has_builtin) || !__has_builtin(__builtin_ctzl) ||     \
-              !__has_builtin(__builtin_clzl) */
+/*=========================  Endian Helpers    ==============================*/
 
 /* Returns 1=true if platform is little endian, else false for big endian. */
 static inline int
@@ -1630,6 +1600,8 @@ is_little_endian(void)
     return (int)*c;
 }
 
+/* Returns a mask converted to little endian byte layout. On a little endian
+platform the value is returned, otherwise byte swapping occurs. */
 static inline index_mask
 to_little_endian(index_mask m)
 {
@@ -1724,5 +1696,82 @@ make_constants_empty_and_full_deleted(group g)
     g.v = ~g.v + (g.v >> (TAG_BITS - 1));
     return g;
 }
+
+/*==========================    Bit Helpers    ==============================*/
+
+#    if defined(__has_builtin) && __has_builtin(__builtin_ctzl)                \
+        && __has_builtin(__builtin_clzl)
+
+static_assert(sizeof((index_mask){}.v) == sizeof(long));
+
+static inline unsigned
+countr_0(index_mask const m)
+{
+    return m.v ? __builtin_ctzl(m.v) / CCC_FHM_GROUP_SIZE : CCC_FHM_GROUP_SIZE;
+}
+
+static inline unsigned
+countl_0(index_mask const m)
+{
+    return m.v ? __builtin_clzl(m.v) / CCC_FHM_GROUP_SIZE : CCC_FHM_GROUP_SIZE;
+}
+
+static inline unsigned
+countl_0_size_t(size_t const n)
+{
+    static_assert(sizeof(size_t) == sizeof(unsigned long));
+    return n ? __builtin_clzl(n) : sizeof(size_t) * CHAR_BIT;
+}
+
+#    else /* defined(__has_builtin) && __has_builtin(__builtin_ctzl) &&        \
+             __has_builtin(__builtin_clzl) */
+
+enum : typeof((index_mask){}.v)
+{
+    /** @private Helps in counting leading bits. */
+    INDEX_MASK_MSB = 0x8000000000000000,
+};
+
+static inline unsigned
+countr_0(index_mask m)
+{
+    if (!m.v)
+    {
+        return CCC_FHM_GROUP_SIZE;
+    }
+    unsigned cnt = 0;
+    for (; m.v; cnt += ((m.v & 1U) == 0), m.v >>= 1U)
+    {}
+    return cnt / CCC_FHM_GROUP_SIZE;
+}
+
+static inline unsigned
+countl_0(index_mask m)
+{
+    if (!m.v)
+    {
+        return CCC_FHM_GROUP_SIZE;
+    }
+    unsigned cnt = 0;
+    for (; (m.v & INDEX_MASK_MSB) == 0; ++cnt, m.v <<= 1U)
+    {}
+    return cnt / CCC_FHM_GROUP_SIZE;
+}
+
+static inline unsigned
+countl_0_size_t(size_t n)
+{
+    if (!n)
+    {
+        return sizeof(size_t) * CHAR_BIT;
+    }
+    unsigned cnt = 0;
+    for (; (n & SIZE_T_MSB) == 0; ++cnt, n <<= 1U)
+    {}
+    return cnt;
+}
+
+#    endif /* !defined(__has_builtin) || !__has_builtin(__builtin_ctzl) ||     \
+              !__has_builtin(__builtin_clzl) */
 
 #endif /* defined(__x86_64) && defined(__SSE2__) */
