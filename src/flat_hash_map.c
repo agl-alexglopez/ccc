@@ -890,20 +890,37 @@ set_insert(struct ccc_fhmap_ *const h, ccc_fhm_tag const m, size_t const i)
     set_tag(h, m, i);
 }
 
+/** Erases an element at index I from the tag array, forfeiting its data in the
+data array for re-use later. The erase procedure decides how to mark a removal
+from the table: deleted, or empty. Which option to choose is determined by what
+is required to ensure the probing sequence works correctly in all cases. */
 static inline void
 erase(struct ccc_fhmap_ *const h, size_t const i)
 {
     assert(i <= h->mask_);
-    size_t const i_before = (i - CCC_FHM_GROUP_SIZE) & h->mask_;
-    index_mask const i_before_empty
-        = match_empty(load_group(&h->tag_[i_before]));
-    index_mask const i_empty = match_empty(load_group(&h->tag_[i]));
-    ccc_fhm_tag const m
-        = leading_zeros(i_before_empty) + trailing_zeros(i_empty)
+    index_mask const prev_group_empties = match_empty(
+        load_group(&h->tag_[(i - CCC_FHM_GROUP_SIZE) & h->mask_]));
+    index_mask const group_empties = match_empty(load_group(&h->tag_[i]));
+    ccc_fhm_tag m;
+    /* Leading means start at most significant bit aka last group member.
+       Trailing means start at the least significant bit aka first group member.
+
+       Marking the slot as empty is ideal. This will allow future probe
+       sequences to stop as early as possible for best performance.
+
+       However, we have asked how many DELETED or FULL slots are before and
+       after our current position. If the answer is greater than or equal to the
+       size of a group we must mark ourselves as deleted so that probing does
+       not stop too early. All the other entries in this group are either full
+       or deleted and empty would incorrectly signal to search function that
+       the requested value does not exist in the table. Instead, the request
+       needs to see that hash collisions have created displacements that must
+       be probed past to be sure the element in question is absent. */
+    m.v = leading_zeros(prev_group_empties) + trailing_zeros(group_empties)
                   >= CCC_FHM_GROUP_SIZE
-              ? (ccc_fhm_tag){CCC_FHM_DELETED}
-              : (ccc_fhm_tag){CCC_FHM_EMPTY};
-    h->avail_ += (m.v == CCC_FHM_EMPTY);
+              ? CCC_FHM_DELETED
+              : CCC_FHM_EMPTY;
+    h->avail_ += (CCC_FHM_EMPTY == m.v);
     --h->sz_;
     set_tag(h, m, i);
 }
