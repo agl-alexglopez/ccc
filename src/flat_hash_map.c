@@ -358,7 +358,7 @@ ccc_fhm_remove_entry(ccc_fhmap_entry const *const e)
     {
         return (ccc_entry){{.stats_ = CCC_ENTRY_ARG_ERROR}};
     }
-    if (e->impl_.handle_.stats_ != CCC_ENTRY_OCCUPIED)
+    if (!(e->impl_.handle_.stats_ & CCC_ENTRY_OCCUPIED))
     {
         return (ccc_entry){{.stats_ = CCC_ENTRY_VACANT}};
     }

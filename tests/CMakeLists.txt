@@ -275,6 +275,7 @@ macro(add_fhmap_test TEST_NAME)
     PRIVATE
       checkers
       fhmap_util
+      random
       ccc
       alloc
   )

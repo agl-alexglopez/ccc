@@ -39,3 +39,12 @@ rand_shuffle(size_t const elem_size, void *const elems, size_t const n,
         memcpy(elem_view + (i * step), tmp, elem_size);
     }
 }
+
+void
+iota(int *const array, size_t n, unsigned start_val)
+{
+    for (size_t i = 0; n--; ++i, ++start_val)
+    {
+        array[i] = (int)start_val;
+    }
+}
