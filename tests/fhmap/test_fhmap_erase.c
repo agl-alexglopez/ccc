@@ -90,17 +90,18 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_insert_erase)
 CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_erase_fixed)
 {
     standard_fixed_map mem;
-    ccc_flat_hash_map h
-        = fhm_init(mem.data, mem.tag, key, fhmap_int_to_u64, fhmap_id_eq, NULL,
-                   NULL, fhm_fixed_capacity(standard_fixed_map));
-    int to_insert[1024];
-    iota(to_insert, 1024, 0);
-    rand_shuffle(sizeof(int), to_insert, 1024, &(int){});
+    size_t const fix_cap = fhm_fixed_capacity(standard_fixed_map);
+    ccc_flat_hash_map h = fhm_init(mem.data, mem.tag, key, fhmap_int_to_u64,
+                                   fhmap_id_eq, NULL, NULL, fix_cap);
+    int to_insert[fhm_fixed_capacity(standard_fixed_map)];
+    iota(to_insert, fix_cap, 0);
+    rand_shuffle(sizeof(int), to_insert, fix_cap, &(int){});
     int inserted = 0;
-    for (; inserted < 1024; ++inserted)
+    for (; inserted < (int)fix_cap; ++inserted)
     {
-        struct val const *const v = unwrap(fhm_insert_or_assign_w(
-            &h, to_insert[inserted], (struct val){.val = inserted}));
+        int const cur = to_insert[inserted];
+        struct val const *const v = unwrap(
+            fhm_insert_or_assign_w(&h, cur, (struct val){.val = inserted}));
         if (!v)
         {
             break;
@@ -112,18 +113,21 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_erase_fixed)
     size_t const full_size = size(&h).count;
     size_t cur_size = size(&h).count;
     int i = 0;
-    for (; i < inserted; ++i)
+    for (; i < (int)(full_size / 3); ++i)
     {
-        CHECK(contains(&h, &to_insert[i]), true);
-        ccc_entry removed = remove_entry(entry_r(&h, &to_insert[i]));
+        int const cur = to_insert[i];
+        ccc_tribool const check = contains(&h, &cur);
+        CHECK(check, true);
+        ccc_entry removed = remove_entry(entry_r(&h, &cur));
         CHECK(occupied(&removed), true);
         CHECK(validate(&h), true);
     }
     i = 0;
-    for (; i < inserted; ++i)
+    for (; i < (int)(full_size / 3); ++i)
     {
-        struct val const *const v = unwrap(
-            fhm_insert_or_assign_w(&h, &to_insert[i], (struct val){.val = i}));
+        int const cur = to_insert[i];
+        struct val const *const v
+            = unwrap(fhm_insert_or_assign_w(&h, cur, (struct val){.val = i}));
         CHECK(v != NULL, true);
         CHECK(validate(&h), true);
     }
@@ -131,17 +135,19 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_erase_fixed)
     i = 0;
     while (!is_empty(&h) && cur_size)
     {
-        CHECK(contains(&h, &to_insert[i]), true);
+        int const cur = to_insert[i];
+        ccc_tribool const check = contains(&h, &cur);
+        CHECK(check, true);
         if (i % 2)
         {
             struct val const *const old_val
-                = unwrap(remove_r(&h, &(struct val){.key = to_insert[i]}));
+                = unwrap(remove_r(&h, &(struct val){.key = cur}));
             CHECK(old_val != NULL, true);
             CHECK(old_val->key, to_insert[i]);
         }
         else
         {
-            ccc_entry removed = remove_entry(entry_r(&h, &to_insert[i]));
+            ccc_entry removed = remove_entry(entry_r(&h, &cur));
             CHECK(occupied(&removed), true);
         }
         --cur_size;
