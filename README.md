@@ -266,7 +266,6 @@ Amortized O(1) access to elements stored in a flat array by key. Not pointer sta
 
 struct key_val
 {
-    fhmap_elem e;
     int key;
     int val;
 };
@@ -289,15 +288,19 @@ fhmap_id_eq(ccc_key_cmp const cmp)
     return va->key == *((int *)cmp.key_lhs);
 }
 
+/* This fix map will be a 'small_fixed_map' used to store struct val. */
+fhm_declare_fixed_map(small_fixed_map, struct val, 64);
+
 /* Two Sum */
 int
 main(void)
 {
-    /* stack array backed, key field named key, intrusive field e, no
-       allocation permission, a hash function, an equality function, no aux. */
+    /* fixed map on the stack, data and tag fields built in, key field named
+       key, a hash function, an equality function, no allocation, no aux. */
+    small_fixed_map mem;
     ccc_flat_hash_map fh;
-        = fhm_init((struct val[20]){}, key, e, fhmap_int_to_u64, fhmap_id_eq,
-                   NULL, NULL, 20);
+        = fhm_init(mem.data, mem.tag, key, fhmap_int_to_u64, fhmap_id_eq,
+                   NULL, NULL, fhm_fixed_capacity(small_fixed_map));
     int const addends[10] = {1, 3, -980, 6, 7, 13, 44, 32, 995, -1};
     int const target = 15;
     int solution_indices[2] = {-1, -1};
@@ -1055,25 +1058,25 @@ main(void)
 
 ### Intrusive and Non-Intrusive Containers
 
-Currently, all associative containers ask the user to store an element in their type. This means wrapping an element in a struct such as this type found in `samples/graph.c` for the flat hash map.
+Currently, many associative containers ask the user to store an element in their type. This means wrapping an element in a struct such as this type found in `samples/words.c` for the flat hash map.
 
 ```c
-struct path_backtrack_cell
+typedef struct
 {
-    ccc_fhmap_elem elem;
-    struct point current;
-    struct point parent;
-};
+    homap_elem e;
+    str_ofs ofs;
+    int cnt;
+} word;
 ```
 
-The interface may then ask for a handle to this type for certain operations. For example, a flat hash map we have the following interface for `try_insert`.
+The interface may then ask for a handle to this type for certain operations. For example, a handle ordered map we have the following interface for `try_insert`.
 
 ```c
-ccc_entry ccc_fhm_try_insert(ccc_flat_hash_map *h,
-                             ccc_fhmap_elem *key_val_handle);
+ccc_entry ccc_hom_try_insert(ccc_handle_ordered_map *om,
+                             ccc_homap_elem *key_val_handle);
 ```
 
-Here, the user is trying to insert a new key and value into the hash map which in the above example would be a `struct path_backtrack_cell` with the `current` and `parent` fields set appropriately.
+Here, the user is trying to insert a new key and value into the map which in the above example would be a `word` with the `ofs` and `cnt` fields set appropriately.
 
 Non-Intrusive containers exist when a flat container can operate without such help from the user. The `flat_priority_queue` is a good example of this. When initializing we give it the following information.
 
@@ -1158,13 +1161,14 @@ A flat hash map may be initialized at compile time if the maximum size is fixed 
 #define FLAT_HASH_MAP_USING_NAMESPACE_CCC
 struct val
 {
-    fhmap_elem e;
     int key;
     int val;
 };
-static flat_hash_map val_map
-    = fhm_init((static struct val[2999]){}, key, e, fhmap_int_to_u64,
-               fhmap_id_eq, NULL, NULL, 2999);
+fhm_declare_fixed_map(small_fixed_map, struct val, 64);
+static small_fixed_map mem;
+static flat_hash_map static_fh
+    = fhm_init(mem.data, mem.tag, key, fhmap_int_to_u64, fhmap_id_eq, NULL,
+               NULL, fhm_fixed_capacity(small_fixed_map));
 ```
 
 A flat hash map can also be initialized in preparation for dynamic allocation at compile time if an allocation function is provided (see [allocation](#allocation) for more on `std_alloc`).
@@ -1173,12 +1177,11 @@ A flat hash map can also be initialized in preparation for dynamic allocation at
 #define FLAT_HASH_MAP_USING_NAMESPACE_CCC
 struct val
 {
-    fhmap_elem e;
     int key;
     int val;
 };
-static flat_hash_map val_map
-    = fhm_init((struct val *)NULL, key, e, fhmap_int_to_u64, fhmap_id_eq,
+static flat_hash_map static_fh
+    = fhm_init((struct val *)NULL, NULL, key, fhmap_int_to_u64, fhmap_id_eq,
                std_alloc, NULL, 0);
 ```
 
