@@ -1000,7 +1000,7 @@ maybe_rehash(struct ccc_fhmap_ *const h, size_t const to_add,
     {
         if (h->mask_)
         {
-            if (!h->tag_ || h->mask_ + 1 < required_total_cap)
+            if (!h->tag_ || !h->data_ || h->mask_ + 1 < required_total_cap)
             {
                 return CCC_RESULT_MEM_ERROR;
             }
@@ -1097,7 +1097,8 @@ rehash_in_place(struct ccc_fhmap_ *const h)
                element for this algorithm so there is no need to write its
                tag to this slot. It's data is in correct location already. */
             assert(prev.v == CCC_FHM_DELETED);
-            swap(h->data_, data_at(h, i), data_at(h, new_slot), h->elem_sz_);
+            swap(swap_slot(h), data_at(h, i), data_at(h, new_slot),
+                 h->elem_sz_);
         } while (1);
     }
     h->avail_ = allowed_cap - h->sz_;
