@@ -99,9 +99,9 @@ data array for swapping purposes because variable length arrays are banned and
 allocation might not be permitted. */
 static_assert(
     (char *)(test_layout_allocation.tag
-             - ((1 + 1)
+             - ((2 + 1)
                 * sizeof(test_layout_allocation.type_with_padding_data[0])))
-        == (char *)&test_layout_allocation.type_with_padding_data[1],
+        == (char *)&test_layout_allocation.type_with_padding_data[0],
     "With a perfectly aligned shared user data and tag array base address, "
     "pointer subtraction for user data must work as expected.");
 
