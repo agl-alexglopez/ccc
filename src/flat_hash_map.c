@@ -79,7 +79,7 @@ static_assert(
              - ((1 + 1)
                 * sizeof(test_layout_allocation.type_with_padding_data[0])))
         == (char *)&test_layout_allocation.type_with_padding_data[1],
-    "With a perfectly aligned shared user data and tag array base address "
+    "With a perfectly aligned shared user data and tag array base address, "
     "pointer subtraction for user data must work as expected.");
 
 /* Can we vectorize instructions? Also it is possible to specify we want a
@@ -87,11 +87,15 @@ portable implementation. Consider exposing to user in header docs. */
 #if defined(__x86_64) && defined(__SSE2__) && !defined(CCC_FHM_PORTABLE)
 #    include <immintrin.h>
 
+/** @private The 128 bit vector type for efficient SIMD group scanning. 16 one
+byte large tags fit in this type. */
 typedef struct
 {
     __m128i v;
 } group;
 
+/** @private Because we use 128 bit vectors over tags the results of various
+operations can be compressed into a 16 bit integer. */
 typedef struct
 {
     uint16_t v;
@@ -99,6 +103,7 @@ typedef struct
 
 enum : uint16_t
 {
+    /** @private A bit of the mask used for portable 0 counting. */
     INDEX_MASK_MSB = 0x8000,
 };
 
