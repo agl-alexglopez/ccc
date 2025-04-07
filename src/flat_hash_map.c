@@ -167,17 +167,19 @@ typedef struct
 
 #elif defined(__ARM_NEON__) && !defined(CCC_FHM_PORTABLE)
 
-/** @private The 128 bit vector type for efficient SIMD group scanning. 16 one
-byte large tags fit in this type. */
+/** @private The 64 bit vector is used on NEON due to a lack of ability to
+compress a 128 bit vector to a smaller int efficiently. */
 typedef struct
 {
+    /** @private NEON offers a specific type for 64 bit manipulations. */
     uint8x8_t v;
 } group;
 
-/** @private Because we use 128 bit vectors over tags the results of various
-operations can be compressed into a 16 bit integer. */
+/** @private The mask will consist of 8 bytes with the most significant bit of
+each byte on to indicate match statuses. */
 typedef struct
 {
+    /** @private NEON returns this type from various uint8x8_t operations. */
     uint64_t v;
 } index_mask;
 
