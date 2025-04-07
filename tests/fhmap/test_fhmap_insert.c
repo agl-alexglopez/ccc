@@ -603,6 +603,37 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert_and_find)
     CHECK_END_FN();
 }
 
+CHECK_BEGIN_STATIC_FN(fhmap_test_reserve_without_permissions)
+{
+    ccc_flat_hash_map fh
+        = fhm_init((struct val *)NULL, NULL, key, fhmap_int_to_u64, fhmap_id_eq,
+                   NULL, NULL, 0);
+    /* The map must insert all of the requested elements but has no permission
+       to resize. This ensures the reserve function works as expected. */
+    int const to_insert = 1000;
+    int const larger_prime = 1009;
+    ccc_result const res = ccc_fhm_reserve(&fh, to_insert, std_alloc);
+    CHECK(res, CCC_RESULT_OK);
+    for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
+         ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
+    {
+        struct val elem = {.key = shuffled_index, .val = i};
+        struct val *v = insert_entry(entry_r(&fh, &elem.key), &elem);
+        CHECK(v != NULL, true);
+        CHECK(v->key, shuffled_index);
+        CHECK(v->val, i);
+    }
+    CHECK(size(&fh).count, to_insert);
+    for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
+         ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
+    {
+        ccc_tribool const check = contains(&fh, &shuffled_index);
+        CHECK(check, true);
+    }
+    CHECK(size(&fh).count, to_insert);
+    CHECK_END_FN(fhm_clear_and_free_reserve(&fh, NULL, std_alloc););
+}
+
 int
 main()
 {
@@ -614,5 +645,5 @@ main()
         fhmap_test_entry_api_macros(), fhmap_test_two_sum(),
         fhmap_test_resize(), fhmap_test_resize_macros(),
         fhmap_test_resize_from_null(), fhmap_test_resize_from_null_macros(),
-        fhmap_test_insert_limit());
+        fhmap_test_insert_limit(), fhmap_test_reserve_without_permissions());
 }
