@@ -47,10 +47,13 @@ enum
 #if defined(__x86_64) && defined(__SSE2__) && !defined(CCC_FHM_PORTABLE)
     /** A group of tags that can be loaded into a 128 bit vector. */
     CCC_FHM_GROUP_SIZE = 16,
-#else
+#elif defined(__ARM_NEON__) && !defined(CCC_FHM_PORTABLE)
     /** A group of tags that can be loded into a 64 bit integer. */
     CCC_FHM_GROUP_SIZE = 8,
-#endif /* defined(__x86_64) && defined(__SSE2__) */
+#else  /* PORTABLE FALLBACK */
+    /** A group of tags that can be loded into a 64 bit integer. */
+    CCC_FHM_GROUP_SIZE = 8,
+#endif /* defined(__x86_64) && defined(__SSE2__) && !CCC_FHM_PORTABLE */
 };
 
 /** @private The layout of the map uses only pointers to account for the
