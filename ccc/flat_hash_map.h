@@ -852,7 +852,6 @@ typedef ccc_fhmap_entry fhmap_entry;
 #    define fhm_clear_and_free(args...) ccc_fhm_clear_and_free(args)
 #    define fhm_clear_and_free_reserve(args...)                                \
         ccc_fhm_clear_and_free_reserve(args)
-#    define fhm_next_prime(args...) ccc_fhm_next_prime(args)
 #    define fhm_capacity(args...) ccc_fhm_capacity(args)
 #    define fhm_validate(args...) ccc_fhm_validate(args)
 #endif
