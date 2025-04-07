@@ -42,7 +42,7 @@ fallback of 8 is good for a portable implementation that will use the widest
 word on a platform for group scanning. Right now, this lib targets 64-bit so
 that means uint64_t is widest default integer widely supported. That width
 is still valid on 32-bit but probably very slow due to emulation. */
-enum
+enum : uint8_t
 {
 #if defined(__x86_64) && defined(__SSE2__) && !defined(CCC_FHM_PORTABLE)
     /** A group of tags that can be loaded into a 128 bit vector. */
