@@ -7,7 +7,6 @@ var dir_5d984c6d55e750c7f944f580303daf53 =
     [ "flat_double_ended_queue.h", "flat__double__ended__queue_8h.html", "flat__double__ended__queue_8h" ],
     [ "flat_hash_map.h", "flat__hash__map_8h.html", "flat__hash__map_8h" ],
     [ "flat_priority_queue.h", "flat__priority__queue_8h.html", "flat__priority__queue_8h" ],
-    [ "handle_hash_map.h", "handle__hash__map_8h.html", "handle__hash__map_8h" ],
     [ "handle_ordered_map.h", "handle__ordered__map_8h.html", "handle__ordered__map_8h" ],
     [ "handle_realtime_ordered_map.h", "handle__realtime__ordered__map_8h.html", "handle__realtime__ordered__map_8h" ],
     [ "ordered_map.h", "ordered__map_8h.html", "ordered__map_8h" ],

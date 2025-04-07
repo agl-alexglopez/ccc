@@ -103,12 +103,10 @@ Include dependency graph for flat_hash_map.h:</div>
 <div class="dyncontent">
 <div class="center"><img src="flat__hash__map_8h__incl.png" border="0" usemap="#accc_2flat__hash__map_8h" alt=""/></div>
 <map name="accc_2flat__hash__map_8h" id="accc_2flat__hash__map_8h">
-<area shape="rect" title="The Flat Hash Map Interface." alt="" coords="156,5,311,31"/>
-<area shape="rect" href="impl__flat__hash__map_8h_source.html" title=" " alt="" coords="102,79,253,119"/>
-<area shape="rect" href="types_8h.html" title="The C Container Collection Fundamental Types." alt="" coords="113,313,196,339"/>
-<area shape="rect" href="buffer_8h.html" title="The Buffer Interface." alt="" coords="113,167,196,192"/>
-<area shape="rect" href="impl__types_8h_source.html" title=" " alt="" coords="5,387,144,412"/>
-<area shape="rect" href="impl__buffer_8h_source.html" title=" " alt="" coords="85,240,225,265"/>
+<area shape="rect" title="The Flat Hash Map Interface." alt="" coords="5,5,160,31"/>
+<area shape="rect" href="impl__flat__hash__map_8h_source.html" title=" " alt="" coords="65,79,215,119"/>
+<area shape="rect" href="types_8h.html" title="The C Container Collection Fundamental Types." alt="" coords="20,167,103,192"/>
+<area shape="rect" href="impl__types_8h_source.html" title=" " alt="" coords="31,240,169,265"/>
 </map>
 </div>
 </div><div class="textblock"><div class="dynheader">
@@ -125,63 +123,60 @@ This graph shows which files directly or indirectly include this file:</div>
 <p><a href="flat__hash__map_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Initialization Interface</h2></td></tr>
-<tr><td class="ititle" colspan="2"><p>Initialize the container with memory, callbacks, and permissions. </p>
+<tr><td class="ititle" colspan="2"><p>Initialize the container with memory, callbacks, and permissions. When a fixed size map is required that will not have allocation permission, a few extra steps are required (see ccc_fhm_declare_fixed_map). </p>
 </td></tr>
-<tr class="memitem:a1b4c379aff04eb239f15349f58d17b50"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a1b4c379aff04eb239f15349f58d17b50">ccc_fhm_init</a>(memory_ptr,  fhash_elem_field,  key_field,  hash_fn,  key_eq_fn,  alloc_fn,  aux_data,  capacity)</td></tr>
-<tr class="memdesc:a1b4c379aff04eb239f15349f58d17b50"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a map with a buffer of types at compile time or runtime.  <br /></td></tr>
-<tr class="separator:a1b4c379aff04eb239f15349f58d17b50"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a31f30782a976a516df763110c667aed5"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a31f30782a976a516df763110c667aed5">ccc_fhm_declare_fixed_map</a>(fixed_map_type_name,  key_val_type_name,  capacity)</td></tr>
+<tr class="memdesc:a31f30782a976a516df763110c667aed5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Declare a fixed size map type for use in the stack, heap, or data segment. Does not return a value.  <br /></td></tr>
+<tr class="separator:a31f30782a976a516df763110c667aed5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae33caa2a02f7dee60e61c146296db357"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#ae33caa2a02f7dee60e61c146296db357">ccc_fhm_fixed_capacity</a>(fixed_map_type_name)&#160;&#160;&#160;    ccc_impl_fhm_fixed_capacity(fixed_map_type_name)</td></tr>
+<tr class="memdesc:ae33caa2a02f7dee60e61c146296db357"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain the capacity previously chosen for the fixed size map type.  <br /></td></tr>
+<tr class="separator:ae33caa2a02f7dee60e61c146296db357"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a08de2e49817c4bad48fe1f29710c70f3"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a08de2e49817c4bad48fe1f29710c70f3">ccc_fhm_init</a>(data_ptr,  tag_ptr,  key_field,  hash_fn,  key_eq_fn,  alloc_fn,  aux_data,  capacity)</td></tr>
+<tr class="memdesc:a08de2e49817c4bad48fe1f29710c70f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a map with a buffer of types at compile time or runtime.  <br /></td></tr>
+<tr class="separator:a08de2e49817c4bad48fe1f29710c70f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7940f9fa1e22af3e8090fca1d5ae4767"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a7940f9fa1e22af3e8090fca1d5ae4767">ccc_fhm_copy</a> (<a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> *dst, <a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> const *src, <a class="el" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a> *fn)</td></tr>
 <tr class="memdesc:a7940f9fa1e22af3e8090fca1d5ae4767"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy the map at source to destination.  <br /></td></tr>
 <tr class="separator:a7940f9fa1e22af3e8090fca1d5ae4767"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8ac631a6d12567a69f8efc29c8b57e98"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a8ac631a6d12567a69f8efc29c8b57e98">ccc_fhm_reserve</a> (<a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> *h, size_t to_add, <a class="el" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a> *fn)</td></tr>
+<tr class="memdesc:a8ac631a6d12567a69f8efc29c8b57e98"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reserve space required to add a specified number of elements to the map. If the current capacity is sufficient, do nothing.  <br /></td></tr>
+<tr class="separator:a8ac631a6d12567a69f8efc29c8b57e98"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Entry Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Obtain and operate on container entries for efficient queries when non-trivial control flow is needed. </p>
 </td></tr>
-<tr class="memitem:a3ad1a238be1f75616a8b6bc26b729236"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a3ad1a238be1f75616a8b6bc26b729236">ccc_fhm_swap_entry_r</a>(flat_hash_map_ptr,  out_handle_ptr)</td></tr>
-<tr class="memdesc:a3ad1a238be1f75616a8b6bc26b729236"><td class="mdescLeft">&#160;</td><td class="mdescRight">Invariantly inserts the key value wrapping out_handle_ptr.  <br /></td></tr>
-<tr class="separator:a3ad1a238be1f75616a8b6bc26b729236"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab3e7d1da422626b8f3624fb50e461331"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#ab3e7d1da422626b8f3624fb50e461331">ccc_fhm_remove_r</a>(flat_hash_map_ptr,  out_handle_ptr)</td></tr>
-<tr class="memdesc:ab3e7d1da422626b8f3624fb50e461331"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes the key value in the map storing the old value, if present, in the struct containing out_handle_ptr provided by the user.  <br /></td></tr>
-<tr class="separator:ab3e7d1da422626b8f3624fb50e461331"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6b3df14a3340eb4eed0a2611152605ae"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a6b3df14a3340eb4eed0a2611152605ae">ccc_fhm_try_insert_r</a>(flat_hash_map_ptr,  key_val_handle_ptr)</td></tr>
-<tr class="memdesc:a6b3df14a3340eb4eed0a2611152605ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Attempts to insert the key value wrapping key_val_handle_ptr.  <br /></td></tr>
-<tr class="separator:a6b3df14a3340eb4eed0a2611152605ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab3a078263d05afaac040fd318dda51ae"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#ab3a078263d05afaac040fd318dda51ae">ccc_fhm_try_insert_w</a>(flat_hash_map_ptr,  key,  lazy_value...)</td></tr>
-<tr class="memdesc:ab3a078263d05afaac040fd318dda51ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">lazily insert lazy_value into the map at key if key is absent.  <br /></td></tr>
-<tr class="separator:ab3a078263d05afaac040fd318dda51ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a70aa536cda96d4572e3d9d4e12fee0e3"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a70aa536cda96d4572e3d9d4e12fee0e3">ccc_fhm_insert_or_assign_r</a>(flat_hash_map_ptr,  key_val_handle_ptr)</td></tr>
-<tr class="memdesc:a70aa536cda96d4572e3d9d4e12fee0e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Invariantly inserts or overwrites a user struct into the table.  <br /></td></tr>
-<tr class="separator:a70aa536cda96d4572e3d9d4e12fee0e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2499a64637dc03b73ecf141ac29e7da5"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a2499a64637dc03b73ecf141ac29e7da5">ccc_fhm_insert_or_assign_w</a>(flat_hash_map_ptr,  key,  lazy_value...)</td></tr>
-<tr class="memdesc:a2499a64637dc03b73ecf141ac29e7da5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inserts a new key value pair or overwrites the existing entry.  <br /></td></tr>
-<tr class="separator:a2499a64637dc03b73ecf141ac29e7da5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a90450f8ab0e3ed9356a35ec8d74b7b5e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a90450f8ab0e3ed9356a35ec8d74b7b5e">ccc_fhm_entry_r</a>(flat_hash_map_ptr,  key_ptr)</td></tr>
-<tr class="memdesc:a90450f8ab0e3ed9356a35ec8d74b7b5e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtains an entry for the provided key in the table for future use.  <br /></td></tr>
-<tr class="separator:a90450f8ab0e3ed9356a35ec8d74b7b5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4a6693a6c7d797a7552deb4d7e7ae172"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a4a6693a6c7d797a7552deb4d7e7ae172">ccc_fhm_and_modify_w</a>(flat_hash_map_entry_ptr,  type_name,  closure_over_T...)</td></tr>
-<tr class="memdesc:a4a6693a6c7d797a7552deb4d7e7ae172"><td class="mdescLeft">&#160;</td><td class="mdescRight">Modify an Occupied entry with a closure over user type T.  <br /></td></tr>
-<tr class="separator:a4a6693a6c7d797a7552deb4d7e7ae172"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a147ceaca531b1d1a6980d77ae4cbf816"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a147ceaca531b1d1a6980d77ae4cbf816">ccc_fhm_or_insert_w</a>(flat_hash_map_entry_ptr,  lazy_key_value...)&#160;&#160;&#160;    ccc_impl_fhm_or_insert_w(flat_hash_map_entry_ptr, lazy_key_value)</td></tr>
-<tr class="memdesc:a147ceaca531b1d1a6980d77ae4cbf816"><td class="mdescLeft">&#160;</td><td class="mdescRight">lazily insert the desired key value into the entry if it is Vacant.  <br /></td></tr>
-<tr class="separator:a147ceaca531b1d1a6980d77ae4cbf816"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a726c7b51ef2288a25cc9fc8e6d75bd22"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a726c7b51ef2288a25cc9fc8e6d75bd22">ccc_fhm_insert_entry_w</a>(flat_hash_map_entry_ptr,  lazy_key_value...)&#160;&#160;&#160;    ccc_impl_fhm_insert_entry_w(flat_hash_map_entry_ptr, lazy_key_value)</td></tr>
-<tr class="memdesc:a726c7b51ef2288a25cc9fc8e6d75bd22"><td class="mdescLeft">&#160;</td><td class="mdescRight">write the contents of the compound literal lazy_key_value to a slot.  <br /></td></tr>
-<tr class="separator:a726c7b51ef2288a25cc9fc8e6d75bd22"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adb6b5779ecab7401ee0656c01a97696c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#adb6b5779ecab7401ee0656c01a97696c">ccc_fhm_remove_entry_r</a>(flat_hash_map_entry_ptr)</td></tr>
-<tr class="memdesc:adb6b5779ecab7401ee0656c01a97696c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove the entry from the table if Occupied.  <br /></td></tr>
-<tr class="separator:adb6b5779ecab7401ee0656c01a97696c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6b8f34e075c8b8eea763a80da974b77a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a70feefd55fafc84e06d2f2a1dfd4f389">ccc_entry</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a6b8f34e075c8b8eea763a80da974b77a">ccc_fhm_swap_entry</a> (<a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> *h, <a class="el" href="flat__hash__map_8h.html#ada2d334ae54ac456f5ff1a37ac546994">ccc_fhmap_elem</a> *out_handle)</td></tr>
-<tr class="memdesc:a6b8f34e075c8b8eea763a80da974b77a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Invariantly inserts the key value wrapping out_handle.  <br /></td></tr>
-<tr class="separator:a6b8f34e075c8b8eea763a80da974b77a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afb4c561620549320c6fd340626e7bb1a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a70feefd55fafc84e06d2f2a1dfd4f389">ccc_entry</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#afb4c561620549320c6fd340626e7bb1a">ccc_fhm_remove</a> (<a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> *h, <a class="el" href="flat__hash__map_8h.html#ada2d334ae54ac456f5ff1a37ac546994">ccc_fhmap_elem</a> *out_handle)</td></tr>
-<tr class="memdesc:afb4c561620549320c6fd340626e7bb1a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes the key value in the map storing the old value, if present, in the struct containing out_handle provided by the user.  <br /></td></tr>
-<tr class="separator:afb4c561620549320c6fd340626e7bb1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aba9e915d0b006d759c55689c27731829"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a70feefd55fafc84e06d2f2a1dfd4f389">ccc_entry</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#aba9e915d0b006d759c55689c27731829">ccc_fhm_try_insert</a> (<a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> *h, <a class="el" href="flat__hash__map_8h.html#ada2d334ae54ac456f5ff1a37ac546994">ccc_fhmap_elem</a> *key_val_handle)</td></tr>
-<tr class="memdesc:aba9e915d0b006d759c55689c27731829"><td class="mdescLeft">&#160;</td><td class="mdescRight">Attempts to insert the key value wrapping key_val_handle.  <br /></td></tr>
-<tr class="separator:aba9e915d0b006d759c55689c27731829"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0dab2b6552aec50fb359413d2731f621"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a70feefd55fafc84e06d2f2a1dfd4f389">ccc_entry</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a0dab2b6552aec50fb359413d2731f621">ccc_fhm_insert_or_assign</a> (<a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> *h, <a class="el" href="flat__hash__map_8h.html#ada2d334ae54ac456f5ff1a37ac546994">ccc_fhmap_elem</a> *key_val_handle)</td></tr>
-<tr class="memdesc:a0dab2b6552aec50fb359413d2731f621"><td class="mdescLeft">&#160;</td><td class="mdescRight">Invariantly inserts or overwrites a user struct into the table.  <br /></td></tr>
-<tr class="separator:a0dab2b6552aec50fb359413d2731f621"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5cdbe2b603f03ce0fd7a8a6c9f557758"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a5cdbe2b603f03ce0fd7a8a6c9f557758">ccc_fhm_entry_r</a>(map_ptr,  key_ptr)</td></tr>
+<tr class="memdesc:a5cdbe2b603f03ce0fd7a8a6c9f557758"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtains an entry for the provided key in the table for future use.  <br /></td></tr>
+<tr class="separator:a5cdbe2b603f03ce0fd7a8a6c9f557758"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a51cbf766c7721ae14fb1ef2a3268edbb"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a51cbf766c7721ae14fb1ef2a3268edbb">ccc_fhm_and_modify_w</a>(map_entry_ptr,  type_name,  closure_over_T...)</td></tr>
+<tr class="memdesc:a51cbf766c7721ae14fb1ef2a3268edbb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Modify an Occupied entry with a closure over user type T.  <br /></td></tr>
+<tr class="separator:a51cbf766c7721ae14fb1ef2a3268edbb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4647510a990216b9e9a3b14e4cc02652"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a4647510a990216b9e9a3b14e4cc02652">ccc_fhm_or_insert_w</a>(map_entry_ptr,  lazy_key_value...)&#160;&#160;&#160;    ccc_impl_fhm_or_insert_w(map_entry_ptr, lazy_key_value)</td></tr>
+<tr class="memdesc:a4647510a990216b9e9a3b14e4cc02652"><td class="mdescLeft">&#160;</td><td class="mdescRight">lazily insert the desired key value into the entry if it is Vacant.  <br /></td></tr>
+<tr class="separator:a4647510a990216b9e9a3b14e4cc02652"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4ad9b4a9cfd17e9a8df198342d175cbf"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a4ad9b4a9cfd17e9a8df198342d175cbf">ccc_fhm_insert_entry_w</a>(map_entry_ptr,  lazy_key_value...)&#160;&#160;&#160;    ccc_impl_fhm_insert_entry_w(map_entry_ptr, lazy_key_value)</td></tr>
+<tr class="memdesc:a4ad9b4a9cfd17e9a8df198342d175cbf"><td class="mdescLeft">&#160;</td><td class="mdescRight">write the contents of the compound literal lazy_key_value to a slot.  <br /></td></tr>
+<tr class="separator:a4ad9b4a9cfd17e9a8df198342d175cbf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a619b7e7755c39964ee4e3fc15ae61d21"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a619b7e7755c39964ee4e3fc15ae61d21">ccc_fhm_swap_entry_r</a>(map_ptr,  key_val_type_ptr)</td></tr>
+<tr class="memdesc:a619b7e7755c39964ee4e3fc15ae61d21"><td class="mdescLeft">&#160;</td><td class="mdescRight">Invariantly inserts the key value wrapping out_handle.  <br /></td></tr>
+<tr class="separator:a619b7e7755c39964ee4e3fc15ae61d21"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a49b898c221f491d9a8633148085ba7ae"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a49b898c221f491d9a8633148085ba7ae">ccc_fhm_remove_entry_r</a>(map_entry_ptr)</td></tr>
+<tr class="memdesc:a49b898c221f491d9a8633148085ba7ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove the entry from the table if Occupied.  <br /></td></tr>
+<tr class="separator:a49b898c221f491d9a8633148085ba7ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af04cea8d3d94673202de769ee16da533"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#af04cea8d3d94673202de769ee16da533">ccc_fhm_try_insert_r</a>(map_ptr,  key_val_type_ptr)</td></tr>
+<tr class="memdesc:af04cea8d3d94673202de769ee16da533"><td class="mdescLeft">&#160;</td><td class="mdescRight">Attempts to insert the key value wrapping key_val_handle_ptr.  <br /></td></tr>
+<tr class="separator:af04cea8d3d94673202de769ee16da533"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8714dfccbe2f3413724deb5f938e1c23"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a8714dfccbe2f3413724deb5f938e1c23">ccc_fhm_try_insert_w</a>(map_ptr,  key,  lazy_value...)</td></tr>
+<tr class="memdesc:a8714dfccbe2f3413724deb5f938e1c23"><td class="mdescLeft">&#160;</td><td class="mdescRight">lazily insert lazy_value into the map at key if key is absent.  <br /></td></tr>
+<tr class="separator:a8714dfccbe2f3413724deb5f938e1c23"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a05d22e5d6720e5b2d9fcce0a42b4c734"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a05d22e5d6720e5b2d9fcce0a42b4c734">ccc_fhm_insert_or_assign_r</a>(map_ptr,  key_val_type_ptr)</td></tr>
+<tr class="memdesc:a05d22e5d6720e5b2d9fcce0a42b4c734"><td class="mdescLeft">&#160;</td><td class="mdescRight">Invariantly inserts or overwrites a user struct into the table.  <br /></td></tr>
+<tr class="separator:a05d22e5d6720e5b2d9fcce0a42b4c734"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6b5e96366ad64fc4ec6f76649b3a9715"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a6b5e96366ad64fc4ec6f76649b3a9715">ccc_fhm_insert_or_assign_w</a>(map_ptr,  key,  lazy_value...)</td></tr>
+<tr class="memdesc:a6b5e96366ad64fc4ec6f76649b3a9715"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inserts a new key value pair or overwrites the existing entry.  <br /></td></tr>
+<tr class="separator:a6b5e96366ad64fc4ec6f76649b3a9715"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aea3e3964aa050571d0064fb269995ca5"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#aea3e3964aa050571d0064fb269995ca5">ccc_fhm_remove_r</a>(map_ptr,  key_val_type_output_ptr)</td></tr>
+<tr class="memdesc:aea3e3964aa050571d0064fb269995ca5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes the key value in the map storing the old value, if present, in the struct containing out_handle_ptr provided by the user.  <br /></td></tr>
+<tr class="separator:aea3e3964aa050571d0064fb269995ca5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ada83753a5e8c45b3daa127a6f70eb96f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="flat__hash__map_8h.html#aefcfb8e4e21401e417bac1f3921606b4">ccc_fhmap_entry</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#ada83753a5e8c45b3daa127a6f70eb96f">ccc_fhm_entry</a> (<a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> *h, void const *key)</td></tr>
 <tr class="memdesc:ada83753a5e8c45b3daa127a6f70eb96f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtains an entry for the provided key in the table for future use.  <br /></td></tr>
 <tr class="separator:ada83753a5e8c45b3daa127a6f70eb96f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -191,15 +186,27 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memitem:a11c4ff86dbe2615a650b0009a78b6d7c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="flat__hash__map_8h.html#aefcfb8e4e21401e417bac1f3921606b4">ccc_fhmap_entry</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a11c4ff86dbe2615a650b0009a78b6d7c">ccc_fhm_and_modify_aux</a> (<a class="el" href="flat__hash__map_8h.html#aefcfb8e4e21401e417bac1f3921606b4">ccc_fhmap_entry</a> *e, <a class="el" href="types_8h.html#a15cf33ea819ae97e1cfdcaf1d55a99b0">ccc_update_fn</a> *fn, void *aux)</td></tr>
 <tr class="memdesc:a11c4ff86dbe2615a650b0009a78b6d7c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Modifies the provided entry if it is Occupied.  <br /></td></tr>
 <tr class="separator:a11c4ff86dbe2615a650b0009a78b6d7c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:addb1d8f91be637277d263d5befa476a5"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#addb1d8f91be637277d263d5befa476a5">ccc_fhm_or_insert</a> (<a class="el" href="flat__hash__map_8h.html#aefcfb8e4e21401e417bac1f3921606b4">ccc_fhmap_entry</a> const *e, <a class="el" href="flat__hash__map_8h.html#ada2d334ae54ac456f5ff1a37ac546994">ccc_fhmap_elem</a> *elem)</td></tr>
-<tr class="memdesc:addb1d8f91be637277d263d5befa476a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inserts the struct with handle elem if the entry is Vacant.  <br /></td></tr>
-<tr class="separator:addb1d8f91be637277d263d5befa476a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a516fb468afdcff82caade184337560ee"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a516fb468afdcff82caade184337560ee">ccc_fhm_insert_entry</a> (<a class="el" href="flat__hash__map_8h.html#aefcfb8e4e21401e417bac1f3921606b4">ccc_fhmap_entry</a> const *e, <a class="el" href="flat__hash__map_8h.html#ada2d334ae54ac456f5ff1a37ac546994">ccc_fhmap_elem</a> *elem)</td></tr>
-<tr class="memdesc:a516fb468afdcff82caade184337560ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inserts the provided entry invariantly.  <br /></td></tr>
-<tr class="separator:a516fb468afdcff82caade184337560ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a64a3168a267b6114453738b29d52d981"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a64a3168a267b6114453738b29d52d981">ccc_fhm_or_insert</a> (<a class="el" href="flat__hash__map_8h.html#aefcfb8e4e21401e417bac1f3921606b4">ccc_fhmap_entry</a> const *e, void const *key_val_type)</td></tr>
+<tr class="memdesc:a64a3168a267b6114453738b29d52d981"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inserts the struct with handle elem if the entry is Vacant.  <br /></td></tr>
+<tr class="separator:a64a3168a267b6114453738b29d52d981"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad4583f0caa12ef973b650722ebd66e45"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#ad4583f0caa12ef973b650722ebd66e45">ccc_fhm_insert_entry</a> (<a class="el" href="flat__hash__map_8h.html#aefcfb8e4e21401e417bac1f3921606b4">ccc_fhmap_entry</a> const *e, void const *key_val_type)</td></tr>
+<tr class="memdesc:ad4583f0caa12ef973b650722ebd66e45"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inserts the provided entry invariantly.  <br /></td></tr>
+<tr class="separator:ad4583f0caa12ef973b650722ebd66e45"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7f6d8911df876e3b223caf32e06010ee"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a70feefd55fafc84e06d2f2a1dfd4f389">ccc_entry</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a7f6d8911df876e3b223caf32e06010ee">ccc_fhm_swap_entry</a> (<a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> *h, void *key_val_type_output)</td></tr>
+<tr class="memdesc:a7f6d8911df876e3b223caf32e06010ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Invariantly inserts the key value wrapping out_handle.  <br /></td></tr>
+<tr class="separator:a7f6d8911df876e3b223caf32e06010ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad8c4a0948272d97ceb1d8219388aedeb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a70feefd55fafc84e06d2f2a1dfd4f389">ccc_entry</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#ad8c4a0948272d97ceb1d8219388aedeb">ccc_fhm_remove_entry</a> (<a class="el" href="flat__hash__map_8h.html#aefcfb8e4e21401e417bac1f3921606b4">ccc_fhmap_entry</a> const *e)</td></tr>
 <tr class="memdesc:ad8c4a0948272d97ceb1d8219388aedeb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove the entry from the table if Occupied.  <br /></td></tr>
 <tr class="separator:ad8c4a0948272d97ceb1d8219388aedeb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0a5d27e1eaacb178cf3fc66d21d4927c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a70feefd55fafc84e06d2f2a1dfd4f389">ccc_entry</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a0a5d27e1eaacb178cf3fc66d21d4927c">ccc_fhm_try_insert</a> (<a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> *h, void *key_val_type)</td></tr>
+<tr class="memdesc:a0a5d27e1eaacb178cf3fc66d21d4927c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Attempts to insert the key value wrapping key_val_handle.  <br /></td></tr>
+<tr class="separator:a0a5d27e1eaacb178cf3fc66d21d4927c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a66d6426664c1aa9836add9708a9b137e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a70feefd55fafc84e06d2f2a1dfd4f389">ccc_entry</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a66d6426664c1aa9836add9708a9b137e">ccc_fhm_insert_or_assign</a> (<a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> *h, void *key_val_type)</td></tr>
+<tr class="memdesc:a66d6426664c1aa9836add9708a9b137e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Invariantly inserts or overwrites a user struct into the table.  <br /></td></tr>
+<tr class="separator:a66d6426664c1aa9836add9708a9b137e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a97bc88c9b82285486418f7e56c8a7511"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a70feefd55fafc84e06d2f2a1dfd4f389">ccc_entry</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a97bc88c9b82285486418f7e56c8a7511">ccc_fhm_remove</a> (<a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> *h, void *key_val_type_output)</td></tr>
+<tr class="memdesc:a97bc88c9b82285486418f7e56c8a7511"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes the key value in the map storing the old value, if present, in the struct containing out_handle provided by the user.  <br /></td></tr>
+<tr class="separator:a97bc88c9b82285486418f7e56c8a7511"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae6ddbf73bfeed2721c35d7a374edf7c1"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#ae6ddbf73bfeed2721c35d7a374edf7c1">ccc_fhm_unwrap</a> (<a class="el" href="flat__hash__map_8h.html#aefcfb8e4e21401e417bac1f3921606b4">ccc_fhmap_entry</a> const *e)</td></tr>
 <tr class="memdesc:ae6ddbf73bfeed2721c35d7a374edf7c1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unwraps the provided entry to obtain a view into the table element.  <br /></td></tr>
 <tr class="separator:ae6ddbf73bfeed2721c35d7a374edf7c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -219,9 +226,6 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memitem:af8251d1f96c8a10e8ff2b20d7f117447"><td class="memItemLeft" align="right" valign="top">typedef struct ccc_fhmap_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a></td></tr>
 <tr class="memdesc:af8251d1f96c8a10e8ff2b20d7f117447"><td class="mdescLeft">&#160;</td><td class="mdescRight">A container for storing key-value structures defined by the user in a contiguous buffer.  <br /></td></tr>
 <tr class="separator:af8251d1f96c8a10e8ff2b20d7f117447"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ada2d334ae54ac456f5ff1a37ac546994"><td class="memItemLeft" align="right" valign="top">typedef struct ccc_fhmap_elem_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#ada2d334ae54ac456f5ff1a37ac546994">ccc_fhmap_elem</a></td></tr>
-<tr class="memdesc:ada2d334ae54ac456f5ff1a37ac546994"><td class="mdescLeft">&#160;</td><td class="mdescRight">An intrusive element for a user provided type.  <br /></td></tr>
-<tr class="separator:ada2d334ae54ac456f5ff1a37ac546994"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aefcfb8e4e21401e417bac1f3921606b4"><td class="memItemLeft" align="right" valign="top">typedef union ccc_fhmap_entry_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#aefcfb8e4e21401e417bac1f3921606b4">ccc_fhmap_entry</a></td></tr>
 <tr class="memdesc:aefcfb8e4e21401e417bac1f3921606b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">A container specific entry used to implement the Entry Interface.  <br /></td></tr>
 <tr class="separator:aefcfb8e4e21401e417bac1f3921606b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -229,12 +233,12 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Membership Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Test membership or obtain references to stored user types directly. </p>
 </td></tr>
-<tr class="memitem:af4d4a31e1026b908a446f3c8d6dbbac0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#af4d4a31e1026b908a446f3c8d6dbbac0">ccc_fhm_contains</a> (<a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> *h, void const *key)</td></tr>
-<tr class="memdesc:af4d4a31e1026b908a446f3c8d6dbbac0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Searches the table for the presence of key.  <br /></td></tr>
-<tr class="separator:af4d4a31e1026b908a446f3c8d6dbbac0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaabf7c72514d440050daea0103552091"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#aaabf7c72514d440050daea0103552091">ccc_fhm_get_key_val</a> (<a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> *h, void const *key)</td></tr>
-<tr class="memdesc:aaabf7c72514d440050daea0103552091"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a reference into the table at entry key.  <br /></td></tr>
-<tr class="separator:aaabf7c72514d440050daea0103552091"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a45270f0e8566ee4969bacdc697fb4934"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a45270f0e8566ee4969bacdc697fb4934">ccc_fhm_contains</a> (<a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> const *h, void const *key)</td></tr>
+<tr class="memdesc:a45270f0e8566ee4969bacdc697fb4934"><td class="mdescLeft">&#160;</td><td class="mdescRight">Searches the table for the presence of key.  <br /></td></tr>
+<tr class="separator:a45270f0e8566ee4969bacdc697fb4934"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3c1cdb79878b34eb949975cf83798855"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a3c1cdb79878b34eb949975cf83798855">ccc_fhm_get_key_val</a> (<a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> const *h, void const *key)</td></tr>
+<tr class="memdesc:a3c1cdb79878b34eb949975cf83798855"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a reference into the table at entry key.  <br /></td></tr>
+<tr class="separator:a3c1cdb79878b34eb949975cf83798855"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Deallocation Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Destroy the container. </p>
@@ -245,6 +249,9 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memitem:a400afaaa4b1e374dd1eb01bd1f9428f5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a400afaaa4b1e374dd1eb01bd1f9428f5">ccc_fhm_clear_and_free</a> (<a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> *h, <a class="el" href="types_8h.html#aa2bb6262f220473dc47f4c73711a6ec5">ccc_destructor_fn</a> *fn)</td></tr>
 <tr class="memdesc:a400afaaa4b1e374dd1eb01bd1f9428f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Frees all slots in the table and frees the underlying buffer.  <br /></td></tr>
 <tr class="separator:a400afaaa4b1e374dd1eb01bd1f9428f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af39867d2a85dd66937154803aaa105cc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#af39867d2a85dd66937154803aaa105cc">ccc_fhm_clear_and_free_reserve</a> (<a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> *h, <a class="el" href="types_8h.html#aa2bb6262f220473dc47f4c73711a6ec5">ccc_destructor_fn</a> *destructor, <a class="el" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a> *alloc)</td></tr>
+<tr class="memdesc:af39867d2a85dd66937154803aaa105cc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Frees all slots in the table and frees the underlying buffer that was previously dynamically reserved with the reserve function.  <br /></td></tr>
+<tr class="separator:af39867d2a85dd66937154803aaa105cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Iterator Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Obtain and manage iterators over the container. </p>
@@ -252,9 +259,9 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memitem:a1d465160018013e982cc536fd61b81da"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a1d465160018013e982cc536fd61b81da">ccc_fhm_begin</a> (<a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> const *h)</td></tr>
 <tr class="memdesc:a1d465160018013e982cc536fd61b81da"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtains a pointer to the first element in the table.  <br /></td></tr>
 <tr class="separator:a1d465160018013e982cc536fd61b81da"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a038d5068338777b40b6f5993ec5c9297"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a038d5068338777b40b6f5993ec5c9297">ccc_fhm_next</a> (<a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> const *h, <a class="el" href="flat__hash__map_8h.html#ada2d334ae54ac456f5ff1a37ac546994">ccc_fhmap_elem</a> const *iter)</td></tr>
-<tr class="memdesc:a038d5068338777b40b6f5993ec5c9297"><td class="mdescLeft">&#160;</td><td class="mdescRight">Advances the iterator to the next occupied table slot.  <br /></td></tr>
-<tr class="separator:a038d5068338777b40b6f5993ec5c9297"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4e8c08b0ed13c7edc79f4736d4d5511b"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a4e8c08b0ed13c7edc79f4736d4d5511b">ccc_fhm_next</a> (<a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> const *h, void const *key_val_type_iter)</td></tr>
+<tr class="memdesc:a4e8c08b0ed13c7edc79f4736d4d5511b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Advances the iterator to the next occupied table slot.  <br /></td></tr>
+<tr class="separator:a4e8c08b0ed13c7edc79f4736d4d5511b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aded7d796d07299df27793836cb566b81"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#aded7d796d07299df27793836cb566b81">ccc_fhm_end</a> (<a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> const *h)</td></tr>
 <tr class="memdesc:aded7d796d07299df27793836cb566b81"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check the current iterator against the end for loop termination.  <br /></td></tr>
 <tr class="separator:aded7d796d07299df27793836cb566b81"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -268,9 +275,6 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memitem:a7e48bf928c47a2a974d5ca7e98e51aad"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a7e48bf928c47a2a974d5ca7e98e51aad">ccc_fhm_size</a> (<a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> const *h)</td></tr>
 <tr class="memdesc:a7e48bf928c47a2a974d5ca7e98e51aad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size of the table representing active slots.  <br /></td></tr>
 <tr class="separator:a7e48bf928c47a2a974d5ca7e98e51aad"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a14204213a0f8812e7f8fd602200f422a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a14204213a0f8812e7f8fd602200f422a">ccc_fhm_next_prime</a> (size_t n)</td></tr>
-<tr class="memdesc:a14204213a0f8812e7f8fd602200f422a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Helper to find a prime number if needed.  <br /></td></tr>
-<tr class="separator:a14204213a0f8812e7f8fd602200f422a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac09ee8b33c9f3e2d98d010185557e070"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#ac09ee8b33c9f3e2d98d010185557e070">ccc_fhm_capacity</a> (<a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> const *h)</td></tr>
 <tr class="memdesc:ac09ee8b33c9f3e2d98d010185557e070"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the full capacity of the backing storage.  <br /></td></tr>
 <tr class="separator:ac09ee8b33c9f3e2d98d010185557e070"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -283,14 +287,14 @@ This graph shows which files directly or indirectly include this file:</div>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The Flat Hash Map Interface. </p>
-<p>A Flat Hash Map stores elements by hash value and allows the user to retrieve them by key in amortized O(1). Elements in the table may be copied and moved so no pointer stability is available in this implementation. If pointer stability is needed, store and hash pointers to those elements in this table.</p>
-<p>A flat hash map requires the user to provide a struct with known key and flat hash element fields as well as a hash function and key comparator function. The hash function should be well tailored to the key being stored in the table to prevent collisions. Currently, the flat hash map does not offer any default hash functions or hash strengthening algorithms so strong hash functions should be obtained by the user for the data set.</p>
+<p>A Flat Hash Map stores elements by hash value and allows the user to retrieve them by key in amortized O(1). Elements in the table may be copied and moved, especially when rehashing occurs, so no pointer stability is available in this implementation.</p>
+<p>A flat hash map requires the user to provide a type, pointers to positions in a contiguous array, a hash function, and a key comparator function. The hash function should be well tailored to the key being stored in the table to prevent collisions. Good variety in the upper bits of the hashed value will also result in faster performance. Currently, the flat hash map does not offer any default hash functions or hash strengthening algorithms so strong hash functions should be obtained by the user for the data set.</p>
 <p>To shorten names in the interface, define the following preprocessor directive at the top of your file.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_HASH_MAP_USING_NAMESPACE_CCC</span></div>
 </div><!-- fragment --><p>All types and functions can then be written without the <code>ccc_</code> prefix. </p>
 </div><h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="a4a6693a6c7d797a7552deb4d7e7ae172" name="a4a6693a6c7d797a7552deb4d7e7ae172"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4a6693a6c7d797a7552deb4d7e7ae172">&#9670;&#160;</a></span>ccc_fhm_and_modify_w</h2>
+<a id="a51cbf766c7721ae14fb1ef2a3268edbb" name="a51cbf766c7721ae14fb1ef2a3268edbb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a51cbf766c7721ae14fb1ef2a3268edbb">&#9670;&#160;</a></span>ccc_fhm_and_modify_w</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -299,7 +303,7 @@ This graph shows which files directly or indirectly include this file:</div>
           <td class="memname">#define ccc_fhm_and_modify_w</td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">flat_hash_map_entry_ptr, </td>
+          <td class="paramname">map_entry_ptr, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -322,15 +326,14 @@ This graph shows which files directly or indirectly include this file:</div>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">    &amp;(<a class="code hl_typedef" href="flat__hash__map_8h.html#aefcfb8e4e21401e417bac1f3921606b4">ccc_fhmap_entry</a>)                                                         \</div>
 <div class="line">    {                                                                          \</div>
-<div class="line">        ccc_impl_fhm_and_modify_w(flat_hash_map_entry_ptr, type_name,          \</div>
-<div class="line">                                  closure_over_T)                              \</div>
+<div class="line">        ccc_impl_fhm_and_modify_w(map_entry_ptr, type_name, closure_over_T)    \</div>
 <div class="line">    }</div>
-<div class="ttc" id="aflat__hash__map_8h_html_aefcfb8e4e21401e417bac1f3921606b4"><div class="ttname"><a href="flat__hash__map_8h.html#aefcfb8e4e21401e417bac1f3921606b4">ccc_fhmap_entry</a></div><div class="ttdeci">union ccc_fhmap_entry_ ccc_fhmap_entry</div><div class="ttdoc">A container specific entry used to implement the Entry Interface.</div><div class="ttdef"><b>Definition:</b> flat_hash_map.h:55</div></div>
+<div class="ttc" id="aflat__hash__map_8h_html_aefcfb8e4e21401e417bac1f3921606b4"><div class="ttname"><a href="flat__hash__map_8h.html#aefcfb8e4e21401e417bac1f3921606b4">ccc_fhmap_entry</a></div><div class="ttdeci">union ccc_fhmap_entry_ ccc_fhmap_entry</div><div class="ttdoc">A container specific entry used to implement the Entry Interface.</div><div class="ttdef"><b>Definition:</b> flat_hash_map.h:65</div></div>
 </div><!-- fragment -->
 <p>Modify an Occupied entry with a closure over user type T. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">flat_hash_map_entry_ptr</td><td>a pointer to the obtained entry. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">map_entry_ptr</td><td>a pointer to the obtained entry. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">type_name</td><td>the name of the user type stored in the container. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">closure_over_T</td><td>the code to be run on the reference to user type T, if Occupied. This may be a semicolon separated list of statements to execute on T or a section of code wrapped in braces {code here} which may be preferred for formatting. </td></tr>
   </table>
@@ -350,8 +353,86 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="a90450f8ab0e3ed9356a35ec8d74b7b5e" name="a90450f8ab0e3ed9356a35ec8d74b7b5e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a90450f8ab0e3ed9356a35ec8d74b7b5e">&#9670;&#160;</a></span>ccc_fhm_entry_r</h2>
+<a id="a31f30782a976a516df763110c667aed5" name="a31f30782a976a516df763110c667aed5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a31f30782a976a516df763110c667aed5">&#9670;&#160;</a></span>ccc_fhm_declare_fixed_map</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define ccc_fhm_declare_fixed_map</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">fixed_map_type_name, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">key_val_type_name, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">capacity&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    ccc_impl_fhm_declare_fixed_map(fixed_map_type_name, key_val_type_name,     \</div>
+<div class="line">                                   capacity)</div>
+</div><!-- fragment -->
+<p>Declare a fixed size map type for use in the stack, heap, or data segment. Does not return a value. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">fixed_map_type_name</td><td>the user chosen name of the fixed sized map. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">key_val_type_name</td><td>the type the user plans to store in the map. It may have a key and value field as well as any additional fields. For set-like behavior, wrap a field in a struct/union (e.g. <code>union int_elem {int e;};</code>). </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">capacity</td><td>the power of two capacity for the map. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section warning"><dt>Warning</dt><dd>the capacity must be a power of two greater than 8 or 16, depending on the platform (e.g. 16, 32, 64, etc.).</dd></dl>
+<p>Once the type has been declared, two fields will be available, .data and .tag. Once the location for the fixed size map is chosen&ndash;stack, heap, or data segment&ndash;provide those two fields to the initializer for a flat hash map as follows:</p>
+<div class="fragment"><div class="line"><span class="keyword">struct </span>val</div>
+<div class="line">{</div>
+<div class="line">    <span class="keywordtype">int</span> key;</div>
+<div class="line">    <span class="keywordtype">int</span> val;</div>
+<div class="line">};</div>
+<div class="line"><a class="code hl_define" href="flat__hash__map_8h.html#a31f30782a976a516df763110c667aed5">ccc_fhm_declare_fixed_map</a>(small_fixed_map, <span class="keyword">struct</span> val, 64);</div>
+<div class="line"><span class="keyword">static</span> small_fixed_map mem;</div>
+<div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> static_fh</div>
+<div class="line">    = fhm_init(mem.data, mem.tag, key, fhmap_int_to_u64, fhmap_id_eq, NULL,</div>
+<div class="line">               NULL, <a class="code hl_define" href="flat__hash__map_8h.html#ae33caa2a02f7dee60e61c146296db357">ccc_fhm_fixed_capacity</a>(small_fixed_map));</div>
+<div class="ttc" id="aflat__hash__map_8h_html_a31f30782a976a516df763110c667aed5"><div class="ttname"><a href="flat__hash__map_8h.html#a31f30782a976a516df763110c667aed5">ccc_fhm_declare_fixed_map</a></div><div class="ttdeci">#define ccc_fhm_declare_fixed_map(fixed_map_type_name, key_val_type_name, capacity)</div><div class="ttdoc">Declare a fixed size map type for use in the stack, heap, or data segment. Does not return a value.</div><div class="ttdef"><b>Definition:</b> flat_hash_map.h:129</div></div>
+<div class="ttc" id="aflat__hash__map_8h_html_ae33caa2a02f7dee60e61c146296db357"><div class="ttname"><a href="flat__hash__map_8h.html#ae33caa2a02f7dee60e61c146296db357">ccc_fhm_fixed_capacity</a></div><div class="ttdeci">#define ccc_fhm_fixed_capacity(fixed_map_type_name)</div><div class="ttdoc">Obtain the capacity previously chosen for the fixed size map type.</div><div class="ttdef"><b>Definition:</b> flat_hash_map.h:138</div></div>
+<div class="ttc" id="aflat__hash__map_8h_html_af8251d1f96c8a10e8ff2b20d7f117447"><div class="ttname"><a href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a></div><div class="ttdeci">struct ccc_fhmap_ ccc_flat_hash_map</div><div class="ttdoc">A container for storing key-value structures defined by the user in a contiguous buffer.</div><div class="ttdef"><b>Definition:</b> flat_hash_map.h:59</div></div>
+</div><!-- fragment --><p>Similarly, a fixed size map can be used on the stack.</p>
+<div class="fragment"><div class="line"><span class="keyword">struct </span>val</div>
+<div class="line">{</div>
+<div class="line">    <span class="keywordtype">int</span> key;</div>
+<div class="line">    <span class="keywordtype">int</span> val;</div>
+<div class="line">};</div>
+<div class="line"><a class="code hl_define" href="flat__hash__map_8h.html#a31f30782a976a516df763110c667aed5">ccc_fhm_declare_fixed_map</a>(small_fixed_map, <span class="keyword">struct</span> val, 64);</div>
+<div class="line"><span class="keywordtype">int</span> main(<span class="keywordtype">void</span>)</div>
+<div class="line">{</div>
+<div class="line">    small_fixed_map mem;</div>
+<div class="line">    <a class="code hl_typedef" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> stack_fh</div>
+<div class="line">        = fhm_init(mem.data, mem.tag, key, fhmap_int_to_u64, fhmap_id_eq, NULL,</div>
+<div class="line">                   NULL, <a class="code hl_define" href="flat__hash__map_8h.html#ae33caa2a02f7dee60e61c146296db357">ccc_fhm_fixed_capacity</a>(small_fixed_map));</div>
+<div class="line">    <span class="keywordflow">return</span> 0;</div>
+<div class="line">}</div>
+</div><!-- fragment --><p>The ccc_fhm_fixed_capacity macro can be used to obtain the previously provided capacity when declaring the fixed map type. Finally, one could allocate a fixed size map on the heap; however, it is usually better to initialize a dynamic map and use the ccc_fhm_reserve function for such a use case.</p>
+<p>This macro is not needed when a dynamic resizing flat hash map is needed. For dynamic maps see the ccc_fhm_init macro. </p>
+
+</div>
+</div>
+<a id="a5cdbe2b603f03ce0fd7a8a6c9f557758" name="a5cdbe2b603f03ce0fd7a8a6c9f557758"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5cdbe2b603f03ce0fd7a8a6c9f557758">&#9670;&#160;</a></span>ccc_fhm_entry_r</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -360,7 +441,7 @@ This graph shows which files directly or indirectly include this file:</div>
           <td class="memname">#define ccc_fhm_entry_r</td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">flat_hash_map_ptr, </td>
+          <td class="paramname">map_ptr, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -377,13 +458,13 @@ This graph shows which files directly or indirectly include this file:</div>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">    &amp;(<a class="code hl_typedef" href="flat__hash__map_8h.html#aefcfb8e4e21401e417bac1f3921606b4">ccc_fhmap_entry</a>)                                                         \</div>
 <div class="line">    {                                                                          \</div>
-<div class="line">        ccc_fhm_entry((flat_hash_map_ptr), (key_ptr)).impl_                    \</div>
+<div class="line">        ccc_fhm_entry(map_ptr, key_ptr).impl_                                  \</div>
 <div class="line">    }</div>
 </div><!-- fragment -->
 <p>Obtains an entry for the provided key in the table for future use. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">flat_hash_map_ptr</td><td>the hash table to be searched. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">map_ptr</td><td>the hash table to be searched. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">key_ptr</td><td>the key used to search the table matching the stored key type. </td></tr>
   </table>
   </dd>
@@ -395,8 +476,35 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="a1b4c379aff04eb239f15349f58d17b50" name="a1b4c379aff04eb239f15349f58d17b50"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1b4c379aff04eb239f15349f58d17b50">&#9670;&#160;</a></span>ccc_fhm_init</h2>
+<a id="ae33caa2a02f7dee60e61c146296db357" name="ae33caa2a02f7dee60e61c146296db357"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae33caa2a02f7dee60e61c146296db357">&#9670;&#160;</a></span>ccc_fhm_fixed_capacity</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define ccc_fhm_fixed_capacity</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">fixed_map_type_name</td><td>)</td>
+          <td>&#160;&#160;&#160;    ccc_impl_fhm_fixed_capacity(fixed_map_type_name)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Obtain the capacity previously chosen for the fixed size map type. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">fixed_map_type_name</td><td>the name of a previously declared map. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the size_t capacity. This is the full capacity without any load factor restrictions. </dd></dl>
+
+</div>
+</div>
+<a id="a08de2e49817c4bad48fe1f29710c70f3" name="a08de2e49817c4bad48fe1f29710c70f3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a08de2e49817c4bad48fe1f29710c70f3">&#9670;&#160;</a></span>ccc_fhm_init</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -405,13 +513,13 @@ This graph shows which files directly or indirectly include this file:</div>
           <td class="memname">#define ccc_fhm_init</td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">memory_ptr, </td>
+          <td class="paramname">data_ptr, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">fhash_elem_field, </td>
+          <td class="paramname">tag_ptr, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -456,49 +564,53 @@ This graph shows which files directly or indirectly include this file:</div>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    ccc_impl_fhm_init(memory_ptr, fhash_elem_field, key_field, hash_fn,        \</div>
-<div class="line">                      key_eq_fn, alloc_fn, aux_data, capacity)</div>
+<b>Value:</b><div class="fragment"><div class="line">    ccc_impl_fhm_init(data_ptr, tag_ptr, key_field, hash_fn, key_eq_fn,        \</div>
+<div class="line">                      alloc_fn, aux_data, capacity)</div>
 </div><!-- fragment -->
 <p>Initialize a map with a buffer of types at compile time or runtime. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">memory_ptr</td><td>the pointer to the backing buffer array of user types. May be NULL if the user provides a allocation function. The buffer will be interpreted in units of type size that the user intends to store. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">fhash_elem_field</td><td>the name of the fhmap_elem field. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">data_ptr</td><td>a pointer to the .data of user type T field of a fixed map or (T *)NULL. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">tag_ptr</td><td>a pointer to the .tag field of a fixed map or NULL. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">key_field</td><td>the field of the struct used for key storage. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">hash_fn</td><td>the ccc_hash_fn function the user desires for the table. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">key_eq_fn</td><td>the ccc_key_eq_fn the user intends to use. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">alloc_fn</td><td>the allocation function for resizing or NULL if no resizing is allowed. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">aux_data</td><td>auxiliary data that is needed for hashing or comparison. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">capacity</td><td>the starting capacity of the provided buffer or 0. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">capacity</td><td>the capacity of a fixed size map or 0. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the flat hash map directly initialized on the right hand side of the equality operator (i.e. ccc_flat_hash_map fh = <a class="el" href="flat__hash__map_8h.html#a1b4c379aff04eb239f15349f58d17b50" title="Initialize a map with a buffer of types at compile time or runtime.">ccc_fhm_init(...)</a>;) </dd></dl>
-<dl class="section warning"><dt>Warning</dt><dd>if initializing with a fixed size table choose a prime number for the table capacity for improved performance.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the flat hash map directly initialized on the right hand side of the equality operator (i.e. ccc_flat_hash_map fh = <a class="el" href="flat__hash__map_8h.html#a08de2e49817c4bad48fe1f29710c70f3" title="Initialize a map with a buffer of types at compile time or runtime.">ccc_fhm_init(...)</a>;) </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>if a dynamic resizing map is required provide two NULL pointers with the data pointer casted to the type stored in the table.</dd></dl>
 <p>Initialize a static fixed size hash map at compile time that has no allocation permission or auxiliary data needed.</p>
 <div class="fragment"><div class="line"><span class="keyword">struct </span>val</div>
 <div class="line">{</div>
-<div class="line">    <a class="code hl_typedef" href="flat__hash__map_8h.html#ada2d334ae54ac456f5ff1a37ac546994">ccc_fhmap_elem</a> e;</div>
 <div class="line">    <span class="keywordtype">int</span> key;</div>
 <div class="line">    <span class="keywordtype">int</span> val;</div>
 <div class="line">};</div>
-<div class="line"> </div>
+<div class="line"><a class="code hl_define" href="flat__hash__map_8h.html#a31f30782a976a516df763110c667aed5">ccc_fhm_declare_fixed_map</a>(small_fixed_map, <span class="keyword">struct</span> val, 64);</div>
+<div class="line"><span class="keyword">static</span> small_fixed_map mem;</div>
 <div class="line"><span class="comment">// Hash and equality functions are defined by the user.</span></div>
-<div class="line"><span class="keyword">static</span> flat_hash_map map</div>
-<div class="line">    = fhm_init((<span class="keyword">static</span> <span class="keyword">struct</span> val[2999]){}, e, key, fhmap_int_to_u64,</div>
-<div class="line">               fhmap_id_eq, NULL, NULL, 2999);</div>
-<div class="ttc" id="aflat__hash__map_8h_html_ada2d334ae54ac456f5ff1a37ac546994"><div class="ttname"><a href="flat__hash__map_8h.html#ada2d334ae54ac456f5ff1a37ac546994">ccc_fhmap_elem</a></div><div class="ttdeci">struct ccc_fhmap_elem_ ccc_fhmap_elem</div><div class="ttdoc">An intrusive element for a user provided type.</div><div class="ttdef"><b>Definition:</b> flat_hash_map.h:49</div></div>
+<div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> static_fh</div>
+<div class="line">    = fhm_init(mem.data, mem.tag, key, fhmap_int_to_u64, fhmap_id_eq, NULL,</div>
+<div class="line">               NULL, <a class="code hl_define" href="flat__hash__map_8h.html#ae33caa2a02f7dee60e61c146296db357">ccc_fhm_fixed_capacity</a>(small_fixed_map));</div>
 </div><!-- fragment --><p>Initialize a dynamic hash table at compile time with allocation permission and no auxiliary data. Use the same type as the previous example.</p>
-<div class="fragment"><div class="line"><span class="comment">// Hash, equality, and allocation functions are defined by the user.</span></div>
-<div class="line"><span class="keyword">static</span> flat_hash_map map</div>
-<div class="line">    = fhm_init((<span class="keyword">struct</span> val *)NULL, e, key, fhmap_int_to_u64,</div>
-<div class="line">               fhmap_id_eq, std_alloc, NULL, 0);</div>
+<div class="fragment"><div class="line"><span class="keyword">struct </span>val</div>
+<div class="line">{</div>
+<div class="line">    <span class="keywordtype">int</span> key;</div>
+<div class="line">    <span class="keywordtype">int</span> val;</div>
+<div class="line">};</div>
+<div class="line"><span class="comment">// Hash, equality, and allocation functions are defined by the user.</span></div>
+<div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> static_fh</div>
+<div class="line">    = fhm_init((<span class="keyword">struct</span> val *)NULL, NULL, key, fhmap_int_to_u64, fhmap_id_eq,</div>
+<div class="line">               std_alloc, NULL, 0);</div>
 </div><!-- fragment --><p>Initialization at runtime is also possible. Stack-based or dynamic maps are identical to the provided examples, except without the <code>static</code> keyword in a runtime context. </p>
 
 </div>
 </div>
-<a id="a726c7b51ef2288a25cc9fc8e6d75bd22" name="a726c7b51ef2288a25cc9fc8e6d75bd22"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a726c7b51ef2288a25cc9fc8e6d75bd22">&#9670;&#160;</a></span>ccc_fhm_insert_entry_w</h2>
+<a id="a4ad9b4a9cfd17e9a8df198342d175cbf" name="a4ad9b4a9cfd17e9a8df198342d175cbf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4ad9b4a9cfd17e9a8df198342d175cbf">&#9670;&#160;</a></span>ccc_fhm_insert_entry_w</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -507,7 +619,7 @@ This graph shows which files directly or indirectly include this file:</div>
           <td class="memname">#define ccc_fhm_insert_entry_w</td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">flat_hash_map_entry_ptr, </td>
+          <td class="paramname">map_entry_ptr, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -518,7 +630,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td>&#160;&#160;&#160;    ccc_impl_fhm_insert_entry_w(flat_hash_map_entry_ptr, lazy_key_value)</td>
+          <td></td><td>&#160;&#160;&#160;    ccc_impl_fhm_insert_entry_w(map_entry_ptr, lazy_key_value)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -526,7 +638,7 @@ This graph shows which files directly or indirectly include this file:</div>
 <p>write the contents of the compound literal lazy_key_value to a slot. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">flat_hash_map_entry_ptr</td><td>a pointer to the obtained entry. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">map_entry_ptr</td><td>a pointer to the obtained entry. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">lazy_key_value</td><td>the compound literal to write to a new slot. </td></tr>
   </table>
   </dd>
@@ -535,8 +647,8 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="a70aa536cda96d4572e3d9d4e12fee0e3" name="a70aa536cda96d4572e3d9d4e12fee0e3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a70aa536cda96d4572e3d9d4e12fee0e3">&#9670;&#160;</a></span>ccc_fhm_insert_or_assign_r</h2>
+<a id="a05d22e5d6720e5b2d9fcce0a42b4c734" name="a05d22e5d6720e5b2d9fcce0a42b4c734"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a05d22e5d6720e5b2d9fcce0a42b4c734">&#9670;&#160;</a></span>ccc_fhm_insert_or_assign_r</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -545,13 +657,13 @@ This graph shows which files directly or indirectly include this file:</div>
           <td class="memname">#define ccc_fhm_insert_or_assign_r</td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">flat_hash_map_ptr, </td>
+          <td class="paramname">map_ptr, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">key_val_handle_ptr&#160;</td>
+          <td class="paramname">key_val_type_ptr&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -562,15 +674,15 @@ This graph shows which files directly or indirectly include this file:</div>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">    &amp;(<a class="code hl_define" href="traits_8h.html#aa6dc7577080398fd18623d2c6a464723">ccc_entry</a>)                                                               \</div>
 <div class="line">    {                                                                          \</div>
-<div class="line">        ccc_fhm_insert_or_assign((flat_hash_map_ptr), (key_val_handle)).impl_  \</div>
+<div class="line">        ccc_fhm_insert_or_assign(map_ptr, key_val_type_ptr).impl_              \</div>
 <div class="line">    }</div>
-<div class="ttc" id="atraits_8h_html_aa6dc7577080398fd18623d2c6a464723"><div class="ttname"><a href="traits_8h.html#aa6dc7577080398fd18623d2c6a464723">ccc_entry</a></div><div class="ttdeci">#define ccc_entry(container_ptr, key_ptr...)</div><div class="ttdoc">Obtain a container specific entry for the Entry Interface.</div><div class="ttdef"><b>Definition:</b> traits.h:126</div></div>
+<div class="ttc" id="atraits_8h_html_aa6dc7577080398fd18623d2c6a464723"><div class="ttname"><a href="traits_8h.html#aa6dc7577080398fd18623d2c6a464723">ccc_entry</a></div><div class="ttdeci">#define ccc_entry(container_ptr, key_ptr...)</div><div class="ttdoc">Obtain a container specific entry for the Entry Interface.</div><div class="ttdef"><b>Definition:</b> traits.h:141</div></div>
 </div><!-- fragment -->
 <p>Invariantly inserts or overwrites a user struct into the table. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">flat_hash_map_ptr</td><td>a pointer to the flat hash map. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">key_val_handle_ptr</td><td>the handle to the wrapping user struct key value. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">map_ptr</td><td>a pointer to the flat hash map. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">key_val_type_ptr</td><td>the complete key and value type to be inserted. </td></tr>
   </table>
   </dd>
 </dl>
@@ -579,8 +691,8 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="a2499a64637dc03b73ecf141ac29e7da5" name="a2499a64637dc03b73ecf141ac29e7da5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2499a64637dc03b73ecf141ac29e7da5">&#9670;&#160;</a></span>ccc_fhm_insert_or_assign_w</h2>
+<a id="a6b5e96366ad64fc4ec6f76649b3a9715" name="a6b5e96366ad64fc4ec6f76649b3a9715"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6b5e96366ad64fc4ec6f76649b3a9715">&#9670;&#160;</a></span>ccc_fhm_insert_or_assign_w</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -589,7 +701,7 @@ This graph shows which files directly or indirectly include this file:</div>
           <td class="memname">#define ccc_fhm_insert_or_assign_w</td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">flat_hash_map_ptr, </td>
+          <td class="paramname">map_ptr, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -612,15 +724,15 @@ This graph shows which files directly or indirectly include this file:</div>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">    &amp;(<a class="code hl_define" href="traits_8h.html#aa6dc7577080398fd18623d2c6a464723">ccc_entry</a>)                                                               \</div>
 <div class="line">    {                                                                          \</div>
-<div class="line">        ccc_impl_fhm_insert_or_assign_w(flat_hash_map_ptr, key, lazy_value)    \</div>
+<div class="line">        ccc_impl_fhm_insert_or_assign_w(map_ptr, key, lazy_value)              \</div>
 <div class="line">    }</div>
 </div><!-- fragment -->
 <p>Inserts a new key value pair or overwrites the existing entry. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">flat_hash_map_ptr</td><td>the pointer to the flat hash map. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">map_ptr</td><td>the pointer to the flat hash map. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">key</td><td>the key to be searched in the table. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">lazy_value</td><td>the compound literal to insert or use for overwrite. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">lazy_value</td><td>the compound literal specifying the value. </td></tr>
   </table>
   </dd>
 </dl>
@@ -629,8 +741,8 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="a147ceaca531b1d1a6980d77ae4cbf816" name="a147ceaca531b1d1a6980d77ae4cbf816"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a147ceaca531b1d1a6980d77ae4cbf816">&#9670;&#160;</a></span>ccc_fhm_or_insert_w</h2>
+<a id="a4647510a990216b9e9a3b14e4cc02652" name="a4647510a990216b9e9a3b14e4cc02652"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4647510a990216b9e9a3b14e4cc02652">&#9670;&#160;</a></span>ccc_fhm_or_insert_w</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -639,7 +751,7 @@ This graph shows which files directly or indirectly include this file:</div>
           <td class="memname">#define ccc_fhm_or_insert_w</td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">flat_hash_map_entry_ptr, </td>
+          <td class="paramname">map_entry_ptr, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -650,7 +762,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td>&#160;&#160;&#160;    ccc_impl_fhm_or_insert_w(flat_hash_map_entry_ptr, lazy_key_value)</td>
+          <td></td><td>&#160;&#160;&#160;    ccc_impl_fhm_or_insert_w(map_entry_ptr, lazy_key_value)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -658,7 +770,7 @@ This graph shows which files directly or indirectly include this file:</div>
 <p>lazily insert the desired key value into the entry if it is Vacant. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">flat_hash_map_entry_ptr</td><td>a pointer to the obtained entry. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">map_entry_ptr</td><td>a pointer to the obtained entry. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">lazy_key_value</td><td>the compound literal to construct in place if the entry is Vacant. </td></tr>
   </table>
   </dd>
@@ -668,8 +780,8 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="adb6b5779ecab7401ee0656c01a97696c" name="adb6b5779ecab7401ee0656c01a97696c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adb6b5779ecab7401ee0656c01a97696c">&#9670;&#160;</a></span>ccc_fhm_remove_entry_r</h2>
+<a id="a49b898c221f491d9a8633148085ba7ae" name="a49b898c221f491d9a8633148085ba7ae"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a49b898c221f491d9a8633148085ba7ae">&#9670;&#160;</a></span>ccc_fhm_remove_entry_r</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -678,29 +790,29 @@ This graph shows which files directly or indirectly include this file:</div>
           <td class="memname">#define ccc_fhm_remove_entry_r</td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">flat_hash_map_entry_ptr</td><td>)</td>
+          <td class="paramname">map_entry_ptr</td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">    &amp;(<a class="code hl_define" href="traits_8h.html#aa6dc7577080398fd18623d2c6a464723">ccc_entry</a>)                                                               \</div>
 <div class="line">    {                                                                          \</div>
-<div class="line">        ccc_fhm_remove_entry((flat_hash_map_entry_ptr)).impl_                  \</div>
+<div class="line">        ccc_fhm_remove_entry(map_entry_ptr).impl_                              \</div>
 <div class="line">    }</div>
 </div><!-- fragment -->
 <p>Remove the entry from the table if Occupied. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">flat_hash_map_entry_ptr</td><td>a pointer to the table entry. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">map_entry_ptr</td><td>a pointer to the table entry. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>an entry containing NULL. If Occupied an entry in the table existed and was removed. If Vacant, no prior entry existed to be removed. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>a compound liter to an entry containing NULL. If Occupied an entry in the table existed and was removed. If Vacant, no prior entry existed to be removed. </dd></dl>
 
 </div>
 </div>
-<a id="ab3e7d1da422626b8f3624fb50e461331" name="ab3e7d1da422626b8f3624fb50e461331"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab3e7d1da422626b8f3624fb50e461331">&#9670;&#160;</a></span>ccc_fhm_remove_r</h2>
+<a id="aea3e3964aa050571d0064fb269995ca5" name="aea3e3964aa050571d0064fb269995ca5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aea3e3964aa050571d0064fb269995ca5">&#9670;&#160;</a></span>ccc_fhm_remove_r</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -709,13 +821,13 @@ This graph shows which files directly or indirectly include this file:</div>
           <td class="memname">#define ccc_fhm_remove_r</td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">flat_hash_map_ptr, </td>
+          <td class="paramname">map_ptr, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">out_handle_ptr&#160;</td>
+          <td class="paramname">key_val_type_output_ptr&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -726,24 +838,24 @@ This graph shows which files directly or indirectly include this file:</div>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">    &amp;(<a class="code hl_define" href="traits_8h.html#aa6dc7577080398fd18623d2c6a464723">ccc_entry</a>)                                                               \</div>
 <div class="line">    {                                                                          \</div>
-<div class="line">        ccc_fhm_remove((flat_hash_map_ptr), (out_handle_ptr)).impl_            \</div>
+<div class="line">        ccc_fhm_remove(map_ptr, key_val_type_output_ptr).impl_                 \</div>
 <div class="line">    }</div>
 </div><!-- fragment -->
 <p>Removes the key value in the map storing the old value, if present, in the struct containing out_handle_ptr provided by the user. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">flat_hash_map_ptr</td><td>the pointer to the flat hash map. </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">out_handle_ptr</td><td>the handle to the user type wrapping fhash elem. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">map_ptr</td><td>the pointer to the flat hash map. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">key_val_type_output_ptr</td><td>the complete key and value type to be removed </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>a compound literal reference to the removed entry. If Occupied it may be unwrapped to obtain the old key value pair. If Vacant the key value pair was not stored in the map. If bad input is provided an input error is set.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>a compound literal reference to the removed entry. If Occupied it may be unwrapped to obtain the old key value pair. If Vacant the key value pair was not stored in the map. If bad input is provided an input error is set. If a previously stored value is returned it is safe to keep and modify this reference because the data has been written to the provided space.</dd></dl>
 <p>Note that this function may write to the struct containing the second parameter and wraps it in an entry to provide information about the old value. </p>
 
 </div>
 </div>
-<a id="a3ad1a238be1f75616a8b6bc26b729236" name="a3ad1a238be1f75616a8b6bc26b729236"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3ad1a238be1f75616a8b6bc26b729236">&#9670;&#160;</a></span>ccc_fhm_swap_entry_r</h2>
+<a id="a619b7e7755c39964ee4e3fc15ae61d21" name="a619b7e7755c39964ee4e3fc15ae61d21"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a619b7e7755c39964ee4e3fc15ae61d21">&#9670;&#160;</a></span>ccc_fhm_swap_entry_r</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -752,13 +864,13 @@ This graph shows which files directly or indirectly include this file:</div>
           <td class="memname">#define ccc_fhm_swap_entry_r</td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">flat_hash_map_ptr, </td>
+          <td class="paramname">map_ptr, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">out_handle_ptr&#160;</td>
+          <td class="paramname">key_val_type_ptr&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -769,24 +881,24 @@ This graph shows which files directly or indirectly include this file:</div>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">    &amp;(<a class="code hl_define" href="traits_8h.html#aa6dc7577080398fd18623d2c6a464723">ccc_entry</a>)                                                               \</div>
 <div class="line">    {                                                                          \</div>
-<div class="line">        ccc_fhm_swap_entry((flat_hash_map_ptr), (out_handle_ptr)).impl_        \</div>
+<div class="line">        ccc_fhm_swap_entry(map_ptr, key_val_type_ptr).impl_                    \</div>
 <div class="line">    }</div>
 </div><!-- fragment -->
-<p>Invariantly inserts the key value wrapping out_handle_ptr. </p>
+<p>Invariantly inserts the key value wrapping out_handle. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">flat_hash_map_ptr</td><td>the pointer to the flat hash map. </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">out_handle_ptr</td><td>the handle to the user type wrapping fhash elem. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">map_ptr</td><td>the pointer to the flat hash map. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">key_val_type_ptr</td><td>the complete key and value type to be inserted. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>a compound literal reference to the entry. If Vacant, no prior element with key existed and the type wrapping out_handle_ptr remains unchanged. If Occupied the old value is written to the type wrapping out_handle_ptr and may be unwrapped to view. If more space is needed but allocation fails or has been forbidden, an insert error is set.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>a compound literal reference to an entry. If Vacant, no prior element with key existed and entry may be unwrapped to view the new insertion in the table. If Occupied the old value is written to key_val_type_output and may be unwrapped to view. If more space is needed but allocation fails or has been forbidden, an insert error is set.</dd></dl>
 <p>Note that this function may write to the struct containing the second parameter and wraps it in an entry to provide information about the old value. </p>
 
 </div>
 </div>
-<a id="a6b3df14a3340eb4eed0a2611152605ae" name="a6b3df14a3340eb4eed0a2611152605ae"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6b3df14a3340eb4eed0a2611152605ae">&#9670;&#160;</a></span>ccc_fhm_try_insert_r</h2>
+<a id="af04cea8d3d94673202de769ee16da533" name="af04cea8d3d94673202de769ee16da533"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af04cea8d3d94673202de769ee16da533">&#9670;&#160;</a></span>ccc_fhm_try_insert_r</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -795,13 +907,13 @@ This graph shows which files directly or indirectly include this file:</div>
           <td class="memname">#define ccc_fhm_try_insert_r</td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">flat_hash_map_ptr, </td>
+          <td class="paramname">map_ptr, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">key_val_handle_ptr&#160;</td>
+          <td class="paramname">key_val_type_ptr&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -812,14 +924,14 @@ This graph shows which files directly or indirectly include this file:</div>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">    &amp;(<a class="code hl_define" href="traits_8h.html#aa6dc7577080398fd18623d2c6a464723">ccc_entry</a>)                                                               \</div>
 <div class="line">    {                                                                          \</div>
-<div class="line">        ccc_fhm_try_insert((flat_hash_map_ptr), (key_val_handle_ptr)).impl_    \</div>
+<div class="line">        ccc_fhm_try_insert(map_ptr, key_val_type_ptr).impl_                    \</div>
 <div class="line">    }</div>
 </div><!-- fragment -->
 <p>Attempts to insert the key value wrapping key_val_handle_ptr. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">flat_hash_map_ptr</td><td>the pointer to the flat hash map. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">key_val_handle_ptr</td><td>the handle to the user type wrapping fhash elem. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">map_ptr</td><td>the pointer to the flat hash map. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">key_val_type_ptr</td><td>the complete key and value type to be inserted. </td></tr>
   </table>
   </dd>
 </dl>
@@ -828,8 +940,8 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="ab3a078263d05afaac040fd318dda51ae" name="ab3a078263d05afaac040fd318dda51ae"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab3a078263d05afaac040fd318dda51ae">&#9670;&#160;</a></span>ccc_fhm_try_insert_w</h2>
+<a id="a8714dfccbe2f3413724deb5f938e1c23" name="a8714dfccbe2f3413724deb5f938e1c23"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8714dfccbe2f3413724deb5f938e1c23">&#9670;&#160;</a></span>ccc_fhm_try_insert_w</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -838,7 +950,7 @@ This graph shows which files directly or indirectly include this file:</div>
           <td class="memname">#define ccc_fhm_try_insert_w</td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">flat_hash_map_ptr, </td>
+          <td class="paramname">map_ptr, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -861,13 +973,13 @@ This graph shows which files directly or indirectly include this file:</div>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">    &amp;(<a class="code hl_define" href="traits_8h.html#aa6dc7577080398fd18623d2c6a464723">ccc_entry</a>)                                                               \</div>
 <div class="line">    {                                                                          \</div>
-<div class="line">        ccc_impl_fhm_try_insert_w(flat_hash_map_ptr, key, lazy_value)          \</div>
+<div class="line">        ccc_impl_fhm_try_insert_w(map_ptr, key, lazy_value)                    \</div>
 <div class="line">    }</div>
 </div><!-- fragment -->
 <p>lazily insert lazy_value into the map at key if key is absent. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">flat_hash_map_ptr</td><td>a pointer to the flat hash map. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">map_ptr</td><td>a pointer to the flat hash map. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">key</td><td>the direct key r-value. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">lazy_value</td><td>the compound literal specifying the value. </td></tr>
   </table>
@@ -880,23 +992,6 @@ This graph shows which files directly or indirectly include this file:</div>
 </div>
 </div>
 <h2 class="groupheader">Typedef Documentation</h2>
-<a id="ada2d334ae54ac456f5ff1a37ac546994" name="ada2d334ae54ac456f5ff1a37ac546994"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ada2d334ae54ac456f5ff1a37ac546994">&#9670;&#160;</a></span>ccc_fhmap_elem</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef struct ccc_fhmap_elem_ <a class="el" href="flat__hash__map_8h.html#ada2d334ae54ac456f5ff1a37ac546994">ccc_fhmap_elem</a></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>An intrusive element for a user provided type. </p>
-<p>Because the hash map is flat, data is always copied from the provided type into the table. </p>
-
-</div>
-</div>
 <a id="aefcfb8e4e21401e417bac1f3921606b4" name="aefcfb8e4e21401e417bac1f3921606b4"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aefcfb8e4e21401e417bac1f3921606b4">&#9670;&#160;</a></span>ccc_fhmap_entry</h2>
 
@@ -1149,8 +1244,56 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="af4d4a31e1026b908a446f3c8d6dbbac0" name="af4d4a31e1026b908a446f3c8d6dbbac0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af4d4a31e1026b908a446f3c8d6dbbac0">&#9670;&#160;</a></span>ccc_fhm_contains()</h2>
+<a id="af39867d2a85dd66937154803aaa105cc" name="af39867d2a85dd66937154803aaa105cc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af39867d2a85dd66937154803aaa105cc">&#9670;&#160;</a></span>ccc_fhm_clear_and_free_reserve()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_fhm_clear_and_free_reserve </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> *&#160;</td>
+          <td class="paramname"><em>h</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#aa2bb6262f220473dc47f4c73711a6ec5">ccc_destructor_fn</a> *&#160;</td>
+          <td class="paramname"><em>destructor</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a> *&#160;</td>
+          <td class="paramname"><em>alloc</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Frees all slots in the table and frees the underlying buffer that was previously dynamically reserved with the reserve function. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">h</td><td>the table to be cleared. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">destructor</td><td>the destructor for each element. NULL can be passed if no maintenance is required on the elements in the table before their slots are forfeit. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">alloc</td><td>the required allocation function to provide to a dynamically reserved map that has no allocation permission. Any auxiliary data provided upon initialization will be passed to the allocation function when called. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the result of free operation. An alloc function must be provided and map must have been denied allocation permission in order to use this function. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>it is an error to call this function on a map with allocation permission. It is also an error to call this function on a map that was not reserved with the provided ccc_alloc_fn. The map must have existing memory to free.</dd></dl>
+<p>This function covers the edge case of reserving a dynamic capacity for a map at runtime but denying the map allocation permission to resize. This can help prevent a map from growing unbounded due to internal decisions about rehashes and resizing. The user in this case knows the map does not have allocation permission and therefore no further memory will be dedicated to the map.</p>
+<p>However, to free the map in such a case this function must be used because the map has no ability to free itself. Just as the allocation function is required to reserve memory so to is it required to free memory. </p>
+
+</div>
+</div>
+<a id="a45270f0e8566ee4969bacdc697fb4934" name="a45270f0e8566ee4969bacdc697fb4934"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a45270f0e8566ee4969bacdc697fb4934">&#9670;&#160;</a></span>ccc_fhm_contains()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1158,7 +1301,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> ccc_fhm_contains </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> const *&#160;</td>
           <td class="paramname"><em>h</em>, </td>
         </tr>
         <tr>
@@ -1235,52 +1378,52 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_HASH_MAP_USING_NAMESPACE_CCC</span></div>
 <div class="line"><span class="keyword">struct </span>val</div>
 <div class="line">{</div>
-<div class="line">    fhmap_elem e;</div>
 <div class="line">    <span class="keywordtype">int</span> key;</div>
 <div class="line">    <span class="keywordtype">int</span> val;</div>
 <div class="line">};</div>
-<div class="line"><span class="keyword">static</span> flat_hash_map src</div>
-<div class="line">    = fhm_init((<span class="keyword">static</span> <span class="keyword">struct</span> val[11]){}, e, key, fhmap_int_to_u64,</div>
-<div class="line">               fhmap_id_eq, NULL, NULL, 11);</div>
-<div class="line">swap_entry_rand_vals(&amp;src);</div>
+<div class="line"><a class="code hl_define" href="flat__hash__map_8h.html#a31f30782a976a516df763110c667aed5">ccc_fhm_declare_fixed_map</a>(small_fixed_map, <span class="keyword">struct</span> val, 64);</div>
+<div class="line"><span class="keyword">static</span> small_fixed_map mem_a;</div>
+<div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> src</div>
+<div class="line">    = fhm_init(mem_a.data, mem_a.tag, key, fhmap_int_to_u64, fhmap_id_eq, NULL,</div>
+<div class="line">               NULL, <a class="code hl_define" href="flat__hash__map_8h.html#ae33caa2a02f7dee60e61c146296db357">ccc_fhm_fixed_capacity</a>(small_fixed_map));</div>
+<div class="line">insert_rand_vals(&amp;src);</div>
+<div class="line"><span class="keyword">static</span> small_fixed_map mem_b;</div>
 <div class="line"><span class="keyword">static</span> flat_hash_map dst</div>
-<div class="line">    = fhm_init((<span class="keyword">static</span> <span class="keyword">struct</span> val[13]){}, e, key, fhmap_int_to_u64,</div>
-<div class="line">               fhmap_id_eq, NULL, NULL, 13);</div>
+<div class="line">    = fhm_init(mem_b.data, mem_b.tag, key, fhmap_int_to_u64, fhmap_id_eq, NULL,</div>
+<div class="line">               NULL, <a class="code hl_define" href="flat__hash__map_8h.html#ae33caa2a02f7dee60e61c146296db357">ccc_fhm_fixed_capacity</a>(small_fixed_map));</div>
 <div class="line"><a class="code hl_enumeration" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> res = fhm_copy(&amp;dst, &amp;src, NULL);</div>
-<div class="ttc" id="atypes_8h_html_a51d6f078a83d667aff5016609d9146ef"><div class="ttname"><a href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a></div><div class="ttdeci">ccc_result</div><div class="ttdoc">A result of actions on containers.</div><div class="ttdef"><b>Definition:</b> types.h:117</div></div>
+<div class="ttc" id="atypes_8h_html_a51d6f078a83d667aff5016609d9146ef"><div class="ttname"><a href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a></div><div class="ttdeci">ccc_result</div><div class="ttdoc">A result of actions on containers.</div><div class="ttdef"><b>Definition:</b> types.h:132</div></div>
 </div><!-- fragment --><p>The above requires dst capacity be greater than or equal to src capacity. Here is memory management handed over to the copy function.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_HASH_MAP_USING_NAMESPACE_CCC</span></div>
 <div class="line"><span class="keyword">struct </span>val</div>
 <div class="line">{</div>
-<div class="line">    fhmap_elem e;</div>
 <div class="line">    <span class="keywordtype">int</span> key;</div>
 <div class="line">    <span class="keywordtype">int</span> val;</div>
 <div class="line">};</div>
-<div class="line"><span class="keyword">static</span> flat_hash_map src</div>
-<div class="line">    = fhm_init((<span class="keyword">struct</span> val*)NULL, e, key, fhmap_int_to_u64, fhmap_id_eq,</div>
-<div class="line">               NULL, NULL, 0);</div>
+<div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> src</div>
+<div class="line">    = fhm_init((<span class="keyword">struct</span> val *)NULL, NULL, key, fhmap_int_to_u64, fhmap_id_eq,</div>
+<div class="line">               std_alloc, NULL, 0);</div>
 <div class="line">insert_rand_vals(&amp;src);</div>
 <div class="line"><span class="keyword">static</span> flat_hash_map dst</div>
-<div class="line">    = fhm_init((<span class="keyword">struct</span> val*)NULL, e, key, fhmap_int_to_u64, fhmap_id_eq,</div>
-<div class="line">               NULL, NULL, 0);</div>
+<div class="line">    = fhm_init((<span class="keyword">struct</span> val *)NULL, NULL, key, fhmap_int_to_u64, fhmap_id_eq,</div>
+<div class="line">               std_alloc, NULL, 0);</div>
 <div class="line"><a class="code hl_enumeration" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> res = fhm_copy(&amp;dst, &amp;src, std_alloc);</div>
 </div><!-- fragment --><p>The above allows dst to have a capacity less than that of the src as long as copy has been provided an allocation function to resize dst. Note that this would still work if copying to a destination that the user wants as a fixed size map.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_HASH_MAP_USING_NAMESPACE_CCC</span></div>
 <div class="line"><span class="keyword">struct </span>val</div>
 <div class="line">{</div>
-<div class="line">    fhmap_elem e;</div>
 <div class="line">    <span class="keywordtype">int</span> key;</div>
 <div class="line">    <span class="keywordtype">int</span> val;</div>
 <div class="line">};</div>
-<div class="line"><span class="keyword">static</span> flat_hash_map src</div>
-<div class="line">    = fhm_init((<span class="keyword">struct</span> val*)NULL, e, key, fhmap_int_to_u64, fhmap_id_eq,</div>
-<div class="line">               NULL, NULL, 0);</div>
+<div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> src</div>
+<div class="line">    = fhm_init((<span class="keyword">struct</span> val *)NULL, NULL, key, fhmap_int_to_u64, fhmap_id_eq,</div>
+<div class="line">               std_alloc, NULL, 0);</div>
 <div class="line">insert_rand_vals(&amp;src);</div>
 <div class="line"><span class="keyword">static</span> flat_hash_map dst</div>
-<div class="line">    = fhm_init((<span class="keyword">struct</span> val*)NULL, e, key, fhmap_int_to_u64, fhmap_id_eq,</div>
+<div class="line">    = fhm_init((<span class="keyword">struct</span> val *)NULL, NULL, key, fhmap_int_to_u64, fhmap_id_eq,</div>
 <div class="line">               NULL, NULL, 0);</div>
 <div class="line"><a class="code hl_enumeration" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> res = fhm_copy(&amp;dst, &amp;src, std_alloc);</div>
-</div><!-- fragment --><p>The above sets up dst with fixed size while src is a dynamic map. Because an allocation function is provided, the dst is resized once for the copy and retains its fixed size after the copy is complete. This would require the user to manually free the underlying buffer at dst eventually if this method is used. Usually it is better to allocate the memory explicitly before the copy if copying between maps without allocation permission.</p>
+</div><!-- fragment --><p>The above sets up dst with fixed size while src is a dynamic map. Because an allocation function is provided, the dst is resized once for the copy and retains its fixed size after the copy is complete. This would require the user to manually free the underlying buffer at dst eventually if this method is used. Usually it is better to allocate the memory with the reserve function if fixed size dynamic maps are required.</p>
 <p>These options allow users to stay consistent across containers with their memory management strategies. </p>
 
 </div>
@@ -1411,8 +1554,8 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="aaabf7c72514d440050daea0103552091" name="aaabf7c72514d440050daea0103552091"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aaabf7c72514d440050daea0103552091">&#9670;&#160;</a></span>ccc_fhm_get_key_val()</h2>
+<a id="a3c1cdb79878b34eb949975cf83798855" name="a3c1cdb79878b34eb949975cf83798855"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3c1cdb79878b34eb949975cf83798855">&#9670;&#160;</a></span>ccc_fhm_get_key_val()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1420,7 +1563,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname">void * ccc_fhm_get_key_val </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> const *&#160;</td>
           <td class="paramname"><em>h</em>, </td>
         </tr>
         <tr>
@@ -1449,8 +1592,8 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="a516fb468afdcff82caade184337560ee" name="a516fb468afdcff82caade184337560ee"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a516fb468afdcff82caade184337560ee">&#9670;&#160;</a></span>ccc_fhm_insert_entry()</h2>
+<a id="ad4583f0caa12ef973b650722ebd66e45" name="ad4583f0caa12ef973b650722ebd66e45"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad4583f0caa12ef973b650722ebd66e45">&#9670;&#160;</a></span>ccc_fhm_insert_entry()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1464,8 +1607,8 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="flat__hash__map_8h.html#ada2d334ae54ac456f5ff1a37ac546994">ccc_fhmap_elem</a> *&#160;</td>
-          <td class="paramname"><em>elem</em>&#160;</td>
+          <td class="paramtype">void const *&#160;</td>
+          <td class="paramname"><em>key_val_type</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1479,7 +1622,7 @@ This graph shows which files directly or indirectly include this file:</div>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">e</td><td>the entry returned from a call obtaining an entry. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">elem</td><td>a handle to the struct the user intends to insert. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">key_val_type</td><td>the complete key and value type to be inserted. </td></tr>
   </table>
   </dd>
 </dl>
@@ -1517,8 +1660,8 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="a0dab2b6552aec50fb359413d2731f621" name="a0dab2b6552aec50fb359413d2731f621"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0dab2b6552aec50fb359413d2731f621">&#9670;&#160;</a></span>ccc_fhm_insert_or_assign()</h2>
+<a id="a66d6426664c1aa9836add9708a9b137e" name="a66d6426664c1aa9836add9708a9b137e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a66d6426664c1aa9836add9708a9b137e">&#9670;&#160;</a></span>ccc_fhm_insert_or_assign()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1532,8 +1675,8 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="flat__hash__map_8h.html#ada2d334ae54ac456f5ff1a37ac546994">ccc_fhmap_elem</a> *&#160;</td>
-          <td class="paramname"><em>key_val_handle</em>&#160;</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>key_val_type</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1547,7 +1690,7 @@ This graph shows which files directly or indirectly include this file:</div>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">h</td><td>a pointer to the flat hash map. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">key_val_handle</td><td>the handle to the wrapping user struct key value. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">key_val_type</td><td>the complete key and value type to be inserted. </td></tr>
   </table>
   </dd>
 </dl>
@@ -1583,8 +1726,8 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="a038d5068338777b40b6f5993ec5c9297" name="a038d5068338777b40b6f5993ec5c9297"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a038d5068338777b40b6f5993ec5c9297">&#9670;&#160;</a></span>ccc_fhm_next()</h2>
+<a id="a4e8c08b0ed13c7edc79f4736d4d5511b" name="a4e8c08b0ed13c7edc79f4736d4d5511b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4e8c08b0ed13c7edc79f4736d4d5511b">&#9670;&#160;</a></span>ccc_fhm_next()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1598,8 +1741,8 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="flat__hash__map_8h.html#ada2d334ae54ac456f5ff1a37ac546994">ccc_fhmap_elem</a> const *&#160;</td>
-          <td class="paramname"><em>iter</em>&#160;</td>
+          <td class="paramtype">void const *&#160;</td>
+          <td class="paramname"><em>key_val_type_iter</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1613,40 +1756,12 @@ This graph shows which files directly or indirectly include this file:</div>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">h</td><td>the table being iterated upon. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">iter</td><td>the previous iterator. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">key_val_type_iter</td><td>the previous iterator. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>a pointer that can be cast directly to the user type that is stored. </dd></dl>
 <dl class="section warning"><dt>Warning</dt><dd>erasing or inserting during iteration may invalidate iterators if resizing occurs which would lead to undefined behavior. O(capacity). </dd></dl>
-
-</div>
-</div>
-<a id="a14204213a0f8812e7f8fd602200f422a" name="a14204213a0f8812e7f8fd602200f422a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a14204213a0f8812e7f8fd602200f422a">&#9670;&#160;</a></span>ccc_fhm_next_prime()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_fhm_next_prime </td>
-          <td>(</td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>n</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Helper to find a prime number if needed. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">n</td><td>the input that may or may not be prime. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>the next larger prime number.</dd></dl>
-<p>It is possible to use this hash table without an allocator by providing the buffer to be used for the underlying storage and preventing allocation. If such a backing store is used it would be best to ensure it is a prime number size to mitigate hash collisions. </p>
 
 </div>
 </div>
@@ -1677,8 +1792,8 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="addb1d8f91be637277d263d5befa476a5" name="addb1d8f91be637277d263d5befa476a5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#addb1d8f91be637277d263d5befa476a5">&#9670;&#160;</a></span>ccc_fhm_or_insert()</h2>
+<a id="a64a3168a267b6114453738b29d52d981" name="a64a3168a267b6114453738b29d52d981"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a64a3168a267b6114453738b29d52d981">&#9670;&#160;</a></span>ccc_fhm_or_insert()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1692,8 +1807,8 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="flat__hash__map_8h.html#ada2d334ae54ac456f5ff1a37ac546994">ccc_fhmap_elem</a> *&#160;</td>
-          <td class="paramname"><em>elem</em>&#160;</td>
+          <td class="paramtype">void const *&#160;</td>
+          <td class="paramname"><em>key_val_type</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1707,7 +1822,7 @@ This graph shows which files directly or indirectly include this file:</div>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">e</td><td>the entry obtained via function or macro call. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">elem</td><td>the handle to the struct to be inserted to a Vacant entry. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">key_val_type</td><td>the complete key and value type to be inserted. </td></tr>
   </table>
   </dd>
 </dl>
@@ -1716,8 +1831,8 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="afb4c561620549320c6fd340626e7bb1a" name="afb4c561620549320c6fd340626e7bb1a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afb4c561620549320c6fd340626e7bb1a">&#9670;&#160;</a></span>ccc_fhm_remove()</h2>
+<a id="a97bc88c9b82285486418f7e56c8a7511" name="a97bc88c9b82285486418f7e56c8a7511"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a97bc88c9b82285486418f7e56c8a7511">&#9670;&#160;</a></span>ccc_fhm_remove()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1731,8 +1846,8 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="flat__hash__map_8h.html#ada2d334ae54ac456f5ff1a37ac546994">ccc_fhmap_elem</a> *&#160;</td>
-          <td class="paramname"><em>out_handle</em>&#160;</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>key_val_type_output</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1746,11 +1861,11 @@ This graph shows which files directly or indirectly include this file:</div>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">h</td><td>the pointer to the flat hash map. </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">out_handle</td><td>the handle to the user type wrapping fhash elem. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">key_val_type_output</td><td>the complete key and value type to be removed </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the removed entry. If Occupied it may be unwrapped to obtain the old key value pair. If Vacant the key value pair was not stored in the map. If bad input is provided an input error is set.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the removed entry. If Occupied it may be unwrapped to obtain the old key value pair. If Vacant the key value pair was not stored in the map. If bad input is provided an input error is set. If a previously stored value is returned it is safe to keep and modify this reference because the data has been written to the provided space.</dd></dl>
 <p>Note that this function may write to the struct containing the second parameter and wraps it in an entry to provide information about the old value. </p>
 
 </div>
@@ -1782,6 +1897,52 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
+<a id="a8ac631a6d12567a69f8efc29c8b57e98" name="a8ac631a6d12567a69f8efc29c8b57e98"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8ac631a6d12567a69f8efc29c8b57e98">&#9670;&#160;</a></span>ccc_fhm_reserve()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_fhm_reserve </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a> *&#160;</td>
+          <td class="paramname"><em>h</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>to_add</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a> *&#160;</td>
+          <td class="paramname"><em>fn</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Reserve space required to add a specified number of elements to the map. If the current capacity is sufficient, do nothing. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">h</td><td>a pointer to the hash map. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">to_add</td><td>the number of elements to add to the map. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">fn</td><td>the required allocation function that can be used for resizing. Such a function is provided to cover the case where the user wants a fixed size map but cannot know the size needed until runtime. In this case, the function needs to be provided to allow the single resizing to occur. Any auxiliary data provided upon initialization will be passed to the allocation function when called. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the result of the reserving operation, OK if successful or an error code to indicate the specific failure.</dd></dl>
+<p>If the map has already been initialized with allocation permission simply provide the same function that was passed upon initialization. </p>
+
+</div>
+</div>
 <a id="a7e48bf928c47a2a974d5ca7e98e51aad" name="a7e48bf928c47a2a974d5ca7e98e51aad"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a7e48bf928c47a2a974d5ca7e98e51aad">&#9670;&#160;</a></span>ccc_fhm_size()</h2>
 
@@ -1809,8 +1970,8 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="a6b8f34e075c8b8eea763a80da974b77a" name="a6b8f34e075c8b8eea763a80da974b77a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6b8f34e075c8b8eea763a80da974b77a">&#9670;&#160;</a></span>ccc_fhm_swap_entry()</h2>
+<a id="a7f6d8911df876e3b223caf32e06010ee" name="a7f6d8911df876e3b223caf32e06010ee"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7f6d8911df876e3b223caf32e06010ee">&#9670;&#160;</a></span>ccc_fhm_swap_entry()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1824,8 +1985,8 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="flat__hash__map_8h.html#ada2d334ae54ac456f5ff1a37ac546994">ccc_fhmap_elem</a> *&#160;</td>
-          <td class="paramname"><em>out_handle</em>&#160;</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>key_val_type_output</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1839,17 +2000,17 @@ This graph shows which files directly or indirectly include this file:</div>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">h</td><td>the pointer to the flat hash map. </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">out_handle</td><td>the handle to the user type wrapping fhash elem. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">key_val_type_output</td><td>the complete key and value type to be inserted. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>an entry. If Vacant, no prior element with key existed and the type wrapping out_handle remains unchanged. If Occupied the old value is written to the type wrapping out_handle and may be unwrapped to view. If more space is needed but allocation fails or has been forbidden, an insert error is set.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>an entry. If Vacant, no prior element with key existed and entry may be unwrapped to view the new insertion in the table. If Occupied the old value is written to key_val_type_output and may be unwrapped to view. If more space is needed but allocation fails or has been forbidden, an insert error is set.</dd></dl>
 <p>Note that this function may write to the struct containing the second parameter and wraps it in an entry to provide information about the old value. </p>
 
 </div>
 </div>
-<a id="aba9e915d0b006d759c55689c27731829" name="aba9e915d0b006d759c55689c27731829"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aba9e915d0b006d759c55689c27731829">&#9670;&#160;</a></span>ccc_fhm_try_insert()</h2>
+<a id="a0a5d27e1eaacb178cf3fc66d21d4927c" name="a0a5d27e1eaacb178cf3fc66d21d4927c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0a5d27e1eaacb178cf3fc66d21d4927c">&#9670;&#160;</a></span>ccc_fhm_try_insert()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1863,8 +2024,8 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="flat__hash__map_8h.html#ada2d334ae54ac456f5ff1a37ac546994">ccc_fhmap_elem</a> *&#160;</td>
-          <td class="paramname"><em>key_val_handle</em>&#160;</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>key_val_type</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1878,7 +2039,7 @@ This graph shows which files directly or indirectly include this file:</div>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">h</td><td>the pointer to the flat hash map. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">key_val_handle</td><td>the handle to the user type wrapping fhash elem. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">key_val_type</td><td>the complete key and value type to be inserted. </td></tr>
   </table>
   </dd>
 </dl>

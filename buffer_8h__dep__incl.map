@@ -1,17 +1,13 @@
 <map id="ccc/buffer.h" name="ccc/buffer.h">
-<area shape="rect" id="node1" title="The Buffer Interface." alt="" coords="480,5,576,31"/>
+<area shape="rect" id="node1" title="The Buffer Interface." alt="" coords="293,5,389,31"/>
 <area shape="rect" id="node2" href="$impl__flat__double__ended__queue_8h_source.html" title=" " alt="" coords="5,79,184,119"/>
-<area shape="rect" id="node4" href="$impl__traits_8h_source.html" title=" " alt="" coords="447,255,609,280"/>
-<area shape="rect" id="node6" href="$impl__flat__hash__map_8h_source.html" title=" " alt="" coords="282,79,419,119"/>
-<area shape="rect" id="node8" href="$impl__flat__priority__queue_8h_source.html" title=" " alt="" coords="459,79,597,119"/>
-<area shape="rect" id="node10" href="$impl__handle__hash__map_8h_source.html" title=" " alt="" coords="625,79,785,119"/>
-<area shape="rect" id="node12" href="$impl__handle__ordered__map_8h_source.html" title=" " alt="" coords="812,79,972,119"/>
-<area shape="rect" id="node14" href="$impl__handle__realtime__ordered__map_8h_source.html" title=" " alt="" coords="997,79,1187,119"/>
+<area shape="rect" id="node4" href="$impl__traits_8h_source.html" title=" " alt="" coords="268,255,431,280"/>
+<area shape="rect" id="node6" href="$impl__flat__priority__queue_8h_source.html" title=" " alt="" coords="273,79,410,119"/>
+<area shape="rect" id="node8" href="$impl__handle__ordered__map_8h_source.html" title=" " alt="" coords="435,79,595,119"/>
+<area shape="rect" id="node10" href="$impl__handle__realtime__ordered__map_8h_source.html" title=" " alt="" coords="619,79,808,119"/>
 <area shape="rect" id="node3" href="$flat__double__ended__queue_8h.html" title="The Flat Double Ended Queue Interface." alt="" coords="14,167,181,207"/>
-<area shape="rect" id="node5" href="$traits_8h.html" title="The C Container Collection Traits Interface." alt="" coords="481,328,575,353"/>
-<area shape="rect" id="node7" href="$flat__hash__map_8h.html" title="The Flat Hash Map Interface." alt="" coords="259,174,413,199"/>
-<area shape="rect" id="node9" href="$flat__priority__queue_8h.html" title="The Flat Priority Queue Interface." alt="" coords="437,174,619,199"/>
-<area shape="rect" id="node11" href="$handle__hash__map_8h.html" title="The Handle Hash Map Interface." alt="" coords="643,174,821,199"/>
-<area shape="rect" id="node13" href="$handle__ordered__map_8h.html" title="The Handle Ordered Map Interface." alt="" coords="845,167,993,207"/>
-<area shape="rect" id="node15" href="$handle__realtime__ordered__map_8h.html" title="The Handle Realtime Ordered Map Interface." alt="" coords="1017,167,1170,207"/>
+<area shape="rect" id="node5" href="$traits_8h.html" title="The C Container Collection Traits Interface." alt="" coords="303,328,396,353"/>
+<area shape="rect" id="node7" href="$flat__priority__queue_8h.html" title="The Flat Priority Queue Interface." alt="" coords="259,174,440,199"/>
+<area shape="rect" id="node9" href="$handle__ordered__map_8h.html" title="The Handle Ordered Map Interface." alt="" coords="465,167,613,207"/>
+<area shape="rect" id="node11" href="$handle__realtime__ordered__map_8h.html" title="The Handle Realtime Ordered Map Interface." alt="" coords="637,167,790,207"/>
 </map>

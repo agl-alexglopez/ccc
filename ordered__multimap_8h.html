@@ -347,7 +347,7 @@ N).  <br /></td></tr>
 <div class="line">        ccc_impl_omm_and_modify_w(ordered_multimap_entry_ptr, type_name,       \</div>
 <div class="line">                                  closure_over_T)                              \</div>
 <div class="line">    }</div>
-<div class="ttc" id="aordered__multimap_8h_html_a3b29c8dbbd10827d07c041fbfff7e2b4"><div class="ttname"><a href="ordered__multimap_8h.html#a3b29c8dbbd10827d07c041fbfff7e2b4">ccc_ommap_entry</a></div><div class="ttdeci">union ccc_ommap_entry_ ccc_ommap_entry</div><div class="ttdoc">The container specific type to support the Entry Interface.</div><div class="ttdef"><b>Definition:</b> ordered_multimap.h:70</div></div>
+<div class="ttc" id="aordered__multimap_8h_html_a3b29c8dbbd10827d07c041fbfff7e2b4"><div class="ttname"><a href="ordered__multimap_8h.html#a3b29c8dbbd10827d07c041fbfff7e2b4">ccc_ommap_entry</a></div><div class="ttdeci">union ccc_ommap_entry_ ccc_ommap_entry</div><div class="ttdoc">The container specific type to support the Entry Interface.</div><div class="ttdef"><b>Definition:</b> ordered_multimap.h:85</div></div>
 </div><!-- fragment -->
 <p>Modify an Occupied entry with a closure over user type T. </p>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -445,7 +445,7 @@ N).  <br /></td></tr>
 <div class="line">        ccc_omm_equal_range(ordered_multimap_ptr, begin_and_end_key_ptrs)      \</div>
 <div class="line">            .impl_                                                             \</div>
 <div class="line">    }</div>
-<div class="ttc" id="atypes_8h_html_a3bf43522fb22e6e499ea327fecf35c55"><div class="ttname"><a href="types_8h.html#a3bf43522fb22e6e499ea327fecf35c55">ccc_range</a></div><div class="ttdeci">union ccc_range_ ccc_range</div><div class="ttdoc">The result of a range query on iterable containers.</div><div class="ttdef"><b>Definition:</b> types.h:29</div></div>
+<div class="ttc" id="atypes_8h_html_a3bf43522fb22e6e499ea327fecf35c55"><div class="ttname"><a href="types_8h.html#a3bf43522fb22e6e499ea327fecf35c55">ccc_range</a></div><div class="ttdeci">union ccc_range_ ccc_range</div><div class="ttdoc">The result of a range query on iterable containers.</div><div class="ttdef"><b>Definition:</b> types.h:44</div></div>
 </div><!-- fragment -->
 <p>Returns a compound literal reference to the desired range. Amortized O(lg N). </p>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -489,7 +489,7 @@ N).  <br /></td></tr>
 <div class="line">        ccc_omm_equal_rrange(ordered_multimap_ptr, rbegin_and_rend_key_ptrs)   \</div>
 <div class="line">            .impl_                                                             \</div>
 <div class="line">    }</div>
-<div class="ttc" id="atypes_8h_html_abbe513ff2fb6678559bcbe22e5faca65"><div class="ttname"><a href="types_8h.html#abbe513ff2fb6678559bcbe22e5faca65">ccc_rrange</a></div><div class="ttdeci">union ccc_rrange_ ccc_rrange</div><div class="ttdoc">The result of a rrange query on iterable containers.</div><div class="ttdef"><b>Definition:</b> types.h:37</div></div>
+<div class="ttc" id="atypes_8h_html_abbe513ff2fb6678559bcbe22e5faca65"><div class="ttname"><a href="types_8h.html#abbe513ff2fb6678559bcbe22e5faca65">ccc_rrange</a></div><div class="ttdeci">union ccc_rrange_ ccc_rrange</div><div class="ttdoc">The result of a rrange query on iterable containers.</div><div class="ttdef"><b>Definition:</b> types.h:52</div></div>
 </div><!-- fragment -->
 <p>Returns a compound literal reference to the desired rrange. Amortized O(lg N). </p>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -653,7 +653,7 @@ N).  <br /></td></tr>
 <div class="line">    {                                                                          \</div>
 <div class="line">        ccc_impl_omm_insert_or_assign_w(ordered_multimap_ptr, key, lazy_value) \</div>
 <div class="line">    }</div>
-<div class="ttc" id="atraits_8h_html_aa6dc7577080398fd18623d2c6a464723"><div class="ttname"><a href="traits_8h.html#aa6dc7577080398fd18623d2c6a464723">ccc_entry</a></div><div class="ttdeci">#define ccc_entry(container_ptr, key_ptr...)</div><div class="ttdoc">Obtain a container specific entry for the Entry Interface.</div><div class="ttdef"><b>Definition:</b> traits.h:126</div></div>
+<div class="ttc" id="atraits_8h_html_aa6dc7577080398fd18623d2c6a464723"><div class="ttname"><a href="traits_8h.html#aa6dc7577080398fd18623d2c6a464723">ccc_entry</a></div><div class="ttdeci">#define ccc_entry(container_ptr, key_ptr...)</div><div class="ttdoc">Obtain a container specific entry for the Entry Interface.</div><div class="ttdef"><b>Definition:</b> traits.h:141</div></div>
 </div><!-- fragment -->
 <p>Invariantly inserts the key value pair into the multimap either as the first entry or overwriting the oldest existing entry at key. Amortized O(lg N). </p>
 <dl class="params"><dt>Parameters</dt><dd>
