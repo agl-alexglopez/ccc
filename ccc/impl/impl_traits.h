@@ -1,3 +1,18 @@
+/** @cond
+Copyright 2025 Alexander G. Lopez
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+@endcond */
 #ifndef CCC_IMPL_TRAITS_H
 #define CCC_IMPL_TRAITS_H
 
@@ -7,7 +22,6 @@
 #include "../flat_double_ended_queue.h"
 #include "../flat_hash_map.h"
 #include "../flat_priority_queue.h"
-#include "../handle_hash_map.h"
 #include "../handle_ordered_map.h"
 #include "../handle_realtime_ordered_map.h"
 #include "../ordered_map.h"
@@ -36,7 +50,6 @@
 
 #define ccc_impl_swap_handle(container_ptr, swap_args...)                      \
     _Generic((container_ptr),                                                  \
-        ccc_handle_hash_map *: ccc_hhm_swap_handle,                            \
         ccc_handle_ordered_map *: ccc_hom_swap_handle,                         \
         ccc_handle_realtime_ordered_map                                        \
             *: ccc_hrm_swap_handle)((container_ptr), swap_args)
@@ -50,7 +63,6 @@
 
 #define ccc_impl_try_insert(container_ptr, try_insert_args...)                 \
     _Generic((container_ptr),                                                  \
-        ccc_handle_hash_map *: ccc_hhm_try_insert,                             \
         ccc_handle_ordered_map *: ccc_hom_try_insert,                          \
         ccc_handle_realtime_ordered_map *: ccc_hrm_try_insert,                 \
         ccc_flat_hash_map *: ccc_fhm_try_insert,                               \
@@ -61,11 +73,6 @@
 
 #define ccc_impl_try_insert_r(container_ptr, try_insert_args...)               \
     _Generic((container_ptr),                                                  \
-        ccc_handle_hash_map                                                    \
-            *: &(ccc_handle){ccc_hhm_try_insert(                               \
-                                 (ccc_handle_hash_map *)container_ptr,         \
-                                 (ccc_hhmap_elem *)try_insert_args)            \
-                                 .impl_},                                      \
         ccc_handle_ordered_map                                                 \
             *: &(ccc_handle){ccc_hom_try_insert(                               \
                                  (ccc_handle_ordered_map *)container_ptr,      \
@@ -100,7 +107,6 @@
 
 #define ccc_impl_insert_or_assign(container_ptr, insert_or_assign_args...)     \
     _Generic((container_ptr),                                                  \
-        ccc_handle_hash_map *: ccc_hhm_insert_or_assign,                       \
         ccc_handle_ordered_map *: ccc_hom_insert_or_assign,                    \
         ccc_handle_realtime_ordered_map *: ccc_hrm_insert_or_assign,           \
         ccc_flat_hash_map *: ccc_fhm_insert_or_assign,                         \
@@ -111,11 +117,6 @@
 
 #define ccc_impl_insert_or_assign_r(container_ptr, insert_or_assign_args...)   \
     _Generic((container_ptr),                                                  \
-        ccc_handle_hash_map                                                    \
-            *: &(ccc_handle){ccc_hhm_insert_or_assign(                         \
-                                 (ccc_handle_hash_map *)container_ptr,         \
-                                 (ccc_hhmap_elem *)insert_or_assign_args)      \
-                                 .impl_},                                      \
         ccc_handle_ordered_map                                                 \
             *: &(ccc_handle){ccc_hom_insert_or_assign(                         \
                                  (ccc_handle_ordered_map *)container_ptr,      \
@@ -150,7 +151,6 @@
 
 #define ccc_impl_remove(container_ptr, key_val_container_handle_ptr...)        \
     _Generic((container_ptr),                                                  \
-        ccc_handle_hash_map *: ccc_hhm_remove,                                 \
         ccc_handle_ordered_map *: ccc_hom_remove,                              \
         ccc_handle_realtime_ordered_map *: ccc_hrm_remove,                     \
         ccc_flat_hash_map *: ccc_fhm_remove,                                   \
@@ -161,12 +161,6 @@
 
 #define ccc_impl_remove_r(container_ptr, key_val_container_handle_ptr...)      \
     _Generic((container_ptr),                                                  \
-        ccc_handle_hash_map                                                    \
-            *: &(ccc_handle){ccc_hhm_remove(                                   \
-                                 (ccc_handle_hash_map *)container_ptr,         \
-                                 (ccc_hhmap_elem *)                            \
-                                     key_val_container_handle_ptr)             \
-                                 .impl_},                                      \
         ccc_handle_ordered_map                                                 \
             *: &(ccc_handle){ccc_hom_remove(                                   \
                                  (ccc_handle_ordered_map *)container_ptr,      \
@@ -223,9 +217,7 @@
         ccc_homap_handle *: ccc_hom_remove_handle,                             \
         ccc_homap_handle const *: ccc_hom_remove_handle,                       \
         ccc_hromap_handle *: ccc_hrm_remove_handle,                            \
-        ccc_hromap_handle const *: ccc_hrm_remove_handle,                      \
-        ccc_hhmap_handle *: ccc_hhm_remove_handle,                             \
-        ccc_hhmap_handle const *: ccc_hhm_remove_handle)(                      \
+        ccc_hromap_handle const *: ccc_hrm_remove_handle)(                     \
         (container_handle_ptr))
 
 #define ccc_impl_remove_handle_r(container_handle_ptr)                         \
@@ -280,9 +272,8 @@
     _Generic((container_ptr),                                                  \
         ccc_handle_ordered_map *: ccc_hom_handle,                              \
         ccc_handle_realtime_ordered_map *: ccc_hrm_handle,                     \
-        ccc_handle_realtime_ordered_map const *: ccc_hrm_handle,               \
-        ccc_handle_hash_map *: ccc_hhm_handle,                                 \
-        ccc_handle_hash_map const *: ccc_hhm_handle)((container_ptr), key_ptr)
+        ccc_handle_realtime_ordered_map const *: ccc_hrm_handle)(              \
+        (container_ptr), key_ptr)
 
 #define ccc_impl_handle_r(container_ptr, key_ptr...)                           \
     _Generic((container_ptr),                                                  \
@@ -297,32 +288,20 @@
                                              *)(container_ptr),                \
                                         key_ptr)                               \
                                         .impl_},                               \
-        ccc_handle_realtime_ordered_map const *: &(                            \
-                 ccc_hromap_handle){ccc_hrm_handle(                            \
-                                        (ccc_handle_realtime_ordered_map       \
-                                             *)(container_ptr),                \
-                                        key_ptr)                               \
-                                        .impl_},                               \
-        ccc_handle_hash_map *: &(                                              \
-                 ccc_hhmap_handle){ccc_hhm_handle(                             \
-                                       (ccc_handle_hash_map *)(container_ptr), \
-                                       key_ptr)                                \
-                                       .impl_},                                \
-        ccc_handle_hash_map const *: &(ccc_hhmap_handle){                      \
-            ccc_hhm_handle((ccc_handle_hash_map *)(container_ptr), key_ptr)    \
+        ccc_handle_realtime_ordered_map const *: &(ccc_hromap_handle){         \
+            ccc_hrm_handle((ccc_handle_realtime_ordered_map *)(container_ptr), \
+                           key_ptr)                                            \
                 .impl_})
 
 #define ccc_impl_and_modify(container_entry_ptr, mod_fn)                       \
     _Generic((container_entry_ptr),                                            \
         ccc_fhmap_entry *: ccc_fhm_and_modify,                                 \
-        ccc_hhmap_handle *: ccc_hhm_and_modify,                                \
         ccc_omap_entry *: ccc_om_and_modify,                                   \
         ccc_ommap_entry *: ccc_omm_and_modify,                                 \
         ccc_homap_handle *: ccc_hom_and_modify,                                \
         ccc_romap_entry *: ccc_rom_and_modify,                                 \
         ccc_hromap_handle *: ccc_hrm_and_modify,                               \
         ccc_fhmap_entry const *: ccc_fhm_and_modify,                           \
-        ccc_hhmap_handle const *: ccc_hhm_and_modify,                          \
         ccc_hromap_handle const *: ccc_hrm_and_modify,                         \
         ccc_omap_entry const *: ccc_om_and_modify,                             \
         ccc_ommap_entry const *: ccc_omm_and_modify,                           \
@@ -333,14 +312,12 @@
 #define ccc_impl_and_modify_aux(container_entry_ptr, mod_fn, aux_data_ptr...)  \
     _Generic((container_entry_ptr),                                            \
         ccc_fhmap_entry *: ccc_fhm_and_modify_aux,                             \
-        ccc_hhmap_handle *: ccc_hhm_and_modify_aux,                            \
         ccc_omap_entry *: ccc_om_and_modify_aux,                               \
         ccc_ommap_entry *: ccc_omm_and_modify_aux,                             \
         ccc_homap_handle *: ccc_hom_and_modify_aux,                            \
         ccc_hromap_handle *: ccc_hrm_and_modify_aux,                           \
         ccc_romap_entry *: ccc_rom_and_modify_aux,                             \
         ccc_fhmap_entry const *: ccc_fhm_and_modify_aux,                       \
-        ccc_hhmap_handle const *: ccc_hhm_and_modify_aux,                      \
         ccc_omap_entry const *: ccc_om_and_modify_aux,                         \
         ccc_ommap_entry const *: ccc_omm_and_modify_aux,                       \
         ccc_hromap_handle const *: ccc_hrm_and_modify_aux,                     \
@@ -366,23 +343,19 @@
     _Generic((container_handle_ptr),                                           \
         ccc_homap_handle *: ccc_hom_insert_handle,                             \
         ccc_hromap_handle *: ccc_hrm_insert_handle,                            \
-        ccc_hromap_handle const *: ccc_hrm_insert_handle,                      \
-        ccc_hhmap_handle *: ccc_hhm_insert_handle,                             \
-        ccc_hhmap_handle const *: ccc_hhm_insert_handle)(                      \
+        ccc_hromap_handle const *: ccc_hrm_insert_handle)(                     \
         (container_handle_ptr), key_val_container_handle_ptr)
 
 #define ccc_impl_or_insert(container_entry_ptr,                                \
                            key_val_container_handle_ptr...)                    \
     _Generic((container_entry_ptr),                                            \
         ccc_fhmap_entry *: ccc_fhm_or_insert,                                  \
-        ccc_hhmap_handle *: ccc_hhm_or_insert,                                 \
         ccc_omap_entry *: ccc_om_or_insert,                                    \
         ccc_ommap_entry *: ccc_omm_or_insert,                                  \
         ccc_homap_handle *: ccc_hom_or_insert,                                 \
         ccc_romap_entry *: ccc_rom_or_insert,                                  \
         ccc_hromap_handle *: ccc_hrm_or_insert,                                \
         ccc_fhmap_entry const *: ccc_fhm_or_insert,                            \
-        ccc_hhmap_handle const *: ccc_hhm_or_insert,                           \
         ccc_omap_entry const *: ccc_om_or_insert,                              \
         ccc_ommap_entry const *: ccc_omm_or_insert,                            \
         ccc_hromap_handle const *: ccc_hrm_or_insert,                          \
@@ -398,8 +371,6 @@
         ccc_handle const *: ccc_handle_unwrap,                                 \
         ccc_fhmap_entry *: ccc_fhm_unwrap,                                     \
         ccc_fhmap_entry const *: ccc_fhm_unwrap,                               \
-        ccc_hhmap_handle *: ccc_hhm_unwrap,                                    \
-        ccc_hhmap_handle const *: ccc_hhm_unwrap,                              \
         ccc_omap_entry *: ccc_om_unwrap,                                       \
         ccc_omap_entry const *: ccc_om_unwrap,                                 \
         ccc_ommap_entry *: ccc_omm_unwrap,                                     \
@@ -419,8 +390,6 @@
         ccc_handle const *: ccc_handle_occupied,                               \
         ccc_fhmap_entry *: ccc_fhm_occupied,                                   \
         ccc_fhmap_entry const *: ccc_fhm_occupied,                             \
-        ccc_hhmap_handle *: ccc_hhm_occupied,                                  \
-        ccc_hhmap_handle const *: ccc_hhm_occupied,                            \
         ccc_omap_entry *: ccc_om_occupied,                                     \
         ccc_omap_entry const *: ccc_om_occupied,                               \
         ccc_ommap_entry *: ccc_omm_occupied,                                   \
@@ -440,8 +409,6 @@
         ccc_handle const *: ccc_handle_insert_error,                           \
         ccc_fhmap_entry *: ccc_fhm_insert_error,                               \
         ccc_fhmap_entry const *: ccc_fhm_insert_error,                         \
-        ccc_hhmap_handle *: ccc_hhm_insert_error,                              \
-        ccc_hhmap_handle const *: ccc_hhm_insert_error,                        \
         ccc_omap_entry *: ccc_om_insert_error,                                 \
         ccc_omap_entry const *: ccc_om_insert_error,                           \
         ccc_ommap_entry *: ccc_omm_insert_error,                               \
@@ -459,8 +426,6 @@
     _Generic((container_ptr),                                                  \
         ccc_flat_hash_map *: ccc_fhm_get_key_val,                              \
         ccc_flat_hash_map const *: ccc_fhm_get_key_val,                        \
-        ccc_handle_hash_map *: ccc_hhm_get_key_val,                            \
-        ccc_handle_hash_map const *: ccc_hhm_get_key_val,                      \
         ccc_ordered_map *: ccc_om_get_key_val,                                 \
         ccc_ordered_multimap *: ccc_omm_get_key_val,                           \
         ccc_handle_ordered_map *: ccc_hom_get_key_val,                         \
@@ -474,8 +439,6 @@
     _Generic((container_ptr),                                                  \
         ccc_flat_hash_map *: ccc_fhm_contains,                                 \
         ccc_flat_hash_map const *: ccc_fhm_contains,                           \
-        ccc_handle_hash_map *: ccc_hhm_contains,                               \
-        ccc_handle_hash_map const *: ccc_hhm_contains,                         \
         ccc_ordered_map *: ccc_om_contains,                                    \
         ccc_handle_ordered_map *: ccc_hom_contains,                            \
         ccc_handle_realtime_ordered_map *: ccc_hrm_contains,                   \
@@ -770,7 +733,6 @@
     _Generic((container_ptr),                                                  \
         ccc_buffer *: ccc_buf_size,                                            \
         ccc_flat_hash_map *: ccc_fhm_size,                                     \
-        ccc_handle_hash_map *: ccc_hhm_size,                                   \
         ccc_ordered_map *: ccc_om_size,                                        \
         ccc_handle_ordered_map *: ccc_hom_size,                                \
         ccc_flat_priority_queue *: ccc_fpq_size,                               \
@@ -783,7 +745,6 @@
         ccc_handle_realtime_ordered_map *: ccc_hrm_size,                       \
         ccc_buffer const *: ccc_buf_size,                                      \
         ccc_flat_hash_map const *: ccc_fhm_size,                               \
-        ccc_handle_hash_map const *: ccc_hhm_size,                             \
         ccc_ordered_map const *: ccc_om_size,                                  \
         ccc_handle_ordered_map const *: ccc_hom_size,                          \
         ccc_flat_priority_queue const *: ccc_fpq_size,                         \
@@ -799,14 +760,12 @@
     _Generic((container_ptr),                                                  \
         ccc_buffer *: ccc_buf_capacity,                                        \
         ccc_flat_hash_map *: ccc_fhm_capacity,                                 \
-        ccc_handle_hash_map *: ccc_hhm_capacity,                               \
         ccc_handle_ordered_map *: ccc_hom_capacity,                            \
         ccc_flat_priority_queue *: ccc_fpq_capacity,                           \
         ccc_flat_double_ended_queue *: ccc_fdeq_capacity,                      \
         ccc_handle_realtime_ordered_map *: ccc_hrm_capacity,                   \
         ccc_buffer const *: ccc_buf_capacity,                                  \
         ccc_flat_hash_map const *: ccc_fhm_capacity,                           \
-        ccc_handle_hash_map const *: ccc_hhm_capacity,                         \
         ccc_handle_ordered_map const *: ccc_hom_capacity,                      \
         ccc_flat_priority_queue const *: ccc_fpq_capacity,                     \
         ccc_flat_double_ended_queue const *: ccc_fdeq_capacity,                \
@@ -817,7 +776,6 @@
     _Generic((container_ptr),                                                  \
         ccc_buffer *: ccc_buf_is_empty,                                        \
         ccc_flat_hash_map *: ccc_fhm_is_empty,                                 \
-        ccc_handle_hash_map *: ccc_hhm_is_empty,                               \
         ccc_ordered_map *: ccc_om_is_empty,                                    \
         ccc_handle_ordered_map *: ccc_hom_is_empty,                            \
         ccc_flat_priority_queue *: ccc_fpq_is_empty,                           \
@@ -830,7 +788,6 @@
         ccc_handle_realtime_ordered_map *: ccc_hrm_is_empty,                   \
         ccc_buffer const *: ccc_buf_is_empty,                                  \
         ccc_flat_hash_map const *: ccc_fhm_is_empty,                           \
-        ccc_handle_hash_map const *: ccc_hhm_is_empty,                         \
         ccc_ordered_map const *: ccc_om_is_empty,                              \
         ccc_handle_ordered_map const *: ccc_hom_is_empty,                      \
         ccc_flat_priority_queue const *: ccc_fpq_is_empty,                     \
@@ -845,7 +802,6 @@
 #define ccc_impl_validate(container_ptr)                                       \
     _Generic((container_ptr),                                                  \
         ccc_flat_hash_map *: ccc_fhm_validate,                                 \
-        ccc_handle_hash_map *: ccc_hhm_validate,                               \
         ccc_ordered_map *: ccc_om_validate,                                    \
         ccc_handle_ordered_map *: ccc_hom_validate,                            \
         ccc_flat_priority_queue *: ccc_fpq_validate,                           \
@@ -857,7 +813,6 @@
         ccc_realtime_ordered_map *: ccc_rom_validate,                          \
         ccc_handle_realtime_ordered_map *: ccc_hrm_validate,                   \
         ccc_flat_hash_map const *: ccc_fhm_validate,                           \
-        ccc_handle_hash_map const *: ccc_hhm_validate,                         \
         ccc_ordered_map const *: ccc_om_validate,                              \
         ccc_handle_ordered_map const *: ccc_hom_validate,                      \
         ccc_flat_priority_queue const *: ccc_fpq_validate,                     \

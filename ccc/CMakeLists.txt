@@ -7,7 +7,6 @@ target_sources(${PROJECT_NAME}
         ${PROJECT_SOURCE_DIR}/src/types.c
         ${PROJECT_SOURCE_DIR}/src/buffer.c
         ${PROJECT_SOURCE_DIR}/src/flat_hash_map.c
-        ${PROJECT_SOURCE_DIR}/src/handle_hash_map.c
         ${PROJECT_SOURCE_DIR}/src/flat_double_ended_queue.c
         ${PROJECT_SOURCE_DIR}/src/flat_priority_queue.c
         ${PROJECT_SOURCE_DIR}/src/ordered_map.c
@@ -37,14 +36,12 @@ target_sources(${PROJECT_NAME}
               impl/impl_traits.h
               impl/impl_flat_double_ended_queue.h
               impl/impl_flat_hash_map.h
-              impl/impl_handle_hash_map.h
               impl/impl_buffer.h
               impl/impl_bitset.h
               types.h
               buffer.h
               bitset.h
               flat_hash_map.h
-              handle_hash_map.h
               flat_double_ended_queue.h
               flat_priority_queue.h
               ordered_map.h
