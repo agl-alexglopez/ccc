@@ -22,7 +22,7 @@ based on the following source.
        extensive modification. I had to update parent and child tracking, and
        unite the left and right cases for fun. See the code for a generalizable
        strategy to eliminate symmetric left and right cases for any binary tree
-       code. https:www.link.cs.cmu.edulinkftp-sitesplayingtop-down-splay.c
+       code. https://www.link.cs.cmu.edu/splay/
 
 Because this is a self-optimizing data structure it may benefit from many
 constant time queries for frequently accessed elements. */

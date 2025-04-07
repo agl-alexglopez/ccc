@@ -23,7 +23,7 @@ implementation is based on the following source.
        update parent and child tracking, and unite the left and right cases for
        fun. See the code for a generalizable strategy to eliminate symmetric
        left and right cases for any binary tree code.
-       https:www.link.cs.cmu.edulinkftp-sitesplayingtop-down-splay.c
+       https://www.link.cs.cmu.edu/splay/
 
 Due to constant time access to duplicates this implementation can be quite fast
 in specific workloads such as push and pop of duplicates. However, the overall

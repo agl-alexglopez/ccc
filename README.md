@@ -1313,3 +1313,13 @@ If these containers do not fit your needs, here are some excellent data structur
 - [C Template Library (CTL)](https://github.com/glouw/ctl)
 - [CC: Convenient Containers](https://github.com/JacksonAllan/CC)
 
+## Citations
+
+A few containers are based off of important work by other data structure developers and researchers. Here are the data structures that inspired some containers in this collection. Full citations and notices of changes can be read in the respective implementations in `src/` directory.
+
+- Rust's hashbrown hash table was the basis for the `flat_hash_map.h` container.
+    - https://github.com/rust-lang/hashbrown
+- Phil Vachon's implementation of a WAVL tree was the inspiration for the `realtime_ordered_map.h` containers.
+    - https://github.com/pvachon/wavl_tree
+- Research by Daniel Sleator in implementations of Splay Trees helped shape the `ordered_map.h` and `ordered_multimap.h` containers.
+    - https://www.link.cs.cmu.edu/splay/
