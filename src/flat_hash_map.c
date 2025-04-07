@@ -243,7 +243,7 @@ struct triangular_seq
 {
     /** @private The index this probe step has placed us on. */
     size_t i;
-    /** @private The triangular numbers. Stride increases by group size. */
+    /** @private Stride increases by group size on each iteration. */
     size_t stride;
 };
 
