@@ -94,7 +94,7 @@ $(document).ready(function(){initNavTree('md_INSTALL.html',''); initResizable();
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>Currently, this library utilizes some features that many compilers support such as gcc, clang, and AppleClang, but support is not ready for Windows.</p>
-<h1><a class="anchor" id="autotoc_md20"></a>
+<h1><a class="anchor" id="autotoc_md21"></a>
 Fetch Content Install</h1>
 <p>This approach will allow CMake to build the collection from source as part of your project. The collection does not have external dependencies, besides the standard library, so this may be viable for you. This is helpful if you want the ability to build the library in release or debug mode along with your project and possibly step through it with a debugger during a debug build. If you would rather link to the release build library file see the next section for the manual install.</p>
 <p>To avoid including tests, samples, and other extraneous files when fetching content download a release.</p>
@@ -119,7 +119,7 @@ Fetch Content Install</h1>
 <div class="line">add_executable(main main.c)</div>
 <div class="line">target_link_libraries(main ccc::ccc)</div>
 </div><!-- fragment --><p>Now, the C Container Collection is part of your project build, allowing you to configure as you see fit. For a more traditional approach read the manual install section below.</p>
-<h1><a class="anchor" id="autotoc_md21"></a>
+<h1><a class="anchor" id="autotoc_md22"></a>
 Manual Install Quick Start</h1>
 <ol type="1">
 <li>Use the provided defaults.</li>
@@ -156,7 +156,7 @@ Manual Install Quick Start</h1>
 <div class="line">    │       └── cccTargets-release.cmake</div>
 <div class="line">    └── libccc_release.a</div>
 </div><!-- fragment --><p>Now to delete the library if needed, simply find all folders and files with the <code>*ccc*</code> string somewhere within them and delete. You can also check the <code>build/install_manifest.txt</code> to confirm the locations of any files installed with this library.</p>
-<h2><a class="anchor" id="autotoc_md22"></a>
+<h2><a class="anchor" id="autotoc_md23"></a>
 Include the Library</h2>
 <p>Once CMake can find the package, link against it and include the container header.</p>
 <p>The <code>CMakeLists.txt</code> file.</p>
@@ -165,14 +165,14 @@ Include the Library</h2>
 </div><!-- fragment --><p>The C code.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &quot;<a class="code" href="flat__hash__map_8h.html">ccc/flat_hash_map.h</a>&quot;</span></div>
 <div class="ttc" id="aflat__hash__map_8h_html"><div class="ttname"><a href="flat__hash__map_8h.html">flat_hash_map.h</a></div><div class="ttdoc">The Flat Hash Map Interface.</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md23"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md24"></a>
 Without Make</h2>
 <p>If your system does not support Makefiles or the <code>make</code> command here are the CMake commands one can run that will do the same.</p>
 <div class="fragment"><div class="line"># Configure the project cmake files.</div>
 <div class="line"># Replace this preset with your own if you&#39;d like.</div>
 <div class="line">cmake --preset=clang-rel -DCMAKE_INSTALL_PREFIX=[DESIRED/INSTALL/LOCATION]</div>
 <div class="line">cmake --build build --target install</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md24"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md25"></a>
 User Presets</h2>
 <p>If you do not like the default presets, create a <code>CMakeUserPresets.json</code> in this folder and place your preferred configuration in that file. Here is my preferred configuration to get you started. I like to use the newest version of gcc that I have installed.</p>
 <div class="fragment"><div class="line">{</div>
@@ -219,7 +219,7 @@ User Presets</h2>
 <div class="fragment"><div class="line"># Your preferred preset with the same other steps as before.</div>
 <div class="line">cmake --preset=rel -DCMAKE_INSTALL_PREFIX=[DESIRED/INSTALL/LOCATION]</div>
 <div class="line">cmake --build build --target install</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md25"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md26"></a>
 Generate Documentation</h1>
 <p>Documentation is available <a href="https://agl-alexglopez.github.io/ccc/">HERE</a>. However, if you want to build the documentation locally you will need <code>doxygen</code> and <code>graphviz</code> installed. Then run:</p>
 <div class="fragment"><div class="line">doxygen Doxyfile</div>
