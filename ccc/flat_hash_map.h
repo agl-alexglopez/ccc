@@ -289,17 +289,19 @@ ccc_result ccc_fhm_copy(ccc_flat_hash_map *dst, ccc_flat_hash_map const *src,
 map. If the current capacity is sufficient, do nothing.
 @param [in] h a pointer to the hash map.
 @param [in] to_add the number of elements to add to the map.
-@param [in] fn the allocation function that can be used for resizing. Such a
-function is provided to cover the case where the user wants a fixed size map
-but cannot know the size needed until runtime. In this case, the function needs
-to be provided to allow the single resizing to occur.
+@param [in] fn the required allocation function that can be used for resizing.
+Such a function is provided to cover the case where the user wants a fixed size
+map but cannot know the size needed until runtime. In this case, the function
+needs to be provided to allow the single resizing to occur. Any auxiliary data
+provided upon initialization will be passed to the allocation function when
+called.
 @return the result of the reserving operation, OK if successful or an error
 code to indicate the specific failure.
 
 If the map has already been initialized with allocation permission simply
 provide the same function that was passed upon initialization. */
 ccc_result ccc_fhm_reserve(ccc_flat_hash_map *h, size_t to_add,
-                           ccc_alloc_fn fn);
+                           ccc_alloc_fn *fn);
 
 /**@}*/
 
@@ -706,6 +708,35 @@ an error to attempt to free the buffer and a memory error is returned.
 Otherwise, an OK result is returned. */
 ccc_result ccc_fhm_clear_and_free(ccc_flat_hash_map *h, ccc_destructor_fn *fn);
 
+/** @brief Frees all slots in the table and frees the underlying buffer that was
+previously dynamically reserved with the reserve function.
+@param [in] h the table to be cleared.
+@param [in] destructor the destructor for each element. NULL can be passed if no
+maintenance is required on the elements in the table before their slots are
+forfeit.
+@param [in] alloc the required allocation function to provide to a dynamically
+reserved map that has no allocation permission. Any auxiliary data provided upon
+initialization will be passed to the allocation function when called.
+@return the result of free operation. An alloc function must be provided and
+map must have been denied allocation permission in order to use this function.
+@warning it is an error to call this function on a map with allocation
+permission. It is also an error to call this function on a map that was not
+reserved with the provided ccc_alloc_fn. The map must have existing memory
+to free.
+
+This function covers the edge case of reserving a dynamic capacity for a map
+at runtime but denying the map allocation permission to resize. This can help
+prevent a map from growing unbounded due to internal decisions about rehashes
+and resizing. The user in this case knows the map does not have allocation
+permission and therefore no further memory will be dedicated to the map.
+
+However, to free the map in such a case this function must be used because the
+map has no ability to free itself. Just as the allocation function is required
+to reserve memory so to is it required to free memory. */
+ccc_result ccc_fhm_clear_and_free_reserve(ccc_flat_hash_map *h,
+                                          ccc_destructor_fn *destructor,
+                                          ccc_alloc_fn *alloc);
+
 /**@}*/
 
 /** @name Iterator Interface
@@ -782,6 +813,7 @@ typedef ccc_flat_hash_map flat_hash_map;
 typedef ccc_fhmap_entry fhmap_entry;
 #    define fhm_declare_fixed_map(args...) ccc_fhm_declare_fixed_map(args)
 #    define fhm_fixed_capacity(args...) ccc_fhm_fixed_capacity(args)
+#    define fhm_fixed_reserve(args...) ccc_fhm_fixed_reserve(args)
 #    define fhm_init(args...) ccc_fhm_init(args)
 #    define fhm_copy(args...) ccc_fhm_copy(args)
 #    define fhm_and_modify_w(args...) ccc_fhm_and_modify_w(args)
@@ -818,6 +850,8 @@ typedef ccc_fhmap_entry fhmap_entry;
 #    define fhm_size(args...) ccc_fhm_size(args)
 #    define fhm_clear(args...) ccc_fhm_clear(args)
 #    define fhm_clear_and_free(args...) ccc_fhm_clear_and_free(args)
+#    define fhm_clear_and_free_reserve(args...)                                \
+        ccc_fhm_clear_and_free_reserve(args)
 #    define fhm_next_prime(args...) ccc_fhm_next_prime(args)
 #    define fhm_capacity(args...) ccc_fhm_capacity(args)
 #    define fhm_validate(args...) ccc_fhm_validate(args)

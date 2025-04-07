@@ -258,7 +258,8 @@ static struct ccc_handl_ find_key_or_slot(struct ccc_fhmap_ const *h,
                                           void const *key, uint64_t hash);
 static ccc_ucount find_key(struct ccc_fhmap_ const *h, void const *key,
                            uint64_t hash);
-static size_t find_known_insert_slot(struct ccc_fhmap_ const *h, uint64_t hash);
+static size_t find_existing_insert_slot(struct ccc_fhmap_ const *h,
+                                        uint64_t hash);
 static ccc_result maybe_rehash(struct ccc_fhmap_ *h, size_t to_add,
                                ccc_alloc_fn);
 static void insert_and_copy(struct ccc_fhmap_ *h, void const *key_val_type,
@@ -641,7 +642,7 @@ ccc_fhm_clear(ccc_flat_hash_map *const h, ccc_destructor_fn *const fn)
 ccc_result
 ccc_fhm_clear_and_free(ccc_flat_hash_map *const h, ccc_destructor_fn *const fn)
 {
-    if (unlikely(!h || !h->data_))
+    if (unlikely(!h || !h->data_ || !h->mask_ || !h->init_))
     {
         return CCC_RESULT_ARG_ERROR;
     }
@@ -666,6 +667,36 @@ ccc_fhm_clear_and_free(ccc_flat_hash_map *const h, ccc_destructor_fn *const fn)
     h->sz_ = 0;
     h->tag_ = NULL;
     h->data_ = h->alloc_fn_(h->data_, 0, h->aux_);
+    return CCC_RESULT_OK;
+}
+
+ccc_result
+ccc_fhm_clear_and_free_reserve(ccc_flat_hash_map *const h,
+                               ccc_destructor_fn *const destructor,
+                               ccc_alloc_fn *const alloc)
+{
+    if (unlikely(!h || !h->data_ || h->alloc_fn_ || !alloc || !h->init_
+                 || !h->mask_))
+    {
+        return CCC_RESULT_ARG_ERROR;
+    }
+    if (destructor)
+    {
+        for (size_t i = 0; i < (h->mask_ + 1); ++i)
+        {
+            if (is_full(h->tag_[i]))
+            {
+                destructor((ccc_user_type){.user_type = data_at(h, i),
+                                           .aux = h->aux_});
+            }
+        }
+    }
+    h->avail_ = 0;
+    h->mask_ = 0;
+    h->init_ = CCC_FALSE;
+    h->sz_ = 0;
+    h->tag_ = NULL;
+    h->data_ = alloc(h->data_, 0, h->aux_);
     return CCC_RESULT_OK;
 }
 
@@ -767,7 +798,7 @@ ccc_fhm_copy(ccc_flat_hash_map *const dst, ccc_flat_hash_map const *const src,
         {
             uint64_t const hash = src->hash_fn_(
                 (ccc_user_key){.user_key = key_at(src, i), .aux = src->aux_});
-            size_t const new_i = find_known_insert_slot(dst, hash);
+            size_t const new_i = find_existing_insert_slot(dst, hash);
             set_tag(dst, to_tag(hash), new_i);
             (void)memcpy(data_at(dst, new_i), data_at(src, i), dst->elem_sz_);
         }
@@ -781,7 +812,7 @@ ccc_result
 ccc_fhm_reserve(ccc_flat_hash_map *const h, size_t const to_add,
                 ccc_alloc_fn *const fn)
 {
-    if (unlikely(!h || !to_add))
+    if (unlikely(!h || !to_add || !fn))
     {
         return CCC_RESULT_ARG_ERROR;
     }
@@ -964,10 +995,11 @@ set_insert_tag(struct ccc_fhmap_ *const h, ccc_fhm_tag const m, size_t const i)
     set_tag(h, m, i);
 }
 
-/** Erases an element at index I from the tag array, forfeiting its data in the
-data array for re-use later. The erase procedure decides how to mark a removal
-from the table: deleted, or empty. Which option to choose is determined by what
-is required to ensure the probing sequence works correctly in all cases. */
+/** Erases an element at the provided index from the tag array, forfeiting its
+data in the data array for re-use later. The erase procedure decides how to mark
+a removal from the table: deleted, or empty. Which option to choose is
+determined by what is required to ensure the probing sequence works correctly in
+all future cases. */
 static inline void
 erase(struct ccc_fhmap_ *const h, size_t const i)
 {
@@ -992,7 +1024,10 @@ erase(struct ccc_fhmap_ *const h, size_t const i)
 
        Because probing operates on groups this check ensures that any group
        load at any position that includes this item will continue as long as
-       needed to ensure the searched key is absent. */
+       needed to ensure the searched key is absent. An important edge case this
+       covers is one in which the previous group is completely full of FULL or
+       DELETED entries and this tag will be the first in the next group. This
+       is an important case where we must mark our tag as deleted. */
     ccc_fhm_tag const m
         = leading_zeros(prev_group_empties) + trailing_zeros(group_empties)
                   >= CCC_FHM_GROUP_SIZE
@@ -1057,7 +1092,7 @@ find_key_or_slot(struct ccc_fhmap_ const *const h, void const *const key,
 to match. This function is better when a simple lookup is needed as a few
 branches and loads of groups are omitted compared to the search with intention
 to insert or remove. A successful search returns the index with an OK status
-while a failed search indicates a failure error. */
+while a failed search indicates a failure error status. */
 static ccc_ucount
 find_key(struct ccc_fhmap_ const *const h, void const *const key,
          uint64_t const hash)
@@ -1094,7 +1129,7 @@ find_key(struct ccc_fhmap_ const *const h, void const *const key,
 /** Finds an insert slot or loops forever. The caller of this function must know
 that there is an available empty or deleted slot in the table. */
 static size_t
-find_known_insert_slot(struct ccc_fhmap_ const *const h, uint64_t const hash)
+find_existing_insert_slot(struct ccc_fhmap_ const *const h, uint64_t const hash)
 {
     size_t const mask = h->mask_;
     struct triangular_seq seq = {.i = hash & mask, .stride = 0};
@@ -1204,7 +1239,7 @@ rehash_in_place(struct ccc_fhmap_ *const h)
         {
             uint64_t const hash = h->hash_fn_(
                 (ccc_user_key){.user_key = key_at(h, i), .aux = h->aux_});
-            size_t const new_slot = find_known_insert_slot(h, hash);
+            size_t const new_slot = find_existing_insert_slot(h, hash);
             size_t const ideal_pos = (hash & mask);
             ccc_fhm_tag const hash_tag = to_tag(hash);
             /* No point relocating when scanning works by groups and the probe
@@ -1276,7 +1311,7 @@ rehash_resize(struct ccc_fhmap_ *const h, size_t const to_add,
         {
             uint64_t const hash = h->hash_fn_(
                 (ccc_user_key){.user_key = key_at(h, i), .aux = h->aux_});
-            size_t const new_i = find_known_insert_slot(&new_h, hash);
+            size_t const new_i = find_existing_insert_slot(&new_h, hash);
             set_tag(&new_h, to_tag(hash), new_i);
             (void)memcpy(data_at(&new_h, new_i), data_at(h, i), new_h.elem_sz_);
         }
@@ -1861,6 +1896,12 @@ enum : uint16_t
     INDEX_MASK_MSB = 0x8000,
 };
 
+enum : size_t
+{
+    /** @private Most significant bit of size_t for bit counting. */
+    SIZE_T_MSB = 0x8000000000000000,
+};
+
 static inline unsigned
 ctz(index_mask m)
 {
@@ -1937,6 +1978,12 @@ enum : typeof((index_mask){}.v)
 {
     /** @private Helps in counting leading bits. */
     INDEX_MASK_MSB = 0x8000000000000000,
+};
+
+enum : size_t
+{
+    /** @private Most significant bit of size_t for bit counting. */
+    SIZE_T_MSB = 0x8000000000000000,
 };
 
 static inline unsigned
