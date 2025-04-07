@@ -87,6 +87,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_insert_erase)
     CHECK_END_FN(fhm_clear_and_free(&h, NULL););
 }
 
+/* This test will force us to test our in place hashing algorithm. */
 CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_erase_fixed)
 {
     standard_fixed_map mem;
@@ -113,7 +114,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_erase_fixed)
     size_t const full_size = size(&h).count;
     size_t cur_size = size(&h).count;
     int i = 0;
-    for (; i < (int)(full_size / 3); ++i)
+    for (; i < (int)(full_size / 2); ++i)
     {
         int const cur = to_insert[i];
         ccc_tribool const check = contains(&h, &cur);
@@ -123,7 +124,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_erase_fixed)
         CHECK(validate(&h), true);
     }
     i = 0;
-    for (; i < (int)(full_size / 3); ++i)
+    for (; i < (int)(full_size / 2); ++i)
     {
         int const cur = to_insert[i];
         struct val const *const v
@@ -159,9 +160,77 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_erase_fixed)
     CHECK_END_FN();
 }
 
+CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_erase_dynamic)
+{
+    ccc_flat_hash_map h
+        = fhm_init((struct val *)NULL, NULL, key, fhmap_int_to_u64, fhmap_id_eq,
+                   std_alloc, NULL, 0);
+    int to_insert[1024];
+    iota(to_insert, 1024, 0);
+    rand_shuffle(sizeof(int), to_insert, 1024, &(int){});
+    int inserted = 0;
+    for (; inserted < 1024; ++inserted)
+    {
+        int const cur = to_insert[inserted];
+        struct val const *const v = unwrap(
+            fhm_insert_or_assign_w(&h, cur, (struct val){.val = inserted}));
+        CHECK(v->key, to_insert[inserted]);
+        CHECK(v->val, inserted);
+        CHECK(validate(&h), true);
+    }
+    size_t const full_size = size(&h).count;
+    size_t cur_size = size(&h).count;
+    int i = 0;
+    for (; i < (int)(full_size / 2); ++i)
+    {
+        int const cur = to_insert[i];
+        ccc_tribool const check = contains(&h, &cur);
+        CHECK(check, true);
+        ccc_entry removed = remove_entry(entry_r(&h, &cur));
+        CHECK(occupied(&removed), true);
+        CHECK(validate(&h), true);
+    }
+    i = 0;
+    for (; i < (int)(full_size / 2); ++i)
+    {
+        int const cur = to_insert[i];
+        struct val const *const v
+            = unwrap(fhm_insert_or_assign_w(&h, cur, (struct val){.val = i}));
+        CHECK(v != NULL, true);
+        CHECK(validate(&h), true);
+    }
+    CHECK(full_size, cur_size);
+    i = 0;
+    while (!is_empty(&h) && cur_size)
+    {
+        int const cur = to_insert[i];
+        ccc_tribool const check = contains(&h, &cur);
+        CHECK(check, true);
+        if (i % 2)
+        {
+            struct val const *const old_val
+                = unwrap(remove_r(&h, &(struct val){.key = cur}));
+            CHECK(old_val != NULL, true);
+            CHECK(old_val->key, to_insert[i]);
+        }
+        else
+        {
+            ccc_entry removed = remove_entry(entry_r(&h, &cur));
+            CHECK(occupied(&removed), true);
+        }
+        --cur_size;
+        ++i;
+        CHECK(size(&h).count, cur_size);
+        CHECK(validate(&h), true);
+    }
+    CHECK(size(&h).count, 0);
+    CHECK_END_FN(fhm_clear_and_free(&h, NULL););
+}
+
 int
 main()
 {
     return CHECK_RUN(fhmap_test_erase(), fhmap_test_shuffle_insert_erase(),
-                     fhmap_test_shuffle_erase_fixed());
+                     fhmap_test_shuffle_erase_fixed(),
+                     fhmap_test_shuffle_erase_dynamic());
 }
