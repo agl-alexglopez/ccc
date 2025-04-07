@@ -1,8 +1,11 @@
-/** Author: Alexander Lopez
+/** flat_hash_map.c
 This file implements an interpretation of Rust's Hashbrown Hash Map which in
 turn is based on Google's Abseil Flat Hash Map. This implementation is based
 on Rust's version which is slightly simpler and a better fit for C code. The
 required license for this adaptation is included at the bottom of the file.
+This implementation has changed a variety of types and data structures to work
+within the C language and its aliasing rules. Here are the two original
+implementations for reference.
 
 Abseil: https://github.com/abseil/abseil-cpp
 Hashbrown: https://github.com/rust-lang/hashbrown
