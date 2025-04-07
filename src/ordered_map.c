@@ -1,4 +1,18 @@
-/** This file implements a splay tree that does not support duplicates.
+/** Copyright 2025 Alexander G. Lopez
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+This file implements a splay tree that does not support duplicates.
 The code to support a splay tree that does not allow duplicates is much simpler
 than the code to support a multimap implementation. This implementation is
 based on the following source.
@@ -8,7 +22,10 @@ based on the following source.
        extensive modification. I had to update parent and child tracking, and
        unite the left and right cases for fun. See the code for a generalizable
        strategy to eliminate symmetric left and right cases for any binary tree
-       code. https:www.link.cs.cmu.edulinkftp-sitesplayingtop-down-splay.c */
+       code. https:www.link.cs.cmu.edulinkftp-sitesplayingtop-down-splay.c
+
+Because this is a self-optimizing data structure it may benefit from many
+constant time queries for frequently accessed elements. */
 #include <assert.h>
 #include <stddef.h>
 #include <string.h>

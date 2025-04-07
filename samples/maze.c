@@ -2,13 +2,11 @@
 This file provides a simple maze builder that implements Prim's algorithm
 to randomly generate a maze. I chose this algorithm because it can use
 both a map and a priority queue to achieve its purpose. Such data structures are
-provided by the library offering a perfect sample program opportunity. Also
-there are some interesting ways to combine allocating and non-allocating
-interfaces. Adding more mazes could be fun.
+provided by the library offering a perfect sample program opportunity.
 
 Maze Builder:
 Builds a Perfect Maze with Prim's Algorithm to demonstrate usage of the priority
-queue and ordered_map provided by this library.
+queue and map provided by this library.
 Usage:
 -r=N The row flag lets you specify maze rows > 7.
 -c=N The col flag lets you specify maze cols > 7.
@@ -26,10 +24,11 @@ Example:
 
 #define TRAITS_USING_NAMESPACE_CCC
 #define TYPES_USING_NAMESPACE_CCC
-#define PRIORITY_QUEUE_USING_NAMESPACE_CCC
-#define HANDLE_HASH_MAP_USING_NAMESPACE_CCC
-#include "ccc/handle_hash_map.h"
-#include "ccc/priority_queue.h"
+#define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
+#define FLAT_HASH_MAP_USING_NAMESPACE_CCC
+#include "alloc.h"
+#include "ccc/flat_hash_map.h"
+#include "ccc/flat_priority_queue.h"
 #include "ccc/traits.h"
 #include "ccc/types.h"
 #include "cli.h"
@@ -66,14 +65,8 @@ struct maze
 
 /*===================  Prim's Algorithm Helper Types   ======================*/
 
-/** The intrusive style lets us bundle all the necessary components for a
-problem together. Instead of two containers using a non contiguous heap in
-their own ways, we are able to put these prim cells in a single array and have
-access to the map and priority queue. */
 struct prim_cell
 {
-    hhmap_elem map_elem;
-    pq_elem pq_elem;
     struct point cell;
     int cost;
 };
@@ -137,10 +130,10 @@ static void flush_cursor_maze_coordinate(struct maze const *, int r, int c);
 static bool can_build_new_square(struct maze const *, int r, int c);
 static void help(void);
 static struct point rand_point(struct maze const *);
-static threeway_cmp cmp_priority_cells(cmp);
+static threeway_cmp cmp_prim_cells(cmp);
 static struct int_conversion parse_digits(str_view);
 static ccc_tribool prim_cell_eq(key_cmp);
-static uint64_t point_hash_fn(user_key);
+static uint64_t prim_cell_hash_fn(user_key);
 static uint64_t hash_64_bits(uint64_t);
 
 /*======================  Main Arg Handling  ===============================*/
@@ -219,46 +212,37 @@ main(int argc, char **argv)
 
 /*======================      Maze Animation      ===========================*/
 
-/* This problem needs both a map and a priority queue. So, we compose them
-   together in the same struct. The handle hash map promises handle stability
-   and if we allocate the entire capacity for the map ahead of time and do not
-   allow resizing this equates to the pointer stability the priority queue
-   elements need. Then we have tightly coupled data in the same location for
-   the two data structures running this algorithm. */
+/* This function presents a very traditional implementation of an algorithm
+that requires multiple containers. This is implemented in a manner that one
+would normally see in Rust or C++, where each container manages its own memory.
+For examples of non-owning container use and composition see other samples.
+This style of data structure use can be comfortable and convenient in some
+cases. */
 static void
 animate_maze(struct maze *maze)
 {
     int const speed = speeds[maze->speed];
     fill_maze_with_walls(maze);
     clear_and_flush_maze(maze);
-
-    ccc_ucount const cap
-        = hhm_next_prime((((size_t)maze->rows * maze->cols) / 2) + 1);
-    assert(!cap.error);
-    size_t bytes = cap.count * sizeof(struct prim_cell);
-    /* The priority queue will have its elements in the slots of the hash map
-       for each prim cell. No allocation permission so pushing and popping is
-       harmless to any other data structures or fields of the struct. */
-    priority_queue cells = pq_init(struct prim_cell, pq_elem, CCC_LES,
-                                   cmp_priority_cells, NULL, NULL);
-    /* Encapsulating malloc like this is OK. We just need a quick sanity check
-       of some sort after. No allocation permission is given to the map so it
-       cannot resize which would invalidate the priority queue. */
-    handle_hash_map costs
-        = hhm_init((struct prim_cell *)malloc(bytes), map_elem, cell,
-                   point_hash_fn, prim_cell_eq, NULL, NULL, cap.count);
-    assert(hhm_data(&costs) != NULL);
+    /* Priority queue will manage its own flat buffer. */
+    ccc_flat_priority_queue cell_pq = ccc_fpq_init(
+        (struct prim_cell *)NULL, CCC_LES, cmp_prim_cells, std_alloc, NULL, 0);
+    /* Map will manage its own flat buffer. */
+    flat_hash_map cost_map
+        = fhm_init((struct prim_cell *)NULL, NULL, cell, prim_cell_hash_fn,
+                   prim_cell_eq, std_alloc, NULL, 0);
     struct point s = rand_point(maze);
-    handle_i first = hhm_insert_handle_w(
-        handle_r(&costs, &s),
+    struct prim_cell const *const first = fhm_insert_entry_w(
+        entry_r(&cost_map, &s),
         (struct prim_cell){.cell = s, .cost = rand_range(0, 100)});
     assert(first);
-    (void)push(&cells, &hhm_as(&costs, struct prim_cell, first)->pq_elem);
-    while (!is_empty(&cells))
+    (void)push(&cell_pq, first);
+    while (!is_empty(&cell_pq))
     {
-        struct prim_cell const *const c = front(&cells);
+        struct prim_cell const *const c = front(&cell_pq);
         *maze_at_r(maze, c->cell.r, c->cell.c) |= cached_bit;
-        handle_i min_handle = 0;
+        /* 0 is an invalid row and column in any maze. */
+        struct prim_cell min_cell = {};
         int min = INT_MAX;
         for (size_t i = 0; i < dir_offsets_size; ++i)
         {
@@ -266,35 +250,30 @@ animate_maze(struct maze *maze)
                                     .c = c->cell.c + dir_offsets[i].c};
             if (can_build_new_square(maze, n.r, n.c))
             {
-                /* The Handle Interface helps make what would be an if else
-                   branch a simple lazily evaluated insertion. If the handle is
-                   Occupied rand_range is never called. This technique also
-                   means cells can be given weights lazily as we go rather than
-                   all at once before the main algorithm starts. */
-                handle_i h = hhm_or_insert_w(
-                    handle_r(&costs, &n),
+                struct prim_cell const *const cell = fhm_or_insert_w(
+                    entry_r(&cost_map, &n),
                     (struct prim_cell){.cell = n, .cost = rand_range(0, 100)});
-                assert(h);
-                struct prim_cell *const cell = hhm_at(&costs, h);
+                assert(cell);
                 if (cell->cost < min)
                 {
                     min = cell->cost;
-                    min_handle = h;
+                    min_cell = *cell;
                 }
             }
         }
-        if (min_handle)
+        /* 0 is an invalid row and column in any maze. */
+        if (min_cell.cell.r)
         {
-            struct prim_cell *const min_cell = hhm_at(&costs, min_handle);
-            join_squares_animated(maze, c->cell, min_cell->cell, speed);
-            (void)push(&cells, &min_cell->pq_elem);
+            join_squares_animated(maze, c->cell, min_cell.cell, speed);
+            (void)push(&cell_pq, &min_cell);
         }
         else
         {
-            (void)pop(&cells);
+            (void)pop(&cell_pq);
         }
     }
-    free(hhm_data(&costs));
+    (void)ccc_fhm_clear_and_free(&cost_map, NULL);
+    (void)ccc_fpq_clear_and_free(&cell_pq, NULL);
 }
 
 /*===================     Container Support Code     ========================*/
@@ -308,12 +287,14 @@ prim_cell_eq(key_cmp const c)
 }
 
 static uint64_t
-point_hash_fn(user_key const k)
+prim_cell_hash_fn(user_key const k)
 {
-    struct point const *const p = k.user_key;
-    uint64_t const wr = p->r;
-    static_assert(sizeof((struct point){}.r) * CHAR_BIT == 32);
-    return hash_64_bits((wr << 31) | p->c);
+    struct prim_cell const *const p = k.user_key;
+    uint64_t const wr = p->cell.r;
+    static_assert(sizeof((struct point){}.r) * CHAR_BIT == 32,
+                  "hashing a row and column requires shifting half the size of "
+                  "the hash code");
+    return hash_64_bits((wr << 31) | p->cell.c);
 }
 
 static inline uint64_t
@@ -326,7 +307,7 @@ hash_64_bits(uint64_t x)
 }
 
 static threeway_cmp
-cmp_priority_cells(cmp const cmp_cells)
+cmp_prim_cells(cmp const cmp_cells)
 {
     struct prim_cell const *const lhs = cmp_cells.user_type_lhs;
     struct prim_cell const *const rhs = cmp_cells.user_type_rhs;
