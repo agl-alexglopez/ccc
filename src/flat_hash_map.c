@@ -4,6 +4,9 @@ turn is based on Google's Abseil Flat Hash Map. This implementation is based
 on Rust's version which is slightly simpler and a better fit for C code. The
 required license for this adaptation is included at the bottom of the file.
 
+Abseil: https://github.com/abseil/abseil-cpp
+Hashbrown: https://github.com/rust-lang/hashbrown
+
 This implementation is focused on SIMD friendly code or Portable Word based
 code when SIMD is not available. In any case the goal is to query multiple
 candidate keys for a match in the map simultaneously. This is achieved in the
@@ -47,13 +50,13 @@ when the most significant bit is off and the next 7 bits are available for the
 fingerprint of the user hash. */
 enum : uint8_t
 {
-    /* FULL = 0b0???????, */
     /** @private Deleted is applied when a removed value in a group must signal
     to a probe sequence to continue searching for a match or empty to stop. */
     CCC_FHM_DELETED = 0x80,
     /** @private Empty is the starting tag value and applied when other empties
     are in a group upon removal. */
     CCC_FHM_EMPTY = 0xFF,
+    /* FULL = 0b0???????, */
 };
 static_assert(sizeof(ccc_fhm_tag) == sizeof(uint8_t),
               "tag must wrap a byte in a struct without padding for better "
@@ -1407,6 +1410,8 @@ vector lanes for a single instruction. */
 
 /*========================   Tag Implementations    =========================*/
 
+/** Sets the specified tag at the index provided. Ensures that the replica
+group at the end of the tag array remains in sync with current tag if needed. */
 static inline void
 set_tag(struct ccc_fhmap_ *const h, ccc_fhm_tag const m, size_t const i)
 {
@@ -1416,18 +1421,24 @@ set_tag(struct ccc_fhmap_ *const h, ccc_fhm_tag const m, size_t const i)
     h->tag_[replica_byte] = m;
 }
 
+/** Returns CCC_TRUE if the tag holds user hash bits, meaning it is occupied. */
 static inline ccc_tribool
 is_full(ccc_fhm_tag const m)
 {
     return (m.v & TAG_MSB) == 0;
 }
 
+/** Returns CCC_TRUE if the tag is one of the two special constants EMPTY or
+DELETED. */
 static inline ccc_tribool
 is_constant(ccc_fhm_tag const m)
 {
     return (m.v & TAG_MSB) != 0;
 }
 
+/** Converts a full hash code to a tag fingerprint. The tag consists of the top
+7 bits of the hash code. Therefore, hash functions with good entropy in the
+upper bits. */
 static inline ccc_fhm_tag
 to_tag(uint64_t const hash)
 {
@@ -1579,6 +1590,16 @@ make_constants_empty_and_full_deleted(group const g)
 
 #elif defined(__ARM_NEON__) && !defined(CCC_FHM_PORTABLE)
 
+/** Below is the experimental NEON implementation for ARM architectures. This
+implementation assumes a little endian architecture as that is the norm in
+99.9% of ARM devices. However, monitor trends just in case. This implementation
+is very similar to the portable one. This is largely due to the lack of an
+equivalent operation to the x86_64 _mm_movemask_epi8, the operation responsible
+for compressing a 128 bit vector into a uint16_t. NEON therefore opts for a
+family of 64 bit operations targeted at u8 bytes. If NEON develops an efficient
+instruction for compressing a 128 bit result into an int--or in our case a
+uint16_t--we should revisit this section for 128 bit targeted intrinsics. */
+
 /*=========================  Group Implementations   ========================*/
 
 /** Loads a group starting at src into a 128 bit vector. This is an unaligned
@@ -1650,16 +1671,13 @@ static inline group
 make_constants_empty_and_full_deleted(group const g)
 {
     uint8x8_t const constant = vcltz_s8(vreinterpret_s8_u8(g.v));
-    return (group){vorr_u8(constant, vdup_n_u8(0x80))};
+    return (group){vorr_u8(constant, vdup_n_u8(TAG_MSB))};
 }
 
 #else /* FALLBACK PORTABLE IMPLEMENTATION */
 
 /* What follows is the generic portable implementation when high width SIMD
-can't be achieved. For now this means NEON on Apple defaults to generic but
-this will likely change in the future as NEON improves. Counting zeros also
-is slightly different with the portable version requiring some thought given
-to group size and tag size. */
+can't be achieved. This ideally works for most platforms. */
 
 /*=========================  Endian Helpers    ==============================*/
 
@@ -1775,7 +1793,7 @@ make_constants_empty_and_full_deleted(group g)
 /*====================  Bit Counting for Index Mask   =======================*/
 
 /** How we count bits can vary depending on the implementation, group size,
-and index mask width. Keep the bit counting logic seperate here so the above
+and index mask width. Keep the bit counting logic separate here so the above
 implementations can simply rely on counting zeros that yields correct results
 for their implementation. Each implementation attempts to use the built-ins
 first and then falls back to manual bit counting. */
