@@ -12,15 +12,18 @@ a match against a candidate fingerprint. The details of how this is done and
 trade-offs involved can be found in the comments around the implementations
 and data structures. */
 #include <assert.h>
-#if defined(__x86_64) && defined(__SSE2__) && !defined(CCC_FHM_PORTABLE)
-#    include <immintrin.h>
-#endif /*defined(__x86_64) && defined(__SSE2__) &&                             \
-          !defined(CCC_FHM_PORTABLE)*/
 #include <limits.h>
 #include <stdalign.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
+
+/** Two platforms offer some form of vector instructions we can try. */
+#if defined(__x86_64) && defined(__SSE2__) && !defined(CCC_FHM_PORTABLE)
+#    include <immintrin.h>
+#elif defined(__ARM_NEON__) && !defined(CCC_FHM_PORTABLE)
+#    include <arm_neon.h>
+#endif /* defined(__x86_64) && defined(__SSE2__) && !CCC_FHM_PORTABLE */
 
 #include "flat_hash_map.h"
 #include "impl/impl_flat_hash_map.h"
@@ -143,9 +146,35 @@ typedef struct
     uint16_t v;
 } index_mask;
 
-#else
+#elif defined(__ARM_NEON__) && !defined(CCC_FHM_PORTABLE)
 
-/** @privat The 8 byte word for managing multiple simultaneous equality checks.
+/** @private The 128 bit vector type for efficient SIMD group scanning. 16 one
+byte large tags fit in this type. */
+typedef struct
+{
+    uint8x8_t v;
+} group;
+
+/** @private Because we use 128 bit vectors over tags the results of various
+operations can be compressed into a 16 bit integer. */
+typedef struct
+{
+    uint64_t v;
+} index_mask;
+
+enum : uint64_t
+{
+    /** @private LSB tag bits used for byte and word level masking. */
+    INDEX_MASK_LSBS = 0x101010101010101,
+    /** @private MSB tag bits used for byte and word level masking. */
+    INDEX_MASK_MSBS = 0x8080808080808080,
+    /** @private Debug mode check for bits that must be off in index mask. */
+    INDEX_MASK_OFF_BITS = 0x7F7F7F7F7F7F7F7F,
+};
+
+#else /* PORTABLE FALLBACK */
+
+/** @private The 8 byte word for managing multiple simultaneous equality checks.
 In contrast to SIMD this group size is the same as the index mask. */
 typedef struct
 {
@@ -178,8 +207,7 @@ enum : uint8_t
     TAG_BITS = sizeof(ccc_fhm_tag) * CHAR_BIT,
 };
 
-#endif /* defined(__x86_64) && defined(__SSE2__) &&                            \
-          !defined(CCC_FHM_GENERIC)*/
+#endif /* defined(__x86_64) && defined(__SSE2__) && !CCC_FHM_PORTABLE */
 
 enum : uint8_t
 {
@@ -1549,7 +1577,210 @@ make_constants_empty_and_full_deleted(group const g)
         _mm_or_si128(match_constants, _mm_set1_epi8((int8_t)CCC_FHM_DELETED))};
 }
 
+#elif defined(__ARM_NEON__) && !defined(CCC_FHM_PORTABLE)
+
+/*=========================  Group Implementations   ========================*/
+
+/** Loads a group starting at src into a 128 bit vector. This is an unaligned
+load and the user must ensure the load will not go off then end of the tag
+array. */
+static inline group
+load_group(ccc_fhm_tag const *const src)
+{
+    return (group){vld1_u8(&src->v)};
+}
+
+/** Stores the src group to dst. The store is unaligned and the user must ensure
+the store will not go off the end of the tag array. */
+static inline void
+store_group(ccc_fhm_tag *const dst, group const src)
+{
+    vst1_u8(&dst->v, src.v);
+}
+
+/** Returns an index mask with the most significant bit set for each byte to
+indicate if the byte in the group matched the mask to be searched. The only
+bit on shall be this most significant bit to ensure iterating through index
+masks is easier and counting bits make sense in the find loops. */
+static inline index_mask
+match_tag(group const g, ccc_fhm_tag const m)
+{
+
+    index_mask const res
+        = {vget_lane_u64(vreinterpret_u64_u8(vceq_u8(g.v, vdup_n_u8(m.v))), 0)
+           & INDEX_MASK_MSBS};
+    assert(
+        (res.v & INDEX_MASK_OFF_BITS) == 0
+        && "For bit counting and iteration purposes the most significant bit "
+           "in every byte will indicate a match for a tag has occurred.");
+    return res;
+}
+
+/** Returns 0 based index mask with every bit on representing those tags in
+group g that are the empty special constant. The user must interpret this 0
+based index in the context of the probe sequence. */
+static inline index_mask
+match_empty(group const g)
+{
+    return match_tag(g, (ccc_fhm_tag){CCC_FHM_EMPTY});
+}
+
+/** Returns a 0 based index mask with every bit on representing those tags
+in the group that are the special constant empty or deleted. These are easy
+to find because they are the one tags in a group with the most significant
+bit on. */
+static inline index_mask
+match_empty_or_deleted(group const g)
+{
+    uint8x8_t const cmp = vcltz_s8(vreinterpret_s8_u8(g.v));
+    index_mask const res
+        = {vget_lane_u64(vreinterpret_u64_u8(cmp), 0) & INDEX_MASK_MSBS};
+    assert(
+        (res.v & INDEX_MASK_OFF_BITS) == 0
+        && "For bit counting and iteration purposes the most significant bit "
+           "in every byte will indicate a match for a tag has occurred.");
+    return res;
+}
+
+/** Converts the empty and deleted constants all CCC_FHM_EMPTY and the full
+tags representing hashed user data CCC_FHM_DELETED. Making the hashed data
+deleted is OK because it will only turn on the previously unused most
+significant bit. This does not affect user hashed data. */
+static inline group
+make_constants_empty_and_full_deleted(group const g)
+{
+    uint8x8_t const constant = vcltz_s8(vreinterpret_s8_u8(g.v));
+    return (group){vorr_u8(constant, vdup_n_u8(0x80))};
+}
+
+#else /* FALLBACK PORTABLE IMPLEMENTATION */
+
+/* What follows is the generic portable implementation when high width SIMD
+can't be achieved. For now this means NEON on Apple defaults to generic but
+this will likely change in the future as NEON improves. Counting zeros also
+is slightly different with the portable version requiring some thought given
+to group size and tag size. */
+
+/*=========================  Endian Helpers    ==============================*/
+
+/* Returns 1=true if platform is little endian, else false for big endian. */
+static inline int
+is_little_endian(void)
+{
+    unsigned int x = 1;
+    char *c = (char *)&x;
+    return (int)*c;
+}
+
+/* Returns a mask converted to little endian byte layout. On a little endian
+platform the value is returned, otherwise byte swapping occurs. */
+static inline index_mask
+to_little_endian(index_mask m)
+{
+    if (is_little_endian())
+    {
+        return m;
+    }
+#    if defined(__has_builtin) && __has_builtin(__builtin_bswap64)
+    m.v = __builtin_bswap64(m.v);
+#    else
+    m.v = (m.v & 0x00000000FFFFFFFF) << 32 | (m.v & 0xFFFFFFFF00000000) >> 32;
+    m.v = (m.v & 0x0000FFFF0000FFFF) << 16 | (m.v & 0xFFFF0000FFFF0000) >> 16;
+    m.v = (m.v & 0x00FF00FF00FF00FF) << 8 | (m.v & 0xFF00FF00FF00FF00) >> 8;
+#    endif
+    return m;
+}
+
+/*=========================  Group Implementations   ========================*/
+
+/** Loads tags into a group without violating strict aliasing. */
+static inline group
+load_group(ccc_fhm_tag const *const src)
+{
+    group g;
+    (void)memcpy(&g, src, sizeof(g));
+    return g;
+}
+
+/** Stores a group back into the tag array without violating strict aliasing. */
+static inline void
+store_group(ccc_fhm_tag *const dst, group const src)
+{
+    (void)memcpy(dst, &src, sizeof(src));
+}
+
+/** Returns an index mask indicating all tags in the group which may have the
+given value. The index mask will only have the most significant bit on within
+the byte representing the tag for the match. This function may return a false
+positive in certain cases where the tag in the group differs from the searched
+value only in its lowest bit. This is fine because:
+- This never happens for `EMPTY` and `DELETED`, only full entries.
+- The check for key equality will catch these.
+- This only happens if there is at least 1 true match.
+- The chance of this happening is very low (< 1% chance per byte). */
+static inline index_mask
+match_tag(group g, ccc_fhm_tag const m)
+{
+    /* This algorithm is derived from:
+       https://graphics.stanford.edu/~seander/bithacks.html##ValueInWord */
+    group const cmp = {g.v
+                       ^ ((((typeof(g.v))m.v) << (TAG_BITS * 7UL))
+                          | (((typeof(g.v))m.v) << (TAG_BITS * 6UL))
+                          | (((typeof(g.v))m.v) << (TAG_BITS * 5UL))
+                          | (((typeof(g.v))m.v) << (TAG_BITS * 4UL))
+                          | (((typeof(g.v))m.v) << (TAG_BITS * 3UL))
+                          | (((typeof(g.v))m.v) << (TAG_BITS * 2UL))
+                          | (((typeof(g.v))m.v) << TAG_BITS) | m.v)};
+    index_mask const res = to_little_endian(
+        (index_mask){(cmp.v - INDEX_MASK_LSBS) & ~cmp.v & INDEX_MASK_MSBS});
+    assert(
+        (res.v & INDEX_MASK_OFF_BITS) == 0
+        && "For bit counting and iteration purposes the most significant bit "
+           "in every byte will indicate a match for a tag has occurred.");
+    return res;
+}
+
+/** Returns an index mask with the most significant bit in every byte on if
+that tag in g is empty. */
+static inline index_mask
+match_empty(group const g)
+{
+    /* EMPTY has all bits on and DELETED has the most significant bit on so
+       EMPTY must have the top 2 bits on. Make sure the mask is only MSB's. */
+    return to_little_endian((index_mask){g.v & (g.v << 1) & INDEX_MASK_MSBS});
+}
+
+/** Returns an index mask with the most significant bit in every byte on if
+that tag in g is empty or deleted. This is found by the most significant bit. */
+static inline index_mask
+match_empty_or_deleted(group const g)
+{
+    return to_little_endian((index_mask){g.v & INDEX_MASK_MSBS});
+}
+
+/** Converts the empty and deleted constants all CCC_FHM_EMPTY and the full
+tags representing hashed user data CCC_FHM_DELETED. Making the hashed data
+deleted is OK because it will only turn on the previously unused most
+significant bit. This does not affect user hashed data. */
+static inline group
+make_constants_empty_and_full_deleted(group g)
+{
+    g.v = ~g.v & INDEX_MASK_MSBS;
+    g.v = ~g.v + (g.v >> (TAG_BITS - 1));
+    return g;
+}
+
+#endif /* defined(__x86_64) && defined(__SSE2__) && !CCC_FHM_PORTABLE */
+
 /*====================  Bit Counting for Index Mask   =======================*/
+
+/** How we count bits can vary depending on the implementation, group size,
+and index mask width. Keep the bit counting logic seperate here so the above
+implementations can simply rely on counting zeros that yields correct results
+for their implementation. Each implementation attempts to use the built-ins
+first and then falls back to manual bit counting. */
+
+#if defined(__x86_64) && defined(__SSE2__) && !defined(CCC_FHM_PORTABLE)
 
 #    if defined(__has_builtin) && __has_builtin(__builtin_ctz)                 \
         && __has_builtin(__builtin_clz) && __has_builtin(__builtin_clzl)
@@ -1639,124 +1870,7 @@ clz_size_t(size_t n)
 #    endif /* defined(__has_builtin) && __has_builtin(__builtin_ctz)           \
         && __has_builtin(__builtin_clz) && __has_builtin(__builtin_clzl) */
 
-#else /* !defined(__x86_64) || !defined(__SSE2__) ||                           \
-         !defined(CCC_FHM_PORTABLE) */
-
-/* What follows is the generic portable implementation when high width SIMD
-can't be achieved. For now this means NEON on Apple defaults to generic but
-this will likely change in the future as NEON improves. Counting zeros also
-is slightly different with the portable version requiring some thought given
-to group size and tag size. */
-
-/*=========================  Endian Helpers    ==============================*/
-
-/* Returns 1=true if platform is little endian, else false for big endian. */
-static inline int
-is_little_endian(void)
-{
-    unsigned int x = 1;
-    char *c = (char *)&x;
-    return (int)*c;
-}
-
-/* Returns a mask converted to little endian byte layout. On a little endian
-platform the value is returned, otherwise byte swapping occurs. */
-static inline index_mask
-to_little_endian(index_mask m)
-{
-    if (is_little_endian())
-    {
-        return m;
-    }
-#    if defined(__has_builtin) && __has_builtin(__builtin_bswap64)
-    m.v = __builtin_bswap64(m.v);
-#    else
-    m.v = (m.v & 0x00000000FFFFFFFF) << 32 | (m.v & 0xFFFFFFFF00000000) >> 32;
-    m.v = (m.v & 0x0000FFFF0000FFFF) << 16 | (m.v & 0xFFFF0000FFFF0000) >> 16;
-    m.v = (m.v & 0x00FF00FF00FF00FF) << 8 | (m.v & 0xFF00FF00FF00FF00) >> 8;
-#    endif
-    return m;
-}
-
-/*=========================  Group Implementations   ========================*/
-
-/** Loads tags into a group without violating strict aliasing. */
-static inline group
-load_group(ccc_fhm_tag const *const src)
-{
-    group g;
-    (void)memcpy(&g, src, sizeof(g));
-    return g;
-}
-
-/** Stores a group back into the tag array without violating strict aliasing. */
-static inline void
-store_group(ccc_fhm_tag *const dst, group const src)
-{
-    (void)memcpy(dst, &src, sizeof(src));
-}
-
-/** Returns an index mask indicating all tags in the group which may have the
-given value. The index mask will only have the most significant bit on within
-the byte representing the tag for the match. This function may return a false
-positive in certain cases where the tag in the group differs from the searched
-value only in its lowest bit. This is fine because:
-- This never happens for `EMPTY` and `DELETED`, only full entries.
-- The check for key equality will catch these.
-- This only happens if there is at least 1 true match.
-- The chance of this happening is very low (< 1% chance per byte). */
-static inline index_mask
-match_tag(group g, ccc_fhm_tag const m)
-{
-    /* This algorithm is derived from:
-       https://graphics.stanford.edu/~seander/bithacks.html##ValueInWord */
-    group const cmp = {g.v
-                       ^ ((((typeof(g.v))m.v) << (TAG_BITS * 7UL))
-                          | (((typeof(g.v))m.v) << (TAG_BITS * 6UL))
-                          | (((typeof(g.v))m.v) << (TAG_BITS * 5UL))
-                          | (((typeof(g.v))m.v) << (TAG_BITS * 4UL))
-                          | (((typeof(g.v))m.v) << (TAG_BITS * 3UL))
-                          | (((typeof(g.v))m.v) << (TAG_BITS * 2UL))
-                          | (((typeof(g.v))m.v) << TAG_BITS) | m.v)};
-    index_mask const res = to_little_endian(
-        (index_mask){(cmp.v - INDEX_MASK_LSBS) & ~cmp.v & INDEX_MASK_MSBS});
-    assert((res.v & INDEX_MASK_OFF_BITS) == 0
-           && "For bit counting and iteration purposes only one bit in every "
-              "byte will indicate a match for a tag has occurred.");
-    return res;
-}
-
-/** Returns an index mask with the most significant bit in every byte on if
-that tag in g is empty. */
-static inline index_mask
-match_empty(group const g)
-{
-    /* EMPTY has all bits on and DELETED has the most significant bit on so
-       EMPTY must have the top 2 bits on. Make sure the mask is only MSB's. */
-    return to_little_endian((index_mask){g.v & (g.v << 1) & INDEX_MASK_MSBS});
-}
-
-/** Returns an index mask with the most significant bit in every byte on if
-that tag in g is empty or deleted. This is found by the most significant bit. */
-static inline index_mask
-match_empty_or_deleted(group const g)
-{
-    return to_little_endian((index_mask){g.v & INDEX_MASK_MSBS});
-}
-
-/** Converts the empty and deleted constants all CCC_FHM_EMPTY and the full
-tags representing hashed user data CCC_FHM_DELETED. Making the hashed data
-deleted is OK because it will only turn on the previously unused most
-significant bit. This does not affect user hashed data. */
-static inline group
-make_constants_empty_and_full_deleted(group g)
-{
-    g.v = ~g.v & INDEX_MASK_MSBS;
-    g.v = ~g.v + (g.v >> (TAG_BITS - 1));
-    return g;
-}
-
-/*==========================    Bit Helpers    ==============================*/
+#else /* NEON and PORTABLE implementation count bits the same way. */
 
 #    if defined(__has_builtin) && __has_builtin(__builtin_ctzl)                \
         && __has_builtin(__builtin_clzl)
@@ -1833,7 +1947,7 @@ clz_size_t(size_t n)
 #    endif /* !defined(__has_builtin) || !__has_builtin(__builtin_ctzl) ||     \
               !__has_builtin(__builtin_clzl) */
 
-#endif /* defined(__x86_64) && defined(__SSE2__) */
+#endif /* defined(__x86_64) && defined(__SSE2__) && !CCC_FHM_PORTABLE */
 
 /** The following Apache license follows as required by the Rust Hashbrown
 table which in turn is based on the Abseil Flat Hash Map developed at Google:
