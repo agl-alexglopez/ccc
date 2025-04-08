@@ -813,7 +813,7 @@ typedef ccc_flat_hash_map flat_hash_map;
 typedef ccc_fhmap_entry fhmap_entry;
 #    define fhm_declare_fixed_map(args...) ccc_fhm_declare_fixed_map(args)
 #    define fhm_fixed_capacity(args...) ccc_fhm_fixed_capacity(args)
-#    define fhm_fixed_reserve(args...) ccc_fhm_fixed_reserve(args)
+#    define fhm_reserve(args...) ccc_fhm_reserve(args)
 #    define fhm_init(args...) ccc_fhm_init(args)
 #    define fhm_copy(args...) ccc_fhm_copy(args)
 #    define fhm_and_modify_w(args...) ccc_fhm_and_modify_w(args)

@@ -116,6 +116,18 @@ uint16_t const cached_bit = 0b0001000000000000;
 
 /*==========================   Prototypes  ================================= */
 
+#define prog_assert(cond, ...)                                                 \
+    do                                                                         \
+    {                                                                          \
+        if (!(cond))                                                           \
+        {                                                                      \
+            __VA_OPT__(__VA_ARGS__)                                            \
+            printf("%s, %d, condition is false: %s\n", __FILE__, __LINE__,     \
+                   #cond);                                                     \
+            exit(1);                                                           \
+        }                                                                      \
+    } while (0)
+
 static void animate_maze(struct maze *);
 static void fill_maze_with_walls(struct maze *);
 static void build_wall(struct maze *, int r, int c);
@@ -224,18 +236,22 @@ animate_maze(struct maze *maze)
     int const speed = speeds[maze->speed];
     fill_maze_with_walls(maze);
     clear_and_flush_maze(maze);
+    /* Test use case of reserve without reallocation permission. Guarantees
+       exactly the needed memory and no more over lifetime of program. */
+    flat_hash_map cost_map
+        = fhm_init((struct prim_cell *)NULL, NULL, cell, prim_cell_hash_fn,
+                   prim_cell_eq, NULL, NULL, 0);
+    ccc_result const r = fhm_reserve(
+        &cost_map, ((maze->rows * maze->cols) / 2) + 1, std_alloc);
+    prog_assert(r == CCC_RESULT_OK);
     /* Priority queue will manage its own flat buffer. */
     ccc_flat_priority_queue cell_pq = ccc_fpq_init(
         (struct prim_cell *)NULL, CCC_LES, cmp_prim_cells, std_alloc, NULL, 0);
-    /* Map will manage its own flat buffer. */
-    flat_hash_map cost_map
-        = fhm_init((struct prim_cell *)NULL, NULL, cell, prim_cell_hash_fn,
-                   prim_cell_eq, std_alloc, NULL, 0);
     struct point s = rand_point(maze);
     struct prim_cell const *const first = fhm_insert_entry_w(
         entry_r(&cost_map, &s),
         (struct prim_cell){.cell = s, .cost = rand_range(0, 100)});
-    assert(first);
+    prog_assert(first);
     (void)push(&cell_pq, first);
     while (!is_empty(&cell_pq))
     {
@@ -253,7 +269,7 @@ animate_maze(struct maze *maze)
                 struct prim_cell const *const cell = fhm_or_insert_w(
                     entry_r(&cost_map, &n),
                     (struct prim_cell){.cell = n, .cost = rand_range(0, 100)});
-                assert(cell);
+                prog_assert(cell);
                 if (cell->cost < min)
                 {
                     min = cell->cost;
@@ -272,7 +288,9 @@ animate_maze(struct maze *maze)
             (void)pop(&cell_pq);
         }
     }
-    (void)ccc_fhm_clear_and_free(&cost_map, NULL);
+    /* If a container is reserved without allocation permission it has no way
+       to free itself. Give it the same allocation function used to reserve. */
+    (void)ccc_fhm_clear_and_free_reserve(&cost_map, NULL, std_alloc);
     (void)ccc_fpq_clear_and_free(&cell_pq, NULL);
 }
 
