@@ -413,6 +413,39 @@ CHECK_BEGIN_STATIC_FN(hromap_test_resize)
     CHECK_END_FN();
 }
 
+CHECK_BEGIN_STATIC_FN(hromap_test_reserve)
+{
+    int const to_insert = 1000;
+    ccc_handle_realtime_ordered_map hrm
+        = hrm_init((struct val *)NULL, elem, id, id_cmp, NULL, NULL, 0);
+    ccc_result const r = hrm_reserve(&hrm, to_insert, std_alloc);
+    CHECK(r, CCC_RESULT_OK);
+    int const larger_prime = 1009;
+    for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
+         ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
+    {
+        struct val elem = {.id = shuffled_index, .val = i};
+        struct val *v
+            = hrm_at(&hrm, insert_handle(handle_r(&hrm, &elem.id), &elem.elem));
+        CHECK(v != NULL, true);
+        CHECK(v->id, shuffled_index);
+        CHECK(v->val, i);
+        CHECK(validate(&hrm), true);
+    }
+    CHECK(size(&hrm).count, to_insert);
+    for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
+         ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
+    {
+        struct val swap_slot = {shuffled_index, shuffled_index, {}};
+        struct val const *const in_table
+            = hrm_at(&hrm, insert_handle(handle_r(&hrm, &swap_slot.id),
+                                         &swap_slot.elem));
+        CHECK(in_table != NULL, true);
+        CHECK(in_table->val, shuffled_index);
+    }
+    CHECK_END_FN(ccc_hrm_clear_and_free_reserve(&hrm, NULL, std_alloc););
+}
+
 CHECK_BEGIN_STATIC_FN(hromap_test_resize_macros)
 {
     size_t const prime_start = 11;
@@ -667,7 +700,7 @@ main()
         hromap_test_insert(), hromap_test_insert_macros(),
         hromap_test_insert_and_find(), hromap_test_insert_overwrite(),
         hromap_test_insert_then_bad_ideas(), hromap_test_insert_via_handle(),
-        hromap_test_insert_via_handle_macros(),
+        hromap_test_insert_via_handle_macros(), hromap_test_reserve(),
         hromap_test_handle_api_functional(), hromap_test_handle_api_macros(),
         hromap_test_two_sum(), hromap_test_resize(),
         hromap_test_resize_macros(), hromap_test_resize_from_null(),

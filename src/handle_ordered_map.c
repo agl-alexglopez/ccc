@@ -527,14 +527,14 @@ ccc_hom_reserve(ccc_handle_ordered_map *const hom, size_t const to_add,
     }
     size_t const old_sz = hom->buf_.sz_;
     size_t old_cap = hom->buf_.capacity_;
-    if (!old_cap && ccc_buf_size_set(&hom->buf_, 1) != CCC_RESULT_OK)
-    {
-        return CCC_RESULT_FAIL;
-    }
     ccc_result const res = ccc_buf_alloc(&hom->buf_, needed, fn);
     if (res != CCC_RESULT_OK)
     {
         return res;
+    }
+    if (!old_cap && ccc_buf_size_set(&hom->buf_, 1) != CCC_RESULT_OK)
+    {
+        return CCC_RESULT_FAIL;
     }
     old_cap = old_sz ? old_cap : 0;
     size_t const new_cap = hom->buf_.capacity_;
