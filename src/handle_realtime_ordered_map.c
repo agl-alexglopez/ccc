@@ -578,14 +578,15 @@ ccc_hrm_reserve(ccc_handle_realtime_ordered_map *const hrm, size_t const to_add,
     }
     size_t const old_sz = hrm->buf_.sz_;
     size_t old_cap = hrm->buf_.capacity_;
-    if (!old_cap && ccc_buf_size_set(&hrm->buf_, 1) != CCC_RESULT_OK)
-    {
-        return CCC_RESULT_FAIL;
-    }
     ccc_result const res = ccc_buf_alloc(&hrm->buf_, needed, fn);
     if (res != CCC_RESULT_OK)
     {
         return res;
+    }
+    at(hrm, 0)->parity_ = 1;
+    if (!old_cap && ccc_buf_size_set(&hrm->buf_, 1) != CCC_RESULT_OK)
+    {
+        return CCC_RESULT_FAIL;
     }
     old_cap = old_sz ? old_cap : 0;
     size_t const new_cap = hrm->buf_.capacity_;

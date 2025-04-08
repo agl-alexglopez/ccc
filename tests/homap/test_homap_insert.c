@@ -414,6 +414,39 @@ CHECK_BEGIN_STATIC_FN(homap_test_resize)
     CHECK_END_FN();
 }
 
+CHECK_BEGIN_STATIC_FN(homap_test_reserve)
+{
+    int const to_insert = 1000;
+    ccc_handle_ordered_map hom
+        = hom_init((struct val *)NULL, elem, id, id_cmp, NULL, NULL, 0);
+    ccc_result const r = hom_reserve(&hom, to_insert, std_alloc);
+    CHECK(r, CCC_RESULT_OK);
+    int const larger_prime = 1009;
+    for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
+         ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
+    {
+        struct val elem = {.id = shuffled_index, .val = i};
+        struct val *v
+            = hom_at(&hom, insert_handle(handle_r(&hom, &elem.id), &elem.elem));
+        CHECK(v != NULL, true);
+        CHECK(v->id, shuffled_index);
+        CHECK(v->val, i);
+        CHECK(validate(&hom), true);
+    }
+    CHECK(size(&hom).count, to_insert);
+    for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
+         ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
+    {
+        struct val swap_slot = {shuffled_index, shuffled_index, {}};
+        struct val const *const in_table
+            = hom_at(&hom, insert_handle(handle_r(&hom, &swap_slot.id),
+                                         &swap_slot.elem));
+        CHECK(in_table != NULL, true);
+        CHECK(in_table->val, shuffled_index);
+    }
+    CHECK_END_FN(hom_clear_and_free_reserve(&hom, NULL, std_alloc););
+}
+
 CHECK_BEGIN_STATIC_FN(homap_test_resize_macros)
 {
     size_t const prime_start = 11;
@@ -672,7 +705,7 @@ main()
         homap_test_insert(), homap_test_insert_macros(),
         homap_test_insert_and_find(), homap_test_insert_overwrite(),
         homap_test_insert_then_bad_ideas(), homap_test_insert_via_handle(),
-        homap_test_insert_via_handle_macros(),
+        homap_test_insert_via_handle_macros(), homap_test_reserve(),
         homap_test_handle_api_functional(), homap_test_handle_api_macros(),
         homap_test_two_sum(), homap_test_resize(), homap_test_resize_macros(),
         homap_test_resize_from_null(), homap_test_resize_from_null_macros(),

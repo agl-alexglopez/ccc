@@ -1,5 +1,6 @@
 #define TRAITS_USING_NAMESPACE_CCC
 
+#include "alloc.h"
 #include "checkers.h"
 #include "flat_priority_queue.h"
 #include "fpq_util.h"
@@ -88,7 +89,6 @@ CHECK_BEGIN_STATIC_FN(fpq_test_insert_three_dups)
 
 CHECK_BEGIN_STATIC_FN(fpq_test_insert_shuffle)
 {
-    /* Math magic ahead... */
     size_t const size = 50;
     int const prime = 53;
     struct val vals[50 + 1];
@@ -107,6 +107,29 @@ CHECK_BEGIN_STATIC_FN(fpq_test_insert_shuffle)
         prev = sorted_check[i];
     }
     CHECK_END_FN();
+}
+
+CHECK_BEGIN_STATIC_FN(fpq_test_insert_shuffle_reserve)
+{
+    size_t const size = 50;
+    int const prime = 53;
+    struct val vals[50];
+    ccc_flat_priority_queue fpq
+        = ccc_fpq_init((struct val *)NULL, CCC_LES, val_cmp, NULL, NULL, 0);
+    ccc_result const r = ccc_fpq_reserve(&fpq, 50, std_alloc);
+    CHECK(r, CCC_RESULT_OK);
+    CHECK(insert_shuffled(&fpq, vals, size, prime), PASS);
+    struct val const *min = front(&fpq);
+    CHECK(min->val, 0);
+    int sorted_check[50];
+    CHECK(inorder_fill(sorted_check, size, &fpq), PASS);
+    int prev = sorted_check[0];
+    for (size_t i = 0; i < size; ++i)
+    {
+        CHECK(prev <= sorted_check[i], true);
+        prev = sorted_check[i];
+    }
+    CHECK_END_FN(ccc_fpq_clear_and_free_reserve(&fpq, NULL, std_alloc););
 }
 
 CHECK_BEGIN_STATIC_FN(fpq_test_read_max_min)
@@ -133,5 +156,7 @@ main()
 {
     return CHECK_RUN(fpq_test_insert_one(), fpq_test_insert_three(),
                      fpq_test_struct_getter(), fpq_test_insert_three_dups(),
-                     fpq_test_insert_shuffle(), fpq_test_read_max_min());
+                     fpq_test_insert_shuffle(),
+                     fpq_test_insert_shuffle_reserve(),
+                     fpq_test_read_max_min());
 }
