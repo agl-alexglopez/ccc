@@ -563,6 +563,47 @@ ccc_hrm_rend(ccc_handle_realtime_ordered_map const *const hrm)
 }
 
 ccc_result
+ccc_hrm_reserve(ccc_handle_realtime_ordered_map *const hrm, size_t const to_add,
+                ccc_alloc_fn *const fn)
+{
+    if (!hrm || !fn)
+    {
+        return CCC_RESULT_ARG_ERROR;
+    }
+    /* Once initialized the buffer always has a size of one for root node. */
+    size_t const needed = hrm->buf_.sz_ + to_add + (hrm->buf_.sz_ == 0);
+    if (needed <= hrm->buf_.capacity_)
+    {
+        return CCC_RESULT_OK;
+    }
+    size_t const old_sz = hrm->buf_.sz_;
+    size_t old_cap = hrm->buf_.capacity_;
+    if (!old_cap && ccc_buf_size_set(&hrm->buf_, 1) != CCC_RESULT_OK)
+    {
+        return CCC_RESULT_FAIL;
+    }
+    ccc_result const res = ccc_buf_alloc(&hrm->buf_, needed, fn);
+    if (res != CCC_RESULT_OK)
+    {
+        return res;
+    }
+    old_cap = old_sz ? old_cap : 0;
+    size_t const new_cap = hrm->buf_.capacity_;
+    size_t prev = 0;
+    for (ptrdiff_t i = (ptrdiff_t)new_cap - 1; i > 0 && i >= (ptrdiff_t)old_cap;
+         prev = i, --i)
+    {
+        at(hrm, i)->parity_ = IN_FREE_LIST;
+        at(hrm, i)->next_free_ = prev;
+    }
+    if (!hrm->free_list_)
+    {
+        hrm->free_list_ = prev;
+    }
+    return CCC_RESULT_OK;
+}
+
+ccc_result
 ccc_hrm_copy(ccc_handle_realtime_ordered_map *const dst,
              ccc_handle_realtime_ordered_map const *const src,
              ccc_alloc_fn *const fn)
@@ -653,6 +694,31 @@ ccc_hrm_clear_and_free(ccc_handle_realtime_ordered_map *const hrm,
     }
     hrm->root_ = 0;
     return ccc_buf_alloc(&hrm->buf_, 0, hrm->buf_.alloc_);
+}
+
+ccc_result
+ccc_hrm_clear_and_free_reserve(ccc_handle_realtime_ordered_map *const hrm,
+                               ccc_destructor_fn *const destructor,
+                               ccc_alloc_fn *const alloc)
+{
+    if (!hrm)
+    {
+        return CCC_RESULT_ARG_ERROR;
+    }
+    if (!destructor)
+    {
+        hrm->root_ = 0;
+        return ccc_buf_alloc(&hrm->buf_, 0, alloc);
+    }
+    while (!ccc_hrm_is_empty(hrm))
+    {
+        size_t const i = remove_fixup(hrm, hrm->root_);
+        assert(i);
+        destructor((ccc_user_type){.user_type = ccc_buf_at(&hrm->buf_, i),
+                                   .aux = hrm->buf_.aux_});
+    }
+    hrm->root_ = 0;
+    return ccc_buf_alloc(&hrm->buf_, 0, alloc);
 }
 
 ccc_tribool

@@ -512,6 +512,46 @@ ccc_hom_equal_rrange(ccc_handle_ordered_map *const hom,
 }
 
 ccc_result
+ccc_hom_reserve(ccc_handle_ordered_map *const hom, size_t const to_add,
+                ccc_alloc_fn *const fn)
+{
+    if (!hom || !fn)
+    {
+        return CCC_RESULT_ARG_ERROR;
+    }
+    /* Once initialized the buffer always has a size of one for root node. */
+    size_t const needed = hom->buf_.sz_ + to_add + (hom->buf_.sz_ == 0);
+    if (needed <= hom->buf_.capacity_)
+    {
+        return CCC_RESULT_OK;
+    }
+    size_t const old_sz = hom->buf_.sz_;
+    size_t old_cap = hom->buf_.capacity_;
+    if (!old_cap && ccc_buf_size_set(&hom->buf_, 1) != CCC_RESULT_OK)
+    {
+        return CCC_RESULT_FAIL;
+    }
+    ccc_result const res = ccc_buf_alloc(&hom->buf_, needed, fn);
+    if (res != CCC_RESULT_OK)
+    {
+        return res;
+    }
+    old_cap = old_sz ? old_cap : 0;
+    size_t const new_cap = hom->buf_.capacity_;
+    size_t prev = 0;
+    for (ptrdiff_t i = (ptrdiff_t)new_cap - 1; i > 0 && i >= (ptrdiff_t)old_cap;
+         prev = i, --i)
+    {
+        at(hom, i)->next_free_ = prev;
+    }
+    if (!hom->free_list_)
+    {
+        hom->free_list_ = prev;
+    }
+    return CCC_RESULT_OK;
+}
+
+ccc_result
 ccc_hom_copy(ccc_handle_ordered_map *const dst,
              ccc_handle_ordered_map const *const src, ccc_alloc_fn *const fn)
 {
@@ -601,6 +641,31 @@ ccc_hom_clear_and_free(ccc_handle_ordered_map *const hom,
     }
     hom->root_ = 0;
     return ccc_buf_alloc(&hom->buf_, 0, hom->buf_.alloc_);
+}
+
+ccc_result
+ccc_hom_clear_and_free_reserve(ccc_handle_ordered_map *const hom,
+                               ccc_destructor_fn *const destructor,
+                               ccc_alloc_fn *const alloc)
+{
+    if (!hom)
+    {
+        return CCC_RESULT_ARG_ERROR;
+    }
+    if (!destructor)
+    {
+        hom->root_ = 0;
+        return ccc_buf_alloc(&hom->buf_, 0, alloc);
+    }
+    while (!ccc_hom_is_empty(hom))
+    {
+        size_t const i = remove_from_tree(hom, hom->root_);
+        assert(i);
+        destructor((ccc_user_type){.user_type = ccc_buf_at(&hom->buf_, i),
+                                   .aux = hom->buf_.aux_});
+    }
+    hom->root_ = 0;
+    return ccc_buf_alloc(&hom->buf_, 0, alloc);
 }
 
 ccc_tribool
@@ -915,7 +980,8 @@ alloc_slot(struct ccc_homap_ *const t)
         old_cap = old_sz ? old_cap : 0;
         size_t const new_cap = t->buf_.capacity_;
         size_t prev = 0;
-        for (size_t i = new_cap - 1; i > 0 && i >= old_cap; prev = i, --i)
+        for (ptrdiff_t i = (ptrdiff_t)new_cap - 1;
+             i > 0 && i >= (ptrdiff_t)old_cap; prev = i, --i)
         {
             at(t, i)->next_free_ = prev;
         }

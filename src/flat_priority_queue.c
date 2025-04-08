@@ -263,6 +263,22 @@ ccc_fpq_order(ccc_flat_priority_queue const *const fpq)
 }
 
 ccc_result
+ccc_fpq_reserve(ccc_flat_priority_queue *const fpq, size_t const to_add,
+                ccc_alloc_fn *const fn)
+{
+    if (!fpq || !fn)
+    {
+        return CCC_RESULT_ARG_ERROR;
+    }
+    size_t const needed = fpq->buf_.sz_ + to_add + 1;
+    if (needed <= fpq->buf_.capacity_)
+    {
+        return CCC_RESULT_OK;
+    }
+    return ccc_buf_alloc(&fpq->buf_, needed, fn);
+}
+
+ccc_result
 ccc_fpq_copy(ccc_flat_priority_queue *const dst,
              ccc_flat_priority_queue const *const src, ccc_alloc_fn *const fn)
 {
@@ -340,6 +356,27 @@ ccc_fpq_clear_and_free(ccc_flat_priority_queue *const fpq,
         }
     }
     return ccc_buf_alloc(&fpq->buf_, 0, fpq->buf_.alloc_);
+}
+
+ccc_result
+ccc_fpq_clear_and_free_reserve(ccc_flat_priority_queue *const fpq,
+                               ccc_destructor_fn *const destructor,
+                               ccc_alloc_fn *const alloc)
+{
+    if (!fpq)
+    {
+        return CCC_RESULT_ARG_ERROR;
+    }
+    if (destructor)
+    {
+        size_t const sz = fpq->buf_.sz_;
+        for (size_t i = 0; i < sz; ++i)
+        {
+            destructor((ccc_user_type){.user_type = at(fpq, i),
+                                       .aux = fpq->buf_.aux_});
+        }
+    }
+    return ccc_buf_alloc(&fpq->buf_, 0, alloc);
 }
 
 ccc_tribool

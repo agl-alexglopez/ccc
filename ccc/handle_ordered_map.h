@@ -187,6 +187,26 @@ memory management strategies. */
 ccc_result ccc_hom_copy(ccc_handle_ordered_map *dst,
                         ccc_handle_ordered_map const *src, ccc_alloc_fn *fn);
 
+/** @brief Reserves space for at least to_add more elements.
+@param [in] hom a pointer to the handle ordered map.
+@param [in] to_add the number of elements to add to the current size.
+@param [in] fn the allocation function to use to reserve memory.
+@return the result of the reservation. OK if successful, otherwise an error
+status is returned.
+@note see the ccc_hom_clear_and_free_reserve function if this function is
+being used for a one-time dynamic reservation.
+
+This function can be used for a dynamic hom with or without allocation
+permission. If the hom has allocation permission, it will reserve the required
+space and later resize if more space is needed.
+
+If the hom has been initialized with no allocation permission and no memory
+this function can serve as a one-time reservation. This is helpful when a fixed
+size is needed but that size is only known dynamically at runtime. To free the
+hom in such a case see the ccc_hom_clear_and_free_reserve function. */
+ccc_result ccc_hom_reserve(ccc_handle_ordered_map *hom, size_t to_add,
+                           ccc_alloc_fn *fn);
+
 /**@}*/
 
 /**@name Membership Interface
@@ -199,10 +219,11 @@ Test membership or obtain references to stored user types directly. */
 @return a pointer to the user type stored at the specified handle or NULL if
 an out of range handle or handle representing no data is provided.
 @warning this function can only check if the handle value is in range. If a
-handle represents a slot that has been taken by a new element because the old
-one has been removed that new element data will be returned.
-@warning do not try to access data in the table manually with a handle. Always
-use this provided interface function when a reference to data is needed. */
+handle represents a slot that has been taken by a new element because the
+old one has been removed that new element data will be returned.
+@warning do not try to access data in the table manually with a handle.
+Always use this provided interface function when a reference to data is
+needed. */
 [[nodiscard]] void *ccc_hom_at(ccc_handle_ordered_map const *h, ccc_handle_i i);
 
 /** @brief Returns a reference to the user type in the table at the handle.
@@ -707,6 +728,36 @@ If NULL is passed as the destructor function time is O(1), else O(size). */
 ccc_result ccc_hom_clear_and_free(ccc_handle_ordered_map *hom,
                                   ccc_destructor_fn *fn);
 
+/** @brief Frees all slots in the hom and frees the underlying buffer that was
+previously dynamically reserved with the reserve function.
+@param [in] hom the map to be cleared.
+@param [in] destructor the destructor for each element. NULL can be passed if no
+maintenance is required on the elements in the hom before their slots are
+dropped.
+@param [in] alloc the required allocation function to provide to a dynamically
+reserved hom. Any auxiliary data provided upon initialization will be passed to
+the allocation function when called.
+@return the result of free operation. OK if success, or an error status to
+indicate the error.
+@warning It is an error to call this function on a hom that was not reserved
+with the provided ccc_alloc_fn. The hom must have existing memory to free.
+
+This function covers the edge case of reserving a dynamic capacity for a hom
+at runtime but denying the hom allocation permission to resize. This can help
+prevent a hom from growing unbounded. The user in this case knows the hom does
+not have allocation permission and therefore no further memory will be dedicated
+to the hom.
+
+However, to free the hom in such a case this function must be used because the
+hom has no ability to free itself. Just as the allocation function is required
+to reserve memory so to is it required to free memory.
+
+This function will work normally if called on a hom with allocation permission
+however the normal ccc_hom_clear_and_free is sufficient for that use case. */
+ccc_result ccc_hom_clear_and_free_reserve(ccc_handle_ordered_map *hom,
+                                          ccc_destructor_fn *destructor,
+                                          ccc_alloc_fn *alloc);
+
 /**@}*/
 
 /** @name State Interface
@@ -762,6 +813,7 @@ typedef ccc_homap_handle homap_handle;
 #    define hom_insert_or_assign_w(args...) ccc_hom_insert_or_assign_w(args)
 #    define hom_init(args...) ccc_hom_init(args)
 #    define hom_copy(args...) ccc_hom_copy(args)
+#    define hom_reserve(args...) ccc_hom_reserve(args)
 #    define hom_contains(args...) ccc_hom_contains(args)
 #    define hom_get_key_val(args...) ccc_hom_get_key_val(args)
 #    define hom_swap_handle_r(args...) ccc_hom_swap_handle_r(args)
@@ -784,6 +836,8 @@ typedef ccc_homap_handle homap_handle;
 #    define hom_occupied(args...) ccc_hom_occupied(args)
 #    define hom_clear(args...) ccc_hom_clear(args)
 #    define hom_clear_and_free(args...) ccc_hom_clear_and_free(args)
+#    define hom_clear_and_free_reserve(args...)                                \
+        ccc_hom_clear_and_free_reserve(args)
 #    define hom_begin(args...) ccc_hom_begin(args)
 #    define hom_rbegin(args...) ccc_hom_rbegin(args)
 #    define hom_end(args...) ccc_hom_end(args)
