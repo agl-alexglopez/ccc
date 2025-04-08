@@ -1101,7 +1101,7 @@ struct point const next = {.r = c->cell.r + dir_offsets[i].r,
                            .c = c->cell.c + dir_offsets[i].c};
 struct prim_cell new = (struct prim_cell){.cell = next,
                                           .cost = rand_range(0, 100)};
-struct prim_cell *const cell = or_insert(entry_r(&costs, &next), &new.map_elem);
+struct prim_cell *const cell = or_insert(entry_r(&cost_map, &next), &new);
 ```
 
 The lazily evaluated macro version.
@@ -1109,8 +1109,8 @@ The lazily evaluated macro version.
 ```c
 struct point const next = {.r = c->cell.r + dir_offsets[i].r,
                            .c = c->cell.c + dir_offsets[i].c};
-struct prim_cell *const cell = om_or_insert_w(
-    entry_r(&costs, &next),
+struct prim_cell const *const cell = fhm_or_insert_w(
+    entry_r(&cost_map, &next),
     (struct prim_cell){.cell = next, .cost = rand_range(0, 100)});
 ```
 
