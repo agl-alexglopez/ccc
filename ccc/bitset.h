@@ -208,6 +208,25 @@ memory management strategies. */
 ccc_result ccc_bs_copy(ccc_bitset *dst, ccc_bitset const *src,
                        ccc_alloc_fn *fn);
 
+/** @brief Reserves space for at least to_add more bits.
+@param [in] bs a pointer to the bit set.
+@param [in] to_add the number of elements to add to the current size.
+@param [in] fn the allocation function to use to reserve memory.
+@return the result of the reservation. OK if successful, otherwise an error
+status is returned.
+@note see the ccc_bs_clear_and_free_reserve function if this function is
+being used for a one-time dynamic reservation.
+
+This function can be used for a dynamic bit set with or without allocation
+permission. If the bit set has allocation permission, it will reserve the
+required space and later resize if more space is needed.
+
+If the bit set has been initialized with no allocation permission and no memory
+this function can serve as a one-time reservation. This is helpful when a fixed
+size is needed but that size is only known dynamically at runtime. To free the
+bit set in such a case see the ccc_bs_clear_and_free_reserve function. */
+ccc_result ccc_bs_reserve(ccc_bitset *bs, size_t to_add, ccc_alloc_fn *fn);
+
 /**@}*/
 
 /** @name Bit Membership Interface
@@ -730,6 +749,31 @@ the set cannot be freed because no allocation function was provided upon
 initialization. */
 ccc_result ccc_bs_clear_and_free(ccc_bitset *bs);
 
+/** @brief Frees the buffer for the bit set that was previously dynamically
+reserved with the reserve function.
+@param [in] bs the bs to be cleared.
+@param [in] fn the required allocation function to provide to a dynamically
+reserved bs. Any auxiliary data provided upon initialization will be passed to
+the allocation function when called.
+@return the result of free operation. OK if success, or an error status to
+indicate the error.
+@warning It is an error to call this function on a bs that was not reserved
+with the provided ccc_alloc_fn. The bs must have existing memory to free.
+
+This function covers the edge case of reserving a dynamic capacity for a bs
+at runtime but denying the bs allocation permission to resize. This can help
+prevent a bs from growing unbounded. The user in this case knows the bs does
+not have allocation permission and therefore no further memory will be dedicated
+to the bs.
+
+However, to free the bs in such a case this function must be used because the
+bs has no ability to free itself. Just as the allocation function is required
+to reserve memory so to is it required to free memory.
+
+This function will work normally if called on a bs with allocation permission
+however the normal ccc_bs_clear_and_free is sufficient for that use case. */
+ccc_result ccc_bs_clear_and_free_reserve(ccc_bitset *bs, ccc_alloc_fn *fn);
+
 /**@}*/
 
 /** @name Dynamic Interface
@@ -760,6 +804,7 @@ typedef ccc_bitblock bitblock;
 #    define bs_blocks(args...) ccc_bs_blocks(args)
 #    define bs_init(args...) ccc_bs_init(args)
 #    define bs_copy(args...) ccc_bs_copy(args)
+#    define bs_reserve(args...) ccc_bs_reserve(args)
 #    define bs_test(args...) ccc_bs_test(args)
 #    define bs_set(args...) ccc_bs_set(args)
 #    define bs_set_all(args...) ccc_bs_set_all(args)
@@ -818,6 +863,8 @@ typedef ccc_bitblock bitblock;
 #    define bs_popcount_range(args...) ccc_bs_popcount_range(args)
 #    define bs_clear(args...) ccc_bs_clear(args)
 #    define bs_clear_and_free(args...) ccc_bs_clear_and_free(args)
+#    define bs_clear_and_free_reserve(args...)                                 \
+        ccc_bs_clear_and_free_reserve(args)
 #    define bs_push_back(args...) ccc_bs_push_back(args)
 #    define bs_pop_back(args...) ccc_bs_pop_back(args)
 #endif /* BITSET_USING_NAMESPACE_CCC */

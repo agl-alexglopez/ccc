@@ -169,7 +169,7 @@ CHECK_BEGIN_STATIC_FN(fdeq_test_insert_ranges_reserve)
     (void)fdeq_insert_range(&q, fdeq_at(&q, 3), 7,
                             (int[7]){23, 24, 25, 26, 27, 28, 29});
     CHECK(check_order(&q, 6, (int[6]){24, 25, 26, 27, 28, 29}), PASS);
-    CHECK_END_FN(ccc_fdeq_clear_and_free_reserve(&q, NULL, std_alloc););
+    CHECK_END_FN(clear_and_free_reserve(&q, NULL, std_alloc););
 }
 
 int

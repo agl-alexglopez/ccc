@@ -129,7 +129,7 @@ CHECK_BEGIN_STATIC_FN(fpq_test_insert_shuffle_reserve)
         CHECK(prev <= sorted_check[i], true);
         prev = sorted_check[i];
     }
-    CHECK_END_FN(ccc_fpq_clear_and_free_reserve(&fpq, NULL, std_alloc););
+    CHECK_END_FN(clear_and_free_reserve(&fpq, NULL, std_alloc););
 }
 
 CHECK_BEGIN_STATIC_FN(fpq_test_read_max_min)

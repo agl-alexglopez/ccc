@@ -17,6 +17,7 @@ limitations under the License.
 #define CCC_IMPL_TRAITS_H
 
 /* NOLINTBEGIN */
+#include "../bitset.h"
 #include "../buffer.h"
 #include "../doubly_linked_list.h"
 #include "../flat_double_ended_queue.h"
@@ -727,10 +728,70 @@ limitations under the License.
         ccc_doubly_linked_list const *: ccc_dll_splice_range)(                 \
         (container_ptr), splice_range_args)
 
+/*===================         Memory Management       =======================*/
+
+#define ccc_impl_copy(dst_container_ptr, src_container_ptr, alloc_fn_ptr)      \
+    _Generic((dst_container_ptr),                                              \
+        ccc_bitset *: ccc_bs_copy,                                             \
+        ccc_flat_hash_map *: ccc_fhm_copy,                                     \
+        ccc_handle_ordered_map *: ccc_hom_copy,                                \
+        ccc_flat_priority_queue *: ccc_fpq_copy,                               \
+        ccc_flat_double_ended_queue *: ccc_fdeq_copy,                          \
+        ccc_handle_realtime_ordered_map *: ccc_hrm_copy)(                      \
+        (dst_container_ptr), (src_container_ptr), (alloc_fn_ptr))
+
+#define ccc_impl_reserve(container_ptr, n_to_add, alloc_fn_ptr)                \
+    _Generic((container_ptr),                                                  \
+        ccc_bitset *: ccc_bs_reserve,                                          \
+        ccc_flat_hash_map *: ccc_fhm_reserve,                                  \
+        ccc_handle_ordered_map *: ccc_hom_reserve,                             \
+        ccc_flat_priority_queue *: ccc_fpq_reserve,                            \
+        ccc_flat_double_ended_queue *: ccc_fdeq_reserve,                       \
+        ccc_handle_realtime_ordered_map                                        \
+            *: ccc_hrm_reserve)((container_ptr), (n_to_add), (alloc_fn_ptr))
+
+#define ccc_impl_clear(container_ptr, ...)                                     \
+    _Generic((container_ptr),                                                  \
+        ccc_bitset *: ccc_bs_clear,                                            \
+        ccc_flat_hash_map *: ccc_fhm_clear,                                    \
+        ccc_handle_ordered_map *: ccc_hom_clear,                               \
+        ccc_flat_priority_queue *: ccc_fpq_clear,                              \
+        ccc_flat_double_ended_queue *: ccc_fdeq_clear,                         \
+        ccc_singly_linked_list *: ccc_sll_clear,                               \
+        ccc_doubly_linked_list *: ccc_dll_clear,                               \
+        ccc_ordered_multimap *: ccc_omm_clear,                                 \
+        ccc_ordered_map *: ccc_omm_clear,                                      \
+        ccc_priority_queue *: ccc_pq_clear,                                    \
+        ccc_realtime_ordered_map *: ccc_rom_clear,                             \
+        ccc_handle_realtime_ordered_map                                        \
+            *: ccc_hrm_clear)((container_ptr)__VA_OPT__(, __VA_ARGS__))
+
+#define ccc_impl_clear_and_free(container_ptr, ...)                            \
+    _Generic((container_ptr),                                                  \
+        ccc_bitset *: ccc_bs_clear_and_free,                                   \
+        ccc_flat_hash_map *: ccc_fhm_clear_and_free,                           \
+        ccc_handle_ordered_map *: ccc_hom_clear_and_free,                      \
+        ccc_flat_priority_queue *: ccc_fpq_clear_and_free,                     \
+        ccc_flat_double_ended_queue *: ccc_fdeq_clear_and_free,                \
+        ccc_handle_realtime_ordered_map *: ccc_hrm_clear_and_free)(            \
+        (container_ptr)__VA_OPT__(, __VA_ARGS__))
+
+#define ccc_impl_clear_and_free_reserve(container_ptr,                         \
+                                        destructor_and_free_args...)           \
+    _Generic((container_ptr),                                                  \
+        ccc_bitset *: ccc_bs_clear_and_free_reserve,                           \
+        ccc_flat_hash_map *: ccc_fhm_clear_and_free_reserve,                   \
+        ccc_handle_ordered_map *: ccc_hom_clear_and_free_reserve,              \
+        ccc_flat_priority_queue *: ccc_fpq_clear_and_free_reserve,             \
+        ccc_flat_double_ended_queue *: ccc_fdeq_clear_and_free_reserve,        \
+        ccc_handle_realtime_ordered_map *: ccc_hrm_clear_and_free_reserve)(    \
+        (container_ptr), destructor_and_free_args)
+
 /*===================    Standard Getters Interface   =======================*/
 
 #define ccc_impl_size(container_ptr)                                           \
     _Generic((container_ptr),                                                  \
+        ccc_bitset *: ccc_bs_size,                                             \
         ccc_buffer *: ccc_buf_size,                                            \
         ccc_flat_hash_map *: ccc_fhm_size,                                     \
         ccc_ordered_map *: ccc_om_size,                                        \
@@ -758,6 +819,7 @@ limitations under the License.
 
 #define ccc_impl_capacity(container_ptr)                                       \
     _Generic((container_ptr),                                                  \
+        ccc_bitset *: ccc_bs_capacity,                                         \
         ccc_buffer *: ccc_buf_capacity,                                        \
         ccc_flat_hash_map *: ccc_fhm_capacity,                                 \
         ccc_handle_ordered_map *: ccc_hom_capacity,                            \
