@@ -22,11 +22,14 @@ limitations under the License. */
 #include "impl/impl_flat_double_ended_queue.h"
 #include "types.h"
 
-static size_t const start_capacity = 8;
+enum : size_t
+{
+    START_CAPACITY = 8,
+};
 
 /*==========================    Prototypes    ===============================*/
 
-static ccc_result maybe_resize(struct ccc_fdeq_ *, size_t);
+static ccc_result maybe_resize(struct ccc_fdeq_ *, size_t, ccc_alloc_fn *);
 static size_t index_of(struct ccc_fdeq_ const *, void const *);
 static void *at(struct ccc_fdeq_ const *, size_t i);
 static size_t increment(struct ccc_fdeq_ const *, size_t i);
@@ -342,6 +345,17 @@ ccc_fdeq_copy(ccc_flat_double_ended_queue *const dst,
 }
 
 ccc_result
+ccc_fdeq_reserve(ccc_flat_double_ended_queue *const fdeq, size_t const to_add,
+                 ccc_alloc_fn *const fn)
+{
+    if (!fdeq || !fn)
+    {
+        return CCC_RESULT_ARG_ERROR;
+    }
+    return maybe_resize(fdeq, to_add, fn);
+}
+
+ccc_result
 ccc_fdeq_clear(ccc_flat_double_ended_queue *const fdeq,
                ccc_destructor_fn *const destructor)
 {
@@ -382,7 +396,40 @@ ccc_fdeq_clear_and_free(ccc_flat_double_ended_queue *const fdeq,
         destructor((ccc_user_type){.user_type = ccc_buf_at(&fdeq->buf_, i),
                                    .aux = fdeq->buf_.aux_});
     }
-    return ccc_buf_alloc(&fdeq->buf_, 0, fdeq->buf_.alloc_);
+    ccc_result const r = ccc_buf_alloc(&fdeq->buf_, 0, fdeq->buf_.alloc_);
+    if (r == CCC_RESULT_OK)
+    {
+        fdeq->buf_.sz_ = fdeq->front_ = 0;
+    }
+    return r;
+}
+
+ccc_result
+ccc_fdeq_clear_and_free_reserve(ccc_flat_double_ended_queue *const fdeq,
+                                ccc_destructor_fn *const destructor,
+                                ccc_alloc_fn *const alloc)
+{
+    if (!fdeq)
+    {
+        return CCC_RESULT_ARG_ERROR;
+    }
+    if (!destructor)
+    {
+        fdeq->buf_.sz_ = fdeq->front_ = 0;
+        return ccc_buf_alloc(&fdeq->buf_, 0, alloc);
+    }
+    size_t const back = back_free_slot(fdeq);
+    for (size_t i = fdeq->front_; i != back; i = increment(fdeq, i))
+    {
+        destructor((ccc_user_type){.user_type = ccc_buf_at(&fdeq->buf_, i),
+                                   .aux = fdeq->buf_.aux_});
+    }
+    ccc_result const r = ccc_buf_alloc(&fdeq->buf_, 0, alloc);
+    if (r == CCC_RESULT_OK)
+    {
+        fdeq->buf_.sz_ = fdeq->front_ = 0;
+    }
+    return r;
 }
 
 ccc_tribool
@@ -449,7 +496,8 @@ ccc_impl_fdeq_alloc_front(struct ccc_fdeq_ *const fdeq)
 static void *
 alloc_front(struct ccc_fdeq_ *const fdeq)
 {
-    ccc_tribool const full = maybe_resize(fdeq, 0) != CCC_RESULT_OK;
+    ccc_tribool const full
+        = maybe_resize(fdeq, 0, fdeq->buf_.alloc_) != CCC_RESULT_OK;
     /* Should have been able to resize. Bad error. */
     if (fdeq->buf_.alloc_ && full)
     {
@@ -467,7 +515,8 @@ alloc_front(struct ccc_fdeq_ *const fdeq)
 static void *
 alloc_back(struct ccc_fdeq_ *const fdeq)
 {
-    ccc_tribool const full = maybe_resize(fdeq, 0) != CCC_RESULT_OK;
+    ccc_tribool const full
+        = maybe_resize(fdeq, 0, fdeq->buf_.alloc_) != CCC_RESULT_OK;
     /* Should have been able to resize. Bad error. */
     if (fdeq->buf_.alloc_ && full)
     {
@@ -490,7 +539,8 @@ static ccc_result
 push_back_range(struct ccc_fdeq_ *const fdeq, size_t const n, char const *elems)
 {
     size_t const elem_sz = fdeq->buf_.elem_sz_;
-    ccc_tribool const full = maybe_resize(fdeq, n) != CCC_RESULT_OK;
+    ccc_tribool const full
+        = maybe_resize(fdeq, n, fdeq->buf_.alloc_) != CCC_RESULT_OK;
     size_t const cap = fdeq->buf_.capacity_;
     if (fdeq->buf_.alloc_ && full)
     {
@@ -531,7 +581,8 @@ push_front_range(struct ccc_fdeq_ *const fdeq, size_t const n,
                  char const *elems)
 {
     size_t const elem_sz = fdeq->buf_.elem_sz_;
-    ccc_tribool const full = maybe_resize(fdeq, n) != CCC_RESULT_OK;
+    ccc_tribool const full
+        = maybe_resize(fdeq, n, fdeq->buf_.alloc_) != CCC_RESULT_OK;
     size_t const cap = fdeq->buf_.capacity_;
     if (fdeq->buf_.alloc_ && full)
     {
@@ -568,7 +619,8 @@ push_range(struct ccc_fdeq_ *const fdeq, char const *const pos, size_t n,
            char const *elems)
 {
     size_t const elem_sz = fdeq->buf_.elem_sz_;
-    ccc_tribool const full = maybe_resize(fdeq, n) != CCC_RESULT_OK;
+    ccc_tribool const full
+        = maybe_resize(fdeq, n, fdeq->buf_.alloc_) != CCC_RESULT_OK;
     if (fdeq->buf_.alloc_ && full)
     {
         return NULL;
@@ -635,7 +687,8 @@ push_range(struct ccc_fdeq_ *const fdeq, char const *const pos, size_t n,
 }
 
 static ccc_result
-maybe_resize(struct ccc_fdeq_ *const q, size_t const additional_elems_to_add)
+maybe_resize(struct ccc_fdeq_ *const q, size_t const additional_elems_to_add,
+             ccc_alloc_fn *const fn)
 {
     size_t const old_size = q->buf_.sz_;
     if (old_size + additional_elems_to_add < old_size)
@@ -646,7 +699,7 @@ maybe_resize(struct ccc_fdeq_ *const q, size_t const additional_elems_to_add)
     {
         return CCC_RESULT_OK;
     }
-    if (!q->buf_.alloc_)
+    if (!fn)
     {
         return CCC_RESULT_NO_ALLOC;
     }
@@ -654,9 +707,8 @@ maybe_resize(struct ccc_fdeq_ *const q, size_t const additional_elems_to_add)
     size_t const new_cap
         = q->buf_.capacity_
               ? ((q->buf_.capacity_ + additional_elems_to_add) * 2)
-              : start_capacity;
-    void *const new_mem
-        = q->buf_.alloc_(NULL, q->buf_.elem_sz_ * new_cap, q->buf_.aux_);
+              : START_CAPACITY;
+    void *const new_mem = fn(NULL, q->buf_.elem_sz_ * new_cap, q->buf_.aux_);
     if (!new_mem)
     {
         return CCC_RESULT_MEM_ERROR;
@@ -674,7 +726,7 @@ maybe_resize(struct ccc_fdeq_ *const q, size_t const additional_elems_to_add)
                          elem_sz * (q->buf_.sz_ - first_chunk));
         }
     }
-    (void)ccc_buf_alloc(&q->buf_, 0, q->buf_.alloc_);
+    (void)ccc_buf_alloc(&q->buf_, 0, fn);
     q->buf_.mem_ = new_mem;
     q->front_ = 0;
     q->buf_.capacity_ = new_cap;

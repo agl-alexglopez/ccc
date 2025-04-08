@@ -140,6 +140,27 @@ ccc_result ccc_fdeq_copy(ccc_flat_double_ended_queue *dst,
                          ccc_flat_double_ended_queue const *src,
                          ccc_alloc_fn *fn);
 
+/** @brief Reserves space for at least to_add more elements.
+@param [in] fdeq a pointer to the flat double ended queue.
+@param [in] to_add the number of elements to add to the current size.
+@param [in] fn the allocation function to use to reserve memory.
+@return the result of the reservation. OK if successful, otherwise an error
+status is returned.
+@note see the ccc_fdeq_clear_and_free_reserve function if this function is
+being used for a one-time dynamic reservation.
+
+This function can be used for a dynamic fdeq with or without allocation
+permission. If the fdeq has allocation permission, it will reserve the required
+space and later resize if more space is needed.
+
+If the fdeq has been initialized with no allocation permission and no memory
+this function can serve as a one-time reservation. The fdeq will then act as
+as ring buffer when space runs out. This is helpful when a fixed size is needed
+but that size is only known dynamically at runtime. To free the fdeq in such a
+case see the ccc_fdeq_clear_and_free_reserve function. */
+ccc_result ccc_fdeq_reserve(ccc_flat_double_ended_queue *fdeq, size_t to_add,
+                            ccc_alloc_fn *fn);
+
 /**@}*/
 
 /** @name Insert and Remove Interface
@@ -296,6 +317,36 @@ If destructor is NULL the buffer is freed directly and capacity is 0. */
 ccc_result ccc_fdeq_clear_and_free(ccc_flat_double_ended_queue *fdeq,
                                    ccc_destructor_fn *destructor);
 
+/** @brief Frees all slots in the fdeq and frees the underlying buffer that was
+previously dynamically reserved with the reserve function.
+@param [in] h the fdeq to be cleared.
+@param [in] destructor the destructor for each element. NULL can be passed if no
+maintenance is required on the elements in the fdeq before their slots are
+forfeit.
+@param [in] alloc the required allocation function to provide to a dynamically
+reserved fdeq. Any auxiliary data provided upon initialization will be passed to
+the allocation function when called.
+@return the result of free operation. OK if success, or an error status to
+indicate the error.
+@warning It is an error to call this function on a fdeq that was not reserved
+with the provided ccc_alloc_fn. The fdeq must have existing memory to free.
+
+This function covers the edge case of reserving a dynamic capacity for a fdeq
+at runtime but denying the fdeq allocation permission to resize. This can help
+prevent a fdeq from growing unbounded. The user in this case knows the fdeq does
+not have allocation permission and therefore no further memory will be dedicated
+to the fdeq.
+
+However, to free the fdeq in such a case this function must be used because the
+fdeq has no ability to free itself. Just as the allocation function is required
+to reserve memory so to is it required to free memory.
+
+This function will work normally if called on a fdeq with allocation permission
+however the normal ccc_fdeq_clear_and_free is sufficient for that use case. */
+ccc_result ccc_fdeq_clear_and_free_reserve(ccc_flat_double_ended_queue *fdeq,
+                                           ccc_destructor_fn *destructor,
+                                           ccc_alloc_fn *alloc);
+
 /**@}*/
 
 /** @name State Interface
@@ -408,6 +459,7 @@ fdeq container. Ensure no namespace collisions occur before name shortening. */
 typedef ccc_flat_double_ended_queue flat_double_ended_queue;
 #    define fdeq_init(args...) ccc_fdeq_init(args)
 #    define fdeq_copy(args...) ccc_fdeq_copy(args)
+#    define fdeq_reserve(args...) ccc_fdeq_reserve(args)
 #    define fdeq_emplace(args...) ccc_fdeq_emplace(args)
 #    define fdeq_push_back(args...) ccc_fdeq_push_back(args)
 #    define fdeq_push_back_range(args...) ccc_fdeq_push_back_range(args)
@@ -422,6 +474,8 @@ typedef ccc_flat_double_ended_queue flat_double_ended_queue;
 #    define fdeq_size(args...) ccc_fdeq_size(args)
 #    define fdeq_clear(args...) ccc_fdeq_clear(args)
 #    define fdeq_clear_and_free(args...) ccc_fdeq_clear_and_free(args)
+#    define fdeq_clear_and_free_reserve(args...)                               \
+        ccc_fdeq_clear_and_free_reserve(args)
 #    define fdeq_at(args...) ccc_fdeq_at(args)
 #    define fdeq_data(args...) ccc_fdeq_data(args)
 #    define fdeq_begin(args...) ccc_fdeq_begin(args)
