@@ -1125,12 +1125,12 @@ Lazy Evaluation</h3>
 <div class="line">                           .c = c-&gt;cell.c + dir_offsets[i].c};</div>
 <div class="line"><span class="keyword">struct </span>prim_cell new = (<span class="keyword">struct </span>prim_cell){.cell = next,</div>
 <div class="line">                                          .cost = rand_range(0, 100)};</div>
-<div class="line"><span class="keyword">struct </span>prim_cell *<span class="keyword">const</span> cell = or_insert(entry_r(&amp;costs, &amp;next), &amp;<span class="keyword">new</span>.map_elem);</div>
+<div class="line"><span class="keyword">struct </span>prim_cell *<span class="keyword">const</span> cell = or_insert(entry_r(&amp;cost_map, &amp;next), &amp;<span class="keyword">new</span>);</div>
 </div><!-- fragment --><p>The lazily evaluated macro version.</p>
 <div class="fragment"><div class="line"><span class="keyword">struct </span>point const next = {.r = c-&gt;cell.r + dir_offsets[i].r,</div>
 <div class="line">                           .c = c-&gt;cell.c + dir_offsets[i].c};</div>
-<div class="line"><span class="keyword">struct </span>prim_cell *<span class="keyword">const</span> cell = om_or_insert_w(</div>
-<div class="line">    entry_r(&amp;costs, &amp;next),</div>
+<div class="line"><span class="keyword">struct </span>prim_cell const *<span class="keyword">const</span> cell = fhm_or_insert_w(</div>
+<div class="line">    entry_r(&amp;cost_map, &amp;next),</div>
 <div class="line">    (<span class="keyword">struct</span> prim_cell){.cell = next, .cost = rand_range(0, 100)});</div>
 </div><!-- fragment --><p>The second example is slightly more convenient and efficient. The compound literal is provided to be directly assigned to a Vacant memory location; it is only constructed if there is no entry present. This also means the random generation function is only called if a Vacant entry requires the insertion of a new value. So, expensive function calls can be lazily evaluated only when needed.</p>
 <p>Here is another example illustrating the difference between the two.</p>
