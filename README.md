@@ -834,7 +834,7 @@ main(void)
 - [Intrusive and non-intrusive containers](#intrusive-and-non-intrusive-containers).
 - [Non-allocating container options](#non-allocating-containers).
 - [Compile time initialization](#compile-time-initialization).
-- [No `container_of` macro required of the user to get to their type after a function call](#no-container_of-macros).
+- [No `container_of` macro required of the user to get to their type after a function call](#no-container-of-macros).
 - [Rust's Entry API for associative containers with C and C++ influences](#rusts-entry-interface).
     - Opt-in macros for more succinct insertion and in place modifications (see "closures" in the [and_modify_w](https://agl-alexglopez.github.io/ccc/flat__hash__map_8h.html) interface for associative containers).
 - [Container Traits implemented with C `_Generic` capabilities](#traits).
@@ -979,7 +979,7 @@ static flat_double_ended_queue ring_buffer
 In all the preceding examples initializing at compile time simplifies the code, eliminates the need for initialization functions, and ensures that all containers are ready to operate when execution begins. Using compound literal initialization also helps create better ownership of memory for each container, eliminating named references to a container's memory that could be accessed by mistake.
 
 
-### No "container of" Macros
+### No Container of Macros
 
 Traditionally, intrusive containers provide the following macro.
 
