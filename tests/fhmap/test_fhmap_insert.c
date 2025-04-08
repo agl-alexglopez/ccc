@@ -67,7 +67,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert_macros)
     CHECK(validate(&fh), true);
     CHECK(ins->val, 100);
     CHECK(size(&fh).count, 4);
-    CHECK_END_FN(ccc_fhm_clear_and_free(&fh, NULL););
+    CHECK_END_FN(clear_and_free(&fh, NULL););
 }
 
 CHECK_BEGIN_STATIC_FN(fhmap_test_insert_overwrite)

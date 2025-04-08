@@ -520,6 +520,63 @@ See container documentation for specific behavior. */
 
 /**@}*/
 
+/** @name Memory Management Interface
+Manage underlying buffers for containers. */
+/**@{*/
+
+/** @brief Copy src containers memory to dst container.
+@param [in] dst_container_ptr a pointer to the destination container.
+@param [in] src_container_ptr a pointer to the source container.
+@param [in] alloc_fn_ptr the allocation function to use for resizing if needed.
+@return the result of the operation.
+
+See container documentation for specific behavior. */
+#define ccc_copy(dst_container_ptr, src_container_ptr, alloc_fn_ptr)           \
+    ccc_impl_copy(dst_container_ptr, src_container_ptr, alloc_fn_ptr)
+
+/** @brief Reserve capacity for n_to_add new elements to be inserted.
+@param [in] container_ptr a pointer to the container.
+@param [in] n_to_add the number of elements to add to the container.
+@param [in] alloc_fn_ptr the allocation function to use for resizing if needed.
+@return the result of the operation.
+
+See container documentation for specific behavior. */
+#define ccc_reserve(container_ptr, n_to_add, alloc_fn_ptr)                     \
+    ccc_impl_reserve(container_ptr, n_to_add, alloc_fn_ptr)
+
+/** @brief Clears the container without freeing the underlying buffer.
+@param [in] container_ptr a pointer to the container.
+@param [in] destructor_args optional function to be called on each element.
+@return the result of the operation.
+
+See container documentation for specific behavior. */
+#define ccc_clear(container_ptr, destructor_args...)                           \
+    ccc_impl_clear(container_ptr, destructor_args)
+
+/** @brief Clears the container and frees the underlying buffer.
+@param [in] container_ptr a pointer to the container.
+@param [in] destructor_and_free_args optional function to be called on each
+element.
+@return the result of the operation.
+
+See container documentation for specific behavior. */
+#define ccc_clear_and_free(container_ptr, destructor_and_free_args...)         \
+    ccc_impl_clear_and_free(container_ptr, destructor_and_free_args)
+
+/** @brief Clears the container previously reserved and frees its underlying
+buffer. Covers the case of a one-time memory reserved container that does not
+otherwise have permissions over its own memory to resize or free.
+@param [in] container_ptr a pointer to the container.
+@param [in] destructor_and_free_args optional destructor function to be called
+on each element and the required allocation function to free memory.
+@return the result of the operation.
+
+See container documentation for specific behavior. */
+#define ccc_clear_and_free_reserve(container_ptr, destructor_and_free_args...) \
+    ccc_impl_clear_and_free_reserve(container_ptr, destructor_and_free_args)
+
+/**@}*/
+
 /** @name State Interface
 Obtain the container state. */
 /**@{*/
@@ -615,6 +672,12 @@ See container documentation for specific behavior. */
 #    define equal_rrange_r(args...) ccc_equal_rrange_r(args)
 #    define splice(args...) ccc_splice(args)
 #    define splice_range(args...) ccc_splice_range(args)
+
+#    define copy(args...) ccc_copy(args)
+#    define reserve(args...) ccc_reserve(args)
+#    define clear(args...) ccc_clear(args)
+#    define clear_and_free(args...) ccc_clear_and_free(args)
+#    define clear_and_free_reserve(args...) ccc_clear_and_free_reserve(args)
 
 #    define size(args...) ccc_size(args)
 #    define capacity(args...) ccc_capacity(args)

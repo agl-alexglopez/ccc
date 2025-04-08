@@ -83,7 +83,8 @@ static struct group max_trailing_ones(ccc_bitblock_ b, size_t i_in_block,
                                       size_t num_ones_remaining);
 static struct group max_leading_ones(ccc_bitblock_ b, ptrdiff_t i_in_block,
                                      ptrdiff_t num_ones_remaining);
-static ccc_result maybe_resize(struct ccc_bitset_ *bs, size_t to_add);
+static ccc_result maybe_resize(struct ccc_bitset_ *bs, size_t to_add,
+                               ccc_alloc_fn *);
 static size_t min(size_t, size_t);
 static void set_all(struct ccc_bitset_ *bs, ccc_tribool b);
 static blockwidth_t blockwidth_i(size_t bit_i);
@@ -653,7 +654,7 @@ ccc_bs_push_back(ccc_bitset *const bs, ccc_tribool const b)
     {
         return CCC_RESULT_ARG_ERROR;
     }
-    ccc_result const check_resize = maybe_resize(bs, 1);
+    ccc_result const check_resize = maybe_resize(bs, 1, bs->alloc_);
     if (check_resize != CCC_RESULT_OK)
     {
         return check_resize;
@@ -865,6 +866,33 @@ ccc_bs_clear_and_free(ccc_bitset *const bs)
 }
 
 ccc_result
+ccc_bs_clear_and_free_reserve(ccc_bitset *bs, ccc_alloc_fn *fn)
+{
+    if (!bs || !fn)
+    {
+        return CCC_RESULT_ARG_ERROR;
+    }
+    if (bs->mem_)
+    {
+        (void)fn(bs->mem_, 0, bs->aux_);
+    }
+    bs->sz_ = 0;
+    bs->cap_ = 0;
+    return CCC_RESULT_OK;
+}
+
+ccc_result
+ccc_bs_reserve(ccc_bitset *const bs, size_t const to_add,
+               ccc_alloc_fn *const fn)
+{
+    if (!bs || !fn)
+    {
+        return CCC_RESULT_ARG_ERROR;
+    }
+    return maybe_resize(bs, to_add, fn);
+}
+
+ccc_result
 ccc_bs_copy(ccc_bitset *const dst, ccc_bitset const *const src,
             ccc_alloc_fn *const fn)
 {
@@ -952,24 +980,37 @@ is_subset_of(struct ccc_bitset_ const *const set,
 }
 
 static ccc_result
-maybe_resize(struct ccc_bitset_ *const bs, size_t const to_add)
+maybe_resize(struct ccc_bitset_ *const bs, size_t const to_add,
+             ccc_alloc_fn *const fn)
 {
-    if (bs->sz_ + to_add <= bs->cap_)
+    size_t required = bs->sz_ + to_add;
+    if (required < bs->sz_)
+    {
+        return CCC_RESULT_ARG_ERROR;
+    }
+    if (required <= bs->cap_)
     {
         return CCC_RESULT_OK;
     }
-    if (!bs->alloc_)
+    if (!fn)
     {
         return CCC_RESULT_NO_ALLOC;
     }
-    size_t const new_cap = bs->sz_ ? (bs->sz_ + to_add) * 2 : BLOCK_BITS;
-    ccc_bitblock_ *const new_mem = bs->alloc_(
-        bs->mem_, blocks(new_cap) * sizeof(ccc_bitblock_), bs->aux_);
+    if (!bs->sz_ && to_add == 1)
+    {
+        required = BLOCK_BITS;
+    }
+    else if (to_add == 1)
+    {
+        required = bs->cap_ * 2;
+    }
+    ccc_bitblock_ *const new_mem
+        = fn(bs->mem_, blocks(required) * sizeof(ccc_bitblock_), bs->aux_);
     if (!new_mem)
     {
         return CCC_RESULT_MEM_ERROR;
     }
-    bs->cap_ = new_cap;
+    bs->cap_ = required;
     bs->mem_ = new_mem;
     return CCC_RESULT_OK;
 }

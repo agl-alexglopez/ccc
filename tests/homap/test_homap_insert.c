@@ -82,7 +82,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert_macros)
     CHECK(validate(&hom), true);
     CHECK(ins->val, 100);
     CHECK(size(&hom).count, 4);
-    CHECK_END_FN(hom_clear_and_free(&hom, NULL););
+    CHECK_END_FN(clear_and_free(&hom, NULL););
 }
 
 CHECK_BEGIN_STATIC_FN(homap_test_insert_overwrite)
@@ -410,7 +410,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_resize)
         CHECK(in_table != NULL, true);
         CHECK(in_table->val, shuffled_index);
     }
-    CHECK(hom_clear_and_free(&hom, NULL), CCC_RESULT_OK);
+    CHECK(clear_and_free(&hom, NULL), CCC_RESULT_OK);
     CHECK_END_FN();
 }
 
@@ -444,7 +444,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_reserve)
         CHECK(in_table != NULL, true);
         CHECK(in_table->val, shuffled_index);
     }
-    CHECK_END_FN(hom_clear_and_free_reserve(&hom, NULL, std_alloc););
+    CHECK_END_FN(clear_and_free_reserve(&hom, NULL, std_alloc););
 }
 
 CHECK_BEGIN_STATIC_FN(homap_test_resize_macros)
@@ -489,7 +489,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_resize_macros)
         CHECK(v != NULL, true);
         CHECK(v->val, i);
     }
-    CHECK(hom_clear_and_free(&hom, NULL), CCC_RESULT_OK);
+    CHECK(clear_and_free(&hom, NULL), CCC_RESULT_OK);
     CHECK_END_FN();
 }
 
@@ -520,7 +520,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_resize_from_null)
         CHECK(in_table != NULL, true);
         CHECK(in_table->val, shuffled_index);
     }
-    CHECK(hom_clear_and_free(&hom, NULL), CCC_RESULT_OK);
+    CHECK(clear_and_free(&hom, NULL), CCC_RESULT_OK);
     CHECK_END_FN();
 }
 
@@ -563,7 +563,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_resize_from_null_macros)
         CHECK(v == NULL, false);
         CHECK(v->val, i);
     }
-    CHECK(hom_clear_and_free(&hom, NULL), CCC_RESULT_OK);
+    CHECK(clear_and_free(&hom, NULL), CCC_RESULT_OK);
     CHECK_END_FN();
 }
 
