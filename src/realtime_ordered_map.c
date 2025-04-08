@@ -1337,19 +1337,14 @@ validate(struct ccc_romap_ const *const rom)
 /* NOLINTEND(*misc-no-recursion) */
 
 /* Below you will find the required license for code that inspired the
-implementation of a WAVL tree in this repository for some map containers. This
-license is identical to that used for the entire repository that I provide at
-the root of the repository.
+implementation of a WAVL tree in this repository for some map containers.
 
 The original repository can be found here:
 
 https://github.com/pvachon/wavl_tree
 
-See the detailed changes to the code described at the top of the file. The
-copyright notice follows.
-
-Copyright (c) 2021, Phil Vachon <phil@security-embedded.com>
-All rights reserved.
+The original implementation has be changed to eliminate left and right cases
+and work within the C Container Collection memory framework.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
