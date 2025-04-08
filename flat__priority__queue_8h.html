@@ -136,6 +136,9 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memitem:a0765c008f4ab6a8a59a0d5f8282a4572"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a0765c008f4ab6a8a59a0d5f8282a4572">ccc_fpq_copy</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> *dst, <a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> const *src, <a class="el" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a> *fn)</td></tr>
 <tr class="memdesc:a0765c008f4ab6a8a59a0d5f8282a4572"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy the fpq from src to newly initialized dst.  <br /></td></tr>
 <tr class="separator:a0765c008f4ab6a8a59a0d5f8282a4572"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a735077119b3cbad2ca827102e8b8033a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a735077119b3cbad2ca827102e8b8033a">ccc_fpq_reserve</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> *fpq, size_t to_add, <a class="el" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a> *fn)</td></tr>
+<tr class="memdesc:a735077119b3cbad2ca827102e8b8033a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reserves space for at least to_add more elements.  <br /></td></tr>
+<tr class="separator:a735077119b3cbad2ca827102e8b8033a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Insert and Remove Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Insert or remove elements from the flat priority queue. </p>
@@ -196,6 +199,9 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memitem:acb7e8a483cf066fc8ff1b473a6802010"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#acb7e8a483cf066fc8ff1b473a6802010">ccc_fpq_clear_and_free</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> *fpq, <a class="el" href="types_8h.html#aa2bb6262f220473dc47f4c73711a6ec5">ccc_destructor_fn</a> *fn)</td></tr>
 <tr class="memdesc:acb7e8a483cf066fc8ff1b473a6802010"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clears the fpq calling fn on every element if provided and frees the underlying buffer. O(1)-O(N).  <br /></td></tr>
 <tr class="separator:acb7e8a483cf066fc8ff1b473a6802010"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac3be155e95dda6040996b2365b917513"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#ac3be155e95dda6040996b2365b917513">ccc_fpq_clear_and_free_reserve</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> *fpq, <a class="el" href="types_8h.html#aa2bb6262f220473dc47f4c73711a6ec5">ccc_destructor_fn</a> *destructor, <a class="el" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a> *alloc)</td></tr>
+<tr class="memdesc:ac3be155e95dda6040996b2365b917513"><td class="mdescLeft">&#160;</td><td class="mdescRight">Frees all slots in the fpq and frees the underlying buffer that was previously dynamically reserved with the reserve function.  <br /></td></tr>
+<tr class="separator:ac3be155e95dda6040996b2365b917513"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">State Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Obtain state from the container. </p>
@@ -735,6 +741,55 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
+<a id="ac3be155e95dda6040996b2365b917513" name="ac3be155e95dda6040996b2365b917513"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac3be155e95dda6040996b2365b917513">&#9670;&#160;</a></span>ccc_fpq_clear_and_free_reserve()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_fpq_clear_and_free_reserve </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> *&#160;</td>
+          <td class="paramname"><em>fpq</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#aa2bb6262f220473dc47f4c73711a6ec5">ccc_destructor_fn</a> *&#160;</td>
+          <td class="paramname"><em>destructor</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a> *&#160;</td>
+          <td class="paramname"><em>alloc</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Frees all slots in the fpq and frees the underlying buffer that was previously dynamically reserved with the reserve function. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">h</td><td>the fpq to be cleared. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">destructor</td><td>the destructor for each element. NULL can be passed if no maintenance is required on the elements in the fpq before their slots are dropped. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">alloc</td><td>the required allocation function to provide to a dynamically reserved fpq. Any auxiliary data provided upon initialization will be passed to the allocation function when called. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the result of free operation. OK if success, or an error status to indicate the error. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>It is an error to call this function on a fpq that was not reserved with the provided ccc_alloc_fn. The fpq must have existing memory to free.</dd></dl>
+<p>This function covers the edge case of reserving a dynamic capacity for a fpq at runtime but denying the fpq allocation permission to resize. This can help prevent a fpq from growing unbounded. The user in this case knows the fpq does not have allocation permission and therefore no further memory will be dedicated to the fpq.</p>
+<p>However, to free the fpq in such a case this function must be used because the fpq has no ability to free itself. Just as the allocation function is required to reserve memory so to is it required to free memory.</p>
+<p>This function will work normally if called on a fpq with allocation permission however the normal ccc_fpq_clear_and_free is sufficient for that use case. </p>
+
+</div>
+</div>
 <a id="a0765c008f4ab6a8a59a0d5f8282a4572" name="a0765c008f4ab6a8a59a0d5f8282a4572"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a0765c008f4ab6a8a59a0d5f8282a4572">&#9670;&#160;</a></span>ccc_fpq_copy()</h2>
 
@@ -1220,6 +1275,54 @@ This graph shows which files directly or indirectly include this file:</div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>a pointer to the inserted element or NULl if NULL args are provided or push required more memory and failed. Failure can occur if the fpq is full and allocation is not allowed or a resize failed when allocation is allowed. </dd></dl>
+
+</div>
+</div>
+<a id="a735077119b3cbad2ca827102e8b8033a" name="a735077119b3cbad2ca827102e8b8033a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a735077119b3cbad2ca827102e8b8033a">&#9670;&#160;</a></span>ccc_fpq_reserve()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_fpq_reserve </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> *&#160;</td>
+          <td class="paramname"><em>fpq</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>to_add</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a> *&#160;</td>
+          <td class="paramname"><em>fn</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Reserves space for at least to_add more elements. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">fpq</td><td>a pointer to the flat priority queue. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">to_add</td><td>the number of elements to add to the current size. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">fn</td><td>the allocation function to use to reserve memory. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the result of the reservation. OK if successful, otherwise an error status is returned. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>see the ccc_fpq_clear_and_free_reserve function if this function is being used for a one-time dynamic reservation.</dd></dl>
+<p>This function can be used for a dynamic fpq with or without allocation permission. If the fpq has allocation permission, it will reserve the required space and later resize if more space is needed.</p>
+<p>If the fpq has been initialized with no allocation permission and no memory this function can serve as a one-time reservation. This is helpful when a fixed size is needed but that size is only known dynamically at runtime. To free the fpq in such a case see the ccc_fpq_clear_and_free_reserve function. </p>
 
 </div>
 </div>

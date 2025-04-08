@@ -133,6 +133,9 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memitem:ade89856eeda34a14b26df7d1c2aee882"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="handle__ordered__map_8h.html#ade89856eeda34a14b26df7d1c2aee882">ccc_hom_copy</a> (<a class="el" href="handle__ordered__map_8h.html#a15793f88c43085c6a661b59c414f73e8">ccc_handle_ordered_map</a> *dst, <a class="el" href="handle__ordered__map_8h.html#a15793f88c43085c6a661b59c414f73e8">ccc_handle_ordered_map</a> const *src, <a class="el" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a> *fn)</td></tr>
 <tr class="memdesc:ade89856eeda34a14b26df7d1c2aee882"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy the map at source to destination.  <br /></td></tr>
 <tr class="separator:ade89856eeda34a14b26df7d1c2aee882"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2f5329789b2e8c69777885c79b8b2a70"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="handle__ordered__map_8h.html#a2f5329789b2e8c69777885c79b8b2a70">ccc_hom_reserve</a> (<a class="el" href="handle__ordered__map_8h.html#a15793f88c43085c6a661b59c414f73e8">ccc_handle_ordered_map</a> *hom, size_t to_add, <a class="el" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a> *fn)</td></tr>
+<tr class="memdesc:a2f5329789b2e8c69777885c79b8b2a70"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reserves space for at least to_add more elements.  <br /></td></tr>
+<tr class="separator:a2f5329789b2e8c69777885c79b8b2a70"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Membership Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Test membership or obtain references to stored user types directly. </p>
@@ -282,6 +285,9 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memitem:ac348983a7701966ebc4593179b0f6634"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="handle__ordered__map_8h.html#ac348983a7701966ebc4593179b0f6634">ccc_hom_clear_and_free</a> (<a class="el" href="handle__ordered__map_8h.html#a15793f88c43085c6a661b59c414f73e8">ccc_handle_ordered_map</a> *hom, <a class="el" href="types_8h.html#aa2bb6262f220473dc47f4c73711a6ec5">ccc_destructor_fn</a> *fn)</td></tr>
 <tr class="memdesc:ac348983a7701966ebc4593179b0f6634"><td class="mdescLeft">&#160;</td><td class="mdescRight">Frees all slots in the map and frees the underlying buffer.  <br /></td></tr>
 <tr class="separator:ac348983a7701966ebc4593179b0f6634"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aef20ead47a185cdf88eb5c2b04399b0b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="handle__ordered__map_8h.html#aef20ead47a185cdf88eb5c2b04399b0b">ccc_hom_clear_and_free_reserve</a> (<a class="el" href="handle__ordered__map_8h.html#a15793f88c43085c6a661b59c414f73e8">ccc_handle_ordered_map</a> *hom, <a class="el" href="types_8h.html#aa2bb6262f220473dc47f4c73711a6ec5">ccc_destructor_fn</a> *destructor, <a class="el" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a> *alloc)</td></tr>
+<tr class="memdesc:aef20ead47a185cdf88eb5c2b04399b0b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Frees all slots in the hom and frees the underlying buffer that was previously dynamically reserved with the reserve function.  <br /></td></tr>
+<tr class="separator:aef20ead47a185cdf88eb5c2b04399b0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">State Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Obtain the container state. </p>
@@ -1274,6 +1280,55 @@ do not try to access data in the table manually with a handle. Always use this p
 
 </div>
 </div>
+<a id="aef20ead47a185cdf88eb5c2b04399b0b" name="aef20ead47a185cdf88eb5c2b04399b0b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aef20ead47a185cdf88eb5c2b04399b0b">&#9670;&#160;</a></span>ccc_hom_clear_and_free_reserve()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_hom_clear_and_free_reserve </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="handle__ordered__map_8h.html#a15793f88c43085c6a661b59c414f73e8">ccc_handle_ordered_map</a> *&#160;</td>
+          <td class="paramname"><em>hom</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#aa2bb6262f220473dc47f4c73711a6ec5">ccc_destructor_fn</a> *&#160;</td>
+          <td class="paramname"><em>destructor</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a> *&#160;</td>
+          <td class="paramname"><em>alloc</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Frees all slots in the hom and frees the underlying buffer that was previously dynamically reserved with the reserve function. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">hom</td><td>the map to be cleared. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">destructor</td><td>the destructor for each element. NULL can be passed if no maintenance is required on the elements in the hom before their slots are dropped. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">alloc</td><td>the required allocation function to provide to a dynamically reserved hom. Any auxiliary data provided upon initialization will be passed to the allocation function when called. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the result of free operation. OK if success, or an error status to indicate the error. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>It is an error to call this function on a hom that was not reserved with the provided ccc_alloc_fn. The hom must have existing memory to free.</dd></dl>
+<p>This function covers the edge case of reserving a dynamic capacity for a hom at runtime but denying the hom allocation permission to resize. This can help prevent a hom from growing unbounded. The user in this case knows the hom does not have allocation permission and therefore no further memory will be dedicated to the hom.</p>
+<p>However, to free the hom in such a case this function must be used because the hom has no ability to free itself. Just as the allocation function is required to reserve memory so to is it required to free memory.</p>
+<p>This function will work normally if called on a hom with allocation permission however the normal ccc_hom_clear_and_free is sufficient for that use case. </p>
+
+</div>
+</div>
 <a id="afc087fac67d7ccc93d659793e87a063c" name="afc087fac67d7ccc93d659793e87a063c"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#afc087fac67d7ccc93d659793e87a063c">&#9670;&#160;</a></span>ccc_hom_contains()</h2>
 
@@ -2023,6 +2078,54 @@ do not try to access data in the table manually with a handle. Always use this p
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the newest minimum element of the map. </dd></dl>
+
+</div>
+</div>
+<a id="a2f5329789b2e8c69777885c79b8b2a70" name="a2f5329789b2e8c69777885c79b8b2a70"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2f5329789b2e8c69777885c79b8b2a70">&#9670;&#160;</a></span>ccc_hom_reserve()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_hom_reserve </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="handle__ordered__map_8h.html#a15793f88c43085c6a661b59c414f73e8">ccc_handle_ordered_map</a> *&#160;</td>
+          <td class="paramname"><em>hom</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>to_add</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a> *&#160;</td>
+          <td class="paramname"><em>fn</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Reserves space for at least to_add more elements. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">hom</td><td>a pointer to the handle ordered map. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">to_add</td><td>the number of elements to add to the current size. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">fn</td><td>the allocation function to use to reserve memory. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the result of the reservation. OK if successful, otherwise an error status is returned. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>see the ccc_hom_clear_and_free_reserve function if this function is being used for a one-time dynamic reservation.</dd></dl>
+<p>This function can be used for a dynamic hom with or without allocation permission. If the hom has allocation permission, it will reserve the required space and later resize if more space is needed.</p>
+<p>If the hom has been initialized with no allocation permission and no memory this function can serve as a one-time reservation. This is helpful when a fixed size is needed but that size is only known dynamically at runtime. To free the hom in such a case see the ccc_hom_clear_and_free_reserve function. </p>
 
 </div>
 </div>

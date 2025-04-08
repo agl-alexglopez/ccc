@@ -133,6 +133,9 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memitem:a7164375cce93f29179ed077fb7ede7db"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a7164375cce93f29179ed077fb7ede7db">ccc_fdeq_copy</a> (<a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> *dst, <a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> const *src, <a class="el" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a> *fn)</td></tr>
 <tr class="memdesc:a7164375cce93f29179ed077fb7ede7db"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy the fdeq from src to newly initialized dst.  <br /></td></tr>
 <tr class="separator:a7164375cce93f29179ed077fb7ede7db"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3dabffdd68621ddb8a58028946ed20f8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a3dabffdd68621ddb8a58028946ed20f8">ccc_fdeq_reserve</a> (<a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> *fdeq, size_t to_add, <a class="el" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a> *fn)</td></tr>
+<tr class="memdesc:a3dabffdd68621ddb8a58028946ed20f8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reserves space for at least to_add more elements.  <br /></td></tr>
+<tr class="separator:a3dabffdd68621ddb8a58028946ed20f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Insert and Remove Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Add or remove elements from the FDEQ. </p>
@@ -181,6 +184,9 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memitem:a661112e9f407ddf187a70ecc2ee2ace9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a661112e9f407ddf187a70ecc2ee2ace9">ccc_fdeq_clear_and_free</a> (<a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> *fdeq, <a class="el" href="types_8h.html#aa2bb6262f220473dc47f4c73711a6ec5">ccc_destructor_fn</a> *destructor)</td></tr>
 <tr class="memdesc:a661112e9f407ddf187a70ecc2ee2ace9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set size of fdeq to 0 and call destructor on each element if needed. Free the underlying buffer setting the capacity to 0. O(1) if no destructor is provided, else O(N).  <br /></td></tr>
 <tr class="separator:a661112e9f407ddf187a70ecc2ee2ace9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a813d4e847ccf34fc7e26a0310f6eba38"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a813d4e847ccf34fc7e26a0310f6eba38">ccc_fdeq_clear_and_free_reserve</a> (<a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> *fdeq, <a class="el" href="types_8h.html#aa2bb6262f220473dc47f4c73711a6ec5">ccc_destructor_fn</a> *destructor, <a class="el" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a> *alloc)</td></tr>
+<tr class="memdesc:a813d4e847ccf34fc7e26a0310f6eba38"><td class="mdescLeft">&#160;</td><td class="mdescRight">Frees all slots in the fdeq and frees the underlying buffer that was previously dynamically reserved with the reserve function.  <br /></td></tr>
+<tr class="separator:a813d4e847ccf34fc7e26a0310f6eba38"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">State Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Interact with the state of the FDEQ. </p>
@@ -585,6 +591,55 @@ This graph shows which files directly or indirectly include this file:</div>
   </dd>
 </dl>
 <p>Note that if destructor is non-NULL it will be called on each element in the fdeq. After all elements are processed the buffer is freed and capacity is 0. If destructor is NULL the buffer is freed directly and capacity is 0. </p>
+
+</div>
+</div>
+<a id="a813d4e847ccf34fc7e26a0310f6eba38" name="a813d4e847ccf34fc7e26a0310f6eba38"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a813d4e847ccf34fc7e26a0310f6eba38">&#9670;&#160;</a></span>ccc_fdeq_clear_and_free_reserve()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_fdeq_clear_and_free_reserve </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> *&#160;</td>
+          <td class="paramname"><em>fdeq</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#aa2bb6262f220473dc47f4c73711a6ec5">ccc_destructor_fn</a> *&#160;</td>
+          <td class="paramname"><em>destructor</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a> *&#160;</td>
+          <td class="paramname"><em>alloc</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Frees all slots in the fdeq and frees the underlying buffer that was previously dynamically reserved with the reserve function. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">fdeq</td><td>the fdeq to be cleared. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">destructor</td><td>the destructor for each element. NULL can be passed if no maintenance is required on the elements in the fdeq before their slots are dropped. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">alloc</td><td>the required allocation function to provide to a dynamically reserved fdeq. Any auxiliary data provided upon initialization will be passed to the allocation function when called. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the result of free operation. OK if success, or an error status to indicate the error. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>It is an error to call this function on a fdeq that was not reserved with the provided ccc_alloc_fn. The fdeq must have existing memory to free.</dd></dl>
+<p>This function covers the edge case of reserving a dynamic capacity for a fdeq at runtime but denying the fdeq allocation permission to resize. This can help prevent a fdeq from growing unbounded. The user in this case knows the fdeq does not have allocation permission and therefore no further memory will be dedicated to the fdeq.</p>
+<p>However, to free the fdeq in such a case this function must be used because the fdeq has no ability to free itself. Just as the allocation function is required to reserve memory so to is it required to free memory.</p>
+<p>This function will work normally if called on a fdeq with allocation permission however the normal ccc_fdeq_clear_and_free is sufficient for that use case. </p>
 
 </div>
 </div>
@@ -1144,6 +1199,54 @@ This graph shows which files directly or indirectly include this file:</div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>a pointer to the start sentinel element that may not be accessed. </dd></dl>
+
+</div>
+</div>
+<a id="a3dabffdd68621ddb8a58028946ed20f8" name="a3dabffdd68621ddb8a58028946ed20f8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3dabffdd68621ddb8a58028946ed20f8">&#9670;&#160;</a></span>ccc_fdeq_reserve()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_fdeq_reserve </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> *&#160;</td>
+          <td class="paramname"><em>fdeq</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>to_add</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a> *&#160;</td>
+          <td class="paramname"><em>fn</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Reserves space for at least to_add more elements. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">fdeq</td><td>a pointer to the flat double ended queue. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">to_add</td><td>the number of elements to add to the current size. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">fn</td><td>the allocation function to use to reserve memory. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the result of the reservation. OK if successful, otherwise an error status is returned. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>see the ccc_fdeq_clear_and_free_reserve function if this function is being used for a one-time dynamic reservation.</dd></dl>
+<p>This function can be used for a dynamic fdeq with or without allocation permission. If the fdeq has allocation permission, it will reserve the required space and later resize if more space is needed.</p>
+<p>If the fdeq has been initialized with no allocation permission and no memory this function can serve as a one-time reservation. The fdeq will then act as as ring buffer when space runs out. This is helpful when a fixed size is needed but that size is only known dynamically at runtime. To free the fdeq in such a case see the ccc_fdeq_clear_and_free_reserve function. </p>
 
 </div>
 </div>

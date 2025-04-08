@@ -10,6 +10,7 @@ var flat__double__ended__queue_8h =
     [ "ccc_fdeq_capacity", "flat__double__ended__queue_8h.html#adadb60693f86fd0157f1b7795a948cbb", null ],
     [ "ccc_fdeq_clear", "flat__double__ended__queue_8h.html#a1b352898bcc66874d9808fd58e4dab5b", null ],
     [ "ccc_fdeq_clear_and_free", "flat__double__ended__queue_8h.html#a661112e9f407ddf187a70ecc2ee2ace9", null ],
+    [ "ccc_fdeq_clear_and_free_reserve", "flat__double__ended__queue_8h.html#a813d4e847ccf34fc7e26a0310f6eba38", null ],
     [ "ccc_fdeq_copy", "flat__double__ended__queue_8h.html#a7164375cce93f29179ed077fb7ede7db", null ],
     [ "ccc_fdeq_data", "flat__double__ended__queue_8h.html#ab49f9096ecd1127d3f8501613ab45602", null ],
     [ "ccc_fdeq_end", "flat__double__ended__queue_8h.html#a9264ced538427697983cdaf42ff8ff27", null ],
@@ -25,6 +26,7 @@ var flat__double__ended__queue_8h =
     [ "ccc_fdeq_push_front_range", "flat__double__ended__queue_8h.html#a5d271eca7745f9da989409b337afb5b7", null ],
     [ "ccc_fdeq_rbegin", "flat__double__ended__queue_8h.html#a01d7a66b34eae3abf0557ed5656c4091", null ],
     [ "ccc_fdeq_rend", "flat__double__ended__queue_8h.html#a91d5c7871381b4bd11eae774ad999962", null ],
+    [ "ccc_fdeq_reserve", "flat__double__ended__queue_8h.html#a3dabffdd68621ddb8a58028946ed20f8", null ],
     [ "ccc_fdeq_rnext", "flat__double__ended__queue_8h.html#af62103b1ef7d05fd9daa66c956c352bf", null ],
     [ "ccc_fdeq_size", "flat__double__ended__queue_8h.html#a5204b7da6c5f33c0fb68d00db4516600", null ],
     [ "ccc_fdeq_validate", "flat__double__ended__queue_8h.html#a996af112cdbfa57d1511a82489b0f074", null ]

@@ -1281,14 +1281,15 @@ This graph shows which files directly or indirectly include this file:</div>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">h</td><td>the table to be cleared. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">destructor</td><td>the destructor for each element. NULL can be passed if no maintenance is required on the elements in the table before their slots are forfeit. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">alloc</td><td>the required allocation function to provide to a dynamically reserved map that has no allocation permission. Any auxiliary data provided upon initialization will be passed to the allocation function when called. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">alloc</td><td>the required allocation function to provide to a dynamically reserved map. Any auxiliary data provided upon initialization will be passed to the allocation function when called. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the result of free operation. An alloc function must be provided and map must have been denied allocation permission in order to use this function. </dd></dl>
-<dl class="section warning"><dt>Warning</dt><dd>it is an error to call this function on a map with allocation permission. It is also an error to call this function on a map that was not reserved with the provided ccc_alloc_fn. The map must have existing memory to free.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the result of free operation. CCC_RESULT_OK if success, or an error status to indicate the error. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>It is an error to call this function on a map that was not reserved with the provided ccc_alloc_fn. The map must have existing memory to free.</dd></dl>
 <p>This function covers the edge case of reserving a dynamic capacity for a map at runtime but denying the map allocation permission to resize. This can help prevent a map from growing unbounded due to internal decisions about rehashes and resizing. The user in this case knows the map does not have allocation permission and therefore no further memory will be dedicated to the map.</p>
-<p>However, to free the map in such a case this function must be used because the map has no ability to free itself. Just as the allocation function is required to reserve memory so to is it required to free memory. </p>
+<p>However, to free the map in such a case this function must be used because the map has no ability to free itself. Just as the allocation function is required to reserve memory so to is it required to free memory.</p>
+<p>This function will work normally if called on a map with allocation permission however the normal ccc_fhm_clear_and_free is sufficient for that use case. </p>
 
 </div>
 </div>

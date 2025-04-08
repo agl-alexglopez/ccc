@@ -11,6 +11,7 @@ var flat__priority__queue_8h =
     [ "ccc_fpq_capacity", "flat__priority__queue_8h.html#af1180cd15477e5b1f0a2ebc3b5bc015a", null ],
     [ "ccc_fpq_clear", "flat__priority__queue_8h.html#a11a936861d17aa714b2ad105468c3a1a", null ],
     [ "ccc_fpq_clear_and_free", "flat__priority__queue_8h.html#acb7e8a483cf066fc8ff1b473a6802010", null ],
+    [ "ccc_fpq_clear_and_free_reserve", "flat__priority__queue_8h.html#ac3be155e95dda6040996b2365b917513", null ],
     [ "ccc_fpq_copy", "flat__priority__queue_8h.html#a0765c008f4ab6a8a59a0d5f8282a4572", null ],
     [ "ccc_fpq_data", "flat__priority__queue_8h.html#a005d37789d5cc821356252292cba646b", null ],
     [ "ccc_fpq_decrease", "flat__priority__queue_8h.html#a7850eb9c6d9d8c2bd8cd23ee134bf5a5", null ],
@@ -23,6 +24,7 @@ var flat__priority__queue_8h =
     [ "ccc_fpq_order", "flat__priority__queue_8h.html#a422acb75de11ece2ae4d9725fc4a468b", null ],
     [ "ccc_fpq_pop", "flat__priority__queue_8h.html#aaec4e075f10f8b6ee6bd99c50fb53d2d", null ],
     [ "ccc_fpq_push", "flat__priority__queue_8h.html#af3629428e2a5117d810852fc70c283c8", null ],
+    [ "ccc_fpq_reserve", "flat__priority__queue_8h.html#a735077119b3cbad2ca827102e8b8033a", null ],
     [ "ccc_fpq_size", "flat__priority__queue_8h.html#a51abc8e082ea3ba3c2bf198525ee4151", null ],
     [ "ccc_fpq_update", "flat__priority__queue_8h.html#a8d1e47054d3f3bffa6eed7393c979de3", null ],
     [ "ccc_fpq_validate", "flat__priority__queue_8h.html#abd9aa3fe7a477f99fb0abc69bbdf67f0", null ]

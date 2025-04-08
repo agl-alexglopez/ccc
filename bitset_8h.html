@@ -109,6 +109,16 @@ Include dependency graph for bitset.h:</div>
 <area shape="rect" href="impl__types_8h_source.html" title=" " alt="" coords="59,225,198,251"/>
 </map>
 </div>
+</div><div class="textblock"><div class="dynheader">
+This graph shows which files directly or indirectly include this file:</div>
+<div class="dyncontent">
+<div class="center"><img src="bitset_8h__dep__incl.png" border="0" usemap="#accc_2bitset_8hdep" alt=""/></div>
+<map name="accc_2bitset_8hdep" id="accc_2bitset_8hdep">
+<area shape="rect" title="The Bit Set Interface." alt="" coords="39,5,135,31"/>
+<area shape="rect" href="impl__traits_8h_source.html" title=" " alt="" coords="5,79,168,104"/>
+<area shape="rect" href="traits_8h.html" title="The C Container Collection Traits Interface." alt="" coords="40,152,133,177"/>
+</map>
+</div>
 </div>
 <p><a href="bitset_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -124,6 +134,9 @@ Include dependency graph for bitset.h:</div>
 <tr class="memitem:ac59dec5a5534159a7030c9077618c486"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#ac59dec5a5534159a7030c9077618c486">ccc_bs_copy</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> *dst, <a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *src, <a class="el" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a> *fn)</td></tr>
 <tr class="memdesc:ac59dec5a5534159a7030c9077618c486"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy the bit set at source to destination.  <br /></td></tr>
 <tr class="separator:ac59dec5a5534159a7030c9077618c486"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0b766f5431d52d04467b1540adc4cb31"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a0b766f5431d52d04467b1540adc4cb31">ccc_bs_reserve</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> *bs, size_t to_add, <a class="el" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a> *fn)</td></tr>
+<tr class="memdesc:a0b766f5431d52d04467b1540adc4cb31"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reserves space for at least to_add more bits.  <br /></td></tr>
+<tr class="separator:a0b766f5431d52d04467b1540adc4cb31"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Container Types</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Types available in the container interface. </p>
@@ -312,6 +325,9 @@ Include dependency graph for bitset.h:</div>
 <tr class="memitem:a86a6e73f368594a889954bc41aa55ba1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a86a6e73f368594a889954bc41aa55ba1">ccc_bs_clear_and_free</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> *bs)</td></tr>
 <tr class="memdesc:a86a6e73f368594a889954bc41aa55ba1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clears the bit set by setting the size to 0 and freeing the underlying memory. Capacity becomes 0 as well.  <br /></td></tr>
 <tr class="separator:a86a6e73f368594a889954bc41aa55ba1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2a78a6f957a990f8bb015e9f629c2e9d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a2a78a6f957a990f8bb015e9f629c2e9d">ccc_bs_clear_and_free_reserve</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> *bs, <a class="el" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a> *fn)</td></tr>
+<tr class="memdesc:a2a78a6f957a990f8bb015e9f629c2e9d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Frees the buffer for the bit set that was previously dynamically reserved with the reserve function.  <br /></td></tr>
+<tr class="separator:a2a78a6f957a990f8bb015e9f629c2e9d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Dynamic Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Allows adding to and removing from the set. </p>
@@ -793,6 +809,48 @@ Include dependency graph for bitset.h:</div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the result of the clear operation, error is returned if bs is NULL or the set cannot be freed because no allocation function was provided upon initialization. </dd></dl>
+
+</div>
+</div>
+<a id="a2a78a6f957a990f8bb015e9f629c2e9d" name="a2a78a6f957a990f8bb015e9f629c2e9d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2a78a6f957a990f8bb015e9f629c2e9d">&#9670;&#160;</a></span>ccc_bs_clear_and_free_reserve()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_bs_clear_and_free_reserve </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> *&#160;</td>
+          <td class="paramname"><em>bs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a> *&#160;</td>
+          <td class="paramname"><em>fn</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Frees the buffer for the bit set that was previously dynamically reserved with the reserve function. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">bs</td><td>the bs to be cleared. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">fn</td><td>the required allocation function to provide to a dynamically reserved bs. Any auxiliary data provided upon initialization will be passed to the allocation function when called. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the result of free operation. OK if success, or an error status to indicate the error. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>It is an error to call this function on a bs that was not reserved with the provided ccc_alloc_fn. The bs must have existing memory to free.</dd></dl>
+<p>This function covers the edge case of reserving a dynamic capacity for a bs at runtime but denying the bs allocation permission to resize. This can help prevent a bs from growing unbounded. The user in this case knows the bs does not have allocation permission and therefore no further memory will be dedicated to the bs.</p>
+<p>However, to free the bs in such a case this function must be used because the bs has no ability to free itself. Just as the allocation function is required to reserve memory so to is it required to free memory.</p>
+<p>This function will work normally if called on a bs with allocation permission however the normal ccc_bs_clear_and_free is sufficient for that use case. </p>
 
 </div>
 </div>
@@ -2045,6 +2103,54 @@ Include dependency graph for bitset.h:</div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the result of the operation, ok if successful or an error if bad parameters are provided or resizing is required to accommodate a new bit but resizing fails. </dd></dl>
+
+</div>
+</div>
+<a id="a0b766f5431d52d04467b1540adc4cb31" name="a0b766f5431d52d04467b1540adc4cb31"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0b766f5431d52d04467b1540adc4cb31">&#9670;&#160;</a></span>ccc_bs_reserve()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_bs_reserve </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> *&#160;</td>
+          <td class="paramname"><em>bs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>to_add</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a> *&#160;</td>
+          <td class="paramname"><em>fn</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Reserves space for at least to_add more bits. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">bs</td><td>a pointer to the bit set. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">to_add</td><td>the number of elements to add to the current size. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">fn</td><td>the allocation function to use to reserve memory. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the result of the reservation. OK if successful, otherwise an error status is returned. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>see the ccc_bs_clear_and_free_reserve function if this function is being used for a one-time dynamic reservation.</dd></dl>
+<p>This function can be used for a dynamic bit set with or without allocation permission. If the bit set has allocation permission, it will reserve the required space and later resize if more space is needed.</p>
+<p>If the bit set has been initialized with no allocation permission and no memory this function can serve as a one-time reservation. This is helpful when a fixed size is needed but that size is only known dynamically at runtime. To free the bit set in such a case see the ccc_bs_clear_and_free_reserve function. </p>
 
 </div>
 </div>
