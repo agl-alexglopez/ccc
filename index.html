@@ -1028,7 +1028,7 @@ Compile Time Initialization</h2>
 <div class="line">    = fdeq_init((<span class="keyword">static</span> <span class="keywordtype">int</span>[4096]){}, NULL, NULL, 4096);</div>
 </div><!-- fragment --><p>In all the preceding examples initializing at compile time simplifies the code, eliminates the need for initialization functions, and ensures that all containers are ready to operate when execution begins. Using compound literal initialization also helps create better ownership of memory for each container, eliminating named references to a container's memory that could be accessed by mistake.</p>
 <h2><a class="anchor" id="autotoc_md8"></a>
-No "container of" Macros</h2>
+No Container of Macros</h2>
 <p>Traditionally, intrusive containers provide the following macro.</p>
 <div class="fragment"><div class="line"> </div>
 <div class="line"><span class="preprocessor">#define list_entry(ptr, type, member) \</span></div>
