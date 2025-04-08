@@ -181,5 +181,5 @@ Variable length arrays are prohibited because they could cause hard to find bugs
 
 At least the following would need to happen before `v1.0`.
 
-- Examine hash table possibilities. Under first consideration the Robin Hood hash table approach seems somewhat naive. But there are some strengths to the implementation given requirements for non-allocation support, memory being provided by the user from stack, heap, or data segment, and other factors. It may be possible to improve this implementation but see the comment at the top of the source file for the flat hash table for more detailed thoughts.
 - More tests. I added a decent suite of tests to each container with most of the focus on the associative containers, but more thorough testing should be added throughout.
+- Now that a much more efficient hash table has been implemented, an adaptation of Rust's Hashbrown Hash Table, it is time to start narrowing down changes and lock in interfaces for v1.0. Suggestions are welcome for this phase of refactoring.
