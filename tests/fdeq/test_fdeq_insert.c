@@ -1,10 +1,12 @@
 #define TRAITS_USING_NAMESPACE_CCC
 #define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC
 
+#include "alloc.h"
 #include "checkers.h"
 #include "fdeq_util.h"
 #include "flat_double_ended_queue.h"
 #include "traits.h"
+#include "types.h"
 
 #include <stddef.h>
 
@@ -145,11 +147,37 @@ CHECK_BEGIN_STATIC_FN(fdeq_test_insert_ranges)
     CHECK_END_FN();
 }
 
+CHECK_BEGIN_STATIC_FN(fdeq_test_insert_ranges_reserve)
+{
+    flat_double_ended_queue q = fdeq_init((int *)NULL, NULL, NULL, 0);
+    ccc_result const r = fdeq_reserve(&q, 6, std_alloc);
+    CHECK(r, CCC_RESULT_OK);
+    (void)fdeq_push_back_range(&q, 3, (int[3]){0, 1, 2});
+    CHECK(check_order(&q, 3, (int[3]){0, 1, 2}), PASS);
+    (void)fdeq_insert_range(&q, fdeq_at(&q, 1), 2, (int[2]){3, 4});
+    CHECK(check_order(&q, 5, (int[5]){0, 3, 4, 1, 2}), PASS);
+    (void)fdeq_insert_range(&q, fdeq_at(&q, 1), 3, (int[3]){5, 6, 7});
+    CHECK(check_order(&q, 6, (int[6]){5, 6, 7, 3, 4, 1}), PASS);
+    (void)fdeq_insert_range(&q, fdeq_at(&q, 2), 4, (int[4]){8, 9, 10, 11});
+    CHECK(check_order(&q, 6, (int[6]){8, 9, 10, 11, 7, 3}), PASS);
+    (void)fdeq_insert_range(&q, fdeq_at(&q, 3), 5,
+                            (int[5]){12, 13, 14, 15, 16});
+    CHECK(check_order(&q, 6, (int[6]){12, 13, 14, 15, 16, 11}), PASS);
+    (void)fdeq_insert_range(&q, fdeq_at(&q, 3), 6,
+                            (int[6]){17, 18, 19, 20, 21, 22});
+    CHECK(check_order(&q, 6, (int[6]){17, 18, 19, 20, 21, 22}), PASS);
+    (void)fdeq_insert_range(&q, fdeq_at(&q, 3), 7,
+                            (int[7]){23, 24, 25, 26, 27, 28, 29});
+    CHECK(check_order(&q, 6, (int[6]){24, 25, 26, 27, 28, 29}), PASS);
+    CHECK_END_FN(ccc_fdeq_clear_and_free_reserve(&q, NULL, std_alloc););
+}
+
 int
 main()
 {
     return CHECK_RUN(
         fdeq_test_insert_three(), fdeq_test_insert_overwrite_three(),
         fdeq_test_push_back_ranges(), fdeq_test_push_front_ranges(),
-        fdeq_test_insert_ranges(), fdeq_test_insert_overwrite());
+        fdeq_test_insert_ranges(), fdeq_test_insert_overwrite(),
+        fdeq_test_insert_ranges_reserve());
 }

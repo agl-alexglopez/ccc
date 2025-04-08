@@ -690,12 +690,12 @@ static ccc_result
 maybe_resize(struct ccc_fdeq_ *const q, size_t const additional_elems_to_add,
              ccc_alloc_fn *const fn)
 {
-    size_t const old_size = q->buf_.sz_;
-    if (old_size + additional_elems_to_add < old_size)
+    size_t required = q->buf_.sz_ + additional_elems_to_add;
+    if (required < q->buf_.sz_)
     {
         return CCC_RESULT_ARG_ERROR;
     }
-    if (old_size + additional_elems_to_add < q->buf_.capacity_)
+    if (required < q->buf_.capacity_)
     {
         return CCC_RESULT_OK;
     }
@@ -704,11 +704,15 @@ maybe_resize(struct ccc_fdeq_ *const q, size_t const additional_elems_to_add,
         return CCC_RESULT_NO_ALLOC;
     }
     size_t const elem_sz = q->buf_.elem_sz_;
-    size_t const new_cap
-        = q->buf_.capacity_
-              ? ((q->buf_.capacity_ + additional_elems_to_add) * 2)
-              : START_CAPACITY;
-    void *const new_mem = fn(NULL, q->buf_.elem_sz_ * new_cap, q->buf_.aux_);
+    if (!q->buf_.capacity_ && additional_elems_to_add == 1)
+    {
+        required = START_CAPACITY;
+    }
+    else if (additional_elems_to_add == 1)
+    {
+        required = q->buf_.capacity_ * 2;
+    }
+    void *const new_mem = fn(NULL, q->buf_.elem_sz_ * required, q->buf_.aux_);
     if (!new_mem)
     {
         return CCC_RESULT_MEM_ERROR;
@@ -729,7 +733,7 @@ maybe_resize(struct ccc_fdeq_ *const q, size_t const additional_elems_to_add,
     (void)ccc_buf_alloc(&q->buf_, 0, fn);
     q->buf_.mem_ = new_mem;
     q->front_ = 0;
-    q->buf_.capacity_ = new_cap;
+    q->buf_.capacity_ = required;
     return CCC_RESULT_OK;
 }
 
