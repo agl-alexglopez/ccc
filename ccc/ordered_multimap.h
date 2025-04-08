@@ -92,7 +92,7 @@ Initialize the container with memory, callbacks, and permissions. */
 
 /** @brief Initialize a ordered multimap of the user specified type.
 @param [in] omm_name the name of the ordered multimap being initialized.
-@param [in] user_struct_name the struct the user intends to store.
+@param [in] any_struct_name the struct the user intends to store.
 @param [in] ommap_elem_field the name of the field with the intrusive element.
 @param [in] key_field the name of the field used as the multimap key.
 @param [in] key_cmp_fn the ccc_key_cmp_fn (types.h) used to compare the key to
@@ -102,9 +102,9 @@ the current stored element under considertion during a map operation.
 @return the initialized ordered multimap. Use this initializer on the right
 hand side of the variable at compile or run time
 (e.g. ccc_ordered_multimap m = ccc_omm_init(...);) */
-#define ccc_omm_init(omm_name, user_struct_name, ommap_elem_field, key_field,  \
+#define ccc_omm_init(omm_name, any_struct_name, ommap_elem_field, key_field,   \
                      key_cmp_fn, alloc_fn, aux)                                \
-    ccc_impl_omm_init(omm_name, user_struct_name, ommap_elem_field, key_field, \
+    ccc_impl_omm_init(omm_name, any_struct_name, ommap_elem_field, key_field,  \
                       key_cmp_fn, alloc_fn, aux)
 
 /**@}*/

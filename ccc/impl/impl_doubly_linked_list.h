@@ -52,7 +52,7 @@ void ccc_impl_dll_push_back(struct ccc_dll_ *, struct ccc_dll_elem_ *);
 void ccc_impl_dll_push_front(struct ccc_dll_ *, struct ccc_dll_elem_ *);
 /** @private */
 struct ccc_dll_elem_ *ccc_impl_dll_elem_in(struct ccc_dll_ const *,
-                                           void const *user_struct);
+                                           void const *any_struct);
 
 /*=======================     Macro Implementations   =======================*/
 

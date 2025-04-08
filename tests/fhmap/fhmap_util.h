@@ -29,13 +29,13 @@ enum : size_t
     STANDARD_FIXED_CAP = ccc_fhm_fixed_capacity(standard_fixed_map),
 };
 
-uint64_t fhmap_int_zero(ccc_user_key);
-uint64_t fhmap_int_last_digit(ccc_user_key);
-uint64_t fhmap_int_to_u64(ccc_user_key);
+uint64_t fhmap_int_zero(ccc_any_key);
+uint64_t fhmap_int_last_digit(ccc_any_key);
+uint64_t fhmap_int_to_u64(ccc_any_key);
 ccc_tribool fhmap_id_eq(ccc_key_cmp);
 
-void fhmap_modplus(ccc_user_type);
+void fhmap_modplus(ccc_any_type);
 struct val fhmap_create(int id, int val);
-void fhmap_swap_val(ccc_user_type u);
+void fhmap_swap_val(ccc_any_type u);
 
 #endif /* CCC_FHMAP_UTIL_H */

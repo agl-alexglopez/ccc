@@ -186,7 +186,7 @@ ccc_om_and_modify(ccc_omap_entry *const e, ccc_update_fn *const fn)
     }
     if (fn && e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED && e->impl_.entry_.e_)
     {
-        fn((ccc_user_type){.user_type = e->impl_.entry_.e_, .aux = NULL});
+        fn((ccc_any_type){.any_type = e->impl_.entry_.e_, .aux = NULL});
     }
     return e;
 }
@@ -198,7 +198,7 @@ ccc_om_and_modify_aux(ccc_omap_entry *const e, ccc_update_fn *const fn,
     if (e && fn && e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED
         && e->impl_.entry_.e_)
     {
-        fn((ccc_user_type){.user_type = e->impl_.entry_.e_, .aux = aux});
+        fn((ccc_any_type){.any_type = e->impl_.entry_.e_, .aux = aux});
     }
     return e;
 }
@@ -216,10 +216,10 @@ ccc_om_swap_entry(ccc_ordered_map *const om,
     {
         assert(om->root_ != &om->end_);
         *key_val_handle = *om->root_;
-        void *const user_struct = struct_base(om, key_val_handle);
+        void *const any_struct = struct_base(om, key_val_handle);
         void *const in_tree = struct_base(om, om->root_);
         void *const old_val = struct_base(om, tmp);
-        swap(old_val, in_tree, user_struct, om->elem_sz_);
+        swap(old_val, in_tree, any_struct, om->elem_sz_);
         key_val_handle->branch_[L] = key_val_handle->branch_[R]
             = key_val_handle->parent_ = NULL;
         tmp->branch_[L] = tmp->branch_[R] = tmp->parent_ = NULL;
@@ -294,10 +294,10 @@ ccc_om_remove(ccc_ordered_map *const om, ccc_omap_elem *const out_handle)
     }
     if (om->alloc_)
     {
-        void *const user_struct = struct_base(om, out_handle);
-        memcpy(user_struct, n, om->elem_sz_);
+        void *const any_struct = struct_base(om, out_handle);
+        memcpy(any_struct, n, om->elem_sz_);
         om->alloc_(n, 0, om->aux_);
-        return (ccc_entry){{.e_ = user_struct, .stats_ = CCC_ENTRY_OCCUPIED}};
+        return (ccc_entry){{.e_ = any_struct, .stats_ = CCC_ENTRY_OCCUPIED}};
     }
     return (ccc_entry){{.e_ = n, .stats_ = CCC_ENTRY_OCCUPIED}};
 }
@@ -453,7 +453,7 @@ ccc_om_clear(ccc_ordered_map *const om, ccc_destructor_fn *const destructor)
         void *const popped = erase(om, key_from_node(om, om->root_));
         if (destructor)
         {
-            destructor((ccc_user_type){.user_type = popped, .aux = om->aux_});
+            destructor((ccc_any_type){.any_type = popped, .aux = om->aux_});
         }
         if (om->alloc_)
         {
@@ -817,7 +817,7 @@ cmp(struct ccc_omap_ const *const t, void const *const key,
 {
     return fn((ccc_key_cmp){
         .key_lhs = key,
-        .user_type_rhs = struct_base(t, node),
+        .any_type_rhs = struct_base(t, node),
         .aux = t->aux_,
     });
 }

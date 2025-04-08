@@ -195,16 +195,16 @@ typedef struct
 
 This type helps the user define the comparison callback function, if the
 container takes a standard element comparison function, and helps avoid
-swappable argument errors. User type LHS is considered the left hand side and
-user type RHS is the right hand side when considering three-way comparison
+swappable argument errors. Any type LHS is considered the left hand side and
+any type RHS is the right hand side when considering three-way comparison
 return values. Aux data is a reference to any auxiliary data provided upon
 container initialization. */
 typedef struct
 {
     /** The left hand side for a three-way comparison operation. */
-    void const *const user_type_lhs;
+    void const *const any_type_lhs;
     /** The right hand side for a three-way comparison operation. */
-    void const *const user_type_rhs;
+    void const *const any_type_rhs;
     /** A reference to aux data provided to container on initialization. */
     void *aux;
 } ccc_cmp;
@@ -218,7 +218,7 @@ typedef struct
     /** Key matching the key field of the provided type to the container. */
     void const *const key_lhs;
     /** The complete user type stored in the container. */
-    void const *const user_type_rhs;
+    void const *const any_type_rhs;
     /** A reference to aux data provided to the container on initialization. */
     void *aux;
 } ccc_key_cmp;
@@ -230,10 +230,10 @@ container. For example, a destruct function will use this type. */
 typedef struct
 {
     /** The user type being stored in the container. */
-    void *user_type;
+    void *any_type;
     /** A reference to aux data provided to the container on initialization. */
     void *aux;
-} ccc_user_type;
+} ccc_any_type;
 
 /** @brief A read only reference to a key type matching the key field type used
 for hash containers.
@@ -243,10 +243,10 @@ to hash their values with their hash function. */
 typedef struct
 {
     /** A reference to the same type used for keys in the container. */
-    void const *const user_key;
+    void const *const any_key;
     /** A reference to aux data provided to the container on initialization. */
     void *aux;
-} ccc_user_key;
+} ccc_any_key;
 
 /** @brief An allocation function at the core of all containers.
 
@@ -312,7 +312,7 @@ is available. The container pointer points to the base of the user type and is
 not NULL. Aux may be NULL if no aux is provided on initialization. An update
 function is used when a container Interface exposes functions to modify the key
 or value used to determine sorted order of elements in the container. */
-typedef void ccc_update_fn(ccc_user_type);
+typedef void ccc_update_fn(ccc_any_type);
 
 /** @brief A callback function for destroying an element in the container.
 
@@ -330,7 +330,7 @@ container frees. If the user has not given permission to the container to
 allocate memory, this a good function in which to free each element, if
 desired; any program state can be maintained then the element can be freed by
 the user in this function as the final step. */
-typedef void ccc_destructor_fn(ccc_user_type);
+typedef void ccc_destructor_fn(ccc_any_type);
 
 /** @brief A callback function to determining equality between two stored keys.
 
@@ -351,7 +351,7 @@ typedef ccc_threeway_cmp ccc_key_cmp_fn(ccc_key_cmp);
 
 A reference to any aux data provided on initialization is also available.
 Return the complete hash value as determined by the user hashing algorithm. */
-typedef uint64_t ccc_hash_fn(ccc_user_key to_hash);
+typedef uint64_t ccc_hash_fn(ccc_any_key to_hash);
 
 /**@}*/
 
@@ -540,8 +540,8 @@ typedef ccc_result result;
 typedef ccc_threeway_cmp threeway_cmp;
 typedef ccc_cmp cmp;
 typedef ccc_key_cmp key_cmp;
-typedef ccc_user_type user_type;
-typedef ccc_user_key user_key;
+typedef ccc_any_type any_type;
+typedef ccc_any_key any_key;
 typedef ccc_alloc_fn alloc_fn;
 typedef ccc_cmp_fn cmp_fn;
 typedef ccc_update_fn update_fn;

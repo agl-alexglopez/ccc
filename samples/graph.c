@@ -284,7 +284,7 @@ static void help(void);
 
 static threeway_cmp cmp_pq_costs(cmp);
 static ccc_tribool eq_parent_cells(key_cmp);
-static uint64_t hash_parent_cells(user_key point_struct);
+static uint64_t hash_parent_cells(any_key point_struct);
 static uint64_t hash_64_bits(uint64_t);
 
 static unsigned count_digits(uintmax_t n);
@@ -1040,15 +1040,15 @@ build_path_outline(struct graph *graph)
 static ccc_tribool
 eq_parent_cells(key_cmp const c)
 {
-    struct path_backtrack_cell const *const pc = c.user_type_rhs;
+    struct path_backtrack_cell const *const pc = c.any_type_rhs;
     struct point const *const p = c.key_lhs;
     return pc->current.r == p->r && pc->current.c == p->c;
 }
 
 static uint64_t
-hash_parent_cells(user_key const point_struct)
+hash_parent_cells(any_key const point_struct)
 {
-    struct point const *const p = point_struct.user_key;
+    struct point const *const p = point_struct.any_key;
     uint64_t const wr = p->r;
     return hash_64_bits((wr << 31) | p->c);
 }
@@ -1056,8 +1056,8 @@ hash_parent_cells(user_key const point_struct)
 static threeway_cmp
 cmp_pq_costs(cmp const cost_cmp)
 {
-    struct dijkstra_vertex const *const a = cost_cmp.user_type_lhs;
-    struct dijkstra_vertex const *const b = cost_cmp.user_type_rhs;
+    struct dijkstra_vertex const *const a = cost_cmp.any_type_lhs;
+    struct dijkstra_vertex const *const b = cost_cmp.any_type_rhs;
     return (a->dist > b->dist) - (a->dist < b->dist);
 }
 

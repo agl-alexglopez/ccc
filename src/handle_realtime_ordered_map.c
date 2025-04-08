@@ -216,9 +216,9 @@ ccc_hrm_swap_handle(ccc_handle_realtime_ordered_map *const hrm,
     {
         void *const slot = ccc_buf_at(&hrm->buf_, q.found_);
         *out_handle = *elem_in_slot(hrm, slot);
-        void *const user_struct = struct_base(hrm, out_handle);
+        void *const any_struct = struct_base(hrm, out_handle);
         void *const tmp = ccc_buf_at(&hrm->buf_, 0);
-        swap(tmp, user_struct, slot, hrm->buf_.elem_sz_);
+        swap(tmp, any_struct, slot, hrm->buf_.elem_sz_);
         elem_in_slot(hrm, tmp)->parity_ = 1;
         return (ccc_handle){{.i_ = q.found_, .stats_ = CCC_ENTRY_OCCUPIED}};
     }
@@ -285,8 +285,8 @@ ccc_hrm_and_modify(ccc_hromap_handle *const h, ccc_update_fn *const fn)
     if (h && fn && h->impl_.handle_.stats_ & CCC_ENTRY_OCCUPIED
         && h->impl_.handle_.i_ > 0)
     {
-        fn((ccc_user_type){
-            .user_type = base_at(h->impl_.hrm_, h->impl_.handle_.i_), NULL});
+        fn((ccc_any_type){
+            .any_type = base_at(h->impl_.hrm_, h->impl_.handle_.i_), NULL});
     }
     return h;
 }
@@ -298,8 +298,8 @@ ccc_hrm_and_modify_aux(ccc_hromap_handle *const h, ccc_update_fn *const fn,
     if (h && fn && h->impl_.handle_.stats_ & CCC_ENTRY_OCCUPIED
         && h->impl_.handle_.stats_ > 0)
     {
-        fn((ccc_user_type){
-            .user_type = base_at(h->impl_.hrm_, h->impl_.handle_.i_), aux});
+        fn((ccc_any_type){
+            .any_type = base_at(h->impl_.hrm_, h->impl_.handle_.i_), aux});
     }
     return h;
 }
@@ -384,11 +384,11 @@ ccc_hrm_remove(ccc_handle_realtime_ordered_map *const hrm,
     }
     size_t const removed = remove_fixup(hrm, q.found_);
     assert(removed);
-    void *const user_struct = struct_base(hrm, out_handle);
+    void *const any_struct = struct_base(hrm, out_handle);
     void const *const r = ccc_buf_at(&hrm->buf_, removed);
-    if (user_struct != r)
+    if (any_struct != r)
     {
-        (void)memcpy(user_struct, r, hrm->buf_.elem_sz_);
+        (void)memcpy(any_struct, r, hrm->buf_.elem_sz_);
     }
     return (ccc_handle){{.i_ = 0, .stats_ = CCC_ENTRY_OCCUPIED}};
 }
@@ -665,8 +665,8 @@ ccc_hrm_clear(ccc_handle_realtime_ordered_map *const hrm,
     {
         size_t const i = remove_fixup(hrm, hrm->root_);
         assert(i);
-        fn((ccc_user_type){.user_type = ccc_buf_at(&hrm->buf_, i),
-                           .aux = hrm->buf_.aux_});
+        fn((ccc_any_type){.any_type = ccc_buf_at(&hrm->buf_, i),
+                          .aux = hrm->buf_.aux_});
     }
     (void)ccc_buf_size_set(&hrm->buf_, 1);
     hrm->root_ = 0;
@@ -690,8 +690,8 @@ ccc_hrm_clear_and_free(ccc_handle_realtime_ordered_map *const hrm,
     {
         size_t const i = remove_fixup(hrm, hrm->root_);
         assert(i);
-        fn((ccc_user_type){.user_type = ccc_buf_at(&hrm->buf_, i),
-                           .aux = hrm->buf_.aux_});
+        fn((ccc_any_type){.any_type = ccc_buf_at(&hrm->buf_, i),
+                          .aux = hrm->buf_.aux_});
     }
     hrm->root_ = 0;
     return ccc_buf_alloc(&hrm->buf_, 0, hrm->buf_.alloc_);
@@ -715,8 +715,8 @@ ccc_hrm_clear_and_free_reserve(ccc_handle_realtime_ordered_map *const hrm,
     {
         size_t const i = remove_fixup(hrm, hrm->root_);
         assert(i);
-        destructor((ccc_user_type){.user_type = ccc_buf_at(&hrm->buf_, i),
-                                   .aux = hrm->buf_.aux_});
+        destructor((ccc_any_type){.any_type = ccc_buf_at(&hrm->buf_, i),
+                                  .aux = hrm->buf_.aux_});
     }
     hrm->root_ = 0;
     return ccc_buf_alloc(&hrm->buf_, 0, alloc);
@@ -914,7 +914,7 @@ cmp_elems(struct ccc_hromap_ const *const hrm, void const *const key,
           size_t const node, ccc_key_cmp_fn *const fn)
 {
     return fn((ccc_key_cmp){.key_lhs = key,
-                            .user_type_rhs = base_at(hrm, node),
+                            .any_type_rhs = base_at(hrm, node),
                             .aux = hrm->buf_.aux_});
 }
 

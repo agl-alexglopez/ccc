@@ -20,9 +20,9 @@ hromap_create(int const id, int const val)
 }
 
 static inline void
-hromap_modplus(ccc_user_type const t)
+hromap_modplus(ccc_any_type const t)
 {
-    ((struct val *)t.user_type)->val++;
+    ((struct val *)t.any_type)->val++;
 }
 
 CHECK_BEGIN_STATIC_FN(hromap_test_insert)

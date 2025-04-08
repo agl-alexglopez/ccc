@@ -137,7 +137,7 @@ ccc_pq_clear(ccc_priority_queue *const pq, ccc_destructor_fn *const fn)
     {
         if (fn)
         {
-            fn((ccc_user_type){.user_type = ccc_pq_front(pq), .aux = pq->aux_});
+            fn((ccc_any_type){.any_type = ccc_pq_front(pq), .aux = pq->aux_});
         }
         (void)ccc_pq_pop(pq);
     }
@@ -178,7 +178,7 @@ ccc_pq_update(ccc_priority_queue *const pq, ccc_pq_elem *const e,
     {
         return CCC_TRIBOOL_ERROR;
     }
-    fn((ccc_user_type){struct_base(pq, e), aux});
+    fn((ccc_any_type){struct_base(pq, e), aux});
     update_fixup(pq, e);
     return CCC_TRUE;
 }
@@ -193,7 +193,7 @@ ccc_pq_increase(ccc_priority_queue *const pq, ccc_pq_elem *const e,
     {
         return CCC_TRIBOOL_ERROR;
     }
-    fn((ccc_user_type){struct_base(pq, e), aux});
+    fn((ccc_any_type){struct_base(pq, e), aux});
     increase_fixup(pq, e);
     return CCC_TRUE;
 }
@@ -208,7 +208,7 @@ ccc_pq_decrease(ccc_priority_queue *const pq, ccc_pq_elem *const e,
     {
         return CCC_TRIBOOL_ERROR;
     }
-    fn((ccc_user_type){struct_base(pq, e), aux});
+    fn((ccc_any_type){struct_base(pq, e), aux});
     decrease_fixup(pq, e);
     return CCC_TRUE;
 }
@@ -247,9 +247,9 @@ ccc_impl_pq_push(struct ccc_pq_ *const pq, struct ccc_pq_elem_ *const e)
 
 struct ccc_pq_elem_ *
 ccc_impl_pq_elem_in(struct ccc_pq_ const *const pq,
-                    void const *const user_struct)
+                    void const *const any_struct)
 {
-    return elem_in(pq, user_struct);
+    return elem_in(pq, any_struct);
 }
 
 void
@@ -464,8 +464,8 @@ static inline ccc_threeway_cmp
 cmp(struct ccc_pq_ const *const pq, struct ccc_pq_elem_ const *const a,
     struct ccc_pq_elem_ const *const b)
 {
-    return pq->cmp_((ccc_cmp){.user_type_lhs = struct_base(pq, a),
-                              .user_type_rhs = struct_base(pq, b),
+    return pq->cmp_((ccc_cmp){.any_type_lhs = struct_base(pq, a),
+                              .any_type_rhs = struct_base(pq, b),
                               .aux = pq->aux_});
 }
 

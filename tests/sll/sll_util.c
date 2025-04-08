@@ -13,8 +13,8 @@
 ccc_threeway_cmp
 val_cmp(ccc_cmp const c)
 {
-    struct val const *const a = c.user_type_lhs;
-    struct val const *const b = c.user_type_rhs;
+    struct val const *const a = c.any_type_lhs;
+    struct val const *const b = c.any_type_rhs;
     return (a->val > b->val) - (a->val < b->val);
 }
 

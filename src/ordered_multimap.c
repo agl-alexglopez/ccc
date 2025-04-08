@@ -209,7 +209,7 @@ ccc_omm_and_modify(ccc_ommap_entry *const e, ccc_update_fn *const fn)
     }
     if (e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED && e->impl_.entry_.e_)
     {
-        fn((ccc_user_type){.user_type = e->impl_.entry_.e_, .aux = NULL});
+        fn((ccc_any_type){.any_type = e->impl_.entry_.e_, .aux = NULL});
     }
     return e;
 }
@@ -224,7 +224,7 @@ ccc_omm_and_modify_aux(ccc_ommap_entry *const e, ccc_update_fn *const fn,
     }
     if (e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED && e->impl_.entry_.e_)
     {
-        fn((ccc_user_type){.user_type = e->impl_.entry_.e_, .aux = aux});
+        fn((ccc_any_type){.any_type = e->impl_.entry_.e_, .aux = aux});
     }
     return e;
 }
@@ -302,10 +302,10 @@ ccc_omm_remove(ccc_ordered_multimap *const mm, ccc_ommap_elem *const out_handle)
     }
     if (mm->alloc_)
     {
-        void *const user_struct = struct_base(mm, out_handle);
-        memcpy(user_struct, n, mm->elem_sz_);
+        void *const any_struct = struct_base(mm, out_handle);
+        memcpy(any_struct, n, mm->elem_sz_);
         mm->alloc_(n, 0, mm->aux_);
-        return (ccc_entry){{.e_ = user_struct, .stats_ = CCC_ENTRY_OCCUPIED}};
+        return (ccc_entry){{.e_ = any_struct, .stats_ = CCC_ENTRY_OCCUPIED}};
     }
     return (ccc_entry){{.e_ = n, .stats_ = CCC_ENTRY_OCCUPIED}};
 }
@@ -472,7 +472,7 @@ ccc_omm_update(ccc_ordered_multimap *const mm,
     {
         return CCC_FALSE;
     }
-    fn((ccc_user_type){e, aux});
+    fn((ccc_any_type){e, aux});
     (void)multimap_insert(mm, key_val_handle);
     return CCC_TRUE;
 }
@@ -616,7 +616,7 @@ ccc_omm_clear(ccc_ordered_multimap *const mm,
         void *const popped = pop_min(mm);
         if (destructor)
         {
-            destructor((ccc_user_type){.user_type = popped, .aux = mm->aux_});
+            destructor((ccc_any_type){.any_type = popped, .aux = mm->aux_});
         }
         if (mm->alloc_)
         {
@@ -1252,7 +1252,7 @@ cmp(struct ccc_ommap_ const *const t, void const *const key,
 {
     return fn((ccc_key_cmp){
         .key_lhs = key,
-        .user_type_rhs = struct_base(t, node),
+        .any_type_rhs = struct_base(t, node),
         .aux = t->aux_,
     });
 }

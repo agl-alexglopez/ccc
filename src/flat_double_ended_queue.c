@@ -371,8 +371,8 @@ ccc_fdeq_clear(ccc_flat_double_ended_queue *const fdeq,
     size_t const back = back_free_slot(fdeq);
     for (size_t i = fdeq->front_; i != back; i = increment(fdeq, i))
     {
-        destructor((ccc_user_type){.user_type = ccc_buf_at(&fdeq->buf_, i),
-                                   .aux = fdeq->buf_.aux_});
+        destructor((ccc_any_type){.any_type = ccc_buf_at(&fdeq->buf_, i),
+                                  .aux = fdeq->buf_.aux_});
     }
     return CCC_RESULT_OK;
 }
@@ -393,8 +393,8 @@ ccc_fdeq_clear_and_free(ccc_flat_double_ended_queue *const fdeq,
     size_t const back = back_free_slot(fdeq);
     for (size_t i = fdeq->front_; i != back; i = increment(fdeq, i))
     {
-        destructor((ccc_user_type){.user_type = ccc_buf_at(&fdeq->buf_, i),
-                                   .aux = fdeq->buf_.aux_});
+        destructor((ccc_any_type){.any_type = ccc_buf_at(&fdeq->buf_, i),
+                                  .aux = fdeq->buf_.aux_});
     }
     ccc_result const r = ccc_buf_alloc(&fdeq->buf_, 0, fdeq->buf_.alloc_);
     if (r == CCC_RESULT_OK)
@@ -421,8 +421,8 @@ ccc_fdeq_clear_and_free_reserve(ccc_flat_double_ended_queue *const fdeq,
     size_t const back = back_free_slot(fdeq);
     for (size_t i = fdeq->front_; i != back; i = increment(fdeq, i))
     {
-        destructor((ccc_user_type){.user_type = ccc_buf_at(&fdeq->buf_, i),
-                                   .aux = fdeq->buf_.aux_});
+        destructor((ccc_any_type){.any_type = ccc_buf_at(&fdeq->buf_, i),
+                                  .aux = fdeq->buf_.aux_});
     }
     ccc_result const r = ccc_buf_alloc(&fdeq->buf_, 0, alloc);
     if (r == CCC_RESULT_OK)
