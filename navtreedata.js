@@ -32,7 +32,7 @@ var NAVTREE =
       [ "Intrusive and Non-Intrusive Containers", "index.html#autotoc_md5", null ],
       [ "Non-Allocating Containers", "index.html#autotoc_md6", null ],
       [ "Compile Time Initialization", "index.html#autotoc_md7", null ],
-      [ "No <tt>container_of</tt> Macros", "index.html#autotoc_md8", null ],
+      [ "No \"container of\" Macros", "index.html#autotoc_md8", null ],
       [ "Rust's Entry Interface", "index.html#autotoc_md9", [
         [ "Lazy Evaluation", "index.html#autotoc_md10", null ]
       ] ],
