@@ -979,7 +979,7 @@ static flat_double_ended_queue ring_buffer
 In all the preceding examples initializing at compile time simplifies the code, eliminates the need for initialization functions, and ensures that all containers are ready to operate when execution begins. Using compound literal initialization also helps create better ownership of memory for each container, eliminating named references to a container's memory that could be accessed by mistake.
 
 
-### No `container_of` Macros
+### No "container of" Macros
 
 Traditionally, intrusive containers provide the following macro.
 
