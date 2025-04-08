@@ -677,10 +677,15 @@ ccc_fhm_clear_and_free_reserve(ccc_flat_hash_map *const h,
                                ccc_destructor_fn *const destructor,
                                ccc_alloc_fn *const alloc)
 {
-    if (unlikely(!h || !h->data_ || h->alloc_fn_ || !alloc || !h->init_
-                 || !h->mask_))
+    if (unlikely(!h || !h->data_ || !h->init_ || !h->mask_
+                 || (h->alloc_fn_ && h->alloc_fn_ != alloc)))
     {
         return CCC_RESULT_ARG_ERROR;
+    }
+    if (!alloc)
+    {
+        (void)ccc_fhm_clear(h, destructor);
+        return CCC_RESULT_NO_ALLOC;
     }
     if (destructor)
     {

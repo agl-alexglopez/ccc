@@ -715,14 +715,12 @@ previously dynamically reserved with the reserve function.
 maintenance is required on the elements in the table before their slots are
 forfeit.
 @param [in] alloc the required allocation function to provide to a dynamically
-reserved map that has no allocation permission. Any auxiliary data provided upon
-initialization will be passed to the allocation function when called.
-@return the result of free operation. An alloc function must be provided and
-map must have been denied allocation permission in order to use this function.
-@warning it is an error to call this function on a map with allocation
-permission. It is also an error to call this function on a map that was not
-reserved with the provided ccc_alloc_fn. The map must have existing memory
-to free.
+reserved map. Any auxiliary data provided upon initialization will be passed to
+the allocation function when called.
+@return the result of free operation. CCC_RESULT_OK if success, or an error
+status to indicate the error.
+@warning It is an error to call this function on a map that was not reserved
+with the provided ccc_alloc_fn. The map must have existing memory to free.
 
 This function covers the edge case of reserving a dynamic capacity for a map
 at runtime but denying the map allocation permission to resize. This can help
@@ -732,7 +730,10 @@ permission and therefore no further memory will be dedicated to the map.
 
 However, to free the map in such a case this function must be used because the
 map has no ability to free itself. Just as the allocation function is required
-to reserve memory so to is it required to free memory. */
+to reserve memory so to is it required to free memory.
+
+This function will work normally if called on a map with allocation permission
+however the normal ccc_fhm_clear_and_free is sufficient for that use case. */
 ccc_result ccc_fhm_clear_and_free_reserve(ccc_flat_hash_map *h,
                                           ccc_destructor_fn *destructor,
                                           ccc_alloc_fn *alloc);
