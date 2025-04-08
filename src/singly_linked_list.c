@@ -34,7 +34,7 @@ static size_t erase_range(struct ccc_sll_ *, struct ccc_sll_elem_ *begin,
                           struct ccc_sll_elem_ *end);
 static struct ccc_sll_elem_ *pop_front(struct ccc_sll_ *);
 static struct ccc_sll_elem_ *elem_in(struct ccc_sll_ const *,
-                                     void const *user_struct);
+                                     void const *any_struct);
 
 /*===========================     Interface     =============================*/
 
@@ -265,7 +265,7 @@ ccc_sll_clear(ccc_singly_linked_list *const sll, ccc_destructor_fn *const fn)
         void *const mem = struct_base(sll, pop_front(sll));
         if (fn)
         {
-            fn((ccc_user_type){.user_type = mem, .aux = sll->aux_});
+            fn((ccc_any_type){.any_type = mem, .aux = sll->aux_});
         }
         if (sll->alloc_)
         {
@@ -416,8 +416,7 @@ struct_base(struct ccc_sll_ const *const l, struct ccc_sll_elem_ const *const e)
 }
 
 static inline struct ccc_sll_elem_ *
-elem_in(struct ccc_sll_ const *const sll, void const *const user_struct)
+elem_in(struct ccc_sll_ const *const sll, void const *const any_struct)
 {
-    return (struct ccc_sll_elem_ *)((char *)user_struct
-                                    + sll->sll_elem_offset_);
+    return (struct ccc_sll_elem_ *)((char *)any_struct + sll->sll_elem_offset_);
 }

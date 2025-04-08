@@ -10,16 +10,16 @@
 #include "types.h"
 
 static void
-mod(ccc_user_type const u)
+mod(ccc_any_type const u)
 {
-    struct val *v = u.user_type;
+    struct val *v = u.any_type;
     v->val += 5;
 }
 
 static void
-modw(ccc_user_type const u)
+modw(ccc_any_type const u)
 {
-    struct val *v = u.user_type;
+    struct val *v = u.any_type;
     v->val = *((int *)u.aux);
 }
 

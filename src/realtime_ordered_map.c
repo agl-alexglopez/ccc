@@ -197,9 +197,9 @@ ccc_rom_swap_entry(ccc_realtime_ordered_map *const rom,
     {
         *key_val_handle = *q.found_;
         void *const found = struct_base(rom, q.found_);
-        void *const user_struct = struct_base(rom, key_val_handle);
+        void *const any_struct = struct_base(rom, key_val_handle);
         void *const old_val = struct_base(rom, tmp);
-        swap(old_val, found, user_struct, rom->elem_sz_);
+        swap(old_val, found, any_struct, rom->elem_sz_);
         key_val_handle->branch_[L] = key_val_handle->branch_[R]
             = key_val_handle->parent_ = NULL;
         tmp->branch_[L] = tmp->branch_[R] = tmp->parent_ = NULL;
@@ -343,10 +343,10 @@ ccc_rom_remove(ccc_realtime_ordered_map *const rom,
     void *const removed = remove_fixup(rom, q.found_);
     if (rom->alloc_)
     {
-        void *const user_struct = struct_base(rom, out_handle);
-        memcpy(user_struct, removed, rom->elem_sz_);
+        void *const any_struct = struct_base(rom, out_handle);
+        memcpy(any_struct, removed, rom->elem_sz_);
         rom->alloc_(removed, 0, rom->aux_);
-        return (ccc_entry){{.e_ = user_struct, .stats_ = CCC_ENTRY_OCCUPIED}};
+        return (ccc_entry){{.e_ = any_struct, .stats_ = CCC_ENTRY_OCCUPIED}};
     }
     return (ccc_entry){{.e_ = removed, .stats_ = CCC_ENTRY_OCCUPIED}};
 }
@@ -360,7 +360,7 @@ ccc_rom_and_modify(ccc_romap_entry *e, ccc_update_fn *fn)
     }
     if (fn && e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED && e->impl_.entry_.e_)
     {
-        fn((ccc_user_type){.user_type = e->impl_.entry_.e_, NULL});
+        fn((ccc_any_type){.any_type = e->impl_.entry_.e_, NULL});
     }
     return e;
 }
@@ -374,7 +374,7 @@ ccc_rom_and_modify_aux(ccc_romap_entry *e, ccc_update_fn *fn, void *aux)
     }
     if (fn && e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED && e->impl_.entry_.e_)
     {
-        fn((ccc_user_type){.user_type = e->impl_.entry_.e_, aux});
+        fn((ccc_any_type){.any_type = e->impl_.entry_.e_, aux});
     }
     return e;
 }
@@ -548,7 +548,7 @@ ccc_rom_clear(ccc_realtime_ordered_map *const rom,
         void *const deleted = remove_fixup(rom, rom->root_);
         if (destructor)
         {
-            destructor((ccc_user_type){.user_type = deleted, .aux = rom->aux_});
+            destructor((ccc_any_type){.any_type = deleted, .aux = rom->aux_});
         }
         if (rom->alloc_)
         {
@@ -769,7 +769,7 @@ cmp(struct ccc_romap_ const *const rom, void const *const key,
 {
     return fn((ccc_key_cmp){
         .key_lhs = key,
-        .user_type_rhs = struct_base(rom, node),
+        .any_type_rhs = struct_base(rom, node),
         .aux = rom->aux_,
     });
 }

@@ -69,15 +69,15 @@ static ccc_threeway_cmp
 cmp_by_key(ccc_key_cmp const cmp)
 {
     int const key_lhs = *(int *)cmp.key_lhs;
-    struct lru_elem const *const kv = cmp.user_type_rhs;
+    struct lru_elem const *const kv = cmp.any_type_rhs;
     return (key_lhs > kv->key) - (key_lhs < kv->key);
 }
 
 static ccc_threeway_cmp
 cmp_list_elems(ccc_cmp const cmp)
 {
-    struct lru_elem const *const kv_a = cmp.user_type_lhs;
-    struct lru_elem const *const kv_b = cmp.user_type_rhs;
+    struct lru_elem const *const kv_a = cmp.any_type_lhs;
+    struct lru_elem const *const kv_b = cmp.any_type_rhs;
     return (kv_a->key > kv_b->key) - (kv_a->key < kv_b->key);
 }
 

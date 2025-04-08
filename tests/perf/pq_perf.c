@@ -38,7 +38,7 @@ static void *valid_malloc(size_t bytes);
 static struct val *create_rand_vals(size_t);
 static ccc_threeway_cmp val_key_cmp(ccc_key_cmp);
 static ccc_threeway_cmp val_cmp(ccc_cmp);
-static void val_update(ccc_user_type);
+static void val_update(ccc_any_type);
 
 #define NUM_TESTS (size_t)6
 static perf_fn const perf_tests[NUM_TESTS] = {test_push,
@@ -444,7 +444,7 @@ valid_malloc(size_t bytes)
 static ccc_threeway_cmp
 val_key_cmp(ccc_key_cmp const cmp)
 {
-    struct val const *const x = cmp.user_type_rhs;
+    struct val const *const x = cmp.any_type_rhs;
     int const key = *((int *)cmp.key_lhs);
     return (key > x->val) - (key < x->val);
 }
@@ -452,13 +452,13 @@ val_key_cmp(ccc_key_cmp const cmp)
 static ccc_threeway_cmp
 val_cmp(ccc_cmp const cmp)
 {
-    struct val const *const a = cmp.user_type_lhs;
-    struct val const *const b = cmp.user_type_rhs;
+    struct val const *const a = cmp.any_type_lhs;
+    struct val const *const b = cmp.any_type_rhs;
     return (a->val > b->val) - (a->val < b->val);
 }
 
 static void
-val_update(ccc_user_type const u)
+val_update(ccc_any_type const u)
 {
-    ((struct val *)u.user_type)->val = *((int *)u.aux);
+    ((struct val *)u.any_type)->val = *((int *)u.aux);
 }

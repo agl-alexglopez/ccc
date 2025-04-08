@@ -409,7 +409,7 @@ ccc_dll_clear(ccc_doubly_linked_list *const l, ccc_destructor_fn *fn)
         void *const node = struct_base(l, pop_front(l));
         if (fn)
         {
-            fn((ccc_user_type){.user_type = node, .aux = l->aux_});
+            fn((ccc_any_type){.any_type = node, .aux = l->aux_});
         }
         if (l->alloc_)
         {
@@ -466,9 +466,9 @@ ccc_impl_dll_push_front(struct ccc_dll_ *const l, struct ccc_dll_elem_ *const e)
 
 struct ccc_dll_elem_ *
 ccc_impl_dll_elem_in(struct ccc_dll_ const *const l,
-                     void const *const user_struct)
+                     void const *const any_struct)
 {
-    return elem_in(l, user_struct);
+    return elem_in(l, any_struct);
 }
 
 /*=======================       Static Helpers    ===========================*/

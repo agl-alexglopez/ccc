@@ -73,15 +73,15 @@ static bool const quiet = true;
 static ccc_tribool
 lru_lookup_cmp(ccc_key_cmp const cmp)
 {
-    struct lru_lookup const *const lookup = cmp.user_type_rhs;
+    struct lru_lookup const *const lookup = cmp.any_type_rhs;
     return lookup->key == *((int *)cmp.key_lhs);
 }
 
 static ccc_threeway_cmp
 cmp_by_key(ccc_cmp const cmp)
 {
-    struct key_val const *const kv_a = cmp.user_type_lhs;
-    struct key_val const *const kv_b = cmp.user_type_rhs;
+    struct key_val const *const kv_a = cmp.any_type_lhs;
+    struct key_val const *const kv_b = cmp.any_type_rhs;
     return (kv_a->key > kv_b->key) - (kv_a->key < kv_b->key);
 }
 

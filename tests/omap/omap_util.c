@@ -12,7 +12,7 @@
 ccc_threeway_cmp
 id_cmp(ccc_key_cmp const cmp)
 {
-    struct val const *const c = cmp.user_type_rhs;
+    struct val const *const c = cmp.any_type_rhs;
     int const key = *((int *)cmp.key_lhs);
     return (key > c->key) - (key < c->key);
 }

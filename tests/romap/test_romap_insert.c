@@ -20,9 +20,9 @@ romap_create(int const id, int const val)
 }
 
 static inline void
-romap_modplus(ccc_user_type const t)
+romap_modplus(ccc_any_type const t)
 {
-    ((struct val *)t.user_type)->val++;
+    ((struct val *)t.any_type)->val++;
 }
 
 CHECK_BEGIN_STATIC_FN(romap_test_insert)

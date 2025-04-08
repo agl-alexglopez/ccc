@@ -193,8 +193,8 @@ struct int_elem
 static ccc_threeway_cmp
 int_cmp(ccc_cmp const cmp)
 {
-    struct int_elem const *const lhs = cmp.user_type_lhs;
-    struct int_elem const *const rhs = cmp.user_type_rhs;
+    struct int_elem const *const lhs = cmp.any_type_lhs;
+    struct int_elem const *const rhs = cmp.any_type_rhs;
     return (lhs->i > rhs->i) - (lhs->i < rhs->i);
 }
 
@@ -271,9 +271,9 @@ struct key_val
 };
 
 static uint64_t
-fhmap_int_to_u64(ccc_user_key const k)
+fhmap_int_to_u64(ccc_any_key const k)
 {
-    int const key_int = *((int *)k.user_key);
+    int const key_int = *((int *)k.any_key);
     uint64_t x = key_int;
     x = (x ^ (x >> 30)) * UINT64_C(0xbf58476d1ce4e5b9);
     x = (x ^ (x >> 27)) * UINT64_C(0x94d049bb133111eb);
@@ -284,7 +284,7 @@ fhmap_int_to_u64(ccc_user_key const k)
 bool
 fhmap_id_eq(ccc_key_cmp const cmp)
 {
-    struct key_val const *const va = cmp.user_type_rhs;
+    struct key_val const *const va = cmp.any_type_rhs;
     return va->key == *((int *)cmp.key_lhs);
 }
 
@@ -342,8 +342,8 @@ main(void)
 ccc_threeway_cmp
 int_cmp(ccc_cmp const ints)
 {
-    int const lhs = *(int *)ints.user_type_lhs;
-    int const rhs = *(int *)ints.user_type_rhs;
+    int const lhs = *(int *)ints.any_type_lhs;
+    int const rhs = *(int *)ints.any_type_rhs;
     return (lhs > rhs) - (lhs < rhs);
 }
 
@@ -396,7 +396,7 @@ struct kval
 static ccc_threeway_cmp
 kval_cmp(ccc_key_cmp const cmp)
 {
-    struct kval const *const rhs = cmp.user_type_rhs;
+    struct kval const *const rhs = cmp.any_type_rhs;
     int const key_lhs = *((int *)cmp.key_lhs);
     return (key_lhs > rhs->key) - (key_lhs < rhs->key);
 }
@@ -468,7 +468,7 @@ struct kval
 static ccc_threeway_cmp
 kval_cmp(ccc_key_cmp const cmp)
 {
-    struct kval const *const rhs = cmp.user_type_rhs;
+    struct kval const *const rhs = cmp.any_type_rhs;
     int const key_lhs = *((int *)cmp.key_lhs);
     return (key_lhs > rhs->key) - (key_lhs < rhs->key);
 }
@@ -539,7 +539,7 @@ ccc_threeway_cmp
 kval_cmp(ccc_key_cmp cmp)
 {
     char const *const key = *(char **)cmp.key_lhs;
-    struct name const *const rhs = cmp.user_type_rhs;
+    struct name const *const rhs = cmp.any_type_rhs;
     int const res = strcmp(key, rhs->name);
     if (res == 0)
     {
@@ -608,7 +608,7 @@ ccc_threeway_cmp
 kval_cmp(ccc_key_cmp cmp)
 {
     char const *const key = *(char **)cmp.key_lhs;
-    struct name const *const rhs = cmp.user_type_rhs;
+    struct name const *const rhs = cmp.any_type_rhs;
     int const res = strcmp(key, rhs->name);
     if (res == 0)
     {
@@ -682,8 +682,8 @@ struct val
 static ccc_threeway_cmp
 val_cmp(ccc_cmp const cmp)
 {
-    struct val const *const lhs = cmp.user_type_lhs;
-    struct val const *const rhs = cmp.user_type_rhs;
+    struct val const *const lhs = cmp.any_type_lhs;
+    struct val const *const rhs = cmp.any_type_rhs;
     return (lhs->val > rhs->val) - (lhs->val < rhs->val);
 }
 
@@ -731,7 +731,7 @@ struct kval
 static ccc_threeway_cmp
 kval_cmp(ccc_key_cmp const cmp)
 {
-    struct kval const *const rhs = cmp.user_type_rhs;
+    struct kval const *const rhs = cmp.any_type_rhs;
     int const key_lhs = *((int *)cmp.key_lhs);
     return (key_lhs > rhs->key) - (key_lhs < rhs->key);
 }
@@ -803,8 +803,8 @@ struct int_elem
 static ccc_threeway_cmp
 int_cmp(ccc_cmp const cmp)
 {
-    struct int_elem const *const lhs = cmp.user_type_lhs;
-    struct int_elem const *const rhs = cmp.user_type_rhs;
+    struct int_elem const *const lhs = cmp.any_type_lhs;
+    struct int_elem const *const rhs = cmp.any_type_rhs;
     return (lhs->i > rhs->i) - (lhs->i < rhs->i);
 }
 
@@ -1039,8 +1039,8 @@ struct id *new_front = ccc_dll_push_front(&id_list, &new_id->id_elem);
 ccc_threeway_cmp
 id_cmp(ccc_cmp const cmp)
 {
-    struct id const *const lhs = cmp.user_type_lhs;
-    struct id const *const rhs = cmp.user_type_rhs;
+    struct id const *const lhs = cmp.any_type_lhs;
+    struct id const *const rhs = cmp.any_type_rhs;
     return (lhs->id > rhs->id) - (lhs->id < rhs->id);
 }
 ```

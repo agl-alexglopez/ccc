@@ -27,15 +27,15 @@ idval(int const id, int const val)
 }
 
 static inline void
-plus(ccc_user_type const t)
+plus(ccc_any_type const t)
 {
-    ((struct val *)t.user_type)->val++;
+    ((struct val *)t.any_type)->val++;
 }
 
 static inline void
-plusaux(ccc_user_type const t)
+plusaux(ccc_any_type const t)
 {
-    ((struct val *)t.user_type)->val += *(int *)t.aux;
+    ((struct val *)t.any_type)->val += *(int *)t.aux;
 }
 
 /* Every test should have three uses of each tested function: one when the

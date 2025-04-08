@@ -348,7 +348,7 @@ ccc_fhm_contains(ccc_flat_hash_map const *const h, void const *const key)
     return CCC_RESULT_OK
            == find_key(
                   h, key,
-                  h->hash_fn_((ccc_user_key){.user_key = key, .aux = h->aux_}))
+                  h->hash_fn_((ccc_any_key){.any_key = key, .aux = h->aux_}))
                   .error;
 }
 
@@ -360,7 +360,7 @@ ccc_fhm_get_key_val(ccc_flat_hash_map const *const h, void const *const key)
         return NULL;
     }
     ccc_ucount const i = find_key(
-        h, key, h->hash_fn_((ccc_user_key){.user_key = key, .aux = h->aux_}));
+        h, key, h->hash_fn_((ccc_any_key){.any_key = key, .aux = h->aux_}));
     if (i.error)
     {
         return NULL;
@@ -442,7 +442,7 @@ ccc_fhm_and_modify(ccc_fhmap_entry *const e, ccc_update_fn *const fn)
 {
     if (e && fn && (e->impl_.handle_.stats_ & CCC_ENTRY_OCCUPIED) != 0)
     {
-        fn((ccc_user_type){data_at(e->impl_.h_, e->impl_.handle_.i_), NULL});
+        fn((ccc_any_type){data_at(e->impl_.h_, e->impl_.handle_.i_), NULL});
     }
     return e;
 }
@@ -453,7 +453,7 @@ ccc_fhm_and_modify_aux(ccc_fhmap_entry *const e, ccc_update_fn *const fn,
 {
     if (e && fn && (e->impl_.handle_.stats_ & CCC_ENTRY_OCCUPIED) != 0)
     {
-        fn((ccc_user_type){data_at(e->impl_.h_, e->impl_.handle_.i_), aux});
+        fn((ccc_any_type){data_at(e->impl_.h_, e->impl_.handle_.i_), aux});
     }
     return e;
 }
@@ -543,7 +543,7 @@ ccc_fhm_remove(ccc_flat_hash_map *const h, void *const key_val_type_output)
     }
     void *const key = key_in_slot(h, key_val_type_output);
     ccc_ucount const index = find_key(
-        h, key, h->hash_fn_((ccc_user_key){.user_key = key, .aux = h->aux_}));
+        h, key, h->hash_fn_((ccc_any_key){.any_key = key, .aux = h->aux_}));
     if (index.error)
     {
         return (ccc_entry){{.stats_ = CCC_ENTRY_VACANT}};
@@ -632,7 +632,7 @@ ccc_fhm_clear(ccc_flat_hash_map *const h, ccc_destructor_fn *const fn)
     {
         if (is_full(h->tag_[i]))
         {
-            fn((ccc_user_type){.user_type = data_at(h, i), .aux = h->aux_});
+            fn((ccc_any_type){.any_type = data_at(h, i), .aux = h->aux_});
         }
     }
     (void)memset(h->tag_, CCC_FHM_EMPTY, mask_to_tag_bytes(h->mask_));
@@ -659,7 +659,7 @@ ccc_fhm_clear_and_free(ccc_flat_hash_map *const h, ccc_destructor_fn *const fn)
         {
             if (is_full(h->tag_[i]))
             {
-                fn((ccc_user_type){.user_type = data_at(h, i), .aux = h->aux_});
+                fn((ccc_any_type){.any_type = data_at(h, i), .aux = h->aux_});
             }
         }
     }
@@ -693,8 +693,8 @@ ccc_fhm_clear_and_free_reserve(ccc_flat_hash_map *const h,
         {
             if (is_full(h->tag_[i]))
             {
-                destructor((ccc_user_type){.user_type = data_at(h, i),
-                                           .aux = h->aux_});
+                destructor(
+                    (ccc_any_type){.any_type = data_at(h, i), .aux = h->aux_});
             }
         }
     }
@@ -804,7 +804,7 @@ ccc_fhm_copy(ccc_flat_hash_map *const dst, ccc_flat_hash_map const *const src,
         if (is_full(src->tag_[i]))
         {
             uint64_t const hash = src->hash_fn_(
-                (ccc_user_key){.user_key = key_at(src, i), .aux = src->aux_});
+                (ccc_any_key){.any_key = key_at(src, i), .aux = src->aux_});
             size_t const new_i = find_existing_insert_slot(dst, hash);
             set_tag(dst, to_tag(hash), new_i);
             (void)memcpy(data_at(dst, new_i), data_at(src, i), dst->elem_sz_);
@@ -878,8 +878,8 @@ ccc_fhm_validate(ccc_flat_hash_map const *const h)
         }
         else if (is_full(t))
         {
-            if (to_tag(h->hash_fn_((ccc_user_key){.user_key = data_at(h, i),
-                                                  .aux = h->aux_}))
+            if (to_tag(h->hash_fn_((ccc_any_key){.any_key = data_at(h, i),
+                                                 .aux = h->aux_}))
                     .v
                 != t.v)
             {
@@ -949,7 +949,7 @@ flag in the handle field will indicate the error. */
 static struct ccc_fhash_entry_
 container_entry(struct ccc_fhmap_ *const h, void const *const key)
 {
-    uint64_t const hash = h->hash_fn_((ccc_user_key){key, h->aux_});
+    uint64_t const hash = h->hash_fn_((ccc_any_key){key, h->aux_});
     return (struct ccc_fhash_entry_){
         .h_ = (struct ccc_fhmap_ *)h,
         .tag_ = to_tag(hash),
@@ -1066,7 +1066,7 @@ find_key_or_slot(struct ccc_fhmap_ const *const h, void const *const key,
         {
             i_match = (seq.i + i_match) & mask;
             if (h->eq_fn_((ccc_key_cmp){.key_lhs = key,
-                                        .user_type_rhs = data_at(h, i_match),
+                                        .any_type_rhs = data_at(h, i_match),
                                         .aux = h->aux_}))
             {
                 return (struct ccc_handl_){.i_ = i_match,
@@ -1115,10 +1115,10 @@ find_key(struct ccc_fhmap_ const *const h, void const *const key,
              i_match = next_index(&m))
         {
             i_match = (seq.i + i_match) & mask;
-            if (likely(h->eq_fn_(
-                    (ccc_key_cmp){.key_lhs = key,
-                                  .user_type_rhs = data_at(h, i_match),
-                                  .aux = h->aux_})))
+            if (likely(
+                    h->eq_fn_((ccc_key_cmp){.key_lhs = key,
+                                            .any_type_rhs = data_at(h, i_match),
+                                            .aux = h->aux_})))
             {
                 return (ccc_ucount){.count = i_match};
             }
@@ -1245,7 +1245,7 @@ rehash_in_place(struct ccc_fhmap_ *const h)
         do
         {
             uint64_t const hash = h->hash_fn_(
-                (ccc_user_key){.user_key = key_at(h, i), .aux = h->aux_});
+                (ccc_any_key){.any_key = key_at(h, i), .aux = h->aux_});
             size_t const new_slot = find_existing_insert_slot(h, hash);
             size_t const ideal_pos = (hash & mask);
             ccc_fhm_tag const hash_tag = to_tag(hash);
@@ -1317,7 +1317,7 @@ rehash_resize(struct ccc_fhmap_ *const h, size_t const to_add,
         if (is_full(h->tag_[i]))
         {
             uint64_t const hash = h->hash_fn_(
-                (ccc_user_key){.user_key = key_at(h, i), .aux = h->aux_});
+                (ccc_any_key){.any_key = key_at(h, i), .aux = h->aux_});
             size_t const new_i = find_existing_insert_slot(&new_h, hash);
             set_tag(&new_h, to_tag(hash), new_i);
             (void)memcpy(data_at(&new_h, new_i), data_at(h, i), new_h.elem_sz_);

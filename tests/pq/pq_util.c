@@ -11,15 +11,15 @@
 ccc_threeway_cmp
 val_cmp(ccc_cmp const cmp)
 {
-    struct val const *const lhs = cmp.user_type_lhs;
-    struct val const *const rhs = cmp.user_type_rhs;
+    struct val const *const lhs = cmp.any_type_lhs;
+    struct val const *const rhs = cmp.any_type_rhs;
     return (lhs->val > rhs->val) - (lhs->val < rhs->val);
 }
 
 void
-val_update(ccc_user_type const u)
+val_update(ccc_any_type const u)
 {
-    struct val *const old = u.user_type;
+    struct val *const old = u.any_type;
     old->val = *(int *)u.aux;
 }
 

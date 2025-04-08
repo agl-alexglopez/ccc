@@ -15,8 +15,8 @@
 static ccc_threeway_cmp
 int_cmp(ccc_cmp const cmp)
 {
-    int a = *((int const *const)cmp.user_type_lhs);
-    int b = *((int const *const)cmp.user_type_rhs);
+    int a = *((int const *const)cmp.any_type_lhs);
+    int b = *((int const *const)cmp.any_type_rhs);
     return (a > b) - (a < b);
 }
 

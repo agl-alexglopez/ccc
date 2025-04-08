@@ -190,8 +190,8 @@ ccc_hom_and_modify(ccc_homap_handle *const h, ccc_update_fn *const fn)
     }
     if (fn && h->impl_.handle_.stats_ & CCC_ENTRY_OCCUPIED)
     {
-        fn((ccc_user_type){
-            .user_type = base_at(h->impl_.hom_, h->impl_.handle_.i_),
+        fn((ccc_any_type){
+            .any_type = base_at(h->impl_.hom_, h->impl_.handle_.i_),
             .aux = NULL,
         });
     }
@@ -208,8 +208,8 @@ ccc_hom_and_modify_aux(ccc_homap_handle *const h, ccc_update_fn *const fn,
     }
     if (fn && h->impl_.handle_.stats_ & CCC_ENTRY_OCCUPIED)
     {
-        fn((ccc_user_type){
-            .user_type = base_at(h->impl_.hom_, h->impl_.handle_.i_),
+        fn((ccc_any_type){
+            .any_type = base_at(h->impl_.hom_, h->impl_.handle_.i_),
             .aux = aux,
         });
     }
@@ -243,10 +243,10 @@ ccc_hom_swap_handle(ccc_handle_ordered_map *const hom,
     {
         assert(hom->root_);
         *out_handle = *at(hom, hom->root_);
-        void *const user_struct = struct_base(hom, out_handle);
+        void *const any_struct = struct_base(hom, out_handle);
         void *const ret = base_at(hom, hom->root_);
         void *const tmp = ccc_buf_at(&hom->buf_, 0);
-        swap(tmp, user_struct, ret, hom->buf_.elem_sz_);
+        swap(tmp, any_struct, ret, hom->buf_.elem_sz_);
         return (ccc_handle){{.i_ = found, .stats_ = CCC_ENTRY_OCCUPIED}};
     }
     size_t const inserted = maybe_alloc_insert(hom, out_handle);
@@ -611,8 +611,8 @@ ccc_hom_clear(ccc_handle_ordered_map *const hom, ccc_destructor_fn *const fn)
     {
         size_t const i = remove_from_tree(hom, hom->root_);
         assert(i);
-        fn((ccc_user_type){.user_type = ccc_buf_at(&hom->buf_, i),
-                           .aux = hom->buf_.aux_});
+        fn((ccc_any_type){.any_type = ccc_buf_at(&hom->buf_, i),
+                          .aux = hom->buf_.aux_});
     }
     (void)ccc_buf_size_set(&hom->buf_, 1);
     hom->root_ = 0;
@@ -636,8 +636,8 @@ ccc_hom_clear_and_free(ccc_handle_ordered_map *const hom,
     {
         size_t const i = remove_from_tree(hom, hom->root_);
         assert(i);
-        fn((ccc_user_type){.user_type = ccc_buf_at(&hom->buf_, i),
-                           .aux = hom->buf_.aux_});
+        fn((ccc_any_type){.any_type = ccc_buf_at(&hom->buf_, i),
+                          .aux = hom->buf_.aux_});
     }
     hom->root_ = 0;
     return ccc_buf_alloc(&hom->buf_, 0, hom->buf_.alloc_);
@@ -661,8 +661,8 @@ ccc_hom_clear_and_free_reserve(ccc_handle_ordered_map *const hom,
     {
         size_t const i = remove_from_tree(hom, hom->root_);
         assert(i);
-        destructor((ccc_user_type){.user_type = ccc_buf_at(&hom->buf_, i),
-                                   .aux = hom->buf_.aux_});
+        destructor((ccc_any_type){.any_type = ccc_buf_at(&hom->buf_, i),
+                                  .aux = hom->buf_.aux_});
     }
     hom->root_ = 0;
     return ccc_buf_alloc(&hom->buf_, 0, alloc);
@@ -956,7 +956,7 @@ cmp_elems(struct ccc_homap_ const *const hom, void const *const key,
           size_t const node, ccc_key_cmp_fn *const fn)
 {
     return fn((ccc_key_cmp){.key_lhs = key,
-                            .user_type_rhs = base_at(hom, node),
+                            .any_type_rhs = base_at(hom, node),
                             .aux = hom->buf_.aux_});
 }
 
