@@ -125,9 +125,9 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Initialization Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Initialize the container with memory, callbacks, and permissions. </p>
 </td></tr>
-<tr class="memitem:a752ee2af97ca560c67b5d9b64e7d745f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#a752ee2af97ca560c67b5d9b64e7d745f">ccc_omm_init</a>(omm_name,  user_struct_name,  ommap_elem_field,  key_field,  key_cmp_fn,  alloc_fn,  aux)</td></tr>
-<tr class="memdesc:a752ee2af97ca560c67b5d9b64e7d745f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a ordered multimap of the user specified type.  <br /></td></tr>
-<tr class="separator:a752ee2af97ca560c67b5d9b64e7d745f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a971cd74a68d80ac32b196dc2e3b15f0f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#a971cd74a68d80ac32b196dc2e3b15f0f">ccc_omm_init</a>(omm_name,  any_struct_name,  ommap_elem_field,  key_field,  key_cmp_fn,  alloc_fn,  aux)</td></tr>
+<tr class="memdesc:a971cd74a68d80ac32b196dc2e3b15f0f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a ordered multimap of the user specified type.  <br /></td></tr>
+<tr class="separator:a971cd74a68d80ac32b196dc2e3b15f0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Entry Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Obtain and operate on container entries for efficient queries when non-trivial control flow is needed. </p>
@@ -165,10 +165,10 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memitem:a155e54fd97aa520dacfca655d2b7decf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="ordered__multimap_8h.html#a3b29c8dbbd10827d07c041fbfff7e2b4">ccc_ommap_entry</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#a155e54fd97aa520dacfca655d2b7decf">ccc_omm_entry</a> (<a class="el" href="ordered__multimap_8h.html#a4b628da74816b31db9f9de347f80acb5">ccc_ordered_multimap</a> *mm, void const *key)</td></tr>
 <tr class="memdesc:a155e54fd97aa520dacfca655d2b7decf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a container specific entry for the given search for key. Amortized O(lg N).  <br /></td></tr>
 <tr class="separator:a155e54fd97aa520dacfca655d2b7decf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2cb0585616dbb6b64e1fb3062daef6e5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="ordered__multimap_8h.html#a3b29c8dbbd10827d07c041fbfff7e2b4">ccc_ommap_entry</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#a2cb0585616dbb6b64e1fb3062daef6e5">ccc_omm_and_modify</a> (<a class="el" href="ordered__multimap_8h.html#a3b29c8dbbd10827d07c041fbfff7e2b4">ccc_ommap_entry</a> *e, <a class="el" href="types_8h.html#a15cf33ea819ae97e1cfdcaf1d55a99b0">ccc_update_fn</a> *fn)</td></tr>
+<tr class="memitem:a2cb0585616dbb6b64e1fb3062daef6e5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="ordered__multimap_8h.html#a3b29c8dbbd10827d07c041fbfff7e2b4">ccc_ommap_entry</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#a2cb0585616dbb6b64e1fb3062daef6e5">ccc_omm_and_modify</a> (<a class="el" href="ordered__multimap_8h.html#a3b29c8dbbd10827d07c041fbfff7e2b4">ccc_ommap_entry</a> *e, <a class="el" href="types_8h.html#aff99511dd6d260a78cbe427a7d66bc14">ccc_update_fn</a> *fn)</td></tr>
 <tr class="memdesc:a2cb0585616dbb6b64e1fb3062daef6e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a reference to the provided entry modified with fn if Occupied.  <br /></td></tr>
 <tr class="separator:a2cb0585616dbb6b64e1fb3062daef6e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acbd6c55fe7483ae6955fdeb1e174869f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="ordered__multimap_8h.html#a3b29c8dbbd10827d07c041fbfff7e2b4">ccc_ommap_entry</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#acbd6c55fe7483ae6955fdeb1e174869f">ccc_omm_and_modify_aux</a> (<a class="el" href="ordered__multimap_8h.html#a3b29c8dbbd10827d07c041fbfff7e2b4">ccc_ommap_entry</a> *e, <a class="el" href="types_8h.html#a15cf33ea819ae97e1cfdcaf1d55a99b0">ccc_update_fn</a> *fn, void *aux)</td></tr>
+<tr class="memitem:acbd6c55fe7483ae6955fdeb1e174869f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="ordered__multimap_8h.html#a3b29c8dbbd10827d07c041fbfff7e2b4">ccc_ommap_entry</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#acbd6c55fe7483ae6955fdeb1e174869f">ccc_omm_and_modify_aux</a> (<a class="el" href="ordered__multimap_8h.html#a3b29c8dbbd10827d07c041fbfff7e2b4">ccc_ommap_entry</a> *e, <a class="el" href="types_8h.html#aff99511dd6d260a78cbe427a7d66bc14">ccc_update_fn</a> *fn, void *aux)</td></tr>
 <tr class="memdesc:acbd6c55fe7483ae6955fdeb1e174869f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a reference to the provided entry modified with fn and auxiliary data aux if Occupied.  <br /></td></tr>
 <tr class="separator:acbd6c55fe7483ae6955fdeb1e174869f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a492d3c9a89862156aa7ff3ef073972ab"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#a492d3c9a89862156aa7ff3ef073972ab">ccc_omm_or_insert</a> (<a class="el" href="ordered__multimap_8h.html#a3b29c8dbbd10827d07c041fbfff7e2b4">ccc_ommap_entry</a> const *e, <a class="el" href="ordered__multimap_8h.html#a78514cb1bacf8053ef13634e25595f09">ccc_ommap_elem</a> *key_val_handle)</td></tr>
@@ -272,20 +272,20 @@ N).  <br /></td></tr>
 <tr class="memitem:ab6cccc31a6c0503e8ac4340459adfbee"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#ab6cccc31a6c0503e8ac4340459adfbee">ccc_omm_extract</a> (<a class="el" href="ordered__multimap_8h.html#a4b628da74816b31db9f9de347f80acb5">ccc_ordered_multimap</a> *mm, <a class="el" href="ordered__multimap_8h.html#a78514cb1bacf8053ef13634e25595f09">ccc_ommap_elem</a> *key_val_handle)</td></tr>
 <tr class="memdesc:ab6cccc31a6c0503e8ac4340459adfbee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extracts a user type known to be stored in the map with key_val_handle as an element currently in use by the map. O(1).  <br /></td></tr>
 <tr class="separator:ab6cccc31a6c0503e8ac4340459adfbee"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a187bb18b8a75dd3d10931bf52683a594"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#a187bb18b8a75dd3d10931bf52683a594">ccc_omm_update</a> (<a class="el" href="ordered__multimap_8h.html#a4b628da74816b31db9f9de347f80acb5">ccc_ordered_multimap</a> *mm, <a class="el" href="ordered__multimap_8h.html#a78514cb1bacf8053ef13634e25595f09">ccc_ommap_elem</a> *key_val_handle, <a class="el" href="types_8h.html#a15cf33ea819ae97e1cfdcaf1d55a99b0">ccc_update_fn</a> *fn, void *aux)</td></tr>
+<tr class="memitem:a187bb18b8a75dd3d10931bf52683a594"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#a187bb18b8a75dd3d10931bf52683a594">ccc_omm_update</a> (<a class="el" href="ordered__multimap_8h.html#a4b628da74816b31db9f9de347f80acb5">ccc_ordered_multimap</a> *mm, <a class="el" href="ordered__multimap_8h.html#a78514cb1bacf8053ef13634e25595f09">ccc_ommap_elem</a> *key_val_handle, <a class="el" href="types_8h.html#aff99511dd6d260a78cbe427a7d66bc14">ccc_update_fn</a> *fn, void *aux)</td></tr>
 <tr class="memdesc:a187bb18b8a75dd3d10931bf52683a594"><td class="mdescLeft">&#160;</td><td class="mdescRight">Updates an element key that is currently tracked directly as a member of the map. Amortized O(lg N).  <br /></td></tr>
 <tr class="separator:a187bb18b8a75dd3d10931bf52683a594"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ada1d2c88299d684da89f89d7d544d288"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#ada1d2c88299d684da89f89d7d544d288">ccc_omm_increase</a> (<a class="el" href="ordered__multimap_8h.html#a4b628da74816b31db9f9de347f80acb5">ccc_ordered_multimap</a> *mm, <a class="el" href="ordered__multimap_8h.html#a78514cb1bacf8053ef13634e25595f09">ccc_ommap_elem</a> *key_val_handle, <a class="el" href="types_8h.html#a15cf33ea819ae97e1cfdcaf1d55a99b0">ccc_update_fn</a> *fn, void *aux)</td></tr>
+<tr class="memitem:ada1d2c88299d684da89f89d7d544d288"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#ada1d2c88299d684da89f89d7d544d288">ccc_omm_increase</a> (<a class="el" href="ordered__multimap_8h.html#a4b628da74816b31db9f9de347f80acb5">ccc_ordered_multimap</a> *mm, <a class="el" href="ordered__multimap_8h.html#a78514cb1bacf8053ef13634e25595f09">ccc_ommap_elem</a> *key_val_handle, <a class="el" href="types_8h.html#aff99511dd6d260a78cbe427a7d66bc14">ccc_update_fn</a> *fn, void *aux)</td></tr>
 <tr class="memdesc:ada1d2c88299d684da89f89d7d544d288"><td class="mdescLeft">&#160;</td><td class="mdescRight">Increases an element key that is currently tracked directly as a member of the map. Amortized O(lg N).  <br /></td></tr>
 <tr class="separator:ada1d2c88299d684da89f89d7d544d288"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7b3a9ac0dfa2a9b1d3f9314d4cb8e587"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#a7b3a9ac0dfa2a9b1d3f9314d4cb8e587">ccc_omm_decrease</a> (<a class="el" href="ordered__multimap_8h.html#a4b628da74816b31db9f9de347f80acb5">ccc_ordered_multimap</a> *mm, <a class="el" href="ordered__multimap_8h.html#a78514cb1bacf8053ef13634e25595f09">ccc_ommap_elem</a> *key_val_handle, <a class="el" href="types_8h.html#a15cf33ea819ae97e1cfdcaf1d55a99b0">ccc_update_fn</a> *fn, void *aux)</td></tr>
+<tr class="memitem:a7b3a9ac0dfa2a9b1d3f9314d4cb8e587"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#a7b3a9ac0dfa2a9b1d3f9314d4cb8e587">ccc_omm_decrease</a> (<a class="el" href="ordered__multimap_8h.html#a4b628da74816b31db9f9de347f80acb5">ccc_ordered_multimap</a> *mm, <a class="el" href="ordered__multimap_8h.html#a78514cb1bacf8053ef13634e25595f09">ccc_ommap_elem</a> *key_val_handle, <a class="el" href="types_8h.html#aff99511dd6d260a78cbe427a7d66bc14">ccc_update_fn</a> *fn, void *aux)</td></tr>
 <tr class="memdesc:a7b3a9ac0dfa2a9b1d3f9314d4cb8e587"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decreases an element key that is currently tracked directly as a member of the map. Amortized O(lg N).  <br /></td></tr>
 <tr class="separator:a7b3a9ac0dfa2a9b1d3f9314d4cb8e587"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Deallocation Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Deallocate the container. </p>
 </td></tr>
-<tr class="memitem:ae82b53c6b679358bb217f58dd46c5ee6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#ae82b53c6b679358bb217f58dd46c5ee6">ccc_omm_clear</a> (<a class="el" href="ordered__multimap_8h.html#a4b628da74816b31db9f9de347f80acb5">ccc_ordered_multimap</a> *mm, <a class="el" href="types_8h.html#aa2bb6262f220473dc47f4c73711a6ec5">ccc_destructor_fn</a> *destructor)</td></tr>
+<tr class="memitem:ae82b53c6b679358bb217f58dd46c5ee6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__multimap_8h.html#ae82b53c6b679358bb217f58dd46c5ee6">ccc_omm_clear</a> (<a class="el" href="ordered__multimap_8h.html#a4b628da74816b31db9f9de347f80acb5">ccc_ordered_multimap</a> *mm, <a class="el" href="types_8h.html#a1d51325017588215973073a4de4f90e1">ccc_destructor_fn</a> *destructor)</td></tr>
 <tr class="memdesc:ae82b53c6b679358bb217f58dd46c5ee6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pops every element from the map calling destructor if destructor is non-NULL. O(N).  <br /></td></tr>
 <tr class="separator:ae82b53c6b679358bb217f58dd46c5ee6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -503,8 +503,8 @@ N).  <br /></td></tr>
 
 </div>
 </div>
-<a id="a752ee2af97ca560c67b5d9b64e7d745f" name="a752ee2af97ca560c67b5d9b64e7d745f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a752ee2af97ca560c67b5d9b64e7d745f">&#9670;&#160;</a></span>ccc_omm_init</h2>
+<a id="a971cd74a68d80ac32b196dc2e3b15f0f" name="a971cd74a68d80ac32b196dc2e3b15f0f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a971cd74a68d80ac32b196dc2e3b15f0f">&#9670;&#160;</a></span>ccc_omm_init</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -519,7 +519,7 @@ N).  <br /></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">user_struct_name, </td>
+          <td class="paramname">any_struct_name, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -558,14 +558,14 @@ N).  <br /></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    ccc_impl_omm_init(omm_name, user_struct_name, ommap_elem_field, key_field, \</div>
+<b>Value:</b><div class="fragment"><div class="line">    ccc_impl_omm_init(omm_name, any_struct_name, ommap_elem_field, key_field,  \</div>
 <div class="line">                      key_cmp_fn, alloc_fn, aux)</div>
 </div><!-- fragment -->
 <p>Initialize a ordered multimap of the user specified type. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">omm_name</td><td>the name of the ordered multimap being initialized. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">user_struct_name</td><td>the struct the user intends to store. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">any_struct_name</td><td>the struct the user intends to store. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">ommap_elem_field</td><td>the name of the field with the intrusive element. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">key_field</td><td>the name of the field used as the multimap key. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">key_cmp_fn</td><td>the ccc_key_cmp_fn (<a class="el" href="types_8h.html" title="The C Container Collection Fundamental Types.">types.h</a>) used to compare the key to the current stored element under considertion during a map operation. </td></tr>
@@ -574,7 +574,7 @@ N).  <br /></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the initialized ordered multimap. Use this initializer on the right hand side of the variable at compile or run time (e.g. ccc_ordered_multimap m = <a class="el" href="ordered__multimap_8h.html#a752ee2af97ca560c67b5d9b64e7d745f" title="Initialize a ordered multimap of the user specified type.">ccc_omm_init(...)</a>;) </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the initialized ordered multimap. Use this initializer on the right hand side of the variable at compile or run time (e.g. ccc_ordered_multimap m = <a class="el" href="ordered__multimap_8h.html#a971cd74a68d80ac32b196dc2e3b15f0f" title="Initialize a ordered multimap of the user specified type.">ccc_omm_init(...)</a>;) </dd></dl>
 
 </div>
 </div>
@@ -828,7 +828,7 @@ N).  <br /></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="types_8h.html#a15cf33ea819ae97e1cfdcaf1d55a99b0">ccc_update_fn</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#aff99511dd6d260a78cbe427a7d66bc14">ccc_update_fn</a> *&#160;</td>
           <td class="paramname"><em>fn</em>&#160;</td>
         </tr>
         <tr>
@@ -866,7 +866,7 @@ N).  <br /></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="types_8h.html#a15cf33ea819ae97e1cfdcaf1d55a99b0">ccc_update_fn</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#aff99511dd6d260a78cbe427a7d66bc14">ccc_update_fn</a> *&#160;</td>
           <td class="paramname"><em>fn</em>, </td>
         </tr>
         <tr>
@@ -939,7 +939,7 @@ N).  <br /></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="types_8h.html#aa2bb6262f220473dc47f4c73711a6ec5">ccc_destructor_fn</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a1d51325017588215973073a4de4f90e1">ccc_destructor_fn</a> *&#160;</td>
           <td class="paramname"><em>destructor</em>&#160;</td>
         </tr>
         <tr>
@@ -1023,7 +1023,7 @@ N).  <br /></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="types_8h.html#a15cf33ea819ae97e1cfdcaf1d55a99b0">ccc_update_fn</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#aff99511dd6d260a78cbe427a7d66bc14">ccc_update_fn</a> *&#160;</td>
           <td class="paramname"><em>fn</em>, </td>
         </tr>
         <tr>
@@ -1343,7 +1343,7 @@ N). </p>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="types_8h.html#a15cf33ea819ae97e1cfdcaf1d55a99b0">ccc_update_fn</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#aff99511dd6d260a78cbe427a7d66bc14">ccc_update_fn</a> *&#160;</td>
           <td class="paramname"><em>fn</em>, </td>
         </tr>
         <tr>
@@ -2065,7 +2065,7 @@ N). </p>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="types_8h.html#a15cf33ea819ae97e1cfdcaf1d55a99b0">ccc_update_fn</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#aff99511dd6d260a78cbe427a7d66bc14">ccc_update_fn</a> *&#160;</td>
           <td class="paramname"><em>fn</em>, </td>
         </tr>
         <tr>

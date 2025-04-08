@@ -158,11 +158,11 @@ Data Structures</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structccc__key__cmp.html">ccc_key_cmp</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A key comparison helper to avoid argument swapping.  <a href="structccc__key__cmp.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structccc__user__type.html">ccc_user_type</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A reference to a user type within the container.  <a href="structccc__user__type.html#details">More...</a><br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structccc__any__type.html">ccc_any_type</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A reference to a user type within the container.  <a href="structccc__any__type.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structccc__user__key.html">ccc_user_key</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A read only reference to a key type matching the key field type used for hash containers.  <a href="structccc__user__key.html#details">More...</a><br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structccc__any__key.html">ccc_any_key</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A read only reference to a key type matching the key field type used for hash containers.  <a href="structccc__any__key.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Container Types</h2></td></tr>
@@ -220,21 +220,21 @@ Data Structures</h2></td></tr>
 <tr class="memitem:a78ab7f61b1a36b2f31c2289bd6236231"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="types_8h.html#afa7f5d9756840807860490d28e345955">ccc_threeway_cmp</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a78ab7f61b1a36b2f31c2289bd6236231">ccc_cmp_fn</a>(<a class="el" href="structccc__cmp.html">ccc_cmp</a>)</td></tr>
 <tr class="memdesc:a78ab7f61b1a36b2f31c2289bd6236231"><td class="mdescLeft">&#160;</td><td class="mdescRight">A callback function for comparing two elements in a container.  <br /></td></tr>
 <tr class="separator:a78ab7f61b1a36b2f31c2289bd6236231"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a15cf33ea819ae97e1cfdcaf1d55a99b0"><td class="memItemLeft" align="right" valign="top">typedef void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a15cf33ea819ae97e1cfdcaf1d55a99b0">ccc_update_fn</a>(<a class="el" href="structccc__user__type.html">ccc_user_type</a>)</td></tr>
-<tr class="memdesc:a15cf33ea819ae97e1cfdcaf1d55a99b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">A callback function for modifying an element in the container.  <br /></td></tr>
-<tr class="separator:a15cf33ea819ae97e1cfdcaf1d55a99b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa2bb6262f220473dc47f4c73711a6ec5"><td class="memItemLeft" align="right" valign="top">typedef void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#aa2bb6262f220473dc47f4c73711a6ec5">ccc_destructor_fn</a>(<a class="el" href="structccc__user__type.html">ccc_user_type</a>)</td></tr>
-<tr class="memdesc:aa2bb6262f220473dc47f4c73711a6ec5"><td class="mdescLeft">&#160;</td><td class="mdescRight">A callback function for destroying an element in the container.  <br /></td></tr>
-<tr class="separator:aa2bb6262f220473dc47f4c73711a6ec5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aff99511dd6d260a78cbe427a7d66bc14"><td class="memItemLeft" align="right" valign="top">typedef void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#aff99511dd6d260a78cbe427a7d66bc14">ccc_update_fn</a>(<a class="el" href="structccc__any__type.html">ccc_any_type</a>)</td></tr>
+<tr class="memdesc:aff99511dd6d260a78cbe427a7d66bc14"><td class="mdescLeft">&#160;</td><td class="mdescRight">A callback function for modifying an element in the container.  <br /></td></tr>
+<tr class="separator:aff99511dd6d260a78cbe427a7d66bc14"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1d51325017588215973073a4de4f90e1"><td class="memItemLeft" align="right" valign="top">typedef void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a1d51325017588215973073a4de4f90e1">ccc_destructor_fn</a>(<a class="el" href="structccc__any__type.html">ccc_any_type</a>)</td></tr>
+<tr class="memdesc:a1d51325017588215973073a4de4f90e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">A callback function for destroying an element in the container.  <br /></td></tr>
+<tr class="separator:a1d51325017588215973073a4de4f90e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa9748f72f95727528cdc40d9e9672a0f"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#aa9748f72f95727528cdc40d9e9672a0f">ccc_key_eq_fn</a>(<a class="el" href="structccc__key__cmp.html">ccc_key_cmp</a>)</td></tr>
 <tr class="memdesc:aa9748f72f95727528cdc40d9e9672a0f"><td class="mdescLeft">&#160;</td><td class="mdescRight">A callback function to determining equality between two stored keys.  <br /></td></tr>
 <tr class="separator:aa9748f72f95727528cdc40d9e9672a0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8097dd574e739c360d2fa2d3e5de70db"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="types_8h.html#afa7f5d9756840807860490d28e345955">ccc_threeway_cmp</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a8097dd574e739c360d2fa2d3e5de70db">ccc_key_cmp_fn</a>(<a class="el" href="structccc__key__cmp.html">ccc_key_cmp</a>)</td></tr>
 <tr class="memdesc:a8097dd574e739c360d2fa2d3e5de70db"><td class="mdescLeft">&#160;</td><td class="mdescRight">A callback function for three-way comparing two stored keys.  <br /></td></tr>
 <tr class="separator:a8097dd574e739c360d2fa2d3e5de70db"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0c4ef0c8c3c49edd91423242e6f3a09e"><td class="memItemLeft" align="right" valign="top">typedef uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a0c4ef0c8c3c49edd91423242e6f3a09e">ccc_hash_fn</a>(<a class="el" href="structccc__user__key.html">ccc_user_key</a> to_hash)</td></tr>
-<tr class="memdesc:a0c4ef0c8c3c49edd91423242e6f3a09e"><td class="mdescLeft">&#160;</td><td class="mdescRight">A callback function to hash the key type used in a container.  <br /></td></tr>
-<tr class="separator:a0c4ef0c8c3c49edd91423242e6f3a09e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab3b14f2bd53eaa3807633fc12a89b91d"><td class="memItemLeft" align="right" valign="top">typedef uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#ab3b14f2bd53eaa3807633fc12a89b91d">ccc_hash_fn</a>(<a class="el" href="structccc__any__key.html">ccc_any_key</a> to_hash)</td></tr>
+<tr class="memdesc:ab3b14f2bd53eaa3807633fc12a89b91d"><td class="mdescLeft">&#160;</td><td class="mdescRight">A callback function to hash the key type used in a container.  <br /></td></tr>
+<tr class="separator:ab3b14f2bd53eaa3807633fc12a89b91d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Entry Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>The generic interface for associative container entries. </p>
@@ -364,14 +364,14 @@ Data Structures</h2></td></tr>
 
 </div>
 </div>
-<a id="aa2bb6262f220473dc47f4c73711a6ec5" name="aa2bb6262f220473dc47f4c73711a6ec5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa2bb6262f220473dc47f4c73711a6ec5">&#9670;&#160;</a></span>ccc_destructor_fn</h2>
+<a id="a1d51325017588215973073a4de4f90e1" name="a1d51325017588215973073a4de4f90e1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1d51325017588215973073a4de4f90e1">&#9670;&#160;</a></span>ccc_destructor_fn</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef void ccc_destructor_fn(<a class="el" href="structccc__user__type.html">ccc_user_type</a>)</td>
+          <td class="memname">typedef void ccc_destructor_fn(<a class="el" href="structccc__any__type.html">ccc_any_type</a>)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -467,14 +467,14 @@ Data Structures</h2></td></tr>
 
 </div>
 </div>
-<a id="a0c4ef0c8c3c49edd91423242e6f3a09e" name="a0c4ef0c8c3c49edd91423242e6f3a09e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0c4ef0c8c3c49edd91423242e6f3a09e">&#9670;&#160;</a></span>ccc_hash_fn</h2>
+<a id="ab3b14f2bd53eaa3807633fc12a89b91d" name="ab3b14f2bd53eaa3807633fc12a89b91d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab3b14f2bd53eaa3807633fc12a89b91d">&#9670;&#160;</a></span>ccc_hash_fn</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef uint64_t ccc_hash_fn(<a class="el" href="structccc__user__key.html">ccc_user_key</a> to_hash)</td>
+          <td class="memname">typedef uint64_t ccc_hash_fn(<a class="el" href="structccc__any__key.html">ccc_any_key</a> to_hash)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -552,14 +552,14 @@ Data Structures</h2></td></tr>
 
 </div>
 </div>
-<a id="a15cf33ea819ae97e1cfdcaf1d55a99b0" name="a15cf33ea819ae97e1cfdcaf1d55a99b0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a15cf33ea819ae97e1cfdcaf1d55a99b0">&#9670;&#160;</a></span>ccc_update_fn</h2>
+<a id="aff99511dd6d260a78cbe427a7d66bc14" name="aff99511dd6d260a78cbe427a7d66bc14"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aff99511dd6d260a78cbe427a7d66bc14">&#9670;&#160;</a></span>ccc_update_fn</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef void ccc_update_fn(<a class="el" href="structccc__user__type.html">ccc_user_type</a>)</td>
+          <td class="memname">typedef void ccc_update_fn(<a class="el" href="structccc__any__type.html">ccc_any_type</a>)</td>
         </tr>
       </table>
 </div><div class="memdoc">

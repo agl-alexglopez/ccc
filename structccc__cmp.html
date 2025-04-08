@@ -103,17 +103,47 @@ $(document).ready(function(){initNavTree('structccc__cmp.html',''); initResizabl
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Data Fields</h2></td></tr>
-<tr class="memitem:a413783988aeb931cebe1ff2355147e49"><td class="memItemLeft" align="right" valign="top">void const  *const&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structccc__cmp.html#a413783988aeb931cebe1ff2355147e49">user_type_lhs</a></td></tr>
-<tr class="separator:a413783988aeb931cebe1ff2355147e49"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aad71faef58d3c2d057d2f2953372f32f"><td class="memItemLeft" align="right" valign="top">void const  *const&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structccc__cmp.html#aad71faef58d3c2d057d2f2953372f32f">user_type_rhs</a></td></tr>
-<tr class="separator:aad71faef58d3c2d057d2f2953372f32f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a426bb6f29fbe5071f7605e8f7e35e780"><td class="memItemLeft" align="right" valign="top">void const  *const&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structccc__cmp.html#a426bb6f29fbe5071f7605e8f7e35e780">any_type_lhs</a></td></tr>
+<tr class="separator:a426bb6f29fbe5071f7605e8f7e35e780"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a79fc74b5967598eaa6c9fe4d00f71fe9"><td class="memItemLeft" align="right" valign="top">void const  *const&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structccc__cmp.html#a79fc74b5967598eaa6c9fe4d00f71fe9">any_type_rhs</a></td></tr>
+<tr class="separator:a79fc74b5967598eaa6c9fe4d00f71fe9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0bda201c1946494f5b688ef783a8b5f2"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structccc__cmp.html#a0bda201c1946494f5b688ef783a8b5f2">aux</a></td></tr>
 <tr class="separator:a0bda201c1946494f5b688ef783a8b5f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>An element comparison helper. </p>
-<p>This type helps the user define the comparison callback function, if the container takes a standard element comparison function, and helps avoid swappable argument errors. User type LHS is considered the left hand side and user type RHS is the right hand side when considering three-way comparison return values. Aux data is a reference to any auxiliary data provided upon container initialization. </p>
+<p>This type helps the user define the comparison callback function, if the container takes a standard element comparison function, and helps avoid swappable argument errors. Any type LHS is considered the left hand side and any type RHS is the right hand side when considering three-way comparison return values. Aux data is a reference to any auxiliary data provided upon container initialization. </p>
 </div><h2 class="groupheader">Field Documentation</h2>
+<a id="a426bb6f29fbe5071f7605e8f7e35e780" name="a426bb6f29fbe5071f7605e8f7e35e780"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a426bb6f29fbe5071f7605e8f7e35e780">&#9670;&#160;</a></span>any_type_lhs</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void const* const ccc_cmp::any_type_lhs</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>The left hand side for a three-way comparison operation. </p>
+
+</div>
+</div>
+<a id="a79fc74b5967598eaa6c9fe4d00f71fe9" name="a79fc74b5967598eaa6c9fe4d00f71fe9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a79fc74b5967598eaa6c9fe4d00f71fe9">&#9670;&#160;</a></span>any_type_rhs</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void const* const ccc_cmp::any_type_rhs</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>The right hand side for a three-way comparison operation. </p>
+
+</div>
+</div>
 <a id="a0bda201c1946494f5b688ef783a8b5f2" name="a0bda201c1946494f5b688ef783a8b5f2"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a0bda201c1946494f5b688ef783a8b5f2">&#9670;&#160;</a></span>aux</h2>
 
@@ -126,36 +156,6 @@ Data Fields</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>A reference to aux data provided to container on initialization. </p>
-
-</div>
-</div>
-<a id="a413783988aeb931cebe1ff2355147e49" name="a413783988aeb931cebe1ff2355147e49"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a413783988aeb931cebe1ff2355147e49">&#9670;&#160;</a></span>user_type_lhs</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void const* const ccc_cmp::user_type_lhs</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>The left hand side for a three-way comparison operation. </p>
-
-</div>
-</div>
-<a id="aad71faef58d3c2d057d2f2953372f32f" name="aad71faef58d3c2d057d2f2953372f32f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aad71faef58d3c2d057d2f2953372f32f">&#9670;&#160;</a></span>user_type_rhs</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void const* const ccc_cmp::user_type_rhs</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>The right hand side for a three-way comparison operation. </p>
 
 </div>
 </div>

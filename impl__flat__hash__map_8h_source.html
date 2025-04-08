@@ -136,7 +136,7 @@ $(document).ready(function(){initNavTree('impl__flat__hash__map_8h_source.html',
 <div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>    <span class="keywordtype">size_t</span> elem_sz_;</div>
 <div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>    <span class="keywordtype">size_t</span> key_offset_;</div>
 <div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>    <a class="code hl_typedef" href="types_8h.html#aa9748f72f95727528cdc40d9e9672a0f">ccc_key_eq_fn</a> *eq_fn_;</div>
-<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>    <a class="code hl_typedef" href="types_8h.html#a0c4ef0c8c3c49edd91423242e6f3a09e">ccc_hash_fn</a> *hash_fn_;</div>
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>    <a class="code hl_typedef" href="types_8h.html#ab3b14f2bd53eaa3807633fc12a89b91d">ccc_hash_fn</a> *hash_fn_;</div>
 <div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>    <a class="code hl_typedef" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a> *alloc_fn_;</div>
 <div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>    <span class="keywordtype">void</span> *aux_;</div>
 <div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>};</div>
@@ -345,10 +345,10 @@ $(document).ready(function(){initNavTree('impl__flat__hash__map_8h_source.html',
 <div class="line"><a id="l00376" name="l00376"></a><span class="lineno">  376</span><span class="comment">/* NOLINTEND(readability-identifier-naming) */</span></div>
 <div class="line"><a id="l00377" name="l00377"></a><span class="lineno">  377</span> </div>
 <div class="line"><a id="l00378" name="l00378"></a><span class="lineno">  378</span><span class="preprocessor">#endif </span><span class="comment">/* CCC_IMPL_FLAT_HASH_MAP_H */</span><span class="preprocessor"></span></div>
-<div class="ttc" id="atypes_8h_html_a0c4ef0c8c3c49edd91423242e6f3a09e"><div class="ttname"><a href="types_8h.html#a0c4ef0c8c3c49edd91423242e6f3a09e">ccc_hash_fn</a></div><div class="ttdeci">uint64_t ccc_hash_fn(ccc_user_key to_hash)</div><div class="ttdoc">A callback function to hash the key type used in a container.</div><div class="ttdef"><b>Definition:</b> types.h:354</div></div>
 <div class="ttc" id="atypes_8h_html_a80a7915df3bc36e01a3a0775eebc0938"><div class="ttname"><a href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a></div><div class="ttdeci">ccc_tribool</div><div class="ttdoc">A three state boolean to allow for an error state. Error is -1, False is 0, and True is 1.</div><div class="ttdef"><b>Definition:</b> types.h:117</div></div>
 <div class="ttc" id="atypes_8h_html_a8be6e2d1b150a5b77b2eba5ae85764f2"><div class="ttname"><a href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a></div><div class="ttdeci">void * ccc_alloc_fn(void *ptr, size_t size, void *aux)</div><div class="ttdoc">An allocation function at the core of all containers.</div><div class="ttdef"><b>Definition:</b> types.h:298</div></div>
 <div class="ttc" id="atypes_8h_html_aa9748f72f95727528cdc40d9e9672a0f"><div class="ttname"><a href="types_8h.html#aa9748f72f95727528cdc40d9e9672a0f">ccc_key_eq_fn</a></div><div class="ttdeci">ccc_tribool ccc_key_eq_fn(ccc_key_cmp)</div><div class="ttdoc">A callback function to determining equality between two stored keys.</div><div class="ttdef"><b>Definition:</b> types.h:341</div></div>
+<div class="ttc" id="atypes_8h_html_ab3b14f2bd53eaa3807633fc12a89b91d"><div class="ttname"><a href="types_8h.html#ab3b14f2bd53eaa3807633fc12a89b91d">ccc_hash_fn</a></div><div class="ttdeci">uint64_t ccc_hash_fn(ccc_any_key to_hash)</div><div class="ttdoc">A callback function to hash the key type used in a container.</div><div class="ttdef"><b>Definition:</b> types.h:354</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

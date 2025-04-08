@@ -178,13 +178,13 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Deallocation Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Destroy the container. </p>
 </td></tr>
-<tr class="memitem:a1b352898bcc66874d9808fd58e4dab5b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a1b352898bcc66874d9808fd58e4dab5b">ccc_fdeq_clear</a> (<a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> *fdeq, <a class="el" href="types_8h.html#aa2bb6262f220473dc47f4c73711a6ec5">ccc_destructor_fn</a> *destructor)</td></tr>
+<tr class="memitem:a1b352898bcc66874d9808fd58e4dab5b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a1b352898bcc66874d9808fd58e4dab5b">ccc_fdeq_clear</a> (<a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> *fdeq, <a class="el" href="types_8h.html#a1d51325017588215973073a4de4f90e1">ccc_destructor_fn</a> *destructor)</td></tr>
 <tr class="memdesc:a1b352898bcc66874d9808fd58e4dab5b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set size of fdeq to 0 and call destructor on each element if needed. O(1) if no destructor is provided, else O(N).  <br /></td></tr>
 <tr class="separator:a1b352898bcc66874d9808fd58e4dab5b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a661112e9f407ddf187a70ecc2ee2ace9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a661112e9f407ddf187a70ecc2ee2ace9">ccc_fdeq_clear_and_free</a> (<a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> *fdeq, <a class="el" href="types_8h.html#aa2bb6262f220473dc47f4c73711a6ec5">ccc_destructor_fn</a> *destructor)</td></tr>
+<tr class="memitem:a661112e9f407ddf187a70ecc2ee2ace9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a661112e9f407ddf187a70ecc2ee2ace9">ccc_fdeq_clear_and_free</a> (<a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> *fdeq, <a class="el" href="types_8h.html#a1d51325017588215973073a4de4f90e1">ccc_destructor_fn</a> *destructor)</td></tr>
 <tr class="memdesc:a661112e9f407ddf187a70ecc2ee2ace9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set size of fdeq to 0 and call destructor on each element if needed. Free the underlying buffer setting the capacity to 0. O(1) if no destructor is provided, else O(N).  <br /></td></tr>
 <tr class="separator:a661112e9f407ddf187a70ecc2ee2ace9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a813d4e847ccf34fc7e26a0310f6eba38"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a813d4e847ccf34fc7e26a0310f6eba38">ccc_fdeq_clear_and_free_reserve</a> (<a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> *fdeq, <a class="el" href="types_8h.html#aa2bb6262f220473dc47f4c73711a6ec5">ccc_destructor_fn</a> *destructor, <a class="el" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a> *alloc)</td></tr>
+<tr class="memitem:a813d4e847ccf34fc7e26a0310f6eba38"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a813d4e847ccf34fc7e26a0310f6eba38">ccc_fdeq_clear_and_free_reserve</a> (<a class="el" href="flat__double__ended__queue_8h.html#a0b47511ed59d60a9e66bdb2fee438eb0">ccc_flat_double_ended_queue</a> *fdeq, <a class="el" href="types_8h.html#a1d51325017588215973073a4de4f90e1">ccc_destructor_fn</a> *destructor, <a class="el" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a> *alloc)</td></tr>
 <tr class="memdesc:a813d4e847ccf34fc7e26a0310f6eba38"><td class="mdescLeft">&#160;</td><td class="mdescRight">Frees all slots in the fdeq and frees the underlying buffer that was previously dynamically reserved with the reserve function.  <br /></td></tr>
 <tr class="separator:a813d4e847ccf34fc7e26a0310f6eba38"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -533,7 +533,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="types_8h.html#aa2bb6262f220473dc47f4c73711a6ec5">ccc_destructor_fn</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a1d51325017588215973073a4de4f90e1">ccc_destructor_fn</a> *&#160;</td>
           <td class="paramname"><em>destructor</em>&#160;</td>
         </tr>
         <tr>
@@ -571,7 +571,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="types_8h.html#aa2bb6262f220473dc47f4c73711a6ec5">ccc_destructor_fn</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a1d51325017588215973073a4de4f90e1">ccc_destructor_fn</a> *&#160;</td>
           <td class="paramname"><em>destructor</em>&#160;</td>
         </tr>
         <tr>
@@ -609,7 +609,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="types_8h.html#aa2bb6262f220473dc47f4c73711a6ec5">ccc_destructor_fn</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a1d51325017588215973073a4de4f90e1">ccc_destructor_fn</a> *&#160;</td>
           <td class="paramname"><em>destructor</em>, </td>
         </tr>
         <tr>

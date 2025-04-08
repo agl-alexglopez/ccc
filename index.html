@@ -287,8 +287,8 @@ doubly_linked_list.h (dropdown)</summary>
 <div class="line"><span class="keyword">static</span> <a class="code hl_enumeration" href="types_8h.html#afa7f5d9756840807860490d28e345955">ccc_threeway_cmp</a></div>
 <div class="line">int_cmp(<a class="code hl_struct" href="structccc__cmp.html">ccc_cmp</a> <span class="keyword">const</span> cmp)</div>
 <div class="line">{</div>
-<div class="line">    <span class="keyword">struct </span>int_elem const *<span class="keyword">const</span> lhs = cmp.<a class="code hl_variable" href="structccc__cmp.html#a413783988aeb931cebe1ff2355147e49">user_type_lhs</a>;</div>
-<div class="line">    <span class="keyword">struct </span>int_elem const *<span class="keyword">const</span> rhs = cmp.<a class="code hl_variable" href="structccc__cmp.html#aad71faef58d3c2d057d2f2953372f32f">user_type_rhs</a>;</div>
+<div class="line">    <span class="keyword">struct </span>int_elem const *<span class="keyword">const</span> lhs = cmp.<a class="code hl_variable" href="structccc__cmp.html#a426bb6f29fbe5071f7605e8f7e35e780">any_type_lhs</a>;</div>
+<div class="line">    <span class="keyword">struct </span>int_elem const *<span class="keyword">const</span> rhs = cmp.<a class="code hl_variable" href="structccc__cmp.html#a79fc74b5967598eaa6c9fe4d00f71fe9">any_type_rhs</a>;</div>
 <div class="line">    <span class="keywordflow">return</span> (lhs-&gt;i &gt; rhs-&gt;i) - (lhs-&gt;i &lt; rhs-&gt;i);</div>
 <div class="line">}</div>
 <div class="line"> </div>
@@ -309,8 +309,8 @@ doubly_linked_list.h (dropdown)</summary>
 <div class="line">}</div>
 <div class="ttc" id="adoubly__linked__list_8h_html"><div class="ttname"><a href="doubly__linked__list_8h.html">doubly_linked_list.h</a></div><div class="ttdoc">The Doubly Linked List Interface.</div></div>
 <div class="ttc" id="astructccc__cmp_html"><div class="ttname"><a href="structccc__cmp.html">ccc_cmp</a></div><div class="ttdoc">An element comparison helper.</div><div class="ttdef"><b>Definition:</b> types.h:203</div></div>
-<div class="ttc" id="astructccc__cmp_html_a413783988aeb931cebe1ff2355147e49"><div class="ttname"><a href="structccc__cmp.html#a413783988aeb931cebe1ff2355147e49">ccc_cmp::user_type_lhs</a></div><div class="ttdeci">void const  *const user_type_lhs</div><div class="ttdef"><b>Definition:</b> types.h:205</div></div>
-<div class="ttc" id="astructccc__cmp_html_aad71faef58d3c2d057d2f2953372f32f"><div class="ttname"><a href="structccc__cmp.html#aad71faef58d3c2d057d2f2953372f32f">ccc_cmp::user_type_rhs</a></div><div class="ttdeci">void const  *const user_type_rhs</div><div class="ttdef"><b>Definition:</b> types.h:207</div></div>
+<div class="ttc" id="astructccc__cmp_html_a426bb6f29fbe5071f7605e8f7e35e780"><div class="ttname"><a href="structccc__cmp.html#a426bb6f29fbe5071f7605e8f7e35e780">ccc_cmp::any_type_lhs</a></div><div class="ttdeci">void const  *const any_type_lhs</div><div class="ttdef"><b>Definition:</b> types.h:205</div></div>
+<div class="ttc" id="astructccc__cmp_html_a79fc74b5967598eaa6c9fe4d00f71fe9"><div class="ttname"><a href="structccc__cmp.html#a79fc74b5967598eaa6c9fe4d00f71fe9">ccc_cmp::any_type_rhs</a></div><div class="ttdeci">void const  *const any_type_rhs</div><div class="ttdef"><b>Definition:</b> types.h:207</div></div>
 <div class="ttc" id="atypes_8h_html_afa7f5d9756840807860490d28e345955"><div class="ttname"><a href="types_8h.html#afa7f5d9756840807860490d28e345955">ccc_threeway_cmp</a></div><div class="ttdeci">ccc_threeway_cmp</div><div class="ttdoc">A three-way comparison for comparison functions.</div><div class="ttdef"><b>Definition:</b> types.h:153</div></div>
 </div><!-- fragment --><p></p>
 </details>
@@ -365,9 +365,9 @@ flat_hash_map.h (dropdown)</summary>
 <div class="line">};</div>
 <div class="line"> </div>
 <div class="line"><span class="keyword">static</span> uint64_t</div>
-<div class="line">fhmap_int_to_u64(<a class="code hl_struct" href="structccc__user__key.html">ccc_user_key</a> <span class="keyword">const</span> k)</div>
+<div class="line">fhmap_int_to_u64(<a class="code hl_struct" href="structccc__any__key.html">ccc_any_key</a> <span class="keyword">const</span> k)</div>
 <div class="line">{</div>
-<div class="line">    <span class="keywordtype">int</span> <span class="keyword">const</span> key_int = *((<span class="keywordtype">int</span> *)k.<a class="code hl_variable" href="structccc__user__key.html#aa8ccc5020a1cada149fb7d1509868b35">user_key</a>);</div>
+<div class="line">    <span class="keywordtype">int</span> <span class="keyword">const</span> key_int = *((<span class="keywordtype">int</span> *)k.<a class="code hl_variable" href="structccc__any__key.html#aafd66c76835e1fdf564ca25a39935d42">any_key</a>);</div>
 <div class="line">    uint64_t x = key_int;</div>
 <div class="line">    x = (x ^ (x &gt;&gt; 30)) * UINT64_C(0xbf58476d1ce4e5b9);</div>
 <div class="line">    x = (x ^ (x &gt;&gt; 27)) * UINT64_C(0x94d049bb133111eb);</div>
@@ -378,7 +378,7 @@ flat_hash_map.h (dropdown)</summary>
 <div class="line"><span class="keywordtype">bool</span></div>
 <div class="line">fhmap_id_eq(<a class="code hl_struct" href="structccc__key__cmp.html">ccc_key_cmp</a> <span class="keyword">const</span> cmp)</div>
 <div class="line">{</div>
-<div class="line">    <span class="keyword">struct </span>key_val const *<span class="keyword">const</span> va = cmp.<a class="code hl_variable" href="structccc__key__cmp.html#a1378c81c5089d815ce1d61090bd391c4">user_type_rhs</a>;</div>
+<div class="line">    <span class="keyword">struct </span>key_val const *<span class="keyword">const</span> va = cmp.<a class="code hl_variable" href="structccc__key__cmp.html#a419bb22ec9d8ac27145810dc3942a497">any_type_rhs</a>;</div>
 <div class="line">    <span class="keywordflow">return</span> va-&gt;key == *((<span class="keywordtype">int</span> *)cmp.<a class="code hl_variable" href="structccc__key__cmp.html#a6077551b8a72a5149f78b81f3cb90951">key_lhs</a>);</div>
 <div class="line">}</div>
 <div class="line"> </div>
@@ -421,11 +421,11 @@ flat_hash_map.h (dropdown)</summary>
 <div class="line">}</div>
 <div class="ttc" id="aflat__hash__map_8h_html"><div class="ttname"><a href="flat__hash__map_8h.html">flat_hash_map.h</a></div><div class="ttdoc">The Flat Hash Map Interface.</div></div>
 <div class="ttc" id="aflat__hash__map_8h_html_af8251d1f96c8a10e8ff2b20d7f117447"><div class="ttname"><a href="flat__hash__map_8h.html#af8251d1f96c8a10e8ff2b20d7f117447">ccc_flat_hash_map</a></div><div class="ttdeci">struct ccc_fhmap_ ccc_flat_hash_map</div><div class="ttdoc">A container for storing key-value structures defined by the user in a contiguous buffer.</div><div class="ttdef"><b>Definition:</b> flat_hash_map.h:59</div></div>
+<div class="ttc" id="astructccc__any__key_html"><div class="ttname"><a href="structccc__any__key.html">ccc_any_key</a></div><div class="ttdoc">A read only reference to a key type matching the key field type used for hash containers.</div><div class="ttdef"><b>Definition:</b> types.h:244</div></div>
+<div class="ttc" id="astructccc__any__key_html_aafd66c76835e1fdf564ca25a39935d42"><div class="ttname"><a href="structccc__any__key.html#aafd66c76835e1fdf564ca25a39935d42">ccc_any_key::any_key</a></div><div class="ttdeci">void const  *const any_key</div><div class="ttdef"><b>Definition:</b> types.h:246</div></div>
 <div class="ttc" id="astructccc__key__cmp_html"><div class="ttname"><a href="structccc__key__cmp.html">ccc_key_cmp</a></div><div class="ttdoc">A key comparison helper to avoid argument swapping.</div><div class="ttdef"><b>Definition:</b> types.h:217</div></div>
-<div class="ttc" id="astructccc__key__cmp_html_a1378c81c5089d815ce1d61090bd391c4"><div class="ttname"><a href="structccc__key__cmp.html#a1378c81c5089d815ce1d61090bd391c4">ccc_key_cmp::user_type_rhs</a></div><div class="ttdeci">void const  *const user_type_rhs</div><div class="ttdef"><b>Definition:</b> types.h:221</div></div>
+<div class="ttc" id="astructccc__key__cmp_html_a419bb22ec9d8ac27145810dc3942a497"><div class="ttname"><a href="structccc__key__cmp.html#a419bb22ec9d8ac27145810dc3942a497">ccc_key_cmp::any_type_rhs</a></div><div class="ttdeci">void const  *const any_type_rhs</div><div class="ttdef"><b>Definition:</b> types.h:221</div></div>
 <div class="ttc" id="astructccc__key__cmp_html_a6077551b8a72a5149f78b81f3cb90951"><div class="ttname"><a href="structccc__key__cmp.html#a6077551b8a72a5149f78b81f3cb90951">ccc_key_cmp::key_lhs</a></div><div class="ttdeci">void const  *const key_lhs</div><div class="ttdef"><b>Definition:</b> types.h:219</div></div>
-<div class="ttc" id="astructccc__user__key_html"><div class="ttname"><a href="structccc__user__key.html">ccc_user_key</a></div><div class="ttdoc">A read only reference to a key type matching the key field type used for hash containers.</div><div class="ttdef"><b>Definition:</b> types.h:244</div></div>
-<div class="ttc" id="astructccc__user__key_html_aa8ccc5020a1cada149fb7d1509868b35"><div class="ttname"><a href="structccc__user__key.html#aa8ccc5020a1cada149fb7d1509868b35">ccc_user_key::user_key</a></div><div class="ttdeci">void const  *const user_key</div><div class="ttdef"><b>Definition:</b> types.h:246</div></div>
 </div><!-- fragment --><p></p>
 </details>
 <details >
@@ -441,8 +441,8 @@ flat_priority_queue.h (dropdown)</summary>
 <div class="line"><a class="code hl_enumeration" href="types_8h.html#afa7f5d9756840807860490d28e345955">ccc_threeway_cmp</a></div>
 <div class="line">int_cmp(<a class="code hl_struct" href="structccc__cmp.html">ccc_cmp</a> <span class="keyword">const</span> ints)</div>
 <div class="line">{</div>
-<div class="line">    <span class="keywordtype">int</span> <span class="keyword">const</span> lhs = *(<span class="keywordtype">int</span> *)ints.<a class="code hl_variable" href="structccc__cmp.html#a413783988aeb931cebe1ff2355147e49">user_type_lhs</a>;</div>
-<div class="line">    <span class="keywordtype">int</span> <span class="keyword">const</span> rhs = *(<span class="keywordtype">int</span> *)ints.<a class="code hl_variable" href="structccc__cmp.html#aad71faef58d3c2d057d2f2953372f32f">user_type_rhs</a>;</div>
+<div class="line">    <span class="keywordtype">int</span> <span class="keyword">const</span> lhs = *(<span class="keywordtype">int</span> *)ints.<a class="code hl_variable" href="structccc__cmp.html#a426bb6f29fbe5071f7605e8f7e35e780">any_type_lhs</a>;</div>
+<div class="line">    <span class="keywordtype">int</span> <span class="keyword">const</span> rhs = *(<span class="keywordtype">int</span> *)ints.<a class="code hl_variable" href="structccc__cmp.html#a79fc74b5967598eaa6c9fe4d00f71fe9">any_type_rhs</a>;</div>
 <div class="line">    <span class="keywordflow">return</span> (lhs &gt; rhs) - (lhs &lt; rhs);</div>
 <div class="line">}</div>
 <div class="line"> </div>
@@ -494,7 +494,7 @@ handle_ordered_map.h (dropdown)</summary>
 <div class="line"><span class="keyword">static</span> <a class="code hl_enumeration" href="types_8h.html#afa7f5d9756840807860490d28e345955">ccc_threeway_cmp</a></div>
 <div class="line">kval_cmp(<a class="code hl_struct" href="structccc__key__cmp.html">ccc_key_cmp</a> <span class="keyword">const</span> cmp)</div>
 <div class="line">{</div>
-<div class="line">    <span class="keyword">struct </span>kval const *<span class="keyword">const</span> rhs = cmp.<a class="code hl_variable" href="structccc__key__cmp.html#a1378c81c5089d815ce1d61090bd391c4">user_type_rhs</a>;</div>
+<div class="line">    <span class="keyword">struct </span>kval const *<span class="keyword">const</span> rhs = cmp.<a class="code hl_variable" href="structccc__key__cmp.html#a419bb22ec9d8ac27145810dc3942a497">any_type_rhs</a>;</div>
 <div class="line">    <span class="keywordtype">int</span> <span class="keyword">const</span> key_lhs = *((<span class="keywordtype">int</span> *)cmp.<a class="code hl_variable" href="structccc__key__cmp.html#a6077551b8a72a5149f78b81f3cb90951">key_lhs</a>);</div>
 <div class="line">    <span class="keywordflow">return</span> (key_lhs &gt; rhs-&gt;key) - (key_lhs &lt; rhs-&gt;key);</div>
 <div class="line">}</div>
@@ -564,7 +564,7 @@ handle_realtime_ordered_map.h (dropdown)</summary>
 <div class="line"><span class="keyword">static</span> <a class="code hl_enumeration" href="types_8h.html#afa7f5d9756840807860490d28e345955">ccc_threeway_cmp</a></div>
 <div class="line">kval_cmp(<a class="code hl_struct" href="structccc__key__cmp.html">ccc_key_cmp</a> <span class="keyword">const</span> cmp)</div>
 <div class="line">{</div>
-<div class="line">    <span class="keyword">struct </span>kval const *<span class="keyword">const</span> rhs = cmp.<a class="code hl_variable" href="structccc__key__cmp.html#a1378c81c5089d815ce1d61090bd391c4">user_type_rhs</a>;</div>
+<div class="line">    <span class="keyword">struct </span>kval const *<span class="keyword">const</span> rhs = cmp.<a class="code hl_variable" href="structccc__key__cmp.html#a419bb22ec9d8ac27145810dc3942a497">any_type_rhs</a>;</div>
 <div class="line">    <span class="keywordtype">int</span> <span class="keyword">const</span> key_lhs = *((<span class="keywordtype">int</span> *)cmp.<a class="code hl_variable" href="structccc__key__cmp.html#a6077551b8a72a5149f78b81f3cb90951">key_lhs</a>);</div>
 <div class="line">    <span class="keywordflow">return</span> (key_lhs &gt; rhs-&gt;key) - (key_lhs &lt; rhs-&gt;key);</div>
 <div class="line">}</div>
@@ -633,7 +633,7 @@ ordered_map.h (dropdown)</summary>
 <div class="line">kval_cmp(<a class="code hl_struct" href="structccc__key__cmp.html">ccc_key_cmp</a> cmp)</div>
 <div class="line">{</div>
 <div class="line">    <span class="keywordtype">char</span> <span class="keyword">const</span> *<span class="keyword">const</span> key = *(<span class="keywordtype">char</span> **)cmp.<a class="code hl_variable" href="structccc__key__cmp.html#a6077551b8a72a5149f78b81f3cb90951">key_lhs</a>;</div>
-<div class="line">    <span class="keyword">struct</span> name <span class="keyword">const</span> *<span class="keyword">const</span> rhs = cmp.<a class="code hl_variable" href="structccc__key__cmp.html#a1378c81c5089d815ce1d61090bd391c4">user_type_rhs</a>;</div>
+<div class="line">    <span class="keyword">struct</span> name <span class="keyword">const</span> *<span class="keyword">const</span> rhs = cmp.<a class="code hl_variable" href="structccc__key__cmp.html#a419bb22ec9d8ac27145810dc3942a497">any_type_rhs</a>;</div>
 <div class="line">    <span class="keywordtype">int</span> <span class="keyword">const</span> res = strcmp(key, rhs-&gt;name);</div>
 <div class="line">    <span class="keywordflow">if</span> (res == 0)</div>
 <div class="line">    {</div>
@@ -703,7 +703,7 @@ ordered_multimap.h (dropdown)</summary>
 <div class="line">kval_cmp(<a class="code hl_struct" href="structccc__key__cmp.html">ccc_key_cmp</a> cmp)</div>
 <div class="line">{</div>
 <div class="line">    <span class="keywordtype">char</span> <span class="keyword">const</span> *<span class="keyword">const</span> key = *(<span class="keywordtype">char</span> **)cmp.<a class="code hl_variable" href="structccc__key__cmp.html#a6077551b8a72a5149f78b81f3cb90951">key_lhs</a>;</div>
-<div class="line">    <span class="keyword">struct</span> name <span class="keyword">const</span> *<span class="keyword">const</span> rhs = cmp.<a class="code hl_variable" href="structccc__key__cmp.html#a1378c81c5089d815ce1d61090bd391c4">user_type_rhs</a>;</div>
+<div class="line">    <span class="keyword">struct</span> name <span class="keyword">const</span> *<span class="keyword">const</span> rhs = cmp.<a class="code hl_variable" href="structccc__key__cmp.html#a419bb22ec9d8ac27145810dc3942a497">any_type_rhs</a>;</div>
 <div class="line">    <span class="keywordtype">int</span> <span class="keyword">const</span> res = strcmp(key, rhs-&gt;name);</div>
 <div class="line">    <span class="keywordflow">if</span> (res == 0)</div>
 <div class="line">    {</div>
@@ -775,8 +775,8 @@ priority_queue.h (dropdown)</summary>
 <div class="line"><span class="keyword">static</span> <a class="code hl_enumeration" href="types_8h.html#afa7f5d9756840807860490d28e345955">ccc_threeway_cmp</a></div>
 <div class="line">val_cmp(<a class="code hl_struct" href="structccc__cmp.html">ccc_cmp</a> <span class="keyword">const</span> cmp)</div>
 <div class="line">{</div>
-<div class="line">    <span class="keyword">struct </span>val const *<span class="keyword">const</span> lhs = cmp.<a class="code hl_variable" href="structccc__cmp.html#a413783988aeb931cebe1ff2355147e49">user_type_lhs</a>;</div>
-<div class="line">    <span class="keyword">struct </span>val const *<span class="keyword">const</span> rhs = cmp.<a class="code hl_variable" href="structccc__cmp.html#aad71faef58d3c2d057d2f2953372f32f">user_type_rhs</a>;</div>
+<div class="line">    <span class="keyword">struct </span>val const *<span class="keyword">const</span> lhs = cmp.<a class="code hl_variable" href="structccc__cmp.html#a426bb6f29fbe5071f7605e8f7e35e780">any_type_lhs</a>;</div>
+<div class="line">    <span class="keyword">struct </span>val const *<span class="keyword">const</span> rhs = cmp.<a class="code hl_variable" href="structccc__cmp.html#a79fc74b5967598eaa6c9fe4d00f71fe9">any_type_rhs</a>;</div>
 <div class="line">    <span class="keywordflow">return</span> (lhs-&gt;val &gt; rhs-&gt;val) - (lhs-&gt;val &lt; rhs-&gt;val);</div>
 <div class="line">}</div>
 <div class="line"> </div>
@@ -822,7 +822,7 @@ realtime_ordered_map.h (dropdown)</summary>
 <div class="line"><span class="keyword">static</span> <a class="code hl_enumeration" href="types_8h.html#afa7f5d9756840807860490d28e345955">ccc_threeway_cmp</a></div>
 <div class="line">kval_cmp(<a class="code hl_struct" href="structccc__key__cmp.html">ccc_key_cmp</a> <span class="keyword">const</span> cmp)</div>
 <div class="line">{</div>
-<div class="line">    <span class="keyword">struct </span>kval const *<span class="keyword">const</span> rhs = cmp.<a class="code hl_variable" href="structccc__key__cmp.html#a1378c81c5089d815ce1d61090bd391c4">user_type_rhs</a>;</div>
+<div class="line">    <span class="keyword">struct </span>kval const *<span class="keyword">const</span> rhs = cmp.<a class="code hl_variable" href="structccc__key__cmp.html#a419bb22ec9d8ac27145810dc3942a497">any_type_rhs</a>;</div>
 <div class="line">    <span class="keywordtype">int</span> <span class="keyword">const</span> key_lhs = *((<span class="keywordtype">int</span> *)cmp.<a class="code hl_variable" href="structccc__key__cmp.html#a6077551b8a72a5149f78b81f3cb90951">key_lhs</a>);</div>
 <div class="line">    <span class="keywordflow">return</span> (key_lhs &gt; rhs-&gt;key) - (key_lhs &lt; rhs-&gt;key);</div>
 <div class="line">}</div>
@@ -892,8 +892,8 @@ singly_linked_list.h (dropdown)</summary>
 <div class="line"><span class="keyword">static</span> <a class="code hl_enumeration" href="types_8h.html#afa7f5d9756840807860490d28e345955">ccc_threeway_cmp</a></div>
 <div class="line">int_cmp(<a class="code hl_struct" href="structccc__cmp.html">ccc_cmp</a> <span class="keyword">const</span> cmp)</div>
 <div class="line">{</div>
-<div class="line">    <span class="keyword">struct </span>int_elem const *<span class="keyword">const</span> lhs = cmp.<a class="code hl_variable" href="structccc__cmp.html#a413783988aeb931cebe1ff2355147e49">user_type_lhs</a>;</div>
-<div class="line">    <span class="keyword">struct </span>int_elem const *<span class="keyword">const</span> rhs = cmp.<a class="code hl_variable" href="structccc__cmp.html#aad71faef58d3c2d057d2f2953372f32f">user_type_rhs</a>;</div>
+<div class="line">    <span class="keyword">struct </span>int_elem const *<span class="keyword">const</span> lhs = cmp.<a class="code hl_variable" href="structccc__cmp.html#a426bb6f29fbe5071f7605e8f7e35e780">any_type_lhs</a>;</div>
+<div class="line">    <span class="keyword">struct </span>int_elem const *<span class="keyword">const</span> rhs = cmp.<a class="code hl_variable" href="structccc__cmp.html#a79fc74b5967598eaa6c9fe4d00f71fe9">any_type_rhs</a>;</div>
 <div class="line">    <span class="keywordflow">return</span> (lhs-&gt;i &gt; rhs-&gt;i) - (lhs-&gt;i &lt; rhs-&gt;i);</div>
 <div class="line">}</div>
 <div class="line"> </div>
@@ -1073,8 +1073,8 @@ No Container of Macros</h2>
 <div class="line"><a class="code hl_enumeration" href="types_8h.html#afa7f5d9756840807860490d28e345955">ccc_threeway_cmp</a></div>
 <div class="line">id_cmp(<a class="code hl_struct" href="structccc__cmp.html">ccc_cmp</a> <span class="keyword">const</span> cmp)</div>
 <div class="line">{</div>
-<div class="line">    <span class="keyword">struct </span>id const *<span class="keyword">const</span> lhs = cmp.<a class="code hl_variable" href="structccc__cmp.html#a413783988aeb931cebe1ff2355147e49">user_type_lhs</a>;</div>
-<div class="line">    <span class="keyword">struct </span>id const *<span class="keyword">const</span> rhs = cmp.<a class="code hl_variable" href="structccc__cmp.html#aad71faef58d3c2d057d2f2953372f32f">user_type_rhs</a>;</div>
+<div class="line">    <span class="keyword">struct </span>id const *<span class="keyword">const</span> lhs = cmp.<a class="code hl_variable" href="structccc__cmp.html#a426bb6f29fbe5071f7605e8f7e35e780">any_type_lhs</a>;</div>
+<div class="line">    <span class="keyword">struct </span>id const *<span class="keyword">const</span> rhs = cmp.<a class="code hl_variable" href="structccc__cmp.html#a79fc74b5967598eaa6c9fe4d00f71fe9">any_type_rhs</a>;</div>
 <div class="line">    <span class="keywordflow">return</span> (lhs-&gt;id &gt; rhs-&gt;id) - (lhs-&gt;id &lt; rhs-&gt;id);</div>
 <div class="line">}</div>
 <div class="ttc" id="adoubly__linked__list_8h_html_a4f7f1c337174a8c19091ab34d25587ff"><div class="ttname"><a href="doubly__linked__list_8h.html#a4f7f1c337174a8c19091ab34d25587ff">ccc_dll_front</a></div><div class="ttdeci">void * ccc_dll_front(ccc_doubly_linked_list const *l)</div><div class="ttdoc">Returns the user type at the front of the list. O(1).</div></div>
