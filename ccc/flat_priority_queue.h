@@ -158,6 +158,26 @@ memory management strategies. */
 ccc_result ccc_fpq_copy(ccc_flat_priority_queue *dst,
                         ccc_flat_priority_queue const *src, ccc_alloc_fn *fn);
 
+/** @brief Reserves space for at least to_add more elements.
+@param [in] fpq a pointer to the flat priority queue.
+@param [in] to_add the number of elements to add to the current size.
+@param [in] fn the allocation function to use to reserve memory.
+@return the result of the reservation. OK if successful, otherwise an error
+status is returned.
+@note see the ccc_fpq_clear_and_free_reserve function if this function is
+being used for a one-time dynamic reservation.
+
+This function can be used for a dynamic fpq with or without allocation
+permission. If the fpq has allocation permission, it will reserve the required
+space and later resize if more space is needed.
+
+If the fpq has been initialized with no allocation permission and no memory
+this function can serve as a one-time reservation. This is helpful when a fixed
+size is needed but that size is only known dynamically at runtime. To free the
+fpq in such a case see the ccc_fpq_clear_and_free_reserve function. */
+ccc_result ccc_fpq_reserve(ccc_flat_priority_queue *fpq, size_t to_add,
+                           ccc_alloc_fn *fn);
+
 /**@}*/
 
 /** @name Insert and Remove Interface
@@ -364,6 +384,36 @@ of the provided allocation function free operation. */
 ccc_result ccc_fpq_clear_and_free(ccc_flat_priority_queue *fpq,
                                   ccc_destructor_fn *fn);
 
+/** @brief Frees all slots in the fpq and frees the underlying buffer that was
+previously dynamically reserved with the reserve function.
+@param [in] h the fpq to be cleared.
+@param [in] destructor the destructor for each element. NULL can be passed if no
+maintenance is required on the elements in the fpq before their slots are
+dropped.
+@param [in] alloc the required allocation function to provide to a dynamically
+reserved fpq. Any auxiliary data provided upon initialization will be passed to
+the allocation function when called.
+@return the result of free operation. OK if success, or an error status to
+indicate the error.
+@warning It is an error to call this function on a fpq that was not reserved
+with the provided ccc_alloc_fn. The fpq must have existing memory to free.
+
+This function covers the edge case of reserving a dynamic capacity for a fpq
+at runtime but denying the fpq allocation permission to resize. This can help
+prevent a fpq from growing unbounded. The user in this case knows the fpq does
+not have allocation permission and therefore no further memory will be dedicated
+to the fpq.
+
+However, to free the fpq in such a case this function must be used because the
+fpq has no ability to free itself. Just as the allocation function is required
+to reserve memory so to is it required to free memory.
+
+This function will work normally if called on a fpq with allocation permission
+however the normal ccc_fpq_clear_and_free is sufficient for that use case. */
+ccc_result ccc_fpq_clear_and_free_reserve(ccc_flat_priority_queue *fpq,
+                                          ccc_destructor_fn *destructor,
+                                          ccc_alloc_fn *alloc);
+
 /**@}*/
 
 /** @name State Interface
@@ -419,6 +469,7 @@ typedef ccc_flat_priority_queue flat_priority_queue;
 #    define fpq_init(args...) ccc_fpq_init(args)
 #    define fpq_heapify_init(args...) ccc_fpq_heapify_init(args)
 #    define fpq_copy(args...) ccc_fpq_copy(args)
+#    define fpq_reserve(args...) ccc_fpq_reserve(args)
 #    define fpq_heapify(args...) ccc_fpq_heapify(args)
 #    define fpq_emplace(args...) ccc_fpq_emplace(args)
 #    define fpq_realloc(args...) ccc_fpq_realloc(args)
@@ -435,6 +486,8 @@ typedef ccc_flat_priority_queue flat_priority_queue;
 #    define fpq_decrease_w(args...) ccc_fpq_decrease_w(args)
 #    define fpq_clear(args...) ccc_fpq_clear(args)
 #    define fpq_clear_and_free(args...) ccc_fpq_clear_and_free(args)
+#    define fpq_clear_and_free_reserve(args...)                                \
+        ccc_fpq_clear_and_free_reserve(args)
 #    define fpq_is_empty(args...) ccc_fpq_is_empty(args)
 #    define fpq_size(args...) ccc_fpq_size(args)
 #    define fpq_data(args...) ccc_fpq_data(args)

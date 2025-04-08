@@ -319,10 +319,10 @@ ccc_result ccc_fdeq_clear_and_free(ccc_flat_double_ended_queue *fdeq,
 
 /** @brief Frees all slots in the fdeq and frees the underlying buffer that was
 previously dynamically reserved with the reserve function.
-@param [in] h the fdeq to be cleared.
+@param [in] fdeq the fdeq to be cleared.
 @param [in] destructor the destructor for each element. NULL can be passed if no
 maintenance is required on the elements in the fdeq before their slots are
-forfeit.
+dropped.
 @param [in] alloc the required allocation function to provide to a dynamically
 reserved fdeq. Any auxiliary data provided upon initialization will be passed to
 the allocation function when called.

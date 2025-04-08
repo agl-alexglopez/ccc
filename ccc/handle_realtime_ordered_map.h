@@ -189,6 +189,26 @@ ccc_result ccc_hrm_copy(ccc_handle_realtime_ordered_map *dst,
                         ccc_handle_realtime_ordered_map const *src,
                         ccc_alloc_fn *fn);
 
+/** @brief Reserves space for at least to_add more elements.
+@param [in] hrm a pointer to the handle realtime ordered map.
+@param [in] to_add the number of elements to add to the current size.
+@param [in] fn the allocation function to use to reserve memory.
+@return the result of the reservation. OK if successful, otherwise an error
+status is returned.
+@note see the ccc_hrm_clear_and_free_reserve function if this function is
+being used for a one-time dynamic reservation.
+
+This function can be used for a dynamic hrm with or without allocation
+permission. If the hrm has allocation permission, it will reserve the required
+space and later resize if more space is needed.
+
+If the hrm has been initialized with no allocation permission and no memory
+this function can serve as a one-time reservation. This is helpful when a fixed
+size is needed but that size is only known dynamically at runtime. To free the
+hrm in such a case see the ccc_hrm_clear_and_free_reserve function. */
+ccc_result ccc_hrm_reserve(ccc_handle_realtime_ordered_map *hrm, size_t to_add,
+                           ccc_alloc_fn *fn);
+
 /**@}*/
 
 /**@name Membership Interface
@@ -611,6 +631,36 @@ If NULL is passed as the destructor function time is O(1), else O(size). */
 ccc_result ccc_hrm_clear_and_free(ccc_handle_realtime_ordered_map *hrm,
                                   ccc_destructor_fn *fn);
 
+/** @brief Frees all slots in the hrm and frees the underlying buffer that was
+previously dynamically reserved with the reserve function.
+@param [in] hrm the map to be cleared.
+@param [in] destructor the destructor for each element. NULL can be passed if no
+maintenance is required on the elements in the hrm before their slots are
+dropped.
+@param [in] alloc the required allocation function to provide to a dynamically
+reserved hrm. Any auxiliary data provided upon initialization will be passed to
+the allocation function when called.
+@return the result of free operation. OK if success, or an error status to
+indicate the error.
+@warning It is an error to call this function on a hrm that was not reserved
+with the provided ccc_alloc_fn. The hrm must have existing memory to free.
+
+This function covers the edge case of reserving a dynamic capacity for a hrm
+at runtime but denying the hrm allocation permission to resize. This can help
+prevent a hrm from growing unbounded. The user in this case knows the hrm does
+not have allocation permission and therefore no further memory will be dedicated
+to the hrm.
+
+However, to free the hrm in such a case this function must be used because the
+hrm has no ability to free itself. Just as the allocation function is required
+to reserve memory so to is it required to free memory.
+
+This function will work normally if called on a hrm with allocation permission
+however the normal ccc_hrm_clear_and_free is sufficient for that use case. */
+ccc_result ccc_hrm_clear_and_free_reserve(ccc_handle_realtime_ordered_map *hrm,
+                                          ccc_destructor_fn *destructor,
+                                          ccc_alloc_fn *alloc);
+
 /**@}*/
 
 /** @name Iterator Interface
@@ -786,6 +836,7 @@ typedef ccc_hromap_handle hromap_handle;
 #    define hrm_insert_or_assign_w(args...) ccc_hrm_insert_or_assign_w(args)
 #    define hrm_init(args...) ccc_hrm_init(args)
 #    define hrm_copy(args...) ccc_hrm_copy(args)
+#    define hrm_reserve(args...) ccc_hrm_reserve(args)
 #    define hrm_contains(args...) ccc_hrm_contains(args)
 #    define hrm_get_key_val(args...) ccc_hrm_get_key_val(args)
 #    define hrm_swap_handle(args...) ccc_hrm_swap_handle(args)
@@ -801,6 +852,8 @@ typedef ccc_hromap_handle hromap_handle;
 #    define hrm_size(args...) ccc_hrm_size(args)
 #    define hrm_clear(args...) ccc_hrm_clear(args)
 #    define hrm_clear_and_free(args...) ccc_hrm_clear_and_free(args)
+#    define hrm_clear_and_free_reserve(args...)                                \
+        ccc_hrm_clear_and_free_reserve(args)
 #    define hrm_validate(args...) ccc_hrm_validate(args)
 #endif /* HANDLE_REALTIME_ORDERED_MAP_USING_NAMESPACE_CCC */
 
