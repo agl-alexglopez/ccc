@@ -87,7 +87,9 @@ static_assert(
 /** @private The following test should ensure some safety in assumptions we make
 when the user defines a fixed size map type. This is just a small type that
 will remain internal to this translation unit and offers a type that needs
-padding due to field sizes. */
+padding due to field sizes. The tag array is not given a replica group size at
+the end of its allocation because that wastes pointless space and has no impact
+on the following layout and pointer arithmetic tests. */
 struct fixed_map_test_type
 {
     struct
