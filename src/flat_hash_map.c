@@ -68,20 +68,20 @@ enum : uint8_t
 {
     /** @private Deleted is applied when a removed value in a group must signal
     to a probe sequence to continue searching for a match or empty to stop. */
-    CCC_FHM_DELETED = 0x80,
+    TAG_DELETED = 0x80,
     /** @private Empty is the starting tag value and applied when other empties
     are in a group upon removal. */
-    CCC_FHM_EMPTY = 0xFF,
-    /* FULL = 0b0???????, */
+    TAG_EMPTY = 0xFF,
+    /* TAG_FULL = 0b0???????, */
 };
 static_assert(sizeof(ccc_fhm_tag) == sizeof(uint8_t),
               "tag must wrap a byte in a struct without padding for better "
               "optimizations and no strict-aliasing exceptions.");
 static_assert(
-    (CCC_FHM_DELETED | CCC_FHM_EMPTY) == (uint8_t)~0,
+    (TAG_DELETED | TAG_EMPTY) == (uint8_t)~0,
     "all bits must be accounted for across deleted and empty status.");
 static_assert(
-    (CCC_FHM_DELETED ^ CCC_FHM_EMPTY) == 0x7F,
+    (TAG_DELETED ^ TAG_EMPTY) == 0x7F,
     "only empty should have lsb on and 7 bits are available for hash");
 
 /** @private The following test should ensure some safety in assumptions we make
@@ -623,7 +623,7 @@ ccc_fhm_clear(ccc_flat_hash_map *const h, ccc_destructor_fn *const fn)
         {
             return CCC_RESULT_OK;
         }
-        (void)memset(h->tag_, CCC_FHM_EMPTY, mask_to_tag_bytes(h->mask_));
+        (void)memset(h->tag_, TAG_EMPTY, mask_to_tag_bytes(h->mask_));
         h->avail_ = mask_to_load_factor_cap(h->mask_);
         h->sz_ = 0;
         return CCC_RESULT_OK;
@@ -635,7 +635,7 @@ ccc_fhm_clear(ccc_flat_hash_map *const h, ccc_destructor_fn *const fn)
             fn((ccc_any_type){.any_type = data_at(h, i), .aux = h->aux_});
         }
     }
-    (void)memset(h->tag_, CCC_FHM_EMPTY, mask_to_tag_bytes(h->mask_));
+    (void)memset(h->tag_, TAG_EMPTY, mask_to_tag_bytes(h->mask_));
     h->avail_ = mask_to_load_factor_cap(h->mask_);
     h->sz_ = 0;
     return CCC_RESULT_OK;
@@ -795,7 +795,7 @@ ccc_fhm_copy(ccc_flat_hash_map *const dst, ccc_flat_hash_map const *const src,
     {
         return CCC_RESULT_ARG_ERROR;
     }
-    (void)memset(dst->tag_, CCC_FHM_EMPTY, mask_to_tag_bytes(dst->mask_));
+    (void)memset(dst->tag_, TAG_EMPTY, mask_to_tag_bytes(dst->mask_));
     dst->avail_ = mask_to_load_factor_cap(dst->mask_);
     dst->sz_ = 0;
     dst->init_ = CCC_TRUE;
@@ -864,15 +864,15 @@ ccc_fhm_validate(ccc_flat_hash_map const *const h)
     {
         ccc_fhm_tag const t = h->tag_[i];
         /* If we are a special constant there are only two possible values. */
-        if (is_constant(t) && t.v != CCC_FHM_DELETED && t.v != CCC_FHM_EMPTY)
+        if (is_constant(t) && t.v != TAG_DELETED && t.v != TAG_EMPTY)
         {
             return CCC_FALSE;
         }
-        if (t.v == CCC_FHM_EMPTY)
+        if (t.v == TAG_EMPTY)
         {
             ++avail;
         }
-        else if (t.v == CCC_FHM_DELETED)
+        else if (t.v == TAG_DELETED)
         {
             ++deleted;
         }
@@ -997,7 +997,7 @@ set_insert_tag(struct ccc_fhmap_ *const h, ccc_fhm_tag const m, size_t const i)
 {
     assert(i <= h->mask_);
     assert((m.v & TAG_MSB) == 0);
-    h->avail_ -= (h->tag_[i].v == CCC_FHM_EMPTY);
+    h->avail_ -= (h->tag_[i].v == TAG_EMPTY);
     ++h->sz_;
     set_tag(h, m, i);
 }
@@ -1038,9 +1038,9 @@ erase(struct ccc_fhmap_ *const h, size_t const i)
     ccc_fhm_tag const m
         = leading_zeros(prev_group_empties) + trailing_zeros(group_empties)
                   >= CCC_FHM_GROUP_SIZE
-              ? (ccc_fhm_tag){CCC_FHM_DELETED}
-              : (ccc_fhm_tag){CCC_FHM_EMPTY};
-    h->avail_ += (CCC_FHM_EMPTY == m.v);
+              ? (ccc_fhm_tag){TAG_DELETED}
+              : (ccc_fhm_tag){TAG_EMPTY};
+    h->avail_ += (TAG_EMPTY == m.v);
     --h->sz_;
     set_tag(h, m, i);
 }
@@ -1186,7 +1186,7 @@ maybe_rehash(struct ccc_fhmap_ *const h, size_t const to_add,
             {
                 return CCC_RESULT_ARG_ERROR;
             }
-            (void)memset(h->tag_, CCC_FHM_EMPTY, mask_to_tag_bytes(h->mask_));
+            (void)memset(h->tag_, TAG_EMPTY, mask_to_tag_bytes(h->mask_));
         }
         h->init_ = CCC_TRUE;
     }
@@ -1206,7 +1206,7 @@ maybe_rehash(struct ccc_fhmap_ *const h, size_t const to_add,
         /* Static assertions at top of file ensure this is correct. */
         h->tag_ = (ccc_fhm_tag *)((char *)buf
                                   + mask_to_data_bytes(h->elem_sz_, h->mask_));
-        (void)memset(h->tag_, CCC_FHM_EMPTY, mask_to_tag_bytes(h->mask_));
+        (void)memset(h->tag_, TAG_EMPTY, mask_to_tag_bytes(h->mask_));
     }
     if (likely(h->avail_))
     {
@@ -1238,7 +1238,7 @@ rehash_in_place(struct ccc_fhmap_ *const h)
     (void)memcpy(h->tag_ + (mask + 1), h->tag_, CCC_FHM_GROUP_SIZE);
     for (size_t i = 0; i < mask + 1; ++i)
     {
-        if (h->tag_[i].v != CCC_FHM_DELETED)
+        if (h->tag_[i].v != TAG_DELETED)
         {
             continue;
         }
@@ -1263,16 +1263,16 @@ rehash_in_place(struct ccc_fhmap_ *const h)
             }
             ccc_fhm_tag const occupant = h->tag_[new_slot];
             set_tag(h, hash_tag, new_slot);
-            if (occupant.v == CCC_FHM_EMPTY)
+            if (occupant.v == TAG_EMPTY)
             {
-                set_tag(h, (ccc_fhm_tag){CCC_FHM_EMPTY}, i);
+                set_tag(h, (ccc_fhm_tag){TAG_EMPTY}, i);
                 (void)memcpy(data_at(h, new_slot), data_at(h, i), h->elem_sz_);
                 break; /* continues outer loop */
             }
             /* The other slots data has been swapped and we rehash every
                element for this algorithm so there is no need to write its
                tag to this slot. It's data is in correct location already. */
-            assert(occupant.v == CCC_FHM_DELETED);
+            assert(occupant.v == TAG_DELETED);
             swap(swap_slot(h), data_at(h, i), data_at(h, new_slot),
                  h->elem_sz_);
         } while (1);
@@ -1311,7 +1311,7 @@ rehash_resize(struct ccc_fhmap_ *const h, size_t const to_add,
     new_h.tag_
         = (ccc_fhm_tag *)((char *)new_buf
                           + mask_to_data_bytes(new_h.elem_sz_, new_h.mask_));
-    (void)memset(new_h.tag_, CCC_FHM_EMPTY, mask_to_tag_bytes(new_h.mask_));
+    (void)memset(new_h.tag_, TAG_EMPTY, mask_to_tag_bytes(new_h.mask_));
     for (size_t i = 0; i < (h->mask_ + 1); ++i)
     {
         if (is_full(h->tag_[i]))
@@ -1619,7 +1619,7 @@ based index in the context of the probe sequence. */
 static inline index_mask
 match_empty(group const g)
 {
-    return match_tag(g, (ccc_fhm_tag){CCC_FHM_EMPTY});
+    return match_tag(g, (ccc_fhm_tag){TAG_EMPTY});
 }
 
 /** Returns a 0 based index mask with every bit on representing those tags
@@ -1643,7 +1643,7 @@ make_constants_empty_and_full_deleted(group const g)
     __m128i const zero = _mm_setzero_si128();
     __m128i const match_constants = _mm_cmpgt_epi8(zero, g.v);
     return (group){
-        _mm_or_si128(match_constants, _mm_set1_epi8((int8_t)CCC_FHM_DELETED))};
+        _mm_or_si128(match_constants, _mm_set1_epi8((int8_t)TAG_DELETED))};
 }
 
 #elif defined(__ARM_NEON__) && !defined(CCC_FHM_PORTABLE)
