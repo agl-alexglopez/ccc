@@ -237,7 +237,7 @@ enum : uint8_t
     /** @private Used to verify if tag is constant or hash data. */
     TAG_MSB = 0x80,
     /** @private Used to create a one byte fingerprint of user hash. */
-    LOWER_7_BITS_MASK = 0x7F,
+    TAG_LOWER_7_MASK = 0x7F,
 };
 
 /** @private A triangular sequence of numbers is a probing sequence that will
@@ -1503,7 +1503,7 @@ static inline ccc_fhm_tag
 to_tag(uint64_t const hash)
 {
     return (ccc_fhm_tag){(hash >> ((sizeof(hash) * CHAR_BIT) - 7))
-                         & LOWER_7_BITS_MASK};
+                         & TAG_LOWER_7_MASK};
 }
 
 /*========================  Index Mask Implementations   ====================*/
