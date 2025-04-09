@@ -303,6 +303,7 @@ static unsigned clz(index_mask m);
 static unsigned clz_size_t(size_t n);
 static size_t next_power_of_two(size_t n);
 static ccc_tribool is_power_of_two(size_t n);
+static size_t to_power_of_two(size_t n);
 
 /*===========================    Interface   ================================*/
 
@@ -1170,10 +1171,11 @@ maybe_rehash(struct ccc_fhmap_ *const h, size_t const to_add,
     {
         return CCC_RESULT_NO_ALLOC;
     }
-    size_t required_total_cap = ((h->sz_ + to_add) * 8) / 7;
-    if (!is_power_of_two(required_total_cap))
+    /* Bump to next power of two and */
+    size_t required_total_cap = to_power_of_two(((h->sz_ + to_add) * 8) / 7);
+    if (!required_total_cap)
     {
-        required_total_cap = next_power_of_two(required_total_cap);
+        return CCC_RESULT_ARG_ERROR;
     }
     if (unlikely(!h->init_))
     {
@@ -1382,6 +1384,19 @@ key_in_slot(struct ccc_fhmap_ const *const h, void const *const slot)
     return (char *)slot + h->key_offset_;
 }
 
+/** Return n if a power of 2, otherwise returns next greater power of 2. 0 is
+returned if overflow will occur. */
+static inline size_t
+to_power_of_two(size_t const n)
+{
+    if (is_power_of_two(n))
+    {
+        return n;
+    }
+    return next_power_of_two(n);
+}
+
+/** Returns next power of 2 greater than n or 0 if no greater can be found. */
 static inline size_t
 next_power_of_two(size_t const n)
 {
@@ -1393,6 +1408,7 @@ next_power_of_two(size_t const n)
     return shifts >= sizeof(size_t) * CHAR_BIT ? 0 : (SIZE_MAX >> shifts) + 1;
 }
 
+/** Returns true if n is a power of two. 0 is not considered a power of 2. */
 static inline ccc_tribool
 is_power_of_two(size_t const n)
 {
