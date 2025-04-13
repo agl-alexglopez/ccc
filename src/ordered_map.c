@@ -179,7 +179,7 @@ ccc_om_or_insert(ccc_omap_entry const *const e, ccc_omap_elem *const elem)
 }
 
 ccc_omap_entry *
-ccc_om_and_modify(ccc_omap_entry *const e, ccc_any_update_fn *const fn)
+ccc_om_and_modify(ccc_omap_entry *const e, ccc_any_type_update_fn *const fn)
 {
     if (!e)
     {
@@ -193,7 +193,7 @@ ccc_om_and_modify(ccc_omap_entry *const e, ccc_any_update_fn *const fn)
 }
 
 ccc_omap_entry *
-ccc_om_and_modify_aux(ccc_omap_entry *const e, ccc_any_update_fn *const fn,
+ccc_om_and_modify_aux(ccc_omap_entry *const e, ccc_any_type_update_fn *const fn,
                       void *const aux)
 {
     if (e && fn && e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED
@@ -443,7 +443,8 @@ ccc_om_equal_rrange(ccc_ordered_map *const om, void const *const rbegin_key,
 }
 
 ccc_result
-ccc_om_clear(ccc_ordered_map *const om, ccc_any_destructor_fn *const destructor)
+ccc_om_clear(ccc_ordered_map *const om,
+             ccc_any_type_destructor_fn *const destructor)
 {
     if (!om)
     {

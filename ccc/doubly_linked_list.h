@@ -82,7 +82,7 @@ destructors.
 @param [in] list_name the name of the list being initialized.
 @param [in] struct_name the type containing the intrusive dll element.
 @param [in] list_elem_field name of the dll element in the containing type.
-@param [in] cmp_fn the ccc_any_cmp_fn used to compare list elements.
+@param [in] cmp_fn the ccc_any_type_cmp_fn used to compare list elements.
 @param [in] aux_data any auxilliary data that will be needed for comparison,
 printing, or destruction of elements.
 @param [in] alloc_fn the optional allocation function or NULL.
@@ -266,7 +266,8 @@ the list elements with the destructor if they wish to do so. The implementation
 ensures the function is called after the element is removed. Otherwise, the user
 must manage their elements at their discretion after the list is emptied in
 this function. */
-ccc_result ccc_dll_clear(ccc_doubly_linked_list *l, ccc_any_destructor_fn *fn);
+ccc_result ccc_dll_clear(ccc_doubly_linked_list *l,
+                         ccc_any_type_destructor_fn *fn);
 
 /**@}*/
 

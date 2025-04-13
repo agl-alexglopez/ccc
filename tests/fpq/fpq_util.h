@@ -13,7 +13,7 @@ struct val
     int val;
 };
 
-ccc_threeway_cmp val_cmp(ccc_any_cmp);
+ccc_threeway_cmp val_cmp(ccc_any_type_cmp);
 void val_update(ccc_any_type);
 size_t rand_range(size_t min, size_t max);
 enum check_result inorder_fill(int[], size_t, ccc_flat_priority_queue *);

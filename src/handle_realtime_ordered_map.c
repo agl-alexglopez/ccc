@@ -280,7 +280,7 @@ ccc_hrm_insert_or_assign(ccc_handle_realtime_ordered_map *const hrm,
 }
 
 ccc_hromap_handle *
-ccc_hrm_and_modify(ccc_hromap_handle *const h, ccc_any_update_fn *const fn)
+ccc_hrm_and_modify(ccc_hromap_handle *const h, ccc_any_type_update_fn *const fn)
 {
     if (h && fn && h->impl_.handle_.stats_ & CCC_ENTRY_OCCUPIED
         && h->impl_.handle_.i_ > 0)
@@ -292,8 +292,8 @@ ccc_hrm_and_modify(ccc_hromap_handle *const h, ccc_any_update_fn *const fn)
 }
 
 ccc_hromap_handle *
-ccc_hrm_and_modify_aux(ccc_hromap_handle *const h, ccc_any_update_fn *const fn,
-                       void *const aux)
+ccc_hrm_and_modify_aux(ccc_hromap_handle *const h,
+                       ccc_any_type_update_fn *const fn, void *const aux)
 {
     if (h && fn && h->impl_.handle_.stats_ & CCC_ENTRY_OCCUPIED
         && h->impl_.handle_.stats_ > 0)
@@ -650,7 +650,7 @@ ccc_hrm_copy(ccc_handle_realtime_ordered_map *const dst,
 
 ccc_result
 ccc_hrm_clear(ccc_handle_realtime_ordered_map *const hrm,
-              ccc_any_destructor_fn *const fn)
+              ccc_any_type_destructor_fn *const fn)
 {
     if (!hrm)
     {
@@ -675,7 +675,7 @@ ccc_hrm_clear(ccc_handle_realtime_ordered_map *const hrm,
 
 ccc_result
 ccc_hrm_clear_and_free(ccc_handle_realtime_ordered_map *const hrm,
-                       ccc_any_destructor_fn *const fn)
+                       ccc_any_type_destructor_fn *const fn)
 {
     if (!hrm)
     {
@@ -699,7 +699,7 @@ ccc_hrm_clear_and_free(ccc_handle_realtime_ordered_map *const hrm,
 
 ccc_result
 ccc_hrm_clear_and_free_reserve(ccc_handle_realtime_ordered_map *const hrm,
-                               ccc_any_destructor_fn *const destructor,
+                               ccc_any_type_destructor_fn *const destructor,
                                ccc_any_alloc_fn *const alloc)
 {
     if (!hrm)

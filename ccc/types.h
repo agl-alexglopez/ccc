@@ -207,7 +207,7 @@ typedef struct
     void const *const any_type_rhs;
     /** A reference to aux data provided to container on initialization. */
     void *aux;
-} ccc_any_cmp;
+} ccc_any_type_cmp;
 
 /** @brief A key comparison helper to avoid argument swapping.
 
@@ -317,7 +317,7 @@ A three-way comparison return value is expected and the two containers being
 compared are guaranteed to be non-NULL and pointing to the base of the user type
 stored in the container. Aux may be NULL if no aux is provided on
 initialization. */
-typedef ccc_threeway_cmp ccc_any_cmp_fn(ccc_any_cmp);
+typedef ccc_threeway_cmp ccc_any_type_cmp_fn(ccc_any_type_cmp);
 
 /** @brief A callback function for modifying an element in the container.
 
@@ -326,7 +326,7 @@ is available. The container pointer points to the base of the user type and is
 not NULL. Aux may be NULL if no aux is provided on initialization. An update
 function is used when a container Interface exposes functions to modify the key
 or value used to determine sorted order of elements in the container. */
-typedef void ccc_any_update_fn(ccc_any_type);
+typedef void ccc_any_type_update_fn(ccc_any_type);
 
 /** @brief A callback function for destroying an element in the container.
 
@@ -344,7 +344,7 @@ container frees. If the user has not given permission to the container to
 allocate memory, this a good function in which to free each element, if
 desired; any program state can be maintained then the element can be freed by
 the user in this function as the final step. */
-typedef void ccc_any_destructor_fn(ccc_any_type);
+typedef void ccc_any_type_destructor_fn(ccc_any_type);
 
 /** @brief A callback function to determining equality between two stored keys.
 
@@ -365,7 +365,7 @@ typedef ccc_threeway_cmp ccc_any_key_cmp_fn(ccc_any_key_cmp);
 
 A reference to any aux data provided on initialization is also available.
 Return the complete hash value as determined by the user hashing algorithm. */
-typedef uint64_t ccc_any_hash_fn(ccc_any_key to_hash);
+typedef uint64_t ccc_any_key_hash_fn(ccc_any_key to_hash);
 
 /**@}*/
 
@@ -552,17 +552,17 @@ typedef ccc_handle handle;
 typedef ccc_handle_i handle_i;
 typedef ccc_result result;
 typedef ccc_threeway_cmp threeway_cmp;
-typedef ccc_any_alloc_fn any_alloc_fn;
-typedef ccc_any_cmp any_cmp;
-typedef ccc_any_key_cmp any_key_cmp;
 typedef ccc_any_type any_type;
+typedef ccc_any_type_cmp any_type_cmp;
 typedef ccc_any_key any_key;
-typedef ccc_any_cmp_fn any_cmp_fn;
-typedef ccc_any_update_fn any_update_fn;
-typedef ccc_any_destructor_fn any_destructor_fn;
+typedef ccc_any_key_cmp any_key_cmp;
+typedef ccc_any_alloc_fn any_alloc_fn;
+typedef ccc_any_type_cmp_fn any_type_cmp_fn;
+typedef ccc_any_type_update_fn any_type_update_fn;
+typedef ccc_any_type_destructor_fn any_type_destructor_fn;
 typedef ccc_any_key_eq_fn any_key_eq_fn;
 typedef ccc_any_key_cmp_fn any_key_cmp_fn;
-typedef ccc_any_hash_fn any_hash_fn;
+typedef ccc_any_key_hash_fn any_key_hash_fn;
 #    define entry_occupied(entry_ptr) ccc_entry_occupied(entry_ptr)
 #    define entry_insert_error(entry_ptr) ccc_entry_insert_error(entry_ptr)
 #    define entry_unwrap(entry_ptr) ccc_entry_unwrap(entry_ptr)

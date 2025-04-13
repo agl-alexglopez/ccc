@@ -40,7 +40,7 @@ struct ccc_dll_
     size_t dll_elem_offset_;
     size_t sz_;
     ccc_any_alloc_fn *alloc_;
-    ccc_any_cmp_fn *cmp_;
+    ccc_any_type_cmp_fn *cmp_;
     void *aux_;
 };
 

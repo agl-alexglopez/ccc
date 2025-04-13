@@ -441,7 +441,7 @@ ccc_fhm_remove_entry(ccc_fhmap_entry const *const e)
 }
 
 ccc_fhmap_entry *
-ccc_fhm_and_modify(ccc_fhmap_entry *const e, ccc_any_update_fn *const fn)
+ccc_fhm_and_modify(ccc_fhmap_entry *const e, ccc_any_type_update_fn *const fn)
 {
     if (e && fn && (e->impl_.handle_.stats_ & CCC_ENTRY_OCCUPIED) != 0)
     {
@@ -451,8 +451,8 @@ ccc_fhm_and_modify(ccc_fhmap_entry *const e, ccc_any_update_fn *const fn)
 }
 
 ccc_fhmap_entry *
-ccc_fhm_and_modify_aux(ccc_fhmap_entry *const e, ccc_any_update_fn *const fn,
-                       void *const aux)
+ccc_fhm_and_modify_aux(ccc_fhmap_entry *const e,
+                       ccc_any_type_update_fn *const fn, void *const aux)
 {
     if (e && fn && (e->impl_.handle_.stats_ & CCC_ENTRY_OCCUPIED) != 0)
     {
@@ -614,7 +614,7 @@ ccc_fhm_unwrap(ccc_fhmap_entry const *const e)
 }
 
 ccc_result
-ccc_fhm_clear(ccc_flat_hash_map *const h, ccc_any_destructor_fn *const fn)
+ccc_fhm_clear(ccc_flat_hash_map *const h, ccc_any_type_destructor_fn *const fn)
 {
     if (unlikely(!h))
     {
@@ -646,7 +646,7 @@ ccc_fhm_clear(ccc_flat_hash_map *const h, ccc_any_destructor_fn *const fn)
 
 ccc_result
 ccc_fhm_clear_and_free(ccc_flat_hash_map *const h,
-                       ccc_any_destructor_fn *const fn)
+                       ccc_any_type_destructor_fn *const fn)
 {
     if (unlikely(!h || !h->data_ || !h->mask_ || !h->init_))
     {
@@ -678,7 +678,7 @@ ccc_fhm_clear_and_free(ccc_flat_hash_map *const h,
 
 ccc_result
 ccc_fhm_clear_and_free_reserve(ccc_flat_hash_map *const h,
-                               ccc_any_destructor_fn *const destructor,
+                               ccc_any_type_destructor_fn *const destructor,
                                ccc_any_alloc_fn *const alloc)
 {
     if (unlikely(!h || !h->data_ || !h->init_ || !h->mask_

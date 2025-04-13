@@ -260,7 +260,7 @@ ccc_result ccc_fpq_erase(ccc_flat_priority_queue *fpq, void *e);
 NULL if parameters are invalid or fpq is empty.
 @warning the user must ensure e is in the fpq. */
 void *ccc_fpq_update(ccc_flat_priority_queue *fpq, void *e,
-                     ccc_any_update_fn *fn, void *aux);
+                     ccc_any_type_update_fn *fn, void *aux);
 
 /** @brief Update the user type stored in the priority queue directly. O(lgN).
 @param [in] fpq_ptr a pointer to the flat priority queue.
@@ -293,7 +293,7 @@ Note that whether the key increases or decreases does not affect runtime. */
 NULL if parameters are invalid or fpq is empty.
 @warning the user must ensure e is in the fpq. */
 void *ccc_fpq_increase(ccc_flat_priority_queue *fpq, void *e,
-                       ccc_any_update_fn *fn, void *aux);
+                       ccc_any_type_update_fn *fn, void *aux);
 
 /** @brief Increase the user type stored in the priority queue directly. O(lgN).
 @param [in] fpq_ptr a pointer to the flat priority queue.
@@ -326,7 +326,7 @@ Note that if this priority queue is min or max, the runtime is the same. */
 NULL if parameters are invalid or fpq is empty.
 @warning the user must ensure e is in the fpq. */
 void *ccc_fpq_decrease(ccc_flat_priority_queue *fpq, void *e,
-                       ccc_any_update_fn *fn, void *aux);
+                       ccc_any_type_update_fn *fn, void *aux);
 
 /** @brief Increase the user type stored in the priority queue directly. O(lgN).
 @param [in] fpq_ptr a pointer to the flat priority queue.
@@ -368,7 +368,7 @@ parts of user code as needed upon destruction of each element.
 If the destructor is NULL, the function is O(1) and no attempt is made to
 free capacity of the fpq. */
 ccc_result ccc_fpq_clear(ccc_flat_priority_queue *fpq,
-                         ccc_any_destructor_fn *fn);
+                         ccc_any_type_destructor_fn *fn);
 
 /** @brief Clears the fpq calling fn on every element if provided and frees the
 underlying buffer. O(1)-O(N).
@@ -384,7 +384,7 @@ parts of user code as needed upon destruction of each element.
 If the destructor is NULL, the function is O(1) and only relies on the runtime
 of the provided allocation function free operation. */
 ccc_result ccc_fpq_clear_and_free(ccc_flat_priority_queue *fpq,
-                                  ccc_any_destructor_fn *fn);
+                                  ccc_any_type_destructor_fn *fn);
 
 /** @brief Frees all slots in the fpq and frees the underlying buffer that was
 previously dynamically reserved with the reserve function.
@@ -412,9 +412,10 @@ to reserve memory so to is it required to free memory.
 
 This function will work normally if called on a fpq with allocation permission
 however the normal ccc_fpq_clear_and_free is sufficient for that use case. */
-ccc_result ccc_fpq_clear_and_free_reserve(ccc_flat_priority_queue *fpq,
-                                          ccc_any_destructor_fn *destructor,
-                                          ccc_any_alloc_fn *alloc);
+ccc_result
+ccc_fpq_clear_and_free_reserve(ccc_flat_priority_queue *fpq,
+                               ccc_any_type_destructor_fn *destructor,
+                               ccc_any_alloc_fn *alloc);
 
 /**@}*/
 

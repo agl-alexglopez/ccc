@@ -182,7 +182,7 @@ ccc_hom_insert_handle(ccc_homap_handle const *const h,
 }
 
 ccc_homap_handle *
-ccc_hom_and_modify(ccc_homap_handle *const h, ccc_any_update_fn *const fn)
+ccc_hom_and_modify(ccc_homap_handle *const h, ccc_any_type_update_fn *const fn)
 {
     if (!h)
     {
@@ -199,8 +199,8 @@ ccc_hom_and_modify(ccc_homap_handle *const h, ccc_any_update_fn *const fn)
 }
 
 ccc_homap_handle *
-ccc_hom_and_modify_aux(ccc_homap_handle *const h, ccc_any_update_fn *const fn,
-                       void *const aux)
+ccc_hom_and_modify_aux(ccc_homap_handle *const h,
+                       ccc_any_type_update_fn *const fn, void *const aux)
 {
     if (!h)
     {
@@ -597,7 +597,7 @@ ccc_hom_copy(ccc_handle_ordered_map *const dst,
 
 ccc_result
 ccc_hom_clear(ccc_handle_ordered_map *const hom,
-              ccc_any_destructor_fn *const fn)
+              ccc_any_type_destructor_fn *const fn)
 {
     if (!hom)
     {
@@ -623,7 +623,7 @@ ccc_hom_clear(ccc_handle_ordered_map *const hom,
 
 ccc_result
 ccc_hom_clear_and_free(ccc_handle_ordered_map *const hom,
-                       ccc_any_destructor_fn *const fn)
+                       ccc_any_type_destructor_fn *const fn)
 {
     if (!hom)
     {
@@ -647,7 +647,7 @@ ccc_hom_clear_and_free(ccc_handle_ordered_map *const hom,
 
 ccc_result
 ccc_hom_clear_and_free_reserve(ccc_handle_ordered_map *const hom,
-                               ccc_any_destructor_fn *const destructor,
+                               ccc_any_type_destructor_fn *const destructor,
                                ccc_any_alloc_fn *const alloc)
 {
     if (!hom)

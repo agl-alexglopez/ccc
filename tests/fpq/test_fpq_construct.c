@@ -13,7 +13,7 @@
 #include "types.h"
 
 static ccc_threeway_cmp
-int_cmp(ccc_any_cmp const cmp)
+int_cmp(ccc_any_type_cmp const cmp)
 {
     int a = *((int const *const)cmp.any_type_lhs);
     int b = *((int const *const)cmp.any_type_rhs);

@@ -30,7 +30,7 @@ limitations under the License.
 struct ccc_fpq_
 {
     ccc_buffer buf_;
-    ccc_any_cmp_fn *cmp_;
+    ccc_any_type_cmp_fn *cmp_;
     ccc_threeway_cmp order_;
 };
 

@@ -448,9 +448,10 @@ to subsequent calls in the Handle Interface. */
 
 This function is intended to make the function chaining in the Handle Interface
 more succinct if the handle will be modified in place based on its own value
-without the need of the auxiliary argument a ccc_any_update_fn can provide. */
+without the need of the auxiliary argument a ccc_any_type_update_fn can provide.
+*/
 [[nodiscard]] ccc_hromap_handle *ccc_hrm_and_modify(ccc_hromap_handle *h,
-                                                    ccc_any_update_fn *fn);
+                                                    ccc_any_type_update_fn *fn);
 
 /** @brief Modifies the provided handle if it is Occupied.
 @param [in] h the handle obtained from a handle function or macro.
@@ -458,10 +459,11 @@ without the need of the auxiliary argument a ccc_any_update_fn can provide. */
 @param [in] aux auxiliary data required for the update.
 @return the updated handle if it was Occupied or the unmodified vacant handle.
 
-This function makes full use of a ccc_any_update_fn capability, meaning a
+This function makes full use of a ccc_any_type_update_fn capability, meaning a
 complete ccc_update object will be passed to the update function callback. */
 [[nodiscard]] ccc_hromap_handle *
-ccc_hrm_and_modify_aux(ccc_hromap_handle *h, ccc_any_update_fn *fn, void *aux);
+ccc_hrm_and_modify_aux(ccc_hromap_handle *h, ccc_any_type_update_fn *fn,
+                       void *aux);
 
 /** @brief Modify an Occupied handle with a closure over user type T.
 @param [in] handle_realtime_ordered_map_handle_ptr a pointer to the obtained
@@ -616,7 +618,7 @@ forfeit.
 
 If NULL is passed as the destructor function time is O(1), else O(size). */
 ccc_result ccc_hrm_clear(ccc_handle_realtime_ordered_map *hrm,
-                         ccc_any_destructor_fn *fn);
+                         ccc_any_type_destructor_fn *fn);
 
 /** @brief Frees all slots in the map and frees the underlying buffer.
 @param [in] hrm the map to be cleared.
@@ -629,7 +631,7 @@ Otherwise, an OK result is returned.
 
 If NULL is passed as the destructor function time is O(1), else O(size). */
 ccc_result ccc_hrm_clear_and_free(ccc_handle_realtime_ordered_map *hrm,
-                                  ccc_any_destructor_fn *fn);
+                                  ccc_any_type_destructor_fn *fn);
 
 /** @brief Frees all slots in the hrm and frees the underlying buffer that was
 previously dynamically reserved with the reserve function.
@@ -657,9 +659,10 @@ to reserve memory so to is it required to free memory.
 
 This function will work normally if called on a hrm with allocation permission
 however the normal ccc_hrm_clear_and_free is sufficient for that use case. */
-ccc_result ccc_hrm_clear_and_free_reserve(ccc_handle_realtime_ordered_map *hrm,
-                                          ccc_any_destructor_fn *destructor,
-                                          ccc_any_alloc_fn *alloc);
+ccc_result
+ccc_hrm_clear_and_free_reserve(ccc_handle_realtime_ordered_map *hrm,
+                               ccc_any_type_destructor_fn *destructor,
+                               ccc_any_alloc_fn *alloc);
 
 /**@}*/
 
