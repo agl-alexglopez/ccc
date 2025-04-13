@@ -1040,8 +1040,8 @@ build_path_outline(struct graph *graph)
 static ccc_tribool
 eq_parent_cells(any_key_cmp const c)
 {
-    struct path_backtrack_cell const *const pc = c.any_type_rhs;
     struct point const *const p = c.any_key_lhs;
+    struct path_backtrack_cell const *const pc = c.any_type_rhs;
     return pc->current.r == p->r && pc->current.c == p->c;
 }
 

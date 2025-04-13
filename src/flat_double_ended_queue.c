@@ -497,7 +497,7 @@ static void *
 alloc_front(struct ccc_fdeq_ *const fdeq)
 {
     ccc_tribool const full
-        = maybe_resize(fdeq, 0, fdeq->buf_.alloc_) != CCC_RESULT_OK;
+        = maybe_resize(fdeq, 1, fdeq->buf_.alloc_) != CCC_RESULT_OK;
     /* Should have been able to resize. Bad error. */
     if (fdeq->buf_.alloc_ && full)
     {
@@ -516,7 +516,7 @@ static void *
 alloc_back(struct ccc_fdeq_ *const fdeq)
 {
     ccc_tribool const full
-        = maybe_resize(fdeq, 0, fdeq->buf_.alloc_) != CCC_RESULT_OK;
+        = maybe_resize(fdeq, 1, fdeq->buf_.alloc_) != CCC_RESULT_OK;
     /* Should have been able to resize. Bad error. */
     if (fdeq->buf_.alloc_ && full)
     {
@@ -695,7 +695,7 @@ maybe_resize(struct ccc_fdeq_ *const q, size_t const additional_elems_to_add,
     {
         return CCC_RESULT_ARG_ERROR;
     }
-    if (required < q->buf_.capacity_)
+    if (required <= q->buf_.capacity_)
     {
         return CCC_RESULT_OK;
     }
