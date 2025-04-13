@@ -185,9 +185,9 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Deallocation Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Deallocate the container. </p>
 </td></tr>
-<tr class="memitem:ae92a3623c7bdfdd9ace703e2e18879d5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="doubly__linked__list_8h.html#ae92a3623c7bdfdd9ace703e2e18879d5">ccc_dll_clear</a> (<a class="el" href="doubly__linked__list_8h.html#aaceb2c981b30f064750203fcb938e774">ccc_doubly_linked_list</a> *l, <a class="el" href="types_8h.html#a1d51325017588215973073a4de4f90e1">ccc_destructor_fn</a> *fn)</td></tr>
-<tr class="memdesc:ae92a3623c7bdfdd9ace703e2e18879d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear the contents of the list freeing elements, if given allocation permission. O(N).  <br /></td></tr>
-<tr class="separator:ae92a3623c7bdfdd9ace703e2e18879d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab69969a0a08b347d3c28ce4ba96fde84"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="doubly__linked__list_8h.html#ab69969a0a08b347d3c28ce4ba96fde84">ccc_dll_clear</a> (<a class="el" href="doubly__linked__list_8h.html#aaceb2c981b30f064750203fcb938e774">ccc_doubly_linked_list</a> *l, <a class="el" href="types_8h.html#a97f231bd3df31cb2730e3304d4cc1dd2">ccc_any_type_destructor_fn</a> *fn)</td></tr>
+<tr class="memdesc:ab69969a0a08b347d3c28ce4ba96fde84"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear the contents of the list freeing elements, if given allocation permission. O(N).  <br /></td></tr>
+<tr class="separator:ab69969a0a08b347d3c28ce4ba96fde84"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Iteration Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Iterate through the doubly linked list. </p>
@@ -383,7 +383,7 @@ This graph shows which files directly or indirectly include this file:</div>
     <tr><td class="paramdir">[in]</td><td class="paramname">list_name</td><td>the name of the list being initialized. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">struct_name</td><td>the type containing the intrusive dll element. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">list_elem_field</td><td>name of the dll element in the containing type. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">cmp_fn</td><td>the ccc_cmp_fn used to compare list elements. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">cmp_fn</td><td>the ccc_any_type_cmp_fn used to compare list elements. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">aux_data</td><td>any auxilliary data that will be needed for comparison, printing, or destruction of elements. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">alloc_fn</td><td>the optional allocation function or NULL. </td></tr>
   </table>
@@ -511,8 +511,8 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="ae92a3623c7bdfdd9ace703e2e18879d5" name="ae92a3623c7bdfdd9ace703e2e18879d5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae92a3623c7bdfdd9ace703e2e18879d5">&#9670;&#160;</a></span>ccc_dll_clear()</h2>
+<a id="ab69969a0a08b347d3c28ce4ba96fde84" name="ab69969a0a08b347d3c28ce4ba96fde84"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab69969a0a08b347d3c28ce4ba96fde84">&#9670;&#160;</a></span>ccc_dll_clear()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -526,7 +526,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="types_8h.html#a1d51325017588215973073a4de4f90e1">ccc_destructor_fn</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a97f231bd3df31cb2730e3304d4cc1dd2">ccc_any_type_destructor_fn</a> *&#160;</td>
           <td class="paramname"><em>fn</em>&#160;</td>
         </tr>
         <tr>

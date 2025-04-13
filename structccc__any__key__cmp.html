@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.6"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>C Container Collection (CCC): ccc_key_cmp Struct Reference</title>
+<title>C Container Collection (CCC): ccc_any_key_cmp Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -64,7 +64,7 @@ $(function() {
 </div>
 <script type="text/javascript">
 /* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-$(document).ready(function(){initNavTree('structccc__key__cmp.html',''); initResizable(); });
+$(document).ready(function(){initNavTree('structccc__any__key__cmp.html',''); initResizable(); });
 /* @license-end */
 </script>
 <div id="doc-content">
@@ -92,36 +92,55 @@ $(document).ready(function(){initNavTree('structccc__key__cmp.html',''); initRes
 <div class="header">
   <div class="summary">
 <a href="#pub-attribs">Data Fields</a>  </div>
-  <div class="headertitle"><div class="title">ccc_key_cmp Struct Reference</div></div>
+  <div class="headertitle"><div class="title">ccc_any_key_cmp Struct Reference</div></div>
 </div><!--header-->
 <div class="contents">
 
 <p>A key comparison helper to avoid argument swapping.  
- <a href="structccc__key__cmp.html#details">More...</a></p>
+ <a href="structccc__any__key__cmp.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="types_8h_source.html">types.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Data Fields</h2></td></tr>
-<tr class="memitem:a6077551b8a72a5149f78b81f3cb90951"><td class="memItemLeft" align="right" valign="top">void const  *const&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structccc__key__cmp.html#a6077551b8a72a5149f78b81f3cb90951">key_lhs</a></td></tr>
-<tr class="separator:a6077551b8a72a5149f78b81f3cb90951"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a419bb22ec9d8ac27145810dc3942a497"><td class="memItemLeft" align="right" valign="top">void const  *const&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structccc__key__cmp.html#a419bb22ec9d8ac27145810dc3942a497">any_type_rhs</a></td></tr>
-<tr class="separator:a419bb22ec9d8ac27145810dc3942a497"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a23dddc57d282e435d6f1aba0cd4f2755"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structccc__key__cmp.html#a23dddc57d282e435d6f1aba0cd4f2755">aux</a></td></tr>
-<tr class="separator:a23dddc57d282e435d6f1aba0cd4f2755"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8807e0158db2b07d5114afec5a246ef7"><td class="memItemLeft" align="right" valign="top">void const  *const&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structccc__any__key__cmp.html#a8807e0158db2b07d5114afec5a246ef7">any_key_lhs</a></td></tr>
+<tr class="separator:a8807e0158db2b07d5114afec5a246ef7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab2ea2359ce47472b625ef49401f268b5"><td class="memItemLeft" align="right" valign="top">void const  *const&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structccc__any__key__cmp.html#ab2ea2359ce47472b625ef49401f268b5">any_type_rhs</a></td></tr>
+<tr class="separator:ab2ea2359ce47472b625ef49401f268b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a524c37065549851e1685d4ce5b5e9e89"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structccc__any__key__cmp.html#a524c37065549851e1685d4ce5b5e9e89">aux</a></td></tr>
+<tr class="separator:a524c37065549851e1685d4ce5b5e9e89"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A key comparison helper to avoid argument swapping. </p>
-<p>The key is considered the left hand side of the operation if three-way comparison is needed. Left and right do not matter if equality is needed. </p>
+<p>The key is considered the left hand side of the operation if three-way comparison is needed. Left and right do not matter if equality is needed. Note a comparison is taking place between the key on the left hand side and the complete user type on the right hand side. This means the right hand side will need to manually access its key field.</p>
+<div class="fragment"><div class="line"><span class="keywordtype">int</span> <span class="keyword">const</span> *<span class="keyword">const</span> my_key = cmp.any_key_lhs;</div>
+<div class="line"><span class="keyword">struct </span>key_val const *<span class="keyword">const</span> my_type  = cmp.any_type_rhs;</div>
+<div class="line"><span class="keywordflow">return</span> *my_key == my_type-&gt;key;</div>
+</div><!-- fragment --><p>Notice that the user type must access its key field of its struct. Comparison must happen this way to support searching by key in associative containers rather than by entire user struct. Only needing to provide a key can save significant memory for a search depending on the size of the user type. </p>
 </div><h2 class="groupheader">Field Documentation</h2>
-<a id="a419bb22ec9d8ac27145810dc3942a497" name="a419bb22ec9d8ac27145810dc3942a497"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a419bb22ec9d8ac27145810dc3942a497">&#9670;&#160;</a></span>any_type_rhs</h2>
+<a id="a8807e0158db2b07d5114afec5a246ef7" name="a8807e0158db2b07d5114afec5a246ef7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8807e0158db2b07d5114afec5a246ef7">&#9670;&#160;</a></span>any_key_lhs</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void const* const ccc_key_cmp::any_type_rhs</td>
+          <td class="memname">void const* const ccc_any_key_cmp::any_key_lhs</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Key matching the key field of the provided type to the container. </p>
+
+</div>
+</div>
+<a id="ab2ea2359ce47472b625ef49401f268b5" name="ab2ea2359ce47472b625ef49401f268b5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab2ea2359ce47472b625ef49401f268b5">&#9670;&#160;</a></span>any_type_rhs</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void const* const ccc_any_key_cmp::any_type_rhs</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -129,33 +148,18 @@ Data Fields</h2></td></tr>
 
 </div>
 </div>
-<a id="a23dddc57d282e435d6f1aba0cd4f2755" name="a23dddc57d282e435d6f1aba0cd4f2755"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a23dddc57d282e435d6f1aba0cd4f2755">&#9670;&#160;</a></span>aux</h2>
+<a id="a524c37065549851e1685d4ce5b5e9e89" name="a524c37065549851e1685d4ce5b5e9e89"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a524c37065549851e1685d4ce5b5e9e89">&#9670;&#160;</a></span>aux</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void* ccc_key_cmp::aux</td>
+          <td class="memname">void* ccc_any_key_cmp::aux</td>
         </tr>
       </table>
 </div><div class="memdoc">
 <p>A reference to aux data provided to the container on initialization. </p>
-
-</div>
-</div>
-<a id="a6077551b8a72a5149f78b81f3cb90951" name="a6077551b8a72a5149f78b81f3cb90951"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6077551b8a72a5149f78b81f3cb90951">&#9670;&#160;</a></span>key_lhs</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void const* const ccc_key_cmp::key_lhs</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Key matching the key field of the provided type to the container. </p>
 
 </div>
 </div>
@@ -167,7 +171,7 @@ Data Fields</h2></td></tr>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="structccc__key__cmp.html">ccc_key_cmp</a></li>
+    <li class="navelem"><a class="el" href="structccc__any__key__cmp.html">ccc_any_key_cmp</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.6 </li>
   </ul>
 </div>

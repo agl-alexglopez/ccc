@@ -147,9 +147,9 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Insert and Remove Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>These functions assume contiguity of elements in the buffer and increase or decrease size accordingly. </p>
 </td></tr>
-<tr class="memitem:ae2359dd2088ea0cd0b7bfb8260cbaa66"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#ae2359dd2088ea0cd0b7bfb8260cbaa66">ccc_buf_alloc</a> (<a class="el" href="buffer_8h.html#a7d8dfe1437e87b31e7f5522d85080aba">ccc_buffer</a> *buf, size_t capacity, <a class="el" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a> *fn)</td></tr>
-<tr class="memdesc:ae2359dd2088ea0cd0b7bfb8260cbaa66"><td class="mdescLeft">&#160;</td><td class="mdescRight">allocates the buffer to the specified size according to the user defined allocation function.  <br /></td></tr>
-<tr class="separator:ae2359dd2088ea0cd0b7bfb8260cbaa66"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af19f6df15e7f313da0d76bf7443906bb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#af19f6df15e7f313da0d76bf7443906bb">ccc_buf_alloc</a> (<a class="el" href="buffer_8h.html#a7d8dfe1437e87b31e7f5522d85080aba">ccc_buffer</a> *buf, size_t capacity, <a class="el" href="types_8h.html#a3e73202894869d2840fb21ff912bbd96">ccc_any_alloc_fn</a> *fn)</td></tr>
+<tr class="memdesc:af19f6df15e7f313da0d76bf7443906bb"><td class="mdescLeft">&#160;</td><td class="mdescRight">allocates the buffer to the specified size according to the user defined allocation function.  <br /></td></tr>
+<tr class="separator:af19f6df15e7f313da0d76bf7443906bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a176afe75a0442da95a8663efbb6ec8b3"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a176afe75a0442da95a8663efbb6ec8b3">ccc_buf_alloc_back</a> (<a class="el" href="buffer_8h.html#a7d8dfe1437e87b31e7f5522d85080aba">ccc_buffer</a> *buf)</td></tr>
 <tr class="memdesc:a176afe75a0442da95a8663efbb6ec8b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">allocates a new slot from the buffer at the end of the contiguous array. A slot is equivalent to one of the element type specified when the buffer is initialized.  <br /></td></tr>
 <tr class="separator:a176afe75a0442da95a8663efbb6ec8b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -305,7 +305,7 @@ This graph shows which files directly or indirectly include this file:</div>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">mem_ptr</td><td>the pointer to existing memory or ((Type *)NULL). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">alloc_fn</td><td>ccc_alloc_fn or NULL if no allocation is permitted. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">alloc_fn</td><td>ccc_any_alloc_fn or NULL if no allocation is permitted. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">aux_data</td><td>any auxiliary data needed for managing buffer memory. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">capacity</td><td>the capacity of memory at mem_ptr. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">optional_size</td><td>optional starting size of the buffer &lt;= capacity. </td></tr>
@@ -338,8 +338,8 @@ This graph shows which files directly or indirectly include this file:</div>
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="ae2359dd2088ea0cd0b7bfb8260cbaa66" name="ae2359dd2088ea0cd0b7bfb8260cbaa66"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae2359dd2088ea0cd0b7bfb8260cbaa66">&#9670;&#160;</a></span>ccc_buf_alloc()</h2>
+<a id="af19f6df15e7f313da0d76bf7443906bb" name="af19f6df15e7f313da0d76bf7443906bb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af19f6df15e7f313da0d76bf7443906bb">&#9670;&#160;</a></span>ccc_buf_alloc()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -359,7 +359,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a3e73202894869d2840fb21ff912bbd96">ccc_any_alloc_fn</a> *&#160;</td>
           <td class="paramname"><em>fn</em>&#160;</td>
         </tr>
         <tr>

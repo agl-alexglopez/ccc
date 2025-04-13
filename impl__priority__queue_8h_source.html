@@ -116,8 +116,8 @@ $(document).ready(function(){initNavTree('impl__priority__queue_8h_source.html',
 <div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>    <span class="keywordtype">size_t</span> sz_;</div>
 <div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>    <span class="keywordtype">size_t</span> pq_elem_offset_;</div>
 <div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>    <span class="keywordtype">size_t</span> elem_sz_;</div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>    <a class="code hl_typedef" href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a> *alloc_;</div>
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>    <a class="code hl_typedef" href="types_8h.html#a78ab7f61b1a36b2f31c2289bd6236231">ccc_cmp_fn</a> *cmp_;</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>    <a class="code hl_typedef" href="types_8h.html#a3e73202894869d2840fb21ff912bbd96">ccc_any_alloc_fn</a> *alloc_;</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>    <a class="code hl_typedef" href="types_8h.html#a36055bd5f8a938ab6ffb246fa0fa8f6a">ccc_any_type_cmp_fn</a> *cmp_;</div>
 <div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>    <a class="code hl_enumeration" href="types_8h.html#afa7f5d9756840807860490d28e345955">ccc_threeway_cmp</a> order_;</div>
 <div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>    <span class="keywordtype">void</span> *aux_;</div>
 <div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>};</div>
@@ -219,8 +219,8 @@ $(document).ready(function(){initNavTree('impl__priority__queue_8h_source.html',
 <div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span><span class="comment">/* NOLINTEND(readability-identifier-naming) */</span></div>
 <div class="line"><a id="l00154" name="l00154"></a><span class="lineno">  154</span> </div>
 <div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span><span class="preprocessor">#endif </span><span class="comment">/* CCC_IMPL_PRIORITY_QUEUE_H */</span><span class="preprocessor"></span></div>
-<div class="ttc" id="atypes_8h_html_a78ab7f61b1a36b2f31c2289bd6236231"><div class="ttname"><a href="types_8h.html#a78ab7f61b1a36b2f31c2289bd6236231">ccc_cmp_fn</a></div><div class="ttdeci">ccc_threeway_cmp ccc_cmp_fn(ccc_cmp)</div><div class="ttdoc">A callback function for comparing two elements in a container.</div><div class="ttdef"><b>Definition:</b> types.h:306</div></div>
-<div class="ttc" id="atypes_8h_html_a8be6e2d1b150a5b77b2eba5ae85764f2"><div class="ttname"><a href="types_8h.html#a8be6e2d1b150a5b77b2eba5ae85764f2">ccc_alloc_fn</a></div><div class="ttdeci">void * ccc_alloc_fn(void *ptr, size_t size, void *aux)</div><div class="ttdoc">An allocation function at the core of all containers.</div><div class="ttdef"><b>Definition:</b> types.h:298</div></div>
+<div class="ttc" id="atypes_8h_html_a36055bd5f8a938ab6ffb246fa0fa8f6a"><div class="ttname"><a href="types_8h.html#a36055bd5f8a938ab6ffb246fa0fa8f6a">ccc_any_type_cmp_fn</a></div><div class="ttdeci">ccc_threeway_cmp ccc_any_type_cmp_fn(ccc_any_type_cmp)</div><div class="ttdoc">A callback function for comparing two elements in a container.</div><div class="ttdef"><b>Definition:</b> types.h:320</div></div>
+<div class="ttc" id="atypes_8h_html_a3e73202894869d2840fb21ff912bbd96"><div class="ttname"><a href="types_8h.html#a3e73202894869d2840fb21ff912bbd96">ccc_any_alloc_fn</a></div><div class="ttdeci">void * ccc_any_alloc_fn(void *ptr, size_t size, void *aux)</div><div class="ttdoc">An allocation function at the core of all containers.</div><div class="ttdef"><b>Definition:</b> types.h:312</div></div>
 <div class="ttc" id="atypes_8h_html_afa7f5d9756840807860490d28e345955"><div class="ttname"><a href="types_8h.html#afa7f5d9756840807860490d28e345955">ccc_threeway_cmp</a></div><div class="ttdeci">ccc_threeway_cmp</div><div class="ttdoc">A three-way comparison for comparison functions.</div><div class="ttdef"><b>Definition:</b> types.h:153</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->

@@ -8,7 +8,7 @@ var doubly__linked__list_8h =
     [ "ccc_dll_back", "doubly__linked__list_8h.html#abea7c774a00b9e84da26660d20a0b1ac", null ],
     [ "ccc_dll_begin", "doubly__linked__list_8h.html#a6659ba404965e290896edf2db6f85520", null ],
     [ "ccc_dll_begin_elem", "doubly__linked__list_8h.html#a1cd9b16a6fe36296e4d95e2791b31a9e", null ],
-    [ "ccc_dll_clear", "doubly__linked__list_8h.html#ae92a3623c7bdfdd9ace703e2e18879d5", null ],
+    [ "ccc_dll_clear", "doubly__linked__list_8h.html#ab69969a0a08b347d3c28ce4ba96fde84", null ],
     [ "ccc_dll_end", "doubly__linked__list_8h.html#aeb49ed9a729d52de6624f37e1931b7f8", null ],
     [ "ccc_dll_end_elem", "doubly__linked__list_8h.html#a4af4285ea65140865e2509f0ac1674be", null ],
     [ "ccc_dll_end_sentinel", "doubly__linked__list_8h.html#a5bcc2bddcba3de980eff5c3142ba3687", null ],

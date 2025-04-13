@@ -2,7 +2,7 @@ var buffer_8h =
 [
     [ "ccc_buf_init", "buffer_8h.html#a66b89d47e24996c7be07dea5d827e649", null ],
     [ "ccc_buffer", "buffer_8h.html#a7d8dfe1437e87b31e7f5522d85080aba", null ],
-    [ "ccc_buf_alloc", "buffer_8h.html#ae2359dd2088ea0cd0b7bfb8260cbaa66", null ],
+    [ "ccc_buf_alloc", "buffer_8h.html#af19f6df15e7f313da0d76bf7443906bb", null ],
     [ "ccc_buf_alloc_back", "buffer_8h.html#a176afe75a0442da95a8663efbb6ec8b3", null ],
     [ "ccc_buf_at", "buffer_8h.html#a5f45a54a635295a962f520afcf61f3ad", null ],
     [ "ccc_buf_back", "buffer_8h.html#a63e900d415ab4c7fca82ad65756d9b6a", null ],
