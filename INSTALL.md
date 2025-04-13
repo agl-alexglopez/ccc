@@ -83,7 +83,7 @@ make clang-ccc ~/.local
 Then the installation looks like this.
 
 ```txt
-install
+~/.local
 ├── include
 │   └── ccc
 │       ├── buffer.h
