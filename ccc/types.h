@@ -207,21 +207,35 @@ typedef struct
     void const *const any_type_rhs;
     /** A reference to aux data provided to container on initialization. */
     void *aux;
-} ccc_cmp;
+} ccc_any_cmp;
 
 /** @brief A key comparison helper to avoid argument swapping.
 
 The key is considered the left hand side of the operation if three-way
-comparison is needed. Left and right do not matter if equality is needed. */
+comparison is needed. Left and right do not matter if equality is needed. Note
+a comparison is taking place between the key on the left hand side and the
+complete user type on the right hand side. This means the right hand side will
+need to manually access its key field.
+
+```
+int const *const my_key = cmp.any_key_lhs;
+struct key_val const *const my_type  = cmp.any_type_rhs;
+return *my_key == my_type->key;
+```
+
+Notice that the user type must access its key field of its struct. Comparison
+must happen this way to support searching by key in associative containers
+rather than by entire user struct. Only needing to provide a key can save
+significant memory for a search depending on the size of the user type. */
 typedef struct
 {
     /** Key matching the key field of the provided type to the container. */
-    void const *const key_lhs;
+    void const *const any_key_lhs;
     /** The complete user type stored in the container. */
     void const *const any_type_rhs;
     /** A reference to aux data provided to the container on initialization. */
     void *aux;
-} ccc_key_cmp;
+} ccc_any_key_cmp;
 
 /** @brief A reference to a user type within the container.
 
@@ -295,7 +309,7 @@ is used. Any allocator that implements the required behavior is sufficient.
 For example programs that utilize the aux parameter, see the sample programs.
 Using custom arena allocators or container compositions are cases when aux is
 needed. */
-typedef void *ccc_alloc_fn(void *ptr, size_t size, void *aux);
+typedef void *ccc_any_alloc_fn(void *ptr, size_t size, void *aux);
 
 /** @brief A callback function for comparing two elements in a container.
 
@@ -303,7 +317,7 @@ A three-way comparison return value is expected and the two containers being
 compared are guaranteed to be non-NULL and pointing to the base of the user type
 stored in the container. Aux may be NULL if no aux is provided on
 initialization. */
-typedef ccc_threeway_cmp ccc_cmp_fn(ccc_cmp);
+typedef ccc_threeway_cmp ccc_any_cmp_fn(ccc_any_cmp);
 
 /** @brief A callback function for modifying an element in the container.
 
@@ -312,7 +326,7 @@ is available. The container pointer points to the base of the user type and is
 not NULL. Aux may be NULL if no aux is provided on initialization. An update
 function is used when a container Interface exposes functions to modify the key
 or value used to determine sorted order of elements in the container. */
-typedef void ccc_update_fn(ccc_any_type);
+typedef void ccc_any_update_fn(ccc_any_type);
 
 /** @brief A callback function for destroying an element in the container.
 
@@ -330,7 +344,7 @@ container frees. If the user has not given permission to the container to
 allocate memory, this a good function in which to free each element, if
 desired; any program state can be maintained then the element can be freed by
 the user in this function as the final step. */
-typedef void ccc_destructor_fn(ccc_any_type);
+typedef void ccc_any_destructor_fn(ccc_any_type);
 
 /** @brief A callback function to determining equality between two stored keys.
 
@@ -338,20 +352,20 @@ The function should return CCC_TRUE if the key and key field in the user type
 are equivalent, else CCC_FALSE.
 @note a callback need not return CCC_TRIBOOL_ERROR as the container code always
 provides data to the arguments of the function invariantly. */
-typedef ccc_tribool ccc_key_eq_fn(ccc_key_cmp);
+typedef ccc_tribool ccc_any_key_eq_fn(ccc_any_key_cmp);
 
 /** @brief A callback function for three-way comparing two stored keys.
 
 The key is considered the left hand side of the comparison. The function should
 return CCC_LES if the key is less than the key in key field of user type,
 CCC_EQL if equal, and CCC_GRT if greater. */
-typedef ccc_threeway_cmp ccc_key_cmp_fn(ccc_key_cmp);
+typedef ccc_threeway_cmp ccc_any_key_cmp_fn(ccc_any_key_cmp);
 
 /** @brief A callback function to hash the key type used in a container.
 
 A reference to any aux data provided on initialization is also available.
 Return the complete hash value as determined by the user hashing algorithm. */
-typedef uint64_t ccc_hash_fn(ccc_any_key to_hash);
+typedef uint64_t ccc_any_hash_fn(ccc_any_key to_hash);
 
 /**@}*/
 
@@ -538,17 +552,17 @@ typedef ccc_handle handle;
 typedef ccc_handle_i handle_i;
 typedef ccc_result result;
 typedef ccc_threeway_cmp threeway_cmp;
-typedef ccc_cmp cmp;
-typedef ccc_key_cmp key_cmp;
+typedef ccc_any_alloc_fn any_alloc_fn;
+typedef ccc_any_cmp any_cmp;
+typedef ccc_any_key_cmp any_key_cmp;
 typedef ccc_any_type any_type;
 typedef ccc_any_key any_key;
-typedef ccc_alloc_fn alloc_fn;
-typedef ccc_cmp_fn cmp_fn;
-typedef ccc_update_fn update_fn;
-typedef ccc_destructor_fn destructor_fn;
-typedef ccc_key_eq_fn key_eq_fn;
-typedef ccc_key_cmp_fn key_cmp_fn;
-typedef ccc_hash_fn hash_fn;
+typedef ccc_any_cmp_fn any_cmp_fn;
+typedef ccc_any_update_fn any_update_fn;
+typedef ccc_any_destructor_fn any_destructor_fn;
+typedef ccc_any_key_eq_fn any_key_eq_fn;
+typedef ccc_any_key_cmp_fn any_key_cmp_fn;
+typedef ccc_any_hash_fn any_hash_fn;
 #    define entry_occupied(entry_ptr) ccc_entry_occupied(entry_ptr)
 #    define entry_insert_error(entry_ptr) ccc_entry_insert_error(entry_ptr)
 #    define entry_unwrap(entry_ptr) ccc_entry_unwrap(entry_ptr)

@@ -40,8 +40,8 @@ struct ccc_pq_
     size_t sz_;
     size_t pq_elem_offset_;
     size_t elem_sz_;
-    ccc_alloc_fn *alloc_;
-    ccc_cmp_fn *cmp_;
+    ccc_any_alloc_fn *alloc_;
+    ccc_any_cmp_fn *cmp_;
     ccc_threeway_cmp order_;
     void *aux_;
 };

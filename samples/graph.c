@@ -282,8 +282,8 @@ static struct int_conversion parse_digits(str_view, int lower_bound,
 static struct path_request parse_path_request(struct graph *, str_view);
 static void help(void);
 
-static threeway_cmp cmp_pq_costs(cmp);
-static ccc_tribool eq_parent_cells(key_cmp);
+static threeway_cmp cmp_pq_costs(any_cmp);
+static ccc_tribool eq_parent_cells(any_key_cmp);
 static uint64_t hash_parent_cells(any_key point_struct);
 static uint64_t hash_64_bits(uint64_t);
 
@@ -1038,10 +1038,10 @@ build_path_outline(struct graph *graph)
 /*====================    Data Structure Helpers    =========================*/
 
 static ccc_tribool
-eq_parent_cells(key_cmp const c)
+eq_parent_cells(any_key_cmp const c)
 {
     struct path_backtrack_cell const *const pc = c.any_type_rhs;
-    struct point const *const p = c.key_lhs;
+    struct point const *const p = c.any_key_lhs;
     return pc->current.r == p->r && pc->current.c == p->c;
 }
 
@@ -1054,7 +1054,7 @@ hash_parent_cells(any_key const point_struct)
 }
 
 static threeway_cmp
-cmp_pq_costs(cmp const cost_cmp)
+cmp_pq_costs(any_cmp const cost_cmp)
 {
     struct dijkstra_vertex const *const a = cost_cmp.any_type_lhs;
     struct dijkstra_vertex const *const b = cost_cmp.any_type_rhs;

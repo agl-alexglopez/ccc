@@ -254,7 +254,8 @@ ccc_sll_next(ccc_singly_linked_list const *const sll,
 }
 
 ccc_result
-ccc_sll_clear(ccc_singly_linked_list *const sll, ccc_destructor_fn *const fn)
+ccc_sll_clear(ccc_singly_linked_list *const sll,
+              ccc_any_destructor_fn *const fn)
 {
     if (!sll)
     {

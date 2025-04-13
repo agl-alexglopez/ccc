@@ -20,7 +20,7 @@ enum push_end
     UTIL_PUSH_BACK,
 };
 
-ccc_threeway_cmp val_cmp(ccc_cmp);
+ccc_threeway_cmp val_cmp(ccc_any_cmp);
 
 enum check_result check_order(ccc_doubly_linked_list const *, size_t n,
                               int const order[]);

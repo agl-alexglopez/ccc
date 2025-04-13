@@ -59,8 +59,8 @@ struct ccc_ommap_
 {
     struct ccc_ommap_elem_ *root_;
     struct ccc_ommap_elem_ end_;
-    ccc_alloc_fn *alloc_;
-    ccc_key_cmp_fn *cmp_;
+    ccc_any_alloc_fn *alloc_;
+    ccc_any_key_cmp_fn *cmp_;
     void *aux_;
     size_t size_;
     size_t elem_sz_;

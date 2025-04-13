@@ -29,7 +29,7 @@ enum : size_t
 
 /*==========================    Prototypes    ===============================*/
 
-static ccc_result maybe_resize(struct ccc_fdeq_ *, size_t, ccc_alloc_fn *);
+static ccc_result maybe_resize(struct ccc_fdeq_ *, size_t, ccc_any_alloc_fn *);
 static size_t index_of(struct ccc_fdeq_ const *, void const *);
 static void *at(struct ccc_fdeq_ const *, size_t i);
 static size_t increment(struct ccc_fdeq_ const *, size_t i);
@@ -285,7 +285,7 @@ ccc_fdeq_data(ccc_flat_double_ended_queue const *const fdeq)
 ccc_result
 ccc_fdeq_copy(ccc_flat_double_ended_queue *const dst,
               ccc_flat_double_ended_queue const *const src,
-              ccc_alloc_fn *const fn)
+              ccc_any_alloc_fn *const fn)
 {
     if (!dst || !src || src == dst
         || (dst->buf_.capacity_ < src->buf_.capacity_ && !fn))
@@ -299,7 +299,7 @@ ccc_fdeq_copy(ccc_flat_double_ended_queue *const dst,
        is a ring buffer or dynamic fdeq. */
     void *const dst_mem = dst->buf_.mem_;
     size_t const dst_cap = dst->buf_.capacity_;
-    ccc_alloc_fn *const dst_alloc = dst->buf_.alloc_;
+    ccc_any_alloc_fn *const dst_alloc = dst->buf_.alloc_;
     *dst = *src;
     dst->buf_.mem_ = dst_mem;
     dst->buf_.capacity_ = dst_cap;
@@ -346,7 +346,7 @@ ccc_fdeq_copy(ccc_flat_double_ended_queue *const dst,
 
 ccc_result
 ccc_fdeq_reserve(ccc_flat_double_ended_queue *const fdeq, size_t const to_add,
-                 ccc_alloc_fn *const fn)
+                 ccc_any_alloc_fn *const fn)
 {
     if (!fdeq || !fn)
     {
@@ -357,7 +357,7 @@ ccc_fdeq_reserve(ccc_flat_double_ended_queue *const fdeq, size_t const to_add,
 
 ccc_result
 ccc_fdeq_clear(ccc_flat_double_ended_queue *const fdeq,
-               ccc_destructor_fn *const destructor)
+               ccc_any_destructor_fn *const destructor)
 {
     if (!fdeq)
     {
@@ -379,7 +379,7 @@ ccc_fdeq_clear(ccc_flat_double_ended_queue *const fdeq,
 
 ccc_result
 ccc_fdeq_clear_and_free(ccc_flat_double_ended_queue *const fdeq,
-                        ccc_destructor_fn *const destructor)
+                        ccc_any_destructor_fn *const destructor)
 {
     if (!fdeq)
     {
@@ -406,8 +406,8 @@ ccc_fdeq_clear_and_free(ccc_flat_double_ended_queue *const fdeq,
 
 ccc_result
 ccc_fdeq_clear_and_free_reserve(ccc_flat_double_ended_queue *const fdeq,
-                                ccc_destructor_fn *const destructor,
-                                ccc_alloc_fn *const alloc)
+                                ccc_any_destructor_fn *const destructor,
+                                ccc_any_alloc_fn *const alloc)
 {
     if (!fdeq)
     {
@@ -688,7 +688,7 @@ push_range(struct ccc_fdeq_ *const fdeq, char const *const pos, size_t n,
 
 static ccc_result
 maybe_resize(struct ccc_fdeq_ *const q, size_t const additional_elems_to_add,
-             ccc_alloc_fn *const fn)
+             ccc_any_alloc_fn *const fn)
 {
     size_t required = q->buf_.sz_ + additional_elems_to_add;
     if (required < q->buf_.sz_)

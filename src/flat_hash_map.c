@@ -265,13 +265,13 @@ static ccc_ucount find_key(struct ccc_fhmap_ const *h, void const *key,
 static size_t find_existing_insert_slot(struct ccc_fhmap_ const *h,
                                         uint64_t hash);
 static ccc_result maybe_rehash(struct ccc_fhmap_ *h, size_t to_add,
-                               ccc_alloc_fn);
+                               ccc_any_alloc_fn);
 static void insert_and_copy(struct ccc_fhmap_ *h, void const *key_val_type,
                             ccc_fhm_tag m, size_t i);
 static void erase(struct ccc_fhmap_ *h, size_t i);
 static void rehash_in_place(struct ccc_fhmap_ *h);
 static ccc_result rehash_resize(struct ccc_fhmap_ *h, size_t to_add,
-                                ccc_alloc_fn);
+                                ccc_any_alloc_fn);
 static void *key_at(struct ccc_fhmap_ const *h, size_t i);
 static void *data_at(struct ccc_fhmap_ const *h, size_t i);
 static void *key_in_slot(struct ccc_fhmap_ const *h, void const *slot);
@@ -441,7 +441,7 @@ ccc_fhm_remove_entry(ccc_fhmap_entry const *const e)
 }
 
 ccc_fhmap_entry *
-ccc_fhm_and_modify(ccc_fhmap_entry *const e, ccc_update_fn *const fn)
+ccc_fhm_and_modify(ccc_fhmap_entry *const e, ccc_any_update_fn *const fn)
 {
     if (e && fn && (e->impl_.handle_.stats_ & CCC_ENTRY_OCCUPIED) != 0)
     {
@@ -451,7 +451,7 @@ ccc_fhm_and_modify(ccc_fhmap_entry *const e, ccc_update_fn *const fn)
 }
 
 ccc_fhmap_entry *
-ccc_fhm_and_modify_aux(ccc_fhmap_entry *const e, ccc_update_fn *const fn,
+ccc_fhm_and_modify_aux(ccc_fhmap_entry *const e, ccc_any_update_fn *const fn,
                        void *const aux)
 {
     if (e && fn && (e->impl_.handle_.stats_ & CCC_ENTRY_OCCUPIED) != 0)
@@ -614,7 +614,7 @@ ccc_fhm_unwrap(ccc_fhmap_entry const *const e)
 }
 
 ccc_result
-ccc_fhm_clear(ccc_flat_hash_map *const h, ccc_destructor_fn *const fn)
+ccc_fhm_clear(ccc_flat_hash_map *const h, ccc_any_destructor_fn *const fn)
 {
     if (unlikely(!h))
     {
@@ -645,7 +645,8 @@ ccc_fhm_clear(ccc_flat_hash_map *const h, ccc_destructor_fn *const fn)
 }
 
 ccc_result
-ccc_fhm_clear_and_free(ccc_flat_hash_map *const h, ccc_destructor_fn *const fn)
+ccc_fhm_clear_and_free(ccc_flat_hash_map *const h,
+                       ccc_any_destructor_fn *const fn)
 {
     if (unlikely(!h || !h->data_ || !h->mask_ || !h->init_))
     {
@@ -677,8 +678,8 @@ ccc_fhm_clear_and_free(ccc_flat_hash_map *const h, ccc_destructor_fn *const fn)
 
 ccc_result
 ccc_fhm_clear_and_free_reserve(ccc_flat_hash_map *const h,
-                               ccc_destructor_fn *const destructor,
-                               ccc_alloc_fn *const alloc)
+                               ccc_any_destructor_fn *const destructor,
+                               ccc_any_alloc_fn *const alloc)
 {
     if (unlikely(!h || !h->data_ || !h->init_ || !h->mask_
                  || (h->alloc_fn_ && h->alloc_fn_ != alloc)))
@@ -748,7 +749,7 @@ ccc_fhm_data(ccc_flat_hash_map const *h)
 
 ccc_result
 ccc_fhm_copy(ccc_flat_hash_map *const dst, ccc_flat_hash_map const *const src,
-             ccc_alloc_fn *const fn)
+             ccc_any_alloc_fn *const fn)
 {
     if (!dst || !src || src == dst
         || (src->mask_ && !is_power_of_two(src->mask_ + 1)))
@@ -767,7 +768,7 @@ ccc_fhm_copy(ccc_flat_hash_map *const dst, ccc_flat_hash_map const *const src,
     size_t const dst_mask = dst->mask_;
     size_t const dst_avail = dst->avail_;
     ccc_tribool const dst_init = dst->init_;
-    ccc_alloc_fn *const dst_alloc = dst->alloc_fn_;
+    ccc_any_alloc_fn *const dst_alloc = dst->alloc_fn_;
     *dst = *src;
     dst->data_ = dst_data;
     dst->tag_ = dst_tag;
@@ -820,7 +821,7 @@ ccc_fhm_copy(ccc_flat_hash_map *const dst, ccc_flat_hash_map const *const src,
 
 ccc_result
 ccc_fhm_reserve(ccc_flat_hash_map *const h, size_t const to_add,
-                ccc_alloc_fn *const fn)
+                ccc_any_alloc_fn *const fn)
 {
     if (unlikely(!h || !to_add || !fn))
     {
@@ -1068,9 +1069,9 @@ find_key_or_slot(struct ccc_fhmap_ const *const h, void const *const key,
              i_match = next_index(&m))
         {
             i_match = (seq.i + i_match) & mask;
-            if (h->eq_fn_((ccc_key_cmp){.key_lhs = key,
-                                        .any_type_rhs = data_at(h, i_match),
-                                        .aux = h->aux_}))
+            if (h->eq_fn_((ccc_any_key_cmp){.any_key_lhs = key,
+                                            .any_type_rhs = data_at(h, i_match),
+                                            .aux = h->aux_}))
             {
                 return (struct ccc_handl_){.i_ = i_match,
                                            .stats_ = CCC_ENTRY_OCCUPIED};
@@ -1118,10 +1119,10 @@ find_key(struct ccc_fhmap_ const *const h, void const *const key,
              i_match = next_index(&m))
         {
             i_match = (seq.i + i_match) & mask;
-            if (likely(
-                    h->eq_fn_((ccc_key_cmp){.key_lhs = key,
-                                            .any_type_rhs = data_at(h, i_match),
-                                            .aux = h->aux_})))
+            if (likely(h->eq_fn_(
+                    (ccc_any_key_cmp){.any_key_lhs = key,
+                                      .any_type_rhs = data_at(h, i_match),
+                                      .aux = h->aux_})))
             {
                 return (ccc_ucount){.count = i_match};
             }
@@ -1165,7 +1166,7 @@ but only once and for a container that is not given permission to resize
 arbitrarily. */
 static ccc_result
 maybe_rehash(struct ccc_fhmap_ *const h, size_t const to_add,
-             ccc_alloc_fn *const fn)
+             ccc_any_alloc_fn *const fn)
 {
     if (unlikely(!h->mask_ && !fn))
     {
@@ -1286,7 +1287,7 @@ rehash_in_place(struct ccc_fhmap_ *const h)
 
 static ccc_result
 rehash_resize(struct ccc_fhmap_ *const h, size_t const to_add,
-              ccc_alloc_fn *const fn)
+              ccc_any_alloc_fn *const fn)
 {
     assert(((h->mask_ + 1) & h->mask_) == 0);
     size_t const new_pow2_cap = next_power_of_two(h->mask_ + 1 + to_add) << 1;

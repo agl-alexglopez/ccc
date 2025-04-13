@@ -143,8 +143,8 @@ restrictions. */
 or (T *)NULL.
 @param [in] tag_ptr a pointer to the .tag field of a fixed map or NULL.
 @param [in] key_field the field of the struct used for key storage.
-@param [in] hash_fn the ccc_hash_fn function the user desires for the table.
-@param [in] key_eq_fn the ccc_key_eq_fn the user intends to use.
+@param [in] hash_fn the ccc_any_hash_fn function the user desires for the table.
+@param [in] key_eq_fn the ccc_any_key_eq_fn the user intends to use.
 @param [in] alloc_fn the allocation function for resizing or NULL if no
 resizing is allowed.
 @param [in] aux_data auxiliary data that is needed for hashing or comparison.
@@ -283,7 +283,7 @@ size dynamic maps are required.
 These options allow users to stay consistent across containers with their
 memory management strategies. */
 ccc_result ccc_fhm_copy(ccc_flat_hash_map *dst, ccc_flat_hash_map const *src,
-                        ccc_alloc_fn *fn);
+                        ccc_any_alloc_fn *fn);
 
 /** @brief Reserve space required to add a specified number of elements to the
 map. If the current capacity is sufficient, do nothing.
@@ -301,7 +301,7 @@ code to indicate the specific failure.
 If the map has already been initialized with allocation permission simply
 provide the same function that was passed upon initialization. */
 ccc_result ccc_fhm_reserve(ccc_flat_hash_map *h, size_t to_add,
-                           ccc_alloc_fn *fn);
+                           ccc_any_alloc_fn *fn);
 
 /**@}*/
 
@@ -377,9 +377,9 @@ Entry Interface.*/
 
 This function is intended to make the function chaining in the Entry Interface
 more succinct if the entry will be modified in place based on its own value
-without the need of the auxiliary argument a ccc_update_fn can provide. */
+without the need of the auxiliary argument a ccc_any_update_fn can provide. */
 [[nodiscard]] ccc_fhmap_entry *ccc_fhm_and_modify(ccc_fhmap_entry *e,
-                                                  ccc_update_fn *fn);
+                                                  ccc_any_update_fn *fn);
 
 /** @brief Modifies the provided entry if it is Occupied.
 @param [in] e the entry obtained from an entry function or macro.
@@ -387,10 +387,10 @@ without the need of the auxiliary argument a ccc_update_fn can provide. */
 @param [in] aux auxiliary data required for the update.
 @return the updated entry if it was Occupied or the unmodified vacant entry.
 
-This function makes full use of a ccc_update_fn capability, meaning a complete
-ccc_update object will be passed to the update function callback. */
+This function makes full use of a ccc_any_update_fn capability, meaning a
+complete ccc_update object will be passed to the update function callback. */
 [[nodiscard]] ccc_fhmap_entry *
-ccc_fhm_and_modify_aux(ccc_fhmap_entry *e, ccc_update_fn *fn, void *aux);
+ccc_fhm_and_modify_aux(ccc_fhmap_entry *e, ccc_any_update_fn *fn, void *aux);
 
 /** @brief Modify an Occupied entry with a closure over user type T.
 @param [in] map_entry_ptr a pointer to the obtained entry.
@@ -696,7 +696,7 @@ maintenance is required on the elements in the table before their slots are
 forfeit.
 
 If NULL is passed as the destructor function time is O(1), else O(capacity). */
-ccc_result ccc_fhm_clear(ccc_flat_hash_map *h, ccc_destructor_fn *fn);
+ccc_result ccc_fhm_clear(ccc_flat_hash_map *h, ccc_any_destructor_fn *fn);
 
 /** @brief Frees all slots in the table and frees the underlying buffer.
 @param [in] h the table to be cleared.
@@ -706,7 +706,8 @@ forfeit.
 @return the result of free operation. If no alloc function is provided it is
 an error to attempt to free the buffer and a memory error is returned.
 Otherwise, an OK result is returned. */
-ccc_result ccc_fhm_clear_and_free(ccc_flat_hash_map *h, ccc_destructor_fn *fn);
+ccc_result ccc_fhm_clear_and_free(ccc_flat_hash_map *h,
+                                  ccc_any_destructor_fn *fn);
 
 /** @brief Frees all slots in the table and frees the underlying buffer that was
 previously dynamically reserved with the reserve function.
@@ -720,7 +721,7 @@ the allocation function when called.
 @return the result of free operation. CCC_RESULT_OK if success, or an error
 status to indicate the error.
 @warning It is an error to call this function on a map that was not reserved
-with the provided ccc_alloc_fn. The map must have existing memory to free.
+with the provided ccc_any_alloc_fn. The map must have existing memory to free.
 
 This function covers the edge case of reserving a dynamic capacity for a map
 at runtime but denying the map allocation permission to resize. This can help
@@ -735,8 +736,8 @@ to reserve memory so to is it required to free memory.
 This function will work normally if called on a map with allocation permission
 however the normal ccc_fhm_clear_and_free is sufficient for that use case. */
 ccc_result ccc_fhm_clear_and_free_reserve(ccc_flat_hash_map *h,
-                                          ccc_destructor_fn *destructor,
-                                          ccc_alloc_fn *alloc);
+                                          ccc_any_destructor_fn *destructor,
+                                          ccc_any_alloc_fn *alloc);
 
 /**@}*/
 

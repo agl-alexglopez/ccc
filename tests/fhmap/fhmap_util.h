@@ -32,7 +32,7 @@ enum : size_t
 uint64_t fhmap_int_zero(ccc_any_key);
 uint64_t fhmap_int_last_digit(ccc_any_key);
 uint64_t fhmap_int_to_u64(ccc_any_key);
-ccc_tribool fhmap_id_eq(ccc_key_cmp);
+ccc_tribool fhmap_id_eq(ccc_any_key_cmp);
 
 void fhmap_modplus(ccc_any_type);
 struct val fhmap_create(int id, int val);

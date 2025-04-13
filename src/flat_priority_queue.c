@@ -43,7 +43,7 @@ static void inplace_heapify(struct ccc_fpq_ *fpq, size_t n);
 
 ccc_result
 ccc_fpq_alloc(ccc_flat_priority_queue *const fpq, size_t const new_capacity,
-              ccc_alloc_fn *const fn)
+              ccc_any_alloc_fn *const fn)
 {
     if (!fpq || !fn)
     {
@@ -168,8 +168,8 @@ ccc_fpq_erase(ccc_flat_priority_queue *const fpq, void *const e)
     swap(fpq, tmp, swap_location, fpq->buf_.sz_ - 1);
     void *const erased = at(fpq, fpq->buf_.sz_ - 1);
     (void)ccc_buf_pop_back(&fpq->buf_);
-    ccc_threeway_cmp const erased_cmp
-        = fpq->cmp_((ccc_cmp){at(fpq, swap_location), erased, fpq->buf_.aux_});
+    ccc_threeway_cmp const erased_cmp = fpq->cmp_(
+        (ccc_any_cmp){at(fpq, swap_location), erased, fpq->buf_.aux_});
     if (erased_cmp == fpq->order_)
     {
         (void)bubble_up(fpq, tmp, swap_location);
@@ -184,7 +184,7 @@ ccc_fpq_erase(ccc_flat_priority_queue *const fpq, void *const e)
 
 void *
 ccc_fpq_update(ccc_flat_priority_queue *const fpq, void *const e,
-               ccc_update_fn *const fn, void *const aux)
+               ccc_any_update_fn *const fn, void *const aux)
 {
     if (!fpq || !e || !fn || ccc_buf_is_empty(&fpq->buf_))
     {
@@ -197,7 +197,7 @@ ccc_fpq_update(ccc_flat_priority_queue *const fpq, void *const e,
 /* There are no efficiency benefits in knowing an increase will occur. */
 void *
 ccc_fpq_increase(ccc_flat_priority_queue *const fpq, void *const e,
-                 ccc_update_fn *const fn, void *const aux)
+                 ccc_any_update_fn *const fn, void *const aux)
 {
     return ccc_fpq_update(fpq, e, fn, aux);
 }
@@ -205,7 +205,7 @@ ccc_fpq_increase(ccc_flat_priority_queue *const fpq, void *const e,
 /* There are no efficiency benefits in knowing an decrease will occur. */
 void *
 ccc_fpq_decrease(ccc_flat_priority_queue *const fpq, void *const e,
-                 ccc_update_fn *const fn, void *const aux)
+                 ccc_any_update_fn *const fn, void *const aux)
 {
     return ccc_fpq_update(fpq, e, fn, aux);
 }
@@ -264,7 +264,7 @@ ccc_fpq_order(ccc_flat_priority_queue const *const fpq)
 
 ccc_result
 ccc_fpq_reserve(ccc_flat_priority_queue *const fpq, size_t const to_add,
-                ccc_alloc_fn *const fn)
+                ccc_any_alloc_fn *const fn)
 {
     if (!fpq || !fn)
     {
@@ -280,7 +280,8 @@ ccc_fpq_reserve(ccc_flat_priority_queue *const fpq, size_t const to_add,
 
 ccc_result
 ccc_fpq_copy(ccc_flat_priority_queue *const dst,
-             ccc_flat_priority_queue const *const src, ccc_alloc_fn *const fn)
+             ccc_flat_priority_queue const *const src,
+             ccc_any_alloc_fn *const fn)
 {
     if (!dst || !src || src == dst
         || (dst->buf_.capacity_ < src->buf_.capacity_ && !fn))
@@ -293,7 +294,7 @@ ccc_fpq_copy(ccc_flat_priority_queue *const dst,
        same as in dst initialization because that controls permission. */
     void *const dst_mem = dst->buf_.mem_;
     size_t const dst_cap = dst->buf_.capacity_;
-    ccc_alloc_fn *const dst_alloc = dst->buf_.alloc_;
+    ccc_any_alloc_fn *const dst_alloc = dst->buf_.alloc_;
     *dst = *src;
     dst->buf_.mem_ = dst_mem;
     dst->buf_.capacity_ = dst_cap;
@@ -322,7 +323,8 @@ ccc_fpq_copy(ccc_flat_priority_queue *const dst,
 }
 
 ccc_result
-ccc_fpq_clear(ccc_flat_priority_queue *const fpq, ccc_destructor_fn *const fn)
+ccc_fpq_clear(ccc_flat_priority_queue *const fpq,
+              ccc_any_destructor_fn *const fn)
 {
     if (!fpq)
     {
@@ -341,7 +343,7 @@ ccc_fpq_clear(ccc_flat_priority_queue *const fpq, ccc_destructor_fn *const fn)
 
 ccc_result
 ccc_fpq_clear_and_free(ccc_flat_priority_queue *const fpq,
-                       ccc_destructor_fn *const fn)
+                       ccc_any_destructor_fn *const fn)
 {
     if (!fpq)
     {
@@ -360,8 +362,8 @@ ccc_fpq_clear_and_free(ccc_flat_priority_queue *const fpq,
 
 ccc_result
 ccc_fpq_clear_and_free_reserve(ccc_flat_priority_queue *const fpq,
-                               ccc_destructor_fn *const destructor,
-                               ccc_alloc_fn *const alloc)
+                               ccc_any_destructor_fn *const destructor,
+                               ccc_any_alloc_fn *const alloc)
 {
     if (!fpq)
     {
@@ -459,7 +461,7 @@ update_fixup(struct ccc_fpq_ *const fpq, void *const e)
         return bubble_down(fpq, tmp, 0);
     }
     ccc_threeway_cmp const parent_cmp = fpq->cmp_(
-        (ccc_cmp){at(fpq, i), at(fpq, (i - 1) / 2), fpq->buf_.aux_});
+        (ccc_any_cmp){at(fpq, i), at(fpq, (i - 1) / 2), fpq->buf_.aux_});
     if (parent_cmp == fpq->order_)
     {
         return bubble_up(fpq, tmp, i);
@@ -552,5 +554,6 @@ static inline ccc_tribool
 wins(struct ccc_fpq_ const *const fpq, void const *const winner,
      void const *const loser)
 {
-    return fpq->cmp_((ccc_cmp){winner, loser, fpq->buf_.aux_}) == fpq->order_;
+    return fpq->cmp_((ccc_any_cmp){winner, loser, fpq->buf_.aux_})
+           == fpq->order_;
 }

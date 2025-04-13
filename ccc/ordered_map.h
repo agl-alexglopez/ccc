@@ -307,9 +307,9 @@ to subsequent calls in the Entry Interface. */
 
 This function is intended to make the function chaining in the Entry Interface
 more succinct if the entry will be modified in place based on its own value
-without the need of the auxiliary argument a ccc_update_fn can provide. */
+without the need of the auxiliary argument a ccc_any_update_fn can provide. */
 [[nodiscard]] ccc_omap_entry *ccc_om_and_modify(ccc_omap_entry *e,
-                                                ccc_update_fn *fn);
+                                                ccc_any_update_fn *fn);
 
 /** @brief Modifies the provided entry if it is Occupied.
 @param [in] e the entry obtained from an entry function or macro.
@@ -317,10 +317,10 @@ without the need of the auxiliary argument a ccc_update_fn can provide. */
 @param [in] aux auxiliary data required for the update.
 @return the updated entry if it was Occupied or the unmodified vacant entry.
 
-This function makes full use of a ccc_update_fn capability, meaning a complete
-ccc_update object will be passed to the update function callback. */
+This function makes full use of a ccc_any_update_fn capability, meaning a
+complete ccc_update object will be passed to the update function callback. */
 [[nodiscard]] ccc_omap_entry *
-ccc_om_and_modify_aux(ccc_omap_entry *e, ccc_update_fn *fn, void *aux);
+ccc_om_and_modify_aux(ccc_omap_entry *e, ccc_any_update_fn *fn, void *aux);
 
 /** @brief Modify an Occupied entry with a closure over user type T.
 @param [in] ordered_map_entry_ptr a pointer to the obtained entry.
@@ -597,7 +597,7 @@ will occur.
 If the container has not been given allocation permission, then the destructor
 may free elements or not depending on how and when the user wishes to free
 elements of the map according to their own memory management schemes. */
-ccc_result ccc_om_clear(ccc_ordered_map *om, ccc_destructor_fn *destructor);
+ccc_result ccc_om_clear(ccc_ordered_map *om, ccc_any_destructor_fn *destructor);
 
 /**@}*/
 

@@ -66,15 +66,15 @@ static bool const quiet = true;
     } while (0)
 
 static ccc_threeway_cmp
-cmp_by_key(ccc_key_cmp const cmp)
+cmp_by_key(ccc_any_key_cmp const cmp)
 {
-    int const key_lhs = *(int *)cmp.key_lhs;
+    int const key_lhs = *(int *)cmp.any_key_lhs;
     struct lru_elem const *const kv = cmp.any_type_rhs;
     return (key_lhs > kv->key) - (key_lhs < kv->key);
 }
 
 static ccc_threeway_cmp
-cmp_list_elems(ccc_cmp const cmp)
+cmp_list_elems(ccc_any_cmp const cmp)
 {
     struct lru_elem const *const kv_a = cmp.any_type_lhs;
     struct lru_elem const *const kv_b = cmp.any_type_rhs;

@@ -173,8 +173,8 @@ static char *str_arena_at(struct str_arena const *, str_ofs);
 
 /* Container Functions */
 static handle_ordered_map create_frequency_map(struct str_arena *, FILE *);
-static threeway_cmp cmp_string_keys(key_cmp);
-static threeway_cmp cmp_freqs(cmp);
+static threeway_cmp cmp_string_keys(any_key_cmp);
+static threeway_cmp cmp_freqs(any_cmp);
 
 /* Misc. Functions */
 static FILE *open_file(str_view file);
@@ -668,11 +668,11 @@ str_arena_at(struct str_arena const *const a, str_ofs const i)
 /*=======================   Container Helpers    ============================*/
 
 static threeway_cmp
-cmp_string_keys(key_cmp const c)
+cmp_string_keys(any_key_cmp const c)
 {
     word const *const w = c.any_type_rhs;
     struct str_arena const *const a = c.aux;
-    str_ofs const *const id = c.key_lhs;
+    str_ofs const *const id = c.any_key_lhs;
     char const *const key_word = str_arena_at(a, *id);
     char const *const struct_word = str_arena_at(a, w->ofs);
     PROG_ASSERT(key_word && struct_word);
@@ -690,7 +690,7 @@ cmp_string_keys(key_cmp const c)
 
 /* Sorts by frequency then alphabetic order if frequencies are tied. */
 static threeway_cmp
-cmp_freqs(cmp const c)
+cmp_freqs(any_cmp const c)
 {
     struct frequency const *const lhs = c.any_type_lhs;
     struct frequency const *const rhs = c.any_type_rhs;

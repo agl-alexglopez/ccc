@@ -30,7 +30,7 @@ struct val_pool
 can only allocate. Freeing is a No Op. Reallocation will kill the program. */
 void *val_bump_alloc(void *ptr, size_t size, void *aux);
 
-ccc_threeway_cmp id_cmp(ccc_key_cmp);
+ccc_threeway_cmp id_cmp(ccc_any_key_cmp);
 
 enum check_result insert_shuffled(ccc_ordered_map *m, struct val vals[],
                                   size_t size, int larger_prime);

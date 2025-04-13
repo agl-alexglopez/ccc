@@ -10,10 +10,10 @@
 #include "types.h"
 
 ccc_threeway_cmp
-id_cmp(ccc_key_cmp const cmp)
+id_cmp(ccc_any_key_cmp const cmp)
 {
     struct val const *const c = cmp.any_type_rhs;
-    int key = *((int *)cmp.key_lhs);
+    int key = *((int *)cmp.any_key_lhs);
     return (key > c->key) - (key < c->key);
 }
 

@@ -117,7 +117,7 @@ static struct ccc_range_u_ equal_range(struct ccc_hromap_ const *, void const *,
 /* Returning threeway comparison with user callback. */
 static ccc_threeway_cmp cmp_elems(struct ccc_hromap_ const *hrm,
                                   void const *key, size_t node,
-                                  ccc_key_cmp_fn *fn);
+                                  ccc_any_key_cmp_fn *fn);
 /* Returning read only indices for tree nodes. */
 static size_t sibling_of(struct ccc_hromap_ const *t, size_t x);
 static size_t next(struct ccc_hromap_ const *t, size_t n,
@@ -280,7 +280,7 @@ ccc_hrm_insert_or_assign(ccc_handle_realtime_ordered_map *const hrm,
 }
 
 ccc_hromap_handle *
-ccc_hrm_and_modify(ccc_hromap_handle *const h, ccc_update_fn *const fn)
+ccc_hrm_and_modify(ccc_hromap_handle *const h, ccc_any_update_fn *const fn)
 {
     if (h && fn && h->impl_.handle_.stats_ & CCC_ENTRY_OCCUPIED
         && h->impl_.handle_.i_ > 0)
@@ -292,7 +292,7 @@ ccc_hrm_and_modify(ccc_hromap_handle *const h, ccc_update_fn *const fn)
 }
 
 ccc_hromap_handle *
-ccc_hrm_and_modify_aux(ccc_hromap_handle *const h, ccc_update_fn *const fn,
+ccc_hrm_and_modify_aux(ccc_hromap_handle *const h, ccc_any_update_fn *const fn,
                        void *const aux)
 {
     if (h && fn && h->impl_.handle_.stats_ & CCC_ENTRY_OCCUPIED
@@ -564,7 +564,7 @@ ccc_hrm_rend(ccc_handle_realtime_ordered_map const *const hrm)
 
 ccc_result
 ccc_hrm_reserve(ccc_handle_realtime_ordered_map *const hrm, size_t const to_add,
-                ccc_alloc_fn *const fn)
+                ccc_any_alloc_fn *const fn)
 {
     if (!hrm || !fn)
     {
@@ -607,7 +607,7 @@ ccc_hrm_reserve(ccc_handle_realtime_ordered_map *const hrm, size_t const to_add,
 ccc_result
 ccc_hrm_copy(ccc_handle_realtime_ordered_map *const dst,
              ccc_handle_realtime_ordered_map const *const src,
-             ccc_alloc_fn *const fn)
+             ccc_any_alloc_fn *const fn)
 {
     if (!dst || !src || src == dst
         || (dst->buf_.capacity_ < src->buf_.capacity_ && !fn))
@@ -620,7 +620,7 @@ ccc_hrm_copy(ccc_handle_realtime_ordered_map *const dst,
        same as in dst initialization because that controls permission. */
     void *const dst_mem = dst->buf_.mem_;
     size_t const dst_cap = dst->buf_.capacity_;
-    ccc_alloc_fn *const dst_alloc = dst->buf_.alloc_;
+    ccc_any_alloc_fn *const dst_alloc = dst->buf_.alloc_;
     *dst = *src;
     dst->buf_.mem_ = dst_mem;
     dst->buf_.capacity_ = dst_cap;
@@ -650,7 +650,7 @@ ccc_hrm_copy(ccc_handle_realtime_ordered_map *const dst,
 
 ccc_result
 ccc_hrm_clear(ccc_handle_realtime_ordered_map *const hrm,
-              ccc_destructor_fn *const fn)
+              ccc_any_destructor_fn *const fn)
 {
     if (!hrm)
     {
@@ -675,7 +675,7 @@ ccc_hrm_clear(ccc_handle_realtime_ordered_map *const hrm,
 
 ccc_result
 ccc_hrm_clear_and_free(ccc_handle_realtime_ordered_map *const hrm,
-                       ccc_destructor_fn *const fn)
+                       ccc_any_destructor_fn *const fn)
 {
     if (!hrm)
     {
@@ -699,8 +699,8 @@ ccc_hrm_clear_and_free(ccc_handle_realtime_ordered_map *const hrm,
 
 ccc_result
 ccc_hrm_clear_and_free_reserve(ccc_handle_realtime_ordered_map *const hrm,
-                               ccc_destructor_fn *const destructor,
-                               ccc_alloc_fn *const alloc)
+                               ccc_any_destructor_fn *const destructor,
+                               ccc_any_alloc_fn *const alloc)
 {
     if (!hrm)
     {
@@ -911,11 +911,11 @@ min_max_from(struct ccc_hromap_ const *const t, size_t start,
 
 static inline ccc_threeway_cmp
 cmp_elems(struct ccc_hromap_ const *const hrm, void const *const key,
-          size_t const node, ccc_key_cmp_fn *const fn)
+          size_t const node, ccc_any_key_cmp_fn *const fn)
 {
-    return fn((ccc_key_cmp){.key_lhs = key,
-                            .any_type_rhs = base_at(hrm, node),
-                            .aux = hrm->buf_.aux_});
+    return fn((ccc_any_key_cmp){.any_key_lhs = key,
+                                .any_type_rhs = base_at(hrm, node),
+                                .aux = hrm->buf_.aux_});
 }
 
 static size_t

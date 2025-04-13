@@ -63,7 +63,7 @@ enum
 
 /* Returning the internal elem type with stored offsets. */
 static size_t splay(struct ccc_homap_ *t, size_t root, void const *key,
-                    ccc_key_cmp_fn *cmp_fn);
+                    ccc_any_key_cmp_fn *cmp_fn);
 static struct ccc_homap_elem_ *at(struct ccc_homap_ const *, size_t);
 static struct ccc_homap_elem_ *elem_in_slot(struct ccc_homap_ const *t,
                                             void const *slot);
@@ -90,7 +90,7 @@ static void *key_from_node(struct ccc_homap_ const *t,
 static void *key_at(struct ccc_homap_ const *t, size_t i);
 /* Returning threeway comparison with user callback. */
 static ccc_threeway_cmp cmp_elems(struct ccc_homap_ const *hom, void const *key,
-                                  size_t node, ccc_key_cmp_fn *fn);
+                                  size_t node, ccc_any_key_cmp_fn *fn);
 /* Returning read only indices for tree nodes. */
 static size_t remove_from_tree(struct ccc_homap_ *t, size_t ret);
 static size_t min_max_from(struct ccc_homap_ const *t, size_t start,
@@ -182,7 +182,7 @@ ccc_hom_insert_handle(ccc_homap_handle const *const h,
 }
 
 ccc_homap_handle *
-ccc_hom_and_modify(ccc_homap_handle *const h, ccc_update_fn *const fn)
+ccc_hom_and_modify(ccc_homap_handle *const h, ccc_any_update_fn *const fn)
 {
     if (!h)
     {
@@ -199,7 +199,7 @@ ccc_hom_and_modify(ccc_homap_handle *const h, ccc_update_fn *const fn)
 }
 
 ccc_homap_handle *
-ccc_hom_and_modify_aux(ccc_homap_handle *const h, ccc_update_fn *const fn,
+ccc_hom_and_modify_aux(ccc_homap_handle *const h, ccc_any_update_fn *const fn,
                        void *const aux)
 {
     if (!h)
@@ -513,7 +513,7 @@ ccc_hom_equal_rrange(ccc_handle_ordered_map *const hom,
 
 ccc_result
 ccc_hom_reserve(ccc_handle_ordered_map *const hom, size_t const to_add,
-                ccc_alloc_fn *const fn)
+                ccc_any_alloc_fn *const fn)
 {
     if (!hom || !fn)
     {
@@ -553,7 +553,8 @@ ccc_hom_reserve(ccc_handle_ordered_map *const hom, size_t const to_add,
 
 ccc_result
 ccc_hom_copy(ccc_handle_ordered_map *const dst,
-             ccc_handle_ordered_map const *const src, ccc_alloc_fn *const fn)
+             ccc_handle_ordered_map const *const src,
+             ccc_any_alloc_fn *const fn)
 {
     if (!dst || !src || src == dst
         || (dst->buf_.capacity_ < src->buf_.capacity_ && !fn))
@@ -566,7 +567,7 @@ ccc_hom_copy(ccc_handle_ordered_map *const dst,
        same as in dst initialization because that controls permission. */
     void *const dst_mem = dst->buf_.mem_;
     size_t const dst_cap = dst->buf_.capacity_;
-    ccc_alloc_fn *const dst_alloc = dst->buf_.alloc_;
+    ccc_any_alloc_fn *const dst_alloc = dst->buf_.alloc_;
     *dst = *src;
     dst->buf_.mem_ = dst_mem;
     dst->buf_.capacity_ = dst_cap;
@@ -595,7 +596,8 @@ ccc_hom_copy(ccc_handle_ordered_map *const dst,
 }
 
 ccc_result
-ccc_hom_clear(ccc_handle_ordered_map *const hom, ccc_destructor_fn *const fn)
+ccc_hom_clear(ccc_handle_ordered_map *const hom,
+              ccc_any_destructor_fn *const fn)
 {
     if (!hom)
     {
@@ -621,7 +623,7 @@ ccc_hom_clear(ccc_handle_ordered_map *const hom, ccc_destructor_fn *const fn)
 
 ccc_result
 ccc_hom_clear_and_free(ccc_handle_ordered_map *const hom,
-                       ccc_destructor_fn *const fn)
+                       ccc_any_destructor_fn *const fn)
 {
     if (!hom)
     {
@@ -645,8 +647,8 @@ ccc_hom_clear_and_free(ccc_handle_ordered_map *const hom,
 
 ccc_result
 ccc_hom_clear_and_free_reserve(ccc_handle_ordered_map *const hom,
-                               ccc_destructor_fn *const destructor,
-                               ccc_alloc_fn *const alloc)
+                               ccc_any_destructor_fn *const destructor,
+                               ccc_any_alloc_fn *const alloc)
 {
     if (!hom)
     {
@@ -860,7 +862,7 @@ find(struct ccc_homap_ *const t, void const *const key)
 
 static size_t
 splay(struct ccc_homap_ *const t, size_t root, void const *const key,
-      ccc_key_cmp_fn *const cmp_fn)
+      ccc_any_key_cmp_fn *const cmp_fn)
 {
     /* Pointers in an array and we can use the symmetric enum and flip it to
        choose the Left or Right subtree. Another benefit of our nil node: use it
@@ -953,11 +955,11 @@ next(struct ccc_homap_ const *const t, size_t n,
 
 static inline ccc_threeway_cmp
 cmp_elems(struct ccc_homap_ const *const hom, void const *const key,
-          size_t const node, ccc_key_cmp_fn *const fn)
+          size_t const node, ccc_any_key_cmp_fn *const fn)
 {
-    return fn((ccc_key_cmp){.key_lhs = key,
-                            .any_type_rhs = base_at(hom, node),
-                            .aux = hom->buf_.aux_});
+    return fn((ccc_any_key_cmp){.any_key_lhs = key,
+                                .any_type_rhs = base_at(hom, node),
+                                .aux = hom->buf_.aux_});
 }
 
 static size_t

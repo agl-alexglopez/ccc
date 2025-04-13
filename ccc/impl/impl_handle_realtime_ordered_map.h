@@ -55,7 +55,7 @@ struct ccc_hromap_
     size_t free_list_;        /** The start of the free singly linked list. */
     size_t key_offset_;       /** Where user key can be found in type. */
     size_t node_elem_offset_; /** Where intrusive elem is found in type. */
-    ccc_key_cmp_fn *cmp_;     /** The provided key comparison function. */
+    ccc_any_key_cmp_fn *cmp_; /** The provided key comparison function. */
 };
 
 /** @private */

@@ -32,7 +32,7 @@ struct ccc_bitset_
     ccc_bitblock_ *mem_;
     size_t sz_;
     size_t cap_;
-    ccc_alloc_fn *alloc_;
+    ccc_any_alloc_fn *alloc_;
     void *aux_;
 };
 

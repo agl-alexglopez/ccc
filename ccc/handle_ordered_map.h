@@ -185,7 +185,8 @@ copying between maps without allocation permission.
 These options allow users to stay consistent across containers with their
 memory management strategies. */
 ccc_result ccc_hom_copy(ccc_handle_ordered_map *dst,
-                        ccc_handle_ordered_map const *src, ccc_alloc_fn *fn);
+                        ccc_handle_ordered_map const *src,
+                        ccc_any_alloc_fn *fn);
 
 /** @brief Reserves space for at least to_add more elements.
 @param [in] hom a pointer to the handle ordered map.
@@ -205,7 +206,7 @@ this function can serve as a one-time reservation. This is helpful when a fixed
 size is needed but that size is only known dynamically at runtime. To free the
 hom in such a case see the ccc_hom_clear_and_free_reserve function. */
 ccc_result ccc_hom_reserve(ccc_handle_ordered_map *hom, size_t to_add,
-                           ccc_alloc_fn *fn);
+                           ccc_any_alloc_fn *fn);
 
 /**@}*/
 
@@ -435,9 +436,9 @@ to subsequent calls in the Handle Interface. */
 
 This function is intended to make the function chaining in the Handle Interface
 more succinct if the handle will be modified in place based on its own value
-without the need of the auxiliary argument a ccc_update_fn can provide. */
+without the need of the auxiliary argument a ccc_any_update_fn can provide. */
 [[nodiscard]] ccc_homap_handle *ccc_hom_and_modify(ccc_homap_handle *h,
-                                                   ccc_update_fn *fn);
+                                                   ccc_any_update_fn *fn);
 
 /** @brief Modifies the provided handle if it is Occupied.
 @param [in] h the handle obtained from a handle function or macro.
@@ -445,10 +446,10 @@ without the need of the auxiliary argument a ccc_update_fn can provide. */
 @param [in] aux auxiliary data required for the update.
 @return the updated handle if it was Occupied or the unmodified vacant handle.
 
-This function makes full use of a ccc_update_fn capability, meaning a complete
-ccc_update object will be passed to the update function callback. */
+This function makes full use of a ccc_any_update_fn capability, meaning a
+complete ccc_update object will be passed to the update function callback. */
 [[nodiscard]] ccc_homap_handle *
-ccc_hom_and_modify_aux(ccc_homap_handle *h, ccc_update_fn *fn, void *aux);
+ccc_hom_and_modify_aux(ccc_homap_handle *h, ccc_any_update_fn *fn, void *aux);
 
 /** @brief Modify an Occupied handle with a closure over user type T.
 @param [in] handle_ordered_map_handle_ptr a pointer to the obtained handle.
@@ -713,7 +714,8 @@ maintenance is required on the elements in the map before their slots are
 forfeit.
 
 If NULL is passed as the destructor function time is O(1), else O(size). */
-ccc_result ccc_hom_clear(ccc_handle_ordered_map *hom, ccc_destructor_fn *fn);
+ccc_result ccc_hom_clear(ccc_handle_ordered_map *hom,
+                         ccc_any_destructor_fn *fn);
 
 /** @brief Frees all slots in the map and frees the underlying buffer.
 @param [in] hom the map to be cleared.
@@ -726,7 +728,7 @@ Otherwise, an OK result is returned.
 
 If NULL is passed as the destructor function time is O(1), else O(size). */
 ccc_result ccc_hom_clear_and_free(ccc_handle_ordered_map *hom,
-                                  ccc_destructor_fn *fn);
+                                  ccc_any_destructor_fn *fn);
 
 /** @brief Frees all slots in the hom and frees the underlying buffer that was
 previously dynamically reserved with the reserve function.
@@ -740,7 +742,7 @@ the allocation function when called.
 @return the result of free operation. OK if success, or an error status to
 indicate the error.
 @warning It is an error to call this function on a hom that was not reserved
-with the provided ccc_alloc_fn. The hom must have existing memory to free.
+with the provided ccc_any_alloc_fn. The hom must have existing memory to free.
 
 This function covers the edge case of reserving a dynamic capacity for a hom
 at runtime but denying the hom allocation permission to resize. This can help
@@ -755,8 +757,8 @@ to reserve memory so to is it required to free memory.
 This function will work normally if called on a hom with allocation permission
 however the normal ccc_hom_clear_and_free is sufficient for that use case. */
 ccc_result ccc_hom_clear_and_free_reserve(ccc_handle_ordered_map *hom,
-                                          ccc_destructor_fn *destructor,
-                                          ccc_alloc_fn *alloc);
+                                          ccc_any_destructor_fn *destructor,
+                                          ccc_any_alloc_fn *alloc);
 
 /**@}*/
 

@@ -43,8 +43,8 @@ struct ccc_romap_
     size_t key_offset_;
     size_t node_elem_offset_;
     size_t elem_sz_;
-    ccc_alloc_fn *alloc_;
-    ccc_key_cmp_fn *cmp_;
+    ccc_any_alloc_fn *alloc_;
+    ccc_any_key_cmp_fn *cmp_;
     void *aux_;
 };
 

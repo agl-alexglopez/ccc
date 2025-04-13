@@ -77,7 +77,7 @@ struct romap_query_
 static void init_node(struct ccc_romap_ *, struct ccc_romap_elem_ *);
 static ccc_threeway_cmp cmp(struct ccc_romap_ const *, void const *key,
                             struct ccc_romap_elem_ const *node,
-                            ccc_key_cmp_fn *);
+                            ccc_any_key_cmp_fn *);
 static void *struct_base(struct ccc_romap_ const *,
                          struct ccc_romap_elem_ const *);
 static struct romap_query_ find(struct ccc_romap_ const *, void const *key);
@@ -352,7 +352,7 @@ ccc_rom_remove(ccc_realtime_ordered_map *const rom,
 }
 
 ccc_romap_entry *
-ccc_rom_and_modify(ccc_romap_entry *e, ccc_update_fn *fn)
+ccc_rom_and_modify(ccc_romap_entry *e, ccc_any_update_fn *fn)
 {
     if (!e)
     {
@@ -366,7 +366,7 @@ ccc_rom_and_modify(ccc_romap_entry *e, ccc_update_fn *fn)
 }
 
 ccc_romap_entry *
-ccc_rom_and_modify_aux(ccc_romap_entry *e, ccc_update_fn *fn, void *aux)
+ccc_rom_and_modify_aux(ccc_romap_entry *e, ccc_any_update_fn *fn, void *aux)
 {
     if (!e)
     {
@@ -533,7 +533,7 @@ ccc_rom_validate(ccc_realtime_ordered_map const *rom)
 
 ccc_result
 ccc_rom_clear(ccc_realtime_ordered_map *const rom,
-              ccc_destructor_fn *const destructor)
+              ccc_any_destructor_fn *const destructor)
 {
     if (!rom)
     {
@@ -765,10 +765,10 @@ swap(char tmp[const], void *const a, void *const b, size_t const elem_sz)
 
 static inline ccc_threeway_cmp
 cmp(struct ccc_romap_ const *const rom, void const *const key,
-    struct ccc_romap_elem_ const *const node, ccc_key_cmp_fn *const fn)
+    struct ccc_romap_elem_ const *const node, ccc_any_key_cmp_fn *const fn)
 {
-    return fn((ccc_key_cmp){
-        .key_lhs = key,
+    return fn((ccc_any_key_cmp){
+        .any_key_lhs = key,
         .any_type_rhs = struct_base(rom, node),
         .aux = rom->aux_,
     });

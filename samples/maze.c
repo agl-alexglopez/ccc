@@ -142,9 +142,9 @@ static void flush_cursor_maze_coordinate(struct maze const *, int r, int c);
 static bool can_build_new_square(struct maze const *, int r, int c);
 static void help(void);
 static struct point rand_point(struct maze const *);
-static threeway_cmp cmp_prim_cells(cmp);
+static threeway_cmp cmp_prim_cells(any_cmp);
 static struct int_conversion parse_digits(str_view);
-static ccc_tribool prim_cell_eq(key_cmp);
+static ccc_tribool prim_cell_eq(any_key_cmp);
 static uint64_t prim_cell_hash_fn(any_key);
 static uint64_t hash_64_bits(uint64_t);
 
@@ -297,9 +297,9 @@ animate_maze(struct maze *maze)
 /*===================     Container Support Code     ========================*/
 
 static ccc_tribool
-prim_cell_eq(key_cmp const c)
+prim_cell_eq(any_key_cmp const c)
 {
-    struct point const *const lhs = c.key_lhs;
+    struct point const *const lhs = c.any_key_lhs;
     struct prim_cell const *const rhs = c.any_type_rhs;
     return lhs->r == rhs->cell.r && lhs->c == rhs->cell.c;
 }
@@ -325,7 +325,7 @@ hash_64_bits(uint64_t x)
 }
 
 static threeway_cmp
-cmp_prim_cells(cmp const cmp_cells)
+cmp_prim_cells(any_cmp const cmp_cells)
 {
     struct prim_cell const *const lhs = cmp_cells.any_type_lhs;
     struct prim_cell const *const rhs = cmp_cells.any_type_rhs;
