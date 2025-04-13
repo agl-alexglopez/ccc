@@ -282,7 +282,7 @@ static struct int_conversion parse_digits(str_view, int lower_bound,
 static struct path_request parse_path_request(struct graph *, str_view);
 static void help(void);
 
-static threeway_cmp cmp_pq_costs(any_cmp);
+static threeway_cmp cmp_pq_costs(any_type_cmp);
 static ccc_tribool eq_parent_cells(any_key_cmp);
 static uint64_t hash_parent_cells(any_key point_struct);
 static uint64_t hash_64_bits(uint64_t);
@@ -1054,7 +1054,7 @@ hash_parent_cells(any_key const point_struct)
 }
 
 static threeway_cmp
-cmp_pq_costs(any_cmp const cost_cmp)
+cmp_pq_costs(any_type_cmp const cost_cmp)
 {
     struct dijkstra_vertex const *const a = cost_cmp.any_type_lhs;
     struct dijkstra_vertex const *const b = cost_cmp.any_type_rhs;

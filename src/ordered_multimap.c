@@ -203,7 +203,7 @@ ccc_omm_or_insert(ccc_ommap_entry const *const e,
 }
 
 ccc_ommap_entry *
-ccc_omm_and_modify(ccc_ommap_entry *const e, ccc_any_update_fn *const fn)
+ccc_omm_and_modify(ccc_ommap_entry *const e, ccc_any_type_update_fn *const fn)
 {
     if (!e || !fn)
     {
@@ -217,8 +217,8 @@ ccc_omm_and_modify(ccc_ommap_entry *const e, ccc_any_update_fn *const fn)
 }
 
 ccc_ommap_entry *
-ccc_omm_and_modify_aux(ccc_ommap_entry *const e, ccc_any_update_fn *const fn,
-                       void *const aux)
+ccc_omm_and_modify_aux(ccc_ommap_entry *const e,
+                       ccc_any_type_update_fn *const fn, void *const aux)
 {
     if (!e || !fn)
     {
@@ -462,7 +462,7 @@ ccc_omm_extract(ccc_ordered_multimap *const mm,
 ccc_tribool
 ccc_omm_update(ccc_ordered_multimap *const mm,
                ccc_ommap_elem *const key_val_handle,
-               ccc_any_update_fn *const fn, void *const aux)
+               ccc_any_type_update_fn *const fn, void *const aux)
 {
     if (!mm || !key_val_handle || !fn || !key_val_handle->branch_[L]
         || !key_val_handle->branch_[R])
@@ -482,7 +482,7 @@ ccc_omm_update(ccc_ordered_multimap *const mm,
 ccc_tribool
 ccc_omm_increase(ccc_ordered_multimap *const mm,
                  ccc_ommap_elem *const key_val_handle,
-                 ccc_any_update_fn *const fn, void *const aux)
+                 ccc_any_type_update_fn *const fn, void *const aux)
 {
     return ccc_omm_update(mm, key_val_handle, fn, aux);
 }
@@ -490,7 +490,7 @@ ccc_omm_increase(ccc_ordered_multimap *const mm,
 ccc_tribool
 ccc_omm_decrease(ccc_ordered_multimap *const mm,
                  ccc_ommap_elem *const key_val_handle,
-                 ccc_any_update_fn *const fn, void *const aux)
+                 ccc_any_type_update_fn *const fn, void *const aux)
 {
     return ccc_omm_update(mm, key_val_handle, fn, aux);
 }
@@ -607,7 +607,7 @@ ccc_omm_validate(ccc_ordered_multimap const *const mm)
 
 ccc_result
 ccc_omm_clear(ccc_ordered_multimap *const mm,
-              ccc_any_destructor_fn *const destructor)
+              ccc_any_type_destructor_fn *const destructor)
 {
     if (!mm)
     {

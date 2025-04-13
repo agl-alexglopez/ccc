@@ -357,7 +357,7 @@ ccc_fdeq_reserve(ccc_flat_double_ended_queue *const fdeq, size_t const to_add,
 
 ccc_result
 ccc_fdeq_clear(ccc_flat_double_ended_queue *const fdeq,
-               ccc_any_destructor_fn *const destructor)
+               ccc_any_type_destructor_fn *const destructor)
 {
     if (!fdeq)
     {
@@ -379,7 +379,7 @@ ccc_fdeq_clear(ccc_flat_double_ended_queue *const fdeq,
 
 ccc_result
 ccc_fdeq_clear_and_free(ccc_flat_double_ended_queue *const fdeq,
-                        ccc_any_destructor_fn *const destructor)
+                        ccc_any_type_destructor_fn *const destructor)
 {
     if (!fdeq)
     {
@@ -406,7 +406,7 @@ ccc_fdeq_clear_and_free(ccc_flat_double_ended_queue *const fdeq,
 
 ccc_result
 ccc_fdeq_clear_and_free_reserve(ccc_flat_double_ended_queue *const fdeq,
-                                ccc_any_destructor_fn *const destructor,
+                                ccc_any_type_destructor_fn *const destructor,
                                 ccc_any_alloc_fn *const alloc)
 {
     if (!fdeq)

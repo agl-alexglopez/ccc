@@ -11,7 +11,7 @@
 #include <stdio.h>
 
 ccc_threeway_cmp
-val_cmp(ccc_any_cmp const c)
+val_cmp(ccc_any_type_cmp const c)
 {
     struct val const *const a = c.any_type_lhs;
     struct val const *const b = c.any_type_rhs;

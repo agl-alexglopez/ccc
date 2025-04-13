@@ -169,7 +169,7 @@ ccc_fpq_erase(ccc_flat_priority_queue *const fpq, void *const e)
     void *const erased = at(fpq, fpq->buf_.sz_ - 1);
     (void)ccc_buf_pop_back(&fpq->buf_);
     ccc_threeway_cmp const erased_cmp = fpq->cmp_(
-        (ccc_any_cmp){at(fpq, swap_location), erased, fpq->buf_.aux_});
+        (ccc_any_type_cmp){at(fpq, swap_location), erased, fpq->buf_.aux_});
     if (erased_cmp == fpq->order_)
     {
         (void)bubble_up(fpq, tmp, swap_location);
@@ -184,7 +184,7 @@ ccc_fpq_erase(ccc_flat_priority_queue *const fpq, void *const e)
 
 void *
 ccc_fpq_update(ccc_flat_priority_queue *const fpq, void *const e,
-               ccc_any_update_fn *const fn, void *const aux)
+               ccc_any_type_update_fn *const fn, void *const aux)
 {
     if (!fpq || !e || !fn || ccc_buf_is_empty(&fpq->buf_))
     {
@@ -197,7 +197,7 @@ ccc_fpq_update(ccc_flat_priority_queue *const fpq, void *const e,
 /* There are no efficiency benefits in knowing an increase will occur. */
 void *
 ccc_fpq_increase(ccc_flat_priority_queue *const fpq, void *const e,
-                 ccc_any_update_fn *const fn, void *const aux)
+                 ccc_any_type_update_fn *const fn, void *const aux)
 {
     return ccc_fpq_update(fpq, e, fn, aux);
 }
@@ -205,7 +205,7 @@ ccc_fpq_increase(ccc_flat_priority_queue *const fpq, void *const e,
 /* There are no efficiency benefits in knowing an decrease will occur. */
 void *
 ccc_fpq_decrease(ccc_flat_priority_queue *const fpq, void *const e,
-                 ccc_any_update_fn *const fn, void *const aux)
+                 ccc_any_type_update_fn *const fn, void *const aux)
 {
     return ccc_fpq_update(fpq, e, fn, aux);
 }
@@ -324,7 +324,7 @@ ccc_fpq_copy(ccc_flat_priority_queue *const dst,
 
 ccc_result
 ccc_fpq_clear(ccc_flat_priority_queue *const fpq,
-              ccc_any_destructor_fn *const fn)
+              ccc_any_type_destructor_fn *const fn)
 {
     if (!fpq)
     {
@@ -343,7 +343,7 @@ ccc_fpq_clear(ccc_flat_priority_queue *const fpq,
 
 ccc_result
 ccc_fpq_clear_and_free(ccc_flat_priority_queue *const fpq,
-                       ccc_any_destructor_fn *const fn)
+                       ccc_any_type_destructor_fn *const fn)
 {
     if (!fpq)
     {
@@ -362,7 +362,7 @@ ccc_fpq_clear_and_free(ccc_flat_priority_queue *const fpq,
 
 ccc_result
 ccc_fpq_clear_and_free_reserve(ccc_flat_priority_queue *const fpq,
-                               ccc_any_destructor_fn *const destructor,
+                               ccc_any_type_destructor_fn *const destructor,
                                ccc_any_alloc_fn *const alloc)
 {
     if (!fpq)
@@ -461,7 +461,7 @@ update_fixup(struct ccc_fpq_ *const fpq, void *const e)
         return bubble_down(fpq, tmp, 0);
     }
     ccc_threeway_cmp const parent_cmp = fpq->cmp_(
-        (ccc_any_cmp){at(fpq, i), at(fpq, (i - 1) / 2), fpq->buf_.aux_});
+        (ccc_any_type_cmp){at(fpq, i), at(fpq, (i - 1) / 2), fpq->buf_.aux_});
     if (parent_cmp == fpq->order_)
     {
         return bubble_up(fpq, tmp, i);
@@ -554,6 +554,6 @@ static inline ccc_tribool
 wins(struct ccc_fpq_ const *const fpq, void const *const winner,
      void const *const loser)
 {
-    return fpq->cmp_((ccc_any_cmp){winner, loser, fpq->buf_.aux_})
+    return fpq->cmp_((ccc_any_type_cmp){winner, loser, fpq->buf_.aux_})
            == fpq->order_;
 }

@@ -174,7 +174,7 @@ static char *str_arena_at(struct str_arena const *, str_ofs);
 /* Container Functions */
 static handle_ordered_map create_frequency_map(struct str_arena *, FILE *);
 static threeway_cmp cmp_string_keys(any_key_cmp);
-static threeway_cmp cmp_freqs(any_cmp);
+static threeway_cmp cmp_freqs(any_type_cmp);
 
 /* Misc. Functions */
 static FILE *open_file(str_view file);
@@ -690,7 +690,7 @@ cmp_string_keys(any_key_cmp const c)
 
 /* Sorts by frequency then alphabetic order if frequencies are tied. */
 static threeway_cmp
-cmp_freqs(any_cmp const c)
+cmp_freqs(any_type_cmp const c)
 {
     struct frequency const *const lhs = c.any_type_lhs;
     struct frequency const *const rhs = c.any_type_rhs;

@@ -116,7 +116,7 @@ struct ccc_fhmap_
     /** The user callback for equality comparison. */
     ccc_any_key_eq_fn *eq_fn_;
     /** The hash function provided by user. */
-    ccc_any_hash_fn *hash_fn_;
+    ccc_any_key_hash_fn *hash_fn_;
     /** The allocation function, if any. */
     ccc_any_alloc_fn *alloc_fn_;
     /** Auxiliary data, if any. */

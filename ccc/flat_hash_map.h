@@ -143,7 +143,8 @@ restrictions. */
 or (T *)NULL.
 @param [in] tag_ptr a pointer to the .tag field of a fixed map or NULL.
 @param [in] key_field the field of the struct used for key storage.
-@param [in] hash_fn the ccc_any_hash_fn function the user desires for the table.
+@param [in] hash_fn the ccc_any_key_hash_fn function the user desires for the
+table.
 @param [in] key_eq_fn the ccc_any_key_eq_fn the user intends to use.
 @param [in] alloc_fn the allocation function for resizing or NULL if no
 resizing is allowed.
@@ -377,9 +378,10 @@ Entry Interface.*/
 
 This function is intended to make the function chaining in the Entry Interface
 more succinct if the entry will be modified in place based on its own value
-without the need of the auxiliary argument a ccc_any_update_fn can provide. */
+without the need of the auxiliary argument a ccc_any_type_update_fn can provide.
+*/
 [[nodiscard]] ccc_fhmap_entry *ccc_fhm_and_modify(ccc_fhmap_entry *e,
-                                                  ccc_any_update_fn *fn);
+                                                  ccc_any_type_update_fn *fn);
 
 /** @brief Modifies the provided entry if it is Occupied.
 @param [in] e the entry obtained from an entry function or macro.
@@ -387,10 +389,11 @@ without the need of the auxiliary argument a ccc_any_update_fn can provide. */
 @param [in] aux auxiliary data required for the update.
 @return the updated entry if it was Occupied or the unmodified vacant entry.
 
-This function makes full use of a ccc_any_update_fn capability, meaning a
+This function makes full use of a ccc_any_type_update_fn capability, meaning a
 complete ccc_update object will be passed to the update function callback. */
 [[nodiscard]] ccc_fhmap_entry *
-ccc_fhm_and_modify_aux(ccc_fhmap_entry *e, ccc_any_update_fn *fn, void *aux);
+ccc_fhm_and_modify_aux(ccc_fhmap_entry *e, ccc_any_type_update_fn *fn,
+                       void *aux);
 
 /** @brief Modify an Occupied entry with a closure over user type T.
 @param [in] map_entry_ptr a pointer to the obtained entry.
@@ -696,7 +699,7 @@ maintenance is required on the elements in the table before their slots are
 forfeit.
 
 If NULL is passed as the destructor function time is O(1), else O(capacity). */
-ccc_result ccc_fhm_clear(ccc_flat_hash_map *h, ccc_any_destructor_fn *fn);
+ccc_result ccc_fhm_clear(ccc_flat_hash_map *h, ccc_any_type_destructor_fn *fn);
 
 /** @brief Frees all slots in the table and frees the underlying buffer.
 @param [in] h the table to be cleared.
@@ -707,7 +710,7 @@ forfeit.
 an error to attempt to free the buffer and a memory error is returned.
 Otherwise, an OK result is returned. */
 ccc_result ccc_fhm_clear_and_free(ccc_flat_hash_map *h,
-                                  ccc_any_destructor_fn *fn);
+                                  ccc_any_type_destructor_fn *fn);
 
 /** @brief Frees all slots in the table and frees the underlying buffer that was
 previously dynamically reserved with the reserve function.
@@ -735,9 +738,10 @@ to reserve memory so to is it required to free memory.
 
 This function will work normally if called on a map with allocation permission
 however the normal ccc_fhm_clear_and_free is sufficient for that use case. */
-ccc_result ccc_fhm_clear_and_free_reserve(ccc_flat_hash_map *h,
-                                          ccc_any_destructor_fn *destructor,
-                                          ccc_any_alloc_fn *alloc);
+ccc_result
+ccc_fhm_clear_and_free_reserve(ccc_flat_hash_map *h,
+                               ccc_any_type_destructor_fn *destructor,
+                               ccc_any_alloc_fn *alloc);
 
 /**@}*/
 

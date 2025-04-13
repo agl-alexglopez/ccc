@@ -78,7 +78,7 @@ lru_lookup_cmp(ccc_any_key_cmp const cmp)
 }
 
 static ccc_threeway_cmp
-cmp_by_key(ccc_any_cmp const cmp)
+cmp_by_key(ccc_any_type_cmp const cmp)
 {
     struct key_val const *const kv_a = cmp.any_type_lhs;
     struct key_val const *const kv_b = cmp.any_type_rhs;

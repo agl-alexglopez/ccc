@@ -352,7 +352,7 @@ ccc_rom_remove(ccc_realtime_ordered_map *const rom,
 }
 
 ccc_romap_entry *
-ccc_rom_and_modify(ccc_romap_entry *e, ccc_any_update_fn *fn)
+ccc_rom_and_modify(ccc_romap_entry *e, ccc_any_type_update_fn *fn)
 {
     if (!e)
     {
@@ -366,7 +366,8 @@ ccc_rom_and_modify(ccc_romap_entry *e, ccc_any_update_fn *fn)
 }
 
 ccc_romap_entry *
-ccc_rom_and_modify_aux(ccc_romap_entry *e, ccc_any_update_fn *fn, void *aux)
+ccc_rom_and_modify_aux(ccc_romap_entry *e, ccc_any_type_update_fn *fn,
+                       void *aux)
 {
     if (!e)
     {
@@ -533,7 +534,7 @@ ccc_rom_validate(ccc_realtime_ordered_map const *rom)
 
 ccc_result
 ccc_rom_clear(ccc_realtime_ordered_map *const rom,
-              ccc_any_destructor_fn *const destructor)
+              ccc_any_type_destructor_fn *const destructor)
 {
     if (!rom)
     {

@@ -191,7 +191,7 @@ struct int_elem
 };
 
 static ccc_threeway_cmp
-int_cmp(ccc_any_cmp const cmp)
+int_cmp(ccc_any_type_cmp const cmp)
 {
     struct int_elem const *const lhs = cmp.any_type_lhs;
     struct int_elem const *const rhs = cmp.any_type_rhs;
@@ -340,7 +340,7 @@ main(void)
 #include "ccc/traits.h"
 
 ccc_threeway_cmp
-int_cmp(ccc_any_cmp const ints)
+int_cmp(ccc_any_type_cmp const ints)
 {
     int const lhs = *(int *)ints.any_type_lhs;
     int const rhs = *(int *)ints.any_type_rhs;
@@ -680,7 +680,7 @@ struct val
 };
 
 static ccc_threeway_cmp
-val_cmp(ccc_any_cmp const cmp)
+val_cmp(ccc_any_type_cmp const cmp)
 {
     struct val const *const lhs = cmp.any_type_lhs;
     struct val const *const rhs = cmp.any_type_rhs;
@@ -801,7 +801,7 @@ struct int_elem
 };
 
 static ccc_threeway_cmp
-int_cmp(ccc_any_cmp const cmp)
+int_cmp(ccc_any_type_cmp const cmp)
 {
     struct int_elem const *const lhs = cmp.any_type_lhs;
     struct int_elem const *const rhs = cmp.any_type_rhs;
@@ -1037,7 +1037,7 @@ struct id *new_id = generate_id();
 struct id *new_front = ccc_dll_push_front(&id_list, &new_id->id_elem);
 /* Or when writing a comparison callback. */
 ccc_threeway_cmp
-id_cmp(ccc_any_cmp const cmp)
+id_cmp(ccc_any_type_cmp const cmp)
 {
     struct id const *const lhs = cmp.any_type_lhs;
     struct id const *const rhs = cmp.any_type_rhs;
