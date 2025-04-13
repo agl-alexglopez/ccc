@@ -206,7 +206,7 @@ copying between maps without allocation permission.
 These options allow users to stay consistent across containers with their
 memory management strategies. */
 ccc_result ccc_bs_copy(ccc_bitset *dst, ccc_bitset const *src,
-                       ccc_alloc_fn *fn);
+                       ccc_any_alloc_fn *fn);
 
 /** @brief Reserves space for at least to_add more bits.
 @param [in] bs a pointer to the bit set.
@@ -225,7 +225,7 @@ If the bit set has been initialized with no allocation permission and no memory
 this function can serve as a one-time reservation. This is helpful when a fixed
 size is needed but that size is only known dynamically at runtime. To free the
 bit set in such a case see the ccc_bs_clear_and_free_reserve function. */
-ccc_result ccc_bs_reserve(ccc_bitset *bs, size_t to_add, ccc_alloc_fn *fn);
+ccc_result ccc_bs_reserve(ccc_bitset *bs, size_t to_add, ccc_any_alloc_fn *fn);
 
 /**@}*/
 
@@ -758,7 +758,7 @@ the allocation function when called.
 @return the result of free operation. OK if success, or an error status to
 indicate the error.
 @warning It is an error to call this function on a bs that was not reserved
-with the provided ccc_alloc_fn. The bs must have existing memory to free.
+with the provided ccc_any_alloc_fn. The bs must have existing memory to free.
 
 This function covers the edge case of reserving a dynamic capacity for a bs
 at runtime but denying the bs allocation permission to resize. This can help
@@ -772,7 +772,7 @@ to reserve memory so to is it required to free memory.
 
 This function will work normally if called on a bs with allocation permission
 however the normal ccc_bs_clear_and_free is sufficient for that use case. */
-ccc_result ccc_bs_clear_and_free_reserve(ccc_bitset *bs, ccc_alloc_fn *fn);
+ccc_result ccc_bs_clear_and_free_reserve(ccc_bitset *bs, ccc_any_alloc_fn *fn);
 
 /**@}*/
 

@@ -9,7 +9,7 @@
 #include <stddef.h>
 
 ccc_threeway_cmp
-val_cmp(ccc_cmp const cmp)
+val_cmp(ccc_any_cmp const cmp)
 {
     struct val const *const lhs = cmp.any_type_lhs;
     struct val const *const rhs = cmp.any_type_rhs;

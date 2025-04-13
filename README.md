@@ -16,7 +16,7 @@ Currently, this library supports a `FetchContent` or manual installation via CMa
 ## Quick Start
 
 - Read the [DOCS](https://agl-alexglopez.github.io/ccc).
-- Read [types.h](https://agl-alexglopez.github.io/ccc/types_8h.html) to understand the `ccc_alloc_fn` interface.
+- Read [types.h](https://agl-alexglopez.github.io/ccc/types_8h.html) to understand the `ccc_any_alloc_fn` interface.
 - Read the [header](https://agl-alexglopez.github.io/ccc/files.html) for the desired container to understand its functionality.
 - Read about generic [traits.h](https://agl-alexglopez.github.io/ccc/traits_8h.html) shared across containers to make code more succinct.
 - Read [CONTRIBUTING.md](CONTRIBUTING.md) if interested in project structure, tools, and todos.
@@ -191,7 +191,7 @@ struct int_elem
 };
 
 static ccc_threeway_cmp
-int_cmp(ccc_cmp const cmp)
+int_cmp(ccc_any_cmp const cmp)
 {
     struct int_elem const *const lhs = cmp.any_type_lhs;
     struct int_elem const *const rhs = cmp.any_type_rhs;
@@ -281,11 +281,11 @@ fhmap_int_to_u64(ccc_any_key const k)
     return x;
 }
 
-bool
-fhmap_id_eq(ccc_key_cmp const cmp)
+ccc_tribool
+fhmap_id_eq(ccc_any_key_cmp const cmp)
 {
     struct key_val const *const va = cmp.any_type_rhs;
-    return va->key == *((int *)cmp.key_lhs);
+    return va->key == *((int *)cmp.any_key_lhs);
 }
 
 /* This fix map will be a 'small_fixed_map' used to store struct val. */
@@ -340,7 +340,7 @@ main(void)
 #include "ccc/traits.h"
 
 ccc_threeway_cmp
-int_cmp(ccc_cmp const ints)
+int_cmp(ccc_any_cmp const ints)
 {
     int const lhs = *(int *)ints.any_type_lhs;
     int const rhs = *(int *)ints.any_type_rhs;
@@ -394,10 +394,10 @@ struct kval
 };
 
 static ccc_threeway_cmp
-kval_cmp(ccc_key_cmp const cmp)
+kval_cmp(ccc_any_key_cmp const cmp)
 {
     struct kval const *const rhs = cmp.any_type_rhs;
-    int const key_lhs = *((int *)cmp.key_lhs);
+    int const key_lhs = *((int *)cmp.any_key_lhs);
     return (key_lhs > rhs->key) - (key_lhs < rhs->key);
 }
 
@@ -466,10 +466,10 @@ struct kval
 };
 
 static ccc_threeway_cmp
-kval_cmp(ccc_key_cmp const cmp)
+kval_cmp(ccc_any_key_cmp const cmp)
 {
     struct kval const *const rhs = cmp.any_type_rhs;
-    int const key_lhs = *((int *)cmp.key_lhs);
+    int const key_lhs = *((int *)cmp.any_key_lhs);
     return (key_lhs > rhs->key) - (key_lhs < rhs->key);
 }
 
@@ -536,9 +536,9 @@ struct name
 };
 
 ccc_threeway_cmp
-kval_cmp(ccc_key_cmp cmp)
+kval_cmp(ccc_any_key_cmp cmp)
 {
-    char const *const key = *(char **)cmp.key_lhs;
+    char const *const key = *(char **)cmp.any_key_lhs;
     struct name const *const rhs = cmp.any_type_rhs;
     int const res = strcmp(key, rhs->name);
     if (res == 0)
@@ -605,9 +605,9 @@ struct name
 };
 
 ccc_threeway_cmp
-kval_cmp(ccc_key_cmp cmp)
+kval_cmp(ccc_any_key_cmp cmp)
 {
-    char const *const key = *(char **)cmp.key_lhs;
+    char const *const key = *(char **)cmp.any_key_lhs;
     struct name const *const rhs = cmp.any_type_rhs;
     int const res = strcmp(key, rhs->name);
     if (res == 0)
@@ -680,7 +680,7 @@ struct val
 };
 
 static ccc_threeway_cmp
-val_cmp(ccc_cmp const cmp)
+val_cmp(ccc_any_cmp const cmp)
 {
     struct val const *const lhs = cmp.any_type_lhs;
     struct val const *const rhs = cmp.any_type_rhs;
@@ -729,10 +729,10 @@ struct kval
 };
 
 static ccc_threeway_cmp
-kval_cmp(ccc_key_cmp const cmp)
+kval_cmp(ccc_any_key_cmp const cmp)
 {
     struct kval const *const rhs = cmp.any_type_rhs;
-    int const key_lhs = *((int *)cmp.key_lhs);
+    int const key_lhs = *((int *)cmp.any_key_lhs);
     return (key_lhs > rhs->key) - (key_lhs < rhs->key);
 }
 
@@ -801,7 +801,7 @@ struct int_elem
 };
 
 static ccc_threeway_cmp
-int_cmp(ccc_cmp const cmp)
+int_cmp(ccc_any_cmp const cmp)
 {
     struct int_elem const *const lhs = cmp.any_type_lhs;
     struct int_elem const *const rhs = cmp.any_type_rhs;
@@ -1037,7 +1037,7 @@ struct id *new_id = generate_id();
 struct id *new_front = ccc_dll_push_front(&id_list, &new_id->id_elem);
 /* Or when writing a comparison callback. */
 ccc_threeway_cmp
-id_cmp(ccc_cmp const cmp)
+id_cmp(ccc_any_cmp const cmp)
 {
     struct id const *const lhs = cmp.any_type_lhs;
     struct id const *const rhs = cmp.any_type_rhs;
@@ -1189,7 +1189,7 @@ Using the first method in your code may expand the code evaluated in different `
 When allocation is required, this collection offers the following interface. The user provides this function to containers upon initialization.
 
 ```c
-typedef void *ccc_alloc_fn(void *ptr, size_t size, void *aux);
+typedef void *ccc_any_alloc_fn(void *ptr, size_t size, void *aux);
 ```
 
 An allocation function implements the following behavior, where ptr is pointer to memory, size is number of bytes to allocate, and aux is a reference to any supplementary information required for allocation, deallocation, or reallocation. The aux parameter is passed to a container upon its initialization and the programmer may choose how to best utilize this reference (read on for more on aux).

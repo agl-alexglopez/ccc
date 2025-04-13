@@ -138,7 +138,7 @@ These options allow users to stay consistent across containers with their
 memory management strategies. */
 ccc_result ccc_fdeq_copy(ccc_flat_double_ended_queue *dst,
                          ccc_flat_double_ended_queue const *src,
-                         ccc_alloc_fn *fn);
+                         ccc_any_alloc_fn *fn);
 
 /** @brief Reserves space for at least to_add more elements.
 @param [in] fdeq a pointer to the flat double ended queue.
@@ -159,7 +159,7 @@ as ring buffer when space runs out. This is helpful when a fixed size is needed
 but that size is only known dynamically at runtime. To free the fdeq in such a
 case see the ccc_fdeq_clear_and_free_reserve function. */
 ccc_result ccc_fdeq_reserve(ccc_flat_double_ended_queue *fdeq, size_t to_add,
-                            ccc_alloc_fn *fn);
+                            ccc_any_alloc_fn *fn);
 
 /**@}*/
 
@@ -303,7 +303,7 @@ Note that if destructor is non-NULL it will be called on each element in the
 fdeq. However, the underlying buffer for the fdeq is not freed. If the
 destructor is NULL, setting the size to 0 is O(1). */
 ccc_result ccc_fdeq_clear(ccc_flat_double_ended_queue *fdeq,
-                          ccc_destructor_fn *destructor);
+                          ccc_any_destructor_fn *destructor);
 
 /** @brief Set size of fdeq to 0 and call destructor on each element if needed.
 Free the underlying buffer setting the capacity to 0. O(1) if no destructor is
@@ -315,7 +315,7 @@ Note that if destructor is non-NULL it will be called on each element in the
 fdeq. After all elements are processed the buffer is freed and capacity is 0.
 If destructor is NULL the buffer is freed directly and capacity is 0. */
 ccc_result ccc_fdeq_clear_and_free(ccc_flat_double_ended_queue *fdeq,
-                                   ccc_destructor_fn *destructor);
+                                   ccc_any_destructor_fn *destructor);
 
 /** @brief Frees all slots in the fdeq and frees the underlying buffer that was
 previously dynamically reserved with the reserve function.
@@ -329,7 +329,7 @@ the allocation function when called.
 @return the result of free operation. OK if success, or an error status to
 indicate the error.
 @warning It is an error to call this function on a fdeq that was not reserved
-with the provided ccc_alloc_fn. The fdeq must have existing memory to free.
+with the provided ccc_any_alloc_fn. The fdeq must have existing memory to free.
 
 This function covers the edge case of reserving a dynamic capacity for a fdeq
 at runtime but denying the fdeq allocation permission to resize. This can help
@@ -344,8 +344,8 @@ to reserve memory so to is it required to free memory.
 This function will work normally if called on a fdeq with allocation permission
 however the normal ccc_fdeq_clear_and_free is sufficient for that use case. */
 ccc_result ccc_fdeq_clear_and_free_reserve(ccc_flat_double_ended_queue *fdeq,
-                                           ccc_destructor_fn *destructor,
-                                           ccc_alloc_fn *alloc);
+                                           ccc_any_destructor_fn *destructor,
+                                           ccc_any_alloc_fn *alloc);
 
 /**@}*/
 

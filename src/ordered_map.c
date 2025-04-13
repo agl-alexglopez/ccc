@@ -93,13 +93,14 @@ static struct ccc_omap_elem_ *remove_from_tree(struct ccc_omap_ *,
 static struct ccc_omap_elem_ const *
 next(struct ccc_omap_ const *, struct ccc_omap_elem_ const *, om_branch_);
 static struct ccc_omap_elem_ *splay(struct ccc_omap_ *, struct ccc_omap_elem_ *,
-                                    void const *key, ccc_key_cmp_fn *);
+                                    void const *key, ccc_any_key_cmp_fn *);
 static struct ccc_omap_elem_ *elem_in_slot(struct ccc_omap_ const *t,
                                            void const *slot);
 
 /* The key comes first. It is the "left hand side" of the comparison. */
 static ccc_threeway_cmp cmp(struct ccc_omap_ const *, void const *key,
-                            struct ccc_omap_elem_ const *, ccc_key_cmp_fn *);
+                            struct ccc_omap_elem_ const *,
+                            ccc_any_key_cmp_fn *);
 
 /* ======================        Map Interface      ====================== */
 
@@ -178,7 +179,7 @@ ccc_om_or_insert(ccc_omap_entry const *const e, ccc_omap_elem *const elem)
 }
 
 ccc_omap_entry *
-ccc_om_and_modify(ccc_omap_entry *const e, ccc_update_fn *const fn)
+ccc_om_and_modify(ccc_omap_entry *const e, ccc_any_update_fn *const fn)
 {
     if (!e)
     {
@@ -192,7 +193,7 @@ ccc_om_and_modify(ccc_omap_entry *const e, ccc_update_fn *const fn)
 }
 
 ccc_omap_entry *
-ccc_om_and_modify_aux(ccc_omap_entry *const e, ccc_update_fn *const fn,
+ccc_om_and_modify_aux(ccc_omap_entry *const e, ccc_any_update_fn *const fn,
                       void *const aux)
 {
     if (e && fn && e->impl_.entry_.stats_ & CCC_ENTRY_OCCUPIED
@@ -442,7 +443,7 @@ ccc_om_equal_rrange(ccc_ordered_map *const om, void const *const rbegin_key,
 }
 
 ccc_result
-ccc_om_clear(ccc_ordered_map *const om, ccc_destructor_fn *const destructor)
+ccc_om_clear(ccc_ordered_map *const om, ccc_any_destructor_fn *const destructor)
 {
     if (!om)
     {
@@ -757,7 +758,7 @@ remove_from_tree(struct ccc_omap_ *const t, struct ccc_omap_elem_ *const ret)
 
 static struct ccc_omap_elem_ *
 splay(struct ccc_omap_ *const t, struct ccc_omap_elem_ *root,
-      void const *const key, ccc_key_cmp_fn *const cmp_fn)
+      void const *const key, ccc_any_key_cmp_fn *const cmp_fn)
 {
     /* Pointers in an array and we can use the symmetric enum and flip it to
        choose the Left or Right subtree. Another benefit of our nil node: use it
@@ -813,10 +814,10 @@ struct_base(struct ccc_omap_ const *const t,
 
 static inline ccc_threeway_cmp
 cmp(struct ccc_omap_ const *const t, void const *const key,
-    struct ccc_omap_elem_ const *const node, ccc_key_cmp_fn *const fn)
+    struct ccc_omap_elem_ const *const node, ccc_any_key_cmp_fn *const fn)
 {
-    return fn((ccc_key_cmp){
-        .key_lhs = key,
+    return fn((ccc_any_key_cmp){
+        .any_key_lhs = key,
         .any_type_rhs = struct_base(t, node),
         .aux = t->aux_,
     });

@@ -73,7 +73,7 @@ Initialize the container with memory, callbacks, and permissions. */
 /** @brief Initialize a contiguous buffer of user a specified type, allocation
 policy, capacity, and optional starting size.
 @param [in] mem_ptr the pointer to existing memory or ((Type *)NULL).
-@param [in] alloc_fn ccc_alloc_fn or NULL if no allocation is permitted.
+@param [in] alloc_fn ccc_any_alloc_fn or NULL if no allocation is permitted.
 @param [in] aux_data any auxiliary data needed for managing buffer memory.
 @param [in] capacity the capacity of memory at mem_ptr.
 @param [in] optional_size optional starting size of the buffer <= capacity.
@@ -115,7 +115,7 @@ managing allocations and resizing directly. If an allocation function has
 been provided than the use of this function should be rare as the buffer
 will reallocate more memory when necessary. */
 [[nodiscard]] ccc_result ccc_buf_alloc(ccc_buffer *buf, size_t capacity,
-                                       ccc_alloc_fn *fn);
+                                       ccc_any_alloc_fn *fn);
 
 /** @brief allocates a new slot from the buffer at the end of the contiguous
 array. A slot is equivalent to one of the element type specified when the

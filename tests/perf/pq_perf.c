@@ -36,8 +36,8 @@ static void test_update(void);
 
 static void *valid_malloc(size_t bytes);
 static struct val *create_rand_vals(size_t);
-static ccc_threeway_cmp val_key_cmp(ccc_key_cmp);
-static ccc_threeway_cmp val_cmp(ccc_cmp);
+static ccc_threeway_cmp val_key_cmp(ccc_any_key_cmp);
+static ccc_threeway_cmp val_cmp(ccc_any_cmp);
 static void val_update(ccc_any_type);
 
 #define NUM_TESTS (size_t)6
@@ -442,15 +442,15 @@ valid_malloc(size_t bytes)
 }
 
 static ccc_threeway_cmp
-val_key_cmp(ccc_key_cmp const cmp)
+val_key_cmp(ccc_any_key_cmp const cmp)
 {
     struct val const *const x = cmp.any_type_rhs;
-    int const key = *((int *)cmp.key_lhs);
+    int const key = *((int *)cmp.any_key_lhs);
     return (key > x->val) - (key < x->val);
 }
 
 static ccc_threeway_cmp
-val_cmp(ccc_cmp const cmp)
+val_cmp(ccc_any_cmp const cmp)
 {
     struct val const *const a = cmp.any_type_lhs;
     struct val const *const b = cmp.any_type_rhs;

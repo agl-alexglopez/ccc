@@ -38,8 +38,8 @@ struct ccc_sll_
     size_t sz_;
     size_t elem_sz_;
     size_t sll_elem_offset_;
-    ccc_alloc_fn *alloc_;
-    ccc_cmp_fn *cmp_;
+    ccc_any_alloc_fn *alloc_;
+    ccc_any_cmp_fn *cmp_;
     void *aux_;
 };
 

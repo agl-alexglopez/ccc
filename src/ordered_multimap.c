@@ -88,7 +88,8 @@ static void *multimap_erase(struct ccc_ommap_ *t, void const *key);
 static void *find(struct ccc_ommap_ *, void const *);
 static void *struct_base(struct ccc_ommap_ const *,
                          struct ccc_ommap_elem_ const *);
-static void *multimap_erase_max_or_min(struct ccc_ommap_ *, ccc_key_cmp_fn *);
+static void *multimap_erase_max_or_min(struct ccc_ommap_ *,
+                                       ccc_any_key_cmp_fn *);
 static void *multimap_erase_node(struct ccc_ommap_ *, struct ccc_ommap_elem_ *);
 static void *connect_new_root(struct ccc_ommap_ *, struct ccc_ommap_elem_ *,
                               ccc_threeway_cmp);
@@ -122,7 +123,7 @@ multimap_next(struct ccc_ommap_ const *, struct ccc_ommap_elem_ const *,
               enum tree_link_);
 static struct ccc_ommap_elem_ *splay(struct ccc_ommap_ *,
                                      struct ccc_ommap_elem_ *, void const *key,
-                                     ccc_key_cmp_fn *);
+                                     ccc_any_key_cmp_fn *);
 static struct ccc_ommap_elem_ const *
 next_tree_node(struct ccc_ommap_ const *, struct ccc_ommap_elem_ const *,
                enum tree_link_);
@@ -134,11 +135,12 @@ static struct ccc_omultimap_entry_ container_entry(struct ccc_ommap_ *,
 
 /* Comparison function returns */
 
-static ccc_threeway_cmp force_find_grt(ccc_key_cmp);
-static ccc_threeway_cmp force_find_les(ccc_key_cmp);
+static ccc_threeway_cmp force_find_grt(ccc_any_key_cmp);
+static ccc_threeway_cmp force_find_les(ccc_any_key_cmp);
 /* The key comes first. It is the "left hand side" of the comparison. */
 static ccc_threeway_cmp cmp(struct ccc_ommap_ const *, void const *key,
-                            struct ccc_ommap_elem_ const *, ccc_key_cmp_fn *);
+                            struct ccc_ommap_elem_ const *,
+                            ccc_any_key_cmp_fn *);
 
 /* ===========================    Interface     ============================ */
 
@@ -201,7 +203,7 @@ ccc_omm_or_insert(ccc_ommap_entry const *const e,
 }
 
 ccc_ommap_entry *
-ccc_omm_and_modify(ccc_ommap_entry *const e, ccc_update_fn *const fn)
+ccc_omm_and_modify(ccc_ommap_entry *const e, ccc_any_update_fn *const fn)
 {
     if (!e || !fn)
     {
@@ -215,7 +217,7 @@ ccc_omm_and_modify(ccc_ommap_entry *const e, ccc_update_fn *const fn)
 }
 
 ccc_ommap_entry *
-ccc_omm_and_modify_aux(ccc_ommap_entry *const e, ccc_update_fn *const fn,
+ccc_omm_and_modify_aux(ccc_ommap_entry *const e, ccc_any_update_fn *const fn,
                        void *const aux)
 {
     if (!e || !fn)
@@ -459,8 +461,8 @@ ccc_omm_extract(ccc_ordered_multimap *const mm,
 
 ccc_tribool
 ccc_omm_update(ccc_ordered_multimap *const mm,
-               ccc_ommap_elem *const key_val_handle, ccc_update_fn *const fn,
-               void *const aux)
+               ccc_ommap_elem *const key_val_handle,
+               ccc_any_update_fn *const fn, void *const aux)
 {
     if (!mm || !key_val_handle || !fn || !key_val_handle->branch_[L]
         || !key_val_handle->branch_[R])
@@ -479,16 +481,16 @@ ccc_omm_update(ccc_ordered_multimap *const mm,
 
 ccc_tribool
 ccc_omm_increase(ccc_ordered_multimap *const mm,
-                 ccc_ommap_elem *const key_val_handle, ccc_update_fn *const fn,
-                 void *const aux)
+                 ccc_ommap_elem *const key_val_handle,
+                 ccc_any_update_fn *const fn, void *const aux)
 {
     return ccc_omm_update(mm, key_val_handle, fn, aux);
 }
 
 ccc_tribool
 ccc_omm_decrease(ccc_ordered_multimap *const mm,
-                 ccc_ommap_elem *const key_val_handle, ccc_update_fn *const fn,
-                 void *const aux)
+                 ccc_ommap_elem *const key_val_handle,
+                 ccc_any_update_fn *const fn, void *const aux)
 {
     return ccc_omm_update(mm, key_val_handle, fn, aux);
 }
@@ -605,7 +607,7 @@ ccc_omm_validate(ccc_ordered_multimap const *const mm)
 
 ccc_result
 ccc_omm_clear(ccc_ordered_multimap *const mm,
-              ccc_destructor_fn *const destructor)
+              ccc_any_destructor_fn *const destructor)
 {
     if (!mm)
     {
@@ -971,7 +973,7 @@ multimap_erase(struct ccc_ommap_ *const t, void const *const key)
    comparison function that forces either the max or min to be searched. */
 static void *
 multimap_erase_max_or_min(struct ccc_ommap_ *const t,
-                          ccc_key_cmp_fn *const force_max_or_min)
+                          ccc_any_key_cmp_fn *const force_max_or_min)
 {
     if (!t || !force_max_or_min)
     {
@@ -1129,7 +1131,7 @@ remove_from_tree(struct ccc_ommap_ *const t, struct ccc_ommap_elem_ *const ret)
 
 static struct ccc_ommap_elem_ *
 splay(struct ccc_ommap_ *const t, struct ccc_ommap_elem_ *root,
-      void const *const key, ccc_key_cmp_fn *const cmp_fn)
+      void const *const key, ccc_any_key_cmp_fn *const cmp_fn)
 {
     /* Pointers in an array and we can use the symmetric enum and flip it to
        choose the Left or Right subtree. Another benefit of our nil node: use it
@@ -1248,10 +1250,10 @@ struct_base(struct ccc_ommap_ const *const t,
 
 static inline ccc_threeway_cmp
 cmp(struct ccc_ommap_ const *const t, void const *const key,
-    struct ccc_ommap_elem_ const *const node, ccc_key_cmp_fn *const fn)
+    struct ccc_ommap_elem_ const *const node, ccc_any_key_cmp_fn *const fn)
 {
-    return fn((ccc_key_cmp){
-        .key_lhs = key,
+    return fn((ccc_any_key_cmp){
+        .any_key_lhs = key,
         .any_type_rhs = struct_base(t, node),
         .aux = t->aux_,
     });
@@ -1282,13 +1284,13 @@ elem_in_slot(struct ccc_ommap_ const *const t, void const *const slot)
    found the desired element. Simply force the function to always
    return one or the other and we will end up at the max or min */
 static inline ccc_threeway_cmp
-force_find_grt(ccc_key_cmp const)
+force_find_grt(ccc_any_key_cmp const)
 {
     return CCC_GRT;
 }
 
 static inline ccc_threeway_cmp
-force_find_les(ccc_key_cmp const)
+force_find_les(ccc_any_key_cmp const)
 {
     return CCC_LES;
 }

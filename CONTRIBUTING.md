@@ -136,7 +136,7 @@ Here is an examples from `buffer.h` (may not be in sync with current code).
 ```c
 ccc_result
 ccc_buf_alloc(ccc_buffer *const buf, size_t const capacity,
-              ccc_alloc_fn *const fn)
+              ccc_any_alloc_fn *const fn)
 {
     if (!buf)
     {

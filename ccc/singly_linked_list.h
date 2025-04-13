@@ -228,7 +228,8 @@ It should only perform other necessary cleanup or state management.
 If allocation is not allowed fn may free memory or not as the user sees fit.
 The user is responsible for managing the memory that wraps each intrusive
 handle as the elements are simply removed from the list. */
-ccc_result ccc_sll_clear(ccc_singly_linked_list *sll, ccc_destructor_fn *fn);
+ccc_result ccc_sll_clear(ccc_singly_linked_list *sll,
+                         ccc_any_destructor_fn *fn);
 
 /**@}*/
 

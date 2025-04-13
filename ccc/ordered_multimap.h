@@ -95,9 +95,10 @@ Initialize the container with memory, callbacks, and permissions. */
 @param [in] any_struct_name the struct the user intends to store.
 @param [in] ommap_elem_field the name of the field with the intrusive element.
 @param [in] key_field the name of the field used as the multimap key.
-@param [in] key_cmp_fn the ccc_key_cmp_fn (types.h) used to compare the key to
-the current stored element under considertion during a map operation.
-@param [in] alloc_fn the ccc_alloc_fn (types.h) used to allocate nodes or NULL.
+@param [in] key_cmp_fn the ccc_any_key_cmp_fn (types.h) used to compare the key
+to the current stored element under considertion during a map operation.
+@param [in] alloc_fn the ccc_any_alloc_fn (types.h) used to allocate nodes or
+NULL.
 @param [in] aux any aux data needed for compare, print, or destruction.
 @return the initialized ordered multimap. Use this initializer on the right
 hand side of the variable at compile or run time
@@ -275,7 +276,7 @@ called on the entry with NULL as the auxiliary argument if the entry is
 Occupied, otherwise the function is not called. If either arguments to the
 function are NULL, NULL is returned. */
 [[nodiscard]] ccc_ommap_entry *ccc_omm_and_modify(ccc_ommap_entry *e,
-                                                  ccc_update_fn *fn);
+                                                  ccc_any_update_fn *fn);
 
 /** @brief Return a reference to the provided entry modified with fn and
 auxiliary data aux if Occupied.
@@ -287,7 +288,7 @@ called on the entry with aux as the auxiliary argument if the entry is
 Occupied, otherwise the function is not called. If any arguments to the
 function are NULL, NULL is returned. */
 [[nodiscard]] ccc_ommap_entry *
-ccc_omm_and_modify_aux(ccc_ommap_entry *e, ccc_update_fn *fn, void *aux);
+ccc_omm_and_modify_aux(ccc_ommap_entry *e, ccc_any_update_fn *fn, void *aux);
 
 /** @brief Modify an Occupied entry with a closure over user type T.
 @param [in] ordered_multimap_entry_ptr the address of the multimap entry.
@@ -523,7 +524,7 @@ arguments are provided or it can be deduced that key_val_handle is not a member
 of the container. */
 [[nodiscard]] ccc_tribool ccc_omm_update(ccc_ordered_multimap *mm,
                                          ccc_ommap_elem *key_val_handle,
-                                         ccc_update_fn *fn, void *aux);
+                                         ccc_any_update_fn *fn, void *aux);
 
 /** @brief Increases an element key that is currently tracked directly as a
 member of the map. Amortized O(lg N).
@@ -538,7 +539,7 @@ arguments are provided or it can be deduced that key_val_handle is not a member
 of the container. */
 [[nodiscard]] ccc_tribool ccc_omm_increase(ccc_ordered_multimap *mm,
                                            ccc_ommap_elem *key_val_handle,
-                                           ccc_update_fn *fn, void *aux);
+                                           ccc_any_update_fn *fn, void *aux);
 
 /** @brief Decreases an element key that is currently tracked directly as a
 member of the map. Amortized O(lg N).
@@ -553,7 +554,7 @@ arguments are provided or it can be deduced that key_val_handle is not a member
 of the container. */
 [[nodiscard]] ccc_tribool ccc_omm_decrease(ccc_ordered_multimap *mm,
                                            ccc_ommap_elem *key_val_handle,
-                                           ccc_update_fn *fn, void *aux);
+                                           ccc_any_update_fn *fn, void *aux);
 
 /**@}*/
 
@@ -576,7 +577,7 @@ If the container has not been given allocation permission, then the destructor
 may free elements or not depending on how and when the user wishes to free
 elements of the map according to their own memory management schemes. */
 ccc_result ccc_omm_clear(ccc_ordered_multimap *mm,
-                         ccc_destructor_fn *destructor);
+                         ccc_any_destructor_fn *destructor);
 
 /**@}*/
 

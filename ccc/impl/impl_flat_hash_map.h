@@ -114,11 +114,11 @@ struct ccc_fhmap_
     /** The location of the key field in user type. */
     size_t key_offset_;
     /** The user callback for equality comparison. */
-    ccc_key_eq_fn *eq_fn_;
+    ccc_any_key_eq_fn *eq_fn_;
     /** The hash function provided by user. */
-    ccc_hash_fn *hash_fn_;
+    ccc_any_hash_fn *hash_fn_;
     /** The allocation function, if any. */
-    ccc_alloc_fn *alloc_fn_;
+    ccc_any_alloc_fn *alloc_fn_;
     /** Auxiliary data, if any. */
     void *aux_;
 };

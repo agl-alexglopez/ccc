@@ -148,7 +148,7 @@ Note that this operation may incur unnecessary overhead if the user can't
 deduce if an increase or decrease is occurring. See the increase and decrease
 operations. O(1) best case, O(lgN) worst case. */
 ccc_tribool ccc_pq_update(ccc_priority_queue *pq, ccc_pq_elem *elem,
-                          ccc_update_fn *fn, void *aux);
+                          ccc_any_update_fn *fn, void *aux);
 
 /** @brief Update the priority in the user type stored in the container.
 @param [in] pq_ptr a pointer to the priority queue.
@@ -197,7 +197,7 @@ value. If this is a max heap O(1), otherwise O(lgN).
 While the best case operation is O(1) the impact of restructuring on future pops
 from the pq creates an amortized o(lgN) runtime for this function. */
 ccc_tribool ccc_pq_increase(ccc_priority_queue *pq, ccc_pq_elem *elem,
-                            ccc_update_fn *fn, void *aux);
+                            ccc_any_update_fn *fn, void *aux);
 
 /** @brief Increases the priority of the user type stored in the container.
 @param [in] pq_ptr a pointer to the priority queue.
@@ -249,7 +249,7 @@ value. If this is a min heap O(1), otherwise O(lgN).
 While the best case operation is O(1) the impact of restructuring on future pops
 from the pq creates an amortized o(lgN) runtime for this function. */
 ccc_tribool ccc_pq_decrease(ccc_priority_queue *pq, ccc_pq_elem *elem,
-                            ccc_update_fn *fn, void *aux);
+                            ccc_any_update_fn *fn, void *aux);
 
 /** @brief Decreases the priority of the user type stored in the container.
 @param [in] pq_ptr a pointer to the priority queue.
@@ -304,7 +304,7 @@ If allocation is not allowed, the user may free their stored types in the
 destructor function if they wish to do so. The container simply removes all
 the elements from the pq, calling fn on each user type if provided, and sets the
 size to zero. */
-ccc_result ccc_pq_clear(ccc_priority_queue *pq, ccc_destructor_fn *fn);
+ccc_result ccc_pq_clear(ccc_priority_queue *pq, ccc_any_destructor_fn *fn);
 
 /**@}*/
 

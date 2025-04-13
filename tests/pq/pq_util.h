@@ -15,7 +15,7 @@ struct val
 };
 
 void val_update(ccc_any_type);
-ccc_threeway_cmp val_cmp(ccc_cmp);
+ccc_threeway_cmp val_cmp(ccc_any_cmp);
 enum check_result insert_shuffled(ccc_priority_queue *, struct val[], size_t,
                                   int);
 enum check_result inorder_fill(int[], size_t, ccc_priority_queue *);

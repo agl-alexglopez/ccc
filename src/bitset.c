@@ -84,7 +84,7 @@ static struct group max_trailing_ones(ccc_bitblock_ b, size_t i_in_block,
 static struct group max_leading_ones(ccc_bitblock_ b, ptrdiff_t i_in_block,
                                      ptrdiff_t num_ones_remaining);
 static ccc_result maybe_resize(struct ccc_bitset_ *bs, size_t to_add,
-                               ccc_alloc_fn *);
+                               ccc_any_alloc_fn *);
 static size_t min(size_t, size_t);
 static void set_all(struct ccc_bitset_ *bs, ccc_tribool b);
 static blockwidth_t blockwidth_i(size_t bit_i);
@@ -866,7 +866,7 @@ ccc_bs_clear_and_free(ccc_bitset *const bs)
 }
 
 ccc_result
-ccc_bs_clear_and_free_reserve(ccc_bitset *bs, ccc_alloc_fn *fn)
+ccc_bs_clear_and_free_reserve(ccc_bitset *bs, ccc_any_alloc_fn *fn)
 {
     if (!bs || !fn)
     {
@@ -883,7 +883,7 @@ ccc_bs_clear_and_free_reserve(ccc_bitset *bs, ccc_alloc_fn *fn)
 
 ccc_result
 ccc_bs_reserve(ccc_bitset *const bs, size_t const to_add,
-               ccc_alloc_fn *const fn)
+               ccc_any_alloc_fn *const fn)
 {
     if (!bs || !fn)
     {
@@ -894,7 +894,7 @@ ccc_bs_reserve(ccc_bitset *const bs, size_t const to_add,
 
 ccc_result
 ccc_bs_copy(ccc_bitset *const dst, ccc_bitset const *const src,
-            ccc_alloc_fn *const fn)
+            ccc_any_alloc_fn *const fn)
 {
     if (!dst || !src || (dst->cap_ < src->cap_ && !fn))
     {
@@ -905,7 +905,7 @@ ccc_bs_copy(ccc_bitset *const dst, ccc_bitset const *const src,
        over everything else as a catch all. */
     ccc_bitblock_ *const dst_mem = dst->mem_;
     size_t const dst_cap = dst->cap_;
-    ccc_alloc_fn *const dst_alloc = dst->alloc_;
+    ccc_any_alloc_fn *const dst_alloc = dst->alloc_;
     *dst = *src;
     dst->mem_ = dst_mem;
     dst->cap_ = dst_cap;
@@ -981,7 +981,7 @@ is_subset_of(struct ccc_bitset_ const *const set,
 
 static ccc_result
 maybe_resize(struct ccc_bitset_ *const bs, size_t const to_add,
-             ccc_alloc_fn *const fn)
+             ccc_any_alloc_fn *const fn)
 {
     size_t required = bs->sz_ + to_add;
     if (required < bs->sz_)

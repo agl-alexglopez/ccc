@@ -127,7 +127,7 @@ ccc_pq_erase(ccc_priority_queue *const pq, ccc_pq_elem *const e)
 }
 
 ccc_result
-ccc_pq_clear(ccc_priority_queue *const pq, ccc_destructor_fn *const fn)
+ccc_pq_clear(ccc_priority_queue *const pq, ccc_any_destructor_fn *const fn)
 {
     if (!pq)
     {
@@ -172,7 +172,7 @@ ccc_pq_size(ccc_priority_queue const *const pq)
    left child value. */
 ccc_tribool
 ccc_pq_update(ccc_priority_queue *const pq, ccc_pq_elem *const e,
-              ccc_update_fn *const fn, void *const aux)
+              ccc_any_update_fn *const fn, void *const aux)
 {
     if (!pq || !e || !fn || !e->next_sibling_ || !e->prev_sibling_)
     {
@@ -187,7 +187,7 @@ ccc_pq_update(ccc_priority_queue *const pq, ccc_pq_elem *const e,
    Much more efficient. */
 ccc_tribool
 ccc_pq_increase(ccc_priority_queue *const pq, ccc_pq_elem *const e,
-                ccc_update_fn *const fn, void *const aux)
+                ccc_any_update_fn *const fn, void *const aux)
 {
     if (!pq || !e || !fn || !e->next_sibling_ || !e->prev_sibling_)
     {
@@ -202,7 +202,7 @@ ccc_pq_increase(ccc_priority_queue *const pq, ccc_pq_elem *const e,
    Much more efficient. */
 ccc_tribool
 ccc_pq_decrease(ccc_priority_queue *const pq, ccc_pq_elem *const e,
-                ccc_update_fn *const fn, void *const aux)
+                ccc_any_update_fn *const fn, void *const aux)
 {
     if (!pq || !e || !fn || !e->next_sibling_ || !e->prev_sibling_)
     {
@@ -464,9 +464,9 @@ static inline ccc_threeway_cmp
 cmp(struct ccc_pq_ const *const pq, struct ccc_pq_elem_ const *const a,
     struct ccc_pq_elem_ const *const b)
 {
-    return pq->cmp_((ccc_cmp){.any_type_lhs = struct_base(pq, a),
-                              .any_type_rhs = struct_base(pq, b),
-                              .aux = pq->aux_});
+    return pq->cmp_((ccc_any_cmp){.any_type_lhs = struct_base(pq, a),
+                                  .any_type_rhs = struct_base(pq, b),
+                                  .aux = pq->aux_});
 }
 
 static inline void *
