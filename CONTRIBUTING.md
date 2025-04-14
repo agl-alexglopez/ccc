@@ -181,5 +181,6 @@ Variable length arrays are prohibited because they could cause hard to find bugs
 
 At least the following would need to happen before `v1.0`.
 
+- Iterative O(1) space natural merge sort for linked lists. Right now comparison function capability is unused and this a core feature of linked lists that must be implemented.
 - More tests. I added a decent suite of tests to each container with most of the focus on the associative containers, but more thorough testing should be added throughout.
 - Now that a much more efficient hash table has been implemented, an adaptation of Rust's Hashbrown Hash Table, it is time to start narrowing down changes and lock in interfaces for v1.0. Suggestions are welcome for this phase of refactoring.
