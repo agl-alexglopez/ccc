@@ -43,7 +43,7 @@ right code paths can be united into one */
 enum tree_link_
 {
     L = 0,
-    R = 1
+    R = 1,
 };
 
 /** @private Trees are just a different interpretation of the same links used
@@ -51,7 +51,7 @@ for doubly linked lists. We take advantage of this for duplicates. */
 enum list_link_
 {
     P = 0,
-    N = 1
+    N = 1,
 };
 
 #define INORDER_TRAVERSAL R

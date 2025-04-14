@@ -39,7 +39,7 @@ constant time queries for frequently accessed elements. */
 /** @private */
 enum
 {
-    LR = 2
+    LR = 2,
 };
 
 /** @private */

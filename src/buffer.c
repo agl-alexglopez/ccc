@@ -17,7 +17,10 @@ limitations under the License. */
 #include "buffer.h"
 #include "types.h"
 
-static size_t const start_capacity = 8;
+enum : size_t
+{
+    START_CAPACITY = 8,
+};
 
 /*==========================   Prototypes    ================================*/
 
@@ -80,7 +83,7 @@ ccc_buf_alloc_back(ccc_buffer *const buf)
         && (CCC_RESULT_OK
             != (buf->capacity_
                     ? ccc_buf_alloc(buf, buf->capacity_ * 2, buf->alloc_)
-                    : ccc_buf_alloc(buf, start_capacity, buf->alloc_))))
+                    : ccc_buf_alloc(buf, START_CAPACITY, buf->alloc_))))
     {
         return NULL;
     }
