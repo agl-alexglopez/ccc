@@ -8,7 +8,7 @@
 CHECK_BEGIN_STATIC_FN(bs_test_construct)
 {
     ccc_bitset bs
-        = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(10)]){}, NULL, NULL, 10, 10);
+        = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(10)]){}, NULL, NULL, 10);
     CHECK(ccc_bs_popcount(&bs).count, 0);
     for (size_t i = 0; i < ccc_bs_capacity(&bs).count; ++i)
     {
@@ -21,7 +21,7 @@ CHECK_BEGIN_STATIC_FN(bs_test_construct)
 CHECK_BEGIN_STATIC_FN(bs_test_copy_no_alloc)
 {
     ccc_bitset src
-        = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(512)]){}, NULL, NULL, 512);
+        = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(512)]){}, NULL, NULL, 512, 0);
     CHECK(ccc_bs_capacity(&src).count, 512);
     CHECK(ccc_bs_size(&src).count, 0);
     ccc_result push_status = CCC_RESULT_OK;
@@ -38,7 +38,7 @@ CHECK_BEGIN_STATIC_FN(bs_test_copy_no_alloc)
     }
     CHECK(push_status, CCC_RESULT_NO_ALLOC);
     ccc_bitset dst
-        = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(513)]){}, NULL, NULL, 513);
+        = ccc_bs_init((ccc_bitblock[ccc_bs_blocks(513)]){}, NULL, NULL, 513, 0);
     ccc_result r = ccc_bs_copy(&dst, &src, NULL);
     CHECK(r, CCC_RESULT_OK);
     CHECK(ccc_bs_popcount(&src).count, ccc_bs_popcount(&dst).count);
