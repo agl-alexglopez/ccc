@@ -1,6 +1,7 @@
 #define TRAITS_USING_NAMESPACE_CCC
 #define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC
 
+#include "alloc.h"
 #include "checkers.h"
 #include "fdeq_util.h"
 #include "flat_double_ended_queue.h"
@@ -38,6 +39,99 @@ CHECK_BEGIN_STATIC_FN(fdeq_test_push_pop_back_three)
     }
     CHECK(is_empty(&q), true);
     CHECK_END_FN();
+}
+
+CHECK_BEGIN_STATIC_FN(fdeq_test_push_pop_front_and_back_singles)
+{
+    /* Avoids Variable Length Arrays but nobody else needs this constant. */
+    enum : size_t
+    {
+        SM_FIXED_Q = 64,
+    };
+    flat_double_ended_queue q
+        = fdeq_init((int[SM_FIXED_Q]){}, NULL, NULL, SM_FIXED_Q);
+    /* Move the front pointer back a bit so that pushing to both sides wraps. */
+    (void)ccc_fdeq_push_back_range(
+        &q, 20,
+        (int[20]){7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7});
+    while (!ccc_fdeq_is_empty(&q))
+    {
+        CHECK(*((int *)ccc_fdeq_front(&q)), 7);
+        CHECK(ccc_fdeq_pop_front(&q), CCC_RESULT_OK);
+    }
+    for (size_t i = 0; ccc_fdeq_size(&q).count != SM_FIXED_Q; ++i)
+    {
+        if (i % 2)
+        {
+            CHECK(ccc_fdeq_push_front(&q, &(int){1}) != NULL, true);
+        }
+        else
+        {
+            CHECK(ccc_fdeq_push_back(&q, &(int){0}) != NULL, true);
+        }
+    }
+    size_t i = 0;
+    for (; !ccc_fdeq_is_empty(&q); ++i)
+    {
+        if (i % 2)
+        {
+            int const elem = *((int *)ccc_fdeq_front(&q));
+            CHECK(ccc_fdeq_pop_front(&q), CCC_RESULT_OK);
+            CHECK(elem, 1);
+        }
+        else
+        {
+            int const elem = *((int *)ccc_fdeq_back(&q));
+            CHECK(ccc_fdeq_pop_back(&q), CCC_RESULT_OK);
+            CHECK(elem, 0);
+        }
+    }
+    CHECK(i, SM_FIXED_Q);
+    CHECK_END_FN();
+}
+
+CHECK_BEGIN_STATIC_FN(fdeq_test_push_pop_front_and_back_singles_dynamic)
+{
+    size_t const sm_dyn_q = 128;
+    flat_double_ended_queue q = fdeq_init((int *)NULL, std_alloc, NULL, 0);
+    /* Move the front pointer back a bit so that pushing to both sides wraps. */
+    (void)ccc_fdeq_push_back_range(
+        &q, 20,
+        (int[20]){7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7});
+    while (!ccc_fdeq_is_empty(&q))
+    {
+        CHECK(*((int *)ccc_fdeq_front(&q)), 7);
+        CHECK(ccc_fdeq_pop_front(&q), CCC_RESULT_OK);
+    }
+    for (size_t i = 0; ccc_fdeq_size(&q).count != sm_dyn_q; ++i)
+    {
+        if (i % 2)
+        {
+            CHECK(ccc_fdeq_push_front(&q, &(int){1}) != NULL, true);
+        }
+        else
+        {
+            CHECK(ccc_fdeq_push_back(&q, &(int){0}) != NULL, true);
+        }
+    }
+    size_t i = 0;
+    for (; !ccc_fdeq_is_empty(&q); ++i)
+    {
+        if (i % 2)
+        {
+            int const elem = *((int *)ccc_fdeq_front(&q));
+            CHECK(ccc_fdeq_pop_front(&q), CCC_RESULT_OK);
+            CHECK(elem, 1);
+        }
+        else
+        {
+            int const elem = *((int *)ccc_fdeq_back(&q));
+            CHECK(ccc_fdeq_pop_back(&q), CCC_RESULT_OK);
+            CHECK(elem, 0);
+        }
+    }
+    CHECK(i, sm_dyn_q);
+    CHECK_END_FN(ccc_fdeq_clear_and_free(&q, NULL););
 }
 
 CHECK_BEGIN_STATIC_FN(fdeq_test_push_pop_front_three)
@@ -142,6 +236,8 @@ main()
 {
     return CHECK_RUN(
         fdeq_test_push_pop_back_three(), fdeq_test_push_pop_front_three(),
+        fdeq_test_push_pop_front_and_back_singles(),
+        fdeq_test_push_pop_front_and_back_singles_dynamic(),
         fdeq_test_push_pop_front_back(), fdeq_test_push_pop_front_ranges(),
         fdeq_test_push_pop_back_ranges(), fdeq_test_push_pop_middle_ranges());
 }
