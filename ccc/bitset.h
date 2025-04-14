@@ -64,21 +64,20 @@ Types available in the container interface. */
 /**@{*/
 
 /** @brief The bit set type that may be stored and initialized on the stack,
-heap, or data segment at compile time or runtime.
+heap, or data segment at compile or run time.
 
 A bit set offers fast membership testing and bit range manipulations when the
 data can be modeled as a 0-indexed key value data set. In the case of a bit
-set the key is the index in the bit set and the value is 1 or 0 depending on
-how the bit has been set. Operations on single bits occur in O(1) time. All
-scanning operations operate in O(N) time. */
+set the key is the index in the bit set and the value is 1 or 0. Operations on
+single bits occur in O(1) time. All scanning operations operate in O(N) time. */
 typedef struct ccc_bitset_ ccc_bitset;
 
 /** @brief The type used to efficiently store bits in the bit set.
 
-A block is a pre-determined integer width that allows for efficient block sized
-bit operations for various scanning and setting tasks. The user must participate
-in the storage of the bit set by using the provided ccc_bs_blocks macro to
-determine how many blocks are needed for the desired bits in the bit set. */
+A block is an integer that allows for efficient block sized bit operations for
+various scanning and setting. The user must participate in the storage of the
+bit set by using the provided ccc_bs_blocks macro to determine how many blocks
+are needed for the desired bits in the bit set. */
 typedef ccc_bitblock_ ccc_bitblock;
 
 /**@}*/
@@ -93,8 +92,7 @@ Initialize and create containers with memory and permissions. */
 @warning bit_cap must be >= 1.
 @note this macro is not needed if capacity is 0 to start.
 
-This method can be used for compile time initialization of bit sets so the user
-need to worry about the underlying bit set representation. For example:
+This method can be used for compile time initialization of bit set. For example:
 
 ```
 static ccc_bitset b
@@ -103,8 +101,8 @@ static ccc_bitset b
 
 The above example also illustrates the benefits of a static compound literal
 to encapsulate the bits within the bit set array to prevent dangling references.
-If your compiler has not implemented storage duration of compound literals the
-more traditional example would look like this.
+If the compiler does not support storage duration of compound literals the more
+traditional example follows:
 
 ```
 static ccc_bitblock blocks[ccc_bs_blocks(256)];
@@ -112,7 +110,8 @@ static ccc_bitset b = ccc_bs_init(blocks, NULL, NULL, 256);
 ```
 
 This macro is required for any initialization where the bit block memory comes
-from the stack or data segment as determined by the user. */
+from the stack or data segment. For one time dynamic reservations of bit block
+memory see the ccc_bs_reserve and ccc_bs_clear_and_free_reserve interface. */
 #define ccc_bs_blocks(bit_cap) ccc_impl_bs_blocks(bit_cap)
 
 /** @brief Initialize the bit set with memory and allocation permissions.
@@ -120,9 +119,11 @@ from the stack or data segment as determined by the user. */
 @param [in] alloc_fn the allocation function for a dynamic bit set or NULL.
 @param [in] aux auxiliary data needed for allocation of the bit set.
 @param [in] cap the number of bits that will be stored in this bit set.
-@param [in] optional_size an optional starting size <= capacity. If the bitset
-is of fixed size with no allocation permission, and dynamic push and pop are not
-needed, the optional size parameter should be set equivalent to capacity.
+@param [in] optional_size an optional starting size <= capacity. This value
+defaults to the same value as capacity which is appropriate for most cases. For
+any case where this is not desirable, set the size manually (for example, a
+fixed size bit set that is pushed to dynamically would have a non-zero capacity
+and 0 size).
 @return the initialized bit set on the right hand side of an equality operator
 @warning the user must use the ccc_bs_blocks macro to help determine the size of
 the bitblock array if a fixed size bitblock array is provided at compile time;
@@ -130,11 +131,20 @@ the necessary conversion from bits requested to number of blocks required to
 store those bits must occur before use. If capacity is zero the helper macro
 is not needed.
 
+A fixed size bit set with size equal to capacity.
+
 ```
 #define BITSET_USING_NAMESPACE_CCC
-bitset bs = bs_init((bitblock[bs_blocks(9)]){}, 9, NULL, NULL, 9);
+bitset bs = bs_init((bitblock[bs_blocks(9)]){}, NULL, NULL, 9);
 ```
-Or, initialize with zero capacity for a dynamic bit set.
+A fixed size bit set with dynamic push and pop.
+
+```
+#define BITSET_USING_NAMESPACE_CCC
+bitset bs = bs_init((bitblock[bs_blocks(9)]){}, NULL, NULL, 9, 0);
+```
+
+A dynamic bit set initialization.
 
 ```
 #define BITSET_USING_NAMESPACE_CCC

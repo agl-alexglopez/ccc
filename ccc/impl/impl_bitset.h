@@ -42,18 +42,21 @@ struct ccc_bitset_
      / (sizeof(ccc_bitblock_) * CHAR_BIT))
 
 /** @private */
-#define IMPL_BS_NON_IMPL_BS_DEFAULT_SIZE(...) __VA_ARGS__
+#define IMPL_BS_NON_IMPL_BS_DEFAULT_SIZE(cap, ...) __VA_ARGS__
 /** @private */
-#define IMPL_BS_DEFAULT_SIZE(...) 0
+#define IMPL_BS_DEFAULT_SIZE(cap, ...) cap
 /** @private */
-#define IMPL_BS_OPTIONAL_SIZE(...)                                             \
-    __VA_OPT__(IMPL_BS_NON_)##IMPL_BS_DEFAULT_SIZE(__VA_ARGS__)
+#define IMPL_BS_OPTIONAL_SIZE(cap, ...)                                        \
+    __VA_OPT__(IMPL_BS_NON_)##IMPL_BS_DEFAULT_SIZE(cap, __VA_ARGS__)
 
-/** @private */
+/** @private Capacity is required argument from the user while size is optional.
+The optional size param defaults equal to capacity if not provided. This covers
+most common cases--fixed size bit set, 0 sized dynamic bit set--and when the
+user wants a fixed size dynamic bit set they provide 0 as size argument. */
 #define ccc_impl_bs_init(bitblock_ptr, alloc_fn, aux, cap, ...)                \
     {                                                                          \
         .mem_ = (bitblock_ptr),                                                \
-        .sz_ = IMPL_BS_OPTIONAL_SIZE(__VA_ARGS__),                             \
+        .sz_ = IMPL_BS_OPTIONAL_SIZE((cap), __VA_ARGS__),                      \
         .cap_ = (cap),                                                         \
         .alloc_ = (alloc_fn),                                                  \
         .aux_ = (aux),                                                         \
