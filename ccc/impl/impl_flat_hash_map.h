@@ -99,7 +99,7 @@ struct ccc_fhmap_
 {
     /** Reversed user type data array. */
     void *data_;
-    /** Tagdata array on byte following data(0). */
+    /** Tag array on byte following data(0). */
     ccc_fhm_tag *tag_;
     /** The number of user active slots. */
     size_t sz_;
