@@ -169,7 +169,7 @@ bitset.h (dropdown)</summary>
 <div class="line">                    <span class="keywordtype">size_t</span> <span class="keyword">const</span> col_start)</div>
 <div class="line">{</div>
 <div class="line">    bitset box_check</div>
-<div class="line">        = bs_init((bitblock[bs_blocks(DIGITS)]){}, NULL, NULL, DIGITS, DIGITS);</div>
+<div class="line">        = bs_init((bitblock[bs_blocks(DIGITS)]){}, NULL, NULL, DIGITS);</div>
 <div class="line">    <a class="code hl_enumeration" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> was_on = <a class="code hl_enumvalue" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938ae6c212c69cef1332b6d31d4783fb0110">CCC_FALSE</a>;</div>
 <div class="line">    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> r = row_start; r &lt; row_start + BOX_SIZE; ++r)</div>
 <div class="line">    {</div>
@@ -210,10 +210,10 @@ bitset.h (dropdown)</summary>
 <div class="line">{</div>
 <div class="line">    bitset row_check</div>
 <div class="line">        = bs_init((bitblock[bs_blocks(ROWS * DIGITS)]){}, NULL, NULL,</div>
-<div class="line">                  ROWS * DIGITS, ROWS * DIGITS);</div>
+<div class="line">                  ROWS * DIGITS);</div>
 <div class="line">    bitset col_check</div>
 <div class="line">        = bs_init((bitblock[bs_blocks(ROWS * DIGITS)]){}, NULL, NULL,</div>
-<div class="line">                  COLS * DIGITS, COLS * DIGITS);</div>
+<div class="line">                  COLS * DIGITS);</div>
 <div class="line">    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> row = 0; row &lt; ROWS; row += BOX_SIZE)</div>
 <div class="line">    {</div>
 <div class="line">        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> col = 0; col &lt; COLS; col += BOX_SIZE)</div>

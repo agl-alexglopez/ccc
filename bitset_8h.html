@@ -142,7 +142,7 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr><td class="ititle" colspan="2"><p>Types available in the container interface. </p>
 </td></tr>
 <tr class="memitem:a9e5e8a0511fe3def848af70344c5b9f3"><td class="memItemLeft" align="right" valign="top">typedef struct ccc_bitset_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a></td></tr>
-<tr class="memdesc:a9e5e8a0511fe3def848af70344c5b9f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">The bit set type that may be stored and initialized on the stack, heap, or data segment at compile time or runtime.  <br /></td></tr>
+<tr class="memdesc:a9e5e8a0511fe3def848af70344c5b9f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">The bit set type that may be stored and initialized on the stack, heap, or data segment at compile or run time.  <br /></td></tr>
 <tr class="separator:a9e5e8a0511fe3def848af70344c5b9f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9c11247557b86b5658723dd9edc58622"><td class="memItemLeft" align="right" valign="top">typedef ccc_bitblock_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a9c11247557b86b5658723dd9edc58622">ccc_bitblock</a></td></tr>
 <tr class="memdesc:a9c11247557b86b5658723dd9edc58622"><td class="mdescLeft">&#160;</td><td class="mdescRight">The type used to efficiently store bits in the bit set.  <br /></td></tr>
@@ -375,17 +375,17 @@ This graph shows which files directly or indirectly include this file:</div>
 <dl class="section return"><dt>Returns</dt><dd>the number of blocks needed for the desired bit set. </dd></dl>
 <dl class="section warning"><dt>Warning</dt><dd>bit_cap must be &gt;= 1. </dd></dl>
 <dl class="section note"><dt>Note</dt><dd>this macro is not needed if capacity is 0 to start.</dd></dl>
-<p>This method can be used for compile time initialization of bit sets so the user need to worry about the underlying bit set representation. For example:</p>
+<p>This method can be used for compile time initialization of bit set. For example:</p>
 <div class="fragment"><div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> b</div>
 <div class="line">    = <a class="code hl_define" href="bitset_8h.html#a98aee1dcbd78e1eb644babc2d3c629e4">ccc_bs_init</a>((<span class="keyword">static</span> <a class="code hl_typedef" href="bitset_8h.html#a9c11247557b86b5658723dd9edc58622">ccc_bitblock</a>[<a class="code hl_define" href="bitset_8h.html#a1099f64c2982ed888e26a6edb6b13734">ccc_bs_blocks</a>(256)]){}, NULL, NULL, 256);</div>
-<div class="ttc" id="abitset_8h_html_a1099f64c2982ed888e26a6edb6b13734"><div class="ttname"><a href="bitset_8h.html#a1099f64c2982ed888e26a6edb6b13734">ccc_bs_blocks</a></div><div class="ttdeci">#define ccc_bs_blocks(bit_cap)</div><div class="ttdoc">Get the number of bit blocks needed for the desired bit set capacity.</div><div class="ttdef"><b>Definition:</b> bitset.h:116</div></div>
-<div class="ttc" id="abitset_8h_html_a98aee1dcbd78e1eb644babc2d3c629e4"><div class="ttname"><a href="bitset_8h.html#a98aee1dcbd78e1eb644babc2d3c629e4">ccc_bs_init</a></div><div class="ttdeci">#define ccc_bs_init(bitblock_ptr, alloc_fn, aux, cap, optional_size...)</div><div class="ttdoc">Initialize the bit set with memory and allocation permissions.</div><div class="ttdef"><b>Definition:</b> bitset.h:145</div></div>
-<div class="ttc" id="abitset_8h_html_a9c11247557b86b5658723dd9edc58622"><div class="ttname"><a href="bitset_8h.html#a9c11247557b86b5658723dd9edc58622">ccc_bitblock</a></div><div class="ttdeci">ccc_bitblock_ ccc_bitblock</div><div class="ttdoc">The type used to efficiently store bits in the bit set.</div><div class="ttdef"><b>Definition:</b> bitset.h:82</div></div>
-<div class="ttc" id="abitset_8h_html_a9e5e8a0511fe3def848af70344c5b9f3"><div class="ttname"><a href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a></div><div class="ttdeci">struct ccc_bitset_ ccc_bitset</div><div class="ttdoc">The bit set type that may be stored and initialized on the stack, heap, or data segment at compile ti...</div><div class="ttdef"><b>Definition:</b> bitset.h:74</div></div>
-</div><!-- fragment --><p>The above example also illustrates the benefits of a static compound literal to encapsulate the bits within the bit set array to prevent dangling references. If your compiler has not implemented storage duration of compound literals the more traditional example would look like this.</p>
+<div class="ttc" id="abitset_8h_html_a1099f64c2982ed888e26a6edb6b13734"><div class="ttname"><a href="bitset_8h.html#a1099f64c2982ed888e26a6edb6b13734">ccc_bs_blocks</a></div><div class="ttdeci">#define ccc_bs_blocks(bit_cap)</div><div class="ttdoc">Get the number of bit blocks needed for the desired bit set capacity.</div><div class="ttdef"><b>Definition:</b> bitset.h:115</div></div>
+<div class="ttc" id="abitset_8h_html_a98aee1dcbd78e1eb644babc2d3c629e4"><div class="ttname"><a href="bitset_8h.html#a98aee1dcbd78e1eb644babc2d3c629e4">ccc_bs_init</a></div><div class="ttdeci">#define ccc_bs_init(bitblock_ptr, alloc_fn, aux, cap, optional_size...)</div><div class="ttdoc">Initialize the bit set with memory and allocation permissions.</div><div class="ttdef"><b>Definition:</b> bitset.h:155</div></div>
+<div class="ttc" id="abitset_8h_html_a9c11247557b86b5658723dd9edc58622"><div class="ttname"><a href="bitset_8h.html#a9c11247557b86b5658723dd9edc58622">ccc_bitblock</a></div><div class="ttdeci">ccc_bitblock_ ccc_bitblock</div><div class="ttdoc">The type used to efficiently store bits in the bit set.</div><div class="ttdef"><b>Definition:</b> bitset.h:81</div></div>
+<div class="ttc" id="abitset_8h_html_a9e5e8a0511fe3def848af70344c5b9f3"><div class="ttname"><a href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a></div><div class="ttdeci">struct ccc_bitset_ ccc_bitset</div><div class="ttdoc">The bit set type that may be stored and initialized on the stack, heap, or data segment at compile or...</div><div class="ttdef"><b>Definition:</b> bitset.h:73</div></div>
+</div><!-- fragment --><p>The above example also illustrates the benefits of a static compound literal to encapsulate the bits within the bit set array to prevent dangling references. If the compiler does not support storage duration of compound literals the more traditional example follows:</p>
 <div class="fragment"><div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="bitset_8h.html#a9c11247557b86b5658723dd9edc58622">ccc_bitblock</a> blocks[<a class="code hl_define" href="bitset_8h.html#a1099f64c2982ed888e26a6edb6b13734">ccc_bs_blocks</a>(256)];</div>
 <div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> b = <a class="code hl_define" href="bitset_8h.html#a98aee1dcbd78e1eb644babc2d3c629e4">ccc_bs_init</a>(blocks, NULL, NULL, 256);</div>
-</div><!-- fragment --><p>This macro is required for any initialization where the bit block memory comes from the stack or data segment as determined by the user. </p>
+</div><!-- fragment --><p>This macro is required for any initialization where the bit block memory comes from the stack or data segment. For one time dynamic reservations of bit block memory see the ccc_bs_reserve and ccc_bs_clear_and_free_reserve interface. </p>
 
 </div>
 </div>
@@ -440,15 +440,19 @@ This graph shows which files directly or indirectly include this file:</div>
     <tr><td class="paramdir">[in]</td><td class="paramname">alloc_fn</td><td>the allocation function for a dynamic bit set or NULL. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">aux</td><td>auxiliary data needed for allocation of the bit set. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">cap</td><td>the number of bits that will be stored in this bit set. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">optional_size</td><td>an optional starting size &lt;= capacity. If the bitset is of fixed size with no allocation permission, and dynamic push and pop are not needed, the optional size parameter should be set equivalent to capacity. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">optional_size</td><td>an optional starting size &lt;= capacity. This value defaults to the same value as capacity which is appropriate for most cases. For any case where this is not desirable, set the size manually (for example, a fixed size bit set that is pushed to dynamically would have a non-zero capacity and 0 size). </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the initialized bit set on the right hand side of an equality operator </dd></dl>
 <dl class="section warning"><dt>Warning</dt><dd>the user must use the ccc_bs_blocks macro to help determine the size of the bitblock array if a fixed size bitblock array is provided at compile time; the necessary conversion from bits requested to number of blocks required to store those bits must occur before use. If capacity is zero the helper macro is not needed.</dd></dl>
+<p>A fixed size bit set with size equal to capacity.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define BITSET_USING_NAMESPACE_CCC</span></div>
-<div class="line">bitset bs = bs_init((bitblock[bs_blocks(9)]){}, 9, NULL, NULL, 9);</div>
-</div><!-- fragment --><p> Or, initialize with zero capacity for a dynamic bit set.</p>
+<div class="line">bitset bs = bs_init((bitblock[bs_blocks(9)]){}, NULL, NULL, 9);</div>
+</div><!-- fragment --><p> A fixed size bit set with dynamic push and pop.</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#define BITSET_USING_NAMESPACE_CCC</span></div>
+<div class="line">bitset bs = bs_init((bitblock[bs_blocks(9)]){}, NULL, NULL, 9, 0);</div>
+</div><!-- fragment --><p>A dynamic bit set initialization.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define BITSET_USING_NAMESPACE_CCC</span></div>
 <div class="line">bitset bs = bs_init(NULL, std_alloc, NULL, 0);</div>
 </div><!-- fragment --><p>See <a class="el" href="types_8h.html" title="The C Container Collection Fundamental Types.">types.h</a> for more on allocation functions. </p>
@@ -469,7 +473,7 @@ This graph shows which files directly or indirectly include this file:</div>
 </div><div class="memdoc">
 
 <p>The type used to efficiently store bits in the bit set. </p>
-<p>A block is a pre-determined integer width that allows for efficient block sized bit operations for various scanning and setting tasks. The user must participate in the storage of the bit set by using the provided ccc_bs_blocks macro to determine how many blocks are needed for the desired bits in the bit set. </p>
+<p>A block is an integer that allows for efficient block sized bit operations for various scanning and setting. The user must participate in the storage of the bit set by using the provided ccc_bs_blocks macro to determine how many blocks are needed for the desired bits in the bit set. </p>
 
 </div>
 </div>
@@ -485,8 +489,8 @@ This graph shows which files directly or indirectly include this file:</div>
       </table>
 </div><div class="memdoc">
 
-<p>The bit set type that may be stored and initialized on the stack, heap, or data segment at compile time or runtime. </p>
-<p>A bit set offers fast membership testing and bit range manipulations when the data can be modeled as a 0-indexed key value data set. In the case of a bit set the key is the index in the bit set and the value is 1 or 0 depending on how the bit has been set. Operations on single bits occur in O(1) time. All scanning operations operate in O(N) time. </p>
+<p>The bit set type that may be stored and initialized on the stack, heap, or data segment at compile or run time. </p>
+<p>A bit set offers fast membership testing and bit range manipulations when the data can be modeled as a 0-indexed key value data set. In the case of a bit set the key is the index in the bit set and the value is 1 or 0. Operations on single bits occur in O(1) time. All scanning operations operate in O(N) time. </p>
 
 </div>
 </div>
