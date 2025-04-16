@@ -462,7 +462,7 @@ ccc_dll_sort(ccc_doubly_linked_list *const dll)
     do
     {
         run = 0;
-        for (struct ccc_dll_elem_ *a_start = dll->sentinel_.n_, *b_end = {};
+        for (struct ccc_dll_elem_ *a_start = dll->sentinel_.n_, *b_end = NULL;
              a_start != &dll->sentinel_; a_start = b_end)
         {
             ++run;
