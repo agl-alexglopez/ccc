@@ -142,6 +142,28 @@ CHECK_BEGIN_STATIC_FN(dll_test_sort_odd)
     CHECK_END_FN();
 }
 
+CHECK_BEGIN_STATIC_FN(dll_test_sort_runs)
+{
+    doubly_linked_list dll = dll_init(dll, struct val, e, val_cmp, NULL, NULL);
+    struct val vals[12]
+        = {{.val = 99},  {.val = 101}, {.val = 103}, {.val = 4},
+           {.val = 8},   {.val = 9},   {.val = -99}, {.val = -55},
+           {.val = -55}, {.val = 3},   {.val = 7},   {.val = 10}};
+    enum check_result t = create_list(&dll, UTIL_PUSH_BACK, 12, vals);
+    CHECK(t, PASS);
+    CHECK(validate(&dll), true);
+    t = check_order(&dll, 12,
+                    (int[12]){99, 101, 103, 4, 8, 9, -99, -55, -55, 3, 7, 10});
+    CHECK(t, PASS);
+    ccc_result const r = ccc_dll_sort(&dll);
+    CHECK(r, CCC_RESULT_OK);
+    CHECK(validate(&dll), true);
+    t = check_order(&dll, 12,
+                    (int[12]){-99, -55, -55, 3, 4, 7, 8, 9, 10, 99, 101, 103});
+    CHECK(t, PASS);
+    CHECK_END_FN();
+}
+
 int
 main()
 {
@@ -149,5 +171,5 @@ main()
                      dll_test_push_and_splice(),
                      dll_test_push_and_splice_range(),
                      dll_test_push_and_splice_no_ops(), dll_test_sort_even(),
-                     dll_test_sort_odd());
+                     dll_test_sort_odd(), dll_test_sort_runs());
 }
