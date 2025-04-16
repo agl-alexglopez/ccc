@@ -36,11 +36,14 @@ static struct ccc_dll_elem_ *elem_in(ccc_doubly_linked_list const *,
 static void push_back(ccc_doubly_linked_list *, struct ccc_dll_elem_ *);
 static void splice_range(struct ccc_dll_elem_ *pos, struct ccc_dll_elem_ *begin,
                          struct ccc_dll_elem_ *end);
-static struct ccc_dll_elem_ *unsorted_elem(struct ccc_dll_ const *dll,
-                                           struct ccc_dll_elem_ *a,
-                                           struct ccc_dll_elem_ const *end);
+static struct ccc_dll_elem_ *first_unsorted(struct ccc_dll_ const *dll,
+                                            struct ccc_dll_elem_ *a,
+                                            struct ccc_dll_elem_ const *end);
 static void merge(struct ccc_dll_ *dll, struct ccc_dll_elem_ *a_0,
                   struct ccc_dll_elem_ *a_n_b_0, struct ccc_dll_elem_ *b_n);
+static ccc_threeway_cmp cmp(struct ccc_dll_ const *dll,
+                            struct ccc_dll_elem_ const *lhs,
+                            struct ccc_dll_elem_ const *rhs);
 
 /*===========================     Interface   ===============================*/
 
@@ -454,69 +457,66 @@ ccc_dll_sort(ccc_doubly_linked_list *const dll)
     {
         return CCC_RESULT_ARG_ERROR;
     }
+    /* Algorithm runs a single pass if list is already sorted aka run = 1. */
     size_t run = 0;
     do
     {
-        struct ccc_dll_elem_ *a_0 = {};
-        struct ccc_dll_elem_ *a_n_b_0 = {};
-        struct ccc_dll_elem_ *b_n = {};
         run = 0;
-        for (a_0 = dll->sentinel_.n_; a_0 != &dll->sentinel_; a_0 = b_n)
+        for (struct ccc_dll_elem_ *a_start = dll->sentinel_.n_, *b_end = {};
+             a_start != &dll->sentinel_; a_start = b_end)
         {
             ++run;
-            a_n_b_0 = unsorted_elem(dll, a_0, &dll->sentinel_);
-            if (a_n_b_0 == &dll->sentinel_)
+            struct ccc_dll_elem_ *const a_end_b_start
+                = first_unsorted(dll, a_start, &dll->sentinel_);
+            if (a_end_b_start == &dll->sentinel_)
             {
                 break;
             }
-            b_n = unsorted_elem(dll, a_n_b_0, &dll->sentinel_);
-            merge(dll, a_0, a_n_b_0, b_n);
+            b_end = first_unsorted(dll, a_end_b_start, &dll->sentinel_);
+            merge(dll, a_start, a_end_b_start, b_end);
         }
     } while (run > 1);
     return CCC_RESULT_OK;
 }
 
-/** Merges lists [a_0, a_n_b_0) with [a_n_b_0, b_n) to form [a_0, b_n). Notice
-that all ranges exclude their final element from the merge for consistency.
-This function assumes the provided lists are already sorted separately. */
-static inline void
-merge(struct ccc_dll_ *const dll, struct ccc_dll_elem_ *a_0,
-      struct ccc_dll_elem_ *a_n_b_0, struct ccc_dll_elem_ *b_n)
+/** Finds the first element lesser than it's previous element as defined by
+the user comparison callback function. If no out of order element can be
+found end is returned. */
+static inline struct ccc_dll_elem_ *
+first_unsorted(struct ccc_dll_ const *const dll, struct ccc_dll_elem_ *start,
+               struct ccc_dll_elem_ const *const end)
 {
-    while (a_0 != a_n_b_0 && a_n_b_0 != b_n)
+    assert(start != end);
+    assert(dll && start && end);
+    do
     {
-        switch (dll->cmp_(
-            (ccc_any_type_cmp){.any_type_lhs = struct_base(dll, a_n_b_0),
-                               .any_type_rhs = struct_base(dll, a_0),
-                               .aux = dll->aux_}))
+        start = start->n_;
+    } while (start != end && cmp(dll, start, start->p_) != CCC_LES);
+    return start;
+}
+
+/** Merges lists [a_start, a_end_b_start) with [a_end_b_start, b_end) to form
+[a_start, b_end). Notice that all ranges exclude their final element from the
+merge for consistency. This function assumes the provided lists are already
+sorted separately. */
+static inline void
+merge(struct ccc_dll_ *const dll, struct ccc_dll_elem_ *a_start,
+      struct ccc_dll_elem_ *a_end_b_start, struct ccc_dll_elem_ *b_end)
+{
+    assert(dll && a_start && a_end_b_start && b_end);
+    while (a_start != a_end_b_start && a_end_b_start != b_end)
+    {
+        switch (cmp(dll, a_end_b_start, a_start))
         {
         case CCC_LES:
-            a_n_b_0 = a_n_b_0->n_;
-            splice_range(a_0, a_n_b_0->p_, a_n_b_0);
+            a_end_b_start = a_end_b_start->n_;
+            splice_range(a_start, a_end_b_start->p_, a_end_b_start);
             break;
         default:
-            a_0 = a_0->n_;
+            a_start = a_start->n_;
             break;
         }
     }
-}
-
-/** Finds the first element lesser than it's previous element as defined by
-the user comparison callback function. */
-static inline struct ccc_dll_elem_ *
-unsorted_elem(struct ccc_dll_ const *const dll, struct ccc_dll_elem_ *a,
-              struct ccc_dll_elem_ const *const end)
-{
-    do
-    {
-        a = a->n_;
-    } while (
-        a != end
-        && dll->cmp_((ccc_any_type_cmp){.any_type_lhs = struct_base(dll, a),
-                                        .any_type_rhs = struct_base(dll, a->p_),
-                                        .aux = dll->aux_})
-               != CCC_LES);
-    return a;
 }
 
 /*=======================     Private Interface   ===========================*/
@@ -671,4 +671,16 @@ elem_in(ccc_doubly_linked_list const *const dll, void const *const struct_base)
 {
     return (struct ccc_dll_elem_ *)((char *)struct_base
                                     + dll->dll_elem_offset_);
+}
+
+/** Calls the user provided three way comparison callback function on the user
+type wrapping the provided intrusive handles. Returns the three way comparison
+result value. */
+static inline ccc_threeway_cmp
+cmp(struct ccc_dll_ const *const dll, struct ccc_dll_elem_ const *const lhs,
+    struct ccc_dll_elem_ const *const rhs)
+{
+    return dll->cmp_((ccc_any_type_cmp){.any_type_lhs = struct_base(dll, lhs),
+                                        .any_type_rhs = struct_base(dll, rhs),
+                                        .aux = dll->aux_});
 }
