@@ -26,13 +26,23 @@ limitations under the License.
 /** @private */
 typedef unsigned ccc_bitblock_;
 
-/** @private */
+/** @private A bitset is a contiguous array of fixed size integers. These aid
+in cache friendly storage and operations.
+
+By default a bit set is initialized with size equal to capacity but the user may
+select to initialize a 0 sized bit set with non-zero capacity for pushing bits
+back dynamically. */
 struct ccc_bitset_
 {
+    /** The array of bit blocks, a platform defined standard bit width. */
     ccc_bitblock_ *mem_;
+    /** The number of active bits in the set available for reads and writes. */
     size_t sz_;
+    /** The number of bits capable of being tracked in the bit block array. */
     size_t cap_;
+    /** The user provided allocation function for resizing, if any. */
     ccc_any_alloc_fn *alloc_;
+    /** Auxiliary data for resizing, if any. */
     void *aux_;
 };
 

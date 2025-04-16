@@ -45,7 +45,9 @@ typedef size_t blockwidth_t;
 or 1's in the set. */
 struct group
 {
-    size_t block_start_i;
+    /** A index [0, bit block bits) indicating the status of a search. */
+    blockwidth_t block_start_i;
+    /** The number of bits of same value found starting at block_start_i. */
     size_t count;
 };
 
@@ -70,8 +72,6 @@ static ccc_ucount first_leading_one_range(struct ccc_bitset_ const *bs,
                                           size_t i, size_t count);
 static ccc_ucount first_leading_zero_range(struct ccc_bitset_ const *bs,
                                            size_t i, size_t count);
-static unsigned countr_0(ccc_bitblock_);
-static unsigned countl_0(ccc_bitblock_);
 static ccc_ucount first_trailing_bits_range(struct ccc_bitset_ const *bs,
                                             size_t i, size_t count,
                                             size_t num_bits,
@@ -90,6 +90,8 @@ static void set_all(struct ccc_bitset_ *bs, ccc_tribool b);
 static blockwidth_t blockwidth_i(size_t bit_i);
 static ccc_tribool is_subset_of(struct ccc_bitset_ const *set,
                                 struct ccc_bitset_ const *subset);
+static unsigned ctz(ccc_bitblock_);
+static unsigned clz(ccc_bitblock_);
 
 /*=======================   Public Interface   ==============================*/
 
@@ -341,11 +343,11 @@ ccc_bs_set_all(ccc_bitset *const bs, ccc_tribool const b)
     return CCC_RESULT_OK;
 }
 
-/* A naive implementation might just call set for every index between the
-   start and start + count. However, calculating the block and index within
-   each block for every call to set costs a division and a modulo operation. We
-   can avoid this by handling the first and last block and then handling
-   everything in between with a bulk memset. */
+/** A naive implementation might just call set for every index between the
+start and start + count. However, calculating the block and index within each
+block for every call to set costs a division and a modulo operation. We can
+avoid this by handling the first and last block and then handling everything in
+between with a bulk memset. */
 ccc_result
 ccc_bs_set_range(ccc_bitset *const bs, size_t const i, size_t const count,
                  ccc_tribool const b)
@@ -434,8 +436,8 @@ ccc_bs_reset_all(ccc_bitset *const bs)
     return CCC_RESULT_OK;
 }
 
-/* Same concept as set range but easier. Handle first and last then set
-   everything in between to false with memset. */
+/** Same concept as set range but easier. Handle first and last then set
+everything in between to false with memset. */
 ccc_result
 ccc_bs_reset_range(ccc_bitset *const bs, size_t const i, size_t const count)
 {
@@ -509,9 +511,9 @@ ccc_bs_flip_all(ccc_bitset *const bs)
     return CCC_RESULT_OK;
 }
 
-/* Maybe future SIMD vectorization could speed things up here because we use
-   the same strat of handling first and last which just leaves a simpler bulk
-   operation in the middle. But we don't benefit from memset here. */
+/** Maybe future SIMD vectorization could speed things up here because we use
+the same strat of handling first and last which just leaves a simpler bulk
+operation in the middle. But we don't benefit from memset here. */
 ccc_result
 ccc_bs_flip_range(ccc_bitset *const bs, size_t const i, size_t const count)
 {
@@ -838,8 +840,9 @@ ccc_bs_clear(ccc_bitset *const bs)
     }
     if (bs->mem_)
     {
+        assert(bs->cap_);
         (void)memset(bs->mem_, CCC_FALSE,
-                     blocks(bs->sz_) * sizeof(ccc_bitblock_));
+                     blocks(bs->cap_) * sizeof(ccc_bitblock_));
     }
     bs->sz_ = 0;
     return CCC_RESULT_OK;
@@ -962,7 +965,7 @@ ccc_bs_eq(ccc_bitset const *const a, ccc_bitset const *const b)
 
 /*=======================    Static Helpers    ==============================*/
 
-/* Assumes set size is greater than or equal to subset size. */
+/** Assumes set size is greater than or equal to subset size. */
 static ccc_tribool
 is_subset_of(struct ccc_bitset_ const *const set,
              struct ccc_bitset_ const *const subset)
@@ -1031,7 +1034,7 @@ first_trailing_one_range(struct ccc_bitset_ const *const bs, size_t const i,
     {
         first_block_on &= ~(BITBLOCK_ALL_ON << (start_i + count));
     }
-    size_t i_in_block = countr_0(first_block_on & bs->mem_[start_block]);
+    size_t i_in_block = ctz(first_block_on & bs->mem_[start_block]);
     if (i_in_block != BITBLOCK_BITS)
     {
         return (ccc_ucount){.count
@@ -1045,7 +1048,7 @@ first_trailing_one_range(struct ccc_bitset_ const *const bs, size_t const i,
     /* Handle all values in between start and end in bulk. */
     for (++start_block; start_block < end_block; ++start_block)
     {
-        i_in_block = countr_0(bs->mem_[start_block]);
+        i_in_block = ctz(bs->mem_[start_block]);
         if (i_in_block != BITBLOCK_BITS)
         {
             return (ccc_ucount){.count
@@ -1056,7 +1059,7 @@ first_trailing_one_range(struct ccc_bitset_ const *const bs, size_t const i,
     blockwidth_t const last_i = blockwidth_i(end - 1);
     ccc_bitblock_ const last_block_on
         = BITBLOCK_ALL_ON >> ((BITBLOCK_BITS - last_i) - 1);
-    i_in_block = countr_0(last_block_on & bs->mem_[end_block]);
+    i_in_block = ctz(last_block_on & bs->mem_[end_block]);
     if (i_in_block != BITBLOCK_BITS)
     {
         return (ccc_ucount){.count = (end_block * BITBLOCK_BITS) + i_in_block};
@@ -1064,10 +1067,10 @@ first_trailing_one_range(struct ccc_bitset_ const *const bs, size_t const i,
     return (ccc_ucount){.error = CCC_RESULT_FAIL};
 }
 
-/* Finds the starting index of a sequence of 1's or 0's of the num_bits size in
-   linear time. The algorithm aims to efficiently skip as many bits as possible
-   while searching for the desired group. This avoids both an O(N^2) runtime and
-   the use of any unnecessary modulo or division operations in a hot loop. */
+/** Finds the starting index of a sequence of 1's or 0's of the num_bits size in
+linear time. The algorithm aims to efficiently skip as many bits as possible
+while searching for the desired group. This avoids both an O(N^2) runtime and
+the use of any unnecessary modulo or division operations in a hot loop. */
 static ccc_ucount
 first_trailing_bits_range(struct ccc_bitset_ const *const bs, size_t const i,
                           size_t const count, size_t const num_bits,
@@ -1130,15 +1133,15 @@ first_trailing_bits_range(struct ccc_bitset_ const *const bs, size_t const i,
     return (ccc_ucount){.error = CCC_RESULT_FAIL};
 }
 
-/* Returns the maximum group of consecutive ones in the bitblock given. If the
-   number of consecutive ones remaining cannot be found the function returns
-   where the next search should start from, a critical step to a linear search;
-   specifically, we seek any group of continuous ones that runs from some index
-   in the block to the end of the block. If no continuous group of ones exist
-   that runs to the end of the block, the BLOCK_BITS index is retuned with a
-   group size of 0 meaning the search for ones will need to continue in the
-   next block. This is helpful for the main search loop adding to its start
-   index and number of ones found so far. */
+/** Returns the maximum group of consecutive ones in the bitblock given. If the
+number of consecutive ones remaining cannot be found the function returns
+where the next search should start from, a critical step to a linear search;
+specifically, we seek any group of continuous ones that runs from some index
+in the block to the end of the block. If no continuous group of ones exist
+that runs to the end of the block, the BLOCK_BITS index is retuned with a
+group size of 0 meaning the search for ones will need to continue in the
+next block. This is helpful for the main search loop adding to its start
+index and number of ones found so far. */
 static struct group
 max_trailing_ones(ccc_bitblock_ const b, size_t const i_in_block,
                   size_t const ones_remaining)
@@ -1174,7 +1177,7 @@ max_trailing_ones(ccc_bitblock_ const b, size_t const i_in_block,
        MSB. The best we could have is a full block of 1's. Otherwise we need
        to find where to start our new search for contiguous 1's. This could be
        the next block if there are not 1's that continue all the way to MSB. */
-    size_t const ones_found = countl_0(~b);
+    size_t const ones_found = clz(~b);
     return (struct group){.block_start_i = BITBLOCK_BITS - ones_found,
                           .count = ones_found};
 }
@@ -1195,7 +1198,7 @@ first_trailing_zero_range(struct ccc_bitset_ const *const bs, size_t const i,
     {
         first_block_on &= ~(BITBLOCK_ALL_ON << (start_i + count));
     }
-    size_t i_in_block = countr_0(first_block_on & ~bs->mem_[start_block]);
+    size_t i_in_block = ctz(first_block_on & ~bs->mem_[start_block]);
     if (i_in_block != BITBLOCK_BITS)
     {
         return (ccc_ucount){.count
@@ -1209,7 +1212,7 @@ first_trailing_zero_range(struct ccc_bitset_ const *const bs, size_t const i,
     /* Handle all values in between start and end in bulk. */
     for (++start_block; start_block < end_block; ++start_block)
     {
-        i_in_block = countr_0(~bs->mem_[start_block]);
+        i_in_block = ctz(~bs->mem_[start_block]);
         if (i_in_block != BITBLOCK_BITS)
         {
             return (ccc_ucount){.count
@@ -1220,7 +1223,7 @@ first_trailing_zero_range(struct ccc_bitset_ const *const bs, size_t const i,
     blockwidth_t const last_i = blockwidth_i(end - 1);
     ccc_bitblock_ const last_block_on
         = BITBLOCK_ALL_ON >> ((BITBLOCK_BITS - last_i) - 1);
-    i_in_block = countr_0(last_block_on & ~bs->mem_[end_block]);
+    i_in_block = ctz(last_block_on & ~bs->mem_[end_block]);
     if (i_in_block != BITBLOCK_BITS)
     {
         return (ccc_ucount){.count = (end_block * BITBLOCK_BITS) + i_in_block};
@@ -1247,7 +1250,7 @@ first_leading_one_range(struct ccc_bitset_ const *const bs, size_t const i,
         first_block_on &= (BITBLOCK_ALL_ON << final_block_i);
     }
     ptrdiff_t lead_zeros
-        = (ptrdiff_t)countl_0(first_block_on & bs->mem_[start_block]);
+        = (ptrdiff_t)clz(first_block_on & bs->mem_[start_block]);
     if (lead_zeros != BITBLOCK_BITS)
     {
         return (ccc_ucount){.count = (start_block * BITBLOCK_BITS)
@@ -1261,7 +1264,7 @@ first_leading_one_range(struct ccc_bitset_ const *const bs, size_t const i,
     /* Handle all values in between start and end in bulk. */
     for (--start_block; start_block > end_block; --start_block)
     {
-        lead_zeros = (ptrdiff_t)countl_0(bs->mem_[start_block]);
+        lead_zeros = (ptrdiff_t)clz(bs->mem_[start_block]);
         if (lead_zeros != BITBLOCK_BITS)
         {
             return (ccc_ucount){.count = (start_block * BITBLOCK_BITS)
@@ -1272,7 +1275,7 @@ first_leading_one_range(struct ccc_bitset_ const *const bs, size_t const i,
     blockwidth_t const last_i = blockwidth_i(end + 1);
     ccc_bitblock_ const last_block_on
         = ~(BITBLOCK_ALL_ON >> ((BITBLOCK_BITS - last_i) - 1));
-    lead_zeros = countl_0(last_block_on & bs->mem_[end_block]);
+    lead_zeros = clz(last_block_on & bs->mem_[end_block]);
     if (lead_zeros != BITBLOCK_BITS)
     {
         return (ccc_ucount){.count = (end_block * BITBLOCK_BITS)
@@ -1359,7 +1362,7 @@ max_leading_ones(ccc_bitblock_ const b, ptrdiff_t const i_in_block,
             }
         }
     }
-    ptrdiff_t const num_ones_found = countr_0(~b);
+    ptrdiff_t const num_ones_found = ctz(~b);
     return (struct group){.block_start_i = num_ones_found - 1,
                           .count = num_ones_found};
 }
@@ -1381,7 +1384,7 @@ first_leading_zero_range(struct ccc_bitset_ const *const bs, size_t const i,
     {
         first_block_on &= ~(BITBLOCK_ALL_ON >> (i - end));
     }
-    ptrdiff_t lead_ones = countl_0(first_block_on & ~bs->mem_[start_block]);
+    ptrdiff_t lead_ones = clz(first_block_on & ~bs->mem_[start_block]);
     if (lead_ones != BITBLOCK_BITS)
     {
         return (ccc_ucount){.count = ((start_block * BITBLOCK_BITS)
@@ -1395,7 +1398,7 @@ first_leading_zero_range(struct ccc_bitset_ const *const bs, size_t const i,
     /* Handle all values in between start and end in bulk. */
     for (--start_block; start_block > end_block; --start_block)
     {
-        lead_ones = countl_0(~bs->mem_[start_block]);
+        lead_ones = clz(~bs->mem_[start_block]);
         if (lead_ones != BITBLOCK_BITS)
         {
             return (ccc_ucount){.count = ((start_block * BITBLOCK_BITS)
@@ -1406,7 +1409,7 @@ first_leading_zero_range(struct ccc_bitset_ const *const bs, size_t const i,
     blockwidth_t const last_i = blockwidth_i(end + 1);
     ccc_bitblock_ const last_block_on
         = ~(BITBLOCK_ALL_ON >> ((BITBLOCK_BITS - last_i) - 1));
-    lead_ones = countl_0(last_block_on & ~bs->mem_[end_block]);
+    lead_ones = clz(last_block_on & ~bs->mem_[end_block]);
     if (lead_ones != BITBLOCK_BITS)
     {
         return (ccc_ucount){.count = ((end_block * BITBLOCK_BITS)
@@ -1415,10 +1418,10 @@ first_leading_zero_range(struct ccc_bitset_ const *const bs, size_t const i,
     return (ccc_ucount){.error = CCC_RESULT_FAIL};
 }
 
-/* Performs the any or none scan operation over the specified range. The only
-   difference between the operations is the return value. Specify the desired
-   tribool value to return upon encountering an on bit. For any this is
-   CCC_TRUE. For none this is CCC_FALSE. Saves writing two identical fns. */
+/** Performs the any or none scan operation over the specified range. The only
+difference between the operations is the return value. Specify the desired
+tribool value to return upon encountering an on bit. For any this is
+CCC_TRUE. For none this is CCC_FALSE. Saves writing two identical fns. */
 static ccc_tribool
 any_or_none_range(struct ccc_bitset_ const *const bs, size_t const i,
                   size_t const count, ccc_tribool const ret)
@@ -1464,8 +1467,8 @@ any_or_none_range(struct ccc_bitset_ const *const bs, size_t const i,
     return !ret;
 }
 
-/* Check for all on is slightly different from the any or none checks so we
-   need a painfully repetitive function. */
+/** Check for all on is slightly different from the any or none checks so we
+need a painfully repetitive function. */
 static ccc_tribool
 all_range(struct ccc_bitset_ const *const bs, size_t const i,
           size_t const count)
@@ -1515,9 +1518,9 @@ set_all(struct ccc_bitset_ *const bs, ccc_tribool const b)
     bs->mem_[set_block_i(bs->sz_ - 1)] &= last_on(bs);
 }
 
-/* Given a reference to the correct block in the set, the true set index (may be
-   greater than size of a block), and the value to set, sets the index in the
-   block to the given tribool value. */
+/** Given a reference to the correct block in the set, the true set index (may
+be greater than size of a block), and the value to set, sets the index in the
+block to the given tribool value. */
 static inline void
 set(ccc_bitblock_ *const block, size_t const bit_i, ccc_tribool const b)
 {
@@ -1531,8 +1534,8 @@ set(ccc_bitblock_ *const block, size_t const bit_i, ccc_tribool const b)
     }
 }
 
-/* Given the bit set and the set index--set index is allowed to be greater than
-   the size of one block--returns the status of the bit at that index. */
+/** Given the bit set and the set index--set index is allowed to be greater than
+the size of one block--returns the status of the bit at that index. */
 static inline ccc_tribool
 status(ccc_bitblock_ const *const bs, size_t const bit_i)
 {
@@ -1541,17 +1544,17 @@ status(ccc_bitblock_ const *const bs, size_t const bit_i)
     return (*bs & on(bit_i)) != 0;
 }
 
-/* Return a block with only the desired bit turned on to true. */
+/** Return a block with only the desired bit turned on to true. */
 static inline ccc_bitblock_
 on(size_t bit_i)
 {
     return (ccc_bitblock_)1 << blockwidth_i(bit_i);
 }
 
-/* Returns a mask of all bits on in the final bit block that represent only
-   those bits which are in use according to the bit set capacity. The remaining
-   higher order bits in the last block will be set to 0 because they are not
-   used. If the capacity is zero a block with all bits on is returned. */
+/** Returns a mask of all bits on in the final bit block that represent only
+those bits which are in use according to the bit set capacity. The remaining
+higher order bits in the last block will be set to 0 because they are not
+used. If the capacity is zero a block with all bits on is returned. */
 static inline ccc_bitblock_
 last_on(struct ccc_bitset_ const *const bs)
 {
@@ -1561,24 +1564,35 @@ last_on(struct ccc_bitset_ const *const bs)
                    : BITBLOCK_ALL_ON;
 }
 
+/** Returns the 0-based index of the block to which the given index belongs.
+Assumes the given index is somewhere between [0, size of bit set). The returned
+index then represents the block in which this index resides which is guaranteed
+to be in the range [0, last block containing last bit in active set). */
 static inline size_t
 set_block_i(size_t const bit_i)
 {
     return bit_i / BITBLOCK_BITS;
 }
 
+/** Returns the 0-based index within a block to which the given index belongs.
+This index will always be between [0, BITBLOCK_BITS - 1). */
 static inline blockwidth_t
 blockwidth_i(size_t const bit_i)
 {
     return bit_i % BITBLOCK_BITS;
 }
 
+/** Returns the number of blocks required to store the given bits. Assumes bits
+is non-zero. */
 static inline size_t
 blocks(size_t const bits)
 {
+    static_assert(BITBLOCK_BITS);
+    assert(bits);
     return (bits + (BITBLOCK_BITS - 1)) / BITBLOCK_BITS;
 }
 
+/** Returns min of size_t arguments. Beware of conversions. */
 static inline size_t
 min(size_t a, size_t b)
 {
@@ -1588,6 +1602,7 @@ min(size_t a, size_t b)
 #if defined(__has_builtin) && __has_builtin(__builtin_ctz)                     \
     && __has_builtin(__builtin_clz) && __has_builtin(__builtin_popcount)
 
+/** Counts the on bits in a bit block. */
 static inline unsigned
 popcount(ccc_bitblock_ const b)
 {
@@ -1597,16 +1612,20 @@ popcount(ccc_bitblock_ const b)
     return __builtin_popcount(b);
 }
 
+/** Counts the number of trailing zeros in a bit block starting from least
+significant bit. */
 static inline unsigned
-countr_0(ccc_bitblock_ const b)
+ctz(ccc_bitblock_ const b)
 {
     static_assert(BITBLOCK_MSB < BITBLOCK_ALL_ON);
     static_assert(sizeof(ccc_bitblock_) == sizeof(unsigned));
     return b ? (unsigned)__builtin_ctz(b) : BITBLOCK_BITS;
 }
 
+/** Counts the leading zeros in a bit block starting from the most significant
+bit. */
 static inline unsigned
-countl_0(ccc_bitblock_ const b)
+clz(ccc_bitblock_ const b)
 {
     static_assert(BITBLOCK_MSB < BITBLOCK_ALL_ON);
     static_assert(sizeof(ccc_bitblock_) == sizeof(unsigned));
@@ -1616,6 +1635,7 @@ countl_0(ccc_bitblock_ const b)
 #else /* !defined(__has_builtin) || !__has_builtin(__builtin_ctz)              \
     || !__has_builtin(__builtin_clz) || !__has_builtin(__builtin_popcount) */
 
+/** Counts the on bits in a bit block. */
 static inline unsigned
 popcount(ccc_bitblock_ b)
 {
@@ -1625,8 +1645,10 @@ popcount(ccc_bitblock_ b)
     return cnt;
 }
 
+/** Counts the number of trailing zeros in a bit block starting from least
+significant bit. */
 static inline unsigned
-countr_0(ccc_bitblock_ b)
+ctz(ccc_bitblock_ b)
 {
     if (!b)
     {
@@ -1638,8 +1660,10 @@ countr_0(ccc_bitblock_ b)
     return cnt;
 }
 
+/** Counts the leading zeros in a bit block starting from the most significant
+bit. */
 static inline unsigned
-countl_0(ccc_bitblock_ b)
+clz(ccc_bitblock_ b)
 {
     if (!b)
     {
