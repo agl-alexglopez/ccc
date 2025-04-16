@@ -27,13 +27,20 @@ static size_t extract_range(struct ccc_dll_ const *l,
                             struct ccc_dll_elem_ *end);
 static size_t erase_range(struct ccc_dll_ const *l, struct ccc_dll_elem_ *begin,
                           struct ccc_dll_elem_ *end);
-static size_t len(struct ccc_dll_ const *, struct ccc_dll_elem_ const *begin,
+static size_t len(struct ccc_dll_elem_ const *begin,
                   struct ccc_dll_elem_ const *end);
 static struct ccc_dll_elem_ *pop_front(struct ccc_dll_ *);
 static void push_front(struct ccc_dll_ *l, struct ccc_dll_elem_ *e);
 static struct ccc_dll_elem_ *elem_in(ccc_doubly_linked_list const *,
                                      void const *struct_base);
 static void push_back(ccc_doubly_linked_list *, struct ccc_dll_elem_ *);
+static void splice_range(struct ccc_dll_elem_ *pos, struct ccc_dll_elem_ *begin,
+                         struct ccc_dll_elem_ *end);
+static struct ccc_dll_elem_ *unsorted_elem(struct ccc_dll_ const *dll,
+                                           struct ccc_dll_elem_ *a,
+                                           struct ccc_dll_elem_ const *end);
+static void merge(struct ccc_dll_ *dll, struct ccc_dll_elem_ *a_0,
+                  struct ccc_dll_elem_ *a_n_b_0, struct ccc_dll_elem_ *b_n);
 
 /*===========================     Interface   ===============================*/
 
@@ -270,15 +277,15 @@ ccc_dll_extract_range(ccc_doubly_linked_list *const l,
 }
 
 ccc_result
-ccc_dll_splice(ccc_doubly_linked_list *const pos_sll, ccc_dll_elem *pos,
-               ccc_doubly_linked_list *const to_cut_sll,
+ccc_dll_splice(ccc_doubly_linked_list *const pos_dll, ccc_dll_elem *pos,
+               ccc_doubly_linked_list *const to_cut_dll,
                ccc_dll_elem *const to_cut)
 {
-    if (!to_cut || !pos || !pos_sll || !to_cut_sll)
+    if (!to_cut || !pos || !pos_dll || !to_cut_dll)
     {
         return CCC_RESULT_ARG_ERROR;
     }
-    if (pos == to_cut || to_cut->n_ == pos || to_cut == &to_cut_sll->sentinel_)
+    if (pos == to_cut || to_cut->n_ == pos || to_cut == &to_cut_dll->sentinel_)
     {
         return CCC_RESULT_OK;
     }
@@ -289,42 +296,36 @@ ccc_dll_splice(ccc_doubly_linked_list *const pos_sll, ccc_dll_elem *pos,
     to_cut->n_ = pos;
     pos->p_->n_ = to_cut;
     pos->p_ = to_cut;
-    if (pos_sll != to_cut_sll)
+    if (pos_dll != to_cut_dll)
     {
-        ++pos_sll->sz_;
-        --to_cut_sll->sz_;
+        ++pos_dll->sz_;
+        --to_cut_dll->sz_;
     }
     return CCC_RESULT_OK;
 }
 
 ccc_result
-ccc_dll_splice_range(ccc_doubly_linked_list *const pos_sll, ccc_dll_elem *pos,
-                     ccc_doubly_linked_list *const to_cut_sll,
+ccc_dll_splice_range(ccc_doubly_linked_list *const pos_dll, ccc_dll_elem *pos,
+                     ccc_doubly_linked_list *const to_cut_dll,
                      ccc_dll_elem *begin, ccc_dll_elem *end)
 {
-    if (!begin || !end || !pos || !pos_sll || !to_cut_sll)
+    if (!begin || !end || !pos || !pos_dll || !to_cut_dll)
     {
         return CCC_RESULT_ARG_ERROR;
     }
     if (pos == begin || pos == end || begin == end
-        || begin == &to_cut_sll->sentinel_ || end->p_ == &to_cut_sll->sentinel_)
+        || begin == &to_cut_dll->sentinel_ || end->p_ == &to_cut_dll->sentinel_)
     {
         return CCC_RESULT_OK;
     }
-    end = end->p_;
-    end->n_->p_ = begin->p_;
-    begin->p_->n_ = end->n_;
-
-    begin->p_ = pos->p_;
-    end->n_ = pos;
-    pos->p_->n_ = begin;
-    pos->p_ = end;
-    if (pos_sll != to_cut_sll)
+    struct ccc_dll_elem_ *const inclusive_end = end->p_;
+    splice_range(pos, begin, end);
+    if (pos_dll != to_cut_dll)
     {
-        size_t const sz = len(pos_sll, begin, end);
-        assert(sz <= to_cut_sll->sz_);
-        pos_sll->sz_ += sz;
-        to_cut_sll->sz_ -= sz;
+        size_t const sz = len(begin, inclusive_end);
+        assert(sz <= to_cut_dll->sz_);
+        pos_dll->sz_ += sz;
+        to_cut_dll->sz_ -= sz;
     }
     return CCC_RESULT_OK;
 }
@@ -442,6 +443,82 @@ ccc_dll_validate(ccc_doubly_linked_list const *const l)
     return size == l->sz_;
 }
 
+/*==========================     Sorting     ================================*/
+
+/** Sorts the list into non-decreasing order according to the user comparison
+callback function in O(NlgN) time and O(1) space. */
+ccc_result
+ccc_dll_sort(ccc_doubly_linked_list *const dll)
+{
+    if (!dll)
+    {
+        return CCC_RESULT_ARG_ERROR;
+    }
+    size_t run = 0;
+    do
+    {
+        struct ccc_dll_elem_ *a_0 = {};
+        struct ccc_dll_elem_ *a_n_b_0 = {};
+        struct ccc_dll_elem_ *b_n = {};
+        run = 0;
+        for (a_0 = dll->sentinel_.n_; a_0 != &dll->sentinel_; a_0 = b_n)
+        {
+            ++run;
+            a_n_b_0 = unsorted_elem(dll, a_0, &dll->sentinel_);
+            if (a_n_b_0 == &dll->sentinel_)
+            {
+                break;
+            }
+            b_n = unsorted_elem(dll, a_n_b_0, &dll->sentinel_);
+            merge(dll, a_0, a_n_b_0, b_n);
+        }
+    } while (run > 1);
+    return CCC_RESULT_OK;
+}
+
+/** Merges lists [a_0, a_n_b_0) with [a_n_b_0, b_n) to form [a_0, b_n). Notice
+that all ranges exclude their final element from the merge for consistency.
+This function assumes the provided lists are already sorted separately. */
+static inline void
+merge(struct ccc_dll_ *const dll, struct ccc_dll_elem_ *a_0,
+      struct ccc_dll_elem_ *a_n_b_0, struct ccc_dll_elem_ *b_n)
+{
+    while (a_0 != a_n_b_0 && a_n_b_0 != b_n)
+    {
+        switch (dll->cmp_(
+            (ccc_any_type_cmp){.any_type_lhs = struct_base(dll, a_n_b_0),
+                               .any_type_rhs = struct_base(dll, a_0),
+                               .aux = dll->aux_}))
+        {
+        case CCC_LES:
+            a_n_b_0 = a_n_b_0->n_;
+            splice_range(a_0, a_n_b_0->p_, a_n_b_0);
+            break;
+        default:
+            a_0 = a_0->n_;
+            break;
+        }
+    }
+}
+
+/** Finds the first element lesser than it's previous element as defined by
+the user comparison callback function. */
+static inline struct ccc_dll_elem_ *
+unsorted_elem(struct ccc_dll_ const *const dll, struct ccc_dll_elem_ *a,
+              struct ccc_dll_elem_ const *const end)
+{
+    do
+    {
+        a = a->n_;
+    } while (
+        a != end
+        && dll->cmp_((ccc_any_type_cmp){.any_type_lhs = struct_base(dll, a),
+                                        .any_type_rhs = struct_base(dll, a->p_),
+                                        .aux = dll->aux_})
+               != CCC_LES);
+    return a;
+}
+
 /*=======================     Private Interface   ===========================*/
 
 void
@@ -507,6 +584,27 @@ pop_front(struct ccc_dll_ *const dll)
     return ret;
 }
 
+/** Places the range [begin, end) at position before pos. This means end is not
+moved or altered due to the exclusive range. If begin is equal to end the
+function returns early changing no nodes. */
+static inline void
+splice_range(struct ccc_dll_elem_ *const pos, struct ccc_dll_elem_ *const begin,
+             struct ccc_dll_elem_ *end)
+{
+    if (begin == end)
+    {
+        return;
+    }
+    end = end->p_;
+    end->n_->p_ = begin->p_;
+    begin->p_->n_ = end->n_;
+
+    begin->p_ = pos->p_;
+    end->n_ = pos;
+    pos->p_->n_ = begin;
+    pos->p_ = end;
+}
+
 static inline size_t
 extract_range([[maybe_unused]] struct ccc_dll_ const *const l,
               struct ccc_dll_elem_ *begin, struct ccc_dll_elem_ *const end)
@@ -515,7 +613,7 @@ extract_range([[maybe_unused]] struct ccc_dll_ const *const l,
     {
         begin->p_ = NULL;
     }
-    size_t sz = len(l, begin, end);
+    size_t sz = len(begin, end);
     if (end != &l->sentinel_)
     {
         end->n_ = NULL;
@@ -533,7 +631,7 @@ erase_range(struct ccc_dll_ const *const l, struct ccc_dll_elem_ *begin,
     }
     if (!l->alloc_)
     {
-        size_t const sz = len(l, begin, end);
+        size_t const sz = len(begin, end);
         if (end != &l->sentinel_)
         {
             end->n_ = NULL;
@@ -552,15 +650,13 @@ erase_range(struct ccc_dll_ const *const l, struct ccc_dll_elem_ *begin,
     return sz;
 }
 
+/** Finds the length from [begin, end]. End is counted. */
 static size_t
-len([[maybe_unused]] struct ccc_dll_ const *const sll,
-    struct ccc_dll_elem_ const *begin, struct ccc_dll_elem_ const *const end)
+len(struct ccc_dll_elem_ const *begin, struct ccc_dll_elem_ const *const end)
 {
     size_t s = 1;
     for (; begin != end; begin = begin->n_, ++s)
-    {
-        assert(s <= sll->sz_);
-    }
+    {}
     return s;
 }
 

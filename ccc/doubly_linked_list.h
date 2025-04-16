@@ -223,27 +223,39 @@ void *ccc_dll_extract_range(ccc_doubly_linked_list *l, ccc_dll_elem *elem_begin,
                             ccc_dll_elem *elem_end);
 
 /** @brief Repositions to_cut before pos. Only list pointers are modified. O(1).
-@param [in] pos_sll the list to which pos belongs.
+@param [in] pos_dll the list to which pos belongs.
 @param [in] pos the position before which to_cut will be moved.
-@param [in] to_cut_sll the list to which to_cut belongs.
+@param [in] to_cut_dll the list to which to_cut belongs.
 @param [in] to_cut the element to cut.
 @return ok if the splice is successful or an error if bad input is provided. */
-ccc_result ccc_dll_splice(ccc_doubly_linked_list *pos_sll, ccc_dll_elem *pos,
-                          ccc_doubly_linked_list *to_cut_sll,
+ccc_result ccc_dll_splice(ccc_doubly_linked_list *pos_dll, ccc_dll_elem *pos,
+                          ccc_doubly_linked_list *to_cut_dll,
                           ccc_dll_elem *to_cut);
 
 /** @brief Repositions begin to end before pos. Only list pointers are modified
 O(N).
-@param [in] pos_sll the list to which pos belongs.
+@param [in] pos_dll the list to which pos belongs.
 @param [in] pos the position before which to_cut will be moved.
-@param [in] to_cut_sll the list to which the range belongs.
+@param [in] to_cut_dll the list to which the range belongs.
 @param [in] begin the start of the list to splice.
 @param [in] end the end of the list to splice.
 @return ok if the splice is successful or an error if bad input is provided. */
-ccc_result ccc_dll_splice_range(ccc_doubly_linked_list *pos_sll,
+ccc_result ccc_dll_splice_range(ccc_doubly_linked_list *pos_dll,
                                 ccc_dll_elem *pos,
-                                ccc_doubly_linked_list *to_cut_sll,
+                                ccc_doubly_linked_list *to_cut_dll,
                                 ccc_dll_elem *begin, ccc_dll_elem *end);
+
+/**@}*/
+
+/** @name Sorting Interface
+Sort the container. */
+/**@{*/
+
+/** @brief Sorts the doubly linked list in non-decreasing order as defined by
+the provided comparison function.
+@param [in] dll the doubly linked list to sort.
+@return the result of the sort, usually OK. An arg error if dll is null. */
+ccc_result ccc_dll_sort(ccc_doubly_linked_list *dll);
 
 /**@}*/
 
