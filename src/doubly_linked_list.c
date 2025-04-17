@@ -36,11 +36,11 @@ static struct ccc_dll_elem_ *elem_in(ccc_doubly_linked_list const *,
 static void push_back(ccc_doubly_linked_list *, struct ccc_dll_elem_ *);
 static void splice_range(struct ccc_dll_elem_ *pos, struct ccc_dll_elem_ *begin,
                          struct ccc_dll_elem_ *end);
-static struct ccc_dll_elem_ *first_unsorted(struct ccc_dll_ const *dll,
-                                            struct ccc_dll_elem_ *,
-                                            struct ccc_dll_elem_ const *);
-static void merge(struct ccc_dll_ *, struct ccc_dll_elem_ *,
-                  struct ccc_dll_elem_ *, struct ccc_dll_elem_ const *);
+static struct ccc_dll_elem_ *first_less(struct ccc_dll_ const *dll,
+                                        struct ccc_dll_elem_ *);
+static struct ccc_dll_elem_ *merge(struct ccc_dll_ *, struct ccc_dll_elem_ *,
+                                   struct ccc_dll_elem_ *,
+                                   struct ccc_dll_elem_ *);
 static ccc_threeway_cmp cmp(struct ccc_dll_ const *dll,
                             struct ccc_dll_elem_ const *lhs,
                             struct ccc_dll_elem_ const *rhs);
@@ -512,18 +512,22 @@ ccc_dll_sort(ccc_doubly_linked_list *const dll)
     do
     {
         run = 0;
-        for (struct ccc_dll_elem_ *a_start = dll->sentinel_.n_, *b_end = NULL;
-             a_start != &dll->sentinel_; a_start = b_end)
+        /* 0th index of the A list. The start of one list to merge. */
+        struct ccc_dll_elem_ *a_0 = dll->sentinel_.n_;
+        while (a_0 != &dll->sentinel_)
         {
             ++run;
-            struct ccc_dll_elem_ *const a_end_b_start
-                = first_unsorted(dll, a_start, &dll->sentinel_);
-            if (a_end_b_start == &dll->sentinel_)
+            /* The Nth index of list A (its size) aka 0th index of B list. */
+            struct ccc_dll_elem_ *const a_n_b_0 = first_less(dll, a_0);
+            if (a_n_b_0 == &dll->sentinel_)
             {
                 break;
             }
-            b_end = first_unsorted(dll, a_end_b_start, &dll->sentinel_);
-            merge(dll, a_start, a_end_b_start, b_end);
+            /* a_0 picks up the exclusive end of this merge, b_n, in order
+               to progress the sorting algorithm with the next run that needs
+               fixing. Merge returns this b_n element to indicate it is the
+               final element that has not been processed by merge comparison. */
+            a_0 = merge(dll, a_0, a_n_b_0, first_less(dll, a_n_b_0));
         }
     } while (run > 1);
     return CCC_RESULT_OK;
@@ -531,64 +535,48 @@ ccc_dll_sort(ccc_doubly_linked_list *const dll)
 
 /** Finds the first element lesser than it's previous element as defined by
 the user comparison callback function. If no out of order element can be
-found end is returned. */
+found the list sentinel is returned. */
 static inline struct ccc_dll_elem_ *
-first_unsorted(struct ccc_dll_ const *const dll, struct ccc_dll_elem_ *start,
-               struct ccc_dll_elem_ const *const end)
+first_less(struct ccc_dll_ const *const dll, struct ccc_dll_elem_ *start)
 {
-    assert(start != end);
-    assert(dll && start && end);
+    assert(dll && start);
     do
     {
         start = start->n_;
-    } while (start != end && cmp(dll, start, start->p_) != CCC_LES);
+    } while (start != &dll->sentinel_ && cmp(dll, start, start->p_) != CCC_LES);
     return start;
 }
 
-/** Merges lists [a_start, a_end_b_start) with [a_end_b_start, b_end) to form
-[a_start, b_end). Notice that all ranges exclude their final element from the
-merge for consistency. This function assumes the provided lists are already
-sorted separately. */
-static inline void
-merge(struct ccc_dll_ *const dll, struct ccc_dll_elem_ *a_start,
-      struct ccc_dll_elem_ *a_end_b_start,
-      struct ccc_dll_elem_ const *const b_end)
+/** Merges lists [a_0, a_n_b_0) with [a_n_b_0, b_n) to form [a_0, b_n). Returns
+the exclusive end of the range, b_n, once the merge sort is complete.
+
+Notice that all ranges exclude their final element from the merge for
+consistency. This function assumes the provided lists are already sorted
+separately. */
+static inline struct ccc_dll_elem_ *
+merge(struct ccc_dll_ *const dll, struct ccc_dll_elem_ *a_0,
+      struct ccc_dll_elem_ *a_n_b_0, struct ccc_dll_elem_ *const b_n)
 {
-    assert(dll && a_start && a_end_b_start && b_end);
-    while (a_start != a_end_b_start && a_end_b_start != b_end)
+    assert(dll && a_0 && a_n_b_0 && b_n);
+    while (a_0 != a_n_b_0 && a_n_b_0 != b_n)
     {
-        switch (cmp(dll, a_end_b_start, a_start))
+        if (cmp(dll, a_n_b_0, a_0) == CCC_LES)
         {
-        case CCC_LES:
-            a_end_b_start = a_end_b_start->n_;
-            splice_range(a_start, a_end_b_start->p_, a_end_b_start);
-            break;
-        default:
-            a_start = a_start->n_;
-            break;
+            struct ccc_dll_elem_ *const lesser = a_n_b_0;
+            a_n_b_0 = lesser->n_;
+            lesser->n_->p_ = lesser->p_;
+            lesser->p_->n_ = lesser->n_;
+            lesser->p_ = a_0->p_;
+            lesser->n_ = a_0;
+            a_0->p_->n_ = lesser;
+            a_0->p_ = lesser;
+        }
+        else
+        {
+            a_0 = a_0->n_;
         }
     }
-}
-
-/** Places the range [begin, end) at position before pos. This means end is not
-moved or altered due to the exclusive range. If begin is equal to end the
-function returns early changing no nodes. */
-static inline void
-splice_range(struct ccc_dll_elem_ *const pos, struct ccc_dll_elem_ *const begin,
-             struct ccc_dll_elem_ *end)
-{
-    if (begin == end)
-    {
-        return;
-    }
-    end = end->p_;
-    end->n_->p_ = begin->p_;
-    begin->p_->n_ = end->n_;
-
-    begin->p_ = pos->p_;
-    end->n_ = pos;
-    pos->p_->n_ = begin;
-    pos->p_ = end;
+    return b_n;
 }
 
 /*=======================     Private Interface   ===========================*/
@@ -621,6 +609,27 @@ ccc_impl_dll_elem_in(struct ccc_dll_ const *const l,
 }
 
 /*=======================       Static Helpers    ===========================*/
+
+/** Places the range [begin, end) at position before pos. This means end is not
+moved or altered due to the exclusive range. If begin is equal to end the
+function returns early changing no nodes. */
+static inline void
+splice_range(struct ccc_dll_elem_ *const pos, struct ccc_dll_elem_ *const begin,
+             struct ccc_dll_elem_ *end)
+{
+    if (begin == end)
+    {
+        return;
+    }
+    end = end->p_;
+    end->n_->p_ = begin->p_;
+    begin->p_->n_ = end->n_;
+
+    begin->p_ = pos->p_;
+    end->n_ = pos;
+    pos->p_->n_ = begin;
+    pos->p_ = end;
+}
 
 static inline void
 push_front(struct ccc_dll_ *const l, struct ccc_dll_elem_ *const e)

@@ -27,7 +27,7 @@ struct list_link
     /** The previous element of cur. Must manually update and manage. */
     struct ccc_sll_elem_ *prev;
     /** The current element. Must manually manage and update. */
-    struct ccc_sll_elem_ *cur;
+    struct ccc_sll_elem_ *i;
 };
 
 /*===========================    Prototypes     =============================*/
@@ -48,8 +48,7 @@ static struct ccc_sll_elem_ *elem_in(struct ccc_sll_ const *,
                                      void const *any_struct);
 static struct list_link merge(struct ccc_sll_ *, struct list_link,
                               struct list_link, struct list_link);
-static struct list_link first_unsorted(struct ccc_sll_ const *,
-                                       struct list_link);
+static struct list_link first_less(struct ccc_sll_ const *, struct list_link);
 static ccc_threeway_cmp cmp(struct ccc_sll_ const *sll,
                             struct ccc_sll_elem_ const *lhs,
                             struct ccc_sll_elem_ const *rhs);
@@ -380,11 +379,11 @@ ccc_sll_insert_sorted(ccc_singly_linked_list *sll, ccc_sll_elem *e)
         (void)memcpy(node, struct_base(sll, e), sll->elem_sz_);
         e = elem_in(sll, node);
     }
-    struct list_link link = {.prev = &sll->sentinel_, .cur = sll->sentinel_.n_};
-    for (; link.cur != &sll->sentinel_ && cmp(sll, e, link.cur) != CCC_LES;
-         link.prev = link.cur, link.cur = link.cur->n_)
+    struct list_link link = {.prev = &sll->sentinel_, .i = sll->sentinel_.n_};
+    for (; link.i != &sll->sentinel_ && cmp(sll, e, link.i) != CCC_LES;
+         link.prev = link.i, link.i = link.i->n_)
     {}
-    e->n_ = link.cur;
+    e->n_ = link.i;
     link.prev->n_ = e;
     ++sll->sz_;
     return struct_base(sll, e);
@@ -403,18 +402,23 @@ ccc_sll_sort(ccc_singly_linked_list *const sll)
     do
     {
         run = 0;
-        struct list_link a_start
-            = {.prev = &sll->sentinel_, .cur = sll->sentinel_.n_};
-        while (a_start.cur != &sll->sentinel_)
+        /* 0th index of the A list. The start of one list to merge. */
+        struct list_link a_0
+            = {.prev = &sll->sentinel_, .i = sll->sentinel_.n_};
+        while (a_0.i != &sll->sentinel_)
         {
             ++run;
-            struct list_link a_end_b_start = first_unsorted(sll, a_start);
-            if (a_end_b_start.cur == &sll->sentinel_)
+            /* The Nth index of list A (its size) aka 0th index of B list. */
+            struct list_link a_n_b_0 = first_less(sll, a_0);
+            if (a_n_b_0.i == &sll->sentinel_)
             {
                 break;
             }
-            struct list_link b_end = first_unsorted(sll, a_end_b_start);
-            a_start = merge(sll, a_start, a_end_b_start, b_end);
+            /* a_0 picks up the exclusive end of this merge, b_n, in order
+               to progress the sorting algorithm with the next run that needs
+               fixing. Merge returns this b_n element to indicate it is the
+               final element that has not been processed by merge comparison. */
+            a_0 = merge(sll, a_0, a_n_b_0, first_less(sll, a_n_b_0));
         }
     } while (run > 1);
     return CCC_RESULT_OK;
@@ -426,52 +430,53 @@ returned will have the out of order element as cur and the last remaining in
 order element as prev. The cur element may be the sentinel if the run is
 sorted. */
 static inline struct list_link
-first_unsorted(ccc_singly_linked_list const *const sll, struct list_link p)
+first_less(ccc_singly_linked_list const *const sll, struct list_link k)
 {
     do
     {
-        p.prev = p.cur;
-        p.cur = p.cur->n_;
-    } while (p.cur != &sll->sentinel_ && cmp(sll, p.cur, p.prev) != CCC_LES);
-    return p;
+        k.prev = k.i;
+        k.i = k.i->n_;
+    } while (k.i != &sll->sentinel_ && cmp(sll, k.i, k.prev) != CCC_LES);
+    return k;
 }
 
-/** Merges two in order list runs. The lists will be sorted according to ranges
-[a_start, a_end_b_start) to [a_end_b_start, b_end), ending in [a_start, b_end).
-Once merging is complete the b_end elements are returned to help the user
-progress the running and merging algorithm. A list_link must be returned because
-merging may alter the b_end previous element and the user needs this list link
-to remain accurate to progress the sorting correctly. */
+/** Merges lists [a_0, a_n_b_0) with [a_n_b_0, b_n) to form [a_0, b_n). Returns
+the exclusive end of the range, b_n, once the merge sort is complete.
+
+Notice that all ranges exclude their final element from the merge for
+consistency. This function assumes the provided lists are already sorted
+separately. A list link must be returned because the b_n previous field may be
+updated due to arbitrary splices during comparison sorting. */
 static inline struct list_link
-merge(ccc_singly_linked_list *const sll, struct list_link a_start,
-      struct list_link a_end_b_start, struct list_link b_end)
+merge(ccc_singly_linked_list *const sll, struct list_link a_0,
+      struct list_link a_n_b_0, struct list_link b_n)
 {
-    while (a_start.cur != a_end_b_start.cur && a_end_b_start.cur != b_end.cur)
+    while (a_0.i != a_n_b_0.i && a_n_b_0.i != b_n.i)
     {
-        if (cmp(sll, a_end_b_start.cur, a_start.cur) == CCC_LES)
+        if (cmp(sll, a_n_b_0.i, a_0.i) == CCC_LES)
         {
-            struct ccc_sll_elem_ *const lesser = a_end_b_start.cur;
-            a_end_b_start.prev->n_ = lesser->n_;
-            /* Critical, otherwise algo breaks. b_end must be accurate. */
-            if (lesser == b_end.prev)
-            {
-                b_end.prev = a_end_b_start.prev;
-            }
+            struct ccc_sll_elem_ *const lesser = a_n_b_0.i;
             /* Must continue these checks after where lesser was but the prev
                does not change because only lesser was spliced out. */
-            a_end_b_start.cur = lesser->n_;
-            a_start.prev->n_ = lesser;
-            lesser->n_ = a_start.cur;
+            a_n_b_0.i = lesser->n_;
+            a_n_b_0.prev->n_ = lesser->n_;
+            /* Critical, otherwise algo breaks. b_n must be accurate. */
+            if (lesser == b_n.prev)
+            {
+                b_n.prev = a_n_b_0.prev;
+            }
+            a_0.prev->n_ = lesser;
+            lesser->n_ = a_0.i;
             /* Another critical update that breaks algorithm if forgotten. */
-            a_start.prev = lesser;
+            a_0.prev = lesser;
         }
         else
         {
-            a_start.prev = a_start.cur;
-            a_start.cur = a_start.cur->n_;
+            a_0.prev = a_0.i;
+            a_0.i = a_0.i->n_;
         }
     }
-    return b_end;
+    return b_n;
 }
 
 /*=========================    Private Interface   ==========================*/
