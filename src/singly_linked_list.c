@@ -19,6 +19,12 @@ limitations under the License. */
 #include "singly_linked_list.h"
 #include "types.h"
 
+struct elem_pair
+{
+    struct ccc_sll_elem_ *prev;
+    struct ccc_sll_elem_ *cur;
+};
+
 /*===========================    Prototypes     =============================*/
 
 static void *struct_base(struct ccc_sll_ const *, struct ccc_sll_elem_ const *);
@@ -35,6 +41,13 @@ static size_t erase_range(struct ccc_sll_ *, struct ccc_sll_elem_ *begin,
 static struct ccc_sll_elem_ *pop_front(struct ccc_sll_ *);
 static struct ccc_sll_elem_ *elem_in(struct ccc_sll_ const *,
                                      void const *any_struct);
+static struct elem_pair merge(struct ccc_sll_ *, struct elem_pair,
+                              struct elem_pair, struct elem_pair);
+static struct elem_pair first_unsorted(struct ccc_sll_ const *,
+                                       struct elem_pair);
+static ccc_threeway_cmp cmp(struct ccc_sll_ const *sll,
+                            struct ccc_sll_elem_ const *lhs,
+                            struct ccc_sll_elem_ const *rhs);
 
 /*===========================     Interface     =============================*/
 
@@ -320,6 +333,94 @@ ccc_sll_is_empty(ccc_singly_linked_list const *const sll)
     return !sll->sz_;
 }
 
+/*==========================     Sorting     ================================*/
+
+static inline struct elem_pair
+first_unsorted(ccc_singly_linked_list const *const sll, struct elem_pair p)
+{
+    do
+    {
+        p.prev = p.cur;
+        p.cur = p.cur->n_;
+    } while (p.cur != &sll->sentinel_ && cmp(sll, p.cur, p.prev) != CCC_LES);
+    return p;
+}
+
+static inline struct elem_pair
+merge(ccc_singly_linked_list *const sll, struct elem_pair a_start,
+      struct elem_pair a_end_b_start, struct elem_pair b_end)
+{
+    // splice one-by-one until one run is exhausted
+    while (a_start.cur != a_end_b_start.cur && a_end_b_start.cur != b_end.cur)
+    {
+        if (cmp(sll, a_end_b_start.cur, a_start.cur) == CCC_LES)
+        {
+            // detach right_cur
+            struct ccc_sll_elem_ *to_move = a_end_b_start.cur;
+            a_end_b_start.prev->n_ = to_move->n_;
+            a_end_b_start.cur = to_move->n_;
+
+            // insert before left_cur
+            a_start.prev->n_ = to_move;
+            to_move->n_ = a_start.cur;
+
+            // advance left_prev to the newly‑inserted node
+            a_start.prev = to_move;
+        }
+        else
+        {
+            // leave left_cur in place, just walk forward
+            a_start.prev = a_start.cur;
+            a_start.cur = a_start.cur->n_;
+        }
+    }
+
+    // left_prev is now the last node of the merged region.
+    // The next start is its successor.
+    return (struct elem_pair){.prev = a_end_b_start.cur, .cur = b_end.cur};
+}
+
+/** Main sort entry—exactly your natural‑runs outer loop. */
+ccc_result
+ccc_sll_sort(ccc_singly_linked_list *const sll)
+{
+    if (!sll)
+    {
+        return CCC_RESULT_ARG_ERROR;
+    }
+
+    size_t run;
+    do
+    {
+        run = 0;
+
+        // start at the very beginning (sentinel → first real node)
+        struct elem_pair a_start
+            = {.prev = &sll->sentinel_, .cur = sll->sentinel_.n_};
+
+        // merge adjacent runs all the way to the sentinel
+        while (a_start.cur != &sll->sentinel_)
+        {
+            ++run;
+
+            // find boundary between run1 and run2
+            struct elem_pair a_mid = first_unsorted(sll, a_start);
+            if (a_mid.cur == &sll->sentinel_)
+            {
+                break;
+            }
+
+            // find end of run2
+            struct elem_pair b_end = first_unsorted(sll, a_mid);
+
+            // merge the two runs and get the next start boundary
+            a_start = merge(sll, a_start, a_mid, b_end);
+        }
+    } while (run > 1);
+
+    return CCC_RESULT_OK;
+}
+
 /*=========================    Private Interface   ==========================*/
 
 void
@@ -420,4 +521,16 @@ static inline struct ccc_sll_elem_ *
 elem_in(struct ccc_sll_ const *const sll, void const *const any_struct)
 {
     return (struct ccc_sll_elem_ *)((char *)any_struct + sll->sll_elem_offset_);
+}
+
+/** Calls the user provided three way comparison callback function on the user
+type wrapping the provided intrusive handles. Returns the three way comparison
+result value. */
+static inline ccc_threeway_cmp
+cmp(struct ccc_sll_ const *const sll, struct ccc_sll_elem_ const *const lhs,
+    struct ccc_sll_elem_ const *const rhs)
+{
+    return sll->cmp_((ccc_any_type_cmp){.any_type_lhs = struct_base(sll, lhs),
+                                        .any_type_rhs = struct_base(sll, rhs),
+                                        .aux = sll->aux_});
 }

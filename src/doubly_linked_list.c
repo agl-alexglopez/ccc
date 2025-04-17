@@ -37,10 +37,10 @@ static void push_back(ccc_doubly_linked_list *, struct ccc_dll_elem_ *);
 static void splice_range(struct ccc_dll_elem_ *pos, struct ccc_dll_elem_ *begin,
                          struct ccc_dll_elem_ *end);
 static struct ccc_dll_elem_ *first_unsorted(struct ccc_dll_ const *dll,
-                                            struct ccc_dll_elem_ *a,
-                                            struct ccc_dll_elem_ const *end);
-static void merge(struct ccc_dll_ *dll, struct ccc_dll_elem_ *a_0,
-                  struct ccc_dll_elem_ *a_n_b_0, struct ccc_dll_elem_ *b_n);
+                                            struct ccc_dll_elem_ *,
+                                            struct ccc_dll_elem_ const *);
+static void merge(struct ccc_dll_ *, struct ccc_dll_elem_ *,
+                  struct ccc_dll_elem_ *, struct ccc_dll_elem_ const *);
 static ccc_threeway_cmp cmp(struct ccc_dll_ const *dll,
                             struct ccc_dll_elem_ const *lhs,
                             struct ccc_dll_elem_ const *rhs);
@@ -501,7 +501,8 @@ merge for consistency. This function assumes the provided lists are already
 sorted separately. */
 static inline void
 merge(struct ccc_dll_ *const dll, struct ccc_dll_elem_ *a_start,
-      struct ccc_dll_elem_ *a_end_b_start, struct ccc_dll_elem_ *b_end)
+      struct ccc_dll_elem_ *a_end_b_start,
+      struct ccc_dll_elem_ const *const b_end)
 {
     assert(dll && a_start && a_end_b_start && b_end);
     while (a_start != a_end_b_start && a_end_b_start != b_end)
@@ -517,6 +518,27 @@ merge(struct ccc_dll_ *const dll, struct ccc_dll_elem_ *a_start,
             break;
         }
     }
+}
+
+/** Places the range [begin, end) at position before pos. This means end is not
+moved or altered due to the exclusive range. If begin is equal to end the
+function returns early changing no nodes. */
+static inline void
+splice_range(struct ccc_dll_elem_ *const pos, struct ccc_dll_elem_ *const begin,
+             struct ccc_dll_elem_ *end)
+{
+    if (begin == end)
+    {
+        return;
+    }
+    end = end->p_;
+    end->n_->p_ = begin->p_;
+    begin->p_->n_ = end->n_;
+
+    begin->p_ = pos->p_;
+    end->n_ = pos;
+    pos->p_->n_ = begin;
+    pos->p_ = end;
 }
 
 /*=======================     Private Interface   ===========================*/
@@ -582,27 +604,6 @@ pop_front(struct ccc_dll_ *const dll)
     }
     --dll->sz_;
     return ret;
-}
-
-/** Places the range [begin, end) at position before pos. This means end is not
-moved or altered due to the exclusive range. If begin is equal to end the
-function returns early changing no nodes. */
-static inline void
-splice_range(struct ccc_dll_elem_ *const pos, struct ccc_dll_elem_ *const begin,
-             struct ccc_dll_elem_ *end)
-{
-    if (begin == end)
-    {
-        return;
-    }
-    end = end->p_;
-    end->n_->p_ = begin->p_;
-    begin->p_->n_ = end->n_;
-
-    begin->p_ = pos->p_;
-    end->n_ = pos;
-    pos->p_->n_ = begin;
-    pos->p_ = end;
 }
 
 static inline size_t

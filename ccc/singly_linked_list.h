@@ -143,13 +143,13 @@ ccc_result ccc_sll_splice(ccc_singly_linked_list *pos_sll, ccc_sll_elem *pos,
                           ccc_singly_linked_list *splice_sll,
                           ccc_sll_elem *splice);
 
-/** @brief Inserts the range of spliced elements before pos. O(N).
+/** @brief Inserts the [begin, end] of spliced elements after pos. O(N).
 @param [in] pos_sll the list to which pos belongs.
-@param [in] pos the position before which the range will be inserted.
+@param [in] pos the position after which the range will be inserted.
 @param [in] splice_sll the list to which the range belongs.
 @param [in] begin the start of the range.
-@param [in] end the end of the range.
-@return ok if the operations is successful. An input error is provided if any
+@param [in] end the inclusive end of the range.
+@return OK if the operations is successful. An input error is provided if any
 input pointers are NULL.
 @warning pos must not be inside of the range (begin, end) if pos_sll is the
 same list as splice_sll.
@@ -208,6 +208,18 @@ a normal list. However, insertions and removals from a range are not possible
 as they no longer belong to any list. */
 void *ccc_sll_extract_range(ccc_singly_linked_list *sll, ccc_sll_elem *begin,
                             ccc_sll_elem *end);
+
+/**@}*/
+
+/** @name Sorting Interface
+Sort the container. */
+/**@{*/
+
+/** @brief Sorts the singly linked list in non-decreasing order as defined by
+the provided comparison function. O(NlgN) time, O(1) space.
+@param [in] sll a pointer to the singly linked list to sort.
+@return the result of the sort, usually OK. An arg error if sll is null. */
+ccc_result ccc_sll_sort(ccc_singly_linked_list *sll);
 
 /**@}*/
 

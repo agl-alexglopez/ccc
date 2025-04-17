@@ -35,7 +35,7 @@ CHECK_BEGIN_STATIC_FN(sll_test_insert_three)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(sll_push_and_splice)
+CHECK_BEGIN_STATIC_FN(sll_test_push_and_splice)
 {
     singly_linked_list sll = sll_init(sll, struct val, e, val_cmp, NULL, NULL);
     struct val vals[4] = {{.val = 0}, {.val = 1}, {.val = 2}, {.val = 3}};
@@ -54,7 +54,7 @@ CHECK_BEGIN_STATIC_FN(sll_push_and_splice)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(sll_push_and_splice_range)
+CHECK_BEGIN_STATIC_FN(sll_test_push_and_splice_range)
 {
     singly_linked_list sll = sll_init(sll, struct val, e, val_cmp, NULL, NULL);
     struct val vals[5]
@@ -85,7 +85,7 @@ CHECK_BEGIN_STATIC_FN(sll_push_and_splice_range)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(sll_push_and_splice_range_no_ops)
+CHECK_BEGIN_STATIC_FN(sll_test_push_and_splice_range_no_ops)
 {
     singly_linked_list sll = sll_init(sll, struct val, e, val_cmp, NULL, NULL);
     struct val vals[5]
@@ -106,10 +106,87 @@ CHECK_BEGIN_STATIC_FN(sll_push_and_splice_range_no_ops)
     CHECK_END_FN();
 }
 
+CHECK_BEGIN_STATIC_FN(sll_test_sort_reverse)
+{
+    singly_linked_list sll = sll_init(sll, struct val, e, val_cmp, NULL, NULL);
+    struct val vals[6] = {{.val = 0}, {.val = 1}, {.val = 2},
+                          {.val = 3}, {.val = 4}, {.val = 5}};
+    enum check_result const t = create_list(&sll, 6, vals);
+    CHECK(t, PASS);
+    CHECK(check_order(&sll, 6, (int[6]){5, 4, 3, 2, 1, 0}), PASS);
+    CHECK(validate(&sll), true);
+    ccc_result const r = ccc_sll_sort(&sll);
+    CHECK(r, CCC_RESULT_OK);
+    CHECK(check_order(&sll, 6, (int[6]){0, 1, 2, 3, 4, 5}), PASS);
+    CHECK_END_FN();
+}
+
+CHECK_BEGIN_STATIC_FN(sll_test_sort_even)
+{
+    singly_linked_list sll = sll_init(sll, struct val, e, val_cmp, NULL, NULL);
+    struct val vals[8] = {
+        [7] = {.val = 9}, [6] = {.val = 4},  [5] = {.val = 1},
+        [4] = {.val = 1}, [3] = {.val = 99}, [2] = {.val = -55},
+        [1] = {.val = 5}, [0] = {.val = 2},
+    };
+    enum check_result const t = create_list(&sll, 8, vals);
+    CHECK(t, PASS);
+    CHECK(validate(&sll), true);
+    CHECK(check_order(&sll, 8, (int[8]){9, 4, 1, 1, 99, -55, 5, 2}), PASS);
+    ccc_result const r = ccc_sll_sort(&sll);
+    CHECK(r, CCC_RESULT_OK);
+    CHECK(check_order(&sll, 8, (int[8]){-55, 1, 1, 2, 4, 5, 9, 99}), PASS);
+    CHECK(validate(&sll), true);
+    CHECK_END_FN();
+}
+
+CHECK_BEGIN_STATIC_FN(sll_test_sort_odd)
+{
+    singly_linked_list sll = sll_init(sll, struct val, e, val_cmp, NULL, NULL);
+    struct val vals[9] = {
+        [8] = {.val = 10},  [7] = {.val = 9}, [6] = {.val = 4},
+        [5] = {.val = 1},   [4] = {.val = 1}, [3] = {.val = 99},
+        [2] = {.val = -55}, [1] = {.val = 5}, [0] = {.val = 2},
+    };
+    enum check_result const t = create_list(&sll, 9, vals);
+    CHECK(t, PASS);
+    CHECK(validate(&sll), true);
+    CHECK(check_order(&sll, 9, (int[9]){10, 9, 4, 1, 1, 99, -55, 5, 2}), PASS);
+    ccc_result const r = ccc_sll_sort(&sll);
+    CHECK(r, CCC_RESULT_OK);
+    CHECK(check_order(&sll, 9, (int[9]){-55, 1, 1, 2, 4, 5, 9, 10, 99}), PASS);
+    CHECK(validate(&sll), true);
+    CHECK_END_FN();
+}
+
+CHECK_BEGIN_STATIC_FN(sll_test_sort_runs)
+{
+    singly_linked_list sll = sll_init(sll, struct val, e, val_cmp, NULL, NULL);
+    struct val vals[12]
+        = {{.val = 99},  {.val = 101}, {.val = 103}, {.val = 4},
+           {.val = 8},   {.val = 9},   {.val = -99}, {.val = -55},
+           {.val = -55}, {.val = 3},   {.val = 7},   {.val = 10}};
+    enum check_result t = create_list(&sll, 12, vals);
+    CHECK(t, PASS);
+    CHECK(validate(&sll), true);
+    t = check_order(&sll, 12,
+                    (int[12]){10, 7, 3, -55, -55, -99, 9, 8, 4, 103, 101, 99});
+    CHECK(t, PASS);
+    ccc_result const r = ccc_sll_sort(&sll);
+    CHECK(r, CCC_RESULT_OK);
+    t = check_order(&sll, 12,
+                    (int[12]){-99, -55, -55, 3, 4, 7, 8, 9, 10, 99, 101, 103});
+    CHECK(validate(&sll), true);
+    CHECK(t, PASS);
+    CHECK_END_FN();
+}
+
 int
 main()
 {
-    return CHECK_RUN(sll_test_insert_three(), sll_push_and_splice(),
-                     sll_push_and_splice_range(),
-                     sll_push_and_splice_range_no_ops());
+    return CHECK_RUN(sll_test_insert_three(), sll_test_push_and_splice(),
+                     sll_test_push_and_splice_range(),
+                     sll_test_push_and_splice_range_no_ops(),
+                     sll_test_sort_reverse(), sll_test_sort_even(),
+                     sll_test_sort_odd(), sll_test_sort_runs());
 }

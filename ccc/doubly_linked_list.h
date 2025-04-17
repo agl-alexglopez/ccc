@@ -252,8 +252,8 @@ Sort the container. */
 /**@{*/
 
 /** @brief Sorts the doubly linked list in non-decreasing order as defined by
-the provided comparison function.
-@param [in] dll the doubly linked list to sort.
+the provided comparison function. O(NlgN) time, O(1) space.
+@param [in] dll a pointer to the doubly linked list to sort.
 @return the result of the sort, usually OK. An arg error if dll is null. */
 ccc_result ccc_dll_sort(ccc_doubly_linked_list *dll);
 
