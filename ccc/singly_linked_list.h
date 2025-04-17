@@ -143,13 +143,13 @@ ccc_result ccc_sll_splice(ccc_singly_linked_list *pos_sll, ccc_sll_elem *pos,
                           ccc_singly_linked_list *splice_sll,
                           ccc_sll_elem *splice);
 
-/** @brief Inserts the range of spliced elements before pos. O(N).
+/** @brief Inserts the [begin, end] of spliced elements after pos. O(N).
 @param [in] pos_sll the list to which pos belongs.
-@param [in] pos the position before which the range will be inserted.
+@param [in] pos the position after which the range will be inserted.
 @param [in] splice_sll the list to which the range belongs.
 @param [in] begin the start of the range.
-@param [in] end the end of the range.
-@return ok if the operations is successful. An input error is provided if any
+@param [in] end the inclusive end of the range.
+@return OK if the operations is successful. An input error is provided if any
 input pointers are NULL.
 @warning pos must not be inside of the range (begin, end) if pos_sll is the
 same list as splice_sll.
@@ -208,6 +208,41 @@ a normal list. However, insertions and removals from a range are not possible
 as they no longer belong to any list. */
 void *ccc_sll_extract_range(ccc_singly_linked_list *sll, ccc_sll_elem *begin,
                             ccc_sll_elem *end);
+
+/**@}*/
+
+/** @name Sorting Interface
+Sort the container. */
+/**@{*/
+
+/** @brief Sorts the singly linked list in non-decreasing order as defined by
+the provided comparison function. O(NlgN) time, O(1) space.
+@param [in] sll a pointer to the singly linked list to sort.
+@return the result of the sort, usually OK. An arg error if sll is null. */
+ccc_result ccc_sll_sort(ccc_singly_linked_list *sll);
+
+/** @brief Inserts e in sorted position according to the non-decreasing order
+of the list determined by the user provided comparison function.
+@param [in] sll a pointer to the singly linked list.
+@param [in] e a pointer to the element to be inserted in order.
+@return a pointer to the element that has been inserted or NULL if allocation
+is required and has failed.
+@warning this function assumes the list is sorted.
+
+If a non-increasing order is desired, return opposite results from the user
+comparison function. If an element is CCC_LES return CCC_GRT and vice versa.
+If elements are equal, return CCC_EQL. */
+void *ccc_sll_insert_sorted(ccc_singly_linked_list *sll, ccc_sll_elem *e);
+
+/** @brief Returns true if the list is sorted in non-decreasing order according
+to the user provided comparison function.
+@param [in] sll a pointer to the singly linked list.
+@return CCC_TRUE if the list is sorted CCC_FALSE if not. Error if sll is NULL.
+
+If a non-increasing order is desired, return opposite results from the user
+comparison function. If an element is CCC_LES return CCC_GRT and vice versa.
+If elements are equal, return CCC_EQL. */
+ccc_tribool ccc_sll_is_sorted(ccc_singly_linked_list const *sll);
 
 /**@}*/
 
@@ -316,6 +351,9 @@ typedef ccc_singly_linked_list singly_linked_list;
 #    define sll_extract_range(args...) ccc_sll_extract_range(args)
 #    define sll_erase(args...) ccc_sll_erase(args)
 #    define sll_erase_range(args...) ccc_sll_erase_range(args)
+#    define sll_sort(args...) ccc_sll_sort(args)
+#    define sll_insert_sorted(args...) ccc_sll_insert_sorted(args)
+#    define sll_is_sorted(args...) ccc_sll_is_sorted(args)
 #    define sll_begin(args...) ccc_sll_begin(args)
 #    define sll_end(args...) ccc_sll_end(args)
 #    define sll_next(args...) ccc_sll_next(args)

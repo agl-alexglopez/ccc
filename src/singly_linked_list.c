@@ -19,6 +19,17 @@ limitations under the License. */
 #include "singly_linked_list.h"
 #include "types.h"
 
+/** @brief When sorting a singly linked list is at a disadvantage for iterative
+O(1) space merge sort: it doesn't have a prev pointer. This will help list
+elements remember their previous element for splicing and merging. */
+struct list_link
+{
+    /** The previous element of cur. Must manually update and manage. */
+    struct ccc_sll_elem_ *prev;
+    /** The current element. Must manually manage and update. */
+    struct ccc_sll_elem_ *cur;
+};
+
 /*===========================    Prototypes     =============================*/
 
 static void *struct_base(struct ccc_sll_ const *, struct ccc_sll_elem_ const *);
@@ -35,6 +46,13 @@ static size_t erase_range(struct ccc_sll_ *, struct ccc_sll_elem_ *begin,
 static struct ccc_sll_elem_ *pop_front(struct ccc_sll_ *);
 static struct ccc_sll_elem_ *elem_in(struct ccc_sll_ const *,
                                      void const *any_struct);
+static struct list_link merge(struct ccc_sll_ *, struct list_link,
+                              struct list_link, struct list_link);
+static struct list_link first_unsorted(struct ccc_sll_ const *,
+                                       struct list_link);
+static ccc_threeway_cmp cmp(struct ccc_sll_ const *sll,
+                            struct ccc_sll_elem_ const *lhs,
+                            struct ccc_sll_elem_ const *rhs);
 
 /*===========================     Interface     =============================*/
 
@@ -320,6 +338,142 @@ ccc_sll_is_empty(ccc_singly_linked_list const *const sll)
     return !sll->sz_;
 }
 
+/*==========================     Sorting     ================================*/
+
+ccc_tribool
+ccc_sll_is_sorted(ccc_singly_linked_list const *const sll)
+{
+    if (!sll)
+    {
+        return CCC_TRIBOOL_ERROR;
+    }
+    if (sll->sz_ <= 1)
+    {
+        return CCC_TRUE;
+    }
+    for (struct ccc_sll_elem_ const *prev = sll->sentinel_.n_,
+                                    *cur = sll->sentinel_.n_->n_;
+         cur != &sll->sentinel_; prev = cur, cur = cur->n_)
+    {
+        if (cmp(sll, prev, cur) == CCC_GRT)
+        {
+            return CCC_FALSE;
+        }
+    }
+    return CCC_TRUE;
+}
+
+void *
+ccc_sll_insert_sorted(ccc_singly_linked_list *sll, ccc_sll_elem *e)
+{
+    if (!sll || !e)
+    {
+        return NULL;
+    }
+    if (sll->alloc_)
+    {
+        void *const node = sll->alloc_(NULL, sll->elem_sz_, sll->aux_);
+        if (!node)
+        {
+            return NULL;
+        }
+        (void)memcpy(node, struct_base(sll, e), sll->elem_sz_);
+        e = elem_in(sll, node);
+    }
+    struct list_link link = {.prev = &sll->sentinel_, .cur = sll->sentinel_.n_};
+    for (; link.cur != &sll->sentinel_ && cmp(sll, e, link.cur) != CCC_LES;
+         link.prev = link.cur, link.cur = link.cur->n_)
+    {}
+    e->n_ = link.cur;
+    link.prev->n_ = e;
+    ++sll->sz_;
+    return struct_base(sll, e);
+}
+
+/** Sorts the list in O(NlgN) time with O(1) auxiliary space (no recursion).
+If the list is already sorted this algorithm only needs one pass. */
+ccc_result
+ccc_sll_sort(ccc_singly_linked_list *const sll)
+{
+    if (!sll)
+    {
+        return CCC_RESULT_ARG_ERROR;
+    }
+    size_t run;
+    do
+    {
+        run = 0;
+        struct list_link a_start
+            = {.prev = &sll->sentinel_, .cur = sll->sentinel_.n_};
+        while (a_start.cur != &sll->sentinel_)
+        {
+            ++run;
+            struct list_link a_end_b_start = first_unsorted(sll, a_start);
+            if (a_end_b_start.cur == &sll->sentinel_)
+            {
+                break;
+            }
+            struct list_link b_end = first_unsorted(sll, a_end_b_start);
+            a_start = merge(sll, a_start, a_end_b_start, b_end);
+        }
+    } while (run > 1);
+    return CCC_RESULT_OK;
+}
+
+/** Returns a pair of elements marking the first list elem that is smaller than
+its previous (CCC_LES) according to the user comparison callback. The list_link
+returned will have the out of order element as cur and the last remaining in
+order element as prev. The cur element may be the sentinel if the run is
+sorted. */
+static inline struct list_link
+first_unsorted(ccc_singly_linked_list const *const sll, struct list_link p)
+{
+    do
+    {
+        p.prev = p.cur;
+        p.cur = p.cur->n_;
+    } while (p.cur != &sll->sentinel_ && cmp(sll, p.cur, p.prev) != CCC_LES);
+    return p;
+}
+
+/** Merges two in order list runs. The lists will be sorted according to ranges
+[a_start, a_end_b_start) to [a_end_b_start, b_end), ending in [a_start, b_end).
+Once merging is complete the b_end elements are returned to help the user
+progress the running and merging algorithm. A list_link must be returned because
+merging may alter the b_end previous element and the user needs this list link
+to remain accurate to progress the sorting correctly. */
+static inline struct list_link
+merge(ccc_singly_linked_list *const sll, struct list_link a_start,
+      struct list_link a_end_b_start, struct list_link b_end)
+{
+    while (a_start.cur != a_end_b_start.cur && a_end_b_start.cur != b_end.cur)
+    {
+        if (cmp(sll, a_end_b_start.cur, a_start.cur) == CCC_LES)
+        {
+            struct ccc_sll_elem_ *const lesser = a_end_b_start.cur;
+            a_end_b_start.prev->n_ = lesser->n_;
+            /* Critical, otherwise algo breaks. b_end must be accurate. */
+            if (lesser == b_end.prev)
+            {
+                b_end.prev = a_end_b_start.prev;
+            }
+            /* Must continue these checks after where lesser was but the prev
+               does not change because only lesser was spliced out. */
+            a_end_b_start.cur = lesser->n_;
+            a_start.prev->n_ = lesser;
+            lesser->n_ = a_start.cur;
+            /* Another critical update that breaks algorithm if forgotten. */
+            a_start.prev = lesser;
+        }
+        else
+        {
+            a_start.prev = a_start.cur;
+            a_start.cur = a_start.cur->n_;
+        }
+    }
+    return b_end;
+}
+
 /*=========================    Private Interface   ==========================*/
 
 void
@@ -420,4 +574,16 @@ static inline struct ccc_sll_elem_ *
 elem_in(struct ccc_sll_ const *const sll, void const *const any_struct)
 {
     return (struct ccc_sll_elem_ *)((char *)any_struct + sll->sll_elem_offset_);
+}
+
+/** Calls the user provided three way comparison callback function on the user
+type wrapping the provided intrusive handles. Returns the three way comparison
+result value. */
+static inline ccc_threeway_cmp
+cmp(struct ccc_sll_ const *const sll, struct ccc_sll_elem_ const *const lhs,
+    struct ccc_sll_elem_ const *const rhs)
+{
+    return sll->cmp_((ccc_any_type_cmp){.any_type_lhs = struct_base(sll, lhs),
+                                        .any_type_rhs = struct_base(sll, rhs),
+                                        .aux = sll->aux_});
 }

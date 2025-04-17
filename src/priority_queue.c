@@ -35,12 +35,14 @@ static void clear_node(struct ccc_pq_elem_ *);
 static void cut_child(struct ccc_pq_elem_ *);
 static void *struct_base(struct ccc_pq_ const *, struct ccc_pq_elem_ const *e);
 static void *elem_in(struct ccc_pq_ const *, struct ccc_pq_elem_ const *);
-static ccc_threeway_cmp cmp(struct ccc_pq_ const *,
-                            struct ccc_pq_elem_ const *a,
-                            struct ccc_pq_elem_ const *b);
-static void update_fixup(struct ccc_pq_ *, struct ccc_pq_elem_ *);
-static void increase_fixup(struct ccc_pq_ *, struct ccc_pq_elem_ *);
-static void decrease_fixup(struct ccc_pq_ *, struct ccc_pq_elem_ *);
+static ccc_threeway_cmp cmp(struct ccc_pq_ const *, struct ccc_pq_elem_ const *,
+                            struct ccc_pq_elem_ const *);
+static void update_fixup(struct ccc_pq_ *, struct ccc_pq_elem_ *,
+                         ccc_any_type_update_fn *, void *);
+static void increase_fixup(struct ccc_pq_ *, struct ccc_pq_elem_ *,
+                           ccc_any_type_update_fn *, void *);
+static void decrease_fixup(struct ccc_pq_ *, struct ccc_pq_elem_ *,
+                           ccc_any_type_update_fn *, void *);
 
 /*=========================  Interface Functions   ==========================*/
 
@@ -178,8 +180,7 @@ ccc_pq_update(ccc_priority_queue *const pq, ccc_pq_elem *const e,
     {
         return CCC_TRIBOOL_ERROR;
     }
-    fn((ccc_any_type){struct_base(pq, e), aux});
-    update_fixup(pq, e);
+    update_fixup(pq, e, fn, aux);
     return CCC_TRUE;
 }
 
@@ -193,8 +194,7 @@ ccc_pq_increase(ccc_priority_queue *const pq, ccc_pq_elem *const e,
     {
         return CCC_TRIBOOL_ERROR;
     }
-    fn((ccc_any_type){struct_base(pq, e), aux});
-    increase_fixup(pq, e);
+    increase_fixup(pq, e, fn, aux);
     return CCC_TRUE;
 }
 
@@ -208,8 +208,7 @@ ccc_pq_decrease(ccc_priority_queue *const pq, ccc_pq_elem *const e,
     {
         return CCC_TRIBOOL_ERROR;
     }
-    fn((ccc_any_type){struct_base(pq, e), aux});
-    decrease_fixup(pq, e);
+    decrease_fixup(pq, e, fn, aux);
     return CCC_TRUE;
 }
 
@@ -252,44 +251,62 @@ ccc_impl_pq_elem_in(struct ccc_pq_ const *const pq,
     return elem_in(pq, any_struct);
 }
 
-void
-ccc_impl_pq_update_fixup(struct ccc_pq_ *const pq, struct ccc_pq_elem_ *const e)
+ccc_threeway_cmp
+ccc_impl_pq_cmp(struct ccc_pq_ const *const pq,
+                struct ccc_pq_elem_ const *const lhs,
+                struct ccc_pq_elem_ const *const rhs)
 {
-    return update_fixup(pq, e);
+    return cmp(pq, lhs, rhs);
+}
+
+struct ccc_pq_elem_ *
+ccc_impl_pq_merge(struct ccc_pq_ *const pq, struct ccc_pq_elem_ *const old,
+                  struct ccc_pq_elem_ *const new)
+{
+    return merge(pq, old, new);
 }
 
 void
-ccc_impl_pq_increase_fixup(struct ccc_pq_ *const pq,
-                           struct ccc_pq_elem_ *const e)
+ccc_impl_pq_cut_child(struct ccc_pq_elem_ *const child)
 {
-    return increase_fixup(pq, e);
+    cut_child(child);
 }
 
 void
-ccc_impl_pq_decrease_fixup(struct ccc_pq_ *const pq,
-                           struct ccc_pq_elem_ *const e)
+ccc_impl_pq_init_node(struct ccc_pq_elem_ *const child)
 {
-    return decrease_fixup(pq, e);
+    init_node(child);
 }
 
-/*========================   Static Helpers   ================================*/
+struct ccc_pq_elem_ *
+ccc_impl_pq_delete_node(struct ccc_pq_ *const pq,
+                        struct ccc_pq_elem_ *const root)
+{
+    return delete_node(pq, root);
+}
+
+/*========================   Static Helpers  ================================*/
 
 static void
-update_fixup(struct ccc_pq_ *const pq, struct ccc_pq_elem_ *const e)
+update_fixup(struct ccc_pq_ *const pq, struct ccc_pq_elem_ *const e,
+             ccc_any_type_update_fn *const fn, void *aux)
 {
     if (e->parent_ && cmp(pq, e, e->parent_) == pq->order_)
     {
         cut_child(e);
+        fn((ccc_any_type){.any_type = struct_base(pq, e), .aux = aux});
         pq->root_ = merge(pq, pq->root_, e);
         return;
     }
     pq->root_ = delete_node(pq, e);
     init_node(e);
+    fn((ccc_any_type){.any_type = struct_base(pq, e), .aux = aux});
     pq->root_ = merge(pq, pq->root_, e);
 }
 
 static void
-increase_fixup(struct ccc_pq_ *const pq, struct ccc_pq_elem_ *const e)
+increase_fixup(struct ccc_pq_ *const pq, struct ccc_pq_elem_ *const e,
+               ccc_any_type_update_fn *const fn, void *aux)
 {
     if (pq->order_ == CCC_GRT)
     {
@@ -300,11 +317,13 @@ increase_fixup(struct ccc_pq_ *const pq, struct ccc_pq_elem_ *const e)
         pq->root_ = delete_node(pq, e);
         init_node(e);
     }
+    fn((ccc_any_type){.any_type = struct_base(pq, e), .aux = aux});
     pq->root_ = merge(pq, pq->root_, e);
 }
 
 static void
-decrease_fixup(struct ccc_pq_ *const pq, struct ccc_pq_elem_ *const e)
+decrease_fixup(struct ccc_pq_ *const pq, struct ccc_pq_elem_ *const e,
+               ccc_any_type_update_fn *const fn, void *aux)
 {
     if (pq->order_ == CCC_LES)
     {
@@ -315,6 +334,7 @@ decrease_fixup(struct ccc_pq_ *const pq, struct ccc_pq_elem_ *const e)
         pq->root_ = delete_node(pq, e);
         init_node(e);
     }
+    fn((ccc_any_type){.any_type = struct_base(pq, e), .aux = aux});
     pq->root_ = merge(pq, pq->root_, e);
 }
 
@@ -342,8 +362,8 @@ delete_node(struct ccc_pq_ *const pq, struct ccc_pq_elem_ *const root)
     return merge(pq, pq->root_, delete_min(pq, root));
 }
 
-/* Uses Fredman et al. oldest to youngest pairing method mentioned on pg 124 of
-the paper to pair nodes in one pass. A non-trivial example for min heap.
+/* Uses Fredman et al. oldest to youngest pairing method mentioned on pg 124
+of the paper to pair nodes in one pass. A non-trivial example for min heap.
 
 < = next_sibling_
 > = prev_sibling_
@@ -381,8 +401,9 @@ the paper to pair nodes in one pass. A non-trivial example for min heap.
 ┌<8>─<9>┐
 └───────┘
 
-Delete min is the slowest operation offered by the priority queue and in part
-contributes to the amortized o(lg n) runtime of the decrease key operation. */
+Delete min is the slowest operation offered by the priority queue and in
+part contributes to the amortized o(lg n) runtime of the decrease key
+operation. */
 static struct ccc_pq_elem_ *
 delete_min(struct ccc_pq_ *const pq, struct ccc_pq_elem_ *root)
 {
@@ -404,7 +425,8 @@ delete_min(struct ccc_pq_ *const pq, struct ccc_pq_elem_ *root)
     }
     /* This covers the odd or even case for number of pairings. */
     root = cur == eldest ? accumulator : merge(pq, accumulator, cur);
-    /* The root is always alone in its circular list at the end of merges. */
+    /* The root is always alone in its circular list at the end of merges.
+     */
     root->next_sibling_ = root->prev_sibling_ = root;
     root->parent_ = NULL;
     return root;
@@ -427,10 +449,10 @@ merge(struct ccc_pq_ *const pq, struct ccc_pq_elem_ *const old,
     return old;
 }
 
-/* Oldest nodes shuffle down, new drops in to replace. This supports the ring
-representation from Fredman et al., pg 125, fig 14 where the left child's next
-pointer wraps to the last element in the list. The previous pointer is to
-support faster deletes and decrease key operations.
+/* Oldest nodes shuffle down, new drops in to replace. This supports the
+ring representation from Fredman et al., pg 125, fig 14 where the left
+child's next pointer wraps to the last element in the list. The previous
+pointer is to support faster deletes and decrease key operations.
 
 < = next_sibling_
 > = prev_sibling_
@@ -461,11 +483,11 @@ link_child(struct ccc_pq_elem_ *const parent, struct ccc_pq_elem_ *const child)
 }
 
 static inline ccc_threeway_cmp
-cmp(struct ccc_pq_ const *const pq, struct ccc_pq_elem_ const *const a,
-    struct ccc_pq_elem_ const *const b)
+cmp(struct ccc_pq_ const *const pq, struct ccc_pq_elem_ const *const lhs,
+    struct ccc_pq_elem_ const *const rhs)
 {
-    return pq->cmp_((ccc_any_type_cmp){.any_type_lhs = struct_base(pq, a),
-                                       .any_type_rhs = struct_base(pq, b),
+    return pq->cmp_((ccc_any_type_cmp){.any_type_lhs = struct_base(pq, lhs),
+                                       .any_type_rhs = struct_base(pq, rhs),
                                        .aux = pq->aux_});
 }
 
@@ -494,7 +516,7 @@ clear_node(struct ccc_pq_elem_ *const e)
     e->left_child_ = e->next_sibling_ = e->prev_sibling_ = e->parent_ = NULL;
 }
 
-/*========================     Validation    ================================*/
+/*========================     Validation ================================*/
 
 /* NOLINTBEGIN(*misc-no-recursion) */
 

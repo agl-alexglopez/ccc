@@ -25,22 +25,73 @@ limitations under the License.
 
 /* NOLINTBEGIN(readability-identifier-naming) */
 
-/** @private */
+/** @private A recursive structure for tracking a user element in a doubly
+linked list. Supports O(1) insert and delete at the front, back, or any
+arbitrary position in the list. Elements always have a valid element to point
+to in the list due to the user of a sentinel so these pointers are never NULL
+if an element is in the list. */
 typedef struct ccc_dll_elem_
 {
+    /** @private The next element. Non-null if elem is in list. */
     struct ccc_dll_elem_ *n_;
+    /** @private The previous element. Non-null if elem is in list. */
     struct ccc_dll_elem_ *p_;
 } ccc_dll_elem_;
 
-/** @private */
+/** @private A doubly linked list with a single sentinel for both head and
+tail. The list offers O(1) push, pop, insert, and erase at arbitrary positions
+in the list. The sentinel operates as follows to ensure nodes in the list never
+point to NULL.
+
+An empty list.
+
+      sentinel
+    ┌──────────┐
+  ┌>│n=sentinel├──┐
+  └─┤p=sentinel│<─┘
+    └──────────┘
+
+A list with one element.
+
+         ┌───────────────────┐
+         V                   │
+      sentinel        A      │
+    ┌──────────┐ ┌──────────┐│
+    │n=A       ├>│n=sentinel├┘
+   ┌┤p=A       │<┤p=sentinel│
+   │└──────────┘ └──────────┘
+   │                  ^
+   └──────────────────┘
+A list with three elements.
+
+         ┌─────────────────────────────────────────────┐
+         V                                             │
+      sentinel         A            B           C      │
+    ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐│
+    │n=A       ├>│n=B       ├>│n=C       ├>│n=sentinel├┘
+   ┌┤p=C       │<┤p=sentinel│<┤p=A       │<┤p=B       │
+   │└──────────┘ └──────────┘ └──────────┘ └──────────┘
+   │                                            ^
+   └────────────────────────────────────────────┘
+
+The single sentinel allows us to use two pointers instead of the four it would
+take with a head and tail sentinel. The only cost is slight care for certain
+cutting and node clearing steps to ensure the sentinel addresses remain valid */
 struct ccc_dll_
 {
+    /** @private The sentinel with storage in the actual list struct. */
     struct ccc_dll_elem_ sentinel_;
+    /** @private The size in bytes of the type which wraps this handle. */
     size_t elem_sz_;
+    /** @private The offset in bytes of the intrusive element in user type. */
     size_t dll_elem_offset_;
+    /** @private The number of elements constantly tracked for O(1) check. */
     size_t sz_;
-    ccc_any_alloc_fn *alloc_;
+    /** @private The user provided comparison callback for sorting. */
     ccc_any_type_cmp_fn *cmp_;
+    /** @private The user provided allocation function, if any. */
+    ccc_any_alloc_fn *alloc_;
+    /** @private User provided auxiliary data, if any. */
     void *aux_;
 };
 
