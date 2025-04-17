@@ -19,9 +19,14 @@ limitations under the License. */
 #include "singly_linked_list.h"
 #include "types.h"
 
-struct elem_pair
+/** @brief When sorting a singly linked list is at a disadvantage for iterative
+O(1) space merge sort: it doesn't have a prev pointer. This will help list
+elements remember their previous element for splicing and merging. */
+struct list_link
 {
+    /** The previous element of cur. Must manually update and manage. */
     struct ccc_sll_elem_ *prev;
+    /** The current element. Must manually manage and update. */
     struct ccc_sll_elem_ *cur;
 };
 
@@ -41,10 +46,10 @@ static size_t erase_range(struct ccc_sll_ *, struct ccc_sll_elem_ *begin,
 static struct ccc_sll_elem_ *pop_front(struct ccc_sll_ *);
 static struct ccc_sll_elem_ *elem_in(struct ccc_sll_ const *,
                                      void const *any_struct);
-static struct elem_pair merge(struct ccc_sll_ *, struct elem_pair,
-                              struct elem_pair, struct elem_pair);
-static struct elem_pair first_unsorted(struct ccc_sll_ const *,
-                                       struct elem_pair);
+static struct list_link merge(struct ccc_sll_ *, struct list_link,
+                              struct list_link, struct list_link);
+static struct list_link first_unsorted(struct ccc_sll_ const *,
+                                       struct list_link);
 static ccc_threeway_cmp cmp(struct ccc_sll_ const *sll,
                             struct ccc_sll_elem_ const *lhs,
                             struct ccc_sll_elem_ const *rhs);
@@ -335,8 +340,43 @@ ccc_sll_is_empty(ccc_singly_linked_list const *const sll)
 
 /*==========================     Sorting     ================================*/
 
-static inline struct elem_pair
-first_unsorted(ccc_singly_linked_list const *const sll, struct elem_pair p)
+/** Sorts the list in O(NlgN) time with O(1) auxiliary space (no recursion).
+If the list is already sorted this algorithm only needs one pass. */
+ccc_result
+ccc_sll_sort(ccc_singly_linked_list *const sll)
+{
+    if (!sll)
+    {
+        return CCC_RESULT_ARG_ERROR;
+    }
+    size_t run;
+    do
+    {
+        run = 0;
+        struct list_link a_start
+            = {.prev = &sll->sentinel_, .cur = sll->sentinel_.n_};
+        while (a_start.cur != &sll->sentinel_)
+        {
+            ++run;
+            struct list_link a_end_b_start = first_unsorted(sll, a_start);
+            if (a_end_b_start.cur == &sll->sentinel_)
+            {
+                break;
+            }
+            struct list_link b_end = first_unsorted(sll, a_end_b_start);
+            a_start = merge(sll, a_start, a_end_b_start, b_end);
+        }
+    } while (run > 1);
+    return CCC_RESULT_OK;
+}
+
+/** Returns a pair of elements marking the first list elem that is smaller than
+its previous (CCC_LES) according to the user comparison callback. The list_link
+returned will have the out of order element as cur and the last remaining in
+order element as prev. The cur element may be the sentinel if the run is
+sorted. */
+static inline struct list_link
+first_unsorted(ccc_singly_linked_list const *const sll, struct list_link p)
 {
     do
     {
@@ -346,79 +386,42 @@ first_unsorted(ccc_singly_linked_list const *const sll, struct elem_pair p)
     return p;
 }
 
-static inline struct elem_pair
-merge(ccc_singly_linked_list *const sll, struct elem_pair a_start,
-      struct elem_pair a_end_b_start, struct elem_pair b_end)
+/** Merges two in order list runs. The lists will be sorted according to ranges
+[a_start, a_end_b_start) to [a_end_b_start, b_end), ending in [a_start, b_end).
+Once merging is complete the b_end elements are returned to help the user
+progress the running and merging algorithm. A list_link must be returned because
+merging may alter the b_end previous element and the user needs this list link
+to remain accurate to progress the sorting correctly. */
+static inline struct list_link
+merge(ccc_singly_linked_list *const sll, struct list_link a_start,
+      struct list_link a_end_b_start, struct list_link b_end)
 {
-    // splice one-by-one until one run is exhausted
     while (a_start.cur != a_end_b_start.cur && a_end_b_start.cur != b_end.cur)
     {
         if (cmp(sll, a_end_b_start.cur, a_start.cur) == CCC_LES)
         {
-            // detach right_cur
-            struct ccc_sll_elem_ *to_move = a_end_b_start.cur;
-            a_end_b_start.prev->n_ = to_move->n_;
-            a_end_b_start.cur = to_move->n_;
-
-            // insert before left_cur
-            a_start.prev->n_ = to_move;
-            to_move->n_ = a_start.cur;
-
-            // advance left_prev to the newly‑inserted node
-            a_start.prev = to_move;
+            struct ccc_sll_elem_ *const lesser = a_end_b_start.cur;
+            a_end_b_start.prev->n_ = lesser->n_;
+            /* Critical, otherwise algo breaks. b_end must be accurate. */
+            if (lesser == b_end.prev)
+            {
+                b_end.prev = a_end_b_start.prev;
+            }
+            /* Must continue these checks after where lesser was but the prev
+               does not change because only lesser was spliced out. */
+            a_end_b_start.cur = lesser->n_;
+            a_start.prev->n_ = lesser;
+            lesser->n_ = a_start.cur;
+            /* Another critical update that breaks algorithm if forgotten. */
+            a_start.prev = lesser;
         }
         else
         {
-            // leave left_cur in place, just walk forward
             a_start.prev = a_start.cur;
             a_start.cur = a_start.cur->n_;
         }
     }
-
-    // left_prev is now the last node of the merged region.
-    // The next start is its successor.
-    return (struct elem_pair){.prev = a_end_b_start.cur, .cur = b_end.cur};
-}
-
-/** Main sort entry—exactly your natural‑runs outer loop. */
-ccc_result
-ccc_sll_sort(ccc_singly_linked_list *const sll)
-{
-    if (!sll)
-    {
-        return CCC_RESULT_ARG_ERROR;
-    }
-
-    size_t run;
-    do
-    {
-        run = 0;
-
-        // start at the very beginning (sentinel → first real node)
-        struct elem_pair a_start
-            = {.prev = &sll->sentinel_, .cur = sll->sentinel_.n_};
-
-        // merge adjacent runs all the way to the sentinel
-        while (a_start.cur != &sll->sentinel_)
-        {
-            ++run;
-
-            // find boundary between run1 and run2
-            struct elem_pair a_mid = first_unsorted(sll, a_start);
-            if (a_mid.cur == &sll->sentinel_)
-            {
-                break;
-            }
-
-            // find end of run2
-            struct elem_pair b_end = first_unsorted(sll, a_mid);
-
-            // merge the two runs and get the next start boundary
-            a_start = merge(sll, a_start, a_mid, b_end);
-        }
-    } while (run > 1);
-
-    return CCC_RESULT_OK;
+    return b_end;
 }
 
 /*=========================    Private Interface   ==========================*/
