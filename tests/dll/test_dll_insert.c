@@ -180,12 +180,34 @@ CHECK_BEGIN_STATIC_FN(dll_test_sort_runs)
     CHECK_END_FN();
 }
 
+CHECK_BEGIN_STATIC_FN(dll_test_sort_halves)
+{
+    doubly_linked_list dll = dll_init(dll, struct val, e, val_cmp, NULL, NULL);
+    struct val vals[12] = {{.val = 7},  {.val = 10}, {.val = 13}, {.val = 17},
+                           {.val = 19}, {.val = 21}, {.val = 8},  {.val = 12},
+                           {.val = 15}, {.val = 18}, {.val = 20}, {.val = 25}};
+    enum check_result t = create_list(&dll, UTIL_PUSH_FRONT, 12, vals);
+    CHECK(t, PASS);
+    CHECK(validate(&dll), true);
+    t = check_order(&dll, 12,
+                    (int[12]){25, 20, 18, 15, 12, 8, 21, 19, 17, 13, 10, 7});
+    CHECK(t, PASS);
+    ccc_result const r = ccc_dll_sort(&dll);
+    CHECK(r, CCC_RESULT_OK);
+    t = check_order(&dll, 12,
+                    (int[12]){7, 8, 10, 12, 13, 15, 17, 18, 19, 20, 21, 25});
+    CHECK(validate(&dll), true);
+    CHECK(t, PASS);
+    CHECK_END_FN();
+}
+
 int
 main()
 {
-    return CHECK_RUN(
-        dll_test_push_three_front(), dll_test_push_three_back(),
-        dll_test_push_and_splice(), dll_test_push_and_splice_range(),
-        dll_test_push_and_splice_no_ops(), dll_test_sort_even(),
-        dll_test_sort_odd(), dll_test_sort_reverse(), dll_test_sort_runs());
+    return CHECK_RUN(dll_test_push_three_front(), dll_test_push_three_back(),
+                     dll_test_push_and_splice(),
+                     dll_test_push_and_splice_range(),
+                     dll_test_push_and_splice_no_ops(), dll_test_sort_even(),
+                     dll_test_sort_odd(), dll_test_sort_reverse(),
+                     dll_test_sort_runs(), dll_test_sort_halves());
 }

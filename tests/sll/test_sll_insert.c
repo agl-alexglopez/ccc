@@ -181,6 +181,27 @@ CHECK_BEGIN_STATIC_FN(sll_test_sort_runs)
     CHECK_END_FN();
 }
 
+CHECK_BEGIN_STATIC_FN(sll_test_sort_halves)
+{
+    singly_linked_list sll = sll_init(sll, struct val, e, val_cmp, NULL, NULL);
+    struct val vals[12] = {{.val = 7},  {.val = 10}, {.val = 13}, {.val = 17},
+                           {.val = 19}, {.val = 21}, {.val = 8},  {.val = 12},
+                           {.val = 15}, {.val = 18}, {.val = 20}, {.val = 25}};
+    enum check_result t = create_list(&sll, 12, vals);
+    CHECK(t, PASS);
+    CHECK(validate(&sll), true);
+    t = check_order(&sll, 12,
+                    (int[12]){25, 20, 18, 15, 12, 8, 21, 19, 17, 13, 10, 7});
+    CHECK(t, PASS);
+    ccc_result const r = ccc_sll_sort(&sll);
+    CHECK(r, CCC_RESULT_OK);
+    t = check_order(&sll, 12,
+                    (int[12]){7, 8, 10, 12, 13, 15, 17, 18, 19, 20, 21, 25});
+    CHECK(validate(&sll), true);
+    CHECK(t, PASS);
+    CHECK_END_FN();
+}
+
 int
 main()
 {
@@ -188,5 +209,6 @@ main()
                      sll_test_push_and_splice_range(),
                      sll_test_push_and_splice_range_no_ops(),
                      sll_test_sort_even(), sll_test_sort_reverse(),
-                     sll_test_sort_odd(), sll_test_sort_runs());
+                     sll_test_sort_odd(), sll_test_sort_runs(),
+                     sll_test_sort_halves());
 }

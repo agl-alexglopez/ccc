@@ -53,11 +53,20 @@ void ccc_impl_pq_push(struct ccc_pq_ *, struct ccc_pq_elem_ *);
 /** @private */
 struct ccc_pq_elem_ *ccc_impl_pq_elem_in(struct ccc_pq_ const *, void const *);
 /** @private */
-void ccc_impl_pq_update_fixup(struct ccc_pq_ *, struct ccc_pq_elem_ *);
+ccc_threeway_cmp ccc_impl_pq_cmp(struct ccc_pq_ const *,
+                                 struct ccc_pq_elem_ const *,
+                                 struct ccc_pq_elem_ const *);
 /** @private */
-void ccc_impl_pq_increase_fixup(struct ccc_pq_ *, struct ccc_pq_elem_ *);
+struct ccc_pq_elem_ *ccc_impl_pq_merge(struct ccc_pq_ *pq,
+                                       struct ccc_pq_elem_ *old,
+                                       struct ccc_pq_elem_ *new);
 /** @private */
-void ccc_impl_pq_decrease_fixup(struct ccc_pq_ *, struct ccc_pq_elem_ *);
+void ccc_impl_pq_cut_child(struct ccc_pq_elem_ *);
+/** @private */
+void ccc_impl_pq_init_node(struct ccc_pq_elem_ *);
+/** @private */
+struct ccc_pq_elem_ *ccc_impl_pq_delete_node(struct ccc_pq_ *,
+                                             struct ccc_pq_elem_ *);
 
 /*=========================  Macro Implementations     ======================*/
 
@@ -110,8 +119,21 @@ void ccc_impl_pq_decrease_fixup(struct ccc_pq_ *, struct ccc_pq_elem_ *);
             && pq_elem_ptr_->prev_sibling_)                                    \
         {                                                                      \
             pq_update_res_ = CCC_TRUE;                                         \
-            {update_closure_over_T} ccc_impl_pq_update_fixup(pq_,              \
-                                                             pq_elem_ptr_);    \
+            if (pq_elem_ptr_->parent_                                          \
+                && ccc_impl_pq_cmp(pq_, pq_elem_ptr_, pq_elem_ptr_->parent_)   \
+                       == pq_->order_)                                         \
+            {                                                                  \
+                ccc_impl_pq_cut_child(pq_elem_ptr_);                           \
+                {update_closure_over_T} pq_->root_                             \
+                    = ccc_impl_pq_merge(pq_, pq_->root_, pq_elem_ptr_);        \
+            }                                                                  \
+            else                                                               \
+            {                                                                  \
+                pq_->root_ = ccc_impl_pq_delete_node(pq_, pq_elem_ptr_);       \
+                ccc_impl_pq_init_node(pq_elem_ptr_);                           \
+                {update_closure_over_T} pq_->root_                             \
+                    = ccc_impl_pq_merge(pq_, pq_->root_, pq_elem_ptr_);        \
+            }                                                                  \
         }                                                                      \
         pq_update_res_;                                                        \
     }))
@@ -127,8 +149,17 @@ void ccc_impl_pq_decrease_fixup(struct ccc_pq_ *, struct ccc_pq_elem_ *);
             && pq_elem_ptr_->prev_sibling_)                                    \
         {                                                                      \
             pq_increase_res_ = CCC_TRUE;                                       \
-            {increase_closure_over_T} ccc_impl_pq_increase_fixup(              \
-                pq_, pq_elem_ptr_);                                            \
+            if (pq_->order_ == CCC_GRT)                                        \
+            {                                                                  \
+                ccc_impl_pq_cut_child(pq_elem_ptr_);                           \
+            }                                                                  \
+            else                                                               \
+            {                                                                  \
+                pq_->root_ = ccc_impl_pq_delete_node(pq_, pq_elem_ptr_);       \
+                ccc_impl_pq_init_node(pq_elem_ptr_);                           \
+            }                                                                  \
+            {increase_closure_over_T} pq_->root_                               \
+                = ccc_impl_pq_merge(pq_, pq_->root_, pq_elem_ptr_);            \
         }                                                                      \
         pq_increase_res_;                                                      \
     }))
@@ -144,8 +175,17 @@ void ccc_impl_pq_decrease_fixup(struct ccc_pq_ *, struct ccc_pq_elem_ *);
             && pq_elem_ptr_->prev_sibling_)                                    \
         {                                                                      \
             pq_decrease_res_ = CCC_TRUE;                                       \
-            {decrease_closure_over_T} ccc_impl_pq_decrease_fixup(              \
-                pq_, pq_elem_ptr_);                                            \
+            if (pq_->order_ == CCC_LES)                                        \
+            {                                                                  \
+                ccc_impl_pq_cut_child(pq_elem_ptr_);                           \
+            }                                                                  \
+            else                                                               \
+            {                                                                  \
+                pq_->root_ = ccc_impl_pq_delete_node(pq_, pq_elem_ptr_);       \
+                ccc_impl_pq_init_node(pq_elem_ptr_);                           \
+            }                                                                  \
+            {decrease_closure_over_T} pq_->root_                               \
+                = ccc_impl_pq_merge(pq_, pq_->root_, pq_elem_ptr_);            \
         }                                                                      \
         pq_decrease_res_;                                                      \
     }))
