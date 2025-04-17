@@ -340,6 +340,56 @@ ccc_sll_is_empty(ccc_singly_linked_list const *const sll)
 
 /*==========================     Sorting     ================================*/
 
+ccc_tribool
+ccc_sll_is_sorted(ccc_singly_linked_list const *const sll)
+{
+    if (!sll)
+    {
+        return CCC_TRIBOOL_ERROR;
+    }
+    if (sll->sz_ <= 1)
+    {
+        return CCC_TRUE;
+    }
+    for (struct ccc_sll_elem_ const *prev = sll->sentinel_.n_,
+                                    *cur = sll->sentinel_.n_->n_;
+         cur != &sll->sentinel_; prev = cur, cur = cur->n_)
+    {
+        if (cmp(sll, prev, cur) == CCC_GRT)
+        {
+            return CCC_FALSE;
+        }
+    }
+    return CCC_TRUE;
+}
+
+void *
+ccc_sll_insert_sorted(ccc_singly_linked_list *sll, ccc_sll_elem *e)
+{
+    if (!sll || !e)
+    {
+        return NULL;
+    }
+    if (sll->alloc_)
+    {
+        void *const node = sll->alloc_(NULL, sll->elem_sz_, sll->aux_);
+        if (!node)
+        {
+            return NULL;
+        }
+        (void)memcpy(node, struct_base(sll, e), sll->elem_sz_);
+        e = elem_in(sll, node);
+    }
+    struct list_link link = {.prev = &sll->sentinel_, .cur = sll->sentinel_.n_};
+    for (; link.cur != &sll->sentinel_ && cmp(sll, e, link.cur) != CCC_LES;
+         link.prev = link.cur, link.cur = link.cur->n_)
+    {}
+    e->n_ = link.cur;
+    link.prev->n_ = e;
+    ++sll->sz_;
+    return struct_base(sll, e);
+}
+
 /** Sorts the list in O(NlgN) time with O(1) auxiliary space (no recursion).
 If the list is already sorted this algorithm only needs one pass. */
 ccc_result

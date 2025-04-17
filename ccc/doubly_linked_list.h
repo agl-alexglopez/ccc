@@ -257,6 +257,29 @@ the provided comparison function. O(NlgN) time, O(1) space.
 @return the result of the sort, usually OK. An arg error if dll is null. */
 ccc_result ccc_dll_sort(ccc_doubly_linked_list *dll);
 
+/** @brief Inserts e in sorted position according to the non-decreasing order
+of the list determined by the user provided comparison function.
+@param [in] dll a pointer to the doubly linked list.
+@param [in] e a pointer to the element to be inserted in order.
+@return a pointer to the element that has been inserted or NULL if allocation
+is required and has failed.
+@warning this function assumes the list is sorted.
+
+If a non-increasing order is desired, return opposite results from the user
+comparison function. If an element is CCC_LES return CCC_GRT and vice versa.
+If elements are equal, return CCC_EQL. */
+void *ccc_dll_insert_sorted(ccc_doubly_linked_list *dll, ccc_dll_elem *e);
+
+/** @brief Returns true if the list is sorted in non-decreasing order according
+to the user provided comparison function.
+@param [in] dll a pointer to the singly linked list.
+@return CCC_TRUE if the list is sorted CCC_FALSE if not. Error if dll is NULL.
+
+If a non-increasing order is desired, return opposite results from the user
+comparison function. If an element is CCC_LES return CCC_GRT and vice versa.
+If elements are equal, return CCC_EQL. */
+ccc_tribool ccc_dll_is_sorted(ccc_doubly_linked_list const *dll);
+
 /**@}*/
 
 /** @name Deallocation Interface
@@ -400,6 +423,9 @@ typedef ccc_doubly_linked_list doubly_linked_list;
 #    define dll_erase_range(args...) ccc_dll_erase_range(args)
 #    define dll_splice(args...) ccc_dll_splice(args)
 #    define dll_splice_range(args...) ccc_dll_splice_range(args)
+#    define dll_sort(args...) ccc_dll_sort(args)
+#    define dll_insert_sorted(args...) ccc_dll_insert_sorted(args)
+#    define dll_is_sorted(args...) ccc_dll_is_sorted(args)
 #    define dll_begin(args...) ccc_dll_begin(args)
 #    define dll_next(args...) ccc_dll_next(args)
 #    define dll_rbegin(args...) ccc_dll_rbegin(args)

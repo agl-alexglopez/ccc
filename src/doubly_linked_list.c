@@ -448,6 +448,56 @@ ccc_dll_validate(ccc_doubly_linked_list const *const l)
 
 /*==========================     Sorting     ================================*/
 
+ccc_tribool
+ccc_dll_is_sorted(ccc_doubly_linked_list const *const dll)
+{
+    if (!dll)
+    {
+        return CCC_TRIBOOL_ERROR;
+    }
+    if (dll->sz_ <= 1)
+    {
+        return CCC_TRUE;
+    }
+    for (struct ccc_dll_elem_ const *cur = dll->sentinel_.n_->n_;
+         cur != &dll->sentinel_; cur = cur->n_)
+    {
+        if (cmp(dll, cur->p_, cur) == CCC_GRT)
+        {
+            return CCC_FALSE;
+        }
+    }
+    return CCC_TRUE;
+}
+
+void *
+ccc_dll_insert_sorted(ccc_doubly_linked_list *const dll, ccc_dll_elem *e)
+{
+    if (!dll || !e)
+    {
+        return NULL;
+    }
+    if (dll->alloc_)
+    {
+        void *const node = dll->alloc_(NULL, dll->elem_sz_, dll->aux_);
+        if (!node)
+        {
+            return NULL;
+        }
+        (void)memcpy(node, struct_base(dll, e), dll->elem_sz_);
+        e = elem_in(dll, node);
+    }
+    struct ccc_dll_elem_ *pos = dll->sentinel_.n_;
+    for (; pos != &dll->sentinel_ && cmp(dll, e, pos) != CCC_LES; pos = pos->n_)
+    {}
+    e->n_ = pos;
+    e->p_ = pos->p_;
+    pos->p_->n_ = e;
+    pos->p_ = e;
+    ++dll->sz_;
+    return struct_base(dll, e);
+}
+
 /** Sorts the list into non-decreasing order according to the user comparison
 callback function in O(NlgN) time and O(1) space. */
 ccc_result
@@ -596,7 +646,7 @@ static inline struct ccc_dll_elem_ *
 pop_front(struct ccc_dll_ *const dll)
 {
     struct ccc_dll_elem_ *ret = dll->sentinel_.n_;
-    dll->sentinel_.n_->p_ = &dll->sentinel_;
+    ret->n_->p_ = &dll->sentinel_;
     dll->sentinel_.n_ = ret->n_;
     if (ret != &dll->sentinel_)
     {
