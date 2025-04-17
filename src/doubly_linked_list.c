@@ -11,6 +11,11 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
+/* Citation:
+[1] See the sort methods for citations and change lists regarding the pintOS
+educational operating system natural merge sort algorithm used for linked lists.
+Code in the pintOS source is at  `src/lib/kernel.list.c`, but this may change if
+they refactor. */
 #include <assert.h>
 #include <stddef.h>
 #include <string.h>
@@ -499,7 +504,22 @@ ccc_dll_insert_sorted(ccc_doubly_linked_list *const dll, ccc_dll_elem *e)
 }
 
 /** Sorts the list into non-decreasing order according to the user comparison
-callback function in O(NlgN) time and O(1) space. */
+callback function in O(NlgN) time and O(1) space.
+
+The following merging algorithm and associated helper functions are based on
+the iterative natural merge sort used in the list module of the pintOS project
+for learning operating systems. Currently the original is located at the
+following path in the pintOS source code:
+
+`src/lib/kernel/list.c`
+
+However, if refactors change this location, seek the list intrusive container
+module for original implementations. The code has been changed for the C
+Container Collection as follows:
+
+- there single sentinel node rather than two.
+- splicing in the merge operation has been simplified along with other tweaks.
+- comparison callbacks are handled with three way comparison. */
 ccc_result
 ccc_dll_sort(ccc_doubly_linked_list *const dll)
 {
@@ -507,16 +527,15 @@ ccc_dll_sort(ccc_doubly_linked_list *const dll)
     {
         return CCC_RESULT_ARG_ERROR;
     }
-    /* Algorithm runs a single pass if list is already sorted aka run = 1. */
-    size_t run = 0;
+    /* Algorithm is one pass if list is sorted. Merging is never true. */
+    ccc_tribool merging = CCC_FALSE;
     do
     {
-        run = 0;
+        merging = CCC_FALSE;
         /* 0th index of the A list. The start of one list to merge. */
         struct ccc_dll_elem_ *a_0 = dll->sentinel_.n_;
         while (a_0 != &dll->sentinel_)
         {
-            ++run;
             /* The Nth index of list A (its size) aka 0th index of B list. */
             struct ccc_dll_elem_ *const a_n_b_0 = first_less(dll, a_0);
             if (a_n_b_0 == &dll->sentinel_)
@@ -528,8 +547,9 @@ ccc_dll_sort(ccc_doubly_linked_list *const dll)
                fixing. Merge returns this b_n element to indicate it is the
                final element that has not been processed by merge comparison. */
             a_0 = merge(dll, a_0, a_n_b_0, first_less(dll, a_n_b_0));
+            merging = CCC_TRUE;
         }
-    } while (run > 1);
+    } while (merging);
     return CCC_RESULT_OK;
 }
 

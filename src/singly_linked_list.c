@@ -11,6 +11,11 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
+/* Citation:
+[1] See the sort methods for citations and change lists regarding the pintOS
+educational operating system natural merge sort algorithm used for linked lists.
+Code in the pintOS source is at  `src/lib/kernel.list.c`, but this may change if
+they refactor. */
 #include <assert.h>
 #include <stddef.h>
 #include <string.h>
@@ -390,7 +395,23 @@ ccc_sll_insert_sorted(ccc_singly_linked_list *sll, ccc_sll_elem *e)
 }
 
 /** Sorts the list in O(NlgN) time with O(1) auxiliary space (no recursion).
-If the list is already sorted this algorithm only needs one pass. */
+If the list is already sorted this algorithm only needs one pass.
+
+The following merging algorithm and associated helper functions are based on
+the iterative natural merge sort used in the list module of the pintOS project
+for learning operating systems. Currently the original is located at the
+following path in the pintOS source code:
+
+`src/lib/kernel/list.c`
+
+However, if refactors change this location, seek the list intrusive container
+module for original implementations. The code has been changed for the C
+Container Collection as follows:
+
+- the algorithm is adapted to work with a singly linked list rather than doubly
+- there single sentinel node rather than two.
+- splicing in the merge operation has been simplified along with other tweaks.
+- comparison callbacks are handled with three way comparison. */
 ccc_result
 ccc_sll_sort(ccc_singly_linked_list *const sll)
 {
@@ -398,16 +419,16 @@ ccc_sll_sort(ccc_singly_linked_list *const sll)
     {
         return CCC_RESULT_ARG_ERROR;
     }
-    size_t run;
+    /* Algorithm is one pass if list is sorted. Merging is never true. */
+    ccc_tribool merging = CCC_FALSE;
     do
     {
-        run = 0;
+        merging = CCC_FALSE;
         /* 0th index of the A list. The start of one list to merge. */
         struct list_link a_0
             = {.prev = &sll->sentinel_, .i = sll->sentinel_.n_};
         while (a_0.i != &sll->sentinel_)
         {
-            ++run;
             /* The Nth index of list A (its size) aka 0th index of B list. */
             struct list_link a_n_b_0 = first_less(sll, a_0);
             if (a_n_b_0.i == &sll->sentinel_)
@@ -419,8 +440,9 @@ ccc_sll_sort(ccc_singly_linked_list *const sll)
                fixing. Merge returns this b_n element to indicate it is the
                final element that has not been processed by merge comparison. */
             a_0 = merge(sll, a_0, a_n_b_0, first_less(sll, a_n_b_0));
+            merging = CCC_TRUE;
         }
-    } while (run > 1);
+    } while (merging);
     return CCC_RESULT_OK;
 }
 
