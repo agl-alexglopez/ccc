@@ -504,7 +504,7 @@ ccc_dll_insert_sorted(ccc_doubly_linked_list *const dll, ccc_dll_elem *e)
 }
 
 /** Sorts the list into non-decreasing order according to the user comparison
-callback function in O(NlgN) time and O(1) space.
+callback function in `O(N*lgN)` time and `O(1)` space.
 
 The following merging algorithm and associated helper functions are based on
 the iterative natural merge sort used in the list module of the pintOS project
@@ -567,8 +567,8 @@ first_less(struct ccc_dll_ const *const dll, struct ccc_dll_elem_ *start)
     return start;
 }
 
-/** Merges lists [a_0, a_n_b_0) with [a_n_b_0, b_n) to form [a_0, b_n). Returns
-the exclusive end of the range, b_n, once the merge sort is complete.
+/** Merges lists `[a_0, a_n_b_0)` with `[a_n_b_0, b_n)` to form `[a_0, b_n)`.
+Returns the exclusive end of the range, `b_n`, once the merge sort is complete.
 
 Notice that all ranges exclude their final element from the merge for
 consistency. This function assumes the provided lists are already sorted
@@ -630,8 +630,8 @@ ccc_impl_dll_elem_in(struct ccc_dll_ const *const l,
 
 /*=======================       Static Helpers    ===========================*/
 
-/** Places the range [begin, end) at position before pos. This means end is not
-moved or altered due to the exclusive range. If begin is equal to end the
+/** Places the range `[begin, end)` at position before pos. This means end is
+not moved or altered due to the exclusive range. If begin is equal to end the
 function returns early changing no nodes. */
 static inline void
 splice_range(struct ccc_dll_elem_ *const pos, struct ccc_dll_elem_ *const begin,
