@@ -28,23 +28,23 @@ limitations under the License.
 /* NOLINTBEGIN(readability-identifier-naming) */
 
 /* TODO: Come up with better system. For now, uncomment to define a preprocessor
-directive to force generics. */
+directive to force generics. This has been used for testing for now. */
 // #define CCC_FHM_PORTABLE
 
 /** @private An array of this byte will be in the tag array. Same idea as
 Rust's Hashbrown table. The only value not represented by constants is
 the following:
 
-DELETED  = 0b10000000
-EMPTY    = 0x11111111
-OCCUPIED = 0b0???????
+`DELETED  = 0b10000000`
+`EMPTY    = 0x11111111`
+`OCCUPIED = 0b0???????`
 
-In this case (?) represents any 7 bits kept from the upper 7 bits of the
+In this case `?` represents any 7 bits kept from the upper 7 bits of the
 original hash code to signify an occupied slot. We know this slot is taken
 because the Most Significant Bit is zero, something that is not true of any
 other state. Wrap a byte in a struct to avoid strict-aliasing exceptions that
-are granted to uint8_t (usually unsigned char) and int8_t (usually char) when
-passed to functions as pointers. Maybe nets performance gain but depends on
+are granted to `uint8_t` (usually unsigned char) and `int8_t` (usually char)
+when passed to functions as pointers. Maybe nets performance gain but depends on
 aggressiveness of compiler. */
 typedef struct
 {
@@ -78,6 +78,7 @@ In the fixed size case we rely on the user defining a fixed size type. In either
 case the arrays are in one contiguous allocation but split as follows:
 
 (N == capacity - 1) Where capacity is a required power of 2. (G == group size).
+
 ┌────┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┐
 │Swap│D_N│...│D_1│D_0│T_0│T_1│...│T_N│R_0│R_1│...│R_G│
 └─┬──┴───┴───┴───┴───┼───┴───┴───┴───┼───┴───┴───┴───┘

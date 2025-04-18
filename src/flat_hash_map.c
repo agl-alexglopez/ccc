@@ -270,8 +270,12 @@ static void insert_and_copy(struct ccc_fhmap_ *h, void const *key_val_type,
                             ccc_fhm_tag m, size_t i);
 static void erase(struct ccc_fhmap_ *h, size_t i);
 static void rehash_in_place(struct ccc_fhmap_ *h);
+static ccc_tribool is_same_group(size_t i, size_t new_i, uint64_t hash,
+                                 size_t mask);
 static ccc_result rehash_resize(struct ccc_fhmap_ *h, size_t to_add,
                                 ccc_any_alloc_fn);
+static ccc_tribool eq_fn(struct ccc_fhmap_ const *h, void const *key, size_t i);
+static uint64_t hash_fn(struct ccc_fhmap_ const *h, void const *any_key);
 static void *key_at(struct ccc_fhmap_ const *h, size_t i);
 static void *data_at(struct ccc_fhmap_ const *h, size_t i);
 static void *key_in_slot(struct ccc_fhmap_ const *h, void const *slot);
@@ -348,11 +352,7 @@ ccc_fhm_contains(ccc_flat_hash_map const *const h, void const *const key)
     {
         return CCC_FALSE;
     }
-    return CCC_RESULT_OK
-           == find_key(
-                  h, key,
-                  h->hash_fn_((ccc_any_key){.any_key = key, .aux = h->aux_}))
-                  .error;
+    return CCC_RESULT_OK == find_key(h, key, hash_fn(h, key)).error;
 }
 
 void *
@@ -362,8 +362,7 @@ ccc_fhm_get_key_val(ccc_flat_hash_map const *const h, void const *const key)
     {
         return NULL;
     }
-    ccc_ucount const i = find_key(
-        h, key, h->hash_fn_((ccc_any_key){.any_key = key, .aux = h->aux_}));
+    ccc_ucount const i = find_key(h, key, hash_fn(h, key));
     if (i.error)
     {
         return NULL;
@@ -445,7 +444,10 @@ ccc_fhm_and_modify(ccc_fhmap_entry *const e, ccc_any_type_update_fn *const fn)
 {
     if (e && fn && (e->impl_.handle_.stats_ & CCC_ENTRY_OCCUPIED) != 0)
     {
-        fn((ccc_any_type){data_at(e->impl_.h_, e->impl_.handle_.i_), NULL});
+        fn((ccc_any_type){
+            .any_type = data_at(e->impl_.h_, e->impl_.handle_.i_),
+            .aux = NULL,
+        });
     }
     return e;
 }
@@ -456,7 +458,10 @@ ccc_fhm_and_modify_aux(ccc_fhmap_entry *const e,
 {
     if (e && fn && (e->impl_.handle_.stats_ & CCC_ENTRY_OCCUPIED) != 0)
     {
-        fn((ccc_any_type){data_at(e->impl_.h_, e->impl_.handle_.i_), aux});
+        fn((ccc_any_type){
+            .any_type = data_at(e->impl_.h_, e->impl_.handle_.i_),
+            .aux = aux,
+        });
     }
     return e;
 }
@@ -474,16 +479,20 @@ ccc_fhm_swap_entry(ccc_flat_hash_map *const h, void *const key_val_type_output)
     {
         swap(swap_slot(h), data_at(h, ent.handle_.i_), key_val_type_output,
              h->elem_sz_);
-        return (ccc_entry){
-            {.e_ = key_val_type_output, .stats_ = CCC_ENTRY_OCCUPIED}};
+        return (ccc_entry){{
+            .e_ = key_val_type_output,
+            .stats_ = CCC_ENTRY_OCCUPIED,
+        }};
     }
     if (ent.handle_.stats_ & CCC_ENTRY_INSERT_ERROR)
     {
         return (ccc_entry){{.stats_ = CCC_ENTRY_INSERT_ERROR}};
     }
     insert_and_copy(ent.h_, key_val_type_output, ent.tag_, ent.handle_.i_);
-    return (ccc_entry){
-        {.e_ = data_at(h, ent.handle_.i_), .stats_ = CCC_ENTRY_VACANT}};
+    return (ccc_entry){{
+        .e_ = data_at(h, ent.handle_.i_),
+        .stats_ = CCC_ENTRY_VACANT,
+    }};
 }
 
 ccc_entry
@@ -497,16 +506,20 @@ ccc_fhm_try_insert(ccc_flat_hash_map *const h, void *const key_val_type)
     struct ccc_fhash_entry_ ent = container_entry(h, key);
     if (ent.handle_.stats_ & CCC_ENTRY_OCCUPIED)
     {
-        return (ccc_entry){
-            {.e_ = data_at(h, ent.handle_.i_), .stats_ = CCC_ENTRY_OCCUPIED}};
+        return (ccc_entry){{
+            .e_ = data_at(h, ent.handle_.i_),
+            .stats_ = CCC_ENTRY_OCCUPIED,
+        }};
     }
     if (ent.handle_.stats_ & CCC_ENTRY_INSERT_ERROR)
     {
         return (ccc_entry){{.stats_ = CCC_ENTRY_INSERT_ERROR}};
     }
     insert_and_copy(ent.h_, key_val_type, ent.tag_, ent.handle_.i_);
-    return (ccc_entry){
-        {.e_ = data_at(h, ent.handle_.i_), .stats_ = CCC_ENTRY_VACANT}};
+    return (ccc_entry){{
+        .e_ = data_at(h, ent.handle_.i_),
+        .stats_ = CCC_ENTRY_VACANT,
+    }};
 }
 
 ccc_entry
@@ -521,16 +534,20 @@ ccc_fhm_insert_or_assign(ccc_flat_hash_map *const h, void *const key_val_type)
     if (ent.handle_.stats_ & CCC_ENTRY_OCCUPIED)
     {
         (void)memcpy(data_at(h, ent.handle_.i_), key_val_type, h->elem_sz_);
-        return (ccc_entry){
-            {.e_ = data_at(h, ent.handle_.i_), .stats_ = CCC_ENTRY_OCCUPIED}};
+        return (ccc_entry){{
+            .e_ = data_at(h, ent.handle_.i_),
+            .stats_ = CCC_ENTRY_OCCUPIED,
+        }};
     }
     if (ent.handle_.stats_ & CCC_ENTRY_INSERT_ERROR)
     {
         return (ccc_entry){{.stats_ = CCC_ENTRY_INSERT_ERROR}};
     }
     insert_and_copy(ent.h_, key_val_type, ent.tag_, ent.handle_.i_);
-    return (ccc_entry){
-        {.e_ = data_at(h, ent.handle_.i_), .stats_ = CCC_ENTRY_VACANT}};
+    return (ccc_entry){{
+        .e_ = data_at(h, ent.handle_.i_),
+        .stats_ = CCC_ENTRY_VACANT,
+    }};
 }
 
 ccc_entry
@@ -545,16 +562,17 @@ ccc_fhm_remove(ccc_flat_hash_map *const h, void *const key_val_type_output)
         return (ccc_entry){{.stats_ = CCC_ENTRY_VACANT}};
     }
     void *const key = key_in_slot(h, key_val_type_output);
-    ccc_ucount const index = find_key(
-        h, key, h->hash_fn_((ccc_any_key){.any_key = key, .aux = h->aux_}));
+    ccc_ucount const index = find_key(h, key, hash_fn(h, key));
     if (index.error)
     {
         return (ccc_entry){{.stats_ = CCC_ENTRY_VACANT}};
     }
     (void)memcpy(key_val_type_output, data_at(h, index.count), h->elem_sz_);
     erase(h, index.count);
-    return (ccc_entry){
-        {.e_ = key_val_type_output, .stats_ = CCC_ENTRY_OCCUPIED}};
+    return (ccc_entry){{
+        .e_ = key_val_type_output,
+        .stats_ = CCC_ENTRY_OCCUPIED,
+    }};
 }
 
 void *
@@ -635,7 +653,10 @@ ccc_fhm_clear(ccc_flat_hash_map *const h, ccc_any_type_destructor_fn *const fn)
     {
         if (is_full(h->tag_[i]))
         {
-            fn((ccc_any_type){.any_type = data_at(h, i), .aux = h->aux_});
+            fn((ccc_any_type){
+                .any_type = data_at(h, i),
+                .aux = h->aux_,
+            });
         }
     }
     (void)memset(h->tag_, TAG_EMPTY, mask_to_tag_bytes(h->mask_));
@@ -663,7 +684,10 @@ ccc_fhm_clear_and_free(ccc_flat_hash_map *const h,
         {
             if (is_full(h->tag_[i]))
             {
-                fn((ccc_any_type){.any_type = data_at(h, i), .aux = h->aux_});
+                fn((ccc_any_type){
+                    .any_type = data_at(h, i),
+                    .aux = h->aux_,
+                });
             }
         }
     }
@@ -697,8 +721,10 @@ ccc_fhm_clear_and_free_reserve(ccc_flat_hash_map *const h,
         {
             if (is_full(h->tag_[i]))
             {
-                destructor(
-                    (ccc_any_type){.any_type = data_at(h, i), .aux = h->aux_});
+                destructor((ccc_any_type){
+                    .any_type = data_at(h, i),
+                    .aux = h->aux_,
+                });
             }
         }
     }
@@ -807,8 +833,7 @@ ccc_fhm_copy(ccc_flat_hash_map *const dst, ccc_flat_hash_map const *const src,
     {
         if (is_full(src->tag_[i]))
         {
-            uint64_t const hash = src->hash_fn_(
-                (ccc_any_key){.any_key = key_at(src, i), .aux = src->aux_});
+            uint64_t const hash = hash_fn(src, key_at(src, i));
             size_t const new_i = find_existing_insert_slot(dst, hash);
             set_tag(dst, to_tag(hash), new_i);
             (void)memcpy(data_at(dst, new_i), data_at(src, i), dst->elem_sz_);
@@ -882,10 +907,7 @@ ccc_fhm_validate(ccc_flat_hash_map const *const h)
         }
         else if (is_full(t))
         {
-            if (to_tag(h->hash_fn_((ccc_any_key){.any_key = data_at(h, i),
-                                                 .aux = h->aux_}))
-                    .v
-                != t.v)
+            if (to_tag(hash_fn(h, data_at(h, i))).v != t.v)
             {
                 return CCC_FALSE;
             }
@@ -953,7 +975,7 @@ flag in the handle field will indicate the error. */
 static struct ccc_fhash_entry_
 container_entry(struct ccc_fhmap_ *const h, void const *const key)
 {
-    uint64_t const hash = h->hash_fn_((ccc_any_key){key, h->aux_});
+    uint64_t const hash = hash_fn(h, key);
     return (struct ccc_fhash_entry_){
         .h_ = (struct ccc_fhmap_ *)h,
         .tag_ = to_tag(hash),
@@ -1040,8 +1062,8 @@ erase(struct ccc_fhmap_ *const h, size_t const i)
        DELETED entries and this tag will be the first in the next group. This
        is an important case where we must mark our tag as deleted. */
     ccc_fhm_tag const m
-        = leading_zeros(prev_group_empties) + trailing_zeros(group_empties)
-                  >= CCC_FHM_GROUP_SIZE
+        = (leading_zeros(prev_group_empties) + trailing_zeros(group_empties)
+           >= CCC_FHM_GROUP_SIZE)
               ? (ccc_fhm_tag){TAG_DELETED}
               : (ccc_fhm_tag){TAG_EMPTY};
     h->avail_ += (TAG_EMPTY == m.v);
@@ -1059,7 +1081,10 @@ find_key_or_slot(struct ccc_fhmap_ const *const h, void const *const key,
 {
     ccc_fhm_tag const tag = to_tag(hash);
     size_t const mask = h->mask_;
-    struct triangular_seq seq = {.i = hash & mask, .stride = 0};
+    struct triangular_seq seq = {
+        .i = hash & mask,
+        .stride = 0,
+    };
     ccc_ucount empty_or_deleted = {.error = CCC_RESULT_FAIL};
     do
     {
@@ -1069,12 +1094,12 @@ find_key_or_slot(struct ccc_fhmap_ const *const h, void const *const key,
              i_match = next_index(&m))
         {
             i_match = (seq.i + i_match) & mask;
-            if (h->eq_fn_((ccc_any_key_cmp){.any_key_lhs = key,
-                                            .any_type_rhs = data_at(h, i_match),
-                                            .aux = h->aux_}))
+            if (eq_fn(h, key, i_match))
             {
-                return (struct ccc_handl_){.i_ = i_match,
-                                           .stats_ = CCC_ENTRY_OCCUPIED};
+                return (struct ccc_handl_){
+                    .i_ = i_match,
+                    .stats_ = CCC_ENTRY_OCCUPIED,
+                };
             }
         }
         /* Taking the first available slot once probing is done is important
@@ -1090,8 +1115,10 @@ find_key_or_slot(struct ccc_fhmap_ const *const h, void const *const key,
         }
         if (is_index_on(match_empty(g)))
         {
-            return (struct ccc_handl_){.i_ = empty_or_deleted.count,
-                                       .stats_ = CCC_ENTRY_VACANT};
+            return (struct ccc_handl_){
+                .i_ = empty_or_deleted.count,
+                .stats_ = CCC_ENTRY_VACANT,
+            };
         }
         seq.stride += CCC_FHM_GROUP_SIZE;
         seq.i += seq.stride;
@@ -1119,10 +1146,7 @@ find_key(struct ccc_fhmap_ const *const h, void const *const key,
              i_match = next_index(&m))
         {
             i_match = (seq.i + i_match) & mask;
-            if (likely(h->eq_fn_(
-                    (ccc_any_key_cmp){.any_key_lhs = key,
-                                      .any_type_rhs = data_at(h, i_match),
-                                      .aux = h->aux_})))
+            if (likely(eq_fn(h, key, i_match)))
             {
                 return (ccc_ucount){.count = i_match};
             }
@@ -1230,10 +1254,15 @@ maybe_rehash(struct ccc_fhmap_ *const h, size_t const to_add,
     return CCC_RESULT_OK;
 }
 
+/** Rehashes the map in place. Elements may or may not move, depending on
+results. Assumes the table has been allocated and had no more remaining slots
+for insertion. Rehashing in place repeatedly can be expensive so the user
+should ensure to select an appropriate capacity for fixed size tables. */
 static void
 rehash_in_place(struct ccc_fhmap_ *const h)
 {
     assert((h->mask_ + 1) % CCC_FHM_GROUP_SIZE == 0);
+    assert(h->tag_ && h->data_);
     size_t const mask = h->mask_;
     for (size_t i = 0; i < mask + 1; i += CCC_FHM_GROUP_SIZE)
     {
@@ -1249,40 +1278,45 @@ rehash_in_place(struct ccc_fhmap_ *const h)
         }
         do
         {
-            uint64_t const hash = h->hash_fn_(
-                (ccc_any_key){.any_key = key_at(h, i), .aux = h->aux_});
-            size_t const new_slot = find_existing_insert_slot(h, hash);
-            size_t const ideal_pos = (hash & mask);
+            uint64_t const hash = hash_fn(h, key_at(h, i));
+            size_t const new_i = find_existing_insert_slot(h, hash);
             ccc_fhm_tag const hash_tag = to_tag(hash);
-            /* No point relocating when scanning works by groups and the probe
-               sequence would place us in this group anyway. This is a valid
-               position because imagine if such a placement occurred during
-               the normal insertion algorithm due to some combination of
-               occupied, deleted, and empty slots. */
-            if (likely(
-                    (((i - ideal_pos) & mask) / CCC_FHM_GROUP_SIZE)
-                    == (((new_slot - ideal_pos) & mask) / CCC_FHM_GROUP_SIZE)))
+            /* We analyze groups not slots. Do not move the element to another
+               slot in the same group load. The tag is in the proper group for a
+               load and match and does not need relocation. */
+            if (likely(is_same_group(i, new_i, hash, mask)))
             {
                 set_tag(h, hash_tag, i);
                 break; /* continues outer loop */
             }
-            ccc_fhm_tag const occupant = h->tag_[new_slot];
-            set_tag(h, hash_tag, new_slot);
+            ccc_fhm_tag const occupant = h->tag_[new_i];
+            set_tag(h, hash_tag, new_i);
             if (occupant.v == TAG_EMPTY)
             {
                 set_tag(h, (ccc_fhm_tag){TAG_EMPTY}, i);
-                (void)memcpy(data_at(h, new_slot), data_at(h, i), h->elem_sz_);
+                (void)memcpy(data_at(h, new_i), data_at(h, i), h->elem_sz_);
                 break; /* continues outer loop */
             }
             /* The other slots data has been swapped and we rehash every
                element for this algorithm so there is no need to write its
                tag to this slot. It's data is in correct location already. */
             assert(occupant.v == TAG_DELETED);
-            swap(swap_slot(h), data_at(h, i), data_at(h, new_slot),
-                 h->elem_sz_);
+            swap(swap_slot(h), data_at(h, i), data_at(h, new_i), h->elem_sz_);
         } while (1);
     }
     h->avail_ = mask_to_load_factor_cap(mask) - h->sz_;
+}
+
+/** Returns true if the position being rehashed would be moved to a new slot
+in the same group it is already in. This means when this data is hashed to its
+ideal index in the table, both i and new_slot are already in that group that
+would be loaded for simultaneous scanning. */
+static inline ccc_tribool
+is_same_group(size_t const i, size_t const new_i, uint64_t const hash,
+              size_t const mask)
+{
+    return (((i - (hash & mask)) & mask) / CCC_FHM_GROUP_SIZE)
+           == (((new_i - (hash & mask)) & mask) / CCC_FHM_GROUP_SIZE);
 }
 
 static ccc_result
@@ -1321,8 +1355,7 @@ rehash_resize(struct ccc_fhmap_ *const h, size_t const to_add,
     {
         if (is_full(h->tag_[i]))
         {
-            uint64_t const hash = h->hash_fn_(
-                (ccc_any_key){.any_key = key_at(h, i), .aux = h->aux_});
+            uint64_t const hash = hash_fn(h, key_at(h, i));
             size_t const new_i = find_existing_insert_slot(&new_h, hash);
             set_tag(&new_h, to_tag(hash), new_i);
             (void)memcpy(data_at(&new_h, new_i), data_at(h, i), new_h.elem_sz_);
@@ -1333,6 +1366,25 @@ rehash_resize(struct ccc_fhmap_ *const h, size_t const to_add,
     (void)fn(h->data_, 0, h->aux_);
     *h = new_h;
     return CCC_RESULT_OK;
+}
+
+static inline uint64_t
+hash_fn(struct ccc_fhmap_ const *const h, void const *const any_key)
+{
+    return h->hash_fn_((ccc_any_key){
+        .any_key = any_key,
+        .aux = h->aux_,
+    });
+}
+
+static inline ccc_tribool
+eq_fn(struct ccc_fhmap_ const *const h, void const *const key, size_t const i)
+{
+    return h->eq_fn_((ccc_any_key_cmp){
+        .any_key_lhs = key,
+        .any_type_rhs = data_at(h, i),
+        .aux = h->aux_,
+    });
 }
 
 static inline void *
@@ -1519,8 +1571,9 @@ upper bits. */
 static inline ccc_fhm_tag
 to_tag(uint64_t const hash)
 {
-    return (ccc_fhm_tag){(hash >> ((sizeof(hash) * CHAR_BIT) - 7))
-                         & TAG_LOWER_7_MASK};
+    return (ccc_fhm_tag){
+        (hash >> ((sizeof(hash) * CHAR_BIT) - 7)) & TAG_LOWER_7_MASK,
+    };
 }
 
 /*========================  Index Mask Implementations   ====================*/
@@ -1629,7 +1682,8 @@ match_tag(group const g, ccc_fhm_tag const m)
 {
 
     return (index_mask){
-        _mm_movemask_epi8(_mm_cmpeq_epi8(g.v, _mm_set1_epi8((int8_t)m.v)))};
+        _mm_movemask_epi8(_mm_cmpeq_epi8(g.v, _mm_set1_epi8((int8_t)m.v))),
+    };
 }
 
 /** Returns 0 based index mask with every bit on representing those tags in
@@ -1662,7 +1716,8 @@ make_constants_empty_and_full_deleted(group const g)
     __m128i const zero = _mm_setzero_si128();
     __m128i const match_constants = _mm_cmpgt_epi8(zero, g.v);
     return (group){
-        _mm_or_si128(match_constants, _mm_set1_epi8((int8_t)TAG_DELETED))};
+        _mm_or_si128(match_constants, _mm_set1_epi8((int8_t)TAG_DELETED)),
+    };
 }
 
 #elif defined(__ARM_NEON__) && !defined(CCC_FHM_PORTABLE)
@@ -1704,9 +1759,10 @@ static inline index_mask
 match_tag(group const g, ccc_fhm_tag const m)
 {
 
-    index_mask const res
-        = {vget_lane_u64(vreinterpret_u64_u8(vceq_u8(g.v, vdup_n_u8(m.v))), 0)
-           & INDEX_MASK_MSBS};
+    index_mask const res = {
+        vget_lane_u64(vreinterpret_u64_u8(vceq_u8(g.v, vdup_n_u8(m.v))), 0)
+            & INDEX_MASK_MSBS,
+    };
     assert(
         (res.v & INDEX_MASK_OFF_BITS) == 0
         && "For bit counting and iteration purposes the most significant bit "
@@ -1731,8 +1787,9 @@ static inline index_mask
 match_empty_or_deleted(group const g)
 {
     uint8x8_t const cmp = vcltz_s8(vreinterpret_s8_u8(g.v));
-    index_mask const res
-        = {vget_lane_u64(vreinterpret_u64_u8(cmp), 0) & INDEX_MASK_MSBS};
+    index_mask const res = {
+        vget_lane_u64(vreinterpret_u64_u8(cmp), 0) & INDEX_MASK_MSBS,
+    };
     assert(
         (res.v & INDEX_MASK_OFF_BITS) == 0
         && "For bit counting and iteration purposes the most significant bit "
@@ -1812,22 +1869,25 @@ value only in its lowest bit. This is fine because:
 - This never happens for `EMPTY` and `DELETED`, only full entries.
 - The check for key equality will catch these.
 - This only happens if there is at least 1 true match.
-- The chance of this happening is very low (< 1% chance per byte). */
+- The chance of this happening is very low (< 1% chance per byte).
+This algorithm is derived from:
+https://graphics.stanford.edu/~seander/bithacks.html##ValueInWord */
 static inline index_mask
 match_tag(group g, ccc_fhm_tag const m)
 {
-    /* This algorithm is derived from:
-       https://graphics.stanford.edu/~seander/bithacks.html##ValueInWord */
-    group const cmp = {g.v
-                       ^ ((((typeof(g.v))m.v) << (TAG_BITS * 7UL))
-                          | (((typeof(g.v))m.v) << (TAG_BITS * 6UL))
-                          | (((typeof(g.v))m.v) << (TAG_BITS * 5UL))
-                          | (((typeof(g.v))m.v) << (TAG_BITS * 4UL))
-                          | (((typeof(g.v))m.v) << (TAG_BITS * 3UL))
-                          | (((typeof(g.v))m.v) << (TAG_BITS * 2UL))
-                          | (((typeof(g.v))m.v) << TAG_BITS) | m.v)};
-    index_mask const res = to_little_endian(
-        (index_mask){(cmp.v - INDEX_MASK_LSBS) & ~cmp.v & INDEX_MASK_MSBS});
+    group const cmp = {
+        g.v
+            ^ ((((typeof(g.v))m.v) << (TAG_BITS * 7UL))
+               | (((typeof(g.v))m.v) << (TAG_BITS * 6UL))
+               | (((typeof(g.v))m.v) << (TAG_BITS * 5UL))
+               | (((typeof(g.v))m.v) << (TAG_BITS * 4UL))
+               | (((typeof(g.v))m.v) << (TAG_BITS * 3UL))
+               | (((typeof(g.v))m.v) << (TAG_BITS * 2UL))
+               | (((typeof(g.v))m.v) << TAG_BITS) | (m.v)),
+    };
+    index_mask const res = to_little_endian((index_mask){
+        (cmp.v - INDEX_MASK_LSBS) & ~cmp.v & INDEX_MASK_MSBS,
+    });
     assert(
         (res.v & INDEX_MASK_OFF_BITS) == 0
         && "For bit counting and iteration purposes the most significant bit "
