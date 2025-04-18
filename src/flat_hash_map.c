@@ -1734,9 +1734,9 @@ uint16_t--we should revisit this section for 128 bit targeted intrinsics. */
 
 /*=========================  Group Implementations   ========================*/
 
-/** Loads a group starting at src into a 128 bit vector. This is an unaligned
-load and the user must ensure the load will not go off then end of the tag
-array. */
+/** Loads a group starting at src into a 8x8 (64) bit vector. This is an
+unaligned load and the user must ensure the load will not go off then end of the
+tag array. */
 static inline group
 load_group(ccc_fhm_tag const *const src)
 {
