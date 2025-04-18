@@ -24,7 +24,7 @@ they refactor. */
 #include "singly_linked_list.h"
 #include "types.h"
 
-/** @brief When sorting a singly linked list is at a disadvantage for iterative
+/** @brief When sorting, a singly linked list is at a disadvantage for iterative
 O(1) space merge sort: it doesn't have a prev pointer. This will help list
 elements remember their previous element for splicing and merging. */
 struct list_link
@@ -40,7 +40,7 @@ struct list_link
 static void *struct_base(struct ccc_sll_ const *, struct ccc_sll_elem_ const *);
 static struct ccc_sll_elem_ *before(struct ccc_sll_ const *,
                                     struct ccc_sll_elem_ const *to_find);
-static size_t len(struct ccc_sll_ const *, struct ccc_sll_elem_ const *begin,
+static size_t len(struct ccc_sll_elem_ const *begin,
                   struct ccc_sll_elem_ const *end);
 
 static void push_front(struct ccc_sll_ *sll, struct ccc_sll_elem_ *elem);
@@ -119,22 +119,21 @@ ccc_sll_pop_front(ccc_singly_linked_list *const sll)
 }
 
 ccc_result
-ccc_sll_splice(ccc_singly_linked_list *const pos_sll,
-               ccc_sll_elem *const pos_before,
+ccc_sll_splice(ccc_singly_linked_list *const pos_sll, ccc_sll_elem *const pos,
                ccc_singly_linked_list *const to_splice_sll,
                ccc_sll_elem *const to_splice)
 {
-    if (!pos_sll || !pos_before || !to_splice || !to_splice_sll)
+    if (!pos_sll || !pos || !to_splice || !to_splice_sll)
     {
         return CCC_RESULT_ARG_ERROR;
     }
-    if (to_splice == pos_before || pos_before->n_ == to_splice)
+    if (to_splice == pos || pos->n_ == to_splice)
     {
         return CCC_RESULT_OK;
     }
     before(to_splice_sll, to_splice)->n_ = to_splice->n_;
-    to_splice->n_ = pos_before->n_;
-    pos_before->n_ = to_splice;
+    to_splice->n_ = pos->n_;
+    pos->n_ = to_splice;
     if (pos_sll != to_splice_sll)
     {
         --to_splice_sll->sz_;
@@ -169,7 +168,7 @@ ccc_sll_splice_range(ccc_singly_linked_list *const pos_sll,
     pos->n_ = begin;
     if (pos_sll != splice_sll)
     {
-        size_t const sz = len(splice_sll, begin, end);
+        size_t const sz = len(begin, end);
         splice_sll->sz_ -= sz;
         pos_sll->sz_ += sz;
     }
@@ -344,6 +343,9 @@ ccc_sll_is_empty(ccc_singly_linked_list const *const sll)
 
 /*==========================     Sorting     ================================*/
 
+/** Returns true if the list is sorted in non-decreasing order. The user should
+flip the return values of their comparison function if they want a different
+order for elements.*/
 ccc_tribool
 ccc_sll_is_sorted(ccc_singly_linked_list const *const sll)
 {
@@ -367,6 +369,9 @@ ccc_sll_is_sorted(ccc_singly_linked_list const *const sll)
     return CCC_TRUE;
 }
 
+/** Inserts an element in non-decreasing order. This means an element will go
+to the end of a section of duplicate values which is good for round-robin style
+list use. */
 void *
 ccc_sll_insert_sorted(ccc_singly_linked_list *sll, ccc_sll_elem *e)
 {
@@ -384,12 +389,13 @@ ccc_sll_insert_sorted(ccc_singly_linked_list *sll, ccc_sll_elem *e)
         (void)memcpy(node, struct_base(sll, e), sll->elem_sz_);
         e = elem_in(sll, node);
     }
-    struct list_link link = {.prev = &sll->sentinel_, .i = sll->sentinel_.n_};
-    for (; link.i != &sll->sentinel_ && cmp(sll, e, link.i) != CCC_LES;
-         link.prev = link.i, link.i = link.i->n_)
+    struct ccc_sll_elem_ *prev = &sll->sentinel_;
+    struct ccc_sll_elem_ *i = sll->sentinel_.n_;
+    for (; i != &sll->sentinel_ && cmp(sll, e, i) != CCC_LES;
+         prev = i, i = i->n_)
     {}
-    e->n_ = link.i;
-    link.prev->n_ = e;
+    e->n_ = i;
+    prev->n_ = e;
     ++sll->sz_;
     return struct_base(sll, e);
 }
@@ -447,7 +453,7 @@ ccc_sll_sort(ccc_singly_linked_list *const sll)
 }
 
 /** Returns a pair of elements marking the first list elem that is smaller than
-its previous (`CCC_LES`) according to the user comparison callback. The
+its previous `CCC_LES` according to the user comparison callback. The
 list_link returned will have the out of order element as cur and the last
 remaining in order element as prev. The cur element may be the sentinel if the
 run is sorted. */
@@ -547,7 +553,7 @@ static inline size_t
 extract_range([[maybe_unused]] struct ccc_sll_ *const sll,
               struct ccc_sll_elem_ *begin, struct ccc_sll_elem_ *const end)
 {
-    size_t const sz = len(sll, begin, end);
+    size_t const sz = len(begin, end);
     if (end != &sll->sentinel_)
     {
         end->n_ = NULL;
@@ -561,7 +567,7 @@ erase_range([[maybe_unused]] struct ccc_sll_ *const sll,
 {
     if (!sll->alloc_)
     {
-        size_t const sz = len(sll, begin, end);
+        size_t const sz = len(begin, end);
         if (end != &sll->sentinel_)
         {
             end->n_ = NULL;
@@ -579,24 +585,24 @@ erase_range([[maybe_unused]] struct ccc_sll_ *const sll,
     return sz;
 }
 
+/** Returns the length [begin, end] inclusive. Assumes end follows begin. */
 static size_t
-len([[maybe_unused]] struct ccc_sll_ const *const sll,
-    struct ccc_sll_elem_ const *begin, struct ccc_sll_elem_ const *const end)
+len(struct ccc_sll_elem_ const *begin, struct ccc_sll_elem_ const *const end)
 {
     size_t s = 1;
     for (; begin != end; begin = begin->n_, ++s)
-    {
-        assert(s <= sll->sz_);
-    }
+    {}
     return s;
 }
 
+/** Provides the base address of the user struct holding e. */
 static inline void *
 struct_base(struct ccc_sll_ const *const l, struct ccc_sll_elem_ const *const e)
 {
     return ((char *)&e->n_) - l->sll_elem_offset_;
 }
 
+/** Given the user struct provides the address of intrusive elem. */
 static inline struct ccc_sll_elem_ *
 elem_in(struct ccc_sll_ const *const sll, void const *const any_struct)
 {

@@ -129,9 +129,9 @@ container to allocate memory. */
 is returned if sll is NULL or the list is empty. */
 ccc_result ccc_sll_pop_front(ccc_singly_linked_list *sll);
 
-/** @brief Inserts splice element before pos. O(N).
+/** @brief Inserts splice element after pos. O(N).
 @param [in] pos_sll the list to which pos belongs.
-@param [in] pos the position before which splice will be inserted.
+@param [in] pos the position after which splice will be inserted.
 @param [in] splice_sll the list to which splice belongs.
 @param [in] splice the element to be moved before pos.
 @return ok if the operations is successful. An input error is provided if any
@@ -143,7 +143,7 @@ ccc_result ccc_sll_splice(ccc_singly_linked_list *pos_sll, ccc_sll_elem *pos,
                           ccc_singly_linked_list *splice_sll,
                           ccc_sll_elem *splice);
 
-/** @brief Inserts the [begin, end] of spliced elements after pos. O(N).
+/** @brief Inserts the `[begin, end]` of spliced elements after pos. `O(N)`.
 @param [in] pos_sll the list to which pos belongs.
 @param [in] pos the position after which the range will be inserted.
 @param [in] splice_sll the list to which the range belongs.
@@ -151,7 +151,7 @@ ccc_result ccc_sll_splice(ccc_singly_linked_list *pos_sll, ccc_sll_elem *pos,
 @param [in] end the inclusive end of the range.
 @return OK if the operations is successful. An input error is provided if any
 input pointers are NULL.
-@warning pos must not be inside of the range (begin, end) if pos_sll is the
+@warning pos must not be inside of the range `[begin, end]` if pos_sll is the
 same list as splice_sll.
 
 Note that pos_sll and splice_sll may be the same or different lists and the

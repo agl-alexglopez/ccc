@@ -453,6 +453,9 @@ ccc_dll_validate(ccc_doubly_linked_list const *const l)
 
 /*==========================     Sorting     ================================*/
 
+/** Returns true if the list is sorted in non-decreasing order. The user should
+flip the return values of their comparison function if they want a different
+order for elements.*/
 ccc_tribool
 ccc_dll_is_sorted(ccc_doubly_linked_list const *const dll)
 {
@@ -475,6 +478,9 @@ ccc_dll_is_sorted(ccc_doubly_linked_list const *const dll)
     return CCC_TRUE;
 }
 
+/** Inserts an element in non-decreasing order. This means an element will go
+to the end of a section of duplicate values which is good for round-robin style
+list use. */
 void *
 ccc_dll_insert_sorted(ccc_doubly_linked_list *const dll, ccc_dll_elem *e)
 {
