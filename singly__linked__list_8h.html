@@ -142,10 +142,10 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memdesc:a2924476c4e07b64703ba579e9126ff7b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pop the front element from the list. O(1).  <br /></td></tr>
 <tr class="separator:a2924476c4e07b64703ba579e9126ff7b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afbf05230243224dbf4d344e852f1cce9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="singly__linked__list_8h.html#afbf05230243224dbf4d344e852f1cce9">ccc_sll_splice</a> (<a class="el" href="singly__linked__list_8h.html#a900d4f0c536208547abfbc1e79e74fbf">ccc_singly_linked_list</a> *pos_sll, <a class="el" href="singly__linked__list_8h.html#adfeb9ade999c0c98572b636601a72bb9">ccc_sll_elem</a> *pos, <a class="el" href="singly__linked__list_8h.html#a900d4f0c536208547abfbc1e79e74fbf">ccc_singly_linked_list</a> *splice_sll, <a class="el" href="singly__linked__list_8h.html#adfeb9ade999c0c98572b636601a72bb9">ccc_sll_elem</a> *splice)</td></tr>
-<tr class="memdesc:afbf05230243224dbf4d344e852f1cce9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inserts splice element before pos. O(N).  <br /></td></tr>
+<tr class="memdesc:afbf05230243224dbf4d344e852f1cce9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inserts splice element after pos. O(N).  <br /></td></tr>
 <tr class="separator:afbf05230243224dbf4d344e852f1cce9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0a78d6739651c7609a0dc73b7e367062"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="singly__linked__list_8h.html#a0a78d6739651c7609a0dc73b7e367062">ccc_sll_splice_range</a> (<a class="el" href="singly__linked__list_8h.html#a900d4f0c536208547abfbc1e79e74fbf">ccc_singly_linked_list</a> *pos_sll, <a class="el" href="singly__linked__list_8h.html#adfeb9ade999c0c98572b636601a72bb9">ccc_sll_elem</a> *pos, <a class="el" href="singly__linked__list_8h.html#a900d4f0c536208547abfbc1e79e74fbf">ccc_singly_linked_list</a> *splice_sll, <a class="el" href="singly__linked__list_8h.html#adfeb9ade999c0c98572b636601a72bb9">ccc_sll_elem</a> *begin, <a class="el" href="singly__linked__list_8h.html#adfeb9ade999c0c98572b636601a72bb9">ccc_sll_elem</a> *end)</td></tr>
-<tr class="memdesc:a0a78d6739651c7609a0dc73b7e367062"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inserts the [begin, end] of spliced elements after pos. O(N).  <br /></td></tr>
+<tr class="memdesc:a0a78d6739651c7609a0dc73b7e367062"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inserts the <code>[begin, end]</code> of spliced elements after pos. <code>O(N)</code>.  <br /></td></tr>
 <tr class="separator:a0a78d6739651c7609a0dc73b7e367062"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a22a146bc93e08c20b82e36fcf079fa08"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="singly__linked__list_8h.html#a22a146bc93e08c20b82e36fcf079fa08">ccc_sll_erase</a> (<a class="el" href="singly__linked__list_8h.html#a900d4f0c536208547abfbc1e79e74fbf">ccc_singly_linked_list</a> *sll, <a class="el" href="singly__linked__list_8h.html#adfeb9ade999c0c98572b636601a72bb9">ccc_sll_elem</a> *elem)</td></tr>
 <tr class="memdesc:a22a146bc93e08c20b82e36fcf079fa08"><td class="mdescLeft">&#160;</td><td class="mdescRight">Erases elem from the list returning the following element. O(N).  <br /></td></tr>
@@ -1016,11 +1016,11 @@ This graph shows which files directly or indirectly include this file:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Inserts splice element before pos. O(N). </p>
+<p>Inserts splice element after pos. O(N). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">pos_sll</td><td>the list to which pos belongs. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">pos</td><td>the position before which splice will be inserted. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">pos</td><td>the position after which splice will be inserted. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">splice_sll</td><td>the list to which splice belongs. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">splice</td><td>the element to be moved before pos. </td></tr>
   </table>
@@ -1075,7 +1075,7 @@ This graph shows which files directly or indirectly include this file:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Inserts the [begin, end] of spliced elements after pos. O(N). </p>
+<p>Inserts the <code>[begin, end]</code> of spliced elements after pos. <code>O(N)</code>. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">pos_sll</td><td>the list to which pos belongs. </td></tr>
@@ -1087,7 +1087,7 @@ This graph shows which files directly or indirectly include this file:</div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>OK if the operations is successful. An input error is provided if any input pointers are NULL. </dd></dl>
-<dl class="section warning"><dt>Warning</dt><dd>pos must not be inside of the range (begin, end) if pos_sll is the same list as splice_sll.</dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>pos must not be inside of the range <code>[begin, end]</code> if pos_sll is the same list as splice_sll.</dd></dl>
 <p>Note that pos_sll and splice_sll may be the same or different lists and the invariants of each or the same list will be maintained by the function. </p>
 
 </div>
