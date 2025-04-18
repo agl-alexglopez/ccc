@@ -1094,7 +1094,7 @@ find_key_or_slot(struct ccc_fhmap_ const *const h, void const *const key,
              i_match = next_index(&m))
         {
             i_match = (seq.i + i_match) & mask;
-            if (eq_fn(h, key, i_match))
+            if (likely(eq_fn(h, key, i_match)))
             {
                 return (struct ccc_handl_){
                     .i_ = i_match,
@@ -1104,7 +1104,7 @@ find_key_or_slot(struct ccc_fhmap_ const *const h, void const *const key,
         }
         /* Taking the first available slot once probing is done is important
            to preserve probing operation and efficiency. */
-        if (empty_or_deleted.error)
+        if (likely(empty_or_deleted.error))
         {
             size_t const i_take = lowest_on_index(match_empty_or_deleted(g));
             if (i_take != CCC_FHM_GROUP_SIZE)
@@ -1113,7 +1113,7 @@ find_key_or_slot(struct ccc_fhmap_ const *const h, void const *const key,
                 empty_or_deleted.error = CCC_RESULT_OK;
             }
         }
-        if (is_index_on(match_empty(g)))
+        if (likely(is_index_on(match_empty(g))))
         {
             return (struct ccc_handl_){
                 .i_ = empty_or_deleted.count,
@@ -1151,7 +1151,7 @@ find_key(struct ccc_fhmap_ const *const h, void const *const key,
                 return (ccc_ucount){.count = i_match};
             }
         }
-        if (is_index_on(match_empty(g)))
+        if (likely(is_index_on(match_empty(g))))
         {
             return (ccc_ucount){.error = CCC_RESULT_FAIL};
         }
