@@ -31,13 +31,13 @@ list for providing new nodes within the buffer. The parent field normally
 tracks parent when in the tree for iteration purposes. When a node is removed
 from the tree it is added to the free singly linked list. The free list is a
 LIFO push to front stack. */
-struct ccc_homap_elem_
+struct ccc_homap_elem
 {
-    size_t branch_[2]; /** Child nodes in array to unify Left and Right. */
+    size_t branch[2]; /** Child nodes in array to unify Left and Right. */
     union
     {
-        size_t parent_;    /** Parent of splay tree node when allocated. */
-        size_t next_free_; /** Points to next free when not allocated. */
+        size_t parent;    /** Parent of splay tree node when allocated. */
+        size_t next_free; /** Points to next free when not allocated. */
     };
 };
 
@@ -46,62 +46,65 @@ inserted into the map they will not move slots even when the array resizes. The
 free slots are tracked in a singly linked list that uses indices instead of
 pointers so that it remains valid even when the table resizes. The 0th index of
 the array is sacrificed for some coding simplicity and falsey 0. */
-struct ccc_homap_
+struct ccc_homap
 {
-    ccc_buffer buf_;          /** Buffer wrapping user provided memory. */
-    size_t root_;             /** The root node of the Splay Tree. */
-    size_t free_list_;        /** The start of the free singly linked list. */
-    size_t key_offset_;       /** Where user key can be found in type. */
-    size_t node_elem_offset_; /** Where intrusive elem is found in type. */
-    ccc_any_key_cmp_fn *cmp_; /** The provided key comparison function. */
+    ccc_buffer buf;          /** Buffer wrapping user provided memory. */
+    size_t root;             /** The root node of the Splay Tree. */
+    size_t free_list;        /** The start of the free singly linked list. */
+    size_t key_offset;       /** Where user key can be found in type. */
+    size_t node_elem_offset; /** Where intrusive elem is found in type. */
+    ccc_any_key_cmp_fn *cmp; /** The provided key comparison function. */
 };
 
 /** @private */
-struct ccc_htree_handle_
+struct ccc_htree_handle
 {
-    struct ccc_homap_ *hom_;    /** Map associated with this handle. */
-    ccc_threeway_cmp last_cmp_; /** Saves last comparison direction. */
-    struct ccc_handl_ handle_;  /** Index and a status. */
+    struct ccc_homap *hom;     /** Map associated with this handle. */
+    ccc_threeway_cmp last_cmp; /** Saves last comparison direction. */
+    struct ccc_handl handle;   /** Index and a status. */
 };
 
 /** @private */
-union ccc_homap_handle_
+union ccc_homap_handle
 {
-    struct ccc_htree_handle_ impl_;
+    struct ccc_htree_handle impl;
 };
 
 /*===========================   Private Interface ===========================*/
 
 /** @private */
-void ccc_impl_hom_insert(struct ccc_homap_ *hom, size_t elem_i);
+void ccc_impl_hom_insert(struct ccc_homap *hom, size_t elem_i);
 /** @private */
-struct ccc_htree_handle_ ccc_impl_hom_handle(struct ccc_homap_ *hom,
-                                             void const *key);
+struct ccc_htree_handle ccc_impl_hom_handle(struct ccc_homap *hom,
+                                            void const *key);
 /** @private */
-void *ccc_impl_hom_key_at(struct ccc_homap_ const *hom, size_t slot);
+void *ccc_impl_hom_key_at(struct ccc_homap const *hom, size_t slot);
 /** @private */
-struct ccc_homap_elem_ *ccc_impl_homap_elem_at(struct ccc_homap_ const *hom,
-                                               size_t slot);
+struct ccc_homap_elem *ccc_impl_homap_elem_at(struct ccc_homap const *hom,
+                                              size_t slot);
 /** @private */
-size_t ccc_impl_hom_alloc_slot(struct ccc_homap_ *hom);
+size_t ccc_impl_hom_alloc_slot(struct ccc_homap *hom);
 
 /*========================     Initialization       =========================*/
 
 /** @private */
-#define ccc_impl_hom_init(mem_ptr, node_elem_field, key_elem_field,            \
-                          key_cmp_fn, alloc_fn, aux_data, capacity)            \
+#define ccc_impl_hom_init(impl_mem_ptr, impl_node_elem_field,                  \
+                          impl_key_elem_field, impl_key_cmp_fn, impl_alloc_fn, \
+                          impl_aux_data, impl_capacity)                        \
     {                                                                          \
-        .buf_ = ccc_buf_init(mem_ptr, alloc_fn, aux_data, capacity),           \
-        .root_ = 0,                                                            \
-        .free_list_ = 0,                                                       \
-        .key_offset_ = offsetof(typeof(*(mem_ptr)), key_elem_field),           \
-        .node_elem_offset_ = offsetof(typeof(*(mem_ptr)), node_elem_field),    \
-        .cmp_ = (key_cmp_fn),                                                  \
+        .buf = ccc_buf_init(impl_mem_ptr, impl_alloc_fn, impl_aux_data,        \
+                            impl_capacity),                                    \
+        .root = 0,                                                             \
+        .free_list = 0,                                                        \
+        .key_offset = offsetof(typeof(*(impl_mem_ptr)), impl_key_elem_field),  \
+        .node_elem_offset                                                      \
+        = offsetof(typeof(*(impl_mem_ptr)), impl_node_elem_field),             \
+        .cmp = (impl_key_cmp_fn),                                              \
     }
 
 /** @private */
 #define ccc_impl_hom_as(handle_ordered_map_ptr, type_name, handle...)          \
-    ((type_name *)ccc_buf_at(&(handle_ordered_map_ptr)->buf_, (handle)))
+    ((type_name *)ccc_buf_at(&(handle_ordered_map_ptr)->buf, (handle)))
 
 /*==================     Core Macro Implementations     =====================*/
 
@@ -109,195 +112,198 @@ size_t ccc_impl_hom_alloc_slot(struct ccc_homap_ *hom);
 #define ccc_impl_hom_and_modify_w(handle_ordered_map_handle_ptr, type_name,    \
                                   closure_over_T...)                           \
     (__extension__({                                                           \
-        __auto_type hom_mod_hndl_ptr_ = (handle_ordered_map_handle_ptr);       \
-        struct ccc_htree_handle_ hom_mod_hndl_                                 \
-            = {.handle_ = {.stats_ = CCC_ENTRY_ARG_ERROR}};                    \
-        if (hom_mod_hndl_ptr_)                                                 \
+        __auto_type impl_hom_mod_hndl_ptr = (handle_ordered_map_handle_ptr);   \
+        struct ccc_htree_handle impl_hom_mod_hndl                              \
+            = {.handle = {.stats = CCC_ENTRY_ARG_ERROR}};                      \
+        if (impl_hom_mod_hndl_ptr)                                             \
         {                                                                      \
-            hom_mod_hndl_ = hom_mod_hndl_ptr_->impl_;                          \
-            if (hom_mod_hndl_.handle_.stats_ & CCC_ENTRY_OCCUPIED)             \
+            impl_hom_mod_hndl = impl_hom_mod_hndl_ptr->impl;                   \
+            if (impl_hom_mod_hndl.handle.stats & CCC_ENTRY_OCCUPIED)           \
             {                                                                  \
-                type_name *const T = ccc_buf_at(&hom_mod_hndl_.hom_->buf_,     \
-                                                hom_mod_hndl_.handle_.i_);     \
+                type_name *const T = ccc_buf_at(&impl_hom_mod_hndl.hom->buf,   \
+                                                impl_hom_mod_hndl.handle.i);   \
                 if (T)                                                         \
                 {                                                              \
                     closure_over_T                                             \
                 }                                                              \
             }                                                                  \
         }                                                                      \
-        hom_mod_hndl_;                                                         \
+        impl_hom_mod_hndl;                                                     \
     }))
 
 /** @private */
 #define ccc_impl_hom_or_insert_w(handle_ordered_map_handle_ptr,                \
                                  lazy_key_value...)                            \
     (__extension__({                                                           \
-        __auto_type hom_or_ins_hndl_ptr_ = (handle_ordered_map_handle_ptr);    \
-        ccc_handle_i hom_or_ins_ret_ = 0;                                      \
-        if (hom_or_ins_hndl_ptr_)                                              \
+        __auto_type impl_hom_or_ins_hndl_ptr                                   \
+            = (handle_ordered_map_handle_ptr);                                 \
+        ccc_handle_i impl_hom_or_ins_ret = 0;                                  \
+        if (impl_hom_or_ins_hndl_ptr)                                          \
         {                                                                      \
-            struct ccc_htree_handle_ *hom_or_ins_hndl_                         \
-                = &hom_or_ins_hndl_ptr_->impl_;                                \
-            if (hom_or_ins_hndl_->handle_.stats_ == CCC_ENTRY_OCCUPIED)        \
+            struct ccc_htree_handle *impl_hom_or_ins_hndl                      \
+                = &impl_hom_or_ins_hndl_ptr->impl;                             \
+            if (impl_hom_or_ins_hndl->handle.stats == CCC_ENTRY_OCCUPIED)      \
             {                                                                  \
-                hom_or_ins_ret_ = hom_or_ins_hndl_->handle_.i_;                \
+                impl_hom_or_ins_ret = impl_hom_or_ins_hndl->handle.i;          \
             }                                                                  \
             else                                                               \
             {                                                                  \
-                hom_or_ins_ret_                                                \
-                    = ccc_impl_hom_alloc_slot(hom_or_ins_hndl_->hom_);         \
-                if (hom_or_ins_ret_)                                           \
+                impl_hom_or_ins_ret                                            \
+                    = ccc_impl_hom_alloc_slot(impl_hom_or_ins_hndl->hom);      \
+                if (impl_hom_or_ins_ret)                                       \
                 {                                                              \
                     *((typeof(lazy_key_value) *)ccc_buf_at(                    \
-                        &hom_or_ins_hndl_->hom_->buf_, hom_or_ins_ret_))       \
+                        &impl_hom_or_ins_hndl->hom->buf, impl_hom_or_ins_ret)) \
                         = lazy_key_value;                                      \
-                    ccc_impl_hom_insert(hom_or_ins_hndl_->hom_,                \
-                                        hom_or_ins_ret_);                      \
+                    ccc_impl_hom_insert(impl_hom_or_ins_hndl->hom,             \
+                                        impl_hom_or_ins_ret);                  \
                 }                                                              \
             }                                                                  \
         }                                                                      \
-        hom_or_ins_ret_;                                                       \
+        impl_hom_or_ins_ret;                                                   \
     }))
 
 /** @private */
 #define ccc_impl_hom_insert_handle_w(handle_ordered_map_handle_ptr,            \
                                      lazy_key_value...)                        \
     (__extension__({                                                           \
-        __auto_type hom_ins_hndl_ptr_ = (handle_ordered_map_handle_ptr);       \
-        ccc_handle_i hom_ins_hndl_ret_ = 0;                                    \
-        if (hom_ins_hndl_ptr_)                                                 \
+        __auto_type impl_hom_ins_hndl_ptr = (handle_ordered_map_handle_ptr);   \
+        ccc_handle_i impl_hom_ins_hndl_ret = 0;                                \
+        if (impl_hom_ins_hndl_ptr)                                             \
         {                                                                      \
-            struct ccc_htree_handle_ *hom_ins_hndl_                            \
-                = &hom_ins_hndl_ptr_->impl_;                                   \
-            if (!(hom_ins_hndl_->handle_.stats_ & CCC_ENTRY_OCCUPIED))         \
+            struct ccc_htree_handle *impl_hom_ins_hndl                         \
+                = &impl_hom_ins_hndl_ptr->impl;                                \
+            if (!(impl_hom_ins_hndl->handle.stats & CCC_ENTRY_OCCUPIED))       \
             {                                                                  \
-                hom_ins_hndl_ret_                                              \
-                    = ccc_impl_hom_alloc_slot(hom_ins_hndl_->hom_);            \
-                if (hom_ins_hndl_ret_)                                         \
+                impl_hom_ins_hndl_ret                                          \
+                    = ccc_impl_hom_alloc_slot(impl_hom_ins_hndl->hom);         \
+                if (impl_hom_ins_hndl_ret)                                     \
                 {                                                              \
                     *((typeof(lazy_key_value) *)ccc_buf_at(                    \
-                        &hom_ins_hndl_->hom_->buf_, hom_ins_hndl_ret_))        \
+                        &impl_hom_ins_hndl->hom->buf, impl_hom_ins_hndl_ret))  \
                         = lazy_key_value;                                      \
-                    ccc_impl_hom_insert(hom_ins_hndl_->hom_,                   \
-                                        hom_ins_hndl_ret_);                    \
+                    ccc_impl_hom_insert(impl_hom_ins_hndl->hom,                \
+                                        impl_hom_ins_hndl_ret);                \
                 }                                                              \
             }                                                                  \
-            else if (hom_ins_hndl_->handle_.stats_ == CCC_ENTRY_OCCUPIED)      \
+            else if (impl_hom_ins_hndl->handle.stats == CCC_ENTRY_OCCUPIED)    \
             {                                                                  \
-                hom_ins_hndl_ret_ = hom_ins_hndl_->handle_.i_;                 \
-                struct ccc_homap_elem_ ins_hndl_saved_                         \
-                    = *ccc_impl_homap_elem_at(hom_ins_hndl_->hom_,             \
-                                              hom_ins_hndl_ret_);              \
+                impl_hom_ins_hndl_ret = impl_hom_ins_hndl->handle.i;           \
+                struct ccc_homap_elem impl_ins_hndl_saved                      \
+                    = *ccc_impl_homap_elem_at(impl_hom_ins_hndl->hom,          \
+                                              impl_hom_ins_hndl_ret);          \
                 *((typeof(lazy_key_value) *)ccc_buf_at(                        \
-                    &hom_ins_hndl_->hom_->buf_, hom_ins_hndl_ret_))            \
+                    &impl_hom_ins_hndl->hom->buf, impl_hom_ins_hndl_ret))      \
                     = lazy_key_value;                                          \
-                *ccc_impl_homap_elem_at(hom_ins_hndl_->hom_,                   \
-                                        hom_ins_hndl_ret_)                     \
-                    = ins_hndl_saved_;                                         \
+                *ccc_impl_homap_elem_at(impl_hom_ins_hndl->hom,                \
+                                        impl_hom_ins_hndl_ret)                 \
+                    = impl_ins_hndl_saved;                                     \
             }                                                                  \
         }                                                                      \
-        hom_ins_hndl_ret_;                                                     \
+        impl_hom_ins_hndl_ret;                                                 \
     }))
 
 /** @private */
 #define ccc_impl_hom_try_insert_w(handle_ordered_map_ptr, key, lazy_value...)  \
     (__extension__({                                                           \
-        __auto_type hom_try_ins_map_ptr_ = (handle_ordered_map_ptr);           \
-        struct ccc_handl_ hom_try_ins_hndl_ret_                                \
-            = {.stats_ = CCC_ENTRY_ARG_ERROR};                                 \
-        if (hom_try_ins_map_ptr_)                                              \
+        __auto_type impl_hom_try_ins_map_ptr = (handle_ordered_map_ptr);       \
+        struct ccc_handl impl_hom_try_ins_hndl_ret                             \
+            = {.stats = CCC_ENTRY_ARG_ERROR};                                  \
+        if (impl_hom_try_ins_map_ptr)                                          \
         {                                                                      \
-            __auto_type hom_key_ = (key);                                      \
-            struct ccc_htree_handle_ hom_try_ins_hndl_ = ccc_impl_hom_handle(  \
-                hom_try_ins_map_ptr_, (void *)&hom_key_);                      \
-            if (!(hom_try_ins_hndl_.handle_.stats_ & CCC_ENTRY_OCCUPIED))      \
+            __auto_type impl_hom_key = (key);                                  \
+            struct ccc_htree_handle impl_hom_try_ins_hndl                      \
+                = ccc_impl_hom_handle(impl_hom_try_ins_map_ptr,                \
+                                      (void *)&impl_hom_key);                  \
+            if (!(impl_hom_try_ins_hndl.handle.stats & CCC_ENTRY_OCCUPIED))    \
             {                                                                  \
-                hom_try_ins_hndl_ret_ = (struct ccc_handl_){                   \
-                    .i_ = ccc_impl_hom_alloc_slot(hom_try_ins_hndl_.hom_),     \
-                    .stats_ = CCC_ENTRY_INSERT_ERROR};                         \
-                if (hom_try_ins_hndl_ret_.i_)                                  \
+                impl_hom_try_ins_hndl_ret = (struct ccc_handl){                \
+                    .i = ccc_impl_hom_alloc_slot(impl_hom_try_ins_hndl.hom),   \
+                    .stats = CCC_ENTRY_INSERT_ERROR};                          \
+                if (impl_hom_try_ins_hndl_ret.i)                               \
                 {                                                              \
                     *((typeof(lazy_value) *)ccc_buf_at(                        \
-                        &hom_try_ins_map_ptr_->buf_,                           \
-                        hom_try_ins_hndl_ret_.i_))                             \
+                        &impl_hom_try_ins_map_ptr->buf,                        \
+                        impl_hom_try_ins_hndl_ret.i))                          \
                         = lazy_value;                                          \
-                    *((typeof(hom_key_) *)ccc_impl_hom_key_at(                 \
-                        hom_try_ins_hndl_.hom_, hom_try_ins_hndl_ret_.i_))     \
-                        = hom_key_;                                            \
-                    ccc_impl_hom_insert(hom_try_ins_hndl_.hom_,                \
-                                        hom_try_ins_hndl_ret_.i_);             \
-                    hom_try_ins_hndl_ret_.stats_ = CCC_ENTRY_VACANT;           \
+                    *((typeof(impl_hom_key) *)ccc_impl_hom_key_at(             \
+                        impl_hom_try_ins_hndl.hom,                             \
+                        impl_hom_try_ins_hndl_ret.i))                          \
+                        = impl_hom_key;                                        \
+                    ccc_impl_hom_insert(impl_hom_try_ins_hndl.hom,             \
+                                        impl_hom_try_ins_hndl_ret.i);          \
+                    impl_hom_try_ins_hndl_ret.stats = CCC_ENTRY_VACANT;        \
                 }                                                              \
             }                                                                  \
-            else if (hom_try_ins_hndl_.handle_.stats_ == CCC_ENTRY_OCCUPIED)   \
+            else if (impl_hom_try_ins_hndl.handle.stats == CCC_ENTRY_OCCUPIED) \
             {                                                                  \
-                hom_try_ins_hndl_ret_ = (struct ccc_handl_){                   \
-                    .i_ = hom_try_ins_hndl_.handle_.i_,                        \
-                    .stats_ = hom_try_ins_hndl_.handle_.stats_};               \
+                impl_hom_try_ins_hndl_ret = (struct ccc_handl){                \
+                    .i = impl_hom_try_ins_hndl.handle.i,                       \
+                    .stats = impl_hom_try_ins_hndl.handle.stats};              \
             }                                                                  \
         }                                                                      \
-        hom_try_ins_hndl_ret_;                                                 \
+        impl_hom_try_ins_hndl_ret;                                             \
     }))
 
 /** @private */
 #define ccc_impl_hom_insert_or_assign_w(handle_ordered_map_ptr, key,           \
                                         lazy_value...)                         \
     (__extension__({                                                           \
-        __auto_type hom_ins_or_assign_map_ptr_ = (handle_ordered_map_ptr);     \
-        struct ccc_handl_ hom_ins_or_assign_hndl_ret_                          \
-            = {.stats_ = CCC_ENTRY_ARG_ERROR};                                 \
-        if (hom_ins_or_assign_map_ptr_)                                        \
+        __auto_type impl_hom_ins_or_assign_map_ptr = (handle_ordered_map_ptr); \
+        struct ccc_handl impl_hom_ins_or_assign_hndl_ret                       \
+            = {.stats = CCC_ENTRY_ARG_ERROR};                                  \
+        if (impl_hom_ins_or_assign_map_ptr)                                    \
         {                                                                      \
-            __auto_type hom_key_ = (key);                                      \
-            struct ccc_htree_handle_ hom_ins_or_assign_hndl_                   \
-                = ccc_impl_hom_handle((handle_ordered_map_ptr),                \
-                                      (void *)&hom_key_);                      \
-            if (!(hom_ins_or_assign_hndl_.handle_.stats_                       \
+            __auto_type impl_hom_key = (key);                                  \
+            struct ccc_htree_handle impl_hom_ins_or_assign_hndl                \
+                = ccc_impl_hom_handle(impl_hom_ins_or_assign_map_ptr,          \
+                                      (void *)&impl_hom_key);                  \
+            if (!(impl_hom_ins_or_assign_hndl.handle.stats                     \
                   & CCC_ENTRY_OCCUPIED))                                       \
             {                                                                  \
-                hom_ins_or_assign_hndl_ret_                                    \
-                    = (struct ccc_handl_){.i_ = ccc_impl_hom_alloc_slot(       \
-                                              hom_ins_or_assign_hndl_.hom_),   \
-                                          .stats_ = CCC_ENTRY_INSERT_ERROR};   \
-                if (hom_ins_or_assign_hndl_ret_.i_)                            \
+                impl_hom_ins_or_assign_hndl_ret                                \
+                    = (struct ccc_handl){.i = ccc_impl_hom_alloc_slot(         \
+                                             impl_hom_ins_or_assign_hndl.hom), \
+                                         .stats = CCC_ENTRY_INSERT_ERROR};     \
+                if (impl_hom_ins_or_assign_hndl_ret.i)                         \
                 {                                                              \
                     *((typeof(lazy_value) *)ccc_buf_at(                        \
-                        &hom_ins_or_assign_map_ptr_->buf_,                     \
-                        hom_ins_or_assign_hndl_ret_.i_))                       \
+                        &impl_hom_ins_or_assign_map_ptr->buf,                  \
+                        impl_hom_ins_or_assign_hndl_ret.i))                    \
                         = lazy_value;                                          \
-                    *((typeof(hom_key_) *)ccc_impl_hom_key_at(                 \
-                        hom_ins_or_assign_hndl_.hom_,                          \
-                        hom_ins_or_assign_hndl_ret_.i_))                       \
-                        = hom_key_;                                            \
-                    ccc_impl_hom_insert(hom_ins_or_assign_hndl_.hom_,          \
-                                        hom_ins_or_assign_hndl_ret_.i_);       \
-                    hom_ins_or_assign_hndl_ret_.stats_ = CCC_ENTRY_VACANT;     \
+                    *((typeof(impl_hom_key) *)ccc_impl_hom_key_at(             \
+                        impl_hom_ins_or_assign_hndl.hom,                       \
+                        impl_hom_ins_or_assign_hndl_ret.i))                    \
+                        = impl_hom_key;                                        \
+                    ccc_impl_hom_insert(impl_hom_ins_or_assign_hndl.hom,       \
+                                        impl_hom_ins_or_assign_hndl_ret.i);    \
+                    impl_hom_ins_or_assign_hndl_ret.stats = CCC_ENTRY_VACANT;  \
                 }                                                              \
             }                                                                  \
-            else if (hom_ins_or_assign_hndl_.handle_.stats_                    \
+            else if (impl_hom_ins_or_assign_hndl.handle.stats                  \
                      == CCC_ENTRY_OCCUPIED)                                    \
             {                                                                  \
-                struct ccc_homap_elem_ ins_hndl_saved_                         \
+                struct ccc_homap_elem impl_ins_hndl_saved                      \
                     = *ccc_impl_homap_elem_at(                                 \
-                        hom_ins_or_assign_hndl_.hom_,                          \
-                        hom_ins_or_assign_hndl_.handle_.i_);                   \
+                        impl_hom_ins_or_assign_hndl.hom,                       \
+                        impl_hom_ins_or_assign_hndl.handle.i);                 \
                 *((typeof(lazy_value) *)ccc_buf_at(                            \
-                    &hom_ins_or_assign_hndl_.hom_->buf_,                       \
-                    hom_ins_or_assign_hndl_.handle_.i_))                       \
+                    &impl_hom_ins_or_assign_hndl.hom->buf,                     \
+                    impl_hom_ins_or_assign_hndl.handle.i))                     \
                     = lazy_value;                                              \
-                *ccc_impl_homap_elem_at(hom_ins_or_assign_hndl_.hom_,          \
-                                        hom_ins_or_assign_hndl_.handle_.i_)    \
-                    = ins_hndl_saved_;                                         \
-                hom_ins_or_assign_hndl_ret_ = (struct ccc_handl_){             \
-                    .i_ = hom_ins_or_assign_hndl_.handle_.i_,                  \
-                    .stats_ = hom_ins_or_assign_hndl_.handle_.stats_};         \
-                *((typeof(hom_key_) *)ccc_impl_hom_key_at(                     \
-                    hom_ins_or_assign_hndl_.hom_,                              \
-                    hom_ins_or_assign_hndl_.handle_.i_))                       \
-                    = hom_key_;                                                \
+                *ccc_impl_homap_elem_at(impl_hom_ins_or_assign_hndl.hom,       \
+                                        impl_hom_ins_or_assign_hndl.handle.i)  \
+                    = impl_ins_hndl_saved;                                     \
+                impl_hom_ins_or_assign_hndl_ret = (struct ccc_handl){          \
+                    .i = impl_hom_ins_or_assign_hndl.handle.i,                 \
+                    .stats = impl_hom_ins_or_assign_hndl.handle.stats};        \
+                *((typeof(impl_hom_key) *)ccc_impl_hom_key_at(                 \
+                    impl_hom_ins_or_assign_hndl.hom,                           \
+                    impl_hom_ins_or_assign_hndl.handle.i))                     \
+                    = impl_hom_key;                                            \
             }                                                                  \
         }                                                                      \
-        hom_ins_or_assign_hndl_ret_;                                           \
+        impl_hom_ins_or_assign_hndl_ret;                                       \
     }))
 
 /* NOLINTEND(readability-identifier-naming) */

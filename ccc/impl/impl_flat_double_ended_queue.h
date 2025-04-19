@@ -25,61 +25,61 @@ limitations under the License.
 /* NOLINTBEGIN(readability-identifier-naming) */
 
 /** @private */
-struct ccc_fdeq_
+struct ccc_fdeq
 {
-    ccc_buffer buf_;
-    size_t front_;
+    ccc_buffer buf;
+    size_t front;
 };
 
 /*=======================    Private Interface   ============================*/
 /** @private */
-void *ccc_impl_fdeq_alloc_front(struct ccc_fdeq_ *);
+void *ccc_impl_fdeq_alloc_front(struct ccc_fdeq *);
 /** @private */
-void *ccc_impl_fdeq_alloc_back(struct ccc_fdeq_ *);
+void *ccc_impl_fdeq_alloc_back(struct ccc_fdeq *);
 
 /*=======================  Macro Implementations   ==========================*/
 
 /** @private */
-#define ccc_impl_fdeq_init(mem_ptr, alloc_fn, aux_data, capacity,              \
-                           optional_size...)                                   \
+#define ccc_impl_fdeq_init(impl_mem_ptr, impl_alloc_fn, impl_aux_data,         \
+                           impl_capacity, optional_size...)                    \
     {                                                                          \
-        .buf_                                                                  \
-        = ccc_buf_init(mem_ptr, alloc_fn, aux_data, capacity, optional_size),  \
-        .front_ = 0,                                                           \
+        .buf = ccc_buf_init(impl_mem_ptr, impl_alloc_fn, impl_aux_data,        \
+                            impl_capacity, optional_size),                     \
+        .front = 0,                                                            \
     }
 
 /** @private */
 #define ccc_impl_fdeq_emplace_back(fdeq_ptr, value...)                         \
     (__extension__({                                                           \
-        __auto_type fdeq_ptr_ = (fdeq_ptr);                                    \
-        void *const fdeq_emplace_ret_ = NULL;                                  \
-        if (fdeq_ptr_)                                                         \
+        __auto_type impl_fdeq_ptr = (fdeq_ptr);                                \
+        void *const impl_fdeq_emplace_ret = NULL;                              \
+        if (impl_fdeq_ptr)                                                     \
         {                                                                      \
-            void *const fdeq_emplace_ret_                                      \
-                = ccc_impl_fdeq_alloc_back(fdeq_ptr_);                         \
-            if (fdeq_emplace_ret_)                                             \
+            void *const impl_fdeq_emplace_ret                                  \
+                = ccc_impl_fdeq_alloc_back(impl_fdeq_ptr);                     \
+            if (impl_fdeq_emplace_ret)                                         \
             {                                                                  \
-                *((typeof(value) *)fdeq_emplace_ret_) = value;                 \
+                *((typeof(value) *)impl_fdeq_emplace_ret) = value;             \
             }                                                                  \
         }                                                                      \
-        fdeq_emplace_ret_;                                                     \
+        impl_fdeq_emplace_ret;                                                 \
     }))
 
 /** @private */
 #define ccc_impl_fdeq_emplace_front(fdeq_ptr, value...)                        \
     (__extension__({                                                           \
-        __auto_type fdeq_ptr_ = (fdeq_ptr);                                    \
-        void *const fdeq_emplace_ret_ = NULL;                                  \
-        if (fdeq_ptr_)                                                         \
+        __auto_type impl_fdeq_ptr = (fdeq_ptr);                                \
+        void *const impl_fdeq_emplace_ret = NULL;                              \
+        if (impl_fdeq_ptr)                                                     \
         {                                                                      \
-            void *const fdeq_emplace_ret_                                      \
-                = ccc_impl_fdeq_alloc_front(fdeq_ptr_);                        \
-            if (fdeq_emplace_ret_)                                             \
+            void *const impl_fdeq_emplace_ret                                  \
+                = ccc_impl_fdeq_alloc_front(impl_fdeq_ptr);                    \
+            if (impl_fdeq_emplace_ret)                                         \
             {                                                                  \
-                *((typeof(value) *)fdeq_emplace_ret_) = value;                 \
+                *((typeof(value) *)impl_fdeq_emplace_ret) = value;             \
             }                                                                  \
         }                                                                      \
-        fdeq_emplace_ret_;                                                     \
+        impl_fdeq_emplace_ret;                                                 \
     }))
 
 /* NOLINTEND(readability-identifier-naming) */

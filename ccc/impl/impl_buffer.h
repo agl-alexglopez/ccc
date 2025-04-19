@@ -26,14 +26,14 @@ limitations under the License.
 /* NOLINTBEGIN(readability-identifier-naming) */
 
 /** @private */
-struct ccc_buf_
+struct ccc_buf
 {
-    void *mem_;
-    size_t elem_sz_;
-    size_t sz_;
-    size_t capacity_;
-    ccc_any_alloc_fn *alloc_;
-    void *aux_;
+    void *mem;
+    size_t elem_sz;
+    size_t sz;
+    size_t capacity;
+    ccc_any_alloc_fn *alloc;
+    void *aux;
 };
 
 /** @private */
@@ -45,45 +45,44 @@ struct ccc_buf_
     __VA_OPT__(IMPL_BUF_NON_)##IMPL_BUF_DEFAULT_SIZE(__VA_ARGS__)
 
 /** @private */
-#define ccc_impl_buf_init(mem, alloc_fn, aux_data, capacity, ...)              \
+#define ccc_impl_buf_init(impl_mem, impl_alloc_fn, impl_aux_data,              \
+                          impl_capacity, ...)                                  \
     {                                                                          \
-        .mem_ = (mem),                                                         \
-        .elem_sz_ = sizeof(*(mem)),                                            \
-        .sz_ = IMPL_BUF_OPTIONAL_SIZE(__VA_ARGS__),                            \
-        .capacity_ = (capacity),                                               \
-        .alloc_ = (alloc_fn),                                                  \
-        .aux_ = (aux_data),                                                    \
+        .mem = (impl_mem),                                                     \
+        .elem_sz = sizeof(*(impl_mem)),                                        \
+        .sz = IMPL_BUF_OPTIONAL_SIZE(__VA_ARGS__),                             \
+        .capacity = (impl_capacity),                                           \
+        .alloc = (impl_alloc_fn),                                              \
+        .aux = (impl_aux_data),                                                \
     }
 
 /** @private */
-#define ccc_impl_buf_emplace(ccc_buf_ptr, index, type_initializer...)          \
+#define ccc_impl_buf_emplace(buf_ptr, index, type_initializer...)              \
     (__extension__({                                                           \
-        typeof(type_initializer) *buf_res_ = NULL;                             \
-        __auto_type i_ = (index);                                              \
-        __auto_type emplace_buff_ptr_ = (ccc_buf_ptr);                         \
-        assert(sizeof(typeof(*buf_res_))                                       \
-               == ccc_buf_elem_size(emplace_buff_ptr_));                       \
-        buf_res_ = ccc_buf_at(emplace_buff_ptr_, index);                       \
-        if (buf_res_)                                                          \
+        typeof(type_initializer) *impl_buf_res = NULL;                         \
+        __auto_type impl_i = (index);                                          \
+        __auto_type impl_emplace_buff_ptr = (buf_ptr);                         \
+        impl_buf_res = ccc_buf_at(impl_emplace_buff_ptr, index);               \
+        if (impl_buf_res)                                                      \
         {                                                                      \
-            *buf_res_ = type_initializer;                                      \
+            *impl_buf_res = type_initializer;                                  \
         }                                                                      \
-        buf_res_;                                                              \
+        impl_buf_res;                                                          \
     }))
 
 /** @private */
-#define ccc_impl_buf_emplace_back(ccc_buf_ptr, type_initializer...)            \
+#define ccc_impl_buf_emplace_back(buf_ptr, type_initializer...)                \
     (__extension__({                                                           \
-        typeof(type_initializer) *buf_res_ = NULL;                             \
-        __auto_type emplace_back_buf_ptr_ = (ccc_buf_ptr);                     \
-        assert(sizeof(typeof(*buf_res_))                                       \
-               == ccc_buf_elem_size(emplace_back_buf_ptr_));                   \
-        buf_res_ = ccc_buf_alloc_back((emplace_back_buf_ptr_));                \
-        if (buf_res_)                                                          \
+        typeof(type_initializer) *impl_buf_res = NULL;                         \
+        __auto_type impl_emplace_back_buf_ptr = (buf_ptr);                     \
+        assert(sizeof(typeof(*impl_buf_res))                                   \
+               == ccc_buf_elem_size(impl_emplace_back_buf_ptr));               \
+        impl_buf_res = ccc_buf_alloc_back((impl_emplace_back_buf_ptr));        \
+        if (impl_buf_res)                                                      \
         {                                                                      \
-            *buf_res_ = type_initializer;                                      \
+            *impl_buf_res = type_initializer;                                  \
         }                                                                      \
-        buf_res_;                                                              \
+        impl_buf_res;                                                          \
     }))
 
 /* NOLINTEND(readability-identifier-naming) */

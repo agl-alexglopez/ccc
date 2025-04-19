@@ -41,7 +41,7 @@ A range provides a view all elements that fit the equals range criteria
 of search-by-key containers. Use the provided range iteration functions in
 this header to iterate from beginning to end in forward order relative to
 the containers default ordering. */
-typedef union ccc_range_ ccc_range;
+typedef union ccc_range ccc_range;
 
 /** @brief The result of a rrange query on iterable containers.
 
@@ -49,7 +49,7 @@ A rrange provides a view all elements that fit the equals rrange criteria
 of search-by-key containers. Use the provided range iteration functions in
 this header to iterate from beginning to end in reverse order relative to
 the containers default ordering. */
-typedef union ccc_rrange_ ccc_rrange;
+typedef union ccc_rrange ccc_rrange;
 
 /** @brief An Occupied or Vacant position in a searchable container.
 
@@ -58,7 +58,7 @@ all search-by-key containers. An entry is returned from various operations
 to provide both a reference to data and any auxiliary status that is
 important for the user. An entry can be Occupied or Vacant. See individual
 headers for containers that return this type for its meaning in context. */
-typedef union ccc_entry_ ccc_entry;
+typedef union ccc_entry ccc_entry;
 
 /** @brief The status monitoring and entry state once it is obtained.
 
@@ -68,7 +68,7 @@ each container are sufficient to obtain the needed status. However if more
 information is needed, the status can be passed to the ccc_entry_status_msg()
 function for detailed string messages regarding the entry status. This may
 be helpful for debugging or logging. */
-typedef enum ccc_entry_status_ ccc_entry_status;
+typedef enum ccc_entry_status ccc_entry_status;
 
 /** @brief An Occupied or Vacant handle to a flat searchable container entry.
 
@@ -78,7 +78,7 @@ promising that this element will remain at the returned handle index until the
 element is removed by the user. This is similar to pointer stability but offers
 a stronger guarantee that will hold even if the underlying container is
 resized. */
-typedef union ccc_handle_ ccc_handle;
+typedef union ccc_handle ccc_handle;
 
 /** @brief A stable index to user data in a container that uses a flat array as
 the underlying storage method.
@@ -100,7 +100,7 @@ each container are sufficient to obtain the needed status. However if more
 information is needed, the status can be passed to the ccc_entry_status_msg()
 function for detailed string messages regarding the handle status. This may
 be helpful for debugging or logging. */
-typedef enum ccc_entry_status_ ccc_handle_status;
+typedef enum ccc_entry_status ccc_handle_status;
 
 /** @brief A three state boolean to allow for an error state. Error is -1, False
 is 0, and True is 1.

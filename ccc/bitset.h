@@ -70,7 +70,7 @@ A bit set offers fast membership testing and bit range manipulations when the
 data can be modeled as a 0-indexed key value data set. In the case of a bit
 set the key is the index in the bit set and the value is 1 or 0. Operations on
 single bits occur in O(1) time. All scanning operations operate in O(N) time. */
-typedef struct ccc_bitset_ ccc_bitset;
+typedef struct ccc_bitset ccc_bitset;
 
 /** @brief The type used to efficiently store bits in the bit set.
 
@@ -78,7 +78,7 @@ A block is an integer that allows for efficient block sized bit operations for
 various scanning and setting. The user must participate in the storage of the
 bit set by using the provided ccc_bs_blocks macro to determine how many blocks
 are needed for the desired bits in the bit set. */
-typedef ccc_bitblock_ ccc_bitblock;
+typedef ccc_bitblock ccc_bitblock;
 
 /**@}*/
 

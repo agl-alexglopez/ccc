@@ -62,7 +62,7 @@ Types available in the container interface. */
 
 A buffer may be initialized on the stack, heap, or data segment at compile time
 or runtime. */
-typedef struct ccc_buf_ ccc_buffer;
+typedef struct ccc_buf ccc_buffer;
 
 /**@}*/
 

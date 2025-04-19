@@ -26,66 +26,67 @@ limitations under the License.
 /* NOLINTBEGIN(readability-identifier-naming) */
 
 /** @private */
-typedef struct ccc_sll_elem_
+struct ccc_sll_elem
 {
-    struct ccc_sll_elem_ *n_;
-} ccc_sll_elem_;
+    struct ccc_sll_elem *n;
+};
 
 /** @private */
-struct ccc_sll_
+struct ccc_sll
 {
-    struct ccc_sll_elem_ sentinel_;
-    size_t sz_;
-    size_t elem_sz_;
-    size_t sll_elem_offset_;
-    ccc_any_alloc_fn *alloc_;
-    ccc_any_type_cmp_fn *cmp_;
-    void *aux_;
+    struct ccc_sll_elem nil;
+    size_t sz;
+    size_t elem_sz;
+    size_t sll_elem_offset;
+    ccc_any_alloc_fn *alloc;
+    ccc_any_type_cmp_fn *cmp;
+    void *aux;
 };
 
 /*=========================   Private Interface  ============================*/
 
 /** @private */
-void ccc_impl_sll_push_front(struct ccc_sll_ *, struct ccc_sll_elem_ *);
+void ccc_impl_sll_push_front(struct ccc_sll *, struct ccc_sll_elem *);
 
 /*======================   Macro Implementations     ========================*/
 
 /** @private */
-#define ccc_impl_sll_init(sll_name, struct_name, sll_elem_field, cmp_fn,       \
-                          alloc_fn, aux_data)                                  \
+#define ccc_impl_sll_init(impl_sll_name, impl_struct_name,                     \
+                          impl_sll_elem_field, impl_cmp_fn, impl_alloc_fn,     \
+                          impl_aux_data)                                       \
     {                                                                          \
-        .sentinel_.n_ = &(sll_name).sentinel_,                                 \
-        .elem_sz_ = sizeof(struct_name),                                       \
-        .sll_elem_offset_ = offsetof(struct_name, sll_elem_field),             \
-        .sz_ = 0,                                                              \
-        .alloc_ = (alloc_fn),                                                  \
-        .cmp_ = (cmp_fn),                                                      \
-        .aux_ = (aux_data),                                                    \
+        .nil.n = &(impl_sll_name).nil,                                         \
+        .elem_sz = sizeof(impl_struct_name),                                   \
+        .sll_elem_offset = offsetof(impl_struct_name, impl_sll_elem_field),    \
+        .sz = 0,                                                               \
+        .alloc = (impl_alloc_fn),                                              \
+        .cmp = (impl_cmp_fn),                                                  \
+        .aux = (impl_aux_data),                                                \
     }
 
 /** @private */
 #define ccc_impl_sll_emplace_front(list_ptr, struct_initializer...)            \
     (__extension__({                                                           \
-        typeof(struct_initializer) *sll_res_ = NULL;                           \
-        struct ccc_sll_ *sll_ = (list_ptr);                                    \
-        if (sll_)                                                              \
+        typeof(struct_initializer) *impl_sll_res = NULL;                       \
+        struct ccc_sll *impl_sll = (list_ptr);                                 \
+        if (impl_sll)                                                          \
         {                                                                      \
-            if (!sll_->alloc_)                                                 \
+            if (!impl_sll->alloc)                                              \
             {                                                                  \
-                sll_res_ = NULL;                                               \
+                impl_sll_res = NULL;                                           \
             }                                                                  \
             else                                                               \
             {                                                                  \
-                sll_res_ = sll_->alloc_(NULL, sll_->elem_sz_);                 \
-                if (sll_res_)                                                  \
+                impl_sll_res = impl_sll->alloc(NULL, impl_sll->elem_sz);       \
+                if (impl_sll_res)                                              \
                 {                                                              \
-                    *sll_res_ = struct_initializer;                            \
-                    ccc_impl_sll_push_front(sll_,                              \
-                                            ccc_sll_elem_in(sll_, sll_res_));  \
+                    *impl_sll_res = struct_initializer;                        \
+                    ccc_impl_sll_push_front(                                   \
+                        impl_sll, ccc_sll_elem_in(impl_sll, impl_sll_res));    \
                 }                                                              \
             }                                                                  \
         }                                                                      \
-        sll_res_;                                                              \
+        impl_sll_res;                                                          \
     }))
 
 /* NOLINTEND(readability-identifier-naming) */

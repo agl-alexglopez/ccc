@@ -63,13 +63,13 @@ amortized O(lg N) insert.
 
 A handle realtime ordered map can be initialized on the stack, heap, or data
 segment at runtime or compile time.*/
-typedef struct ccc_hromap_ ccc_handle_realtime_ordered_map;
+typedef struct ccc_hromap ccc_handle_realtime_ordered_map;
 
 /** @brief The intrusive element for the user defined struct being stored in the
 map
 
 Because the map is handle data is always copied from the user type to map. */
-typedef struct ccc_hromap_elem_ ccc_hromap_elem;
+typedef struct ccc_hromap_elem ccc_hromap_elem;
 
 /** @brief A container specific handle used to implement the Handle Interface.
 @warning it is undefined behavior to access an uninitialized container.
@@ -79,7 +79,7 @@ or value update based on the needs of the user. Handles obtained via the Handle
 Interface are stable until the user removes the element at the provided handle.
 Insertions and deletions of other elements do not affect handle stability.
 Resizing of the table does not affect handle stability. */
-typedef union ccc_hromap_handle_ ccc_hromap_handle;
+typedef union ccc_hromap_handle ccc_hromap_handle;
 
 /**@}*/
 
@@ -290,7 +290,7 @@ it in a handle to provide information about the old value. */
     {                                                                          \
         ccc_hrm_swap_handle((handle_realtime_ordered_map_ptr),                 \
                             (out_handle_ptr))                                  \
-            .impl_                                                             \
+            .impl                                                              \
     }
 
 /** @brief Attempts to insert the key value wrapping key_val_handle.
@@ -317,7 +317,7 @@ map. If more space is needed but allocation fails an insert error is set. */
     {                                                                          \
         ccc_hrm_try_insert((handle_realtime_ordered_map_ptr),                  \
                            (key_val_handle_ptr))                               \
-            .impl_                                                             \
+            .impl                                                              \
     }
 
 /** @brief lazily insert lazy_value into the map at key if key is absent.
@@ -399,7 +399,7 @@ and wraps it in a handle to provide information about the old value. */
     &(ccc_handle)                                                              \
     {                                                                          \
         ccc_hrm_remove((handle_realtime_ordered_map_ptr), (out_handle_ptr))    \
-            .impl_                                                             \
+            .impl                                                              \
     }
 
 /** @brief Obtains a handle for the provided key in the map for future use.
@@ -438,7 +438,7 @@ to subsequent calls in the Handle Interface. */
 #define ccc_hrm_handle_r(handle_realtime_ordered_map_ptr, key_ptr)             \
     &(ccc_hromap_handle)                                                       \
     {                                                                          \
-        ccc_hrm_handle((handle_realtime_ordered_map_ptr), (key_ptr)).impl_     \
+        ccc_hrm_handle((handle_realtime_ordered_map_ptr), (key_ptr)).impl      \
     }
 
 /** @brief Modifies the provided handle if it is Occupied.
@@ -572,7 +572,7 @@ insertions. */
 #define ccc_hrm_remove_handle_r(handle_realtime_ordered_map_handle_ptr)        \
     &(ccc_handle)                                                              \
     {                                                                          \
-        ccc_hrm_remove_handle((handle_realtime_ordered_map_handle_ptr)).impl_  \
+        ccc_hrm_remove_handle((handle_realtime_ordered_map_handle_ptr)).impl   \
     }
 
 /** @brief Unwraps the provided handle to obtain a view into the map element.
@@ -704,7 +704,7 @@ enclosing scope. This reference is always non-NULL. */
     {                                                                          \
         ccc_hrm_equal_range((handle_realtime_ordered_map_ptr),                 \
                             (begin_and_end_key_ptrs))                          \
-            .impl_                                                             \
+            .impl                                                              \
     }
 
 /** @brief Return an iterable rrange of values from [begin_key, end_key).
@@ -742,7 +742,7 @@ enclosing scope. This reference is always non-NULL. */
     {                                                                          \
         ccc_hrm_equal_rrange((handle_realtime_ordered_map_ptr),                \
                              (rbegin_and_rend_key_ptrs))                       \
-            .impl_                                                             \
+            .impl                                                              \
     }
 
 /** @brief Return the start of an inorder traversal of the map. O(lg N).

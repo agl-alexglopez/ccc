@@ -64,7 +64,7 @@ keys.
 
 A ordered multimap may be stored on the stack, heap, or data segment. It can
 be initialized at compile time or runtime.*/
-typedef struct ccc_ommap_ ccc_ordered_multimap;
+typedef struct ccc_ommap ccc_ordered_multimap;
 
 /** @brief The intrusive element for the user defined type stored in the
 multimap.
@@ -74,7 +74,7 @@ struct. Note that if allocation is not permitted, insertions functions accepting
 this type as an argument assume it to exist in pre-allocated memory that will
 exist with the appropriate lifetime and scope for the user's needs; the
 container does not allocate or free in this case. */
-typedef struct ccc_ommap_elem_ ccc_ommap_elem;
+typedef struct ccc_ommap_elem ccc_ommap_elem;
 
 /** @brief The container specific type to support the Entry Interface.
 
@@ -82,7 +82,7 @@ An Entry Interface offers efficient conditional searching, saving multiple
 searches. Entries are views of Vacant or Occupied multimap elements allowing
 further operations to be performed once they are obtained without a second
 search, insert, or remove query. */
-typedef union ccc_ommap_entry_ ccc_ommap_entry;
+typedef union ccc_ommap_entry ccc_ommap_entry;
 
 /**@}*/
 
@@ -264,7 +264,7 @@ values and references (e.g. struct val *v = or_insert(entry_r(...), ...)); */
 #define ccc_omm_entry_r(ordered_multimap_ptr, key_ptr)                         \
     &(ccc_ommap_entry)                                                         \
     {                                                                          \
-        ccc_omm_entry((ordered_multimap_ptr), (key_ptr)).impl_                 \
+        ccc_omm_entry((ordered_multimap_ptr), (key_ptr)).impl                  \
     }
 
 /** @brief Return a reference to the provided entry modified with fn if
@@ -620,8 +620,7 @@ enclosing scope. This reference is always non-NULL. */
 #define ccc_omm_equal_range_r(ordered_multimap_ptr, begin_and_end_key_ptrs...) \
     &(ccc_range)                                                               \
     {                                                                          \
-        ccc_omm_equal_range(ordered_multimap_ptr, begin_and_end_key_ptrs)      \
-            .impl_                                                             \
+        ccc_omm_equal_range(ordered_multimap_ptr, begin_and_end_key_ptrs).impl \
     }
 
 /** @brief Return an iterable rrange of values from [begin_key, end_key).
@@ -658,7 +657,7 @@ enclosing scope. This reference is always non-NULL. */
     &(ccc_rrange)                                                              \
     {                                                                          \
         ccc_omm_equal_rrange(ordered_multimap_ptr, rbegin_and_rend_key_ptrs)   \
-            .impl_                                                             \
+            .impl                                                              \
     }
 
 /** @brief Return the start of an inorder traversal of the multimap. Amortized

@@ -46,7 +46,7 @@ limitations under the License.
 #define ccc_impl_swap_entry_r(container_ptr, key_val_container_handle_ptr...)  \
     &(ccc_entry)                                                               \
     {                                                                          \
-        ccc_impl_swap_entry(container_ptr, key_val_container_handle_ptr).impl_ \
+        ccc_impl_swap_entry(container_ptr, key_val_container_handle_ptr).impl  \
     }
 
 #define ccc_impl_swap_handle(container_ptr, swap_args...)                      \
@@ -58,8 +58,7 @@ limitations under the License.
 #define ccc_impl_swap_handle_r(container_ptr, key_val_container_handle_ptr...) \
     &(ccc_handle)                                                              \
     {                                                                          \
-        ccc_impl_swap_handle(container_ptr, key_val_container_handle_ptr)      \
-            .impl_                                                             \
+        ccc_impl_swap_handle(container_ptr, key_val_container_handle_ptr).impl \
     }
 
 #define ccc_impl_try_insert(container_ptr, try_insert_args...)                 \
@@ -78,33 +77,33 @@ limitations under the License.
             *: &(ccc_handle){ccc_hom_try_insert(                               \
                                  (ccc_handle_ordered_map *)container_ptr,      \
                                  (ccc_homap_elem *)try_insert_args)            \
-                                 .impl_},                                      \
+                                 .impl},                                       \
         ccc_handle_realtime_ordered_map                                        \
             *: &(ccc_handle){ccc_hrm_try_insert(                               \
                                  (ccc_handle_realtime_ordered_map *)           \
                                      container_ptr,                            \
                                  (ccc_hromap_elem *)try_insert_args)           \
-                                 .impl_},                                      \
+                                 .impl},                                       \
         ccc_flat_hash_map                                                      \
             *: &(ccc_entry){ccc_fhm_try_insert(                                \
                                 (ccc_flat_hash_map *)container_ptr,            \
                                 (void *)try_insert_args)                       \
-                                .impl_},                                       \
+                                .impl},                                        \
         ccc_ordered_map                                                        \
             *: &(                                                              \
                 ccc_entry){ccc_om_try_insert((ccc_ordered_map *)container_ptr, \
                                              (ccc_omap_elem *)try_insert_args) \
-                               .impl_},                                        \
+                               .impl},                                         \
         ccc_ordered_multimap                                                   \
             *: &(ccc_entry){ccc_omm_try_insert(                                \
                                 (ccc_ordered_multimap *)container_ptr,         \
                                 (ccc_ommap_elem *)try_insert_args)             \
-                                .impl_},                                       \
+                                .impl},                                        \
         ccc_realtime_ordered_map                                               \
             *: &(ccc_entry){                                                   \
                 ccc_rom_try_insert((ccc_realtime_ordered_map *)container_ptr,  \
                                    (ccc_romap_elem *)try_insert_args)          \
-                    .impl_})
+                    .impl})
 
 #define ccc_impl_insert_or_assign(container_ptr, insert_or_assign_args...)     \
     _Generic((container_ptr),                                                  \
@@ -122,33 +121,33 @@ limitations under the License.
             *: &(ccc_handle){ccc_hom_insert_or_assign(                         \
                                  (ccc_handle_ordered_map *)container_ptr,      \
                                  (ccc_homap_elem *)insert_or_assign_args)      \
-                                 .impl_},                                      \
+                                 .impl},                                       \
         ccc_handle_realtime_ordered_map                                        \
             *: &(ccc_handle){ccc_hrm_insert_or_assign(                         \
                                  (ccc_handle_realtime_ordered_map *)           \
                                      container_ptr,                            \
                                  (ccc_hromap_elem *)insert_or_assign_args)     \
-                                 .impl_},                                      \
+                                 .impl},                                       \
         ccc_flat_hash_map                                                      \
             *: &(ccc_entry){ccc_fhm_insert_or_assign(                          \
                                 (ccc_flat_hash_map *)container_ptr,            \
                                 (void *)insert_or_assign_args)                 \
-                                .impl_},                                       \
+                                .impl},                                        \
         ccc_ordered_map                                                        \
             *: &(ccc_entry){ccc_om_insert_or_assign(                           \
                                 (ccc_ordered_map *)container_ptr,              \
                                 (ccc_omap_elem *)insert_or_assign_args)        \
-                                .impl_},                                       \
+                                .impl},                                        \
         ccc_ordered_multimap                                                   \
             *: &(ccc_entry){ccc_omm_insert_or_assign(                          \
                                 (ccc_ordered_multimap *)container_ptr,         \
                                 (ccc_ommap_elem *)insert_or_assign_args)       \
-                                .impl_},                                       \
+                                .impl},                                        \
         ccc_realtime_ordered_map                                               \
             *: &(ccc_entry){ccc_rom_insert_or_assign(                          \
                                 (ccc_realtime_ordered_map *)container_ptr,     \
                                 (ccc_romap_elem *)insert_or_assign_args)       \
-                                .impl_})
+                                .impl})
 
 #define ccc_impl_remove(container_ptr, key_val_container_handle_ptr...)        \
     _Generic((container_ptr),                                                  \
@@ -167,35 +166,35 @@ limitations under the License.
                                  (ccc_handle_ordered_map *)container_ptr,      \
                                  (ccc_homap_elem *)                            \
                                      key_val_container_handle_ptr)             \
-                                 .impl_},                                      \
+                                 .impl},                                       \
         ccc_handle_realtime_ordered_map                                        \
             *: &(                                                              \
                 ccc_handle){ccc_hrm_remove((ccc_handle_realtime_ordered_map *) \
                                                container_ptr,                  \
                                            (ccc_hromap_elem *)                 \
                                                key_val_container_handle_ptr)   \
-                                .impl_},                                       \
+                                .impl},                                        \
         ccc_flat_hash_map                                                      \
             *: &(ccc_entry){ccc_fhm_remove(                                    \
                                 (ccc_flat_hash_map *)container_ptr,            \
                                 (void *)key_val_container_handle_ptr)          \
-                                .impl_},                                       \
+                                .impl},                                        \
         ccc_ordered_map                                                        \
             *: &(ccc_entry){ccc_om_remove(                                     \
                                 (ccc_ordered_map *)container_ptr,              \
                                 (ccc_omap_elem *)key_val_container_handle_ptr) \
-                                .impl_},                                       \
+                                .impl},                                        \
         ccc_ordered_multimap                                                   \
             *: &(                                                              \
                 ccc_entry){ccc_omm_remove(                                     \
                                (ccc_ordered_multimap *)container_ptr,          \
                                (ccc_ommap_elem *)key_val_container_handle_ptr) \
-                               .impl_},                                        \
+                               .impl},                                         \
         ccc_realtime_ordered_map                                               \
             *: &(ccc_entry){                                                   \
                 ccc_rom_remove((ccc_realtime_ordered_map *)container_ptr,      \
                                (ccc_romap_elem *)key_val_container_handle_ptr) \
-                    .impl_})
+                    .impl})
 
 #define ccc_impl_remove_entry(container_entry_ptr)                             \
     _Generic((container_entry_ptr),                                            \
@@ -210,7 +209,7 @@ limitations under the License.
 #define ccc_impl_remove_entry_r(container_entry_ptr)                           \
     &(ccc_entry)                                                               \
     {                                                                          \
-        ccc_impl_remove_entry(container_entry_ptr).impl_                       \
+        ccc_impl_remove_entry(container_entry_ptr).impl                        \
     }
 
 #define ccc_impl_remove_handle(container_handle_ptr)                           \
@@ -224,7 +223,7 @@ limitations under the License.
 #define ccc_impl_remove_handle_r(container_handle_ptr)                         \
     &(ccc_handle)                                                              \
     {                                                                          \
-        ccc_impl_remove_handle(container_handle_ptr).impl_                     \
+        ccc_impl_remove_handle(container_handle_ptr).impl                      \
     }
 
 #define ccc_impl_entry(container_ptr, key_ptr...)                              \
@@ -243,31 +242,31 @@ limitations under the License.
             *: &(ccc_fhmap_entry){ccc_fhm_entry(                               \
                                       (ccc_flat_hash_map *)(container_ptr),    \
                                       key_ptr)                                 \
-                                      .impl_},                                 \
+                                      .impl},                                  \
         ccc_flat_hash_map const *: &(                                          \
                  ccc_fhmap_entry){ccc_fhm_entry(                               \
                                       (ccc_flat_hash_map *)(container_ptr),    \
                                       key_ptr)                                 \
-                                      .impl_},                                 \
+                                      .impl},                                  \
         ccc_ordered_map *: &(                                                  \
                  ccc_omap_entry){ccc_om_entry(                                 \
                                      (ccc_ordered_map *)(container_ptr),       \
                                      key_ptr)                                  \
-                                     .impl_},                                  \
+                                     .impl},                                   \
         ccc_ordered_multimap *: &(                                             \
                  ccc_ommap_entry){ccc_omm_entry(                               \
                                       (ccc_ordered_multimap *)(container_ptr), \
                                       key_ptr)                                 \
-                                      .impl_},                                 \
+                                      .impl},                                  \
         ccc_realtime_ordered_map *: &(                                         \
                  ccc_romap_entry){ccc_rom_entry((ccc_realtime_ordered_map      \
                                                      *)(container_ptr),        \
                                                 key_ptr)                       \
-                                      .impl_},                                 \
+                                      .impl},                                  \
         ccc_realtime_ordered_map const *: &(ccc_romap_entry){                  \
             ccc_rom_entry((ccc_realtime_ordered_map *)(container_ptr),         \
                           key_ptr)                                             \
-                .impl_})
+                .impl})
 
 #define ccc_impl_handle(container_ptr, key_ptr...)                             \
     _Generic((container_ptr),                                                  \
@@ -282,17 +281,17 @@ limitations under the License.
             *: &(ccc_homap_handle){ccc_hom_handle((ccc_handle_ordered_map      \
                                                        *)(container_ptr),      \
                                                   key_ptr)                     \
-                                       .impl_},                                \
+                                       .impl},                                 \
         ccc_handle_realtime_ordered_map                                        \
             *: &(ccc_hromap_handle){ccc_hrm_handle(                            \
                                         (ccc_handle_realtime_ordered_map       \
                                              *)(container_ptr),                \
                                         key_ptr)                               \
-                                        .impl_},                               \
+                                        .impl},                                \
         ccc_handle_realtime_ordered_map const *: &(ccc_hromap_handle){         \
             ccc_hrm_handle((ccc_handle_realtime_ordered_map *)(container_ptr), \
                            key_ptr)                                            \
-                .impl_})
+                .impl})
 
 #define ccc_impl_and_modify(container_entry_ptr, mod_fn)                       \
     _Generic((container_entry_ptr),                                            \
@@ -692,7 +691,7 @@ limitations under the License.
 #define ccc_impl_equal_range_r(container_ptr, begin_and_end_key_ptr...)        \
     &(ccc_range)                                                               \
     {                                                                          \
-        ccc_impl_equal_range(container_ptr, begin_and_end_key_ptr).impl_       \
+        ccc_impl_equal_range(container_ptr, begin_and_end_key_ptr).impl        \
     }
 
 #define ccc_impl_equal_rrange(container_ptr, rbegin_and_rend_key_ptr...)       \
@@ -709,7 +708,7 @@ limitations under the License.
 #define ccc_impl_equal_rrange_r(container_ptr, rbegin_and_rend_key_ptr...)     \
     &(ccc_rrange)                                                              \
     {                                                                          \
-        ccc_impl_equal_rrange(container_ptr, rbegin_and_rend_key_ptr).impl_    \
+        ccc_impl_equal_rrange(container_ptr, rbegin_and_rend_key_ptr).impl     \
     }
 
 #define ccc_impl_splice(container_ptr, splice_args...)                         \

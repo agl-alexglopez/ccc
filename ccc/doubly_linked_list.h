@@ -57,7 +57,7 @@ Types available in the container interface. */
 A doubly linked list may be stored in the stack, heap, or data segment. Once
 initialized it is passed by reference to all functions. A doubly linked list
 can be initialized at compile time or runtime. */
-typedef struct ccc_dll_ ccc_doubly_linked_list;
+typedef struct ccc_dll ccc_doubly_linked_list;
 
 /** @brief A doubly linked list intrusive element to embedded in a user type.
 
@@ -67,7 +67,7 @@ memory with the appropriate lifetime and scope for the user's needs; the
 container does not allocate or free in this case. If allocation is allowed
 the container will handle copying the data wrapping the element to allocations
 and deallocating when necessary. */
-typedef struct ccc_dll_elem_ ccc_dll_elem;
+typedef struct ccc_dll_elem ccc_dll_elem;
 
 /**@}*/
 
