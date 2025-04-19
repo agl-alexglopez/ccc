@@ -238,12 +238,12 @@ ccc_omm_swap_entry(ccc_ordered_multimap *const mm,
     struct ccc_ommap_elem *n = key_val_handle;
     if (mm->alloc)
     {
-        void *const mem = mm->alloc(NULL, mm->elem_sz, mm->aux);
+        void *const mem = mm->alloc(NULL, mm->sizeof_type, mm->aux);
         if (!mem)
         {
             return (ccc_entry){{.e = NULL, .stats = CCC_ENTRY_INSERT_ERROR}};
         }
-        (void)memcpy(mem, struct_base(mm, key_val_handle), mm->elem_sz);
+        (void)memcpy(mem, struct_base(mm, key_val_handle), mm->sizeof_type);
         n = elem_in_slot(mm, mem);
     }
     return (ccc_entry){multimap_insert(mm, n)};
@@ -279,7 +279,7 @@ ccc_omm_insert_or_assign(ccc_ordered_multimap *const mm,
     {
         *key_val_handle = *elem_in_slot(mm, found);
         assert(mm->root != &mm->end);
-        memcpy(found, struct_base(mm, key_val_handle), mm->elem_sz);
+        memcpy(found, struct_base(mm, key_val_handle), mm->sizeof_type);
         return (ccc_entry){{.e = found, .stats = CCC_ENTRY_OCCUPIED}};
     }
     return (ccc_entry){multimap_insert(mm, key_val_handle)};
@@ -301,7 +301,7 @@ ccc_omm_remove(ccc_ordered_multimap *const mm, ccc_ommap_elem *const out_handle)
     if (mm->alloc)
     {
         void *const any_struct = struct_base(mm, out_handle);
-        memcpy(any_struct, n, mm->elem_sz);
+        memcpy(any_struct, n, mm->sizeof_type);
         mm->alloc(n, 0, mm->aux);
         return (ccc_entry){{.e = any_struct, .stats = CCC_ENTRY_OCCUPIED}};
     }

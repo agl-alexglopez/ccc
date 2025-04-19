@@ -111,7 +111,7 @@ static ccc_tribool validate(struct ccc_homap const *hom);
 
 /* Returning void as miscellaneous helpers. */
 static void init_node(struct ccc_homap_elem *e);
-static void swap(char tmp[const], void *a, void *b, size_t elem_sz);
+static void swap(char tmp[const], void *a, void *b, size_t sizeof_type);
 static void link(struct ccc_homap *t, size_t parent, enum hom_branch dir,
                  size_t subtree);
 static size_t max(size_t, size_t);
@@ -174,7 +174,7 @@ ccc_hom_insert_handle(ccc_homap_handle const *const h,
         void const *const e_base = struct_base(h->impl.hom, elem);
         if (e_base != ret)
         {
-            memcpy(ret, e_base, h->impl.hom->buf.elem_sz);
+            memcpy(ret, e_base, h->impl.hom->buf.sizeof_type);
         }
         return h->impl.handle.i;
     }
@@ -246,7 +246,7 @@ ccc_hom_swap_handle(ccc_handle_ordered_map *const hom,
         void *const any_struct = struct_base(hom, out_handle);
         void *const ret = base_at(hom, hom->root);
         void *const tmp = ccc_buf_at(&hom->buf, 0);
-        swap(tmp, any_struct, ret, hom->buf.elem_sz);
+        swap(tmp, any_struct, ret, hom->buf.sizeof_type);
         return (ccc_handle){{.i = found, .stats = CCC_ENTRY_OCCUPIED}};
     }
     size_t const inserted = maybe_alloc_insert(hom, out_handle);
@@ -296,7 +296,7 @@ ccc_hom_insert_or_assign(ccc_handle_ordered_map *const hom,
         void *const f_base = ccc_buf_at(&hom->buf, found);
         if (e_base != f_base)
         {
-            memcpy(f_base, e_base, hom->buf.elem_sz);
+            memcpy(f_base, e_base, hom->buf.sizeof_type);
         }
         return (ccc_handle){{.i = found, .stats = CCC_ENTRY_OCCUPIED}};
     }
@@ -394,14 +394,14 @@ ccc_hom_size(ccc_handle_ordered_map const *const hom)
     {
         return (ccc_ucount){.error = CCC_RESULT_ARG_ERROR};
     }
-    ccc_ucount sz = ccc_buf_size(&hom->buf);
-    if (sz.error || !sz.count)
+    ccc_ucount count = ccc_buf_size(&hom->buf);
+    if (count.error || !count.count)
     {
-        return sz;
+        return count;
     }
     /* The root is occupied at slot 0 but don't tell the user that. */
-    --sz.count;
-    return sz;
+    --count.count;
+    return count;
 }
 
 ccc_ucount
@@ -519,12 +519,12 @@ ccc_hom_reserve(ccc_handle_ordered_map *const hom, size_t const to_add,
         return CCC_RESULT_ARG_ERROR;
     }
     /* Once initialized the buffer always has a size of one for root node. */
-    size_t const needed = hom->buf.sz + to_add + (hom->buf.sz == 0);
+    size_t const needed = hom->buf.count + to_add + (hom->buf.count == 0);
     if (needed <= hom->buf.capacity)
     {
         return CCC_RESULT_OK;
     }
-    size_t const old_sz = hom->buf.sz;
+    size_t const old_count = hom->buf.count;
     size_t old_cap = hom->buf.capacity;
     ccc_result const res = ccc_buf_alloc(&hom->buf, needed, fn);
     if (res != CCC_RESULT_OK)
@@ -535,7 +535,7 @@ ccc_hom_reserve(ccc_handle_ordered_map *const hom, size_t const to_add,
     {
         return CCC_RESULT_FAIL;
     }
-    old_cap = old_sz ? old_cap : 0;
+    old_cap = old_count ? old_cap : 0;
     size_t const new_cap = hom->buf.capacity;
     size_t prev = 0;
     for (ptrdiff_t i = (ptrdiff_t)new_cap - 1; i > 0 && i >= (ptrdiff_t)old_cap;
@@ -589,7 +589,7 @@ ccc_hom_copy(ccc_handle_ordered_map *const dst,
         return CCC_RESULT_ARG_ERROR;
     }
     (void)memcpy(dst->buf.mem, src->buf.mem,
-                 src->buf.capacity * src->buf.elem_sz);
+                 src->buf.capacity * src->buf.sizeof_type);
     return CCC_RESULT_OK;
 }
 
@@ -780,7 +780,7 @@ insert(struct ccc_homap *const t, size_t const n)
 {
     struct ccc_homap_elem *const node = at(t, n);
     init_node(node);
-    if (t->buf.sz == EMPTY_TREE)
+    if (t->buf.count == EMPTY_TREE)
     {
         t->root = n;
         return;
@@ -964,18 +964,18 @@ alloc_slot(struct ccc_homap *const t)
 {
     /* The end sentinel node will always be at 0. This also means once
        initialized the internal size for implementer is always at least 1. */
-    size_t const old_sz = t->buf.sz;
+    size_t const old_count = t->buf.count;
     size_t old_cap = t->buf.capacity;
-    if (!old_sz || old_sz == old_cap)
+    if (!old_count || old_count == old_cap)
     {
         assert(!t->free_list);
-        if (old_sz == old_cap
+        if (old_count == old_cap
             && ccc_buf_alloc(&t->buf, old_cap ? old_cap * 2 : 8, t->buf.alloc)
                    != CCC_RESULT_OK)
         {
             return 0;
         }
-        old_cap = old_sz ? old_cap : 0;
+        old_cap = old_count ? old_cap : 0;
         size_t const new_cap = t->buf.capacity;
         size_t prev = 0;
         for (ptrdiff_t i = (ptrdiff_t)new_cap - 1;
@@ -984,7 +984,7 @@ alloc_slot(struct ccc_homap *const t)
             at(t, i)->next_free = prev;
         }
         t->free_list = prev;
-        if (ccc_buf_size_set(&t->buf, max(old_sz, 1)) != CCC_RESULT_OK)
+        if (ccc_buf_size_set(&t->buf, max(old_count, 1)) != CCC_RESULT_OK)
         {
             return 0;
         }
@@ -1006,15 +1006,15 @@ init_node(struct ccc_homap_elem *const e)
 }
 
 static inline void
-swap(char tmp[const], void *const a, void *const b, size_t const elem_sz)
+swap(char tmp[const], void *const a, void *const b, size_t const sizeof_type)
 {
     if (a == b)
     {
         return;
     }
-    (void)memcpy(tmp, a, elem_sz);
-    (void)memcpy(a, b, elem_sz);
-    (void)memcpy(b, tmp, elem_sz);
+    (void)memcpy(tmp, a, sizeof_type);
+    (void)memcpy(a, b, sizeof_type);
+    (void)memcpy(b, tmp, sizeof_type);
 }
 
 static inline struct ccc_homap_elem *
@@ -1161,7 +1161,7 @@ is_storing_parent(struct ccc_homap const *const t, size_t const p,
 static ccc_tribool
 is_free_list_valid(struct ccc_homap const *const t)
 {
-    if (!t->buf.sz)
+    if (!t->buf.count)
     {
         return CCC_TRUE;
     }
@@ -1169,7 +1169,7 @@ is_free_list_valid(struct ccc_homap const *const t)
     for (size_t cur = t->free_list; cur && list_check < t->buf.capacity;
          cur = at(t, cur)->next_free, ++list_check)
     {}
-    return (list_check + t->buf.sz == t->buf.capacity);
+    return (list_check + t->buf.count == t->buf.capacity);
 }
 
 static ccc_tribool
@@ -1180,7 +1180,7 @@ validate(struct ccc_homap const *const hom)
         return CCC_FALSE;
     }
     size_t const size = recursive_size(hom, hom->root);
-    if (size && size != hom->buf.sz - 1)
+    if (size && size != hom->buf.count - 1)
     {
         return CCC_FALSE;
     }

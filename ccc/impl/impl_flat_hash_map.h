@@ -103,15 +103,15 @@ struct ccc_fhmap
     /** Tag array on byte following data(0). */
     ccc_fhm_tag *tag;
     /** The number of user active slots. */
-    size_t sz;
+    size_t count;
     /** Track to know when rehashing is needed. */
-    size_t avail;
+    size_t remain;
     /** The mask for power of two table sizing. */
     size_t mask;
     /** One-time flag to lazily initialize table. */
     ccc_tribool init;
     /** Size of each user data element being stored. */
-    size_t elem_sz;
+    size_t sizeof_type;
     /** The location of the key field in user type. */
     size_t key_offset;
     /** The user callback for equality comparison. */
@@ -206,12 +206,12 @@ fixed size map when they don't know exactly the size needed until runtime. */
     {                                                                          \
         .data = (impl_data_ptr),                                               \
         .tag = (impl_tag_ptr),                                                 \
-        .sz = 0,                                                               \
-        .avail = (((impl_capacity) / (size_t)8) * (size_t)7),                  \
+        .count = 0,                                                            \
+        .remain = (((impl_capacity) / (size_t)8) * (size_t)7),                 \
         .mask = (((impl_capacity) > (size_t)0) ? ((impl_capacity) - (size_t)1) \
                                                : (size_t)0),                   \
         .init = CCC_FALSE,                                                     \
-        .elem_sz = sizeof(*(impl_data_ptr)),                                   \
+        .sizeof_type = sizeof(*(impl_data_ptr)),                               \
         .key_offset = offsetof(typeof(*(impl_data_ptr)), impl_key_field),      \
         .eq_fn = (impl_key_eq_fn),                                             \
         .hash_fn = (impl_hash_fn),                                             \

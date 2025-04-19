@@ -35,8 +35,8 @@ struct ccc_sll_elem
 struct ccc_sll
 {
     struct ccc_sll_elem nil;
-    size_t sz;
-    size_t elem_sz;
+    size_t count;
+    size_t sizeof_type;
     size_t sll_elem_offset;
     ccc_any_alloc_fn *alloc;
     ccc_any_type_cmp_fn *cmp;
@@ -56,9 +56,9 @@ void ccc_impl_sll_push_front(struct ccc_sll *, struct ccc_sll_elem *);
                           impl_aux_data)                                       \
     {                                                                          \
         .nil.n = &(impl_sll_name).nil,                                         \
-        .elem_sz = sizeof(impl_struct_name),                                   \
+        .sizeof_type = sizeof(impl_struct_name),                               \
         .sll_elem_offset = offsetof(impl_struct_name, impl_sll_elem_field),    \
-        .sz = 0,                                                               \
+        .count = 0,                                                            \
         .alloc = (impl_alloc_fn),                                              \
         .cmp = (impl_cmp_fn),                                                  \
         .aux = (impl_aux_data),                                                \
@@ -77,7 +77,7 @@ void ccc_impl_sll_push_front(struct ccc_sll *, struct ccc_sll_elem *);
             }                                                                  \
             else                                                               \
             {                                                                  \
-                impl_sll_res = impl_sll->alloc(NULL, impl_sll->elem_sz);       \
+                impl_sll_res = impl_sll->alloc(NULL, impl_sll->sizeof_type);   \
                 if (impl_sll_res)                                              \
                 {                                                              \
                     *impl_sll_res = struct_initializer;                        \

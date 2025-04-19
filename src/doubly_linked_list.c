@@ -59,12 +59,12 @@ ccc_dll_push_front(ccc_doubly_linked_list *const l, ccc_dll_elem *elem)
     }
     if (l->alloc)
     {
-        void *const node = l->alloc(NULL, l->elem_sz, l->aux);
+        void *const node = l->alloc(NULL, l->sizeof_type, l->aux);
         if (!node)
         {
             return NULL;
         }
-        (void)memcpy(node, struct_base(l, elem), l->elem_sz);
+        (void)memcpy(node, struct_base(l, elem), l->sizeof_type);
         elem = elem_in(l, node);
     }
     push_front(l, elem);
@@ -80,12 +80,12 @@ ccc_dll_push_back(ccc_doubly_linked_list *const l, ccc_dll_elem *elem)
     }
     if (l->alloc)
     {
-        void *const node = l->alloc(NULL, l->elem_sz, l->aux);
+        void *const node = l->alloc(NULL, l->sizeof_type, l->aux);
         if (!node)
         {
             return NULL;
         }
-        (void)memcpy(node, struct_base(l, elem), l->elem_sz);
+        (void)memcpy(node, struct_base(l, elem), l->sizeof_type);
         elem = elem_in(l, node);
     }
     push_back(l, elem);
@@ -95,7 +95,7 @@ ccc_dll_push_back(ccc_doubly_linked_list *const l, ccc_dll_elem *elem)
 void *
 ccc_dll_front(ccc_doubly_linked_list const *l)
 {
-    if (!l || !l->sz)
+    if (!l || !l->count)
     {
         return NULL;
     }
@@ -105,7 +105,7 @@ ccc_dll_front(ccc_doubly_linked_list const *l)
 void *
 ccc_dll_back(ccc_doubly_linked_list const *l)
 {
-    if (!l || !l->sz)
+    if (!l || !l->count)
     {
         return NULL;
     }
@@ -115,7 +115,7 @@ ccc_dll_back(ccc_doubly_linked_list const *l)
 ccc_result
 ccc_dll_pop_front(ccc_doubly_linked_list *const l)
 {
-    if (!l || !l->sz)
+    if (!l || !l->count)
     {
         return CCC_RESULT_ARG_ERROR;
     }
@@ -130,7 +130,7 @@ ccc_dll_pop_front(ccc_doubly_linked_list *const l)
 ccc_result
 ccc_dll_pop_back(ccc_doubly_linked_list *const l)
 {
-    if (!l || !l->sz)
+    if (!l || !l->count)
     {
         return CCC_RESULT_ARG_ERROR;
     }
@@ -145,7 +145,7 @@ ccc_dll_pop_back(ccc_doubly_linked_list *const l)
     {
         (void)l->alloc(struct_base(l, remove), 0, l->aux);
     }
-    --l->sz;
+    --l->count;
     return CCC_RESULT_OK;
 }
 
@@ -159,12 +159,12 @@ ccc_dll_insert(ccc_doubly_linked_list *const l, ccc_dll_elem *const pos,
     }
     if (l->alloc)
     {
-        void *const node = l->alloc(NULL, l->elem_sz, l->aux);
+        void *const node = l->alloc(NULL, l->sizeof_type, l->aux);
         if (!node)
         {
             return NULL;
         }
-        (void)memcpy(node, struct_base(l, elem), l->elem_sz);
+        (void)memcpy(node, struct_base(l, elem), l->sizeof_type);
         elem = elem_in(l, node);
     }
     elem->n = pos;
@@ -172,14 +172,14 @@ ccc_dll_insert(ccc_doubly_linked_list *const l, ccc_dll_elem *const pos,
 
     pos->p->n = elem;
     pos->p = elem;
-    ++l->sz;
+    ++l->count;
     return struct_base(l, elem);
 }
 
 void *
 ccc_dll_erase(ccc_doubly_linked_list *const l, ccc_dll_elem *const elem)
 {
-    if (!l || !elem || !l->sz)
+    if (!l || !elem || !l->count)
     {
         return NULL;
     }
@@ -190,7 +190,7 @@ ccc_dll_erase(ccc_doubly_linked_list *const l, ccc_dll_elem *const elem)
     {
         (void)l->alloc(struct_base(l, elem), 0, l->aux);
     }
-    --l->sz;
+    --l->count;
     return ret;
 }
 
@@ -199,7 +199,7 @@ ccc_dll_erase_range(ccc_doubly_linked_list *const l,
                     ccc_dll_elem *const elem_begin, ccc_dll_elem *elem_end)
 {
     if (!l || !elem_begin || !elem_end || !elem_begin->n || !elem_begin->p
-        || !elem_end->n || !elem_end->p || !l->sz)
+        || !elem_end->n || !elem_end->p || !l->count)
     {
         return NULL;
     }
@@ -214,8 +214,8 @@ ccc_dll_erase_range(ccc_doubly_linked_list *const l,
 
     size_t const deleted = erase_range(l, elem_begin, elem_end);
 
-    assert(deleted <= l->sz);
-    l->sz -= deleted;
+    assert(deleted <= l->count);
+    l->count -= deleted;
     return ret == &l->nil ? NULL : struct_base(l, ret);
 }
 
@@ -241,7 +241,8 @@ void *
 ccc_dll_extract(ccc_doubly_linked_list *const l,
                 ccc_dll_elem *const elem_in_list)
 {
-    if (!l || !elem_in_list || !elem_in_list->n || !elem_in_list->p || !l->sz)
+    if (!l || !elem_in_list || !elem_in_list->n || !elem_in_list->p
+        || !l->count)
     {
         return NULL;
     }
@@ -252,7 +253,7 @@ ccc_dll_extract(ccc_doubly_linked_list *const l,
     {
         elem_in_list->n = elem_in_list->p = NULL;
     }
-    --l->sz;
+    --l->count;
     return ret == &l->nil ? NULL : struct_base(l, ret);
 }
 
@@ -261,7 +262,7 @@ ccc_dll_extract_range(ccc_doubly_linked_list *const l,
                       ccc_dll_elem *const elem_begin, ccc_dll_elem *elem_end)
 {
     if (!l || !elem_begin || !elem_end || !elem_begin->n || !elem_begin->p
-        || !elem_end->n || !elem_end->p || !l->sz)
+        || !elem_end->n || !elem_end->p || !l->count)
     {
         return NULL;
     }
@@ -276,8 +277,8 @@ ccc_dll_extract_range(ccc_doubly_linked_list *const l,
 
     size_t const deleted = extract_range(l, elem_begin, elem_end);
 
-    assert(deleted <= l->sz);
-    l->sz -= deleted;
+    assert(deleted <= l->count);
+    l->count -= deleted;
     return ret == &l->nil ? NULL : struct_base(l, ret);
 }
 
@@ -303,8 +304,8 @@ ccc_dll_splice(ccc_doubly_linked_list *const pos_dll, ccc_dll_elem *pos,
     pos->p = to_cut;
     if (pos_dll != to_cut_dll)
     {
-        ++pos_dll->sz;
-        --to_cut_dll->sz;
+        ++pos_dll->count;
+        --to_cut_dll->count;
     }
     return CCC_RESULT_OK;
 }
@@ -327,10 +328,10 @@ ccc_dll_splice_range(ccc_doubly_linked_list *const pos_dll, ccc_dll_elem *pos,
     splice_range(pos, begin, end);
     if (pos_dll != to_cut_dll)
     {
-        size_t const sz = len(begin, inclusive_end);
-        assert(sz <= to_cut_dll->sz);
-        pos_dll->sz += sz;
-        to_cut_dll->sz -= sz;
+        size_t const count = len(begin, inclusive_end);
+        assert(count <= to_cut_dll->count);
+        pos_dll->count += count;
+        to_cut_dll->count -= count;
     }
     return CCC_RESULT_OK;
 }
@@ -394,13 +395,13 @@ ccc_dll_size(ccc_doubly_linked_list const *const l)
     {
         return (ccc_ucount){.error = CCC_RESULT_ARG_ERROR};
     }
-    return (ccc_ucount){.count = l->sz};
+    return (ccc_ucount){.count = l->count};
 }
 
 ccc_tribool
 ccc_dll_is_empty(ccc_doubly_linked_list const *const l)
 {
-    return l ? !l->sz : CCC_TRUE;
+    return l ? !l->count : CCC_TRUE;
 }
 
 ccc_result
@@ -436,7 +437,7 @@ ccc_dll_validate(ccc_doubly_linked_list const *const l)
     for (struct ccc_dll_elem const *e = l->nil.n; e != &l->nil;
          e = e->n, ++size)
     {
-        if (size >= l->sz)
+        if (size >= l->count)
         {
             return CCC_FALSE;
         }
@@ -445,7 +446,7 @@ ccc_dll_validate(ccc_doubly_linked_list const *const l)
             return CCC_FALSE;
         }
     }
-    return size == l->sz;
+    return size == l->count;
 }
 
 /*==========================     Sorting     ================================*/
@@ -460,7 +461,7 @@ ccc_dll_is_sorted(ccc_doubly_linked_list const *const dll)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    if (dll->sz <= 1)
+    if (dll->count <= 1)
     {
         return CCC_TRUE;
     }
@@ -487,12 +488,12 @@ ccc_dll_insert_sorted(ccc_doubly_linked_list *const dll, ccc_dll_elem *e)
     }
     if (dll->alloc)
     {
-        void *const node = dll->alloc(NULL, dll->elem_sz, dll->aux);
+        void *const node = dll->alloc(NULL, dll->sizeof_type, dll->aux);
         if (!node)
         {
             return NULL;
         }
-        (void)memcpy(node, struct_base(dll, e), dll->elem_sz);
+        (void)memcpy(node, struct_base(dll, e), dll->sizeof_type);
         e = elem_in(dll, node);
     }
     struct ccc_dll_elem *pos = dll->nil.n;
@@ -502,7 +503,7 @@ ccc_dll_insert_sorted(ccc_doubly_linked_list *const dll, ccc_dll_elem *e)
     e->p = pos->p;
     pos->p->n = e;
     pos->p = e;
-    ++dll->sz;
+    ++dll->count;
     return struct_base(dll, e);
 }
 
@@ -661,7 +662,7 @@ push_front(struct ccc_dll *const l, struct ccc_dll_elem *const e)
     e->n = l->nil.n;
     l->nil.n->p = e;
     l->nil.n = e;
-    ++l->sz;
+    ++l->count;
 }
 
 static inline void
@@ -671,7 +672,7 @@ push_back(ccc_doubly_linked_list *const l, struct ccc_dll_elem *const e)
     e->p = l->nil.p;
     l->nil.p->n = e;
     l->nil.p = e;
-    ++l->sz;
+    ++l->count;
 }
 
 static inline struct ccc_dll_elem *
@@ -684,7 +685,7 @@ pop_front(struct ccc_dll *const dll)
     {
         ret->n = ret->p = NULL;
     }
-    --dll->sz;
+    --dll->count;
     return ret;
 }
 
@@ -696,12 +697,12 @@ extract_range([[maybe_unused]] struct ccc_dll const *const l,
     {
         begin->p = NULL;
     }
-    size_t sz = len(begin, end);
+    size_t count = len(begin, end);
     if (end != &l->nil)
     {
         end->n = NULL;
     }
-    return sz;
+    return count;
 }
 
 static size_t
@@ -714,23 +715,23 @@ erase_range(struct ccc_dll const *const l, struct ccc_dll_elem *begin,
     }
     if (!l->alloc)
     {
-        size_t const sz = len(begin, end);
+        size_t const count = len(begin, end);
         if (end != &l->nil)
         {
             end->n = NULL;
         }
-        return sz;
+        return count;
     }
-    size_t sz = 1;
-    for (; begin != end; ++sz)
+    size_t count = 1;
+    for (; begin != end; ++count)
     {
-        assert(sz <= l->sz);
+        assert(count <= l->count);
         struct ccc_dll_elem *const next = begin->n;
         (void)l->alloc(struct_base(l, begin), 0, l->aux);
         begin = next;
     }
     (void)l->alloc(struct_base(l, end), 0, l->aux);
-    return sz;
+    return count;
 }
 
 /** Finds the length from [begin, end]. End is counted. */

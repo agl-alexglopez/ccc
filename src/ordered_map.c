@@ -155,7 +155,7 @@ ccc_om_insert_entry(ccc_omap_entry const *const e, ccc_omap_elem *const elem)
         {
             *elem = *elem_in_slot(e->impl.t, e->impl.entry.e);
             (void)memcpy(e->impl.entry.e, struct_base(e->impl.t, elem),
-                         e->impl.t->elem_sz);
+                         e->impl.t->sizeof_type);
         }
         return e->impl.entry.e;
     }
@@ -217,7 +217,7 @@ ccc_om_swap_entry(ccc_ordered_map *const om,
         void *const any_struct = struct_base(om, key_val_handle);
         void *const in_tree = struct_base(om, om->root);
         void *const old_val = struct_base(om, tmp);
-        swap(old_val, in_tree, any_struct, om->elem_sz);
+        swap(old_val, in_tree, any_struct, om->sizeof_type);
         key_val_handle->branch[L] = key_val_handle->branch[R]
             = key_val_handle->parent = NULL;
         tmp->branch[L] = tmp->branch[R] = tmp->parent = NULL;
@@ -267,7 +267,7 @@ ccc_om_insert_or_assign(ccc_ordered_map *const om,
     {
         *key_val_handle = *elem_in_slot(om, found);
         assert(om->root != &om->end);
-        memcpy(found, struct_base(om, key_val_handle), om->elem_sz);
+        memcpy(found, struct_base(om, key_val_handle), om->sizeof_type);
         return (ccc_entry){{.e = found, .stats = CCC_ENTRY_OCCUPIED}};
     }
     void *const inserted = alloc_insert(om, key_val_handle);
@@ -293,7 +293,7 @@ ccc_om_remove(ccc_ordered_map *const om, ccc_omap_elem *const out_handle)
     if (om->alloc)
     {
         void *const any_struct = struct_base(om, out_handle);
-        memcpy(any_struct, n, om->elem_sz);
+        memcpy(any_struct, n, om->sizeof_type);
         om->alloc(n, 0, om->aux);
         return (ccc_entry){{.e = any_struct, .stats = CCC_ENTRY_OCCUPIED}};
     }
@@ -663,12 +663,12 @@ alloc_insert(struct ccc_omap *const t, struct ccc_omap_elem *out_handle)
     }
     if (t->alloc)
     {
-        void *const node = t->alloc(NULL, t->elem_sz, t->aux);
+        void *const node = t->alloc(NULL, t->sizeof_type, t->aux);
         if (!node)
         {
             return NULL;
         }
-        (void)memcpy(node, struct_base(t, out_handle), t->elem_sz);
+        (void)memcpy(node, struct_base(t, out_handle), t->sizeof_type);
         out_handle = elem_in_slot(t, node);
     }
     if (empty(t))
@@ -819,15 +819,15 @@ cmp(struct ccc_omap const *const t, void const *const key,
 }
 
 static inline void
-swap(char tmp[const], void *const a, void *const b, size_t elem_sz)
+swap(char tmp[const], void *const a, void *const b, size_t sizeof_type)
 {
     if (a == b || !a || !b)
     {
         return;
     }
-    (void)memcpy(tmp, a, elem_sz);
-    (void)memcpy(a, b, elem_sz);
-    (void)memcpy(b, tmp, elem_sz);
+    (void)memcpy(tmp, a, sizeof_type);
+    (void)memcpy(a, b, sizeof_type);
+    (void)memcpy(b, tmp, sizeof_type);
 }
 
 static inline void

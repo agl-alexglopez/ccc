@@ -35,11 +35,11 @@ back dynamically. */
 struct ccc_bitset
 {
     /** The array of bit blocks, a platform defined standard bit width. */
-    ccc_bitblock *mem;
+    ccc_bitblock *blocks;
     /** The number of active bits in the set available for reads and writes. */
-    size_t sz;
+    size_t count;
     /** The number of bits capable of being tracked in the bit block array. */
-    size_t cap;
+    size_t capacity;
     /** The user provided allocation function for resizing, if any. */
     ccc_any_alloc_fn *alloc;
     /** Auxiliary data for resizing, if any. */
@@ -66,9 +66,9 @@ user wants a fixed size dynamic bit set they provide 0 as size argument. */
 #define ccc_impl_bs_init(impl_bitblock_ptr, impl_alloc_fn, impl_aux, impl_cap, \
                          ...)                                                  \
     {                                                                          \
-        .mem = (impl_bitblock_ptr),                                            \
-        .sz = IMPL_BS_OPTIONAL_SIZE((impl_cap), __VA_ARGS__),                  \
-        .cap = (impl_cap),                                                     \
+        .blocks = (impl_bitblock_ptr),                                         \
+        .count = IMPL_BS_OPTIONAL_SIZE((impl_cap), __VA_ARGS__),               \
+        .capacity = (impl_cap),                                                \
         .alloc = (impl_alloc_fn),                                              \
         .aux = (impl_aux),                                                     \
     }

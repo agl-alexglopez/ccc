@@ -37,9 +37,9 @@ struct ccc_pq_elem
 struct ccc_pq
 {
     struct ccc_pq_elem *root;
-    size_t sz;
+    size_t count;
     size_t pq_elem_offset;
-    size_t elem_sz;
+    size_t sizeof_type;
     ccc_any_alloc_fn *alloc;
     ccc_any_type_cmp_fn *cmp;
     ccc_threeway_cmp order;
@@ -75,9 +75,9 @@ struct ccc_pq_elem *ccc_impl_pq_delete_node(struct ccc_pq *,
                          impl_cmp_fn, impl_alloc_fn, impl_aux_data)            \
     {                                                                          \
         .root = NULL,                                                          \
-        .sz = 0,                                                               \
+        .count = 0,                                                            \
         .pq_elem_offset = offsetof(impl_struct_name, impl_pq_elem_field),      \
-        .elem_sz = sizeof(impl_struct_name),                                   \
+        .sizeof_type = sizeof(impl_struct_name),                               \
         .alloc = (impl_alloc_fn),                                              \
         .cmp = (impl_cmp_fn),                                                  \
         .order = (impl_pq_order),                                              \
@@ -97,8 +97,8 @@ struct ccc_pq_elem *ccc_impl_pq_delete_node(struct ccc_pq *,
             }                                                                  \
             else                                                               \
             {                                                                  \
-                impl_pq_res                                                    \
-                    = impl_pq->alloc(NULL, impl_pq->elem_sz, impl_pq->aux);    \
+                impl_pq_res = impl_pq->alloc(NULL, impl_pq->sizeof_type,       \
+                                             impl_pq->aux);                    \
                 if (impl_pq_res)                                               \
                 {                                                              \
                     *impl_pq_res = lazy_value;                                 \
