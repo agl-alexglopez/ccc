@@ -104,7 +104,7 @@ struct ccc_fhmap
     ccc_fhm_tag *tag;
     /** The number of user active slots. */
     size_t count;
-    /** Track to know when rehashing is needed. */
+    /** Track available slots given load factor constrains. When 0, rehash. */
     size_t remain;
     /** The mask for power of two table sizing. */
     size_t mask;
