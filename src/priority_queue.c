@@ -138,7 +138,10 @@ ccc_pq_clear(ccc_priority_queue *const pq, ccc_any_type_destructor_fn *const fn)
     {
         if (fn)
         {
-            fn((ccc_any_type){.any_type = ccc_pq_front(pq), .aux = pq->aux});
+            fn((ccc_any_type){
+                .any_type = ccc_pq_front(pq),
+                .aux = pq->aux,
+            });
         }
         (void)ccc_pq_pop(pq);
     }
@@ -291,13 +294,19 @@ update_fixup(struct ccc_pq *const pq, struct ccc_pq_elem *const e,
     if (e->parent && cmp(pq, e, e->parent) == pq->order)
     {
         cut_child(e);
-        fn((ccc_any_type){.any_type = struct_base(pq, e), .aux = aux});
+        fn((ccc_any_type){
+            .any_type = struct_base(pq, e),
+            .aux = aux,
+        });
         pq->root = merge(pq, pq->root, e);
         return;
     }
     pq->root = delete_node(pq, e);
     init_node(e);
-    fn((ccc_any_type){.any_type = struct_base(pq, e), .aux = aux});
+    fn((ccc_any_type){
+        .any_type = struct_base(pq, e),
+        .aux = aux,
+    });
     pq->root = merge(pq, pq->root, e);
 }
 
@@ -314,7 +323,10 @@ increase_fixup(struct ccc_pq *const pq, struct ccc_pq_elem *const e,
         pq->root = delete_node(pq, e);
         init_node(e);
     }
-    fn((ccc_any_type){.any_type = struct_base(pq, e), .aux = aux});
+    fn((ccc_any_type){
+        .any_type = struct_base(pq, e),
+        .aux = aux,
+    });
     pq->root = merge(pq, pq->root, e);
 }
 
@@ -331,7 +343,10 @@ decrease_fixup(struct ccc_pq *const pq, struct ccc_pq_elem *const e,
         pq->root = delete_node(pq, e);
         init_node(e);
     }
-    fn((ccc_any_type){.any_type = struct_base(pq, e), .aux = aux});
+    fn((ccc_any_type){
+        .any_type = struct_base(pq, e),
+        .aux = aux,
+    });
     pq->root = merge(pq, pq->root, e);
 }
 

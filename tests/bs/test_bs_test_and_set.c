@@ -935,6 +935,7 @@ CHECK_BEGIN_STATIC_FN(bs_test_shiftl)
     size_t const bits_in_block = sizeof(bitblock) * CHAR_BIT;
     size_t ones = 512;
     CHECK(bs_shiftl(&bs, bits_in_block), CCC_RESULT_OK);
+    CHECK(bs_popcount_range(&bs, 0, bits_in_block).count, 0);
     ones -= bits_in_block;
     CHECK(bs_popcount(&bs).count, ones);
     CHECK(bs_shiftl(&bs, bits_in_block / 2), CCC_RESULT_OK);
@@ -949,6 +950,26 @@ CHECK_BEGIN_STATIC_FN(bs_test_shiftl)
     CHECK_END_FN();
 }
 
+CHECK_BEGIN_STATIC_FN(bs_test_shiftl_edgecase)
+{
+    bitset bs = bs_init((bitblock[bs_blocks(512)]){}, NULL, NULL, 512);
+    CHECK(bs_set_all(&bs, CCC_TRUE), CCC_RESULT_OK);
+    CHECK(bs_popcount(&bs).count, 512);
+    CHECK(bs_shiftl(&bs, 510), CCC_RESULT_OK);
+    CHECK(bs_popcount(&bs).count, 2);
+    CHECK_END_FN();
+}
+
+CHECK_BEGIN_STATIC_FN(bs_test_shiftl_edgecase_small)
+{
+    bitset bs = bs_init((bitblock[bs_blocks(8)]){}, NULL, NULL, 8);
+    CHECK(bs_set_all(&bs, CCC_TRUE), CCC_RESULT_OK);
+    CHECK(bs_popcount(&bs).count, 8);
+    CHECK(bs_shiftl(&bs, 7), CCC_RESULT_OK);
+    CHECK(bs_popcount(&bs).count, 1);
+    CHECK_END_FN();
+}
+
 CHECK_BEGIN_STATIC_FN(bs_test_shiftr)
 {
     bitset bs = bs_init((bitblock[bs_blocks(512)]){}, NULL, NULL, 512);
@@ -960,6 +981,7 @@ CHECK_BEGIN_STATIC_FN(bs_test_shiftr)
     size_t const bits_in_block = sizeof(bitblock) * CHAR_BIT;
     size_t ones = 512;
     CHECK(bs_shiftr(&bs, bits_in_block), CCC_RESULT_OK);
+    CHECK(bs_popcount_range(&bs, 512 - bits_in_block, bits_in_block).count, 0);
     ones -= bits_in_block;
     CHECK(bs_popcount(&bs).count, ones);
     CHECK(bs_shiftr(&bs, bits_in_block / 2), CCC_RESULT_OK);
@@ -971,6 +993,26 @@ CHECK_BEGIN_STATIC_FN(bs_test_shiftr)
     CHECK(bs_shiftr(&bs, (bits_in_block - 3) * 3), CCC_RESULT_OK);
     ones -= ((bits_in_block - 3) * 3);
     CHECK(bs_popcount(&bs).count, ones);
+    CHECK_END_FN();
+}
+
+CHECK_BEGIN_STATIC_FN(bs_test_shiftr_edgecase)
+{
+    bitset bs = bs_init((bitblock[bs_blocks(512)]){}, NULL, NULL, 512);
+    CHECK(bs_set_all(&bs, CCC_TRUE), CCC_RESULT_OK);
+    CHECK(bs_popcount(&bs).count, 512);
+    CHECK(bs_shiftr(&bs, 510), CCC_RESULT_OK);
+    CHECK(bs_popcount(&bs).count, 2);
+    CHECK_END_FN();
+}
+
+CHECK_BEGIN_STATIC_FN(bs_test_shiftr_edgecase_small)
+{
+    bitset bs = bs_init((bitblock[bs_blocks(8)]){}, NULL, NULL, 8);
+    CHECK(bs_set_all(&bs, CCC_TRUE), CCC_RESULT_OK);
+    CHECK(bs_popcount(&bs).count, 8);
+    CHECK(bs_shiftr(&bs, 7), CCC_RESULT_OK);
+    CHECK(bs_popcount(&bs).count, 1);
     CHECK_END_FN();
 }
 
@@ -1160,6 +1202,8 @@ main(void)
         bs_test_or_same_size(), bs_test_or_diff_size(), bs_test_and_same_size(),
         bs_test_and_diff_size(), bs_test_xor_same_size(),
         bs_test_xor_diff_size(), bs_test_shiftl(), bs_test_shiftr(),
+        bs_test_shiftl_edgecase(), bs_test_shiftr_edgecase(),
+        bs_test_shiftl_edgecase_small(), bs_test_shiftr_edgecase_small(),
         bs_test_subset(), bs_test_proper_subset(), bs_test_valid_sudoku(),
         bs_test_invalid_sudoku());
 }

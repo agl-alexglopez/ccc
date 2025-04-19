@@ -31,11 +31,11 @@ enum : size_t
 
 static void *at(struct ccc_fpq const *, size_t);
 static size_t index_of(struct ccc_fpq const *, void const *);
-static ccc_tribool wins(struct ccc_fpq const *, void const *winner,
-                        void const *loser);
+static ccc_tribool wins(struct ccc_fpq const *, size_t winner, size_t loser);
+static ccc_threeway_cmp cmp(struct ccc_fpq const *, size_t lhs, size_t rhs);
 static void swap(struct ccc_fpq *, char tmp[const], size_t, size_t);
 static size_t bubble_up(struct ccc_fpq *fpq, char tmp[const], size_t i);
-static size_t bubble_down(struct ccc_fpq *, char tmp[], size_t);
+static size_t bubble_down(struct ccc_fpq *, char tmp[const], size_t);
 static size_t update_fixup(struct ccc_fpq *, void *e);
 static void inplace_heapify(struct ccc_fpq *fpq, size_t n);
 
@@ -158,25 +158,23 @@ ccc_fpq_erase(ccc_flat_priority_queue *const fpq, void *const e)
     }
     /* Important to remember this key now to avoid confusion later once the
        elements are swapped and we lose access to original handle index. */
-    size_t const swap_location = index_of(fpq, e);
-    if (swap_location == fpq->buf.count - 1)
+    size_t const i = index_of(fpq, e);
+    if (i == fpq->buf.count - 1)
     {
         (void)ccc_buf_pop_back(&fpq->buf);
         return CCC_RESULT_OK;
     }
     void *const tmp = ccc_buf_at(&fpq->buf, fpq->buf.count);
-    swap(fpq, tmp, swap_location, fpq->buf.count - 1);
-    void *const erased = at(fpq, fpq->buf.count - 1);
+    swap(fpq, tmp, i, fpq->buf.count - 1);
+    ccc_threeway_cmp const cmp_res = cmp(fpq, i, fpq->buf.count - 1);
     (void)ccc_buf_pop_back(&fpq->buf);
-    ccc_threeway_cmp const erased_cmp = fpq->cmp(
-        (ccc_any_type_cmp){at(fpq, swap_location), erased, fpq->buf.aux});
-    if (erased_cmp == fpq->order)
+    if (cmp_res == fpq->order)
     {
-        (void)bubble_up(fpq, tmp, swap_location);
+        (void)bubble_up(fpq, tmp, i);
     }
-    else if (erased_cmp != CCC_EQL)
+    else if (cmp_res != CCC_EQL)
     {
-        (void)bubble_down(fpq, tmp, swap_location);
+        (void)bubble_down(fpq, tmp, i);
     }
     /* If the comparison is equal do nothing. Element is in right spot. */
     return CCC_RESULT_OK;
@@ -190,7 +188,10 @@ ccc_fpq_update(ccc_flat_priority_queue *const fpq, void *const e,
     {
         return NULL;
     }
-    fn((ccc_any_type){e, aux});
+    fn((ccc_any_type){
+        .any_type = e,
+        .aux = aux,
+    });
     return ccc_buf_at(&fpq->buf, update_fixup(fpq, e));
 }
 
@@ -334,7 +335,10 @@ ccc_fpq_clear(ccc_flat_priority_queue *const fpq,
         size_t const count = fpq->buf.count;
         for (size_t i = 0; i < count; ++i)
         {
-            fn((ccc_any_type){.any_type = at(fpq, i), .aux = fpq->buf.aux});
+            fn((ccc_any_type){
+                .any_type = at(fpq, i),
+                .aux = fpq->buf.aux,
+            });
         }
     }
     return ccc_buf_size_set(&fpq->buf, 0);
@@ -353,7 +357,10 @@ ccc_fpq_clear_and_free(ccc_flat_priority_queue *const fpq,
         size_t const count = fpq->buf.count;
         for (size_t i = 0; i < count; ++i)
         {
-            fn((ccc_any_type){.any_type = at(fpq, i), .aux = fpq->buf.aux});
+            fn((ccc_any_type){
+                .any_type = at(fpq, i),
+                .aux = fpq->buf.aux,
+            });
         }
     }
     return ccc_buf_alloc(&fpq->buf, 0, fpq->buf.alloc);
@@ -373,8 +380,10 @@ ccc_fpq_clear_and_free_reserve(ccc_flat_priority_queue *const fpq,
         size_t const count = fpq->buf.count;
         for (size_t i = 0; i < count; ++i)
         {
-            destructor(
-                (ccc_any_type){.any_type = at(fpq, i), .aux = fpq->buf.aux});
+            destructor((ccc_any_type){
+                .any_type = at(fpq, i),
+                .aux = fpq->buf.aux,
+            });
         }
     }
     return ccc_buf_alloc(&fpq->buf, 0, alloc);
@@ -395,16 +404,15 @@ ccc_fpq_validate(ccc_flat_priority_queue const *const fpq)
     for (size_t i = 0, left = (i * 2) + 1, right = (i * 2) + 2;
          i <= (count - 2) / 2; ++i, left = (i * 2) + 1, right = (i * 2) + 2)
     {
-        void *const cur = at(fpq, i);
         /* Putting the child in the comparison function first evaluates
            the child's three way comparison in relation to the parent. If
            the child beats the parent in total ordering (min/max) something
            has gone wrong. */
-        if (left < count && wins(fpq, at(fpq, left), cur))
+        if (left < count && wins(fpq, left, i))
         {
             return CCC_FALSE;
         }
-        if (right < count && wins(fpq, at(fpq, right), cur))
+        if (right < count && wins(fpq, right, i))
         {
             return CCC_FALSE;
         }
@@ -459,8 +467,7 @@ update_fixup(struct ccc_fpq *const fpq, void *const e)
     {
         return bubble_down(fpq, tmp, 0);
     }
-    ccc_threeway_cmp const parent_cmp = fpq->cmp(
-        (ccc_any_type_cmp){at(fpq, i), at(fpq, (i - 1) / 2), fpq->buf.aux});
+    ccc_threeway_cmp const parent_cmp = cmp(fpq, i, (i - 1) / 2);
     if (parent_cmp == fpq->order)
     {
         return bubble_up(fpq, tmp, i);
@@ -480,7 +487,7 @@ bubble_up(struct ccc_fpq *const fpq, char tmp[const], size_t i)
     for (size_t parent = (i - 1) / 2; i; i = parent, parent = (parent - 1) / 2)
     {
         /* Not winning here means we are in correct order or equal. */
-        if (!wins(fpq, at(fpq, i), at(fpq, parent)))
+        if (!wins(fpq, i, parent))
         {
             return i;
         }
@@ -498,11 +505,9 @@ bubble_down(struct ccc_fpq *const fpq, char tmp[const], size_t i)
          i = next, left = (i * 2) + 1, right = left + 1)
     {
         /* Avoid one comparison call if there is no right child. */
-        next = (right < count && wins(fpq, at(fpq, right), at(fpq, left)))
-                   ? right
-                   : left;
+        next = (right < count && wins(fpq, right, left)) ? right : left;
         /* If the child beats the parent we must swap. Equal is ok to break. */
-        if (!wins(fpq, at(fpq, next), at(fpq, i)))
+        if (!wins(fpq, next, i))
         {
             return i;
         }
@@ -537,9 +542,8 @@ static inline size_t
 index_of(struct ccc_fpq const *const fpq, void const *const slot)
 {
     assert(slot >= ccc_buf_begin(&fpq->buf));
-    size_t const i
-        = (size_t)((((char *)slot) - ((char *)ccc_buf_begin(&fpq->buf)))
-                   / fpq->buf.sizeof_type);
+    size_t const i = ((((char *)slot) - ((char *)ccc_buf_begin(&fpq->buf)))
+                      / fpq->buf.sizeof_type);
     assert(i < fpq->buf.count);
     return i;
 }
@@ -550,9 +554,22 @@ index_of(struct ccc_fpq const *const fpq, void const *const slot)
    function would return false. If the winner is in the wrong order, thus
    losing the total order comparison, the function also returns false. */
 static inline ccc_tribool
-wins(struct ccc_fpq const *const fpq, void const *const winner,
-     void const *const loser)
+wins(struct ccc_fpq const *const fpq, size_t const winner, size_t const loser)
 {
-    return fpq->cmp((ccc_any_type_cmp){winner, loser, fpq->buf.aux})
+    return fpq->cmp((ccc_any_type_cmp){
+               .any_type_lhs = at(fpq, winner),
+               .any_type_rhs = at(fpq, loser),
+               .aux = fpq->buf.aux,
+           })
            == fpq->order;
+}
+
+static inline ccc_threeway_cmp
+cmp(struct ccc_fpq const *const fpq, size_t lhs, size_t rhs)
+{
+    return fpq->cmp((ccc_any_type_cmp){
+        .any_type_lhs = at(fpq, lhs),
+        .any_type_rhs = at(fpq, rhs),
+        .aux = fpq->buf.aux,
+    });
 }

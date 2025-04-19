@@ -218,14 +218,23 @@ ccc_hrm_swap_handle(ccc_handle_realtime_ordered_map *const hrm,
         void *const tmp = ccc_buf_at(&hrm->buf, 0);
         swap(tmp, any_struct, slot, hrm->buf.sizeof_type);
         elem_in_slot(hrm, tmp)->parity = 1;
-        return (ccc_handle){{.i = q.found, .stats = CCC_ENTRY_OCCUPIED}};
+        return (ccc_handle){{
+            .i = q.found,
+            .stats = CCC_ENTRY_OCCUPIED,
+        }};
     }
     size_t const i = maybe_alloc_insert(hrm, q.parent, q.last_cmp, out_handle);
     if (!i)
     {
-        return (ccc_handle){{.i = 0, .stats = CCC_ENTRY_INSERT_ERROR}};
+        return (ccc_handle){{
+            .i = 0,
+            .stats = CCC_ENTRY_INSERT_ERROR,
+        }};
     }
-    return (ccc_handle){{.i = i, .stats = CCC_ENTRY_VACANT}};
+    return (ccc_handle){{
+        .i = i,
+        .stats = CCC_ENTRY_VACANT,
+    }};
 }
 
 ccc_handle
@@ -239,15 +248,24 @@ ccc_hrm_try_insert(ccc_handle_realtime_ordered_map *const hrm,
     struct hrm_query const q = find(hrm, key_from_node(hrm, key_val_handle));
     if (CCC_EQL == q.last_cmp)
     {
-        return (ccc_handle){{.i = q.found, .stats = CCC_ENTRY_OCCUPIED}};
+        return (ccc_handle){{
+            .i = q.found,
+            .stats = CCC_ENTRY_OCCUPIED,
+        }};
     }
     size_t const i
         = maybe_alloc_insert(hrm, q.parent, q.last_cmp, key_val_handle);
     if (!i)
     {
-        return (ccc_handle){{.i = 0, .stats = CCC_ENTRY_INSERT_ERROR}};
+        return (ccc_handle){{
+            .i = 0,
+            .stats = CCC_ENTRY_INSERT_ERROR,
+        }};
     }
-    return (ccc_handle){{.i = i, .stats = CCC_ENTRY_VACANT}};
+    return (ccc_handle){{
+        .i = i,
+        .stats = CCC_ENTRY_VACANT,
+    }};
 }
 
 ccc_handle
@@ -265,15 +283,24 @@ ccc_hrm_insert_or_assign(ccc_handle_realtime_ordered_map *const hrm,
         *key_val_handle = *elem_in_slot(hrm, found);
         (void)ccc_buf_write(&hrm->buf, q.found,
                             struct_base(hrm, key_val_handle));
-        return (ccc_handle){{.i = q.found, .stats = CCC_ENTRY_OCCUPIED}};
+        return (ccc_handle){{
+            .i = q.found,
+            .stats = CCC_ENTRY_OCCUPIED,
+        }};
     }
     size_t const i
         = maybe_alloc_insert(hrm, q.parent, q.last_cmp, key_val_handle);
     if (!i)
     {
-        return (ccc_handle){{.i = 0, .stats = CCC_ENTRY_INSERT_ERROR}};
+        return (ccc_handle){{
+            .i = 0,
+            .stats = CCC_ENTRY_INSERT_ERROR,
+        }};
     }
-    return (ccc_handle){{.i = i, .stats = CCC_ENTRY_VACANT}};
+    return (ccc_handle){{
+        .i = i,
+        .stats = CCC_ENTRY_VACANT,
+    }};
 }
 
 ccc_hromap_handle *
@@ -282,8 +309,10 @@ ccc_hrm_and_modify(ccc_hromap_handle *const h, ccc_any_type_update_fn *const fn)
     if (h && fn && h->impl.handle.stats & CCC_ENTRY_OCCUPIED
         && h->impl.handle.i > 0)
     {
-        fn((ccc_any_type){.any_type = base_at(h->impl.hrm, h->impl.handle.i),
-                          NULL});
+        fn((ccc_any_type){
+            .any_type = base_at(h->impl.hrm, h->impl.handle.i),
+            NULL,
+        });
     }
     return h;
 }
@@ -295,8 +324,10 @@ ccc_hrm_and_modify_aux(ccc_hromap_handle *const h,
     if (h && fn && h->impl.handle.stats & CCC_ENTRY_OCCUPIED
         && h->impl.handle.stats > 0)
     {
-        fn((ccc_any_type){.any_type = base_at(h->impl.hrm, h->impl.handle.i),
-                          aux});
+        fn((ccc_any_type){
+            .any_type = base_at(h->impl.hrm, h->impl.handle.i),
+            aux,
+        });
     }
     return h;
 }
@@ -360,9 +391,15 @@ ccc_hrm_remove_handle(ccc_hromap_handle const *const h)
     if (h->impl.handle.stats == CCC_ENTRY_OCCUPIED)
     {
         size_t const ret = remove_fixup(h->impl.hrm, h->impl.handle.i);
-        return (ccc_handle){{.i = ret, .stats = CCC_ENTRY_OCCUPIED}};
+        return (ccc_handle){{
+            .i = ret,
+            .stats = CCC_ENTRY_OCCUPIED,
+        }};
     }
-    return (ccc_handle){{.i = 0, .stats = CCC_ENTRY_VACANT}};
+    return (ccc_handle){{
+        .i = 0,
+        .stats = CCC_ENTRY_VACANT,
+    }};
 }
 
 ccc_handle
@@ -376,7 +413,10 @@ ccc_hrm_remove(ccc_handle_realtime_ordered_map *const hrm,
     struct hrm_query const q = find(hrm, key_from_node(hrm, out_handle));
     if (q.last_cmp != CCC_EQL)
     {
-        return (ccc_handle){{.i = 0, .stats = CCC_ENTRY_VACANT}};
+        return (ccc_handle){{
+            .i = 0,
+            .stats = CCC_ENTRY_VACANT,
+        }};
     }
     size_t const removed = remove_fixup(hrm, q.found);
     assert(removed);
@@ -386,7 +426,10 @@ ccc_hrm_remove(ccc_handle_realtime_ordered_map *const hrm,
     {
         (void)memcpy(any_struct, r, hrm->buf.sizeof_type);
     }
-    return (ccc_handle){{.i = 0, .stats = CCC_ENTRY_OCCUPIED}};
+    return (ccc_handle){{
+        .i = 0,
+        .stats = CCC_ENTRY_OCCUPIED,
+    }};
 }
 
 ccc_range
@@ -409,7 +452,8 @@ ccc_hrm_equal_rrange(ccc_handle_realtime_ordered_map const *const hrm,
         return (ccc_rrange){};
     }
     return (ccc_rrange){
-        equal_range(hrm, rbegin_key, rend_key, REVERSE_INORDER_TRAVERSAL)};
+        equal_range(hrm, rbegin_key, rend_key, REVERSE_INORDER_TRAVERSAL),
+    };
 }
 
 ccc_handle_i
@@ -660,8 +704,10 @@ ccc_hrm_clear(ccc_handle_realtime_ordered_map *const hrm,
     {
         size_t const i = remove_fixup(hrm, hrm->root);
         assert(i);
-        fn((ccc_any_type){.any_type = ccc_buf_at(&hrm->buf, i),
-                          .aux = hrm->buf.aux});
+        fn((ccc_any_type){
+            .any_type = ccc_buf_at(&hrm->buf, i),
+            .aux = hrm->buf.aux,
+        });
     }
     (void)ccc_buf_size_set(&hrm->buf, 1);
     hrm->root = 0;
@@ -685,8 +731,10 @@ ccc_hrm_clear_and_free(ccc_handle_realtime_ordered_map *const hrm,
     {
         size_t const i = remove_fixup(hrm, hrm->root);
         assert(i);
-        fn((ccc_any_type){.any_type = ccc_buf_at(&hrm->buf, i),
-                          .aux = hrm->buf.aux});
+        fn((ccc_any_type){
+            .any_type = ccc_buf_at(&hrm->buf, i),
+            .aux = hrm->buf.aux,
+        });
     }
     hrm->root = 0;
     return ccc_buf_alloc(&hrm->buf, 0, hrm->buf.alloc);
@@ -710,8 +758,10 @@ ccc_hrm_clear_and_free_reserve(ccc_handle_realtime_ordered_map *const hrm,
     {
         size_t const i = remove_fixup(hrm, hrm->root);
         assert(i);
-        destructor((ccc_any_type){.any_type = ccc_buf_at(&hrm->buf, i),
-                                  .aux = hrm->buf.aux});
+        destructor((ccc_any_type){
+            .any_type = ccc_buf_at(&hrm->buf, i),
+            .aux = hrm->buf.aux,
+        });
     }
     hrm->root = 0;
     return ccc_buf_alloc(&hrm->buf, 0, alloc);
@@ -1509,14 +1559,17 @@ are_subtrees_valid(struct ccc_hromap const *t, struct tree_range const r)
     {
         return CCC_FALSE;
     }
-    return are_subtrees_valid(
-               t, (struct tree_range){.low = r.low,
-                                      .root = branch_i(t, r.root, L),
-                                      .high = r.root})
-           && are_subtrees_valid(
-               t, (struct tree_range){.low = r.root,
-                                      .root = branch_i(t, r.root, R),
-                                      .high = r.high});
+    return are_subtrees_valid(t,
+                              (struct tree_range){
+                                  .low = r.low,
+                                  .root = branch_i(t, r.root, L),
+                                  .high = r.root,
+                              })
+           && are_subtrees_valid(t, (struct tree_range){
+                                        .low = r.root,
+                                        .root = branch_i(t, r.root, R),
+                                        .high = r.high,
+                                    });
 }
 
 static ccc_tribool

@@ -188,13 +188,13 @@ ccc_entry_status_msg(ccc_entry_status const status)
         return "occupied and non-NULL";
         break;
     case CCC_ENTRY_INSERT_ERROR:
-        return "insert error has or will occur when insert is attempted";
+        return "insert error has occurred or will occur on insert attempted";
         break;
     case CCC_ENTRY_ARG_ERROR:
-        return "could not proceed due to bad input to function";
+        return "could not proceed due to bad arguments to a function";
         break;
     case CCC_ENTRY_NO_UNWRAP:
-        return "unwrap denied in order to protect container";
+        return "unwrap prohibited in order to protect container";
         break;
     default:
         return "error: encountered an unknown combination of flags";

@@ -202,13 +202,22 @@ ccc_rom_swap_entry(ccc_realtime_ordered_map *const rom,
         key_val_handle->branch[L] = key_val_handle->branch[R]
             = key_val_handle->parent = NULL;
         tmp->branch[L] = tmp->branch[R] = tmp->parent = NULL;
-        return (ccc_entry){{.e = old_val, .stats = CCC_ENTRY_OCCUPIED}};
+        return (ccc_entry){{
+            .e = old_val,
+            .stats = CCC_ENTRY_OCCUPIED,
+        }};
     }
     if (!maybe_alloc_insert(rom, q.parent, q.last_cmp, key_val_handle))
     {
-        return (ccc_entry){{.e = NULL, .stats = CCC_ENTRY_INSERT_ERROR}};
+        return (ccc_entry){{
+            .e = NULL,
+            .stats = CCC_ENTRY_INSERT_ERROR,
+        }};
     }
-    return (ccc_entry){{.e = NULL, .stats = CCC_ENTRY_VACANT}};
+    return (ccc_entry){{
+        .e = NULL,
+        .stats = CCC_ENTRY_VACANT,
+    }};
 }
 
 ccc_entry
@@ -222,16 +231,24 @@ ccc_rom_try_insert(ccc_realtime_ordered_map *const rom,
     struct romap_query const q = find(rom, key_from_node(rom, key_val_handle));
     if (CCC_EQL == q.last_cmp)
     {
-        return (ccc_entry){
-            {.e = struct_base(rom, q.found), .stats = CCC_ENTRY_OCCUPIED}};
+        return (ccc_entry){{
+            .e = struct_base(rom, q.found),
+            .stats = CCC_ENTRY_OCCUPIED,
+        }};
     }
     void *const inserted
         = maybe_alloc_insert(rom, q.parent, q.last_cmp, key_val_handle);
     if (!inserted)
     {
-        return (ccc_entry){{.e = NULL, .stats = CCC_ENTRY_INSERT_ERROR}};
+        return (ccc_entry){{
+            .e = NULL,
+            .stats = CCC_ENTRY_INSERT_ERROR,
+        }};
     }
-    return (ccc_entry){{.e = inserted, .stats = CCC_ENTRY_VACANT}};
+    return (ccc_entry){{
+        .e = inserted,
+        .stats = CCC_ENTRY_VACANT,
+    }};
 }
 
 ccc_entry
@@ -248,15 +265,24 @@ ccc_rom_insert_or_assign(ccc_realtime_ordered_map *const rom,
         void *const found = struct_base(rom, q.found);
         *key_val_handle = *elem_in_slot(rom, found);
         memcpy(found, struct_base(rom, key_val_handle), rom->sizeof_type);
-        return (ccc_entry){{.e = found, .stats = CCC_ENTRY_OCCUPIED}};
+        return (ccc_entry){{
+            .e = found,
+            .stats = CCC_ENTRY_OCCUPIED,
+        }};
     }
     void *const inserted
         = maybe_alloc_insert(rom, q.parent, q.last_cmp, key_val_handle);
     if (!inserted)
     {
-        return (ccc_entry){{.e = NULL, .stats = CCC_ENTRY_INSERT_ERROR}};
+        return (ccc_entry){{
+            .e = NULL,
+            .stats = CCC_ENTRY_INSERT_ERROR,
+        }};
     }
-    return (ccc_entry){{.e = inserted, .stats = CCC_ENTRY_VACANT}};
+    return (ccc_entry){{
+        .e = inserted,
+        .stats = CCC_ENTRY_VACANT,
+    }};
 }
 
 ccc_romap_entry
@@ -319,11 +345,20 @@ ccc_rom_remove_entry(ccc_romap_entry const *const e)
         if (e->impl.rom->alloc)
         {
             e->impl.rom->alloc(erased, 0, e->impl.rom->aux);
-            return (ccc_entry){{.e = NULL, .stats = CCC_ENTRY_OCCUPIED}};
+            return (ccc_entry){{
+                .e = NULL,
+                .stats = CCC_ENTRY_OCCUPIED,
+            }};
         }
-        return (ccc_entry){{.e = erased, .stats = CCC_ENTRY_OCCUPIED}};
+        return (ccc_entry){{
+            .e = erased,
+            .stats = CCC_ENTRY_OCCUPIED,
+        }};
     }
-    return (ccc_entry){{.e = NULL, .stats = CCC_ENTRY_VACANT}};
+    return (ccc_entry){{
+        .e = NULL,
+        .stats = CCC_ENTRY_VACANT,
+    }};
 }
 
 ccc_entry
@@ -337,7 +372,10 @@ ccc_rom_remove(ccc_realtime_ordered_map *const rom,
     struct romap_query const q = find(rom, key_from_node(rom, out_handle));
     if (q.last_cmp != CCC_EQL)
     {
-        return (ccc_entry){{.e = NULL, .stats = CCC_ENTRY_VACANT}};
+        return (ccc_entry){{
+            .e = NULL,
+            .stats = CCC_ENTRY_VACANT,
+        }};
     }
     void *const removed = remove_fixup(rom, q.found);
     if (rom->alloc)
@@ -345,9 +383,15 @@ ccc_rom_remove(ccc_realtime_ordered_map *const rom,
         void *const any_struct = struct_base(rom, out_handle);
         memcpy(any_struct, removed, rom->sizeof_type);
         rom->alloc(removed, 0, rom->aux);
-        return (ccc_entry){{.e = any_struct, .stats = CCC_ENTRY_OCCUPIED}};
+        return (ccc_entry){{
+            .e = any_struct,
+            .stats = CCC_ENTRY_OCCUPIED,
+        }};
     }
-    return (ccc_entry){{.e = removed, .stats = CCC_ENTRY_OCCUPIED}};
+    return (ccc_entry){{
+        .e = removed,
+        .stats = CCC_ENTRY_OCCUPIED,
+    }};
 }
 
 ccc_romap_entry *
@@ -359,7 +403,10 @@ ccc_rom_and_modify(ccc_romap_entry *e, ccc_any_type_update_fn *fn)
     }
     if (fn && e->impl.entry.stats & CCC_ENTRY_OCCUPIED && e->impl.entry.e)
     {
-        fn((ccc_any_type){.any_type = e->impl.entry.e, NULL});
+        fn((ccc_any_type){
+            .any_type = e->impl.entry.e,
+            NULL,
+        });
     }
     return e;
 }
@@ -374,7 +421,10 @@ ccc_rom_and_modify_aux(ccc_romap_entry *e, ccc_any_type_update_fn *fn,
     }
     if (fn && e->impl.entry.stats & CCC_ENTRY_OCCUPIED && e->impl.entry.e)
     {
-        fn((ccc_any_type){.any_type = e->impl.entry.e, aux});
+        fn((ccc_any_type){
+            .any_type = e->impl.entry.e,
+            aux,
+        });
     }
     return e;
 }
@@ -498,7 +548,8 @@ ccc_rom_equal_rrange(ccc_realtime_ordered_map const *const rom,
         return (ccc_rrange){};
     }
     return (ccc_rrange){
-        equal_range(rom, rbegin_key, rend_key, REVERSE_INORDER_TRAVERSAL)};
+        equal_range(rom, rbegin_key, rend_key, REVERSE_INORDER_TRAVERSAL),
+    };
 }
 
 ccc_ucount
@@ -548,7 +599,10 @@ ccc_rom_clear(ccc_realtime_ordered_map *const rom,
         void *const deleted = remove_fixup(rom, rom->root);
         if (destructor)
         {
-            destructor((ccc_any_type){.any_type = deleted, .aux = rom->aux});
+            destructor((ccc_any_type){
+                .any_type = deleted,
+                .aux = rom->aux,
+            });
         }
         if (rom->alloc)
         {
@@ -676,7 +730,10 @@ static struct romap_query
 find(struct ccc_romap const *const rom, void const *const key)
 {
     struct ccc_romap_elem const *parent = &rom->end;
-    struct romap_query q = {.last_cmp = CCC_CMP_ERROR, .found = rom->root};
+    struct romap_query q = {
+        .last_cmp = CCC_CMP_ERROR,
+        .found = rom->root,
+    };
     for (; q.found != &rom->end;
          parent = q.found, q.found = q.found->branch[CCC_GRT == q.last_cmp])
     {

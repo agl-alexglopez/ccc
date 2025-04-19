@@ -342,7 +342,8 @@ ccc_buf_i(ccc_buffer const *const buf, void const *const slot)
         return (ccc_ucount){.error = CCC_RESULT_ARG_ERROR};
     }
     return (ccc_ucount){
-        .count = (((char *)slot - ((char *)buf->mem)) / buf->sizeof_type)};
+        .count = (((char *)slot - ((char *)buf->mem)) / buf->sizeof_type),
+    };
 }
 
 ccc_result

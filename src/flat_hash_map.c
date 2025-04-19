@@ -1410,8 +1410,9 @@ data_i(struct ccc_fhmap const *const h, void const *const data_slot)
     {
         return (ccc_ucount){.error = CCC_RESULT_ARG_ERROR};
     }
-    return (ccc_ucount){.count = ((char *)h->tag - (char *)data_slot)
-                                 / h->sizeof_type};
+    return (ccc_ucount){
+        .count = ((char *)h->tag - (char *)data_slot) / h->sizeof_type,
+    };
 }
 
 static inline void *

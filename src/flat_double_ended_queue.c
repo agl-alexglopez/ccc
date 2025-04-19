@@ -370,8 +370,10 @@ ccc_fdeq_clear(ccc_flat_double_ended_queue *const fdeq,
     size_t const back = back_free_slot(fdeq);
     for (size_t i = fdeq->front; i != back; i = increment(fdeq, i))
     {
-        destructor((ccc_any_type){.any_type = ccc_buf_at(&fdeq->buf, i),
-                                  .aux = fdeq->buf.aux});
+        destructor((ccc_any_type){
+            .any_type = ccc_buf_at(&fdeq->buf, i),
+            .aux = fdeq->buf.aux,
+        });
     }
     return CCC_RESULT_OK;
 }
@@ -392,8 +394,10 @@ ccc_fdeq_clear_and_free(ccc_flat_double_ended_queue *const fdeq,
     size_t const back = back_free_slot(fdeq);
     for (size_t i = fdeq->front; i != back; i = increment(fdeq, i))
     {
-        destructor((ccc_any_type){.any_type = ccc_buf_at(&fdeq->buf, i),
-                                  .aux = fdeq->buf.aux});
+        destructor((ccc_any_type){
+            .any_type = ccc_buf_at(&fdeq->buf, i),
+            .aux = fdeq->buf.aux,
+        });
     }
     ccc_result const r = ccc_buf_alloc(&fdeq->buf, 0, fdeq->buf.alloc);
     if (r == CCC_RESULT_OK)
@@ -420,8 +424,10 @@ ccc_fdeq_clear_and_free_reserve(ccc_flat_double_ended_queue *const fdeq,
     size_t const back = back_free_slot(fdeq);
     for (size_t i = fdeq->front; i != back; i = increment(fdeq, i))
     {
-        destructor((ccc_any_type){.any_type = ccc_buf_at(&fdeq->buf, i),
-                                  .aux = fdeq->buf.aux});
+        destructor((ccc_any_type){
+            .any_type = ccc_buf_at(&fdeq->buf, i),
+            .aux = fdeq->buf.aux,
+        });
     }
     ccc_result const r = ccc_buf_alloc(&fdeq->buf, 0, alloc);
     if (r == CCC_RESULT_OK)

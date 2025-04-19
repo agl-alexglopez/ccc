@@ -241,7 +241,10 @@ ccc_omm_swap_entry(ccc_ordered_multimap *const mm,
         void *const mem = mm->alloc(NULL, mm->sizeof_type, mm->aux);
         if (!mem)
         {
-            return (ccc_entry){{.e = NULL, .stats = CCC_ENTRY_INSERT_ERROR}};
+            return (ccc_entry){{
+                .e = NULL,
+                .stats = CCC_ENTRY_INSERT_ERROR,
+            }};
         }
         (void)memcpy(mem, struct_base(mm, key_val_handle), mm->sizeof_type);
         n = elem_in_slot(mm, mem);
@@ -255,13 +258,19 @@ ccc_omm_try_insert(ccc_ordered_multimap *const mm,
 {
     if (!mm || !key_val_handle)
     {
-        return (ccc_entry){{.e = NULL, .stats = CCC_ENTRY_ARG_ERROR}};
+        return (ccc_entry){{
+            .e = NULL,
+            .stats = CCC_ENTRY_ARG_ERROR,
+        }};
     }
     void const *const key = key_from_node(mm, key_val_handle);
     void *const found = find(mm, key);
     if (found)
     {
-        return (ccc_entry){{.e = found, .stats = CCC_ENTRY_OCCUPIED}};
+        return (ccc_entry){{
+            .e = found,
+            .stats = CCC_ENTRY_OCCUPIED,
+        }};
     }
     return (ccc_entry){multimap_insert(mm, key_val_handle)};
 }
@@ -272,7 +281,10 @@ ccc_omm_insert_or_assign(ccc_ordered_multimap *const mm,
 {
     if (!mm || !key_val_handle)
     {
-        return (ccc_entry){{.e = NULL, .stats = CCC_ENTRY_ARG_ERROR}};
+        return (ccc_entry){{
+            .e = NULL,
+            .stats = CCC_ENTRY_ARG_ERROR,
+        }};
     }
     void *const found = find(mm, key_from_node(mm, key_val_handle));
     if (found)
@@ -280,7 +292,10 @@ ccc_omm_insert_or_assign(ccc_ordered_multimap *const mm,
         *key_val_handle = *elem_in_slot(mm, found);
         assert(mm->root != &mm->end);
         memcpy(found, struct_base(mm, key_val_handle), mm->sizeof_type);
-        return (ccc_entry){{.e = found, .stats = CCC_ENTRY_OCCUPIED}};
+        return (ccc_entry){{
+            .e = found,
+            .stats = CCC_ENTRY_OCCUPIED,
+        }};
     }
     return (ccc_entry){multimap_insert(mm, key_val_handle)};
 }
@@ -291,21 +306,33 @@ ccc_omm_remove(ccc_ordered_multimap *const mm, ccc_ommap_elem *const out_handle)
 
     if (!mm || !out_handle)
     {
-        return (ccc_entry){{.e = NULL, .stats = CCC_ENTRY_ARG_ERROR}};
+        return (ccc_entry){{
+            .e = NULL,
+            .stats = CCC_ENTRY_ARG_ERROR,
+        }};
     }
     void *const n = multimap_erase(mm, key_from_node(mm, out_handle));
     if (!n)
     {
-        return (ccc_entry){{.e = NULL, .stats = CCC_ENTRY_VACANT}};
+        return (ccc_entry){{
+            .e = NULL,
+            .stats = CCC_ENTRY_VACANT,
+        }};
     }
     if (mm->alloc)
     {
         void *const any_struct = struct_base(mm, out_handle);
         memcpy(any_struct, n, mm->sizeof_type);
         mm->alloc(n, 0, mm->aux);
-        return (ccc_entry){{.e = any_struct, .stats = CCC_ENTRY_OCCUPIED}};
+        return (ccc_entry){{
+            .e = any_struct,
+            .stats = CCC_ENTRY_OCCUPIED,
+        }};
     }
-    return (ccc_entry){{.e = n, .stats = CCC_ENTRY_OCCUPIED}};
+    return (ccc_entry){{
+        .e = n,
+        .stats = CCC_ENTRY_OCCUPIED,
+    }};
 }
 
 ccc_entry
@@ -313,7 +340,10 @@ ccc_omm_remove_entry(ccc_ommap_entry *const e)
 {
     if (!e)
     {
-        return (ccc_entry){{.e = NULL, .stats = CCC_ENTRY_ARG_ERROR}};
+        return (ccc_entry){{
+            .e = NULL,
+            .stats = CCC_ENTRY_ARG_ERROR,
+        }};
     }
     if (e->impl.entry.stats == CCC_ENTRY_OCCUPIED && e->impl.entry.e)
     {
@@ -323,11 +353,20 @@ ccc_omm_remove_entry(ccc_ommap_entry *const e)
         if (e->impl.t->alloc)
         {
             e->impl.t->alloc(erased, 0, e->impl.t->aux);
-            return (ccc_entry){{.e = NULL, .stats = CCC_ENTRY_OCCUPIED}};
+            return (ccc_entry){{
+                .e = NULL,
+                .stats = CCC_ENTRY_OCCUPIED,
+            }};
         }
-        return (ccc_entry){{.e = erased, .stats = CCC_ENTRY_OCCUPIED}};
+        return (ccc_entry){{
+            .e = erased,
+            .stats = CCC_ENTRY_OCCUPIED,
+        }};
     }
-    return (ccc_entry){{.e = NULL, .stats = CCC_ENTRY_VACANT}};
+    return (ccc_entry){{
+        .e = NULL,
+        .stats = CCC_ENTRY_VACANT,
+    }};
 }
 
 void *
@@ -470,7 +509,10 @@ ccc_omm_update(ccc_ordered_multimap *const mm,
     {
         return CCC_FALSE;
     }
-    fn((ccc_any_type){e, aux});
+    fn((ccc_any_type){
+        e,
+        aux,
+    });
     (void)multimap_insert(mm, key_val_handle);
     return CCC_TRUE;
 }
@@ -614,7 +656,10 @@ ccc_omm_clear(ccc_ordered_multimap *const mm,
         void *const popped = pop_min(mm);
         if (destructor)
         {
-            destructor((ccc_any_type){.any_type = popped, .aux = mm->aux});
+            destructor((ccc_any_type){
+                .any_type = popped,
+                .aux = mm->aux,
+            });
         }
         if (mm->alloc)
         {
@@ -662,10 +707,20 @@ container_entry(struct ccc_ommap *const t, void const *const key)
     if (found)
     {
         return (struct ccc_omultimap_entry){
-            .t = t, .entry = {.e = found, .stats = CCC_ENTRY_OCCUPIED}};
+            .t = t,
+            .entry = {
+                .e = found,
+                .stats = CCC_ENTRY_OCCUPIED,
+            },
+        };
     }
     return (struct ccc_omultimap_entry){
-        .t = t, .entry = {.e = NULL, .stats = CCC_ENTRY_VACANT}};
+        .t = t,
+        .entry = {
+            .e = NULL,
+            .stats = CCC_ENTRY_VACANT,
+        },
+    };
 }
 
 static void *
