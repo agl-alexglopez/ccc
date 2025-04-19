@@ -8,6 +8,16 @@ Point the executable at the tests as follows:
 
 .build/[path to]/run_tests tests/
 
+The much easier way is to run the Makefile command:
+
+In debug mode:
+
+make dtest
+
+In release mode:
+
+make rtest
+
 The path will be different to the run_tests executable depending on the build
 being build/debug/bin or build/bin.
 
