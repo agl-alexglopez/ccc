@@ -2,8 +2,8 @@ var singly__linked__list_8h =
 [
     [ "ccc_sll_emplace_front", "singly__linked__list_8h.html#a9002202a3809db1cf28ab47146f5cb3a", null ],
     [ "ccc_sll_init", "singly__linked__list_8h.html#a8174fe3f20bc2352f7b7eff866f6fd96", null ],
-    [ "ccc_singly_linked_list", "singly__linked__list_8h.html#a900d4f0c536208547abfbc1e79e74fbf", null ],
-    [ "ccc_sll_elem", "singly__linked__list_8h.html#adfeb9ade999c0c98572b636601a72bb9", null ],
+    [ "ccc_singly_linked_list", "singly__linked__list_8h.html#ae76c86dea3ed2d9344bdb9068e8562ea", null ],
+    [ "ccc_sll_elem", "singly__linked__list_8h.html#af627fd1c96ccfbe9128278506b536541", null ],
     [ "ccc_sll_begin", "singly__linked__list_8h.html#abe30c1573bc55030386e62844f8ae74e", null ],
     [ "ccc_sll_begin_elem", "singly__linked__list_8h.html#a96a2fa2efc460be38875c7893b1416e2", null ],
     [ "ccc_sll_begin_sentinel", "singly__linked__list_8h.html#a8a3332d20b463538ad83abc752858a37", null ],

@@ -131,211 +131,211 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memitem:a98aee1dcbd78e1eb644babc2d3c629e4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a98aee1dcbd78e1eb644babc2d3c629e4">ccc_bs_init</a>(bitblock_ptr,  alloc_fn,  aux,  cap,  optional_size...)&#160;&#160;&#160;    ccc_impl_bs_init(bitblock_ptr, alloc_fn, aux, cap, optional_size)</td></tr>
 <tr class="memdesc:a98aee1dcbd78e1eb644babc2d3c629e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the bit set with memory and allocation permissions.  <br /></td></tr>
 <tr class="separator:a98aee1dcbd78e1eb644babc2d3c629e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9f42bf8a5dcb20b35ba23d80be0be324"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a9f42bf8a5dcb20b35ba23d80be0be324">ccc_bs_copy</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> *dst, <a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *src, <a class="el" href="types_8h.html#a3e73202894869d2840fb21ff912bbd96">ccc_any_alloc_fn</a> *fn)</td></tr>
+<tr class="memitem:a9f42bf8a5dcb20b35ba23d80be0be324"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a9f42bf8a5dcb20b35ba23d80be0be324">ccc_bs_copy</a> (ccc_bitset *dst, ccc_bitset const *src, <a class="el" href="types_8h.html#a3e73202894869d2840fb21ff912bbd96">ccc_any_alloc_fn</a> *fn)</td></tr>
 <tr class="memdesc:a9f42bf8a5dcb20b35ba23d80be0be324"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy the bit set at source to destination.  <br /></td></tr>
 <tr class="separator:a9f42bf8a5dcb20b35ba23d80be0be324"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a965d407f9529cc37e15ccf92f2009708"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a965d407f9529cc37e15ccf92f2009708">ccc_bs_reserve</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> *bs, size_t to_add, <a class="el" href="types_8h.html#a3e73202894869d2840fb21ff912bbd96">ccc_any_alloc_fn</a> *fn)</td></tr>
+<tr class="memitem:a965d407f9529cc37e15ccf92f2009708"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a965d407f9529cc37e15ccf92f2009708">ccc_bs_reserve</a> (ccc_bitset *bs, size_t to_add, <a class="el" href="types_8h.html#a3e73202894869d2840fb21ff912bbd96">ccc_any_alloc_fn</a> *fn)</td></tr>
 <tr class="memdesc:a965d407f9529cc37e15ccf92f2009708"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reserves space for at least to_add more bits.  <br /></td></tr>
 <tr class="separator:a965d407f9529cc37e15ccf92f2009708"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Container Types</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Types available in the container interface. </p>
 </td></tr>
-<tr class="memitem:a9e5e8a0511fe3def848af70344c5b9f3"><td class="memItemLeft" align="right" valign="top">typedef struct ccc_bitset_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a></td></tr>
-<tr class="memdesc:a9e5e8a0511fe3def848af70344c5b9f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">The bit set type that may be stored and initialized on the stack, heap, or data segment at compile or run time.  <br /></td></tr>
-<tr class="separator:a9e5e8a0511fe3def848af70344c5b9f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9c11247557b86b5658723dd9edc58622"><td class="memItemLeft" align="right" valign="top">typedef ccc_bitblock_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a9c11247557b86b5658723dd9edc58622">ccc_bitblock</a></td></tr>
-<tr class="memdesc:a9c11247557b86b5658723dd9edc58622"><td class="mdescLeft">&#160;</td><td class="mdescRight">The type used to efficiently store bits in the bit set.  <br /></td></tr>
-<tr class="separator:a9c11247557b86b5658723dd9edc58622"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a91c02e4cbaa5d2ad80b4d448b19a8f2b"><td class="memItemLeft" align="right" valign="top">typedef struct ccc_bitset&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a91c02e4cbaa5d2ad80b4d448b19a8f2b">ccc_bitset</a></td></tr>
+<tr class="memdesc:a91c02e4cbaa5d2ad80b4d448b19a8f2b"><td class="mdescLeft">&#160;</td><td class="mdescRight">The bit set type that may be stored and initialized on the stack, heap, or data segment at compile or run time.  <br /></td></tr>
+<tr class="separator:a91c02e4cbaa5d2ad80b4d448b19a8f2b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1165b11608a79fa0bc28acef6b8862fe"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="bitset_8h.html#a1165b11608a79fa0bc28acef6b8862fe">ccc_bitblock</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a1165b11608a79fa0bc28acef6b8862fe">ccc_bitblock</a></td></tr>
+<tr class="memdesc:a1165b11608a79fa0bc28acef6b8862fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">The type used to efficiently store bits in the bit set.  <br /></td></tr>
+<tr class="separator:a1165b11608a79fa0bc28acef6b8862fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Bit Membership Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Test for the presence of bits. </p>
 </td></tr>
-<tr class="memitem:a80670173528bf5e7d869af97267588fb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a80670173528bf5e7d869af97267588fb">ccc_bs_test</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *bs, size_t i)</td></tr>
+<tr class="memitem:a80670173528bf5e7d869af97267588fb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a80670173528bf5e7d869af97267588fb">ccc_bs_test</a> (ccc_bitset const *bs, size_t i)</td></tr>
 <tr class="memdesc:a80670173528bf5e7d869af97267588fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Test the bit at index i for boolean status (CCC_TRUE or CCC_FALSE).  <br /></td></tr>
 <tr class="separator:a80670173528bf5e7d869af97267588fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Bit Modification Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Set and flip bits in the set. </p>
 </td></tr>
-<tr class="memitem:a456a56ff135626553fea89b750e1e6b9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a456a56ff135626553fea89b750e1e6b9">ccc_bs_set</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> *bs, size_t i, <a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> b)</td></tr>
+<tr class="memitem:a456a56ff135626553fea89b750e1e6b9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a456a56ff135626553fea89b750e1e6b9">ccc_bs_set</a> (ccc_bitset *bs, size_t i, <a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> b)</td></tr>
 <tr class="memdesc:a456a56ff135626553fea89b750e1e6b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the bit at valid index i to value b (true or false).  <br /></td></tr>
 <tr class="separator:a456a56ff135626553fea89b750e1e6b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a146a45dbb880f853ee15c0d8c0811124"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a146a45dbb880f853ee15c0d8c0811124">ccc_bs_set_all</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> *bs, <a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> b)</td></tr>
+<tr class="memitem:a146a45dbb880f853ee15c0d8c0811124"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a146a45dbb880f853ee15c0d8c0811124">ccc_bs_set_all</a> (ccc_bitset *bs, <a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> b)</td></tr>
 <tr class="memdesc:a146a45dbb880f853ee15c0d8c0811124"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set all the bits to the provided value (CCC_TRUE or CCC_FALSE).  <br /></td></tr>
 <tr class="separator:a146a45dbb880f853ee15c0d8c0811124"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac4d931194dc1e8f43098dab462865779"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#ac4d931194dc1e8f43098dab462865779">ccc_bs_set_range</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> *bs, size_t i, size_t count, <a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> b)</td></tr>
+<tr class="memitem:ac4d931194dc1e8f43098dab462865779"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#ac4d931194dc1e8f43098dab462865779">ccc_bs_set_range</a> (ccc_bitset *bs, size_t i, size_t count, <a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> b)</td></tr>
 <tr class="memdesc:ac4d931194dc1e8f43098dab462865779"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set all the bits in the specified range starting at the Least Significant Bit of the range and ending at the Most Significant Bit of the range (CCC_TRUE or CCC_FALSE).  <br /></td></tr>
 <tr class="separator:ac4d931194dc1e8f43098dab462865779"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab934450c4b165fd65263ae305c5d45dd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#ab934450c4b165fd65263ae305c5d45dd">ccc_bs_reset</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> *bs, size_t i)</td></tr>
+<tr class="memitem:ab934450c4b165fd65263ae305c5d45dd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#ab934450c4b165fd65263ae305c5d45dd">ccc_bs_reset</a> (ccc_bitset *bs, size_t i)</td></tr>
 <tr class="memdesc:ab934450c4b165fd65263ae305c5d45dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the bit at valid index i to boolean value b (true or false).  <br /></td></tr>
 <tr class="separator:ab934450c4b165fd65263ae305c5d45dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adda0d8b43b8303160d54e7089064eee8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#adda0d8b43b8303160d54e7089064eee8">ccc_bs_reset_all</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> *bs)</td></tr>
+<tr class="memitem:adda0d8b43b8303160d54e7089064eee8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#adda0d8b43b8303160d54e7089064eee8">ccc_bs_reset_all</a> (ccc_bitset *bs)</td></tr>
 <tr class="memdesc:adda0d8b43b8303160d54e7089064eee8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set all the bits to CCC_FALSE.  <br /></td></tr>
 <tr class="separator:adda0d8b43b8303160d54e7089064eee8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0ed0ded2ea7e1b17e265854e30e7e6f5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a0ed0ded2ea7e1b17e265854e30e7e6f5">ccc_bs_reset_range</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> *bs, size_t i, size_t count)</td></tr>
+<tr class="memitem:a0ed0ded2ea7e1b17e265854e30e7e6f5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a0ed0ded2ea7e1b17e265854e30e7e6f5">ccc_bs_reset_range</a> (ccc_bitset *bs, size_t i, size_t count)</td></tr>
 <tr class="memdesc:a0ed0ded2ea7e1b17e265854e30e7e6f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set all the bits in the specified range starting at the Least Significant Bit of the range and ending at the Most Significant Bit of the range to CCC_FALSE.  <br /></td></tr>
 <tr class="separator:a0ed0ded2ea7e1b17e265854e30e7e6f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aef913435a29a576312a574c6dfba1aae"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#aef913435a29a576312a574c6dfba1aae">ccc_bs_flip</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> *bs, size_t i)</td></tr>
+<tr class="memitem:aef913435a29a576312a574c6dfba1aae"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#aef913435a29a576312a574c6dfba1aae">ccc_bs_flip</a> (ccc_bitset *bs, size_t i)</td></tr>
 <tr class="memdesc:aef913435a29a576312a574c6dfba1aae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Toggle the bit at index i.  <br /></td></tr>
 <tr class="separator:aef913435a29a576312a574c6dfba1aae"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a33ff102ddb95249859fda4e1afd642b2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a33ff102ddb95249859fda4e1afd642b2">ccc_bs_flip_all</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> *bs)</td></tr>
+<tr class="memitem:a33ff102ddb95249859fda4e1afd642b2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a33ff102ddb95249859fda4e1afd642b2">ccc_bs_flip_all</a> (ccc_bitset *bs)</td></tr>
 <tr class="memdesc:a33ff102ddb95249859fda4e1afd642b2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Toggle all of the bits to their opposing boolean value.  <br /></td></tr>
 <tr class="separator:a33ff102ddb95249859fda4e1afd642b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4493d19bf00e2baf617a7cbfad8a3b21"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a4493d19bf00e2baf617a7cbfad8a3b21">ccc_bs_flip_range</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> *bs, size_t i, size_t count)</td></tr>
+<tr class="memitem:a4493d19bf00e2baf617a7cbfad8a3b21"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a4493d19bf00e2baf617a7cbfad8a3b21">ccc_bs_flip_range</a> (ccc_bitset *bs, size_t i, size_t count)</td></tr>
 <tr class="memdesc:a4493d19bf00e2baf617a7cbfad8a3b21"><td class="mdescLeft">&#160;</td><td class="mdescRight">Flip all the bits in the range, starting at the Least Significant Bit in range and ending at the Most Significant Bit, to their opposite value.  <br /></td></tr>
 <tr class="separator:a4493d19bf00e2baf617a7cbfad8a3b21"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Bit Scan Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Find bits with a specific status. </p>
 </td></tr>
-<tr class="memitem:a71449b35a6c312275536affc28b68d13"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a71449b35a6c312275536affc28b68d13">ccc_bs_any</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *bs)</td></tr>
+<tr class="memitem:a71449b35a6c312275536affc28b68d13"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a71449b35a6c312275536affc28b68d13">ccc_bs_any</a> (ccc_bitset const *bs)</td></tr>
 <tr class="memdesc:a71449b35a6c312275536affc28b68d13"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return true if any bits in set are 1.  <br /></td></tr>
 <tr class="separator:a71449b35a6c312275536affc28b68d13"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a45bec2b3f42ebc989d9db52b11d50296"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a45bec2b3f42ebc989d9db52b11d50296">ccc_bs_any_range</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *bs, size_t i, size_t count)</td></tr>
+<tr class="memitem:a45bec2b3f42ebc989d9db52b11d50296"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a45bec2b3f42ebc989d9db52b11d50296">ccc_bs_any_range</a> (ccc_bitset const *bs, size_t i, size_t count)</td></tr>
 <tr class="memdesc:a45bec2b3f42ebc989d9db52b11d50296"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return true if any bits are 1 in the specified range.  <br /></td></tr>
 <tr class="separator:a45bec2b3f42ebc989d9db52b11d50296"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa42c1b133918438e72d2c0dd38967777"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#aa42c1b133918438e72d2c0dd38967777">ccc_bs_none</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *bs)</td></tr>
+<tr class="memitem:aa42c1b133918438e72d2c0dd38967777"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#aa42c1b133918438e72d2c0dd38967777">ccc_bs_none</a> (ccc_bitset const *bs)</td></tr>
 <tr class="memdesc:aa42c1b133918438e72d2c0dd38967777"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return true if all bits are set to 0.  <br /></td></tr>
 <tr class="separator:aa42c1b133918438e72d2c0dd38967777"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab1065ec375e318e144b37d3712e45338"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#ab1065ec375e318e144b37d3712e45338">ccc_bs_none_range</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *bs, size_t i, size_t count)</td></tr>
+<tr class="memitem:ab1065ec375e318e144b37d3712e45338"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#ab1065ec375e318e144b37d3712e45338">ccc_bs_none_range</a> (ccc_bitset const *bs, size_t i, size_t count)</td></tr>
 <tr class="memdesc:ab1065ec375e318e144b37d3712e45338"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return true if all bits are 0 in the specified range.  <br /></td></tr>
 <tr class="separator:ab1065ec375e318e144b37d3712e45338"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5731fd7132c03dc0770e198ece0d99fc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a5731fd7132c03dc0770e198ece0d99fc">ccc_bs_all</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *bs)</td></tr>
+<tr class="memitem:a5731fd7132c03dc0770e198ece0d99fc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a5731fd7132c03dc0770e198ece0d99fc">ccc_bs_all</a> (ccc_bitset const *bs)</td></tr>
 <tr class="memdesc:a5731fd7132c03dc0770e198ece0d99fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return true if all bits in set are 1.  <br /></td></tr>
 <tr class="separator:a5731fd7132c03dc0770e198ece0d99fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab7a13dac3f587e132051d3ffee62a959"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#ab7a13dac3f587e132051d3ffee62a959">ccc_bs_all_range</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *bs, size_t i, size_t count)</td></tr>
+<tr class="memitem:ab7a13dac3f587e132051d3ffee62a959"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#ab7a13dac3f587e132051d3ffee62a959">ccc_bs_all_range</a> (ccc_bitset const *bs, size_t i, size_t count)</td></tr>
 <tr class="memdesc:ab7a13dac3f587e132051d3ffee62a959"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return true if all bits are set to 1 in the specified range.  <br /></td></tr>
 <tr class="separator:ab7a13dac3f587e132051d3ffee62a959"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1dad9e3f36eaf6e0115e21ec8dcd595e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a1dad9e3f36eaf6e0115e21ec8dcd595e">ccc_bs_first_trailing_one</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *bs)</td></tr>
+<tr class="memitem:a1dad9e3f36eaf6e0115e21ec8dcd595e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a1dad9e3f36eaf6e0115e21ec8dcd595e">ccc_bs_first_trailing_one</a> (ccc_bitset const *bs)</td></tr>
 <tr class="memdesc:a1dad9e3f36eaf6e0115e21ec8dcd595e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the index of the first trailing bit set to 1 in the set.  <br /></td></tr>
 <tr class="separator:a1dad9e3f36eaf6e0115e21ec8dcd595e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2be8f471564f35056a00d14a03f41549"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a2be8f471564f35056a00d14a03f41549">ccc_bs_first_trailing_one_range</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *bs, size_t i, size_t count)</td></tr>
+<tr class="memitem:a2be8f471564f35056a00d14a03f41549"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a2be8f471564f35056a00d14a03f41549">ccc_bs_first_trailing_one_range</a> (ccc_bitset const *bs, size_t i, size_t count)</td></tr>
 <tr class="memdesc:a2be8f471564f35056a00d14a03f41549"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the index of the first trailing bit set to 1 in the range, starting from the Least Significant Bit at index 0.  <br /></td></tr>
 <tr class="separator:a2be8f471564f35056a00d14a03f41549"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2ff1f0ee2b78a400a8fc948b86b32487"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a2ff1f0ee2b78a400a8fc948b86b32487">ccc_bs_first_trailing_ones</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *bs, size_t num_ones)</td></tr>
+<tr class="memitem:a2ff1f0ee2b78a400a8fc948b86b32487"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a2ff1f0ee2b78a400a8fc948b86b32487">ccc_bs_first_trailing_ones</a> (ccc_bitset const *bs, size_t num_ones)</td></tr>
 <tr class="memdesc:a2ff1f0ee2b78a400a8fc948b86b32487"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the index of the start of the first trailing num_ones contiguous 1 bits.  <br /></td></tr>
 <tr class="separator:a2ff1f0ee2b78a400a8fc948b86b32487"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0f5a23db70d656a3efc565d491f15ca8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a0f5a23db70d656a3efc565d491f15ca8">ccc_bs_first_trailing_ones_range</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *bs, size_t i, size_t count, size_t num_ones)</td></tr>
+<tr class="memitem:a0f5a23db70d656a3efc565d491f15ca8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a0f5a23db70d656a3efc565d491f15ca8">ccc_bs_first_trailing_ones_range</a> (ccc_bitset const *bs, size_t i, size_t count, size_t num_ones)</td></tr>
 <tr class="memdesc:a0f5a23db70d656a3efc565d491f15ca8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the index of the start of the first trailing num_ones contiguous 1 bits in the specified range.  <br /></td></tr>
 <tr class="separator:a0f5a23db70d656a3efc565d491f15ca8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1856a0d02fba9b315aaaeea18c5e99f8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a1856a0d02fba9b315aaaeea18c5e99f8">ccc_bs_first_trailing_zero</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *bs)</td></tr>
+<tr class="memitem:a1856a0d02fba9b315aaaeea18c5e99f8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a1856a0d02fba9b315aaaeea18c5e99f8">ccc_bs_first_trailing_zero</a> (ccc_bitset const *bs)</td></tr>
 <tr class="memdesc:a1856a0d02fba9b315aaaeea18c5e99f8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the index of the first bit set to 0 in the set.  <br /></td></tr>
 <tr class="separator:a1856a0d02fba9b315aaaeea18c5e99f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad3a1bc7466ffceb974e67f7e3f6b32d1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#ad3a1bc7466ffceb974e67f7e3f6b32d1">ccc_bs_first_trailing_zero_range</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *bs, size_t i, size_t count)</td></tr>
+<tr class="memitem:ad3a1bc7466ffceb974e67f7e3f6b32d1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#ad3a1bc7466ffceb974e67f7e3f6b32d1">ccc_bs_first_trailing_zero_range</a> (ccc_bitset const *bs, size_t i, size_t count)</td></tr>
 <tr class="memdesc:ad3a1bc7466ffceb974e67f7e3f6b32d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the index of the first bit set to 0 in the range.  <br /></td></tr>
 <tr class="separator:ad3a1bc7466ffceb974e67f7e3f6b32d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a87276b6c943fe9d4296addae51b13622"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a87276b6c943fe9d4296addae51b13622">ccc_bs_first_trailing_zeros</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *bs, size_t num_zeros)</td></tr>
+<tr class="memitem:a87276b6c943fe9d4296addae51b13622"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a87276b6c943fe9d4296addae51b13622">ccc_bs_first_trailing_zeros</a> (ccc_bitset const *bs, size_t num_zeros)</td></tr>
 <tr class="memdesc:a87276b6c943fe9d4296addae51b13622"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the index of the start of the first trailing num_zeros contiguous 0 bits.  <br /></td></tr>
 <tr class="separator:a87276b6c943fe9d4296addae51b13622"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a80d79d488f897c92ddbc3a8a20723314"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a80d79d488f897c92ddbc3a8a20723314">ccc_bs_first_trailing_zeros_range</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *bs, size_t i, size_t count, size_t num_zeros)</td></tr>
+<tr class="memitem:a80d79d488f897c92ddbc3a8a20723314"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a80d79d488f897c92ddbc3a8a20723314">ccc_bs_first_trailing_zeros_range</a> (ccc_bitset const *bs, size_t i, size_t count, size_t num_zeros)</td></tr>
 <tr class="memdesc:a80d79d488f897c92ddbc3a8a20723314"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the index of the start of the first trailing num_zeros contiguous 0 bits in the specified range.  <br /></td></tr>
 <tr class="separator:a80d79d488f897c92ddbc3a8a20723314"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7b43af2a3745d899c29be0297842e92a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a7b43af2a3745d899c29be0297842e92a">ccc_bs_first_leading_one</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *bs)</td></tr>
+<tr class="memitem:a7b43af2a3745d899c29be0297842e92a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a7b43af2a3745d899c29be0297842e92a">ccc_bs_first_leading_one</a> (ccc_bitset const *bs)</td></tr>
 <tr class="memdesc:a7b43af2a3745d899c29be0297842e92a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the index of the first leading bit set to 1 in the set, starting from the Most Significant Bit at index size - 1.  <br /></td></tr>
 <tr class="separator:a7b43af2a3745d899c29be0297842e92a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a972cdff08c90d678d21ba694123caef6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a972cdff08c90d678d21ba694123caef6">ccc_bs_first_leading_one_range</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *bs, size_t i, size_t count)</td></tr>
+<tr class="memitem:a972cdff08c90d678d21ba694123caef6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a972cdff08c90d678d21ba694123caef6">ccc_bs_first_leading_one_range</a> (ccc_bitset const *bs, size_t i, size_t count)</td></tr>
 <tr class="memdesc:a972cdff08c90d678d21ba694123caef6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the index of the first leading bit set to 1 in the set, starting from the Most Significant Bit at index size - 1.  <br /></td></tr>
 <tr class="separator:a972cdff08c90d678d21ba694123caef6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac9fab3c4bc68074606e835ef96f0b8c0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#ac9fab3c4bc68074606e835ef96f0b8c0">ccc_bs_first_leading_ones</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *bs, size_t num_ones)</td></tr>
+<tr class="memitem:ac9fab3c4bc68074606e835ef96f0b8c0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#ac9fab3c4bc68074606e835ef96f0b8c0">ccc_bs_first_leading_ones</a> (ccc_bitset const *bs, size_t num_ones)</td></tr>
 <tr class="memdesc:ac9fab3c4bc68074606e835ef96f0b8c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the index of the start of the first leading num_ones contiguous 1 bits.  <br /></td></tr>
 <tr class="separator:ac9fab3c4bc68074606e835ef96f0b8c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a539c467e06980972cd0577484258bd6d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a539c467e06980972cd0577484258bd6d">ccc_bs_first_leading_ones_range</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *bs, size_t i, size_t count, size_t num_ones)</td></tr>
+<tr class="memitem:a539c467e06980972cd0577484258bd6d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a539c467e06980972cd0577484258bd6d">ccc_bs_first_leading_ones_range</a> (ccc_bitset const *bs, size_t i, size_t count, size_t num_ones)</td></tr>
 <tr class="memdesc:a539c467e06980972cd0577484258bd6d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the index of the start of the first leading num_ones contiguous 1 bits in the specified range.  <br /></td></tr>
 <tr class="separator:a539c467e06980972cd0577484258bd6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a687ef0f6fa7b94d1866e87faee7d046b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a687ef0f6fa7b94d1866e87faee7d046b">ccc_bs_first_leading_zero</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *bs)</td></tr>
+<tr class="memitem:a687ef0f6fa7b94d1866e87faee7d046b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a687ef0f6fa7b94d1866e87faee7d046b">ccc_bs_first_leading_zero</a> (ccc_bitset const *bs)</td></tr>
 <tr class="memdesc:a687ef0f6fa7b94d1866e87faee7d046b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the index of the first leading bit set to 0 in the set, starting from the Most Significant Bit at index size - 1.  <br /></td></tr>
 <tr class="separator:a687ef0f6fa7b94d1866e87faee7d046b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac923624ced35408361c88fdfaed4062f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#ac923624ced35408361c88fdfaed4062f">ccc_bs_first_leading_zero_range</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *bs, size_t i, size_t count)</td></tr>
+<tr class="memitem:ac923624ced35408361c88fdfaed4062f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#ac923624ced35408361c88fdfaed4062f">ccc_bs_first_leading_zero_range</a> (ccc_bitset const *bs, size_t i, size_t count)</td></tr>
 <tr class="memdesc:ac923624ced35408361c88fdfaed4062f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the index of the first leading bit set to 0 in the set, starting from the Most Significant Bit at index size - 1.  <br /></td></tr>
 <tr class="separator:ac923624ced35408361c88fdfaed4062f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7d975add69d73e5a3544f65d9326f359"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a7d975add69d73e5a3544f65d9326f359">ccc_bs_first_leading_zeros</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *bs, size_t num_zeros)</td></tr>
+<tr class="memitem:a7d975add69d73e5a3544f65d9326f359"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a7d975add69d73e5a3544f65d9326f359">ccc_bs_first_leading_zeros</a> (ccc_bitset const *bs, size_t num_zeros)</td></tr>
 <tr class="memdesc:a7d975add69d73e5a3544f65d9326f359"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the index of the start of the first leading num_zeros contiguous 0 bits.  <br /></td></tr>
 <tr class="separator:a7d975add69d73e5a3544f65d9326f359"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6e9f4ef29e9f0b9beda0b3e3270ce6b3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a6e9f4ef29e9f0b9beda0b3e3270ce6b3">ccc_bs_first_leading_zeros_range</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *bs, size_t i, size_t count, size_t num_zeros)</td></tr>
+<tr class="memitem:a6e9f4ef29e9f0b9beda0b3e3270ce6b3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a6e9f4ef29e9f0b9beda0b3e3270ce6b3">ccc_bs_first_leading_zeros_range</a> (ccc_bitset const *bs, size_t i, size_t count, size_t num_zeros)</td></tr>
 <tr class="memdesc:a6e9f4ef29e9f0b9beda0b3e3270ce6b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the index of the start of the first leading num_zeros contiguous 0 bits in the specified range.  <br /></td></tr>
 <tr class="separator:a6e9f4ef29e9f0b9beda0b3e3270ce6b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Bit Operations Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Use standard integer width bit operations on the entire set. </p>
 </td></tr>
-<tr class="memitem:a1dab16e9c7911e402dffdaf2e56296fb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a1dab16e9c7911e402dffdaf2e56296fb">ccc_bs_or</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> *dst, <a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *src)</td></tr>
+<tr class="memitem:a1dab16e9c7911e402dffdaf2e56296fb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a1dab16e9c7911e402dffdaf2e56296fb">ccc_bs_or</a> (ccc_bitset *dst, ccc_bitset const *src)</td></tr>
 <tr class="memdesc:a1dab16e9c7911e402dffdaf2e56296fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bitwise OR dst set with src set.  <br /></td></tr>
 <tr class="separator:a1dab16e9c7911e402dffdaf2e56296fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa5bd6be9aca62559d4978b123df360e0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#aa5bd6be9aca62559d4978b123df360e0">ccc_bs_and</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> *dst, <a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *src)</td></tr>
+<tr class="memitem:aa5bd6be9aca62559d4978b123df360e0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#aa5bd6be9aca62559d4978b123df360e0">ccc_bs_and</a> (ccc_bitset *dst, ccc_bitset const *src)</td></tr>
 <tr class="memdesc:aa5bd6be9aca62559d4978b123df360e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bitwise AND dst set with src set.  <br /></td></tr>
 <tr class="separator:aa5bd6be9aca62559d4978b123df360e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abc7d69c14933420697660958ab6f58e8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#abc7d69c14933420697660958ab6f58e8">ccc_bs_xor</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> *dst, <a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *src)</td></tr>
+<tr class="memitem:abc7d69c14933420697660958ab6f58e8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#abc7d69c14933420697660958ab6f58e8">ccc_bs_xor</a> (ccc_bitset *dst, ccc_bitset const *src)</td></tr>
 <tr class="memdesc:abc7d69c14933420697660958ab6f58e8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bitwise XOR dst set with src set.  <br /></td></tr>
 <tr class="separator:abc7d69c14933420697660958ab6f58e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aebdf3b2f9a9a5d94d6b1594a239bf885"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#aebdf3b2f9a9a5d94d6b1594a239bf885">ccc_bs_shiftl</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> *bs, size_t left_shifts)</td></tr>
+<tr class="memitem:aebdf3b2f9a9a5d94d6b1594a239bf885"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#aebdf3b2f9a9a5d94d6b1594a239bf885">ccc_bs_shiftl</a> (ccc_bitset *bs, size_t left_shifts)</td></tr>
 <tr class="memdesc:aebdf3b2f9a9a5d94d6b1594a239bf885"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shift the bit set left by left_shifts amount.  <br /></td></tr>
 <tr class="separator:aebdf3b2f9a9a5d94d6b1594a239bf885"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0df76650520a8e15222337b4daa0af33"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a0df76650520a8e15222337b4daa0af33">ccc_bs_shiftr</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> *bs, size_t right_shifts)</td></tr>
+<tr class="memitem:a0df76650520a8e15222337b4daa0af33"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a0df76650520a8e15222337b4daa0af33">ccc_bs_shiftr</a> (ccc_bitset *bs, size_t right_shifts)</td></tr>
 <tr class="memdesc:a0df76650520a8e15222337b4daa0af33"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shift the bit set right by right_shifts amount.  <br /></td></tr>
 <tr class="separator:a0df76650520a8e15222337b4daa0af33"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae3c370560cfbcc8113f6362336971613"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#ae3c370560cfbcc8113f6362336971613">ccc_bs_eq</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *a, <a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *b)</td></tr>
+<tr class="memitem:ae3c370560cfbcc8113f6362336971613"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#ae3c370560cfbcc8113f6362336971613">ccc_bs_eq</a> (ccc_bitset const *a, ccc_bitset const *b)</td></tr>
 <tr class="memdesc:ae3c370560cfbcc8113f6362336971613"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks two bit sets of the same size (not capacity) for equality.  <br /></td></tr>
 <tr class="separator:ae3c370560cfbcc8113f6362336971613"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Set Operations Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Perform basic mathematical set operations on the bit set. </p>
 </td></tr>
-<tr class="memitem:a05f13dab316307949208de651d998554"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a05f13dab316307949208de651d998554">ccc_bs_is_proper_subset</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *set, <a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *subset)</td></tr>
+<tr class="memitem:a05f13dab316307949208de651d998554"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a05f13dab316307949208de651d998554">ccc_bs_is_proper_subset</a> (ccc_bitset const *set, ccc_bitset const *subset)</td></tr>
 <tr class="memdesc:a05f13dab316307949208de651d998554"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return CCC_TRUE if subset is a proper subset of set (subset ⊂ set).  <br /></td></tr>
 <tr class="separator:a05f13dab316307949208de651d998554"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af4bb702cf28f8836cadc1731e00eb400"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#af4bb702cf28f8836cadc1731e00eb400">ccc_bs_is_subset</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *set, <a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *subset)</td></tr>
+<tr class="memitem:af4bb702cf28f8836cadc1731e00eb400"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#af4bb702cf28f8836cadc1731e00eb400">ccc_bs_is_subset</a> (ccc_bitset const *set, ccc_bitset const *subset)</td></tr>
 <tr class="memdesc:af4bb702cf28f8836cadc1731e00eb400"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return CCC_TRUE if subset is a subset of set (subset ⊆ set).  <br /></td></tr>
 <tr class="separator:af4bb702cf28f8836cadc1731e00eb400"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">State Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Obtain state from the container. </p>
 </td></tr>
-<tr class="memitem:a061752140a2fabc6685db8383de395a9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="bitset_8h.html#a9c11247557b86b5658723dd9edc58622">ccc_bitblock</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a061752140a2fabc6685db8383de395a9">ccc_bs_data</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *bs)</td></tr>
+<tr class="memitem:a061752140a2fabc6685db8383de395a9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="bitset_8h.html#a1165b11608a79fa0bc28acef6b8862fe">ccc_bitblock</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a061752140a2fabc6685db8383de395a9">ccc_bs_data</a> (ccc_bitset const *bs)</td></tr>
 <tr class="memdesc:a061752140a2fabc6685db8383de395a9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a reference to the base of the underlying block array.  <br /></td></tr>
 <tr class="separator:a061752140a2fabc6685db8383de395a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a03d6315f23faa4d7019f1faa5d0d7da3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a03d6315f23faa4d7019f1faa5d0d7da3">ccc_bs_capacity</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *bs)</td></tr>
+<tr class="memitem:a03d6315f23faa4d7019f1faa5d0d7da3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a03d6315f23faa4d7019f1faa5d0d7da3">ccc_bs_capacity</a> (ccc_bitset const *bs)</td></tr>
 <tr class="memdesc:a03d6315f23faa4d7019f1faa5d0d7da3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return total number of bits the capacity of the set can hold.  <br /></td></tr>
 <tr class="separator:a03d6315f23faa4d7019f1faa5d0d7da3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa76271db4c6269eb4b7a6df26019bfef"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#aa76271db4c6269eb4b7a6df26019bfef">ccc_bs_size</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *bs)</td></tr>
+<tr class="memitem:aa76271db4c6269eb4b7a6df26019bfef"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#aa76271db4c6269eb4b7a6df26019bfef">ccc_bs_size</a> (ccc_bitset const *bs)</td></tr>
 <tr class="memdesc:aa76271db4c6269eb4b7a6df26019bfef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return total number of bits actively tracked by the user and set.  <br /></td></tr>
 <tr class="separator:aa76271db4c6269eb4b7a6df26019bfef"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adc0efc2ec22410e9cf24e2e23ef21e69"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#adc0efc2ec22410e9cf24e2e23ef21e69">ccc_bs_blocks_capacity</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *bs)</td></tr>
+<tr class="memitem:adc0efc2ec22410e9cf24e2e23ef21e69"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#adc0efc2ec22410e9cf24e2e23ef21e69">ccc_bs_blocks_capacity</a> (ccc_bitset const *bs)</td></tr>
 <tr class="memdesc:adc0efc2ec22410e9cf24e2e23ef21e69"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return number of ccc_bitblocks used by bit set for capacity bits.  <br /></td></tr>
 <tr class="separator:adc0efc2ec22410e9cf24e2e23ef21e69"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a08debe571c0179a6f436102c88c40a7f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a08debe571c0179a6f436102c88c40a7f">ccc_bs_blocks_size</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *bs)</td></tr>
+<tr class="memitem:a08debe571c0179a6f436102c88c40a7f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a08debe571c0179a6f436102c88c40a7f">ccc_bs_blocks_size</a> (ccc_bitset const *bs)</td></tr>
 <tr class="memdesc:a08debe571c0179a6f436102c88c40a7f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return number of ccc_bitblocks used by the bit set for size bits.  <br /></td></tr>
 <tr class="separator:a08debe571c0179a6f436102c88c40a7f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a65bbaf204dfdf055e6c99592bbe001a6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a65bbaf204dfdf055e6c99592bbe001a6">ccc_bs_empty</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *bs)</td></tr>
+<tr class="memitem:a65bbaf204dfdf055e6c99592bbe001a6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a65bbaf204dfdf055e6c99592bbe001a6">ccc_bs_empty</a> (ccc_bitset const *bs)</td></tr>
 <tr class="memdesc:a65bbaf204dfdf055e6c99592bbe001a6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return true if no bits are actively tracked by the user and set.  <br /></td></tr>
 <tr class="separator:a65bbaf204dfdf055e6c99592bbe001a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae6e7806f8af47365978ed5d4e8aca364"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#ae6e7806f8af47365978ed5d4e8aca364">ccc_bs_popcount</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *bs)</td></tr>
+<tr class="memitem:ae6e7806f8af47365978ed5d4e8aca364"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#ae6e7806f8af47365978ed5d4e8aca364">ccc_bs_popcount</a> (ccc_bitset const *bs)</td></tr>
 <tr class="memdesc:ae6e7806f8af47365978ed5d4e8aca364"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the number of bits set to CCC_TRUE. O(n).  <br /></td></tr>
 <tr class="separator:ae6e7806f8af47365978ed5d4e8aca364"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a480c3387aa15b951b805b759d0034489"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a480c3387aa15b951b805b759d0034489">ccc_bs_popcount_range</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *bs, size_t i, size_t count)</td></tr>
+<tr class="memitem:a480c3387aa15b951b805b759d0034489"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a480c3387aa15b951b805b759d0034489">ccc_bs_popcount_range</a> (ccc_bitset const *bs, size_t i, size_t count)</td></tr>
 <tr class="memdesc:a480c3387aa15b951b805b759d0034489"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the number of bits set to CCC_TRUE in the range. O(n).  <br /></td></tr>
 <tr class="separator:a480c3387aa15b951b805b759d0034489"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Destructor Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Clear the set and manage its memory. </p>
 </td></tr>
-<tr class="memitem:a1475807011f61e6dea5cc74524b77a85"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a1475807011f61e6dea5cc74524b77a85">ccc_bs_clear</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> *bs)</td></tr>
+<tr class="memitem:a1475807011f61e6dea5cc74524b77a85"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a1475807011f61e6dea5cc74524b77a85">ccc_bs_clear</a> (ccc_bitset *bs)</td></tr>
 <tr class="memdesc:a1475807011f61e6dea5cc74524b77a85"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clears the bit set by setting the size to 0 and all bits to 0. The underlying memory capacity remains unchanged.  <br /></td></tr>
 <tr class="separator:a1475807011f61e6dea5cc74524b77a85"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a86a6e73f368594a889954bc41aa55ba1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a86a6e73f368594a889954bc41aa55ba1">ccc_bs_clear_and_free</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> *bs)</td></tr>
+<tr class="memitem:a86a6e73f368594a889954bc41aa55ba1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a86a6e73f368594a889954bc41aa55ba1">ccc_bs_clear_and_free</a> (ccc_bitset *bs)</td></tr>
 <tr class="memdesc:a86a6e73f368594a889954bc41aa55ba1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clears the bit set by setting the size to 0 and freeing the underlying memory. Capacity becomes 0 as well.  <br /></td></tr>
 <tr class="separator:a86a6e73f368594a889954bc41aa55ba1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2ddb48b6b6b694bac567a67cac8d2359"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a2ddb48b6b6b694bac567a67cac8d2359">ccc_bs_clear_and_free_reserve</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> *bs, <a class="el" href="types_8h.html#a3e73202894869d2840fb21ff912bbd96">ccc_any_alloc_fn</a> *fn)</td></tr>
+<tr class="memitem:a2ddb48b6b6b694bac567a67cac8d2359"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a2ddb48b6b6b694bac567a67cac8d2359">ccc_bs_clear_and_free_reserve</a> (ccc_bitset *bs, <a class="el" href="types_8h.html#a3e73202894869d2840fb21ff912bbd96">ccc_any_alloc_fn</a> *fn)</td></tr>
 <tr class="memdesc:a2ddb48b6b6b694bac567a67cac8d2359"><td class="mdescLeft">&#160;</td><td class="mdescRight">Frees the buffer for the bit set that was previously dynamically reserved with the reserve function.  <br /></td></tr>
 <tr class="separator:a2ddb48b6b6b694bac567a67cac8d2359"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Dynamic Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Allows adding to and removing from the set. </p>
 </td></tr>
-<tr class="memitem:a23aeedf8c053be1252b44b124e933542"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a23aeedf8c053be1252b44b124e933542">ccc_bs_push_back</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> *bs, <a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> b)</td></tr>
+<tr class="memitem:a23aeedf8c053be1252b44b124e933542"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a23aeedf8c053be1252b44b124e933542">ccc_bs_push_back</a> (ccc_bitset *bs, <a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> b)</td></tr>
 <tr class="memdesc:a23aeedf8c053be1252b44b124e933542"><td class="mdescLeft">&#160;</td><td class="mdescRight">Append a bit value to the set as the new Most Significant Bit.  <br /></td></tr>
 <tr class="separator:a23aeedf8c053be1252b44b124e933542"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae9baee7e324a3b1db04d6e83748118f7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#ae9baee7e324a3b1db04d6e83748118f7">ccc_bs_pop_back</a> (<a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> *bs)</td></tr>
+<tr class="memitem:ae9baee7e324a3b1db04d6e83748118f7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#ae9baee7e324a3b1db04d6e83748118f7">ccc_bs_pop_back</a> (ccc_bitset *bs)</td></tr>
 <tr class="memdesc:ae9baee7e324a3b1db04d6e83748118f7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove the Most Significant Bit from the set.  <br /></td></tr>
 <tr class="separator:ae9baee7e324a3b1db04d6e83748118f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -376,15 +376,15 @@ This graph shows which files directly or indirectly include this file:</div>
 <dl class="section warning"><dt>Warning</dt><dd>bit_cap must be &gt;= 1. </dd></dl>
 <dl class="section note"><dt>Note</dt><dd>this macro is not needed if capacity is 0 to start.</dd></dl>
 <p>This method can be used for compile time initialization of bit set. For example:</p>
-<div class="fragment"><div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> b</div>
-<div class="line">    = <a class="code hl_define" href="bitset_8h.html#a98aee1dcbd78e1eb644babc2d3c629e4">ccc_bs_init</a>((<span class="keyword">static</span> <a class="code hl_typedef" href="bitset_8h.html#a9c11247557b86b5658723dd9edc58622">ccc_bitblock</a>[<a class="code hl_define" href="bitset_8h.html#a1099f64c2982ed888e26a6edb6b13734">ccc_bs_blocks</a>(256)]){}, NULL, NULL, 256);</div>
+<div class="fragment"><div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="bitset_8h.html#a91c02e4cbaa5d2ad80b4d448b19a8f2b">ccc_bitset</a> b</div>
+<div class="line">    = <a class="code hl_define" href="bitset_8h.html#a98aee1dcbd78e1eb644babc2d3c629e4">ccc_bs_init</a>((<span class="keyword">static</span> <a class="code hl_typedef" href="bitset_8h.html#a1165b11608a79fa0bc28acef6b8862fe">ccc_bitblock</a>[<a class="code hl_define" href="bitset_8h.html#a1099f64c2982ed888e26a6edb6b13734">ccc_bs_blocks</a>(256)]){}, NULL, NULL, 256);</div>
 <div class="ttc" id="abitset_8h_html_a1099f64c2982ed888e26a6edb6b13734"><div class="ttname"><a href="bitset_8h.html#a1099f64c2982ed888e26a6edb6b13734">ccc_bs_blocks</a></div><div class="ttdeci">#define ccc_bs_blocks(bit_cap)</div><div class="ttdoc">Get the number of bit blocks needed for the desired bit set capacity.</div><div class="ttdef"><b>Definition:</b> bitset.h:115</div></div>
+<div class="ttc" id="abitset_8h_html_a1165b11608a79fa0bc28acef6b8862fe"><div class="ttname"><a href="bitset_8h.html#a1165b11608a79fa0bc28acef6b8862fe">ccc_bitblock</a></div><div class="ttdeci">ccc_bitblock ccc_bitblock</div><div class="ttdoc">The type used to efficiently store bits in the bit set.</div><div class="ttdef"><b>Definition:</b> bitset.h:81</div></div>
+<div class="ttc" id="abitset_8h_html_a91c02e4cbaa5d2ad80b4d448b19a8f2b"><div class="ttname"><a href="bitset_8h.html#a91c02e4cbaa5d2ad80b4d448b19a8f2b">ccc_bitset</a></div><div class="ttdeci">struct ccc_bitset ccc_bitset</div><div class="ttdoc">The bit set type that may be stored and initialized on the stack, heap, or data segment at compile or...</div><div class="ttdef"><b>Definition:</b> bitset.h:73</div></div>
 <div class="ttc" id="abitset_8h_html_a98aee1dcbd78e1eb644babc2d3c629e4"><div class="ttname"><a href="bitset_8h.html#a98aee1dcbd78e1eb644babc2d3c629e4">ccc_bs_init</a></div><div class="ttdeci">#define ccc_bs_init(bitblock_ptr, alloc_fn, aux, cap, optional_size...)</div><div class="ttdoc">Initialize the bit set with memory and allocation permissions.</div><div class="ttdef"><b>Definition:</b> bitset.h:155</div></div>
-<div class="ttc" id="abitset_8h_html_a9c11247557b86b5658723dd9edc58622"><div class="ttname"><a href="bitset_8h.html#a9c11247557b86b5658723dd9edc58622">ccc_bitblock</a></div><div class="ttdeci">ccc_bitblock_ ccc_bitblock</div><div class="ttdoc">The type used to efficiently store bits in the bit set.</div><div class="ttdef"><b>Definition:</b> bitset.h:81</div></div>
-<div class="ttc" id="abitset_8h_html_a9e5e8a0511fe3def848af70344c5b9f3"><div class="ttname"><a href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a></div><div class="ttdeci">struct ccc_bitset_ ccc_bitset</div><div class="ttdoc">The bit set type that may be stored and initialized on the stack, heap, or data segment at compile or...</div><div class="ttdef"><b>Definition:</b> bitset.h:73</div></div>
 </div><!-- fragment --><p>The above example also illustrates the benefits of a static compound literal to encapsulate the bits within the bit set array to prevent dangling references. If the compiler does not support storage duration of compound literals the more traditional example follows:</p>
-<div class="fragment"><div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="bitset_8h.html#a9c11247557b86b5658723dd9edc58622">ccc_bitblock</a> blocks[<a class="code hl_define" href="bitset_8h.html#a1099f64c2982ed888e26a6edb6b13734">ccc_bs_blocks</a>(256)];</div>
-<div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> b = <a class="code hl_define" href="bitset_8h.html#a98aee1dcbd78e1eb644babc2d3c629e4">ccc_bs_init</a>(blocks, NULL, NULL, 256);</div>
+<div class="fragment"><div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="bitset_8h.html#a1165b11608a79fa0bc28acef6b8862fe">ccc_bitblock</a> blocks[<a class="code hl_define" href="bitset_8h.html#a1099f64c2982ed888e26a6edb6b13734">ccc_bs_blocks</a>(256)];</div>
+<div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="bitset_8h.html#a91c02e4cbaa5d2ad80b4d448b19a8f2b">ccc_bitset</a> b = <a class="code hl_define" href="bitset_8h.html#a98aee1dcbd78e1eb644babc2d3c629e4">ccc_bs_init</a>(blocks, NULL, NULL, 256);</div>
 </div><!-- fragment --><p>This macro is required for any initialization where the bit block memory comes from the stack or data segment. For one time dynamic reservations of bit block memory see the ccc_bs_reserve and ccc_bs_clear_and_free_reserve interface. </p>
 
 </div>
@@ -460,14 +460,14 @@ This graph shows which files directly or indirectly include this file:</div>
 </div>
 </div>
 <h2 class="groupheader">Typedef Documentation</h2>
-<a id="a9c11247557b86b5658723dd9edc58622" name="a9c11247557b86b5658723dd9edc58622"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9c11247557b86b5658723dd9edc58622">&#9670;&#160;</a></span>ccc_bitblock</h2>
+<a id="a1165b11608a79fa0bc28acef6b8862fe" name="a1165b11608a79fa0bc28acef6b8862fe"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1165b11608a79fa0bc28acef6b8862fe">&#9670;&#160;</a></span>ccc_bitblock</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef ccc_bitblock_ <a class="el" href="bitset_8h.html#a9c11247557b86b5658723dd9edc58622">ccc_bitblock</a></td>
+          <td class="memname">typedef <a class="el" href="bitset_8h.html#a1165b11608a79fa0bc28acef6b8862fe">ccc_bitblock</a> <a class="el" href="bitset_8h.html#a1165b11608a79fa0bc28acef6b8862fe">ccc_bitblock</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -477,14 +477,14 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="a9e5e8a0511fe3def848af70344c5b9f3" name="a9e5e8a0511fe3def848af70344c5b9f3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9e5e8a0511fe3def848af70344c5b9f3">&#9670;&#160;</a></span>ccc_bitset</h2>
+<a id="a91c02e4cbaa5d2ad80b4d448b19a8f2b" name="a91c02e4cbaa5d2ad80b4d448b19a8f2b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a91c02e4cbaa5d2ad80b4d448b19a8f2b">&#9670;&#160;</a></span>ccc_bitset</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef struct ccc_bitset_ <a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a></td>
+          <td class="memname">typedef struct ccc_bitset ccc_bitset</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -504,7 +504,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> ccc_bs_all </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *&#160;</td>
+          <td class="paramtype">ccc_bitset const *&#160;</td>
           <td class="paramname"><em>bs</em></td><td>)</td>
           <td></td>
         </tr>
@@ -531,7 +531,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> ccc_bs_all_range </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *&#160;</td>
+          <td class="paramtype">ccc_bitset const *&#160;</td>
           <td class="paramname"><em>bs</em>, </td>
         </tr>
         <tr>
@@ -576,13 +576,13 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_bs_and </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> *&#160;</td>
+          <td class="paramtype">ccc_bitset *&#160;</td>
           <td class="paramname"><em>dst</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *&#160;</td>
+          <td class="paramtype">ccc_bitset const *&#160;</td>
           <td class="paramname"><em>src</em>&#160;</td>
         </tr>
         <tr>
@@ -616,7 +616,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> ccc_bs_any </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *&#160;</td>
+          <td class="paramtype">ccc_bitset const *&#160;</td>
           <td class="paramname"><em>bs</em></td><td>)</td>
           <td></td>
         </tr>
@@ -643,7 +643,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> ccc_bs_any_range </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *&#160;</td>
+          <td class="paramtype">ccc_bitset const *&#160;</td>
           <td class="paramname"><em>bs</em>, </td>
         </tr>
         <tr>
@@ -688,7 +688,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_bs_blocks_capacity </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *&#160;</td>
+          <td class="paramtype">ccc_bitset const *&#160;</td>
           <td class="paramname"><em>bs</em></td><td>)</td>
           <td></td>
         </tr>
@@ -716,7 +716,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_bs_blocks_size </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *&#160;</td>
+          <td class="paramtype">ccc_bitset const *&#160;</td>
           <td class="paramname"><em>bs</em></td><td>)</td>
           <td></td>
         </tr>
@@ -744,7 +744,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_bs_capacity </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *&#160;</td>
+          <td class="paramtype">ccc_bitset const *&#160;</td>
           <td class="paramname"><em>bs</em></td><td>)</td>
           <td></td>
         </tr>
@@ -771,7 +771,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_bs_clear </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> *&#160;</td>
+          <td class="paramtype">ccc_bitset *&#160;</td>
           <td class="paramname"><em>bs</em></td><td>)</td>
           <td></td>
         </tr>
@@ -798,7 +798,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_bs_clear_and_free </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> *&#160;</td>
+          <td class="paramtype">ccc_bitset *&#160;</td>
           <td class="paramname"><em>bs</em></td><td>)</td>
           <td></td>
         </tr>
@@ -825,7 +825,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_bs_clear_and_free_reserve </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> *&#160;</td>
+          <td class="paramtype">ccc_bitset *&#160;</td>
           <td class="paramname"><em>bs</em>, </td>
         </tr>
         <tr>
@@ -867,13 +867,13 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_bs_copy </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> *&#160;</td>
+          <td class="paramtype">ccc_bitset *&#160;</td>
           <td class="paramname"><em>dst</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *&#160;</td>
+          <td class="paramtype">ccc_bitset const *&#160;</td>
           <td class="paramname"><em>src</em>, </td>
         </tr>
         <tr>
@@ -935,9 +935,9 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="bitset_8h.html#a9c11247557b86b5658723dd9edc58622">ccc_bitblock</a> * ccc_bs_data </td>
+          <td class="memname"><a class="el" href="bitset_8h.html#a1165b11608a79fa0bc28acef6b8862fe">ccc_bitblock</a> * ccc_bs_data </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *&#160;</td>
+          <td class="paramtype">ccc_bitset const *&#160;</td>
           <td class="paramname"><em>bs</em></td><td>)</td>
           <td></td>
         </tr>
@@ -965,7 +965,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> ccc_bs_empty </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *&#160;</td>
+          <td class="paramtype">ccc_bitset const *&#160;</td>
           <td class="paramname"><em>bs</em></td><td>)</td>
           <td></td>
         </tr>
@@ -993,13 +993,13 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> ccc_bs_eq </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *&#160;</td>
+          <td class="paramtype">ccc_bitset const *&#160;</td>
           <td class="paramname"><em>a</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *&#160;</td>
+          <td class="paramtype">ccc_bitset const *&#160;</td>
           <td class="paramname"><em>b</em>&#160;</td>
         </tr>
         <tr>
@@ -1031,7 +1031,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_bs_first_leading_one </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *&#160;</td>
+          <td class="paramtype">ccc_bitset const *&#160;</td>
           <td class="paramname"><em>bs</em></td><td>)</td>
           <td></td>
         </tr>
@@ -1058,7 +1058,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_bs_first_leading_one_range </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *&#160;</td>
+          <td class="paramtype">ccc_bitset const *&#160;</td>
           <td class="paramname"><em>bs</em>, </td>
         </tr>
         <tr>
@@ -1104,7 +1104,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_bs_first_leading_ones </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *&#160;</td>
+          <td class="paramtype">ccc_bitset const *&#160;</td>
           <td class="paramname"><em>bs</em>, </td>
         </tr>
         <tr>
@@ -1143,7 +1143,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_bs_first_leading_ones_range </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *&#160;</td>
+          <td class="paramtype">ccc_bitset const *&#160;</td>
           <td class="paramname"><em>bs</em>, </td>
         </tr>
         <tr>
@@ -1195,7 +1195,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_bs_first_leading_zero </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *&#160;</td>
+          <td class="paramtype">ccc_bitset const *&#160;</td>
           <td class="paramname"><em>bs</em></td><td>)</td>
           <td></td>
         </tr>
@@ -1222,7 +1222,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_bs_first_leading_zero_range </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *&#160;</td>
+          <td class="paramtype">ccc_bitset const *&#160;</td>
           <td class="paramname"><em>bs</em>, </td>
         </tr>
         <tr>
@@ -1267,7 +1267,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_bs_first_leading_zeros </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *&#160;</td>
+          <td class="paramtype">ccc_bitset const *&#160;</td>
           <td class="paramname"><em>bs</em>, </td>
         </tr>
         <tr>
@@ -1305,7 +1305,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_bs_first_leading_zeros_range </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *&#160;</td>
+          <td class="paramtype">ccc_bitset const *&#160;</td>
           <td class="paramname"><em>bs</em>, </td>
         </tr>
         <tr>
@@ -1357,7 +1357,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_bs_first_trailing_one </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *&#160;</td>
+          <td class="paramtype">ccc_bitset const *&#160;</td>
           <td class="paramname"><em>bs</em></td><td>)</td>
           <td></td>
         </tr>
@@ -1384,7 +1384,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_bs_first_trailing_one_range </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *&#160;</td>
+          <td class="paramtype">ccc_bitset const *&#160;</td>
           <td class="paramname"><em>bs</em>, </td>
         </tr>
         <tr>
@@ -1429,7 +1429,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_bs_first_trailing_ones </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *&#160;</td>
+          <td class="paramtype">ccc_bitset const *&#160;</td>
           <td class="paramname"><em>bs</em>, </td>
         </tr>
         <tr>
@@ -1467,7 +1467,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_bs_first_trailing_ones_range </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *&#160;</td>
+          <td class="paramtype">ccc_bitset const *&#160;</td>
           <td class="paramname"><em>bs</em>, </td>
         </tr>
         <tr>
@@ -1519,7 +1519,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_bs_first_trailing_zero </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *&#160;</td>
+          <td class="paramtype">ccc_bitset const *&#160;</td>
           <td class="paramname"><em>bs</em></td><td>)</td>
           <td></td>
         </tr>
@@ -1546,7 +1546,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_bs_first_trailing_zero_range </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *&#160;</td>
+          <td class="paramtype">ccc_bitset const *&#160;</td>
           <td class="paramname"><em>bs</em>, </td>
         </tr>
         <tr>
@@ -1591,7 +1591,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_bs_first_trailing_zeros </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *&#160;</td>
+          <td class="paramtype">ccc_bitset const *&#160;</td>
           <td class="paramname"><em>bs</em>, </td>
         </tr>
         <tr>
@@ -1629,7 +1629,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_bs_first_trailing_zeros_range </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *&#160;</td>
+          <td class="paramtype">ccc_bitset const *&#160;</td>
           <td class="paramname"><em>bs</em>, </td>
         </tr>
         <tr>
@@ -1681,7 +1681,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> ccc_bs_flip </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> *&#160;</td>
+          <td class="paramtype">ccc_bitset *&#160;</td>
           <td class="paramname"><em>bs</em>, </td>
         </tr>
         <tr>
@@ -1720,7 +1720,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_bs_flip_all </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> *&#160;</td>
+          <td class="paramtype">ccc_bitset *&#160;</td>
           <td class="paramname"><em>bs</em></td><td>)</td>
           <td></td>
         </tr>
@@ -1747,7 +1747,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_bs_flip_range </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> *&#160;</td>
+          <td class="paramtype">ccc_bitset *&#160;</td>
           <td class="paramname"><em>bs</em>, </td>
         </tr>
         <tr>
@@ -1793,13 +1793,13 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> ccc_bs_is_proper_subset </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *&#160;</td>
+          <td class="paramtype">ccc_bitset const *&#160;</td>
           <td class="paramname"><em>set</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *&#160;</td>
+          <td class="paramtype">ccc_bitset const *&#160;</td>
           <td class="paramname"><em>subset</em>&#160;</td>
         </tr>
         <tr>
@@ -1832,13 +1832,13 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> ccc_bs_is_subset </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *&#160;</td>
+          <td class="paramtype">ccc_bitset const *&#160;</td>
           <td class="paramname"><em>set</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *&#160;</td>
+          <td class="paramtype">ccc_bitset const *&#160;</td>
           <td class="paramname"><em>subset</em>&#160;</td>
         </tr>
         <tr>
@@ -1871,7 +1871,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> ccc_bs_none </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *&#160;</td>
+          <td class="paramtype">ccc_bitset const *&#160;</td>
           <td class="paramname"><em>bs</em></td><td>)</td>
           <td></td>
         </tr>
@@ -1898,7 +1898,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> ccc_bs_none_range </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *&#160;</td>
+          <td class="paramtype">ccc_bitset const *&#160;</td>
           <td class="paramname"><em>bs</em>, </td>
         </tr>
         <tr>
@@ -1943,13 +1943,13 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_bs_or </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> *&#160;</td>
+          <td class="paramtype">ccc_bitset *&#160;</td>
           <td class="paramname"><em>dst</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *&#160;</td>
+          <td class="paramtype">ccc_bitset const *&#160;</td>
           <td class="paramname"><em>src</em>&#160;</td>
         </tr>
         <tr>
@@ -1982,7 +1982,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> ccc_bs_pop_back </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> *&#160;</td>
+          <td class="paramtype">ccc_bitset *&#160;</td>
           <td class="paramname"><em>bs</em></td><td>)</td>
           <td></td>
         </tr>
@@ -2009,7 +2009,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_bs_popcount </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *&#160;</td>
+          <td class="paramtype">ccc_bitset const *&#160;</td>
           <td class="paramname"><em>bs</em></td><td>)</td>
           <td></td>
         </tr>
@@ -2036,7 +2036,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_bs_popcount_range </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *&#160;</td>
+          <td class="paramtype">ccc_bitset const *&#160;</td>
           <td class="paramname"><em>bs</em>, </td>
         </tr>
         <tr>
@@ -2081,7 +2081,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_bs_push_back </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> *&#160;</td>
+          <td class="paramtype">ccc_bitset *&#160;</td>
           <td class="paramname"><em>bs</em>, </td>
         </tr>
         <tr>
@@ -2119,7 +2119,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_bs_reserve </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> *&#160;</td>
+          <td class="paramtype">ccc_bitset *&#160;</td>
           <td class="paramname"><em>bs</em>, </td>
         </tr>
         <tr>
@@ -2167,7 +2167,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> ccc_bs_reset </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> *&#160;</td>
+          <td class="paramtype">ccc_bitset *&#160;</td>
           <td class="paramname"><em>bs</em>, </td>
         </tr>
         <tr>
@@ -2206,7 +2206,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_bs_reset_all </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> *&#160;</td>
+          <td class="paramtype">ccc_bitset *&#160;</td>
           <td class="paramname"><em>bs</em></td><td>)</td>
           <td></td>
         </tr>
@@ -2233,7 +2233,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_bs_reset_range </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> *&#160;</td>
+          <td class="paramtype">ccc_bitset *&#160;</td>
           <td class="paramname"><em>bs</em>, </td>
         </tr>
         <tr>
@@ -2279,7 +2279,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> ccc_bs_set </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> *&#160;</td>
+          <td class="paramtype">ccc_bitset *&#160;</td>
           <td class="paramname"><em>bs</em>, </td>
         </tr>
         <tr>
@@ -2325,7 +2325,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_bs_set_all </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> *&#160;</td>
+          <td class="paramtype">ccc_bitset *&#160;</td>
           <td class="paramname"><em>bs</em>, </td>
         </tr>
         <tr>
@@ -2363,7 +2363,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_bs_set_range </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> *&#160;</td>
+          <td class="paramtype">ccc_bitset *&#160;</td>
           <td class="paramname"><em>bs</em>, </td>
         </tr>
         <tr>
@@ -2416,7 +2416,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_bs_shiftl </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> *&#160;</td>
+          <td class="paramtype">ccc_bitset *&#160;</td>
           <td class="paramname"><em>bs</em>, </td>
         </tr>
         <tr>
@@ -2455,7 +2455,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_bs_shiftr </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> *&#160;</td>
+          <td class="paramtype">ccc_bitset *&#160;</td>
           <td class="paramname"><em>bs</em>, </td>
         </tr>
         <tr>
@@ -2494,7 +2494,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_bs_size </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *&#160;</td>
+          <td class="paramtype">ccc_bitset const *&#160;</td>
           <td class="paramname"><em>bs</em></td><td>)</td>
           <td></td>
         </tr>
@@ -2521,7 +2521,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> ccc_bs_test </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *&#160;</td>
+          <td class="paramtype">ccc_bitset const *&#160;</td>
           <td class="paramname"><em>bs</em>, </td>
         </tr>
         <tr>
@@ -2560,13 +2560,13 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_bs_xor </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> *&#160;</td>
+          <td class="paramtype">ccc_bitset *&#160;</td>
           <td class="paramname"><em>dst</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3">ccc_bitset</a> const *&#160;</td>
+          <td class="paramtype">ccc_bitset const *&#160;</td>
           <td class="paramname"><em>src</em>&#160;</td>
         </tr>
         <tr>

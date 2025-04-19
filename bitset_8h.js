@@ -2,8 +2,8 @@ var bitset_8h =
 [
     [ "ccc_bs_blocks", "bitset_8h.html#a1099f64c2982ed888e26a6edb6b13734", null ],
     [ "ccc_bs_init", "bitset_8h.html#a98aee1dcbd78e1eb644babc2d3c629e4", null ],
-    [ "ccc_bitblock", "bitset_8h.html#a9c11247557b86b5658723dd9edc58622", null ],
-    [ "ccc_bitset", "bitset_8h.html#a9e5e8a0511fe3def848af70344c5b9f3", null ],
+    [ "ccc_bitblock", "bitset_8h.html#a1165b11608a79fa0bc28acef6b8862fe", null ],
+    [ "ccc_bitset", "bitset_8h.html#a91c02e4cbaa5d2ad80b4d448b19a8f2b", null ],
     [ "ccc_bs_all", "bitset_8h.html#a5731fd7132c03dc0770e198ece0d99fc", null ],
     [ "ccc_bs_all_range", "bitset_8h.html#ab7a13dac3f587e132051d3ffee62a959", null ],
     [ "ccc_bs_and", "bitset_8h.html#aa5bd6be9aca62559d4978b123df360e0", null ],

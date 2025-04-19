@@ -133,10 +133,10 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memitem:a7915b0dc8d16f99709d35b483d02a3e1"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a7915b0dc8d16f99709d35b483d02a3e1">ccc_fpq_heapify_init</a>(mem_ptr,  cmp_order,  cmp_fn,  alloc_fn,  aux_data,  capacity,  size)</td></tr>
 <tr class="memdesc:a7915b0dc8d16f99709d35b483d02a3e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Order an existing array of elements as a min or max heap. O(N).  <br /></td></tr>
 <tr class="separator:a7915b0dc8d16f99709d35b483d02a3e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad65d783f01bd17614486b178bb2c7015"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#ad65d783f01bd17614486b178bb2c7015">ccc_fpq_copy</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> *dst, <a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> const *src, <a class="el" href="types_8h.html#a3e73202894869d2840fb21ff912bbd96">ccc_any_alloc_fn</a> *fn)</td></tr>
+<tr class="memitem:ad65d783f01bd17614486b178bb2c7015"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#ad65d783f01bd17614486b178bb2c7015">ccc_fpq_copy</a> (<a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> *dst, <a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> const *src, <a class="el" href="types_8h.html#a3e73202894869d2840fb21ff912bbd96">ccc_any_alloc_fn</a> *fn)</td></tr>
 <tr class="memdesc:ad65d783f01bd17614486b178bb2c7015"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy the fpq from src to newly initialized dst.  <br /></td></tr>
 <tr class="separator:ad65d783f01bd17614486b178bb2c7015"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab1ad4f0ed5e05f3582d37c8306b57358"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#ab1ad4f0ed5e05f3582d37c8306b57358">ccc_fpq_reserve</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> *fpq, size_t to_add, <a class="el" href="types_8h.html#a3e73202894869d2840fb21ff912bbd96">ccc_any_alloc_fn</a> *fn)</td></tr>
+<tr class="memitem:ab1ad4f0ed5e05f3582d37c8306b57358"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#ab1ad4f0ed5e05f3582d37c8306b57358">ccc_fpq_reserve</a> (<a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> *fpq, size_t to_add, <a class="el" href="types_8h.html#a3e73202894869d2840fb21ff912bbd96">ccc_any_alloc_fn</a> *fn)</td></tr>
 <tr class="memdesc:ab1ad4f0ed5e05f3582d37c8306b57358"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reserves space for at least to_add more elements.  <br /></td></tr>
 <tr class="separator:ab1ad4f0ed5e05f3582d37c8306b57358"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -155,76 +155,76 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memitem:adcfa93d4f2921229a42a494adbfc0921"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#adcfa93d4f2921229a42a494adbfc0921">ccc_fpq_decrease_w</a>(fpq_ptr,  T_ptr,  decrease_closure_over_T...)&#160;&#160;&#160;    ccc_impl_fpq_decrease_w(fpq_ptr, T_ptr, decrease_closure_over_T)</td></tr>
 <tr class="memdesc:adcfa93d4f2921229a42a494adbfc0921"><td class="mdescLeft">&#160;</td><td class="mdescRight">Increase the user type stored in the priority queue directly. O(lgN).  <br /></td></tr>
 <tr class="separator:adcfa93d4f2921229a42a494adbfc0921"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8ef3dc2632fab0c00dce97c16957beba"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a8ef3dc2632fab0c00dce97c16957beba">ccc_fpq_heapify</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> *fpq, void *input_array, size_t input_n, size_t input_elem_size)</td></tr>
-<tr class="memdesc:a8ef3dc2632fab0c00dce97c16957beba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy input array into the fpq, organizing into heap. O(N).  <br /></td></tr>
-<tr class="separator:a8ef3dc2632fab0c00dce97c16957beba"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0f90ef3349b3ec122d044be793a2ba73"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a0f90ef3349b3ec122d044be793a2ba73">ccc_fpq_heapify_inplace</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> *fpq, size_t n)</td></tr>
+<tr class="memitem:a3c03845f1ccf579f3eab485086c77131"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a3c03845f1ccf579f3eab485086c77131">ccc_fpq_heapify</a> (<a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> *fpq, void *input_array, size_t input_n, size_t input_sizeof_type)</td></tr>
+<tr class="memdesc:a3c03845f1ccf579f3eab485086c77131"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy input array into the fpq, organizing into heap. O(N).  <br /></td></tr>
+<tr class="separator:a3c03845f1ccf579f3eab485086c77131"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0f90ef3349b3ec122d044be793a2ba73"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a0f90ef3349b3ec122d044be793a2ba73">ccc_fpq_heapify_inplace</a> (<a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> *fpq, size_t n)</td></tr>
 <tr class="memdesc:a0f90ef3349b3ec122d044be793a2ba73"><td class="mdescLeft">&#160;</td><td class="mdescRight">Order n elements of the underlying fpq buffer as an fpq.  <br /></td></tr>
 <tr class="separator:a0f90ef3349b3ec122d044be793a2ba73"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae25b1b64e02e35686cc1a138b20208b4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#ae25b1b64e02e35686cc1a138b20208b4">ccc_fpq_alloc</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> *fpq, size_t new_capacity, <a class="el" href="types_8h.html#a3e73202894869d2840fb21ff912bbd96">ccc_any_alloc_fn</a> *fn)</td></tr>
+<tr class="memitem:ae25b1b64e02e35686cc1a138b20208b4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#ae25b1b64e02e35686cc1a138b20208b4">ccc_fpq_alloc</a> (<a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> *fpq, size_t new_capacity, <a class="el" href="types_8h.html#a3e73202894869d2840fb21ff912bbd96">ccc_any_alloc_fn</a> *fn)</td></tr>
 <tr class="memdesc:ae25b1b64e02e35686cc1a138b20208b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Many allocate memory for the fpq.  <br /></td></tr>
 <tr class="separator:ae25b1b64e02e35686cc1a138b20208b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af3629428e2a5117d810852fc70c283c8"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#af3629428e2a5117d810852fc70c283c8">ccc_fpq_push</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> *fpq, void const *e)</td></tr>
+<tr class="memitem:af3629428e2a5117d810852fc70c283c8"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#af3629428e2a5117d810852fc70c283c8">ccc_fpq_push</a> (<a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> *fpq, void const *e)</td></tr>
 <tr class="memdesc:af3629428e2a5117d810852fc70c283c8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pushes element pointed to at e into fpq. O(lgN).  <br /></td></tr>
 <tr class="separator:af3629428e2a5117d810852fc70c283c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaec4e075f10f8b6ee6bd99c50fb53d2d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#aaec4e075f10f8b6ee6bd99c50fb53d2d">ccc_fpq_pop</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> *fpq)</td></tr>
+<tr class="memitem:aaec4e075f10f8b6ee6bd99c50fb53d2d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#aaec4e075f10f8b6ee6bd99c50fb53d2d">ccc_fpq_pop</a> (<a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> *fpq)</td></tr>
 <tr class="memdesc:aaec4e075f10f8b6ee6bd99c50fb53d2d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pop the front element (min or max) element in the fpq. O(lgN).  <br /></td></tr>
 <tr class="separator:aaec4e075f10f8b6ee6bd99c50fb53d2d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afc193b31385a3a97002e77d833340c31"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#afc193b31385a3a97002e77d833340c31">ccc_fpq_erase</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> *fpq, void *e)</td></tr>
+<tr class="memitem:afc193b31385a3a97002e77d833340c31"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#afc193b31385a3a97002e77d833340c31">ccc_fpq_erase</a> (<a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> *fpq, void *e)</td></tr>
 <tr class="memdesc:afc193b31385a3a97002e77d833340c31"><td class="mdescLeft">&#160;</td><td class="mdescRight">Erase element e that is a handle to the stored fpq element.  <br /></td></tr>
 <tr class="separator:afc193b31385a3a97002e77d833340c31"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9c223a3f8653b7c334bba5cc5ee30f2f"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a9c223a3f8653b7c334bba5cc5ee30f2f">ccc_fpq_update</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> *fpq, void *e, <a class="el" href="types_8h.html#ada79c0d2b3cfeee31b9990c23a187d12">ccc_any_type_update_fn</a> *fn, void *aux)</td></tr>
+<tr class="memitem:a9c223a3f8653b7c334bba5cc5ee30f2f"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a9c223a3f8653b7c334bba5cc5ee30f2f">ccc_fpq_update</a> (<a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> *fpq, void *e, <a class="el" href="types_8h.html#ada79c0d2b3cfeee31b9990c23a187d12">ccc_any_type_update_fn</a> *fn, void *aux)</td></tr>
 <tr class="memdesc:a9c223a3f8653b7c334bba5cc5ee30f2f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update e that is a handle to the stored fpq element. O(lgN).  <br /></td></tr>
 <tr class="separator:a9c223a3f8653b7c334bba5cc5ee30f2f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af476beafc16e6f4209f65c9105407056"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#af476beafc16e6f4209f65c9105407056">ccc_fpq_increase</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> *fpq, void *e, <a class="el" href="types_8h.html#ada79c0d2b3cfeee31b9990c23a187d12">ccc_any_type_update_fn</a> *fn, void *aux)</td></tr>
+<tr class="memitem:af476beafc16e6f4209f65c9105407056"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#af476beafc16e6f4209f65c9105407056">ccc_fpq_increase</a> (<a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> *fpq, void *e, <a class="el" href="types_8h.html#ada79c0d2b3cfeee31b9990c23a187d12">ccc_any_type_update_fn</a> *fn, void *aux)</td></tr>
 <tr class="memdesc:af476beafc16e6f4209f65c9105407056"><td class="mdescLeft">&#160;</td><td class="mdescRight">Increase e that is a handle to the stored fpq element. O(lgN).  <br /></td></tr>
 <tr class="separator:af476beafc16e6f4209f65c9105407056"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab0d8a8e7b73f1274d1088572c39678d7"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#ab0d8a8e7b73f1274d1088572c39678d7">ccc_fpq_decrease</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> *fpq, void *e, <a class="el" href="types_8h.html#ada79c0d2b3cfeee31b9990c23a187d12">ccc_any_type_update_fn</a> *fn, void *aux)</td></tr>
+<tr class="memitem:ab0d8a8e7b73f1274d1088572c39678d7"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#ab0d8a8e7b73f1274d1088572c39678d7">ccc_fpq_decrease</a> (<a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> *fpq, void *e, <a class="el" href="types_8h.html#ada79c0d2b3cfeee31b9990c23a187d12">ccc_any_type_update_fn</a> *fn, void *aux)</td></tr>
 <tr class="memdesc:ab0d8a8e7b73f1274d1088572c39678d7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decrease e that is a handle to the stored fpq element. O(lgN).  <br /></td></tr>
 <tr class="separator:ab0d8a8e7b73f1274d1088572c39678d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Container Types</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Types available in the container interface. </p>
 </td></tr>
-<tr class="memitem:a8ed534b783c08382f5e3cd0456a1d72c"><td class="memItemLeft" align="right" valign="top">typedef struct ccc_fpq_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a></td></tr>
-<tr class="memdesc:a8ed534b783c08382f5e3cd0456a1d72c"><td class="mdescLeft">&#160;</td><td class="mdescRight">A container offering direct storage and sorting of user data by heap order.  <br /></td></tr>
-<tr class="separator:a8ed534b783c08382f5e3cd0456a1d72c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5fd5a6ed6546b30a2f61de13d7f97817"><td class="memItemLeft" align="right" valign="top">typedef struct ccc_fpq&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a></td></tr>
+<tr class="memdesc:a5fd5a6ed6546b30a2f61de13d7f97817"><td class="mdescLeft">&#160;</td><td class="mdescRight">A container offering direct storage and sorting of user data by heap order.  <br /></td></tr>
+<tr class="separator:a5fd5a6ed6546b30a2f61de13d7f97817"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Deallocation Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Deallocate the container. </p>
 </td></tr>
-<tr class="memitem:a8ae67e38b248056c21865d20978d42bf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a8ae67e38b248056c21865d20978d42bf">ccc_fpq_clear</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> *fpq, <a class="el" href="types_8h.html#a97f231bd3df31cb2730e3304d4cc1dd2">ccc_any_type_destructor_fn</a> *fn)</td></tr>
+<tr class="memitem:a8ae67e38b248056c21865d20978d42bf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a8ae67e38b248056c21865d20978d42bf">ccc_fpq_clear</a> (<a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> *fpq, <a class="el" href="types_8h.html#a97f231bd3df31cb2730e3304d4cc1dd2">ccc_any_type_destructor_fn</a> *fn)</td></tr>
 <tr class="memdesc:a8ae67e38b248056c21865d20978d42bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clears the fpq calling fn on every element if provided. O(1)-O(N).  <br /></td></tr>
 <tr class="separator:a8ae67e38b248056c21865d20978d42bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7f8a4c0c941d14f8a721cc529eb64fce"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a7f8a4c0c941d14f8a721cc529eb64fce">ccc_fpq_clear_and_free</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> *fpq, <a class="el" href="types_8h.html#a97f231bd3df31cb2730e3304d4cc1dd2">ccc_any_type_destructor_fn</a> *fn)</td></tr>
+<tr class="memitem:a7f8a4c0c941d14f8a721cc529eb64fce"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a7f8a4c0c941d14f8a721cc529eb64fce">ccc_fpq_clear_and_free</a> (<a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> *fpq, <a class="el" href="types_8h.html#a97f231bd3df31cb2730e3304d4cc1dd2">ccc_any_type_destructor_fn</a> *fn)</td></tr>
 <tr class="memdesc:a7f8a4c0c941d14f8a721cc529eb64fce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clears the fpq calling fn on every element if provided and frees the underlying buffer. O(1)-O(N).  <br /></td></tr>
 <tr class="separator:a7f8a4c0c941d14f8a721cc529eb64fce"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aca2387a268f99be1f8cf3672e964af4a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#aca2387a268f99be1f8cf3672e964af4a">ccc_fpq_clear_and_free_reserve</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> *fpq, <a class="el" href="types_8h.html#a97f231bd3df31cb2730e3304d4cc1dd2">ccc_any_type_destructor_fn</a> *destructor, <a class="el" href="types_8h.html#a3e73202894869d2840fb21ff912bbd96">ccc_any_alloc_fn</a> *alloc)</td></tr>
+<tr class="memitem:aca2387a268f99be1f8cf3672e964af4a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#aca2387a268f99be1f8cf3672e964af4a">ccc_fpq_clear_and_free_reserve</a> (<a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> *fpq, <a class="el" href="types_8h.html#a97f231bd3df31cb2730e3304d4cc1dd2">ccc_any_type_destructor_fn</a> *destructor, <a class="el" href="types_8h.html#a3e73202894869d2840fb21ff912bbd96">ccc_any_alloc_fn</a> *alloc)</td></tr>
 <tr class="memdesc:aca2387a268f99be1f8cf3672e964af4a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Frees all slots in the fpq and frees the underlying buffer that was previously dynamically reserved with the reserve function.  <br /></td></tr>
 <tr class="separator:aca2387a268f99be1f8cf3672e964af4a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">State Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Obtain state from the container. </p>
 </td></tr>
-<tr class="memitem:a51c6495321c6d46093b06ef01f0c6360"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a51c6495321c6d46093b06ef01f0c6360">ccc_fpq_front</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> const *fpq)</td></tr>
+<tr class="memitem:a51c6495321c6d46093b06ef01f0c6360"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a51c6495321c6d46093b06ef01f0c6360">ccc_fpq_front</a> (<a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> const *fpq)</td></tr>
 <tr class="memdesc:a51c6495321c6d46093b06ef01f0c6360"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a pointer to the front (min or max) element in the fpq. O(1).  <br /></td></tr>
 <tr class="separator:a51c6495321c6d46093b06ef01f0c6360"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0c76f3d7e3ed207ff526c07b759ce4c5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a0c76f3d7e3ed207ff526c07b759ce4c5">ccc_fpq_is_empty</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> const *fpq)</td></tr>
+<tr class="memitem:a0c76f3d7e3ed207ff526c07b759ce4c5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a0c76f3d7e3ed207ff526c07b759ce4c5">ccc_fpq_is_empty</a> (<a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> const *fpq)</td></tr>
 <tr class="memdesc:a0c76f3d7e3ed207ff526c07b759ce4c5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if the fpq is empty false if not. O(1).  <br /></td></tr>
 <tr class="separator:a0c76f3d7e3ed207ff526c07b759ce4c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a51abc8e082ea3ba3c2bf198525ee4151"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a51abc8e082ea3ba3c2bf198525ee4151">ccc_fpq_size</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> const *fpq)</td></tr>
+<tr class="memitem:a51abc8e082ea3ba3c2bf198525ee4151"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a51abc8e082ea3ba3c2bf198525ee4151">ccc_fpq_size</a> (<a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> const *fpq)</td></tr>
 <tr class="memdesc:a51abc8e082ea3ba3c2bf198525ee4151"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size of the fpq representing active slots.  <br /></td></tr>
 <tr class="separator:a51abc8e082ea3ba3c2bf198525ee4151"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af1180cd15477e5b1f0a2ebc3b5bc015a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#af1180cd15477e5b1f0a2ebc3b5bc015a">ccc_fpq_capacity</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> const *fpq)</td></tr>
+<tr class="memitem:af1180cd15477e5b1f0a2ebc3b5bc015a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#af1180cd15477e5b1f0a2ebc3b5bc015a">ccc_fpq_capacity</a> (<a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> const *fpq)</td></tr>
 <tr class="memdesc:af1180cd15477e5b1f0a2ebc3b5bc015a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the capacity of the fpq representing total possible slots.  <br /></td></tr>
 <tr class="separator:af1180cd15477e5b1f0a2ebc3b5bc015a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a005d37789d5cc821356252292cba646b"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a005d37789d5cc821356252292cba646b">ccc_fpq_data</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> const *fpq)</td></tr>
+<tr class="memitem:a005d37789d5cc821356252292cba646b"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a005d37789d5cc821356252292cba646b">ccc_fpq_data</a> (<a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> const *fpq)</td></tr>
 <tr class="memdesc:a005d37789d5cc821356252292cba646b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a pointer to the base of the backing array. O(1).  <br /></td></tr>
 <tr class="separator:a005d37789d5cc821356252292cba646b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abd9aa3fe7a477f99fb0abc69bbdf67f0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#abd9aa3fe7a477f99fb0abc69bbdf67f0">ccc_fpq_validate</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> const *fpq)</td></tr>
+<tr class="memitem:abd9aa3fe7a477f99fb0abc69bbdf67f0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#abd9aa3fe7a477f99fb0abc69bbdf67f0">ccc_fpq_validate</a> (<a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> const *fpq)</td></tr>
 <tr class="memdesc:abd9aa3fe7a477f99fb0abc69bbdf67f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Verifies the internal invariants of the fpq hold.  <br /></td></tr>
 <tr class="separator:abd9aa3fe7a477f99fb0abc69bbdf67f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a422acb75de11ece2ae4d9725fc4a468b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#afa7f5d9756840807860490d28e345955">ccc_threeway_cmp</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a422acb75de11ece2ae4d9725fc4a468b">ccc_fpq_order</a> (<a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> const *fpq)</td></tr>
+<tr class="memitem:a422acb75de11ece2ae4d9725fc4a468b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#afa7f5d9756840807860490d28e345955">ccc_threeway_cmp</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a422acb75de11ece2ae4d9725fc4a468b">ccc_fpq_order</a> (<a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> const *fpq)</td></tr>
 <tr class="memdesc:a422acb75de11ece2ae4d9725fc4a468b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the order used to initialize the fpq.  <br /></td></tr>
 <tr class="separator:a422acb75de11ece2ae4d9725fc4a468b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -570,14 +570,14 @@ This graph shows which files directly or indirectly include this file:</div>
 </div>
 </div>
 <h2 class="groupheader">Typedef Documentation</h2>
-<a id="a8ed534b783c08382f5e3cd0456a1d72c" name="a8ed534b783c08382f5e3cd0456a1d72c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8ed534b783c08382f5e3cd0456a1d72c">&#9670;&#160;</a></span>ccc_flat_priority_queue</h2>
+<a id="a5fd5a6ed6546b30a2f61de13d7f97817" name="a5fd5a6ed6546b30a2f61de13d7f97817"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5fd5a6ed6546b30a2f61de13d7f97817">&#9670;&#160;</a></span>ccc_flat_priority_queue</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef struct ccc_fpq_ <a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a></td>
+          <td class="memname">typedef struct ccc_fpq <a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -598,7 +598,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_fpq_alloc </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> *&#160;</td>
           <td class="paramname"><em>fpq</em>, </td>
         </tr>
         <tr>
@@ -643,7 +643,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_fpq_capacity </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> const *&#160;</td>
+          <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> const *&#160;</td>
           <td class="paramname"><em>fpq</em></td><td>)</td>
           <td></td>
         </tr>
@@ -670,7 +670,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_fpq_clear </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> *&#160;</td>
           <td class="paramname"><em>fpq</em>, </td>
         </tr>
         <tr>
@@ -710,7 +710,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_fpq_clear_and_free </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> *&#160;</td>
           <td class="paramname"><em>fpq</em>, </td>
         </tr>
         <tr>
@@ -750,7 +750,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_fpq_clear_and_free_reserve </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> *&#160;</td>
           <td class="paramname"><em>fpq</em>, </td>
         </tr>
         <tr>
@@ -799,13 +799,13 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_fpq_copy </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> *&#160;</td>
           <td class="paramname"><em>dst</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> const *&#160;</td>
+          <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> const *&#160;</td>
           <td class="paramname"><em>src</em>, </td>
         </tr>
         <tr>
@@ -874,7 +874,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname">void * ccc_fpq_data </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> const *&#160;</td>
+          <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> const *&#160;</td>
           <td class="paramname"><em>fpq</em></td><td>)</td>
           <td></td>
         </tr>
@@ -903,7 +903,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname">void * ccc_fpq_decrease </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> *&#160;</td>
           <td class="paramname"><em>fpq</em>, </td>
         </tr>
         <tr>
@@ -956,7 +956,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_fpq_erase </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> *&#160;</td>
           <td class="paramname"><em>fpq</em>, </td>
         </tr>
         <tr>
@@ -996,7 +996,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname">void * ccc_fpq_front </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> const *&#160;</td>
+          <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> const *&#160;</td>
           <td class="paramname"><em>fpq</em></td><td>)</td>
           <td></td>
         </tr>
@@ -1014,8 +1014,8 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="a8ef3dc2632fab0c00dce97c16957beba" name="a8ef3dc2632fab0c00dce97c16957beba"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8ef3dc2632fab0c00dce97c16957beba">&#9670;&#160;</a></span>ccc_fpq_heapify()</h2>
+<a id="a3c03845f1ccf579f3eab485086c77131" name="a3c03845f1ccf579f3eab485086c77131"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3c03845f1ccf579f3eab485086c77131">&#9670;&#160;</a></span>ccc_fpq_heapify()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1023,7 +1023,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_fpq_heapify </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> *&#160;</td>
           <td class="paramname"><em>fpq</em>, </td>
         </tr>
         <tr>
@@ -1042,7 +1042,7 @@ This graph shows which files directly or indirectly include this file:</div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>input_elem_size</em>&#160;</td>
+          <td class="paramname"><em>input_sizeof_type</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1058,7 +1058,7 @@ This graph shows which files directly or indirectly include this file:</div>
     <tr><td class="paramdir">[in]</td><td class="paramname">fpq</td><td>a pointer to the priority queue. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">input_array</td><td>an array of elements of the same size as the type used to initialize fpq. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">input_n</td><td>the number of contiguous elements at input_array. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">input_elem_size</td><td>size of each element in input_array matching element size of fpq. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">input_sizeof_type</td><td>size of each element in input_array matching element size of fpq. </td></tr>
   </table>
   </dd>
 </dl>
@@ -1076,7 +1076,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_fpq_heapify_inplace </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> *&#160;</td>
           <td class="paramname"><em>fpq</em>, </td>
         </tr>
         <tr>
@@ -1115,7 +1115,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname">void * ccc_fpq_increase </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> *&#160;</td>
           <td class="paramname"><em>fpq</em>, </td>
         </tr>
         <tr>
@@ -1168,7 +1168,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> ccc_fpq_is_empty </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> const *&#160;</td>
+          <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> const *&#160;</td>
           <td class="paramname"><em>fpq</em></td><td>)</td>
           <td></td>
         </tr>
@@ -1195,7 +1195,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#afa7f5d9756840807860490d28e345955">ccc_threeway_cmp</a> ccc_fpq_order </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> const *&#160;</td>
+          <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> const *&#160;</td>
           <td class="paramname"><em>fpq</em></td><td>)</td>
           <td></td>
         </tr>
@@ -1222,7 +1222,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_fpq_pop </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> *&#160;</td>
           <td class="paramname"><em>fpq</em></td><td>)</td>
           <td></td>
         </tr>
@@ -1249,7 +1249,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname">void * ccc_fpq_push </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> *&#160;</td>
           <td class="paramname"><em>fpq</em>, </td>
         </tr>
         <tr>
@@ -1287,7 +1287,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_fpq_reserve </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> *&#160;</td>
           <td class="paramname"><em>fpq</em>, </td>
         </tr>
         <tr>
@@ -1335,7 +1335,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_fpq_size </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> const *&#160;</td>
+          <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> const *&#160;</td>
           <td class="paramname"><em>fpq</em></td><td>)</td>
           <td></td>
         </tr>
@@ -1362,7 +1362,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname">void * ccc_fpq_update </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> *&#160;</td>
           <td class="paramname"><em>fpq</em>, </td>
         </tr>
         <tr>
@@ -1415,7 +1415,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> ccc_fpq_validate </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a8ed534b783c08382f5e3cd0456a1d72c">ccc_flat_priority_queue</a> const *&#160;</td>
+          <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> const *&#160;</td>
           <td class="paramname"><em>fpq</em></td><td>)</td>
           <td></td>
         </tr>
