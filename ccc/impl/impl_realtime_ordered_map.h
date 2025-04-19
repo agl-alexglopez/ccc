@@ -39,10 +39,10 @@ struct ccc_romap
 {
     struct ccc_romap_elem *root;
     struct ccc_romap_elem end;
-    size_t sz;
+    size_t count;
     size_t key_offset;
     size_t node_elem_offset;
-    size_t elem_sz;
+    size_t sizeof_type;
     ccc_any_alloc_fn *alloc;
     ccc_any_key_cmp_fn *cmp;
     void *aux;
@@ -88,10 +88,10 @@ void *ccc_impl_rom_insert(struct ccc_romap *rom, struct ccc_romap_elem *parent,
         .end = {.parity = 1,                                                   \
                 .parent = &(impl_map_name).end,                                \
                 .branch = {&(impl_map_name).end, &(impl_map_name).end}},       \
-        .sz = 0,                                                               \
+        .count = 0,                                                            \
         .key_offset = offsetof(impl_struct_name, impl_key_elem_field),         \
         .node_elem_offset = offsetof(impl_struct_name, impl_node_elem_field),  \
-        .elem_sz = sizeof(impl_struct_name),                                   \
+        .sizeof_type = sizeof(impl_struct_name),                               \
         .alloc = (impl_alloc_fn),                                              \
         .cmp = (impl_key_cmp_fn),                                              \
         .aux = (impl_aux_data),                                                \
@@ -107,9 +107,10 @@ void *ccc_impl_rom_insert(struct ccc_romap *rom, struct ccc_romap_elem *parent,
         {                                                                      \
             impl_rom_ins_alloc_ret                                             \
                 = (realtime_ordered_map_entry)                                 \
-                      ->rom->alloc(NULL,                                       \
-                                   (realtime_ordered_map_entry)->rom->elem_sz, \
-                                   (realtime_ordered_map_entry)->rom->aux);    \
+                      ->rom->alloc(                                            \
+                          NULL,                                                \
+                          (realtime_ordered_map_entry)->rom->sizeof_type,      \
+                          (realtime_ordered_map_entry)->rom->aux);             \
         }                                                                      \
         impl_rom_ins_alloc_ret;                                                \
     }))

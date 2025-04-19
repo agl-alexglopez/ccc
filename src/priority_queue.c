@@ -66,17 +66,17 @@ ccc_pq_push(ccc_priority_queue *const pq, ccc_pq_elem *e)
     void *ret = struct_base(pq, e);
     if (pq->alloc)
     {
-        void *const node = pq->alloc(NULL, pq->elem_sz, pq->aux);
+        void *const node = pq->alloc(NULL, pq->sizeof_type, pq->aux);
         if (!node)
         {
             return NULL;
         }
-        (void)memcpy(node, ret, pq->elem_sz);
+        (void)memcpy(node, ret, pq->sizeof_type);
         ret = node;
         e = elem_in(pq, e);
     }
     pq->root = merge(pq, pq->root, e);
-    ++pq->sz;
+    ++pq->count;
     return ret;
 }
 
@@ -89,7 +89,7 @@ ccc_pq_pop(ccc_priority_queue *const pq)
     }
     struct ccc_pq_elem *const popped = pq->root;
     pq->root = delete_min(pq, pq->root);
-    pq->sz--;
+    pq->count--;
     clear_node(popped);
     if (pq->alloc)
     {
@@ -106,7 +106,7 @@ ccc_pq_extract(ccc_priority_queue *const pq, ccc_pq_elem *const e)
         return NULL;
     }
     pq->root = delete_node(pq, e);
-    pq->sz--;
+    pq->count--;
     clear_node(e);
     return struct_base(pq, e);
 }
@@ -119,7 +119,7 @@ ccc_pq_erase(ccc_priority_queue *const pq, ccc_pq_elem *const e)
         return CCC_RESULT_ARG_ERROR;
     }
     pq->root = delete_node(pq, e);
-    pq->sz--;
+    pq->count--;
     if (pq->alloc)
     {
         (void)pq->alloc(struct_base(pq, e), 0, pq->aux);
@@ -152,7 +152,7 @@ ccc_pq_is_empty(ccc_priority_queue const *const pq)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    return !pq->sz;
+    return !pq->count;
 }
 
 ccc_ucount
@@ -162,7 +162,7 @@ ccc_pq_size(ccc_priority_queue const *const pq)
     {
         return (ccc_ucount){.error = CCC_RESULT_ARG_ERROR};
     }
-    return (ccc_ucount){.count = pq->sz};
+    return (ccc_ucount){.count = pq->count};
 }
 
 /* This is a difficult function. Without knowing if this new value is greater
@@ -222,7 +222,7 @@ ccc_pq_validate(ccc_priority_queue const *const pq)
     {
         return CCC_FALSE;
     }
-    if (traversal_size(pq->root) != pq->sz)
+    if (traversal_size(pq->root) != pq->count)
     {
         return CCC_FALSE;
     }
@@ -524,13 +524,13 @@ traversal_size(struct ccc_pq_elem const *const root)
     {
         return 0;
     }
-    size_t sz = 0;
+    size_t count = 0;
     struct ccc_pq_elem const *cur = root;
     do
     {
-        sz += 1 + traversal_size(cur->left_child);
+        count += 1 + traversal_size(cur->left_child);
     } while ((cur = cur->next_sibling) != root);
-    return sz;
+    return count;
 }
 
 static ccc_tribool

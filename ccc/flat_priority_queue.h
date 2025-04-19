@@ -197,8 +197,8 @@ Insert or remove elements from the flat priority queue. */
 @param [in] input_array an array of elements of the same size as the type used
 to initialize fpq.
 @param [in] input_n the number of contiguous elements at input_array.
-@param [in] input_elem_size size of each element in input_array matching element
-size of fpq.
+@param [in] input_sizeof_type size of each element in input_array matching
+element size of fpq.
 @return OK if sorting was successful or an input error if bad input is
 provided. A permission error will occur if no allocation is allowed and the
 input array is larger than the fixed fpq capacity. A memory error will
@@ -207,7 +207,7 @@ occur if reallocation is required to fit all elements but reallocation fails.
 Note that this version of heapify copies elements from the input array. If an
 in place heapify is required use the initializer version of this method. */
 ccc_result ccc_fpq_heapify(ccc_flat_priority_queue *fpq, void *input_array,
-                           size_t input_n, size_t input_elem_size);
+                           size_t input_n, size_t input_sizeof_type);
 
 /** @brief Order n elements of the underlying fpq buffer as an fpq.
 @param [in] fpq a pointer to the flat priority queue.

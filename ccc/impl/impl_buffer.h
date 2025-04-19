@@ -29,8 +29,8 @@ limitations under the License.
 struct ccc_buf
 {
     void *mem;
-    size_t elem_sz;
-    size_t sz;
+    size_t sizeof_type;
+    size_t count;
     size_t capacity;
     ccc_any_alloc_fn *alloc;
     void *aux;
@@ -49,8 +49,8 @@ struct ccc_buf
                           impl_capacity, ...)                                  \
     {                                                                          \
         .mem = (impl_mem),                                                     \
-        .elem_sz = sizeof(*(impl_mem)),                                        \
-        .sz = IMPL_BUF_OPTIONAL_SIZE(__VA_ARGS__),                             \
+        .sizeof_type = sizeof(*(impl_mem)),                                    \
+        .count = IMPL_BUF_OPTIONAL_SIZE(__VA_ARGS__),                          \
         .capacity = (impl_capacity),                                           \
         .alloc = (impl_alloc_fn),                                              \
         .aux = (impl_aux_data),                                                \
@@ -76,7 +76,7 @@ struct ccc_buf
         typeof(type_initializer) *impl_buf_res = NULL;                         \
         __auto_type impl_emplace_back_buf_ptr = (buf_ptr);                     \
         assert(sizeof(typeof(*impl_buf_res))                                   \
-               == ccc_buf_elem_size(impl_emplace_back_buf_ptr));               \
+               == ccc_buf_sizeof_type(impl_emplace_back_buf_ptr));             \
         impl_buf_res = ccc_buf_alloc_back((impl_emplace_back_buf_ptr));        \
         if (impl_buf_res)                                                      \
         {                                                                      \

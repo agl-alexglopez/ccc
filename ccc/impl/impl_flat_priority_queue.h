@@ -76,7 +76,7 @@ void *ccc_impl_fpq_update_fixup(struct ccc_fpq *, void *);
         typeof(type_initializer) *impl_fpq_res;                                \
         struct ccc_fpq *impl_fpq = (fpq);                                      \
         assert(sizeof(*impl_fpq_res)                                           \
-               == ccc_buf_elem_size(&impl_fpq->buf).count);                    \
+               == ccc_buf_sizeof_type(&impl_fpq->buf).count);                  \
         impl_fpq_res = ccc_buf_alloc_back(&impl_fpq->buf);                     \
         if (ccc_buf_size(&impl_fpq->buf).count                                 \
             == ccc_buf_capacity(&impl_fpq->buf).count)                         \

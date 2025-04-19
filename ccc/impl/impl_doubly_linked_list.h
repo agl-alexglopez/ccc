@@ -82,11 +82,11 @@ struct ccc_dll
     /** @private The sentinel with storage in the actual list struct. */
     struct ccc_dll_elem nil;
     /** @private The size in bytes of the type which wraps this handle. */
-    size_t elem_sz;
+    size_t sizeof_type;
     /** @private The offset in bytes of the intrusive element in user type. */
     size_t dll_elem_offset;
     /** @private The number of elements constantly tracked for O(1) check. */
-    size_t sz;
+    size_t count;
     /** @private The user provided comparison callback for sorting. */
     ccc_any_type_cmp_fn *cmp;
     /** @private The user provided allocation function, if any. */
@@ -114,9 +114,9 @@ struct ccc_dll_elem *ccc_impl_dll_elem_in(struct ccc_dll const *,
     {                                                                          \
         .nil.n = &(impl_dll_name).nil,                                         \
         .nil.p = &(impl_dll_name).nil,                                         \
-        .elem_sz = sizeof(impl_struct_name),                                   \
+        .sizeof_type = sizeof(impl_struct_name),                               \
         .dll_elem_offset = offsetof(impl_struct_name, impl_dll_elem_field),    \
-        .sz = 0,                                                               \
+        .count = 0,                                                            \
         .alloc = (impl_alloc_fn),                                              \
         .cmp = (impl_cmp_fn),                                                  \
         .aux = (impl_aux_data),                                                \
@@ -131,8 +131,8 @@ struct ccc_dll_elem *ccc_impl_dll_elem_in(struct ccc_dll const *,
         {                                                                      \
             if (impl_dll->alloc)                                               \
             {                                                                  \
-                impl_dll_res                                                   \
-                    = impl_dll->alloc(NULL, impl_dll->elem_sz, impl_dll->aux); \
+                impl_dll_res = impl_dll->alloc(NULL, impl_dll->sizeof_type,    \
+                                               impl_dll->aux);                 \
                 if (impl_dll_res)                                              \
                 {                                                              \
                     *impl_dll_res = (typeof(*impl_dll_res))struct_initializer; \
@@ -157,7 +157,7 @@ struct ccc_dll_elem *ccc_impl_dll_elem_in(struct ccc_dll const *,
         else                                                                   \
         {                                                                      \
             impl_dll_res                                                       \
-                = impl_dll->alloc(NULL, impl_dll->elem_sz, impl_dll->aux);     \
+                = impl_dll->alloc(NULL, impl_dll->sizeof_type, impl_dll->aux); \
             if (impl_dll_res)                                                  \
             {                                                                  \
                 *impl_dll_res = struct_initializer;                            \

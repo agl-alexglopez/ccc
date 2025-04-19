@@ -41,7 +41,7 @@ struct ccc_omap
     ccc_any_key_cmp_fn *cmp;
     void *aux;
     size_t size;
-    size_t elem_sz;
+    size_t sizeof_type;
     size_t node_elem_offset;
     size_t key_offset;
 };
@@ -85,7 +85,7 @@ void *ccc_impl_om_insert(struct ccc_omap *t, struct ccc_omap_elem *n);
         .cmp = (impl_key_cmp_fn),                                              \
         .aux = (impl_aux_data),                                                \
         .size = 0,                                                             \
-        .elem_sz = sizeof(impl_struct_name),                                   \
+        .sizeof_type = sizeof(impl_struct_name),                               \
         .node_elem_offset = offsetof(impl_struct_name, impl_node_elem_field),  \
         .key_offset = offsetof(impl_struct_name, impl_key_elem_field),         \
     }
@@ -98,7 +98,7 @@ void *ccc_impl_om_insert(struct ccc_omap *t, struct ccc_omap_elem *n);
         {                                                                      \
             impl_om_ins_alloc_ret                                              \
                 = (ordered_map_entry)                                          \
-                      ->t->alloc(NULL, (ordered_map_entry)->t->elem_sz,        \
+                      ->t->alloc(NULL, (ordered_map_entry)->t->sizeof_type,    \
                                  (ordered_map_entry)->t->aux);                 \
         }                                                                      \
         impl_om_ins_alloc_ret;                                                 \

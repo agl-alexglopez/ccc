@@ -380,7 +380,7 @@ NULL. */
 @param [in] buf the pointer to the buffer.
 @return the size of the type being stored in the buffer. 0 if buf is NULL
 because a zero sized object is not possible for a buffer. */
-[[nodiscard]] ccc_ucount ccc_buf_elem_size(ccc_buffer const *buf);
+[[nodiscard]] ccc_ucount ccc_buf_sizeof_type(ccc_buffer const *buf);
 
 /** @brief obtain the size of the buffer representing active slots.
 @param [in] buf the pointer to the buffer.
@@ -414,7 +414,7 @@ typedef ccc_buffer buffer;
 #    define buf_size_minus(args...) ccc_buf_size_minus(args)
 #    define buf_size_set(args...) ccc_buf_size_set(args)
 #    define buf_capacity(args...) ccc_buf_capacity(args)
-#    define buf_elem_size(args...) ccc_buf_elem_size(args)
+#    define buf_sizeof_type(args...) ccc_buf_sizeof_type(args)
 #    define buf_i(args...) ccc_buf_i(args)
 #    define buf_is_full(args...) ccc_buf_is_full(args)
 #    define buf_is_empty(args...) ccc_buf_is_empty(args)

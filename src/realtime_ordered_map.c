@@ -81,7 +81,7 @@ static ccc_threeway_cmp cmp(struct ccc_romap const *, void const *key,
 static void *struct_base(struct ccc_romap const *,
                          struct ccc_romap_elem const *);
 static struct romap_query find(struct ccc_romap const *, void const *key);
-static void swap(char tmp[], void *a, void *b, size_t elem_sz);
+static void swap(char tmp[], void *a, void *b, size_t sizeof_type);
 static void *maybe_alloc_insert(struct ccc_romap *,
                                 struct ccc_romap_elem *parent,
                                 ccc_threeway_cmp last_cmp,
@@ -198,7 +198,7 @@ ccc_rom_swap_entry(ccc_realtime_ordered_map *const rom,
         void *const found = struct_base(rom, q.found);
         void *const any_struct = struct_base(rom, key_val_handle);
         void *const old_val = struct_base(rom, tmp);
-        swap(old_val, found, any_struct, rom->elem_sz);
+        swap(old_val, found, any_struct, rom->sizeof_type);
         key_val_handle->branch[L] = key_val_handle->branch[R]
             = key_val_handle->parent = NULL;
         tmp->branch[L] = tmp->branch[R] = tmp->parent = NULL;
@@ -247,7 +247,7 @@ ccc_rom_insert_or_assign(ccc_realtime_ordered_map *const rom,
     {
         void *const found = struct_base(rom, q.found);
         *key_val_handle = *elem_in_slot(rom, found);
-        memcpy(found, struct_base(rom, key_val_handle), rom->elem_sz);
+        memcpy(found, struct_base(rom, key_val_handle), rom->sizeof_type);
         return (ccc_entry){{.e = found, .stats = CCC_ENTRY_OCCUPIED}};
     }
     void *const inserted
@@ -296,7 +296,7 @@ ccc_rom_insert_entry(ccc_romap_entry const *const e, ccc_romap_elem *const elem)
     {
         *elem = *elem_in_slot(e->impl.rom, e->impl.entry.e);
         memcpy(e->impl.entry.e, struct_base(e->impl.rom, elem),
-               e->impl.rom->elem_sz);
+               e->impl.rom->sizeof_type);
         return e->impl.entry.e;
     }
     return maybe_alloc_insert(e->impl.rom,
@@ -343,7 +343,7 @@ ccc_rom_remove(ccc_realtime_ordered_map *const rom,
     if (rom->alloc)
     {
         void *const any_struct = struct_base(rom, out_handle);
-        memcpy(any_struct, removed, rom->elem_sz);
+        memcpy(any_struct, removed, rom->sizeof_type);
         rom->alloc(removed, 0, rom->aux);
         return (ccc_entry){{.e = any_struct, .stats = CCC_ENTRY_OCCUPIED}};
     }
@@ -508,7 +508,7 @@ ccc_rom_size(ccc_realtime_ordered_map const *const rom)
     {
         return (ccc_ucount){.error = CCC_RESULT_ARG_ERROR};
     }
-    return (ccc_ucount){.count = rom->sz};
+    return (ccc_ucount){.count = rom->count};
 }
 
 ccc_tribool
@@ -518,7 +518,7 @@ ccc_rom_is_empty(ccc_realtime_ordered_map const *const rom)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    return !rom->sz;
+    return !rom->count;
 }
 
 ccc_tribool
@@ -634,10 +634,10 @@ insert(struct ccc_romap *const rom, struct ccc_romap_elem *const parent,
        ccc_threeway_cmp const last_cmp, struct ccc_romap_elem *const out_handle)
 {
     init_node(rom, out_handle);
-    if (!rom->sz)
+    if (!rom->count)
     {
         rom->root = out_handle;
-        ++rom->sz;
+        ++rom->count;
         return struct_base(rom, out_handle);
     }
     assert(last_cmp == CCC_GRT || last_cmp == CCC_LES);
@@ -649,7 +649,7 @@ insert(struct ccc_romap *const rom, struct ccc_romap_elem *const parent,
     {
         insert_fixup(rom, parent, out_handle);
     }
-    ++rom->sz;
+    ++rom->count;
     return struct_base(rom, out_handle);
 }
 
@@ -661,12 +661,12 @@ maybe_alloc_insert(struct ccc_romap *const rom,
 {
     if (rom->alloc)
     {
-        void *const new = rom->alloc(NULL, rom->elem_sz, rom->aux);
+        void *const new = rom->alloc(NULL, rom->sizeof_type, rom->aux);
         if (!new)
         {
             return NULL;
         }
-        memcpy(new, struct_base(rom, out_handle), rom->elem_sz);
+        memcpy(new, struct_base(rom, out_handle), rom->sizeof_type);
         out_handle = elem_in_slot(rom, new);
     }
     return insert(rom, parent, last_cmp, out_handle);
@@ -719,7 +719,7 @@ static struct ccc_range_u
 equal_range(struct ccc_romap const *const rom, void const *const begin_key,
             void const *const end_key, enum romap_link const traversal)
 {
-    if (!rom->sz)
+    if (!rom->count)
     {
         return (struct ccc_range_u){};
     }
@@ -750,15 +750,15 @@ init_node(struct ccc_romap *const rom, struct ccc_romap_elem *const e)
 }
 
 static inline void
-swap(char tmp[const], void *const a, void *const b, size_t const elem_sz)
+swap(char tmp[const], void *const a, void *const b, size_t const sizeof_type)
 {
     if (a == b || !a || !b)
     {
         return;
     }
-    (void)memcpy(tmp, a, elem_sz);
-    (void)memcpy(a, b, elem_sz);
-    (void)memcpy(b, tmp, elem_sz);
+    (void)memcpy(tmp, a, sizeof_type);
+    (void)memcpy(a, b, sizeof_type);
+    (void)memcpy(b, tmp, sizeof_type);
 }
 
 static inline ccc_threeway_cmp
@@ -900,7 +900,7 @@ remove_fixup(struct ccc_romap *const rom, struct ccc_romap_elem *const remove)
     }
     remove->branch[L] = remove->branch[R] = remove->parent = NULL;
     remove->parity = 0;
-    --rom->sz;
+    --rom->count;
     return struct_base(rom, remove);
 }
 
@@ -1320,7 +1320,7 @@ validate(struct ccc_romap const *const rom)
     {
         return CCC_FALSE;
     }
-    if (recursive_size(rom, rom->root) != rom->sz)
+    if (recursive_size(rom, rom->root) != rom->count)
     {
         return CCC_FALSE;
     }
