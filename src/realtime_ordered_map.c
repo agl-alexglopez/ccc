@@ -55,8 +55,8 @@ enum romap_link
     R,
 };
 
-#define INORDER_TRAVERSAL R
-#define REVERSE_INORDER_TRAVERSAL L
+#define INORDER R
+#define R_INORDER L
 
 /** @private This will utilize safe type punning in C. Both union fields have
 the same type and when obtaining an entry we either have the desired element
@@ -484,7 +484,7 @@ ccc_rom_next(ccc_realtime_ordered_map const *const rom,
     {
         return NULL;
     }
-    struct ccc_romap_elem const *const n = next(rom, e, INORDER_TRAVERSAL);
+    struct ccc_romap_elem const *const n = next(rom, e, INORDER);
     if (n == &rom->end)
     {
         return NULL;
@@ -523,8 +523,7 @@ ccc_rom_rnext(ccc_realtime_ordered_map const *const rom,
     {
         return NULL;
     }
-    struct ccc_romap_elem const *const n
-        = next(rom, e, REVERSE_INORDER_TRAVERSAL);
+    struct ccc_romap_elem const *const n = next(rom, e, R_INORDER);
     return (n == &rom->end) ? NULL : struct_base(rom, n);
 }
 
@@ -536,7 +535,7 @@ ccc_rom_equal_range(ccc_realtime_ordered_map const *const rom,
     {
         return (ccc_range){};
     }
-    return (ccc_range){equal_range(rom, begin_key, end_key, INORDER_TRAVERSAL)};
+    return (ccc_range){equal_range(rom, begin_key, end_key, INORDER)};
 }
 
 ccc_rrange
@@ -547,9 +546,7 @@ ccc_rom_equal_rrange(ccc_realtime_ordered_map const *const rom,
     {
         return (ccc_rrange){};
     }
-    return (ccc_rrange){
-        equal_range(rom, rbegin_key, rend_key, REVERSE_INORDER_TRAVERSAL),
-    };
+    return (ccc_rrange){equal_range(rom, rbegin_key, rend_key, R_INORDER)};
 }
 
 ccc_ucount

@@ -54,8 +54,8 @@ enum list_link
     N = 1,
 };
 
-#define INORDER_TRAVERSAL R
-#define REVERSE_INORDER_TRAVERSAL L
+#define INORDER R
+#define R_INORDER L
 
 enum
 {
@@ -430,7 +430,7 @@ ccc_omm_next(ccc_ordered_multimap const *const mm,
         return NULL;
     }
     struct ccc_ommap_elem const *const n
-        = multimap_next(mm, iter_handle, REVERSE_INORDER_TRAVERSAL);
+        = multimap_next(mm, iter_handle, R_INORDER);
     return n == &mm->end ? NULL : struct_base(mm, n);
 }
 
@@ -443,7 +443,7 @@ ccc_omm_rnext(ccc_ordered_multimap const *const mm,
         return NULL;
     }
     struct ccc_ommap_elem const *const n
-        = multimap_next(mm, iter_handle, INORDER_TRAVERSAL);
+        = multimap_next(mm, iter_handle, INORDER);
     return n == &mm->end ? NULL : struct_base(mm, n);
 }
 
@@ -467,8 +467,7 @@ ccc_omm_equal_range(ccc_ordered_multimap *const mm, void const *const begin_key,
     {
         return (ccc_range){};
     }
-    return (ccc_range){
-        equal_range(mm, begin_key, end_key, REVERSE_INORDER_TRAVERSAL)};
+    return (ccc_range){equal_range(mm, begin_key, end_key, R_INORDER)};
 }
 
 ccc_rrange
@@ -479,8 +478,7 @@ ccc_omm_equal_rrange(ccc_ordered_multimap *const mm,
     {
         return (ccc_rrange){};
     }
-    return (ccc_rrange){
-        equal_range(mm, rbegin_key, rend_key, INORDER_TRAVERSAL)};
+    return (ccc_rrange){equal_range(mm, rbegin_key, rend_key, INORDER)};
 }
 
 void *

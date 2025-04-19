@@ -75,8 +75,8 @@ struct hrm_query
     };
 };
 
-#define INORDER_TRAVERSAL R
-#define REVERSE_INORDER_TRAVERSAL L
+#define INORDER R
+#define R_INORDER L
 #define MINDIR L
 #define MAXDIR R
 
@@ -440,7 +440,7 @@ ccc_hrm_equal_range(ccc_handle_realtime_ordered_map const *const hrm,
     {
         return (ccc_range){};
     }
-    return (ccc_range){equal_range(hrm, begin_key, end_key, INORDER_TRAVERSAL)};
+    return (ccc_range){equal_range(hrm, begin_key, end_key, INORDER)};
 }
 
 ccc_rrange
@@ -451,9 +451,7 @@ ccc_hrm_equal_rrange(ccc_handle_realtime_ordered_map const *const hrm,
     {
         return (ccc_rrange){};
     }
-    return (ccc_rrange){
-        equal_range(hrm, rbegin_key, rend_key, REVERSE_INORDER_TRAVERSAL),
-    };
+    return (ccc_rrange){equal_range(hrm, rbegin_key, rend_key, R_INORDER)};
 }
 
 ccc_handle_i
@@ -565,7 +563,7 @@ ccc_hrm_next(ccc_handle_realtime_ordered_map const *const hrm,
     {
         return NULL;
     }
-    size_t const n = next(hrm, index_of(hrm, e), INORDER_TRAVERSAL);
+    size_t const n = next(hrm, index_of(hrm, e), INORDER);
     return base_at(hrm, n);
 }
 
@@ -577,7 +575,7 @@ ccc_hrm_rnext(ccc_handle_realtime_ordered_map const *const hrm,
     {
         return NULL;
     }
-    size_t const n = next(hrm, index_of(hrm, e), REVERSE_INORDER_TRAVERSAL);
+    size_t const n = next(hrm, index_of(hrm, e), R_INORDER);
     return base_at(hrm, n);
 }
 

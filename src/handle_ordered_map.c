@@ -49,8 +49,8 @@ enum hom_branch
     R,
 };
 
-#define INORDER_TRAVERSAL R
-#define REVERSE_INORDER_TRAVERSAL L
+#define INORDER R
+#define R_INORDER L
 
 enum
 {
@@ -483,7 +483,7 @@ ccc_hom_next(ccc_handle_ordered_map const *const hom,
     {
         return NULL;
     }
-    size_t const n = next(hom, index_of(hom, e), INORDER_TRAVERSAL);
+    size_t const n = next(hom, index_of(hom, e), INORDER);
     return base_at(hom, n);
 }
 
@@ -495,7 +495,7 @@ ccc_hom_rnext(ccc_handle_ordered_map const *const hom,
     {
         return NULL;
     }
-    size_t const n = next(hom, index_of(hom, e), REVERSE_INORDER_TRAVERSAL);
+    size_t const n = next(hom, index_of(hom, e), R_INORDER);
     return base_at(hom, n);
 }
 
@@ -533,7 +533,7 @@ ccc_hom_equal_range(ccc_handle_ordered_map *const hom,
     {
         return (ccc_range){};
     }
-    return (ccc_range){equal_range(hom, begin_key, end_key, INORDER_TRAVERSAL)};
+    return (ccc_range){equal_range(hom, begin_key, end_key, INORDER)};
 }
 
 ccc_rrange
@@ -545,9 +545,7 @@ ccc_hom_equal_rrange(ccc_handle_ordered_map *const hom,
     {
         return (ccc_rrange){};
     }
-    return (ccc_rrange){
-        equal_range(hom, rbegin_key, rend_key, REVERSE_INORDER_TRAVERSAL),
-    };
+    return (ccc_rrange){equal_range(hom, rbegin_key, rend_key, R_INORDER)};
 }
 
 ccc_result

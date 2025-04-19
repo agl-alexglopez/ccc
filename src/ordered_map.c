@@ -44,8 +44,8 @@ typedef enum
     R,
 } om_branch;
 
-#define INORDER_TRAVERSAL R
-#define REVERSE_INORDER_TRAVERSAL L
+#define INORDER R
+#define R_INORDER L
 
 enum
 {
@@ -449,7 +449,7 @@ ccc_om_next(ccc_ordered_map const *const om, ccc_omap_elem const *const e)
     {
         return NULL;
     }
-    struct ccc_omap_elem const *n = next(om, e, INORDER_TRAVERSAL);
+    struct ccc_omap_elem const *n = next(om, e, INORDER);
     return n == &om->end ? NULL : struct_base(om, n);
 }
 
@@ -460,7 +460,7 @@ ccc_om_rnext(ccc_ordered_map const *const om, ccc_omap_elem const *const e)
     {
         return NULL;
     }
-    struct ccc_omap_elem const *n = next(om, e, REVERSE_INORDER_TRAVERSAL);
+    struct ccc_omap_elem const *n = next(om, e, R_INORDER);
     return n == &om->end ? NULL : struct_base(om, n);
 }
 
@@ -472,7 +472,7 @@ ccc_om_equal_range(ccc_ordered_map *const om, void const *const begin_key,
     {
         return (ccc_range){};
     }
-    return (ccc_range){equal_range(om, begin_key, end_key, INORDER_TRAVERSAL)};
+    return (ccc_range){equal_range(om, begin_key, end_key, INORDER)};
 }
 
 ccc_rrange
@@ -484,9 +484,7 @@ ccc_om_equal_rrange(ccc_ordered_map *const om, void const *const rbegin_key,
     {
         return (ccc_rrange){};
     }
-    return (ccc_rrange){
-        equal_range(om, rbegin_key, rend_key, REVERSE_INORDER_TRAVERSAL),
-    };
+    return (ccc_rrange){equal_range(om, rbegin_key, rend_key, R_INORDER)};
 }
 
 ccc_result
