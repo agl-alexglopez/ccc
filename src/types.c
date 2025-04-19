@@ -43,7 +43,7 @@ ccc_entry_occupied(ccc_entry const *const e)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    return (e->impl_.stats_ & CCC_ENTRY_OCCUPIED) != 0;
+    return (e->impl.stats & CCC_ENTRY_OCCUPIED) != 0;
 }
 
 ccc_tribool
@@ -53,7 +53,7 @@ ccc_entry_insert_error(ccc_entry const *const e)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    return (e->impl_.stats_ & CCC_ENTRY_INSERT_ERROR) != 0;
+    return (e->impl.stats & CCC_ENTRY_INSERT_ERROR) != 0;
 }
 
 ccc_tribool
@@ -63,7 +63,7 @@ ccc_entry_input_error(ccc_entry const *const e)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    return (e->impl_.stats_ & CCC_ENTRY_ARG_ERROR) != 0;
+    return (e->impl.stats & CCC_ENTRY_ARG_ERROR) != 0;
 }
 
 void *
@@ -73,7 +73,7 @@ ccc_entry_unwrap(ccc_entry const *const e)
     {
         return NULL;
     }
-    return e->impl_.stats_ & CCC_ENTRY_NO_UNWRAP ? NULL : e->impl_.e_;
+    return e->impl.stats & CCC_ENTRY_NO_UNWRAP ? NULL : e->impl.e;
 }
 
 ccc_tribool
@@ -83,7 +83,7 @@ ccc_handle_occupied(ccc_handle const *const e)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    return (e->impl_.stats_ & CCC_ENTRY_OCCUPIED) != 0;
+    return (e->impl.stats & CCC_ENTRY_OCCUPIED) != 0;
 }
 
 ccc_tribool
@@ -93,7 +93,7 @@ ccc_handle_insert_error(ccc_handle const *const e)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    return (e->impl_.stats_ & CCC_ENTRY_INSERT_ERROR) != 0;
+    return (e->impl.stats & CCC_ENTRY_INSERT_ERROR) != 0;
 }
 
 ccc_tribool
@@ -103,7 +103,7 @@ ccc_handle_input_error(ccc_handle const *const e)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    return (e->impl_.stats_ & CCC_ENTRY_ARG_ERROR) != 0;
+    return (e->impl.stats & CCC_ENTRY_ARG_ERROR) != 0;
 }
 
 ccc_handle_i
@@ -113,31 +113,31 @@ ccc_handle_unwrap(ccc_handle const *const e)
     {
         return 0;
     }
-    return e->impl_.stats_ & CCC_ENTRY_NO_UNWRAP ? 0 : e->impl_.i_;
+    return e->impl.stats & CCC_ENTRY_NO_UNWRAP ? 0 : e->impl.i;
 }
 
 void *
 ccc_begin_range(ccc_range const *const r)
 {
-    return r ? r->impl_.begin_ : NULL;
+    return r ? r->impl.begin : NULL;
 }
 
 void *
 ccc_end_range(ccc_range const *const r)
 {
-    return r ? r->impl_.end_ : NULL;
+    return r ? r->impl.end : NULL;
 }
 
 void *
 ccc_rbegin_rrange(ccc_rrange const *const r)
 {
-    return r ? r->impl_.rbegin_ : NULL;
+    return r ? r->impl.rbegin : NULL;
 }
 
 void *
 ccc_rend_rrange(ccc_rrange const *const r)
 {
-    return r ? r->impl_.rend_ : NULL;
+    return r ? r->impl.rend : NULL;
 }
 
 char const *
@@ -157,7 +157,7 @@ ccc_get_entry_status(ccc_entry const *e)
     {
         return CCC_ENTRY_ARG_ERROR;
     }
-    return e->impl_.stats_;
+    return e->impl.stats;
 }
 
 ccc_handle_status
@@ -167,7 +167,7 @@ ccc_get_handle_status(ccc_handle const *e)
     {
         return CCC_ENTRY_ARG_ERROR;
     }
-    return e->impl_.stats_;
+    return e->impl.stats;
 }
 
 char const *

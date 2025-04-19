@@ -27,43 +27,45 @@ limitations under the License.
 /* NOLINTBEGIN(readability-identifier-naming) */
 
 /** @private */
-struct ccc_fpq_
+struct ccc_fpq
 {
-    ccc_buffer buf_;
-    ccc_any_type_cmp_fn *cmp_;
-    ccc_threeway_cmp order_;
+    ccc_buffer buf;
+    ccc_any_type_cmp_fn *cmp;
+    ccc_threeway_cmp order;
 };
 
 /*========================    Private Interface     =========================*/
 
 /** @private */
-size_t ccc_impl_fpq_bubble_up(struct ccc_fpq_ *, char[], size_t);
+size_t ccc_impl_fpq_bubble_up(struct ccc_fpq *, char[], size_t);
 /** @private */
-void ccc_impl_fpq_in_place_heapify(struct ccc_fpq_ *, size_t n);
+void ccc_impl_fpq_in_place_heapify(struct ccc_fpq *, size_t n);
 /** @private */
-void *ccc_impl_fpq_update_fixup(struct ccc_fpq_ *, void *);
+void *ccc_impl_fpq_update_fixup(struct ccc_fpq *, void *);
 
 /*======================    Macro Implementations    ========================*/
 
 /** @private */
-#define ccc_impl_fpq_init(mem_ptr, cmp_order, cmp_fn, alloc_fn, aux_data,      \
-                          capacity)                                            \
+#define ccc_impl_fpq_init(impl_mem_ptr, impl_cmp_order, impl_cmp_fn,           \
+                          impl_alloc_fn, impl_aux_data, impl_capacity)         \
     {                                                                          \
-        .buf_ = ccc_buf_init(mem_ptr, alloc_fn, aux_data, capacity),           \
-        .cmp_ = (cmp_fn),                                                      \
-        .order_ = (cmp_order),                                                 \
+        .buf = ccc_buf_init(impl_mem_ptr, impl_alloc_fn, impl_aux_data,        \
+                            impl_capacity),                                    \
+        .cmp = (impl_cmp_fn),                                                  \
+        .order = (impl_cmp_order),                                             \
     }
 
 /** @private */
-#define ccc_impl_fpq_heapify_init(mem_ptr, cmp_order, cmp_fn, alloc_fn,        \
-                                  aux_data, capacity, size)                    \
+#define ccc_impl_fpq_heapify_init(impl_mem_ptr, impl_cmp_order, impl_cmp_fn,   \
+                                  impl_alloc_fn, impl_aux_data, impl_capacity, \
+                                  impl_size)                                   \
     (__extension__({                                                           \
-        __auto_type fpq_heapify_mem_ = (mem_ptr);                              \
-        struct ccc_fpq_ fpq_heapify_res_                                       \
-            = ccc_impl_fpq_init(fpq_heapify_mem_, cmp_order, cmp_fn, alloc_fn, \
-                                aux_data, capacity);                           \
-        ccc_impl_fpq_in_place_heapify(&fpq_heapify_res_, (size));              \
-        fpq_heapify_res_;                                                      \
+        __auto_type impl_fpq_heapify_mem = (impl_mem_ptr);                     \
+        struct ccc_fpq impl_fpq_heapify_res = ccc_impl_fpq_init(               \
+            impl_fpq_heapify_mem, impl_cmp_order, impl_cmp_fn, impl_alloc_fn,  \
+            impl_aux_data, impl_capacity);                                     \
+        ccc_impl_fpq_in_place_heapify(&impl_fpq_heapify_res, (impl_size));     \
+        impl_fpq_heapify_res;                                                  \
     }))
 
 /** @private This macro "returns" a value thanks to clang and gcc statement
@@ -71,55 +73,57 @@ void *ccc_impl_fpq_update_fixup(struct ccc_fpq_ *, void *);
    details of the macro are hidden here in the impl header. */
 #define ccc_impl_fpq_emplace(fpq, type_initializer...)                         \
     (__extension__({                                                           \
-        typeof(type_initializer) *fpq_res_;                                    \
-        struct ccc_fpq_ *fpq_ = (fpq);                                         \
-        assert(sizeof(*fpq_res_) == ccc_buf_elem_size(&fpq_->buf_).count);     \
-        fpq_res_ = ccc_buf_alloc_back(&fpq_->buf_);                            \
-        if (ccc_buf_size(&fpq_->buf_).count                                    \
-            == ccc_buf_capacity(&fpq_->buf_).count)                            \
+        typeof(type_initializer) *impl_fpq_res;                                \
+        struct ccc_fpq *impl_fpq = (fpq);                                      \
+        assert(sizeof(*impl_fpq_res)                                           \
+               == ccc_buf_elem_size(&impl_fpq->buf).count);                    \
+        impl_fpq_res = ccc_buf_alloc_back(&impl_fpq->buf);                     \
+        if (ccc_buf_size(&impl_fpq->buf).count                                 \
+            == ccc_buf_capacity(&impl_fpq->buf).count)                         \
         {                                                                      \
-            fpq_res_ = NULL;                                                   \
-            ccc_result const extra_space_ = ccc_buf_alloc(                     \
-                &fpq_->buf_, ccc_buf_capacity(&fpq_->buf_).count * 2,          \
-                fpq_->buf_.alloc_);                                            \
-            if (extra_space_ == CCC_RESULT_OK)                                 \
+            impl_fpq_res = NULL;                                               \
+            ccc_result const impl_extra_space = ccc_buf_alloc(                 \
+                &impl_fpq->buf, ccc_buf_capacity(&impl_fpq->buf).count * 2,    \
+                impl_fpq->buf.alloc);                                          \
+            if (impl_extra_space == CCC_RESULT_OK)                             \
             {                                                                  \
-                fpq_res_ = ccc_buf_back(&fpq_->buf_);                          \
+                impl_fpq_res = ccc_buf_back(&impl_fpq->buf);                   \
             }                                                                  \
         }                                                                      \
-        if (fpq_res_)                                                          \
+        if (impl_fpq_res)                                                      \
         {                                                                      \
-            *fpq_res_ = type_initializer;                                      \
-            if (ccc_buf_size(&fpq_->buf_).count > 1)                           \
+            *impl_fpq_res = type_initializer;                                  \
+            if (ccc_buf_size(&impl_fpq->buf).count > 1)                        \
             {                                                                  \
-                void *fpq_tmp_ = ccc_buf_at(&fpq_->buf_,                       \
-                                            ccc_buf_size(&fpq_->buf_).count);  \
-                fpq_res_ = ccc_buf_at(                                         \
-                    &fpq_->buf_,                                               \
-                    ccc_impl_fpq_bubble_up(                                    \
-                        fpq_, fpq_tmp_, ccc_buf_size(&fpq_->buf_).count - 1)); \
+                void *impl_fpq_tmp = ccc_buf_at(                               \
+                    &impl_fpq->buf, ccc_buf_size(&impl_fpq->buf).count);       \
+                impl_fpq_res                                                   \
+                    = ccc_buf_at(&impl_fpq->buf,                               \
+                                 ccc_impl_fpq_bubble_up(                       \
+                                     impl_fpq, impl_fpq_tmp,                   \
+                                     ccc_buf_size(&impl_fpq->buf).count - 1)); \
             }                                                                  \
             else                                                               \
             {                                                                  \
-                fpq_res_ = ccc_buf_at(&fpq_->buf_, 0);                         \
+                impl_fpq_res = ccc_buf_at(&impl_fpq->buf, 0);                  \
             }                                                                  \
         }                                                                      \
-        fpq_res_;                                                              \
+        impl_fpq_res;                                                          \
     }))
 
 /** @private Only one update fn is needed because there is no advantage to
    updates if it is known they are min/max increase/decrease etc. */
 #define ccc_impl_fpq_update_w(fpq_ptr, T_ptr, update_closure_over_T...)        \
     (__extension__({                                                           \
-        struct ccc_fpq_ *const fpq_ = (fpq_ptr);                               \
-        void *fpq_update_res_ = NULL;                                          \
-        void *const fpq_t_ptr_ = (T_ptr);                                      \
-        if (fpq_ && fpq_t_ptr_ && !ccc_buf_is_empty(&fpq_->buf_))              \
+        struct ccc_fpq *const impl_fpq = (fpq_ptr);                            \
+        void *impl_fpq_update_res = NULL;                                      \
+        void *const impl_fpq_t_ptr = (T_ptr);                                  \
+        if (impl_fpq && impl_fpq_t_ptr && !ccc_buf_is_empty(&impl_fpq->buf))   \
         {                                                                      \
-            {update_closure_over_T} fpq_update_res_                            \
-                = ccc_impl_fpq_update_fixup(fpq_, fpq_t_ptr_);                 \
+            {update_closure_over_T} impl_fpq_update_res                        \
+                = ccc_impl_fpq_update_fixup(impl_fpq, impl_fpq_t_ptr);         \
         }                                                                      \
-        fpq_update_res_;                                                       \
+        impl_fpq_update_res;                                                   \
     }))
 
 /** @private */

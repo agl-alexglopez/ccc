@@ -48,7 +48,7 @@ order.
 
 A flat priority queue can be initialized on the stack, heap, or data segment at
 runtime or compile time.*/
-typedef struct ccc_fpq_ ccc_flat_priority_queue;
+typedef struct ccc_fpq ccc_flat_priority_queue;
 
 /**@}*/
 

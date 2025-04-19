@@ -53,7 +53,7 @@ insert, and erase and pointer stability.
 
 An ordered map can be initialized on the stack, heap, or data segment at
 runtime or compile time.*/
-typedef struct ccc_omap_ ccc_ordered_map;
+typedef struct ccc_omap ccc_ordered_map;
 
 /** @brief The intrusive element for the user defined struct being stored in the
 map.
@@ -62,13 +62,13 @@ Note that if allocation is not permitted, insertions functions accepting this
 type as an argument assume it to exist in pre-allocated memory that will exist
 with the appropriate lifetime and scope for the user's needs; the container does
 not allocate or free in this case. */
-typedef struct ccc_omap_elem_ ccc_omap_elem;
+typedef struct ccc_omap_elem ccc_omap_elem;
 
 /** @brief A container specific entry used to implement the Entry Interface.
 
 The Entry Interface offers efficient search and subsequent insertion, deletion,
 or value update based on the needs of the user. */
-typedef union ccc_omap_entry_ ccc_omap_entry;
+typedef union ccc_omap_entry ccc_omap_entry;
 
 /**@}*/
 
@@ -150,7 +150,7 @@ in an entry to provide information about the old value. */
     &(ccc_entry)                                                               \
     {                                                                          \
         ccc_om_swap_entry((ordered_map_ptr), (key_val_handle_ptr), (tmp_ptr))  \
-            .impl_                                                             \
+            .impl                                                              \
     }
 
 /** @brief Attempts to insert the key value wrapping key_val_handle.
@@ -174,7 +174,7 @@ error is set. */
 #define ccc_om_try_insert_r(ordered_map_ptr, key_val_handle_ptr)               \
     &(ccc_entry)                                                               \
     {                                                                          \
-        ccc_om_try_insert((ordered_map_ptr), (key_val_handle_ptr)).impl_       \
+        ccc_om_try_insert((ordered_map_ptr), (key_val_handle_ptr)).impl        \
     }
 
 /** @brief lazily insert lazy_value into the map at key if key is absent.
@@ -260,7 +260,7 @@ stored memory as they see fit. */
 #define ccc_om_remove_r(ordered_map_ptr, out_handle_ptr)                       \
     &(ccc_entry)                                                               \
     {                                                                          \
-        ccc_om_remove((ordered_map_ptr), (out_handle_ptr)).impl_               \
+        ccc_om_remove((ordered_map_ptr), (out_handle_ptr)).impl                \
     }
 
 /** @brief Obtains an entry for the provided key in the map for future use.
@@ -297,7 +297,7 @@ to subsequent calls in the Entry Interface. */
 #define ccc_om_entry_r(ordered_map_ptr, key_ptr)                               \
     &(ccc_omap_entry)                                                          \
     {                                                                          \
-        ccc_om_entry((ordered_map_ptr), (key_ptr)).impl_                       \
+        ccc_om_entry((ordered_map_ptr), (key_ptr)).impl                        \
     }
 
 /** @brief Modifies the provided entry if it is Occupied.
@@ -428,7 +428,7 @@ free or use as needed. */
 #define ccc_om_remove_entry_r(ordered_map_entry_ptr)                           \
     &(ccc_entry)                                                               \
     {                                                                          \
-        ccc_om_remove_entry((ordered_map_entry_ptr)).impl_                     \
+        ccc_om_remove_entry((ordered_map_entry_ptr)).impl                      \
     }
 
 /** @brief Unwraps the provided entry to obtain a view into the map element.
@@ -499,7 +499,7 @@ enclosing scope. This reference is always non-NULL. */
 #define ccc_om_equal_range_r(ordered_map_ptr, begin_and_end_key_ptrs...)       \
     &(ccc_range)                                                               \
     {                                                                          \
-        ccc_om_equal_range(ordered_map_ptr, begin_and_end_key_ptrs).impl_      \
+        ccc_om_equal_range(ordered_map_ptr, begin_and_end_key_ptrs).impl       \
     }
 
 /** @brief Return an iterable rrange of values from [begin_key, end_key).
@@ -536,7 +536,7 @@ enclosing scope. This reference is always non-NULL. */
 #define ccc_om_equal_rrange_r(ordered_map_ptr, rbegin_and_rend_key_ptrs...)    \
     &(ccc_rrange)                                                              \
     {                                                                          \
-        ccc_om_equal_rrange(ordered_map_ptr, rbegin_and_rend_key_ptrs).impl_   \
+        ccc_om_equal_rrange(ordered_map_ptr, rbegin_and_rend_key_ptrs).impl    \
     }
 
 /** @brief Return the start of an inorder traversal of the map. Amortized

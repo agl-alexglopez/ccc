@@ -64,7 +64,7 @@ insert, and erase.
 
 A handle ordered map can be initialized on the stack, heap, or data segment at
 runtime or compile time.*/
-typedef struct ccc_homap_ ccc_handle_ordered_map;
+typedef struct ccc_homap ccc_handle_ordered_map;
 
 /** @brief The intrusive element for the user defined type being stored in the
 map.
@@ -73,13 +73,13 @@ Note that if allocation is not permitted, insertions functions accepting
 this type as an argument assume it to exist in pre-allocated memory that will
 exist with the appropriate lifetime and scope for the user's needs; the
 container does not allocate or free in this case. */
-typedef struct ccc_homap_elem_ ccc_homap_elem;
+typedef struct ccc_homap_elem ccc_homap_elem;
 
 /** @brief A container specific handle used to implement the Handle Interface.
 
 The Handle Interface offers efficient search and subsequent insertion, deletion,
 or value update based on the needs of the user. */
-typedef union ccc_homap_handle_ ccc_homap_handle;
+typedef union ccc_homap_handle ccc_homap_handle;
 
 /**@}*/
 
@@ -285,7 +285,7 @@ it in a handle to provide information about the old value. */
 #define ccc_hom_swap_handle_r(handle_ordered_map_ptr, out_handle_ptr)          \
     &(ccc_handle)                                                              \
     {                                                                          \
-        ccc_hom_swap_handle((handle_ordered_map_ptr), (out_handle_ptr)).impl_  \
+        ccc_hom_swap_handle((handle_ordered_map_ptr), (out_handle_ptr)).impl   \
     }
 
 /** @brief Attempts to insert the key value wrapping key_val_handle.
@@ -309,7 +309,7 @@ map. If more space is needed but allocation fails an insert error is set. */
     &(ccc_handle)                                                              \
     {                                                                          \
         ccc_hom_try_insert((handle_ordered_map_ptr), (key_val_handle_ptr))     \
-            .impl_                                                             \
+            .impl                                                              \
     }
 
 /** @brief lazily insert lazy_value into the map at key if key is absent.
@@ -387,7 +387,7 @@ and wraps it in a handle to provide information about the old value. */
 #define ccc_hom_remove_r(handle_ordered_map_ptr, out_handle_ptr)               \
     &(ccc_handle)                                                              \
     {                                                                          \
-        ccc_hom_remove((handle_ordered_map_ptr), (out_handle_ptr)).impl_       \
+        ccc_hom_remove((handle_ordered_map_ptr), (out_handle_ptr)).impl        \
     }
 
 /** @brief Obtains a handle for the provided key in the map for future use.
@@ -426,7 +426,7 @@ to subsequent calls in the Handle Interface. */
 #define ccc_hom_handle_r(handle_ordered_map_ptr, key_ptr)                      \
     &(ccc_homap_handle)                                                        \
     {                                                                          \
-        ccc_hom_handle((handle_ordered_map_ptr), (key_ptr)).impl_              \
+        ccc_hom_handle((handle_ordered_map_ptr), (key_ptr)).impl               \
     }
 
 /** @brief Modifies the provided handle if it is Occupied.
@@ -549,7 +549,7 @@ was removed. If Vacant, no prior handle existed to be removed. */
 #define ccc_hom_remove_handle_r(handle_ordered_map_handle_ptr)                 \
     &(ccc_handle)                                                              \
     {                                                                          \
-        ccc_hom_remove_handle((handle_ordered_map_handle_ptr)).impl_           \
+        ccc_hom_remove_handle((handle_ordered_map_handle_ptr)).impl            \
     }
 
 /** @brief Unwraps the provided handle to obtain a view into the map element.
@@ -622,7 +622,7 @@ enclosing scope. This reference is always be valid. */
     &(ccc_range)                                                               \
     {                                                                          \
         ccc_hom_equal_range(handle_ordered_map_ptr, begin_and_end_key_ptrs)    \
-            .impl_                                                             \
+            .impl                                                              \
     }
 
 /** @brief Return an iterable rrange of values from [rbegin_key, end_key).
@@ -661,7 +661,7 @@ enclosing scope. This reference is always valid. */
     &(ccc_rrange)                                                              \
     {                                                                          \
         ccc_hom_equal_rrange(handle_ordered_map_ptr, rbegin_and_rend_key_ptrs) \
-            .impl_                                                             \
+            .impl                                                              \
     }
 
 /** @brief Return the start of an inorder traversal of the map. Amortized

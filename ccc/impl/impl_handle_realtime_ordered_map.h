@@ -32,15 +32,15 @@ a free list. The parent field tracks the parent for an allocated node in the
 tree that the user has inserted into the array. When the user removes a node
 it is added to the front of a free list. The map will track the first free
 node. The list is push to front LIFO stack. */
-struct ccc_hromap_elem_
+struct ccc_hromap_elem
 {
-    size_t branch_[2]; /** Child nodes in array to unify Left and Right. */
+    size_t branch[2]; /** Child nodes in array to unify Left and Right. */
     union
     {
-        size_t parent_;    /** Parent of WAVL node when allocated. */
-        size_t next_free_; /** Points to next free when not allocated. */
+        size_t parent;    /** Parent of WAVL node when allocated. */
+        size_t next_free; /** Points to next free when not allocated. */
     };
-    uint8_t parity_; /** WAVL logic. Instead of rank integer, use 0 or 1. */
+    uint8_t parity; /** WAVL logic. Instead of rank integer, use 0 or 1. */
 };
 
 /** @private A realtime ordered map providing handle stability. Once elements
@@ -48,64 +48,67 @@ are inserted into the map they will not move slots even when the array resizes.
 The free slots are tracked in a singly linked list that uses indices instead
 of pointers so that it remains valid even when the table resizes. The 0th
 index of the array is sacrificed for some coding simplicity and falsey 0. */
-struct ccc_hromap_
+struct ccc_hromap
 {
-    ccc_buffer buf_;          /** The buffer wrapping user memory. */
-    size_t root_;             /** The root node of the WAVL tree. */
-    size_t free_list_;        /** The start of the free singly linked list. */
-    size_t key_offset_;       /** Where user key can be found in type. */
-    size_t node_elem_offset_; /** Where intrusive elem is found in type. */
-    ccc_any_key_cmp_fn *cmp_; /** The provided key comparison function. */
+    ccc_buffer buf;          /** The buffer wrapping user memory. */
+    size_t root;             /** The root node of the WAVL tree. */
+    size_t free_list;        /** The start of the free singly linked list. */
+    size_t key_offset;       /** Where user key can be found in type. */
+    size_t node_elem_offset; /** Where intrusive elem is found in type. */
+    ccc_any_key_cmp_fn *cmp; /** The provided key comparison function. */
 };
 
 /** @private */
-struct ccc_hrtree_handle_
+struct ccc_hrtree_handle
 {
-    struct ccc_hromap_ *hrm_;   /** Map associated with this handle. */
-    ccc_threeway_cmp last_cmp_; /** Saves last comparison direction. */
-    struct ccc_handl_ handle_;  /** Index and a status. */
+    struct ccc_hromap *hrm;    /** Map associated with this handle. */
+    ccc_threeway_cmp last_cmp; /** Saves last comparison direction. */
+    struct ccc_handl handle;   /** Index and a status. */
 };
 
 /** @private */
-union ccc_hromap_handle_
+union ccc_hromap_handle
 {
-    struct ccc_hrtree_handle_ impl_;
+    struct ccc_hrtree_handle impl;
 };
 
 /*========================  Private Interface  ==============================*/
 
 /** @private */
-void *ccc_impl_hrm_key_at(struct ccc_hromap_ const *hrm, size_t slot);
+void *ccc_impl_hrm_key_at(struct ccc_hromap const *hrm, size_t slot);
 /** @private */
-struct ccc_hromap_elem_ *ccc_impl_hrm_elem_at(struct ccc_hromap_ const *hrm,
-                                              size_t i);
+struct ccc_hromap_elem *ccc_impl_hrm_elem_at(struct ccc_hromap const *hrm,
+                                             size_t i);
 /** @private */
-struct ccc_hrtree_handle_ ccc_impl_hrm_handle(struct ccc_hromap_ const *hrm,
-                                              void const *key);
+struct ccc_hrtree_handle ccc_impl_hrm_handle(struct ccc_hromap const *hrm,
+                                             void const *key);
 /** @private */
-void ccc_impl_hrm_insert(struct ccc_hromap_ *hrm, size_t parent_i,
+void ccc_impl_hrm_insert(struct ccc_hromap *hrm, size_t parent_i,
                          ccc_threeway_cmp last_cmp, size_t elem_i);
 /** @private */
-size_t ccc_impl_hrm_alloc_slot(struct ccc_hromap_ *hrm);
+size_t ccc_impl_hrm_alloc_slot(struct ccc_hromap *hrm);
 
 /*=========================      Initialization     =========================*/
 
 /** @private */
-#define ccc_impl_hrm_init(memory_ptr, node_elem_field, key_elem_field,         \
-                          key_cmp_fn, alloc_fn, aux_data, capacity)            \
+#define ccc_impl_hrm_init(impl_memory_ptr, impl_node_elem_field,               \
+                          impl_key_elem_field, impl_key_cmp_fn, impl_alloc_fn, \
+                          impl_aux_data, impl_capacity)                        \
     {                                                                          \
-        .buf_ = ccc_buf_init(memory_ptr, alloc_fn, aux_data, capacity),        \
-        .root_ = 0,                                                            \
-        .free_list_ = 0,                                                       \
-        .key_offset_ = offsetof(typeof(*(memory_ptr)), key_elem_field),        \
-        .node_elem_offset_ = offsetof(typeof(*(memory_ptr)), node_elem_field), \
-        .cmp_ = (key_cmp_fn),                                                  \
+        .buf = ccc_buf_init(impl_memory_ptr, impl_alloc_fn, impl_aux_data,     \
+                            impl_capacity),                                    \
+        .root = 0,                                                             \
+        .free_list = 0,                                                        \
+        .key_offset                                                            \
+        = offsetof(typeof(*(impl_memory_ptr)), impl_key_elem_field),           \
+        .node_elem_offset                                                      \
+        = offsetof(typeof(*(impl_memory_ptr)), impl_node_elem_field),          \
+        .cmp = (impl_key_cmp_fn),                                              \
     }
 
 /** @private */
 #define ccc_impl_hrm_as(handle_realtime_ordered_map_ptr, type_name, handle...) \
-    ((type_name *)ccc_buf_at(&(handle_realtime_ordered_map_ptr)->buf_,         \
-                             (handle)))
+    ((type_name *)ccc_buf_at(&(handle_realtime_ordered_map_ptr)->buf, (handle)))
 
 /*==================     Core Macro Implementations     =====================*/
 
@@ -113,203 +116,210 @@ size_t ccc_impl_hrm_alloc_slot(struct ccc_hromap_ *hrm);
 #define ccc_impl_hrm_and_modify_w(handle_realtime_ordered_map_handle_ptr,      \
                                   type_name, closure_over_T...)                \
     (__extension__({                                                           \
-        __auto_type hrm_hndl_ptr_ = (handle_realtime_ordered_map_handle_ptr);  \
-        struct ccc_hrtree_handle_ hrm_mod_hndl_                                \
-            = {.handle_ = {.stats_ = CCC_ENTRY_ARG_ERROR}};                    \
-        if (hrm_hndl_ptr_)                                                     \
+        __auto_type impl_hrm_hndl_ptr                                          \
+            = (handle_realtime_ordered_map_handle_ptr);                        \
+        struct ccc_hrtree_handle impl_hrm_mod_hndl                             \
+            = {.handle = {.stats = CCC_ENTRY_ARG_ERROR}};                      \
+        if (impl_hrm_hndl_ptr)                                                 \
         {                                                                      \
-            hrm_mod_hndl_ = hrm_hndl_ptr_->impl_;                              \
-            if (hrm_mod_hndl_.handle_.stats_ & CCC_ENTRY_OCCUPIED)             \
+            impl_hrm_mod_hndl = impl_hrm_hndl_ptr->impl;                       \
+            if (impl_hrm_mod_hndl.handle.stats & CCC_ENTRY_OCCUPIED)           \
             {                                                                  \
-                type_name *const T = ccc_buf_at(&hrm_mod_hndl_.hrm_->buf_,     \
-                                                hrm_mod_hndl_.handle_.i_);     \
+                type_name *const T = ccc_buf_at(&impl_hrm_mod_hndl.hrm->buf,   \
+                                                impl_hrm_mod_hndl.handle.i);   \
                 if (T)                                                         \
                 {                                                              \
                     closure_over_T                                             \
                 }                                                              \
             }                                                                  \
         }                                                                      \
-        hrm_mod_hndl_;                                                         \
+        impl_hrm_mod_hndl;                                                     \
     }))
 
 /** @private */
 #define ccc_impl_hrm_or_insert_w(handle_realtime_ordered_map_handle_ptr,       \
                                  lazy_key_value...)                            \
     (__extension__({                                                           \
-        __auto_type or_ins_handle_ptr_                                         \
+        __auto_type impl_or_ins_handle_ptr                                     \
             = (handle_realtime_ordered_map_handle_ptr);                        \
-        ccc_handle_i hrm_or_ins_ret_ = 0;                                      \
-        if (or_ins_handle_ptr_)                                                \
+        ccc_handle_i impl_hrm_or_ins_ret = 0;                                  \
+        if (impl_or_ins_handle_ptr)                                            \
         {                                                                      \
-            struct ccc_hrtree_handle_ *hrm_or_ins_hndl_                        \
-                = &or_ins_handle_ptr_->impl_;                                  \
-            if (hrm_or_ins_hndl_->handle_.stats_ == CCC_ENTRY_OCCUPIED)        \
+            struct ccc_hrtree_handle *impl_hrm_or_ins_hndl                     \
+                = &impl_or_ins_handle_ptr->impl;                               \
+            if (impl_hrm_or_ins_hndl->handle.stats == CCC_ENTRY_OCCUPIED)      \
             {                                                                  \
-                hrm_or_ins_ret_ = hrm_or_ins_hndl_->handle_.i_;                \
+                impl_hrm_or_ins_ret = impl_hrm_or_ins_hndl->handle.i;          \
             }                                                                  \
             else                                                               \
             {                                                                  \
-                hrm_or_ins_ret_                                                \
-                    = ccc_impl_hrm_alloc_slot(hrm_or_ins_hndl_->hrm_);         \
-                if (hrm_or_ins_ret_)                                           \
+                impl_hrm_or_ins_ret                                            \
+                    = ccc_impl_hrm_alloc_slot(impl_hrm_or_ins_hndl->hrm);      \
+                if (impl_hrm_or_ins_ret)                                       \
                 {                                                              \
                     *((typeof(lazy_key_value) *)ccc_buf_at(                    \
-                        &hrm_or_ins_hndl_->hrm_->buf_, hrm_or_ins_ret_))       \
+                        &impl_hrm_or_ins_hndl->hrm->buf, impl_hrm_or_ins_ret)) \
                         = lazy_key_value;                                      \
-                    ccc_impl_hrm_insert(                                       \
-                        hrm_or_ins_hndl_->hrm_, hrm_or_ins_hndl_->handle_.i_,  \
-                        hrm_or_ins_hndl_->last_cmp_, hrm_or_ins_ret_);         \
+                    ccc_impl_hrm_insert(impl_hrm_or_ins_hndl->hrm,             \
+                                        impl_hrm_or_ins_hndl->handle.i,        \
+                                        impl_hrm_or_ins_hndl->last_cmp,        \
+                                        impl_hrm_or_ins_ret);                  \
                 }                                                              \
             }                                                                  \
         }                                                                      \
-        hrm_or_ins_ret_;                                                       \
+        impl_hrm_or_ins_ret;                                                   \
     }))
 
 /** @private */
 #define ccc_impl_hrm_insert_handle_w(handle_realtime_ordered_map_handle_ptr,   \
                                      lazy_key_value...)                        \
     (__extension__({                                                           \
-        __auto_type ins_handle_ptr_                                            \
+        __auto_type impl_ins_handle_ptr                                        \
             = (handle_realtime_ordered_map_handle_ptr);                        \
-        ccc_handle_i hrm_ins_hndl_ret_ = 0;                                    \
-        if (ins_handle_ptr_)                                                   \
+        ccc_handle_i impl_hrm_ins_hndl_ret = 0;                                \
+        if (impl_ins_handle_ptr)                                               \
         {                                                                      \
-            struct ccc_hrtree_handle_ *hrm_ins_hndl_                           \
-                = &ins_handle_ptr_->impl_;                                     \
-            if (!(hrm_ins_hndl_->handle_.stats_ & CCC_ENTRY_OCCUPIED))         \
+            struct ccc_hrtree_handle *impl_hrm_ins_hndl                        \
+                = &impl_ins_handle_ptr->impl;                                  \
+            if (!(impl_hrm_ins_hndl->handle.stats & CCC_ENTRY_OCCUPIED))       \
             {                                                                  \
-                hrm_ins_hndl_ret_                                              \
-                    = ccc_impl_hrm_alloc_slot(hrm_ins_hndl_->hrm_);            \
-                if (hrm_ins_hndl_ret_)                                         \
+                impl_hrm_ins_hndl_ret                                          \
+                    = ccc_impl_hrm_alloc_slot(impl_hrm_ins_hndl->hrm);         \
+                if (impl_hrm_ins_hndl_ret)                                     \
                 {                                                              \
                     *((typeof(lazy_key_value) *)ccc_buf_at(                    \
-                        &hrm_ins_hndl_->hrm_->buf_, hrm_ins_hndl_ret_))        \
+                        &impl_hrm_ins_hndl->hrm->buf, impl_hrm_ins_hndl_ret))  \
                         = lazy_key_value;                                      \
                     ccc_impl_hrm_insert(                                       \
-                        hrm_ins_hndl_->hrm_, hrm_ins_hndl_->handle_.i_,        \
-                        hrm_ins_hndl_->last_cmp_, hrm_ins_hndl_ret_);          \
+                        impl_hrm_ins_hndl->hrm, impl_hrm_ins_hndl->handle.i,   \
+                        impl_hrm_ins_hndl->last_cmp, impl_hrm_ins_hndl_ret);   \
                 }                                                              \
             }                                                                  \
-            else if (hrm_ins_hndl_->handle_.stats_ == CCC_ENTRY_OCCUPIED)      \
+            else if (impl_hrm_ins_hndl->handle.stats == CCC_ENTRY_OCCUPIED)    \
             {                                                                  \
-                hrm_ins_hndl_ret_ = hrm_ins_hndl_->handle_.i_;                 \
-                struct ccc_hromap_elem_ ins_hndl_saved_                        \
-                    = *ccc_impl_hrm_elem_at(hrm_ins_hndl_->hrm_,               \
-                                            hrm_ins_hndl_ret_);                \
+                impl_hrm_ins_hndl_ret = impl_hrm_ins_hndl->handle.i;           \
+                struct ccc_hromap_elem impl_ins_hndl_saved                     \
+                    = *ccc_impl_hrm_elem_at(impl_hrm_ins_hndl->hrm,            \
+                                            impl_hrm_ins_hndl_ret);            \
                 *((typeof(lazy_key_value) *)ccc_buf_at(                        \
-                    &hrm_ins_hndl_->hrm_->buf_, hrm_ins_hndl_ret_))            \
+                    &impl_hrm_ins_hndl->hrm->buf, impl_hrm_ins_hndl_ret))      \
                     = lazy_key_value;                                          \
-                *ccc_impl_hrm_elem_at(hrm_ins_hndl_->hrm_, hrm_ins_hndl_ret_)  \
-                    = ins_hndl_saved_;                                         \
+                *ccc_impl_hrm_elem_at(impl_hrm_ins_hndl->hrm,                  \
+                                      impl_hrm_ins_hndl_ret)                   \
+                    = impl_ins_hndl_saved;                                     \
             }                                                                  \
         }                                                                      \
-        hrm_ins_hndl_ret_;                                                     \
+        impl_hrm_ins_hndl_ret;                                                 \
     }))
 
 /** @private */
 #define ccc_impl_hrm_try_insert_w(handle_realtime_ordered_map_ptr, key,        \
                                   lazy_value...)                               \
     (__extension__({                                                           \
-        __auto_type try_ins_map_ptr_ = (handle_realtime_ordered_map_ptr);      \
-        struct ccc_handl_ hrm_try_ins_hndl_ret_                                \
-            = {.stats_ = CCC_ENTRY_ARG_ERROR};                                 \
-        if (try_ins_map_ptr_)                                                  \
+        __auto_type impl_try_ins_map_ptr = (handle_realtime_ordered_map_ptr);  \
+        struct ccc_handl impl_hrm_try_ins_hndl_ret                             \
+            = {.stats = CCC_ENTRY_ARG_ERROR};                                  \
+        if (impl_try_ins_map_ptr)                                              \
         {                                                                      \
-            __auto_type hrm_key_ = (key);                                      \
-            struct ccc_hrtree_handle_ hrm_try_ins_hndl_                        \
-                = ccc_impl_hrm_handle(try_ins_map_ptr_, (void *)&hrm_key_);    \
-            if (!(hrm_try_ins_hndl_.handle_.stats_ & CCC_ENTRY_OCCUPIED))      \
+            __auto_type impl_hrm_key = (key);                                  \
+            struct ccc_hrtree_handle impl_hrm_try_ins_hndl                     \
+                = ccc_impl_hrm_handle(impl_try_ins_map_ptr,                    \
+                                      (void *)&impl_hrm_key);                  \
+            if (!(impl_hrm_try_ins_hndl.handle.stats & CCC_ENTRY_OCCUPIED))    \
             {                                                                  \
-                hrm_try_ins_hndl_ret_ = (struct ccc_handl_){                   \
-                    .i_ = ccc_impl_hrm_alloc_slot(hrm_try_ins_hndl_.hrm_),     \
-                    .stats_ = CCC_ENTRY_INSERT_ERROR};                         \
-                if (hrm_try_ins_hndl_ret_.i_)                                  \
+                impl_hrm_try_ins_hndl_ret = (struct ccc_handl){                \
+                    .i = ccc_impl_hrm_alloc_slot(impl_hrm_try_ins_hndl.hrm),   \
+                    .stats = CCC_ENTRY_INSERT_ERROR,                           \
+                };                                                             \
+                if (impl_hrm_try_ins_hndl_ret.i)                               \
                 {                                                              \
                     *((typeof(lazy_value) *)ccc_buf_at(                        \
-                        &try_ins_map_ptr_->buf_, hrm_try_ins_hndl_ret_.i_))    \
+                        &impl_try_ins_map_ptr->buf,                            \
+                        impl_hrm_try_ins_hndl_ret.i))                          \
                         = lazy_value;                                          \
-                    *((typeof(hrm_key_) *)ccc_impl_hrm_key_at(                 \
-                        try_ins_map_ptr_, hrm_try_ins_hndl_ret_.i_))           \
-                        = hrm_key_;                                            \
-                    ccc_impl_hrm_insert(hrm_try_ins_hndl_.hrm_,                \
-                                        hrm_try_ins_hndl_.handle_.i_,          \
-                                        hrm_try_ins_hndl_.last_cmp_,           \
-                                        hrm_try_ins_hndl_ret_.i_);             \
-                    hrm_try_ins_hndl_ret_.stats_ = CCC_ENTRY_VACANT;           \
+                    *((typeof(impl_hrm_key) *)ccc_impl_hrm_key_at(             \
+                        impl_try_ins_map_ptr, impl_hrm_try_ins_hndl_ret.i))    \
+                        = impl_hrm_key;                                        \
+                    ccc_impl_hrm_insert(impl_hrm_try_ins_hndl.hrm,             \
+                                        impl_hrm_try_ins_hndl.handle.i,        \
+                                        impl_hrm_try_ins_hndl.last_cmp,        \
+                                        impl_hrm_try_ins_hndl_ret.i);          \
+                    impl_hrm_try_ins_hndl_ret.stats = CCC_ENTRY_VACANT;        \
                 }                                                              \
             }                                                                  \
-            else if (hrm_try_ins_hndl_.handle_.stats_ == CCC_ENTRY_OCCUPIED)   \
+            else if (impl_hrm_try_ins_hndl.handle.stats == CCC_ENTRY_OCCUPIED) \
             {                                                                  \
-                hrm_try_ins_hndl_ret_ = (struct ccc_handl_){                   \
-                    .i_ = hrm_try_ins_hndl_.handle_.i_,                        \
-                    .stats_ = hrm_try_ins_hndl_.handle_.stats_};               \
+                impl_hrm_try_ins_hndl_ret = (struct ccc_handl){                \
+                    .i = impl_hrm_try_ins_hndl.handle.i,                       \
+                    .stats = impl_hrm_try_ins_hndl.handle.stats,               \
+                };                                                             \
             }                                                                  \
         }                                                                      \
-        hrm_try_ins_hndl_ret_;                                                 \
+        impl_hrm_try_ins_hndl_ret;                                             \
     }))
 
 /** @private */
 #define ccc_impl_hrm_insert_or_assign_w(handle_realtime_ordered_map_ptr, key,  \
                                         lazy_value...)                         \
     (__extension__({                                                           \
-        __auto_type ins_or_assign_map_ptr_                                     \
+        __auto_type impl_ins_or_assign_map_ptr                                 \
             = (handle_realtime_ordered_map_ptr);                               \
-        struct ccc_handl_ hrm_ins_or_assign_hndl_ret_                          \
-            = {.stats_ = CCC_ENTRY_ARG_ERROR};                                 \
-        if (ins_or_assign_map_ptr_)                                            \
+        struct ccc_handl impl_hrm_ins_or_assign_hndl_ret                       \
+            = {.stats = CCC_ENTRY_ARG_ERROR};                                  \
+        if (impl_ins_or_assign_map_ptr)                                        \
         {                                                                      \
-            __auto_type hrm_key_ = (key);                                      \
-            struct ccc_hrtree_handle_ hrm_ins_or_assign_hndl_                  \
-                = ccc_impl_hrm_handle(ins_or_assign_map_ptr_,                  \
-                                      (void *)&hrm_key_);                      \
-            if (!(hrm_ins_or_assign_hndl_.handle_.stats_                       \
+            __auto_type impl_hrm_key = (key);                                  \
+            struct ccc_hrtree_handle impl_hrm_ins_or_assign_hndl               \
+                = ccc_impl_hrm_handle(impl_ins_or_assign_map_ptr,              \
+                                      (void *)&impl_hrm_key);                  \
+            if (!(impl_hrm_ins_or_assign_hndl.handle.stats                     \
                   & CCC_ENTRY_OCCUPIED))                                       \
             {                                                                  \
-                hrm_ins_or_assign_hndl_ret_                                    \
-                    = (struct ccc_handl_){.i_ = ccc_impl_hrm_alloc_slot(       \
-                                              hrm_ins_or_assign_hndl_.hrm_),   \
-                                          .stats_ = CCC_ENTRY_INSERT_ERROR};   \
-                if (hrm_ins_or_assign_hndl_ret_.i_)                            \
+                impl_hrm_ins_or_assign_hndl_ret                                \
+                    = (struct ccc_handl){.i = ccc_impl_hrm_alloc_slot(         \
+                                             impl_hrm_ins_or_assign_hndl.hrm), \
+                                         .stats = CCC_ENTRY_INSERT_ERROR};     \
+                if (impl_hrm_ins_or_assign_hndl_ret.i)                         \
                 {                                                              \
                     *((typeof(lazy_value) *)ccc_buf_at(                        \
-                        &hrm_ins_or_assign_hndl_.hrm_->buf_,                   \
-                        hrm_ins_or_assign_hndl_ret_.i_))                       \
+                        &impl_hrm_ins_or_assign_hndl.hrm->buf,                 \
+                        impl_hrm_ins_or_assign_hndl_ret.i))                    \
                         = lazy_value;                                          \
-                    *((typeof(hrm_key_) *)ccc_impl_hrm_key_at(                 \
-                        hrm_ins_or_assign_hndl_.hrm_,                          \
-                        hrm_ins_or_assign_hndl_ret_.i_))                       \
-                        = hrm_key_;                                            \
-                    ccc_impl_hrm_insert(hrm_ins_or_assign_hndl_.hrm_,          \
-                                        hrm_ins_or_assign_hndl_.handle_.i_,    \
-                                        hrm_ins_or_assign_hndl_.last_cmp_,     \
-                                        hrm_ins_or_assign_hndl_ret_.i_);       \
-                    hrm_ins_or_assign_hndl_ret_.stats_ = CCC_ENTRY_VACANT;     \
+                    *((typeof(impl_hrm_key) *)ccc_impl_hrm_key_at(             \
+                        impl_hrm_ins_or_assign_hndl.hrm,                       \
+                        impl_hrm_ins_or_assign_hndl_ret.i))                    \
+                        = impl_hrm_key;                                        \
+                    ccc_impl_hrm_insert(impl_hrm_ins_or_assign_hndl.hrm,       \
+                                        impl_hrm_ins_or_assign_hndl.handle.i,  \
+                                        impl_hrm_ins_or_assign_hndl.last_cmp,  \
+                                        impl_hrm_ins_or_assign_hndl_ret.i);    \
+                    impl_hrm_ins_or_assign_hndl_ret.stats = CCC_ENTRY_VACANT;  \
                 }                                                              \
             }                                                                  \
-            else if (hrm_ins_or_assign_hndl_.handle_.stats_                    \
+            else if (impl_hrm_ins_or_assign_hndl.handle.stats                  \
                      == CCC_ENTRY_OCCUPIED)                                    \
             {                                                                  \
-                struct ccc_hromap_elem_ ins_hndl_saved_                        \
+                struct ccc_hromap_elem impl_ins_hndl_saved                     \
                     = *ccc_impl_hrm_elem_at(                                   \
-                        hrm_ins_or_assign_hndl_.hrm_,                          \
-                        hrm_ins_or_assign_hndl_.handle_.i_);                   \
+                        impl_hrm_ins_or_assign_hndl.hrm,                       \
+                        impl_hrm_ins_or_assign_hndl.handle.i);                 \
                 *((typeof(lazy_value) *)ccc_buf_at(                            \
-                    &hrm_ins_or_assign_hndl_.hrm_->buf_,                       \
-                    hrm_ins_or_assign_hndl_.handle_.i_))                       \
+                    &impl_hrm_ins_or_assign_hndl.hrm->buf,                     \
+                    impl_hrm_ins_or_assign_hndl.handle.i))                     \
                     = lazy_value;                                              \
-                *ccc_impl_hrm_elem_at(hrm_ins_or_assign_hndl_.hrm_,            \
-                                      hrm_ins_or_assign_hndl_.handle_.i_)      \
-                    = ins_hndl_saved_;                                         \
-                hrm_ins_or_assign_hndl_ret_ = (struct ccc_handl_){             \
-                    .i_ = hrm_ins_or_assign_hndl_.handle_.i_,                  \
-                    .stats_ = hrm_ins_or_assign_hndl_.handle_.stats_};         \
-                *((typeof(hrm_key_) *)ccc_impl_hrm_key_at(                     \
-                    hrm_ins_or_assign_hndl_.hrm_,                              \
-                    hrm_ins_or_assign_hndl_.handle_.i_))                       \
-                    = hrm_key_;                                                \
+                *ccc_impl_hrm_elem_at(impl_hrm_ins_or_assign_hndl.hrm,         \
+                                      impl_hrm_ins_or_assign_hndl.handle.i)    \
+                    = impl_ins_hndl_saved;                                     \
+                impl_hrm_ins_or_assign_hndl_ret = (struct ccc_handl){          \
+                    .i = impl_hrm_ins_or_assign_hndl.handle.i,                 \
+                    .stats = impl_hrm_ins_or_assign_hndl.handle.stats};        \
+                *((typeof(impl_hrm_key) *)ccc_impl_hrm_key_at(                 \
+                    impl_hrm_ins_or_assign_hndl.hrm,                           \
+                    impl_hrm_ins_or_assign_hndl.handle.i))                     \
+                    = impl_hrm_key;                                            \
             }                                                                  \
         }                                                                      \
-        hrm_ins_or_assign_hndl_ret_;                                           \
+        impl_hrm_ins_or_assign_hndl_ret;                                       \
     }))
 
 /* NOLINTEND(readability-identifier-naming) */

@@ -22,7 +22,7 @@ limitations under the License.
 /** @endcond */
 
 /** @private */
-enum ccc_entry_status_ : uint8_t
+enum ccc_entry_status : uint8_t
 {
     CCC_ENTRY_VACANT = 0,
     CCC_ENTRY_OCCUPIED = 0x1,
@@ -32,56 +32,56 @@ enum ccc_entry_status_ : uint8_t
 };
 
 /** @private */
-struct ccc_ent_
+struct ccc_ent
 {
-    void *e_;
-    enum ccc_entry_status_ stats_;
+    void *e;
+    enum ccc_entry_status stats;
 };
 
 /** @private */
-union ccc_entry_
+union ccc_entry
 {
-    struct ccc_ent_ impl_;
+    struct ccc_ent impl;
 };
 
 /** @private */
-struct ccc_handl_
+struct ccc_handl
 {
-    size_t i_;
-    enum ccc_entry_status_ stats_;
+    size_t i;
+    enum ccc_entry_status stats;
 };
 
 /** @private */
-union ccc_handle_
+union ccc_handle
 {
-    struct ccc_handl_ impl_;
+    struct ccc_handl impl;
 };
 
 /** @private */
-struct ccc_range_u_
+struct ccc_range_u
 {
     union
     {
-        void *begin_;
-        void *rbegin_;
+        void *begin;
+        void *rbegin;
     };
     union
     {
-        void *end_;
-        void *rend_;
+        void *end;
+        void *rend;
     };
 };
 
 /** @private */
-union ccc_range_
+union ccc_range
 {
-    struct ccc_range_u_ impl_;
+    struct ccc_range_u impl;
 };
 
 /** @private */
-union ccc_rrange_
+union ccc_rrange
 {
-    struct ccc_range_u_ impl_;
+    struct ccc_range_u impl;
 };
 
 #endif /* CCC_IMPL_TYPES_H */

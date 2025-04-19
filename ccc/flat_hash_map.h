@@ -56,13 +56,13 @@ a contiguous buffer.
 
 A flat hash map can be initialized on the stack, heap, or data segment at
 runtime or compile time. */
-typedef struct ccc_fhmap_ ccc_flat_hash_map;
+typedef struct ccc_fhmap ccc_flat_hash_map;
 
 /** @brief A container specific entry used to implement the Entry Interface.
 
 The Entry Interface offers efficient search and subsequent insertion, deletion,
 or value update based on the needs of the user. */
-typedef union ccc_fhmap_entry_ ccc_fhmap_entry;
+typedef union ccc_fhmap_entry ccc_fhmap_entry;
 
 /**@}*/
 
@@ -368,7 +368,7 @@ Entry Interface.*/
 #define ccc_fhm_entry_r(map_ptr, key_ptr)                                      \
     &(ccc_fhmap_entry)                                                         \
     {                                                                          \
-        ccc_fhm_entry(map_ptr, key_ptr).impl_                                  \
+        ccc_fhm_entry(map_ptr, key_ptr).impl                                   \
     }
 
 /** @brief Modifies the provided entry if it is Occupied.
@@ -502,7 +502,7 @@ and wraps it in an entry to provide information about the old value. */
 #define ccc_fhm_swap_entry_r(map_ptr, key_val_type_ptr)                        \
     &(ccc_entry)                                                               \
     {                                                                          \
-        ccc_fhm_swap_entry(map_ptr, key_val_type_ptr).impl_                    \
+        ccc_fhm_swap_entry(map_ptr, key_val_type_ptr).impl                     \
     }
 
 /** @brief Remove the entry from the table if Occupied.
@@ -519,7 +519,7 @@ removed. */
 #define ccc_fhm_remove_entry_r(map_entry_ptr)                                  \
     &(ccc_entry)                                                               \
     {                                                                          \
-        ccc_fhm_remove_entry(map_entry_ptr).impl_                              \
+        ccc_fhm_remove_entry(map_entry_ptr).impl                               \
     }
 
 /** @brief Attempts to insert the key value wrapping key_val_handle
@@ -547,7 +547,7 @@ any subsequent insertions or deletions invalidate this reference. */
 #define ccc_fhm_try_insert_r(map_ptr, key_val_type_ptr)                        \
     &(ccc_entry)                                                               \
     {                                                                          \
-        ccc_fhm_try_insert(map_ptr, key_val_type_ptr).impl_                    \
+        ccc_fhm_try_insert(map_ptr, key_val_type_ptr).impl                     \
     }
 
 /** @brief lazily insert lazy_value into the map at key if key is absent.
@@ -593,7 +593,7 @@ the information regarding its presence is helpful. */
 #define ccc_fhm_insert_or_assign_r(map_ptr, key_val_type_ptr)                  \
     &(ccc_entry)                                                               \
     {                                                                          \
-        ccc_fhm_insert_or_assign(map_ptr, key_val_type_ptr).impl_              \
+        ccc_fhm_insert_or_assign(map_ptr, key_val_type_ptr).impl               \
     }
 
 /** @brief Inserts a new key value pair or overwrites the existing entry.
@@ -645,7 +645,7 @@ and wraps it in an entry to provide information about the old value. */
 #define ccc_fhm_remove_r(map_ptr, key_val_type_output_ptr)                     \
     &(ccc_entry)                                                               \
     {                                                                          \
-        ccc_fhm_remove(map_ptr, key_val_type_output_ptr).impl_                 \
+        ccc_fhm_remove(map_ptr, key_val_type_output_ptr).impl                  \
     }
 
 /** @brief Unwraps the provided entry to obtain a view into the table element.

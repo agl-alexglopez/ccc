@@ -50,7 +50,7 @@ N) increase/decrease key.
 
 A priority queue can be initialized on the stack, heap, or data segment at
 runtime or compile time.*/
-typedef struct ccc_pq_ ccc_priority_queue;
+typedef struct ccc_pq ccc_priority_queue;
 
 /** @brief The embedded struct type for operation of the priority queue.
 
@@ -60,7 +60,7 @@ memory with the appropriate lifetime and scope for the user's needs; the
 container does not allocate or free in this case. If allocation is allowed
 the container will handle copying the data wrapping the element to allocations
 and deallocating when necessary. */
-typedef struct ccc_pq_elem_ ccc_pq_elem;
+typedef struct ccc_pq_elem ccc_pq_elem;
 
 /**@}*/
 

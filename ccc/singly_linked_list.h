@@ -57,7 +57,7 @@ Types available in the container interface. */
 A singly linked list may be stored in the stack, heap, or data segment. Once
 Initialized it is passed by reference to all functions. A singly linked list
 can be initialized at compile time or runtime. */
-typedef struct ccc_sll_ ccc_singly_linked_list;
+typedef struct ccc_sll ccc_singly_linked_list;
 
 /** @brief A singly linked list intrusive element to embedded in a user type.
 
@@ -67,7 +67,7 @@ memory with the appropriate lifetime and scope for the user's needs; the
 container does not allocate or free in this case. If allocation is allowed
 the container will handle copying the data wrapping the element to allocations
 and deallocating when necessary. */
-typedef struct ccc_sll_elem_ ccc_sll_elem;
+typedef struct ccc_sll_elem ccc_sll_elem;
 
 /**@}*/
 

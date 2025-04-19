@@ -30,139 +30,142 @@ linked list. Supports O(1) insert and delete at the front, back, or any
 arbitrary position in the list. Elements always have a valid element to point
 to in the list due to the user of a sentinel so these pointers are never NULL
 if an element is in the list. */
-typedef struct ccc_dll_elem_
+struct ccc_dll_elem
 {
     /** @private The next element. Non-null if elem is in list. */
-    struct ccc_dll_elem_ *n_;
+    struct ccc_dll_elem *n;
     /** @private The previous element. Non-null if elem is in list. */
-    struct ccc_dll_elem_ *p_;
-} ccc_dll_elem_;
+    struct ccc_dll_elem *p;
+};
 
 /** @private A doubly linked list with a single sentinel for both head and
 tail. The list offers O(1) push, pop, insert, and erase at arbitrary positions
-in the list. The sentinel operates as follows to ensure nodes in the list never
-point to NULL.
+in the list. The sentinel (nil) operates as follows to ensure nodes in the list
+never point to NULL.
 
 An empty list.
 
-      sentinel
-    ┌──────────┐
-  ┌>│n=sentinel├──┐
-  └─┤p=sentinel│<─┘
-    └──────────┘
+      nil
+    ┌─────┐
+  ┌>│n=nil├──┐
+  └─┤p=nil│<─┘
+    └─────┘
 
 A list with one element.
 
-         ┌───────────────────┐
-         V                   │
-      sentinel        A      │
-    ┌──────────┐ ┌──────────┐│
-    │n=A       ├>│n=sentinel├┘
-   ┌┤p=A       │<┤p=sentinel│
-   │└──────────┘ └──────────┘
-   │                  ^
-   └──────────────────┘
+         ┌─────────┐
+         V         │
+      nil      A   │
+    ┌─────┐ ┌─────┐│
+    │n=A  ├>│n=nil├┘
+   ┌┤p=A  │<┤p=nil│
+   │└─────┘ └─────┘
+   │           ^
+   └───────────┘
 A list with three elements.
 
-         ┌─────────────────────────────────────────────┐
-         V                                             │
-      sentinel         A            B           C      │
-    ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐│
-    │n=A       ├>│n=B       ├>│n=C       ├>│n=sentinel├┘
-   ┌┤p=C       │<┤p=sentinel│<┤p=A       │<┤p=B       │
-   │└──────────┘ └──────────┘ └──────────┘ └──────────┘
-   │                                            ^
-   └────────────────────────────────────────────┘
+       ┌───────────────────────────┐
+       V                           │
+      nil      A       B       C   │
+    ┌─────┐ ┌─────┐ ┌─────┐ ┌─────┐│
+    │n=A  ├>│n=B  ├>│n=C  ├>│n=nil├┘
+   ┌┤p=C  │<┤p=nil│<┤p=A  │<┤p=B  │
+   │└─────┘ └─────┘ └─────┘ └─────┘
+   │                           ^
+   └───────────────────────────┘
 
-The single sentinel allows us to use two pointers instead of the four it would
-take with a head and tail sentinel. The only cost is slight care for certain
-cutting and node clearing steps to ensure the sentinel addresses remain valid */
-struct ccc_dll_
+The single nil allows us to use two pointers instead of the four it would
+take with a head and tail nil. The only cost is slight care for certain
+cutting and node clearing steps to ensure the nil addresses remain valid */
+struct ccc_dll
 {
     /** @private The sentinel with storage in the actual list struct. */
-    struct ccc_dll_elem_ sentinel_;
+    struct ccc_dll_elem nil;
     /** @private The size in bytes of the type which wraps this handle. */
-    size_t elem_sz_;
+    size_t elem_sz;
     /** @private The offset in bytes of the intrusive element in user type. */
-    size_t dll_elem_offset_;
+    size_t dll_elem_offset;
     /** @private The number of elements constantly tracked for O(1) check. */
-    size_t sz_;
+    size_t sz;
     /** @private The user provided comparison callback for sorting. */
-    ccc_any_type_cmp_fn *cmp_;
+    ccc_any_type_cmp_fn *cmp;
     /** @private The user provided allocation function, if any. */
-    ccc_any_alloc_fn *alloc_;
+    ccc_any_alloc_fn *alloc;
     /** @private User provided auxiliary data, if any. */
-    void *aux_;
+    void *aux;
 };
 
 /*=======================     Private Interface   ===========================*/
 
 /** @private */
-void ccc_impl_dll_push_back(struct ccc_dll_ *, struct ccc_dll_elem_ *);
+void ccc_impl_dll_push_back(struct ccc_dll *, struct ccc_dll_elem *);
 /** @private */
-void ccc_impl_dll_push_front(struct ccc_dll_ *, struct ccc_dll_elem_ *);
+void ccc_impl_dll_push_front(struct ccc_dll *, struct ccc_dll_elem *);
 /** @private */
-struct ccc_dll_elem_ *ccc_impl_dll_elem_in(struct ccc_dll_ const *,
-                                           void const *any_struct);
+struct ccc_dll_elem *ccc_impl_dll_elem_in(struct ccc_dll const *,
+                                          void const *any_struct);
 
 /*=======================     Macro Implementations   =======================*/
 
 /** @private */
-#define ccc_impl_dll_init(dll_name, struct_name, dll_elem_field, cmp_fn,       \
-                          alloc_fn, aux_data)                                  \
+#define ccc_impl_dll_init(impl_dll_name, impl_struct_name,                     \
+                          impl_dll_elem_field, impl_cmp_fn, impl_alloc_fn,     \
+                          impl_aux_data)                                       \
     {                                                                          \
-        .sentinel_.n_ = &(dll_name).sentinel_,                                 \
-        .sentinel_.p_ = &(dll_name).sentinel_,                                 \
-        .elem_sz_ = sizeof(struct_name),                                       \
-        .dll_elem_offset_ = offsetof(struct_name, dll_elem_field),             \
-        .sz_ = 0,                                                              \
-        .alloc_ = (alloc_fn),                                                  \
-        .cmp_ = (cmp_fn),                                                      \
-        .aux_ = (aux_data),                                                    \
+        .nil.n = &(impl_dll_name).nil,                                         \
+        .nil.p = &(impl_dll_name).nil,                                         \
+        .elem_sz = sizeof(impl_struct_name),                                   \
+        .dll_elem_offset = offsetof(impl_struct_name, impl_dll_elem_field),    \
+        .sz = 0,                                                               \
+        .alloc = (impl_alloc_fn),                                              \
+        .cmp = (impl_cmp_fn),                                                  \
+        .aux = (impl_aux_data),                                                \
     }
 
 /** @private */
 #define ccc_impl_dll_emplace_back(dll_ptr, struct_initializer...)              \
     (__extension__({                                                           \
-        typeof(struct_initializer) *dll_res_ = NULL;                           \
-        struct ccc_dll_ *dll_ = (dll_ptr);                                     \
-        if (dll_)                                                              \
+        typeof(struct_initializer) *impl_dll_res = NULL;                       \
+        struct ccc_dll *impl_dll = (dll_ptr);                                  \
+        if (impl_dll)                                                          \
         {                                                                      \
-            if (dll_->alloc_)                                                  \
+            if (impl_dll->alloc)                                               \
             {                                                                  \
-                dll_res_ = dll_->alloc_(NULL, dll_->elem_sz_, dll_->aux_);     \
-                if (dll_res_)                                                  \
+                impl_dll_res                                                   \
+                    = impl_dll->alloc(NULL, impl_dll->elem_sz, impl_dll->aux); \
+                if (impl_dll_res)                                              \
                 {                                                              \
-                    *dll_res_ = (typeof(*dll_res_))struct_initializer;         \
+                    *impl_dll_res = (typeof(*impl_dll_res))struct_initializer; \
                     ccc_impl_dll_push_back(                                    \
-                        dll_, ccc_impl_dll_elem_in(dll_, dll_res_));           \
+                        impl_dll,                                              \
+                        ccc_impl_dll_elem_in(impl_dll, impl_dll_res));         \
                 }                                                              \
             }                                                                  \
         }                                                                      \
-        dll_res_;                                                              \
+        impl_dll_res;                                                          \
     }))
 
 /** @private */
 #define ccc_impl_dll_emplace_front(dll_ptr, struct_initializer...)             \
     (__extension__({                                                           \
-        typeof(struct_initializer) *dll_res_;                                  \
-        struct ccc_dll_ *dll_ = (dll_ptr);                                     \
-        assert(sizeof(*dll_res_) == dll_->elem_sz_);                           \
-        if (!dll_->alloc_)                                                     \
+        typeof(struct_initializer) *impl_dll_res = NULL;                       \
+        struct ccc_dll *impl_dll = (dll_ptr);                                  \
+        if (!impl_dll->alloc)                                                  \
         {                                                                      \
-            dll_res_ = NULL;                                                   \
+            impl_dll_res = NULL;                                               \
         }                                                                      \
         else                                                                   \
         {                                                                      \
-            dll_res_ = dll_->alloc_(NULL, dll_->elem_sz_, dll_->aux_);         \
-            if (dll_res_)                                                      \
+            impl_dll_res                                                       \
+                = impl_dll->alloc(NULL, impl_dll->elem_sz, impl_dll->aux);     \
+            if (impl_dll_res)                                                  \
             {                                                                  \
-                *dll_res_ = struct_initializer;                                \
-                ccc_impl_dll_push_front(dll_,                                  \
-                                        ccc_impl_dll_elem_in(dll_, dll_res_)); \
+                *impl_dll_res = struct_initializer;                            \
+                ccc_impl_dll_push_front(                                       \
+                    impl_dll, ccc_impl_dll_elem_in(impl_dll, impl_dll_res));   \
             }                                                                  \
         }                                                                      \
-        dll_res_;                                                              \
+        impl_dll_res;                                                          \
     }))
 
 /* NOLINTEND(readability-identifier-naming) */

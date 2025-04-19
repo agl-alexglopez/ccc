@@ -49,7 +49,7 @@ pointer stability.
 
 A realtime ordered map can be initialized on the stack, heap, or data segment at
 runtime or compile time.*/
-typedef struct ccc_romap_ ccc_realtime_ordered_map;
+typedef struct ccc_romap ccc_realtime_ordered_map;
 
 /** @brief The intrusive element of the user defined struct being stored in the
 map.
@@ -60,13 +60,13 @@ memory with the appropriate lifetime and scope for the user's needs; the
 container does not allocate or free in this case. If allocation is allowed
 the container will handle copying the data wrapping the element to allocations
 and deallocating when necessary. */
-typedef struct ccc_romap_elem_ ccc_romap_elem;
+typedef struct ccc_romap_elem ccc_romap_elem;
 
 /** @brief A container specific entry used to implement the Entry Interface.
 
 The Entry Interface offers efficient search and subsequent insertion, deletion,
 or value update based on the needs of the user. */
-typedef union ccc_romap_entry_ ccc_romap_entry;
+typedef union ccc_romap_entry ccc_romap_entry;
 
 /**@}*/
 
@@ -153,7 +153,7 @@ in an entry to provide information about the old value. */
     {                                                                          \
         ccc_rom_swap_entry((realtime_ordered_map_ptr), (key_val_handle_ptr),   \
                            (tmp_ptr))                                          \
-            .impl_                                                             \
+            .impl                                                              \
     }
 
 /** @brief Attempts to insert the key value wrapping key_val_handle.
@@ -178,7 +178,7 @@ error is set. */
     &(ccc_entry)                                                               \
     {                                                                          \
         ccc_rom_try_insert((realtime_ordered_map_ptr), (key_val_handle_ptr))   \
-            .impl_                                                             \
+            .impl                                                              \
     }
 
 /** @brief lazily insert lazy_value into the map at key if key is absent.
@@ -267,7 +267,7 @@ previously stored memory as they see fit. */
 #define ccc_rom_remove_r(realtime_ordered_map_ptr, out_handle_ptr)             \
     &(ccc_entry)                                                               \
     {                                                                          \
-        ccc_rom_remove((realtime_ordered_map_ptr), (out_handle_ptr)).impl_     \
+        ccc_rom_remove((realtime_ordered_map_ptr), (out_handle_ptr)).impl      \
     }
 
 /** @brief Obtains an entry for the provided key in the map for future use.
@@ -305,7 +305,7 @@ to subsequent calls in the Entry Interface. */
 #define ccc_rom_entry_r(realtime_ordered_map_ptr, key_ptr)                     \
     &(ccc_romap_entry)                                                         \
     {                                                                          \
-        ccc_rom_entry((realtime_ordered_map_ptr), (key_ptr)).impl_             \
+        ccc_rom_entry((realtime_ordered_map_ptr), (key_ptr)).impl              \
     }
 
 /** @brief Modifies the provided entry if it is Occupied.
@@ -438,7 +438,7 @@ free or use as needed. */
 #define ccc_rom_remove_entry_r(realtime_ordered_map_entry_ptr)                 \
     &(ccc_entry)                                                               \
     {                                                                          \
-        ccc_rom_remove_entry((realtime_ordered_map_entry_ptr)).impl_           \
+        ccc_rom_remove_entry((realtime_ordered_map_entry_ptr)).impl            \
     }
 
 /** @brief Unwraps the provided entry to obtain a view into the map element.
@@ -533,7 +533,7 @@ enclosing scope. This reference is always non-NULL. */
     {                                                                          \
         ccc_rom_equal_range((realtime_ordered_map_ptr),                        \
                             (begin_and_end_key_ptrs))                          \
-            .impl_                                                             \
+            .impl                                                              \
     }
 
 /** @brief Return an iterable rrange of values from [begin_key, end_key).
@@ -571,7 +571,7 @@ enclosing scope. This reference is always non-NULL. */
     {                                                                          \
         ccc_rom_equal_rrange((realtime_ordered_map_ptr),                       \
                              (rbegin_and_rend_key_ptrs))                       \
-            .impl_                                                             \
+            .impl                                                              \
     }
 
 /** @brief Return the start of an inorder traversal of the map. Amortized

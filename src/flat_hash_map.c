@@ -38,11 +38,11 @@ and data structures. */
 #include <string.h>
 
 /** Two platforms offer some form of vector instructions we can try. */
-#if defined(__x86_64) && defined(__SSE2__) && !defined(CCC_FHM_PORTABLE)
+#if defined(__x86_64) && defined(__SSE2_) && !defined(CCC_FHM_PORTABLE)
 #    include <immintrin.h>
-#elif defined(__ARM_NEON__) && !defined(CCC_FHM_PORTABLE)
+#elif defined(__ARM_NEON_) && !defined(CCC_FHM_PORTABLE)
 #    include <arm_neon.h>
-#endif /* defined(__x86_64) && defined(__SSE2__) && !CCC_FHM_PORTABLE */
+#endif /* defined(__x86_64) && defined(__SSE2_) && !CCC_FHM_PORTABLE */
 
 #include "flat_hash_map.h"
 #include "impl/impl_flat_hash_map.h"
@@ -151,7 +151,7 @@ static_assert(
 
 /* Can we vectorize instructions? Also it is possible to specify we want a
 portable implementation. Consider exposing to user in header docs. */
-#if defined(__x86_64) && defined(__SSE2__) && !defined(CCC_FHM_PORTABLE)
+#if defined(__x86_64) && defined(__SSE2_) && !defined(CCC_FHM_PORTABLE)
 
 /** @private The 128 bit vector type for efficient SIMD group scanning. 16 one
 byte large tags fit in this type. */
@@ -167,7 +167,7 @@ typedef struct
     uint16_t v;
 } index_mask;
 
-#elif defined(__ARM_NEON__) && !defined(CCC_FHM_PORTABLE)
+#elif defined(__ARM_NEON_) && !defined(CCC_FHM_PORTABLE)
 
 /** @private The 64 bit vector is used on NEON due to a lack of ability to
 compress a 128 bit vector to a smaller int efficiently. */
@@ -230,7 +230,7 @@ enum : uint8_t
     TAG_BITS = sizeof(ccc_fhm_tag) * CHAR_BIT,
 };
 
-#endif /* defined(__x86_64) && defined(__SSE2__) && !CCC_FHM_PORTABLE */
+#endif /* defined(__x86_64) && defined(__SSE2_) && !CCC_FHM_PORTABLE */
 
 enum : uint8_t
 {
@@ -254,40 +254,40 @@ struct triangular_seq
 /*===========================   Prototypes   ================================*/
 
 static void swap(char tmp[const], void *a, void *b, size_t ab_size);
-static struct ccc_fhash_entry_ container_entry(struct ccc_fhmap_ *h,
-                                               void const *key);
-static struct ccc_handl_ handle(struct ccc_fhmap_ *h, void const *key,
-                                uint64_t hash);
-static struct ccc_handl_ find_key_or_slot(struct ccc_fhmap_ const *h,
-                                          void const *key, uint64_t hash);
-static ccc_ucount find_key(struct ccc_fhmap_ const *h, void const *key,
+static struct ccc_fhash_entry container_entry(struct ccc_fhmap *h,
+                                              void const *key);
+static struct ccc_handl handle(struct ccc_fhmap *h, void const *key,
+                               uint64_t hash);
+static struct ccc_handl find_key_or_slot(struct ccc_fhmap const *h,
+                                         void const *key, uint64_t hash);
+static ccc_ucount find_key(struct ccc_fhmap const *h, void const *key,
                            uint64_t hash);
-static size_t find_existing_insert_slot(struct ccc_fhmap_ const *h,
+static size_t find_existing_insert_slot(struct ccc_fhmap const *h,
                                         uint64_t hash);
-static ccc_result maybe_rehash(struct ccc_fhmap_ *h, size_t to_add,
+static ccc_result maybe_rehash(struct ccc_fhmap *h, size_t to_add,
                                ccc_any_alloc_fn);
-static void insert_and_copy(struct ccc_fhmap_ *h, void const *key_val_type,
+static void insert_and_copy(struct ccc_fhmap *h, void const *key_val_type,
                             ccc_fhm_tag m, size_t i);
-static void erase(struct ccc_fhmap_ *h, size_t i);
-static void rehash_in_place(struct ccc_fhmap_ *h);
+static void erase(struct ccc_fhmap *h, size_t i);
+static void rehash_in_place(struct ccc_fhmap *h);
 static ccc_tribool is_same_group(size_t i, size_t new_i, uint64_t hash,
                                  size_t mask);
-static ccc_result rehash_resize(struct ccc_fhmap_ *h, size_t to_add,
+static ccc_result rehash_resize(struct ccc_fhmap *h, size_t to_add,
                                 ccc_any_alloc_fn);
-static ccc_tribool eq_fn(struct ccc_fhmap_ const *h, void const *key, size_t i);
-static uint64_t hash_fn(struct ccc_fhmap_ const *h, void const *any_key);
-static void *key_at(struct ccc_fhmap_ const *h, size_t i);
-static void *data_at(struct ccc_fhmap_ const *h, size_t i);
-static void *key_in_slot(struct ccc_fhmap_ const *h, void const *slot);
-static void *swap_slot(struct ccc_fhmap_ const *h);
-static ccc_ucount data_i(struct ccc_fhmap_ const *h, void const *data_slot);
+static ccc_tribool eq_fn(struct ccc_fhmap const *h, void const *key, size_t i);
+static uint64_t hash_fn(struct ccc_fhmap const *h, void const *any_key);
+static void *key_at(struct ccc_fhmap const *h, size_t i);
+static void *data_at(struct ccc_fhmap const *h, size_t i);
+static void *key_in_slot(struct ccc_fhmap const *h, void const *slot);
+static void *swap_slot(struct ccc_fhmap const *h);
+static ccc_ucount data_i(struct ccc_fhmap const *h, void const *data_slot);
 static size_t mask_to_total_bytes(size_t elem_size, size_t mask);
 static size_t mask_to_tag_bytes(size_t mask);
 static size_t mask_to_data_bytes(size_t elem_size, size_t mask);
-static void set_insert_tag(struct ccc_fhmap_ *h, ccc_fhm_tag m, size_t i);
+static void set_insert_tag(struct ccc_fhmap *h, ccc_fhm_tag m, size_t i);
 static size_t mask_to_load_factor_cap(size_t mask);
 static size_t max(size_t a, size_t b);
-static void set_tag(struct ccc_fhmap_ *h, ccc_fhm_tag m, size_t i);
+static void set_tag(struct ccc_fhmap *h, ccc_fhm_tag m, size_t i);
 static ccc_tribool is_index_on(index_mask m);
 static size_t lowest_on_index(index_mask m);
 static size_t leading_zeros(index_mask m);
@@ -318,7 +318,7 @@ ccc_fhm_is_empty(ccc_flat_hash_map const *const h)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    return !h->sz_;
+    return !h->sz;
 }
 
 ccc_ucount
@@ -328,7 +328,7 @@ ccc_fhm_size(ccc_flat_hash_map const *const h)
     {
         return (ccc_ucount){.error = CCC_RESULT_ARG_ERROR};
     }
-    return (ccc_ucount){.count = h->sz_};
+    return (ccc_ucount){.count = h->sz};
 }
 
 ccc_ucount
@@ -338,7 +338,7 @@ ccc_fhm_capacity(ccc_flat_hash_map const *const h)
     {
         return (ccc_ucount){.error = CCC_RESULT_ARG_ERROR};
     }
-    return (ccc_ucount){.count = h->mask_ + 1};
+    return (ccc_ucount){.count = h->mask + 1};
 }
 
 ccc_tribool
@@ -348,7 +348,7 @@ ccc_fhm_contains(ccc_flat_hash_map const *const h, void const *const key)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    if (unlikely(!h->init_ || !h->sz_))
+    if (unlikely(!h->init || !h->sz))
     {
         return CCC_FALSE;
     }
@@ -358,7 +358,7 @@ ccc_fhm_contains(ccc_flat_hash_map const *const h, void const *const key)
 void *
 ccc_fhm_get_key_val(ccc_flat_hash_map const *const h, void const *const key)
 {
-    if (unlikely(!h || !key || !h->init_ || !h->sz_))
+    if (unlikely(!h || !key || !h->init || !h->sz))
     {
         return NULL;
     }
@@ -375,7 +375,7 @@ ccc_fhm_entry(ccc_flat_hash_map *const h, void const *const key)
 {
     if (unlikely(!h || !key))
     {
-        return (ccc_fhmap_entry){{.handle_ = {.stats_ = CCC_ENTRY_ARG_ERROR}}};
+        return (ccc_fhmap_entry){{.handle = {.stats = CCC_ENTRY_ARG_ERROR}}};
     }
     return (ccc_fhmap_entry){container_entry(h, key)};
 }
@@ -388,17 +388,16 @@ ccc_fhm_or_insert(ccc_fhmap_entry const *const e, void const *key_val_type)
     {
         return NULL;
     }
-    if (e->impl_.handle_.stats_ & CCC_ENTRY_OCCUPIED)
+    if (e->impl.handle.stats & CCC_ENTRY_OCCUPIED)
     {
-        return data_at(e->impl_.h_, e->impl_.handle_.i_);
+        return data_at(e->impl.h, e->impl.handle.i);
     }
-    if (e->impl_.handle_.stats_ & CCC_ENTRY_INSERT_ERROR)
+    if (e->impl.handle.stats & CCC_ENTRY_INSERT_ERROR)
     {
         return NULL;
     }
-    insert_and_copy(e->impl_.h_, key_val_type, e->impl_.tag_,
-                    e->impl_.handle_.i_);
-    return data_at(e->impl_.h_, e->impl_.handle_.i_);
+    insert_and_copy(e->impl.h, key_val_type, e->impl.tag, e->impl.handle.i);
+    return data_at(e->impl.h, e->impl.handle.i);
 }
 
 void *
@@ -409,19 +408,18 @@ ccc_fhm_insert_entry(ccc_fhmap_entry const *const e, void const *key_val_type)
     {
         return NULL;
     }
-    if (e->impl_.handle_.stats_ & CCC_ENTRY_OCCUPIED)
+    if (e->impl.handle.stats & CCC_ENTRY_OCCUPIED)
     {
-        void *const slot = data_at(e->impl_.h_, e->impl_.handle_.i_);
-        (void)memcpy(slot, key_val_type, e->impl_.h_->elem_sz_);
+        void *const slot = data_at(e->impl.h, e->impl.handle.i);
+        (void)memcpy(slot, key_val_type, e->impl.h->elem_sz);
         return slot;
     }
-    if (e->impl_.handle_.stats_ & CCC_ENTRY_INSERT_ERROR)
+    if (e->impl.handle.stats & CCC_ENTRY_INSERT_ERROR)
     {
         return NULL;
     }
-    insert_and_copy(e->impl_.h_, key_val_type, e->impl_.tag_,
-                    e->impl_.handle_.i_);
-    return data_at(e->impl_.h_, e->impl_.handle_.i_);
+    insert_and_copy(e->impl.h, key_val_type, e->impl.tag, e->impl.handle.i);
+    return data_at(e->impl.h, e->impl.handle.i);
 }
 
 ccc_entry
@@ -429,23 +427,23 @@ ccc_fhm_remove_entry(ccc_fhmap_entry const *const e)
 {
     if (unlikely(!e))
     {
-        return (ccc_entry){{.stats_ = CCC_ENTRY_ARG_ERROR}};
+        return (ccc_entry){{.stats = CCC_ENTRY_ARG_ERROR}};
     }
-    if (!(e->impl_.handle_.stats_ & CCC_ENTRY_OCCUPIED))
+    if (!(e->impl.handle.stats & CCC_ENTRY_OCCUPIED))
     {
-        return (ccc_entry){{.stats_ = CCC_ENTRY_VACANT}};
+        return (ccc_entry){{.stats = CCC_ENTRY_VACANT}};
     }
-    erase(e->impl_.h_, e->impl_.handle_.i_);
-    return (ccc_entry){{.stats_ = CCC_ENTRY_OCCUPIED}};
+    erase(e->impl.h, e->impl.handle.i);
+    return (ccc_entry){{.stats = CCC_ENTRY_OCCUPIED}};
 }
 
 ccc_fhmap_entry *
 ccc_fhm_and_modify(ccc_fhmap_entry *const e, ccc_any_type_update_fn *const fn)
 {
-    if (e && fn && (e->impl_.handle_.stats_ & CCC_ENTRY_OCCUPIED) != 0)
+    if (e && fn && (e->impl.handle.stats & CCC_ENTRY_OCCUPIED) != 0)
     {
         fn((ccc_any_type){
-            .any_type = data_at(e->impl_.h_, e->impl_.handle_.i_),
+            .any_type = data_at(e->impl.h, e->impl.handle.i),
             .aux = NULL,
         });
     }
@@ -456,10 +454,10 @@ ccc_fhmap_entry *
 ccc_fhm_and_modify_aux(ccc_fhmap_entry *const e,
                        ccc_any_type_update_fn *const fn, void *const aux)
 {
-    if (e && fn && (e->impl_.handle_.stats_ & CCC_ENTRY_OCCUPIED) != 0)
+    if (e && fn && (e->impl.handle.stats & CCC_ENTRY_OCCUPIED) != 0)
     {
         fn((ccc_any_type){
-            .any_type = data_at(e->impl_.h_, e->impl_.handle_.i_),
+            .any_type = data_at(e->impl.h, e->impl.handle.i),
             .aux = aux,
         });
     }
@@ -471,27 +469,27 @@ ccc_fhm_swap_entry(ccc_flat_hash_map *const h, void *const key_val_type_output)
 {
     if (unlikely(!h || !key_val_type_output))
     {
-        return (ccc_entry){{.stats_ = CCC_ENTRY_ARG_ERROR}};
+        return (ccc_entry){{.stats = CCC_ENTRY_ARG_ERROR}};
     }
     void *const key = key_in_slot(h, key_val_type_output);
-    struct ccc_fhash_entry_ ent = container_entry(h, key);
-    if (ent.handle_.stats_ & CCC_ENTRY_OCCUPIED)
+    struct ccc_fhash_entry ent = container_entry(h, key);
+    if (ent.handle.stats & CCC_ENTRY_OCCUPIED)
     {
-        swap(swap_slot(h), data_at(h, ent.handle_.i_), key_val_type_output,
-             h->elem_sz_);
+        swap(swap_slot(h), data_at(h, ent.handle.i), key_val_type_output,
+             h->elem_sz);
         return (ccc_entry){{
-            .e_ = key_val_type_output,
-            .stats_ = CCC_ENTRY_OCCUPIED,
+            .e = key_val_type_output,
+            .stats = CCC_ENTRY_OCCUPIED,
         }};
     }
-    if (ent.handle_.stats_ & CCC_ENTRY_INSERT_ERROR)
+    if (ent.handle.stats & CCC_ENTRY_INSERT_ERROR)
     {
-        return (ccc_entry){{.stats_ = CCC_ENTRY_INSERT_ERROR}};
+        return (ccc_entry){{.stats = CCC_ENTRY_INSERT_ERROR}};
     }
-    insert_and_copy(ent.h_, key_val_type_output, ent.tag_, ent.handle_.i_);
+    insert_and_copy(ent.h, key_val_type_output, ent.tag, ent.handle.i);
     return (ccc_entry){{
-        .e_ = data_at(h, ent.handle_.i_),
-        .stats_ = CCC_ENTRY_VACANT,
+        .e = data_at(h, ent.handle.i),
+        .stats = CCC_ENTRY_VACANT,
     }};
 }
 
@@ -500,25 +498,25 @@ ccc_fhm_try_insert(ccc_flat_hash_map *const h, void *const key_val_type)
 {
     if (unlikely(!h || !key_val_type))
     {
-        return (ccc_entry){{.stats_ = CCC_ENTRY_ARG_ERROR}};
+        return (ccc_entry){{.stats = CCC_ENTRY_ARG_ERROR}};
     }
     void *const key = key_in_slot(h, key_val_type);
-    struct ccc_fhash_entry_ ent = container_entry(h, key);
-    if (ent.handle_.stats_ & CCC_ENTRY_OCCUPIED)
+    struct ccc_fhash_entry ent = container_entry(h, key);
+    if (ent.handle.stats & CCC_ENTRY_OCCUPIED)
     {
         return (ccc_entry){{
-            .e_ = data_at(h, ent.handle_.i_),
-            .stats_ = CCC_ENTRY_OCCUPIED,
+            .e = data_at(h, ent.handle.i),
+            .stats = CCC_ENTRY_OCCUPIED,
         }};
     }
-    if (ent.handle_.stats_ & CCC_ENTRY_INSERT_ERROR)
+    if (ent.handle.stats & CCC_ENTRY_INSERT_ERROR)
     {
-        return (ccc_entry){{.stats_ = CCC_ENTRY_INSERT_ERROR}};
+        return (ccc_entry){{.stats = CCC_ENTRY_INSERT_ERROR}};
     }
-    insert_and_copy(ent.h_, key_val_type, ent.tag_, ent.handle_.i_);
+    insert_and_copy(ent.h, key_val_type, ent.tag, ent.handle.i);
     return (ccc_entry){{
-        .e_ = data_at(h, ent.handle_.i_),
-        .stats_ = CCC_ENTRY_VACANT,
+        .e = data_at(h, ent.handle.i),
+        .stats = CCC_ENTRY_VACANT,
     }};
 }
 
@@ -527,26 +525,26 @@ ccc_fhm_insert_or_assign(ccc_flat_hash_map *const h, void *const key_val_type)
 {
     if (unlikely(!h || !key_val_type))
     {
-        return (ccc_entry){{.stats_ = CCC_ENTRY_ARG_ERROR}};
+        return (ccc_entry){{.stats = CCC_ENTRY_ARG_ERROR}};
     }
     void *const key = key_in_slot(h, key_val_type);
-    struct ccc_fhash_entry_ ent = container_entry(h, key);
-    if (ent.handle_.stats_ & CCC_ENTRY_OCCUPIED)
+    struct ccc_fhash_entry ent = container_entry(h, key);
+    if (ent.handle.stats & CCC_ENTRY_OCCUPIED)
     {
-        (void)memcpy(data_at(h, ent.handle_.i_), key_val_type, h->elem_sz_);
+        (void)memcpy(data_at(h, ent.handle.i), key_val_type, h->elem_sz);
         return (ccc_entry){{
-            .e_ = data_at(h, ent.handle_.i_),
-            .stats_ = CCC_ENTRY_OCCUPIED,
+            .e = data_at(h, ent.handle.i),
+            .stats = CCC_ENTRY_OCCUPIED,
         }};
     }
-    if (ent.handle_.stats_ & CCC_ENTRY_INSERT_ERROR)
+    if (ent.handle.stats & CCC_ENTRY_INSERT_ERROR)
     {
-        return (ccc_entry){{.stats_ = CCC_ENTRY_INSERT_ERROR}};
+        return (ccc_entry){{.stats = CCC_ENTRY_INSERT_ERROR}};
     }
-    insert_and_copy(ent.h_, key_val_type, ent.tag_, ent.handle_.i_);
+    insert_and_copy(ent.h, key_val_type, ent.tag, ent.handle.i);
     return (ccc_entry){{
-        .e_ = data_at(h, ent.handle_.i_),
-        .stats_ = CCC_ENTRY_VACANT,
+        .e = data_at(h, ent.handle.i),
+        .stats = CCC_ENTRY_VACANT,
     }};
 }
 
@@ -555,36 +553,36 @@ ccc_fhm_remove(ccc_flat_hash_map *const h, void *const key_val_type_output)
 {
     if (unlikely(!h || !key_val_type_output))
     {
-        return (ccc_entry){{.stats_ = CCC_ENTRY_ARG_ERROR}};
+        return (ccc_entry){{.stats = CCC_ENTRY_ARG_ERROR}};
     }
-    if (unlikely(!h->init_ || !h->sz_))
+    if (unlikely(!h->init || !h->sz))
     {
-        return (ccc_entry){{.stats_ = CCC_ENTRY_VACANT}};
+        return (ccc_entry){{.stats = CCC_ENTRY_VACANT}};
     }
     void *const key = key_in_slot(h, key_val_type_output);
     ccc_ucount const index = find_key(h, key, hash_fn(h, key));
     if (index.error)
     {
-        return (ccc_entry){{.stats_ = CCC_ENTRY_VACANT}};
+        return (ccc_entry){{.stats = CCC_ENTRY_VACANT}};
     }
-    (void)memcpy(key_val_type_output, data_at(h, index.count), h->elem_sz_);
+    (void)memcpy(key_val_type_output, data_at(h, index.count), h->elem_sz);
     erase(h, index.count);
     return (ccc_entry){{
-        .e_ = key_val_type_output,
-        .stats_ = CCC_ENTRY_OCCUPIED,
+        .e = key_val_type_output,
+        .stats = CCC_ENTRY_OCCUPIED,
     }};
 }
 
 void *
 ccc_fhm_begin(ccc_flat_hash_map const *const h)
 {
-    if (unlikely(!h || !h->mask_ || !h->init_ || !h->mask_ || !h->sz_))
+    if (unlikely(!h || !h->mask || !h->init || !h->mask || !h->sz))
     {
         return NULL;
     }
-    for (size_t i = 0; i < (h->mask_ + 1); ++i)
+    for (size_t i = 0; i < (h->mask + 1); ++i)
     {
-        if (is_full(h->tag_[i]))
+        if (is_full(h->tag[i]))
         {
             return data_at(h, i);
         }
@@ -596,7 +594,7 @@ void *
 ccc_fhm_next(ccc_flat_hash_map const *const h,
              void const *const key_val_type_iter)
 {
-    if (unlikely(!h || !key_val_type_iter || !h->mask_ || !h->init_ || !h->sz_))
+    if (unlikely(!h || !key_val_type_iter || !h->mask || !h->init || !h->sz))
     {
         return NULL;
     }
@@ -605,9 +603,9 @@ ccc_fhm_next(ccc_flat_hash_map const *const h,
     {
         return NULL;
     }
-    for (; i.count < (h->mask_ + 1); ++i.count)
+    for (; i.count < (h->mask + 1); ++i.count)
     {
-        if (is_full(h->tag_[i.count]))
+        if (is_full(h->tag[i.count]))
         {
             return data_at(h, i.count);
         }
@@ -624,11 +622,11 @@ ccc_fhm_end(ccc_flat_hash_map const *const)
 void *
 ccc_fhm_unwrap(ccc_fhmap_entry const *const e)
 {
-    if (unlikely(!e) || !(e->impl_.handle_.stats_ & CCC_ENTRY_OCCUPIED))
+    if (unlikely(!e) || !(e->impl.handle.stats & CCC_ENTRY_OCCUPIED))
     {
         return NULL;
     }
-    return data_at(e->impl_.h_, e->impl_.handle_.i_);
+    return data_at(e->impl.h, e->impl.handle.i);
 }
 
 ccc_result
@@ -640,28 +638,28 @@ ccc_fhm_clear(ccc_flat_hash_map *const h, ccc_any_type_destructor_fn *const fn)
     }
     if (!fn)
     {
-        if (unlikely(!h->init_ || !h->mask_ || !h->tag_))
+        if (unlikely(!h->init || !h->mask || !h->tag))
         {
             return CCC_RESULT_OK;
         }
-        (void)memset(h->tag_, TAG_EMPTY, mask_to_tag_bytes(h->mask_));
-        h->avail_ = mask_to_load_factor_cap(h->mask_);
-        h->sz_ = 0;
+        (void)memset(h->tag, TAG_EMPTY, mask_to_tag_bytes(h->mask));
+        h->avail = mask_to_load_factor_cap(h->mask);
+        h->sz = 0;
         return CCC_RESULT_OK;
     }
-    for (size_t i = 0; i < (h->mask_ + 1); ++i)
+    for (size_t i = 0; i < (h->mask + 1); ++i)
     {
-        if (is_full(h->tag_[i]))
+        if (is_full(h->tag[i]))
         {
             fn((ccc_any_type){
                 .any_type = data_at(h, i),
-                .aux = h->aux_,
+                .aux = h->aux,
             });
         }
     }
-    (void)memset(h->tag_, TAG_EMPTY, mask_to_tag_bytes(h->mask_));
-    h->avail_ = mask_to_load_factor_cap(h->mask_);
-    h->sz_ = 0;
+    (void)memset(h->tag, TAG_EMPTY, mask_to_tag_bytes(h->mask));
+    h->avail = mask_to_load_factor_cap(h->mask);
+    h->sz = 0;
     return CCC_RESULT_OK;
 }
 
@@ -669,34 +667,34 @@ ccc_result
 ccc_fhm_clear_and_free(ccc_flat_hash_map *const h,
                        ccc_any_type_destructor_fn *const fn)
 {
-    if (unlikely(!h || !h->data_ || !h->mask_ || !h->init_))
+    if (unlikely(!h || !h->data || !h->mask || !h->init))
     {
         return CCC_RESULT_ARG_ERROR;
     }
-    if (!h->alloc_fn_)
+    if (!h->alloc_fn)
     {
         (void)ccc_fhm_clear(h, fn);
         return CCC_RESULT_NO_ALLOC;
     }
     if (fn)
     {
-        for (size_t i = 0; i < (h->mask_ + 1); ++i)
+        for (size_t i = 0; i < (h->mask + 1); ++i)
         {
-            if (is_full(h->tag_[i]))
+            if (is_full(h->tag[i]))
             {
                 fn((ccc_any_type){
                     .any_type = data_at(h, i),
-                    .aux = h->aux_,
+                    .aux = h->aux,
                 });
             }
         }
     }
-    h->avail_ = 0;
-    h->mask_ = 0;
-    h->init_ = CCC_FALSE;
-    h->sz_ = 0;
-    h->tag_ = NULL;
-    h->data_ = h->alloc_fn_(h->data_, 0, h->aux_);
+    h->avail = 0;
+    h->mask = 0;
+    h->init = CCC_FALSE;
+    h->sz = 0;
+    h->tag = NULL;
+    h->data = h->alloc_fn(h->data, 0, h->aux);
     return CCC_RESULT_OK;
 }
 
@@ -705,8 +703,8 @@ ccc_fhm_clear_and_free_reserve(ccc_flat_hash_map *const h,
                                ccc_any_type_destructor_fn *const destructor,
                                ccc_any_alloc_fn *const alloc)
 {
-    if (unlikely(!h || !h->data_ || !h->init_ || !h->mask_
-                 || (h->alloc_fn_ && h->alloc_fn_ != alloc)))
+    if (unlikely(!h || !h->data || !h->init || !h->mask
+                 || (h->alloc_fn && h->alloc_fn != alloc)))
     {
         return CCC_RESULT_ARG_ERROR;
     }
@@ -717,23 +715,23 @@ ccc_fhm_clear_and_free_reserve(ccc_flat_hash_map *const h,
     }
     if (destructor)
     {
-        for (size_t i = 0; i < (h->mask_ + 1); ++i)
+        for (size_t i = 0; i < (h->mask + 1); ++i)
         {
-            if (is_full(h->tag_[i]))
+            if (is_full(h->tag[i]))
             {
                 destructor((ccc_any_type){
                     .any_type = data_at(h, i),
-                    .aux = h->aux_,
+                    .aux = h->aux,
                 });
             }
         }
     }
-    h->avail_ = 0;
-    h->mask_ = 0;
-    h->init_ = CCC_FALSE;
-    h->sz_ = 0;
-    h->tag_ = NULL;
-    h->data_ = alloc(h->data_, 0, h->aux_);
+    h->avail = 0;
+    h->mask = 0;
+    h->init = CCC_FALSE;
+    h->sz = 0;
+    h->tag = NULL;
+    h->data = alloc(h->data, 0, h->aux);
     return CCC_RESULT_OK;
 }
 
@@ -744,7 +742,7 @@ ccc_fhm_occupied(ccc_fhmap_entry const *const e)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    return (e->impl_.handle_.stats_ & CCC_ENTRY_OCCUPIED) != 0;
+    return (e->impl.handle.stats & CCC_ENTRY_OCCUPIED) != 0;
 }
 
 ccc_tribool
@@ -754,7 +752,7 @@ ccc_fhm_insert_error(ccc_fhmap_entry const *const e)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    return (e->impl_.handle_.stats_ & CCC_ENTRY_INSERT_ERROR) != 0;
+    return (e->impl.handle.stats & CCC_ENTRY_INSERT_ERROR) != 0;
 }
 
 ccc_handle_status
@@ -764,13 +762,13 @@ ccc_fhm_handle_status(ccc_fhmap_entry const *const e)
     {
         return CCC_ENTRY_ARG_ERROR;
     }
-    return e->impl_.handle_.stats_;
+    return e->impl.handle.stats;
 }
 
 void *
 ccc_fhm_data(ccc_flat_hash_map const *h)
 {
-    return h ? h->data_ : NULL;
+    return h ? h->data : NULL;
 }
 
 ccc_result
@@ -778,69 +776,69 @@ ccc_fhm_copy(ccc_flat_hash_map *const dst, ccc_flat_hash_map const *const src,
              ccc_any_alloc_fn *const fn)
 {
     if (!dst || !src || src == dst
-        || (src->mask_ && !is_power_of_two(src->mask_ + 1)))
+        || (src->mask && !is_power_of_two(src->mask + 1)))
     {
         return CCC_RESULT_ARG_ERROR;
     }
-    if (dst->mask_ < src->mask_ && !fn)
+    if (dst->mask < src->mask && !fn)
     {
         return CCC_RESULT_NO_ALLOC;
     }
     /* The destination could be messed up in a variety of ways that make it
        incompatible with src. Overwrite everything and save what we need from
        dst for a smooth copy over. */
-    void *const dst_data = dst->data_;
-    void *const dst_tag = dst->tag_;
-    size_t const dst_mask = dst->mask_;
-    size_t const dst_avail = dst->avail_;
-    ccc_tribool const dst_init = dst->init_;
-    ccc_any_alloc_fn *const dst_alloc = dst->alloc_fn_;
+    void *const dst_data = dst->data;
+    void *const dst_tag = dst->tag;
+    size_t const dst_mask = dst->mask;
+    size_t const dst_avail = dst->avail;
+    ccc_tribool const dst_init = dst->init;
+    ccc_any_alloc_fn *const dst_alloc = dst->alloc_fn;
     *dst = *src;
-    dst->data_ = dst_data;
-    dst->tag_ = dst_tag;
-    dst->mask_ = dst_mask;
-    dst->avail_ = dst_avail;
-    dst->init_ = dst_init;
-    dst->alloc_fn_ = dst_alloc;
-    if (!src->mask_ || !src->init_)
+    dst->data = dst_data;
+    dst->tag = dst_tag;
+    dst->mask = dst_mask;
+    dst->avail = dst_avail;
+    dst->init = dst_init;
+    dst->alloc_fn = dst_alloc;
+    if (!src->mask || !src->init)
     {
         return CCC_RESULT_OK;
     }
-    size_t const src_bytes = mask_to_total_bytes(src->elem_sz_, src->mask_);
-    if (dst->mask_ < src->mask_)
+    size_t const src_bytes = mask_to_total_bytes(src->elem_sz, src->mask);
+    if (dst->mask < src->mask)
     {
-        void *const new_mem = dst->alloc_fn_(dst->data_, src_bytes, dst->aux_);
+        void *const new_mem = dst->alloc_fn(dst->data, src_bytes, dst->aux);
         if (!new_mem)
         {
             return CCC_RESULT_MEM_ERROR;
         }
-        dst->data_ = new_mem;
+        dst->data = new_mem;
         /* Static assertions at top of file ensure this is correct. */
-        dst->tag_
+        dst->tag
             = (ccc_fhm_tag *)((char *)new_mem
-                              + mask_to_data_bytes(src->elem_sz_, src->mask_));
-        dst->mask_ = src->mask_;
+                              + mask_to_data_bytes(src->elem_sz, src->mask));
+        dst->mask = src->mask;
     }
-    if (!dst->data_ || !src->data_)
+    if (!dst->data || !src->data)
     {
         return CCC_RESULT_ARG_ERROR;
     }
-    (void)memset(dst->tag_, TAG_EMPTY, mask_to_tag_bytes(dst->mask_));
-    dst->avail_ = mask_to_load_factor_cap(dst->mask_);
-    dst->sz_ = 0;
-    dst->init_ = CCC_TRUE;
-    for (size_t i = 0; i < (src->mask_ + 1); ++i)
+    (void)memset(dst->tag, TAG_EMPTY, mask_to_tag_bytes(dst->mask));
+    dst->avail = mask_to_load_factor_cap(dst->mask);
+    dst->sz = 0;
+    dst->init = CCC_TRUE;
+    for (size_t i = 0; i < (src->mask + 1); ++i)
     {
-        if (is_full(src->tag_[i]))
+        if (is_full(src->tag[i]))
         {
             uint64_t const hash = hash_fn(src, key_at(src, i));
             size_t const new_i = find_existing_insert_slot(dst, hash);
             set_tag(dst, to_tag(hash), new_i);
-            (void)memcpy(data_at(dst, new_i), data_at(src, i), dst->elem_sz_);
+            (void)memcpy(data_at(dst, new_i), data_at(src, i), dst->elem_sz);
         }
     }
-    dst->avail_ -= src->sz_;
-    dst->sz_ = src->sz_;
+    dst->avail -= src->sz;
+    dst->sz = src->sz;
     return CCC_RESULT_OK;
 }
 
@@ -863,25 +861,25 @@ ccc_fhm_validate(ccc_flat_hash_map const *const h)
         return CCC_TRIBOOL_ERROR;
     }
     /* We initialized the metadata array of 0 capacity table? Not possible. */
-    if (h->init_ && !h->mask_)
+    if (h->init && !h->mask)
     {
         return CCC_FALSE;
     }
     /* No point checking invariants when lazy init hasn't happened yet. */
-    if (!h->init_ || !h->mask_)
+    if (!h->init || !h->mask)
     {
         return CCC_TRUE;
     }
     /* We are initialized, these need to point to the array positions. */
-    if (!h->data_ || !h->tag_)
+    if (!h->data || !h->tag)
     {
         return CCC_FALSE;
     }
     /* The replica group should be in sync. */
-    for (size_t original = 0, clone = (h->mask_ + 1);
+    for (size_t original = 0, clone = (h->mask + 1);
          original < CCC_FHM_GROUP_SIZE; ++original, ++clone)
     {
-        if (h->tag_[original].v != h->tag_[clone].v)
+        if (h->tag[original].v != h->tag[clone].v)
         {
             return CCC_FALSE;
         }
@@ -889,9 +887,9 @@ ccc_fhm_validate(ccc_flat_hash_map const *const h)
     size_t occupied = 0;
     size_t avail = 0;
     size_t deleted = 0;
-    for (size_t i = 0; i < (h->mask_ + 1); ++i)
+    for (size_t i = 0; i < (h->mask + 1); ++i)
     {
-        ccc_fhm_tag const t = h->tag_[i];
+        ccc_fhm_tag const t = h->tag[i];
         /* If we are a special constant there are only two possible values. */
         if (is_constant(t) && t.v != TAG_DELETED && t.v != TAG_EMPTY)
         {
@@ -915,10 +913,10 @@ ccc_fhm_validate(ccc_flat_hash_map const *const h)
         }
     }
     /* Do our tags agree with our manually tracked and set state? */
-    if (occupied != h->sz_ || occupied + avail + deleted != h->mask_ + 1
+    if (occupied != h->sz || occupied + avail + deleted != h->mask + 1
         || mask_to_load_factor_cap(occupied + avail + deleted) - occupied
                    - deleted
-               != h->avail_)
+               != h->avail)
     {
         return CCC_FALSE;
     }
@@ -927,42 +925,42 @@ ccc_fhm_validate(ccc_flat_hash_map const *const h)
 
 /*======================     Private Interface      =========================*/
 
-struct ccc_fhash_entry_
-ccc_impl_fhm_entry(struct ccc_fhmap_ *const h, void const *const key)
+struct ccc_fhash_entry
+ccc_impl_fhm_entry(struct ccc_fhmap *const h, void const *const key)
 {
     return container_entry(h, key);
 }
 
 void
-ccc_impl_fhm_insert(struct ccc_fhmap_ *h, void const *key_val_type,
+ccc_impl_fhm_insert(struct ccc_fhmap *h, void const *key_val_type,
                     ccc_fhm_tag m, size_t i)
 {
     insert_and_copy(h, key_val_type, m, i);
 }
 
 void
-ccc_impl_fhm_erase(struct ccc_fhmap_ *h, size_t i)
+ccc_impl_fhm_erase(struct ccc_fhmap *h, size_t i)
 {
     erase(h, i);
 }
 
 void *
-ccc_impl_fhm_data_at(struct ccc_fhmap_ const *const h, size_t const i)
+ccc_impl_fhm_data_at(struct ccc_fhmap const *const h, size_t const i)
 {
     return data_at(h, i);
 }
 
 void *
-ccc_impl_fhm_key_at(struct ccc_fhmap_ const *const h, size_t const i)
+ccc_impl_fhm_key_at(struct ccc_fhmap const *const h, size_t const i)
 {
     return key_at(h, i);
 }
 
 /* This is needed to help the macros only set a new insert conditionally. */
 void
-ccc_impl_fhm_set_insert(struct ccc_fhash_entry_ const *const e)
+ccc_impl_fhm_set_insert(struct ccc_fhash_entry const *const e)
 {
-    return set_insert_tag(e->h_, e->tag_, e->handle_.i_);
+    return set_insert_tag(e->h, e->tag, e->handle.i);
 }
 
 /*=========================   Static Internals   ============================*/
@@ -972,59 +970,59 @@ searched queries. This entry gives a reference to the associated map and any
 metadata and location info necessary for future actions. If this entry was
 obtained in hopes of insertions but insertion will cause an error. A status
 flag in the handle field will indicate the error. */
-static struct ccc_fhash_entry_
-container_entry(struct ccc_fhmap_ *const h, void const *const key)
+static struct ccc_fhash_entry
+container_entry(struct ccc_fhmap *const h, void const *const key)
 {
     uint64_t const hash = hash_fn(h, key);
-    return (struct ccc_fhash_entry_){
-        .h_ = (struct ccc_fhmap_ *)h,
-        .tag_ = to_tag(hash),
-        .handle_ = handle(h, key, hash),
+    return (struct ccc_fhash_entry){
+        .h = (struct ccc_fhmap *)h,
+        .tag = to_tag(hash),
+        .handle = handle(h, key, hash),
     };
 }
 
 /** Obtaining a handle may fail if a resize or rehash fails but certain queries
 must continue with that information. The status of the handle will indicate if
 an entry is occupied, vacant, or some error has occurred. */
-static struct ccc_handl_
-handle(struct ccc_fhmap_ *const h, void const *const key, uint64_t const hash)
+static struct ccc_handl
+handle(struct ccc_fhmap *const h, void const *const key, uint64_t const hash)
 {
     ccc_entry_status upcoming_insertion_error = 0;
-    switch (maybe_rehash(h, 1, h->alloc_fn_))
+    switch (maybe_rehash(h, 1, h->alloc_fn))
     {
     case CCC_RESULT_OK:
         break;
     case CCC_RESULT_ARG_ERROR:
-        return (struct ccc_handl_){.stats_ = CCC_ENTRY_ARG_ERROR};
+        return (struct ccc_handl){.stats = CCC_ENTRY_ARG_ERROR};
         break;
     default:
         upcoming_insertion_error = CCC_ENTRY_INSERT_ERROR;
         break;
     };
-    struct ccc_handl_ res = find_key_or_slot(h, key, hash);
-    res.stats_ |= upcoming_insertion_error;
+    struct ccc_handl res = find_key_or_slot(h, key, hash);
+    res.stats |= upcoming_insertion_error;
     return res;
 }
 
 /** Sets the insert tag meta data and copies the user type into the associated
 data slot. It is user's responsibility to ensure that the insert is valid. */
 static inline void
-insert_and_copy(struct ccc_fhmap_ *const h, void const *const key_val_type,
+insert_and_copy(struct ccc_fhmap *const h, void const *const key_val_type,
                 ccc_fhm_tag const m, size_t const i)
 {
     set_insert_tag(h, m, i);
-    (void)memcpy(data_at(h, i), key_val_type, h->elem_sz_);
+    (void)memcpy(data_at(h, i), key_val_type, h->elem_sz);
 }
 
 /** Sets the insert tag meta data. It is user's responsibility to ensure that
 the insert is valid. */
 static inline void
-set_insert_tag(struct ccc_fhmap_ *const h, ccc_fhm_tag const m, size_t const i)
+set_insert_tag(struct ccc_fhmap *const h, ccc_fhm_tag const m, size_t const i)
 {
-    assert(i <= h->mask_);
+    assert(i <= h->mask);
     assert((m.v & TAG_MSB) == 0);
-    h->avail_ -= (h->tag_[i].v == TAG_EMPTY);
-    ++h->sz_;
+    h->avail -= (h->tag[i].v == TAG_EMPTY);
+    ++h->sz;
     set_tag(h, m, i);
 }
 
@@ -1034,12 +1032,12 @@ a removal from the table: deleted, or empty. Which option to choose is
 determined by what is required to ensure the probing sequence works correctly in
 all future cases. */
 static inline void
-erase(struct ccc_fhmap_ *const h, size_t const i)
+erase(struct ccc_fhmap *const h, size_t const i)
 {
-    assert(i <= h->mask_);
-    index_mask const prev_group_empties = match_empty(
-        load_group(&h->tag_[(i - CCC_FHM_GROUP_SIZE) & h->mask_]));
-    index_mask const group_empties = match_empty(load_group(&h->tag_[i]));
+    assert(i <= h->mask);
+    index_mask const prev_group_empties
+        = match_empty(load_group(&h->tag[(i - CCC_FHM_GROUP_SIZE) & h->mask]));
+    index_mask const group_empties = match_empty(load_group(&h->tag[i]));
     /* Leading means start at most significant bit aka last group member.
        Trailing means start at the least significant bit aka first group member.
 
@@ -1066,8 +1064,8 @@ erase(struct ccc_fhmap_ *const h, size_t const i)
            >= CCC_FHM_GROUP_SIZE)
               ? (ccc_fhm_tag){TAG_DELETED}
               : (ccc_fhm_tag){TAG_EMPTY};
-    h->avail_ += (TAG_EMPTY == m.v);
-    --h->sz_;
+    h->avail += (TAG_EMPTY == m.v);
+    --h->sz;
     set_tag(h, m, i);
 }
 
@@ -1075,12 +1073,12 @@ erase(struct ccc_fhmap_ *const h, size_t const i)
 inserted. If the element does not exist and a non-occupied slot is returned
 that slot will have been the first empty or deleted slot encountered in the
 probe sequence. This function assumes an empty slot exists in the table. */
-static struct ccc_handl_
-find_key_or_slot(struct ccc_fhmap_ const *const h, void const *const key,
+static struct ccc_handl
+find_key_or_slot(struct ccc_fhmap const *const h, void const *const key,
                  uint64_t const hash)
 {
     ccc_fhm_tag const tag = to_tag(hash);
-    size_t const mask = h->mask_;
+    size_t const mask = h->mask;
     struct triangular_seq seq = {
         .i = hash & mask,
         .stride = 0,
@@ -1088,7 +1086,7 @@ find_key_or_slot(struct ccc_fhmap_ const *const h, void const *const key,
     ccc_ucount empty_or_deleted = {.error = CCC_RESULT_FAIL};
     do
     {
-        group const g = load_group(&h->tag_[seq.i]);
+        group const g = load_group(&h->tag[seq.i]);
         index_mask m = match_tag(g, tag);
         for (size_t i_match = lowest_on_index(m); i_match != CCC_FHM_GROUP_SIZE;
              i_match = next_index(&m))
@@ -1096,9 +1094,9 @@ find_key_or_slot(struct ccc_fhmap_ const *const h, void const *const key,
             i_match = (seq.i + i_match) & mask;
             if (likely(eq_fn(h, key, i_match)))
             {
-                return (struct ccc_handl_){
-                    .i_ = i_match,
-                    .stats_ = CCC_ENTRY_OCCUPIED,
+                return (struct ccc_handl){
+                    .i = i_match,
+                    .stats = CCC_ENTRY_OCCUPIED,
                 };
             }
         }
@@ -1115,9 +1113,9 @@ find_key_or_slot(struct ccc_fhmap_ const *const h, void const *const key,
         }
         if (likely(is_index_on(match_empty(g))))
         {
-            return (struct ccc_handl_){
-                .i_ = empty_or_deleted.count,
-                .stats_ = CCC_ENTRY_VACANT,
+            return (struct ccc_handl){
+                .i = empty_or_deleted.count,
+                .stats = CCC_ENTRY_VACANT,
             };
         }
         seq.stride += CCC_FHM_GROUP_SIZE;
@@ -1132,15 +1130,15 @@ branches and loads of groups are omitted compared to the search with intention
 to insert or remove. A successful search returns the index with an OK status
 while a failed search indicates a failure error status. */
 static ccc_ucount
-find_key(struct ccc_fhmap_ const *const h, void const *const key,
+find_key(struct ccc_fhmap const *const h, void const *const key,
          uint64_t const hash)
 {
     ccc_fhm_tag const tag = to_tag(hash);
-    size_t const mask = h->mask_;
+    size_t const mask = h->mask;
     struct triangular_seq seq = {.i = hash & mask, .stride = 0};
     do
     {
-        group const g = load_group(&h->tag_[seq.i]);
+        group const g = load_group(&h->tag[seq.i]);
         index_mask m = match_tag(g, tag);
         for (size_t i_match = lowest_on_index(m); i_match != CCC_FHM_GROUP_SIZE;
              i_match = next_index(&m))
@@ -1164,14 +1162,14 @@ find_key(struct ccc_fhmap_ const *const h, void const *const key,
 /** Finds an insert slot or loops forever. The caller of this function must know
 that there is an available empty or deleted slot in the table. */
 static size_t
-find_existing_insert_slot(struct ccc_fhmap_ const *const h, uint64_t const hash)
+find_existing_insert_slot(struct ccc_fhmap const *const h, uint64_t const hash)
 {
-    size_t const mask = h->mask_;
+    size_t const mask = h->mask;
     struct triangular_seq seq = {.i = hash & mask, .stride = 0};
     do
     {
         size_t const i = lowest_on_index(
-            match_empty_or_deleted(load_group(&h->tag_[seq.i])));
+            match_empty_or_deleted(load_group(&h->tag[seq.i])));
         if (likely(i != CCC_FHM_GROUP_SIZE))
         {
             return (seq.i + i) & mask;
@@ -1189,64 +1187,64 @@ is when the user wants to reserve the necessary space dynamically at runtime
 but only once and for a container that is not given permission to resize
 arbitrarily. */
 static ccc_result
-maybe_rehash(struct ccc_fhmap_ *const h, size_t const to_add,
+maybe_rehash(struct ccc_fhmap *const h, size_t const to_add,
              ccc_any_alloc_fn *const fn)
 {
-    if (unlikely(!h->mask_ && !fn))
+    if (unlikely(!h->mask && !fn))
     {
         return CCC_RESULT_NO_ALLOC;
     }
     /* Bump to next power of two and */
-    size_t required_total_cap = to_power_of_two(((h->sz_ + to_add) * 8) / 7);
+    size_t required_total_cap = to_power_of_two(((h->sz + to_add) * 8) / 7);
     if (!required_total_cap)
     {
         return CCC_RESULT_ARG_ERROR;
     }
-    if (unlikely(!h->init_))
+    if (unlikely(!h->init))
     {
-        if (h->mask_)
+        if (h->mask)
         {
-            if (!h->tag_ || !h->data_ || h->mask_ + 1 < required_total_cap)
+            if (!h->tag || !h->data || h->mask + 1 < required_total_cap)
             {
                 return CCC_RESULT_MEM_ERROR;
             }
-            if (h->mask_ + 1 < CCC_FHM_GROUP_SIZE
-                || !is_power_of_two(h->mask_ + 1))
+            if (h->mask + 1 < CCC_FHM_GROUP_SIZE
+                || !is_power_of_two(h->mask + 1))
             {
                 return CCC_RESULT_ARG_ERROR;
             }
-            (void)memset(h->tag_, TAG_EMPTY, mask_to_tag_bytes(h->mask_));
+            (void)memset(h->tag, TAG_EMPTY, mask_to_tag_bytes(h->mask));
         }
-        h->init_ = CCC_TRUE;
+        h->init = CCC_TRUE;
     }
-    if (unlikely(!h->mask_))
+    if (unlikely(!h->mask))
     {
         required_total_cap = max(required_total_cap, CCC_FHM_GROUP_SIZE);
         size_t const total_bytes
-            = mask_to_total_bytes(h->elem_sz_, required_total_cap - 1);
-        void *const buf = fn(NULL, total_bytes, h->aux_);
+            = mask_to_total_bytes(h->elem_sz, required_total_cap - 1);
+        void *const buf = fn(NULL, total_bytes, h->aux);
         if (!buf)
         {
             return CCC_RESULT_MEM_ERROR;
         }
-        h->mask_ = required_total_cap - 1;
-        h->data_ = buf;
-        h->avail_ = mask_to_load_factor_cap(h->mask_);
+        h->mask = required_total_cap - 1;
+        h->data = buf;
+        h->avail = mask_to_load_factor_cap(h->mask);
         /* Static assertions at top of file ensure this is correct. */
-        h->tag_ = (ccc_fhm_tag *)((char *)buf
-                                  + mask_to_data_bytes(h->elem_sz_, h->mask_));
-        (void)memset(h->tag_, TAG_EMPTY, mask_to_tag_bytes(h->mask_));
+        h->tag = (ccc_fhm_tag *)((char *)buf
+                                 + mask_to_data_bytes(h->elem_sz, h->mask));
+        (void)memset(h->tag, TAG_EMPTY, mask_to_tag_bytes(h->mask));
     }
-    if (likely(h->avail_))
+    if (likely(h->avail))
     {
         return CCC_RESULT_OK;
     }
-    size_t const current_total_cap = h->mask_ + 1;
-    if (fn && (h->sz_ + to_add) > current_total_cap / 2)
+    size_t const current_total_cap = h->mask + 1;
+    if (fn && (h->sz + to_add) > current_total_cap / 2)
     {
         return rehash_resize(h, to_add, fn);
     }
-    if (h->sz_ == mask_to_load_factor_cap(h->mask_))
+    if (h->sz == mask_to_load_factor_cap(h->mask))
     {
         return CCC_RESULT_NO_ALLOC;
     }
@@ -1259,20 +1257,20 @@ results. Assumes the table has been allocated and had no more remaining slots
 for insertion. Rehashing in place repeatedly can be expensive so the user
 should ensure to select an appropriate capacity for fixed size tables. */
 static void
-rehash_in_place(struct ccc_fhmap_ *const h)
+rehash_in_place(struct ccc_fhmap *const h)
 {
-    assert((h->mask_ + 1) % CCC_FHM_GROUP_SIZE == 0);
-    assert(h->tag_ && h->data_);
-    size_t const mask = h->mask_;
+    assert((h->mask + 1) % CCC_FHM_GROUP_SIZE == 0);
+    assert(h->tag && h->data);
+    size_t const mask = h->mask;
     for (size_t i = 0; i < mask + 1; i += CCC_FHM_GROUP_SIZE)
     {
-        store_group(&h->tag_[i], make_constants_empty_and_full_deleted(
-                                     load_group(&h->tag_[i])));
+        store_group(&h->tag[i], make_constants_empty_and_full_deleted(
+                                    load_group(&h->tag[i])));
     }
-    (void)memcpy(h->tag_ + (mask + 1), h->tag_, CCC_FHM_GROUP_SIZE);
+    (void)memcpy(h->tag + (mask + 1), h->tag, CCC_FHM_GROUP_SIZE);
     for (size_t i = 0; i < mask + 1; ++i)
     {
-        if (h->tag_[i].v != TAG_DELETED)
+        if (h->tag[i].v != TAG_DELETED)
         {
             continue;
         }
@@ -1289,22 +1287,22 @@ rehash_in_place(struct ccc_fhmap_ *const h)
                 set_tag(h, hash_tag, i);
                 break; /* continues outer loop */
             }
-            ccc_fhm_tag const occupant = h->tag_[new_i];
+            ccc_fhm_tag const occupant = h->tag[new_i];
             set_tag(h, hash_tag, new_i);
             if (occupant.v == TAG_EMPTY)
             {
                 set_tag(h, (ccc_fhm_tag){TAG_EMPTY}, i);
-                (void)memcpy(data_at(h, new_i), data_at(h, i), h->elem_sz_);
+                (void)memcpy(data_at(h, new_i), data_at(h, i), h->elem_sz);
                 break; /* continues outer loop */
             }
             /* The other slots data has been swapped and we rehash every
                element for this algorithm so there is no need to write its
                tag to this slot. It's data is in correct location already. */
             assert(occupant.v == TAG_DELETED);
-            swap(swap_slot(h), data_at(h, i), data_at(h, new_i), h->elem_sz_);
+            swap(swap_slot(h), data_at(h, i), data_at(h, new_i), h->elem_sz);
         } while (1);
     }
-    h->avail_ = mask_to_load_factor_cap(mask) - h->sz_;
+    h->avail = mask_to_load_factor_cap(mask) - h->sz;
 }
 
 /** Returns true if the position being rehashed would be moved to a new slot
@@ -1320,103 +1318,103 @@ is_same_group(size_t const i, size_t const new_i, uint64_t const hash,
 }
 
 static ccc_result
-rehash_resize(struct ccc_fhmap_ *const h, size_t const to_add,
+rehash_resize(struct ccc_fhmap *const h, size_t const to_add,
               ccc_any_alloc_fn *const fn)
 {
-    assert(((h->mask_ + 1) & h->mask_) == 0);
-    size_t const new_pow2_cap = next_power_of_two(h->mask_ + 1 + to_add) << 1;
-    if (new_pow2_cap < (h->mask_ + 1))
+    assert(((h->mask + 1) & h->mask) == 0);
+    size_t const new_pow2_cap = next_power_of_two(h->mask + 1 + to_add) << 1;
+    if (new_pow2_cap < (h->mask + 1))
     {
         return CCC_RESULT_MEM_ERROR;
     }
-    size_t const prev_bytes = mask_to_total_bytes(h->elem_sz_, h->mask_);
+    size_t const prev_bytes = mask_to_total_bytes(h->elem_sz, h->mask);
     size_t const total_bytes
-        = mask_to_total_bytes(h->elem_sz_, new_pow2_cap - 1);
+        = mask_to_total_bytes(h->elem_sz, new_pow2_cap - 1);
     if (total_bytes < prev_bytes)
     {
         return CCC_RESULT_MEM_ERROR;
     }
-    void *const new_buf = fn(NULL, total_bytes, h->aux_);
+    void *const new_buf = fn(NULL, total_bytes, h->aux);
     if (!new_buf)
     {
         return CCC_RESULT_MEM_ERROR;
     }
-    struct ccc_fhmap_ new_h = *h;
-    new_h.sz_ = 0;
-    new_h.mask_ = new_pow2_cap - 1;
-    new_h.avail_ = mask_to_load_factor_cap(new_h.mask_);
-    new_h.data_ = new_buf;
+    struct ccc_fhmap new_h = *h;
+    new_h.sz = 0;
+    new_h.mask = new_pow2_cap - 1;
+    new_h.avail = mask_to_load_factor_cap(new_h.mask);
+    new_h.data = new_buf;
     /* Our static assertions at start of file guarantee this is correct. */
-    new_h.tag_
+    new_h.tag
         = (ccc_fhm_tag *)((char *)new_buf
-                          + mask_to_data_bytes(new_h.elem_sz_, new_h.mask_));
-    (void)memset(new_h.tag_, TAG_EMPTY, mask_to_tag_bytes(new_h.mask_));
-    for (size_t i = 0; i < (h->mask_ + 1); ++i)
+                          + mask_to_data_bytes(new_h.elem_sz, new_h.mask));
+    (void)memset(new_h.tag, TAG_EMPTY, mask_to_tag_bytes(new_h.mask));
+    for (size_t i = 0; i < (h->mask + 1); ++i)
     {
-        if (is_full(h->tag_[i]))
+        if (is_full(h->tag[i]))
         {
             uint64_t const hash = hash_fn(h, key_at(h, i));
             size_t const new_i = find_existing_insert_slot(&new_h, hash);
             set_tag(&new_h, to_tag(hash), new_i);
-            (void)memcpy(data_at(&new_h, new_i), data_at(h, i), new_h.elem_sz_);
+            (void)memcpy(data_at(&new_h, new_i), data_at(h, i), new_h.elem_sz);
         }
     }
-    new_h.avail_ -= h->sz_;
-    new_h.sz_ = h->sz_;
-    (void)fn(h->data_, 0, h->aux_);
+    new_h.avail -= h->sz;
+    new_h.sz = h->sz;
+    (void)fn(h->data, 0, h->aux);
     *h = new_h;
     return CCC_RESULT_OK;
 }
 
 static inline uint64_t
-hash_fn(struct ccc_fhmap_ const *const h, void const *const any_key)
+hash_fn(struct ccc_fhmap const *const h, void const *const any_key)
 {
-    return h->hash_fn_((ccc_any_key){
+    return h->hash_fn((ccc_any_key){
         .any_key = any_key,
-        .aux = h->aux_,
+        .aux = h->aux,
     });
 }
 
 static inline ccc_tribool
-eq_fn(struct ccc_fhmap_ const *const h, void const *const key, size_t const i)
+eq_fn(struct ccc_fhmap const *const h, void const *const key, size_t const i)
 {
-    return h->eq_fn_((ccc_any_key_cmp){
+    return h->eq_fn((ccc_any_key_cmp){
         .any_key_lhs = key,
         .any_type_rhs = data_at(h, i),
-        .aux = h->aux_,
+        .aux = h->aux,
     });
 }
 
 static inline void *
-key_at(struct ccc_fhmap_ const *const h, size_t const i)
+key_at(struct ccc_fhmap const *const h, size_t const i)
 {
-    assert(i <= h->mask_);
-    return (char *)(h->tag_ - ((i + 1) * h->elem_sz_)) + h->key_offset_;
+    assert(i <= h->mask);
+    return (char *)(h->tag - ((i + 1) * h->elem_sz)) + h->key_offset;
 }
 
 static inline void *
-data_at(struct ccc_fhmap_ const *const h, size_t const i)
+data_at(struct ccc_fhmap const *const h, size_t const i)
 {
-    assert(i <= h->mask_);
-    return h->tag_ - ((i + 1) * h->elem_sz_);
+    assert(i <= h->mask);
+    return h->tag - ((i + 1) * h->elem_sz);
 }
 
 static inline ccc_ucount
-data_i(struct ccc_fhmap_ const *const h, void const *const data_slot)
+data_i(struct ccc_fhmap const *const h, void const *const data_slot)
 {
-    if ((char *)data_slot >= (char *)h->tag_
-        || (char *)data_slot <= (char *)h->data_)
+    if ((char *)data_slot >= (char *)h->tag
+        || (char *)data_slot <= (char *)h->data)
     {
         return (ccc_ucount){.error = CCC_RESULT_ARG_ERROR};
     }
     return (ccc_ucount){.count
-                        = ((char *)h->tag_ - (char *)data_slot) / h->elem_sz_};
+                        = ((char *)h->tag - (char *)data_slot) / h->elem_sz};
 }
 
 static inline void *
-swap_slot(struct ccc_fhmap_ const *h)
+swap_slot(struct ccc_fhmap const *h)
 {
-    return h->data_;
+    return h->data;
 }
 
 static inline void
@@ -1432,9 +1430,9 @@ swap(char tmp[const], void *const a, void *const b, size_t const ab_size)
 }
 
 static inline void *
-key_in_slot(struct ccc_fhmap_ const *const h, void const *const slot)
+key_in_slot(struct ccc_fhmap const *const h, void const *const slot)
 {
-    return (char *)slot + h->key_offset_;
+    return (char *)slot + h->key_offset;
 }
 
 /** Return n if a power of 2, otherwise returns next greater power of 2. 0 is
@@ -1542,12 +1540,12 @@ vector lanes for a single instruction. */
 /** Sets the specified tag at the index provided. Ensures that the replica
 group at the end of the tag array remains in sync with current tag if needed. */
 static inline void
-set_tag(struct ccc_fhmap_ *const h, ccc_fhm_tag const m, size_t const i)
+set_tag(struct ccc_fhmap *const h, ccc_fhm_tag const m, size_t const i)
 {
     size_t const replica_byte
-        = ((i - CCC_FHM_GROUP_SIZE) & h->mask_) + CCC_FHM_GROUP_SIZE;
-    h->tag_[i] = m;
-    h->tag_[replica_byte] = m;
+        = ((i - CCC_FHM_GROUP_SIZE) & h->mask) + CCC_FHM_GROUP_SIZE;
+    h->tag[i] = m;
+    h->tag[replica_byte] = m;
 }
 
 /** Returns CCC_TRUE if the tag holds user hash bits, meaning it is occupied. */
@@ -1625,7 +1623,7 @@ next_index(index_mask *const m)
 
 /** We have abstracted at much as we can before this point. Now implementations
 will need to vary based on availability of vectorized instructions. */
-#if defined(__x86_64) && defined(__SSE2__) && !defined(CCC_FHM_PORTABLE)
+#if defined(__x86_64) && defined(__SSE2_) && !defined(CCC_FHM_PORTABLE)
 
 /*=========================  Group Implementations   ========================*/
 
@@ -1720,7 +1718,7 @@ make_constants_empty_and_full_deleted(group const g)
     };
 }
 
-#elif defined(__ARM_NEON__) && !defined(CCC_FHM_PORTABLE)
+#elif defined(__ARM_NEON_) && !defined(CCC_FHM_PORTABLE)
 
 /** Below is the experimental NEON implementation for ARM architectures. This
 implementation assumes a little endian architecture as that is the norm in
@@ -1925,7 +1923,7 @@ make_constants_empty_and_full_deleted(group g)
     return g;
 }
 
-#endif /* defined(__x86_64) && defined(__SSE2__) && !CCC_FHM_PORTABLE */
+#endif /* defined(__x86_64) && defined(__SSE2_) && !CCC_FHM_PORTABLE */
 
 /*====================  Bit Counting for Index Mask   =======================*/
 
@@ -1935,7 +1933,7 @@ implementations can simply rely on counting zeros that yields correct results
 for their implementation. Each implementation attempts to use the built-ins
 first and then falls back to manual bit counting. */
 
-#if defined(__x86_64) && defined(__SSE2__) && !defined(CCC_FHM_PORTABLE)
+#if defined(__x86_64) && defined(__SSE2_) && !defined(CCC_FHM_PORTABLE)
 
 #    if defined(__has_builtin) && __has_builtin(__builtin_ctz)                 \
         && __has_builtin(__builtin_clz) && __has_builtin(__builtin_clzl)
@@ -2114,7 +2112,7 @@ clz_size_t(size_t n)
 #    endif /* !defined(__has_builtin) || !__has_builtin(__builtin_ctzl) ||     \
               !__has_builtin(__builtin_clzl) */
 
-#endif /* defined(__x86_64) && defined(__SSE2__) && !CCC_FHM_PORTABLE */
+#endif /* defined(__x86_64) && defined(__SSE2_) && !CCC_FHM_PORTABLE */
 
 /** The following Apache license follows as required by the Rust Hashbrown
 table which in turn is based on the Abseil Flat Hash Map developed at Google:
