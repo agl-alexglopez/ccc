@@ -1,8 +1,29 @@
-#include "checkers.h"
-#include "str_view.h"
+/** Author: Alexander Lopez
+===========================
+The test harness is meant to be run on the tests/ folder, not specific tests
+For running specific tests, you can run the binaries directly in the
+tests/[container]/ folder.
 
-#include <string.h>
+Point the executable at the tests as follows:
 
+.build/[path to]/run_tests tests/
+
+The path will be different to the run_tests executable depending on the build
+being build/debug/bin or build/bin.
+
+This program runs the tests as a child process so that we can also accept a
+report from the test program on its own determination of success. Each child
+will return a test status as its exit code. A pass is 0 and failure is non-zero,
+currently set as 1 to be POSIX compliant.
+
+Running children also gives us a chance to catch unforseen crashes or segfaults
+while still being able to run subsequent tests. Most programmer errors will
+trigger some sort of OS level failure that we can handle as the parent. If a
+test child fails in a non-catastrophic way it will only fail the individual
+function it is testing and will continue running subsequent test functions. This
+way we get as much information from all tests on their failures as possible.
+
+See checkers.h for the testing framework all tests agree to use. */
 #ifdef __linux__
 #    include <linux/limits.h>
 #    define FILESYS_MAX_PATH PATH_MAX
@@ -18,8 +39,12 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/wait.h>
 #include <unistd.h>
+
+#include "checkers.h"
+#include "str_view.h"
 
 struct path_bin
 {
