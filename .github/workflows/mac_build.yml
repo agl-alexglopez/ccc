@@ -6,7 +6,7 @@ on:
 
 jobs:
   check-diff:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     outputs: 
       handle: ${{ steps.check.outputs.run }}
     steps:
@@ -33,7 +33,7 @@ jobs:
           fi
 
   build:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     needs: check-diff
     if: ${{ needs.check-diff.outputs.handle == 'true' }}
 
