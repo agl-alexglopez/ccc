@@ -196,12 +196,12 @@ typedef struct
 
 enum : uint64_t
 {
-    /** @private LSB tag bits used for byte and word level masking. */
-    INDEX_MASK_BYTE_LSBS = 0x101010101010101,
     /** @private MSB tag bit used for static assert. */
     INDEX_MASK_MSB = 0x8000000000000000,
     /** @private MSB tag bits used for byte and word level masking. */
     INDEX_MASK_BYTE_MSBS = 0x8080808080808080,
+    /** @private LSB tag bits used for byte and word level masking. */
+    INDEX_MASK_BYTE_LSBS = 0x101010101010101,
     /** @private Debug mode check for bits that must be off in index mask. */
     INDEX_MASK_BYTE_OFF_BITS = 0x7F7F7F7F7F7F7F7F,
 };
@@ -227,12 +227,12 @@ typedef struct
 
 enum : typeof((group){}.v)
 {
-    /** @private LSB tag bits used for byte and word level masking. */
-    INDEX_MASK_BYTE_LSBS = 0x101010101010101,
     /** @private MSB tag bit used for static assert. */
     INDEX_MASK_MSB = 0x8000000000000000,
     /** @private MSB tag bits used for byte and word level masking. */
     INDEX_MASK_BYTE_MSBS = 0x8080808080808080,
+    /** @private LSB tag bits used for byte and word level masking. */
+    INDEX_MASK_BYTE_LSBS = 0x101010101010101,
     /** @private Debug mode check for bits that must be off in index mask. */
     INDEX_MASK_BYTE_OFF_BITS = 0x7F7F7F7F7F7F7F7F,
 };
@@ -2049,24 +2049,24 @@ clz_size_t(size_t n)
 static_assert(
     sizeof((index_mask){}.v) == sizeof(long),
     "builtin assumes an integer width that must be compatible with index mask");
-static_assert(
-    __builtin_ctzl(INDEX_MASK_MSB) / CCC_FHM_GROUP_SIZE
-        == CCC_FHM_GROUP_SIZE - 1,
-    "builtin trailing zeros must produce number of bits we expect for mask");
-static_assert(
-    __builtin_clzl((index_mask){1}.v) / CCC_FHM_GROUP_SIZE
-        == CCC_FHM_GROUP_SIZE - 1,
-    "builtin trailing zeros must produce number of bits we expect for mask");
 
 static inline unsigned
 ctz(index_mask const m)
 {
+    static_assert(__builtin_ctzl(INDEX_MASK_MSB) / CCC_FHM_GROUP_SIZE
+                      == CCC_FHM_GROUP_SIZE - 1,
+                  "builtin trailing zeros must produce number of bits we "
+                  "expect for mask");
     return m.v ? __builtin_ctzl(m.v) / CCC_FHM_GROUP_SIZE : CCC_FHM_GROUP_SIZE;
 }
 
 static inline unsigned
 clz(index_mask const m)
 {
+    static_assert(__builtin_clzl((index_mask){1}.v) / CCC_FHM_GROUP_SIZE
+                      == CCC_FHM_GROUP_SIZE - 1,
+                  "builtin trailing zeros must produce number of bits we "
+                  "expect for mask");
     return m.v ? __builtin_clzl(m.v) / CCC_FHM_GROUP_SIZE : CCC_FHM_GROUP_SIZE;
 }
 
