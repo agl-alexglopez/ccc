@@ -67,7 +67,7 @@ constants because the most significant bit is on and then empty can be easily
 distinguished from deleted by the least significant bit. The full case occurs
 when the most significant bit is off and the next 7 bits are available for the
 fingerprint of the user hash. */
-enum : uint8_t
+enum : typeof((ccc_fhm_tag){}.v)
 {
     /** @private Deleted is applied when a removed value in a group must signal
     to a probe sequence to continue searching for a match or empty to stop. */
@@ -81,7 +81,7 @@ static_assert(sizeof(ccc_fhm_tag) == sizeof(uint8_t),
               "tag must wrap a byte in a struct without padding for better "
               "optimizations and no strict-aliasing exceptions.");
 static_assert(
-    (TAG_DELETED | TAG_EMPTY) == (uint8_t)~0,
+    (TAG_DELETED | TAG_EMPTY) == (typeof((ccc_fhm_tag){}.v))~0,
     "all bits must be accounted for across deleted and empty status.");
 static_assert(
     (TAG_DELETED ^ TAG_EMPTY) == 0x7F,
@@ -237,7 +237,7 @@ enum : typeof((group){}.v)
     INDEX_MASK_TAGS_OFF_BITS = 0x7F7F7F7F7F7F7F7F,
 };
 
-enum : uint8_t
+enum : typeof((ccc_fhm_tag){}.v)
 {
     /** @private Bits in a tag used to help in creating a group of one tag. */
     TAG_BITS = sizeof(ccc_fhm_tag) * CHAR_BIT,
@@ -245,7 +245,7 @@ enum : uint8_t
 
 #endif /* defined(CCC_HAS_X86_SIMD) */
 
-enum : uint8_t
+enum : typeof((ccc_fhm_tag){}.v)
 {
     /** @private Used to verify if tag is constant or hash data. */
     TAG_MSB = 0x80,
