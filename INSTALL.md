@@ -12,7 +12,7 @@ To avoid including tests, samples, and other extraneous files when fetching cont
 include(FetchContent)
 FetchContent_Declare(
   ccc
-  URL https://github.com/agl-alexglopez/ccc/releases/download/v[MAJOR.MINOR.PATCH]/v[MAJOR.MINOR.PATCH].zip
+  URL https://github.com/agl-alexglopez/ccc/releases/download/v[MAJOR.MINOR.PATCH]/ccc-v[MAJOR.MINOR.PATCH].zip
   #DOWNLOAD_EXTRACT_TIMESTAMP FALSE # CMake may raise a warning to set this. If so, uncomment and set.
 )
 FetchContent_MakeAvailable(ccc)
