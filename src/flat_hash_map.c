@@ -38,17 +38,17 @@ better capabilities for 128 bit group operations. */
 #include <stdint.h>
 #include <string.h>
 
-/** Two platforms offer some form of vector instructions we can try. */
-#if defined(__x86_64) && defined(__SSE2__) && !defined(CCC_FHM_PORTABLE)
-#    include <immintrin.h>
-#elif defined(__ARM_NEON__) && !defined(CCC_FHM_PORTABLE)
-#    include <arm_neon.h>
-#endif /* defined(__x86_64) && defined(__SSE2__) && !CCC_FHM_PORTABLE */
-
 #include "flat_hash_map.h"
 #include "impl/impl_flat_hash_map.h"
 #include "impl/impl_types.h"
 #include "types.h"
+
+/** Two platforms offer some form of vector instructions we can try. */
+#if defined(CCC_HAS_X86_SIMD)
+#    include <immintrin.h>
+#elif defined(CCC_HAS_ARM_SIMD)
+#    include <arm_neon.h>
+#endif /* defined(CCC_HAS_X86_SIMD) */
 
 /** Maybe the compiler can give us better performance in key paths. */
 #if defined(__has_builtin) && __has_builtin(__builtin_expect)
@@ -152,7 +152,7 @@ static_assert(
 
 /* Can we vectorize instructions? Also it is possible to specify we want a
 portable implementation. Consider exposing to user in header docs. */
-#if defined(__x86_64) && defined(__SSE2__) && !defined(CCC_FHM_PORTABLE)
+#if defined(CCC_HAS_X86_SIMD)
 
 /** @private The 128 bit vector type for efficient SIMD group scanning. 16 one
 byte large tags fit in this type. */
@@ -168,7 +168,7 @@ typedef struct
     uint16_t v;
 } index_mask;
 
-#elif defined(__ARM_NEON__) && !defined(CCC_FHM_PORTABLE)
+#elif defined(CCC_HAS_ARM_SIMD)
 
 /** @private The 64 bit vector is used on NEON due to a lack of ability to
 compress a 128 bit vector to a smaller int efficiently. */
@@ -231,7 +231,7 @@ enum : uint8_t
     TAG_BITS = sizeof(ccc_fhm_tag) * CHAR_BIT,
 };
 
-#endif /* defined(__x86_64) && defined(__SSE2__) && !CCC_FHM_PORTABLE */
+#endif /* defined(CCC_HAS_X86_SIMD) */
 
 enum : uint8_t
 {
@@ -1628,7 +1628,7 @@ next_index(index_mask *const m)
 
 /** We have abstracted at much as we can before this point. Now implementations
 will need to vary based on availability of vectorized instructions. */
-#if defined(__x86_64) && defined(__SSE2__) && !defined(CCC_FHM_PORTABLE)
+#if defined(CCC_HAS_X86_SIMD)
 
 /*=========================  Group Implementations   ========================*/
 
@@ -1723,7 +1723,7 @@ make_constants_empty_and_full_deleted(group const g)
     };
 }
 
-#elif defined(__ARM_NEON__) && !defined(CCC_FHM_PORTABLE)
+#elif defined(CCC_HAS_ARM_SIMD)
 
 /** Below is the experimental NEON implementation for ARM architectures. This
 implementation assumes a little endian architecture as that is the norm in
@@ -1928,7 +1928,7 @@ make_constants_empty_and_full_deleted(group g)
     return g;
 }
 
-#endif /* defined(__x86_64) && defined(__SSE2__) && !CCC_FHM_PORTABLE */
+#endif /* defined(CCC_HAS_X86_SIMD) */
 
 /*====================  Bit Counting for Index Mask   =======================*/
 
@@ -1938,7 +1938,7 @@ implementations can simply rely on counting zeros that yields correct results
 for their implementation. Each implementation attempts to use the built-ins
 first and then falls back to manual bit counting. */
 
-#if defined(__x86_64) && defined(__SSE2__) && !defined(CCC_FHM_PORTABLE)
+#if defined(CCC_HAS_X86_SIMD)
 
 #    if defined(__has_builtin) && __has_builtin(__builtin_ctz)                 \
         && __has_builtin(__builtin_clz) && __has_builtin(__builtin_clzl)
@@ -2117,7 +2117,7 @@ clz_size_t(size_t n)
 #    endif /* !defined(__has_builtin) || !__has_builtin(__builtin_ctzl) ||     \
               !__has_builtin(__builtin_clzl) */
 
-#endif /* defined(__x86_64) && defined(__SSE2__) && !CCC_FHM_PORTABLE */
+#endif /* defined(CCC_HAS_X86_SIMD) */
 
 /** The following Apache license follows as required by the Rust Hashbrown
 table which in turn is based on the Abseil Flat Hash Map developed at Google:
