@@ -1616,7 +1616,7 @@ the size of one block--returns the status of the bit at that index. */
 static inline ccc_tribool
 status(ccc_bitblock const *const bs, size_t const bit_i)
 {
-    /* Be careful. Bitwise & does not promise to evaluate to 1 or 0. We often
+    /* Be careful. The & op does not promise to evaluate to 1 or 0. We often
        just use it where that conversion takes place implicitly for us. */
     return (*bs & on(bit_i)) != 0;
 }
