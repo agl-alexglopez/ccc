@@ -52,6 +52,19 @@ typedef struct
     uint8_t v;
 } ccc_fhm_tag;
 
+#if defined(__x86_64) && defined(__SSE2__) && !defined(CCC_FHM_PORTABLE)
+/** @private Internal container collection detection for SIMD instructions on
+the x86 architectures. This will be the most efficient version possible
+offering the widest group matching. */
+#    define CCC_HAS_X86_SIMD
+#elif defined(__ARM_NEON__) && !defined(CCC_FHM_PORTABLE)
+/** @private Internal container collection detection for SIMD instructions on
+the NEON architecture. This implementation currently lacks some of the features
+of the x86 SIMD version but should still be fast. */
+#    define CCC_HAS_ARM_SIMD
+#endif
+/** Else we define nothing and the portable fallback will take effect. */
+
 /** @private Vectorized group scanning allows more parallel scans but a
 fallback of 8 is good for a portable implementation that will use the widest
 word on a platform for group scanning. Right now, this lib targets 64-bit so
@@ -59,16 +72,16 @@ that means uint64_t is widest default integer widely supported. That width
 is still valid on 32-bit but probably very slow due to emulation. */
 enum : uint8_t
 {
-#if defined(__x86_64) && defined(__SSE2__) && !defined(CCC_FHM_PORTABLE)
+#if defined(CCC_HAS_X86_SIMD)
     /** A group of tags that can be loaded into a 128 bit vector. */
     CCC_FHM_GROUP_SIZE = 16,
-#elif defined(__ARM_NEON__) && !defined(CCC_FHM_PORTABLE)
+#elif defined(CCC_HAS_ARM_SIMD)
     /** A group of tags that can be loded into a 64 bit integer. */
     CCC_FHM_GROUP_SIZE = 8,
 #else  /* PORTABLE FALLBACK */
     /** A group of tags that can be loded into a 64 bit integer. */
     CCC_FHM_GROUP_SIZE = 8,
-#endif /* defined(__x86_64) && defined(__SSE2__) && !CCC_FHM_PORTABLE */
+#endif /* defined(CCC_HAS_X86_SIMD) */
 };
 
 /** @private The layout of the map uses only pointers to account for the
