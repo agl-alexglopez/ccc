@@ -700,9 +700,8 @@ CHECK_BEGIN_STATIC_FN(bs_test_first_leading_zero)
     {
         CHECK(bs_set(&bs, i, CCC_TRUE), CCC_FALSE);
         CHECK(bs_first_leading_zero(&bs).count, i - 1);
-        CHECK(bs_first_leading_zero_range(&bs, last_i, 512 - i).error
-                  != CCC_RESULT_OK,
-              true);
+        ccc_ucount const r = bs_first_leading_zero_range(&bs, last_i, 512 - i);
+        CHECK(r.error != CCC_RESULT_OK, true);
         CHECK(bs_first_leading_zero_range(&bs, i, i + 1).count, i - 1);
     }
     CHECK_END_FN();

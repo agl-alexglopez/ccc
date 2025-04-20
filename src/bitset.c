@@ -1272,57 +1272,54 @@ static ccc_ucount
 first_leading_one_range(struct ccc_bitset const *const bs, size_t const i,
                         size_t const count)
 {
-    if (!bs || i >= bs->count || count > bs->count
-        || (ptrdiff_t)(i - count) < -1)
+    if (!bs || i >= bs->count || count > bs->count || i + 1 < count)
     {
         return (ccc_ucount){.error = CCC_RESULT_ARG_ERROR};
     }
-    ptrdiff_t const end = (ptrdiff_t)(i - count);
-    ublockwidth const final_block_i = blockwidth_i(i - count + 1);
-    ptrdiff_t start_block = (ptrdiff_t)block_i(i);
-    ublockwidth const start_i = blockwidth_i(i);
+    size_t const end_i = (i + 1 - count);
+    ublockwidth const width_end_i = blockwidth_i(i);
+    ublockwidth const width_final_i = blockwidth_i(end_i);
+    size_t start_block_i = block_i(i);
     ccc_bitblock first_block_on
-        = BITBLOCK_ALL_ON >> ((BITBLOCK_BITS - start_i) - 1);
-    if (end >= 0 && i - end < BITBLOCK_BITS)
+        = BITBLOCK_ALL_ON >> ((BITBLOCK_BITS - width_end_i) - 1);
+    if (i - end_i < BITBLOCK_BITS)
     {
-        first_block_on &= (BITBLOCK_ALL_ON << final_block_i);
+        first_block_on &= (BITBLOCK_ALL_ON << width_final_i);
     }
-    ptrdiff_t lead_zeros
-        = (ptrdiff_t)clz(first_block_on & bs->blocks[start_block]);
+    size_t lead_zeros = clz(first_block_on & bs->blocks[start_block_i]);
     if (lead_zeros != BITBLOCK_BITS)
     {
         return (ccc_ucount){
-            .count
-            = (start_block * BITBLOCK_BITS) + (BITBLOCK_BITS - lead_zeros - 1),
+            .count = (start_block_i * BITBLOCK_BITS)
+                     + (BITBLOCK_BITS - lead_zeros - 1),
         };
     }
-    ptrdiff_t const end_block = (ptrdiff_t)block_i(end + 1);
-    if (end_block == start_block)
+    size_t const end_block_i = block_i(end_i);
+    if (end_block_i == start_block_i)
     {
         return (ccc_ucount){.error = CCC_RESULT_FAIL};
     }
     /* Handle all values in between start and end in bulk. */
-    for (--start_block; start_block > end_block; --start_block)
+    for (--start_block_i; start_block_i > end_block_i; --start_block_i)
     {
-        lead_zeros = (ptrdiff_t)clz(bs->blocks[start_block]);
+        lead_zeros = clz(bs->blocks[start_block_i]);
         if (lead_zeros != BITBLOCK_BITS)
         {
             return (ccc_ucount){
-                .count = (start_block * BITBLOCK_BITS)
+                .count = (start_block_i * BITBLOCK_BITS)
                          + (BITBLOCK_BITS - lead_zeros - 1),
             };
         }
     }
     /* Handle last block. */
-    ublockwidth const last_i = blockwidth_i(end + 1);
     ccc_bitblock const last_block_on
-        = ~(BITBLOCK_ALL_ON >> ((BITBLOCK_BITS - last_i) - 1));
-    lead_zeros = clz(last_block_on & bs->blocks[end_block]);
+        = ~(BITBLOCK_ALL_ON >> ((BITBLOCK_BITS - width_final_i) - 1));
+    lead_zeros = clz(last_block_on & bs->blocks[end_block_i]);
     if (lead_zeros != BITBLOCK_BITS)
     {
         return (ccc_ucount){
             .count
-            = (end_block * BITBLOCK_BITS) + (BITBLOCK_BITS - lead_zeros - 1),
+            = (end_block_i * BITBLOCK_BITS) + (BITBLOCK_BITS - lead_zeros - 1),
         };
     }
     return (ccc_ucount){.error = CCC_RESULT_FAIL};
@@ -1424,48 +1421,48 @@ static ccc_ucount
 first_leading_zero_range(struct ccc_bitset const *const bs, size_t const i,
                          size_t const count)
 {
-    ptrdiff_t const end = (ptrdiff_t)(i - count);
-    if (!bs || i >= bs->count || count > bs->count || end < -1)
+    if (!bs || i >= bs->count || count > bs->count || i + 1 < count)
     {
         return (ccc_ucount){.error = CCC_RESULT_ARG_ERROR};
     }
-    ptrdiff_t start_block = (ptrdiff_t)block_i(i);
-    ublockwidth const start_i = blockwidth_i(i);
+    size_t const end_i = i + 1 - count;
+    size_t start_block_i = block_i(i);
+    ublockwidth const width_end_i = blockwidth_i(end_i);
+    ublockwidth const width_start_i = blockwidth_i(i);
     ccc_bitblock first_block_on
-        = BITBLOCK_ALL_ON >> ((BITBLOCK_BITS - start_i) - 1);
-    if (end >= 0 && i - end < BITBLOCK_BITS)
+        = BITBLOCK_ALL_ON >> ((BITBLOCK_BITS - width_start_i) - 1);
+    if (i - end_i < BITBLOCK_BITS)
     {
-        first_block_on &= ~(BITBLOCK_ALL_ON >> (i - end));
+        first_block_on &= (BITBLOCK_ALL_ON << width_end_i);
     }
-    ptrdiff_t lead_ones = clz(first_block_on & ~bs->blocks[start_block]);
+    size_t lead_ones = clz(first_block_on & ~bs->blocks[start_block_i]);
     if (lead_ones != BITBLOCK_BITS)
     {
         return (ccc_ucount){
-            .count
-            = ((start_block * BITBLOCK_BITS) + (BITBLOCK_BITS - lead_ones - 1)),
+            .count = ((start_block_i * BITBLOCK_BITS)
+                      + (BITBLOCK_BITS - lead_ones - 1)),
         };
     }
-    ptrdiff_t const end_block = (ptrdiff_t)block_i(end + 1);
-    if (end_block == start_block)
+    size_t const end_block = block_i(end_i);
+    if (end_block == start_block_i)
     {
         return (ccc_ucount){.error = CCC_RESULT_FAIL};
     }
     /* Handle all values in between start and end in bulk. */
-    for (--start_block; start_block > end_block; --start_block)
+    for (--start_block_i; start_block_i > end_block; --start_block_i)
     {
-        lead_ones = clz(~bs->blocks[start_block]);
+        lead_ones = clz(~bs->blocks[start_block_i]);
         if (lead_ones != BITBLOCK_BITS)
         {
             return (ccc_ucount){
-                .count = ((start_block * BITBLOCK_BITS)
+                .count = ((start_block_i * BITBLOCK_BITS)
                           + (BITBLOCK_BITS - lead_ones - 1)),
             };
         }
     }
     /* Handle last block. */
-    ublockwidth const last_i = blockwidth_i(end + 1);
     ccc_bitblock const last_block_on
-        = ~(BITBLOCK_ALL_ON >> ((BITBLOCK_BITS - last_i) - 1));
+        = ~(BITBLOCK_ALL_ON >> ((BITBLOCK_BITS - width_end_i) - 1));
     lead_ones = clz(last_block_on & ~bs->blocks[end_block]);
     if (lead_ones != BITBLOCK_BITS)
     {
