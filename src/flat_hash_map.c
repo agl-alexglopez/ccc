@@ -170,6 +170,12 @@ typedef struct
     uint16_t v;
 } index_mask;
 
+enum : typeof((index_mask){}.v)
+{
+    /** @private MSB tag bit used for static assert. */
+    INDEX_MASK_MSB = 0x8000,
+};
+
 #elif defined(CCC_HAS_ARM_SIMD)
 
 /** @private The 64 bit vector is used on NEON due to a lack of ability to
@@ -191,11 +197,13 @@ typedef struct
 enum : uint64_t
 {
     /** @private LSB tag bits used for byte and word level masking. */
-    INDEX_MASK_LSBS = 0x101010101010101,
+    INDEX_MASK_BYTE_LSBS = 0x101010101010101,
+    /** @private MSB tag bit used for static assert. */
+    INDEX_MASK_MSB = 0x8000000000000000,
     /** @private MSB tag bits used for byte and word level masking. */
-    INDEX_MASK_MSBS = 0x8080808080808080,
+    INDEX_MASK_BYTE_MSBS = 0x8080808080808080,
     /** @private Debug mode check for bits that must be off in index mask. */
-    INDEX_MASK_OFF_BITS = 0x7F7F7F7F7F7F7F7F,
+    INDEX_MASK_BYTE_OFF_BITS = 0x7F7F7F7F7F7F7F7F,
 };
 
 #else /* PORTABLE FALLBACK */
@@ -220,11 +228,13 @@ typedef struct
 enum : typeof((group){}.v)
 {
     /** @private LSB tag bits used for byte and word level masking. */
-    INDEX_MASK_LSBS = 0x101010101010101,
+    INDEX_MASK_BYTE_LSBS = 0x101010101010101,
+    /** @private MSB tag bit used for static assert. */
+    INDEX_MASK_MSB = 0x8000000000000000,
     /** @private MSB tag bits used for byte and word level masking. */
-    INDEX_MASK_MSBS = 0x8080808080808080,
+    INDEX_MASK_BYTE_MSBS = 0x8080808080808080,
     /** @private Debug mode check for bits that must be off in index mask. */
-    INDEX_MASK_OFF_BITS = 0x7F7F7F7F7F7F7F7F,
+    INDEX_MASK_BYTE_OFF_BITS = 0x7F7F7F7F7F7F7F7F,
 };
 
 enum : uint8_t
@@ -1766,10 +1776,10 @@ match_tag(group const g, ccc_fhm_tag const m)
 
     index_mask const res = {
         vget_lane_u64(vreinterpret_u64_u8(vceq_u8(g.v, vdup_n_u8(m.v))), 0)
-            & INDEX_MASK_MSBS,
+            & INDEX_MASK_BYTE_MSBS,
     };
     assert(
-        (res.v & INDEX_MASK_OFF_BITS) == 0
+        (res.v & INDEX_MASK_BYTE_OFF_BITS) == 0
         && "For bit counting and iteration purposes the most significant bit "
            "in every byte will indicate a match for a tag has occurred.");
     return res;
@@ -1793,10 +1803,10 @@ match_empty_or_deleted(group const g)
 {
     uint8x8_t const cmp = vcltz_s8(vreinterpret_s8_u8(g.v));
     index_mask const res = {
-        vget_lane_u64(vreinterpret_u64_u8(cmp), 0) & INDEX_MASK_MSBS,
+        vget_lane_u64(vreinterpret_u64_u8(cmp), 0) & INDEX_MASK_BYTE_MSBS,
     };
     assert(
-        (res.v & INDEX_MASK_OFF_BITS) == 0
+        (res.v & INDEX_MASK_BYTE_OFF_BITS) == 0
         && "For bit counting and iteration purposes the most significant bit "
            "in every byte will indicate a match for a tag has occurred.");
     return res;
@@ -1891,10 +1901,10 @@ match_tag(group g, ccc_fhm_tag const m)
                | (((typeof(g.v))m.v) << TAG_BITS) | (m.v)),
     };
     index_mask const res = to_little_endian((index_mask){
-        (cmp.v - INDEX_MASK_LSBS) & ~cmp.v & INDEX_MASK_MSBS,
+        (cmp.v - INDEX_MASK_BYTE_LSBS) & ~cmp.v & INDEX_MASK_BYTE_MSBS,
     });
     assert(
-        (res.v & INDEX_MASK_OFF_BITS) == 0
+        (res.v & INDEX_MASK_BYTE_OFF_BITS) == 0
         && "For bit counting and iteration purposes the most significant bit "
            "in every byte will indicate a match for a tag has occurred.");
     return res;
@@ -1907,7 +1917,8 @@ match_empty(group const g)
 {
     /* EMPTY has all bits on and DELETED has the most significant bit on so
        EMPTY must have the top 2 bits on. Make sure the mask is only MSB's. */
-    return to_little_endian((index_mask){g.v & (g.v << 1) & INDEX_MASK_MSBS});
+    return to_little_endian(
+        (index_mask){g.v & (g.v << 1) & INDEX_MASK_BYTE_MSBS});
 }
 
 /** Returns an index mask with the most significant bit in every byte on if
@@ -1915,7 +1926,7 @@ that tag in g is empty or deleted. This is found by the most significant bit. */
 static inline index_mask
 match_empty_or_deleted(group const g)
 {
-    return to_little_endian((index_mask){g.v & INDEX_MASK_MSBS});
+    return to_little_endian((index_mask){g.v & INDEX_MASK_BYTE_MSBS});
 }
 
 /** Converts the empty and deleted constants all TAG_EMPTY and the full
@@ -1925,7 +1936,7 @@ significant bit. This does not affect user hashed data. */
 static inline group
 make_constants_empty_and_full_deleted(group g)
 {
-    g.v = ~g.v & INDEX_MASK_MSBS;
+    g.v = ~g.v & INDEX_MASK_BYTE_MSBS;
     g.v = ~g.v + (g.v >> (TAG_BITS - 1));
     return g;
 }
@@ -1981,12 +1992,6 @@ clz_size_t(size_t const n)
 #    else /* !defined(__has_builtin) || !__has_builtin(__builtin_ctz)          \
         || !__has_builtin(__builtin_clz) || !__has_builtin(__builtin_clzl) */
 
-enum : uint16_t
-{
-    /** @private A bit of the mask used for portable 0 counting. */
-    INDEX_MASK_MSB = 0x8000,
-};
-
 enum : size_t
 {
     /** @private Most significant bit of size_t for bit counting. */
@@ -2041,7 +2046,17 @@ clz_size_t(size_t n)
 #    if defined(__has_builtin) && __has_builtin(__builtin_ctzl)                \
         && __has_builtin(__builtin_clzl)
 
-static_assert(sizeof((index_mask){}.v) == sizeof(long));
+static_assert(
+    sizeof((index_mask){}.v) == sizeof(long),
+    "builtin assumes an integer width that must be compatible with index mask");
+static_assert(
+    __builtin_ctzl(INDEX_MASK_MSB) / CCC_FHM_GROUP_SIZE
+        == CCC_FHM_GROUP_SIZE - 1,
+    "builtin trailing zeros must produce number of bits we expect for mask");
+static_assert(
+    __builtin_clzl((index_mask){1}.v) / CCC_FHM_GROUP_SIZE
+        == CCC_FHM_GROUP_SIZE - 1,
+    "builtin trailing zeros must produce number of bits we expect for mask");
 
 static inline unsigned
 ctz(index_mask const m)
@@ -2064,12 +2079,6 @@ clz_size_t(size_t const n)
 
 #    else /* defined(__has_builtin) && __has_builtin(__builtin_ctzl) &&        \
              __has_builtin(__builtin_clzl) */
-
-enum : typeof((index_mask){}.v)
-{
-    /** @private Helps in counting leading bits. */
-    INDEX_MASK_MSB = 0x8000000000000000,
-};
 
 enum : size_t
 {
