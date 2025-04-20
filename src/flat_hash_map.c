@@ -43,7 +43,9 @@ better capabilities for 128 bit group operations. */
 #include "impl/impl_types.h"
 #include "types.h"
 
-/** Two platforms offer some form of vector instructions we can try. */
+/** Note that these includes must come after inclusion of the
+`impl/impl_flat_hash_map.h` header. Two platforms offer some form of vector
+instructions we can try. */
 #if defined(CCC_HAS_X86_SIMD)
 #    include <immintrin.h>
 #elif defined(CCC_HAS_ARM_SIMD)
