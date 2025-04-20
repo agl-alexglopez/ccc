@@ -1701,12 +1701,8 @@ size_t_min(size_t a, size_t b)
 /** The following asserts assure that whether portable or built in bit
 operations are used in the coming section we are safe in our assumptions about
 widths and counts. */
-
-static_assert(__builtin_popcount((ccc_bitblock)~0) <= U8BLOCK_MAX);
 static_assert(BITBLOCK_MSB < BITBLOCK_ON);
 static_assert(SIZEOF_BLOCK == sizeof(unsigned));
-static_assert(__builtin_ctz(BITBLOCK_MSB) <= U8BLOCK_MAX);
-static_assert(__builtin_clz((ccc_bitblock)1) <= U8BLOCK_MAX);
 
 /** Built-ins are common on Clang and GCC but we have portable fallback. */
 #if defined(__has_builtin) && __has_builtin(__builtin_ctz)                     \
@@ -1718,6 +1714,7 @@ popcount(ccc_bitblock const b)
 {
     /* There are different pop counts for different integer widths. Be sure to
        catch the use of the wrong one by mistake here at compile time. */
+    static_assert(__builtin_popcount((ccc_bitblock)~0) <= U8BLOCK_MAX);
     return (ublock8)__builtin_popcount(b);
 }
 
@@ -1726,6 +1723,7 @@ significant bit. */
 static inline ublock8
 ctz(ccc_bitblock const b)
 {
+    static_assert(__builtin_ctz(BITBLOCK_MSB) <= U8BLOCK_MAX);
     return b ? (ublock8)__builtin_ctz(b) : BITBLOCK_BITS;
 }
 
@@ -1734,6 +1732,7 @@ bit. */
 static inline ublock8
 clz(ccc_bitblock const b)
 {
+    static_assert(__builtin_clz((ccc_bitblock)1) <= U8BLOCK_MAX);
     return b ? (ublock8)__builtin_clz(b) : BITBLOCK_BITS;
 }
 
