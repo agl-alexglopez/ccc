@@ -29,7 +29,8 @@ candidate keys for a match in the map simultaneously. This is achieved in the
 best case by having 16 one-byte hash fingerprints analyzed simultaneously for
 a match against a candidate fingerprint. The details of how this is done and
 trade-offs involved can be found in the comments around the implementations
-and data structures. */
+and data structures. The ARM NEON implementation may be updated if they add
+better capabilities for 128 bit group operations. */
 #include <assert.h>
 #include <limits.h>
 #include <stdalign.h>
