@@ -1709,8 +1709,8 @@ match_empty_or_deleted(group const g)
     return (index_mask){_mm_movemask_epi8(g.v)};
 }
 
-/** Converts the empty and deleted constants all CCC_FHM_EMPTY and the full
-tags representing hashed user data CCC_FHM_DELETED. Making the hashed data
+/** Converts the empty and deleted constants all TAG_EMPTY and the full
+tags representing hashed user data TAG_DELETED. Making the hashed data
 deleted is OK because it will only turn on the previously unused most
 significant bit. This does not affect user hashed data. */
 static inline group
@@ -1779,7 +1779,7 @@ based index in the context of the probe sequence. */
 static inline index_mask
 match_empty(group const g)
 {
-    return match_tag(g, (ccc_fhm_tag){CCC_FHM_EMPTY});
+    return match_tag(g, (ccc_fhm_tag){TAG_EMPTY});
 }
 
 /** Returns a 0 based index mask with every bit on representing those tags
@@ -1800,8 +1800,8 @@ match_empty_or_deleted(group const g)
     return res;
 }
 
-/** Converts the empty and deleted constants all CCC_FHM_EMPTY and the full
-tags representing hashed user data CCC_FHM_DELETED. Making the hashed data
+/** Converts the empty and deleted constants all TAG_EMPTY and the full
+tags representing hashed user data TAG_DELETED. Making the hashed data
 deleted is OK because it will only turn on the previously unused most
 significant bit. This does not affect user hashed data. */
 static inline group
@@ -1916,8 +1916,8 @@ match_empty_or_deleted(group const g)
     return to_little_endian((index_mask){g.v & INDEX_MASK_MSBS});
 }
 
-/** Converts the empty and deleted constants all CCC_FHM_EMPTY and the full
-tags representing hashed user data CCC_FHM_DELETED. Making the hashed data
+/** Converts the empty and deleted constants all TAG_EMPTY and the full
+tags representing hashed user data TAG_DELETED. Making the hashed data
 deleted is OK because it will only turn on the previously unused most
 significant bit. This does not affect user hashed data. */
 static inline group
