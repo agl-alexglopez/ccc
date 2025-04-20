@@ -116,13 +116,13 @@ $(document).ready(function(){initNavTree('impl__flat__hash__map_8h_source.html',
 <div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span> </div>
 <div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>enum : uint8_t</div>
 <div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>{</div>
-<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span><span class="preprocessor">#if defined(__x86_64) &amp;&amp; defined(__SSE2_) &amp;&amp; !defined(CCC_FHM_PORTABLE)</span></div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span><span class="preprocessor">#if defined(__x86_64) &amp;&amp; defined(__SSE2__) &amp;&amp; !defined(CCC_FHM_PORTABLE)</span></div>
 <div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>    CCC_FHM_GROUP_SIZE = 16,</div>
-<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span><span class="preprocessor">#elif defined(__ARM_NEON_) &amp;&amp; !defined(CCC_FHM_PORTABLE)</span></div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span><span class="preprocessor">#elif defined(__ARM_NEON__) &amp;&amp; !defined(CCC_FHM_PORTABLE)</span></div>
 <div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>    CCC_FHM_GROUP_SIZE = 8,</div>
 <div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span><span class="preprocessor">#else  </span><span class="comment">/* PORTABLE FALLBACK */</span><span class="preprocessor"></span></div>
 <div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>    CCC_FHM_GROUP_SIZE = 8,</div>
-<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span><span class="preprocessor">#endif </span><span class="comment">/* defined(__x86_64) &amp;&amp; defined(__SSE2_) &amp;&amp; !CCC_FHM_PORTABLE */</span><span class="preprocessor"></span></div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span><span class="preprocessor">#endif </span><span class="comment">/* defined(__x86_64) &amp;&amp; defined(__SSE2__) &amp;&amp; !CCC_FHM_PORTABLE */</span><span class="preprocessor"></span></div>
 <div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>};</div>
 <div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span> </div>
 <div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span><span class="keyword">struct </span>ccc_fhmap</div>
