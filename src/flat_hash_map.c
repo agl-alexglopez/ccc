@@ -199,11 +199,11 @@ enum : uint64_t
     /** @private MSB tag bit used for static assert. */
     INDEX_MASK_MSB = 0x8000000000000000,
     /** @private MSB tag bits used for byte and word level masking. */
-    INDEX_MASK_BYTE_MSBS = 0x8080808080808080,
+    INDEX_MASK_TAG_MSBS = 0x8080808080808080,
     /** @private LSB tag bits used for byte and word level masking. */
-    INDEX_MASK_BYTE_LSBS = 0x101010101010101,
+    INDEX_MASK_TAG_LSBS = 0x101010101010101,
     /** @private Debug mode check for bits that must be off in index mask. */
-    INDEX_MASK_BYTE_OFF_BITS = 0x7F7F7F7F7F7F7F7F,
+    INDEX_MASK_TAG_OFF_BITS = 0x7F7F7F7F7F7F7F7F,
 };
 
 #else /* PORTABLE FALLBACK */
@@ -230,11 +230,11 @@ enum : typeof((group){}.v)
     /** @private MSB tag bit used for static assert. */
     INDEX_MASK_MSB = 0x8000000000000000,
     /** @private MSB tag bits used for byte and word level masking. */
-    INDEX_MASK_BYTE_MSBS = 0x8080808080808080,
+    INDEX_MASK_TAG_MSBS = 0x8080808080808080,
     /** @private LSB tag bits used for byte and word level masking. */
-    INDEX_MASK_BYTE_LSBS = 0x101010101010101,
+    INDEX_MASK_TAG_LSBS = 0x101010101010101,
     /** @private Debug mode check for bits that must be off in index mask. */
-    INDEX_MASK_BYTE_OFF_BITS = 0x7F7F7F7F7F7F7F7F,
+    INDEX_MASK_TAG_OFF_BITS = 0x7F7F7F7F7F7F7F7F,
 };
 
 enum : uint8_t
@@ -1776,10 +1776,10 @@ match_tag(group const g, ccc_fhm_tag const m)
 
     index_mask const res = {
         vget_lane_u64(vreinterpret_u64_u8(vceq_u8(g.v, vdup_n_u8(m.v))), 0)
-            & INDEX_MASK_BYTE_MSBS,
+            & INDEX_MASK_TAG_MSBS,
     };
     assert(
-        (res.v & INDEX_MASK_BYTE_OFF_BITS) == 0
+        (res.v & INDEX_MASK_TAG_OFF_BITS) == 0
         && "For bit counting and iteration purposes the most significant bit "
            "in every byte will indicate a match for a tag has occurred.");
     return res;
@@ -1803,10 +1803,10 @@ match_empty_or_deleted(group const g)
 {
     uint8x8_t const cmp = vcltz_s8(vreinterpret_s8_u8(g.v));
     index_mask const res = {
-        vget_lane_u64(vreinterpret_u64_u8(cmp), 0) & INDEX_MASK_BYTE_MSBS,
+        vget_lane_u64(vreinterpret_u64_u8(cmp), 0) & INDEX_MASK_TAG_MSBS,
     };
     assert(
-        (res.v & INDEX_MASK_BYTE_OFF_BITS) == 0
+        (res.v & INDEX_MASK_TAG_OFF_BITS) == 0
         && "For bit counting and iteration purposes the most significant bit "
            "in every byte will indicate a match for a tag has occurred.");
     return res;
@@ -1901,10 +1901,10 @@ match_tag(group g, ccc_fhm_tag const m)
                | (((typeof(g.v))m.v) << TAG_BITS) | (m.v)),
     };
     index_mask const res = to_little_endian((index_mask){
-        (cmp.v - INDEX_MASK_BYTE_LSBS) & ~cmp.v & INDEX_MASK_BYTE_MSBS,
+        (cmp.v - INDEX_MASK_TAG_LSBS) & ~cmp.v & INDEX_MASK_TAG_MSBS,
     });
     assert(
-        (res.v & INDEX_MASK_BYTE_OFF_BITS) == 0
+        (res.v & INDEX_MASK_TAG_OFF_BITS) == 0
         && "For bit counting and iteration purposes the most significant bit "
            "in every byte will indicate a match for a tag has occurred.");
     return res;
@@ -1918,7 +1918,7 @@ match_empty(group const g)
     /* EMPTY has all bits on and DELETED has the most significant bit on so
        EMPTY must have the top 2 bits on. Make sure the mask is only MSB's. */
     return to_little_endian(
-        (index_mask){g.v & (g.v << 1) & INDEX_MASK_BYTE_MSBS});
+        (index_mask){g.v & (g.v << 1) & INDEX_MASK_TAG_MSBS});
 }
 
 /** Returns an index mask with the most significant bit in every byte on if
@@ -1926,7 +1926,7 @@ that tag in g is empty or deleted. This is found by the most significant bit. */
 static inline index_mask
 match_empty_or_deleted(group const g)
 {
-    return to_little_endian((index_mask){g.v & INDEX_MASK_BYTE_MSBS});
+    return to_little_endian((index_mask){g.v & INDEX_MASK_TAG_MSBS});
 }
 
 /** Converts the empty and deleted constants all TAG_EMPTY and the full
@@ -1936,7 +1936,7 @@ significant bit. This does not affect user hashed data. */
 static inline group
 make_constants_empty_and_full_deleted(group g)
 {
-    g.v = ~g.v & INDEX_MASK_BYTE_MSBS;
+    g.v = ~g.v & INDEX_MASK_TAG_MSBS;
     g.v = ~g.v + (g.v >> (TAG_BITS - 1));
     return g;
 }
