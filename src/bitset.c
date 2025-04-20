@@ -323,7 +323,7 @@ ccc_bs_shiftr(ccc_bitset *const bs, size_t const right_shifts)
          occurred in the 0th block so zeroing would be a mistake.
        - All other cases ensure it is safe to decrease i (no underflow).
        This operation emulates the zeroing of high bits on a right shift and
-       a bit sign is considered unsigned so we don't sign bit fill. */
+       a bit set is considered unsigned so we don't sign bit fill. */
     for (size_t i = last_block, end = last_block - shifted_blocks; i > end; --i)
     {
         bs->blocks[i] = 0;
