@@ -27,9 +27,25 @@ limitations under the License.
 
 /* NOLINTBEGIN(readability-identifier-naming) */
 
-/* TODO: Come up with better system. For now, uncomment to define a preprocessor
-directive to force generics. This has been used for testing for now. */
+/** @private TODO: Come up with better system. For now, uncomment to define a
+preprocessor directive to force generics. This has been used for testing for
+now. */
 // #define CCC_FHM_PORTABLE
+
+/** @private If we only make these complex checks once, it is easier to read
+and used the source code during all the platform based implementations. */
+#if defined(__x86_64) && defined(__SSE2__) && !defined(CCC_FHM_PORTABLE)
+/** @private Internal container collection detection for SIMD instructions on
+the x86 architectures. This will be the most efficient version possible
+offering the widest group matching. */
+#    define CCC_HAS_X86_SIMD
+#elif defined(__ARM_NEON__) && !defined(CCC_FHM_PORTABLE)
+/** @private Internal container collection detection for SIMD instructions on
+the NEON architecture. This implementation currently lacks some of the features
+of the x86 SIMD version but should still be fast. */
+#    define CCC_HAS_ARM_SIMD
+#endif /* defined(__x86_64)&&defined(__SSE2__)&&!defined(CCC_FHM_PORTABLE) */
+/** else we define nothing and the portable fallback will take effect. */
 
 /** @private An array of this byte will be in the tag array. Same idea as
 Rust's Hashbrown table. The only value not represented by constants is
@@ -52,25 +68,12 @@ typedef struct
     uint8_t v;
 } ccc_fhm_tag;
 
-#if defined(__x86_64) && defined(__SSE2__) && !defined(CCC_FHM_PORTABLE)
-/** @private Internal container collection detection for SIMD instructions on
-the x86 architectures. This will be the most efficient version possible
-offering the widest group matching. */
-#    define CCC_HAS_X86_SIMD
-#elif defined(__ARM_NEON__) && !defined(CCC_FHM_PORTABLE)
-/** @private Internal container collection detection for SIMD instructions on
-the NEON architecture. This implementation currently lacks some of the features
-of the x86 SIMD version but should still be fast. */
-#    define CCC_HAS_ARM_SIMD
-#endif
-/** Else we define nothing and the portable fallback will take effect. */
-
 /** @private Vectorized group scanning allows more parallel scans but a
 fallback of 8 is good for a portable implementation that will use the widest
 word on a platform for group scanning. Right now, this lib targets 64-bit so
 that means uint64_t is widest default integer widely supported. That width
 is still valid on 32-bit but probably very slow due to emulation. */
-enum : uint8_t
+enum : typeof((ccc_fhm_tag){}.v)
 {
 #if defined(CCC_HAS_X86_SIMD)
     /** A group of tags that can be loaded into a 128 bit vector. */
@@ -200,7 +203,13 @@ they wish. */
 /** @private If the user does not want to remember the capacity they chose
 for their type or make mistakes this macro offers consistent calculation of
 total capacity (aka buckets) of the map. This is not the capacity that is
-limited by load factor. */
+limited by load factor.
+
+The sizeof operator does not decay to a simple pointer here because the tag
+array of a fixed type has a length known at compile time. Also the tag array is
+simple byte sized chunks so no division needed. See earlier static asserts for
+how we ensure no fixed size type is allowed to be defined in a way to make this
+call unsafe. */
 #define ccc_impl_fhm_fixed_capacity(fixed_map_type_name)                       \
     (sizeof((fixed_map_type_name){}.tag) - CCC_FHM_GROUP_SIZE)
 
