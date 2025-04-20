@@ -167,7 +167,7 @@ typedef struct
     uint16_t v;
 } index_mask;
 
-#elif defined(__ARM_NEON_) && !defined(CCC_FHM_PORTABLE)
+#elif defined(__ARM_NEON__) && !defined(CCC_FHM_PORTABLE)
 
 /** @private The 64 bit vector is used on NEON due to a lack of ability to
 compress a 128 bit vector to a smaller int efficiently. */
