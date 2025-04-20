@@ -1166,15 +1166,16 @@ first_trailing_bits_range(struct ccc_bitset const *const bs, size_t const i,
     return (ccc_ucount){.error = CCC_RESULT_FAIL};
 }
 
-/** Returns the maximum group of consecutive ones in the bitblock given. If the
+/** Returns the maximum group of consecutive ones in the bit block given. If the
 number of consecutive ones remaining cannot be found the function returns
 where the next search should start from, a critical step to a linear search;
 specifically, we seek any group of continuous ones that runs from some index
-in the block to the end of the block. If no continuous group of ones exist
-that runs to the end of the block, the BLOCK_BITS index is retuned with a
-group size of 0 meaning the search for ones will need to continue in the
-next block. This is helpful for the main search loop adding to its start
-index and number of ones found so far. */
+in the block to the end of the block.
+
+If no continuous group of ones exist that runs to the end of the block, the
+BLOCK_BITS index is returned with a group size of 0 meaning the search for ones
+will need to continue in the next block. This is helpful for the main search
+loop adding to its start index and number of ones found so far. */
 static struct ugroup
 max_trailing_ones(ccc_bitblock const b, ublockwidth const i_in_block,
                   size_t const ones_remaining)
@@ -1385,6 +1386,18 @@ first_leading_bits_range(struct ccc_bitset const *const bs, size_t const i,
     return (ccc_ucount){.error = CCC_RESULT_FAIL};
 }
 
+/** Returns the maximum group of consecutive ones in the bit block given. If the
+number of consecutive ones remaining cannot be found the function returns
+where the next search should start from, a critical step to a linear search;
+specifically, we seek any group of continuous ones that runs from some index
+in the block to the start of the block (0th index).
+
+If no continuous group of ones exist that runs to the start of the block, an -1
+index is returned with a group size of 0 meaning the search for ones will need
+to continue in the next block lower block. This is helpful for the main search
+loop adding to its start index and number of ones found so far. Adding -1 is
+just subtraction so this will correctly drop us to the top bit of the next Least
+Significant Block to continue the search. */
 static struct igroup
 max_leading_ones(ccc_bitblock const b, ublockwidth const i_in_block,
                  size_t const ones_remaining)
