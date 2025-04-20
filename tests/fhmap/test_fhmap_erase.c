@@ -96,7 +96,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_erase_fixed)
                                    fhmap_id_eq, NULL, NULL, fix_cap);
     int to_insert[fhm_fixed_capacity(standard_fixed_map)];
     iota(to_insert, fix_cap, 0);
-    rand_shuffle(sizeof(int), to_insert, fix_cap, &(int){});
+    rand_shuffle(sizeof(int), to_insert, fix_cap, &(int){0});
     int i = 0;
     do
     {
@@ -176,7 +176,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_erase_reserved)
     /* Give ourselves plenty more to insert so we don't run out before cap. */
     int to_insert[1024];
     iota(to_insert, 1024, 0);
-    rand_shuffle(sizeof(int), to_insert, 1024, &(int){});
+    rand_shuffle(sizeof(int), to_insert, 1024, &(int){0});
     int i = 0;
     do
     {
@@ -248,7 +248,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_erase_dynamic)
                    std_alloc, NULL, 0);
     int to_insert[1024];
     iota(to_insert, 1024, 0);
-    rand_shuffle(sizeof(int), to_insert, 1024, &(int){});
+    rand_shuffle(sizeof(int), to_insert, 1024, &(int){0});
     int inserted = 0;
     for (; inserted < 1024; ++inserted)
     {
