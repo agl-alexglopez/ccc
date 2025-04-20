@@ -38,10 +38,8 @@ enum : size_t
 /** @private Various constants to support bit block size bit ops. */
 enum : ccc_bitblock
 {
-    /** @private How many total bits that fit in a bit block. */
-    BITBLOCK_BITS = (SIZEOF_BLOCK * CHAR_BIT),
     /** @private A mask of a bit block with all bits on. */
-    BITBLOCK_ALL_ON = ((ccc_bitblock)~0),
+    BITBLOCK_ON = ((ccc_bitblock)~0),
     /** @private The Most Significant Bit of a bit block turned on to 1. */
     BITBLOCK_MSB = (((ccc_bitblock)1) << (((SIZEOF_BLOCK * CHAR_BIT)) - 1)),
 };
@@ -54,17 +52,38 @@ range is `[0, BITBLOCK_BITS]`, for ease of use and clarity.
 There are many types of indexing and counting that take place in a bit set so
 use this type specifically for counting bits in a block so the reader is clear
 on intent. */
-typedef uint8_t ublockwidth;
-static_assert((ublockwidth)~0 >= 0, "blockwidth_t must be unsigned");
-static_assert((ublockwidth)~0 >= BITBLOCK_BITS,
-              "blockwidth_t must be able to count all bits in a block.");
+typedef uint8_t ublock8;
+
+enum : ublock8
+{
+    /** @private How many total bits that fit in a bit block. */
+    BITBLOCK_BITS = (SIZEOF_BLOCK * CHAR_BIT),
+    U8BLOCK_MAX = UINT8_MAX,
+};
+static_assert((ublock8)~0 >= 0, "ublock8 must be unsigned");
+static_assert(UINT8_MAX >= BITBLOCK_BITS, "ublock8 counts all block bits.");
+
+/** @private A signed index within a block. A block is bounded to some number of
+bits as determined by the type used for each block. This type is intended to
+count bits in a block and therefore cannot count up to arbitrary indices. Assume
+its range is `[-1, BITBLOCK_BITS]`, for ease of use and clarity.
+
+There are many types of indexing and counting that take place in a bit set so
+use this type specifically for counting bits in a block so the reader is clear
+on intent. It helps clean up algorithms for finding ranges of leading bits.
+It also a wider type to avoid warnings or dangers when taking the value of a
+`ublock8` type. */
+typedef int16_t iblock16;
+static_assert(sizeof(iblock16) > sizeof(ublock8));
+static_assert((iblock16)~0 < 0, "iblock16 must be signed");
+static_assert(INT16_MAX >= BITBLOCK_BITS, "iblock16 counts all block bits.");
 
 /** @private A helper to allow for an efficient linear scan for groups of 0's
 or 1's in the set. */
 struct ugroup
 {
-    /** A index [0, bit block bits) indicating the status of a search. */
-    ublockwidth block_start_i;
+    /** A index [0, bit block bits] indicating the status of a search. */
+    ublock8 ublock8_i;
     /** The number of bits of same value found starting at block_start_i. */
     size_t count;
 };
@@ -74,13 +93,13 @@ struct ugroup
 group scanning in reverse. */
 struct igroup
 {
-    /** A index [-1, bit block bits - 1) indicating the status of a search. */
-    ptrdiff_t block_start_i;
+    /** A index [-1, bit block bits] indicating the status of a search. */
+    iblock16 block_start_i;
     /** The number of bits of same value found starting at block_start_i. */
     size_t count;
 };
 
-static size_t block_i(size_t bit_i);
+static size_t block_array_index(size_t bit_i);
 static inline ccc_bitblock *block_at(ccc_bitset const *bs, size_t bit_i);
 static void set(ccc_bitblock *, size_t bit_i, ccc_tribool);
 static ccc_bitblock on(size_t bit_i);
@@ -88,7 +107,6 @@ static ccc_bitblock last_on(struct ccc_bitset const *);
 static void fix_end(struct ccc_bitset *);
 static ccc_tribool status(ccc_bitblock const *, size_t bit_i);
 static size_t block_count(size_t bits);
-static unsigned popcount(ccc_bitblock);
 static ccc_tribool any_or_none_range(struct ccc_bitset const *, size_t i,
                                      size_t count, ccc_tribool);
 static ccc_tribool all_range(struct ccc_bitset const *bs, size_t i,
@@ -108,19 +126,20 @@ static ccc_ucount first_trailing_bits_range(struct ccc_bitset const *bs,
 static ccc_ucount first_leading_bits_range(struct ccc_bitset const *bs,
                                            size_t i, size_t count,
                                            size_t num_bits, ccc_tribool is_one);
-static struct ugroup max_trailing_ones(ccc_bitblock b, ublockwidth i_in_block,
-                                       size_t num_ones_remaining);
-static struct igroup max_leading_ones(ccc_bitblock b, ublockwidth i_in_block,
+static struct ugroup max_trailing_ones(ccc_bitblock b, ublock8 i,
+                                       size_t num_ones_remain);
+static struct igroup max_leading_ones(ccc_bitblock b, iblock16 i,
                                       size_t num_ones_remaining);
 static ccc_result maybe_resize(struct ccc_bitset *bs, size_t to_add,
                                ccc_any_alloc_fn *);
 static size_t size_t_min(size_t, size_t);
 static void set_all(struct ccc_bitset *bs, ccc_tribool b);
-static ublockwidth blockwidth_i(size_t bit_i);
+static ublock8 ublock8_index(size_t bit_i);
 static ccc_tribool is_subset_of(struct ccc_bitset const *set,
                                 struct ccc_bitset const *subset);
-static unsigned ctz(ccc_bitblock);
-static unsigned clz(ccc_bitblock);
+static ublock8 popcount(ccc_bitblock);
+static ublock8 ctz(ccc_bitblock);
+static ublock8 clz(ccc_bitblock);
 
 /*=======================   Public Interface   ==============================*/
 
@@ -242,9 +261,9 @@ ccc_bs_shiftl(ccc_bitset *const bs, size_t const left_shifts)
         set_all(bs, CCC_FALSE);
         return CCC_RESULT_OK;
     }
-    size_t const last_block = block_i(bs->count - 1);
-    size_t const shifted_blocks = block_i(left_shifts);
-    ublockwidth const partial_shift = blockwidth_i(left_shifts);
+    size_t const last_block = block_array_index(bs->count - 1);
+    size_t const shifted_blocks = block_array_index(left_shifts);
+    ublock8 const partial_shift = ublock8_index(left_shifts);
     if (!partial_shift)
     {
         for (size_t shifted = last_block - shifted_blocks + 1,
@@ -256,7 +275,7 @@ ccc_bs_shiftl(ccc_bitset *const bs, size_t const left_shifts)
     }
     else
     {
-        ublockwidth const remaining_shift = BITBLOCK_BITS - partial_shift;
+        ublock8 const remaining_shift = BITBLOCK_BITS - partial_shift;
         for (size_t shifted = last_block - shifted_blocks,
                     overwritten = last_block;
              shifted > 0; --shifted, --overwritten)
@@ -292,9 +311,9 @@ ccc_bs_shiftr(ccc_bitset *const bs, size_t const right_shifts)
         set_all(bs, CCC_FALSE);
         return CCC_RESULT_OK;
     }
-    size_t const last_block = block_i(bs->count - 1);
-    size_t const shifted_blocks = block_i(right_shifts);
-    ublockwidth partial_shift = blockwidth_i(right_shifts);
+    size_t const last_block = block_array_index(bs->count - 1);
+    size_t const shifted_blocks = block_array_index(right_shifts);
+    ublock8 partial_shift = ublock8_index(right_shifts);
     if (!partial_shift)
     {
         for (size_t shifted = shifted_blocks, overwritten = 0;
@@ -305,7 +324,7 @@ ccc_bs_shiftr(ccc_bitset *const bs, size_t const right_shifts)
     }
     else
     {
-        ublockwidth remaining_shift = BITBLOCK_BITS - partial_shift;
+        ublock8 remaining_shift = BITBLOCK_BITS - partial_shift;
         for (size_t shifted = shifted_blocks, overwritten = 0;
              shifted < last_block; ++shifted, ++overwritten)
         {
@@ -391,12 +410,12 @@ ccc_bs_set_range(ccc_bitset *const bs, size_t const i, size_t const count,
         return CCC_RESULT_ARG_ERROR;
     }
     size_t const end = i + count;
-    size_t start_block = block_i(i);
-    ublockwidth const start_i = blockwidth_i(i);
-    ccc_bitblock first_block_on = BITBLOCK_ALL_ON << start_i;
+    size_t start_block = block_array_index(i);
+    ublock8 const start_i = ublock8_index(i);
+    ccc_bitblock first_block_on = BITBLOCK_ON << start_i;
     if (start_i + count < BITBLOCK_BITS)
     {
-        first_block_on &= ~(BITBLOCK_ALL_ON << (start_i + count));
+        first_block_on &= ~(BITBLOCK_ON << (start_i + count));
     }
     if (b)
     {
@@ -406,7 +425,7 @@ ccc_bs_set_range(ccc_bitset *const bs, size_t const i, size_t const count,
     {
         bs->blocks[start_block] &= ~first_block_on;
     }
-    size_t const end_block = block_i(end - 1);
+    size_t const end_block = block_array_index(end - 1);
     if (end_block == start_block)
     {
         fix_end(bs);
@@ -418,9 +437,9 @@ ccc_bs_set_range(ccc_bitset *const bs, size_t const i, size_t const count,
         (void)memset(&bs->blocks[start_block], v,
                      (end_block - start_block) * SIZEOF_BLOCK);
     }
-    ublockwidth const last_i = blockwidth_i(end - 1);
+    ublock8 const last_i = ublock8_index(end - 1);
     ccc_bitblock const last_block_on
-        = BITBLOCK_ALL_ON >> ((BITBLOCK_BITS - last_i) - 1);
+        = BITBLOCK_ON >> ((BITBLOCK_BITS - last_i) - 1);
     if (b)
     {
         bs->blocks[end_block] |= last_block_on;
@@ -476,15 +495,15 @@ ccc_bs_reset_range(ccc_bitset *const bs, size_t const i, size_t const count)
         return CCC_RESULT_ARG_ERROR;
     }
     size_t const end = i + count;
-    size_t start_block = block_i(i);
-    ublockwidth const start_i = blockwidth_i(i);
-    ccc_bitblock first_block_on = BITBLOCK_ALL_ON << start_i;
+    size_t start_block = block_array_index(i);
+    ublock8 const start_i = ublock8_index(i);
+    ccc_bitblock first_block_on = BITBLOCK_ON << start_i;
     if (start_i + count < BITBLOCK_BITS)
     {
-        first_block_on &= ~(BITBLOCK_ALL_ON << (start_i + count));
+        first_block_on &= ~(BITBLOCK_ON << (start_i + count));
     }
     bs->blocks[start_block] &= ~first_block_on;
-    size_t const end_block = block_i(end - 1);
+    size_t const end_block = block_array_index(end - 1);
     if (end_block == start_block)
     {
         fix_end(bs);
@@ -495,9 +514,9 @@ ccc_bs_reset_range(ccc_bitset *const bs, size_t const i, size_t const count)
         (void)memset(&bs->blocks[start_block], CCC_FALSE,
                      (end_block - start_block) * SIZEOF_BLOCK);
     }
-    ublockwidth const last_i = blockwidth_i(end - 1);
+    ublock8 const last_i = ublock8_index(end - 1);
     ccc_bitblock const last_block_on
-        = BITBLOCK_ALL_ON >> ((BITBLOCK_BITS - last_i) - 1);
+        = BITBLOCK_ON >> ((BITBLOCK_BITS - last_i) - 1);
     bs->blocks[end_block] &= ~last_block_on;
     fix_end(bs);
     return CCC_RESULT_OK;
@@ -510,7 +529,7 @@ ccc_bs_flip(ccc_bitset *const bs, size_t const i)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    size_t const b_i = block_i(i);
+    size_t const b_i = block_array_index(i);
     if (b_i >= bs->count)
     {
         return CCC_TRIBOOL_ERROR;
@@ -553,15 +572,15 @@ ccc_bs_flip_range(ccc_bitset *const bs, size_t const i, size_t const count)
         return CCC_RESULT_ARG_ERROR;
     }
     size_t const end = i + count;
-    size_t start_block = block_i(i);
-    ublockwidth const start_i = blockwidth_i(i);
-    ccc_bitblock first_block_on = BITBLOCK_ALL_ON << start_i;
+    size_t start_block = block_array_index(i);
+    ublock8 const start_i = ublock8_index(i);
+    ccc_bitblock first_block_on = BITBLOCK_ON << start_i;
     if (start_i + count < BITBLOCK_BITS)
     {
-        first_block_on &= ~(BITBLOCK_ALL_ON << (start_i + count));
+        first_block_on &= ~(BITBLOCK_ON << (start_i + count));
     }
     bs->blocks[start_block] ^= first_block_on;
-    size_t const end_block = block_i(end - 1);
+    size_t const end_block = block_array_index(end - 1);
     if (end_block == start_block)
     {
         fix_end(bs);
@@ -571,9 +590,9 @@ ccc_bs_flip_range(ccc_bitset *const bs, size_t const i, size_t const count)
     {
         bs->blocks[start_block] = ~bs->blocks[start_block];
     }
-    ublockwidth const last_i = blockwidth_i(end - 1);
+    ublock8 const last_i = ublock8_index(end - 1);
     ccc_bitblock const last_block_on
-        = BITBLOCK_ALL_ON >> ((BITBLOCK_BITS - last_i) - 1);
+        = BITBLOCK_ON >> ((BITBLOCK_BITS - last_i) - 1);
     bs->blocks[end_block] ^= last_block_on;
     fix_end(bs);
     return CCC_RESULT_OK;
@@ -657,15 +676,15 @@ ccc_bs_popcount_range(ccc_bitset const *const bs, size_t const i,
     }
     size_t const end = i + count;
     size_t popped = 0;
-    size_t start_block = block_i(i);
-    ublockwidth const start_i_in_block = blockwidth_i(i);
-    ccc_bitblock first_block_on = BITBLOCK_ALL_ON << start_i_in_block;
-    if (start_i_in_block + count < BITBLOCK_BITS)
+    size_t start_block = block_array_index(i);
+    ublock8 const start_ublock8 = ublock8_index(i);
+    ccc_bitblock first_block_on = BITBLOCK_ON << start_ublock8;
+    if (start_ublock8 + count < BITBLOCK_BITS)
     {
-        first_block_on &= ~(BITBLOCK_ALL_ON << (start_i_in_block + count));
+        first_block_on &= ~(BITBLOCK_ON << (start_ublock8 + count));
     }
     popped += popcount(first_block_on & bs->blocks[start_block]);
-    size_t const end_block = block_i(end - 1);
+    size_t const end_block = block_array_index(end - 1);
     if (end_block == start_block)
     {
         return (ccc_ucount){.count = popped};
@@ -673,9 +692,9 @@ ccc_bs_popcount_range(ccc_bitset const *const bs, size_t const i,
     for (++start_block; start_block < end_block;
          popped += popcount(bs->blocks[start_block++]))
     {}
-    ublockwidth const last_i = blockwidth_i(end - 1);
+    ublock8 const end_ublock8 = ublock8_index(end - 1);
     ccc_bitblock const last_block_on
-        = BITBLOCK_ALL_ON >> ((BITBLOCK_BITS - last_i) - 1);
+        = BITBLOCK_ON >> ((BITBLOCK_BITS - end_ublock8) - 1);
     popped += popcount(last_block_on & bs->blocks[end_block]);
     return (ccc_ucount){.count = popped};
 }
@@ -1057,21 +1076,19 @@ first_trailing_one_range(struct ccc_bitset const *const bs, size_t const i,
         return (ccc_ucount){.error = CCC_RESULT_ARG_ERROR};
     }
     size_t const end = i + count;
-    size_t start_block = block_i(i);
-    ublockwidth const start_i = blockwidth_i(i);
-    ccc_bitblock first_block_on = BITBLOCK_ALL_ON << start_i;
-    if (start_i + count < BITBLOCK_BITS)
+    size_t start_block = block_array_index(i);
+    ublock8 const start_ublock8 = ublock8_index(i);
+    ccc_bitblock first_block_on = BITBLOCK_ON << start_ublock8;
+    if (start_ublock8 + count < BITBLOCK_BITS)
     {
-        first_block_on &= ~(BITBLOCK_ALL_ON << (start_i + count));
+        first_block_on &= ~(BITBLOCK_ON << (start_ublock8 + count));
     }
-    size_t i_in_block = ctz(first_block_on & bs->blocks[start_block]);
-    if (i_in_block != BITBLOCK_BITS)
+    ublock8 tz = ctz(first_block_on & bs->blocks[start_block]);
+    if (tz != BITBLOCK_BITS)
     {
-        return (ccc_ucount){
-            .count = (start_block * BITBLOCK_BITS) + i_in_block,
-        };
+        return (ccc_ucount){.count = (start_block * BITBLOCK_BITS) + tz};
     }
-    size_t const end_block = block_i(end - 1);
+    size_t const end_block = block_array_index(end - 1);
     if (end_block == start_block)
     {
         return (ccc_ucount){.error = CCC_RESULT_FAIL};
@@ -1079,22 +1096,22 @@ first_trailing_one_range(struct ccc_bitset const *const bs, size_t const i,
     /* Handle all values in between start and end in bulk. */
     for (++start_block; start_block < end_block; ++start_block)
     {
-        i_in_block = ctz(bs->blocks[start_block]);
-        if (i_in_block != BITBLOCK_BITS)
+        tz = ctz(bs->blocks[start_block]);
+        if (tz != BITBLOCK_BITS)
         {
             return (ccc_ucount){
-                .count = (start_block * BITBLOCK_BITS) + i_in_block,
+                .count = (start_block * BITBLOCK_BITS) + tz,
             };
         }
     }
     /* Handle last block. */
-    ublockwidth const last_i = blockwidth_i(end - 1);
+    ublock8 const end_ublock8 = ublock8_index(end - 1);
     ccc_bitblock const last_block_on
-        = BITBLOCK_ALL_ON >> ((BITBLOCK_BITS - last_i) - 1);
-    i_in_block = ctz(last_block_on & bs->blocks[end_block]);
-    if (i_in_block != BITBLOCK_BITS)
+        = BITBLOCK_ON >> ((BITBLOCK_BITS - end_ublock8) - 1);
+    tz = ctz(last_block_on & bs->blocks[end_block]);
+    if (tz != BITBLOCK_BITS)
     {
-        return (ccc_ucount){.count = (end_block * BITBLOCK_BITS) + i_in_block};
+        return (ccc_ucount){.count = (end_block * BITBLOCK_BITS) + tz};
     }
     return (ccc_ucount){.error = CCC_RESULT_FAIL};
 }
@@ -1116,9 +1133,9 @@ first_trailing_bits_range(struct ccc_bitset const *const bs, size_t const i,
     size_t const range_end = i + count;
     size_t num_found = 0;
     size_t bits_start = i;
-    size_t cur_block = block_i(i);
+    size_t cur_block = block_array_index(i);
     size_t cur_end = (cur_block * BITBLOCK_BITS) + BITBLOCK_BITS;
-    ublockwidth block_i = blockwidth_i(i);
+    ublock8 i_ublock8 = ublock8_index(i);
     do
     {
         /* Clean up some edge cases for the helper function because we allow
@@ -1126,23 +1143,23 @@ first_trailing_bits_range(struct ccc_bitset const *const bs, size_t const i,
            end of this block? What if it starts after index 0 of the first
            block? Pretend out of range bits are zeros. */
         ccc_bitblock bits
-            = is_one ? bs->blocks[cur_block] & (BITBLOCK_ALL_ON << block_i)
-                     : (~bs->blocks[cur_block]) & (BITBLOCK_ALL_ON << block_i);
+            = is_one ? bs->blocks[cur_block] & (BITBLOCK_ON << i_ublock8)
+                     : (~bs->blocks[cur_block]) & (BITBLOCK_ON << i_ublock8);
         if (cur_end > range_end)
         {
             /* Modulo at most once entire function, not every loop cycle. */
-            bits &= ~(BITBLOCK_ALL_ON << blockwidth_i(range_end));
+            bits &= ~(BITBLOCK_ON << ublock8_index(range_end));
         }
         struct ugroup const ones
-            = max_trailing_ones(bits, block_i, num_bits - num_found);
+            = max_trailing_ones(bits, i_ublock8, num_bits - num_found);
         if (ones.count >= num_bits)
         {
             /* Found the solution all at once within a block. */
             return (ccc_ucount){
-                .count = (cur_block * BITBLOCK_BITS) + ones.block_start_i,
+                .count = (cur_block * BITBLOCK_BITS) + ones.ublock8_i,
             };
         }
-        if (!ones.block_start_i)
+        if (!ones.ublock8_i)
         {
             if (num_found + ones.count >= num_bits)
             {
@@ -1156,10 +1173,10 @@ first_trailing_bits_range(struct ccc_bitset const *const bs, size_t const i,
         {
             /* Fail but we have largest skip possible to continue our search
                from in order to save double checking unnecessary prefixes. */
-            bits_start = (cur_block * BITBLOCK_BITS) + ones.block_start_i;
+            bits_start = (cur_block * BITBLOCK_BITS) + ones.ublock8_i;
             num_found = ones.count;
         }
-        block_i = 0;
+        i_ublock8 = 0;
         ++cur_block;
         cur_end += BITBLOCK_BITS;
     } while (bits_start + num_bits <= range_end);
@@ -1177,32 +1194,32 @@ BLOCK_BITS index is returned with a group size of 0 meaning the search for ones
 will need to continue in the next block. This is helpful for the main search
 loop adding to its start index and number of ones found so far. */
 static struct ugroup
-max_trailing_ones(ccc_bitblock const b, ublockwidth const i_in_block,
-                  size_t const ones_remaining)
+max_trailing_ones(ccc_bitblock const b, ublock8 const i,
+                  size_t const ones_remain)
 {
     /* Easy exit skip to the next block. Helps with sparse sets. */
     if (!b)
     {
-        return (struct ugroup){.block_start_i = BITBLOCK_BITS};
+        return (struct ugroup){.ublock8_i = BITBLOCK_BITS};
     }
-    if (ones_remaining <= BITBLOCK_BITS)
+    if (ones_remain <= BITBLOCK_BITS)
     {
-        assert(i_in_block < BITBLOCK_BITS);
+        assert(i < BITBLOCK_BITS);
         /* This branch must find a smaller group anywhere in this block which is
            the most work required in this algorithm. We have some tricks to tell
            when to give up on this as soon as possible. */
-        ccc_bitblock b_check = b >> i_in_block;
+        ccc_bitblock b_check = b >> i;
         ccc_bitblock const remain
-            = BITBLOCK_ALL_ON >> (BITBLOCK_BITS - ones_remaining);
+            = BITBLOCK_ON >> (BITBLOCK_BITS - ones_remain);
         /* Because of power of 2 rules we can stop early when the shifted
            becomes impossible to match. */
-        for (size_t shifts = 0; b_check >= remain; b_check >>= 1, ++shifts)
+        for (ublock8 shifts = 0; b_check >= remain; b_check >>= 1, ++shifts)
         {
             if ((remain & b_check) == remain)
             {
                 return (struct ugroup){
-                    .block_start_i = i_in_block + shifts,
-                    .count = ones_remaining,
+                    .ublock8_i = i + shifts,
+                    .count = ones_remain,
                 };
             }
         }
@@ -1213,9 +1230,8 @@ max_trailing_ones(ccc_bitblock const b, ublockwidth const i_in_block,
        MSB. The best we could have is a full block of 1's. Otherwise we need
        to find where to start our new search for contiguous 1's. This could be
        the next block if there are not 1's that continue all the way to MSB. */
-    size_t const ones_found = clz(~b);
-    return (struct ugroup){.block_start_i = BITBLOCK_BITS - ones_found,
-                           .count = ones_found};
+    ublock8 const lz = clz(~b);
+    return (struct ugroup){.ublock8_i = BITBLOCK_BITS - lz, .count = lz};
 }
 
 static ccc_ucount
@@ -1227,21 +1243,21 @@ first_trailing_zero_range(struct ccc_bitset const *const bs, size_t const i,
         return (ccc_ucount){.error = CCC_RESULT_ARG_ERROR};
     }
     size_t const end = i + count;
-    size_t start_block = block_i(i);
-    ublockwidth const start_i = blockwidth_i(i);
-    ccc_bitblock first_block_on = BITBLOCK_ALL_ON << start_i;
-    if (start_i + count < BITBLOCK_BITS)
+    size_t start_block = block_array_index(i);
+    ublock8 const start_ublock8 = ublock8_index(i);
+    ccc_bitblock first_block_on = BITBLOCK_ON << start_ublock8;
+    if (start_ublock8 + count < BITBLOCK_BITS)
     {
-        first_block_on &= ~(BITBLOCK_ALL_ON << (start_i + count));
+        first_block_on &= ~(BITBLOCK_ON << (start_ublock8 + count));
     }
-    size_t i_in_block = ctz(first_block_on & ~bs->blocks[start_block]);
-    if (i_in_block != BITBLOCK_BITS)
+    ublock8 tz = ctz(first_block_on & ~bs->blocks[start_block]);
+    if (tz != BITBLOCK_BITS)
     {
         return (ccc_ucount){
-            .count = (start_block * BITBLOCK_BITS) + i_in_block,
+            .count = (start_block * BITBLOCK_BITS) + tz,
         };
     }
-    size_t const end_block = block_i(end - 1);
+    size_t const end_block = block_array_index(end - 1);
     if (start_block == end_block)
     {
         return (ccc_ucount){.error = CCC_RESULT_FAIL};
@@ -1249,22 +1265,22 @@ first_trailing_zero_range(struct ccc_bitset const *const bs, size_t const i,
     /* Handle all values in between start and end in bulk. */
     for (++start_block; start_block < end_block; ++start_block)
     {
-        i_in_block = ctz(~bs->blocks[start_block]);
-        if (i_in_block != BITBLOCK_BITS)
+        tz = ctz(~bs->blocks[start_block]);
+        if (tz != BITBLOCK_BITS)
         {
             return (ccc_ucount){
-                .count = (start_block * BITBLOCK_BITS) + i_in_block,
+                .count = (start_block * BITBLOCK_BITS) + tz,
             };
         }
     }
     /* Handle last block. */
-    ublockwidth const last_i = blockwidth_i(end - 1);
+    ublock8 const end_ublock8 = ublock8_index(end - 1);
     ccc_bitblock const last_block_on
-        = BITBLOCK_ALL_ON >> ((BITBLOCK_BITS - last_i) - 1);
-    i_in_block = ctz(last_block_on & ~bs->blocks[end_block]);
-    if (i_in_block != BITBLOCK_BITS)
+        = BITBLOCK_ON >> ((BITBLOCK_BITS - end_ublock8) - 1);
+    tz = ctz(last_block_on & ~bs->blocks[end_block]);
+    if (tz != BITBLOCK_BITS)
     {
-        return (ccc_ucount){.count = (end_block * BITBLOCK_BITS) + i_in_block};
+        return (ccc_ucount){.count = (end_block * BITBLOCK_BITS) + tz};
     }
     return (ccc_ucount){.error = CCC_RESULT_FAIL};
 }
@@ -1278,24 +1294,23 @@ first_leading_one_range(struct ccc_bitset const *const bs, size_t const i,
         return (ccc_ucount){.error = CCC_RESULT_ARG_ERROR};
     }
     size_t const end_i = (i + 1 - count);
-    ublockwidth const width_end_i = blockwidth_i(i);
-    ublockwidth const width_final_i = blockwidth_i(end_i);
-    size_t start_block_i = block_i(i);
+    ublock8 const start_ublock8 = ublock8_index(i);
+    ublock8 const end_ublock8 = ublock8_index(end_i);
+    size_t start_block_i = block_array_index(i);
     ccc_bitblock first_block_on
-        = BITBLOCK_ALL_ON >> ((BITBLOCK_BITS - width_end_i) - 1);
+        = BITBLOCK_ON >> ((BITBLOCK_BITS - start_ublock8) - 1);
     if (i - end_i < BITBLOCK_BITS)
     {
-        first_block_on &= (BITBLOCK_ALL_ON << width_final_i);
+        first_block_on &= (BITBLOCK_ON << end_ublock8);
     }
-    size_t lead_zeros = clz(first_block_on & bs->blocks[start_block_i]);
-    if (lead_zeros != BITBLOCK_BITS)
+    ublock8 lz = clz(first_block_on & bs->blocks[start_block_i]);
+    if (lz != BITBLOCK_BITS)
     {
         return (ccc_ucount){
-            .count = (start_block_i * BITBLOCK_BITS)
-                     + (BITBLOCK_BITS - lead_zeros - 1),
+            .count = (start_block_i * BITBLOCK_BITS) + (BITBLOCK_BITS - lz - 1),
         };
     }
-    size_t const end_block_i = block_i(end_i);
+    size_t const end_block_i = block_array_index(end_i);
     if (end_block_i == start_block_i)
     {
         return (ccc_ucount){.error = CCC_RESULT_FAIL};
@@ -1303,24 +1318,23 @@ first_leading_one_range(struct ccc_bitset const *const bs, size_t const i,
     /* Handle all values in between start and end in bulk. */
     for (--start_block_i; start_block_i > end_block_i; --start_block_i)
     {
-        lead_zeros = clz(bs->blocks[start_block_i]);
-        if (lead_zeros != BITBLOCK_BITS)
+        lz = clz(bs->blocks[start_block_i]);
+        if (lz != BITBLOCK_BITS)
         {
             return (ccc_ucount){
-                .count = (start_block_i * BITBLOCK_BITS)
-                         + (BITBLOCK_BITS - lead_zeros - 1),
+                .count
+                = (start_block_i * BITBLOCK_BITS) + (BITBLOCK_BITS - lz - 1),
             };
         }
     }
     /* Handle last block. */
     ccc_bitblock const last_block_on
-        = ~(BITBLOCK_ALL_ON >> ((BITBLOCK_BITS - width_final_i) - 1));
-    lead_zeros = clz(last_block_on & bs->blocks[end_block_i]);
-    if (lead_zeros != BITBLOCK_BITS)
+        = ~(BITBLOCK_ON >> ((BITBLOCK_BITS - end_ublock8) - 1));
+    lz = clz(last_block_on & bs->blocks[end_block_i]);
+    if (lz != BITBLOCK_BITS)
     {
         return (ccc_ucount){
-            .count
-            = (end_block_i * BITBLOCK_BITS) + (BITBLOCK_BITS - lead_zeros - 1),
+            .count = (end_block_i * BITBLOCK_BITS) + (BITBLOCK_BITS - lz - 1),
         };
     }
     return (ccc_ucount){.error = CCC_RESULT_FAIL};
@@ -1332,27 +1346,26 @@ first_leading_bits_range(struct ccc_bitset const *const bs, size_t const i,
                          ccc_tribool const is_one)
 {
     ptrdiff_t const range_end = (ptrdiff_t)(i - count);
-    if (!bs || i >= bs->count || !num_bits || num_bits > count
-        || range_end < -1)
+    if (!bs || i >= bs->count || !num_bits || num_bits > count || range_end < -1
+        || num_bits > PTRDIFF_MAX || i > PTRDIFF_MAX)
     {
         return (ccc_ucount){.error = CCC_RESULT_ARG_ERROR};
     }
     size_t num_found = 0;
     ptrdiff_t bits_start = (ptrdiff_t)i;
-    ptrdiff_t cur_block = (ptrdiff_t)block_i(i);
+    ptrdiff_t cur_block = (ptrdiff_t)block_array_index(i);
     ptrdiff_t cur_end = (ptrdiff_t)((cur_block * BITBLOCK_BITS) - 1);
-    ublockwidth block_i = blockwidth_i(i);
+    iblock16 block_i = ublock8_index(i);
     do
     {
         ccc_bitblock bits
-            = is_one
-                  ? bs->blocks[cur_block]
-                        & (BITBLOCK_ALL_ON >> ((BITBLOCK_BITS - block_i) - 1))
-                  : ~bs->blocks[cur_block]
-                        & (BITBLOCK_ALL_ON >> ((BITBLOCK_BITS - block_i) - 1));
+            = is_one ? bs->blocks[cur_block]
+                           & (BITBLOCK_ON >> ((BITBLOCK_BITS - block_i) - 1))
+                     : ~bs->blocks[cur_block]
+                           & (BITBLOCK_ON >> ((BITBLOCK_BITS - block_i) - 1));
         if (cur_end < range_end)
         {
-            bits &= (BITBLOCK_ALL_ON << blockwidth_i(range_end + 1));
+            bits &= (BITBLOCK_ON << ublock8_index(range_end + 1));
         }
         struct igroup const ones
             = max_leading_ones(bits, block_i, num_bits - num_found);
@@ -1399,7 +1412,7 @@ loop adding to its start index and number of ones found so far. Adding -1 is
 just subtraction so this will correctly drop us to the top bit of the next Least
 Significant Block to continue the search. */
 static struct igroup
-max_leading_ones(ccc_bitblock const b, ublockwidth const i_in_block,
+max_leading_ones(ccc_bitblock const b, iblock16 const i,
                  size_t const ones_remaining)
 {
     if (!b)
@@ -1408,24 +1421,24 @@ max_leading_ones(ccc_bitblock const b, ublockwidth const i_in_block,
     }
     if (ones_remaining <= BITBLOCK_BITS)
     {
-        assert(i_in_block < BITBLOCK_BITS);
-        ccc_bitblock b_check = b << (BITBLOCK_BITS - i_in_block - 1);
-        ccc_bitblock const required = BITBLOCK_ALL_ON
+        assert(i < BITBLOCK_BITS);
+        ccc_bitblock b_check = b << (BITBLOCK_BITS - i - 1);
+        ccc_bitblock const required = BITBLOCK_ON
                                       << (BITBLOCK_BITS - ones_remaining);
-        for (ublockwidth shifts = 0; b_check; b_check <<= 1, ++shifts)
+        for (iblock16 shifts = 0; b_check; b_check <<= 1, ++shifts)
         {
             if ((required & b_check) == required)
             {
                 return (struct igroup){
-                    .block_start_i = i_in_block - shifts,
+                    .block_start_i = (iblock16)(i - shifts),
                     .count = ones_remaining,
                 };
             }
         }
     }
-    ptrdiff_t const num_ones_found = ctz(~b);
+    iblock16 const num_ones_found = (iblock16)ctz(~b);
     return (struct igroup){
-        .block_start_i = num_ones_found - 1,
+        .block_start_i = (iblock16)(num_ones_found - 1),
         .count = num_ones_found,
     };
 }
@@ -1439,24 +1452,24 @@ first_leading_zero_range(struct ccc_bitset const *const bs, size_t const i,
         return (ccc_ucount){.error = CCC_RESULT_ARG_ERROR};
     }
     size_t const end_i = i + 1 - count;
-    size_t start_block_i = block_i(i);
-    ublockwidth const width_end_i = blockwidth_i(end_i);
-    ublockwidth const width_start_i = blockwidth_i(i);
+    size_t start_block_i = block_array_index(i);
+    ublock8 const end_ublock8 = ublock8_index(end_i);
+    ublock8 const start_ublock8 = ublock8_index(i);
     ccc_bitblock first_block_on
-        = BITBLOCK_ALL_ON >> ((BITBLOCK_BITS - width_start_i) - 1);
+        = BITBLOCK_ON >> ((BITBLOCK_BITS - start_ublock8) - 1);
     if (i - end_i < BITBLOCK_BITS)
     {
-        first_block_on &= (BITBLOCK_ALL_ON << width_end_i);
+        first_block_on &= (BITBLOCK_ON << end_ublock8);
     }
-    size_t lead_ones = clz(first_block_on & ~bs->blocks[start_block_i]);
-    if (lead_ones != BITBLOCK_BITS)
+    ublock8 lz = clz(first_block_on & ~bs->blocks[start_block_i]);
+    if (lz != BITBLOCK_BITS)
     {
         return (ccc_ucount){
-            .count = ((start_block_i * BITBLOCK_BITS)
-                      + (BITBLOCK_BITS - lead_ones - 1)),
+            .count
+            = ((start_block_i * BITBLOCK_BITS) + (BITBLOCK_BITS - lz - 1)),
         };
     }
-    size_t const end_block = block_i(end_i);
+    size_t const end_block = block_array_index(end_i);
     if (end_block == start_block_i)
     {
         return (ccc_ucount){.error = CCC_RESULT_FAIL};
@@ -1464,24 +1477,23 @@ first_leading_zero_range(struct ccc_bitset const *const bs, size_t const i,
     /* Handle all values in between start and end in bulk. */
     for (--start_block_i; start_block_i > end_block; --start_block_i)
     {
-        lead_ones = clz(~bs->blocks[start_block_i]);
-        if (lead_ones != BITBLOCK_BITS)
+        lz = clz(~bs->blocks[start_block_i]);
+        if (lz != BITBLOCK_BITS)
         {
             return (ccc_ucount){
-                .count = ((start_block_i * BITBLOCK_BITS)
-                          + (BITBLOCK_BITS - lead_ones - 1)),
+                .count
+                = ((start_block_i * BITBLOCK_BITS) + (BITBLOCK_BITS - lz - 1)),
             };
         }
     }
     /* Handle last block. */
     ccc_bitblock const last_block_on
-        = ~(BITBLOCK_ALL_ON >> ((BITBLOCK_BITS - width_end_i) - 1));
-    lead_ones = clz(last_block_on & ~bs->blocks[end_block]);
-    if (lead_ones != BITBLOCK_BITS)
+        = ~(BITBLOCK_ON >> ((BITBLOCK_BITS - end_ublock8) - 1));
+    lz = clz(last_block_on & ~bs->blocks[end_block]);
+    if (lz != BITBLOCK_BITS)
     {
         return (ccc_ucount){
-            .count
-            = ((end_block * BITBLOCK_BITS) + (BITBLOCK_BITS - lead_ones - 1)),
+            .count = ((end_block * BITBLOCK_BITS) + (BITBLOCK_BITS - lz - 1)),
         };
     }
     return (ccc_ucount){.error = CCC_RESULT_FAIL};
@@ -1501,34 +1513,34 @@ any_or_none_range(struct ccc_bitset const *const bs, size_t const i,
         return CCC_TRIBOOL_ERROR;
     }
     size_t const end = i + count;
-    size_t start_block = block_i(i);
-    ublockwidth const start_i = blockwidth_i(i);
-    ccc_bitblock first_block_on = BITBLOCK_ALL_ON << start_i;
-    if (start_i + count < BITBLOCK_BITS)
+    size_t start_block = block_array_index(i);
+    ublock8 const start_ublock8 = ublock8_index(i);
+    ccc_bitblock first_block_on = BITBLOCK_ON << start_ublock8;
+    if (start_ublock8 + count < BITBLOCK_BITS)
     {
-        first_block_on &= ~(BITBLOCK_ALL_ON << (start_i + count));
+        first_block_on &= ~(BITBLOCK_ON << (start_ublock8 + count));
     }
     if (first_block_on & bs->blocks[start_block])
     {
         return ret;
     }
-    size_t const end_block = block_i(end - 1);
+    size_t const end_block = block_array_index(end - 1);
     if (end_block == start_block)
     {
         return !ret;
     }
     /* If this is the any check we might get lucky by checking the last block
        before looping over everything. */
-    ublockwidth const last_i = blockwidth_i(end - 1);
+    ublock8 const end_ublock8 = ublock8_index(end - 1);
     ccc_bitblock const last_block_on
-        = BITBLOCK_ALL_ON >> ((BITBLOCK_BITS - last_i) - 1);
+        = BITBLOCK_ON >> ((BITBLOCK_BITS - end_ublock8) - 1);
     if (last_block_on & bs->blocks[end_block])
     {
         return ret;
     }
     for (++start_block; start_block < end_block; ++start_block)
     {
-        if (bs->blocks[start_block] & BITBLOCK_ALL_ON)
+        if (bs->blocks[start_block] & BITBLOCK_ON)
         {
             return ret;
         }
@@ -1546,32 +1558,32 @@ all_range(struct ccc_bitset const *const bs, size_t const i, size_t const count)
         return CCC_TRIBOOL_ERROR;
     }
     size_t const end = i + count;
-    size_t start_block = block_i(i);
-    ublockwidth const start_i = blockwidth_i(i);
-    ccc_bitblock first_block_on = BITBLOCK_ALL_ON << start_i;
-    if (start_i + count < BITBLOCK_BITS)
+    size_t start_block = block_array_index(i);
+    ublock8 const start_ublock8 = ublock8_index(i);
+    ccc_bitblock first_block_on = BITBLOCK_ON << start_ublock8;
+    if (start_ublock8 + count < BITBLOCK_BITS)
     {
-        first_block_on &= ~(BITBLOCK_ALL_ON << (start_i + count));
+        first_block_on &= ~(BITBLOCK_ON << (start_ublock8 + count));
     }
     if ((first_block_on & bs->blocks[start_block]) != first_block_on)
     {
         return CCC_FALSE;
     }
-    size_t const end_block = block_i(end - 1);
+    size_t const end_block = block_array_index(end - 1);
     if (end_block == start_block)
     {
         return CCC_TRUE;
     }
     for (++start_block; start_block < end_block; ++start_block)
     {
-        if (bs->blocks[start_block] != BITBLOCK_ALL_ON)
+        if (bs->blocks[start_block] != BITBLOCK_ON)
         {
             return CCC_FALSE;
         }
     }
-    size_t const last_i = blockwidth_i(end - 1);
+    ublock8 const end_ublock8 = ublock8_index(end - 1);
     ccc_bitblock const last_block_on
-        = BITBLOCK_ALL_ON >> ((BITBLOCK_BITS - last_i) - 1);
+        = BITBLOCK_ON >> ((BITBLOCK_BITS - end_ublock8) - 1);
     if ((last_block_on & bs->blocks[end_block]) != last_block_on)
     {
         return CCC_FALSE;
@@ -1585,7 +1597,7 @@ point to some block at index [0, count of blocks used in the set). */
 static inline ccc_bitblock *
 block_at(ccc_bitset const *const bs, size_t const bit_i)
 {
-    return &bs->blocks[block_i(bit_i)];
+    return &bs->blocks[block_array_index(bit_i)];
 }
 
 static inline void
@@ -1625,7 +1637,7 @@ status(ccc_bitblock const *const bs, size_t const bit_i)
 static inline ccc_bitblock
 on(size_t bit_i)
 {
-    return (ccc_bitblock)1 << blockwidth_i(bit_i);
+    return (ccc_bitblock)1 << ublock8_index(bit_i);
 }
 
 /** Clears unused bits in the last block according to count. Sets the last block
@@ -1647,30 +1659,30 @@ last_on(struct ccc_bitset const *const bs)
 {
     /* Remember, we fill from LSB to MSB so we want the mask to start at lower
        order bit which is why we do the second funky flip on the whole op. */
-    return bs->count ? ~(((ccc_bitblock)~1) << blockwidth_i(bs->count - 1))
-                     : BITBLOCK_ALL_ON;
+    return bs->count ? ~(((ccc_bitblock)~1) << ublock8_index(bs->count - 1))
+                     : BITBLOCK_ON;
 }
 
-/** Returns the 0-based index of the block to which the given index belongs.
-Assumes the given index is somewhere between [0, size of bit set). The returned
-index then represents the block in which this index resides which is guaranteed
-to be in the range [0, last block containing last bit in active set). */
+/** Returns the 0-based index of the block in the block array allocation to
+which the given index belongs. Assumes the given index is somewhere between [0,
+count of bits set). The returned index then represents the block in which this
+index resides which is in the range [0, block containing last in use bit). */
 static inline size_t
-block_i(size_t const bit_i)
+block_array_index(size_t const bit_i)
 {
     return bit_i / BITBLOCK_BITS;
 }
 
 /** Returns the 0-based index within a block to which the given index belongs.
 This index will always be between [0, BITBLOCK_BITS - 1). */
-static inline ublockwidth
-blockwidth_i(size_t const bit_i)
+static inline ublock8
+ublock8_index(size_t const bit_i)
 {
     return bit_i % BITBLOCK_BITS;
 }
 
 /** Returns the number of blocks required to store the given bits. Assumes bits
-is non-zero. */
+is non-zero. For any bits > 1 the block count is always less than bits.*/
 static inline size_t
 block_count(size_t const bits)
 {
@@ -1690,43 +1702,46 @@ size_t_min(size_t a, size_t b)
     && __has_builtin(__builtin_clz) && __has_builtin(__builtin_popcount)
 
 /** Counts the on bits in a bit block. */
-static inline unsigned
+static inline ublock8
 popcount(ccc_bitblock const b)
 {
     /* There are different pop counts for different integer widths. Be sure to
        catch the use of the wrong one by mistake here at compile time. */
     static_assert(SIZEOF_BLOCK == sizeof(unsigned));
-    return __builtin_popcount(b);
+    static_assert(__builtin_popcount((ccc_bitblock)~0) <= U8BLOCK_MAX);
+    return (ublock8)__builtin_popcount(b);
 }
 
 /** Counts the number of trailing zeros in a bit block starting from least
 significant bit. */
-static inline unsigned
+static inline ublock8
 ctz(ccc_bitblock const b)
 {
-    static_assert(BITBLOCK_MSB < BITBLOCK_ALL_ON);
+    static_assert(BITBLOCK_MSB < BITBLOCK_ON);
     static_assert(SIZEOF_BLOCK == sizeof(unsigned));
-    return b ? (unsigned)__builtin_ctz(b) : BITBLOCK_BITS;
+    static_assert(__builtin_ctz(BITBLOCK_MSB) <= U8BLOCK_MAX);
+    return b ? (ublock8)__builtin_ctz(b) : BITBLOCK_BITS;
 }
 
 /** Counts the leading zeros in a bit block starting from the most significant
 bit. */
-static inline unsigned
+static inline ublock8
 clz(ccc_bitblock const b)
 {
-    static_assert(BITBLOCK_MSB < BITBLOCK_ALL_ON);
+    static_assert(BITBLOCK_MSB < BITBLOCK_ON);
     static_assert(SIZEOF_BLOCK == sizeof(unsigned));
-    return b ? (unsigned)__builtin_clz(b) : BITBLOCK_BITS;
+    static_assert(__builtin_clz((ccc_bitblock)1) <= U8BLOCK_MAX);
+    return b ? (ublock8)__builtin_clz(b) : BITBLOCK_BITS;
 }
 
 #else /* !defined(__has_builtin) || !__has_builtin(__builtin_ctz)              \
     || !__has_builtin(__builtin_clz) || !__has_builtin(__builtin_popcount) */
 
 /** Counts the on bits in a bit block. */
-static inline unsigned
+static inline ublock8
 popcount(ccc_bitblock b)
 {
-    unsigned cnt = 0;
+    ublock8 cnt = 0;
     for (; b; cnt += ((b & 1U) != 0), b >>= 1U)
     {}
     return cnt;
@@ -1734,14 +1749,14 @@ popcount(ccc_bitblock b)
 
 /** Counts the number of trailing zeros in a bit block starting from least
 significant bit. */
-static inline unsigned
+static inline ublock8
 ctz(ccc_bitblock b)
 {
     if (!b)
     {
         return BLOCK_BITS;
     }
-    unsigned cnt = 0;
+    ublock8 cnt = 0;
     for (; (b & 1U) == 0; ++cnt, b >>= 1U)
     {}
     return cnt;
@@ -1749,14 +1764,14 @@ ctz(ccc_bitblock b)
 
 /** Counts the leading zeros in a bit block starting from the most significant
 bit. */
-static inline unsigned
+static inline ublock8
 clz(ccc_bitblock b)
 {
     if (!b)
     {
         return BLOCK_BITS;
     }
-    unsigned cnt = 0;
+    ublock8 cnt = 0;
     for (; (b & BITBLOCK_MSB) == 0; ++cnt, b <<= 1U)
     {}
     return cnt;
