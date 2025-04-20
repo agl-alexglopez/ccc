@@ -59,16 +59,16 @@ that means uint64_t is widest default integer widely supported. That width
 is still valid on 32-bit but probably very slow due to emulation. */
 enum : uint8_t
 {
-#if defined(__x86_64) && defined(__SSE2_) && !defined(CCC_FHM_PORTABLE)
+#if defined(__x86_64) && defined(__SSE2__) && !defined(CCC_FHM_PORTABLE)
     /** A group of tags that can be loaded into a 128 bit vector. */
     CCC_FHM_GROUP_SIZE = 16,
-#elif defined(__ARM_NEON_) && !defined(CCC_FHM_PORTABLE)
+#elif defined(__ARM_NEON__) && !defined(CCC_FHM_PORTABLE)
     /** A group of tags that can be loded into a 64 bit integer. */
     CCC_FHM_GROUP_SIZE = 8,
 #else  /* PORTABLE FALLBACK */
     /** A group of tags that can be loded into a 64 bit integer. */
     CCC_FHM_GROUP_SIZE = 8,
-#endif /* defined(__x86_64) && defined(__SSE2_) && !CCC_FHM_PORTABLE */
+#endif /* defined(__x86_64) && defined(__SSE2__) && !CCC_FHM_PORTABLE */
 };
 
 /** @private The layout of the map uses only pointers to account for the
@@ -77,7 +77,7 @@ map is allowed to allocate it will take care of aligning pointers appropriately.
 In the fixed size case we rely on the user defining a fixed size type. In either
 case the arrays are in one contiguous allocation but split as follows:
 
-(N == capacity - 1) Where capacity is a required power of 2. (G == group size).
+(N == capacity - 1) Where capacity is a power of 2. (G == group size - 1).
 
 ┌────┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┐
 │Swap│D_N│...│D_1│D_0│T_0│T_1│...│T_N│R_0│R_1│...│R_G│
