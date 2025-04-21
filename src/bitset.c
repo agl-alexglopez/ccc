@@ -97,7 +97,7 @@ on intent. It helps clean up algorithms for finding ranges of leading bits.
 It also a wider type to avoid warnings or dangers when taking the value of a
 `ubit` type. */
 typedef int16_t ibit;
-static_assert(sizeof(ibit) > sizeof(ubit), "(ibit)((ubit)x) cast is defined");
+static_assert(sizeof(ibit) > sizeof(ubit), "ibit x = (ibit)x_ubit; is safe");
 static_assert((ibit)~0 < 0, "ibit must be signed");
 static_assert(INT16_MAX >= BITBLOCK_BITS, "ibit counts all block bits");
 
