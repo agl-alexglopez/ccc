@@ -709,7 +709,7 @@ maybe_resize(struct ccc_fdeq *const q, size_t const additional_elems_to_add,
     {
         required = q->buf.capacity * 2;
     }
-    void *const new_mem = fn(NULL, q->buf.sizeof_type * required, q->buf.aux);
+    void *const new_mem = fn(NULL, sizeof_type * required, q->buf.aux);
     if (!new_mem)
     {
         return CCC_RESULT_MEM_ERROR;
