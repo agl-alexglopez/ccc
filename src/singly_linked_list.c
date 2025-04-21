@@ -397,7 +397,7 @@ ccc_sll_insert_sorted(ccc_singly_linked_list *sll, ccc_sll_elem *e)
     return struct_base(sll, e);
 }
 
-/** Sorts the list in `O(N*log(N))` time with `O(1)` auxiliary space (no
+/** Sorts the list in `O(N * log(N))` time with `O(1)` auxiliary space (no
 recursion). If the list is already sorted this algorithm only needs one pass.
 
 The following merging algorithm and associated helper functions are based on
@@ -412,9 +412,16 @@ module for original implementations. The code has been changed for the C
 Container Collection as follows:
 
 - the algorithm is adapted to work with a singly linked list rather than doubly
-- there single sentinel node rather than two.
+- there is a single sentinel node rather than two.
 - splicing in the merge operation has been simplified along with other tweaks.
-- comparison callbacks are handled with three way comparison. */
+- comparison callbacks are handled with three way comparison.
+
+If the runtime is not obvious from the code, consider that this algorithms runs
+bottom up on sorted sub-ranges. It roughly "halves" the remaining sub-ranges
+that need to be sorted by roughly "doubling" the length of a sorted range on
+each merge step. Therefore the number of times we must perform the merge step is
+`O(log(N))`. The most elements we would have to merge in the merge step is all
+`N` elements so together that gives us the runtime of `O(N * log(N))`. */
 ccc_result
 ccc_sll_sort(ccc_singly_linked_list *const sll)
 {
@@ -467,9 +474,9 @@ first_less(ccc_singly_linked_list const *const sll, struct list_link k)
 /** Merges lists `[a_0, a_n_b_0)` with `[a_n_b_0, b_n)` to form `[a_0, b_n)`.
 Returns the exclusive end of the range, `b_n`, once the merge sort is complete.
 
-Notice that all ranges exclude their final element from the merge for
+Notice that all ranges treat the end of their range as an exclusive sentinel for
 consistency. This function assumes the provided lists are already sorted
-separately. A list link must be returned because the b_n previous field may be
+separately. A list link must be returned because the `b_n` previous field may be
 updated due to arbitrary splices during comparison sorting. */
 static inline struct list_link
 merge(ccc_singly_linked_list *const sll, struct list_link a_0,
@@ -484,7 +491,7 @@ merge(ccc_singly_linked_list *const sll, struct list_link a_0,
                does not change because only lesser was spliced out. */
             a_n_b_0.i = lesser->n;
             a_n_b_0.prev->n = lesser->n;
-            /* Critical, otherwise algo breaks. b_n must be accurate. */
+            /* Critical, otherwise algorithm breaks. `b_n` must be accurate. */
             if (lesser == b_n.prev)
             {
                 b_n.prev = a_n_b_0.prev;

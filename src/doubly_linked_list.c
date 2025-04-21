@@ -508,7 +508,7 @@ ccc_dll_insert_sorted(ccc_doubly_linked_list *const dll, ccc_dll_elem *e)
 }
 
 /** Sorts the list into non-decreasing order according to the user comparison
-callback function in `O(N*lgN)` time and `O(1)` space.
+callback function in `O(N * log(N))` time and `O(1)` space.
 
 The following merging algorithm and associated helper functions are based on
 the iterative natural merge sort used in the list module of the pintOS project
@@ -521,9 +521,16 @@ However, if refactors change this location, seek the list intrusive container
 module for original implementations. The code has been changed for the C
 Container Collection as follows:
 
-- there single sentinel node rather than two.
+- there is a single sentinel node rather than two.
 - splicing in the merge operation has been simplified along with other tweaks.
-- comparison callbacks are handled with three way comparison. */
+- comparison callbacks are handled with three way comparison.
+
+If the runtime is not obvious from the code, consider that this algorithms runs
+bottom up on sorted sub-ranges. It roughly "halves" the remaining sub-ranges
+that need to be sorted by roughly "doubling" the length of a sorted range on
+each merge step. Therefore the number of times we must perform the merge step is
+`O(log(N))`. The most elements we would have to merge in the merge step is all
+`N` elements so together that gives us the runtime of `O(N * log(N))`. */
 ccc_result
 ccc_dll_sort(ccc_doubly_linked_list *const dll)
 {
@@ -574,7 +581,7 @@ first_less(struct ccc_dll const *const dll, struct ccc_dll_elem *start)
 /** Merges lists `[a_0, a_n_b_0)` with `[a_n_b_0, b_n)` to form `[a_0, b_n)`.
 Returns the exclusive end of the range, `b_n`, once the merge sort is complete.
 
-Notice that all ranges exclude their final element from the merge for
+Notice that all ranges treat the end of their range as an exclusive sentinel for
 consistency. This function assumes the provided lists are already sorted
 separately. */
 static inline struct ccc_dll_elem *
