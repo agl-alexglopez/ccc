@@ -79,13 +79,15 @@ ccc_buf_alloc_back(ccc_buffer *const buf)
     {
         return NULL;
     }
-    if (buf->count == buf->capacity
-        && (CCC_RESULT_OK
-            != (buf->capacity
-                    ? ccc_buf_alloc(buf, buf->capacity * 2, buf->alloc)
-                    : ccc_buf_alloc(buf, START_CAPACITY, buf->alloc))))
+    if (buf->count == buf->capacity)
     {
-        return NULL;
+        ccc_result const resize_res
+            = buf->capacity ? ccc_buf_alloc(buf, buf->capacity * 2, buf->alloc)
+                            : ccc_buf_alloc(buf, START_CAPACITY, buf->alloc);
+        if (resize_res != CCC_RESULT_OK)
+        {
+            return NULL;
+        }
     }
     void *const ret = ((char *)buf->mem + (buf->sizeof_type * buf->count));
     ++buf->count;
