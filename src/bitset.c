@@ -44,9 +44,9 @@ enum : ccc_bitblock
     BITBLOCK_MSB = (((ccc_bitblock)1) << (((SIZEOF_BLOCK * CHAR_BIT)) - 1)),
 };
 
-/** @private An index into the block array. The block array is bounded by the
-number of blocks required to support the current bit set capacity. Assume this
-index type has range [0, count of blocks needed to hold all bits in set].
+/** @private An index into the block array or count of bit blocks. The block
+array is bounded by the number of blocks required to support the current bit set
+capacity. Assume this index type has range [0, block count to support N bits].
 
 User input is given as a `size_t` so distinguish from that input with this type
 to make it clear to the reader the index refers to a block not the given bit
