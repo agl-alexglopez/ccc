@@ -1222,13 +1222,15 @@ splay(struct ccc_ommap *const t, struct ccc_ommap_elem *root,
     return root;
 }
 
-/* This function has proven to be VERY important. The nil node often
-   has garbage values associated with real nodes in our tree and if we access
-   them by mistake it's bad! But the nil is also helpful for some invariant
-   coding patters and reducing if checks all over the place. Links a parent
-   to a subtree updating the parents child pointer in the direction specified
-   and updating the subtree parent field to point back to parent. This last
-   step is critical and easy to miss or mess up. */
+/* Links a parent to a sub-tree updating the parents child pointer in the
+direction specified and updating the sub-tree parent field to point back to
+parent. The direction of the parent to link is given by dir. This last step is
+critical and easy to miss or mess up.
+
+This function has proven to be VERY important. The nil node often has garbage
+values associated with real nodes in our tree and if we access them by mistake
+it's bad! But the nil is also helpful for some invariant coding patters and
+reducing if checks all over the place.  */
 static void
 link_trees(struct ccc_ommap *const t, struct ccc_ommap_elem *const parent,
            enum tree_link const dir, struct ccc_ommap_elem *const subtree)

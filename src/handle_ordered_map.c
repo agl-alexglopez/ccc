@@ -947,6 +947,8 @@ splay(struct ccc_homap *const t, size_t root, void const *const key,
     return root;
 }
 
+/** Links the parent node to node starting at subtree root via direction dir.
+updates the parent of the child being picked up by the new parent as well. */
 static inline void
 link(struct ccc_homap *const t, size_t const parent, enum hom_branch const dir,
      size_t const subtree)
