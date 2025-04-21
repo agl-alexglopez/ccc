@@ -74,9 +74,10 @@ on intent. It helps clean up algorithms for finding ranges of leading bits.
 It also a wider type to avoid warnings or dangers when taking the value of a
 `ublock8` type. */
 typedef int16_t iblock16;
-static_assert(sizeof(iblock16) > sizeof(ublock8));
+static_assert(sizeof(iblock16) > sizeof(ublock8),
+              "a signed block indexer can be cast from unsigned source");
 static_assert((iblock16)~0 < 0, "iblock16 must be signed");
-static_assert(INT16_MAX >= BITBLOCK_BITS, "iblock16 counts all block bits.");
+static_assert(INT16_MAX >= BITBLOCK_BITS, "iblock16 counts all block bits");
 
 /** @private A helper to allow for an efficient linear scan for groups of 0's
 or 1's in the set. */
