@@ -388,7 +388,7 @@ ccc_result ccc_fpq_clear_and_free(ccc_flat_priority_queue *fpq,
 
 /** @brief Frees all slots in the fpq and frees the underlying buffer that was
 previously dynamically reserved with the reserve function.
-@param [in] h the fpq to be cleared.
+@param [in] fpq the fpq to be cleared.
 @param [in] destructor the destructor for each element. NULL can be passed if no
 maintenance is required on the elements in the fpq before their slots are
 dropped.
