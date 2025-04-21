@@ -671,21 +671,13 @@ push_range(struct ccc_fdeq *const fdeq, char const *const pos, size_t n,
     }
     if (new_size > cap)
     {
-        size_t const excess = (new_size - cap);
         /* Wrapping behavior stops if it would overwrite the start of the
            range being inserted. This is to preserve as much info about
            the range as possible. If wrapping occurs the range is the new
            front. */
-        if ((fdeq->front <= pos_i && fdeq->front + excess >= pos_i)
-            || (fdeq->front + excess > cap
-                && ((fdeq->front + excess) - cap) >= pos_i))
-        {
-            fdeq->front = pos_i;
-        }
-        else
-        {
-            fdeq->front = (fdeq->front + excess) % cap;
-        }
+        size_t const excess = (new_size - cap);
+        size_t const front_to_pos_dist = (pos_i + cap - fdeq->front) % cap;
+        fdeq->front = (fdeq->front + min(excess, front_to_pos_dist)) % cap;
     }
     (void)ccc_buf_size_set(&fdeq->buf, min(cap, new_size));
     return ccc_buf_at(&fdeq->buf, pos_i);

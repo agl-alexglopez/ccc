@@ -506,7 +506,7 @@ bubble_down(struct ccc_fpq *const fpq, char tmp[const], size_t i)
     {
         /* Avoid one comparison call if there is no right child. */
         next = (right < count && wins(fpq, right, left)) ? right : left;
-        /* If the child beats the parent we must swap. Equal is ok to break. */
+        /* If the child beats the parent we must swap. Equal is OK to break. */
         if (!wins(fpq, next, i))
         {
             return i;
@@ -535,9 +535,9 @@ at(struct ccc_fpq const *const fpq, size_t const i)
     return addr;
 }
 
-/* Flat pq code that uses indices of the underlying buffer should always
-   be within the buffer range. It should never exceed the current size and
-   start at or after the buffer base. Only checked in debug. */
+/* Flat priority queue code that uses indices of the underlying buffer should
+   always be within the buffer range. It should never exceed the current size
+   and start at or after the buffer base. Only checked in debug. */
 static inline size_t
 index_of(struct ccc_fpq const *const fpq, void const *const slot)
 {
