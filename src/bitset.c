@@ -107,7 +107,7 @@ or 1's in the set. */
 struct ugroup
 {
     /** A index [0, bit block bits] indicating the status of a search. */
-    ubit ubit_i;
+    ubit i;
     /** The number of bits of same value found starting at block_start_i. */
     size_t count;
 };
@@ -118,7 +118,7 @@ group scanning in reverse. */
 struct igroup
 {
     /** A index [-1, bit block bits] indicating the status of a search. */
-    ibit block_start_i;
+    ibit i;
     /** The number of bits of same value found starting at block_start_i. */
     size_t count;
 };
@@ -1175,10 +1175,10 @@ first_trailing_bits_range(struct ccc_bitset const *const bs, size_t const i,
         {
             /* Found the solution all at once within a block. */
             return (ccc_ucount){
-                .count = (cur_block * BITBLOCK_BITS) + ones.ubit_i,
+                .count = (cur_block * BITBLOCK_BITS) + ones.i,
             };
         }
-        if (!ones.ubit_i)
+        if (!ones.i)
         {
             if (num_found + ones.count >= num_bits)
             {
@@ -1192,7 +1192,7 @@ first_trailing_bits_range(struct ccc_bitset const *const bs, size_t const i,
         {
             /* Fail but we have largest skip possible to continue our search
                from in order to save double checking unnecessary prefixes. */
-            bits_start = (cur_block * BITBLOCK_BITS) + ones.ubit_i;
+            bits_start = (cur_block * BITBLOCK_BITS) + ones.i;
             num_found = ones.count;
         }
         i_bit = 0;
@@ -1219,7 +1219,7 @@ max_trailing_ones(ccc_bitblock const b, ubit const i_bit,
     /* Easy exit skip to the next block. Helps with sparse sets. */
     if (!b)
     {
-        return (struct ugroup){.ubit_i = BITBLOCK_BITS};
+        return (struct ugroup){.i = BITBLOCK_BITS};
     }
     if (ones_remain <= BITBLOCK_BITS)
     {
@@ -1237,7 +1237,7 @@ max_trailing_ones(ccc_bitblock const b, ubit const i_bit,
             if ((remain & b_check) == remain)
             {
                 return (struct ugroup){
-                    .ubit_i = i_bit + shifts,
+                    .i = i_bit + shifts,
                     .count = ones_remain,
                 };
             }
@@ -1250,7 +1250,7 @@ max_trailing_ones(ccc_bitblock const b, ubit const i_bit,
        to find where to start our new search for contiguous 1's. This could be
        the next block if there are not 1's that continue all the way to MSB. */
     ubit const lz = clz(~b);
-    return (struct ugroup){.ubit_i = BITBLOCK_BITS - lz, .count = lz};
+    return (struct ugroup){.i = BITBLOCK_BITS - lz, .count = lz};
 }
 
 static ccc_ucount
@@ -1398,10 +1398,10 @@ first_leading_bits_range(struct ccc_bitset const *const bs, size_t const i,
         if (ones.count >= num_bits)
         {
             return (ccc_ucount){
-                .count = (cur_block * BITBLOCK_BITS) + ones.block_start_i,
+                .count = (cur_block * BITBLOCK_BITS) + ones.i,
             };
         }
-        if (ones.block_start_i == BITBLOCK_BITS - 1)
+        if (ones.i == BITBLOCK_BITS - 1)
         {
             if (num_found + ones.count >= num_bits)
             {
@@ -1414,8 +1414,7 @@ first_leading_bits_range(struct ccc_bitset const *const bs, size_t const i,
             /* If the new block start index is -1, then this addition bumps us
                to the next block's Most Significant Bit and is a simple
                subtraction by one to start search on next block.*/
-            bits_start
-                = (ptrdiff_t)((cur_block * BITBLOCK_BITS) + ones.block_start_i);
+            bits_start = (ptrdiff_t)((cur_block * BITBLOCK_BITS) + ones.i);
             num_found = ones.count;
         }
         i_bit = BITBLOCK_BITS - 1;
@@ -1443,7 +1442,7 @@ max_leading_ones(ccc_bitblock const b, ibit const i_bit,
 {
     if (!b)
     {
-        return (struct igroup){.block_start_i = -1};
+        return (struct igroup){.i = -1};
     }
     if (ones_remaining <= BITBLOCK_BITS)
     {
@@ -1456,7 +1455,7 @@ max_leading_ones(ccc_bitblock const b, ibit const i_bit,
             if ((required & b_check) == required)
             {
                 return (struct igroup){
-                    .block_start_i = (ibit)(i_bit - shifts),
+                    .i = (ibit)(i_bit - shifts),
                     .count = ones_remaining,
                 };
             }
@@ -1464,7 +1463,7 @@ max_leading_ones(ccc_bitblock const b, ibit const i_bit,
     }
     ibit const num_ones_found = (ibit)ctz(~b);
     return (struct igroup){
-        .block_start_i = (ibit)(num_ones_found - 1),
+        .i = (ibit)(num_ones_found - 1),
         .count = num_ones_found,
     };
 }
