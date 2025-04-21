@@ -553,10 +553,10 @@ ccc_dll_sort(ccc_doubly_linked_list *const dll)
             {
                 break;
             }
-            /* a_0 picks up the exclusive end of this merge, b_n, in order
+            /* A picks up the exclusive end of this merge, B, in order
                to progress the sorting algorithm with the next run that needs
-               fixing. Merge returns this b_n element to indicate it is the
-               final element that has not been processed by merge comparison. */
+               fixing. Merge returns the end of B to indicate it is the final
+               sentinel node yet to be examined. */
             a_0 = merge(dll, a_0, a_n_b_0, first_less(dll, a_n_b_0));
             merging = CCC_TRUE;
         }
