@@ -255,7 +255,10 @@ enum : typeof((ccc_fhm_tag){}.v)
 
 /** @private A triangular sequence of numbers is a probing sequence that will
 visit every group in a power of 2 capacity hash table. Here is a popular proof:
-https://fgiesen.wordpress.com/2015/02/22/triangular-numbers-mod-2n/ */
+https://fgiesen.wordpress.com/2015/02/22/triangular-numbers-mod-2n/
+
+See also Donald Knuth's The Art of Computer Programming Volume 3, Chapter 6.4,
+Answers to Exercises, problem 20, page 731 for another proof. */
 struct triangular_seq
 {
     /** @private The index this probe step has placed us on. */
