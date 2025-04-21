@@ -776,7 +776,7 @@ This graph shows which files directly or indirectly include this file:</div>
 <p>Frees all slots in the fpq and frees the underlying buffer that was previously dynamically reserved with the reserve function. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">h</td><td>the fpq to be cleared. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">fpq</td><td>the fpq to be cleared. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">destructor</td><td>the destructor for each element. NULL can be passed if no maintenance is required on the elements in the fpq before their slots are dropped. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">alloc</td><td>the required allocation function to provide to a dynamically reserved fpq. Any auxiliary data provided upon initialization will be passed to the allocation function when called. </td></tr>
   </table>
