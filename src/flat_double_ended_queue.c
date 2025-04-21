@@ -734,6 +734,10 @@ maybe_resize(struct ccc_fdeq *const q, size_t const additional_elems_to_add,
     return CCC_RESULT_OK;
 }
 
+/** Returns the distance between the current iter position and the origin
+position. Distance is calculated in ascending indices, meaning the result is
+the number of forward steps in the buffer origin would need to take reach iter,
+possibly accounting for wrapping around the end of the buffer. */
 static inline size_t
 distance(struct ccc_fdeq const *const fdeq, size_t const iter,
          size_t const origin)
@@ -741,6 +745,10 @@ distance(struct ccc_fdeq const *const fdeq, size_t const iter,
     return iter > origin ? iter - origin : (fdeq->buf.capacity - origin) + iter;
 }
 
+/** Returns the rdistance between the current iter position and the origin
+position. Rdistance is calculated in descending indices, meaning the result is
+the number of backward steps in the buffer origin would need to take to reach
+iter, possibly accounting for wrapping around the beginning of buffer. */
 static inline size_t
 rdistance(struct ccc_fdeq const *const fdeq, size_t const iter,
           size_t const origin)
