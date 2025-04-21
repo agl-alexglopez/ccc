@@ -418,14 +418,11 @@ ccc_bs_set_range(ccc_bitset *const bs, size_t const i, size_t const count,
     {
         first_block_on &= ~(BITBLOCK_ON << (start_i + count));
     }
-    if (b)
-    {
-        bs->blocks[start_block] |= first_block_on;
-    }
-    else
-    {
-        bs->blocks[start_block] &= ~first_block_on;
-    }
+
+    /* Logic is uniform except for key lines to turn bits on or off. */
+    b ? (bs->blocks[start_block] |= first_block_on)
+      : (bs->blocks[start_block] &= ~first_block_on);
+
     size_t const end_block = block_array_index(end - 1);
     if (end_block == start_block)
     {
@@ -434,6 +431,7 @@ ccc_bs_set_range(ccc_bitset *const bs, size_t const i, size_t const count,
     }
     if (++start_block != end_block)
     {
+        /* Bulk setting blocks to 1 or 0 is OK. Only full blocks are set. */
         int const v = b ? ~0 : 0;
         (void)memset(&bs->blocks[start_block], v,
                      (end_block - start_block) * SIZEOF_BLOCK);
@@ -441,14 +439,11 @@ ccc_bs_set_range(ccc_bitset *const bs, size_t const i, size_t const count,
     ublock8 const last_i = ublock8_index(end - 1);
     ccc_bitblock const last_block_on
         = BITBLOCK_ON >> ((BITBLOCK_BITS - last_i) - 1);
-    if (b)
-    {
-        bs->blocks[end_block] |= last_block_on;
-    }
-    else
-    {
-        bs->blocks[end_block] &= ~last_block_on;
-    }
+
+    /* Same as first block but we are careful about bits past our range. */
+    b ? (bs->blocks[end_block] |= last_block_on)
+      : (bs->blocks[end_block] &= ~last_block_on);
+
     fix_end(bs);
     return CCC_RESULT_OK;
 }
