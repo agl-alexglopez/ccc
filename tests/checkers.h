@@ -20,7 +20,7 @@ typedef enum check_result (*test_fn)(void);
 #define CHECK_FAIL_PRINT(result, result_string, expected, expected_string)     \
     do                                                                         \
     {                                                                          \
-        char const *const format_string = _Generic((result),                   \
+        char const *const check_impl_format_string = _Generic((result),        \
             _Bool: "%d",                                                       \
             char: "%c",                                                        \
             signed char: "%hhd",                                               \
@@ -48,9 +48,9 @@ typedef enum check_result (*test_fn)(void);
         (void)fprintf(stderr, "%sCHECK: result( %s ) == expected( %s )%s\n",   \
                       GREEN, result_string, expected_string, NONE);            \
         (void)fprintf(stderr, "%sERROR: result( ", RED);                       \
-        (void)fprintf(stderr, format_string, result);                          \
+        (void)fprintf(stderr, check_impl_format_string, result);               \
         (void)fprintf(stderr, " ) != expected( ");                             \
-        (void)fprintf(stderr, format_string, expected);                        \
+        (void)fprintf(stderr, check_impl_format_string, expected);             \
         (void)fprintf(stderr, " )\n%s", NONE);                                 \
     } while (0)
 
@@ -103,7 +103,7 @@ CHECK_BEGIN_STATIC_FN(insert_shuffled, ccc_ordered_multimap *pq,
 #define CHECK_BEGIN_STATIC_FN(test_name, ...)                                  \
     static enum check_result(test_name)(OPTIONAL_PARAMS(__VA_ARGS__))          \
     {                                                                          \
-        enum check_result check_macro_res = PASS;
+        enum check_result check_impl_macro_res = PASS;
 
 /** @brief Define a test function that has a name and optionally
 additional parameters that one may wish to define a test function.
@@ -117,7 +117,7 @@ a test fails. See begin static test for examples. */
 #define CHECK_BEGIN_FN(test_name, ...)                                         \
     enum check_result(test_name)(OPTIONAL_PARAMS(__VA_ARGS__))                 \
     {                                                                          \
-        enum check_result check_macro_res = PASS;
+        enum check_result check_impl_macro_res = PASS;
 
 /** @brief execute a check within the context of a test.
 @param [in] test_result the result value of some action.
@@ -142,12 +142,13 @@ though the braces are not required. */
 #define CHECK(test_result, test_expected, ...)                                 \
     do                                                                         \
     {                                                                          \
-        const __auto_type result = (test_result);                              \
-        typeof(result) const expected = (test_expected);                       \
-        if (result != expected)                                                \
+        const __auto_type check_impl_result = (test_result);                   \
+        const typeof(check_impl_result) check_impl_expected = (test_expected); \
+        if (check_impl_result != check_impl_expected)                          \
         {                                                                      \
-            CHECK_FAIL_PRINT(result, #test_result, expected, #test_expected);  \
-            check_macro_res = FAIL;                                            \
+            CHECK_FAIL_PRINT(check_impl_result, #test_result,                  \
+                             check_impl_expected, #test_expected);             \
+            check_impl_macro_res = FAIL;                                       \
             __VA_OPT__((void)({__VA_ARGS__});)                                 \
             goto use_a_check_and_end_fn_with_one_of_the_CHECK_END_macros;      \
         }                                                                      \
@@ -179,12 +180,13 @@ though the braces are not required. */
 #define CHECK_ERROR(test_result, test_expected, ...)                           \
     do                                                                         \
     {                                                                          \
-        const __auto_type result = (test_result);                              \
-        typeof(result) const expected = (test_expected);                       \
-        if (result != expected)                                                \
+        const __auto_type check_impl_result = (test_result);                   \
+        const typeof(check_impl_result) check_impl_expected = (test_expected); \
+        if (check_impl_result != check_impl_expected)                          \
         {                                                                      \
-            CHECK_FAIL_PRINT(result, #test_result, expected, #test_expected);  \
-            check_macro_res = ERROR;                                           \
+            CHECK_FAIL_PRINT(check_impl_result, #test_result,                  \
+                             check_impl_expected, #test_expected);             \
+            check_impl_macro_res = ERROR;                                      \
             __VA_OPT__((void)({__VA_ARGS__});)                                 \
             goto use_a_check_and_end_fn_with_one_of_the_CHECK_END_macros;      \
         }                                                                      \
@@ -216,7 +218,7 @@ CHECK_BEGIN_FN(my_test)
 
 This is not recommended as complex tests should be simplified such that one
 of the end test macros is sufficient. */
-#define CHECK_STATUS check_macro_res
+#define CHECK_STATUS check_impl_macro_res
 
 /** @brief End every test started with the end test macro.
 @param [in] ... optional code block with arbitrary cleanup code to be executed
@@ -237,7 +239,7 @@ grained control over nested scope is required upon a failure.*/
 #define CHECK_END_FN(...)                                                      \
 use_a_check_and_end_fn_with_one_of_the_CHECK_END_macros:                       \
     __VA_OPT__((void)({__VA_ARGS__});)                                         \
-    return check_macro_res;                                                    \
+    return check_impl_macro_res;                                               \
     }
 
 /** @brief End every test started with the end pass macro.
@@ -258,12 +260,12 @@ macro if more fine grained control over nested scope is required upon a failure.
 #define CHECK_END_FN_PASS(...)                                                 \
 use_a_check_and_end_fn_with_one_of_the_CHECK_END_macros:                       \
     __VA_OPT__((void)({                                                        \
-                   if (check_macro_res == PASS)                                \
+                   if (check_impl_macro_res == PASS)                           \
                    {                                                           \
                        __VA_ARGS__                                             \
                    }                                                           \
                });)                                                            \
-    return check_macro_res;                                                    \
+    return check_impl_macro_res;                                               \
     }
 
 /** @brief End every test started with the end fail macros.
@@ -284,12 +286,12 @@ failure.*/
 #define CHECK_END_FN_FAIL(...)                                                 \
 use_a_check_and_end_fn_with_one_of_the_CHECK_END_macros:                       \
     __VA_OPT__((void)({                                                        \
-                   if (check_macro_res == FAIL)                                \
+                   if (check_impl_macro_res == FAIL)                           \
                    {                                                           \
                        __VA_ARGS__                                             \
                    }                                                           \
                });)                                                            \
-    return check_macro_res;                                                    \
+    return check_impl_macro_res;                                               \
     }
 
 /** @brief End every test started with the end error macro.
@@ -310,12 +312,12 @@ failure.*/
 #define CHECK_END_FN_ERROR(...)                                                \
 use_a_check_and_end_fn_with_one_of_the_CHECK_END_macros:                       \
     __VA_OPT__((void)({                                                        \
-                   if (check_macro_res == ERROR)                               \
+                   if (check_impl_macro_res == ERROR)                          \
                    {                                                           \
                        __VA_ARGS__                                             \
                    }                                                           \
                });)                                                            \
-    return check_macro_res;                                                    \
+    return check_impl_macro_res;                                               \
     }
 
 /** @brief Runs a list of test functions and returns the result.
@@ -331,17 +333,18 @@ will simply set the overall test state to fail and the user should examine the
 individual test that failed with FAIL or ERROR. */
 #define CHECK_RUN(test_fn_list...)                                             \
     ({                                                                         \
-        enum check_result const check_all_checks[] = {test_fn_list};           \
-        enum check_result check_all_checks_res = PASS;                         \
+        enum check_result const check_impl_all_checks[] = {test_fn_list};      \
+        enum check_result check_impl_all_checks_res = PASS;                    \
         for (unsigned long long i = 0;                                         \
-             i < sizeof(check_all_checks) / sizeof(enum check_result); ++i)    \
+             i < sizeof(check_impl_all_checks) / sizeof(enum check_result);    \
+             ++i)                                                              \
         {                                                                      \
-            if (check_all_checks[i] != PASS)                                   \
+            if (check_impl_all_checks[i] != PASS)                              \
             {                                                                  \
-                check_all_checks_res = FAIL;                                   \
+                check_impl_all_checks_res = FAIL;                              \
             }                                                                  \
         }                                                                      \
-        check_all_checks_res;                                                  \
+        check_impl_all_checks_res;                                             \
     })
 
 #endif /* CHECKERS */
