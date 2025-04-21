@@ -444,10 +444,10 @@ ccc_sll_sort(ccc_singly_linked_list *const sll)
             {
                 break;
             }
-            /* a_0 picks up the exclusive end of this merge, b_n, in order
+            /* A picks up the exclusive end of this merge, B, in order
                to progress the sorting algorithm with the next run that needs
-               fixing. Merge returns this b_n element to indicate it is the
-               final element that has not been processed by merge comparison. */
+               fixing. Merge returns the final B element to indicate it is the
+               final sentinel that has not yet been examined. */
             a_0 = merge(sll, a_0, a_n_b_0, first_less(sll, a_n_b_0));
             merging = CCC_TRUE;
         }
