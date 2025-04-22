@@ -24,25 +24,80 @@ limitations under the License.
 
 /* NOLINTBEGIN(readability-identifier-naming) */
 
-/** @private */
+/** @private A node in the priority queue. The child is technically a left
+child but the direction is not important. The next and prev pointers represent
+sibling nodes in a circular doubly linked list in the child ring. When a node
+loses a merge and is sent down to be another nodes child it joins this sibling
+ring of nodes. The list is doubly linked and we have a parent pointer to keep
+operations like delete min, erase, and update fast. */
 struct ccc_pq_elem
 {
-    struct ccc_pq_elem *left_child;
-    struct ccc_pq_elem *next_sibling;
-    struct ccc_pq_elem *prev_sibling;
+    /** @private The left child of this node. */
+    struct ccc_pq_elem *child;
+    /** @private The next sibling in the sibling ring or self. */
+    struct ccc_pq_elem *next;
+    /** @private The previous sibling in the sibling ring or self. */
+    struct ccc_pq_elem *prev;
+    /** @private A parent or NULL if this is the root node. */
     struct ccc_pq_elem *parent;
 };
 
-/** @private */
+/** @private A priority queue is a variation on a heap ordered tree aimed at
+simple operations and run times that are very close to optimal. The root of
+the entire heap never has a next, prev, or parent because only a single heap
+root is allowed. Nodes can have a left child. The direction of the child does
+not matter to the implementation because there is only one. Then, any node
+besides the root of the entire heap can be in a ring of siblings with next
+and previous pointers. Here is a sample heap.
+
+< = next
+> = prev
+
+    ┌<0>┐
+    └/──┘
+  ┌<1>─<7>┐
+  └/────/─┘
+┌<9>┐┌<8>─<9>┐
+└───┘└───────┘
+
+The heap child rings are circular doubly linked lists to support fast update
+and erase operations. This construction gives the following run times.
+
+```
+┌─────────┬─────────┬─────────┬─────────┐
+│min      │delete   │increase │insert   │
+│         │min      │decrease │         │
+├─────────┼─────────┼─────────┼─────────┤
+│O(1)     │O(log(N))│o(log(N))│O(1)     │
+│         │amortized│amortized│         │
+└─────────┴─────────┴─────────┴─────────┘
+```
+
+The proof for the increase/decrease runtime is complicated. The gist is that
+updating the key is an `O(1)` operation. However, it restructures the tree in
+such a way that the next delete min has more work to do. That is why update and
+delete min have their amortized run times. In practice, the simplicity of the
+implementation keeps the pairing heap fast and easy to understand. In fact, if
+nodes are allocated ahead of time in a buffer, the pairing heap beats the
+binary flat priority queue in the C Container Collection across many operations
+with the trade-off being more memory consumed. */
 struct ccc_pq
 {
+    /** @private The node at the root of the heap. No parent. */
     struct ccc_pq_elem *root;
+    /** @private Quantity of nodes stored in heap for O(1) reporting. */
     size_t count;
+    /** @private The byte offset of the intrusive node in user type. */
     size_t pq_elem_offset;
+    /** @private The size of the type we are intruding upon. */
     size_t sizeof_type;
-    ccc_any_alloc_fn *alloc;
-    ccc_any_type_cmp_fn *cmp;
+    /** @private The order of this heap, `CCC_LES` (min) or `CCC_GRT` (max).*/
     ccc_threeway_cmp order;
+    /** @private The comparison function to enforce ordering. */
+    ccc_any_type_cmp_fn *cmp;
+    /** @private The allocation function, if any. */
+    ccc_any_alloc_fn *alloc;
+    /** @private Auxiliary data, if any. */
     void *aux;
 };
 
@@ -116,8 +171,8 @@ struct ccc_pq_elem *ccc_impl_pq_delete_node(struct ccc_pq *,
         struct ccc_pq *const impl_pq = (pq_ptr);                               \
         ccc_tribool impl_pq_update_res = CCC_FALSE;                            \
         struct ccc_pq_elem *const impl_pq_node_ptr = (pq_elem_ptr);            \
-        if (impl_pq && impl_pq_node_ptr && impl_pq_node_ptr->next_sibling      \
-            && impl_pq_node_ptr->prev_sibling)                                 \
+        if (impl_pq && impl_pq_node_ptr && impl_pq_node_ptr->next              \
+            && impl_pq_node_ptr->prev)                                         \
         {                                                                      \
             impl_pq_update_res = CCC_TRUE;                                     \
             if (impl_pq_node_ptr->parent                                       \
@@ -148,8 +203,8 @@ struct ccc_pq_elem *ccc_impl_pq_delete_node(struct ccc_pq *,
         struct ccc_pq *const impl_pq = (pq_ptr);                               \
         ccc_tribool impl_pq_increase_res = CCC_FALSE;                          \
         struct ccc_pq_elem *const impl_pq_elem_ptr = (pq_elem_ptr);            \
-        if (impl_pq && impl_pq_elem_ptr && impl_pq_elem_ptr->next_sibling      \
-            && impl_pq_elem_ptr->prev_sibling)                                 \
+        if (impl_pq && impl_pq_elem_ptr && impl_pq_elem_ptr->next              \
+            && impl_pq_elem_ptr->prev)                                         \
         {                                                                      \
             impl_pq_increase_res = CCC_TRUE;                                   \
             if (impl_pq->order == CCC_GRT)                                     \
@@ -175,8 +230,8 @@ struct ccc_pq_elem *ccc_impl_pq_delete_node(struct ccc_pq *,
         struct ccc_pq *const impl_pq = (pq_ptr);                               \
         ccc_tribool impl_pq_decrease_res = CCC_FALSE;                          \
         struct ccc_pq_elem *const impl_pq_elem_ptr = (pq_elem_ptr);            \
-        if (impl_pq && impl_pq_elem_ptr && impl_pq_elem_ptr->next_sibling      \
-            && impl_pq_elem_ptr->prev_sibling)                                 \
+        if (impl_pq && impl_pq_elem_ptr && impl_pq_elem_ptr->next              \
+            && impl_pq_elem_ptr->prev)                                         \
         {                                                                      \
             impl_pq_decrease_res = CCC_TRUE;                                   \
             if (impl_pq->order == CCC_LES)                                     \

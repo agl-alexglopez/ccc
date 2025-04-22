@@ -20,6 +20,7 @@ limitations under the License. */
 
 /*=========================  Function Prototypes   ==========================*/
 
+static void *elem_in(struct ccc_pq const *, struct ccc_pq_elem const *);
 static struct ccc_pq_elem *merge(struct ccc_pq *, struct ccc_pq_elem *old,
                                  struct ccc_pq_elem *new);
 static void link_child(struct ccc_pq_elem *parent, struct ccc_pq_elem *child);
@@ -33,7 +34,6 @@ static struct ccc_pq_elem *delete_min(struct ccc_pq *, struct ccc_pq_elem *);
 static void clear_node(struct ccc_pq_elem *);
 static void cut_child(struct ccc_pq_elem *);
 static void *struct_base(struct ccc_pq const *, struct ccc_pq_elem const *e);
-static void *elem_in(struct ccc_pq const *, struct ccc_pq_elem const *);
 static ccc_threeway_cmp cmp(struct ccc_pq const *, struct ccc_pq_elem const *,
                             struct ccc_pq_elem const *);
 static void update_fixup(struct ccc_pq *, struct ccc_pq_elem *,
@@ -101,7 +101,7 @@ ccc_pq_pop(ccc_priority_queue *const pq)
 void *
 ccc_pq_extract(ccc_priority_queue *const pq, ccc_pq_elem *const e)
 {
-    if (!pq || !e || !pq->root || !e->next_sibling || !e->prev_sibling)
+    if (!pq || !e || !pq->root || !e->next || !e->prev)
     {
         return NULL;
     }
@@ -114,7 +114,7 @@ ccc_pq_extract(ccc_priority_queue *const pq, ccc_pq_elem *const e)
 ccc_result
 ccc_pq_erase(ccc_priority_queue *const pq, ccc_pq_elem *const e)
 {
-    if (!pq || !e || !pq->root || !e->next_sibling || !e->prev_sibling)
+    if (!pq || !e || !pq->root || !e->next || !e->prev)
     {
         return CCC_RESULT_ARG_ERROR;
     }
@@ -178,7 +178,7 @@ ccc_tribool
 ccc_pq_update(ccc_priority_queue *const pq, ccc_pq_elem *const e,
               ccc_any_type_update_fn *const fn, void *const aux)
 {
-    if (!pq || !e || !fn || !e->next_sibling || !e->prev_sibling)
+    if (!pq || !e || !fn || !e->next || !e->prev)
     {
         return CCC_TRIBOOL_ERROR;
     }
@@ -192,7 +192,7 @@ ccc_tribool
 ccc_pq_increase(ccc_priority_queue *const pq, ccc_pq_elem *const e,
                 ccc_any_type_update_fn *const fn, void *const aux)
 {
-    if (!pq || !e || !fn || !e->next_sibling || !e->prev_sibling)
+    if (!pq || !e || !fn || !e->next || !e->prev)
     {
         return CCC_TRIBOOL_ERROR;
     }
@@ -206,7 +206,7 @@ ccc_tribool
 ccc_pq_decrease(ccc_priority_queue *const pq, ccc_pq_elem *const e,
                 ccc_any_type_update_fn *const fn, void *const aux)
 {
-    if (!pq || !e || !fn || !e->next_sibling || !e->prev_sibling)
+    if (!pq || !e || !fn || !e->next || !e->prev)
     {
         return CCC_TRIBOOL_ERROR;
     }
@@ -353,12 +353,11 @@ decrease_fixup(struct ccc_pq *const pq, struct ccc_pq_elem *const e,
 static void
 cut_child(struct ccc_pq_elem *const child)
 {
-    child->next_sibling->prev_sibling = child->prev_sibling;
-    child->prev_sibling->next_sibling = child->next_sibling;
-    if (child->parent && child == child->parent->left_child)
+    child->next->prev = child->prev;
+    child->prev->next = child->next;
+    if (child->parent && child == child->parent->child)
     {
-        child->parent->left_child
-            = child->next_sibling == child ? NULL : child->next_sibling;
+        child->parent->child = child->next == child ? NULL : child->next;
     }
     child->parent = NULL;
 }
@@ -380,9 +379,8 @@ of the paper to pair nodes in one pass. A non-trivial example for min heap.
 < = next_sibling
 > = prev_sibling
 
-   ┌<1>┐
-   └───┘
-   /
+  ┌<1>┐
+  └/──┘
 ┌<9>─<1>─<9>─<7>─<8>┐
 └───────────────────┘
         |
@@ -405,45 +403,49 @@ of the paper to pair nodes in one pass. A non-trivial example for min heap.
 └───┘└───────┘
         |
         v
-     ┌<1>┐
-     └───┘
-     /
+    ┌<1>┐
+    └/──┘
   ┌<7>─<9>┐
   └/──────┘
 ┌<8>─<9>┐
 └───────┘
 
 Delete min is the slowest operation offered by the priority queue and in
-part contributes to the amortized o(lg n) runtime of the decrease key
+part contributes to the amortized `o(log(N))` runtime of the decrease key
 operation. */
 static struct ccc_pq_elem *
 delete_min(struct ccc_pq *const pq, struct ccc_pq_elem *root)
 {
-    if (!root->left_child)
+    if (!root->child)
     {
         return NULL;
     }
-    struct ccc_pq_elem *const eldest = root->left_child->next_sibling;
-    struct ccc_pq_elem *accumulator = root->left_child->next_sibling;
-    struct ccc_pq_elem *cur = root->left_child->next_sibling->next_sibling;
-    while (cur != eldest && cur->next_sibling != eldest)
+    struct ccc_pq_elem *const eldest = root->child->next;
+    struct ccc_pq_elem *accumulator = root->child->next;
+    struct ccc_pq_elem *cur = root->child->next->next;
+    while (cur != eldest && cur->next != eldest)
     {
-        struct ccc_pq_elem *const next = cur->next_sibling;
-        struct ccc_pq_elem *const next_cur = cur->next_sibling->next_sibling;
-        next->next_sibling = next->prev_sibling = NULL;
-        cur->next_sibling = cur->prev_sibling = NULL;
+        struct ccc_pq_elem *const next = cur->next;
+        struct ccc_pq_elem *const next_cur = cur->next->next;
+        next->next = next->prev = NULL;
+        cur->next = cur->prev = NULL;
+        /* Double merge ensures `O(log(N))` steps rather than O(N). */
         accumulator = merge(pq, accumulator, merge(pq, cur, next));
         cur = next_cur;
     }
     /* This covers the odd or even case for number of pairings. */
     root = cur == eldest ? accumulator : merge(pq, accumulator, cur);
-    /* The root is always alone in its circular list at the end of merges.
-     */
-    root->next_sibling = root->prev_sibling = root;
+    /* The root is always alone in its circular list at the end of merges. */
+    root->next = root->prev = root;
     root->parent = NULL;
     return root;
 }
 
+/** Merges two priority queues, making the winner by ordering the root and
+pushing the loser to the left child ring. Old should be the element that has
+been in the queue longer and new, newer. This algorithm will still work if this
+argument ordering is not respected and it does not change runtime, but it is how
+to comply with the strategy outlined in the Fredman et. al. paper. */
 static struct ccc_pq_elem *
 merge(struct ccc_pq *const pq, struct ccc_pq_elem *const old,
       struct ccc_pq_elem *const new)
@@ -474,23 +476,23 @@ pointer is to support faster deletes and decrease key operations.
     ┌─<B>─┐  ┌─<C>──<B>─┐ ┌─<D>──<C>──<B>─┐
     └─────┘  └──────────┘ └───────────────┘
 
-Pairing in the delete min phase would then start B in this example and work
+Pairing in the delete min phase would then start at B in this example and work
 towards D. That is the oldest to youngest order mentioned in the paper. */
 static void
 link_child(struct ccc_pq_elem *const parent, struct ccc_pq_elem *const child)
 {
-    if (parent->left_child)
+    if (parent->child)
     {
-        child->next_sibling = parent->left_child->next_sibling;
-        child->prev_sibling = parent->left_child;
-        parent->left_child->next_sibling->prev_sibling = child;
-        parent->left_child->next_sibling = child;
+        child->next = parent->child->next;
+        child->prev = parent->child;
+        parent->child->next->prev = child;
+        parent->child->next = child;
     }
     else
     {
-        child->next_sibling = child->prev_sibling = child;
+        child->next = child->prev = child;
     }
-    parent->left_child = child;
+    parent->child = child;
     child->parent = parent;
 }
 
@@ -506,26 +508,26 @@ cmp(struct ccc_pq const *const pq, struct ccc_pq_elem const *const lhs,
 static inline void *
 struct_base(struct ccc_pq const *const pq, struct ccc_pq_elem const *const e)
 {
-    return ((char *)&(e->left_child)) - pq->pq_elem_offset;
+    return ((char *)&(e->child)) - pq->pq_elem_offset;
 }
 
 static inline void *
 elem_in(struct ccc_pq const *const pq, struct ccc_pq_elem const *const e)
 {
-    return ((char *)&(e->left_child)) + pq->pq_elem_offset;
+    return ((char *)&(e->child)) + pq->pq_elem_offset;
 }
 
 static inline void
 init_node(struct ccc_pq_elem *const e)
 {
-    e->left_child = e->parent = NULL;
-    e->next_sibling = e->prev_sibling = e;
+    e->child = e->parent = NULL;
+    e->next = e->prev = e;
 }
 
 static inline void
 clear_node(struct ccc_pq_elem *const e)
 {
-    e->left_child = e->next_sibling = e->prev_sibling = e->parent = NULL;
+    e->child = e->next = e->prev = e->parent = NULL;
 }
 
 /*========================     Validation ================================*/
@@ -543,8 +545,8 @@ traversal_size(struct ccc_pq_elem const *const root)
     struct ccc_pq_elem const *cur = root;
     do
     {
-        count += 1 + traversal_size(cur->left_child);
-    } while ((cur = cur->next_sibling) != root);
+        count += 1 + traversal_size(cur->child);
+    } while ((cur = cur->next) != root);
     return count;
 }
 
@@ -572,12 +574,11 @@ has_valid_links(struct ccc_pq const *const pq,
         {
             return CCC_FALSE;
         }
-        if (parent && parent->left_child != child->parent->left_child)
+        if (parent && parent->child != child->parent->child)
         {
             return CCC_FALSE;
         }
-        if (child->next_sibling->prev_sibling != child
-            || child->prev_sibling->next_sibling != child)
+        if (child->next->prev != child || child->prev->next != child)
         {
             return CCC_FALSE;
         }
@@ -585,11 +586,11 @@ has_valid_links(struct ccc_pq const *const pq,
         {
             return CCC_FALSE;
         }
-        if (!has_valid_links(pq, cur, cur->left_child)) /* ! RECURSE ! */
+        if (!has_valid_links(pq, cur, cur->child)) /* ! RECURSE ! */
         {
             return CCC_FALSE;
         }
-    } while ((cur = cur->next_sibling) != child);
+    } while ((cur = cur->next) != child);
     return CCC_TRUE;
 }
 
