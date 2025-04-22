@@ -50,6 +50,7 @@ not matter to the implementation because there is only one. Then, any node
 besides the root of the entire heap can be in a ring of siblings with next
 and previous pointers. Here is a sample heap.
 
+```
 < = next
 > = prev
 
@@ -59,6 +60,7 @@ and previous pointers. Here is a sample heap.
   └/────/─┘
 ┌<9>┐┌<8>─<9>┐
 └───┘└───────┘
+```
 
 The heap child rings are circular doubly linked lists to support fast update
 and erase operations. This construction gives the following run times.

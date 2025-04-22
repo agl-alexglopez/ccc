@@ -376,6 +376,7 @@ delete_node(struct ccc_pq *const pq, struct ccc_pq_elem *const root)
 /* Uses Fredman et al. oldest to youngest pairing method mentioned on pg 124
 of the paper to pair nodes in one pass. A non-trivial example for min heap.
 
+```
 < = next_sibling
 > = prev_sibling
 
@@ -409,6 +410,7 @@ of the paper to pair nodes in one pass. A non-trivial example for min heap.
   └/──────┘
 ┌<8>─<9>┐
 └───────┘
+```
 
 Delete min is the slowest operation offered by the priority queue and in
 part contributes to the amortized `o(log(N))` runtime of the decrease key
