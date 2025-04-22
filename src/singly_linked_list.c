@@ -416,7 +416,7 @@ Container Collection as follows:
 - splicing in the merge operation has been simplified along with other tweaks.
 - comparison callbacks are handled with three way comparison.
 
-If the runtime is not obvious from the code, consider that this algorithms runs
+If the runtime is not obvious from the code, consider that this algorithm runs
 bottom up on sorted sub-ranges. It roughly "halves" the remaining sub-ranges
 that need to be sorted by roughly "doubling" the length of a sorted range on
 each merge step. Therefore the number of times we must perform the merge step is
