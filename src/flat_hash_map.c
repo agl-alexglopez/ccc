@@ -278,8 +278,7 @@ static struct ccc_handl find_key_or_slot(struct ccc_fhmap const *h,
                                          void const *key, uint64_t hash);
 static ccc_ucount find_key(struct ccc_fhmap const *h, void const *key,
                            uint64_t hash);
-static size_t find_existing_insert_slot(struct ccc_fhmap const *h,
-                                        uint64_t hash);
+static size_t find_slot_or_noreturn(struct ccc_fhmap const *h, uint64_t hash);
 static ccc_result maybe_rehash(struct ccc_fhmap *h, size_t to_add,
                                ccc_any_alloc_fn);
 static void insert_and_copy(struct ccc_fhmap *h, void const *key_val_type,
@@ -304,11 +303,11 @@ static void set_insert_tag(struct ccc_fhmap *h, ccc_fhm_tag m, size_t i);
 static size_t mask_to_load_factor_cap(size_t mask);
 static size_t max(size_t a, size_t b);
 static void set_tag(struct ccc_fhmap *h, ccc_fhm_tag m, size_t i);
-static ccc_tribool is_index_on(index_mask m);
-static size_t lowest_on_index(index_mask m);
+static ccc_tribool has_one(index_mask m);
+static size_t trailing_one(index_mask m);
 static size_t leading_zeros(index_mask m);
 static size_t trailing_zeros(index_mask m);
-static size_t next_index(index_mask *m);
+static size_t next_one(index_mask *m);
 static ccc_tribool is_full(ccc_fhm_tag m);
 static ccc_tribool is_constant(ccc_fhm_tag m);
 static ccc_fhm_tag to_tag(uint64_t hash);
@@ -848,7 +847,7 @@ ccc_fhm_copy(ccc_flat_hash_map *const dst, ccc_flat_hash_map const *const src,
         if (is_full(src->tag[i]))
         {
             uint64_t const hash = hash_fn(src, key_at(src, i));
-            size_t const new_i = find_existing_insert_slot(dst, hash);
+            size_t const new_i = find_slot_or_noreturn(dst, hash);
             set_tag(dst, to_tag(hash), new_i);
             (void)memcpy(data_at(dst, new_i), data_at(src, i),
                          dst->sizeof_type);
@@ -1105,8 +1104,8 @@ find_key_or_slot(struct ccc_fhmap const *const h, void const *const key,
     {
         group const g = load_group(&h->tag[seq.i]);
         index_mask m = match_tag(g, tag);
-        for (size_t i_match = lowest_on_index(m); i_match != CCC_FHM_GROUP_SIZE;
-             i_match = next_index(&m))
+        for (size_t i_match = trailing_one(m); i_match != CCC_FHM_GROUP_SIZE;
+             i_match = next_one(&m))
         {
             i_match = (seq.i + i_match) & mask;
             if (likely(eq_fn(h, key, i_match)))
@@ -1121,14 +1120,14 @@ find_key_or_slot(struct ccc_fhmap const *const h, void const *const key,
            to preserve probing operation and efficiency. */
         if (likely(empty_or_deleted.error))
         {
-            size_t const i_take = lowest_on_index(match_empty_or_deleted(g));
+            size_t const i_take = trailing_one(match_empty_or_deleted(g));
             if (i_take != CCC_FHM_GROUP_SIZE)
             {
                 empty_or_deleted.count = (seq.i + i_take) & mask;
                 empty_or_deleted.error = CCC_RESULT_OK;
             }
         }
-        if (likely(is_index_on(match_empty(g))))
+        if (likely(has_one(match_empty(g))))
         {
             return (struct ccc_handl){
                 .i = empty_or_deleted.count,
@@ -1157,8 +1156,8 @@ find_key(struct ccc_fhmap const *const h, void const *const key,
     {
         group const g = load_group(&h->tag[seq.i]);
         index_mask m = match_tag(g, tag);
-        for (size_t i_match = lowest_on_index(m); i_match != CCC_FHM_GROUP_SIZE;
-             i_match = next_index(&m))
+        for (size_t i_match = trailing_one(m); i_match != CCC_FHM_GROUP_SIZE;
+             i_match = next_one(&m))
         {
             i_match = (seq.i + i_match) & mask;
             if (likely(eq_fn(h, key, i_match)))
@@ -1166,7 +1165,7 @@ find_key(struct ccc_fhmap const *const h, void const *const key,
                 return (ccc_ucount){.count = i_match};
             }
         }
-        if (likely(is_index_on(match_empty(g))))
+        if (likely(has_one(match_empty(g))))
         {
             return (ccc_ucount){.error = CCC_RESULT_FAIL};
         }
@@ -1179,14 +1178,14 @@ find_key(struct ccc_fhmap const *const h, void const *const key,
 /** Finds an insert slot or loops forever. The caller of this function must know
 that there is an available empty or deleted slot in the table. */
 static size_t
-find_existing_insert_slot(struct ccc_fhmap const *const h, uint64_t const hash)
+find_slot_or_noreturn(struct ccc_fhmap const *const h, uint64_t const hash)
 {
     size_t const mask = h->mask;
     struct triangular_seq seq = {.i = hash & mask, .stride = 0};
     do
     {
-        size_t const i = lowest_on_index(
-            match_empty_or_deleted(load_group(&h->tag[seq.i])));
+        size_t const i
+            = trailing_one(match_empty_or_deleted(load_group(&h->tag[seq.i])));
         if (likely(i != CCC_FHM_GROUP_SIZE))
         {
             return (seq.i + i) & mask;
@@ -1294,7 +1293,7 @@ rehash_in_place(struct ccc_fhmap *const h)
         do
         {
             uint64_t const hash = hash_fn(h, key_at(h, i));
-            size_t const new_i = find_existing_insert_slot(h, hash);
+            size_t const new_i = find_slot_or_noreturn(h, hash);
             ccc_fhm_tag const hash_tag = to_tag(hash);
             /* We analyze groups not slots. Do not move the element to another
                slot in the same group load. The tag is in the proper group for a
@@ -1372,7 +1371,7 @@ rehash_resize(struct ccc_fhmap *const h, size_t const to_add,
         if (is_full(h->tag[i]))
         {
             uint64_t const hash = hash_fn(h, key_at(h, i));
-            size_t const new_i = find_existing_insert_slot(&new_h, hash);
+            size_t const new_i = find_slot_or_noreturn(&new_h, hash);
             set_tag(&new_h, to_tag(hash), new_i);
             (void)memcpy(data_at(&new_h, new_i), data_at(h, i),
                          new_h.sizeof_type);
@@ -1598,18 +1597,33 @@ to_tag(uint64_t const hash)
 
 /** Returns true if any index is on in the mask otherwise false. */
 static inline ccc_tribool
-is_index_on(index_mask const m)
+has_one(index_mask const m)
 {
     return m.v != 0;
 }
 
-/** Returns the 0 based lowest on index, or the bit width of the index mask
-if no lowest index is found. The user must interpret this index in the context
-of the probe sequence because it can only be 0 to index mask bit width. */
+/** Return the index of the first trailing one in the given index mask in the
+range `[0, CCC_FHM_GROUP_SIZE]` to indicate a positive result of a group query
+operation. This index represents the group member with a tag that has matched.
+Because 0 is a valid index the user must check the index against
+`CCC_FHM_GROUP_SIZE`, which means no trailing one is found. */
 static inline size_t
-lowest_on_index(index_mask const m)
+trailing_one(index_mask const m)
 {
     return ctz(m);
+}
+
+/** A function to aid in iterating over on bits/indices in an index mask. The
+function returns the 0-based next on index and then adjusts the mask
+appropriately for future iteration by removing the lowest on index bit. If no
+on bits are found the width of the mask is returned and iteration should end. */
+static inline size_t
+next_one(index_mask *const m)
+{
+    assert(m);
+    size_t const index = trailing_one(*m);
+    m->v &= (m->v - 1);
+    return index;
 }
 
 /** Counts the leading zeros in an index mask. Leading zeros are those starting
@@ -1626,19 +1640,6 @@ static inline size_t
 trailing_zeros(index_mask const m)
 {
     return ctz(m);
-}
-
-/** A function to aid in iterating over on bits/indices in an index mask. The
-function returns the 0-based next on index and then adjusts the mask
-appropriately for future iteration by removing the lowest on index bit. If no
-on bits are found the width of the mask is returned and iteration should end. */
-static inline size_t
-next_index(index_mask *const m)
-{
-    assert(m);
-    size_t const index = lowest_on_index(*m);
-    m->v &= (m->v - 1);
-    return index;
 }
 
 /** We have abstracted at much as we can before this point. Now implementations
