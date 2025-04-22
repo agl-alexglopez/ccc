@@ -173,7 +173,7 @@ ccc_hrm_at(ccc_handle_realtime_ordered_map const *const h, ccc_handle_i const i)
 {
     if (!h || !i)
     {
-        return 0;
+        return NULL;
     }
     return ccc_buf_at(&h->buf, i);
 }
