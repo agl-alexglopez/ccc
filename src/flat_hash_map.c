@@ -173,7 +173,7 @@ typedef struct
 enum : typeof((match_mask){}.v)
 {
     /** @private MSB tag bit used for static assert. */
-    MATCH_MSB = 0x8000,
+    MATCH_MASK_MSB = 0x8000,
 };
 
 #elif defined(CCC_HAS_ARM_SIMD)
@@ -197,13 +197,13 @@ typedef struct
 enum : uint64_t
 {
     /** @private MSB tag bit used for static assert. */
-    MATCH_MSB = 0x8000000000000000,
+    MATCH_MASK_MSB = 0x8000000000000000,
     /** @private MSB tag bits used for byte and word level masking. */
-    MATCH_TAGS_MSBS = 0x8080808080808080,
+    MATCH_MASK_TAGS_MSBS = 0x8080808080808080,
     /** @private LSB tag bits used for byte and word level masking. */
-    MATCH_TAGS_LSBS = 0x101010101010101,
+    MATCH_MASK_TAGS_LSBS = 0x101010101010101,
     /** @private Debug mode check for bits that must be off in match. */
-    MATCH_TAGS_OFF_BITS = 0x7F7F7F7F7F7F7F7F,
+    MATCH_MASK_TAGS_OFF_BITS = 0x7F7F7F7F7F7F7F7F,
 };
 
 #else /* PORTABLE FALLBACK */
@@ -228,13 +228,13 @@ typedef struct
 enum : typeof((group){}.v)
 {
     /** @private MSB tag bit used for static assert. */
-    MATCH_MSB = 0x8000000000000000,
+    MATCH_MASK_MSB = 0x8000000000000000,
     /** @private MSB tag bits used for byte and word level masking. */
-    MATCH_TAGS_MSBS = 0x8080808080808080,
+    MATCH_MASK_TAGS_MSBS = 0x8080808080808080,
     /** @private LSB tag bits used for byte and word level masking. */
-    MATCH_TAGS_LSBS = 0x101010101010101,
+    MATCH_MASK_TAGS_LSBS = 0x101010101010101,
     /** @private Debug mode check for bits that must be off in match. */
-    MATCH_TAGS_OFF_BITS = 0x7F7F7F7F7F7F7F7F,
+    MATCH_MASK_TAGS_OFF_BITS = 0x7F7F7F7F7F7F7F7F,
 };
 
 enum : typeof((ccc_fhm_tag){}.v)
@@ -1771,10 +1771,10 @@ match_tag(group const g, ccc_fhm_tag const m)
 
     match_mask const res = {
         vget_lane_u64(vreinterpret_u64_u8(vceq_u8(g.v, vdup_n_u8(m.v))), 0)
-            & MATCH_TAGS_MSBS,
+            & MATCH_MASK_TAGS_MSBS,
     };
     assert(
-        (res.v & MATCH_TAGS_OFF_BITS) == 0
+        (res.v & MATCH_MASK_TAGS_OFF_BITS) == 0
         && "For bit counting and iteration purposes the most significant bit "
            "in every byte will indicate a match for a tag has occurred.");
     return res;
@@ -1798,10 +1798,10 @@ match_empty_deleted(group const g)
 {
     uint8x8_t const cmp = vcltz_s8(vreinterpret_s8_u8(g.v));
     match_mask const res = {
-        vget_lane_u64(vreinterpret_u64_u8(cmp), 0) & MATCH_TAGS_MSBS,
+        vget_lane_u64(vreinterpret_u64_u8(cmp), 0) & MATCH_MASK_TAGS_MSBS,
     };
     assert(
-        (res.v & MATCH_TAGS_OFF_BITS) == 0
+        (res.v & MATCH_MASK_TAGS_OFF_BITS) == 0
         && "For bit counting and iteration purposes the most significant bit "
            "in every byte will indicate a match for a tag has occurred.");
     return res;
@@ -1899,10 +1899,10 @@ match_tag(group g, ccc_fhm_tag const m)
                | (((typeof(g.v))m.v) << TAG_BITS) | (m.v)),
     };
     match_mask const res = to_little_endian((match_mask){
-        (cmp.v - MATCH_TAGS_LSBS) & ~cmp.v & MATCH_TAGS_MSBS,
+        (cmp.v - MATCH_MASK_TAGS_LSBS) & ~cmp.v & MATCH_MASK_TAGS_MSBS,
     });
     assert(
-        (res.v & MATCH_TAGS_OFF_BITS) == 0
+        (res.v & MATCH_MASK_TAGS_OFF_BITS) == 0
         && "For bit counting and iteration purposes the most significant bit "
            "in every byte will indicate a match for a tag has occurred.");
     return res;
@@ -1915,7 +1915,9 @@ match_empty(group const g)
 {
     /* EMPTY has all bits on and DELETED has the most significant bit on so
        EMPTY must have the top 2 bits on. Make sure the mask is only MSB's. */
-    return to_little_endian((match_mask){g.v & (g.v << 1) & MATCH_TAGS_MSBS});
+    return to_little_endian((match_mask){
+        g.v & (g.v << 1) & MATCH_MASK_TAGS_MSBS,
+    });
 }
 
 /** Returns a match with the most significant bit in every byte on if
@@ -1923,7 +1925,7 @@ that tag in g is empty or deleted. This is found by the most significant bit. */
 static inline match_mask
 match_empty_deleted(group const g)
 {
-    return to_little_endian((match_mask){g.v & MATCH_TAGS_MSBS});
+    return to_little_endian((match_mask){g.v & MATCH_MASK_TAGS_MSBS});
 }
 
 /*=========================  Group Implementations   ========================*/
@@ -1951,7 +1953,7 @@ significant bit. This does not affect user hashed data. */
 static inline group
 group_constant_to_empty_full_to_deleted(group g)
 {
-    g.v = ~g.v & MATCH_TAGS_MSBS;
+    g.v = ~g.v & MATCH_MASK_TAGS_MSBS;
     g.v = ~g.v + (g.v >> (TAG_BITS - 1));
     return g;
 }
@@ -2035,7 +2037,7 @@ clz(match_mask m)
     }
     unsigned mv = (unsigned)m.v << CCC_FHM_GROUP_SIZE;
     unsigned cnt = 0;
-    for (; (mv & (MATCH_MSB << CCC_FHM_GROUP_SIZE)) == 0; ++cnt, mv <<= 1U)
+    for (; (mv & (MATCH_MASK_MSB << CCC_FHM_GROUP_SIZE)) == 0; ++cnt, mv <<= 1U)
     {}
     return cnt;
 }
@@ -2068,7 +2070,7 @@ static_assert(
 static inline unsigned
 ctz(match_mask const m)
 {
-    static_assert(__builtin_ctzl(MATCH_MSB) / CCC_FHM_GROUP_SIZE
+    static_assert(__builtin_ctzl(MATCH_MASK_MSB) / CCC_FHM_GROUP_SIZE
                       == CCC_FHM_GROUP_SIZE - 1,
                   "builtin trailing zeros must produce number of bits we "
                   "expect for mask");
@@ -2123,7 +2125,7 @@ clz(match_mask m)
         return CCC_FHM_GROUP_SIZE;
     }
     unsigned cnt = 0;
-    for (; (m.v & MATCH_MSB) == 0; ++cnt, m.v <<= 1U)
+    for (; (m.v & MATCH_MASK_MSB) == 0; ++cnt, m.v <<= 1U)
     {}
     return cnt / CCC_FHM_GROUP_SIZE;
 }
