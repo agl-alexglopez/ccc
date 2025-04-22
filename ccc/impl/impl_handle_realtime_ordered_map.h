@@ -34,13 +34,17 @@ it is added to the front of a free list. The map will track the first free
 node. The list is push to front LIFO stack. */
 struct ccc_hromap_elem
 {
-    size_t branch[2]; /** Child nodes in array to unify Left and Right. */
+    /** @private Child nodes in array to unify Left and Right. */
+    size_t branch[2];
     union
     {
-        size_t parent;    /** Parent of WAVL node when allocated. */
-        size_t next_free; /** Points to next free when not allocated. */
+        /** @private Parent of WAVL node when allocated. */
+        size_t parent;
+        /** @private Points to next free when not allocated. */
+        size_t next_free;
     };
-    uint8_t parity; /** WAVL logic. Instead of rank integer, use 0 or 1. */
+    /** @private WAVL logic. Instead of rank integer, use 0 or 1. */
+    uint8_t parity;
 };
 
 /** @private A realtime ordered map providing handle stability. Once elements
@@ -50,25 +54,35 @@ of pointers so that it remains valid even when the table resizes. The 0th
 index of the array is sacrificed for some coding simplicity and falsey 0. */
 struct ccc_hromap
 {
-    ccc_buffer buf;          /** The buffer wrapping user memory. */
-    size_t root;             /** The root node of the WAVL tree. */
-    size_t free_list;        /** The start of the free singly linked list. */
-    size_t key_offset;       /** Where user key can be found in type. */
-    size_t node_elem_offset; /** Where intrusive elem is found in type. */
-    ccc_any_key_cmp_fn *cmp; /** The provided key comparison function. */
+    /** @private The buffer wrapping user memory. */
+    ccc_buffer buf;
+    /** @private The root node of the WAVL tree. */
+    size_t root;
+    /** @private The start of the free singly linked list. */
+    size_t free_list;
+    /** @private Where user key can be found in type. */
+    size_t key_offset;
+    /** @private Where intrusive elem is found in type. */
+    size_t node_elem_offset;
+    /** @private The provided key comparison function. */
+    ccc_any_key_cmp_fn *cmp;
 };
 
 /** @private */
 struct ccc_hrtree_handle
 {
-    struct ccc_hromap *hrm;    /** Map associated with this handle. */
-    ccc_threeway_cmp last_cmp; /** Saves last comparison direction. */
-    struct ccc_handl handle;   /** Index and a status. */
+    /** @private Map associated with this handle. */
+    struct ccc_hromap *hrm;
+    /** @private Saves last comparison direction. */
+    ccc_threeway_cmp last_cmp;
+    /** @private Index and a status. */
+    struct ccc_handl handle;
 };
 
-/** @private */
+/** @private Wrapper for return by pointer on the stack in C23. */
 union ccc_hromap_handle
 {
+    /** @private Single field to enable return by compound literal reference. */
     struct ccc_hrtree_handle impl;
 };
 

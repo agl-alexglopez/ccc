@@ -26,39 +26,73 @@ limitations under the License.
 
 /* NOLINTBEGIN(readability-identifier-naming) */
 
-/** @private */
+/** @private A WAVL node follows traditional balanced binary tree constructs
+except for the rank field which can be simplified to an even/odd parity. */
 struct ccc_romap_elem
 {
+    /** @private Children in an array to unite left and right cases. */
     struct ccc_romap_elem *branch[2];
+    /** @private The parent node needed for iteration and rotation. */
     struct ccc_romap_elem *parent;
+    /** @private The rank for rank difference calculations 1(odd) or 0(even). */
     uint8_t parity;
 };
 
-/** @private */
+/** @private The realtime ordered map offers strict `O(log(N))` searching,
+inserting, and deleting operations with the Weak AVL Tree Rank Balance
+framework. The number of rotations after an operation are kept to a maximum of
+two, which neither the Red-Black Tree or AVL tree are able to achieve. However,
+there may be `O(log(N))` rank changes, but these are efficient bit flip ops.
+
+This makes the Weak AVL tree the leader in terms of minimal rotations and a
+hybrid of the search strengths of an AVL tree with the favorable fix-up
+maintenance of a Red-Black Tree. In fact, under a workload that is strictly
+insertions, the WAVL tree is identical to an AVL tree in terms of balance and
+shape, making it fast for searching while performing fewer rotations than the
+AVL tree. The implementation is also simpler than either of the other trees. */
 struct ccc_romap
 {
+    /** @private The root of the tree or the sentinel end if empty. */
     struct ccc_romap_elem *root;
+    /** @private The end sentinel in the struct for fewer code branches. */
     struct ccc_romap_elem end;
+    /** @private The count of stored nodes in the tree. */
     size_t count;
+    /** @private The byte offset of the key in the user struct. */
     size_t key_offset;
+    /** @private The byte offset of the intrusive element in the user struct. */
     size_t node_elem_offset;
+    /** @private The size of the user struct holding the intruder. */
     size_t sizeof_type;
+    /** @private An allocation function, if any. */
     ccc_any_alloc_fn *alloc;
+    /** @private The comparison function for three way comparison. */
     ccc_any_key_cmp_fn *cmp;
+    /** @private Auxiliary data, if any. */
     void *aux;
 };
 
-/** @private */
+/** @private An entry is a way to store a node or the information needed to
+insert a node without a second query. The user can then take different actions
+depending on the Occupied or Vacant status of the entry. */
 struct ccc_rtree_entry
 {
+    /** @private The tree associated with this query. */
     struct ccc_romap *rom;
+    /** @private The result of the last comparison to find the user specified
+    node. Equal if found or indicates the direction the node should be
+    inserted from the parent we currently store in the entry. */
     ccc_threeway_cmp last_cmp;
+    /** @private The stored node or it's parent if it does not exist. */
     struct ccc_ent entry;
 };
 
-/** @private */
+/** @private Enable return by compound literal reference on the stack. Think
+of this method as return by value but with the additional ability to pass by
+pointer in a functional style. `fnB(&(union ccc_romap_entry){fnA().impl});` */
 union ccc_romap_entry
 {
+    /** @private The field containing the entry struct. */
     struct ccc_rtree_entry impl;
 };
 

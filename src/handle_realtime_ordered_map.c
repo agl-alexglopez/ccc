@@ -1648,8 +1648,8 @@ The original repository can be found here:
 
 https://github.com/pvachon/wavl_tree
 
-The original implementation has be changed to eliminate left and right cases
-and work within the C Container Collection memory framework.
+The original implementation has be changed to eliminate left and right cases,
+simplify deletion, and work within the C Container Collection memory framework.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
