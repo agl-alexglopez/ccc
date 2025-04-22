@@ -21,11 +21,9 @@ limitations under the License.
 #include <stdint.h>
 
 /* Make more modern nullptr_t and nullptr available on mac available  */
-#if !defined(__STDC__) || !defined(__STDC_VERSION__)                           \
-    || (__STDC_VERSION__ < 202000L)                                            \
-    || (!defined(__has_builtin) && !__has_builtin(__is_identifier)             \
-        && !__is_identifier(nullptr))
-#    define nullptr (void *)0
+#if defined(__APPLE_CLANG__) || !defined(__STDC__)                             \
+    || !defined(__STDC_VERSION__) || (__STDC_VERSION__ < 202000L)
+#    define nullptr ((void *)0)
 typedef void *nullptr_t;
 #endif
 /** @endcond */
