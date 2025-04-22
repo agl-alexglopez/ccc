@@ -168,12 +168,12 @@ operations can be compressed into a 16 bit integer. */
 typedef struct
 {
     uint16_t v;
-} index_mask;
+} match_mask;
 
-enum : typeof((index_mask){}.v)
+enum : typeof((match_mask){}.v)
 {
     /** @private MSB tag bit used for static assert. */
-    INDEX_MASK_MSB = 0x8000,
+    MATCH_MSB = 0x8000,
 };
 
 #elif defined(CCC_HAS_ARM_SIMD)
@@ -192,49 +192,49 @@ typedef struct
 {
     /** @private NEON returns this type from various uint8x8_t operations. */
     uint64_t v;
-} index_mask;
+} match_mask;
 
 enum : uint64_t
 {
     /** @private MSB tag bit used for static assert. */
-    INDEX_MASK_MSB = 0x8000000000000000,
+    MATCH_MSB = 0x8000000000000000,
     /** @private MSB tag bits used for byte and word level masking. */
-    INDEX_MASK_TAGS_MSBS = 0x8080808080808080,
+    MATCH_TAGS_MSBS = 0x8080808080808080,
     /** @private LSB tag bits used for byte and word level masking. */
-    INDEX_MASK_TAGS_LSBS = 0x101010101010101,
-    /** @private Debug mode check for bits that must be off in index mask. */
-    INDEX_MASK_TAGS_OFF_BITS = 0x7F7F7F7F7F7F7F7F,
+    MATCH_TAGS_LSBS = 0x101010101010101,
+    /** @private Debug mode check for bits that must be off in match. */
+    MATCH_TAGS_OFF_BITS = 0x7F7F7F7F7F7F7F7F,
 };
 
 #else /* PORTABLE FALLBACK */
 
 /** @private The 8 byte word for managing multiple simultaneous equality checks.
-In contrast to SIMD this group size is the same as the index mask. */
+In contrast to SIMD this group size is the same as the match. */
 typedef struct
 {
     /** @private 64 bits allows 8 tags to be checked at once. */
     uint64_t v;
 } group;
 
-/** @private The index mask is the same size as the group because only the most
+/** @private The match is the same size as the group because only the most
 significant bit in a byte within the mask will be on to indicate the result of
 various queries such as matching a tag, empty, or constant. */
 typedef struct
 {
-    /** @private The index mask is the same as a group with MSB on. */
+    /** @private The match is the same as a group with MSB on. */
     typeof((group){}.v) v;
-} index_mask;
+} match_mask;
 
 enum : typeof((group){}.v)
 {
     /** @private MSB tag bit used for static assert. */
-    INDEX_MASK_MSB = 0x8000000000000000,
+    MATCH_MSB = 0x8000000000000000,
     /** @private MSB tag bits used for byte and word level masking. */
-    INDEX_MASK_TAGS_MSBS = 0x8080808080808080,
+    MATCH_TAGS_MSBS = 0x8080808080808080,
     /** @private LSB tag bits used for byte and word level masking. */
-    INDEX_MASK_TAGS_LSBS = 0x101010101010101,
-    /** @private Debug mode check for bits that must be off in index mask. */
-    INDEX_MASK_TAGS_OFF_BITS = 0x7F7F7F7F7F7F7F7F,
+    MATCH_TAGS_LSBS = 0x101010101010101,
+    /** @private Debug mode check for bits that must be off in match. */
+    MATCH_TAGS_OFF_BITS = 0x7F7F7F7F7F7F7F7F,
 };
 
 enum : typeof((ccc_fhm_tag){}.v)
@@ -259,7 +259,7 @@ https://fgiesen.wordpress.com/2015/02/22/triangular-numbers-mod-2n/
 
 See also Donald Knuth's The Art of Computer Programming Volume 3, Chapter 6.4,
 Answers to Exercises, problem 20, page 731 for another proof. */
-struct triangular_seq
+struct probe_sequence
 {
     /** @private The index this probe step has placed us on. */
     size_t i;
@@ -302,23 +302,23 @@ static size_t mask_to_data_bytes(size_t sizeof_type, size_t mask);
 static void set_insert_tag(struct ccc_fhmap *h, ccc_fhm_tag m, size_t i);
 static size_t mask_to_load_factor_cap(size_t mask);
 static size_t max(size_t a, size_t b);
-static void set_tag(struct ccc_fhmap *h, ccc_fhm_tag m, size_t i);
-static ccc_tribool has_one(index_mask m);
-static size_t trailing_one(index_mask m);
-static size_t leading_zeros(index_mask m);
-static size_t trailing_zeros(index_mask m);
-static size_t next_one(index_mask *m);
-static ccc_tribool is_full(ccc_fhm_tag m);
-static ccc_tribool is_constant(ccc_fhm_tag m);
-static ccc_fhm_tag to_tag(uint64_t hash);
-static group load_group(ccc_fhm_tag const *src);
-static void store_group(ccc_fhm_tag *dst, group src);
-static index_mask match_tag(group g, ccc_fhm_tag m);
-static index_mask match_empty(group g);
-static index_mask match_empty_or_deleted(group g);
-static group make_constants_empty_and_full_deleted(group g);
-static unsigned ctz(index_mask m);
-static unsigned clz(index_mask m);
+static void tag_set(struct ccc_fhmap *h, ccc_fhm_tag m, size_t i);
+static ccc_tribool match_has_one(match_mask m);
+static size_t match_trailing_one(match_mask m);
+static size_t match_leading_zeros(match_mask m);
+static size_t match_trailing_zeros(match_mask m);
+static size_t match_next_one(match_mask *m);
+static ccc_tribool tag_full(ccc_fhm_tag m);
+static ccc_tribool tag_constant(ccc_fhm_tag m);
+static ccc_fhm_tag tag_from(uint64_t hash);
+static group group_load(ccc_fhm_tag const *src);
+static void group_store(ccc_fhm_tag *dst, group src);
+static match_mask match_tag(group g, ccc_fhm_tag m);
+static match_mask match_empty(group g);
+static match_mask match_empty_deleted(group g);
+static group group_constant_to_empty_full_to_deleted(group g);
+static unsigned ctz(match_mask m);
+static unsigned clz(match_mask m);
 static unsigned clz_size_t(size_t n);
 static size_t next_power_of_two(size_t n);
 static ccc_tribool is_power_of_two(size_t n);
@@ -597,7 +597,7 @@ ccc_fhm_begin(ccc_flat_hash_map const *const h)
     }
     for (size_t i = 0; i < (h->mask + 1); ++i)
     {
-        if (is_full(h->tag[i]))
+        if (tag_full(h->tag[i]))
         {
             return data_at(h, i);
         }
@@ -620,7 +620,7 @@ ccc_fhm_next(ccc_flat_hash_map const *const h,
     }
     for (; i.count < (h->mask + 1); ++i.count)
     {
-        if (is_full(h->tag[i.count]))
+        if (tag_full(h->tag[i.count]))
         {
             return data_at(h, i.count);
         }
@@ -664,7 +664,7 @@ ccc_fhm_clear(ccc_flat_hash_map *const h, ccc_any_type_destructor_fn *const fn)
     }
     for (size_t i = 0; i < (h->mask + 1); ++i)
     {
-        if (is_full(h->tag[i]))
+        if (tag_full(h->tag[i]))
         {
             fn((ccc_any_type){
                 .any_type = data_at(h, i),
@@ -695,7 +695,7 @@ ccc_fhm_clear_and_free(ccc_flat_hash_map *const h,
     {
         for (size_t i = 0; i < (h->mask + 1); ++i)
         {
-            if (is_full(h->tag[i]))
+            if (tag_full(h->tag[i]))
             {
                 fn((ccc_any_type){
                     .any_type = data_at(h, i),
@@ -732,7 +732,7 @@ ccc_fhm_clear_and_free_reserve(ccc_flat_hash_map *const h,
     {
         for (size_t i = 0; i < (h->mask + 1); ++i)
         {
-            if (is_full(h->tag[i]))
+            if (tag_full(h->tag[i]))
             {
                 destructor((ccc_any_type){
                     .any_type = data_at(h, i),
@@ -844,11 +844,11 @@ ccc_fhm_copy(ccc_flat_hash_map *const dst, ccc_flat_hash_map const *const src,
     dst->init = CCC_TRUE;
     for (size_t i = 0; i < (src->mask + 1); ++i)
     {
-        if (is_full(src->tag[i]))
+        if (tag_full(src->tag[i]))
         {
             uint64_t const hash = hash_fn(src, key_at(src, i));
             size_t const new_i = find_slot_or_noreturn(dst, hash);
-            set_tag(dst, to_tag(hash), new_i);
+            tag_set(dst, tag_from(hash), new_i);
             (void)memcpy(data_at(dst, new_i), data_at(src, i),
                          dst->sizeof_type);
         }
@@ -907,7 +907,7 @@ ccc_fhm_validate(ccc_flat_hash_map const *const h)
     {
         ccc_fhm_tag const t = h->tag[i];
         /* If we are a special constant there are only two possible values. */
-        if (is_constant(t) && t.v != TAG_DELETED && t.v != TAG_EMPTY)
+        if (tag_constant(t) && t.v != TAG_DELETED && t.v != TAG_EMPTY)
         {
             return CCC_FALSE;
         }
@@ -919,9 +919,9 @@ ccc_fhm_validate(ccc_flat_hash_map const *const h)
         {
             ++deleted;
         }
-        else if (is_full(t))
+        else if (tag_full(t))
         {
-            if (to_tag(hash_fn(h, data_at(h, i))).v != t.v)
+            if (tag_from(hash_fn(h, data_at(h, i))).v != t.v)
             {
                 return CCC_FALSE;
             }
@@ -992,7 +992,7 @@ container_entry(struct ccc_fhmap *const h, void const *const key)
     uint64_t const hash = hash_fn(h, key);
     return (struct ccc_fhash_entry){
         .h = (struct ccc_fhmap *)h,
-        .tag = to_tag(hash),
+        .tag = tag_from(hash),
         .handle = handle(h, key, hash),
     };
 }
@@ -1039,7 +1039,7 @@ set_insert_tag(struct ccc_fhmap *const h, ccc_fhm_tag const m, size_t const i)
     assert((m.v & TAG_MSB) == 0);
     h->remain -= (h->tag[i].v == TAG_EMPTY);
     ++h->count;
-    set_tag(h, m, i);
+    tag_set(h, m, i);
 }
 
 /** Erases an element at the provided index from the tag array, forfeiting its
@@ -1051,9 +1051,9 @@ static inline void
 erase(struct ccc_fhmap *const h, size_t const i)
 {
     assert(i <= h->mask);
-    index_mask const prev_group_empties
-        = match_empty(load_group(&h->tag[(i - CCC_FHM_GROUP_SIZE) & h->mask]));
-    index_mask const group_empties = match_empty(load_group(&h->tag[i]));
+    size_t const prev_i = (i - CCC_FHM_GROUP_SIZE) & h->mask;
+    match_mask const prev_empties = match_empty(group_load(&h->tag[prev_i]));
+    match_mask const empties = match_empty(group_load(&h->tag[i]));
     /* Leading means start at most significant bit aka last group member.
        Trailing means start at the least significant bit aka first group member.
 
@@ -1076,13 +1076,13 @@ erase(struct ccc_fhmap *const h, size_t const i)
        DELETED entries and this tag will be the first in the next group. This
        is an important case where we must mark our tag as deleted. */
     ccc_fhm_tag const m
-        = (leading_zeros(prev_group_empties) + trailing_zeros(group_empties)
+        = (match_leading_zeros(prev_empties) + match_trailing_zeros(empties)
            >= CCC_FHM_GROUP_SIZE)
               ? (ccc_fhm_tag){TAG_DELETED}
               : (ccc_fhm_tag){TAG_EMPTY};
     h->remain += (TAG_EMPTY == m.v);
     --h->count;
-    set_tag(h, m, i);
+    tag_set(h, m, i);
 }
 
 /** Finds the specified hash or first available slot where the hash could be
@@ -1093,21 +1093,21 @@ static struct ccc_handl
 find_key_or_slot(struct ccc_fhmap const *const h, void const *const key,
                  uint64_t const hash)
 {
-    ccc_fhm_tag const tag = to_tag(hash);
+    ccc_fhm_tag const tag = tag_from(hash);
     size_t const mask = h->mask;
-    struct triangular_seq seq = {
+    struct probe_sequence p = {
         .i = hash & mask,
         .stride = 0,
     };
-    ccc_ucount empty_or_deleted = {.error = CCC_RESULT_FAIL};
+    ccc_ucount empty_deleted = {.error = CCC_RESULT_FAIL};
     do
     {
-        group const g = load_group(&h->tag[seq.i]);
-        index_mask m = match_tag(g, tag);
-        for (size_t i_match = trailing_one(m); i_match != CCC_FHM_GROUP_SIZE;
-             i_match = next_one(&m))
+        group const g = group_load(&h->tag[p.i]);
+        match_mask m = match_tag(g, tag);
+        for (size_t i_match = match_trailing_one(m);
+             i_match != CCC_FHM_GROUP_SIZE; i_match = match_next_one(&m))
         {
-            i_match = (seq.i + i_match) & mask;
+            i_match = (p.i + i_match) & mask;
             if (likely(eq_fn(h, key, i_match)))
             {
                 return (struct ccc_handl){
@@ -1118,25 +1118,25 @@ find_key_or_slot(struct ccc_fhmap const *const h, void const *const key,
         }
         /* Taking the first available slot once probing is done is important
            to preserve probing operation and efficiency. */
-        if (likely(empty_or_deleted.error))
+        if (likely(empty_deleted.error))
         {
-            size_t const i_take = trailing_one(match_empty_or_deleted(g));
+            size_t const i_take = match_trailing_one(match_empty_deleted(g));
             if (i_take != CCC_FHM_GROUP_SIZE)
             {
-                empty_or_deleted.count = (seq.i + i_take) & mask;
-                empty_or_deleted.error = CCC_RESULT_OK;
+                empty_deleted.count = (p.i + i_take) & mask;
+                empty_deleted.error = CCC_RESULT_OK;
             }
         }
-        if (likely(has_one(match_empty(g))))
+        if (likely(match_has_one(match_empty(g))))
         {
             return (struct ccc_handl){
-                .i = empty_or_deleted.count,
+                .i = empty_deleted.count,
                 .stats = CCC_ENTRY_VACANT,
             };
         }
-        seq.stride += CCC_FHM_GROUP_SIZE;
-        seq.i += seq.stride;
-        seq.i &= mask;
+        p.stride += CCC_FHM_GROUP_SIZE;
+        p.i += p.stride;
+        p.i &= mask;
     } while (1);
 }
 
@@ -1149,29 +1149,32 @@ static ccc_ucount
 find_key(struct ccc_fhmap const *const h, void const *const key,
          uint64_t const hash)
 {
-    ccc_fhm_tag const tag = to_tag(hash);
+    ccc_fhm_tag const tag = tag_from(hash);
     size_t const mask = h->mask;
-    struct triangular_seq seq = {.i = hash & mask, .stride = 0};
+    struct probe_sequence p = {
+        .i = hash & mask,
+        .stride = 0,
+    };
     do
     {
-        group const g = load_group(&h->tag[seq.i]);
-        index_mask m = match_tag(g, tag);
-        for (size_t i_match = trailing_one(m); i_match != CCC_FHM_GROUP_SIZE;
-             i_match = next_one(&m))
+        group const g = group_load(&h->tag[p.i]);
+        match_mask m = match_tag(g, tag);
+        for (size_t i_match = match_trailing_one(m);
+             i_match != CCC_FHM_GROUP_SIZE; i_match = match_next_one(&m))
         {
-            i_match = (seq.i + i_match) & mask;
+            i_match = (p.i + i_match) & mask;
             if (likely(eq_fn(h, key, i_match)))
             {
                 return (ccc_ucount){.count = i_match};
             }
         }
-        if (likely(has_one(match_empty(g))))
+        if (likely(match_has_one(match_empty(g))))
         {
             return (ccc_ucount){.error = CCC_RESULT_FAIL};
         }
-        seq.stride += CCC_FHM_GROUP_SIZE;
-        seq.i += seq.stride;
-        seq.i &= mask;
+        p.stride += CCC_FHM_GROUP_SIZE;
+        p.i += p.stride;
+        p.i &= mask;
     } while (1);
 }
 
@@ -1181,18 +1184,21 @@ static size_t
 find_slot_or_noreturn(struct ccc_fhmap const *const h, uint64_t const hash)
 {
     size_t const mask = h->mask;
-    struct triangular_seq seq = {.i = hash & mask, .stride = 0};
+    struct probe_sequence p = {
+        .i = hash & mask,
+        .stride = 0,
+    };
     do
     {
         size_t const i
-            = trailing_one(match_empty_or_deleted(load_group(&h->tag[seq.i])));
+            = match_trailing_one(match_empty_deleted(group_load(&h->tag[p.i])));
         if (likely(i != CCC_FHM_GROUP_SIZE))
         {
-            return (seq.i + i) & mask;
+            return (p.i + i) & mask;
         }
-        seq.stride += CCC_FHM_GROUP_SIZE;
-        seq.i += seq.stride;
-        seq.i &= mask;
+        p.stride += CCC_FHM_GROUP_SIZE;
+        p.i += p.stride;
+        p.i &= mask;
     } while (1);
 }
 
@@ -1280,8 +1286,8 @@ rehash_in_place(struct ccc_fhmap *const h)
     size_t const mask = h->mask;
     for (size_t i = 0; i < mask + 1; i += CCC_FHM_GROUP_SIZE)
     {
-        store_group(&h->tag[i], make_constants_empty_and_full_deleted(
-                                    load_group(&h->tag[i])));
+        group_store(&h->tag[i], group_constant_to_empty_full_to_deleted(
+                                    group_load(&h->tag[i])));
     }
     (void)memcpy(h->tag + (mask + 1), h->tag, CCC_FHM_GROUP_SIZE);
     for (size_t i = 0; i < mask + 1; ++i)
@@ -1294,20 +1300,20 @@ rehash_in_place(struct ccc_fhmap *const h)
         {
             uint64_t const hash = hash_fn(h, key_at(h, i));
             size_t const new_i = find_slot_or_noreturn(h, hash);
-            ccc_fhm_tag const hash_tag = to_tag(hash);
+            ccc_fhm_tag const hash_tag = tag_from(hash);
             /* We analyze groups not slots. Do not move the element to another
                slot in the same group load. The tag is in the proper group for a
                load and match and does not need relocation. */
             if (likely(is_same_group(i, new_i, hash, mask)))
             {
-                set_tag(h, hash_tag, i);
+                tag_set(h, hash_tag, i);
                 break; /* continues outer loop */
             }
             ccc_fhm_tag const occupant = h->tag[new_i];
-            set_tag(h, hash_tag, new_i);
+            tag_set(h, hash_tag, new_i);
             if (occupant.v == TAG_EMPTY)
             {
-                set_tag(h, (ccc_fhm_tag){TAG_EMPTY}, i);
+                tag_set(h, (ccc_fhm_tag){TAG_EMPTY}, i);
                 (void)memcpy(data_at(h, new_i), data_at(h, i), h->sizeof_type);
                 break; /* continues outer loop */
             }
@@ -1368,11 +1374,11 @@ rehash_resize(struct ccc_fhmap *const h, size_t const to_add,
     (void)memset(new_h.tag, TAG_EMPTY, mask_to_tag_bytes(new_h.mask));
     for (size_t i = 0; i < (h->mask + 1); ++i)
     {
-        if (is_full(h->tag[i]))
+        if (tag_full(h->tag[i]))
         {
             uint64_t const hash = hash_fn(h, key_at(h, i));
             size_t const new_i = find_slot_or_noreturn(&new_h, hash);
-            set_tag(&new_h, to_tag(hash), new_i);
+            tag_set(&new_h, tag_from(hash), new_i);
             (void)memcpy(data_at(&new_h, new_i), data_at(h, i),
                          new_h.sizeof_type);
         }
@@ -1559,7 +1565,7 @@ vector lanes for a single instruction. */
 /** Sets the specified tag at the index provided. Ensures that the replica
 group at the end of the tag array remains in sync with current tag if needed. */
 static inline void
-set_tag(struct ccc_fhmap *const h, ccc_fhm_tag const m, size_t const i)
+tag_set(struct ccc_fhmap *const h, ccc_fhm_tag const m, size_t const i)
 {
     size_t const replica_byte
         = ((i - CCC_FHM_GROUP_SIZE) & h->mask) + CCC_FHM_GROUP_SIZE;
@@ -1569,7 +1575,7 @@ set_tag(struct ccc_fhmap *const h, ccc_fhm_tag const m, size_t const i)
 
 /** Returns CCC_TRUE if the tag holds user hash bits, meaning it is occupied. */
 static inline ccc_tribool
-is_full(ccc_fhm_tag const m)
+tag_full(ccc_fhm_tag const m)
 {
     return (m.v & TAG_MSB) == 0;
 }
@@ -1577,7 +1583,7 @@ is_full(ccc_fhm_tag const m)
 /** Returns CCC_TRUE if the tag is one of the two special constants EMPTY or
 DELETED. */
 static inline ccc_tribool
-is_constant(ccc_fhm_tag const m)
+tag_constant(ccc_fhm_tag const m)
 {
     return (m.v & TAG_MSB) != 0;
 }
@@ -1586,7 +1592,7 @@ is_constant(ccc_fhm_tag const m)
 7 bits of the hash code. Therefore, hash functions with good entropy in the
 upper bits. */
 static inline ccc_fhm_tag
-to_tag(uint64_t const hash)
+tag_from(uint64_t const hash)
 {
     return (ccc_fhm_tag){
         (hash >> ((sizeof(hash) * CHAR_BIT) - 7)) & TAG_LOWER_7_MASK,
@@ -1597,47 +1603,47 @@ to_tag(uint64_t const hash)
 
 /** Returns true if any index is on in the mask otherwise false. */
 static inline ccc_tribool
-has_one(index_mask const m)
+match_has_one(match_mask const m)
 {
     return m.v != 0;
 }
 
-/** Return the index of the first trailing one in the given index mask in the
+/** Return the index of the first trailing one in the given match in the
 range `[0, CCC_FHM_GROUP_SIZE]` to indicate a positive result of a group query
 operation. This index represents the group member with a tag that has matched.
 Because 0 is a valid index the user must check the index against
 `CCC_FHM_GROUP_SIZE`, which means no trailing one is found. */
 static inline size_t
-trailing_one(index_mask const m)
+match_trailing_one(match_mask const m)
 {
     return ctz(m);
 }
 
-/** A function to aid in iterating over on bits/indices in an index mask. The
+/** A function to aid in iterating over on bits/indices in a match. The
 function returns the 0-based next on index and then adjusts the mask
 appropriately for future iteration by removing the lowest on index bit. If no
 on bits are found the width of the mask is returned and iteration should end. */
 static inline size_t
-next_one(index_mask *const m)
+match_next_one(match_mask *const m)
 {
     assert(m);
-    size_t const index = trailing_one(*m);
+    size_t const index = match_trailing_one(*m);
     m->v &= (m->v - 1);
     return index;
 }
 
-/** Counts the leading zeros in an index mask. Leading zeros are those starting
+/** Counts the leading zeros in a match. Leading zeros are those starting
 at the most significant bit. */
 static inline size_t
-leading_zeros(index_mask const m)
+match_leading_zeros(match_mask const m)
 {
     return clz(m);
 }
 
-/** Counts the trailing zeros in an index mask. Trailing zeros are those
+/** Counts the trailing zeros in a match. Trailing zeros are those
 starting at the least significant bit. */
 static inline size_t
-trailing_zeros(index_mask const m)
+match_trailing_zeros(match_mask const m)
 {
     return ctz(m);
 }
@@ -1646,27 +1652,10 @@ trailing_zeros(index_mask const m)
 will need to vary based on availability of vectorized instructions. */
 #if defined(CCC_HAS_X86_SIMD)
 
-/*=========================  Group Implementations   ========================*/
+/*=========================   Match SIMD Matching    ========================*/
 
-/** Loads a group starting at src into a 128 bit vector. This is an unaligned
-load and the user must ensure the load will not go off then end of the tag
-array. */
-static inline group
-load_group(ccc_fhm_tag const *const src)
-{
-    return (group){_mm_loadu_si128((__m128i *)src)};
-}
-
-/** Stores the src group to dst. The store is unaligned and the user must ensure
-the store will not go off the end of the tag array. */
-static inline void
-store_group(ccc_fhm_tag *const dst, group const src)
-{
-    _mm_storeu_si128((__m128i *)dst, src.v);
-}
-
-/** Returns an index mask with a bit on if the tag at that index in group g
-matches the provided tag m. If no indices matched this will be a 0 index mask.
+/** Returns a match with a bit on if the tag at that index in group g
+matches the provided tag m. If no indices matched this will be a 0 match.
 
 Here is the process to help understand the dense intrinsics.
 
@@ -1688,41 +1677,60 @@ Here is the process to help understand the dense intrinsics.
      │      ┌──────────────────────────────────────┘
 0x0001000000100000
 
-4. Return the result as an index mask.
+4. Return the result as a match.
 
-(index_mask){0x0001000000100000}
+(match_mask){0x0001000000100000}
 
 With a good hash function it is very likely that the first match will be the
 hashed data and the full comparison will evaluate to true. Note that this
 method inevitably forces a call to the comparison callback function on every
 match so an efficient comparison is beneficial. */
-static inline index_mask
+static inline match_mask
 match_tag(group const g, ccc_fhm_tag const m)
 {
 
-    return (index_mask){
+    return (match_mask){
         _mm_movemask_epi8(_mm_cmpeq_epi8(g.v, _mm_set1_epi8((int8_t)m.v))),
     };
 }
 
-/** Returns 0 based index mask with every bit on representing those tags in
+/** Returns 0 based match with every bit on representing those tags in
 group g that are the empty special constant. The user must interpret this 0
 based index in the context of the probe sequence. */
-static inline index_mask
+static inline match_mask
 match_empty(group const g)
 {
     return match_tag(g, (ccc_fhm_tag){TAG_EMPTY});
 }
 
-/** Returns a 0 based index mask with every bit on representing those tags
+/** Returns a 0 based match with every bit on representing those tags
 in the group that are the special constant empty or deleted. These are easy
 to find because they are the one tags in a group with the most significant
 bit on. */
-static inline index_mask
-match_empty_or_deleted(group const g)
+static inline match_mask
+match_empty_deleted(group const g)
 {
     static_assert(sizeof(int) >= sizeof(uint16_t));
-    return (index_mask){_mm_movemask_epi8(g.v)};
+    return (match_mask){_mm_movemask_epi8(g.v)};
+}
+
+/*=========================  Group Implementations   ========================*/
+
+/** Loads a group starting at src into a 128 bit vector. This is an unaligned
+load and the user must ensure the load will not go off then end of the tag
+array. */
+static inline group
+group_load(ccc_fhm_tag const *const src)
+{
+    return (group){_mm_loadu_si128((__m128i *)src)};
+}
+
+/** Stores the src group to dst. The store is unaligned and the user must ensure
+the store will not go off the end of the tag array. */
+static inline void
+group_store(ccc_fhm_tag *const dst, group const src)
+{
+    _mm_storeu_si128((__m128i *)dst, src.v);
 }
 
 /** Converts the empty and deleted constants all TAG_EMPTY and the full
@@ -1730,12 +1738,12 @@ tags representing hashed user data TAG_DELETED. Making the hashed data
 deleted is OK because it will only turn on the previously unused most
 significant bit. This does not affect user hashed data. */
 static inline group
-make_constants_empty_and_full_deleted(group const g)
+group_constant_to_empty_full_to_deleted(group const g)
 {
     __m128i const zero = _mm_setzero_si128();
-    __m128i const match_constants = _mm_cmpgt_epi8(zero, g.v);
+    __m128i const match_mask_constants = _mm_cmpgt_epi8(zero, g.v);
     return (group){
-        _mm_or_si128(match_constants, _mm_set1_epi8((int8_t)TAG_DELETED)),
+        _mm_or_si128(match_mask_constants, _mm_set1_epi8((int8_t)TAG_DELETED)),
     };
 }
 
@@ -1751,13 +1759,61 @@ family of 64 bit operations targeted at u8 bytes. If NEON develops an efficient
 instruction for compressing a 128 bit result into an int--or in our case a
 uint16_t--we should revisit this section for 128 bit targeted intrinsics. */
 
+/*=========================   Match SIMD Matching    ========================*/
+
+/** Returns a match with the most significant bit set for each byte to
+indicate if the byte in the group matched the mask to be searched. The only
+bit on shall be this most significant bit to ensure iterating through index
+masks is easier and counting bits make sense in the find loops. */
+static inline match
+match_tag(group const g, ccc_fhm_tag const m)
+{
+
+    match_mask const res = {
+        vget_lane_u64(vreinterpret_u64_u8(vceq_u8(g.v, vdup_n_u8(m.v))), 0)
+            & MATCH_TAGS_MSBS,
+    };
+    assert(
+        (res.v & MATCH_TAGS_OFF_BITS) == 0
+        && "For bit counting and iteration purposes the most significant bit "
+           "in every byte will indicate a match for a tag has occurred.");
+    return res;
+}
+
+/** Returns 0 based match_mask with every bit on representing those tags in
+group g that are the empty special constant. The user must interpret this 0
+based index in the context of the probe sequence. */
+static inline match_mask
+match_empty(group const g)
+{
+    return match_tag(g, (ccc_fhm_tag){TAG_EMPTY});
+}
+
+/** Returns a 0 based match with every bit on representing those tags
+in the group that are the special constant empty or deleted. These are easy
+to find because they are the one tags in a group with the most significant
+bit on. */
+static inline match_mask
+match_empty_deleted(group const g)
+{
+    uint8x8_t const cmp = vcltz_s8(vreinterpret_s8_u8(g.v));
+    match_mask const res = {
+        vget_lane_u64(vreinterpret_u64_u8(cmp), 0) & MATCH_TAGS_MSBS,
+    };
+    assert(
+        (res.v & MATCH_TAGS_OFF_BITS) == 0
+        && "For bit counting and iteration purposes the most significant bit "
+           "in every byte will indicate a match for a tag has occurred.");
+    return res;
+}
+
 /*=========================  Group Implementations   ========================*/
 
 /** Loads a group starting at src into a 8x8 (64) bit vector. This is an
 unaligned load and the user must ensure the load will not go off then end of the
 tag array. */
 static inline group
-load_group(ccc_fhm_tag const *const src)
+group_load(ccc_fhm_tag const *const src)
 {
     return (group){vld1_u8(&src->v)};
 }
@@ -1765,55 +1821,9 @@ load_group(ccc_fhm_tag const *const src)
 /** Stores the src group to dst. The store is unaligned and the user must ensure
 the store will not go off the end of the tag array. */
 static inline void
-store_group(ccc_fhm_tag *const dst, group const src)
+group_store(ccc_fhm_tag *const dst, group const src)
 {
     vst1_u8(&dst->v, src.v);
-}
-
-/** Returns an index mask with the most significant bit set for each byte to
-indicate if the byte in the group matched the mask to be searched. The only
-bit on shall be this most significant bit to ensure iterating through index
-masks is easier and counting bits make sense in the find loops. */
-static inline index_mask
-match_tag(group const g, ccc_fhm_tag const m)
-{
-
-    index_mask const res = {
-        vget_lane_u64(vreinterpret_u64_u8(vceq_u8(g.v, vdup_n_u8(m.v))), 0)
-            & INDEX_MASK_TAGS_MSBS,
-    };
-    assert(
-        (res.v & INDEX_MASK_TAGS_OFF_BITS) == 0
-        && "For bit counting and iteration purposes the most significant bit "
-           "in every byte will indicate a match for a tag has occurred.");
-    return res;
-}
-
-/** Returns 0 based index mask with every bit on representing those tags in
-group g that are the empty special constant. The user must interpret this 0
-based index in the context of the probe sequence. */
-static inline index_mask
-match_empty(group const g)
-{
-    return match_tag(g, (ccc_fhm_tag){TAG_EMPTY});
-}
-
-/** Returns a 0 based index mask with every bit on representing those tags
-in the group that are the special constant empty or deleted. These are easy
-to find because they are the one tags in a group with the most significant
-bit on. */
-static inline index_mask
-match_empty_or_deleted(group const g)
-{
-    uint8x8_t const cmp = vcltz_s8(vreinterpret_s8_u8(g.v));
-    index_mask const res = {
-        vget_lane_u64(vreinterpret_u64_u8(cmp), 0) & INDEX_MASK_TAGS_MSBS,
-    };
-    assert(
-        (res.v & INDEX_MASK_TAGS_OFF_BITS) == 0
-        && "For bit counting and iteration purposes the most significant bit "
-           "in every byte will indicate a match for a tag has occurred.");
-    return res;
 }
 
 /** Converts the empty and deleted constants all TAG_EMPTY and the full
@@ -1821,7 +1831,7 @@ tags representing hashed user data TAG_DELETED. Making the hashed data
 deleted is OK because it will only turn on the previously unused most
 significant bit. This does not affect user hashed data. */
 static inline group
-make_constants_empty_and_full_deleted(group const g)
+group_constant_to_empty_full_to_deleted(group const g)
 {
     uint8x8_t const constant = vcltz_s8(vreinterpret_s8_u8(g.v));
     return (group){vorr_u8(constant, vdup_n_u8(TAG_MSB))};
@@ -1845,8 +1855,8 @@ is_little_endian(void)
 
 /* Returns a mask converted to little endian byte layout. On a little endian
 platform the value is returned, otherwise byte swapping occurs. */
-static inline index_mask
-to_little_endian(index_mask m)
+static inline match_mask
+to_little_endian(match_mask m)
 {
     if (is_little_endian())
     {
@@ -1862,36 +1872,20 @@ to_little_endian(index_mask m)
     return m;
 }
 
-/*=========================  Group Implementations   ========================*/
+/*=========================   Match SRMD Matching    ========================*/
 
-/** Loads tags into a group without violating strict aliasing. */
-static inline group
-load_group(ccc_fhm_tag const *const src)
-{
-    group g;
-    (void)memcpy(&g, src, sizeof(g));
-    return g;
-}
-
-/** Stores a group back into the tag array without violating strict aliasing. */
-static inline void
-store_group(ccc_fhm_tag *const dst, group const src)
-{
-    (void)memcpy(dst, &src, sizeof(src));
-}
-
-/** Returns an index mask indicating all tags in the group which may have the
-given value. The index mask will only have the most significant bit on within
-the byte representing the tag for the match. This function may return a false
-positive in certain cases where the tag in the group differs from the searched
-value only in its lowest bit. This is fine because:
+/** Returns a match_mask indicating all tags in the group which may have the
+given value. The match_mask will only have the most significant bit on within
+the byte representing the tag for the match_mask. This function may return a
+false positive in certain cases where the tag in the group differs from the
+searched value only in its lowest bit. This is fine because:
 - This never happens for `EMPTY` and `DELETED`, only full entries.
 - The check for key equality will catch these.
 - This only happens if there is at least 1 true match.
 - The chance of this happening is very low (< 1% chance per byte).
 This algorithm is derived from:
 https://graphics.stanford.edu/~seander/bithacks.html##ValueInWord */
-static inline index_mask
+static inline match_mask
 match_tag(group g, ccc_fhm_tag const m)
 {
     group const cmp = {
@@ -1904,33 +1898,50 @@ match_tag(group g, ccc_fhm_tag const m)
                | (((typeof(g.v))m.v) << (TAG_BITS * 2UL))
                | (((typeof(g.v))m.v) << TAG_BITS) | (m.v)),
     };
-    index_mask const res = to_little_endian((index_mask){
-        (cmp.v - INDEX_MASK_TAGS_LSBS) & ~cmp.v & INDEX_MASK_TAGS_MSBS,
+    match_mask const res = to_little_endian((match_mask){
+        (cmp.v - MATCH_TAGS_LSBS) & ~cmp.v & MATCH_TAGS_MSBS,
     });
     assert(
-        (res.v & INDEX_MASK_TAGS_OFF_BITS) == 0
+        (res.v & MATCH_TAGS_OFF_BITS) == 0
         && "For bit counting and iteration purposes the most significant bit "
            "in every byte will indicate a match for a tag has occurred.");
     return res;
 }
 
-/** Returns an index mask with the most significant bit in every byte on if
+/** Returns a match_mask with the most significant bit in every byte on if
 that tag in g is empty. */
-static inline index_mask
+static inline match_mask
 match_empty(group const g)
 {
     /* EMPTY has all bits on and DELETED has the most significant bit on so
        EMPTY must have the top 2 bits on. Make sure the mask is only MSB's. */
-    return to_little_endian(
-        (index_mask){g.v & (g.v << 1) & INDEX_MASK_TAGS_MSBS});
+    return to_little_endian((match_mask){g.v & (g.v << 1) & MATCH_TAGS_MSBS});
 }
 
-/** Returns an index mask with the most significant bit in every byte on if
+/** Returns a match with the most significant bit in every byte on if
 that tag in g is empty or deleted. This is found by the most significant bit. */
-static inline index_mask
-match_empty_or_deleted(group const g)
+static inline match_mask
+match_empty_deleted(group const g)
 {
-    return to_little_endian((index_mask){g.v & INDEX_MASK_TAGS_MSBS});
+    return to_little_endian((match_mask){g.v & MATCH_TAGS_MSBS});
+}
+
+/*=========================  Group Implementations   ========================*/
+
+/** Loads tags into a group without violating strict aliasing. */
+static inline group
+group_load(ccc_fhm_tag const *const src)
+{
+    group g;
+    (void)memcpy(&g, src, sizeof(g));
+    return g;
+}
+
+/** Stores a group back into the tag array without violating strict aliasing. */
+static inline void
+group_store(ccc_fhm_tag *const dst, group const src)
+{
+    (void)memcpy(dst, &src, sizeof(src));
 }
 
 /** Converts the empty and deleted constants all TAG_EMPTY and the full
@@ -1938,9 +1949,9 @@ tags representing hashed user data TAG_DELETED. Making the hashed data
 deleted is OK because it will only turn on the previously unused most
 significant bit. This does not affect user hashed data. */
 static inline group
-make_constants_empty_and_full_deleted(group g)
+group_constant_to_empty_full_to_deleted(group g)
 {
-    g.v = ~g.v & INDEX_MASK_TAGS_MSBS;
+    g.v = ~g.v & MATCH_TAGS_MSBS;
     g.v = ~g.v + (g.v >> (TAG_BITS - 1));
     return g;
 }
@@ -1950,7 +1961,7 @@ make_constants_empty_and_full_deleted(group g)
 /*====================  Bit Counting for Index Mask   =======================*/
 
 /** How we count bits can vary depending on the implementation, group size,
-and index mask width. Keep the bit counting logic separate here so the above
+and match_mask width. Keep the bit counting logic separate here so the above
 implementations can simply rely on counting zeros that yields correct results
 for their implementation. Each implementation attempts to use the built-ins
 first and then falls back to manual bit counting. */
@@ -1960,25 +1971,25 @@ first and then falls back to manual bit counting. */
 #    if defined(__has_builtin) && __has_builtin(__builtin_ctz)                 \
         && __has_builtin(__builtin_clz) && __has_builtin(__builtin_clzl)
 
-static_assert(sizeof((index_mask){}.v) <= sizeof(unsigned),
-              "An index mask is expected to be smaller than an unsigned due to "
+static_assert(sizeof((match_mask){}.v) <= sizeof(unsigned),
+              "a match_mask is expected to be smaller than an unsigned due to "
               "available builtins on the given platform.");
 
 static inline unsigned
-ctz(index_mask const m)
+ctz(match_mask const m)
 {
     static_assert(__builtin_ctz(0x8000) == CCC_FHM_GROUP_SIZE - 1,
                   "Counting trailing zeros will always result in a valid mask "
-                  "based on index_mask width if the mask is not 0, even though "
+                  "based on match_mask width if the mask is not 0, even though "
                   "m is implicitly widened to an int.");
     return m.v ? __builtin_ctz(m.v) : CCC_FHM_GROUP_SIZE;
 }
 
 static inline unsigned
-clz(index_mask const m)
+clz(match_mask const m)
 {
-    static_assert(sizeof(m.v) * 2UL == sizeof(unsigned),
-                  "An index_mask will be implicitly widened to exactly twice "
+    static_assert(sizeof((match_mask){}.v) * 2UL == sizeof(unsigned),
+                  "a match_mask will be implicitly widened to exactly twice "
                   "its width if non-zero due to builtin functions available.");
     return m.v ? __builtin_clz(((unsigned)m.v) << CCC_FHM_GROUP_SIZE)
                : CCC_FHM_GROUP_SIZE;
@@ -2003,7 +2014,7 @@ enum : size_t
 };
 
 static inline unsigned
-ctz(index_mask m)
+ctz(match_mask m)
 {
     if (!m.v)
     {
@@ -2016,7 +2027,7 @@ ctz(index_mask m)
 }
 
 static inline unsigned
-clz(index_mask m)
+clz(match_mask m)
 {
     if (!m.v)
     {
@@ -2024,7 +2035,7 @@ clz(index_mask m)
     }
     unsigned mv = (unsigned)m.v << CCC_FHM_GROUP_SIZE;
     unsigned cnt = 0;
-    for (; (mv & (INDEX_MASK_MSB << CCC_FHM_GROUP_SIZE)) == 0; ++cnt, mv <<= 1U)
+    for (; (mv & (MATCH_MSB << CCC_FHM_GROUP_SIZE)) == 0; ++cnt, mv <<= 1U)
     {}
     return cnt;
 }
@@ -2051,13 +2062,13 @@ clz_size_t(size_t n)
         && __has_builtin(__builtin_clzl)
 
 static_assert(
-    sizeof((index_mask){}.v) == sizeof(long),
-    "builtin assumes an integer width that must be compatible with index mask");
+    sizeof((match_mask){}.v) == sizeof(long),
+    "builtin assumes an integer width that must be compatible with match_mask");
 
 static inline unsigned
-ctz(index_mask const m)
+ctz(match_mask const m)
 {
-    static_assert(__builtin_ctzl(INDEX_MASK_MSB) / CCC_FHM_GROUP_SIZE
+    static_assert(__builtin_ctzl(MATCH_MSB) / CCC_FHM_GROUP_SIZE
                       == CCC_FHM_GROUP_SIZE - 1,
                   "builtin trailing zeros must produce number of bits we "
                   "expect for mask");
@@ -2065,9 +2076,10 @@ ctz(index_mask const m)
 }
 
 static inline unsigned
-clz(index_mask const m)
+clz(match_mask const m)
 {
-    static_assert(__builtin_clzl((index_mask){1}.v) / CCC_FHM_GROUP_SIZE
+    static_assert(__builtin_clzl((typeof((match_mask){}.v))0x1)
+                          / CCC_FHM_GROUP_SIZE
                       == CCC_FHM_GROUP_SIZE - 1,
                   "builtin trailing zeros must produce number of bits we "
                   "expect for mask");
@@ -2091,7 +2103,7 @@ enum : size_t
 };
 
 static inline unsigned
-ctz(index_mask m)
+ctz(match_mask m)
 {
     if (!m.v)
     {
@@ -2104,14 +2116,14 @@ ctz(index_mask m)
 }
 
 static inline unsigned
-clz(index_mask m)
+clz(match_mask m)
 {
     if (!m.v)
     {
         return CCC_FHM_GROUP_SIZE;
     }
     unsigned cnt = 0;
-    for (; (m.v & INDEX_MASK_MSB) == 0; ++cnt, m.v <<= 1U)
+    for (; (m.v & MATCH_MSB) == 0; ++cnt, m.v <<= 1U)
     {}
     return cnt / CCC_FHM_GROUP_SIZE;
 }
