@@ -17,7 +17,10 @@ The leetcode lru problem in C. */
 #include <stdio.h>
 #include <stdlib.h>
 
-#define REQS 11
+enum
+{
+    REQS = 11,
+};
 
 struct lru_cache
 {
@@ -105,9 +108,9 @@ static small_fixed_map map_mem;
 static struct lru_cache lru_cache = {
     .cap = CAP,
     .l = dll_init(lru_cache.l, struct key_val, list_elem, cmp_by_key, std_alloc,
-                  NULL),
+                  nullptr),
     .fh = fhm_init(map_mem.data, map_mem.tag, key, fhmap_int_to_u64,
-                   lru_lookup_cmp, NULL, NULL, SMALL_FIXED_CAP),
+                   lru_lookup_cmp, nullptr, nullptr, SMALL_FIXED_CAP),
 };
 
 CHECK_BEGIN_STATIC_FN(lru_put, struct lru_cache *const lru, int const key,
@@ -127,14 +130,14 @@ CHECK_BEGIN_STATIC_FN(lru_put, struct lru_cache *const lru, int const key,
     {
         struct lru_lookup *const new
             = insert_entry(ent, &(struct lru_lookup){.key = key});
-        CHECK(new == NULL, false);
+        CHECK(new == nullptr, false);
         new->kv_in_list = dll_emplace_front(
             &lru->l, (struct key_val){.key = key, .val = val});
-        CHECK(new->kv_in_list == NULL, false);
+        CHECK(new->kv_in_list == nullptr, false);
         if (size(&lru->l).count > lru->cap)
         {
             struct key_val const *const to_drop = back(&lru->l);
-            CHECK(to_drop == NULL, false);
+            CHECK(to_drop == nullptr, false);
             ccc_entry const e = remove_entry(entry_r(&lru->fh, &to_drop->key));
             CHECK(occupied(&e), true);
             (void)pop_back(&lru->l);
@@ -146,7 +149,7 @@ CHECK_BEGIN_STATIC_FN(lru_put, struct lru_cache *const lru, int const key,
 CHECK_BEGIN_STATIC_FN(lru_get, struct lru_cache *const lru, int const key,
                       int *val)
 {
-    CHECK_ERROR(val != NULL, true);
+    CHECK_ERROR(val != nullptr, true);
     struct lru_lookup const *const found = get_key_val(&lru->fh, &key);
     if (!found)
     {
@@ -208,7 +211,7 @@ CHECK_BEGIN_STATIC_FN(run_lru_cache)
             QUIET_PRINT("HED -> {key: %d, val: %d}\n", requests[i].key,
                         requests[i].val);
             struct key_val const *const kv = requests[i].header(&lru_cache);
-            CHECK(kv != NULL, true);
+            CHECK(kv != nullptr, true);
             CHECK(kv->key, requests[i].key);
             CHECK(kv->val, requests[i].val);
         }
@@ -218,8 +221,8 @@ CHECK_BEGIN_STATIC_FN(run_lru_cache)
         }
     }
     CHECK_END_FN({
-        (void)ccc_fhm_clear_and_free(&lru_cache.fh, NULL);
-        (void)dll_clear(&lru_cache.l, NULL);
+        (void)ccc_fhm_clear_and_free(&lru_cache.fh, nullptr);
+        (void)dll_clear(&lru_cache.l, nullptr);
     });
 }
 

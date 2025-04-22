@@ -14,7 +14,7 @@
 CHECK_BEGIN_STATIC_FN(omap_test_prime_shuffle)
 {
     ccc_ordered_map s
-        = ccc_om_init(s, struct val, elem, key, id_cmp, NULL, NULL);
+        = ccc_om_init(s, struct val, elem, key, id_cmp, nullptr, nullptr);
     size_t const size = 50;
     size_t const prime = 53;
     size_t const less = 10;
@@ -48,7 +48,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_prime_shuffle)
 CHECK_BEGIN_STATIC_FN(omap_test_insert_erase_shuffled)
 {
     ccc_ordered_map s
-        = ccc_om_init(s, struct val, elem, key, id_cmp, NULL, NULL);
+        = ccc_om_init(s, struct val, elem, key, id_cmp, nullptr, nullptr);
     size_t const size = 50;
     int const prime = 53;
     struct val vals[50];
@@ -63,7 +63,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_insert_erase_shuffled)
     for (size_t i = 0; i < size; ++i)
     {
         struct val *v = unwrap(remove_r(&s, &vals[i].elem));
-        CHECK(v != NULL, true);
+        CHECK(v != nullptr, true);
         CHECK(v->key, vals[i].key);
         CHECK(validate(&s), true);
     }
@@ -74,10 +74,10 @@ CHECK_BEGIN_STATIC_FN(omap_test_insert_erase_shuffled)
 CHECK_BEGIN_STATIC_FN(omap_test_weak_srand)
 {
     ccc_ordered_map s
-        = ccc_om_init(s, struct val, elem, key, id_cmp, NULL, NULL);
+        = ccc_om_init(s, struct val, elem, key, id_cmp, nullptr, nullptr);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
-    srand(time(NULL));
+    srand(time(nullptr));
     struct val vals[1000];
     int const num_nodes = 1000;
     for (int i = 0; i < num_nodes; ++i)

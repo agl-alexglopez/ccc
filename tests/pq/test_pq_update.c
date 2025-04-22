@@ -14,10 +14,10 @@
 CHECK_BEGIN_STATIC_FN(pq_test_insert_iterate_pop)
 {
     ccc_priority_queue pq
-        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
+        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, nullptr, nullptr);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
-    srand(time(NULL));
+    srand(time(nullptr));
     size_t const num_nodes = 1000;
     struct val vals[1000];
     for (size_t i = 0; i < num_nodes; ++i)
@@ -25,7 +25,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_insert_iterate_pop)
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
-        CHECK(push(&pq, &vals[i].elem) != NULL, true);
+        CHECK(push(&pq, &vals[i].elem) != nullptr, true);
         CHECK(validate(&pq), true);
     }
     size_t pop_count = 0;
@@ -42,10 +42,10 @@ CHECK_BEGIN_STATIC_FN(pq_test_insert_iterate_pop)
 CHECK_BEGIN_STATIC_FN(pq_test_priority_removal)
 {
     ccc_priority_queue pq
-        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
+        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, nullptr, nullptr);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
-    srand(time(NULL));
+    srand(time(nullptr));
     size_t const num_nodes = 1000;
     struct val vals[1000];
     for (size_t i = 0; i < num_nodes; ++i)
@@ -53,7 +53,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_removal)
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
-        CHECK(push(&pq, &vals[i].elem) != NULL, true);
+        CHECK(push(&pq, &vals[i].elem) != nullptr, true);
         CHECK(validate(&pq), true);
     }
     int const limit = 400;
@@ -72,10 +72,10 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_removal)
 CHECK_BEGIN_STATIC_FN(pq_test_priority_update)
 {
     ccc_priority_queue pq
-        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
+        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, nullptr, nullptr);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
-    srand(time(NULL));
+    srand(time(nullptr));
     size_t const num_nodes = 1000;
     struct val vals[1000];
     for (size_t i = 0; i < num_nodes; ++i)
@@ -83,7 +83,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_update)
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
-        CHECK(push(&pq, &vals[i].elem) != NULL, true);
+        CHECK(push(&pq, &vals[i].elem) != nullptr, true);
         CHECK(validate(&pq), true);
     }
     int const limit = 400;
@@ -104,10 +104,10 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_update)
 CHECK_BEGIN_STATIC_FN(pq_test_priority_update_with)
 {
     ccc_priority_queue pq
-        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
+        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, nullptr, nullptr);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
-    srand(time(NULL));
+    srand(time(nullptr));
     size_t const num_nodes = 1000;
     struct val vals[1000];
     for (size_t i = 0; i < num_nodes; ++i)
@@ -115,7 +115,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_update_with)
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
-        CHECK(push(&pq, &vals[i].elem) != NULL, true);
+        CHECK(push(&pq, &vals[i].elem) != nullptr, true);
         CHECK(validate(&pq), true);
     }
     int const limit = 400;
@@ -136,10 +136,10 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_update_with)
 CHECK_BEGIN_STATIC_FN(pq_test_priority_increase)
 {
     ccc_priority_queue pq
-        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
+        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, nullptr, nullptr);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
-    srand(time(NULL));
+    srand(time(nullptr));
     size_t const num_nodes = 1000;
     struct val vals[1000];
     for (size_t i = 0; i < num_nodes; ++i)
@@ -147,7 +147,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_increase)
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
-        CHECK(push(&pq, &vals[i].elem) != NULL, true);
+        CHECK(push(&pq, &vals[i].elem) != nullptr, true);
         CHECK(validate(&pq), true);
     }
     int const limit = 400;
@@ -174,10 +174,10 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_increase)
 CHECK_BEGIN_STATIC_FN(pq_test_priority_increase_with)
 {
     ccc_priority_queue pq
-        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
+        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, nullptr, nullptr);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
-    srand(time(NULL));
+    srand(time(nullptr));
     size_t const num_nodes = 1000;
     struct val vals[1000];
     for (size_t i = 0; i < num_nodes; ++i)
@@ -185,7 +185,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_increase_with)
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
-        CHECK(push(&pq, &vals[i].elem) != NULL, true);
+        CHECK(push(&pq, &vals[i].elem) != nullptr, true);
         CHECK(validate(&pq), true);
     }
     int const limit = 400;
@@ -212,10 +212,10 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_increase_with)
 CHECK_BEGIN_STATIC_FN(pq_test_priority_decrease)
 {
     ccc_priority_queue pq
-        = ccc_pq_init(struct val, elem, CCC_GRT, val_cmp, NULL, NULL);
+        = ccc_pq_init(struct val, elem, CCC_GRT, val_cmp, nullptr, nullptr);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
-    srand(time(NULL));
+    srand(time(nullptr));
     size_t const num_nodes = 1000;
     struct val vals[1000];
     for (size_t i = 0; i < num_nodes; ++i)
@@ -223,7 +223,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_decrease)
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
-        CHECK(push(&pq, &vals[i].elem) != NULL, true);
+        CHECK(push(&pq, &vals[i].elem) != nullptr, true);
         CHECK(validate(&pq), true);
     }
     int const limit = 400;
@@ -250,10 +250,10 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_decrease)
 CHECK_BEGIN_STATIC_FN(pq_test_priority_decrease_with)
 {
     ccc_priority_queue pq
-        = ccc_pq_init(struct val, elem, CCC_GRT, val_cmp, NULL, NULL);
+        = ccc_pq_init(struct val, elem, CCC_GRT, val_cmp, nullptr, nullptr);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
-    srand(time(NULL));
+    srand(time(nullptr));
     size_t const num_nodes = 1000;
     struct val vals[1000];
     for (size_t i = 0; i < num_nodes; ++i)
@@ -261,7 +261,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_decrease_with)
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
-        CHECK(push(&pq, &vals[i].elem) != NULL, true);
+        CHECK(push(&pq, &vals[i].elem) != nullptr, true);
         CHECK(validate(&pq), true);
     }
     int const limit = 400;

@@ -297,12 +297,12 @@ main(int argc, char **argv)
     /* Randomness will be used throughout the program but it need not be
        perfect. It only helps build graphs.
        NOLINTNEXTLINE(cert-msc32-c, cert-msc51-cpp) */
-    srand(time(NULL));
+    srand(time(nullptr));
     struct graph graph = {.rows = default_rows,
                           .cols = default_cols,
                           .vertices = default_vertices,
                           .speed = {},
-                          .grid = NULL,
+                          .grid = nullptr,
                           .graph = network};
     for (int i = 1; i < argc; ++i)
     {
@@ -410,10 +410,10 @@ static bool
 found_dst(struct graph *const graph, struct vertex *const src)
 {
     flat_hash_map parent_map
-        = fhm_init((struct path_backtrack_cell *)NULL, NULL, current,
-                   hash_parent_cells, eq_parent_cells, std_alloc, NULL, 0);
+        = fhm_init((struct path_backtrack_cell *)nullptr, nullptr, current,
+                   hash_parent_cells, eq_parent_cells, std_alloc, nullptr, 0);
     flat_double_ended_queue bfs
-        = fdeq_init((struct point *)NULL, std_alloc, NULL, 0);
+        = fdeq_init((struct point *)nullptr, std_alloc, nullptr, 0);
     entry *e = fhm_insert_or_assign_w(
         &parent_map, src->pos,
         (struct path_backtrack_cell){.parent = {-1, -1}});
@@ -453,8 +453,8 @@ found_dst(struct graph *const graph, struct vertex *const src)
         }
     }
 done:
-    (void)fdeq_clear_and_free(&bfs, NULL);
-    (void)fhm_clear_and_free(&parent_map, NULL);
+    (void)fdeq_clear_and_free(&bfs, nullptr);
+    (void)fhm_clear_and_free(&parent_map, nullptr);
     return dst_connection;
 }
 
@@ -643,7 +643,7 @@ random_vertex_placement(struct graph const *const graph)
 static void
 find_shortest_paths(struct graph *const graph)
 {
-    char *lineptr = NULL;
+    char *lineptr = nullptr;
     size_t len = 0;
     for (;;)
     {
@@ -701,7 +701,7 @@ dijkstra_shortest_path(struct graph *const graph, char const src,
        to be small [A-Z] so provide memory on the stack for speed and safety. */
     struct dijkstra_vertex map_pq[MAX_VERTICES] = {};
     priority_queue distances = pq_init(struct dijkstra_vertex, pq_elem, CCC_LES,
-                                       cmp_pq_costs, NULL, NULL);
+                                       cmp_pq_costs, nullptr, nullptr);
     for (int i = 0, vx = start_vertex_title; i < graph->vertices; ++i, ++vx)
     {
         *map_pq_at(map_pq, (char)vx) = (struct dijkstra_vertex){
@@ -724,7 +724,7 @@ dijkstra_shortest_path(struct graph *const graph, char const src,
                 for (; u->from; u = map_pq_at(map_pq, u->from))
                 {
                     paint_edge(graph, u->name, u->from, CYN);
-                    nanosleep(&graph->speed, NULL);
+                    nanosleep(&graph->speed, nullptr);
                 }
             }
             return u->dist;
@@ -743,7 +743,7 @@ dijkstra_shortest_path(struct graph *const graph, char const src,
                 });
                 prog_assert(relax == true);
                 paint_edge(graph, u->name, v->name, MAG);
-                nanosleep(&graph->speed, NULL);
+                nanosleep(&graph->speed, nullptr);
             }
         }
     }
@@ -757,7 +757,7 @@ map_pq_at(struct dijkstra_vertex const *const dj_arr, char const vertex)
     return (struct dijkstra_vertex *)&dj_arr[vertex - start_vertex_title];
 }
 
-/* Paints the edge and flushes the specified color at that position. If NULL
+/* Paints the edge and flushes the specified color at that position. If nullptr
    is passed as the edge color then the paint bit is removed and default path
    color will be flushed at the patch square location. */
 static void

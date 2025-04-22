@@ -11,51 +11,54 @@
 
 CHECK_BEGIN_STATIC_FN(dll_test_push_three_front)
 {
-    doubly_linked_list dll = dll_init(dll, struct val, e, val_cmp, NULL, NULL);
+    doubly_linked_list dll
+        = dll_init(dll, struct val, e, val_cmp, nullptr, nullptr);
     struct val v0 = {};
-    CHECK(push_front(&dll, &v0.e) != NULL, true);
+    CHECK(push_front(&dll, &v0.e) != nullptr, true);
     CHECK(validate(&dll), true);
     struct val v1 = {.id = 1, .val = 1};
-    CHECK(push_front(&dll, &v1.e) != NULL, true);
+    CHECK(push_front(&dll, &v1.e) != nullptr, true);
     CHECK(validate(&dll), true);
     struct val v2 = {.id = 2, .val = 2};
-    CHECK(push_front(&dll, &v2.e) != NULL, true);
+    CHECK(push_front(&dll, &v2.e) != nullptr, true);
     CHECK(validate(&dll), true);
     CHECK(size(&dll).count, 3);
     struct val *v = dll_front(&dll);
-    CHECK(v == NULL, false);
+    CHECK(v == nullptr, false);
     CHECK(v->id, 2);
     v = dll_back(&dll);
-    CHECK(v == NULL, false);
+    CHECK(v == nullptr, false);
     CHECK(v->id, 0);
     CHECK_END_FN();
 }
 
 CHECK_BEGIN_STATIC_FN(dll_test_push_three_back)
 {
-    doubly_linked_list dll = dll_init(dll, struct val, e, val_cmp, NULL, NULL);
+    doubly_linked_list dll
+        = dll_init(dll, struct val, e, val_cmp, nullptr, nullptr);
     struct val v0 = {};
-    CHECK(push_back(&dll, &v0.e) != NULL, true);
+    CHECK(push_back(&dll, &v0.e) != nullptr, true);
     CHECK(validate(&dll), true);
     struct val v1 = {.id = 1, .val = 1};
-    CHECK(push_back(&dll, &v1.e) != NULL, true);
+    CHECK(push_back(&dll, &v1.e) != nullptr, true);
     CHECK(validate(&dll), true);
     struct val v2 = {.id = 2, .val = 2};
-    CHECK(push_back(&dll, &v2.e) != NULL, true);
+    CHECK(push_back(&dll, &v2.e) != nullptr, true);
     CHECK(validate(&dll), true);
     CHECK(size(&dll).count, 3);
     struct val *v = dll_front(&dll);
     CHECK(v->id, 0);
-    CHECK(v == NULL, false);
+    CHECK(v == nullptr, false);
     v = dll_back(&dll);
-    CHECK(v == NULL, false);
+    CHECK(v == nullptr, false);
     CHECK(v->id, 2);
     CHECK_END_FN();
 }
 
 CHECK_BEGIN_STATIC_FN(dll_test_push_and_splice)
 {
-    doubly_linked_list dll = dll_init(dll, struct val, e, val_cmp, NULL, NULL);
+    doubly_linked_list dll
+        = dll_init(dll, struct val, e, val_cmp, nullptr, nullptr);
     struct val vals[4] = {{.val = 0}, {.val = 1}, {.val = 2}, {.val = 3}};
     enum check_result const t = create_list(&dll, UTIL_PUSH_BACK, 4, vals);
     CHECK(t, PASS);
@@ -70,7 +73,8 @@ CHECK_BEGIN_STATIC_FN(dll_test_push_and_splice)
 
 CHECK_BEGIN_STATIC_FN(dll_test_push_and_splice_range)
 {
-    doubly_linked_list dll = dll_init(dll, struct val, e, val_cmp, NULL, NULL);
+    doubly_linked_list dll
+        = dll_init(dll, struct val, e, val_cmp, nullptr, nullptr);
     struct val vals[4] = {{.val = 0}, {.val = 1}, {.val = 2}, {.val = 3}};
     enum check_result const t = create_list(&dll, UTIL_PUSH_BACK, 4, vals);
     CHECK(t, PASS);
@@ -93,7 +97,8 @@ CHECK_BEGIN_STATIC_FN(dll_test_push_and_splice_range)
 
 CHECK_BEGIN_STATIC_FN(dll_test_push_and_splice_no_ops)
 {
-    doubly_linked_list dll = dll_init(dll, struct val, e, val_cmp, NULL, NULL);
+    doubly_linked_list dll
+        = dll_init(dll, struct val, e, val_cmp, nullptr, nullptr);
     struct val vals[4] = {{.val = 0}, {.val = 1}, {.val = 2}, {.val = 3}};
     enum check_result const t = create_list(&dll, UTIL_PUSH_BACK, 4, vals);
     CHECK(t, PASS);
@@ -111,7 +116,8 @@ CHECK_BEGIN_STATIC_FN(dll_test_push_and_splice_no_ops)
 
 CHECK_BEGIN_STATIC_FN(dll_test_sort_even)
 {
-    doubly_linked_list dll = dll_init(dll, struct val, e, val_cmp, NULL, NULL);
+    doubly_linked_list dll
+        = dll_init(dll, struct val, e, val_cmp, nullptr, nullptr);
     struct val vals[8] = {{.val = 9},  {.val = 4},   {.val = 1}, {.val = 1},
                           {.val = 99}, {.val = -55}, {.val = 5}, {.val = 2}};
     enum check_result const t = create_list(&dll, UTIL_PUSH_BACK, 8, vals);
@@ -129,7 +135,8 @@ CHECK_BEGIN_STATIC_FN(dll_test_sort_even)
 
 CHECK_BEGIN_STATIC_FN(dll_test_sort_odd)
 {
-    doubly_linked_list dll = dll_init(dll, struct val, e, val_cmp, NULL, NULL);
+    doubly_linked_list dll
+        = dll_init(dll, struct val, e, val_cmp, nullptr, nullptr);
     struct val vals[9]
         = {{.val = 9},   {.val = 4}, {.val = 1}, {.val = 1},  {.val = 99},
            {.val = -55}, {.val = 5}, {.val = 2}, {.val = -99}};
@@ -148,7 +155,8 @@ CHECK_BEGIN_STATIC_FN(dll_test_sort_odd)
 
 CHECK_BEGIN_STATIC_FN(dll_test_sort_reverse)
 {
-    doubly_linked_list dll = dll_init(dll, struct val, e, val_cmp, NULL, NULL);
+    doubly_linked_list dll
+        = dll_init(dll, struct val, e, val_cmp, nullptr, nullptr);
     struct val vals[8] = {{.val = 9}, {.val = 8}, {.val = 7}, {.val = 6},
                           {.val = 5}, {.val = 4}, {.val = 3}, {.val = 2}};
     enum check_result const t = create_list(&dll, UTIL_PUSH_BACK, 8, vals);
@@ -166,7 +174,8 @@ CHECK_BEGIN_STATIC_FN(dll_test_sort_reverse)
 
 CHECK_BEGIN_STATIC_FN(dll_test_sort_runs)
 {
-    doubly_linked_list dll = dll_init(dll, struct val, e, val_cmp, NULL, NULL);
+    doubly_linked_list dll
+        = dll_init(dll, struct val, e, val_cmp, nullptr, nullptr);
     struct val vals[12]
         = {{.val = 99},  {.val = 101}, {.val = 103}, {.val = 4},
            {.val = 8},   {.val = 9},   {.val = -99}, {.val = -55},
@@ -190,7 +199,8 @@ CHECK_BEGIN_STATIC_FN(dll_test_sort_runs)
 
 CHECK_BEGIN_STATIC_FN(dll_test_sort_halves)
 {
-    doubly_linked_list dll = dll_init(dll, struct val, e, val_cmp, NULL, NULL);
+    doubly_linked_list dll
+        = dll_init(dll, struct val, e, val_cmp, nullptr, nullptr);
     struct val vals[12] = {{.val = 7},  {.val = 10}, {.val = 13}, {.val = 17},
                            {.val = 19}, {.val = 21}, {.val = 8},  {.val = 12},
                            {.val = 15}, {.val = 18}, {.val = 20}, {.val = 25}};
@@ -213,7 +223,8 @@ CHECK_BEGIN_STATIC_FN(dll_test_sort_halves)
 
 CHECK_BEGIN_STATIC_FN(dll_test_sort_insert)
 {
-    doubly_linked_list dll = dll_init(dll, struct val, e, val_cmp, NULL, NULL);
+    doubly_linked_list dll
+        = dll_init(dll, struct val, e, val_cmp, nullptr, nullptr);
     struct val *inserted
         = dll_insert_sorted(&dll, &(struct val){.val = -99999}.e);
     CHECK(inserted->val, -99999);
@@ -241,35 +252,35 @@ CHECK_BEGIN_STATIC_FN(dll_test_sort_insert)
     };
     /* Before -99. */
     inserted = dll_insert_sorted(&dll, &to_insert[0].e);
-    CHECK(inserted != NULL, true);
+    CHECK(inserted != nullptr, true);
     CHECK(validate(&dll), true);
     CHECK(dll_rnext(&dll, &inserted->e), dll_rend(&dll));
     CHECK(dll_next(&dll, &inserted->e), &vals[8]);
 
     /* After -99. */
     inserted = dll_insert_sorted(&dll, &to_insert[1].e);
-    CHECK(inserted != NULL, true);
+    CHECK(inserted != nullptr, true);
     CHECK(validate(&dll), true);
     CHECK(dll_rnext(&dll, &inserted->e), &vals[8]);
     CHECK(dll_next(&dll, &inserted->e), &vals[5]);
 
     /* Before 4. */
     inserted = dll_insert_sorted(&dll, &to_insert[2].e);
-    CHECK(inserted != NULL, true);
+    CHECK(inserted != nullptr, true);
     CHECK(validate(&dll), true);
     CHECK(dll_rnext(&dll, &inserted->e), &vals[7]);
     CHECK(dll_next(&dll, &inserted->e), &vals[1]);
 
     /* Before 99. */
     inserted = dll_insert_sorted(&dll, &to_insert[3].e);
-    CHECK(inserted != NULL, true);
+    CHECK(inserted != nullptr, true);
     CHECK(validate(&dll), true);
     CHECK(dll_rnext(&dll, &inserted->e), &vals[0]);
     CHECK(dll_next(&dll, &inserted->e), &vals[4]);
 
     /* After 99. */
     inserted = dll_insert_sorted(&dll, &to_insert[4].e);
-    CHECK(inserted != NULL, true);
+    CHECK(inserted != nullptr, true);
     CHECK(validate(&dll), true);
     CHECK(dll_rnext(&dll, &inserted->e), &vals[4]);
     CHECK(dll_next(&dll, &inserted->e), dll_end(&dll));

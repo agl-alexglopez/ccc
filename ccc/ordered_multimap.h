@@ -98,7 +98,7 @@ Initialize the container with memory, callbacks, and permissions. */
 @param [in] key_cmp_fn the ccc_any_key_cmp_fn (types.h) used to compare the key
 to the current stored element under considertion during a map operation.
 @param [in] alloc_fn the ccc_any_alloc_fn (types.h) used to allocate nodes or
-NULL.
+nullptr.
 @param [in] aux any aux data needed for compare, print, or destruction.
 @return the initialized ordered multimap. Use this initializer on the right
 hand side of the variable at compile or run time
@@ -118,7 +118,7 @@ Test membership or obtain references to stored user types directly. */
 @param [in] mm a pointer to the multimap.
 @param [in] key a pointer to the key to be searched.
 @return true if the multimap contains at least one entry at key, else false.
-Error if mm or key is NULL. */
+Error if mm or key is nullptr. */
 [[nodiscard]] ccc_tribool ccc_omm_contains(ccc_ordered_multimap *mm,
                                            void const *key);
 
@@ -126,7 +126,8 @@ Error if mm or key is NULL. */
 N).
 @param [in] mm a pointer to the multimap.
 @param [in] key a pointer to the key to be searched.
-@return a reference to the oldest existing user type at key, NULL if absent. */
+@return a reference to the oldest existing user type at key, nullptr if absent.
+*/
 [[nodiscard]] void *ccc_omm_get_key_val(ccc_ordered_multimap *mm,
                                         void const *key);
 
@@ -256,7 +257,7 @@ Amortized O(lg N).
 @param [in] ordered_multimap_ptr a pointer to the multimap.
 @param [in] key_ptr a ponter to the key to be searched.
 @return a compound literal reference to a container specific entry associated
-with the enclosing scope. This reference is always non-NULL.
+with the enclosing scope. This reference is always non-nullptr.
 
 Note this is useful for nested calls where an entry pointer is requested by
 further operations in the Entry Interface, avoiding uneccessary intermediate
@@ -272,9 +273,9 @@ Occupied.
 @param [in] e a pointer to the container specific entry.
 @param [in] fn the update function to modify the type in the entry.
 @return a reference to the same entry provided. The update function will be
-called on the entry with NULL as the auxiliary argument if the entry is
+called on the entry with nullptr as the auxiliary argument if the entry is
 Occupied, otherwise the function is not called. If either arguments to the
-function are NULL, NULL is returned. */
+function are nullptr, nullptr is returned. */
 [[nodiscard]] ccc_ommap_entry *ccc_omm_and_modify(ccc_ommap_entry *e,
                                                   ccc_any_type_update_fn *fn);
 
@@ -286,7 +287,7 @@ auxiliary data aux if Occupied.
 @return a reference to the same entry provided. The update function will be
 called on the entry with aux as the auxiliary argument if the entry is
 Occupied, otherwise the function is not called. If any arguments to the
-function are NULL, NULL is returned. */
+function are nullptr, nullptr is returned. */
 [[nodiscard]] ccc_ommap_entry *
 ccc_omm_and_modify_aux(ccc_ommap_entry *e, ccc_any_type_update_fn *fn,
                        void *aux);
@@ -301,7 +302,7 @@ for formatting.
 @return a compound literal reference to the modified entry if it was occupied
 or a vacant entry if it was vacant.
 @note T is a reference to the user type stored in the entry guaranteed to be
-non-NULL if the closure executes.
+non-nullptr if the closure executes.
 
 ```
 #define ORDERED_MULTIMAP_USING_NAMESPACE_CCC
@@ -331,7 +332,7 @@ otherwise return the oldest user type stored at the specified key. O(1).
 @param [in] e a pointer to the multimap entry.
 @param [in] key_val_handle a pointer to the intrusive element in the user type.
 @return a pointer to the user type stored in the map either existing or newly
-inserted. If NULL is returned, an allocator error has occured when allocation
+inserted. If nullptr is returned, an allocator error has occured when allocation
 was allowed for the container.
 
 Note that if allocation has been prohibited the address of the key_val_handle
@@ -347,7 +348,7 @@ otherwise return the oldest user type stored at the specified key. O(1).
 @param [in] lazy_key_value the compound literal of the user struct stored in
 the map.
 @return a pointer to the user type stored in the map either existing or newly
-inserted. If NULL is returned, an allocator error has occured or allocation
+inserted. If nullptr is returned, an allocator error has occured or allocation
 was disallowed on initialization to prevent inserting a new element.
 @warning the key in the lazy_key_value compound literal must match the key
 used for the initial entry generation.
@@ -362,7 +363,7 @@ or newly allocated entry. O(1).
 @param [in] e a pointer to the multimap entry.
 @param [in] key_val_handle a pointer to the intrusive element in the user type.
 @return a pointer to the user type written to the existing map entry or newly
-inserted. NULL is returned if allocation is permitted but the allocator
+inserted. nullptr is returned if allocation is permitted but the allocator
 encounters an error.
 
 Note that if allocation has been prohibited the address of the key_val_handle
@@ -378,7 +379,7 @@ existing or newly allocated entry. O(1).
 @param [in] lazy_key_value the compound literal that is constructed directly
 at the existing or newly allocated memory in the container.
 @return a pointer to the user type written to the existing map entry or newly
-inserted. If NULL is returned, an allocator error has occured or allocation
+inserted. If nullptr is returned, an allocator error has occured or allocation
 was disallowed on initialization to prevent inserting a new element
 @warning the key in the lazy_key_value compound literal must match the key
 used for the initial entry generation.
@@ -391,29 +392,29 @@ permitted to allocate memory. */
 /** @brief Removes the entry if it is Occupied. O(1).
 @param [in] e a pointer to the multimap entry.
 @return an entry indicating the status of the removal. If the entry was Vacant,
-a Vacant entry with NULL is returned. If the entry is Occupied and allocation
-is permitted, the stored user type is freed, the entry points to NULL, and the
-status indicates the entry was Occupied but contains NULL. If allocation is
-prohibited the entry is removed from the map and returned to be unwrapped and
+a Vacant entry with nullptr is returned. If the entry is Occupied and allocation
+is permitted, the stored user type is freed, the entry points to nullptr, and
+the status indicates the entry was Occupied but contains nullptr. If allocation
+is prohibited the entry is removed from the map and returned to be unwrapped and
 freed by the user. */
 [[nodiscard]] ccc_entry ccc_omm_remove_entry(ccc_ommap_entry *e);
 
 /** @brief Indicates if an entry is Occupied or Vacant.
 @param [in] e a pointer to the multimap entry.
 @return true if the entry is Occupied, false if it is Vacant. Error if e is
-NULL. */
+nullptr. */
 [[nodiscard]] ccc_tribool ccc_omm_occupied(ccc_ommap_entry const *e);
 
 /** @brief Unwraps the provided entry. An Occupied entry will point to the user
-type stored in the map, a Vacant entry will be NULL.
+type stored in the map, a Vacant entry will be nullptr.
 @param [in] e a pointer to the multimap entry.
-@return a pointer to the user type if Occupied, otherwise NULL. */
+@return a pointer to the user type if Occupied, otherwise nullptr. */
 [[nodiscard]] void *ccc_omm_unwrap(ccc_ommap_entry const *e);
 
 /** @brief Indicates if an insertion error occurs.
 @param [in] e a pointer to the multimap entry.
 @return true if an insertion error occured preventing completing of an Entry
-Interface series of operations. Error if e is NULL.
+Interface series of operations. Error if e is nullptr.
 
 Note that this will most commonly occur if the container is permitted to
 allocate but the allocation has failed. */
@@ -423,17 +424,17 @@ allocate but the allocation has failed. */
 encountered bad arguments that prevented the operation of the function.
 @param [in] e a pointer to the multimap entry.
 @return true if bad function arguments were provided, otherwise false. Error if
-e is NULL.
+e is nullptr.
 
-Note bad arguments usually mean NULL pointers were passed to functions expecting
-non-NULL arguments. */
+Note bad arguments usually mean nullptr pointers were passed to functions
+expecting non-nullptr arguments. */
 [[nodiscard]] ccc_tribool ccc_omm_input_error(ccc_ommap_entry const *e);
 
 /** @brief Obtain the entry status from a container entry.
 @param [in] e a pointer to the entry.
 @return the status stored in the entry after the required action on the
-container completes. If e is NULL an entry input error is returned so ensure
-e is non-NULL to avoid an inaccurate status returned.
+container completes. If e is nullptr an entry input error is returned so ensure
+e is non-nullptr to avoid an inaccurate status returned.
 
 Note that this function can be useful for debugging or if more detailed
 messages are needed for logging purposes. See ccc_entry_status_msg() in
@@ -450,7 +451,7 @@ An interface to enhance the priority queue capabilities of a multimap. */
 are stored in ascending order, smallest as defined by the comparison function is
 min and largest is max. Amortized O(lg N).
 @param [in] mm the pointer to the multimap.
-@return the status of the pop operation. If NULL pointer is provided or the
+@return the status of the pop operation. If nullptr pointer is provided or the
 map is empty a bad input result is returned otherwise ok.
 
 Note that continual pop max operations emptying a full queue with few to no
@@ -462,7 +463,7 @@ ccc_result ccc_omm_pop_max(ccc_ordered_multimap *mm);
 in ascending order, smallest as defined by the comparison function is min and
 largest is max. Amortized O(lg N).
 @param [in] mm the pointer to the multimap.
-@return the status of the pop operation. If NULL pointer is provided or the
+@return the status of the pop operation. If nullptr pointer is provided or the
 map is empty a bad input result is returned otherwise ok.
 
 Note that continual pop min operations emptying a full queue with few to no
@@ -503,8 +504,9 @@ key_val_handle as an element currently in use by the map. O(1).
 @param [in] mm the pointer to the multimap.
 @param [in] key_val_handle a pointer to the intrusive element embedded in a
 user type that the user knows is currently in the map.
-@return a reference to the extracted element. NULL is returned if it is possible
-to prove the key_val_handle is not tracked by the map or the map is empty.
+@return a reference to the extracted element. nullptr is returned if it is
+possible to prove the key_val_handle is not tracked by the map or the map is
+empty.
 
 Note that the element that is extracted is not freed, even if allocation
 permission is given to the container. It is the user's responsibility to free
@@ -519,7 +521,7 @@ member of the map. Amortized O(lg N).
 user type that the user knows is currently in the map.
 @param [in] fn the function used to update an element key in the map.
 @param [in] aux any auxiliary data needed for the update. Usually a new value
-but NULL is possible if aux is not needed.
+but nullptr is possible if aux is not needed.
 @return true if the key update was successful. Error is returned if bad
 arguments are provided or it can be deduced that key_val_handle is not a member
 of the container. */
@@ -534,7 +536,7 @@ member of the map. Amortized O(lg N).
 user type that the user knows is currently in the map.
 @param [in] fn the function used to increase an element key in the map.
 @param [in] aux any auxiliary data needed for the key increase. Usually a new
-value but NULL is possible if aux is not needed.
+value but nullptr is possible if aux is not needed.
 @return true if the key increase was successful. Error is returned if bad
 arguments are provided or it can be deduced that key_val_handle is not a member
 of the container. */
@@ -550,7 +552,7 @@ member of the map. Amortized O(lg N).
 user type that the user knows is currently in the map.
 @param [in] fn the function used to decrease an element key in the map.
 @param [in] aux any auxiliary data needed for the key decrease. Usually a new
-value but NULL is possible if aux is not needed.
+value but nullptr is possible if aux is not needed.
 @return true if the key decrease was successful. Error is returned if bad
 arguments are provided or it can be deduced that key_val_handle is not a member
 of the container. */
@@ -566,10 +568,10 @@ Deallocate the container. */
 /**@{*/
 
 /** @brief Pops every element from the map calling destructor if destructor is
-non-NULL. O(N).
+non-nullptr. O(N).
 @param [in] mm a pointer to the multimap.
-@param [in] destructor a destructor function if required. NULL if unneeded.
-@return an input error if mm points to NULL otherwise ok.
+@param [in] destructor a destructor function if required. nullptr if unneeded.
+@return an input error if mm points to nullptr otherwise ok.
 
 Note that if the multimap has been given permission to allocate, the destructor
 will be called on each element before it uses the provided allocator to free
@@ -616,7 +618,7 @@ O(lg N).
 @param [in] begin_and_end_key_ptrs two pointers, one to the beginning of the
 range and one to the end of the range.
 @return a compound literal reference to the produced range associated with the
-enclosing scope. This reference is always non-NULL. */
+enclosing scope. This reference is always non-nullptr. */
 #define ccc_omm_equal_range_r(ordered_multimap_ptr, begin_and_end_key_ptrs...) \
     &(ccc_range)                                                               \
     {                                                                          \
@@ -651,7 +653,7 @@ O(lg N).
 @param [in] rbegin_and_rend_key_ptrs two pointers, one to the beginning of the
 rrange and one to the end of the rrange.
 @return a compound literal reference to the produced rrange associated with the
-enclosing scope. This reference is always non-NULL. */
+enclosing scope. This reference is always non-nullptr. */
 #define ccc_omm_equal_rrange_r(ordered_multimap_ptr,                           \
                                rbegin_and_rend_key_ptrs...)                    \
     &(ccc_rrange)                                                              \
@@ -732,18 +734,19 @@ Obtain the container state. */
 
 /** @brief Returns true if the multimap is empty. O(1).
 @param [in] mm a pointer to the multimap.
-@return true if empty, false if mm is not empty. Error if mm is NULL. */
+@return true if empty, false if mm is not empty. Error if mm is nullptr. */
 [[nodiscard]] ccc_tribool ccc_omm_is_empty(ccc_ordered_multimap const *mm);
 
 /** @brief Returns the size of the multimap. O(1).
 @param [in] mm a pointer to the multimap.
-@return the size of the container or an argument error is set if mm is NULL. */
+@return the size of the container or an argument error is set if mm is nullptr.
+*/
 [[nodiscard]] ccc_ucount ccc_omm_size(ccc_ordered_multimap const *mm);
 
 /** @brief Returns true if the multimap is empty.
 @param [in] mm a pointer to the multimap.
 @return true if invariants of the data structure are preserved, else false.
-Error if mm is NULL. */
+Error if mm is nullptr. */
 [[nodiscard]] ccc_tribool ccc_omm_validate(ccc_ordered_multimap const *mm);
 
 /**@}*/

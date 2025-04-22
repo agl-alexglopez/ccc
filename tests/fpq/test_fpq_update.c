@@ -18,14 +18,15 @@ CHECK_BEGIN_STATIC_FN(fpq_test_insert_iterate_pop)
     srand(1);
     size_t const num_nodes = 1000;
     struct val vals[1000 + 1];
-    ccc_flat_priority_queue fpq = ccc_fpq_init(
-        vals, CCC_LES, val_cmp, NULL, NULL, (sizeof(vals) / sizeof(vals[0])));
+    ccc_flat_priority_queue fpq
+        = ccc_fpq_init(vals, CCC_LES, val_cmp, nullptr, nullptr,
+                       (sizeof(vals) / sizeof(vals[0])));
     for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
-        CHECK(push(&fpq, &vals[i]) != NULL, true);
+        CHECK(push(&fpq, &vals[i]) != nullptr, true);
         CHECK(validate(&fpq), true);
     }
     size_t pop_count = 0;
@@ -43,11 +44,12 @@ CHECK_BEGIN_STATIC_FN(fpq_test_priority_removal)
 {
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
-    srand(time(NULL));
+    srand(time(nullptr));
     size_t const num_nodes = 1000;
     struct val vals[1000 + 1];
-    ccc_flat_priority_queue fpq = ccc_fpq_init(
-        vals, CCC_LES, val_cmp, NULL, NULL, (sizeof(vals) / sizeof(vals[0])));
+    ccc_flat_priority_queue fpq
+        = ccc_fpq_init(vals, CCC_LES, val_cmp, nullptr, nullptr,
+                       (sizeof(vals) / sizeof(vals[0])));
     for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
@@ -56,7 +58,7 @@ CHECK_BEGIN_STATIC_FN(fpq_test_priority_removal)
                       .val = rand() % (num_nodes + 1), /*NOLINT*/
                       .id = (int)i,
                   });
-        CHECK(res != NULL, true);
+        CHECK(res != nullptr, true);
         CHECK(validate(&fpq), true);
     }
     int const limit = 400;
@@ -77,11 +79,12 @@ CHECK_BEGIN_STATIC_FN(fpq_test_priority_update)
 {
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
-    srand(time(NULL));
+    srand(time(nullptr));
     size_t const num_nodes = 1000;
     struct val vals[1000 + 1];
-    ccc_flat_priority_queue fpq = ccc_fpq_init(
-        vals, CCC_LES, val_cmp, NULL, NULL, (sizeof(vals) / sizeof(vals[0])));
+    ccc_flat_priority_queue fpq
+        = ccc_fpq_init(vals, CCC_LES, val_cmp, nullptr, nullptr,
+                       (sizeof(vals) / sizeof(vals[0])));
     for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
@@ -90,7 +93,7 @@ CHECK_BEGIN_STATIC_FN(fpq_test_priority_update)
                       .val = rand() % (num_nodes + 1), /*NOLINT*/
                       .id = (int)i,
                   });
-        CHECK(res != NULL, true);
+        CHECK(res != nullptr, true);
         CHECK(validate(&fpq), true);
     }
     int const limit = 400;
@@ -102,7 +105,7 @@ CHECK_BEGIN_STATIC_FN(fpq_test_priority_update)
         {
             struct val const *const updated
                 = update(&fpq, cur, val_update, &backoff);
-            CHECK(updated != NULL, true);
+            CHECK(updated != nullptr, true);
             CHECK(updated->val, backoff);
             CHECK(validate(&fpq), true);
         }
@@ -115,11 +118,12 @@ CHECK_BEGIN_STATIC_FN(fpq_test_priority_update_with)
 {
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
-    srand(time(NULL));
+    srand(time(nullptr));
     size_t const num_nodes = 1000;
     struct val vals[1000 + 1];
-    ccc_flat_priority_queue fpq = ccc_fpq_init(
-        vals, CCC_LES, val_cmp, NULL, NULL, (sizeof(vals) / sizeof(vals[0])));
+    ccc_flat_priority_queue fpq
+        = ccc_fpq_init(vals, CCC_LES, val_cmp, nullptr, nullptr,
+                       (sizeof(vals) / sizeof(vals[0])));
     for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
@@ -128,7 +132,7 @@ CHECK_BEGIN_STATIC_FN(fpq_test_priority_update_with)
                       .val = rand() % (num_nodes + 1), /*NOLINT*/
                       .id = (int)i,
                   });
-        CHECK(res != NULL, true);
+        CHECK(res != nullptr, true);
         CHECK(validate(&fpq), true);
     }
     int const limit = 400;
@@ -143,7 +147,7 @@ CHECK_BEGIN_STATIC_FN(fpq_test_priority_update_with)
                                    {
                                        cur->val = backoff;
                                    });
-            CHECK(updated != NULL, true);
+            CHECK(updated != nullptr, true);
             CHECK(updated->val, backoff);
             CHECK(validate(&fpq), true);
         }

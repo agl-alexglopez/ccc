@@ -67,7 +67,7 @@ Initialize and create containers with memory, callbacks, and permissions. */
 /**@{*/
 
 /** @brief Initialize the fdeq with memory and allocation permission.
-@param [in] mem_ptr a pointer to existing memory or ((T *)NULL).
+@param [in] mem_ptr a pointer to existing memory or ((T *)nullptr).
 @param [in] alloc_fn the allocator function, if allocation is allowed.
 @param [in] aux_data any auxiliary data needed for element destruction.
 @param [in] capacity the number of contiguous elements at mem_ptr
@@ -89,18 +89,18 @@ is returned.
 less than src, an allocation function must be provided with the fn argument.
 
 Note that there are two ways to copy data from source to destination: provide
-sufficient memory and pass NULL as fn, or allow the copy function to take care
-of allocation for the copy.
+sufficient memory and pass nullptr as fn, or allow the copy function to take
+care of allocation for the copy.
 
 Manual memory management with no allocation function provided.
 
 ```
 #define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC
-flat_double_ended_queue src = fdeq_init((int[10]){}, NULL, NULL, 10);
+flat_double_ended_queue src = fdeq_init((int[10]){}, nullptr, nullptr, 10);
 int *new_mem = malloc(sizeof(int) * fdeq_capacity(&src));
 flat_double_ended_queue dst
-    = fdeq_init(new_mem, NULL, NULL, fdeq_capacity(&src));
-ccc_result res = fdeq_copy(&dst, &src, NULL);
+    = fdeq_init(new_mem, nullptr, nullptr, fdeq_capacity(&src));
+ccc_result res = fdeq_copy(&dst, &src, nullptr);
 ```
 
 The above requires dst capacity be greater than or equal to src capacity. Here
@@ -108,9 +108,9 @@ is memory management handed over to the copy function.
 
 ```
 #define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC
-flat_double_ended_queue src = fdeq_init((int *)NULL, std_alloc, NULL, 0);
+flat_double_ended_queue src = fdeq_init((int *)nullptr, std_alloc, nullptr, 0);
 (void)ccc_fdeq_push_back_range(&src, 5, (int[5]){0,1,2,3,4});
-flat_double_ended_queue dst = fdeq_init((int *)NULL, std_alloc, NULL, 0);
+flat_double_ended_queue dst = fdeq_init((int *)nullptr, std_alloc, nullptr, 0);
 ccc_result res = fdeq_copy(&dst, &src, std_alloc);
 ```
 
@@ -121,9 +121,9 @@ size fdeq (ring buffer).
 
 ```
 #define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC
-flat_double_ended_queue src = fdeq_init((int *)NULL, std_alloc, NULL, 0);
+flat_double_ended_queue src = fdeq_init((int *)nullptr, std_alloc, nullptr, 0);
 (void)ccc_fdeq_push_back_range(&src, 5, (int[5]){0,1,2,3,4});
-flat_double_ended_queue dst = fdeq_init((int *)NULL, NULL, NULL, 0);
+flat_double_ended_queue dst = fdeq_init((int *)nullptr, nullptr, nullptr, 0);
 ccc_result res = fdeq_copy(&dst, &src, std_alloc);
 ```
 
@@ -174,7 +174,7 @@ resize is required.
 @param [in] value for integral types, the direct value. For structs and
 unions use compound literal syntax.
 @return a reference to the inserted element. If allocation is permitted and a
-resizing is required to insert the element but fails, NULL is returned. */
+resizing is required to insert the element but fails, nullptr is returned. */
 #define ccc_fdeq_emplace_back(fdeq_ptr, value...)                              \
     ccc_impl_fdeq_emplace_back(fdeq_ptr, value)
 
@@ -185,7 +185,7 @@ resize is required.
 @param [in] value for integral types, the direct value. For structs and
 unions use compound literal syntax.
 @return a reference to the inserted element. If allocation is permitted and a
-resizing is required to insert the element but fails, NULL is returned. */
+resizing is required to insert the element but fails, nullptr is returned. */
 #define ccc_fdeq_emplace_front(fdeq_ptr, value...)                             \
     ccc_impl_fdeq_emplace_front(fdeq_ptr, value)
 
@@ -240,7 +240,7 @@ ccc_result ccc_fdeq_push_front_range(ccc_flat_double_ended_queue *fdeq,
 @param [in] pos the position in the fdeq before which to push the range.
 @param [in] n the number of user types in the elems range.
 @param [in] elems a pointer to the array of user types.
-@return a pointer to the start of the inserted range or NULL if a resize was
+@return a pointer to the start of the inserted range or nullptr if a resize was
 required and could not complete.
 
 Note that if no allocation is permitted the fdeq behaves as a ring buffer.
@@ -278,13 +278,13 @@ Notice that the start of the range, {0,0,3,...}, is overwritten. */
 
 /** @brief Pop an element from the front of the fdeq. O(1).
 @param [in] fdeq a pointer to the fdeq.
-@return ok if the pop was successful. If fdeq is NULL or the fdeq is empty an
+@return ok if the pop was successful. If fdeq is nullptr or the fdeq is empty an
 input error is returned. */
 ccc_result ccc_fdeq_pop_front(ccc_flat_double_ended_queue *fdeq);
 
 /** @brief Pop an element from the back of the fdeq. O(1).
 @param [in] fdeq a pointer to the fdeq.
-@return ok if the pop was successful. If fdeq is NULL or the fdeq is empty an
+@return ok if the pop was successful. If fdeq is nullptr or the fdeq is empty an
 input error is returned. */
 ccc_result ccc_fdeq_pop_back(ccc_flat_double_ended_queue *fdeq);
 
@@ -297,11 +297,11 @@ Destroy the container. */
 /** @brief Set size of fdeq to 0 and call destructor on each element if needed.
 O(1) if no destructor is provided, else O(N).
 @param [in] fdeq a pointer to the fdeq.
-@param [in] destructor the destructor if needed or NULL.
+@param [in] destructor the destructor if needed or nullptr.
 
-Note that if destructor is non-NULL it will be called on each element in the
+Note that if destructor is non-nullptr it will be called on each element in the
 fdeq. However, the underlying buffer for the fdeq is not freed. If the
-destructor is NULL, setting the size to 0 is O(1). */
+destructor is nullptr, setting the size to 0 is O(1). */
 ccc_result ccc_fdeq_clear(ccc_flat_double_ended_queue *fdeq,
                           ccc_any_type_destructor_fn *destructor);
 
@@ -309,19 +309,19 @@ ccc_result ccc_fdeq_clear(ccc_flat_double_ended_queue *fdeq,
 Free the underlying buffer setting the capacity to 0. O(1) if no destructor is
 provided, else O(N).
 @param [in] fdeq a pointer to the fdeq.
-@param [in] destructor the destructor if needed or NULL.
+@param [in] destructor the destructor if needed or nullptr.
 
-Note that if destructor is non-NULL it will be called on each element in the
+Note that if destructor is non-nullptr it will be called on each element in the
 fdeq. After all elements are processed the buffer is freed and capacity is 0.
-If destructor is NULL the buffer is freed directly and capacity is 0. */
+If destructor is nullptr the buffer is freed directly and capacity is 0. */
 ccc_result ccc_fdeq_clear_and_free(ccc_flat_double_ended_queue *fdeq,
                                    ccc_any_type_destructor_fn *destructor);
 
 /** @brief Frees all slots in the fdeq and frees the underlying buffer that was
 previously dynamically reserved with the reserve function.
 @param [in] fdeq the fdeq to be cleared.
-@param [in] destructor the destructor for each element. NULL can be passed if no
-maintenance is required on the elements in the fdeq before their slots are
+@param [in] destructor the destructor for each element. nullptr can be passed if
+no maintenance is required on the elements in the fdeq before their slots are
 dropped.
 @param [in] alloc the required allocation function to provide to a dynamically
 reserved fdeq. Any auxiliary data provided upon initialization will be passed to
@@ -356,25 +356,26 @@ Interact with the state of the FDEQ. */
 
 /** @brief Return a pointer to the front element of the fdeq. O(1).
 @param [in] fdeq a pointer to the fdeq.
-@return a pointer to the user type at the start of the fdeq. NULL if empty. */
+@return a pointer to the user type at the start of the fdeq. nullptr if empty.
+*/
 [[nodiscard]] void *ccc_fdeq_begin(ccc_flat_double_ended_queue const *fdeq);
 
 /** @brief Return a pointer to the back element of the fdeq. O(1).
 @param [in] fdeq a pointer to the fdeq.
-@return a pointer to the user type at the back of the fdeq. NULL if empty. */
+@return a pointer to the user type at the back of the fdeq. nullptr if empty. */
 [[nodiscard]] void *ccc_fdeq_rbegin(ccc_flat_double_ended_queue const *fdeq);
 
 /** @brief Return the next element in the fdeq moving front to back. O(1).
 @param [in] fdeq a pointer to the fdeq.
 @param [in] iter_ptr the current element in the fdeq.
-@return the element following iter_ptr or NULL if no elements follow. */
+@return the element following iter_ptr or nullptr if no elements follow. */
 [[nodiscard]] void *ccc_fdeq_next(ccc_flat_double_ended_queue const *fdeq,
                                   void const *iter_ptr);
 
 /** @brief Return the next element in the fdeq moving back to front. O(1).
 @param [in] fdeq a pointer to the fdeq.
 @param [in] iter_ptr the current element in the fdeq.
-@return the element preceding iter_ptr or NULL if no elements follow. */
+@return the element preceding iter_ptr or nullptr if no elements follow. */
 [[nodiscard]] void *ccc_fdeq_rnext(ccc_flat_double_ended_queue const *fdeq,
                                    void const *iter_ptr);
 
@@ -406,30 +407,31 @@ worry about where the front is for indexing purposes. */
 
 /** @brief Return a reference to the front of the fdeq. O(1).
 @param [in] fdeq a pointer to the fdeq.
-@return a reference to the front element or NULL if fdeq is NULL or the fdeq is
-empty. */
+@return a reference to the front element or nullptr if fdeq is nullptr or the
+fdeq is empty. */
 [[nodiscard]] void *ccc_fdeq_front(ccc_flat_double_ended_queue const *fdeq);
 
 /** @brief Return a reference to the back of the fdeq. O(1).
 @param [in] fdeq a pointer to the fdeq.
-@return a reference to the back element or NULL if fdeq is NULL or the fdeq is
-empty. */
+@return a reference to the back element or nullptr if fdeq is nullptr or the
+fdeq is empty. */
 [[nodiscard]] void *ccc_fdeq_back(ccc_flat_double_ended_queue const *fdeq);
 
 /** @brief Return true if the size of the fdeq is 0. O(1).
 @param [in] fdeq a pointer to the fdeq.
-@return true if the size is 0 or false. Error if fdeq is NULL. */
+@return true if the size is 0 or false. Error if fdeq is nullptr. */
 [[nodiscard]] ccc_tribool
 ccc_fdeq_is_empty(ccc_flat_double_ended_queue const *fdeq);
 
 /** @brief Return the size of the fdeq representing active slots. O(1).
 @param [in] fdeq a pointer to the fdeq.
-@return the size of the fdeq or an argument error is set if fdeq is NULL. */
+@return the size of the fdeq or an argument error is set if fdeq is nullptr. */
 [[nodiscard]] ccc_ucount ccc_fdeq_size(ccc_flat_double_ended_queue const *fdeq);
 
 /** @brief Return the capacity representing total possible slots. O(1).
 @param [in] fdeq a pointer to the fdeq.
-@return the capacity of the fdeq or an argument error is set if fdeq is NULL. */
+@return the capacity of the fdeq or an argument error is set if fdeq is nullptr.
+*/
 [[nodiscard]] ccc_ucount
 ccc_fdeq_capacity(ccc_flat_double_ended_queue const *fdeq);
 
@@ -448,7 +450,7 @@ the array may not point to valid data in terms of organization of the fdeq. */
 /** @brief Return true if the internal invariants of the fdeq.
 @param [in] fdeq a pointer to the fdeq.
 @return true if the internal invariants of the fdeq are held, else false. Error
-if fdeq is NULL. */
+if fdeq is nullptr. */
 [[nodiscard]] ccc_tribool
 ccc_fdeq_validate(ccc_flat_double_ended_queue const *fdeq);
 

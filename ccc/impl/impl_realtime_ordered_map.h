@@ -102,13 +102,13 @@ void *ccc_impl_rom_insert(struct ccc_romap *rom, struct ccc_romap_elem *parent,
 /** @private */
 #define ccc_impl_rom_new(realtime_ordered_map_entry)                           \
     (__extension__({                                                           \
-        void *impl_rom_ins_alloc_ret = NULL;                                   \
+        void *impl_rom_ins_alloc_ret = nullptr;                                \
         if ((realtime_ordered_map_entry)->rom->alloc)                          \
         {                                                                      \
             impl_rom_ins_alloc_ret                                             \
                 = (realtime_ordered_map_entry)                                 \
                       ->rom->alloc(                                            \
-                          NULL,                                                \
+                          nullptr,                                             \
                           (realtime_ordered_map_entry)->rom->sizeof_type,      \
                           (realtime_ordered_map_entry)->rom->aux);             \
         }                                                                      \
@@ -188,7 +188,7 @@ void *ccc_impl_rom_insert(struct ccc_romap *rom, struct ccc_romap_elem *parent,
                                  lazy_key_value...)                            \
     (__extension__({                                                           \
         __auto_type impl_or_ins_entry_ptr = (realtime_ordered_map_entry_ptr);  \
-        typeof(lazy_key_value) *impl_rom_or_ins_ret = NULL;                    \
+        typeof(lazy_key_value) *impl_rom_or_ins_ret = nullptr;                 \
         if (impl_or_ins_entry_ptr)                                             \
         {                                                                      \
             struct ccc_rtree_entry *impl_rom_or_ins_ent                        \
@@ -212,7 +212,7 @@ void *ccc_impl_rom_insert(struct ccc_romap *rom, struct ccc_romap_elem *parent,
                                     lazy_key_value...)                         \
     (__extension__({                                                           \
         __auto_type impl_ins_entry_ptr = (realtime_ordered_map_entry_ptr);     \
-        typeof(lazy_key_value) *impl_rom_ins_ent_ret = NULL;                   \
+        typeof(lazy_key_value) *impl_rom_ins_ent_ret = nullptr;                \
         if (impl_ins_entry_ptr)                                                \
         {                                                                      \
             struct ccc_rtree_entry *impl_rom_ins_ent                           \

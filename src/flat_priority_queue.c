@@ -91,7 +91,7 @@ ccc_fpq_push(ccc_flat_priority_queue *const fpq, void const *const e)
 {
     if (!fpq || !e)
     {
-        return NULL;
+        return nullptr;
     }
     if (fpq->buf.count + SWAP_SPACE >= fpq->buf.capacity)
     {
@@ -99,13 +99,13 @@ ccc_fpq_push(ccc_flat_priority_queue *const fpq, void const *const e)
             = ccc_buf_alloc(&fpq->buf, fpq->buf.capacity * 2, fpq->buf.alloc);
         if (extra_space != CCC_RESULT_OK)
         {
-            return NULL;
+            return nullptr;
         }
     }
     void *const new = ccc_buf_alloc_back(&fpq->buf);
     if (!new)
     {
-        return NULL;
+        return nullptr;
     }
     if (new != e)
     {
@@ -186,7 +186,7 @@ ccc_fpq_update(ccc_flat_priority_queue *const fpq, void *const e,
 {
     if (!fpq || !e || !fn || ccc_buf_is_empty(&fpq->buf))
     {
-        return NULL;
+        return nullptr;
     }
     fn((ccc_any_type){
         .any_type = e,
@@ -216,7 +216,7 @@ ccc_fpq_front(ccc_flat_priority_queue const *const fpq)
 {
     if (!fpq || ccc_buf_is_empty(&fpq->buf))
     {
-        return NULL;
+        return nullptr;
     }
     return at(fpq, 0);
 }
@@ -254,7 +254,7 @@ ccc_fpq_capacity(ccc_flat_priority_queue const *const fpq)
 void *
 ccc_fpq_data(ccc_flat_priority_queue const *const fpq)
 {
-    return fpq ? ccc_buf_begin(&fpq->buf) : NULL;
+    return fpq ? ccc_buf_begin(&fpq->buf) : nullptr;
 }
 
 ccc_threeway_cmp

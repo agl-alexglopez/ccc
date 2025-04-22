@@ -85,7 +85,7 @@ destructors.
 @param [in] cmp_fn the ccc_any_type_cmp_fn used to compare list elements.
 @param [in] aux_data any auxilliary data that will be needed for comparison,
 printing, or destruction of elements.
-@param [in] alloc_fn the optional allocation function or NULL.
+@param [in] alloc_fn the optional allocation function or nullptr.
 @return the initialized list. Assign to the list directly on the right hand
 side of an equality operator. Initialization can occur at runtime or compile
 time (e.g. ccc_doubly_linked l = ccc_dll_init(...);). */
@@ -106,7 +106,7 @@ the back of the list. O(1).
 @param [in] type_initializer the r-value initializer of the type to be inserted
 in the list. This should match the type containing dll elements as a struct
 member for this list.
-@return a reference to the inserted element or NULL if allocation is not
+@return a reference to the inserted element or nullptr if allocation is not
 allowed or fails.
 
 Note that it does not make sense to use this method if the list has been
@@ -122,7 +122,7 @@ the front of the list. O(1).
 @param [in] type_initializer the r-value initializer of the type to be inserted
 in the list. This should match the type containing dll elements as a struct
 member for this list.
-@return a reference to the inserted element or NULL if allocation is not
+@return a reference to the inserted element or nullptr if allocation is not
 allowed or fails.
 
 Note that it does not make sense to use this method if the list has been
@@ -135,7 +135,7 @@ the user prior to any inserts into the list. */
 /** @brief Push user type wrapping elem to the front of the list. O(1).
 @param [in] l a pointer to the doubly linked list.
 @param [in] elem a pointer to the list element.
-@return a pointer to the element inserted or NULL if bad input is provided
+@return a pointer to the element inserted or nullptr if bad input is provided
 or allocation fails. */
 [[nodiscard]] void *ccc_dll_push_front(ccc_doubly_linked_list *l,
                                        ccc_dll_elem *elem);
@@ -143,7 +143,7 @@ or allocation fails. */
 /** @brief Push user type wrapping elem to the back of the list. O(1).
 @param [in] l a pointer to the doubly linked list.
 @param [in] elem a pointer to the list element.
-@return a pointer to the element inserted or NULL if bad input is provided
+@return a pointer to the element inserted or nullptr if bad input is provided
 or allocation fails. */
 [[nodiscard]] void *ccc_dll_push_back(ccc_doubly_linked_list *l,
                                       ccc_dll_elem *elem);
@@ -152,7 +152,7 @@ or allocation fails. */
 @param [in] l a pointer to the doubly linked list.
 @param [in] pos_elem a pointer to the list element before which elem inserts.
 @param [in] elem a pointer to the list element.
-@return a pointer to the element inserted or NULL if bad input is provided
+@return a pointer to the element inserted or nullptr if bad input is provided
 or allocation fails. */
 [[nodiscard]] void *ccc_dll_insert(ccc_doubly_linked_list *l,
                                    ccc_dll_elem *pos_elem, ccc_dll_elem *elem);
@@ -174,16 +174,16 @@ without deallocating regardless of allocation permission provided to the
 container. O(1).
 @param [in] l a pointer to the doubly linked list.
 @param [in] elem the handle of an element known to be in the list.
-@return a reference to the element in the list following elem or NULL if the
-element is the last. NULL is returned if bad input is provided or the elem is
+@return a reference to the element in the list following elem or nullptr if the
+element is the last. nullptr is returned if bad input is provided or the elem is
 not in the list. */
 void *ccc_dll_extract(ccc_doubly_linked_list *l, ccc_dll_elem *elem);
 
 /** @brief Returns the element following an erased element from the list. O(1).
 @param [in] l a pointer to the doubly linked list.
 @param [in] elem the handle of an element known to be in the list.
-@return a reference to the element in the list following elem or NULL if the
-element is the last. NULL is returned if bad input is provided or the elem is
+@return a reference to the element in the list following elem or nullptr if the
+element is the last. nullptr is returned if bad input is provided or the elem is
 not in the list. */
 void *ccc_dll_erase(ccc_doubly_linked_list *l, ccc_dll_elem *elem);
 
@@ -194,9 +194,9 @@ list. O(N).
 start of the range.
 @param [in] elem_end the handle of an element known to be in the list at the
 end of the range following elem_begin.
-@return a reference to the element in the list following elem_end or NULL if the
-element is the last. NULL is returned if bad input is provided or the elem is
-not in the list.
+@return a reference to the element in the list following elem_end or nullptr if
+the element is the last. nullptr is returned if bad input is provided or the
+elem is not in the list.
 
 Note that if the user does not permit the container to allocate they may iterate
 through the extracted range in the same way one iterates through a normal list
@@ -213,9 +213,9 @@ container. O(N).
 start of the range.
 @param [in] elem_end the handle of an element known to be in the list at the
 end of the range following elem_begin.
-@return a reference to the element in the list following elem_end or NULL if the
-element is the last. NULL is returned if bad input is provided or the elem is
-not in the list.
+@return a reference to the element in the list following elem_end or nullptr if
+the element is the last. nullptr is returned if bad input is provided or the
+elem is not in the list.
 
 Note that the user may iterate through the extracted range in the same way one
 iterates through a normal list using the iterator function. */
@@ -261,7 +261,7 @@ ccc_result ccc_dll_sort(ccc_doubly_linked_list *dll);
 of the list determined by the user provided comparison function.
 @param [in] dll a pointer to the doubly linked list.
 @param [in] e a pointer to the element to be inserted in order.
-@return a pointer to the element that has been inserted or NULL if allocation
+@return a pointer to the element that has been inserted or nullptr if allocation
 is required and has failed.
 @warning this function assumes the list is sorted.
 
@@ -273,7 +273,8 @@ void *ccc_dll_insert_sorted(ccc_doubly_linked_list *dll, ccc_dll_elem *e);
 /** @brief Returns true if the list is sorted in non-decreasing order according
 to the user provided comparison function.
 @param [in] dll a pointer to the singly linked list.
-@return CCC_TRUE if the list is sorted CCC_FALSE if not. Error if dll is NULL.
+@return CCC_TRUE if the list is sorted CCC_FALSE if not. Error if dll is
+nullptr.
 
 If a non-increasing order is desired, return opposite results from the user
 comparison function. If an element is CCC_LES return CCC_GRT and vice versa.
@@ -290,7 +291,8 @@ Deallocate the container. */
 permission. O(N).
 @param [in] l a pointer to the doubly linked list.
 @param [in] fn a destructor function to run on each element.
-@return ok if the clearing was a success or an input error if l or fn is NULL.
+@return ok if the clearing was a success or an input error if l or fn is
+nullptr.
 
 Note that if the list is initialized with allocation permission it will free
 elements for the user and the destructor function should only perform auxiliary
@@ -310,21 +312,23 @@ ccc_result ccc_dll_clear(ccc_doubly_linked_list *l,
 Iterate through the doubly linked list. */
 /**@{*/
 
-/** @brief Return the user type at the start of the list or NULL if empty. O(1).
+/** @brief Return the user type at the start of the list or nullptr if empty.
+O(1).
 @param [in] l a pointer to the doubly linked list.
-@return a pointer to the user type or NULL if empty or bad input. */
+@return a pointer to the user type or nullptr if empty or bad input. */
 [[nodiscard]] void *ccc_dll_begin(ccc_doubly_linked_list const *l);
 
-/** @brief Return the user type at the end of the list or NULL if empty. O(1).
+/** @brief Return the user type at the end of the list or nullptr if empty.
+O(1).
 @param [in] l a pointer to the doubly linked list.
-@return a pointer to the user type or NULL if empty or bad input. */
+@return a pointer to the user type or nullptr if empty or bad input. */
 [[nodiscard]] void *ccc_dll_rbegin(ccc_doubly_linked_list const *l);
 
 /** @brief Return the user type following the element known to be in the list.
 O(1).
 @param [in] l a pointer to the doubly linked list.
 @param [in] elem a handle to the list element known to be in the list.
-@return a pointer to the element following elem or NULL if no elements follow
+@return a pointer to the element following elem or nullptr if no elements follow
 or bad input is provided. */
 [[nodiscard]] void *ccc_dll_next(ccc_doubly_linked_list const *l,
                                  ccc_dll_elem const *elem);
@@ -333,8 +337,8 @@ or bad input is provided. */
 moving from back to front. O(1).
 @param [in] l a pointer to the doubly linked list.
 @param [in] elem a handle to the list element known to be in the list.
-@return a pointer to the element following elem from back to front or NULL if no
-elements follow or bad input is provided. */
+@return a pointer to the element following elem from back to front or nullptr if
+no elements follow or bad input is provided. */
 [[nodiscard]] void *ccc_dll_rnext(ccc_doubly_linked_list const *l,
                                   ccc_dll_elem const *elem);
 
@@ -356,48 +360,51 @@ Obtain state from the doubly linked list. */
 
 /** @brief Returns the user type at the front of the list. O(1).
 @param [in] l a pointer to the doubly linked list.
-@return a pointer to the user type at the front of the list. NULL if empty. */
+@return a pointer to the user type at the front of the list. nullptr if empty.
+*/
 [[nodiscard]] void *ccc_dll_front(ccc_doubly_linked_list const *l);
 
 /** @brief Returns the user type at the back of the list. O(1).
 @param [in] l a pointer to the doubly linked list.
-@return a pointer to the user type at the back of the list. NULL if empty. */
+@return a pointer to the user type at the back of the list. nullptr if empty. */
 [[nodiscard]] void *ccc_dll_back(ccc_doubly_linked_list const *l);
 
 /** @brief Return a handle to the list element at the front of the list which
 may be the sentinel. O(1).
 @param [in] l a pointer to the doubly linked list.
 @return a pointer to the list element at the beginning of the list which may be
-the sentinel but will not be NULL unless a NULL pointer is provided as l. */
+the sentinel but will not be nullptr unless a nullptr pointer is provided as l.
+*/
 [[nodiscard]] ccc_dll_elem *ccc_dll_begin_elem(ccc_doubly_linked_list const *l);
 
 /** @brief Return a handle to the list element at the back of the list which
 may be the sentinel. O(1).
 @param [in] l a pointer to the doubly linked list.
 @return a pointer to the list element at the end of the list which may be
-the sentinel but will not be NULL unless a NULL pointer is provided as l. */
+the sentinel but will not be nullptr unless a nullptr pointer is provided as l.
+*/
 [[nodiscard]] ccc_dll_elem *ccc_dll_end_elem(ccc_doubly_linked_list const *l);
 
 /** @brief Return a handle to the sentinel at the back of the list. O(1).
 @param [in] l a pointer to the doubly linked list.
-@return a pointer to the sentinel at the end of the list which will not be NULL
-unless a NULL pointer is provided as l. */
+@return a pointer to the sentinel at the end of the list which will not be
+nullptr unless a nullptr pointer is provided as l. */
 [[nodiscard]] ccc_dll_elem *
 ccc_dll_end_sentinel(ccc_doubly_linked_list const *l);
 
 /** @brief Return the size of the list. O(1).
 @param [in] l a pointer to the doubly linked list.
-@return the size of the list. An argument error is set if l is NULL. */
+@return the size of the list. An argument error is set if l is nullptr. */
 [[nodiscard]] ccc_ucount ccc_dll_size(ccc_doubly_linked_list const *l);
 
 /** @brief Return if the size of the list is equal to 0. O(1).
 @param [in] l a pointer to the doubly linked list.
-@return true if the size is 0, else false. Error if l is NULL. */
+@return true if the size is 0, else false. Error if l is nullptr. */
 [[nodiscard]] ccc_tribool ccc_dll_is_empty(ccc_doubly_linked_list const *l);
 
 /** @brief Validates internal state of the list.
 @param [in] l a pointer to the doubly linked list.
-@return true if invariants hold, false if not. Error if l is NULL. */
+@return true if invariants hold, false if not. Error if l is nullptr. */
 [[nodiscard]] ccc_tribool ccc_dll_validate(ccc_doubly_linked_list const *l);
 
 /**@}*/

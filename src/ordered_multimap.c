@@ -146,7 +146,7 @@ ccc_omm_get_key_val(ccc_ordered_multimap *const mm, void const *const key)
 {
     if (!mm || !key)
     {
-        return NULL;
+        return nullptr;
     }
     return find(mm, key);
 }
@@ -167,7 +167,8 @@ ccc_omm_entry(ccc_ordered_multimap *const mm, void const *const key)
     if (!mm || !key)
     {
         return (ccc_ommap_entry){
-            {.t = NULL, .entry = {.e = NULL, .stats = CCC_ENTRY_ARG_ERROR}}};
+            {.t = nullptr,
+             .entry = {.e = nullptr, .stats = CCC_ENTRY_ARG_ERROR}}};
     }
     return (ccc_ommap_entry){container_entry(mm, key)};
 }
@@ -178,7 +179,7 @@ ccc_omm_insert_entry(ccc_ommap_entry const *const e,
 {
     if (!e || !key_val_handle)
     {
-        return NULL;
+        return nullptr;
     }
     return multimap_insert(e->impl.t, key_val_handle).e;
 }
@@ -189,7 +190,7 @@ ccc_omm_or_insert(ccc_ommap_entry const *const e,
 {
     if (!e || !key_val_handle)
     {
-        return NULL;
+        return nullptr;
     }
     if (e->impl.entry.stats & CCC_ENTRY_OCCUPIED)
     {
@@ -203,11 +204,11 @@ ccc_omm_and_modify(ccc_ommap_entry *const e, ccc_any_type_update_fn *const fn)
 {
     if (!e || !fn)
     {
-        return NULL;
+        return nullptr;
     }
     if (e->impl.entry.stats & CCC_ENTRY_OCCUPIED && e->impl.entry.e)
     {
-        fn((ccc_any_type){.any_type = e->impl.entry.e, .aux = NULL});
+        fn((ccc_any_type){.any_type = e->impl.entry.e, .aux = nullptr});
     }
     return e;
 }
@@ -218,7 +219,7 @@ ccc_omm_and_modify_aux(ccc_ommap_entry *const e,
 {
     if (!e || !fn)
     {
-        return NULL;
+        return nullptr;
     }
     if (e->impl.entry.stats & CCC_ENTRY_OCCUPIED && e->impl.entry.e)
     {
@@ -233,16 +234,16 @@ ccc_omm_swap_entry(ccc_ordered_multimap *const mm,
 {
     if (!mm || !key_val_handle)
     {
-        return (ccc_entry){{.e = NULL, .stats = CCC_ENTRY_ARG_ERROR}};
+        return (ccc_entry){{.e = nullptr, .stats = CCC_ENTRY_ARG_ERROR}};
     }
     struct ccc_ommap_elem *n = key_val_handle;
     if (mm->alloc)
     {
-        void *const mem = mm->alloc(NULL, mm->sizeof_type, mm->aux);
+        void *const mem = mm->alloc(nullptr, mm->sizeof_type, mm->aux);
         if (!mem)
         {
             return (ccc_entry){{
-                .e = NULL,
+                .e = nullptr,
                 .stats = CCC_ENTRY_INSERT_ERROR,
             }};
         }
@@ -259,7 +260,7 @@ ccc_omm_try_insert(ccc_ordered_multimap *const mm,
     if (!mm || !key_val_handle)
     {
         return (ccc_entry){{
-            .e = NULL,
+            .e = nullptr,
             .stats = CCC_ENTRY_ARG_ERROR,
         }};
     }
@@ -282,7 +283,7 @@ ccc_omm_insert_or_assign(ccc_ordered_multimap *const mm,
     if (!mm || !key_val_handle)
     {
         return (ccc_entry){{
-            .e = NULL,
+            .e = nullptr,
             .stats = CCC_ENTRY_ARG_ERROR,
         }};
     }
@@ -307,7 +308,7 @@ ccc_omm_remove(ccc_ordered_multimap *const mm, ccc_ommap_elem *const out_handle)
     if (!mm || !out_handle)
     {
         return (ccc_entry){{
-            .e = NULL,
+            .e = nullptr,
             .stats = CCC_ENTRY_ARG_ERROR,
         }};
     }
@@ -315,7 +316,7 @@ ccc_omm_remove(ccc_ordered_multimap *const mm, ccc_ommap_elem *const out_handle)
     if (!n)
     {
         return (ccc_entry){{
-            .e = NULL,
+            .e = nullptr,
             .stats = CCC_ENTRY_VACANT,
         }};
     }
@@ -341,7 +342,7 @@ ccc_omm_remove_entry(ccc_ommap_entry *const e)
     if (!e)
     {
         return (ccc_entry){{
-            .e = NULL,
+            .e = nullptr,
             .stats = CCC_ENTRY_ARG_ERROR,
         }};
     }
@@ -354,7 +355,7 @@ ccc_omm_remove_entry(ccc_ommap_entry *const e)
         {
             e->impl.t->alloc(erased, 0, e->impl.t->aux);
             return (ccc_entry){{
-                .e = NULL,
+                .e = nullptr,
                 .stats = CCC_ENTRY_OCCUPIED,
             }};
         }
@@ -364,7 +365,7 @@ ccc_omm_remove_entry(ccc_ommap_entry *const e)
         }};
     }
     return (ccc_entry){{
-        .e = NULL,
+        .e = nullptr,
         .stats = CCC_ENTRY_VACANT,
     }};
 }
@@ -374,13 +375,13 @@ ccc_omm_max(ccc_ordered_multimap *const mm)
 {
     if (!mm)
     {
-        return NULL;
+        return nullptr;
     }
     struct ccc_ommap_elem const *const n
-        = splay(mm, mm->root, NULL, force_find_grt);
+        = splay(mm, mm->root, nullptr, force_find_grt);
     if (!n)
     {
-        return NULL;
+        return nullptr;
     }
     return struct_base(mm, n);
 }
@@ -390,13 +391,13 @@ ccc_omm_min(ccc_ordered_multimap *const mm)
 {
     if (!mm)
     {
-        return NULL;
+        return nullptr;
     }
     struct ccc_ommap_elem const *const n
-        = splay(mm, mm->root, NULL, force_find_les);
+        = splay(mm, mm->root, nullptr, force_find_les);
     if (!n)
     {
-        return NULL;
+        return nullptr;
     }
     return struct_base(mm, n);
 }
@@ -406,7 +407,7 @@ ccc_omm_begin(ccc_ordered_multimap const *const mm)
 {
     if (!mm)
     {
-        return NULL;
+        return nullptr;
     }
     return max(mm);
 }
@@ -416,7 +417,7 @@ ccc_omm_rbegin(ccc_ordered_multimap const *const mm)
 {
     if (!mm)
     {
-        return NULL;
+        return nullptr;
     }
     return min(mm);
 }
@@ -427,11 +428,11 @@ ccc_omm_next(ccc_ordered_multimap const *const mm,
 {
     if (!mm || !iter_handle)
     {
-        return NULL;
+        return nullptr;
     }
     struct ccc_ommap_elem const *const n
         = multimap_next(mm, iter_handle, R_INORDER);
-    return n == &mm->end ? NULL : struct_base(mm, n);
+    return n == &mm->end ? nullptr : struct_base(mm, n);
 }
 
 void *
@@ -440,23 +441,23 @@ ccc_omm_rnext(ccc_ordered_multimap const *const mm,
 {
     if (!mm || !iter_handle)
     {
-        return NULL;
+        return nullptr;
     }
     struct ccc_ommap_elem const *const n
         = multimap_next(mm, iter_handle, INORDER);
-    return n == &mm->end ? NULL : struct_base(mm, n);
+    return n == &mm->end ? nullptr : struct_base(mm, n);
 }
 
 void *
 ccc_omm_end(ccc_ordered_multimap const *const)
 {
-    return NULL;
+    return nullptr;
 }
 
 void *
 ccc_omm_rend(ccc_ordered_multimap const *const)
 {
-    return NULL;
+    return nullptr;
 }
 
 ccc_range
@@ -487,7 +488,7 @@ ccc_omm_extract(ccc_ordered_multimap *const mm,
 {
     if (!mm || !key_val_handle)
     {
-        return NULL;
+        return nullptr;
     }
     return multimap_erase_node(mm, key_val_handle);
 }
@@ -715,7 +716,7 @@ container_entry(struct ccc_ommap *const t, void const *const key)
     return (struct ccc_omultimap_entry){
         .t = t,
         .entry = {
-            .e = NULL,
+            .e = nullptr,
             .stats = CCC_ENTRY_VACANT,
         },
     };
@@ -726,11 +727,11 @@ find(struct ccc_ommap *const t, void const *const key)
 {
     if (t->root == &t->end)
     {
-        return NULL;
+        return nullptr;
     }
     t->root = splay(t, t->root, key, t->cmp);
     return cmp(t, key, t->root, t->cmp) == CCC_EQL ? struct_base(t, t->root)
-                                                   : NULL;
+                                                   : nullptr;
 }
 
 static inline void
@@ -752,7 +753,7 @@ max(struct ccc_ommap const *const t)
 {
     if (!t->size)
     {
-        return NULL;
+        return nullptr;
     }
     struct ccc_ommap_elem *m = t->root;
     for (; m->branch[R] != &t->end; m = m->branch[R])
@@ -765,7 +766,7 @@ min(struct ccc_ommap const *const t)
 {
     if (!t->size)
     {
-        return NULL;
+        return nullptr;
     }
     struct ccc_ommap_elem *m = t->root;
     for (; m->branch[L] != &t->end; m = m->branch[L])
@@ -788,7 +789,7 @@ pop_min(struct ccc_ommap *const t)
 static inline ccc_tribool
 is_dup_head_next(struct ccc_ommap_elem const *const i)
 {
-    return i->link[R]->parent != NULL;
+    return i->link[R]->parent != nullptr;
 }
 
 static inline ccc_tribool
@@ -804,7 +805,7 @@ multimap_next(struct ccc_ommap const *const t,
               enum tree_link const traversal)
 {
     /* An arbitrary node in a doubly linked list of duplicates. */
-    if (NULL == i->parent)
+    if (nullptr == i->parent)
     {
         /* We have finished the lap around the duplicate list. */
         if (is_dup_head_next(i))
@@ -857,7 +858,7 @@ next(struct ccc_ommap const *const t, struct ccc_ommap_elem const *n,
 {
     if (!n || n == &t->end)
     {
-        return NULL;
+        return nullptr;
     }
     assert(parent_r(t, t->root) == &t->end);
     /* The node is a parent, backtracked to, or the end. */
@@ -902,8 +903,8 @@ equal_range(struct ccc_ommap *const t, void const *const begin_key,
         e = next(t, e, traversal);
     }
     return (struct ccc_range_u){
-        .begin = b == &t->end ? NULL : struct_base(t, b),
-        .end = e == &t->end ? NULL : struct_base(t, e),
+        .begin = b == &t->end ? nullptr : struct_base(t, b),
+        .end = e == &t->end ? nullptr : struct_base(t, e),
     };
 }
 
@@ -975,7 +976,7 @@ add_duplicate(struct ccc_ommap *const t, struct ccc_ommap_elem *const tree_node,
         add->link[P] = add;
         return;
     }
-    add->parent = NULL;
+    add->parent = nullptr;
     struct ccc_ommap_elem *const list_head = tree_node->dup_head;
     struct ccc_ommap_elem *const tail = list_head->link[P];
     tail->link[N] = add;
@@ -989,16 +990,16 @@ multimap_erase(struct ccc_ommap *const t, void const *const key)
 {
     if (!t || !key)
     {
-        return NULL;
+        return nullptr;
     }
     if (empty(t))
     {
-        return NULL;
+        return nullptr;
     }
     struct ccc_ommap_elem *ret = splay(t, t->root, key, t->cmp);
     if (cmp(t, key, ret, t->cmp) != CCC_EQL)
     {
-        return NULL;
+        return nullptr;
     }
     --t->size;
     if (has_dups(&t->end, ret))
@@ -1009,7 +1010,7 @@ multimap_erase(struct ccc_ommap *const t, void const *const key)
     {
         ret = remove_from_tree(t, ret);
     }
-    ret->branch[L] = ret->branch[R] = ret->parent = NULL;
+    ret->branch[L] = ret->branch[R] = ret->parent = nullptr;
     return struct_base(t, ret);
 }
 
@@ -1025,14 +1026,14 @@ multimap_erase_max_or_min(struct ccc_ommap *const t,
 {
     if (!t || !force_max_or_min)
     {
-        return NULL;
+        return nullptr;
     }
     if (empty(t))
     {
-        return NULL;
+        return nullptr;
     }
     t->size--;
-    struct ccc_ommap_elem *ret = splay(t, t->root, NULL, force_max_or_min);
+    struct ccc_ommap_elem *ret = splay(t, t->root, nullptr, force_max_or_min);
     if (has_dups(&t->end, ret))
     {
         ret = pop_front_dup(t, ret, key_from_node(t, ret));
@@ -1041,7 +1042,7 @@ multimap_erase_max_or_min(struct ccc_ommap *const t,
     {
         ret = remove_from_tree(t, ret);
     }
-    ret->branch[L] = ret->branch[R] = ret->parent = NULL;
+    ret->branch[L] = ret->branch[R] = ret->parent = nullptr;
     return struct_base(t, ret);
 }
 
@@ -1055,13 +1056,13 @@ multimap_erase_node(struct ccc_ommap *const t,
                     struct ccc_ommap_elem *const node)
 {
     /* This is what we set removed nodes to so this is a mistaken query */
-    if (NULL == node->branch[R] || NULL == node->branch[L])
+    if (nullptr == node->branch[R] || nullptr == node->branch[L])
     {
-        return NULL;
+        return nullptr;
     }
     if (empty(t))
     {
-        return NULL;
+        return nullptr;
     }
     t->size--;
     /* Special case that this must be a duplicate that is in the
@@ -1073,14 +1074,14 @@ multimap_erase_node(struct ccc_ommap *const t,
                && node->link[P]->link[N] == node);
         node->link[P]->link[N] = node->link[N];
         node->link[N]->link[P] = node->link[P];
-        node->link[N] = node->link[P] = node->parent = NULL;
+        node->link[N] = node->link[P] = node->parent = nullptr;
         return struct_base(t, node);
     }
     void const *const key = key_from_node(t, node);
     struct ccc_ommap_elem *ret = splay(t, t->root, key, t->cmp);
     if (cmp(t, key, ret, t->cmp) != CCC_EQL)
     {
-        return NULL;
+        return nullptr;
     }
     if (has_dups(&t->end, ret))
     {
@@ -1090,7 +1091,7 @@ multimap_erase_node(struct ccc_ommap *const t,
     {
         ret = remove_from_tree(t, ret);
     }
-    ret->branch[L] = ret->branch[R] = ret->parent = NULL;
+    ret->branch[L] = ret->branch[R] = ret->parent = nullptr;
     return struct_base(t, ret);
 }
 

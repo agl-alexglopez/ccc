@@ -11,9 +11,10 @@
 CHECK_BEGIN_STATIC_FN(dll_test_construct)
 {
     struct val val = {};
-    doubly_linked_list dll = dll_init(dll, struct val, e, val_cmp, NULL, NULL);
+    doubly_linked_list dll
+        = dll_init(dll, struct val, e, val_cmp, nullptr, nullptr);
     CHECK(is_empty(&dll), true);
-    CHECK(dll_push_front(&dll, &val.e) != NULL, true);
+    CHECK(dll_push_front(&dll, &val.e) != nullptr, true);
     CHECK(is_empty(&dll), false);
     CHECK(size(&dll).count, 1);
     CHECK_END_FN();

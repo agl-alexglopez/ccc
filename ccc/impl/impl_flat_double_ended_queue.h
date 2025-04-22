@@ -52,7 +52,7 @@ void *ccc_impl_fdeq_alloc_back(struct ccc_fdeq *);
 #define ccc_impl_fdeq_emplace_back(fdeq_ptr, value...)                         \
     (__extension__({                                                           \
         __auto_type impl_fdeq_ptr = (fdeq_ptr);                                \
-        void *const impl_fdeq_emplace_ret = NULL;                              \
+        void *const impl_fdeq_emplace_ret = nullptr;                           \
         if (impl_fdeq_ptr)                                                     \
         {                                                                      \
             void *const impl_fdeq_emplace_ret                                  \
@@ -69,7 +69,7 @@ void *ccc_impl_fdeq_alloc_back(struct ccc_fdeq *);
 #define ccc_impl_fdeq_emplace_front(fdeq_ptr, value...)                        \
     (__extension__({                                                           \
         __auto_type impl_fdeq_ptr = (fdeq_ptr);                                \
-        void *const impl_fdeq_emplace_ret = NULL;                              \
+        void *const impl_fdeq_emplace_ret = nullptr;                           \
         if (impl_fdeq_ptr)                                                     \
         {                                                                      \
             void *const impl_fdeq_emplace_ret                                  \

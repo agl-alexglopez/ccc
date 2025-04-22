@@ -29,13 +29,13 @@ CHECK_BEGIN_FN(check_order, doubly_linked_list const *const dll, size_t const n,
     struct val *v = begin(dll);
     for (; v != end(dll) && i < n; v = next(dll, &v->e), ++i)
     {
-        CHECK(v == NULL, false);
+        CHECK(v == nullptr, false);
         CHECK(order[i], v->val);
     }
     i = n;
     for (v = rbegin(dll); v != rend(dll) && i--; v = rnext(dll, &v->e))
     {
-        CHECK(v == NULL, false);
+        CHECK(v == nullptr, false);
         CHECK(order[i], v->val);
     }
     CHECK_END_FN_FAIL({
@@ -77,11 +77,11 @@ CHECK_BEGIN_FN(create_list, ccc_doubly_linked_list *const dll,
     {
         if (dir == UTIL_PUSH_FRONT)
         {
-            CHECK(push_front(dll, &vals[i].e) == NULL, false);
+            CHECK(push_front(dll, &vals[i].e) == nullptr, false);
         }
         else
         {
-            CHECK(push_back(dll, &vals[i].e) == NULL, false);
+            CHECK(push_back(dll, &vals[i].e) == nullptr, false);
         }
     }
     CHECK(validate(dll), true);

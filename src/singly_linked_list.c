@@ -65,14 +65,14 @@ ccc_sll_push_front(ccc_singly_linked_list *const sll, ccc_sll_elem *elem)
 {
     if (!sll || !elem)
     {
-        return NULL;
+        return nullptr;
     }
     if (sll->alloc)
     {
-        void *const node = sll->alloc(NULL, sll->sizeof_type, sll->aux);
+        void *const node = sll->alloc(nullptr, sll->sizeof_type, sll->aux);
         if (!node)
         {
-            return NULL;
+            return nullptr;
         }
         (void)memcpy(node, struct_base(sll, elem), sll->sizeof_type);
         elem = elem_in(sll, node);
@@ -86,7 +86,7 @@ ccc_sll_front(ccc_singly_linked_list const *const sll)
 {
     if (!sll || sll->nil.n == &sll->nil)
     {
-        return NULL;
+        return nullptr;
     }
     return struct_base(sll, sll->nil.n);
 }
@@ -94,13 +94,13 @@ ccc_sll_front(ccc_singly_linked_list const *const sll)
 ccc_sll_elem *
 ccc_sll_begin_elem(ccc_singly_linked_list const *const sll)
 {
-    return sll ? sll->nil.n : NULL;
+    return sll ? sll->nil.n : nullptr;
 }
 
 ccc_sll_elem *
 ccc_sll_begin_sentinel(ccc_singly_linked_list const *const sll)
 {
-    return sll ? (ccc_sll_elem *)&sll->nil : NULL;
+    return sll ? (ccc_sll_elem *)&sll->nil : nullptr;
 }
 
 ccc_result
@@ -180,20 +180,20 @@ ccc_sll_erase(ccc_singly_linked_list *const sll, ccc_sll_elem *const elem)
 {
     if (!sll || !elem || !sll->count || elem == &sll->nil)
     {
-        return NULL;
+        return nullptr;
     }
     struct ccc_sll_elem const *const ret = elem->n;
     before(sll, elem)->n = elem->n;
     if (elem != &sll->nil)
     {
-        elem->n = NULL;
+        elem->n = nullptr;
     }
     if (sll->alloc)
     {
         (void)sll->alloc(struct_base(sll, elem), 0, sll->aux);
     }
     --sll->count;
-    return ret == &sll->nil ? NULL : struct_base(sll, ret);
+    return ret == &sll->nil ? nullptr : struct_base(sll, ret);
 }
 
 void *
@@ -203,14 +203,14 @@ ccc_sll_erase_range(ccc_singly_linked_list *const sll,
     if (!sll || !begin || !end || !sll->count || begin == &sll->nil
         || end == &sll->nil)
     {
-        return NULL;
+        return nullptr;
     }
     struct ccc_sll_elem const *const ret = end->n;
     before(sll, begin)->n = end->n;
     size_t const deleted = erase_range(sll, begin, end);
     assert(deleted <= sll->count);
     sll->count -= deleted;
-    return ret == &sll->nil ? NULL : struct_base(sll, ret);
+    return ret == &sll->nil ? nullptr : struct_base(sll, ret);
 }
 
 void *
@@ -218,16 +218,16 @@ ccc_sll_extract(ccc_singly_linked_list *const sll, ccc_sll_elem *const elem)
 {
     if (!sll || !elem || !sll->count || elem == &sll->nil)
     {
-        return NULL;
+        return nullptr;
     }
     struct ccc_sll_elem const *const ret = elem->n;
     before(sll, elem)->n = elem->n;
     if (elem != &sll->nil)
     {
-        elem->n = NULL;
+        elem->n = nullptr;
     }
     --sll->count;
-    return ret == &sll->nil ? NULL : struct_base(sll, ret);
+    return ret == &sll->nil ? nullptr : struct_base(sll, ret);
 }
 
 void *
@@ -237,14 +237,14 @@ ccc_sll_extract_range(ccc_singly_linked_list *const sll,
     if (!sll || !begin || !end || !sll->count || begin == &sll->nil
         || end == &sll->nil)
     {
-        return NULL;
+        return nullptr;
     }
     struct ccc_sll_elem const *const ret = end->n;
     before(sll, begin)->n = end->n;
     size_t const deleted = extract_range(sll, begin, end);
     assert(deleted <= sll->count);
     sll->count -= deleted;
-    return ret == &sll->nil ? NULL : struct_base(sll, ret);
+    return ret == &sll->nil ? nullptr : struct_base(sll, ret);
 }
 
 void *
@@ -252,7 +252,7 @@ ccc_sll_begin(ccc_singly_linked_list const *const sll)
 {
     if (!sll || sll->nil.n == &sll->nil)
     {
-        return NULL;
+        return nullptr;
     }
     return struct_base(sll, sll->nil.n);
 }
@@ -260,7 +260,7 @@ ccc_sll_begin(ccc_singly_linked_list const *const sll)
 void *
 ccc_sll_end(ccc_singly_linked_list const *const)
 {
-    return NULL;
+    return nullptr;
 }
 
 void *
@@ -269,7 +269,7 @@ ccc_sll_next(ccc_singly_linked_list const *const sll,
 {
     if (!sll || !elem || elem->n == &sll->nil)
     {
-        return NULL;
+        return nullptr;
     }
     return struct_base(sll, elem->n);
 }
@@ -375,14 +375,14 @@ ccc_sll_insert_sorted(ccc_singly_linked_list *sll, ccc_sll_elem *e)
 {
     if (!sll || !e)
     {
-        return NULL;
+        return nullptr;
     }
     if (sll->alloc)
     {
-        void *const node = sll->alloc(NULL, sll->sizeof_type, sll->aux);
+        void *const node = sll->alloc(nullptr, sll->sizeof_type, sll->aux);
         if (!node)
         {
-            return NULL;
+            return nullptr;
         }
         (void)memcpy(node, struct_base(sll, e), sll->sizeof_type);
         e = elem_in(sll, node);
@@ -536,7 +536,7 @@ pop_front(struct ccc_sll *const sll)
     sll->nil.n = remove->n;
     if (remove != &sll->nil)
     {
-        remove->n = NULL;
+        remove->n = nullptr;
     }
     --sll->count;
     return remove;
@@ -559,7 +559,7 @@ extract_range([[maybe_unused]] struct ccc_sll *const sll,
     size_t const count = len(begin, end);
     if (end != &sll->nil)
     {
-        end->n = NULL;
+        end->n = nullptr;
     }
     return count;
 }
@@ -573,12 +573,13 @@ erase_range([[maybe_unused]] struct ccc_sll *const sll,
         size_t const count = len(begin, end);
         if (end != &sll->nil)
         {
-            end->n = NULL;
+            end->n = nullptr;
         }
         return count;
     }
     size_t count = 1;
-    for (struct ccc_sll_elem *next = NULL; begin != end; begin = next, ++count)
+    for (struct ccc_sll_elem *next = nullptr; begin != end;
+         begin = next, ++count)
     {
         assert(count <= sll->count);
         next = begin->n;

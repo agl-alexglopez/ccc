@@ -155,7 +155,7 @@ CHECK_BEGIN_STATIC_FN(iterator_check, ccc_ordered_map *s)
 CHECK_BEGIN_STATIC_FN(omap_test_forward_iter)
 {
     ccc_ordered_map s
-        = ccc_om_init(s, struct val, elem, key, id_cmp, NULL, NULL);
+        = ccc_om_init(s, struct val, elem, key, id_cmp, nullptr, nullptr);
     /* We should have the expected behavior iteration over empty tree. */
     int j = 0;
     for (struct val *e = begin(&s); e != end(&s); e = next(&s, &e->elem), ++j)
@@ -187,10 +187,10 @@ CHECK_BEGIN_STATIC_FN(omap_test_forward_iter)
 CHECK_BEGIN_STATIC_FN(omap_test_iterate_removal)
 {
     ccc_ordered_map s
-        = ccc_om_init(s, struct val, elem, key, id_cmp, NULL, NULL);
+        = ccc_om_init(s, struct val, elem, key, id_cmp, nullptr, nullptr);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
-    srand(time(NULL));
+    srand(time(nullptr));
     size_t const num_nodes = 1000;
     struct val vals[1000];
     for (size_t i = 0; i < num_nodes; ++i)
@@ -203,7 +203,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_iterate_removal)
     }
     CHECK(iterator_check(&s), PASS);
     int const limit = 400;
-    for (struct val *i = begin(&s), *next = NULL; i; i = next)
+    for (struct val *i = begin(&s), *next = nullptr; i; i = next)
     {
         next = next(&s, &i->elem);
         if (i->key > limit)
@@ -218,10 +218,10 @@ CHECK_BEGIN_STATIC_FN(omap_test_iterate_removal)
 CHECK_BEGIN_STATIC_FN(omap_test_iterate_remove_reinsert)
 {
     ccc_ordered_map s
-        = ccc_om_init(s, struct val, elem, key, id_cmp, NULL, NULL);
+        = ccc_om_init(s, struct val, elem, key, id_cmp, nullptr, nullptr);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
-    srand(time(NULL));
+    srand(time(nullptr));
     size_t const num_nodes = 1000;
     struct val vals[1000];
     for (size_t i = 0; i < num_nodes; ++i)
@@ -236,14 +236,15 @@ CHECK_BEGIN_STATIC_FN(omap_test_iterate_remove_reinsert)
     size_t const old_size = size(&s).count;
     int const limit = 400;
     int new_unique_entry_val = 1001;
-    for (struct val *i = begin(&s), *next = NULL; i; i = next)
+    for (struct val *i = begin(&s), *next = nullptr; i; i = next)
     {
         next = next(&s, &i->elem);
         if (i->key < limit)
         {
             (void)remove(&s, &i->elem);
             i->key = new_unique_entry_val;
-            CHECK(insert_entry(entry_r(&s, &i->key), &i->elem) != NULL, true);
+            CHECK(insert_entry(entry_r(&s, &i->key), &i->elem) != nullptr,
+                  true);
             CHECK(validate(&s), true);
             ++new_unique_entry_val;
         }
@@ -255,7 +256,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_iterate_remove_reinsert)
 CHECK_BEGIN_STATIC_FN(omap_test_valid_range)
 {
     ccc_ordered_map s
-        = ccc_om_init(s, struct val, elem, key, id_cmp, NULL, NULL);
+        = ccc_om_init(s, struct val, elem, key, id_cmp, nullptr, nullptr);
 
     int const num_nodes = 25;
     struct val vals[25];
@@ -285,7 +286,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_valid_range)
 CHECK_BEGIN_STATIC_FN(omap_test_valid_range_equals)
 {
     ccc_ordered_map s
-        = ccc_om_init(s, struct val, elem, key, id_cmp, NULL, NULL);
+        = ccc_om_init(s, struct val, elem, key, id_cmp, nullptr, nullptr);
 
     int const num_nodes = 25;
     struct val vals[25];
@@ -309,7 +310,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_valid_range_equals)
 CHECK_BEGIN_STATIC_FN(omap_test_invalid_range)
 {
     ccc_ordered_map s
-        = ccc_om_init(s, struct val, elem, key, id_cmp, NULL, NULL);
+        = ccc_om_init(s, struct val, elem, key, id_cmp, nullptr, nullptr);
     int const num_nodes = 25;
     struct val vals[25];
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
@@ -338,7 +339,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_invalid_range)
 CHECK_BEGIN_STATIC_FN(omap_test_empty_range)
 {
     ccc_ordered_map s
-        = ccc_om_init(s, struct val, elem, key, id_cmp, NULL, NULL);
+        = ccc_om_init(s, struct val, elem, key, id_cmp, nullptr, nullptr);
     int const num_nodes = 25;
     struct val vals[25];
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */

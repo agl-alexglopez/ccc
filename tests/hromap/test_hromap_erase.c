@@ -18,7 +18,7 @@ CHECK_BEGIN_STATIC_FN(hromap_test_insert_erase_shuffled)
 {
     struct val vals[51];
     ccc_handle_realtime_ordered_map s
-        = hrm_init(vals, elem, id, id_cmp, NULL, NULL, 51);
+        = hrm_init(vals, elem, id, id_cmp, nullptr, nullptr, 51);
     size_t const size = 50;
     int const prime = 53;
     CHECK(insert_shuffled(&s, size, prime), PASS);
@@ -44,7 +44,7 @@ CHECK_BEGIN_STATIC_FN(hromap_test_prime_shuffle)
 {
     struct val vals[51];
     ccc_handle_realtime_ordered_map s
-        = hrm_init(vals, elem, id, id_cmp, NULL, NULL, 51);
+        = hrm_init(vals, elem, id, id_cmp, nullptr, nullptr, 51);
     size_t const size = 50;
     size_t const prime = 53;
     size_t const less = 10;
@@ -77,10 +77,11 @@ CHECK_BEGIN_STATIC_FN(hromap_test_prime_shuffle)
 CHECK_BEGIN_STATIC_FN(hromap_test_weak_srand)
 {
     struct val vals[1001];
-    ccc_handle_realtime_ordered_map s = hrm_init(
-        vals, elem, id, id_cmp, NULL, NULL, sizeof(vals) / sizeof(vals[0]));
+    ccc_handle_realtime_ordered_map s
+        = hrm_init(vals, elem, id, id_cmp, nullptr, nullptr,
+                   sizeof(vals) / sizeof(vals[0]));
     /* NOLINTNEXTLINE */
-    srand(time(NULL));
+    srand(time(nullptr));
     int const num_nodes = 1000;
     int id_keys[1000];
     for (int i = 0; i < num_nodes; ++i)
@@ -105,10 +106,11 @@ CHECK_BEGIN_STATIC_FN(hromap_test_weak_srand)
 CHECK_BEGIN_STATIC_FN(hromap_test_insert_erase_cycles_no_alloc)
 {
     struct val vals[1001];
-    ccc_handle_realtime_ordered_map s = hrm_init(
-        vals, elem, id, id_cmp, NULL, NULL, sizeof(vals) / sizeof(vals[0]));
+    ccc_handle_realtime_ordered_map s
+        = hrm_init(vals, elem, id, id_cmp, nullptr, nullptr,
+                   sizeof(vals) / sizeof(vals[0]));
     /* NOLINTNEXTLINE */
-    srand(time(NULL));
+    srand(time(nullptr));
     int const num_nodes = 1000;
     int id_keys[1000];
     for (int i = 0; i < num_nodes; ++i)
@@ -144,10 +146,10 @@ CHECK_BEGIN_STATIC_FN(hromap_test_insert_erase_cycles_no_alloc)
 
 CHECK_BEGIN_STATIC_FN(hromap_test_insert_erase_cycles_alloc)
 {
-    ccc_handle_realtime_ordered_map s
-        = hrm_init((struct val *)NULL, elem, id, id_cmp, std_alloc, NULL, 0);
+    ccc_handle_realtime_ordered_map s = hrm_init(
+        (struct val *)nullptr, elem, id, id_cmp, std_alloc, nullptr, 0);
     /* NOLINTNEXTLINE */
-    srand(time(NULL));
+    srand(time(nullptr));
     int const num_nodes = 1000;
     int id_keys[1000];
     for (int i = 0; i < num_nodes; ++i)
@@ -178,7 +180,7 @@ CHECK_BEGIN_STATIC_FN(hromap_test_insert_erase_cycles_alloc)
         CHECK(validate(&s), true);
     }
     CHECK(is_empty(&s), true);
-    CHECK_END_FN(hrm_clear_and_free(&s, NULL););
+    CHECK_END_FN(hrm_clear_and_free(&s, nullptr););
 }
 
 int

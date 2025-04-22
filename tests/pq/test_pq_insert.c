@@ -12,10 +12,10 @@
 CHECK_BEGIN_STATIC_FN(pq_test_insert_one)
 {
     ccc_priority_queue pq
-        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
+        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, nullptr, nullptr);
     struct val single;
     single.val = 0;
-    CHECK(push(&pq, &single.elem) != NULL, true);
+    CHECK(push(&pq, &single.elem) != nullptr, true);
     CHECK(ccc_pq_is_empty(&pq), false);
     CHECK_END_FN();
 }
@@ -23,12 +23,12 @@ CHECK_BEGIN_STATIC_FN(pq_test_insert_one)
 CHECK_BEGIN_STATIC_FN(pq_test_insert_three)
 {
     ccc_priority_queue pq
-        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
+        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, nullptr, nullptr);
     struct val three_vals[3];
     for (int i = 0; i < 3; ++i)
     {
         three_vals[i].val = i;
-        CHECK(push(&pq, &three_vals[i].elem) != NULL, true);
+        CHECK(push(&pq, &three_vals[i].elem) != nullptr, true);
         CHECK(validate(&pq), true);
         CHECK(ccc_pq_size(&pq).count, (size_t)i + 1);
     }
@@ -39,17 +39,17 @@ CHECK_BEGIN_STATIC_FN(pq_test_insert_three)
 CHECK_BEGIN_STATIC_FN(pq_test_struct_getter)
 {
     ccc_priority_queue pq
-        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
+        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, nullptr, nullptr);
     ccc_priority_queue pq_tester_clone
-        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
+        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, nullptr, nullptr);
     struct val vals[10];
     struct val tester_clone[10];
     for (int i = 0; i < 10; ++i)
     {
         vals[i].val = i;
         tester_clone[i].val = i;
-        CHECK(push(&pq, &vals[i].elem) != NULL, true);
-        CHECK(push(&pq_tester_clone, &tester_clone[i].elem) != NULL, true);
+        CHECK(push(&pq, &vals[i].elem) != nullptr, true);
+        CHECK(push(&pq_tester_clone, &tester_clone[i].elem) != nullptr, true);
         CHECK(validate(&pq), true);
         /* Because the getter returns a pointer, if the casting returned
            misaligned data and we overwrote something we need to compare our get
@@ -64,12 +64,12 @@ CHECK_BEGIN_STATIC_FN(pq_test_struct_getter)
 CHECK_BEGIN_STATIC_FN(pq_test_insert_three_dups)
 {
     ccc_priority_queue pq
-        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
+        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, nullptr, nullptr);
     struct val three_vals[3];
     for (int i = 0; i < 3; ++i)
     {
         three_vals[i].val = 0;
-        CHECK(push(&pq, &three_vals[i].elem) != NULL, true);
+        CHECK(push(&pq, &three_vals[i].elem) != nullptr, true);
         CHECK(validate(&pq), true);
         CHECK(ccc_pq_size(&pq).count, (size_t)i + 1);
     }
@@ -80,7 +80,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_insert_three_dups)
 CHECK_BEGIN_STATIC_FN(pq_test_insert_shuffle)
 {
     ccc_priority_queue pq
-        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
+        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, nullptr, nullptr);
     /* Math magic ahead... */
     size_t const size = 50;
     int const prime = 53;
@@ -96,12 +96,12 @@ CHECK_BEGIN_STATIC_FN(pq_test_insert_shuffle)
 CHECK_BEGIN_STATIC_FN(pq_test_read_max_min)
 {
     ccc_priority_queue pq
-        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
+        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, nullptr, nullptr);
     struct val vals[10];
     for (int i = 0; i < 10; ++i)
     {
         vals[i].val = i;
-        CHECK(push(&pq, &vals[i].elem) != NULL, true);
+        CHECK(push(&pq, &vals[i].elem) != nullptr, true);
         CHECK(validate(&pq), true);
         CHECK(ccc_pq_size(&pq).count, (size_t)i + 1);
     }

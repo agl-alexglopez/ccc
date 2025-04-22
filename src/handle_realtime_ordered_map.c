@@ -173,7 +173,7 @@ ccc_hrm_at(ccc_handle_realtime_ordered_map const *const h, ccc_handle_i const i)
 {
     if (!h || !i)
     {
-        return 0;
+        return nullptr;
     }
     return ccc_buf_at(&h->buf, i);
 }
@@ -311,7 +311,7 @@ ccc_hrm_and_modify(ccc_hromap_handle *const h, ccc_any_type_update_fn *const fn)
     {
         fn((ccc_any_type){
             .any_type = base_at(h->impl.hrm, h->impl.handle.i),
-            NULL,
+            nullptr,
         });
     }
     return h;
@@ -530,7 +530,7 @@ ccc_hrm_capacity(ccc_handle_realtime_ordered_map const *const hrm)
 void *
 ccc_hrm_data(ccc_handle_realtime_ordered_map const *const hrm)
 {
-    return hrm ? ccc_buf_begin(&hrm->buf) : NULL;
+    return hrm ? ccc_buf_begin(&hrm->buf) : nullptr;
 }
 
 void *
@@ -538,7 +538,7 @@ ccc_hrm_begin(ccc_handle_realtime_ordered_map const *const hrm)
 {
     if (!hrm || ccc_buf_is_empty(&hrm->buf))
     {
-        return NULL;
+        return nullptr;
     }
     size_t const n = min_max_from(hrm, hrm->root, MINDIR);
     return base_at(hrm, n);
@@ -549,7 +549,7 @@ ccc_hrm_rbegin(ccc_handle_realtime_ordered_map const *const hrm)
 {
     if (!hrm || ccc_buf_is_empty(&hrm->buf))
     {
-        return NULL;
+        return nullptr;
     }
     size_t const n = min_max_from(hrm, hrm->root, MAXDIR);
     return base_at(hrm, n);
@@ -561,7 +561,7 @@ ccc_hrm_next(ccc_handle_realtime_ordered_map const *const hrm,
 {
     if (!hrm || !e || ccc_buf_is_empty(&hrm->buf))
     {
-        return NULL;
+        return nullptr;
     }
     size_t const n = next(hrm, index_of(hrm, e), INORDER);
     return base_at(hrm, n);
@@ -573,7 +573,7 @@ ccc_hrm_rnext(ccc_handle_realtime_ordered_map const *const hrm,
 {
     if (!hrm || !e || ccc_buf_is_empty(&hrm->buf))
     {
-        return NULL;
+        return nullptr;
     }
     size_t const n = next(hrm, index_of(hrm, e), R_INORDER);
     return base_at(hrm, n);
@@ -584,7 +584,7 @@ ccc_hrm_end(ccc_handle_realtime_ordered_map const *const hrm)
 {
     if (!hrm || ccc_buf_is_empty(&hrm->buf))
     {
-        return NULL;
+        return nullptr;
     }
     return base_at(hrm, 0);
 }
@@ -594,7 +594,7 @@ ccc_hrm_rend(ccc_handle_realtime_ordered_map const *const hrm)
 {
     if (!hrm || ccc_buf_is_empty(&hrm->buf))
     {
-        return NULL;
+        return nullptr;
     }
     return base_at(hrm, 0);
 }
@@ -1004,7 +1004,7 @@ alloc_slot(struct ccc_hromap *const t)
 static inline void
 init_node(struct ccc_hromap_elem *const e)
 {
-    assert(e != NULL);
+    assert(e != nullptr);
     e->parity = 0;
     e->branch[L] = e->branch[R] = e->parent = 0;
 }

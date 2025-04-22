@@ -88,14 +88,14 @@ Initialize the container with memory, callbacks, and permissions. */
 /**@{*/
 
 /** @brief Initializes the map at runtime or compile time.
-@param [in] memory_ptr a pointer to the contiguous user types or ((T *)NULL).
+@param [in] memory_ptr a pointer to the contiguous user types or ((T *)nullptr).
 @param [in] hrm_elem_field the name of the intrusive map elem field.
 @param [in] key_elem_field the name of the field in user type used as key.
 @param [in] key_cmp_fn the key comparison function (see types.h).
-@param [in] alloc_fn the allocation function or NULL if allocation is banned.
+@param [in] alloc_fn the allocation function or nullptr if allocation is banned.
 @param [in] aux_data a pointer to any auxiliary data for comparison or
 destruction.
-@param [in] capacity the capacity at mem_ptr or 0 if ((T *)NULL).
+@param [in] capacity the capacity at mem_ptr or 0 if ((T *)nullptr).
 @return the struct initialized ordered map for direct assignment
 (i.e. ccc_handle_realtime_ordered_map m = ccc_hrm_init(...);). */
 #define ccc_hrm_init(memory_ptr, hrm_elem_field, key_elem_field, key_cmp_fn,   \
@@ -106,7 +106,7 @@ destruction.
 /** @brief Copy the map at source to destination.
 @param [in] dst the initialized destination for the copy of the src map.
 @param [in] src the initialized source of the map.
-@param [in] fn the allocation function to resize dst or NULL.
+@param [in] fn the allocation function to resize dst or nullptr.
 @return the result of the copy operation. If the destination capacity is less
 than the source capacity and no allocation function is provided an input error
 is returned. If resizing is required and resizing of dst fails a memory error
@@ -115,8 +115,8 @@ is returned.
 less than src, an allocation function must be provided with the fn argument.
 
 Note that there are two ways to copy data from source to destination: provide
-sufficient memory and pass NULL as fn, or allow the copy function to take care
-of allocation for the copy.
+sufficient memory and pass nullptr as fn, or allow the copy function to take
+care of allocation for the copy.
 
 Manual memory management with no allocation function provided.
 
@@ -129,11 +129,10 @@ struct val
     int val;
 };
 static handle_ordered_map src
-    = hrm_init((static struct val[11]){}, e, key, key_cmp, NULL, NULL, 11);
-insert_rand_vals(&src);
-static handle_ordered_map dst
-    = hrm_init((static struct val[13]){}, e, key, key_cmp, NULL, NULL, 13);
-ccc_result res = hrm_copy(&dst, &src, NULL);
+    = hrm_init((static struct val[11]){}, e, key, key_cmp, nullptr, nullptr,
+11); insert_rand_vals(&src); static handle_ordered_map dst = hrm_init((static
+struct val[13]){}, e, key, key_cmp, nullptr, nullptr, 13); ccc_result res =
+hrm_copy(&dst, &src, nullptr);
 ```
 
 The above requires dst capacity be greater than or equal to src capacity. Here
@@ -148,10 +147,10 @@ struct val
     int val;
 };
 static handle_ordered_map src
-    = hrm_init((struct val *)NULL, e, key, key_cmp, std_alloc, NULL, 0);
+    = hrm_init((struct val *)nullptr, e, key, key_cmp, std_alloc, nullptr, 0);
 insert_rand_vals(&src);
 static handle_ordered_map dst
-    = hrm_init((struct val *)NULL, e, key, key_cmp, std_alloc, NULL, 0);
+    = hrm_init((struct val *)nullptr, e, key, key_cmp, std_alloc, nullptr, 0);
 ccc_result res = hrm_copy(&dst, &src, std_alloc);
 ```
 
@@ -169,10 +168,10 @@ struct val
     int val;
 };
 static handle_ordered_map src
-    = hrm_init((struct val *)NULL, e, key, key_cmp, std_alloc, NULL, 0);
+    = hrm_init((struct val *)nullptr, e, key, key_cmp, std_alloc, nullptr, 0);
 insert_rand_vals(&src);
 static handle_ordered_map dst
-    = hrm_init((struct val *)NULL, e, key, key_cmp, NULL, NULL, 0);
+    = hrm_init((struct val *)nullptr, e, key, key_cmp, nullptr, nullptr, 0);
 ccc_result res = hrm_copy(&dst, &src, std_alloc);
 ```
 
@@ -218,7 +217,7 @@ Test membership or obtain references to stored user types directly. */
 /** @brief Returns a reference to the user data at the provided handle.
 @param [in] h a pointer to the map.
 @param [in] i the stable handle obtained by the user.
-@return a pointer to the user type stored at the specified handle or NULL if
+@return a pointer to the user type stored at the specified handle or nullptr if
 an out of range handle or handle representing no data is provided.
 @warning this function can only check if the handle value is in range. If a
 handle represents a slot that has been taken by a new element because the old
@@ -241,14 +240,14 @@ stored in the map. */
 @param [in] hrm the map to be searched.
 @param [in] key pointer to the key matching the key type of the user struct.
 @return true if the struct containing key is stored, false if not. Error if hrm
-or key is NULL. */
+or key is nullptr. */
 [[nodiscard]] ccc_tribool
 ccc_hrm_contains(ccc_handle_realtime_ordered_map const *hrm, void const *key);
 
 /** @brief Returns a reference into the map at handle key.
 @param [in] hrm the ordered map to search.
 @param [in] key the key to search matching stored key type.
-@return a view of the map handle if it is present, else NULL. */
+@return a view of the map handle if it is present, else nullptr. */
 [[nodiscard]] ccc_handle_i
 ccc_hrm_get_key_val(ccc_handle_realtime_ordered_map const *hrm,
                     void const *key);
@@ -476,7 +475,7 @@ for formatting.
 @return a compound literal reference to the modified handle if it was occupied
 or a vacant handle if it was vacant.
 @note T is a reference to the user type stored in the handle guaranteed to be
-non-NULL if the closure executes.
+non-nullptr if the closure executes.
 
 ```
 #define HANDLE_REALTIME_ORDERED_MAP_USING_NAMESPACE_CCC
@@ -503,11 +502,11 @@ evaluated in the closure scope. */
 /** @brief Inserts the struct with handle elem if the handle is Vacant.
 @param [in] h the handle obtained via function or macro call.
 @param [in] elem the handle to the struct to be inserted to a Vacant handle.
-@return a pointer to handle in the map invariantly. NULL on error.
+@return a pointer to handle in the map invariantly. nullptr on error.
 
 Because this functions takes a handle and inserts if it is Vacant, the only
-reason NULL shall be returned is when an insertion error occurs, usually due to
-a user struct allocation failure.
+reason nullptr shall be returned is when an insertion error occurs, usually due
+to a user struct allocation failure.
 
 If no allocation is permitted, this function assumes the user struct wrapping
 elem has been allocated with the appropriate lifetime and scope by the user. */
@@ -521,8 +520,8 @@ handle.
 handle is Vacant.
 @return a reference to the unwrapped user type in the handle, either the
 unmodified reference if the handle was Occupied or the newly inserted element
-if the handle was Vacant. NULL is returned if resizing is required but fails or
-is not allowed.
+if the handle was Vacant. nullptr is returned if resizing is required but fails
+or is not allowed.
 
 Note that if the compound literal uses any function calls to generate values
 or other data, such functions will not be called if the handle is Occupied. */
@@ -534,7 +533,7 @@ or other data, such functions will not be called if the handle is Occupied. */
 /** @brief Inserts the provided handle invariantly.
 @param [in] h the handle returned from a call obtaining a handle.
 @param [in] elem a handle to the struct the user intends to insert.
-@return a pointer to the inserted element or NULL upon allocation failure.
+@return a pointer to the inserted element or nullptr upon allocation failure.
 
 This method can be used when the old value in the map does not need to
 be preserved. See the regular insert method if the old value is of interest. */
@@ -545,7 +544,7 @@ be preserved. See the regular insert method if the old value is of interest. */
 @param [in] handle_realtime_ordered_map_handle_ptr a pointer to the obtained
 handle.
 @param [in] lazy_key_value the compound literal to write to a new slot.
-@return a reference to the newly inserted or overwritten user type. NULL is
+@return a reference to the newly inserted or overwritten user type. nullptr is
 returned if allocation failed or is not allowed when required. */
 #define ccc_hrm_insert_handle_w(handle_realtime_ordered_map_handle_ptr,        \
                                 lazy_key_value...)                             \
@@ -554,18 +553,18 @@ returned if allocation failed or is not allowed when required. */
 
 /** @brief Remove the handle from the map if Occupied.
 @param [in] h a pointer to the map handle.
-@return a handle containing NULL or a reference to the old handle. If Occupied
-a handle in the map existed and was removed. If Vacant, no prior handle existed
-to be removed.
+@return a handle containing nullptr or a reference to the old handle. If
+Occupied a handle in the map existed and was removed. If Vacant, no prior handle
+existed to be removed.
 @warning the reference to the removed handle is invalidated upon any further
 insertions. */
 ccc_handle ccc_hrm_remove_handle(ccc_hromap_handle const *h);
 
 /** @brief Remove the handle from the map if Occupied.
 @param [in] handle_realtime_ordered_map_handle_ptr a pointer to the map handle.
-@return a compound literal reference to a handle containing NULL or a reference
-to the old handle. If Occupied a handle in the map existed and was removed. If
-Vacant, no prior handle existed to be removed.
+@return a compound literal reference to a handle containing nullptr or a
+reference to the old handle. If Occupied a handle in the map existed and was
+removed. If Vacant, no prior handle existed to be removed.
 
 Note that the reference to the removed handle is invalidated upon any further
 insertions. */
@@ -577,26 +576,26 @@ insertions. */
 
 /** @brief Unwraps the provided handle to obtain a view into the map element.
 @param [in] h the handle from a query to the map via function or macro.
-@return a view into the table handle if one is present, or NULL. */
+@return a view into the table handle if one is present, or nullptr. */
 [[nodiscard]] ccc_handle_i ccc_hrm_unwrap(ccc_hromap_handle const *h);
 
 /** @brief Returns the Vacant or Occupied status of the handle.
 @param [in] h the handle from a query to the map via function or macro.
-@return true if the handle is occupied, false if not. Error if h is NULL. */
+@return true if the handle is occupied, false if not. Error if h is nullptr. */
 [[nodiscard]] ccc_tribool ccc_hrm_occupied(ccc_hromap_handle const *h);
 
 /** @brief Provides the status of the handle should an insertion follow.
 @param [in] h the handle from a query to the table via function or macro.
 @return true if a handle obtained from an insertion attempt failed to insert
 due to an allocation failure when allocation success was expected. Error if h is
-NULL. */
+nullptr. */
 [[nodiscard]] ccc_tribool ccc_hrm_insert_error(ccc_hromap_handle const *h);
 
 /** @brief Obtain the handle status from a container handle.
 @param [in] h a pointer to the handle.
 @return the status stored in the handle after the required action on the
-container completes. If h is NULL a handle input error is returned so ensure
-e is non-NULL to avoid an inaccurate status returned.
+container completes. If h is nullptr a handle input error is returned so ensure
+e is non-nullptr to avoid an inaccurate status returned.
 
 Note that this function can be useful for debugging or if more detailed
 messages are needed for logging purposes. See ccc_handle_status_msg() in
@@ -612,32 +611,32 @@ Deallocate the container. */
 
 /** @brief Frees all slots in the map for use without affecting capacity.
 @param [in] hrm the map to be cleared.
-@param [in] fn the destructor for each element. NULL can be passed if no
+@param [in] fn the destructor for each element. nullptr can be passed if no
 maintenance is required on the elements in the map before their slots are
 forfeit.
 
-If NULL is passed as the destructor function time is O(1), else O(size). */
+If nullptr is passed as the destructor function time is O(1), else O(size). */
 ccc_result ccc_hrm_clear(ccc_handle_realtime_ordered_map *hrm,
                          ccc_any_type_destructor_fn *fn);
 
 /** @brief Frees all slots in the map and frees the underlying buffer.
 @param [in] hrm the map to be cleared.
-@param [in] fn the destructor for each element. NULL can be passed if no
+@param [in] fn the destructor for each element. nullptr can be passed if no
 maintenance is required on the elements in the map before their slots are
 forfeit.
 @return the result of free operation. If no alloc function is provided it is
 an error to attempt to free the buffer and a memory error is returned.
 Otherwise, an OK result is returned.
 
-If NULL is passed as the destructor function time is O(1), else O(size). */
+If nullptr is passed as the destructor function time is O(1), else O(size). */
 ccc_result ccc_hrm_clear_and_free(ccc_handle_realtime_ordered_map *hrm,
                                   ccc_any_type_destructor_fn *fn);
 
 /** @brief Frees all slots in the hrm and frees the underlying buffer that was
 previously dynamically reserved with the reserve function.
 @param [in] hrm the map to be cleared.
-@param [in] destructor the destructor for each element. NULL can be passed if no
-maintenance is required on the elements in the hrm before their slots are
+@param [in] destructor the destructor for each element. nullptr can be passed if
+no maintenance is required on the elements in the hrm before their slots are
 dropped.
 @param [in] alloc the required allocation function to provide to a dynamically
 reserved hrm. Any auxiliary data provided upon initialization will be passed to
@@ -697,7 +696,7 @@ ccc_hrm_equal_range(ccc_handle_realtime_ordered_map const *hrm,
 @param [in] begin_and_end_key_ptrs two pointers, the first to the start of the
 range the second to the end of the range.
 @return a compound literal reference to the produced range associated with the
-enclosing scope. This reference is always non-NULL. */
+enclosing scope. This reference is always non-nullptr. */
 #define ccc_hrm_equal_range_r(handle_realtime_ordered_map_ptr,                 \
                               begin_and_end_key_ptrs...)                       \
     &(ccc_range)                                                               \
@@ -735,7 +734,7 @@ O(lg N).
 @param [in] rbegin_and_rend_key_ptrs two pointers, the first to the start of the
 rrange the second to the end of the rrange.
 @return a compound literal reference to the produced rrange associated with the
-enclosing scope. This reference is always non-NULL. */
+enclosing scope. This reference is always non-nullptr. */
 #define ccc_hrm_equal_rrange_r(handle_realtime_ordered_map_ptr,                \
                                rbegin_and_rend_key_ptrs...)                    \
     &(ccc_rrange)                                                              \
@@ -790,19 +789,19 @@ Obtain the container state. */
 
 /** @brief Returns the size status of the map.
 @param [in] hrm the map.
-@return true if empty else false. Error if hrm is NULL. */
+@return true if empty else false. Error if hrm is nullptr. */
 [[nodiscard]] ccc_tribool
 ccc_hrm_is_empty(ccc_handle_realtime_ordered_map const *hrm);
 
 /** @brief Returns the size of the map representing active slots.
 @param [in] hrm the map.
-@return the size of the map or an argument error is set if hrm is NULL. */
+@return the size of the map or an argument error is set if hrm is nullptr. */
 [[nodiscard]] ccc_ucount
 ccc_hrm_size(ccc_handle_realtime_ordered_map const *hrm);
 
 /** @brief Returns the capacity of the map representing total available slots.
 @param [in] hrm the map.
-@return the capacity or an argument error is set if hrm is NULL. */
+@return the capacity or an argument error is set if hrm is nullptr. */
 [[nodiscard]] ccc_ucount
 ccc_hrm_capacity(ccc_handle_realtime_ordered_map const *hrm);
 
@@ -818,7 +817,7 @@ within the capacity of the backing buffer. */
 /** @brief Validation of invariants for the map.
 @param [in] hrm the map to validate.
 @return true if all invariants hold, false if corruption occurs. Error if hrm is
-NULL. */
+nullptr. */
 [[nodiscard]] ccc_tribool
 ccc_hrm_validate(ccc_handle_realtime_ordered_map const *hrm);
 

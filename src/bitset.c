@@ -1010,7 +1010,7 @@ ccc_bs_data(ccc_bitset const *const bs)
 {
     if (!bs)
     {
-        return NULL;
+        return nullptr;
     }
     return bs->blocks;
 }

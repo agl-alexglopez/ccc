@@ -13,7 +13,7 @@
 CHECK_BEGIN_STATIC_FN(homap_test_empty)
 {
     handle_ordered_map s
-        = hom_init((struct val[3]){}, elem, id, id_cmp, NULL, NULL, 3);
+        = hom_init((struct val[3]){}, elem, id, id_cmp, nullptr, nullptr, 3);
     CHECK(is_empty(&s), true);
     CHECK_END_FN();
 }
@@ -21,15 +21,15 @@ CHECK_BEGIN_STATIC_FN(homap_test_empty)
 CHECK_BEGIN_STATIC_FN(homap_test_copy_no_alloc)
 {
     handle_ordered_map src
-        = hom_init((struct val[11]){}, elem, id, id_cmp, NULL, NULL, 11);
+        = hom_init((struct val[11]){}, elem, id, id_cmp, nullptr, nullptr, 11);
     handle_ordered_map dst
-        = hom_init((struct val[11]){}, elem, id, id_cmp, NULL, NULL, 11);
+        = hom_init((struct val[11]){}, elem, id, id_cmp, nullptr, nullptr, 11);
     (void)swap_handle(&src, &(struct val){.id = 0}.elem);
     (void)swap_handle(&src, &(struct val){.id = 1, .val = 1}.elem);
     (void)swap_handle(&src, &(struct val){.id = 2, .val = 2}.elem);
     CHECK(size(&src).count, 3);
     CHECK(is_empty(&dst), true);
-    ccc_result res = hom_copy(&dst, &src, NULL);
+    ccc_result res = hom_copy(&dst, &src, nullptr);
     CHECK(res, CCC_RESULT_OK);
     CHECK(size(&dst).count, size(&src).count);
     for (int i = 0; i < 3; ++i)
@@ -50,25 +50,25 @@ CHECK_BEGIN_STATIC_FN(homap_test_copy_no_alloc)
 CHECK_BEGIN_STATIC_FN(homap_test_copy_no_alloc_fail)
 {
     handle_ordered_map src
-        = hom_init((struct val[11]){}, elem, id, id_cmp, NULL, NULL, 11);
+        = hom_init((struct val[11]){}, elem, id, id_cmp, nullptr, nullptr, 11);
     handle_ordered_map dst
-        = hom_init((struct val[7]){}, elem, id, id_cmp, NULL, NULL, 7);
+        = hom_init((struct val[7]){}, elem, id, id_cmp, nullptr, nullptr, 7);
     (void)swap_handle(&src, &(struct val){.id = 0}.elem);
     (void)swap_handle(&src, &(struct val){.id = 1, .val = 1}.elem);
     (void)swap_handle(&src, &(struct val){.id = 2, .val = 2}.elem);
     CHECK(size(&src).count, 3);
     CHECK(is_empty(&dst), true);
-    ccc_result res = hom_copy(&dst, &src, NULL);
+    ccc_result res = hom_copy(&dst, &src, nullptr);
     CHECK(res != CCC_RESULT_OK, true);
     CHECK_END_FN();
 }
 
 CHECK_BEGIN_STATIC_FN(homap_test_copy_alloc)
 {
-    handle_ordered_map src
-        = hom_init((struct val *)NULL, elem, id, id_cmp, std_alloc, NULL, 0);
-    handle_ordered_map dst
-        = hom_init((struct val *)NULL, elem, id, id_cmp, std_alloc, NULL, 0);
+    handle_ordered_map src = hom_init((struct val *)nullptr, elem, id, id_cmp,
+                                      std_alloc, nullptr, 0);
+    handle_ordered_map dst = hom_init((struct val *)nullptr, elem, id, id_cmp,
+                                      std_alloc, nullptr, 0);
     (void)swap_handle(&src, &(struct val){.id = 0}.elem);
     (void)swap_handle(&src, &(struct val){.id = 1, .val = 1}.elem);
     (void)swap_handle(&src, &(struct val){.id = 2, .val = 2}.elem);
@@ -90,25 +90,25 @@ CHECK_BEGIN_STATIC_FN(homap_test_copy_alloc)
     CHECK(is_empty(&src), is_empty(&dst));
     CHECK(is_empty(&dst), true);
     CHECK_END_FN({
-        (void)hom_clear_and_free(&src, NULL);
-        (void)hom_clear_and_free(&dst, NULL);
+        (void)hom_clear_and_free(&src, nullptr);
+        (void)hom_clear_and_free(&dst, nullptr);
     });
 }
 
 CHECK_BEGIN_STATIC_FN(homap_test_copy_alloc_fail)
 {
-    handle_ordered_map src
-        = hom_init((struct val *)NULL, elem, id, id_cmp, std_alloc, NULL, 0);
-    handle_ordered_map dst
-        = hom_init((struct val *)NULL, elem, id, id_cmp, std_alloc, NULL, 0);
+    handle_ordered_map src = hom_init((struct val *)nullptr, elem, id, id_cmp,
+                                      std_alloc, nullptr, 0);
+    handle_ordered_map dst = hom_init((struct val *)nullptr, elem, id, id_cmp,
+                                      std_alloc, nullptr, 0);
     (void)swap_handle(&src, &(struct val){.id = 0}.elem);
     (void)swap_handle(&src, &(struct val){.id = 1, .val = 1}.elem);
     (void)swap_handle(&src, &(struct val){.id = 2, .val = 2}.elem);
     CHECK(size(&src).count, 3);
     CHECK(is_empty(&dst), true);
-    ccc_result res = hom_copy(&dst, &src, NULL);
+    ccc_result res = hom_copy(&dst, &src, nullptr);
     CHECK(res != CCC_RESULT_OK, true);
-    CHECK_END_FN({ (void)hom_clear_and_free(&src, NULL); });
+    CHECK_END_FN({ (void)hom_clear_and_free(&src, nullptr); });
 }
 
 int

@@ -312,7 +312,7 @@ print_found(FILE *const f, str_view w)
         }
     }
     str_arena_free(&a);
-    (void)hom_clear_and_free(&map, NULL);
+    (void)hom_clear_and_free(&map, nullptr);
 }
 
 static void
@@ -340,8 +340,8 @@ print_top_n(FILE *const f, int n)
     }
     print_n(&fpq, &a, n);
     str_arena_free(&a);
-    (void)fpq_clear_and_free(&fpq, NULL);
-    (void)hom_clear_and_free(&map, NULL);
+    (void)fpq_clear_and_free(&fpq, nullptr);
+    (void)hom_clear_and_free(&map, nullptr);
 }
 
 static void
@@ -363,8 +363,8 @@ print_last_n(FILE *const f, int n)
     }
     print_n(&fpq, &a, n);
     str_arena_free(&a);
-    (void)fpq_clear_and_free(&fpq, NULL);
-    (void)hom_clear_and_free(&map, NULL);
+    (void)fpq_clear_and_free(&fpq, nullptr);
+    (void)hom_clear_and_free(&map, nullptr);
 }
 
 static void
@@ -386,7 +386,7 @@ print_alpha_n(FILE *const f, int n)
         printf("%s %d\n", str_arena_at(&a, w->ofs), w->cnt);
     }
     str_arena_free(&a);
-    (void)hom_clear_and_free(&map, NULL);
+    (void)hom_clear_and_free(&map, nullptr);
 }
 
 static void
@@ -408,7 +408,7 @@ print_ralpha_n(FILE *const f, int n)
         printf("%s %d\n", str_arena_at(&a, w->ofs), w->cnt);
     }
     str_arena_free(&a);
-    (void)hom_clear_and_free(&map, NULL);
+    (void)hom_clear_and_free(&map, nullptr);
 }
 
 static struct frequency_alloc
@@ -453,11 +453,11 @@ print_n(flat_priority_queue *const fpq, struct str_arena const *const a,
 static handle_ordered_map
 create_frequency_map(struct str_arena *const a, FILE *const f)
 {
-    char *lineptr = NULL;
+    char *lineptr = nullptr;
     size_t len = 0;
     ptrdiff_t read = 0;
     handle_ordered_map hom
-        = hom_init((word *)NULL, e, ofs, cmp_string_keys, std_alloc, a, 0);
+        = hom_init((word *)nullptr, e, ofs, cmp_string_keys, std_alloc, a, 0);
     while ((read = getline(&lineptr, &len, f)) > 0)
     {
         str_view const line = {.s = lineptr, .len = read - 1};
@@ -608,7 +608,7 @@ str_arena_maybe_resize_pos(struct str_arena *const a, size_t const furthest_pos)
     if (furthest_pos >= a->cap)
     {
         size_t const new_cap = (furthest_pos) * 2;
-        void *const moved_arena = std_alloc(a->arena, new_cap, NULL);
+        void *const moved_arena = std_alloc(a->arena, new_cap, nullptr);
         if (!moved_arena)
         {
             return CCC_RESULT_MEM_ERROR;
@@ -649,7 +649,7 @@ str_arena_free(struct str_arena *const a)
     if (a->arena)
     {
         free(a->arena);
-        a->arena = NULL;
+        a->arena = nullptr;
     }
     a->next_free_pos = 0;
     a->cap = 0;
@@ -660,7 +660,7 @@ str_arena_at(struct str_arena const *const a, str_ofs const i)
 {
     if (!a || (size_t)i >= a->cap)
     {
-        return NULL;
+        return nullptr;
     }
     return a->arena + i;
 }
@@ -742,7 +742,7 @@ open_file(str_view file)
 {
     if (sv_empty(file))
     {
-        return NULL;
+        return nullptr;
     }
     FILE *const f = fopen(sv_begin(file), "r");
     if (!f)

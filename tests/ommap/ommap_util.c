@@ -36,7 +36,7 @@ CHECK_BEGIN_FN(insert_shuffled, ccc_ordered_multimap *pq, struct val vals[],
     for (size_t i = 0; i < size; ++i)
     {
         vals[shuffled_index].key = (int)shuffled_index;
-        CHECK(unwrap(swap_entry_r(pq, &vals[shuffled_index].elem)) != NULL,
+        CHECK(unwrap(swap_entry_r(pq, &vals[shuffled_index].elem)) != nullptr,
               true);
         CHECK(validate(pq), true);
         CHECK(size(pq).count, i + 1);
@@ -67,7 +67,7 @@ val_bump_alloc(void *const ptr, size_t const size, void *const aux)
 {
     if (!ptr && !size)
     {
-        return NULL;
+        return nullptr;
     }
     if (!ptr)
     {
@@ -76,15 +76,15 @@ val_bump_alloc(void *const ptr, size_t const size, void *const aux)
         struct val_pool *vals = aux;
         if (vals->next_free >= vals->capacity)
         {
-            return NULL;
+            return nullptr;
         }
         return &vals->vals[vals->next_free++];
     }
     if (!size)
     {
         /* Don't do anything fancy on free, just bump forward so no op here. */
-        return NULL;
+        return nullptr;
     }
     assert(!"Shouldn't attempt to realloc in bump allocator.");
-    return NULL;
+    return nullptr;
 }

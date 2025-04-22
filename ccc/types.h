@@ -270,13 +270,13 @@ supplementary information required for allocation, deallocation, or
 reallocation. Aux is passed to a container upon its initialization and the
 programmer may choose how to best utilize this reference (more on aux later).
 
-- If NULL is provided with a size of 0, NULL is returned.
-- If NULL is provided with a non-zero size, new memory is allocated/returned.
-- If ptr is non-NULL it has been previously allocated by the alloc function.
-- If ptr is non-NULL with non-zero size, ptr is resized to at least size
-  size. The pointer returned is NULL if resizing fails. Upon success, the
+- If nullptr is provided with a size of 0, nullptr is returned.
+- If nullptr is provided with a non-zero size, new memory is allocated/returned.
+- If ptr is non-nullptr it has been previously allocated by the alloc function.
+- If ptr is non-nullptr with non-zero size, ptr is resized to at least size
+  size. The pointer returned is nullptr if resizing fails. Upon success, the
   pointer returned might not be equal to the pointer provided.
-- If ptr is non-NULL and size is 0, ptr is freed and NULL is returned.
+- If ptr is non-nullptr and size is 0, ptr is freed and nullptr is returned.
 
 One may be tempted to use realloc to check all of these boxes but realloc is
 implementation defined on some of these points. So, the aux parameter also
@@ -289,7 +289,7 @@ std_alloc(void *const ptr, size_t const size, void *)
 {
     if (!ptr && !size)
     {
-        return NULL;
+        return nullptr;
     }
     if (!ptr)
     {
@@ -298,7 +298,7 @@ std_alloc(void *const ptr, size_t const size, void *)
     if (!size)
     {
         free(ptr);
-        return NULL;
+        return nullptr;
     }
     return realloc(ptr, size);
 }
@@ -314,8 +314,8 @@ typedef void *ccc_any_alloc_fn(void *ptr, size_t size, void *aux);
 /** @brief A callback function for comparing two elements in a container.
 
 A three-way comparison return value is expected and the two containers being
-compared are guaranteed to be non-NULL and pointing to the base of the user type
-stored in the container. Aux may be NULL if no aux is provided on
+compared are guaranteed to be non-nullptr and pointing to the base of the user
+type stored in the container. Aux may be nullptr if no aux is provided on
 initialization. */
 typedef ccc_threeway_cmp ccc_any_type_cmp_fn(ccc_any_type_cmp);
 
@@ -323,18 +323,18 @@ typedef ccc_threeway_cmp ccc_any_type_cmp_fn(ccc_any_type_cmp);
 
 A reference to the container type and any aux data provided on initialization
 is available. The container pointer points to the base of the user type and is
-not NULL. Aux may be NULL if no aux is provided on initialization. An update
-function is used when a container Interface exposes functions to modify the key
-or value used to determine sorted order of elements in the container. */
+not nullptr. Aux may be nullptr if no aux is provided on initialization. An
+update function is used when a container Interface exposes functions to modify
+the key or value used to determine sorted order of elements in the container. */
 typedef void ccc_any_type_update_fn(ccc_any_type);
 
 /** @brief A callback function for destroying an element in the container.
 
 A reference to the container type and any aux data provided on initialization
 is available. The container pointer points to the base of the user type and is
-not NULL. Aux may be NULL if no aux is provided on initialization. A destructor
-function is used to act on each element of the container when it is being
-emptied and destroyed. The function will be called on each type after it
+not nullptr. Aux may be nullptr if no aux is provided on initialization. A
+destructor function is used to act on each element of the container when it is
+being emptied and destroyed. The function will be called on each type after it
 removed from the container and before it is freed by the container, if
 allocation permission is provided to the container. Therefore, if the user
 has given permission to the container to allocate memory they can assume the
@@ -375,7 +375,7 @@ The generic interface for associative container entries. */
 
 /** @brief Determine if an entry is Occupied in the container.
 @param [in] e the pointer to the entry obtained from a container.
-@return true if Occupied false if Vacant. Error if e is NULL. */
+@return true if Occupied false if Vacant. Error if e is nullptr. */
 ccc_tribool ccc_entry_occupied(ccc_entry const *e);
 
 /** @brief Determine if an insertion error has occurred when a function that
@@ -383,20 +383,20 @@ attempts to insert a value in a container is used.
 @param [in] e the pointer to the entry obtained from a container insert.
 @return true if an insertion error occurred usually meaning a insertion should
 have occurred but the container did not have permission to allocate new memory
-or allocation failed. Error if e is NULL. */
+or allocation failed. Error if e is nullptr. */
 ccc_tribool ccc_entry_insert_error(ccc_entry const *e);
 
 /** @brief Determine if an input error has occurred for a function that
 generates an entry.
 @param [in] e the pointer to the entry obtained from a container function.
 @return true if an input error occurred usually meaning an invalid argument such
-as a NULL pointer was provided to a function. Error if e is NULL. */
+as a nullptr pointer was provided to a function. Error if e is nullptr. */
 ccc_tribool ccc_entry_input_error(ccc_entry const *e);
 
 /** @brief Unwraps the provided entry providing a reference to the user type
 obtained from the operation that provides the entry.
 @param [in] e the pointer to the entry obtained from an operation.
-@return a reference to the user type stored in the Occupied entry or NULL if
+@return a reference to the user type stored in the Occupied entry or nullptr if
 the entry is Vacant or otherwise cannot be viewed.
 
 The expected return value from unwrapping a value will change depending on the
@@ -407,7 +407,7 @@ void *ccc_entry_unwrap(ccc_entry const *e);
 
 /** @brief Determine if an handle is Occupied in the container.
 @param [in] e the pointer to the handle obtained from a container.
-@return true if Occupied false if Vacant. Error if e is NULL. */
+@return true if Occupied false if Vacant. Error if e is nullptr. */
 ccc_tribool ccc_handle_occupied(ccc_handle const *e);
 
 /** @brief Determine if an insertion error has occurred when a function that
@@ -415,20 +415,20 @@ attempts to insert a value in a container is used.
 @param [in] e the pointer to the handle obtained from a container insert.
 @return true if an insertion error occurred usually meaning a insertion should
 have occurred but the container did not have permission to allocate new memory
-or allocation failed. Error if e is NULL. */
+or allocation failed. Error if e is nullptr. */
 ccc_tribool ccc_handle_insert_error(ccc_handle const *e);
 
 /** @brief Determine if an input error has occurred for a function that
 generates an handle.
 @param [in] e the pointer to the handle obtained from a container function.
 @return true if an input error occurred usually meaning an invalid argument such
-as a NULL pointer was provided to a function. Error if e is NULL. */
+as a nullptr pointer was provided to a function. Error if e is nullptr. */
 ccc_tribool ccc_handle_input_error(ccc_handle const *e);
 
 /** @brief Unwraps the provided handle providing a reference to the user type
 obtained from the operation that provides the handle.
 @param [in] e the pointer to the handle obtained from an operation.
-@return a reference to the user type stored in the Occupied handle or NULL if
+@return a reference to the user type stored in the Occupied handle or nullptr if
 the handle is Vacant or otherwise cannot be viewed.
 
 The expected return value from unwrapping a value will change depending on the
@@ -449,7 +449,7 @@ container in the provided range.
 @return a reference to the user type stored in the container that serves as
 the beginning of the range.
 
-Note the beginning of a range may be equivalent to the end or NULL. */
+Note the beginning of a range may be equivalent to the end or nullptr. */
 void *ccc_begin_range(ccc_range const *r);
 
 /** @brief Obtain a reference to the end user element stored in a
@@ -458,7 +458,7 @@ container in the provided range.
 @return a reference to the user type stored in the container that serves as
 the end of the range.
 
-Note the end of a range may be equivalent to the beginning or NULL. Functions
+Note the end of a range may be equivalent to the beginning or nullptr. Functions
 that obtain ranges treat the end as an exclusive bound and therefore it is
 undefined to access this element. */
 void *ccc_end_range(ccc_range const *r);
@@ -470,7 +470,7 @@ container in the provided range.
 the reverse beginning of the range.
 
 Note the reverse beginning of a range may be equivalent to the reverse end or
-NULL. */
+nullptr. */
 void *ccc_rbegin_rrange(ccc_rrange const *r);
 
 /** @brief Obtain a reference to the reverse end user element stored in a
@@ -480,8 +480,8 @@ container in the provided range.
 the reverse end of the range.
 
 Note the reverse end of a range may be equivalent to the reverse beginning or
-NULL. Functions that obtain ranges treat the reverse end as an exclusive bound
-and therefore it is undefined to access this element. */
+nullptr. Functions that obtain ranges treat the reverse end as an exclusive
+bound and therefore it is undefined to access this element. */
 void *ccc_rend_rrange(ccc_rrange const *r);
 
 /**@}*/
@@ -494,7 +494,7 @@ Functions for obtaining more descriptive status information. */
 from a container operation, possible causes, and possible fixes to such error.
 @param [in] res the result obtained from a container operation.
 @return a string message of the result. A CCC_RESULT_OK result is an empty
-string, the falsey NULL terminator. All other results have a string message.
+string, the falsey nullptr terminator. All other results have a string message.
 
 These messages can be used for logging or to help with debugging by providing
 more information for why such a result might be obtained from a container. */
@@ -503,15 +503,15 @@ char const *ccc_result_msg(ccc_result res);
 /** @brief Obtain the entry status from a generic entry.
 @param [in] e a pointer to the entry.
 @return the status stored in the entry after the required action on the
-container completes. If e is NULL an entry input error is returned so ensure
-e is non-NULL to avoid an inaccurate status returned. */
+container completes. If e is nullptr an entry input error is returned so ensure
+e is non-nullptr to avoid an inaccurate status returned. */
 ccc_entry_status ccc_get_entry_status(ccc_entry const *e);
 
 /** @brief Obtain the handle status from a generic handle.
 @param [in] e a pointer to the handle.
 @return the status stored in the handle after the required action on the
-container completes. If e is NULL an handle input error is returned so ensure
-e is non-NULL to avoid an inaccurate status returned. */
+container completes. If e is nullptr an handle input error is returned so ensure
+e is non-nullptr to avoid an inaccurate status returned. */
 ccc_handle_status ccc_get_handle_status(ccc_handle const *e);
 
 /** @brief Obtain a string message with a description of the entry status.

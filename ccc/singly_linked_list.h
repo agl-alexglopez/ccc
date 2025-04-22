@@ -100,7 +100,7 @@ Add or remove elements from the container. */
 /** @brief Push the type wrapping elem to the front of the list. O(1).
 @param [in] sll a pointer to the singly linked list.
 @param [in] elem a pointer to the intrusive handle in the user type.
-@return a pointer to the inserted element or NULL if allocation failed.
+@return a pointer to the inserted element or nullptr if allocation failed.
 
 Note that if allocation is not allowed the container assumes the memory wrapping
 elem has been allocated appropriately and with the correct lifetime by the user.
@@ -114,11 +114,11 @@ O(1).
 @param [in] list_ptr a pointer to the singly linked list.
 @param [in] struct_initializer a compound literal containing the elements to
 be written to a newly allocated node.
-@return a reference to the element pushed to the front or NULL if allocation
+@return a reference to the element pushed to the front or nullptr if allocation
 failed.
 
 Note that it only makes sense to use this method when the container is given
-allocation permission. Otherwise NULL is returned due to an inability for the
+allocation permission. Otherwise nullptr is returned due to an inability for the
 container to allocate memory. */
 #define ccc_sll_emplace_front(list_ptr, struct_initializer...)                 \
     ccc_impl_sll_emplace_front(list_ptr, struct_initializer)
@@ -126,7 +126,7 @@ container to allocate memory. */
 /** @brief Pop the front element from the list. O(1).
 @param [in] sll a pointer to the singly linked list.
 @return ok if the list is non-empty and the pop is successful. An input error
-is returned if sll is NULL or the list is empty. */
+is returned if sll is nullptr or the list is empty. */
 ccc_result ccc_sll_pop_front(ccc_singly_linked_list *sll);
 
 /** @brief Inserts splice element after pos. O(N).
@@ -135,7 +135,7 @@ ccc_result ccc_sll_pop_front(ccc_singly_linked_list *sll);
 @param [in] splice_sll the list to which splice belongs.
 @param [in] splice the element to be moved before pos.
 @return ok if the operations is successful. An input error is provided if any
-input pointers are NULL.
+input pointers are nullptr.
 
 Note that pos_sll and splice_sll may be the same or different lists and the
 invariants of each or the same list will be maintained by the function. */
@@ -150,7 +150,7 @@ ccc_result ccc_sll_splice(ccc_singly_linked_list *pos_sll, ccc_sll_elem *pos,
 @param [in] begin the start of the range.
 @param [in] end the inclusive end of the range.
 @return OK if the operations is successful. An input error is provided if any
-input pointers are NULL.
+input pointers are nullptr.
 @warning pos must not be inside of the range `[begin, end]` if pos_sll is the
 same list as splice_sll.
 
@@ -164,7 +164,7 @@ ccc_result ccc_sll_splice_range(ccc_singly_linked_list *pos_sll,
 /** @brief Erases elem from the list returning the following element. O(N).
 @param [in] sll a pointer to the singly linked list.
 @param [in] elem a handle to the intrusive element known to be in the list.
-@return a pointer to the element following elem in the list or NULL if the
+@return a pointer to the element following elem in the list or nullptr if the
 list is empty or any bad input is provided to the function.
 @warning elem must be in the list.
 
@@ -177,8 +177,8 @@ void *ccc_sll_erase(ccc_singly_linked_list *sll, ccc_sll_elem *elem);
 @param [in] sll a pointer to the singly linked list.
 @param [in] begin the start of the range in the list.
 @param [in] end the exclusive end of the range in the list.
-@return a pointer to the element following the range in the list or NULL if the
-list is empty or any bad input is provided to the function.
+@return a pointer to the element following the range in the list or nullptr if
+the list is empty or any bad input is provided to the function.
 @warning the provided range must be in the list.
 
 Note that if allocation permission is given to the container it will free the
@@ -225,7 +225,7 @@ ccc_result ccc_sll_sort(ccc_singly_linked_list *sll);
 of the list determined by the user provided comparison function.
 @param [in] sll a pointer to the singly linked list.
 @param [in] e a pointer to the element to be inserted in order.
-@return a pointer to the element that has been inserted or NULL if allocation
+@return a pointer to the element that has been inserted or nullptr if allocation
 is required and has failed.
 @warning this function assumes the list is sorted.
 
@@ -237,7 +237,8 @@ void *ccc_sll_insert_sorted(ccc_singly_linked_list *sll, ccc_sll_elem *e);
 /** @brief Returns true if the list is sorted in non-decreasing order according
 to the user provided comparison function.
 @param [in] sll a pointer to the singly linked list.
-@return CCC_TRUE if the list is sorted CCC_FALSE if not. Error if sll is NULL.
+@return CCC_TRUE if the list is sorted CCC_FALSE if not. Error if sll is
+nullptr.
 
 If a non-increasing order is desired, return opposite results from the user
 comparison function. If an element is CCC_LES return CCC_GRT and vice versa.
@@ -252,8 +253,8 @@ Deallocate the container. */
 
 /** @brief Clears the list freeing memory if needed. O(N).
 @param [in] sll a pointer to the singly linked list.
-@param [in] fn a destructor function or NULL if not needed.
-@return ok if the clear succeeded or an input error if sll or fn are NULL.
+@param [in] fn a destructor function or nullptr if not needed.
+@return ok if the clear succeeded or an input error if sll or fn are nullptr.
 
 Note that if allocation is allowed, the container will free the user types
 wrapping each intrusive element in the list after calling fn. Therefore, fn
@@ -275,21 +276,21 @@ Iterate through the doubly linked list. */
 /** @brief Return the user type at the front of the list. O(1).
 @param [in] sll a pointer to the singly linked list.
 @return a pointer to the user type at the start of the list or the end sentinel.
-NULL is returned if sll is NULL. */
+nullptr is returned if sll is nullptr. */
 [[nodiscard]] void *ccc_sll_begin(ccc_singly_linked_list const *sll);
 
 /** @brief Return the sentinel at the end of the list. Do not access sentinel.
 O(1).
 @param [in] sll a pointer to the singly linked list.
 @return a pointer to the sentinel at the end of the list. It is undefined to
-access the sentinel. NULL is returned if sll is NULL.  */
+access the sentinel. nullptr is returned if sll is nullptr.  */
 [[nodiscard]] void *ccc_sll_end(ccc_singly_linked_list const *sll);
 
 /** @brief Return the user type following elem in the list. O(1).
 @param [in] sll a pointer to the singly linked list.
 @param [in] elem a pointer to the intrusive handle known to be in the list.
-@return the user type following elem or the end sentinel if none follow. NULL
-is returned if sll or elem are NULL. */
+@return the user type following elem or the end sentinel if none follow. nullptr
+is returned if sll or elem are nullptr. */
 [[nodiscard]] void *ccc_sll_next(ccc_singly_linked_list const *sll,
                                  ccc_sll_elem const *elem);
 
@@ -301,36 +302,38 @@ Obtain state from the doubly linked list. */
 
 /** @brief Return a pointer to the element at the front of the list. O(1).
 @param [in] sll a pointer to the singly linked list.
-@return a reference to the front element or NULL if empty or sll is NULL. */
+@return a reference to the front element or nullptr if empty or sll is nullptr.
+*/
 [[nodiscard]] void *ccc_sll_front(ccc_singly_linked_list const *sll);
 
 /** @brief Return a pointer to the first intrusive handle in the list. O(1).
 @param [in] sll a pointer to the singly linked list.
-@return a pointer to the first handle to a user type in the list or NULL if
+@return a pointer to the first handle to a user type in the list or nullptr if
 empty. */
 [[nodiscard]] ccc_sll_elem *
 ccc_sll_begin_elem(ccc_singly_linked_list const *sll);
 
 /** @brief Return a pointer to the first list element in the list. O(1).
 @param [in] sll a pointer to the singly linked list.
-@return a pointer to the first list element. This will never be NULL, even if
-the list is empty. If bad input is provided (sll is NULL) NULL is returned. */
+@return a pointer to the first list element. This will never be nullptr, even if
+the list is empty. If bad input is provided (sll is nullptr) nullptr is
+returned. */
 [[nodiscard]] ccc_sll_elem *
 ccc_sll_begin_sentinel(ccc_singly_linked_list const *sll);
 
 /** @brief Return the size of the list. O(1).
 @param [in] sll a pointer to the singly linked list.
-@return the size or an argument error is set if sll is NULL. */
+@return the size or an argument error is set if sll is nullptr. */
 [[nodiscard]] ccc_ucount ccc_sll_size(ccc_singly_linked_list const *sll);
 
 /** @brief Return true if the list is empty. O(1).
 @param [in] sll a pointer to the singly linked list.
-@return true if size is 0 otherwise false. Error returned if sll is NULL. */
+@return true if size is 0 otherwise false. Error returned if sll is nullptr. */
 [[nodiscard]] ccc_tribool ccc_sll_is_empty(ccc_singly_linked_list const *sll);
 
 /** @brief Returns true if the invariants of the list hold.
 @param [in] sll a pointer to the singly linked list.
-@return true if list is valid, else false. Error returned if sll is NULL. */
+@return true if list is valid, else false. Error returned if sll is nullptr. */
 [[nodiscard]] ccc_tribool ccc_sll_validate(ccc_singly_linked_list const *sll);
 
 /**@}*/

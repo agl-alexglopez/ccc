@@ -156,11 +156,11 @@ main(int argc, char **argv)
     /* Randomness will be used throughout the program but it need not be
        perfect. It only helps build the maze.
        NOLINTNEXTLINE(cert-msc32-c, cert-msc51-cpp) */
-    srand(time(NULL));
+    srand(time(nullptr));
     struct maze maze = {.rows = default_rows,
                         .cols = default_cols,
                         .speed = default_speed,
-                        .maze = NULL};
+                        .maze = nullptr};
     for (int i = 1; i < argc; ++i)
     {
         str_view const arg = sv(argv[i]);
@@ -239,14 +239,15 @@ animate_maze(struct maze *maze)
     /* Test use case of reserve without reallocation permission. Guarantees
        exactly the needed memory and no more over lifetime of program. */
     flat_hash_map cost_map
-        = fhm_init((struct prim_cell *)NULL, NULL, cell, prim_cell_hash_fn,
-                   prim_cell_eq, NULL, NULL, 0);
+        = fhm_init((struct prim_cell *)nullptr, nullptr, cell,
+                   prim_cell_hash_fn, prim_cell_eq, nullptr, nullptr, 0);
     ccc_result const r = fhm_reserve(
         &cost_map, ((maze->rows * maze->cols) / 2) + 1, std_alloc);
     prog_assert(r == CCC_RESULT_OK);
     /* Priority queue will manage its own flat buffer. */
-    ccc_flat_priority_queue cell_pq = ccc_fpq_init(
-        (struct prim_cell *)NULL, CCC_LES, cmp_prim_cells, std_alloc, NULL, 0);
+    ccc_flat_priority_queue cell_pq
+        = ccc_fpq_init((struct prim_cell *)nullptr, CCC_LES, cmp_prim_cells,
+                       std_alloc, nullptr, 0);
     struct point s = rand_point(maze);
     struct prim_cell const *const first = fhm_insert_entry_w(
         entry_r(&cost_map, &s),
@@ -290,8 +291,8 @@ animate_maze(struct maze *maze)
     }
     /* If a container is reserved without allocation permission it has no way
        to free itself. Give it the same allocation function used to reserve. */
-    (void)ccc_fhm_clear_and_free_reserve(&cost_map, NULL, std_alloc);
-    (void)ccc_fpq_clear_and_free(&cell_pq, NULL);
+    (void)ccc_fhm_clear_and_free_reserve(&cost_map, nullptr, std_alloc);
+    (void)ccc_fpq_clear_and_free(&cell_pq, nullptr);
 }
 
 /*===================     Container Support Code     ========================*/
@@ -407,30 +408,30 @@ carve_path_walls_animated(struct maze *maze, struct point const p,
     *maze_at_r(maze, p.r, p.c) |= path_bit;
     flush_cursor_maze_coordinate(maze, p.r, p.c);
     struct timespec ts = {.tv_sec = 0, .tv_nsec = time};
-    nanosleep(&ts, NULL);
+    nanosleep(&ts, nullptr);
     if (p.r - 1 >= 0 && !(maze_at(maze, p.r - 1, p.c) & path_bit))
     {
         *maze_at_r(maze, p.r - 1, p.c) &= ~south_wall;
         flush_cursor_maze_coordinate(maze, p.r - 1, p.c);
-        nanosleep(&ts, NULL);
+        nanosleep(&ts, nullptr);
     }
     if (p.r + 1 < maze->rows && !(maze_at(maze, p.r + 1, p.c) & path_bit))
     {
         *maze_at_r(maze, p.r + 1, p.c) &= ~north_wall;
         flush_cursor_maze_coordinate(maze, p.r + 1, p.c);
-        nanosleep(&ts, NULL);
+        nanosleep(&ts, nullptr);
     }
     if (p.c - 1 >= 0 && !(maze_at(maze, p.r, p.c - 1) & path_bit))
     {
         *maze_at_r(maze, p.r, p.c - 1) &= ~east_wall;
         flush_cursor_maze_coordinate(maze, p.r, p.c - 1);
-        nanosleep(&ts, NULL);
+        nanosleep(&ts, nullptr);
     }
     if (p.c + 1 < maze->cols && !(maze_at(maze, p.r, p.c + 1) & path_bit))
     {
         *maze_at_r(maze, p.r, p.c + 1) &= ~west_wall;
         flush_cursor_maze_coordinate(maze, p.r, p.c + 1);
-        nanosleep(&ts, NULL);
+        nanosleep(&ts, nullptr);
     }
     *maze_at_r(maze, p.r, p.c) |= cached_bit;
 }

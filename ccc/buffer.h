@@ -72,8 +72,8 @@ Initialize the container with memory, callbacks, and permissions. */
 
 /** @brief Initialize a contiguous buffer of user a specified type, allocation
 policy, capacity, and optional starting size.
-@param [in] mem_ptr the pointer to existing memory or ((Type *)NULL).
-@param [in] alloc_fn ccc_any_alloc_fn or NULL if no allocation is permitted.
+@param [in] mem_ptr the pointer to existing memory or ((Type *)nullptr).
+@param [in] alloc_fn ccc_any_alloc_fn or nullptr if no allocation is permitted.
 @param [in] aux_data any auxiliary data needed for managing buffer memory.
 @param [in] capacity the capacity of memory at mem_ptr.
 @param [in] optional_size optional starting size of the buffer <= capacity.
@@ -83,8 +83,8 @@ side of the equality operator (e.g. ccc_buffer b = ccc_buf_init(...);).
 Initialization of a buffer can occur at compile time or run time depending
 on the arguments. The memory pointer should be of the same type one intends to
 store in the buffer. Therefore, if one desires a dynamic buffer with a starting
-capacity of 0 and mem_ptr of NULL, casting to a type is required
-(e.g. (int*)NULL).
+capacity of 0 and mem_ptr of nullptr, casting to a type is required
+(e.g. (int*)nullptr).
 
 This initializer determines memory control for the lifetime of the buffer. If
 the buffer points to memory of a predetermined and fixed capacity do not
@@ -121,7 +121,7 @@ will reallocate more memory when necessary. */
 array. A slot is equivalent to one of the element type specified when the
 buffer is initialized.
 @param [in] buf a pointer to the buffer.
-@return a pointer to the newly allocated memory or NULL if no buffer is
+@return a pointer to the newly allocated memory or nullptr if no buffer is
 provided or the buffer is unable to allocate more memory.
 @note this function modifies the size of the container.
 
@@ -134,8 +134,8 @@ higher level organizations. */
 according to size.
 @param [in] buf the pointer to the buffer.
 @param [in] data the pointer to the data of element size.
-@return the pointer to the newly pushed element or NULL if no buffer exists or
-resizing has failed due to memory exhuastion or no allocation allowed.
+@return the pointer to the newly pushed element or nullptr if no buffer exists
+or resizing has failed due to memory exhuastion or no allocation allowed.
 @note this function modifies the size of the container.
 
 The data is copied into the buffer at the final slot if there is remaining
@@ -150,7 +150,7 @@ contiguous storage of elements between 0 and size.
 @param [in] i the index at which to insert data.
 @param [in] data the data copied into the buffer at index i of the same size
 as elements stored in the buffer.
-@return the pointer to the inserted element or NULL if bad input is provided,
+@return the pointer to the inserted element or nullptr if bad input is provided,
 the buffer is full and no resizing is allowed, or resizing fails when resizing
 is allowed.
 @note this function modifies the size of the container.
@@ -201,8 +201,8 @@ implementations operating at a higher level of abstraction. */
 /** @brief return the element at slot i in buf.
 @param [in] buf the pointer to the buffer.
 @param [in] i the index within capacity range of the buffer.
-@return a pointer to the element in the slot at position i or NULL if i is out
-of capacity range.
+@return a pointer to the element in the slot at position i or nullptr if i is
+out of capacity range.
 
 Note that as long as the index is valid within the capacity of the buffer a
 valid pointer is returned, which may result in a slot of old or uninitialized
@@ -220,12 +220,12 @@ buffer, otherwise an argument error is set. */
 /** @brief return the final element in the buffer according the current size.
 @param [in] buf the pointer to the buffer.
 @return the pointer the final element in the buffer according to the current
-size or NULL if the buffer does not exist or is empty. */
+size or nullptr if the buffer does not exist or is empty. */
 [[nodiscard]] void *ccc_buf_back(ccc_buffer const *buf);
 
 /** @brief return the first element in the buffer at index 0.
 @param [in] buf the pointer to the buffer.
-@return the pointer to the front element or NULL if the buffer does not exist
+@return the pointer to the front element or nullptr if the buffer does not exist
 or is empty. */
 [[nodiscard]] void *ccc_buf_front(ccc_buffer const *buf);
 
@@ -233,7 +233,7 @@ or is empty. */
 @param [in] buf the pointer to the buffer.
 @param [in] dst the index of destination within bounds of capacity.
 @param [in] src the index of source within bounds of capacity.
-@return a pointer to the slot at dst or NULL if bad input is provided.
+@return a pointer to the slot at dst or nullptr if bad input is provided.
 @note this function does NOT modify the size of the container.
 
 Note that destination and source are only required to be valid within bounds
@@ -281,8 +281,8 @@ The following functions implement iterators over the buffer. */
 /** @brief obtain the base address of the buffer in preparation for iteration.
 @param [in] buf the pointer to the buffer.
 @return the base address of the buffer. This will be equivalent to the buffer
-end iterator if the buffer size is 0. NULL is returned if a NULL argument is
-provided or the buffer has not yet been allocated. */
+end iterator if the buffer size is 0. nullptr is returned if a nullptr argument
+is provided or the buffer has not yet been allocated. */
 [[nodiscard]] void *ccc_buf_begin(ccc_buffer const *buf);
 
 /** @brief advance the iter to the next slot in the buffer according to size.
@@ -294,8 +294,8 @@ provided or the buffer has not yet been allocated. */
 /** @brief return the end position of the buffer according to size.
 @param [in] buf the pointer to the buffer.
 @return the address of the end position. It is undefined to access this
-position for any reason. NULL is returned if NULL is provided or buffer has
-not yet been allocated.
+position for any reason. nullptr is returned if nullptr is provided or buffer
+has not yet been allocated.
 
 Note that end is determined by the size of the buffer dynamically. */
 [[nodiscard]] void *ccc_buf_end(ccc_buffer const *buf);
@@ -303,8 +303,8 @@ Note that end is determined by the size of the buffer dynamically. */
 /** @brief return the end position of the buffer according to capacity.
 @param [in] buf the pointer to the buffer.
 @return the address of the position one past capacity. It is undefined to
-access this position for any reason. NULL is returned if NULL is provided or
-buffer has not yet been allocated.
+access this position for any reason. nullptr is returned if nullptr is provided
+or buffer has not yet been allocated.
 
 Note that end is determined by the capcity of the buffer and will not change
 until a resize has occured, if permitted. */
@@ -314,7 +314,7 @@ until a resize has occured, if permitted. */
 for iteration according to size.
 @param [in] buf the pointer to the buffer.
 @return the address of the last element buffer. This will be equivalent to the
-buffer rend iterator if the buffer size is 0. NULL is returned if a NULL
+buffer rend iterator if the buffer size is 0. nullptr is returned if a nullptr
 argument is provided or the buffer has not yet been allocated. */
 [[nodiscard]] void *ccc_buf_rbegin(ccc_buffer const *buf);
 
@@ -322,15 +322,16 @@ argument is provided or the buffer has not yet been allocated. */
 in reverse order.
 @param [in] buf the pointer to the buffer.
 @param [in] iter the pointer to the current slot of the buffer.
-@return the next iterator position according to size and in reverse order. NULL
-is returned if bad input is provided or the buffer has not been allocated. */
+@return the next iterator position according to size and in reverse order.
+nullptr is returned if bad input is provided or the buffer has not been
+allocated. */
 [[nodiscard]] void *ccc_buf_rnext(ccc_buffer const *buf, void const *iter);
 
 /** @brief return the rend position of the buffer.
 @param [in] buf the pointer to the buffer.
 @return the address of the rend position. It is undefined to access this
-position for any reason. NULL is returned if NULL is provided or buffer has
-not yet been allocated. */
+position for any reason. nullptr is returned if nullptr is provided or buffer
+has not yet been allocated. */
 [[nodiscard]] void *ccc_buf_rend(ccc_buffer const *buf);
 
 /**@}*/
@@ -373,31 +374,31 @@ ccc_result ccc_buf_size_set(ccc_buffer *buf, size_t n);
 @param [in] buf the pointer to the buffer.
 @return the total number of elements the can be stored in the buffer. This
 value remains the same until a resize occurs. An argument error is set if buf is
-NULL. */
+nullptr. */
 [[nodiscard]] ccc_ucount ccc_buf_capacity(ccc_buffer const *buf);
 
 /** @brief the size of the type being stored contiguously in the buffer.
 @param [in] buf the pointer to the buffer.
-@return the size of the type being stored in the buffer. 0 if buf is NULL
+@return the size of the type being stored in the buffer. 0 if buf is nullptr
 because a zero sized object is not possible for a buffer. */
 [[nodiscard]] ccc_ucount ccc_buf_sizeof_type(ccc_buffer const *buf);
 
 /** @brief obtain the size of the buffer representing active slots.
 @param [in] buf the pointer to the buffer.
 @return the quantity of elements stored in the buffer. An argument error is set
-if buf is NULL.
+if buf is nullptr.
 
 Note that size must be less than or equal to capacity. */
 [[nodiscard]] ccc_ucount ccc_buf_size(ccc_buffer const *buf);
 
 /** @brief return true if the size of the buffer is 0.
 @param [in] buf the pointer to the buffer.
-@return true if the size is 0 false if not. Error if buf is NULL. */
+@return true if the size is 0 false if not. Error if buf is nullptr. */
 [[nodiscard]] ccc_tribool ccc_buf_is_empty(ccc_buffer const *buf);
 
 /** @brief return true if the size of the buffer equals capacity.
 @param [in] buf the pointer to the buffer.
-@return true if the size equals the capacity. Error if buf is NULL. */
+@return true if the size equals the capacity. Error if buf is nullptr. */
 [[nodiscard]] ccc_tribool ccc_buf_is_full(ccc_buffer const *buf);
 
 /**@}*/

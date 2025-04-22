@@ -67,17 +67,18 @@ void ccc_impl_sll_push_front(struct ccc_sll *, struct ccc_sll_elem *);
 /** @private */
 #define ccc_impl_sll_emplace_front(list_ptr, struct_initializer...)            \
     (__extension__({                                                           \
-        typeof(struct_initializer) *impl_sll_res = NULL;                       \
+        typeof(struct_initializer) *impl_sll_res = nullptr;                    \
         struct ccc_sll *impl_sll = (list_ptr);                                 \
         if (impl_sll)                                                          \
         {                                                                      \
             if (!impl_sll->alloc)                                              \
             {                                                                  \
-                impl_sll_res = NULL;                                           \
+                impl_sll_res = nullptr;                                        \
             }                                                                  \
             else                                                               \
             {                                                                  \
-                impl_sll_res = impl_sll->alloc(NULL, impl_sll->sizeof_type);   \
+                impl_sll_res                                                   \
+                    = impl_sll->alloc(nullptr, impl_sll->sizeof_type);         \
                 if (impl_sll_res)                                              \
                 {                                                              \
                     *impl_sll_res = struct_initializer;                        \

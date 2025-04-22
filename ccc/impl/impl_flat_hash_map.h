@@ -270,12 +270,12 @@ desired data if occupied. */
 
 /** @private The or insert method is unique in that it directly returns a
 reference to the inserted data rather than a entry with a status. This is
-because it should not fail. If NULL is returned the user knows there is a
+because it should not fail. If nullptr is returned the user knows there is a
 problem. */
 #define ccc_impl_fhm_or_insert_w(flat_hash_map_entry_ptr, lazy_key_value...)   \
     (__extension__({                                                           \
         __auto_type impl_fhm_or_ins_ent_ptr = (flat_hash_map_entry_ptr);       \
-        typeof(lazy_key_value) *impl_fhm_or_ins_res = NULL;                    \
+        typeof(lazy_key_value) *impl_fhm_or_ins_res = nullptr;                 \
         if (impl_fhm_or_ins_ent_ptr)                                           \
         {                                                                      \
             struct ccc_fhash_entry *impl_fhm_or_ins_entry                      \
@@ -302,7 +302,7 @@ directly. This is similar to insert or assign where overwriting may occur. */
                                     lazy_key_value...)                         \
     (__extension__({                                                           \
         __auto_type impl_fhm_ins_ent_ptr = (flat_hash_map_entry_ptr);          \
-        typeof(lazy_key_value) *impl_fhm_ins_ent_res = NULL;                   \
+        typeof(lazy_key_value) *impl_fhm_ins_ent_res = nullptr;                \
         if (impl_fhm_ins_ent_ptr)                                              \
         {                                                                      \
             struct ccc_fhash_entry *impl_fhm_ins_entry                         \

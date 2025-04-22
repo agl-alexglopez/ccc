@@ -376,12 +376,12 @@ ccc_fhm_get_key_val(ccc_flat_hash_map const *const h, void const *const key)
 {
     if (unlikely(!h || !key || !h->init || !h->count))
     {
-        return NULL;
+        return nullptr;
     }
     ccc_ucount const i = find_key(h, key, hash_fn(h, key));
     if (i.error)
     {
-        return NULL;
+        return nullptr;
     }
     return data_at(h, i.count);
 }
@@ -402,7 +402,7 @@ ccc_fhm_or_insert(ccc_fhmap_entry const *const e, void const *key_val_type)
 
     if (unlikely(!e || !key_val_type))
     {
-        return NULL;
+        return nullptr;
     }
     if (e->impl.handle.stats & CCC_ENTRY_OCCUPIED)
     {
@@ -410,7 +410,7 @@ ccc_fhm_or_insert(ccc_fhmap_entry const *const e, void const *key_val_type)
     }
     if (e->impl.handle.stats & CCC_ENTRY_INSERT_ERROR)
     {
-        return NULL;
+        return nullptr;
     }
     insert_and_copy(e->impl.h, key_val_type, e->impl.tag, e->impl.handle.i);
     return data_at(e->impl.h, e->impl.handle.i);
@@ -422,7 +422,7 @@ ccc_fhm_insert_entry(ccc_fhmap_entry const *const e, void const *key_val_type)
 
     if (unlikely(!e || !key_val_type))
     {
-        return NULL;
+        return nullptr;
     }
     if (e->impl.handle.stats & CCC_ENTRY_OCCUPIED)
     {
@@ -432,7 +432,7 @@ ccc_fhm_insert_entry(ccc_fhmap_entry const *const e, void const *key_val_type)
     }
     if (e->impl.handle.stats & CCC_ENTRY_INSERT_ERROR)
     {
-        return NULL;
+        return nullptr;
     }
     insert_and_copy(e->impl.h, key_val_type, e->impl.tag, e->impl.handle.i);
     return data_at(e->impl.h, e->impl.handle.i);
@@ -460,7 +460,7 @@ ccc_fhm_and_modify(ccc_fhmap_entry *const e, ccc_any_type_update_fn *const fn)
     {
         fn((ccc_any_type){
             .any_type = data_at(e->impl.h, e->impl.handle.i),
-            .aux = NULL,
+            .aux = nullptr,
         });
     }
     return e;
@@ -594,7 +594,7 @@ ccc_fhm_begin(ccc_flat_hash_map const *const h)
 {
     if (unlikely(!h || !h->mask || !h->init || !h->mask || !h->count))
     {
-        return NULL;
+        return nullptr;
     }
     for (size_t i = 0; i < (h->mask + 1); ++i)
     {
@@ -603,7 +603,7 @@ ccc_fhm_begin(ccc_flat_hash_map const *const h)
             return data_at(h, i);
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 void *
@@ -612,12 +612,12 @@ ccc_fhm_next(ccc_flat_hash_map const *const h,
 {
     if (unlikely(!h || !key_val_type_iter || !h->mask || !h->init || !h->count))
     {
-        return NULL;
+        return nullptr;
     }
     ccc_ucount i = data_i(h, key_val_type_iter);
     if (i.error)
     {
-        return NULL;
+        return nullptr;
     }
     for (; i.count < (h->mask + 1); ++i.count)
     {
@@ -626,13 +626,13 @@ ccc_fhm_next(ccc_flat_hash_map const *const h,
             return data_at(h, i.count);
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 void *
 ccc_fhm_end(ccc_flat_hash_map const *const)
 {
-    return NULL;
+    return nullptr;
 }
 
 void *
@@ -640,7 +640,7 @@ ccc_fhm_unwrap(ccc_fhmap_entry const *const e)
 {
     if (unlikely(!e) || !(e->impl.handle.stats & CCC_ENTRY_OCCUPIED))
     {
-        return NULL;
+        return nullptr;
     }
     return data_at(e->impl.h, e->impl.handle.i);
 }
@@ -709,7 +709,7 @@ ccc_fhm_clear_and_free(ccc_flat_hash_map *const h,
     h->mask = 0;
     h->init = CCC_FALSE;
     h->count = 0;
-    h->tag = NULL;
+    h->tag = nullptr;
     h->data = h->alloc_fn(h->data, 0, h->aux);
     return CCC_RESULT_OK;
 }
@@ -746,7 +746,7 @@ ccc_fhm_clear_and_free_reserve(ccc_flat_hash_map *const h,
     h->mask = 0;
     h->init = CCC_FALSE;
     h->count = 0;
-    h->tag = NULL;
+    h->tag = nullptr;
     h->data = alloc(h->data, 0, h->aux);
     return CCC_RESULT_OK;
 }
@@ -784,7 +784,7 @@ ccc_fhm_handle_status(ccc_fhmap_entry const *const e)
 void *
 ccc_fhm_data(ccc_flat_hash_map const *h)
 {
-    return h ? h->data : NULL;
+    return h ? h->data : nullptr;
 }
 
 ccc_result
@@ -1239,7 +1239,7 @@ maybe_rehash(struct ccc_fhmap *const h, size_t const to_add,
         required_total_cap = max(required_total_cap, CCC_FHM_GROUP_SIZE);
         size_t const total_bytes
             = mask_to_total_bytes(h->sizeof_type, required_total_cap - 1);
-        void *const buf = fn(NULL, total_bytes, h->aux);
+        void *const buf = fn(nullptr, total_bytes, h->aux);
         if (!buf)
         {
             return CCC_RESULT_MEM_ERROR;
@@ -1352,7 +1352,7 @@ rehash_resize(struct ccc_fhmap *const h, size_t const to_add,
     {
         return CCC_RESULT_MEM_ERROR;
     }
-    void *const new_buf = fn(NULL, total_bytes, h->aux);
+    void *const new_buf = fn(nullptr, total_bytes, h->aux);
     if (!new_buf)
     {
         return CCC_RESULT_MEM_ERROR;

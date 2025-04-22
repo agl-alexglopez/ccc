@@ -123,7 +123,7 @@ ccc_hom_at(ccc_handle_ordered_map const *const h, ccc_handle_i const i)
 {
     if (!h || !i)
     {
-        return NULL;
+        return nullptr;
     }
     return ccc_buf_at(&h->buf, i);
 }
@@ -186,13 +186,13 @@ ccc_hom_and_modify(ccc_homap_handle *const h, ccc_any_type_update_fn *const fn)
 {
     if (!h)
     {
-        return NULL;
+        return nullptr;
     }
     if (fn && h->impl.handle.stats & CCC_ENTRY_OCCUPIED)
     {
         fn((ccc_any_type){
             .any_type = base_at(h->impl.hom, h->impl.handle.i),
-            .aux = NULL,
+            .aux = nullptr,
         });
     }
     return h;
@@ -204,7 +204,7 @@ ccc_hom_and_modify_aux(ccc_homap_handle *const h,
 {
     if (!h)
     {
-        return NULL;
+        return nullptr;
     }
     if (fn && h->impl.handle.stats & CCC_ENTRY_OCCUPIED)
     {
@@ -458,7 +458,7 @@ ccc_hom_begin(ccc_handle_ordered_map const *const hom)
 {
     if (!hom || ccc_buf_is_empty(&hom->buf))
     {
-        return NULL;
+        return nullptr;
     }
     size_t const n = min_max_from(hom, hom->root, L);
     return base_at(hom, n);
@@ -469,7 +469,7 @@ ccc_hom_rbegin(ccc_handle_ordered_map const *const hom)
 {
     if (!hom || ccc_buf_is_empty(&hom->buf))
     {
-        return NULL;
+        return nullptr;
     }
     size_t const n = min_max_from(hom, hom->root, R);
     return base_at(hom, n);
@@ -481,7 +481,7 @@ ccc_hom_next(ccc_handle_ordered_map const *const hom,
 {
     if (!hom || ccc_buf_is_empty(&hom->buf))
     {
-        return NULL;
+        return nullptr;
     }
     size_t const n = next(hom, index_of(hom, e), INORDER);
     return base_at(hom, n);
@@ -493,7 +493,7 @@ ccc_hom_rnext(ccc_handle_ordered_map const *const hom,
 {
     if (!hom || !e || ccc_buf_is_empty(&hom->buf))
     {
-        return NULL;
+        return nullptr;
     }
     size_t const n = next(hom, index_of(hom, e), R_INORDER);
     return base_at(hom, n);
@@ -504,7 +504,7 @@ ccc_hom_end(ccc_handle_ordered_map const *const hom)
 {
     if (!hom || ccc_buf_is_empty(&hom->buf))
     {
-        return NULL;
+        return nullptr;
     }
     return base_at(hom, 0);
 }
@@ -514,7 +514,7 @@ ccc_hom_rend(ccc_handle_ordered_map const *const hom)
 {
     if (!hom || ccc_buf_is_empty(&hom->buf))
     {
-        return NULL;
+        return nullptr;
     }
     return base_at(hom, 0);
 }
@@ -522,7 +522,7 @@ ccc_hom_rend(ccc_handle_ordered_map const *const hom)
 void *
 ccc_hom_data(ccc_handle_ordered_map const *const hom)
 {
-    return hom ? ccc_buf_begin(&hom->buf) : NULL;
+    return hom ? ccc_buf_begin(&hom->buf) : nullptr;
 }
 
 ccc_range
@@ -1047,7 +1047,7 @@ alloc_slot(struct ccc_homap *const t)
 static inline void
 init_node(struct ccc_homap_elem *const e)
 {
-    assert(e != NULL);
+    assert(e != nullptr);
     e->branch[L] = e->branch[R] = e->parent = 0;
 }
 

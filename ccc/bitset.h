@@ -96,7 +96,8 @@ This method can be used for compile time initialization of bit set. For example:
 
 ```
 static ccc_bitset b
-    = ccc_bs_init((static ccc_bitblock[ccc_bs_blocks(256)]){}, NULL, NULL, 256);
+    = ccc_bs_init((static ccc_bitblock[ccc_bs_blocks(256)]){}, nullptr, nullptr,
+256);
 ```
 
 The above example also illustrates the benefits of a static compound literal
@@ -106,7 +107,7 @@ traditional example follows:
 
 ```
 static ccc_bitblock blocks[ccc_bs_blocks(256)];
-static ccc_bitset b = ccc_bs_init(blocks, NULL, NULL, 256);
+static ccc_bitset b = ccc_bs_init(blocks, nullptr, nullptr, 256);
 ```
 
 This macro is required for any initialization where the bit block memory comes
@@ -115,8 +116,8 @@ memory see the ccc_bs_reserve and ccc_bs_clear_and_free_reserve interface. */
 #define ccc_bs_blocks(bit_cap) ccc_impl_bs_blocks(bit_cap)
 
 /** @brief Initialize the bit set with memory and allocation permissions.
-@param [in] bitblock_ptr the pointer to existing blocks or NULL.
-@param [in] alloc_fn the allocation function for a dynamic bit set or NULL.
+@param [in] bitblock_ptr the pointer to existing blocks or nullptr.
+@param [in] alloc_fn the allocation function for a dynamic bit set or nullptr.
 @param [in] aux auxiliary data needed for allocation of the bit set.
 @param [in] cap the number of bits that will be stored in this bit set.
 @param [in] optional_size an optional starting size <= capacity. This value
@@ -135,20 +136,20 @@ A fixed size bit set with size equal to capacity.
 
 ```
 #define BITSET_USING_NAMESPACE_CCC
-bitset bs = bs_init((bitblock[bs_blocks(9)]){}, NULL, NULL, 9);
+bitset bs = bs_init((bitblock[bs_blocks(9)]){}, nullptr, nullptr, 9);
 ```
 A fixed size bit set with dynamic push and pop.
 
 ```
 #define BITSET_USING_NAMESPACE_CCC
-bitset bs = bs_init((bitblock[bs_blocks(9)]){}, NULL, NULL, 9, 0);
+bitset bs = bs_init((bitblock[bs_blocks(9)]){}, nullptr, nullptr, 9, 0);
 ```
 
 A dynamic bit set initialization.
 
 ```
 #define BITSET_USING_NAMESPACE_CCC
-bitset bs = bs_init(NULL, std_alloc, NULL, 0);
+bitset bs = bs_init(nullptr, std_alloc, nullptr, 0);
 ```
 
 See types.h for more on allocation functions. */
@@ -167,19 +168,19 @@ is returned.
 less than src, an allocation function must be provided with the fn argument.
 
 Note that there are two ways to copy data from source to destination: provide
-sufficient memory and pass NULL as fn, or allow the copy function to take care
-of allocation for the copy.
+sufficient memory and pass nullptr as fn, or allow the copy function to take
+care of allocation for the copy.
 
 Manual memory management with no allocation function provided.
 
 ```
 #define BITSET_USING_NAMESPACE_CCC
 static bitset src
-    = bs_init((static bitblock[bs_blocks(11)]){}, NULL, NULL, 11);
+    = bs_init((static bitblock[bs_blocks(11)]){}, nullptr, nullptr, 11);
 set_rand_bits(&src);
 static bitset src
-    = bs_init((static bitblock[bs_blocks(13)]){}, NULL, NULL, 13);
-ccc_result res = bs_copy(&dst, &src, NULL);
+    = bs_init((static bitblock[bs_blocks(13)]){}, nullptr, nullptr, 13);
+ccc_result res = bs_copy(&dst, &src, nullptr);
 ```
 
 The above requires dst capacity be greater than or equal to src capacity. Here
@@ -187,9 +188,9 @@ is memory management handed over to the copy function.
 
 ```
 #define BITSET_USING_NAMESPACE_CCC
-static bitset src = bs_init((bitblock *)NULL, std_alloc, NULL, 0);
+static bitset src = bs_init((bitblock *)nullptr, std_alloc, nullptr, 0);
 push_rand_bits(&src);
-static bitset src = bs_init((bitblock *)NULL, std_alloc, NULL, 0);
+static bitset src = bs_init((bitblock *)nullptr, std_alloc, nullptr, 0);
 ccc_result res = bs_copy(&dst, &src, std_alloc);
 ```
 
@@ -200,9 +201,9 @@ size map.
 
 ```
 #define BITSET_USING_NAMESPACE_CCC
-static bitset src = bs_init((bitblock *)NULL, std_alloc, NULL, 0);
+static bitset src = bs_init((bitblock *)nullptr, std_alloc, nullptr, 0);
 push_rand_bits(&src);
-static bitset src = bs_init((bitblock *)NULL, NULL, NULL, 0);
+static bitset src = bs_init((bitblock *)nullptr, nullptr, nullptr, 0);
 ccc_result res = bs_copy(&dst, &src, std_alloc);
 ```
 
@@ -246,7 +247,7 @@ Test for the presence of bits. */
 /** @brief Test the bit at index i for boolean status (CCC_TRUE or CCC_FALSE).
 @param [in] bs a pointer to the bit set.
 @param [in] i the index identifying the bit to set.
-@return the state of the bit, or CCC_TRIBOOL_ERROR if bs is NULL.
+@return the state of the bit, or CCC_TRIBOOL_ERROR if bs is nullptr.
 @note this function performs bounds checking in the release target. */
 ccc_tribool ccc_bs_test(ccc_bitset const *bs, size_t i);
 
@@ -261,7 +262,7 @@ Set and flip bits in the set. */
 @param [in] i the valid index identifying the bit to set.
 @param [in] b the value to set at position i (CCC_TRUE or CCC_FALSE).
 @return the state of the bit before the set operation, true if it was
-previously true, false if it was previously false, or error if bs is NULL or
+previously true, false if it was previously false, or error if bs is nullptr or
 i is out of range.
 @note this function performs bounds checking in the release target. */
 ccc_tribool ccc_bs_set(ccc_bitset *bs, size_t i, ccc_tribool b);
@@ -270,7 +271,7 @@ ccc_tribool ccc_bs_set(ccc_bitset *bs, size_t i, ccc_tribool b);
 @param [in] bs a pointer to the bit set.
 @param [in] b the value to set (CCC_TRUE or CCC_FALSE).
 @return the result of the operation. OK if successful, or an input error if
-bs is NULL. */
+bs is nullptr. */
 ccc_result ccc_bs_set_all(ccc_bitset *bs, ccc_tribool b);
 
 /** @brief Set all the bits in the specified range starting at the Least
@@ -281,7 +282,7 @@ range (CCC_TRUE or CCC_FALSE).
 @param [in] i the starting index to set.
 @param [in] count the count of bits starting at i to set.
 @return the result of the operation. OK if successful, or an input error if
-bs is NULL or the range is invalid by position, count, or both.
+bs is nullptr or the range is invalid by position, count, or both.
 
 Note that a range is defined from i to i + count, where i + count is the
 exclusive end of the range. This is equivalent to moving from Least to Most
@@ -293,7 +294,7 @@ ccc_result ccc_bs_set_range(ccc_bitset *bs, size_t i, size_t count,
 @param [in] bs a pointer to the bit set.
 @param [in] i the valid index identifying the bit to set.
 @return the state of the bit before the set operation, true if it was
-previously true, false if it was previously false, or error if bs is NULL or
+previously true, false if it was previously false, or error if bs is nullptr or
 i is out of range.
 @note this function performs bounds checking in the release target. */
 ccc_tribool ccc_bs_reset(ccc_bitset *bs, size_t i);
@@ -301,7 +302,7 @@ ccc_tribool ccc_bs_reset(ccc_bitset *bs, size_t i);
 /** @brief Set all the bits to CCC_FALSE.
 @param [in] bs a pointer to the bit set.
 @return the result of the operation. OK if successful, or an input error if
-bs is NULL. */
+bs is nullptr. */
 ccc_result ccc_bs_reset_all(ccc_bitset *bs);
 
 /** @brief Set all the bits in the specified range starting at the Least
@@ -311,7 +312,7 @@ range to CCC_FALSE.
 @param [in] i the starting index to reset.
 @param [in] count the count of bits starting at i to reset.
 @return the result of the operation. OK if successful, or an input error if
-bs is NULL or the range is invalid by position, count, or both.
+bs is nullptr or the range is invalid by position, count, or both.
 
 Note that a range is defined from i to i + count, where i + count is the
 exclusive end of the range. This is equivalent to moving from Least to Most
@@ -322,7 +323,7 @@ ccc_result ccc_bs_reset_range(ccc_bitset *bs, size_t i, size_t count);
 @param [in] bs a pointer to the bit set.
 @param [in] i the index identifying the bit to toggle
 @return the state of the bit before the toggle operation, true if it was
-previously true, false if it was previously false, or error if bs is NULL or
+previously true, false if it was previously false, or error if bs is nullptr or
 i is out of range.
 @note this function performs bounds checking in the release target. */
 ccc_tribool ccc_bs_flip(ccc_bitset *bs, size_t i);
@@ -330,7 +331,7 @@ ccc_tribool ccc_bs_flip(ccc_bitset *bs, size_t i);
 /** @brief Toggle all of the bits to their opposing boolean value.
 @param [in] bs a pointer to the bit set.
 @return the result of the operation. OK if successful, or an input error if
-bs is NULL. */
+bs is nullptr. */
 ccc_result ccc_bs_flip_all(ccc_bitset *bs);
 
 /** @brief Flip all the bits in the range, starting at the Least Significant Bit
@@ -339,7 +340,7 @@ in range and ending at the Most Significant Bit, to their opposite value.
 @param [in] i the starting index to reset.
 @param [in] count the count of bits starting at i to reset.
 @return the result of the operation. OK if successful, or an input error if
-bs is NULL or the range is invalid by position, count, or both.
+bs is nullptr or the range is invalid by position, count, or both.
 
 Note that a range is defined from i to i + count, where i + count is the
 exclusive end of the range. This is equivalent to moving from Least to Most
@@ -355,7 +356,7 @@ Find bits with a specific status. */
 /** @brief Return true if any bits in set are 1.
 @param [in] bs a pointer to the bit set.
 @return CCC_TRUE if any bits are 1, CCC_FALSE if no bits are 1,
-CCC_TRIBOOL_ERROR if bs is NULL. */
+CCC_TRIBOOL_ERROR if bs is nullptr. */
 ccc_tribool ccc_bs_any(ccc_bitset const *bs);
 
 /** @brief Return true if any bits are 1 in the specified range.
@@ -363,14 +364,14 @@ ccc_tribool ccc_bs_any(ccc_bitset const *bs);
 @param [in] i the starting position.
 @param [in] count the size of the range to check.
 @return CCC_TRUE if any bits are 1, CCC_FALSE if no bits are 1,
-CCC_TRIBOOL_ERROR if bs is NULL, i is invalid, count is invalid, or both i and
-count are invalid. */
+CCC_TRIBOOL_ERROR if bs is nullptr, i is invalid, count is invalid, or both i
+and count are invalid. */
 ccc_tribool ccc_bs_any_range(ccc_bitset const *bs, size_t i, size_t count);
 
 /** @brief Return true if all bits are set to 0.
 @param [in] bs a pointer to the bit set.
 @return CCC_TRUE if all bits are 0, CCC_FALSE if any bits are 1,
-CCC_TRIBOOL_ERROR if bs is NULL. */
+CCC_TRIBOOL_ERROR if bs is nullptr. */
 ccc_tribool ccc_bs_none(ccc_bitset const *bs);
 
 /** @brief Return true if all bits are 0 in the specified range.
@@ -378,14 +379,14 @@ ccc_tribool ccc_bs_none(ccc_bitset const *bs);
 @param [in] i the starting position.
 @param [in] count the size of the range to check.
 @return CCC_TRUE if all bits are 0, CCC_FALSE if any bits are 1,
-CCC_TRIBOOL_ERROR if bs is NULL, i is invalid, count is invalid, or both i and
-count are invalid. */
+CCC_TRIBOOL_ERROR if bs is nullptr, i is invalid, count is invalid, or both i
+and count are invalid. */
 ccc_tribool ccc_bs_none_range(ccc_bitset const *bs, size_t i, size_t count);
 
 /** @brief Return true if all bits in set are 1.
 @param [in] bs a pointer to the bit set.
 @return CCC_TRUE if all bits are 1, CCC_FALSE if any bits are 0,
-CCC_TRIBOOL_ERROR if bs is NULL. */
+CCC_TRIBOOL_ERROR if bs is nullptr. */
 ccc_tribool ccc_bs_all(ccc_bitset const *bs);
 
 /** @brief Return true if all bits are set to 1 in the specified range.
@@ -393,15 +394,15 @@ ccc_tribool ccc_bs_all(ccc_bitset const *bs);
 @param [in] i the starting position.
 @param [in] count the size of the range to check.
 @return CCC_TRUE if all bits are 1, CCC_FALSE if any bits are 0,
-CCC_TRIBOOL_ERROR if bs is NULL, i is invalid, count is invalid, or both i and
-count are invalid. */
+CCC_TRIBOOL_ERROR if bs is nullptr, i is invalid, count is invalid, or both i
+and count are invalid. */
 ccc_tribool ccc_bs_all_range(ccc_bitset const *bs, size_t i, size_t count);
 
 /** @brief Return the index of the first trailing bit set to 1 in the set.
 @param [in] bs a pointer to the bit set.
 @return an OK(0) status and index of the first trailing bit set to 1 or an error
 set to CCC_RESULT_FAIL if no 1 bit is found. Argument error is set if bs is
-NULL. */
+nullptr. */
 ccc_ucount ccc_bs_first_trailing_one(ccc_bitset const *bs);
 
 /** @brief Return the index of the first trailing bit set to 1 in the range,
@@ -410,8 +411,8 @@ starting from the Least Significant Bit at index 0.
 @param [in] i the starting index to search.
 @param [in] count the size of the range to check.
 @return an OK(0) status and the index of the first trailing bit set to 1 or
-CCC_RESULT_FAIL if no 1 bit is found. Argument error is returned bs is NULL, or
-the range is invalid. */
+CCC_RESULT_FAIL if no 1 bit is found. Argument error is returned bs is nullptr,
+or the range is invalid. */
 ccc_ucount ccc_bs_first_trailing_one_range(ccc_bitset const *bs, size_t i,
                                            size_t count);
 
@@ -422,7 +423,7 @@ contiguous 1 bits.
 @return an OK(0) status and the index in a search starting from the Least
 Significant Bit of the set of the first 1 in a sequence of num_ones 1 bits. If
 such a sequence cannot be found CCC_RESULT_FAIL result error is set. If bs is
-NULL or num_ones is too large an argument error is set. */
+nullptr or num_ones is too large an argument error is set. */
 ccc_ucount ccc_bs_first_trailing_ones(ccc_bitset const *bs, size_t num_ones);
 
 /** @brief Returns the index of the start of the first trailing num_ones
@@ -433,15 +434,16 @@ contiguous 1 bits in the specified range.
 @param [in] num_ones the number of trailing contiguous 1 bits to find.
 @return an OK(0) status and the index in a search starting from the Least
 Significant Bit of the range of the first 1 in a sequence of num_ones 1 bits. If
-no range is found CCC_RESULT_FAIL error is set. If bs is NULL or arguments are
-out of range an argument error is set. */
+no range is found CCC_RESULT_FAIL error is set. If bs is nullptr or arguments
+are out of range an argument error is set. */
 ccc_ucount ccc_bs_first_trailing_ones_range(ccc_bitset const *bs, size_t i,
                                             size_t count, size_t num_ones);
 
 /** @brief Return the index of the first bit set to 0 in the set.
 @param [in] bs a pointer to the bit set.
 @return an OK(0) status and the index of the first bit set to 0 or
-CCC_RESULT_FAIL if no 0 bit is found. If bs is NULL an argument error is set. */
+CCC_RESULT_FAIL if no 0 bit is found. If bs is nullptr an argument error is set.
+*/
 ccc_ucount ccc_bs_first_trailing_zero(ccc_bitset const *bs);
 
 /** @brief Return the index of the first bit set to 0 in the range.
@@ -449,8 +451,8 @@ ccc_ucount ccc_bs_first_trailing_zero(ccc_bitset const *bs);
 @param [in] i the starting index to search.
 @param [in] count the size of the range to check.
 @return an OK(0) status and the index of the first bit set to 0 or
-CCC_RESULT_FAIL if no 0 bit is found. If bs is NULL, or the range is invalid, an
-argument error is set. */
+CCC_RESULT_FAIL if no 0 bit is found. If bs is nullptr, or the range is invalid,
+an argument error is set. */
 ccc_ucount ccc_bs_first_trailing_zero_range(ccc_bitset const *bs, size_t i,
                                             size_t count);
 
@@ -460,7 +462,7 @@ contiguous 0 bits.
 @param [in] num_zeros the number of trailing contiguous 0 bits to find.
 @return an OK(0) status and the index in a search, starting from the Least
 Significant Bit of the set, of the first 0 in a sequence of num_zeros 0 bits. If
-such a sequence cannot be found CCC_RESULT_FAIL is returned. If bs is NULL or
+such a sequence cannot be found CCC_RESULT_FAIL is returned. If bs is nullptr or
 num zeros is too large an argument error is set. */
 ccc_ucount ccc_bs_first_trailing_zeros(ccc_bitset const *bs, size_t num_zeros);
 
@@ -480,7 +482,7 @@ ccc_ucount ccc_bs_first_trailing_zeros_range(ccc_bitset const *bs, size_t i,
 starting from the Most Significant Bit at index size - 1.
 @param [in] bs a pointer to the bit set.
 @return the index of the first leading bit set to 1 or CCC_RESULT_FAIL if no 1
-bit is found or bs in NULL. */
+bit is found or bs in nullptr. */
 ccc_ucount ccc_bs_first_leading_one(ccc_bitset const *bs);
 
 /** @brief Return the index of the first leading bit set to 1 in the set,
@@ -489,7 +491,7 @@ starting from the Most Significant Bit at index size - 1.
 @param [in] i the starting index to search.
 @param [in] count the size of the range to check from i towards index 0.
 @return the index of the first leading bit set to 1 or CCC_RESULT_FAIL if no 1
-bit is found, bs is NULL, or the range is invalid.
+bit is found, bs is nullptr, or the range is invalid.
 @warning the user must validate their own range. A bit does not exist in an
 invalid range therefore CCC_RESULT_FAIL is returned. To distinguish a valid
 negative result signifying not found and a negative result indicating a range
@@ -504,7 +506,7 @@ contiguous 1 bits.
 @return the index in a search starting from the Least Significant Bit of the
 set of the first 1 in a sequence of num_ones 1 bits. If the input is invalid
 or such a sequence cannot be found CCC_RESULT_FAIL is returned.
-@warning the user must validate that bs is non-NULL and num_ones is less than
+@warning the user must validate that bs is non-nullptr and num_ones is less than
 the size of the set in order to distinguish CCC_RESULT_FAIL returned as a result
 of a failed search or bad input. */
 ccc_ucount ccc_bs_first_leading_ones(ccc_bitset const *bs, size_t num_ones);
@@ -517,7 +519,7 @@ contiguous 1 bits in the specified range.
 @param [in] num_ones the number of leading contiguous 1 bits to find.
 @return an OK(0) status and the index in a search starting from the Least
 Significant Bit of the range of the first 1 in a sequence of num_ones 1 bits. If
-such a sequence cannot be found CCC_RESULT_FAIL is set. If bs is NULL or any
+such a sequence cannot be found CCC_RESULT_FAIL is set. If bs is nullptr or any
 argument is out of range an argument error is set. */
 ccc_ucount ccc_bs_first_leading_ones_range(ccc_bitset const *bs, size_t i,
                                            size_t count, size_t num_ones);
@@ -526,7 +528,8 @@ ccc_ucount ccc_bs_first_leading_ones_range(ccc_bitset const *bs, size_t i,
 starting from the Most Significant Bit at index size - 1.
 @param [in] bs a pointer to the bit set.
 @return an OK(0) status and the index of the first bit set to 0 or
-CCC_RESULT_FAIL if no 1 bit is found. If bs in NULL an argument error is set. */
+CCC_RESULT_FAIL if no 1 bit is found. If bs in nullptr an argument error is set.
+*/
 ccc_ucount ccc_bs_first_leading_zero(ccc_bitset const *bs);
 
 /** @brief Return the index of the first leading bit set to 0 in the set,
@@ -535,7 +538,7 @@ starting from the Most Significant Bit at index size - 1.
 @param [in] i the starting index to search for a 0 bit.
 @param [in] count size to search from Most Significant Bit to Least in range.
 @return an OK(0) status the index of the first bit set to 0 or CCC_RESULT_FAIL
-if no 0 bit is found. If bs in NULL an argument error is set. */
+if no 0 bit is found. If bs in nullptr an argument error is set. */
 ccc_ucount ccc_bs_first_leading_zero_range(ccc_bitset const *bs, size_t i,
                                            size_t count);
 
@@ -545,7 +548,7 @@ contiguous 0 bits.
 @param [in] num_zeros the number of leading contiguous 0 bits to find.
 @return an OK(0) status and the index in a search, starting from the Most
 Significant Bit of the set, of the first 0 in a sequence of num_zeros 0 bits. If
-such a sequence cannot be found CCC_RESULT_FAIL is set. If bs is NULL or
+such a sequence cannot be found CCC_RESULT_FAIL is set. If bs is nullptr or
 num_zeros is too large an argument error is set. */
 ccc_ucount ccc_bs_first_leading_zeros(ccc_bitset const *bs, size_t num_zeros);
 
@@ -557,8 +560,8 @@ contiguous 0 bits in the specified range.
 @param [in] num_zeros the number of leading contiguous 0 bits to find.
 @return an OK(0) status and the index in a search, starting from the Most
 Significant Bit of the range, of the first 0 in a sequence of num_zeros 0 bits.
-If such a sequence cannot be found CCC_RESULT_FAIL is returned. If bs is NULL or
-the arguments are out of range an argument error is set. */
+If such a sequence cannot be found CCC_RESULT_FAIL is returned. If bs is nullptr
+or the arguments are out of range an argument error is set. */
 ccc_ucount ccc_bs_first_leading_zeros_range(ccc_bitset const *bs, size_t i,
                                             size_t count, size_t num_zeros);
 
@@ -572,7 +575,7 @@ Use standard integer width bit operations on the entire set. */
 @param [in] dst the set to modified with the OR operation.
 @param [in] src the set to be read as the source bits for the OR operation.
 @return an OK result if the operation is successful or an input error if dst
-or src are NULL.
+or src are nullptr.
 
 Note that sets are aligned from their Least Significant Bit and a smaller src
 set is conceptually padded with 0's in its higher order bits to align with
@@ -585,7 +588,7 @@ ccc_result ccc_bs_or(ccc_bitset *dst, ccc_bitset const *src);
 @param [in] dst the set to modified with the AND operation.
 @param [in] src the set to be read as the source bits for the AND operation.
 @return an OK result if the operation is successful or an input error if dst
-or src are NULL.
+or src are nullptr.
 @warning sets behave identically to integers for the AND operation when widening
 occurs. If dst is larger than src, src is padded with zeros in its Most
 Significant Bits. This means a bitwise AND operations will occur with the higher
@@ -603,7 +606,7 @@ ccc_result ccc_bs_and(ccc_bitset *dst, ccc_bitset const *src);
 @param [in] dst the set to modified with the XOR operation.
 @param [in] src the set to be read as the source bits for the XOR operation.
 @return an OK result if the operation is successful or an input error if dst
-or src are NULL.
+or src are nullptr.
 
 Note that sets are aligned from their Least Significant Bit and a smaller src
 set is conceptually padded with 0's in its higher order bits to align with
@@ -616,7 +619,7 @@ ccc_result ccc_bs_xor(ccc_bitset *dst, ccc_bitset const *src);
 @param [in] bs a pointer to the bit set.
 @param [in] left_shifts the number of left shifts to perform.
 @return an ok result if the operation was successful or an error if the bitset
-is NULL.
+is nullptr.
 
 Note that if the number of shifts is greater than the bit set size the bit set
 is zeroed out rather than exhibiting undefined behavior as in the equivalent
@@ -627,7 +630,7 @@ ccc_result ccc_bs_shiftl(ccc_bitset *bs, size_t left_shifts);
 @param [in] bs a pointer to the bit set.
 @param [in] right_shifts the number of right shifts to perform.
 @return an ok result if the operation was successful or an error if the bitset
-is NULL.
+is nullptr.
 
 Note that if the number of shifts is greater than the bit set size the bit set
 is zeroed out rather than exhibiting undefined behavior as in the equivalent
@@ -639,7 +642,7 @@ ccc_result ccc_bs_shiftr(ccc_bitset *bs, size_t right_shifts);
 @param [in] b pointer to another bit set of equal size.
 @return true if the bit sets are of equal size with identical bit values at
 every position, false if the sets are different sizes or have mismatched bits.
-A bool error is returned if either pointer is NULL. */
+A bool error is returned if either pointer is nullptr. */
 ccc_tribool ccc_bs_eq(ccc_bitset const *a, ccc_bitset const *b);
 
 /**@}*/
@@ -653,7 +656,7 @@ Perform basic mathematical set operations on the bit set. */
 @param [subset] the subset to confirm as a proper subset of set.
 @return CCC_TRUE if all bit positions in subset share the same
 value--0 or 1--as the bit positions in set and set is of greater size than
-subset. A CCC_TRIBOOL_ERROR is returned if set or subset is NULL.
+subset. A CCC_TRIBOOL_ERROR is returned if set or subset is nullptr.
 
 If set is of size 0 the function returns CCC_FALSE regardless of the size of
 subset. If set is not of size 0 and subset is of size 0 the function returns
@@ -666,7 +669,7 @@ ccc_tribool ccc_bs_is_proper_subset(ccc_bitset const *set,
 @param [subset] the subset to confirm as a subset of set.
 @return CCC_TRUE if all bit positions in subset share the same
 value--0 or 1--as the bit positions in set. A CCC_TRIBOOL_ERROR is returned if
-set or subset is NULL.
+set or subset is nullptr.
 
 If set is size zero subset must also be of size 0 to return CCC_TRUE. If
 subset is size 0 the function returns CCC_TRUE regardless of the size of set. */
@@ -681,7 +684,7 @@ Obtain state from the container. */
 /** @brief Return a reference to the base of the underlying block array.
 @param [in] bs a pointer to the bit set.
 @return a reference to the base of the first block of the bit set block array
-or NULL if bs is NULL or has no capacity.
+or nullptr if bs is nullptr or has no capacity.
 
 Every block populates bits from Least Significant Bit (LSB) to Most Significant
 Bit (MSB) so this reference is to the base or LSB of the entire set. */
@@ -690,20 +693,21 @@ ccc_bitblock *ccc_bs_data(ccc_bitset const *bs);
 /** @brief Return total number of bits the capacity of the set can hold.
 @param [in] bs a pointer to the bit set.
 @return an OK(0) status and the capacity of bits capable of being stored in the
-current set. If bs is NULL an argument error is set. */
+current set. If bs is nullptr an argument error is set. */
 ccc_ucount ccc_bs_capacity(ccc_bitset const *bs);
 
 /** @brief Return total number of bits actively tracked by the user and set.
 @param [in] bs a pointer to the bit set.
 @return an OK(0) status and the total number of bits currently tracked by the
-set regardless of true or false state of each. If bs is NULL an argument error
-is set. */
+set regardless of true or false state of each. If bs is nullptr an argument
+error is set. */
 ccc_ucount ccc_bs_size(ccc_bitset const *bs);
 
 /** @brief Return number of ccc_bitblocks used by bit set for capacity bits.
 @param [in] bs a pointer to the bit set.
 @return an OK(0) status and the capacity in number of bit blocks used to hold
-the entire capacity of bits in the set. If bs is NULL an argument error is set.
+the entire capacity of bits in the set. If bs is nullptr an argument error is
+set.
 
 Capacity may be greater than or equal to size. */
 ccc_ucount ccc_bs_blocks_capacity(ccc_bitset const *bs);
@@ -711,7 +715,7 @@ ccc_ucount ccc_bs_blocks_capacity(ccc_bitset const *bs);
 /** @brief Return number of ccc_bitblocks used by the bit set for size bits.
 @param [in] bs a pointer to the bit set.
 @return size in number of bit blocks used to hold the current size of bits in
-the set. An argument error is set if bs is NULL.
+the set. An argument error is set if bs is nullptr.
 
 Size may be less than or equal to capacity. */
 ccc_ucount ccc_bs_blocks_size(ccc_bitset const *bs);
@@ -720,14 +724,14 @@ ccc_ucount ccc_bs_blocks_size(ccc_bitset const *bs);
 @param [in] bs a pointer to the bit set.
 @return CCC_TRUE if the size of the set is 0 meaning no bits, regardless of
 0 or 1 status, are tracked by the set. CCC_TRIBOOL_ERROR is returned if bs is
-NULL.
+nullptr.
 @warning if the number of bits set to 1 is desired see ccc_bs_popcount. */
 ccc_tribool ccc_bs_empty(ccc_bitset const *bs);
 
 /** @brief Return the number of bits set to CCC_TRUE. O(n).
 @param [in] bs a pointer to the bit set.
 @return the total number of bits currently set to CCC_TRUE. CCC_RESULT_FAIL is
-returned if bs is NULL. */
+returned if bs is nullptr. */
 ccc_ucount ccc_bs_popcount(ccc_bitset const *bs);
 
 /** @brief Return the number of bits set to CCC_TRUE in the range. O(n).
@@ -735,8 +739,8 @@ ccc_ucount ccc_bs_popcount(ccc_bitset const *bs);
 @param [in] i the starting position.
 @param [in] count the size of the range to check.
 @return the total number of bits currently set in the range to CCC_TRUE. An
-argument error is set if bs is NULL, i is invalid, count is invalid, or both i
-and count are invalid. */
+argument error is set if bs is nullptr, i is invalid, count is invalid, or both
+i and count are invalid. */
 ccc_ucount ccc_bs_popcount_range(ccc_bitset const *bs, size_t i, size_t count);
 
 /**@}*/
@@ -748,13 +752,14 @@ Clear the set and manage its memory. */
 /** @brief Clears the bit set by setting the size to 0 and all bits to 0.
 The underlying memory capacity remains unchanged.
 @param [in] bs a pointer to the bit set.
-@return the result of the clear operation, error is returned if bs is NULL . */
+@return the result of the clear operation, error is returned if bs is nullptr .
+*/
 ccc_result ccc_bs_clear(ccc_bitset *bs);
 
 /** @brief Clears the bit set by setting the size to 0 and freeing the
 underlying memory. Capacity becomes 0 as well.
 @param [in] bs a pointer to the bit set.
-@return the result of the clear operation, error is returned if bs is NULL or
+@return the result of the clear operation, error is returned if bs is nullptr or
 the set cannot be freed because no allocation function was provided upon
 initialization. */
 ccc_result ccc_bs_clear_and_free(ccc_bitset *bs);
@@ -801,7 +806,7 @@ ccc_result ccc_bs_push_back(ccc_bitset *bs, ccc_tribool b);
 /** @brief Remove the Most Significant Bit from the set.
 @param [in] bs a pointer to the bit set.
 @return the previous value of the Most Significant Bit (CCC_TRUE or CCC_FALSE)
-or a bool error if bs is NULL or bs is empty. */
+or a bool error if bs is nullptr or bs is empty. */
 ccc_tribool ccc_bs_pop_back(ccc_bitset *bs);
 
 /**@}*/

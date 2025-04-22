@@ -25,7 +25,7 @@ CHECK_BEGIN_FN(check_order, singly_linked_list const *const sll, size_t const n,
     struct val const *v = begin(sll);
     for (; v != end(sll) && i < n; v = next(sll, &v->e), ++i)
     {
-        CHECK(v == NULL, false);
+        CHECK(v == nullptr, false);
         CHECK(v->val, order[i]);
     }
     CHECK(i, n);
@@ -66,7 +66,7 @@ CHECK_BEGIN_FN(create_list, ccc_singly_linked_list *const sll, size_t const n,
 {
     for (size_t i = 0; i < n; ++i)
     {
-        CHECK(push_front(sll, &vals[i].e) == NULL, false);
+        CHECK(push_front(sll, &vals[i].e) == nullptr, false);
     }
     CHECK(validate(sll), true);
     CHECK_END_FN();

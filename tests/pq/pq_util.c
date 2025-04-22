@@ -49,8 +49,8 @@ CHECK_BEGIN_FN(inorder_fill, int vals[], size_t size, ccc_priority_queue *ppq)
 {
     CHECK(size(ppq).count, size);
     size_t i = 0;
-    ccc_priority_queue copy
-        = ccc_pq_init(struct val, elem, ccc_pq_order(ppq), val_cmp, NULL, NULL);
+    ccc_priority_queue copy = ccc_pq_init(struct val, elem, ccc_pq_order(ppq),
+                                          val_cmp, nullptr, nullptr);
     while (!is_empty(ppq))
     {
         struct val *const front = front(ppq);

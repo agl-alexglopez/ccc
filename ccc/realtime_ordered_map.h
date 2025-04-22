@@ -80,7 +80,7 @@ Initialize the container with memory, callbacks, and permissions. */
 @param [in] rom_elem_field the name of the intrusive map elem field.
 @param [in] key_elem_field the name of the field in user type used as key.
 @param [in] key_cmp_fn the key comparison function (see types.h).
-@param [in] alloc_fn the allocation function or NULL if allocation is banned.
+@param [in] alloc_fn the allocation function or nullptr if allocation is banned.
 @param [in] aux_data a pointer to any auxiliary data for comparison or
 destruction.
 @return the struct initialized ordered map for direct assignment
@@ -100,14 +100,14 @@ Test membership or obtain references to stored user types directly. */
 @param [in] rom the map to be searched.
 @param [in] key pointer to the key matching the key type of the user struct.
 @return true if the struct containing key is stored, false if not. Error if rom
-or key is NULL.*/
+or key is nullptr.*/
 [[nodiscard]] ccc_tribool ccc_rom_contains(ccc_realtime_ordered_map const *rom,
                                            void const *key);
 
 /** @brief Returns a reference into the map at entry key.
 @param [in] rom the ordered map to search.
 @param [in] key the key to search matching stored key type.
-@return a view of the map entry if it is present, else NULL. */
+@return a view of the map entry if it is present, else nullptr. */
 [[nodiscard]] void *ccc_rom_get_key_val(ccc_realtime_ordered_map const *rom,
                                         void const *key);
 
@@ -342,7 +342,7 @@ for formatting.
 @return a compound literal reference to the modified entry if it was occupied
 or a vacant entry if it was vacant.
 @note T is a reference to the user type stored in the entry guaranteed to be
-non-NULL if the closure executes.
+non-nullptr if the closure executes.
 
 ```
 #define REALTIME_ORDERED_MAP_USING_NAMESPACE_CCC
@@ -369,11 +369,11 @@ evaluated in the closure scope. */
 /** @brief Inserts the struct with handle elem if the entry is Vacant.
 @param [in] e the entry obtained via function or macro call.
 @param [in] elem the handle to the struct to be inserted to a Vacant entry.
-@return a pointer to entry in the map invariantly. NULL on error.
+@return a pointer to entry in the map invariantly. nullptr on error.
 
 Because this functions takes an entry and inserts if it is Vacant, the only
-reason NULL shall be returned is when an insertion error occurs, usually due to
-a user struct allocation failure.
+reason nullptr shall be returned is when an insertion error occurs, usually due
+to a user struct allocation failure.
 
 If no allocation is permitted, this function assumes the user struct wrapping
 elem has been allocated with the appropriate lifetime and scope by the user. */
@@ -386,8 +386,8 @@ elem has been allocated with the appropriate lifetime and scope by the user. */
 entry is Vacant.
 @return a reference to the unwrapped user type in the entry, either the
 unmodified reference if the entry was Occupied or the newly inserted element
-if the entry was Vacant. NULL is returned if resizing is required but fails or
-is not allowed.
+if the entry was Vacant. nullptr is returned if resizing is required but fails
+or is not allowed.
 
 Note that if the compound literal uses any function calls to generate values
 or other data, such functions will not be called if the entry is Occupied. */
@@ -397,7 +397,7 @@ or other data, such functions will not be called if the entry is Occupied. */
 /** @brief Inserts the provided entry invariantly.
 @param [in] e the entry returned from a call obtaining an entry.
 @param [in] elem a handle to the struct the user intends to insert.
-@return a pointer to the inserted element or NULL upon allocation failure.
+@return a pointer to the inserted element or nullptr upon allocation failure.
 
 This method can be used when the old value in the map does not need to
 be preserved. See the regular insert method if the old value is of interest. */
@@ -407,7 +407,7 @@ be preserved. See the regular insert method if the old value is of interest. */
 /** @brief Write the contents of the compound literal lazy_key_value to a node.
 @param [in] realtime_ordered_map_entry_ptr a pointer to the obtained entry.
 @param [in] lazy_key_value the compound literal to write to a new slot.
-@return a reference to the newly inserted or overwritten user type. NULL is
+@return a reference to the newly inserted or overwritten user type. nullptr is
 returned if allocation failed or is not allowed when required. */
 #define ccc_rom_insert_entry_w(realtime_ordered_map_entry_ptr,                 \
                                lazy_key_value...)                              \
@@ -415,24 +415,24 @@ returned if allocation failed or is not allowed when required. */
 
 /** @brief Remove the entry from the map if Occupied.
 @param [in] e a pointer to the map entry.
-@return an entry containing NULL or a reference to the old entry. If Occupied an
-entry in the map existed and was removed. If Vacant, no prior entry existed to
-be removed.
+@return an entry containing nullptr or a reference to the old entry. If Occupied
+an entry in the map existed and was removed. If Vacant, no prior entry existed
+to be removed.
 
 Note that if allocation is permitted the old element is freed and the entry
-will contain a NULL reference. If allocation is prohibited the entry can be
+will contain a nullptr reference. If allocation is prohibited the entry can be
 unwrapped to obtain the old user struct stored in the map and the user may
 free or use as needed. */
 [[nodiscard]] ccc_entry ccc_rom_remove_entry(ccc_romap_entry const *e);
 
 /** @brief Remove the entry from the map if Occupied.
 @param [in] realtime_ordered_map_entry_ptr a pointer to the map entry.
-@return a compound literal reference to an entry containing NULL or a reference
-to the old entry. If Occupied an entry in the map existed and was removed. If
-Vacant, no prior entry existed to be removed.
+@return a compound literal reference to an entry containing nullptr or a
+reference to the old entry. If Occupied an entry in the map existed and was
+removed. If Vacant, no prior entry existed to be removed.
 
 Note that if allocation is permitted the old element is freed and the entry
-will contain a NULL reference. If allocation is prohibited the entry can be
+will contain a nullptr reference. If allocation is prohibited the entry can be
 unwrapped to obtain the old user struct stored in the map and the user may
 free or use as needed. */
 #define ccc_rom_remove_entry_r(realtime_ordered_map_entry_ptr)                 \
@@ -443,26 +443,26 @@ free or use as needed. */
 
 /** @brief Unwraps the provided entry to obtain a view into the map element.
 @param [in] e the entry from a query to the map via function or macro.
-@return a view into the table entry if one is present, or NULL. */
+@return a view into the table entry if one is present, or nullptr. */
 [[nodiscard]] void *ccc_rom_unwrap(ccc_romap_entry const *e);
 
 /** @brief Returns the Vacant or Occupied status of the entry.
 @param [in] e the entry from a query to the map via function or macro.
-@return true if the entry is occupied, false if not. Error if e is NULL. */
+@return true if the entry is occupied, false if not. Error if e is nullptr. */
 [[nodiscard]] ccc_tribool ccc_rom_insert_error(ccc_romap_entry const *e);
 
 /** @brief Provides the status of the entry should an insertion follow.
 @param [in] e the entry from a query to the table via function or macro.
 @return true if an entry obtained from an insertion attempt failed to insert
 due to an allocation failure when allocation success was expected. Error if e is
-NULL. */
+nullptr. */
 [[nodiscard]] ccc_tribool ccc_rom_occupied(ccc_romap_entry const *e);
 
 /** @brief Obtain the entry status from a container entry.
 @param [in] e a pointer to the entry.
 @return the status stored in the entry after the required action on the
-container completes. If e is NULL an entry input error is returned so ensure
-e is non-NULL to avoid an inaccurate status returned.
+container completes. If e is nullptr an entry input error is returned so ensure
+e is non-nullptr to avoid an inaccurate status returned.
 
 Note that this function can be useful for debugging or if more detailed
 messages are needed for logging purposes. See ccc_entry_status_msg() in
@@ -476,10 +476,10 @@ Deallocate the container. */
 /**@{*/
 
 /** @brief Pops every element from the map calling destructor if destructor is
-non-NULL. O(N).
+non-nullptr. O(N).
 @param [in] rom a pointer to the map.
-@param [in] destructor a destructor function if required. NULL if unneeded.
-@return an input error if rom points to NULL otherwise OK.
+@param [in] destructor a destructor function if required. nullptr if unneeded.
+@return an input error if rom points to nullptr otherwise OK.
 
 Note that if the map has been given permission to allocate, the destructor will
 be called on each element before it uses the provided allocator to free the
@@ -526,7 +526,7 @@ O(lg N).
 @param [in] begin_and_end_key_ptrs two pointers, the first to the start of the
 range the second to the end of the range.
 @return a compound literal reference to the produced range associated with the
-enclosing scope. This reference is always non-NULL. */
+enclosing scope. This reference is always non-nullptr. */
 #define ccc_rom_equal_range_r(realtime_ordered_map_ptr,                        \
                               begin_and_end_key_ptrs...)                       \
     &(ccc_range)                                                               \
@@ -564,7 +564,7 @@ O(lg N).
 @param [in] rbegin_and_rend_key_ptrs two pointers, the first to the start of the
 rrange the second to the end of the rrange.
 @return a compound literal reference to the produced rrange associated with the
-enclosing scope. This reference is always non-NULL. */
+enclosing scope. This reference is always non-nullptr. */
 #define ccc_rom_equal_rrange_r(realtime_ordered_map_ptr,                       \
                                rbegin_and_rend_key_ptrs...)                    \
     &(ccc_rrange)                                                              \
@@ -621,18 +621,18 @@ Obtain the container state. */
 
 /** @brief Returns the size of the map.
 @param [in] rom the map.
-@return the size or an argument is set if rom is NULL. */
+@return the size or an argument is set if rom is nullptr. */
 [[nodiscard]] ccc_ucount ccc_rom_size(ccc_realtime_ordered_map const *rom);
 
 /** @brief Returns the size status of the map.
 @param [in] rom the map.
-@return true if empty else false. Error if rom is NULL. */
+@return true if empty else false. Error if rom is nullptr. */
 [[nodiscard]] ccc_tribool ccc_rom_is_empty(ccc_realtime_ordered_map const *rom);
 
 /** @brief Validation of invariants for the map.
 @param [in] rom the map to validate.
 @return true if all invariants hold, false if corruption occurs. Error if rom is
-NULL. */
+nullptr. */
 [[nodiscard]] ccc_tribool ccc_rom_validate(ccc_realtime_ordered_map const *rom);
 
 /**@}*/

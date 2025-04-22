@@ -50,9 +50,9 @@ ccc_pq_front(ccc_priority_queue const *const pq)
 {
     if (!pq)
     {
-        return NULL;
+        return nullptr;
     }
-    return pq->root ? struct_base(pq, pq->root) : NULL;
+    return pq->root ? struct_base(pq, pq->root) : nullptr;
 }
 
 void *
@@ -60,16 +60,16 @@ ccc_pq_push(ccc_priority_queue *const pq, ccc_pq_elem *e)
 {
     if (!e || !pq)
     {
-        return NULL;
+        return nullptr;
     }
     init_node(e);
     void *ret = struct_base(pq, e);
     if (pq->alloc)
     {
-        void *const node = pq->alloc(NULL, pq->sizeof_type, pq->aux);
+        void *const node = pq->alloc(nullptr, pq->sizeof_type, pq->aux);
         if (!node)
         {
-            return NULL;
+            return nullptr;
         }
         (void)memcpy(node, ret, pq->sizeof_type);
         ret = node;
@@ -103,7 +103,7 @@ ccc_pq_extract(ccc_priority_queue *const pq, ccc_pq_elem *const e)
 {
     if (!pq || !e || !pq->root || !e->next_sibling || !e->prev_sibling)
     {
-        return NULL;
+        return nullptr;
     }
     pq->root = delete_node(pq, e);
     pq->count--;
@@ -221,7 +221,7 @@ ccc_pq_validate(ccc_priority_queue const *const pq)
     {
         return CCC_FALSE;
     }
-    if (!has_valid_links(pq, NULL, pq->root))
+    if (!has_valid_links(pq, nullptr, pq->root))
     {
         return CCC_FALSE;
     }
@@ -358,9 +358,9 @@ cut_child(struct ccc_pq_elem *const child)
     if (child->parent && child == child->parent->left_child)
     {
         child->parent->left_child
-            = child->next_sibling == child ? NULL : child->next_sibling;
+            = child->next_sibling == child ? nullptr : child->next_sibling;
     }
-    child->parent = NULL;
+    child->parent = nullptr;
 }
 
 static struct ccc_pq_elem *
@@ -421,7 +421,7 @@ delete_min(struct ccc_pq *const pq, struct ccc_pq_elem *root)
 {
     if (!root->left_child)
     {
-        return NULL;
+        return nullptr;
     }
     struct ccc_pq_elem *const eldest = root->left_child->next_sibling;
     struct ccc_pq_elem *accumulator = root->left_child->next_sibling;
@@ -430,8 +430,8 @@ delete_min(struct ccc_pq *const pq, struct ccc_pq_elem *root)
     {
         struct ccc_pq_elem *const next = cur->next_sibling;
         struct ccc_pq_elem *const next_cur = cur->next_sibling->next_sibling;
-        next->next_sibling = next->prev_sibling = NULL;
-        cur->next_sibling = cur->prev_sibling = NULL;
+        next->next_sibling = next->prev_sibling = nullptr;
+        cur->next_sibling = cur->prev_sibling = nullptr;
         accumulator = merge(pq, accumulator, merge(pq, cur, next));
         cur = next_cur;
     }
@@ -440,7 +440,7 @@ delete_min(struct ccc_pq *const pq, struct ccc_pq_elem *root)
     /* The root is always alone in its circular list at the end of merges.
      */
     root->next_sibling = root->prev_sibling = root;
-    root->parent = NULL;
+    root->parent = nullptr;
     return root;
 }
 
@@ -518,14 +518,14 @@ elem_in(struct ccc_pq const *const pq, struct ccc_pq_elem const *const e)
 static inline void
 init_node(struct ccc_pq_elem *const e)
 {
-    e->left_child = e->parent = NULL;
+    e->left_child = e->parent = nullptr;
     e->next_sibling = e->prev_sibling = e;
 }
 
 static inline void
 clear_node(struct ccc_pq_elem *const e)
 {
-    e->left_child = e->next_sibling = e->prev_sibling = e->parent = NULL;
+    e->left_child = e->next_sibling = e->prev_sibling = e->parent = nullptr;
 }
 
 /*========================     Validation ================================*/

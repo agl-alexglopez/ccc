@@ -59,7 +59,7 @@ struct ccc_buf
 /** @private */
 #define ccc_impl_buf_emplace(buf_ptr, index, type_initializer...)              \
     (__extension__({                                                           \
-        typeof(type_initializer) *impl_buf_res = NULL;                         \
+        typeof(type_initializer) *impl_buf_res = nullptr;                      \
         __auto_type impl_i = (index);                                          \
         __auto_type impl_emplace_buff_ptr = (buf_ptr);                         \
         impl_buf_res = ccc_buf_at(impl_emplace_buff_ptr, index);               \
@@ -73,7 +73,7 @@ struct ccc_buf
 /** @private */
 #define ccc_impl_buf_emplace_back(buf_ptr, type_initializer...)                \
     (__extension__({                                                           \
-        typeof(type_initializer) *impl_buf_res = NULL;                         \
+        typeof(type_initializer) *impl_buf_res = nullptr;                      \
         __auto_type impl_emplace_back_buf_ptr = (buf_ptr);                     \
         assert(sizeof(typeof(*impl_buf_res))                                   \
                == ccc_buf_sizeof_type(impl_emplace_back_buf_ptr));             \

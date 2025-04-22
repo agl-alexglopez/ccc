@@ -55,7 +55,7 @@ val_bump_alloc(void *const ptr, size_t const size, void *const aux)
 {
     if (!ptr && !size)
     {
-        return NULL;
+        return nullptr;
     }
     if (!ptr)
     {
@@ -64,15 +64,15 @@ val_bump_alloc(void *const ptr, size_t const size, void *const aux)
         struct val_pool *vals = aux;
         if (vals->next_free >= vals->capacity)
         {
-            return NULL;
+            return nullptr;
         }
         return &vals->vals[vals->next_free++];
     }
     if (!size)
     {
         /* Don't do anything fancy on free, just bump forward so no op here. */
-        return NULL;
+        return nullptr;
     }
     assert(!"Shouldn't attempt to realloc in bump allocator.");
-    return NULL;
+    return nullptr;
 }

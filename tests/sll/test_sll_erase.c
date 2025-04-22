@@ -11,18 +11,20 @@
 
 CHECK_BEGIN_STATIC_FN(sll_test_pop_empty)
 {
-    singly_linked_list sll = sll_init(sll, struct val, e, val_cmp, NULL, NULL);
+    singly_linked_list sll
+        = sll_init(sll, struct val, e, val_cmp, nullptr, nullptr);
     CHECK(is_empty(&sll), true);
     CHECK(sll_pop_front(&sll), CCC_RESULT_ARG_ERROR);
     CHECK(sll_validate(&sll), true);
-    CHECK(sll_front(&sll), NULL);
+    CHECK(sll_front(&sll), nullptr);
     CHECK(is_empty(&sll), true);
     CHECK_END_FN();
 }
 
 CHECK_BEGIN_STATIC_FN(sll_test_push_pop_three)
 {
-    singly_linked_list sll = sll_init(sll, struct val, e, val_cmp, NULL, NULL);
+    singly_linked_list sll
+        = sll_init(sll, struct val, e, val_cmp, nullptr, nullptr);
     struct val vals[3] = {{.val = 0}, {.val = 1}, {.val = 2}};
     enum check_result const t = create_list(&sll, 3, vals);
     CHECK(t, PASS);
@@ -38,14 +40,15 @@ CHECK_BEGIN_STATIC_FN(sll_test_push_pop_three)
 
 CHECK_BEGIN_STATIC_FN(sll_test_push_extract_middle)
 {
-    singly_linked_list sll = sll_init(sll, struct val, e, val_cmp, NULL, NULL);
+    singly_linked_list sll
+        = sll_init(sll, struct val, e, val_cmp, nullptr, nullptr);
     struct val vals[3] = {{.val = 0}, {.val = 1}, {.val = 2}};
     enum check_result const t = create_list(&sll, 3, vals);
     CHECK(t, PASS);
     CHECK(check_order(&sll, 3, (int[3]){2, 1, 0}), PASS);
     struct val *after_extract = extract(&sll, &vals[1].e);
     CHECK(validate(&sll), true);
-    CHECK(after_extract == NULL, false);
+    CHECK(after_extract == nullptr, false);
     CHECK(after_extract->val, 0);
     CHECK(check_order(&sll, 2, (int[2]){2, 0}), PASS);
     after_extract = extract(&sll, &vals[0].e);
@@ -57,7 +60,8 @@ CHECK_BEGIN_STATIC_FN(sll_test_push_extract_middle)
 
 CHECK_BEGIN_STATIC_FN(sll_test_push_extract_range)
 {
-    singly_linked_list sll = sll_init(sll, struct val, e, val_cmp, NULL, NULL);
+    singly_linked_list sll
+        = sll_init(sll, struct val, e, val_cmp, nullptr, nullptr);
     struct val vals[5]
         = {{.val = 0}, {.val = 1}, {.val = 2}, {.val = 3}, {.val = 4}};
     enum check_result const t = create_list(&sll, 5, vals);
@@ -66,7 +70,7 @@ CHECK_BEGIN_STATIC_FN(sll_test_push_extract_range)
     struct val *after_extract = extract_range(&sll, &vals[3].e, &vals[1].e);
     CHECK(size(&sll).count, 2);
     CHECK(validate(&sll), true);
-    CHECK(after_extract == NULL, false);
+    CHECK(after_extract == nullptr, false);
     CHECK(after_extract->val, 0);
     CHECK(check_order(&sll, 2, (int[2]){4, 0}), PASS);
     after_extract = extract_range(&sll, sll_begin_elem(&sll), &vals[0].e);
@@ -78,13 +82,13 @@ CHECK_BEGIN_STATIC_FN(sll_test_push_extract_range)
 CHECK_BEGIN_STATIC_FN(sll_test_splice_two_lists)
 {
     singly_linked_list to_lose
-        = sll_init(to_lose, struct val, e, val_cmp, NULL, NULL);
+        = sll_init(to_lose, struct val, e, val_cmp, nullptr, nullptr);
     struct val to_lose_vals[5]
         = {{.val = 0}, {.val = 1}, {.val = 2}, {.val = 3}, {.val = 4}};
     enum check_result t = create_list(&to_lose, 5, to_lose_vals);
     CHECK(t, PASS);
     singly_linked_list to_gain
-        = sll_init(to_gain, struct val, e, val_cmp, NULL, NULL);
+        = sll_init(to_gain, struct val, e, val_cmp, nullptr, nullptr);
     struct val to_gain_vals[2] = {{.val = 0}, {.val = 1}};
     t = create_list(&to_gain, 2, to_gain_vals);
     CHECK(t, PASS);

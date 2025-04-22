@@ -29,7 +29,8 @@ static char const *const result_msgs[CCC_RESULT_SIZE] = {
     = "A container performed an operation requiring new allocation of memory, "
       "but the allocator function provided on initialization failed.",
     [CCC_RESULT_ARG_ERROR]
-    = "A container function received bad arguments such as NULL pointers, out "
+    = "A container function received bad arguments such as nullptr pointers, "
+      "out "
       "of range values, or arguments that cannot be processed in the context "
       "of an operation.",
 };
@@ -71,9 +72,9 @@ ccc_entry_unwrap(ccc_entry const *const e)
 {
     if (!e)
     {
-        return NULL;
+        return nullptr;
     }
-    return e->impl.stats & CCC_ENTRY_NO_UNWRAP ? NULL : e->impl.e;
+    return e->impl.stats & CCC_ENTRY_NO_UNWRAP ? nullptr : e->impl.e;
 }
 
 ccc_tribool
@@ -119,25 +120,25 @@ ccc_handle_unwrap(ccc_handle const *const e)
 void *
 ccc_begin_range(ccc_range const *const r)
 {
-    return r ? r->impl.begin : NULL;
+    return r ? r->impl.begin : nullptr;
 }
 
 void *
 ccc_end_range(ccc_range const *const r)
 {
-    return r ? r->impl.end : NULL;
+    return r ? r->impl.end : nullptr;
 }
 
 void *
 ccc_rbegin_rrange(ccc_rrange const *const r)
 {
-    return r ? r->impl.rbegin : NULL;
+    return r ? r->impl.rbegin : nullptr;
 }
 
 void *
 ccc_rend_rrange(ccc_rrange const *const r)
 {
-    return r ? r->impl.rend : NULL;
+    return r ? r->impl.rend : nullptr;
 }
 
 char const *
@@ -185,7 +186,7 @@ ccc_entry_status_msg(ccc_entry_status const status)
         return "vacant with no errors";
         break;
     case CCC_ENTRY_OCCUPIED:
-        return "occupied and non-NULL";
+        return "occupied and non-nullptr";
         break;
     case CCC_ENTRY_INSERT_ERROR:
         return "insert error has occurred or will occur on insert attempted";

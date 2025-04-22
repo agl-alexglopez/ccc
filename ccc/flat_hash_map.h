@@ -96,8 +96,8 @@ struct val
 ccc_fhm_declare_fixed_map(small_fixed_map, struct val, 64);
 static small_fixed_map mem;
 static ccc_flat_hash_map static_fh
-    = fhm_init(mem.data, mem.tag, key, fhmap_int_to_u64, fhmap_id_eq, NULL,
-               NULL, ccc_fhm_fixed_capacity(small_fixed_map));
+    = fhm_init(mem.data, mem.tag, key, fhmap_int_to_u64, fhmap_id_eq, nullptr,
+               nullptr, ccc_fhm_fixed_capacity(small_fixed_map));
 ```
 
 Similarly, a fixed size map can be used on the stack.
@@ -113,9 +113,8 @@ int main(void)
 {
     small_fixed_map mem;
     ccc_flat_hash_map stack_fh
-        = fhm_init(mem.data, mem.tag, key, fhmap_int_to_u64, fhmap_id_eq, NULL,
-                   NULL, ccc_fhm_fixed_capacity(small_fixed_map));
-    return 0;
+        = fhm_init(mem.data, mem.tag, key, fhmap_int_to_u64, fhmap_id_eq,
+nullptr, nullptr, ccc_fhm_fixed_capacity(small_fixed_map)); return 0;
 }
 ```
 
@@ -140,19 +139,19 @@ restrictions. */
 
 /** @brief Initialize a map with a buffer of types at compile time or runtime.
 @param [in] data_ptr a pointer to the .data of user type T field of a fixed map
-or (T *)NULL.
-@param [in] tag_ptr a pointer to the .tag field of a fixed map or NULL.
+or (T *)nullptr.
+@param [in] tag_ptr a pointer to the .tag field of a fixed map or nullptr.
 @param [in] key_field the field of the struct used for key storage.
 @param [in] hash_fn the ccc_any_key_hash_fn function the user desires for the
 table.
 @param [in] key_eq_fn the ccc_any_key_eq_fn the user intends to use.
-@param [in] alloc_fn the allocation function for resizing or NULL if no
+@param [in] alloc_fn the allocation function for resizing or nullptr if no
 resizing is allowed.
 @param [in] aux_data auxiliary data that is needed for hashing or comparison.
 @param [in] capacity the capacity of a fixed size map or 0.
 @return the flat hash map directly initialized on the right hand side of the
 equality operator (i.e. ccc_flat_hash_map fh = ccc_fhm_init(...);)
-@warning if a dynamic resizing map is required provide two NULL pointers with
+@warning if a dynamic resizing map is required provide two nullptr pointers with
 the data pointer casted to the type stored in the table.
 
 Initialize a static fixed size hash map at compile time that has
@@ -168,8 +167,8 @@ ccc_fhm_declare_fixed_map(small_fixed_map, struct val, 64);
 static small_fixed_map mem;
 // Hash and equality functions are defined by the user.
 static ccc_flat_hash_map static_fh
-    = fhm_init(mem.data, mem.tag, key, fhmap_int_to_u64, fhmap_id_eq, NULL,
-               NULL, ccc_fhm_fixed_capacity(small_fixed_map));
+    = fhm_init(mem.data, mem.tag, key, fhmap_int_to_u64, fhmap_id_eq, nullptr,
+               nullptr, ccc_fhm_fixed_capacity(small_fixed_map));
 ```
 
 Initialize a dynamic hash table at compile time with allocation permission and
@@ -183,8 +182,8 @@ struct val
 };
 // Hash, equality, and allocation functions are defined by the user.
 static ccc_flat_hash_map static_fh
-    = fhm_init((struct val *)NULL, NULL, key, fhmap_int_to_u64, fhmap_id_eq,
-               std_alloc, NULL, 0);
+    = fhm_init((struct val *)nullptr, nullptr, key, fhmap_int_to_u64,
+fhmap_id_eq, std_alloc, nullptr, 0);
 ```
 
 Initialization at runtime is also possible. Stack-based or dynamic maps are
@@ -207,8 +206,8 @@ is returned.
 less than src, an allocation function must be provided with the fn argument.
 
 Note that there are two ways to copy data from source to destination: provide
-sufficient memory and pass NULL as fn, or allow the copy function to take care
-of allocation for the copy.
+sufficient memory and pass nullptr as fn, or allow the copy function to take
+care of allocation for the copy.
 
 Manual memory management with no allocation function provided.
 
@@ -222,14 +221,14 @@ struct val
 ccc_fhm_declare_fixed_map(small_fixed_map, struct val, 64);
 static small_fixed_map mem_a;
 static ccc_flat_hash_map src
-    = fhm_init(mem_a.data, mem_a.tag, key, fhmap_int_to_u64, fhmap_id_eq, NULL,
-               NULL, ccc_fhm_fixed_capacity(small_fixed_map));
+    = fhm_init(mem_a.data, mem_a.tag, key, fhmap_int_to_u64, fhmap_id_eq,
+nullptr, nullptr, ccc_fhm_fixed_capacity(small_fixed_map));
 insert_rand_vals(&src);
 static small_fixed_map mem_b;
 static flat_hash_map dst
-    = fhm_init(mem_b.data, mem_b.tag, key, fhmap_int_to_u64, fhmap_id_eq, NULL,
-               NULL, ccc_fhm_fixed_capacity(small_fixed_map));
-ccc_result res = fhm_copy(&dst, &src, NULL);
+    = fhm_init(mem_b.data, mem_b.tag, key, fhmap_int_to_u64, fhmap_id_eq,
+nullptr, nullptr, ccc_fhm_fixed_capacity(small_fixed_map)); ccc_result res =
+fhm_copy(&dst, &src, nullptr);
 ```
 
 The above requires dst capacity be greater than or equal to src capacity. Here
@@ -243,13 +242,11 @@ struct val
     int val;
 };
 static ccc_flat_hash_map src
-    = fhm_init((struct val *)NULL, NULL, key, fhmap_int_to_u64, fhmap_id_eq,
-               std_alloc, NULL, 0);
-insert_rand_vals(&src);
-static flat_hash_map dst
-    = fhm_init((struct val *)NULL, NULL, key, fhmap_int_to_u64, fhmap_id_eq,
-               std_alloc, NULL, 0);
-ccc_result res = fhm_copy(&dst, &src, std_alloc);
+    = fhm_init((struct val *)nullptr, nullptr, key, fhmap_int_to_u64,
+fhmap_id_eq, std_alloc, nullptr, 0); insert_rand_vals(&src); static
+flat_hash_map dst = fhm_init((struct val *)nullptr, nullptr, key,
+fhmap_int_to_u64, fhmap_id_eq, std_alloc, nullptr, 0); ccc_result res =
+fhm_copy(&dst, &src, std_alloc);
 ```
 
 The above allows dst to have a capacity less than that of the src as long as
@@ -265,13 +262,11 @@ struct val
     int val;
 };
 static ccc_flat_hash_map src
-    = fhm_init((struct val *)NULL, NULL, key, fhmap_int_to_u64, fhmap_id_eq,
-               std_alloc, NULL, 0);
-insert_rand_vals(&src);
-static flat_hash_map dst
-    = fhm_init((struct val *)NULL, NULL, key, fhmap_int_to_u64, fhmap_id_eq,
-               NULL, NULL, 0);
-ccc_result res = fhm_copy(&dst, &src, std_alloc);
+    = fhm_init((struct val *)nullptr, nullptr, key, fhmap_int_to_u64,
+fhmap_id_eq, std_alloc, nullptr, 0); insert_rand_vals(&src); static
+flat_hash_map dst = fhm_init((struct val *)nullptr, nullptr, key,
+fhmap_int_to_u64, fhmap_id_eq, nullptr, nullptr, 0); ccc_result res =
+fhm_copy(&dst, &src, std_alloc);
 ```
 
 The above sets up dst with fixed size while src is a dynamic map. Because an
@@ -314,14 +309,14 @@ Test membership or obtain references to stored user types directly. */
 @param [in] h the flat hash table to be searched.
 @param [in] key pointer to the key matching the key type of the user struct.
 @return true if the struct containing key is stored, false if not. Error if h or
-key is NULL. */
+key is nullptr. */
 [[nodiscard]] ccc_tribool ccc_fhm_contains(ccc_flat_hash_map const *h,
                                            void const *key);
 
 /** @brief Returns a reference into the table at entry key.
 @param [in] h the flat hash map to search.
 @param [in] key the key to search matching stored key type.
-@return a view of the table entry if it is present, else NULL. */
+@return a view of the table entry if it is present, else nullptr. */
 [[nodiscard]] void *ccc_fhm_get_key_val(ccc_flat_hash_map const *h,
                                         void const *key);
 
@@ -405,7 +400,7 @@ for formatting.
 @return a compound literal reference to the modified entry if it was occupied
 or a vacant entry if it was vacant.
 @note T is a reference to the user type stored in the entry guaranteed to be
-non-NULL if the closure executes.
+non-nullptr if the closure executes.
 
 ```
 #define FLAT_HASH_MAP_USING_NAMESPACE_CCC
@@ -430,10 +425,10 @@ evaluated in the closure scope. */
 /** @brief Inserts the struct with handle elem if the entry is Vacant.
 @param [in] e the entry obtained via function or macro call.
 @param [in] key_val_type the complete key and value type to be inserted.
-@return a pointer to entry in the table invariantly. NULL on error.
+@return a pointer to entry in the table invariantly. nullptr on error.
 
 Because this functions takes an entry and inserts if it is Vacant, the only
-reason NULL shall be returned is when an insertion error will occur, usually
+reason nullptr shall be returned is when an insertion error will occur, usually
 due to a resizing memory error. This can happen if the table is not allowed
 to resize because no allocation function is provided. */
 [[nodiscard]] void *ccc_fhm_or_insert(ccc_fhmap_entry const *e,
@@ -445,8 +440,8 @@ to resize because no allocation function is provided. */
 entry is Vacant.
 @return a reference to the unwrapped user type in the entry, either the
 unmodified reference if the entry was Occupied or the newly inserted element
-if the entry was Vacant. NULL is returned if resizing is required but fails or
-is not allowed.
+if the entry was Vacant. nullptr is returned if resizing is required but fails
+or is not allowed.
 
 Note that if the compound literal uses any function calls to generate values
 or other data, such functions will not be called if the entry is Occupied. */
@@ -456,21 +451,21 @@ or other data, such functions will not be called if the entry is Occupied. */
 /** @brief Inserts the provided entry invariantly.
 @param [in] e the entry returned from a call obtaining an entry.
 @param [in] key_val_type the complete key and value type to be inserted.
-@return a pointer to the inserted element or NULL upon a memory error in which
-the load factor would be exceeded when no allocation policy is defined or
+@return a pointer to the inserted element or nullptr upon a memory error in
+which the load factor would be exceeded when no allocation policy is defined or
 resizing failed to find more memory.
 
 This method can be used when the old value in the table does not need to
 be preserved. See the regular insert method if the old value is of interest.
 If an error occurs during the insertion process due to memory limitations
-or a search error NULL is returned. Otherwise insertion should not fail. */
+or a search error nullptr is returned. Otherwise insertion should not fail. */
 [[nodiscard]] void *ccc_fhm_insert_entry(ccc_fhmap_entry const *e,
                                          void const *key_val_type);
 
 /** @brief write the contents of the compound literal lazy_key_value to a slot.
 @param [in] map_entry_ptr a pointer to the obtained entry.
 @param [in] lazy_key_value the compound literal to write to a new slot.
-@return a reference to the newly inserted or overwritten user type. NULL is
+@return a reference to the newly inserted or overwritten user type. nullptr is
 returned if resizing is required but fails or is not allowed. */
 #define ccc_fhm_insert_entry_w(map_entry_ptr, lazy_key_value...)               \
     ccc_impl_fhm_insert_entry_w(map_entry_ptr, lazy_key_value)
@@ -507,13 +502,13 @@ and wraps it in an entry to provide information about the old value. */
 
 /** @brief Remove the entry from the table if Occupied.
 @param [in] e a pointer to the table entry.
-@return an entry containing NULL. If Occupied an entry in the table existed and
-was removed. If Vacant, no prior entry existed to be removed. */
+@return an entry containing nullptr. If Occupied an entry in the table existed
+and was removed. If Vacant, no prior entry existed to be removed. */
 [[nodiscard]] ccc_entry ccc_fhm_remove_entry(ccc_fhmap_entry const *e);
 
 /** @brief Remove the entry from the table if Occupied.
 @param [in] map_entry_ptr a pointer to the table entry.
-@return a compound liter to an entry containing NULL. If Occupied an entry in
+@return a compound liter to an entry containing nullptr. If Occupied an entry in
 the table existed and was removed. If Vacant, no prior entry existed to be
 removed. */
 #define ccc_fhm_remove_entry_r(map_entry_ptr)                                  \
@@ -650,12 +645,12 @@ and wraps it in an entry to provide information about the old value. */
 
 /** @brief Unwraps the provided entry to obtain a view into the table element.
 @param [in] e the entry from a query to the table via function or macro.
-@return an view into the table entry if one is present, or NULL. */
+@return an view into the table entry if one is present, or nullptr. */
 [[nodiscard]] void *ccc_fhm_unwrap(ccc_fhmap_entry const *e);
 
 /** @brief Returns the Vacant or Occupied status of the entry.
 @param [in] e the entry from a query to the table via function or macro.
-@return true if the entry is occupied, false if not. Error if e is NULL. */
+@return true if the entry is occupied, false if not. Error if e is nullptr. */
 [[nodiscard]] ccc_tribool ccc_fhm_occupied(ccc_fhmap_entry const *e);
 
 /** @brief Provides the status of the entry should an insertion follow.
@@ -678,8 +673,8 @@ in an assert for debug builds can be a helpful sanity check. */
 /** @brief Obtain the entry status from a container entry.
 @param [in] e a pointer to the entry.
 @return the status stored in the entry after the required action on the
-container completes. If e is NULL an entry input error is returned so ensure
-e is non-NULL to avoid an inaccurate status returned.
+container completes. If e is nullptr an entry input error is returned so ensure
+e is non-nullptr to avoid an inaccurate status returned.
 
 Note that this function can be useful for debugging or if more detailed
 messages are needed for logging purposes. See ccc_entry_status_msg() in
@@ -694,16 +689,17 @@ Destroy the container. */
 
 /** @brief Frees all slots in the table for use without affecting capacity.
 @param [in] h the table to be cleared.
-@param [in] fn the destructor for each element. NULL can be passed if no
+@param [in] fn the destructor for each element. nullptr can be passed if no
 maintenance is required on the elements in the table before their slots are
 forfeit.
 
-If NULL is passed as the destructor function time is O(1), else O(capacity). */
+If nullptr is passed as the destructor function time is O(1), else O(capacity).
+*/
 ccc_result ccc_fhm_clear(ccc_flat_hash_map *h, ccc_any_type_destructor_fn *fn);
 
 /** @brief Frees all slots in the table and frees the underlying buffer.
 @param [in] h the table to be cleared.
-@param [in] fn the destructor for each element. NULL can be passed if no
+@param [in] fn the destructor for each element. nullptr can be passed if no
 maintenance is required on the elements in the table before their slots are
 forfeit.
 @return the result of free operation. If no alloc function is provided it is
@@ -715,8 +711,8 @@ ccc_result ccc_fhm_clear_and_free(ccc_flat_hash_map *h,
 /** @brief Frees all slots in the table and frees the underlying buffer that was
 previously dynamically reserved with the reserve function.
 @param [in] h the table to be cleared.
-@param [in] destructor the destructor for each element. NULL can be passed if no
-maintenance is required on the elements in the table before their slots are
+@param [in] destructor the destructor for each element. nullptr can be passed if
+no maintenance is required on the elements in the table before their slots are
 forfeit.
 @param [in] alloc the required allocation function to provide to a dynamically
 reserved map. Any auxiliary data provided upon initialization will be passed to
@@ -782,17 +778,17 @@ Obtain the container state. */
 
 /** @brief Returns the size status of the table.
 @param [in] h the hash table.
-@return true if empty else false. Error if h is NULL. */
+@return true if empty else false. Error if h is nullptr. */
 [[nodiscard]] ccc_tribool ccc_fhm_is_empty(ccc_flat_hash_map const *h);
 
 /** @brief Returns the size of the table representing active slots.
 @param [in] h the hash table.
-@return the size of the map or an argument error is set if h is NULL. */
+@return the size of the map or an argument error is set if h is nullptr. */
 [[nodiscard]] ccc_ucount ccc_fhm_size(ccc_flat_hash_map const *h);
 
 /** @brief Return the full capacity of the backing storage.
 @param [in] h the hash table.
-@return the capacity of the map or an argument error is set if h is NULL. */
+@return the capacity of the map or an argument error is set if h is nullptr. */
 [[nodiscard]] ccc_ucount ccc_fhm_capacity(ccc_flat_hash_map const *h);
 
 /** @brief Return a reference to the base of backing array. O(1).
@@ -807,7 +803,7 @@ within the capacity of the backing buffer. */
 /** @brief Validation of invariants for the hash table.
 @param [in] h the table to validate.
 @return true if all invariants hold, false if corruption occurs. Error if h is
-NULL. */
+nullptr. */
 [[nodiscard]] ccc_tribool ccc_fhm_validate(ccc_flat_hash_map const *h);
 
 /**@}*/

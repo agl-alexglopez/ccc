@@ -74,7 +74,7 @@ struct ccc_pq_elem *ccc_impl_pq_delete_node(struct ccc_pq *,
 #define ccc_impl_pq_init(impl_struct_name, impl_pq_elem_field, impl_pq_order,  \
                          impl_cmp_fn, impl_alloc_fn, impl_aux_data)            \
     {                                                                          \
-        .root = NULL,                                                          \
+        .root = nullptr,                                                       \
         .count = 0,                                                            \
         .pq_elem_offset = offsetof(impl_struct_name, impl_pq_elem_field),      \
         .sizeof_type = sizeof(impl_struct_name),                               \
@@ -87,17 +87,17 @@ struct ccc_pq_elem *ccc_impl_pq_delete_node(struct ccc_pq *,
 /** @private */
 #define ccc_impl_pq_emplace(pq_ptr, lazy_value...)                             \
     (__extension__({                                                           \
-        typeof(lazy_value) *impl_pq_res = NULL;                                \
+        typeof(lazy_value) *impl_pq_res = nullptr;                             \
         struct ccc_pq *impl_pq = (pq_ptr);                                     \
         if (impl_pq)                                                           \
         {                                                                      \
             if (!impl_pq->alloc)                                               \
             {                                                                  \
-                impl_pq_res = NULL;                                            \
+                impl_pq_res = nullptr;                                         \
             }                                                                  \
             else                                                               \
             {                                                                  \
-                impl_pq_res = impl_pq->alloc(NULL, impl_pq->sizeof_type,       \
+                impl_pq_res = impl_pq->alloc(nullptr, impl_pq->sizeof_type,    \
                                              impl_pq->aux);                    \
                 if (impl_pq_res)                                               \
                 {                                                              \

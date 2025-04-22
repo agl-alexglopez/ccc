@@ -11,24 +11,25 @@
 
 CHECK_BEGIN_STATIC_FN(sll_test_insert_three)
 {
-    singly_linked_list sll = sll_init(sll, struct val, e, val_cmp, NULL, NULL);
+    singly_linked_list sll
+        = sll_init(sll, struct val, e, val_cmp, nullptr, nullptr);
     struct val v0 = (struct val){};
-    CHECK(push_front(&sll, &v0.e) != NULL, true);
+    CHECK(push_front(&sll, &v0.e) != nullptr, true);
     struct val *v = front(&sll);
     CHECK(validate(&sll), true);
-    CHECK(v == NULL, false);
+    CHECK(v == nullptr, false);
     CHECK(v->val, 0);
     struct val v1 = (struct val){.val = 1};
-    CHECK(push_front(&sll, &v1.e) != NULL, true);
+    CHECK(push_front(&sll, &v1.e) != nullptr, true);
     CHECK(validate(&sll), true);
     v = front(&sll);
-    CHECK(v == NULL, false);
+    CHECK(v == nullptr, false);
     CHECK(v->val, 1);
     struct val v2 = (struct val){.val = 2};
-    CHECK(push_front(&sll, &v2.e) != NULL, true);
+    CHECK(push_front(&sll, &v2.e) != nullptr, true);
     CHECK(validate(&sll), true);
     v = front(&sll);
-    CHECK(v == NULL, false);
+    CHECK(v == nullptr, false);
     CHECK(v->val, 2);
     CHECK(size(&sll).count, 3);
     CHECK(check_order(&sll, 3, (int[3]){2, 1, 0}), PASS);
@@ -37,7 +38,8 @@ CHECK_BEGIN_STATIC_FN(sll_test_insert_three)
 
 CHECK_BEGIN_STATIC_FN(sll_test_push_and_splice)
 {
-    singly_linked_list sll = sll_init(sll, struct val, e, val_cmp, NULL, NULL);
+    singly_linked_list sll
+        = sll_init(sll, struct val, e, val_cmp, nullptr, nullptr);
     struct val vals[4] = {{.val = 0}, {.val = 1}, {.val = 2}, {.val = 3}};
     enum check_result const t = create_list(&sll, 4, vals);
     CHECK(t, PASS);
@@ -56,7 +58,8 @@ CHECK_BEGIN_STATIC_FN(sll_test_push_and_splice)
 
 CHECK_BEGIN_STATIC_FN(sll_test_push_and_splice_range)
 {
-    singly_linked_list sll = sll_init(sll, struct val, e, val_cmp, NULL, NULL);
+    singly_linked_list sll
+        = sll_init(sll, struct val, e, val_cmp, nullptr, nullptr);
     struct val vals[5]
         = {{.val = 0}, {.val = 1}, {.val = 2}, {.val = 3}, {.val = 4}};
     enum check_result const t = create_list(&sll, 5, vals);
@@ -87,7 +90,8 @@ CHECK_BEGIN_STATIC_FN(sll_test_push_and_splice_range)
 
 CHECK_BEGIN_STATIC_FN(sll_test_push_and_splice_range_no_ops)
 {
-    singly_linked_list sll = sll_init(sll, struct val, e, val_cmp, NULL, NULL);
+    singly_linked_list sll
+        = sll_init(sll, struct val, e, val_cmp, nullptr, nullptr);
     struct val vals[5]
         = {{.val = 0}, {.val = 1}, {.val = 2}, {.val = 3}, {.val = 4}};
     enum check_result const t = create_list(&sll, 5, vals);
@@ -108,7 +112,8 @@ CHECK_BEGIN_STATIC_FN(sll_test_push_and_splice_range_no_ops)
 
 CHECK_BEGIN_STATIC_FN(sll_test_sort_reverse)
 {
-    singly_linked_list sll = sll_init(sll, struct val, e, val_cmp, NULL, NULL);
+    singly_linked_list sll
+        = sll_init(sll, struct val, e, val_cmp, nullptr, nullptr);
     struct val vals[6] = {{.val = 0}, {.val = 1}, {.val = 2},
                           {.val = 3}, {.val = 4}, {.val = 5}};
     enum check_result const t = create_list(&sll, 6, vals);
@@ -125,7 +130,8 @@ CHECK_BEGIN_STATIC_FN(sll_test_sort_reverse)
 
 CHECK_BEGIN_STATIC_FN(sll_test_sort_even)
 {
-    singly_linked_list sll = sll_init(sll, struct val, e, val_cmp, NULL, NULL);
+    singly_linked_list sll
+        = sll_init(sll, struct val, e, val_cmp, nullptr, nullptr);
     struct val vals[8] = {
         [7] = {.val = 9}, [6] = {.val = 4},  [5] = {.val = 1},
         [4] = {.val = 3}, [3] = {.val = 99}, [2] = {.val = -55},
@@ -146,7 +152,8 @@ CHECK_BEGIN_STATIC_FN(sll_test_sort_even)
 
 CHECK_BEGIN_STATIC_FN(sll_test_sort_odd)
 {
-    singly_linked_list sll = sll_init(sll, struct val, e, val_cmp, NULL, NULL);
+    singly_linked_list sll
+        = sll_init(sll, struct val, e, val_cmp, nullptr, nullptr);
     struct val vals[9] = {
         [8] = {.val = 10},  [7] = {.val = 9}, [6] = {.val = 4},
         [5] = {.val = 1},   [4] = {.val = 1}, [3] = {.val = 99},
@@ -167,7 +174,8 @@ CHECK_BEGIN_STATIC_FN(sll_test_sort_odd)
 
 CHECK_BEGIN_STATIC_FN(sll_test_sort_runs)
 {
-    singly_linked_list sll = sll_init(sll, struct val, e, val_cmp, NULL, NULL);
+    singly_linked_list sll
+        = sll_init(sll, struct val, e, val_cmp, nullptr, nullptr);
     struct val vals[12]
         = {{.val = 99},  {.val = 101}, {.val = 103}, {.val = 4},
            {.val = 8},   {.val = 9},   {.val = -99}, {.val = -55},
@@ -191,7 +199,8 @@ CHECK_BEGIN_STATIC_FN(sll_test_sort_runs)
 
 CHECK_BEGIN_STATIC_FN(sll_test_sort_halves)
 {
-    singly_linked_list sll = sll_init(sll, struct val, e, val_cmp, NULL, NULL);
+    singly_linked_list sll
+        = sll_init(sll, struct val, e, val_cmp, nullptr, nullptr);
     struct val vals[12] = {{.val = 7},  {.val = 10}, {.val = 13}, {.val = 17},
                            {.val = 19}, {.val = 21}, {.val = 8},  {.val = 12},
                            {.val = 15}, {.val = 18}, {.val = 20}, {.val = 25}};
@@ -214,7 +223,8 @@ CHECK_BEGIN_STATIC_FN(sll_test_sort_halves)
 
 CHECK_BEGIN_STATIC_FN(sll_test_sort_insert)
 {
-    singly_linked_list sll = sll_init(sll, struct val, e, val_cmp, NULL, NULL);
+    singly_linked_list sll
+        = sll_init(sll, struct val, e, val_cmp, nullptr, nullptr);
     struct val *inserted
         = sll_insert_sorted(&sll, &(struct val){.val = -99999}.e);
     CHECK(inserted->val, -99999);
@@ -242,31 +252,31 @@ CHECK_BEGIN_STATIC_FN(sll_test_sort_insert)
     };
     /* Before -99. */
     inserted = sll_insert_sorted(&sll, &to_insert[0].e);
-    CHECK(inserted != NULL, true);
+    CHECK(inserted != nullptr, true);
     CHECK(validate(&sll), true);
     CHECK(sll_next(&sll, &inserted->e), &vals[0]);
 
     /* After -99. */
     inserted = sll_insert_sorted(&sll, &to_insert[1].e);
-    CHECK(inserted != NULL, true);
+    CHECK(inserted != nullptr, true);
     CHECK(validate(&sll), true);
     CHECK(sll_next(&sll, &inserted->e), &vals[3]);
 
     /* Before 4. */
     inserted = sll_insert_sorted(&sll, &to_insert[2].e);
-    CHECK(inserted != NULL, true);
+    CHECK(inserted != nullptr, true);
     CHECK(validate(&sll), true);
     CHECK(sll_next(&sll, &inserted->e), &vals[7]);
 
     /* Before 99. */
     inserted = sll_insert_sorted(&sll, &to_insert[3].e);
-    CHECK(inserted != NULL, true);
+    CHECK(inserted != nullptr, true);
     CHECK(validate(&sll), true);
     CHECK(sll_next(&sll, &inserted->e), &vals[4]);
 
     /* After 99. */
     inserted = sll_insert_sorted(&sll, &to_insert[4].e);
-    CHECK(inserted != NULL, true);
+    CHECK(inserted != nullptr, true);
     CHECK(validate(&sll), true);
     CHECK(sll_next(&sll, &inserted->e), sll_end(&sll));
 

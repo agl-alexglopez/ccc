@@ -119,12 +119,12 @@ void *ccc_impl_omm_multimap_insert(struct ccc_ommap *t,
 /** @private */
 #define ccc_impl_omm_new(ordered_map_entry)                                    \
     (__extension__({                                                           \
-        void *impl_omm_ins_alloc_ret = NULL;                                   \
+        void *impl_omm_ins_alloc_ret = nullptr;                                \
         if ((ordered_map_entry)->t->alloc)                                     \
         {                                                                      \
             impl_omm_ins_alloc_ret                                             \
                 = (ordered_map_entry)                                          \
-                      ->t->alloc(NULL, (ordered_map_entry)->t->sizeof_type,    \
+                      ->t->alloc(nullptr, (ordered_map_entry)->t->sizeof_type, \
                                  (ordered_map_entry)->t->aux);                 \
         }                                                                      \
         impl_omm_ins_alloc_ret;                                                \
@@ -194,7 +194,7 @@ void *ccc_impl_omm_multimap_insert(struct ccc_ommap *t,
 #define ccc_impl_omm_or_insert_w(ordered_map_entry_ptr, lazy_key_value...)     \
     (__extension__({                                                           \
         __auto_type impl_omm_or_ins_ent_ptr = (ordered_map_entry_ptr);         \
-        typeof(lazy_key_value) *impl_or_ins_ret = NULL;                        \
+        typeof(lazy_key_value) *impl_or_ins_ret = nullptr;                     \
         if (impl_omm_or_ins_ent_ptr)                                           \
         {                                                                      \
             struct ccc_omultimap_entry *impl_omm_or_ins_ent                    \
@@ -217,7 +217,7 @@ void *ccc_impl_omm_multimap_insert(struct ccc_ommap *t,
 #define ccc_impl_omm_insert_entry_w(ordered_map_entry_ptr, lazy_key_value...)  \
     (__extension__({                                                           \
         __auto_type impl_omm_ins_ent_ptr = (ordered_map_entry_ptr);            \
-        typeof(lazy_key_value) *impl_omm_ins_ent_ret = NULL;                   \
+        typeof(lazy_key_value) *impl_omm_ins_ent_ret = nullptr;                \
         if (impl_omm_ins_ent_ptr)                                              \
         {                                                                      \
             struct ccc_omultimap_entry *impl_omm_ins_ent                       \

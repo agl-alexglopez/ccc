@@ -55,7 +55,7 @@ ccc_buf_at(ccc_buffer const *const buf, size_t const i)
 {
     if (!buf || i >= buf->capacity)
     {
-        return NULL;
+        return nullptr;
     }
     return ((char *)buf->mem + (i * buf->sizeof_type));
 }
@@ -77,7 +77,7 @@ ccc_buf_alloc_back(ccc_buffer *const buf)
 {
     if (!buf)
     {
-        return NULL;
+        return nullptr;
     }
     if (buf->count == buf->capacity)
     {
@@ -86,7 +86,7 @@ ccc_buf_alloc_back(ccc_buffer *const buf)
                             : ccc_buf_alloc(buf, START_CAPACITY, buf->alloc);
         if (resize_res != CCC_RESULT_OK)
         {
-            return NULL;
+            return nullptr;
         }
     }
     void *const ret = ((char *)buf->mem + (buf->sizeof_type * buf->count));
@@ -124,7 +124,7 @@ ccc_buf_copy(ccc_buffer *const buf, size_t const dst, size_t const src)
 {
     if (!buf || dst >= buf->capacity || src >= buf->capacity)
     {
-        return NULL;
+        return nullptr;
     }
     if (dst == src)
     {
@@ -177,7 +177,7 @@ ccc_buf_insert(ccc_buffer *const buf, size_t const i, void const *const data)
 {
     if (!buf || !buf->mem || i > buf->count)
     {
-        return NULL;
+        return nullptr;
     }
     if (i == buf->count)
     {
@@ -263,7 +263,7 @@ ccc_buf_is_full(ccc_buffer const *const buf)
 void *
 ccc_buf_begin(ccc_buffer const *const buf)
 {
-    return buf ? buf->mem : NULL;
+    return buf ? buf->mem : nullptr;
 }
 
 void *
@@ -271,7 +271,7 @@ ccc_buf_rbegin(ccc_buffer const *const buf)
 {
     if (!buf || !buf->mem)
     {
-        return NULL;
+        return nullptr;
     }
     return (char *)buf->mem + (buf->count * buf->sizeof_type);
 }
@@ -281,7 +281,7 @@ ccc_buf_next(ccc_buffer const *const buf, void const *const iter)
 {
     if (!buf || !buf->mem)
     {
-        return NULL;
+        return nullptr;
     }
     if (iter >= ccc_buf_capacity_end(buf))
     {
@@ -295,7 +295,7 @@ ccc_buf_rnext(ccc_buffer const *const buf, void const *const iter)
 {
     if (!buf || !buf->mem)
     {
-        return NULL;
+        return nullptr;
     }
     if (iter <= ccc_buf_rend(buf))
     {
@@ -309,7 +309,7 @@ ccc_buf_end(ccc_buffer const *const buf)
 {
     if (!buf || !buf->mem)
     {
-        return NULL;
+        return nullptr;
     }
     return (char *)buf->mem + (buf->count * buf->sizeof_type);
 }
@@ -319,7 +319,7 @@ ccc_buf_rend(ccc_buffer const *const buf)
 {
     if (!buf || !buf->mem)
     {
-        return NULL;
+        return nullptr;
     }
     return (char *)buf->mem - buf->sizeof_type;
 }
@@ -329,7 +329,7 @@ ccc_buf_capacity_end(ccc_buffer const *const buf)
 {
     if (!buf || !buf->mem)
     {
-        return NULL;
+        return nullptr;
     }
     return (char *)buf->mem + (buf->sizeof_type * buf->capacity);
 }

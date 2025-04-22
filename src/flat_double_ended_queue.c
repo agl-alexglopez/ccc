@@ -57,7 +57,7 @@ ccc_fdeq_push_back(ccc_flat_double_ended_queue *const fdeq,
 {
     if (!fdeq || !elem)
     {
-        return NULL;
+        return nullptr;
     }
     void *const slot = alloc_back(fdeq);
     if (slot && slot != elem)
@@ -73,7 +73,7 @@ ccc_fdeq_push_front(ccc_flat_double_ended_queue *const fdeq,
 {
     if (!fdeq || !elem)
     {
-        return NULL;
+        return nullptr;
     }
     void *const slot = alloc_front(fdeq);
     if (slot && slot != elem)
@@ -111,7 +111,7 @@ ccc_fdeq_insert_range(ccc_flat_double_ended_queue *const fdeq, void *const pos,
 {
     if (!fdeq || !elems)
     {
-        return NULL;
+        return nullptr;
     }
     if (!n)
     {
@@ -120,13 +120,13 @@ ccc_fdeq_insert_range(ccc_flat_double_ended_queue *const fdeq, void *const pos,
     if (pos == ccc_fdeq_begin(fdeq))
     {
         return push_front_range(fdeq, n, elems) != CCC_RESULT_OK
-                   ? NULL
+                   ? nullptr
                    : at(fdeq, n - 1);
     }
     if (pos == ccc_fdeq_end(fdeq))
     {
         return push_back_range(fdeq, n, elems) != CCC_RESULT_OK
-                   ? NULL
+                   ? nullptr
                    : at(fdeq, fdeq->buf.count - n);
     }
     return push_range(fdeq, pos, n, elems);
@@ -162,7 +162,7 @@ ccc_fdeq_front(ccc_flat_double_ended_queue const *const fdeq)
 {
     if (!fdeq || ccc_buf_is_empty(&fdeq->buf))
     {
-        return NULL;
+        return nullptr;
     }
     return ccc_buf_at(&fdeq->buf, fdeq->front);
 }
@@ -172,7 +172,7 @@ ccc_fdeq_back(ccc_flat_double_ended_queue const *const fdeq)
 {
     if (!fdeq || ccc_buf_is_empty(&fdeq->buf))
     {
-        return NULL;
+        return nullptr;
     }
     return ccc_buf_at(&fdeq->buf, last_elem_index(fdeq));
 }
@@ -212,7 +212,7 @@ ccc_fdeq_at(ccc_flat_double_ended_queue const *const fdeq, size_t const i)
 {
     if (!fdeq || i >= fdeq->buf.capacity)
     {
-        return NULL;
+        return nullptr;
     }
     return ccc_buf_at(&fdeq->buf, (fdeq->front + i) % fdeq->buf.capacity);
 }
@@ -222,7 +222,7 @@ ccc_fdeq_begin(ccc_flat_double_ended_queue const *const fdeq)
 {
     if (!fdeq || !fdeq->buf.count)
     {
-        return NULL;
+        return nullptr;
     }
     return ccc_buf_at(&fdeq->buf, fdeq->front);
 }
@@ -232,7 +232,7 @@ ccc_fdeq_rbegin(ccc_flat_double_ended_queue const *const fdeq)
 {
     if (!fdeq || !fdeq->buf.count)
     {
-        return NULL;
+        return nullptr;
     }
     return ccc_buf_at(&fdeq->buf, last_elem_index(fdeq));
 }
@@ -245,7 +245,7 @@ ccc_fdeq_next(ccc_flat_double_ended_queue const *const fdeq,
     if (next_i == fdeq->front
         || distance(fdeq, next_i, fdeq->front) >= fdeq->buf.count)
     {
-        return NULL;
+        return nullptr;
     }
     return ccc_buf_at(&fdeq->buf, next_i);
 }
@@ -259,7 +259,7 @@ ccc_fdeq_rnext(ccc_flat_double_ended_queue const *const fdeq,
     size_t const rbegin = last_elem_index(fdeq);
     if (next_i == rbegin || rdistance(fdeq, next_i, rbegin) >= fdeq->buf.count)
     {
-        return NULL;
+        return nullptr;
     }
     return ccc_buf_at(&fdeq->buf, next_i);
 }
@@ -267,19 +267,19 @@ ccc_fdeq_rnext(ccc_flat_double_ended_queue const *const fdeq,
 void *
 ccc_fdeq_end(ccc_flat_double_ended_queue const *const)
 {
-    return NULL;
+    return nullptr;
 }
 
 void *
 ccc_fdeq_rend(ccc_flat_double_ended_queue const *const)
 {
-    return NULL;
+    return nullptr;
 }
 
 void *
 ccc_fdeq_data(ccc_flat_double_ended_queue const *const fdeq)
 {
-    return fdeq ? ccc_buf_begin(&fdeq->buf) : NULL;
+    return fdeq ? ccc_buf_begin(&fdeq->buf) : nullptr;
 }
 
 ccc_result
@@ -506,7 +506,7 @@ alloc_front(struct ccc_fdeq *const fdeq)
     /* Should have been able to resize. Bad error. */
     if (fdeq->buf.alloc && full)
     {
-        return NULL;
+        return nullptr;
     }
     fdeq->front = front_free_slot(fdeq->front, fdeq->buf.capacity);
     void *const new_slot = ccc_buf_at(&fdeq->buf, fdeq->front);
@@ -525,7 +525,7 @@ alloc_back(struct ccc_fdeq *const fdeq)
     /* Should have been able to resize. Bad error. */
     if (fdeq->buf.alloc && full)
     {
-        return NULL;
+        return nullptr;
     }
     void *const new_slot = ccc_buf_at(&fdeq->buf, back_free_slot(fdeq));
     /* If no reallocation policy is given we are a ring buffer. */
@@ -627,7 +627,7 @@ push_range(struct ccc_fdeq *const fdeq, char const *const pos, size_t n,
         = maybe_resize(fdeq, n, fdeq->buf.alloc) != CCC_RESULT_OK;
     if (fdeq->buf.alloc && full)
     {
-        return NULL;
+        return nullptr;
     }
     size_t const cap = fdeq->buf.capacity;
     size_t const new_size = fdeq->buf.count + n;
@@ -709,7 +709,7 @@ maybe_resize(struct ccc_fdeq *const q, size_t const additional_elems_to_add,
     {
         required = q->buf.capacity * 2;
     }
-    void *const new_mem = fn(NULL, sizeof_type * required, q->buf.aux);
+    void *const new_mem = fn(nullptr, sizeof_type * required, q->buf.aux);
     if (!new_mem)
     {
         return CCC_RESULT_MEM_ERROR;

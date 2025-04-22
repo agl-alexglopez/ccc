@@ -15,12 +15,12 @@ CHECK_BEGIN_STATIC_FN(fpq_test_insert_remove_four_dups)
 {
     struct val three_vals[4 + 1];
     ccc_flat_priority_queue fpq
-        = ccc_fpq_init(three_vals, CCC_LES, val_cmp, NULL, NULL,
+        = ccc_fpq_init(three_vals, CCC_LES, val_cmp, nullptr, nullptr,
                        (sizeof(three_vals) / sizeof(three_vals[0])));
     for (int i = 0; i < 4; ++i)
     {
         three_vals[i].val = 0;
-        CHECK(push(&fpq, &three_vals[i]) != NULL, true);
+        CHECK(push(&fpq, &three_vals[i]) != nullptr, true);
         CHECK(validate(&fpq), true);
         size_t const size_check = i + 1;
         CHECK(ccc_fpq_size(&fpq).count, size_check);
@@ -40,12 +40,13 @@ CHECK_BEGIN_STATIC_FN(fpq_test_insert_erase_shuffled)
 {
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
-    srand(time(NULL));
+    srand(time(nullptr));
     size_t const size = 50;
     int const prime = 53;
     struct val vals[50 + 1];
-    ccc_flat_priority_queue fpq = ccc_fpq_init(
-        vals, CCC_LES, val_cmp, NULL, NULL, (sizeof(vals) / sizeof(vals[0])));
+    ccc_flat_priority_queue fpq
+        = ccc_fpq_init(vals, CCC_LES, val_cmp, nullptr, nullptr,
+                       (sizeof(vals) / sizeof(vals[0])));
     CHECK(insert_shuffled(&fpq, vals, size, prime), PASS);
     struct val const *min = front(&fpq);
     CHECK(min->val, 0);
@@ -68,8 +69,9 @@ CHECK_BEGIN_STATIC_FN(fpq_test_pop_max)
     size_t const size = 50;
     int const prime = 53;
     struct val vals[50 + 1];
-    ccc_flat_priority_queue fpq = ccc_fpq_init(
-        vals, CCC_LES, val_cmp, NULL, NULL, (sizeof(vals) / sizeof(vals[0])));
+    ccc_flat_priority_queue fpq
+        = ccc_fpq_init(vals, CCC_LES, val_cmp, nullptr, nullptr,
+                       (sizeof(vals) / sizeof(vals[0])));
     CHECK(insert_shuffled(&fpq, vals, size, prime), PASS);
     struct val const *min = front(&fpq);
     CHECK(min->val, 0);
@@ -91,8 +93,9 @@ CHECK_BEGIN_STATIC_FN(fpq_test_pop_min)
     size_t const size = 50;
     int const prime = 53;
     struct val vals[50 + 1];
-    ccc_flat_priority_queue fpq = ccc_fpq_init(
-        vals, CCC_LES, val_cmp, NULL, NULL, (sizeof(vals) / sizeof(vals[0])));
+    ccc_flat_priority_queue fpq
+        = ccc_fpq_init(vals, CCC_LES, val_cmp, nullptr, nullptr,
+                       (sizeof(vals) / sizeof(vals[0])));
     CHECK(insert_shuffled(&fpq, vals, size, prime), PASS);
     struct val const *min = front(&fpq);
     CHECK(min->val, 0);
@@ -113,20 +116,21 @@ CHECK_BEGIN_STATIC_FN(fpq_test_delete_prime_shuffle_duplicates)
 {
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
-    srand(time(NULL));
+    srand(time(nullptr));
     int const size = 99;
     int const prime = 101;
     /* Make the prime shuffle shorter than size for many duplicates. */
     int const less = 77;
     struct val vals[99 + 1];
-    ccc_flat_priority_queue fpq = ccc_fpq_init(
-        vals, CCC_LES, val_cmp, NULL, NULL, (sizeof(vals) / sizeof(vals[0])));
+    ccc_flat_priority_queue fpq
+        = ccc_fpq_init(vals, CCC_LES, val_cmp, nullptr, nullptr,
+                       (sizeof(vals) / sizeof(vals[0])));
     int shuffled_index = prime % (size - less);
     for (int i = 0; i < size; ++i)
     {
         vals[i].val = shuffled_index;
         vals[i].id = i;
-        CHECK(push(&fpq, &vals[i]) != NULL, true);
+        CHECK(push(&fpq, &vals[i]) != nullptr, true);
         CHECK(validate(&fpq), true);
         size_t const s = i + 1;
         CHECK(ccc_fpq_size(&fpq).count, s);
@@ -155,13 +159,14 @@ CHECK_BEGIN_STATIC_FN(fpq_test_prime_shuffle)
        reduce the shuffle range so it will repeat some values. */
     int shuffled_index = prime % (size - less);
     struct val vals[50 + 1];
-    ccc_flat_priority_queue fpq = ccc_fpq_init(
-        vals, CCC_LES, val_cmp, NULL, NULL, (sizeof(vals) / sizeof(vals[0])));
+    ccc_flat_priority_queue fpq
+        = ccc_fpq_init(vals, CCC_LES, val_cmp, nullptr, nullptr,
+                       (sizeof(vals) / sizeof(vals[0])));
     for (int i = 0; i < size; ++i)
     {
         vals[i].val = shuffled_index;
         vals[i].id = shuffled_index;
-        CHECK(push(&fpq, &vals[i]) != NULL, true);
+        CHECK(push(&fpq, &vals[i]) != nullptr, true);
         CHECK(validate(&fpq), true);
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
@@ -184,16 +189,17 @@ CHECK_BEGIN_STATIC_FN(fpq_test_weak_srand)
 {
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
-    srand(time(NULL));
+    srand(time(nullptr));
     int const num_stack_elems = 1000;
     struct val vals[1000 + 1];
-    ccc_flat_priority_queue fpq = ccc_fpq_init(
-        vals, CCC_LES, val_cmp, NULL, NULL, (sizeof(vals) / sizeof(vals[0])));
+    ccc_flat_priority_queue fpq
+        = ccc_fpq_init(vals, CCC_LES, val_cmp, nullptr, nullptr,
+                       (sizeof(vals) / sizeof(vals[0])));
     for (int i = 0; i < num_stack_elems; ++i)
     {
         vals[i].val = rand(); // NOLINT
         vals[i].id = i;
-        CHECK(push(&fpq, &vals[i]) != NULL, true);
+        CHECK(push(&fpq, &vals[i]) != nullptr, true);
         CHECK(validate(&fpq), true);
     }
     while (!ccc_fpq_is_empty(&fpq))

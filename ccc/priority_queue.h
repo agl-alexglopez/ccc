@@ -73,7 +73,7 @@ Initialize the container with memory, callbacks, and permissions. */
 @param [in] pq_elem_field the name of the field for the pq elem.
 @param [in] pq_order CCC_LES for a min pq or CCC_GRT for a max pq.
 @param [in] cmp_fn the function used to compare two user types.
-@param [in] alloc_fn the allocation function or NULL if allocation is banned.
+@param [in] alloc_fn the allocation function or nullptr if allocation is banned.
 @param [in] aux_data auxiliary data needed for comparison or destruction.
 @return the initialized pq on the right side of an equality operator
 (e.g. ccc_priority_queue pq = ccc_pq_init(...);) */
@@ -91,8 +91,8 @@ Insert and remove elements from the priority queue. */
 /** @brief Adds an element to the priority queue in correct total order. O(1).
 @param [in] pq a pointer to the priority queue.
 @param [in] elem a pointer to the intrusive element in the user type.
-@return a reference to the newly inserted user type or NULL if NULL arguments
-are provided or allocation fails when permitted.
+@return a reference to the newly inserted user type or nullptr if nullptr
+arguments are provided or allocation fails when permitted.
 
 Note that if allocation is permitted the user type is copied into a newly
 allocated node.
@@ -104,8 +104,8 @@ has been allocated with the appropriate lifetime for the user's needs. */
 /** @brief Write user type directly to a newly allocated priority queue elem.
 @param [in] priority_queue_ptr a pointer to the priority queue.
 @param [in] lazy_value the compound literal to write to the allocation.
-@return a reference to the successfully inserted element or NULL if allocation
-fails or is not allowed.
+@return a reference to the successfully inserted element or nullptr if
+allocation fails or is not allowed.
 
 Note that the priority queue must be initialized with allocation permission to
 use this macro. */
@@ -114,7 +114,7 @@ use this macro. */
 
 /** @brief Pops the front element from the priority queue. Amortized O(lgN).
 @param [in] pq a pointer to the priority queue.
-@return ok if pop was successful or an input error if pq is NULL or empty. */
+@return ok if pop was successful or an input error if pq is nullptr or empty. */
 ccc_result ccc_pq_pop(ccc_priority_queue *pq);
 
 /** Extract the element known to be in the pq without freeing memory. Amortized
@@ -129,7 +129,7 @@ Note that the user must ensure that elem is in the priority queue. */
 /** @brief Erase elem from the pq. Amortized O(lgN).
 @param [in] pq a pointer to the priority queue.
 @param [in] elem a pointer to the intrusive element in the user type.
-@return ok if erase was successful or an input error if pq or elem is NULL or
+@return ok if erase was successful or an input error if pq or elem is nullptr or
 pq is empty.
 
 Note that the user must ensure that elem is in the priority queue. */
@@ -293,8 +293,8 @@ Deallocate the container. */
 
 /** @brief Removes all elements from the pq, freeing if needed.
 @param [in] pq a pointer to the priority queue.
-@param [in] fn the destructor function or NULL if not needed.
-@return ok if the clear was successful or an input error for NULL args.
+@param [in] fn the destructor function or nullptr if not needed.
+@return ok if the clear was successful or an input error for nullptr args.
 
 Note that if allocation is allowed the container will free the user type
 wrapping each element in the pq. Therefore, the user should not free in the
@@ -319,17 +319,18 @@ Obtain state from the container. */
 
 /** @brief Returns true if the priority queue is empty false if not. O(1).
 @param [in] pq a pointer to the priority queue.
-@return true if the size is 0, false if not empty. Error if pq is NULL. */
+@return true if the size is 0, false if not empty. Error if pq is nullptr. */
 [[nodiscard]] ccc_tribool ccc_pq_is_empty(ccc_priority_queue const *pq);
 
 /** @brief Returns the size of the priority queue.
 @param [in] pq a pointer to the priority queue.
-@return the size of the pq or an argument error is set if pq is NULL. */
+@return the size of the pq or an argument error is set if pq is nullptr. */
 [[nodiscard]] ccc_ucount ccc_pq_size(ccc_priority_queue const *pq);
 
 /** @brief Verifies the internal invariants of the pq hold.
 @param [in] pq a pointer to the priority queue.
-@return true if the pq is valid false if pq is invalid. Error if pq is NULL. */
+@return true if the pq is valid false if pq is invalid. Error if pq is nullptr.
+*/
 [[nodiscard]] ccc_tribool ccc_pq_validate(ccc_priority_queue const *pq);
 
 /** @brief Return the order used to initialize the pq.

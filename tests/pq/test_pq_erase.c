@@ -14,12 +14,12 @@
 CHECK_BEGIN_STATIC_FN(pq_test_insert_remove_four_dups)
 {
     ccc_priority_queue ppq
-        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
+        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, nullptr, nullptr);
     struct val three_vals[4];
     for (int i = 0; i < 4; ++i)
     {
         three_vals[i].val = 0;
-        CHECK(push(&ppq, &three_vals[i].elem) != NULL, true);
+        CHECK(push(&ppq, &three_vals[i].elem) != nullptr, true);
         CHECK(validate(&ppq), true);
         size_t const size = i + 1;
         CHECK(ccc_pq_size(&ppq).count, size);
@@ -38,7 +38,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_insert_remove_four_dups)
 CHECK_BEGIN_STATIC_FN(pq_test_insert_extract_shuffled)
 {
     ccc_priority_queue ppq
-        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
+        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, nullptr, nullptr);
     size_t const size = 50;
     int const prime = 53;
     struct val vals[50];
@@ -60,7 +60,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_insert_extract_shuffled)
 CHECK_BEGIN_STATIC_FN(pq_test_pop_max)
 {
     ccc_priority_queue ppq
-        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
+        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, nullptr, nullptr);
     size_t const size = 50;
     int const prime = 53;
     struct val vals[50];
@@ -83,7 +83,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_pop_max)
 CHECK_BEGIN_STATIC_FN(pq_test_pop_min)
 {
     ccc_priority_queue ppq
-        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
+        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, nullptr, nullptr);
     size_t const size = 50;
     int const prime = 53;
     struct val vals[50];
@@ -106,7 +106,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_pop_min)
 CHECK_BEGIN_STATIC_FN(pq_test_delete_prime_shuffle_duplicates)
 {
     ccc_priority_queue ppq
-        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
+        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, nullptr, nullptr);
     int const size = 99;
     int const prime = 101;
     /* Make the prime shuffle shorter than size for many duplicates. */
@@ -117,7 +117,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_delete_prime_shuffle_duplicates)
     {
         vals[i].val = shuffled_index;
         vals[i].id = i;
-        CHECK(push(&ppq, &vals[i].elem) != NULL, true);
+        CHECK(push(&ppq, &vals[i].elem) != nullptr, true);
         CHECK(validate(&ppq), true);
         size_t const s = i + 1;
         CHECK(ccc_pq_size(&ppq).count, s);
@@ -142,7 +142,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_delete_prime_shuffle_duplicates)
 CHECK_BEGIN_STATIC_FN(pq_test_prime_shuffle)
 {
     ccc_priority_queue ppq
-        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
+        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, nullptr, nullptr);
     int const size = 50;
     int const prime = 53;
     int const less = 10;
@@ -154,7 +154,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_prime_shuffle)
     {
         vals[i].val = shuffled_index;
         vals[i].id = shuffled_index;
-        CHECK(push(&ppq, &vals[i].elem) != NULL, true);
+        CHECK(push(&ppq, &vals[i].elem) != nullptr, true);
         CHECK(validate(&ppq), true);
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
@@ -174,17 +174,17 @@ CHECK_BEGIN_STATIC_FN(pq_test_prime_shuffle)
 CHECK_BEGIN_STATIC_FN(pq_test_weak_srand)
 {
     ccc_priority_queue ppq
-        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
+        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, nullptr, nullptr);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
-    srand(time(NULL));
+    srand(time(nullptr));
     int const num_heap_elems = 1000;
     struct val vals[1000];
     for (int i = 0; i < num_heap_elems; ++i)
     {
         vals[i].val = rand(); // NOLINT
         vals[i].id = i;
-        CHECK(push(&ppq, &vals[i].elem) != NULL, true);
+        CHECK(push(&ppq, &vals[i].elem) != nullptr, true);
         CHECK(validate(&ppq), true);
     }
     for (int i = 0; i < num_heap_elems; ++i)

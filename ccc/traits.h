@@ -245,7 +245,7 @@ See container documentation for specific behavior. */
 
 /** @brief Unwrap user type in entry.
 @param [in] entry_ptr a pointer to the container.
-@return a valid reference if Occupied or NULL if vacant.
+@return a valid reference if Occupied or nullptr if vacant.
 
 See container documentation for specific behavior. */
 #define ccc_unwrap(entry_ptr) ccc_impl_unwrap(entry_ptr)
@@ -273,7 +273,7 @@ Test membership or obtain references to stored user types directly. */
 /** @brief Obtain a reference to the user type stored at the key.
 @param [in] container_ptr a pointer to the container.
 @param [in] key_ptr a pointer to the search key.
-@return a reference to the stored user type or NULL of absent.
+@return a reference to the stored user type or nullptr of absent.
 
 See container documentation for specific behavior. */
 #define ccc_get_key_val(container_ptr, key_ptr...)                             \
@@ -583,21 +583,21 @@ Obtain the container state. */
 
 /** @brief Return the size of the container.
 @param [in] container_ptr a pointer to the container.
-@return the size or an argument error is set if container_ptr is NULL.
+@return the size or an argument error is set if container_ptr is nullptr.
 
 See container documentation for specific behavior. */
 #define ccc_size(container_ptr) ccc_impl_size(container_ptr)
 
 /** @brief Return the capacity of the container.
 @param [in] container_ptr a pointer to the container.
-@return the capacity or an argument error is set if container_ptr is NULL.
+@return the capacity or an argument error is set if container_ptr is nullptr.
 
 See container documentation for specific behavior. */
 #define ccc_capacity(container_ptr) ccc_impl_capacity(container_ptr)
 
 /** @brief Return the size status of a container.
 @param [in] container_ptr a pointer to the container.
-@return true if empty or NULL false if not.
+@return true if empty or nullptr false if not.
 
 See container documentation for specific behavior. */
 #define ccc_is_empty(container_ptr) ccc_impl_is_empty(container_ptr)

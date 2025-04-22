@@ -29,14 +29,14 @@ CHECK_BEGIN_FN(check_order, flat_double_ended_queue const *const q,
     int *v = begin(q);
     for (; v != end(q) && i < n; v = next(q, v), ++i)
     {
-        CHECK(v == NULL, false);
+        CHECK(v == nullptr, false);
         CHECK(*v, order[i]);
     }
     i = n;
     v = rbegin(q);
     for (; v != rend(q) && i--; v = rnext(q, v))
     {
-        CHECK(v == NULL, false);
+        CHECK(v == nullptr, false);
         CHECK(*v, order[i]);
     }
     CHECK_END_FN_FAIL({

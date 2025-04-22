@@ -139,7 +139,7 @@ CHECK_BEGIN_STATIC_FN(iterator_check, handle_ordered_map *s)
 CHECK_BEGIN_STATIC_FN(homap_test_forward_iter)
 {
     handle_ordered_map s
-        = hom_init((struct val[34]){}, elem, id, id_cmp, NULL, NULL, 34);
+        = hom_init((struct val[34]){}, elem, id, id_cmp, nullptr, nullptr, 34);
     /* We should have the expected behavior iteration over empty tree. */
     int j = 0;
     for (struct val *e = begin(&s); e != end(&s); e = next(&s, &e->elem), ++j)
@@ -168,11 +168,11 @@ CHECK_BEGIN_STATIC_FN(homap_test_forward_iter)
 
 CHECK_BEGIN_STATIC_FN(homap_test_iterate_removal)
 {
-    handle_ordered_map s
-        = hom_init((struct val[1001]){}, elem, id, id_cmp, NULL, NULL, 1001);
+    handle_ordered_map s = hom_init((struct val[1001]){}, elem, id, id_cmp,
+                                    nullptr, nullptr, 1001);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
-    srand(time(NULL));
+    srand(time(nullptr));
     size_t const num_nodes = 1000;
     for (size_t i = 0; i < num_nodes; ++i)
     {
@@ -184,7 +184,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_iterate_removal)
     }
     CHECK(iterator_check(&s), PASS);
     int const limit = 400;
-    for (struct val *i = begin(&s), *next = NULL; i != end(&s); i = next)
+    for (struct val *i = begin(&s), *next = nullptr; i != end(&s); i = next)
     {
         next = next(&s, &i->elem);
         if (i->id > limit)
@@ -198,11 +198,11 @@ CHECK_BEGIN_STATIC_FN(homap_test_iterate_removal)
 
 CHECK_BEGIN_STATIC_FN(homap_test_iterate_remove_reinsert)
 {
-    handle_ordered_map s
-        = hom_init((struct val[1001]){}, elem, id, id_cmp, NULL, NULL, 1001);
+    handle_ordered_map s = hom_init((struct val[1001]){}, elem, id, id_cmp,
+                                    nullptr, nullptr, 1001);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
-    srand(time(NULL));
+    srand(time(nullptr));
     size_t const num_nodes = 1000;
     for (size_t i = 0; i < num_nodes; ++i)
     {
@@ -216,7 +216,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_iterate_remove_reinsert)
     size_t const old_size = size(&s).count;
     int const limit = 400;
     int new_unique_handle_id = 1001;
-    for (struct val *i = begin(&s), *next = NULL; i != end(&s); i = next)
+    for (struct val *i = begin(&s), *next = nullptr; i != end(&s); i = next)
     {
         next = next(&s, &i->elem);
         if (i->id < limit)
@@ -237,7 +237,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_iterate_remove_reinsert)
 CHECK_BEGIN_STATIC_FN(homap_test_valid_range)
 {
     handle_ordered_map s
-        = hom_init((struct val[26]){}, elem, id, id_cmp, NULL, NULL, 26);
+        = hom_init((struct val[26]){}, elem, id, id_cmp, nullptr, nullptr, 26);
 
     int const num_nodes = 25;
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
@@ -264,7 +264,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_valid_range)
 CHECK_BEGIN_STATIC_FN(homap_test_valid_range_equals)
 {
     handle_ordered_map s
-        = hom_init((struct val[26]){}, elem, id, id_cmp, NULL, NULL, 26);
+        = hom_init((struct val[26]){}, elem, id, id_cmp, nullptr, nullptr, 26);
     int const num_nodes = 25;
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
     for (int i = 0, id = 0; i < num_nodes; ++i, id += 5)
@@ -289,7 +289,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_valid_range_equals)
 CHECK_BEGIN_STATIC_FN(homap_test_invalid_range)
 {
     handle_ordered_map s
-        = hom_init((struct val[26]){}, elem, id, id_cmp, NULL, NULL, 26);
+        = hom_init((struct val[26]){}, elem, id, id_cmp, nullptr, nullptr, 26);
     int const num_nodes = 25;
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
     for (int i = 0, id = 0; i < num_nodes; ++i, id += 5)
@@ -315,7 +315,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_invalid_range)
 CHECK_BEGIN_STATIC_FN(homap_test_empty_range)
 {
     handle_ordered_map s
-        = hom_init((struct val[26]){}, elem, id, id_cmp, NULL, NULL, 26);
+        = hom_init((struct val[26]){}, elem, id, id_cmp, nullptr, nullptr, 26);
     int const num_nodes = 25;
     int const step = 5;
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */

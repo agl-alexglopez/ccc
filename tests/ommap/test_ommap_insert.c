@@ -15,10 +15,10 @@
 CHECK_BEGIN_STATIC_FN(ommap_test_insert_one)
 {
     ccc_ordered_multimap omm
-        = ccc_omm_init(omm, struct val, elem, key, id_cmp, NULL, NULL);
+        = ccc_omm_init(omm, struct val, elem, key, id_cmp, nullptr, nullptr);
     struct val single;
     single.key = 0;
-    CHECK(unwrap(swap_entry_r(&omm, &single.elem)) != NULL, true);
+    CHECK(unwrap(swap_entry_r(&omm, &single.elem)) != nullptr, true);
     CHECK(is_empty(&omm), false);
     CHECK_END_FN();
 }
@@ -26,12 +26,12 @@ CHECK_BEGIN_STATIC_FN(ommap_test_insert_one)
 CHECK_BEGIN_STATIC_FN(ommap_test_insert_three)
 {
     ccc_ordered_multimap omm
-        = ccc_omm_init(omm, struct val, elem, key, id_cmp, NULL, NULL);
+        = ccc_omm_init(omm, struct val, elem, key, id_cmp, nullptr, nullptr);
     struct val three_vals[3];
     for (int i = 0; i < 3; ++i)
     {
         three_vals[i].key = i;
-        CHECK(unwrap(swap_entry_r(&omm, &three_vals[i].elem)) != NULL, true);
+        CHECK(unwrap(swap_entry_r(&omm, &three_vals[i].elem)) != nullptr, true);
         CHECK(validate(&omm), true);
         CHECK(size(&omm).count, (size_t)i + 1);
     }
@@ -42,63 +42,63 @@ CHECK_BEGIN_STATIC_FN(ommap_test_insert_three)
 CHECK_BEGIN_STATIC_FN(ommap_test_insert_macros)
 {
     ccc_ordered_multimap omm
-        = ccc_omm_init(omm, struct val, elem, key, id_cmp, std_alloc, NULL);
+        = ccc_omm_init(omm, struct val, elem, key, id_cmp, std_alloc, nullptr);
     struct val const *ins = ccc_omm_or_insert_w(
         entry_r(&omm, &(int){2}), (struct val){.val = 0, .key = 2});
-    CHECK(ins != NULL, true);
+    CHECK(ins != nullptr, true);
     CHECK(validate(&omm), true);
     CHECK(size(&omm).count, 1);
     ins = omm_insert_entry_w(entry_r(&omm, &(int){2}),
                              (struct val){.val = 0, .key = 2});
-    CHECK(ins != NULL, true);
+    CHECK(ins != nullptr, true);
     CHECK(validate(&omm), true);
     CHECK(size(&omm).count, 2);
     ins = omm_insert_entry_w(entry_r(&omm, &(int){9}),
                              (struct val){.val = 1, .key = 9});
-    CHECK(ins != NULL, true);
+    CHECK(ins != nullptr, true);
     CHECK(validate(&omm), true);
     CHECK(size(&omm).count, 3);
     ins = ccc_entry_unwrap(
         omm_insert_or_assign_w(&omm, 3, (struct val){.val = 99}));
     CHECK(validate(&omm), true);
-    CHECK(ins == NULL, false);
+    CHECK(ins == nullptr, false);
     CHECK(validate(&omm), true);
     CHECK(ins->val, 99);
     CHECK(size(&omm).count, 4);
     ins = ccc_entry_unwrap(
         omm_insert_or_assign_w(&omm, 3, (struct val){.val = 98}));
     CHECK(validate(&omm), true);
-    CHECK(ins == NULL, false);
+    CHECK(ins == nullptr, false);
     CHECK(ins->val, 98);
     CHECK(size(&omm).count, 4);
     ins = ccc_entry_unwrap(omm_try_insert_w(&omm, 3, (struct val){.val = 100}));
-    CHECK(ins == NULL, false);
+    CHECK(ins == nullptr, false);
     CHECK(validate(&omm), true);
     CHECK(ins->val, 98);
     CHECK(size(&omm).count, 4);
     ins = ccc_entry_unwrap(omm_try_insert_w(&omm, 4, (struct val){.val = 100}));
-    CHECK(ins == NULL, false);
+    CHECK(ins == nullptr, false);
     CHECK(validate(&omm), true);
     CHECK(ins->val, 100);
     CHECK(size(&omm).count, 5);
-    CHECK_END_FN(omm_clear(&omm, NULL););
+    CHECK_END_FN(omm_clear(&omm, nullptr););
 }
 
 CHECK_BEGIN_STATIC_FN(ommap_test_struct_getter)
 {
     ccc_ordered_multimap omm
-        = ccc_omm_init(omm, struct val, elem, key, id_cmp, NULL, NULL);
+        = ccc_omm_init(omm, struct val, elem, key, id_cmp, nullptr, nullptr);
     ccc_ordered_multimap omm_tester_clone = ccc_omm_init(
-        omm_tester_clone, struct val, elem, key, id_cmp, NULL, NULL);
+        omm_tester_clone, struct val, elem, key, id_cmp, nullptr, nullptr);
     struct val vals[10];
     struct val tester_clone[10];
     for (int i = 0; i < 10; ++i)
     {
         vals[i].key = i;
         tester_clone[i].key = i;
-        CHECK(unwrap(swap_entry_r(&omm, &vals[i].elem)) != NULL, true);
+        CHECK(unwrap(swap_entry_r(&omm, &vals[i].elem)) != nullptr, true);
         CHECK(unwrap(swap_entry_r(&omm_tester_clone, &tester_clone[i].elem))
-                  != NULL,
+                  != nullptr,
               true);
         CHECK(validate(&omm), true);
         /* Because the getter returns a pointer, if the casting returned
@@ -114,12 +114,12 @@ CHECK_BEGIN_STATIC_FN(ommap_test_struct_getter)
 CHECK_BEGIN_STATIC_FN(ommap_test_insert_three_dups)
 {
     ccc_ordered_multimap omm
-        = ccc_omm_init(omm, struct val, elem, key, id_cmp, NULL, NULL);
+        = ccc_omm_init(omm, struct val, elem, key, id_cmp, nullptr, nullptr);
     struct val three_vals[3];
     for (int i = 0; i < 3; ++i)
     {
         three_vals[i].key = 0;
-        CHECK(unwrap(swap_entry_r(&omm, &three_vals[i].elem)) != NULL, true);
+        CHECK(unwrap(swap_entry_r(&omm, &three_vals[i].elem)) != nullptr, true);
         CHECK(validate(&omm), true);
         CHECK(size(&omm).count, (size_t)i + 1);
     }
@@ -130,7 +130,7 @@ CHECK_BEGIN_STATIC_FN(ommap_test_insert_three_dups)
 CHECK_BEGIN_STATIC_FN(ommap_test_insert_shuffle)
 {
     ccc_ordered_multimap omm
-        = ccc_omm_init(omm, struct val, elem, key, id_cmp, NULL, NULL);
+        = ccc_omm_init(omm, struct val, elem, key, id_cmp, nullptr, nullptr);
     /* Math magic ahead... */
     size_t const size = 50;
     int const prime = 53;
@@ -152,12 +152,12 @@ CHECK_BEGIN_STATIC_FN(ommap_test_insert_shuffle)
 CHECK_BEGIN_STATIC_FN(ommap_test_read_max_min)
 {
     ccc_ordered_multimap omm
-        = ccc_omm_init(omm, struct val, elem, key, id_cmp, NULL, NULL);
+        = ccc_omm_init(omm, struct val, elem, key, id_cmp, nullptr, nullptr);
     struct val vals[10];
     for (int i = 0; i < 10; ++i)
     {
         vals[i].key = i;
-        CHECK(unwrap(swap_entry_r(&omm, &vals[i].elem)) != NULL, true);
+        CHECK(unwrap(swap_entry_r(&omm, &vals[i].elem)) != nullptr, true);
         CHECK(validate(&omm), true);
         CHECK(size(&omm).count, (size_t)i + 1);
     }
@@ -172,7 +172,8 @@ CHECK_BEGIN_STATIC_FN(ommap_test_read_max_min)
 CHECK_BEGIN_STATIC_FN(ommap_test_insert_and_find)
 {
     int const size = 100;
-    ordered_multimap s = omm_init(s, struct val, elem, key, id_cmp, NULL, NULL);
+    ordered_multimap s
+        = omm_init(s, struct val, elem, key, id_cmp, nullptr, nullptr);
     struct val vals[101];
     for (int i = 0, curval = 0; i < size; i += 2, ++curval)
     {
@@ -184,7 +185,7 @@ CHECK_BEGIN_STATIC_FN(ommap_test_insert_and_find)
         CHECK(occupied(&e), true);
         CHECK(validate(&s), true);
         struct val const *const v = unwrap(&e);
-        CHECK(v == NULL, false);
+        CHECK(v == nullptr, false);
         CHECK(v->key, i);
         CHECK(v->val, i);
     }

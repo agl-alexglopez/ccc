@@ -81,7 +81,7 @@ void *ccc_impl_fpq_update_fixup(struct ccc_fpq *, void *);
         if (ccc_buf_size(&impl_fpq->buf).count                                 \
             == ccc_buf_capacity(&impl_fpq->buf).count)                         \
         {                                                                      \
-            impl_fpq_res = NULL;                                               \
+            impl_fpq_res = nullptr;                                            \
             ccc_result const impl_extra_space = ccc_buf_alloc(                 \
                 &impl_fpq->buf, ccc_buf_capacity(&impl_fpq->buf).count * 2,    \
                 impl_fpq->buf.alloc);                                          \
@@ -116,7 +116,7 @@ void *ccc_impl_fpq_update_fixup(struct ccc_fpq *, void *);
 #define ccc_impl_fpq_update_w(fpq_ptr, T_ptr, update_closure_over_T...)        \
     (__extension__({                                                           \
         struct ccc_fpq *const impl_fpq = (fpq_ptr);                            \
-        void *impl_fpq_update_res = NULL;                                      \
+        void *impl_fpq_update_res = nullptr;                                   \
         void *const impl_fpq_t_ptr = (T_ptr);                                  \
         if (impl_fpq && impl_fpq_t_ptr && !ccc_buf_is_empty(&impl_fpq->buf))   \
         {                                                                      \

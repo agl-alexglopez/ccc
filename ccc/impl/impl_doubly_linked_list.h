@@ -28,7 +28,7 @@ limitations under the License.
 /** @private A recursive structure for tracking a user element in a doubly
 linked list. Supports O(1) insert and delete at the front, back, or any
 arbitrary position in the list. Elements always have a valid element to point
-to in the list due to the user of a sentinel so these pointers are never NULL
+to in the list due to the user of a sentinel so these pointers are never nullptr
 if an element is in the list. */
 struct ccc_dll_elem
 {
@@ -41,7 +41,7 @@ struct ccc_dll_elem
 /** @private A doubly linked list with a single sentinel for both head and
 tail. The list offers O(1) push, pop, insert, and erase at arbitrary positions
 in the list. The sentinel (nil) operates as follows to ensure nodes in the list
-never point to NULL.
+never point to nullptr.
 
 An empty list.
 
@@ -125,13 +125,13 @@ struct ccc_dll_elem *ccc_impl_dll_elem_in(struct ccc_dll const *,
 /** @private */
 #define ccc_impl_dll_emplace_back(dll_ptr, struct_initializer...)              \
     (__extension__({                                                           \
-        typeof(struct_initializer) *impl_dll_res = NULL;                       \
+        typeof(struct_initializer) *impl_dll_res = nullptr;                    \
         struct ccc_dll *impl_dll = (dll_ptr);                                  \
         if (impl_dll)                                                          \
         {                                                                      \
             if (impl_dll->alloc)                                               \
             {                                                                  \
-                impl_dll_res = impl_dll->alloc(NULL, impl_dll->sizeof_type,    \
+                impl_dll_res = impl_dll->alloc(nullptr, impl_dll->sizeof_type, \
                                                impl_dll->aux);                 \
                 if (impl_dll_res)                                              \
                 {                                                              \
@@ -148,16 +148,16 @@ struct ccc_dll_elem *ccc_impl_dll_elem_in(struct ccc_dll const *,
 /** @private */
 #define ccc_impl_dll_emplace_front(dll_ptr, struct_initializer...)             \
     (__extension__({                                                           \
-        typeof(struct_initializer) *impl_dll_res = NULL;                       \
+        typeof(struct_initializer) *impl_dll_res = nullptr;                    \
         struct ccc_dll *impl_dll = (dll_ptr);                                  \
         if (!impl_dll->alloc)                                                  \
         {                                                                      \
-            impl_dll_res = NULL;                                               \
+            impl_dll_res = nullptr;                                            \
         }                                                                      \
         else                                                                   \
         {                                                                      \
-            impl_dll_res                                                       \
-                = impl_dll->alloc(NULL, impl_dll->sizeof_type, impl_dll->aux); \
+            impl_dll_res = impl_dll->alloc(nullptr, impl_dll->sizeof_type,     \
+                                           impl_dll->aux);                     \
             if (impl_dll_res)                                                  \
             {                                                                  \
                 *impl_dll_res = struct_initializer;                            \
