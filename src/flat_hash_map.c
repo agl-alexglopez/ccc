@@ -1765,7 +1765,7 @@ uint16_t--we should revisit this section for 128 bit targeted intrinsics. */
 indicate if the byte in the group matched the mask to be searched. The only
 bit on shall be this most significant bit to ensure iterating through index
 masks is easier and counting bits make sense in the find loops. */
-static inline match
+static inline match_mask
 match_tag(group const g, ccc_fhm_tag const m)
 {
 
