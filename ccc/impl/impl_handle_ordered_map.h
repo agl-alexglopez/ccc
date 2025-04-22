@@ -33,11 +33,14 @@ from the tree it is added to the free singly linked list. The free list is a
 LIFO push to front stack. */
 struct ccc_homap_elem
 {
-    size_t branch[2]; /** Child nodes in array to unify Left and Right. */
+    /** @private Child nodes in array to unify Left and Right. */
+    size_t branch[2];
     union
     {
-        size_t parent;    /** Parent of splay tree node when allocated. */
-        size_t next_free; /** Points to next free when not allocated. */
+        /** @private Parent of splay tree node when allocated. */
+        size_t parent;
+        /** @private Points to next free when not allocated. */
+        size_t next_free;
     };
 };
 
@@ -48,25 +51,38 @@ pointers so that it remains valid even when the table resizes. The 0th index of
 the array is sacrificed for some coding simplicity and falsey 0. */
 struct ccc_homap
 {
-    ccc_buffer buf;          /** Buffer wrapping user provided memory. */
-    size_t root;             /** The root node of the Splay Tree. */
-    size_t free_list;        /** The start of the free singly linked list. */
-    size_t key_offset;       /** Where user key can be found in type. */
-    size_t node_elem_offset; /** Where intrusive elem is found in type. */
-    ccc_any_key_cmp_fn *cmp; /** The provided key comparison function. */
+    /** @private Buffer wrapping user provided memory. */
+    ccc_buffer buf;
+    /** @private The root node of the Splay Tree. */
+    size_t root;
+    /** @private The start of the free singly linked list. */
+    size_t free_list;
+    /** @private Where user key can be found in type. */
+    size_t key_offset;
+    /** @private Where intrusive elem is found in type. */
+    size_t node_elem_offset;
+    /** @private The provided key comparison function. */
+    ccc_any_key_cmp_fn *cmp;
 };
 
-/** @private */
+/** @private A handle is like an entry but if the handle is Occupied, we can
+guarantee the user that their element will not move from the provided index. */
 struct ccc_htree_handle
 {
-    struct ccc_homap *hom;     /** Map associated with this handle. */
-    ccc_threeway_cmp last_cmp; /** Saves last comparison direction. */
-    struct ccc_handl handle;   /** Index and a status. */
+    /** @private Map associated with this handle. */
+    struct ccc_homap *hom;
+    /** @private Saves last comparison direction. */
+    ccc_threeway_cmp last_cmp;
+    /** @private Index and a status. */
+    struct ccc_handl handle;
 };
 
-/** @private */
+/** @private Enable return by compound literal reference on the stack. Think
+of this method as return by value but with the additional ability to pass by
+pointer in a functional style. `fnB(&(union ccc_homap_handle){fnA().impl});` */
 union ccc_homap_handle
 {
+    /** @private The field containing the handle struct. */
     struct ccc_htree_handle impl;
 };
 

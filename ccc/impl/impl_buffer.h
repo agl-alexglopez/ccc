@@ -29,9 +29,9 @@ limitations under the License.
 struct ccc_buf
 {
     void *mem;
-    size_t sizeof_type;
     size_t count;
     size_t capacity;
+    size_t sizeof_type;
     ccc_any_alloc_fn *alloc;
     void *aux;
 };

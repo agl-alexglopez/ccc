@@ -26,12 +26,20 @@ limitations under the License.
 
 /* NOLINTBEGIN(readability-identifier-naming) */
 
-/** @private */
+/** @private A flat priority queue is a binary heap in a contiguous buffer
+storing an implicit complete binary tree; elements are stored contiguously from
+`[0, N)`. Starting at any node in the tree at index i the parent is at `(i - 1)
+/ 2`, the left child is at `(i * 2) + 1`, and the right child is at `(i * 2) +
+2`. The heap can be initialized as a min or max heap due to the use of the three
+way comparison function. */
 struct ccc_fpq
 {
+    /** @private The underlying buffer owned by the fpq. */
     ccc_buffer buf;
-    ccc_any_type_cmp_fn *cmp;
+    /** @private The order `CCC_LES` (min) or `CCC_GRT` (max) of the fpq. */
     ccc_threeway_cmp order;
+    /** @private The user defined three way comparison function. */
+    ccc_any_type_cmp_fn *cmp;
 };
 
 /*========================    Private Interface     =========================*/

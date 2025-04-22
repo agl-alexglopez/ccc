@@ -25,21 +25,40 @@ limitations under the License.
 
 /* NOLINTBEGIN(readability-identifier-naming) */
 
-/** @private */
+/** @private A recursive structure for tracking a user element in a singly
+linked list. Supports O(1) insert and delete at the front. Elements always have
+a valid element to point to in the list due to the user of a sentinel so these
+pointers are never NULL if an element is in the list. */
 struct ccc_sll_elem
 {
+    /** @private The next element. Non-null if elem is in list. */
     struct ccc_sll_elem *n;
 };
 
-/** @private */
+/** @private A singly linked list is a good stack based abstraction for push
+and pop to front operations. If the user pre-allocates all the nodes they will
+need in a buffer, and manages the slots, this can be an efficient data
+structure that can avoid annoyances with maintaining contiguity if one were to
+push from the front of a C++ style vector. For a flat container that does
+support O(1) push and pop at the front see the flat double ended queue. However,
+there are some specific abstractions that someone could hack on top of this
+list, either on top of or by hacking on the provided implementation
+(non-blocking linked list, concurrent hash table, etc). */
 struct ccc_sll
 {
+    /** @private The sentinel with storage in the actual list struct. */
     struct ccc_sll_elem nil;
+    /** @private The number of elements constantly tracked for O(1) check. */
     size_t count;
+    /** @private The size in bytes of the type which wraps this handle. */
     size_t sizeof_type;
+    /** @private The offset in bytes of the intrusive element in user type. */
     size_t sll_elem_offset;
-    ccc_any_alloc_fn *alloc;
+    /** @private The user provided comparison callback for sorting. */
     ccc_any_type_cmp_fn *cmp;
+    /** @private The user provided allocation function, if any. */
+    ccc_any_alloc_fn *alloc;
+    /** @private User provided auxiliary data, if any. */
     void *aux;
 };
 

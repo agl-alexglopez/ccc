@@ -81,12 +81,12 @@ struct ccc_dll
 {
     /** @private The sentinel with storage in the actual list struct. */
     struct ccc_dll_elem nil;
+    /** @private The number of elements constantly tracked for O(1) check. */
+    size_t count;
     /** @private The size in bytes of the type which wraps this handle. */
     size_t sizeof_type;
     /** @private The offset in bytes of the intrusive element in user type. */
     size_t dll_elem_offset;
-    /** @private The number of elements constantly tracked for O(1) check. */
-    size_t count;
     /** @private The user provided comparison callback for sorting. */
     ccc_any_type_cmp_fn *cmp;
     /** @private The user provided allocation function, if any. */

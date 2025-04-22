@@ -24,10 +24,17 @@ limitations under the License.
 
 /* NOLINTBEGIN(readability-identifier-naming) */
 
-/** @private */
+/** @private A flat doubled ended queue is a single buffer with push and pop
+at the front and back. If no allocation is permitted it is a ring buffer.
+Because the `ccc_buffer` abstraction already exists, the fdeq can be
+implemented with a single additional field rather than a front and back pointer.
+The back of the fdeq is always known if we know where the front is and how
+many elements are stored in the buffer. */
 struct ccc_fdeq
 {
+    /** @private The helper buffer abstraction the fdeq owns. */
     ccc_buffer buf;
+    /** @private The front of the fdeq. The back is implicit given the size. */
     size_t front;
 };
 
