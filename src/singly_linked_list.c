@@ -455,22 +455,6 @@ ccc_sll_sort(ccc_singly_linked_list *const sll)
     return CCC_RESULT_OK;
 }
 
-/** Returns a pair of elements marking the first list elem that is smaller than
-its previous `CCC_LES` according to the user comparison callback. The
-list_link returned will have the out of order element as cur and the last
-remaining in order element as prev. The cur element may be the sentinel if the
-run is sorted. */
-static inline struct list_link
-first_less(ccc_singly_linked_list const *const sll, struct list_link k)
-{
-    do
-    {
-        k.prev = k.i;
-        k.i = k.i->n;
-    } while (k.i != &sll->nil && cmp(sll, k.i, k.prev) != CCC_LES);
-    return k;
-}
-
 /** Merges lists `[a_0, a_n_b_0)` with `[a_n_b_0, b_n)` to form `[a_0, b_n)`.
 Returns the exclusive end of the range, `b_n`, once the merge sort is complete.
 
@@ -508,6 +492,22 @@ merge(ccc_singly_linked_list *const sll, struct list_link a_0,
         }
     }
     return b_n;
+}
+
+/** Returns a pair of elements marking the first list elem that is smaller than
+its previous `CCC_LES` according to the user comparison callback. The
+list_link returned will have the out of order element as cur and the last
+remaining in order element as prev. The cur element may be the sentinel if the
+run is sorted. */
+static inline struct list_link
+first_less(ccc_singly_linked_list const *const sll, struct list_link k)
+{
+    do
+    {
+        k.prev = k.i;
+        k.i = k.i->n;
+    } while (k.i != &sll->nil && cmp(sll, k.i, k.prev) != CCC_LES);
+    return k;
 }
 
 /*=========================    Private Interface   ==========================*/

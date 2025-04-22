@@ -564,20 +564,6 @@ ccc_dll_sort(ccc_doubly_linked_list *const dll)
     return CCC_RESULT_OK;
 }
 
-/** Finds the first element lesser than it's previous element as defined by
-the user comparison callback function. If no out of order element can be
-found the list sentinel is returned. */
-static inline struct ccc_dll_elem *
-first_less(struct ccc_dll const *const dll, struct ccc_dll_elem *start)
-{
-    assert(dll && start);
-    do
-    {
-        start = start->n;
-    } while (start != &dll->nil && cmp(dll, start, start->p) != CCC_LES);
-    return start;
-}
-
 /** Merges lists `[a_0, a_n_b_0)` with `[a_n_b_0, b_n)` to form `[a_0, b_n)`.
 Returns the exclusive end of the range, `b_n`, once the merge sort is complete.
 
@@ -608,6 +594,20 @@ merge(struct ccc_dll *const dll, struct ccc_dll_elem *a_0,
         }
     }
     return b_n;
+}
+
+/** Finds the first element lesser than it's previous element as defined by
+the user comparison callback function. If no out of order element can be
+found the list sentinel is returned. */
+static inline struct ccc_dll_elem *
+first_less(struct ccc_dll const *const dll, struct ccc_dll_elem *start)
+{
+    assert(dll && start);
+    do
+    {
+        start = start->n;
+    } while (start != &dll->nil && cmp(dll, start, start->p) != CCC_LES);
+    return start;
 }
 
 /*=======================     Private Interface   ===========================*/
