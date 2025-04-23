@@ -1121,7 +1121,7 @@ find_key_or_slot(struct ccc_fhmap const *const h, void const *const key,
         if (likely(empty_deleted.error))
         {
             size_t const i_take = match_trailing_one(match_empty_deleted(g));
-            if (i_take != CCC_FHM_GROUP_SIZE)
+            if (likely(i_take != CCC_FHM_GROUP_SIZE))
             {
                 empty_deleted.count = (p.i + i_take) & mask;
                 empty_deleted.error = CCC_RESULT_OK;
@@ -1590,7 +1590,7 @@ tag_constant(ccc_fhm_tag const m)
 
 /** Converts a full hash code to a tag fingerprint. The tag consists of the top
 7 bits of the hash code. Therefore, hash functions with good entropy in the
-upper bits. */
+upper bits are desirable. */
 static inline ccc_fhm_tag
 tag_from(uint64_t const hash)
 {
