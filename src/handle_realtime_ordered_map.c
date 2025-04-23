@@ -875,14 +875,15 @@ find(struct ccc_hromap const *const hrm, void const *const key)
 {
     size_t parent = 0;
     struct hrm_query q = {.last_cmp = CCC_CMP_ERROR, .found = hrm->root};
-    for (; q.found; parent = q.found,
-                    q.found = branch_i(hrm, q.found, CCC_GRT == q.last_cmp))
+    while (q.found)
     {
         q.last_cmp = cmp_elems(hrm, key, q.found, hrm->cmp);
         if (CCC_EQL == q.last_cmp)
         {
             return q;
         }
+        parent = q.found;
+        q.found = branch_i(hrm, q.found, CCC_GRT == q.last_cmp);
     }
     /* Type punning here OK as both union members have same type and size. */
     q.parent = parent;

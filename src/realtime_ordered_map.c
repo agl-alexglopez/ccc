@@ -731,14 +731,15 @@ find(struct ccc_romap const *const rom, void const *const key)
         .last_cmp = CCC_CMP_ERROR,
         .found = rom->root,
     };
-    for (; q.found != &rom->end;
-         parent = q.found, q.found = q.found->branch[CCC_GRT == q.last_cmp])
+    while (q.found != &rom->end)
     {
         q.last_cmp = cmp(rom, key, q.found, rom->cmp);
         if (CCC_EQL == q.last_cmp)
         {
             return q;
         }
+        parent = q.found;
+        q.found = q.found->branch[CCC_GRT == q.last_cmp];
     }
     /* Type punning here OK as both union members have same type and size. */
     q.parent = (struct ccc_romap_elem *)parent;
