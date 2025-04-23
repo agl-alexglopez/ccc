@@ -55,7 +55,7 @@ typedef size_t ublock;
 
 /** @private A signed index into the block array. The block array is bounded by
 the number of blocks required to support the current bit set capacity. Assume
-this index type has range [0, count of blocks needed to hold all bits in set].
+this index type has range [-1, count of blocks needed to hold all bits in set].
 This makes reverse iteration problems easier.
 
 Most platforms will allow for this signed type to index any bit block that the
