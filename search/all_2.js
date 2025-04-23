@@ -106,7 +106,7 @@ var searchData=
   ['ccc_5fbuf_5fsizeof_5ftype_103',['ccc_buf_sizeof_type',['../buffer_8h.html#a5221e60bac73187c0154af05dc230904',1,'buffer.h']]],
   ['ccc_5fbuf_5fswap_104',['ccc_buf_swap',['../buffer_8h.html#a140e6e4c58ece0874c72524eed8ce0c4',1,'buffer.h']]],
   ['ccc_5fbuf_5fwrite_105',['ccc_buf_write',['../buffer_8h.html#a764b6e66be33497355956c55b22712a9',1,'buffer.h']]],
-  ['ccc_5fbuffer_106',['ccc_buffer',['../buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179',1,'buffer.h']]],
+  ['ccc_5fbuffer_106',['ccc_buffer',['../buffer_8h.html#a31fe1f716bca34ad83323df1d401947b',1,'buffer.h']]],
   ['ccc_5fcapacity_107',['ccc_capacity',['../traits_8h.html#aae688bdaa0dcc56b89e62081bcca734b',1,'traits.h']]],
   ['ccc_5fclear_108',['ccc_clear',['../traits_8h.html#ac4434d63cb180a5ccdb8e0f41a1bb20b',1,'traits.h']]],
   ['ccc_5fclear_5fand_5ffree_109',['ccc_clear_and_free',['../traits_8h.html#a9f86b46e77380f91d59f96d9ce6fce32',1,'traits.h']]],

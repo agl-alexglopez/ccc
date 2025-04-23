@@ -140,110 +140,110 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Container Types</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Types available in the container interface. </p>
 </td></tr>
-<tr class="memitem:aeacee6faab0ce1071559f3cf3ff51179"><td class="memItemLeft" align="right" valign="top">typedef struct ccc_buf&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a></td></tr>
-<tr class="memdesc:aeacee6faab0ce1071559f3cf3ff51179"><td class="mdescLeft">&#160;</td><td class="mdescRight">A contiguous block of storage for elements of the same type.  <br /></td></tr>
-<tr class="separator:aeacee6faab0ce1071559f3cf3ff51179"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a31fe1f716bca34ad83323df1d401947b"><td class="memItemLeft" align="right" valign="top">typedef struct ccc_buffer&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a31fe1f716bca34ad83323df1d401947b">ccc_buffer</a></td></tr>
+<tr class="memdesc:a31fe1f716bca34ad83323df1d401947b"><td class="mdescLeft">&#160;</td><td class="mdescRight">A contiguous block of storage for elements of the same type.  <br /></td></tr>
+<tr class="separator:a31fe1f716bca34ad83323df1d401947b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Insert and Remove Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>These functions assume contiguity of elements in the buffer and increase or decrease size accordingly. </p>
 </td></tr>
-<tr class="memitem:af19f6df15e7f313da0d76bf7443906bb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#af19f6df15e7f313da0d76bf7443906bb">ccc_buf_alloc</a> (<a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> *buf, size_t capacity, <a class="el" href="types_8h.html#a3e73202894869d2840fb21ff912bbd96">ccc_any_alloc_fn</a> *fn)</td></tr>
+<tr class="memitem:af19f6df15e7f313da0d76bf7443906bb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#af19f6df15e7f313da0d76bf7443906bb">ccc_buf_alloc</a> (ccc_buffer *buf, size_t capacity, <a class="el" href="types_8h.html#a3e73202894869d2840fb21ff912bbd96">ccc_any_alloc_fn</a> *fn)</td></tr>
 <tr class="memdesc:af19f6df15e7f313da0d76bf7443906bb"><td class="mdescLeft">&#160;</td><td class="mdescRight">allocates the buffer to the specified size according to the user defined allocation function.  <br /></td></tr>
 <tr class="separator:af19f6df15e7f313da0d76bf7443906bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a176afe75a0442da95a8663efbb6ec8b3"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a176afe75a0442da95a8663efbb6ec8b3">ccc_buf_alloc_back</a> (<a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> *buf)</td></tr>
+<tr class="memitem:a176afe75a0442da95a8663efbb6ec8b3"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a176afe75a0442da95a8663efbb6ec8b3">ccc_buf_alloc_back</a> (ccc_buffer *buf)</td></tr>
 <tr class="memdesc:a176afe75a0442da95a8663efbb6ec8b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">allocates a new slot from the buffer at the end of the contiguous array. A slot is equivalent to one of the element type specified when the buffer is initialized.  <br /></td></tr>
 <tr class="separator:a176afe75a0442da95a8663efbb6ec8b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af52c4be9804b8639755e424e4177173c"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#af52c4be9804b8639755e424e4177173c">ccc_buf_push_back</a> (<a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> *buf, void const *data)</td></tr>
+<tr class="memitem:af52c4be9804b8639755e424e4177173c"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#af52c4be9804b8639755e424e4177173c">ccc_buf_push_back</a> (ccc_buffer *buf, void const *data)</td></tr>
 <tr class="memdesc:af52c4be9804b8639755e424e4177173c"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the newly pushed data into the last slot of the buffer according to size.  <br /></td></tr>
 <tr class="separator:af52c4be9804b8639755e424e4177173c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae82c527efc9dc329c39375260d9384ed"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#ae82c527efc9dc329c39375260d9384ed">ccc_buf_insert</a> (<a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> *buf, size_t i, void const *data)</td></tr>
+<tr class="memitem:ae82c527efc9dc329c39375260d9384ed"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#ae82c527efc9dc329c39375260d9384ed">ccc_buf_insert</a> (ccc_buffer *buf, size_t i, void const *data)</td></tr>
 <tr class="memdesc:ae82c527efc9dc329c39375260d9384ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">insert data at slot i according to size of the buffer maintaining contiguous storage of elements between 0 and size.  <br /></td></tr>
 <tr class="separator:ae82c527efc9dc329c39375260d9384ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1150613b4392aae875aaf3c96146a39a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a1150613b4392aae875aaf3c96146a39a">ccc_buf_pop_back</a> (<a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> *buf)</td></tr>
+<tr class="memitem:a1150613b4392aae875aaf3c96146a39a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a1150613b4392aae875aaf3c96146a39a">ccc_buf_pop_back</a> (ccc_buffer *buf)</td></tr>
 <tr class="memdesc:a1150613b4392aae875aaf3c96146a39a"><td class="mdescLeft">&#160;</td><td class="mdescRight">pop the back element from the buffer according to size.  <br /></td></tr>
 <tr class="separator:a1150613b4392aae875aaf3c96146a39a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aeac24a10e4e20cc59c7b7b4a81b4704b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#aeac24a10e4e20cc59c7b7b4a81b4704b">ccc_buf_pop_back_n</a> (<a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> *buf, size_t n)</td></tr>
+<tr class="memitem:aeac24a10e4e20cc59c7b7b4a81b4704b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#aeac24a10e4e20cc59c7b7b4a81b4704b">ccc_buf_pop_back_n</a> (ccc_buffer *buf, size_t n)</td></tr>
 <tr class="memdesc:aeac24a10e4e20cc59c7b7b4a81b4704b"><td class="mdescLeft">&#160;</td><td class="mdescRight">pop n elements from the back of the buffer according to size.  <br /></td></tr>
 <tr class="separator:aeac24a10e4e20cc59c7b7b4a81b4704b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acd3fe998c43ec179e503d9f7c98f2b83"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#acd3fe998c43ec179e503d9f7c98f2b83">ccc_buf_erase</a> (<a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> *buf, size_t i)</td></tr>
+<tr class="memitem:acd3fe998c43ec179e503d9f7c98f2b83"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#acd3fe998c43ec179e503d9f7c98f2b83">ccc_buf_erase</a> (ccc_buffer *buf, size_t i)</td></tr>
 <tr class="memdesc:acd3fe998c43ec179e503d9f7c98f2b83"><td class="mdescLeft">&#160;</td><td class="mdescRight">erase element at slot i according to size of the buffer maintaining contiguous storage of elements between 0 and size.  <br /></td></tr>
 <tr class="separator:acd3fe998c43ec179e503d9f7c98f2b83"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Slot Management Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>These functions interact with slots in the buffer directly and do not modify the size of the buffer. These are best used for custom container implementations operating at a higher level of abstraction. </p>
 </td></tr>
-<tr class="memitem:a5f45a54a635295a962f520afcf61f3ad"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a5f45a54a635295a962f520afcf61f3ad">ccc_buf_at</a> (<a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> const *buf, size_t i)</td></tr>
+<tr class="memitem:a5f45a54a635295a962f520afcf61f3ad"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a5f45a54a635295a962f520afcf61f3ad">ccc_buf_at</a> (ccc_buffer const *buf, size_t i)</td></tr>
 <tr class="memdesc:a5f45a54a635295a962f520afcf61f3ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the element at slot i in buf.  <br /></td></tr>
 <tr class="separator:a5f45a54a635295a962f520afcf61f3ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0351059c88a41da62ff4aa3800c5fccf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a0351059c88a41da62ff4aa3800c5fccf">ccc_buf_i</a> (<a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> const *buf, void const *slot)</td></tr>
+<tr class="memitem:a0351059c88a41da62ff4aa3800c5fccf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a0351059c88a41da62ff4aa3800c5fccf">ccc_buf_i</a> (ccc_buffer const *buf, void const *slot)</td></tr>
 <tr class="memdesc:a0351059c88a41da62ff4aa3800c5fccf"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the index of an element known to be in the buffer.  <br /></td></tr>
 <tr class="separator:a0351059c88a41da62ff4aa3800c5fccf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a63e900d415ab4c7fca82ad65756d9b6a"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a63e900d415ab4c7fca82ad65756d9b6a">ccc_buf_back</a> (<a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> const *buf)</td></tr>
+<tr class="memitem:a63e900d415ab4c7fca82ad65756d9b6a"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a63e900d415ab4c7fca82ad65756d9b6a">ccc_buf_back</a> (ccc_buffer const *buf)</td></tr>
 <tr class="memdesc:a63e900d415ab4c7fca82ad65756d9b6a"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the final element in the buffer according the current size.  <br /></td></tr>
 <tr class="separator:a63e900d415ab4c7fca82ad65756d9b6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a910cea92529561713753a3450e34c436"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a910cea92529561713753a3450e34c436">ccc_buf_front</a> (<a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> const *buf)</td></tr>
+<tr class="memitem:a910cea92529561713753a3450e34c436"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a910cea92529561713753a3450e34c436">ccc_buf_front</a> (ccc_buffer const *buf)</td></tr>
 <tr class="memdesc:a910cea92529561713753a3450e34c436"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the first element in the buffer at index 0.  <br /></td></tr>
 <tr class="separator:a910cea92529561713753a3450e34c436"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a83006ab67af03f193634e446a5bd3ce9"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a83006ab67af03f193634e446a5bd3ce9">ccc_buf_copy</a> (<a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> *buf, size_t dst, size_t src)</td></tr>
+<tr class="memitem:a83006ab67af03f193634e446a5bd3ce9"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a83006ab67af03f193634e446a5bd3ce9">ccc_buf_copy</a> (ccc_buffer *buf, size_t dst, size_t src)</td></tr>
 <tr class="memdesc:a83006ab67af03f193634e446a5bd3ce9"><td class="mdescLeft">&#160;</td><td class="mdescRight">copy data at index src to dst according to capacity.  <br /></td></tr>
 <tr class="separator:a83006ab67af03f193634e446a5bd3ce9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a764b6e66be33497355956c55b22712a9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a764b6e66be33497355956c55b22712a9">ccc_buf_write</a> (<a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> *buf, size_t i, void const *data)</td></tr>
+<tr class="memitem:a764b6e66be33497355956c55b22712a9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a764b6e66be33497355956c55b22712a9">ccc_buf_write</a> (ccc_buffer *buf, size_t i, void const *data)</td></tr>
 <tr class="memdesc:a764b6e66be33497355956c55b22712a9"><td class="mdescLeft">&#160;</td><td class="mdescRight">write data to buffer at slot at index i according to capacity.  <br /></td></tr>
 <tr class="separator:a764b6e66be33497355956c55b22712a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a140e6e4c58ece0874c72524eed8ce0c4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a140e6e4c58ece0874c72524eed8ce0c4">ccc_buf_swap</a> (<a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> *buf, char tmp[], size_t i, size_t j)</td></tr>
+<tr class="memitem:a140e6e4c58ece0874c72524eed8ce0c4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a140e6e4c58ece0874c72524eed8ce0c4">ccc_buf_swap</a> (ccc_buffer *buf, char tmp[], size_t i, size_t j)</td></tr>
 <tr class="memdesc:a140e6e4c58ece0874c72524eed8ce0c4"><td class="mdescLeft">&#160;</td><td class="mdescRight">swap elements at i and j according to capacity of the bufer.  <br /></td></tr>
 <tr class="separator:a140e6e4c58ece0874c72524eed8ce0c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Iteration Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>The following functions implement iterators over the buffer. </p>
 </td></tr>
-<tr class="memitem:aa2025e9fa8daa95cd7b1f84147ecc14b"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#aa2025e9fa8daa95cd7b1f84147ecc14b">ccc_buf_begin</a> (<a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> const *buf)</td></tr>
+<tr class="memitem:aa2025e9fa8daa95cd7b1f84147ecc14b"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#aa2025e9fa8daa95cd7b1f84147ecc14b">ccc_buf_begin</a> (ccc_buffer const *buf)</td></tr>
 <tr class="memdesc:aa2025e9fa8daa95cd7b1f84147ecc14b"><td class="mdescLeft">&#160;</td><td class="mdescRight">obtain the base address of the buffer in preparation for iteration.  <br /></td></tr>
 <tr class="separator:aa2025e9fa8daa95cd7b1f84147ecc14b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a735cf0a859dca1708431410398dfdbdf"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a735cf0a859dca1708431410398dfdbdf">ccc_buf_next</a> (<a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> const *buf, void const *iter)</td></tr>
+<tr class="memitem:a735cf0a859dca1708431410398dfdbdf"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a735cf0a859dca1708431410398dfdbdf">ccc_buf_next</a> (ccc_buffer const *buf, void const *iter)</td></tr>
 <tr class="memdesc:a735cf0a859dca1708431410398dfdbdf"><td class="mdescLeft">&#160;</td><td class="mdescRight">advance the iter to the next slot in the buffer according to size.  <br /></td></tr>
 <tr class="separator:a735cf0a859dca1708431410398dfdbdf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a80b30824e5b5244058aa4bbf8d9d4660"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a80b30824e5b5244058aa4bbf8d9d4660">ccc_buf_end</a> (<a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> const *buf)</td></tr>
+<tr class="memitem:a80b30824e5b5244058aa4bbf8d9d4660"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a80b30824e5b5244058aa4bbf8d9d4660">ccc_buf_end</a> (ccc_buffer const *buf)</td></tr>
 <tr class="memdesc:a80b30824e5b5244058aa4bbf8d9d4660"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the end position of the buffer according to size.  <br /></td></tr>
 <tr class="separator:a80b30824e5b5244058aa4bbf8d9d4660"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4d42a75bb27fe09f0e6947b20148a6c5"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a4d42a75bb27fe09f0e6947b20148a6c5">ccc_buf_capacity_end</a> (<a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> const *buf)</td></tr>
+<tr class="memitem:a4d42a75bb27fe09f0e6947b20148a6c5"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a4d42a75bb27fe09f0e6947b20148a6c5">ccc_buf_capacity_end</a> (ccc_buffer const *buf)</td></tr>
 <tr class="memdesc:a4d42a75bb27fe09f0e6947b20148a6c5"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the end position of the buffer according to capacity.  <br /></td></tr>
 <tr class="separator:a4d42a75bb27fe09f0e6947b20148a6c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a77438a7cc61c4b76776db6a5ff6d9316"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a77438a7cc61c4b76776db6a5ff6d9316">ccc_buf_rbegin</a> (<a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> const *buf)</td></tr>
+<tr class="memitem:a77438a7cc61c4b76776db6a5ff6d9316"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a77438a7cc61c4b76776db6a5ff6d9316">ccc_buf_rbegin</a> (ccc_buffer const *buf)</td></tr>
 <tr class="memdesc:a77438a7cc61c4b76776db6a5ff6d9316"><td class="mdescLeft">&#160;</td><td class="mdescRight">obtain the address of the last element in the buffer in preparation for iteration according to size.  <br /></td></tr>
 <tr class="separator:a77438a7cc61c4b76776db6a5ff6d9316"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a61080f33c02ed033f249e6639e6b4ec6"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a61080f33c02ed033f249e6639e6b4ec6">ccc_buf_rnext</a> (<a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> const *buf, void const *iter)</td></tr>
+<tr class="memitem:a61080f33c02ed033f249e6639e6b4ec6"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a61080f33c02ed033f249e6639e6b4ec6">ccc_buf_rnext</a> (ccc_buffer const *buf, void const *iter)</td></tr>
 <tr class="memdesc:a61080f33c02ed033f249e6639e6b4ec6"><td class="mdescLeft">&#160;</td><td class="mdescRight">advance the iter to the next slot in the buffer according to size and in reverse order.  <br /></td></tr>
 <tr class="separator:a61080f33c02ed033f249e6639e6b4ec6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4d000d8e2b263a44fd0d754a98513931"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a4d000d8e2b263a44fd0d754a98513931">ccc_buf_rend</a> (<a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> const *buf)</td></tr>
+<tr class="memitem:a4d000d8e2b263a44fd0d754a98513931"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a4d000d8e2b263a44fd0d754a98513931">ccc_buf_rend</a> (ccc_buffer const *buf)</td></tr>
 <tr class="memdesc:a4d000d8e2b263a44fd0d754a98513931"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the rend position of the buffer.  <br /></td></tr>
 <tr class="separator:a4d000d8e2b263a44fd0d754a98513931"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">State Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>These functions help manage or obtain state of the buffer. </p>
 </td></tr>
-<tr class="memitem:a771c734d199d4cc35654bcd5d62b3fb3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a771c734d199d4cc35654bcd5d62b3fb3">ccc_buf_size_plus</a> (<a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> *buf, size_t n)</td></tr>
+<tr class="memitem:a771c734d199d4cc35654bcd5d62b3fb3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a771c734d199d4cc35654bcd5d62b3fb3">ccc_buf_size_plus</a> (ccc_buffer *buf, size_t n)</td></tr>
 <tr class="memdesc:a771c734d199d4cc35654bcd5d62b3fb3"><td class="mdescLeft">&#160;</td><td class="mdescRight">add n to the size of the buffer.  <br /></td></tr>
 <tr class="separator:a771c734d199d4cc35654bcd5d62b3fb3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a12150474cd794575ba4eb7442247d327"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a12150474cd794575ba4eb7442247d327">ccc_buf_size_minus</a> (<a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> *buf, size_t n)</td></tr>
+<tr class="memitem:a12150474cd794575ba4eb7442247d327"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a12150474cd794575ba4eb7442247d327">ccc_buf_size_minus</a> (ccc_buffer *buf, size_t n)</td></tr>
 <tr class="memdesc:a12150474cd794575ba4eb7442247d327"><td class="mdescLeft">&#160;</td><td class="mdescRight">subtract n from the size of the buffer.  <br /></td></tr>
 <tr class="separator:a12150474cd794575ba4eb7442247d327"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a38ddb0477e6fb68d75086489a973afc4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a38ddb0477e6fb68d75086489a973afc4">ccc_buf_size_set</a> (<a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> *buf, size_t n)</td></tr>
+<tr class="memitem:a38ddb0477e6fb68d75086489a973afc4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a38ddb0477e6fb68d75086489a973afc4">ccc_buf_size_set</a> (ccc_buffer *buf, size_t n)</td></tr>
 <tr class="memdesc:a38ddb0477e6fb68d75086489a973afc4"><td class="mdescLeft">&#160;</td><td class="mdescRight">set the buffer size to n.  <br /></td></tr>
 <tr class="separator:a38ddb0477e6fb68d75086489a973afc4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8c12071400603b3e786588eb3cdd8b8b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a8c12071400603b3e786588eb3cdd8b8b">ccc_buf_capacity</a> (<a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> const *buf)</td></tr>
+<tr class="memitem:a8c12071400603b3e786588eb3cdd8b8b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a8c12071400603b3e786588eb3cdd8b8b">ccc_buf_capacity</a> (ccc_buffer const *buf)</td></tr>
 <tr class="memdesc:a8c12071400603b3e786588eb3cdd8b8b"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the current capacity of total possible slots.  <br /></td></tr>
 <tr class="separator:a8c12071400603b3e786588eb3cdd8b8b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5221e60bac73187c0154af05dc230904"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a5221e60bac73187c0154af05dc230904">ccc_buf_sizeof_type</a> (<a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> const *buf)</td></tr>
+<tr class="memitem:a5221e60bac73187c0154af05dc230904"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a5221e60bac73187c0154af05dc230904">ccc_buf_sizeof_type</a> (ccc_buffer const *buf)</td></tr>
 <tr class="memdesc:a5221e60bac73187c0154af05dc230904"><td class="mdescLeft">&#160;</td><td class="mdescRight">the size of the type being stored contiguously in the buffer.  <br /></td></tr>
 <tr class="separator:a5221e60bac73187c0154af05dc230904"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad93634769bf57469d89310325e93e425"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#ad93634769bf57469d89310325e93e425">ccc_buf_size</a> (<a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> const *buf)</td></tr>
+<tr class="memitem:ad93634769bf57469d89310325e93e425"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#ad93634769bf57469d89310325e93e425">ccc_buf_size</a> (ccc_buffer const *buf)</td></tr>
 <tr class="memdesc:ad93634769bf57469d89310325e93e425"><td class="mdescLeft">&#160;</td><td class="mdescRight">obtain the size of the buffer representing active slots.  <br /></td></tr>
 <tr class="separator:ad93634769bf57469d89310325e93e425"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2b808c7a344ba63cee75c95aeaaabebe"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a2b808c7a344ba63cee75c95aeaaabebe">ccc_buf_is_empty</a> (<a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> const *buf)</td></tr>
+<tr class="memitem:a2b808c7a344ba63cee75c95aeaaabebe"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a2b808c7a344ba63cee75c95aeaaabebe">ccc_buf_is_empty</a> (ccc_buffer const *buf)</td></tr>
 <tr class="memdesc:a2b808c7a344ba63cee75c95aeaaabebe"><td class="mdescLeft">&#160;</td><td class="mdescRight">return true if the size of the buffer is 0.  <br /></td></tr>
 <tr class="separator:a2b808c7a344ba63cee75c95aeaaabebe"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a35e780d4ce7e275f053bdfacb44db265"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a35e780d4ce7e275f053bdfacb44db265">ccc_buf_is_full</a> (<a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> const *buf)</td></tr>
+<tr class="memitem:a35e780d4ce7e275f053bdfacb44db265"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a35e780d4ce7e275f053bdfacb44db265">ccc_buf_is_full</a> (ccc_buffer const *buf)</td></tr>
 <tr class="memdesc:a35e780d4ce7e275f053bdfacb44db265"><td class="mdescLeft">&#160;</td><td class="mdescRight">return true if the size of the buffer equals capacity.  <br /></td></tr>
 <tr class="separator:a35e780d4ce7e275f053bdfacb44db265"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -319,14 +319,14 @@ This graph shows which files directly or indirectly include this file:</div>
 </div>
 </div>
 <h2 class="groupheader">Typedef Documentation</h2>
-<a id="aeacee6faab0ce1071559f3cf3ff51179" name="aeacee6faab0ce1071559f3cf3ff51179"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aeacee6faab0ce1071559f3cf3ff51179">&#9670;&#160;</a></span>ccc_buffer</h2>
+<a id="a31fe1f716bca34ad83323df1d401947b" name="a31fe1f716bca34ad83323df1d401947b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a31fe1f716bca34ad83323df1d401947b">&#9670;&#160;</a></span>ccc_buffer</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef struct ccc_buf <a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a></td>
+          <td class="memname">typedef struct ccc_buffer ccc_buffer</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -347,7 +347,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_buf_alloc </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> *&#160;</td>
+          <td class="paramtype">ccc_buffer *&#160;</td>
           <td class="paramname"><em>buf</em>, </td>
         </tr>
         <tr>
@@ -393,7 +393,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname">void * ccc_buf_alloc_back </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> *&#160;</td>
+          <td class="paramtype">ccc_buffer *&#160;</td>
           <td class="paramname"><em>buf</em></td><td>)</td>
           <td></td>
         </tr>
@@ -422,7 +422,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname">void * ccc_buf_at </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> const *&#160;</td>
+          <td class="paramtype">ccc_buffer const *&#160;</td>
           <td class="paramname"><em>buf</em>, </td>
         </tr>
         <tr>
@@ -461,7 +461,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname">void * ccc_buf_back </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> const *&#160;</td>
+          <td class="paramtype">ccc_buffer const *&#160;</td>
           <td class="paramname"><em>buf</em></td><td>)</td>
           <td></td>
         </tr>
@@ -488,7 +488,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname">void * ccc_buf_begin </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> const *&#160;</td>
+          <td class="paramtype">ccc_buffer const *&#160;</td>
           <td class="paramname"><em>buf</em></td><td>)</td>
           <td></td>
         </tr>
@@ -515,7 +515,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_buf_capacity </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> const *&#160;</td>
+          <td class="paramtype">ccc_buffer const *&#160;</td>
           <td class="paramname"><em>buf</em></td><td>)</td>
           <td></td>
         </tr>
@@ -542,7 +542,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname">void * ccc_buf_capacity_end </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> const *&#160;</td>
+          <td class="paramtype">ccc_buffer const *&#160;</td>
           <td class="paramname"><em>buf</em></td><td>)</td>
           <td></td>
         </tr>
@@ -570,7 +570,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname">void * ccc_buf_copy </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> *&#160;</td>
+          <td class="paramtype">ccc_buffer *&#160;</td>
           <td class="paramname"><em>buf</em>, </td>
         </tr>
         <tr>
@@ -617,7 +617,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname">void * ccc_buf_end </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> const *&#160;</td>
+          <td class="paramtype">ccc_buffer const *&#160;</td>
           <td class="paramname"><em>buf</em></td><td>)</td>
           <td></td>
         </tr>
@@ -645,7 +645,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_buf_erase </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> *&#160;</td>
+          <td class="paramtype">ccc_buffer *&#160;</td>
           <td class="paramname"><em>buf</em>, </td>
         </tr>
         <tr>
@@ -685,7 +685,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname">void * ccc_buf_front </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> const *&#160;</td>
+          <td class="paramtype">ccc_buffer const *&#160;</td>
           <td class="paramname"><em>buf</em></td><td>)</td>
           <td></td>
         </tr>
@@ -712,7 +712,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_buf_i </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> const *&#160;</td>
+          <td class="paramtype">ccc_buffer const *&#160;</td>
           <td class="paramname"><em>buf</em>, </td>
         </tr>
         <tr>
@@ -750,7 +750,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname">void * ccc_buf_insert </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> *&#160;</td>
+          <td class="paramtype">ccc_buffer *&#160;</td>
           <td class="paramname"><em>buf</em>, </td>
         </tr>
         <tr>
@@ -797,7 +797,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> ccc_buf_is_empty </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> const *&#160;</td>
+          <td class="paramtype">ccc_buffer const *&#160;</td>
           <td class="paramname"><em>buf</em></td><td>)</td>
           <td></td>
         </tr>
@@ -824,7 +824,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> ccc_buf_is_full </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> const *&#160;</td>
+          <td class="paramtype">ccc_buffer const *&#160;</td>
           <td class="paramname"><em>buf</em></td><td>)</td>
           <td></td>
         </tr>
@@ -851,7 +851,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname">void * ccc_buf_next </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> const *&#160;</td>
+          <td class="paramtype">ccc_buffer const *&#160;</td>
           <td class="paramname"><em>buf</em>, </td>
         </tr>
         <tr>
@@ -889,7 +889,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_buf_pop_back </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> *&#160;</td>
+          <td class="paramtype">ccc_buffer *&#160;</td>
           <td class="paramname"><em>buf</em></td><td>)</td>
           <td></td>
         </tr>
@@ -917,7 +917,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_buf_pop_back_n </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> *&#160;</td>
+          <td class="paramtype">ccc_buffer *&#160;</td>
           <td class="paramname"><em>buf</em>, </td>
         </tr>
         <tr>
@@ -956,7 +956,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname">void * ccc_buf_push_back </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> *&#160;</td>
+          <td class="paramtype">ccc_buffer *&#160;</td>
           <td class="paramname"><em>buf</em>, </td>
         </tr>
         <tr>
@@ -996,7 +996,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname">void * ccc_buf_rbegin </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> const *&#160;</td>
+          <td class="paramtype">ccc_buffer const *&#160;</td>
           <td class="paramname"><em>buf</em></td><td>)</td>
           <td></td>
         </tr>
@@ -1023,7 +1023,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname">void * ccc_buf_rend </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> const *&#160;</td>
+          <td class="paramtype">ccc_buffer const *&#160;</td>
           <td class="paramname"><em>buf</em></td><td>)</td>
           <td></td>
         </tr>
@@ -1050,7 +1050,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname">void * ccc_buf_rnext </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> const *&#160;</td>
+          <td class="paramtype">ccc_buffer const *&#160;</td>
           <td class="paramname"><em>buf</em>, </td>
         </tr>
         <tr>
@@ -1088,7 +1088,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_buf_size </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> const *&#160;</td>
+          <td class="paramtype">ccc_buffer const *&#160;</td>
           <td class="paramname"><em>buf</em></td><td>)</td>
           <td></td>
         </tr>
@@ -1116,7 +1116,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_buf_size_minus </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> *&#160;</td>
+          <td class="paramtype">ccc_buffer *&#160;</td>
           <td class="paramname"><em>buf</em>, </td>
         </tr>
         <tr>
@@ -1155,7 +1155,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_buf_size_plus </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> *&#160;</td>
+          <td class="paramtype">ccc_buffer *&#160;</td>
           <td class="paramname"><em>buf</em>, </td>
         </tr>
         <tr>
@@ -1194,7 +1194,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_buf_size_set </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> *&#160;</td>
+          <td class="paramtype">ccc_buffer *&#160;</td>
           <td class="paramname"><em>buf</em>, </td>
         </tr>
         <tr>
@@ -1233,7 +1233,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_buf_sizeof_type </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> const *&#160;</td>
+          <td class="paramtype">ccc_buffer const *&#160;</td>
           <td class="paramname"><em>buf</em></td><td>)</td>
           <td></td>
         </tr>
@@ -1260,7 +1260,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_buf_swap </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> *&#160;</td>
+          <td class="paramtype">ccc_buffer *&#160;</td>
           <td class="paramname"><em>buf</em>, </td>
         </tr>
         <tr>
@@ -1314,7 +1314,7 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_buf_write </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179">ccc_buffer</a> *&#160;</td>
+          <td class="paramtype">ccc_buffer *&#160;</td>
           <td class="paramname"><em>buf</em>, </td>
         </tr>
         <tr>

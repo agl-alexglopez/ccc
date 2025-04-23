@@ -9,7 +9,7 @@ var searchData=
   ['ccc_5fany_5ftype_5fupdate_5ffn_6',['ccc_any_type_update_fn',['../types_8h.html#ada79c0d2b3cfeee31b9990c23a187d12',1,'types.h']]],
   ['ccc_5fbitblock_7',['ccc_bitblock',['../bitset_8h.html#a1165b11608a79fa0bc28acef6b8862fe',1,'bitset.h']]],
   ['ccc_5fbitset_8',['ccc_bitset',['../bitset_8h.html#a91c02e4cbaa5d2ad80b4d448b19a8f2b',1,'bitset.h']]],
-  ['ccc_5fbuffer_9',['ccc_buffer',['../buffer_8h.html#aeacee6faab0ce1071559f3cf3ff51179',1,'buffer.h']]],
+  ['ccc_5fbuffer_9',['ccc_buffer',['../buffer_8h.html#a31fe1f716bca34ad83323df1d401947b',1,'buffer.h']]],
   ['ccc_5fdll_5felem_10',['ccc_dll_elem',['../doubly__linked__list_8h.html#ad6d4a719fb9081cc5a42a6713e193861',1,'doubly_linked_list.h']]],
   ['ccc_5fdoubly_5flinked_5flist_11',['ccc_doubly_linked_list',['../doubly__linked__list_8h.html#a242216a4880ae2513dbbcfd181a71ad7',1,'doubly_linked_list.h']]],
   ['ccc_5fentry_12',['ccc_entry',['../types_8h.html#aa3c40fddcd1ec571a0b9a6d5d742805c',1,'types.h']]],
