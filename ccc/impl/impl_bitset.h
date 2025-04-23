@@ -46,7 +46,8 @@ struct ccc_bitset
     void *aux;
 };
 
-/** @private */
+/** @private Returns the number of blocks needed to support a given capacity
+of bits. Assumes the given capacity is greater than 0. Classic div round up. */
 #define ccc_impl_bs_blocks(impl_bit_cap)                                       \
     (((impl_bit_cap) + ((sizeof(ccc_bitblock) * CHAR_BIT) - 1))                \
      / (sizeof(ccc_bitblock) * CHAR_BIT))

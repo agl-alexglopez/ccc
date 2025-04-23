@@ -25,14 +25,23 @@ limitations under the License.
 
 /* NOLINTBEGIN(readability-identifier-naming) */
 
-/** @private */
-struct ccc_buf
+/** @private A buffer is a contiguous array of a uniform type. The user can
+specify any type. The buffer can be fixed size if no allocation permission is
+given or dynamic if allocation permission is granted. The buffer can also be
+manually resized via the interface. */
+struct ccc_buffer
 {
+    /** @private The contiguous memory of uniform type. */
     void *mem;
+    /** @private The current count of active buffer slots. */
     size_t count;
+    /** @private The total buffer slots possible for this array. */
     size_t capacity;
+    /** @private The size of the type the user stores in the buffer. */
     size_t sizeof_type;
+    /** @private An allocation function for resizing, if allowed. */
     ccc_any_alloc_fn *alloc;
+    /** @private Auxiliary data, if any. */
     void *aux;
 };
 
@@ -44,7 +53,10 @@ struct ccc_buf
 #define IMPL_BUF_OPTIONAL_SIZE(...)                                            \
     __VA_OPT__(IMPL_BUF_NON_)##IMPL_BUF_DEFAULT_SIZE(__VA_ARGS__)
 
-/** @private */
+/** @private Initializes the buffer with a default size of 0. However the user
+can specify that the buffer has some count of elements from index
+`[0, capacity - 1)` at initialization time. The buffer assumes these elements
+are contiguous. */
 #define ccc_impl_buf_init(impl_mem, impl_alloc_fn, impl_aux_data,              \
                           impl_capacity, ...)                                  \
     {                                                                          \

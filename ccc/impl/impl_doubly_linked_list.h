@@ -45,34 +45,41 @@ never point to NULL.
 
 An empty list.
 
-      nil
-    ┌─────┐
-  ┌>│n=nil├──┐
-  └─┤p=nil│<─┘
-    └─────┘
+```
+    nil
+  ┌─────┐
+┌>│n=nil├──┐
+└─┤p=nil│<─┘
+  └─────┘
+```
 
 A list with one element.
 
-         ┌─────────┐
-         V         │
-      nil      A   │
-    ┌─────┐ ┌─────┐│
-    │n=A  ├>│n=nil├┘
-   ┌┤p=A  │<┤p=nil│
-   │└─────┘ └─────┘
-   │           ^
-   └───────────┘
+```
+    ┌───────────┐
+    V           │
+   nil      A   │
+ ┌─────┐ ┌─────┐│
+ │n=A  ├>│n=nil├┘
+┌┤p=A  │<┤p=nil│
+│└─────┘ └─────┘
+│           ^
+└───────────┘
+```
+
 A list with three elements.
 
-       ┌───────────────────────────┐
-       V                           │
-      nil      A       B       C   │
-    ┌─────┐ ┌─────┐ ┌─────┐ ┌─────┐│
-    │n=A  ├>│n=B  ├>│n=C  ├>│n=nil├┘
-   ┌┤p=C  │<┤p=nil│<┤p=A  │<┤p=B  │
-   │└─────┘ └─────┘ └─────┘ └─────┘
-   │                           ^
-   └───────────────────────────┘
+```
+    ┌───────────────────────────┐
+    V                           │
+   nil      A       B       C   │
+ ┌─────┐ ┌─────┐ ┌─────┐ ┌─────┐│
+ │n=A  ├>│n=B  ├>│n=C  ├>│n=nil├┘
+┌┤p=C  │<┤p=nil│<┤p=A  │<┤p=B  │
+│└─────┘ └─────┘ └─────┘ └─────┘
+│                           ^
+└───────────────────────────┘
+```
 
 The single nil allows us to use two pointers instead of the four it would
 take with a head and tail nil. The only cost is slight care for certain
@@ -107,7 +114,8 @@ struct ccc_dll_elem *ccc_impl_dll_elem_in(struct ccc_dll const *,
 
 /*=======================     Macro Implementations   =======================*/
 
-/** @private */
+/** @private Initialization at compile time is allowed in C due to the provided
+name of the list being on the left hand side of the assignment operator. */
 #define ccc_impl_dll_init(impl_dll_name, impl_struct_name,                     \
                           impl_dll_elem_field, impl_cmp_fn, impl_alloc_fn,     \
                           impl_aux_data)                                       \
