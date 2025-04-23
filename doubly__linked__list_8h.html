@@ -186,10 +186,10 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr><td class="ititle" colspan="2"><p>Sort the container. </p>
 </td></tr>
 <tr class="memitem:a5a2c45400ceeddd0376e4e99b6bdee72"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="doubly__linked__list_8h.html#a5a2c45400ceeddd0376e4e99b6bdee72">ccc_dll_sort</a> (<a class="el" href="doubly__linked__list_8h.html#a242216a4880ae2513dbbcfd181a71ad7">ccc_doubly_linked_list</a> *dll)</td></tr>
-<tr class="memdesc:a5a2c45400ceeddd0376e4e99b6bdee72"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sorts the doubly linked list in non-decreasing order as defined by the provided comparison function. O(NlgN) time, O(1) space.  <br /></td></tr>
+<tr class="memdesc:a5a2c45400ceeddd0376e4e99b6bdee72"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sorts the doubly linked list in non-decreasing order as defined by the provided comparison function. <code>O(N * log(N))</code> time, <code>O(1)</code> space.  <br /></td></tr>
 <tr class="separator:a5a2c45400ceeddd0376e4e99b6bdee72"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a923163067d6714b03cc96a097365c70f"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="doubly__linked__list_8h.html#a923163067d6714b03cc96a097365c70f">ccc_dll_insert_sorted</a> (<a class="el" href="doubly__linked__list_8h.html#a242216a4880ae2513dbbcfd181a71ad7">ccc_doubly_linked_list</a> *dll, ccc_dll_elem *e)</td></tr>
-<tr class="memdesc:a923163067d6714b03cc96a097365c70f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inserts e in sorted position according to the non-decreasing order of the list determined by the user provided comparison function.  <br /></td></tr>
+<tr class="memdesc:a923163067d6714b03cc96a097365c70f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inserts e in sorted position according to the non-decreasing order of the list determined by the user provided comparison function. <code>O(1)</code>.  <br /></td></tr>
 <tr class="separator:a923163067d6714b03cc96a097365c70f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8d470f29668780270b4beeb71cc024be"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="doubly__linked__list_8h.html#a8d470f29668780270b4beeb71cc024be">ccc_dll_is_sorted</a> (<a class="el" href="doubly__linked__list_8h.html#a242216a4880ae2513dbbcfd181a71ad7">ccc_doubly_linked_list</a> const *dll)</td></tr>
 <tr class="memdesc:a8d470f29668780270b4beeb71cc024be"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if the list is sorted in non-decreasing order according to the user provided comparison function.  <br /></td></tr>
@@ -911,7 +911,7 @@ This graph shows which files directly or indirectly include this file:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Inserts e in sorted position according to the non-decreasing order of the list determined by the user provided comparison function. </p>
+<p>Inserts e in sorted position according to the non-decreasing order of the list determined by the user provided comparison function. <code>O(1)</code>. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">dll</td><td>a pointer to the doubly linked list. </td></tr>
@@ -1283,7 +1283,7 @@ This graph shows which files directly or indirectly include this file:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Sorts the doubly linked list in non-decreasing order as defined by the provided comparison function. O(NlgN) time, O(1) space. </p>
+<p>Sorts the doubly linked list in non-decreasing order as defined by the provided comparison function. <code>O(N * log(N))</code> time, <code>O(1)</code> space. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">dll</td><td>a pointer to the doubly linked list to sort. </td></tr>

@@ -847,17 +847,17 @@ This graph shows which files directly or indirectly include this file:</div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>a pointer to the start of the inserted range or NULL if a resize was required and could not complete.</dd></dl>
 <p>Note that if no allocation is permitted the fdeq behaves as a ring buffer. Therefore, pushing a range that will exceed capacity will overwrite elements at the start of the fdeq.</p>
-<p>Pushing a range of elements prioritizes the range and allows the range to overwrite elements instead of pushing those elements over the start of the range. For example, push a range {3,4,5} over a fdeq with capacity 5 before pos with value 6.</p>
+<p>Pushing a range of elements prioritizes the range and allows the range to overwrite elements instead of pushing those elements over the start of the range. For example, push a range <code>{3,4,5}</code> over a fdeq with capacity 5 before pos with value 6.</p>
 <div class="fragment"><div class="line"> front pos        front</div>
 <div class="line">┌─┬┴┬─┬┴┬─┐    ┌─┬─┬┴┬─┬─┐</div>
 <div class="line">│ │1│2│6│ │ -&gt; │5│6│2│3│4│</div>
 <div class="line">└─┴─┴─┴─┴─┘    └─┴─┴─┴─┴─┘</div>
-</div><!-- fragment --><p>Notice that 1 and 2 were NOT moved to overwrite the start of the range, the values 3 and 4. The only way the start of a range will be overwritten is if the range itself is too large for the capacity. For example, push a range {0,0,3,3,4,4,5,5} over the same fdeq.</p>
+</div><!-- fragment --><p>Notice that 1 and 2 were NOT moved to overwrite the start of the range, the values 3 and 4. The only way the start of a range will be overwritten is if the range itself is too large for the capacity. For example, push a range <code>{0,0,3,3,4,4,5,5}</code> over the same fdeq.</p>
 <div class="fragment"><div class="line"> front pos    front</div>
 <div class="line">┌─┬┴┬─┬┴┬─┐    ┌┴┬─┬─┬─┬─┐</div>
 <div class="line">│ │1│2│6│ │ -&gt; │3│4│4│5│5│</div>
 <div class="line">└─┴─┴─┴─┴─┘    └─┴─┴─┴─┴─┘</div>
-</div><!-- fragment --><p>Notice that the start of the range, {0,0,3,...}, is overwritten. </p>
+</div><!-- fragment --><p>Notice that the start of the range, <code>{0,0,3,...}</code>, is overwritten. </p>
 
 </div>
 </div>
