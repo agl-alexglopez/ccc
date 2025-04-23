@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['c_20container_20collection_20_28ccc_29_0',['C Container Collection (CCC)',['../index.html',1,'']]],
+  ['ccc_20doc_0',['CCC DOC',['../index.html',1,'']]],
   ['ccc_5fand_5fmodify_1',['ccc_and_modify',['../traits_8h.html#ab25eca1e59257aab34f67308a523553c',1,'traits.h']]],
   ['ccc_5fand_5fmodify_5faux_2',['ccc_and_modify_aux',['../traits_8h.html#a25c5c848da545831e1efa54645aae2dd',1,'traits.h']]],
   ['ccc_5fany_5falloc_5ffn_3',['ccc_any_alloc_fn',['../types_8h.html#a3e73202894869d2840fb21ff912bbd96',1,'types.h']]],

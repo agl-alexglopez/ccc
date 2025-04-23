@@ -25,36 +25,15 @@
 var NAVTREE =
 [
   [ "C Container Collection (CCC)", "index.html", [
-    [ "Installation", "index.html#autotoc_md1", null ],
-    [ "Quick Start", "index.html#autotoc_md2", null ],
-    [ "Containers", "index.html#autotoc_md3", null ],
-    [ "Features", "index.html#autotoc_md4", [
-      [ "Intrusive and Non-Intrusive Containers", "index.html#autotoc_md5", null ],
-      [ "Non-Allocating Containers", "index.html#autotoc_md6", null ],
-      [ "Compile Time Initialization", "index.html#autotoc_md7", null ],
-      [ "No Container of Macros", "index.html#autotoc_md8", null ],
-      [ "Rust's Entry Interface", "index.html#autotoc_md9", [
-        [ "Lazy Evaluation", "index.html#autotoc_md10", null ]
-      ] ],
-      [ "Traits", "index.html#autotoc_md11", null ]
-    ] ],
-    [ "Allocation", "index.html#autotoc_md12", [
-      [ "Constructors", "index.html#autotoc_md13", null ],
-      [ "Destructors", "index.html#autotoc_md14", null ]
-    ] ],
-    [ "Samples", "index.html#autotoc_md15", null ],
-    [ "Tests", "index.html#autotoc_md16", null ],
-    [ "Miscellaneous Why?", "index.html#autotoc_md17", null ],
-    [ "Related", "index.html#autotoc_md18", null ],
-    [ "Citations", "index.html#autotoc_md19", null ],
+    [ "CCC DOC", "index.html", "index" ],
     [ "Building and Installation", "md_INSTALL.html", [
-      [ "Fetch Content Install", "md_INSTALL.html#autotoc_md21", null ],
-      [ "Manual Install Quick Start", "md_INSTALL.html#autotoc_md22", [
-        [ "Include the Library", "md_INSTALL.html#autotoc_md23", null ],
-        [ "Without Make", "md_INSTALL.html#autotoc_md24", null ],
-        [ "User Presets", "md_INSTALL.html#autotoc_md25", null ]
+      [ "Fetch Content Install", "md_INSTALL.html#autotoc_md4", null ],
+      [ "Manual Install Quick Start", "md_INSTALL.html#autotoc_md5", [
+        [ "Include the Library", "md_INSTALL.html#autotoc_md6", null ],
+        [ "Without Make", "md_INSTALL.html#autotoc_md7", null ],
+        [ "User Presets", "md_INSTALL.html#autotoc_md8", null ]
       ] ],
-      [ "Generate Documentation", "md_INSTALL.html#autotoc_md26", null ]
+      [ "Generate Documentation", "md_INSTALL.html#autotoc_md9", null ]
     ] ],
     [ "Data Structures", "annotated.html", [
       [ "Data Structures", "annotated.html", "annotated_dup" ],
@@ -82,7 +61,7 @@ var NAVTREEINDEX =
 [
 "annotated.html",
 "globals_eval.html",
-"ordered__multimap_8h_source.html"
+"priority__queue_8h.html#ac151ad453261b727302345e17c07ba3c"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
