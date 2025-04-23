@@ -252,13 +252,13 @@ Sort the container. */
 /**@{*/
 
 /** @brief Sorts the doubly linked list in non-decreasing order as defined by
-the provided comparison function. O(NlgN) time, O(1) space.
+the provided comparison function. `O(N * log(N))` time, `O(1)` space.
 @param [in] dll a pointer to the doubly linked list to sort.
 @return the result of the sort, usually OK. An arg error if dll is null. */
 ccc_result ccc_dll_sort(ccc_doubly_linked_list *dll);
 
 /** @brief Inserts e in sorted position according to the non-decreasing order
-of the list determined by the user provided comparison function.
+of the list determined by the user provided comparison function. `O(1)`.
 @param [in] dll a pointer to the doubly linked list.
 @param [in] e a pointer to the element to be inserted in order.
 @return a pointer to the element that has been inserted or NULL if allocation

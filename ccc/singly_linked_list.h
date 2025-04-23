@@ -216,7 +216,7 @@ Sort the container. */
 /**@{*/
 
 /** @brief Sorts the singly linked list in non-decreasing order as defined by
-the provided comparison function. O(NlgN) time, O(1) space.
+the provided comparison function. `O(N * log(N))` time, `O(1)` space.
 @param [in] sll a pointer to the singly linked list to sort.
 @return the result of the sort, usually OK. An arg error if sll is null. */
 ccc_result ccc_sll_sort(ccc_singly_linked_list *sll);

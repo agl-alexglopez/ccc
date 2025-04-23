@@ -249,7 +249,7 @@ at the start of the fdeq.
 
 Pushing a range of elements prioritizes the range and allows the range to
 overwrite elements instead of pushing those elements over the start of the
-range. For example, push a range {3,4,5} over a fdeq with capacity 5 before
+range. For example, push a range `{3,4,5}` over a fdeq with capacity 5 before
 pos with value 6.
 
 ```
@@ -262,7 +262,7 @@ pos with value 6.
 Notice that 1 and 2 were NOT moved to overwrite the start of the range, the
 values 3 and 4. The only way the start of a range will be overwritten is if
 the range itself is too large for the capacity. For example, push a range
-{0,0,3,3,4,4,5,5} over the same fdeq.
+`{0,0,3,3,4,4,5,5}` over the same fdeq.
 
 ```
  front pos    front
@@ -271,7 +271,7 @@ the range itself is too large for the capacity. For example, push a range
 └─┴─┴─┴─┴─┘    └─┴─┴─┴─┴─┘
 ```
 
-Notice that the start of the range, {0,0,3,...}, is overwritten. */
+Notice that the start of the range, `{0,0,3,...}`, is overwritten. */
 [[nodiscard]] void *ccc_fdeq_insert_range(ccc_flat_double_ended_queue *fdeq,
                                           void *pos, size_t n,
                                           void const *elems);
