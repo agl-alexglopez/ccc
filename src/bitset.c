@@ -1349,6 +1349,11 @@ first_leading_one_range(struct ccc_bitset const *const bs, size_t const i,
     return (ccc_ucount){.error = CCC_RESULT_FAIL};
 }
 
+/* Overall I am not thrilled with the need for handling signed values and back
+wards iteration in this version. However, I am having trouble finding a clean
+way to do this unsigned. Signed simplifies the iteration and interaction with
+the helper function finding leading ones because the algorithm is complex
+enough as is. Candidate for refactor. */
 static ccc_ucount
 first_leading_bits_range(struct ccc_bitset const *const bs, size_t const i,
                          size_t const count, size_t const num_bits,
