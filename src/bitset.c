@@ -122,13 +122,13 @@ struct igroup
     size_t count;
 };
 
-static size_t ublock_index(size_t bit_i);
-static inline ccc_bitblock *block_at(ccc_bitset const *bs, size_t bit_i);
-static void set(ccc_bitblock *, size_t bit_i, ccc_tribool);
-static ccc_bitblock on(size_t bit_i);
+static size_t ublock_index(size_t bitset_index);
+static inline ccc_bitblock *block_at(ccc_bitset const *bs, size_t bitset_index);
+static void set(ccc_bitblock *, size_t bitset_index, ccc_tribool);
+static ccc_bitblock on(size_t bitset_index);
 static ccc_bitblock last_on(struct ccc_bitset const *);
 static void fix_end(struct ccc_bitset *);
-static ccc_tribool status(ccc_bitblock const *, size_t bit_i);
+static ccc_tribool status(ccc_bitblock const *, size_t bitset_index);
 static size_t ublock_count(size_t bits);
 static ccc_tribool any_or_none_range(struct ccc_bitset const *, size_t i,
                                      size_t count, ccc_tribool);
@@ -157,7 +157,7 @@ static ccc_result maybe_resize(struct ccc_bitset *bs, size_t to_add,
                                ccc_any_alloc_fn *);
 static size_t size_t_min(size_t, size_t);
 static void set_all(struct ccc_bitset *bs, ccc_tribool b);
-static ubit ubit_index(size_t bit_i);
+static ubit ubit_index(size_t bitset_index);
 static ccc_tribool is_subset_of(struct ccc_bitset const *set,
                                 struct ccc_bitset const *subset);
 static ubit popcount(ccc_bitblock);
@@ -289,18 +289,19 @@ ccc_bs_shiftl(ccc_bitset *const bs, size_t const left_shifts)
     ubit const split = ubit_index(left_shifts);
     if (!split)
     {
-        for (ublock r = end - blocks + 1, w = end; r--; --w)
+        for (ublock shift = end - blocks + 1, write = end; shift--; --write)
         {
-            bs->blocks[w] = bs->blocks[r];
+            bs->blocks[write] = bs->blocks[shift];
         }
     }
     else
     {
         ubit const remain = BITBLOCK_BITS - split;
-        for (ublock r = end - blocks, w = end; r > 0; --r, --w)
+        for (ublock shift = end - blocks, write = end; shift > 0;
+             --shift, --write)
         {
-            bs->blocks[w]
-                = (bs->blocks[r] << split) | (bs->blocks[r - 1] >> remain);
+            bs->blocks[write] = (bs->blocks[shift] << split)
+                                | (bs->blocks[shift - 1] >> remain);
         }
         bs->blocks[blocks] = bs->blocks[0] << split;
     }
@@ -334,18 +335,19 @@ ccc_bs_shiftr(ccc_bitset *const bs, size_t const right_shifts)
     ubit split = ubit_index(right_shifts);
     if (!split)
     {
-        for (ublock r = blocks, w = 0; r < end + 1; ++r, ++w)
+        for (ublock shift = blocks, write = 0; shift < end + 1;
+             ++shift, ++write)
         {
-            bs->blocks[w] = bs->blocks[r];
+            bs->blocks[write] = bs->blocks[shift];
         }
     }
     else
     {
         ubit const remain = BITBLOCK_BITS - split;
-        for (ublock r = blocks, w = 0; r < end; ++r, ++w)
+        for (ublock shift = blocks, write = 0; shift < end; ++shift, ++write)
         {
-            bs->blocks[w]
-                = (bs->blocks[r + 1] << remain) | (bs->blocks[r] >> split);
+            bs->blocks[write] = (bs->blocks[shift + 1] << remain)
+                                | (bs->blocks[shift] >> split);
         }
         bs->blocks[end - blocks] = bs->blocks[end] >> split;
     }
@@ -1239,8 +1241,11 @@ max_trailing_ones(ccc_bitblock const b, ubit const i_bit,
        MSB. The best we could have is a full block of 1's. Otherwise we need
        to find where to start our new search for contiguous 1's. This could be
        the next block if there are not 1's that continue all the way to MSB. */
-    ubit const lz = clz(~b);
-    return (struct ugroup){.i = BITBLOCK_BITS - lz, .count = lz};
+    ubit const leading_ones = clz(~b);
+    return (struct ugroup){
+        .i = BITBLOCK_BITS - leading_ones,
+        .count = leading_ones,
+    };
 }
 
 static ccc_ucount
@@ -1456,11 +1461,11 @@ max_leading_ones(ccc_bitblock const b, ibit const i_bit,
             }
         }
     }
-    ibit const num_ones_found = (ibit)ctz(~b);
+    ibit const trailing_ones = (ibit)ctz(~b);
     return (struct igroup){
         /* May be -1 if no ones found. This make backward iteration easier. */
-        .i = (ibit)(num_ones_found - 1),
-        .count = num_ones_found,
+        .i = (ibit)(trailing_ones - 1),
+        .count = trailing_ones,
     };
 }
 
@@ -1615,9 +1620,9 @@ all_range(struct ccc_bitset const *const bs, size_t const i, size_t const count)
 reference to the block that such a bit belongs to. This block reference will
 point to some block at index [0, count of blocks used in the set). */
 static inline ccc_bitblock *
-block_at(ccc_bitset const *const bs, size_t const bit_i)
+block_at(ccc_bitset const *const bs, size_t const bitset_index)
 {
-    return &bs->blocks[ublock_index(bit_i)];
+    return &bs->blocks[ublock_index(bitset_index)];
 }
 
 /** Sets all bits in bulk to value b and fixes the end block to ensure all bits
@@ -1636,26 +1641,26 @@ to 0 or 1 as specified by the ccc_tribool argument b.
 Assumes block has been retrieved correctly in range [0, count of blocks in set)
 and that bit_i is in range [0, count of active bits in set). */
 static inline void
-set(ccc_bitblock *const block, size_t const bit_i, ccc_tribool const b)
+set(ccc_bitblock *const block, size_t const bitset_index, ccc_tribool const b)
 {
     if (b)
     {
-        *block |= on(bit_i);
+        *block |= on(bitset_index);
     }
     else
     {
-        *block &= ~on(bit_i);
+        *block &= ~on(bitset_index);
     }
 }
 
 /** Given the bit set and the set index--set index is allowed to be greater than
 the size of one block--returns the status of the bit at that index. */
 static inline ccc_tribool
-status(ccc_bitblock const *const bs, size_t const bit_i)
+status(ccc_bitblock const *const bs, size_t const bitset_index)
 {
     /* Be careful. The & op does not promise to evaluate to 1 or 0. We often
        just use it where that conversion takes place implicitly for us. */
-    return (*bs & on(bit_i)) != 0;
+    return (*bs & on(bitset_index)) != 0;
 }
 
 /** Given the true bit index in the bit set, expected to be in the range
@@ -1663,9 +1668,9 @@ status(ccc_bitblock const *const bs, size_t const bit_i)
 on in block to which it belongs. This mask guarantees to have a bit on within
 a bit block at index [0, BITBLOCK_BITS - 1). */
 static inline ccc_bitblock
-on(size_t bit_i)
+on(size_t bitset_index)
 {
-    return (ccc_bitblock)1 << ubit_index(bit_i);
+    return (ccc_bitblock)1 << ubit_index(bitset_index);
 }
 
 /** Clears unused bits in the last block according to count. Sets the last block
@@ -1696,27 +1701,27 @@ which the given index belongs. Assumes the given index is somewhere between [0,
 count of bits set). The returned index then represents the block in which this
 index resides which is in the range [0, block containing last in use bit). */
 static inline ublock
-ublock_index(size_t const bit_i)
+ublock_index(size_t const bitset_index)
 {
-    return bit_i / BITBLOCK_BITS;
+    return bitset_index / BITBLOCK_BITS;
 }
 
 /** Returns the 0-based index within a block to which the given index belongs.
 This index will always be between [0, BITBLOCK_BITS - 1). */
 static inline ubit
-ubit_index(size_t const bit_i)
+ubit_index(size_t const bitset_index)
 {
-    return bit_i % BITBLOCK_BITS;
+    return bitset_index % BITBLOCK_BITS;
 }
 
 /** Returns the number of blocks required to store the given bits. Assumes bits
 is non-zero. For any bits > 1 the block count is always less than bits.*/
 static inline ublock
-ublock_count(size_t const bits)
+ublock_count(size_t const set_bits)
 {
     static_assert(BITBLOCK_BITS);
-    assert(bits);
-    return (bits + (BITBLOCK_BITS - 1)) / BITBLOCK_BITS;
+    assert(set_bits);
+    return (set_bits + (BITBLOCK_BITS - 1)) / BITBLOCK_BITS;
 }
 
 /** Returns min of size_t arguments. Beware of conversions. */
