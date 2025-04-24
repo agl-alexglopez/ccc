@@ -1425,7 +1425,7 @@ where the next search should start from, a critical step to a linear search;
 specifically, we seek any group of continuous ones that runs from some index
 in the block to the start of the block (0th index).
 
-If no continuous group of ones exist that runs to the start of the block, an -1
+If no continuous group of ones exist that runs to the start of the block, a -1
 index is returned with a group size of 0 meaning the search for ones will need
 to continue in the next block lower block. This is helpful for the main search
 loop adding to its start index and number of ones found so far. Adding -1 is
@@ -1458,6 +1458,7 @@ max_leading_ones(ccc_bitblock const b, ibit const i_bit,
     }
     ibit const num_ones_found = (ibit)ctz(~b);
     return (struct igroup){
+        /* May be -1 if no ones found. This make backward iteration easier. */
         .i = (ibit)(num_ones_found - 1),
         .count = num_ones_found,
     };
