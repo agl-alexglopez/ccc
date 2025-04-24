@@ -284,33 +284,28 @@ ccc_bs_shiftl(ccc_bitset *const bs, size_t const left_shifts)
         set_all(bs, CCC_FALSE);
         return CCC_RESULT_OK;
     }
-    ublock const last_block = ublock_index(bs->count - 1);
-    ublock const shifted_blocks = ublock_index(left_shifts);
-    ubit const partial_shift = ubit_index(left_shifts);
-    if (!partial_shift)
+    ublock const end = ublock_index(bs->count - 1);
+    ublock const blocks = ublock_index(left_shifts);
+    ubit const split = ubit_index(left_shifts);
+    if (!split)
     {
-        for (ublock shifted = last_block - shifted_blocks + 1,
-                    overwritten = last_block;
-             shifted--; --overwritten)
+        for (ublock r = end - blocks + 1, w = end; r--; --w)
         {
-            bs->blocks[overwritten] = bs->blocks[shifted];
+            bs->blocks[w] = bs->blocks[r];
         }
     }
     else
     {
-        ubit const remaining_shift = BITBLOCK_BITS - partial_shift;
-        for (ublock shifted = last_block - shifted_blocks,
-                    overwritten = last_block;
-             shifted > 0; --shifted, --overwritten)
+        ubit const remain = BITBLOCK_BITS - split;
+        for (ublock r = end - blocks, w = end; r > 0; --r, --w)
         {
-            bs->blocks[overwritten]
-                = (bs->blocks[shifted] << partial_shift)
-                  | (bs->blocks[shifted - 1] >> remaining_shift);
+            bs->blocks[w]
+                = (bs->blocks[r] << split) | (bs->blocks[r - 1] >> remain);
         }
-        bs->blocks[shifted_blocks] = bs->blocks[0] << partial_shift;
+        bs->blocks[blocks] = bs->blocks[0] << split;
     }
     /* Zero fills in lower bits just as an integer shift would. */
-    for (ublock i = 0; i < shifted_blocks; ++i)
+    for (ublock i = 0; i < blocks; ++i)
     {
         bs->blocks[i] = 0;
     }
@@ -334,29 +329,25 @@ ccc_bs_shiftr(ccc_bitset *const bs, size_t const right_shifts)
         set_all(bs, CCC_FALSE);
         return CCC_RESULT_OK;
     }
-    ublock const last_block = ublock_index(bs->count - 1);
-    ublock const shifted_blocks = ublock_index(right_shifts);
-    ubit partial_shift = ubit_index(right_shifts);
-    if (!partial_shift)
+    ublock const end = ublock_index(bs->count - 1);
+    ublock const blocks = ublock_index(right_shifts);
+    ubit split = ubit_index(right_shifts);
+    if (!split)
     {
-        for (ublock shifted = shifted_blocks, overwritten = 0;
-             shifted < last_block + 1; ++shifted, ++overwritten)
+        for (ublock r = blocks, w = 0; r < end + 1; ++r, ++w)
         {
-            bs->blocks[overwritten] = bs->blocks[shifted];
+            bs->blocks[w] = bs->blocks[r];
         }
     }
     else
     {
-        ubit remaining_shift = BITBLOCK_BITS - partial_shift;
-        for (ublock shifted = shifted_blocks, overwritten = 0;
-             shifted < last_block; ++shifted, ++overwritten)
+        ubit const remain = BITBLOCK_BITS - split;
+        for (ublock r = blocks, w = 0; r < end; ++r, ++w)
         {
-            bs->blocks[overwritten]
-                = (bs->blocks[shifted + 1] << remaining_shift)
-                  | (bs->blocks[shifted] >> partial_shift);
+            bs->blocks[w]
+                = (bs->blocks[r + 1] << remain) | (bs->blocks[r] >> split);
         }
-        bs->blocks[last_block - shifted_blocks]
-            = bs->blocks[last_block] >> partial_shift;
+        bs->blocks[end - blocks] = bs->blocks[end] >> split;
     }
     /* This is safe for a few reasons:
        - If shifts equals count we set all to 0 and returned early.
@@ -366,7 +357,7 @@ ccc_bs_shiftr(ccc_bitset *const bs, size_t const right_shifts)
        - All other cases ensure it is safe to decrease i (no underflow).
        This operation emulates the zeroing of high bits on a right shift and
        a bit set is considered unsigned so we don't sign bit fill. */
-    for (ublock i = last_block, end = last_block - shifted_blocks; i > end; --i)
+    for (ublock i = end; i > end - blocks; --i)
     {
         bs->blocks[i] = 0;
     }
