@@ -1687,7 +1687,6 @@ match so an efficient comparison is beneficial. */
 static inline match_mask
 match_tag(group const g, ccc_fhm_tag const m)
 {
-
     return (match_mask){
         _mm_movemask_epi8(_mm_cmpeq_epi8(g.v, _mm_set1_epi8((int8_t)m.v))),
     };
