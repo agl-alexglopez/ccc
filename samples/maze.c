@@ -229,7 +229,11 @@ that requires multiple containers. This is implemented in a manner that one
 would normally see in Rust or C++, where each container manages its own memory.
 For examples of non-owning container use and composition see other samples.
 This style of data structure use can be comfortable and convenient in some
-cases. */
+cases.
+
+However, we can still be "C" about it by thinking about reserving exactly
+the memory we need dynamically and giving no ability to the container to re-size
+later. In this way we exercise exact control over memory use of our program. */
 static void
 animate_maze(struct maze *maze)
 {
@@ -241,12 +245,14 @@ animate_maze(struct maze *maze)
     flat_hash_map cost_map
         = fhm_init((struct prim_cell *)NULL, NULL, cell, prim_cell_hash_fn,
                    prim_cell_eq, NULL, NULL, 0);
-    ccc_result const r = fhm_reserve(
-        &cost_map, ((maze->rows * maze->cols) / 2) + 1, std_alloc);
+    result r = fhm_reserve(&cost_map, ((maze->rows * maze->cols) / 2) + 1,
+                           std_alloc);
     prog_assert(r == CCC_RESULT_OK);
-    /* Priority queue will manage its own flat buffer. */
-    ccc_flat_priority_queue cell_pq = ccc_fpq_init(
-        (struct prim_cell *)NULL, CCC_LES, cmp_prim_cells, std_alloc, NULL, 0);
+    /* Priority queue gets same reserve interface. */
+    flat_priority_queue cell_pq = fpq_init((struct prim_cell *)NULL, CCC_LES,
+                                           cmp_prim_cells, NULL, NULL, 0);
+    r = fpq_reserve(&cell_pq, ((maze->rows * maze->cols) / 2) + 1, std_alloc);
+    prog_assert(r == CCC_RESULT_OK);
     struct point s = rand_point(maze);
     struct prim_cell const *const first = fhm_insert_entry_w(
         entry_r(&cost_map, &s),
@@ -277,8 +283,7 @@ animate_maze(struct maze *maze)
                 }
             }
         }
-        /* 0 is an invalid row and column in any maze. */
-        if (min_cell.cell.r)
+        if (min != INT_MAX)
         {
             join_squares_animated(maze, c->cell, min_cell.cell, speed);
             (void)push(&cell_pq, &min_cell);
@@ -290,8 +295,8 @@ animate_maze(struct maze *maze)
     }
     /* If a container is reserved without allocation permission it has no way
        to free itself. Give it the same allocation function used to reserve. */
-    (void)ccc_fhm_clear_and_free_reserve(&cost_map, NULL, std_alloc);
-    (void)ccc_fpq_clear_and_free(&cell_pq, NULL);
+    (void)fhm_clear_and_free_reserve(&cost_map, NULL, std_alloc);
+    (void)fpq_clear_and_free_reserve(&cell_pq, NULL, std_alloc);
 }
 
 /*===================     Container Support Code     ========================*/
@@ -473,7 +478,7 @@ print_square(struct maze const *m, int const r, int const c)
     uint16_t const square = maze_at(m, r, c);
     if (!(square & path_bit))
     {
-        if (r % 2 != 0)
+        if (r % 2)
         {
             printf("%s", walls[maze_at(m, r - 1, c) & wall_mask]);
         }
@@ -484,11 +489,11 @@ print_square(struct maze const *m, int const r, int const c)
     }
     else if (square & path_bit)
     {
-        if (r % 2 == 0)
+        if (r % 2)
         {
-            if (!(maze_at(m, r + 1, c) & path_bit))
+            if (r > 0 && !(maze_at(m, r - 1, c) & path_bit))
             {
-                printf("▄");
+                printf("▀");
             }
             else
             {
@@ -497,9 +502,9 @@ print_square(struct maze const *m, int const r, int const c)
         }
         else
         {
-            if (r > 0 && !(maze_at(m, r - 1, c) & path_bit))
+            if (!(maze_at(m, r + 1, c) & path_bit))
             {
-                printf("▀");
+                printf("▄");
             }
             else
             {
