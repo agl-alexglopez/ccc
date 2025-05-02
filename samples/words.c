@@ -677,15 +677,7 @@ cmp_string_keys(any_key_cmp const c)
     char const *const struct_word = str_arena_at(a, w->ofs);
     PROG_ASSERT(key_word && struct_word);
     int const res = strcmp(key_word, struct_word);
-    if (res > 0)
-    {
-        return CCC_GRT;
-    }
-    if (res < 0)
-    {
-        return CCC_LES;
-    }
-    return CCC_EQL;
+    return (res > 0) - (res < 0);
 }
 
 /* Sorts by frequency then alphabetic order if frequencies are tied. */
@@ -707,15 +699,7 @@ cmp_freqs(any_type_cmp const c)
     /* Looks like we have chosen wrong order to return but not so: greater
        lexicographic order is sorted first in a min priority queue or CCC_LES
        in this case. */
-    if (res > 0)
-    {
-        return CCC_LES;
-    }
-    if (res < 0)
-    {
-        return CCC_GRT;
-    }
-    return CCC_EQL;
+    return (res < 0) - (res > 0);
 }
 
 /*=======================   CLI Helpers    ==================================*/
