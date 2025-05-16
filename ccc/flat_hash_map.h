@@ -391,6 +391,7 @@ key is NULL. */
 /** @name Entry Interface
 Obtain and operate on container entries for efficient queries when non-trivial
 control flow is needed. */
+/**@{*/
 
 /** @brief Obtains an entry for the provided key in the table for future use.
 @param [in] h the hash table to be searched.
