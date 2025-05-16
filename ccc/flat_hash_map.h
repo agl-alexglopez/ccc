@@ -21,13 +21,13 @@ them by key in amortized O(1). Elements in the table may be copied and moved,
 especially when rehashing occurs, so no pointer stability is available in this
 implementation.
 
-A flat hash map requires the user to provide a type, pointers to positions in a
-contiguous array, a hash function, and a key comparator function. The hash
-function should be well tailored to the key being stored in the table to prevent
-collisions. Good variety in the upper bits of the hashed value will also result
-in faster performance. Currently, the flat hash map does not offer any default
-hash functions or hash strengthening algorithms so strong hash functions should
-be obtained by the user for the data set.
+A flat hash map requires the user to provide a pointer to the map, a type, a key
+field, a hash function, and a key comparator function. The hash function should
+be well tailored to the key being stored in the table to prevent collisions.
+Good variety in the upper bits of the hashed value will also result in faster
+performance. Currently, the flat hash map does not offer any default hash
+functions or hash strengthening algorithms so strong hash functions should be
+obtained by the user for the data set.
 
 To shorten names in the interface, define the following preprocessor directive
 at the top of your file.
@@ -68,8 +68,8 @@ typedef union ccc_fhmap_entry ccc_fhmap_entry;
 
 /** @name Initialization Interface
 Initialize the container with memory, callbacks, and permissions. When a fixed
-size map is required that will not have allocation permission, a few extra steps
-are required (see ccc_fhm_declare_fixed_map). */
+size map is required that will not have allocation permission, the user must
+declare the type name and size of the map they will use. */
 /**@{*/
 
 /** @brief Declare a fixed size map type for use in the stack, heap, or data
@@ -82,10 +82,8 @@ behavior, wrap a field in a struct/union (e.g. `union int_elem {int e;};`).
 @warning the capacity must be a power of two greater than 8 or 16, depending on
 the platform (e.g. 16, 32, 64, etc.).
 
-Once the type has been declared, two fields will be available, .data and .tag.
 Once the location for the fixed size map is chosen--stack, heap, or data
-segment--provide those two fields to the initializer for a flat hash map as
-follows:
+segment--provide a pointer to the map for the initialization macro.
 
 ```
 struct val
@@ -94,10 +92,16 @@ struct val
     int val;
 };
 ccc_fhm_declare_fixed_map(small_fixed_map, struct val, 64);
-static small_fixed_map mem;
-static ccc_flat_hash_map static_fh
-    = fhm_init(mem.data, mem.tag, key, fhmap_int_to_u64, fhmap_id_eq, NULL,
-               NULL, ccc_fhm_fixed_capacity(small_fixed_map));
+static flat_hash_map static_fh = fhm_init(
+    &(static small_fixed_map){},
+    struct val,
+    key,
+    fhmap_int_to_u64,
+    fhmap_id_eq,
+    NULL,
+    NULL,
+    fhm_fixed_capacity(small_fixed_map)
+);
 ```
 
 Similarly, a fixed size map can be used on the stack.
@@ -111,10 +115,16 @@ struct val
 ccc_fhm_declare_fixed_map(small_fixed_map, struct val, 64);
 int main(void)
 {
-    small_fixed_map mem;
-    ccc_flat_hash_map stack_fh
-        = fhm_init(mem.data, mem.tag, key, fhmap_int_to_u64, fhmap_id_eq, NULL,
-                   NULL, ccc_fhm_fixed_capacity(small_fixed_map));
+    static flat_hash_map static_fh = fhm_init(
+        &(small_fixed_map){},
+        struct val,
+        key,
+        fhmap_int_to_u64,
+        fhmap_id_eq,
+        NULL,
+        NULL,
+        fhm_fixed_capacity(small_fixed_map)
+    );
     return 0;
 }
 ```
@@ -125,7 +135,7 @@ size map on the heap; however, it is usually better to initialize a dynamic
 map and use the ccc_fhm_reserve function for such a use case.
 
 This macro is not needed when a dynamic resizing flat hash map is needed. For
-dynamic maps see the ccc_fhm_init macro. */
+dynamic maps, simply pass NULL and 0 capacity to the initialization macro. */
 #define ccc_fhm_declare_fixed_map(fixed_map_type_name, key_val_type_name,      \
                                   capacity)                                    \
     ccc_impl_fhm_declare_fixed_map(fixed_map_type_name, key_val_type_name,     \
