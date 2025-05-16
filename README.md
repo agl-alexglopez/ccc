@@ -297,10 +297,10 @@ main(void)
 {
     /* fixed map on the stack, data and tag fields built in, key field named
        key, a hash function, an equality function, no allocation, no aux. */
-    small_fixed_map mem;
     ccc_flat_hash_map fh;
-        = fhm_init(mem.data, mem.tag, key, fhmap_int_to_u64, fhmap_id_eq,
-                   NULL, NULL, fhm_fixed_capacity(small_fixed_map));
+        = fhm_init(&(small_fixed_map){}, struct val, key, fhmap_int_to_u64,
+                   fhmap_id_eq, NULL, NULL,
+                   fhm_fixed_capacity(small_fixed_map));
     int const addends[10] = {1, 3, -980, 6, 7, 13, 44, 32, 995, -1};
     int const target = 15;
     int solution_indices[2] = {-1, -1};
@@ -948,10 +948,9 @@ struct val
     int val;
 };
 fhm_declare_fixed_map(small_fixed_map, struct val, 64);
-static small_fixed_map mem;
 static flat_hash_map static_fh
-    = fhm_init(mem.data, mem.tag, key, fhmap_int_to_u64, fhmap_id_eq, NULL,
-               NULL, fhm_fixed_capacity(small_fixed_map));
+    = fhm_init(&(static small_fixed_map){}, struct val, key, fhmap_int_to_u64,
+               fhmap_id_eq, NULL, NULL, fhm_fixed_capacity(small_fixed_map));
 ```
 
 A flat hash map can also be initialized in preparation for dynamic allocation at compile time if an allocation function is provided (see [allocation](#allocation) for more on `std_alloc`).
@@ -964,8 +963,8 @@ struct val
     int val;
 };
 static flat_hash_map static_fh
-    = fhm_init((struct val *)NULL, NULL, key, fhmap_int_to_u64, fhmap_id_eq,
-               std_alloc, NULL, 0);
+    = fhm_init(NULL, struct val, key, fhmap_int_to_u64, fhmap_id_eq, std_alloc,
+               NULL, 0);
 ```
 
 All other containers provide default initialization macros that can be used at compile time or runtime. For example, initializing a ring buffer at compile time is simple.
