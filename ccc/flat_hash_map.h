@@ -21,13 +21,13 @@ them by key in amortized O(1). Elements in the table may be copied and moved,
 especially when rehashing occurs, so no pointer stability is available in this
 implementation.
 
-A flat hash map requires the user to provide a type, pointers to positions in a
-contiguous array, a hash function, and a key comparator function. The hash
-function should be well tailored to the key being stored in the table to prevent
-collisions. Good variety in the upper bits of the hashed value will also result
-in faster performance. Currently, the flat hash map does not offer any default
-hash functions or hash strengthening algorithms so strong hash functions should
-be obtained by the user for the data set.
+A flat hash map requires the user to provide a pointer to the map, a type, a key
+field, a hash function, and a key comparator function. The hash function should
+be well tailored to the key being stored in the table to prevent collisions.
+Good variety in the upper bits of the hashed value will also result in faster
+performance. Currently, the flat hash map does not offer any default hash
+functions or hash strengthening algorithms so strong hash functions should be
+obtained by the user for the data set.
 
 To shorten names in the interface, define the following preprocessor directive
 at the top of your file.
@@ -68,8 +68,8 @@ typedef union ccc_fhmap_entry ccc_fhmap_entry;
 
 /** @name Initialization Interface
 Initialize the container with memory, callbacks, and permissions. When a fixed
-size map is required that will not have allocation permission, a few extra steps
-are required (see ccc_fhm_declare_fixed_map). */
+size map is required that will not have allocation permission, the user must
+declare the type name and size of the map they will use. */
 /**@{*/
 
 /** @brief Declare a fixed size map type for use in the stack, heap, or data
@@ -82,10 +82,8 @@ behavior, wrap a field in a struct/union (e.g. `union int_elem {int e;};`).
 @warning the capacity must be a power of two greater than 8 or 16, depending on
 the platform (e.g. 16, 32, 64, etc.).
 
-Once the type has been declared, two fields will be available, .data and .tag.
 Once the location for the fixed size map is chosen--stack, heap, or data
-segment--provide those two fields to the initializer for a flat hash map as
-follows:
+segment--provide a pointer to the map for the initialization macro.
 
 ```
 struct val
@@ -94,10 +92,16 @@ struct val
     int val;
 };
 ccc_fhm_declare_fixed_map(small_fixed_map, struct val, 64);
-static small_fixed_map mem;
-static ccc_flat_hash_map static_fh
-    = fhm_init(mem.data, mem.tag, key, fhmap_int_to_u64, fhmap_id_eq, NULL,
-               NULL, ccc_fhm_fixed_capacity(small_fixed_map));
+static flat_hash_map static_fh = fhm_init(
+    &(static small_fixed_map){},
+    struct val,
+    key,
+    fhmap_int_to_u64,
+    fhmap_id_eq,
+    NULL,
+    NULL,
+    fhm_fixed_capacity(small_fixed_map)
+);
 ```
 
 Similarly, a fixed size map can be used on the stack.
@@ -111,10 +115,16 @@ struct val
 ccc_fhm_declare_fixed_map(small_fixed_map, struct val, 64);
 int main(void)
 {
-    small_fixed_map mem;
-    ccc_flat_hash_map stack_fh
-        = fhm_init(mem.data, mem.tag, key, fhmap_int_to_u64, fhmap_id_eq, NULL,
-                   NULL, ccc_fhm_fixed_capacity(small_fixed_map));
+    static flat_hash_map static_fh = fhm_init(
+        &(small_fixed_map){},
+        struct val,
+        key,
+        fhmap_int_to_u64,
+        fhmap_id_eq,
+        NULL,
+        NULL,
+        fhm_fixed_capacity(small_fixed_map)
+    );
     return 0;
 }
 ```
@@ -125,7 +135,7 @@ size map on the heap; however, it is usually better to initialize a dynamic
 map and use the ccc_fhm_reserve function for such a use case.
 
 This macro is not needed when a dynamic resizing flat hash map is needed. For
-dynamic maps see the ccc_fhm_init macro. */
+dynamic maps, simply pass NULL and 0 capacity to the initialization macro. */
 #define ccc_fhm_declare_fixed_map(fixed_map_type_name, key_val_type_name,      \
                                   capacity)                                    \
     ccc_impl_fhm_declare_fixed_map(fixed_map_type_name, key_val_type_name,     \
@@ -139,9 +149,8 @@ restrictions. */
     ccc_impl_fhm_fixed_capacity(fixed_map_type_name)
 
 /** @brief Initialize a map with a buffer of types at compile time or runtime.
-@param [in] data_ptr a pointer to the .data of user type T field of a fixed map
-or (T *)NULL.
-@param [in] tag_ptr a pointer to the .tag field of a fixed map or NULL.
+@param [in] map_ptr a pointer to a fixed map allocation or NULL.
+@param [in] any_type_name the name of the user defined type stored in the map.
 @param [in] key_field the field of the struct used for key storage.
 @param [in] hash_fn the ccc_any_key_hash_fn function the user desires for the
 table.
@@ -152,47 +161,59 @@ resizing is allowed.
 @param [in] capacity the capacity of a fixed size map or 0.
 @return the flat hash map directly initialized on the right hand side of the
 equality operator (i.e. ccc_flat_hash_map fh = ccc_fhm_init(...);)
-@warning if a dynamic resizing map is required provide two NULL pointers with
-the data pointer casted to the type stored in the table.
+@note if a dynamic resizing map is required provide NULL as the map_ptr.
 
 Initialize a static fixed size hash map at compile time that has
 no allocation permission or auxiliary data needed.
 
 ```
+#define FLAT_HASH_MAP_USING_NAMESPACE_CCC
 struct val
 {
     int key;
     int val;
 };
-ccc_fhm_declare_fixed_map(small_fixed_map, struct val, 64);
-static small_fixed_map mem;
-// Hash and equality functions are defined by the user.
-static ccc_flat_hash_map static_fh
-    = fhm_init(mem.data, mem.tag, key, fhmap_int_to_u64, fhmap_id_eq, NULL,
-               NULL, ccc_fhm_fixed_capacity(small_fixed_map));
+fhm_declare_fixed_map(small_fixed_map, struct val, 64);
+static flat_hash_map static_fh = fhm_init(
+    &(static small_fixed_map){},
+    struct val,
+    key,
+    fhmap_int_to_u64,
+    fhmap_id_eq,
+    NULL,
+    NULL,
+    fhm_fixed_capacity(small_fixed_map)
+);
 ```
 
 Initialize a dynamic hash table at compile time with allocation permission and
 no auxiliary data. Use the same type as the previous example.
 
 ```
+#define FLAT_HASH_MAP_USING_NAMESPACE_CCC
 struct val
 {
     int key;
     int val;
 };
 // Hash, equality, and allocation functions are defined by the user.
-static ccc_flat_hash_map static_fh
-    = fhm_init((struct val *)NULL, NULL, key, fhmap_int_to_u64, fhmap_id_eq,
-               std_alloc, NULL, 0);
+static flat_hash_map static_fh = fhm_init(
+    NULL,
+    struct val,
+    key,
+    fhmap_int_to_u64,
+    fhmap_id_eq,
+    std_alloc,
+    NULL,
+    0
+);
 ```
 
 Initialization at runtime is also possible. Stack-based or dynamic maps are
-identical to the provided examples, except without the `static` keyword in a
-runtime context. */
-#define ccc_fhm_init(data_ptr, tag_ptr, key_field, hash_fn, key_eq_fn,         \
+identical to the provided examples. Omit `static` in a runtime context. */
+#define ccc_fhm_init(map_ptr, any_type_name, key_field, hash_fn, key_eq_fn,    \
                      alloc_fn, aux_data, capacity)                             \
-    ccc_impl_fhm_init(data_ptr, tag_ptr, key_field, hash_fn, key_eq_fn,        \
+    ccc_impl_fhm_init(map_ptr, any_type_name, key_field, hash_fn, key_eq_fn,   \
                       alloc_fn, aux_data, capacity)
 
 /** @brief Copy the map at source to destination.
@@ -219,16 +240,28 @@ struct val
     int key;
     int val;
 };
-ccc_fhm_declare_fixed_map(small_fixed_map, struct val, 64);
-static small_fixed_map mem_a;
-static ccc_flat_hash_map src
-    = fhm_init(mem_a.data, mem_a.tag, key, fhmap_int_to_u64, fhmap_id_eq, NULL,
-               NULL, ccc_fhm_fixed_capacity(small_fixed_map));
+fhm_declare_fixed_map(small_fixed_map, struct val, 64);
+flat_hash_map src = fhm_init(
+    &(static small_fixed_map){},
+    struct val,
+    key,
+    fhmap_int_to_u64,
+    fhmap_id_eq,
+    NULL,
+    NULL,
+    ccc_fhm_fixed_capacity(small_fixed_map)
+);
 insert_rand_vals(&src);
-static small_fixed_map mem_b;
-static flat_hash_map dst
-    = fhm_init(mem_b.data, mem_b.tag, key, fhmap_int_to_u64, fhmap_id_eq, NULL,
-               NULL, ccc_fhm_fixed_capacity(small_fixed_map));
+flat_hash_map dst = fhm_init(
+    &(static small_fixed_map){},
+    struct val,
+    key,
+    fhmap_int_to_u64,
+    fhmap_id_eq,
+    NULL,
+    NULL,
+    ccc_fhm_fixed_capacity(small_fixed_map)
+);
 ccc_result res = fhm_copy(&dst, &src, NULL);
 ```
 
@@ -242,13 +275,27 @@ struct val
     int key;
     int val;
 };
-static ccc_flat_hash_map src
-    = fhm_init((struct val *)NULL, NULL, key, fhmap_int_to_u64, fhmap_id_eq,
-               std_alloc, NULL, 0);
+flat_hash_map src = fhm_init(
+    NULL,
+    struct val,
+    key,
+    fhmap_int_to_u64,
+    fhmap_id_eq,
+    std_alloc,
+    NULL,
+    0
+);
 insert_rand_vals(&src);
-static flat_hash_map dst
-    = fhm_init((struct val *)NULL, NULL, key, fhmap_int_to_u64, fhmap_id_eq,
-               std_alloc, NULL, 0);
+flat_hash_map dst = fhm_init(
+    NULL,
+    struct val,
+    key,
+    fhmap_int_to_u64,
+    fhmap_id_eq,
+    std_alloc,
+    NULL,
+    0
+);
 ccc_result res = fhm_copy(&dst, &src, std_alloc);
 ```
 
@@ -264,13 +311,27 @@ struct val
     int key;
     int val;
 };
-static ccc_flat_hash_map src
-    = fhm_init((struct val *)NULL, NULL, key, fhmap_int_to_u64, fhmap_id_eq,
-               std_alloc, NULL, 0);
+flat_hash_map src = fhm_init(
+    NULL,
+    struct val,
+    key,
+    fhmap_int_to_u64,
+    fhmap_id_eq,
+    std_alloc,
+    NULL,
+    0
+);
 insert_rand_vals(&src);
-static flat_hash_map dst
-    = fhm_init((struct val *)NULL, NULL, key, fhmap_int_to_u64, fhmap_id_eq,
-               NULL, NULL, 0);
+flat_hash_map dst = fhm_init(
+    NULL,
+    struct val,
+    key,
+    fhmap_int_to_u64,
+    fhmap_id_eq,
+    NULL,
+    NULL,
+    0
+);
 ccc_result res = fhm_copy(&dst, &src, std_alloc);
 ```
 
@@ -330,6 +391,7 @@ key is NULL. */
 /** @name Entry Interface
 Obtain and operate on container entries for efficient queries when non-trivial
 control flow is needed. */
+/**@{*/
 
 /** @brief Obtains an entry for the provided key in the table for future use.
 @param [in] h the hash table to be searched.

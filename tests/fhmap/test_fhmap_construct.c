@@ -23,9 +23,8 @@ modw(ccc_any_type const u)
     v->val = *((int *)u.aux);
 }
 
-static small_fixed_map static_fh_mem;
 static ccc_flat_hash_map static_fh
-    = fhm_init(static_fh_mem.data, static_fh_mem.tag, key, fhmap_int_to_u64,
+    = fhm_init(&(small_fixed_map){}, struct val, key, fhmap_int_to_u64,
                fhmap_id_eq, NULL, NULL, SMALL_FIXED_CAP);
 
 CHECK_BEGIN_STATIC_FN(fhmap_test_static_init)
@@ -70,12 +69,12 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_static_init)
 
 CHECK_BEGIN_STATIC_FN(fhmap_test_copy_no_alloc)
 {
-    small_fixed_map src_mem;
-    standard_fixed_map dst_mem;
-    flat_hash_map src = fhm_init(src_mem.data, src_mem.tag, key, fhmap_int_zero,
-                                 fhmap_id_eq, NULL, NULL, SMALL_FIXED_CAP);
-    flat_hash_map dst = fhm_init(dst_mem.data, dst_mem.tag, key, fhmap_int_zero,
-                                 fhmap_id_eq, NULL, NULL, STANDARD_FIXED_CAP);
+    flat_hash_map src
+        = fhm_init(&(small_fixed_map){}, struct val, key, fhmap_int_zero,
+                   fhmap_id_eq, NULL, NULL, SMALL_FIXED_CAP);
+    flat_hash_map dst
+        = fhm_init(&(standard_fixed_map){}, struct val, key, fhmap_int_zero,
+                   fhmap_id_eq, NULL, NULL, STANDARD_FIXED_CAP);
     (void)swap_entry(&src, &(struct val){.key = 0});
     (void)swap_entry(&src, &(struct val){.key = 1, .val = 1});
     (void)swap_entry(&src, &(struct val){.key = 2, .val = 2});
@@ -97,12 +96,12 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_copy_no_alloc)
 
 CHECK_BEGIN_STATIC_FN(fhmap_test_copy_no_alloc_fail)
 {
-    standard_fixed_map src_mem;
-    small_fixed_map dst_mem;
-    flat_hash_map src = fhm_init(src_mem.data, src_mem.tag, key, fhmap_int_zero,
-                                 fhmap_id_eq, NULL, NULL, STANDARD_FIXED_CAP);
-    flat_hash_map dst = fhm_init(dst_mem.data, dst_mem.tag, key, fhmap_int_zero,
-                                 fhmap_id_eq, NULL, NULL, SMALL_FIXED_CAP);
+    flat_hash_map src
+        = fhm_init(&(standard_fixed_map){}, struct val, key, fhmap_int_zero,
+                   fhmap_id_eq, NULL, NULL, STANDARD_FIXED_CAP);
+    flat_hash_map dst
+        = fhm_init(&(small_fixed_map){}, struct val, key, fhmap_int_zero,
+                   fhmap_id_eq, NULL, NULL, SMALL_FIXED_CAP);
     (void)swap_entry(&src, &(struct val){.key = 0});
     (void)swap_entry(&src, &(struct val){.key = 1, .val = 1});
     (void)swap_entry(&src, &(struct val){.key = 2, .val = 2});
@@ -115,9 +114,9 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_copy_no_alloc_fail)
 
 CHECK_BEGIN_STATIC_FN(fhmap_test_copy_alloc)
 {
-    flat_hash_map src = fhm_init((struct val *)NULL, NULL, key, fhmap_int_zero,
+    flat_hash_map src = fhm_init(NULL, struct val, key, fhmap_int_zero,
                                  fhmap_id_eq, std_alloc, NULL, 0);
-    flat_hash_map dst = fhm_init((struct val *)NULL, NULL, key, fhmap_int_zero,
+    flat_hash_map dst = fhm_init(NULL, struct val, key, fhmap_int_zero,
                                  fhmap_id_eq, std_alloc, NULL, 0);
     (void)swap_entry(&src, &(struct val){.key = 0});
     (void)swap_entry(&src, &(struct val){.key = 1, .val = 1});
@@ -143,9 +142,9 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_copy_alloc)
 
 CHECK_BEGIN_STATIC_FN(fhmap_test_copy_alloc_fail)
 {
-    flat_hash_map src = fhm_init((struct val *)NULL, NULL, key, fhmap_int_zero,
+    flat_hash_map src = fhm_init(NULL, struct val, key, fhmap_int_zero,
                                  fhmap_id_eq, std_alloc, NULL, 0);
-    flat_hash_map dst = fhm_init((struct val *)NULL, NULL, key, fhmap_int_zero,
+    flat_hash_map dst = fhm_init(NULL, struct val, key, fhmap_int_zero,
                                  fhmap_id_eq, std_alloc, NULL, 0);
     (void)swap_entry(&src, &(struct val){.key = 0});
     (void)swap_entry(&src, &(struct val){.key = 1, .val = 1});
@@ -159,9 +158,9 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_copy_alloc_fail)
 
 CHECK_BEGIN_STATIC_FN(fhmap_test_empty)
 {
-    small_fixed_map s;
-    flat_hash_map fh = fhm_init(s.data, s.tag, key, fhmap_int_zero, fhmap_id_eq,
-                                NULL, NULL, SMALL_FIXED_CAP);
+    flat_hash_map fh
+        = fhm_init(&(small_fixed_map){}, struct val, key, fhmap_int_zero,
+                   fhmap_id_eq, NULL, NULL, SMALL_FIXED_CAP);
     CHECK(is_empty(&fh), true);
     CHECK_END_FN();
 }

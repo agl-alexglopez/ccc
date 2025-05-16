@@ -243,7 +243,7 @@ animate_maze(struct maze *maze)
     /* Test use case of reserve without reallocation permission. Guarantees
        exactly the needed memory and no more over lifetime of program. */
     flat_hash_map cost_map
-        = fhm_init((struct prim_cell *)NULL, NULL, cell, prim_cell_hash_fn,
+        = fhm_init(NULL, struct prim_cell, cell, prim_cell_hash_fn,
                    prim_cell_eq, NULL, NULL, 0);
     result r = fhm_reserve(&cost_map, ((maze->rows * maze->cols) / 2) + 1,
                            std_alloc);

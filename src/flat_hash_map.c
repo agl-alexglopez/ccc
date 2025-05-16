@@ -284,6 +284,7 @@ static ccc_result maybe_rehash(struct ccc_fhmap *h, size_t to_add,
 static void insert_and_copy(struct ccc_fhmap *h, void const *key_val_type,
                             ccc_fhm_tag m, size_t i);
 static void erase(struct ccc_fhmap *h, size_t i);
+static ccc_result check_init(struct ccc_fhmap *, size_t required_total_cap);
 static void rehash_in_place(struct ccc_fhmap *h);
 static ccc_tribool is_same_group(size_t i, size_t new_i, uint64_t hash,
                                  size_t mask);
@@ -323,6 +324,7 @@ static unsigned clz_size_t(size_t n);
 static size_t next_power_of_two(size_t n);
 static ccc_tribool is_power_of_two(size_t n);
 static size_t to_power_of_two(size_t n);
+static ccc_tribool is_uninitialized(struct ccc_fhmap const *);
 
 /*===========================    Interface   ================================*/
 
@@ -363,7 +365,7 @@ ccc_fhm_contains(ccc_flat_hash_map const *const h, void const *const key)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    if (unlikely(!h->init || !h->count))
+    if (unlikely(is_uninitialized(h) || !h->count))
     {
         return CCC_FALSE;
     }
@@ -373,7 +375,7 @@ ccc_fhm_contains(ccc_flat_hash_map const *const h, void const *const key)
 void *
 ccc_fhm_get_key_val(ccc_flat_hash_map const *const h, void const *const key)
 {
-    if (unlikely(!h || !key || !h->init || !h->count))
+    if (unlikely(!h || !key || is_uninitialized(h) || !h->count))
     {
         return NULL;
     }
@@ -570,7 +572,7 @@ ccc_fhm_remove(ccc_flat_hash_map *const h, void *const key_val_type_output)
     {
         return (ccc_entry){{.stats = CCC_ENTRY_ARG_ERROR}};
     }
-    if (unlikely(!h->init || !h->count))
+    if (unlikely(is_uninitialized(h) || !h->count))
     {
         return (ccc_entry){{.stats = CCC_ENTRY_VACANT}};
     }
@@ -591,7 +593,8 @@ ccc_fhm_remove(ccc_flat_hash_map *const h, void *const key_val_type_output)
 void *
 ccc_fhm_begin(ccc_flat_hash_map const *const h)
 {
-    if (unlikely(!h || !h->mask || !h->init || !h->mask || !h->count))
+    if (unlikely(!h || !h->mask || is_uninitialized(h) || !h->mask
+                 || !h->count))
     {
         return NULL;
     }
@@ -609,7 +612,8 @@ void *
 ccc_fhm_next(ccc_flat_hash_map const *const h,
              void const *const key_val_type_iter)
 {
-    if (unlikely(!h || !key_val_type_iter || !h->mask || !h->init || !h->count))
+    if (unlikely(!h || !key_val_type_iter || !h->mask || is_uninitialized(h)
+                 || !h->count))
     {
         return NULL;
     }
@@ -653,7 +657,7 @@ ccc_fhm_clear(ccc_flat_hash_map *const h, ccc_any_type_destructor_fn *const fn)
     }
     if (!fn)
     {
-        if (unlikely(!h->init || !h->mask || !h->tag))
+        if (unlikely(is_uninitialized(h) || !h->mask || !h->tag))
         {
             return CCC_RESULT_OK;
         }
@@ -682,7 +686,7 @@ ccc_result
 ccc_fhm_clear_and_free(ccc_flat_hash_map *const h,
                        ccc_any_type_destructor_fn *const fn)
 {
-    if (unlikely(!h || !h->data || !h->mask || !h->init))
+    if (unlikely(!h || !h->data || !h->mask || is_uninitialized(h)))
     {
         return CCC_RESULT_ARG_ERROR;
     }
@@ -706,7 +710,6 @@ ccc_fhm_clear_and_free(ccc_flat_hash_map *const h,
     }
     h->remain = 0;
     h->mask = 0;
-    h->init = CCC_FALSE;
     h->count = 0;
     h->tag = NULL;
     h->data = h->alloc_fn(h->data, 0, h->aux);
@@ -718,7 +721,7 @@ ccc_fhm_clear_and_free_reserve(ccc_flat_hash_map *const h,
                                ccc_any_type_destructor_fn *const destructor,
                                ccc_any_alloc_fn *const alloc)
 {
-    if (unlikely(!h || !h->data || !h->init || !h->mask
+    if (unlikely(!h || !h->data || is_uninitialized(h) || !h->mask
                  || (h->alloc_fn && h->alloc_fn != alloc)))
     {
         return CCC_RESULT_ARG_ERROR;
@@ -743,7 +746,6 @@ ccc_fhm_clear_and_free_reserve(ccc_flat_hash_map *const h,
     }
     h->remain = 0;
     h->mask = 0;
-    h->init = CCC_FALSE;
     h->count = 0;
     h->tag = NULL;
     h->data = alloc(h->data, 0, h->aux);
@@ -799,6 +801,11 @@ ccc_fhm_copy(ccc_flat_hash_map *const dst, ccc_flat_hash_map const *const src,
     {
         return CCC_RESULT_NO_ALLOC;
     }
+    ccc_result check = check_init(dst, 0);
+    if (check != CCC_RESULT_OK)
+    {
+        return check;
+    }
     /* The destination could be messed up in a variety of ways that make it
        incompatible with src. Overwrite everything and save what we need from
        dst for a smooth copy over. */
@@ -806,16 +813,14 @@ ccc_fhm_copy(ccc_flat_hash_map *const dst, ccc_flat_hash_map const *const src,
     void *const dst_tag = dst->tag;
     size_t const dst_mask = dst->mask;
     size_t const dst_remain = dst->remain;
-    ccc_tribool const dst_init = dst->init;
     ccc_any_alloc_fn *const dst_alloc = dst->alloc_fn;
     *dst = *src;
     dst->data = dst_data;
     dst->tag = dst_tag;
     dst->mask = dst_mask;
     dst->remain = dst_remain;
-    dst->init = dst_init;
     dst->alloc_fn = dst_alloc;
-    if (!src->mask || !src->init)
+    if (!src->mask || is_uninitialized(src))
     {
         return CCC_RESULT_OK;
     }
@@ -841,7 +846,6 @@ ccc_fhm_copy(ccc_flat_hash_map *const dst, ccc_flat_hash_map const *const src,
     (void)memset(dst->tag, TAG_EMPTY, mask_to_tag_bytes(dst->mask));
     dst->remain = mask_to_load_factor_cap(dst->mask);
     dst->count = 0;
-    dst->init = CCC_TRUE;
     for (size_t i = 0; i < (src->mask + 1); ++i)
     {
         if (tag_full(src->tag[i]))
@@ -877,12 +881,12 @@ ccc_fhm_validate(ccc_flat_hash_map const *const h)
         return CCC_TRIBOOL_ERROR;
     }
     /* We initialized the metadata array of 0 capacity table? Not possible. */
-    if (h->init && !h->mask)
+    if (!is_uninitialized(h) && !h->mask)
     {
         return CCC_FALSE;
     }
     /* No point checking invariants when lazy init hasn't happened yet. */
-    if (!h->init || !h->mask)
+    if (is_uninitialized(h) || !h->mask)
     {
         return CCC_TRUE;
     }
@@ -1221,38 +1225,25 @@ maybe_rehash(struct ccc_fhmap *const h, size_t const to_add,
     {
         return CCC_RESULT_ARG_ERROR;
     }
-    if (unlikely(!h->init))
+    ccc_result const init = check_init(h, required_total_cap);
+    if (init != CCC_RESULT_OK)
     {
-        if (h->mask)
-        {
-            if (!h->tag || !h->data || h->mask + 1 < required_total_cap)
-            {
-                return CCC_RESULT_MEM_ERROR;
-            }
-            if (h->mask + 1 < CCC_FHM_GROUP_SIZE
-                || !is_power_of_two(h->mask + 1))
-            {
-                return CCC_RESULT_ARG_ERROR;
-            }
-            (void)memset(h->tag, TAG_EMPTY, mask_to_tag_bytes(h->mask));
-        }
-        h->init = CCC_TRUE;
+        return init;
     }
     if (unlikely(!h->mask))
     {
         required_total_cap = max(required_total_cap, CCC_FHM_GROUP_SIZE);
         size_t const total_bytes
             = mask_to_total_bytes(h->sizeof_type, required_total_cap - 1);
-        void *const buf = fn(NULL, total_bytes, h->aux);
-        if (!buf)
+        h->data = fn(NULL, total_bytes, h->aux);
+        if (!h->data)
         {
             return CCC_RESULT_MEM_ERROR;
         }
         h->mask = required_total_cap - 1;
-        h->data = buf;
         h->remain = mask_to_load_factor_cap(h->mask);
         /* Static assertions at top of file ensure this is correct. */
-        h->tag = (ccc_fhm_tag *)((char *)buf
+        h->tag = (ccc_fhm_tag *)((char *)h->data
                                  + mask_to_data_bytes(h->sizeof_type, h->mask));
         (void)memset(h->tag, TAG_EMPTY, mask_to_tag_bytes(h->mask));
     }
@@ -1386,6 +1377,34 @@ rehash_resize(struct ccc_fhmap *const h, size_t const to_add,
     new_h.count = h->count;
     (void)fn(h->data, 0, h->aux);
     *h = new_h;
+    return CCC_RESULT_OK;
+}
+
+/** Ensures the map is initialized due to our allowance of lazy initialization
+to support various sources of memory at compile and runtime. */
+static inline ccc_result
+check_init(struct ccc_fhmap *const h, size_t const required_total_cap)
+{
+    if (likely(!is_uninitialized(h)))
+    {
+        return CCC_RESULT_OK;
+    }
+    /* A fixed size map that is not initialized. */
+    if (h->mask)
+    {
+        if (!h->data || h->mask + 1 < required_total_cap)
+        {
+            return CCC_RESULT_MEM_ERROR;
+        }
+        if (h->mask + 1 < CCC_FHM_GROUP_SIZE || !is_power_of_two(h->mask + 1))
+        {
+            return CCC_RESULT_ARG_ERROR;
+        }
+        h->tag
+            = (ccc_fhm_tag *)((char *)h->data
+                              + +mask_to_data_bytes(h->sizeof_type, h->mask));
+        (void)memset(h->tag, TAG_EMPTY, mask_to_tag_bytes(h->mask));
+    }
     return CCC_RESULT_OK;
 }
 
@@ -1545,6 +1564,12 @@ static inline size_t
 max(size_t const a, size_t const b)
 {
     return a > b ? a : b;
+}
+
+static inline ccc_tribool
+is_uninitialized(struct ccc_fhmap const *const h)
+{
+    return (h->data && !h->tag) || (!h->data && !h->tag);
 }
 
 /*=====================   Intrinsics and Generics   =========================*/

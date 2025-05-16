@@ -98,15 +98,13 @@ enum : size_t
 
 static_assert(CAP * 1UL < SMALL_FIXED_CAP * 1UL);
 
-static small_fixed_map map_mem;
-
 /* This is a good opportunity to test the static initialization capabilities
    of the hash table and list. */
 static struct lru_cache lru_cache = {
     .cap = CAP,
     .l = dll_init(lru_cache.l, struct key_val, list_elem, cmp_by_key, std_alloc,
                   NULL),
-    .fh = fhm_init(map_mem.data, map_mem.tag, key, fhmap_int_to_u64,
+    .fh = fhm_init(&(small_fixed_map){}, struct val, key, fhmap_int_to_u64,
                    lru_lookup_cmp, NULL, NULL, SMALL_FIXED_CAP),
 };
 
