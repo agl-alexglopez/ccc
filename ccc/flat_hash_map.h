@@ -115,7 +115,7 @@ struct val
 ccc_fhm_declare_fixed_map(small_fixed_map, struct val, 64);
 int main(void)
 {
-    static flat_hash_map static_fh = fhm_init(
+    flat_hash_map static_fh = fhm_init(
         &(small_fixed_map){},
         struct val,
         key,
