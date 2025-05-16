@@ -342,10 +342,8 @@ This graph shows which files directly or indirectly include this file:</div>
 <dl class="section return"><dt>Returns</dt><dd>a compound literal reference to the modified entry if it was occupied or a vacant entry if it was vacant. </dd></dl>
 <dl class="section note"><dt>Note</dt><dd>T is a reference to the user type stored in the entry guaranteed to be non-NULL if the closure executes.</dd></dl>
 <div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_HASH_MAP_USING_NAMESPACE_CCC</span></div>
-<div class="line"><span class="comment">// Increment the key k if found otherwise do nothing.</span></div>
 <div class="line">fhm_entry *e = fhm_and_modify_w(entry_r(&amp;fhm, &amp;k), word, T-&gt;cnt++;);</div>
 <div class="line"> </div>
-<div class="line"><span class="comment">// Increment the key k if found otherwise insert a default value.</span></div>
 <div class="line">word *w = fhm_or_insert_w(fhm_and_modify_w(entry_r(&amp;fhm, &amp;k), word,</div>
 <div class="line">                                           { T-&gt;cnt++; }),</div>
 <div class="line">                          (word){.key = k, .cnt = 1});</div>
@@ -618,7 +616,6 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="line">    <span class="keywordtype">int</span> key;</div>
 <div class="line">    <span class="keywordtype">int</span> val;</div>
 <div class="line">};</div>
-<div class="line"><span class="comment">// Hash, equality, and allocation functions are defined by the user.</span></div>
 <div class="line"><span class="keyword">static</span> flat_hash_map static_fh = fhm_init(</div>
 <div class="line">    NULL,</div>
 <div class="line">    <span class="keyword">struct</span> val,</div>
