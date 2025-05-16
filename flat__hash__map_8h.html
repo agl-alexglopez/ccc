@@ -123,7 +123,7 @@ This graph shows which files directly or indirectly include this file:</div>
 <p><a href="flat__hash__map_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Initialization Interface</h2></td></tr>
-<tr><td class="ititle" colspan="2"><p>Initialize the container with memory, callbacks, and permissions. When a fixed size map is required that will not have allocation permission, a few extra steps are required (see ccc_fhm_declare_fixed_map). </p>
+<tr><td class="ititle" colspan="2"><p>Initialize the container with memory, callbacks, and permissions. When a fixed size map is required that will not have allocation permission, the user must declare the type name and size of the map they will use. </p>
 </td></tr>
 <tr class="memitem:a31f30782a976a516df763110c667aed5"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a31f30782a976a516df763110c667aed5">ccc_fhm_declare_fixed_map</a>(fixed_map_type_name,  key_val_type_name,  capacity)</td></tr>
 <tr class="memdesc:a31f30782a976a516df763110c667aed5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Declare a fixed size map type for use in the stack, heap, or data segment. Does not return a value.  <br /></td></tr>
@@ -131,9 +131,9 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memitem:ae33caa2a02f7dee60e61c146296db357"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#ae33caa2a02f7dee60e61c146296db357">ccc_fhm_fixed_capacity</a>(fixed_map_type_name)&#160;&#160;&#160;    ccc_impl_fhm_fixed_capacity(fixed_map_type_name)</td></tr>
 <tr class="memdesc:ae33caa2a02f7dee60e61c146296db357"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain the capacity previously chosen for the fixed size map type.  <br /></td></tr>
 <tr class="separator:ae33caa2a02f7dee60e61c146296db357"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a08de2e49817c4bad48fe1f29710c70f3"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a08de2e49817c4bad48fe1f29710c70f3">ccc_fhm_init</a>(data_ptr,  tag_ptr,  key_field,  hash_fn,  key_eq_fn,  alloc_fn,  aux_data,  capacity)</td></tr>
-<tr class="memdesc:a08de2e49817c4bad48fe1f29710c70f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a map with a buffer of types at compile time or runtime.  <br /></td></tr>
-<tr class="separator:a08de2e49817c4bad48fe1f29710c70f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a069c316044b54538c086596d01585410"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a069c316044b54538c086596d01585410">ccc_fhm_init</a>(map_ptr,  any_type_name,  key_field,  hash_fn,  key_eq_fn,  alloc_fn,  aux_data,  capacity)</td></tr>
+<tr class="memdesc:a069c316044b54538c086596d01585410"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a map with a buffer of types at compile time or runtime.  <br /></td></tr>
+<tr class="separator:a069c316044b54538c086596d01585410"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6b68e62760766164ae30d8c4adb314dc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a6b68e62760766164ae30d8c4adb314dc">ccc_fhm_copy</a> (<a class="el" href="flat__hash__map_8h.html#a16a7808cff5a3e445e18a830e3ef3e40">ccc_flat_hash_map</a> *dst, <a class="el" href="flat__hash__map_8h.html#a16a7808cff5a3e445e18a830e3ef3e40">ccc_flat_hash_map</a> const *src, <a class="el" href="types_8h.html#a3e73202894869d2840fb21ff912bbd96">ccc_any_alloc_fn</a> *fn)</td></tr>
 <tr class="memdesc:a6b68e62760766164ae30d8c4adb314dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy the map at source to destination.  <br /></td></tr>
 <tr class="separator:a6b68e62760766164ae30d8c4adb314dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -288,7 +288,7 @@ This graph shows which files directly or indirectly include this file:</div>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The Flat Hash Map Interface. </p>
 <p>A Flat Hash Map stores elements by hash value and allows the user to retrieve them by key in amortized O(1). Elements in the table may be copied and moved, especially when rehashing occurs, so no pointer stability is available in this implementation.</p>
-<p>A flat hash map requires the user to provide a type, pointers to positions in a contiguous array, a hash function, and a key comparator function. The hash function should be well tailored to the key being stored in the table to prevent collisions. Good variety in the upper bits of the hashed value will also result in faster performance. Currently, the flat hash map does not offer any default hash functions or hash strengthening algorithms so strong hash functions should be obtained by the user for the data set.</p>
+<p>A flat hash map requires the user to provide a pointer to the map, a type, a key field, a hash function, and a key comparator function. The hash function should be well tailored to the key being stored in the table to prevent collisions. Good variety in the upper bits of the hashed value will also result in faster performance. Currently, the flat hash map does not offer any default hash functions or hash strengthening algorithms so strong hash functions should be obtained by the user for the data set.</p>
 <p>To shorten names in the interface, define the following preprocessor directive at the top of your file.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_HASH_MAP_USING_NAMESPACE_CCC</span></div>
 </div><!-- fragment --><p>All types and functions can then be written without the <code>ccc_</code> prefix. </p>
@@ -397,20 +397,24 @@ This graph shows which files directly or indirectly include this file:</div>
   </dd>
 </dl>
 <dl class="section warning"><dt>Warning</dt><dd>the capacity must be a power of two greater than 8 or 16, depending on the platform (e.g. 16, 32, 64, etc.).</dd></dl>
-<p>Once the type has been declared, two fields will be available, .data and .tag. Once the location for the fixed size map is chosen&ndash;stack, heap, or data segment&ndash;provide those two fields to the initializer for a flat hash map as follows:</p>
+<p>Once the location for the fixed size map is chosen&ndash;stack, heap, or data segment&ndash;provide a pointer to the map for the initialization macro.</p>
 <div class="fragment"><div class="line"><span class="keyword">struct </span>val</div>
 <div class="line">{</div>
 <div class="line">    <span class="keywordtype">int</span> key;</div>
 <div class="line">    <span class="keywordtype">int</span> val;</div>
 <div class="line">};</div>
 <div class="line"><a class="code hl_define" href="flat__hash__map_8h.html#a31f30782a976a516df763110c667aed5">ccc_fhm_declare_fixed_map</a>(small_fixed_map, <span class="keyword">struct</span> val, 64);</div>
-<div class="line"><span class="keyword">static</span> small_fixed_map mem;</div>
-<div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="flat__hash__map_8h.html#a16a7808cff5a3e445e18a830e3ef3e40">ccc_flat_hash_map</a> static_fh</div>
-<div class="line">    = fhm_init(mem.data, mem.tag, key, fhmap_int_to_u64, fhmap_id_eq, NULL,</div>
-<div class="line">               NULL, <a class="code hl_define" href="flat__hash__map_8h.html#ae33caa2a02f7dee60e61c146296db357">ccc_fhm_fixed_capacity</a>(small_fixed_map));</div>
-<div class="ttc" id="aflat__hash__map_8h_html_a16a7808cff5a3e445e18a830e3ef3e40"><div class="ttname"><a href="flat__hash__map_8h.html#a16a7808cff5a3e445e18a830e3ef3e40">ccc_flat_hash_map</a></div><div class="ttdeci">struct ccc_fhmap ccc_flat_hash_map</div><div class="ttdoc">A container for storing key-value structures defined by the user in a contiguous buffer.</div><div class="ttdef"><b>Definition:</b> flat_hash_map.h:59</div></div>
-<div class="ttc" id="aflat__hash__map_8h_html_a31f30782a976a516df763110c667aed5"><div class="ttname"><a href="flat__hash__map_8h.html#a31f30782a976a516df763110c667aed5">ccc_fhm_declare_fixed_map</a></div><div class="ttdeci">#define ccc_fhm_declare_fixed_map(fixed_map_type_name, key_val_type_name, capacity)</div><div class="ttdoc">Declare a fixed size map type for use in the stack, heap, or data segment. Does not return a value.</div><div class="ttdef"><b>Definition:</b> flat_hash_map.h:129</div></div>
-<div class="ttc" id="aflat__hash__map_8h_html_ae33caa2a02f7dee60e61c146296db357"><div class="ttname"><a href="flat__hash__map_8h.html#ae33caa2a02f7dee60e61c146296db357">ccc_fhm_fixed_capacity</a></div><div class="ttdeci">#define ccc_fhm_fixed_capacity(fixed_map_type_name)</div><div class="ttdoc">Obtain the capacity previously chosen for the fixed size map type.</div><div class="ttdef"><b>Definition:</b> flat_hash_map.h:138</div></div>
+<div class="line"><span class="keyword">static</span> flat_hash_map static_fh = fhm_init(</div>
+<div class="line">    &amp;(<span class="keyword">static</span> small_fixed_map){},</div>
+<div class="line">    <span class="keyword">struct </span>val,</div>
+<div class="line">    key,</div>
+<div class="line">    fhmap_int_to_u64,</div>
+<div class="line">    fhmap_id_eq,</div>
+<div class="line">    NULL,</div>
+<div class="line">    NULL,</div>
+<div class="line">    fhm_fixed_capacity(small_fixed_map)</div>
+<div class="line">);</div>
+<div class="ttc" id="aflat__hash__map_8h_html_a31f30782a976a516df763110c667aed5"><div class="ttname"><a href="flat__hash__map_8h.html#a31f30782a976a516df763110c667aed5">ccc_fhm_declare_fixed_map</a></div><div class="ttdeci">#define ccc_fhm_declare_fixed_map(fixed_map_type_name, key_val_type_name, capacity)</div><div class="ttdoc">Declare a fixed size map type for use in the stack, heap, or data segment. Does not return a value.</div><div class="ttdef"><b>Definition:</b> flat_hash_map.h:139</div></div>
 </div><!-- fragment --><p>Similarly, a fixed size map can be used on the stack.</p>
 <div class="fragment"><div class="line"><span class="keyword">struct </span>val</div>
 <div class="line">{</div>
@@ -420,14 +424,20 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="line"><a class="code hl_define" href="flat__hash__map_8h.html#a31f30782a976a516df763110c667aed5">ccc_fhm_declare_fixed_map</a>(small_fixed_map, <span class="keyword">struct</span> val, 64);</div>
 <div class="line"><span class="keywordtype">int</span> main(<span class="keywordtype">void</span>)</div>
 <div class="line">{</div>
-<div class="line">    small_fixed_map mem;</div>
-<div class="line">    <a class="code hl_typedef" href="flat__hash__map_8h.html#a16a7808cff5a3e445e18a830e3ef3e40">ccc_flat_hash_map</a> stack_fh</div>
-<div class="line">        = fhm_init(mem.data, mem.tag, key, fhmap_int_to_u64, fhmap_id_eq, NULL,</div>
-<div class="line">                   NULL, <a class="code hl_define" href="flat__hash__map_8h.html#ae33caa2a02f7dee60e61c146296db357">ccc_fhm_fixed_capacity</a>(small_fixed_map));</div>
+<div class="line">    <span class="keyword">static</span> flat_hash_map static_fh = fhm_init(</div>
+<div class="line">        &amp;(small_fixed_map){},</div>
+<div class="line">        <span class="keyword">struct </span>val,</div>
+<div class="line">        key,</div>
+<div class="line">        fhmap_int_to_u64,</div>
+<div class="line">        fhmap_id_eq,</div>
+<div class="line">        NULL,</div>
+<div class="line">        NULL,</div>
+<div class="line">        fhm_fixed_capacity(small_fixed_map)</div>
+<div class="line">    );</div>
 <div class="line">    <span class="keywordflow">return</span> 0;</div>
 <div class="line">}</div>
 </div><!-- fragment --><p>The ccc_fhm_fixed_capacity macro can be used to obtain the previously provided capacity when declaring the fixed map type. Finally, one could allocate a fixed size map on the heap; however, it is usually better to initialize a dynamic map and use the ccc_fhm_reserve function for such a use case.</p>
-<p>This macro is not needed when a dynamic resizing flat hash map is needed. For dynamic maps see the ccc_fhm_init macro. </p>
+<p>This macro is not needed when a dynamic resizing flat hash map is needed. For dynamic maps, simply pass NULL and 0 capacity to the initialization macro. </p>
 
 </div>
 </div>
@@ -503,8 +513,8 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="a08de2e49817c4bad48fe1f29710c70f3" name="a08de2e49817c4bad48fe1f29710c70f3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a08de2e49817c4bad48fe1f29710c70f3">&#9670;&#160;</a></span>ccc_fhm_init</h2>
+<a id="a069c316044b54538c086596d01585410" name="a069c316044b54538c086596d01585410"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a069c316044b54538c086596d01585410">&#9670;&#160;</a></span>ccc_fhm_init</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -513,13 +523,13 @@ This graph shows which files directly or indirectly include this file:</div>
           <td class="memname">#define ccc_fhm_init</td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">data_ptr, </td>
+          <td class="paramname">map_ptr, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">tag_ptr, </td>
+          <td class="paramname">any_type_name, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -564,14 +574,14 @@ This graph shows which files directly or indirectly include this file:</div>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    ccc_impl_fhm_init(data_ptr, tag_ptr, key_field, hash_fn, key_eq_fn,        \</div>
+<b>Value:</b><div class="fragment"><div class="line">    ccc_impl_fhm_init(map_ptr, any_type_name, key_field, hash_fn, key_eq_fn,   \</div>
 <div class="line">                      alloc_fn, aux_data, capacity)</div>
 </div><!-- fragment -->
 <p>Initialize a map with a buffer of types at compile time or runtime. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">data_ptr</td><td>a pointer to the .data of user type T field of a fixed map or (T *)NULL. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">tag_ptr</td><td>a pointer to the .tag field of a fixed map or NULL. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">map_ptr</td><td>a pointer to a fixed map allocation or NULL. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">any_type_name</td><td>the name of the user defined type stored in the map. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">key_field</td><td>the field of the struct used for key storage. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">hash_fn</td><td>the ccc_any_key_hash_fn function the user desires for the table. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">key_eq_fn</td><td>the ccc_any_key_eq_fn the user intends to use. </td></tr>
@@ -581,31 +591,45 @@ This graph shows which files directly or indirectly include this file:</div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the flat hash map directly initialized on the right hand side of the equality operator (i.e. ccc_flat_hash_map fh = <a class="el" href="flat__hash__map_8h.html#a08de2e49817c4bad48fe1f29710c70f3" title="Initialize a map with a buffer of types at compile time or runtime.">ccc_fhm_init(...)</a>;) </dd></dl>
-<dl class="section warning"><dt>Warning</dt><dd>if a dynamic resizing map is required provide two NULL pointers with the data pointer casted to the type stored in the table.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the flat hash map directly initialized on the right hand side of the equality operator (i.e. ccc_flat_hash_map fh = <a class="el" href="flat__hash__map_8h.html#a069c316044b54538c086596d01585410" title="Initialize a map with a buffer of types at compile time or runtime.">ccc_fhm_init(...)</a>;) </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>if a dynamic resizing map is required provide NULL as the map_ptr.</dd></dl>
 <p>Initialize a static fixed size hash map at compile time that has no allocation permission or auxiliary data needed.</p>
-<div class="fragment"><div class="line"><span class="keyword">struct </span>val</div>
+<div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_HASH_MAP_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="keyword">struct </span>val</div>
 <div class="line">{</div>
 <div class="line">    <span class="keywordtype">int</span> key;</div>
 <div class="line">    <span class="keywordtype">int</span> val;</div>
 <div class="line">};</div>
-<div class="line"><a class="code hl_define" href="flat__hash__map_8h.html#a31f30782a976a516df763110c667aed5">ccc_fhm_declare_fixed_map</a>(small_fixed_map, <span class="keyword">struct</span> val, 64);</div>
-<div class="line"><span class="keyword">static</span> small_fixed_map mem;</div>
-<div class="line"><span class="comment">// Hash and equality functions are defined by the user.</span></div>
-<div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="flat__hash__map_8h.html#a16a7808cff5a3e445e18a830e3ef3e40">ccc_flat_hash_map</a> static_fh</div>
-<div class="line">    = fhm_init(mem.data, mem.tag, key, fhmap_int_to_u64, fhmap_id_eq, NULL,</div>
-<div class="line">               NULL, <a class="code hl_define" href="flat__hash__map_8h.html#ae33caa2a02f7dee60e61c146296db357">ccc_fhm_fixed_capacity</a>(small_fixed_map));</div>
+<div class="line">fhm_declare_fixed_map(small_fixed_map, <span class="keyword">struct</span> val, 64);</div>
+<div class="line"><span class="keyword">static</span> flat_hash_map static_fh = fhm_init(</div>
+<div class="line">    &amp;(<span class="keyword">static</span> small_fixed_map){},</div>
+<div class="line">    <span class="keyword">struct </span>val,</div>
+<div class="line">    key,</div>
+<div class="line">    fhmap_int_to_u64,</div>
+<div class="line">    fhmap_id_eq,</div>
+<div class="line">    NULL,</div>
+<div class="line">    NULL,</div>
+<div class="line">    fhm_fixed_capacity(small_fixed_map)</div>
+<div class="line">);</div>
 </div><!-- fragment --><p>Initialize a dynamic hash table at compile time with allocation permission and no auxiliary data. Use the same type as the previous example.</p>
-<div class="fragment"><div class="line"><span class="keyword">struct </span>val</div>
+<div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_HASH_MAP_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="keyword">struct </span>val</div>
 <div class="line">{</div>
 <div class="line">    <span class="keywordtype">int</span> key;</div>
 <div class="line">    <span class="keywordtype">int</span> val;</div>
 <div class="line">};</div>
 <div class="line"><span class="comment">// Hash, equality, and allocation functions are defined by the user.</span></div>
-<div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="flat__hash__map_8h.html#a16a7808cff5a3e445e18a830e3ef3e40">ccc_flat_hash_map</a> static_fh</div>
-<div class="line">    = fhm_init((<span class="keyword">struct</span> val *)NULL, NULL, key, fhmap_int_to_u64, fhmap_id_eq,</div>
-<div class="line">               std_alloc, NULL, 0);</div>
-</div><!-- fragment --><p>Initialization at runtime is also possible. Stack-based or dynamic maps are identical to the provided examples, except without the <code>static</code> keyword in a runtime context. </p>
+<div class="line"><span class="keyword">static</span> flat_hash_map static_fh = fhm_init(</div>
+<div class="line">    NULL,</div>
+<div class="line">    <span class="keyword">struct</span> val,</div>
+<div class="line">    key,</div>
+<div class="line">    fhmap_int_to_u64,</div>
+<div class="line">    fhmap_id_eq,</div>
+<div class="line">    std_alloc,</div>
+<div class="line">    NULL,</div>
+<div class="line">    0</div>
+<div class="line">);</div>
+</div><!-- fragment --><p>Initialization at runtime is also possible. Stack-based or dynamic maps are identical to the provided examples. Omit <code>static</code> in a runtime context. </p>
 
 </div>
 </div>
@@ -1382,17 +1406,30 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="line">    <span class="keywordtype">int</span> key;</div>
 <div class="line">    <span class="keywordtype">int</span> val;</div>
 <div class="line">};</div>
-<div class="line"><a class="code hl_define" href="flat__hash__map_8h.html#a31f30782a976a516df763110c667aed5">ccc_fhm_declare_fixed_map</a>(small_fixed_map, <span class="keyword">struct</span> val, 64);</div>
-<div class="line"><span class="keyword">static</span> small_fixed_map mem_a;</div>
-<div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="flat__hash__map_8h.html#a16a7808cff5a3e445e18a830e3ef3e40">ccc_flat_hash_map</a> src</div>
-<div class="line">    = fhm_init(mem_a.data, mem_a.tag, key, fhmap_int_to_u64, fhmap_id_eq, NULL,</div>
-<div class="line">               NULL, <a class="code hl_define" href="flat__hash__map_8h.html#ae33caa2a02f7dee60e61c146296db357">ccc_fhm_fixed_capacity</a>(small_fixed_map));</div>
+<div class="line">fhm_declare_fixed_map(small_fixed_map, <span class="keyword">struct</span> val, 64);</div>
+<div class="line">flat_hash_map src = fhm_init(</div>
+<div class="line">    &amp;(<span class="keyword">static</span> small_fixed_map){},</div>
+<div class="line">    <span class="keyword">struct </span>val,</div>
+<div class="line">    key,</div>
+<div class="line">    fhmap_int_to_u64,</div>
+<div class="line">    fhmap_id_eq,</div>
+<div class="line">    NULL,</div>
+<div class="line">    NULL,</div>
+<div class="line">    <a class="code hl_define" href="flat__hash__map_8h.html#ae33caa2a02f7dee60e61c146296db357">ccc_fhm_fixed_capacity</a>(small_fixed_map)</div>
+<div class="line">);</div>
 <div class="line">insert_rand_vals(&amp;src);</div>
-<div class="line"><span class="keyword">static</span> small_fixed_map mem_b;</div>
-<div class="line"><span class="keyword">static</span> flat_hash_map dst</div>
-<div class="line">    = fhm_init(mem_b.data, mem_b.tag, key, fhmap_int_to_u64, fhmap_id_eq, NULL,</div>
-<div class="line">               NULL, <a class="code hl_define" href="flat__hash__map_8h.html#ae33caa2a02f7dee60e61c146296db357">ccc_fhm_fixed_capacity</a>(small_fixed_map));</div>
+<div class="line">flat_hash_map dst = fhm_init(</div>
+<div class="line">    &amp;(<span class="keyword">static</span> small_fixed_map){},</div>
+<div class="line">    <span class="keyword">struct </span>val,</div>
+<div class="line">    key,</div>
+<div class="line">    fhmap_int_to_u64,</div>
+<div class="line">    fhmap_id_eq,</div>
+<div class="line">    NULL,</div>
+<div class="line">    NULL,</div>
+<div class="line">    <a class="code hl_define" href="flat__hash__map_8h.html#ae33caa2a02f7dee60e61c146296db357">ccc_fhm_fixed_capacity</a>(small_fixed_map)</div>
+<div class="line">);</div>
 <div class="line"><a class="code hl_enumeration" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> res = fhm_copy(&amp;dst, &amp;src, NULL);</div>
+<div class="ttc" id="aflat__hash__map_8h_html_ae33caa2a02f7dee60e61c146296db357"><div class="ttname"><a href="flat__hash__map_8h.html#ae33caa2a02f7dee60e61c146296db357">ccc_fhm_fixed_capacity</a></div><div class="ttdeci">#define ccc_fhm_fixed_capacity(fixed_map_type_name)</div><div class="ttdoc">Obtain the capacity previously chosen for the fixed size map type.</div><div class="ttdef"><b>Definition:</b> flat_hash_map.h:148</div></div>
 <div class="ttc" id="atypes_8h_html_a51d6f078a83d667aff5016609d9146ef"><div class="ttname"><a href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a></div><div class="ttdeci">ccc_result</div><div class="ttdoc">A result of actions on containers.</div><div class="ttdef"><b>Definition:</b> types.h:132</div></div>
 </div><!-- fragment --><p>The above requires dst capacity be greater than or equal to src capacity. Here is memory management handed over to the copy function.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_HASH_MAP_USING_NAMESPACE_CCC</span></div>
@@ -1401,13 +1438,27 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="line">    <span class="keywordtype">int</span> key;</div>
 <div class="line">    <span class="keywordtype">int</span> val;</div>
 <div class="line">};</div>
-<div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="flat__hash__map_8h.html#a16a7808cff5a3e445e18a830e3ef3e40">ccc_flat_hash_map</a> src</div>
-<div class="line">    = fhm_init((<span class="keyword">struct</span> val *)NULL, NULL, key, fhmap_int_to_u64, fhmap_id_eq,</div>
-<div class="line">               std_alloc, NULL, 0);</div>
+<div class="line">flat_hash_map src = fhm_init(</div>
+<div class="line">    NULL,</div>
+<div class="line">    <span class="keyword">struct</span> val,</div>
+<div class="line">    key,</div>
+<div class="line">    fhmap_int_to_u64,</div>
+<div class="line">    fhmap_id_eq,</div>
+<div class="line">    std_alloc,</div>
+<div class="line">    NULL,</div>
+<div class="line">    0</div>
+<div class="line">);</div>
 <div class="line">insert_rand_vals(&amp;src);</div>
-<div class="line"><span class="keyword">static</span> flat_hash_map dst</div>
-<div class="line">    = fhm_init((<span class="keyword">struct</span> val *)NULL, NULL, key, fhmap_int_to_u64, fhmap_id_eq,</div>
-<div class="line">               std_alloc, NULL, 0);</div>
+<div class="line">flat_hash_map dst = fhm_init(</div>
+<div class="line">    NULL,</div>
+<div class="line">    <span class="keyword">struct</span> val,</div>
+<div class="line">    key,</div>
+<div class="line">    fhmap_int_to_u64,</div>
+<div class="line">    fhmap_id_eq,</div>
+<div class="line">    std_alloc,</div>
+<div class="line">    NULL,</div>
+<div class="line">    0</div>
+<div class="line">);</div>
 <div class="line"><a class="code hl_enumeration" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> res = fhm_copy(&amp;dst, &amp;src, std_alloc);</div>
 </div><!-- fragment --><p>The above allows dst to have a capacity less than that of the src as long as copy has been provided an allocation function to resize dst. Note that this would still work if copying to a destination that the user wants as a fixed size map.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_HASH_MAP_USING_NAMESPACE_CCC</span></div>
@@ -1416,13 +1467,27 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="line">    <span class="keywordtype">int</span> key;</div>
 <div class="line">    <span class="keywordtype">int</span> val;</div>
 <div class="line">};</div>
-<div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="flat__hash__map_8h.html#a16a7808cff5a3e445e18a830e3ef3e40">ccc_flat_hash_map</a> src</div>
-<div class="line">    = fhm_init((<span class="keyword">struct</span> val *)NULL, NULL, key, fhmap_int_to_u64, fhmap_id_eq,</div>
-<div class="line">               std_alloc, NULL, 0);</div>
+<div class="line">flat_hash_map src = fhm_init(</div>
+<div class="line">    NULL,</div>
+<div class="line">    <span class="keyword">struct</span> val,</div>
+<div class="line">    key,</div>
+<div class="line">    fhmap_int_to_u64,</div>
+<div class="line">    fhmap_id_eq,</div>
+<div class="line">    std_alloc,</div>
+<div class="line">    NULL,</div>
+<div class="line">    0</div>
+<div class="line">);</div>
 <div class="line">insert_rand_vals(&amp;src);</div>
-<div class="line"><span class="keyword">static</span> flat_hash_map dst</div>
-<div class="line">    = fhm_init((<span class="keyword">struct</span> val *)NULL, NULL, key, fhmap_int_to_u64, fhmap_id_eq,</div>
-<div class="line">               NULL, NULL, 0);</div>
+<div class="line">flat_hash_map dst = fhm_init(</div>
+<div class="line">    NULL,</div>
+<div class="line">    <span class="keyword">struct</span> val,</div>
+<div class="line">    key,</div>
+<div class="line">    fhmap_int_to_u64,</div>
+<div class="line">    fhmap_id_eq,</div>
+<div class="line">    NULL,</div>
+<div class="line">    NULL,</div>
+<div class="line">    0</div>
+<div class="line">);</div>
 <div class="line"><a class="code hl_enumeration" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> res = fhm_copy(&amp;dst, &amp;src, std_alloc);</div>
 </div><!-- fragment --><p>The above sets up dst with fixed size while src is a dynamic map. Because an allocation function is provided, the dst is resized once for the copy and retains its fixed size after the copy is complete. This would require the user to manually free the underlying buffer at dst eventually if this method is used. Usually it is better to allocate the memory with the reserve function if fixed size dynamic maps are required.</p>
 <p>These options allow users to stay consistent across containers with their memory management strategies. </p>
