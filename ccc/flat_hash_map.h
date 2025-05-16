@@ -139,9 +139,8 @@ restrictions. */
     ccc_impl_fhm_fixed_capacity(fixed_map_type_name)
 
 /** @brief Initialize a map with a buffer of types at compile time or runtime.
-@param [in] data_ptr a pointer to the .data of user type T field of a fixed map
-or (T *)NULL.
-@param [in] tag_ptr a pointer to the .tag field of a fixed map or NULL.
+@param [in] map_ptr a pointer to a fixed map allocation or NULL.
+@param [in] any_type_name the name of the user defined type stored in the map.
 @param [in] key_field the field of the struct used for key storage.
 @param [in] hash_fn the ccc_any_key_hash_fn function the user desires for the
 table.
@@ -152,47 +151,59 @@ resizing is allowed.
 @param [in] capacity the capacity of a fixed size map or 0.
 @return the flat hash map directly initialized on the right hand side of the
 equality operator (i.e. ccc_flat_hash_map fh = ccc_fhm_init(...);)
-@warning if a dynamic resizing map is required provide two NULL pointers with
-the data pointer casted to the type stored in the table.
+@note if a dynamic resizing map is required provide NULL as the map_ptr.
 
 Initialize a static fixed size hash map at compile time that has
 no allocation permission or auxiliary data needed.
 
 ```
+#define FLAT_HASH_MAP_USING_NAMESPACE_CCC
 struct val
 {
     int key;
     int val;
 };
-ccc_fhm_declare_fixed_map(small_fixed_map, struct val, 64);
-static small_fixed_map mem;
-// Hash and equality functions are defined by the user.
-static ccc_flat_hash_map static_fh
-    = fhm_init(mem.data, mem.tag, key, fhmap_int_to_u64, fhmap_id_eq, NULL,
-               NULL, ccc_fhm_fixed_capacity(small_fixed_map));
+fhm_declare_fixed_map(small_fixed_map, struct val, 64);
+static flat_hash_map static_fh = fhm_init(
+    &(static small_fixed_map){},
+    struct val,
+    key,
+    fhmap_int_to_u64,
+    fhmap_id_eq,
+    NULL,
+    NULL,
+    fhm_fixed_capacity(small_fixed_map)
+);
 ```
 
 Initialize a dynamic hash table at compile time with allocation permission and
 no auxiliary data. Use the same type as the previous example.
 
 ```
+#define FLAT_HASH_MAP_USING_NAMESPACE_CCC
 struct val
 {
     int key;
     int val;
 };
 // Hash, equality, and allocation functions are defined by the user.
-static ccc_flat_hash_map static_fh
-    = fhm_init((struct val *)NULL, NULL, key, fhmap_int_to_u64, fhmap_id_eq,
-               std_alloc, NULL, 0);
+static flat_hash_map static_fh = fhm_init(
+    NULL,
+    struct val,
+    key,
+    fhmap_int_to_u64,
+    fhmap_id_eq,
+    std_alloc,
+    NULL,
+    0
+);
 ```
 
 Initialization at runtime is also possible. Stack-based or dynamic maps are
-identical to the provided examples, except without the `static` keyword in a
-runtime context. */
-#define ccc_fhm_init(data_ptr, tag_ptr, key_field, hash_fn, key_eq_fn,         \
+identical to the provided examples. Omit `static` in a runtime context. */
+#define ccc_fhm_init(map_ptr, any_type_name, key_field, hash_fn, key_eq_fn,    \
                      alloc_fn, aux_data, capacity)                             \
-    ccc_impl_fhm_init(data_ptr, tag_ptr, key_field, hash_fn, key_eq_fn,        \
+    ccc_impl_fhm_init(map_ptr, any_type_name, key_field, hash_fn, key_eq_fn,   \
                       alloc_fn, aux_data, capacity)
 
 /** @brief Copy the map at source to destination.
@@ -219,16 +230,28 @@ struct val
     int key;
     int val;
 };
-ccc_fhm_declare_fixed_map(small_fixed_map, struct val, 64);
-static small_fixed_map mem_a;
-static ccc_flat_hash_map src
-    = fhm_init(mem_a.data, mem_a.tag, key, fhmap_int_to_u64, fhmap_id_eq, NULL,
-               NULL, ccc_fhm_fixed_capacity(small_fixed_map));
+fhm_declare_fixed_map(small_fixed_map, struct val, 64);
+flat_hash_map src = fhm_init(
+    &(static small_fixed_map){},
+    struct val,
+    key,
+    fhmap_int_to_u64,
+    fhmap_id_eq,
+    NULL,
+    NULL,
+    ccc_fhm_fixed_capacity(small_fixed_map)
+);
 insert_rand_vals(&src);
-static small_fixed_map mem_b;
-static flat_hash_map dst
-    = fhm_init(mem_b.data, mem_b.tag, key, fhmap_int_to_u64, fhmap_id_eq, NULL,
-               NULL, ccc_fhm_fixed_capacity(small_fixed_map));
+flat_hash_map dst = fhm_init(
+    &(static small_fixed_map){},
+    struct val,
+    key,
+    fhmap_int_to_u64,
+    fhmap_id_eq,
+    NULL,
+    NULL,
+    ccc_fhm_fixed_capacity(small_fixed_map)
+);
 ccc_result res = fhm_copy(&dst, &src, NULL);
 ```
 
@@ -242,13 +265,27 @@ struct val
     int key;
     int val;
 };
-static ccc_flat_hash_map src
-    = fhm_init((struct val *)NULL, NULL, key, fhmap_int_to_u64, fhmap_id_eq,
-               std_alloc, NULL, 0);
+flat_hash_map src = fhm_init(
+    NULL,
+    struct val,
+    key,
+    fhmap_int_to_u64,
+    fhmap_id_eq,
+    std_alloc,
+    NULL,
+    0
+);
 insert_rand_vals(&src);
-static flat_hash_map dst
-    = fhm_init((struct val *)NULL, NULL, key, fhmap_int_to_u64, fhmap_id_eq,
-               std_alloc, NULL, 0);
+flat_hash_map dst = fhm_init(
+    NULL,
+    struct val,
+    key,
+    fhmap_int_to_u64,
+    fhmap_id_eq,
+    std_alloc,
+    NULL,
+    0
+);
 ccc_result res = fhm_copy(&dst, &src, std_alloc);
 ```
 
@@ -264,13 +301,27 @@ struct val
     int key;
     int val;
 };
-static ccc_flat_hash_map src
-    = fhm_init((struct val *)NULL, NULL, key, fhmap_int_to_u64, fhmap_id_eq,
-               std_alloc, NULL, 0);
+flat_hash_map src = fhm_init(
+    NULL,
+    struct val,
+    key,
+    fhmap_int_to_u64,
+    fhmap_id_eq,
+    std_alloc,
+    NULL,
+    0
+);
 insert_rand_vals(&src);
-static flat_hash_map dst
-    = fhm_init((struct val *)NULL, NULL, key, fhmap_int_to_u64, fhmap_id_eq,
-               NULL, NULL, 0);
+flat_hash_map dst = fhm_init(
+    NULL,
+    struct val,
+    key,
+    fhmap_int_to_u64,
+    fhmap_id_eq,
+    NULL,
+    NULL,
+    0
+);
 ccc_result res = fhm_copy(&dst, &src, std_alloc);
 ```
 

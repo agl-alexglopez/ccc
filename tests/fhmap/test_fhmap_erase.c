@@ -14,9 +14,9 @@
 
 CHECK_BEGIN_STATIC_FN(fhmap_test_erase)
 {
-    small_fixed_map s;
-    ccc_flat_hash_map fh = fhm_init(s.data, s.tag, key, fhmap_int_zero,
-                                    fhmap_id_eq, NULL, NULL, SMALL_FIXED_CAP);
+    ccc_flat_hash_map fh
+        = fhm_init(&(small_fixed_map){}, struct val, key, fhmap_int_zero,
+                   fhmap_id_eq, NULL, NULL, SMALL_FIXED_CAP);
     struct val query = {.key = 137, .val = 99};
     /* Nothing was there before so nothing is in the entry. */
     ccc_entry ent = swap_entry(&fh, &query);
@@ -44,10 +44,8 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_erase)
 
 CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_insert_erase)
 {
-    ccc_flat_hash_map h
-        = fhm_init((struct val *)NULL, NULL, key, fhmap_int_to_u64, fhmap_id_eq,
-                   std_alloc, NULL, 0);
-
+    ccc_flat_hash_map h = fhm_init(NULL, struct val, key, fhmap_int_to_u64,
+                                   fhmap_id_eq, std_alloc, NULL, 0);
     int const to_insert = 100;
     int const larger_prime = 101;
     for (int i = 0, shuffle = larger_prime % to_insert; i < to_insert;
@@ -90,13 +88,12 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_insert_erase)
 /* This test will force us to test our in place hashing algorithm. */
 CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_erase_fixed)
 {
-    standard_fixed_map mem;
-    size_t const fix_cap = fhm_fixed_capacity(standard_fixed_map);
-    ccc_flat_hash_map h = fhm_init(mem.data, mem.tag, key, fhmap_int_to_u64,
-                                   fhmap_id_eq, NULL, NULL, fix_cap);
-    int to_insert[fhm_fixed_capacity(standard_fixed_map)];
-    iota(to_insert, fix_cap, 0);
-    rand_shuffle(sizeof(int), to_insert, fix_cap, &(int){0});
+    ccc_flat_hash_map h
+        = fhm_init(&(standard_fixed_map){}, struct val, key, fhmap_int_to_u64,
+                   fhmap_id_eq, NULL, NULL, STANDARD_FIXED_CAP);
+    int to_insert[STANDARD_FIXED_CAP];
+    iota(to_insert, STANDARD_FIXED_CAP, 0);
+    rand_shuffle(sizeof(int), to_insert, STANDARD_FIXED_CAP, &(int){0});
     int i = 0;
     do
     {
@@ -166,9 +163,8 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_erase_reserved)
     /* The map will be given dynamically reserved space but no ability to
        resize. All algorithms should function normally and in place rehashing
        should take effect. */
-    ccc_flat_hash_map h
-        = fhm_init((struct val *)NULL, NULL, key, fhmap_int_to_u64, fhmap_id_eq,
-                   NULL, NULL, 0);
+    ccc_flat_hash_map h = fhm_init(NULL, struct val, key, fhmap_int_to_u64,
+                                   fhmap_id_eq, NULL, NULL, 0);
     int const test_amount = 896;
     ccc_result const res_check = ccc_fhm_reserve(&h, test_amount, std_alloc);
     CHECK(res_check, CCC_RESULT_OK);
@@ -243,9 +239,8 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_erase_reserved)
 
 CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_erase_dynamic)
 {
-    ccc_flat_hash_map h
-        = fhm_init((struct val *)NULL, NULL, key, fhmap_int_to_u64, fhmap_id_eq,
-                   std_alloc, NULL, 0);
+    ccc_flat_hash_map h = fhm_init(NULL, struct val, key, fhmap_int_to_u64,
+                                   fhmap_id_eq, std_alloc, NULL, 0);
     int to_insert[1024];
     iota(to_insert, 1024, 0);
     rand_shuffle(sizeof(int), to_insert, 1024, &(int){0});

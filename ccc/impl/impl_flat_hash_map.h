@@ -124,8 +124,6 @@ struct ccc_fhmap
     size_t remain;
     /** The mask for power of two table sizing. */
     size_t mask;
-    /** One-time flag to lazily initialize table. */
-    ccc_tribool init;
     /** Size of each user data element being stored. */
     size_t sizeof_type;
     /** The location of the key field in user type. */
@@ -213,28 +211,32 @@ call unsafe. */
 #define ccc_impl_fhm_fixed_capacity(fixed_map_type_name)                       \
     (sizeof((fixed_map_type_name){}.tag) - CCC_FHM_GROUP_SIZE)
 
-/** @private Initializing is tricky due to variety of sources of memory we must
-support. To make it easier we allow the user to pass data and tag arrays as
-two separate pointers even though they are in the same contiguous allocation.
-This could lead to some errors but we will have to make the user facing header
-documentation abundantly clear about what we expect and why.
+/** @private Initialization is tricky but we simplify by only accepting a
+pointer to the map this pointer could be any of the following.
 
-We will not support being passed a dynamically allocated array at runtime.
-Instead we will expose a reserve() interface to allow the user to specify a
-fixed size map when they don't know exactly the size needed until runtime. */
-#define ccc_impl_fhm_init(impl_data_ptr, impl_tag_ptr, impl_key_field,         \
-                          impl_hash_fn, impl_key_eq_fn, impl_alloc_fn,         \
-                          impl_aux_data, impl_capacity)                        \
+    - The address of a user defined fixed size map stored in data segment.
+    - The address of a user defined fixed size map stored on the stack.
+    - The address of a user defined fixed size map allocated on the heap.
+    - NULL if the user intends for a dynamic map.
+
+All of the above cases are covered by accepting the pointer at .data and only
+evaluating the argument once. This also allows the user to pass a compound
+literal to the first argument and eliminate any dangling references, such as
+`&(static user_defined_map_type){}`. However, to accept a map from all of these
+sources at compile or runtime, we must implement lazy initialization. This is
+because we can't initialize the tag array at compile time. */
+#define ccc_impl_fhm_init(impl_fixed_map_ptr, impl_any_type_name,              \
+                          impl_key_field, impl_hash_fn, impl_key_eq_fn,        \
+                          impl_alloc_fn, impl_aux_data, impl_capacity)         \
     {                                                                          \
-        .data = (impl_data_ptr),                                               \
-        .tag = (impl_tag_ptr),                                                 \
+        .data = (impl_fixed_map_ptr),                                          \
+        .tag = NULL,                                                           \
         .count = 0,                                                            \
         .remain = (((impl_capacity) / (size_t)8) * (size_t)7),                 \
         .mask = (((impl_capacity) > (size_t)0) ? ((impl_capacity) - (size_t)1) \
                                                : (size_t)0),                   \
-        .init = CCC_FALSE,                                                     \
-        .sizeof_type = sizeof(*(impl_data_ptr)),                               \
-        .key_offset = offsetof(typeof(*(impl_data_ptr)), impl_key_field),      \
+        .sizeof_type = sizeof(impl_any_type_name),                             \
+        .key_offset = offsetof(impl_any_type_name, impl_key_field),            \
         .eq_fn = (impl_key_eq_fn),                                             \
         .hash_fn = (impl_hash_fn),                                             \
         .alloc_fn = (impl_alloc_fn),                                           \
