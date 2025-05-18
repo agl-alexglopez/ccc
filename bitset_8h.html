@@ -121,7 +121,16 @@ This graph shows which files directly or indirectly include this file:</div>
 </div>
 </div>
 <p><a href="bitset_8h_source.html">Go to the source code of this file.</a></p>
-<table class="memberdecls">
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>The Bit Set Interface. </p>
+<p>A bit set offers efficient set membership operations when the range of values can be tracked via an index. Both a fixed size and dynamic variant are possible depending on initialization options.</p>
+<p>Conceptually, the bit set can be thought of as an arbitrary length integer with index 0 being the Least Significant Bit and index N - 1 being the Most Significant Bit of the integer. Internally, this is implemented by populating each block of the bit set from Least Significant Bit to Most Significant Bit. Therefore, "trailing" means starting from the Least Significant Bit and "leading" means starting from the Most Significant Bit; this is done to stay consistent with upcoming bit operations introduced to the C23 standard.</p>
+<p>A bit set can be used for modeling integer operations on integers that exceed the widths available on one's platform. The provided bitwise operation functions are helpful for these types of manipulations.</p>
+<p>A bit set can also be used for modeling data that can be abstracted to a position and binary value. For example, disk blocks in a file system, free blocks in a memory allocator, and many other resource abstractions can benefit from a bit set. For these use cases the bit set offers efficient functions to find the first bits set to zero or one from either the trailing or leading direction. A bit set can also efficiently report if contiguous ranges of zeros or ones are available.</p>
+<p>To shorten names in the interface, define the following preprocessor directive at the top of your file.</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#define BITSET_USING_NAMESPACE_CCC</span></div>
+</div><!-- fragment --><p>All types and functions can then be written without the <code>ccc_</code> prefix. </p>
+</div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Container Initialization</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Initialize and create containers with memory and permissions. </p>
 </td></tr>
@@ -339,16 +348,7 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memdesc:ae9baee7e324a3b1db04d6e83748118f7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove the Most Significant Bit from the set.  <br /></td></tr>
 <tr class="separator:ae9baee7e324a3b1db04d6e83748118f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>The Bit Set Interface. </p>
-<p>A bit set offers efficient set membership operations when the range of values can be tracked via an index. Both a fixed size and dynamic variant are possible depending on initialization options.</p>
-<p>Conceptually, the bit set can be thought of as an arbitrary length integer with index 0 being the Least Significant Bit and index N - 1 being the Most Significant Bit of the integer. Internally, this is implemented by populating each block of the bit set from Least Significant Bit to Most Significant Bit. Therefore, "trailing" means starting from the Least Significant Bit and "leading" means starting from the Most Significant Bit; this is done to stay consistent with upcoming bit operations introduced to the C23 standard.</p>
-<p>A bit set can be used for modeling integer operations on integers that exceed the widths available on one's platform. The provided bitwise operation functions are helpful for these types of manipulations.</p>
-<p>A bit set can also be used for modeling data that can be abstracted to a position and binary value. For example, disk blocks in a file system, free blocks in a memory allocator, and many other resource abstractions can benefit from a bit set. For these use cases the bit set offers efficient functions to find the first bits set to zero or one from either the trailing or leading direction. A bit set can also efficiently report if contiguous ranges of zeros or ones are available.</p>
-<p>To shorten names in the interface, define the following preprocessor directive at the top of your file.</p>
-<div class="fragment"><div class="line"><span class="preprocessor">#define BITSET_USING_NAMESPACE_CCC</span></div>
-</div><!-- fragment --><p>All types and functions can then be written without the <code>ccc_</code> prefix. </p>
-</div><h2 class="groupheader">Macro Definition Documentation</h2>
+<h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="a1099f64c2982ed888e26a6edb6b13734" name="a1099f64c2982ed888e26a6edb6b13734"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a1099f64c2982ed888e26a6edb6b13734">&#9670;&#160;</a></span>ccc_bs_blocks</h2>
 
@@ -913,15 +913,15 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="ttc" id="atypes_8h_html_a51d6f078a83d667aff5016609d9146ef"><div class="ttname"><a href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a></div><div class="ttdeci">ccc_result</div><div class="ttdoc">A result of actions on containers.</div><div class="ttdef"><b>Definition:</b> types.h:132</div></div>
 </div><!-- fragment --><p>The above requires dst capacity be greater than or equal to src capacity. Here is memory management handed over to the copy function.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define BITSET_USING_NAMESPACE_CCC</span></div>
-<div class="line"><span class="keyword">static</span> bitset src = bs_init((bitblock *)NULL, std_alloc, NULL, 0);</div>
+<div class="line"><span class="keyword">static</span> bitset src = bs_init(NULL, std_alloc, NULL, 0);</div>
 <div class="line">push_rand_bits(&amp;src);</div>
-<div class="line"><span class="keyword">static</span> bitset src = bs_init((bitblock *)NULL, std_alloc, NULL, 0);</div>
+<div class="line"><span class="keyword">static</span> bitset src = bs_init(NULL, std_alloc, NULL, 0);</div>
 <div class="line"><a class="code hl_enumeration" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> res = bs_copy(&amp;dst, &amp;src, std_alloc);</div>
 </div><!-- fragment --><p>The above allows dst to have a capacity less than that of the src as long as copy has been provided an allocation function to resize dst. Note that this would still work if copying to a destination that the user wants as a fixed size map.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define BITSET_USING_NAMESPACE_CCC</span></div>
-<div class="line"><span class="keyword">static</span> bitset src = bs_init((bitblock *)NULL, std_alloc, NULL, 0);</div>
+<div class="line"><span class="keyword">static</span> bitset src = bs_init(NULL, std_alloc, NULL, 0);</div>
 <div class="line">push_rand_bits(&amp;src);</div>
-<div class="line"><span class="keyword">static</span> bitset src = bs_init((bitblock *)NULL, NULL, NULL, 0);</div>
+<div class="line"><span class="keyword">static</span> bitset src = bs_init(NULL, NULL, NULL, 0);</div>
 <div class="line"><a class="code hl_enumeration" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> res = bs_copy(&amp;dst, &amp;src, std_alloc);</div>
 </div><!-- fragment --><p>The above sets up dst with fixed size while src is a dynamic map. Because an allocation function is provided, the dst is resized once for the copy and retains its fixed size after the copy is complete. This would require the user to manually free the underlying buffer at dst eventually if this method is used. Usually it is better to allocate the memory explicitly before the copy if copying between maps without allocation permission.</p>
 <p>These options allow users to stay consistent across containers with their memory management strategies. </p>

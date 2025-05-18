@@ -100,7 +100,14 @@ $(document).ready(function(){initNavTree('structccc__any__key__cmp.html',''); in
  <a href="structccc__any__key__cmp.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="types_8h_source.html">types.h</a>&gt;</code></p>
-<table class="memberdecls">
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>A key comparison helper to avoid argument swapping. </p>
+<p>The key is considered the left hand side of the operation if three-way comparison is needed. Left and right do not matter if equality is needed. Note a comparison is taking place between the key on the left hand side and the complete user type on the right hand side. This means the right hand side will need to manually access its key field.</p>
+<div class="fragment"><div class="line"><span class="keywordtype">int</span> <span class="keyword">const</span> *<span class="keyword">const</span> my_key = cmp.any_key_lhs;</div>
+<div class="line"><span class="keyword">struct </span>key_val const *<span class="keyword">const</span> my_type  = cmp.any_type_rhs;</div>
+<div class="line"><span class="keywordflow">return</span> *my_key == my_type-&gt;key;</div>
+</div><!-- fragment --><p>Notice that the user type must access its key field of its struct. Comparison must happen this way to support searching by key in associative containers rather than by entire user struct. Only needing to provide a key can save significant memory for a search depending on the size of the user type. </p>
+</div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Data Fields</h2></td></tr>
 <tr class="memitem:a8807e0158db2b07d5114afec5a246ef7"><td class="memItemLeft" align="right" valign="top">void const  *const&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structccc__any__key__cmp.html#a8807e0158db2b07d5114afec5a246ef7">any_key_lhs</a></td></tr>
@@ -110,14 +117,7 @@ Data Fields</h2></td></tr>
 <tr class="memitem:a524c37065549851e1685d4ce5b5e9e89"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structccc__any__key__cmp.html#a524c37065549851e1685d4ce5b5e9e89">aux</a></td></tr>
 <tr class="separator:a524c37065549851e1685d4ce5b5e9e89"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>A key comparison helper to avoid argument swapping. </p>
-<p>The key is considered the left hand side of the operation if three-way comparison is needed. Left and right do not matter if equality is needed. Note a comparison is taking place between the key on the left hand side and the complete user type on the right hand side. This means the right hand side will need to manually access its key field.</p>
-<div class="fragment"><div class="line"><span class="keywordtype">int</span> <span class="keyword">const</span> *<span class="keyword">const</span> my_key = cmp.any_key_lhs;</div>
-<div class="line"><span class="keyword">struct </span>key_val const *<span class="keyword">const</span> my_type  = cmp.any_type_rhs;</div>
-<div class="line"><span class="keywordflow">return</span> *my_key == my_type-&gt;key;</div>
-</div><!-- fragment --><p>Notice that the user type must access its key field of its struct. Comparison must happen this way to support searching by key in associative containers rather than by entire user struct. Only needing to provide a key can save significant memory for a search depending on the size of the user type. </p>
-</div><h2 class="groupheader">Field Documentation</h2>
+<h2 class="groupheader">Field Documentation</h2>
 <a id="a8807e0158db2b07d5114afec5a246ef7" name="a8807e0158db2b07d5114afec5a246ef7"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a8807e0158db2b07d5114afec5a246ef7">&#9670;&#160;</a></span>any_key_lhs</h2>
 

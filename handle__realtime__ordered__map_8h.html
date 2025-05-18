@@ -123,7 +123,14 @@ This graph shows which files directly or indirectly include this file:</div>
 </div>
 </div>
 <p><a href="handle__realtime__ordered__map_8h_source.html">Go to the source code of this file.</a></p>
-<table class="memberdecls">
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>The Handle Realtime Ordered Map Interface. </p>
+<p>A handle realtime ordered map offers storage and retrieval by key. This map is suitable for realtime applications if resizing can be well controlled. Insert operations may cause resizing if allocation is allowed.</p>
+<p>The handle variant of the ordered map promises contiguous storage and random access if needed. Handles are stable and the user can use them to refer to an element until that element is removed from the map. Handles remain valid even if resizing of the table, insertions of other elements, or removals of other elements occur. Active user elements may not be contiguous from index [0, N) where N is the size of map; there may be gaps between active elements in the buffer and it is only guaranteed that N elements are stored between index [0, Capacity). Also, all elements in the map track their relationships via indices in the buffer. Therefore, this data structure can be relocated, copied, serialized, or written to disk and all internal data structure references will remain valid. Insertion may invoke an O(N) operation if resizing occurs. Finally, if allocation is prohibited upon initialization and the user intends to store a fixed size N nodes in the map N + 1 capacity is needed for the sentinel node in the buffer.</p>
+<p>To shorten names in the interface, define the following preprocessor directive at the top of your file.</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#define HANDLE_REALTIME_ORDERED_MAP_USING_NAMESPACE_CCC</span></div>
+</div><!-- fragment --><p>All types and functions can then be written without the <code>ccc_</code> prefix. </p>
+</div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Initialization Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Initialize the container with memory, callbacks, and permissions. </p>
 </td></tr>
@@ -308,14 +315,7 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memdesc:ac653c79b05eed5def30a7fed34fee0b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Validation of invariants for the map.  <br /></td></tr>
 <tr class="separator:ac653c79b05eed5def30a7fed34fee0b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>The Handle Realtime Ordered Map Interface. </p>
-<p>A handle realtime ordered map offers storage and retrieval by key. This map is suitable for realtime applications if resizing can be well controlled. Insert operations may cause resizing if allocation is allowed.</p>
-<p>The handle variant of the ordered map promises contiguous storage and random access if needed. Handles are stable and the user can use them to refer to an element until that element is removed from the map. Handles remain valid even if resizing of the table, insertions of other elements, or removals of other elements occur. Active user elements may not be contiguous from index [0, N) where N is the size of map; there may be gaps between active elements in the buffer and it is only guaranteed that N elements are stored between index [0, Capacity). Also, all elements in the map track their relationships via indices in the buffer. Therefore, this data structure can be relocated, copied, serialized, or written to disk and all internal data structure references will remain valid. Insertion may invoke an O(N) operation if resizing occurs. Finally, if allocation is prohibited upon initialization and the user intends to store a fixed size N nodes in the map N + 1 capacity is needed for the sentinel node in the buffer.</p>
-<p>To shorten names in the interface, define the following preprocessor directive at the top of your file.</p>
-<div class="fragment"><div class="line"><span class="preprocessor">#define HANDLE_REALTIME_ORDERED_MAP_USING_NAMESPACE_CCC</span></div>
-</div><!-- fragment --><p>All types and functions can then be written without the <code>ccc_</code> prefix. </p>
-</div><h2 class="groupheader">Macro Definition Documentation</h2>
+<h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="ad861ef0703bd012d92b70e22ec38d0de" name="ad861ef0703bd012d92b70e22ec38d0de"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ad861ef0703bd012d92b70e22ec38d0de">&#9670;&#160;</a></span>ccc_hrm_and_modify_w</h2>
 

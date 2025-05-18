@@ -129,7 +129,16 @@ This graph shows which files directly or indirectly include this file:</div>
 </div>
 </div>
 <p><a href="buffer_8h_source.html">Go to the source code of this file.</a></p>
-<table class="memberdecls">
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>The Buffer Interface. </p>
+<p>Buffer usage is similar to a C++ vector, with more flexible functions provided to support higher level containers and abstractions. While useful on its own&ndash;a stack could be implemented with the provided functions&ndash;a buffer is often used as the lower level abstraction for the flat data structures in this library that provide more specialized operations. A buffer does not require the user accommodate any intrusive elements.</p>
+<p>A buffer with allocation permission will re-size when a new element is inserted in a contiguous fashion. Interface in the allocation management section assume elements are stored contiguously and adjust size accordingly.</p>
+<p>Interface in the slot management section offer data movement and writing operations that do not affect the size of the container. If writing a more complex higher level container that does not need size management these functions offer more custom control over the buffer.</p>
+<p>If allocation is not permitted, resizing will not occur and the insertion function will fail when capacity is reached, returning some value to indicate failure.</p>
+<p>If shorter names are desired, define the following preprocessor directive.</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#define BUFFER_USING_NAMESPACE_CCC</span></div>
+</div><!-- fragment --><p>Then, the <code>ccc_</code> prefix can be dropped from all types and functions. </p>
+</div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Initialization Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Initialize the container with memory, callbacks, and permissions. </p>
 </td></tr>
@@ -247,16 +256,7 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memdesc:a35e780d4ce7e275f053bdfacb44db265"><td class="mdescLeft">&#160;</td><td class="mdescRight">return true if the size of the buffer equals capacity.  <br /></td></tr>
 <tr class="separator:a35e780d4ce7e275f053bdfacb44db265"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>The Buffer Interface. </p>
-<p>Buffer usage is similar to a C++ vector, with more flexible functions provided to support higher level containers and abstractions. While useful on its own&ndash;a stack could be implemented with the provided functions&ndash;a buffer is often used as the lower level abstraction for the flat data structures in this library that provide more specialized operations. A buffer does not require the user accommodate any intrusive elements.</p>
-<p>A buffer with allocation permission will re-size when a new element is inserted in a contiguous fashion. Interface in the allocation management section assume elements are stored contiguously and adjust size accordingly.</p>
-<p>Interface in the slot management section offer data movement and writing operations that do not affect the size of the container. If writing a more complex higher level container that does not need size management these functions offer more custom control over the buffer.</p>
-<p>If allocation is not permitted, resizing will not occur and the insertion function will fail when capacity is reached, returning some value to indicate failure.</p>
-<p>If shorter names are desired, define the following preprocessor directive.</p>
-<div class="fragment"><div class="line"><span class="preprocessor">#define BUFFER_USING_NAMESPACE_CCC</span></div>
-</div><!-- fragment --><p>Then, the <code>ccc_</code> prefix can be dropped from all types and functions. </p>
-</div><h2 class="groupheader">Macro Definition Documentation</h2>
+<h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="a66b89d47e24996c7be07dea5d827e649" name="a66b89d47e24996c7be07dea5d827e649"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a66b89d47e24996c7be07dea5d827e649">&#9670;&#160;</a></span>ccc_buf_init</h2>
 

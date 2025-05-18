@@ -121,7 +121,13 @@ This graph shows which files directly or indirectly include this file:</div>
 </div>
 </div>
 <p><a href="ordered__map_8h_source.html">Go to the source code of this file.</a></p>
-<table class="memberdecls">
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>The Ordered Map Interface. </p>
+<p>An ordered map offers storage and retrieval elements by key. Because the data structure is self-optimizing it is not suitable map in a realtime environment where strict runtime bounds are needed. Also, searching the map is not a const thread-safe operation as indicated by the function signatures. The map is optimized upon every new search. However, in many cases the self-optimizing structure of the map can be beneficial when considering non-uniform access patterns. In the best case, repeated searches of the same value yield an O(1) access and many other frequently searched values will remain close to the root</p>
+<p>To shorten names in the interface, define the following preprocessor directive at the top of your file.</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#define ORDERED_MAP_USING_NAMESPACE_CCC</span></div>
+</div><!-- fragment --><p>All types and functions can then be written without the <code>ccc_</code> prefix. </p>
+</div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Initialization Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Initialize the container with memory, callbacks, and permissions. </p>
 </td></tr>
@@ -282,13 +288,7 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memdesc:a023a210902012edae578022f65704f00"><td class="mdescLeft">&#160;</td><td class="mdescRight">Validation of invariants for the map.  <br /></td></tr>
 <tr class="separator:a023a210902012edae578022f65704f00"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>The Ordered Map Interface. </p>
-<p>An ordered map offers storage and retrieval elements by key. Because the data structure is self-optimizing it is not suitable map in a realtime environment where strict runtime bounds are needed. Also, searching the map is not a const thread-safe operation as indicated by the function signatures. The map is optimized upon every new search. However, in many cases the self-optimizing structure of the map can be beneficial when considering non-uniform access patterns. In the best case, repeated searches of the same value yield an O(1) access and many other frequently searched values will remain close to the root</p>
-<p>To shorten names in the interface, define the following preprocessor directive at the top of your file.</p>
-<div class="fragment"><div class="line"><span class="preprocessor">#define ORDERED_MAP_USING_NAMESPACE_CCC</span></div>
-</div><!-- fragment --><p>All types and functions can then be written without the <code>ccc_</code> prefix. </p>
-</div><h2 class="groupheader">Macro Definition Documentation</h2>
+<h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="ae1d13cce23b4bf0b8bee3b1bd0dce38e" name="ae1d13cce23b4bf0b8bee3b1bd0dce38e"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ae1d13cce23b4bf0b8bee3b1bd0dce38e">&#9670;&#160;</a></span>ccc_om_and_modify_w</h2>
 

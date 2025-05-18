@@ -123,7 +123,14 @@ This graph shows which files directly or indirectly include this file:</div>
 </div>
 </div>
 <p><a href="handle__ordered__map_8h_source.html">Go to the source code of this file.</a></p>
-<table class="memberdecls">
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>The Handle Ordered Map Interface. </p>
+<p>A handle ordered map is a contiguously stored map offering storage and retrieval by key. Because the data structure is self-optimizing it is not a suitable map in a realtime environment where strict runtime bounds are needed. Also, searching the map is not a const thread-safe operation as indicated by the function signatures. The map is optimized upon every new search. However, in many cases the self-optimizing structure of the map can be beneficial when considering non-uniform access patterns. In the best case, repeated searches of the same value yield an O(1) access and many other frequently searched values will remain close to the root of the map.</p>
+<p>The handle variant of the ordered map promises contiguous storage and random access if needed. Handles remain valid until an element is removed even if other elements are inserted, other elements are removed, or resizing occurs. All elements in the map track their relationships via indices in the buffer. Therefore, this data structure can be relocated, copied, serialized, or written to disk and all internal data structure references will remain valid. Insertion may invoke an O(N) operation if resizing occurs. Finally, if allocation is prohibited upon initialization and the user intends to store a fixed size N nodes in the map N + 1 capacity is needed for the sentinel node in the buffer.</p>
+<p>To shorten names in the interface, define the following preprocessor directive at the top of your file.</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#define HANDLE_ORDERED_MAP_USING_NAMESPACE_CCC</span></div>
+</div><!-- fragment --><p>All types and functions can then be written without the <code>ccc_</code> prefix. </p>
+</div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Initialization Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Initialize the container with memory, callbacks, and permissions. </p>
 </td></tr>
@@ -308,14 +315,7 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memdesc:a6c3411ef39c6e605a165bc1f0c64bb6c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Validation of invariants for the map.  <br /></td></tr>
 <tr class="separator:a6c3411ef39c6e605a165bc1f0c64bb6c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>The Handle Ordered Map Interface. </p>
-<p>A handle ordered map is a contiguously stored map offering storage and retrieval by key. Because the data structure is self-optimizing it is not a suitable map in a realtime environment where strict runtime bounds are needed. Also, searching the map is not a const thread-safe operation as indicated by the function signatures. The map is optimized upon every new search. However, in many cases the self-optimizing structure of the map can be beneficial when considering non-uniform access patterns. In the best case, repeated searches of the same value yield an O(1) access and many other frequently searched values will remain close to the root of the map.</p>
-<p>The handle variant of the ordered map promises contiguous storage and random access if needed. Handles remain valid until an element is removed even if other elements are inserted, other elements are removed, or resizing occurs. All elements in the map track their relationships via indices in the buffer. Therefore, this data structure can be relocated, copied, serialized, or written to disk and all internal data structure references will remain valid. Insertion may invoke an O(N) operation if resizing occurs. Finally, if allocation is prohibited upon initialization and the user intends to store a fixed size N nodes in the map N + 1 capacity is needed for the sentinel node in the buffer.</p>
-<p>To shorten names in the interface, define the following preprocessor directive at the top of your file.</p>
-<div class="fragment"><div class="line"><span class="preprocessor">#define HANDLE_ORDERED_MAP_USING_NAMESPACE_CCC</span></div>
-</div><!-- fragment --><p>All types and functions can then be written without the <code>ccc_</code> prefix. </p>
-</div><h2 class="groupheader">Macro Definition Documentation</h2>
+<h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="a25cf216f4a4d3f3fc8cf797da47fbb37" name="a25cf216f4a4d3f3fc8cf797da47fbb37"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a25cf216f4a4d3f3fc8cf797da47fbb37">&#9670;&#160;</a></span>ccc_hom_and_modify_w</h2>
 

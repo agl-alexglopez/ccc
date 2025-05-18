@@ -123,7 +123,15 @@ This graph shows which files directly or indirectly include this file:</div>
 </div>
 </div>
 <p><a href="flat__double__ended__queue_8h_source.html">Go to the source code of this file.</a></p>
-<table class="memberdecls">
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>The Flat Double Ended Queue Interface. </p>
+<p>An FDEQ offers contiguous storage and random access, push, and pop in constant time. The contiguous nature of the buffer makes it well-suited to dynamic or fixed size contexts where a double ended queue is needed.</p>
+<p>If the container is initialized with allocation permission it will resize when needed but support constant time push and pop to the front and back when resizing is not required, resulting in amortized O(1) operations.</p>
+<p>If the FDEQ is initialized without allocation permission its behavior is equivalent to a Ring Buffer. This is somewhat unique in that it does not fail to insert elements when size is equal to capacity. This means that push front, push back, pop front, and pop back are O(1) operations. However, if any push exceeds capacity an element where the push should occur is overwritten.</p>
+<p>To shorten names in the interface, define the following preprocessor directive at the top of your file.</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC</span></div>
+</div><!-- fragment --><p>All types and functions can then be written without the <code>ccc_</code> prefix. </p>
+</div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Initialization Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Initialize and create containers with memory, callbacks, and permissions. </p>
 </td></tr>
@@ -234,15 +242,7 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memdesc:a996af112cdbfa57d1511a82489b0f074"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return true if the internal invariants of the fdeq.  <br /></td></tr>
 <tr class="separator:a996af112cdbfa57d1511a82489b0f074"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>The Flat Double Ended Queue Interface. </p>
-<p>An FDEQ offers contiguous storage and random access, push, and pop in constant time. The contiguous nature of the buffer makes it well-suited to dynamic or fixed size contexts where a double ended queue is needed.</p>
-<p>If the container is initialized with allocation permission it will resize when needed but support constant time push and pop to the front and back when resizing is not required, resulting in amortized O(1) operations.</p>
-<p>If the FDEQ is initialized without allocation permission its behavior is equivalent to a Ring Buffer. This is somewhat unique in that it does not fail to insert elements when size is equal to capacity. This means that push front, push back, pop front, and pop back are O(1) operations. However, if any push exceeds capacity an element where the push should occur is overwritten.</p>
-<p>To shorten names in the interface, define the following preprocessor directive at the top of your file.</p>
-<div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC</span></div>
-</div><!-- fragment --><p>All types and functions can then be written without the <code>ccc_</code> prefix. </p>
-</div><h2 class="groupheader">Macro Definition Documentation</h2>
+<h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="a9ee4b94addf503252a94ee32a438b5e0" name="a9ee4b94addf503252a94ee32a438b5e0"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a9ee4b94addf503252a94ee32a438b5e0">&#9670;&#160;</a></span>ccc_fdeq_emplace_back</h2>
 
