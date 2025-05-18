@@ -1,4 +1,4 @@
-# for CMAKE_INSTALL_LIBDIR, CMAKE_INSTALL_BINDIR, CMAKE_INSTALL_INCLUDEDIR and others
+# for CMAKE_INSTALL_LIBDIR, CMAKE_INSTALL_BINDIR, CMAKE_INSTALL_INCLUDEDIR etc
 include(GNUInstallDirs)
 
 # Keeping the project name within a cmake folder helps reduce file clutter
