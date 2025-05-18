@@ -93,7 +93,8 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_update)
         int backoff = i->val / 2;
         if (i->val > limit)
         {
-            CHECK(ccc_pq_update(&pq, &i->elem, val_update, &backoff), true);
+            CHECK(ccc_pq_update(&pq, &i->elem, val_update, &backoff) != NULL,
+                  true);
             CHECK(validate(&pq), true);
         }
     }
@@ -121,11 +122,12 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_update_with)
     int const limit = 400;
     for (size_t val = 0; val < num_nodes; ++val)
     {
-        struct val *i = &vals[val];
-        int backoff = i->val / 2;
-        if (i->val > limit)
+        int backoff = vals[val].val / 2;
+        if (vals[val].val > limit)
         {
-            CHECK(ccc_pq_update_w(&pq, &i->elem, { i->val = backoff; }), true);
+            CHECK(ccc_pq_update_w(&pq, &vals[val], { T->val = backoff; })
+                      != NULL,
+                  true);
             CHECK(validate(&pq), true);
         }
     }
@@ -158,12 +160,14 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_increase)
         int dec = i->val / 2;
         if (i->val >= limit)
         {
-            CHECK(ccc_pq_decrease(&pq, &i->elem, val_update, &dec), true);
+            CHECK(ccc_pq_decrease(&pq, &i->elem, val_update, &dec) != NULL,
+                  true);
             CHECK(validate(&pq), true);
         }
         else
         {
-            CHECK(ccc_pq_increase(&pq, &i->elem, val_update, &inc), true);
+            CHECK(ccc_pq_increase(&pq, &i->elem, val_update, &inc) != NULL,
+                  true);
             CHECK(validate(&pq), true);
         }
     }
@@ -191,17 +195,18 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_increase_with)
     int const limit = 400;
     for (size_t val = 0; val < num_nodes; ++val)
     {
-        struct val *const i = &vals[val];
         int inc = limit * 2;
-        int dec = i->val / 2;
-        if (i->val >= limit)
+        int dec = vals[val].val / 2;
+        if (vals[val].val >= limit)
         {
-            CHECK(ccc_pq_decrease_w(&pq, &i->elem, { i->val = dec; }), true);
+            CHECK(ccc_pq_decrease_w(&pq, &vals[val], { T->val = dec; }) != NULL,
+                  true);
             CHECK(validate(&pq), true);
         }
         else
         {
-            CHECK(ccc_pq_increase_w(&pq, &i->elem, { i->val = inc; }), true);
+            CHECK(ccc_pq_increase_w(&pq, &vals[val], { T->val = inc; }) != NULL,
+                  true);
             CHECK(validate(&pq), true);
         }
     }
@@ -234,12 +239,14 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_decrease)
         int dec = i->val / 2;
         if (i->val < limit)
         {
-            CHECK(ccc_pq_increase(&pq, &i->elem, val_update, &inc), true);
+            CHECK(ccc_pq_increase(&pq, &i->elem, val_update, &inc) != NULL,
+                  true);
             CHECK(validate(&pq), true);
         }
         else
         {
-            CHECK(ccc_pq_decrease(&pq, &i->elem, val_update, &dec), true);
+            CHECK(ccc_pq_decrease(&pq, &i->elem, val_update, &dec) != NULL,
+                  true);
             CHECK(validate(&pq), true);
         }
     }
@@ -267,17 +274,18 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_decrease_with)
     int const limit = 400;
     for (size_t val = 0; val < num_nodes; ++val)
     {
-        struct val *const i = &vals[val];
         int inc = limit * 2;
-        int dec = i->val / 2;
-        if (i->val < limit)
+        int dec = vals[val].val / 2;
+        if (vals[val].val < limit)
         {
-            CHECK(ccc_pq_increase_w(&pq, &i->elem, { i->val = inc; }), true);
+            CHECK(ccc_pq_increase_w(&pq, &vals[val], { T->val = inc; }) != NULL,
+                  true);
             CHECK(validate(&pq), true);
         }
         else
         {
-            CHECK(ccc_pq_decrease_w(&pq, &i->elem, { i->val = dec; }), true);
+            CHECK(ccc_pq_decrease_w(&pq, &vals[val], { T->val = dec; }) != NULL,
+                  true);
             CHECK(validate(&pq), true);
         }
     }

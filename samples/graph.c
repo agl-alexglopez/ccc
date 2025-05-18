@@ -738,11 +738,13 @@ dijkstra_shortest_path(struct graph *const graph, char const src,
             if (alt < v->dist)
             {
                 /* Build the map with the appropriate best candidate parent. */
-                bool const relax = pq_decrease_w(&distances, &v->pq_elem, {
-                    v->dist = alt;
-                    v->from = u->name;
-                });
-                prog_assert(relax == true);
+                struct dijkstra_vertex const *const relax
+                    = pq_decrease_w(&distances, v,
+                                    {
+                                        T->dist = alt;
+                                        T->from = u->name;
+                                    });
+                prog_assert(relax == v);
                 paint_edge(graph, u->name, v->name, MAG);
                 nanosleep(&graph->speed, NULL);
             }

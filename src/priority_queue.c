@@ -174,44 +174,44 @@ ccc_pq_size(ccc_priority_queue const *const pq)
    to check if the value has exceeded the value of the first left child as
    any sibling of that left child may be bigger than or smaller than that
    left child value. */
-ccc_tribool
+void *
 ccc_pq_update(ccc_priority_queue *const pq, ccc_pq_elem *const e,
               ccc_any_type_update_fn *const fn, void *const aux)
 {
     if (!pq || !e || !fn || !e->next || !e->prev)
     {
-        return CCC_TRIBOOL_ERROR;
+        return NULL;
     }
     update_fixup(pq, e, fn, aux);
-    return CCC_TRUE;
+    return struct_base(pq, e);
 }
 
 /* Preferable to use this function if it is known the value is increasing.
    Much more efficient. */
-ccc_tribool
+void *
 ccc_pq_increase(ccc_priority_queue *const pq, ccc_pq_elem *const e,
                 ccc_any_type_update_fn *const fn, void *const aux)
 {
     if (!pq || !e || !fn || !e->next || !e->prev)
     {
-        return CCC_TRIBOOL_ERROR;
+        return NULL;
     }
     increase_fixup(pq, e, fn, aux);
-    return CCC_TRUE;
+    return struct_base(pq, e);
 }
 
 /* Preferable to use this function if it is known the value is decreasing.
    Much more efficient. */
-ccc_tribool
+void *
 ccc_pq_decrease(ccc_priority_queue *const pq, ccc_pq_elem *const e,
                 ccc_any_type_update_fn *const fn, void *const aux)
 {
     if (!pq || !e || !fn || !e->next || !e->prev)
     {
-        return CCC_TRIBOOL_ERROR;
+        return NULL;
     }
     decrease_fixup(pq, e, fn, aux);
-    return CCC_TRUE;
+    return struct_base(pq, e);
 }
 
 ccc_tribool
@@ -283,6 +283,13 @@ struct ccc_pq_elem *
 ccc_impl_pq_delete_node(struct ccc_pq *const pq, struct ccc_pq_elem *const root)
 {
     return delete_node(pq, root);
+}
+
+void *
+ccc_impl_pq_struct_base(struct ccc_pq const *const pq,
+                        struct ccc_pq_elem const *const e)
+{
+    return struct_base(pq, e);
 }
 
 /*========================   Static Helpers  ================================*/

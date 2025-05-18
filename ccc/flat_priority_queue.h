@@ -264,25 +264,24 @@ void *ccc_fpq_update(ccc_flat_priority_queue *fpq, void *e,
 
 /** @brief Update the user type stored in the priority queue directly. O(lgN).
 @param [in] fpq_ptr a pointer to the flat priority queue.
-@param [in] T_ptr a pointer to the user type being updated.
+@param [in] any_type_ptr a pointer to the user type being updated.
 @param [in] update_closure_over_T the semicolon separated statements to execute
-on the user type at T_ptr (optionally wrapping {code here} in braces may help
+on the user type at T (optionally wrapping {code here} in braces may help
 with formatting). This closure may safely modify the key used to track the user
 element's priority in the priority queue.
 @return a reference to the element at its new position in the fpq on success,
 NULL if parameters are invalid or fpq is empty.
-@warning the user must ensure T_ptr is in the fpq.
+@warning the user must ensure any_type_ptr is in the fpq.
 
 ```
 #define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
 flat_priority_queue fpq = build_rand_int_fpq();
-int *i = get_rand_fpq_elem(&fpq);
-(void)fpq_update_w(&fpq, i, { *i = rand_key(); });
+(void)fpq_update_w(&fpq, get_rand_fpq_elem(&fpq), { *T = rand_key(); });
 ```
 
 Note that whether the key increases or decreases does not affect runtime. */
-#define ccc_fpq_update_w(fpq_ptr, T_ptr, update_closure_over_T...)             \
-    ccc_impl_fpq_update_w(fpq_ptr, T_ptr, update_closure_over_T)
+#define ccc_fpq_update_w(fpq_ptr, any_type_ptr, update_closure_over_T...)      \
+    ccc_impl_fpq_update_w(fpq_ptr, any_type_ptr, update_closure_over_T)
 
 /** @brief Increase e that is a handle to the stored fpq element. O(lgN).
 @param [in] fpq a pointer to the flat priority queue.
@@ -297,25 +296,24 @@ void *ccc_fpq_increase(ccc_flat_priority_queue *fpq, void *e,
 
 /** @brief Increase the user type stored in the priority queue directly. O(lgN).
 @param [in] fpq_ptr a pointer to the flat priority queue.
-@param [in] T_ptr a pointer to the user type being updated.
+@param [in] any_type_ptr a pointer to the user type being updated.
 @param [in] increase_closure_over_T the semicolon separated statements to
-execute on the user type at T_ptr (optionally wrapping {code here} in braces may
-help with formatting). This closure may safely modify the key used to track the
-user element's priority in the priority queue.
+execute on the user type at T (optionally wrapping {code here} in
+braces may help with formatting). This closure may safely modify the key used to
+track the user element's priority in the priority queue.
 @return a reference to the element at its new position in the fpq on success,
 NULL if parameters are invalid or fpq is empty.
-@warning the user must ensure T_ptr is in the fpq.
+@warning the user must ensure any_type_ptr is in the fpq.
 
 ```
 #define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
 flat_priority_queue fpq = build_rand_int_fpq();
-int *i = get_rand_fpq_elem(&fpq);
-(void)fpq_increase_w(&fpq, i, { (*i)++; });
+(void)fpq_increase_w(&fpq, get_rand_fpq_elem(&fpq), { (*T)++; });
 ```
 
 Note that if this priority queue is min or max, the runtime is the same. */
-#define ccc_fpq_increase_w(fpq_ptr, T_ptr, increase_closure_over_T...)         \
-    ccc_impl_fpq_increase_w(fpq_ptr, T_ptr, increase_closure_over_T)
+#define ccc_fpq_increase_w(fpq_ptr, any_type_ptr, increase_closure_over_T...)  \
+    ccc_impl_fpq_increase_w(fpq_ptr, any_type_ptr, increase_closure_over_T)
 
 /** @brief Decrease e that is a handle to the stored fpq element. O(lgN).
 @param [in] fpq a pointer to the flat priority queue.
@@ -330,25 +328,24 @@ void *ccc_fpq_decrease(ccc_flat_priority_queue *fpq, void *e,
 
 /** @brief Increase the user type stored in the priority queue directly. O(lgN).
 @param [in] fpq_ptr a pointer to the flat priority queue.
-@param [in] T_ptr a pointer to the user type being updated.
+@param [in] any_type_ptr a pointer to the user type being updated.
 @param [in] decrease_closure_over_T the semicolon separated statements to
-execute on the user type at T_ptr (optionally wrapping {code here} in braces may
-help with formatting). This closure may safely modify the key used to track the
-user element's priority in the priority queue.
+execute on the user type at T (optionally wrapping {code here} in
+braces may help with formatting). This closure may safely modify the key used to
+track the user element's priority in the priority queue.
 @return a reference to the element at its new position in the fpq on success,
 NULL if parameters are invalid or fpq is empty.
-@warning the user must ensure T_ptr is in the fpq.
+@warning the user must ensure any_type_ptr is in the fpq.
 
 ```
 #define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
 flat_priority_queue fpq = build_rand_int_fpq();
-int *i = get_rand_fpq_elem(&fpq);
-(void)fpq_decrease_w(&fpq, i, { (*i)--; });
+(void)fpq_decrease_w(&fpq, get_rand_fpq_elem(&fpq), { (*T)--; });
 ```
 
 Note that if this priority queue is min or max, the runtime is the same. */
-#define ccc_fpq_decrease_w(fpq_ptr, T_ptr, decrease_closure_over_T...)         \
-    ccc_impl_fpq_decrease_w(fpq_ptr, T_ptr, decrease_closure_over_T)
+#define ccc_fpq_decrease_w(fpq_ptr, any_type_ptr, decrease_closure_over_T...)  \
+    ccc_impl_fpq_decrease_w(fpq_ptr, any_type_ptr, decrease_closure_over_T)
 
 /**@}*/
 

@@ -124,14 +124,13 @@ void *ccc_impl_fpq_update_fixup(struct ccc_fpq *, void *);
 #define ccc_impl_fpq_update_w(fpq_ptr, T_ptr, update_closure_over_T...)        \
     (__extension__({                                                           \
         struct ccc_fpq *const impl_fpq = (fpq_ptr);                            \
-        void *impl_fpq_update_res = NULL;                                      \
-        void *const impl_fpq_t_ptr = (T_ptr);                                  \
-        if (impl_fpq && impl_fpq_t_ptr && !ccc_buf_is_empty(&impl_fpq->buf))   \
+        typeof(*T_ptr) *T = (T_ptr);                                           \
+        if (impl_fpq && !ccc_buf_is_empty(&impl_fpq->buf) && T)                \
         {                                                                      \
-            {update_closure_over_T} impl_fpq_update_res                        \
-                = ccc_impl_fpq_update_fixup(impl_fpq, impl_fpq_t_ptr);         \
+            {update_closure_over_T} T                                          \
+                = ccc_impl_fpq_update_fixup(impl_fpq, T);                      \
         }                                                                      \
-        impl_fpq_update_res;                                                   \
+        T;                                                                     \
     }))
 
 /** @private */
