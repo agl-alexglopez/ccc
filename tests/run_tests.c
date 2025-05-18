@@ -75,7 +75,7 @@ static bool fill_path(char *, str_view, str_view);
 /** Logs errors to stderr. Change stream as needed. */
 #define logerr(format_string...) (void)fprintf(stderr, format_string)
 /** Logs to stdout. Change stream as needed. */
-#define log(format_string...) (void)fprintf(stdout, format_string)
+#define logout(format_string...) (void)fprintf(stdout, format_string)
 
 int
 main(int argc, char **argv)
@@ -115,10 +115,10 @@ CHECK_BEGIN_STATIC_FN(run, str_view const tests_dir)
                        sv_begin(entry), RED, fail_mark, CYAN, NONE);
                 break;
             case PASS:
-                log(" %s%s%s)%s\n", GREEN, pass_mark, CYAN, NONE);
+                logout(" %s%s%s)%s\n", GREEN, pass_mark, CYAN, NONE);
                 break;
             case FAIL:
-                log("\n%s%s%s)%s\n", RED, fail_mark, CYAN, NONE);
+                logout("\n%s%s%s)%s\n", RED, fail_mark, CYAN, NONE);
                 break;
         }
         if (res == PASS)
