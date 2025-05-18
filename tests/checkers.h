@@ -52,7 +52,8 @@ typedef enum check_result (*test_fn)(void);
         (void)fprintf(stderr, " ) != expected( ");                             \
         (void)fprintf(stderr, check_impl_format_string, expected);             \
         (void)fprintf(stderr, " )\n%s", NONE);                                 \
-    } while (0)
+    }                                                                          \
+    while (0)
 
 #define NON_DEFAULT_PARAMS(...) __VA_ARGS__
 #define DEFAULT_PARAMS(...) void
@@ -152,7 +153,8 @@ though the braces are not required. */
             __VA_OPT__((void)({__VA_ARGS__});)                                 \
             goto use_a_check_and_end_fn_with_one_of_the_CHECK_END_macros;      \
         }                                                                      \
-    } while (0)
+    }                                                                          \
+    while (0)
 
 /** @brief execute a check within the context of a test that sets an error.
 @param [in] test_result the result value of some action.
@@ -190,7 +192,8 @@ though the braces are not required. */
             __VA_OPT__((void)({__VA_ARGS__});)                                 \
             goto use_a_check_and_end_fn_with_one_of_the_CHECK_END_macros;      \
         }                                                                      \
-    } while (0)
+    }                                                                          \
+    while (0)
 
 /** Returns the current test status. If the end pass and end fail macros to
 finish a test do not provide the necessary flow control for various test
