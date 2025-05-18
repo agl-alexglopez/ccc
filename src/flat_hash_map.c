@@ -1010,14 +1010,14 @@ handle(struct ccc_fhmap *const h, void const *const key, uint64_t const hash)
     ccc_entry_status upcoming_insertion_error = 0;
     switch (maybe_rehash(h, 1, h->alloc_fn))
     {
-    case CCC_RESULT_OK:
-        break;
-    case CCC_RESULT_ARG_ERROR:
-        return (struct ccc_handl){.stats = CCC_ENTRY_ARG_ERROR};
-        break;
-    default:
-        upcoming_insertion_error = CCC_ENTRY_INSERT_ERROR;
-        break;
+        case CCC_RESULT_OK:
+            break;
+        case CCC_RESULT_ARG_ERROR:
+            return (struct ccc_handl){.stats = CCC_ENTRY_ARG_ERROR};
+            break;
+        default:
+            upcoming_insertion_error = CCC_ENTRY_INSERT_ERROR;
+            break;
     };
     struct ccc_handl res = find_key_or_slot(h, key, hash);
     res.stats |= upcoming_insertion_error;

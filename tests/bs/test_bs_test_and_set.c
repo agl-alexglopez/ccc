@@ -1093,17 +1093,17 @@ validate_sudoku_box(int board[9][9], bitset *const row_check,
 done:
     switch (was_on)
     {
-    case CCC_TRUE:
-        return CCC_FALSE;
-        break;
-    case CCC_FALSE:
-        return CCC_TRUE;
-        break;
-    case CCC_TRIBOOL_ERROR:
-        return CCC_TRIBOOL_ERROR;
-        break;
-    default:
-        return CCC_TRIBOOL_ERROR;
+        case CCC_TRUE:
+            return CCC_FALSE;
+            break;
+        case CCC_FALSE:
+            return CCC_TRUE;
+            break;
+        case CCC_TRIBOOL_ERROR:
+            return CCC_TRIBOOL_ERROR;
+            break;
+        default:
+            return CCC_TRIBOOL_ERROR;
     }
 }
 

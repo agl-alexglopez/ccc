@@ -181,39 +181,40 @@ CHECK_BEGIN_STATIC_FN(run_lru_cache)
     {
         switch (requests[i].call)
         {
-        case PUT:
-        {
-            CHECK(requests[i].putter(&lru_cache, requests[i].key,
-                                     requests[i].val),
-                  PASS);
-            QUIET_PRINT("PUT -> {key: %d, val: %d}\n", requests[i].key,
-                        requests[i].val);
-            CHECK(validate(&lru_cache.fh), true);
-            CHECK(validate(&lru_cache.l), true);
-        }
-        break;
-        case GET:
-        {
-            QUIET_PRINT("GET -> {key: %d, val: %d}\n", requests[i].key,
-                        requests[i].val);
-            int val = 0;
-            CHECK(requests[i].getter(&lru_cache, requests[i].key, &val), PASS);
-            CHECK(val, requests[i].val);
-            CHECK(validate(&lru_cache.l), true);
-        }
-        break;
-        case HED:
-        {
-            QUIET_PRINT("HED -> {key: %d, val: %d}\n", requests[i].key,
-                        requests[i].val);
-            struct key_val const *const kv = requests[i].header(&lru_cache);
-            CHECK(kv != NULL, true);
-            CHECK(kv->key, requests[i].key);
-            CHECK(kv->val, requests[i].val);
-        }
-        break;
-        default:
+            case PUT:
+            {
+                CHECK(requests[i].putter(&lru_cache, requests[i].key,
+                                         requests[i].val),
+                      PASS);
+                QUIET_PRINT("PUT -> {key: %d, val: %d}\n", requests[i].key,
+                            requests[i].val);
+                CHECK(validate(&lru_cache.fh), true);
+                CHECK(validate(&lru_cache.l), true);
+            }
             break;
+            case GET:
+            {
+                QUIET_PRINT("GET -> {key: %d, val: %d}\n", requests[i].key,
+                            requests[i].val);
+                int val = 0;
+                CHECK(requests[i].getter(&lru_cache, requests[i].key, &val),
+                      PASS);
+                CHECK(val, requests[i].val);
+                CHECK(validate(&lru_cache.l), true);
+            }
+            break;
+            case HED:
+            {
+                QUIET_PRINT("HED -> {key: %d, val: %d}\n", requests[i].key,
+                            requests[i].val);
+                struct key_val const *const kv = requests[i].header(&lru_cache);
+                CHECK(kv != NULL, true);
+                CHECK(kv->key, requests[i].key);
+                CHECK(kv->val, requests[i].val);
+            }
+            break;
+            default:
+                break;
         }
     }
     CHECK_END_FN({

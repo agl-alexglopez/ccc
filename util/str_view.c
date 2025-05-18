@@ -1145,29 +1145,29 @@ sv_maximal_suffix(ptrdiff_t const needle_sz,
     {
         switch (sv_char_cmp(needle[last_rest + rest], needle[suff_pos + rest]))
         {
-        case SV_LES:
-            last_rest += rest;
-            rest = 1;
-            period = last_rest - suff_pos;
-            break;
-        case SV_EQL:
-            if (rest != period)
-            {
-                ++rest;
-            }
-            else
-            {
-                last_rest += period;
+            case SV_LES:
+                last_rest += rest;
                 rest = 1;
-            }
-            break;
-        case SV_GRT:
-            suff_pos = last_rest;
-            last_rest = suff_pos + 1;
-            rest = period = 1;
-            break;
-        default:
-            break;
+                period = last_rest - suff_pos;
+                break;
+            case SV_EQL:
+                if (rest != period)
+                {
+                    ++rest;
+                }
+                else
+                {
+                    last_rest += period;
+                    rest = 1;
+                }
+                break;
+            case SV_GRT:
+                suff_pos = last_rest;
+                last_rest = suff_pos + 1;
+                rest = period = 1;
+                break;
+            default:
+                break;
         }
     }
     return (struct sv_factorization){.critical_pos = suff_pos,
@@ -1189,29 +1189,29 @@ sv_maximal_suffix_rev(ptrdiff_t const needle_sz,
     {
         switch (sv_char_cmp(needle[last_rest + rest], needle[suff_pos + rest]))
         {
-        case SV_GRT:
-            last_rest += rest;
-            rest = 1;
-            period = last_rest - suff_pos;
-            break;
-        case SV_EQL:
-            if (rest != period)
-            {
-                ++rest;
-            }
-            else
-            {
-                last_rest += period;
+            case SV_GRT:
+                last_rest += rest;
                 rest = 1;
-            }
-            break;
-        case SV_LES:
-            suff_pos = last_rest;
-            last_rest = suff_pos + 1;
-            rest = period = 1;
-            break;
-        default:
-            break;
+                period = last_rest - suff_pos;
+                break;
+            case SV_EQL:
+                if (rest != period)
+                {
+                    ++rest;
+                }
+                else
+                {
+                    last_rest += period;
+                    rest = 1;
+                }
+                break;
+            case SV_LES:
+                suff_pos = last_rest;
+                last_rest = suff_pos + 1;
+                rest = period = 1;
+                break;
+            default:
+                break;
         }
     }
     return (struct sv_factorization){.critical_pos = suff_pos,
@@ -1366,29 +1366,29 @@ sv_rmaximal_suffix(ptrdiff_t const needle_sz,
         switch (sv_char_cmp(needle[needle_sz - (last_rest + rest) - 1],
                             needle[needle_sz - (suff_pos + rest) - 1]))
         {
-        case SV_LES:
-            last_rest += rest;
-            rest = 1;
-            period = last_rest - suff_pos;
-            break;
-        case SV_EQL:
-            if (rest != period)
-            {
-                ++rest;
-            }
-            else
-            {
-                last_rest += period;
+            case SV_LES:
+                last_rest += rest;
                 rest = 1;
-            }
-            break;
-        case SV_GRT:
-            suff_pos = last_rest;
-            last_rest = suff_pos + 1;
-            rest = period = 1;
-            break;
-        default:
-            break;
+                period = last_rest - suff_pos;
+                break;
+            case SV_EQL:
+                if (rest != period)
+                {
+                    ++rest;
+                }
+                else
+                {
+                    last_rest += period;
+                    rest = 1;
+                }
+                break;
+            case SV_GRT:
+                suff_pos = last_rest;
+                last_rest = suff_pos + 1;
+                rest = period = 1;
+                break;
+            default:
+                break;
         }
     }
     return (struct sv_factorization){.critical_pos = suff_pos,
@@ -1408,29 +1408,29 @@ sv_rmaximal_suffix_rev(ptrdiff_t const needle_sz,
         switch (sv_char_cmp(needle[needle_sz - (last_rest + rest) - 1],
                             needle[needle_sz - (suff_pos + rest) - 1]))
         {
-        case SV_GRT:
-            last_rest += rest;
-            rest = 1;
-            period = last_rest - suff_pos;
-            break;
-        case SV_EQL:
-            if (rest != period)
-            {
-                ++rest;
-            }
-            else
-            {
-                last_rest += period;
+            case SV_GRT:
+                last_rest += rest;
                 rest = 1;
-            }
-            break;
-        case SV_LES:
-            suff_pos = last_rest;
-            last_rest = suff_pos + 1;
-            rest = period = 1;
-            break;
-        default:
-            break;
+                period = last_rest - suff_pos;
+                break;
+            case SV_EQL:
+                if (rest != period)
+                {
+                    ++rest;
+                }
+                else
+                {
+                    last_rest += period;
+                    rest = 1;
+                }
+                break;
+            case SV_LES:
+                suff_pos = last_rest;
+                last_rest = suff_pos + 1;
+                rest = period = 1;
+                break;
+            default:
+                break;
         }
     }
     return (struct sv_factorization){.critical_pos = suff_pos,

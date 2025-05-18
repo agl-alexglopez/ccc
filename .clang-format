@@ -3,6 +3,7 @@ IndentWidth: 4
 ColumnLimit: 80
 SpacesInParentheses: false
 IndentPPDirectives: AfterHash
+IndentCaseLabels: true
 BreakAfterReturnType: AllDefinitions
 AllowShortBlocksOnASingleLine: Empty
 AllowShortFunctionsOnASingleLine: None
