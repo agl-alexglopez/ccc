@@ -124,6 +124,9 @@ void ccc_impl_pq_init_node(struct ccc_pq_elem *);
 /** @private */
 struct ccc_pq_elem *ccc_impl_pq_delete_node(struct ccc_pq *,
                                             struct ccc_pq_elem *);
+/** @private */
+void *ccc_impl_pq_struct_base(struct ccc_pq const *,
+                              struct ccc_pq_elem const *);
 
 /*=========================  Macro Implementations     ======================*/
 
@@ -168,47 +171,45 @@ struct ccc_pq_elem *ccc_impl_pq_delete_node(struct ccc_pq *,
     }))
 
 /** @private */
-#define ccc_impl_pq_update_w(pq_ptr, pq_elem_ptr, update_closure_over_T...)    \
+#define ccc_impl_pq_update_w(pq_ptr, any_type_ptr, update_closure_over_T...)   \
     (__extension__({                                                           \
         struct ccc_pq *const impl_pq = (pq_ptr);                               \
-        ccc_tribool impl_pq_update_res = CCC_FALSE;                            \
-        struct ccc_pq_elem *const impl_pq_node_ptr = (pq_elem_ptr);            \
-        if (impl_pq && impl_pq_node_ptr && impl_pq_node_ptr->next              \
-            && impl_pq_node_ptr->prev)                                         \
+        typeof(*any_type_ptr) *T = (any_type_ptr);                             \
+        if (impl_pq && T)                                                      \
         {                                                                      \
-            impl_pq_update_res = CCC_TRUE;                                     \
-            if (impl_pq_node_ptr->parent                                       \
-                && ccc_impl_pq_cmp(impl_pq, impl_pq_node_ptr,                  \
-                                   impl_pq_node_ptr->parent)                   \
+            struct ccc_pq_elem *const impl_pq_elem_ptr                         \
+                = ccc_impl_pq_elem_in(impl_pq, T);                             \
+            if (impl_pq_elem_ptr->parent                                       \
+                && ccc_impl_pq_cmp(impl_pq, impl_pq_elem_ptr,                  \
+                                   impl_pq_elem_ptr->parent)                   \
                        == impl_pq->order)                                      \
             {                                                                  \
-                ccc_impl_pq_cut_child(impl_pq_node_ptr);                       \
+                ccc_impl_pq_cut_child(impl_pq_elem_ptr);                       \
                 {update_closure_over_T} impl_pq->root = ccc_impl_pq_merge(     \
-                    impl_pq, impl_pq->root, impl_pq_node_ptr);                 \
+                    impl_pq, impl_pq->root, impl_pq_elem_ptr);                 \
             }                                                                  \
             else                                                               \
             {                                                                  \
                 impl_pq->root                                                  \
-                    = ccc_impl_pq_delete_node(impl_pq, impl_pq_node_ptr);      \
-                ccc_impl_pq_init_node(impl_pq_node_ptr);                       \
+                    = ccc_impl_pq_delete_node(impl_pq, impl_pq_elem_ptr);      \
+                ccc_impl_pq_init_node(impl_pq_elem_ptr);                       \
                 {update_closure_over_T} impl_pq->root = ccc_impl_pq_merge(     \
-                    impl_pq, impl_pq->root, impl_pq_node_ptr);                 \
+                    impl_pq, impl_pq->root, impl_pq_elem_ptr);                 \
             }                                                                  \
         }                                                                      \
-        impl_pq_update_res;                                                    \
+        T;                                                                     \
     }))
 
 /** @private */
-#define ccc_impl_pq_increase_w(pq_ptr, pq_elem_ptr,                            \
+#define ccc_impl_pq_increase_w(pq_ptr, any_type_ptr,                           \
                                increase_closure_over_T...)                     \
     (__extension__({                                                           \
         struct ccc_pq *const impl_pq = (pq_ptr);                               \
-        ccc_tribool impl_pq_increase_res = CCC_FALSE;                          \
-        struct ccc_pq_elem *const impl_pq_elem_ptr = (pq_elem_ptr);            \
-        if (impl_pq && impl_pq_elem_ptr && impl_pq_elem_ptr->next              \
-            && impl_pq_elem_ptr->prev)                                         \
+        typeof(*any_type_ptr) *T = (any_type_ptr);                             \
+        if (impl_pq && T)                                                      \
         {                                                                      \
-            impl_pq_increase_res = CCC_TRUE;                                   \
+            struct ccc_pq_elem *const impl_pq_elem_ptr                         \
+                = ccc_impl_pq_elem_in(impl_pq, T);                             \
             if (impl_pq->order == CCC_GRT)                                     \
             {                                                                  \
                 ccc_impl_pq_cut_child(impl_pq_elem_ptr);                       \
@@ -222,20 +223,19 @@ struct ccc_pq_elem *ccc_impl_pq_delete_node(struct ccc_pq *,
             {increase_closure_over_T} impl_pq->root                            \
                 = ccc_impl_pq_merge(impl_pq, impl_pq->root, impl_pq_elem_ptr); \
         }                                                                      \
-        impl_pq_increase_res;                                                  \
+        T;                                                                     \
     }))
 
 /** @private */
-#define ccc_impl_pq_decrease_w(pq_ptr, pq_elem_ptr,                            \
+#define ccc_impl_pq_decrease_w(pq_ptr, any_type_ptr,                           \
                                decrease_closure_over_T...)                     \
     (__extension__({                                                           \
         struct ccc_pq *const impl_pq = (pq_ptr);                               \
-        ccc_tribool impl_pq_decrease_res = CCC_FALSE;                          \
-        struct ccc_pq_elem *const impl_pq_elem_ptr = (pq_elem_ptr);            \
-        if (impl_pq && impl_pq_elem_ptr && impl_pq_elem_ptr->next              \
-            && impl_pq_elem_ptr->prev)                                         \
+        typeof(*any_type_ptr) *T = (any_type_ptr);                             \
+        if (impl_pq && T)                                                      \
         {                                                                      \
-            impl_pq_decrease_res = CCC_TRUE;                                   \
+            struct ccc_pq_elem *const impl_pq_elem_ptr                         \
+                = ccc_impl_pq_elem_in(impl_pq, T);                             \
             if (impl_pq->order == CCC_LES)                                     \
             {                                                                  \
                 ccc_impl_pq_cut_child(impl_pq_elem_ptr);                       \
@@ -249,7 +249,7 @@ struct ccc_pq_elem *ccc_impl_pq_delete_node(struct ccc_pq *,
             {decrease_closure_over_T} impl_pq->root                            \
                 = ccc_impl_pq_merge(impl_pq, impl_pq->root, impl_pq_elem_ptr); \
         }                                                                      \
-        impl_pq_decrease_res;                                                  \
+        T;                                                                     \
     }))
 
 /* NOLINTEND(readability-identifier-naming) */

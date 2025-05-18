@@ -134,14 +134,13 @@ CHECK_BEGIN_STATIC_FN(fpq_test_priority_update_with)
     int const limit = 400;
     for (size_t val = 0; val < num_nodes; ++val)
     {
-        struct val *cur = &vals[val];
-        int backoff = cur->val / 2;
-        if (cur->val > limit)
+        int backoff = vals[val].val / 2;
+        if (vals[val].val > limit)
         {
             struct val const *const updated
-                = ccc_fpq_update_w(&fpq, cur,
+                = ccc_fpq_update_w(&fpq, &vals[val],
                                    {
-                                       cur->val = backoff;
+                                       T->val = backoff;
                                    });
             CHECK(updated != NULL, true);
             CHECK(updated->val, backoff);
