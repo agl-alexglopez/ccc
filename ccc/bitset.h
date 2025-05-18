@@ -187,9 +187,9 @@ is memory management handed over to the copy function.
 
 ```
 #define BITSET_USING_NAMESPACE_CCC
-static bitset src = bs_init((bitblock *)NULL, std_alloc, NULL, 0);
+static bitset src = bs_init(NULL, std_alloc, NULL, 0);
 push_rand_bits(&src);
-static bitset src = bs_init((bitblock *)NULL, std_alloc, NULL, 0);
+static bitset src = bs_init(NULL, std_alloc, NULL, 0);
 ccc_result res = bs_copy(&dst, &src, std_alloc);
 ```
 
@@ -200,9 +200,9 @@ size map.
 
 ```
 #define BITSET_USING_NAMESPACE_CCC
-static bitset src = bs_init((bitblock *)NULL, std_alloc, NULL, 0);
+static bitset src = bs_init(NULL, std_alloc, NULL, 0);
 push_rand_bits(&src);
-static bitset src = bs_init((bitblock *)NULL, NULL, NULL, 0);
+static bitset src = bs_init(NULL, NULL, NULL, 0);
 ccc_result res = bs_copy(&dst, &src, std_alloc);
 ```
 
