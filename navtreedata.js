@@ -61,7 +61,7 @@ var NAVTREEINDEX =
 [
 "annotated.html",
 "globals_eval.html",
-"priority__queue_8h.html#ac151ad453261b727302345e17c07ba3c"
+"priority__queue_8h.html#a8c312ced807d9b9e413b7850848634c5"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

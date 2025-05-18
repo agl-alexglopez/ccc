@@ -142,15 +142,15 @@ N). The cost of a pop operation is O(lg N).</p>
 <tr class="memitem:ada85255159c46fcaf747cd9a60473ceb"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#ada85255159c46fcaf747cd9a60473ceb">ccc_pq_emplace</a>(priority_queue_ptr,  lazy_value...)&#160;&#160;&#160;    ccc_impl_pq_emplace(priority_queue_ptr, lazy_value)</td></tr>
 <tr class="memdesc:ada85255159c46fcaf747cd9a60473ceb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write user type directly to a newly allocated priority queue elem.  <br /></td></tr>
 <tr class="separator:ada85255159c46fcaf747cd9a60473ceb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a394b5e79ecce5d30c8f130ca88acc01f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#a394b5e79ecce5d30c8f130ca88acc01f">ccc_pq_update_w</a>(pq_ptr,  pq_elem_ptr,  update_closure_over_T...)&#160;&#160;&#160;    ccc_impl_pq_update_w(pq_ptr, pq_elem_ptr, update_closure_over_T)</td></tr>
-<tr class="memdesc:a394b5e79ecce5d30c8f130ca88acc01f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update the priority in the user type stored in the container.  <br /></td></tr>
-<tr class="separator:a394b5e79ecce5d30c8f130ca88acc01f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a792119fbdb30362b4848949a74312990"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#a792119fbdb30362b4848949a74312990">ccc_pq_increase_w</a>(pq_ptr,  pq_elem_ptr,  increase_closure_over_T...)&#160;&#160;&#160;    ccc_impl_pq_increase_w(pq_ptr, pq_elem_ptr, increase_closure_over_T)</td></tr>
-<tr class="memdesc:a792119fbdb30362b4848949a74312990"><td class="mdescLeft">&#160;</td><td class="mdescRight">Increases the priority of the user type stored in the container.  <br /></td></tr>
-<tr class="separator:a792119fbdb30362b4848949a74312990"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a831bf770c1838bde3c1fde4358ff510c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#a831bf770c1838bde3c1fde4358ff510c">ccc_pq_decrease_w</a>(pq_ptr,  pq_elem_ptr,  decrease_closure_over_T...)&#160;&#160;&#160;    ccc_impl_pq_decrease_w(pq_ptr, pq_elem_ptr, decrease_closure_over_T)</td></tr>
-<tr class="memdesc:a831bf770c1838bde3c1fde4358ff510c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decreases the priority of the user type stored in the container.  <br /></td></tr>
-<tr class="separator:a831bf770c1838bde3c1fde4358ff510c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a33f1f787d08551619b1ea40c3cc84dd4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#a33f1f787d08551619b1ea40c3cc84dd4">ccc_pq_update_w</a>(pq_ptr,  any_type_ptr,  update_closure_over_T...)&#160;&#160;&#160;    ccc_impl_pq_update_w(pq_ptr, any_type_ptr, update_closure_over_T)</td></tr>
+<tr class="memdesc:a33f1f787d08551619b1ea40c3cc84dd4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update the priority in the user type stored in the container.  <br /></td></tr>
+<tr class="separator:a33f1f787d08551619b1ea40c3cc84dd4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a51f7ef8cad204938beda04f7237d0cd9"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#a51f7ef8cad204938beda04f7237d0cd9">ccc_pq_increase_w</a>(pq_ptr,  any_type_ptr,  increase_closure_over_T...)&#160;&#160;&#160;    ccc_impl_pq_increase_w(pq_ptr, any_type_ptr, increase_closure_over_T)</td></tr>
+<tr class="memdesc:a51f7ef8cad204938beda04f7237d0cd9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Increases the priority of the user type stored in the container.  <br /></td></tr>
+<tr class="separator:a51f7ef8cad204938beda04f7237d0cd9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3213fb03aac69cbe43a732dcf29a899d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#a3213fb03aac69cbe43a732dcf29a899d">ccc_pq_decrease_w</a>(pq_ptr,  any_type_ptr,  decrease_closure_over_T...)&#160;&#160;&#160;    ccc_impl_pq_decrease_w(pq_ptr, any_type_ptr, decrease_closure_over_T)</td></tr>
+<tr class="memdesc:a3213fb03aac69cbe43a732dcf29a899d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decreases the priority of the user type stored in the container.  <br /></td></tr>
+<tr class="separator:a3213fb03aac69cbe43a732dcf29a899d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a17fc73bd17733632f5712e3220f3216a"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#a17fc73bd17733632f5712e3220f3216a">ccc_pq_push</a> (<a class="el" href="priority__queue_8h.html#a53a826a19b684827cc3cda7a5517406b">ccc_priority_queue</a> *pq, ccc_pq_elem *elem)</td></tr>
 <tr class="memdesc:a17fc73bd17733632f5712e3220f3216a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds an element to the priority queue in correct total order. O(1).  <br /></td></tr>
 <tr class="separator:a17fc73bd17733632f5712e3220f3216a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -162,15 +162,15 @@ N). The cost of a pop operation is O(lg N).</p>
 <tr class="memitem:a58950b81644cdc83ff6e6dc2df186630"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#a58950b81644cdc83ff6e6dc2df186630">ccc_pq_erase</a> (<a class="el" href="priority__queue_8h.html#a53a826a19b684827cc3cda7a5517406b">ccc_priority_queue</a> *pq, ccc_pq_elem *elem)</td></tr>
 <tr class="memdesc:a58950b81644cdc83ff6e6dc2df186630"><td class="mdescLeft">&#160;</td><td class="mdescRight">Erase elem from the pq. Amortized O(lgN).  <br /></td></tr>
 <tr class="separator:a58950b81644cdc83ff6e6dc2df186630"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aca0fe8e7c63e5d95adf1f1aefe4d8218"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#aca0fe8e7c63e5d95adf1f1aefe4d8218">ccc_pq_update</a> (<a class="el" href="priority__queue_8h.html#a53a826a19b684827cc3cda7a5517406b">ccc_priority_queue</a> *pq, ccc_pq_elem *elem, <a class="el" href="types_8h.html#ada79c0d2b3cfeee31b9990c23a187d12">ccc_any_type_update_fn</a> *fn, void *aux)</td></tr>
-<tr class="memdesc:aca0fe8e7c63e5d95adf1f1aefe4d8218"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update the priority in the user type wrapping elem.  <br /></td></tr>
-<tr class="separator:aca0fe8e7c63e5d95adf1f1aefe4d8218"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a21f844e20f2fe5c5878f0222583f2656"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#a21f844e20f2fe5c5878f0222583f2656">ccc_pq_increase</a> (<a class="el" href="priority__queue_8h.html#a53a826a19b684827cc3cda7a5517406b">ccc_priority_queue</a> *pq, ccc_pq_elem *elem, <a class="el" href="types_8h.html#ada79c0d2b3cfeee31b9990c23a187d12">ccc_any_type_update_fn</a> *fn, void *aux)</td></tr>
-<tr class="memdesc:a21f844e20f2fe5c5878f0222583f2656"><td class="mdescLeft">&#160;</td><td class="mdescRight">Increases the priority of the type wrapping elem. O(1) or O(lgN)  <br /></td></tr>
-<tr class="separator:a21f844e20f2fe5c5878f0222583f2656"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acf5ee1522f6c854fe5d715d48776e827"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#acf5ee1522f6c854fe5d715d48776e827">ccc_pq_decrease</a> (<a class="el" href="priority__queue_8h.html#a53a826a19b684827cc3cda7a5517406b">ccc_priority_queue</a> *pq, ccc_pq_elem *elem, <a class="el" href="types_8h.html#ada79c0d2b3cfeee31b9990c23a187d12">ccc_any_type_update_fn</a> *fn, void *aux)</td></tr>
-<tr class="memdesc:acf5ee1522f6c854fe5d715d48776e827"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decreases the value of the type wrapping elem. O(1) or O(lgN)  <br /></td></tr>
-<tr class="separator:acf5ee1522f6c854fe5d715d48776e827"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a00be9b8276bedd5baa735f5caf350837"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#a00be9b8276bedd5baa735f5caf350837">ccc_pq_update</a> (<a class="el" href="priority__queue_8h.html#a53a826a19b684827cc3cda7a5517406b">ccc_priority_queue</a> *pq, ccc_pq_elem *elem, <a class="el" href="types_8h.html#ada79c0d2b3cfeee31b9990c23a187d12">ccc_any_type_update_fn</a> *fn, void *aux)</td></tr>
+<tr class="memdesc:a00be9b8276bedd5baa735f5caf350837"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update the priority in the user type wrapping elem.  <br /></td></tr>
+<tr class="separator:a00be9b8276bedd5baa735f5caf350837"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8c312ced807d9b9e413b7850848634c5"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#a8c312ced807d9b9e413b7850848634c5">ccc_pq_increase</a> (<a class="el" href="priority__queue_8h.html#a53a826a19b684827cc3cda7a5517406b">ccc_priority_queue</a> *pq, ccc_pq_elem *elem, <a class="el" href="types_8h.html#ada79c0d2b3cfeee31b9990c23a187d12">ccc_any_type_update_fn</a> *fn, void *aux)</td></tr>
+<tr class="memdesc:a8c312ced807d9b9e413b7850848634c5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Increases the priority of the type wrapping elem. O(1) or O(lgN)  <br /></td></tr>
+<tr class="separator:a8c312ced807d9b9e413b7850848634c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a17434c0141c85e588fd3758dfef32576"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#a17434c0141c85e588fd3758dfef32576">ccc_pq_decrease</a> (<a class="el" href="priority__queue_8h.html#a53a826a19b684827cc3cda7a5517406b">ccc_priority_queue</a> *pq, ccc_pq_elem *elem, <a class="el" href="types_8h.html#ada79c0d2b3cfeee31b9990c23a187d12">ccc_any_type_update_fn</a> *fn, void *aux)</td></tr>
+<tr class="memdesc:a17434c0141c85e588fd3758dfef32576"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decreases the value of the type wrapping elem. O(1) or O(lgN)  <br /></td></tr>
+<tr class="separator:a17434c0141c85e588fd3758dfef32576"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Container Types</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Types available in the container interface. </p>
@@ -210,8 +210,8 @@ N) increase/decrease key.  <br /></td></tr>
 <tr class="separator:ac93c8b051f2c6d02f706b7d71ce9bed5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="a831bf770c1838bde3c1fde4358ff510c" name="a831bf770c1838bde3c1fde4358ff510c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a831bf770c1838bde3c1fde4358ff510c">&#9670;&#160;</a></span>ccc_pq_decrease_w</h2>
+<a id="a3213fb03aac69cbe43a732dcf29a899d" name="a3213fb03aac69cbe43a732dcf29a899d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3213fb03aac69cbe43a732dcf29a899d">&#9670;&#160;</a></span>ccc_pq_decrease_w</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -226,7 +226,7 @@ N) increase/decrease key.  <br /></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">pq_elem_ptr, </td>
+          <td class="paramname">any_type_ptr, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -237,7 +237,7 @@ N) increase/decrease key.  <br /></td></tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td>&#160;&#160;&#160;    ccc_impl_pq_decrease_w(pq_ptr, pq_elem_ptr, decrease_closure_over_T)</td>
+          <td></td><td>&#160;&#160;&#160;    ccc_impl_pq_decrease_w(pq_ptr, any_type_ptr, decrease_closure_over_T)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -246,13 +246,13 @@ N) increase/decrease key.  <br /></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">pq_ptr</td><td>a pointer to the priority queue. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">pq_elem_ptr</td><td>a pointer to the intrusive handle in the user type. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">decrease_closure_over_T</td><td>the semicolon separated statements to execute on the user type which wraps pq_elem_ptr (optionally wrapping {code here} in braces may help with formatting). This closure may safely decrease the key used to track the user element's priority in the priority queue. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">any_type_ptr</td><td>a pointer to the user struct type in the pq. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">decrease_closure_over_T</td><td>a pointer to the user struct type T is made available. Use a semicolon separated statements to execute on the user type which wraps pq_elem_ptr (optionally wrapping {code here} in braces may help with formatting). This closure may safely modify the key used to track the user element's priority in the priority queue. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>true if the decrease occurred. Error if parameters were invalid or the function can deduce elem is not in the pq. </dd></dl>
-<dl class="section warning"><dt>Warning</dt><dd>the user must ensure elem is in the pq and pq_elem_ptr points to the intrusive element in the same user type that is being decreased. The data structure will be in an invalid state if the user decreases the priority by mistake in this function.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>a reference to the updated user type or NULL if update failed due to bad arguments provided. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>the user must ensure the any_type_ptr is a reference to an instance of the type actively stored in the priority queue. The data structure will be in an invalid state if the user decreases the priority by mistake in this function.</dd></dl>
 <div class="fragment"><div class="line"><span class="preprocessor">#define PRIORITY_QUEUE_USING_NAMESPACE_CCC</span></div>
 <div class="line"><span class="keyword">struct </span>val</div>
 <div class="line">{</div>
@@ -260,9 +260,8 @@ N) increase/decrease key.  <br /></td></tr>
 <div class="line">    <span class="keywordtype">int</span> key;</div>
 <div class="line">};</div>
 <div class="line">priority_queue pq = build_rand_pq();</div>
-<div class="line"><span class="keyword">struct </span>val *i = get_rand_pq_elem(&amp;pq);</div>
-<div class="line">pq_decrease_w(&amp;pq, &amp;i-&gt;e, { i-&gt;key--; });</div>
-</div><!-- fragment --><p> Note that this is optimal update technique if the priority queue has been initialized as a min queue and the new value is known to be less than the old value. If this is a min heap O(1), otherwise O(lgN).</p>
+<div class="line">pq_decrease_w(&amp;pq, get_rand_pq_elem(&amp;pq), { T-&gt;key--; });</div>
+</div><!-- fragment --><p>Note that this is optimal update technique if the priority queue has been initialized as a min queue and the new value is known to be less than the old value. If this is a min heap O(1), otherwise O(lgN).</p>
 <p>While the best case operation is O(1) the impact of restructuring on future pops from the pq creates an amortized o(lgN) runtime for this function. </p>
 
 </div>
@@ -306,8 +305,8 @@ N) increase/decrease key.  <br /></td></tr>
 
 </div>
 </div>
-<a id="a792119fbdb30362b4848949a74312990" name="a792119fbdb30362b4848949a74312990"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a792119fbdb30362b4848949a74312990">&#9670;&#160;</a></span>ccc_pq_increase_w</h2>
+<a id="a51f7ef8cad204938beda04f7237d0cd9" name="a51f7ef8cad204938beda04f7237d0cd9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a51f7ef8cad204938beda04f7237d0cd9">&#9670;&#160;</a></span>ccc_pq_increase_w</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -322,7 +321,7 @@ N) increase/decrease key.  <br /></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">pq_elem_ptr, </td>
+          <td class="paramname">any_type_ptr, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -333,7 +332,7 @@ N) increase/decrease key.  <br /></td></tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td>&#160;&#160;&#160;    ccc_impl_pq_increase_w(pq_ptr, pq_elem_ptr, increase_closure_over_T)</td>
+          <td></td><td>&#160;&#160;&#160;    ccc_impl_pq_increase_w(pq_ptr, any_type_ptr, increase_closure_over_T)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -342,13 +341,13 @@ N) increase/decrease key.  <br /></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">pq_ptr</td><td>a pointer to the priority queue. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">pq_elem_ptr</td><td>a pointer to the intrusive handle in the user type. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">increase_closure_over_T</td><td>the semicolon separated statements to execute on the user type which wraps pq_elem_ptr (optionally wrapping {code here} in braces may help with formatting). This closure may safely increase the key used to track the user element's priority in the priority queue. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">any_type_ptr</td><td>a pointer to the user struct type in the pq. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">increase_closure_over_T</td><td>a pointer to the user struct type T is made available. Use a semicolon separated statements to execute on the user type which wraps pq_elem_ptr (optionally wrapping {code here} in braces may help with formatting). This closure may safely modify the key used to track the user element's priority in the priority queue. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>true if the increase occurred. Error if parameters were invalid or the function can deduce elem is not in the pq. </dd></dl>
-<dl class="section warning"><dt>Warning</dt><dd>the user must ensure elem is in the pq and pq_elem_ptr points to the intrusive element in the same user type that is being increased. The data structure will be in an invalid state if the user decreases the priority by mistake in this function.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>a reference to the updated user type or NULL if update failed due to bad arguments provided. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>the user must ensure the any_type_ptr is a reference to an instance of the type actively stored in the priority queue. The data structure will be in an invalid state if the user decreases the priority by mistake in this function.</dd></dl>
 <div class="fragment"><div class="line"><span class="preprocessor">#define PRIORITY_QUEUE_USING_NAMESPACE_CCC</span></div>
 <div class="line"><span class="keyword">struct </span>val</div>
 <div class="line">{</div>
@@ -356,8 +355,7 @@ N) increase/decrease key.  <br /></td></tr>
 <div class="line">    <span class="keywordtype">int</span> key;</div>
 <div class="line">};</div>
 <div class="line">priority_queue pq = build_rand_pq();</div>
-<div class="line"><span class="keyword">struct </span>val *i = get_rand_pq_elem(&amp;pq);</div>
-<div class="line">pq_increase_w(&amp;pq, &amp;i-&gt;e, { i-&gt;key++; });</div>
+<div class="line">pq_increase_w(&amp;pq, get_rand_val(&amp;pq), { T-&gt;key++; });</div>
 </div><!-- fragment --><p>Note that this is optimal update technique if the priority queue has been initialized as a max queue and the new value is known to be greater than the old value. If this is a max heap O(1), otherwise O(lgN).</p>
 <p>While the best case operation is O(1) the impact of restructuring on future pops from the pq creates an amortized o(lgN) runtime for this function. </p>
 
@@ -431,8 +429,8 @@ N) increase/decrease key.  <br /></td></tr>
 
 </div>
 </div>
-<a id="a394b5e79ecce5d30c8f130ca88acc01f" name="a394b5e79ecce5d30c8f130ca88acc01f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a394b5e79ecce5d30c8f130ca88acc01f">&#9670;&#160;</a></span>ccc_pq_update_w</h2>
+<a id="a33f1f787d08551619b1ea40c3cc84dd4" name="a33f1f787d08551619b1ea40c3cc84dd4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a33f1f787d08551619b1ea40c3cc84dd4">&#9670;&#160;</a></span>ccc_pq_update_w</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -447,7 +445,7 @@ N) increase/decrease key.  <br /></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">pq_elem_ptr, </td>
+          <td class="paramname">any_type_ptr, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -458,7 +456,7 @@ N) increase/decrease key.  <br /></td></tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td>&#160;&#160;&#160;    ccc_impl_pq_update_w(pq_ptr, pq_elem_ptr, update_closure_over_T)</td>
+          <td></td><td>&#160;&#160;&#160;    ccc_impl_pq_update_w(pq_ptr, any_type_ptr, update_closure_over_T)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -467,13 +465,13 @@ N) increase/decrease key.  <br /></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">pq_ptr</td><td>a pointer to the priority queue. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">pq_elem_ptr</td><td>a pointer to the intrusive handle in the user type. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">update_closure_over_T</td><td>the semicolon separated statements to execute on the user type which wraps pq_elem_ptr (optionally wrapping {code here} in braces may help with formatting). This closure may safely modify the key used to track the user element's priority in the priority queue. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">any_type_ptr</td><td>a pointer to the user struct type in the pq. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">update_closure_over_T</td><td>a pointer to the user struct type T is made available. Use a semicolon separated statements to execute on the user type which wraps pq_elem_ptr (optionally wrapping {code here} in braces may help with formatting). This closure may safely modify the key used to track the user element's priority in the priority queue. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>true if the update occurred. Error if parameters were invalid or the function can deduce elem is not in the pq. </dd></dl>
-<dl class="section warning"><dt>Warning</dt><dd>the user must ensure elem is in the pq and pq_elem_ptr points to the intrusive element in the same user type that is being updated.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>a reference to the updated user type or NULL if update failed due to bad arguments provided. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>the user must ensure the any_type_ptr is a reference to an instance of the type actively stored in the priority queue.</dd></dl>
 <div class="fragment"><div class="line"><span class="preprocessor">#define PRIORITY_QUEUE_USING_NAMESPACE_CCC</span></div>
 <div class="line"><span class="keyword">struct </span>val</div>
 <div class="line">{</div>
@@ -481,8 +479,7 @@ N) increase/decrease key.  <br /></td></tr>
 <div class="line">    <span class="keywordtype">int</span> key;</div>
 <div class="line">};</div>
 <div class="line">priority_queue pq = build_rand_pq();</div>
-<div class="line"><span class="keyword">struct </span>val *i = get_rand_pq_elem(&amp;pq);</div>
-<div class="line">pq_update_w(&amp;pq, &amp;i-&gt;e, { i-&gt;key = rand_key(); });</div>
+<div class="line">pq_update_w(&amp;pq, get_rand_val(&amp;pq), { T-&gt;key = rand_key(); });</div>
 </div><!-- fragment --><p>Note that this operation may incur unnecessary overhead if the user can't deduce if an increase or decrease is occurring. See the increase and decrease operations. O(1) best case, O(lgN) worst case. </p>
 
 </div>
@@ -565,14 +562,14 @@ N) increase/decrease key. </p>
 
 </div>
 </div>
-<a id="acf5ee1522f6c854fe5d715d48776e827" name="acf5ee1522f6c854fe5d715d48776e827"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acf5ee1522f6c854fe5d715d48776e827">&#9670;&#160;</a></span>ccc_pq_decrease()</h2>
+<a id="a17434c0141c85e588fd3758dfef32576" name="a17434c0141c85e588fd3758dfef32576"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a17434c0141c85e588fd3758dfef32576">&#9670;&#160;</a></span>ccc_pq_decrease()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> ccc_pq_decrease </td>
+          <td class="memname">void * ccc_pq_decrease </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="priority__queue_8h.html#a53a826a19b684827cc3cda7a5517406b">ccc_priority_queue</a> *&#160;</td>
           <td class="paramname"><em>pq</em>, </td>
@@ -613,7 +610,7 @@ N) increase/decrease key. </p>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>true if the decrease occurred. Error if parameters were invalid or the function can deduce elem is not in the pq.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>a reference to the updated user type or NULL if update failed due to bad arguments provided.</dd></dl>
 <p>Note that this is optimal update technique if the priority queue has been initialized as a min queue and the new value is known to be less than the old value. If this is a min heap O(1), otherwise O(lgN).</p>
 <p>While the best case operation is O(1) the impact of restructuring on future pops from the pq creates an amortized o(lgN) runtime for this function. </p>
 
@@ -722,14 +719,14 @@ N) increase/decrease key. </p>
 
 </div>
 </div>
-<a id="a21f844e20f2fe5c5878f0222583f2656" name="a21f844e20f2fe5c5878f0222583f2656"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a21f844e20f2fe5c5878f0222583f2656">&#9670;&#160;</a></span>ccc_pq_increase()</h2>
+<a id="a8c312ced807d9b9e413b7850848634c5" name="a8c312ced807d9b9e413b7850848634c5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8c312ced807d9b9e413b7850848634c5">&#9670;&#160;</a></span>ccc_pq_increase()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> ccc_pq_increase </td>
+          <td class="memname">void * ccc_pq_increase </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="priority__queue_8h.html#a53a826a19b684827cc3cda7a5517406b">ccc_priority_queue</a> *&#160;</td>
           <td class="paramname"><em>pq</em>, </td>
@@ -770,7 +767,7 @@ N) increase/decrease key. </p>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>true if the increase occurred. Error if parameters were invalid or the function can deduce elem is not in the pq. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>a reference to the updated user type or NULL if update failed due to bad arguments provided. </dd></dl>
 <dl class="section warning"><dt>Warning</dt><dd>the data structure will be in an invalid state if the user decreases the priority by mistake in this function.</dd></dl>
 <p>Note that this is optimal update technique if the priority queue has been initialized as a max queue and the new value is known to be greater than the old value. If this is a max heap O(1), otherwise O(lgN).</p>
 <p>While the best case operation is O(1) the impact of restructuring on future pops from the pq creates an amortized o(lgN) runtime for this function. </p>
@@ -925,14 +922,14 @@ N) increase/decrease key. </p>
 
 </div>
 </div>
-<a id="aca0fe8e7c63e5d95adf1f1aefe4d8218" name="aca0fe8e7c63e5d95adf1f1aefe4d8218"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aca0fe8e7c63e5d95adf1f1aefe4d8218">&#9670;&#160;</a></span>ccc_pq_update()</h2>
+<a id="a00be9b8276bedd5baa735f5caf350837" name="a00be9b8276bedd5baa735f5caf350837"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a00be9b8276bedd5baa735f5caf350837">&#9670;&#160;</a></span>ccc_pq_update()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> ccc_pq_update </td>
+          <td class="memname">void * ccc_pq_update </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="priority__queue_8h.html#a53a826a19b684827cc3cda7a5517406b">ccc_priority_queue</a> *&#160;</td>
           <td class="paramname"><em>pq</em>, </td>
@@ -973,7 +970,7 @@ N) increase/decrease key. </p>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>true if the update occurred. Error if parameters were invalid or the function can deduce elem is not in the pq. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>a reference to the updated user type or NULL if update failed due to bad arguments provided. </dd></dl>
 <dl class="section warning"><dt>Warning</dt><dd>the user must ensure elem is in the pq.</dd></dl>
 <p>Note that this operation may incur unnecessary overhead if the user can't deduce if an increase or decrease is occurring. See the increase and decrease operations. O(1) best case, O(lgN) worst case. </p>
 
