@@ -10,8 +10,10 @@ set(CMAKE_C_STANDARD 23)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 option(BUILD_SHARED_LIBS "Building ccc as a shared library is available, but OFF by default." OFF)
 
+# Required to help clarify and cleanup install in ccc/ and cmake/ cmake files.
 set(namespace "ccc")
 
+# For releases we only produce this and the src. No test or sample bloat.
 include_directories("${PROJECT_SOURCE_DIR}/${PROJECT_NAME}")
 add_subdirectory("${PROJECT_SOURCE_DIR}/${PROJECT_NAME}")
 

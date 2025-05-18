@@ -1,7 +1,7 @@
 add_library(${PROJECT_NAME})
-add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
+add_library(${namespace}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
-# add sources to the library target
+# File sets simplify install and allow isolation of only container files.
 target_sources(${PROJECT_NAME}
     PRIVATE
         ${PROJECT_SOURCE_DIR}/src/types.c
