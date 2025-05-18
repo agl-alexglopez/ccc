@@ -18,14 +18,14 @@ build:
 
 gcc-ccc:
 	cmake --preset=gcc-rel -DCMAKE_INSTALL_PREFIX=$(PREFIX)
-	cmake --build $(BUILD_DIR) --target install $(JOBS)
+	cmake --build $(BUILD_DIR) $(JOBS) --target install $(JOBS)
 
 clang-ccc:
 	cmake --preset=clang-rel -DCMAKE_INSTALL_PREFIX=$(PREFIX)
-	cmake --build $(BUILD_DIR) --target install $(JOBS)
+	cmake --build $(BUILD_DIR) $(JOBS) --target install $(JOBS)
 
 install:
-	cmake --build $(BUILD_DIR) --target install $(JOBS)
+	cmake --build $(BUILD_DIR) $(JOBS) --target install $(JOBS)
 
 gcc-rel:
 	cmake --preset=gcc-rel
