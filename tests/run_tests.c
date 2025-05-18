@@ -63,14 +63,19 @@ struct path_bin
 };
 
 static str_view const test_prefix = SV("test_");
-char const *const pass_msg = "⬤";
-char const *const fail_msg = "X";
-char const *const err_msg = "Test process failed abnormally:";
+char const *const pass_mark = "⬤";
+char const *const fail_mark = "X";
+char const *const err_msg = "Test process was unexpectedly killed.";
 
 static enum check_result run(str_view);
 static enum check_result run_test_process(struct path_bin);
 static DIR *open_test_dir(str_view);
 static bool fill_path(char *, str_view, str_view);
+
+/** Logs errors to stderr. Change stream as needed. */
+#define logerr(format_string...) (void)fprintf(stderr, format_string)
+/** Logs to stdout. Change stream as needed. */
+#define log(format_string...) (void)fprintf(stdout, format_string)
 
 int
 main(int argc, char **argv)
@@ -106,16 +111,14 @@ CHECK_BEGIN_STATIC_FN(run, str_view const tests_dir)
         switch (res)
         {
             case ERROR:
-                (void)fprintf(stderr, "\n%s%s%s %s %s%s%s)%s\n", RED, err_msg,
-                              CYAN, sv_begin(entry), RED, fail_msg, CYAN, NONE);
+                logerr("\n%s%s%s\n%s %s%s%s)%s\n", RED, err_msg, CYAN,
+                       sv_begin(entry), RED, fail_mark, CYAN, NONE);
                 break;
             case PASS:
-                (void)fprintf(stdout, " %s%s%s)%s\n", GREEN, pass_msg, CYAN,
-                              NONE);
+                log(" %s%s%s)%s\n", GREEN, pass_mark, CYAN, NONE);
                 break;
             case FAIL:
-                (void)fprintf(stdout, "\n%s%s%s)%s\n", RED, fail_msg, CYAN,
-                              NONE);
+                log("\n%s%s%s)%s\n", RED, fail_mark, CYAN, NONE);
                 break;
         }
         if (res == PASS)
@@ -130,34 +133,28 @@ CHECK_BEGIN_STATIC_FN(run, str_view const tests_dir)
 
 CHECK_BEGIN_STATIC_FN(run_test_process, struct path_bin pb)
 {
-    CHECK_ERROR(sv_empty(pb.path), false,
-                { (void)fprintf(stderr, "No test provided.\n"); });
+    CHECK_ERROR(sv_empty(pb.path), false, { logerr("No test provided.\n"); });
     pid_t const test_proc = fork();
     if (test_proc == 0)
     {
-        CHECK_ERROR(
-            execl(sv_begin(pb.path), sv_begin(pb.bin), NULL) >= 0, true, {
-                (void)fprintf(stderr, "Child test process could not start.\n");
-            });
+        (void)execl(sv_begin(pb.path), sv_begin(pb.bin), NULL);
+        CHECK_ERROR(0, 1, { logerr("Child test process could not start.\n"); });
     }
     int status = 0;
-    CHECK_ERROR(waitpid(test_proc, &status, 0) >= 0, true, {
-        (void)fprintf(stderr, "Error running test: %s\n", sv_begin(pb.bin));
-    });
+    CHECK_ERROR(waitpid(test_proc, &status, 0) >= 0, true,
+                { logerr("Error running test: %s\n", sv_begin(pb.bin)); });
     CHECK_ERROR(WIFSIGNALED(status), false, {
         int const sig = WTERMSIG(status);
         char const *const msg = strsignal(sig);
         if (msg)
         {
-            (void)fprintf(stderr, "%sProcess terminated with signal %d: %s%s\n",
-                          RED, sig, msg, NONE);
+            logerr("%sProcess killed with signal %d: %s%s\n", RED, sig, msg,
+                   NONE);
         }
         else
         {
-            (void)fprintf(
-                stderr,
-                "%sProcess terminated with signal %d: unknown signal code%s\n",
-                RED, sig, NONE);
+            logerr("%sProcess killed with signal %d: unknown signal code%s\n",
+                   RED, sig, NONE);
         }
     });
     CHECK(WIFEXITED(status), true);
@@ -170,15 +167,14 @@ open_test_dir(str_view tests_folder)
 {
     if (sv_empty(tests_folder) || sv_len(tests_folder) > FILESYS_MAX_PATH)
     {
-        (void)fprintf(stderr, "Invalid input to path to test executables %s\n",
-                      sv_begin(tests_folder));
+        logerr("Invalid input to path to test executables %s\n",
+               sv_begin(tests_folder));
         return NULL;
     }
     DIR *dir_ptr = opendir(sv_begin(tests_folder));
     if (!dir_ptr)
     {
-        (void)fprintf(stderr, "Could not open directory %s\n",
-                      sv_begin(tests_folder));
+        logerr("Could not open directory %s\n", sv_begin(tests_folder));
         return NULL;
     }
     return dir_ptr;
@@ -190,8 +186,7 @@ fill_path(char *path_buf, str_view tests_dir, str_view entry)
     size_t const dir_bytes = sv_fill(FILESYS_MAX_PATH, path_buf, tests_dir);
     if (FILESYS_MAX_PATH - dir_bytes < sv_size(entry))
     {
-        (void)fprintf(stderr, "Relative path exceeds FILESYS_MAX_PATH?\n%s",
-                      path_buf);
+        logerr("Relative path exceeds FILESYS_MAX_PATH?\n%s", path_buf);
         return false;
     }
     (void)sv_fill(FILESYS_MAX_PATH - dir_bytes, path_buf + sv_len(tests_dir),

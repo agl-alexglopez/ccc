@@ -52,19 +52,19 @@ dsan:
 	$(MAKE) build
 
 format:
-	cmake --build $(BUILD_DIR) --target format
+	cmake --build $(BUILD_DIR) $(JOBS) --target format
 
 tidy:
-	cmake --build $(BUILD_DIR) --target tidy $(JOBS)
+	cmake --build $(BUILD_DIR) $(JOBS) --target tidy $(JOBS)
 
 tests:
-	cmake --build $(BUILD_DIR) --target tests $(JOBS)
+	cmake --build $(BUILD_DIR) $(JOBS) --target tests $(JOBS)
 
 samples:
-	cmake --build $(BUILD_DIR) --target samples $(JOBS)
+	cmake --build $(BUILD_DIR) $(JOBS) --target samples $(JOBS)
 
 util:
-	cmake --build $(BUILD_DIR) --target util $(JOBS)
+	cmake --build $(BUILD_DIR) $(JOBS) --target util $(JOBS)
 
 all-gcc-deb:
 	cmake --preset=gcc-deb && cmake --build build $(JOBS) --target ccc tests samples
