@@ -26,7 +26,7 @@ report from the test program on its own determination of success. Each child
 will return a test status as its exit code. A pass is 0 and failure is non-zero,
 currently set as 1 to be POSIX compliant.
 
-Running children also gives us a chance to catch unforseen crashes or segfaults
+Running children also gives us a chance to catch surprise crashes or segfaults
 while still being able to run subsequent tests. Most programmer errors will
 trigger some sort of OS level failure that we can handle as the parent. If a
 test child fails in a non-catastrophic way it will only fail the individual
