@@ -68,7 +68,8 @@ static bool const quiet = true;
         {                                                                      \
             printf(format_string);                                             \
         }                                                                      \
-    } while (0)
+    }                                                                          \
+    while (0)
 
 static ccc_tribool
 lru_lookup_cmp(ccc_any_key_cmp const cmp)

@@ -137,14 +137,16 @@ static str_view const directions
             sv_print(stderr, directions);                                      \
             exit(1);                                                           \
         }                                                                      \
-    } while (0)
+    }                                                                          \
+    while (0)
 
 #define QUIT_MSG(file, msg...)                                                 \
     do                                                                         \
     {                                                                          \
         (void)fprintf(file, msg);                                              \
         exit(1);                                                               \
-    } while (0)
+    }                                                                          \
+    while (0)
 
 static void print_found(FILE *file, str_view w);
 static void print_top_n(FILE *file, int n);

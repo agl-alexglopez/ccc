@@ -1115,7 +1115,8 @@ insert_fixup(struct ccc_hromap *const t, size_t z, size_t x)
         {
             return;
         }
-    } while (is_01_parent(t, x, z, sibling_of(t, x)));
+    }
+    while (is_01_parent(t, x, z, sibling_of(t, x)));
 
     if (!is_02_parent(t, x, z, sibling_of(t, x)))
     {
@@ -1298,7 +1299,8 @@ rebalance_3_child(struct ccc_hromap *const t, size_t z, size_t x)
         }
         x = z;
         z = g;
-    } while (z && made_3_child);
+    }
+    while (z && made_3_child);
 }
 
 /** A single rotation is symmetric. Here is the right case. Lowercase are nodes
@@ -1426,7 +1428,7 @@ is_01_parent(struct ccc_hromap const *const t, size_t const x, size_t const p,
 {
     assert(p);
     return (!parity(t, x) && !parity(t, p) && parity(t, y))
-           || (parity(t, x) && parity(t, p) && !parity(t, y));
+        || (parity(t, x) && parity(t, p) && !parity(t, y));
 }
 
 /* Returns true if a parent is a 1,1 node. Either child may be the sentinel
@@ -1440,7 +1442,7 @@ is_11_parent(struct ccc_hromap const *const t, size_t const x, size_t const p,
 {
     assert(p);
     return (!parity(t, x) && parity(t, p) && !parity(t, y))
-           || (parity(t, x) && !parity(t, p) && parity(t, y));
+        || (parity(t, x) && !parity(t, p) && parity(t, y));
 }
 
 /* Returns true if a parent is a 0,2 or 2,0 node, which is not allowed. Either
@@ -1540,7 +1542,7 @@ recursive_size(struct ccc_hromap const *const t, size_t const r)
         return 0;
     }
     return 1 + recursive_size(t, branch_i(t, r, R))
-           + recursive_size(t, branch_i(t, r, L));
+         + recursive_size(t, branch_i(t, r, L));
 }
 
 static ccc_tribool
@@ -1564,11 +1566,11 @@ are_subtrees_valid(struct ccc_hromap const *t, struct tree_range const r)
                                   .root = branch_i(t, r.root, L),
                                   .high = r.root,
                               })
-           && are_subtrees_valid(t, (struct tree_range){
-                                        .low = r.root,
-                                        .root = branch_i(t, r.root, R),
-                                        .high = r.high,
-                                    });
+        && are_subtrees_valid(t, (struct tree_range){
+                                     .low = r.root,
+                                     .root = branch_i(t, r.root, R),
+                                     .high = r.high,
+                                 });
 }
 
 static ccc_tribool
@@ -1584,7 +1586,7 @@ is_storing_parent(struct ccc_hromap const *const t, size_t const p,
         return CCC_FALSE;
     }
     return is_storing_parent(t, root, branch_i(t, root, L))
-           && is_storing_parent(t, root, branch_i(t, root, R));
+        && is_storing_parent(t, root, branch_i(t, root, R));
 }
 
 static ccc_tribool

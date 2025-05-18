@@ -63,7 +63,8 @@ static bool const quiet = true;
         {                                                                      \
             printf(format_string);                                             \
         }                                                                      \
-    } while (0)
+    }                                                                          \
+    while (0)
 
 static ccc_threeway_cmp
 cmp_by_key(ccc_any_key_cmp const cmp)

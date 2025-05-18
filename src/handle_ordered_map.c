@@ -937,7 +937,8 @@ splay(struct ccc_homap *const t, size_t root, void const *const key,
         link(t, l_r_subtrees[!dir], dir, root);
         l_r_subtrees[!dir] = root;
         root = branch_i(t, root, dir);
-    } while (1);
+    }
+    while (1);
     link(t, l_r_subtrees[L], R, branch_i(t, root, L));
     link(t, l_r_subtrees[R], L, branch_i(t, root, R));
     link(t, root, L, nil->branch[R]);
@@ -1160,7 +1161,7 @@ recursive_size(struct ccc_homap const *const t, size_t const r)
         return 0;
     }
     return 1 + recursive_size(t, branch_i(t, r, R))
-           + recursive_size(t, branch_i(t, r, L));
+         + recursive_size(t, branch_i(t, r, L));
 }
 
 static ccc_tribool
@@ -1182,7 +1183,7 @@ are_subtrees_valid(struct ccc_homap const *t, struct tree_range const r)
                t, (struct tree_range){.low = r.low,
                                       .root = branch_i(t, r.root, L),
                                       .high = r.root})
-           && are_subtrees_valid(
+        && are_subtrees_valid(
                t, (struct tree_range){.low = r.root,
                                       .root = branch_i(t, r.root, R),
                                       .high = r.high});
@@ -1201,7 +1202,7 @@ is_storing_parent(struct ccc_homap const *const t, size_t const p,
         return CCC_FALSE;
     }
     return is_storing_parent(t, root, branch_i(t, root, L))
-           && is_storing_parent(t, root, branch_i(t, root, R));
+        && is_storing_parent(t, root, branch_i(t, root, R));
 }
 
 static ccc_tribool

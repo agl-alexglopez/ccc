@@ -204,7 +204,8 @@ static char const end_vertex_title = 'Z';
                    #cond);                                                     \
             exit(1);                                                           \
         }                                                                      \
-    } while (0)
+    }                                                                          \
+    while (0)
 
 static int const default_rows = 33;
 static int const default_cols = 111;
@@ -382,7 +383,7 @@ build_graph(struct graph *const graph)
         struct point rand_point = random_vertex_placement(graph);
         *grid_at_mut(graph, rand_point.r, rand_point.c)
             = vertex_bit | path_bit
-              | ((cell)vertex_title << vertex_cell_title_shift);
+            | ((cell)vertex_title << vertex_cell_title_shift);
         *vertex_at(graph, (char)vertex_title) = (struct vertex){
             .name = (char)vertex_title,
             .pos = rand_point,
@@ -548,8 +549,8 @@ encode_digits(struct graph const *const g, struct digit_encoding *const e)
     if (e->orientation == NORTH || e->orientation == SOUTH)
     {
         e->start.r = e->orientation == NORTH
-                         ? e->start.r + (int)e->spaces_needed - 2
-                         : e->start.r - 1;
+                       ? e->start.r + (int)e->spaces_needed - 2
+                       : e->start.r - 1;
         for (uintmax_t digits = e->cost; digits; digits /= 10, --e->start.r)
         {
             *grid_at_mut(g, e->start.r, e->start.c) |= digit_bit;
@@ -560,8 +561,8 @@ encode_digits(struct graph const *const g, struct digit_encoding *const e)
     else
     {
         e->start.c = e->orientation == WEST
-                         ? e->start.c + (int)e->spaces_needed - 2
-                         : e->start.c - 1;
+                       ? e->start.c + (int)e->spaces_needed - 2
+                       : e->start.c - 1;
         for (uintmax_t digits = e->cost; digits; digits /= 10, --e->start.c)
         {
             *grid_at_mut(g, e->start.r, e->start.c) |= digit_bit;
@@ -630,7 +631,7 @@ random_vertex_placement(struct graph const *const graph)
                 return cur;
             }
             exhausted = ((row + 1) % graph->rows) == row_start
-                        && ((col + 1) % graph->cols) == col_start;
+                     && ((col + 1) % graph->cols) == col_start;
         }
     }
     quit("cannot find a place for another vertex on this grid, quitting now.\n",
@@ -821,10 +822,10 @@ static inline bool
 is_valid_vertex_pos(struct graph const *graph, int const r, int const c)
 {
     return !(grid_at(graph, r, c) & vertex_bit)
-           && !(grid_at(graph, r + 1, c) & vertex_bit)
-           && !(grid_at(graph, r - 1, c) & vertex_bit)
-           && !(grid_at(graph, r, c - 1) & vertex_bit)
-           && !(grid_at(graph, r, c + 1) & vertex_bit);
+        && !(grid_at(graph, r + 1, c) & vertex_bit)
+        && !(grid_at(graph, r - 1, c) & vertex_bit)
+        && !(grid_at(graph, r, c - 1) & vertex_bit)
+        && !(grid_at(graph, r, c + 1) & vertex_bit);
 }
 
 static int
@@ -989,7 +990,7 @@ static bool
 is_valid_edge_cell(cell const square, cell const edge_id)
 {
     return ((square & vertex_bit) && is_edge_vertex(square, edge_id))
-           || ((square & path_bit) && (square & edge_id_mask) == edge_id);
+        || ((square & path_bit) && (square & edge_id_mask) == edge_id);
 }
 
 static void

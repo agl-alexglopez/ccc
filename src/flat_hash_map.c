@@ -1082,8 +1082,8 @@ erase(struct ccc_fhmap *const h, size_t const i)
     ccc_fhm_tag const m
         = (match_leading_zeros(prev_empties) + match_trailing_zeros(empties)
            >= CCC_FHM_GROUP_SIZE)
-              ? (ccc_fhm_tag){TAG_DELETED}
-              : (ccc_fhm_tag){TAG_EMPTY};
+            ? (ccc_fhm_tag){TAG_DELETED}
+            : (ccc_fhm_tag){TAG_EMPTY};
     h->remain += (TAG_EMPTY == m.v);
     --h->count;
     tag_set(h, m, i);
@@ -1141,7 +1141,8 @@ find_key_or_slot(struct ccc_fhmap const *const h, void const *const key,
         p.stride += CCC_FHM_GROUP_SIZE;
         p.i += p.stride;
         p.i &= mask;
-    } while (1);
+    }
+    while (1);
 }
 
 /** Finds key or quits when first empty slot is encountered after a group fails
@@ -1179,7 +1180,8 @@ find_key(struct ccc_fhmap const *const h, void const *const key,
         p.stride += CCC_FHM_GROUP_SIZE;
         p.i += p.stride;
         p.i &= mask;
-    } while (1);
+    }
+    while (1);
 }
 
 /** Finds an insert slot or loops forever. The caller of this function must know
@@ -1203,7 +1205,8 @@ find_slot_or_noreturn(struct ccc_fhmap const *const h, uint64_t const hash)
         p.stride += CCC_FHM_GROUP_SIZE;
         p.i += p.stride;
         p.i &= mask;
-    } while (1);
+    }
+    while (1);
 }
 
 /** Accepts the map, elements to add, and an allocation function if resizing
@@ -1313,7 +1316,8 @@ rehash_in_place(struct ccc_fhmap *const h)
             assert(occupant.v == TAG_DELETED);
             swap(swap_slot(h), data_at(h, i), data_at(h, new_i),
                  h->sizeof_type);
-        } while (1);
+        }
+        while (1);
     }
     h->remain = mask_to_load_factor_cap(mask) - h->count;
 }
@@ -1327,7 +1331,7 @@ is_same_group(size_t const i, size_t const new_i, uint64_t const hash,
               size_t const mask)
 {
     return (((i - (hash & mask)) & mask) / CCC_FHM_GROUP_SIZE)
-           == (((new_i - (hash & mask)) & mask) / CCC_FHM_GROUP_SIZE);
+        == (((new_i - (hash & mask)) & mask) / CCC_FHM_GROUP_SIZE);
 }
 
 static ccc_result

@@ -120,14 +120,14 @@ ccc_fdeq_insert_range(ccc_flat_double_ended_queue *const fdeq, void *const pos,
     if (pos == ccc_fdeq_begin(fdeq))
     {
         return push_front_range(fdeq, n, elems) != CCC_RESULT_OK
-                   ? NULL
-                   : at(fdeq, n - 1);
+                 ? NULL
+                 : at(fdeq, n - 1);
     }
     if (pos == ccc_fdeq_end(fdeq))
     {
         return push_back_range(fdeq, n, elems) != CCC_RESULT_OK
-                   ? NULL
-                   : at(fdeq, fdeq->buf.count - n);
+                 ? NULL
+                 : at(fdeq, fdeq->buf.count - n);
     }
     return push_range(fdeq, pos, n, elems);
 }

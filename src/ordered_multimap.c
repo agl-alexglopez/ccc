@@ -1212,7 +1212,8 @@ splay(struct ccc_ommap *const t, struct ccc_ommap_elem *root,
         link_trees(t, l_r_subtrees[!dir], dir, root);
         l_r_subtrees[!dir] = root;
         root = root->branch[dir];
-    } while (1);
+    }
+    while (1);
     link_trees(t, l_r_subtrees[L], R, root->branch[L]);
     link_trees(t, l_r_subtrees[R], L, root->branch[R]);
     link_trees(t, root, L, t->end.branch[R]);
@@ -1277,7 +1278,7 @@ has_dups(struct ccc_ommap_elem const *const end,
          struct ccc_ommap_elem const *const n)
 {
     return n != end && n->dup_head != end && n->dup_head->link[P] != end
-           && n->dup_head->link[P]->link[N] == n->dup_head;
+        && n->dup_head->link[P]->link[N] == n->dup_head;
 }
 
 static inline struct ccc_ommap_elem *
@@ -1392,7 +1393,7 @@ recursive_size(struct ccc_ommap const *const t,
     }
     size_t s = count_dups(t, r) + 1;
     return s + recursive_size(t, r->branch[R])
-           + recursive_size(t, r->branch[L]);
+         + recursive_size(t, r->branch[L]);
 }
 
 static ccc_tribool
@@ -1424,13 +1425,13 @@ are_subtrees_valid(struct ccc_ommap const *const t, struct tree_range const r,
                                   .high = r.root,
                               },
                               nil)
-           && are_subtrees_valid(t,
-                                 (struct tree_range){
-                                     .low = r.root,
-                                     .root = r.root->branch[R],
-                                     .high = r.high,
-                                 },
-                                 nil);
+        && are_subtrees_valid(t,
+                              (struct tree_range){
+                                  .low = r.root,
+                                  .root = r.root->branch[R],
+                                  .high = r.high,
+                              },
+                              nil);
 }
 
 static ccc_tribool
@@ -1454,7 +1455,7 @@ is_duplicate_storing_parent(struct ccc_ommap const *const t,
         return CCC_FALSE;
     }
     return is_duplicate_storing_parent(t, root, root->branch[L])
-           && is_duplicate_storing_parent(t, root, root->branch[R]);
+        && is_duplicate_storing_parent(t, root, root->branch[R]);
 }
 
 /* Validate tree prefers to use recursion to examine the tree over the

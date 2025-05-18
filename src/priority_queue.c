@@ -548,7 +548,8 @@ traversal_size(struct ccc_pq_elem const *const root)
     do
     {
         count += 1 + traversal_size(cur->child);
-    } while ((cur = cur->next) != root);
+    }
+    while ((cur = cur->next) != root);
     return count;
 }
 
@@ -592,7 +593,8 @@ has_valid_links(struct ccc_pq const *const pq,
         {
             return CCC_FALSE;
         }
-    } while ((cur = cur->next) != child);
+    }
+    while ((cur = cur->next) != child);
     return CCC_TRUE;
 }
 

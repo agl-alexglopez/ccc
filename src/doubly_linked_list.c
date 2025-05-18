@@ -560,7 +560,8 @@ ccc_dll_sort(ccc_doubly_linked_list *const dll)
             a_0 = merge(dll, a_0, a_n_b_0, first_less(dll, a_n_b_0));
             merging = CCC_TRUE;
         }
-    } while (merging);
+    }
+    while (merging);
     return CCC_RESULT_OK;
 }
 
@@ -606,7 +607,8 @@ first_less(struct ccc_dll const *const dll, struct ccc_dll_elem *start)
     do
     {
         start = start->n;
-    } while (start != &dll->nil && cmp(dll, start, start->p) != CCC_LES);
+    }
+    while (start != &dll->nil && cmp(dll, start, start->p) != CCC_LES);
     return start;
 }
 

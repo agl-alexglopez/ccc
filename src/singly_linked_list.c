@@ -451,7 +451,8 @@ ccc_sll_sort(ccc_singly_linked_list *const sll)
             a_0 = merge(sll, a_0, a_n_b_0, first_less(sll, a_n_b_0));
             merging = CCC_TRUE;
         }
-    } while (merging);
+    }
+    while (merging);
     return CCC_RESULT_OK;
 }
 
@@ -506,7 +507,8 @@ first_less(ccc_singly_linked_list const *const sll, struct list_link k)
     {
         k.prev = k.i;
         k.i = k.i->n;
-    } while (k.i != &sll->nil && cmp(sll, k.i, k.prev) != CCC_LES);
+    }
+    while (k.i != &sll->nil && cmp(sll, k.i, k.prev) != CCC_LES);
     return k;
 }
 

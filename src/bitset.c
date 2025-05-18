@@ -301,7 +301,7 @@ ccc_bs_shiftl(ccc_bitset *const bs, size_t const left_shifts)
              --shift, --write)
         {
             bs->blocks[write] = (bs->blocks[shift] << split)
-                                | (bs->blocks[shift - 1] >> remain);
+                              | (bs->blocks[shift - 1] >> remain);
         }
         bs->blocks[blocks] = bs->blocks[0] << split;
     }
@@ -347,7 +347,7 @@ ccc_bs_shiftr(ccc_bitset *const bs, size_t const right_shifts)
         for (ublock shift = blocks, write = 0; shift < end; ++shift, ++write)
         {
             bs->blocks[write] = (bs->blocks[shift + 1] << remain)
-                                | (bs->blocks[shift] >> split);
+                              | (bs->blocks[shift] >> split);
         }
         bs->blocks[end - blocks] = bs->blocks[end] >> split;
     }
@@ -1020,7 +1020,7 @@ ccc_bs_eq(ccc_bitset const *const a, ccc_bitset const *const b)
         return CCC_FALSE;
     }
     return memcmp(a->blocks, b->blocks, ublock_count(a->count) * SIZEOF_BLOCK)
-           == 0;
+        == 0;
 }
 
 /*=======================    Static Helpers    ==============================*/
@@ -1190,7 +1190,8 @@ first_trailing_bits_range(struct ccc_bitset const *const bs, size_t const i,
         i_bit = 0;
         ++cur_block;
         cur_end += BITBLOCK_BITS;
-    } while (bits_start + num_bits <= range_end);
+    }
+    while (bits_start + num_bits <= range_end);
     return (ccc_ucount){.error = CCC_RESULT_FAIL};
 }
 
@@ -1420,7 +1421,8 @@ first_leading_bits_range(struct ccc_bitset const *const bs, size_t const i,
         i_bit = BITBLOCK_BITS - 1;
         --cur_block;
         cur_end -= BITBLOCK_BITS;
-    } while (bits_start >= range_end + (ptrdiff_t)num_bits);
+    }
+    while (bits_start >= range_end + (ptrdiff_t)num_bits);
     return (ccc_ucount){.error = CCC_RESULT_FAIL};
 }
 
@@ -1449,7 +1451,7 @@ max_leading_ones(ccc_bitblock const b, ibit const i_bit,
         assert(i_bit < BITBLOCK_BITS);
         ccc_bitblock b_check = b << (BITBLOCK_BITS - i_bit - 1);
         ccc_bitblock const required = BITBLOCK_ON
-                                      << (BITBLOCK_BITS - ones_remaining);
+                                   << (BITBLOCK_BITS - ones_remaining);
         for (ibit shifts = 0; b_check; b_check <<= 1, ++shifts)
         {
             if ((required & b_check) == required)

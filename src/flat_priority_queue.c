@@ -561,7 +561,7 @@ wins(struct ccc_fpq const *const fpq, size_t const winner, size_t const loser)
                .any_type_rhs = at(fpq, loser),
                .aux = fpq->buf.aux,
            })
-           == fpq->order;
+        == fpq->order;
 }
 
 static inline ccc_threeway_cmp

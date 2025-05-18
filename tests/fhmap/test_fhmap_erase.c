@@ -108,7 +108,8 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_erase_fixed)
         CHECK(v->val, i);
         CHECK(validate(&h), true);
         ++i;
-    } while (1);
+    }
+    while (1);
     size_t const full_size = size(&h).count;
     size_t cur_size = size(&h).count;
     i = 0;
@@ -187,7 +188,8 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_erase_reserved)
         CHECK(v->val, i);
         CHECK(validate(&h), true);
         ++i;
-    } while (1);
+    }
+    while (1);
     size_t const full_size = size(&h).count;
     size_t cur_size = size(&h).count;
     i = 0;

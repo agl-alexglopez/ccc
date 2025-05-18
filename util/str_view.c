@@ -601,7 +601,7 @@ sv_ends_with(str_view const sv, str_view const suffix)
         return false;
     }
     return sv_cmp(sv_substr(sv, sv.len - suffix.len, suffix.len), suffix)
-           == SV_EQL;
+        == SV_EQL;
 }
 
 str_view
@@ -640,8 +640,8 @@ sv_contains(str_view const hay, str_view const needle)
         return true;
     }
     return hay.len
-           != sv_strnstrn((ptrdiff_t)hay.len, hay.s, (ptrdiff_t)needle.len,
-                          needle.s);
+        != sv_strnstrn((ptrdiff_t)hay.len, hay.s, (ptrdiff_t)needle.len,
+                       needle.s);
 }
 
 str_view
@@ -686,8 +686,8 @@ sv_find(str_view const hay, size_t const pos, str_view const needle)
         return hay.len;
     }
     return pos
-           + sv_strnstrn((ptrdiff_t)(hay.len - pos), hay.s + pos,
-                         (ptrdiff_t)needle.len, needle.s);
+         + sv_strnstrn((ptrdiff_t)(hay.len - pos), hay.s + pos,
+                       (ptrdiff_t)needle.len, needle.s);
 }
 
 size_t

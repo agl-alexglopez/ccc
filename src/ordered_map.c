@@ -850,7 +850,8 @@ splay(struct ccc_omap *const t, struct ccc_omap_elem *root,
         link(l_r_subtrees[!dir], dir, root);
         l_r_subtrees[!dir] = root;
         root = root->branch[dir];
-    } while (1);
+    }
+    while (1);
     link(l_r_subtrees[L], R, root->branch[L]);
     link(l_r_subtrees[R], L, root->branch[R]);
     link(root, L, t->end.branch[R]);
@@ -931,7 +932,7 @@ recursive_size(struct ccc_omap const *const t,
         return 0;
     }
     return 1 + recursive_size(t, r->branch[R])
-           + recursive_size(t, r->branch[L]);
+         + recursive_size(t, r->branch[L]);
 }
 
 static ccc_tribool
@@ -963,13 +964,13 @@ are_subtrees_valid(struct ccc_omap const *const t, struct tree_range const r,
                                   .high = r.root,
                               },
                               nil)
-           && are_subtrees_valid(t,
-                                 (struct tree_range){
-                                     .low = r.root,
-                                     .root = r.root->branch[R],
-                                     .high = r.high,
-                                 },
-                                 nil);
+        && are_subtrees_valid(t,
+                              (struct tree_range){
+                                  .low = r.root,
+                                  .root = r.root->branch[R],
+                                  .high = r.high,
+                              },
+                              nil);
 }
 
 static struct parent_status
@@ -1004,7 +1005,7 @@ is_duplicate_storing_parent(struct ccc_omap const *const t,
         return CCC_FALSE;
     }
     return is_duplicate_storing_parent(t, root, root->branch[L])
-           && is_duplicate_storing_parent(t, root, root->branch[R]);
+        && is_duplicate_storing_parent(t, root, root->branch[R]);
 }
 
 /* Validate tree prefers to use recursion to examine the tree over the

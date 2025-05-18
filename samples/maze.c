@@ -126,7 +126,8 @@ uint16_t const cached_bit = 0b0001000000000000;
                    #cond);                                                     \
             exit(1);                                                           \
         }                                                                      \
-    } while (0)
+    }                                                                          \
+    while (0)
 
 static void animate_maze(struct maze *);
 static void fill_maze_with_walls(struct maze *);
@@ -537,7 +538,7 @@ static bool
 can_build_new_square(struct maze const *const maze, int const r, int const c)
 {
     return r > 0 && r < maze->rows - 1 && c > 0 && c < maze->cols - 1
-           && !(maze_at(maze, r, c) & cached_bit);
+        && !(maze_at(maze, r, c) & cached_bit);
 }
 
 /*===========================    Misc    ====================================*/

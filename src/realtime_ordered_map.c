@@ -868,7 +868,8 @@ insert_fixup(struct ccc_romap *const rom, struct ccc_romap_elem *z,
         {
             return;
         }
-    } while (is_01_parent(rom, x, z, sibling_of(rom, x)));
+    }
+    while (is_01_parent(rom, x, z, sibling_of(rom, x)));
 
     if (!is_02_parent(rom, x, z, sibling_of(rom, x)))
     {
@@ -1025,7 +1026,8 @@ rebalance_3_child(struct ccc_romap *const rom, struct ccc_romap_elem *z,
         }
         x = z;
         z = g;
-    } while (z != &rom->end && made_3_child);
+    }
+    while (z != &rom->end && made_3_child);
 }
 
 static void
@@ -1183,7 +1185,7 @@ is_01_parent([[maybe_unused]] struct ccc_romap const *const rom,
 {
     assert(p != &rom->end);
     return (!x->parity && !p->parity && y->parity)
-           || (x->parity && p->parity && !y->parity);
+        || (x->parity && p->parity && !y->parity);
 }
 
 /* Returns true if a parent is a 1,1 node. Either child may be the sentinel
@@ -1199,7 +1201,7 @@ is_11_parent([[maybe_unused]] struct ccc_romap const *const rom,
 {
     assert(p != &rom->end);
     return (!x->parity && p->parity && !y->parity)
-           || (x->parity && !p->parity && y->parity);
+        || (x->parity && !p->parity && y->parity);
 }
 
 /* Returns true if a parent is a 0,2 or 2,0 node, which is not allowed. Either
@@ -1300,7 +1302,7 @@ recursive_size(struct ccc_romap const *const rom,
         return 0;
     }
     return 1 + recursive_size(rom, r->branch[R])
-           + recursive_size(rom, r->branch[L]);
+         + recursive_size(rom, r->branch[L]);
 }
 
 static ccc_tribool
@@ -1332,13 +1334,13 @@ are_subtrees_valid(struct ccc_romap const *t, struct tree_range const r,
                                   .high = r.root,
                               },
                               nil)
-           && are_subtrees_valid(t,
-                                 (struct tree_range){
-                                     .low = r.root,
-                                     .root = r.root->branch[R],
-                                     .high = r.high,
-                                 },
-                                 nil);
+        && are_subtrees_valid(t,
+                              (struct tree_range){
+                                  .low = r.root,
+                                  .root = r.root->branch[R],
+                                  .high = r.high,
+                              },
+                              nil);
 }
 
 static ccc_tribool
@@ -1355,7 +1357,7 @@ is_storing_parent(struct ccc_romap const *const t,
         return CCC_FALSE;
     }
     return is_storing_parent(t, root, root->branch[L])
-           && is_storing_parent(t, root, root->branch[R]);
+        && is_storing_parent(t, root, root->branch[R]);
 }
 
 static ccc_tribool

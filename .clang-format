@@ -3,17 +3,22 @@ IndentWidth: 4
 ColumnLimit: 80
 SpacesInParentheses: false
 IndentPPDirectives: AfterHash
-AlwaysBreakAfterReturnType: AllDefinitions
-BreakBeforeBinaryOperators: All
+BreakAfterReturnType: AllDefinitions
 AllowShortBlocksOnASingleLine: Empty
 AllowShortFunctionsOnASingleLine: None
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortEnumsOnASingleLine: false
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+BreakBeforeBinaryOperators: All
+AlignOperands: AlignAfterOperator
 AlignAfterOpenBracket: Align
 AlignTrailingComments: Always
 BinPackArguments: true
 BinPackParameters: true
-BreakBeforeBraces: Custom
 QualifierAlignment: Custom
 QualifierOrder: [static, inline, type, volatile, const]
+BreakBeforeBraces: Custom
 BraceWrapping:
   AfterControlStatement: Always
   AfterCaseLabel: true
@@ -22,5 +27,6 @@ BraceWrapping:
   AfterUnion: true
   AfterEnum: true
   BeforeElse: true
+  BeforeWhile: true
   SplitEmptyFunction: false
 ---
