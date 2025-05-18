@@ -165,15 +165,15 @@ Variable length arrays are strictly prohibited. All containers must be designed 
 
 For example, a flat priority queue is a binary heap that operates by swapping elements. To swap elements we need a temporary space the size of one of the elements in the heap. To avoid dynamically allocating such a space--we might not have permission to do so--the heap simply saves the last slot in the array for swapping.
 
-Other containers must find other solutions. The ordered map for example is a node based container that offers the `insert` function.
+Other containers must find other solutions. The ordered map for example is a node based container that offers the `swap_entry` function.
 
 ```c
-[[nodiscard]] ccc_entry ccc_om_insert(ccc_ordered_map *om,
-                                      ccc_omap_elem *key_val_handle,
-                                      ccc_omap_elem *tmp);
+[[nodiscard]] ccc_entry ccc_om_swap_entry(ccc_ordered_map *om,
+                                          ccc_omap_elem *key_val_handle,
+                                          ccc_omap_elem *tmp);
 ```
 
-The insert function promises to return the old entry in the map if one existed and is now being replaced by the new key value. If the map has no allocation permission it cannot create space for this swap to occur. Therefore, it asks the user to decide where this space should come from by providing space for one more of their type. However, containers try to avoid passing these space requirements on to the user when possible.
+The `swap_entry` function promises to return the old entry in the map if one existed and is now being replaced by the new key value. If the map has no allocation permission it cannot create space for this swap to occur. Therefore, it asks the user to decide where this space should come from by providing space for one of their type. However, containers try to avoid passing these space requirements on to the user when possible.
 
 Variable length arrays are prohibited because they could cause hard to find bugs if the array caused a stack overflow in our library code for the user.
 
@@ -182,4 +182,5 @@ Variable length arrays are prohibited because they could cause hard to find bugs
 At least the following would need to happen before `v1.0`.
 
 - More tests. I added a decent suite of tests to each container with most of the focus on the associative containers, but more thorough testing should be added throughout.
+    - A "bad user" test file should be added for every container in order to learn to what extent we can protect the user from their mistakes. If we cannot protect the user, the documentation must be obvious and clear regarding the critical error they can make.
 - Now that a much more efficient hash table has been implemented, an adaptation of Rust's Hashbrown Hash Table, it is time to start narrowing down changes and lock in interfaces for v1.0. Suggestions are welcome for this phase of refactoring.
