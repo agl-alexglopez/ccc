@@ -6,6 +6,8 @@ file (GLOB PROJ_C_FILES
   ${CMAKE_SOURCE_DIR}/src/*.h 
   ${CMAKE_SOURCE_DIR}/samples/*.c 
   ${CMAKE_SOURCE_DIR}/samples/*.h 
+  ${CMAKE_SOURCE_DIR}/tests/*.c
+  ${CMAKE_SOURCE_DIR}/tests/*.h
   ${CMAKE_SOURCE_DIR}/tests/*/*.c
   ${CMAKE_SOURCE_DIR}/tests/*/*.h
   ${CMAKE_SOURCE_DIR}/util/*.c
