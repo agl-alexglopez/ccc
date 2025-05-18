@@ -105,16 +105,18 @@ CHECK_BEGIN_STATIC_FN(run, str_view const tests_dir)
             = run_test_process((struct path_bin){sv(absolute_path), entry});
         switch (res)
         {
-        case ERROR:
-            (void)fprintf(stderr, "\n%s%s%s %s %s%s%s)%s\n", RED, err_msg, CYAN,
-                          sv_begin(entry), RED, fail_msg, CYAN, NONE);
-            break;
-        case PASS:
-            (void)fprintf(stdout, " %s%s%s)%s\n", GREEN, pass_msg, CYAN, NONE);
-            break;
-        case FAIL:
-            (void)fprintf(stdout, "\n%s%s%s)%s\n", RED, fail_msg, CYAN, NONE);
-            break;
+            case ERROR:
+                (void)fprintf(stderr, "\n%s%s%s %s %s%s%s)%s\n", RED, err_msg,
+                              CYAN, sv_begin(entry), RED, fail_msg, CYAN, NONE);
+                break;
+            case PASS:
+                (void)fprintf(stdout, " %s%s%s)%s\n", GREEN, pass_msg, CYAN,
+                              NONE);
+                break;
+            case FAIL:
+                (void)fprintf(stdout, "\n%s%s%s)%s\n", RED, fail_msg, CYAN,
+                              NONE);
+                break;
         }
         if (res == PASS)
         {
