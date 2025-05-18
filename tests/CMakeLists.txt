@@ -5,11 +5,20 @@ project("ccc tests"
     DESCRIPTION "Testing the C Container Collection (ccc)."
 )
 
+####################  Final Target   ##############################
+# Create a custom target and each test adds itself as dependency to this target.
+# This will allow us to selectively build the test target when needed. This
+# cleans up the release distribution and makes Makefile commands easier.
+add_custom_target(tests)
+
 add_library(checkers INTERFACE checkers.h)
+add_dependencies(tests checkers)
+
 
 add_executable(run_tests run_tests.c)
 target_include_directories(run_tests PRIVATE "../util")
 target_link_libraries(run_tests PRIVATE checkers str_view)
+add_dependencies(tests run_tests)
 
 ###########   Add Test Files Below This Point   ###########
 
@@ -33,6 +42,7 @@ macro(add_bs_test TEST_NAME)
       RUNTIME_OUTPUT_DIRECTORY 
         ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/tests
   )
+  add_dependencies(tests ${TEST_NAME})
 endmacro()
 
 # Add tests below here by the name of the c file without the .c suffix
@@ -48,6 +58,7 @@ target_link_libraries(ommap_util
     ccc
     checkers
 )
+add_dependencies(tests ommap_util)
 
 macro(add_ommap_test TEST_NAME)
   add_executable(${TEST_NAME} ommap/${TEST_NAME}.c)
@@ -64,6 +75,7 @@ macro(add_ommap_test TEST_NAME)
       RUNTIME_OUTPUT_DIRECTORY 
         ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/tests
   )
+  add_dependencies(tests ${TEST_NAME})
 endmacro()
 
 # Add tests below here by the name of the c file without the .c suffix
@@ -80,6 +92,8 @@ target_link_libraries(fpq_util
     ccc
     checkers
 )
+add_dependencies(tests fpq_util)
+
 
 macro(add_fpq_test TEST_NAME)
   add_executable(${TEST_NAME} fpq/${TEST_NAME}.c)
@@ -96,6 +110,7 @@ macro(add_fpq_test TEST_NAME)
       RUNTIME_OUTPUT_DIRECTORY 
         ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/tests
   )
+  add_dependencies(tests ${TEST_NAME})
 endmacro()
 
 # Add tests below here by the name of the c file without the .c suffix
@@ -111,6 +126,7 @@ target_link_libraries(pq_util
     ccc
     checkers
 )
+add_dependencies(tests pq_util)
 
 macro(add_pq_test TEST_NAME)
   add_executable(${TEST_NAME} pq/${TEST_NAME}.c)
@@ -127,6 +143,7 @@ macro(add_pq_test TEST_NAME)
       RUNTIME_OUTPUT_DIRECTORY 
         ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/tests
   )
+  add_dependencies(tests ${TEST_NAME})
 endmacro()
 
 # Add tests below here by the name of the c file without the .c suffix
@@ -142,6 +159,7 @@ target_link_libraries(omap_util
     ccc
     checkers
 )
+add_dependencies(tests omap_util)
 
 macro(add_omap_test TEST_NAME)
   add_executable(${TEST_NAME} omap/${TEST_NAME}.c)
@@ -158,6 +176,7 @@ macro(add_omap_test TEST_NAME)
       RUNTIME_OUTPUT_DIRECTORY 
         ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/tests
   )
+  add_dependencies(tests ${TEST_NAME})
 endmacro()
 
 add_omap_test(test_omap_construct)
@@ -174,6 +193,7 @@ target_link_libraries(homap_util
     ccc
     checkers
 )
+add_dependencies(tests homap_util)
 
 macro(add_homap_test TEST_NAME)
   add_executable(${TEST_NAME} homap/${TEST_NAME}.c)
@@ -190,6 +210,7 @@ macro(add_homap_test TEST_NAME)
       RUNTIME_OUTPUT_DIRECTORY 
         ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/tests
   )
+  add_dependencies(tests ${TEST_NAME})
 endmacro()
 
 add_homap_test(test_homap_construct)
@@ -205,6 +226,7 @@ target_link_libraries(romap_util
     ccc
     checkers
 )
+add_dependencies(tests romap_util)
 
 macro(add_romap_test TEST_NAME)
   add_executable(${TEST_NAME} romap/${TEST_NAME}.c)
@@ -221,6 +243,7 @@ macro(add_romap_test TEST_NAME)
       RUNTIME_OUTPUT_DIRECTORY 
         ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/tests
   )
+  add_dependencies(tests ${TEST_NAME})
 endmacro()
 
 add_romap_test(test_romap_construct)
@@ -237,6 +260,7 @@ target_link_libraries(hromap_util
     ccc
     checkers
 )
+add_dependencies(tests hromap_util)
 
 macro(add_hromap_test TEST_NAME)
   add_executable(${TEST_NAME} hromap/${TEST_NAME}.c)
@@ -253,6 +277,7 @@ macro(add_hromap_test TEST_NAME)
       RUNTIME_OUTPUT_DIRECTORY 
         ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/tests
   )
+  add_dependencies(tests ${TEST_NAME})
 endmacro()
 
 add_hromap_test(test_hromap_construct)
@@ -267,6 +292,7 @@ add_library(fhmap_util fhmap/fhmap_util.h fhmap/fhmap_util.c)
 target_link_libraries(fhmap_util
     ccc
 )
+add_dependencies(tests fhmap_util)
 
 macro(add_fhmap_test TEST_NAME)
   add_executable(${TEST_NAME} fhmap/${TEST_NAME}.c)
@@ -284,6 +310,7 @@ macro(add_fhmap_test TEST_NAME)
       RUNTIME_OUTPUT_DIRECTORY 
         ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/tests
   )
+  add_dependencies(tests ${TEST_NAME})
 endmacro()
 
 add_fhmap_test(test_fhmap_construct)
@@ -298,6 +325,7 @@ add_library(dll_util dll/dll_util.h dll/dll_util.c)
 target_link_libraries(dll_util
   ccc
 )
+add_dependencies(tests dll_util)
 
 macro(add_dll_test TEST_NAME)
   add_executable(${TEST_NAME} dll/${TEST_NAME}.c)
@@ -314,6 +342,7 @@ macro(add_dll_test TEST_NAME)
       RUNTIME_OUTPUT_DIRECTORY 
         ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/tests
   )
+  add_dependencies(tests ${TEST_NAME})
 endmacro()
 
 add_dll_test(test_dll_construct)
@@ -326,6 +355,7 @@ add_library(sll_util sll/sll_util.h sll/sll_util.c)
 target_link_libraries(sll_util
   ccc
 )
+add_dependencies(tests sll_util)
 
 macro(add_sll_test TEST_NAME)
   add_executable(${TEST_NAME} sll/${TEST_NAME}.c)
@@ -342,6 +372,7 @@ macro(add_sll_test TEST_NAME)
       RUNTIME_OUTPUT_DIRECTORY 
         ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/tests
   )
+  add_dependencies(tests ${TEST_NAME})
 endmacro()
 
 add_sll_test(test_sll_construct)
@@ -354,6 +385,7 @@ add_library(fdeq_util fdeq/fdeq_util.h fdeq/fdeq_util.c)
 target_link_libraries(fdeq_util
   ccc
 )
+add_dependencies(tests fdeq_util)
 
 macro(add_fdeq_test TEST_NAME)
   add_executable(${TEST_NAME} fdeq/${TEST_NAME}.c)
@@ -370,6 +402,7 @@ macro(add_fdeq_test TEST_NAME)
       RUNTIME_OUTPUT_DIRECTORY 
         ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/tests
   )
+  add_dependencies(tests ${TEST_NAME})
 endmacro()
 
 add_fdeq_test(test_fdeq_construct)
@@ -393,15 +426,8 @@ macro(add_perf_test TEST_NAME)
       RUNTIME_OUTPUT_DIRECTORY 
         ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/tests
   )
+  add_dependencies(tests ${TEST_NAME})
 endmacro()
 
 add_perf_test(pq_perf)
 
-####################  Final Target   ##############################
-# Create a custom target that will depend on all targets in the subdirectory
-add_custom_target(tests)
-# Function to add dependencies on all targets from the subdirectory
-get_property(test_targets DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY BUILDSYSTEM_TARGETS)
-foreach(target IN LISTS test_targets)
-    add_dependencies(tests ${target})
-endforeach()
