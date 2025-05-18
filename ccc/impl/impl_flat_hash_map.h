@@ -224,7 +224,9 @@ evaluating the argument once. This also allows the user to pass a compound
 literal to the first argument and eliminate any dangling references, such as
 `&(static user_defined_map_type){}`. However, to accept a map from all of these
 sources at compile or runtime, we must implement lazy initialization. This is
-because we can't initialize the tag array at compile time. */
+because we can't initialize the tag array at compile time. By setting the tag
+field to NULL we will be able to tell if our map is initialized whether it is
+fixed size and has data or is dynamic and has not yet been given allocation. */
 #define ccc_impl_fhm_init(impl_fixed_map_ptr, impl_any_type_name,              \
                           impl_key_field, impl_hash_fn, impl_key_eq_fn,        \
                           impl_alloc_fn, impl_aux_data, impl_capacity)         \
