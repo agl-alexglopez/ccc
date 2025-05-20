@@ -99,15 +99,15 @@ struct path_backtrack_cell
     struct point parent;
 };
 
-/** A dijkstra_vertex optimizes the problem so that we can store the path
-rebuilding map implicitly in an array of dijkstra_vertex[A-Z]. Then the pq
+/** A cost optimizes the problem so that we can store the path
+rebuilding map implicitly in an array of cost[A-Z]. Then the pq
 element can run the efficient push and decrease key operations with pointer
 stability guaranteed. Finally these can be allocated on the stack because
 there will be at most 26 of them which is very small. */
-struct dijkstra_vertex
+struct cost
 {
     pq_elem pq_elem;
-    int dist;
+    int cost;
     char name;
     char from;
 };
@@ -272,8 +272,7 @@ static void clear_paint(struct graph *);
 static bool is_vertex(cell);
 static bool is_path_cell(cell);
 static struct vertex *vertex_at(struct graph const *g, char name);
-static struct dijkstra_vertex *map_pq_at(struct dijkstra_vertex const *dj_arr,
-                                         char vertex);
+static struct cost *map_pq_at(struct cost const *dj_arr, char vertex);
 
 static void encode_digits(struct graph const *, struct digit_encoding *);
 static enum label_orientation get_direction(struct point const *,
@@ -646,10 +645,19 @@ find_shortest_paths(struct graph *const graph)
 {
     char *lineptr = NULL;
     size_t len = 0;
+    int total_cost = 0;
     for (;;)
     {
         set_cursor_position(graph->rows, 0);
         clear_line();
+        if (total_cost == INT_MAX)
+        {
+            (void)fprintf(stdout, "Total Cost: INFINITY\n");
+        }
+        else
+        {
+            (void)fprintf(stdout, "Total Cost: %d\n", total_cost);
+        }
         sv_print(stdout, prompt_msg);
         ssize_t read = 0;
         while ((read = getline(&lineptr, &len, stdin)) > 0)
@@ -672,7 +680,8 @@ find_shortest_paths(struct graph *const graph)
                        "needed.\n");
                 return;
             }
-            if (dijkstra_shortest_path(graph, pr.src, pr.dst) == INT_MAX)
+            total_cost = dijkstra_shortest_path(graph, pr.src, pr.dst);
+            if (total_cost == INT_MAX)
             {
                 struct point const *const src = &vertex_at(graph, pr.src)->pos;
                 struct point const *const dst = &vertex_at(graph, pr.dst)->pos;
@@ -687,61 +696,75 @@ find_shortest_paths(struct graph *const graph)
     }
 }
 
+/** Returns the distance of the shortest path from src to dst in the graph. If
+no route exists INT_MAX is returned which can be interpreted as INFINITY in this
+context. Assumes the graph is well formed without negative distances. */
 static int
 dijkstra_shortest_path(struct graph *const graph, char const src,
                        char const dst)
 {
     clear_paint(graph);
     clear_and_flush_graph(graph, NIL);
-    /* One struct dijkstra_vertex will represent the path rebuilding map and the
+    /* One struct cost will represent the path rebuilding map and the
        priority queue. The intrusive pq elem will give us an O(1) (technically
        o(lg N)) decrease key. The pq element is not given allocation permissions
        so that push and pop from the pq only affects the priority queue data
        structure not the memory that is used to store the elements; the path
        rebuild map remains accessible. Best of all, maximum pq/map size is known
        to be small [A-Z] so provide memory on the stack for speed and safety. */
-    struct dijkstra_vertex map_pq[MAX_VERTICES] = {};
-    priority_queue distances = pq_init(struct dijkstra_vertex, pq_elem, CCC_LES,
-                                       cmp_pq_costs, NULL, NULL);
+    struct cost map_pq[MAX_VERTICES] = {};
+    priority_queue costs
+        = pq_init(struct cost, pq_elem, CCC_LES, cmp_pq_costs, NULL, NULL);
     for (int i = 0, vx = start_vertex_title; i < graph->vertices; ++i, ++vx)
     {
-        *map_pq_at(map_pq, (char)vx) = (struct dijkstra_vertex){
+        *map_pq_at(map_pq, (char)vx) = (struct cost){
             .name = (char)vx,
             .from = '\0',
-            .dist = (char)vx == src ? 0 : INT_MAX,
+            .cost = (char)vx == src ? 0 : INT_MAX,
         };
-        prog_assert(push(&distances, &map_pq_at(map_pq, (char)vx)->pq_elem));
+        struct cost const *const v
+            = push(&costs, &map_pq_at(map_pq, (char)vx)->pq_elem);
+        prog_assert(v);
     }
-    while (!is_empty(&distances))
+    while (!is_empty(&costs))
     {
         /* The reference to u is valid after the pop because the pop does not
            deallocate any memory. The pq has no allocation permissions. */
-        struct dijkstra_vertex const *u = front(&distances);
-        (void)pop(&distances);
-        if (u->name == dst || u->dist == INT_MAX)
+        struct cost const *u = front(&costs);
+        (void)pop(&costs);
+        if (u->cost == INT_MAX)
         {
-            if (u->dist != INT_MAX)
+            return INT_MAX;
+        }
+        if (u->name == dst)
+        {
+            int total = 0;
+            for (; u->from; u = map_pq_at(map_pq, u->from))
             {
-                for (; u->from; u = map_pq_at(map_pq, u->from))
-                {
-                    paint_edge(graph, u->name, u->from, CYN);
-                    nanosleep(&graph->speed, NULL);
-                }
+                struct node const *const edges
+                    = vertex_at(graph, u->name)->edges;
+                int i = 0;
+                for (; i < MAX_DEGREE && edges[i].name != u->from; ++i)
+                {}
+                prog_assert(i < MAX_DEGREE && edges[i].name);
+                total += edges[i].cost;
+                paint_edge(graph, u->name, u->from, CYN);
+                nanosleep(&graph->speed, NULL);
             }
-            return u->dist;
+            return total;
         }
         struct node const *const edges = vertex_at(graph, u->name)->edges;
         for (int i = 0; i < MAX_DEGREE && edges[i].name; ++i)
         {
-            struct dijkstra_vertex *const v = map_pq_at(map_pq, edges[i].name);
-            int const alt = u->dist + edges[i].cost;
-            if (alt < v->dist)
+            struct cost *const v = map_pq_at(map_pq, edges[i].name);
+            int const alt = u->cost + edges[i].cost;
+            if (alt < v->cost)
             {
                 /* Build the map with the appropriate best candidate parent. */
-                struct dijkstra_vertex const *const relax
-                    = pq_decrease_w(&distances, v,
+                struct cost const *const relax
+                    = pq_decrease_w(&costs, v,
                                     {
-                                        T->dist = alt;
+                                        T->cost = alt;
                                         T->from = u->name;
                                     });
                 prog_assert(relax == v);
@@ -753,11 +776,11 @@ dijkstra_shortest_path(struct graph *const graph, char const src,
     return INT_MAX;
 }
 
-static inline struct dijkstra_vertex *
-map_pq_at(struct dijkstra_vertex const *const dj_arr, char const vertex)
+static inline struct cost *
+map_pq_at(struct cost const *const dj_arr, char const vertex)
 {
     prog_assert(vertex >= start_vertex_title && vertex <= end_vertex_title);
-    return (struct dijkstra_vertex *)&dj_arr[vertex - start_vertex_title];
+    return (struct cost *)&dj_arr[vertex - start_vertex_title];
 }
 
 /* Paints the edge and flushes the specified color at that position. If NULL
@@ -1059,9 +1082,9 @@ hash_parent_cells(any_key const point_struct)
 static threeway_cmp
 cmp_pq_costs(any_type_cmp const cost_cmp)
 {
-    struct dijkstra_vertex const *const a = cost_cmp.any_type_lhs;
-    struct dijkstra_vertex const *const b = cost_cmp.any_type_rhs;
-    return (a->dist > b->dist) - (a->dist < b->dist);
+    struct cost const *const a = cost_cmp.any_type_lhs;
+    struct cost const *const b = cost_cmp.any_type_rhs;
+    return (a->cost > b->cost) - (a->cost < b->cost);
 }
 
 static uint64_t
