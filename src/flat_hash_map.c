@@ -276,8 +276,8 @@ static struct ccc_handl handle(struct ccc_fhmap *h, void const *key,
                                uint64_t hash);
 static struct ccc_handl find_key_or_slot(struct ccc_fhmap const *h,
                                          void const *key, uint64_t hash);
-static ccc_ucount find_key(struct ccc_fhmap const *h, void const *key,
-                           uint64_t hash);
+static ccc_ucount find_key_or_fail(struct ccc_fhmap const *h, void const *key,
+                                   uint64_t hash);
 static size_t find_slot_or_noreturn(struct ccc_fhmap const *h, uint64_t hash);
 static ccc_result maybe_rehash(struct ccc_fhmap *h, size_t to_add,
                                ccc_any_alloc_fn);
@@ -369,7 +369,7 @@ ccc_fhm_contains(ccc_flat_hash_map const *const h, void const *const key)
     {
         return CCC_FALSE;
     }
-    return CCC_RESULT_OK == find_key(h, key, hash_fn(h, key)).error;
+    return !find_key_or_fail(h, key, hash_fn(h, key)).error;
 }
 
 void *
@@ -379,7 +379,7 @@ ccc_fhm_get_key_val(ccc_flat_hash_map const *const h, void const *const key)
     {
         return NULL;
     }
-    ccc_ucount const i = find_key(h, key, hash_fn(h, key));
+    ccc_ucount const i = find_key_or_fail(h, key, hash_fn(h, key));
     if (i.error)
     {
         return NULL;
@@ -577,7 +577,7 @@ ccc_fhm_remove(ccc_flat_hash_map *const h, void *const key_val_type_output)
         return (ccc_entry){{.stats = CCC_ENTRY_VACANT}};
     }
     void *const key = key_in_slot(h, key_val_type_output);
-    ccc_ucount const index = find_key(h, key, hash_fn(h, key));
+    ccc_ucount const index = find_key_or_fail(h, key, hash_fn(h, key));
     if (index.error)
     {
         return (ccc_entry){{.stats = CCC_ENTRY_VACANT}};
@@ -1145,14 +1145,17 @@ find_key_or_slot(struct ccc_fhmap const *const h, void const *const key,
     while (1);
 }
 
-/** Finds key or quits when first empty slot is encountered after a group fails
-to match. This function is better when a simple lookup is needed as a few
-branches and loads of groups are omitted compared to the search with intention
-to insert or remove. A successful search returns the index with an OK status
-while a failed search indicates a failure error status. */
+/** Finds key or fails when first empty slot is encountered after a group fails
+to match. If the search is successful the ucount holds the index of the desired
+key, otherwise the ucount holds the failure status flag and the index is
+undefined. This index would not be helpful if an insert slot is desired because
+we may have passed preferred deleted slots for insertion to find this empty one.
+
+This function is better when a simple lookup is needed as a few branches and
+loads are omitted compared to the search with intention to insert or remove. */
 static ccc_ucount
-find_key(struct ccc_fhmap const *const h, void const *const key,
-         uint64_t const hash)
+find_key_or_fail(struct ccc_fhmap const *const h, void const *const key,
+                 uint64_t const hash)
 {
     ccc_fhm_tag const tag = tag_from(hash);
     size_t const mask = h->mask;
