@@ -24,7 +24,7 @@ limitations under the License. */
 
 enum : size_t
 {
-    SWAP_SPACE = 1,
+    SWAP_SLOT = 1,
 };
 
 /*=====================      Prototypes      ================================*/
@@ -61,10 +61,10 @@ ccc_fpq_heapify(ccc_flat_priority_queue *const fpq, void *const array,
     {
         return CCC_RESULT_ARG_ERROR;
     }
-    if (n + 1 > fpq->buf.capacity)
+    if (n + SWAP_SLOT > fpq->buf.capacity)
     {
         ccc_result const resize_res
-            = ccc_buf_alloc(&fpq->buf, n + 1, fpq->buf.alloc);
+            = ccc_buf_alloc(&fpq->buf, n + SWAP_SLOT, fpq->buf.alloc);
         if (resize_res != CCC_RESULT_OK)
         {
             return resize_res;
@@ -78,7 +78,7 @@ ccc_fpq_heapify(ccc_flat_priority_queue *const fpq, void *const array,
 ccc_result
 ccc_fpq_heapify_inplace(ccc_flat_priority_queue *fpq, size_t const n)
 {
-    if (!fpq || n + 1 > fpq->buf.capacity)
+    if (!fpq || n + SWAP_SLOT > fpq->buf.capacity)
     {
         return CCC_RESULT_ARG_ERROR;
     }
@@ -93,7 +93,7 @@ ccc_fpq_push(ccc_flat_priority_queue *const fpq, void const *const e)
     {
         return NULL;
     }
-    if (fpq->buf.count + SWAP_SPACE >= fpq->buf.capacity)
+    if (fpq->buf.count + SWAP_SLOT >= fpq->buf.capacity)
     {
         ccc_result const extra_space
             = ccc_buf_alloc(&fpq->buf, fpq->buf.capacity * 2, fpq->buf.alloc);
@@ -271,7 +271,7 @@ ccc_fpq_reserve(ccc_flat_priority_queue *const fpq, size_t const to_add,
     {
         return CCC_RESULT_ARG_ERROR;
     }
-    size_t const needed = fpq->buf.count + to_add + 1;
+    size_t const needed = fpq->buf.count + to_add + SWAP_SLOT;
     if (needed <= fpq->buf.capacity)
     {
         return CCC_RESULT_OK;
@@ -437,7 +437,7 @@ ccc_impl_fpq_update_fixup(struct ccc_fpq *const fpq, void *const e)
 void
 ccc_impl_fpq_in_place_heapify(struct ccc_fpq *const fpq, size_t const n)
 {
-    if (!fpq || fpq->buf.capacity < n + 1)
+    if (!fpq || fpq->buf.capacity < n + SWAP_SLOT)
     {
         return;
     }
