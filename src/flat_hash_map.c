@@ -43,6 +43,8 @@ better capabilities for 128 bit group operations. */
 #include "impl/impl_types.h"
 #include "types.h"
 
+/*=========================   Platform Selection  ===========================*/
+
 /** Note that these includes must come after inclusion of the
 `impl/impl_flat_hash_map.h` header. Two platforms offer some form of vector
 instructions we can try. */
@@ -60,97 +62,6 @@ instructions we can try. */
 #    define unlikely(expr) expr
 #    define likely(expr) expr
 #endif /* defined(__has_builtin) && __has_builtin(__builtin_expect) */
-
-/** @private Range of constants specified as special for this hash table. Same
-general design as Rust Hashbrown table. Importantly, we know these are special
-constants because the most significant bit is on and then empty can be easily
-distinguished from deleted by the least significant bit. The full case occurs
-when the most significant bit is off and the next 7 bits are available for the
-fingerprint of the user hash. */
-enum : typeof((ccc_fhm_tag){}.v)
-{
-    /** @private Deleted is applied when a removed value in a group must signal
-    to a probe sequence to continue searching for a match or empty to stop. */
-    TAG_DELETED = 0x80,
-    /** @private Empty is the starting tag value and applied when other empties
-    are in a group upon removal. */
-    TAG_EMPTY = 0xFF,
-    /* TAG_FULL = 0b0???????, */
-};
-static_assert(sizeof(ccc_fhm_tag) == sizeof(uint8_t),
-              "tag must wrap a byte in a struct without padding for better "
-              "optimizations and no strict-aliasing exceptions.");
-static_assert(
-    (TAG_DELETED | TAG_EMPTY) == (typeof((ccc_fhm_tag){}.v))~0,
-    "all bits must be accounted for across deleted and empty status.");
-static_assert(
-    (TAG_DELETED ^ TAG_EMPTY) == 0x7F,
-    "only empty should have lsb on and 7 bits are available for hash");
-
-/** @private The following test should ensure some safety in assumptions we make
-when the user defines a fixed size map type. This is just a small type that
-will remain internal to this translation unit and offers a type that needs
-padding due to field sizes. The tag array is not given a replica group size at
-the end of its allocation because that wastes pointless space and has no impact
-on the following layout and pointer arithmetic tests. */
-struct fixed_map_test_type
-{
-    struct
-    {
-        size_t s;
-        uint8_t u;
-    } type_with_padding_data[2 + 1];
-    ccc_fhm_tag tag[2];
-};
-/* The type must actually get an allocation on the given platform to validate
-some memory layout assumptions. This should be sufficient and the assumptions
-will hold if the user happens to allocate a fixed size map on the stack. */
-static struct fixed_map_test_type data_and_tag_layout_test;
-/* The size of the user data and tags should be what we expect. No hidden
-padding should violate our mental model of the bytes occupied by contiguous user
-data and metadata tags. We don't care about padding after the tag array which
-may very well exist. The continuity from the base of the user data to the start
-of the tags array is the most important aspect for fixed size maps.
-
-Over index the tag array to get the end address for pointer differences. The
-0th element in an array at the start of a struct is guaranteed to start at the
-first byte of the struct with no padding BEFORE this first element. */
-static_assert(
-    (char *)&data_and_tag_layout_test.tag[2]
-            - (char *)&data_and_tag_layout_test.type_with_padding_data[0]
-        == ((sizeof(data_and_tag_layout_test.type_with_padding_data[0]) * 3)
-            + sizeof(ccc_fhm_tag) * 2),
-    "The size in bytes of the contiguous user data to tag array must be what "
-    "we would expect with no padding that will interfere with pointer "
-    "arithmetic.");
-/* We must ensure that the tags array starts at the exact next byte boundary
-after the user data type. This is required due to how we access tags and user
-data via indexing. Data is accessed with pointer subtraction from the tags
-array. The tags array 0th element is the shared base for both arrays.
-
-Data has decreasing indices and tags have ascending indices. Here we index too
-far for our type with padding to ensure the next assertion will hold when we
-index from the shared tags base address and subtract to find user data. */
-static_assert((char *)&data_and_tag_layout_test.type_with_padding_data[3]
-                  == (char *)&data_and_tag_layout_test.tag,
-              "The start of the tag array must align perfectly with the next "
-              "byte past the final user data element.");
-/* Here is an example of how we access user data slots. We take whatever the
-index is of the tag element and add one. Then we subtract the bytes needed to
-access this user data slot. We add one because our shared base index is at the
-next byte boundary AFTER the final user data element (consider the error of
-subtracting 0 from the tag array for the 0th array element!).
-
-We also always have an extra allocation of the user type at the start of the
-data array for swapping purposes because variable length arrays are banned and
-allocation might not be permitted. */
-static_assert(
-    (char *)(data_and_tag_layout_test.tag
-             - ((2 + 1)
-                * sizeof(data_and_tag_layout_test.type_with_padding_data[0])))
-        == (char *)&data_and_tag_layout_test.type_with_padding_data[0],
-    "With a perfectly aligned shared user data and tag array base address, "
-    "pointer subtraction for user data must work as expected.");
 
 /* Can we vectorize instructions? Also it is possible to specify we want a
 portable implementation. Consider exposing to user in header docs. */
@@ -245,13 +156,106 @@ enum : typeof((ccc_fhm_tag){}.v)
 
 #endif /* defined(CCC_HAS_X86_SIMD) */
 
+/*=======================   Data Alignment Test   ===========================*/
+
+/** @private The following test should ensure some safety in assumptions we make
+when the user defines a fixed size map type. This is just a small type that
+will remain internal to this translation unit and offers a type that needs
+padding due to field sizes. The tag array is not given a replica group size at
+the end of its allocation because that wastes pointless space and has no impact
+on the following layout and pointer arithmetic tests. */
+struct fixed_map_test_type
+{
+    struct
+    {
+        size_t s;
+        uint8_t u;
+    } type_with_padding_data[2 + 1];
+    ccc_fhm_tag tag[2];
+};
+/* The type must actually get an allocation on the given platform to validate
+some memory layout assumptions. This should be sufficient and the assumptions
+will hold if the user happens to allocate a fixed size map on the stack. */
+static struct fixed_map_test_type data_and_tag_layout_test;
+/* The size of the user data and tags should be what we expect. No hidden
+padding should violate our mental model of the bytes occupied by contiguous user
+data and metadata tags. We don't care about padding after the tag array which
+may very well exist. The continuity from the base of the user data to the start
+of the tags array is the most important aspect for fixed size maps.
+
+Over index the tag array to get the end address for pointer differences. The
+0th element in an array at the start of a struct is guaranteed to start at the
+first byte of the struct with no padding BEFORE this first element. */
+static_assert(
+    (char *)&data_and_tag_layout_test.tag[2]
+            - (char *)&data_and_tag_layout_test.type_with_padding_data[0]
+        == ((sizeof(data_and_tag_layout_test.type_with_padding_data[0]) * 3)
+            + sizeof(ccc_fhm_tag) * 2),
+    "The size in bytes of the contiguous user data to tag array must be what "
+    "we would expect with no padding that will interfere with pointer "
+    "arithmetic.");
+/* We must ensure that the tags array starts at the exact next byte boundary
+after the user data type. This is required due to how we access tags and user
+data via indexing. Data is accessed with pointer subtraction from the tags
+array. The tags array 0th element is the shared base for both arrays.
+
+Data has decreasing indices and tags have ascending indices. Here we index too
+far for our type with padding to ensure the next assertion will hold when we
+index from the shared tags base address and subtract to find user data. */
+static_assert((char *)&data_and_tag_layout_test.type_with_padding_data[3]
+                  == (char *)&data_and_tag_layout_test.tag,
+              "The start of the tag array must align perfectly with the next "
+              "byte past the final user data element.");
+/* Here is an example of how we access user data slots. We take whatever the
+index is of the tag element and add one. Then we subtract the bytes needed to
+access this user data slot. We add one because our shared base index is at the
+next byte boundary AFTER the final user data element (consider the error of
+subtracting 0 from the tag array for the 0th array element!).
+
+We also always have an extra allocation of the user type at the start of the
+data array for swapping purposes because variable length arrays are banned and
+allocation might not be permitted. */
+static_assert(
+    (char *)(data_and_tag_layout_test.tag
+             - ((2 + 1)
+                * sizeof(data_and_tag_layout_test.type_with_padding_data[0])))
+        == (char *)&data_and_tag_layout_test.type_with_padding_data[0],
+    "With a perfectly aligned shared user data and tag array base address, "
+    "pointer subtraction for user data must work as expected.");
+
+/*=======================    Special Constants    ===========================*/
+
+/** @private Range of constants specified as special for this hash table. Same
+general design as Rust Hashbrown table. Importantly, we know these are special
+constants because the most significant bit is on and then empty can be easily
+distinguished from deleted by the least significant bit. The full case occurs
+when the most significant bit is off and the next 7 bits are available for the
+fingerprint of the user hash. */
 enum : typeof((ccc_fhm_tag){}.v)
 {
+    /** @private Deleted is applied when a removed value in a group must signal
+    to a probe sequence to continue searching for a match or empty to stop. */
+    TAG_DELETED = 0x80,
+    /** @private Empty is the starting tag value and applied when other empties
+    are in a group upon removal. */
+    TAG_EMPTY = 0xFF,
+    /* TAG_FULL = 0b0???????, */
     /** @private Used to verify if tag is constant or hash data. */
-    TAG_MSB = 0x80,
+    TAG_MSB = TAG_DELETED,
     /** @private Used to create a one byte fingerprint of user hash. */
-    TAG_LOWER_7_MASK = 0x7F,
+    TAG_LOWER_7_MASK = (typeof((ccc_fhm_tag){}.v))~TAG_DELETED,
 };
+static_assert(sizeof(ccc_fhm_tag) == sizeof(uint8_t),
+              "tag must wrap a byte in a struct without padding for better "
+              "optimizations and no strict-aliasing exceptions.");
+static_assert(
+    (TAG_DELETED | TAG_EMPTY) == (typeof((ccc_fhm_tag){}.v))~0,
+    "all bits must be accounted for across deleted and empty status.");
+static_assert(
+    (TAG_DELETED ^ TAG_EMPTY) == 0x7F,
+    "only empty should have lsb on and 7 bits are available for hash");
+
+/*=======================    Type Declarations    ===========================*/
 
 /** @private A triangular sequence of numbers is a probing sequence that will
 visit every group in a power of 2 capacity hash table. Here is a popular proof:
