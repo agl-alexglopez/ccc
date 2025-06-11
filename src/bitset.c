@@ -1078,6 +1078,12 @@ maybe_resize(struct ccc_bitset *const bs, size_t const to_add,
     return CCC_RESULT_OK;
 }
 
+/** A trailing one in a range is the first bit set to one in any block within
+range. The input i gives the starting bit of the search, meaning a bit within a
+block that is the inclusive start of the range. The count gives us the end of
+the search for an overall range of `[i, i + count)`. This means if the search
+range is greater than a single block we will iterate in ascending order through
+our blocks and from least to most significant bit within each block. */
 static ccc_ucount
 first_trailing_one_range(struct ccc_bitset const *const bs, size_t const i,
                          size_t const count)
@@ -1146,7 +1152,7 @@ first_trailing_bits_range(struct ccc_bitset const *const bs, size_t const i,
     size_t bits_start = i;
     ublock cur_block = ublock_index(i);
     size_t cur_end = (cur_block * BITBLOCK_BITS) + BITBLOCK_BITS;
-    ubit i_bit = ubit_index(i);
+    ubit bit_i = ubit_index(i);
     do
     {
         /* Clean up some edge cases for the helper function because we allow
@@ -1154,15 +1160,15 @@ first_trailing_bits_range(struct ccc_bitset const *const bs, size_t const i,
            end of this block? What if it starts after index 0 of the first
            block? Pretend out of range bits are zeros. */
         ccc_bitblock bits
-            = is_one ? bs->blocks[cur_block] & (BITBLOCK_ON << i_bit)
-                     : (~bs->blocks[cur_block]) & (BITBLOCK_ON << i_bit);
+            = is_one ? bs->blocks[cur_block] & (BITBLOCK_ON << bit_i)
+                     : (~bs->blocks[cur_block]) & (BITBLOCK_ON << bit_i);
         if (cur_end > range_end)
         {
             /* Modulo at most once entire function, not every loop cycle. */
             bits &= ~(BITBLOCK_ON << ubit_index(range_end));
         }
         struct ugroup const ones
-            = max_trailing_ones(bits, i_bit, num_bits - num_found);
+            = max_trailing_ones(bits, bit_i, num_bits - num_found);
         if (ones.count >= num_bits)
         {
             /* Found the solution all at once within a block. */
@@ -1187,7 +1193,7 @@ first_trailing_bits_range(struct ccc_bitset const *const bs, size_t const i,
             bits_start = (cur_block * BITBLOCK_BITS) + ones.i;
             num_found = ones.count;
         }
-        i_bit = 0;
+        bit_i = 0;
         ++cur_block;
         cur_end += BITBLOCK_BITS;
     }
@@ -1249,6 +1255,12 @@ max_trailing_ones(ccc_bitblock const b, ubit const i_bit,
     };
 }
 
+/** A trailing zero in a range is the first bit set to zero in any block within
+range. The input i gives the starting bit of the search, meaning a bit within a
+block that is the inclusive start of the range. The count gives us the end of
+the search for an overall range of `[i, i + count)`. This means if the search
+range is greater than a single block we will iterate in ascending order through
+our blocks and from least to most significant bit within each block. */
 static ccc_ucount
 first_trailing_zero_range(struct ccc_bitset const *const bs, size_t const i,
                           size_t const count)
@@ -1300,6 +1312,12 @@ first_trailing_zero_range(struct ccc_bitset const *const bs, size_t const i,
     return (ccc_ucount){.error = CCC_RESULT_FAIL};
 }
 
+/** A leading one is the first bit in the range to be set to one withing a block
+starting the search from the Most Significant Bit of each block. This means that
+if the range is larger than a single block we iterate in descending order
+through the set of blocks starting at i for the range of `[i, i - count)`. The
+search within a given block proceeds from Most Significant Bit toward Least
+Significant Bit. */
 static ccc_ucount
 first_leading_one_range(struct ccc_bitset const *const bs, size_t const i,
                         size_t const count)
@@ -1471,6 +1489,12 @@ max_leading_ones(ccc_bitblock const b, ibit const i_bit,
     };
 }
 
+/** A leading zero is the first bit in the range to be set to zero withing a
+block starting the search from the Most Significant Bit of each block. This
+means that if the range is larger than a single block we iterate in descending
+order through the set of blocks starting at i for the range of `[i, i - count)`.
+The search within a given block proceeds from Most Significant Bit toward Least
+Significant Bit. */
 static ccc_ucount
 first_leading_zero_range(struct ccc_bitset const *const bs, size_t const i,
                          size_t const count)

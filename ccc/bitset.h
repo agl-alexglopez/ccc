@@ -404,8 +404,8 @@ set to CCC_RESULT_FAIL if no 1 bit is found. Argument error is set if bs is
 NULL. */
 ccc_ucount ccc_bs_first_trailing_one(ccc_bitset const *bs);
 
-/** @brief Return the index of the first trailing bit set to 1 in the range,
-starting from the Least Significant Bit at index 0.
+/** @brief Return the index of the first trailing bit set to 1 in the range
+`[i, i + count)`.
 @param [in] bs a pointer to the bit set.
 @param [in] i the starting index to search.
 @param [in] count the size of the range to check.
@@ -426,15 +426,14 @@ NULL or num_ones is too large an argument error is set. */
 ccc_ucount ccc_bs_first_trailing_ones(ccc_bitset const *bs, size_t num_ones);
 
 /** @brief Returns the index of the start of the first trailing num_ones
-contiguous 1 bits in the specified range.
+contiguous 1 bits in the range `[i, i + count)`.
 @param [in] bs a pointer to the bit set.
 @param [in] i the starting index to search.
 @param [in] count the size of the range to check.
 @param [in] num_ones the number of trailing contiguous 1 bits to find.
-@return an OK(0) status and the index in a search starting from the Least
-Significant Bit of the range of the first 1 in a sequence of num_ones 1 bits. If
-no range is found CCC_RESULT_FAIL error is set. If bs is NULL or arguments are
-out of range an argument error is set. */
+@return an OK(0) status and the starting index of the first 1 in a sequence of
+num_ones 1 bits. If no range is found CCC_RESULT_FAIL error is set. If bs is
+NULL or arguments are out of range an argument error is set. */
 ccc_ucount ccc_bs_first_trailing_ones_range(ccc_bitset const *bs, size_t i,
                                             size_t count, size_t num_ones);
 
@@ -444,7 +443,8 @@ ccc_ucount ccc_bs_first_trailing_ones_range(ccc_bitset const *bs, size_t i,
 CCC_RESULT_FAIL if no 0 bit is found. If bs is NULL an argument error is set. */
 ccc_ucount ccc_bs_first_trailing_zero(ccc_bitset const *bs);
 
-/** @brief Return the index of the first bit set to 0 in the range.
+/** @brief Return the index of the first bit set to 0 in the range
+`[i, i + count)`.
 @param [in] bs a pointer to the bit set.
 @param [in] i the starting index to search.
 @param [in] count the size of the range to check.
@@ -455,7 +455,7 @@ ccc_ucount ccc_bs_first_trailing_zero_range(ccc_bitset const *bs, size_t i,
                                             size_t count);
 
 /** @brief Returns the index of the start of the first trailing num_zeros
-contiguous 0 bits.
+contiguous 0 bits in the set.
 @param [in] bs a pointer to the bit set.
 @param [in] num_zeros the number of trailing contiguous 0 bits to find.
 @return an OK(0) status and the index in a search, starting from the Least
@@ -465,7 +465,7 @@ num zeros is too large an argument error is set. */
 ccc_ucount ccc_bs_first_trailing_zeros(ccc_bitset const *bs, size_t num_zeros);
 
 /** @brief Returns the index of the start of the first trailing num_zeros
-contiguous 0 bits in the specified range.
+contiguous 0 bits in the range `[i, i + count)`.
 @param [in] bs a pointer to the bit set.
 @param [in] i the starting index to search.
 @param [in] count the size of the range to check.
@@ -483,8 +483,8 @@ starting from the Most Significant Bit at index size - 1.
 bit is found or bs in NULL. */
 ccc_ucount ccc_bs_first_leading_one(ccc_bitset const *bs);
 
-/** @brief Return the index of the first leading bit set to 1 in the set,
-starting from the Most Significant Bit at index size - 1.
+/** @brief Return the index of the first leading bit set to 1 in the range
+`[i, i - count)`.
 @param [in] bs a pointer to the bit set.
 @param [in] i the starting index to search.
 @param [in] count the size of the range to check from i towards index 0.
@@ -503,12 +503,12 @@ or such a sequence cannot be found CCC_RESULT_FAIL is returned. */
 ccc_ucount ccc_bs_first_leading_ones(ccc_bitset const *bs, size_t num_ones);
 
 /** @brief Returns the index of the start of the first leading num_ones
-contiguous 1 bits in the specified range.
+contiguous 1 bits in the range `[i, i - count)`.
 @param [in] bs a pointer to the bit set.
 @param [in] i the starting index to search.
 @param [in] count the size of the range to check.
 @param [in] num_ones the number of leading contiguous 1 bits to find.
-@return an OK(0) status and the index in a search starting from the Least
+@return an OK(0) status and the index in a search starting from the Most
 Significant Bit of the range of the first 1 in a sequence of num_ones 1 bits. If
 such a sequence cannot be found CCC_RESULT_FAIL is set. If bs is NULL or any
 argument is out of range an argument error is set. */
@@ -522,13 +522,14 @@ starting from the Most Significant Bit at index size - 1.
 CCC_RESULT_FAIL if no 1 bit is found. If bs in NULL an argument error is set. */
 ccc_ucount ccc_bs_first_leading_zero(ccc_bitset const *bs);
 
-/** @brief Return the index of the first leading bit set to 0 in the set,
-starting from the Most Significant Bit at index size - 1.
+/** @brief Return the index of the first leading bit set to 0 in the range
+`[i, i - count)`.
 @param [in] bs a pointer to the bit set.
 @param [in] i the starting index to search for a 0 bit.
 @param [in] count size to search from Most Significant Bit to Least in range.
-@return an OK(0) status the index of the first bit set to 0 or CCC_RESULT_FAIL
-if no 0 bit is found. If bs in NULL an argument error is set. */
+@return an OK(0) status and the index of the first bit set to 0 in the specified
+range CCC_RESULT_FAIL if no 0 bit is found. If bs in NULL an argument error is
+set. */
 ccc_ucount ccc_bs_first_leading_zero_range(ccc_bitset const *bs, size_t i,
                                            size_t count);
 
@@ -543,7 +544,7 @@ num_zeros is too large an argument error is set. */
 ccc_ucount ccc_bs_first_leading_zeros(ccc_bitset const *bs, size_t num_zeros);
 
 /** @brief Returns the index of the start of the first leading num_zeros
-contiguous 0 bits in the specified range.
+contiguous 0 bits in the range `[i, i - count)`.
 @param [in] bs a pointer to the bit set.
 @param [in] i the starting index to search.
 @param [in] count the size of the range to check.
