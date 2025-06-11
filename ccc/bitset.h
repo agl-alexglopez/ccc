@@ -489,11 +489,7 @@ starting from the Most Significant Bit at index size - 1.
 @param [in] i the starting index to search.
 @param [in] count the size of the range to check from i towards index 0.
 @return the index of the first leading bit set to 1 or CCC_RESULT_FAIL if no 1
-bit is found, bs is NULL, or the range is invalid.
-@warning the user must validate their own range. A bit does not exist in an
-invalid range therefore CCC_RESULT_FAIL is returned. To distinguish a valid
-negative result signifying not found and a negative result indicating a range
-error the user must check their input. */
+bit is found, bs is NULL, or the range is invalid. */
 ccc_ucount ccc_bs_first_leading_one_range(ccc_bitset const *bs, size_t i,
                                           size_t count);
 
