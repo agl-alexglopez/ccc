@@ -499,10 +499,7 @@ contiguous 1 bits.
 @param [in] num_ones the number of leading contiguous 1 bits to find.
 @return the index in a search starting from the Least Significant Bit of the
 set of the first 1 in a sequence of num_ones 1 bits. If the input is invalid
-or such a sequence cannot be found CCC_RESULT_FAIL is returned.
-@warning the user must validate that bs is non-NULL and num_ones is less than
-the size of the set in order to distinguish CCC_RESULT_FAIL returned as a result
-of a failed search or bad input. */
+or such a sequence cannot be found CCC_RESULT_FAIL is returned. */
 ccc_ucount ccc_bs_first_leading_ones(ccc_bitset const *bs, size_t num_ones);
 
 /** @brief Returns the index of the start of the first leading num_ones
