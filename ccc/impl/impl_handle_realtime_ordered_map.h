@@ -17,6 +17,7 @@ limitations under the License.
 #define IMPL_HANDLE_REALTIME_ORDERED_MAP_H
 
 /** @cond */
+#include <limits.h>
 #include <stddef.h>
 #include <stdint.h>
 /** @endcond */
@@ -43,19 +44,41 @@ struct ccc_hromap_elem
         /** @private Points to next free when not allocated. */
         size_t next_free;
     };
-    /** @private WAVL logic. Instead of rank integer, use 0 or 1. */
-    uint8_t parity;
 };
 
-/** @private A realtime ordered map providing handle stability. Once elements
-are inserted into the map they will not move slots even when the array resizes.
-The free slots are tracked in a singly linked list that uses indices instead
-of pointers so that it remains valid even when the table resizes. The 0th
-index of the array is sacrificed for some coding simplicity and falsey 0. */
+/** @private A handle realtime ordered map is a modified struct of arrays layout
+with the modification being that we may have the arrays as pointer offsets in
+a contiguous allocation if the user desires a dynamic map.
+
+The user data array comes first allowing the user to store any type they wish
+in the container contiguously with no padding, saving space.
+
+The nodes array is next. These nodes track the indices of the child and parent
+nodes in the WAVL tree.
+
+Finally, comes the parity bit array. This comes last because it allows the
+optimal storage space to be used, a single bit. Instead of wasting a byte per
+element, that is likely given 7 bytes of padding to avoid alignment issues by
+the compiler, we use exactly one bit per element as the theorists intended.
+
+This layout comes at the cost of cache locality during traversals and
+comparisons, but the goal of this container variant is handle stability and
+optimal storage space, not raw speed. It is also possible that the compact
+layout can benefit the cache for tree allocations that are close in terms of
+both tree structure and allocation position in the arrays, but this should be
+measured not assumed. */
 struct ccc_hromap
 {
-    /** @private The buffer wrapping user memory. */
-    ccc_buffer buf;
+    /** @private The contiguous array of user data. */
+    void *data;
+    /** @private The contiguous array of WAVL tree metadata. */
+    struct ccc_hromap_elem *nodes;
+    /** @private The parity bit array corresponding to each node. */
+    unsigned *parity;
+    /** @private The current capacity. */
+    size_t cap;
+    /** @private The current size. */
+    size_t size;
     /** @private The root node of the WAVL tree. */
     size_t root;
     /** @private The start of the free singly linked list. */
@@ -103,6 +126,25 @@ void ccc_impl_hrm_insert(struct ccc_hromap *hrm, size_t parent_i,
 size_t ccc_impl_hrm_alloc_slot(struct ccc_hromap *hrm);
 
 /*=========================      Initialization     =========================*/
+
+#define ccc_impl_hrm_blocks(impl_block_type, impl_cap)                         \
+    (((impl_cap) + ((sizeof(impl_block_type) * CHAR_BIT) - 1))                 \
+     / (sizeof(impl_block_type) * CHAR_BIT))
+
+/** @private The user can declare a fixed size realtime ordered map with the
+help of static asserts to ensure the layout is compatible with our internal
+metadata. */
+#define ccc_impl_hrm_declare_fixed_map(fixed_map_type_name, key_val_type_name, \
+                                       capacity)                               \
+    static_assert((capacity) > 0,                                              \
+                  "fixed size map must have capacity greater than 0");         \
+    typedef struct                                                             \
+    {                                                                          \
+        key_val_type_name data[(capacity) + 1];                                \
+        struct ccc_hromap_elem nodes[(capacity) + 1];                          \
+        typeof(*(struct ccc_hromap){}.parity) parity[ccc_impl_hrm_blocks(      \
+            typeof(*(struct ccc_hromap){}.parity), capacity)];                 \
+    }(fixed_map_type_name)
 
 /** @private */
 #define ccc_impl_hrm_init(impl_memory_ptr, impl_node_elem_field,               \
