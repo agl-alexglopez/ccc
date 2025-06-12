@@ -144,10 +144,12 @@ struct ccc_fhash_entry
 {
     /** The map associated with this entry. */
     struct ccc_fhmap *h;
+    /** The index in the data/tag array of this entry. */
+    size_t i;
     /** The saved tag from the current query hash value. */
     ccc_fhm_tag tag;
-    /** The location and status of the query index, occupied, vacant, etc. */
-    struct ccc_handl handle;
+    /** The status of this entry. */
+    enum ccc_entry_status stats;
 };
 
 /** @private A simple wrapper for an entry that allows us to return a compound
@@ -255,14 +257,14 @@ desired data if occupied. */
     (__extension__({                                                           \
         __auto_type impl_fhm_mod_ent_ptr = (flat_hash_map_entry_ptr);          \
         struct ccc_fhash_entry impl_fhm_mod_with_ent                           \
-            = {.handle = {.stats = CCC_ENTRY_ARG_ERROR}};                      \
+            = {.stats = CCC_ENTRY_ARG_ERROR};                                  \
         if (impl_fhm_mod_ent_ptr)                                              \
         {                                                                      \
             impl_fhm_mod_with_ent = impl_fhm_mod_ent_ptr->impl;                \
-            if (impl_fhm_mod_with_ent.handle.stats & CCC_ENTRY_OCCUPIED)       \
+            if (impl_fhm_mod_with_ent.stats & CCC_ENTRY_OCCUPIED)              \
             {                                                                  \
                 type_name *const T = ccc_impl_fhm_data_at(                     \
-                    impl_fhm_mod_with_ent.h, impl_fhm_mod_with_ent.handle.i);  \
+                    impl_fhm_mod_with_ent.h, impl_fhm_mod_with_ent.i);         \
                 if (T)                                                         \
                 {                                                              \
                     closure_over_T                                             \
@@ -284,13 +286,11 @@ problem. */
         {                                                                      \
             struct ccc_fhash_entry *impl_fhm_or_ins_entry                      \
                 = &impl_fhm_or_ins_ent_ptr->impl;                              \
-            if (!(impl_fhm_or_ins_entry->handle.stats                          \
-                  & CCC_ENTRY_INSERT_ERROR))                                   \
+            if (!(impl_fhm_or_ins_entry->stats & CCC_ENTRY_INSERT_ERROR))      \
             {                                                                  \
-                impl_fhm_or_ins_res                                            \
-                    = ccc_impl_fhm_data_at(impl_fhm_or_ins_entry->h,           \
-                                           impl_fhm_or_ins_entry->handle.i);   \
-                if (impl_fhm_or_ins_entry->handle.stats == CCC_ENTRY_VACANT)   \
+                impl_fhm_or_ins_res = ccc_impl_fhm_data_at(                    \
+                    impl_fhm_or_ins_entry->h, impl_fhm_or_ins_entry->i);       \
+                if (impl_fhm_or_ins_entry->stats == CCC_ENTRY_VACANT)          \
                 {                                                              \
                     *impl_fhm_or_ins_res = lazy_key_value;                     \
                     ccc_impl_fhm_set_insert(impl_fhm_or_ins_entry);            \
@@ -311,12 +311,12 @@ directly. This is similar to insert or assign where overwriting may occur. */
         {                                                                      \
             struct ccc_fhash_entry *impl_fhm_ins_entry                         \
                 = &impl_fhm_ins_ent_ptr->impl;                                 \
-            if (!(impl_fhm_ins_entry->handle.stats & CCC_ENTRY_INSERT_ERROR))  \
+            if (!(impl_fhm_ins_entry->stats & CCC_ENTRY_INSERT_ERROR))         \
             {                                                                  \
                 impl_fhm_ins_ent_res = ccc_impl_fhm_data_at(                   \
-                    impl_fhm_ins_entry->h, impl_fhm_ins_entry->handle.i);      \
+                    impl_fhm_ins_entry->h, impl_fhm_ins_entry->i);             \
                 *impl_fhm_ins_ent_res = lazy_key_value;                        \
-                if (impl_fhm_ins_entry->handle.stats == CCC_ENTRY_VACANT)      \
+                if (impl_fhm_ins_entry->stats == CCC_ENTRY_VACANT)             \
                 {                                                              \
                     ccc_impl_fhm_set_insert(impl_fhm_ins_entry);               \
                 }                                                              \
@@ -338,27 +338,26 @@ Importantly, this function makes sure the key is in sync with key in table. */
             __auto_type impl_fhm_key = key;                                    \
             struct ccc_fhash_entry impl_fhm_try_ins_ent = ccc_impl_fhm_entry(  \
                 impl_flat_hash_map_ptr, (void *)&impl_fhm_key);                \
-            if ((impl_fhm_try_ins_ent.handle.stats & CCC_ENTRY_OCCUPIED)       \
-                || (impl_fhm_try_ins_ent.handle.stats                          \
-                    & CCC_ENTRY_INSERT_ERROR))                                 \
+            if ((impl_fhm_try_ins_ent.stats & CCC_ENTRY_OCCUPIED)              \
+                || (impl_fhm_try_ins_ent.stats & CCC_ENTRY_INSERT_ERROR))      \
             {                                                                  \
                 impl_fhm_try_insert_res = (struct ccc_ent){                    \
                     .e = ccc_impl_fhm_data_at(impl_fhm_try_ins_ent.h,          \
-                                              impl_fhm_try_ins_ent.handle.i),  \
-                    .stats = impl_fhm_try_ins_ent.handle.stats,                \
+                                              impl_fhm_try_ins_ent.i),         \
+                    .stats = impl_fhm_try_ins_ent.stats,                       \
                 };                                                             \
             }                                                                  \
             else                                                               \
             {                                                                  \
                 impl_fhm_try_insert_res = (struct ccc_ent){                    \
                     .e = ccc_impl_fhm_data_at(impl_fhm_try_ins_ent.h,          \
-                                              impl_fhm_try_ins_ent.handle.i),  \
+                                              impl_fhm_try_ins_ent.i),         \
                     .stats = CCC_ENTRY_VACANT,                                 \
                 };                                                             \
                 *((typeof(lazy_value) *)impl_fhm_try_insert_res.e)             \
                     = lazy_value;                                              \
                 *((typeof(impl_fhm_key) *)ccc_impl_fhm_key_at(                 \
-                    impl_fhm_try_ins_ent.h, impl_fhm_try_ins_ent.handle.i))    \
+                    impl_fhm_try_ins_ent.h, impl_fhm_try_ins_ent.i))           \
                     = impl_fhm_key;                                            \
                 ccc_impl_fhm_set_insert(&impl_fhm_try_ins_ent);                \
             }                                                                  \
@@ -382,23 +381,20 @@ Similar to insert entry this will overwrite. */
             struct ccc_fhash_entry impl_fhm_ins_or_assign_ent                  \
                 = ccc_impl_fhm_entry(impl_flat_hash_map_ptr,                   \
                                      (void *)&impl_fhm_key);                   \
-            if (!(impl_fhm_ins_or_assign_ent.handle.stats                      \
-                  & CCC_ENTRY_INSERT_ERROR))                                   \
+            if (!(impl_fhm_ins_or_assign_ent.stats & CCC_ENTRY_INSERT_ERROR))  \
             {                                                                  \
                 impl_fhm_insert_or_assign_res = (struct ccc_ent){              \
-                    .e = ccc_impl_fhm_data_at(                                 \
-                        impl_fhm_ins_or_assign_ent.h,                          \
-                        impl_fhm_ins_or_assign_ent.handle.i),                  \
-                    .stats = impl_fhm_ins_or_assign_ent.handle.stats,          \
+                    .e = ccc_impl_fhm_data_at(impl_fhm_ins_or_assign_ent.h,    \
+                                              impl_fhm_ins_or_assign_ent.i),   \
+                    .stats = impl_fhm_ins_or_assign_ent.stats,                 \
                 };                                                             \
                 *((typeof(lazy_value) *)impl_fhm_insert_or_assign_res.e)       \
                     = lazy_value;                                              \
                 *((typeof(impl_fhm_key) *)ccc_impl_fhm_key_at(                 \
                     impl_fhm_ins_or_assign_ent.h,                              \
-                    impl_fhm_ins_or_assign_ent.handle.i))                      \
+                    impl_fhm_ins_or_assign_ent.i))                             \
                     = impl_fhm_key;                                            \
-                if (impl_fhm_ins_or_assign_ent.handle.stats                    \
-                    == CCC_ENTRY_VACANT)                                       \
+                if (impl_fhm_ins_or_assign_ent.stats == CCC_ENTRY_VACANT)      \
                 {                                                              \
                     ccc_impl_fhm_set_insert(&impl_fhm_ins_or_assign_ent);      \
                 }                                                              \

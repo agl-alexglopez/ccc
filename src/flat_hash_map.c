@@ -271,15 +271,20 @@ struct probe_sequence
     size_t stride;
 };
 
+struct query
+{
+    size_t i;
+    enum ccc_entry_status stats;
+};
+
 /*===========================   Prototypes   ================================*/
 
 static void swap(char tmp[const], void *a, void *b, size_t ab_size);
 static struct ccc_fhash_entry container_entry(struct ccc_fhmap *h,
                                               void const *key);
-static struct ccc_handl handle(struct ccc_fhmap *h, void const *key,
-                               uint64_t hash);
-static struct ccc_handl find_key_or_slot(struct ccc_fhmap const *h,
-                                         void const *key, uint64_t hash);
+static struct query find(struct ccc_fhmap *h, void const *key, uint64_t hash);
+static struct query find_key_or_slot(struct ccc_fhmap const *h, void const *key,
+                                     uint64_t hash);
 static ccc_ucount find_key_or_fail(struct ccc_fhmap const *h, void const *key,
                                    uint64_t hash);
 static size_t find_slot_or_noreturn(struct ccc_fhmap const *h, uint64_t hash);
@@ -396,7 +401,7 @@ ccc_fhm_entry(ccc_flat_hash_map *const h, void const *const key)
 {
     if (unlikely(!h || !key))
     {
-        return (ccc_fhmap_entry){{.handle = {.stats = CCC_ENTRY_ARG_ERROR}}};
+        return (ccc_fhmap_entry){{.stats = CCC_ENTRY_ARG_ERROR}};
     }
     return (ccc_fhmap_entry){container_entry(h, key)};
 }
@@ -409,16 +414,16 @@ ccc_fhm_or_insert(ccc_fhmap_entry const *const e, void const *key_val_type)
     {
         return NULL;
     }
-    if (e->impl.handle.stats & CCC_ENTRY_OCCUPIED)
+    if (e->impl.stats & CCC_ENTRY_OCCUPIED)
     {
-        return data_at(e->impl.h, e->impl.handle.i);
+        return data_at(e->impl.h, e->impl.i);
     }
-    if (e->impl.handle.stats & CCC_ENTRY_INSERT_ERROR)
+    if (e->impl.stats & CCC_ENTRY_INSERT_ERROR)
     {
         return NULL;
     }
-    insert_and_copy(e->impl.h, key_val_type, e->impl.tag, e->impl.handle.i);
-    return data_at(e->impl.h, e->impl.handle.i);
+    insert_and_copy(e->impl.h, key_val_type, e->impl.tag, e->impl.i);
+    return data_at(e->impl.h, e->impl.i);
 }
 
 void *
@@ -429,18 +434,18 @@ ccc_fhm_insert_entry(ccc_fhmap_entry const *const e, void const *key_val_type)
     {
         return NULL;
     }
-    if (e->impl.handle.stats & CCC_ENTRY_OCCUPIED)
+    if (e->impl.stats & CCC_ENTRY_OCCUPIED)
     {
-        void *const slot = data_at(e->impl.h, e->impl.handle.i);
+        void *const slot = data_at(e->impl.h, e->impl.i);
         (void)memcpy(slot, key_val_type, e->impl.h->sizeof_type);
         return slot;
     }
-    if (e->impl.handle.stats & CCC_ENTRY_INSERT_ERROR)
+    if (e->impl.stats & CCC_ENTRY_INSERT_ERROR)
     {
         return NULL;
     }
-    insert_and_copy(e->impl.h, key_val_type, e->impl.tag, e->impl.handle.i);
-    return data_at(e->impl.h, e->impl.handle.i);
+    insert_and_copy(e->impl.h, key_val_type, e->impl.tag, e->impl.i);
+    return data_at(e->impl.h, e->impl.i);
 }
 
 ccc_entry
@@ -450,21 +455,21 @@ ccc_fhm_remove_entry(ccc_fhmap_entry const *const e)
     {
         return (ccc_entry){{.stats = CCC_ENTRY_ARG_ERROR}};
     }
-    if (!(e->impl.handle.stats & CCC_ENTRY_OCCUPIED))
+    if (!(e->impl.stats & CCC_ENTRY_OCCUPIED))
     {
         return (ccc_entry){{.stats = CCC_ENTRY_VACANT}};
     }
-    erase(e->impl.h, e->impl.handle.i);
+    erase(e->impl.h, e->impl.i);
     return (ccc_entry){{.stats = CCC_ENTRY_OCCUPIED}};
 }
 
 ccc_fhmap_entry *
 ccc_fhm_and_modify(ccc_fhmap_entry *const e, ccc_any_type_update_fn *const fn)
 {
-    if (e && fn && (e->impl.handle.stats & CCC_ENTRY_OCCUPIED) != 0)
+    if (e && fn && (e->impl.stats & CCC_ENTRY_OCCUPIED) != 0)
     {
         fn((ccc_any_type){
-            .any_type = data_at(e->impl.h, e->impl.handle.i),
+            .any_type = data_at(e->impl.h, e->impl.i),
             .aux = NULL,
         });
     }
@@ -475,10 +480,10 @@ ccc_fhmap_entry *
 ccc_fhm_and_modify_aux(ccc_fhmap_entry *const e,
                        ccc_any_type_update_fn *const fn, void *const aux)
 {
-    if (e && fn && (e->impl.handle.stats & CCC_ENTRY_OCCUPIED) != 0)
+    if (e && fn && (e->impl.stats & CCC_ENTRY_OCCUPIED) != 0)
     {
         fn((ccc_any_type){
-            .any_type = data_at(e->impl.h, e->impl.handle.i),
+            .any_type = data_at(e->impl.h, e->impl.i),
             .aux = aux,
         });
     }
@@ -494,22 +499,22 @@ ccc_fhm_swap_entry(ccc_flat_hash_map *const h, void *const key_val_type_output)
     }
     void *const key = key_in_slot(h, key_val_type_output);
     struct ccc_fhash_entry ent = container_entry(h, key);
-    if (ent.handle.stats & CCC_ENTRY_OCCUPIED)
+    if (ent.stats & CCC_ENTRY_OCCUPIED)
     {
-        swap(swap_slot(h), data_at(h, ent.handle.i), key_val_type_output,
+        swap(swap_slot(h), data_at(h, ent.i), key_val_type_output,
              h->sizeof_type);
         return (ccc_entry){{
             .e = key_val_type_output,
             .stats = CCC_ENTRY_OCCUPIED,
         }};
     }
-    if (ent.handle.stats & CCC_ENTRY_INSERT_ERROR)
+    if (ent.stats & CCC_ENTRY_INSERT_ERROR)
     {
         return (ccc_entry){{.stats = CCC_ENTRY_INSERT_ERROR}};
     }
-    insert_and_copy(ent.h, key_val_type_output, ent.tag, ent.handle.i);
+    insert_and_copy(ent.h, key_val_type_output, ent.tag, ent.i);
     return (ccc_entry){{
-        .e = data_at(h, ent.handle.i),
+        .e = data_at(h, ent.i),
         .stats = CCC_ENTRY_VACANT,
     }};
 }
@@ -523,20 +528,20 @@ ccc_fhm_try_insert(ccc_flat_hash_map *const h, void *const key_val_type)
     }
     void *const key = key_in_slot(h, key_val_type);
     struct ccc_fhash_entry ent = container_entry(h, key);
-    if (ent.handle.stats & CCC_ENTRY_OCCUPIED)
+    if (ent.stats & CCC_ENTRY_OCCUPIED)
     {
         return (ccc_entry){{
-            .e = data_at(h, ent.handle.i),
+            .e = data_at(h, ent.i),
             .stats = CCC_ENTRY_OCCUPIED,
         }};
     }
-    if (ent.handle.stats & CCC_ENTRY_INSERT_ERROR)
+    if (ent.stats & CCC_ENTRY_INSERT_ERROR)
     {
         return (ccc_entry){{.stats = CCC_ENTRY_INSERT_ERROR}};
     }
-    insert_and_copy(ent.h, key_val_type, ent.tag, ent.handle.i);
+    insert_and_copy(ent.h, key_val_type, ent.tag, ent.i);
     return (ccc_entry){{
-        .e = data_at(h, ent.handle.i),
+        .e = data_at(h, ent.i),
         .stats = CCC_ENTRY_VACANT,
     }};
 }
@@ -550,21 +555,21 @@ ccc_fhm_insert_or_assign(ccc_flat_hash_map *const h, void *const key_val_type)
     }
     void *const key = key_in_slot(h, key_val_type);
     struct ccc_fhash_entry ent = container_entry(h, key);
-    if (ent.handle.stats & CCC_ENTRY_OCCUPIED)
+    if (ent.stats & CCC_ENTRY_OCCUPIED)
     {
-        (void)memcpy(data_at(h, ent.handle.i), key_val_type, h->sizeof_type);
+        (void)memcpy(data_at(h, ent.i), key_val_type, h->sizeof_type);
         return (ccc_entry){{
-            .e = data_at(h, ent.handle.i),
+            .e = data_at(h, ent.i),
             .stats = CCC_ENTRY_OCCUPIED,
         }};
     }
-    if (ent.handle.stats & CCC_ENTRY_INSERT_ERROR)
+    if (ent.stats & CCC_ENTRY_INSERT_ERROR)
     {
         return (ccc_entry){{.stats = CCC_ENTRY_INSERT_ERROR}};
     }
-    insert_and_copy(ent.h, key_val_type, ent.tag, ent.handle.i);
+    insert_and_copy(ent.h, key_val_type, ent.tag, ent.i);
     return (ccc_entry){{
-        .e = data_at(h, ent.handle.i),
+        .e = data_at(h, ent.i),
         .stats = CCC_ENTRY_VACANT,
     }};
 }
@@ -645,11 +650,11 @@ ccc_fhm_end(ccc_flat_hash_map const *const)
 void *
 ccc_fhm_unwrap(ccc_fhmap_entry const *const e)
 {
-    if (unlikely(!e) || !(e->impl.handle.stats & CCC_ENTRY_OCCUPIED))
+    if (unlikely(!e) || !(e->impl.stats & CCC_ENTRY_OCCUPIED))
     {
         return NULL;
     }
-    return data_at(e->impl.h, e->impl.handle.i);
+    return data_at(e->impl.h, e->impl.i);
 }
 
 ccc_result
@@ -763,7 +768,7 @@ ccc_fhm_occupied(ccc_fhmap_entry const *const e)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    return (e->impl.handle.stats & CCC_ENTRY_OCCUPIED) != 0;
+    return (e->impl.stats & CCC_ENTRY_OCCUPIED) != 0;
 }
 
 ccc_tribool
@@ -773,17 +778,17 @@ ccc_fhm_insert_error(ccc_fhmap_entry const *const e)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    return (e->impl.handle.stats & CCC_ENTRY_INSERT_ERROR) != 0;
+    return (e->impl.stats & CCC_ENTRY_INSERT_ERROR) != 0;
 }
 
-ccc_handle_status
-ccc_fhm_handle_status(ccc_fhmap_entry const *const e)
+ccc_entry_status
+ccc_fhm_entry_status(ccc_fhmap_entry const *const e)
 {
     if (unlikely(!e))
     {
         return CCC_ENTRY_ARG_ERROR;
     }
-    return e->impl.handle.stats;
+    return e->impl.stats;
 }
 
 void *
@@ -984,7 +989,7 @@ ccc_impl_fhm_key_at(struct ccc_fhmap const *const h, size_t const i)
 void
 ccc_impl_fhm_set_insert(struct ccc_fhash_entry const *const e)
 {
-    return set_insert_tag(e->h, e->tag, e->handle.i);
+    return set_insert_tag(e->h, e->tag, e->i);
 }
 
 /*=========================   Static Internals   ============================*/
@@ -998,18 +1003,20 @@ static struct ccc_fhash_entry
 container_entry(struct ccc_fhmap *const h, void const *const key)
 {
     uint64_t const hash = hash_fn(h, key);
+    struct query const e = find(h, key, hash);
     return (struct ccc_fhash_entry){
         .h = (struct ccc_fhmap *)h,
         .tag = tag_from(hash),
-        .handle = handle(h, key, hash),
+        .i = e.i,
+        .stats = e.stats,
     };
 }
 
 /** Obtaining a handle may fail if a resize or rehash fails but certain queries
 must continue with that information. The status of the handle will indicate if
 an entry is occupied, vacant, or some error has occurred. */
-static struct ccc_handl
-handle(struct ccc_fhmap *const h, void const *const key, uint64_t const hash)
+static struct query
+find(struct ccc_fhmap *const h, void const *const key, uint64_t const hash)
 {
     ccc_entry_status upcoming_insertion_error = 0;
     switch (maybe_rehash(h, 1, h->alloc_fn))
@@ -1017,13 +1024,13 @@ handle(struct ccc_fhmap *const h, void const *const key, uint64_t const hash)
         case CCC_RESULT_OK:
             break;
         case CCC_RESULT_ARG_ERROR:
-            return (struct ccc_handl){.stats = CCC_ENTRY_ARG_ERROR};
+            return (struct query){.stats = CCC_ENTRY_ARG_ERROR};
             break;
         default:
             upcoming_insertion_error = CCC_ENTRY_INSERT_ERROR;
             break;
     };
-    struct ccc_handl res = find_key_or_slot(h, key, hash);
+    struct query res = find_key_or_slot(h, key, hash);
     res.stats |= upcoming_insertion_error;
     return res;
 }
@@ -1097,7 +1104,7 @@ erase(struct ccc_fhmap *const h, size_t const i)
 inserted. If the element does not exist and a non-occupied slot is returned
 that slot will have been the first empty or deleted slot encountered in the
 probe sequence. This function assumes an empty slot exists in the table. */
-static struct ccc_handl
+static struct query
 find_key_or_slot(struct ccc_fhmap const *const h, void const *const key,
                  uint64_t const hash)
 {
@@ -1118,7 +1125,7 @@ find_key_or_slot(struct ccc_fhmap const *const h, void const *const key,
             i_match = (p.i + i_match) & mask;
             if (likely(eq_fn(h, key, i_match)))
             {
-                return (struct ccc_handl){
+                return (struct query){
                     .i = i_match,
                     .stats = CCC_ENTRY_OCCUPIED,
                 };
@@ -1137,7 +1144,7 @@ find_key_or_slot(struct ccc_fhmap const *const h, void const *const key,
         }
         if (likely(match_has_one(match_empty(g))))
         {
-            return (struct ccc_handl){
+            return (struct query){
                 .i = empty_deleted.count,
                 .stats = CCC_ENTRY_VACANT,
             };
