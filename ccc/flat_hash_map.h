@@ -29,11 +29,22 @@ performance. Currently, the flat hash map does not offer any default hash
 functions or hash strengthening algorithms so strong hash functions should be
 obtained by the user for the data set.
 
+The current implementation will seek to use the best platform specific SIMD or
+SRMD instructions available. However, if for any reason the user wishes to use
+the most portable Single Register Multiple Data fallback implementation, define
+the following flag before including the `ccc/flat_hash_map.h` header.
+
+```
+#define CCC_FHM_PORTABLE
+#include "ccc/flat_hash_map.h"
+```
+
 To shorten names in the interface, define the following preprocessor directive
 at the top of your file.
 
 ```
 #define FLAT_HASH_MAP_USING_NAMESPACE_CCC
+#include "ccc/flat_hash_map.h"
 ```
 
 All types and functions can then be written without the `ccc_` prefix. */

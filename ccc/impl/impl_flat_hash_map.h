@@ -27,11 +27,6 @@ limitations under the License.
 
 /* NOLINTBEGIN(readability-identifier-naming) */
 
-/** @private TODO: Come up with better system. For now, uncomment to define a
-preprocessor directive to force generics. This has been used for testing for
-now. */
-// #define CCC_FHM_PORTABLE
-
 /** @private If we only make these complex checks once, it is easier to read
 and used the source code during all the platform based implementations. */
 #if defined(__x86_64) && defined(__SSE2__) && !defined(CCC_FHM_PORTABLE)
