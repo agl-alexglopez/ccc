@@ -181,19 +181,19 @@ capabilities. They control the name of the type so they can organize types as
 they wish. */
 #define ccc_impl_fhm_declare_fixed_map(fixed_map_type_name, key_val_type_name, \
                                        capacity)                               \
-    static_assert((capacity) != 0,                                             \
-                  "fixed size map must have capacity greater than 0.");        \
+    static_assert((capacity) > 0,                                              \
+                  "fixed size map must have capacity greater than 0");         \
     static_assert((capacity) >= CCC_FHM_GROUP_SIZE,                            \
                   "fixed size map must have capacity >= CCC_FHM_GROUP_SIZE "   \
-                  "(8 or 16 depending on platform).");                         \
+                  "(8 or 16 depending on platform)");                          \
     static_assert(((capacity) & ((capacity) - 1)) == 0,                        \
                   "fixed size map must be a power of 2 capacity (32, 64, "     \
-                  "128, 256, etc.).");                                         \
+                  "128, 256, etc.)");                                          \
     typedef struct                                                             \
     {                                                                          \
         key_val_type_name data[(capacity) + 1];                                \
         ccc_fhm_tag tag[(capacity) + CCC_FHM_GROUP_SIZE];                      \
-    }(fixed_map_type_name);
+    }(fixed_map_type_name)
 
 /** @private If the user does not want to remember the capacity they chose
 for their type or make mistakes this macro offers consistent calculation of
