@@ -11,7 +11,15 @@ struct val
 {
     int id;
     int val;
-    ccc_hromap_elem elem;
+};
+
+ccc_hrm_declare_fixed_map(small_fixed_map, struct val, 64);
+ccc_hrm_declare_fixed_map(standard_fixed_map, struct val, 1024);
+
+enum : size_t
+{
+    SMALL_FIXED_CAP = ccc_hrm_fixed_capacity(small_fixed_map),
+    STANDARD_FIXED_CAP = ccc_hrm_fixed_capacity(standard_fixed_map),
 };
 
 ccc_threeway_cmp id_cmp(ccc_any_key_cmp);

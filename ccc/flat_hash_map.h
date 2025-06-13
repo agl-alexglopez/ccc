@@ -190,7 +190,7 @@ static flat_hash_map static_fh = fhm_init(
     struct val,
     key,
     fhmap_int_to_u64,
-    fhmap_id_eq,
+    fhmap_key_eq,
     NULL,
     NULL,
     fhm_fixed_capacity(small_fixed_map)
@@ -212,7 +212,7 @@ static flat_hash_map static_fh = fhm_init(
     struct val,
     key,
     fhmap_int_to_u64,
-    fhmap_id_eq,
+    fhmap_key_eq,
     std_alloc,
     NULL,
     0
@@ -256,7 +256,7 @@ flat_hash_map src = fhm_init(
     struct val,
     key,
     fhmap_int_to_u64,
-    fhmap_id_eq,
+    fhmap_key_eq,
     NULL,
     NULL,
     ccc_fhm_fixed_capacity(small_fixed_map)
@@ -267,7 +267,7 @@ flat_hash_map dst = fhm_init(
     struct val,
     key,
     fhmap_int_to_u64,
-    fhmap_id_eq,
+    fhmap_key_eq,
     NULL,
     NULL,
     ccc_fhm_fixed_capacity(small_fixed_map)
@@ -290,7 +290,7 @@ flat_hash_map src = fhm_init(
     struct val,
     key,
     fhmap_int_to_u64,
-    fhmap_id_eq,
+    fhmap_key_eq,
     std_alloc,
     NULL,
     0
@@ -301,7 +301,7 @@ flat_hash_map dst = fhm_init(
     struct val,
     key,
     fhmap_int_to_u64,
-    fhmap_id_eq,
+    fhmap_key_eq,
     std_alloc,
     NULL,
     0
@@ -326,7 +326,7 @@ flat_hash_map src = fhm_init(
     struct val,
     key,
     fhmap_int_to_u64,
-    fhmap_id_eq,
+    fhmap_key_eq,
     std_alloc,
     NULL,
     0
@@ -337,7 +337,7 @@ flat_hash_map dst = fhm_init(
     struct val,
     key,
     fhmap_int_to_u64,
-    fhmap_id_eq,
+    fhmap_key_eq,
     NULL,
     NULL,
     0

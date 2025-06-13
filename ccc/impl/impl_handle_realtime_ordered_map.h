@@ -139,21 +139,22 @@ size_t ccc_impl_hrm_alloc_slot(struct ccc_hromap *hrm);
 /** @private The user can declare a fixed size realtime ordered map with the
 help of static asserts to ensure the layout is compatible with our internal
 metadata. */
-#define ccc_impl_hrm_declare_fixed_map(fixed_map_type_name, key_val_type_name, \
-                                       capacity)                               \
-    static_assert((capacity) > 0,                                              \
-                  "fixed size map must have capacity greater than 0");         \
+#define ccc_impl_hrm_declare_fixed_map(impl_fixed_map_type_name,               \
+                                       impl_key_val_type_name, impl_capacity)  \
+    static_assert((impl_capacity) > 1,                                         \
+                  "fixed size map must have capacity greater than 1");         \
     typedef struct                                                             \
     {                                                                          \
-        key_val_type_name data[(capacity) + 1];                                \
-        struct ccc_hromap_elem nodes[(capacity) + 1];                          \
+        impl_key_val_type_name data[(impl_capacity)];                          \
+        struct ccc_hromap_elem nodes[(impl_capacity)];                         \
         typeof(*(struct ccc_hromap){}.parity) parity[ccc_impl_hrm_blocks(      \
-            typeof(*(struct ccc_hromap){}.parity), capacity)];                 \
-    }(fixed_map_type_name)
+            typeof(*(struct ccc_hromap){}.parity), (impl_capacity))];          \
+    }(impl_fixed_map_type_name)
 
+/** @private Taking the size of the array actually works here because the field
+is of a known fixed size defined at compile time, not just a pointer. */
 #define ccc_impl_hrm_fixed_capacity(fixed_map_type_name)                       \
-    ((sizeof((fixed_map_type_name){}.nodes) / sizeof(struct ccc_hromap_elem))  \
-     - 1)
+    (sizeof((fixed_map_type_name){}.nodes) / sizeof(struct ccc_hromap_elem))
 
 /** @private */
 #define ccc_impl_hrm_init(impl_memory_ptr, impl_type_name,                     \
@@ -168,8 +169,7 @@ metadata. */
         .root = 0,                                                             \
         .free_list = 0,                                                        \
         .sizeof_type = sizeof(impl_type_name),                                 \
-        .key_offset                                                            \
-        = offsetof(typeof(*(impl_memory_ptr)), impl_key_elem_field),           \
+        .key_offset = offsetof(impl_type_name, impl_key_elem_field),           \
         .cmp = (impl_key_cmp_fn),                                              \
         .alloc = (impl_alloc_fn),                                              \
         .aux = (impl_aux_data),                                                \

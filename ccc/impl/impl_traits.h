@@ -82,12 +82,12 @@ limitations under the License.
             *: &(ccc_handle){ccc_hrm_try_insert(                               \
                                  (ccc_handle_realtime_ordered_map *)           \
                                      container_ptr,                            \
-                                 (ccc_hromap_elem *)try_insert_args)           \
+                                 try_insert_args)                              \
                                  .impl},                                       \
         ccc_flat_hash_map                                                      \
             *: &(ccc_entry){ccc_fhm_try_insert(                                \
                                 (ccc_flat_hash_map *)container_ptr,            \
-                                (void *)try_insert_args)                       \
+                                try_insert_args)                               \
                                 .impl},                                        \
         ccc_ordered_map                                                        \
             *: &(                                                              \
@@ -126,12 +126,12 @@ limitations under the License.
             *: &(ccc_handle){ccc_hrm_insert_or_assign(                         \
                                  (ccc_handle_realtime_ordered_map *)           \
                                      container_ptr,                            \
-                                 (ccc_hromap_elem *)insert_or_assign_args)     \
+                                 insert_or_assign_args)                        \
                                  .impl},                                       \
         ccc_flat_hash_map                                                      \
             *: &(ccc_entry){ccc_fhm_insert_or_assign(                          \
                                 (ccc_flat_hash_map *)container_ptr,            \
-                                (void *)insert_or_assign_args)                 \
+                                insert_or_assign_args)                         \
                                 .impl},                                        \
         ccc_ordered_map                                                        \
             *: &(ccc_entry){ccc_om_insert_or_assign(                           \
@@ -171,13 +171,11 @@ limitations under the License.
             *: &(                                                              \
                 ccc_handle){ccc_hrm_remove((ccc_handle_realtime_ordered_map *) \
                                                container_ptr,                  \
-                                           (ccc_hromap_elem *)                 \
-                                               key_val_container_handle_ptr)   \
+                                           key_val_container_handle_ptr)       \
                                 .impl},                                        \
         ccc_flat_hash_map                                                      \
-            *: &(ccc_entry){ccc_fhm_remove(                                    \
-                                (ccc_flat_hash_map *)container_ptr,            \
-                                (void *)key_val_container_handle_ptr)          \
+            *: &(ccc_entry){ccc_fhm_remove((ccc_flat_hash_map *)container_ptr, \
+                                           key_val_container_handle_ptr)       \
                                 .impl},                                        \
         ccc_ordered_map                                                        \
             *: &(ccc_entry){ccc_om_remove(                                     \
