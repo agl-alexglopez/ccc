@@ -115,6 +115,8 @@ union ccc_hromap_handle
 /*========================  Private Interface  ==============================*/
 
 /** @private */
+void *ccc_impl_hrm_data_at(struct ccc_hromap const *hrm, size_t slot);
+/** @private */
 void *ccc_impl_hrm_key_at(struct ccc_hromap const *hrm, size_t slot);
 /** @private */
 struct ccc_hromap_elem *ccc_impl_hrm_elem_at(struct ccc_hromap const *hrm,
@@ -175,7 +177,8 @@ metadata. */
 
 /** @private */
 #define ccc_impl_hrm_as(handle_realtime_ordered_map_ptr, type_name, handle...) \
-    ((type_name *)ccc_buf_at(&(handle_realtime_ordered_map_ptr)->buf, (handle)))
+    ((type_name *)ccc_impl_hrm_data_at((handle_realtime_ordered_map_ptr),      \
+                                       (handle)))
 
 /*==================     Core Macro Implementations     =====================*/
 
@@ -192,8 +195,8 @@ metadata. */
             impl_hrm_mod_hndl = impl_hrm_hndl_ptr->impl;                       \
             if (impl_hrm_mod_hndl.handle.stats & CCC_ENTRY_OCCUPIED)           \
             {                                                                  \
-                type_name *const T = ccc_buf_at(&impl_hrm_mod_hndl.hrm->buf,   \
-                                                impl_hrm_mod_hndl.handle.i);   \
+                type_name *const T = ccc_impl_hrm_data_at(                     \
+                    impl_hrm_mod_hndl.hrm, impl_hrm_mod_hndl.handle.i);        \
                 if (T)                                                         \
                 {                                                              \
                     closure_over_T                                             \
@@ -224,8 +227,8 @@ metadata. */
                     = ccc_impl_hrm_alloc_slot(impl_hrm_or_ins_hndl->hrm);      \
                 if (impl_hrm_or_ins_ret)                                       \
                 {                                                              \
-                    *((typeof(lazy_key_value) *)ccc_buf_at(                    \
-                        &impl_hrm_or_ins_hndl->hrm->buf, impl_hrm_or_ins_ret)) \
+                    *((typeof(lazy_key_value) *)ccc_impl_hrm_data_at(          \
+                        impl_hrm_or_ins_hndl->hrm, impl_hrm_or_ins_ret))       \
                         = lazy_key_value;                                      \
                     ccc_impl_hrm_insert(impl_hrm_or_ins_hndl->hrm,             \
                                         impl_hrm_or_ins_hndl->handle.i,        \
@@ -254,8 +257,8 @@ metadata. */
                     = ccc_impl_hrm_alloc_slot(impl_hrm_ins_hndl->hrm);         \
                 if (impl_hrm_ins_hndl_ret)                                     \
                 {                                                              \
-                    *((typeof(lazy_key_value) *)ccc_buf_at(                    \
-                        &impl_hrm_ins_hndl->hrm->buf, impl_hrm_ins_hndl_ret))  \
+                    *((typeof(lazy_key_value) *)ccc_impl_hrm_data_at(          \
+                        impl_hrm_ins_hndl->hrm, impl_hrm_ins_hndl_ret))        \
                         = lazy_key_value;                                      \
                     ccc_impl_hrm_insert(                                       \
                         impl_hrm_ins_hndl->hrm, impl_hrm_ins_hndl->handle.i,   \
@@ -265,15 +268,9 @@ metadata. */
             else if (impl_hrm_ins_hndl->handle.stats == CCC_ENTRY_OCCUPIED)    \
             {                                                                  \
                 impl_hrm_ins_hndl_ret = impl_hrm_ins_hndl->handle.i;           \
-                struct ccc_hromap_elem impl_ins_hndl_saved                     \
-                    = *ccc_impl_hrm_elem_at(impl_hrm_ins_hndl->hrm,            \
-                                            impl_hrm_ins_hndl_ret);            \
-                *((typeof(lazy_key_value) *)ccc_buf_at(                        \
-                    &impl_hrm_ins_hndl->hrm->buf, impl_hrm_ins_hndl_ret))      \
+                *((typeof(lazy_key_value) *)ccc_impl_hrm_data_at(              \
+                    impl_hrm_ins_hndl->hrm, impl_hrm_ins_hndl_ret))            \
                     = lazy_key_value;                                          \
-                *ccc_impl_hrm_elem_at(impl_hrm_ins_hndl->hrm,                  \
-                                      impl_hrm_ins_hndl_ret)                   \
-                    = impl_ins_hndl_saved;                                     \
             }                                                                  \
         }                                                                      \
         impl_hrm_ins_hndl_ret;                                                 \
@@ -300,9 +297,8 @@ metadata. */
                 };                                                             \
                 if (impl_hrm_try_ins_hndl_ret.i)                               \
                 {                                                              \
-                    *((typeof(lazy_value) *)ccc_buf_at(                        \
-                        &impl_try_ins_map_ptr->buf,                            \
-                        impl_hrm_try_ins_hndl_ret.i))                          \
+                    *((typeof(lazy_value) *)ccc_impl_hrm_data_at(              \
+                        impl_try_ins_map_ptr, impl_hrm_try_ins_hndl_ret.i))    \
                         = lazy_value;                                          \
                     *((typeof(impl_hrm_key) *)ccc_impl_hrm_key_at(             \
                         impl_try_ins_map_ptr, impl_hrm_try_ins_hndl_ret.i))    \
@@ -348,8 +344,8 @@ metadata. */
                                          .stats = CCC_ENTRY_INSERT_ERROR};     \
                 if (impl_hrm_ins_or_assign_hndl_ret.i)                         \
                 {                                                              \
-                    *((typeof(lazy_value) *)ccc_buf_at(                        \
-                        &impl_hrm_ins_or_assign_hndl.hrm->buf,                 \
+                    *((typeof(lazy_value) *)ccc_impl_hrm_data_at(              \
+                        impl_hrm_ins_or_assign_hndl.hrm,                       \
                         impl_hrm_ins_or_assign_hndl_ret.i))                    \
                         = lazy_value;                                          \
                     *((typeof(impl_hrm_key) *)ccc_impl_hrm_key_at(             \
@@ -366,17 +362,10 @@ metadata. */
             else if (impl_hrm_ins_or_assign_hndl.handle.stats                  \
                      == CCC_ENTRY_OCCUPIED)                                    \
             {                                                                  \
-                struct ccc_hromap_elem impl_ins_hndl_saved                     \
-                    = *ccc_impl_hrm_elem_at(                                   \
-                        impl_hrm_ins_or_assign_hndl.hrm,                       \
-                        impl_hrm_ins_or_assign_hndl.handle.i);                 \
-                *((typeof(lazy_value) *)ccc_buf_at(                            \
-                    &impl_hrm_ins_or_assign_hndl.hrm->buf,                     \
+                *((typeof(lazy_value) *)ccc_impl_hrm_data_at(                  \
+                    impl_hrm_ins_or_assign_hndl.hrm,                           \
                     impl_hrm_ins_or_assign_hndl.handle.i))                     \
                     = lazy_value;                                              \
-                *ccc_impl_hrm_elem_at(impl_hrm_ins_or_assign_hndl.hrm,         \
-                                      impl_hrm_ins_or_assign_hndl.handle.i)    \
-                    = impl_ins_hndl_saved;                                     \
                 impl_hrm_ins_or_assign_hndl_ret = (struct ccc_handl){          \
                     .i = impl_hrm_ins_or_assign_hndl.handle.i,                 \
                     .stats = impl_hrm_ins_or_assign_hndl.handle.stats};        \
