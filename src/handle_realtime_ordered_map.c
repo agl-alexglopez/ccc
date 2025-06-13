@@ -797,6 +797,12 @@ ccc_impl_hrm_handle(struct ccc_hromap const *const hrm, void const *const key)
 }
 
 void *
+ccc_impl_hrm_data_at(struct ccc_hromap const *const hrm, size_t const slot)
+{
+    return data_at(hrm, slot);
+}
+
+void *
 ccc_impl_hrm_key_at(struct ccc_hromap const *const hrm, size_t const slot)
 {
     return key_at(hrm, slot);
@@ -962,9 +968,11 @@ static inline ccc_threeway_cmp
 cmp_elems(struct ccc_hromap const *const hrm, void const *const key,
           size_t const node, ccc_any_key_cmp_fn *const fn)
 {
-    return fn((ccc_any_key_cmp){.any_key_lhs = key,
-                                .any_type_rhs = data_at(hrm, node),
-                                .aux = hrm->aux});
+    return fn((ccc_any_key_cmp){
+        .any_key_lhs = key,
+        .any_type_rhs = data_at(hrm, node),
+        .aux = hrm->aux,
+    });
 }
 
 static ccc_result
@@ -974,6 +982,10 @@ resize(struct ccc_hromap *const hrm, size_t new_count,
     if (hrm->capacity && new_count <= hrm->capacity - 1)
     {
         return CCC_RESULT_OK;
+    }
+    if (!fn)
+    {
+        return CCC_RESULT_NO_ALLOC;
     }
     void *const new_data = fn(hrm->data, total_bytes(hrm, new_count), hrm->aux);
     if (!new_data)
@@ -1008,6 +1020,13 @@ alloc_slot(struct ccc_hromap *const t)
                 return 0;
             }
         }
+        /* Perform this step every time just in case the pointers have not been
+           initialized yet. */
+        t->nodes = (struct ccc_hromap_elem *)((char *)t->data
+                                              + (t->capacity * t->sizeof_type));
+        t->parity
+            = (hrm_block *)((char *)t->nodes
+                            + (t->capacity * sizeof(struct ccc_hromap_elem)));
         old_cap = old_count ? old_cap : 0;
         size_t const new_cap = t->capacity;
         size_t prev = 0;
