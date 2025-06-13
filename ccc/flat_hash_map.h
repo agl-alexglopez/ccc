@@ -602,7 +602,7 @@ allocation fails or has been forbidden, an insert error is set.
 @warning because this function returns a reference to a user type in the table
 any subsequent insertions or deletions invalidate this reference. */
 [[nodiscard]]
-ccc_entry ccc_fhm_try_insert(ccc_flat_hash_map *h, void *key_val_type);
+ccc_entry ccc_fhm_try_insert(ccc_flat_hash_map *h, void const *key_val_type);
 
 /** @brief Attempts to insert the key value wrapping key_val_handle_ptr.
 @param [in] map_ptr the pointer to the flat hash map.
@@ -650,7 +650,8 @@ Vacant no prior table entry existed.
 Note that this function can be used when the old user type is not needed but
 the information regarding its presence is helpful. */
 [[nodiscard]]
-ccc_entry ccc_fhm_insert_or_assign(ccc_flat_hash_map *h, void *key_val_type);
+ccc_entry ccc_fhm_insert_or_assign(ccc_flat_hash_map *h,
+                                   void const *key_val_type);
 
 /** @brief Invariantly inserts or overwrites a user struct into the table.
 @param [in] map_ptr a pointer to the flat hash map.

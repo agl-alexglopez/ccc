@@ -520,7 +520,7 @@ ccc_fhm_swap_entry(ccc_flat_hash_map *const h, void *const key_val_type_output)
 }
 
 ccc_entry
-ccc_fhm_try_insert(ccc_flat_hash_map *const h, void *const key_val_type)
+ccc_fhm_try_insert(ccc_flat_hash_map *const h, void const *const key_val_type)
 {
     if (unlikely(!h || !key_val_type))
     {
@@ -547,7 +547,8 @@ ccc_fhm_try_insert(ccc_flat_hash_map *const h, void *const key_val_type)
 }
 
 ccc_entry
-ccc_fhm_insert_or_assign(ccc_flat_hash_map *const h, void *const key_val_type)
+ccc_fhm_insert_or_assign(ccc_flat_hash_map *const h,
+                         void const *const key_val_type)
 {
     if (unlikely(!h || !key_val_type))
     {
