@@ -22,7 +22,6 @@ limitations under the License.
 #include <stdint.h>
 /** @endcond */
 
-#include "../buffer.h"
 #include "../types.h"
 #include "impl_types.h"
 
@@ -76,19 +75,23 @@ struct ccc_hromap
     /** @private The parity bit array corresponding to each node. */
     unsigned *parity;
     /** @private The current capacity. */
-    size_t cap;
+    size_t capacity;
     /** @private The current size. */
-    size_t size;
+    size_t count;
     /** @private The root node of the WAVL tree. */
     size_t root;
     /** @private The start of the free singly linked list. */
     size_t free_list;
+    /** @private The size of the type stored in the map. */
+    size_t sizeof_type;
     /** @private Where user key can be found in type. */
     size_t key_offset;
-    /** @private Where intrusive elem is found in type. */
-    size_t node_elem_offset;
     /** @private The provided key comparison function. */
     ccc_any_key_cmp_fn *cmp;
+    /** @private The provided allocation function, if any. */
+    ccc_any_alloc_fn *alloc;
+    /** @private The provided auxiliary data, if any. */
+    void *aux;
 };
 
 /** @private */
@@ -146,20 +149,28 @@ metadata. */
             typeof(*(struct ccc_hromap){}.parity), capacity)];                 \
     }(fixed_map_type_name)
 
+#define ccc_impl_hrm_fixed_capacity(fixed_map_type_name)                       \
+    ((sizeof((fixed_map_type_name){}.nodes) / sizeof(struct ccc_hromap_elem))  \
+     - 1)
+
 /** @private */
-#define ccc_impl_hrm_init(impl_memory_ptr, impl_node_elem_field,               \
+#define ccc_impl_hrm_init(impl_memory_ptr, impl_type_name,                     \
                           impl_key_elem_field, impl_key_cmp_fn, impl_alloc_fn, \
                           impl_aux_data, impl_capacity)                        \
     {                                                                          \
-        .buf = ccc_buf_init(impl_memory_ptr, impl_alloc_fn, impl_aux_data,     \
-                            impl_capacity),                                    \
+        .data = (impl_memory_ptr),                                             \
+        .nodes = NULL,                                                         \
+        .parity = NULL,                                                        \
+        .capacity = (impl_capacity),                                           \
+        .count = 0,                                                            \
         .root = 0,                                                             \
         .free_list = 0,                                                        \
+        .sizeof_type = sizeof(impl_type_name),                                 \
         .key_offset                                                            \
         = offsetof(typeof(*(impl_memory_ptr)), impl_key_elem_field),           \
-        .node_elem_offset                                                      \
-        = offsetof(typeof(*(impl_memory_ptr)), impl_node_elem_field),          \
         .cmp = (impl_key_cmp_fn),                                              \
+        .alloc = (impl_alloc_fn),                                              \
+        .aux = (impl_aux_data),                                                \
     }
 
 /** @private */

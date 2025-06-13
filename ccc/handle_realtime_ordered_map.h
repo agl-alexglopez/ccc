@@ -65,12 +65,6 @@ A handle realtime ordered map can be initialized on the stack, heap, or data
 segment at runtime or compile time.*/
 typedef struct ccc_hromap ccc_handle_realtime_ordered_map;
 
-/** @brief The intrusive element for the user defined struct being stored in the
-map
-
-Because the map is handle data is always copied from the user type to map. */
-typedef struct ccc_hromap_elem ccc_hromap_elem;
-
 /** @brief A container specific handle used to implement the Handle Interface.
 @warning it is undefined behavior to access an uninitialized container.
 
@@ -272,7 +266,7 @@ Note that this function may write to the struct containing out_handle and wraps
 it in a handle to provide information about the old value. */
 [[nodiscard]] ccc_handle
 ccc_hrm_swap_handle(ccc_handle_realtime_ordered_map *hrm,
-                    ccc_hromap_elem *out_handle);
+                    void *key_val_type_output);
 
 /** @brief Invariantly inserts the key value wrapping key_val_handle.
 @param [in] handle_realtime_ordered_map_ptr the pointer to the ordered map.
@@ -302,7 +296,7 @@ reference to the newly inserted handle in the map. If more space is needed but
 allocation fails, an insert error is set. */
 [[nodiscard]] ccc_handle
 ccc_hrm_try_insert(ccc_handle_realtime_ordered_map *hrm,
-                   ccc_hromap_elem *key_val_handle);
+                   void const *key_val_type);
 
 /** @brief Attempts to insert the key value wrapping key_val_handle.
 @param [in] handle_realtime_ordered_map_ptr the pointer to the map.
@@ -350,7 +344,7 @@ Note that this function can be used when the old user type is not needed but
 the information regarding its presence is helpful. */
 [[nodiscard]] ccc_handle
 ccc_hrm_insert_or_assign(ccc_handle_realtime_ordered_map *hrm,
-                         ccc_hromap_elem *key_val_handle);
+                         void const *key_val_type);
 
 /** @brief Inserts a new key value pair or overwrites the existing handle.
 @param [in] handle_realtime_ordered_map_ptr the pointer to the handle hash map.
@@ -383,7 +377,7 @@ an input error is set.
 Note that this function may write to the struct containing the second parameter
 and wraps it in a handle to provide information about the old value. */
 [[nodiscard]] ccc_handle ccc_hrm_remove(ccc_handle_realtime_ordered_map *hrm,
-                                        ccc_hromap_elem *out_handle);
+                                        void *key_val_type_output);
 
 /** @brief Removes the key value in the map storing the old value, if present,
 in the struct containing out_handle provided by the user.
@@ -512,7 +506,7 @@ a user struct allocation failure.
 If no allocation is permitted, this function assumes the user struct wrapping
 elem has been allocated with the appropriate lifetime and scope by the user. */
 [[nodiscard]] ccc_handle_i ccc_hrm_or_insert(ccc_hromap_handle const *h,
-                                             ccc_hromap_elem *elem);
+                                             void const *key_val_type);
 
 /** @brief Lazily insert the desired key value into the handle if it is Vacant.
 @param [in] handle_realtime_ordered_map_handle_ptr a pointer to the obtained
@@ -539,7 +533,7 @@ or other data, such functions will not be called if the handle is Occupied. */
 This method can be used when the old value in the map does not need to
 be preserved. See the regular insert method if the old value is of interest. */
 [[nodiscard]] ccc_handle_i ccc_hrm_insert_handle(ccc_hromap_handle const *h,
-                                                 ccc_hromap_elem *elem);
+                                                 void const *key_val_type);
 
 /** @brief Write the contents of the compound literal lazy_key_value to a node.
 @param [in] handle_realtime_ordered_map_handle_ptr a pointer to the obtained
@@ -761,7 +755,7 @@ enclosing scope. This reference is always non-NULL. */
 current iterator.
 @return the next user type stored in the map in an inorder traversal. */
 [[nodiscard]] void *ccc_hrm_next(ccc_handle_realtime_ordered_map const *hrm,
-                                 ccc_hromap_elem const *iter_handle);
+                                 void const *key_val_type_iter);
 
 /** @brief Return the rnext element in a reverse inorder traversal of the map.
 O(1).
@@ -770,7 +764,7 @@ O(1).
 current iterator.
 @return the rnext user type stored in the map in a reverse inorder traversal. */
 [[nodiscard]] void *ccc_hrm_rnext(ccc_handle_realtime_ordered_map const *hrm,
-                                  ccc_hromap_elem const *iter_handle);
+                                  void const *key_val_type_iter);
 
 /** @brief Return the end of an inorder traversal of the map. O(1).
 @param [in] hrm a pointer to the map.
