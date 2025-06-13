@@ -52,7 +52,7 @@ CHECK_BEGIN_STATIC_FN(fill_n, ccc_handle_realtime_ordered_map *const hrm,
     for (size_t i = 0; i < n; ++i, ++id_and_val)
     {
         ccc_handle hndl = swap_handle(
-            hrm, &(struct val){.id = id_and_val, .val = id_and_val}.elem);
+            hrm, &(struct val){.id = id_and_val, .val = id_and_val});
         CHECK(insert_error(&hndl), false);
         CHECK(occupied(&hndl), false);
         CHECK(validate(hrm), true);
@@ -65,13 +65,13 @@ CHECK_BEGIN_STATIC_FN(fill_n, ccc_handle_realtime_ordered_map *const hrm,
 CHECK_BEGIN_STATIC_FN(hromap_test_validate)
 {
     ccc_handle_realtime_ordered_map hrm
-        = hrm_init((struct val[3]){}, elem, id, id_cmp, NULL, NULL, 3);
-    ccc_handle hndl
-        = swap_handle(&hrm, &(struct val){.id = -1, .val = -1}.elem);
+        = hrm_init(&(small_fixed_map){}, struct val, id, id_cmp, NULL, NULL,
+                   SMALL_FIXED_CAP);
+    ccc_handle hndl = swap_handle(&hrm, &(struct val){.id = -1, .val = -1});
     CHECK(validate(&hrm), true);
     CHECK(occupied(&hndl), false);
     CHECK(size(&hrm).count, 1);
-    hndl = swap_handle(&hrm, &(struct val){.id = -1, .val = -1}.elem);
+    hndl = swap_handle(&hrm, &(struct val){.id = -1, .val = -1});
     CHECK(validate(&hrm), true);
     CHECK(occupied(&hndl), true);
     CHECK(size(&hrm).count, 1);
@@ -84,15 +84,15 @@ CHECK_BEGIN_STATIC_FN(hromap_test_validate)
 
 CHECK_BEGIN_STATIC_FN(hromap_test_insert)
 {
-    int size = 30;
     ccc_handle_realtime_ordered_map hrm
-        = hrm_init((struct val[33]){}, elem, id, id_cmp, NULL, NULL, 33);
-    ccc_handle hndl
-        = swap_handle(&hrm, &(struct val){.id = -1, .val = -1}.elem);
+        = hrm_init(&(small_fixed_map){}, struct val, id, id_cmp, NULL, NULL,
+                   SMALL_FIXED_CAP);
+    int size = 30;
+    ccc_handle hndl = swap_handle(&hrm, &(struct val){.id = -1, .val = -1});
     CHECK(validate(&hrm), true);
     CHECK(occupied(&hndl), false);
     CHECK(size(&hrm).count, 1);
-    hndl = swap_handle(&hrm, &(struct val){.id = -1, .val = -1}.elem);
+    hndl = swap_handle(&hrm, &(struct val){.id = -1, .val = -1});
     CHECK(validate(&hrm), true);
     CHECK(occupied(&hndl), true);
     CHECK(size(&hrm).count, 1);
@@ -105,11 +105,11 @@ CHECK_BEGIN_STATIC_FN(hromap_test_insert)
     CHECK(fill_n(&hrm, size / 2, i), PASS);
 
     i += (size / 2);
-    hndl = swap_handle(&hrm, &(struct val){.id = i, .val = i}.elem);
+    hndl = swap_handle(&hrm, &(struct val){.id = i, .val = i});
     CHECK(validate(&hrm), true);
     CHECK(occupied(&hndl), false);
     CHECK(size(&hrm).count, i + 2);
-    hndl = swap_handle(&hrm, &(struct val){.id = i, .val = i}.elem);
+    hndl = swap_handle(&hrm, &(struct val){.id = i, .val = i});
     CHECK(validate(&hrm), true);
     CHECK(occupied(&hndl), true);
     CHECK(size(&hrm).count, i + 2);
@@ -122,11 +122,11 @@ CHECK_BEGIN_STATIC_FN(hromap_test_insert)
     CHECK(fill_n(&hrm, size - i, i), PASS);
 
     i = size;
-    hndl = swap_handle(&hrm, &(struct val){.id = i, .val = i}.elem);
+    hndl = swap_handle(&hrm, &(struct val){.id = i, .val = i});
     CHECK(validate(&hrm), true);
     CHECK(occupied(&hndl), false);
     CHECK(size(&hrm).count, i + 2);
-    hndl = swap_handle(&hrm, &(struct val){.id = i, .val = i}.elem);
+    hndl = swap_handle(&hrm, &(struct val){.id = i, .val = i});
     CHECK(validate(&hrm), true);
     CHECK(occupied(&hndl), true);
     CHECK(size(&hrm).count, i + 2);
@@ -140,18 +140,19 @@ CHECK_BEGIN_STATIC_FN(hromap_test_insert)
 CHECK_BEGIN_STATIC_FN(hromap_test_remove)
 {
     ccc_handle_realtime_ordered_map hrm
-        = hrm_init((struct val[33]){}, elem, id, id_cmp, NULL, NULL, 33);
+        = hrm_init(&(small_fixed_map){}, struct val, id, id_cmp, NULL, NULL,
+                   SMALL_FIXED_CAP);
     int size = 30;
-    ccc_handle hndl = ccc_remove(&hrm, &(struct val){.id = -1, .val = -1}.elem);
+    ccc_handle hndl = ccc_remove(&hrm, &(struct val){.id = -1, .val = -1});
     CHECK(validate(&hrm), true);
     CHECK(occupied(&hndl), false);
     CHECK(size(&hrm).count, 0);
-    hndl = swap_handle(&hrm, &(struct val){.id = -1, .val = -1}.elem);
+    hndl = swap_handle(&hrm, &(struct val){.id = -1, .val = -1});
     CHECK(validate(&hrm), true);
     CHECK(occupied(&hndl), false);
     CHECK(size(&hrm).count, 1);
     struct val old = {.id = -1};
-    hndl = ccc_remove(&hrm, &old.elem);
+    hndl = ccc_remove(&hrm, &old);
     CHECK(validate(&hrm), true);
     CHECK(occupied(&hndl), true);
     CHECK(size(&hrm).count, 0);
@@ -161,16 +162,16 @@ CHECK_BEGIN_STATIC_FN(hromap_test_remove)
     CHECK(fill_n(&hrm, size / 2, i), PASS);
 
     i += (size / 2);
-    hndl = ccc_remove(&hrm, &(struct val){.id = i, .val = i}.elem);
+    hndl = ccc_remove(&hrm, &(struct val){.id = i, .val = i});
     CHECK(validate(&hrm), true);
     CHECK(occupied(&hndl), false);
     CHECK(size(&hrm).count, i);
-    hndl = swap_handle(&hrm, &(struct val){.id = i, .val = i}.elem);
+    hndl = swap_handle(&hrm, &(struct val){.id = i, .val = i});
     CHECK(validate(&hrm), true);
     CHECK(occupied(&hndl), false);
     CHECK(size(&hrm).count, i + 1);
     old = (struct val){.id = i};
-    hndl = ccc_remove(&hrm, &old.elem);
+    hndl = ccc_remove(&hrm, &old);
     CHECK(validate(&hrm), true);
     CHECK(occupied(&hndl), true);
     CHECK(size(&hrm).count, i);
@@ -180,16 +181,16 @@ CHECK_BEGIN_STATIC_FN(hromap_test_remove)
     CHECK(fill_n(&hrm, size - i, i), PASS);
 
     i = size;
-    hndl = ccc_remove(&hrm, &(struct val){.id = i, .val = i}.elem);
+    hndl = ccc_remove(&hrm, &(struct val){.id = i, .val = i});
     CHECK(validate(&hrm), true);
     CHECK(occupied(&hndl), false);
     CHECK(size(&hrm).count, i);
-    hndl = swap_handle(&hrm, &(struct val){.id = i, .val = i}.elem);
+    hndl = swap_handle(&hrm, &(struct val){.id = i, .val = i});
     CHECK(validate(&hrm), true);
     CHECK(occupied(&hndl), false);
     CHECK(size(&hrm).count, i + 1);
     old = (struct val){.id = i};
-    hndl = ccc_remove(&hrm, &old.elem);
+    hndl = ccc_remove(&hrm, &old);
     CHECK(validate(&hrm), true);
     CHECK(occupied(&hndl), true);
     CHECK(size(&hrm).count, i);
@@ -201,13 +202,14 @@ CHECK_BEGIN_STATIC_FN(hromap_test_remove)
 CHECK_BEGIN_STATIC_FN(hromap_test_try_insert)
 {
     ccc_handle_realtime_ordered_map hrm
-        = hrm_init((struct val[33]){}, elem, id, id_cmp, NULL, NULL, 33);
+        = hrm_init(&(small_fixed_map){}, struct val, id, id_cmp, NULL, NULL,
+                   SMALL_FIXED_CAP);
     int size = 30;
-    ccc_handle hndl = try_insert(&hrm, &(struct val){.id = -1, .val = -1}.elem);
+    ccc_handle hndl = try_insert(&hrm, &(struct val){.id = -1, .val = -1});
     CHECK(validate(&hrm), true);
     CHECK(occupied(&hndl), false);
     CHECK(size(&hrm).count, 1);
-    hndl = try_insert(&hrm, &(struct val){.id = -1, .val = -1}.elem);
+    hndl = try_insert(&hrm, &(struct val){.id = -1, .val = -1});
     CHECK(validate(&hrm), true);
     CHECK(occupied(&hndl), true);
     CHECK(size(&hrm).count, 1);
@@ -220,11 +222,11 @@ CHECK_BEGIN_STATIC_FN(hromap_test_try_insert)
     CHECK(fill_n(&hrm, size / 2, i), PASS);
 
     i += (size / 2);
-    hndl = try_insert(&hrm, &(struct val){.id = i, .val = i}.elem);
+    hndl = try_insert(&hrm, &(struct val){.id = i, .val = i});
     CHECK(validate(&hrm), true);
     CHECK(occupied(&hndl), false);
     CHECK(size(&hrm).count, i + 2);
-    hndl = try_insert(&hrm, &(struct val){.id = i, .val = i}.elem);
+    hndl = try_insert(&hrm, &(struct val){.id = i, .val = i});
     CHECK(validate(&hrm), true);
     CHECK(occupied(&hndl), true);
     CHECK(size(&hrm).count, i + 2);
@@ -237,11 +239,11 @@ CHECK_BEGIN_STATIC_FN(hromap_test_try_insert)
     CHECK(fill_n(&hrm, size - i, i), PASS);
 
     i = size;
-    hndl = try_insert(&hrm, &(struct val){.id = i, .val = i}.elem);
+    hndl = try_insert(&hrm, &(struct val){.id = i, .val = i});
     CHECK(validate(&hrm), true);
     CHECK(occupied(&hndl), false);
     CHECK(size(&hrm).count, i + 2);
-    hndl = try_insert(&hrm, &(struct val){.id = i, .val = i}.elem);
+    hndl = try_insert(&hrm, &(struct val){.id = i, .val = i});
     CHECK(occupied(&hndl), true);
     CHECK(size(&hrm).count, i + 2);
     v = hrm_at(&hrm, unwrap(&hndl));
@@ -254,7 +256,8 @@ CHECK_BEGIN_STATIC_FN(hromap_test_try_insert)
 CHECK_BEGIN_STATIC_FN(hromap_test_try_insert_with)
 {
     ccc_handle_realtime_ordered_map hrm
-        = hrm_init((struct val[33]){}, elem, id, id_cmp, NULL, NULL, 33);
+        = hrm_init(&(small_fixed_map){}, struct val, id, id_cmp, NULL, NULL,
+                   SMALL_FIXED_CAP);
     int size = 30;
     ccc_handle *hndl = hrm_try_insert_w(&hrm, -1, val(-1));
     CHECK(validate(&hrm), true);
@@ -308,14 +311,15 @@ CHECK_BEGIN_STATIC_FN(hromap_test_try_insert_with)
 CHECK_BEGIN_STATIC_FN(hromap_test_insert_or_assign)
 {
     ccc_handle_realtime_ordered_map hrm
-        = hrm_init((struct val[33]){}, elem, id, id_cmp, NULL, NULL, 33);
+        = hrm_init(&(small_fixed_map){}, struct val, id, id_cmp, NULL, NULL,
+                   SMALL_FIXED_CAP);
     int size = 30;
     ccc_handle hndl
-        = insert_or_assign(&hrm, &(struct val){.id = -1, .val = -1}.elem);
+        = insert_or_assign(&hrm, &(struct val){.id = -1, .val = -1});
     CHECK(validate(&hrm), true);
     CHECK(occupied(&hndl), false);
     CHECK(size(&hrm).count, 1);
-    hndl = insert_or_assign(&hrm, &(struct val){.id = -1, .val = -2}.elem);
+    hndl = insert_or_assign(&hrm, &(struct val){.id = -1, .val = -2});
     CHECK(validate(&hrm), true);
     CHECK(occupied(&hndl), true);
     CHECK(size(&hrm).count, 1);
@@ -328,11 +332,11 @@ CHECK_BEGIN_STATIC_FN(hromap_test_insert_or_assign)
     CHECK(fill_n(&hrm, size / 2, i), PASS);
 
     i += (size / 2);
-    hndl = insert_or_assign(&hrm, &(struct val){.id = i, .val = i}.elem);
+    hndl = insert_or_assign(&hrm, &(struct val){.id = i, .val = i});
     CHECK(validate(&hrm), true);
     CHECK(occupied(&hndl), false);
     CHECK(size(&hrm).count, i + 2);
-    hndl = insert_or_assign(&hrm, &(struct val){.id = i, .val = i + 1}.elem);
+    hndl = insert_or_assign(&hrm, &(struct val){.id = i, .val = i + 1});
     CHECK(occupied(&hndl), true);
     CHECK(size(&hrm).count, i + 2);
     v = hrm_at(&hrm, unwrap(&hndl));
@@ -344,11 +348,11 @@ CHECK_BEGIN_STATIC_FN(hromap_test_insert_or_assign)
     CHECK(fill_n(&hrm, size - i, i), PASS);
 
     i = size;
-    hndl = insert_or_assign(&hrm, &(struct val){.id = i, .val = i}.elem);
+    hndl = insert_or_assign(&hrm, &(struct val){.id = i, .val = i});
     CHECK(validate(&hrm), true);
     CHECK(occupied(&hndl), false);
     CHECK(size(&hrm).count, i + 2);
-    hndl = insert_or_assign(&hrm, &(struct val){.id = i, .val = i + 1}.elem);
+    hndl = insert_or_assign(&hrm, &(struct val){.id = i, .val = i + 1});
     CHECK(validate(&hrm), true);
     CHECK(occupied(&hndl), true);
     CHECK(size(&hrm).count, i + 2);
@@ -362,7 +366,8 @@ CHECK_BEGIN_STATIC_FN(hromap_test_insert_or_assign)
 CHECK_BEGIN_STATIC_FN(hromap_test_insert_or_assign_with)
 {
     ccc_handle_realtime_ordered_map hrm
-        = hrm_init((struct val[33]){}, elem, id, id_cmp, NULL, NULL, 33);
+        = hrm_init(&(small_fixed_map){}, struct val, id, id_cmp, NULL, NULL,
+                   SMALL_FIXED_CAP);
     int size = 30;
     ccc_handle *hndl = hrm_insert_or_assign_w(&hrm, -1, val(-1));
     CHECK(validate(&hrm), true);
@@ -415,7 +420,8 @@ CHECK_BEGIN_STATIC_FN(hromap_test_insert_or_assign_with)
 CHECK_BEGIN_STATIC_FN(hromap_test_handle_and_modify)
 {
     ccc_handle_realtime_ordered_map hrm
-        = hrm_init((struct val[33]){}, elem, id, id_cmp, NULL, NULL, 33);
+        = hrm_init(&(small_fixed_map){}, struct val, id, id_cmp, NULL, NULL,
+                   SMALL_FIXED_CAP);
     int size = 30;
     ccc_hromap_handle *hndl = handle_r(&hrm, &(int){-1});
     CHECK(validate(&hrm), true);
@@ -480,7 +486,8 @@ CHECK_BEGIN_STATIC_FN(hromap_test_handle_and_modify)
 CHECK_BEGIN_STATIC_FN(hromap_test_handle_and_modify_aux)
 {
     ccc_handle_realtime_ordered_map hrm
-        = hrm_init((struct val[33]){}, elem, id, id_cmp, NULL, NULL, 33);
+        = hrm_init(&(small_fixed_map){}, struct val, id, id_cmp, NULL, NULL,
+                   SMALL_FIXED_CAP);
     int size = 30;
     int aux = 1;
     ccc_hromap_handle *hndl = handle_r(&hrm, &(int){-1});
@@ -543,7 +550,8 @@ CHECK_BEGIN_STATIC_FN(hromap_test_handle_and_modify_aux)
 CHECK_BEGIN_STATIC_FN(hromap_test_handle_and_modify_with)
 {
     ccc_handle_realtime_ordered_map hrm
-        = hrm_init((struct val[33]){}, elem, id, id_cmp, NULL, NULL, 33);
+        = hrm_init(&(small_fixed_map){}, struct val, id, id_cmp, NULL, NULL,
+                   SMALL_FIXED_CAP);
     int size = 30;
     ccc_hromap_handle *hndl = handle_r(&hrm, &(int){-1});
     hndl = hrm_and_modify_w(hndl, struct val, { T->val++; });
@@ -605,18 +613,18 @@ CHECK_BEGIN_STATIC_FN(hromap_test_handle_and_modify_with)
 CHECK_BEGIN_STATIC_FN(hromap_test_or_insert)
 {
     ccc_handle_realtime_ordered_map hrm
-        = hrm_init((struct val[33]){}, elem, id, id_cmp, NULL, NULL, 33);
+        = hrm_init(&(small_fixed_map){}, struct val, id, id_cmp, NULL, NULL,
+                   SMALL_FIXED_CAP);
     int size = 30;
-    struct val *v
-        = hrm_at(&hrm, or_insert(handle_r(&hrm, &(int){-1}),
-                                 &(struct val){.id = -1, .val = -1}.elem));
+    struct val *v = hrm_at(&hrm, or_insert(handle_r(&hrm, &(int){-1}),
+                                           &(struct val){.id = -1, .val = -1}));
     CHECK(validate(&hrm), true);
     CHECK(v != NULL, true);
     CHECK(v->id, -1);
     CHECK(v->val, -1);
     CHECK(size(&hrm).count, 1);
     v = hrm_at(&hrm, or_insert(handle_r(&hrm, &(int){-1}),
-                               &(struct val){.id = -1, .val = -2}.elem));
+                               &(struct val){.id = -1, .val = -2}));
     CHECK(v != NULL, true);
     CHECK(v->id, -1);
     CHECK(v->val, -1);
@@ -626,15 +634,15 @@ CHECK_BEGIN_STATIC_FN(hromap_test_or_insert)
     CHECK(fill_n(&hrm, size / 2, i), PASS);
 
     i += (size / 2);
-    v = hrm_at(&hrm, or_insert(handle_r(&hrm, &i),
-                               &(struct val){.id = i, .val = i}.elem));
+    v = hrm_at(&hrm,
+               or_insert(handle_r(&hrm, &i), &(struct val){.id = i, .val = i}));
     CHECK(validate(&hrm), true);
     CHECK(v != NULL, true);
     CHECK(v->id, i);
     CHECK(v->val, i);
     CHECK(size(&hrm).count, i + 2);
     v = hrm_at(&hrm, or_insert(handle_r(&hrm, &i),
-                               &(struct val){.id = i, .val = i + 1}.elem));
+                               &(struct val){.id = i, .val = i + 1}));
     CHECK(v != NULL, true);
     CHECK(v->id, i);
     CHECK(v->val, i);
@@ -644,15 +652,15 @@ CHECK_BEGIN_STATIC_FN(hromap_test_or_insert)
     CHECK(fill_n(&hrm, size - i, i), PASS);
 
     i = size;
-    v = hrm_at(&hrm, or_insert(handle_r(&hrm, &i),
-                               &(struct val){.id = i, .val = i}.elem));
+    v = hrm_at(&hrm,
+               or_insert(handle_r(&hrm, &i), &(struct val){.id = i, .val = i}));
     CHECK(validate(&hrm), true);
     CHECK(v != NULL, true);
     CHECK(v->id, i);
     CHECK(v->val, i);
     CHECK(size(&hrm).count, i + 2);
     v = hrm_at(&hrm, or_insert(handle_r(&hrm, &i),
-                               &(struct val){.id = i, .val = i + 1}.elem));
+                               &(struct val){.id = i, .val = i + 1}));
     CHECK(v != NULL, true);
     CHECK(v->id, i);
     CHECK(v->val, i);
@@ -663,7 +671,8 @@ CHECK_BEGIN_STATIC_FN(hromap_test_or_insert)
 CHECK_BEGIN_STATIC_FN(hromap_test_or_insert_with)
 {
     ccc_handle_realtime_ordered_map hrm
-        = hrm_init((struct val[33]){}, elem, id, id_cmp, NULL, NULL, 33);
+        = hrm_init(&(small_fixed_map){}, struct val, id, id_cmp, NULL, NULL,
+                   SMALL_FIXED_CAP);
     int size = 30;
     struct val *v = hrm_at(
         &hrm, hrm_or_insert_w(handle_r(&hrm, &(int){-1}), idval(-1, -1)));
@@ -716,18 +725,19 @@ CHECK_BEGIN_STATIC_FN(hromap_test_or_insert_with)
 CHECK_BEGIN_STATIC_FN(hromap_test_insert_handle)
 {
     ccc_handle_realtime_ordered_map hrm
-        = hrm_init((struct val[33]){}, elem, id, id_cmp, NULL, NULL, 33);
+        = hrm_init(&(small_fixed_map){}, struct val, id, id_cmp, NULL, NULL,
+                   SMALL_FIXED_CAP);
     int size = 30;
     struct val *v
         = hrm_at(&hrm, insert_handle(handle_r(&hrm, &(int){-1}),
-                                     &(struct val){.id = -1, .val = -1}.elem));
+                                     &(struct val){.id = -1, .val = -1}));
     CHECK(validate(&hrm), true);
     CHECK(v != NULL, true);
     CHECK(v->id, -1);
     CHECK(v->val, -1);
     CHECK(size(&hrm).count, 1);
     v = hrm_at(&hrm, insert_handle(handle_r(&hrm, &(int){-1}),
-                                   &(struct val){.id = -1, .val = -2}.elem));
+                                   &(struct val){.id = -1, .val = -2}));
     CHECK(v != NULL, true);
     CHECK(v->id, -1);
     CHECK(v->val, -2);
@@ -738,14 +748,14 @@ CHECK_BEGIN_STATIC_FN(hromap_test_insert_handle)
 
     i += (size / 2);
     v = hrm_at(&hrm, insert_handle(handle_r(&hrm, &i),
-                                   &(struct val){.id = i, .val = i}.elem));
+                                   &(struct val){.id = i, .val = i}));
     CHECK(validate(&hrm), true);
     CHECK(v != NULL, true);
     CHECK(v->id, i);
     CHECK(v->val, i);
     CHECK(size(&hrm).count, i + 2);
     v = hrm_at(&hrm, insert_handle(handle_r(&hrm, &i),
-                                   &(struct val){.id = i, .val = i + 1}.elem));
+                                   &(struct val){.id = i, .val = i + 1}));
     CHECK(v != NULL, true);
     CHECK(v->id, i);
     CHECK(v->val, i + 1);
@@ -756,14 +766,14 @@ CHECK_BEGIN_STATIC_FN(hromap_test_insert_handle)
 
     i = size;
     v = hrm_at(&hrm, insert_handle(handle_r(&hrm, &i),
-                                   &(struct val){.id = i, .val = i}.elem));
+                                   &(struct val){.id = i, .val = i}));
     CHECK(validate(&hrm), true);
     CHECK(v != NULL, true);
     CHECK(v->id, i);
     CHECK(v->val, i);
     CHECK(size(&hrm).count, i + 2);
     v = hrm_at(&hrm, insert_handle(handle_r(&hrm, &i),
-                                   &(struct val){.id = i, .val = i + 1}.elem));
+                                   &(struct val){.id = i, .val = i + 1}));
     CHECK(v != NULL, true);
     CHECK(v->id, i);
     CHECK(v->val, i + 1);
@@ -774,7 +784,8 @@ CHECK_BEGIN_STATIC_FN(hromap_test_insert_handle)
 CHECK_BEGIN_STATIC_FN(hromap_test_insert_handle_with)
 {
     ccc_handle_realtime_ordered_map hrm
-        = hrm_init((struct val[33]){}, elem, id, id_cmp, NULL, NULL, 33);
+        = hrm_init(&(small_fixed_map){}, struct val, id, id_cmp, NULL, NULL,
+                   SMALL_FIXED_CAP);
     int size = 30;
     struct val *v = hrm_at(
         &hrm, hrm_insert_handle_w(handle_r(&hrm, &(int){-1}), idval(-1, -1)));
@@ -827,11 +838,11 @@ CHECK_BEGIN_STATIC_FN(hromap_test_insert_handle_with)
 CHECK_BEGIN_STATIC_FN(hromap_test_remove_handle)
 {
     ccc_handle_realtime_ordered_map hrm
-        = hrm_init((struct val[33]){}, elem, id, id_cmp, NULL, NULL, 33);
+        = hrm_init(&(small_fixed_map){}, struct val, id, id_cmp, NULL, NULL,
+                   SMALL_FIXED_CAP);
     int size = 30;
-    struct val *v
-        = hrm_at(&hrm, or_insert(handle_r(&hrm, &(int){-1}),
-                                 &(struct val){.id = -1, .val = -1}.elem));
+    struct val *v = hrm_at(&hrm, or_insert(handle_r(&hrm, &(int){-1}),
+                                           &(struct val){.id = -1, .val = -1}));
     CHECK(validate(&hrm), true);
     CHECK(v != NULL, true);
     CHECK(v->id, -1);
@@ -850,8 +861,8 @@ CHECK_BEGIN_STATIC_FN(hromap_test_remove_handle)
     CHECK(fill_n(&hrm, size / 2, i), PASS);
 
     i += (size / 2);
-    v = hrm_at(&hrm, or_insert(handle_r(&hrm, &i),
-                               &(struct val){.id = i, .val = i}.elem));
+    v = hrm_at(&hrm,
+               or_insert(handle_r(&hrm, &i), &(struct val){.id = i, .val = i}));
     CHECK(validate(&hrm), true);
     CHECK(v != NULL, true);
     CHECK(v->id, i);
@@ -869,8 +880,8 @@ CHECK_BEGIN_STATIC_FN(hromap_test_remove_handle)
     CHECK(fill_n(&hrm, size - i, i), PASS);
 
     i = size;
-    v = hrm_at(&hrm, or_insert(handle_r(&hrm, &i),
-                               &(struct val){.id = i, .val = i}.elem));
+    v = hrm_at(&hrm,
+               or_insert(handle_r(&hrm, &i), &(struct val){.id = i, .val = i}));
     CHECK(validate(&hrm), true);
     CHECK(v != NULL, true);
     CHECK(v->id, i);
