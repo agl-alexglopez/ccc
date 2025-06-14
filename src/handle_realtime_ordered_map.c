@@ -97,8 +97,17 @@ enum : size_t
 /* Returning the user struct type with stored offsets. */
 static void insert(struct ccc_hromap *hrm, size_t parent_i,
                    ccc_threeway_cmp last_cmp, size_t elem_i);
-static ccc_result resize(struct ccc_hromap *hrm, size_t new_count,
+static ccc_result resize(struct ccc_hromap *hrm, size_t new_capacity,
                          ccc_any_alloc_fn *fn);
+static void copy_soa(struct ccc_hromap const *src, void *dst_data_base,
+                     size_t dst_capacity);
+static size_t data_bytes(size_t sizeof_type, size_t capacity);
+static size_t node_bytes(size_t capacity);
+static size_t parity_bytes(size_t capacity);
+static struct ccc_hromap_elem *node_pos(size_t sizeof_type, void const *data,
+                                        size_t capacity);
+static hrm_block *parity_pos(size_t sizeof_type, void const *data,
+                             size_t capacity);
 static size_t maybe_alloc_insert(struct ccc_hromap *hrm, size_t parent,
                                  ccc_threeway_cmp last_cmp,
                                  void const *user_type);
@@ -222,7 +231,6 @@ ccc_hrm_swap_handle(ccc_handle_realtime_ordered_map *const hrm,
         void *const slot = data_at(hrm, q.found);
         void *const tmp = data_at(hrm, 0);
         swap(tmp, key_val_type_output, slot, hrm->sizeof_type);
-        set_parity(hrm, q.found, CCC_TRUE);
         return (ccc_handle){{
             .i = q.found,
             .stats = CCC_ENTRY_OCCUPIED,
@@ -672,17 +680,17 @@ ccc_hrm_copy(ccc_handle_realtime_ordered_map *const dst,
             return r;
         }
     }
+    else
+    {
+        /* Might not be necessary but not worth finding out. Do every time. */
+        dst->nodes = node_pos(dst->sizeof_type, dst->data, dst->capacity);
+        dst->parity = parity_pos(dst->sizeof_type, dst->data, dst->capacity);
+    }
     if (!dst->data || !src->data)
     {
         return CCC_RESULT_ARG_ERROR;
     }
-    dst->nodes
-        = (struct ccc_hromap_elem *)((char *)dst->data
-                                     + (dst->capacity * dst->sizeof_type));
-    dst->parity
-        = (hrm_block *)((char *)dst->nodes
-                        + (dst->capacity * sizeof(struct ccc_hromap_elem)));
-    (void)memcpy(dst->data, src->data, total_bytes(src, src->capacity));
+    copy_soa(src, dst->data, dst->capacity);
     return CCC_RESULT_OK;
 }
 
@@ -844,6 +852,76 @@ maybe_alloc_insert(struct ccc_hromap *const hrm, size_t const parent,
     return node;
 }
 
+static size_t
+alloc_slot(struct ccc_hromap *const t)
+{
+    /* The end sentinel node will always be at 0. This also means once
+       initialized the internal size for implementer is always at least 1. */
+    size_t const old_count = t->count;
+    size_t old_cap = t->capacity;
+    if (!old_count || old_count == old_cap)
+    {
+        assert(!t->free_list);
+        if (old_count == old_cap)
+        {
+            if (resize(t, old_cap ? old_cap * 2 : 8, t->alloc) != CCC_RESULT_OK)
+            {
+                return 0;
+            }
+        }
+        else
+        {
+            /* Might not be needed but not worth checking. Do every time. */
+            t->nodes = node_pos(t->sizeof_type, t->data, t->capacity);
+            t->parity = parity_pos(t->sizeof_type, t->data, t->capacity);
+        }
+        old_cap = old_count ? old_cap : 0;
+        size_t const new_cap = t->capacity;
+        size_t prev = 0;
+        for (size_t i = new_cap - 1; i > 0 && i >= old_cap; prev = i, --i)
+        {
+            node_at(t, i)->next_free = prev;
+        }
+        t->free_list = prev;
+        t->count = max(old_count, 1);
+        set_parity(t, 0, CCC_TRUE);
+    }
+    if (!t->free_list)
+    {
+        return 0;
+    }
+    ++t->count;
+    size_t const slot = t->free_list;
+    t->free_list = node_at(t, slot)->next_free;
+    return slot;
+}
+
+static ccc_result
+resize(struct ccc_hromap *const hrm, size_t const new_capacity,
+       ccc_any_alloc_fn *const fn)
+{
+    if (hrm->capacity && new_capacity <= hrm->capacity - 1)
+    {
+        return CCC_RESULT_OK;
+    }
+    if (!fn)
+    {
+        return CCC_RESULT_NO_ALLOC;
+    }
+    void *const new_data = fn(NULL, total_bytes(hrm, new_capacity), hrm->aux);
+    if (!new_data)
+    {
+        return CCC_RESULT_MEM_ERROR;
+    }
+    copy_soa(hrm, new_data, new_capacity);
+    hrm->nodes = node_pos(hrm->sizeof_type, new_data, new_capacity);
+    hrm->parity = parity_pos(hrm->sizeof_type, new_data, new_capacity);
+    fn(hrm->data, 0, hrm->aux);
+    hrm->data = new_data;
+    hrm->capacity = new_capacity;
+    return CCC_RESULT_OK;
+}
+
 static void
 insert(struct ccc_hromap *const hrm, size_t const parent_i,
        ccc_threeway_cmp const last_cmp, size_t const elem_i)
@@ -981,77 +1059,61 @@ cmp_elems(struct ccc_hromap const *const hrm, void const *const key,
     });
 }
 
-static ccc_result
-resize(struct ccc_hromap *const hrm, size_t new_count,
-       ccc_any_alloc_fn *const fn)
+static inline size_t
+data_bytes(size_t const sizeof_type, size_t const capacity)
 {
-    if (hrm->capacity && new_count <= hrm->capacity - 1)
-    {
-        return CCC_RESULT_OK;
-    }
-    if (!fn)
-    {
-        return CCC_RESULT_NO_ALLOC;
-    }
-    void *const new_data = fn(hrm->data, total_bytes(hrm, new_count), hrm->aux);
-    if (!new_data)
-    {
-        return CCC_RESULT_MEM_ERROR;
-    }
-    hrm->capacity = new_count;
-    hrm->data = new_data;
-    hrm->nodes
-        = (struct ccc_hromap_elem *)((char *)new_data
-                                     + (hrm->capacity * hrm->sizeof_type));
-    hrm->parity
-        = (hrm_block *)((char *)hrm->nodes
-                        + (hrm->capacity * sizeof(struct ccc_hromap_elem)));
-    return CCC_RESULT_OK;
+    return sizeof_type * capacity;
 }
 
-static size_t
-alloc_slot(struct ccc_hromap *const t)
+static inline size_t
+node_bytes(size_t const capacity)
 {
-    /* The end sentinel node will always be at 0. This also means once
-       initialized the internal size for implementer is always at least 1. */
-    size_t const old_count = t->count;
-    size_t old_cap = t->capacity;
-    if (!old_count || old_count == old_cap)
-    {
-        assert(!t->free_list);
-        if (old_count == old_cap)
-        {
-            if (resize(t, old_cap ? old_cap * 2 : 8, t->alloc) != CCC_RESULT_OK)
-            {
-                return 0;
-            }
-        }
-        /* Perform this step every time just in case the pointers have not been
-           initialized yet. */
-        t->nodes = (struct ccc_hromap_elem *)((char *)t->data
-                                              + (t->capacity * t->sizeof_type));
-        t->parity
-            = (hrm_block *)((char *)t->nodes
-                            + (t->capacity * sizeof(struct ccc_hromap_elem)));
-        old_cap = old_count ? old_cap : 0;
-        size_t const new_cap = t->capacity;
-        size_t prev = 0;
-        for (size_t i = new_cap - 1; i > 0 && i >= old_cap; prev = i, --i)
-        {
-            node_at(t, i)->next_free = prev;
-        }
-        t->free_list = prev;
-        t->count = max(old_count, 1);
-        set_parity(t, 0, CCC_TRUE);
-    }
-    if (!t->free_list)
-    {
-        return 0;
-    }
-    ++t->count;
-    size_t const slot = t->free_list;
-    t->free_list = node_at(t, slot)->next_free;
-    return slot;
+    return sizeof(typeof(*(struct ccc_hromap){}.nodes)) * capacity;
+}
+
+static inline size_t
+parity_bytes(size_t capacity)
+{
+    return sizeof(hrm_block) * block_count(capacity);
+}
+
+static inline struct ccc_hromap_elem *
+node_pos(size_t const sizeof_type, void const *const data,
+         size_t const capacity)
+{
+    return (struct ccc_hromap_elem *)((char *)data
+                                      + data_bytes(sizeof_type, capacity));
+}
+
+static inline hrm_block *
+parity_pos(size_t const sizeof_type, void const *const data,
+           size_t const capacity)
+{
+    return (hrm_block *)((char *)data + data_bytes(sizeof_type, capacity)
+                         + node_bytes(capacity));
+}
+
+/** Copies over the Struct of Arrays contained within the one contiguous
+allocation of the map to the new memory provided. Assumes the new_data pointer
+points to the base of an allocation that has been allocated with sufficient
+bytes to support the user data, nodes, and parity arrays for the provided new
+capacity. */
+static inline void
+copy_soa(struct ccc_hromap const *const src, void *const dst_data_base,
+         size_t const dst_capacity)
+{
+    assert(dst_capacity >= src->capacity);
+    size_t const sizeof_type = src->sizeof_type;
+    /* Each section of the allocation "grows" when we re-size so one copy would
+       not work. Instead each component is copied over allowing each to grow. */
+    (void)memcpy(dst_data_base, src->data,
+                 data_bytes(sizeof_type, src->capacity));
+    (void)memcpy(node_pos(sizeof_type, dst_data_base, dst_capacity),
+                 node_pos(sizeof_type, src->data, src->capacity),
+                 node_bytes(src->capacity));
+    (void)memcpy(parity_pos(sizeof_type, dst_data_base, dst_capacity),
+                 parity_pos(sizeof_type, src->data, src->capacity),
+                 parity_bytes(src->capacity));
 }
 
 static inline void
@@ -1098,12 +1160,6 @@ bit_on(size_t const i)
     return ((hrm_block)1) << (i % HRM_BLOCK_BITS);
 }
 
-static inline ccc_tribool
-parity_at(struct ccc_hromap const *const t, size_t const i)
-{
-    return (*block_at(t, i) & bit_on(i)) != 0;
-}
-
 static inline size_t
 branch_i(struct ccc_hromap const *const t, size_t const parent,
          enum hrm_branch const dir)
@@ -1127,9 +1183,9 @@ index_of(struct ccc_hromap const *const t, void const *const key_val_type)
 }
 
 static inline ccc_tribool
-parity(struct ccc_hromap const *t, size_t const node)
+parity(struct ccc_hromap const *const t, size_t const node)
 {
-    return parity_at(t, node);
+    return (*block_at(t, node) & bit_on(node)) != 0;
 }
 
 static inline void
@@ -1312,7 +1368,7 @@ transplant(struct ccc_hromap *const t, size_t const remove,
     *parent_r(t, remove_r->branch[L]) = replacement;
     replace_r->branch[R] = remove_r->branch[R];
     replace_r->branch[L] = remove_r->branch[L];
-    set_parity(t, remove, parity(t, replacement));
+    set_parity(t, replacement, parity(t, remove));
 }
 
 static void
@@ -1688,6 +1744,11 @@ is_free_list_valid(struct ccc_hromap const *const t)
 static inline ccc_tribool
 validate(struct ccc_hromap const *const hrm)
 {
+    /* If we haven't lazily initialized we should not check anything. */
+    if (hrm->data && (!hrm->nodes || !hrm->parity))
+    {
+        return CCC_TRUE;
+    }
     if (!hrm->count && !parity(hrm, 0))
     {
         return CCC_FALSE;
