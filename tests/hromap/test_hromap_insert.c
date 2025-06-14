@@ -385,12 +385,8 @@ CHECK_BEGIN_STATIC_FN(hromap_test_two_sum)
 
 CHECK_BEGIN_STATIC_FN(hromap_test_resize)
 {
-    size_t const prime_start = 11;
     ccc_handle_realtime_ordered_map hrm
-        = hrm_init(malloc(sizeof(struct val) * prime_start), struct val, id,
-                   id_cmp, std_alloc, NULL, prime_start);
-    CHECK(hrm_data(&hrm) != NULL, true);
-
+        = hrm_init(NULL, struct val, id, id_cmp, std_alloc, NULL, 0);
     int const to_insert = 1000;
     int const larger_prime = 1009;
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
@@ -452,11 +448,8 @@ CHECK_BEGIN_STATIC_FN(hromap_test_reserve)
 
 CHECK_BEGIN_STATIC_FN(hromap_test_resize_macros)
 {
-    size_t const prime_start = 11;
     ccc_handle_realtime_ordered_map hrm
-        = hrm_init(malloc(sizeof(struct val) * prime_start), struct val, id,
-                   id_cmp, std_alloc, NULL, prime_start);
-    CHECK(hrm_data(&hrm) != NULL, true);
+        = hrm_init(NULL, struct val, id, id_cmp, std_alloc, NULL, 0);
     int const to_insert = 1000;
     int const larger_prime = 1009;
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;

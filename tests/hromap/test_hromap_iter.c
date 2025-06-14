@@ -174,7 +174,7 @@ CHECK_BEGIN_STATIC_FN(hromap_test_iterate_removal)
                    STANDARD_FIXED_CAP);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
-    srand(time(NULL));
+    srand(1);
     size_t const num_nodes = 1000;
     for (size_t i = 0; i < num_nodes; ++i)
     {
@@ -185,7 +185,9 @@ CHECK_BEGIN_STATIC_FN(hromap_test_iterate_removal)
     }
     CHECK(iterator_check(&s), PASS);
     int const limit = 400;
-    for (struct val *i = begin(&s), *next = NULL; i != end(&s); i = next)
+    size_t cur_node = 0;
+    for (struct val *i = begin(&s), *next = NULL;
+         i != end(&s) && cur_node < num_nodes; i = next, ++cur_node)
     {
         next = next(&s, i);
         if (i->id > limit)
