@@ -676,6 +676,12 @@ ccc_hrm_copy(ccc_handle_realtime_ordered_map *const dst,
     {
         return CCC_RESULT_ARG_ERROR;
     }
+    dst->nodes
+        = (struct ccc_hromap_elem *)((char *)dst->data
+                                     + (dst->capacity * dst->sizeof_type));
+    dst->parity
+        = (hrm_block *)((char *)dst->nodes
+                        + (dst->capacity * sizeof(struct ccc_hromap_elem)));
     (void)memcpy(dst->data, src->data, total_bytes(src, src->capacity));
     return CCC_RESULT_OK;
 }
