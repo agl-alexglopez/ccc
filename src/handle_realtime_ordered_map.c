@@ -52,6 +52,8 @@ and flexible in how it can be implemented. */
 #include "impl/impl_types.h"
 #include "types.h"
 
+/*==========================  Type Declarations   ===========================*/
+
 /** @private */
 enum hrm_branch
 {
@@ -161,7 +163,7 @@ static ccc_tribool is_leaf(struct ccc_hromap const *t, size_t x);
 static ccc_tribool parity(struct ccc_hromap const *t, size_t node);
 static void set_parity(struct ccc_hromap const *t, size_t node,
                        ccc_tribool status);
-static size_t total_bytes(struct ccc_hromap const *t, size_t nodes);
+static size_t total_bytes(size_t sizeof_type, size_t nodes);
 static size_t block_count(size_t node_count);
 static ccc_tribool validate(struct ccc_hromap const *hrm);
 /* Returning void and maintaining the WAVL tree. */
@@ -181,6 +183,42 @@ static void double_rotate(struct ccc_hromap *t, size_t z, size_t x, size_t y,
 /* Returning void as miscellaneous helpers. */
 static void swap(char tmp[const], void *a, void *b, size_t sizeof_type);
 static size_t max(size_t, size_t);
+
+/*==========================   Data Layout Test   ===========================*/
+
+enum : size_t
+{
+    TEST_LAYOUT_CAP = 3,
+};
+struct type_with_padding_data
+{
+    size_t s;
+    uint8_t u;
+};
+ccc_hrm_declare_fixed_map(fixed_map_test_type, struct type_with_padding_data,
+                          TEST_LAYOUT_CAP);
+static fixed_map_test_type data_nodes_and_parity_layout_test;
+static_assert(
+    (char *)&data_nodes_and_parity_layout_test
+                .parity[ccc_impl_hrm_blocks(hrm_block, TEST_LAYOUT_CAP)]
+            - (char *)&data_nodes_and_parity_layout_test.data[0]
+        == ((sizeof(*data_nodes_and_parity_layout_test.data) * TEST_LAYOUT_CAP)
+            + (sizeof(*data_nodes_and_parity_layout_test.nodes)
+               * TEST_LAYOUT_CAP)
+            + (sizeof(hrm_block)
+               * ccc_impl_hrm_blocks(hrm_block, TEST_LAYOUT_CAP))),
+    "The pointer difference in bytes between end of parity bit array and start "
+    "of user data array must be the same as the total bytes we assume to be "
+    "stored in that range.");
+static_assert((char *)&data_nodes_and_parity_layout_test.data[TEST_LAYOUT_CAP]
+                  == (char *)&data_nodes_and_parity_layout_test.nodes,
+              "The start of the nodes array must begin at the next byte past "
+              "the final user data element.");
+static_assert(
+    (char *)&data_nodes_and_parity_layout_test.nodes[TEST_LAYOUT_CAP]
+        == (char *)&data_nodes_and_parity_layout_test.parity,
+    "The start of the parity bit array must begin at the next byte past "
+    "the final internal node element.");
 
 /*==============================  Interface    ==============================*/
 
@@ -908,7 +946,8 @@ resize(struct ccc_hromap *const hrm, size_t const new_capacity,
     {
         return CCC_RESULT_NO_ALLOC;
     }
-    void *const new_data = fn(NULL, total_bytes(hrm, new_capacity), hrm->aux);
+    void *const new_data
+        = fn(NULL, total_bytes(hrm->sizeof_type, new_capacity), hrm->aux);
     if (!new_data)
     {
         return CCC_RESULT_MEM_ERROR;
@@ -1209,9 +1248,9 @@ block_count(size_t const node_count)
 }
 
 static inline size_t
-total_bytes(struct ccc_hromap const *const t, size_t const nodes)
+total_bytes(size_t sizeof_type, size_t const nodes)
 {
-    return (nodes * t->sizeof_type) + (nodes * sizeof(struct ccc_hromap_elem))
+    return (nodes * sizeof_type) + (nodes * sizeof(struct ccc_hromap_elem))
          + (block_count(nodes) * sizeof(hrm_block));
 }
 
