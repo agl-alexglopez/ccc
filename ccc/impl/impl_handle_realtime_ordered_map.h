@@ -85,7 +85,7 @@ struct ccc_hromap
 {
     /** @private The contiguous array of user data. */
     void *data;
-    /** @private The contiguous array of WAVL tree metadata. */
+    /** @private The contiguous array of WAVL tree meta data. */
     struct ccc_hromap_elem *nodes;
     /** @private The parity bit array corresponding to each node. */
     unsigned *parity;
@@ -147,6 +147,9 @@ size_t ccc_impl_hrm_alloc_slot(struct ccc_hromap *hrm);
 
 /*=========================      Initialization     =========================*/
 
+/** @private Calculates the number of parity blocks needed to support the given
+capacity. Provide the type used for the parity block array and the number of
+blocks needed to round up to will be returned. */
 #define ccc_impl_hrm_blocks(impl_block_type, impl_cap)                         \
     (((impl_cap) + ((sizeof(impl_block_type) * CHAR_BIT) - 1))                 \
      / (sizeof(impl_block_type) * CHAR_BIT))
@@ -171,7 +174,11 @@ is of a known fixed size defined at compile time, not just a pointer. */
 #define ccc_impl_hrm_fixed_capacity(fixed_map_type_name)                       \
     (sizeof((fixed_map_type_name){}.nodes) / sizeof(struct ccc_hromap_elem))
 
-/** @private */
+/** @private Initialization only tracks pointers to support a variety of memory
+sources for both fixed and dynamic maps. The nodes and parity pointers will be
+lazily initialized upon the first runtime opportunity. This allows the initial
+memory provided to the data pointer to come from any source at compile or
+runtime. */
 #define ccc_impl_hrm_init(impl_memory_ptr, impl_type_name,                     \
                           impl_key_elem_field, impl_key_cmp_fn, impl_alloc_fn, \
                           impl_aux_data, impl_capacity)                        \
