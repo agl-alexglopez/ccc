@@ -65,12 +65,22 @@ all the bits are packed into their own bit array at the end of the allocation.
 The bit at a given index represents the parity of data and its node at that same
 index. This allows the implementation to follow the theorist's ideal.
 
+Here is the layout in one contiguous array.
+
+(D = Data Array, N = Nodes Array, P = Parity Bit Array, _N = Capacity - 1)
+
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┐
+│D_0│D_1│...│D_N│N_0│N_1│...│N_N│P_0│P_1│...│P_N│
+└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┘
+
 This layout comes at the cost of consulting multiple arrays for many operations.
 However, once user data has been inserted or removed the tree fix up operations
 only need to consult the nodes array and the bit array which means more bits
 and nodes can be loaded on a cache line. We no longer need to consider
 arbitrarily sized or organized user data while we do operations on nodes and
-bits. */
+bits. Performance metrics still must be measured to say whether this is faster
+or slower than other approaches. However, the goal with this design is space
+efficiency first, speed second. */
 struct ccc_hromap
 {
     /** @private The contiguous array of user data. */
