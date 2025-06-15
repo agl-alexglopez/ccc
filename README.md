@@ -460,10 +460,10 @@ An ordered map with strict runtime bounds implemented in an array with indices t
 
 struct kval
 {
-    fromap_elem elem;
     int key;
     int val;
 };
+ccc_hrm_declare_fixed_map(small_fixed_map, struct val, 64);
 
 static ccc_threeway_cmp
 kval_cmp(ccc_any_key_cmp const cmp)
@@ -476,11 +476,17 @@ kval_cmp(ccc_any_key_cmp const cmp)
 int
 main(void)
 {
-    /* stack array of 25 elements with one slot for sentinel, intrusive field
-       named elem, key field named key, no allocation permission, key comparison
-       function, no aux data. */
-    handle_realtime_ordered_map s
-        = hrm_init((struct kval[26]){}, elem, key, kval_cmp, NULL, NULL, 26);
+    /* stack array, user defined type, key field named key, no allocation
+       permission, key comparison function, no aux data. */
+    handle_realtime_ordered_map s = hrm_init(
+        &(small_fixed_map){},
+        struct val,
+        key,
+        hrmap_key_cmp,
+        NULL,
+        NULL,
+        hrm_fixed_capacity(small_fixed_map)
+    );
     int const num_nodes = 25;
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
     for (int i = 0, id = 0; i < num_nodes; ++i, id += 5)
