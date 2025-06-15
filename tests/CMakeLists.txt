@@ -285,6 +285,7 @@ add_hromap_test(test_hromap_insert)
 add_hromap_test(test_hromap_erase)
 add_hromap_test(test_hromap_iter)
 add_hromap_test(test_hromap_handle)
+add_hromap_test(test_hromap_lru)
 
 #############  Flat Hash Map ##########################
 
