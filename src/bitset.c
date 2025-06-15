@@ -28,6 +28,8 @@ based operations over the set. */
 
 /*=========================   Types/Prototypes   ============================*/
 
+typedef typeof(*(struct ccc_bitset){}.blocks) ccc_bitblock;
+
 /** @private Used frequently so call the builtin just once. */
 enum : size_t
 {

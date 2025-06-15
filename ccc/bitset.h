@@ -52,6 +52,7 @@ All types and functions can then be written without the `ccc_` prefix. */
 #define CCC_BITSET
 
 /** @cond */
+#include <limits.h>
 #include <stddef.h>
 #include <stdint.h>
 /** @endcond */
@@ -72,31 +73,36 @@ set the key is the index in the bit set and the value is 1 or 0. Operations on
 single bits occur in O(1) time. All scanning operations operate in O(N) time. */
 typedef struct ccc_bitset ccc_bitset;
 
-/** @brief The type used to efficiently store bits in the bit set.
-
-A block is an integer that allows for efficient block sized bit operations for
-various scanning and setting. The user must participate in the storage of the
-bit set by using the provided ccc_bs_blocks macro to determine how many blocks
-are needed for the desired bits in the bit set. */
-typedef ccc_bitblock ccc_bitblock;
-
 /**@}*/
 
 /** @name Container Initialization
 Initialize and create containers with memory and permissions. */
 /**@{*/
 
+enum : typeof(CCC_IMPL_BS_BLOCK_BITS)
+{
+    /** @brief The number of bits in a block of the bit set. */
+    CCC_BS_BLOCK_BITS = CCC_IMPL_BS_BLOCK_BITS,
+};
+
 /** @brief Get the number of bit blocks needed for the desired bit set capacity.
 @param [in] bit_cap the number of bits representing this bit set.
 @return the number of blocks needed for the desired bit set.
-@warning bit_cap must be >= 1.
-@note this macro is not needed if capacity is 0 to start.
+@warning bit_cap must be >= 1. */
+#define ccc_bs_block_count(bit_cap) ccc_impl_bs_block_count(bit_cap)
+
+/** @brief Allocate the necessary number of blocks at compile or runtime on the
+stack or data segment.
+@param [in] bit_cap the desired number of bits to store in the bit set.
+@param [in] optional_storage_duration an optional storage duration specifier
+such as static or automatic.
+@return a compound literal array of the necessary bit block type allocated in
+the scope it is created with any storage duration specifiers added.
 
 This method can be used for compile time initialization of bit set. For example:
 
 ```
-static ccc_bitset b
-    = ccc_bs_init((static ccc_bitblock[ccc_bs_blocks(256)]){}, NULL, NULL, 256);
+static ccc_bitset b = ccc_bs_init(ccc_bs_blocks(256, static), NULL, NULL, 256);
 ```
 
 The above example also illustrates the benefits of a static compound literal
@@ -105,14 +111,14 @@ If the compiler does not support storage duration of compound literals the more
 traditional example follows:
 
 ```
-static ccc_bitblock blocks[ccc_bs_blocks(256)];
-static ccc_bitset b = ccc_bs_init(blocks, NULL, NULL, 256);
+static ccc_bitset b = ccc_bs_init(ccc_bs_blocks(256), NULL, NULL, 256);
 ```
 
 This macro is required for any initialization where the bit block memory comes
 from the stack or data segment. For one time dynamic reservations of bit block
 memory see the ccc_bs_reserve and ccc_bs_clear_and_free_reserve interface. */
-#define ccc_bs_blocks(bit_cap) ccc_impl_bs_blocks(bit_cap)
+#define ccc_bs_blocks(bit_cap, optional_storage_duration...)                   \
+    ccc_impl_bs_blocks(bit_cap, optional_storage_duration)
 
 /** @brief Initialize the bit set with memory and allocation permissions.
 @param [in] bitblock_ptr the pointer to existing blocks or NULL.
@@ -135,13 +141,13 @@ A fixed size bit set with size equal to capacity.
 
 ```
 #define BITSET_USING_NAMESPACE_CCC
-bitset bs = bs_init((bitblock[bs_blocks(9)]){}, NULL, NULL, 9);
+bitset bs = bs_init(bs_blocks(9), NULL, NULL, 9);
 ```
 A fixed size bit set with dynamic push and pop.
 
 ```
 #define BITSET_USING_NAMESPACE_CCC
-bitset bs = bs_init((bitblock[bs_blocks(9)]){}, NULL, NULL, 9, 0);
+bitset bs = bs_init(bs_blocks(9), NULL, NULL, 9, 0);
 ```
 
 A dynamic bit set initialization.
@@ -679,7 +685,7 @@ or NULL if bs is NULL or has no capacity.
 
 Every block populates bits from Least Significant Bit (LSB) to Most Significant
 Bit (MSB) so this reference is to the base or LSB of the entire set. */
-ccc_bitblock *ccc_bs_data(ccc_bitset const *bs);
+typeof((ccc_bitset){}.blocks) ccc_bs_data(ccc_bitset const *bs);
 
 /** @brief Return total number of bits the capacity of the set can hold.
 @param [in] bs a pointer to the bit set.
@@ -804,7 +810,8 @@ ccc_tribool ccc_bs_pop_back(ccc_bitset *bs);
 container. Check for namespace clashes before name shortening. */
 #ifdef BITSET_USING_NAMESPACE_CCC
 typedef ccc_bitset bitset;
-typedef ccc_bitblock bitblock;
+#    define BS_BLOCK_BITS CCC_BS_BLOCK_BITS
+#    define bs_block_count(args...) ccc_bs_block_count(args)
 #    define bs_blocks(args...) ccc_bs_blocks(args)
 #    define bs_init(args...) ccc_bs_init(args)
 #    define bs_copy(args...) ccc_bs_copy(args)

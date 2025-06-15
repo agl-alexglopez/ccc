@@ -23,9 +23,6 @@ limitations under the License.
 
 #include "../types.h"
 
-/** @private */
-typedef unsigned ccc_bitblock;
-
 /** @private A bitset is a contiguous array of fixed size integers. These aid
 in cache friendly storage and operations.
 
@@ -35,7 +32,7 @@ back dynamically. */
 struct ccc_bitset
 {
     /** The array of bit blocks, a platform defined standard bit width. */
-    ccc_bitblock *blocks;
+    unsigned *blocks;
     /** The number of active bits in the set available for reads and writes. */
     size_t count;
     /** The number of bits capable of being tracked in the bit block array. */
@@ -46,11 +43,21 @@ struct ccc_bitset
     void *aux;
 };
 
+enum : size_t
+{
+    CCC_IMPL_BS_BLOCK_BITS
+        = (sizeof(typeof(*(struct ccc_bitset){}.blocks)) * CHAR_BIT),
+};
+
 /** @private Returns the number of blocks needed to support a given capacity
 of bits. Assumes the given capacity is greater than 0. Classic div round up. */
-#define ccc_impl_bs_blocks(impl_bit_cap)                                       \
-    (((impl_bit_cap) + ((sizeof(ccc_bitblock) * CHAR_BIT) - 1))                \
-     / (sizeof(ccc_bitblock) * CHAR_BIT))
+#define ccc_impl_bs_block_count(impl_bit_cap)                                  \
+    (((impl_bit_cap) + (CCC_IMPL_BS_BLOCK_BITS - 1)) / CCC_IMPL_BS_BLOCK_BITS)
+
+#define ccc_impl_bs_blocks(impl_bit_cap, ...)                                  \
+    (__VA_OPT__(__VA_ARGS__) typeof (                                          \
+        *(struct ccc_bitset){}.blocks)[ccc_impl_bs_block_count(impl_bit_cap)]) \
+    {}
 
 /** @private */
 #define IMPL_BS_NON_IMPL_BS_DEFAULT_SIZE(impl_cap, ...) __VA_ARGS__
