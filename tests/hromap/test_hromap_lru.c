@@ -91,20 +91,20 @@ lru_head(struct lru_cache *const lru)
 /* This is a good opportunity to test the static initialization capabilities
    of the hash table and list. */
 static struct lru_cache lru_cache = {
-    .cap = 3,
+    .map = hrm_init(&(small_fixed_map){}, struct lru_elem, key, cmp_by_key,
+                    NULL, NULL, SMALL_FIXED_CAP),
     .l = dll_init(lru_cache.l, struct lru_elem, list_elem, cmp_list_elems, NULL,
                   NULL),
-    .map = hrm_init(&(small_fixed_map){}, struct lru_elem, key, cmp_by_key,
-                    std_alloc, NULL, SMALL_FIXED_CAP),
+    .cap = 3,
 };
 
 CHECK_BEGIN_STATIC_FN(lru_put, struct lru_cache *const lru, int const key,
                       int const val)
 {
-    ccc_hromap_handle const ent = handle(&lru->map, &key);
-    if (occupied(&ent))
+    ccc_hromap_handle const *const ent = handle_r(&lru->map, &key);
+    if (occupied(ent))
     {
-        struct lru_elem *const found = hrm_at(&lru->map, unwrap(&ent));
+        struct lru_elem *const found = hrm_at(&lru->map, unwrap(ent));
         found->key = key;
         found->val = val;
         ccc_result r = dll_splice(&lru->l, dll_begin_elem(&lru->l), &lru->l,
@@ -115,7 +115,7 @@ CHECK_BEGIN_STATIC_FN(lru_put, struct lru_cache *const lru, int const key,
     {
         struct lru_elem *new = hrm_at(
             &lru->map,
-            insert_handle(&ent, &(struct lru_elem){.key = key, .val = val}));
+            insert_handle(ent, &(struct lru_elem){.key = key, .val = val}));
         CHECK(new == NULL, false);
         new = dll_push_front(&lru->l, &new->list_elem);
         CHECK(new == NULL, false);
