@@ -73,14 +73,12 @@ asserts must be true in order to support the Struct of Array style layout we
 use for the data, nodes, and parity arrays. */
 static fixed_map_test_type data_nodes_parity_layout_test;
 static_assert(
-    (char *)&data_nodes_parity_layout_test.parity[ccc_impl_hrm_blocks(
-        typeof(*data_nodes_parity_layout_test.parity), TCAP)]
+    (char *)&data_nodes_parity_layout_test.parity[ccc_impl_hrm_blocks(TCAP)]
             - (char *)&data_nodes_parity_layout_test.data[0]
         == ((sizeof(*data_nodes_parity_layout_test.data) * TCAP)
             + (sizeof(*data_nodes_parity_layout_test.nodes) * TCAP)
             + (sizeof(typeof(*data_nodes_parity_layout_test.parity))
-               * (ccc_impl_hrm_blocks(
-                   typeof(*data_nodes_parity_layout_test.parity), TCAP)))),
+               * (ccc_impl_hrm_blocks(TCAP)))),
     "The pointer difference in bytes between end of parity bit array and start "
     "of user data array must be the same as the total bytes we assume to be "
     "stored in that range.");
