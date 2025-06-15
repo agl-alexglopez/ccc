@@ -67,6 +67,7 @@ static ccc_threeway_cmp cmp_list_elems(ccc_any_type_cmp ccmp);
 static struct lru_elem *lru_head(struct lru_cache *lru);
 static enum check_result lru_put(struct lru_cache *lru, int key, int val);
 static enum check_result lru_get(struct lru_cache *lru, int key, int *val);
+static enum check_result run_lru_cache(void);
 
 /*===========================   Static Data  ================================*/
 
@@ -81,6 +82,12 @@ static struct lru_cache lru_cache = {
 };
 
 /*===========================     LRU Test   ================================*/
+
+int
+main(void)
+{
+    return CHECK_RUN(run_lru_cache());
+}
 
 /* Disable me if tests start failing! */
 static bool const quiet = true;
@@ -228,10 +235,4 @@ cmp_list_elems(ccc_any_type_cmp const cmp)
     struct lru_elem const *const kv_a = cmp.any_type_lhs;
     struct lru_elem const *const kv_b = cmp.any_type_rhs;
     return (kv_a->key > kv_b->key) - (kv_a->key < kv_b->key);
-}
-
-int
-main()
-{
-    return CHECK_RUN(run_lru_cache());
 }
