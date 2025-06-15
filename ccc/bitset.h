@@ -79,7 +79,7 @@ typedef struct ccc_bitset ccc_bitset;
 Initialize and create containers with memory and permissions. */
 /**@{*/
 
-enum : typeof(CCC_IMPL_BS_BLOCK_BITS)
+enum : size_t
 {
     /** @brief The number of bits in a block of the bit set. */
     CCC_BS_BLOCK_BITS = CCC_IMPL_BS_BLOCK_BITS,
@@ -90,6 +90,12 @@ enum : typeof(CCC_IMPL_BS_BLOCK_BITS)
 @return the number of blocks needed for the desired bit set.
 @warning bit_cap must be >= 1. */
 #define ccc_bs_block_count(bit_cap) ccc_impl_bs_block_count(bit_cap)
+
+/** @brief Get the number of bytes needed for the desired bit set capacity.
+@param [in] bit_cap the number of bits representing this bit set.
+@return the number of bytes needed to support the bit capacity. This is the
+number of bytes occupied by the number of bit blocks that must be allocated. */
+#define ccc_bs_block_bytes(bit_cap) ccc_impl_bs_block_bytes(bit_cap)
 
 /** @brief Allocate the necessary number of blocks at compile or runtime on the
 stack or data segment.
@@ -180,11 +186,9 @@ Manual memory management with no allocation function provided.
 
 ```
 #define BITSET_USING_NAMESPACE_CCC
-static bitset src
-    = bs_init((static bitblock[bs_blocks(11)]){}, NULL, NULL, 11);
+static bitset src = bs_init(bs_blocks(11, static), NULL, NULL, 11);
 set_rand_bits(&src);
-static bitset src
-    = bs_init((static bitblock[bs_blocks(13)]){}, NULL, NULL, 13);
+static bitset src = bs_init(bs_blocks(13, static), NULL, NULL, 13);
 ccc_result res = bs_copy(&dst, &src, NULL);
 ```
 
@@ -812,6 +816,7 @@ container. Check for namespace clashes before name shortening. */
 typedef ccc_bitset bitset;
 #    define BS_BLOCK_BITS CCC_BS_BLOCK_BITS
 #    define bs_block_count(args...) ccc_bs_block_count(args)
+#    define bs_block_bytes(args...) ccc_bs_block_bytes(args)
 #    define bs_blocks(args...) ccc_bs_blocks(args)
 #    define bs_init(args...) ccc_bs_init(args)
 #    define bs_copy(args...) ccc_bs_copy(args)
