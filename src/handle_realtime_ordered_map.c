@@ -56,8 +56,10 @@ and flexible in how it can be implemented. */
 
 enum : size_t
 {
+    /* @private Test capacity. */
     TCAP = 3,
 };
+/** @private Type used for a test exclusive to this translation unit. */
 struct type_with_padding_data
 {
     size_t s;
@@ -65,6 +67,10 @@ struct type_with_padding_data
 };
 ccc_hrm_declare_fixed_map(fixed_map_test_type, struct type_with_padding_data,
                           TCAP);
+/** @private This is a static fixed size map exclusive to this translation unit
+used to ensure assumptions about data layout are correct. The following static
+asserts must be true in order to support the Struct of Array style layout we
+use for the data, nodes, and parity arrays. */
 static fixed_map_test_type data_nodes_parity_layout_test;
 static_assert(
     (char *)&data_nodes_parity_layout_test.parity[ccc_impl_hrm_blocks(
@@ -111,11 +117,6 @@ enum hrm_branch
 {
     L = 0,
     R,
-};
-
-enum : uint8_t
-{
-    IN_FREE_LIST = (uint8_t)~0,
 };
 
 /** @private */
