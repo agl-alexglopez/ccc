@@ -52,7 +52,7 @@ and flexible in how it can be implemented. */
 #include "impl/impl_types.h"
 #include "types.h"
 
-/*==========================   Data Layout Test   ===========================*/
+/*========================   Data Alignment Test   ==========================*/
 
 enum : size_t
 {
