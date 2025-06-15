@@ -170,13 +170,13 @@ struct fixed_map_test_type
     {
         size_t s;
         uint8_t u;
-    } type_with_padding_data[2 + 1];
+    } data[2 + 1];
     ccc_fhm_tag tag[2];
 };
 /* The type must actually get an allocation on the given platform to validate
 some memory layout assumptions. This should be sufficient and the assumptions
 will hold if the user happens to allocate a fixed size map on the stack. */
-static struct fixed_map_test_type data_and_tag_layout_test;
+static struct fixed_map_test_type data_tag_layout_test;
 /* The size of the user data and tags should be what we expect. No hidden
 padding should violate our mental model of the bytes occupied by contiguous user
 data and metadata tags. We don't care about padding after the tag array which
@@ -187,9 +187,8 @@ Over index the tag array to get the end address for pointer differences. The
 0th element in an array at the start of a struct is guaranteed to start at the
 first byte of the struct with no padding BEFORE this first element. */
 static_assert(
-    (char *)&data_and_tag_layout_test.tag[2]
-            - (char *)&data_and_tag_layout_test.type_with_padding_data[0]
-        == ((sizeof(data_and_tag_layout_test.type_with_padding_data[0]) * 3)
+    (char *)&data_tag_layout_test.tag[2] - (char *)&data_tag_layout_test.data[0]
+        == ((sizeof(data_tag_layout_test.data[0]) * 3)
             + sizeof(ccc_fhm_tag) * 2),
     "The size in bytes of the contiguous user data to tag array must be what "
     "we would expect with no padding that will interfere with pointer "
@@ -202,10 +201,17 @@ array. The tags array 0th element is the shared base for both arrays.
 Data has decreasing indices and tags have ascending indices. Here we index too
 far for our type with padding to ensure the next assertion will hold when we
 index from the shared tags base address and subtract to find user data. */
-static_assert((char *)&data_and_tag_layout_test.type_with_padding_data[3]
-                  == (char *)&data_and_tag_layout_test.tag,
+static_assert((char *)&data_tag_layout_test.data[3]
+                  == (char *)&data_tag_layout_test.tag,
               "The start of the tag array must align perfectly with the next "
               "byte past the final user data element.");
+/* Same as the above test but this is how the location of the tag array would be
+found in normal runtime code. */
+static_assert((char *)&data_tag_layout_test.tag
+                  == (char *)&data_tag_layout_test.data
+                         + (sizeof(*data_tag_layout_test.data) * 3),
+              "Manual pointer arithmetic from the base of data array to find "
+              "tag array should result in correct location.");
 /* Here is an example of how we access user data slots. We take whatever the
 index is of the tag element and add one. Then we subtract the bytes needed to
 access this user data slot. We add one because our shared base index is at the
@@ -216,10 +222,9 @@ We also always have an extra allocation of the user type at the start of the
 data array for swapping purposes because variable length arrays are banned and
 allocation might not be permitted. */
 static_assert(
-    (char *)(data_and_tag_layout_test.tag
-             - ((2 + 1)
-                * sizeof(data_and_tag_layout_test.type_with_padding_data[0])))
-        == (char *)&data_and_tag_layout_test.type_with_padding_data[0],
+    (char *)(data_tag_layout_test.tag
+             - ((2 + 1) * sizeof(data_tag_layout_test.data[0])))
+        == (char *)&data_tag_layout_test.data[0],
     "With a perfectly aligned shared user data and tag array base address, "
     "pointer subtraction for user data must work as expected.");
 

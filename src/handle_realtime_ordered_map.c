@@ -188,7 +188,7 @@ static size_t max(size_t, size_t);
 
 enum : size_t
 {
-    TEST_LAYOUT_CAP = 3,
+    TCAP = 3,
 };
 struct type_with_padding_data
 {
@@ -196,29 +196,43 @@ struct type_with_padding_data
     uint8_t u;
 };
 ccc_hrm_declare_fixed_map(fixed_map_test_type, struct type_with_padding_data,
-                          TEST_LAYOUT_CAP);
-static fixed_map_test_type data_nodes_and_parity_layout_test;
+                          TCAP);
+static fixed_map_test_type data_nodes_parity_layout_test;
 static_assert(
-    (char *)&data_nodes_and_parity_layout_test
-                .parity[ccc_impl_hrm_blocks(hrm_block, TEST_LAYOUT_CAP)]
-            - (char *)&data_nodes_and_parity_layout_test.data[0]
-        == ((sizeof(*data_nodes_and_parity_layout_test.data) * TEST_LAYOUT_CAP)
-            + (sizeof(*data_nodes_and_parity_layout_test.nodes)
-               * TEST_LAYOUT_CAP)
-            + (sizeof(hrm_block)
-               * ccc_impl_hrm_blocks(hrm_block, TEST_LAYOUT_CAP))),
+    (char *)&data_nodes_parity_layout_test
+                .parity[ccc_impl_hrm_blocks(hrm_block, TCAP)]
+            - (char *)&data_nodes_parity_layout_test.data[0]
+        == ((sizeof(*data_nodes_parity_layout_test.data) * TCAP)
+            + (sizeof(*data_nodes_parity_layout_test.nodes) * TCAP)
+            + (sizeof(hrm_block) * ccc_impl_hrm_blocks(hrm_block, TCAP))),
     "The pointer difference in bytes between end of parity bit array and start "
     "of user data array must be the same as the total bytes we assume to be "
     "stored in that range.");
-static_assert((char *)&data_nodes_and_parity_layout_test.data[TEST_LAYOUT_CAP]
-                  == (char *)&data_nodes_and_parity_layout_test.nodes,
+static_assert((char *)&data_nodes_parity_layout_test.data[TCAP]
+                  == (char *)&data_nodes_parity_layout_test.nodes,
               "The start of the nodes array must begin at the next byte past "
               "the final user data element.");
+static_assert((char *)&data_nodes_parity_layout_test.nodes
+                  == ((char *)&data_nodes_parity_layout_test.data
+                      + (sizeof(*data_nodes_parity_layout_test.data) * TCAP)),
+              "Manual pointer arithmetic from the base of data array to find "
+              "nodes array should result in correct location.");
 static_assert(
-    (char *)&data_nodes_and_parity_layout_test.nodes[TEST_LAYOUT_CAP]
-        == (char *)&data_nodes_and_parity_layout_test.parity,
+    (char *)&data_nodes_parity_layout_test.nodes[TCAP]
+        == (char *)&data_nodes_parity_layout_test.parity,
     "The start of the parity bit array must begin at the next byte past "
     "the final internal node element.");
+static_assert((char *)&data_nodes_parity_layout_test.parity
+                  == ((char *)&data_nodes_parity_layout_test.data
+                      + (sizeof(*data_nodes_parity_layout_test.data) * TCAP)
+                      + (sizeof(*data_nodes_parity_layout_test.nodes) * TCAP)),
+              "Manual pointer arithmetic from the base of data array to find "
+              "parity array should result in correct location.");
+static_assert((char *)&data_nodes_parity_layout_test.parity
+                  == ((char *)&data_nodes_parity_layout_test.nodes
+                      + (sizeof(*data_nodes_parity_layout_test.nodes) * TCAP)),
+              "Manual pointer arithmetic from the base of nodes array to find "
+              "parity array should result in correct location.");
 
 /*==============================  Interface    ==============================*/
 
