@@ -8,15 +8,17 @@ The leetcode lru problem in C. */
 #define DOUBLY_LINKED_LIST_USING_NAMESPACE_CCC
 #define TRAITS_USING_NAMESPACE_CCC
 
-#include "alloc.h"
 #include "checkers.h"
 #include "doubly_linked_list.h"
 #include "handle_realtime_ordered_map.h"
-#include "hromap_util.h"
 #include "traits.h"
 #include "types.h"
 
-#define REQS 11
+enum : size_t
+{
+    LRU_CAP = 32,
+    REQS = 11,
+};
 
 struct lru_cache
 {
@@ -33,6 +35,8 @@ struct lru_elem
     int key;
     int val;
 };
+
+ccc_hrm_declare_fixed_map(lru_fixed_map, struct lru_elem, LRU_CAP);
 
 enum lru_call
 {
@@ -91,8 +95,8 @@ lru_head(struct lru_cache *const lru)
 /* This is a good opportunity to test the static initialization capabilities
    of the hash table and list. */
 static struct lru_cache lru_cache = {
-    .map = hrm_init(&(small_fixed_map){}, struct lru_elem, key, cmp_by_key,
-                    NULL, NULL, SMALL_FIXED_CAP),
+    .map = hrm_init(&(lru_fixed_map){}, struct lru_elem, key, cmp_by_key, NULL,
+                    NULL, LRU_CAP),
     .l = dll_init(lru_cache.l, struct lru_elem, list_elem, cmp_list_elems, NULL,
                   NULL),
     .cap = 3,
