@@ -926,7 +926,6 @@ alloc_slot(struct ccc_hromap *const t)
         }
         else
         {
-            /* Might not be needed but not worth checking. Do every time. */
             t->nodes = node_pos(t->sizeof_type, t->data, t->capacity);
             t->parity = parity_pos(t->sizeof_type, t->data, t->capacity);
         }
