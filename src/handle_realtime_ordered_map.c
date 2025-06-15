@@ -1157,6 +1157,10 @@ static inline void
 copy_soa(struct ccc_hromap const *const src, void *const dst_data_base,
          size_t const dst_capacity)
 {
+    if (!src->data)
+    {
+        return;
+    }
     assert(dst_capacity >= src->capacity);
     size_t const sizeof_type = src->sizeof_type;
     /* Each section of the allocation "grows" when we re-size so one copy would
