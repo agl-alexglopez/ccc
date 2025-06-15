@@ -27,13 +27,19 @@ resizing of the table, insertions of other elements, or removals of other
 elements occur. Active user elements may not be contiguous from index [0, N)
 where N is the size of map; there may be gaps between active elements in the
 buffer and it is only guaranteed that N elements are stored between index [0,
-Capacity). Also, all elements in the map track their relationships via indices
-in the buffer. Therefore, this data structure can be relocated, copied,
-serialized, or written to disk and all internal data structure references will
-remain valid. Insertion may invoke an O(N) operation if resizing occurs.
-Finally, if allocation is prohibited upon initialization and the user intends to
-store a fixed size N nodes in the map N + 1 capacity is needed for the sentinel
-node in the buffer.
+Capacity).
+
+All elements in the map track their relationships via indices in the buffer.
+Therefore, this data structure can be relocated, copied, serialized, or written
+to disk and all internal data structure references will remain valid. Insertion
+may invoke an O(N) operation if resizing occurs. Finally, if allocation is
+prohibited upon initialization and the user intends to store a fixed size N
+nodes in the map N + 1 capacity is needed for the sentinel node in the buffer.
+
+All interface functions accept `void *` references to either the key or the full
+type the user is storing in the map. Therefore, it is important for the user to
+be aware if they are passing a reference to the key or the full type depending
+on the function requirements.
 
 To shorten names in the interface, define the following preprocessor directive
 at the top of your file.
@@ -196,11 +202,26 @@ struct val
     int key;
     int val;
 };
-static handle_ordered_map src
-    = hrm_init((static struct val[11]){}, e, key, key_cmp, NULL, NULL, 11);
+ccc_hrm_declare_fixed_map(small_fixed_map, struct val, 64);
+static handle_realtime_ordered_map src = hrm_init(
+    &(static small_fixed_map){},
+    struct val,
+    key,
+    hrmap_key_cmp,
+    NULL,
+    NULL,
+    hrm_fixed_capacity(small_fixed_map)
+);
 insert_rand_vals(&src);
-static handle_ordered_map dst
-    = hrm_init((static struct val[13]){}, e, key, key_cmp, NULL, NULL, 13);
+static handle_realtime_ordered_map dst = hrm_init(
+    &(static small_fixed_map){},
+    struct val,
+    key,
+    hrmap_key_cmp,
+    NULL,
+    NULL,
+    hrm_fixed_capacity(small_fixed_map)
+);
 ccc_result res = hrm_copy(&dst, &src, NULL);
 ```
 
@@ -215,10 +236,10 @@ struct val
     int val;
 };
 static handle_ordered_map src
-    = hrm_init((struct val *)NULL, e, key, key_cmp, std_alloc, NULL, 0);
+    = hrm_init(NULL, struct val, key, key_cmp, std_alloc, NULL, 0);
 insert_rand_vals(&src);
 static handle_ordered_map dst
-    = hrm_init((struct val *)NULL, e, key, key_cmp, std_alloc, NULL, 0);
+    = hrm_init(NULL, struct val, key, key_cmp, std_alloc, NULL, 0);
 ccc_result res = hrm_copy(&dst, &src, std_alloc);
 ```
 
@@ -235,10 +256,10 @@ struct val
     int val;
 };
 static handle_ordered_map src
-    = hrm_init((struct val *)NULL, e, key, key_cmp, std_alloc, NULL, 0);
+    = hrm_init(NULL, struct val, key, key_cmp, std_alloc, NULL, 0);
 insert_rand_vals(&src);
 static handle_ordered_map dst
-    = hrm_init((struct val *)NULL, e, key, key_cmp, NULL, NULL, 0);
+    = hrm_init(NULL, struct val, key, key_cmp, NULL, NULL, 0);
 ccc_result res = hrm_copy(&dst, &src, std_alloc);
 ```
 
@@ -546,10 +567,7 @@ non-NULL if the closure executes.
 
 ```
 #define HANDLE_REALTIME_ORDERED_MAP_USING_NAMESPACE_CCC
-// Increment the key k if found otherwise do nothing.
 hrm_handle *e = hrm_and_modify_w(handle_r(&hrm, &k), word, T->cnt++;);
-
-// Increment the key k if found otherwise insert a default value.
 handle_i w = hrm_or_insert_w(hrm_and_modify_w(handle_r(&hrm, &k), word,
                                               { T->cnt++; }),
                              (word){.key = k, .cnt = 1});
@@ -747,10 +765,12 @@ the first element GREATER than end_key.
 Note that due to the variety of values that can be returned in the range, using
 the provided range iteration functions from types.h is recommended for example:
 
+```
 for (struct val *i = range_begin(&range);
      i != end_range(&range);
      i = next(&hrm, &i->elem))
 {}
+```
 
 This avoids any possible errors in handling an end range element that is in the
 map versus the end map sentinel. */
@@ -784,10 +804,12 @@ the first element LESS than rend_key.
 Note that due to the variety of values that can be returned in the rrange, using
 the provided rrange iteration functions from types.h is recommended for example:
 
+```
 for (struct val *i = rrange_begin(&rrange);
      i != rend_rrange(&rrange);
      i = rnext(&fom, &i->elem))
 {}
+```
 
 This avoids any possible errors in handling an rend rrange element that is in
 the map versus the end map sentinel. */
