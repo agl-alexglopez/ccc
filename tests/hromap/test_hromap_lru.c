@@ -36,8 +36,6 @@ struct lru_elem
     int val;
 };
 
-ccc_hrm_declare_fixed_map(lru_fixed_map, struct lru_elem, LRU_CAP);
-
 enum lru_call
 {
     PUT,
@@ -58,39 +56,19 @@ struct lru_request
     };
 };
 
-/* Disable me if tests start failing! */
-static bool const quiet = true;
-#define QUIET_PRINT(format_string...)                                          \
-    do                                                                         \
-    {                                                                          \
-        if (!quiet)                                                            \
-        {                                                                      \
-            printf(format_string);                                             \
-        }                                                                      \
-    }                                                                          \
-    while (0)
+/* Fixed map used for the lru storage. List piggy backs of this array for its
+   memory. Map does not need to re-size for this small test. */
+ccc_hrm_declare_fixed_map(lru_fixed_map, struct lru_elem, LRU_CAP);
 
-static ccc_threeway_cmp
-cmp_by_key(ccc_any_key_cmp const cmp)
-{
-    int const key_lhs = *(int *)cmp.any_key_lhs;
-    struct lru_elem const *const kv = cmp.any_type_rhs;
-    return (key_lhs > kv->key) - (key_lhs < kv->key);
-}
+/*===========================   Prototypes   ================================*/
 
-static ccc_threeway_cmp
-cmp_list_elems(ccc_any_type_cmp const cmp)
-{
-    struct lru_elem const *const kv_a = cmp.any_type_lhs;
-    struct lru_elem const *const kv_b = cmp.any_type_rhs;
-    return (kv_a->key > kv_b->key) - (kv_a->key < kv_b->key);
-}
+static ccc_threeway_cmp cmp_by_key(ccc_any_key_cmp cmp);
+static ccc_threeway_cmp cmp_list_elems(ccc_any_type_cmp ccmp);
+static struct lru_elem *lru_head(struct lru_cache *lru);
+static enum check_result lru_put(struct lru_cache *lru, int key, int val);
+static enum check_result lru_get(struct lru_cache *lru, int key, int *val);
 
-static struct lru_elem *
-lru_head(struct lru_cache *const lru)
-{
-    return dll_front(&lru->l);
-}
+/*===========================   Static Data  ================================*/
 
 /* This is a good opportunity to test the static initialization capabilities
    of the hash table and list. */
@@ -102,59 +80,19 @@ static struct lru_cache lru_cache = {
     .cap = 3,
 };
 
-CHECK_BEGIN_STATIC_FN(lru_put, struct lru_cache *const lru, int const key,
-                      int const val)
-{
-    ccc_hromap_handle const *const ent = handle_r(&lru->map, &key);
-    if (occupied(ent))
-    {
-        struct lru_elem *const found = hrm_at(&lru->map, unwrap(ent));
-        found->key = key;
-        found->val = val;
-        ccc_result r = dll_splice(&lru->l, dll_begin_elem(&lru->l), &lru->l,
-                                  &found->list_elem);
-        CHECK(r, CCC_RESULT_OK);
-    }
-    else
-    {
-        struct lru_elem *new = hrm_at(
-            &lru->map,
-            insert_handle(ent, &(struct lru_elem){.key = key, .val = val}));
-        CHECK(new == NULL, false);
-        new = dll_push_front(&lru->l, &new->list_elem);
-        CHECK(new == NULL, false);
-        if (size(&lru->l).count > lru->cap)
-        {
-            struct lru_elem const *const to_drop = back(&lru->l);
-            CHECK(to_drop == NULL, false);
-            (void)pop_back(&lru->l);
-            ccc_handle const e
-                = remove_handle(handle_r(&lru->map, &to_drop->key));
-            CHECK(occupied(&e), true);
-        }
-    }
-    CHECK_END_FN();
-}
+/*===========================     LRU Test   ================================*/
 
-CHECK_BEGIN_STATIC_FN(lru_get, struct lru_cache *const lru, int const key,
-                      int *val)
-{
-    CHECK_ERROR(val != NULL, true);
-    struct lru_elem *const found
-        = hrm_at(&lru->map, get_key_val(&lru->map, &key));
-    if (!found)
-    {
-        *val = -1;
-    }
-    else
-    {
-        ccc_result r = dll_splice(&lru->l, dll_begin_elem(&lru->l), &lru->l,
-                                  &found->list_elem);
-        CHECK(r, CCC_RESULT_OK);
-        *val = found->val;
-    }
-    CHECK_END_FN();
-}
+/* Disable me if tests start failing! */
+static bool const quiet = true;
+#define QUIET_PRINT(format_string...)                                          \
+    do                                                                         \
+    {                                                                          \
+        if (!quiet)                                                            \
+        {                                                                      \
+            printf(format_string);                                             \
+        }                                                                      \
+    }                                                                          \
+    while (0)
 
 CHECK_BEGIN_STATIC_FN(run_lru_cache)
 {
@@ -214,6 +152,82 @@ CHECK_BEGIN_STATIC_FN(run_lru_cache)
         }
     }
     CHECK_END_FN({ (void)ccc_hrm_clear(&lru_cache.map, NULL); });
+}
+
+CHECK_BEGIN_STATIC_FN(lru_put, struct lru_cache *const lru, int const key,
+                      int const val)
+{
+    ccc_hromap_handle const *const ent = handle_r(&lru->map, &key);
+    if (occupied(ent))
+    {
+        struct lru_elem *const found = hrm_at(&lru->map, unwrap(ent));
+        found->key = key;
+        found->val = val;
+        ccc_result r = dll_splice(&lru->l, dll_begin_elem(&lru->l), &lru->l,
+                                  &found->list_elem);
+        CHECK(r, CCC_RESULT_OK);
+    }
+    else
+    {
+        struct lru_elem *new = hrm_at(
+            &lru->map,
+            insert_handle(ent, &(struct lru_elem){.key = key, .val = val}));
+        CHECK(new == NULL, false);
+        new = dll_push_front(&lru->l, &new->list_elem);
+        CHECK(new == NULL, false);
+        if (size(&lru->l).count > lru->cap)
+        {
+            struct lru_elem const *const to_drop = back(&lru->l);
+            CHECK(to_drop == NULL, false);
+            (void)pop_back(&lru->l);
+            ccc_handle const e
+                = remove_handle(handle_r(&lru->map, &to_drop->key));
+            CHECK(occupied(&e), true);
+        }
+    }
+    CHECK_END_FN();
+}
+
+CHECK_BEGIN_STATIC_FN(lru_get, struct lru_cache *const lru, int const key,
+                      int *val)
+{
+    CHECK_ERROR(val != NULL, true);
+    struct lru_elem *const found
+        = hrm_at(&lru->map, get_key_val(&lru->map, &key));
+    if (!found)
+    {
+        *val = -1;
+    }
+    else
+    {
+        ccc_result r = dll_splice(&lru->l, dll_begin_elem(&lru->l), &lru->l,
+                                  &found->list_elem);
+        CHECK(r, CCC_RESULT_OK);
+        *val = found->val;
+    }
+    CHECK_END_FN();
+}
+
+static struct lru_elem *
+lru_head(struct lru_cache *const lru)
+{
+    return dll_front(&lru->l);
+}
+
+static ccc_threeway_cmp
+cmp_by_key(ccc_any_key_cmp const cmp)
+{
+    int const key_lhs = *(int *)cmp.any_key_lhs;
+    struct lru_elem const *const kv = cmp.any_type_rhs;
+    return (key_lhs > kv->key) - (key_lhs < kv->key);
+}
+
+static ccc_threeway_cmp
+cmp_list_elems(ccc_any_type_cmp const cmp)
+{
+    struct lru_elem const *const kv_a = cmp.any_type_lhs;
+    struct lru_elem const *const kv_b = cmp.any_type_rhs;
+    return (kv_a->key > kv_b->key) - (kv_a->key < kv_b->key);
 }
 
 int
