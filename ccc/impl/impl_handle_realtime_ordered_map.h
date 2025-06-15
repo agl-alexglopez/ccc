@@ -50,22 +50,27 @@ with the modification being that we may have the arrays as pointer offsets in
 a contiguous allocation if the user desires a dynamic map.
 
 The user data array comes first allowing the user to store any type they wish
-in the container contiguously with no padding, saving space.
+in the container contiguously with no intrusive element padding, saving space.
 
 The nodes array is next. These nodes track the indices of the child and parent
 nodes in the WAVL tree.
 
 Finally, comes the parity bit array. This comes last because it allows the
-optimal storage space to be used, a single bit. Instead of wasting a byte per
-element, that is likely given 7 bytes of padding to avoid alignment issues by
-the compiler, we use exactly one bit per element as the theorists intended.
+optimal storage space to be used, a single bit. Usually, a data structure
+theorist's "bit" of extra information per node comes out to a byte in practice
+due to portability and implementation concerns. If this byte were to be included
+in the current map elem, it would then be given 7 more bytes of padding by
+the compiler to ensure proper alignment, wasting large amounts of space. Instead
+all the bits are packed into their own bit array at the end of the allocation.
+The bit at a given index represents the parity of data and its node at that same
+index. This allows the implementation to follow the theorist's ideal.
 
-This layout comes at the cost of cache locality during traversals and
-comparisons, but the goal of this container variant is handle stability and
-optimal storage space, not raw speed. It is also possible that the compact
-layout can benefit the cache for tree allocations that are close in terms of
-both tree structure and allocation position in the arrays, but this should be
-measured not assumed. */
+This layout comes at the cost of consulting multiple arrays for many operations.
+However, once user data has been inserted or removed the tree fix up operations
+only need to consult the nodes array and the bit array which means more bits
+and nodes can be loaded on a cache line. We no longer need to consider
+arbitrarily sized or organized user data while we do operations on nodes and
+bits. */
 struct ccc_hromap
 {
     /** @private The contiguous array of user data. */
