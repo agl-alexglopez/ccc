@@ -216,7 +216,7 @@ static ccc_tribool is_leaf(struct ccc_hromap const *t, size_t x);
 static ccc_tribool parity(struct ccc_hromap const *t, size_t node);
 static void set_parity(struct ccc_hromap const *t, size_t node,
                        ccc_tribool status);
-static size_t total_bytes(size_t sizeof_type, size_t nodes);
+static size_t total_bytes(size_t sizeof_type, size_t capacity);
 static size_t block_count(size_t node_count);
 static ccc_tribool validate(struct ccc_hromap const *hrm);
 /* Returning void and maintaining the WAVL tree. */
@@ -1268,10 +1268,11 @@ block_count(size_t const node_count)
 }
 
 static inline size_t
-total_bytes(size_t sizeof_type, size_t const nodes)
+total_bytes(size_t sizeof_type, size_t const capacity)
 {
-    return (nodes * sizeof_type) + (nodes * sizeof(struct ccc_hromap_elem))
-         + (block_count(nodes) * sizeof(hrm_block));
+    return (capacity * sizeof_type)
+         + (capacity * sizeof(struct ccc_hromap_elem))
+         + (block_count(capacity) * sizeof(hrm_block));
 }
 
 static inline size_t *
