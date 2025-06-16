@@ -168,8 +168,7 @@ struct fixed_map_test_type
 {
     struct
     {
-        size_t s;
-        uint8_t u;
+        int i;
     } data[2 + 1];
     ccc_fhm_tag tag[2];
 };

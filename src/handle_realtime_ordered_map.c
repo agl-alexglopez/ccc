@@ -43,6 +43,7 @@ improvements over AVL and Red-Black trees. The rank framework is intuitive
 and flexible in how it can be implemented. */
 #include <assert.h>
 #include <limits.h>
+#include <stdalign.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
@@ -59,36 +60,48 @@ enum : size_t
     /* @private Test capacity. */
     TCAP = 3,
 };
-/** @private Type used for a test exclusive to this translation unit. */
-struct type_with_padding_data
+/** @private Use an int because that will force the nodes array to be wary of
+where to start. The nodes are 8 byte aligned but an int is 4. This means the
+nodes need to start after a 4 byte buffer of padding at end of data array. */
+struct test_data_type
 {
-    size_t s;
-    uint8_t u;
+    int i;
 };
-ccc_hrm_declare_fixed_map(fixed_map_test_type, struct type_with_padding_data,
-                          TCAP);
+ccc_hrm_declare_fixed_map(fixed_map_test_type, struct test_data_type, TCAP);
 /** @private This is a static fixed size map exclusive to this translation unit
 used to ensure assumptions about data layout are correct. The following static
 asserts must be true in order to support the Struct of Array style layout we
 use for the data, nodes, and parity arrays. */
 static fixed_map_test_type data_nodes_parity_layout_test;
+/** There is a more portable way to round up the bytes aligned to a certain type
+that we use in the runtime code but it is less readable so for this test we
+will just add the alignment difference to certain operations as needed. */
+static_assert(alignof(struct test_data_type)
+                  <= alignof(*data_nodes_parity_layout_test.nodes),
+              "The node type has alignment >= int wrapper.");
 static_assert(
     (char *)&data_nodes_parity_layout_test.parity[ccc_impl_hrm_blocks(TCAP)]
             - (char *)&data_nodes_parity_layout_test.data[0]
         == ((sizeof(*data_nodes_parity_layout_test.data) * TCAP)
+            + (alignof(*data_nodes_parity_layout_test.nodes)
+               - alignof(*data_nodes_parity_layout_test.data))
             + (sizeof(*data_nodes_parity_layout_test.nodes) * TCAP)
-            + (sizeof(typeof(*data_nodes_parity_layout_test.parity))
+            + (sizeof(*data_nodes_parity_layout_test.parity)
                * (ccc_impl_hrm_blocks(TCAP)))),
     "The pointer difference in bytes between end of parity bit array and start "
     "of user data array must be the same as the total bytes we assume to be "
-    "stored in that range.");
+    "stored in that range. Alignment of user data must be considered.");
 static_assert((char *)&data_nodes_parity_layout_test.data[TCAP]
+                      + (alignof(*data_nodes_parity_layout_test.nodes)
+                         - alignof(*data_nodes_parity_layout_test.data))
                   == (char *)&data_nodes_parity_layout_test.nodes,
-              "The start of the nodes array must begin at the next byte past "
-              "the final user data element.");
+              "The start of the nodes array must begin at the next aligned "
+              "byte given alignment of a node.");
 static_assert((char *)&data_nodes_parity_layout_test.nodes
                   == ((char *)&data_nodes_parity_layout_test.data
-                      + (sizeof(*data_nodes_parity_layout_test.data) * TCAP)),
+                      + (sizeof(*data_nodes_parity_layout_test.data) * TCAP)
+                      + (alignof(*data_nodes_parity_layout_test.nodes)
+                         - alignof(*data_nodes_parity_layout_test.data))),
               "Manual pointer arithmetic from the base of data array to find "
               "nodes array should result in correct location.");
 static_assert(
@@ -99,6 +112,8 @@ static_assert(
 static_assert((char *)&data_nodes_parity_layout_test.parity
                   == ((char *)&data_nodes_parity_layout_test.data
                       + (sizeof(*data_nodes_parity_layout_test.data) * TCAP)
+                      + (alignof(*data_nodes_parity_layout_test.nodes)
+                         - alignof(*data_nodes_parity_layout_test.data))
                       + (sizeof(*data_nodes_parity_layout_test.nodes) * TCAP)),
               "Manual pointer arithmetic from the base of data array to find "
               "parity array should result in correct location.");
@@ -1116,13 +1131,17 @@ cmp_elems(struct ccc_hromap const *const hrm, void const *const key,
 static inline size_t
 data_bytes(size_t const sizeof_type, size_t const capacity)
 {
-    return sizeof_type * capacity;
+    return ((sizeof_type * capacity)
+            + alignof(typeof(*(struct ccc_hromap){}.nodes)) - 1)
+         & ~(alignof(typeof(*(struct ccc_hromap){}.nodes)) - 1);
 }
 
 static inline size_t
 node_bytes(size_t const capacity)
 {
-    return sizeof(typeof(*(struct ccc_hromap){}.nodes)) * capacity;
+    return ((sizeof(typeof(*(struct ccc_hromap){}.nodes)) * capacity)
+            + alignof(typeof(*(struct ccc_hromap){}.parity)) - 1)
+         & ~(alignof(typeof(*(struct ccc_hromap){}.parity)) - 1);
 }
 
 static inline size_t
@@ -1269,9 +1288,8 @@ block_count(size_t const node_count)
 static inline size_t
 total_bytes(size_t sizeof_type, size_t const capacity)
 {
-    return (capacity * sizeof_type)
-         + (capacity * sizeof(struct ccc_hromap_elem))
-         + (block_count(capacity) * sizeof(hrm_block));
+    return data_bytes(sizeof_type, capacity) + node_bytes(capacity)
+         + parity_bytes(capacity);
 }
 
 static inline size_t *

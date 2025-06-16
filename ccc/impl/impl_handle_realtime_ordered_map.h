@@ -73,6 +73,39 @@ Here is the layout in one contiguous array.
 │D_0│D_1│...│D_N│N_0│N_1│...│N_N│P_0│P_1│...│P_N│
 └───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┘
 
+Consider how this layout saves space. Here is a more traditional approach.
+
+```
+struct ccc_romap_elem
+{
+    size_t branch[2];
+    union
+    {
+        size_t parent;
+        size_t next_free;
+    };
+    uint8_t parity;
+};
+```
+
+This struct wastes a byte for parity when only a bit is needed. It also has
+an alignment of 8 bytes meaning the trailing 7 bytes are completely useless. If
+this element were to intrude on a user element it would also force its 8 byte
+alignment on user data. This is more wasted space if the user wanted to simply
+use the map as a set for a smaller type such as an int.
+
+If the user wanted a simple set of 64 ints, this intrusive design would cost
+`64 * 40 = 2480` bytes, of which only `64 * (40 - 7 - 4) = 1856` bytes are in
+use leaving `2480 - 1856 = 624` bytes wasted.
+
+In contrast the current struct of arrays design lays out data such that we use
+`(64 * 4) + 4 + (64 * 24) + 64 + B = 1860 + B` bytes where B is the number of
+unused bits in the last block of the bit array (in this case 0). That means
+there are only `4 + B` bytes wasted, 4 bytes of padding between the end of the
+user type array and the start of the nodes array and the unused bits at the end
+of the bit array. This also means it important to consider the alignment
+differences that may occur between the user type and the node type.
+
 This layout comes at the cost of consulting multiple arrays for many operations.
 However, once user data has been inserted or removed the tree fix up operations
 only need to consult the nodes array and the bit array which means more bits
