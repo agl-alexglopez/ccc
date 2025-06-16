@@ -689,7 +689,7 @@ or NULL if bs is NULL or has no capacity.
 
 Every block populates bits from Least Significant Bit (LSB) to Most Significant
 Bit (MSB) so this reference is to the base or LSB of the entire set. */
-typeof((ccc_bitset){}.blocks) ccc_bs_data(ccc_bitset const *bs);
+void *ccc_bs_data(ccc_bitset const *bs);
 
 /** @brief Return total number of bits the capacity of the set can hold.
 @param [in] bs a pointer to the bit set.
