@@ -917,7 +917,8 @@ alloc_slot(struct ccc_hromap *const t)
         assert(!t->free_list);
         if (old_count == old_cap)
         {
-            if (resize(t, old_cap ? old_cap * 2 : 8, t->alloc) != CCC_RESULT_OK)
+            if (resize(t, max(old_cap * 2, HRM_BLOCK_BITS), t->alloc)
+                != CCC_RESULT_OK)
             {
                 return 0;
             }
