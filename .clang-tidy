@@ -18,6 +18,7 @@ Checks: >
    -*-magic-numbers,
    -concurrency-*,
    -Wvariadic-macros,
+   -Wgnu-alignof-expression,
    -clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,
    -bugprone-easily-swappable-parameters
 
