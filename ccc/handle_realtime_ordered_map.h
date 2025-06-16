@@ -347,42 +347,41 @@ Obtain and operate on container entries for efficient queries when non-trivial
 control flow is needed. */
 /**@{*/
 
-/** @brief Invariantly inserts the key value wrapping key_val_handle.
+/** @brief Invariantly inserts the key value in key_val_type_output.
 @param [in] hrm the pointer to the ordered map.
-@param [out] out_handle the handle to the user type wrapping map elem.
-@return a handle to the element in the table. If Vacant, no prior element with
-key existed and the type wrapping out_handle remains unchanged. If Occupied the
-old value is written to the type wrapping out_handle. If more space is needed
+@param [out] key_val_type_output the type user type map elem.
+@return a type element in the table. If Vacant, no prior element with
+key existed and the type key value type remains unchanged. If Occupied the
+old value is written to the type key value type. If more space is needed
 but allocation fails or has been forbidden, an insert error is set.
 
-Note that this function may write to the struct containing out_handle and wraps
-it in a handle to provide information about the old value. */
+Note that this function may write to the provided user type struct. */
 [[nodiscard]] ccc_handle
 ccc_hrm_swap_handle(ccc_handle_realtime_ordered_map *hrm,
                     void *key_val_type_output);
 
-/** @brief Invariantly inserts the key value wrapping key_val_handle.
+/** @brief Invariantly inserts the key value in key_val_type_output_ptr.
 @param [in] handle_realtime_ordered_map_ptr the pointer to the ordered map.
-@param [out] out_handle_ptr the handle to the user type wrapping map elem.
-@return a compound literal reference to a handle to the element in the table. If
-Vacant, no prior element with key existed and the type wrapping out_handle
+@param [out] key_val_type_output_ptr type user type map elem.
+@return a compound literal reference to a type element in the table. If
+Vacant, no prior element with key existed and the type key value type
 remains unchanged. If Occupied the old value is written to the type wrapping
-out_handle. If more space is needed but allocation fails or has been forbidden,
-an insert error is set.
+key value type. If more space is needed but allocation fails or has been
+forbidden, an insert error is set.
 
-Note that this function may write to the struct containing out_handle and wraps
-it in a handle to provide information about the old value. */
-#define ccc_hrm_swap_handle_r(handle_realtime_ordered_map_ptr, out_handle_ptr) \
+Note that this function may write to the provided user type struct. */
+#define ccc_hrm_swap_handle_r(handle_realtime_ordered_map_ptr,                 \
+                              key_val_type_output_ptr)                         \
     &(ccc_handle)                                                              \
     {                                                                          \
         ccc_hrm_swap_handle((handle_realtime_ordered_map_ptr),                 \
-                            (out_handle_ptr))                                  \
+                            (key_val_type_output_ptr))                         \
             .impl                                                              \
     }
 
-/** @brief Attempts to insert the key value wrapping key_val_handle.
+/** @brief Attempts to insert the key value in key_val_type.
 @param [in] hrm the pointer to the map.
-@param [in] key_val_handle the handle to the user type wrapping map elem.
+@param [in] key_val_type the type user type map elem.
 @return a handle. If Occupied, the handle contains a reference to the key value
 user type in the map and may be unwrapped. If Vacant the handle contains a
 reference to the newly inserted handle in the map. If more space is needed but
@@ -391,19 +390,19 @@ allocation fails, an insert error is set. */
 ccc_hrm_try_insert(ccc_handle_realtime_ordered_map *hrm,
                    void const *key_val_type);
 
-/** @brief Attempts to insert the key value wrapping key_val_handle.
+/** @brief Attempts to insert the key value key_val_type_ptr.
 @param [in] handle_realtime_ordered_map_ptr the pointer to the map.
-@param [in] key_val_handle_ptr the handle to the user type wrapping map elem.
+@param [in] key_val_type_ptr the type user type map elem.
 @return a compound literal reference to a handle. If Occupied, the handle
 contains a reference to the key value user type in the map and may be unwrapped.
 If Vacant the handle contains a reference to the newly inserted handle in the
 map. If more space is needed but allocation fails an insert error is set. */
 #define ccc_hrm_try_insert_r(handle_realtime_ordered_map_ptr,                  \
-                             key_val_handle_ptr)                               \
+                             key_val_type_ptr)                                 \
     &(ccc_handle)                                                              \
     {                                                                          \
         ccc_hrm_try_insert((handle_realtime_ordered_map_ptr),                  \
-                           (key_val_handle_ptr))                               \
+                           (key_val_type_ptr))                                 \
             .impl                                                              \
     }
 
@@ -413,7 +412,7 @@ map. If more space is needed but allocation fails an insert error is set. */
 @param [in] lazy_value the compound literal specifying the value.
 @return a compound literal reference to the handle of the existing or newly
 inserted value. Occupied indicates the key existed, Vacant indicates the key
-was absent. Unwrapping in any case provides the current value unless an error
+was absent. Unin any case provides the current value unless an error
 occurs that prevents insertion. An insertion error will flag such a case.
 
 Note that for brevity and convenience the user need not write the key to the
@@ -429,7 +428,7 @@ compound literal matches the searched key. */
 
 /** @brief Invariantly inserts or overwrites a user struct into the map.
 @param [in] hrm a pointer to the handle hash map.
-@param [in] key_val_handle the handle to the wrapping user struct key value.
+@param [in] key_val_type the type user struct key value.
 @return a handle. If Occupied a handle was overwritten by the new key value.
 If Vacant no prior map handle existed.
 
@@ -445,7 +444,7 @@ ccc_hrm_insert_or_assign(ccc_handle_realtime_ordered_map *hrm,
 @param [in] lazy_value the compound literal to insert or use for overwrite.
 @return a compound literal reference to the handle of the existing or newly
 inserted value. Occupied indicates the key existed, Vacant indicates the key
-was absent. Unwrapping in any case provides the current value unless an error
+was absent. Unin any case provides the current value unless an error
 occurs that prevents insertion. An insertion error will flag such a case.
 
 Note that for brevity and convenience the user need not write the key to the
@@ -460,32 +459,32 @@ compound literal matches the searched key. */
     }
 
 /** @brief Removes the key value in the map storing the old value, if present,
-in the struct containing out_handle provided by the user.
+in the struct containing key_val_type_output provided by the user.
 @param [in] hrm the pointer to the ordered map.
-@param [out] out_handle the handle to the user type wrapping map elem.
-@return the removed handle. If Occupied out_handle holds the old key value pair.
-If Vacant the key value pair was not stored in the map. If bad input is provided
-an input error is set.
+@param [out] key_val_type_output the type user type map elem.
+@return the removed handle. If Occupied key value type holds the old key value
+pair. If Vacant the key value pair was not stored in the map. If bad input is
+provided an input error is set.
 
-Note that this function may write to the struct containing the second parameter
-and wraps it in a handle to provide information about the old value. */
+Note that this function may write to the user type struct. */
 [[nodiscard]] ccc_handle ccc_hrm_remove(ccc_handle_realtime_ordered_map *hrm,
                                         void *key_val_type_output);
 
 /** @brief Removes the key value in the map storing the old value, if present,
-in the struct containing out_handle provided by the user.
+in the struct containing key value type provided by the user.
 @param [in] handle_realtime_ordered_map_ptr the pointer to the ordered map.
-@param [out] out_handle_ptr the handle to the user type wrapping map elem.
+@param [out] key_val_type_output_ptr type user type map elem.
 @return a compound literal reference to the removed handle. If Occupied
-out_handle_ptr holds the old key value pair.. If Vacant the key value pair was
-not stored in the map. If bad input is provided an input error is set.
+key_val_type_output_ptr holds the old key value pair.. If Vacant the key value
+pair was not stored in the map. If bad input is provided an input error is set.
 
-Note that this function may write to the struct containing the second parameter
-and wraps it in a handle to provide information about the old value. */
-#define ccc_hrm_remove_r(handle_realtime_ordered_map_ptr, out_handle_ptr)      \
+Note that this function may write to the user type struct. */
+#define ccc_hrm_remove_r(handle_realtime_ordered_map_ptr,                      \
+                         key_val_type_output_ptr)                              \
     &(ccc_handle)                                                              \
     {                                                                          \
-        ccc_hrm_remove((handle_realtime_ordered_map_ptr), (out_handle_ptr))    \
+        ccc_hrm_remove((handle_realtime_ordered_map_ptr),                      \
+                       (key_val_type_output_ptr))                              \
             .impl                                                              \
     }
 
@@ -584,9 +583,9 @@ evaluated in the closure scope. */
                                   type_name, closure_over_T)                   \
     }
 
-/** @brief Inserts the struct with handle elem if the handle is Vacant.
+/** @brief Inserts the provided user type if the handle is Vacant.
 @param [in] h the handle obtained via function or macro call.
-@param [in] elem the handle to the struct to be inserted to a Vacant handle.
+@param [in] key_val_type the type struct to be inserted to a Vacant handle.
 @return a pointer to handle in the map invariantly. NULL on error.
 
 Because this functions takes a handle and inserts if it is Vacant, the only
@@ -615,9 +614,9 @@ or other data, such functions will not be called if the handle is Occupied. */
     ccc_impl_hrm_or_insert_w(handle_realtime_ordered_map_handle_ptr,           \
                              lazy_key_value)
 
-/** @brief Inserts the provided handle invariantly.
+/** @brief Inserts the provided user type invariantly.
 @param [in] h the handle returned from a call obtaining a handle.
-@param [in] elem a handle to the struct the user intends to insert.
+@param [in] key_val_type a type struct the user intends to insert.
 @return a pointer to the inserted element or NULL upon allocation failure.
 
 This method can be used when the old value in the map does not need to
@@ -754,8 +753,7 @@ ccc_hrm_clear_and_free_reserve(ccc_handle_realtime_ordered_map *hrm,
 Obtain and manage iterators over the container. */
 /**@{*/
 
-/** @brief Return an iterable range of values from [begin_key, end_key).
-O(lg N).
+/** @brief Return an iterable range of values from [begin_key, end_key). O(lgN).
 @param [in] hrm a pointer to the map.
 @param [in] begin_key a pointer to the key intended as the start of the range.
 @param [in] end_key a pointer to the key intended as the end of the range.
@@ -768,7 +766,7 @@ the provided range iteration functions from types.h is recommended for example:
 ```
 for (struct val *i = range_begin(&range);
      i != end_range(&range);
-     i = next(&hrm, &i->elem))
+     i = next(&hrm, i))
 {}
 ```
 
@@ -807,7 +805,7 @@ the provided rrange iteration functions from types.h is recommended for example:
 ```
 for (struct val *i = rrange_begin(&rrange);
      i != rend_rrange(&rrange);
-     i = rnext(&fom, &i->elem))
+     i = rnext(&fom, i))
 {}
 ```
 
@@ -845,7 +843,7 @@ enclosing scope. This reference is always non-NULL. */
 
 /** @brief Return the next element in an inorder traversal of the map. O(1).
 @param [in] hrm a pointer to the map.
-@param [in] iter_handle a pointer to the intrusive map element of the
+@param [in] key_val_type_iter a pointer to the intrusive map element of the
 current iterator.
 @return the next user type stored in the map in an inorder traversal. */
 [[nodiscard]] void *ccc_hrm_next(ccc_handle_realtime_ordered_map const *hrm,
@@ -854,7 +852,7 @@ current iterator.
 /** @brief Return the rnext element in a reverse inorder traversal of the map.
 O(1).
 @param [in] hrm a pointer to the map.
-@param [in] iter_handle a pointer to the intrusive map element of the
+@param [in] key_val_type_iter a pointer to the intrusive map element of the
 current iterator.
 @return the rnext user type stored in the map in a reverse inorder traversal. */
 [[nodiscard]] void *ccc_hrm_rnext(ccc_handle_realtime_ordered_map const *hrm,

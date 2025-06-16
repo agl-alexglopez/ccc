@@ -1000,7 +1000,7 @@ ccc_bs_copy(ccc_bitset *const dst, ccc_bitset const *const src,
     return CCC_RESULT_OK;
 }
 
-bitblock *
+void *
 ccc_bs_data(ccc_bitset const *const bs)
 {
     if (!bs)
