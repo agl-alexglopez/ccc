@@ -100,11 +100,11 @@ use leaving `2480 - 1856 = 624` bytes wasted.
 
 In contrast the current struct of arrays design lays out data such that we use
 `(64 * 4) + 4 + (64 * 24) + 64 + B = 1860 + B` bytes where B is the number of
-unused bits in the last block of the bit array (in this case 0). That means
-there are only `4 + B` bytes wasted, 4 bytes of padding between the end of the
-user type array and the start of the nodes array and the unused bits at the end
-of the bit array. This also means it important to consider the alignment
-differences that may occur between the user type and the node type.
+unused bits in the last block of the parity bit array (in this case 0). That
+means there are only `4 + B` bytes wasted, 4 bytes of padding between the end of
+the user type array and the start of the nodes array and the unused bits at the
+end of the parity bit array. This also means it important to consider the
+alignment differences that may occur between the user type and the node type.
 
 This layout comes at the cost of consulting multiple arrays for many operations.
 However, once user data has been inserted or removed the tree fix up operations
