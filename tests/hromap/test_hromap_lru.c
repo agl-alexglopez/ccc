@@ -58,7 +58,7 @@ struct lru_request
 
 /* Fixed map used for the lru storage. List piggy backs of this array for its
    memory. Map does not need to re-size for this small test. */
-ccc_hrm_declare_fixed_map(lru_fixed_map, struct lru_elem, LRU_CAP);
+hrm_declare_fixed_map(lru_fixed_map, struct lru_elem, LRU_CAP);
 
 /*===========================   Prototypes   ================================*/
 
@@ -75,7 +75,7 @@ static enum check_result run_lru_cache(void);
    of the hash table and list. */
 static struct lru_cache lru_cache = {
     .map = hrm_init(&(lru_fixed_map){}, struct lru_elem, key, cmp_by_key, NULL,
-                    NULL, LRU_CAP),
+                    NULL, hrm_fixed_capacity(lru_fixed_map)),
     .l = dll_init(lru_cache.l, struct lru_elem, list_elem, cmp_list_elems, NULL,
                   NULL),
     .cap = 3,
