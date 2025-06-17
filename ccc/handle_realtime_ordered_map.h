@@ -915,6 +915,11 @@ ccc_hrm_validate(ccc_handle_realtime_ordered_map const *hrm);
 #ifdef HANDLE_REALTIME_ORDERED_MAP_USING_NAMESPACE_CCC
 typedef ccc_handle_realtime_ordered_map handle_realtime_ordered_map;
 typedef ccc_hromap_handle hromap_handle;
+#    define hrm_declare_fixed_map(args...) ccc_hrm_declare_fixed_map(args)
+#    define hrm_init(args...) ccc_hrm_init(args)
+#    define hrm_fixed_capacity(args...) ccc_hrm_fixed_capacity(args)
+#    define hrm_copy(args...) ccc_hrm_copy(args)
+#    define hrm_reserve(args...) ccc_hrm_reserve(args)
 #    define hrm_at(args...) ccc_hrm_at(args)
 #    define hrm_as(args...) ccc_hrm_as(args)
 #    define hrm_and_modify_w(args...) ccc_hrm_and_modify_w(args)
@@ -922,9 +927,6 @@ typedef ccc_hromap_handle hromap_handle;
 #    define hrm_insert_handle_w(args...) ccc_hrm_insert_handle_w(args)
 #    define hrm_try_insert_w(args...) ccc_hrm_try_insert_w(args)
 #    define hrm_insert_or_assign_w(args...) ccc_hrm_insert_or_assign_w(args)
-#    define hrm_init(args...) ccc_hrm_init(args)
-#    define hrm_copy(args...) ccc_hrm_copy(args)
-#    define hrm_reserve(args...) ccc_hrm_reserve(args)
 #    define hrm_contains(args...) ccc_hrm_contains(args)
 #    define hrm_get_key_val(args...) ccc_hrm_get_key_val(args)
 #    define hrm_swap_handle(args...) ccc_hrm_swap_handle(args)
