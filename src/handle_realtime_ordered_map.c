@@ -55,6 +55,16 @@ and flexible in how it can be implemented. */
 
 /*========================   Data Alignment Test   ==========================*/
 
+/** @private A macro version of the runtime alignment operations we perform
+for calculating bytes. This way we can use in static assert. The user data type
+may not be the same alignment as the nodes and therefore the nodes array must
+start at next aligned byte. Similarly the parity array may not be on an aligned
+byte after the nodes array, though in the current implementation it is.
+Regardless we always ensure the position is correct with respect to power of two
+alignments in C. */
+#define roundup(bytes_to_round, alignment)                                     \
+    (((bytes_to_round) + (alignment) - 1) & ~((alignment) - 1))
+
 enum : size_t
 {
     /* @private Test capacity. */
@@ -73,55 +83,39 @@ used to ensure assumptions about data layout are correct. The following static
 asserts must be true in order to support the Struct of Array style layout we
 use for the data, nodes, and parity arrays. */
 static fixed_map_test_type data_nodes_parity_layout_test;
-/** There is a more portable way to round up the bytes aligned to a certain type
-that we use in the runtime code but it is less readable so for this test we
-will just add the alignment difference to certain operations as needed. */
-static_assert(alignof(struct test_data_type)
-                  <= alignof(*data_nodes_parity_layout_test.nodes),
-              "The node type has alignment >= int wrapper.");
+/** We don't care about the alignment or padding after the parity array because
+we never need to set or move any pointers to that position. The alignment is
+important for the nodes and parity pointer to be set to the correct aligned
+positions and so that we allocate enough bytes for our single allocation if
+the map is dynamic and not a fixed type. */
 static_assert(
     (char *)&data_nodes_parity_layout_test.parity[ccc_impl_hrm_blocks(TCAP)]
             - (char *)&data_nodes_parity_layout_test.data[0]
-        == ((sizeof(*data_nodes_parity_layout_test.data) * TCAP)
-            + (alignof(*data_nodes_parity_layout_test.nodes)
-               - alignof(*data_nodes_parity_layout_test.data))
-            + (sizeof(*data_nodes_parity_layout_test.nodes) * TCAP)
-            + (sizeof(*data_nodes_parity_layout_test.parity)
-               * (ccc_impl_hrm_blocks(TCAP)))),
+        == roundup((sizeof(*data_nodes_parity_layout_test.data) * TCAP),
+                   alignof(*data_nodes_parity_layout_test.nodes))
+               + roundup((sizeof(*data_nodes_parity_layout_test.nodes) * TCAP),
+                         alignof(*data_nodes_parity_layout_test.parity))
+               + (sizeof(*data_nodes_parity_layout_test.parity)
+                  * ccc_impl_hrm_blocks(TCAP)),
     "The pointer difference in bytes between end of parity bit array and start "
     "of user data array must be the same as the total bytes we assume to be "
     "stored in that range. Alignment of user data must be considered.");
-static_assert((char *)&data_nodes_parity_layout_test.data[TCAP]
-                      + (alignof(*data_nodes_parity_layout_test.nodes)
-                         - alignof(*data_nodes_parity_layout_test.data))
+static_assert((char *)&data_nodes_parity_layout_test.data
+                      + roundup((sizeof(*data_nodes_parity_layout_test.data)
+                                 * TCAP),
+                                alignof(*data_nodes_parity_layout_test.nodes))
                   == (char *)&data_nodes_parity_layout_test.nodes,
               "The start of the nodes array must begin at the next aligned "
               "byte given alignment of a node.");
-static_assert((char *)&data_nodes_parity_layout_test.nodes
-                  == ((char *)&data_nodes_parity_layout_test.data
-                      + (sizeof(*data_nodes_parity_layout_test.data) * TCAP)
-                      + (alignof(*data_nodes_parity_layout_test.nodes)
-                         - alignof(*data_nodes_parity_layout_test.data))),
-              "Manual pointer arithmetic from the base of data array to find "
-              "nodes array should result in correct location.");
 static_assert(
-    (char *)&data_nodes_parity_layout_test.nodes[TCAP]
-        == (char *)&data_nodes_parity_layout_test.parity,
-    "The start of the parity bit array must begin at the next byte past "
-    "the final internal node element.");
-static_assert((char *)&data_nodes_parity_layout_test.parity
-                  == ((char *)&data_nodes_parity_layout_test.data
-                      + (sizeof(*data_nodes_parity_layout_test.data) * TCAP)
-                      + (alignof(*data_nodes_parity_layout_test.nodes)
-                         - alignof(*data_nodes_parity_layout_test.data))
-                      + (sizeof(*data_nodes_parity_layout_test.nodes) * TCAP)),
-              "Manual pointer arithmetic from the base of data array to find "
-              "parity array should result in correct location.");
-static_assert((char *)&data_nodes_parity_layout_test.parity
-                  == ((char *)&data_nodes_parity_layout_test.nodes
-                      + (sizeof(*data_nodes_parity_layout_test.nodes) * TCAP)),
-              "Manual pointer arithmetic from the base of nodes array to find "
-              "parity array should result in correct location.");
+    (char *)&data_nodes_parity_layout_test.parity
+        == ((char *)&data_nodes_parity_layout_test.data
+            + roundup((sizeof(*data_nodes_parity_layout_test.data) * TCAP),
+                      alignof(*data_nodes_parity_layout_test.nodes))
+            + roundup((sizeof(*data_nodes_parity_layout_test.nodes) * TCAP),
+                      alignof(*data_nodes_parity_layout_test.parity))),
+    "The start of the parity array must begin at the next aligned byte given "
+    "alignment of both the data and nodes array.");
 
 /*==========================  Type Declarations   ===========================*/
 
@@ -132,13 +126,20 @@ enum hrm_branch
     R,
 };
 
-/** @private */
+/** @private To make insertions and removals more efficient we can remember the
+last node encountered on the search for the requested node. It will either be
+the correct node or the parent of the missing node if it is not found. This
+means insertions will not need a second search of the tree and we can insert
+immediately by adding the child. */
 struct hrm_query
 {
+    /** The last branch direction we took to the found or missing node. */
     ccc_threeway_cmp last_cmp;
     union
     {
+        /** The node was found so here is its index in the array. */
         size_t found;
+        /** The node was not found so here is its direct parent. */
         size_t parent;
     };
 };
@@ -153,11 +154,13 @@ enum
     SINGLE_TREE_NODE = 2,
 };
 
-typedef typeof(*(struct ccc_hromap){}.parity) hrm_block;
+/** @private A block of parity bits. */
+typedef typeof(*(struct ccc_hromap){}.parity) pblock;
 
 enum : size_t
 {
-    HRM_BLOCK_BITS = sizeof(hrm_block) * CHAR_BIT,
+    /** @private The number of bits in a block of parity bits. */
+    PBLOCK_BITS = sizeof(pblock) * CHAR_BIT,
 };
 
 /*==============================  Prototypes   ==============================*/
@@ -174,8 +177,8 @@ static size_t node_bytes(size_t capacity);
 static size_t parity_bytes(size_t capacity);
 static struct ccc_hromap_elem *node_pos(size_t sizeof_type, void const *data,
                                         size_t capacity);
-static hrm_block *parity_pos(size_t sizeof_type, void const *data,
-                             size_t capacity);
+static pblock *parity_pos(size_t sizeof_type, void const *data,
+                          size_t capacity);
 static size_t maybe_alloc_insert(struct ccc_hromap *hrm, size_t parent,
                                  ccc_threeway_cmp last_cmp,
                                  void const *user_type);
@@ -727,7 +730,7 @@ ccc_hrm_copy(ccc_handle_realtime_ordered_map *const dst,
     }
     void *const dst_mem = dst->data;
     struct ccc_hromap_elem *const dst_nodes = dst->nodes;
-    hrm_block *const dst_parity = dst->parity;
+    pblock *const dst_parity = dst->parity;
     size_t const dst_cap = dst->capacity;
     ccc_any_alloc_fn *const dst_alloc = dst->alloc;
     *dst = *src;
@@ -932,7 +935,7 @@ alloc_slot(struct ccc_hromap *const t)
         assert(!t->free_list);
         if (old_count == old_cap)
         {
-            if (resize(t, max(old_cap * 2, HRM_BLOCK_BITS), t->alloc)
+            if (resize(t, max(old_cap * 2, PBLOCK_BITS), t->alloc)
                 != CCC_RESULT_OK)
             {
                 return 0;
@@ -1147,7 +1150,7 @@ node_bytes(size_t const capacity)
 static inline size_t
 parity_bytes(size_t capacity)
 {
-    return sizeof(hrm_block) * block_count(capacity);
+    return sizeof(pblock) * block_count(capacity);
 }
 
 static inline struct ccc_hromap_elem *
@@ -1158,12 +1161,12 @@ node_pos(size_t const sizeof_type, void const *const data,
                                       + data_bytes(sizeof_type, capacity));
 }
 
-static inline hrm_block *
+static inline pblock *
 parity_pos(size_t const sizeof_type, void const *const data,
            size_t const capacity)
 {
-    return (hrm_block *)((char *)data + data_bytes(sizeof_type, capacity)
-                         + node_bytes(capacity));
+    return (pblock *)((char *)data + data_bytes(sizeof_type, capacity)
+                      + node_bytes(capacity));
 }
 
 /** Copies over the Struct of Arrays contained within the one contiguous
@@ -1225,16 +1228,16 @@ data_at(struct ccc_hromap const *const t, size_t const i)
     return (char *)t->data + (t->sizeof_type * i);
 }
 
-static inline hrm_block *
+static inline pblock *
 block_at(struct ccc_hromap const *const t, size_t const i)
 {
-    return &t->parity[i / HRM_BLOCK_BITS];
+    return &t->parity[i / PBLOCK_BITS];
 }
 
-static inline hrm_block
+static inline pblock
 bit_on(size_t const i)
 {
-    return ((hrm_block)1) << (i % HRM_BLOCK_BITS);
+    return ((pblock)1) << (i % PBLOCK_BITS);
 }
 
 static inline size_t
@@ -1282,7 +1285,7 @@ set_parity(struct ccc_hromap const *const t, size_t const node,
 static inline size_t
 block_count(size_t const node_count)
 {
-    return (node_count + (HRM_BLOCK_BITS - 1)) / HRM_BLOCK_BITS;
+    return (node_count + (PBLOCK_BITS - 1)) / PBLOCK_BITS;
 }
 
 static inline size_t
