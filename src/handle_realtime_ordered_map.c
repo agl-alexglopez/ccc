@@ -86,6 +86,16 @@ code when we set the positions of the nodes and parity pointers relative to the
 data pointer the positions are correct regardless of if our backing storage is
 a fixed map or heap allocation. */
 static fixed_map_test_type data_nodes_parity_layout_test;
+/** Some assumptions in the code assume that parity array is last so ensure that
+is the case here. Also good to assume user data comes first. */
+static_assert((char *)data_nodes_parity_layout_test.data
+                      < (char *)data_nodes_parity_layout_test.nodes
+                  && (char *)data_nodes_parity_layout_test.nodes
+                         < (char *)data_nodes_parity_layout_test.parity
+                  && (char *)data_nodes_parity_layout_test.data
+                         < (char *)data_nodes_parity_layout_test.parity,
+              "The order of the arrays in a Struct of Arrays map is data, then "
+              "nodes, then parity.");
 /** We don't care about the alignment or padding after the parity array because
 we never need to set or move any pointers to that position. The alignment is
 important for the nodes and parity pointer to be set to the correct aligned
@@ -1133,6 +1143,11 @@ cmp_elems(struct ccc_hromap const *const hrm, void const *const key,
     });
 }
 
+/** Calculates the number of bytes needed for user data INCLUDING any bytes we
+need to add to the end of the array such that the following nodes array starts
+on an aligned byte boundary given the alignment requirements of a node. This
+means the value returned from this function may or may not be slightly larger
+then the raw size of just user elements if rounding up must occur. */
 static inline size_t
 data_bytes(size_t const sizeof_type, size_t const capacity)
 {
@@ -1141,6 +1156,12 @@ data_bytes(size_t const sizeof_type, size_t const capacity)
          & ~(alignof(typeof(*(struct ccc_hromap){}.nodes)) - 1);
 }
 
+/** Calculates the number of bytes needed for the nodes array INCLUDING any
+bytes we need to add to the end of the array such that the following parity bit
+array starts on an aligned byte boundary given the alignment requirements of
+a parity block. This means the value returned from this function may or may not
+be slightly larger then the raw size of just the nodes array if rounding up must
+occur. */
 static inline size_t
 node_bytes(size_t const capacity)
 {
@@ -1149,10 +1170,20 @@ node_bytes(size_t const capacity)
          & ~(alignof(typeof(*(struct ccc_hromap){}.parity)) - 1);
 }
 
+/** Calculates the number of bytes needed for the parity block bit array. No
+rounding up or alignment concerns need apply because this is the last array
+in the allocation. */
 static inline size_t
 parity_bytes(size_t capacity)
 {
     return sizeof(pblock) * block_count(capacity);
+}
+
+static inline size_t
+total_bytes(size_t sizeof_type, size_t const capacity)
+{
+    return data_bytes(sizeof_type, capacity) + node_bytes(capacity)
+         + parity_bytes(capacity);
 }
 
 static inline struct ccc_hromap_elem *
@@ -1288,13 +1319,6 @@ static inline size_t
 block_count(size_t const node_count)
 {
     return (node_count + (PBLOCK_BITS - 1)) / PBLOCK_BITS;
-}
-
-static inline size_t
-total_bytes(size_t sizeof_type, size_t const capacity)
-{
-    return data_bytes(sizeof_type, capacity) + node_bytes(capacity)
-         + parity_bytes(capacity);
 }
 
 static inline size_t *
