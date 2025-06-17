@@ -23,7 +23,7 @@ limitations under the License.
 /** @endcond */
 
 #include "../types.h"
-#include "impl_types.h"
+#include "impl_types.h" /* NOLINT */
 
 /* NOLINTBEGIN(readability-identifier-naming) */
 
@@ -147,10 +147,12 @@ struct ccc_hrtree_handle
 {
     /** @private Map associated with this handle. */
     struct ccc_hromap *hrm;
+    /** @private Current index of the handle. */
+    size_t i;
     /** @private Saves last comparison direction. */
     ccc_threeway_cmp last_cmp;
-    /** @private Index and a status. */
-    struct ccc_handl handle;
+    /** @private The entry status flag. */
+    ccc_entry_status stats;
 };
 
 /** @private Wrapper for return by pointer on the stack in C23. */
@@ -245,14 +247,14 @@ runtime. */
         __auto_type impl_hrm_hndl_ptr                                          \
             = (handle_realtime_ordered_map_handle_ptr);                        \
         struct ccc_hrtree_handle impl_hrm_mod_hndl                             \
-            = {.handle = {.stats = CCC_ENTRY_ARG_ERROR}};                      \
+            = {.stats = CCC_ENTRY_ARG_ERROR};                                  \
         if (impl_hrm_hndl_ptr)                                                 \
         {                                                                      \
             impl_hrm_mod_hndl = impl_hrm_hndl_ptr->impl;                       \
-            if (impl_hrm_mod_hndl.handle.stats & CCC_ENTRY_OCCUPIED)           \
+            if (impl_hrm_mod_hndl.stats & CCC_ENTRY_OCCUPIED)                  \
             {                                                                  \
                 type_name *const T = ccc_impl_hrm_data_at(                     \
-                    impl_hrm_mod_hndl.hrm, impl_hrm_mod_hndl.handle.i);        \
+                    impl_hrm_mod_hndl.hrm, impl_hrm_mod_hndl.i);               \
                 if (T)                                                         \
                 {                                                              \
                     closure_over_T                                             \
@@ -273,9 +275,9 @@ runtime. */
         {                                                                      \
             struct ccc_hrtree_handle *impl_hrm_or_ins_hndl                     \
                 = &impl_or_ins_handle_ptr->impl;                               \
-            if (impl_hrm_or_ins_hndl->handle.stats == CCC_ENTRY_OCCUPIED)      \
+            if (impl_hrm_or_ins_hndl->stats == CCC_ENTRY_OCCUPIED)             \
             {                                                                  \
-                impl_hrm_or_ins_ret = impl_hrm_or_ins_hndl->handle.i;          \
+                impl_hrm_or_ins_ret = impl_hrm_or_ins_hndl->i;                 \
             }                                                                  \
             else                                                               \
             {                                                                  \
@@ -286,10 +288,9 @@ runtime. */
                     *((typeof(lazy_key_value) *)ccc_impl_hrm_data_at(          \
                         impl_hrm_or_ins_hndl->hrm, impl_hrm_or_ins_ret))       \
                         = lazy_key_value;                                      \
-                    ccc_impl_hrm_insert(impl_hrm_or_ins_hndl->hrm,             \
-                                        impl_hrm_or_ins_hndl->handle.i,        \
-                                        impl_hrm_or_ins_hndl->last_cmp,        \
-                                        impl_hrm_or_ins_ret);                  \
+                    ccc_impl_hrm_insert(                                       \
+                        impl_hrm_or_ins_hndl->hrm, impl_hrm_or_ins_hndl->i,    \
+                        impl_hrm_or_ins_hndl->last_cmp, impl_hrm_or_ins_ret);  \
                 }                                                              \
             }                                                                  \
         }                                                                      \
@@ -307,7 +308,7 @@ runtime. */
         {                                                                      \
             struct ccc_hrtree_handle *impl_hrm_ins_hndl                        \
                 = &impl_ins_handle_ptr->impl;                                  \
-            if (!(impl_hrm_ins_hndl->handle.stats & CCC_ENTRY_OCCUPIED))       \
+            if (!(impl_hrm_ins_hndl->stats & CCC_ENTRY_OCCUPIED))              \
             {                                                                  \
                 impl_hrm_ins_hndl_ret                                          \
                     = ccc_impl_hrm_alloc_slot(impl_hrm_ins_hndl->hrm);         \
@@ -317,13 +318,13 @@ runtime. */
                         impl_hrm_ins_hndl->hrm, impl_hrm_ins_hndl_ret))        \
                         = lazy_key_value;                                      \
                     ccc_impl_hrm_insert(                                       \
-                        impl_hrm_ins_hndl->hrm, impl_hrm_ins_hndl->handle.i,   \
+                        impl_hrm_ins_hndl->hrm, impl_hrm_ins_hndl->i,          \
                         impl_hrm_ins_hndl->last_cmp, impl_hrm_ins_hndl_ret);   \
                 }                                                              \
             }                                                                  \
-            else if (impl_hrm_ins_hndl->handle.stats == CCC_ENTRY_OCCUPIED)    \
+            else if (impl_hrm_ins_hndl->stats == CCC_ENTRY_OCCUPIED)           \
             {                                                                  \
-                impl_hrm_ins_hndl_ret = impl_hrm_ins_hndl->handle.i;           \
+                impl_hrm_ins_hndl_ret = impl_hrm_ins_hndl->i;                  \
                 *((typeof(lazy_key_value) *)ccc_impl_hrm_data_at(              \
                     impl_hrm_ins_hndl->hrm, impl_hrm_ins_hndl_ret))            \
                     = lazy_key_value;                                          \
@@ -345,7 +346,7 @@ runtime. */
             struct ccc_hrtree_handle impl_hrm_try_ins_hndl                     \
                 = ccc_impl_hrm_handle(impl_try_ins_map_ptr,                    \
                                       (void *)&impl_hrm_key);                  \
-            if (!(impl_hrm_try_ins_hndl.handle.stats & CCC_ENTRY_OCCUPIED))    \
+            if (!(impl_hrm_try_ins_hndl.stats & CCC_ENTRY_OCCUPIED))           \
             {                                                                  \
                 impl_hrm_try_ins_hndl_ret = (struct ccc_handl){                \
                     .i = ccc_impl_hrm_alloc_slot(impl_hrm_try_ins_hndl.hrm),   \
@@ -360,17 +361,17 @@ runtime. */
                         impl_try_ins_map_ptr, impl_hrm_try_ins_hndl_ret.i))    \
                         = impl_hrm_key;                                        \
                     ccc_impl_hrm_insert(impl_hrm_try_ins_hndl.hrm,             \
-                                        impl_hrm_try_ins_hndl.handle.i,        \
+                                        impl_hrm_try_ins_hndl.i,               \
                                         impl_hrm_try_ins_hndl.last_cmp,        \
                                         impl_hrm_try_ins_hndl_ret.i);          \
                     impl_hrm_try_ins_hndl_ret.stats = CCC_ENTRY_VACANT;        \
                 }                                                              \
             }                                                                  \
-            else if (impl_hrm_try_ins_hndl.handle.stats == CCC_ENTRY_OCCUPIED) \
+            else if (impl_hrm_try_ins_hndl.stats == CCC_ENTRY_OCCUPIED)        \
             {                                                                  \
                 impl_hrm_try_ins_hndl_ret = (struct ccc_handl){                \
-                    .i = impl_hrm_try_ins_hndl.handle.i,                       \
-                    .stats = impl_hrm_try_ins_hndl.handle.stats,               \
+                    .i = impl_hrm_try_ins_hndl.i,                              \
+                    .stats = impl_hrm_try_ins_hndl.stats,                      \
                 };                                                             \
             }                                                                  \
         }                                                                      \
@@ -391,8 +392,7 @@ runtime. */
             struct ccc_hrtree_handle impl_hrm_ins_or_assign_hndl               \
                 = ccc_impl_hrm_handle(impl_ins_or_assign_map_ptr,              \
                                       (void *)&impl_hrm_key);                  \
-            if (!(impl_hrm_ins_or_assign_hndl.handle.stats                     \
-                  & CCC_ENTRY_OCCUPIED))                                       \
+            if (!(impl_hrm_ins_or_assign_hndl.stats & CCC_ENTRY_OCCUPIED))     \
             {                                                                  \
                 impl_hrm_ins_or_assign_hndl_ret                                \
                     = (struct ccc_handl){.i = ccc_impl_hrm_alloc_slot(         \
@@ -409,25 +409,24 @@ runtime. */
                         impl_hrm_ins_or_assign_hndl_ret.i))                    \
                         = impl_hrm_key;                                        \
                     ccc_impl_hrm_insert(impl_hrm_ins_or_assign_hndl.hrm,       \
-                                        impl_hrm_ins_or_assign_hndl.handle.i,  \
+                                        impl_hrm_ins_or_assign_hndl.i,         \
                                         impl_hrm_ins_or_assign_hndl.last_cmp,  \
                                         impl_hrm_ins_or_assign_hndl_ret.i);    \
                     impl_hrm_ins_or_assign_hndl_ret.stats = CCC_ENTRY_VACANT;  \
                 }                                                              \
             }                                                                  \
-            else if (impl_hrm_ins_or_assign_hndl.handle.stats                  \
-                     == CCC_ENTRY_OCCUPIED)                                    \
+            else if (impl_hrm_ins_or_assign_hndl.stats == CCC_ENTRY_OCCUPIED)  \
             {                                                                  \
                 *((typeof(lazy_value) *)ccc_impl_hrm_data_at(                  \
                     impl_hrm_ins_or_assign_hndl.hrm,                           \
-                    impl_hrm_ins_or_assign_hndl.handle.i))                     \
+                    impl_hrm_ins_or_assign_hndl.i))                            \
                     = lazy_value;                                              \
                 impl_hrm_ins_or_assign_hndl_ret = (struct ccc_handl){          \
-                    .i = impl_hrm_ins_or_assign_hndl.handle.i,                 \
-                    .stats = impl_hrm_ins_or_assign_hndl.handle.stats};        \
+                    .i = impl_hrm_ins_or_assign_hndl.i,                        \
+                    .stats = impl_hrm_ins_or_assign_hndl.stats};               \
                 *((typeof(impl_hrm_key) *)ccc_impl_hrm_key_at(                 \
                     impl_hrm_ins_or_assign_hndl.hrm,                           \
-                    impl_hrm_ins_or_assign_hndl.handle.i))                     \
+                    impl_hrm_ins_or_assign_hndl.i))                            \
                     = impl_hrm_key;                                            \
             }                                                                  \
         }                                                                      \

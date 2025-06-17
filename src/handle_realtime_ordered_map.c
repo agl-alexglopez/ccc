@@ -392,11 +392,10 @@ ccc_hrm_insert_or_assign(ccc_handle_realtime_ordered_map *const hrm,
 ccc_hromap_handle *
 ccc_hrm_and_modify(ccc_hromap_handle *const h, ccc_any_type_update_fn *const fn)
 {
-    if (h && fn && h->impl.handle.stats & CCC_ENTRY_OCCUPIED
-        && h->impl.handle.i > 0)
+    if (h && fn && h->impl.stats & CCC_ENTRY_OCCUPIED && h->impl.i > 0)
     {
         fn((ccc_any_type){
-            .any_type = data_at(h->impl.hrm, h->impl.handle.i),
+            .any_type = data_at(h->impl.hrm, h->impl.i),
             NULL,
         });
     }
@@ -407,11 +406,10 @@ ccc_hromap_handle *
 ccc_hrm_and_modify_aux(ccc_hromap_handle *const h,
                        ccc_any_type_update_fn *const fn, void *const aux)
 {
-    if (h && fn && h->impl.handle.stats & CCC_ENTRY_OCCUPIED
-        && h->impl.handle.stats > 0)
+    if (h && fn && h->impl.stats & CCC_ENTRY_OCCUPIED && h->impl.stats > 0)
     {
         fn((ccc_any_type){
-            .any_type = data_at(h->impl.hrm, h->impl.handle.i),
+            .any_type = data_at(h->impl.hrm, h->impl.i),
             aux,
         });
     }
@@ -426,11 +424,11 @@ ccc_hrm_or_insert(ccc_hromap_handle const *const h,
     {
         return 0;
     }
-    if (h->impl.handle.stats == CCC_ENTRY_OCCUPIED)
+    if (h->impl.stats == CCC_ENTRY_OCCUPIED)
     {
-        return h->impl.handle.i;
+        return h->impl.i;
     }
-    return maybe_alloc_insert(h->impl.hrm, h->impl.handle.i, h->impl.last_cmp,
+    return maybe_alloc_insert(h->impl.hrm, h->impl.i, h->impl.last_cmp,
                               key_val_type);
 }
 
@@ -442,16 +440,16 @@ ccc_hrm_insert_handle(ccc_hromap_handle const *const h,
     {
         return 0;
     }
-    if (h->impl.handle.stats == CCC_ENTRY_OCCUPIED)
+    if (h->impl.stats == CCC_ENTRY_OCCUPIED)
     {
-        void *const slot = data_at(h->impl.hrm, h->impl.handle.i);
+        void *const slot = data_at(h->impl.hrm, h->impl.i);
         if (slot != key_val_type)
         {
             (void)memcpy(slot, key_val_type, h->impl.hrm->sizeof_type);
         }
-        return h->impl.handle.i;
+        return h->impl.i;
     }
-    return maybe_alloc_insert(h->impl.hrm, h->impl.handle.i, h->impl.last_cmp,
+    return maybe_alloc_insert(h->impl.hrm, h->impl.i, h->impl.last_cmp,
                               key_val_type);
 }
 
@@ -461,7 +459,7 @@ ccc_hrm_handle(ccc_handle_realtime_ordered_map const *const hrm,
 {
     if (!hrm || !key)
     {
-        return (ccc_hromap_handle){{.handle = {.stats = CCC_ENTRY_ARG_ERROR}}};
+        return (ccc_hromap_handle){{.stats = CCC_ENTRY_ARG_ERROR}};
     }
     return (ccc_hromap_handle){handle(hrm, key)};
 }
@@ -473,9 +471,9 @@ ccc_hrm_remove_handle(ccc_hromap_handle const *const h)
     {
         return (ccc_handle){{.stats = CCC_ENTRY_ARG_ERROR}};
     }
-    if (h->impl.handle.stats == CCC_ENTRY_OCCUPIED)
+    if (h->impl.stats == CCC_ENTRY_OCCUPIED)
     {
-        size_t const ret = remove_fixup(h->impl.hrm, h->impl.handle.i);
+        size_t const ret = remove_fixup(h->impl.hrm, h->impl.i);
         return (ccc_handle){{
             .i = ret,
             .stats = CCC_ENTRY_OCCUPIED,
@@ -541,9 +539,9 @@ ccc_hrm_equal_rrange(ccc_handle_realtime_ordered_map const *const hrm,
 ccc_handle_i
 ccc_hrm_unwrap(ccc_hromap_handle const *const h)
 {
-    if (h && h->impl.handle.stats & CCC_ENTRY_OCCUPIED && h->impl.handle.i > 0)
+    if (h && h->impl.stats & CCC_ENTRY_OCCUPIED && h->impl.i > 0)
     {
-        return h->impl.handle.i;
+        return h->impl.i;
     }
     return 0;
 }
@@ -555,7 +553,7 @@ ccc_hrm_insert_error(ccc_hromap_handle const *const h)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    return (h->impl.handle.stats & CCC_ENTRY_INSERT_ERROR) != 0;
+    return (h->impl.stats & CCC_ENTRY_INSERT_ERROR) != 0;
 }
 
 ccc_tribool
@@ -565,13 +563,13 @@ ccc_hrm_occupied(ccc_hromap_handle const *const h)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    return (h->impl.handle.stats & CCC_ENTRY_OCCUPIED) != 0;
+    return (h->impl.stats & CCC_ENTRY_OCCUPIED) != 0;
 }
 
 ccc_handle_status
 ccc_hrm_handle_status(ccc_hromap_handle const *const h)
 {
-    return h ? h->impl.handle.stats : CCC_ENTRY_ARG_ERROR;
+    return h ? h->impl.stats : CCC_ENTRY_ARG_ERROR;
 }
 
 ccc_tribool
@@ -1029,14 +1027,15 @@ handle(struct ccc_hromap const *const hrm, void const *const key)
         return (struct ccc_hrtree_handle){
             .hrm = (struct ccc_hromap *)hrm,
             .last_cmp = q.last_cmp,
-            .handle = {.i = q.found, .stats = CCC_ENTRY_OCCUPIED},
+            .i = q.found,
+            .stats = CCC_ENTRY_OCCUPIED,
         };
     }
     return (struct ccc_hrtree_handle){
         .hrm = (struct ccc_hromap *)hrm,
         .last_cmp = q.last_cmp,
-        .handle
-        = {.i = q.parent, .stats = CCC_ENTRY_NO_UNWRAP | CCC_ENTRY_VACANT},
+        .i = q.parent,
+        .stats = CCC_ENTRY_NO_UNWRAP | CCC_ENTRY_VACANT,
     };
 }
 
