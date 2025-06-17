@@ -81,7 +81,10 @@ ccc_hrm_declare_fixed_map(fixed_map_test_type, struct test_data_type, TCAP);
 /** @private This is a static fixed size map exclusive to this translation unit
 used to ensure assumptions about data layout are correct. The following static
 asserts must be true in order to support the Struct of Array style layout we
-use for the data, nodes, and parity arrays. */
+use for the data, nodes, and parity arrays. It is important that in our user
+code when we set the positions of the nodes and parity pointers relative to the
+data pointer the positions are correct regardless of if our backing storage is
+a fixed map or heap allocation. */
 static fixed_map_test_type data_nodes_parity_layout_test;
 /** We don't care about the alignment or padding after the parity array because
 we never need to set or move any pointers to that position. The alignment is
