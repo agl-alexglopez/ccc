@@ -1179,6 +1179,15 @@ parity_bytes(size_t capacity)
     return sizeof(pblock) * block_count(capacity);
 }
 
+/** Calculates the number of bytes needed for all arrays in the Struct of Arrays
+map design INCLUDING any extra padding bytes that need to be added between the
+data and node arrays and the node and parity arrays. Padding might be needed if
+the alignment of the type in next array that follows a preceding array is
+different from the preceding array. In that case it is the preceding array's
+responsibility to add padding bytes to its end such that the next array begins
+on an aligned byte boundary for its own type. This means that the bytes returned
+by this function may be greater than summing the (sizeof(type) * capacity) for
+each array in the conceptual struct. */
 static inline size_t
 total_bytes(size_t sizeof_type, size_t const capacity)
 {
@@ -1186,6 +1195,10 @@ total_bytes(size_t sizeof_type, size_t const capacity)
          + parity_bytes(capacity);
 }
 
+/** Returns the base of the node array relative to the data base pointer. This
+positions is guaranteed to be the first aligned byte given the alignment of the
+node type after the data array. The data array has added any necessary padding
+after it to ensure that the base of the node array is aligned for its type. */
 static inline struct ccc_hromap_elem *
 node_pos(size_t const sizeof_type, void const *const data,
          size_t const capacity)
@@ -1194,6 +1207,11 @@ node_pos(size_t const sizeof_type, void const *const data,
                                       + data_bytes(sizeof_type, capacity));
 }
 
+/** Returns the base of the parity array relative to the data base pointer. This
+positions is guaranteed to be the first aligned byte given the alignment of the
+parity block type after the data and node arrays. The node array has added any
+necessary padding after it to ensure that the base of the parity block array is
+aligned for its type. */
 static inline pblock *
 parity_pos(size_t const sizeof_type, void const *const data,
            size_t const capacity)
