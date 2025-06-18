@@ -158,7 +158,7 @@ struct hrm_query
 };
 
 #define INORDER R
-#define R_INORDER L
+#define RINORDER L
 #define MINDIR L
 #define MAXDIR R
 
@@ -543,7 +543,7 @@ ccc_hrm_equal_rrange(ccc_handle_realtime_ordered_map const *const hrm,
     {
         return (ccc_rrange){};
     }
-    return (ccc_rrange){equal_range(hrm, rbegin_key, rend_key, R_INORDER)};
+    return (ccc_rrange){equal_range(hrm, rbegin_key, rend_key, RINORDER)};
 }
 
 ccc_handle_i
@@ -665,7 +665,7 @@ ccc_hrm_rnext(ccc_handle_realtime_ordered_map const *const hrm,
     {
         return NULL;
     }
-    size_t const n = next(hrm, index_of(hrm, key_val_type_iter), R_INORDER);
+    size_t const n = next(hrm, index_of(hrm, key_val_type_iter), RINORDER);
     return data_at(hrm, n);
 }
 
