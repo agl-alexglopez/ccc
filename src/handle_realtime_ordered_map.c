@@ -1151,9 +1151,9 @@ then the raw size of just user elements if rounding up must occur. */
 static inline size_t
 data_bytes(size_t const sizeof_type, size_t const capacity)
 {
-    return ((sizeof_type * capacity)
-            + alignof(typeof(*(struct ccc_hromap){}.nodes)) - 1)
-         & ~(alignof(typeof(*(struct ccc_hromap){}.nodes)) - 1);
+    return ((sizeof_type * capacity) + alignof(*(struct ccc_hromap){}.nodes)
+            - 1)
+         & ~(alignof(*(struct ccc_hromap){}.nodes) - 1);
 }
 
 /** Calculates the number of bytes needed for the nodes array INCLUDING any
@@ -1165,9 +1165,9 @@ occur. */
 static inline size_t
 node_bytes(size_t const capacity)
 {
-    return ((sizeof(typeof(*(struct ccc_hromap){}.nodes)) * capacity)
-            + alignof(typeof(*(struct ccc_hromap){}.parity)) - 1)
-         & ~(alignof(typeof(*(struct ccc_hromap){}.parity)) - 1);
+    return ((sizeof(*(struct ccc_hromap){}.nodes) * capacity)
+            + alignof(*(struct ccc_hromap){}.parity) - 1)
+         & ~(alignof(*(struct ccc_hromap){}.parity) - 1);
 }
 
 /** Calculates the number of bytes needed for the parity block bit array. No

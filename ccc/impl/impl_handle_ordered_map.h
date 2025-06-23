@@ -20,9 +20,8 @@ limitations under the License.
 #include <stddef.h>
 /** @endcond */
 
-#include "../buffer.h"
 #include "../types.h"
-#include "impl_types.h"
+#include "impl_types.h" /* NOLINT */
 
 /* NOLINTBEGIN(readability-identifier-naming) */
 
@@ -51,18 +50,28 @@ pointers so that it remains valid even when the table resizes. The 0th index of
 the array is sacrificed for some coding simplicity and falsey 0. */
 struct ccc_homap
 {
-    /** @private Buffer wrapping user provided memory. */
-    ccc_buffer buf;
+    /** @private The contiguous array of user data. */
+    void *data;
+    /** @private The contiguous array of WAVL tree meta data. */
+    struct ccc_homap_elem *nodes;
+    /** @private The current capacity. */
+    size_t capacity;
+    /** @private The current size. */
+    size_t count;
     /** @private The root node of the Splay Tree. */
     size_t root;
     /** @private The start of the free singly linked list. */
     size_t free_list;
+    /** @private The size of the type stored in the map. */
+    size_t sizeof_type;
     /** @private Where user key can be found in type. */
     size_t key_offset;
-    /** @private Where intrusive elem is found in type. */
-    size_t node_elem_offset;
     /** @private The provided key comparison function. */
     ccc_any_key_cmp_fn *cmp;
+    /** @private The provided allocation function, if any. */
+    ccc_any_alloc_fn *alloc;
+    /** @private The provided auxiliary data, if any. */
+    void *aux;
 };
 
 /** @private A handle is like an entry but if the handle is Occupied, we can
@@ -71,10 +80,12 @@ struct ccc_htree_handle
 {
     /** @private Map associated with this handle. */
     struct ccc_homap *hom;
+    /** @private Current index of the handle. */
+    size_t i;
     /** @private Saves last comparison direction. */
     ccc_threeway_cmp last_cmp;
-    /** @private Index and a status. */
-    struct ccc_handl handle;
+    /** @private The entry status flag. */
+    ccc_entry_status stats;
 };
 
 /** @private Enable return by compound literal reference on the stack. Think
@@ -94,6 +105,8 @@ void ccc_impl_hom_insert(struct ccc_homap *hom, size_t elem_i);
 struct ccc_htree_handle ccc_impl_hom_handle(struct ccc_homap *hom,
                                             void const *key);
 /** @private */
+void *ccc_impl_hrm_data_at(struct ccc_homap const *hom, size_t slot);
+/** @private */
 void *ccc_impl_hom_key_at(struct ccc_homap const *hom, size_t slot);
 /** @private */
 struct ccc_homap_elem *ccc_impl_homap_elem_at(struct ccc_homap const *hom,
@@ -103,19 +116,41 @@ size_t ccc_impl_hom_alloc_slot(struct ccc_homap *hom);
 
 /*========================     Initialization       =========================*/
 
+/** @private The user can declare a fixed size realtime ordered map with the
+help of static asserts to ensure the layout is compatible with our internal
+metadata. */
+#define ccc_impl_hom_declare_fixed_map(impl_fixed_map_type_name,               \
+                                       impl_key_val_type_name, impl_capacity)  \
+    static_assert((impl_capacity) > 1,                                         \
+                  "fixed size map must have capacity greater than 1");         \
+    typedef struct                                                             \
+    {                                                                          \
+        impl_key_val_type_name data[(impl_capacity)];                          \
+        struct ccc_hromap_elem nodes[(impl_capacity)];                         \
+    }(impl_fixed_map_type_name)
+
+/** @private Taking the size of the array actually works here because the field
+is of a known fixed size defined at compile time, not just a pointer. */
+#define ccc_impl_hom_fixed_capacity(fixed_map_type_name)                       \
+    (sizeof((fixed_map_type_name){}.nodes) / sizeof(struct ccc_hromap_elem))
+
 /** @private */
 #define ccc_impl_hom_init(impl_mem_ptr, impl_node_elem_field,                  \
                           impl_key_elem_field, impl_key_cmp_fn, impl_alloc_fn, \
                           impl_aux_data, impl_capacity)                        \
     {                                                                          \
-        .buf = ccc_buf_init(impl_mem_ptr, impl_alloc_fn, impl_aux_data,        \
-                            impl_capacity),                                    \
+        .data = (impl_memory_ptr),                                             \
+        .nodes = NULL,                                                         \
+        .parity = NULL,                                                        \
+        .capacity = (impl_capacity),                                           \
+        .count = 0,                                                            \
         .root = 0,                                                             \
         .free_list = 0,                                                        \
-        .key_offset = offsetof(typeof(*(impl_mem_ptr)), impl_key_elem_field),  \
-        .node_elem_offset                                                      \
-        = offsetof(typeof(*(impl_mem_ptr)), impl_node_elem_field),             \
+        .sizeof_type = sizeof(impl_type_name),                                 \
+        .key_offset = offsetof(impl_type_name, impl_key_elem_field),           \
         .cmp = (impl_key_cmp_fn),                                              \
+        .alloc = (impl_alloc_fn),                                              \
+        .aux = (impl_aux_data),                                                \
     }
 
 /** @private */

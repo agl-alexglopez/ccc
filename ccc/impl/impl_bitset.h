@@ -46,8 +46,7 @@ struct ccc_bitset
 enum : size_t
 {
     /** @private The number of bits in a bit block. In sync with set type. */
-    CCC_IMPL_BS_BLOCK_BITS
-        = (sizeof(typeof(*(struct ccc_bitset){}.blocks)) * CHAR_BIT),
+    CCC_IMPL_BS_BLOCK_BITS = (sizeof(*(struct ccc_bitset){}.blocks) * CHAR_BIT),
 };
 
 /** @private Returns the number of blocks needed to support a given capacity
@@ -57,7 +56,7 @@ of bits. Assumes the given capacity is greater than 0. Classic div round up. */
 
 /** @private Returns the number of bytes needed for the required blocks. */
 #define ccc_impl_bs_block_bytes(impl_bit_cap)                                  \
-    (sizeof(typeof(*(struct ccc_bitset){}.blocks)) * (impl_bit_cap))
+    (sizeof(*(struct ccc_bitset){}.blocks) * (impl_bit_cap))
 
 /** @private Allocates a compound literal bit block array in the scope at which
 the macro is used. However, the optional parameter supports storage duration
