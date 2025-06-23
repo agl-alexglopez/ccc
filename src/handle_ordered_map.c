@@ -30,7 +30,6 @@ constant time queries for frequently accessed elements. */
 #include <stddef.h>
 #include <string.h>
 
-#include "buffer.h"
 #include "handle_ordered_map.h"
 #include "impl/impl_handle_ordered_map.h"
 #include "impl/impl_types.h"
@@ -64,29 +63,32 @@ enum
 /* Returning the internal elem type with stored offsets. */
 static size_t splay(struct ccc_homap *t, size_t root, void const *key,
                     ccc_any_key_cmp_fn *cmp_fn);
-static struct ccc_homap_elem *at(struct ccc_homap const *, size_t);
-static struct ccc_homap_elem *elem_in_slot(struct ccc_homap const *t,
-                                           void const *slot);
+static struct ccc_homap_elem *node_at(struct ccc_homap const *, size_t);
+static void *data_at(struct ccc_homap const *, size_t);
 /* Returning the user struct type with stored offsets. */
 static struct ccc_htree_handle handle(struct ccc_homap *hom, void const *key);
 static size_t erase(struct ccc_homap *t, void const *key);
-static size_t maybe_alloc_insert(struct ccc_homap *hom,
-                                 struct ccc_homap_elem *elem);
+static size_t maybe_alloc_insert(struct ccc_homap *hom, void const *user_type);
+static ccc_result resize(struct ccc_homap *hom, size_t new_capacity,
+                         ccc_any_alloc_fn *fn);
+static void copy_soa(struct ccc_homap const *src, void *dst_data_base,
+                     size_t dst_capacity);
+static size_t data_bytes(size_t sizeof_type, size_t capacity);
+static size_t node_bytes(size_t capacity);
+static struct ccc_homap_elem *node_pos(size_t sizeof_type, void const *data,
+                                       size_t capacity);
 static size_t find(struct ccc_homap *, void const *key);
 static size_t connect_new_root(struct ccc_homap *t, size_t new_root,
                                ccc_threeway_cmp cmp_result);
-static void *struct_base(struct ccc_homap const *,
-                         struct ccc_homap_elem const *);
 static void insert(struct ccc_homap *t, size_t n);
-static void *base_at(struct ccc_homap const *, size_t);
+static void *key_in_slot(struct ccc_homap const *t, void const *user_struct);
 static size_t alloc_slot(struct ccc_homap *t);
+static size_t total_bytes(size_t sizeof_type, size_t capacity);
 static struct ccc_range_u equal_range(struct ccc_homap *t,
                                       void const *begin_key,
                                       void const *end_key,
                                       enum hom_branch traversal);
 /* Returning the user key with stored offsets. */
-static void *key_from_node(struct ccc_homap const *t,
-                           struct ccc_homap_elem const *);
 static void *key_at(struct ccc_homap const *t, size_t i);
 /* Returning threeway comparison with user callback. */
 static ccc_threeway_cmp cmp_elems(struct ccc_homap const *hom, void const *key,
@@ -100,8 +102,7 @@ static size_t next(struct ccc_homap const *t, size_t n,
 static size_t branch_i(struct ccc_homap const *t, size_t parent,
                        enum hom_branch dir);
 static size_t parent_i(struct ccc_homap const *t, size_t child);
-static size_t index_of(struct ccc_homap const *t,
-                       struct ccc_homap_elem const *elem);
+static size_t index_of(struct ccc_homap const *t, void const *key_val_type);
 /* Returning references to index fields for tree nodes. */
 static size_t *branch_ref(struct ccc_homap const *t, size_t node,
                           enum hom_branch branch);
@@ -125,7 +126,7 @@ ccc_hom_at(ccc_handle_ordered_map const *const h, ccc_handle_i const i)
     {
         return NULL;
     }
-    return ccc_buf_at(&h->buf, i);
+    return data_at(h, i);
 }
 
 ccc_tribool
@@ -154,31 +155,29 @@ ccc_hom_handle(ccc_handle_ordered_map *const hom, void const *const key)
 {
     if (!hom || !key)
     {
-        return (ccc_homap_handle){{.handle = {.stats = CCC_ENTRY_ARG_ERROR}}};
+        return (ccc_homap_handle){{.stats = CCC_ENTRY_ARG_ERROR}};
     }
     return (ccc_homap_handle){handle(hom, key)};
 }
 
 ccc_handle_i
 ccc_hom_insert_handle(ccc_homap_handle const *const h,
-                      ccc_homap_elem *const elem)
+                      void const *const key_val_type)
 {
-    if (!h || !elem)
+    if (!h || !key_val_type)
     {
         return 0;
     }
-    if (h->impl.handle.stats == CCC_ENTRY_OCCUPIED)
+    if (h->impl.stats == CCC_ENTRY_OCCUPIED)
     {
-        *elem = *at(h->impl.hom, h->impl.handle.i);
-        void *const ret = base_at(h->impl.hom, h->impl.handle.i);
-        void const *const e_base = struct_base(h->impl.hom, elem);
-        if (e_base != ret)
+        void *const ret = data_at(h->impl.hom, h->impl.i);
+        if (key_val_type != ret)
         {
-            memcpy(ret, e_base, h->impl.hom->buf.sizeof_type);
+            memcpy(ret, key_val_type, h->impl.hom->sizeof_type);
         }
-        return h->impl.handle.i;
+        return h->impl.i;
     }
-    return maybe_alloc_insert(h->impl.hom, elem);
+    return maybe_alloc_insert(h->impl.hom, key_val_type);
 }
 
 ccc_homap_handle *
@@ -188,10 +187,10 @@ ccc_hom_and_modify(ccc_homap_handle *const h, ccc_any_type_update_fn *const fn)
     {
         return NULL;
     }
-    if (fn && h->impl.handle.stats & CCC_ENTRY_OCCUPIED)
+    if (fn && h->impl.stats & CCC_ENTRY_OCCUPIED)
     {
         fn((ccc_any_type){
-            .any_type = base_at(h->impl.hom, h->impl.handle.i),
+            .any_type = data_at(h->impl.hom, h->impl.i),
             .aux = NULL,
         });
     }
@@ -206,10 +205,10 @@ ccc_hom_and_modify_aux(ccc_homap_handle *const h,
     {
         return NULL;
     }
-    if (fn && h->impl.handle.stats & CCC_ENTRY_OCCUPIED)
+    if (fn && h->impl.stats & CCC_ENTRY_OCCUPIED)
     {
         fn((ccc_any_type){
-            .any_type = base_at(h->impl.hom, h->impl.handle.i),
+            .any_type = data_at(h->impl.hom, h->impl.i),
             .aux = aux,
         });
     }
@@ -217,42 +216,41 @@ ccc_hom_and_modify_aux(ccc_homap_handle *const h,
 }
 
 ccc_handle_i
-ccc_hom_or_insert(ccc_homap_handle const *const h, ccc_homap_elem *const elem)
+ccc_hom_or_insert(ccc_homap_handle const *const h,
+                  void const *const key_val_type)
 {
-    if (!h || !elem)
+    if (!h || !key_val_type)
     {
         return 0;
     }
-    if (h->impl.handle.stats & CCC_ENTRY_OCCUPIED)
+    if (h->impl.stats & CCC_ENTRY_OCCUPIED)
     {
-        return h->impl.handle.i;
+        return h->impl.i;
     }
-    return maybe_alloc_insert(h->impl.hom, elem);
+    return maybe_alloc_insert(h->impl.hom, key_val_type);
 }
 
 ccc_handle
 ccc_hom_swap_handle(ccc_handle_ordered_map *const hom,
-                    ccc_homap_elem *const out_handle)
+                    void *const key_val_output)
 {
-    if (!hom || !out_handle)
+    if (!hom || !key_val_output)
     {
         return (ccc_handle){{.stats = CCC_ENTRY_ARG_ERROR}};
     }
-    size_t const found = find(hom, key_from_node(hom, out_handle));
+    size_t const found = find(hom, key_in_slot(hom, key_val_output));
     if (found)
     {
         assert(hom->root);
-        *out_handle = *at(hom, hom->root);
-        void *const any_struct = struct_base(hom, out_handle);
-        void *const ret = base_at(hom, hom->root);
-        void *const tmp = ccc_buf_at(&hom->buf, 0);
-        swap(tmp, any_struct, ret, hom->buf.sizeof_type);
+        void *const ret = data_at(hom, hom->root);
+        void *const tmp = data_at(hom, 0);
+        swap(tmp, key_val_output, ret, hom->sizeof_type);
         return (ccc_handle){{
             .i = found,
             .stats = CCC_ENTRY_OCCUPIED,
         }};
     }
-    size_t const inserted = maybe_alloc_insert(hom, out_handle);
+    size_t const inserted = maybe_alloc_insert(hom, key_val_output);
     if (!inserted)
     {
         return (ccc_handle){{
@@ -268,13 +266,13 @@ ccc_hom_swap_handle(ccc_handle_ordered_map *const hom,
 
 ccc_handle
 ccc_hom_try_insert(ccc_handle_ordered_map *const hom,
-                   ccc_homap_elem *const key_val_handle)
+                   void const *const key_val_type)
 {
-    if (!hom || !key_val_handle)
+    if (!hom || !key_val_type)
     {
         return (ccc_handle){{.stats = CCC_ENTRY_ARG_ERROR}};
     }
-    size_t const found = find(hom, key_from_node(hom, key_val_handle));
+    size_t const found = find(hom, key_in_slot(hom, key_val_type));
     if (found)
     {
         assert(hom->root);
@@ -283,7 +281,7 @@ ccc_hom_try_insert(ccc_handle_ordered_map *const hom,
             .stats = CCC_ENTRY_OCCUPIED,
         }};
     }
-    size_t const inserted = maybe_alloc_insert(hom, key_val_handle);
+    size_t const inserted = maybe_alloc_insert(hom, key_val_type);
     if (!inserted)
     {
         return (ccc_handle){{
@@ -299,29 +297,27 @@ ccc_hom_try_insert(ccc_handle_ordered_map *const hom,
 
 ccc_handle
 ccc_hom_insert_or_assign(ccc_handle_ordered_map *const hom,
-                         ccc_homap_elem *const key_val_handle)
+                         void const *const key_val_type)
 {
-    if (!hom || !key_val_handle)
+    if (!hom || !key_val_type)
     {
         return (ccc_handle){{.stats = CCC_ENTRY_ARG_ERROR}};
     }
-    size_t const found = find(hom, key_from_node(hom, key_val_handle));
+    size_t const found = find(hom, key_in_slot(hom, key_val_type));
     if (found)
     {
-        *key_val_handle = *at(hom, found);
         assert(hom->root);
-        void const *const e_base = struct_base(hom, key_val_handle);
-        void *const f_base = ccc_buf_at(&hom->buf, found);
-        if (e_base != f_base)
+        void *const f_base = data_at(hom, found);
+        if (key_val_type != f_base)
         {
-            memcpy(f_base, e_base, hom->buf.sizeof_type);
+            memcpy(f_base, key_val_type, hom->sizeof_type);
         }
         return (ccc_handle){{
             .i = found,
             .stats = CCC_ENTRY_OCCUPIED,
         }};
     }
-    size_t const inserted = maybe_alloc_insert(hom, key_val_handle);
+    size_t const inserted = maybe_alloc_insert(hom, key_val_type);
     if (!inserted)
     {
         return (ccc_handle){{
@@ -336,14 +332,13 @@ ccc_hom_insert_or_assign(ccc_handle_ordered_map *const hom,
 }
 
 ccc_handle
-ccc_hom_remove(ccc_handle_ordered_map *const hom,
-               ccc_homap_elem *const out_handle)
+ccc_hom_remove(ccc_handle_ordered_map *const hom, void *const key_val_output)
 {
-    if (!hom || !out_handle)
+    if (!hom || !key_val_output)
     {
         return (ccc_handle){{.stats = CCC_ENTRY_ARG_ERROR}};
     }
-    size_t const n = erase(hom, key_from_node(hom, out_handle));
+    size_t const n = erase(hom, key_in_slot(hom, key_val_output));
     if (!n)
     {
         return (ccc_handle){{
@@ -364,10 +359,10 @@ ccc_hom_remove_handle(ccc_homap_handle *const h)
     {
         return (ccc_handle){{.stats = CCC_ENTRY_ARG_ERROR}};
     }
-    if (h->impl.handle.stats == CCC_ENTRY_OCCUPIED)
+    if (h->impl.stats == CCC_ENTRY_OCCUPIED)
     {
         size_t const erased
-            = erase(h->impl.hom, key_at(h->impl.hom, h->impl.handle.i));
+            = erase(h->impl.hom, key_at(h->impl.hom, h->impl.i));
         assert(erased);
         return (ccc_handle){{
             .i = erased,
@@ -387,7 +382,7 @@ ccc_hom_unwrap(ccc_homap_handle const *const h)
     {
         return 0;
     }
-    return h->impl.handle.stats == CCC_ENTRY_OCCUPIED ? h->impl.handle.i : 0;
+    return h->impl.stats == CCC_ENTRY_OCCUPIED ? h->impl.i : 0;
 }
 
 ccc_tribool
@@ -397,7 +392,7 @@ ccc_hom_insert_error(ccc_homap_handle const *const h)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    return (h->impl.handle.stats & CCC_ENTRY_INSERT_ERROR) != 0;
+    return (h->impl.stats & CCC_ENTRY_INSERT_ERROR) != 0;
 }
 
 ccc_tribool
@@ -407,13 +402,13 @@ ccc_hom_occupied(ccc_homap_handle const *const h)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    return (h->impl.handle.stats & CCC_ENTRY_OCCUPIED) != 0;
+    return (h->impl.stats & CCC_ENTRY_OCCUPIED) != 0;
 }
 
 ccc_handle_status
 ccc_hom_handle_status(ccc_homap_handle const *const h)
 {
-    return h ? h->impl.handle.stats : CCC_ENTRY_ARG_ERROR;
+    return h ? h->impl.stats : CCC_ENTRY_ARG_ERROR;
 }
 
 ccc_tribool
@@ -433,14 +428,7 @@ ccc_hom_size(ccc_handle_ordered_map const *const hom)
     {
         return (ccc_ucount){.error = CCC_RESULT_ARG_ERROR};
     }
-    ccc_ucount count = ccc_buf_size(&hom->buf);
-    if (count.error || !count.count)
-    {
-        return count;
-    }
-    /* The root is occupied at slot 0 but don't tell the user that. */
-    --count.count;
-    return count;
+    return (ccc_ucount){.count = hom->count};
 }
 
 ccc_ucount
@@ -450,79 +438,77 @@ ccc_hom_capacity(ccc_handle_ordered_map const *const hom)
     {
         return (ccc_ucount){.error = CCC_RESULT_ARG_ERROR};
     }
-    return ccc_buf_capacity(&hom->buf);
+    return (ccc_ucount){.count = hom->capacity};
 }
 
 void *
 ccc_hom_begin(ccc_handle_ordered_map const *const hom)
 {
-    if (!hom || ccc_buf_is_empty(&hom->buf))
+    if (!hom || !hom->count)
     {
         return NULL;
     }
     size_t const n = min_max_from(hom, hom->root, L);
-    return base_at(hom, n);
+    return data_at(hom, n);
 }
 
 void *
 ccc_hom_rbegin(ccc_handle_ordered_map const *const hom)
 {
-    if (!hom || ccc_buf_is_empty(&hom->buf))
+    if (!hom || !hom->count)
     {
         return NULL;
     }
     size_t const n = min_max_from(hom, hom->root, R);
-    return base_at(hom, n);
+    return data_at(hom, n);
 }
 
 void *
-ccc_hom_next(ccc_handle_ordered_map const *const hom,
-             ccc_homap_elem const *const e)
+ccc_hom_next(ccc_handle_ordered_map const *const hom, void const *const e)
 {
-    if (!hom || ccc_buf_is_empty(&hom->buf))
+    if (!hom || !hom->count)
     {
         return NULL;
     }
     size_t const n = next(hom, index_of(hom, e), INORDER);
-    return base_at(hom, n);
+    return data_at(hom, n);
 }
 
 void *
-ccc_hom_rnext(ccc_handle_ordered_map const *const hom,
-              ccc_homap_elem const *const e)
+ccc_hom_rnext(ccc_handle_ordered_map const *const hom, void const *const e)
 {
-    if (!hom || !e || ccc_buf_is_empty(&hom->buf))
+    if (!hom || !e || !hom->count)
     {
         return NULL;
     }
     size_t const n = next(hom, index_of(hom, e), R_INORDER);
-    return base_at(hom, n);
+    return data_at(hom, n);
 }
 
 void *
 ccc_hom_end(ccc_handle_ordered_map const *const hom)
 {
-    if (!hom || ccc_buf_is_empty(&hom->buf))
+    if (!hom || !hom->count)
     {
         return NULL;
     }
-    return base_at(hom, 0);
+    return data_at(hom, 0);
 }
 
 void *
 ccc_hom_rend(ccc_handle_ordered_map const *const hom)
 {
-    if (!hom || ccc_buf_is_empty(&hom->buf))
+    if (!hom || !hom->count)
     {
         return NULL;
     }
-    return base_at(hom, 0);
+    return data_at(hom, 0);
 }
 
 void *
 ccc_hom_data(ccc_handle_ordered_map const *const hom)
 {
-    return hom ? ccc_buf_begin(&hom->buf) : NULL;
+    return hom ? hom->data : NULL;
 }
 
 ccc_range
@@ -557,29 +543,29 @@ ccc_hom_reserve(ccc_handle_ordered_map *const hom, size_t const to_add,
         return CCC_RESULT_ARG_ERROR;
     }
     /* Once initialized the buffer always has a size of one for root node. */
-    size_t const needed = hom->buf.count + to_add + (hom->buf.count == 0);
-    if (needed <= hom->buf.capacity)
+    size_t const needed = hom->count + to_add + (hom->count == 0);
+    if (needed <= hom->capacity)
     {
         return CCC_RESULT_OK;
     }
-    size_t const old_count = hom->buf.count;
-    size_t old_cap = hom->buf.capacity;
-    ccc_result const res = ccc_buf_alloc(&hom->buf, needed, fn);
-    if (res != CCC_RESULT_OK)
+    size_t const old_count = hom->count;
+    size_t old_cap = hom->capacity;
+    ccc_result const r = resize(hom, needed, fn);
+    if (r != CCC_RESULT_OK)
     {
-        return res;
+        return r;
     }
-    if (!old_cap && ccc_buf_size_set(&hom->buf, 1) != CCC_RESULT_OK)
+    if (!old_cap)
     {
-        return CCC_RESULT_FAIL;
+        hom->count = 1;
     }
     old_cap = old_count ? old_cap : 0;
-    size_t const new_cap = hom->buf.capacity;
+    size_t const new_cap = hom->capacity;
     size_t prev = 0;
     for (ptrdiff_t i = (ptrdiff_t)new_cap - 1; i > 0 && i >= (ptrdiff_t)old_cap;
          prev = i, --i)
     {
-        at(hom, i)->next_free = prev;
+        node_at(hom, i)->next_free = prev;
     }
     if (!hom->free_list)
     {
@@ -593,41 +579,41 @@ ccc_hom_copy(ccc_handle_ordered_map *const dst,
              ccc_handle_ordered_map const *const src,
              ccc_any_alloc_fn *const fn)
 {
-    if (!dst || !src || src == dst
-        || (dst->buf.capacity < src->buf.capacity && !fn))
+    if (!dst || !src || src == dst || (dst->capacity < src->capacity && !fn))
     {
         return CCC_RESULT_ARG_ERROR;
     }
-    /* Copy everything so we don't worry about staying in sync with future
-       changes to buf container. But we have to give back original destination
-       memory in case it has already been allocated. Alloc will remain the
-       same as in dst initialization because that controls permission. */
-    void *const dst_mem = dst->buf.mem;
-    size_t const dst_cap = dst->buf.capacity;
-    ccc_any_alloc_fn *const dst_alloc = dst->buf.alloc;
+    void *const dst_mem = dst->data;
+    struct ccc_homap_elem *const dst_nodes = dst->nodes;
+    size_t const dst_cap = dst->capacity;
+    ccc_any_alloc_fn *const dst_alloc = dst->alloc;
     *dst = *src;
-    dst->buf.mem = dst_mem;
-    dst->buf.capacity = dst_cap;
-    dst->buf.alloc = dst_alloc;
-    if (!src->buf.capacity)
+    dst->data = dst_mem;
+    dst->nodes = dst_nodes;
+    dst->capacity = dst_cap;
+    dst->alloc = dst_alloc;
+    if (!src->capacity)
     {
         return CCC_RESULT_OK;
     }
-    if (dst->buf.capacity < src->buf.capacity)
+    if (dst->capacity < src->capacity)
     {
-        ccc_result resize_res = ccc_buf_alloc(&dst->buf, src->buf.capacity, fn);
-        if (resize_res != CCC_RESULT_OK)
+        ccc_result const r = resize(dst, src->capacity, fn);
+        if (r != CCC_RESULT_OK)
         {
-            return resize_res;
+            return r;
         }
-        dst->buf.capacity = src->buf.capacity;
     }
-    if (!dst->buf.mem || !src->buf.mem)
+    else
+    {
+        /* Might not be necessary but not worth finding out. Do every time. */
+        dst->nodes = node_pos(dst->sizeof_type, dst->data, dst->capacity);
+    }
+    if (!dst->data || !src->data)
     {
         return CCC_RESULT_ARG_ERROR;
     }
-    (void)memcpy(dst->buf.mem, src->buf.mem,
-                 src->buf.capacity * src->buf.sizeof_type);
+    copy_soa(src, dst->data, dst->capacity);
     return CCC_RESULT_OK;
 }
 
@@ -641,8 +627,8 @@ ccc_hom_clear(ccc_handle_ordered_map *const hom,
     }
     if (!fn)
     {
-        (void)ccc_buf_size_set(&hom->buf, 1);
         hom->root = 0;
+        hom->count = 1;
         return CCC_RESULT_OK;
     }
     while (!ccc_hom_is_empty(hom))
@@ -650,11 +636,11 @@ ccc_hom_clear(ccc_handle_ordered_map *const hom,
         size_t const i = remove_from_tree(hom, hom->root);
         assert(i);
         fn((ccc_any_type){
-            .any_type = ccc_buf_at(&hom->buf, i),
-            .aux = hom->buf.aux,
+            .any_type = data_at(hom, i),
+            .aux = hom->aux,
         });
     }
-    (void)ccc_buf_size_set(&hom->buf, 1);
+    hom->count = 1;
     hom->root = 0;
     return CCC_RESULT_OK;
 }
@@ -670,17 +656,24 @@ ccc_hom_clear_and_free(ccc_handle_ordered_map *const hom,
     if (!fn)
     {
         hom->root = 0;
-        return ccc_buf_alloc(&hom->buf, 0, hom->buf.alloc);
+        hom->count = 0;
+        hom->capacity = 0;
+        (void)hom->alloc(hom->data, 0, hom->aux);
+        return CCC_RESULT_OK;
     }
     while (!ccc_hom_is_empty(hom))
     {
         size_t const i = remove_from_tree(hom, hom->root);
         assert(i);
-        fn((ccc_any_type){.any_type = ccc_buf_at(&hom->buf, i),
-                          .aux = hom->buf.aux});
+        fn((ccc_any_type){
+            .any_type = data_at(hom, i),
+            .aux = hom->aux,
+        });
     }
     hom->root = 0;
-    return ccc_buf_alloc(&hom->buf, 0, hom->buf.alloc);
+    hom->capacity = 0;
+    (void)hom->alloc(hom->data, 0, hom->aux);
+    return CCC_RESULT_OK;
 }
 
 ccc_result
@@ -695,19 +688,24 @@ ccc_hom_clear_and_free_reserve(ccc_handle_ordered_map *const hom,
     if (!destructor)
     {
         hom->root = 0;
-        return ccc_buf_alloc(&hom->buf, 0, alloc);
+        hom->count = 0;
+        hom->capacity = 0;
+        (void)alloc(hom->data, 0, hom->aux);
+        return CCC_RESULT_OK;
     }
     while (!ccc_hom_is_empty(hom))
     {
         size_t const i = remove_from_tree(hom, hom->root);
         assert(i);
         destructor((ccc_any_type){
-            .any_type = ccc_buf_at(&hom->buf, i),
-            .aux = hom->buf.aux,
+            .any_type = data_at(hom, i),
+            .aux = hom->aux,
         });
     }
     hom->root = 0;
-    return ccc_buf_alloc(&hom->buf, 0, alloc);
+    hom->capacity = 0;
+    (void)alloc(hom->data, 0, hom->aux);
+    return CCC_RESULT_OK;
 }
 
 ccc_tribool
@@ -740,10 +738,16 @@ ccc_impl_hom_key_at(struct ccc_homap const *const hom, size_t const slot)
     return key_at(hom, slot);
 }
 
+void *
+ccc_impl_hrm_data_at(struct ccc_homap const *const hom, size_t const slot)
+{
+    return data_at(hom, slot);
+}
+
 struct ccc_homap_elem *
 ccc_impl_homap_elem_at(struct ccc_homap const *const hom, size_t const slot)
 {
-    return at(hom, slot);
+    return node_at(hom, slot);
 }
 
 size_t
@@ -779,8 +783,8 @@ equal_range(struct ccc_homap *const t, void const *const begin_key,
         e = next(t, e, traversal);
     }
     return (struct ccc_range_u){
-        .begin = base_at(t, b),
-        .end = base_at(t, e),
+        .begin = data_at(t, b),
+        .end = data_at(t, e),
     };
 }
 
@@ -792,18 +796,19 @@ handle(struct ccc_homap *const hom, void const *const key)
     {
         return (struct ccc_htree_handle){
             .hom = hom,
-            .handle = {.i = found, .stats = CCC_ENTRY_OCCUPIED},
+            .i = found,
+            .stats = CCC_ENTRY_OCCUPIED,
         };
     }
     return (struct ccc_htree_handle){
         .hom = hom,
-        .handle = {.i = 0, .stats = CCC_ENTRY_VACANT},
+        .i = 0,
+        .stats = CCC_ENTRY_VACANT,
     };
 }
 
 static size_t
-maybe_alloc_insert(struct ccc_homap *const hom,
-                   struct ccc_homap_elem *const elem)
+maybe_alloc_insert(struct ccc_homap *const hom, void const *const user_type)
 {
     /* The end sentinel node will always be at 0. This also means once
        initialized the internal size for implementer is always at least 1. */
@@ -812,22 +817,89 @@ maybe_alloc_insert(struct ccc_homap *const hom,
     {
         return 0;
     }
-    (void)ccc_buf_write(&hom->buf, node, struct_base(hom, elem));
+    (void)memcpy(data_at(hom, node), user_type, hom->sizeof_type);
     insert(hom, node);
     return node;
+}
+
+static size_t
+alloc_slot(struct ccc_homap *const t)
+{
+    /* The end sentinel node will always be at 0. This also means once
+       initialized the internal size for implementer is always at least 1. */
+    size_t const old_count = t->count;
+    size_t old_cap = t->capacity;
+    if (!old_count || old_count == old_cap)
+    {
+        assert(!t->free_list);
+        if (old_count == old_cap)
+        {
+            if (resize(t, max(old_cap * 2, 8), t->alloc) != CCC_RESULT_OK)
+            {
+                return 0;
+            }
+        }
+        else
+        {
+            t->nodes = node_pos(t->sizeof_type, t->data, t->capacity);
+        }
+        old_cap = old_count ? old_cap : 0;
+        size_t const new_cap = t->capacity;
+        size_t prev = 0;
+        for (size_t i = new_cap - 1; i > 0 && i >= old_cap; prev = i, --i)
+        {
+            node_at(t, i)->next_free = prev;
+        }
+        t->free_list = prev;
+        t->count = max(old_count, 1);
+    }
+    if (!t->free_list)
+    {
+        return 0;
+    }
+    ++t->count;
+    size_t const slot = t->free_list;
+    t->free_list = node_at(t, slot)->next_free;
+    return slot;
+}
+
+static ccc_result
+resize(struct ccc_homap *const hom, size_t const new_capacity,
+       ccc_any_alloc_fn *const fn)
+{
+    if (hom->capacity && new_capacity <= hom->capacity - 1)
+    {
+        return CCC_RESULT_OK;
+    }
+    if (!fn)
+    {
+        return CCC_RESULT_NO_ALLOC;
+    }
+    void *const new_data
+        = fn(NULL, total_bytes(hom->sizeof_type, new_capacity), hom->aux);
+    if (!new_data)
+    {
+        return CCC_RESULT_MEM_ERROR;
+    }
+    copy_soa(hom, new_data, new_capacity);
+    hom->nodes = node_pos(hom->sizeof_type, new_data, new_capacity);
+    fn(hom->data, 0, hom->aux);
+    hom->data = new_data;
+    hom->capacity = new_capacity;
+    return CCC_RESULT_OK;
 }
 
 static void
 insert(struct ccc_homap *const t, size_t const n)
 {
-    struct ccc_homap_elem *const node = at(t, n);
+    struct ccc_homap_elem *const node = node_at(t, n);
     init_node(node);
-    if (t->buf.count == EMPTY_TREE)
+    if (t->count == EMPTY_TREE)
     {
         t->root = n;
         return;
     }
-    void const *const key = key_from_node(t, node);
+    void const *const key = key_in_slot(t, node);
     t->root = splay(t, t->root, key, t->cmp);
     ccc_threeway_cmp const root_cmp = cmp_elems(t, key, t->root, t->cmp);
     if (CCC_EQL == root_cmp)
@@ -864,14 +936,13 @@ remove_from_tree(struct ccc_homap *const t, size_t const ret)
     }
     else
     {
-        t->root = splay(t, branch_i(t, ret, L), key_from_node(t, at(t, ret)),
+        t->root = splay(t, branch_i(t, ret, L), key_in_slot(t, node_at(t, ret)),
                         t->cmp);
         link(t, t->root, R, branch_i(t, ret, R));
     }
-    at(t, ret)->next_free = t->free_list;
+    node_at(t, ret)->next_free = t->free_list;
     t->free_list = ret;
-    [[maybe_unused]] ccc_result const r = ccc_buf_size_minus(&t->buf, 1);
-    assert(r == CCC_RESULT_OK);
+    --t->count;
     return ret;
 }
 
@@ -907,7 +978,7 @@ splay(struct ccc_homap *const t, size_t root, void const *const key,
     /* Pointers in an array and we can use the symmetric enum and flip it to
        choose the Left or Right subtree. Another benefit of our nil node: use it
        as our helper tree because we don't need its Left Right fields. */
-    struct ccc_homap_elem *const nil = at(t, 0);
+    struct ccc_homap_elem *const nil = node_at(t, 0);
     nil->branch[L] = nil->branch[R] = nil->parent = 0;
     size_t l_r_subtrees[LR] = {0, 0};
     do
@@ -1001,48 +1072,9 @@ cmp_elems(struct ccc_homap const *const hom, void const *const key,
 {
     return fn((ccc_any_key_cmp){
         .any_key_lhs = key,
-        .any_type_rhs = base_at(hom, node),
-        .aux = hom->buf.aux,
+        .any_type_rhs = data_at(hom, node),
+        .aux = hom->aux,
     });
-}
-
-static size_t
-alloc_slot(struct ccc_homap *const t)
-{
-    /* The end sentinel node will always be at 0. This also means once
-       initialized the internal size for implementer is always at least 1. */
-    size_t const old_count = t->buf.count;
-    size_t old_cap = t->buf.capacity;
-    if (!old_count || old_count == old_cap)
-    {
-        assert(!t->free_list);
-        if (old_count == old_cap
-            && ccc_buf_alloc(&t->buf, old_cap ? old_cap * 2 : 8, t->buf.alloc)
-                   != CCC_RESULT_OK)
-        {
-            return 0;
-        }
-        old_cap = old_count ? old_cap : 0;
-        size_t const new_cap = t->buf.capacity;
-        size_t prev = 0;
-        for (ptrdiff_t i = (ptrdiff_t)new_cap - 1;
-             i > 0 && i >= (ptrdiff_t)old_cap; prev = i, --i)
-        {
-            at(t, i)->next_free = prev;
-        }
-        t->free_list = prev;
-        if (ccc_buf_size_set(&t->buf, max(old_count, 1)) != CCC_RESULT_OK)
-        {
-            return 0;
-        }
-    }
-    if (!t->free_list || ccc_buf_size_plus(&t->buf, 1) != CCC_RESULT_OK)
-    {
-        return 0;
-    }
-    size_t const slot = t->free_list;
-    t->free_list = at(t, slot)->next_free;
-    return slot;
 }
 
 static inline void
@@ -1050,6 +1082,77 @@ init_node(struct ccc_homap_elem *const e)
 {
     assert(e != NULL);
     e->branch[L] = e->branch[R] = e->parent = 0;
+}
+
+/** Calculates the number of bytes needed for user data INCLUDING any bytes we
+need to add to the end of the array such that the following nodes array starts
+on an aligned byte boundary given the alignment requirements of a node. This
+means the value returned from this function may or may not be slightly larger
+then the raw size of just user elements if rounding up must occur. */
+static inline size_t
+data_bytes(size_t const sizeof_type, size_t const capacity)
+{
+    return ((sizeof_type * capacity) + alignof(*(struct ccc_homap){}.nodes) - 1)
+         & ~(alignof(*(struct ccc_homap){}.nodes) - 1);
+}
+
+/** Calculates the number of bytes needed for the nodes array without any
+consideration for end padding as no arrays follow. */
+static inline size_t
+node_bytes(size_t const capacity)
+{
+    return sizeof(*(struct ccc_homap){}.nodes) * capacity;
+}
+
+/** Calculates the number of bytes needed for all arrays in the Struct of Arrays
+map design INCLUDING any extra padding bytes that need to be added between the
+data and node arrays and the node and parity arrays. Padding might be needed if
+the alignment of the type in next array that follows a preceding array is
+different from the preceding array. In that case it is the preceding array's
+responsibility to add padding bytes to its end such that the next array begins
+on an aligned byte boundary for its own type. This means that the bytes returned
+by this function may be greater than summing the (sizeof(type) * capacity) for
+each array in the conceptual struct. */
+static inline size_t
+total_bytes(size_t sizeof_type, size_t const capacity)
+{
+    return data_bytes(sizeof_type, capacity) + node_bytes(capacity);
+}
+
+/** Returns the base of the node array relative to the data base pointer. This
+positions is guaranteed to be the first aligned byte given the alignment of the
+node type after the data array. The data array has added any necessary padding
+after it to ensure that the base of the node array is aligned for its type. */
+static inline struct ccc_homap_elem *
+node_pos(size_t const sizeof_type, void const *const data,
+         size_t const capacity)
+{
+    return (struct ccc_homap_elem *)((char *)data
+                                     + data_bytes(sizeof_type, capacity));
+}
+
+/** Copies over the Struct of Arrays contained within the one contiguous
+allocation of the map to the new memory provided. Assumes the new_data pointer
+points to the base of an allocation that has been allocated with sufficient
+bytes to support the user data, nodes, and parity arrays for the provided new
+capacity. */
+static inline void
+copy_soa(struct ccc_homap const *const src, void *const dst_data_base,
+         size_t const dst_capacity)
+{
+    if (!src->data)
+    {
+        return;
+    }
+    assert(dst_capacity >= src->capacity);
+    size_t const sizeof_type = src->sizeof_type;
+    /* Each section of the allocation "grows" when we re-size so one copy would
+       not work. Instead each component is copied over allowing each to grow. */
+    (void)memcpy(dst_data_base, src->data,
+                 data_bytes(sizeof_type, src->capacity));
+    (void)memcpy(node_pos(sizeof_type, dst_data_base, dst_capacity),
+                 node_pos(sizeof_type, src->data, src->capacity),
+                 node_bytes(src->capacity));
 }
 
 static inline void
@@ -1065,74 +1168,62 @@ swap(char tmp[const], void *const a, void *const b, size_t const sizeof_type)
 }
 
 static inline struct ccc_homap_elem *
-at(struct ccc_homap const *const t, size_t const i)
+node_at(struct ccc_homap const *const t, size_t const i)
 {
-    return elem_in_slot(t, ccc_buf_at(&t->buf, i));
+    return &t->nodes[i];
+}
+
+static inline void *
+data_at(struct ccc_homap const *const t, size_t const i)
+{
+    return (char *)t->data + (i * t->sizeof_type);
 }
 
 static inline size_t
 branch_i(struct ccc_homap const *const t, size_t const parent,
          enum hom_branch const dir)
 {
-    return elem_in_slot(t, ccc_buf_at(&t->buf, parent))->branch[dir];
+    return node_at(t, parent)->branch[dir];
 }
 
 static inline size_t
 parent_i(struct ccc_homap const *const t, size_t const child)
 {
-    return elem_in_slot(t, ccc_buf_at(&t->buf, child))->parent;
+    return node_at(t, child)->parent;
 }
 
 static inline size_t
-index_of(struct ccc_homap const *const t,
-         struct ccc_homap_elem const *const elem)
+index_of(struct ccc_homap const *const t, void const *const key_val_type)
 {
-    return ccc_buf_i(&t->buf, struct_base(t, elem)).count;
+    assert(key_val_type >= t->data
+           && (char *)key_val_type
+                  < ((char *)t->data + (t->capacity * t->sizeof_type)));
+    return ((char *)key_val_type - (char *)t->data) / t->sizeof_type;
 }
 
 static inline size_t *
 branch_ref(struct ccc_homap const *t, size_t const node,
            enum hom_branch const branch)
 {
-    return &elem_in_slot(t, ccc_buf_at(&t->buf, node))->branch[branch];
+    return &node_at(t, node)->branch[branch];
 }
 
 static inline size_t *
 parent_ref(struct ccc_homap const *t, size_t node)
 {
-    return &elem_in_slot(t, ccc_buf_at(&t->buf, node))->parent;
-}
-
-static inline void *
-base_at(struct ccc_homap const *const hom, size_t const i)
-{
-    return ccc_buf_at(&hom->buf, i);
-}
-
-static inline void *
-struct_base(struct ccc_homap const *const hom,
-            struct ccc_homap_elem const *const e)
-{
-    return ((char *)e->branch) - hom->node_elem_offset;
-}
-
-static struct ccc_homap_elem *
-elem_in_slot(struct ccc_homap const *const t, void const *const slot)
-{
-    return (struct ccc_homap_elem *)((char *)slot + t->node_elem_offset);
-}
-
-static inline void *
-key_from_node(struct ccc_homap const *const t,
-              struct ccc_homap_elem const *const elem)
-{
-    return (char *)struct_base(t, elem) + t->key_offset;
+    return &node_at(t, node)->parent;
 }
 
 static inline void *
 key_at(struct ccc_homap const *const t, size_t const i)
 {
-    return (char *)ccc_buf_at(&t->buf, i) + t->key_offset;
+    return (char *)data_at(t, i) + t->key_offset;
+}
+
+static void *
+key_in_slot(struct ccc_homap const *t, void const *const user_struct)
+{
+    return (char *)user_struct + t->key_offset;
 }
 
 static inline size_t
@@ -1208,15 +1299,15 @@ is_storing_parent(struct ccc_homap const *const t, size_t const p,
 static ccc_tribool
 is_free_list_valid(struct ccc_homap const *const t)
 {
-    if (!t->buf.count)
+    if (!t->count)
     {
         return CCC_TRUE;
     }
     size_t list_check = 0;
-    for (size_t cur = t->free_list; cur && list_check < t->buf.capacity;
-         cur = at(t, cur)->next_free, ++list_check)
+    for (size_t cur = t->free_list; cur && list_check < t->capacity;
+         cur = node_at(t, cur)->next_free, ++list_check)
     {}
-    return (list_check + t->buf.count == t->buf.capacity);
+    return (list_check + t->count == t->capacity);
 }
 
 static ccc_tribool
@@ -1227,7 +1318,7 @@ validate(struct ccc_homap const *const hom)
         return CCC_FALSE;
     }
     size_t const size = recursive_size(hom, hom->root);
-    if (size && size != hom->buf.count - 1)
+    if (size && size != hom->count - 1)
     {
         return CCC_FALSE;
     }

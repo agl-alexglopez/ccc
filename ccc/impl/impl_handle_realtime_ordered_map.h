@@ -186,9 +186,8 @@ size_t ccc_impl_hrm_alloc_slot(struct ccc_hromap *hrm);
 capacity. Provide the type used for the parity block array and the number of
 blocks needed to round up to will be returned. */
 #define ccc_impl_hrm_blocks(impl_cap)                                          \
-    (((impl_cap)                                                               \
-      + ((sizeof(typeof(*(struct ccc_hromap){}.parity)) * CHAR_BIT) - 1))      \
-     / (sizeof(typeof(*(struct ccc_hromap){}.parity)) * CHAR_BIT))
+    (((impl_cap) + ((sizeof(*(struct ccc_hromap){}.parity) * CHAR_BIT) - 1))   \
+     / (sizeof(*(struct ccc_hromap){}.parity) * CHAR_BIT))
 
 /** @private The user can declare a fixed size realtime ordered map with the
 help of static asserts to ensure the layout is compatible with our internal

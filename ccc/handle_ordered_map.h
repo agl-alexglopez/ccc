@@ -66,15 +66,6 @@ A handle ordered map can be initialized on the stack, heap, or data segment at
 runtime or compile time.*/
 typedef struct ccc_homap ccc_handle_ordered_map;
 
-/** @brief The intrusive element for the user defined type being stored in the
-map.
-
-Note that if allocation is not permitted, insertions functions accepting
-this type as an argument assume it to exist in pre-allocated memory that will
-exist with the appropriate lifetime and scope for the user's needs; the
-container does not allocate or free in this case. */
-typedef struct ccc_homap_elem ccc_homap_elem;
-
 /** @brief A container specific handle used to implement the Handle Interface.
 
 The Handle Interface offers efficient search and subsequent insertion, deletion,
@@ -258,58 +249,58 @@ Obtain and operate on container handles for efficient queries when non-trivial
 control flow is needed. */
 /**@{*/
 
-/** @brief Invariantly inserts the key value wrapping key_val_handle.
+/** @brief Invariantly inserts the key value wrapping key_val_type.
 @param [in] hom the pointer to the ordered map.
-@param [out] out_handle the handle to the user type wrapping map elem.
+@param [out] key_val_output the handle to the user type wrapping map elem.
 @return a handle. If Vacant, no prior element with key existed and the type
-wrapping out_handle remains unchanged. If Occupied the old value is written
-to the type wrapping out_handle and may be unwrapped to view. If more space
+wrapping key_val_output remains unchanged. If Occupied the old value is written
+to the type wrapping key_val_output and may be unwrapped to view. If more space
 is needed but allocation fails or has been forbidden, an insert error is set.
 
-Note that this function may write to the struct containing out_handle and wraps
-it in a handle to provide information about the old value. */
+Note that this function may write to the struct containing key_val_output and
+wraps it in a handle to provide information about the old value. */
 [[nodiscard]] ccc_handle ccc_hom_swap_handle(ccc_handle_ordered_map *hom,
-                                             ccc_homap_elem *out_handle);
+                                             void *key_val_output);
 
-/** @brief Invariantly inserts the key value wrapping key_val_handle.
+/** @brief Invariantly inserts the key value wrapping key_val_type.
 @param [in] handle_ordered_map_ptr the pointer to the ordered map.
-@param [out] out_handle_ptr the handle to the user type wrapping map elem.
+@param [out] key_val_output_ptr the handle to the user type wrapping map elem.
 @return a compound literal reference to a handle. If Vacant, no prior element
-with key existed and the type wrapping out_handle remains unchanged. If Occupied
-the old value is written to the type wrapping out_handle and may be unwrapped to
-view. If more space is needed but allocation fails or has been forbidden, an
-insert error is set.
+with key existed and the type wrapping key_val_output remains unchanged. If
+Occupied the old value is written to the type wrapping key_val_output and may be
+unwrapped to view. If more space is needed but allocation fails or has been
+forbidden, an insert error is set.
 
-Note that this function may write to the struct containing out_handle and wraps
-it in a handle to provide information about the old value. */
-#define ccc_hom_swap_handle_r(handle_ordered_map_ptr, out_handle_ptr)          \
+Note that this function may write to the struct containing key_val_output and
+wraps it in a handle to provide information about the old value. */
+#define ccc_hom_swap_handle_r(handle_ordered_map_ptr, key_val_output_ptr)      \
     &(ccc_handle)                                                              \
     {                                                                          \
-        ccc_hom_swap_handle((handle_ordered_map_ptr), (out_handle_ptr)).impl   \
+        ccc_hom_swap_handle((handle_ordered_map_ptr), (key_val_output_ptr))    \
+            .impl                                                              \
     }
 
-/** @brief Attempts to insert the key value wrapping key_val_handle.
+/** @brief Attempts to insert the key value wrapping key_val_type.
 @param [in] hom the pointer to the map.
-@param [in] key_val_handle the handle to the user type wrapping map elem.
+@param [in] key_val_type the handle to the user type wrapping map elem.
 @return a handle. If Occupied, the handle contains a reference to the key value
 user type in the map and may be unwrapped. If Vacant the handle contains a
 reference to the newly inserted handle in the map. If more space is needed but
 allocation fails, an insert error is set. */
 [[nodiscard]] ccc_handle ccc_hom_try_insert(ccc_handle_ordered_map *hom,
-                                            ccc_homap_elem *key_val_handle);
+                                            void const *key_val_type);
 
-/** @brief Attempts to insert the key value wrapping key_val_handle.
+/** @brief Attempts to insert the key value wrapping key_val_type.
 @param [in] handle_ordered_map_ptr the pointer to the map.
-@param [in] key_val_handle_ptr the handle to the user type wrapping map elem.
+@param [in] key_val_type_ptr the handle to the user type wrapping map elem.
 @return a compound literal reference to a handle. If Occupied, the handle
 contains a reference to the key value user type in the map and may be unwrapped.
 If Vacant the handle contains a reference to the newly inserted handle in the
 map. If more space is needed but allocation fails an insert error is set. */
-#define ccc_hom_try_insert_r(handle_ordered_map_ptr, key_val_handle_ptr)       \
+#define ccc_hom_try_insert_r(handle_ordered_map_ptr, key_val_type_ptr)         \
     &(ccc_handle)                                                              \
     {                                                                          \
-        ccc_hom_try_insert((handle_ordered_map_ptr), (key_val_handle_ptr))     \
-            .impl                                                              \
+        ccc_hom_try_insert((handle_ordered_map_ptr), (key_val_type_ptr)).impl  \
     }
 
 /** @brief lazily insert lazy_value into the map at key if key is absent.
@@ -332,15 +323,14 @@ compound literal matches the searched key. */
 
 /** @brief Invariantly inserts or overwrites a user struct into the map.
 @param [in] hom a pointer to the handle hash map.
-@param [in] key_val_handle the handle to the wrapping user struct key value.
+@param [in] key_val_type the handle to the wrapping user struct key value.
 @return a handle. If Occupied a handle was overwritten by the new key value.
 If Vacant no prior map handle existed.
 
 Note that this function can be used when the old user type is not needed but
 the information regarding its presence is helpful. */
-[[nodiscard]] ccc_handle
-ccc_hom_insert_or_assign(ccc_handle_ordered_map *hom,
-                         ccc_homap_elem *key_val_handle);
+[[nodiscard]] ccc_handle ccc_hom_insert_or_assign(ccc_handle_ordered_map *hom,
+                                                  void const *key_val_type);
 
 /** @brief Inserts a new key value pair or overwrites the existing handle.
 @param [in] handle_ordered_map_ptr the pointer to the handle hash map.
@@ -362,32 +352,32 @@ compound literal matches the searched key. */
     }
 
 /** @brief Removes the key value in the map storing the old value, if present,
-in the struct containing out_handle provided by the user.
+in the struct containing key_val_output provided by the user.
 @param [in] hom the pointer to the ordered map.
-@param [out] out_handle the handle to the user type wrapping map elem.
-@return the removed handle. If Occupied the struct containing out_handle holds
-the old value. If Vacant the key value pair was not stored in the map. If bad
-input is provided an input error is set.
+@param [out] key_val_output the handle to the user type wrapping map elem.
+@return the removed handle. If Occupied the struct containing key_val_output
+holds the old value. If Vacant the key value pair was not stored in the map. If
+bad input is provided an input error is set.
 
 Note that this function may write to the struct containing the second parameter
 and wraps it in a handle to provide information about the old value. */
 [[nodiscard]] ccc_handle ccc_hom_remove(ccc_handle_ordered_map *hom,
-                                        ccc_homap_elem *out_handle);
+                                        void *key_val_output);
 
 /** @brief Removes the key value in the map storing the old value, if present,
-in the struct containing out_handle provided by the user.
+in the struct containing key_val_output provided by the user.
 @param [in] handle_ordered_map_ptr the pointer to the ordered map.
-@param [out] out_handle_ptr the handle to the user type wrapping map elem.
+@param [out] key_val_output_ptr the handle to the user type wrapping map elem.
 @return a compound literal reference to a handle. If Occupied the struct
-containing out_handle holds the old value. If Vacant the key value pair was not
-stored in the map. If bad input is provided an input error is set.
+containing key_val_output holds the old value. If Vacant the key value pair was
+not stored in the map. If bad input is provided an input error is set.
 
 Note that this function may write to the struct containing the second parameter
 and wraps it in a handle to provide information about the old value. */
-#define ccc_hom_remove_r(handle_ordered_map_ptr, out_handle_ptr)               \
+#define ccc_hom_remove_r(handle_ordered_map_ptr, key_val_output_ptr)           \
     &(ccc_handle)                                                              \
     {                                                                          \
-        ccc_hom_remove((handle_ordered_map_ptr), (out_handle_ptr)).impl        \
+        ccc_hom_remove((handle_ordered_map_ptr), (key_val_output_ptr)).impl    \
     }
 
 /** @brief Obtains a handle for the provided key in the map for future use.
@@ -499,7 +489,7 @@ a user struct allocation failure.
 If no allocation is permitted, this function assumes the user struct wrapping
 elem has been allocated with the appropriate lifetime and scope by the user. */
 [[nodiscard]] ccc_handle_i ccc_hom_or_insert(ccc_homap_handle const *h,
-                                             ccc_homap_elem *elem);
+                                             void const *key_val_type);
 
 /** @brief Lazily insert the desired key value into the handle if it is Vacant.
 @param [in] handle_ordered_map_handle_ptr a pointer to the obtained handle.
@@ -523,7 +513,7 @@ or other data, such functions will not be called if the handle is Occupied. */
 This method can be used when the old value in the map does not need to
 be preserved. See the regular insert method if the old value is of interest. */
 [[nodiscard]] ccc_handle_i ccc_hom_insert_handle(ccc_homap_handle const *h,
-                                                 ccc_homap_elem *elem);
+                                                 void const *key_val_type);
 
 /** @brief Write the contents of the compound literal lazy_key_value to a node.
 @param [in] handle_ordered_map_handle_ptr a pointer to the obtained handle.
@@ -682,7 +672,7 @@ Amortized O(lg N).
 current iterator.
 @return the next user type stored in the map in an inorder traversal. */
 [[nodiscard]] void *ccc_hom_next(ccc_handle_ordered_map const *hom,
-                                 ccc_homap_elem const *iter_handle);
+                                 void const *iter_handle);
 
 /** @brief Return the rnext element in a reverse inorder traversal of the map.
 O(1).
@@ -691,7 +681,7 @@ O(1).
 current iterator.
 @return the rnext user type stored in the map in a reverse inorder traversal. */
 [[nodiscard]] void *ccc_hom_rnext(ccc_handle_ordered_map const *hom,
-                                  ccc_homap_elem const *iter_handle);
+                                  void const *iter_handle);
 
 /** @brief Return the end of an inorder traversal of the map. O(1).
 @param [in] hom a pointer to the map.
@@ -807,7 +797,6 @@ is NULL.  */
  no namespace clashes occur before shortening. */
 #ifdef HANDLE_ORDERED_MAP_USING_NAMESPACE_CCC
 typedef ccc_handle_ordered_map handle_ordered_map;
-typedef ccc_homap_elem homap_elem;
 typedef ccc_homap_handle homap_handle;
 #    define hom_at(args...) ccc_hom_at(args)
 #    define hom_as(args...) ccc_hom_as(args)

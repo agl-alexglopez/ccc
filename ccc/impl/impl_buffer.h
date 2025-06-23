@@ -87,7 +87,7 @@ are contiguous. */
     (__extension__({                                                           \
         typeof(type_initializer) *impl_buf_res = NULL;                         \
         __auto_type impl_emplace_back_buf_ptr = (buf_ptr);                     \
-        assert(sizeof(typeof(*impl_buf_res))                                   \
+        assert(sizeof(*impl_buf_res)                                           \
                == ccc_buf_sizeof_type(impl_emplace_back_buf_ptr));             \
         impl_buf_res = ccc_buf_alloc_back((impl_emplace_back_buf_ptr));        \
         if (impl_buf_res)                                                      \
