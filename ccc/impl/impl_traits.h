@@ -339,6 +339,7 @@ limitations under the License.
                                key_val_container_handle_ptr...)                \
     _Generic((container_handle_ptr),                                           \
         ccc_homap_handle *: ccc_hom_insert_handle,                             \
+        ccc_homap_handle const *: ccc_hom_insert_handle,                       \
         ccc_hromap_handle *: ccc_hrm_insert_handle,                            \
         ccc_hromap_handle const *: ccc_hrm_insert_handle)(                     \
         (container_handle_ptr), key_val_container_handle_ptr)

@@ -886,6 +886,9 @@ is NULL.  */
 #ifdef HANDLE_ORDERED_MAP_USING_NAMESPACE_CCC
 typedef ccc_handle_ordered_map handle_ordered_map;
 typedef ccc_homap_handle homap_handle;
+#    define hom_declare_fixed_map(args...) ccc_hom_declare_fixed_map(args)
+#    define hom_fixed_capacity(args...) ccc_hom_fixed_capacity(args)
+#    define hom_init(args...) ccc_hom_init(args)
 #    define hom_at(args...) ccc_hom_at(args)
 #    define hom_as(args...) ccc_hom_as(args)
 #    define hom_and_modify_w(args...) ccc_hom_and_modify_w(args)
@@ -893,7 +896,6 @@ typedef ccc_homap_handle homap_handle;
 #    define hom_insert_handle_w(args...) ccc_hom_insert_handle_w(args)
 #    define hom_try_insert_w(args...) ccc_hom_try_insert_w(args)
 #    define hom_insert_or_assign_w(args...) ccc_hom_insert_or_assign_w(args)
-#    define hom_init(args...) ccc_hom_init(args)
 #    define hom_copy(args...) ccc_hom_copy(args)
 #    define hom_reserve(args...) ccc_hom_reserve(args)
 #    define hom_contains(args...) ccc_hom_contains(args)
