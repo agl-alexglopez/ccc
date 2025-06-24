@@ -99,7 +99,7 @@ struct val
     int val;
 };
 ccc_hom_declare_fixed_map(small_fixed_map, struct val, 64);
-static handle_realtime_ordered_map static_map = hom_init(
+static handle_ordered_map static_map = hom_init(
     &(static small_fixed_map){},
     struct val,
     key,
@@ -121,7 +121,7 @@ struct val
 ccc_hom_declare_fixed_map(small_fixed_map, struct val, 64);
 int main(void)
 {
-    handle_realtime_ordered_map static_fh = hom_init(
+    handle_ordered_map static_fh = hom_init(
         &(small_fixed_map){},
         struct val,
         key,
@@ -163,7 +163,7 @@ desired allocation function. */
 destruction.
 @param [in] capacity the capacity at mem_ptr or 0.
 @return the struct initialized ordered map for direct assignment
-(i.e. ccc_handle_realtime_ordered_map m = ccc_hom_init(...);). */
+(i.e. ccc_handle_ordered_map m = ccc_hom_init(...);). */
 #define ccc_hom_init(memory_ptr, any_type_name, key_elem_field, key_cmp_fn,    \
                      alloc_fn, aux_data, capacity)                             \
     ccc_impl_hom_init(memory_ptr, any_type_name, key_elem_field, key_cmp_fn,   \
@@ -190,15 +190,29 @@ Manual memory management with no allocation function provided.
 #define HANDLE_ORDERED_MAP_USING_NAMESPACE_CCC
 struct val
 {
-    homap_elem e;
     int key;
     int val;
 };
-static handle_ordered_map src
-    = hom_init((static struct val[11]){}, e, key, key_cmp, NULL, NULL, 11);
+ccc_hom_declare_fixed_map(small_fixed_map, struct val, 64);
+static handle_realtime_ordered_map src = hom_init(
+    &(static small_fixed_map){},
+    struct val,
+    key,
+    homap_key_cmp,
+    NULL,
+    NULL,
+    hom_fixed_capacity(small_fixed_map)
+);
 insert_rand_vals(&src);
-static handle_ordered_map dst
-    = hom_init((static struct val[13]){}, e, key, key_cmp, NULL, NULL, 13);
+static handle_realtime_ordered_map dst = hom_init(
+    &(static small_fixed_map){},
+    struct val,
+    key,
+    homap_key_cmp,
+    NULL,
+    NULL,
+    hom_fixed_capacity(small_fixed_map)
+);
 ccc_result res = hom_copy(&dst, &src, NULL);
 ```
 
@@ -209,15 +223,14 @@ is memory management handed over to the copy function.
 #define HANDLE_ORDERED_MAP_USING_NAMESPACE_CCC
 struct val
 {
-    homap_elem e;
     int key;
     int val;
 };
 static handle_ordered_map src
-    = hom_init((struct val *)NULL, e, key, key_cmp, std_alloc, NULL, 0);
+    = hom_init(NULL, struct val, key, key_cmp, std_alloc, NULL, 0);
 insert_rand_vals(&src);
 static handle_ordered_map dst
-    = hom_init((struct val *)NULL, e, key, key_cmp, std_alloc, NULL, 0);
+    = hom_init(NULL, struct val, key, key_cmp, std_alloc, NULL, 0);
 ccc_result res = hom_copy(&dst, &src, std_alloc);
 ```
 
@@ -230,15 +243,14 @@ size map.
 #define HANDLE_ORDERED_MAP_USING_NAMESPACE_CCC
 struct val
 {
-    homap_elem e;
     int key;
     int val;
 };
 static handle_ordered_map src
-    = hom_init((struct val *)NULL, e, key, key_cmp, std_alloc, NULL);
+    = hom_init(NULL, struct val, key, key_cmp, std_alloc, NULL, 0);
 insert_rand_vals(&src);
 static handle_ordered_map dst
-    = hom_init((struct val *)NULL, e, key, key_cmp, NULL, NULL, 0);
+    = hom_init(NULL, struct val, key, key_cmp, NULL, NULL, 0);
 ccc_result res = hom_copy(&dst, &src, std_alloc);
 ```
 
@@ -553,9 +565,9 @@ evaluated in the closure scope. */
                                   closure_over_T)                              \
     }
 
-/** @brief Inserts the struct with handle elem if the handle is Vacant.
+/** @brief Inserts the struct with user type if the handle is Vacant.
 @param [in] h the handle obtained via function or macro call.
-@param [in] elem the handle to the struct to be inserted to a Vacant handle.
+@param [in] key_val_type handle to the struct to be inserted to Vacant handle.
 @return a pointer to handle in the map invariantly. NULL on error.
 
 Because this functions takes a handle and inserts if it is Vacant, the only
@@ -583,7 +595,7 @@ or other data, such functions will not be called if the handle is Occupied. */
 
 /** @brief Inserts the provided handle invariantly.
 @param [in] h the handle returned from a call obtaining a handle.
-@param [in] elem a handle to the struct the user intends to insert.
+@param [in] key_val_type a handle to the struct the user intends to insert.
 @return a pointer to the inserted element or NULL upon allocation failure.
 
 This method can be used when the old value in the map does not need to
