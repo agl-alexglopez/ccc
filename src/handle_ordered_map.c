@@ -35,6 +35,65 @@ constant time queries for frequently accessed elements. */
 #include "impl/impl_types.h"
 #include "types.h"
 
+/*========================   Data Alignment Test   ==========================*/
+
+/** @private A macro version of the runtime alignment operations we perform
+for calculating bytes. This way we can use in static assert. The user data type
+may not be the same alignment as the nodes and therefore the nodes array must
+start at next aligned byte. */
+#define roundup(bytes_to_round, alignment)                                     \
+    (((bytes_to_round) + (alignment) - 1) & ~((alignment) - 1))
+
+enum : size_t
+{
+    /* @private Test capacity. */
+    TCAP = 3,
+};
+/** @private Use an int because that will force the nodes array to be wary of
+where to start. The nodes are 8 byte aligned but an int is 4. This means the
+nodes need to start after a 4 byte buffer of padding at end of data array. */
+struct test_data_type
+{
+    int i;
+};
+ccc_hom_declare_fixed_map(fixed_map_test_type, struct test_data_type, TCAP);
+/** @private This is a static fixed size map exclusive to this translation unit
+used to ensure assumptions about data layout are correct. The following static
+asserts must be true in order to support the Struct of Array style layout we
+use for the data and nodes. It is important that in our user code when we set
+the positions of the node pointer relative to the data pointer the positions are
+correct regardless of backing storage as a fixed map or heap allocation. */
+static fixed_map_test_type data_nodes_layout_test;
+/** Some assumptions in the code assume that nodes array is last so ensure that
+is the case here. Also good to assume user data comes first. */
+static_assert((char *)data_nodes_layout_test.data
+                      < (char *)data_nodes_layout_test.nodes
+                  && (char *)data_nodes_layout_test.nodes,
+              "The order of the arrays in a Struct of Arrays map is data, then "
+              "nodes.");
+/** We don't care about the alignment or padding after the nodes array because
+we never need to set or move any pointers to that position. The alignment is
+important for the nodes pointer to be set to the correct aligned position and
+so that we allocate enough bytes for our single allocation if the map is dynamic
+and not a fixed type. */
+static_assert(
+    (char *)&data_nodes_layout_test.nodes[TCAP]
+            - (char *)&data_nodes_layout_test.data[0]
+        == roundup((sizeof(*data_nodes_layout_test.data) * TCAP),
+                   alignof(*data_nodes_layout_test.nodes))
+               + (sizeof(*data_nodes_layout_test.nodes) * TCAP),
+    "The pointer difference in bytes between end of the nodes array and start "
+    "of user data array must be the same as the total bytes we assume to be "
+    "stored in that range. Alignment of user data must be considered.");
+static_assert((char *)&data_nodes_layout_test.data
+                      + roundup((sizeof(*data_nodes_layout_test.data) * TCAP),
+                                alignof(*data_nodes_layout_test.nodes))
+                  == (char *)&data_nodes_layout_test.nodes,
+              "The start of the nodes array must begin at the next aligned "
+              "byte given alignment of a node.");
+
+/*==========================  Type Declarations   ===========================*/
+
 /** @private */
 enum
 {
