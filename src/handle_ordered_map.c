@@ -173,7 +173,7 @@ ccc_hom_insert_handle(ccc_homap_handle const *const h,
         void *const ret = data_at(h->impl.hom, h->impl.i);
         if (key_val_type != ret)
         {
-            memcpy(ret, key_val_type, h->impl.hom->sizeof_type);
+            (void)memcpy(ret, key_val_type, h->impl.hom->sizeof_type);
         }
         return h->impl.i;
     }
@@ -899,7 +899,7 @@ insert(struct ccc_homap *const t, size_t const n)
         t->root = n;
         return;
     }
-    void const *const key = key_in_slot(t, node);
+    void const *const key = key_at(t, n);
     t->root = splay(t, t->root, key, t->cmp);
     ccc_threeway_cmp const root_cmp = cmp_elems(t, key, t->root, t->cmp);
     if (CCC_EQL == root_cmp)
@@ -936,8 +936,7 @@ remove_from_tree(struct ccc_homap *const t, size_t const ret)
     }
     else
     {
-        t->root = splay(t, branch_i(t, ret, L), key_in_slot(t, node_at(t, ret)),
-                        t->cmp);
+        t->root = splay(t, branch_i(t, ret, L), key_at(t, ret), t->cmp);
         link(t, t->root, R, branch_i(t, ret, R));
     }
     node_at(t, ret)->next_free = t->free_list;
