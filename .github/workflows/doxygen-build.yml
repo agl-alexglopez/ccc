@@ -49,6 +49,8 @@ jobs:
   
     - name: Install doxygen
       uses: ssciwr/doxygen-install@v1 
+      with:
+          version "1.9.1"
 
     - name: Install graphviz
       uses: ts-graphviz/setup-graphviz@v2
