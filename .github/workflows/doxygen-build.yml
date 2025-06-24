@@ -23,14 +23,14 @@ jobs:
       - name: Check the diff
         id: check
         run: |
-          echo "Here are the changed header files:"
-          echo "$(git --no-pager diff --name-only HEAD HEAD~1 | grep -E '\.(h)$')"
-          if git --no-pager diff --name-only HEAD HEAD~1 | grep -qE '\.(h)$'; then
+          echo "Here are the changed C files:"
+          echo "$(git --no-pager diff --name-only HEAD HEAD~1 | grep -E '\.(c|h)$')"
+          if git --no-pager diff --name-only HEAD HEAD~1 | grep -qE '\.(c|h)$'; then
             echo "run=true" >> $GITHUB_OUTPUT
-            echo "Header files have changed, rebuilding Doxyfile..."
+            echo "C files have changed, rebuilding Doxyfile..."
           else
             echo "run=false" >> $GITHUB_OUTPUT
-            echo "Header files have NOT changed, skipping Doxyfile build..."
+            echo "C files have NOT changed, skipping Doxyfile build..."
           fi
 
   build:
@@ -50,7 +50,7 @@ jobs:
     - name: Install doxygen
       uses: ssciwr/doxygen-install@v1 
       with:
-          version "1.9.1"
+        version: "1.9.1"
 
     - name: Install graphviz
       uses: ts-graphviz/setup-graphviz@v2
