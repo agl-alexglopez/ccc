@@ -111,7 +111,7 @@ static size_t *parent_ref(struct ccc_homap const *t, size_t node);
 static ccc_tribool validate(struct ccc_homap const *hom);
 
 /* Returning void as miscellaneous helpers. */
-static void init_node(struct ccc_homap_elem *e);
+static void init_node(struct ccc_homap const *hom, size_t node);
 static void swap(char tmp[const], void *a, void *b, size_t sizeof_type);
 static void link(struct ccc_homap *t, size_t parent, enum hom_branch dir,
                  size_t subtree);
@@ -338,16 +338,22 @@ ccc_hom_remove(ccc_handle_ordered_map *const hom, void *const key_val_output)
     {
         return (ccc_handle){{.stats = CCC_ENTRY_ARG_ERROR}};
     }
-    size_t const n = erase(hom, key_in_slot(hom, key_val_output));
-    if (!n)
+    size_t const removed = erase(hom, key_in_slot(hom, key_val_output));
+    if (!removed)
     {
         return (ccc_handle){{
             .i = 0,
             .stats = CCC_ENTRY_VACANT,
         }};
     }
+    assert(removed);
+    void const *const r = data_at(hom, removed);
+    if (key_val_output != r)
+    {
+        (void)memcpy(key_val_output, r, hom->sizeof_type);
+    }
     return (ccc_handle){{
-        .i = n,
+        .i = 0,
         .stats = CCC_ENTRY_OCCUPIED,
     }};
 }
@@ -744,12 +750,6 @@ ccc_impl_hom_data_at(struct ccc_homap const *const hom, size_t const slot)
     return data_at(hom, slot);
 }
 
-struct ccc_homap_elem *
-ccc_impl_homap_elem_at(struct ccc_homap const *const hom, size_t const slot)
-{
-    return node_at(hom, slot);
-}
-
 size_t
 ccc_impl_hom_alloc_slot(struct ccc_homap *const hom)
 {
@@ -892,8 +892,7 @@ resize(struct ccc_homap *const hom, size_t const new_capacity,
 static void
 insert(struct ccc_homap *const t, size_t const n)
 {
-    struct ccc_homap_elem *const node = node_at(t, n);
-    init_node(node);
+    init_node(t, n);
     if (t->count == EMPTY_TREE)
     {
         t->root = n;
@@ -1077,9 +1076,9 @@ cmp_elems(struct ccc_homap const *const hom, void const *const key,
 }
 
 static inline void
-init_node(struct ccc_homap_elem *const e)
+init_node(struct ccc_homap const *const hom, size_t const node)
 {
-    assert(e != NULL);
+    struct ccc_homap_elem *const e = node_at(hom, node);
     e->branch[L] = e->branch[R] = e->parent = 0;
 }
 
@@ -1201,14 +1200,14 @@ index_of(struct ccc_homap const *const t, void const *const key_val_type)
 }
 
 static inline size_t *
-branch_ref(struct ccc_homap const *t, size_t const node,
+branch_ref(struct ccc_homap const *const t, size_t const node,
            enum hom_branch const branch)
 {
     return &node_at(t, node)->branch[branch];
 }
 
 static inline size_t *
-parent_ref(struct ccc_homap const *t, size_t node)
+parent_ref(struct ccc_homap const *const t, size_t const node)
 {
     return &node_at(t, node)->parent;
 }

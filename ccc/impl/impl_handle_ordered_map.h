@@ -109,9 +109,6 @@ void *ccc_impl_hom_data_at(struct ccc_homap const *hom, size_t slot);
 /** @private */
 void *ccc_impl_hom_key_at(struct ccc_homap const *hom, size_t slot);
 /** @private */
-struct ccc_homap_elem *ccc_impl_homap_elem_at(struct ccc_homap const *hom,
-                                              size_t slot);
-/** @private */
 size_t ccc_impl_hom_alloc_slot(struct ccc_homap *hom);
 
 /*========================     Initialization       =========================*/
@@ -241,6 +238,7 @@ is of a known fixed size defined at compile time, not just a pointer. */
                 *((typeof(lazy_key_value) *)ccc_impl_hom_data_at(              \
                     impl_hom_ins_hndl->hom, impl_hom_ins_hndl->i))             \
                     = lazy_key_value;                                          \
+                impl_hom_ins_hndl_ret = impl_hom_ins_hndl->i;                  \
             }                                                                  \
         }                                                                      \
         impl_hom_ins_hndl_ret;                                                 \
@@ -262,7 +260,8 @@ is of a known fixed size defined at compile time, not just a pointer. */
             {                                                                  \
                 impl_hom_try_ins_hndl_ret = (struct ccc_handl){                \
                     .i = ccc_impl_hom_alloc_slot(impl_hom_try_ins_hndl.hom),   \
-                    .stats = CCC_ENTRY_INSERT_ERROR};                          \
+                    .stats = CCC_ENTRY_INSERT_ERROR,                           \
+                };                                                             \
                 if (impl_hom_try_ins_hndl_ret.i)                               \
                 {                                                              \
                     *((typeof(lazy_value) *)ccc_impl_hom_data_at(              \
@@ -303,10 +302,11 @@ is of a known fixed size defined at compile time, not just a pointer. */
                                       (void *)&impl_hom_key);                  \
             if (!(impl_hom_ins_or_assign_hndl.stats & CCC_ENTRY_OCCUPIED))     \
             {                                                                  \
-                impl_hom_ins_or_assign_hndl_ret                                \
-                    = (struct ccc_handl){.i = ccc_impl_hom_alloc_slot(         \
-                                             impl_hom_ins_or_assign_hndl.hom), \
-                                         .stats = CCC_ENTRY_INSERT_ERROR};     \
+                impl_hom_ins_or_assign_hndl_ret = (struct ccc_handl){          \
+                    .i = ccc_impl_hom_alloc_slot(                              \
+                        impl_hom_ins_or_assign_hndl.hom),                      \
+                    .stats = CCC_ENTRY_INSERT_ERROR,                           \
+                };                                                             \
                 if (impl_hom_ins_or_assign_hndl_ret.i)                         \
                 {                                                              \
                     *((typeof(lazy_value) *)ccc_impl_hom_data_at(              \
@@ -330,7 +330,8 @@ is of a known fixed size defined at compile time, not just a pointer. */
                     = lazy_value;                                              \
                 impl_hom_ins_or_assign_hndl_ret = (struct ccc_handl){          \
                     .i = impl_hom_ins_or_assign_hndl.i,                        \
-                    .stats = impl_hom_ins_or_assign_hndl.stats};               \
+                    .stats = impl_hom_ins_or_assign_hndl.stats,                \
+                };                                                             \
                 *((typeof(impl_hom_key) *)ccc_impl_hom_key_at(                 \
                     impl_hom_ins_or_assign_hndl.hom,                           \
                     impl_hom_ins_or_assign_hndl.i))                            \
