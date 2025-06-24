@@ -626,7 +626,7 @@ ccc_hrm_data(ccc_handle_realtime_ordered_map const *const hrm)
 void *
 ccc_hrm_begin(ccc_handle_realtime_ordered_map const *const hrm)
 {
-    if (!hrm || !hrm->count)
+    if (!hrm || !hrm->capacity)
     {
         return NULL;
     }
@@ -637,7 +637,7 @@ ccc_hrm_begin(ccc_handle_realtime_ordered_map const *const hrm)
 void *
 ccc_hrm_rbegin(ccc_handle_realtime_ordered_map const *const hrm)
 {
-    if (!hrm || !hrm->count)
+    if (!hrm || !hrm->capacity)
     {
         return NULL;
     }
@@ -649,7 +649,7 @@ void *
 ccc_hrm_next(ccc_handle_realtime_ordered_map const *const hrm,
              void const *const key_val_type_iter)
 {
-    if (!hrm || !key_val_type_iter || !hrm->count)
+    if (!hrm || !key_val_type_iter || !hrm->capacity)
     {
         return NULL;
     }
@@ -661,7 +661,7 @@ void *
 ccc_hrm_rnext(ccc_handle_realtime_ordered_map const *const hrm,
               void const *const key_val_type_iter)
 {
-    if (!hrm || !key_val_type_iter || !hrm->count)
+    if (!hrm || !key_val_type_iter || !hrm->capacity)
     {
         return NULL;
     }
@@ -672,7 +672,7 @@ ccc_hrm_rnext(ccc_handle_realtime_ordered_map const *const hrm,
 void *
 ccc_hrm_end(ccc_handle_realtime_ordered_map const *const hrm)
 {
-    if (!hrm || !hrm->count)
+    if (!hrm || !hrm->capacity)
     {
         return NULL;
     }
@@ -682,7 +682,7 @@ ccc_hrm_end(ccc_handle_realtime_ordered_map const *const hrm)
 void *
 ccc_hrm_rend(ccc_handle_realtime_ordered_map const *const hrm)
 {
-    if (!hrm || !hrm->count)
+    if (!hrm || !hrm->capacity)
     {
         return NULL;
     }

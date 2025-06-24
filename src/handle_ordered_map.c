@@ -450,7 +450,7 @@ ccc_hom_capacity(ccc_handle_ordered_map const *const hom)
 void *
 ccc_hom_begin(ccc_handle_ordered_map const *const hom)
 {
-    if (!hom || !hom->count)
+    if (!hom || !hom->capacity)
     {
         return NULL;
     }
@@ -461,7 +461,7 @@ ccc_hom_begin(ccc_handle_ordered_map const *const hom)
 void *
 ccc_hom_rbegin(ccc_handle_ordered_map const *const hom)
 {
-    if (!hom || !hom->count)
+    if (!hom || !hom->capacity)
     {
         return NULL;
     }
@@ -472,7 +472,7 @@ ccc_hom_rbegin(ccc_handle_ordered_map const *const hom)
 void *
 ccc_hom_next(ccc_handle_ordered_map const *const hom, void const *const e)
 {
-    if (!hom || !hom->count)
+    if (!hom || !hom->capacity)
     {
         return NULL;
     }
@@ -483,7 +483,7 @@ ccc_hom_next(ccc_handle_ordered_map const *const hom, void const *const e)
 void *
 ccc_hom_rnext(ccc_handle_ordered_map const *const hom, void const *const e)
 {
-    if (!hom || !e || !hom->count)
+    if (!hom || !e || !hom->capacity)
     {
         return NULL;
     }
@@ -494,7 +494,7 @@ ccc_hom_rnext(ccc_handle_ordered_map const *const hom, void const *const e)
 void *
 ccc_hom_end(ccc_handle_ordered_map const *const hom)
 {
-    if (!hom || !hom->count)
+    if (!hom || !hom->capacity)
     {
         return NULL;
     }
@@ -504,7 +504,7 @@ ccc_hom_end(ccc_handle_ordered_map const *const hom)
 void *
 ccc_hom_rend(ccc_handle_ordered_map const *const hom)
 {
-    if (!hom || !hom->count)
+    if (!hom || !hom->capacity)
     {
         return NULL;
     }
