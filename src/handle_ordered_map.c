@@ -428,7 +428,7 @@ ccc_hom_size(ccc_handle_ordered_map const *const hom)
     {
         return (ccc_ucount){.error = CCC_RESULT_ARG_ERROR};
     }
-    return (ccc_ucount){.count = hom->count};
+    return (ccc_ucount){.count = hom->count ? hom->count - 1 : 0};
 }
 
 ccc_ucount
@@ -649,7 +649,7 @@ ccc_result
 ccc_hom_clear_and_free(ccc_handle_ordered_map *const hom,
                        ccc_any_type_destructor_fn *const fn)
 {
-    if (!hom)
+    if (!hom || !hom->alloc)
     {
         return CCC_RESULT_ARG_ERROR;
     }
@@ -681,7 +681,7 @@ ccc_hom_clear_and_free_reserve(ccc_handle_ordered_map *const hom,
                                ccc_any_type_destructor_fn *const destructor,
                                ccc_any_alloc_fn *const alloc)
 {
-    if (!hom)
+    if (!hom || !alloc)
     {
         return CCC_RESULT_ARG_ERROR;
     }
@@ -739,7 +739,7 @@ ccc_impl_hom_key_at(struct ccc_homap const *const hom, size_t const slot)
 }
 
 void *
-ccc_impl_hrm_data_at(struct ccc_homap const *const hom, size_t const slot)
+ccc_impl_hom_data_at(struct ccc_homap const *const hom, size_t const slot)
 {
     return data_at(hom, slot);
 }
@@ -1313,6 +1313,10 @@ is_free_list_valid(struct ccc_homap const *const t)
 static ccc_tribool
 validate(struct ccc_homap const *const hom)
 {
+    if (!hom->count)
+    {
+        return CCC_TRUE;
+    }
     if (!are_subtrees_valid(hom, (struct tree_range){.root = hom->root}))
     {
         return CCC_FALSE;

@@ -70,10 +70,9 @@ struct frequency
     int freq;
 };
 
+/* Map element for logging frequencies by string key, freq value. */
 typedef struct
 {
-    /* Map element for logging frequencies by string key, freq value. */
-    homap_elem e;
     str_ofs ofs;
     int cnt;
 } word;
@@ -382,8 +381,7 @@ print_alpha_n(FILE *const f, int n)
     }
     int i = 0;
     /* The ordered nature of the map comes in handy for alpha printing. */
-    for (word *w = begin(&map); w != end(&map) && i < n;
-         w = next(&map, &w->e), ++i)
+    for (word *w = begin(&map); w != end(&map) && i < n; w = next(&map, w), ++i)
     {
         printf("%s %d\n", str_arena_at(&a, w->ofs), w->cnt);
     }
@@ -405,7 +403,7 @@ print_ralpha_n(FILE *const f, int n)
     int i = 0;
     /* The ordered nature of the map comes in handy for reverse iteration. */
     for (word *w = rbegin(&map); w != rend(&map) && i < n;
-         w = rnext(&map, &w->e), ++i)
+         w = rnext(&map, w), ++i)
     {
         printf("%s %d\n", str_arena_at(&a, w->ofs), w->cnt);
     }
@@ -422,7 +420,7 @@ copy_frequencies(handle_ordered_map const *const map)
     PROG_ASSERT(freqs);
     size_t i = 0;
     for (word const *w = begin(map); w != end(map) && i < cap;
-         w = next(map, &w->e), ++i)
+         w = next(map, w), ++i)
     {
         freqs[i].ofs = w->ofs;
         freqs[i].freq = w->cnt;
@@ -459,7 +457,7 @@ create_frequency_map(struct str_arena *const a, FILE *const f)
     size_t len = 0;
     ptrdiff_t read = 0;
     handle_ordered_map hom
-        = hom_init((word *)NULL, e, ofs, cmp_string_keys, std_alloc, a, 0);
+        = hom_init(NULL, word, ofs, cmp_string_keys, std_alloc, a, 0);
     while ((read = getline(&lineptr, &len, f)) > 0)
     {
         str_view const line = {.s = lineptr, .len = read - 1};

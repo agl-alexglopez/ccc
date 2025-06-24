@@ -130,7 +130,7 @@ struct val
 ccc_hrm_declare_fixed_map(small_fixed_map, struct val, 64);
 int main(void)
 {
-    flat_hash_map static_fh = hrm_init(
+    handle_realtime_ordered_map static_fh = hrm_init(
         &(small_fixed_map){},
         struct val,
         key,

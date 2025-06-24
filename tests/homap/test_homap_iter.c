@@ -20,8 +20,7 @@ CHECK_BEGIN_STATIC_FN(check_range, handle_ordered_map const *const hom,
 {
     size_t index = 0;
     struct val *iter = begin_range(r);
-    for (; iter != end_range(r) && index < n;
-         iter = next(hom, &iter->elem), ++index)
+    for (; iter != end_range(r) && index < n; iter = next(hom, iter), ++index)
     {
         int const cur_id = iter->id;
         CHECK(expect_range[index], cur_id);
@@ -41,7 +40,7 @@ CHECK_BEGIN_STATIC_FN(check_range, handle_ordered_map const *const hom,
         (void)fprintf(stderr, "%sERROR:%s (int[%zu]){", RED, GREEN, n);
         iter = begin_range(r);
         for (size_t j = 0; j < n && iter != end_range(r);
-             ++j, iter = next(hom, &iter->elem))
+             ++j, iter = next(hom, iter))
         {
             if (iter == end(hom) || !iter)
             {
@@ -56,7 +55,7 @@ CHECK_BEGIN_STATIC_FN(check_range, handle_ordered_map const *const hom,
                 (void)fprintf(stderr, "%s%d, %s", RED, iter->id, NONE);
             }
         }
-        for (; iter != end_range(r); iter = next(hom, &iter->elem))
+        for (; iter != end_range(r); iter = next(hom, iter))
         {
             (void)fprintf(stderr, "%s%d, %s", RED, iter->id, NONE);
         }
@@ -70,7 +69,7 @@ CHECK_BEGIN_STATIC_FN(check_rrange, handle_ordered_map const *const hom,
 {
     struct val *iter = rbegin_rrange(r);
     size_t index = 0;
-    for (; iter != rend_rrange(r); iter = rnext(hom, &iter->elem))
+    for (; iter != rend_rrange(r); iter = rnext(hom, iter))
     {
         int const cur_id = iter->id;
         CHECK(expect_rrange[index], cur_id);
@@ -92,7 +91,7 @@ CHECK_BEGIN_STATIC_FN(check_rrange, handle_ordered_map const *const hom,
         (void)fprintf(stderr, "%sERROR:%s (int[%zu]){", RED, GREEN, n);
         iter = rbegin_rrange(r);
         for (j = 0; j < n && iter != rend_rrange(r);
-             ++j, iter = rnext(hom, &iter->elem))
+             ++j, iter = rnext(hom, iter))
         {
             if (iter == rend(hom) || !iter)
             {
@@ -108,7 +107,7 @@ CHECK_BEGIN_STATIC_FN(check_rrange, handle_ordered_map const *const hom,
                 (void)fprintf(stderr, "%s%d, %s", RED, iter->id, NONE);
             }
         }
-        for (; iter != rend_rrange(r); iter = rnext(hom, &iter->elem))
+        for (; iter != rend_rrange(r); iter = rnext(hom, iter))
         {
             (void)fprintf(stderr, "%s%d, %s", RED, iter->id, NONE);
         }
@@ -120,14 +119,14 @@ CHECK_BEGIN_STATIC_FN(iterator_check, handle_ordered_map *s)
 {
     size_t const size = size(s).count;
     size_t iter_count = 0;
-    for (struct val *e = begin(s); e != end(s); e = next(s, &e->elem))
+    for (struct val *e = begin(s); e != end(s); e = next(s, e))
     {
         ++iter_count;
         CHECK(iter_count <= size, true);
     }
     CHECK(iter_count, size);
     iter_count = 0;
-    for (struct val *e = rbegin(s); e != end(s); e = rnext(s, &e->elem))
+    for (struct val *e = rbegin(s); e != end(s); e = rnext(s, e))
     {
         ++iter_count;
         CHECK(iter_count <= size, true);
@@ -138,11 +137,11 @@ CHECK_BEGIN_STATIC_FN(iterator_check, handle_ordered_map *s)
 
 CHECK_BEGIN_STATIC_FN(homap_test_forward_iter)
 {
-    handle_ordered_map s
-        = hom_init((struct val[34]){}, elem, id, id_cmp, NULL, NULL, 34);
+    ccc_handle_ordered_map s = hom_init(&(small_fixed_map){}, struct val, id,
+                                        id_cmp, NULL, NULL, SMALL_FIXED_CAP);
     /* We should have the expected behavior iteration over empty tree. */
     int j = 0;
-    for (struct val *e = begin(&s); e != end(&s); e = next(&s, &e->elem), ++j)
+    for (struct val *e = begin(&s); e != end(&s); e = next(&s, e), ++j)
     {}
     CHECK(j, 0);
     int const num_nodes = 33;
@@ -150,8 +149,8 @@ CHECK_BEGIN_STATIC_FN(homap_test_forward_iter)
     size_t shuffled_index = prime % num_nodes;
     for (int i = 0; i < num_nodes; ++i)
     {
-        (void)swap_handle(
-            &s, &(struct val){.id = (int)shuffled_index, .val = i}.elem);
+        (void)swap_handle(&s,
+                          &(struct val){.id = (int)shuffled_index, .val = i});
         CHECK(validate(&s), true);
         shuffled_index = (shuffled_index + prime) % num_nodes;
     }
@@ -159,7 +158,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_forward_iter)
     CHECK(inorder_fill(keys_inorder, num_nodes, &s), size(&s).count);
     j = 0;
     for (struct val *e = begin(&s); e != end(&s) && j < num_nodes;
-         e = next(&s, &e->elem), ++j)
+         e = next(&s, e), ++j)
     {
         CHECK(e->id, keys_inorder[j]);
     }
@@ -168,28 +167,29 @@ CHECK_BEGIN_STATIC_FN(homap_test_forward_iter)
 
 CHECK_BEGIN_STATIC_FN(homap_test_iterate_removal)
 {
-    handle_ordered_map s
-        = hom_init((struct val[1001]){}, elem, id, id_cmp, NULL, NULL, 1001);
+    ccc_handle_ordered_map s = hom_init(&(standard_fixed_map){}, struct val, id,
+                                        id_cmp, NULL, NULL, STANDARD_FIXED_CAP);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
-    srand(time(NULL));
+    srand(1);
     size_t const num_nodes = 1000;
     for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. NOLINTNEXTLINE */
         (void)swap_handle(
-            &s,
-            &(struct val){.id = rand() % (num_nodes + 1), .val = (int)i}.elem);
+            &s, &(struct val){.id = rand() % (num_nodes + 1), .val = (int)i});
         CHECK(validate(&s), true);
     }
     CHECK(iterator_check(&s), PASS);
     int const limit = 400;
-    for (struct val *i = begin(&s), *next = NULL; i != end(&s); i = next)
+    size_t cur_node = 0;
+    for (struct val *i = begin(&s), *next = NULL;
+         i != end(&s) && cur_node < num_nodes; i = next, ++cur_node)
     {
-        next = next(&s, &i->elem);
+        next = next(&s, i);
         if (i->id > limit)
         {
-            (void)remove(&s, &(struct val){.id = i->id}.elem);
+            (void)remove(&s, &(struct val){.id = i->id});
             CHECK(validate(&s), true);
         }
     }
@@ -198,8 +198,8 @@ CHECK_BEGIN_STATIC_FN(homap_test_iterate_removal)
 
 CHECK_BEGIN_STATIC_FN(homap_test_iterate_remove_reinsert)
 {
-    handle_ordered_map s
-        = hom_init((struct val[1001]){}, elem, id, id_cmp, NULL, NULL, 1001);
+    ccc_handle_ordered_map s = hom_init(&(standard_fixed_map){}, struct val, id,
+                                        id_cmp, NULL, NULL, STANDARD_FIXED_CAP);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -208,8 +208,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_iterate_remove_reinsert)
     {
         /* Force duplicates. NOLINTNEXTLINE */
         (void)swap_handle(
-            &s,
-            &(struct val){.id = rand() % (num_nodes + 1), .val = (int)i}.elem);
+            &s, &(struct val){.id = rand() % (num_nodes + 1), .val = (int)i});
         CHECK(validate(&s), true);
     }
     CHECK(iterator_check(&s), PASS);
@@ -218,13 +217,13 @@ CHECK_BEGIN_STATIC_FN(homap_test_iterate_remove_reinsert)
     int new_unique_handle_id = 1001;
     for (struct val *i = begin(&s), *next = NULL; i != end(&s); i = next)
     {
-        next = next(&s, &i->elem);
+        next = next(&s, i);
         if (i->id < limit)
         {
             struct val new_val = {.id = i->id};
-            (void)remove(&s, &new_val.elem);
+            (void)remove(&s, &new_val);
             new_val.id = new_unique_handle_id;
-            ccc_handle e = insert_or_assign(&s, &new_val.elem);
+            ccc_handle e = insert_or_assign(&s, &new_val);
             CHECK(unwrap(&e) != 0, true);
             CHECK(validate(&s), true);
             ++new_unique_handle_id;
@@ -236,14 +235,14 @@ CHECK_BEGIN_STATIC_FN(homap_test_iterate_remove_reinsert)
 
 CHECK_BEGIN_STATIC_FN(homap_test_valid_range)
 {
-    handle_ordered_map s
-        = hom_init((struct val[26]){}, elem, id, id_cmp, NULL, NULL, 26);
+    ccc_handle_ordered_map s = hom_init(&(small_fixed_map){}, struct val, id,
+                                        id_cmp, NULL, NULL, SMALL_FIXED_CAP);
 
     int const num_nodes = 25;
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
     for (int i = 0, id = 0; i < num_nodes; ++i, id += 5)
     {
-        (void)insert_or_assign(&s, &(struct val){.id = id, .val = i}.elem);
+        (void)insert_or_assign(&s, &(struct val){.id = id, .val = i});
         CHECK(validate(&s), true);
     }
     /* This should be the following range [6,44). 6 should raise to
@@ -263,13 +262,13 @@ CHECK_BEGIN_STATIC_FN(homap_test_valid_range)
 
 CHECK_BEGIN_STATIC_FN(homap_test_valid_range_equals)
 {
-    handle_ordered_map s
-        = hom_init((struct val[26]){}, elem, id, id_cmp, NULL, NULL, 26);
+    ccc_handle_ordered_map s = hom_init(&(small_fixed_map){}, struct val, id,
+                                        id_cmp, NULL, NULL, SMALL_FIXED_CAP);
     int const num_nodes = 25;
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
     for (int i = 0, id = 0; i < num_nodes; ++i, id += 5)
     {
-        (void)insert_or_assign(&s, &(struct val){.id = id, .val = i}.elem);
+        (void)insert_or_assign(&s, &(struct val){.id = id, .val = i});
         CHECK(validate(&s), true);
     }
     /* This should be the following range [5,50). 5 should stay at the start,
@@ -288,13 +287,13 @@ CHECK_BEGIN_STATIC_FN(homap_test_valid_range_equals)
 
 CHECK_BEGIN_STATIC_FN(homap_test_invalid_range)
 {
-    handle_ordered_map s
-        = hom_init((struct val[26]){}, elem, id, id_cmp, NULL, NULL, 26);
+    ccc_handle_ordered_map s = hom_init(&(small_fixed_map){}, struct val, id,
+                                        id_cmp, NULL, NULL, SMALL_FIXED_CAP);
     int const num_nodes = 25;
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
     for (int i = 0, id = 0; i < num_nodes; ++i, id += 5)
     {
-        (void)insert_or_assign(&s, &(struct val){.id = id, .val = i}.elem);
+        (void)insert_or_assign(&s, &(struct val){.id = id, .val = i});
         CHECK(validate(&s), true);
     }
     /* This should be the following range [95,999). 95 should raise to
@@ -314,18 +313,18 @@ CHECK_BEGIN_STATIC_FN(homap_test_invalid_range)
 
 CHECK_BEGIN_STATIC_FN(homap_test_empty_range)
 {
-    handle_ordered_map s
-        = hom_init((struct val[26]){}, elem, id, id_cmp, NULL, NULL, 26);
+    ccc_handle_ordered_map s = hom_init(&(small_fixed_map){}, struct val, id,
+                                        id_cmp, NULL, NULL, SMALL_FIXED_CAP);
     int const num_nodes = 25;
     int const step = 5;
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
     for (int i = 0, id = 0; i < num_nodes; ++i, id += step)
     {
-        (void)insert_or_assign(&s, &(struct val){.id = id, .val = i}.elem);
+        (void)insert_or_assign(&s, &(struct val){.id = id, .val = i});
         CHECK(validate(&s), true);
     }
-    /* Nonexistent range returns end [begin, end) in both positions.
-       Which may not be the end element but a value in the tree. However,
+    /* Nonexistant range returns end [begin, end) in both positions.
+       which may not be the end element but a value in the tree. However,
        Normal iteration patterns would consider this empty. */
     ccc_range const forward_range = equal_range(&s, &(int){-50}, &(int){-25});
     CHECK(((struct val *)begin_range(&forward_range))->id, 0);

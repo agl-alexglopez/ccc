@@ -78,20 +78,96 @@ typedef union ccc_homap_handle ccc_homap_handle;
 Initialize the container with memory, callbacks, and permissions. */
 /**@{*/
 
+/** @brief Declare a fixed size map type for use in the stack, heap, or data
+segment. Does not return a value.
+@param [in] fixed_map_type_name the user chosen name of the fixed sized map.
+@param [in] key_val_type_name the type the user plans to store in the map. It
+may have a key and value field as well as any additional fields. For set-like
+behavior, wrap a field in a struct/union (e.g. `union int_elem {int e;};`).
+@param [in] capacity the desired number of user accessible nodes.
+@warning the map will use one slot of the specified capacity for a sentinel
+node. This is not important to the user unless an exact allocation count is
+needed in which case 1 should be added to desired capacity.
+
+Once the location for the fixed size map is chosen--stack, heap, or data
+segment--provide a pointer to the map for the initialization macro.
+
+```
+struct val
+{
+    int key;
+    int val;
+};
+ccc_hom_declare_fixed_map(small_fixed_map, struct val, 64);
+static handle_realtime_ordered_map static_map = hom_init(
+    &(static small_fixed_map){},
+    struct val,
+    key,
+    homap_key_cmp,
+    NULL,
+    NULL,
+    hom_fixed_capacity(small_fixed_map)
+);
+```
+
+Similarly, a fixed size map can be used on the stack.
+
+```
+struct val
+{
+    int key;
+    int val;
+};
+ccc_hom_declare_fixed_map(small_fixed_map, struct val, 64);
+int main(void)
+{
+    handle_realtime_ordered_map static_fh = hom_init(
+        &(small_fixed_map){},
+        struct val,
+        key,
+        homap_key_cmp,
+        NULL,
+        NULL,
+        hom_fixed_capacity(small_fixed_map)
+    );
+    return 0;
+}
+```
+
+The ccc_hom_fixed_capacity macro can be used to obtain the previously provided
+capacity when declaring the fixed map type. Finally, one could allocate a fixed
+size map on the heap; however, it is usually better to initialize a dynamic
+map and use the ccc_hom_reserve function for such a use case.
+
+This macro is not needed when a dynamic resizing map is needed. For dynamic
+maps, simply pass NULL and 0 capacity to the initialization macro along with the
+desired allocation function. */
+#define ccc_hom_declare_fixed_map(fixed_map_type_name, key_val_type_name,      \
+                                  capacity)                                    \
+    ccc_impl_hom_declare_fixed_map(fixed_map_type_name, key_val_type_name,     \
+                                   capacity)
+
+/** @brief Obtain the capacity previously chosen for the fixed size map type.
+@param [in] fixed_map_type_name the name of a previously declared map.
+@return the size_t capacity previously specified for this type by user. */
+#define ccc_hom_fixed_capacity(fixed_map_type_name)                            \
+    ccc_impl_hom_fixed_capacity(fixed_map_type_name)
+
 /** @brief Initializes the map at runtime or compile time.
-@param [in] mem_ptr a pointer to the contiguous user types or ((T *)NULL).
-@param [in] om_elem_field the name of the intrusive map elem field.
+@param [in] memory_ptr a pointer to the contiguous user types or ((T *)NULL).
+@param [in] any_type_name the name of the user type stored in the map.
 @param [in] key_elem_field the name of the field in user type used as key.
-@param [in] key_cmp the key comparison function (see types.h).
+@param [in] key_cmp_fn the key comparison function (see types.h).
 @param [in] alloc_fn the allocation function or NULL if allocation is banned.
-@param [in] aux a pointer to any auxiliary data for comparison or destruction.
-@param [in] capacity the capacity at mem_ptr or 0 if ((T *)NULL).
+@param [in] aux_data a pointer to any auxiliary data for comparison or
+destruction.
+@param [in] capacity the capacity at mem_ptr or 0.
 @return the struct initialized ordered map for direct assignment
-(i.e. ccc_handle_ordered_map m = ccc_hom_init(...);). */
-#define ccc_hom_init(mem_ptr, om_elem_field, key_elem_field, key_cmp,          \
-                     alloc_fn, aux, capacity)                                  \
-    ccc_impl_hom_init(mem_ptr, om_elem_field, key_elem_field, key_cmp,         \
-                      alloc_fn, aux, capacity)
+(i.e. ccc_handle_realtime_ordered_map m = ccc_hom_init(...);). */
+#define ccc_hom_init(memory_ptr, any_type_name, key_elem_field, key_cmp_fn,    \
+                     alloc_fn, aux_data, capacity)                             \
+    ccc_impl_hom_init(memory_ptr, any_type_name, key_elem_field, key_cmp_fn,   \
+                      alloc_fn, aux_data, capacity)
 
 /** @brief Copy the map at source to destination.
 @param [in] dst the initialized destination for the copy of the src map.
