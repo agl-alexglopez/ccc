@@ -26,7 +26,7 @@ considering non-uniform access patterns. In the best case, repeated searches of
 the same value yield an O(1) access and many other frequently searched values
 will remain close to the root of the map.
 
-The handle variant of the ordered map promises contiguous storage and random
+The handle version of the ordered map promises contiguous storage and random
 access if needed. Handles remain valid until an element is removed even if other
 elements are inserted, other elements are removed, or resizing occurs. All
 elements in the map track their relationships via indices in the buffer.
