@@ -140,7 +140,7 @@ size map on the heap; however, it is usually better to initialize a dynamic
 map and use the ccc_hom_reserve function for such a use case.
 
 This macro is not needed when a dynamic resizing map is needed. For dynamic
-maps, simply pass NULL and 0 capacity to the initialization macro along with the
+maps, pass NULL and 0 capacity to the initialization macro along with the
 desired allocation function. */
 #define ccc_hom_declare_fixed_map(fixed_map_type_name, key_val_type_name,      \
                                   capacity)                                    \
