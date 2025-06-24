@@ -1040,31 +1040,31 @@ splay(struct ccc_homap *const t, size_t root, void const *const key,
     size_t l_r_subtrees[LR] = {0, 0};
     do
     {
-        ccc_threeway_cmp const root_cmp = cmp_elems(t, key, root, cmp_fn);
-        enum hom_branch const dir = CCC_GRT == root_cmp;
-        if (CCC_EQL == root_cmp || !branch_i(t, root, dir))
+        ccc_threeway_cmp const key_cmp = cmp_elems(t, key, root, cmp_fn);
+        enum hom_branch const child_link = CCC_GRT == key_cmp;
+        if (CCC_EQL == key_cmp || !branch_i(t, root, child_link))
         {
             break;
         }
         ccc_threeway_cmp const child_cmp
-            = cmp_elems(t, key, branch_i(t, root, dir), cmp_fn);
-        enum hom_branch const dir_from_child = CCC_GRT == child_cmp;
-        /* A straight line has formed from root->child->elem. An opportunity
-           to splay and heal the tree arises. */
-        if (CCC_EQL != child_cmp && dir == dir_from_child)
+            = cmp_elems(t, key, branch_i(t, root, child_link), cmp_fn);
+        enum hom_branch const grandchild_link = CCC_GRT == child_cmp;
+        /* A straight line has formed from root->child->grandchild. An
+           opportunity to splay and heal the tree arises. */
+        if (CCC_EQL != child_cmp && child_link == grandchild_link)
         {
-            size_t const pivot = branch_i(t, root, dir);
-            link(t, root, dir, branch_i(t, pivot, !dir));
-            link(t, pivot, !dir, root);
-            root = pivot;
-            if (!branch_i(t, root, dir))
+            size_t const child_node = branch_i(t, root, child_link);
+            link(t, root, child_link, branch_i(t, child_node, !child_link));
+            link(t, child_node, !child_link, root);
+            root = child_node;
+            if (!branch_i(t, root, child_link))
             {
                 break;
             }
         }
-        link(t, l_r_subtrees[!dir], dir, root);
-        l_r_subtrees[!dir] = root;
-        root = branch_i(t, root, dir);
+        link(t, l_r_subtrees[!child_link], child_link, root);
+        l_r_subtrees[!child_link] = root;
+        root = branch_i(t, root, child_link);
     }
     while (1);
     link(t, l_r_subtrees[L], R, branch_i(t, root, L));
