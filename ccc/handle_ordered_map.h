@@ -21,7 +21,7 @@ by key. Because the data structure is self-optimizing it is not a suitable map
 in a realtime environment where strict runtime bounds are needed. Also,
 searching the map is not a const thread-safe operation as indicated by the
 function signatures. The map is optimized upon every new search. However, in
-many cases the self-optimizing structure of the map can be beneficial when
+many cases the self-optimizing structure of the map may be beneficial when
 considering non-uniform access patterns. In the best case, repeated searches of
 the same value yield an O(1) access and many other frequently searched values
 will remain close to the root of the map.
