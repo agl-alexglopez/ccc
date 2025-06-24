@@ -218,6 +218,7 @@ add_homap_test(test_homap_insert)
 add_homap_test(test_homap_erase)
 add_homap_test(test_homap_iter)
 add_homap_test(test_homap_entry)
+add_homap_test(test_homap_lru)
 
 #############  Realtime Map  ##########################
 add_library(romap_util romap/romap_util.h romap/romap_util.c)
