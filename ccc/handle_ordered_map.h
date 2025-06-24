@@ -33,8 +33,8 @@ elements in the map track their relationships via indices in the buffer.
 Therefore, this data structure can be relocated, copied, serialized, or written
 to disk and all internal data structure references will remain valid. Insertion
 may invoke an O(N) operation if resizing occurs. Finally, if allocation is
-prohibited upon initialization and the user intends to store a fixed size N
-nodes in the map N + 1 capacity is needed for the sentinel node in the buffer.
+prohibited upon initialization, and the user intends to store a fixed size N
+nodes in the map, N + 1 capacity is needed for the sentinel node in the buffer.
 
 To shorten names in the interface, define the following preprocessor directive
 at the top of your file.
