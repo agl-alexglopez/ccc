@@ -22,7 +22,7 @@ CHECK_BEGIN_FN(insert_shuffled, ccc_handle_ordered_map *m, size_t const size,
     for (size_t i = 0; i < size; ++i)
     {
         (void)insert_or_assign(
-            m, &(struct val){.id = (int)shuffled_index, .val = (int)i}.elem);
+            m, &(struct val){.id = (int)shuffled_index, .val = (int)i});
         CHECK(validate(m), true);
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
@@ -39,7 +39,7 @@ inorder_fill(int vals[], size_t size, ccc_handle_ordered_map const *const m)
         return 0;
     }
     size_t i = 0;
-    for (struct val *e = begin(m); e != end(m); e = next(m, &e->elem))
+    for (struct val *e = begin(m); e != end(m); e = next(m, e))
     {
         vals[i++] = e->id;
     }

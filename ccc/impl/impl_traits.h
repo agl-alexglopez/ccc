@@ -76,7 +76,7 @@ limitations under the License.
         ccc_handle_ordered_map                                                 \
             *: &(ccc_handle){ccc_hom_try_insert(                               \
                                  (ccc_handle_ordered_map *)container_ptr,      \
-                                 (ccc_homap_elem *)try_insert_args)            \
+                                 try_insert_args)                              \
                                  .impl},                                       \
         ccc_handle_realtime_ordered_map                                        \
             *: &(ccc_handle){ccc_hrm_try_insert(                               \
@@ -120,7 +120,7 @@ limitations under the License.
         ccc_handle_ordered_map                                                 \
             *: &(ccc_handle){ccc_hom_insert_or_assign(                         \
                                  (ccc_handle_ordered_map *)container_ptr,      \
-                                 (ccc_homap_elem *)insert_or_assign_args)      \
+                                 insert_or_assign_args)                        \
                                  .impl},                                       \
         ccc_handle_realtime_ordered_map                                        \
             *: &(ccc_handle){ccc_hrm_insert_or_assign(                         \
@@ -164,8 +164,7 @@ limitations under the License.
         ccc_handle_ordered_map                                                 \
             *: &(ccc_handle){ccc_hom_remove(                                   \
                                  (ccc_handle_ordered_map *)container_ptr,      \
-                                 (ccc_homap_elem *)                            \
-                                     key_val_container_handle_ptr)             \
+                                 key_val_container_handle_ptr)                 \
                                  .impl},                                       \
         ccc_handle_realtime_ordered_map                                        \
             *: &(                                                              \
