@@ -679,7 +679,7 @@ the provided range iteration functions from types.h is recommended for example:
 ```
 for (struct val *i = range_begin(&range);
      i != end_range(&range);
-     i = next(&hom, &i->elem))
+     i = next(&hom, i))
 {}
 ```
 
@@ -717,7 +717,7 @@ the provided rrange iteration functions from types.h is recommended for example:
 ```
 for (struct val *i = rrange_begin(&rrange);
      i != rend_rrange(&rrange);
-     i = rnext(&hom, &i->elem))
+     i = rnext(&hom, i))
 {}
 ```
 
