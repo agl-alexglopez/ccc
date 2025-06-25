@@ -765,6 +765,9 @@ dijkstra_shortest_path(struct graph *const graph, char const src,
     return INT_MAX;
 }
 
+/** Returns the shortest path total distance while painting the lines as a side
+effect of this process. The edges will be painted a color different than the
+color used while considering paths to clearly indicate it is the shortest. */
 static int
 paint_shortest_path(struct graph *const graph, struct cost const *const map_pq,
                     struct cost const *u)
