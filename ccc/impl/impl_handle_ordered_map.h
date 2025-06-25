@@ -43,11 +43,29 @@ struct ccc_homap_elem
     };
 };
 
-/** @private A ordered map providing handle stability. Once elements are
-inserted into the map they will not move slots even when the array resizes. The
-free slots are tracked in a singly linked list that uses indices instead of
-pointers so that it remains valid even when the table resizes. The 0th index of
-the array is sacrificed for some coding simplicity and falsey 0. */
+/** @private A handle ordered map is a modified struct of arrays layout
+with the modification being that we may have the arrays as pointer offsets in
+a contiguous allocation if the user desires a dynamic map.
+
+The user data array comes first allowing the user to store any type they wish
+in the container contiguously with no intrusive element padding, saving space.
+
+The nodes array is next. These nodes track the indices of the child and parent
+nodes in the WAVL tree.
+
+Here is the layout in one contiguous array.
+
+(D = Data Array, N = Nodes Array, _N = Capacity - 1)
+
+┌───┬───┬───┬───┬───┬───┬───┬───┐
+│D_0│D_1│...│D_N│N_0│N_1│...│N_N│
+└───┴───┴───┴───┴───┴───┴───┴───┘
+
+This layout costs us in consulting both the data and nodes array during the
+top down splay operation. However, the benefit of space saving and no wasted
+padding bytes between element fields or multiple elements in an array is the
+goal of this implementation. Speed is a secondary goal to space for these
+implementations as the space savings can be significant. */
 struct ccc_homap
 {
     /** @private The contiguous array of user data. */
@@ -113,9 +131,8 @@ size_t ccc_impl_hom_alloc_slot(struct ccc_homap *hom);
 
 /*========================     Initialization       =========================*/
 
-/** @private The user can declare a fixed size realtime ordered map with the
-help of static asserts to ensure the layout is compatible with our internal
-metadata. */
+/** @private The user can declare a fixed size ordered map with the help of
+static asserts to ensure the layout is compatible with our internal metadata. */
 #define ccc_impl_hom_declare_fixed_map(impl_fixed_map_type_name,               \
                                        impl_key_val_type_name, impl_capacity)  \
     static_assert((impl_capacity) > 1,                                         \
