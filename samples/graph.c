@@ -273,6 +273,8 @@ static bool is_vertex(cell);
 static bool is_path_cell(cell);
 static struct vertex *vertex_at(struct graph const *g, char name);
 static struct cost *map_pq_at(struct cost const *dj_arr, char vertex);
+static int paint_shortest_path(struct graph *, struct cost const *,
+                               struct cost const *);
 
 static void encode_digits(struct graph const *, struct digit_encoding *);
 static enum label_orientation get_direction(struct point const *,
@@ -738,20 +740,7 @@ dijkstra_shortest_path(struct graph *const graph, char const src,
         }
         if (u->name == dst)
         {
-            int total = 0;
-            for (; u->from; u = map_pq_at(map_pq, u->from))
-            {
-                struct node const *const edges
-                    = vertex_at(graph, u->name)->edges;
-                int i = 0;
-                for (; i < MAX_DEGREE && edges[i].name != u->from; ++i)
-                {}
-                prog_assert(i < MAX_DEGREE && edges[i].name);
-                total += edges[i].cost;
-                paint_edge(graph, u->name, u->from, CYN);
-                nanosleep(&graph->speed, NULL);
-            }
-            return total;
+            return paint_shortest_path(graph, map_pq, u);
         }
         struct node const *const edges = vertex_at(graph, u->name)->edges;
         for (int i = 0; i < MAX_DEGREE && edges[i].name; ++i)
@@ -774,6 +763,25 @@ dijkstra_shortest_path(struct graph *const graph, char const src,
         }
     }
     return INT_MAX;
+}
+
+static int
+paint_shortest_path(struct graph *const graph, struct cost const *const map_pq,
+                    struct cost const *u)
+{
+    int total = 0;
+    for (; u->from; u = map_pq_at(map_pq, u->from))
+    {
+        struct node const *const edges = vertex_at(graph, u->name)->edges;
+        int i = 0;
+        for (; i < MAX_DEGREE && edges[i].name != u->from; ++i)
+        {}
+        prog_assert(i < MAX_DEGREE && edges[i].name);
+        total += edges[i].cost;
+        paint_edge(graph, u->name, u->from, CYN);
+        nanosleep(&graph->speed, NULL);
+    }
+    return total;
 }
 
 static inline struct cost *
