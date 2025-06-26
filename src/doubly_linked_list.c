@@ -234,7 +234,7 @@ ccc_dll_end_elem(ccc_doubly_linked_list const *const l)
 ccc_dll_elem *
 ccc_dll_end_sentinel(ccc_doubly_linked_list const *const l)
 {
-    return l ? (struct ccc_dll_elem *)&l->nil : NULL;
+    return l ? (ccc_dll_elem *)&l->nil : NULL;
 }
 
 void *

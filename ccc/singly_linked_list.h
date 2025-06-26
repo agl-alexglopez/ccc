@@ -311,10 +311,15 @@ empty. */
 [[nodiscard]] ccc_sll_elem *
 ccc_sll_begin_elem(ccc_singly_linked_list const *sll);
 
-/** @brief Return a pointer to the first list element in the list. O(1).
+/** @brief Return a pointer to the sentinel node at the front of the list.
 @param [in] sll a pointer to the singly linked list.
-@return a pointer to the first list element. This will never be NULL, even if
-the list is empty. If bad input is provided (sll is NULL) NULL is returned. */
+@return a pointer to the sentinel node that always points to the first list
+element or itself. It will not be NULL unless the sll pointer provided is NULL.
+
+This functions can be used when the user wishes to splice an element or range
+of elements to the front of the list. Because the interface only allows the user
+to splice an element or range AFTER a position having access to the sentinel
+makes it possible to splice to the front of the list. */
 [[nodiscard]] ccc_sll_elem *
 ccc_sll_begin_sentinel(ccc_singly_linked_list const *sll);
 

@@ -378,10 +378,15 @@ may be the sentinel. O(1).
 the sentinel but will not be NULL unless a NULL pointer is provided as l. */
 [[nodiscard]] ccc_dll_elem *ccc_dll_end_elem(ccc_doubly_linked_list const *l);
 
-/** @brief Return a handle to the sentinel at the back of the list. O(1).
+/** @brief Return a pointer to the sentinel node at the back of the list.
 @param [in] l a pointer to the doubly linked list.
-@return a pointer to the sentinel at the end of the list which will not be NULL
-unless a NULL pointer is provided as l. */
+@return a pointer to the sentinel node that always points to the first and last
+elements or itself. It will not be NULL unless sll pointer provided is NULL.
+
+This function can be used when the user wishes to splice an element or range of
+elements to the back of the list. Because the interface only allows the user
+to splice an element or elements BEFORE a position having access to the sentinel
+makes it possible to splice to the back of the list. */
 [[nodiscard]] ccc_dll_elem *
 ccc_dll_end_sentinel(ccc_doubly_linked_list const *l);
 
