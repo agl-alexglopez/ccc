@@ -103,12 +103,10 @@ Include dependency graph for handle_ordered_map.h:</div>
 <div class="dyncontent">
 <div class="center"><img src="handle__ordered__map_8h__incl.png" border="0" usemap="#accc_2handle__ordered__map_8h" alt=""/></div>
 <map name="accc_2handle__ordered__map_8h" id="accc_2handle__ordered__map_8h">
-<area shape="rect" title="The Handle Ordered Map Interface." alt="" coords="161,5,309,45"/>
-<area shape="rect" href="impl__handle__ordered__map_8h_source.html" title=" " alt="" coords="72,93,264,133"/>
-<area shape="rect" href="types_8h.html" title="The C Container Collection Fundamental Types." alt="" coords="113,328,196,353"/>
-<area shape="rect" href="buffer_8h.html" title="The Buffer Interface." alt="" coords="113,181,196,207"/>
-<area shape="rect" href="impl__types_8h_source.html" title=" " alt="" coords="5,401,144,427"/>
-<area shape="rect" href="impl__buffer_8h_source.html" title=" " alt="" coords="85,255,225,280"/>
+<area shape="rect" title="The Handle Ordered Map Interface." alt="" coords="5,5,153,45"/>
+<area shape="rect" href="impl__handle__ordered__map_8h_source.html" title=" " alt="" coords="50,93,242,133"/>
+<area shape="rect" href="types_8h.html" title="The C Container Collection Fundamental Types." alt="" coords="26,181,109,207"/>
+<area shape="rect" href="impl__types_8h_source.html" title=" " alt="" coords="37,255,175,280"/>
 </map>
 </div>
 </div><div class="textblock"><div class="dynheader">
@@ -125,8 +123,8 @@ This graph shows which files directly or indirectly include this file:</div>
 <p><a href="handle__ordered__map_8h_source.html">Go to the source code of this file.</a></p>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The Handle Ordered Map Interface. </p>
-<p>A handle ordered map is a contiguously stored map offering storage and retrieval by key. Because the data structure is self-optimizing it is not a suitable map in a realtime environment where strict runtime bounds are needed. Also, searching the map is not a const thread-safe operation as indicated by the function signatures. The map is optimized upon every new search. However, in many cases the self-optimizing structure of the map can be beneficial when considering non-uniform access patterns. In the best case, repeated searches of the same value yield an O(1) access and many other frequently searched values will remain close to the root of the map.</p>
-<p>The handle variant of the ordered map promises contiguous storage and random access if needed. Handles remain valid until an element is removed even if other elements are inserted, other elements are removed, or resizing occurs. All elements in the map track their relationships via indices in the buffer. Therefore, this data structure can be relocated, copied, serialized, or written to disk and all internal data structure references will remain valid. Insertion may invoke an O(N) operation if resizing occurs. Finally, if allocation is prohibited upon initialization and the user intends to store a fixed size N nodes in the map N + 1 capacity is needed for the sentinel node in the buffer.</p>
+<p>A handle ordered map is a contiguously stored map offering storage and retrieval by key. Because the data structure is self-optimizing it is not a suitable map in a realtime environment where strict runtime bounds are needed. Also, searching the map is not a const thread-safe operation as indicated by the function signatures. The map is optimized upon every new search. However, in many cases the self-optimizing structure of the map may be beneficial when considering non-uniform access patterns. In the best case, repeated searches of the same value yield an O(1) access and many other frequently searched values will remain close to the root of the map.</p>
+<p>The handle version of the ordered map promises contiguous storage and random access if needed. Handles remain valid until an element is removed even if other elements are inserted, other elements are removed, or resizing occurs. All elements in the map track their relationships via indices in the buffer. Therefore, this data structure can be relocated, copied, serialized, or written to disk and all internal data structure references will remain valid. Insertion may invoke an O(N) operation if resizing occurs. Finally, if allocation is prohibited upon initialization, and the user intends to store a fixed size N nodes in the map, N + 1 capacity is needed for the sentinel node in the buffer.</p>
 <p>To shorten names in the interface, define the following preprocessor directive at the top of your file.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define HANDLE_ORDERED_MAP_USING_NAMESPACE_CCC</span></div>
 </div><!-- fragment --><p>All types and functions can then be written without the <code>ccc_</code> prefix. </p>
@@ -134,9 +132,15 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Initialization Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Initialize the container with memory, callbacks, and permissions. </p>
 </td></tr>
-<tr class="memitem:a62966a332acdaf02f2e29322e578f198"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="handle__ordered__map_8h.html#a62966a332acdaf02f2e29322e578f198">ccc_hom_init</a>(mem_ptr,  om_elem_field,  key_elem_field,  key_cmp,  alloc_fn,  aux,  capacity)</td></tr>
-<tr class="memdesc:a62966a332acdaf02f2e29322e578f198"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the map at runtime or compile time.  <br /></td></tr>
-<tr class="separator:a62966a332acdaf02f2e29322e578f198"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af92a5082774cad09211d6222d1686af9"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="handle__ordered__map_8h.html#af92a5082774cad09211d6222d1686af9">ccc_hom_declare_fixed_map</a>(fixed_map_type_name,  key_val_type_name,  capacity)</td></tr>
+<tr class="memdesc:af92a5082774cad09211d6222d1686af9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Declare a fixed size map type for use in the stack, heap, or data segment. Does not return a value.  <br /></td></tr>
+<tr class="separator:af92a5082774cad09211d6222d1686af9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3c91477bb4dda0b163acc15bf67d21fd"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="handle__ordered__map_8h.html#a3c91477bb4dda0b163acc15bf67d21fd">ccc_hom_fixed_capacity</a>(fixed_map_type_name)&#160;&#160;&#160;    ccc_impl_hom_fixed_capacity(fixed_map_type_name)</td></tr>
+<tr class="memdesc:a3c91477bb4dda0b163acc15bf67d21fd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain the capacity previously chosen for the fixed size map type.  <br /></td></tr>
+<tr class="separator:a3c91477bb4dda0b163acc15bf67d21fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaba2f6ff810fd90f4ec7ea05a318e7d0"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="handle__ordered__map_8h.html#aaba2f6ff810fd90f4ec7ea05a318e7d0">ccc_hom_init</a>(memory_ptr,  any_type_name,  key_elem_field,  key_cmp_fn,  alloc_fn,  aux_data,  capacity)</td></tr>
+<tr class="memdesc:aaba2f6ff810fd90f4ec7ea05a318e7d0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the map at runtime or compile time.  <br /></td></tr>
+<tr class="separator:aaba2f6ff810fd90f4ec7ea05a318e7d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a358440f1ba3699b6b529c164b3a19e67"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="handle__ordered__map_8h.html#a358440f1ba3699b6b529c164b3a19e67">ccc_hom_copy</a> (<a class="el" href="handle__ordered__map_8h.html#a5b41518bacfebf07fddfb1558a50345c">ccc_handle_ordered_map</a> *dst, <a class="el" href="handle__ordered__map_8h.html#a5b41518bacfebf07fddfb1558a50345c">ccc_handle_ordered_map</a> const *src, <a class="el" href="types_8h.html#a3e73202894869d2840fb21ff912bbd96">ccc_any_alloc_fn</a> *fn)</td></tr>
 <tr class="memdesc:a358440f1ba3699b6b529c164b3a19e67"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy the map at source to destination.  <br /></td></tr>
 <tr class="separator:a358440f1ba3699b6b529c164b3a19e67"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -163,21 +167,21 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Handle Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Obtain and operate on container handles for efficient queries when non-trivial control flow is needed. </p>
 </td></tr>
-<tr class="memitem:aa8a9aebe29d8ccde258444b62c5f4f00"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="handle__ordered__map_8h.html#aa8a9aebe29d8ccde258444b62c5f4f00">ccc_hom_swap_handle_r</a>(handle_ordered_map_ptr,  out_handle_ptr)</td></tr>
-<tr class="memdesc:aa8a9aebe29d8ccde258444b62c5f4f00"><td class="mdescLeft">&#160;</td><td class="mdescRight">Invariantly inserts the key value wrapping key_val_handle.  <br /></td></tr>
-<tr class="separator:aa8a9aebe29d8ccde258444b62c5f4f00"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a39fa8ed15ae984b7be6a914baa771c0a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="handle__ordered__map_8h.html#a39fa8ed15ae984b7be6a914baa771c0a">ccc_hom_try_insert_r</a>(handle_ordered_map_ptr,  key_val_handle_ptr)</td></tr>
-<tr class="memdesc:a39fa8ed15ae984b7be6a914baa771c0a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Attempts to insert the key value wrapping key_val_handle.  <br /></td></tr>
-<tr class="separator:a39fa8ed15ae984b7be6a914baa771c0a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a65c45090e69c2fba89fc1417e58a2801"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="handle__ordered__map_8h.html#a65c45090e69c2fba89fc1417e58a2801">ccc_hom_swap_handle_r</a>(handle_ordered_map_ptr,  key_val_output_ptr)</td></tr>
+<tr class="memdesc:a65c45090e69c2fba89fc1417e58a2801"><td class="mdescLeft">&#160;</td><td class="mdescRight">Invariantly inserts the key value wrapping key_val_type.  <br /></td></tr>
+<tr class="separator:a65c45090e69c2fba89fc1417e58a2801"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a36c28a42212d89df662f440d3eec058b"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="handle__ordered__map_8h.html#a36c28a42212d89df662f440d3eec058b">ccc_hom_try_insert_r</a>(handle_ordered_map_ptr,  key_val_type_ptr)</td></tr>
+<tr class="memdesc:a36c28a42212d89df662f440d3eec058b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Attempts to insert the key value wrapping key_val_type.  <br /></td></tr>
+<tr class="separator:a36c28a42212d89df662f440d3eec058b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a899d078f9bb25e273e0893c9b9636f16"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="handle__ordered__map_8h.html#a899d078f9bb25e273e0893c9b9636f16">ccc_hom_try_insert_w</a>(handle_ordered_map_ptr,  key,  lazy_value...)</td></tr>
 <tr class="memdesc:a899d078f9bb25e273e0893c9b9636f16"><td class="mdescLeft">&#160;</td><td class="mdescRight">lazily insert lazy_value into the map at key if key is absent.  <br /></td></tr>
 <tr class="separator:a899d078f9bb25e273e0893c9b9636f16"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5f0662cf243667fb1d7b119c8f991b7e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="handle__ordered__map_8h.html#a5f0662cf243667fb1d7b119c8f991b7e">ccc_hom_insert_or_assign_w</a>(handle_ordered_map_ptr,  key,  lazy_value...)</td></tr>
 <tr class="memdesc:a5f0662cf243667fb1d7b119c8f991b7e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inserts a new key value pair or overwrites the existing handle.  <br /></td></tr>
 <tr class="separator:a5f0662cf243667fb1d7b119c8f991b7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0e330a1a8d897aac246af6f349063c4a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="handle__ordered__map_8h.html#a0e330a1a8d897aac246af6f349063c4a">ccc_hom_remove_r</a>(handle_ordered_map_ptr,  out_handle_ptr)</td></tr>
-<tr class="memdesc:a0e330a1a8d897aac246af6f349063c4a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes the key value in the map storing the old value, if present, in the struct containing out_handle provided by the user.  <br /></td></tr>
-<tr class="separator:a0e330a1a8d897aac246af6f349063c4a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5818e7fa4926c7b657f39d761eebe186"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="handle__ordered__map_8h.html#a5818e7fa4926c7b657f39d761eebe186">ccc_hom_remove_r</a>(handle_ordered_map_ptr,  key_val_output_ptr)</td></tr>
+<tr class="memdesc:a5818e7fa4926c7b657f39d761eebe186"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes the key value in the map storing the old value, if present, in the struct containing key_val_output provided by the user.  <br /></td></tr>
+<tr class="separator:a5818e7fa4926c7b657f39d761eebe186"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af95f3601dc9a5d4cadee29cd0ba271a9"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="handle__ordered__map_8h.html#af95f3601dc9a5d4cadee29cd0ba271a9">ccc_hom_handle_r</a>(handle_ordered_map_ptr,  key_ptr)</td></tr>
 <tr class="memdesc:af95f3601dc9a5d4cadee29cd0ba271a9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtains a handle for the provided key in the map for future use.  <br /></td></tr>
 <tr class="separator:af95f3601dc9a5d4cadee29cd0ba271a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -193,18 +197,18 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memitem:a8f28044a3f5bc804107e6f4eda99f828"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="handle__ordered__map_8h.html#a8f28044a3f5bc804107e6f4eda99f828">ccc_hom_remove_handle_r</a>(handle_ordered_map_handle_ptr)</td></tr>
 <tr class="memdesc:a8f28044a3f5bc804107e6f4eda99f828"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove the handle from the map if Occupied.  <br /></td></tr>
 <tr class="separator:a8f28044a3f5bc804107e6f4eda99f828"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7bebdc72c017b07cf5bc148b835fdeb5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="traits_8h.html#ac028e04a12f65503490708cd1f5d69ba">ccc_handle</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="handle__ordered__map_8h.html#a7bebdc72c017b07cf5bc148b835fdeb5">ccc_hom_swap_handle</a> (<a class="el" href="handle__ordered__map_8h.html#a5b41518bacfebf07fddfb1558a50345c">ccc_handle_ordered_map</a> *hom, ccc_homap_elem *out_handle)</td></tr>
-<tr class="memdesc:a7bebdc72c017b07cf5bc148b835fdeb5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Invariantly inserts the key value wrapping key_val_handle.  <br /></td></tr>
-<tr class="separator:a7bebdc72c017b07cf5bc148b835fdeb5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab445ad41ee5ca1c5453cb529bbebbe44"><td class="memItemLeft" align="right" valign="top"><a class="el" href="traits_8h.html#ac028e04a12f65503490708cd1f5d69ba">ccc_handle</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="handle__ordered__map_8h.html#ab445ad41ee5ca1c5453cb529bbebbe44">ccc_hom_try_insert</a> (<a class="el" href="handle__ordered__map_8h.html#a5b41518bacfebf07fddfb1558a50345c">ccc_handle_ordered_map</a> *hom, ccc_homap_elem *key_val_handle)</td></tr>
-<tr class="memdesc:ab445ad41ee5ca1c5453cb529bbebbe44"><td class="mdescLeft">&#160;</td><td class="mdescRight">Attempts to insert the key value wrapping key_val_handle.  <br /></td></tr>
-<tr class="separator:ab445ad41ee5ca1c5453cb529bbebbe44"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aec2b6c22f1f7d8d310498bd5aa20131d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="traits_8h.html#ac028e04a12f65503490708cd1f5d69ba">ccc_handle</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="handle__ordered__map_8h.html#aec2b6c22f1f7d8d310498bd5aa20131d">ccc_hom_insert_or_assign</a> (<a class="el" href="handle__ordered__map_8h.html#a5b41518bacfebf07fddfb1558a50345c">ccc_handle_ordered_map</a> *hom, ccc_homap_elem *key_val_handle)</td></tr>
-<tr class="memdesc:aec2b6c22f1f7d8d310498bd5aa20131d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Invariantly inserts or overwrites a user struct into the map.  <br /></td></tr>
-<tr class="separator:aec2b6c22f1f7d8d310498bd5aa20131d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9d86f81dfd798539df040e41e5cd1ab4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="traits_8h.html#ac028e04a12f65503490708cd1f5d69ba">ccc_handle</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="handle__ordered__map_8h.html#a9d86f81dfd798539df040e41e5cd1ab4">ccc_hom_remove</a> (<a class="el" href="handle__ordered__map_8h.html#a5b41518bacfebf07fddfb1558a50345c">ccc_handle_ordered_map</a> *hom, ccc_homap_elem *out_handle)</td></tr>
-<tr class="memdesc:a9d86f81dfd798539df040e41e5cd1ab4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes the key value in the map storing the old value, if present, in the struct containing out_handle provided by the user.  <br /></td></tr>
-<tr class="separator:a9d86f81dfd798539df040e41e5cd1ab4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adc6f7f71c662912169bf6a7fdbb278d6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="traits_8h.html#ac028e04a12f65503490708cd1f5d69ba">ccc_handle</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="handle__ordered__map_8h.html#adc6f7f71c662912169bf6a7fdbb278d6">ccc_hom_swap_handle</a> (<a class="el" href="handle__ordered__map_8h.html#a5b41518bacfebf07fddfb1558a50345c">ccc_handle_ordered_map</a> *hom, void *key_val_output)</td></tr>
+<tr class="memdesc:adc6f7f71c662912169bf6a7fdbb278d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Invariantly inserts the key value wrapping key_val_type.  <br /></td></tr>
+<tr class="separator:adc6f7f71c662912169bf6a7fdbb278d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a15e72007021a57a4dfefc024a7078bbb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="traits_8h.html#ac028e04a12f65503490708cd1f5d69ba">ccc_handle</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="handle__ordered__map_8h.html#a15e72007021a57a4dfefc024a7078bbb">ccc_hom_try_insert</a> (<a class="el" href="handle__ordered__map_8h.html#a5b41518bacfebf07fddfb1558a50345c">ccc_handle_ordered_map</a> *hom, void const *key_val_type)</td></tr>
+<tr class="memdesc:a15e72007021a57a4dfefc024a7078bbb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Attempts to insert the key value wrapping key_val_type.  <br /></td></tr>
+<tr class="separator:a15e72007021a57a4dfefc024a7078bbb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2790658b955c263b8c034cc53c28c4e6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="traits_8h.html#ac028e04a12f65503490708cd1f5d69ba">ccc_handle</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="handle__ordered__map_8h.html#a2790658b955c263b8c034cc53c28c4e6">ccc_hom_insert_or_assign</a> (<a class="el" href="handle__ordered__map_8h.html#a5b41518bacfebf07fddfb1558a50345c">ccc_handle_ordered_map</a> *hom, void const *key_val_type)</td></tr>
+<tr class="memdesc:a2790658b955c263b8c034cc53c28c4e6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Invariantly inserts or overwrites a user struct into the map.  <br /></td></tr>
+<tr class="separator:a2790658b955c263b8c034cc53c28c4e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6f89b3a038eaac9bc3bf541c88862a5d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="traits_8h.html#ac028e04a12f65503490708cd1f5d69ba">ccc_handle</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="handle__ordered__map_8h.html#a6f89b3a038eaac9bc3bf541c88862a5d">ccc_hom_remove</a> (<a class="el" href="handle__ordered__map_8h.html#a5b41518bacfebf07fddfb1558a50345c">ccc_handle_ordered_map</a> *hom, void *key_val_output)</td></tr>
+<tr class="memdesc:a6f89b3a038eaac9bc3bf541c88862a5d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes the key value in the map storing the old value, if present, in the struct containing key_val_output provided by the user.  <br /></td></tr>
+<tr class="separator:a6f89b3a038eaac9bc3bf541c88862a5d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8c28ad6ecb83060c01b611fe934f4b47"><td class="memItemLeft" align="right" valign="top">ccc_homap_handle&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="handle__ordered__map_8h.html#a8c28ad6ecb83060c01b611fe934f4b47">ccc_hom_handle</a> (<a class="el" href="handle__ordered__map_8h.html#a5b41518bacfebf07fddfb1558a50345c">ccc_handle_ordered_map</a> *hom, void const *key)</td></tr>
 <tr class="memdesc:a8c28ad6ecb83060c01b611fe934f4b47"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtains a handle for the provided key in the map for future use.  <br /></td></tr>
 <tr class="separator:a8c28ad6ecb83060c01b611fe934f4b47"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -214,12 +218,12 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memitem:a763b3da7fea1c3f6569d778f2d1c475f"><td class="memItemLeft" align="right" valign="top">ccc_homap_handle *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="handle__ordered__map_8h.html#a763b3da7fea1c3f6569d778f2d1c475f">ccc_hom_and_modify_aux</a> (ccc_homap_handle *h, <a class="el" href="types_8h.html#ada79c0d2b3cfeee31b9990c23a187d12">ccc_any_type_update_fn</a> *fn, void *aux)</td></tr>
 <tr class="memdesc:a763b3da7fea1c3f6569d778f2d1c475f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Modifies the provided handle if it is Occupied.  <br /></td></tr>
 <tr class="separator:a763b3da7fea1c3f6569d778f2d1c475f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a67cb058d67f88506bafd6cfd3fe08e27"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a39d707127c6bb25cb76587203582743c">ccc_handle_i</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="handle__ordered__map_8h.html#a67cb058d67f88506bafd6cfd3fe08e27">ccc_hom_or_insert</a> (ccc_homap_handle const *h, ccc_homap_elem *elem)</td></tr>
-<tr class="memdesc:a67cb058d67f88506bafd6cfd3fe08e27"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inserts the struct with handle elem if the handle is Vacant.  <br /></td></tr>
-<tr class="separator:a67cb058d67f88506bafd6cfd3fe08e27"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a31767e639edff68693cc52ab84126c58"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a39d707127c6bb25cb76587203582743c">ccc_handle_i</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="handle__ordered__map_8h.html#a31767e639edff68693cc52ab84126c58">ccc_hom_insert_handle</a> (ccc_homap_handle const *h, ccc_homap_elem *elem)</td></tr>
-<tr class="memdesc:a31767e639edff68693cc52ab84126c58"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inserts the provided handle invariantly.  <br /></td></tr>
-<tr class="separator:a31767e639edff68693cc52ab84126c58"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a47c43f7db67b80504d83ae68a138e46f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a39d707127c6bb25cb76587203582743c">ccc_handle_i</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="handle__ordered__map_8h.html#a47c43f7db67b80504d83ae68a138e46f">ccc_hom_or_insert</a> (ccc_homap_handle const *h, void const *key_val_type)</td></tr>
+<tr class="memdesc:a47c43f7db67b80504d83ae68a138e46f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inserts the struct with user type if the handle is Vacant.  <br /></td></tr>
+<tr class="separator:a47c43f7db67b80504d83ae68a138e46f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a64ee5307d6e53c22b82233a244901e9e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a39d707127c6bb25cb76587203582743c">ccc_handle_i</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="handle__ordered__map_8h.html#a64ee5307d6e53c22b82233a244901e9e">ccc_hom_insert_handle</a> (ccc_homap_handle const *h, void const *key_val_type)</td></tr>
+<tr class="memdesc:a64ee5307d6e53c22b82233a244901e9e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inserts the provided handle invariantly.  <br /></td></tr>
+<tr class="separator:a64ee5307d6e53c22b82233a244901e9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aafdf62137fe94126f004795a101b6b23"><td class="memItemLeft" align="right" valign="top"><a class="el" href="traits_8h.html#ac028e04a12f65503490708cd1f5d69ba">ccc_handle</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="handle__ordered__map_8h.html#aafdf62137fe94126f004795a101b6b23">ccc_hom_remove_handle</a> (ccc_homap_handle *h)</td></tr>
 <tr class="memdesc:aafdf62137fe94126f004795a101b6b23"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove the handle from the map if Occupied.  <br /></td></tr>
 <tr class="separator:aafdf62137fe94126f004795a101b6b23"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -257,12 +261,12 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memitem:a17c170d55dc30345d264fa0cea97af19"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="handle__ordered__map_8h.html#a17c170d55dc30345d264fa0cea97af19">ccc_hom_rbegin</a> (<a class="el" href="handle__ordered__map_8h.html#a5b41518bacfebf07fddfb1558a50345c">ccc_handle_ordered_map</a> const *hom)</td></tr>
 <tr class="memdesc:a17c170d55dc30345d264fa0cea97af19"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the start of a reverse inorder traversal of the map. Amortized O(lg N).  <br /></td></tr>
 <tr class="separator:a17c170d55dc30345d264fa0cea97af19"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9144f04bdb7c548a799a59b4242b81e4"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="handle__ordered__map_8h.html#a9144f04bdb7c548a799a59b4242b81e4">ccc_hom_next</a> (<a class="el" href="handle__ordered__map_8h.html#a5b41518bacfebf07fddfb1558a50345c">ccc_handle_ordered_map</a> const *hom, ccc_homap_elem const *iter_handle)</td></tr>
-<tr class="memdesc:a9144f04bdb7c548a799a59b4242b81e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the next element in an inorder traversal of the map. O(1).  <br /></td></tr>
-<tr class="separator:a9144f04bdb7c548a799a59b4242b81e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afdae943ea8eb6468941ea9a0b53b4018"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="handle__ordered__map_8h.html#afdae943ea8eb6468941ea9a0b53b4018">ccc_hom_rnext</a> (<a class="el" href="handle__ordered__map_8h.html#a5b41518bacfebf07fddfb1558a50345c">ccc_handle_ordered_map</a> const *hom, ccc_homap_elem const *iter_handle)</td></tr>
-<tr class="memdesc:afdae943ea8eb6468941ea9a0b53b4018"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the rnext element in a reverse inorder traversal of the map. O(1).  <br /></td></tr>
-<tr class="separator:afdae943ea8eb6468941ea9a0b53b4018"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad711db4aa580e1166b0a1c67e281bcf2"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="handle__ordered__map_8h.html#ad711db4aa580e1166b0a1c67e281bcf2">ccc_hom_next</a> (<a class="el" href="handle__ordered__map_8h.html#a5b41518bacfebf07fddfb1558a50345c">ccc_handle_ordered_map</a> const *hom, void const *iter_handle)</td></tr>
+<tr class="memdesc:ad711db4aa580e1166b0a1c67e281bcf2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the next element in an inorder traversal of the map. O(1).  <br /></td></tr>
+<tr class="separator:ad711db4aa580e1166b0a1c67e281bcf2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0f3a66a8f91a35d95953c727cf661ca3"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="handle__ordered__map_8h.html#a0f3a66a8f91a35d95953c727cf661ca3">ccc_hom_rnext</a> (<a class="el" href="handle__ordered__map_8h.html#a5b41518bacfebf07fddfb1558a50345c">ccc_handle_ordered_map</a> const *hom, void const *iter_handle)</td></tr>
+<tr class="memdesc:a0f3a66a8f91a35d95953c727cf661ca3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the rnext element in a reverse inorder traversal of the map. O(1).  <br /></td></tr>
+<tr class="separator:a0f3a66a8f91a35d95953c727cf661ca3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8e4b418ebdbe410566b661b6b12ecffa"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="handle__ordered__map_8h.html#a8e4b418ebdbe410566b661b6b12ecffa">ccc_hom_end</a> (<a class="el" href="handle__ordered__map_8h.html#a5b41518bacfebf07fddfb1558a50345c">ccc_handle_ordered_map</a> const *hom)</td></tr>
 <tr class="memdesc:a8e4b418ebdbe410566b661b6b12ecffa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the end of an inorder traversal of the map. O(1).  <br /></td></tr>
 <tr class="separator:a8e4b418ebdbe410566b661b6b12ecffa"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -276,9 +280,6 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memitem:a5b41518bacfebf07fddfb1558a50345c"><td class="memItemLeft" align="right" valign="top">typedef struct ccc_homap&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="handle__ordered__map_8h.html#a5b41518bacfebf07fddfb1558a50345c">ccc_handle_ordered_map</a></td></tr>
 <tr class="memdesc:a5b41518bacfebf07fddfb1558a50345c"><td class="mdescLeft">&#160;</td><td class="mdescRight">A self-optimizing data structure offering amortized O(lg N) search, insert, and erase.  <br /></td></tr>
 <tr class="separator:a5b41518bacfebf07fddfb1558a50345c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3b41911fc7acea698ec4484bab6408fc"><td class="memItemLeft" align="right" valign="top">typedef struct ccc_homap_elem&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="handle__ordered__map_8h.html#a3b41911fc7acea698ec4484bab6408fc">ccc_homap_elem</a></td></tr>
-<tr class="memdesc:a3b41911fc7acea698ec4484bab6408fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">The intrusive element for the user defined type being stored in the map.  <br /></td></tr>
-<tr class="separator:a3b41911fc7acea698ec4484bab6408fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1ca562cd9069f96c0c451877436317b0"><td class="memItemLeft" align="right" valign="top">typedef union ccc_homap_handle&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="handle__ordered__map_8h.html#a1ca562cd9069f96c0c451877436317b0">ccc_homap_handle</a></td></tr>
 <tr class="memdesc:a1ca562cd9069f96c0c451877436317b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">A container specific handle used to implement the Handle Interface.  <br /></td></tr>
 <tr class="separator:a1ca562cd9069f96c0c451877436317b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -352,7 +353,7 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="line">        ccc_impl_hom_and_modify_w(handle_ordered_map_handle_ptr, type_name,    \</div>
 <div class="line">                                  closure_over_T)                              \</div>
 <div class="line">    }</div>
-<div class="ttc" id="ahandle__ordered__map_8h_html_a1ca562cd9069f96c0c451877436317b0"><div class="ttname"><a href="handle__ordered__map_8h.html#a1ca562cd9069f96c0c451877436317b0">ccc_homap_handle</a></div><div class="ttdeci">union ccc_homap_handle ccc_homap_handle</div><div class="ttdoc">A container specific handle used to implement the Handle Interface.</div><div class="ttdef"><b>Definition:</b> handle_ordered_map.h:82</div></div>
+<div class="ttc" id="ahandle__ordered__map_8h_html_a1ca562cd9069f96c0c451877436317b0"><div class="ttname"><a href="handle__ordered__map_8h.html#a1ca562cd9069f96c0c451877436317b0">ccc_homap_handle</a></div><div class="ttdeci">union ccc_homap_handle ccc_homap_handle</div><div class="ttdoc">A container specific handle used to implement the Handle Interface.</div><div class="ttdef"><b>Definition:</b> handle_ordered_map.h:73</div></div>
 </div><!-- fragment -->
 <p>Modify an Occupied handle with a closure over user type T. </p>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -419,6 +420,92 @@ This graph shows which files directly or indirectly include this file:</div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>a reference to the handle at handle in the map as the type the user has stored in the map. </dd></dl>
+
+</div>
+</div>
+<a id="af92a5082774cad09211d6222d1686af9" name="af92a5082774cad09211d6222d1686af9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af92a5082774cad09211d6222d1686af9">&#9670;&#160;</a></span>ccc_hom_declare_fixed_map</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define ccc_hom_declare_fixed_map</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">fixed_map_type_name, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">key_val_type_name, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">capacity&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    ccc_impl_hom_declare_fixed_map(fixed_map_type_name, key_val_type_name,     \</div>
+<div class="line">                                   capacity)</div>
+</div><!-- fragment -->
+<p>Declare a fixed size map type for use in the stack, heap, or data segment. Does not return a value. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">fixed_map_type_name</td><td>the user chosen name of the fixed sized map. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">key_val_type_name</td><td>the type the user plans to store in the map. It may have a key and value field as well as any additional fields. For set-like behavior, wrap a field in a struct/union (e.g. <code>union int_elem {int e;};</code>). </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">capacity</td><td>the desired number of user accessible nodes. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section warning"><dt>Warning</dt><dd>the map will use one slot of the specified capacity for a sentinel node. This is not important to the user unless an exact allocation count is needed in which case 1 should be added to desired capacity.</dd></dl>
+<p>Once the location for the fixed size map is chosen&ndash;stack, heap, or data segment&ndash;provide a pointer to the map for the initialization macro.</p>
+<div class="fragment"><div class="line"><span class="keyword">struct </span>val</div>
+<div class="line">{</div>
+<div class="line">    <span class="keywordtype">int</span> key;</div>
+<div class="line">    <span class="keywordtype">int</span> val;</div>
+<div class="line">};</div>
+<div class="line"><a class="code hl_define" href="handle__ordered__map_8h.html#af92a5082774cad09211d6222d1686af9">ccc_hom_declare_fixed_map</a>(small_fixed_map, <span class="keyword">struct</span> val, 64);</div>
+<div class="line"><span class="keyword">static</span> handle_ordered_map static_map = hom_init(</div>
+<div class="line">    &amp;(<span class="keyword">static</span> small_fixed_map){},</div>
+<div class="line">    <span class="keyword">struct </span>val,</div>
+<div class="line">    key,</div>
+<div class="line">    homap_key_cmp,</div>
+<div class="line">    NULL,</div>
+<div class="line">    NULL,</div>
+<div class="line">    hom_fixed_capacity(small_fixed_map)</div>
+<div class="line">);</div>
+<div class="ttc" id="ahandle__ordered__map_8h_html_af92a5082774cad09211d6222d1686af9"><div class="ttname"><a href="handle__ordered__map_8h.html#af92a5082774cad09211d6222d1686af9">ccc_hom_declare_fixed_map</a></div><div class="ttdeci">#define ccc_hom_declare_fixed_map(fixed_map_type_name, key_val_type_name, capacity)</div><div class="ttdoc">Declare a fixed size map type for use in the stack, heap, or data segment. Does not return a value.</div><div class="ttdef"><b>Definition:</b> handle_ordered_map.h:145</div></div>
+</div><!-- fragment --><p>Similarly, a fixed size map can be used on the stack.</p>
+<div class="fragment"><div class="line"><span class="keyword">struct </span>val</div>
+<div class="line">{</div>
+<div class="line">    <span class="keywordtype">int</span> key;</div>
+<div class="line">    <span class="keywordtype">int</span> val;</div>
+<div class="line">};</div>
+<div class="line"><a class="code hl_define" href="handle__ordered__map_8h.html#af92a5082774cad09211d6222d1686af9">ccc_hom_declare_fixed_map</a>(small_fixed_map, <span class="keyword">struct</span> val, 64);</div>
+<div class="line"><span class="keywordtype">int</span> main(<span class="keywordtype">void</span>)</div>
+<div class="line">{</div>
+<div class="line">    handle_ordered_map static_fh = hom_init(</div>
+<div class="line">        &amp;(small_fixed_map){},</div>
+<div class="line">        <span class="keyword">struct </span>val,</div>
+<div class="line">        key,</div>
+<div class="line">        homap_key_cmp,</div>
+<div class="line">        NULL,</div>
+<div class="line">        NULL,</div>
+<div class="line">        hom_fixed_capacity(small_fixed_map)</div>
+<div class="line">    );</div>
+<div class="line">    <span class="keywordflow">return</span> 0;</div>
+<div class="line">}</div>
+</div><!-- fragment --><p>The ccc_hom_fixed_capacity macro can be used to obtain the previously provided capacity when declaring the fixed map type. Finally, one could allocate a fixed size map on the heap; however, it is usually better to initialize a dynamic map and use the ccc_hom_reserve function for such a use case.</p>
+<p>This macro is not needed when a dynamic resizing map is needed. For dynamic maps, pass NULL and 0 capacity to the initialization macro along with the desired allocation function. </p>
 
 </div>
 </div>
@@ -510,6 +597,33 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
+<a id="a3c91477bb4dda0b163acc15bf67d21fd" name="a3c91477bb4dda0b163acc15bf67d21fd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3c91477bb4dda0b163acc15bf67d21fd">&#9670;&#160;</a></span>ccc_hom_fixed_capacity</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define ccc_hom_fixed_capacity</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">fixed_map_type_name</td><td>)</td>
+          <td>&#160;&#160;&#160;    ccc_impl_hom_fixed_capacity(fixed_map_type_name)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Obtain the capacity previously chosen for the fixed size map type. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">fixed_map_type_name</td><td>the name of a previously declared map. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the size_t capacity previously specified for this type by user. </dd></dl>
+
+</div>
+</div>
 <a id="af95f3601dc9a5d4cadee29cd0ba271a9" name="af95f3601dc9a5d4cadee29cd0ba271a9"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#af95f3601dc9a5d4cadee29cd0ba271a9">&#9670;&#160;</a></span>ccc_hom_handle_r</h2>
 
@@ -555,8 +669,8 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="a62966a332acdaf02f2e29322e578f198" name="a62966a332acdaf02f2e29322e578f198"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a62966a332acdaf02f2e29322e578f198">&#9670;&#160;</a></span>ccc_hom_init</h2>
+<a id="aaba2f6ff810fd90f4ec7ea05a318e7d0" name="aaba2f6ff810fd90f4ec7ea05a318e7d0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaba2f6ff810fd90f4ec7ea05a318e7d0">&#9670;&#160;</a></span>ccc_hom_init</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -565,13 +679,13 @@ This graph shows which files directly or indirectly include this file:</div>
           <td class="memname">#define ccc_hom_init</td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">mem_ptr, </td>
+          <td class="paramname">memory_ptr, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">om_elem_field, </td>
+          <td class="paramname">any_type_name, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -583,7 +697,7 @@ This graph shows which files directly or indirectly include this file:</div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">key_cmp, </td>
+          <td class="paramname">key_cmp_fn, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -595,7 +709,7 @@ This graph shows which files directly or indirectly include this file:</div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">aux, </td>
+          <td class="paramname">aux_data, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -610,23 +724,23 @@ This graph shows which files directly or indirectly include this file:</div>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    ccc_impl_hom_init(mem_ptr, om_elem_field, key_elem_field, key_cmp,         \</div>
-<div class="line">                      alloc_fn, aux, capacity)</div>
+<b>Value:</b><div class="fragment"><div class="line">    ccc_impl_hom_init(memory_ptr, any_type_name, key_elem_field, key_cmp_fn,   \</div>
+<div class="line">                      alloc_fn, aux_data, capacity)</div>
 </div><!-- fragment -->
 <p>Initializes the map at runtime or compile time. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">mem_ptr</td><td>a pointer to the contiguous user types or ((T *)NULL). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">om_elem_field</td><td>the name of the intrusive map elem field. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">memory_ptr</td><td>a pointer to the contiguous user types or ((T *)NULL). </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">any_type_name</td><td>the name of the user type stored in the map. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">key_elem_field</td><td>the name of the field in user type used as key. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">key_cmp</td><td>the key comparison function (see <a class="el" href="types_8h.html" title="The C Container Collection Fundamental Types.">types.h</a>). </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">key_cmp_fn</td><td>the key comparison function (see <a class="el" href="types_8h.html" title="The C Container Collection Fundamental Types.">types.h</a>). </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">alloc_fn</td><td>the allocation function or NULL if allocation is banned. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">aux</td><td>a pointer to any auxiliary data for comparison or destruction. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">capacity</td><td>the capacity at mem_ptr or 0 if ((T *)NULL). </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">aux_data</td><td>a pointer to any auxiliary data for comparison or destruction. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">capacity</td><td>the capacity at mem_ptr or 0. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the struct initialized ordered map for direct assignment (i.e. ccc_handle_ordered_map m = <a class="el" href="handle__ordered__map_8h.html#a62966a332acdaf02f2e29322e578f198" title="Initializes the map at runtime or compile time.">ccc_hom_init(...)</a>;). </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the struct initialized ordered map for direct assignment (i.e. ccc_handle_ordered_map m = <a class="el" href="handle__ordered__map_8h.html#aaba2f6ff810fd90f4ec7ea05a318e7d0" title="Initializes the map at runtime or compile time.">ccc_hom_init(...)</a>;). </dd></dl>
 
 </div>
 </div>
@@ -790,8 +904,8 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="a0e330a1a8d897aac246af6f349063c4a" name="a0e330a1a8d897aac246af6f349063c4a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0e330a1a8d897aac246af6f349063c4a">&#9670;&#160;</a></span>ccc_hom_remove_r</h2>
+<a id="a5818e7fa4926c7b657f39d761eebe186" name="a5818e7fa4926c7b657f39d761eebe186"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5818e7fa4926c7b657f39d761eebe186">&#9670;&#160;</a></span>ccc_hom_remove_r</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -806,7 +920,7 @@ This graph shows which files directly or indirectly include this file:</div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">out_handle_ptr&#160;</td>
+          <td class="paramname">key_val_output_ptr&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -817,24 +931,24 @@ This graph shows which files directly or indirectly include this file:</div>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">    &amp;(<a class="code hl_define" href="traits_8h.html#ac028e04a12f65503490708cd1f5d69ba">ccc_handle</a>)                                                              \</div>
 <div class="line">    {                                                                          \</div>
-<div class="line">        ccc_hom_remove((handle_ordered_map_ptr), (out_handle_ptr)).impl        \</div>
+<div class="line">        ccc_hom_remove((handle_ordered_map_ptr), (key_val_output_ptr)).impl    \</div>
 <div class="line">    }</div>
 </div><!-- fragment -->
-<p>Removes the key value in the map storing the old value, if present, in the struct containing out_handle provided by the user. </p>
+<p>Removes the key value in the map storing the old value, if present, in the struct containing key_val_output provided by the user. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">handle_ordered_map_ptr</td><td>the pointer to the ordered map. </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">out_handle_ptr</td><td>the handle to the user type wrapping map elem. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">key_val_output_ptr</td><td>the handle to the user type wrapping map elem. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>a compound literal reference to a handle. If Occupied the struct containing out_handle holds the old value. If Vacant the key value pair was not stored in the map. If bad input is provided an input error is set.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>a compound literal reference to a handle. If Occupied the struct containing key_val_output holds the old value. If Vacant the key value pair was not stored in the map. If bad input is provided an input error is set.</dd></dl>
 <p>Note that this function may write to the struct containing the second parameter and wraps it in a handle to provide information about the old value. </p>
 
 </div>
 </div>
-<a id="aa8a9aebe29d8ccde258444b62c5f4f00" name="aa8a9aebe29d8ccde258444b62c5f4f00"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa8a9aebe29d8ccde258444b62c5f4f00">&#9670;&#160;</a></span>ccc_hom_swap_handle_r</h2>
+<a id="a65c45090e69c2fba89fc1417e58a2801" name="a65c45090e69c2fba89fc1417e58a2801"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a65c45090e69c2fba89fc1417e58a2801">&#9670;&#160;</a></span>ccc_hom_swap_handle_r</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -849,7 +963,7 @@ This graph shows which files directly or indirectly include this file:</div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">out_handle_ptr&#160;</td>
+          <td class="paramname">key_val_output_ptr&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -860,24 +974,25 @@ This graph shows which files directly or indirectly include this file:</div>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">    &amp;(<a class="code hl_define" href="traits_8h.html#ac028e04a12f65503490708cd1f5d69ba">ccc_handle</a>)                                                              \</div>
 <div class="line">    {                                                                          \</div>
-<div class="line">        ccc_hom_swap_handle((handle_ordered_map_ptr), (out_handle_ptr)).impl   \</div>
+<div class="line">        ccc_hom_swap_handle((handle_ordered_map_ptr), (key_val_output_ptr))    \</div>
+<div class="line">            .impl                                                              \</div>
 <div class="line">    }</div>
 </div><!-- fragment -->
-<p>Invariantly inserts the key value wrapping key_val_handle. </p>
+<p>Invariantly inserts the key value wrapping key_val_type. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">handle_ordered_map_ptr</td><td>the pointer to the ordered map. </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">out_handle_ptr</td><td>the handle to the user type wrapping map elem. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">key_val_output_ptr</td><td>the handle to the user type wrapping map elem. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>a compound literal reference to a handle. If Vacant, no prior element with key existed and the type wrapping out_handle remains unchanged. If Occupied the old value is written to the type wrapping out_handle and may be unwrapped to view. If more space is needed but allocation fails or has been forbidden, an insert error is set.</dd></dl>
-<p>Note that this function may write to the struct containing out_handle and wraps it in a handle to provide information about the old value. </p>
+<dl class="section return"><dt>Returns</dt><dd>a compound literal reference to a handle. If Vacant, no prior element with key existed and the type wrapping key_val_output remains unchanged. If Occupied the old value is written to the type wrapping key_val_output and may be unwrapped to view. If more space is needed but allocation fails or has been forbidden, an insert error is set.</dd></dl>
+<p>Note that this function may write to the struct containing key_val_output and wraps it in a handle to provide information about the old value. </p>
 
 </div>
 </div>
-<a id="a39fa8ed15ae984b7be6a914baa771c0a" name="a39fa8ed15ae984b7be6a914baa771c0a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a39fa8ed15ae984b7be6a914baa771c0a">&#9670;&#160;</a></span>ccc_hom_try_insert_r</h2>
+<a id="a36c28a42212d89df662f440d3eec058b" name="a36c28a42212d89df662f440d3eec058b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a36c28a42212d89df662f440d3eec058b">&#9670;&#160;</a></span>ccc_hom_try_insert_r</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -892,7 +1007,7 @@ This graph shows which files directly or indirectly include this file:</div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">key_val_handle_ptr&#160;</td>
+          <td class="paramname">key_val_type_ptr&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -903,15 +1018,14 @@ This graph shows which files directly or indirectly include this file:</div>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">    &amp;(<a class="code hl_define" href="traits_8h.html#ac028e04a12f65503490708cd1f5d69ba">ccc_handle</a>)                                                              \</div>
 <div class="line">    {                                                                          \</div>
-<div class="line">        ccc_hom_try_insert((handle_ordered_map_ptr), (key_val_handle_ptr))     \</div>
-<div class="line">            .impl                                                              \</div>
+<div class="line">        ccc_hom_try_insert((handle_ordered_map_ptr), (key_val_type_ptr)).impl  \</div>
 <div class="line">    }</div>
 </div><!-- fragment -->
-<p>Attempts to insert the key value wrapping key_val_handle. </p>
+<p>Attempts to insert the key value wrapping key_val_type. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">handle_ordered_map_ptr</td><td>the pointer to the map. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">key_val_handle_ptr</td><td>the handle to the user type wrapping map elem. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">key_val_type_ptr</td><td>the handle to the user type wrapping map elem. </td></tr>
   </table>
   </dd>
 </dl>
@@ -985,23 +1099,6 @@ This graph shows which files directly or indirectly include this file:</div>
 <p>A self-optimizing data structure offering amortized O(lg N) search, insert, and erase. </p>
 <dl class="section warning"><dt>Warning</dt><dd>it is undefined behavior to access an uninitialized container.</dd></dl>
 <p>A handle ordered map can be initialized on the stack, heap, or data segment at runtime or compile time. </p>
-
-</div>
-</div>
-<a id="a3b41911fc7acea698ec4484bab6408fc" name="a3b41911fc7acea698ec4484bab6408fc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3b41911fc7acea698ec4484bab6408fc">&#9670;&#160;</a></span>ccc_homap_elem</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef struct ccc_homap_elem ccc_homap_elem</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>The intrusive element for the user defined type being stored in the map. </p>
-<p>Note that if allocation is not permitted, insertions functions accepting this type as an argument assume it to exist in pre-allocated memory that will exist with the appropriate lifetime and scope for the user's needs; the container does not allocate or free in this case. </p>
 
 </div>
 </div>
@@ -1415,44 +1512,56 @@ do not try to access data in the table manually with a handle. Always use this p
 <div class="fragment"><div class="line"><span class="preprocessor">#define HANDLE_ORDERED_MAP_USING_NAMESPACE_CCC</span></div>
 <div class="line"><span class="keyword">struct </span>val</div>
 <div class="line">{</div>
-<div class="line">    homap_elem e;</div>
 <div class="line">    <span class="keywordtype">int</span> key;</div>
 <div class="line">    <span class="keywordtype">int</span> val;</div>
 <div class="line">};</div>
-<div class="line"><span class="keyword">static</span> handle_ordered_map src</div>
-<div class="line">    = hom_init((<span class="keyword">static</span> <span class="keyword">struct</span> val[11]){}, e, key, key_cmp, NULL, NULL, 11);</div>
+<div class="line"><a class="code hl_define" href="handle__ordered__map_8h.html#af92a5082774cad09211d6222d1686af9">ccc_hom_declare_fixed_map</a>(small_fixed_map, <span class="keyword">struct</span> val, 64);</div>
+<div class="line"><span class="keyword">static</span> handle_realtime_ordered_map src = hom_init(</div>
+<div class="line">    &amp;(<span class="keyword">static</span> small_fixed_map){},</div>
+<div class="line">    <span class="keyword">struct </span>val,</div>
+<div class="line">    key,</div>
+<div class="line">    homap_key_cmp,</div>
+<div class="line">    NULL,</div>
+<div class="line">    NULL,</div>
+<div class="line">    hom_fixed_capacity(small_fixed_map)</div>
+<div class="line">);</div>
 <div class="line">insert_rand_vals(&amp;src);</div>
-<div class="line"><span class="keyword">static</span> handle_ordered_map dst</div>
-<div class="line">    = hom_init((<span class="keyword">static</span> <span class="keyword">struct</span> val[13]){}, e, key, key_cmp, NULL, NULL, 13);</div>
+<div class="line"><span class="keyword">static</span> handle_realtime_ordered_map dst = hom_init(</div>
+<div class="line">    &amp;(<span class="keyword">static</span> small_fixed_map){},</div>
+<div class="line">    <span class="keyword">struct </span>val,</div>
+<div class="line">    key,</div>
+<div class="line">    homap_key_cmp,</div>
+<div class="line">    NULL,</div>
+<div class="line">    NULL,</div>
+<div class="line">    hom_fixed_capacity(small_fixed_map)</div>
+<div class="line">);</div>
 <div class="line"><a class="code hl_enumeration" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> res = hom_copy(&amp;dst, &amp;src, NULL);</div>
 <div class="ttc" id="atypes_8h_html_a51d6f078a83d667aff5016609d9146ef"><div class="ttname"><a href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a></div><div class="ttdeci">ccc_result</div><div class="ttdoc">A result of actions on containers.</div><div class="ttdef"><b>Definition:</b> types.h:132</div></div>
 </div><!-- fragment --><p>The above requires dst capacity be greater than or equal to src capacity. Here is memory management handed over to the copy function.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define HANDLE_ORDERED_MAP_USING_NAMESPACE_CCC</span></div>
 <div class="line"><span class="keyword">struct </span>val</div>
 <div class="line">{</div>
-<div class="line">    homap_elem e;</div>
 <div class="line">    <span class="keywordtype">int</span> key;</div>
 <div class="line">    <span class="keywordtype">int</span> val;</div>
 <div class="line">};</div>
 <div class="line"><span class="keyword">static</span> handle_ordered_map src</div>
-<div class="line">    = hom_init((<span class="keyword">struct</span> val *)NULL, e, key, key_cmp, std_alloc, NULL, 0);</div>
+<div class="line">    = hom_init(NULL, <span class="keyword">struct</span> val, key, key_cmp, std_alloc, NULL, 0);</div>
 <div class="line">insert_rand_vals(&amp;src);</div>
 <div class="line"><span class="keyword">static</span> handle_ordered_map dst</div>
-<div class="line">    = hom_init((<span class="keyword">struct</span> val *)NULL, e, key, key_cmp, std_alloc, NULL, 0);</div>
+<div class="line">    = hom_init(NULL, <span class="keyword">struct</span> val, key, key_cmp, std_alloc, NULL, 0);</div>
 <div class="line"><a class="code hl_enumeration" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> res = hom_copy(&amp;dst, &amp;src, std_alloc);</div>
 </div><!-- fragment --><p>The above allows dst to have a capacity less than that of the src as long as copy has been provided an allocation function to resize dst. Note that this would still work if copying to a destination that the user wants as a fixed size map.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define HANDLE_ORDERED_MAP_USING_NAMESPACE_CCC</span></div>
 <div class="line"><span class="keyword">struct </span>val</div>
 <div class="line">{</div>
-<div class="line">    homap_elem e;</div>
 <div class="line">    <span class="keywordtype">int</span> key;</div>
 <div class="line">    <span class="keywordtype">int</span> val;</div>
 <div class="line">};</div>
 <div class="line"><span class="keyword">static</span> handle_ordered_map src</div>
-<div class="line">    = hom_init((<span class="keyword">struct</span> val *)NULL, e, key, key_cmp, std_alloc, NULL);</div>
+<div class="line">    = hom_init(NULL, <span class="keyword">struct</span> val, key, key_cmp, std_alloc, NULL, 0);</div>
 <div class="line">insert_rand_vals(&amp;src);</div>
 <div class="line"><span class="keyword">static</span> handle_ordered_map dst</div>
-<div class="line">    = hom_init((<span class="keyword">struct</span> val *)NULL, e, key, key_cmp, NULL, NULL, 0);</div>
+<div class="line">    = hom_init(NULL, <span class="keyword">struct</span> val, key, key_cmp, NULL, NULL, 0);</div>
 <div class="line"><a class="code hl_enumeration" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> res = hom_copy(&amp;dst, &amp;src, std_alloc);</div>
 </div><!-- fragment --><p>The above sets up dst with fixed size while src is a dynamic map. Because an allocation function is provided, the dst is resized once for the copy and retains its fixed size after the copy is complete. This would require the user to manually free the underlying buffer at dst eventually if this method is used. Usually it is better to allocate the memory explicitly before the copy if copying between maps without allocation permission.</p>
 <p>These options allow users to stay consistent across containers with their memory management strategies. </p>
@@ -1560,7 +1669,7 @@ do not try to access data in the table manually with a handle. Always use this p
 <p>Note that due to the variety of values that can be returned in the range, using the provided range iteration functions from <a class="el" href="types_8h.html" title="The C Container Collection Fundamental Types.">types.h</a> is recommended for example:</p>
 <div class="fragment"><div class="line"><span class="keywordflow">for</span> (<span class="keyword">struct</span> val *i = range_begin(&amp;range);</div>
 <div class="line">     i != end_range(&amp;range);</div>
-<div class="line">     i = next(&amp;hom, &amp;i-&gt;elem))</div>
+<div class="line">     i = next(&amp;hom, i))</div>
 <div class="line">{}</div>
 </div><!-- fragment --><p>This avoids any possible errors in handling an end range element that is in the map versus the end map sentinel. </p>
 
@@ -1611,7 +1720,7 @@ do not try to access data in the table manually with a handle. Always use this p
 <p>Note that due to the variety of values that can be returned in the rrange, using the provided rrange iteration functions from <a class="el" href="types_8h.html" title="The C Container Collection Fundamental Types.">types.h</a> is recommended for example:</p>
 <div class="fragment"><div class="line"><span class="keywordflow">for</span> (<span class="keyword">struct</span> val *i = rrange_begin(&amp;rrange);</div>
 <div class="line">     i != rend_rrange(&amp;rrange);</div>
-<div class="line">     i = rnext(&amp;hom, &amp;i-&gt;elem))</div>
+<div class="line">     i = rnext(&amp;hom, i))</div>
 <div class="line">{}</div>
 </div><!-- fragment --><p>This avoids any possible errors in handling an rend rrange element that is in the map versus the end map sentinel. </p>
 
@@ -1751,8 +1860,8 @@ do not try to access data in the table manually with a handle. Always use this p
 
 </div>
 </div>
-<a id="a31767e639edff68693cc52ab84126c58" name="a31767e639edff68693cc52ab84126c58"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a31767e639edff68693cc52ab84126c58">&#9670;&#160;</a></span>ccc_hom_insert_handle()</h2>
+<a id="a64ee5307d6e53c22b82233a244901e9e" name="a64ee5307d6e53c22b82233a244901e9e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a64ee5307d6e53c22b82233a244901e9e">&#9670;&#160;</a></span>ccc_hom_insert_handle()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1766,8 +1875,8 @@ do not try to access data in the table manually with a handle. Always use this p
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">ccc_homap_elem *&#160;</td>
-          <td class="paramname"><em>elem</em>&#160;</td>
+          <td class="paramtype">void const *&#160;</td>
+          <td class="paramname"><em>key_val_type</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1781,7 +1890,7 @@ do not try to access data in the table manually with a handle. Always use this p
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">h</td><td>the handle returned from a call obtaining a handle. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">elem</td><td>a handle to the struct the user intends to insert. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">key_val_type</td><td>a handle to the struct the user intends to insert. </td></tr>
   </table>
   </dd>
 </dl>
@@ -1790,8 +1899,8 @@ do not try to access data in the table manually with a handle. Always use this p
 
 </div>
 </div>
-<a id="aec2b6c22f1f7d8d310498bd5aa20131d" name="aec2b6c22f1f7d8d310498bd5aa20131d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aec2b6c22f1f7d8d310498bd5aa20131d">&#9670;&#160;</a></span>ccc_hom_insert_or_assign()</h2>
+<a id="a2790658b955c263b8c034cc53c28c4e6" name="a2790658b955c263b8c034cc53c28c4e6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2790658b955c263b8c034cc53c28c4e6">&#9670;&#160;</a></span>ccc_hom_insert_or_assign()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1805,8 +1914,8 @@ do not try to access data in the table manually with a handle. Always use this p
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">ccc_homap_elem *&#160;</td>
-          <td class="paramname"><em>key_val_handle</em>&#160;</td>
+          <td class="paramtype">void const *&#160;</td>
+          <td class="paramname"><em>key_val_type</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1820,7 +1929,7 @@ do not try to access data in the table manually with a handle. Always use this p
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">hom</td><td>a pointer to the handle hash map. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">key_val_handle</td><td>the handle to the wrapping user struct key value. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">key_val_type</td><td>the handle to the wrapping user struct key value. </td></tr>
   </table>
   </dd>
 </dl>
@@ -1856,8 +1965,8 @@ do not try to access data in the table manually with a handle. Always use this p
 
 </div>
 </div>
-<a id="a9144f04bdb7c548a799a59b4242b81e4" name="a9144f04bdb7c548a799a59b4242b81e4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9144f04bdb7c548a799a59b4242b81e4">&#9670;&#160;</a></span>ccc_hom_next()</h2>
+<a id="ad711db4aa580e1166b0a1c67e281bcf2" name="ad711db4aa580e1166b0a1c67e281bcf2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad711db4aa580e1166b0a1c67e281bcf2">&#9670;&#160;</a></span>ccc_hom_next()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1871,7 +1980,7 @@ do not try to access data in the table manually with a handle. Always use this p
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">ccc_homap_elem const *&#160;</td>
+          <td class="paramtype">void const *&#160;</td>
           <td class="paramname"><em>iter_handle</em>&#160;</td>
         </tr>
         <tr>
@@ -1921,8 +2030,8 @@ do not try to access data in the table manually with a handle. Always use this p
 
 </div>
 </div>
-<a id="a67cb058d67f88506bafd6cfd3fe08e27" name="a67cb058d67f88506bafd6cfd3fe08e27"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a67cb058d67f88506bafd6cfd3fe08e27">&#9670;&#160;</a></span>ccc_hom_or_insert()</h2>
+<a id="a47c43f7db67b80504d83ae68a138e46f" name="a47c43f7db67b80504d83ae68a138e46f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a47c43f7db67b80504d83ae68a138e46f">&#9670;&#160;</a></span>ccc_hom_or_insert()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1936,8 +2045,8 @@ do not try to access data in the table manually with a handle. Always use this p
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">ccc_homap_elem *&#160;</td>
-          <td class="paramname"><em>elem</em>&#160;</td>
+          <td class="paramtype">void const *&#160;</td>
+          <td class="paramname"><em>key_val_type</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1947,11 +2056,11 @@ do not try to access data in the table manually with a handle. Always use this p
       </table>
 </div><div class="memdoc">
 
-<p>Inserts the struct with handle elem if the handle is Vacant. </p>
+<p>Inserts the struct with user type if the handle is Vacant. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">h</td><td>the handle obtained via function or macro call. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">elem</td><td>the handle to the struct to be inserted to a Vacant handle. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">key_val_type</td><td>handle to the struct to be inserted to Vacant handle. </td></tr>
   </table>
   </dd>
 </dl>
@@ -1988,8 +2097,8 @@ do not try to access data in the table manually with a handle. Always use this p
 
 </div>
 </div>
-<a id="a9d86f81dfd798539df040e41e5cd1ab4" name="a9d86f81dfd798539df040e41e5cd1ab4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9d86f81dfd798539df040e41e5cd1ab4">&#9670;&#160;</a></span>ccc_hom_remove()</h2>
+<a id="a6f89b3a038eaac9bc3bf541c88862a5d" name="a6f89b3a038eaac9bc3bf541c88862a5d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6f89b3a038eaac9bc3bf541c88862a5d">&#9670;&#160;</a></span>ccc_hom_remove()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2003,8 +2112,8 @@ do not try to access data in the table manually with a handle. Always use this p
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">ccc_homap_elem *&#160;</td>
-          <td class="paramname"><em>out_handle</em>&#160;</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>key_val_output</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -2014,15 +2123,15 @@ do not try to access data in the table manually with a handle. Always use this p
       </table>
 </div><div class="memdoc">
 
-<p>Removes the key value in the map storing the old value, if present, in the struct containing out_handle provided by the user. </p>
+<p>Removes the key value in the map storing the old value, if present, in the struct containing key_val_output provided by the user. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">hom</td><td>the pointer to the ordered map. </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">out_handle</td><td>the handle to the user type wrapping map elem. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">key_val_output</td><td>the handle to the user type wrapping map elem. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the removed handle. If Occupied the struct containing out_handle holds the old value. If Vacant the key value pair was not stored in the map. If bad input is provided an input error is set.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the removed handle. If Occupied the struct containing key_val_output holds the old value. If Vacant the key value pair was not stored in the map. If bad input is provided an input error is set.</dd></dl>
 <p>Note that this function may write to the struct containing the second parameter and wraps it in a handle to provide information about the old value. </p>
 
 </div>
@@ -2129,8 +2238,8 @@ do not try to access data in the table manually with a handle. Always use this p
 
 </div>
 </div>
-<a id="afdae943ea8eb6468941ea9a0b53b4018" name="afdae943ea8eb6468941ea9a0b53b4018"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afdae943ea8eb6468941ea9a0b53b4018">&#9670;&#160;</a></span>ccc_hom_rnext()</h2>
+<a id="a0f3a66a8f91a35d95953c727cf661ca3" name="a0f3a66a8f91a35d95953c727cf661ca3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0f3a66a8f91a35d95953c727cf661ca3">&#9670;&#160;</a></span>ccc_hom_rnext()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2144,7 +2253,7 @@ do not try to access data in the table manually with a handle. Always use this p
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">ccc_homap_elem const *&#160;</td>
+          <td class="paramtype">void const *&#160;</td>
           <td class="paramname"><em>iter_handle</em>&#160;</td>
         </tr>
         <tr>
@@ -2194,8 +2303,8 @@ do not try to access data in the table manually with a handle. Always use this p
 
 </div>
 </div>
-<a id="a7bebdc72c017b07cf5bc148b835fdeb5" name="a7bebdc72c017b07cf5bc148b835fdeb5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7bebdc72c017b07cf5bc148b835fdeb5">&#9670;&#160;</a></span>ccc_hom_swap_handle()</h2>
+<a id="adc6f7f71c662912169bf6a7fdbb278d6" name="adc6f7f71c662912169bf6a7fdbb278d6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adc6f7f71c662912169bf6a7fdbb278d6">&#9670;&#160;</a></span>ccc_hom_swap_handle()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2209,8 +2318,8 @@ do not try to access data in the table manually with a handle. Always use this p
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">ccc_homap_elem *&#160;</td>
-          <td class="paramname"><em>out_handle</em>&#160;</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>key_val_output</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -2220,21 +2329,21 @@ do not try to access data in the table manually with a handle. Always use this p
       </table>
 </div><div class="memdoc">
 
-<p>Invariantly inserts the key value wrapping key_val_handle. </p>
+<p>Invariantly inserts the key value wrapping key_val_type. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">hom</td><td>the pointer to the ordered map. </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">out_handle</td><td>the handle to the user type wrapping map elem. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">key_val_output</td><td>the handle to the user type wrapping map elem. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>a handle. If Vacant, no prior element with key existed and the type wrapping out_handle remains unchanged. If Occupied the old value is written to the type wrapping out_handle and may be unwrapped to view. If more space is needed but allocation fails or has been forbidden, an insert error is set.</dd></dl>
-<p>Note that this function may write to the struct containing out_handle and wraps it in a handle to provide information about the old value. </p>
+<dl class="section return"><dt>Returns</dt><dd>a handle. If Vacant, no prior element with key existed and the type wrapping key_val_output remains unchanged. If Occupied the old value is written to the type wrapping key_val_output and may be unwrapped to view. If more space is needed but allocation fails or has been forbidden, an insert error is set.</dd></dl>
+<p>Note that this function may write to the struct containing key_val_output and wraps it in a handle to provide information about the old value. </p>
 
 </div>
 </div>
-<a id="ab445ad41ee5ca1c5453cb529bbebbe44" name="ab445ad41ee5ca1c5453cb529bbebbe44"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab445ad41ee5ca1c5453cb529bbebbe44">&#9670;&#160;</a></span>ccc_hom_try_insert()</h2>
+<a id="a15e72007021a57a4dfefc024a7078bbb" name="a15e72007021a57a4dfefc024a7078bbb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a15e72007021a57a4dfefc024a7078bbb">&#9670;&#160;</a></span>ccc_hom_try_insert()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2248,8 +2357,8 @@ do not try to access data in the table manually with a handle. Always use this p
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">ccc_homap_elem *&#160;</td>
-          <td class="paramname"><em>key_val_handle</em>&#160;</td>
+          <td class="paramtype">void const *&#160;</td>
+          <td class="paramname"><em>key_val_type</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -2259,11 +2368,11 @@ do not try to access data in the table manually with a handle. Always use this p
       </table>
 </div><div class="memdoc">
 
-<p>Attempts to insert the key value wrapping key_val_handle. </p>
+<p>Attempts to insert the key value wrapping key_val_type. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">hom</td><td>the pointer to the map. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">key_val_handle</td><td>the handle to the user type wrapping map elem. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">key_val_type</td><td>the handle to the user type wrapping map elem. </td></tr>
   </table>
   </dd>
 </dl>

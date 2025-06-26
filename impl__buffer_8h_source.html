@@ -146,7 +146,7 @@ $(document).ready(function(){initNavTree('impl__buffer_8h_source.html',''); init
 <div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span><span class="preprocessor">    (__extension__({                                                           \</span></div>
 <div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span><span class="preprocessor">        typeof(type_initializer) *impl_buf_res = NULL;                         \</span></div>
 <div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span><span class="preprocessor">        __auto_type impl_emplace_back_buf_ptr = (buf_ptr);                     \</span></div>
-<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span><span class="preprocessor">        assert(sizeof(typeof(*impl_buf_res))                                   \</span></div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span><span class="preprocessor">        assert(sizeof(*impl_buf_res)                                           \</span></div>
 <div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span><span class="preprocessor">               == ccc_buf_sizeof_type(impl_emplace_back_buf_ptr));             \</span></div>
 <div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span><span class="preprocessor">        impl_buf_res = ccc_buf_alloc_back((impl_emplace_back_buf_ptr));        \</span></div>
 <div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span><span class="preprocessor">        if (impl_buf_res)                                                      \</span></div>

@@ -32,7 +32,7 @@ var flat__hash__map_8h =
     [ "ccc_fhm_get_key_val", "flat__hash__map_8h.html#a3c1cdb79878b34eb949975cf83798855", null ],
     [ "ccc_fhm_insert_entry", "flat__hash__map_8h.html#ad4583f0caa12ef973b650722ebd66e45", null ],
     [ "ccc_fhm_insert_error", "flat__hash__map_8h.html#a843ee92c59d6fb20220e7e1d2fc3a2c3", null ],
-    [ "ccc_fhm_insert_or_assign", "flat__hash__map_8h.html#a66d6426664c1aa9836add9708a9b137e", null ],
+    [ "ccc_fhm_insert_or_assign", "flat__hash__map_8h.html#a49cd73c566f167893eeae5676b7e9aba", null ],
     [ "ccc_fhm_is_empty", "flat__hash__map_8h.html#a42427fab615a1366b09a518931c73434", null ],
     [ "ccc_fhm_next", "flat__hash__map_8h.html#a4e8c08b0ed13c7edc79f4736d4d5511b", null ],
     [ "ccc_fhm_occupied", "flat__hash__map_8h.html#ac51153e0bfbf73ed456d361b1ffc6b7e", null ],
@@ -42,7 +42,7 @@ var flat__hash__map_8h =
     [ "ccc_fhm_reserve", "flat__hash__map_8h.html#afd8dc18ef193bb1cfdd580578d93afb2", null ],
     [ "ccc_fhm_size", "flat__hash__map_8h.html#a7e48bf928c47a2a974d5ca7e98e51aad", null ],
     [ "ccc_fhm_swap_entry", "flat__hash__map_8h.html#a7f6d8911df876e3b223caf32e06010ee", null ],
-    [ "ccc_fhm_try_insert", "flat__hash__map_8h.html#a0a5d27e1eaacb178cf3fc66d21d4927c", null ],
+    [ "ccc_fhm_try_insert", "flat__hash__map_8h.html#aad6850e23f5ec7c7e54d1566c2b6e5d8", null ],
     [ "ccc_fhm_unwrap", "flat__hash__map_8h.html#ae6ddbf73bfeed2721c35d7a374edf7c1", null ],
     [ "ccc_fhm_validate", "flat__hash__map_8h.html#a90049a9bdadf7ab0f75a44a4d5924082", null ]
 ];

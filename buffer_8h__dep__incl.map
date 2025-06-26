@@ -1,13 +1,9 @@
 <map id="ccc/buffer.h" name="ccc/buffer.h">
-<area shape="rect" id="node1" title="The Buffer Interface." alt="" coords="293,5,389,31"/>
+<area shape="rect" id="node1" title="The Buffer Interface." alt="" coords="173,5,269,31"/>
 <area shape="rect" id="node2" href="$impl__flat__double__ended__queue_8h_source.html" title=" " alt="" coords="5,79,184,119"/>
-<area shape="rect" id="node4" href="$impl__traits_8h_source.html" title=" " alt="" coords="268,255,431,280"/>
-<area shape="rect" id="node6" href="$impl__flat__priority__queue_8h_source.html" title=" " alt="" coords="273,79,410,119"/>
-<area shape="rect" id="node8" href="$impl__handle__ordered__map_8h_source.html" title=" " alt="" coords="435,79,595,119"/>
-<area shape="rect" id="node10" href="$impl__handle__realtime__ordered__map_8h_source.html" title=" " alt="" coords="619,79,808,119"/>
+<area shape="rect" id="node4" href="$impl__traits_8h_source.html" title=" " alt="" coords="140,255,303,280"/>
+<area shape="rect" id="node6" href="$impl__flat__priority__queue_8h_source.html" title=" " alt="" coords="270,79,407,119"/>
 <area shape="rect" id="node3" href="$flat__double__ended__queue_8h.html" title="The Flat Double Ended Queue Interface." alt="" coords="14,167,181,207"/>
-<area shape="rect" id="node5" href="$traits_8h.html" title="The C Container Collection Traits Interface." alt="" coords="303,328,396,353"/>
+<area shape="rect" id="node5" href="$traits_8h.html" title="The C Container Collection Traits Interface." alt="" coords="175,328,268,353"/>
 <area shape="rect" id="node7" href="$flat__priority__queue_8h.html" title="The Flat Priority Queue Interface." alt="" coords="259,174,440,199"/>
-<area shape="rect" id="node9" href="$handle__ordered__map_8h.html" title="The Handle Ordered Map Interface." alt="" coords="465,167,613,207"/>
-<area shape="rect" id="node11" href="$handle__realtime__ordered__map_8h.html" title="The Handle Realtime Ordered Map Interface." alt="" coords="637,167,790,207"/>
 </map>

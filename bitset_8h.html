@@ -134,12 +134,21 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Container Initialization</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Initialize and create containers with memory and permissions. </p>
 </td></tr>
-<tr class="memitem:a1099f64c2982ed888e26a6edb6b13734"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a1099f64c2982ed888e26a6edb6b13734">ccc_bs_blocks</a>(bit_cap)&#160;&#160;&#160;ccc_impl_bs_blocks(bit_cap)</td></tr>
-<tr class="memdesc:a1099f64c2982ed888e26a6edb6b13734"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the number of bit blocks needed for the desired bit set capacity.  <br /></td></tr>
-<tr class="separator:a1099f64c2982ed888e26a6edb6b13734"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac050a8a3ec1fdd75feae0e2737eb3e0c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#ac050a8a3ec1fdd75feae0e2737eb3e0c">ccc_bs_block_count</a>(bit_cap)&#160;&#160;&#160;ccc_impl_bs_block_count(bit_cap)</td></tr>
+<tr class="memdesc:ac050a8a3ec1fdd75feae0e2737eb3e0c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the number of bit blocks needed for the desired bit set capacity.  <br /></td></tr>
+<tr class="separator:ac050a8a3ec1fdd75feae0e2737eb3e0c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae9a75c7ad54a2965b3d47fc4d0a86b09"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#ae9a75c7ad54a2965b3d47fc4d0a86b09">ccc_bs_block_bytes</a>(bit_cap)&#160;&#160;&#160;ccc_impl_bs_block_bytes(bit_cap)</td></tr>
+<tr class="memdesc:ae9a75c7ad54a2965b3d47fc4d0a86b09"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the number of bytes needed for the desired bit set capacity.  <br /></td></tr>
+<tr class="separator:ae9a75c7ad54a2965b3d47fc4d0a86b09"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aabc0793e5393dd7fa4ffadba15007d93"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#aabc0793e5393dd7fa4ffadba15007d93">ccc_bs_blocks</a>(bit_cap,  optional_storage_duration...)&#160;&#160;&#160;    ccc_impl_bs_blocks(bit_cap, optional_storage_duration)</td></tr>
+<tr class="memdesc:aabc0793e5393dd7fa4ffadba15007d93"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocate the necessary number of blocks at compile or runtime on the stack or data segment.  <br /></td></tr>
+<tr class="separator:aabc0793e5393dd7fa4ffadba15007d93"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a98aee1dcbd78e1eb644babc2d3c629e4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a98aee1dcbd78e1eb644babc2d3c629e4">ccc_bs_init</a>(bitblock_ptr,  alloc_fn,  aux,  cap,  optional_size...)&#160;&#160;&#160;    ccc_impl_bs_init(bitblock_ptr, alloc_fn, aux, cap, optional_size)</td></tr>
 <tr class="memdesc:a98aee1dcbd78e1eb644babc2d3c629e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the bit set with memory and allocation permissions.  <br /></td></tr>
 <tr class="separator:a98aee1dcbd78e1eb644babc2d3c629e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a52c429148b439f77564a95b3edc3b452"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom">: size_t { <a class="el" href="bitset_8h.html#a52c429148b439f77564a95b3edc3b452a75045162a3afeacb8bec25de9d9289a9">CCC_BS_BLOCK_BITS</a> = CCC_IMPL_BS_BLOCK_BITS
+ }</td></tr>
+<tr class="separator:a52c429148b439f77564a95b3edc3b452"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9f42bf8a5dcb20b35ba23d80be0be324"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a9f42bf8a5dcb20b35ba23d80be0be324">ccc_bs_copy</a> (ccc_bitset *dst, ccc_bitset const *src, <a class="el" href="types_8h.html#a3e73202894869d2840fb21ff912bbd96">ccc_any_alloc_fn</a> *fn)</td></tr>
 <tr class="memdesc:a9f42bf8a5dcb20b35ba23d80be0be324"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy the bit set at source to destination.  <br /></td></tr>
 <tr class="separator:a9f42bf8a5dcb20b35ba23d80be0be324"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -153,9 +162,6 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memitem:a91c02e4cbaa5d2ad80b4d448b19a8f2b"><td class="memItemLeft" align="right" valign="top">typedef struct ccc_bitset&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a91c02e4cbaa5d2ad80b4d448b19a8f2b">ccc_bitset</a></td></tr>
 <tr class="memdesc:a91c02e4cbaa5d2ad80b4d448b19a8f2b"><td class="mdescLeft">&#160;</td><td class="mdescRight">The bit set type that may be stored and initialized on the stack, heap, or data segment at compile or run time.  <br /></td></tr>
 <tr class="separator:a91c02e4cbaa5d2ad80b4d448b19a8f2b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1165b11608a79fa0bc28acef6b8862fe"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="bitset_8h.html#a1165b11608a79fa0bc28acef6b8862fe">ccc_bitblock</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a1165b11608a79fa0bc28acef6b8862fe">ccc_bitblock</a></td></tr>
-<tr class="memdesc:a1165b11608a79fa0bc28acef6b8862fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">The type used to efficiently store bits in the bit set.  <br /></td></tr>
-<tr class="separator:a1165b11608a79fa0bc28acef6b8862fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Bit Membership Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Test for the presence of bits. </p>
@@ -300,9 +306,9 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader">State Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Obtain state from the container. </p>
 </td></tr>
-<tr class="memitem:a061752140a2fabc6685db8383de395a9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="bitset_8h.html#a1165b11608a79fa0bc28acef6b8862fe">ccc_bitblock</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a061752140a2fabc6685db8383de395a9">ccc_bs_data</a> (ccc_bitset const *bs)</td></tr>
-<tr class="memdesc:a061752140a2fabc6685db8383de395a9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a reference to the base of the underlying block array.  <br /></td></tr>
-<tr class="separator:a061752140a2fabc6685db8383de395a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4357b8c95413a63a01cac5794dcd7ea9"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a4357b8c95413a63a01cac5794dcd7ea9">ccc_bs_data</a> (ccc_bitset const *bs)</td></tr>
+<tr class="memdesc:a4357b8c95413a63a01cac5794dcd7ea9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a reference to the base of the underlying block array.  <br /></td></tr>
+<tr class="separator:a4357b8c95413a63a01cac5794dcd7ea9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a03d6315f23faa4d7019f1faa5d0d7da3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a03d6315f23faa4d7019f1faa5d0d7da3">ccc_bs_capacity</a> (ccc_bitset const *bs)</td></tr>
 <tr class="memdesc:a03d6315f23faa4d7019f1faa5d0d7da3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return total number of bits the capacity of the set can hold.  <br /></td></tr>
 <tr class="separator:a03d6315f23faa4d7019f1faa5d0d7da3"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -349,18 +355,45 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="separator:ae9baee7e324a3b1db04d6e83748118f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="a1099f64c2982ed888e26a6edb6b13734" name="a1099f64c2982ed888e26a6edb6b13734"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1099f64c2982ed888e26a6edb6b13734">&#9670;&#160;</a></span>ccc_bs_blocks</h2>
+<a id="ae9a75c7ad54a2965b3d47fc4d0a86b09" name="ae9a75c7ad54a2965b3d47fc4d0a86b09"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae9a75c7ad54a2965b3d47fc4d0a86b09">&#9670;&#160;</a></span>ccc_bs_block_bytes</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define ccc_bs_blocks</td>
+          <td class="memname">#define ccc_bs_block_bytes</td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
           <td class="paramname">bit_cap</td><td>)</td>
-          <td>&#160;&#160;&#160;ccc_impl_bs_blocks(bit_cap)</td>
+          <td>&#160;&#160;&#160;ccc_impl_bs_block_bytes(bit_cap)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the number of bytes needed for the desired bit set capacity. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">bit_cap</td><td>the number of bits representing this bit set. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the number of bytes needed to support the bit capacity. This is the number of bytes occupied by the number of bit blocks that must be allocated. </dd></dl>
+
+</div>
+</div>
+<a id="ac050a8a3ec1fdd75feae0e2737eb3e0c" name="ac050a8a3ec1fdd75feae0e2737eb3e0c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac050a8a3ec1fdd75feae0e2737eb3e0c">&#9670;&#160;</a></span>ccc_bs_block_count</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define ccc_bs_block_count</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">bit_cap</td><td>)</td>
+          <td>&#160;&#160;&#160;ccc_impl_bs_block_count(bit_cap)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -374,17 +407,51 @@ This graph shows which files directly or indirectly include this file:</div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the number of blocks needed for the desired bit set. </dd></dl>
 <dl class="section warning"><dt>Warning</dt><dd>bit_cap must be &gt;= 1. </dd></dl>
-<dl class="section note"><dt>Note</dt><dd>this macro is not needed if capacity is 0 to start.</dd></dl>
+
+</div>
+</div>
+<a id="aabc0793e5393dd7fa4ffadba15007d93" name="aabc0793e5393dd7fa4ffadba15007d93"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aabc0793e5393dd7fa4ffadba15007d93">&#9670;&#160;</a></span>ccc_bs_blocks</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define ccc_bs_blocks</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">bit_cap, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">optional_storage_duration...&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;    ccc_impl_bs_blocks(bit_cap, optional_storage_duration)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Allocate the necessary number of blocks at compile or runtime on the stack or data segment. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">bit_cap</td><td>the desired number of bits to store in the bit set. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">optional_storage_duration</td><td>an optional storage duration specifier such as static or automatic. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>a compound literal array of the necessary bit block type allocated in the scope it is created with any storage duration specifiers added.</dd></dl>
 <p>This method can be used for compile time initialization of bit set. For example:</p>
-<div class="fragment"><div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="bitset_8h.html#a91c02e4cbaa5d2ad80b4d448b19a8f2b">ccc_bitset</a> b</div>
-<div class="line">    = <a class="code hl_define" href="bitset_8h.html#a98aee1dcbd78e1eb644babc2d3c629e4">ccc_bs_init</a>((<span class="keyword">static</span> <a class="code hl_typedef" href="bitset_8h.html#a1165b11608a79fa0bc28acef6b8862fe">ccc_bitblock</a>[<a class="code hl_define" href="bitset_8h.html#a1099f64c2982ed888e26a6edb6b13734">ccc_bs_blocks</a>(256)]){}, NULL, NULL, 256);</div>
-<div class="ttc" id="abitset_8h_html_a1099f64c2982ed888e26a6edb6b13734"><div class="ttname"><a href="bitset_8h.html#a1099f64c2982ed888e26a6edb6b13734">ccc_bs_blocks</a></div><div class="ttdeci">#define ccc_bs_blocks(bit_cap)</div><div class="ttdoc">Get the number of bit blocks needed for the desired bit set capacity.</div><div class="ttdef"><b>Definition:</b> bitset.h:115</div></div>
-<div class="ttc" id="abitset_8h_html_a1165b11608a79fa0bc28acef6b8862fe"><div class="ttname"><a href="bitset_8h.html#a1165b11608a79fa0bc28acef6b8862fe">ccc_bitblock</a></div><div class="ttdeci">ccc_bitblock ccc_bitblock</div><div class="ttdoc">The type used to efficiently store bits in the bit set.</div><div class="ttdef"><b>Definition:</b> bitset.h:81</div></div>
+<div class="fragment"><div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="bitset_8h.html#a91c02e4cbaa5d2ad80b4d448b19a8f2b">ccc_bitset</a> b = <a class="code hl_define" href="bitset_8h.html#a98aee1dcbd78e1eb644babc2d3c629e4">ccc_bs_init</a>(<a class="code hl_define" href="bitset_8h.html#aabc0793e5393dd7fa4ffadba15007d93">ccc_bs_blocks</a>(256, <span class="keyword">static</span>), NULL, NULL, 256);</div>
 <div class="ttc" id="abitset_8h_html_a91c02e4cbaa5d2ad80b4d448b19a8f2b"><div class="ttname"><a href="bitset_8h.html#a91c02e4cbaa5d2ad80b4d448b19a8f2b">ccc_bitset</a></div><div class="ttdeci">struct ccc_bitset ccc_bitset</div><div class="ttdoc">The bit set type that may be stored and initialized on the stack, heap, or data segment at compile or...</div><div class="ttdef"><b>Definition:</b> bitset.h:73</div></div>
-<div class="ttc" id="abitset_8h_html_a98aee1dcbd78e1eb644babc2d3c629e4"><div class="ttname"><a href="bitset_8h.html#a98aee1dcbd78e1eb644babc2d3c629e4">ccc_bs_init</a></div><div class="ttdeci">#define ccc_bs_init(bitblock_ptr, alloc_fn, aux, cap, optional_size...)</div><div class="ttdoc">Initialize the bit set with memory and allocation permissions.</div><div class="ttdef"><b>Definition:</b> bitset.h:155</div></div>
+<div class="ttc" id="abitset_8h_html_a98aee1dcbd78e1eb644babc2d3c629e4"><div class="ttname"><a href="bitset_8h.html#a98aee1dcbd78e1eb644babc2d3c629e4">ccc_bs_init</a></div><div class="ttdeci">#define ccc_bs_init(bitblock_ptr, alloc_fn, aux, cap, optional_size...)</div><div class="ttdoc">Initialize the bit set with memory and allocation permissions.</div><div class="ttdef"><b>Definition:</b> bitset.h:166</div></div>
+<div class="ttc" id="abitset_8h_html_aabc0793e5393dd7fa4ffadba15007d93"><div class="ttname"><a href="bitset_8h.html#aabc0793e5393dd7fa4ffadba15007d93">ccc_bs_blocks</a></div><div class="ttdeci">#define ccc_bs_blocks(bit_cap, optional_storage_duration...)</div><div class="ttdoc">Allocate the necessary number of blocks at compile or runtime on the stack or data segment.</div><div class="ttdef"><b>Definition:</b> bitset.h:125</div></div>
 </div><!-- fragment --><p>The above example also illustrates the benefits of a static compound literal to encapsulate the bits within the bit set array to prevent dangling references. If the compiler does not support storage duration of compound literals the more traditional example follows:</p>
-<div class="fragment"><div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="bitset_8h.html#a1165b11608a79fa0bc28acef6b8862fe">ccc_bitblock</a> blocks[<a class="code hl_define" href="bitset_8h.html#a1099f64c2982ed888e26a6edb6b13734">ccc_bs_blocks</a>(256)];</div>
-<div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="bitset_8h.html#a91c02e4cbaa5d2ad80b4d448b19a8f2b">ccc_bitset</a> b = <a class="code hl_define" href="bitset_8h.html#a98aee1dcbd78e1eb644babc2d3c629e4">ccc_bs_init</a>(blocks, NULL, NULL, 256);</div>
+<div class="fragment"><div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="bitset_8h.html#a91c02e4cbaa5d2ad80b4d448b19a8f2b">ccc_bitset</a> b = <a class="code hl_define" href="bitset_8h.html#a98aee1dcbd78e1eb644babc2d3c629e4">ccc_bs_init</a>(<a class="code hl_define" href="bitset_8h.html#aabc0793e5393dd7fa4ffadba15007d93">ccc_bs_blocks</a>(256), NULL, NULL, 256);</div>
 </div><!-- fragment --><p>This macro is required for any initialization where the bit block memory comes from the stack or data segment. For one time dynamic reservations of bit block memory see the ccc_bs_reserve and ccc_bs_clear_and_free_reserve interface. </p>
 
 </div>
@@ -448,10 +515,10 @@ This graph shows which files directly or indirectly include this file:</div>
 <dl class="section warning"><dt>Warning</dt><dd>the user must use the ccc_bs_blocks macro to help determine the size of the bitblock array if a fixed size bitblock array is provided at compile time; the necessary conversion from bits requested to number of blocks required to store those bits must occur before use. If capacity is zero the helper macro is not needed.</dd></dl>
 <p>A fixed size bit set with size equal to capacity.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define BITSET_USING_NAMESPACE_CCC</span></div>
-<div class="line">bitset bs = bs_init((bitblock[bs_blocks(9)]){}, NULL, NULL, 9);</div>
+<div class="line">bitset bs = bs_init(bs_blocks(9), NULL, NULL, 9);</div>
 </div><!-- fragment --><p> A fixed size bit set with dynamic push and pop.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define BITSET_USING_NAMESPACE_CCC</span></div>
-<div class="line">bitset bs = bs_init((bitblock[bs_blocks(9)]){}, NULL, NULL, 9, 0);</div>
+<div class="line">bitset bs = bs_init(bs_blocks(9), NULL, NULL, 9, 0);</div>
 </div><!-- fragment --><p>A dynamic bit set initialization.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define BITSET_USING_NAMESPACE_CCC</span></div>
 <div class="line">bitset bs = bs_init(NULL, std_alloc, NULL, 0);</div>
@@ -460,23 +527,6 @@ This graph shows which files directly or indirectly include this file:</div>
 </div>
 </div>
 <h2 class="groupheader">Typedef Documentation</h2>
-<a id="a1165b11608a79fa0bc28acef6b8862fe" name="a1165b11608a79fa0bc28acef6b8862fe"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1165b11608a79fa0bc28acef6b8862fe">&#9670;&#160;</a></span>ccc_bitblock</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="bitset_8h.html#a1165b11608a79fa0bc28acef6b8862fe">ccc_bitblock</a> <a class="el" href="bitset_8h.html#a1165b11608a79fa0bc28acef6b8862fe">ccc_bitblock</a></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>The type used to efficiently store bits in the bit set. </p>
-<p>A block is an integer that allows for efficient block sized bit operations for various scanning and setting. The user must participate in the storage of the bit set by using the provided ccc_bs_blocks macro to determine how many blocks are needed for the desired bits in the bit set. </p>
-
-</div>
-</div>
 <a id="a91c02e4cbaa5d2ad80b4d448b19a8f2b" name="a91c02e4cbaa5d2ad80b4d448b19a8f2b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a91c02e4cbaa5d2ad80b4d448b19a8f2b">&#9670;&#160;</a></span>ccc_bitset</h2>
 
@@ -491,6 +541,25 @@ This graph shows which files directly or indirectly include this file:</div>
 
 <p>The bit set type that may be stored and initialized on the stack, heap, or data segment at compile or run time. </p>
 <p>A bit set offers fast membership testing and bit range manipulations when the data can be modeled as a 0-indexed key value data set. In the case of a bit set the key is the index in the bit set and the value is 1 or 0. Operations on single bits occur in O(1) time. All scanning operations operate in O(N) time. </p>
+
+</div>
+</div>
+<h2 class="groupheader">Enumeration Type Documentation</h2>
+<a id="a52c429148b439f77564a95b3edc3b452" name="a52c429148b439f77564a95b3edc3b452"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a52c429148b439f77564a95b3edc3b452">&#9670;&#160;</a></span>anonymous enum</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">anonymous enum : size_t</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a52c429148b439f77564a95b3edc3b452a75045162a3afeacb8bec25de9d9289a9" name="a52c429148b439f77564a95b3edc3b452a75045162a3afeacb8bec25de9d9289a9"></a>CCC_BS_BLOCK_BITS&#160;</td><td class="fielddoc"><p>The number of bits in a block of the bit set. </p>
+</td></tr>
+</table>
 
 </div>
 </div>
@@ -904,11 +973,9 @@ This graph shows which files directly or indirectly include this file:</div>
 <p>Note that there are two ways to copy data from source to destination: provide sufficient memory and pass NULL as fn, or allow the copy function to take care of allocation for the copy.</p>
 <p>Manual memory management with no allocation function provided.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define BITSET_USING_NAMESPACE_CCC</span></div>
-<div class="line"><span class="keyword">static</span> bitset src</div>
-<div class="line">    = bs_init((<span class="keyword">static</span> bitblock[bs_blocks(11)]){}, NULL, NULL, 11);</div>
+<div class="line"><span class="keyword">static</span> bitset src = bs_init(bs_blocks(11, <span class="keyword">static</span>), NULL, NULL, 11);</div>
 <div class="line">set_rand_bits(&amp;src);</div>
-<div class="line"><span class="keyword">static</span> bitset src</div>
-<div class="line">    = bs_init((<span class="keyword">static</span> bitblock[bs_blocks(13)]){}, NULL, NULL, 13);</div>
+<div class="line"><span class="keyword">static</span> bitset src = bs_init(bs_blocks(13, <span class="keyword">static</span>), NULL, NULL, 13);</div>
 <div class="line"><a class="code hl_enumeration" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> res = bs_copy(&amp;dst, &amp;src, NULL);</div>
 <div class="ttc" id="atypes_8h_html_a51d6f078a83d667aff5016609d9146ef"><div class="ttname"><a href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a></div><div class="ttdeci">ccc_result</div><div class="ttdoc">A result of actions on containers.</div><div class="ttdef"><b>Definition:</b> types.h:132</div></div>
 </div><!-- fragment --><p>The above requires dst capacity be greater than or equal to src capacity. Here is memory management handed over to the copy function.</p>
@@ -928,14 +995,14 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="a061752140a2fabc6685db8383de395a9" name="a061752140a2fabc6685db8383de395a9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a061752140a2fabc6685db8383de395a9">&#9670;&#160;</a></span>ccc_bs_data()</h2>
+<a id="a4357b8c95413a63a01cac5794dcd7ea9" name="a4357b8c95413a63a01cac5794dcd7ea9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4357b8c95413a63a01cac5794dcd7ea9">&#9670;&#160;</a></span>ccc_bs_data()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="bitset_8h.html#a1165b11608a79fa0bc28acef6b8862fe">ccc_bitblock</a> * ccc_bs_data </td>
+          <td class="memname">void * ccc_bs_data </td>
           <td>(</td>
           <td class="paramtype">ccc_bitset const *&#160;</td>
           <td class="paramname"><em>bs</em></td><td>)</td>
