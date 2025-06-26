@@ -220,7 +220,7 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memdesc:a96a2fa2efc460be38875c7893b1416e2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a pointer to the first intrusive handle in the list. O(1).  <br /></td></tr>
 <tr class="separator:a96a2fa2efc460be38875c7893b1416e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8a3332d20b463538ad83abc752858a37"><td class="memItemLeft" align="right" valign="top">ccc_sll_elem *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="singly__linked__list_8h.html#a8a3332d20b463538ad83abc752858a37">ccc_sll_begin_sentinel</a> (<a class="el" href="singly__linked__list_8h.html#ae76c86dea3ed2d9344bdb9068e8562ea">ccc_singly_linked_list</a> const *sll)</td></tr>
-<tr class="memdesc:a8a3332d20b463538ad83abc752858a37"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a pointer to the first list element in the list. O(1).  <br /></td></tr>
+<tr class="memdesc:a8a3332d20b463538ad83abc752858a37"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a pointer to the sentinel node at the front of the list.  <br /></td></tr>
 <tr class="separator:a8a3332d20b463538ad83abc752858a37"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a69a89032d3cb969e8a83fc46f9bffc86"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="singly__linked__list_8h.html#a69a89032d3cb969e8a83fc46f9bffc86">ccc_sll_size</a> (<a class="el" href="singly__linked__list_8h.html#ae76c86dea3ed2d9344bdb9068e8562ea">ccc_singly_linked_list</a> const *sll)</td></tr>
 <tr class="memdesc:a69a89032d3cb969e8a83fc46f9bffc86"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the size of the list. O(1).  <br /></td></tr>
@@ -446,14 +446,15 @@ This graph shows which files directly or indirectly include this file:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Return a pointer to the first list element in the list. O(1). </p>
+<p>Return a pointer to the sentinel node at the front of the list. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">sll</td><td>a pointer to the singly linked list. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>a pointer to the first list element. This will never be NULL, even if the list is empty. If bad input is provided (sll is NULL) NULL is returned. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>a pointer to the sentinel node that always points to the first list element or itself. It will not be NULL unless the sll pointer provided is NULL.</dd></dl>
+<p>This functions can be used when the user wishes to splice an element or range of elements to the front of the list. Because the interface only allows the user to splice an element or range AFTER a position having access to the sentinel makes it possible to splice to the front of the list. </p>
 
 </div>
 </div>

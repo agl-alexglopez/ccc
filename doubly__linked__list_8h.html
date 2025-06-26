@@ -247,7 +247,7 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memdesc:a4af4285ea65140865e2509f0ac1674be"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a handle to the list element at the back of the list which may be the sentinel. O(1).  <br /></td></tr>
 <tr class="separator:a4af4285ea65140865e2509f0ac1674be"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5bcc2bddcba3de980eff5c3142ba3687"><td class="memItemLeft" align="right" valign="top">ccc_dll_elem *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="doubly__linked__list_8h.html#a5bcc2bddcba3de980eff5c3142ba3687">ccc_dll_end_sentinel</a> (<a class="el" href="doubly__linked__list_8h.html#a242216a4880ae2513dbbcfd181a71ad7">ccc_doubly_linked_list</a> const *l)</td></tr>
-<tr class="memdesc:a5bcc2bddcba3de980eff5c3142ba3687"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a handle to the sentinel at the back of the list. O(1).  <br /></td></tr>
+<tr class="memdesc:a5bcc2bddcba3de980eff5c3142ba3687"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a pointer to the sentinel node at the back of the list.  <br /></td></tr>
 <tr class="separator:a5bcc2bddcba3de980eff5c3142ba3687"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5b577a366604b3fec516672cbc8dc370"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="doubly__linked__list_8h.html#a5b577a366604b3fec516672cbc8dc370">ccc_dll_size</a> (<a class="el" href="doubly__linked__list_8h.html#a242216a4880ae2513dbbcfd181a71ad7">ccc_doubly_linked_list</a> const *l)</td></tr>
 <tr class="memdesc:a5b577a366604b3fec516672cbc8dc370"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the size of the list. O(1).  <br /></td></tr>
@@ -634,14 +634,15 @@ This graph shows which files directly or indirectly include this file:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Return a handle to the sentinel at the back of the list. O(1). </p>
+<p>Return a pointer to the sentinel node at the back of the list. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">l</td><td>a pointer to the doubly linked list. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>a pointer to the sentinel at the end of the list which will not be NULL unless a NULL pointer is provided as l. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>a pointer to the sentinel node that always points to the first and last elements or itself. It will not be NULL unless sll pointer provided is NULL.</dd></dl>
+<p>This function can be used when the user wishes to splice an element or range of elements to the back of the list. Because the interface only allows the user to splice an element or elements BEFORE a position having access to the sentinel makes it possible to splice to the back of the list. </p>
 
 </div>
 </div>
