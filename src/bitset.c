@@ -926,7 +926,7 @@ ccc_bs_clear_and_free(ccc_bitset *const bs)
 }
 
 ccc_result
-ccc_bs_clear_and_free_reserve(ccc_bitset *bs, ccc_any_alloc_fn *fn)
+ccc_bs_clear_and_free_reserve(ccc_bitset *const bs, ccc_any_alloc_fn *const fn)
 {
     if (!bs || !fn)
     {
@@ -1736,7 +1736,7 @@ ublock_count(size_t const set_bits)
 
 /** Returns min of size_t arguments. Beware of conversions. */
 static inline size_t
-size_t_min(size_t a, size_t b)
+size_t_min(size_t const a, size_t const b)
 {
     return a < b ? a : b;
 }
