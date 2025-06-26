@@ -160,10 +160,13 @@ enum : typeof((ccc_fhm_tag){}.v)
 
 /** @private The following test should ensure some safety in assumptions we make
 when the user defines a fixed size map type. This is just a small type that
-will remain internal to this translation unit and offers a type that needs
-padding due to field sizes. The tag array is not given a replica group size at
-the end of its allocation because that wastes pointless space and has no impact
-on the following layout and pointer arithmetic tests. */
+will remain internal to this translation unit. The tag array is not given a
+replica group size at the end of its allocation because that wastes pointless
+space and has no impact on the following layout and pointer arithmetic tests.
+One behavior we want to ensure is that the tag array starts on the exact next
+byte after the user data type because the tag array has no alignment
+requirement: it is only a byte so any address following the data array will be
+aligned. */
 struct fixed_map_test_type
 {
     struct
@@ -187,8 +190,7 @@ Over index the tag array to get the end address for pointer differences. The
 first byte of the struct with no padding BEFORE this first element. */
 static_assert(
     (char *)&data_tag_layout_test.tag[2] - (char *)&data_tag_layout_test.data[0]
-        == ((sizeof(data_tag_layout_test.data[0]) * 3)
-            + sizeof(ccc_fhm_tag) * 2),
+        == ((sizeof(*data_tag_layout_test.data) * 3) + sizeof(ccc_fhm_tag) * 2),
     "The size in bytes of the contiguous user data to tag array must be what "
     "we would expect with no padding that will interfere with pointer "
     "arithmetic.");
@@ -222,7 +224,7 @@ data array for swapping purposes because variable length arrays are banned and
 allocation might not be permitted. */
 static_assert(
     (char *)(data_tag_layout_test.tag
-             - ((2 + 1) * sizeof(data_tag_layout_test.data[0])))
+             - ((2 + 1) * sizeof(*data_tag_layout_test.data)))
         == (char *)&data_tag_layout_test.data[0],
     "With a perfectly aligned shared user data and tag array base address, "
     "pointer subtraction for user data must work as expected.");
