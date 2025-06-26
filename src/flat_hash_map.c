@@ -1570,7 +1570,7 @@ extra swap slot provided at the start of the array. This swap slot is never
 accounted for in load factor or capacity calculations but must be remembered in
 cases like this for resizing and allocation purposes. */
 static inline size_t
-mask_to_data_bytes(size_t sizeof_type, size_t const mask)
+mask_to_data_bytes(size_t const sizeof_type, size_t const mask)
 {
     /* Add two because there is always a bonus user data type at the 0th index
        of the data array for swapping purposes. */
