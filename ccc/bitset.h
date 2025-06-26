@@ -52,7 +52,6 @@ All types and functions can then be written without the `ccc_` prefix. */
 #define CCC_BITSET
 
 /** @cond */
-#include <limits.h>
 #include <stddef.h>
 #include <stdint.h>
 /** @endcond */
