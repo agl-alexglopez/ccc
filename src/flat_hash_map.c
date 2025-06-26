@@ -307,6 +307,7 @@ static ccc_tribool eq_fn(struct ccc_fhmap const *h, void const *key, size_t i);
 static uint64_t hash_fn(struct ccc_fhmap const *h, void const *any_key);
 static void *key_at(struct ccc_fhmap const *h, size_t i);
 static void *data_at(struct ccc_fhmap const *h, size_t i);
+static ccc_fhm_tag *tag_pos(size_t sizeof_type, void const *data, size_t mask);
 static void *key_in_slot(struct ccc_fhmap const *h, void const *slot);
 static void *swap_slot(struct ccc_fhmap const *h);
 static ccc_ucount data_i(struct ccc_fhmap const *h, void const *data_slot);
@@ -847,10 +848,7 @@ ccc_fhm_copy(ccc_flat_hash_map *const dst, ccc_flat_hash_map const *const src,
             return CCC_RESULT_MEM_ERROR;
         }
         dst->data = new_mem;
-        /* Static assertions at top of file ensure this is correct. */
-        dst->tag = (ccc_fhm_tag *)((char *)new_mem
-                                   + mask_to_data_bytes(src->sizeof_type,
-                                                        src->mask));
+        dst->tag = tag_pos(src->sizeof_type, new_mem, src->mask);
         dst->mask = src->mask;
     }
     if (!dst->data || !src->data)
@@ -1264,9 +1262,7 @@ maybe_rehash(struct ccc_fhmap *const h, size_t const to_add,
         }
         h->mask = required_total_cap - 1;
         h->remain = mask_to_load_factor_cap(h->mask);
-        /* Static assertions at top of file ensure this is correct. */
-        h->tag = (ccc_fhm_tag *)((char *)h->data
-                                 + mask_to_data_bytes(h->sizeof_type, h->mask));
+        h->tag = tag_pos(h->sizeof_type, h->data, h->mask);
         (void)memset(h->tag, TAG_EMPTY, mask_to_tag_bytes(h->mask));
     }
     if (likely(h->remain))
@@ -1423,8 +1419,7 @@ check_init(struct ccc_fhmap *const h, size_t const required_total_cap)
         {
             return CCC_RESULT_ARG_ERROR;
         }
-        h->tag = (ccc_fhm_tag *)((char *)h->data
-                                 + mask_to_data_bytes(h->sizeof_type, h->mask));
+        h->tag = tag_pos(h->sizeof_type, h->data, h->mask);
         (void)memset(h->tag, TAG_EMPTY, mask_to_tag_bytes(h->mask));
     }
     return CCC_RESULT_OK;
@@ -1580,6 +1575,18 @@ mask_to_data_bytes(size_t sizeof_type, size_t const mask)
     /* Add two because there is always a bonus user data type at the 0th index
        of the data array for swapping purposes. */
     return sizeof_type * (mask + 2);
+}
+
+/** Returns the correct position of the start of the tag array given the base
+of the data array. This position is determined by the size of the type in the
+data array and the current mask being used for the hash map to which the data
+belongs. */
+static inline ccc_fhm_tag *
+tag_pos(size_t const sizeof_type, void const *const data, size_t const mask)
+{
+    /* Static assertions at top of file ensure this is correct. */
+    return (ccc_fhm_tag *)((char *)data
+                           + mask_to_data_bytes(sizeof_type, mask));
 }
 
 static inline size_t
