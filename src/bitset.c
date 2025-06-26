@@ -26,7 +26,7 @@ based operations over the set. */
 #include "impl/impl_bitset.h"
 #include "types.h"
 
-/*=========================   Types/Prototypes   ============================*/
+/*=========================   Type Declarations  ============================*/
 
 typedef typeof(*(struct ccc_bitset){}.blocks) bitblock;
 
@@ -124,11 +124,12 @@ struct igroup
     size_t count;
 };
 
+/*=========================      Prototypes      ============================*/
+
 static size_t ublock_index(size_t bitset_index);
 static inline bitblock *block_at(ccc_bitset const *bs, size_t bitset_index);
 static void set(bitblock *, size_t bitset_index, ccc_tribool);
 static bitblock on(size_t bitset_index);
-static bitblock last_on(struct ccc_bitset const *);
 static void fix_end(struct ccc_bitset *);
 static ccc_tribool status(bitblock const *, size_t bitset_index);
 static size_t ublock_count(size_t bits);
@@ -416,9 +417,10 @@ ccc_bs_set_all(ccc_bitset *const bs, ccc_tribool const b)
 
 /** A naive implementation might just call set for every index between the
 start and start + count. However, calculating the block and index within each
-block for every call to set costs a division and a modulo operation. We can
-avoid this by handling the first and last block and then handling everything in
-between with a bulk memset. */
+block for every call to set costs a division and a modulo operation. This also
+loads and stores a block multiple times just to set each bit within a block to
+the same value. We can avoid this by handling the first and last block with one
+operations and then handling everything in between with a bulk memset. */
 ccc_result
 ccc_bs_set_range(ccc_bitset *const bs, size_t const i, size_t const count,
                  ccc_tribool const b)
@@ -739,14 +741,7 @@ ccc_bs_pop_back(ccc_bitset *const bs)
     }
     ccc_tribool const was = status(block_at(bs, bs->count - 1), bs->count - 1);
     --bs->count;
-    if (bs->count)
-    {
-        fix_end(bs);
-    }
-    else
-    {
-        bs->blocks[0] = 0;
-    }
+    fix_end(bs);
     return was;
 }
 
@@ -1704,20 +1699,11 @@ on bit blocks to ensure any side effects on unused bits are deleted. */
 static inline void
 fix_end(struct ccc_bitset *const bs)
 {
-    *block_at(bs, bs->count - 1) &= last_on(bs);
-}
-
-/** Returns a mask of all bits on in the final bit block that represent only
-those bits which are in use according to the bit set capacity. The remaining
-higher order bits in the last block will be set to 0 because they are not
-used. If the capacity is zero a block with all bits on is returned. */
-static inline bitblock
-last_on(struct ccc_bitset const *const bs)
-{
     /* Remember, we fill from LSB to MSB so we want the mask to start at lower
        order bit which is why we do the second funky flip on the whole op. */
-    return bs->count ? ~(((bitblock)~1) << ubit_index(bs->count - 1))
-                     : BITBLOCK_ON;
+    bs->count ? (*block_at(bs, bs->count - 1)
+                 &= ~(((bitblock)~1) << ubit_index(bs->count - 1)))
+              : (bs->blocks[0] = 0);
 }
 
 /** Returns the 0-based index of the block in the block array allocation to
