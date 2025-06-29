@@ -31,9 +31,8 @@ Please specify a command as follows:
 #include "ccc/traits.h"
 #include "ccc/types.h"
 #include "cli.h"
+#include "str_arena.h"
 #include "str_view.h"
-
-typedef ptrdiff_t str_ofs;
 
 enum action_type
 {
@@ -52,13 +51,6 @@ struct clean_word
 {
     str_ofs str;
     enum word_clean_status stat;
-};
-
-struct str_arena
-{
-    char *arena;
-    size_t next_free_pos;
-    size_t cap;
 };
 
 /* Type that will serve as key val for both map and priority queue. */
@@ -158,19 +150,6 @@ static struct int_conversion parse_n_ranks(str_view arg);
 
 /* String Helper Functions */
 static struct clean_word clean_word(struct str_arena *, str_view wv);
-
-/* String Arena Functions */
-static struct str_arena str_arena_create(size_t);
-static ptrdiff_t str_arena_alloc(struct str_arena *, size_t bytes);
-static result str_arena_maybe_resize(struct str_arena *, size_t byte_request);
-static result str_arena_maybe_resize_pos(struct str_arena *,
-                                         size_t furthest_pos);
-static void str_arena_free_to_pos(struct str_arena *, str_ofs last_str,
-                                  size_t str_len);
-static bool str_arena_push_back(struct str_arena *, str_ofs str, size_t len,
-                                char);
-static void str_arena_free(struct str_arena *);
-static char *str_arena_at(struct str_arena const *, str_ofs);
 
 /* Container Functions */
 static handle_ordered_map create_frequency_map(struct str_arena *, FILE *);
@@ -529,140 +508,6 @@ clean_word(struct str_arena *const a, str_view wv)
         return (struct clean_word){.stat = WC_NOT_WORD};
     }
     return (struct clean_word){.str = str, .stat = WC_CLEAN_WORD};
-}
-
-/*=======================   Str Arena Allocator   ===========================*/
-
-static struct str_arena
-str_arena_create(size_t const cap)
-{
-    struct str_arena a;
-    a.arena = calloc(cap, sizeof(char));
-    if (!a.arena)
-    {
-        return (struct str_arena){};
-    }
-    a.cap = arena_start_cap;
-    a.next_free_pos = 0;
-    return a;
-}
-
-/* Allocates exactly bytes bytes from the arena. Do not forget the null
-   terminator in requests if a string is requested. */
-static ptrdiff_t
-str_arena_alloc(struct str_arena *const a, size_t const bytes)
-{
-    if (str_arena_maybe_resize(a, bytes) != CCC_RESULT_OK)
-    {
-        return -1;
-    }
-    size_t const ret = a->next_free_pos;
-    a->next_free_pos += bytes;
-    return (ptrdiff_t)ret;
-}
-
-/* Push a character back to the last string allocation. This is possible
-   and useful when a string may be edited depending on other factors
-   before it is finally recorded for later use. One would overwrite other
-   strings if this is not the last element. However all strings will remain
-   null terminated. A null terminator is added after the new character.
-   Assumes str_len + 1 bytes for str have been allocated already starting
-   at str. */
-static bool
-str_arena_push_back(struct str_arena *const a, str_ofs const str,
-                    size_t const str_len, char const c)
-{
-    size_t const new_pos = str + str_len + 1;
-    if (str_arena_maybe_resize_pos(a, new_pos) != CCC_RESULT_OK)
-    {
-        return false;
-    }
-    char *const string = str_arena_at(a, str);
-    PROG_ASSERT(string);
-    *(string + str_len) = c;
-    *(string + str_len + 1) = '\0';
-    if (new_pos >= a->next_free_pos)
-    {
-        a->next_free_pos += ((new_pos + 1) - a->next_free_pos);
-    }
-    return true;
-}
-
-static result
-str_arena_maybe_resize(struct str_arena *const a, size_t const byte_request)
-{
-    if (!a)
-    {
-        return CCC_RESULT_ARG_ERROR;
-    }
-    return str_arena_maybe_resize_pos(a, a->next_free_pos + byte_request);
-}
-
-static result
-str_arena_maybe_resize_pos(struct str_arena *const a, size_t const furthest_pos)
-{
-    if (!a)
-    {
-        return CCC_RESULT_ARG_ERROR;
-    }
-    if (furthest_pos >= a->cap)
-    {
-        size_t const new_cap = (furthest_pos) * 2;
-        void *const moved_arena = std_alloc(a->arena, new_cap, NULL);
-        if (!moved_arena)
-        {
-            return CCC_RESULT_MEM_ERROR;
-        }
-        memset((char *)moved_arena + a->cap, '\0', new_cap - a->cap);
-        a->arena = moved_arena;
-        a->cap = new_cap;
-    }
-    return CCC_RESULT_OK;
-}
-
-/* Returns the last given out position to the arena. The only fine grained
-   freeing made possible and requires the user knows the most recently
-   allocated position or all strings between end and last_pos are
-   invalidated. */
-static void
-str_arena_free_to_pos(struct str_arena *const a, str_ofs const last_str,
-                      size_t const str_len)
-{
-    if (!a || !a->arena || !a->cap || !a->next_free_pos)
-    {
-        return;
-    }
-    if (str_len)
-    {
-        memset(a->arena + last_str, '\0', str_len);
-    }
-    a->next_free_pos = last_str;
-}
-
-static void
-str_arena_free(struct str_arena *const a)
-{
-    if (!a)
-    {
-        return;
-    }
-    if (a->arena)
-    {
-        free(a->arena);
-        a->arena = NULL;
-    }
-    a->next_free_pos = 0;
-    a->cap = 0;
-}
-
-static char *
-str_arena_at(struct str_arena const *const a, str_ofs const i)
-{
-    if (!a || (size_t)i >= a->cap)
-    {
-        return NULL;
-    }
-    return a->arena + i;
 }
 
 /*=======================   Container Helpers    ============================*/

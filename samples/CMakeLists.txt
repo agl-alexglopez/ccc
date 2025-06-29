@@ -36,5 +36,17 @@ target_link_libraries(words PRIVATE
   str_view
   ccc
   alloc
+  str_arena
 )
 add_dependencies(samples words)
+
+add_executable(compression compression.c)
+target_include_directories(compression PRIVATE "../util")
+target_link_libraries(compression PRIVATE
+  cli
+  str_view
+  ccc
+  alloc
+  str_arena
+)
+add_dependencies(samples compression)
