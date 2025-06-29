@@ -20,3 +20,6 @@ add_dependencies(util cli)
 
 add_library(alloc alloc.h alloc.c)
 add_dependencies(util alloc)
+
+add_library(str_arena str_arena.h str_arena.c)
+add_dependencies(util str_arena)
