@@ -9,14 +9,16 @@ algorithms use a wide range of data structures. */
 #include <stdlib.h>
 
 #define BITSET_USING_NAMESPACE_CCC
+#define BUFFER_USING_NAMESPACE_CCC
 #define FLAT_HASH_MAP_USING_NAMESPACE_CCC
-#define PRIORITY_QUEUE_USING_NAMESPACE_CCC
+#define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
 #define TRAITS_USING_NAMESPACE_CCC
 
 #include "alloc.h"
 #include "ccc/bitset.h"
+#include "ccc/buffer.h"
 #include "ccc/flat_hash_map.h"
-#include "ccc/priority_queue.h"
+#include "ccc/flat_priority_queue.h"
 #include "ccc/traits.h"
 #include "str_arena.h"
 #include "str_view.h"
@@ -42,30 +44,35 @@ enum : uint8_t
     ITER_END = LINK_SIZE,
 };
 
-/** An encode node will be hashed into a frequency flat hash map and then
-pushed into a priority queue by frequency to perform Huffman Encoding. An
-important implementation detail to observe is that we must finish frequency
-counting and inserting all nodes into the flat hash map before pushing to the
-priority queue. */
-struct encode_node
+/** Encode nodes will be allocated freely in the heap as tree nodes for now.
+They will be referenced in the priority queue stage of the algorithm but need
+not have any intrusive elements for now. Once the tree is built, it will be
+traversed to complete message and tree compression. */
+struct huffman_node
 {
-    /** Once frequency is counted this is the priority queue intruder. */
-    pq_elem pqe;
-    /** The value for frequency counting before pushing to queue. */
-    size_t freq;
     /** The parent for backtracking during dfs. */
-    struct encode_node *parent;
+    struct huffman_node *parent;
     /** The necessary links needed to build the encoding tree. */
-    struct encode_node *link[LINK_SIZE];
+    struct huffman_node *link[LINK_SIZE];
     /** The key for frequency map counting. */
     char ch;
     /** The caching iterator used during dfs path building text encoding. */
     uint8_t iter;
 };
 
-struct encode_tree
+/** Element intended for the flat priority queue during the tree building phase.
+Having a small simple type in the contiguous flat priority queue is good for
+performance and the entire buffer can be freed when the algorithm completes.
+The priority queue is only needed while building the tree. */
+struct fpq_elem
 {
-    struct encode_node *root;
+    size_t freq;
+    struct huffman_node *node;
+};
+
+struct huffman_tree
+{
+    struct huffman_node *root;
     size_t num_nodes;
     size_t num_leaves;
 };
@@ -97,7 +104,7 @@ struct leaf_string
     size_t len;
 };
 
-struct compressed_tree
+struct compressed_huffman_tree
 {
     struct bitq tree_paths;
     struct leaf_string leaves;
@@ -106,12 +113,13 @@ struct compressed_tree
 struct huffman_encoding
 {
     struct bitq text_bits;
-    struct compressed_tree tree;
+    struct compressed_huffman_tree tree;
 };
 
 /*===========================      Prototypes      ==========================*/
 
-static priority_queue build_encoding_pq(FILE *f);
+static void compress_file(FILE *f, struct str_arena *arena);
+static flat_priority_queue build_encoding_pq(FILE *f);
 static void bitq_push_back(struct bitq *, ccc_tribool);
 static ccc_tribool bitq_pop_back(struct bitq *bq);
 static ccc_tribool bitq_pop_front(struct bitq *);
@@ -123,13 +131,13 @@ static uint64_t hash_ch(ccc_any_key to_hash);
 static ccc_tribool ch_eq(ccc_any_key_cmp);
 static ccc_threeway_cmp cmp_freqs(ccc_any_type_cmp cmp);
 static ccc_tribool path_memo_eq(ccc_any_key_cmp cmp);
-static struct path_memo *memoize_path(struct encode_tree *tree,
+static struct path_memo *memoize_path(struct huffman_tree *tree,
                                       flat_hash_map *fh, struct bitq *, char c);
-static struct bitq build_encoding_bitq(FILE *f, struct encode_tree *tree);
-static struct encode_tree build_encoding_tree(FILE *f);
-static struct compressed_tree compress_tree(struct encode_tree *tree,
-                                            struct str_arena *);
-static void free_encode_tree(struct encode_tree *);
+static struct bitq build_encoding_bitq(FILE *f, struct huffman_tree *tree);
+static struct huffman_tree build_encoding_tree(FILE *f);
+static struct compressed_huffman_tree compress_tree(struct huffman_tree *tree,
+                                                    struct str_arena *);
+static void free_encode_tree(struct huffman_tree *);
 
 #define prog_assert(cond, ...)                                                 \
     do                                                                         \
@@ -202,15 +210,7 @@ main(int argc, char **argv)
         f, (void)fprintf(stderr, "could not open file %s", sv_begin(file)););
     struct str_arena arena = str_arena_create(START_STR_ARENA_CAP);
     prog_assert(arena.arena);
-    struct encode_tree tree = build_encoding_tree(f);
-    struct huffman_encoding encoding = {
-        .text_bits = build_encoding_bitq(f, &tree),
-        .tree = compress_tree(&tree, &arena),
-    };
-    free_encode_tree(&tree);
-
-    bitq_clear_and_free(&encoding.text_bits);
-    bitq_clear_and_free(&encoding.tree.tree_paths);
+    compress_file(f, &arena);
     (void)fclose(f);
     str_arena_free(&arena);
     return 0;
@@ -218,10 +218,30 @@ main(int argc, char **argv)
 
 /*=========================     Huffman Encoding    =========================*/
 
-static struct compressed_tree
-compress_tree(struct encode_tree *const tree, struct str_arena *const arena)
+static void
+compress_file(FILE *const f, struct str_arena *const arena)
 {
-    struct compressed_tree ret = {
+    /* Encode characters in alphabet. */
+    struct huffman_tree tree = build_encoding_tree(f);
+
+    /* Encode message and compress alphabet tree relative to message encode. */
+    struct huffman_encoding encoding = {
+        .text_bits = build_encoding_bitq(f, &tree),
+        .tree = compress_tree(&tree, arena),
+    };
+
+    /* Write compression to file. */
+
+    /* Free in memory resources. */
+    bitq_clear_and_free(&encoding.text_bits);
+    bitq_clear_and_free(&encoding.tree.tree_paths);
+    free_encode_tree(&tree);
+}
+
+static struct compressed_huffman_tree
+compress_tree(struct huffman_tree *const tree, struct str_arena *const arena)
+{
+    struct compressed_huffman_tree ret = {
         .tree_paths = {
             .bs = bs_init(NULL, std_alloc, NULL, 0),
             .front = 0,
@@ -230,7 +250,7 @@ compress_tree(struct encode_tree *const tree, struct str_arena *const arena)
     };
     prog_assert(bitq_reserve(&ret.tree_paths, tree->num_nodes)
                 == CCC_RESULT_OK);
-    struct encode_node *cur = tree->root;
+    struct huffman_node *cur = tree->root;
     while (cur)
     {
         if (cur->iter >= ITER_END)
@@ -249,6 +269,10 @@ compress_tree(struct encode_tree *const tree, struct str_arena *const arena)
             continue;
         }
         prog_assert(cur->iter <= CCC_TRUE);
+        /* We are compressing the pre-order traversal of the tree so we should
+           not enter an internal node to the path again if we are simply
+           backtracking to it to get to its other child, it already has been
+           entered to the queue. */
         if (cur->iter == 0)
         {
             bitq_push_back(&ret.tree_paths, CCC_TRUE);
@@ -261,7 +285,7 @@ compress_tree(struct encode_tree *const tree, struct str_arena *const arena)
 }
 
 static struct bitq
-build_encoding_bitq(FILE *const f, struct encode_tree *const tree)
+build_encoding_bitq(FILE *const f, struct huffman_tree *const tree)
 {
     struct bitq ret = {
         .bs = bs_init(NULL, std_alloc, NULL, 0),
@@ -300,7 +324,7 @@ as an entry in the path memo map. This function modifies the tree nodes by
 altering their iterator field during the DFS, but it restores all nodes to their
 original state before returning. */
 static struct path_memo *
-memoize_path(struct encode_tree *const tree, flat_hash_map *const fh,
+memoize_path(struct huffman_tree *const tree, flat_hash_map *const fh,
              struct bitq *const bq, char const c)
 {
     struct path_memo *const path = fhm_insert_entry_w(
@@ -308,7 +332,7 @@ memoize_path(struct encode_tree *const tree, flat_hash_map *const fh,
                                  .ch = c,
                                  .path_start_index = bitq_size(bq),
                              });
-    struct encode_node *cur = tree->root;
+    struct huffman_node *cur = tree->root;
     while (cur)
     {
         if (!cur->link[1] && cur->ch == c)
@@ -336,47 +360,48 @@ memoize_path(struct encode_tree *const tree, flat_hash_map *const fh,
     return path;
 }
 
-static struct encode_tree
+static struct huffman_tree
 build_encoding_tree(FILE *const f)
 {
-    priority_queue pq = build_encoding_pq(f);
-    struct encode_tree ret = {
+    flat_priority_queue pq = build_encoding_pq(f);
+    struct huffman_tree ret = {
         .root = NULL,
         .num_nodes = size(&pq).count,
         .num_leaves = size(&pq).count,
     };
     while (size(&pq).count >= 2)
     {
-        /* Popping is OK because the priority queue does not own any memory. */
-        struct encode_node *const zero = front(&pq);
+        struct fpq_elem zero = *(struct fpq_elem *)front(&pq);
         prog_assert(pop(&pq) == CCC_RESULT_OK);
-        struct encode_node *const one = front(&pq);
+        struct fpq_elem one = *(struct fpq_elem *)front(&pq);
         prog_assert(pop(&pq) == CCC_RESULT_OK);
-        struct encode_node *const subtree_root
-            = malloc(sizeof(struct encode_node));
+        struct huffman_node *const subtree_root
+            = malloc(sizeof(struct huffman_node));
         prog_assert(subtree_root);
-        zero->parent = subtree_root;
-        one->parent = subtree_root;
-        *subtree_root = (struct encode_node){
-            .freq = zero->freq + one->freq,
+        zero.node->parent = subtree_root;
+        one.node->parent = subtree_root;
+        *subtree_root = (struct huffman_node){
             .parent = NULL,
-            .link = {zero, one},
+            .link = {zero.node, one.node},
             .ch = '\0',
             .iter = 0,
         };
         ++ret.num_nodes;
-        struct encode_node const *const pushed = push(&pq, &subtree_root->pqe);
+        struct fpq_elem const *const pushed
+            = fpq_emplace(&pq, (struct fpq_elem){
+                                   .freq = zero.freq + one.freq,
+                                   .node = subtree_root,
+                               });
         prog_assert(pushed);
         ret.root = subtree_root;
     }
-    /* No cleanup needed for pq, it never owned any memory. */
+    prog_assert(fpq_clear_and_free(&pq, NULL) == CCC_RESULT_OK);
     return ret;
 }
 
 /** Returns a min priority queue sorted by frequency meaning the least frequent
-character will be the root. This priority queue does not own any memory leaving
-it to the user to allocate and free the priority queue elements as needed. */
-static priority_queue
+character will be the root. The priority queue is built in O(N) time. */
+static flat_priority_queue
 build_encoding_pq(FILE *const f)
 {
     flat_hash_map fh = fhm_init(NULL, struct ch_freq, ch, hash_ch, ch_eq,
@@ -388,39 +413,53 @@ build_encoding_pq(FILE *const f)
         prog_assert(cf);
     });
     prog_assert(size(&fh).count >= 2);
-    priority_queue pq
-        = pq_init(struct encode_node, pqe, CCC_LES, cmp_freqs, NULL, NULL);
+    /* Use a buffer to simply push back elements we will heapify at the end. */
+    buffer buf = buf_init((struct fpq_elem *)NULL, NULL, NULL, 0);
+    /* Add one to reservation for the flat priority queue swap slot. */
+    prog_assert(buf_alloc(&buf, size(&fh).count + 1, std_alloc)
+                == CCC_RESULT_OK);
     for (struct ch_freq const *map_slot = fhm_begin(&fh);
          map_slot != fhm_end(&fh); map_slot = fhm_next(&fh, map_slot))
     {
-        struct encode_node *const pq_node = malloc(sizeof(struct encode_node));
-        prog_assert(pq_node);
-        *pq_node = (struct encode_node){
-            .ch = map_slot->ch,
-            .freq = map_slot->freq,
-        };
-        struct encode_node const *const pushed = push(&pq, &pq_node->pqe);
+        struct huffman_node *const tree_node
+            = malloc(sizeof(struct huffman_node));
+        prog_assert(tree_node);
+        *tree_node = (struct huffman_node){.ch = map_slot->ch};
+        struct fpq_elem const *const pushed
+            = buf_push_back(&buf, &(struct fpq_elem){
+                                      .freq = map_slot->freq,
+                                      .node = tree_node,
+                                  });
         prog_assert(pushed);
     }
+    /* The buffer had no allocation permission and set up all the elements we
+       needed to be in the flat priority queue. Now we take its memory and
+       heapify the data in O(N) time rather than pushing each element. */
+    flat_priority_queue pq = fpq_heapify_init(
+        (struct fpq_elem *)buf_begin(&buf), CCC_LES, cmp_freqs, std_alloc, NULL,
+        buf_capacity(&buf).count, buf_size(&buf).count);
+    /* Free map but not the buffer because the priority queue took buffer. */
     prog_assert(fhm_clear_and_free(&fh, NULL) == CCC_RESULT_OK);
     return pq;
 }
 
+/** Frees all encoding nodes from the tree provided. */
 static void
-free_encode_tree(struct encode_tree *tree)
+free_encode_tree(struct huffman_tree *tree)
 {
-    struct encode_node *cur = tree->root;
+    /* Freeing via left rotations is an easy iterative way to destroy tree. */
+    struct huffman_node *cur = tree->root;
     while (cur)
     {
         if (cur->link[0])
         {
-            struct encode_node *const zero = cur->link[0];
+            struct huffman_node *const zero = cur->link[0];
             cur->link[0] = cur->link[0]->link[1];
             zero->link[1] = cur;
             cur = zero;
             continue;
         }
-        struct encode_node *const next = cur->link[1];
+        struct huffman_node *const next = cur->link[1];
         free(cur);
         cur = next;
     }
@@ -520,10 +559,8 @@ ch_eq(ccc_any_key_cmp const cmp)
 static ccc_threeway_cmp
 cmp_freqs(ccc_any_type_cmp const cmp)
 {
-    struct encode_node const *const lhs
-        = (struct encode_node *)cmp.any_type_lhs;
-    struct encode_node const *const rhs
-        = (struct encode_node *)cmp.any_type_rhs;
+    struct fpq_elem const *const lhs = (struct fpq_elem *)cmp.any_type_lhs;
+    struct fpq_elem const *const rhs = (struct fpq_elem *)cmp.any_type_rhs;
     return (lhs->freq > rhs->freq) - (lhs->freq < rhs->freq);
 }
 
