@@ -250,6 +250,12 @@ compress_file(FILE *const f, struct str_arena *const arena)
     free_encode_tree(&tree);
 }
 
+/** Compresses the Huffman tree by creating its representation as a Pre-Order
+traversal of the tree. The traversal is entered into a bit queue. We also push
+the leaves to a string as they are encountered during this traversal. By the
+end of the operation, we have a bit queue of our traversal where every internal
+node encountered on the way down is a 1 and every leaf is a 0. We also have a
+string of leaf characters that we encountered. */
 static struct compressed_huffman_tree
 compress_tree(struct huffman_tree *const tree, struct str_arena *const arena)
 {
@@ -259,10 +265,14 @@ compress_tree(struct huffman_tree *const tree, struct str_arena *const arena)
     prog_assert(bitq_reserve(&ret.tree_paths, tree->num_nodes)
                 == CCC_RESULT_OK);
     struct huffman_node *cur = tree->root;
+    /* To properly emulate a recursive Pre-Order traversal with iteration we
+       use the parent field for backtracking and an iterator for caching and
+       progression. */
     while (cur)
     {
         if (!cur->link[1])
         {
+            /* A leaf is always pushed because it is only seen once. */
             bitq_push_back(&ret.tree_paths, CCC_FALSE);
             str_arena_push_back(arena, ret.leaves.start, ret.leaves.len,
                                 cur->ch);
@@ -271,16 +281,20 @@ compress_tree(struct huffman_tree *const tree, struct str_arena *const arena)
         }
         else if (cur->iter < ITER_END)
         {
+            /* Be wary of this during backtracking. We only push internal 1
+               nodes the first time they are encountered on the way down. We
+               still need to access the second child so don't push a bit when
+               we are simply progressing to the next child subtree. */
             if (cur->iter == 0)
             {
                 bitq_push_back(&ret.tree_paths, CCC_TRUE);
             }
-            uint8_t const branch = cur->iter;
-            ++cur->iter;
-            cur = cur->link[branch];
+            cur = cur->link[cur->iter++];
         }
         else
         {
+            /* Both child subtrees have been explored, so we backtrack. */
+            cur->iter = 0;
             cur = cur->parent;
         }
     }
@@ -333,28 +347,35 @@ memoize_path(struct huffman_tree *const tree, flat_hash_map *const fh,
                                  .path_start_index = bitq_size(bq),
                              });
     struct huffman_node *cur = tree->root;
+    /* An iterative depth first search is convenient because the bit path in
+       the queue can represent the exact path we are currently on. Just be
+       sure to backtrack up the path to cleanup iterators. */
     while (cur)
     {
+        /* This is the leaf we want. */
         if (!cur->link[1] && cur->ch == c)
         {
-            for (; cur; cur = cur->parent)
-            {
-                cur->iter = 0;
-            }
             break;
         }
-        if (!cur->link[0] || cur->iter >= ITER_END)
+        /* Wrong leaf or we have explored both subtrees of an internal node. */
+        if (!cur->link[1] || cur->iter >= ITER_END)
         {
             cur->iter = 0;
             cur = cur->parent;
             bitq_pop_back(bq);
             continue;
         }
+        /* Depth progression of depth first search. */
         prog_assert(cur->iter <= CCC_TRUE);
         bitq_push_back(bq, cur->iter);
-        uint8_t const branch = cur->iter;
-        ++cur->iter;
-        cur = cur->link[branch];
+        /* During backtracking this helps us know which child subtree needs to
+           be explored or if we are done and can continue backtracking. */
+        cur = cur->link[cur->iter++];
+    }
+    /* Cleanup because we now have the correct path. */
+    for (; cur; cur = cur->parent)
+    {
+        cur->iter = 0;
     }
     path->path_len = bitq_size(bq) - path->path_start_index;
     return path;
@@ -532,7 +553,7 @@ print_node(struct huffman_node const *const root)
 {
     if (is_leaf(root))
     {
-        printf("0:%c\n", root->ch);
+        printf("(%c)\n", root->ch);
     }
     else
     {
@@ -549,9 +570,13 @@ is_leaf(struct huffman_node const *const root)
 [[maybe_unused]] static void
 print_bitq(struct bitq const *const bq)
 {
-    for (size_t i = 0, end = bitq_size(bq); i < end; ++i)
+    for (size_t i = 0, col = 1, end = bitq_size(bq); i < end; ++i, ++col)
     {
         bitq_test(bq, i) ? printf("1") : printf("0");
+        if (col % 50 == 0)
+        {
+            printf("\n");
+        }
     }
     printf("\n");
 }
