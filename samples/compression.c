@@ -193,8 +193,9 @@ static void print_bitq(struct bitq const *bq);
 /** Helper iterator to to turn a file pointer into a character iterator,
 setting up iteration of each character in the file. Name the iterator and then
 use it in the code block. Wrapping the code block in brackets is recommended for
-formatting, though not required. Do not return early or use goto out of this
-macro or memory will be leaked. */
+formatting, though not required.
+
+Do not return early or use goto out of this macro or memory will be leaked. */
 #define foreach_filechar(file_ptr, char_iter_name, codeblock...)               \
     do                                                                         \
     {                                                                          \
