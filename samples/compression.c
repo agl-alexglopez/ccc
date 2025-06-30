@@ -453,15 +453,13 @@ build_encoding_pq(FILE *const f)
             &buf, &(struct fpq_elem){.freq = i->freq, .node = tree_node});
         prog_assert(pushed);
     }
+    /* Free map but not the buffer because the priority queue took buffer. */
+    prog_assert(clear_and_free(&fh, NULL) == CCC_RESULT_OK);
     /* The buffer had no allocation permission and set up all the elements we
        needed to be in the flat priority queue. Now we take its memory and
        heapify the data in O(N) time rather than pushing each element. */
-    flat_priority_queue pq
-        = fpq_heapify_init((struct fpq_elem *)begin(&buf), CCC_LES, cmp_freqs,
-                           NULL, NULL, capacity(&buf).count, size(&buf).count);
-    /* Free map but not the buffer because the priority queue took buffer. */
-    prog_assert(clear_and_free(&fh, NULL) == CCC_RESULT_OK);
-    return pq;
+    return fpq_heapify_init((struct fpq_elem *)begin(&buf), CCC_LES, cmp_freqs,
+                            NULL, NULL, capacity(&buf).count, size(&buf).count);
 }
 
 /** Frees all encoding nodes from the tree provided. */
