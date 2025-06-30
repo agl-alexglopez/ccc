@@ -455,6 +455,7 @@ limitations under the License.
 
 #define ccc_impl_push_back(container_ptr, container_handle_ptr...)             \
     _Generic((container_ptr),                                                  \
+        ccc_bitset *: ccc_bs_push_back,                                        \
         ccc_flat_double_ended_queue *: ccc_fdeq_push_back,                     \
         ccc_doubly_linked_list *: ccc_dll_push_back,                           \
         ccc_buffer *: ccc_buf_push_back)((container_ptr),                      \
@@ -823,6 +824,7 @@ limitations under the License.
         ccc_flat_priority_queue *: ccc_fpq_capacity,                           \
         ccc_flat_double_ended_queue *: ccc_fdeq_capacity,                      \
         ccc_handle_realtime_ordered_map *: ccc_hrm_capacity,                   \
+        ccc_bitset const *: ccc_bs_capacity,                                   \
         ccc_buffer const *: ccc_buf_capacity,                                  \
         ccc_flat_hash_map const *: ccc_fhm_capacity,                           \
         ccc_handle_ordered_map const *: ccc_hom_capacity,                      \

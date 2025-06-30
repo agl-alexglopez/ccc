@@ -311,10 +311,9 @@ build_encoding_bitq(FILE *const f, struct huffman_tree *const tree)
        alphabets aka trees with many leaves. */
     flat_hash_map memo = ccc_fhm_init(NULL, struct path_memo, ch, hash_ch,
                                       path_memo_eq, NULL, NULL, 0);
-    prog_assert(fhm_reserve(&memo, tree->num_leaves, std_alloc)
-                == CCC_RESULT_OK);
+    prog_assert(reserve(&memo, tree->num_leaves, std_alloc) == CCC_RESULT_OK);
     foreach_filechar(f, c, {
-        struct path_memo const *path = fhm_get_key_val(&memo, c);
+        struct path_memo const *path = get_key_val(&memo, c);
         if (!path)
         {
             path = memoize_path(tree, &memo, &ret, *c);
@@ -328,7 +327,7 @@ build_encoding_bitq(FILE *const f, struct huffman_tree *const tree)
             bitq_push_back(&ret, bit);
         }
     });
-    prog_assert(fhm_clear_and_free_reserve(&memo, NULL, std_alloc)
+    prog_assert(clear_and_free_reserve(&memo, NULL, std_alloc)
                 == CCC_RESULT_OK);
     return ret;
 }
@@ -341,11 +340,9 @@ static struct path_memo *
 memoize_path(struct huffman_tree *const tree, flat_hash_map *const fh,
              struct bitq *const bq, char const c)
 {
-    struct path_memo *const path = fhm_insert_entry_w(
-        fhm_entry_r(fh, &c), (struct path_memo){
-                                 .ch = c,
-                                 .path_start_index = bitq_size(bq),
-                             });
+    struct path_memo *const path = insert_entry(
+        entry_r(fh, &c),
+        &(struct path_memo){.ch = c, .path_start_index = bitq_size(bq)});
     struct huffman_node *cur = tree->root;
     /* An iterative depth first search is convenient because the bit path in
        the queue can represent the exact path we are currently on. Just be
@@ -392,16 +389,17 @@ build_encoding_tree(FILE *const f)
     };
     while (size(&pq).count >= 2)
     {
+        /* Small elements and we need the pair so we can't hold references. */
         struct fpq_elem zero = *(struct fpq_elem *)front(&pq);
         prog_assert(pop(&pq) == CCC_RESULT_OK);
         struct fpq_elem one = *(struct fpq_elem *)front(&pq);
         prog_assert(pop(&pq) == CCC_RESULT_OK);
-        struct huffman_node *const subtree_root
+        struct huffman_node *const internal_one
             = malloc(sizeof(struct huffman_node));
-        prog_assert(subtree_root);
-        zero.node->parent = subtree_root;
-        one.node->parent = subtree_root;
-        *subtree_root = (struct huffman_node){
+        prog_assert(internal_one);
+        zero.node->parent = internal_one;
+        one.node->parent = internal_one;
+        *internal_one = (struct huffman_node){
             .parent = NULL,
             .link = {zero.node, one.node},
             .ch = '\0',
@@ -409,35 +407,35 @@ build_encoding_tree(FILE *const f)
         };
         ++ret.num_nodes;
         struct fpq_elem const *const pushed
-            = fpq_emplace(&pq, (struct fpq_elem){
-                                   .freq = zero.freq + one.freq,
-                                   .node = subtree_root,
-                               });
+            = push(&pq, &(struct fpq_elem){.freq = zero.freq + one.freq,
+                                           .node = internal_one});
         prog_assert(pushed);
-        ret.root = subtree_root;
+        ret.root = internal_one;
     }
     print_tree(ret.root);
     /* The flat pq was given no allocation permission because the memory it
        needs was already allocated by the buffer it stole from. The priority
        queue only gets smaller as the algorithms progresses so we didn't need
        to worry about growth. Provide same function used to reserve buffer. */
-    prog_assert(fpq_clear_and_free_reserve(&pq, NULL, std_alloc)
-                == CCC_RESULT_OK);
+    prog_assert(clear_and_free_reserve(&pq, NULL, std_alloc) == CCC_RESULT_OK);
     return ret;
 }
 
 /** Returns a min priority queue sorted by frequency meaning the least frequent
-character will be the root. The priority queue is built in O(N) time. */
+character will be the root. The priority queue is built in O(N) time. The
+priority queue has no allocation permission, knowing the space it needs to
+reserve ahead of time and assuming the tree building algorithm will strictly
+decrease the size of the priority queue. */
 static flat_priority_queue
 build_encoding_pq(FILE *const f)
 {
     flat_hash_map fh = fhm_init(NULL, struct ch_freq, ch, hash_ch, ch_eq,
                                 std_alloc, NULL, 0);
     foreach_filechar(f, c, {
-        struct ch_freq const *const cf = fhm_or_insert_w(
-            fhm_and_modify_w(entry_r(&fh, c), struct ch_freq, ++T->freq;),
-            (struct ch_freq){.ch = *c, .freq = 1});
+        struct ch_freq *const cf
+            = or_insert(entry_r(&fh, c), &(struct ch_freq){.ch = *c});
         prog_assert(cf);
+        ++cf->freq;
     });
     prog_assert(size(&fh).count >= 2);
     /* Use a buffer to simply push back elements we will heapify at the end. */
@@ -445,28 +443,24 @@ build_encoding_pq(FILE *const f)
     /* Add one to reservation for the flat priority queue swap slot. */
     prog_assert(buf_alloc(&buf, size(&fh).count + 1, std_alloc)
                 == CCC_RESULT_OK);
-    for (struct ch_freq const *map_slot = fhm_begin(&fh);
-         map_slot != fhm_end(&fh); map_slot = fhm_next(&fh, map_slot))
+    for (struct ch_freq const *i = begin(&fh); i != end(&fh); i = next(&fh, i))
     {
         struct huffman_node *const tree_node
             = malloc(sizeof(struct huffman_node));
         prog_assert(tree_node);
-        *tree_node = (struct huffman_node){.ch = map_slot->ch};
-        struct fpq_elem const *const pushed
-            = buf_push_back(&buf, &(struct fpq_elem){
-                                      .freq = map_slot->freq,
-                                      .node = tree_node,
-                                  });
+        *tree_node = (struct huffman_node){.ch = i->ch};
+        struct fpq_elem const *const pushed = push_back(
+            &buf, &(struct fpq_elem){.freq = i->freq, .node = tree_node});
         prog_assert(pushed);
     }
     /* The buffer had no allocation permission and set up all the elements we
        needed to be in the flat priority queue. Now we take its memory and
        heapify the data in O(N) time rather than pushing each element. */
-    flat_priority_queue pq = fpq_heapify_init(
-        (struct fpq_elem *)buf_begin(&buf), CCC_LES, cmp_freqs, NULL, NULL,
-        buf_capacity(&buf).count, buf_size(&buf).count);
+    flat_priority_queue pq
+        = fpq_heapify_init((struct fpq_elem *)begin(&buf), CCC_LES, cmp_freqs,
+                           NULL, NULL, capacity(&buf).count, size(&buf).count);
     /* Free map but not the buffer because the priority queue took buffer. */
-    prog_assert(fhm_clear_and_free(&fh, NULL) == CCC_RESULT_OK);
+    prog_assert(clear_and_free(&fh, NULL) == CCC_RESULT_OK);
     return pq;
 }
 
@@ -597,14 +591,13 @@ bitq_push_back(struct bitq *const bq, ccc_tribool const bit)
 {
     if (bq->size == bs_size(&bq->bs).count)
     {
-        ccc_result const r = bs_push_back(&bq->bs, bit);
+        ccc_result const r = push_back(&bq->bs, bit);
         prog_assert(r == CCC_RESULT_OK);
     }
     else
     {
         ccc_tribool const was = bs_set(
-            &bq->bs, ((bq->front + bq->size) % bs_capacity(&bq->bs).count),
-            bit);
+            &bq->bs, ((bq->front + bq->size) % capacity(&bq->bs).count), bit);
         prog_assert(was != CCC_TRIBOOL_ERROR);
     }
     ++bq->size;
@@ -613,7 +606,7 @@ bitq_push_back(struct bitq *const bq, ccc_tribool const bit)
 static ccc_tribool
 bitq_pop_back(struct bitq *const bq)
 {
-    size_t const i = (bq->front + bq->size - 1) % bs_capacity(&bq->bs).count;
+    size_t const i = (bq->front + bq->size - 1) % capacity(&bq->bs).count;
     ccc_tribool const bit = bs_test(&bq->bs, i);
     prog_assert(bit != CCC_TRIBOOL_ERROR);
     --bq->size;
@@ -625,7 +618,7 @@ bitq_pop_front(struct bitq *const bq)
 {
     ccc_tribool const bit = bs_test(&bq->bs, bq->front);
     prog_assert(bit != CCC_TRIBOOL_ERROR);
-    bq->front = (bq->front + 1) % bs_size(&bq->bs).count;
+    bq->front = (bq->front + 1) % size(&bq->bs).count;
     --bq->size;
     return bit;
 }
@@ -633,7 +626,7 @@ bitq_pop_front(struct bitq *const bq)
 static ccc_tribool
 bitq_test(struct bitq const *const bq, size_t const i)
 {
-    return bs_test(&bq->bs, (bq->front + i) % bs_capacity(&bq->bs).count);
+    return bs_test(&bq->bs, (bq->front + i) % capacity(&bq->bs).count);
 }
 
 static size_t
@@ -646,14 +639,14 @@ static void
 bitq_clear_and_free(struct bitq *const bq)
 {
     prog_assert(bq);
-    ccc_result const r = bs_clear_and_free(&bq->bs);
+    ccc_result const r = clear_and_free(&bq->bs);
     prog_assert(r == CCC_RESULT_OK);
 }
 
 static ccc_result
 bitq_reserve(struct bitq *const bq, size_t const to_add)
 {
-    return bs_reserve(&bq->bs, to_add, std_alloc);
+    return reserve(&bq->bs, to_add, std_alloc);
 }
 
 /*=====================       Hash Map Helper Code      =====================*/
