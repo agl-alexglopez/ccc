@@ -25,6 +25,14 @@ algorithms use a wide range of data structures. */
 #include "str_arena.h"
 #include "str_view.h"
 
+#ifdef __linux__
+#    include <linux/limits.h>
+#    define FILESYS_MAX_PATH PATH_MAX
+#endif
+#ifdef __APPLE__
+#    include <sys/syslimits.h>
+#    define FILESYS_MAX_PATH NAME_MAX
+#endif
 /*===========================   Type Declarations  ==========================*/
 
 enum print_branch
@@ -149,6 +157,8 @@ struct huffman_encoding
     struct compressed_huffman_tree blueprint;
 };
 
+static str_view const relative_output_dir = SV("samples/output/");
+
 /*===========================      Prototypes      ==========================*/
 
 static struct huffman_encoding compress_file(FILE *f, struct str_arena *arena);
@@ -181,7 +191,8 @@ static ccc_tribool bitq_front(struct bitq const *bq);
 static FILE *decompress_file(struct huffman_encoding *he);
 static struct huffman_tree
 reconstruct_tree(struct compressed_huffman_tree *blueprint);
-FILE *reconstruct_text(struct huffman_tree const *, struct bitq *);
+FILE *reconstruct_text(str_view out_file_name, struct huffman_tree const *,
+                       struct bitq *);
 
 /** Asserts even in release mode. Run code in the second argument if needed. */
 #define prog_assert(cond, ...)                                                 \
@@ -510,7 +521,8 @@ decompress_file(struct huffman_encoding *const he)
     prog_assert(bitq_size(&he->blueprint.tree_paths)
                 && bitq_front(&he->blueprint.tree_paths) == CCC_TRUE);
     struct huffman_tree tree = reconstruct_tree(&he->blueprint);
-    FILE *const f = reconstruct_text(&tree, &he->text_bits);
+    FILE *const f
+        = reconstruct_text(SV("reconstructed.txt"), &tree, &he->text_bits);
     free_encode_tree(&tree);
     return f;
 }
@@ -560,9 +572,16 @@ reconstruct_tree(struct compressed_huffman_tree *const blueprint)
 }
 
 FILE *
-reconstruct_text(struct huffman_tree const *const tree, struct bitq *const bq)
+reconstruct_text(str_view const out_file_name,
+                 struct huffman_tree const *const tree, struct bitq *const bq)
 {
-    FILE *const f = fopen("samples/output/reconstructed.txt", "w");
+    char path[FILESYS_MAX_PATH];
+    size_t const last_byte
+        = sv_fill(FILESYS_MAX_PATH, path, relative_output_dir);
+    size_t const remaining = sv_fill(FILESYS_MAX_PATH - last_byte - 1,
+                                     path + last_byte - 1, out_file_name);
+    prog_assert(last_byte + remaining < FILESYS_MAX_PATH);
+    FILE *const f = fopen(path, "w");
     prog_assert(f, printf("%s", strerror(errno)););
     struct huffman_node const *cur = tree->root;
     while (bitq_size(bq))
