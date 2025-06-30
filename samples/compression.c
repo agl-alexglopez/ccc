@@ -25,11 +25,17 @@ algorithms use a wide range of data structures. */
 
 /*===========================   Type Declarations  ==========================*/
 
+enum print_branch
+{
+    BRANCH = 0, /* ├── */
+    LEAF = 1    /* └── */
+};
+
 struct bitq
 {
     bitset bs;
     size_t front;
-    size_t back;
+    size_t size;
 };
 
 struct ch_freq
@@ -138,6 +144,12 @@ static struct huffman_tree build_encoding_tree(FILE *f);
 static struct compressed_huffman_tree compress_tree(struct huffman_tree *tree,
                                                     struct str_arena *);
 static void free_encode_tree(struct huffman_tree *);
+static void print_tree(struct huffman_node const *tree);
+static void print_inner_tree(struct huffman_node const *root, enum print_branch,
+                             char const *prefix);
+static void print_node(struct huffman_node const *root);
+static bool is_leaf(struct huffman_node const *root);
+static void print_bitq(struct bitq const *bq);
 
 #define prog_assert(cond, ...)                                                 \
     do                                                                         \
@@ -242,56 +254,44 @@ static struct compressed_huffman_tree
 compress_tree(struct huffman_tree *const tree, struct str_arena *const arena)
 {
     struct compressed_huffman_tree ret = {
-        .tree_paths = {
-            .bs = bs_init(NULL, std_alloc, NULL, 0),
-            .front = 0,
-            .back = 0,
-        },
+        .tree_paths = {.bs = bs_init(NULL, std_alloc, NULL, 0)},
     };
     prog_assert(bitq_reserve(&ret.tree_paths, tree->num_nodes)
                 == CCC_RESULT_OK);
     struct huffman_node *cur = tree->root;
     while (cur)
     {
-        if (cur->iter >= ITER_END)
-        {
-            cur = cur->parent;
-            continue;
-        }
         if (!cur->link[1])
         {
-            cur->iter = 0;
             bitq_push_back(&ret.tree_paths, CCC_FALSE);
             str_arena_push_back(arena, ret.leaves.start, ret.leaves.len,
                                 cur->ch);
             ++ret.leaves.len;
             cur = cur->parent;
-            continue;
         }
-        prog_assert(cur->iter <= CCC_TRUE);
-        /* We are compressing the pre-order traversal of the tree so we should
-           not enter an internal node to the path again if we are simply
-           backtracking to it to get to its other child, it already has been
-           entered to the queue. */
-        if (cur->iter == 0)
+        else if (cur->iter < ITER_END)
         {
-            bitq_push_back(&ret.tree_paths, CCC_TRUE);
+            if (cur->iter == 0)
+            {
+                bitq_push_back(&ret.tree_paths, CCC_TRUE);
+            }
+            uint8_t const branch = cur->iter;
+            ++cur->iter;
+            cur = cur->link[branch];
         }
-        uint8_t const branch = cur->iter;
-        ++cur->iter;
-        cur = cur->link[branch];
+        else
+        {
+            cur = cur->parent;
+        }
     }
+    print_bitq(&ret.tree_paths);
     return ret;
 }
 
 static struct bitq
 build_encoding_bitq(FILE *const f, struct huffman_tree *const tree)
 {
-    struct bitq ret = {
-        .bs = bs_init(NULL, std_alloc, NULL, 0),
-        .front = 0,
-        .back = 0,
-    };
+    struct bitq ret = {.bs = bs_init(NULL, std_alloc, NULL, 0)};
     /* By memoizing known bit sequences we can save significant time by not
        performing a DFS over the tree. This is especially helpful for large
        alphabets aka trees with many leaves. */
@@ -395,6 +395,7 @@ build_encoding_tree(FILE *const f)
         prog_assert(pushed);
         ret.root = subtree_root;
     }
+    print_tree(ret.root);
     prog_assert(fpq_clear_and_free(&pq, NULL) == CCC_RESULT_OK);
     return ret;
 }
@@ -468,6 +469,95 @@ free_encode_tree(struct huffman_tree *tree)
     tree->root = NULL;
 }
 
+/* NOLINTBEGIN(*misc-no-recursion) */
+
+[[maybe_unused]] static void
+print_tree(struct huffman_node const *const tree)
+{
+    if (!tree)
+    {
+        return;
+    }
+    print_node(tree);
+    print_inner_tree(tree->link[1], BRANCH, "");
+    print_inner_tree(tree->link[0], LEAF, "");
+}
+
+[[maybe_unused]] static void
+print_inner_tree(struct huffman_node const *const root,
+                 enum print_branch const branch_type, char const *const prefix)
+{
+    if (!root)
+    {
+        return;
+    }
+    printf("%s", prefix);
+    printf("%s", branch_type == LEAF ? " └──" : " ├──");
+
+    print_node(root);
+
+    char *str = NULL;
+    int const string_length = snprintf(NULL, 0, "%s%s", prefix,
+                                       branch_type == LEAF ? "     " : " │   ");
+    if (string_length > 0)
+    {
+        str = malloc(string_length + 1);
+        (void)snprintf(str, string_length, "%s%s", prefix,
+                       branch_type == LEAF ? "     " : " │   ");
+    }
+    if (str == NULL)
+    {
+        printf("memory exceeded. Cannot display tree.\n");
+        return;
+    }
+
+    if (!root->link[1])
+    {
+        print_inner_tree(root->link[0], LEAF, str);
+    }
+    else if (!root->link[0])
+    {
+        print_inner_tree(root->link[1], LEAF, str);
+    }
+    else
+    {
+        print_inner_tree(root->link[1], BRANCH, str);
+        print_inner_tree(root->link[0], LEAF, str);
+    }
+    free(str);
+}
+
+[[maybe_unused]] static void
+print_node(struct huffman_node const *const root)
+{
+    if (is_leaf(root))
+    {
+        printf("0:%c\n", root->ch);
+    }
+    else
+    {
+        printf("1┐\n");
+    }
+}
+
+[[maybe_unused]] static bool
+is_leaf(struct huffman_node const *const root)
+{
+    return !root->link[0] && !root->link[1];
+}
+
+[[maybe_unused]] static void
+print_bitq(struct bitq const *const bq)
+{
+    for (size_t i = 0, end = bitq_size(bq); i < end; ++i)
+    {
+        bitq_test(bq, i) ? printf("1") : printf("0");
+    }
+    printf("\n");
+}
+
+/* NOLINTEND(*misc-no-recursion) */
+
 /*=========================     Huffman Decoding    =========================*/
 
 /*=====================       Bit Queue Helper Code     =====================*/
@@ -475,27 +565,28 @@ free_encode_tree(struct huffman_tree *tree)
 static void
 bitq_push_back(struct bitq *const bq, ccc_tribool const bit)
 {
-    if (bitq_size(bq) == bs_size(&bq->bs).count)
+    if (bq->size == bs_size(&bq->bs).count)
     {
         ccc_result const r = bs_push_back(&bq->bs, bit);
         prog_assert(r == CCC_RESULT_OK);
     }
     else
     {
-        ccc_tribool const was = bs_set(&bq->bs, bq->back, bit);
+        ccc_tribool const was = bs_set(
+            &bq->bs, ((bq->front + bq->size) % bs_capacity(&bq->bs).count),
+            bit);
         prog_assert(was != CCC_TRIBOOL_ERROR);
     }
-    bq->back = (bq->back + 1) % bs_capacity(&bq->bs).count;
+    ++bq->size;
 }
 
 static ccc_tribool
 bitq_pop_back(struct bitq *const bq)
 {
-    size_t const next_back
-        = bq->back ? bq->back - 1 : bs_size(&bq->bs).count - 1;
-    ccc_tribool const bit = bs_test(&bq->bs, next_back);
+    size_t const i = (bq->front + bq->size - 1) % bs_capacity(&bq->bs).count;
+    ccc_tribool const bit = bs_test(&bq->bs, i);
     prog_assert(bit != CCC_TRIBOOL_ERROR);
-    bq->back = next_back;
+    --bq->size;
     return bit;
 }
 
@@ -505,6 +596,7 @@ bitq_pop_front(struct bitq *const bq)
     ccc_tribool const bit = bs_test(&bq->bs, bq->front);
     prog_assert(bit != CCC_TRIBOOL_ERROR);
     bq->front = (bq->front + 1) % bs_size(&bq->bs).count;
+    --bq->size;
     return bit;
 }
 
@@ -517,9 +609,7 @@ bitq_test(struct bitq const *const bq, size_t const i)
 static size_t
 bitq_size(struct bitq const *const bq)
 {
-    return bq->back < bq->front
-             ? (bs_capacity(&bq->bs).count - bq->front) + bq->back
-             : bq->back - bq->front;
+    return bq->size;
 }
 
 static void
