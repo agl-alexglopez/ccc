@@ -223,7 +223,7 @@ Do not return early or use goto out of this macro or memory will be leaked. */
         ptrdiff_t read = 0;                                                    \
         while ((read = getline(&lineptr, &len, f)) > 0)                        \
         {                                                                      \
-            str_view const line = {.s = lineptr, .len = read - 1};             \
+            str_view const line = {.s = lineptr, .len = read};                 \
             for (char const *char_iter_name = sv_begin(line);                  \
                  char_iter_name != sv_end(line);                               \
                  char_iter_name = sv_next(char_iter_name))                     \
@@ -694,7 +694,29 @@ print_node(struct huffman_node const *const root)
 {
     if (is_leaf(root))
     {
-        printf("(%c)\n", root->ch);
+        switch (root->ch)
+        {
+            case '\n':
+                printf("(\\n)\n");
+                break;
+            case '\r':
+                printf("(\\r)\n");
+                break;
+            case '\t':
+                printf("(\\t)\n");
+                break;
+            case '\v':
+                printf("(\\v)\n");
+                break;
+            case '\f':
+                printf("(\\f)\n");
+                break;
+            case '\b':
+                printf("(\\b)\n");
+                break;
+            default:
+                printf("(%c)\n", root->ch);
+        }
     }
     else
     {
