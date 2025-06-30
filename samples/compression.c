@@ -164,8 +164,8 @@ static uint64_t hash_ch(ccc_any_key to_hash);
 static ccc_tribool ch_eq(ccc_any_key_cmp);
 static ccc_threeway_cmp cmp_freqs(ccc_any_type_cmp cmp);
 static ccc_tribool path_memo_eq(ccc_any_key_cmp cmp);
-static struct path_memo *memoize_path(struct huffman_tree *tree,
-                                      flat_hash_map *fh, struct bitq *, char c);
+static void memoize_path(struct huffman_tree *tree, flat_hash_map *fh,
+                         struct bitq *, char c);
 static struct bitq build_encoding_bitq(FILE *f, struct huffman_tree *tree);
 static struct huffman_tree build_encoding_tree(FILE *f);
 static struct compressed_huffman_tree compress_tree(struct huffman_tree *tree,
@@ -353,17 +353,20 @@ build_encoding_bitq(FILE *const f, struct huffman_tree *const tree)
     prog_assert(reserve(&memo, tree->num_leaves, std_alloc) == CCC_RESULT_OK);
     foreach_filechar(f, c, {
         struct path_memo const *path = get_key_val(&memo, c);
-        if (!path)
+        if (path)
         {
-            path = memoize_path(tree, &memo, &ret, *c);
+            for (size_t i = path->path_start_index,
+                        end = path->path_start_index + path->path_len;
+                 i < end; ++i)
+            {
+                ccc_tribool const bit = bitq_test(&ret, i);
+                prog_assert(bit != CCC_TRIBOOL_ERROR);
+                bitq_push_back(&ret, bit);
+            }
         }
-        for (size_t i = path->path_start_index,
-                    end = path->path_start_index + path->path_len;
-             i < end; ++i)
+        else
         {
-            ccc_tribool const bit = bitq_test(&ret, i);
-            prog_assert(bit != CCC_TRIBOOL_ERROR);
-            bitq_push_back(&ret, bit);
+            memoize_path(tree, &memo, &ret, *c);
         }
     });
     prog_assert(clear_and_free_reserve(&memo, NULL, std_alloc)
@@ -375,7 +378,7 @@ build_encoding_bitq(FILE *const f, struct huffman_tree *const tree)
 as an entry in the path memo map. This function modifies the tree nodes by
 altering their iterator field during the DFS, but it restores all nodes to their
 original state before returning. */
-static struct path_memo *
+static void
 memoize_path(struct huffman_tree *const tree, flat_hash_map *const fh,
              struct bitq *const bq, char const c)
 {
@@ -414,7 +417,6 @@ memoize_path(struct huffman_tree *const tree, flat_hash_map *const fh,
         cur->iter = 0;
     }
     path->path_len = bitq_size(bq) - path->path_start_index;
-    return path;
 }
 
 static struct huffman_tree
