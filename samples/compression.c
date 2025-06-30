@@ -31,6 +31,12 @@ enum print_branch
     LEAF = 1    /* └── */
 };
 
+/** A thin wrapper around a bit set to provide queue/deq like behavior. For
+Huffman Compression we only need to push and pop from back and pop from the
+front so we don't need the full suite of deq functionality. The bit set provides
+almost all the functionality needed we just need to manage what happens when
+we pop from bit set but do not manually decrease the size of the underlying bit
+set container. Instead we manage our own front and size fields. */
 struct bitq
 {
     bitset bs;
@@ -38,6 +44,7 @@ struct bitq
     size_t size;
 };
 
+/** Simple entry in the flat hash map while counting character occurrences. */
 struct ch_freq
 {
     char ch;
@@ -46,23 +53,25 @@ struct ch_freq
 
 enum : uint8_t
 {
+    /** There are two children for every Huffman tree node. */
     LINK_SIZE = 2,
+    /** Caching for iterative traversals uses this position as end sentinel. */
     ITER_END = LINK_SIZE,
 };
 
-/** Encode nodes will be allocated freely in the heap as tree nodes for now.
-They will be referenced in the priority queue stage of the algorithm but need
-not have any intrusive elements for now. Once the tree is built, it will be
-traversed to complete message and tree compression. */
+/** Nodes will be allocated freely in the heap as tree nodes for now. They will
+be referenced in the priority queue stage of the algorithm but need not have any
+intrusive elements for now. Once the tree is built, it will be traversed to
+complete message and tree compression. */
 struct huffman_node
 {
-    /** The parent for backtracking during dfs. */
+    /** The parent for backtracking during DFS and Pre-Order traversal. */
     struct huffman_node *parent;
     /** The necessary links needed to build the encoding tree. */
     struct huffman_node *link[LINK_SIZE];
     /** The key for frequency map counting. */
     char ch;
-    /** The caching iterator used during dfs path building text encoding. */
+    /** The caching iterator to help emulate recursion with iteration. */
     uint8_t iter;
 };
 
@@ -76,6 +85,8 @@ struct fpq_elem
     struct huffman_node *node;
 };
 
+/** It is helpful to know how many leaves and total nodes there are for
+reserving the appropriate space for helper data structures. */
 struct huffman_tree
 {
     struct huffman_node *root;
@@ -90,8 +101,11 @@ queue and simply append this range of bits to the end of the queue as we build
 the sequence. */
 struct path_memo
 {
+    /** The key for the path memo. */
     char ch;
+    /** The index in the bit queue where we have seen this path before. */
     size_t path_start_index;
+    /** The length of the known path we have already pushed to the queue. */
     size_t path_len;
 };
 
@@ -106,20 +120,31 @@ in an in-order traversal of the encoding tree. This is done when we are encoding
 a tree we have formed into its more compact representation. */
 struct leaf_string
 {
+    /** The string arena hands out offsets not pointers to strings. */
     str_ofs start;
+    /** We should know the length of the leaf string for safety. */
     size_t len;
 };
 
+/** The compact representation of the tree structure we will encode to a
+compressed file for later reconstruction. */
 struct compressed_huffman_tree
 {
+    /** The Pre-Order traversal of internal nodes and leaves. Every internal
+    node encountered on the way down is a 1 and every leaf is a 0. */
     struct bitq tree_paths;
+    /** The inorder sequence of leaf character nodes. */
     struct leaf_string leaves;
 };
 
+/** The completed encoding of a file. This can be written to disk and retrieved
+later to be reconstructed. This method loses no information by compression. */
 struct huffman_encoding
 {
+    /** The path to every character encountered in the file text in order. */
     struct bitq text_bits;
-    struct compressed_huffman_tree tree;
+    /** The compact representation of the tree to be reconstructed later. */
+    struct compressed_huffman_tree blueprint;
 };
 
 /*===========================      Prototypes      ==========================*/
@@ -151,6 +176,7 @@ static void print_node(struct huffman_node const *root);
 static bool is_leaf(struct huffman_node const *root);
 static void print_bitq(struct bitq const *bq);
 
+/** Asserts even in release mode. Run code in the second argument if needed. */
 #define prog_assert(cond, ...)                                                 \
     do                                                                         \
     {                                                                          \
@@ -239,14 +265,14 @@ compress_file(FILE *const f, struct str_arena *const arena)
     /* Encode message and compress alphabet tree relative to message encode. */
     struct huffman_encoding encoding = {
         .text_bits = build_encoding_bitq(f, &tree),
-        .tree = compress_tree(&tree, arena),
+        .blueprint = compress_tree(&tree, arena),
     };
 
-    /* Write compression to file. */
+    /* TODO: Write compression to file. */
 
     /* Free in memory resources. */
     bitq_clear_and_free(&encoding.text_bits);
-    bitq_clear_and_free(&encoding.tree.tree_paths);
+    bitq_clear_and_free(&encoding.blueprint.tree_paths);
     free_encode_tree(&tree);
 }
 
@@ -281,10 +307,9 @@ compress_tree(struct huffman_tree *const tree, struct str_arena *const arena)
         }
         else if (cur->iter < ITER_END)
         {
-            /* Be wary of this during backtracking. We only push internal 1
-               nodes the first time they are encountered on the way down. We
-               still need to access the second child so don't push a bit when
-               we are simply progressing to the next child subtree. */
+            /* We only push internal 1 nodes the first time on the way down. We
+               still need to access the second child so don't push a bit when we
+               are simply progressing to the next child subtree. */
             if (cur->iter == 0)
             {
                 bitq_push_back(&ret.tree_paths, CCC_TRUE);
@@ -293,7 +318,7 @@ compress_tree(struct huffman_tree *const tree, struct str_arena *const arena)
         }
         else
         {
-            /* Both child subtrees have been explored, so we backtrack. */
+            /* Both child subtrees have been explored, so cleanup/backtrack. */
             cur->iter = 0;
             cur = cur->parent;
         }
