@@ -417,7 +417,12 @@ build_encoding_tree(FILE *const f)
         ret.root = subtree_root;
     }
     print_tree(ret.root);
-    prog_assert(fpq_clear_and_free(&pq, NULL) == CCC_RESULT_OK);
+    /* The flat pq was given no allocation permission because the memory it
+       needs was already allocated by the buffer it stole from. The priority
+       queue only gets smaller as the algorithms progresses so we didn't need
+       to worry about growth. Provide same function used to reserve buffer. */
+    prog_assert(fpq_clear_and_free_reserve(&pq, NULL, std_alloc)
+                == CCC_RESULT_OK);
     return ret;
 }
 
@@ -458,7 +463,7 @@ build_encoding_pq(FILE *const f)
        needed to be in the flat priority queue. Now we take its memory and
        heapify the data in O(N) time rather than pushing each element. */
     flat_priority_queue pq = fpq_heapify_init(
-        (struct fpq_elem *)buf_begin(&buf), CCC_LES, cmp_freqs, std_alloc, NULL,
+        (struct fpq_elem *)buf_begin(&buf), CCC_LES, cmp_freqs, NULL, NULL,
         buf_capacity(&buf).count, buf_size(&buf).count);
     /* Free map but not the buffer because the priority queue took buffer. */
     prog_assert(fhm_clear_and_free(&fh, NULL) == CCC_RESULT_OK);
