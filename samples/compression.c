@@ -575,12 +575,14 @@ FILE *
 reconstruct_text(str_view const out_file_name,
                  struct huffman_tree const *const tree, struct bitq *const bq)
 {
+    prog_assert(sv_size(relative_output_dir) < FILESYS_MAX_PATH);
     char path[FILESYS_MAX_PATH];
-    size_t const last_byte
+    size_t const prefix_bytes_including_nullterm
         = sv_fill(FILESYS_MAX_PATH, path, relative_output_dir);
-    size_t const remaining = sv_fill(FILESYS_MAX_PATH - last_byte - 1,
-                                     path + last_byte - 1, out_file_name);
-    prog_assert(last_byte + remaining < FILESYS_MAX_PATH);
+    prog_assert(FILESYS_MAX_PATH - prefix_bytes_including_nullterm
+                > sv_size(out_file_name));
+    (void)sv_fill(FILESYS_MAX_PATH - prefix_bytes_including_nullterm - 1,
+                  path + prefix_bytes_including_nullterm - 1, out_file_name);
     FILE *const f = fopen(path, "w");
     prog_assert(f, printf("%s", strerror(errno)););
     struct huffman_node const *cur = tree->root;
