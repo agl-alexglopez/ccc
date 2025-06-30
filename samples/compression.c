@@ -255,7 +255,7 @@ traversal of the tree. The traversal is entered into a bit queue. We also push
 the leaves to a string as they are encountered during this traversal. By the
 end of the operation, we have a bit queue of our traversal where every internal
 node encountered on the way down is a 1 and every leaf is a 0. We also have a
-string of leaf characters that we encountered. */
+string of leaf characters that we encountered in order. */
 static struct compressed_huffman_tree
 compress_tree(struct huffman_tree *const tree, struct str_arena *const arena)
 {
