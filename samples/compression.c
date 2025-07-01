@@ -566,9 +566,11 @@ reconstruct_tree(struct compressed_huffman_tree *const blueprint)
     };
     prog_assert(buf_alloc(&ret.nodes, ret.num_nodes, std_alloc)
                 == CCC_RESULT_OK);
+    /* 0 index is NULL so real data can't be there. */
     prog_assert(push_back(&ret.nodes, &(struct huffman_node){}));
-    (void)push_back(&ret.nodes, &(struct huffman_node){});
-    ret.root = size(&ret.nodes).count - 1;
+    struct huffman_node const *const first
+        = push_back(&ret.nodes, &(struct huffman_node){});
+    ret.root = buf_i(&ret.nodes, first).count;
     size_t prev = ret.root;
     size_t cur = 0;
     (void)bitq_pop_front(&blueprint->tree_paths);
