@@ -161,13 +161,23 @@ struct huffman_encoding
     struct compressed_huffman_tree blueprint;
 };
 
+struct huffman_header
+{
+    uint8_t magic;
+    uint8_t leaves_len;
+    char leaves[256];
+};
+
 struct file_action_pack
 {
     str_view to_compress;
     str_view to_decompress;
 };
 
+/** File format ".cccz" in header. */
+static uint32_t const cccz_magic = 0x2E63637A;
 static str_view const relative_output_dir = SV("samples/output/");
+static str_view const compression_file_suffix = SV(".cccz");
 
 /*===========================      Prototypes      ==========================*/
 
@@ -210,6 +220,7 @@ size_t branch_i(struct huffman_tree const *t, size_t node, uint8_t dir);
 size_t parent_i(struct huffman_tree const *t, size_t node);
 char char_i(struct huffman_tree const *t, size_t node);
 struct huffman_node *node_at(struct huffman_tree const *t, size_t node);
+void write_to_file(str_view original_filename, struct huffman_encoding *);
 
 /** Asserts even in release mode. Run code in the second argument if needed. */
 #define prog_assert(cond, ...)                                                 \
@@ -295,9 +306,6 @@ main(int argc, char **argv)
         decompress_file(todo.to_decompress, &encode);
     }
 
-    /* Free all queues and strings */
-    bitq_clear_and_free(&encode.text_bits);
-    bitq_clear_and_free(&encode.blueprint.tree_paths);
     str_arena_free(&arena);
     return 0;
 }
@@ -313,15 +321,46 @@ compress_file(str_view const to_compress, struct str_arena *const arena)
     /* Encode characters in alphabet. */
     struct huffman_tree tree = build_encoding_tree(f);
 
-    /* Encode message and compress alphabet tree relative to message encode. */
+    /* Encode message and compress alphabet tree relative to message. */
     struct huffman_encoding encoding = {
         .text_bits = build_encoding_bitq(f, &tree),
         .blueprint = compress_tree(&tree, arena),
     };
 
+    /* Create header and write this compressed data to disk. */
+    write_to_file(to_compress, &encoding);
+
     /* Free in memory resources. */
     free_encode_tree(&tree);
+    bitq_clear_and_free(&encoding.text_bits);
+    bitq_clear_and_free(&encoding.blueprint.tree_paths);
+    (void)fclose(f);
     return encoding;
+}
+
+void
+write_to_file(str_view const original_filepath,
+              struct huffman_encoding *const encoding)
+{
+    size_t dir_delim
+        = sv_rfind(original_filepath, sv_len(original_filepath), SV("/"));
+    str_view const raw_file = dir_delim == sv_npos(original_filepath)
+                                ? original_filepath
+                                : sv_substr(original_filepath, dir_delim + 1,
+                                            sv_len(original_filepath));
+    prog_assert(sv_size(relative_output_dir) + sv_size(raw_file)
+                    + sv_size(compression_file_suffix)
+                < FILESYS_MAX_PATH);
+    char full_path[FILESYS_MAX_PATH];
+    size_t path_bytes
+        = sv_fill(sv_size(relative_output_dir), full_path, relative_output_dir);
+    size_t file_bytes
+        = sv_fill(sv_size(raw_file), full_path + (path_bytes - 1), raw_file);
+    (void)sv_fill(sv_size(compression_file_suffix),
+                  full_path + (path_bytes - 1) + (file_bytes - 1),
+                  compression_file_suffix);
+    FILE *const cccz = fopen(full_path, "w");
+    prog_assert(cccz, printf("%s", strerror(errno)););
 }
 
 /** Compresses the Huffman tree by creating its representation as a Pre-Order
@@ -564,7 +603,7 @@ reconstruct_tree(struct compressed_huffman_tree *const blueprint)
         .nodes = ccc_buf_init((struct huffman_node *)NULL, std_alloc, NULL, 0),
         .num_nodes = bitq_size(&blueprint->tree_paths),
     };
-    prog_assert(buf_alloc(&ret.nodes, ret.num_nodes, std_alloc)
+    prog_assert(buf_alloc(&ret.nodes, ret.num_nodes + 1, std_alloc)
                 == CCC_RESULT_OK);
     /* 0 index is NULL so real data can't be there. */
     prog_assert(push_back(&ret.nodes, &(struct huffman_node){}));
