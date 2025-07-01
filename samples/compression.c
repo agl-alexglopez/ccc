@@ -5,6 +5,8 @@ Huffman Encoding and Decoding but more methods could be added later. Such
 algorithms use a wide range of data structures. */
 
 #include <errno.h>
+#include <inttypes.h>
+#include <limits.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -147,8 +149,8 @@ struct compressed_huffman_tree
     /** The Pre-Order traversal of internal nodes and leaves. Every internal
     node encountered on the way down is a 1 and every leaf is a 0. */
     struct bitq tree_paths;
-    /** The inorder sequence of leaf character nodes. */
-    char const *leaf_string;
+    struct str_arena arena;
+    struct leaf_string leaf_string;
 };
 
 /** The completed encoding of a file. This can be written to disk and retrieved
@@ -156,16 +158,25 @@ later to be reconstructed. This method loses no information by compression. */
 struct huffman_encoding
 {
     /** The path to every character encountered in the file text in order. */
-    struct bitq text_bits;
+    struct bitq file_bits;
     /** The compact representation of the tree to be reconstructed later. */
     struct compressed_huffman_tree blueprint;
 };
 
+/** The header representing the compressed file structure of a compressed file
+via Huffman Encoding. The fields of this struct should be handled in order as
+we write to or read from a file. */
 struct huffman_header
 {
-    uint8_t magic;
-    uint8_t leaves_len;
-    char leaves[256];
+    /** Magic to recognize our cccz files ".cccz" */
+    uint32_t magic;
+    /** The number of leaves in the tree minus 1. Subtract 1 in case we actually
+        have all 256 characters used as leaves in which case they could only
+        be recorded in the file as 255, the number that fits in uint8_t. */
+    uint8_t leaf_count_minus_one;
+    /** Number of bits in the file content bit queue we encoded. */
+    size_t file_bits_count;
+    struct huffman_encoding *encoding;
 };
 
 struct file_action_pack
@@ -181,8 +192,7 @@ static str_view const compression_file_suffix = SV(".cccz");
 
 /*===========================      Prototypes      ==========================*/
 
-static struct huffman_encoding compress_file(str_view to_compress,
-                                             struct str_arena *arena);
+static void compress_file(str_view to_compress);
 static flat_priority_queue build_encoding_pq(FILE *f, struct huffman_tree *);
 static void bitq_push_back(struct bitq *, ccc_tribool);
 static ccc_tribool bitq_pop_back(struct bitq *bq);
@@ -199,8 +209,7 @@ static void memoize_path(struct huffman_tree *tree, flat_hash_map *fh,
                          struct bitq *, char c);
 static struct bitq build_encoding_bitq(FILE *f, struct huffman_tree *tree);
 static struct huffman_tree build_encoding_tree(FILE *f);
-static struct compressed_huffman_tree compress_tree(struct huffman_tree *tree,
-                                                    struct str_arena *);
+static struct compressed_huffman_tree compress_tree(struct huffman_tree *tree);
 static void free_encode_tree(struct huffman_tree *);
 static void print_tree(struct huffman_tree const *tree, size_t node);
 static void print_inner_tree(struct huffman_tree const *tree, size_t node,
@@ -208,22 +217,27 @@ static void print_inner_tree(struct huffman_tree const *tree, size_t node,
 static void print_node(struct huffman_tree const *tree, size_t node);
 static bool is_leaf(struct huffman_tree const *tree, size_t node);
 static void print_bitq(struct bitq const *bq);
-static ccc_tribool bitq_front(struct bitq const *bq);
-static void decompress_file(str_view to_decompress,
-                            struct huffman_encoding *he);
+static void decompress_file(str_view to_decompress);
 static struct huffman_tree
 reconstruct_tree(struct compressed_huffman_tree *blueprint);
-static void reconstruct_text(str_view to_decompress,
-                             struct huffman_tree const *, struct bitq *);
+static void reconstruct_text(FILE *f, struct huffman_tree const *,
+                             struct bitq *);
 static void print_help(void);
-size_t branch_i(struct huffman_tree const *t, size_t node, uint8_t dir);
-size_t parent_i(struct huffman_tree const *t, size_t node);
-char char_i(struct huffman_tree const *t, size_t node);
-struct huffman_node *node_at(struct huffman_tree const *t, size_t node);
-void write_to_file(str_view original_filename, struct huffman_encoding *);
+static size_t branch_i(struct huffman_tree const *t, size_t node, uint8_t dir);
+static size_t parent_i(struct huffman_tree const *t, size_t node);
+static char char_i(struct huffman_tree const *t, size_t node);
+static struct huffman_node *node_at(struct huffman_tree const *t, size_t node);
+static void write_to_file(str_view original_filepath, struct huffman_header *);
+static FILE *open_cccz(str_view original_filepath);
+static void write_bitq(FILE *cccz, struct bitq *bq);
+static struct huffman_encoding read_from_file(str_view to_decompress);
+static FILE *open_decompressed(str_view to_decompress);
+static void fill_header(FILE *, struct huffman_header *);
+static size_t readbytes(FILE *f, void *base, size_t to_read);
+static void fill_bitq(FILE *f, struct bitq *bq, size_t expected_bits);
 
 /** Asserts even in release mode. Run code in the second argument if needed. */
-#define prog_assert(cond, ...)                                                 \
+#define check(cond, ...)                                                       \
     do                                                                         \
     {                                                                          \
         if (!(cond))                                                           \
@@ -245,7 +259,7 @@ Do not return early or use goto out of this macro or memory will be leaked. */
 #define foreach_filechar(file_ptr, char_iter_name, codeblock...)               \
     do                                                                         \
     {                                                                          \
-        prog_assert(fseek(file_ptr, 0L, SEEK_SET) >= 0);                       \
+        check(fseek(file_ptr, 0L, SEEK_SET) >= 0);                             \
         char *lineptr = NULL;                                                  \
         size_t len = 0;                                                        \
         ptrdiff_t read = 0;                                                    \
@@ -285,82 +299,60 @@ main(int argc, char **argv)
         {
             str_view const raw_file = sv_substr(
                 sv_arg, sv_find(sv_arg, 0, SV("=")) + 1, sv_len(sv_arg));
-            prog_assert(!sv_empty(raw_file),
-                        (void)fprintf(stderr, "file string is empty\n"););
+            check(!sv_empty(raw_file),
+                  (void)fprintf(stderr, "file string is empty\n"););
             todo.to_compress = raw_file;
         }
         else if (sv_starts_with(sv_arg, SV("-d=")))
         {
             str_view const raw_file = sv_substr(
                 sv_arg, sv_find(sv_arg, 0, SV("=")) + 1, sv_len(sv_arg));
-            prog_assert(!sv_empty(raw_file),
-                        (void)fprintf(stderr, "file string is empty\n"););
+            check(!sv_empty(raw_file),
+                  (void)fprintf(stderr, "file string is empty\n"););
             todo.to_decompress = raw_file;
         }
     }
-    struct str_arena arena = str_arena_create(START_STR_ARENA_CAP);
-    prog_assert(arena.arena);
-    struct huffman_encoding encode = compress_file(todo.to_compress, &arena);
+    compress_file(todo.to_compress);
     if (!sv_empty(todo.to_decompress))
     {
-        decompress_file(todo.to_decompress, &encode);
+        decompress_file(todo.to_decompress);
     }
-
-    str_arena_free(&arena);
     return 0;
 }
 
 /*=========================     Huffman Encoding    =========================*/
 
-static struct huffman_encoding
-compress_file(str_view const to_compress, struct str_arena *const arena)
+void
+compress_file(str_view const to_compress)
 {
     FILE *const f = fopen(sv_begin(to_compress), "r");
-    prog_assert(f, (void)fprintf(stderr, "could not open file %s",
-                                 sv_begin(to_compress)););
+    check(f, (void)fprintf(stderr, "could not open file %s",
+                           sv_begin(to_compress)););
     /* Encode characters in alphabet. */
     struct huffman_tree tree = build_encoding_tree(f);
 
     /* Encode message and compress alphabet tree relative to message. */
     struct huffman_encoding encoding = {
-        .text_bits = build_encoding_bitq(f, &tree),
-        .blueprint = compress_tree(&tree, arena),
+        .file_bits = build_encoding_bitq(f, &tree),
+        .blueprint = compress_tree(&tree),
     };
 
     /* Create header and write this compressed data to disk. */
-    write_to_file(to_compress, &encoding);
+    write_to_file(
+        to_compress,
+        &(struct huffman_header){
+            .magic = cccz_magic,
+            .leaf_count_minus_one = encoding.blueprint.leaf_string.len - 1,
+            .file_bits_count = bitq_size(&encoding.file_bits),
+            .encoding = &encoding,
+        });
 
     /* Free in memory resources. */
     free_encode_tree(&tree);
-    bitq_clear_and_free(&encoding.text_bits);
+    bitq_clear_and_free(&encoding.file_bits);
     bitq_clear_and_free(&encoding.blueprint.tree_paths);
+    str_arena_free(&encoding.blueprint.arena);
     (void)fclose(f);
-    return encoding;
-}
-
-void
-write_to_file(str_view const original_filepath,
-              struct huffman_encoding *const encoding)
-{
-    size_t dir_delim
-        = sv_rfind(original_filepath, sv_len(original_filepath), SV("/"));
-    str_view const raw_file = dir_delim == sv_npos(original_filepath)
-                                ? original_filepath
-                                : sv_substr(original_filepath, dir_delim + 1,
-                                            sv_len(original_filepath));
-    prog_assert(sv_size(relative_output_dir) + sv_size(raw_file)
-                    + sv_size(compression_file_suffix)
-                < FILESYS_MAX_PATH);
-    char full_path[FILESYS_MAX_PATH];
-    size_t path_bytes
-        = sv_fill(sv_size(relative_output_dir), full_path, relative_output_dir);
-    size_t file_bytes
-        = sv_fill(sv_size(raw_file), full_path + (path_bytes - 1), raw_file);
-    (void)sv_fill(sv_size(compression_file_suffix),
-                  full_path + (path_bytes - 1) + (file_bytes - 1),
-                  compression_file_suffix);
-    FILE *const cccz = fopen(full_path, "w");
-    prog_assert(cccz, printf("%s", strerror(errno)););
 }
 
 /** Compresses the Huffman tree by creating its representation as a Pre-Order
@@ -370,14 +362,15 @@ end of the operation, we have a bit queue of our traversal where every internal
 node encountered on the way down is a 1 and every leaf is a 0. We also have a
 string of leaf characters that we encountered in order. */
 static struct compressed_huffman_tree
-compress_tree(struct huffman_tree *const tree, struct str_arena *const arena)
+compress_tree(struct huffman_tree *const tree)
 {
     struct compressed_huffman_tree ret = {
         .tree_paths = {.bs = bs_init(NULL, std_alloc, NULL, 0)},
+        .arena = str_arena_create(START_STR_ARENA_CAP),
     };
-    struct leaf_string leaves = {.start = str_arena_alloc(arena, 0)};
-    prog_assert(bitq_reserve(&ret.tree_paths, tree->num_nodes)
-                == CCC_RESULT_OK);
+    check(ret.arena.arena);
+    ret.leaf_string.start = str_arena_alloc(&ret.arena, 0);
+    check(bitq_reserve(&ret.tree_paths, tree->num_nodes) == CCC_RESULT_OK);
     size_t cur = tree->root;
     /* To properly emulate a recursive Pre-Order traversal with iteration we
        use the parent field for backtracking and an iterator for caching and
@@ -389,8 +382,9 @@ compress_tree(struct huffman_tree *const tree, struct str_arena *const arena)
         {
             /* A leaf is always pushed because it is only seen once. */
             bitq_push_back(&ret.tree_paths, CCC_FALSE);
-            str_arena_push_back(arena, leaves.start, leaves.len, node->ch);
-            ++leaves.len;
+            str_arena_push_back(&ret.arena, ret.leaf_string.start,
+                                ret.leaf_string.len, node->ch);
+            ++ret.leaf_string.len;
             cur = node->parent;
         }
         else if (node->iter < ITER_END)
@@ -411,7 +405,6 @@ compress_tree(struct huffman_tree *const tree, struct str_arena *const arena)
             cur = node->parent;
         }
     }
-    ret.leaf_string = str_arena_at(arena, leaves.start);
     print_bitq(&ret.tree_paths);
     return ret;
 }
@@ -425,7 +418,7 @@ build_encoding_bitq(FILE *const f, struct huffman_tree *const tree)
        alphabets aka trees with many leaves. */
     flat_hash_map memo = ccc_fhm_init(NULL, struct path_memo, ch, hash_ch,
                                       path_memo_eq, NULL, NULL, 0);
-    prog_assert(reserve(&memo, tree->num_leaves, std_alloc) == CCC_RESULT_OK);
+    check(reserve(&memo, tree->num_leaves, std_alloc) == CCC_RESULT_OK);
     foreach_filechar(f, c, {
         struct path_memo const *path = get_key_val(&memo, c);
         if (path)
@@ -435,7 +428,7 @@ build_encoding_bitq(FILE *const f, struct huffman_tree *const tree)
                  i < end; ++i)
             {
                 ccc_tribool const bit = bitq_test(&ret, i);
-                prog_assert(bit != CCC_TRIBOOL_ERROR);
+                check(bit != CCC_TRIBOOL_ERROR);
                 bitq_push_back(&ret, bit);
             }
         }
@@ -444,8 +437,7 @@ build_encoding_bitq(FILE *const f, struct huffman_tree *const tree)
             memoize_path(tree, &memo, &ret, *c);
         }
     });
-    prog_assert(clear_and_free_reserve(&memo, NULL, std_alloc)
-                == CCC_RESULT_OK);
+    check(clear_and_free_reserve(&memo, NULL, std_alloc) == CCC_RESULT_OK);
     return ret;
 }
 
@@ -481,7 +473,7 @@ memoize_path(struct huffman_tree *const tree, flat_hash_map *const fh,
             continue;
         }
         /* Depth progression of depth first search. */
-        prog_assert(node->iter <= CCC_TRUE);
+        check(node->iter <= CCC_TRUE);
         bitq_push_back(bq, node->iter);
         /* During backtracking this helps us know which child subtree needs to
            be explored or if we are done and can continue backtracking. */
@@ -508,9 +500,9 @@ build_encoding_tree(FILE *const f)
     {
         /* Small elements and we need the pair so we can't hold references. */
         struct fpq_elem zero = *(struct fpq_elem *)front(&pq);
-        prog_assert(pop(&pq) == CCC_RESULT_OK);
+        check(pop(&pq) == CCC_RESULT_OK);
         struct fpq_elem one = *(struct fpq_elem *)front(&pq);
-        prog_assert(pop(&pq) == CCC_RESULT_OK);
+        check(pop(&pq) == CCC_RESULT_OK);
         struct huffman_node *const internal_one
             = push_back(&ret.nodes, &(struct huffman_node){
                                         .parent = 0,
@@ -519,14 +511,14 @@ build_encoding_tree(FILE *const f)
                                         .iter = 0,
                                     });
         size_t const new_root = buf_i(&ret.nodes, internal_one).count;
-        prog_assert(internal_one);
+        check(internal_one);
         node_at(&ret, zero.node)->parent = new_root;
         node_at(&ret, one.node)->parent = new_root;
         ++ret.num_nodes;
         struct fpq_elem const *const pushed
             = push(&pq, &(struct fpq_elem){.freq = zero.freq + one.freq,
                                            .node = new_root});
-        prog_assert(pushed);
+        check(pushed);
         ret.root = new_root;
     }
     print_tree(&ret, ret.root);
@@ -534,7 +526,7 @@ build_encoding_tree(FILE *const f)
        needs was already allocated by the buffer it stole from. The priority
        queue only gets smaller as the algorithms progresses so we didn't need
        to worry about growth. Provide same function used to reserve buffer. */
-    prog_assert(clear_and_free_reserve(&pq, NULL, std_alloc) == CCC_RESULT_OK);
+    check(clear_and_free_reserve(&pq, NULL, std_alloc) == CCC_RESULT_OK);
     return ret;
 }
 
@@ -548,21 +540,20 @@ build_encoding_pq(FILE *const f, struct huffman_tree *const tree)
 {
     /* For a buffer based tree 0 is the NULL node so we can't have actual data
        we want at that index in the tree. */
-    prog_assert(push_back(&tree->nodes, &(struct huffman_node){}));
+    check(push_back(&tree->nodes, &(struct huffman_node){}));
     flat_hash_map fh = fhm_init(NULL, struct ch_freq, ch, hash_ch, ch_eq,
                                 std_alloc, NULL, 0);
     foreach_filechar(f, c, {
         struct ch_freq *const cf
             = or_insert(entry_r(&fh, c), &(struct ch_freq){.ch = *c});
-        prog_assert(cf);
+        check(cf);
         ++cf->freq;
     });
-    prog_assert(size(&fh).count >= 2);
+    check(size(&fh).count >= 2);
     /* Use a buffer to simply push back elements we will heapify at the end. */
     buffer buf = buf_init((struct fpq_elem *)NULL, NULL, NULL, 0);
     /* Add one to reservation for the flat priority queue swap slot. */
-    prog_assert(buf_alloc(&buf, size(&fh).count + 1, std_alloc)
-                == CCC_RESULT_OK);
+    check(buf_alloc(&buf, size(&fh).count + 1, std_alloc) == CCC_RESULT_OK);
     for (struct ch_freq const *i = begin(&fh); i != end(&fh); i = next(&fh, i))
     {
         struct huffman_node *const node
@@ -570,10 +561,10 @@ build_encoding_pq(FILE *const f, struct huffman_tree *const tree)
         struct fpq_elem const *const fe = push_back(
             &buf, &(struct fpq_elem){.freq = i->freq,
                                      .node = buf_i(&tree->nodes, node).count});
-        prog_assert(fe);
+        check(fe);
     }
     /* Free map but not the buffer because the priority queue took buffer. */
-    prog_assert(clear_and_free(&fh, NULL) == CCC_RESULT_OK);
+    check(clear_and_free(&fh, NULL) == CCC_RESULT_OK);
     /* The buffer had no allocation permission and set up all the elements we
        needed to be in the flat priority queue. Now we take its memory and
        heapify the data in O(N) time rather than pushing each element. */
@@ -581,16 +572,192 @@ build_encoding_pq(FILE *const f, struct huffman_tree *const tree)
                             NULL, NULL, capacity(&buf).count, size(&buf).count);
 }
 
+static void
+write_to_file(str_view const original_filepath,
+              struct huffman_header *const header)
+{
+    FILE *const cccz = open_cccz(original_filepath);
+    (void)fprintf(cccz, "%" PRIu32, header->magic);
+    (void)fprintf(cccz, "%" PRIu8, header->leaf_count_minus_one);
+    char const *const leaf_string
+        = str_arena_at(&header->encoding->blueprint.arena,
+                       header->encoding->blueprint.leaf_string.start);
+    for (size_t i = 0, end = header->leaf_count_minus_one + 1; i < end; ++i)
+    {
+        (void)fprintf(cccz, "%c", leaf_string[i]);
+    }
+    (void)fprintf(cccz, "%zu", header->file_bits_count);
+    write_bitq(cccz, &header->encoding->blueprint.tree_paths);
+    write_bitq(cccz, &header->encoding->file_bits);
+    (void)fclose(cccz);
+}
+
+static void
+write_bitq(FILE *const cccz, struct bitq *const bq)
+{
+    for (uint8_t buf = 0, biti = 0; bitq_size(bq);)
+    {
+        static_assert(sizeof(uint8_t) == sizeof(ccc_tribool));
+        ccc_tribool const bit = bitq_pop_front(bq);
+        buf |= (bit << biti);
+        ++biti;
+        if (biti >= CHAR_BIT)
+        {
+            (void)fprintf(cccz, "%" PRIu8, buf);
+            buf = 0;
+            biti = 0;
+        }
+    }
+}
+
+static FILE *
+open_cccz(str_view original_filepath)
+{
+    size_t const dir_delim
+        = sv_rfind(original_filepath, sv_len(original_filepath), SV("/"));
+    str_view const raw_file = dir_delim == sv_npos(original_filepath)
+                                ? original_filepath
+                                : sv_substr(original_filepath, dir_delim + 1,
+                                            sv_len(original_filepath));
+    check(sv_size(relative_output_dir) + sv_size(raw_file)
+              + sv_size(compression_file_suffix)
+          < FILESYS_MAX_PATH);
+    char path_to_cccz[FILESYS_MAX_PATH];
+    size_t const path_bytes = sv_fill(sv_size(relative_output_dir),
+                                      path_to_cccz, relative_output_dir);
+    size_t const file_bytes
+        = sv_fill(sv_size(raw_file), path_to_cccz + (path_bytes - 1), raw_file);
+    (void)sv_fill(sv_size(compression_file_suffix),
+                  path_to_cccz + (path_bytes - 1) + (file_bytes - 1),
+                  compression_file_suffix);
+    FILE *const cccz = fopen(path_to_cccz, "w");
+    check(cccz, printf("%s", strerror(errno)););
+    return cccz;
+}
+
 /*=========================     Huffman Decoding    =========================*/
 
-void
-decompress_file(str_view to_decompress, struct huffman_encoding *const he)
+static void
+decompress_file(str_view to_decompress)
 {
-    prog_assert(bitq_size(&he->blueprint.tree_paths)
-                && bitq_front(&he->blueprint.tree_paths) == CCC_TRUE);
-    struct huffman_tree tree = reconstruct_tree(&he->blueprint);
-    reconstruct_text(to_decompress, &tree, &he->text_bits);
+    struct huffman_encoding he = read_from_file(to_decompress);
+    struct huffman_tree tree = reconstruct_tree(&he.blueprint);
+    FILE *const decompressed = open_decompressed(to_decompress);
+    reconstruct_text(decompressed, &tree, &he.file_bits);
+    /* All info is on disk we can free in memory resources. */
     free_encode_tree(&tree);
+    bitq_clear_and_free(&he.file_bits);
+    bitq_clear_and_free(&he.blueprint.tree_paths);
+    str_arena_free(&he.blueprint.arena);
+    (void)fclose(decompressed);
+}
+
+static struct huffman_encoding
+read_from_file(str_view const to_decompress)
+{
+    check(sv_ends_with(to_decompress, SV(".cccz")),
+          (void)fprintf(stderr, "only '.cccz' files may be decompressed.\n"););
+    FILE *const cccz = fopen(sv_begin(to_decompress), "r");
+    check(cccz, printf("%s", strerror(errno)););
+    struct huffman_encoding ret = {
+        .file_bits = {.bs = bs_init(NULL, std_alloc, NULL, 0)},
+        .blueprint = {
+            .arena = str_arena_create(START_STR_ARENA_CAP),
+            .tree_paths = {.bs = bs_init(NULL, std_alloc, NULL, 0)},
+        },
+    };
+    fill_header(cccz, &(struct huffman_header){.encoding = &ret});
+    (void)fclose(cccz);
+    return ret;
+}
+
+static void
+fill_header(FILE *const f, struct huffman_header *const header)
+{
+    check(readbytes(f, &header->magic, sizeof(header->magic))
+                  == sizeof(header->magic)
+              && header->magic == cccz_magic,
+          (void)fprintf(stderr, "bad magic in header of .cccz file\n"););
+    check(readbytes(f, &header->leaf_count_minus_one,
+                    sizeof(header->leaf_count_minus_one))
+          == sizeof(header->leaf_count_minus_one));
+    struct str_arena *const arena = &header->encoding->blueprint.arena;
+    struct leaf_string *const leaves = &header->encoding->blueprint.leaf_string;
+    leaves->start = str_arena_alloc(arena, header->leaf_count_minus_one + 1);
+    check(leaves->start >= 0);
+    leaves->len = header->leaf_count_minus_one + 1;
+    check(readbytes(f, str_arena_at(arena, leaves->start),
+                    header->leaf_count_minus_one + 1)
+          == (size_t)(header->leaf_count_minus_one + 1));
+    check(
+        readbytes(f, &header->file_bits_count, sizeof(header->file_bits_count))
+        == sizeof(header->file_bits_count));
+    /* The pairing method we used while building the tree makes this true. */
+    size_t const tree_path_bits = ((header->leaf_count_minus_one + 1) * 2) - 1;
+    fill_bitq(f, &header->encoding->blueprint.tree_paths, tree_path_bits);
+    fill_bitq(f, &header->encoding->file_bits, header->file_bits_count);
+}
+
+static void
+fill_bitq(FILE *const f, struct bitq *const bq, size_t expected_bits)
+{
+    uint8_t buf = 0;
+    uint8_t biti = CHAR_BIT;
+    while (expected_bits)
+    {
+        if (biti == CHAR_BIT)
+        {
+            check(
+                readbytes(f, &buf, 1),
+                (void)fprintf(stderr, "expected more bits from the file.\n"););
+            biti = 0;
+        }
+        static_assert(sizeof(ccc_tribool) == sizeof(uint8_t));
+        ccc_tribool const bit = (buf & ((uint8_t)1 << biti)) != 0;
+        bitq_push_back(bq, bit);
+        ++biti;
+        --expected_bits;
+    }
+}
+
+static size_t
+readbytes(FILE *const f, void *base, size_t const to_read)
+{
+    size_t count = 0;
+    while (count < to_read)
+    {
+        int const read = fgetc(f);
+        if (read == EOF)
+        {
+            return count;
+        }
+        *(char *)base = (char)read;
+        base = (char *)base + 1;
+        ++count;
+    }
+    return count;
+}
+
+static FILE *
+open_decompressed(str_view to_decompress)
+{
+    check(sv_ends_with(to_decompress, compression_file_suffix));
+    to_decompress
+        = sv_remove_suffix(to_decompress, sv_len(compression_file_suffix));
+    size_t const dir_delim
+        = sv_rfind(to_decompress, sv_len(to_decompress), SV("/"));
+    str_view const raw_file
+        = dir_delim == sv_npos(to_decompress)
+            ? to_decompress
+            : sv_substr(to_decompress, dir_delim + 1, sv_len(to_decompress));
+    check(sv_size(relative_output_dir) + sv_size(raw_file) < FILESYS_MAX_PATH);
+    char path[FILESYS_MAX_PATH];
+    size_t const prefix
+        = sv_fill(sv_size(relative_output_dir), path, relative_output_dir);
+    (void)sv_fill(sv_size(raw_file), path + (prefix - 1), raw_file);
+    FILE *const f = fopen(path, "w");
+    check(f, printf("%s", strerror(errno)););
+    return f;
 }
 
 /** Reconstructs a Huffman encoding tree based on the blueprint provided. The
@@ -603,10 +770,9 @@ reconstruct_tree(struct compressed_huffman_tree *const blueprint)
         .nodes = ccc_buf_init((struct huffman_node *)NULL, std_alloc, NULL, 0),
         .num_nodes = bitq_size(&blueprint->tree_paths),
     };
-    prog_assert(buf_alloc(&ret.nodes, ret.num_nodes + 1, std_alloc)
-                == CCC_RESULT_OK);
+    check(buf_alloc(&ret.nodes, ret.num_nodes + 1, std_alloc) == CCC_RESULT_OK);
     /* 0 index is NULL so real data can't be there. */
-    prog_assert(push_back(&ret.nodes, &(struct huffman_node){}));
+    check(push_back(&ret.nodes, &(struct huffman_node){}));
     struct huffman_node const *const first
         = push_back(&ret.nodes, &(struct huffman_node){});
     ret.root = buf_i(&ret.nodes, first).count;
@@ -627,7 +793,8 @@ reconstruct_tree(struct compressed_huffman_tree *const blueprint)
             prev_node->link[prev_node->iter++] = cur;
             if (!bit)
             {
-                pushed->ch = blueprint->leaf_string[ch_i++];
+                pushed->ch = *str_arena_at(&blueprint->arena, (str_ofs)ch_i);
+                ++ch_i;
             }
         }
         struct huffman_node *const cur_node = node_at(&ret, cur);
@@ -647,12 +814,9 @@ reconstruct_tree(struct compressed_huffman_tree *const blueprint)
 }
 
 void
-reconstruct_text(str_view const to_decompress,
-                 struct huffman_tree const *const tree, struct bitq *const bq)
+reconstruct_text(FILE *const f, struct huffman_tree const *const tree,
+                 struct bitq *const bq)
 {
-    prog_assert(sv_ends_with(to_decompress, SV(".ccc")));
-    FILE *const f = fopen(sv_begin(to_decompress), "w");
-    prog_assert(f, printf("%s", strerror(errno)););
     size_t cur = tree->root;
     while (bitq_size(bq))
     {
@@ -663,7 +827,7 @@ reconstruct_text(str_view const to_decompress,
             cur = tree->root;
         }
         ccc_tribool const bit = bitq_pop_front(bq);
-        prog_assert(bit != CCC_TRIBOOL_ERROR);
+        check(bit != CCC_TRIBOOL_ERROR);
         cur = node->link[bit];
     }
     if (!branch_i(tree, cur, 1))
@@ -675,26 +839,26 @@ reconstruct_text(str_view const to_decompress,
 
 /*=========================      Huffman Helpers    =========================*/
 
-struct huffman_node *
+static struct huffman_node *
 node_at(struct huffman_tree const *const t, size_t const node)
 {
     return ((struct huffman_node *)buf_at(&t->nodes, node));
 }
 
-size_t
+static size_t
 branch_i(struct huffman_tree const *const t, size_t const node,
          uint8_t const dir)
 {
     return ((struct huffman_node *)buf_at(&t->nodes, node))->link[dir];
 }
 
-size_t
+static size_t
 parent_i(struct huffman_tree const *const t, size_t node)
 {
     return ((struct huffman_node *)buf_at(&t->nodes, node))->parent;
 }
 
-char
+static char
 char_i(struct huffman_tree const *const t, size_t const node)
 {
     return ((struct huffman_node *)buf_at(&t->nodes, node))->ch;
@@ -704,7 +868,7 @@ char_i(struct huffman_tree const *const t, size_t const node)
 static void
 free_encode_tree(struct huffman_tree *tree)
 {
-    prog_assert(buf_alloc(&tree->nodes, 0, std_alloc) == CCC_RESULT_OK);
+    check(buf_alloc(&tree->nodes, 0, std_alloc) == CCC_RESULT_OK);
     tree->num_leaves = 0;
     tree->num_nodes = 0;
     tree->root = 0;
@@ -836,13 +1000,13 @@ bitq_push_back(struct bitq *const bq, ccc_tribool const bit)
     if (bq->size == bs_size(&bq->bs).count)
     {
         ccc_result const r = push_back(&bq->bs, bit);
-        prog_assert(r == CCC_RESULT_OK);
+        check(r == CCC_RESULT_OK);
     }
     else
     {
         ccc_tribool const was = bs_set(
             &bq->bs, ((bq->front + bq->size) % capacity(&bq->bs).count), bit);
-        prog_assert(was != CCC_TRIBOOL_ERROR);
+        check(was != CCC_TRIBOOL_ERROR);
     }
     ++bq->size;
 }
@@ -852,7 +1016,7 @@ bitq_pop_back(struct bitq *const bq)
 {
     size_t const i = (bq->front + bq->size - 1) % capacity(&bq->bs).count;
     ccc_tribool const bit = bs_test(&bq->bs, i);
-    prog_assert(bit != CCC_TRIBOOL_ERROR);
+    check(bit != CCC_TRIBOOL_ERROR);
     --bq->size;
     return bit;
 }
@@ -861,17 +1025,9 @@ static ccc_tribool
 bitq_pop_front(struct bitq *const bq)
 {
     ccc_tribool const bit = bs_test(&bq->bs, bq->front);
-    prog_assert(bit != CCC_TRIBOOL_ERROR);
+    check(bit != CCC_TRIBOOL_ERROR);
     bq->front = (bq->front + 1) % size(&bq->bs).count;
     --bq->size;
-    return bit;
-}
-
-static ccc_tribool
-bitq_front(struct bitq const *const bq)
-{
-    ccc_tribool const bit = bs_test(&bq->bs, bq->front);
-    prog_assert(bit != CCC_TRIBOOL_ERROR);
     return bit;
 }
 
@@ -890,9 +1046,9 @@ bitq_size(struct bitq const *const bq)
 static void
 bitq_clear_and_free(struct bitq *const bq)
 {
-    prog_assert(bq);
+    check(bq);
     ccc_result const r = clear_and_free(&bq->bs);
-    prog_assert(r == CCC_RESULT_OK);
+    check(r == CCC_RESULT_OK);
 }
 
 static ccc_result
