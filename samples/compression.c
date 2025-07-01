@@ -69,17 +69,20 @@ enum : uint8_t
     ITER_END = LINK_SIZE,
 };
 
-/** Nodes will be allocated freely in the heap as tree nodes for now. They will
-be referenced in the priority queue stage of the algorithm but need not have any
-intrusive elements for now. Once the tree is built, it will be traversed to
-complete message and tree compression. */
+/** Tree nodes will be pushed into a ccc_buffer. This is the same concept as
+freely allocating them in the heap, but much more efficient and convenient. We
+push elements to the back of the buffer to allocate and because we never free
+any nodes until we are done with the entire tree this is an optimal bump
+allocator. All memory is freed at once in one contiguous allocation. The only
+detail to manage is that due to resizing of the buffer elements must track each
+other through indices not pointers. */
 struct huffman_node
 {
     /** The parent for backtracking during DFS and Pre-Order traversal. */
-    struct huffman_node *parent;
+    size_t parent;
     /** The necessary links needed to build the encoding tree. */
-    struct huffman_node *link[LINK_SIZE];
-    /** The key for frequency map counting. */
+    size_t link[LINK_SIZE];
+    /** The leaf character if this node is a leaf. */
     char ch;
     /** The caching iterator to help emulate recursion with iteration. */
     uint8_t iter;
@@ -92,14 +95,15 @@ The priority queue is only needed while building the tree. */
 struct fpq_elem
 {
     size_t freq;
-    struct huffman_node *node;
+    size_t node;
 };
 
 /** It is helpful to know how many leaves and total nodes there are for
 reserving the appropriate space for helper data structures. */
 struct huffman_tree
 {
-    struct huffman_node *root;
+    ccc_buffer nodes;
+    size_t root;
     size_t num_nodes;
     size_t num_leaves;
 };
@@ -157,12 +161,19 @@ struct huffman_encoding
     struct compressed_huffman_tree blueprint;
 };
 
+struct file_action_pack
+{
+    str_view to_compress;
+    str_view to_decompress;
+};
+
 static str_view const relative_output_dir = SV("samples/output/");
 
 /*===========================      Prototypes      ==========================*/
 
-static struct huffman_encoding compress_file(FILE *f, struct str_arena *arena);
-static flat_priority_queue build_encoding_pq(FILE *f);
+static struct huffman_encoding compress_file(str_view to_compress,
+                                             struct str_arena *arena);
+static flat_priority_queue build_encoding_pq(FILE *f, struct huffman_tree *);
 static void bitq_push_back(struct bitq *, ccc_tribool);
 static ccc_tribool bitq_pop_back(struct bitq *bq);
 static ccc_tribool bitq_pop_front(struct bitq *);
@@ -181,18 +192,24 @@ static struct huffman_tree build_encoding_tree(FILE *f);
 static struct compressed_huffman_tree compress_tree(struct huffman_tree *tree,
                                                     struct str_arena *);
 static void free_encode_tree(struct huffman_tree *);
-static void print_tree(struct huffman_node const *tree);
-static void print_inner_tree(struct huffman_node const *root, enum print_branch,
-                             char const *prefix);
-static void print_node(struct huffman_node const *root);
-static bool is_leaf(struct huffman_node const *root);
+static void print_tree(struct huffman_tree const *tree, size_t node);
+static void print_inner_tree(struct huffman_tree const *tree, size_t node,
+                             enum print_branch, char const *prefix);
+static void print_node(struct huffman_tree const *tree, size_t node);
+static bool is_leaf(struct huffman_tree const *tree, size_t node);
 static void print_bitq(struct bitq const *bq);
 static ccc_tribool bitq_front(struct bitq const *bq);
-static FILE *decompress_file(struct huffman_encoding *he);
+static void decompress_file(str_view to_decompress,
+                            struct huffman_encoding *he);
 static struct huffman_tree
 reconstruct_tree(struct compressed_huffman_tree *blueprint);
-FILE *reconstruct_text(str_view out_file_name, struct huffman_tree const *,
-                       struct bitq *);
+static void reconstruct_text(str_view to_decompress,
+                             struct huffman_tree const *, struct bitq *);
+static void print_help(void);
+size_t branch_i(struct huffman_tree const *t, size_t node, uint8_t dir);
+size_t parent_i(struct huffman_tree const *t, size_t node);
+char char_i(struct huffman_tree const *t, size_t node);
+struct huffman_node *node_at(struct huffman_tree const *t, size_t node);
 
 /** Asserts even in release mode. Run code in the second argument if needed. */
 #define prog_assert(cond, ...)                                                 \
@@ -244,46 +261,55 @@ main(int argc, char **argv)
     {
         return 0;
     }
-    if (argc == 2 && sv_starts_with(sv(argv[1]), SV("-h")))
-    {
-        return 0;
-    }
-
-    str_view file = {};
+    struct file_action_pack todo = {};
     for (int arg = 1; arg < argc; ++arg)
     {
         str_view const sv_arg = sv(argv[arg]);
-        if (sv_starts_with(sv_arg, SV("-f=")))
+        if (sv_starts_with(sv_arg, SV("-h")))
+        {
+            print_help();
+            return 0;
+        }
+        if (sv_starts_with(sv_arg, SV("-c=")))
         {
             str_view const raw_file = sv_substr(
                 sv_arg, sv_find(sv_arg, 0, SV("=")) + 1, sv_len(sv_arg));
             prog_assert(!sv_empty(raw_file),
                         (void)fprintf(stderr, "file string is empty\n"););
-            file = raw_file;
+            todo.to_compress = raw_file;
+        }
+        else if (sv_starts_with(sv_arg, SV("-d=")))
+        {
+            str_view const raw_file = sv_substr(
+                sv_arg, sv_find(sv_arg, 0, SV("=")) + 1, sv_len(sv_arg));
+            prog_assert(!sv_empty(raw_file),
+                        (void)fprintf(stderr, "file string is empty\n"););
+            todo.to_decompress = raw_file;
         }
     }
-    FILE *const f = fopen(sv_begin(file), "r");
-    prog_assert(
-        f, (void)fprintf(stderr, "could not open file %s", sv_begin(file)););
     struct str_arena arena = str_arena_create(START_STR_ARENA_CAP);
     prog_assert(arena.arena);
-    struct huffman_encoding encode = compress_file(f, &arena);
-    FILE *const reconstructed_output = decompress_file(&encode);
+    struct huffman_encoding encode = compress_file(todo.to_compress, &arena);
+    if (!sv_empty(todo.to_decompress))
+    {
+        decompress_file(todo.to_decompress, &encode);
+    }
 
     /* Free all queues and strings */
     bitq_clear_and_free(&encode.text_bits);
     bitq_clear_and_free(&encode.blueprint.tree_paths);
     str_arena_free(&arena);
-    (void)fclose(f);
-    (void)fclose(reconstructed_output);
     return 0;
 }
 
 /*=========================     Huffman Encoding    =========================*/
 
 static struct huffman_encoding
-compress_file(FILE *const f, struct str_arena *const arena)
+compress_file(str_view const to_compress, struct str_arena *const arena)
 {
+    FILE *const f = fopen(sv_begin(to_compress), "r");
+    prog_assert(f, (void)fprintf(stderr, "could not open file %s",
+                                 sv_begin(to_compress)););
     /* Encode characters in alphabet. */
     struct huffman_tree tree = build_encoding_tree(f);
 
@@ -292,8 +318,6 @@ compress_file(FILE *const f, struct str_arena *const arena)
         .text_bits = build_encoding_bitq(f, &tree),
         .blueprint = compress_tree(&tree, arena),
     };
-
-    /* TODO: Write compression to file. */
 
     /* Free in memory resources. */
     free_encode_tree(&tree);
@@ -315,36 +339,37 @@ compress_tree(struct huffman_tree *const tree, struct str_arena *const arena)
     struct leaf_string leaves = {.start = str_arena_alloc(arena, 0)};
     prog_assert(bitq_reserve(&ret.tree_paths, tree->num_nodes)
                 == CCC_RESULT_OK);
-    struct huffman_node *cur = tree->root;
+    size_t cur = tree->root;
     /* To properly emulate a recursive Pre-Order traversal with iteration we
        use the parent field for backtracking and an iterator for caching and
        progression. */
     while (cur)
     {
-        if (!cur->link[1])
+        struct huffman_node *const node = node_at(tree, cur);
+        if (!node->link[1])
         {
             /* A leaf is always pushed because it is only seen once. */
             bitq_push_back(&ret.tree_paths, CCC_FALSE);
-            str_arena_push_back(arena, leaves.start, leaves.len, cur->ch);
+            str_arena_push_back(arena, leaves.start, leaves.len, node->ch);
             ++leaves.len;
-            cur = cur->parent;
+            cur = node->parent;
         }
-        else if (cur->iter < ITER_END)
+        else if (node->iter < ITER_END)
         {
             /* We only push internal 1 nodes the first time on the way down. We
                still need to access the second child so don't push a bit when we
                are simply progressing to the next child subtree. */
-            if (cur->iter == 0)
+            if (node->iter == 0)
             {
                 bitq_push_back(&ret.tree_paths, CCC_TRUE);
             }
-            cur = cur->link[cur->iter++];
+            cur = node->link[node->iter++];
         }
         else
         {
             /* Both child subtrees have been explored, so cleanup/backtrack. */
-            cur->iter = 0;
-            cur = cur->parent;
+            node->iter = 0;
+            cur = node->parent;
         }
     }
     ret.leaf_string = str_arena_at(arena, leaves.start);
@@ -396,36 +421,37 @@ memoize_path(struct huffman_tree *const tree, flat_hash_map *const fh,
     struct path_memo *const path = insert_entry(
         entry_r(fh, &c),
         &(struct path_memo){.ch = c, .path_start_index = bitq_size(bq)});
-    struct huffman_node *cur = tree->root;
+    size_t cur = tree->root;
     /* An iterative depth first search is convenient because the bit path in
        the queue can represent the exact path we are currently on. Just be
        sure to backtrack up the path to cleanup iterators. */
     while (cur)
     {
+        struct huffman_node *const node = node_at(tree, cur);
         /* This is the leaf we want. */
-        if (!cur->link[1] && cur->ch == c)
+        if (!node->link[1] && node->ch == c)
         {
             break;
         }
         /* Wrong leaf or we have explored both subtrees of an internal node. */
-        if (!cur->link[1] || cur->iter >= ITER_END)
+        if (!node->link[1] || node->iter >= ITER_END)
         {
-            cur->iter = 0;
-            cur = cur->parent;
+            node->iter = 0;
+            cur = node->parent;
             bitq_pop_back(bq);
             continue;
         }
         /* Depth progression of depth first search. */
-        prog_assert(cur->iter <= CCC_TRUE);
-        bitq_push_back(bq, cur->iter);
+        prog_assert(node->iter <= CCC_TRUE);
+        bitq_push_back(bq, node->iter);
         /* During backtracking this helps us know which child subtree needs to
            be explored or if we are done and can continue backtracking. */
-        cur = cur->link[cur->iter++];
+        cur = node->link[node->iter++];
     }
     /* Cleanup because we now have the correct path. */
-    for (; cur; cur = cur->parent)
+    for (; cur; cur = parent_i(tree, cur))
     {
-        cur->iter = 0;
+        node_at(tree, cur)->iter = 0;
     }
     path->path_len = bitq_size(bq) - path->path_start_index;
 }
@@ -433,12 +459,12 @@ memoize_path(struct huffman_tree *const tree, flat_hash_map *const fh,
 static struct huffman_tree
 build_encoding_tree(FILE *const f)
 {
-    flat_priority_queue pq = build_encoding_pq(f);
     struct huffman_tree ret = {
-        .root = NULL,
-        .num_nodes = size(&pq).count,
-        .num_leaves = size(&pq).count,
+        .nodes = buf_init((struct huffman_node *)NULL, std_alloc, NULL, 0),
+        .root = 0,
     };
+    flat_priority_queue pq = build_encoding_pq(f, &ret);
+    ret.num_leaves = ret.num_nodes = size(&pq).count;
     while (size(&pq).count >= 2)
     {
         /* Small elements and we need the pair so we can't hold references. */
@@ -447,24 +473,24 @@ build_encoding_tree(FILE *const f)
         struct fpq_elem one = *(struct fpq_elem *)front(&pq);
         prog_assert(pop(&pq) == CCC_RESULT_OK);
         struct huffman_node *const internal_one
-            = malloc(sizeof(struct huffman_node));
+            = push_back(&ret.nodes, &(struct huffman_node){
+                                        .parent = 0,
+                                        .link = {zero.node, one.node},
+                                        .ch = '\0',
+                                        .iter = 0,
+                                    });
+        size_t const new_root = buf_i(&ret.nodes, internal_one).count;
         prog_assert(internal_one);
-        zero.node->parent = internal_one;
-        one.node->parent = internal_one;
-        *internal_one = (struct huffman_node){
-            .parent = NULL,
-            .link = {zero.node, one.node},
-            .ch = '\0',
-            .iter = 0,
-        };
+        node_at(&ret, zero.node)->parent = new_root;
+        node_at(&ret, one.node)->parent = new_root;
         ++ret.num_nodes;
         struct fpq_elem const *const pushed
             = push(&pq, &(struct fpq_elem){.freq = zero.freq + one.freq,
-                                           .node = internal_one});
+                                           .node = new_root});
         prog_assert(pushed);
-        ret.root = internal_one;
+        ret.root = new_root;
     }
-    print_tree(ret.root);
+    print_tree(&ret, ret.root);
     /* The flat pq was given no allocation permission because the memory it
        needs was already allocated by the buffer it stole from. The priority
        queue only gets smaller as the algorithms progresses so we didn't need
@@ -479,8 +505,11 @@ priority queue has no allocation permission, knowing the space it needs to
 reserve ahead of time and assuming the tree building algorithm will strictly
 decrease the size of the priority queue. */
 static flat_priority_queue
-build_encoding_pq(FILE *const f)
+build_encoding_pq(FILE *const f, struct huffman_tree *const tree)
 {
+    /* For a buffer based tree 0 is the NULL node so we can't have actual data
+       we want at that index in the tree. */
+    prog_assert(push_back(&tree->nodes, &(struct huffman_node){}));
     flat_hash_map fh = fhm_init(NULL, struct ch_freq, ch, hash_ch, ch_eq,
                                 std_alloc, NULL, 0);
     foreach_filechar(f, c, {
@@ -497,11 +526,11 @@ build_encoding_pq(FILE *const f)
                 == CCC_RESULT_OK);
     for (struct ch_freq const *i = begin(&fh); i != end(&fh); i = next(&fh, i))
     {
-        struct huffman_node *const hn = malloc(sizeof(struct huffman_node));
-        prog_assert(hn);
-        *hn = (struct huffman_node){.ch = i->ch};
-        struct fpq_elem const *const fe
-            = push_back(&buf, &(struct fpq_elem){.freq = i->freq, .node = hn});
+        struct huffman_node *const node
+            = buf_push_back(&tree->nodes, &(struct huffman_node){.ch = i->ch});
+        struct fpq_elem const *const fe = push_back(
+            &buf, &(struct fpq_elem){.freq = i->freq,
+                                     .node = buf_i(&tree->nodes, node).count});
         prog_assert(fe);
     }
     /* Free map but not the buffer because the priority queue took buffer. */
@@ -515,16 +544,14 @@ build_encoding_pq(FILE *const f)
 
 /*=========================     Huffman Decoding    =========================*/
 
-static FILE *
-decompress_file(struct huffman_encoding *const he)
+void
+decompress_file(str_view to_decompress, struct huffman_encoding *const he)
 {
     prog_assert(bitq_size(&he->blueprint.tree_paths)
                 && bitq_front(&he->blueprint.tree_paths) == CCC_TRUE);
     struct huffman_tree tree = reconstruct_tree(&he->blueprint);
-    FILE *const f
-        = reconstruct_text(SV("reconstructed.txt"), &tree, &he->text_bits);
+    reconstruct_text(to_decompress, &tree, &he->text_bits);
     free_encode_tree(&tree);
-    return f;
 }
 
 /** Reconstructs a Huffman encoding tree based on the blueprint provided. The
@@ -533,12 +560,17 @@ being allocated. */
 static struct huffman_tree
 reconstruct_tree(struct compressed_huffman_tree *const blueprint)
 {
-    struct huffman_tree ret = {.num_nodes = bitq_size(&blueprint->tree_paths)};
-    ret.root = malloc(sizeof(struct huffman_node));
-    prog_assert(ret.root);
-    *ret.root = (struct huffman_node){};
-    struct huffman_node *prev = ret.root;
-    struct huffman_node *cur = NULL;
+    struct huffman_tree ret = {
+        .nodes = ccc_buf_init((struct huffman_node *)NULL, std_alloc, NULL, 0),
+        .num_nodes = bitq_size(&blueprint->tree_paths),
+    };
+    prog_assert(buf_alloc(&ret.nodes, ret.num_nodes, std_alloc)
+                == CCC_RESULT_OK);
+    prog_assert(push_back(&ret.nodes, &(struct huffman_node){}));
+    (void)push_back(&ret.nodes, &(struct huffman_node){});
+    ret.root = size(&ret.nodes).count - 1;
+    size_t prev = ret.root;
+    size_t cur = 0;
     (void)bitq_pop_front(&blueprint->tree_paths);
     size_t ch_i = 0;
     while (bitq_size(&blueprint->tree_paths))
@@ -546,117 +578,123 @@ reconstruct_tree(struct compressed_huffman_tree *const blueprint)
         ccc_tribool bit = CCC_TRUE;
         if (!cur)
         {
+            struct huffman_node *const prev_node = node_at(&ret, prev);
             bit = bitq_pop_front(&blueprint->tree_paths);
-            cur = malloc(sizeof(struct huffman_node));
-            prog_assert(cur);
-            *cur = (struct huffman_node){.parent = prev};
-            prev->link[prev->iter++] = cur;
+            struct huffman_node *const pushed
+                = push_back(&ret.nodes, &(struct huffman_node){.parent = prev});
+            cur = ccc_buf_i(&ret.nodes, pushed).count;
+            prev_node->link[prev_node->iter++] = cur;
             if (!bit)
             {
-                cur->ch = blueprint->leaf_string[ch_i++];
+                pushed->ch = blueprint->leaf_string[ch_i++];
             }
         }
+        struct huffman_node *const cur_node = node_at(&ret, cur);
         /* An internal node has further child subtrees to build. */
-        if (bit && cur->iter < ITER_END)
+        if (bit && cur_node->iter < ITER_END)
         {
             prev = cur;
-            cur = cur->link[cur->iter];
+            cur = cur_node->link[cur_node->iter];
             continue;
         }
         /* Backtrack. A leaf or internal node with both children built. */
         cur = prev;
-        prev = prev->parent;
+        prev = parent_i(&ret, prev);
     }
-    print_tree(ret.root);
+    print_tree(&ret, ret.root);
     return ret;
 }
 
-FILE *
-reconstruct_text(str_view const out_file_name,
+void
+reconstruct_text(str_view const to_decompress,
                  struct huffman_tree const *const tree, struct bitq *const bq)
 {
-    prog_assert(sv_size(relative_output_dir) < FILESYS_MAX_PATH);
-    char path[FILESYS_MAX_PATH];
-    size_t const prefix_bytes_including_nullterm
-        = sv_fill(FILESYS_MAX_PATH, path, relative_output_dir);
-    prog_assert(FILESYS_MAX_PATH - prefix_bytes_including_nullterm
-                > sv_size(out_file_name));
-    (void)sv_fill(FILESYS_MAX_PATH - prefix_bytes_including_nullterm - 1,
-                  path + prefix_bytes_including_nullterm - 1, out_file_name);
-    FILE *const f = fopen(path, "w");
+    prog_assert(sv_ends_with(to_decompress, SV(".ccc")));
+    FILE *const f = fopen(sv_begin(to_decompress), "w");
     prog_assert(f, printf("%s", strerror(errno)););
-    struct huffman_node const *cur = tree->root;
+    size_t cur = tree->root;
     while (bitq_size(bq))
     {
-        if (!cur->link[1])
+        struct huffman_node const *const node = node_at(tree, cur);
+        if (!node->link[1])
         {
-            (void)fprintf(f, "%c", cur->ch);
+            (void)fprintf(f, "%c", node->ch);
             cur = tree->root;
         }
         ccc_tribool const bit = bitq_pop_front(bq);
         prog_assert(bit != CCC_TRIBOOL_ERROR);
-        cur = cur->link[bit];
+        cur = node->link[bit];
     }
-    if (!cur->link[1])
+    if (!branch_i(tree, cur, 1))
     {
-        (void)fprintf(f, "%c", cur->ch);
+        (void)fprintf(f, "%c", char_i(tree, cur));
     }
-    return f;
+    (void)fclose(f);
 }
 
 /*=========================      Huffman Helpers    =========================*/
+
+struct huffman_node *
+node_at(struct huffman_tree const *const t, size_t const node)
+{
+    return ((struct huffman_node *)buf_at(&t->nodes, node));
+}
+
+size_t
+branch_i(struct huffman_tree const *const t, size_t const node,
+         uint8_t const dir)
+{
+    return ((struct huffman_node *)buf_at(&t->nodes, node))->link[dir];
+}
+
+size_t
+parent_i(struct huffman_tree const *const t, size_t node)
+{
+    return ((struct huffman_node *)buf_at(&t->nodes, node))->parent;
+}
+
+char
+char_i(struct huffman_tree const *const t, size_t const node)
+{
+    return ((struct huffman_node *)buf_at(&t->nodes, node))->ch;
+}
 
 /** Frees all encoding nodes from the tree provided. */
 static void
 free_encode_tree(struct huffman_tree *tree)
 {
-    /* Freeing via left rotations is an easy iterative way to destroy tree. */
-    struct huffman_node *cur = tree->root;
-    while (cur)
-    {
-        if (cur->link[0])
-        {
-            struct huffman_node *const zero = cur->link[0];
-            cur->link[0] = cur->link[0]->link[1];
-            zero->link[1] = cur;
-            cur = zero;
-            continue;
-        }
-        struct huffman_node *const next = cur->link[1];
-        free(cur);
-        cur = next;
-    }
+    prog_assert(buf_alloc(&tree->nodes, 0, std_alloc) == CCC_RESULT_OK);
     tree->num_leaves = 0;
     tree->num_nodes = 0;
-    tree->root = NULL;
+    tree->root = 0;
 }
 
 /* NOLINTBEGIN(*misc-no-recursion) */
 
 [[maybe_unused]] static void
-print_tree(struct huffman_node const *const tree)
+print_tree(struct huffman_tree const *const tree, size_t const node)
 {
     if (!tree)
     {
         return;
     }
-    print_node(tree);
-    print_inner_tree(tree->link[1], BRANCH, "");
-    print_inner_tree(tree->link[0], LEAF, "");
+    print_node(tree, node);
+    print_inner_tree(tree, branch_i(tree, node, 1), BRANCH, "");
+    print_inner_tree(tree, branch_i(tree, node, 0), LEAF, "");
 }
 
 [[maybe_unused]] static void
-print_inner_tree(struct huffman_node const *const root,
+print_inner_tree(struct huffman_tree const *const tree, size_t const node,
                  enum print_branch const branch_type, char const *const prefix)
 {
-    if (!root)
+    if (!node)
     {
         return;
     }
     printf("%s", prefix);
     printf("%s", branch_type == LEAF ? " └──" : " ├──");
 
-    print_node(root);
+    print_node(tree, node);
 
     char *str = NULL;
     int const string_length = snprintf(NULL, 0, "%s%s", prefix,
@@ -672,29 +710,29 @@ print_inner_tree(struct huffman_node const *const root,
         printf("memory exceeded. Cannot display tree.\n");
         return;
     }
-
+    struct huffman_node const *const root = node_at(tree, node);
     if (!root->link[1])
     {
-        print_inner_tree(root->link[0], LEAF, str);
+        print_inner_tree(tree, root->link[0], LEAF, str);
     }
     else if (!root->link[0])
     {
-        print_inner_tree(root->link[1], LEAF, str);
+        print_inner_tree(tree, root->link[1], LEAF, str);
     }
     else
     {
-        print_inner_tree(root->link[1], BRANCH, str);
-        print_inner_tree(root->link[0], LEAF, str);
+        print_inner_tree(tree, root->link[1], BRANCH, str);
+        print_inner_tree(tree, root->link[0], LEAF, str);
     }
     free(str);
 }
 
 [[maybe_unused]] static void
-print_node(struct huffman_node const *const root)
+print_node(struct huffman_tree const *const tree, size_t const node)
 {
-    if (is_leaf(root))
+    if (is_leaf(tree, node))
     {
-        switch (root->ch)
+        switch (char_i(tree, node))
         {
             case '\n':
                 printf("(\\n)\n");
@@ -715,7 +753,7 @@ print_node(struct huffman_node const *const root)
                 printf("(\\b)\n");
                 break;
             default:
-                printf("(%c)\n", root->ch);
+                printf("(%c)\n", char_i(tree, node));
         }
     }
     else
@@ -725,8 +763,9 @@ print_node(struct huffman_node const *const root)
 }
 
 [[maybe_unused]] static bool
-is_leaf(struct huffman_node const *const root)
+is_leaf(struct huffman_tree const *const tree, size_t const node)
 {
+    struct huffman_node const *const root = node_at(tree, node);
     return !root->link[0] && !root->link[1];
 }
 
@@ -854,4 +893,19 @@ path_memo_eq(ccc_any_key_cmp const cmp)
 {
     struct path_memo const *const type = (struct path_memo *)cmp.any_type_rhs;
     return *(char *)cmp.any_key_lhs == type->ch;
+}
+
+/*=========================     Help Message      ===========================*/
+
+static void
+print_help(void)
+{
+    static char const *const msg
+        = "Compress and Decompress Files:\n-c=/file/name - [c]ompress the "
+          "specified file to create a samples/output/name.ccc file\n"
+          "-d=/samples/output/name.ccc - [d]ecompress the specified file to "
+          "create a samples/output/name file\nSample "
+          "Command:\n./build/bin/compress -c=README.md "
+          "-d=samples/output/README.md.ccc\n";
+    printf("%s", msg);
 }
