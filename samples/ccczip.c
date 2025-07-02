@@ -109,6 +109,7 @@ struct huffman_tree
 {
     ccc_buffer bump_arena;
     size_t root;
+    size_t num_nodes;
     size_t num_leaves;
 };
 
@@ -375,8 +376,7 @@ compress_tree(struct huffman_tree *const tree)
     };
     check(ret.arena.arena);
     ret.leaf_string.start = str_arena_alloc(&ret.arena, 0);
-    check(bitq_reserve(&ret.tree_paths, (tree->num_leaves * 2) - 1)
-          == CCC_RESULT_OK);
+    check(bitq_reserve(&ret.tree_paths, tree->num_nodes) == CCC_RESULT_OK);
     size_t cur = tree->root;
     /* To properly emulate a recursive Pre-Order traversal with iteration we
        use the parent field for backtracking and an iterator for caching and
@@ -501,7 +501,7 @@ build_encoding_tree(FILE *const f)
         .root = 0,
     };
     flat_priority_queue pq = build_encoding_pq(f, &ret);
-    ret.num_leaves = size(&pq).count;
+    ret.num_leaves = ret.num_nodes = size(&pq).count;
     while (size(&pq).count >= 2)
     {
         /* Small elements and we need the pair so we can't hold references. */
@@ -520,6 +520,7 @@ build_encoding_tree(FILE *const f)
         check(internal_one);
         node_at(&ret, zero.node)->parent = new_root;
         node_at(&ret, one.node)->parent = new_root;
+        ++ret.num_nodes;
         struct fpq_elem const *const pushed
             = push(&pq, &(struct fpq_elem){.freq = zero.freq + one.freq,
                                            .node = new_root});
@@ -694,8 +695,9 @@ reconstruct_tree(struct compressed_huffman_tree *const blueprint)
     struct huffman_tree ret = {
         .bump_arena
         = ccc_buf_init((struct huffman_node *)NULL, std_alloc, NULL, 0),
+        .num_nodes = bitq_size(&blueprint->tree_paths),
     };
-    check(reserve(&ret.bump_arena, (2 * ret.num_leaves), std_alloc)
+    check(reserve(&ret.bump_arena, ret.num_nodes + 1, std_alloc)
           == CCC_RESULT_OK);
     /* 0 index is NULL so real data can't be there. */
     check(push_back(&ret.bump_arena, &(struct huffman_node){}));
@@ -904,6 +906,7 @@ free_encode_tree(struct huffman_tree *tree)
     check(clear_and_free_reserve(&tree->bump_arena, NULL, std_alloc)
           == CCC_RESULT_OK);
     tree->num_leaves = 0;
+    tree->num_nodes = 0;
     tree->root = 0;
 }
 
