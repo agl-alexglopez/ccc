@@ -277,9 +277,12 @@ struct probe_sequence
     size_t stride;
 };
 
+/** @private Helper type for obtaining a search result on the map. */
 struct query
 {
+    /** The slot in the table. */
     size_t i;
+    /** Status indicating occupied, vacant, or possible error. */
     enum ccc_entry_status stats;
 };
 
