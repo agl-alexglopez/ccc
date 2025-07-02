@@ -206,8 +206,8 @@ static ccc_tribool bitq_test(struct bitq const *, size_t i);
 static size_t bitq_size(struct bitq const *bq);
 static void bitq_clear_and_free(struct bitq *);
 static ccc_result bitq_reserve(struct bitq *, size_t to_add);
-static uint64_t hash_ch(ccc_any_key to_hash);
-static ccc_tribool ch_eq(ccc_any_key_cmp);
+static uint64_t hash_char(ccc_any_key to_hash);
+static ccc_tribool char_eq(ccc_any_key_cmp);
 static ccc_threeway_cmp cmp_freqs(ccc_any_type_cmp cmp);
 static ccc_tribool path_memo_eq(ccc_any_key_cmp cmp);
 static void memoize_path(struct huffman_tree *tree, flat_hash_map *fh,
@@ -318,7 +318,10 @@ main(int argc, char **argv)
             todo.unzip = raw_file;
         }
     }
-    zip_file(todo.zip);
+    if (!sv_empty(todo.zip))
+    {
+        zip_file(todo.zip);
+    }
     if (!sv_empty(todo.unzip))
     {
         unzip_file(todo.unzip);
@@ -421,7 +424,7 @@ build_encoding_bitq(FILE *const f, struct huffman_tree *const tree)
     /* By memoizing known bit sequences we can save significant time by not
        performing a DFS over the tree. This is especially helpful for large
        alphabets aka trees with many leaves. */
-    flat_hash_map memo = ccc_fhm_init(NULL, struct path_memo, ch, hash_ch,
+    flat_hash_map memo = ccc_fhm_init(NULL, struct path_memo, ch, hash_char,
                                       path_memo_eq, NULL, NULL, 0);
     check(reserve(&memo, tree->num_leaves, std_alloc) == CCC_RESULT_OK);
     foreach_filechar(f, c, {
@@ -546,7 +549,7 @@ build_encoding_pq(FILE *const f, struct huffman_tree *const tree)
     /* For a buffer based tree 0 is the NULL node so we can't have actual data
        we want at that index in the tree. */
     check(push_back(&tree->bump_arena, &(struct huffman_node){}));
-    flat_hash_map fh = fhm_init(NULL, struct char_freq, ch, hash_ch, ch_eq,
+    flat_hash_map fh = fhm_init(NULL, struct char_freq, ch, hash_char, char_eq,
                                 std_alloc, NULL, 0);
     foreach_filechar(f, c, {
         struct char_freq *const cf
@@ -1093,14 +1096,14 @@ are their own unique value across all characters we will encounter. So the
 hashed value will just be the character repeated at the high and low byte. We
 should not expect any collisions for such a value and data set. */
 static uint64_t
-hash_ch(ccc_any_key const to_hash)
+hash_char(ccc_any_key const to_hash)
 {
     char const key = *(char *)to_hash.any_key;
     return ((uint64_t)key << 55) | key;
 }
 
 static ccc_tribool
-ch_eq(ccc_any_key_cmp const cmp)
+char_eq(ccc_any_key_cmp const cmp)
 {
     struct char_freq const *const type = (struct char_freq *)cmp.any_type_rhs;
     return *(char *)cmp.any_key_lhs == type->ch;
