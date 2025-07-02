@@ -57,7 +57,8 @@ Initialize the container with memory, callbacks, and permissions. */
 /**@{*/
 
 /** @brief Initialize a fpq as a min or max heap.
-@param [in] mem_ptr a pointer to an array of user types or ((T *)NULL).
+@param [in] mem_ptr a pointer to an array of user types or NULL.
+@param [in] any_type_name the name of the user type.
 @param [in] cmp_order CCC_LES or CCC_GRT for min or max heap, respectively.
 @param [in] cmp_fn the user defined comarison function for user types.
 @param [in] alloc_fn the allocation function or NULL if no allocation.
@@ -69,11 +70,14 @@ operator. (i.e. ccc_flat_priority_queue q = ccc_fpq_init(...);).
 Note that to avoid temporary or unpredictable allocation the fpq requires one
 slot for swapping. Therefore if the user wants a fixed size fpq of size N,
 N + 1 capacity is required. */
-#define ccc_fpq_init(mem_ptr, cmp_order, cmp_fn, alloc_fn, aux_data, capacity) \
-    ccc_impl_fpq_init(mem_ptr, cmp_order, cmp_fn, alloc_fn, aux_data, capacity)
+#define ccc_fpq_init(mem_ptr, any_type_name, cmp_order, cmp_fn, alloc_fn,      \
+                     aux_data, capacity)                                       \
+    ccc_impl_fpq_init(mem_ptr, any_type_name, cmp_order, cmp_fn, alloc_fn,     \
+                      aux_data, capacity)
 
 /** @brief Order an existing array of elements as a min or max heap. O(N).
-@param [in] mem_ptr a pointer to an array of user types or ((T *)NULL).
+@param [in] mem_ptr a pointer to an array of user types or NULL.
+@param [in] any_type_name the name of the user type.
 @param [in] cmp_order CCC_LES or CCC_GRT for min or max heap, respectively.
 @param [in] cmp_fn the user defined comparison function for user types.
 @param [in] alloc_fn the allocation function or NULL if no allocation.
@@ -86,10 +90,10 @@ operator. (i.e. ccc_flat_priority_queue q = ccc_fpq_heapify_init(...);).
 Note that to avoid temporary or unpredictable allocation the fpq requires one
 slot for swapping. Therefore if the user wants a fixed size fpq of size N,
 N + 1 capacity is required. */
-#define ccc_fpq_heapify_init(mem_ptr, cmp_order, cmp_fn, alloc_fn, aux_data,   \
-                             capacity, size)                                   \
-    ccc_impl_fpq_heapify_init(mem_ptr, cmp_order, cmp_fn, alloc_fn, aux_data,  \
-                              capacity, size)
+#define ccc_fpq_heapify_init(mem_ptr, any_type_name, cmp_order, cmp_fn,        \
+                             alloc_fn, aux_data, capacity, size)               \
+    ccc_impl_fpq_heapify_init(mem_ptr, any_type_name, cmp_order, cmp_fn,       \
+                              alloc_fn, aux_data, capacity, size)
 
 /** @brief Copy the fpq from src to newly initialized dst.
 @param [in] dst the destination that will copy the source fpq.

@@ -54,24 +54,25 @@ void *ccc_impl_fpq_update_fixup(struct ccc_fpq *, void *);
 /*======================    Macro Implementations    ========================*/
 
 /** @private */
-#define ccc_impl_fpq_init(impl_mem_ptr, impl_cmp_order, impl_cmp_fn,           \
-                          impl_alloc_fn, impl_aux_data, impl_capacity)         \
+#define ccc_impl_fpq_init(impl_mem_ptr, impl_any_type_name, impl_cmp_order,    \
+                          impl_cmp_fn, impl_alloc_fn, impl_aux_data,           \
+                          impl_capacity)                                       \
     {                                                                          \
-        .buf = ccc_buf_init(impl_mem_ptr, impl_alloc_fn, impl_aux_data,        \
-                            impl_capacity),                                    \
+        .buf = ccc_buf_init(impl_mem_ptr, impl_any_type_name, impl_alloc_fn,   \
+                            impl_aux_data, impl_capacity),                     \
         .cmp = (impl_cmp_fn),                                                  \
         .order = (impl_cmp_order),                                             \
     }
 
 /** @private */
-#define ccc_impl_fpq_heapify_init(impl_mem_ptr, impl_cmp_order, impl_cmp_fn,   \
-                                  impl_alloc_fn, impl_aux_data, impl_capacity, \
-                                  impl_size)                                   \
+#define ccc_impl_fpq_heapify_init(impl_mem_ptr, impl_any_type_name,            \
+                                  impl_cmp_order, impl_cmp_fn, impl_alloc_fn,  \
+                                  impl_aux_data, impl_capacity, impl_size)     \
     (__extension__({                                                           \
         __auto_type impl_fpq_heapify_mem = (impl_mem_ptr);                     \
         struct ccc_fpq impl_fpq_heapify_res = ccc_impl_fpq_init(               \
-            impl_fpq_heapify_mem, impl_cmp_order, impl_cmp_fn, impl_alloc_fn,  \
-            impl_aux_data, impl_capacity);                                     \
+            impl_fpq_heapify_mem, impl_any_type_name, impl_cmp_order,          \
+            impl_cmp_fn, impl_alloc_fn, impl_aux_data, impl_capacity);         \
         ccc_impl_fpq_in_place_heapify(&impl_fpq_heapify_res, (impl_size));     \
         impl_fpq_heapify_res;                                                  \
     }))

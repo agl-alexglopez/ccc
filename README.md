@@ -229,7 +229,7 @@ int
 main(void)
 {
     /* stack array, no allocation permission, no aux data, capacity 2 */
-    flat_double_ended_queue q = fdeq_init((int[2]){}, NULL, NULL, 2);
+    flat_double_ended_queue q = fdeq_init((int[2]){}, int, NULL, NULL, 2);
     (void)push_back(&q, &(int){3});
     (void)push_front(&q, &(int){2});
     (void)push_back(&q, &(int){1}); /* Overwrite 2. */
@@ -352,8 +352,9 @@ main(void)
                     -3, 90, 20,  27, 97, -22, -20, -19, 70, 76};
     /* Heapify existing array of values, with capacity, size one less than
        capacity for swap space, min priority queue, no allocation, no aux. */
-    flat_priority_queue pq = fpq_heapify_init(
-        heap, CCC_LES, int_cmp, NULL, NULL, (sizeof(heap) / sizeof(int)), 19);
+    flat_priority_queue pq
+        = fpq_heapify_init(heap, int, CCC_LES, int_cmp, NULL, NULL,
+                           (sizeof(heap) / sizeof(int)), 19);
     (void)fpq_update_w(&pq, &heap[5], { heap[5] -= 4; });
     int prev = *((int *)front(&pq));
     (void)pop(&pq);
@@ -880,7 +881,7 @@ Non-Intrusive containers exist when a flat container can operate without such he
 /* For example: */
 
 ccc_flat_priority_queue fpq
-    = ccc_fpq_init((int[40]){}, CCC_LES, int_cmp, NULL, NULL, 40);
+    = ccc_fpq_init((int[40]){}, int, CCC_LES, int_cmp, NULL, NULL, 40);
 
 ```
 
@@ -888,7 +889,7 @@ Here a small min priority queue of integers with a maximum capacity of 40 has be
 
 ```c
 ccc_flat_priority_queue fpq
-    = ccc_fpq_init((int *)NULL, CCC_LES, int_cmp, std_alloc, NULL, 0);
+    = ccc_fpq_init(NULL, int, CCC_LES, int_cmp, std_alloc, NULL, 0);
 ```
 
 Notice that we need to help the container by casting to the type we are storing. The interface then looks like this.

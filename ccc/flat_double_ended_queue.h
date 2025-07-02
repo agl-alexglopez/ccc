@@ -68,14 +68,17 @@ Initialize and create containers with memory, callbacks, and permissions. */
 
 /** @brief Initialize the fdeq with memory and allocation permission.
 @param [in] mem_ptr a pointer to existing memory or ((T *)NULL).
+@param [in] any_type_name the name of the user type.
 @param [in] alloc_fn the allocator function, if allocation is allowed.
 @param [in] aux_data any auxiliary data needed for element destruction.
 @param [in] capacity the number of contiguous elements at mem_ptr
 @param [in] optional_size an optional initial size between 1 and capacity.
 @return the fdeq on the right hand side of an equality operator at runtime or
 compiletime (e.g. ccc_flat_double_ended_queue q = ccc_fdeq_init(...);) */
-#define ccc_fdeq_init(mem_ptr, alloc_fn, aux_data, capacity, optional_size...) \
-    ccc_impl_fdeq_init(mem_ptr, alloc_fn, aux_data, capacity, optional_size)
+#define ccc_fdeq_init(mem_ptr, any_type_name, alloc_fn, aux_data, capacity,    \
+                      optional_size...)                                        \
+    ccc_impl_fdeq_init(mem_ptr, any_type_name, alloc_fn, aux_data, capacity,   \
+                       optional_size)
 
 /** @brief Copy the fdeq from src to newly initialized dst.
 @param [in] dst the destination that will copy the source fdeq.

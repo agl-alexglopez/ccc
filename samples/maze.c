@@ -250,7 +250,7 @@ animate_maze(struct maze *maze)
                            std_alloc);
     prog_assert(r == CCC_RESULT_OK);
     /* Priority queue gets same reserve interface. */
-    flat_priority_queue cell_pq = fpq_init((struct prim_cell *)NULL, CCC_LES,
+    flat_priority_queue cell_pq = fpq_init(NULL, struct prim_cell, CCC_LES,
                                            cmp_prim_cells, NULL, NULL, 0);
     r = fpq_reserve(&cell_pq, ((maze->rows * maze->cols) / 2) + 1, std_alloc);
     prog_assert(r == CCC_RESULT_OK);
