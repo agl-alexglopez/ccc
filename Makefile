@@ -28,27 +28,27 @@ install:
 	cmake --build $(BUILD_DIR) $(JOBS) --target install $(JOBS)
 
 gcc-rel:
-	cmake --preset=gcc-rel
+	cmake --preset=gcc-rel -DCMAKE_INSTALL_PREFIX=$(PREFIX)
 	$(MAKE) build
 
 gcc-deb:
-	cmake --preset=gcc-deb
+	cmake --preset=gcc-deb -DCMAKE_INSTALL_PREFIX=$(PREFIX)
 	$(MAKE) build
 
 clang-rel:
-	cmake --preset=clang-rel
+	cmake --preset=clang-rel -DCMAKE_INSTALL_PREFIX=$(PREFIX)
 	$(MAKE) build
 
 clang-deb:
-	cmake --preset=clang-deb
+	cmake --preset=clang-deb -DCMAKE_INSTALL_PREFIX=$(PREFIX)
 	$(MAKE) build
 
 rsan:
-	cmake --preset=rsan
+	cmake --preset=rsan -DCMAKE_INSTALL_PREFIX=$(PREFIX)
 	$(MAKE) build
 
 dsan:
-	cmake --preset=dsan
+	cmake --preset=dsan -DCMAKE_INSTALL_PREFIX=$(PREFIX)
 	$(MAKE) build
 
 format:
@@ -67,22 +67,22 @@ util:
 	cmake --build $(BUILD_DIR) $(JOBS) --target util $(JOBS)
 
 all-gcc-deb:
-	cmake --preset=gcc-deb && cmake --build build $(JOBS) --target ccc tests samples
+	cmake --preset=gcc-deb -DCMAKE_INSTALL_PREFIX=$(PREFIX) && cmake --build build $(JOBS) --target ccc tests samples
 
 all-gcc-rel:
-	cmake --preset=gcc-rel && cmake --build build $(JOBS) --target ccc tests samples
+	cmake --preset=gcc-rel -DCMAKE_INSTALL_PREFIX=$(PREFIX) && cmake --build build $(JOBS) --target ccc tests samples
 
 all-dsan:
-	cmake --preset=dsan && cmake --build build $(JOBS) --target ccc tests samples
+	cmake --preset=dsan -DCMAKE_INSTALL_PREFIX=$(PREFIX) && cmake --build build $(JOBS) --target ccc tests samples
 
 all-rsan:
-	cmake --preset=rsan && cmake --build build $(JOBS) --target ccc tests samples
+	cmake --preset=rsan -DCMAKE_INSTALL_PREFIX=$(PREFIX) && cmake --build build $(JOBS) --target ccc tests samples
 
 all-clang-deb:
-	cmake --preset=clang-deb && cmake --build build $(JOBS) --target ccc tests samples
+	cmake --preset=clang-deb -DCMAKE_INSTALL_PREFIX=$(PREFIX) && cmake --build build $(JOBS) --target ccc tests samples
 
 all-clang-rel:
-	cmake --preset=clang-rel && cmake --build build $(JOBS) --target ccc tests samples
+	cmake --preset=clang-rel -DCMAKE_INSTALL_PREFIX=$(PREFIX) && cmake --build build $(JOBS) --target ccc tests samples
 
 dtest: tests
 	cmake --build build $(JOBS) --target tests
