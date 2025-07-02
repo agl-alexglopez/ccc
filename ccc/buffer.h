@@ -102,6 +102,82 @@ These functions assume contiguity of elements in the buffer and increase or
 decrease size accordingly. */
 /**@{*/
 
+/** @brief Reserves space for at least to_add more elements.
+@param [in] buf a pointer to the buffer.
+@param [in] to_add the number of elements to add to the current size.
+@param [in] fn the allocation function to use to reserve memory.
+@return the result of the reservation. OK if successful, otherwise an error
+status is returned.
+@note see the ccc_buf_clear_and_free_reserve function if this function is
+being used for a one-time dynamic reservation.
+
+This function can be used for a dynamic buf with or without allocation
+permission. If the buf has allocation permission, it will reserve the required
+space and later resize if more space is needed.
+
+If the buf has been initialized with no allocation permission and no memory
+this function can serve as a one-time reservation. To free the buf in such a
+case see the ccc_buf_clear_and_free_reserve function. */
+[[nodiscard]] ccc_result ccc_buf_reserve(ccc_buffer *buf, size_t to_add,
+                                         ccc_any_alloc_fn *fn);
+
+/** @brief Frees all slots in the buf and frees the underlying buffer that was
+previously dynamically reserved with the reserve function.
+@param [in] buf the buffer to be cleared.
+@param [in] destructor the destructor for each element. NULL can be passed if no
+maintenance is required on the elements in the buf before their slots are
+dropped.
+@param [in] alloc the required allocation function to provide to a dynamically
+reserved buf. Any auxiliary data provided upon initialization will be passed to
+the allocation function when called.
+@return the result of free operation. OK if success, or an error status to
+indicate the error.
+@warning It is an error to call this function on a buf that was not reserved
+with the provided ccc_any_alloc_fn. The buf must have existing memory to free.
+
+This function covers the edge case of reserving a dynamic capacity for a buf
+at runtime but denying the buf allocation permission to resize. This can help
+prevent a buf from growing unbounded. The user in this case knows the buf does
+not have allocation permission and therefore no further memory will be dedicated
+to the buf.
+
+However, to free the buf in such a case this function must be used because the
+buf has no ability to free itself. Just as the allocation function is required
+to reserve memory so to is it required to free memory.
+
+This function will work normally if called on a buf with allocation permission
+however the normal ccc_buf_clear_and_free is sufficient for that use case.
+Elements are assumed to be contiguous from the 0th index to index at size - 1.*/
+ccc_result
+ccc_buf_clear_and_free_reserve(ccc_buffer *buf,
+                               ccc_any_type_destructor_fn *destructor,
+                               ccc_any_alloc_fn *alloc);
+
+/** @brief Set size of buf to 0 and call destructor on each element if needed.
+Free the underlying buffer setting the capacity to 0. O(1) if no destructor is
+provided, else O(N).
+@param [in] buf a pointer to the buf.
+@param [in] destructor the destructor if needed or NULL.
+
+Note that if destructor is non-NULL it will be called on each element in the
+buf. After all elements are processed the buffer is freed and capacity is 0.
+If destructor is NULL the buffer is freed directly and capacity is 0. Elements
+are assumed to be contiguous from the 0th index to index at size - 1.*/
+ccc_result ccc_buf_clear_and_free(ccc_buffer *buf,
+                                  ccc_any_type_destructor_fn *destructor);
+
+/** @brief Set size of buf to 0 and call destructor on each element if needed.
+O(1) if no destructor is provided, else O(N).
+@param [in] buf a pointer to the buf.
+@param [in] destructor the destructor if needed or NULL.
+
+Note that if destructor is non-NULL it will be called on each element in the
+buf. However, the underlying buffer for the buf is not freed. If the
+destructor is NULL, setting the size to 0 is O(1). Elements are assumed to be
+contiguous from the 0th index to index at size - 1.*/
+ccc_result ccc_buf_clear(ccc_buffer *buf,
+                         ccc_any_type_destructor_fn *destructor);
+
 /** @brief allocates the buffer to the specified size according to the user
 defined allocation function.
 @param [in] buf a pointer to the buffer.

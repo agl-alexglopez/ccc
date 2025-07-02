@@ -723,6 +723,8 @@ ccc_hom_clear_and_free(ccc_handle_ordered_map *const hom,
         hom->count = 0;
         hom->capacity = 0;
         (void)hom->alloc(hom->data, 0, hom->aux);
+        hom->data = NULL;
+        hom->nodes = NULL;
         return CCC_RESULT_OK;
     }
     while (!ccc_hom_is_empty(hom))
@@ -737,6 +739,8 @@ ccc_hom_clear_and_free(ccc_handle_ordered_map *const hom,
     hom->root = 0;
     hom->capacity = 0;
     (void)hom->alloc(hom->data, 0, hom->aux);
+    hom->data = NULL;
+    hom->nodes = NULL;
     return CCC_RESULT_OK;
 }
 
@@ -755,6 +759,7 @@ ccc_hom_clear_and_free_reserve(ccc_handle_ordered_map *const hom,
         hom->count = 0;
         hom->capacity = 0;
         (void)alloc(hom->data, 0, hom->aux);
+        hom->data = NULL;
         return CCC_RESULT_OK;
     }
     while (!ccc_hom_is_empty(hom))
@@ -769,6 +774,7 @@ ccc_hom_clear_and_free_reserve(ccc_handle_ordered_map *const hom,
     hom->root = 0;
     hom->capacity = 0;
     (void)alloc(hom->data, 0, hom->aux);
+    hom->data = NULL;
     return CCC_RESULT_OK;
 }
 
