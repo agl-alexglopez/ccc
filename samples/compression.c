@@ -646,17 +646,18 @@ open_cccz(str_view original_filepath)
 }
 
 static size_t
-writebytes(FILE *const f, void const *base, size_t const to_write)
+writebytes(FILE *const f, void const *const base, size_t const to_write)
 {
     size_t count = 0;
+    char const *p = base;
     while (count < to_write)
     {
-        int const writ = fputc(*(char *)base, f);
+        int const writ = fputc(*p, f);
         if (writ == EOF)
         {
             return count;
         }
-        base = (char *)base + 1;
+        ++p;
         ++count;
     }
     return count;
@@ -665,7 +666,7 @@ writebytes(FILE *const f, void const *base, size_t const to_write)
 /*=========================     Huffman Decoding    =========================*/
 
 static void
-decompress_file(str_view to_decompress)
+decompress_file(str_view const to_decompress)
 {
     struct huffman_encoding he = read_from_file(to_decompress);
     struct huffman_tree tree = reconstruct_tree(&he.blueprint);
@@ -692,12 +693,14 @@ reconstruct_tree(struct compressed_huffman_tree *const blueprint)
     check(buf_alloc(&ret.nodes, ret.num_nodes + 1, std_alloc) == CCC_RESULT_OK);
     /* 0 index is NULL so real data can't be there. */
     check(push_back(&ret.nodes, &(struct huffman_node){}));
+    /* By creating the root outside of the main loop we can be sure we always
+       have valid prev node. Don't need to check on every loop iteration. */
     struct huffman_node const *const first
         = push_back(&ret.nodes, &(struct huffman_node){});
     ret.root = buf_i(&ret.nodes, first).count;
+    (void)bitq_pop_front(&blueprint->tree_paths);
     size_t prev = ret.root;
     size_t cur = 0;
-    (void)bitq_pop_front(&blueprint->tree_paths);
     size_t ch_i = 0;
     while (bitq_size(&blueprint->tree_paths))
     {
@@ -742,6 +745,8 @@ reconstruct_text(FILE *const f, struct huffman_tree const *const tree,
     size_t cur = tree->root;
     while (bitq_size(bq))
     {
+        /* All paths started from the root during encoding and chose a direction
+           first so popping is OK here. Root 1 node never was pushed to q. */
         ccc_tribool const bit = bitq_pop_front(bq);
         check(bit != CCC_TRIBOOL_ERROR);
         cur = branch_i(tree, cur, bit);
@@ -822,9 +827,10 @@ fill_bitq(FILE *const f, struct bitq *const bq, size_t expected_bits)
 }
 
 static size_t
-readbytes(FILE *const f, void *base, size_t const to_read)
+readbytes(FILE *const f, void *const base, size_t const to_read)
 {
     size_t count = 0;
+    char *p = base;
     while (count < to_read)
     {
         int const read = fgetc(f);
@@ -832,8 +838,7 @@ readbytes(FILE *const f, void *base, size_t const to_read)
         {
             return count;
         }
-        *(char *)base = (char)read;
-        base = (char *)base + 1;
+        *p++ = (char)read;
         ++count;
     }
     return count;
@@ -1122,11 +1127,13 @@ static void
 print_help(void)
 {
     static char const *const msg
-        = "Compress and Decompress Files:\n-c=/file/name - [c]ompress the "
-          "specified file to create a samples/output/name.ccc file\n"
-          "-d=/samples/output/name.ccc - [d]ecompress the specified file to "
-          "create a samples/output/name file\nSample "
-          "Command:\n./build/bin/compress -c=README.md "
-          "-d=samples/output/README.md.ccc\n";
+        = "Compress and Decompress Files:\n\n\t-c=/file/name - [c]ompress the "
+          "file to create a samples/output/name.ccc file\n\t"
+          "-d=/samples/output/name.ccc - [d]ecompress the file to "
+          "create a samples/output/name file\n\nNote: Compression comes before "
+          "decompression.\nThe following command compresses a file and then "
+          "decompresses it.\nThe final copy of the original file is in the "
+          "output directory.\nSample Command:\n./build/bin/compress "
+          "-c=README.md -d=samples/output/README.md.ccc\n";
     printf("%s", msg);
 }
