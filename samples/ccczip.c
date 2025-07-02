@@ -174,7 +174,7 @@ struct huffman_header
     /** The number of leaves in the tree minus 1. Subtract 1 in case we actually
         have all 256 characters used as leaves in which case they could only
         be recorded in the file as 255, the number that fits in uint8_t. */
-    uint8_t leaf_count_minus_one;
+    uint8_t leaves_minus_one;
     /** Number of bits in the file content bit queue we encoded. */
     size_t file_bits_count;
     /** A reference to the encoding to access the needed bit queues. */
@@ -189,7 +189,7 @@ struct ccczip_actions
 
 /** File format "cccz" in header. */
 static uint32_t const cccz_magic = 0x6363637A;
-static str_view const proj_output_dir = SV("samples/output/");
+static str_view const output_dir = SV("samples/output/");
 static str_view const cccz_suffix = SV(".cccz");
 
 /*===========================      Prototypes      ==========================*/
@@ -345,7 +345,7 @@ zip_file(str_view const to_compress)
         to_compress,
         &(struct huffman_header){
             .magic = cccz_magic,
-            .leaf_count_minus_one = encoding.blueprint.leaf_string.len - 1,
+            .leaves_minus_one = encoding.blueprint.leaf_string.len - 1,
             .file_bits_count = bitq_size(&encoding.file_bits),
             .encoding = &encoding,
         });
@@ -583,14 +583,14 @@ write_to_file(str_view const original_filepath,
     FILE *const cccz = open_cccz(original_filepath);
     check(writebytes(cccz, &header->magic, sizeof(header->magic))
           == sizeof(header->magic));
-    check(writebytes(cccz, &header->leaf_count_minus_one,
-                     sizeof(header->leaf_count_minus_one))
-          == sizeof(header->leaf_count_minus_one));
+    check(writebytes(cccz, &header->leaves_minus_one,
+                     sizeof(header->leaves_minus_one))
+          == sizeof(header->leaves_minus_one));
     char const *leaf_string
         = str_arena_at(&header->encoding->blueprint.arena,
                        header->encoding->blueprint.leaf_string.start);
-    check(writebytes(cccz, leaf_string, header->leaf_count_minus_one + 1)
-          == (size_t)(header->leaf_count_minus_one + 1));
+    check(writebytes(cccz, leaf_string, header->leaves_minus_one + 1)
+          == (size_t)(header->leaves_minus_one + 1));
     check(writebytes(cccz, &header->file_bits_count,
                      sizeof(header->file_bits_count))
           == sizeof(header->file_bits_count));
@@ -632,11 +632,11 @@ open_cccz(str_view original_filepath)
                                 ? original_filepath
                                 : sv_substr(original_filepath, dir_delim + 1,
                                             sv_len(original_filepath));
-    check(sv_size(proj_output_dir) + sv_size(raw_file) + sv_size(cccz_suffix)
+    check(sv_size(output_dir) + sv_size(raw_file) + sv_size(cccz_suffix)
           < FILESYS_MAX_PATH);
     char path_to_cccz[FILESYS_MAX_PATH];
     size_t const path_bytes
-        = sv_fill(sv_size(proj_output_dir), path_to_cccz, proj_output_dir);
+        = sv_fill(sv_size(output_dir), path_to_cccz, output_dir);
     size_t const file_bytes
         = sv_fill(sv_size(raw_file), path_to_cccz + (path_bytes - 1), raw_file);
     (void)sv_fill(sv_size(cccz_suffix),
@@ -790,16 +790,16 @@ fill_header(FILE *const f, struct huffman_header *const header)
                   == sizeof(header->magic)
               && header->magic == cccz_magic,
           (void)fprintf(stderr, "bad magic in header of .cccz file\n"););
-    check(readbytes(f, &header->leaf_count_minus_one,
-                    sizeof(header->leaf_count_minus_one))
-          == sizeof(header->leaf_count_minus_one));
+    check(readbytes(f, &header->leaves_minus_one,
+                    sizeof(header->leaves_minus_one))
+          == sizeof(header->leaves_minus_one));
     struct str_arena *const arena = &header->encoding->blueprint.arena;
     struct leaf_string *const leaves = &header->encoding->blueprint.leaf_string;
-    leaves->start = str_arena_alloc(arena, header->leaf_count_minus_one + 1);
+    leaves->start = str_arena_alloc(arena, header->leaves_minus_one + 1);
     check(leaves->start >= 0);
-    leaves->len = header->leaf_count_minus_one + 1;
+    leaves->len = header->leaves_minus_one + 1;
     check(readbytes(f, str_arena_at(arena, leaves->start), leaves->len)
-          == (size_t)(header->leaf_count_minus_one + 1));
+          == (size_t)(header->leaves_minus_one + 1));
     check(
         readbytes(f, &header->file_bits_count, sizeof(header->file_bits_count))
         == sizeof(header->file_bits_count));
@@ -841,10 +841,9 @@ open_unzipped(str_view unzip)
         = dir_delim == sv_npos(unzip)
             ? unzip
             : sv_substr(unzip, dir_delim + 1, sv_len(unzip));
-    check(sv_size(proj_output_dir) + sv_size(raw_file) < FILESYS_MAX_PATH);
+    check(sv_size(output_dir) + sv_size(raw_file) < FILESYS_MAX_PATH);
     char path[FILESYS_MAX_PATH];
-    size_t const prefix
-        = sv_fill(sv_size(proj_output_dir), path, proj_output_dir);
+    size_t const prefix = sv_fill(sv_size(output_dir), path, output_dir);
     (void)sv_fill(sv_size(raw_file), path + (prefix - 1), raw_file);
     FILE *const f = fopen(path, "w");
     check(f, printf("%s", strerror(errno)););
