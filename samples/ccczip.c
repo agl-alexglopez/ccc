@@ -4,9 +4,11 @@ text files for demonstration purposes. The compression algorithm used now is
 Huffman Encoding and Decoding but more methods could be added later. Such
 algorithms use a wide range of data structures. */
 
+#include <assert.h>
 #include <errno.h>
 #include <inttypes.h>
 #include <limits.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -24,6 +26,7 @@ algorithms use a wide range of data structures. */
 #include "ccc/flat_hash_map.h"
 #include "ccc/flat_priority_queue.h"
 #include "ccc/traits.h"
+#include "ccc/types.h"
 #include "str_arena.h"
 #include "str_view.h"
 
