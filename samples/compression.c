@@ -234,6 +234,7 @@ static struct huffman_encoding read_from_file(str_view to_decompress);
 static FILE *open_decompressed(str_view to_decompress);
 static void fill_header(FILE *, struct huffman_header *);
 static size_t readbytes(FILE *f, void *base, size_t to_read);
+static size_t writebytes(FILE *f, void const *base, size_t to_write);
 static void fill_bitq(FILE *f, struct bitq *bq, size_t expected_bits);
 
 /** Asserts even in release mode. Run code in the second argument if needed. */
@@ -577,16 +578,19 @@ write_to_file(str_view const original_filepath,
               struct huffman_header *const header)
 {
     FILE *const cccz = open_cccz(original_filepath);
-    (void)fprintf(cccz, "%" PRIu32, header->magic);
-    (void)fprintf(cccz, "%" PRIu8, header->leaf_count_minus_one);
-    char const *const leaf_string
+    check(writebytes(cccz, &header->magic, sizeof(header->magic))
+          == sizeof(header->magic));
+    check(writebytes(cccz, &header->leaf_count_minus_one,
+                     sizeof(header->leaf_count_minus_one))
+          == sizeof(header->leaf_count_minus_one));
+    char const *leaf_string
         = str_arena_at(&header->encoding->blueprint.arena,
                        header->encoding->blueprint.leaf_string.start);
-    for (size_t i = 0, end = header->leaf_count_minus_one + 1; i < end; ++i)
-    {
-        (void)fprintf(cccz, "%c", leaf_string[i]);
-    }
-    (void)fprintf(cccz, "%zu", header->file_bits_count);
+    check(writebytes(cccz, leaf_string, header->leaf_count_minus_one + 1)
+          == (size_t)(header->leaf_count_minus_one + 1));
+    check(writebytes(cccz, &header->file_bits_count,
+                     sizeof(header->file_bits_count))
+          == sizeof(header->file_bits_count));
     write_bitq(cccz, &header->encoding->blueprint.tree_paths);
     write_bitq(cccz, &header->encoding->file_bits);
     (void)fclose(cccz);
@@ -595,7 +599,9 @@ write_to_file(str_view const original_filepath,
 static void
 write_bitq(FILE *const cccz, struct bitq *const bq)
 {
-    for (uint8_t buf = 0, biti = 0; bitq_size(bq);)
+    uint8_t buf = 0;
+    uint8_t biti = 0;
+    while (bitq_size(bq))
     {
         static_assert(sizeof(uint8_t) == sizeof(ccc_tribool));
         ccc_tribool const bit = bitq_pop_front(bq);
@@ -603,10 +609,14 @@ write_bitq(FILE *const cccz, struct bitq *const bq)
         ++biti;
         if (biti >= CHAR_BIT)
         {
-            (void)fprintf(cccz, "%" PRIu8, buf);
+            check(writebytes(cccz, &buf, sizeof(buf)));
             buf = 0;
             biti = 0;
         }
+    }
+    if (biti)
+    {
+        check(writebytes(cccz, &buf, sizeof(buf)));
     }
 }
 
@@ -635,6 +645,23 @@ open_cccz(str_view original_filepath)
     return cccz;
 }
 
+static size_t
+writebytes(FILE *const f, void const *base, size_t const to_write)
+{
+    size_t count = 0;
+    while (count < to_write)
+    {
+        int const writ = fputc(*(char *)base, f);
+        if (writ == EOF)
+        {
+            return count;
+        }
+        base = (char *)base + 1;
+        ++count;
+    }
+    return count;
+}
+
 /*=========================     Huffman Decoding    =========================*/
 
 static void
@@ -650,6 +677,86 @@ decompress_file(str_view to_decompress)
     bitq_clear_and_free(&he.blueprint.tree_paths);
     str_arena_free(&he.blueprint.arena);
     (void)fclose(decompressed);
+}
+
+/** Reconstructs a Huffman encoding tree based on the blueprint provided. The
+tree is constructed in linear time and constant space additional to the nodes
+being allocated. */
+static struct huffman_tree
+reconstruct_tree(struct compressed_huffman_tree *const blueprint)
+{
+    struct huffman_tree ret = {
+        .nodes = ccc_buf_init((struct huffman_node *)NULL, std_alloc, NULL, 0),
+        .num_nodes = bitq_size(&blueprint->tree_paths),
+    };
+    check(buf_alloc(&ret.nodes, ret.num_nodes + 1, std_alloc) == CCC_RESULT_OK);
+    /* 0 index is NULL so real data can't be there. */
+    check(push_back(&ret.nodes, &(struct huffman_node){}));
+    struct huffman_node const *const first
+        = push_back(&ret.nodes, &(struct huffman_node){});
+    ret.root = buf_i(&ret.nodes, first).count;
+    size_t prev = ret.root;
+    size_t cur = 0;
+    (void)bitq_pop_front(&blueprint->tree_paths);
+    size_t ch_i = 0;
+    while (bitq_size(&blueprint->tree_paths))
+    {
+        ccc_tribool bit = CCC_TRUE;
+        if (!cur)
+        {
+            struct huffman_node *const prev_node = node_at(&ret, prev);
+            bit = bitq_pop_front(&blueprint->tree_paths);
+            struct huffman_node *const pushed
+                = push_back(&ret.nodes, &(struct huffman_node){.parent = prev});
+            cur = ccc_buf_i(&ret.nodes, pushed).count;
+            prev_node->link[prev_node->iter++] = cur;
+            if (!bit)
+            {
+                pushed->ch = *str_arena_at(&blueprint->arena,
+                                           blueprint->leaf_string.start
+                                               + (str_ofs)ch_i);
+                ++ch_i;
+                ++ret.num_leaves;
+            }
+        }
+        struct huffman_node *const cur_node = node_at(&ret, cur);
+        /* An internal node has further child subtrees to build. */
+        if (bit && cur_node->iter < ITER_END)
+        {
+            prev = cur;
+            cur = cur_node->link[cur_node->iter];
+            continue;
+        }
+        /* Backtrack. A leaf or internal node with both children built. */
+        cur = prev;
+        prev = parent_i(&ret, prev);
+    }
+    print_tree(&ret, ret.root);
+    return ret;
+}
+
+void
+reconstruct_text(FILE *const f, struct huffman_tree const *const tree,
+                 struct bitq *const bq)
+{
+    size_t cur = tree->root;
+    while (bitq_size(bq))
+    {
+        if (!branch_i(tree, cur, 1))
+        {
+            char const c = char_i(tree, cur);
+            check(writebytes(f, &c, sizeof(c)));
+            cur = tree->root;
+        }
+        ccc_tribool const bit = bitq_pop_front(bq);
+        check(bit != CCC_TRIBOOL_ERROR);
+        cur = branch_i(tree, cur, bit);
+    }
+    if (!branch_i(tree, cur, 1))
+    {
+        char const c = char_i(tree, cur);
+        check(writebytes(f, &c, sizeof(c)));
+    }
 }
 
 static struct huffman_encoding
@@ -686,14 +793,13 @@ fill_header(FILE *const f, struct huffman_header *const header)
     leaves->start = str_arena_alloc(arena, header->leaf_count_minus_one + 1);
     check(leaves->start >= 0);
     leaves->len = header->leaf_count_minus_one + 1;
-    check(readbytes(f, str_arena_at(arena, leaves->start),
-                    header->leaf_count_minus_one + 1)
+    check(readbytes(f, str_arena_at(arena, leaves->start), leaves->len)
           == (size_t)(header->leaf_count_minus_one + 1));
     check(
         readbytes(f, &header->file_bits_count, sizeof(header->file_bits_count))
         == sizeof(header->file_bits_count));
     /* The pairing method we used while building the tree makes this true. */
-    size_t const tree_path_bits = ((header->leaf_count_minus_one + 1) * 2) - 1;
+    size_t const tree_path_bits = (leaves->len * 2) - 1;
     fill_bitq(f, &header->encoding->blueprint.tree_paths, tree_path_bits);
     fill_bitq(f, &header->encoding->file_bits, header->file_bits_count);
 }
@@ -708,7 +814,7 @@ fill_bitq(FILE *const f, struct bitq *const bq, size_t expected_bits)
         if (biti == CHAR_BIT)
         {
             check(
-                readbytes(f, &buf, 1),
+                readbytes(f, &buf, sizeof(buf)),
                 (void)fprintf(stderr, "expected more bits from the file.\n"););
             biti = 0;
         }
@@ -758,83 +864,6 @@ open_decompressed(str_view to_decompress)
     FILE *const f = fopen(path, "w");
     check(f, printf("%s", strerror(errno)););
     return f;
-}
-
-/** Reconstructs a Huffman encoding tree based on the blueprint provided. The
-tree is constructed in linear time and constant space additional to the nodes
-being allocated. */
-static struct huffman_tree
-reconstruct_tree(struct compressed_huffman_tree *const blueprint)
-{
-    struct huffman_tree ret = {
-        .nodes = ccc_buf_init((struct huffman_node *)NULL, std_alloc, NULL, 0),
-        .num_nodes = bitq_size(&blueprint->tree_paths),
-    };
-    check(buf_alloc(&ret.nodes, ret.num_nodes + 1, std_alloc) == CCC_RESULT_OK);
-    /* 0 index is NULL so real data can't be there. */
-    check(push_back(&ret.nodes, &(struct huffman_node){}));
-    struct huffman_node const *const first
-        = push_back(&ret.nodes, &(struct huffman_node){});
-    ret.root = buf_i(&ret.nodes, first).count;
-    size_t prev = ret.root;
-    size_t cur = 0;
-    (void)bitq_pop_front(&blueprint->tree_paths);
-    size_t ch_i = 0;
-    while (bitq_size(&blueprint->tree_paths))
-    {
-        ccc_tribool bit = CCC_TRUE;
-        if (!cur)
-        {
-            struct huffman_node *const prev_node = node_at(&ret, prev);
-            bit = bitq_pop_front(&blueprint->tree_paths);
-            struct huffman_node *const pushed
-                = push_back(&ret.nodes, &(struct huffman_node){.parent = prev});
-            cur = ccc_buf_i(&ret.nodes, pushed).count;
-            prev_node->link[prev_node->iter++] = cur;
-            if (!bit)
-            {
-                pushed->ch = *str_arena_at(&blueprint->arena, (str_ofs)ch_i);
-                ++ch_i;
-            }
-        }
-        struct huffman_node *const cur_node = node_at(&ret, cur);
-        /* An internal node has further child subtrees to build. */
-        if (bit && cur_node->iter < ITER_END)
-        {
-            prev = cur;
-            cur = cur_node->link[cur_node->iter];
-            continue;
-        }
-        /* Backtrack. A leaf or internal node with both children built. */
-        cur = prev;
-        prev = parent_i(&ret, prev);
-    }
-    print_tree(&ret, ret.root);
-    return ret;
-}
-
-void
-reconstruct_text(FILE *const f, struct huffman_tree const *const tree,
-                 struct bitq *const bq)
-{
-    size_t cur = tree->root;
-    while (bitq_size(bq))
-    {
-        struct huffman_node const *const node = node_at(tree, cur);
-        if (!node->link[1])
-        {
-            (void)fprintf(f, "%c", node->ch);
-            cur = tree->root;
-        }
-        ccc_tribool const bit = bitq_pop_front(bq);
-        check(bit != CCC_TRIBOOL_ERROR);
-        cur = node->link[bit];
-    }
-    if (!branch_i(tree, cur, 1))
-    {
-        (void)fprintf(f, "%c", char_i(tree, cur));
-    }
-    (void)fclose(f);
 }
 
 /*=========================      Huffman Helpers    =========================*/
