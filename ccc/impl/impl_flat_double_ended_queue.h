@@ -47,11 +47,11 @@ void *ccc_impl_fdeq_alloc_back(struct ccc_fdeq *);
 /*=======================  Macro Implementations   ==========================*/
 
 /** @private */
-#define ccc_impl_fdeq_init(impl_mem_ptr, impl_alloc_fn, impl_aux_data,         \
-                           impl_capacity, optional_size...)                    \
+#define ccc_impl_fdeq_init(impl_mem_ptr, impl_any_type_name, impl_alloc_fn,    \
+                           impl_aux_data, impl_capacity, optional_size...)     \
     {                                                                          \
-        .buf = ccc_buf_init(impl_mem_ptr, impl_alloc_fn, impl_aux_data,        \
-                            impl_capacity, optional_size),                     \
+        .buf = ccc_buf_init(impl_mem_ptr, impl_any_type_name, impl_alloc_fn,   \
+                            impl_aux_data, impl_capacity, optional_size),      \
         .front = 0,                                                            \
     }
 

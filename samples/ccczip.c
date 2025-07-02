@@ -499,7 +499,7 @@ static struct huffman_tree
 build_encoding_tree(FILE *const f)
 {
     struct huffman_tree ret = {
-        .bump_arena = buf_init((struct huffman_node *)NULL, std_alloc, NULL, 0),
+        .bump_arena = buf_init(NULL, struct huffman_node, std_alloc, NULL, 0),
         .root = 0,
     };
     flat_priority_queue pq = build_encoding_pq(f, &ret);
@@ -559,7 +559,7 @@ build_encoding_pq(FILE *const f, struct huffman_tree *const tree)
     });
     check(size(&fh).count >= 2);
     /* Use a buffer to simply push back elements we will heapify at the end. */
-    buffer buf = buf_init((struct fpq_elem *)NULL, NULL, NULL, 0);
+    buffer buf = buf_init(NULL, struct fpq_elem, NULL, NULL, 0);
     /* Add one to reservation for the flat priority queue swap slot. */
     check(reserve(&buf, size(&fh).count + 1, std_alloc) == CCC_RESULT_OK);
     for (struct char_freq const *i = begin(&fh); i != end(&fh);
@@ -578,7 +578,7 @@ build_encoding_pq(FILE *const f, struct huffman_tree *const tree)
     /* The buffer had no allocation permission and set up all the elements we
        needed to be in the flat priority queue. Now we take its memory and
        heapify the data in O(N) time rather than pushing each element. */
-    return fpq_heapify_init((struct fpq_elem *)begin(&buf), CCC_LES, cmp_freqs,
+    return fpq_heapify_init(begin(&buf), struct fpq_elem, CCC_LES, cmp_freqs,
                             NULL, NULL, capacity(&buf).count, size(&buf).count);
 }
 
@@ -697,7 +697,7 @@ reconstruct_tree(struct compressed_huffman_tree *const blueprint)
 {
     struct huffman_tree ret = {
         .bump_arena
-        = ccc_buf_init((struct huffman_node *)NULL, std_alloc, NULL, 0),
+        = ccc_buf_init(NULL, struct huffman_node, std_alloc, NULL, 0),
         .num_nodes = bitq_size(&blueprint->tree_paths),
     };
     check(reserve(&ret.bump_arena, ret.num_nodes + 1, std_alloc)

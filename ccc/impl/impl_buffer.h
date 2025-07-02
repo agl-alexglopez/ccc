@@ -57,11 +57,11 @@ struct ccc_buffer
 can specify that the buffer has some count of elements from index
 `[0, capacity - 1)` at initialization time. The buffer assumes these elements
 are contiguous. */
-#define ccc_impl_buf_init(impl_mem, impl_alloc_fn, impl_aux_data,              \
-                          impl_capacity, ...)                                  \
+#define ccc_impl_buf_init(impl_mem, impl_any_type_name, impl_alloc_fn,         \
+                          impl_aux_data, impl_capacity, ...)                   \
     {                                                                          \
         .mem = (impl_mem),                                                     \
-        .sizeof_type = sizeof(*(impl_mem)),                                    \
+        .sizeof_type = sizeof(impl_any_type_name),                             \
         .count = IMPL_BUF_OPTIONAL_SIZE(__VA_ARGS__),                          \
         .capacity = (impl_capacity),                                           \
         .alloc = (impl_alloc_fn),                                              \

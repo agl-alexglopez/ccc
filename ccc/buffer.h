@@ -72,7 +72,8 @@ Initialize the container with memory, callbacks, and permissions. */
 
 /** @brief Initialize a contiguous buffer of user a specified type, allocation
 policy, capacity, and optional starting size.
-@param [in] mem_ptr the pointer to existing memory or ((Type *)NULL).
+@param [in] mem_ptr the pointer to existing memory or NULL.
+@param [in] any_type_name the name of the user type in the buffer.
 @param [in] alloc_fn ccc_any_alloc_fn or NULL if no allocation is permitted.
 @param [in] aux_data any auxiliary data needed for managing buffer memory.
 @param [in] capacity the capacity of memory at mem_ptr.
@@ -82,9 +83,7 @@ side of the equality operator (e.g. ccc_buffer b = ccc_buf_init(...);).
 
 Initialization of a buffer can occur at compile time or run time depending
 on the arguments. The memory pointer should be of the same type one intends to
-store in the buffer. Therefore, if one desires a dynamic buffer with a starting
-capacity of 0 and mem_ptr of NULL, casting to a type is required
-(e.g. (int*)NULL).
+store in the buffer.
 
 This initializer determines memory control for the lifetime of the buffer. If
 the buffer points to memory of a predetermined and fixed capacity do not
@@ -92,8 +91,10 @@ provide an allocation function. If a dynamic buffer is preferred, provide the
 allocation function as defined by the signature in types.h. If resizing is
 desired on memory that has already been allocated, ensure allocation has
 occurred with the provided allocation function. */
-#define ccc_buf_init(mem_ptr, alloc_fn, aux_data, capacity, optional_size...)  \
-    ccc_impl_buf_init(mem_ptr, alloc_fn, aux_data, capacity, optional_size)
+#define ccc_buf_init(mem_ptr, any_type_name, alloc_fn, aux_data, capacity,     \
+                     optional_size...)                                         \
+    ccc_impl_buf_init(mem_ptr, any_type_name, alloc_fn, aux_data, capacity,    \
+                      optional_size)
 
 /**@}*/
 

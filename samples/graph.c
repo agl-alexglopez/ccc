@@ -415,7 +415,7 @@ found_dst(struct graph *const graph, struct vertex *const src)
         = fhm_init(NULL, struct path_backtrack_cell, current, hash_parent_cells,
                    eq_parent_cells, std_alloc, NULL, 0);
     flat_double_ended_queue bfs
-        = fdeq_init((struct point *)NULL, std_alloc, NULL, 0);
+        = fdeq_init(NULL, struct point, std_alloc, NULL, 0);
     entry *e = fhm_insert_or_assign_w(
         &parent_map, src->pos,
         (struct path_backtrack_cell){.parent = {-1, -1}});
