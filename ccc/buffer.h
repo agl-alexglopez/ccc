@@ -485,6 +485,11 @@ dropped with this directive if one is sure no namespace collisions occur. */
 typedef ccc_buffer buffer;
 #    define buf_init(args...) ccc_buf_init(args)
 #    define buf_alloc(args...) ccc_buf_alloc(args)
+#    define buf_reserve(args...) ccc_buf_reserve(args)
+#    define buf_clear(args...) ccc_buf_clear(args)
+#    define buf_clear_and_free(args...) ccc_buf_clear_and_free(args)
+#    define buf_clear_and_free_reserve(args...)                                \
+        ccc_buf_clear_and_free_reserve(args)
 #    define buf_size(args...) ccc_buf_size(args)
 #    define buf_size_plus(args...) ccc_buf_size_plus(args)
 #    define buf_size_minus(args...) ccc_buf_size_minus(args)

@@ -741,6 +741,7 @@ limitations under the License.
 #define ccc_impl_reserve(container_ptr, n_to_add, alloc_fn_ptr)                \
     _Generic((container_ptr),                                                  \
         ccc_bitset *: ccc_bs_reserve,                                          \
+        ccc_buffer *: ccc_buf_reserve,                                         \
         ccc_flat_hash_map *: ccc_fhm_reserve,                                  \
         ccc_handle_ordered_map *: ccc_hom_reserve,                             \
         ccc_flat_priority_queue *: ccc_fpq_reserve,                            \
@@ -751,6 +752,7 @@ limitations under the License.
 #define ccc_impl_clear(container_ptr, ...)                                     \
     _Generic((container_ptr),                                                  \
         ccc_bitset *: ccc_bs_clear,                                            \
+        ccc_buffer *: ccc_buf_clear,                                           \
         ccc_flat_hash_map *: ccc_fhm_clear,                                    \
         ccc_handle_ordered_map *: ccc_hom_clear,                               \
         ccc_flat_priority_queue *: ccc_fpq_clear,                              \
@@ -767,6 +769,7 @@ limitations under the License.
 #define ccc_impl_clear_and_free(container_ptr, ...)                            \
     _Generic((container_ptr),                                                  \
         ccc_bitset *: ccc_bs_clear_and_free,                                   \
+        ccc_buffer *: ccc_buf_clear_and_free,                                  \
         ccc_flat_hash_map *: ccc_fhm_clear_and_free,                           \
         ccc_handle_ordered_map *: ccc_hom_clear_and_free,                      \
         ccc_flat_priority_queue *: ccc_fpq_clear_and_free,                     \
@@ -778,6 +781,7 @@ limitations under the License.
                                         destructor_and_free_args...)           \
     _Generic((container_ptr),                                                  \
         ccc_bitset *: ccc_bs_clear_and_free_reserve,                           \
+        ccc_buffer *: ccc_buf_clear_and_free_reserve,                          \
         ccc_flat_hash_map *: ccc_fhm_clear_and_free_reserve,                   \
         ccc_handle_ordered_map *: ccc_hom_clear_and_free_reserve,              \
         ccc_flat_priority_queue *: ccc_fpq_clear_and_free_reserve,             \

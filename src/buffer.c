@@ -134,7 +134,7 @@ ccc_buf_clear_and_free_reserve(ccc_buffer *const buf,
                                ccc_any_type_destructor_fn *const destructor,
                                ccc_any_alloc_fn *const alloc)
 {
-    if (!buf || alloc)
+    if (!buf || !alloc)
     {
         return CCC_RESULT_ARG_ERROR;
     }

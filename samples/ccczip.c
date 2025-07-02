@@ -556,7 +556,7 @@ build_encoding_pq(FILE *const f, struct huffman_tree *const tree)
     /* Use a buffer to simply push back elements we will heapify at the end. */
     buffer buf = buf_init((struct fpq_elem *)NULL, NULL, NULL, 0);
     /* Add one to reservation for the flat priority queue swap slot. */
-    check(buf_alloc(&buf, size(&fh).count + 1, std_alloc) == CCC_RESULT_OK);
+    check(reserve(&buf, size(&fh).count + 1, std_alloc) == CCC_RESULT_OK);
     for (struct ch_freq const *i = begin(&fh); i != end(&fh); i = next(&fh, i))
     {
         struct huffman_node *const node = buf_push_back(
@@ -694,7 +694,7 @@ reconstruct_tree(struct compressed_huffman_tree *const blueprint)
         = ccc_buf_init((struct huffman_node *)NULL, std_alloc, NULL, 0),
         .num_nodes = bitq_size(&blueprint->tree_paths),
     };
-    check(buf_alloc(&ret.bump_arena, ret.num_nodes + 1, std_alloc)
+    check(reserve(&ret.bump_arena, ret.num_nodes + 1, std_alloc)
           == CCC_RESULT_OK);
     /* 0 index is NULL so real data can't be there. */
     check(push_back(&ret.bump_arena, &(struct huffman_node){}));
@@ -901,7 +901,8 @@ char_i(struct huffman_tree const *const t, size_t const node)
 static void
 free_encode_tree(struct huffman_tree *tree)
 {
-    check(buf_alloc(&tree->bump_arena, 0, std_alloc) == CCC_RESULT_OK);
+    check(clear_and_free_reserve(&tree->bump_arena, NULL, std_alloc)
+          == CCC_RESULT_OK);
     tree->num_leaves = 0;
     tree->num_nodes = 0;
     tree->root = 0;
