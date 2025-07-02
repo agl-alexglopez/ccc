@@ -742,20 +742,15 @@ reconstruct_text(FILE *const f, struct huffman_tree const *const tree,
     size_t cur = tree->root;
     while (bitq_size(bq))
     {
+        ccc_tribool const bit = bitq_pop_front(bq);
+        check(bit != CCC_TRIBOOL_ERROR);
+        cur = branch_i(tree, cur, bit);
         if (!branch_i(tree, cur, 1))
         {
             char const c = char_i(tree, cur);
             check(writebytes(f, &c, sizeof(c)));
             cur = tree->root;
         }
-        ccc_tribool const bit = bitq_pop_front(bq);
-        check(bit != CCC_TRIBOOL_ERROR);
-        cur = branch_i(tree, cur, bit);
-    }
-    if (!branch_i(tree, cur, 1))
-    {
-        char const c = char_i(tree, cur);
-        check(writebytes(f, &c, sizeof(c)));
     }
 }
 
