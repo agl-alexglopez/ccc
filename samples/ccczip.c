@@ -184,6 +184,7 @@ struct huffman_header
     struct huffman_encoding *encoding;
 };
 
+/** Files the user wants zipped or unzipped. */
 struct ccczip_actions
 {
     str_view zip;
@@ -331,21 +332,19 @@ main(int argc, char **argv)
 
 /*=========================     Huffman Encoding    =========================*/
 
+/** Zips the requested file via Huffman Encoding into the output directory. The
+compressed file has a header that can be used to reconstruct the data. */
 void
 zip_file(str_view const to_compress)
 {
     FILE *const f = fopen(sv_begin(to_compress), "r");
     check(f, printf("%s", strerror(errno)););
-    /* Encode characters in alphabet. */
     struct huffman_tree tree = build_encoding_tree(f);
 
-    /* Encode message and compress alphabet tree relative to message. */
     struct huffman_encoding encoding = {
         .file_bits = build_encoding_bitq(f, &tree),
         .blueprint = compress_tree(&tree),
     };
-
-    /* Create header and write this compressed data to disk. */
     write_to_file(
         to_compress,
         &(struct huffman_header){
@@ -354,8 +353,6 @@ zip_file(str_view const to_compress)
             .file_bits_count = bitq_size(&encoding.file_bits),
             .encoding = &encoding,
         });
-
-    /* Free in memory resources. */
     free_encode_tree(&tree);
     bitq_clear_and_free(&encoding.file_bits);
     bitq_clear_and_free(&encoding.blueprint.tree_paths);
@@ -418,6 +415,9 @@ compress_tree(struct huffman_tree *const tree)
     return ret;
 }
 
+/** Returns the bit queue representing the bit path to every character in the
+file. This queue represents each byte of the file in order; the first path in
+at the front of the queue represents the first character. */
 static struct bitq
 build_encoding_bitq(FILE *const f, struct huffman_tree *const tree)
 {
@@ -498,6 +498,15 @@ memoize_path(struct huffman_tree *const tree, flat_hash_map *const fh,
     path->path_len = bitq_size(bq) - path->path_start_index;
 }
 
+/** Builds the Huffman Encoding tree that will allow us to encode file bytes
+and later compress the tree structure. The tree is formed by pairing the two
+least frequently occurring characters at a new root that is the sum of their
+frequencies. This process takes O(log(N)) iterations because we pair nodes
+at each step.
+
+Because the priority queue is a min queue this means that high frequency
+elements will be paired later in the algorithm and thus closer to the root of
+the encoding tree. */
 static struct huffman_tree
 build_encoding_tree(FILE *const f)
 {
@@ -592,6 +601,8 @@ build_encoding_pq(FILE *const f, struct huffman_tree *const tree)
                             NULL, NULL, capacity(&buf).count, size(&buf).count);
 }
 
+/** Writes all encoded information to a file with the help of a header for
+later file reconstruction. */
 static void
 write_to_file(str_view const original_filepath,
               struct huffman_header *const header)
@@ -615,6 +626,11 @@ write_to_file(str_view const original_filepath,
     (void)fclose(cccz);
 }
 
+/** Writes a queue of bits to a file. Some bits may be unused in the last byte
+written to the file but this should not be a problem because the header can
+tell us the number of tree bits and file text bits we write to the file. The
+information written to file is on a per byte basis where every bit of the byte
+represents a bit in the bit queue. */
 static void
 write_bitq(FILE *const cccz, struct bitq *const bq)
 {
@@ -641,6 +657,8 @@ write_bitq(FILE *const cccz, struct bitq *const bq)
     }
 }
 
+/** Opens a new compressed file at the output directory to write to or quits
+the program on failure. */
 static FILE *
 open_cccz(str_view original_filepath)
 {
@@ -666,6 +684,8 @@ open_cccz(str_view original_filepath)
     return cccz;
 }
 
+/** Write the specified bytes to the file or exit the program if an error
+occurs. Returns the number of bytes written. */
 static size_t
 writebytes(FILE *const f, void const *const base, size_t const to_write)
 {
@@ -687,6 +707,9 @@ writebytes(FILE *const f, void const *const base, size_t const to_write)
 
 /*=========================     Huffman Decoding    =========================*/
 
+/** Unzips the requested file. The file must end in the .cccz suffix. This file
+is reconstructed and a copy of the original text is written to the output
+directory as a new file with the same name. */
 static void
 unzip_file(str_view const unzip)
 {
@@ -762,6 +785,9 @@ reconstruct_tree(struct compressed_huffman_tree *const blueprint)
     return ret;
 }
 
+/** Reconstructs the text by following the bit paths specified in the file text
+bit queue. Bits are written on a per byte basis to the file and each bit of
+the byte corresponds to a bit in the bit queue. */
 void
 reconstruct_text(FILE *const f, struct huffman_tree const *const tree,
                  struct bitq *const bq)
@@ -777,12 +803,16 @@ reconstruct_text(FILE *const f, struct huffman_tree const *const tree,
         if (!branch_i(tree, cur, 1))
         {
             char const c = char_i(tree, cur);
-            check(writebytes(f, &c, sizeof(c)));
+            size_t const byte = writebytes(f, &c, sizeof(c));
+            check(byte);
             cur = tree->root;
         }
     }
 }
 
+/** Reconstructs the Huffman encoding queues from the header of the specified
+file. Once complete this function returns all information needed to reconstruct
+the tree and write out a copy of the original file to the output directory. */
 static struct huffman_encoding
 read_from_file(str_view const unzip)
 {
@@ -803,6 +833,12 @@ read_from_file(str_view const unzip)
     return ret;
 }
 
+/** Validates and fills in the fields of the header to enable use of the Huffman
+Encoding for file reconstruction. Exits if errors occur. After this function
+the Huffman Encoding struct will have its bit queues appropriately filled and
+the algorithm can proceed to reconstruct the tree from the tree paths queue.
+The text bytes queue is also populated but the tree must be built before this
+is useful. */
 static void
 fill_header(FILE *const f, struct huffman_header *const header)
 {
@@ -828,6 +864,9 @@ fill_header(FILE *const f, struct huffman_header *const header)
     fill_bitq(f, &header->encoding->file_bits, header->file_bits_count);
 }
 
+/** Fills a bit queue from a file given an expected number of bits. The bits
+are read in on a per byte basis where every bit of a file byte represents a bit
+in the bit queue. Exits if not enough bits are found in the file. */
 static void
 fill_bitq(FILE *const f, struct bitq *const bq, size_t expected_bits)
 {
@@ -850,6 +889,8 @@ fill_bitq(FILE *const f, struct bitq *const bq, size_t expected_bits)
     }
 }
 
+/** Opens a new copy of the original file in the output directory. This is what
+is written to when all Huffman Encoding data structures are reconstructed. */
 static FILE *
 open_unzipped(str_view unzip)
 {
@@ -871,6 +912,9 @@ open_unzipped(str_view unzip)
     return f;
 }
 
+/** Reads the specified number of bytes from the file or exits if an error
+occurs. The bytes read are returned and may be less than requested if the file
+ends. */
 static size_t
 readbytes(FILE *const f, void *const base, size_t const to_read)
 {
