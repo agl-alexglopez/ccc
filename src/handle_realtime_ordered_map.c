@@ -818,6 +818,9 @@ ccc_hrm_clear_and_free(ccc_handle_realtime_ordered_map *const hrm,
         hrm->count = 0;
         hrm->capacity = 0;
         (void)hrm->alloc(hrm->data, 0, hrm->aux);
+        hrm->data = NULL;
+        hrm->nodes = NULL;
+        hrm->parity = NULL;
         return CCC_RESULT_OK;
     }
     while (!ccc_hrm_is_empty(hrm))
@@ -832,6 +835,9 @@ ccc_hrm_clear_and_free(ccc_handle_realtime_ordered_map *const hrm,
     hrm->root = 0;
     hrm->capacity = 0;
     (void)hrm->alloc(hrm->data, 0, hrm->aux);
+    hrm->data = NULL;
+    hrm->nodes = NULL;
+    hrm->parity = NULL;
     return CCC_RESULT_OK;
 }
 
@@ -850,6 +856,7 @@ ccc_hrm_clear_and_free_reserve(ccc_handle_realtime_ordered_map *const hrm,
         hrm->count = 0;
         hrm->capacity = 0;
         (void)alloc(hrm->data, 0, hrm->aux);
+        hrm->data = NULL;
         return CCC_RESULT_OK;
     }
     while (!ccc_hrm_is_empty(hrm))
@@ -864,6 +871,9 @@ ccc_hrm_clear_and_free_reserve(ccc_handle_realtime_ordered_map *const hrm,
     hrm->root = 0;
     hrm->capacity = 0;
     (void)alloc(hrm->data, 0, hrm->aux);
+    hrm->data = NULL;
+    hrm->nodes = NULL;
+    hrm->parity = NULL;
     return CCC_RESULT_OK;
 }
 

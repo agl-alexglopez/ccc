@@ -50,6 +50,117 @@ ccc_buf_alloc(ccc_buffer *const buf, size_t const capacity,
     return CCC_RESULT_OK;
 }
 
+ccc_result
+ccc_buf_reserve(ccc_buffer *const buf, size_t const to_add,
+                ccc_any_alloc_fn *const fn)
+{
+    if (!buf || !fn)
+    {
+        return CCC_RESULT_ARG_ERROR;
+    }
+    size_t const needed = buf->count + to_add;
+    if (needed <= buf->capacity)
+    {
+        return CCC_RESULT_OK;
+    }
+    void *const new_mem = fn(buf->mem, buf->sizeof_type * needed, buf->aux);
+    if (!new_mem)
+    {
+        return CCC_RESULT_MEM_ERROR;
+    }
+    buf->mem = new_mem;
+    buf->capacity = needed;
+    return CCC_RESULT_OK;
+}
+
+ccc_result
+ccc_buf_clear(ccc_buffer *const buf,
+              ccc_any_type_destructor_fn *const destructor)
+{
+    if (!buf)
+    {
+        return CCC_RESULT_ARG_ERROR;
+    }
+    if (!destructor)
+    {
+        buf->count = 0;
+        return CCC_RESULT_OK;
+    }
+    for (void *i = ccc_buf_begin(buf); i != ccc_buf_end(buf);
+         i = ccc_buf_next(buf, i))
+    {
+        destructor((ccc_any_type){
+            .any_type = i,
+            .aux = buf->aux,
+        });
+    }
+    buf->count = 0;
+    return CCC_RESULT_OK;
+}
+
+ccc_result
+ccc_buf_clear_and_free(ccc_buffer *const buf,
+                       ccc_any_type_destructor_fn *const destructor)
+{
+    if (!buf || !buf->alloc)
+    {
+        return CCC_RESULT_ARG_ERROR;
+    }
+    if (!destructor)
+    {
+        (void)buf->alloc(buf->mem, 0, buf->aux);
+        buf->mem = NULL;
+        buf->count = 0;
+        buf->capacity = 0;
+        return CCC_RESULT_OK;
+    }
+    for (void *i = ccc_buf_begin(buf); i != ccc_buf_end(buf);
+         i = ccc_buf_next(buf, i))
+    {
+        destructor((ccc_any_type){
+            .any_type = i,
+            .aux = buf->aux,
+        });
+    }
+    (void)buf->alloc(buf->mem, 0, buf->aux);
+    buf->mem = NULL;
+    buf->count = 0;
+    buf->capacity = 0;
+    return CCC_RESULT_OK;
+}
+
+ccc_result
+ccc_buf_clear_and_free_reserve(ccc_buffer *const buf,
+                               ccc_any_type_destructor_fn *const destructor,
+                               ccc_any_alloc_fn *const alloc)
+{
+    if (!buf || alloc)
+    {
+        return CCC_RESULT_ARG_ERROR;
+    }
+    if (!destructor)
+    {
+        (void)alloc(buf->mem, 0, buf->aux);
+        buf->mem = NULL;
+        buf->count = 0;
+        buf->capacity = 0;
+        return CCC_RESULT_OK;
+    }
+    for (void *i = ccc_buf_begin(buf); i != ccc_buf_end(buf);
+         i = ccc_buf_next(buf, i))
+    {
+        destructor((ccc_any_type){
+            .any_type = i,
+            .aux = buf->aux,
+        });
+    }
+    (void)alloc(buf->mem, 0, buf->aux);
+    buf->mem = NULL;
+    buf->count = 0;
+    buf->capacity = 0;
+    return CCC_RESULT_OK;
+}
+
 void *
 ccc_buf_at(ccc_buffer const *const buf, size_t const i)
 {

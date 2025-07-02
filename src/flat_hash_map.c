@@ -729,7 +729,8 @@ ccc_fhm_clear_and_free(ccc_flat_hash_map *const h,
     h->mask = 0;
     h->count = 0;
     h->tag = NULL;
-    h->data = h->alloc_fn(h->data, 0, h->aux);
+    (void)h->alloc_fn(h->data, 0, h->aux);
+    h->data = NULL;
     return CCC_RESULT_OK;
 }
 
@@ -765,7 +766,8 @@ ccc_fhm_clear_and_free_reserve(ccc_flat_hash_map *const h,
     h->mask = 0;
     h->count = 0;
     h->tag = NULL;
-    h->data = alloc(h->data, 0, h->aux);
+    (void)alloc(h->data, 0, h->aux);
+    h->data = NULL;
     return CCC_RESULT_OK;
 }
 
