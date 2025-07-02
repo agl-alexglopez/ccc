@@ -104,7 +104,7 @@ struct fpq_elem
 reserving the appropriate space for helper data structures. */
 struct huffman_tree
 {
-    ccc_buffer nodes;
+    ccc_buffer bump_arena;
     size_t root;
     size_t num_nodes;
     size_t num_leaves;
@@ -492,7 +492,7 @@ static struct huffman_tree
 build_encoding_tree(FILE *const f)
 {
     struct huffman_tree ret = {
-        .nodes = buf_init((struct huffman_node *)NULL, std_alloc, NULL, 0),
+        .bump_arena = buf_init((struct huffman_node *)NULL, std_alloc, NULL, 0),
         .root = 0,
     };
     flat_priority_queue pq = build_encoding_pq(f, &ret);
@@ -505,13 +505,13 @@ build_encoding_tree(FILE *const f)
         struct fpq_elem one = *(struct fpq_elem *)front(&pq);
         check(pop(&pq) == CCC_RESULT_OK);
         struct huffman_node *const internal_one
-            = push_back(&ret.nodes, &(struct huffman_node){
-                                        .parent = 0,
-                                        .link = {zero.node, one.node},
-                                        .ch = '\0',
-                                        .iter = 0,
-                                    });
-        size_t const new_root = buf_i(&ret.nodes, internal_one).count;
+            = push_back(&ret.bump_arena, &(struct huffman_node){
+                                             .parent = 0,
+                                             .link = {zero.node, one.node},
+                                             .ch = '\0',
+                                             .iter = 0,
+                                         });
+        size_t const new_root = buf_i(&ret.bump_arena, internal_one).count;
         check(internal_one);
         node_at(&ret, zero.node)->parent = new_root;
         node_at(&ret, one.node)->parent = new_root;
@@ -541,7 +541,7 @@ build_encoding_pq(FILE *const f, struct huffman_tree *const tree)
 {
     /* For a buffer based tree 0 is the NULL node so we can't have actual data
        we want at that index in the tree. */
-    check(push_back(&tree->nodes, &(struct huffman_node){}));
+    check(push_back(&tree->bump_arena, &(struct huffman_node){}));
     flat_hash_map fh = fhm_init(NULL, struct ch_freq, ch, hash_ch, ch_eq,
                                 std_alloc, NULL, 0);
     foreach_filechar(f, c, {
@@ -557,11 +557,12 @@ build_encoding_pq(FILE *const f, struct huffman_tree *const tree)
     check(buf_alloc(&buf, size(&fh).count + 1, std_alloc) == CCC_RESULT_OK);
     for (struct ch_freq const *i = begin(&fh); i != end(&fh); i = next(&fh, i))
     {
-        struct huffman_node *const node
-            = buf_push_back(&tree->nodes, &(struct huffman_node){.ch = i->ch});
+        struct huffman_node *const node = buf_push_back(
+            &tree->bump_arena, &(struct huffman_node){.ch = i->ch});
         struct fpq_elem const *const fe = push_back(
-            &buf, &(struct fpq_elem){.freq = i->freq,
-                                     .node = buf_i(&tree->nodes, node).count});
+            &buf,
+            &(struct fpq_elem){.freq = i->freq,
+                               .node = buf_i(&tree->bump_arena, node).count});
         check(fe);
     }
     /* Free map but not the buffer because the priority queue took buffer. */
@@ -687,17 +688,19 @@ static struct huffman_tree
 reconstruct_tree(struct compressed_huffman_tree *const blueprint)
 {
     struct huffman_tree ret = {
-        .nodes = ccc_buf_init((struct huffman_node *)NULL, std_alloc, NULL, 0),
+        .bump_arena
+        = ccc_buf_init((struct huffman_node *)NULL, std_alloc, NULL, 0),
         .num_nodes = bitq_size(&blueprint->tree_paths),
     };
-    check(buf_alloc(&ret.nodes, ret.num_nodes + 1, std_alloc) == CCC_RESULT_OK);
+    check(buf_alloc(&ret.bump_arena, ret.num_nodes + 1, std_alloc)
+          == CCC_RESULT_OK);
     /* 0 index is NULL so real data can't be there. */
-    check(push_back(&ret.nodes, &(struct huffman_node){}));
+    check(push_back(&ret.bump_arena, &(struct huffman_node){}));
     /* By creating the root outside of the main loop we can be sure we always
        have valid prev node. Don't need to check on every loop iteration. */
     struct huffman_node const *const first
-        = push_back(&ret.nodes, &(struct huffman_node){});
-    ret.root = buf_i(&ret.nodes, first).count;
+        = push_back(&ret.bump_arena, &(struct huffman_node){});
+    ret.root = buf_i(&ret.bump_arena, first).count;
     (void)bitq_pop_front(&blueprint->tree_paths);
     size_t prev = ret.root;
     size_t cur = 0;
@@ -709,9 +712,9 @@ reconstruct_tree(struct compressed_huffman_tree *const blueprint)
         {
             struct huffman_node *const prev_node = node_at(&ret, prev);
             bit = bitq_pop_front(&blueprint->tree_paths);
-            struct huffman_node *const pushed
-                = push_back(&ret.nodes, &(struct huffman_node){.parent = prev});
-            cur = ccc_buf_i(&ret.nodes, pushed).count;
+            struct huffman_node *const pushed = push_back(
+                &ret.bump_arena, &(struct huffman_node){.parent = prev});
+            cur = ccc_buf_i(&ret.bump_arena, pushed).count;
             prev_node->link[prev_node->iter++] = cur;
             if (!bit)
             {
@@ -826,24 +829,6 @@ fill_bitq(FILE *const f, struct bitq *const bq, size_t expected_bits)
     }
 }
 
-static size_t
-readbytes(FILE *const f, void *const base, size_t const to_read)
-{
-    size_t count = 0;
-    char *p = base;
-    while (count < to_read)
-    {
-        int const read = fgetc(f);
-        if (read == EOF)
-        {
-            return count;
-        }
-        *p++ = (char)read;
-        ++count;
-    }
-    return count;
-}
-
 static FILE *
 open_decompressed(str_view to_decompress)
 {
@@ -866,38 +851,56 @@ open_decompressed(str_view to_decompress)
     return f;
 }
 
+static size_t
+readbytes(FILE *const f, void *const base, size_t const to_read)
+{
+    size_t count = 0;
+    char *p = base;
+    while (count < to_read)
+    {
+        int const read = fgetc(f);
+        if (read == EOF)
+        {
+            return count;
+        }
+        *p++ = (char)read;
+        ++count;
+    }
+    return count;
+}
+
 /*=========================      Huffman Helpers    =========================*/
 
 static struct huffman_node *
 node_at(struct huffman_tree const *const t, size_t const node)
 {
-    return ((struct huffman_node *)buf_at(&t->nodes, node));
+    return ((struct huffman_node *)buf_at(&t->bump_arena, node));
 }
 
 static size_t
 branch_i(struct huffman_tree const *const t, size_t const node,
          uint8_t const dir)
 {
-    return ((struct huffman_node *)buf_at(&t->nodes, node))->link[dir];
+    return ((struct huffman_node *)buf_at(&t->bump_arena, node))->link[dir];
 }
 
 static size_t
 parent_i(struct huffman_tree const *const t, size_t node)
 {
-    return ((struct huffman_node *)buf_at(&t->nodes, node))->parent;
+    return ((struct huffman_node *)buf_at(&t->bump_arena, node))->parent;
 }
 
 static char
 char_i(struct huffman_tree const *const t, size_t const node)
 {
-    return ((struct huffman_node *)buf_at(&t->nodes, node))->ch;
+    return ((struct huffman_node *)buf_at(&t->bump_arena, node))->ch;
 }
 
 /** Frees all encoding nodes from the tree provided. */
 static void
 free_encode_tree(struct huffman_tree *tree)
 {
-    check(buf_alloc(&tree->nodes, 0, std_alloc) == CCC_RESULT_OK);
+    check(buf_alloc(&tree->bump_arena, 0, std_alloc) == CCC_RESULT_OK);
     tree->num_leaves = 0;
     tree->num_nodes = 0;
     tree->root = 0;
@@ -1019,8 +1022,6 @@ print_bitq(struct bitq const *const bq)
 
 /* NOLINTEND(*misc-no-recursion) */
 
-/*=========================     Huffman Decoding    =========================*/
-
 /*=====================       Bit Queue Helper Code     =====================*/
 
 static void
@@ -1091,7 +1092,8 @@ bitq_reserve(struct bitq *const bq, size_t const to_add)
 /** The flat hash map documentation mentions we should have good bit diversity
 in the high and low byte of our hash but we are only hashing characters which
 are their own unique value across all characters we will encounter. So the
-hashed value will just be the character repeated at the high and low bit. */
+hashed value will just be the character repeated at the high and low byte. We
+should not expect any collisions for such a value and data set. */
 static uint64_t
 hash_ch(ccc_any_key const to_hash)
 {
