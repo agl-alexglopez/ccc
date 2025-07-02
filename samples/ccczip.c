@@ -165,10 +165,11 @@ struct huffman_encoding
 
 /** The header representing the compressed file structure of a compressed file
 via Huffman Encoding. The fields of this struct should be handled in order as
-we write to or read from a file. */
+we write to or read from a file. It is not strictly necessary to use this but
+it helps keep logic consistent across compression and decompression. */
 struct huffman_header
 {
-    /** Magic to recognize our cccz files ".cccz" */
+    /** Magic to recognize our cccz files "cccz" */
     uint32_t magic;
     /** The number of leaves in the tree minus 1. Subtract 1 in case we actually
         have all 256 characters used as leaves in which case they could only
@@ -176,23 +177,24 @@ struct huffman_header
     uint8_t leaf_count_minus_one;
     /** Number of bits in the file content bit queue we encoded. */
     size_t file_bits_count;
+    /** A reference to the encoding to access the needed bit queues. */
     struct huffman_encoding *encoding;
 };
 
-struct file_action_pack
+struct ccczip_actions
 {
-    str_view to_compress;
-    str_view to_decompress;
+    str_view zip;
+    str_view unzip;
 };
 
-/** File format ".cccz" in header. */
-static uint32_t const cccz_magic = 0x2E63637A;
-static str_view const relative_output_dir = SV("samples/output/");
-static str_view const compression_file_suffix = SV(".cccz");
+/** File format "cccz" in header. */
+static uint32_t const cccz_magic = 0x6363637A;
+static str_view const proj_output_dir = SV("samples/output/");
+static str_view const cccz_suffix = SV(".cccz");
 
 /*===========================      Prototypes      ==========================*/
 
-static void compress_file(str_view to_compress);
+static void zip_file(str_view to_compress);
 static flat_priority_queue build_encoding_pq(FILE *f, struct huffman_tree *);
 static void bitq_push_back(struct bitq *, ccc_tribool);
 static ccc_tribool bitq_pop_back(struct bitq *bq);
@@ -217,7 +219,7 @@ static void print_inner_tree(struct huffman_tree const *tree, size_t node,
 static void print_node(struct huffman_tree const *tree, size_t node);
 static bool is_leaf(struct huffman_tree const *tree, size_t node);
 static void print_bitq(struct bitq const *bq);
-static void decompress_file(str_view to_decompress);
+static void unzip_file(str_view unzip);
 static struct huffman_tree
 reconstruct_tree(struct compressed_huffman_tree *blueprint);
 static void reconstruct_text(FILE *f, struct huffman_tree const *,
@@ -230,8 +232,8 @@ static struct huffman_node *node_at(struct huffman_tree const *t, size_t node);
 static void write_to_file(str_view original_filepath, struct huffman_header *);
 static FILE *open_cccz(str_view original_filepath);
 static void write_bitq(FILE *cccz, struct bitq *bq);
-static struct huffman_encoding read_from_file(str_view to_decompress);
-static FILE *open_decompressed(str_view to_decompress);
+static struct huffman_encoding read_from_file(str_view unzip);
+static FILE *open_unzipped(str_view unzip);
 static void fill_header(FILE *, struct huffman_header *);
 static size_t readbytes(FILE *f, void *base, size_t to_read);
 static size_t writebytes(FILE *f, void const *base, size_t to_write);
@@ -287,7 +289,7 @@ main(int argc, char **argv)
     {
         return 0;
     }
-    struct file_action_pack todo = {};
+    struct ccczip_actions todo = {};
     for (int arg = 1; arg < argc; ++arg)
     {
         str_view const sv_arg = sv(argv[arg]);
@@ -302,7 +304,7 @@ main(int argc, char **argv)
                 sv_arg, sv_find(sv_arg, 0, SV("=")) + 1, sv_len(sv_arg));
             check(!sv_empty(raw_file),
                   (void)fprintf(stderr, "file string is empty\n"););
-            todo.to_compress = raw_file;
+            todo.zip = raw_file;
         }
         else if (sv_starts_with(sv_arg, SV("-d=")))
         {
@@ -310,13 +312,13 @@ main(int argc, char **argv)
                 sv_arg, sv_find(sv_arg, 0, SV("=")) + 1, sv_len(sv_arg));
             check(!sv_empty(raw_file),
                   (void)fprintf(stderr, "file string is empty\n"););
-            todo.to_decompress = raw_file;
+            todo.unzip = raw_file;
         }
     }
-    compress_file(todo.to_compress);
-    if (!sv_empty(todo.to_decompress))
+    zip_file(todo.zip);
+    if (!sv_empty(todo.unzip))
     {
-        decompress_file(todo.to_decompress);
+        unzip_file(todo.unzip);
     }
     return 0;
 }
@@ -324,7 +326,7 @@ main(int argc, char **argv)
 /*=========================     Huffman Encoding    =========================*/
 
 void
-compress_file(str_view const to_compress)
+zip_file(str_view const to_compress)
 {
     FILE *const f = fopen(sv_begin(to_compress), "r");
     check(f, (void)fprintf(stderr, "could not open file %s",
@@ -630,17 +632,16 @@ open_cccz(str_view original_filepath)
                                 ? original_filepath
                                 : sv_substr(original_filepath, dir_delim + 1,
                                             sv_len(original_filepath));
-    check(sv_size(relative_output_dir) + sv_size(raw_file)
-              + sv_size(compression_file_suffix)
+    check(sv_size(proj_output_dir) + sv_size(raw_file) + sv_size(cccz_suffix)
           < FILESYS_MAX_PATH);
     char path_to_cccz[FILESYS_MAX_PATH];
-    size_t const path_bytes = sv_fill(sv_size(relative_output_dir),
-                                      path_to_cccz, relative_output_dir);
+    size_t const path_bytes
+        = sv_fill(sv_size(proj_output_dir), path_to_cccz, proj_output_dir);
     size_t const file_bytes
         = sv_fill(sv_size(raw_file), path_to_cccz + (path_bytes - 1), raw_file);
-    (void)sv_fill(sv_size(compression_file_suffix),
+    (void)sv_fill(sv_size(cccz_suffix),
                   path_to_cccz + (path_bytes - 1) + (file_bytes - 1),
-                  compression_file_suffix);
+                  cccz_suffix);
     FILE *const cccz = fopen(path_to_cccz, "w");
     check(cccz, printf("%s", strerror(errno)););
     return cccz;
@@ -650,10 +651,11 @@ static size_t
 writebytes(FILE *const f, void const *const base, size_t const to_write)
 {
     size_t count = 0;
-    char const *p = base;
+    unsigned char const *p = base;
     while (count < to_write)
     {
         int const writ = fputc(*p, f);
+        check(!ferror(f));
         if (writ == EOF)
         {
             return count;
@@ -667,18 +669,18 @@ writebytes(FILE *const f, void const *const base, size_t const to_write)
 /*=========================     Huffman Decoding    =========================*/
 
 static void
-decompress_file(str_view const to_decompress)
+unzip_file(str_view const unzip)
 {
-    struct huffman_encoding he = read_from_file(to_decompress);
+    struct huffman_encoding he = read_from_file(unzip);
     struct huffman_tree tree = reconstruct_tree(&he.blueprint);
-    FILE *const decompressed = open_decompressed(to_decompress);
-    reconstruct_text(decompressed, &tree, &he.file_bits);
+    FILE *const copy_of_original = open_unzipped(unzip);
+    reconstruct_text(copy_of_original, &tree, &he.file_bits);
     /* All info is on disk we can free in memory resources. */
     free_encode_tree(&tree);
     bitq_clear_and_free(&he.file_bits);
     bitq_clear_and_free(&he.blueprint.tree_paths);
     str_arena_free(&he.blueprint.arena);
-    (void)fclose(decompressed);
+    (void)fclose(copy_of_original);
 }
 
 /** Reconstructs a Huffman encoding tree based on the blueprint provided. The
@@ -763,11 +765,11 @@ reconstruct_text(FILE *const f, struct huffman_tree const *const tree,
 }
 
 static struct huffman_encoding
-read_from_file(str_view const to_decompress)
+read_from_file(str_view const unzip)
 {
-    check(sv_ends_with(to_decompress, SV(".cccz")),
+    check(sv_ends_with(unzip, SV(".cccz")),
           (void)fprintf(stderr, "only '.cccz' files may be decompressed.\n"););
-    FILE *const cccz = fopen(sv_begin(to_decompress), "r");
+    FILE *const cccz = fopen(sv_begin(unzip), "r");
     check(cccz, printf("%s", strerror(errno)););
     struct huffman_encoding ret = {
         .file_bits = {.bs = bs_init(NULL, std_alloc, NULL, 0)},
@@ -830,21 +832,19 @@ fill_bitq(FILE *const f, struct bitq *const bq, size_t expected_bits)
 }
 
 static FILE *
-open_decompressed(str_view to_decompress)
+open_unzipped(str_view unzip)
 {
-    check(sv_ends_with(to_decompress, compression_file_suffix));
-    to_decompress
-        = sv_remove_suffix(to_decompress, sv_len(compression_file_suffix));
-    size_t const dir_delim
-        = sv_rfind(to_decompress, sv_len(to_decompress), SV("/"));
+    check(sv_ends_with(unzip, cccz_suffix));
+    unzip = sv_remove_suffix(unzip, sv_len(cccz_suffix));
+    size_t const dir_delim = sv_rfind(unzip, sv_len(unzip), SV("/"));
     str_view const raw_file
-        = dir_delim == sv_npos(to_decompress)
-            ? to_decompress
-            : sv_substr(to_decompress, dir_delim + 1, sv_len(to_decompress));
-    check(sv_size(relative_output_dir) + sv_size(raw_file) < FILESYS_MAX_PATH);
+        = dir_delim == sv_npos(unzip)
+            ? unzip
+            : sv_substr(unzip, dir_delim + 1, sv_len(unzip));
+    check(sv_size(proj_output_dir) + sv_size(raw_file) < FILESYS_MAX_PATH);
     char path[FILESYS_MAX_PATH];
     size_t const prefix
-        = sv_fill(sv_size(relative_output_dir), path, relative_output_dir);
+        = sv_fill(sv_size(proj_output_dir), path, proj_output_dir);
     (void)sv_fill(sv_size(raw_file), path + (prefix - 1), raw_file);
     FILE *const f = fopen(path, "w");
     check(f, printf("%s", strerror(errno)););
@@ -855,15 +855,16 @@ static size_t
 readbytes(FILE *const f, void *const base, size_t const to_read)
 {
     size_t count = 0;
-    char *p = base;
+    unsigned char *p = (unsigned char *)base;
     while (count < to_read)
     {
         int const read = fgetc(f);
+        check(!ferror(f));
         if (read == EOF)
         {
             return count;
         }
-        *p++ = (char)read;
+        *p++ = (unsigned char)read;
         ++count;
     }
     return count;
@@ -1135,7 +1136,7 @@ print_help(void)
           "create a samples/output/name file\n\nNote: Compression comes before "
           "decompression.\nThe following command compresses a file and then "
           "decompresses it.\nThe final copy of the original file is in the "
-          "output directory.\nSample Command:\n./build/bin/compress "
+          "output directory.\nSample Command:\n./build/bin/ccczip "
           "-c=README.md -d=samples/output/README.md.ccc\n";
     printf("%s", msg);
 }

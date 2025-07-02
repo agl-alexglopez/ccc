@@ -40,13 +40,13 @@ target_link_libraries(words PRIVATE
 )
 add_dependencies(samples words)
 
-add_executable(compression compression.c)
-target_include_directories(compression PRIVATE "../util")
-target_link_libraries(compression PRIVATE
+add_executable(ccczip ccczip.c)
+target_include_directories(ccczip PRIVATE "../util")
+target_link_libraries(ccczip PRIVATE
   cli
   str_view
   ccc
   alloc
   str_arena
 )
-add_dependencies(samples compression)
+add_dependencies(samples ccczip)
