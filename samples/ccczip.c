@@ -60,7 +60,7 @@ struct bitq
 };
 
 /** Simple entry in the flat hash map while counting character occurrences. */
-struct ch_freq
+struct char_freq
 {
     char ch;
     size_t freq;
@@ -332,8 +332,7 @@ void
 zip_file(str_view const to_compress)
 {
     FILE *const f = fopen(sv_begin(to_compress), "r");
-    check(f, (void)fprintf(stderr, "could not open file %s",
-                           sv_begin(to_compress)););
+    check(f, printf("%s", strerror(errno)););
     /* Encode characters in alphabet. */
     struct huffman_tree tree = build_encoding_tree(f);
 
@@ -547,11 +546,11 @@ build_encoding_pq(FILE *const f, struct huffman_tree *const tree)
     /* For a buffer based tree 0 is the NULL node so we can't have actual data
        we want at that index in the tree. */
     check(push_back(&tree->bump_arena, &(struct huffman_node){}));
-    flat_hash_map fh = fhm_init(NULL, struct ch_freq, ch, hash_ch, ch_eq,
+    flat_hash_map fh = fhm_init(NULL, struct char_freq, ch, hash_ch, ch_eq,
                                 std_alloc, NULL, 0);
     foreach_filechar(f, c, {
-        struct ch_freq *const cf
-            = or_insert(entry_r(&fh, c), &(struct ch_freq){.ch = *c});
+        struct char_freq *const cf
+            = or_insert(entry_r(&fh, c), &(struct char_freq){.ch = *c});
         check(cf);
         ++cf->freq;
     });
@@ -560,7 +559,8 @@ build_encoding_pq(FILE *const f, struct huffman_tree *const tree)
     buffer buf = buf_init((struct fpq_elem *)NULL, NULL, NULL, 0);
     /* Add one to reservation for the flat priority queue swap slot. */
     check(reserve(&buf, size(&fh).count + 1, std_alloc) == CCC_RESULT_OK);
-    for (struct ch_freq const *i = begin(&fh); i != end(&fh); i = next(&fh, i))
+    for (struct char_freq const *i = begin(&fh); i != end(&fh);
+         i = next(&fh, i))
     {
         struct huffman_node *const node = buf_push_back(
             &tree->bump_arena, &(struct huffman_node){.ch = i->ch});
@@ -709,7 +709,7 @@ reconstruct_tree(struct compressed_huffman_tree *const blueprint)
     (void)bitq_pop_front(&blueprint->tree_paths);
     size_t prev = ret.root;
     size_t cur = 0;
-    size_t ch_i = 0;
+    size_t ch_i = blueprint->leaf_string.start;
     while (bitq_size(&blueprint->tree_paths))
     {
         ccc_tribool bit = CCC_TRUE;
@@ -723,9 +723,7 @@ reconstruct_tree(struct compressed_huffman_tree *const blueprint)
             prev_node->link[prev_node->iter++] = cur;
             if (!bit)
             {
-                pushed->ch = *str_arena_at(&blueprint->arena,
-                                           blueprint->leaf_string.start
-                                               + (str_ofs)ch_i);
+                pushed->ch = *str_arena_at(&blueprint->arena, (str_ofs)ch_i);
                 ++ch_i;
                 ++ret.num_leaves;
             }
@@ -946,11 +944,7 @@ print_inner_tree(struct huffman_tree const *const tree, size_t const node,
         (void)snprintf(str, string_length, "%s%s", prefix,
                        branch_type == LEAF ? "     " : " │   ");
     }
-    if (str == NULL)
-    {
-        printf("memory exceeded. Cannot display tree.\n");
-        return;
-    }
+    check(str, (void)fprintf(stderr, "tree printer out of memory.\n"););
     struct huffman_node const *const root = node_at(tree, node);
     if (!root->link[1])
     {
@@ -1108,7 +1102,7 @@ hash_ch(ccc_any_key const to_hash)
 static ccc_tribool
 ch_eq(ccc_any_key_cmp const cmp)
 {
-    struct ch_freq const *const type = (struct ch_freq *)cmp.any_type_rhs;
+    struct char_freq const *const type = (struct char_freq *)cmp.any_type_rhs;
     return *(char *)cmp.any_key_lhs == type->ch;
 }
 
