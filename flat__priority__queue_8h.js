@@ -2,9 +2,9 @@ var flat__priority__queue_8h =
 [
     [ "ccc_fpq_decrease_w", "flat__priority__queue_8h.html#abab50c378df48872ce942ac89e4a11c9", null ],
     [ "ccc_fpq_emplace", "flat__priority__queue_8h.html#a1c8103699b633d1da090dd867b46d1ec", null ],
-    [ "ccc_fpq_heapify_init", "flat__priority__queue_8h.html#a7915b0dc8d16f99709d35b483d02a3e1", null ],
+    [ "ccc_fpq_heapify_init", "flat__priority__queue_8h.html#a7a3542f48eda623e55b72e8ef4cc7ae3", null ],
     [ "ccc_fpq_increase_w", "flat__priority__queue_8h.html#a22f154ea0ca88725a32a07bd57886e54", null ],
-    [ "ccc_fpq_init", "flat__priority__queue_8h.html#a2db0f718884bbad1a53a4a6ae763c507", null ],
+    [ "ccc_fpq_init", "flat__priority__queue_8h.html#abb90b4408d828e1f2820858c6523f289", null ],
     [ "ccc_fpq_update_w", "flat__priority__queue_8h.html#ae6637e9dc9b06d7026319cc8498ec4d9", null ],
     [ "ccc_flat_priority_queue", "flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817", null ],
     [ "ccc_fpq_alloc", "flat__priority__queue_8h.html#ae25b1b64e02e35686cc1a138b20208b4", null ],

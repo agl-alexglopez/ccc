@@ -135,9 +135,9 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Initialization Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Initialize and create containers with memory, callbacks, and permissions. </p>
 </td></tr>
-<tr class="memitem:a5f6c51ae30c8f0cae6e1b05466008784"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a5f6c51ae30c8f0cae6e1b05466008784">ccc_fdeq_init</a>(mem_ptr,  alloc_fn,  aux_data,  capacity,  optional_size...)&#160;&#160;&#160;    ccc_impl_fdeq_init(mem_ptr, alloc_fn, aux_data, capacity, optional_size)</td></tr>
-<tr class="memdesc:a5f6c51ae30c8f0cae6e1b05466008784"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the fdeq with memory and allocation permission.  <br /></td></tr>
-<tr class="separator:a5f6c51ae30c8f0cae6e1b05466008784"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a84c654bbd98a261f5204764a8714335e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a84c654bbd98a261f5204764a8714335e">ccc_fdeq_init</a>(mem_ptr,  any_type_name,  alloc_fn,  aux_data,  capacity,  optional_size...)</td></tr>
+<tr class="memdesc:a84c654bbd98a261f5204764a8714335e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the fdeq with memory and allocation permission.  <br /></td></tr>
+<tr class="separator:a84c654bbd98a261f5204764a8714335e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a65978652c26e3d1878e343a5c618e300"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a65978652c26e3d1878e343a5c618e300">ccc_fdeq_copy</a> (<a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> *dst, <a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> const *src, <a class="el" href="types_8h.html#a3e73202894869d2840fb21ff912bbd96">ccc_any_alloc_fn</a> *fn)</td></tr>
 <tr class="memdesc:a65978652c26e3d1878e343a5c618e300"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy the fdeq from src to newly initialized dst.  <br /></td></tr>
 <tr class="separator:a65978652c26e3d1878e343a5c618e300"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -319,8 +319,8 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="a5f6c51ae30c8f0cae6e1b05466008784" name="a5f6c51ae30c8f0cae6e1b05466008784"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5f6c51ae30c8f0cae6e1b05466008784">&#9670;&#160;</a></span>ccc_fdeq_init</h2>
+<a id="a84c654bbd98a261f5204764a8714335e" name="a84c654bbd98a261f5204764a8714335e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a84c654bbd98a261f5204764a8714335e">&#9670;&#160;</a></span>ccc_fdeq_init</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -330,6 +330,12 @@ This graph shows which files directly or indirectly include this file:</div>
           <td>(</td>
           <td class="paramtype">&#160;</td>
           <td class="paramname">mem_ptr, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">any_type_name, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -358,15 +364,18 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td>&#160;&#160;&#160;    ccc_impl_fdeq_init(mem_ptr, alloc_fn, aux_data, capacity, optional_size)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
-
+<b>Value:</b><div class="fragment"><div class="line">    ccc_impl_fdeq_init(mem_ptr, any_type_name, alloc_fn, aux_data, capacity,   \</div>
+<div class="line">                       optional_size)</div>
+</div><!-- fragment -->
 <p>Initialize the fdeq with memory and allocation permission. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">mem_ptr</td><td>a pointer to existing memory or ((T *)NULL). </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">any_type_name</td><td>the name of the user type. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">alloc_fn</td><td>the allocator function, if allocation is allowed. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">aux_data</td><td>any auxiliary data needed for element destruction. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">capacity</td><td>the number of contiguous elements at mem_ptr </td></tr>
@@ -374,7 +383,7 @@ This graph shows which files directly or indirectly include this file:</div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the fdeq on the right hand side of an equality operator at runtime or compiletime (e.g. ccc_flat_double_ended_queue q = <a class="el" href="flat__double__ended__queue_8h.html#a5f6c51ae30c8f0cae6e1b05466008784" title="Initialize the fdeq with memory and allocation permission.">ccc_fdeq_init(...)</a>;) </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the fdeq on the right hand side of an equality operator at runtime or compiletime (e.g. ccc_flat_double_ended_queue q = <a class="el" href="flat__double__ended__queue_8h.html#a84c654bbd98a261f5204764a8714335e" title="Initialize the fdeq with memory and allocation permission.">ccc_fdeq_init(...)</a>;) </dd></dl>
 
 </div>
 </div>

@@ -138,9 +138,9 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Initialization Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Initialize the container with memory, callbacks, and permissions. </p>
 </td></tr>
-<tr class="memitem:a66b89d47e24996c7be07dea5d827e649"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a66b89d47e24996c7be07dea5d827e649">ccc_buf_init</a>(mem_ptr,  alloc_fn,  aux_data,  capacity,  optional_size...)&#160;&#160;&#160;    ccc_impl_buf_init(mem_ptr, alloc_fn, aux_data, capacity, optional_size)</td></tr>
-<tr class="memdesc:a66b89d47e24996c7be07dea5d827e649"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a contiguous buffer of user a specified type, allocation policy, capacity, and optional starting size.  <br /></td></tr>
-<tr class="separator:a66b89d47e24996c7be07dea5d827e649"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a65c9bea2e4c5989727b995c92cfc5ed4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a65c9bea2e4c5989727b995c92cfc5ed4">ccc_buf_init</a>(mem_ptr,  any_type_name,  alloc_fn,  aux_data,  capacity,  optional_size...)</td></tr>
+<tr class="memdesc:a65c9bea2e4c5989727b995c92cfc5ed4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a contiguous buffer of user a specified type, allocation policy, capacity, and optional starting size.  <br /></td></tr>
+<tr class="separator:a65c9bea2e4c5989727b995c92cfc5ed4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Container Types</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Types available in the container interface. </p>
@@ -152,6 +152,18 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Insert and Remove Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>These functions assume contiguity of elements in the buffer and increase or decrease size accordingly. </p>
 </td></tr>
+<tr class="memitem:a7b8f3da9cd649e160260684bf53a9c87"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a7b8f3da9cd649e160260684bf53a9c87">ccc_buf_reserve</a> (ccc_buffer *buf, size_t to_add, <a class="el" href="types_8h.html#a3e73202894869d2840fb21ff912bbd96">ccc_any_alloc_fn</a> *fn)</td></tr>
+<tr class="memdesc:a7b8f3da9cd649e160260684bf53a9c87"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reserves space for at least to_add more elements.  <br /></td></tr>
+<tr class="separator:a7b8f3da9cd649e160260684bf53a9c87"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acd72f0206a0acea011780e77009a558c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#acd72f0206a0acea011780e77009a558c">ccc_buf_clear_and_free_reserve</a> (ccc_buffer *buf, <a class="el" href="types_8h.html#a97f231bd3df31cb2730e3304d4cc1dd2">ccc_any_type_destructor_fn</a> *destructor, <a class="el" href="types_8h.html#a3e73202894869d2840fb21ff912bbd96">ccc_any_alloc_fn</a> *alloc)</td></tr>
+<tr class="memdesc:acd72f0206a0acea011780e77009a558c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Frees all slots in the buf and frees the underlying buffer that was previously dynamically reserved with the reserve function.  <br /></td></tr>
+<tr class="separator:acd72f0206a0acea011780e77009a558c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a151879bad404ddd776f65c5dcad882eb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a151879bad404ddd776f65c5dcad882eb">ccc_buf_clear_and_free</a> (ccc_buffer *buf, <a class="el" href="types_8h.html#a97f231bd3df31cb2730e3304d4cc1dd2">ccc_any_type_destructor_fn</a> *destructor)</td></tr>
+<tr class="memdesc:a151879bad404ddd776f65c5dcad882eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set size of buf to 0 and call destructor on each element if needed. Free the underlying buffer setting the capacity to 0. O(1) if no destructor is provided, else O(N).  <br /></td></tr>
+<tr class="separator:a151879bad404ddd776f65c5dcad882eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a40af0bf222a629030406f4d4c26b7c3a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a40af0bf222a629030406f4d4c26b7c3a">ccc_buf_clear</a> (ccc_buffer *buf, <a class="el" href="types_8h.html#a97f231bd3df31cb2730e3304d4cc1dd2">ccc_any_type_destructor_fn</a> *destructor)</td></tr>
+<tr class="memdesc:a40af0bf222a629030406f4d4c26b7c3a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set size of buf to 0 and call destructor on each element if needed. O(1) if no destructor is provided, else O(N).  <br /></td></tr>
+<tr class="separator:a40af0bf222a629030406f4d4c26b7c3a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af19f6df15e7f313da0d76bf7443906bb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#af19f6df15e7f313da0d76bf7443906bb">ccc_buf_alloc</a> (ccc_buffer *buf, size_t capacity, <a class="el" href="types_8h.html#a3e73202894869d2840fb21ff912bbd96">ccc_any_alloc_fn</a> *fn)</td></tr>
 <tr class="memdesc:af19f6df15e7f313da0d76bf7443906bb"><td class="mdescLeft">&#160;</td><td class="mdescRight">allocates the buffer to the specified size according to the user defined allocation function.  <br /></td></tr>
 <tr class="separator:af19f6df15e7f313da0d76bf7443906bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -253,8 +265,8 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="separator:a35e780d4ce7e275f053bdfacb44db265"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="a66b89d47e24996c7be07dea5d827e649" name="a66b89d47e24996c7be07dea5d827e649"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a66b89d47e24996c7be07dea5d827e649">&#9670;&#160;</a></span>ccc_buf_init</h2>
+<a id="a65c9bea2e4c5989727b995c92cfc5ed4" name="a65c9bea2e4c5989727b995c92cfc5ed4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a65c9bea2e4c5989727b995c92cfc5ed4">&#9670;&#160;</a></span>ccc_buf_init</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -264,6 +276,12 @@ This graph shows which files directly or indirectly include this file:</div>
           <td>(</td>
           <td class="paramtype">&#160;</td>
           <td class="paramname">mem_ptr, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">any_type_name, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -292,15 +310,18 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td>&#160;&#160;&#160;    ccc_impl_buf_init(mem_ptr, alloc_fn, aux_data, capacity, optional_size)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
-
+<b>Value:</b><div class="fragment"><div class="line">    ccc_impl_buf_init(mem_ptr, any_type_name, alloc_fn, aux_data, capacity,    \</div>
+<div class="line">                      optional_size)</div>
+</div><!-- fragment -->
 <p>Initialize a contiguous buffer of user a specified type, allocation policy, capacity, and optional starting size. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">mem_ptr</td><td>the pointer to existing memory or ((Type *)NULL). </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">mem_ptr</td><td>the pointer to existing memory or NULL. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">any_type_name</td><td>the name of the user type in the buffer. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">alloc_fn</td><td>ccc_any_alloc_fn or NULL if no allocation is permitted. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">aux_data</td><td>any auxiliary data needed for managing buffer memory. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">capacity</td><td>the capacity of memory at mem_ptr. </td></tr>
@@ -308,8 +329,8 @@ This graph shows which files directly or indirectly include this file:</div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the initialized buffer. Directly assign to buffer on the right hand side of the equality operator (e.g. ccc_buffer b = <a class="el" href="buffer_8h.html#a66b89d47e24996c7be07dea5d827e649" title="Initialize a contiguous buffer of user a specified type, allocation policy, capacity,...">ccc_buf_init(...)</a>;).</dd></dl>
-<p>Initialization of a buffer can occur at compile time or run time depending on the arguments. The memory pointer should be of the same type one intends to store in the buffer. Therefore, if one desires a dynamic buffer with a starting capacity of 0 and mem_ptr of NULL, casting to a type is required (e.g. (int*)NULL).</p>
+<dl class="section return"><dt>Returns</dt><dd>the initialized buffer. Directly assign to buffer on the right hand side of the equality operator (e.g. ccc_buffer b = <a class="el" href="buffer_8h.html#a65c9bea2e4c5989727b995c92cfc5ed4" title="Initialize a contiguous buffer of user a specified type, allocation policy, capacity,...">ccc_buf_init(...)</a>;).</dd></dl>
+<p>Initialization of a buffer can occur at compile time or run time depending on the arguments. The memory pointer should be of the same type one intends to store in the buffer.</p>
 <p>This initializer determines memory control for the lifetime of the buffer. If the buffer points to memory of a predetermined and fixed capacity do not provide an allocation function. If a dynamic buffer is preferred, provide the allocation function as defined by the signature in <a class="el" href="types_8h.html" title="The C Container Collection Fundamental Types.">types.h</a>. If resizing is desired on memory that has already been allocated, ensure allocation has occurred with the provided allocation function. </p>
 
 </div>
@@ -554,6 +575,131 @@ This graph shows which files directly or indirectly include this file:</div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the address of the position one past capacity. It is undefined to access this position for any reason. NULL is returned if NULL is provided or buffer has not yet been allocated.</dd></dl>
 <p>Note that end is determined by the capcity of the buffer and will not change until a resize has occured, if permitted. </p>
+
+</div>
+</div>
+<a id="a40af0bf222a629030406f4d4c26b7c3a" name="a40af0bf222a629030406f4d4c26b7c3a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a40af0bf222a629030406f4d4c26b7c3a">&#9670;&#160;</a></span>ccc_buf_clear()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_buf_clear </td>
+          <td>(</td>
+          <td class="paramtype">ccc_buffer *&#160;</td>
+          <td class="paramname"><em>buf</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a97f231bd3df31cb2730e3304d4cc1dd2">ccc_any_type_destructor_fn</a> *&#160;</td>
+          <td class="paramname"><em>destructor</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set size of buf to 0 and call destructor on each element if needed. O(1) if no destructor is provided, else O(N). </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">buf</td><td>a pointer to the buf. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">destructor</td><td>the destructor if needed or NULL.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Note that if destructor is non-NULL it will be called on each element in the buf. However, the underlying buffer for the buf is not freed. If the destructor is NULL, setting the size to 0 is O(1). Elements are assumed to be contiguous from the 0th index to index at size - 1. </p>
+
+</div>
+</div>
+<a id="a151879bad404ddd776f65c5dcad882eb" name="a151879bad404ddd776f65c5dcad882eb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a151879bad404ddd776f65c5dcad882eb">&#9670;&#160;</a></span>ccc_buf_clear_and_free()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_buf_clear_and_free </td>
+          <td>(</td>
+          <td class="paramtype">ccc_buffer *&#160;</td>
+          <td class="paramname"><em>buf</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a97f231bd3df31cb2730e3304d4cc1dd2">ccc_any_type_destructor_fn</a> *&#160;</td>
+          <td class="paramname"><em>destructor</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set size of buf to 0 and call destructor on each element if needed. Free the underlying buffer setting the capacity to 0. O(1) if no destructor is provided, else O(N). </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">buf</td><td>a pointer to the buf. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">destructor</td><td>the destructor if needed or NULL.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Note that if destructor is non-NULL it will be called on each element in the buf. After all elements are processed the buffer is freed and capacity is 0. If destructor is NULL the buffer is freed directly and capacity is 0. Elements are assumed to be contiguous from the 0th index to index at size - 1. </p>
+
+</div>
+</div>
+<a id="acd72f0206a0acea011780e77009a558c" name="acd72f0206a0acea011780e77009a558c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acd72f0206a0acea011780e77009a558c">&#9670;&#160;</a></span>ccc_buf_clear_and_free_reserve()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_buf_clear_and_free_reserve </td>
+          <td>(</td>
+          <td class="paramtype">ccc_buffer *&#160;</td>
+          <td class="paramname"><em>buf</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a97f231bd3df31cb2730e3304d4cc1dd2">ccc_any_type_destructor_fn</a> *&#160;</td>
+          <td class="paramname"><em>destructor</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a3e73202894869d2840fb21ff912bbd96">ccc_any_alloc_fn</a> *&#160;</td>
+          <td class="paramname"><em>alloc</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Frees all slots in the buf and frees the underlying buffer that was previously dynamically reserved with the reserve function. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">buf</td><td>the buffer to be cleared. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">destructor</td><td>the destructor for each element. NULL can be passed if no maintenance is required on the elements in the buf before their slots are dropped. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">alloc</td><td>the required allocation function to provide to a dynamically reserved buf. Any auxiliary data provided upon initialization will be passed to the allocation function when called. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the result of free operation. OK if success, or an error status to indicate the error. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>It is an error to call this function on a buf that was not reserved with the provided ccc_any_alloc_fn. The buf must have existing memory to free.</dd></dl>
+<p>This function covers the edge case of reserving a dynamic capacity for a buf at runtime but denying the buf allocation permission to resize. This can help prevent a buf from growing unbounded. The user in this case knows the buf does not have allocation permission and therefore no further memory will be dedicated to the buf.</p>
+<p>However, to free the buf in such a case this function must be used because the buf has no ability to free itself. Just as the allocation function is required to reserve memory so to is it required to free memory.</p>
+<p>This function will work normally if called on a buf with allocation permission however the normal ccc_buf_clear_and_free is sufficient for that use case. Elements are assumed to be contiguous from the 0th index to index at size - 1. </p>
 
 </div>
 </div>
@@ -1034,6 +1180,54 @@ This graph shows which files directly or indirectly include this file:</div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the address of the rend position. It is undefined to access this position for any reason. NULL is returned if NULL is provided or buffer has not yet been allocated. </dd></dl>
+
+</div>
+</div>
+<a id="a7b8f3da9cd649e160260684bf53a9c87" name="a7b8f3da9cd649e160260684bf53a9c87"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7b8f3da9cd649e160260684bf53a9c87">&#9670;&#160;</a></span>ccc_buf_reserve()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_buf_reserve </td>
+          <td>(</td>
+          <td class="paramtype">ccc_buffer *&#160;</td>
+          <td class="paramname"><em>buf</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>to_add</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a3e73202894869d2840fb21ff912bbd96">ccc_any_alloc_fn</a> *&#160;</td>
+          <td class="paramname"><em>fn</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Reserves space for at least to_add more elements. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">buf</td><td>a pointer to the buffer. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">to_add</td><td>the number of elements to add to the current size. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">fn</td><td>the allocation function to use to reserve memory. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the result of the reservation. OK if successful, otherwise an error status is returned. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>see the ccc_buf_clear_and_free_reserve function if this function is being used for a one-time dynamic reservation.</dd></dl>
+<p>This function can be used for a dynamic buf with or without allocation permission. If the buf has allocation permission, it will reserve the required space and later resize if more space is needed.</p>
+<p>If the buf has been initialized with no allocation permission and no memory this function can serve as a one-time reservation. To free the buf in such a case see the ccc_buf_clear_and_free_reserve function. </p>
 
 </div>
 </div>

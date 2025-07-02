@@ -1,6 +1,6 @@
 var buffer_8h =
 [
-    [ "ccc_buf_init", "buffer_8h.html#a66b89d47e24996c7be07dea5d827e649", null ],
+    [ "ccc_buf_init", "buffer_8h.html#a65c9bea2e4c5989727b995c92cfc5ed4", null ],
     [ "ccc_buffer", "buffer_8h.html#a31fe1f716bca34ad83323df1d401947b", null ],
     [ "ccc_buf_alloc", "buffer_8h.html#af19f6df15e7f313da0d76bf7443906bb", null ],
     [ "ccc_buf_alloc_back", "buffer_8h.html#a176afe75a0442da95a8663efbb6ec8b3", null ],
@@ -9,6 +9,9 @@ var buffer_8h =
     [ "ccc_buf_begin", "buffer_8h.html#aa2025e9fa8daa95cd7b1f84147ecc14b", null ],
     [ "ccc_buf_capacity", "buffer_8h.html#a8c12071400603b3e786588eb3cdd8b8b", null ],
     [ "ccc_buf_capacity_end", "buffer_8h.html#a4d42a75bb27fe09f0e6947b20148a6c5", null ],
+    [ "ccc_buf_clear", "buffer_8h.html#a40af0bf222a629030406f4d4c26b7c3a", null ],
+    [ "ccc_buf_clear_and_free", "buffer_8h.html#a151879bad404ddd776f65c5dcad882eb", null ],
+    [ "ccc_buf_clear_and_free_reserve", "buffer_8h.html#acd72f0206a0acea011780e77009a558c", null ],
     [ "ccc_buf_copy", "buffer_8h.html#a83006ab67af03f193634e446a5bd3ce9", null ],
     [ "ccc_buf_end", "buffer_8h.html#a80b30824e5b5244058aa4bbf8d9d4660", null ],
     [ "ccc_buf_erase", "buffer_8h.html#acd3fe998c43ec179e503d9f7c98f2b83", null ],
@@ -23,6 +26,7 @@ var buffer_8h =
     [ "ccc_buf_push_back", "buffer_8h.html#af52c4be9804b8639755e424e4177173c", null ],
     [ "ccc_buf_rbegin", "buffer_8h.html#a77438a7cc61c4b76776db6a5ff6d9316", null ],
     [ "ccc_buf_rend", "buffer_8h.html#a4d000d8e2b263a44fd0d754a98513931", null ],
+    [ "ccc_buf_reserve", "buffer_8h.html#a7b8f3da9cd649e160260684bf53a9c87", null ],
     [ "ccc_buf_rnext", "buffer_8h.html#a61080f33c02ed033f249e6639e6b4ec6", null ],
     [ "ccc_buf_size", "buffer_8h.html#ad93634769bf57469d89310325e93e425", null ],
     [ "ccc_buf_size_minus", "buffer_8h.html#a12150474cd794575ba4eb7442247d327", null ],

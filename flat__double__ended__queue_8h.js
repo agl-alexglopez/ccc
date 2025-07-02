@@ -2,7 +2,7 @@ var flat__double__ended__queue_8h =
 [
     [ "ccc_fdeq_emplace_back", "flat__double__ended__queue_8h.html#a9ee4b94addf503252a94ee32a438b5e0", null ],
     [ "ccc_fdeq_emplace_front", "flat__double__ended__queue_8h.html#a82291c88d3a1153d9370d57334bd1a1e", null ],
-    [ "ccc_fdeq_init", "flat__double__ended__queue_8h.html#a5f6c51ae30c8f0cae6e1b05466008784", null ],
+    [ "ccc_fdeq_init", "flat__double__ended__queue_8h.html#a84c654bbd98a261f5204764a8714335e", null ],
     [ "ccc_flat_double_ended_queue", "flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191", null ],
     [ "ccc_fdeq_at", "flat__double__ended__queue_8h.html#a4caa4193f1547f8cdf5289935aa2da6a", null ],
     [ "ccc_fdeq_back", "flat__double__ended__queue_8h.html#a9cd07edbd36d2c84bbb633e910a4d59a", null ],

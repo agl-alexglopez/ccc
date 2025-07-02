@@ -1,5 +1,9 @@
 var NAVTREEINDEX2 =
 {
+"priority__queue_8h.html#a51f7ef8cad204938beda04f7237d0cd9":[3,0,0,11,2],
+"priority__queue_8h.html#a53a826a19b684827cc3cda7a5517406b":[3,0,0,11,6],
+"priority__queue_8h.html#a5769ba899672364e962e6ea290728307":[3,0,0,11,7],
+"priority__queue_8h.html#a58950b81644cdc83ff6e6dc2df186630":[3,0,0,11,9],
 "priority__queue_8h.html#a5cfb0c9461d07915f3026f29fff5007d":[3,0,0,11,11],
 "priority__queue_8h.html#a62aaade66dff6a9328767e1c5ceaef5a":[3,0,0,11,17],
 "priority__queue_8h.html#a832c4c57933999f1dd86887c337fd4a5":[3,0,0,11,19],
