@@ -922,6 +922,7 @@ ccc_bs_clear_and_free(ccc_bitset *const bs)
     }
     bs->count = 0;
     bs->capacity = 0;
+    bs->blocks = NULL;
     return CCC_RESULT_OK;
 }
 
@@ -938,6 +939,7 @@ ccc_bs_clear_and_free_reserve(ccc_bitset *const bs, ccc_any_alloc_fn *const fn)
     }
     bs->count = 0;
     bs->capacity = 0;
+    bs->blocks = NULL;
     return CCC_RESULT_OK;
 }
 
