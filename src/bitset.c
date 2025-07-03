@@ -1045,12 +1045,12 @@ static ccc_result
 maybe_resize(struct ccc_bitset *const bs, size_t const to_add,
              ccc_any_alloc_fn *const fn)
 {
-    size_t required = bs->count + to_add;
-    if (required < bs->count)
+    size_t bits_needed = bs->count + to_add;
+    if (bits_needed < bs->count)
     {
         return CCC_RESULT_ARG_ERROR;
     }
-    if (required <= bs->capacity)
+    if (bits_needed <= bs->capacity)
     {
         return CCC_RESULT_OK;
     }
@@ -1060,19 +1060,19 @@ maybe_resize(struct ccc_bitset *const bs, size_t const to_add,
     }
     if (!bs->count && to_add == 1)
     {
-        required = BITBLOCK_BITS;
+        bits_needed = BITBLOCK_BITS;
     }
     else if (to_add == 1)
     {
-        required = bs->capacity * 2;
+        bits_needed = bs->capacity * 2;
     }
     bitblock *const new_mem
-        = fn(bs->blocks, ublock_count(required) * SIZEOF_BLOCK, bs->aux);
+        = fn(bs->blocks, ublock_count(bits_needed) * SIZEOF_BLOCK, bs->aux);
     if (!new_mem)
     {
         return CCC_RESULT_MEM_ERROR;
     }
-    bs->capacity = required;
+    bs->capacity = bits_needed;
     bs->blocks = new_mem;
     return CCC_RESULT_OK;
 }
