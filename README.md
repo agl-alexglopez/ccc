@@ -906,7 +906,7 @@ As was mentioned in the previous section, all containers can be forbidden from a
 
 ```c
 ccc_flat_priority_queue fpq
-    = ccc_fpq_init((int[40]){}, CCC_LES, int_cmp, NULL, NULL, 40);
+    = ccc_fpq_init((int[40]){}, int, CCC_LES, int_cmp, NULL, NULL, 40);
 ```
 
 For flat containers, fixed capacity is straightforward. Once space runs out, further insertion functions will fail and report that failure in different ways depending on the function used. If other behavior occurs when space runs out, such as ring buffer behavior for the flat double ended queue, it will be documented in the header of that container.
@@ -998,7 +998,7 @@ All other containers provide default initialization macros that can be used at c
 ```c
 #define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC
 static flat_double_ended_queue ring_buffer
-    = fdeq_init((static int[4096]){}, NULL, NULL, 4096);
+    = fdeq_init((static int[4096]){}, int, NULL, NULL, 4096);
 ```
 
 In all the preceding examples initializing at compile time simplifies the code, eliminates the need for initialization functions, and ensures that all containers are ready to operate when execution begins. Using compound literal initialization also helps create better ownership of memory for each container, eliminating named references to a container's memory that could be accessed by mistake.
