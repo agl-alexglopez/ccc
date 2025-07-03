@@ -38,6 +38,7 @@ algorithms use a wide range of data structures. */
 #    include <sys/syslimits.h>
 #    define FILESYS_MAX_PATH NAME_MAX
 #endif
+
 /*===========================   Type Declarations  ==========================*/
 
 enum print_branch
@@ -298,16 +299,14 @@ main(int argc, char **argv)
         {
             str_view const raw_file = sv_substr(
                 sv_arg, sv_find(sv_arg, 0, SV("=")) + 1, sv_len(sv_arg));
-            check(!sv_empty(raw_file),
-                  (void)fprintf(stderr, "file string is empty\n"););
+            check(!sv_empty(raw_file));
             todo.zip = raw_file;
         }
         else if (sv_starts_with(sv_arg, SV("-d=")))
         {
             str_view const raw_file = sv_substr(
                 sv_arg, sv_find(sv_arg, 0, SV("=")) + 1, sv_len(sv_arg));
-            check(!sv_empty(raw_file),
-                  (void)fprintf(stderr, "file string is empty\n"););
+            check(!sv_empty(raw_file));
             todo.unzip = raw_file;
         }
     }
@@ -617,7 +616,7 @@ write_to_file(str_view const original_filepath,
 
     /* Path is now correct and verified try to create file. */
     FILE *const cccz = fopen(path_to_cccz, "w");
-    check(cccz, printf("%s", strerror(errno)););
+    check(cccz, (void)fprintf(stderr, "%s", strerror(errno)););
 
     /* When writing bytes we need every bit to make it so use many checks. */
     size_t writ = writebytes(cccz, &header->magic, sizeof(header->magic));
@@ -720,7 +719,7 @@ unzip_file(str_view unzip)
 
     /* Checks are good and path is set this will be a fresh copy. */
     FILE *const copy_of_original = fopen(path, "w");
-    check(copy_of_original, printf("%s", strerror(errno)););
+    check(copy_of_original, (void)fprintf(stderr, "%s", strerror(errno)););
     reconstruct_text(copy_of_original, &tree, &he.file_bits);
 
     /* All info is on disk we can free in memory resources. */
@@ -740,10 +739,9 @@ static struct huffman_encoding
 read_from_file(str_view const unzip)
 {
     ccc_tribool has_suffix = sv_ends_with(unzip, SV(".cccz"));
-    check(has_suffix,
-          (void)fprintf(stderr, "only '.cccz' files may be decompressed.\n"););
+    check(has_suffix);
     FILE *const cccz = fopen(sv_begin(unzip), "r");
-    check(cccz, printf("%s", strerror(errno)););
+    check(cccz, (void)fprintf(stderr, "%s", strerror(errno)););
     struct huffman_encoding ret = {
         .file_bits = {.bs = bs_init(NULL, std_alloc, NULL, 0)},
         .blueprint = {
@@ -752,8 +750,7 @@ read_from_file(str_view const unzip)
         },
     };
     size_t read = readbytes(cccz, &ret.magic, sizeof(ret.magic));
-    check(read == sizeof(ret.magic) && ret.magic == cccz_magic,
-          (void)fprintf(stderr, "bad magic in header of .cccz file\n"););
+    check(read == sizeof(ret.magic) && ret.magic == cccz_magic);
     read = readbytes(cccz, &ret.leaves_minus_one, sizeof(ret.leaves_minus_one));
     check(read == sizeof(ret.leaves_minus_one));
     struct str_arena *const arena = &ret.blueprint.arena;
@@ -872,8 +869,7 @@ fill_bitq(FILE *const f, struct bitq *const bq, size_t expected_bits)
         if (biti == CHAR_BIT)
         {
             size_t const byte = readbytes(f, &buf, sizeof(buf));
-            check(byte, (void)fprintf(stderr,
-                                      "expected more bits from the file.\n"););
+            check(byte);
             biti = 0;
         }
         static_assert(sizeof(ccc_tribool) == sizeof(uint8_t));
@@ -981,7 +977,7 @@ print_inner_tree(struct huffman_tree const *const tree, size_t const node,
         (void)snprintf(str, string_length, "%s%s", prefix,
                        branch_type == LEAF ? "     " : " │   ");
     }
-    check(str, (void)fprintf(stderr, "tree printer out of memory.\n"););
+    check(str);
     struct huffman_node const *const root = node_at(tree, node);
     if (!root->link[1])
     {
@@ -1079,6 +1075,10 @@ bitq_push_back(struct bitq *const bq, ccc_tribool const bit)
 static ccc_tribool
 bitq_pop_back(struct bitq *const bq)
 {
+    if (!bq->size)
+    {
+        return CCC_TRIBOOL_ERROR;
+    }
     size_t const i = (bq->front + bq->size - 1) % capacity(&bq->bs).count;
     ccc_tribool const bit = bs_test(&bq->bs, i);
     check(bit != CCC_TRIBOOL_ERROR);
@@ -1089,6 +1089,10 @@ bitq_pop_back(struct bitq *const bq)
 static ccc_tribool
 bitq_pop_front(struct bitq *const bq)
 {
+    if (!bq->size)
+    {
+        return CCC_TRIBOOL_ERROR;
+    }
     ccc_tribool const bit = bs_test(&bq->bs, bq->front);
     check(bit != CCC_TRIBOOL_ERROR);
     bq->front = (bq->front + 1) % size(&bq->bs).count;
@@ -1099,6 +1103,10 @@ bitq_pop_front(struct bitq *const bq)
 static ccc_tribool
 bitq_test(struct bitq const *const bq, size_t const i)
 {
+    if (!bq->size)
+    {
+        return CCC_TRIBOOL_ERROR;
+    }
     return bs_test(&bq->bs, (bq->front + i) % capacity(&bq->bs).count);
 }
 
