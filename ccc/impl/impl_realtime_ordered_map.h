@@ -225,17 +225,17 @@ void *ccc_impl_rom_insert(struct ccc_romap *rom, struct ccc_romap_elem *parent,
         typeof(lazy_key_value) *impl_rom_or_ins_ret = NULL;                    \
         if (impl_or_ins_entry_ptr)                                             \
         {                                                                      \
-            struct ccc_rtree_entry *impl_rom_or_ins_ent                        \
-                = &impl_or_ins_entry_ptr->impl;                                \
-            if (impl_rom_or_ins_ent->entry.stats == CCC_ENTRY_OCCUPIED)        \
+            if (impl_or_ins_entry_ptr->impl.entry.stats == CCC_ENTRY_OCCUPIED) \
             {                                                                  \
-                impl_rom_or_ins_ret = impl_rom_or_ins_ent->entry.e;            \
+                impl_rom_or_ins_ret = impl_or_ins_entry_ptr->impl.entry.e;     \
             }                                                                  \
             else                                                               \
             {                                                                  \
-                impl_rom_or_ins_ret = ccc_impl_rom_new(impl_rom_or_ins_ent);   \
-                ccc_impl_rom_insert_key_val(                                   \
-                    impl_rom_or_ins_ent, impl_rom_or_ins_ret, lazy_key_value); \
+                impl_rom_or_ins_ret                                            \
+                    = ccc_impl_rom_new(&impl_or_ins_entry_ptr->impl);          \
+                ccc_impl_rom_insert_key_val(&impl_or_ins_entry_ptr->impl,      \
+                                            impl_rom_or_ins_ret,               \
+                                            lazy_key_value);                   \
             }                                                                  \
         }                                                                      \
         impl_rom_or_ins_ret;                                                   \
@@ -249,25 +249,28 @@ void *ccc_impl_rom_insert(struct ccc_romap *rom, struct ccc_romap_elem *parent,
         typeof(lazy_key_value) *impl_rom_ins_ent_ret = NULL;                   \
         if (impl_ins_entry_ptr)                                                \
         {                                                                      \
-            struct ccc_rtree_entry *impl_rom_ins_ent                           \
-                = &impl_ins_entry_ptr->impl;                                   \
-            if (!(impl_rom_ins_ent->entry.stats & CCC_ENTRY_OCCUPIED))         \
+            if (!(impl_ins_entry_ptr->impl.entry.stats & CCC_ENTRY_OCCUPIED))  \
             {                                                                  \
-                impl_rom_ins_ent_ret = ccc_impl_rom_new(impl_rom_ins_ent);     \
-                ccc_impl_rom_insert_key_val(                                   \
-                    impl_rom_ins_ent, impl_rom_ins_ent_ret, lazy_key_value);   \
+                impl_rom_ins_ent_ret                                           \
+                    = ccc_impl_rom_new(&impl_ins_entry_ptr->impl);             \
+                ccc_impl_rom_insert_key_val(&impl_ins_entry_ptr->impl,         \
+                                            impl_rom_ins_ent_ret,              \
+                                            lazy_key_value);                   \
             }                                                                  \
-            else if (impl_rom_ins_ent->entry.stats == CCC_ENTRY_OCCUPIED)      \
+            else if (impl_ins_entry_ptr->impl.entry.stats                      \
+                     == CCC_ENTRY_OCCUPIED)                                    \
             {                                                                  \
                 struct ccc_romap_elem impl_ins_ent_saved                       \
-                    = *ccc_impl_romap_elem_in_slot(impl_rom_ins_ent->rom,      \
-                                                   impl_rom_ins_ent->entry.e); \
-                *((typeof(impl_rom_ins_ent_ret))impl_rom_ins_ent->entry.e)     \
+                    = *ccc_impl_romap_elem_in_slot(                            \
+                        impl_ins_entry_ptr->impl.rom,                          \
+                        impl_ins_entry_ptr->impl.entry.e);                     \
+                *((typeof(impl_rom_ins_ent_ret))                               \
+                      impl_ins_entry_ptr->impl.entry.e)                        \
                     = lazy_key_value;                                          \
-                *ccc_impl_romap_elem_in_slot(impl_rom_ins_ent->rom,            \
-                                             impl_rom_ins_ent->entry.e)        \
+                *ccc_impl_romap_elem_in_slot(impl_ins_entry_ptr->impl.rom,     \
+                                             impl_ins_entry_ptr->impl.entry.e) \
                     = impl_ins_ent_saved;                                      \
-                impl_rom_ins_ent_ret = impl_rom_ins_ent->entry.e;              \
+                impl_rom_ins_ent_ret = impl_ins_entry_ptr->impl.entry.e;       \
             }                                                                  \
         }                                                                      \
         impl_rom_ins_ent_ret;                                                  \

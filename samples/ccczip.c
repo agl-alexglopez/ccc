@@ -417,10 +417,10 @@ build_encoding_pq(FILE *const f, struct huffman_tree *const tree)
     flat_hash_map fh = fhm_init(NULL, struct char_freq, ch, hash_char, char_eq,
                                 std_alloc, NULL, 0);
     foreach_filechar(f, c, {
-        struct char_freq *const cf
-            = or_insert(entry_r(&fh, c), &(struct char_freq){.ch = *c});
-        check(cf);
-        ++cf->freq;
+        struct char_freq *const ins = or_insert(
+            fhm_and_modify_w(entry_r(&fh, c), struct char_freq, ++T->freq;),
+            &(struct char_freq){.ch = *c, .freq = 1});
+        check(ins);
     });
     check(size(&fh).count >= 2);
     /* Use a buffer to simply push back elements we will heapify at the end. */
@@ -433,10 +433,10 @@ build_encoding_pq(FILE *const f, struct huffman_tree *const tree)
     {
         struct huffman_node *const node = buf_push_back(
             &tree->bump_arena, &(struct huffman_node){.ch = i->ch});
+        check(node);
+        size_t const node_i = buf_i(&tree->bump_arena, node).count;
         struct fpq_elem const *const fe = push_back(
-            &buf,
-            &(struct fpq_elem){.freq = i->freq,
-                               .node = buf_i(&tree->bump_arena, node).count});
+            &buf, &(struct fpq_elem){.freq = i->freq, .node = node_i});
         check(fe);
     }
     /* Free map but not the buffer because the priority queue took buffer. */
@@ -469,9 +469,8 @@ build_encoding_bitq(FILE *const f, struct huffman_tree *const tree)
         struct path_memo const *path = get_key_val(&memo, c);
         if (path)
         {
-            for (size_t i = path->path_start_index,
-                        end = path->path_start_index + path->path_len;
-                 i < end; ++i)
+            size_t const end = path->path_start_index + path->path_len;
+            for (size_t i = path->path_start_index; i < end; ++i)
             {
                 ccc_tribool const bit = bitq_test(&ret, i);
                 check(bit != CCC_TRIBOOL_ERROR);
