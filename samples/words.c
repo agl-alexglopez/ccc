@@ -119,7 +119,7 @@ static str_view const directions
 
 /*=======================   Prototypes     ==================================*/
 
-#define PROG_ASSERT(cond, ...)                                                 \
+#define check(cond, ...)                                                       \
     do                                                                         \
     {                                                                          \
         if (!(cond))                                                           \
@@ -194,8 +194,7 @@ main(int argc, char *argv[])
             exe.type = COUNT;
             exe.freq_fn = print_top_n;
             struct int_conversion c = parse_n_ranks(sv_arg);
-            PROG_ASSERT(c.status != CONV_ER,
-                        "cannot convert -top= flag to int");
+            check(c.status != CONV_ER, "cannot convert -top= flag to int");
             exe.n = c.conversion;
         }
         else if (sv_starts_with(sv_arg, SV("-last=")))
@@ -203,8 +202,7 @@ main(int argc, char *argv[])
             exe.type = COUNT;
             exe.freq_fn = print_last_n;
             struct int_conversion c = parse_n_ranks(sv_arg);
-            PROG_ASSERT(c.status != CONV_ER,
-                        "cannot convert -last= flat to int");
+            check(c.status != CONV_ER, "cannot convert -last= flat to int");
             exe.n = c.conversion;
         }
         else if (sv_starts_with(sv_arg, SV("-alph=")))
@@ -212,8 +210,7 @@ main(int argc, char *argv[])
             exe.type = COUNT;
             exe.freq_fn = print_alpha_n;
             struct int_conversion c = parse_n_ranks(sv_arg);
-            PROG_ASSERT(c.status != CONV_ER,
-                        "cannot convert -alph= flag to int");
+            check(c.status != CONV_ER, "cannot convert -alph= flag to int");
             exe.n = c.conversion;
         }
         else if (sv_starts_with(sv_arg, SV("-ralph=")))
@@ -221,15 +218,14 @@ main(int argc, char *argv[])
             exe.type = COUNT;
             exe.freq_fn = print_ralpha_n;
             struct int_conversion c = parse_n_ranks(sv_arg);
-            PROG_ASSERT(c.status != CONV_ER,
-                        "cannot convert -ralph= flat to int");
+            check(c.status != CONV_ER, "cannot convert -ralph= flat to int");
             exe.n = c.conversion;
         }
         else if (sv_starts_with(sv_arg, SV("-find=")))
         {
             str_view const raw_word = sv_substr(
                 sv_arg, sv_find(sv_arg, 0, SV("=")) + 1, sv_len(sv_arg));
-            PROG_ASSERT(!sv_empty(raw_word), "-find= flag has invalid entry");
+            check(!sv_empty(raw_word), "-find= flag has invalid entry");
             exe.type = FIND;
             exe.find_fn = print_found;
             exe.w = raw_word;
@@ -238,7 +234,7 @@ main(int argc, char *argv[])
         {
             str_view const raw_file = sv_substr(
                 sv_arg, sv_find(sv_arg, 0, SV("=")) + 1, sv_len(sv_arg));
-            PROG_ASSERT(!sv_empty(raw_file), "file string is empty");
+            check(!sv_empty(raw_file), "file string is empty");
             exe.file = raw_file;
         }
         else if (sv_starts_with(sv_arg, SV("-h")))
@@ -279,9 +275,9 @@ static void
 print_found(FILE *const f, str_view w)
 {
     struct str_arena a = str_arena_create(arena_start_cap);
-    PROG_ASSERT(a.arena);
+    check(a.arena);
     handle_ordered_map map = create_frequency_map(&a, f);
-    PROG_ASSERT(!is_empty(&map));
+    check(!is_empty(&map));
     struct clean_word wc = clean_word(&a, w);
     if (wc.stat == WC_CLEAN_WORD)
     {
@@ -299,12 +295,12 @@ static void
 print_top_n(FILE *const f, int n)
 {
     struct str_arena a = str_arena_create(arena_start_cap);
-    PROG_ASSERT(a.arena);
+    check(a.arena);
     handle_ordered_map map = create_frequency_map(&a, f);
-    PROG_ASSERT(!is_empty(&map));
+    check(!is_empty(&map));
     /* O(n) copy */
     struct frequency_alloc freqs = copy_frequencies(&map);
-    PROG_ASSERT(freqs.cap);
+    check(freqs.cap);
     /* O(n) sort kind of. Pops will be O(nlgn). But we don't have stdlib qsort
        space overhead to emulate why someone in an embedded or OS
        environment might choose this approach for sorting. Granted any O(1)
@@ -313,47 +309,47 @@ print_top_n(FILE *const f, int n)
     flat_priority_queue fpq
         = fpq_heapify_init(freqs.arr, struct frequency, CCC_GRT, cmp_freqs,
                            std_alloc, &a, freqs.cap, size(&map).count);
-    PROG_ASSERT(size(&fpq).count == size(&map).count);
+    check(size(&fpq).count == size(&map).count);
     if (!n)
     {
         n = size(&fpq).count;
     }
     print_n(&fpq, &a, n);
     str_arena_free(&a);
-    (void)fpq_clear_and_free(&fpq, NULL);
-    (void)hom_clear_and_free(&map, NULL);
+    (void)clear_and_free(&fpq, NULL);
+    (void)clear_and_free(&map, NULL);
 }
 
 static void
 print_last_n(FILE *const f, int n)
 {
     struct str_arena a = str_arena_create(arena_start_cap);
-    PROG_ASSERT(a.arena);
+    check(a.arena);
     handle_ordered_map map = create_frequency_map(&a, f);
-    PROG_ASSERT(!is_empty(&map));
+    check(!is_empty(&map));
     struct frequency_alloc freqs = copy_frequencies(&map);
-    PROG_ASSERT(freqs.cap);
+    check(freqs.cap);
     flat_priority_queue fpq
         = fpq_heapify_init(freqs.arr, struct frequency, CCC_LES, cmp_freqs,
                            std_alloc, &a, freqs.cap, size(&map).count);
-    PROG_ASSERT(size(&fpq).count == size(&map).count);
+    check(size(&fpq).count == size(&map).count);
     if (!n)
     {
         n = size(&fpq).count;
     }
     print_n(&fpq, &a, n);
     str_arena_free(&a);
-    (void)fpq_clear_and_free(&fpq, NULL);
-    (void)hom_clear_and_free(&map, NULL);
+    (void)clear_and_free(&fpq, NULL);
+    (void)clear_and_free(&map, NULL);
 }
 
 static void
 print_alpha_n(FILE *const f, int n)
 {
     struct str_arena a = str_arena_create(arena_start_cap);
-    PROG_ASSERT(a.arena);
+    check(a.arena);
     handle_ordered_map map = create_frequency_map(&a, f);
-    PROG_ASSERT(!is_empty(&map));
+    check(!is_empty(&map));
     if (!n)
     {
         n = size(&map).count;
@@ -365,16 +361,16 @@ print_alpha_n(FILE *const f, int n)
         printf("%s %d\n", str_arena_at(&a, w->ofs), w->cnt);
     }
     str_arena_free(&a);
-    (void)hom_clear_and_free(&map, NULL);
+    (void)clear_and_free(&map, NULL);
 }
 
 static void
 print_ralpha_n(FILE *const f, int n)
 {
     struct str_arena a = str_arena_create(arena_start_cap);
-    PROG_ASSERT(a.arena);
+    check(a.arena);
     handle_ordered_map map = create_frequency_map(&a, f);
-    PROG_ASSERT(!is_empty(&map));
+    check(!is_empty(&map));
     if (!n)
     {
         n = size(&map).count;
@@ -387,16 +383,16 @@ print_ralpha_n(FILE *const f, int n)
         printf("%s %d\n", str_arena_at(&a, w->ofs), w->cnt);
     }
     str_arena_free(&a);
-    (void)hom_clear_and_free(&map, NULL);
+    (void)clear_and_free(&map, NULL);
 }
 
 static struct frequency_alloc
 copy_frequencies(handle_ordered_map const *const map)
 {
-    PROG_ASSERT(!is_empty(map));
+    check(!is_empty(map));
     size_t const cap = sizeof(struct frequency) * (size(map).count + 1);
     struct frequency *const freqs = malloc(cap);
-    PROG_ASSERT(freqs);
+    check(freqs);
     size_t i = 0;
     for (word const *w = begin(map); w != end(map) && i < cap;
          w = next(map, w), ++i)
@@ -445,7 +441,7 @@ create_frequency_map(struct str_arena *const a, FILE *const f)
              word_view = sv_next_tok(line, word_view, space))
         {
             struct clean_word const cw = clean_word(a, word_view);
-            PROG_ASSERT(cw.stat != WC_ARENA_ERR);
+            check(cw.stat != WC_ARENA_ERR);
             if (cw.stat == WC_CLEAN_WORD)
             {
                 /* There are a few idiomatic ways we could tackle this step.
@@ -465,7 +461,7 @@ create_frequency_map(struct str_arena *const a, FILE *const f)
                 e = hom_and_modify_w(e, word, { T->cnt++; });
                 word const *const w = hom_at(
                     &hom, hom_or_insert_w(e, (word){.ofs = cw.str, .cnt = 1}));
-                PROG_ASSERT(w);
+                check(w);
             }
         }
     }
@@ -493,7 +489,7 @@ clean_word(struct str_arena *const a, str_view wv)
         }
         [[maybe_unused]] bool const pushed_char
             = str_arena_push_back(a, str, str_len, (char)tolower(*c));
-        PROG_ASSERT(pushed_char);
+        check(pushed_char);
         ++str_len;
     }
     if (!str_len)
@@ -501,7 +497,7 @@ clean_word(struct str_arena *const a, str_view wv)
         return (struct clean_word){.stat = WC_NOT_WORD};
     }
     char const *const w = str_arena_at(a, str);
-    PROG_ASSERT(w);
+    check(w);
     if (!isalpha(*w) || !isalpha(*(w + (str_len - 1))))
     {
         str_arena_free_to_pos(a, str, str_len);
@@ -520,7 +516,7 @@ cmp_string_keys(any_key_cmp const c)
     str_ofs const *const id = c.any_key_lhs;
     char const *const key_word = str_arena_at(a, *id);
     char const *const struct_word = str_arena_at(a, w->ofs);
-    PROG_ASSERT(key_word && struct_word);
+    check(key_word && struct_word);
     int const res = strcmp(key_word, struct_word);
     return (res > 0) - (res < 0);
 }
@@ -539,7 +535,7 @@ cmp_freqs(any_type_cmp const c)
     struct str_arena const *const arena = c.aux;
     char const *const lhs_word = str_arena_at(arena, lhs->ofs);
     char const *const rhs_word = str_arena_at(arena, rhs->ofs);
-    PROG_ASSERT(lhs_word && rhs_word);
+    check(lhs_word && rhs_word);
     int const res = strcmp(lhs_word, rhs_word);
     /* Looks like we have chosen wrong order to return but not so: greater
        lexicographic order is sorted first in a min priority queue or CCC_LES

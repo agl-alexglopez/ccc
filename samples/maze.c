@@ -116,7 +116,7 @@ uint16_t const cached_bit = 0b0001000000000000;
 
 /*==========================   Prototypes  ================================= */
 
-#define prog_assert(cond, ...)                                                 \
+#define check(cond, ...)                                                       \
     do                                                                         \
     {                                                                          \
         if (!(cond))                                                           \
@@ -158,10 +158,12 @@ main(int argc, char **argv)
        perfect. It only helps build the maze.
        NOLINTNEXTLINE(cert-msc32-c, cert-msc51-cpp) */
     srand(time(NULL));
-    struct maze maze = {.rows = default_rows,
-                        .cols = default_cols,
-                        .speed = default_speed,
-                        .maze = NULL};
+    struct maze maze = {
+        .rows = default_rows,
+        .cols = default_cols,
+        .speed = default_speed,
+        .maze = NULL,
+    };
     for (int i = 1; i < argc; ++i)
     {
         str_view const arg = sv(argv[i]);
@@ -246,19 +248,19 @@ animate_maze(struct maze *maze)
     flat_hash_map cost_map
         = fhm_init(NULL, struct prim_cell, cell, prim_cell_hash_fn,
                    prim_cell_eq, NULL, NULL, 0);
-    result r = fhm_reserve(&cost_map, ((maze->rows * maze->cols) / 2) + 1,
-                           std_alloc);
-    prog_assert(r == CCC_RESULT_OK);
+    result r
+        = reserve(&cost_map, ((maze->rows * maze->cols) / 2) + 1, std_alloc);
+    check(r == CCC_RESULT_OK);
     /* Priority queue gets same reserve interface. */
     flat_priority_queue cell_pq = fpq_init(NULL, struct prim_cell, CCC_LES,
                                            cmp_prim_cells, NULL, NULL, 0);
-    r = fpq_reserve(&cell_pq, ((maze->rows * maze->cols) / 2) + 1, std_alloc);
-    prog_assert(r == CCC_RESULT_OK);
+    r = reserve(&cell_pq, ((maze->rows * maze->cols) / 2) + 1, std_alloc);
+    check(r == CCC_RESULT_OK);
     struct point s = rand_point(maze);
     struct prim_cell const *const first = fhm_insert_entry_w(
         entry_r(&cost_map, &s),
         (struct prim_cell){.cell = s, .cost = rand_range(0, 100)});
-    prog_assert(first);
+    check(first);
     (void)push(&cell_pq, first);
     while (!is_empty(&cell_pq))
     {
@@ -276,7 +278,7 @@ animate_maze(struct maze *maze)
                 struct prim_cell const *const cell = fhm_or_insert_w(
                     entry_r(&cost_map, &n),
                     (struct prim_cell){.cell = n, .cost = rand_range(0, 100)});
-                prog_assert(cell);
+                check(cell);
                 if (cell->cost < min)
                 {
                     min = cell->cost;
@@ -296,8 +298,8 @@ animate_maze(struct maze *maze)
     }
     /* If a container is reserved without allocation permission it has no way
        to free itself. Give it the same allocation function used to reserve. */
-    (void)fhm_clear_and_free_reserve(&cost_map, NULL, std_alloc);
-    (void)fpq_clear_and_free_reserve(&cell_pq, NULL, std_alloc);
+    (void)clear_and_free_reserve(&cost_map, NULL, std_alloc);
+    (void)clear_and_free_reserve(&cell_pq, NULL, std_alloc);
 }
 
 /*===================     Container Support Code     ========================*/

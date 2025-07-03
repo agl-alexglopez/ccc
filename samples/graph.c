@@ -194,7 +194,7 @@ static struct point const dirs[DIRS_SIZE] = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
 static char const start_vertex_title = 'A';
 static char const end_vertex_title = 'Z';
 
-#define prog_assert(cond, ...)                                                 \
+#define check(cond, ...)                                                       \
     do                                                                         \
     {                                                                          \
         if (!(cond))                                                           \
@@ -300,12 +300,14 @@ main(int argc, char **argv)
        perfect. It only helps build graphs.
        NOLINTNEXTLINE(cert-msc32-c, cert-msc51-cpp) */
     srand(time(NULL));
-    struct graph graph = {.rows = default_rows,
-                          .cols = default_cols,
-                          .vertices = default_vertices,
-                          .speed = {},
-                          .grid = NULL,
-                          .graph = network};
+    struct graph graph = {
+        .rows = default_rows,
+        .cols = default_cols,
+        .vertices = default_vertices,
+        .speed = {},
+        .grid = NULL,
+        .graph = network,
+    };
     for (int i = 1; i < argc; ++i)
     {
         str_view const arg = sv(argv[i]);
@@ -419,7 +421,7 @@ found_dst(struct graph *const graph, struct vertex *const src)
     entry *e = fhm_insert_or_assign_w(
         &parent_map, src->pos,
         (struct path_backtrack_cell){.parent = {-1, -1}});
-    prog_assert(!insert_error(e));
+    check(!insert_error(e));
     (void)push_back(&bfs, &src->pos);
     bool dst_connection = false;
     while (!is_empty(&bfs))
@@ -440,7 +442,7 @@ found_dst(struct graph *const graph, struct vertex *const src)
                     && !has_edge_with(src, nv->name))
                 {
                     entry const in = insert_or_assign(&parent_map, &push);
-                    prog_assert(!insert_error(&in));
+                    check(!insert_error(&in));
                     edge_construct(graph, &parent_map, src, nv);
                     dst_connection = true;
                     goto done;
@@ -450,13 +452,13 @@ found_dst(struct graph *const graph, struct vertex *const src)
                 && !occupied(try_insert_r(&parent_map, &push)))
             {
                 struct point const *const n = push_back(&bfs, &next);
-                prog_assert(n);
+                check(n);
             }
         }
     }
 done:
-    (void)fdeq_clear_and_free(&bfs, NULL);
-    (void)fhm_clear_and_free(&parent_map, NULL);
+    (void)clear_and_free(&bfs, NULL);
+    (void)clear_and_free(&parent_map, NULL);
     return dst_connection;
 }
 
@@ -470,12 +472,12 @@ edge_construct(struct graph *const g, flat_hash_map *const parent_map,
     cell const edge_id = make_edge(src->name, dst->name);
     struct point cur = dst->pos;
     struct path_backtrack_cell const *c = get_key_val(parent_map, &cur);
-    prog_assert(c);
+    check(c);
     struct edge edge = {.n = {.name = dst->name, .cost = 0}, .pos = dst->pos};
     while (c->parent.r > 0)
     {
         c = get_key_val(parent_map, &c->parent);
-        prog_assert(c, printf("Cannot find cell parent to rebuild path.\n"););
+        check(c, printf("Cannot find cell parent to rebuild path.\n"););
         ++edge.n.cost;
         *grid_at_mut(g, c->current.r, c->current.c) |= edge_id;
         build_path_cell(g, c->current.r, c->current.c, edge_id);
@@ -648,7 +650,7 @@ find_shortest_paths(struct graph *const graph)
     char *lineptr = NULL;
     size_t len = 0;
     int total_cost = 0;
-    for (;;)
+    do
     {
         set_cursor_position(graph->rows, 0);
         clear_line();
@@ -696,6 +698,7 @@ find_shortest_paths(struct graph *const graph)
             break;
         }
     }
+    while (1);
 }
 
 /** Returns the distance of the shortest path from src to dst in the graph. If
@@ -726,7 +729,7 @@ dijkstra_shortest_path(struct graph *const graph, char const src,
         };
         struct cost const *const v
             = push(&costs, &map_pq_at(map_pq, (char)vx)->pq_elem);
-        prog_assert(v);
+        check(v);
     }
     while (!is_empty(&costs))
     {
@@ -756,7 +759,7 @@ dijkstra_shortest_path(struct graph *const graph, char const src,
                                         T->cost = alt;
                                         T->from = u->name;
                                     });
-                prog_assert(relax == v);
+                check(relax == v);
                 paint_edge(graph, u->name, v->name, MAG);
                 nanosleep(&graph->speed, NULL);
             }
@@ -779,7 +782,7 @@ paint_shortest_path(struct graph *const graph, struct cost const *const map_pq,
         int i = 0;
         for (; i < MAX_DEGREE && edges[i].name != u->from; ++i)
         {}
-        prog_assert(i < MAX_DEGREE && edges[i].name);
+        check(i < MAX_DEGREE && edges[i].name);
         total += edges[i].cost;
         paint_edge(graph, u->name, u->from, CYN);
         nanosleep(&graph->speed, NULL);
@@ -790,7 +793,7 @@ paint_shortest_path(struct graph *const graph, struct cost const *const map_pq,
 static inline struct cost *
 map_pq_at(struct cost const *const dj_arr, char const vertex)
 {
-    prog_assert(vertex >= start_vertex_title && vertex <= end_vertex_title);
+    check(vertex >= start_vertex_title && vertex <= end_vertex_title);
     return (struct cost *)&dj_arr[vertex - start_vertex_title];
 }
 
@@ -846,8 +849,8 @@ paint_edge(struct graph *const g, char const src_name, char const dst_name,
 static struct vertex *
 vertex_at(struct graph const *const g, char const name)
 {
-    prog_assert(name >= start_vertex_title
-                && name < start_vertex_title + g->vertices);
+    check(name >= start_vertex_title
+          && name < start_vertex_title + g->vertices);
     return &((struct vertex *)g->graph)[((size_t)name - start_vertex_title)];
 }
 
@@ -1127,7 +1130,7 @@ parse_path_request(struct graph *const g, str_view r)
         if (*c >= start_vertex_title && *c <= end_title)
         {
             struct vertex *v = vertex_at(g, *c);
-            prog_assert(v);
+            check(v);
             res.src ? (res.dst = v->name) : (res.src = v->name);
         }
     }
