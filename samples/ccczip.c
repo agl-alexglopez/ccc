@@ -391,7 +391,6 @@ build_encoding_tree(FILE *const f)
         check(pushed);
         ret.root = new_root;
     }
-    print_tree(&ret, ret.root);
     /* The flat pq was given no allocation permission because the memory it
        needs was already allocated by the buffer it stole from. The priority
        queue only gets smaller as the algorithms progresses so we didn't need
@@ -584,7 +583,6 @@ compress_tree(struct huffman_tree *const tree)
             cur = node->parent;
         }
     }
-    print_bitq(&ret.tree_paths);
     return ret;
 }
 
@@ -645,23 +643,22 @@ represents a bit in the bit queue. */
 static void
 write_bitq(FILE *const cccz, struct bitq *const bq)
 {
+    static_assert(sizeof(uint8_t) == sizeof(ccc_tribool));
     uint8_t buf = 0;
-    uint8_t biti = 0;
+    uint8_t i = 0;
     while (bitq_size(bq))
     {
-        static_assert(sizeof(uint8_t) == sizeof(ccc_tribool));
-        ccc_tribool const bit = bitq_pop_front(bq);
-        buf |= (bit << biti);
-        ++biti;
-        if (biti >= CHAR_BIT)
+        buf |= (bitq_pop_front(bq) << i);
+        ++i;
+        if (i >= CHAR_BIT)
         {
             size_t const byte = writebytes(cccz, &buf, sizeof(buf));
             check(byte);
             buf = 0;
-            biti = 0;
+            i = 0;
         }
     }
-    if (biti)
+    if (i)
     {
         size_t const byte = writebytes(cccz, &buf, sizeof(buf));
         check(byte);
@@ -826,7 +823,6 @@ reconstruct_tree(struct compressed_huffman_tree *const blueprint)
         node = parent;
         parent = parent_i(&ret, parent);
     }
-    print_tree(&ret, ret.root);
     return ret;
 }
 
@@ -862,19 +858,19 @@ static void
 fill_bitq(FILE *const f, struct bitq *const bq, size_t expected_bits)
 {
     uint8_t buf = 0;
-    uint8_t biti = CHAR_BIT;
+    uint8_t i = CHAR_BIT;
     while (expected_bits)
     {
-        if (biti == CHAR_BIT)
+        if (i == CHAR_BIT)
         {
             size_t const byte = readbytes(f, &buf, sizeof(buf));
             check(byte);
-            biti = 0;
+            i = 0;
         }
         static_assert(sizeof(ccc_tribool) == sizeof(uint8_t));
-        ccc_tribool const bit = (buf & ((uint8_t)1 << biti)) != 0;
+        ccc_tribool const bit = (buf & ((uint8_t)1 << i)) != 0;
         bitq_push_back(bq, bit);
-        ++biti;
+        ++i;
         --expected_bits;
     }
 }
@@ -1065,7 +1061,7 @@ bitq_push_back(struct bitq *const bq, ccc_tribool const bit)
     else
     {
         ccc_tribool const was = bs_set(
-            &bq->bs, ((bq->front + bq->size) % capacity(&bq->bs).count), bit);
+            &bq->bs, (bq->front + bq->size) % capacity(&bq->bs).count, bit);
         check(was != CCC_TRIBOOL_ERROR);
     }
     ++bq->size;
