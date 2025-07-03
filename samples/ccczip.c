@@ -3,7 +3,6 @@ This file implements data compression algorithms over simple files, primarily
 text files for demonstration purposes. The compression algorithm used now is
 Huffman Encoding and Decoding but more methods could be added later. Such
 algorithms use a wide range of data structures. */
-
 #include <assert.h>
 #include <errno.h>
 #include <inttypes.h>
@@ -228,13 +227,14 @@ static size_t branch_i(struct huffman_tree const *t, size_t node, uint8_t dir);
 static size_t parent_i(struct huffman_tree const *t, size_t node);
 static char char_i(struct huffman_tree const *t, size_t node);
 static struct huffman_node *node_at(struct huffman_tree const *t, size_t node);
-static void write_to_file(str_view original_filepath,
+static void write_to_file(str_view original_filepath, size_t original_filesize,
                           struct huffman_encoding *);
 static void write_bitq(FILE *cccz, struct bitq *bq);
 static struct huffman_encoding read_from_file(str_view unzip);
 static size_t readbytes(FILE *f, void *base, size_t to_read);
 static size_t writebytes(FILE *f, void const *base, size_t to_write);
 static void fill_bitq(FILE *f, struct bitq *bq, size_t expected_bits);
+static size_t file_size(FILE *f);
 
 /** Asserts even in release mode. Run code in the second argument if needed. */
 #define check(cond, ...)                                                       \
@@ -243,8 +243,8 @@ static void fill_bitq(FILE *f, struct bitq *bq, size_t expected_bits);
         if (!(cond))                                                           \
         {                                                                      \
             __VA_OPT__(__VA_ARGS__)                                            \
-            printf("%s, %d, condition is false: %s\n", __FILE__, __LINE__,     \
-                   #cond);                                                     \
+            (void)fprintf(stderr, "%s, %d, condition is false: %s\n",          \
+                          __FILE__, __LINE__, #cond);                          \
             exit(1);                                                           \
         }                                                                      \
     }                                                                          \
@@ -330,6 +330,8 @@ zip_file(str_view const to_compress)
 {
     FILE *const f = fopen(sv_begin(to_compress), "r");
     check(f, printf("%s", strerror(errno)););
+    size_t const fsize = file_size(f);
+    printf("Zip %s (%zu bytes).\n", sv_begin(to_compress), fsize);
     struct huffman_tree tree = build_encoding_tree(f);
     struct huffman_encoding encoding = {
         .magic = cccz_magic,
@@ -338,7 +340,7 @@ zip_file(str_view const to_compress)
     };
     encoding.leaves_minus_one = encoding.blueprint.leaf_string.len - 1,
     encoding.file_bits_count = bitq_size(&encoding.file_bits),
-    write_to_file(to_compress, &encoding);
+    write_to_file(to_compress, fsize, &encoding);
     free_encode_tree(&tree);
     bitq_clear_and_free(&encoding.file_bits);
     bitq_clear_and_free(&encoding.blueprint.tree_paths);
@@ -589,7 +591,7 @@ compress_tree(struct huffman_tree *const tree)
 /** Writes all encoded information to a file with the help of a header for
 later file reconstruction. */
 static void
-write_to_file(str_view const original_filepath,
+write_to_file(str_view const original_filepath, size_t const original_filesize,
               struct huffman_encoding *const header)
 {
     /* We write all new files to output directory so create the new path. */
@@ -631,6 +633,10 @@ write_to_file(str_view const original_filepath,
     write_bitq(cccz, &header->blueprint.tree_paths);
     write_bitq(cccz, &header->file_bits);
 
+    size_t const cccz_size = file_size(cccz);
+    printf("Zipped file %s is %zu bytes (compression ratio = %.2lf%%).\n",
+           path_to_cccz, cccz_size,
+           (100.0 * (double)cccz_size) / (double)(original_filesize));
     /* This file now lives in the output/ as long as user desires. */
     (void)fclose(cccz);
 }
@@ -724,6 +730,8 @@ unzip_file(str_view unzip)
     bitq_clear_and_free(&he.blueprint.tree_paths);
     str_arena_free(&he.blueprint.arena);
 
+    printf("Unzipped %s to size %zu bytes.\n", path,
+           file_size(copy_of_original));
     /* Copy is now in output/ original file remains untouched. */
     (void)fclose(copy_of_original);
 }
@@ -738,6 +746,7 @@ read_from_file(str_view const unzip)
     check(has_suffix);
     FILE *const cccz = fopen(sv_begin(unzip), "r");
     check(cccz, (void)fprintf(stderr, "%s", strerror(errno)););
+    printf("Unzip %s of size %zu bytes.\n", sv_begin(unzip), file_size(cccz));
     struct huffman_encoding ret = {
         .file_bits = {.bs = bs_init(NULL, std_alloc, NULL, 0)},
         .blueprint = {
@@ -934,6 +943,15 @@ free_encode_tree(struct huffman_tree *tree)
     tree->num_leaves = 0;
     tree->num_nodes = 0;
     tree->root = 0;
+}
+
+static size_t
+file_size(FILE *f)
+{
+    check(fseek(f, 0L, SEEK_END) >= 0);
+    size_t const ret = ftell(f);
+    check(fseek(f, 0L, SEEK_SET) >= 0);
+    return ret;
 }
 
 /* NOLINTBEGIN(*misc-no-recursion) */
