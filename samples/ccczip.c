@@ -634,9 +634,10 @@ write_to_file(str_view const original_filepath, size_t const original_filesize,
     write_bitq(cccz, &header->file_bits);
 
     size_t const cccz_size = file_size(cccz);
-    printf("Zipped file %s is %zu bytes (compression ratio = %.2lf%%).\n",
-           path_to_cccz, cccz_size,
-           (100.0 * (double)cccz_size) / (double)(original_filesize));
+    printf("Zipped file %s has compression ratio of %.2lf%% (%zu bytes).\n",
+           path_to_cccz,
+           (100.0 * (double)cccz_size) / (double)(original_filesize),
+           cccz_size);
     /* This file now lives in the output/ as long as user desires. */
     (void)fclose(cccz);
 }
@@ -730,8 +731,7 @@ unzip_file(str_view unzip)
     bitq_clear_and_free(&he.blueprint.tree_paths);
     str_arena_free(&he.blueprint.arena);
 
-    printf("Unzipped %s to size %zu bytes.\n", path,
-           file_size(copy_of_original));
+    printf("Unzipped %s (%zu bytes).\n", path, file_size(copy_of_original));
     /* Copy is now in output/ original file remains untouched. */
     (void)fclose(copy_of_original);
 }
@@ -746,7 +746,7 @@ read_from_file(str_view const unzip)
     check(has_suffix);
     FILE *const cccz = fopen(sv_begin(unzip), "r");
     check(cccz, (void)fprintf(stderr, "%s", strerror(errno)););
-    printf("Unzip %s of size %zu bytes.\n", sv_begin(unzip), file_size(cccz));
+    printf("Unzip %s (%zu bytes).\n", sv_begin(unzip), file_size(cccz));
     struct huffman_encoding ret = {
         .file_bits = {.bs = bs_init(NULL, std_alloc, NULL, 0)},
         .blueprint = {
