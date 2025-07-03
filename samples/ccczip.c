@@ -152,25 +152,17 @@ struct compressed_huffman_tree
     /** The Pre-Order traversal of internal nodes and leaves. Every internal
     node encountered on the way down is a 1 and every leaf is a 0. */
     struct bitq tree_paths;
+    /** The arena that allows us to form the dynamic string of leaves. */
     struct str_arena arena;
+    /** The handle to the leaf string in the string arena. */
     struct leaf_string leaf_string;
-};
-
-/** The completed encoding of a file. This can be written to disk and retrieved
-later to be reconstructed. This method loses no information by compression. */
-struct huffman_encoding
-{
-    /** The path to every character encountered in the file text in order. */
-    struct bitq file_bits;
-    /** The compact representation of the tree to be reconstructed later. */
-    struct compressed_huffman_tree blueprint;
 };
 
 /** The header representing the compressed file structure of a compressed file
 via Huffman Encoding. The fields of this struct should be handled in order as
 we write to or read from a file. It is not strictly necessary to use this but
 it helps keep logic consistent across compression and decompression. */
-struct huffman_header
+struct huffman_encoding
 {
     /** Magic to recognize our cccz files "cccz" */
     uint32_t magic;
@@ -180,8 +172,10 @@ struct huffman_header
     uint8_t leaves_minus_one;
     /** Number of bits in the file content bit queue we encoded. */
     size_t file_bits_count;
-    /** A reference to the encoding to access the needed bit queues. */
-    struct huffman_encoding *encoding;
+    /** The compact representation of the tree to be reconstructed later. */
+    struct compressed_huffman_tree blueprint;
+    /** The path to every character encountered in the file text in order. */
+    struct bitq file_bits;
 };
 
 /** Files the user wants zipped or unzipped. */
@@ -233,12 +227,10 @@ static size_t branch_i(struct huffman_tree const *t, size_t node, uint8_t dir);
 static size_t parent_i(struct huffman_tree const *t, size_t node);
 static char char_i(struct huffman_tree const *t, size_t node);
 static struct huffman_node *node_at(struct huffman_tree const *t, size_t node);
-static void write_to_file(str_view original_filepath, struct huffman_header *);
-static FILE *open_cccz(str_view original_filepath);
+static void write_to_file(str_view original_filepath,
+                          struct huffman_encoding *);
 static void write_bitq(FILE *cccz, struct bitq *bq);
 static struct huffman_encoding read_from_file(str_view unzip);
-static FILE *open_unzipped(str_view unzip);
-static void fill_header(FILE *, struct huffman_header *);
 static size_t readbytes(FILE *f, void *base, size_t to_read);
 static size_t writebytes(FILE *f, void const *base, size_t to_write);
 static void fill_bitq(FILE *f, struct bitq *bq, size_t expected_bits);
@@ -340,19 +332,14 @@ zip_file(str_view const to_compress)
     FILE *const f = fopen(sv_begin(to_compress), "r");
     check(f, printf("%s", strerror(errno)););
     struct huffman_tree tree = build_encoding_tree(f);
-
     struct huffman_encoding encoding = {
+        .magic = cccz_magic,
         .file_bits = build_encoding_bitq(f, &tree),
         .blueprint = compress_tree(&tree),
     };
-    write_to_file(
-        to_compress,
-        &(struct huffman_header){
-            .magic = cccz_magic,
-            .leaves_minus_one = encoding.blueprint.leaf_string.len - 1,
-            .file_bits_count = bitq_size(&encoding.file_bits),
-            .encoding = &encoding,
-        });
+    encoding.leaves_minus_one = encoding.blueprint.leaf_string.len - 1,
+    encoding.file_bits_count = bitq_size(&encoding.file_bits),
+    write_to_file(to_compress, &encoding);
     free_encode_tree(&tree);
     bitq_clear_and_free(&encoding.file_bits);
     bitq_clear_and_free(&encoding.blueprint.tree_paths);
@@ -424,7 +411,9 @@ build_encoding_bitq(FILE *const f, struct huffman_tree *const tree)
     struct bitq ret = {.bs = bs_init(NULL, std_alloc, NULL, 0)};
     /* By memoizing known bit sequences we can save significant time by not
        performing a DFS over the tree. This is especially helpful for large
-       alphabets aka trees with many leaves. */
+       alphabets aka trees with many leaves. An array of 0-256 elements as a map
+       could achieve the same result faster but it would waste much more space.
+       It is rare to have a file use all 256 possible character values. */
     flat_hash_map memo = ccc_fhm_init(NULL, struct path_memo, ch, hash_char,
                                       path_memo_eq, NULL, NULL, 0);
     ccc_result r = reserve(&memo, tree->num_leaves, std_alloc);
@@ -605,24 +594,48 @@ build_encoding_pq(FILE *const f, struct huffman_tree *const tree)
 later file reconstruction. */
 static void
 write_to_file(str_view const original_filepath,
-              struct huffman_header *const header)
+              struct huffman_encoding *const header)
 {
-    FILE *const cccz = open_cccz(original_filepath);
+    /* We write all new files to output directory so create the new path. */
+    char path_to_cccz[FILESYS_MAX_PATH];
+    size_t const dir_delim
+        = sv_rfind(original_filepath, sv_len(original_filepath), SV("/"));
+    str_view const raw_file = dir_delim == sv_npos(original_filepath)
+                                ? original_filepath
+                                : sv_substr(original_filepath, dir_delim + 1,
+                                            sv_len(original_filepath));
+    size_t const total_bytes
+        = sv_size(output_dir) + sv_size(raw_file) + sv_size(cccz_suffix);
+    check(total_bytes < FILESYS_MAX_PATH);
+    size_t const path_bytes
+        = sv_fill(sv_size(output_dir), path_to_cccz, output_dir);
+    size_t const file_bytes
+        = sv_fill(sv_size(raw_file), path_to_cccz + (path_bytes - 1), raw_file);
+    (void)sv_fill(sv_size(cccz_suffix),
+                  path_to_cccz + (path_bytes - 1) + (file_bytes - 1),
+                  cccz_suffix);
+
+    /* Path is now correct and verified try to create file. */
+    FILE *const cccz = fopen(path_to_cccz, "w");
+    check(cccz, printf("%s", strerror(errno)););
+
+    /* When writing bytes we need every bit to make it so use many checks. */
     size_t writ = writebytes(cccz, &header->magic, sizeof(header->magic));
     check(writ == sizeof(header->magic));
     writ = writebytes(cccz, &header->leaves_minus_one,
                       sizeof(header->leaves_minus_one));
     check(writ == sizeof(header->leaves_minus_one));
-    char const *leaf_string
-        = str_arena_at(&header->encoding->blueprint.arena,
-                       header->encoding->blueprint.leaf_string.start);
+    char const *leaf_string = str_arena_at(&header->blueprint.arena,
+                                           header->blueprint.leaf_string.start);
     writ = writebytes(cccz, leaf_string, header->leaves_minus_one + 1);
     check(writ == (size_t)(header->leaves_minus_one + 1));
     writ = writebytes(cccz, &header->file_bits_count,
                       sizeof(header->file_bits_count));
     check(writ == sizeof(header->file_bits_count));
-    write_bitq(cccz, &header->encoding->blueprint.tree_paths);
-    write_bitq(cccz, &header->encoding->file_bits);
+    write_bitq(cccz, &header->blueprint.tree_paths);
+    write_bitq(cccz, &header->file_bits);
+
+    /* This file now lives in the output/ as long as user desires. */
     (void)fclose(cccz);
 }
 
@@ -657,33 +670,6 @@ write_bitq(FILE *const cccz, struct bitq *const bq)
     }
 }
 
-/** Opens a new compressed file at the output directory to write to or quits
-the program on failure. */
-static FILE *
-open_cccz(str_view original_filepath)
-{
-    size_t const dir_delim
-        = sv_rfind(original_filepath, sv_len(original_filepath), SV("/"));
-    str_view const raw_file = dir_delim == sv_npos(original_filepath)
-                                ? original_filepath
-                                : sv_substr(original_filepath, dir_delim + 1,
-                                            sv_len(original_filepath));
-    size_t const total_bytes
-        = sv_size(output_dir) + sv_size(raw_file) + sv_size(cccz_suffix);
-    check(total_bytes < FILESYS_MAX_PATH);
-    char path_to_cccz[FILESYS_MAX_PATH];
-    size_t const path_bytes
-        = sv_fill(sv_size(output_dir), path_to_cccz, output_dir);
-    size_t const file_bytes
-        = sv_fill(sv_size(raw_file), path_to_cccz + (path_bytes - 1), raw_file);
-    (void)sv_fill(sv_size(cccz_suffix),
-                  path_to_cccz + (path_bytes - 1) + (file_bytes - 1),
-                  cccz_suffix);
-    FILE *const cccz = fopen(path_to_cccz, "w");
-    check(cccz, printf("%s", strerror(errno)););
-    return cccz;
-}
-
 /** Write the specified bytes to the file or exit the program if an error
 occurs. Returns the number of bytes written. */
 static size_t
@@ -711,17 +697,39 @@ writebytes(FILE *const f, void const *const base, size_t const to_write)
 is reconstructed and a copy of the original text is written to the output
 directory as a new file with the same name. */
 static void
-unzip_file(str_view const unzip)
+unzip_file(str_view unzip)
 {
+    /* First we verify the compressed file is correct before creating new. */
     struct huffman_encoding he = read_from_file(unzip);
     struct huffman_tree tree = reconstruct_tree(&he.blueprint);
-    FILE *const copy_of_original = open_unzipped(unzip);
+
+    /* This means the compressed file was valid so write a new one to output. */
+    char path[FILESYS_MAX_PATH];
+    ccc_tribool has_suf = sv_ends_with(unzip, cccz_suffix);
+    check(has_suf);
+    unzip = sv_remove_suffix(unzip, sv_len(cccz_suffix));
+    size_t const dir_delim = sv_rfind(unzip, sv_len(unzip), SV("/"));
+    str_view const raw_file
+        = dir_delim == sv_npos(unzip)
+            ? unzip
+            : sv_substr(unzip, dir_delim + 1, sv_len(unzip));
+    size_t const total_bytes = sv_size(output_dir) + sv_size(raw_file);
+    check(total_bytes < FILESYS_MAX_PATH);
+    size_t const prefix = sv_fill(sv_size(output_dir), path, output_dir);
+    (void)sv_fill(sv_size(raw_file), path + (prefix - 1), raw_file);
+
+    /* Checks are good and path is set this will be a fresh copy. */
+    FILE *const copy_of_original = fopen(path, "w");
+    check(copy_of_original, printf("%s", strerror(errno)););
     reconstruct_text(copy_of_original, &tree, &he.file_bits);
+
     /* All info is on disk we can free in memory resources. */
     free_encode_tree(&tree);
     bitq_clear_and_free(&he.file_bits);
     bitq_clear_and_free(&he.blueprint.tree_paths);
     str_arena_free(&he.blueprint.arena);
+
+    /* Copy is now in output/ original file remains untouched. */
     (void)fclose(copy_of_original);
 }
 
@@ -828,40 +836,27 @@ read_from_file(str_view const unzip)
             .tree_paths = {.bs = bs_init(NULL, std_alloc, NULL, 0)},
         },
     };
-    fill_header(cccz, &(struct huffman_header){.encoding = &ret});
-    (void)fclose(cccz);
-    return ret;
-}
-
-/** Validates and fills in the fields of the header to enable use of the Huffman
-Encoding for file reconstruction. Exits if errors occur. After this function
-the Huffman Encoding struct will have its bit queues appropriately filled and
-the algorithm can proceed to reconstruct the tree from the tree paths queue.
-The text bytes queue is also populated but the tree must be built before this
-is useful. */
-static void
-fill_header(FILE *const f, struct huffman_header *const header)
-{
-    size_t read = readbytes(f, &header->magic, sizeof(header->magic));
-    check(read == sizeof(header->magic) && header->magic == cccz_magic,
+    size_t read = readbytes(cccz, &ret.magic, sizeof(ret.magic));
+    check(read == sizeof(ret.magic) && ret.magic == cccz_magic,
           (void)fprintf(stderr, "bad magic in header of .cccz file\n"););
-    read = readbytes(f, &header->leaves_minus_one,
-                     sizeof(header->leaves_minus_one));
-    check(read == sizeof(header->leaves_minus_one));
-    struct str_arena *const arena = &header->encoding->blueprint.arena;
-    struct leaf_string *const leaves = &header->encoding->blueprint.leaf_string;
-    leaves->start = str_arena_alloc(arena, header->leaves_minus_one + 1);
+    read = readbytes(cccz, &ret.leaves_minus_one, sizeof(ret.leaves_minus_one));
+    check(read == sizeof(ret.leaves_minus_one));
+    struct str_arena *const arena = &ret.blueprint.arena;
+    struct leaf_string *const leaves = &ret.blueprint.leaf_string;
+    leaves->start = str_arena_alloc(arena, ret.leaves_minus_one + 1);
     check(leaves->start >= 0);
-    leaves->len = header->leaves_minus_one + 1;
-    read = readbytes(f, str_arena_at(arena, leaves->start), leaves->len);
-    check(read == (size_t)(header->leaves_minus_one + 1));
-    read = readbytes(f, &header->file_bits_count,
-                     sizeof(header->file_bits_count));
-    check(read == sizeof(header->file_bits_count));
+    leaves->len = ret.leaves_minus_one + 1;
+    read = readbytes(cccz, str_arena_at(arena, leaves->start), leaves->len);
+    check(read == (size_t)(ret.leaves_minus_one + 1));
+    read = readbytes(cccz, &ret.file_bits_count, sizeof(ret.file_bits_count));
+    check(read == sizeof(ret.file_bits_count));
     /* The pairing method we used while building the tree makes this true. */
     size_t const tree_path_bits = (leaves->len * 2) - 1;
-    fill_bitq(f, &header->encoding->blueprint.tree_paths, tree_path_bits);
-    fill_bitq(f, &header->encoding->file_bits, header->file_bits_count);
+    fill_bitq(cccz, &ret.blueprint.tree_paths, tree_path_bits);
+    fill_bitq(cccz, &ret.file_bits, ret.file_bits_count);
+
+    (void)fclose(cccz);
+    return ret;
 }
 
 /** Fills a bit queue from a file given an expected number of bits. The bits
@@ -887,29 +882,6 @@ fill_bitq(FILE *const f, struct bitq *const bq, size_t expected_bits)
         ++biti;
         --expected_bits;
     }
-}
-
-/** Opens a new copy of the original file in the output directory. This is what
-is written to when all Huffman Encoding data structures are reconstructed. */
-static FILE *
-open_unzipped(str_view unzip)
-{
-    ccc_tribool has_suf = sv_ends_with(unzip, cccz_suffix);
-    check(has_suf);
-    unzip = sv_remove_suffix(unzip, sv_len(cccz_suffix));
-    size_t const dir_delim = sv_rfind(unzip, sv_len(unzip), SV("/"));
-    str_view const raw_file
-        = dir_delim == sv_npos(unzip)
-            ? unzip
-            : sv_substr(unzip, dir_delim + 1, sv_len(unzip));
-    size_t const total_bytes = sv_size(output_dir) + sv_size(raw_file);
-    check(total_bytes < FILESYS_MAX_PATH);
-    char path[FILESYS_MAX_PATH];
-    size_t const prefix = sv_fill(sv_size(output_dir), path, output_dir);
-    (void)sv_fill(sv_size(raw_file), path + (prefix - 1), raw_file);
-    FILE *const f = fopen(path, "w");
-    check(f, printf("%s", strerror(errno)););
-    return f;
 }
 
 /** Reads the specified number of bytes from the file or exits if an error
