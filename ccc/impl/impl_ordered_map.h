@@ -208,16 +208,15 @@ void *ccc_impl_om_insert(struct ccc_omap *t, struct ccc_omap_elem *n);
         typeof(lazy_key_value) *impl_or_ins_ret = NULL;                        \
         if (impl_or_ins_entry_ptr)                                             \
         {                                                                      \
-            struct ccc_otree_entry *impl_om_or_ins_ent                         \
-                = &impl_or_ins_entry_ptr->impl;                                \
-            if (impl_om_or_ins_ent->entry.stats == CCC_ENTRY_OCCUPIED)         \
+            if (impl_or_ins_entry_ptr->impl.entry.stats == CCC_ENTRY_OCCUPIED) \
             {                                                                  \
-                impl_or_ins_ret = impl_om_or_ins_ent->entry.e;                 \
+                impl_or_ins_ret = impl_or_ins_entry_ptr->impl.entry.e;         \
             }                                                                  \
             else                                                               \
             {                                                                  \
-                impl_or_ins_ret = ccc_impl_om_new(impl_om_or_ins_ent);         \
-                ccc_impl_om_insert_key_val(impl_om_or_ins_ent,                 \
+                impl_or_ins_ret                                                \
+                    = ccc_impl_om_new(&impl_or_ins_entry_ptr->impl);           \
+                ccc_impl_om_insert_key_val(&impl_or_ins_entry_ptr->impl,       \
                                            impl_or_ins_ret, lazy_key_value);   \
             }                                                                  \
         }                                                                      \
@@ -231,25 +230,27 @@ void *ccc_impl_om_insert(struct ccc_omap *t, struct ccc_omap_elem *n);
         typeof(lazy_key_value) *impl_om_ins_ent_ret = NULL;                    \
         if (impl_ins_entry_ptr)                                                \
         {                                                                      \
-            struct ccc_otree_entry *impl_om_ins_ent                            \
-                = &impl_ins_entry_ptr->impl;                                   \
-            if (!(impl_om_ins_ent->entry.stats & CCC_ENTRY_OCCUPIED))          \
+            if (!(impl_ins_entry_ptr->impl.entry.stats & CCC_ENTRY_OCCUPIED))  \
             {                                                                  \
-                impl_om_ins_ent_ret = ccc_impl_om_new(impl_om_ins_ent);        \
-                ccc_impl_om_insert_key_val(                                    \
-                    impl_om_ins_ent, impl_om_ins_ent_ret, lazy_key_value);     \
+                impl_om_ins_ent_ret                                            \
+                    = ccc_impl_om_new(&impl_ins_entry_ptr->impl);              \
+                ccc_impl_om_insert_key_val(&impl_ins_entry_ptr->impl,          \
+                                           impl_om_ins_ent_ret,                \
+                                           lazy_key_value);                    \
             }                                                                  \
-            else if (impl_om_ins_ent->entry.stats == CCC_ENTRY_OCCUPIED)       \
+            else if (impl_ins_entry_ptr->impl.entry.stats                      \
+                     == CCC_ENTRY_OCCUPIED)                                    \
             {                                                                  \
                 struct ccc_omap_elem impl_ins_ent_saved                        \
-                    = *ccc_impl_omap_elem_in_slot(impl_om_ins_ent->t,          \
-                                                  impl_om_ins_ent->entry.e);   \
-                *((typeof(lazy_key_value) *)impl_om_ins_ent->entry.e)          \
+                    = *ccc_impl_omap_elem_in_slot(                             \
+                        impl_ins_entry_ptr->impl.t,                            \
+                        impl_ins_entry_ptr->impl.entry.e);                     \
+                *((typeof(lazy_key_value) *)impl_ins_entry_ptr->impl.entry.e)  \
                     = lazy_key_value;                                          \
-                *ccc_impl_omap_elem_in_slot(impl_om_ins_ent->t,                \
-                                            impl_om_ins_ent->entry.e)          \
+                *ccc_impl_omap_elem_in_slot(impl_ins_entry_ptr->impl.t,        \
+                                            impl_ins_entry_ptr->impl.entry.e)  \
                     = impl_ins_ent_saved;                                      \
-                impl_om_ins_ent_ret = impl_om_ins_ent->entry.e;                \
+                impl_om_ins_ent_ret = impl_ins_entry_ptr->impl.entry.e;        \
             }                                                                  \
         }                                                                      \
         impl_om_ins_ent_ret;                                                   \

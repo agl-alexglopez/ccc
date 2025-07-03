@@ -279,16 +279,16 @@ problem. */
         typeof(lazy_key_value) *impl_fhm_or_ins_res = NULL;                    \
         if (impl_fhm_or_ins_ent_ptr)                                           \
         {                                                                      \
-            struct ccc_fhash_entry *impl_fhm_or_ins_entry                      \
-                = &impl_fhm_or_ins_ent_ptr->impl;                              \
-            if (!(impl_fhm_or_ins_entry->stats & CCC_ENTRY_INSERT_ERROR))      \
+            if (!(impl_fhm_or_ins_ent_ptr->impl.stats                          \
+                  & CCC_ENTRY_INSERT_ERROR))                                   \
             {                                                                  \
-                impl_fhm_or_ins_res = ccc_impl_fhm_data_at(                    \
-                    impl_fhm_or_ins_entry->h, impl_fhm_or_ins_entry->i);       \
-                if (impl_fhm_or_ins_entry->stats == CCC_ENTRY_VACANT)          \
+                impl_fhm_or_ins_res                                            \
+                    = ccc_impl_fhm_data_at(impl_fhm_or_ins_ent_ptr->impl.h,    \
+                                           impl_fhm_or_ins_ent_ptr->impl.i);   \
+                if (impl_fhm_or_ins_ent_ptr->impl.stats == CCC_ENTRY_VACANT)   \
                 {                                                              \
                     *impl_fhm_or_ins_res = lazy_key_value;                     \
-                    ccc_impl_fhm_set_insert(impl_fhm_or_ins_entry);            \
+                    ccc_impl_fhm_set_insert(&impl_fhm_or_ins_ent_ptr->impl);   \
                 }                                                              \
             }                                                                  \
         }                                                                      \
@@ -304,16 +304,15 @@ directly. This is similar to insert or assign where overwriting may occur. */
         typeof(lazy_key_value) *impl_fhm_ins_ent_res = NULL;                   \
         if (impl_fhm_ins_ent_ptr)                                              \
         {                                                                      \
-            struct ccc_fhash_entry *impl_fhm_ins_entry                         \
-                = &impl_fhm_ins_ent_ptr->impl;                                 \
-            if (!(impl_fhm_ins_entry->stats & CCC_ENTRY_INSERT_ERROR))         \
+            if (!(impl_fhm_ins_ent_ptr->impl.stats & CCC_ENTRY_INSERT_ERROR))  \
             {                                                                  \
-                impl_fhm_ins_ent_res = ccc_impl_fhm_data_at(                   \
-                    impl_fhm_ins_entry->h, impl_fhm_ins_entry->i);             \
+                impl_fhm_ins_ent_res                                           \
+                    = ccc_impl_fhm_data_at(impl_fhm_ins_ent_ptr->impl.h,       \
+                                           impl_fhm_ins_ent_ptr->impl.i);      \
                 *impl_fhm_ins_ent_res = lazy_key_value;                        \
-                if (impl_fhm_ins_entry->stats == CCC_ENTRY_VACANT)             \
+                if (impl_fhm_ins_ent_ptr->impl.stats == CCC_ENTRY_VACANT)      \
                 {                                                              \
-                    ccc_impl_fhm_set_insert(impl_fhm_ins_entry);               \
+                    ccc_impl_fhm_set_insert(&impl_fhm_ins_ent_ptr->impl);      \
                 }                                                              \
             }                                                                  \
         }                                                                      \

@@ -237,16 +237,16 @@ void *ccc_impl_omm_multimap_insert(struct ccc_ommap *t,
         typeof(lazy_key_value) *impl_or_ins_ret = NULL;                        \
         if (impl_omm_or_ins_ent_ptr)                                           \
         {                                                                      \
-            struct ccc_omultimap_entry *impl_omm_or_ins_ent                    \
-                = &impl_omm_or_ins_ent_ptr->impl;                              \
-            if (impl_omm_or_ins_ent->entry.stats == CCC_ENTRY_OCCUPIED)        \
+            if (impl_omm_or_ins_ent_ptr->impl.entry.stats                      \
+                == CCC_ENTRY_OCCUPIED)                                         \
             {                                                                  \
-                impl_or_ins_ret = impl_omm_or_ins_ent->entry.e;                \
+                impl_or_ins_ret = impl_omm_or_ins_ent_ptr->impl.entry.e;       \
             }                                                                  \
             else                                                               \
             {                                                                  \
-                impl_or_ins_ret = ccc_impl_omm_new(impl_omm_or_ins_ent);       \
-                ccc_impl_omm_insert_key_val(impl_omm_or_ins_ent,               \
+                impl_or_ins_ret                                                \
+                    = ccc_impl_omm_new(&impl_omm_or_ins_ent_ptr->impl);        \
+                ccc_impl_omm_insert_key_val(&impl_omm_or_ins_ent_ptr->impl,    \
                                             impl_or_ins_ret, lazy_key_value);  \
             }                                                                  \
         }                                                                      \
@@ -260,10 +260,9 @@ void *ccc_impl_omm_multimap_insert(struct ccc_ommap *t,
         typeof(lazy_key_value) *impl_omm_ins_ent_ret = NULL;                   \
         if (impl_omm_ins_ent_ptr)                                              \
         {                                                                      \
-            struct ccc_omultimap_entry *impl_omm_ins_ent                       \
-                = &impl_omm_ins_ent_ptr->impl;                                 \
-            impl_omm_ins_ent_ret = ccc_impl_omm_new(impl_omm_ins_ent);         \
-            ccc_impl_omm_insert_key_val(impl_omm_ins_ent,                      \
+            impl_omm_ins_ent_ret                                               \
+                = ccc_impl_omm_new(&impl_omm_ins_ent_ptr->impl);               \
+            ccc_impl_omm_insert_key_val(&impl_omm_ins_ent_ptr->impl,           \
                                         impl_omm_ins_ent_ret, lazy_key_value); \
         }                                                                      \
         impl_omm_ins_ent_ret;                                                  \

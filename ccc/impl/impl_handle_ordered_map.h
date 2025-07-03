@@ -204,22 +204,21 @@ is of a known fixed size defined at compile time, not just a pointer. */
         ccc_handle_i impl_hom_or_ins_ret = 0;                                  \
         if (impl_hom_or_ins_hndl_ptr)                                          \
         {                                                                      \
-            struct ccc_htree_handle *impl_hom_or_ins_hndl                      \
-                = &impl_hom_or_ins_hndl_ptr->impl;                             \
-            if (impl_hom_or_ins_hndl->stats == CCC_ENTRY_OCCUPIED)             \
+            if (impl_hom_or_ins_hndl_ptr->impl.stats == CCC_ENTRY_OCCUPIED)    \
             {                                                                  \
-                impl_hom_or_ins_ret = impl_hom_or_ins_hndl->i;                 \
+                impl_hom_or_ins_ret = impl_hom_or_ins_hndl_ptr->impl.i;        \
             }                                                                  \
             else                                                               \
             {                                                                  \
-                impl_hom_or_ins_ret                                            \
-                    = ccc_impl_hom_alloc_slot(impl_hom_or_ins_hndl->hom);      \
+                impl_hom_or_ins_ret = ccc_impl_hom_alloc_slot(                 \
+                    impl_hom_or_ins_hndl_ptr->impl.hom);                       \
                 if (impl_hom_or_ins_ret)                                       \
                 {                                                              \
                     *((typeof(lazy_key_value) *)ccc_impl_hom_data_at(          \
-                        impl_hom_or_ins_hndl->hom, impl_hom_or_ins_ret))       \
+                        impl_hom_or_ins_hndl_ptr->impl.hom,                    \
+                        impl_hom_or_ins_ret))                                  \
                         = lazy_key_value;                                      \
-                    ccc_impl_hom_insert(impl_hom_or_ins_hndl->hom,             \
+                    ccc_impl_hom_insert(impl_hom_or_ins_hndl_ptr->impl.hom,    \
                                         impl_hom_or_ins_ret);                  \
                 }                                                              \
             }                                                                  \
@@ -235,27 +234,27 @@ is of a known fixed size defined at compile time, not just a pointer. */
         ccc_handle_i impl_hom_ins_hndl_ret = 0;                                \
         if (impl_hom_ins_hndl_ptr)                                             \
         {                                                                      \
-            struct ccc_htree_handle *impl_hom_ins_hndl                         \
-                = &impl_hom_ins_hndl_ptr->impl;                                \
-            if (!(impl_hom_ins_hndl->stats & CCC_ENTRY_OCCUPIED))              \
+            if (!(impl_hom_ins_hndl_ptr->impl.stats & CCC_ENTRY_OCCUPIED))     \
             {                                                                  \
-                impl_hom_ins_hndl_ret                                          \
-                    = ccc_impl_hom_alloc_slot(impl_hom_ins_hndl->hom);         \
+                impl_hom_ins_hndl_ret = ccc_impl_hom_alloc_slot(               \
+                    impl_hom_ins_hndl_ptr->impl.hom);                          \
                 if (impl_hom_ins_hndl_ret)                                     \
                 {                                                              \
                     *((typeof(lazy_key_value) *)ccc_impl_hom_data_at(          \
-                        impl_hom_ins_hndl->hom, impl_hom_ins_hndl_ret))        \
+                        impl_hom_ins_hndl_ptr->impl.hom,                       \
+                        impl_hom_ins_hndl_ret))                                \
                         = lazy_key_value;                                      \
-                    ccc_impl_hom_insert(impl_hom_ins_hndl->hom,                \
+                    ccc_impl_hom_insert(impl_hom_ins_hndl_ptr->impl.hom,       \
                                         impl_hom_ins_hndl_ret);                \
                 }                                                              \
             }                                                                  \
-            else if (impl_hom_ins_hndl->stats == CCC_ENTRY_OCCUPIED)           \
+            else if (impl_hom_ins_hndl_ptr->impl.stats == CCC_ENTRY_OCCUPIED)  \
             {                                                                  \
                 *((typeof(lazy_key_value) *)ccc_impl_hom_data_at(              \
-                    impl_hom_ins_hndl->hom, impl_hom_ins_hndl->i))             \
+                    impl_hom_ins_hndl_ptr->impl.hom,                           \
+                    impl_hom_ins_hndl_ptr->impl.i))                            \
                     = lazy_key_value;                                          \
-                impl_hom_ins_hndl_ret = impl_hom_ins_hndl->i;                  \
+                impl_hom_ins_hndl_ret = impl_hom_ins_hndl_ptr->impl.i;         \
             }                                                                  \
         }                                                                      \
         impl_hom_ins_hndl_ret;                                                 \
