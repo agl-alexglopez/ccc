@@ -347,146 +347,6 @@ zip_file(str_view const to_compress)
     (void)fclose(f);
 }
 
-/** Compresses the Huffman tree by creating its representation as a Pre-Order
-traversal of the tree. The traversal is entered into a bit queue. We also push
-the leaves to a string as they are encountered during this traversal. By the
-end of the operation, we have a bit queue of our traversal where every internal
-node encountered on the way down is a 1 and every leaf is a 0. We also have a
-string of leaf characters that we encountered in order. */
-static struct compressed_huffman_tree
-compress_tree(struct huffman_tree *const tree)
-{
-    struct compressed_huffman_tree ret = {
-        .tree_paths = {.bs = bs_init(NULL, std_alloc, NULL, 0)},
-        .arena = str_arena_create(START_STR_ARENA_CAP),
-    };
-    check(ret.arena.arena);
-    ret.leaf_string.start = str_arena_alloc(&ret.arena, 0);
-    ccc_result const r = bitq_reserve(&ret.tree_paths, tree->num_nodes);
-    check(r == CCC_RESULT_OK);
-    size_t cur = tree->root;
-    /* To properly emulate a recursive Pre-Order traversal with iteration we
-       use the parent field for backtracking and an iterator for caching and
-       progression. */
-    while (cur)
-    {
-        struct huffman_node *const node = node_at(tree, cur);
-        if (!node->link[1])
-        {
-            /* A leaf is always pushed because it is only seen once. */
-            bitq_push_back(&ret.tree_paths, CCC_FALSE);
-            str_arena_push_back(&ret.arena, ret.leaf_string.start,
-                                ret.leaf_string.len, node->ch);
-            ++ret.leaf_string.len;
-            cur = node->parent;
-        }
-        else if (node->iter < ITER_END)
-        {
-            /* We only push internal 1 nodes the first time on the way down. We
-               still need to access the second child so don't push a bit when we
-               are simply progressing to the next child subtree. */
-            if (node->iter == 0)
-            {
-                bitq_push_back(&ret.tree_paths, CCC_TRUE);
-            }
-            cur = node->link[node->iter++];
-        }
-        else
-        {
-            /* Both child subtrees have been explored, so cleanup/backtrack. */
-            node->iter = 0;
-            cur = node->parent;
-        }
-    }
-    print_bitq(&ret.tree_paths);
-    return ret;
-}
-
-/** Returns the bit queue representing the bit path to every character in the
-file. This queue represents each byte of the file in order; the first path in
-at the front of the queue represents the first character. */
-static struct bitq
-build_encoding_bitq(FILE *const f, struct huffman_tree *const tree)
-{
-    struct bitq ret = {.bs = bs_init(NULL, std_alloc, NULL, 0)};
-    /* By memoizing known bit sequences we can save significant time by not
-       performing a DFS over the tree. This is especially helpful for large
-       alphabets aka trees with many leaves. An array of 0-256 elements as a map
-       could achieve the same result faster but it would waste much more space.
-       It is rare to have a file use all 256 possible character values. */
-    flat_hash_map memo = ccc_fhm_init(NULL, struct path_memo, ch, hash_char,
-                                      path_memo_eq, NULL, NULL, 0);
-    ccc_result r = reserve(&memo, tree->num_leaves, std_alloc);
-    check(r == CCC_RESULT_OK);
-    foreach_filechar(f, c, {
-        struct path_memo const *path = get_key_val(&memo, c);
-        if (path)
-        {
-            for (size_t i = path->path_start_index,
-                        end = path->path_start_index + path->path_len;
-                 i < end; ++i)
-            {
-                ccc_tribool const bit = bitq_test(&ret, i);
-                check(bit != CCC_TRIBOOL_ERROR);
-                bitq_push_back(&ret, bit);
-            }
-        }
-        else
-        {
-            memoize_path(tree, &memo, &ret, *c);
-        }
-    });
-    r = clear_and_free_reserve(&memo, NULL, std_alloc);
-    check(r == CCC_RESULT_OK);
-    return ret;
-}
-
-/** Finds the path to the current character in the encoding tree and adds it
-as an entry in the path memo map. This function modifies the tree nodes by
-altering their iterator field during the DFS, but it restores all nodes to their
-original state before returning. */
-static void
-memoize_path(struct huffman_tree *const tree, flat_hash_map *const fh,
-             struct bitq *const bq, char const c)
-{
-    struct path_memo *const path = insert_entry(
-        entry_r(fh, &c),
-        &(struct path_memo){.ch = c, .path_start_index = bitq_size(bq)});
-    size_t cur = tree->root;
-    /* An iterative depth first search is convenient because the bit path in
-       the queue can represent the exact path we are currently on. Just be
-       sure to backtrack up the path to cleanup iterators. */
-    while (cur)
-    {
-        struct huffman_node *const node = node_at(tree, cur);
-        /* This is the leaf we want. */
-        if (!node->link[1] && node->ch == c)
-        {
-            break;
-        }
-        /* Wrong leaf or we have explored both subtrees of an internal node. */
-        if (!node->link[1] || node->iter >= ITER_END)
-        {
-            node->iter = 0;
-            cur = node->parent;
-            bitq_pop_back(bq);
-            continue;
-        }
-        /* Depth progression of depth first search. */
-        check(node->iter <= CCC_TRUE);
-        bitq_push_back(bq, node->iter);
-        /* During backtracking this helps us know which child subtree needs to
-           be explored or if we are done and can continue backtracking. */
-        cur = node->link[node->iter++];
-    }
-    /* Cleanup because we now have the correct path. */
-    for (; cur; cur = parent_i(tree, cur))
-    {
-        node_at(tree, cur)->iter = 0;
-    }
-    path->path_len = bitq_size(bq) - path->path_start_index;
-}
-
 /** Builds the Huffman Encoding tree that will allow us to encode file bytes
 and later compress the tree structure. The tree is formed by pairing the two
 least frequently occurring characters at a new root that is the sum of their
@@ -588,6 +448,146 @@ build_encoding_pq(FILE *const f, struct huffman_tree *const tree)
        heapify the data in O(N) time rather than pushing each element. */
     return fpq_heapify_init(begin(&buf), struct fpq_elem, CCC_LES, cmp_freqs,
                             NULL, NULL, capacity(&buf).count, size(&buf).count);
+}
+
+/** Returns the bit queue representing the bit path to every character in the
+file. This queue represents each byte of the file in order; the first path in
+at the front of the queue represents the first character. */
+static struct bitq
+build_encoding_bitq(FILE *const f, struct huffman_tree *const tree)
+{
+    struct bitq ret = {.bs = bs_init(NULL, std_alloc, NULL, 0)};
+    /* By memoizing known bit sequences we can save significant time by not
+       performing a DFS over the tree. This is especially helpful for large
+       alphabets aka trees with many leaves. An array of 0-256 elements as a map
+       could achieve the same result faster but it would waste much more space.
+       It is rare to have a file use all 256 possible character values. */
+    flat_hash_map memo = ccc_fhm_init(NULL, struct path_memo, ch, hash_char,
+                                      path_memo_eq, NULL, NULL, 0);
+    ccc_result r = reserve(&memo, tree->num_leaves, std_alloc);
+    check(r == CCC_RESULT_OK);
+    foreach_filechar(f, c, {
+        struct path_memo const *path = get_key_val(&memo, c);
+        if (path)
+        {
+            for (size_t i = path->path_start_index,
+                        end = path->path_start_index + path->path_len;
+                 i < end; ++i)
+            {
+                ccc_tribool const bit = bitq_test(&ret, i);
+                check(bit != CCC_TRIBOOL_ERROR);
+                bitq_push_back(&ret, bit);
+            }
+        }
+        else
+        {
+            memoize_path(tree, &memo, &ret, *c);
+        }
+    });
+    r = clear_and_free_reserve(&memo, NULL, std_alloc);
+    check(r == CCC_RESULT_OK);
+    return ret;
+}
+
+/** Finds the path to the current character in the encoding tree and adds it
+as an entry in the path memo map. This function modifies the tree nodes by
+altering their iterator field during the DFS, but it restores all nodes to their
+original state before returning. */
+static void
+memoize_path(struct huffman_tree *const tree, flat_hash_map *const fh,
+             struct bitq *const bq, char const c)
+{
+    struct path_memo *const path = insert_entry(
+        entry_r(fh, &c),
+        &(struct path_memo){.ch = c, .path_start_index = bitq_size(bq)});
+    size_t cur = tree->root;
+    /* An iterative depth first search is convenient because the bit path in
+       the queue can represent the exact path we are currently on. Just be
+       sure to backtrack up the path to cleanup iterators. */
+    while (cur)
+    {
+        struct huffman_node *const node = node_at(tree, cur);
+        /* This is the leaf we want. */
+        if (!node->link[1] && node->ch == c)
+        {
+            break;
+        }
+        /* Wrong leaf or we have explored both subtrees of an internal node. */
+        if (!node->link[1] || node->iter >= ITER_END)
+        {
+            node->iter = 0;
+            cur = node->parent;
+            bitq_pop_back(bq);
+            continue;
+        }
+        /* Depth progression of depth first search. */
+        check(node->iter <= CCC_TRUE);
+        bitq_push_back(bq, node->iter);
+        /* During backtracking this helps us know which child subtree needs to
+           be explored or if we are done and can continue backtracking. */
+        cur = node->link[node->iter++];
+    }
+    /* Cleanup because we now have the correct path. */
+    for (; cur; cur = parent_i(tree, cur))
+    {
+        node_at(tree, cur)->iter = 0;
+    }
+    path->path_len = bitq_size(bq) - path->path_start_index;
+}
+
+/** Compresses the Huffman tree by creating its representation as a Pre-Order
+traversal of the tree. The traversal is entered into a bit queue. We also push
+the leaves to a string as they are encountered during this traversal. By the
+end of the operation, we have a bit queue of our traversal where every internal
+node encountered on the way down is a 1 and every leaf is a 0. We also have a
+string of leaf characters that we encountered in order. */
+static struct compressed_huffman_tree
+compress_tree(struct huffman_tree *const tree)
+{
+    struct compressed_huffman_tree ret = {
+        .tree_paths = {.bs = bs_init(NULL, std_alloc, NULL, 0)},
+        .arena = str_arena_create(START_STR_ARENA_CAP),
+    };
+    check(ret.arena.arena);
+    ret.leaf_string.start = str_arena_alloc(&ret.arena, 0);
+    ccc_result const r = bitq_reserve(&ret.tree_paths, tree->num_nodes);
+    check(r == CCC_RESULT_OK);
+    size_t cur = tree->root;
+    /* To properly emulate a recursive Pre-Order traversal with iteration we
+       use the parent field for backtracking and an iterator for caching and
+       progression. */
+    while (cur)
+    {
+        struct huffman_node *const node = node_at(tree, cur);
+        if (!node->link[1])
+        {
+            /* A leaf is always pushed because it is only seen once. */
+            bitq_push_back(&ret.tree_paths, CCC_FALSE);
+            str_arena_push_back(&ret.arena, ret.leaf_string.start,
+                                ret.leaf_string.len, node->ch);
+            ++ret.leaf_string.len;
+            cur = node->parent;
+        }
+        else if (node->iter < ITER_END)
+        {
+            /* We only push internal 1 nodes the first time on the way down. We
+               still need to access the second child so don't push a bit when we
+               are simply progressing to the next child subtree. */
+            if (node->iter == 0)
+            {
+                bitq_push_back(&ret.tree_paths, CCC_TRUE);
+            }
+            cur = node->link[node->iter++];
+        }
+        else
+        {
+            /* Both child subtrees have been explored, so cleanup/backtrack. */
+            node->iter = 0;
+            cur = node->parent;
+        }
+    }
+    print_bitq(&ret.tree_paths);
+    return ret;
 }
 
 /** Writes all encoded information to a file with the help of a header for
@@ -733,6 +733,47 @@ unzip_file(str_view unzip)
     (void)fclose(copy_of_original);
 }
 
+/** Reconstructs the Huffman encoding queues from the header of the specified
+file. Once complete this function returns all information needed to reconstruct
+the tree and write out a copy of the original file to the output directory. */
+static struct huffman_encoding
+read_from_file(str_view const unzip)
+{
+    ccc_tribool has_suffix = sv_ends_with(unzip, SV(".cccz"));
+    check(has_suffix,
+          (void)fprintf(stderr, "only '.cccz' files may be decompressed.\n"););
+    FILE *const cccz = fopen(sv_begin(unzip), "r");
+    check(cccz, printf("%s", strerror(errno)););
+    struct huffman_encoding ret = {
+        .file_bits = {.bs = bs_init(NULL, std_alloc, NULL, 0)},
+        .blueprint = {
+            .arena = str_arena_create(START_STR_ARENA_CAP),
+            .tree_paths = {.bs = bs_init(NULL, std_alloc, NULL, 0)},
+        },
+    };
+    size_t read = readbytes(cccz, &ret.magic, sizeof(ret.magic));
+    check(read == sizeof(ret.magic) && ret.magic == cccz_magic,
+          (void)fprintf(stderr, "bad magic in header of .cccz file\n"););
+    read = readbytes(cccz, &ret.leaves_minus_one, sizeof(ret.leaves_minus_one));
+    check(read == sizeof(ret.leaves_minus_one));
+    struct str_arena *const arena = &ret.blueprint.arena;
+    struct leaf_string *const leaves = &ret.blueprint.leaf_string;
+    leaves->start = str_arena_alloc(arena, ret.leaves_minus_one + 1);
+    check(leaves->start >= 0);
+    leaves->len = ret.leaves_minus_one + 1;
+    read = readbytes(cccz, str_arena_at(arena, leaves->start), leaves->len);
+    check(read == (size_t)(ret.leaves_minus_one + 1));
+    read = readbytes(cccz, &ret.file_bits_count, sizeof(ret.file_bits_count));
+    check(read == sizeof(ret.file_bits_count));
+    /* The pairing method we used while building the tree makes this true. */
+    size_t const tree_path_bits = (leaves->len * 2) - 1;
+    fill_bitq(cccz, &ret.blueprint.tree_paths, tree_path_bits);
+    fill_bitq(cccz, &ret.file_bits, ret.file_bits_count);
+
+    (void)fclose(cccz);
+    return ret;
+}
+
 /** Reconstructs a Huffman encoding tree based on the blueprint provided. The
 tree is constructed in linear time and constant space additional to the nodes
 being allocated. */
@@ -816,47 +857,6 @@ reconstruct_text(FILE *const f, struct huffman_tree const *const tree,
             cur = tree->root;
         }
     }
-}
-
-/** Reconstructs the Huffman encoding queues from the header of the specified
-file. Once complete this function returns all information needed to reconstruct
-the tree and write out a copy of the original file to the output directory. */
-static struct huffman_encoding
-read_from_file(str_view const unzip)
-{
-    ccc_tribool has_suffix = sv_ends_with(unzip, SV(".cccz"));
-    check(has_suffix,
-          (void)fprintf(stderr, "only '.cccz' files may be decompressed.\n"););
-    FILE *const cccz = fopen(sv_begin(unzip), "r");
-    check(cccz, printf("%s", strerror(errno)););
-    struct huffman_encoding ret = {
-        .file_bits = {.bs = bs_init(NULL, std_alloc, NULL, 0)},
-        .blueprint = {
-            .arena = str_arena_create(START_STR_ARENA_CAP),
-            .tree_paths = {.bs = bs_init(NULL, std_alloc, NULL, 0)},
-        },
-    };
-    size_t read = readbytes(cccz, &ret.magic, sizeof(ret.magic));
-    check(read == sizeof(ret.magic) && ret.magic == cccz_magic,
-          (void)fprintf(stderr, "bad magic in header of .cccz file\n"););
-    read = readbytes(cccz, &ret.leaves_minus_one, sizeof(ret.leaves_minus_one));
-    check(read == sizeof(ret.leaves_minus_one));
-    struct str_arena *const arena = &ret.blueprint.arena;
-    struct leaf_string *const leaves = &ret.blueprint.leaf_string;
-    leaves->start = str_arena_alloc(arena, ret.leaves_minus_one + 1);
-    check(leaves->start >= 0);
-    leaves->len = ret.leaves_minus_one + 1;
-    read = readbytes(cccz, str_arena_at(arena, leaves->start), leaves->len);
-    check(read == (size_t)(ret.leaves_minus_one + 1));
-    read = readbytes(cccz, &ret.file_bits_count, sizeof(ret.file_bits_count));
-    check(read == sizeof(ret.file_bits_count));
-    /* The pairing method we used while building the tree makes this true. */
-    size_t const tree_path_bits = (leaves->len * 2) - 1;
-    fill_bitq(cccz, &ret.blueprint.tree_paths, tree_path_bits);
-    fill_bitq(cccz, &ret.file_bits, ret.file_bits_count);
-
-    (void)fclose(cccz);
-    return ret;
 }
 
 /** Fills a bit queue from a file given an expected number of bits. The bits
