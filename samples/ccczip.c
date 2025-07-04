@@ -1143,7 +1143,7 @@ bitq_reserve(struct bitq *const bq, size_t const to_add)
     return reserve(&bq->bs, to_add, std_alloc);
 }
 
-/*=====================       Hash Map Helper Code      =====================*/
+/*=====================       Container Helper Code     =====================*/
 
 /** The flat hash map documentation mentions we should have good bit diversity
 in the high and low byte of our hash but we are only hashing characters which
