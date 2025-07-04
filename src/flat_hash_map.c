@@ -645,6 +645,9 @@ ccc_fhm_next(ccc_flat_hash_map const *const h,
     {
         return NULL;
     }
+    /* It is OK to start at iterating group by group because we have the replica
+       group at the end of the tag array so even loading a group from the last
+       possible slot in the map will result in a safe load. */
     for (++i.count; i.count < (h->mask + 1); i.count += CCC_FHM_GROUP_SIZE)
     {
         size_t const full
