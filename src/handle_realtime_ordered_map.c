@@ -88,12 +88,12 @@ a fixed map or heap allocation. */
 static fixed_map_test_type data_nodes_parity_layout_test;
 /** Some assumptions in the code assume that parity array is last so ensure that
 is the case here. Also good to assume user data comes first. */
-static_assert((char *)data_nodes_parity_layout_test.data
-                      < (char *)data_nodes_parity_layout_test.nodes
-                  && (char *)data_nodes_parity_layout_test.nodes
-                         < (char *)data_nodes_parity_layout_test.parity
-                  && (char *)data_nodes_parity_layout_test.data
-                         < (char *)data_nodes_parity_layout_test.parity,
+static_assert(((char *)data_nodes_parity_layout_test.data
+               < (char *)data_nodes_parity_layout_test.nodes)
+                  && ((char *)data_nodes_parity_layout_test.nodes
+                      < (char *)data_nodes_parity_layout_test.parity)
+                  && ((char *)data_nodes_parity_layout_test.data
+                      < (char *)data_nodes_parity_layout_test.parity),
               "The order of the arrays in a Struct of Arrays map is data, then "
               "nodes, then parity.");
 /** We don't care about the alignment or padding after the parity array because
