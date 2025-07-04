@@ -365,7 +365,6 @@ build_encoding_tree(FILE *const f)
         .root = 0,
     };
     flat_priority_queue pq = build_encoding_pq(f, &ret);
-    ret.num_leaves = ret.num_nodes = size(&pq).count;
     while (size(&pq).count >= 2)
     {
         /* Small elements and we need the pair so we can't hold references. */
@@ -377,19 +376,17 @@ build_encoding_tree(FILE *const f)
         check(r == CCC_RESULT_OK);
         struct huffman_node *const internal_one
             = push_back(&ret.bump_arena, &(struct huffman_node){
-                                             .parent = 0,
                                              .link = {zero.node, one.node},
-                                             .ch = '\0',
-                                             .iter = 0,
                                          });
         size_t const new_root = buf_i(&ret.bump_arena, internal_one).count;
         check(internal_one);
         node_at(&ret, zero.node)->parent = new_root;
         node_at(&ret, one.node)->parent = new_root;
-        ++ret.num_nodes;
         struct fpq_elem const *const pushed
-            = push(&pq, &(struct fpq_elem){.freq = zero.freq + one.freq,
-                                           .node = new_root});
+            = push(&pq, &(struct fpq_elem){
+                            .freq = zero.freq + one.freq,
+                            .node = new_root,
+                        });
         check(pushed);
         ret.root = new_root;
     }
@@ -410,35 +407,42 @@ decrease the size of the priority queue. */
 static flat_priority_queue
 build_encoding_pq(FILE *const f, struct huffman_tree *const tree)
 {
-    /* For a buffer based tree 0 is the NULL node so we can't have actual data
-       we want at that index in the tree. */
-    struct huffman_node const *const nil
-        = push_back(&tree->bump_arena, &(struct huffman_node){});
-    check(nil);
     flat_hash_map fh = fhm_init(NULL, struct char_freq, ch, hash_char, char_eq,
                                 std_alloc, NULL, 0);
     foreach_filechar(f, c, {
         struct char_freq *const ins = or_insert(
             fhm_and_modify_w(entry_r(&fh, c), struct char_freq, ++T->freq;),
-            &(struct char_freq){.ch = *c, .freq = 1});
+            &(struct char_freq){
+                .ch = *c,
+                .freq = 1,
+            });
         check(ins);
     });
-    check(size(&fh).count >= 2);
+    size_t const leaves = size(&fh).count;
+    check(leaves >= 2);
+    tree->num_leaves = leaves;
+    tree->num_nodes = (2 * leaves) - 1;
+    ccc_result r = reserve(&tree->bump_arena, tree->num_nodes + 1, std_alloc);
+    check(r == CCC_RESULT_OK);
+    /* For a buffer based tree 0 is the NULL node so we can't have actual data
+       we want at that index in the tree. */
+    struct huffman_node const *const nil
+        = push_back(&tree->bump_arena, &(struct huffman_node){});
+    check(nil);
     /* Use a buffer to simply push back elements we will heapify at the end. */
     buffer buf = buf_init(NULL, struct fpq_elem, NULL, NULL, 0);
     /* Add one to reservation for the flat priority queue swap slot. */
-    ccc_result r = reserve(&buf, size(&fh).count + 1, std_alloc);
+    r = reserve(&buf, size(&fh).count + 1, std_alloc);
     check(r == CCC_RESULT_OK);
     for (struct char_freq const *i = begin(&fh); i != end(&fh);
          i = next(&fh, i))
     {
-        struct huffman_node *const node = buf_push_back(
-            &tree->bump_arena, &(struct huffman_node){.ch = i->ch});
-        check(node);
-        size_t const node_i = buf_i(&tree->bump_arena, node).count;
-        struct fpq_elem const *const fe = push_back(
-            &buf, &(struct fpq_elem){.freq = i->freq, .node = node_i});
-        check(fe);
+        struct huffman_node const *const node
+            = push_back(&tree->bump_arena, &(struct huffman_node){.ch = i->ch});
+        (void)push_back(&buf, &(struct fpq_elem){
+                                  .freq = i->freq,
+                                  .node = buf_i(&tree->bump_arena, node).count,
+                              });
     }
     /* Free map but not the buffer because the priority queue took buffer. */
     r = clear_and_free(&fh, NULL);
