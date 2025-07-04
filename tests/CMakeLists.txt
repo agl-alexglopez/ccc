@@ -320,6 +320,7 @@ add_fhmap_test(test_fhmap_insert)
 add_fhmap_test(test_fhmap_erase)
 add_fhmap_test(test_fhmap_lru)
 add_fhmap_test(test_fhmap_entry)
+add_fhmap_test(test_fhmap_iter)
 
 #############  Doubly Linked List ##########################
 

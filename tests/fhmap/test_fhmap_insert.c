@@ -624,7 +624,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_reserve_without_permissions)
 }
 
 int
-main()
+main(void)
 {
     return CHECK_RUN(
         fhmap_test_insert(), fhmap_test_insert_macros(),
