@@ -499,6 +499,7 @@ memoize_path(struct huffman_tree *const tree, flat_hash_map *const fh,
     struct path_memo *const path = insert_entry(
         entry_r(fh, &c),
         &(struct path_memo){.ch = c, .path_start_index = bitq_size(bq)});
+    check(path, do {} while (1););
     size_t cur = tree->root;
     /* An iterative depth first search is convenient because the bit path in
        the queue can represent the exact path we are currently on. Just be

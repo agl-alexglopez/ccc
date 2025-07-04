@@ -336,6 +336,7 @@ static void group_store(ccc_fhm_tag *dst, group src);
 static match_mask match_tag(group g, ccc_fhm_tag m);
 static match_mask match_empty(group g);
 static match_mask match_empty_deleted(group g);
+static match_mask match_full(group g);
 static group group_constant_to_empty_full_to_deleted(group g);
 static unsigned ctz(match_mask m);
 static unsigned clz(match_mask m);
@@ -618,11 +619,13 @@ ccc_fhm_begin(ccc_flat_hash_map const *const h)
     {
         return NULL;
     }
-    for (size_t i = 0; i < (h->mask + 1); ++i)
+    for (size_t i = 0; i < (h->mask + 1); i += CCC_FHM_GROUP_SIZE)
     {
-        if (tag_full(h->tag[i]))
+        size_t const full
+            = match_trailing_one(match_full(group_load(&h->tag[i])));
+        if (full != CCC_FHM_GROUP_SIZE)
         {
-            return data_at(h, i);
+            return data_at(h, (i + full));
         }
     }
     return NULL;
@@ -642,11 +645,19 @@ ccc_fhm_next(ccc_flat_hash_map const *const h,
     {
         return NULL;
     }
-    for (; i.count < (h->mask + 1); ++i.count)
+    for (++i.count; i.count < (h->mask + 1); i.count += CCC_FHM_GROUP_SIZE)
     {
-        if (tag_full(h->tag[i.count]))
+        size_t const full
+            = match_trailing_one(match_full(group_load(&h->tag[i.count])));
+        if (full != CCC_FHM_GROUP_SIZE)
         {
-            return data_at(h, i.count);
+            size_t const new_i = (i.count + full);
+            /* This would be the replica group at the end of the tag array. */
+            if (new_i >= (h->mask + 1))
+            {
+                return NULL;
+            }
+            return data_at(h, new_i);
         }
     }
     return NULL;
@@ -1473,8 +1484,11 @@ data_i(struct ccc_fhmap const *const h, void const *const data_slot)
     {
         return (ccc_ucount){.error = CCC_RESULT_ARG_ERROR};
     }
+    /* Subtract one to account for the base of the 0th element in the data
+       array being one size of type away from the tag array address. The 0th
+       data element is NOT at the same address at the tag array address. */
     return (ccc_ucount){
-        .count = ((char *)h->tag - (char *)data_slot) / h->sizeof_type,
+        .count = (((char *)h->tag - (char *)data_slot) / h->sizeof_type) - 1,
     };
 }
 
@@ -1773,6 +1787,15 @@ match_empty_deleted(group const g)
     return (match_mask){_mm_movemask_epi8(g.v)};
 }
 
+/** Returns a 0 based match with every bit on representing those tags in the
+group that are occupied by a user hash value. These are those tags that have
+the most significant bit off and the lower 7 bits occupied by user hash. */
+static inline match_mask
+match_full(group const g)
+{
+    return (match_mask){~match_empty_deleted(g).v};
+}
+
 /*=========================  Group Implementations   ========================*/
 
 /** Loads a group starting at src into a 128 bit vector. This is an unaligned
@@ -1856,6 +1879,23 @@ static inline match_mask
 match_empty_deleted(group const g)
 {
     uint8x8_t const cmp = vcltz_s8(vreinterpret_s8_u8(g.v));
+    match_mask const res = {
+        vget_lane_u64(vreinterpret_u64_u8(cmp), 0) & MATCH_MASK_TAGS_MSBS,
+    };
+    assert(
+        (res.v & MATCH_MASK_TAGS_OFF_BITS) == 0
+        && "For bit counting and iteration purposes the most significant bit "
+           "in every byte will indicate a match for a tag has occurred.");
+    return res;
+}
+
+/** Returns a 0 based match with every bit on representing those tags in the
+group that are occupied by a user hash value. These are those tags that have
+the most significant bit off and the lower 7 bits occupied by user hash. */
+static inline match_mask
+match_full(group const g)
+{
+    uint8x8_t const cmp = vcgez_s8(vreinterpret_s8_u8(g.v));
     match_mask const res = {
         vget_lane_u64(vreinterpret_u64_u8(cmp), 0) & MATCH_MASK_TAGS_MSBS,
     };
@@ -1985,6 +2025,15 @@ static inline match_mask
 match_empty_deleted(group const g)
 {
     return to_little_endian((match_mask){g.v & MATCH_MASK_TAGS_MSBS});
+}
+
+/** Returns a 0 based match with every bit on representing those tags in the
+group that are occupied by a user hash value. These are those tags that have
+the most significant bit off and the lower 7 bits occupied by user hash. */
+static inline match_mask
+match_full(group const g)
+{
+    return to_little_endian((match_mask){(~g.v) & MATCH_MASK_TAGS_MSBS});
 }
 
 /*=========================  Group Implementations   ========================*/
