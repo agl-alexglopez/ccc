@@ -46,7 +46,7 @@ static size_t len(struct ccc_sll_elem const *begin,
 static void push_front(struct ccc_sll *sll, struct ccc_sll_elem *elem);
 static size_t extract_range(struct ccc_sll *, struct ccc_sll_elem *begin,
                             struct ccc_sll_elem *end);
-static size_t erase_range(struct ccc_sll *, struct ccc_sll_elem *begin,
+static size_t erase_range(struct ccc_sll *, struct ccc_sll_elem const *begin,
                           struct ccc_sll_elem *end);
 static struct ccc_sll_elem *pop_front(struct ccc_sll *);
 static struct ccc_sll_elem *elem_in(struct ccc_sll const *,
@@ -534,7 +534,7 @@ push_front(struct ccc_sll *const sll, struct ccc_sll_elem *const elem)
 static inline struct ccc_sll_elem *
 pop_front(struct ccc_sll *const sll)
 {
-    struct ccc_sll_elem *remove = sll->nil.n;
+    struct ccc_sll_elem *const remove = sll->nil.n;
     sll->nil.n = remove->n;
     if (remove != &sll->nil)
     {
@@ -555,8 +555,8 @@ before(struct ccc_sll const *const sll,
 }
 
 static inline size_t
-extract_range([[maybe_unused]] struct ccc_sll *const sll,
-              struct ccc_sll_elem *begin, struct ccc_sll_elem *const end)
+extract_range(struct ccc_sll *const sll, struct ccc_sll_elem *begin,
+              struct ccc_sll_elem *const end)
 {
     size_t const count = len(begin, end);
     if (end != &sll->nil)
@@ -567,8 +567,8 @@ extract_range([[maybe_unused]] struct ccc_sll *const sll,
 }
 
 static size_t
-erase_range([[maybe_unused]] struct ccc_sll *const sll,
-            struct ccc_sll_elem *begin, struct ccc_sll_elem *const end)
+erase_range(struct ccc_sll *const sll, struct ccc_sll_elem const *begin,
+            struct ccc_sll_elem *const end)
 {
     if (!sll->alloc)
     {
@@ -580,7 +580,8 @@ erase_range([[maybe_unused]] struct ccc_sll *const sll,
         return count;
     }
     size_t count = 1;
-    for (struct ccc_sll_elem *next = NULL; begin != end; begin = next, ++count)
+    for (struct ccc_sll_elem const *next = NULL; begin != end;
+         begin = next, ++count)
     {
         assert(count <= sll->count);
         next = begin->n;

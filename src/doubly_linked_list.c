@@ -687,7 +687,7 @@ push_back(ccc_doubly_linked_list *const l, struct ccc_dll_elem *const e)
 static inline struct ccc_dll_elem *
 pop_front(struct ccc_dll *const dll)
 {
-    struct ccc_dll_elem *ret = dll->nil.n;
+    struct ccc_dll_elem *const ret = dll->nil.n;
     ret->n->p = &dll->nil;
     dll->nil.n = ret->n;
     if (ret != &dll->nil)
@@ -699,14 +699,14 @@ pop_front(struct ccc_dll *const dll)
 }
 
 static inline size_t
-extract_range([[maybe_unused]] struct ccc_dll const *const l,
-              struct ccc_dll_elem *begin, struct ccc_dll_elem *const end)
+extract_range(struct ccc_dll const *const l, struct ccc_dll_elem *begin,
+              struct ccc_dll_elem *const end)
 {
     if (begin != &l->nil)
     {
         begin->p = NULL;
     }
-    size_t count = len(begin, end);
+    size_t const count = len(begin, end);
     if (end != &l->nil)
     {
         end->n = NULL;
