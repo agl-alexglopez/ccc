@@ -654,13 +654,13 @@ ccc_fhm_next(ccc_flat_hash_map const *const h,
             = match_trailing_one(match_full(group_load(&h->tag[i.count])));
         if (full != CCC_FHM_GROUP_SIZE)
         {
-            size_t const new_i = (i.count + full);
+            size_t const next_i = (i.count + full);
             /* This would be the replica group at the end of the tag array. */
-            if (new_i >= (h->mask + 1))
+            if (next_i >= (h->mask + 1))
             {
                 return NULL;
             }
-            return data_at(h, new_i);
+            return data_at(h, next_i);
         }
     }
     return NULL;
