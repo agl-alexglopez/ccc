@@ -302,7 +302,8 @@ static ccc_result maybe_rehash(struct ccc_fhmap *h, size_t to_add,
 static void insert_and_copy(struct ccc_fhmap *h, void const *key_val_type,
                             ccc_fhm_tag m, size_t i);
 static void erase(struct ccc_fhmap *h, size_t i);
-static ccc_result check_init(struct ccc_fhmap *, size_t required_total_cap);
+static ccc_result check_init(struct ccc_fhmap *, size_t required_total_cap,
+                             ccc_any_alloc_fn *);
 static void rehash_in_place(struct ccc_fhmap *h);
 static ccc_tribool is_same_group(size_t i, size_t new_i, uint64_t hash,
                                  size_t mask);
@@ -837,7 +838,7 @@ ccc_fhm_copy(ccc_flat_hash_map *const dst, ccc_flat_hash_map const *const src,
     {
         return CCC_RESULT_NO_ALLOC;
     }
-    ccc_result check = check_init(dst, 0);
+    ccc_result check = check_init(dst, 0, fn);
     if (check != CCC_RESULT_OK)
     {
         return check;
@@ -1266,25 +1267,10 @@ maybe_rehash(struct ccc_fhmap *const h, size_t const to_add,
     {
         return CCC_RESULT_ARG_ERROR;
     }
-    ccc_result const init = check_init(h, required_total_cap);
+    ccc_result const init = check_init(h, required_total_cap, fn);
     if (init != CCC_RESULT_OK)
     {
         return init;
-    }
-    if (unlikely(!h->mask))
-    {
-        required_total_cap = max(required_total_cap, CCC_FHM_GROUP_SIZE);
-        size_t const total_bytes
-            = mask_to_total_bytes(h->sizeof_type, required_total_cap - 1);
-        h->data = fn(NULL, total_bytes, h->aux);
-        if (!h->data)
-        {
-            return CCC_RESULT_MEM_ERROR;
-        }
-        h->mask = required_total_cap - 1;
-        h->remain = mask_to_load_factor_cap(h->mask);
-        h->tag = tag_pos(h->sizeof_type, h->data, h->mask);
-        (void)memset(h->tag, TAG_EMPTY, mask_to_tag_bytes(h->mask));
     }
     if (likely(h->remain))
     {
@@ -1423,15 +1409,16 @@ rehash_resize(struct ccc_fhmap *const h, size_t const to_add,
 /** Ensures the map is initialized due to our allowance of lazy initialization
 to support various sources of memory at compile and runtime. */
 static inline ccc_result
-check_init(struct ccc_fhmap *const h, size_t const required_total_cap)
+check_init(struct ccc_fhmap *const h, size_t required_total_cap,
+           ccc_any_alloc_fn *const fn)
 {
     if (likely(!is_uninitialized(h)))
     {
         return CCC_RESULT_OK;
     }
-    /* A fixed size map that is not initialized. */
     if (h->mask)
     {
+        /* A fixed size map that is not initialized. */
         if (!h->data || h->mask + 1 < required_total_cap)
         {
             return CCC_RESULT_MEM_ERROR;
@@ -1440,6 +1427,22 @@ check_init(struct ccc_fhmap *const h, size_t const required_total_cap)
         {
             return CCC_RESULT_ARG_ERROR;
         }
+        h->tag = tag_pos(h->sizeof_type, h->data, h->mask);
+        (void)memset(h->tag, TAG_EMPTY, mask_to_tag_bytes(h->mask));
+    }
+    else
+    {
+        /* A dynamic map we can re-size as needed. */
+        required_total_cap = max(required_total_cap, CCC_FHM_GROUP_SIZE);
+        size_t const total_bytes
+            = mask_to_total_bytes(h->sizeof_type, required_total_cap - 1);
+        h->data = fn(NULL, total_bytes, h->aux);
+        if (!h->data)
+        {
+            return CCC_RESULT_MEM_ERROR;
+        }
+        h->mask = required_total_cap - 1;
+        h->remain = mask_to_load_factor_cap(h->mask);
         h->tag = tag_pos(h->sizeof_type, h->data, h->mask);
         (void)memset(h->tag, TAG_EMPTY, mask_to_tag_bytes(h->mask));
     }
@@ -1622,7 +1625,7 @@ max(size_t const a, size_t const b)
 static inline ccc_tribool
 is_uninitialized(struct ccc_fhmap const *const h)
 {
-    return (h->data && !h->tag) || (!h->data && !h->tag);
+    return !h->data || !h->tag;
 }
 
 /*=====================   Intrinsics and Generics   =========================*/
