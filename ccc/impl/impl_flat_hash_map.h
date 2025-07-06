@@ -178,7 +178,19 @@ local. They would need to define their fixed size type every time but that
 should be fine as they are likely to only declare one or two. They would likely
 only have a one fixed size map per translation unit if they are using these
 capabilities. They control the name of the type so they can organize types as
-they wish. */
+they wish.
+
+The declaration specifies that we have one extra data slot for swapping during
+in place rehashing and some interface functions and an extra duplicate group
+of tags at the end of the tag array for safer group loading.
+
+Finally, one consequence of allowing the user to declare this type is that the
+tag array is always aligned immediately after the user type array. This may not
+be aligned to the group size of the tag array meaning any group load
+instructions must be their unaligned equivalents. We cannot know at runtime
+whether our data and tag array pointers are to a fixed type or dynamic heap
+allocation so we assume unaligned loads every time. This allows compile time
+declared and initialized containers which is very convenient in C. */
 #define ccc_impl_fhm_declare_fixed_map(fixed_map_type_name, key_val_type_name, \
                                        capacity)                               \
     static_assert((capacity) > 0,                                              \
