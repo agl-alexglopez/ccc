@@ -435,6 +435,7 @@ ccc_impl_fpq_in_place_heapify(struct ccc_fpq *const fpq, size_t const n)
 
 /*====================     Static Helpers     ===============================*/
 
+/* Orders the provided priority queue in O(N) time. */
 static void
 heapify(struct ccc_fpq *const fpq, size_t const n)
 {
@@ -505,6 +506,27 @@ bubble_down(struct ccc_fpq *const fpq, char tmp[const], size_t i)
     return i;
 }
 
+/* Returns true if the winner (the "left hand side") wins the comparison.
+   Winning in a three-way comparison means satisfying the total order of the
+   priority queue. So, there is no winner if the elements are equal and this
+   function would return false. If the winner is in the wrong order, thus
+   losing the total order comparison, the function also returns false. */
+static inline ccc_tribool
+wins(struct ccc_fpq const *const fpq, size_t const winner, size_t const loser)
+{
+    return cmp(fpq, winner, loser) == fpq->order;
+}
+
+static inline ccc_threeway_cmp
+cmp(struct ccc_fpq const *const fpq, size_t lhs, size_t rhs)
+{
+    return fpq->cmp((ccc_any_type_cmp){
+        .any_type_lhs = at(fpq, lhs),
+        .any_type_rhs = at(fpq, rhs),
+        .aux = fpq->buf.aux,
+    });
+}
+
 /* Swaps i and j using the underlying buffer capabilities. Not checked for
    an error in release. */
 static inline void
@@ -535,27 +557,6 @@ index_of(struct ccc_fpq const *const fpq, void const *const slot)
                       / fpq->buf.sizeof_type);
     assert(i < fpq->buf.count);
     return i;
-}
-
-/* Returns true if the winner (the "left hand side") wins the comparison.
-   Winning in a three-way comparison means satisfying the total order of the
-   priority queue. So, there is no winner if the elements are equal and this
-   function would return false. If the winner is in the wrong order, thus
-   losing the total order comparison, the function also returns false. */
-static inline ccc_tribool
-wins(struct ccc_fpq const *const fpq, size_t const winner, size_t const loser)
-{
-    return cmp(fpq, winner, loser) == fpq->order;
-}
-
-static inline ccc_threeway_cmp
-cmp(struct ccc_fpq const *const fpq, size_t lhs, size_t rhs)
-{
-    return fpq->cmp((ccc_any_type_cmp){
-        .any_type_lhs = at(fpq, lhs),
-        .any_type_rhs = at(fpq, rhs),
-        .aux = fpq->buf.aux,
-    });
 }
 
 static inline size_t
