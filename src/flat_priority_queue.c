@@ -37,7 +37,7 @@ static void swap(struct ccc_fpq *, char tmp[const], size_t, size_t);
 static size_t bubble_up(struct ccc_fpq *fpq, char tmp[const], size_t i);
 static size_t bubble_down(struct ccc_fpq *, char tmp[const], size_t);
 static size_t update_fixup(struct ccc_fpq *, void *e);
-static void inplace_heapify(struct ccc_fpq *fpq, size_t n);
+static void heapify(struct ccc_fpq *fpq, size_t n);
 
 /*=====================       Interface      ================================*/
 
@@ -71,7 +71,7 @@ ccc_fpq_heapify(ccc_flat_priority_queue *const fpq, void *const array,
         }
     }
     (void)memcpy(ccc_buf_begin(&fpq->buf), array, n * input_sizeof_type);
-    inplace_heapify(fpq, n);
+    heapify(fpq, n);
     return CCC_RESULT_OK;
 }
 
@@ -82,7 +82,7 @@ ccc_fpq_heapify_inplace(ccc_flat_priority_queue *fpq, size_t const n)
     {
         return CCC_RESULT_ARG_ERROR;
     }
-    inplace_heapify(fpq, n);
+    heapify(fpq, n);
     return CCC_RESULT_OK;
 }
 
@@ -93,11 +93,11 @@ ccc_fpq_push(ccc_flat_priority_queue *const fpq, void const *const e)
     {
         return NULL;
     }
-    if (fpq->buf.count + SWAP_SLOT >= fpq->buf.capacity)
+    if (fpq->buf.capacity && fpq->buf.count + SWAP_SLOT >= fpq->buf.capacity)
     {
-        ccc_result const extra_space
-            = ccc_buf_alloc(&fpq->buf, fpq->buf.capacity * 2, fpq->buf.alloc);
-        if (extra_space != CCC_RESULT_OK)
+        ccc_result const r
+            = ccc_buf_reserve(&fpq->buf, fpq->buf.capacity, fpq->buf.alloc);
+        if (r != CCC_RESULT_OK)
         {
             return NULL;
         }
@@ -138,8 +138,10 @@ ccc_fpq_pop(ccc_flat_priority_queue *const fpq)
         return CCC_RESULT_OK;
     }
     void *const tmp = ccc_buf_at(&fpq->buf, fpq->buf.count);
+    assert(tmp);
     swap(fpq, tmp, 0, fpq->buf.count - 1);
-    (void)ccc_buf_pop_back(&fpq->buf);
+    [[maybe_unused]] ccc_result const r = ccc_buf_pop_back(&fpq->buf);
+    assert(r == CCC_RESULT_OK);
     (void)bubble_down(fpq, tmp, 0);
     return CCC_RESULT_OK;
 }
@@ -156,8 +158,6 @@ ccc_fpq_erase(ccc_flat_priority_queue *const fpq, void *const e)
         (void)ccc_buf_pop_back(&fpq->buf);
         return CCC_RESULT_OK;
     }
-    /* Important to remember this key now to avoid confusion later once the
-       elements are swapped and we lose access to original handle index. */
     size_t const i = index_of(fpq, e);
     if (i == fpq->buf.count - 1)
     {
@@ -271,12 +271,7 @@ ccc_fpq_reserve(ccc_flat_priority_queue *const fpq, size_t const to_add,
     {
         return CCC_RESULT_ARG_ERROR;
     }
-    size_t const needed = fpq->buf.count + to_add + SWAP_SLOT;
-    if (needed <= fpq->buf.capacity)
-    {
-        return CCC_RESULT_OK;
-    }
-    return ccc_buf_alloc(&fpq->buf, needed, fn);
+    return ccc_buf_reserve(&fpq->buf, fpq->buf.count + to_add + SWAP_SLOT, fn);
 }
 
 ccc_result
@@ -306,10 +301,10 @@ ccc_fpq_copy(ccc_flat_priority_queue *const dst,
     }
     if (dst->buf.capacity < src->buf.capacity)
     {
-        ccc_result resize_res = ccc_buf_alloc(&dst->buf, src->buf.capacity, fn);
-        if (resize_res != CCC_RESULT_OK)
+        ccc_result const r = ccc_buf_alloc(&dst->buf, src->buf.capacity, fn);
+        if (r != CCC_RESULT_OK)
         {
-            return resize_res;
+            return r;
         }
         dst->buf.capacity = src->buf.capacity;
     }
@@ -441,13 +436,13 @@ ccc_impl_fpq_in_place_heapify(struct ccc_fpq *const fpq, size_t const n)
     {
         return;
     }
-    inplace_heapify(fpq, n);
+    heapify(fpq, n);
 }
 
 /*====================     Static Helpers     ===============================*/
 
 static void
-inplace_heapify(struct ccc_fpq *const fpq, size_t const n)
+heapify(struct ccc_fpq *const fpq, size_t const n)
 {
     (void)ccc_buf_size_set(&fpq->buf, n);
     void *const tmp = ccc_buf_at(&fpq->buf, n);
@@ -556,12 +551,7 @@ index_of(struct ccc_fpq const *const fpq, void const *const slot)
 static inline ccc_tribool
 wins(struct ccc_fpq const *const fpq, size_t const winner, size_t const loser)
 {
-    return fpq->cmp((ccc_any_type_cmp){
-               .any_type_lhs = at(fpq, winner),
-               .any_type_rhs = at(fpq, loser),
-               .aux = fpq->buf.aux,
-           })
-        == fpq->order;
+    return cmp(fpq, winner, loser) == fpq->order;
 }
 
 static inline ccc_threeway_cmp

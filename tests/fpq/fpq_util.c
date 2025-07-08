@@ -43,7 +43,7 @@ CHECK_BEGIN_FN(insert_shuffled, ccc_flat_priority_queue *pq, struct val vals[],
     for (size_t i = 0; i < size; ++i)
     {
         vals[i].id = vals[i].val = (int)shuffled_index;
-        (void)push(pq, &vals[i]);
+        CHECK(push(pq, &vals[i]) != NULL, CCC_TRUE);
         CHECK(ccc_fpq_size(pq).count, i + 1);
         CHECK(validate(pq), true);
         shuffled_index = (shuffled_index + larger_prime) % size;
