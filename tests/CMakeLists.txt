@@ -51,40 +51,6 @@ add_bs_test(test_bs_insert)
 add_bs_test(test_bs_erase)
 add_bs_test(test_bs_test_and_set)
 
-#############  Ordered Multimap ##########################
-add_library(ommap_util ommap/ommap_util.h ommap/ommap_util.c)
-target_link_libraries(ommap_util
-  PRIVATE
-    ccc
-    checkers
-)
-add_dependencies(tests ommap_util)
-
-macro(add_ommap_test TEST_NAME)
-  add_executable(${TEST_NAME} ommap/${TEST_NAME}.c)
-  target_include_directories(${TEST_NAME} PRIVATE "../util")
-  target_link_libraries(${TEST_NAME}
-    PRIVATE
-      ccc
-      ommap_util
-      checkers
-      alloc
-  )
-  set_target_properties(${TEST_NAME} 
-    PROPERTIES 
-      RUNTIME_OUTPUT_DIRECTORY 
-        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/tests
-  )
-  add_dependencies(tests ${TEST_NAME})
-endmacro()
-
-# Add tests below here by the name of the c file without the .c suffix
-add_ommap_test(test_ommap_construct)
-add_ommap_test(test_ommap_insert)
-add_ommap_test(test_ommap_erase)
-add_ommap_test(test_ommap_iter)
-add_ommap_test(test_ommap_entry)
-
 #############  Heap Priority Queue  ##########################
 add_library(fpq_util fpq/fpq_util.h fpq/fpq_util.c)
 target_link_libraries(fpq_util
@@ -411,26 +377,4 @@ endmacro()
 add_fdeq_test(test_fdeq_construct)
 add_fdeq_test(test_fdeq_insert)
 add_fdeq_test(test_fdeq_erase)
-
-################### Performance Testing #################
-macro(add_perf_test TEST_NAME)
-  add_executable(${TEST_NAME} perf/${TEST_NAME}.c)
-  target_include_directories(${TEST_NAME} PRIVATE "../util")
-  target_link_libraries(${TEST_NAME}
-    PRIVATE
-      ccc
-        random
-        str_view
-        cli
-        alloc
-  )
-  set_target_properties(${TEST_NAME} 
-    PROPERTIES 
-      RUNTIME_OUTPUT_DIRECTORY 
-        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/tests
-  )
-  add_dependencies(tests ${TEST_NAME})
-endmacro()
-
-add_perf_test(pq_perf)
 

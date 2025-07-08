@@ -26,7 +26,6 @@ limitations under the License.
 #include "../handle_ordered_map.h"
 #include "../handle_realtime_ordered_map.h"
 #include "../ordered_map.h"
-#include "../ordered_multimap.h"
 #include "../priority_queue.h"
 #include "../realtime_ordered_map.h"
 #include "../singly_linked_list.h"
@@ -39,7 +38,6 @@ limitations under the License.
     _Generic((container_ptr),                                                  \
         ccc_flat_hash_map *: ccc_fhm_swap_entry,                               \
         ccc_ordered_map *: ccc_om_swap_entry,                                  \
-        ccc_ordered_multimap *: ccc_omm_swap_entry,                            \
         ccc_realtime_ordered_map *: ccc_rom_swap_entry)((container_ptr),       \
                                                         swap_args)
 
@@ -67,7 +65,6 @@ limitations under the License.
         ccc_handle_realtime_ordered_map *: ccc_hrm_try_insert,                 \
         ccc_flat_hash_map *: ccc_fhm_try_insert,                               \
         ccc_ordered_map *: ccc_om_try_insert,                                  \
-        ccc_ordered_multimap *: ccc_omm_try_insert,                            \
         ccc_realtime_ordered_map *: ccc_rom_try_insert)((container_ptr),       \
                                                         try_insert_args)
 
@@ -94,11 +91,6 @@ limitations under the License.
                 ccc_entry){ccc_om_try_insert((ccc_ordered_map *)container_ptr, \
                                              (ccc_omap_elem *)try_insert_args) \
                                .impl},                                         \
-        ccc_ordered_multimap                                                   \
-            *: &(ccc_entry){ccc_omm_try_insert(                                \
-                                (ccc_ordered_multimap *)container_ptr,         \
-                                (ccc_ommap_elem *)try_insert_args)             \
-                                .impl},                                        \
         ccc_realtime_ordered_map                                               \
             *: &(ccc_entry){                                                   \
                 ccc_rom_try_insert((ccc_realtime_ordered_map *)container_ptr,  \
@@ -111,7 +103,6 @@ limitations under the License.
         ccc_handle_realtime_ordered_map *: ccc_hrm_insert_or_assign,           \
         ccc_flat_hash_map *: ccc_fhm_insert_or_assign,                         \
         ccc_ordered_map *: ccc_om_insert_or_assign,                            \
-        ccc_ordered_multimap *: ccc_omm_insert_or_assign,                      \
         ccc_realtime_ordered_map *: ccc_rom_insert_or_assign)(                 \
         (container_ptr), insert_or_assign_args)
 
@@ -138,11 +129,6 @@ limitations under the License.
                                 (ccc_ordered_map *)container_ptr,              \
                                 (ccc_omap_elem *)insert_or_assign_args)        \
                                 .impl},                                        \
-        ccc_ordered_multimap                                                   \
-            *: &(ccc_entry){ccc_omm_insert_or_assign(                          \
-                                (ccc_ordered_multimap *)container_ptr,         \
-                                (ccc_ommap_elem *)insert_or_assign_args)       \
-                                .impl},                                        \
         ccc_realtime_ordered_map                                               \
             *: &(ccc_entry){ccc_rom_insert_or_assign(                          \
                                 (ccc_realtime_ordered_map *)container_ptr,     \
@@ -155,7 +141,6 @@ limitations under the License.
         ccc_handle_realtime_ordered_map *: ccc_hrm_remove,                     \
         ccc_flat_hash_map *: ccc_fhm_remove,                                   \
         ccc_ordered_map *: ccc_om_remove,                                      \
-        ccc_ordered_multimap *: ccc_omm_remove,                                \
         ccc_realtime_ordered_map                                               \
             *: ccc_rom_remove)((container_ptr), key_val_container_handle_ptr)
 
@@ -181,12 +166,6 @@ limitations under the License.
                                 (ccc_ordered_map *)container_ptr,              \
                                 (ccc_omap_elem *)key_val_container_handle_ptr) \
                                 .impl},                                        \
-        ccc_ordered_multimap                                                   \
-            *: &(                                                              \
-                ccc_entry){ccc_omm_remove(                                     \
-                               (ccc_ordered_multimap *)container_ptr,          \
-                               (ccc_ommap_elem *)key_val_container_handle_ptr) \
-                               .impl},                                         \
         ccc_realtime_ordered_map                                               \
             *: &(ccc_entry){                                                   \
                 ccc_rom_remove((ccc_realtime_ordered_map *)container_ptr,      \
@@ -197,7 +176,6 @@ limitations under the License.
     _Generic((container_entry_ptr),                                            \
         ccc_fhmap_entry *: ccc_fhm_remove_entry,                               \
         ccc_omap_entry *: ccc_om_remove_entry,                                 \
-        ccc_ommap_entry *: ccc_omm_remove_entry,                               \
         ccc_romap_entry *: ccc_rom_remove_entry,                               \
         ccc_fhmap_entry const *: ccc_fhm_remove_entry,                         \
         ccc_omap_entry const *: ccc_om_remove_entry,                           \
@@ -228,7 +206,6 @@ limitations under the License.
         ccc_flat_hash_map *: ccc_fhm_entry,                                    \
         ccc_flat_hash_map const *: ccc_fhm_entry,                              \
         ccc_ordered_map *: ccc_om_entry,                                       \
-        ccc_ordered_multimap *: ccc_omm_entry,                                 \
         ccc_realtime_ordered_map *: ccc_rom_entry,                             \
         ccc_realtime_ordered_map const *: ccc_rom_entry)((container_ptr),      \
                                                          key_ptr)
@@ -250,11 +227,6 @@ limitations under the License.
                                      (ccc_ordered_map *)(container_ptr),       \
                                      key_ptr)                                  \
                                      .impl},                                   \
-        ccc_ordered_multimap *: &(                                             \
-                 ccc_ommap_entry){ccc_omm_entry(                               \
-                                      (ccc_ordered_multimap *)(container_ptr), \
-                                      key_ptr)                                 \
-                                      .impl},                                  \
         ccc_realtime_ordered_map *: &(                                         \
                  ccc_romap_entry){ccc_rom_entry((ccc_realtime_ordered_map      \
                                                      *)(container_ptr),        \
@@ -294,14 +266,12 @@ limitations under the License.
     _Generic((container_entry_ptr),                                            \
         ccc_fhmap_entry *: ccc_fhm_and_modify,                                 \
         ccc_omap_entry *: ccc_om_and_modify,                                   \
-        ccc_ommap_entry *: ccc_omm_and_modify,                                 \
         ccc_homap_handle *: ccc_hom_and_modify,                                \
         ccc_romap_entry *: ccc_rom_and_modify,                                 \
         ccc_hromap_handle *: ccc_hrm_and_modify,                               \
         ccc_fhmap_entry const *: ccc_fhm_and_modify,                           \
         ccc_hromap_handle const *: ccc_hrm_and_modify,                         \
         ccc_omap_entry const *: ccc_om_and_modify,                             \
-        ccc_ommap_entry const *: ccc_omm_and_modify,                           \
         ccc_homap_handle const *: ccc_hom_and_modify,                          \
         ccc_romap_entry const *: ccc_rom_and_modify)((container_entry_ptr),    \
                                                      (mod_fn))
@@ -310,13 +280,11 @@ limitations under the License.
     _Generic((container_entry_ptr),                                            \
         ccc_fhmap_entry *: ccc_fhm_and_modify_aux,                             \
         ccc_omap_entry *: ccc_om_and_modify_aux,                               \
-        ccc_ommap_entry *: ccc_omm_and_modify_aux,                             \
         ccc_homap_handle *: ccc_hom_and_modify_aux,                            \
         ccc_hromap_handle *: ccc_hrm_and_modify_aux,                           \
         ccc_romap_entry *: ccc_rom_and_modify_aux,                             \
         ccc_fhmap_entry const *: ccc_fhm_and_modify_aux,                       \
         ccc_omap_entry const *: ccc_om_and_modify_aux,                         \
-        ccc_ommap_entry const *: ccc_omm_and_modify_aux,                       \
         ccc_hromap_handle const *: ccc_hrm_and_modify_aux,                     \
         ccc_homap_handle const *: ccc_hom_and_modify_aux,                      \
         ccc_romap_entry const *: ccc_rom_and_modify_aux)(                      \
@@ -327,11 +295,9 @@ limitations under the License.
     _Generic((container_entry_ptr),                                            \
         ccc_fhmap_entry *: ccc_fhm_insert_entry,                               \
         ccc_omap_entry *: ccc_om_insert_entry,                                 \
-        ccc_ommap_entry *: ccc_omm_insert_entry,                               \
         ccc_romap_entry *: ccc_rom_insert_entry,                               \
         ccc_fhmap_entry const *: ccc_fhm_insert_entry,                         \
         ccc_omap_entry const *: ccc_om_insert_entry,                           \
-        ccc_ommap_entry const *: ccc_omm_insert_entry,                         \
         ccc_romap_entry const *: ccc_rom_insert_entry)(                        \
         (container_entry_ptr), key_val_container_handle_ptr)
 
@@ -349,13 +315,11 @@ limitations under the License.
     _Generic((container_entry_ptr),                                            \
         ccc_fhmap_entry *: ccc_fhm_or_insert,                                  \
         ccc_omap_entry *: ccc_om_or_insert,                                    \
-        ccc_ommap_entry *: ccc_omm_or_insert,                                  \
         ccc_homap_handle *: ccc_hom_or_insert,                                 \
         ccc_romap_entry *: ccc_rom_or_insert,                                  \
         ccc_hromap_handle *: ccc_hrm_or_insert,                                \
         ccc_fhmap_entry const *: ccc_fhm_or_insert,                            \
         ccc_omap_entry const *: ccc_om_or_insert,                              \
-        ccc_ommap_entry const *: ccc_omm_or_insert,                            \
         ccc_hromap_handle const *: ccc_hrm_or_insert,                          \
         ccc_homap_handle const *: ccc_hom_or_insert,                           \
         ccc_romap_entry const *: ccc_rom_or_insert)(                           \
@@ -371,8 +335,6 @@ limitations under the License.
         ccc_fhmap_entry const *: ccc_fhm_unwrap,                               \
         ccc_omap_entry *: ccc_om_unwrap,                                       \
         ccc_omap_entry const *: ccc_om_unwrap,                                 \
-        ccc_ommap_entry *: ccc_omm_unwrap,                                     \
-        ccc_ommap_entry const *: ccc_omm_unwrap,                               \
         ccc_homap_handle *: ccc_hom_unwrap,                                    \
         ccc_homap_handle const *: ccc_hom_unwrap,                              \
         ccc_hromap_handle *: ccc_hrm_unwrap,                                   \
@@ -390,8 +352,6 @@ limitations under the License.
         ccc_fhmap_entry const *: ccc_fhm_occupied,                             \
         ccc_omap_entry *: ccc_om_occupied,                                     \
         ccc_omap_entry const *: ccc_om_occupied,                               \
-        ccc_ommap_entry *: ccc_omm_occupied,                                   \
-        ccc_ommap_entry const *: ccc_omm_occupied,                             \
         ccc_homap_handle *: ccc_hom_occupied,                                  \
         ccc_homap_handle const *: ccc_hom_occupied,                            \
         ccc_hromap_handle *: ccc_hrm_occupied,                                 \
@@ -409,8 +369,6 @@ limitations under the License.
         ccc_fhmap_entry const *: ccc_fhm_insert_error,                         \
         ccc_omap_entry *: ccc_om_insert_error,                                 \
         ccc_omap_entry const *: ccc_om_insert_error,                           \
-        ccc_ommap_entry *: ccc_omm_insert_error,                               \
-        ccc_ommap_entry const *: ccc_omm_insert_error,                         \
         ccc_homap_handle *: ccc_hom_insert_error,                              \
         ccc_homap_handle const *: ccc_hom_insert_error,                        \
         ccc_hromap_handle *: ccc_hrm_insert_error,                             \
@@ -425,7 +383,6 @@ limitations under the License.
         ccc_flat_hash_map *: ccc_fhm_get_key_val,                              \
         ccc_flat_hash_map const *: ccc_fhm_get_key_val,                        \
         ccc_ordered_map *: ccc_om_get_key_val,                                 \
-        ccc_ordered_multimap *: ccc_omm_get_key_val,                           \
         ccc_handle_ordered_map *: ccc_hom_get_key_val,                         \
         ccc_handle_realtime_ordered_map *: ccc_hrm_get_key_val,                \
         ccc_handle_realtime_ordered_map const *: ccc_hrm_get_key_val,          \
@@ -442,8 +399,8 @@ limitations under the License.
         ccc_handle_realtime_ordered_map *: ccc_hrm_contains,                   \
         ccc_handle_realtime_ordered_map const *: ccc_hrm_contains,             \
         ccc_realtime_ordered_map *: ccc_rom_contains,                          \
-        ccc_realtime_ordered_map const *: ccc_rom_contains,                    \
-        ccc_ordered_multimap *: ccc_omm_contains)((container_ptr), key_ptr)
+        ccc_realtime_ordered_map const *: ccc_rom_contains)((container_ptr),   \
+                                                            key_ptr)
 
 /*================    Sequential Containers Interface   =====================*/
 
@@ -511,25 +468,21 @@ limitations under the License.
 
 #define ccc_impl_update(container_ptr, update_args...)                         \
     _Generic((container_ptr),                                                  \
-        ccc_ordered_multimap *: ccc_omm_update,                                \
         ccc_flat_priority_queue *: ccc_fpq_update,                             \
         ccc_priority_queue *: ccc_pq_update)((container_ptr), update_args)
 
 #define ccc_impl_increase(container_ptr, increase_args...)                     \
     _Generic((container_ptr),                                                  \
-        ccc_ordered_multimap *: ccc_omm_increase,                              \
         ccc_flat_priority_queue *: ccc_fpq_increase,                           \
         ccc_priority_queue *: ccc_pq_increase)((container_ptr), increase_args)
 
 #define ccc_impl_decrease(container_ptr, decrease_args...)                     \
     _Generic((container_ptr),                                                  \
-        ccc_ordered_multimap *: ccc_omm_decrease,                              \
         ccc_flat_priority_queue *: ccc_fpq_decrease,                           \
         ccc_priority_queue *: ccc_pq_decrease)((container_ptr), decrease_args)
 
 #define ccc_impl_extract(container_ptr, container_handle_ptr...)               \
     _Generic((container_ptr),                                                  \
-        ccc_ordered_multimap *: ccc_omm_extract,                               \
         ccc_doubly_linked_list *: ccc_dll_extract,                             \
         ccc_singly_linked_list *: ccc_sll_extract,                             \
         ccc_priority_queue *: ccc_pq_extract)((container_ptr),                 \
@@ -555,7 +508,6 @@ limitations under the License.
         ccc_ordered_map *: ccc_om_begin,                                       \
         ccc_handle_ordered_map *: ccc_hom_begin,                               \
         ccc_flat_double_ended_queue *: ccc_fdeq_begin,                         \
-        ccc_ordered_multimap *: ccc_omm_begin,                                 \
         ccc_singly_linked_list *: ccc_sll_begin,                               \
         ccc_doubly_linked_list *: ccc_dll_begin,                               \
         ccc_realtime_ordered_map *: ccc_rom_begin,                             \
@@ -565,7 +517,6 @@ limitations under the License.
         ccc_ordered_map const *: ccc_om_begin,                                 \
         ccc_handle_ordered_map const *: ccc_hom_begin,                         \
         ccc_flat_double_ended_queue const *: ccc_fdeq_begin,                   \
-        ccc_ordered_multimap const *: ccc_omm_begin,                           \
         ccc_singly_linked_list const *: ccc_sll_begin,                         \
         ccc_doubly_linked_list const *: ccc_dll_begin,                         \
         ccc_handle_realtime_ordered_map const *: ccc_hrm_begin,                \
@@ -577,7 +528,6 @@ limitations under the License.
         ccc_ordered_map *: ccc_om_rbegin,                                      \
         ccc_handle_ordered_map *: ccc_hom_rbegin,                              \
         ccc_flat_double_ended_queue *: ccc_fdeq_rbegin,                        \
-        ccc_ordered_multimap *: ccc_omm_rbegin,                                \
         ccc_doubly_linked_list *: ccc_dll_rbegin,                              \
         ccc_realtime_ordered_map *: ccc_rom_rbegin,                            \
         ccc_handle_realtime_ordered_map *: ccc_hrm_rbegin,                     \
@@ -585,7 +535,6 @@ limitations under the License.
         ccc_ordered_map const *: ccc_om_rbegin,                                \
         ccc_handle_ordered_map const *: ccc_hom_rbegin,                        \
         ccc_flat_double_ended_queue const *: ccc_fdeq_rbegin,                  \
-        ccc_ordered_multimap const *: ccc_omm_rbegin,                          \
         ccc_doubly_linked_list const *: ccc_dll_rbegin,                        \
         ccc_handle_realtime_ordered_map const *: ccc_hrm_rbegin,               \
         ccc_realtime_ordered_map const *: ccc_rom_rbegin)((container_ptr))
@@ -597,7 +546,6 @@ limitations under the License.
         ccc_ordered_map *: ccc_om_next,                                        \
         ccc_handle_ordered_map *: ccc_hom_next,                                \
         ccc_flat_double_ended_queue *: ccc_fdeq_next,                          \
-        ccc_ordered_multimap *: ccc_omm_next,                                  \
         ccc_singly_linked_list *: ccc_sll_next,                                \
         ccc_doubly_linked_list *: ccc_dll_next,                                \
         ccc_realtime_ordered_map *: ccc_rom_next,                              \
@@ -607,7 +555,6 @@ limitations under the License.
         ccc_ordered_map const *: ccc_om_next,                                  \
         ccc_handle_ordered_map const *: ccc_hom_next,                          \
         ccc_flat_double_ended_queue const *: ccc_fdeq_next,                    \
-        ccc_ordered_multimap const *: ccc_omm_next,                            \
         ccc_singly_linked_list const *: ccc_sll_next,                          \
         ccc_doubly_linked_list const *: ccc_dll_next,                          \
         ccc_handle_realtime_ordered_map const *: ccc_hrm_next,                 \
@@ -620,7 +567,6 @@ limitations under the License.
         ccc_ordered_map *: ccc_om_rnext,                                       \
         ccc_handle_ordered_map *: ccc_hom_rnext,                               \
         ccc_flat_double_ended_queue *: ccc_fdeq_rnext,                         \
-        ccc_ordered_multimap *: ccc_omm_rnext,                                 \
         ccc_doubly_linked_list *: ccc_dll_rnext,                               \
         ccc_realtime_ordered_map *: ccc_rom_rnext,                             \
         ccc_handle_realtime_ordered_map *: ccc_hrm_rnext,                      \
@@ -628,7 +574,6 @@ limitations under the License.
         ccc_ordered_map const *: ccc_om_rnext,                                 \
         ccc_handle_ordered_map const *: ccc_hom_rnext,                         \
         ccc_flat_double_ended_queue const *: ccc_fdeq_rnext,                   \
-        ccc_ordered_multimap const *: ccc_omm_rnext,                           \
         ccc_doubly_linked_list const *: ccc_dll_rnext,                         \
         ccc_handle_realtime_ordered_map const *: ccc_hrm_rnext,                \
         ccc_realtime_ordered_map const *: ccc_rom_rnext)((container_ptr),      \
@@ -641,7 +586,6 @@ limitations under the License.
         ccc_ordered_map *: ccc_om_end,                                         \
         ccc_handle_ordered_map *: ccc_hom_end,                                 \
         ccc_flat_double_ended_queue *: ccc_fdeq_end,                           \
-        ccc_ordered_multimap *: ccc_omm_end,                                   \
         ccc_singly_linked_list *: ccc_sll_end,                                 \
         ccc_doubly_linked_list *: ccc_dll_end,                                 \
         ccc_realtime_ordered_map *: ccc_rom_end,                               \
@@ -651,7 +595,6 @@ limitations under the License.
         ccc_ordered_map const *: ccc_om_end,                                   \
         ccc_handle_ordered_map const *: ccc_hom_end,                           \
         ccc_flat_double_ended_queue const *: ccc_fdeq_end,                     \
-        ccc_ordered_multimap const *: ccc_omm_end,                             \
         ccc_singly_linked_list const *: ccc_sll_end,                           \
         ccc_doubly_linked_list const *: ccc_dll_end,                           \
         ccc_handle_realtime_ordered_map const *: ccc_hrm_end,                  \
@@ -663,7 +606,6 @@ limitations under the License.
         ccc_ordered_map *: ccc_om_rend,                                        \
         ccc_handle_ordered_map *: ccc_hom_rend,                                \
         ccc_flat_double_ended_queue *: ccc_fdeq_rend,                          \
-        ccc_ordered_multimap *: ccc_omm_rend,                                  \
         ccc_doubly_linked_list *: ccc_dll_rend,                                \
         ccc_realtime_ordered_map *: ccc_rom_rend,                              \
         ccc_handle_realtime_ordered_map *: ccc_hrm_rend,                       \
@@ -671,7 +613,6 @@ limitations under the License.
         ccc_ordered_map const *: ccc_om_rend,                                  \
         ccc_handle_ordered_map const *: ccc_hom_rend,                          \
         ccc_flat_double_ended_queue const *: ccc_fdeq_rend,                    \
-        ccc_ordered_multimap const *: ccc_omm_rend,                            \
         ccc_doubly_linked_list const *: ccc_dll_rend,                          \
         ccc_handle_realtime_ordered_map const *: ccc_hrm_rend,                 \
         ccc_realtime_ordered_map const *: ccc_rom_rend)((container_ptr))
@@ -680,7 +621,6 @@ limitations under the License.
     _Generic((container_ptr),                                                  \
         ccc_ordered_map *: ccc_om_equal_range,                                 \
         ccc_handle_ordered_map *: ccc_hom_equal_range,                         \
-        ccc_ordered_multimap *: ccc_omm_equal_range,                           \
         ccc_handle_realtime_ordered_map *: ccc_hrm_equal_range,                \
         ccc_handle_realtime_ordered_map const *: ccc_hrm_equal_range,          \
         ccc_realtime_ordered_map *: ccc_rom_equal_range,                       \
@@ -697,7 +637,6 @@ limitations under the License.
     _Generic((container_ptr),                                                  \
         ccc_ordered_map *: ccc_om_equal_rrange,                                \
         ccc_handle_ordered_map *: ccc_hom_equal_rrange,                        \
-        ccc_ordered_multimap *: ccc_omm_equal_rrange,                          \
         ccc_handle_realtime_ordered_map *: ccc_hrm_equal_rrange,               \
         ccc_handle_realtime_ordered_map const *: ccc_hrm_equal_rrange,         \
         ccc_realtime_ordered_map *: ccc_rom_equal_rrange,                      \
@@ -759,8 +698,7 @@ limitations under the License.
         ccc_flat_double_ended_queue *: ccc_fdeq_clear,                         \
         ccc_singly_linked_list *: ccc_sll_clear,                               \
         ccc_doubly_linked_list *: ccc_dll_clear,                               \
-        ccc_ordered_multimap *: ccc_omm_clear,                                 \
-        ccc_ordered_map *: ccc_omm_clear,                                      \
+        ccc_ordered_map *: ccc_om_clear,                                       \
         ccc_priority_queue *: ccc_pq_clear,                                    \
         ccc_realtime_ordered_map *: ccc_rom_clear,                             \
         ccc_handle_realtime_ordered_map                                        \
@@ -800,7 +738,6 @@ limitations under the License.
         ccc_handle_ordered_map *: ccc_hom_size,                                \
         ccc_flat_priority_queue *: ccc_fpq_size,                               \
         ccc_flat_double_ended_queue *: ccc_fdeq_size,                          \
-        ccc_ordered_multimap *: ccc_omm_size,                                  \
         ccc_priority_queue *: ccc_pq_size,                                     \
         ccc_singly_linked_list *: ccc_sll_size,                                \
         ccc_doubly_linked_list *: ccc_dll_size,                                \
@@ -812,7 +749,6 @@ limitations under the License.
         ccc_handle_ordered_map const *: ccc_hom_size,                          \
         ccc_flat_priority_queue const *: ccc_fpq_size,                         \
         ccc_flat_double_ended_queue const *: ccc_fdeq_size,                    \
-        ccc_ordered_multimap const *: ccc_omm_size,                            \
         ccc_priority_queue const *: ccc_pq_size,                               \
         ccc_singly_linked_list const *: ccc_sll_size,                          \
         ccc_doubly_linked_list const *: ccc_dll_size,                          \
@@ -845,7 +781,6 @@ limitations under the License.
         ccc_handle_ordered_map *: ccc_hom_is_empty,                            \
         ccc_flat_priority_queue *: ccc_fpq_is_empty,                           \
         ccc_flat_double_ended_queue *: ccc_fdeq_is_empty,                      \
-        ccc_ordered_multimap *: ccc_omm_is_empty,                              \
         ccc_priority_queue *: ccc_pq_is_empty,                                 \
         ccc_singly_linked_list *: ccc_sll_is_empty,                            \
         ccc_doubly_linked_list *: ccc_dll_is_empty,                            \
@@ -857,7 +792,6 @@ limitations under the License.
         ccc_handle_ordered_map const *: ccc_hom_is_empty,                      \
         ccc_flat_priority_queue const *: ccc_fpq_is_empty,                     \
         ccc_flat_double_ended_queue const *: ccc_fdeq_is_empty,                \
-        ccc_ordered_multimap const *: ccc_omm_is_empty,                        \
         ccc_priority_queue const *: ccc_pq_is_empty,                           \
         ccc_singly_linked_list const *: ccc_sll_is_empty,                      \
         ccc_doubly_linked_list const *: ccc_dll_is_empty,                      \
@@ -871,7 +805,6 @@ limitations under the License.
         ccc_handle_ordered_map *: ccc_hom_validate,                            \
         ccc_flat_priority_queue *: ccc_fpq_validate,                           \
         ccc_flat_double_ended_queue *: ccc_fdeq_validate,                      \
-        ccc_ordered_multimap *: ccc_omm_validate,                              \
         ccc_priority_queue *: ccc_pq_validate,                                 \
         ccc_singly_linked_list *: ccc_sll_validate,                            \
         ccc_doubly_linked_list *: ccc_dll_validate,                            \
@@ -882,7 +815,6 @@ limitations under the License.
         ccc_handle_ordered_map const *: ccc_hom_validate,                      \
         ccc_flat_priority_queue const *: ccc_fpq_validate,                     \
         ccc_flat_double_ended_queue const *: ccc_fdeq_validate,                \
-        ccc_ordered_multimap const *: ccc_omm_validate,                        \
         ccc_priority_queue const *: ccc_pq_validate,                           \
         ccc_singly_linked_list const *: ccc_sll_validate,                      \
         ccc_doubly_linked_list const *: ccc_dll_validate,                      \
