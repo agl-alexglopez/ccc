@@ -90,7 +90,7 @@ Then the installation looks like this.
 │       ├── double_ended_priority_queue.h
 │       ├── doubly_linked_list.h
 │       ├── flat_hash_map.h
-│       └── ...continues
+│       └── ...
 └── lib
     ├── cmake
     │   └── ccc
