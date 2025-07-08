@@ -10,7 +10,6 @@ var dir_5d984c6d55e750c7f944f580303daf53 =
     [ "handle_ordered_map.h", "handle__ordered__map_8h.html", "handle__ordered__map_8h" ],
     [ "handle_realtime_ordered_map.h", "handle__realtime__ordered__map_8h.html", "handle__realtime__ordered__map_8h" ],
     [ "ordered_map.h", "ordered__map_8h.html", "ordered__map_8h" ],
-    [ "ordered_multimap.h", "ordered__multimap_8h.html", "ordered__multimap_8h" ],
     [ "priority_queue.h", "priority__queue_8h.html", "priority__queue_8h" ],
     [ "realtime_ordered_map.h", "realtime__ordered__map_8h.html", "realtime__ordered__map_8h" ],
     [ "singly_linked_list.h", "singly__linked__list_8h.html", "singly__linked__list_8h" ],
