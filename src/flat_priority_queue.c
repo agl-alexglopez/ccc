@@ -113,16 +113,10 @@ ccc_fpq_push(ccc_flat_priority_queue *const fpq, void const *const e)
     {
         (void)memcpy(new, e, fpq->buf.sizeof_type);
     }
-    size_t i = fpq->buf.count - 1;
-    if (fpq->buf.count > 1)
-    {
-        void *const tmp = ccc_buf_at(&fpq->buf, fpq->buf.count);
-        i = bubble_up(fpq, tmp, i);
-    }
-    else
-    {
-        i = 0;
-    }
+    void *const tmp = ccc_buf_at(&fpq->buf, fpq->buf.count);
+    assert(tmp);
+    size_t const i = bubble_up(fpq, tmp, fpq->buf.count - 1);
+    assert(i < fpq->buf.count);
     return ccc_buf_at(&fpq->buf, i);
 }
 
