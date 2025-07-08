@@ -795,11 +795,13 @@ front_free_slot(size_t const front, size_t const cap)
     return front ? front - 1 : cap - 1;
 }
 
-/* Assumes the queue is not empty. */
+/** Returns index of the last element in the fdeq or front if empty. */
 static inline size_t
 last_elem_index(struct ccc_fdeq const *const fdeq)
 {
-    return (fdeq->front + (fdeq->buf.count - 1)) % fdeq->buf.capacity;
+    return fdeq->buf.count
+             ? (fdeq->front + fdeq->buf.count - 1) % fdeq->buf.capacity
+             : fdeq->front;
 }
 
 static inline size_t
