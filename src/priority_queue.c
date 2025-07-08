@@ -381,7 +381,10 @@ delete_node(struct ccc_pq *const pq, struct ccc_pq_elem *const root)
 }
 
 /* Uses Fredman et al. oldest to youngest pairing method mentioned on pg 124
-of the paper to pair nodes in one pass. A non-trivial example for min heap.
+of the paper to pair nodes in one pass. Of all the variants for pairing given
+in the paper this one is the back-to-front variant and the only one for which
+the runtime analysis holds identically to the two-pass standard variant. A
+non-trivial example for min heap.
 
 ```
 < = next_sibling
@@ -486,7 +489,9 @@ pointer is to support faster deletes and decrease key operations.
     └─────┘  └──────────┘ └───────────────┘
 
 Pairing in the delete min phase would then start at B in this example and work
-towards D. That is the oldest to youngest order mentioned in the paper. */
+towards D. That is the oldest to youngest order mentioned in the paper and
+helps set up the one-pass back-to-front variant mentioned in the paper allowing
+the same runtime guarantees as the two pass standard pairing heap. */
 static void
 link_child(struct ccc_pq_elem *const parent, struct ccc_pq_elem *const child)
 {
