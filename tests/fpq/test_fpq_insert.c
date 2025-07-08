@@ -111,6 +111,28 @@ CHECK_BEGIN_STATIC_FN(fpq_test_insert_shuffle)
     CHECK_END_FN();
 }
 
+CHECK_BEGIN_STATIC_FN(fpq_test_insert_shuffle_grow)
+{
+    size_t const size = 50;
+    int const prime = 53;
+    struct val vals[50 + 1];
+    ccc_flat_priority_queue fpq
+        = ccc_fpq_init(NULL, struct val, CCC_LES, val_cmp, std_alloc, NULL, 0);
+    CHECK(insert_shuffled(&fpq, vals, size, prime), PASS);
+
+    struct val const *min = front(&fpq);
+    CHECK(min->val, 0);
+    int sorted_check[50];
+    CHECK(inorder_fill(sorted_check, size, &fpq), PASS);
+    int prev = sorted_check[0];
+    for (size_t i = 0; i < size; ++i)
+    {
+        CHECK(prev <= sorted_check[i], true);
+        prev = sorted_check[i];
+    }
+    CHECK_END_FN((void)ccc_fpq_clear_and_free(&fpq, NULL););
+}
+
 CHECK_BEGIN_STATIC_FN(fpq_test_insert_shuffle_reserve)
 {
     size_t const size = 50;
@@ -159,7 +181,7 @@ main()
 {
     return CHECK_RUN(fpq_test_insert_one(), fpq_test_insert_three(),
                      fpq_test_struct_getter(), fpq_test_insert_three_dups(),
-                     fpq_test_insert_shuffle(),
+                     fpq_test_insert_shuffle(), fpq_test_insert_shuffle_grow(),
                      fpq_test_insert_shuffle_reserve(),
                      fpq_test_read_max_min());
 }

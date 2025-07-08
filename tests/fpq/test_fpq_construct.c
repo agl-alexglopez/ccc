@@ -20,7 +20,7 @@ int_cmp(ccc_any_type_cmp const cmp)
     return (a > b) - (a < b);
 }
 
-CHECK_BEGIN_STATIC_FN(pq_test_empty)
+CHECK_BEGIN_STATIC_FN(fpq_test_empty)
 {
     struct val vals[2] = {};
     flat_priority_queue pq
@@ -30,7 +30,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_empty)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(pq_test_macro)
+CHECK_BEGIN_STATIC_FN(fpq_test_macro)
 {
     struct val vals[2] = {};
     flat_priority_queue pq
@@ -44,7 +44,19 @@ CHECK_BEGIN_STATIC_FN(pq_test_macro)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(pq_test_push)
+CHECK_BEGIN_STATIC_FN(fpq_test_macro_grow)
+{
+    flat_priority_queue pq
+        = fpq_init(NULL, struct val, CCC_LES, val_cmp, std_alloc, NULL, 0);
+    struct val *res = fpq_emplace(&pq, (struct val){.val = 0, .id = 0});
+    CHECK(res != NULL, true);
+    CHECK(fpq_is_empty(&pq), false);
+    struct val *res2 = fpq_emplace(&pq, (struct val){.val = 0, .id = 0});
+    CHECK(res2 != NULL, true);
+    CHECK_END_FN((void)ccc_fpq_clear_and_free(&pq, NULL););
+}
+
+CHECK_BEGIN_STATIC_FN(fpq_test_push)
 {
     struct val vals[3] = {};
     flat_priority_queue pq
@@ -56,7 +68,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_push)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(pq_test_raw_type)
+CHECK_BEGIN_STATIC_FN(fpq_test_raw_type)
 {
     int vals[4] = {};
     flat_priority_queue pq = fpq_init(vals, int, CCC_LES, int_cmp, NULL, NULL,
@@ -73,7 +85,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_raw_type)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(pq_test_heapify_init)
+CHECK_BEGIN_STATIC_FN(fpq_test_heapify_init)
 {
     srand(time(NULL)); /* NOLINT */
     int heap[100] = {};
@@ -97,7 +109,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_heapify_init)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(pq_test_heapify_copy)
+CHECK_BEGIN_STATIC_FN(fpq_test_heapify_copy)
 {
     srand(time(NULL)); /* NOLINT */
     int heap[100] = {};
@@ -123,7 +135,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_heapify_copy)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(pq_test_copy_no_alloc)
+CHECK_BEGIN_STATIC_FN(fpq_test_copy_no_alloc)
 {
     flat_priority_queue src
         = fpq_init((int[4]){}, int, CCC_LES, int_cmp, NULL, NULL, 4);
@@ -150,7 +162,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_copy_no_alloc)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(pq_test_copy_no_alloc_fail)
+CHECK_BEGIN_STATIC_FN(fpq_test_copy_no_alloc_fail)
 {
     flat_priority_queue src
         = fpq_init((int[4]){}, int, CCC_LES, int_cmp, NULL, NULL, 4);
@@ -167,7 +179,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_copy_no_alloc_fail)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(pq_test_copy_alloc)
+CHECK_BEGIN_STATIC_FN(fpq_test_copy_alloc)
 {
     flat_priority_queue src
         = fpq_init(NULL, int, CCC_LES, int_cmp, std_alloc, NULL, 0);
@@ -196,7 +208,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_copy_alloc)
     });
 }
 
-CHECK_BEGIN_STATIC_FN(pq_test_copy_alloc_fail)
+CHECK_BEGIN_STATIC_FN(fpq_test_copy_alloc_fail)
 {
     flat_priority_queue src
         = fpq_init(NULL, int, CCC_LES, int_cmp, std_alloc, NULL, 0);
@@ -215,9 +227,9 @@ CHECK_BEGIN_STATIC_FN(pq_test_copy_alloc_fail)
 int
 main()
 {
-    return CHECK_RUN(pq_test_empty(), pq_test_macro(), pq_test_push(),
-                     pq_test_raw_type(), pq_test_heapify_init(),
-                     pq_test_heapify_copy(), pq_test_copy_no_alloc(),
-                     pq_test_copy_no_alloc_fail(), pq_test_copy_alloc(),
-                     pq_test_copy_alloc_fail());
+    return CHECK_RUN(fpq_test_empty(), fpq_test_macro(), fpq_test_macro_grow(),
+                     fpq_test_push(), fpq_test_raw_type(),
+                     fpq_test_heapify_init(), fpq_test_heapify_copy(),
+                     fpq_test_copy_no_alloc(), fpq_test_copy_no_alloc_fail(),
+                     fpq_test_copy_alloc(), fpq_test_copy_alloc_fail());
 }

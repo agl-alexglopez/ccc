@@ -25,6 +25,7 @@ enum : size_t
 /*==========================   Prototypes    ================================*/
 
 static void *at(ccc_buffer const *, size_t);
+static size_t max(size_t a, size_t b);
 
 /*==========================    Interface    ================================*/
 
@@ -192,9 +193,8 @@ ccc_buf_alloc_back(ccc_buffer *const buf)
     }
     if (buf->count == buf->capacity)
     {
-        ccc_result const resize_res
-            = buf->capacity ? ccc_buf_alloc(buf, buf->capacity * 2, buf->alloc)
-                            : ccc_buf_alloc(buf, START_CAPACITY, buf->alloc);
+        ccc_result const resize_res = ccc_buf_alloc(
+            buf, max(buf->capacity * 2, START_CAPACITY), buf->alloc);
         if (resize_res != CCC_RESULT_OK)
         {
             return NULL;
@@ -514,4 +514,10 @@ static inline void *
 at(ccc_buffer const *const buf, size_t const i)
 {
     return ((char *)buf->mem + (i * buf->sizeof_type));
+}
+
+static inline size_t
+max(size_t const a, size_t const b)
+{
+    return a > b ? a : b;
 }
