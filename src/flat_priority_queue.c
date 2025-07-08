@@ -25,6 +25,7 @@ limitations under the License. */
 enum : size_t
 {
     SWAP_SLOT = 1,
+    START_CAP = 8,
 };
 
 /*=====================      Prototypes      ================================*/
@@ -38,6 +39,7 @@ static size_t bubble_up(struct ccc_fpq *fpq, char tmp[const], size_t i);
 static size_t bubble_down(struct ccc_fpq *, char tmp[const], size_t);
 static size_t update_fixup(struct ccc_fpq *, void *e);
 static void heapify(struct ccc_fpq *fpq, size_t n);
+static size_t max(size_t, size_t);
 
 /*=====================       Interface      ================================*/
 
@@ -93,10 +95,10 @@ ccc_fpq_push(ccc_flat_priority_queue *const fpq, void const *const e)
     {
         return NULL;
     }
-    if (fpq->buf.capacity && fpq->buf.count + SWAP_SLOT >= fpq->buf.capacity)
+    if (fpq->buf.count + SWAP_SLOT >= fpq->buf.capacity)
     {
-        ccc_result const r
-            = ccc_buf_reserve(&fpq->buf, fpq->buf.capacity, fpq->buf.alloc);
+        ccc_result const r = ccc_buf_reserve(
+            &fpq->buf, max(fpq->buf.capacity, START_CAP), fpq->buf.alloc);
         if (r != CCC_RESULT_OK)
         {
             return NULL;
@@ -111,9 +113,8 @@ ccc_fpq_push(ccc_flat_priority_queue *const fpq, void const *const e)
     {
         (void)memcpy(new, e, fpq->buf.sizeof_type);
     }
-    size_t const buf_count = fpq->buf.count;
-    size_t i = buf_count - 1;
-    if (buf_count > 1)
+    size_t i = fpq->buf.count - 1;
+    if (fpq->buf.count > 1)
     {
         void *const tmp = ccc_buf_at(&fpq->buf, fpq->buf.count);
         i = bubble_up(fpq, tmp, i);
@@ -128,7 +129,7 @@ ccc_fpq_push(ccc_flat_priority_queue *const fpq, void const *const e)
 ccc_result
 ccc_fpq_pop(ccc_flat_priority_queue *const fpq)
 {
-    if (!fpq || ccc_buf_is_empty(&fpq->buf))
+    if (!fpq || !fpq->buf.count)
     {
         return CCC_RESULT_ARG_ERROR;
     }
@@ -149,20 +150,18 @@ ccc_fpq_pop(ccc_flat_priority_queue *const fpq)
 ccc_result
 ccc_fpq_erase(ccc_flat_priority_queue *const fpq, void *const e)
 {
-    if (!fpq || !e || ccc_buf_is_empty(&fpq->buf))
+    if (!fpq || !e || !fpq->buf.count)
     {
         return CCC_RESULT_ARG_ERROR;
     }
     if (fpq->buf.count == 1)
     {
-        (void)ccc_buf_pop_back(&fpq->buf);
-        return CCC_RESULT_OK;
+        return ccc_buf_pop_back(&fpq->buf);
     }
     size_t const i = index_of(fpq, e);
     if (i == fpq->buf.count - 1)
     {
-        (void)ccc_buf_pop_back(&fpq->buf);
-        return CCC_RESULT_OK;
+        return ccc_buf_pop_back(&fpq->buf);
     }
     void *const tmp = ccc_buf_at(&fpq->buf, fpq->buf.count);
     swap(fpq, tmp, i, fpq->buf.count - 1);
@@ -184,7 +183,7 @@ void *
 ccc_fpq_update(ccc_flat_priority_queue *const fpq, void *const e,
                ccc_any_type_update_fn *const fn, void *const aux)
 {
-    if (!fpq || !e || !fn || ccc_buf_is_empty(&fpq->buf))
+    if (!fpq || !e || !fn || !fpq->buf.count)
     {
         return NULL;
     }
@@ -214,7 +213,7 @@ ccc_fpq_decrease(ccc_flat_priority_queue *const fpq, void *const e,
 void *
 ccc_fpq_front(ccc_flat_priority_queue const *const fpq)
 {
-    if (!fpq || ccc_buf_is_empty(&fpq->buf))
+    if (!fpq || !fpq->buf.count)
     {
         return NULL;
     }
@@ -396,8 +395,9 @@ ccc_fpq_validate(ccc_flat_priority_queue const *const fpq)
     {
         return CCC_TRUE;
     }
-    for (size_t i = 0, left = (i * 2) + 1, right = (i * 2) + 2;
-         i <= (count - 2) / 2; ++i, left = (i * 2) + 1, right = (i * 2) + 2)
+    for (size_t i = 0, left = (i * 2) + 1, right = (i * 2) + 2,
+                end = (count - 2) / 2;
+         i <= end; ++i, left = (i * 2) + 1, right = (i * 2) + 2)
     {
         /* Putting the child in the comparison function first evaluates
            the child's three way comparison in relation to the parent. If
@@ -486,7 +486,7 @@ bubble_up(struct ccc_fpq *const fpq, char tmp[const], size_t i)
         {
             return i;
         }
-        swap(fpq, tmp, parent, i);
+        swap(fpq, tmp, i, parent);
     }
     return 0;
 }
@@ -562,4 +562,10 @@ cmp(struct ccc_fpq const *const fpq, size_t lhs, size_t rhs)
         .any_type_rhs = at(fpq, rhs),
         .aux = fpq->buf.aux,
     });
+}
+
+static inline size_t
+max(size_t const a, size_t const b)
+{
+    return a > b ? a : b;
 }
