@@ -285,7 +285,7 @@ fhmap_id_eq(ccc_any_key_cmp const cmp)
     return va->key == *((int *)cmp.any_key_lhs);
 }
 
-fhm_declare_fixed_map(standard_fixed_map, struct val, 1024);
+fhm_declare_fixed_map(standard_fixed_map, struct key_val, 1024);
 
 enum : size_t
 {
