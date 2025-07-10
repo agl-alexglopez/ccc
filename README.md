@@ -285,41 +285,72 @@ fhmap_id_eq(ccc_any_key_cmp const cmp)
     return va->key == *((int *)cmp.any_key_lhs);
 }
 
-/* This fix map will be a 'small_fixed_map' used to store struct val. */
-fhm_declare_fixed_map(small_fixed_map, struct val, 64);
+fhm_declare_fixed_map(standard_fixed_map, struct val, 1024);
 
-/* Two Sum */
+enum : size_t
+{
+    STANDARD_FIXED_CAP = fhm_fixed_capacity(standard_fixed_map),
+};
+
+/* Longest Consecutive Sequence Leetcode Problem */
 int
 main(void)
 {
-    /* fixed map on the stack, data and tag fields built in, key field named
-       key, a hash function, an equality function, no allocation, no aux. */
-    ccc_flat_hash_map fh;
-        = fhm_init(&(small_fixed_map){}, struct val, key, fhmap_int_to_u64,
-                   fhmap_id_eq, NULL, NULL,
-                   fhm_fixed_capacity(small_fixed_map));
-    int const addends[10] = {1, 3, -980, 6, 7, 13, 44, 32, 995, -1};
-    int const target = 15;
-    int solution_indices[2] = {-1, -1};
-    for (size_t i = 0; i < (sizeof(addends) / sizeof(addends[0])); ++i)
+    ccc_flat_hash_map fh = fhm_init(
+        &(standard_fixed_map){},
+        struct key_val,
+        key,
+        fhmap_int_to_u64,
+        fhmap_id_eq,
+        NULL,
+        NULL,
+        STANDARD_FIXED_CAP
+    );
+    /* Longest sequence is 1,2,3,4,5,6,7,8,9,10 of length 10. */
+    int const nums[] = {
+        99, 54, 1, 4, 9,  2, 3,   4,  8,  271, 32, 45, 86, 44, 7,  777, 6,  20,
+        19, 5,  9, 1, 10, 4, 101, 15, 16, 17,  18, 19, 20, 10, 21, 22,  23,
+    };
+    static_assert(sizeof(nums) / sizeof(nums[0]) < STANDARD_FIXED_CAP / 2);
+    int const correct_max_run = 10;
+    size_t const nums_size = sizeof(nums) / sizeof(nums[0]);
+    int max_run = 0;
+    for (size_t i = 0; i < nums_size; ++i)
     {
-        /* Functions take keys and structs by reference. */
-        struct key_val const *const other_addend
-            = get_key_val(&fh, &(int){target - addends[i]});
-        if (other_addend)
+        int const n = nums[i];
+        ccc_entry const *const seen_n
+            = try_insert_r(&fh, &(struct key_val){.key = n, .val = 1});
+        /* We have already connected this run as much as possible. */
+        if (occupied(seen_n))
         {
-            solution_indices[0] = (int)i;
-            solution_indices[1] = other_addend->val;
-            break;
+            continue;
         }
-        /* Macros take keys and structs by value. */
-        (void)fhm_insert_or_assign_w(&fh, addends[i],
-                                     (struct key_val){.val = i});
+        assert(!insert_error(seen_n));
+
+        /* There may or may not be runs already existing to left and right. */
+        struct key_val const *const connect_left
+            = get_key_val(&fh, &(int){n - 1});
+        struct key_val const *const connect_right
+            = get_key_val(&fh, &(int){n + 1});
+        int const left_run = connect_left ? connect_left->val : 0;
+        int const right_run = connect_right ? connect_right->val : 0;
+        int const full_run = left_run + 1 + right_run;
+
+        /* Track solution to problem. */
+        max_run = full_run > max_run ? full_run : max_run;
+
+        /* Update the boundaries of the full run range. */
+        ((struct key_val *)unwrap(seen_n))->val = full_run;
+        ccc_entry const *const run_min = insert_or_assign_r(
+            &fh, &(struct key_val){.key = n - left_run, .val = full_run});
+        ccc_entry const *const run_max = insert_or_assign_r(
+            &fh, &(struct key_val){.key = n + right_run, .val = full_run});
+        assert(occupied(run_min));
+        assert(occupied(run_max));
+        assert(!insert_error(run_min));
+        assert(!insert_error(run_max));
     }
-    assert(solution_indices[0] == 8);
-    assert(solution_indices[1] == 2);
-    assert(addends[solution_indices[0]] + addends[solution_indices[1]]
-           == target);
+    assert(max_run == correct_max_run);
     return 0;
 }
 ```
