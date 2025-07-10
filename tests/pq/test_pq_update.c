@@ -156,9 +156,9 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_increase)
     for (size_t val = 0; val < num_nodes; ++val)
     {
         struct val *const i = &vals[val];
-        int inc = limit * 2;
-        int dec = i->val / 2;
-        if (i->val >= limit)
+        int inc = (limit * 2) + 1;
+        int dec = (i->val / 2) - 1;
+        if (i->val >= limit && dec < i->val)
         {
             CHECK(ccc_pq_decrease(&pq, &i->elem, val_update, &dec) != NULL,
                   true);
@@ -195,8 +195,8 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_increase_with)
     int const limit = 400;
     for (size_t val = 0; val < num_nodes; ++val)
     {
-        int inc = limit * 2;
-        int dec = vals[val].val / 2;
+        int inc = (limit * 2) + 1;
+        int dec = (vals[val].val / 2) - 1;
         if (vals[val].val >= limit)
         {
             CHECK(ccc_pq_decrease_w(&pq, &vals[val], { T->val = dec; }) != NULL,
@@ -235,8 +235,8 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_decrease)
     for (size_t val = 0; val < num_nodes; ++val)
     {
         struct val *const i = &vals[val];
-        int inc = limit * 2;
-        int dec = i->val / 2;
+        int inc = (limit * 2) + 1;
+        int dec = (i->val / 2) - 1;
         if (i->val < limit)
         {
             CHECK(ccc_pq_increase(&pq, &i->elem, val_update, &inc) != NULL,
@@ -274,8 +274,8 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_decrease_with)
     int const limit = 400;
     for (size_t val = 0; val < num_nodes; ++val)
     {
-        int inc = limit * 2;
-        int dec = vals[val].val / 2;
+        int inc = (limit * 2) + 1;
+        int dec = (vals[val].val / 2) - 1;
         if (vals[val].val < limit)
         {
             CHECK(ccc_pq_increase_w(&pq, &vals[val], { T->val = inc; }) != NULL,

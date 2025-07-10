@@ -359,6 +359,57 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_two_sum)
     CHECK_END_FN();
 }
 
+CHECK_BEGIN_STATIC_FN(fhmap_test_longest_consecutive_sequence)
+{
+    ccc_flat_hash_map fh
+        = fhm_init(&(standard_fixed_map){}, struct val, key, fhmap_int_to_u64,
+                   fhmap_id_eq, NULL, NULL, STANDARD_FIXED_CAP);
+    /* Longest sequence is 1,2,3,4,5,6,7,8,9,10 of length 10. */
+    int const nums[] = {
+        99, 54, 1, 4, 9,  2, 3,   4,  8,  271, 32, 45, 86, 44, 7,  777, 6,  20,
+        19, 5,  9, 1, 10, 4, 101, 15, 16, 17,  18, 19, 20, 10, 21, 22,  23,
+    };
+    int const correct_max_run = 10;
+    size_t const nums_size = sizeof(nums) / sizeof(nums[0]);
+    int maxrun = 0;
+    for (size_t i = 0; i < nums_size; ++i)
+    {
+        int const n = nums[i];
+        ccc_entry const *const seen_n
+            = try_insert_r(&fh, &(struct val){.key = n, .val = 1});
+        /* We have already connected this run as much as possible. */
+        if (occupied(seen_n))
+        {
+            continue;
+        }
+
+        /* There may or may not be runs already existing to left and right. */
+        struct val const *const connect_left = get_key_val(&fh, &(int){n - 1});
+        struct val const *const connect_right = get_key_val(&fh, &(int){n + 1});
+        int const left_run = connect_left ? connect_left->val : 0;
+        int const right_run = connect_right ? connect_right->val : 0;
+        int const full_run = left_run + 1 + right_run;
+
+        /* Track solution to problem. */
+        maxrun = full_run > maxrun ? full_run : maxrun;
+
+        /* Update the boundaries of the full run range. */
+        ((struct val *)unwrap(seen_n))->val = full_run;
+        ccc_entry left_start = insert_or_assign(
+            &fh, &(struct val){.key = n - left_run, .val = full_run});
+        ccc_entry right_start = insert_or_assign(
+            &fh, &(struct val){.key = n + right_run, .val = full_run});
+
+        /* Validate for testing purposes. */
+        CHECK(occupied(&left_start), CCC_TRUE);
+        CHECK(insert_error(&left_start), CCC_FALSE);
+        CHECK(occupied(&right_start), CCC_TRUE);
+        CHECK(insert_error(&right_start), CCC_FALSE);
+    }
+    CHECK(maxrun, correct_max_run);
+    CHECK_END_FN();
+}
+
 CHECK_BEGIN_STATIC_FN(fhmap_test_resize)
 {
     ccc_flat_hash_map fh = fhm_init(NULL, struct val, key, fhmap_int_to_u64,
@@ -632,7 +683,8 @@ main(void)
         fhmap_test_insert_then_bad_ideas(), fhmap_test_insert_via_entry(),
         fhmap_test_insert_via_entry_macros(), fhmap_test_entry_api_functional(),
         fhmap_test_entry_api_macros(), fhmap_test_two_sum(),
-        fhmap_test_resize(), fhmap_test_resize_macros(),
-        fhmap_test_resize_from_null(), fhmap_test_resize_from_null_macros(),
-        fhmap_test_insert_limit(), fhmap_test_reserve_without_permissions());
+        fhmap_test_longest_consecutive_sequence(), fhmap_test_resize(),
+        fhmap_test_resize_macros(), fhmap_test_resize_from_null(),
+        fhmap_test_resize_from_null_macros(), fhmap_test_insert_limit(),
+        fhmap_test_reserve_without_permissions());
 }
