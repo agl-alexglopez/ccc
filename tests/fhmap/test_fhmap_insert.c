@@ -395,9 +395,9 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_longest_consecutive_sequence)
 
         /* Update the boundaries of the full run range. */
         ((struct val *)unwrap(seen_n))->val = full_run;
-        ccc_entry left_start = insert_or_assign(
+        ccc_entry const left_start = insert_or_assign(
             &fh, &(struct val){.key = n - left_run, .val = full_run});
-        ccc_entry right_start = insert_or_assign(
+        ccc_entry const right_start = insert_or_assign(
             &fh, &(struct val){.key = n + right_run, .val = full_run});
 
         /* Validate for testing purposes. */
