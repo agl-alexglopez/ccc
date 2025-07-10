@@ -369,6 +369,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_longest_consecutive_sequence)
         99, 54, 1, 4, 9,  2, 3,   4,  8,  271, 32, 45, 86, 44, 7,  777, 6,  20,
         19, 5,  9, 1, 10, 4, 101, 15, 16, 17,  18, 19, 20, 10, 21, 22,  23,
     };
+    CHECK(sizeof(nums) / sizeof(nums[0]) < STANDARD_FIXED_CAP / 2, CCC_TRUE);
     int const correct_max_run = 10;
     size_t const nums_size = sizeof(nums) / sizeof(nums[0]);
     int maxrun = 0;
