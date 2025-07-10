@@ -372,7 +372,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_longest_consecutive_sequence)
     CHECK(sizeof(nums) / sizeof(nums[0]) < STANDARD_FIXED_CAP / 2, CCC_TRUE);
     int const correct_max_run = 10;
     size_t const nums_size = sizeof(nums) / sizeof(nums[0]);
-    int maxrun = 0;
+    int max_run = 0;
     for (size_t i = 0; i < nums_size; ++i)
     {
         int const n = nums[i];
@@ -392,22 +392,22 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_longest_consecutive_sequence)
         int const full_run = left_run + 1 + right_run;
 
         /* Track solution to problem. */
-        maxrun = full_run > maxrun ? full_run : maxrun;
+        max_run = full_run > max_run ? full_run : max_run;
 
         /* Update the boundaries of the full run range. */
         ((struct val *)unwrap(seen_n))->val = full_run;
-        ccc_entry const left_start = insert_or_assign(
+        ccc_entry const run_min = insert_or_assign(
             &fh, &(struct val){.key = n - left_run, .val = full_run});
-        ccc_entry const right_start = insert_or_assign(
+        ccc_entry const run_max = insert_or_assign(
             &fh, &(struct val){.key = n + right_run, .val = full_run});
 
         /* Validate for testing purposes. */
-        CHECK(occupied(&left_start), CCC_TRUE);
-        CHECK(insert_error(&left_start), CCC_FALSE);
-        CHECK(occupied(&right_start), CCC_TRUE);
-        CHECK(insert_error(&right_start), CCC_FALSE);
+        CHECK(occupied(&run_min), CCC_TRUE);
+        CHECK(insert_error(&run_min), CCC_FALSE);
+        CHECK(occupied(&run_max), CCC_TRUE);
+        CHECK(insert_error(&run_max), CCC_FALSE);
     }
-    CHECK(maxrun, correct_max_run);
+    CHECK(max_run, correct_max_run);
     CHECK_END_FN();
 }
 
