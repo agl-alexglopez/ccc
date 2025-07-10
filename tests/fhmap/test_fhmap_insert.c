@@ -396,16 +396,16 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_longest_consecutive_sequence)
 
         /* Update the boundaries of the full run range. */
         ((struct val *)unwrap(seen_n))->val = full_run;
-        ccc_entry const run_min = insert_or_assign(
+        ccc_entry const *const run_min = insert_or_assign_r(
             &fh, &(struct val){.key = n - left_run, .val = full_run});
-        ccc_entry const run_max = insert_or_assign(
+        ccc_entry const *const run_max = insert_or_assign_r(
             &fh, &(struct val){.key = n + right_run, .val = full_run});
 
         /* Validate for testing purposes. */
-        CHECK(occupied(&run_min), CCC_TRUE);
-        CHECK(insert_error(&run_min), CCC_FALSE);
-        CHECK(occupied(&run_max), CCC_TRUE);
-        CHECK(insert_error(&run_max), CCC_FALSE);
+        CHECK(occupied(run_min), CCC_TRUE);
+        CHECK(insert_error(run_min), CCC_FALSE);
+        CHECK(occupied(run_max), CCC_TRUE);
+        CHECK(insert_error(run_max), CCC_FALSE);
     }
     CHECK(max_run, correct_max_run);
     CHECK_END_FN();
