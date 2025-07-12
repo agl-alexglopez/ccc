@@ -217,7 +217,7 @@ ccc_buf_push_back(ccc_buffer *const buf, void const *const data)
 }
 
 ccc_result
-ccc_buf_swap(ccc_buffer *const buf, char tmp[const], size_t const i,
+ccc_buf_swap(ccc_buffer *const buf, void *const tmp, size_t const i,
              size_t const j)
 {
     if (!buf || !tmp || i >= buf->capacity || j >= buf->capacity || j == i)
@@ -231,7 +231,7 @@ ccc_buf_swap(ccc_buffer *const buf, char tmp[const], size_t const i,
 }
 
 void *
-ccc_buf_copy(ccc_buffer *const buf, size_t const dst, size_t const src)
+ccc_buf_move(ccc_buffer *const buf, size_t const dst, size_t const src)
 {
     if (!buf || dst >= buf->capacity || src >= buf->capacity)
     {
@@ -297,7 +297,7 @@ ccc_buf_insert(ccc_buffer *const buf, size_t const i, void const *const data)
     (void)memmove(at(buf, i + 1), at(buf, i),
                   buf->sizeof_type * (buf->count - i));
     ++buf->count;
-    return at(buf, i);
+    return memcpy(at(buf, i), data, buf->sizeof_type);
 }
 
 ccc_result
@@ -384,7 +384,8 @@ ccc_buf_rbegin(ccc_buffer const *const buf)
     {
         return NULL;
     }
-    return (char *)buf->mem + (buf->count * buf->sizeof_type);
+    /* OK if count is 0. Negative offset puts at rend anyway. */
+    return (unsigned char *)buf->mem + ((buf->count - 1) * buf->sizeof_type);
 }
 
 void *
@@ -398,7 +399,7 @@ ccc_buf_next(ccc_buffer const *const buf, void const *const iter)
     {
         return ccc_buf_end(buf);
     }
-    return (char *)iter + buf->sizeof_type;
+    return (unsigned char *)iter + buf->sizeof_type;
 }
 
 void *
@@ -415,6 +416,7 @@ ccc_buf_rnext(ccc_buffer const *const buf, void const *const iter)
     return (char *)iter - buf->sizeof_type;
 }
 
+/** We accept that end may be the address past buffer capacity. */
 void *
 ccc_buf_end(ccc_buffer const *const buf)
 {
@@ -422,9 +424,13 @@ ccc_buf_end(ccc_buffer const *const buf)
     {
         return NULL;
     }
-    return (char *)buf->mem + (buf->count * buf->sizeof_type);
+    return (unsigned char *)buf->mem + (buf->count * buf->sizeof_type);
 }
 
+/** We accept that rend is out of bounds and the address before start. Even if
+the array base was somehow 0 and wrapping occurred upon subtraction the iterator
+would eventually reach this same address through rnext and be compared to it
+in the main user loop. */
 void *
 ccc_buf_rend(ccc_buffer const *const buf)
 {
@@ -432,9 +438,10 @@ ccc_buf_rend(ccc_buffer const *const buf)
     {
         return NULL;
     }
-    return (char *)buf->mem - buf->sizeof_type;
+    return (unsigned char *)buf->mem - buf->sizeof_type;
 }
 
+/** Will always be the address after capacity. */
 void *
 ccc_buf_capacity_end(ccc_buffer const *const buf)
 {
@@ -442,7 +449,7 @@ ccc_buf_capacity_end(ccc_buffer const *const buf)
     {
         return NULL;
     }
-    return (char *)buf->mem + (buf->sizeof_type * buf->capacity);
+    return (unsigned char *)buf->mem + (buf->sizeof_type * buf->capacity);
 }
 
 ccc_ucount
@@ -505,6 +512,66 @@ ccc_buf_size_set(ccc_buffer *const buf, size_t const n)
         return CCC_RESULT_ARG_ERROR;
     }
     buf->count = n;
+    return CCC_RESULT_OK;
+}
+
+ccc_ucount
+ccc_buf_size_bytes(ccc_buffer const *buf)
+{
+    if (!buf)
+    {
+        return (ccc_ucount){.error = CCC_RESULT_ARG_ERROR};
+    }
+    return (ccc_ucount){.count = buf->count * buf->sizeof_type};
+}
+
+ccc_ucount
+ccc_buf_capacity_bytes(ccc_buffer const *buf)
+{
+    if (!buf)
+    {
+        return (ccc_ucount){.error = CCC_RESULT_ARG_ERROR};
+    }
+    return (ccc_ucount){.count = buf->capacity * buf->sizeof_type};
+}
+
+ccc_result
+ccc_buf_copy(ccc_buffer *const dst, ccc_buffer const *const src,
+             ccc_any_alloc_fn *const fn)
+{
+    if (!dst || !src || src == dst || (dst->capacity < src->capacity && !fn))
+    {
+        return CCC_RESULT_ARG_ERROR;
+    }
+    /* Copy everything so we don't worry about staying in sync with future
+       changes to buf container. But we have to give back original destination
+       memory in case it has already been allocated. Alloc will remain the
+       same as in dst initialization because that controls permission. */
+    void *const dst_mem = dst->mem;
+    size_t const dst_cap = dst->capacity;
+    ccc_any_alloc_fn *const dst_alloc = dst->alloc;
+    *dst = *src;
+    dst->mem = dst_mem;
+    dst->capacity = dst_cap;
+    dst->alloc = dst_alloc;
+    if (!src->capacity)
+    {
+        return CCC_RESULT_OK;
+    }
+    if (dst->capacity < src->capacity)
+    {
+        ccc_result const r = ccc_buf_alloc(dst, src->capacity, fn);
+        if (r != CCC_RESULT_OK)
+        {
+            return r;
+        }
+        dst->capacity = src->capacity;
+    }
+    if (!src->mem || !dst->mem)
+    {
+        return CCC_RESULT_ARG_ERROR;
+    }
+    (void)memcpy(dst->mem, src->mem, src->capacity * src->sizeof_type);
     return CCC_RESULT_OK;
 }
 

@@ -99,10 +99,10 @@ Manual memory management with no allocation function provided.
 
 ```
 #define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC
-flat_double_ended_queue src = fdeq_init((int[10]){}, NULL, NULL, 10);
-int *new_mem = malloc(sizeof(int) * fdeq_capacity(&src));
+flat_double_ended_queue src = fdeq_init((int[10]){}, int, NULL, NULL, 10);
+int *new_mem = malloc(sizeof(int) * fdeq_capacity(&src).count);
 flat_double_ended_queue dst
-    = fdeq_init(new_mem, NULL, NULL, fdeq_capacity(&src));
+    = fdeq_init(new_mem, int, NULL, NULL, fdeq_capacity(&src).count);
 ccc_result res = fdeq_copy(&dst, &src, NULL);
 ```
 
@@ -111,9 +111,9 @@ is memory management handed over to the copy function.
 
 ```
 #define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC
-flat_double_ended_queue src = fdeq_init((int *)NULL, std_alloc, NULL, 0);
+flat_double_ended_queue src = fdeq_init(NULL, int, std_alloc, NULL, 0);
 (void)ccc_fdeq_push_back_range(&src, 5, (int[5]){0,1,2,3,4});
-flat_double_ended_queue dst = fdeq_init((int *)NULL, std_alloc, NULL, 0);
+flat_double_ended_queue dst = fdeq_init(NULL, int, std_alloc, NULL, 0);
 ccc_result res = fdeq_copy(&dst, &src, std_alloc);
 ```
 
@@ -124,9 +124,9 @@ size fdeq (ring buffer).
 
 ```
 #define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC
-flat_double_ended_queue src = fdeq_init((int *)NULL, std_alloc, NULL, 0);
+flat_double_ended_queue src = fdeq_init(NULL, int, std_alloc, NULL, 0);
 (void)ccc_fdeq_push_back_range(&src, 5, (int[5]){0,1,2,3,4});
-flat_double_ended_queue dst = fdeq_init((int *)NULL, NULL, NULL, 0);
+flat_double_ended_queue dst = fdeq_init(NULL, int, NULL, NULL, 0);
 ccc_result res = fdeq_copy(&dst, &src, std_alloc);
 ```
 
