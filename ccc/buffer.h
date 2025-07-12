@@ -457,7 +457,7 @@ If n would exceed the current capacity of the buffer the size is set to
 capacity and the input error status is returned. */
 ccc_result ccc_buf_size_plus(ccc_buffer *buf, size_t n);
 
-/** @brief subtract n from the size of the buffer.
+/** @brief Subtract n from the size of the buffer.
 @param [in] buf the pointer to the buffer.
 @param [in] n the quantity to subtract from the current buffer size.
 @return the result of resizing. CCC_RESULT_OK if no errors occur or an error
@@ -467,7 +467,7 @@ If n would reduce the size to less than 0, the buffer size is set to 0 and the
 input error status is returned. */
 ccc_result ccc_buf_size_minus(ccc_buffer *buf, size_t n);
 
-/** @brief set the buffer size to n.
+/** @brief Set the buffer size to n.
 @param [in] buf the pointer to the buffer.
 @param [in] n the new size of the buffer.
 @return the result of setting the size. CCC_RESULT_OK if no errors occur or an
@@ -477,18 +477,35 @@ If n is larger than the capacity of the buffer the size is set equal to the
 capacity and an error is returned. */
 ccc_result ccc_buf_size_set(ccc_buffer *buf, size_t n);
 
-/** @brief return the current capacity of total possible slots.
+/** @brief Return the current capacity of total possible slots.
 @param [in] buf the pointer to the buffer.
 @return the total number of elements the can be stored in the buffer. This
 value remains the same until a resize occurs. An argument error is set if buf is
 NULL. */
 [[nodiscard]] ccc_ucount ccc_buf_capacity(ccc_buffer const *buf);
 
-/** @brief the size of the type being stored contiguously in the buffer.
+/** @brief The size of the type being stored contiguously in the buffer.
 @param [in] buf the pointer to the buffer.
 @return the size of the type being stored in the buffer. 0 if buf is NULL
 because a zero sized object is not possible for a buffer. */
 [[nodiscard]] ccc_ucount ccc_buf_sizeof_type(ccc_buffer const *buf);
+
+/** @brief Return the bytes in the buffer given the current count of active
+elements.
+@param [in] buf the pointer to the buffer.
+@return the number of bytes occupied by the current count of elements.
+
+For total possible bytes that can be stored in the buffer see
+ccc_buf_capacity_bytes. */
+[[nodiscard]] ccc_ucount ccc_buf_size_bytes(ccc_buffer const *buf);
+
+/** @brief Return the bytes in the buffer given the current capacity elements.
+@param [in] buf the pointer to the buffer.
+@return the number of bytes occupied by the current capacity elements.
+
+For total possible bytes that can be stored in the buffer given the current
+element count see ccc_buf_size_bytes. */
+[[nodiscard]] ccc_ucount ccc_buf_capacity_bytes(ccc_buffer const *buf);
 
 /** @brief obtain the size of the buffer representing active slots.
 @param [in] buf the pointer to the buffer.
@@ -587,10 +604,12 @@ typedef ccc_buffer buffer;
 #    define buf_clear_and_free_reserve(args...)                                \
         ccc_buf_clear_and_free_reserve(args)
 #    define buf_size(args...) ccc_buf_size(args)
+#    define buf_size_bytes(args...) ccc_buf_size_bytes(args)
 #    define buf_size_plus(args...) ccc_buf_size_plus(args)
 #    define buf_size_minus(args...) ccc_buf_size_minus(args)
 #    define buf_size_set(args...) ccc_buf_size_set(args)
 #    define buf_capacity(args...) ccc_buf_capacity(args)
+#    define buf_capacity_bytes(args...) ccc_buf_capacity_bytes(args)
 #    define buf_sizeof_type(args...) ccc_buf_sizeof_type(args)
 #    define buf_i(args...) ccc_buf_i(args)
 #    define buf_is_full(args...) ccc_buf_is_full(args)

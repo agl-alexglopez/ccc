@@ -73,7 +73,7 @@ endmacro()
 # Add tests below here by the name of the c file without the .c suffix
 add_buf_test(test_buf_construct)
 add_buf_test(test_buf_insert)
-#add_buf_test(test_buf_erase)
+add_buf_test(test_buf_erase)
 
 #############  Heap Priority Queue  ##########################
 add_library(fpq_util fpq/fpq_util.h fpq/fpq_util.c)
