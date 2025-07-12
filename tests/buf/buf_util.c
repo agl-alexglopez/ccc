@@ -26,7 +26,7 @@ partition(buffer *const b, ccc_any_type_cmp_fn *const fn, void *const swap,
             ++i;
         }
     }
-    (void)buf_swap(b, &(int){}, i, hi);
+    (void)buf_swap(b, swap, i, hi);
     return i;
 }
 
