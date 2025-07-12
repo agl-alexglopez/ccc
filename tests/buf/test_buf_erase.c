@@ -187,10 +187,39 @@ CHECK_BEGIN_STATIC_FN(buf_test_largest_rectangle_in_histogram)
     CHECK_END_FN();
 }
 
+CHECK_BEGIN_STATIC_FN(buf_test_erase)
+{
+    enum : size_t
+    {
+        BECAP = 8,
+    };
+    buffer b = buf_init(((int[BECAP]){0, 1, 2, 3, 4, 5, 6, 7}), int, NULL, NULL,
+                        BECAP, BECAP);
+    CHECK(buf_size(&b).count, BECAP);
+    ccc_result r = buf_erase(&b, 4);
+    CHECK(r, CCC_RESULT_OK);
+    ccc_threeway_cmp cmp
+        = bufcmp(&b, BECAP - 1, (int[BECAP - 1]){0, 1, 2, 3, 5, 6, 7});
+    CHECK(cmp, CCC_EQL);
+    CHECK(buf_size(&b).count, BECAP - 1);
+    r = buf_erase(&b, 0);
+    CHECK(r, CCC_RESULT_OK);
+    cmp = bufcmp(&b, BECAP - 2, (int[BECAP - 2]){1, 2, 3, 5, 6, 7});
+    CHECK(cmp, CCC_EQL);
+    CHECK(buf_size(&b).count, BECAP - 2);
+    r = buf_erase(&b, BECAP - 3);
+    CHECK(r, CCC_RESULT_OK);
+    cmp = bufcmp(&b, BECAP - 3, (int[BECAP - 3]){1, 2, 3, 5, 6});
+    CHECK(cmp, CCC_EQL);
+    CHECK(buf_size(&b).count, BECAP - 3);
+    CHECK_END_FN();
+}
+
 int
 main(void)
 {
     return CHECK_RUN(buf_test_push_pop_fixed(), buf_test_push_resize_pop(),
                      buf_test_daily_temperatures(), buf_test_car_fleet(),
-                     buf_test_largest_rectangle_in_histogram());
+                     buf_test_largest_rectangle_in_histogram(),
+                     buf_test_erase());
 }
