@@ -36,13 +36,21 @@ partition(buffer *const b, ccc_any_type_cmp_fn *const fn, void *const swap,
 https://en.wikipedia.org/wiki/Quicksort */
 static void
 sort_rec(buffer *const b, ccc_any_type_cmp_fn *const fn, void *const swap,
-         int lo, int const hi)
+         int lo, int hi)
 {
     while (lo < hi)
     {
         int const pivot_i = partition(b, fn, swap, lo, hi);
-        sort_rec(b, fn, swap, lo, pivot_i - 1);
-        lo = pivot_i + 1;
+        if (pivot_i - lo < hi - pivot_i)
+        {
+            sort_rec(b, fn, swap, lo, pivot_i - 1);
+            lo = pivot_i + 1;
+        }
+        else
+        {
+            sort_rec(b, fn, swap, pivot_i + 1, hi);
+            hi = pivot_i - 1;
+        }
     }
 }
 
