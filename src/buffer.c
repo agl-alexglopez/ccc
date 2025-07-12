@@ -384,7 +384,8 @@ ccc_buf_rbegin(ccc_buffer const *const buf)
     {
         return NULL;
     }
-    return (char *)buf->mem + ((buf->count - 1) * buf->sizeof_type);
+    /* OK if count is 0. Negative offset puts at rend anyway. */
+    return (unsigned char *)buf->mem + ((buf->count - 1) * buf->sizeof_type);
 }
 
 void *
@@ -398,7 +399,7 @@ ccc_buf_next(ccc_buffer const *const buf, void const *const iter)
     {
         return ccc_buf_end(buf);
     }
-    return (char *)iter + buf->sizeof_type;
+    return (unsigned char *)iter + buf->sizeof_type;
 }
 
 void *
@@ -415,6 +416,7 @@ ccc_buf_rnext(ccc_buffer const *const buf, void const *const iter)
     return (char *)iter - buf->sizeof_type;
 }
 
+/** We accept that end may be the address past buffer capacity. */
 void *
 ccc_buf_end(ccc_buffer const *const buf)
 {
@@ -422,9 +424,13 @@ ccc_buf_end(ccc_buffer const *const buf)
     {
         return NULL;
     }
-    return (char *)buf->mem + (buf->count * buf->sizeof_type);
+    return (unsigned char *)buf->mem + (buf->count * buf->sizeof_type);
 }
 
+/** We accept that rend is out of bounds and the address before start. Even if
+the array base was somehow 0 and wrapping occurred upon subtraction the iterator
+would eventually reach this same address through rnext and be compared to it
+in the main user loop. */
 void *
 ccc_buf_rend(ccc_buffer const *const buf)
 {
@@ -432,9 +438,10 @@ ccc_buf_rend(ccc_buffer const *const buf)
     {
         return NULL;
     }
-    return (char *)buf->mem - buf->sizeof_type;
+    return (unsigned char *)buf->mem - buf->sizeof_type;
 }
 
+/** Will always be the address after capacity. */
 void *
 ccc_buf_capacity_end(ccc_buffer const *const buf)
 {
@@ -442,7 +449,7 @@ ccc_buf_capacity_end(ccc_buffer const *const buf)
     {
         return NULL;
     }
-    return (char *)buf->mem + (buf->sizeof_type * buf->capacity);
+    return (unsigned char *)buf->mem + (buf->sizeof_type * buf->capacity);
 }
 
 ccc_ucount
