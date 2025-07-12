@@ -68,7 +68,7 @@ CHECK_BEGIN_STATIC_FN(buf_test_reverse_buf)
 
 /** The concept of two pointers can be implemented quite cleanly with the buffer
 iterator abstraction, especially because we don't force a foreach macro use
-onto the user. They are able to set up a for loop freely. */
+onto the user. They are able to set up a while/for loop freely. */
 CHECK_BEGIN_STATIC_FN(buf_test_trap_rainwater_two_pointers)
 {
     enum : size_t
