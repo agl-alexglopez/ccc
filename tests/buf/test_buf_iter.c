@@ -49,11 +49,11 @@ CHECK_BEGIN_STATIC_FN(buf_test_reverse_buf)
         CHECK(i != NULL, CCC_TRUE);
         CHECK(*i > prev, CCC_TRUE);
     }
-    for (int *f = buf_begin(&b), *r = buf_rbegin(&b); f < r;
-         f = buf_next(&b, f), r = buf_rnext(&b, r))
+    for (int *l = buf_begin(&b), *r = buf_rbegin(&b); l < r;
+         l = buf_next(&b, l), r = buf_rnext(&b, r))
     {
         ccc_result const res
-            = buf_swap(&b, &(int){}, buf_i(&b, f).count, buf_i(&b, r).count);
+            = buf_swap(&b, &(int){}, buf_i(&b, l).count, buf_i(&b, r).count);
         CHECK(res, CCC_RESULT_OK);
     }
     prev = 7;
