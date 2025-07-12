@@ -106,11 +106,9 @@ CHECK_BEGIN_STATIC_FN(buf_test_daily_temperatures)
 static ccc_threeway_cmp
 cmp_car_idx(ccc_any_type_cmp const cmp)
 {
-    int const *const lhs = cmp.any_type_lhs;
-    int const *const rhs = cmp.any_type_rhs;
     buffer const *const positions = cmp.aux;
-    int const *const lhs_pos = buf_at(positions, *lhs);
-    int const *const rhs_pos = buf_at(positions, *rhs);
+    int const *const lhs_pos = buf_at(positions, *(int *)cmp.any_type_lhs);
+    int const *const rhs_pos = buf_at(positions, *(int *)cmp.any_type_rhs);
     /* Reversed sort. We want descending not ascending order. We ask how many
        car fleets there will be by starting at the cars furthest away that may
        catch up to those ahead. */
