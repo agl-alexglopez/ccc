@@ -122,11 +122,89 @@ CHECK_BEGIN_STATIC_FN(buf_test_push_sort)
     CHECK_END_FN();
 }
 
+CHECK_BEGIN_STATIC_FN(buf_test_insert_no_alloc)
+{
+    enum : size_t
+    {
+        BUFINSCAP = 8,
+    };
+    buffer b = buf_init(((int[BUFINSCAP]){1, 2, 4, 5}), int, NULL, NULL,
+                        BUFINSCAP, BUFINSCAP - 3);
+    CHECK(buf_size(&b).count, BUFINSCAP - 3);
+    int const *const three = buf_insert(&b, 2, &(int){3});
+    CHECK(three != NULL, CCC_TRUE);
+    CHECK(*three, 3);
+    ccc_threeway_cmp cmp
+        = bufcmp(&b, BUFINSCAP - 2, (int[BUFINSCAP - 2]){1, 2, 3, 4, 5});
+    CHECK(cmp, CCC_EQL);
+    CHECK(buf_size(&b).count, BUFINSCAP - 2);
+    int const *const zero = buf_insert(&b, 0, &(int){0});
+    CHECK(zero != NULL, CCC_TRUE);
+    CHECK(*zero, 0);
+    cmp = bufcmp(&b, BUFINSCAP - 1, (int[BUFINSCAP - 1]){0, 1, 2, 3, 4, 5});
+    CHECK(cmp, CCC_EQL);
+    CHECK(buf_size(&b).count, BUFINSCAP - 1);
+    int const *const six = buf_insert(&b, 6, &(int){6});
+    CHECK(six != NULL, CCC_TRUE);
+    CHECK(*six, 6);
+    cmp = bufcmp(&b, BUFINSCAP, (int[BUFINSCAP]){0, 1, 2, 3, 4, 5, 6});
+    CHECK(cmp, CCC_EQL);
+    CHECK(buf_size(&b).count, BUFINSCAP);
+    CHECK_END_FN();
+}
+
+CHECK_BEGIN_STATIC_FN(buf_test_insert_no_alloc_fail)
+{
+    enum : size_t
+    {
+        BUFINSCAP = 8,
+    };
+    buffer b = buf_init(((int[BUFINSCAP]){0, 1, 2, 3, 4, 5, 6}), int, NULL,
+                        NULL, BUFINSCAP, BUFINSCAP);
+    CHECK(buf_size(&b).count, BUFINSCAP);
+    int const *const three = buf_insert(&b, 3, &(int){3});
+    CHECK(three == NULL, CCC_TRUE);
+    CHECK(buf_size(&b).count, BUFINSCAP);
+    CHECK_END_FN();
+}
+
+/* Force a resize when inserting in middle forces shuffle down. */
+CHECK_BEGIN_STATIC_FN(buf_test_insert_alloc)
+{
+    buffer b = buf_init(NULL, int, std_alloc, NULL, 0);
+    ccc_result r = buf_reserve(&b, 6, std_alloc);
+    CHECK(r, CCC_RESULT_OK);
+    r = append_range(&b, 6, (int[6]){1, 2, 4, 5, 6, 7});
+    CHECK(r, CCC_RESULT_OK);
+    CHECK(buf_size(&b).count, 6);
+    int const *const three = buf_insert(&b, 2, &(int){3});
+    CHECK(three != NULL, CCC_TRUE);
+    CHECK(*three, 3);
+    ccc_threeway_cmp cmp = bufcmp(&b, 7, (int[7]){1, 2, 3, 4, 5, 6, 7});
+    CHECK(cmp, CCC_EQL);
+    CHECK(buf_size(&b).count, 7);
+    int const *const zero = buf_insert(&b, 0, &(int){0});
+    CHECK(zero != NULL, CCC_TRUE);
+    CHECK(*zero, 0);
+    cmp = bufcmp(&b, 8, (int[8]){0, 1, 2, 3, 4, 5, 6, 7});
+    CHECK(cmp, CCC_EQL);
+    CHECK(buf_size(&b).count, 8);
+    int const *const eight = buf_insert(&b, 8, &(int){8});
+    CHECK(eight != NULL, CCC_TRUE);
+    CHECK(*eight, 8);
+    cmp = bufcmp(&b, 9, (int[9]){0, 1, 2, 3, 4, 5, 6, 7, 8});
+    CHECK(cmp, CCC_EQL);
+    CHECK(buf_size(&b).count, 9);
+    CHECK_END_FN(buf_clear_and_free(&b, NULL););
+}
+
 int
 main(void)
 {
     /* NOLINTNEXTLINE */
     srand(time(NULL));
     return CHECK_RUN(buf_test_push_fixed(), buf_test_push_resize(),
-                     buf_test_push_qsort(), buf_test_push_sort());
+                     buf_test_push_qsort(), buf_test_push_sort(),
+                     buf_test_insert_no_alloc(),
+                     buf_test_insert_no_alloc_fail(), buf_test_insert_alloc());
 }

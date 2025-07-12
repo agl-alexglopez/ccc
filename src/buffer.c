@@ -294,6 +294,15 @@ ccc_buf_insert(ccc_buffer *const buf, size_t const i, void const *const data)
     {
         return ccc_buf_push_back(buf, data);
     }
+    if (buf->count == buf->capacity)
+    {
+        ccc_result const r = ccc_buf_alloc(
+            buf, max(buf->count * 2, START_CAPACITY), buf->alloc);
+        if (r != CCC_RESULT_OK)
+        {
+            return NULL;
+        }
+    }
     (void)memmove(at(buf, i + 1), at(buf, i),
                   buf->sizeof_type * (buf->count - i));
     ++buf->count;
