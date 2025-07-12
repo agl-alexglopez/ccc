@@ -304,6 +304,20 @@ data. It is up to the user to ensure the index provided is within the current
 size of the buffer. */
 [[nodiscard]] void *ccc_buf_at(ccc_buffer const *buf, size_t i);
 
+/** @brief Access en element at the specified index as the stored type.
+@param [in] buf_ptr the pointer to the buffer.
+@param [in] type_name the name of the stored type.
+@param [in] i the index within capacity range of the buffer.
+@return a pointer to the element in the slot at position i or NULL if i is out
+of capacity range.
+
+Note that as long as the index is valid within the capacity of the buffer a
+valid pointer is returned, which may result in a slot of old or uninitialized
+data. It is up to the user to ensure the index provided is within the current
+size of the buffer. */
+#define ccc_buf_as(buf_ptr, type_name, index)                                  \
+    ((type_name *)ccc_buf_at(buf_ptr, index))
+
 /** @brief return the index of an element known to be in the buffer.
 @param [in] buf the pointer to the buffer.
 @param [in] slot the pointer to the element stored in the buffer.
@@ -317,11 +331,26 @@ buffer, otherwise an argument error is set. */
 size or NULL if the buffer does not exist or is empty. */
 [[nodiscard]] void *ccc_buf_back(ccc_buffer const *buf);
 
+/** @brief return the final element in the buffer according the current size.
+@param [in] buf_ptr the pointer to the buffer.
+@param [in] type_name the name of the stored type.
+@return the pointer the final element in the buffer according to the current
+size or NULL if the buffer does not exist or is empty. */
+#define ccc_buf_back_as(buf_ptr, type_name) ((type_name *)ccc_buf_back(buf_ptr))
+
 /** @brief return the first element in the buffer at index 0.
 @param [in] buf the pointer to the buffer.
 @return the pointer to the front element or NULL if the buffer does not exist
 or is empty. */
 [[nodiscard]] void *ccc_buf_front(ccc_buffer const *buf);
+
+/** @brief return the first element in the buffer at index 0.
+@param [in] buf_ptr the pointer to the buffer.
+@param [in] type_name the name of the stored type.
+@return the pointer to the front element or NULL if the buffer does not exist
+or is empty. */
+#define ccc_buf_front_as(buf_ptr, type_name)                                   \
+    ((type_name *)ccc_buf_front(buf_ptr))
 
 /** @brief Move data at index src to dst according to capacity.
 @param [in] buf the pointer to the buffer.
@@ -615,8 +644,11 @@ typedef ccc_buffer buffer;
 #    define buf_is_full(args...) ccc_buf_is_full(args)
 #    define buf_is_empty(args...) ccc_buf_is_empty(args)
 #    define buf_at(args...) ccc_buf_at(args)
+#    define buf_as(args...) ccc_buf_as(args)
 #    define buf_back(args...) ccc_buf_back(args)
+#    define buf_back_as(args...) ccc_buf_back_as(args)
 #    define buf_front(args...) ccc_buf_front(args)
+#    define buf_front_as(args...) ccc_buf_front_as(args)
 #    define buf_alloc_back(args...) ccc_buf_alloc_back(args)
 #    define buf_emplace(args...) ccc_buf_emplace(args)
 #    define buf_emplace_back(args...) ccc_buf_emplace_back(args)

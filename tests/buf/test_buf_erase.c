@@ -58,7 +58,7 @@ CHECK_BEGIN_STATIC_FN(buf_test_push_resize_pop)
     CHECK(buf_capacity(&b).count >= cap, CCC_TRUE);
     while (!buf_is_empty(&b))
     {
-        int const v = *(int *)buf_back(&b);
+        int const v = *buf_back_as(&b, int);
         CHECK(buf_pop_back(&b), CCC_RESULT_OK);
         --count;
         CHECK(v, many[count]);
@@ -87,12 +87,12 @@ CHECK_BEGIN_STATIC_FN(buf_test_daily_temperatures)
     for (int i = 0, end = (int)buf_size(&temps).count; i < end; ++i)
     {
         while (!buf_is_empty(&idx_stack)
-               && *(int *)buf_at(&temps, i)
-                      > *(int *)buf_at(&temps, *(int *)buf_back(&idx_stack)))
+               && *buf_as(&temps, int, i)
+                      > *buf_as(&temps, int, *buf_back_as(&idx_stack, int)))
         {
             int const *const ptr
-                = buf_emplace(&res, *(int *)buf_back(&idx_stack),
-                              i - *(int *)buf_back(&idx_stack));
+                = buf_emplace(&res, *buf_back_as(&idx_stack, int),
+                              i - *buf_back_as(&idx_stack, int));
             CHECK(ptr != NULL, CCC_TRUE);
             ccc_result const r = buf_pop_back(&idx_stack);
             CHECK(r, CCC_RESULT_OK);
@@ -136,14 +136,14 @@ CHECK_BEGIN_STATIC_FN(buf_test_car_fleet)
     int target = 12;
     int fleets = 1;
     double slowest_time_to_target
-        = ((double)(target - *(int *)buf_at(&positions, 0)))
-        / *(int *)buf_at(&speeds, 0);
+        = ((double)(target - *buf_as(&positions, int, 0)))
+        / *buf_as(&speeds, int, 0);
     for (int const *iter = buf_begin(&car_idx); iter != buf_end(&car_idx);
          iter = buf_next(&car_idx, iter))
     {
         double const time_of_closer_car
-            = ((double)(target - *(int *)buf_at(&positions, *iter)))
-            / *(int *)buf_at(&speeds, *iter);
+            = ((double)(target - *buf_as(&positions, int, *iter)))
+            / *buf_as(&speeds, int, *iter);
         if (time_of_closer_car > slowest_time_to_target)
         {
             ++fleets;
@@ -154,9 +154,47 @@ CHECK_BEGIN_STATIC_FN(buf_test_car_fleet)
     CHECK_END_FN();
 }
 
+CHECK_BEGIN_STATIC_FN(buf_test_largest_rectangle_in_histogram)
+{
+    enum : size_t
+    {
+        HCAP = 6,
+    };
+    buffer const heights = buf_init(((int[HCAP]){2, 1, 5, 6, 2, 3}), int, NULL,
+                                    NULL, HCAP, HCAP);
+    int const correct_max_rectangle = 10;
+    int max_rectangle = 0;
+    buffer bars_idx = buf_init((int[HCAP]){}, int, NULL, NULL, HCAP);
+    for (int i = 0, end = buf_size(&heights).count; i <= end; ++i)
+    {
+        while (!buf_is_empty(&bars_idx)
+               && (i == end
+                   || *buf_as(&heights, int, i) < *buf_as(
+                          &heights, int, *buf_back_as(&bars_idx, int))))
+        {
+            int const h = *buf_as(&heights, int, *buf_back_as(&bars_idx, int));
+            ccc_result const r = buf_pop_back(&bars_idx);
+            CHECK(r, CCC_RESULT_OK);
+            int const w = buf_is_empty(&bars_idx)
+                            ? 1
+                            : i - *buf_back_as(&bars_idx, int) - 1;
+            int const area = h * w;
+            if (area > max_rectangle)
+            {
+                max_rectangle = area;
+            }
+        }
+        int const *const ptr = buf_push_back(&bars_idx, &i);
+        CHECK(ptr != NULL, CCC_TRUE);
+    }
+    CHECK(max_rectangle, correct_max_rectangle);
+    CHECK_END_FN();
+}
+
 int
 main(void)
 {
     return CHECK_RUN(buf_test_push_pop_fixed(), buf_test_push_resize_pop(),
-                     buf_test_daily_temperatures(), buf_test_car_fleet());
+                     buf_test_daily_temperatures(), buf_test_car_fleet(),
+                     buf_test_largest_rectangle_in_histogram());
 }
