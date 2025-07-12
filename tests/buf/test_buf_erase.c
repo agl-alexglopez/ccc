@@ -111,6 +111,7 @@ cmp_car_idx(ccc_any_type_cmp const cmp)
     buffer const *const positions = cmp.aux;
     int const *const lhs_pos = buf_at(positions, *lhs);
     int const *const rhs_pos = buf_at(positions, *rhs);
+    /* Reversed sort. We want descending not ascending order. */
     return (*lhs_pos < *rhs_pos) - (*lhs_pos > *rhs_pos);
 }
 
