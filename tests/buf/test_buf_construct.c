@@ -53,11 +53,11 @@ CHECK_BEGIN_STATIC_FN(buf_test_copy_no_alloc)
 
 CHECK_BEGIN_STATIC_FN(buf_test_copy_no_alloc_fail)
 {
-    buffer q1 = buf_init(((int[3]){0, 1, 2}), int, NULL, NULL, 3, 3);
-    buffer q2 = buf_init(((int[2]){}), int, NULL, NULL, 2);
-    CHECK(buf_size(&q1).count, 3);
-    CHECK(buf_is_empty(&q2), CCC_TRUE);
-    ccc_result res = buf_copy(&q2, &q1, NULL);
+    buffer src = buf_init(((int[3]){0, 1, 2}), int, NULL, NULL, 3, 3);
+    buffer bad_dst = buf_init(((int[2]){}), int, NULL, NULL, 2);
+    CHECK(buf_size(&src).count, 3);
+    CHECK(buf_is_empty(&bad_dst), CCC_TRUE);
+    ccc_result res = buf_copy(&bad_dst, &src, NULL);
     CHECK(res != CCC_RESULT_OK, CCC_TRUE);
     CHECK_END_FN();
 }
@@ -67,8 +67,12 @@ CHECK_BEGIN_STATIC_FN(buf_test_copy_alloc)
     buffer src = buf_init(NULL, int, std_alloc, NULL, 0);
     buffer dst = buf_init(NULL, int, NULL, NULL, 0);
     CHECK(buf_is_empty(&dst), CCC_TRUE);
-    int push[5] = {0, 1, 2, 3, 4};
-    for (size_t i = 0; i < sizeof(push) / sizeof(typeof(*push)); ++i)
+    enum : size_t
+    {
+        PUSHCAP = 5,
+    };
+    int push[PUSHCAP] = {0, 1, 2, 3, 4};
+    for (size_t i = 0; i < PUSHCAP; ++i)
     {
         CHECK(buf_push_back(&src, &push[i]) != NULL, CCC_TRUE);
     }
@@ -87,7 +91,7 @@ CHECK_BEGIN_STATIC_FN(buf_test_copy_alloc)
     CHECK(buf_is_empty(&src), buf_is_empty(&dst));
     CHECK_END_FN({
         (void)buf_clear_and_free(&src, NULL);
-        (void)buf_clear_and_free_reserve(&src, NULL, std_alloc);
+        (void)buf_clear_and_free_reserve(&dst, NULL, std_alloc);
     });
 }
 
