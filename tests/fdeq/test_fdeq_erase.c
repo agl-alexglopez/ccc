@@ -59,7 +59,7 @@ CHECK_BEGIN_STATIC_FN(fdeq_test_push_pop_front_and_back_singles)
         CHECK(*((int *)ccc_fdeq_front(&q)), 7);
         CHECK(ccc_fdeq_pop_front(&q), CCC_RESULT_OK);
     }
-    for (size_t i = 0; ccc_fdeq_size(&q).count != SM_FIXED_Q; ++i)
+    for (size_t i = 0; ccc_fdeq_count(&q).count != SM_FIXED_Q; ++i)
     {
         if (i % 2)
         {
@@ -103,7 +103,7 @@ CHECK_BEGIN_STATIC_FN(fdeq_test_push_pop_front_and_back_singles_dynamic)
         CHECK(*((int *)ccc_fdeq_front(&q)), 7);
         CHECK(ccc_fdeq_pop_front(&q), CCC_RESULT_OK);
     }
-    for (size_t i = 0; ccc_fdeq_size(&q).count != sm_dyn_q; ++i)
+    for (size_t i = 0; ccc_fdeq_count(&q).count != sm_dyn_q; ++i)
     {
         if (i % 2)
         {
@@ -153,7 +153,7 @@ CHECK_BEGIN_STATIC_FN(fdeq_test_push_pop_front_back)
     CHECK(create_queue(&q, 6, (int[6]){0, 1, 2, 3, 4, 5}), PASS);
     while (!is_empty(&q))
     {
-        if (size(&q).count % 2)
+        if (count(&q).count % 2)
         {
             (void)pop_front(&q);
         }

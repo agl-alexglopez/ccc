@@ -701,7 +701,7 @@ ccc_ucount ccc_bs_capacity(ccc_bitset const *bs);
 @return an OK(0) status and the total number of bits currently tracked by the
 set regardless of true or false state of each. If bs is NULL an argument error
 is set. */
-ccc_ucount ccc_bs_size(ccc_bitset const *bs);
+ccc_ucount ccc_bs_count(ccc_bitset const *bs);
 
 /** @brief Return number of ccc_bitblocks used by bit set for capacity bits.
 @param [in] bs a pointer to the bit set.
@@ -717,7 +717,7 @@ ccc_ucount ccc_bs_blocks_capacity(ccc_bitset const *bs);
 the set. An argument error is set if bs is NULL.
 
 Size may be less than or equal to capacity. */
-ccc_ucount ccc_bs_blocks_size(ccc_bitset const *bs);
+ccc_ucount ccc_bs_blocks_count(ccc_bitset const *bs);
 
 /** @brief Return true if no bits are actively tracked by the user and set.
 @param [in] bs a pointer to the bit set.
@@ -871,8 +871,8 @@ typedef ccc_bitset bitset;
 #    define bs_data(args...) ccc_bs_data(args)
 #    define bs_capacity(args...) ccc_bs_capacity(args)
 #    define bs_blocks_capacity(args...) ccc_bs_blocks_capacity(args)
-#    define bs_size(args...) ccc_bs_size(args)
-#    define bs_blocks_size(args...) ccc_bs_blocks_size(args)
+#    define bs_count(args...) ccc_bs_count(args)
+#    define bs_blocks_count(args...) ccc_bs_blocks_count(args)
 #    define bs_empty(args...) ccc_bs_empty(args)
 #    define bs_popcount(args...) ccc_bs_popcount(args)
 #    define bs_popcount_range(args...) ccc_bs_popcount_range(args)

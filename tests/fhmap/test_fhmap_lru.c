@@ -130,7 +130,7 @@ CHECK_BEGIN_STATIC_FN(lru_put, struct lru_cache *const lru, int const key,
         new->kv_in_list = dll_emplace_front(
             &lru->l, (struct key_val){.key = key, .val = val});
         CHECK(new->kv_in_list == NULL, false);
-        if (size(&lru->l).count > lru->cap)
+        if (count(&lru->l).count > lru->cap)
         {
             struct key_val const *const to_drop = back(&lru->l);
             CHECK(to_drop == NULL, false);

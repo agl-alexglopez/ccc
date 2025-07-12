@@ -847,10 +847,10 @@ ccc_hom_clear_and_free_reserve(ccc_handle_ordered_map *hom,
 Obtain the container state. */
 /**@{*/
 
-/** @brief Returns the size of the map representing active slots.
+/** @brief Returns the count of map occupied slots.
 @param [in] hom the map.
 @return the size of the map or an argument error is set if hom is NULL. */
-[[nodiscard]] ccc_ucount ccc_hom_size(ccc_handle_ordered_map const *hom);
+[[nodiscard]] ccc_ucount ccc_hom_count(ccc_handle_ordered_map const *hom);
 
 /** @brief Returns the capacity of the map representing total possible slots.
 @param [in] hom the map.
@@ -929,7 +929,7 @@ typedef ccc_homap_handle homap_handle;
 #    define hom_next(args...) ccc_hom_next(args)
 #    define hom_rnext(args...) ccc_hom_rnext(args)
 #    define hom_data(args...) ccc_hom_data(args)
-#    define hom_size(args...) ccc_hom_size(args)
+#    define hom_count(args...) ccc_hom_count(args)
 #    define hom_is_empty(args...) ccc_hom_is_empty(args)
 #    define hom_validate(args...) ccc_hom_validate(args)
 #endif /* HANDLE_ORDERED_MAP_USING_NAMESPACE_CCC */

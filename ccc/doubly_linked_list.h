@@ -390,10 +390,10 @@ makes it possible to splice to the back of the list. */
 [[nodiscard]] ccc_dll_elem *
 ccc_dll_end_sentinel(ccc_doubly_linked_list const *l);
 
-/** @brief Return the size of the list. O(1).
+/** @brief Return the count of elements in the list. O(1).
 @param [in] l a pointer to the doubly linked list.
 @return the size of the list. An argument error is set if l is NULL. */
-[[nodiscard]] ccc_ucount ccc_dll_size(ccc_doubly_linked_list const *l);
+[[nodiscard]] ccc_ucount ccc_dll_count(ccc_doubly_linked_list const *l);
 
 /** @brief Return if the size of the list is equal to 0. O(1).
 @param [in] l a pointer to the doubly linked list.
@@ -441,7 +441,7 @@ typedef ccc_doubly_linked_list doubly_linked_list;
 #    define dll_begin_elem(args...) ccc_dll_begin_elem(args)
 #    define dll_end_elem(args...) ccc_dll_end_elem(args)
 #    define dll_end_sentinel(args...) ccc_dll_end_sentinel(args)
-#    define dll_size(args...) ccc_dll_size(args)
+#    define dll_count(args...) ccc_dll_count(args)
 #    define dll_is_empty(args...) ccc_dll_is_empty(args)
 #    define dll_clear(args...) ccc_dll_clear(args)
 #    define dll_validate(args...) ccc_dll_validate(args)

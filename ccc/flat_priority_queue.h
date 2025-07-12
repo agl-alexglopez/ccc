@@ -434,10 +434,10 @@ Obtain state from the container. */
 @return true if the size is 0, false if not empty. Error if fpq is NULL. */
 [[nodiscard]] ccc_tribool ccc_fpq_is_empty(ccc_flat_priority_queue const *fpq);
 
-/** @brief Returns the size of the fpq representing active slots.
+/** @brief Returns the count of the fpq active slots.
 @param [in] fpq a pointer to the flat priority queue.
 @return the size of the fpq or an argument error is set if fpq is NULL. */
-[[nodiscard]] ccc_ucount ccc_fpq_size(ccc_flat_priority_queue const *fpq);
+[[nodiscard]] ccc_ucount ccc_fpq_count(ccc_flat_priority_queue const *fpq);
 
 /** @brief Returns the capacity of the fpq representing total possible slots.
 @param [in] fpq a pointer to the flat priority queue.
@@ -493,7 +493,7 @@ typedef ccc_flat_priority_queue flat_priority_queue;
 #    define fpq_clear_and_free_reserve(args...)                                \
         ccc_fpq_clear_and_free_reserve(args)
 #    define fpq_is_empty(args...) ccc_fpq_is_empty(args)
-#    define fpq_size(args...) ccc_fpq_size(args)
+#    define fpq_count(args...) ccc_fpq_count(args)
 #    define fpq_data(args...) ccc_fpq_data(args)
 #    define fpq_validate(args...) ccc_fpq_validate(args)
 #    define fpq_order(args...) ccc_fpq_order(args)

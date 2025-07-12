@@ -609,10 +609,10 @@ Obtain the container state. */
 @return true if empty else false. Error if om is NULL. */
 [[nodiscard]] ccc_tribool ccc_om_is_empty(ccc_ordered_map const *om);
 
-/** @brief Returns the size of the map.
+/** @brief Returns the count of occupied map nodes.
 @param [in] om the map.
 @return the size or an argument error is set if om is NULL. */
-[[nodiscard]] ccc_ucount ccc_om_size(ccc_ordered_map const *om);
+[[nodiscard]] ccc_ucount ccc_om_count(ccc_ordered_map const *om);
 
 /** @brief Validation of invariants for the map.
 @param [in] om the map to validate.
@@ -657,7 +657,7 @@ typedef ccc_omap_entry omap_entry;
 #    define om_rnext(args...) ccc_om_rnext(args)
 #    define om_end(args...) ccc_om_end(args)
 #    define om_rend(args...) ccc_om_rend(args)
-#    define om_size(args...) ccc_om_size(args)
+#    define om_count(args...) ccc_om_count(args)
 #    define om_is_empty(args...) ccc_om_is_empty(args)
 #    define om_clear(args...) ccc_om_clear(args)
 #    define om_validate(args...) ccc_om_validate(args)

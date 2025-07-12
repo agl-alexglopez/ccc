@@ -33,7 +33,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert)
     /* Nothing was there before so nothing is in the handle. */
     ccc_handle *hndl = swap_handle_r(&hom, &(struct val){.id = 137, .val = 99});
     CHECK(occupied(hndl), false);
-    CHECK(size(&hom).count, 1);
+    CHECK(count(&hom).count, 1);
     CHECK_END_FN();
 }
 
@@ -47,7 +47,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert_macros)
                                            (struct val){.id = 2, .val = 0}));
     CHECK(ins != NULL, true);
     CHECK(validate(&hom), true);
-    CHECK(size(&hom).count, 1);
+    CHECK(count(&hom).count, 1);
     ins = hom_at(&hom, hom_insert_handle_w(handle_r(&hom, &(int){2}),
                                            (struct val){.id = 2, .val = 0}));
     CHECK(validate(&hom), true);
@@ -62,25 +62,25 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert_macros)
     CHECK(ins == NULL, false);
     CHECK(validate(&hom), true);
     CHECK(ins->val, 99);
-    CHECK(size(&hom).count, 3);
+    CHECK(count(&hom).count, 3);
     ins = hom_at(&hom, ccc_handle_unwrap(hom_insert_or_assign_w(
                            &hom, 3, (struct val){.val = 98})));
     CHECK(validate(&hom), true);
     CHECK(ins == NULL, false);
     CHECK(ins->val, 98);
-    CHECK(size(&hom).count, 3);
+    CHECK(count(&hom).count, 3);
     ins = hom_at(&hom,
                  unwrap(hom_try_insert_w(&hom, 3, (struct val){.val = 100})));
     CHECK(ins == NULL, false);
     CHECK(validate(&hom), true);
     CHECK(ins->val, 98);
-    CHECK(size(&hom).count, 3);
+    CHECK(count(&hom).count, 3);
     ins = hom_at(&hom, ccc_handle_unwrap(hom_try_insert_w(
                            &hom, 4, (struct val){.val = 100})));
     CHECK(ins == NULL, false);
     CHECK(validate(&hom), true);
     CHECK(ins->val, 100);
-    CHECK(size(&hom).count, 4);
+    CHECK(count(&hom).count, 4);
     CHECK_END_FN(clear_and_free(&hom, NULL););
 }
 
@@ -166,7 +166,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_handle_api_functional)
         CHECK(d->id, i);
         CHECK(d->val, i);
     }
-    CHECK(size(&hom).count, (size / 2) / 2);
+    CHECK(count(&hom).count, (size / 2) / 2);
     /* The default insertion should not occur every other element. */
     for (size_t i = 0; i < size / 2; ++i)
     {
@@ -190,7 +190,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_handle_api_functional)
         }
         CHECK(d->val % 2, true);
     }
-    CHECK(size(&hom).count, (size / 2));
+    CHECK(count(&hom).count, (size / 2));
     /* More simply modifications don't require the and modify function. All
        should be switched back to even now. */
     for (size_t i = 0; i < size / 2; ++i)
@@ -203,7 +203,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_handle_api_functional)
         /* All values in the array should be odd now */
         CHECK((in->val % 2 == 0), true);
     }
-    CHECK(size(&hom).count, (size / 2));
+    CHECK(count(&hom).count, (size / 2));
     CHECK_END_FN();
 }
 
@@ -229,7 +229,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert_via_handle)
         CHECK(d->id, i);
         CHECK(d->val, i);
     }
-    CHECK(size(&hom).count, (size / 2) / 2);
+    CHECK(count(&hom).count, (size / 2) / 2);
     /* The default insertion should not occur every other element. */
     for (size_t i = 0; i < size / 2; ++i)
     {
@@ -249,7 +249,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert_via_handle)
             CHECK(d->val % 2, true);
         }
     }
-    CHECK(size(&hom).count, (size / 2));
+    CHECK(count(&hom).count, (size / 2));
     CHECK_END_FN();
 }
 
@@ -272,7 +272,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert_via_handle_macros)
         CHECK(d->id, i);
         CHECK(d->val, i);
     }
-    CHECK(size(&hom).count, (size / 2) / 2);
+    CHECK(count(&hom).count, (size / 2) / 2);
     /* The default insertion should not occur every other element. */
     for (size_t i = 0; i < size / 2; ++i)
     {
@@ -290,7 +290,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert_via_handle_macros)
             CHECK(d->val % 2, true);
         }
     }
-    CHECK(size(&hom).count, (size / 2));
+    CHECK(count(&hom).count, (size / 2));
     CHECK_END_FN();
 }
 
@@ -315,7 +315,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_handle_api_macros)
         CHECK(d->id, i);
         CHECK(d->val, i);
     }
-    CHECK(size(&hom).count, (size / 2) / 2);
+    CHECK(count(&hom).count, (size / 2) / 2);
     /* The default insertion should not occur every other element. */
     for (int i = 0; i < size / 2; ++i)
     {
@@ -335,7 +335,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_handle_api_macros)
         }
         CHECK(d->val % 2, true);
     }
-    CHECK(size(&hom).count, (size / 2));
+    CHECK(count(&hom).count, (size / 2));
     /* More simply modifications don't require the and modify function. All
        should be switched back to even now. */
     for (int i = 0; i < size / 2; ++i)
@@ -347,7 +347,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_handle_api_macros)
         /* All values in the array should be odd now */
         CHECK(v->val % 2 == 0, true);
     }
-    CHECK(size(&hom).count, (size / 2));
+    CHECK(count(&hom).count, (size / 2));
     CHECK_END_FN();
 }
 
@@ -394,7 +394,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_resize)
         CHECK(v->val, i);
         CHECK(validate(&hom), true);
     }
-    CHECK(size(&hom).count, to_insert);
+    CHECK(count(&hom).count, to_insert);
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
@@ -427,7 +427,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_reserve)
         CHECK(v->val, i);
         CHECK(validate(&hom), true);
     }
-    CHECK(size(&hom).count, to_insert);
+    CHECK(count(&hom).count, to_insert);
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
@@ -456,7 +456,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_resize_macros)
         CHECK(v->id, shuffled_index);
         CHECK(v->val, i);
     }
-    CHECK(size(&hom).count, to_insert);
+    CHECK(count(&hom).count, to_insert);
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
@@ -496,7 +496,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_resize_from_null)
         CHECK(v->id, shuffled_index);
         CHECK(v->val, i);
     }
-    CHECK(size(&hom).count, to_insert);
+    CHECK(count(&hom).count, to_insert);
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
@@ -526,7 +526,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_resize_from_null_macros)
         CHECK(v->id, shuffled_index);
         CHECK(v->val, i);
     }
-    CHECK(size(&hom).count, to_insert);
+    CHECK(count(&hom).count, to_insert);
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
@@ -573,44 +573,44 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert_limit)
         CHECK(v->val, i);
         last_index = shuffled_index;
     }
-    size_t const final_size = size(&hom).count;
+    size_t const final_size = count(&hom).count;
     /* The last successful handle is still in the table and is overwritten. */
     struct val v = {.id = last_index, .val = -1};
     ccc_handle hndl = swap_handle(&hom, &v);
     CHECK(unwrap(&hndl) != 0, true);
     CHECK(insert_error(&hndl), false);
-    CHECK(size(&hom).count, final_size);
+    CHECK(count(&hom).count, final_size);
 
     v = (struct val){.id = last_index, .val = -2};
     struct val *in_table
         = hom_at(&hom, insert_handle(handle_r(&hom, &v.id), &v));
     CHECK(in_table != NULL, true);
     CHECK(in_table->val, -2);
-    CHECK(size(&hom).count, final_size);
+    CHECK(count(&hom).count, final_size);
 
     in_table = hom_at(
         &hom, insert_handle(handle_r(&hom, &last_index),
                             &(struct val){.id = last_index, .val = -3}));
     CHECK(in_table != NULL, true);
     CHECK(in_table->val, -3);
-    CHECK(size(&hom).count, final_size);
+    CHECK(count(&hom).count, final_size);
 
     /* The shuffled index key that failed insertion should fail again. */
     v = (struct val){.id = shuffled_index, .val = -4};
     in_table = hom_at(&hom, insert_handle(handle_r(&hom, &v.id), &v));
     CHECK(in_table == NULL, true);
-    CHECK(size(&hom).count, final_size);
+    CHECK(count(&hom).count, final_size);
 
     in_table = hom_at(
         &hom, insert_handle(handle_r(&hom, &shuffled_index),
                             &(struct val){.id = shuffled_index, .val = -4}));
     CHECK(in_table == NULL, true);
-    CHECK(size(&hom).count, final_size);
+    CHECK(count(&hom).count, final_size);
 
     hndl = swap_handle(&hom, &v);
     CHECK(unwrap(&hndl) == 0, true);
     CHECK(insert_error(&hndl), true);
-    CHECK(size(&hom).count, final_size);
+    CHECK(count(&hom).count, final_size);
     CHECK_END_FN();
 }
 
@@ -679,7 +679,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert_weak_srand)
         CHECK(insert_error(&e), false);
         CHECK(validate(&hom), true);
     }
-    CHECK(size(&hom).count, (size_t)num_nodes);
+    CHECK(count(&hom).count, (size_t)num_nodes);
     CHECK_END_FN();
 }
 

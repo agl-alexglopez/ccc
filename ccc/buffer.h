@@ -526,23 +526,23 @@ elements.
 
 For total possible bytes that can be stored in the buffer see
 ccc_buf_capacity_bytes. */
-[[nodiscard]] ccc_ucount ccc_buf_size_bytes(ccc_buffer const *buf);
+[[nodiscard]] ccc_ucount ccc_buf_count_bytes(ccc_buffer const *buf);
 
 /** @brief Return the bytes in the buffer given the current capacity elements.
 @param [in] buf the pointer to the buffer.
 @return the number of bytes occupied by the current capacity elements.
 
 For total possible bytes that can be stored in the buffer given the current
-element count see ccc_buf_size_bytes. */
+element count see ccc_buf_count_bytes. */
 [[nodiscard]] ccc_ucount ccc_buf_capacity_bytes(ccc_buffer const *buf);
 
-/** @brief obtain the size of the buffer representing active slots.
+/** @brief obtain the count of buffer active slots.
 @param [in] buf the pointer to the buffer.
 @return the quantity of elements stored in the buffer. An argument error is set
 if buf is NULL.
 
 Note that size must be less than or equal to capacity. */
-[[nodiscard]] ccc_ucount ccc_buf_size(ccc_buffer const *buf);
+[[nodiscard]] ccc_ucount ccc_buf_count(ccc_buffer const *buf);
 
 /** @brief return true if the size of the buffer is 0.
 @param [in] buf the pointer to the buffer.
@@ -632,8 +632,8 @@ typedef ccc_buffer buffer;
 #    define buf_clear_and_free(args...) ccc_buf_clear_and_free(args)
 #    define buf_clear_and_free_reserve(args...)                                \
         ccc_buf_clear_and_free_reserve(args)
-#    define buf_size(args...) ccc_buf_size(args)
-#    define buf_size_bytes(args...) ccc_buf_size_bytes(args)
+#    define buf_count(args...) ccc_buf_count(args)
+#    define buf_count_bytes(args...) ccc_buf_count_bytes(args)
 #    define buf_size_plus(args...) ccc_buf_size_plus(args)
 #    define buf_size_minus(args...) ccc_buf_size_minus(args)
 #    define buf_size_set(args...) ccc_buf_size_set(args)

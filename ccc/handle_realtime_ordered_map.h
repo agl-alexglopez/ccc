@@ -880,11 +880,11 @@ Obtain the container state. */
 [[nodiscard]] ccc_tribool
 ccc_hrm_is_empty(ccc_handle_realtime_ordered_map const *hrm);
 
-/** @brief Returns the size of the map representing active slots.
+/** @brief Returns the count of map occupied slots.
 @param [in] hrm the map.
 @return the size of the map or an argument error is set if hrm is NULL. */
 [[nodiscard]] ccc_ucount
-ccc_hrm_size(ccc_handle_realtime_ordered_map const *hrm);
+ccc_hrm_count(ccc_handle_realtime_ordered_map const *hrm);
 
 /** @brief Returns the capacity of the map representing total available slots.
 @param [in] hrm the map.
@@ -939,7 +939,7 @@ typedef ccc_hromap_handle hromap_handle;
 #    define hrm_rend(args...) ccc_hrm_rend(args)
 #    define hrm_data(args...) ccc_hrm_data(args)
 #    define hrm_is_empty(args...) ccc_hrm_is_empty(args)
-#    define hrm_size(args...) ccc_hrm_size(args)
+#    define hrm_count(args...) ccc_hrm_count(args)
 #    define hrm_clear(args...) ccc_hrm_clear(args)
 #    define hrm_clear_and_free(args...) ccc_hrm_clear_and_free(args)
 #    define hrm_clear_and_free_reserve(args...)                                \

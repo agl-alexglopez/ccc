@@ -65,7 +65,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_prime_shuffle)
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
     /* One test can use our printer function as test output */
-    CHECK(rom_size(&s).count < size, true);
+    CHECK(rom_count(&s).count < size, true);
     for (size_t i = 0; i < size; ++i)
     {
         CHECK(occupied(remove_entry_r(entry_r(&s, &vals[i].key))) || repeats[i],

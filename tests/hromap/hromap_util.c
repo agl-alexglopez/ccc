@@ -26,7 +26,7 @@ CHECK_BEGIN_FN(insert_shuffled, ccc_handle_realtime_ordered_map *m,
         CHECK(validate(m), true);
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
-    CHECK(size(m).count, size);
+    CHECK(count(m).count, size);
     CHECK_END_FN();
 }
 
@@ -35,7 +35,7 @@ size_t
 inorder_fill(int vals[], size_t size,
              ccc_handle_realtime_ordered_map const *const m)
 {
-    if (ccc_hrm_size(m).count != size)
+    if (ccc_hrm_count(m).count != size)
     {
         return 0;
     }

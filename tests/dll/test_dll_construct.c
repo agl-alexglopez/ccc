@@ -15,7 +15,7 @@ CHECK_BEGIN_STATIC_FN(dll_test_construct)
     CHECK(is_empty(&dll), true);
     CHECK(dll_push_front(&dll, &val.e) != NULL, true);
     CHECK(is_empty(&dll), false);
-    CHECK(size(&dll).count, 1);
+    CHECK(count(&dll).count, 1);
     CHECK_END_FN();
 }
 

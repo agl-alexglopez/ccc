@@ -21,7 +21,7 @@ CHECK_BEGIN_STATIC_FN(dll_test_push_three_front)
     struct val v2 = {.id = 2, .val = 2};
     CHECK(push_front(&dll, &v2.e) != NULL, true);
     CHECK(validate(&dll), true);
-    CHECK(size(&dll).count, 3);
+    CHECK(count(&dll).count, 3);
     struct val *v = dll_front(&dll);
     CHECK(v == NULL, false);
     CHECK(v->id, 2);
@@ -43,7 +43,7 @@ CHECK_BEGIN_STATIC_FN(dll_test_push_three_back)
     struct val v2 = {.id = 2, .val = 2};
     CHECK(push_back(&dll, &v2.e) != NULL, true);
     CHECK(validate(&dll), true);
-    CHECK(size(&dll).count, 3);
+    CHECK(count(&dll).count, 3);
     struct val *v = dll_front(&dll);
     CHECK(v->id, 0);
     CHECK(v == NULL, false);

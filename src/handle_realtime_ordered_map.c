@@ -589,11 +589,11 @@ ccc_hrm_is_empty(ccc_handle_realtime_ordered_map const *const hrm)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    return !ccc_hrm_size(hrm).count;
+    return !ccc_hrm_count(hrm).count;
 }
 
 ccc_ucount
-ccc_hrm_size(ccc_handle_realtime_ordered_map const *const hrm)
+ccc_hrm_count(ccc_handle_realtime_ordered_map const *const hrm)
 {
     if (!hrm)
     {
@@ -1807,14 +1807,14 @@ struct tree_range
 };
 
 static size_t
-recursive_size(struct ccc_hromap const *const t, size_t const r)
+recursive_count(struct ccc_hromap const *const t, size_t const r)
 {
     if (!r)
     {
         return 0;
     }
-    return 1 + recursive_size(t, branch_i(t, r, R))
-         + recursive_size(t, branch_i(t, r, L));
+    return 1 + recursive_count(t, branch_i(t, r, R))
+         + recursive_count(t, branch_i(t, r, L));
 }
 
 static ccc_tribool
@@ -1891,7 +1891,7 @@ validate(struct ccc_hromap const *const hrm)
     {
         return CCC_FALSE;
     }
-    size_t const size = recursive_size(hrm, hrm->root);
+    size_t const size = recursive_count(hrm, hrm->root);
     if (size && size != hrm->count - 1)
     {
         return CCC_FALSE;

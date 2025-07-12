@@ -36,18 +36,18 @@ CHECK_BEGIN_FN(insert_shuffled, ccc_priority_queue *ppq, struct val vals[],
     {
         vals[shuffled_index].val = (int)shuffled_index;
         (void)push(ppq, &vals[shuffled_index].elem);
-        CHECK(size(ppq).count, i + 1);
+        CHECK(count(ppq).count, i + 1);
         CHECK(validate(ppq), true);
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
-    CHECK(size(ppq).count, size);
+    CHECK(count(ppq).count, size);
     CHECK_END_FN();
 }
 
 /* Iterative inorder traversal to check the heap is sorted. */
 CHECK_BEGIN_FN(inorder_fill, int vals[], size_t size, ccc_priority_queue *ppq)
 {
-    CHECK(size(ppq).count, size);
+    CHECK(count(ppq).count, size);
     size_t i = 0;
     ccc_priority_queue copy
         = ccc_pq_init(struct val, elem, ccc_pq_order(ppq), val_cmp, NULL, NULL);

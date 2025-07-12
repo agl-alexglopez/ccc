@@ -30,7 +30,7 @@ CHECK_BEGIN_FN(insert_shuffled, ccc_realtime_ordered_map *m, struct val vals[],
         CHECK(validate(m), true);
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
-    CHECK(ccc_rom_size(m).count, size);
+    CHECK(ccc_rom_count(m).count, size);
     CHECK_END_FN();
 }
 
@@ -38,7 +38,7 @@ CHECK_BEGIN_FN(insert_shuffled, ccc_realtime_ordered_map *m, struct val vals[],
 size_t
 inorder_fill(int vals[], size_t size, ccc_realtime_ordered_map const *const m)
 {
-    if (ccc_rom_size(m).count != size)
+    if (ccc_rom_count(m).count != size)
     {
         return 0;
     }

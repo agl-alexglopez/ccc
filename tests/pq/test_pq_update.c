@@ -98,7 +98,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_update)
             CHECK(validate(&pq), true);
         }
     }
-    CHECK(ccc_pq_size(&pq).count, num_nodes);
+    CHECK(ccc_pq_count(&pq).count, num_nodes);
     CHECK_END_FN();
 }
 
@@ -131,7 +131,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_update_with)
             CHECK(validate(&pq), true);
         }
     }
-    CHECK(ccc_pq_size(&pq).count, num_nodes);
+    CHECK(ccc_pq_count(&pq).count, num_nodes);
     CHECK_END_FN();
 }
 
@@ -171,7 +171,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_increase)
             CHECK(validate(&pq), true);
         }
     }
-    CHECK(ccc_pq_size(&pq).count, num_nodes);
+    CHECK(ccc_pq_count(&pq).count, num_nodes);
     CHECK_END_FN();
 }
 
@@ -210,7 +210,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_increase_with)
             CHECK(validate(&pq), true);
         }
     }
-    CHECK(ccc_pq_size(&pq).count, num_nodes);
+    CHECK(ccc_pq_count(&pq).count, num_nodes);
     CHECK_END_FN();
 }
 
@@ -250,7 +250,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_decrease)
             CHECK(validate(&pq), true);
         }
     }
-    CHECK(ccc_pq_size(&pq).count, num_nodes);
+    CHECK(ccc_pq_count(&pq).count, num_nodes);
     CHECK_END_FN();
 }
 
@@ -289,7 +289,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_decrease_with)
             CHECK(validate(&pq), true);
         }
     }
-    CHECK(ccc_pq_size(&pq).count, num_nodes);
+    CHECK(ccc_pq_count(&pq).count, num_nodes);
     CHECK_END_FN();
 }
 

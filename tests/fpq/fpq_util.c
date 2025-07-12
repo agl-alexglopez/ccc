@@ -44,11 +44,11 @@ CHECK_BEGIN_FN(insert_shuffled, ccc_flat_priority_queue *pq, struct val vals[],
     {
         vals[i].id = vals[i].val = (int)shuffled_index;
         CHECK(push(pq, &vals[i]) != NULL, CCC_TRUE);
-        CHECK(ccc_fpq_size(pq).count, i + 1);
+        CHECK(ccc_fpq_count(pq).count, i + 1);
         CHECK(validate(pq), true);
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
-    CHECK(ccc_fpq_size(pq).count, size);
+    CHECK(ccc_fpq_count(pq).count, size);
     CHECK_END_FN();
 }
 
@@ -56,37 +56,37 @@ CHECK_BEGIN_FN(insert_shuffled, ccc_flat_priority_queue *pq, struct val vals[],
 CHECK_BEGIN_FN(inorder_fill, int vals[], size_t size,
                ccc_flat_priority_queue *fpq)
 {
-    if (ccc_fpq_size(fpq).count != size)
+    if (ccc_fpq_count(fpq).count != size)
     {
         return FAIL;
     }
     size_t i = 0;
     struct val *copy_buf
-        = malloc(sizeof(struct val) * (ccc_fpq_size(fpq).count + 1));
+        = malloc(sizeof(struct val) * (ccc_fpq_count(fpq).count + 1));
     CHECK(copy_buf == NULL, false);
     ccc_flat_priority_queue fpq_copy
         = ccc_fpq_init(copy_buf, struct val, CCC_LES, val_cmp, NULL, NULL,
-                       ccc_fpq_size(fpq).count + 1);
+                       ccc_fpq_count(fpq).count + 1);
     while (!ccc_fpq_is_empty(fpq) && i < size)
     {
         struct val *const front = front(fpq);
         vals[i++] = front->val;
-        size_t const prev = ccc_fpq_size(&fpq_copy).count;
+        size_t const prev = ccc_fpq_count(&fpq_copy).count;
         struct val *v = ccc_fpq_emplace(
             &fpq_copy, (struct val){.id = front->id, .val = front->val});
         CHECK(v != NULL, true);
-        CHECK(prev < ccc_fpq_size(&fpq_copy).count, true);
+        CHECK(prev < ccc_fpq_count(&fpq_copy).count, true);
         (void)pop(fpq);
     }
     i = 0;
     while (!ccc_fpq_is_empty(&fpq_copy) && i < size)
     {
         struct val *const v = front(&fpq_copy);
-        size_t const prev = ccc_fpq_size(fpq).count;
+        size_t const prev = ccc_fpq_count(fpq).count;
         struct val *e
             = ccc_fpq_emplace(fpq, (struct val){.id = v->id, .val = v->val});
         CHECK(e != NULL, true);
-        CHECK(prev < ccc_fpq_size(fpq).count, true);
+        CHECK(prev < ccc_fpq_count(fpq).count, true);
         CHECK(vals[i++], v->val);
         (void)pop(&fpq_copy);
     };

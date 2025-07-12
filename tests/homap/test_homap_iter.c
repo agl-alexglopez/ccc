@@ -117,7 +117,7 @@ CHECK_BEGIN_STATIC_FN(check_rrange, handle_ordered_map const *const hom,
 
 CHECK_BEGIN_STATIC_FN(iterator_check, handle_ordered_map *s)
 {
-    size_t const size = size(s).count;
+    size_t const size = count(s).count;
     size_t iter_count = 0;
     for (struct val *e = begin(s); e != end(s); e = next(s, e))
     {
@@ -155,7 +155,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_forward_iter)
         shuffled_index = (shuffled_index + prime) % num_nodes;
     }
     int keys_inorder[33];
-    CHECK(inorder_fill(keys_inorder, num_nodes, &s), size(&s).count);
+    CHECK(inorder_fill(keys_inorder, num_nodes, &s), count(&s).count);
     j = 0;
     for (struct val *e = begin(&s); e != end(&s) && j < num_nodes;
          e = next(&s, e), ++j)
@@ -212,7 +212,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_iterate_remove_reinsert)
         CHECK(validate(&s), true);
     }
     CHECK(iterator_check(&s), PASS);
-    size_t const old_size = size(&s).count;
+    size_t const old_size = count(&s).count;
     int const limit = 400;
     int new_unique_handle_id = 1001;
     for (struct val *i = begin(&s), *next = NULL; i != end(&s); i = next)
@@ -229,7 +229,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_iterate_remove_reinsert)
             ++new_unique_handle_id;
         }
     }
-    CHECK(size(&s).count, old_size);
+    CHECK(count(&s).count, old_size);
     CHECK_END_FN();
 }
 

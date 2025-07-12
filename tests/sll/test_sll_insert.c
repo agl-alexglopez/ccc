@@ -30,7 +30,7 @@ CHECK_BEGIN_STATIC_FN(sll_test_insert_three)
     v = front(&sll);
     CHECK(v == NULL, false);
     CHECK(v->val, 2);
-    CHECK(size(&sll).count, 3);
+    CHECK(count(&sll).count, 3);
     CHECK(check_order(&sll, 3, (int[3]){2, 1, 0}), PASS);
     CHECK_END_FN();
 }

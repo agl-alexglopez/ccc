@@ -320,7 +320,7 @@ ccc_sll_validate(ccc_singly_linked_list const *const sll)
 }
 
 ccc_ucount
-ccc_sll_size(ccc_singly_linked_list const *const sll)
+ccc_sll_count(ccc_singly_linked_list const *const sll)
 {
 
     if (!sll)

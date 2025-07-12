@@ -22,23 +22,23 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_erase)
     ccc_entry ent = swap_entry(&fh, &query);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent) != NULL, true);
-    CHECK(size(&fh).count, 1);
+    CHECK(count(&fh).count, 1);
     ent = ccc_remove(&fh, &query);
     CHECK(occupied(&ent), true);
     struct val *v = unwrap(&ent);
     CHECK(v != NULL, true);
     CHECK(v->key, 137);
     CHECK(v->val, 99);
-    CHECK(size(&fh).count, 0);
+    CHECK(count(&fh).count, 0);
     query.key = 101;
     ent = ccc_remove(&fh, &query);
     CHECK(occupied(&ent), false);
-    CHECK(size(&fh).count, 0);
+    CHECK(count(&fh).count, 0);
     ccc_fhm_insert_entry_w(entry_r(&fh, &(int){137}),
                            (struct val){.key = 137, .val = 99});
-    CHECK(size(&fh).count, 1);
+    CHECK(count(&fh).count, 1);
     CHECK(occupied(remove_entry_r(entry_r(&fh, &(int){137}))), true);
-    CHECK(size(&fh).count, 0);
+    CHECK(count(&fh).count, 0);
     CHECK_END_FN();
 }
 
@@ -58,8 +58,8 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_insert_erase)
         CHECK(v->val, i);
         CHECK(validate(&h), true);
     }
-    CHECK(size(&h).count, to_insert);
-    size_t cur_size = size(&h).count;
+    CHECK(count(&h).count, to_insert);
+    size_t cur_size = count(&h).count;
     int i = 0;
     while (!is_empty(&h) && cur_size)
     {
@@ -78,10 +78,10 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_insert_erase)
         }
         --cur_size;
         ++i;
-        CHECK(size(&h).count, cur_size);
+        CHECK(count(&h).count, cur_size);
         CHECK(validate(&h), true);
     }
-    CHECK(size(&h).count, 0);
+    CHECK(count(&h).count, 0);
     CHECK_END_FN(fhm_clear_and_free(&h, NULL););
 }
 
@@ -110,8 +110,8 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_erase_fixed)
         ++i;
     }
     while (1);
-    size_t const full_size = size(&h).count;
-    size_t cur_size = size(&h).count;
+    size_t const full_size = count(&h).count;
+    size_t cur_size = count(&h).count;
     i = 0;
     for (; i < (int)(full_size / 2); ++i)
     {
@@ -152,10 +152,10 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_erase_fixed)
         }
         --cur_size;
         ++i;
-        CHECK(size(&h).count, cur_size);
+        CHECK(count(&h).count, cur_size);
         CHECK(validate(&h), true);
     }
-    CHECK(size(&h).count, 0);
+    CHECK(count(&h).count, 0);
     CHECK_END_FN();
 }
 
@@ -190,8 +190,8 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_erase_reserved)
         ++i;
     }
     while (1);
-    size_t const full_size = size(&h).count;
-    size_t cur_size = size(&h).count;
+    size_t const full_size = count(&h).count;
+    size_t cur_size = count(&h).count;
     i = 0;
     for (; i < (int)(full_size / 2); ++i)
     {
@@ -232,10 +232,10 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_erase_reserved)
         }
         --cur_size;
         ++i;
-        CHECK(size(&h).count, cur_size);
+        CHECK(count(&h).count, cur_size);
         CHECK(validate(&h), true);
     }
-    CHECK(size(&h).count, 0);
+    CHECK(count(&h).count, 0);
     CHECK_END_FN((void)ccc_fhm_clear_and_free_reserve(&h, NULL, std_alloc););
 }
 
@@ -256,8 +256,8 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_erase_dynamic)
         CHECK(v->val, inserted);
         CHECK(validate(&h), true);
     }
-    size_t const full_size = size(&h).count;
-    size_t cur_size = size(&h).count;
+    size_t const full_size = count(&h).count;
+    size_t cur_size = count(&h).count;
     int i = 0;
     for (; i < (int)(full_size / 2); ++i)
     {
@@ -298,10 +298,10 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_erase_dynamic)
         }
         --cur_size;
         ++i;
-        CHECK(size(&h).count, cur_size);
+        CHECK(count(&h).count, cur_size);
         CHECK(validate(&h), true);
     }
-    CHECK(size(&h).count, 0);
+    CHECK(count(&h).count, 0);
     CHECK_END_FN(fhm_clear_and_free(&h, NULL););
 }
 

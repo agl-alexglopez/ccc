@@ -22,16 +22,16 @@ CHECK_BEGIN_STATIC_FN(pq_test_insert_remove_four_dups)
         CHECK(push(&ppq, &three_vals[i].elem) != NULL, true);
         CHECK(validate(&ppq), true);
         size_t const size = i + 1;
-        CHECK(ccc_pq_size(&ppq).count, size);
+        CHECK(ccc_pq_count(&ppq).count, size);
     }
-    CHECK(ccc_pq_size(&ppq).count, (size_t)4);
+    CHECK(ccc_pq_count(&ppq).count, (size_t)4);
     for (int i = 0; i < 4; ++i)
     {
         three_vals[i].val = 0;
         CHECK(pop(&ppq), CCC_RESULT_OK);
         CHECK(validate(&ppq), true);
     }
-    CHECK(ccc_pq_size(&ppq).count, (size_t)0);
+    CHECK(ccc_pq_count(&ppq).count, (size_t)0);
     CHECK_END_FN();
 }
 
@@ -53,7 +53,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_insert_extract_shuffled)
         (void)ccc_pq_extract(&ppq, &vals[i].elem);
         CHECK(validate(&ppq), true);
     }
-    CHECK(ccc_pq_size(&ppq).count, (size_t)0);
+    CHECK(ccc_pq_count(&ppq).count, (size_t)0);
     CHECK_END_FN();
 }
 
@@ -120,7 +120,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_delete_prime_shuffle_duplicates)
         CHECK(push(&ppq, &vals[i].elem) != NULL, true);
         CHECK(validate(&ppq), true);
         size_t const s = i + 1;
-        CHECK(ccc_pq_size(&ppq).count, s);
+        CHECK(ccc_pq_count(&ppq).count, s);
         /* Shuffle like this only on insertions to create more dups. */
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
@@ -132,7 +132,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_delete_prime_shuffle_duplicates)
         (void)ccc_pq_extract(&ppq, &vals[shuffled_index].elem);
         CHECK(validate(&ppq), true);
         --cur_size;
-        CHECK(ccc_pq_size(&ppq).count, cur_size);
+        CHECK(ccc_pq_count(&ppq).count, cur_size);
         /* Shuffle normally here so we only remove each elem once. */
         shuffled_index = (shuffled_index + prime) % size;
     }
@@ -166,7 +166,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_prime_shuffle)
         (void)ccc_pq_extract(&ppq, &vals[i].elem);
         CHECK(validate(&ppq), true);
         --cur_size;
-        CHECK(ccc_pq_size(&ppq).count, cur_size);
+        CHECK(ccc_pq_count(&ppq).count, cur_size);
     }
     CHECK_END_FN();
 }

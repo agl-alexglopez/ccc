@@ -188,7 +188,7 @@ ccc_fdeq_is_empty(ccc_flat_double_ended_queue const *const fdeq)
 }
 
 ccc_ucount
-ccc_fdeq_size(ccc_flat_double_ended_queue const *const fdeq)
+ccc_fdeq_count(ccc_flat_double_ended_queue const *const fdeq)
 {
     if (!fdeq)
     {
@@ -456,12 +456,12 @@ ccc_fdeq_validate(ccc_flat_double_ended_queue const *const fdeq)
     size_t size = 0;
     for (; iter != ccc_fdeq_end(fdeq); iter = ccc_fdeq_next(fdeq, iter), ++size)
     {
-        if (size >= ccc_fdeq_size(fdeq).count)
+        if (size >= ccc_fdeq_count(fdeq).count)
         {
             return CCC_FALSE;
         }
     }
-    if (size != ccc_fdeq_size(fdeq).count)
+    if (size != ccc_fdeq_count(fdeq).count)
     {
         return CCC_FALSE;
     }
@@ -474,12 +474,12 @@ ccc_fdeq_validate(ccc_flat_double_ended_queue const *const fdeq)
     for (; iter != ccc_fdeq_rend(fdeq);
          iter = ccc_fdeq_rnext(fdeq, iter), ++size)
     {
-        if (size >= ccc_fdeq_size(fdeq).count)
+        if (size >= ccc_fdeq_count(fdeq).count)
         {
             return CCC_FALSE;
         }
     }
-    return size == ccc_fdeq_size(fdeq).count;
+    return size == ccc_fdeq_count(fdeq).count;
 }
 
 /*======================   Private Interface   ==============================*/

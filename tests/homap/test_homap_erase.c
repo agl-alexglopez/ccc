@@ -61,7 +61,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_prime_shuffle)
         CHECK(validate(&s), true);
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
-    CHECK(hom_size(&s).count < size, true);
+    CHECK(hom_count(&s).count < size, true);
     for (size_t i = 0; i < size; ++i)
     {
         ccc_handle const *const e = remove_handle_r(handle_r(&s, &i));

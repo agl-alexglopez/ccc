@@ -581,12 +581,12 @@ See container documentation for specific behavior. */
 Obtain the container state. */
 /**@{*/
 
-/** @brief Return the size of the container.
+/** @brief Return the count of elements in the container.
 @param [in] container_ptr a pointer to the container.
 @return the size or an argument error is set if container_ptr is NULL.
 
 See container documentation for specific behavior. */
-#define ccc_size(container_ptr) ccc_impl_size(container_ptr)
+#define ccc_count(container_ptr) ccc_impl_count(container_ptr)
 
 /** @brief Return the capacity of the container.
 @param [in] container_ptr a pointer to the container.
@@ -679,7 +679,7 @@ See container documentation for specific behavior. */
 #    define clear_and_free(args...) ccc_clear_and_free(args)
 #    define clear_and_free_reserve(args...) ccc_clear_and_free_reserve(args)
 
-#    define size(args...) ccc_size(args)
+#    define count(args...) ccc_count(args)
 #    define capacity(args...) ccc_capacity(args)
 #    define is_empty(args...) ccc_is_empty(args)
 #    define validate(args...) ccc_validate(args)

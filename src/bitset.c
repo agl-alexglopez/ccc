@@ -634,7 +634,7 @@ ccc_bs_blocks_capacity(ccc_bitset const *const bs)
 }
 
 ccc_ucount
-ccc_bs_size(ccc_bitset const *const bs)
+ccc_bs_count(ccc_bitset const *const bs)
 {
     if (!bs)
     {
@@ -644,7 +644,7 @@ ccc_bs_size(ccc_bitset const *const bs)
 }
 
 ccc_ucount
-ccc_bs_blocks_size(ccc_bitset const *const bs)
+ccc_bs_blocks_count(ccc_bitset const *const bs)
 {
     if (!bs)
     {

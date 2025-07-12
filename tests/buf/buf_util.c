@@ -66,9 +66,9 @@ sort(ccc_buffer *const b, ccc_any_type_cmp_fn *const fn, void *const swap)
     {
         return CCC_RESULT_ARG_ERROR;
     }
-    if (buf_size(b).count)
+    if (buf_count(b).count)
     {
-        sort_rec(b, fn, swap, 0, buf_size(b).count - 1);
+        sort_rec(b, fn, swap, 0, buf_count(b).count - 1);
     }
     return CCC_RESULT_OK;
 }
@@ -78,7 +78,7 @@ bufcmp(ccc_buffer const *const lhs, size_t const rhs_count,
        void const *const rhs)
 {
     size_t const type_size = buf_sizeof_type(lhs).count;
-    size_t const buf_size = buf_size(lhs).count;
+    size_t const buf_size = buf_count(lhs).count;
     if (buf_size < rhs_count)
     {
         return CCC_LES;

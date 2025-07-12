@@ -323,10 +323,10 @@ makes it possible to splice to the front of the list. */
 [[nodiscard]] ccc_sll_elem *
 ccc_sll_begin_sentinel(ccc_singly_linked_list const *sll);
 
-/** @brief Return the size of the list. O(1).
+/** @brief Return the count of nodes in the list. O(1).
 @param [in] sll a pointer to the singly linked list.
 @return the size or an argument error is set if sll is NULL. */
-[[nodiscard]] ccc_ucount ccc_sll_size(ccc_singly_linked_list const *sll);
+[[nodiscard]] ccc_ucount ccc_sll_count(ccc_singly_linked_list const *sll);
 
 /** @brief Return true if the list is empty. O(1).
 @param [in] sll a pointer to the singly linked list.
@@ -364,7 +364,7 @@ typedef ccc_singly_linked_list singly_linked_list;
 #    define sll_next(args...) ccc_sll_next(args)
 #    define sll_begin_elem(args...) ccc_sll_begin_elem(args)
 #    define sll_begin_sentinel(args...) ccc_sll_begin_sentinel(args)
-#    define sll_size(args...) ccc_sll_size(args)
+#    define sll_count(args...) ccc_sll_count(args)
 #    define sll_is_empty(args...) ccc_sll_is_empty(args)
 #    define sll_validate(args...) ccc_sll_validate(args)
 #    define sll_clear(args...) ccc_sll_clear(args)

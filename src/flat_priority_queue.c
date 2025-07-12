@@ -225,13 +225,13 @@ ccc_fpq_is_empty(ccc_flat_priority_queue const *const fpq)
 }
 
 ccc_ucount
-ccc_fpq_size(ccc_flat_priority_queue const *const fpq)
+ccc_fpq_count(ccc_flat_priority_queue const *const fpq)
 {
     if (!fpq)
     {
         return (ccc_ucount){.error = CCC_RESULT_ARG_ERROR};
     }
-    return ccc_buf_size(&fpq->buf);
+    return ccc_buf_count(&fpq->buf);
 }
 
 ccc_ucount

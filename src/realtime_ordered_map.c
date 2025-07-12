@@ -550,7 +550,7 @@ ccc_rom_equal_rrange(ccc_realtime_ordered_map const *const rom,
 }
 
 ccc_ucount
-ccc_rom_size(ccc_realtime_ordered_map const *const rom)
+ccc_rom_count(ccc_realtime_ordered_map const *const rom)
 {
     if (!rom)
     {
@@ -1294,15 +1294,15 @@ struct tree_range
 };
 
 static size_t
-recursive_size(struct ccc_romap const *const rom,
-               struct ccc_romap_elem const *const r)
+recursive_count(struct ccc_romap const *const rom,
+                struct ccc_romap_elem const *const r)
 {
     if (r == &rom->end)
     {
         return 0;
     }
-    return 1 + recursive_size(rom, r->branch[R])
-         + recursive_size(rom, r->branch[L]);
+    return 1 + recursive_count(rom, r->branch[R])
+         + recursive_count(rom, r->branch[L]);
 }
 
 static ccc_tribool
@@ -1377,7 +1377,7 @@ validate(struct ccc_romap const *const rom)
     {
         return CCC_FALSE;
     }
-    if (recursive_size(rom, rom->root) != rom->count)
+    if (recursive_count(rom, rom->root) != rom->count)
     {
         return CCC_FALSE;
     }

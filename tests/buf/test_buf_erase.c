@@ -23,8 +23,8 @@ CHECK_BEGIN_STATIC_FN(buf_test_push_pop_fixed)
         CHECK(*p, push[i]);
         ++count;
     }
-    CHECK(buf_size(&b).count, sizeof(push) / sizeof(*push));
-    CHECK(buf_size(&b).count, count);
+    CHECK(buf_count(&b).count, sizeof(push) / sizeof(*push));
+    CHECK(buf_count(&b).count, count);
     CHECK(buf_push_back(&b, &(int){99}) == NULL, CCC_TRUE);
     while (!buf_is_empty(&b))
     {
@@ -33,7 +33,7 @@ CHECK_BEGIN_STATIC_FN(buf_test_push_pop_fixed)
         --count;
         CHECK(v, push[count]);
     }
-    CHECK(buf_size(&b).count, count);
+    CHECK(buf_count(&b).count, count);
     CHECK(count, 0);
     CHECK_END_FN();
 }
@@ -54,7 +54,7 @@ CHECK_BEGIN_STATIC_FN(buf_test_push_resize_pop)
         ++count;
     }
     CHECK(count, cap);
-    CHECK(buf_size(&b).count, cap);
+    CHECK(buf_count(&b).count, cap);
     CHECK(buf_capacity(&b).count >= cap, CCC_TRUE);
     while (!buf_is_empty(&b))
     {
@@ -63,7 +63,7 @@ CHECK_BEGIN_STATIC_FN(buf_test_push_resize_pop)
         --count;
         CHECK(v, many[count]);
     }
-    CHECK(buf_size(&b).count, count);
+    CHECK(buf_count(&b).count, count);
     CHECK(count, 0);
     CHECK_END_FN({
         (void)buf_clear_and_free(&b, NULL);
@@ -84,7 +84,7 @@ CHECK_BEGIN_STATIC_FN(buf_test_daily_temperatures)
                                     int, NULL, NULL, TMPCAP, TMPCAP);
     buffer res = buf_init((int[TMPCAP]){}, int, NULL, NULL, TMPCAP, TMPCAP);
     buffer idx_stack = buf_init((int[TMPCAP]){}, int, NULL, NULL, TMPCAP);
-    for (int i = 0, end = (int)buf_size(&temps).count; i < end; ++i)
+    for (int i = 0, end = (int)buf_count(&temps).count; i < end; ++i)
     {
         while (!buf_is_empty(&idx_stack)
                && *buf_as(&temps, int, i)
@@ -101,7 +101,7 @@ CHECK_BEGIN_STATIC_FN(buf_test_daily_temperatures)
         CHECK(ptr != NULL, CCC_TRUE);
     }
     CHECK(memcmp(buf_begin(&res), buf_begin(&correct),
-                 buf_size_bytes(&correct).count),
+                 buf_count_bytes(&correct).count),
           0);
     CHECK_END_FN();
 }
@@ -165,7 +165,7 @@ CHECK_BEGIN_STATIC_FN(buf_test_largest_rectangle_in_histogram)
     int const correct_max_rectangle = 10;
     int max_rectangle = 0;
     buffer bars_idx = buf_init((int[HCAP]){}, int, NULL, NULL, HCAP);
-    for (int i = 0, end = buf_size(&heights).count; i <= end; ++i)
+    for (int i = 0, end = buf_count(&heights).count; i <= end; ++i)
     {
         while (!buf_is_empty(&bars_idx)
                && (i == end
@@ -195,23 +195,23 @@ CHECK_BEGIN_STATIC_FN(buf_test_erase)
     };
     buffer b = buf_init(((int[BECAP]){0, 1, 2, 3, 4, 5, 6, 7}), int, NULL, NULL,
                         BECAP, BECAP);
-    CHECK(buf_size(&b).count, BECAP);
+    CHECK(buf_count(&b).count, BECAP);
     ccc_result r = buf_erase(&b, 4);
     CHECK(r, CCC_RESULT_OK);
     ccc_threeway_cmp cmp
         = bufcmp(&b, BECAP - 1, (int[BECAP - 1]){0, 1, 2, 3, 5, 6, 7});
     CHECK(cmp, CCC_EQL);
-    CHECK(buf_size(&b).count, BECAP - 1);
+    CHECK(buf_count(&b).count, BECAP - 1);
     r = buf_erase(&b, 0);
     CHECK(r, CCC_RESULT_OK);
     cmp = bufcmp(&b, BECAP - 2, (int[BECAP - 2]){1, 2, 3, 5, 6, 7});
     CHECK(cmp, CCC_EQL);
-    CHECK(buf_size(&b).count, BECAP - 2);
+    CHECK(buf_count(&b).count, BECAP - 2);
     r = buf_erase(&b, BECAP - 3);
     CHECK(r, CCC_RESULT_OK);
     cmp = bufcmp(&b, BECAP - 3, (int[BECAP - 3]){1, 2, 3, 5, 6});
     CHECK(cmp, CCC_EQL);
-    CHECK(buf_size(&b).count, BECAP - 3);
+    CHECK(buf_count(&b).count, BECAP - 3);
     CHECK_END_FN();
 }
 

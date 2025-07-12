@@ -35,7 +35,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_prime_shuffle)
         CHECK(validate(&s), true);
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
-    CHECK(ccc_om_size(&s).count < size, true);
+    CHECK(ccc_om_count(&s).count < size, true);
     for (size_t i = 0; i < size; ++i)
     {
         CHECK(occupied(remove_entry_r(entry_r(&s, &vals[i].key))) || repeats[i],

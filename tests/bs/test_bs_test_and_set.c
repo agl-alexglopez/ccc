@@ -882,7 +882,7 @@ CHECK_BEGIN_STATIC_FN(bs_test_and_diff_size)
     CHECK(bs_popcount(&src).count, 244);
     CHECK(bs_and(&dst, &src), CCC_RESULT_OK);
     CHECK(bs_popcount(&dst).count, 244);
-    CHECK(bs_size(&dst).count, 512);
+    CHECK(bs_count(&dst).count, 512);
     CHECK_END_FN();
 }
 
@@ -917,7 +917,7 @@ CHECK_BEGIN_STATIC_FN(bs_test_xor_diff_size)
     CHECK(bs_popcount(&src).count, 244);
     CHECK(bs_xor(&dst, &src), CCC_RESULT_OK);
     CHECK(bs_popcount(&dst).count, 512 - 244);
-    CHECK(bs_size(&dst).count, 512);
+    CHECK(bs_count(&dst).count, 512);
     CHECK_END_FN();
 }
 

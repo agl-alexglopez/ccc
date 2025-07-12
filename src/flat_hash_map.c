@@ -360,7 +360,7 @@ ccc_fhm_is_empty(ccc_flat_hash_map const *const h)
 }
 
 ccc_ucount
-ccc_fhm_size(ccc_flat_hash_map const *const h)
+ccc_fhm_count(ccc_flat_hash_map const *const h)
 {
     if (!h)
     {
