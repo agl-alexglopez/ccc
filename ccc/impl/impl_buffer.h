@@ -74,7 +74,7 @@ are contiguous. */
         typeof(impl_type_initializer) *impl_buf_res = NULL;                    \
         __auto_type impl_i = (index);                                          \
         __auto_type impl_emplace_buff_ptr = (impl_buf_ptr);                    \
-        impl_buf_res = ccc_buf_at(impl_emplace_buff_ptr, index);               \
+        impl_buf_res = ccc_buf_at(impl_emplace_buff_ptr, impl_i);              \
         if (impl_buf_res)                                                      \
         {                                                                      \
             *impl_buf_res = impl_type_initializer;                             \

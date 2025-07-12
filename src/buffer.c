@@ -508,6 +508,26 @@ ccc_buf_size_set(ccc_buffer *const buf, size_t const n)
     return CCC_RESULT_OK;
 }
 
+ccc_ucount
+ccc_buf_size_bytes(ccc_buffer const *buf)
+{
+    if (!buf)
+    {
+        return (ccc_ucount){.error = CCC_RESULT_ARG_ERROR};
+    }
+    return (ccc_ucount){.count = buf->count * buf->sizeof_type};
+}
+
+ccc_ucount
+ccc_buf_capacity_bytes(ccc_buffer const *buf)
+{
+    if (!buf)
+    {
+        return (ccc_ucount){.error = CCC_RESULT_ARG_ERROR};
+    }
+    return (ccc_ucount){.count = buf->capacity * buf->sizeof_type};
+}
+
 ccc_result
 ccc_buf_copy(ccc_buffer *const dst, ccc_buffer const *const src,
              ccc_any_alloc_fn *const fn)
