@@ -178,11 +178,7 @@ CHECK_BEGIN_STATIC_FN(buf_test_largest_rectangle_in_histogram)
             int const w = buf_is_empty(&bars_idx)
                             ? 1
                             : i - *buf_back_as(&bars_idx, int) - 1;
-            int const area = h * w;
-            if (area > max_rectangle)
-            {
-                max_rectangle = area;
-            }
+            max_rectangle = maxint(max_rectangle, h * w);
         }
         int const *const ptr = buf_push_back(&bars_idx, &i);
         CHECK(ptr != NULL, CCC_TRUE);
