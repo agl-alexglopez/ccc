@@ -103,9 +103,56 @@ CHECK_BEGIN_STATIC_FN(buf_test_daily_temperatures)
     CHECK_END_FN();
 }
 
+static ccc_threeway_cmp
+cmp_car_idx(ccc_any_type_cmp const cmp)
+{
+    int const *const lhs = cmp.any_type_lhs;
+    int const *const rhs = cmp.any_type_rhs;
+    buffer const *const positions = cmp.aux;
+    int const *const lhs_pos = buf_at(positions, *lhs);
+    int const *const rhs_pos = buf_at(positions, *rhs);
+    return (*lhs_pos < *rhs_pos) - (*lhs_pos > *rhs_pos);
+}
+
+CHECK_BEGIN_STATIC_FN(buf_test_car_fleet)
+{
+    enum : size_t
+    {
+        CARCAP = 5,
+    };
+    buffer positions = buf_init(((int[CARCAP]){10, 8, 0, 5, 3}), int, NULL,
+                                NULL, CARCAP, CARCAP);
+    buffer const speeds = buf_init(((int[CARCAP]){2, 4, 1, 1, 3}), int, NULL,
+                                   NULL, CARCAP, CARCAP);
+    buffer car_idx
+        = buf_init((int[CARCAP]){}, int, NULL, &positions, CARCAP, CARCAP);
+    iota(buf_begin(&car_idx), CARCAP, 0);
+    sort(&car_idx, cmp_car_idx, &(int){});
+    int target = 12;
+    int const correct = 3;
+    int fleets = 1;
+    double slowest_time_to_target
+        = ((double)(target - *(int *)buf_at(&positions, 0)))
+        / *(int *)buf_at(&speeds, 0);
+    for (int const *iter = buf_begin(&car_idx); iter != buf_end(&car_idx);
+         iter = buf_next(&car_idx, iter))
+    {
+        double const time_of_closer_car
+            = ((double)(target - *(int *)buf_at(&positions, *iter)))
+            / *(int *)buf_at(&speeds, *iter);
+        if (time_of_closer_car > slowest_time_to_target)
+        {
+            ++fleets;
+            slowest_time_to_target = time_of_closer_car;
+        }
+    }
+    CHECK(fleets, correct);
+    CHECK_END_FN();
+}
+
 int
 main(void)
 {
     return CHECK_RUN(buf_test_push_pop_fixed(), buf_test_push_resize_pop(),
-                     buf_test_daily_temperatures());
+                     buf_test_daily_temperatures(), buf_test_car_fleet());
 }

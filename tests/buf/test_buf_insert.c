@@ -21,6 +21,14 @@ cmp_ints(void const *const lhs, void const *const rhs)
     return (lhs_int > rhs_int) - (lhs_int < rhs_int);
 }
 
+static ccc_threeway_cmp
+ccc_cmp_ints(ccc_any_type_cmp const cmp)
+{
+    int const lhs_int = *(int *)cmp.any_type_lhs;
+    int const rhs_int = *(int *)cmp.any_type_rhs;
+    return (lhs_int > rhs_int) - (lhs_int < rhs_int);
+}
+
 CHECK_BEGIN_STATIC_FN(buf_test_push_fixed)
 {
     buffer b = buf_init((int[8]){}, int, NULL, NULL, 8);
@@ -133,7 +141,7 @@ CHECK_BEGIN_STATIC_FN(buf_test_push_sort)
     iota(buf_begin(&b), BUF_SORT_CAP, 0);
     rand_shuffle(buf_sizeof_type(&b).count, buf_begin(&b), buf_size(&b).count,
                  &(int){});
-    sort(&b);
+    (void)sort(&b, ccc_cmp_ints, &(int){});
     int prev = INT_MIN;
     size_t count = 0;
     for (int const *i = buf_begin(&b); i != buf_end(&b); i = buf_next(&b, i))
