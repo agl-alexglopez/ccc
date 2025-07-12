@@ -698,24 +698,24 @@ This graph shows which files directly or indirectly include this file:</div>
 <p>Note that there are two ways to copy data from source to destination: provide sufficient memory and pass NULL as fn, or allow the copy function to take care of allocation for the copy.</p>
 <p>Manual memory management with no allocation function provided.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC</span></div>
-<div class="line">flat_double_ended_queue src = fdeq_init((<span class="keywordtype">int</span>[10]){}, NULL, NULL, 10);</div>
-<div class="line"><span class="keywordtype">int</span> *new_mem = malloc(<span class="keyword">sizeof</span>(<span class="keywordtype">int</span>) * fdeq_capacity(&amp;src));</div>
+<div class="line">flat_double_ended_queue src = fdeq_init((<span class="keywordtype">int</span>[10]){}, int, NULL, NULL, 10);</div>
+<div class="line"><span class="keywordtype">int</span> *new_mem = malloc(<span class="keyword">sizeof</span>(<span class="keywordtype">int</span>) * fdeq_capacity(&amp;src).count);</div>
 <div class="line">flat_double_ended_queue dst</div>
-<div class="line">    = fdeq_init(new_mem, NULL, NULL, fdeq_capacity(&amp;src));</div>
+<div class="line">    = fdeq_init(new_mem, <span class="keywordtype">int</span>, NULL, NULL, fdeq_capacity(&amp;src).count);</div>
 <div class="line"><a class="code hl_enumeration" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> res = fdeq_copy(&amp;dst, &amp;src, NULL);</div>
 <div class="ttc" id="atypes_8h_html_a51d6f078a83d667aff5016609d9146ef"><div class="ttname"><a href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a></div><div class="ttdeci">ccc_result</div><div class="ttdoc">A result of actions on containers.</div><div class="ttdef"><b>Definition:</b> types.h:132</div></div>
 </div><!-- fragment --><p>The above requires dst capacity be greater than or equal to src capacity. Here is memory management handed over to the copy function.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC</span></div>
-<div class="line">flat_double_ended_queue src = fdeq_init((<span class="keywordtype">int</span> *)NULL, std_alloc, NULL, 0);</div>
+<div class="line">flat_double_ended_queue src = fdeq_init(NULL, <span class="keywordtype">int</span>, std_alloc, NULL, 0);</div>
 <div class="line">(void)<a class="code hl_function" href="flat__double__ended__queue_8h.html#a2d8c8988041f24a63d46defee8db29bd">ccc_fdeq_push_back_range</a>(&amp;src, 5, (<span class="keywordtype">int</span>[5]){0,1,2,3,4});</div>
-<div class="line">flat_double_ended_queue dst = fdeq_init((<span class="keywordtype">int</span> *)NULL, std_alloc, NULL, 0);</div>
+<div class="line">flat_double_ended_queue dst = fdeq_init(NULL, <span class="keywordtype">int</span>, std_alloc, NULL, 0);</div>
 <div class="line"><a class="code hl_enumeration" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> res = fdeq_copy(&amp;dst, &amp;src, std_alloc);</div>
 <div class="ttc" id="aflat__double__ended__queue_8h_html_a2d8c8988041f24a63d46defee8db29bd"><div class="ttname"><a href="flat__double__ended__queue_8h.html#a2d8c8988041f24a63d46defee8db29bd">ccc_fdeq_push_back_range</a></div><div class="ttdeci">ccc_result ccc_fdeq_push_back_range(ccc_flat_double_ended_queue *fdeq, size_t n, void const *elems)</div><div class="ttdoc">Push the range of user types to the back of the fdeq. O(N).</div></div>
 </div><!-- fragment --><p>The above allows dst to have a capacity less than that of the src as long as copy has been provided an allocation function to resize dst. Note that this would still work if copying to a destination that the user wants as a fixed size fdeq (ring buffer).</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC</span></div>
-<div class="line">flat_double_ended_queue src = fdeq_init((<span class="keywordtype">int</span> *)NULL, std_alloc, NULL, 0);</div>
+<div class="line">flat_double_ended_queue src = fdeq_init(NULL, <span class="keywordtype">int</span>, std_alloc, NULL, 0);</div>
 <div class="line">(void)<a class="code hl_function" href="flat__double__ended__queue_8h.html#a2d8c8988041f24a63d46defee8db29bd">ccc_fdeq_push_back_range</a>(&amp;src, 5, (<span class="keywordtype">int</span>[5]){0,1,2,3,4});</div>
-<div class="line">flat_double_ended_queue dst = fdeq_init((<span class="keywordtype">int</span> *)NULL, NULL, NULL, 0);</div>
+<div class="line">flat_double_ended_queue dst = fdeq_init(NULL, <span class="keywordtype">int</span>, NULL, NULL, 0);</div>
 <div class="line"><a class="code hl_enumeration" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> res = fdeq_copy(&amp;dst, &amp;src, std_alloc);</div>
 </div><!-- fragment --><p>The above sets up dst as a ring buffer while src is a dynamic fdeq. Because an allocation function is provided, the dst is resized once for the copy and retains its fixed size after the copy is complete. This would require the user to manually free the underlying buffer at dst eventually if this method is used. Usually it is better to allocate the memory explicitly before the copy if copying between ring buffers.</p>
 <p>These options allow users to stay consistent across containers with their memory management strategies. </p>
