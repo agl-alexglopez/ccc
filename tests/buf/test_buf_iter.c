@@ -4,6 +4,7 @@
 
 #define BUFFER_USING_NAMESPACE_CCC
 
+#include "buf_util.h"
 #include "ccc/buffer.h"
 #include "ccc/types.h"
 #include "checkers.h"
@@ -65,9 +66,48 @@ CHECK_BEGIN_STATIC_FN(buf_test_reverse_buf)
     CHECK_END_FN();
 }
 
+/** The concept of two pointers can be implemented quite cleanly with the buffer
+iterator abstraction, especially because we don't force a foreach macro use
+onto the user. They are able to set up a for loop freely. */
+CHECK_BEGIN_STATIC_FN(buf_test_trap_rainwater_two_pointers)
+{
+    enum : size_t
+    {
+        HCAP = 12,
+    };
+    buffer const heights
+        = buf_init(((int[HCAP]){0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1}), int, NULL,
+                   NULL, HCAP, HCAP);
+    int const correct_trapped = 6;
+    CHECK(buf_is_empty(&heights), CCC_FALSE);
+    int lpeak = *buf_front_as(&heights, int);
+    int rpeak = *buf_back_as(&heights, int);
+    int trapped = 0;
+    for (int const *l = buf_next(&heights, buf_begin(&heights)),
+                   *r = buf_rnext(&heights, buf_rbegin(&heights));
+         l <= r;)
+    {
+        if (lpeak < rpeak)
+        {
+            lpeak = maxint(lpeak, *l);
+            trapped += (lpeak - *l);
+            l = buf_next(&heights, l);
+        }
+        else
+        {
+            rpeak = maxint(rpeak, *r);
+            trapped += (rpeak - *r);
+            r = buf_rnext(&heights, r);
+        }
+    }
+    CHECK(trapped, correct_trapped);
+    CHECK_END_FN();
+}
+
 int
 main(void)
 {
     return CHECK_RUN(buf_test_iter_forward(), buf_test_iter_reverse(),
-                     buf_test_reverse_buf());
+                     buf_test_reverse_buf(),
+                     buf_test_trap_rainwater_two_pointers());
 }
