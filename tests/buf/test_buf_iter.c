@@ -79,15 +79,15 @@ CHECK_BEGIN_STATIC_FN(buf_test_trap_rainwater_two_pointers)
         = buf_init(((int[HCAP]){0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1}), int, NULL,
                    NULL, HCAP, HCAP);
     int const correct_trapped = 6;
+    int trapped = 0;
     CHECK(buf_is_empty(&heights), CCC_FALSE);
     int lpeak = *buf_front_as(&heights, int);
     int rpeak = *buf_back_as(&heights, int);
-    int trapped = 0;
     /* Easy way to have a "skip first" iterator because the iterator is
        returned from each iterator function. */
-    for (int const *l = buf_next(&heights, buf_begin(&heights)),
-                   *r = buf_rnext(&heights, buf_rbegin(&heights));
-         l <= r;)
+    int const *l = buf_next(&heights, buf_begin(&heights));
+    int const *r = buf_rnext(&heights, buf_rbegin(&heights));
+    while (l <= r)
     {
         if (lpeak < rpeak)
         {
