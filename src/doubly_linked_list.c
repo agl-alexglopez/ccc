@@ -389,7 +389,7 @@ ccc_dll_rnext(ccc_doubly_linked_list const *const l, ccc_dll_elem const *e)
 }
 
 ccc_ucount
-ccc_dll_size(ccc_doubly_linked_list const *const l)
+ccc_dll_count(ccc_doubly_linked_list const *const l)
 {
     if (!l)
     {

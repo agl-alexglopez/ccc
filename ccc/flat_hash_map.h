@@ -856,10 +856,10 @@ Obtain the container state. */
 @return true if empty else false. Error if h is NULL. */
 [[nodiscard]] ccc_tribool ccc_fhm_is_empty(ccc_flat_hash_map const *h);
 
-/** @brief Returns the size of the table representing active slots.
+/** @brief Returns the count of table occupied slots.
 @param [in] h the hash table.
 @return the size of the map or an argument error is set if h is NULL. */
-[[nodiscard]] ccc_ucount ccc_fhm_size(ccc_flat_hash_map const *h);
+[[nodiscard]] ccc_ucount ccc_fhm_count(ccc_flat_hash_map const *h);
 
 /** @brief Return the full capacity of the backing storage.
 @param [in] h the hash table.
@@ -924,7 +924,7 @@ typedef ccc_fhmap_entry fhmap_entry;
 #    define fhm_end(args...) ccc_fhm_end(args)
 #    define fhm_data(args...) ccc_fhm_data(args)
 #    define fhm_is_empty(args...) ccc_fhm_is_empty(args)
-#    define fhm_size(args...) ccc_fhm_size(args)
+#    define fhm_count(args...) ccc_fhm_count(args)
 #    define fhm_clear(args...) ccc_fhm_clear(args)
 #    define fhm_clear_and_free(args...) ccc_fhm_clear_and_free(args)
 #    define fhm_clear_and_free_reserve(args...)                                \

@@ -30,7 +30,7 @@ static ccc_flat_hash_map static_fh
 CHECK_BEGIN_STATIC_FN(fhmap_test_static_init)
 {
     CHECK(fhm_capacity(&static_fh).count, SMALL_FIXED_CAP);
-    CHECK(fhm_size(&static_fh).count, 0);
+    CHECK(fhm_count(&static_fh).count, 0);
     CHECK(validate(&static_fh), true);
     CHECK(is_empty(&static_fh), true);
     struct val def = {.key = 137, .val = 0};
@@ -78,11 +78,11 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_copy_no_alloc)
     (void)swap_entry(&src, &(struct val){.key = 0});
     (void)swap_entry(&src, &(struct val){.key = 1, .val = 1});
     (void)swap_entry(&src, &(struct val){.key = 2, .val = 2});
-    CHECK(size(&src).count, 3);
+    CHECK(count(&src).count, 3);
     CHECK(is_empty(&dst), true);
     ccc_result res = fhm_copy(&dst, &src, NULL);
     CHECK(res, CCC_RESULT_OK);
-    CHECK(size(&dst).count, size(&src).count);
+    CHECK(count(&dst).count, count(&src).count);
     for (int i = 0; i < 3; ++i)
     {
         ccc_entry src_e = ccc_remove(&src, &(struct val){.key = i});
@@ -105,7 +105,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_copy_no_alloc_fail)
     (void)swap_entry(&src, &(struct val){.key = 0});
     (void)swap_entry(&src, &(struct val){.key = 1, .val = 1});
     (void)swap_entry(&src, &(struct val){.key = 2, .val = 2});
-    CHECK(size(&src).count, 3);
+    CHECK(count(&src).count, 3);
     CHECK(is_empty(&dst), true);
     ccc_result res = fhm_copy(&dst, &src, NULL);
     CHECK(res != CCC_RESULT_OK, true);
@@ -121,11 +121,11 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_copy_alloc)
     (void)swap_entry(&src, &(struct val){.key = 0});
     (void)swap_entry(&src, &(struct val){.key = 1, .val = 1});
     (void)swap_entry(&src, &(struct val){.key = 2, .val = 2});
-    CHECK(size(&src).count, 3);
+    CHECK(count(&src).count, 3);
     CHECK(is_empty(&dst), true);
     ccc_result res = fhm_copy(&dst, &src, std_alloc);
     CHECK(res, CCC_RESULT_OK);
-    CHECK(size(&dst).count, size(&src).count);
+    CHECK(count(&dst).count, count(&src).count);
     for (int i = 0; i < 3; ++i)
     {
         ccc_entry src_e = ccc_remove(&src, &(struct val){.key = i});
@@ -149,7 +149,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_copy_alloc_fail)
     (void)swap_entry(&src, &(struct val){.key = 0});
     (void)swap_entry(&src, &(struct val){.key = 1, .val = 1});
     (void)swap_entry(&src, &(struct val){.key = 2, .val = 2});
-    CHECK(size(&src).count, 3);
+    CHECK(count(&src).count, 3);
     CHECK(is_empty(&dst), true);
     ccc_result res = fhm_copy(&dst, &src, NULL);
     CHECK(res != CCC_RESULT_OK, true);

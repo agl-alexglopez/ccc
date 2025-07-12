@@ -619,10 +619,10 @@ current iterator.
 Obtain the container state. */
 /**@{*/
 
-/** @brief Returns the size of the map.
+/** @brief Returns the count of map occupied nodes.
 @param [in] rom the map.
 @return the size or an argument is set if rom is NULL. */
-[[nodiscard]] ccc_ucount ccc_rom_size(ccc_realtime_ordered_map const *rom);
+[[nodiscard]] ccc_ucount ccc_rom_count(ccc_realtime_ordered_map const *rom);
 
 /** @brief Returns the size status of the map.
 @param [in] rom the map.
@@ -672,7 +672,7 @@ typedef ccc_romap_entry romap_entry;
 #    define rom_rnext(args...) ccc_rom_rnext(args)
 #    define rom_end(args...) ccc_rom_end(args)
 #    define rom_rend(args...) ccc_rom_rend(args)
-#    define rom_size(args...) ccc_rom_size(args)
+#    define rom_count(args...) ccc_rom_count(args)
 #    define rom_is_empty(args...) ccc_rom_is_empty(args)
 #    define rom_clear(args...) ccc_rom_clear(args)
 #    define rom_validate(args...) ccc_rom_validate(args)

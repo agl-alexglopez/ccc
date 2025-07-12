@@ -25,11 +25,11 @@ CHECK_BEGIN_FN(insert_shuffled, ccc_ordered_map *m, struct val vals[],
     {
         vals[shuffled_index].key = (int)shuffled_index;
         (void)swap_entry(m, &vals[shuffled_index].elem, &(struct val){}.elem);
-        CHECK(size(m).count, i + 1);
+        CHECK(count(m).count, i + 1);
         CHECK(validate(m), true);
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
-    CHECK(size(m).count, size);
+    CHECK(count(m).count, size);
     CHECK_END_FN();
 }
 
@@ -37,7 +37,7 @@ CHECK_BEGIN_FN(insert_shuffled, ccc_ordered_map *m, struct val vals[],
 size_t
 inorder_fill(int vals[], size_t size, ccc_ordered_map *m)
 {
-    if (size(m).count != size)
+    if (count(m).count != size)
     {
         return 0;
     }

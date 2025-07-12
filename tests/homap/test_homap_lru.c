@@ -182,7 +182,7 @@ CHECK_BEGIN_STATIC_FN(lru_put, struct lru_cache *const lru, int const key,
         CHECK(new == NULL, false);
         new = dll_push_front(&lru->l, &new->list_elem);
         CHECK(new == NULL, false);
-        if (size(&lru->l).count > lru->cap)
+        if (count(&lru->l).count > lru->cap)
         {
             struct lru_elem const *const to_drop = back(&lru->l);
             CHECK(to_drop == NULL, false);

@@ -23,16 +23,16 @@ CHECK_BEGIN_STATIC_FN(fpq_test_insert_remove_four_dups)
         CHECK(push(&fpq, &three_vals[i]) != NULL, true);
         CHECK(validate(&fpq), true);
         size_t const size_check = i + 1;
-        CHECK(ccc_fpq_size(&fpq).count, size_check);
+        CHECK(ccc_fpq_count(&fpq).count, size_check);
     }
-    CHECK(ccc_fpq_size(&fpq).count, (size_t)4);
+    CHECK(ccc_fpq_count(&fpq).count, (size_t)4);
     for (int i = 0; i < 4; ++i)
     {
         three_vals[i].val = 0;
         (void)pop(&fpq);
         CHECK(validate(&fpq), true);
     }
-    CHECK(ccc_fpq_size(&fpq).count, (size_t)0);
+    CHECK(ccc_fpq_count(&fpq).count, (size_t)0);
     CHECK_END_FN();
 }
 
@@ -56,11 +56,11 @@ CHECK_BEGIN_STATIC_FN(fpq_test_insert_erase_shuffled)
     while (!ccc_fpq_is_empty(&fpq))
     {
         size_t const rand_index
-            = rand_range(0, (int)ccc_fpq_size(&fpq).count - 1);
+            = rand_range(0, (int)ccc_fpq_count(&fpq).count - 1);
         (void)ccc_fpq_erase(&fpq, &vals[rand_index]);
         CHECK(validate(&fpq), true);
     }
-    CHECK(ccc_fpq_size(&fpq).count, (size_t)0);
+    CHECK(ccc_fpq_count(&fpq).count, (size_t)0);
     CHECK_END_FN();
 }
 
@@ -133,7 +133,7 @@ CHECK_BEGIN_STATIC_FN(fpq_test_delete_prime_shuffle_duplicates)
         CHECK(push(&fpq, &vals[i]) != NULL, true);
         CHECK(validate(&fpq), true);
         size_t const s = i + 1;
-        CHECK(ccc_fpq_size(&fpq).count, s);
+        CHECK(ccc_fpq_count(&fpq).count, s);
         /* Shuffle like this only on insertions to create more dups. */
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
@@ -141,11 +141,11 @@ CHECK_BEGIN_STATIC_FN(fpq_test_delete_prime_shuffle_duplicates)
     while (!ccc_fpq_is_empty(&fpq))
     {
         size_t const rand_index
-            = rand_range(0, (int)ccc_fpq_size(&fpq).count - 1);
+            = rand_range(0, (int)ccc_fpq_count(&fpq).count - 1);
         (void)ccc_fpq_erase(&fpq, &vals[rand_index]);
         CHECK(validate(&fpq), true);
         --cur_size;
-        CHECK(ccc_fpq_size(&fpq).count, cur_size);
+        CHECK(ccc_fpq_count(&fpq).count, cur_size);
     }
     CHECK_END_FN();
 }
@@ -176,11 +176,11 @@ CHECK_BEGIN_STATIC_FN(fpq_test_prime_shuffle)
     while (!ccc_fpq_is_empty(&fpq))
     {
         size_t const rand_index
-            = rand_range(0, (int)ccc_fpq_size(&fpq).count - 1);
+            = rand_range(0, (int)ccc_fpq_count(&fpq).count - 1);
         CHECK(ccc_fpq_erase(&fpq, &vals[rand_index]) == CCC_RESULT_OK, true);
         CHECK(validate(&fpq), true);
         --cur_size;
-        CHECK(ccc_fpq_size(&fpq).count, cur_size);
+        CHECK(ccc_fpq_count(&fpq).count, cur_size);
     }
     CHECK_END_FN();
 }
@@ -205,7 +205,7 @@ CHECK_BEGIN_STATIC_FN(fpq_test_weak_srand)
     while (!ccc_fpq_is_empty(&fpq))
     {
         size_t const rand_index
-            = rand_range(0, (int)ccc_fpq_size(&fpq).count - 1);
+            = rand_range(0, (int)ccc_fpq_count(&fpq).count - 1);
         CHECK(ccc_fpq_erase(&fpq, &vals[rand_index]) == CCC_RESULT_OK, true);
         CHECK(validate(&fpq), true);
     }

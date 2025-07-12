@@ -72,11 +72,11 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_validate)
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent) != NULL, true);
-    CHECK(size(&fh).count, 1);
+    CHECK(count(&fh).count, 1);
     ent = swap_entry(&fh, &(struct val){.key = -1, .val = -1});
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), true);
-    CHECK(size(&fh).count, 1);
+    CHECK(count(&fh).count, 1);
     struct val *v = unwrap(&ent);
     CHECK(v != NULL, true);
     CHECK(v->val, -1);
@@ -94,11 +94,11 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert)
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent) != NULL, true);
-    CHECK(size(&fh).count, 1);
+    CHECK(count(&fh).count, 1);
     ent = swap_entry(&fh, &(struct val){.key = -1, .val = -1});
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), true);
-    CHECK(size(&fh).count, 1);
+    CHECK(count(&fh).count, 1);
     struct val *v = unwrap(&ent);
     CHECK(v != NULL, true);
     CHECK(v->val, -1);
@@ -112,11 +112,11 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert)
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent) != NULL, true);
-    CHECK(size(&fh).count, i + 2);
+    CHECK(count(&fh).count, i + 2);
     ent = swap_entry(&fh, &(struct val){.key = i, .val = i});
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), true);
-    CHECK(size(&fh).count, i + 2);
+    CHECK(count(&fh).count, i + 2);
     v = unwrap(&ent);
     CHECK(v != NULL, true);
     CHECK(v->val, i);
@@ -130,11 +130,11 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert)
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent) != NULL, true);
-    CHECK(size(&fh).count, i + 2);
+    CHECK(count(&fh).count, i + 2);
     ent = swap_entry(&fh, &(struct val){.key = i, .val = i});
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), true);
-    CHECK(size(&fh).count, i + 2);
+    CHECK(count(&fh).count, i + 2);
     v = unwrap(&ent);
     CHECK(v != NULL, true);
     CHECK(v->val, i);
@@ -152,16 +152,16 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_remove)
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
-    CHECK(size(&fh).count, 0);
+    CHECK(count(&fh).count, 0);
     ent = swap_entry(&fh, &(struct val){.key = -1, .val = -1});
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent) != NULL, true);
-    CHECK(size(&fh).count, 1);
+    CHECK(count(&fh).count, 1);
     ent = ccc_remove(&fh, &(struct val){.key = -1, .val = -1});
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), true);
-    CHECK(size(&fh).count, 0);
+    CHECK(count(&fh).count, 0);
     struct val *v = unwrap(&ent);
     CHECK(v != NULL, true);
     CHECK(v->val, -1);
@@ -174,16 +174,16 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_remove)
     ent = ccc_remove(&fh, &(struct val){.key = i, .val = i});
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), false);
-    CHECK(size(&fh).count, i);
+    CHECK(count(&fh).count, i);
     ent = swap_entry(&fh, &(struct val){.key = i, .val = i});
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent) != NULL, true);
-    CHECK(size(&fh).count, i + 1);
+    CHECK(count(&fh).count, i + 1);
     ent = ccc_remove(&fh, &(struct val){.key = i, .val = i});
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), true);
-    CHECK(size(&fh).count, i);
+    CHECK(count(&fh).count, i);
     v = unwrap(&ent);
     CHECK(v != NULL, true);
     CHECK(v->val, i);
@@ -195,16 +195,16 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_remove)
     ent = ccc_remove(&fh, &(struct val){.key = i, .val = i});
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), false);
-    CHECK(size(&fh).count, i);
+    CHECK(count(&fh).count, i);
     ent = swap_entry(&fh, &(struct val){.key = i, .val = i});
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent) != NULL, true);
-    CHECK(size(&fh).count, i + 1);
+    CHECK(count(&fh).count, i + 1);
     ent = ccc_remove(&fh, &(struct val){.key = i, .val = i});
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), true);
-    CHECK(size(&fh).count, i);
+    CHECK(count(&fh).count, i);
     v = unwrap(&ent);
     CHECK(v != NULL, true);
     CHECK(v->val, i);
@@ -222,11 +222,11 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_try_insert)
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent) != NULL, true);
-    CHECK(size(&fh).count, 1);
+    CHECK(count(&fh).count, 1);
     ent = try_insert(&fh, &(struct val){.key = -1, .val = -1});
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), true);
-    CHECK(size(&fh).count, 1);
+    CHECK(count(&fh).count, 1);
     struct val *v = unwrap(&ent);
     CHECK(v != NULL, true);
     CHECK(v->val, -1);
@@ -240,11 +240,11 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_try_insert)
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent) != NULL, true);
-    CHECK(size(&fh).count, i + 2);
+    CHECK(count(&fh).count, i + 2);
     ent = try_insert(&fh, &(struct val){.key = i, .val = i});
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), true);
-    CHECK(size(&fh).count, i + 2);
+    CHECK(count(&fh).count, i + 2);
     v = unwrap(&ent);
     CHECK(v != NULL, true);
     CHECK(v->val, i);
@@ -258,10 +258,10 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_try_insert)
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent) != NULL, true);
-    CHECK(size(&fh).count, i + 2);
+    CHECK(count(&fh).count, i + 2);
     ent = try_insert(&fh, &(struct val){.key = i, .val = i});
     CHECK(occupied(&ent), true);
-    CHECK(size(&fh).count, i + 2);
+    CHECK(count(&fh).count, i + 2);
     v = unwrap(&ent);
     CHECK(v != NULL, true);
     CHECK(v->val, i);
@@ -279,11 +279,11 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_try_insert_with)
     CHECK(validate(&fh), true);
     CHECK(occupied(ent), false);
     CHECK(unwrap(ent) != NULL, true);
-    CHECK(size(&fh).count, 1);
+    CHECK(count(&fh).count, 1);
     ent = fhm_try_insert_w(&fh, -1, val(-1));
     CHECK(validate(&fh), true);
     CHECK(occupied(ent), true);
-    CHECK(size(&fh).count, 1);
+    CHECK(count(&fh).count, 1);
     struct val *v = unwrap(ent);
     CHECK(v != NULL, true);
     CHECK(v->val, -1);
@@ -297,11 +297,11 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_try_insert_with)
     CHECK(validate(&fh), true);
     CHECK(occupied(ent), false);
     CHECK(unwrap(ent) != NULL, true);
-    CHECK(size(&fh).count, i + 2);
+    CHECK(count(&fh).count, i + 2);
     ent = fhm_try_insert_w(&fh, i, val(i));
     CHECK(validate(&fh), true);
     CHECK(occupied(ent), true);
-    CHECK(size(&fh).count, i + 2);
+    CHECK(count(&fh).count, i + 2);
     v = unwrap(ent);
     CHECK(v != NULL, true);
     CHECK(v->val, i);
@@ -315,11 +315,11 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_try_insert_with)
     CHECK(validate(&fh), true);
     CHECK(occupied(ent), false);
     CHECK(unwrap(ent) != NULL, true);
-    CHECK(size(&fh).count, i + 2);
+    CHECK(count(&fh).count, i + 2);
     ent = fhm_try_insert_w(&fh, i, val(i));
     CHECK(validate(&fh), true);
     CHECK(occupied(ent), true);
-    CHECK(size(&fh).count, i + 2);
+    CHECK(count(&fh).count, i + 2);
     v = unwrap(ent);
     CHECK(v != NULL, true);
     CHECK(v->val, i);
@@ -337,11 +337,11 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert_or_assign)
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent) != NULL, true);
-    CHECK(size(&fh).count, 1);
+    CHECK(count(&fh).count, 1);
     ent = insert_or_assign(&fh, &(struct val){.key = -1, .val = -2});
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), true);
-    CHECK(size(&fh).count, 1);
+    CHECK(count(&fh).count, 1);
     struct val *v = unwrap(&ent);
     CHECK(v != NULL, true);
     CHECK(v->val, -2);
@@ -355,10 +355,10 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert_or_assign)
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent) != NULL, true);
-    CHECK(size(&fh).count, i + 2);
+    CHECK(count(&fh).count, i + 2);
     ent = insert_or_assign(&fh, &(struct val){.key = i, .val = i + 1});
     CHECK(occupied(&ent), true);
-    CHECK(size(&fh).count, i + 2);
+    CHECK(count(&fh).count, i + 2);
     v = unwrap(&ent);
     CHECK(v != NULL, true);
     CHECK(v->val, i + 1);
@@ -372,11 +372,11 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert_or_assign)
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent) != NULL, true);
-    CHECK(size(&fh).count, i + 2);
+    CHECK(count(&fh).count, i + 2);
     ent = insert_or_assign(&fh, &(struct val){.key = i, .val = i + 1});
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), true);
-    CHECK(size(&fh).count, i + 2);
+    CHECK(count(&fh).count, i + 2);
     v = unwrap(&ent);
     CHECK(v != NULL, true);
     CHECK(v->val, i + 1);
@@ -394,11 +394,11 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert_or_assign_with)
     CHECK(validate(&fh), true);
     CHECK(occupied(ent), false);
     CHECK(unwrap(ent) != NULL, true);
-    CHECK(size(&fh).count, 1);
+    CHECK(count(&fh).count, 1);
     ent = fhm_insert_or_assign_w(&fh, -1, val(0));
     CHECK(validate(&fh), true);
     CHECK(occupied(ent), true);
-    CHECK(size(&fh).count, 1);
+    CHECK(count(&fh).count, 1);
     struct val *v = unwrap(ent);
     CHECK(v != NULL, true);
     CHECK(v->val, 0);
@@ -412,10 +412,10 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert_or_assign_with)
     CHECK(validate(&fh), true);
     CHECK(occupied(ent), false);
     CHECK(unwrap(ent) != NULL, true);
-    CHECK(size(&fh).count, i + 2);
+    CHECK(count(&fh).count, i + 2);
     ent = fhm_insert_or_assign_w(&fh, i, val(i + 1));
     CHECK(occupied(ent), true);
-    CHECK(size(&fh).count, i + 2);
+    CHECK(count(&fh).count, i + 2);
     v = unwrap(ent);
     CHECK(v != NULL, true);
     CHECK(v->val, i + 1);
@@ -429,11 +429,11 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert_or_assign_with)
     CHECK(validate(&fh), true);
     CHECK(occupied(ent), false);
     CHECK(unwrap(ent) != NULL, true);
-    CHECK(size(&fh).count, i + 2);
+    CHECK(count(&fh).count, i + 2);
     ent = fhm_insert_or_assign_w(&fh, i, val(i + 1));
     CHECK(validate(&fh), true);
     CHECK(occupied(ent), true);
-    CHECK(size(&fh).count, i + 2);
+    CHECK(count(&fh).count, i + 2);
     v = unwrap(ent);
     CHECK(v != NULL, true);
     CHECK(v->val, i + 1);
@@ -451,16 +451,16 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_entry_and_modify)
     CHECK(validate(&fh), true);
     CHECK(occupied(ent), false);
     CHECK(unwrap(ent) == NULL, true);
-    CHECK(size(&fh).count, 0);
+    CHECK(count(&fh).count, 0);
     ent = and_modify(ent, plus);
     CHECK(occupied(ent), false);
     CHECK(unwrap(ent) == NULL, true);
-    CHECK(size(&fh).count, 0);
+    CHECK(count(&fh).count, 0);
     (void)fhm_insert_or_assign_w(&fh, -1, val(-1));
     CHECK(validate(&fh), true);
     ent = entry_r(&fh, &(int){-1});
     CHECK(occupied(ent), true);
-    CHECK(size(&fh).count, 1);
+    CHECK(count(&fh).count, 1);
     struct val *v = unwrap(ent);
     CHECK(v != NULL, true);
     CHECK(v->val, -1);
@@ -478,12 +478,12 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_entry_and_modify)
     ent = entry_r(&fh, &i);
     CHECK(occupied(ent), false);
     CHECK(unwrap(ent) == NULL, true);
-    CHECK(size(&fh).count, i + 1);
+    CHECK(count(&fh).count, i + 1);
     (void)fhm_insert_or_assign_w(&fh, i, val(i));
     CHECK(validate(&fh), true);
     ent = entry_r(&fh, &i);
     CHECK(occupied(ent), true);
-    CHECK(size(&fh).count, i + 2);
+    CHECK(count(&fh).count, i + 2);
     ent = and_modify(ent, plus);
     v = unwrap(ent);
     CHECK(v != NULL, true);
@@ -497,12 +497,12 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_entry_and_modify)
     ent = entry_r(&fh, &i);
     CHECK(occupied(ent), false);
     CHECK(unwrap(ent) == NULL, true);
-    CHECK(size(&fh).count, i + 1);
+    CHECK(count(&fh).count, i + 1);
     (void)fhm_insert_or_assign_w(&fh, i, val(i));
     CHECK(validate(&fh), true);
     ent = entry_r(&fh, &i);
     CHECK(occupied(ent), true);
-    CHECK(size(&fh).count, i + 2);
+    CHECK(count(&fh).count, i + 2);
     ent = and_modify(ent, plus);
     v = unwrap(ent);
     CHECK(v != NULL, true);
@@ -522,12 +522,12 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_entry_and_modify_aux)
     ent = and_modify_aux(ent, plusaux, &aux);
     CHECK(occupied(ent), false);
     CHECK(unwrap(ent) == NULL, true);
-    CHECK(size(&fh).count, 0);
+    CHECK(count(&fh).count, 0);
     (void)fhm_insert_or_assign_w(&fh, -1, val(-1));
     CHECK(validate(&fh), true);
     ent = entry_r(&fh, &(int){-1});
     CHECK(occupied(ent), true);
-    CHECK(size(&fh).count, 1);
+    CHECK(count(&fh).count, 1);
     struct val *v = unwrap(ent);
     CHECK(v != NULL, true);
     CHECK(v->val, -1);
@@ -546,7 +546,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_entry_and_modify_aux)
     ent = and_modify_aux(ent, plusaux, &aux);
     CHECK(occupied(ent), false);
     CHECK(unwrap(ent) == NULL, true);
-    CHECK(size(&fh).count, i + 1);
+    CHECK(count(&fh).count, i + 1);
     (void)fhm_insert_or_assign_w(&fh, i, val(i));
     CHECK(validate(&fh), true);
     ent = entry_r(&fh, &i);
@@ -555,7 +555,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_entry_and_modify_aux)
     CHECK(v != NULL, true);
     CHECK(v->val, i + 1);
     CHECK(v->key, i);
-    CHECK(size(&fh).count, i + 2);
+    CHECK(count(&fh).count, i + 2);
     ++i;
 
     CHECK(fill_n(&fh, size - i, i), PASS);
@@ -565,7 +565,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_entry_and_modify_aux)
     ent = and_modify_aux(ent, plusaux, &aux);
     CHECK(occupied(ent), false);
     CHECK(unwrap(ent) == NULL, true);
-    CHECK(size(&fh).count, i + 1);
+    CHECK(count(&fh).count, i + 1);
     (void)fhm_insert_or_assign_w(&fh, i, val(i));
     CHECK(validate(&fh), true);
     ent = entry_r(&fh, &i);
@@ -574,7 +574,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_entry_and_modify_aux)
     CHECK(v != NULL, true);
     CHECK(v->val, i + 1);
     CHECK(v->key, i);
-    CHECK(size(&fh).count, i + 2);
+    CHECK(count(&fh).count, i + 2);
     CHECK_END_FN();
 }
 
@@ -586,10 +586,10 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_entry_and_modify_with)
                    fhmap_id_eq, NULL, NULL, SMALL_FIXED_CAP);
     ccc_fhmap_entry *ent = entry_r(&fh, &(int){-1});
     ent = fhm_and_modify_w(ent, struct val, { T->val++; });
-    CHECK(size(&fh).count, 0);
+    CHECK(count(&fh).count, 0);
     CHECK(occupied(ent), false);
     CHECK(unwrap(ent) == NULL, true);
-    CHECK(size(&fh).count, 0);
+    CHECK(count(&fh).count, 0);
     (void)fhm_insert_or_assign_w(&fh, -1, val(-1));
     CHECK(validate(&fh), true);
     ent = entry_r(&fh, &(int){-1});
@@ -602,7 +602,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_entry_and_modify_with)
     CHECK(v != NULL, true);
     CHECK(v->key, -1);
     CHECK(v->val, 0);
-    CHECK(size(&fh).count, 1);
+    CHECK(count(&fh).count, 1);
     int i = 0;
 
     CHECK(fill_n(&fh, size / 2, i), PASS);
@@ -612,7 +612,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_entry_and_modify_with)
     ent = fhm_and_modify_w(ent, struct val, { T->val++; });
     CHECK(occupied(ent), false);
     CHECK(unwrap(ent) == NULL, true);
-    CHECK(size(&fh).count, i + 1);
+    CHECK(count(&fh).count, i + 1);
     (void)fhm_insert_or_assign_w(&fh, i, val(i));
     CHECK(validate(&fh), true);
     ent = entry_r(&fh, &i);
@@ -621,7 +621,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_entry_and_modify_with)
     CHECK(v != NULL, true);
     CHECK(v->val, i + 1);
     CHECK(v->key, i);
-    CHECK(size(&fh).count, i + 2);
+    CHECK(count(&fh).count, i + 2);
     ++i;
 
     CHECK(fill_n(&fh, size - i, i), PASS);
@@ -631,7 +631,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_entry_and_modify_with)
     ent = fhm_and_modify_w(ent, struct val, { T->val++; });
     CHECK(occupied(ent), false);
     CHECK(unwrap(ent) == NULL, true);
-    CHECK(size(&fh).count, i + 1);
+    CHECK(count(&fh).count, i + 1);
     (void)fhm_insert_or_assign_w(&fh, i, val(i));
     CHECK(validate(&fh), true);
     ent = entry_r(&fh, &i);
@@ -640,7 +640,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_entry_and_modify_with)
     CHECK(v != NULL, true);
     CHECK(v->val, i + 1);
     CHECK(v->key, i);
-    CHECK(size(&fh).count, i + 2);
+    CHECK(count(&fh).count, i + 2);
     CHECK_END_FN();
 }
 
@@ -656,13 +656,13 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_or_insert)
     CHECK(v != NULL, true);
     CHECK(v->key, -1);
     CHECK(v->val, -1);
-    CHECK(size(&fh).count, 1);
+    CHECK(count(&fh).count, 1);
     v = or_insert(entry_r(&fh, &(int){-1}),
                   &(struct val){.key = -1, .val = -2});
     CHECK(v != NULL, true);
     CHECK(v->key, -1);
     CHECK(v->val, -1);
-    CHECK(size(&fh).count, 1);
+    CHECK(count(&fh).count, 1);
     int i = 0;
 
     CHECK(fill_n(&fh, size / 2, i), PASS);
@@ -673,12 +673,12 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_or_insert)
     CHECK(v != NULL, true);
     CHECK(v->key, i);
     CHECK(v->val, i);
-    CHECK(size(&fh).count, i + 2);
+    CHECK(count(&fh).count, i + 2);
     v = or_insert(entry_r(&fh, &i), &(struct val){.key = i, .val = i + 1});
     CHECK(v != NULL, true);
     CHECK(v->key, i);
     CHECK(v->val, i);
-    CHECK(size(&fh).count, i + 2);
+    CHECK(count(&fh).count, i + 2);
     ++i;
 
     CHECK(fill_n(&fh, size - i, i), PASS);
@@ -689,12 +689,12 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_or_insert)
     CHECK(v != NULL, true);
     CHECK(v->key, i);
     CHECK(v->val, i);
-    CHECK(size(&fh).count, i + 2);
+    CHECK(count(&fh).count, i + 2);
     v = or_insert(entry_r(&fh, &i), &(struct val){.key = i, .val = i + 1});
     CHECK(v != NULL, true);
     CHECK(v->key, i);
     CHECK(v->val, i);
-    CHECK(size(&fh).count, i + 2);
+    CHECK(count(&fh).count, i + 2);
     CHECK_END_FN();
 }
 
@@ -709,12 +709,12 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_or_insert_with)
     CHECK(v != NULL, true);
     CHECK(v->key, -1);
     CHECK(v->val, -1);
-    CHECK(size(&fh).count, 1);
+    CHECK(count(&fh).count, 1);
     v = fhm_or_insert_w(entry_r(&fh, &(int){-1}), idval(-1, -2));
     CHECK(v != NULL, true);
     CHECK(v->key, -1);
     CHECK(v->val, -1);
-    CHECK(size(&fh).count, 1);
+    CHECK(count(&fh).count, 1);
     int i = 0;
 
     CHECK(fill_n(&fh, size / 2, i), PASS);
@@ -725,12 +725,12 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_or_insert_with)
     CHECK(v != NULL, true);
     CHECK(v->key, i);
     CHECK(v->val, i);
-    CHECK(size(&fh).count, i + 2);
+    CHECK(count(&fh).count, i + 2);
     v = fhm_or_insert_w(entry_r(&fh, &i), idval(i, i + 1));
     CHECK(v != NULL, true);
     CHECK(v->key, i);
     CHECK(v->val, i);
-    CHECK(size(&fh).count, i + 2);
+    CHECK(count(&fh).count, i + 2);
     ++i;
 
     CHECK(fill_n(&fh, size - i, i), PASS);
@@ -741,12 +741,12 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_or_insert_with)
     CHECK(v != NULL, true);
     CHECK(v->key, i);
     CHECK(v->val, i);
-    CHECK(size(&fh).count, i + 2);
+    CHECK(count(&fh).count, i + 2);
     v = fhm_or_insert_w(entry_r(&fh, &i), idval(i, i + 1));
     CHECK(v != NULL, true);
     CHECK(v->key, i);
     CHECK(v->val, i);
-    CHECK(size(&fh).count, i + 2);
+    CHECK(count(&fh).count, i + 2);
     CHECK_END_FN();
 }
 
@@ -762,13 +762,13 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert_entry)
     CHECK(v != NULL, true);
     CHECK(v->key, -1);
     CHECK(v->val, -1);
-    CHECK(size(&fh).count, 1);
+    CHECK(count(&fh).count, 1);
     v = insert_entry(entry_r(&fh, &(int){-1}),
                      &(struct val){.key = -1, .val = -2});
     CHECK(v != NULL, true);
     CHECK(v->key, -1);
     CHECK(v->val, -2);
-    CHECK(size(&fh).count, 1);
+    CHECK(count(&fh).count, 1);
     int i = 0;
 
     CHECK(fill_n(&fh, size / 2, i), PASS);
@@ -779,12 +779,12 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert_entry)
     CHECK(v != NULL, true);
     CHECK(v->key, i);
     CHECK(v->val, i);
-    CHECK(size(&fh).count, i + 2);
+    CHECK(count(&fh).count, i + 2);
     v = insert_entry(entry_r(&fh, &i), &(struct val){.key = i, .val = i + 1});
     CHECK(v != NULL, true);
     CHECK(v->key, i);
     CHECK(v->val, i + 1);
-    CHECK(size(&fh).count, i + 2);
+    CHECK(count(&fh).count, i + 2);
     ++i;
 
     CHECK(fill_n(&fh, size - i, i), PASS);
@@ -795,12 +795,12 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert_entry)
     CHECK(v != NULL, true);
     CHECK(v->key, i);
     CHECK(v->val, i);
-    CHECK(size(&fh).count, i + 2);
+    CHECK(count(&fh).count, i + 2);
     v = insert_entry(entry_r(&fh, &i), &(struct val){.key = i, .val = i + 1});
     CHECK(v != NULL, true);
     CHECK(v->key, i);
     CHECK(v->val, i + 1);
-    CHECK(size(&fh).count, i + 2);
+    CHECK(count(&fh).count, i + 2);
     CHECK_END_FN();
 }
 
@@ -815,12 +815,12 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert_entry_with)
     CHECK(v != NULL, true);
     CHECK(v->key, -1);
     CHECK(v->val, -1);
-    CHECK(size(&fh).count, 1);
+    CHECK(count(&fh).count, 1);
     v = fhm_insert_entry_w(entry_r(&fh, &(int){-1}), idval(-1, -2));
     CHECK(v != NULL, true);
     CHECK(v->key, -1);
     CHECK(v->val, -2);
-    CHECK(size(&fh).count, 1);
+    CHECK(count(&fh).count, 1);
     int i = 0;
 
     CHECK(fill_n(&fh, size / 2, i), PASS);
@@ -831,12 +831,12 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert_entry_with)
     CHECK(v != NULL, true);
     CHECK(v->key, i);
     CHECK(v->val, i);
-    CHECK(size(&fh).count, i + 2);
+    CHECK(count(&fh).count, i + 2);
     v = fhm_insert_entry_w(entry_r(&fh, &i), idval(i, i + 1));
     CHECK(v != NULL, true);
     CHECK(v->key, i);
     CHECK(v->val, i + 1);
-    CHECK(size(&fh).count, i + 2);
+    CHECK(count(&fh).count, i + 2);
     ++i;
 
     CHECK(fill_n(&fh, size - i, i), PASS);
@@ -847,12 +847,12 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert_entry_with)
     CHECK(v != NULL, true);
     CHECK(v->key, i);
     CHECK(v->val, i);
-    CHECK(size(&fh).count, i + 2);
+    CHECK(count(&fh).count, i + 2);
     v = fhm_insert_entry_w(entry_r(&fh, &i), idval(i, i + 1));
     CHECK(v != NULL, true);
     CHECK(v->key, i);
     CHECK(v->val, i + 1);
-    CHECK(size(&fh).count, i + 2);
+    CHECK(count(&fh).count, i + 2);
     CHECK_END_FN();
 }
 
@@ -868,12 +868,12 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_remove_entry)
     CHECK(v != NULL, true);
     CHECK(v->key, -1);
     CHECK(v->val, -1);
-    CHECK(size(&fh).count, 1);
+    CHECK(count(&fh).count, 1);
     ccc_entry *e = remove_entry_r(entry_r(&fh, &(int){-1}));
     CHECK(validate(&fh), true);
     CHECK(occupied(e), true);
     CHECK(unwrap(e) == NULL, true);
-    CHECK(size(&fh).count, 0);
+    CHECK(count(&fh).count, 0);
     int i = 0;
 
     CHECK(fill_n(&fh, size / 2, i), PASS);
@@ -884,12 +884,12 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_remove_entry)
     CHECK(v != NULL, true);
     CHECK(v->key, i);
     CHECK(v->val, i);
-    CHECK(size(&fh).count, i + 1);
+    CHECK(count(&fh).count, i + 1);
     e = remove_entry_r(entry_r(&fh, &i));
     CHECK(validate(&fh), true);
     CHECK(occupied(e), true);
     CHECK(unwrap(e) == NULL, true);
-    CHECK(size(&fh).count, i);
+    CHECK(count(&fh).count, i);
 
     CHECK(fill_n(&fh, size - i, i), PASS);
 
@@ -899,12 +899,12 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_remove_entry)
     CHECK(v != NULL, true);
     CHECK(v->key, i);
     CHECK(v->val, i);
-    CHECK(size(&fh).count, i + 1);
+    CHECK(count(&fh).count, i + 1);
     e = remove_entry_r(entry_r(&fh, &i));
     CHECK(validate(&fh), true);
     CHECK(occupied(e), true);
     CHECK(unwrap(e) == NULL, true);
-    CHECK(size(&fh).count, i);
+    CHECK(count(&fh).count, i);
     CHECK_END_FN();
 }
 

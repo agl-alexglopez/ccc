@@ -37,7 +37,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert_then_iterate)
         CHECK(validate(&fh), true);
         ++seen;
     }
-    CHECK((size_t)seen, size(&fh).count);
+    CHECK((size_t)seen, count(&fh).count);
     int seen2 = 0;
     for (struct val const *i = begin(&fh); i != end(&fh); i = next(&fh, i))
     {

@@ -425,10 +425,11 @@ empty. */
 [[nodiscard]] ccc_tribool
 ccc_fdeq_is_empty(ccc_flat_double_ended_queue const *fdeq);
 
-/** @brief Return the size of the fdeq representing active slots. O(1).
+/** @brief Return the count of active fdeq slots. O(1).
 @param [in] fdeq a pointer to the fdeq.
 @return the size of the fdeq or an argument error is set if fdeq is NULL. */
-[[nodiscard]] ccc_ucount ccc_fdeq_size(ccc_flat_double_ended_queue const *fdeq);
+[[nodiscard]] ccc_ucount
+ccc_fdeq_count(ccc_flat_double_ended_queue const *fdeq);
 
 /** @brief Return the capacity representing total possible slots. O(1).
 @param [in] fdeq a pointer to the fdeq.
@@ -475,7 +476,7 @@ typedef ccc_flat_double_ended_queue flat_double_ended_queue;
 #    define fdeq_front(args...) ccc_fdeq_front(args)
 #    define fdeq_back(args...) ccc_fdeq_back(args)
 #    define fdeq_is_empty(args...) ccc_fdeq_is_empty(args)
-#    define fdeq_size(args...) ccc_fdeq_size(args)
+#    define fdeq_count(args...) ccc_fdeq_count(args)
 #    define fdeq_clear(args...) ccc_fdeq_clear(args)
 #    define fdeq_clear_and_free(args...) ccc_fdeq_clear_and_free(args)
 #    define fdeq_clear_and_free_reserve(args...)                               \

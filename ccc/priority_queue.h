@@ -321,10 +321,10 @@ Obtain state from the container. */
 @return true if the size is 0, false if not empty. Error if pq is NULL. */
 [[nodiscard]] ccc_tribool ccc_pq_is_empty(ccc_priority_queue const *pq);
 
-/** @brief Returns the size of the priority queue.
+/** @brief Returns the count of priority queue occupied nodes.
 @param [in] pq a pointer to the priority queue.
 @return the size of the pq or an argument error is set if pq is NULL. */
-[[nodiscard]] ccc_ucount ccc_pq_size(ccc_priority_queue const *pq);
+[[nodiscard]] ccc_ucount ccc_pq_count(ccc_priority_queue const *pq);
 
 /** @brief Verifies the internal invariants of the pq hold.
 @param [in] pq a pointer to the priority queue.
@@ -350,7 +350,7 @@ typedef ccc_priority_queue priority_queue;
 #    define pq_pop(args...) ccc_pq_pop(args)
 #    define pq_extract(args...) ccc_pq_extract(args)
 #    define pq_is_empty(args...) ccc_pq_is_empty(args)
-#    define pq_size(args...) ccc_pq_size(args)
+#    define pq_count(args...) ccc_pq_count(args)
 #    define pq_update(args...) ccc_pq_update(args)
 #    define pq_increase(args...) ccc_pq_increase(args)
 #    define pq_decrease(args...) ccc_pq_decrease(args)

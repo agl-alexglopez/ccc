@@ -113,7 +113,7 @@ ccc_om_is_empty(ccc_ordered_map const *const om)
 }
 
 ccc_ucount
-ccc_om_size(ccc_ordered_map const *const om)
+ccc_om_count(ccc_ordered_map const *const om)
 {
     if (!om)
     {
@@ -924,15 +924,15 @@ struct parent_status
 };
 
 static size_t
-recursive_size(struct ccc_omap const *const t,
-               struct ccc_omap_elem const *const r)
+recursive_count(struct ccc_omap const *const t,
+                struct ccc_omap_elem const *const r)
 {
     if (r == &t->end)
     {
         return 0;
     }
-    return 1 + recursive_size(t, r->branch[R])
-         + recursive_size(t, r->branch[L]);
+    return 1 + recursive_count(t, r->branch[R])
+         + recursive_count(t, r->branch[L]);
 }
 
 static ccc_tribool
@@ -1031,7 +1031,7 @@ ccc_omap_validate(struct ccc_omap const *const t)
     {
         return CCC_FALSE;
     }
-    if (recursive_size(t, t->root) != t->size)
+    if (recursive_count(t, t->root) != t->size)
     {
         return CCC_FALSE;
     }

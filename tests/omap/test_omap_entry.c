@@ -75,12 +75,12 @@ CHECK_BEGIN_STATIC_FN(omap_test_validate)
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
-    CHECK(size(&om).count, 1);
+    CHECK(count(&om).count, 1);
     ent = swap_entry(&om, &(struct val){.key = -1, .val = -1}.elem,
                      &(struct val){}.elem);
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), true);
-    CHECK(size(&om).count, 1);
+    CHECK(count(&om).count, 1);
     struct val *v = unwrap(&ent);
     CHECK(v != NULL, true);
     CHECK(v->val, -1);
@@ -100,12 +100,12 @@ CHECK_BEGIN_STATIC_FN(omap_test_insert)
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
-    CHECK(size(&om).count, 1);
+    CHECK(count(&om).count, 1);
     ent = swap_entry(&om, &(struct val){.key = -1, .val = -1}.elem,
                      &(struct val){}.elem);
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), true);
-    CHECK(size(&om).count, 1);
+    CHECK(count(&om).count, 1);
     struct val *v = unwrap(&ent);
     CHECK(v != NULL, true);
     CHECK(v->val, -1);
@@ -120,12 +120,12 @@ CHECK_BEGIN_STATIC_FN(omap_test_insert)
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
-    CHECK(size(&om).count, i + 2);
+    CHECK(count(&om).count, i + 2);
     ent = swap_entry(&om, &(struct val){.key = i, .val = i}.elem,
                      &(struct val){}.elem);
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), true);
-    CHECK(size(&om).count, i + 2);
+    CHECK(count(&om).count, i + 2);
     v = unwrap(&ent);
     CHECK(v != NULL, true);
     CHECK(v->val, i);
@@ -140,12 +140,12 @@ CHECK_BEGIN_STATIC_FN(omap_test_insert)
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
-    CHECK(size(&om).count, i + 2);
+    CHECK(count(&om).count, i + 2);
     ent = swap_entry(&om, &(struct val){.key = i, .val = i}.elem,
                      &(struct val){}.elem);
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), true);
-    CHECK(size(&om).count, i + 2);
+    CHECK(count(&om).count, i + 2);
     v = unwrap(&ent);
     CHECK(v != NULL, true);
     CHECK(v->val, i);
@@ -164,17 +164,17 @@ CHECK_BEGIN_STATIC_FN(omap_test_remove)
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
-    CHECK(size(&om).count, 0);
+    CHECK(count(&om).count, 0);
     ent = swap_entry(&om, &(struct val){.key = -1, .val = -1}.elem,
                      &(struct val){}.elem);
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
-    CHECK(size(&om).count, 1);
+    CHECK(count(&om).count, 1);
     ent = ccc_remove(&om, &(struct val){.key = -1, .val = -1}.elem);
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), true);
-    CHECK(size(&om).count, 0);
+    CHECK(count(&om).count, 0);
     struct val *v = unwrap(&ent);
     CHECK(v != NULL, true);
     CHECK(v->val, -1);
@@ -187,17 +187,17 @@ CHECK_BEGIN_STATIC_FN(omap_test_remove)
     ent = ccc_remove(&om, &(struct val){.key = i, .val = i}.elem);
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), false);
-    CHECK(size(&om).count, i);
+    CHECK(count(&om).count, i);
     ent = swap_entry(&om, &(struct val){.key = i, .val = i}.elem,
                      &(struct val){}.elem);
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
-    CHECK(size(&om).count, i + 1);
+    CHECK(count(&om).count, i + 1);
     ent = ccc_remove(&om, &(struct val){.key = i, .val = i}.elem);
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), true);
-    CHECK(size(&om).count, i);
+    CHECK(count(&om).count, i);
     v = unwrap(&ent);
     CHECK(v != NULL, true);
     CHECK(v->val, i);
@@ -209,17 +209,17 @@ CHECK_BEGIN_STATIC_FN(omap_test_remove)
     ent = ccc_remove(&om, &(struct val){.key = i, .val = i}.elem);
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), false);
-    CHECK(size(&om).count, i);
+    CHECK(count(&om).count, i);
     ent = swap_entry(&om, &(struct val){.key = i, .val = i}.elem,
                      &(struct val){}.elem);
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
-    CHECK(size(&om).count, i + 1);
+    CHECK(count(&om).count, i + 1);
     ent = ccc_remove(&om, &(struct val){.key = i, .val = i}.elem);
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), true);
-    CHECK(size(&om).count, i);
+    CHECK(count(&om).count, i);
     v = unwrap(&ent);
     CHECK(v != NULL, true);
     CHECK(v->val, i);
@@ -238,11 +238,11 @@ CHECK_BEGIN_STATIC_FN(omap_test_try_insert)
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent) != NULL, true);
-    CHECK(size(&om).count, 1);
+    CHECK(count(&om).count, 1);
     ent = try_insert(&om, &(struct val){.key = -1, .val = -1}.elem);
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), true);
-    CHECK(size(&om).count, 1);
+    CHECK(count(&om).count, 1);
     struct val *v = unwrap(&ent);
     CHECK(v != NULL, true);
     CHECK(v->val, -1);
@@ -256,11 +256,11 @@ CHECK_BEGIN_STATIC_FN(omap_test_try_insert)
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent) != NULL, true);
-    CHECK(size(&om).count, i + 2);
+    CHECK(count(&om).count, i + 2);
     ent = try_insert(&om, &(struct val){.key = i, .val = i}.elem);
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), true);
-    CHECK(size(&om).count, i + 2);
+    CHECK(count(&om).count, i + 2);
     v = unwrap(&ent);
     CHECK(v != NULL, true);
     CHECK(v->val, i);
@@ -274,10 +274,10 @@ CHECK_BEGIN_STATIC_FN(omap_test_try_insert)
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent) != NULL, true);
-    CHECK(size(&om).count, i + 2);
+    CHECK(count(&om).count, i + 2);
     ent = try_insert(&om, &(struct val){.key = i, .val = i}.elem);
     CHECK(occupied(&ent), true);
-    CHECK(size(&om).count, i + 2);
+    CHECK(count(&om).count, i + 2);
     v = unwrap(&ent);
     CHECK(v != NULL, true);
     CHECK(v->val, i);
@@ -296,11 +296,11 @@ CHECK_BEGIN_STATIC_FN(omap_test_try_insert_with)
     CHECK(validate(&om), true);
     CHECK(occupied(ent), false);
     CHECK(unwrap(ent) != NULL, true);
-    CHECK(size(&om).count, 1);
+    CHECK(count(&om).count, 1);
     ent = om_try_insert_w(&om, -1, val(-1));
     CHECK(validate(&om), true);
     CHECK(occupied(ent), true);
-    CHECK(size(&om).count, 1);
+    CHECK(count(&om).count, 1);
     struct val *v = unwrap(ent);
     CHECK(v != NULL, true);
     CHECK(v->val, -1);
@@ -314,11 +314,11 @@ CHECK_BEGIN_STATIC_FN(omap_test_try_insert_with)
     CHECK(validate(&om), true);
     CHECK(occupied(ent), false);
     CHECK(unwrap(ent) != NULL, true);
-    CHECK(size(&om).count, i + 2);
+    CHECK(count(&om).count, i + 2);
     ent = om_try_insert_w(&om, i, val(i));
     CHECK(validate(&om), true);
     CHECK(occupied(ent), true);
-    CHECK(size(&om).count, i + 2);
+    CHECK(count(&om).count, i + 2);
     v = unwrap(ent);
     CHECK(v != NULL, true);
     CHECK(v->val, i);
@@ -332,11 +332,11 @@ CHECK_BEGIN_STATIC_FN(omap_test_try_insert_with)
     CHECK(validate(&om), true);
     CHECK(occupied(ent), false);
     CHECK(unwrap(ent) != NULL, true);
-    CHECK(size(&om).count, i + 2);
+    CHECK(count(&om).count, i + 2);
     ent = om_try_insert_w(&om, i, val(i));
     CHECK(validate(&om), true);
     CHECK(occupied(ent), true);
-    CHECK(size(&om).count, i + 2);
+    CHECK(count(&om).count, i + 2);
     v = unwrap(ent);
     CHECK(v != NULL, true);
     CHECK(v->val, i);
@@ -356,11 +356,11 @@ CHECK_BEGIN_STATIC_FN(omap_test_insert_or_assign)
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent) != NULL, true);
-    CHECK(size(&om).count, 1);
+    CHECK(count(&om).count, 1);
     ent = insert_or_assign(&om, &(struct val){.key = -1, .val = -2}.elem);
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), true);
-    CHECK(size(&om).count, 1);
+    CHECK(count(&om).count, 1);
     struct val *v = unwrap(&ent);
     CHECK(v != NULL, true);
     CHECK(v->val, -2);
@@ -374,10 +374,10 @@ CHECK_BEGIN_STATIC_FN(omap_test_insert_or_assign)
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent) != NULL, true);
-    CHECK(size(&om).count, i + 2);
+    CHECK(count(&om).count, i + 2);
     ent = insert_or_assign(&om, &(struct val){.key = i, .val = i + 1}.elem);
     CHECK(occupied(&ent), true);
-    CHECK(size(&om).count, i + 2);
+    CHECK(count(&om).count, i + 2);
     v = unwrap(&ent);
     CHECK(v != NULL, true);
     CHECK(v->val, i + 1);
@@ -391,11 +391,11 @@ CHECK_BEGIN_STATIC_FN(omap_test_insert_or_assign)
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent) != NULL, true);
-    CHECK(size(&om).count, i + 2);
+    CHECK(count(&om).count, i + 2);
     ent = insert_or_assign(&om, &(struct val){.key = i, .val = i + 1}.elem);
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), true);
-    CHECK(size(&om).count, i + 2);
+    CHECK(count(&om).count, i + 2);
     v = unwrap(&ent);
     CHECK(v != NULL, true);
     CHECK(v->val, i + 1);
@@ -414,11 +414,11 @@ CHECK_BEGIN_STATIC_FN(omap_test_insert_or_assign_with)
     CHECK(validate(&om), true);
     CHECK(occupied(ent), false);
     CHECK(unwrap(ent) != NULL, true);
-    CHECK(size(&om).count, 1);
+    CHECK(count(&om).count, 1);
     ent = om_insert_or_assign_w(&om, -1, val(-2));
     CHECK(validate(&om), true);
     CHECK(occupied(ent), true);
-    CHECK(size(&om).count, 1);
+    CHECK(count(&om).count, 1);
     struct val *v = unwrap(ent);
     CHECK(v != NULL, true);
     CHECK(v->val, -2);
@@ -432,10 +432,10 @@ CHECK_BEGIN_STATIC_FN(omap_test_insert_or_assign_with)
     CHECK(validate(&om), true);
     CHECK(occupied(ent), false);
     CHECK(unwrap(ent) != NULL, true);
-    CHECK(size(&om).count, i + 2);
+    CHECK(count(&om).count, i + 2);
     ent = om_insert_or_assign_w(&om, i, val(i + 1));
     CHECK(occupied(ent), true);
-    CHECK(size(&om).count, i + 2);
+    CHECK(count(&om).count, i + 2);
     v = unwrap(ent);
     CHECK(v != NULL, true);
     CHECK(v->val, i + 1);
@@ -449,11 +449,11 @@ CHECK_BEGIN_STATIC_FN(omap_test_insert_or_assign_with)
     CHECK(validate(&om), true);
     CHECK(occupied(ent), false);
     CHECK(unwrap(ent) != NULL, true);
-    CHECK(size(&om).count, i + 2);
+    CHECK(count(&om).count, i + 2);
     ent = om_insert_or_assign_w(&om, i, val(i + 1));
     CHECK(validate(&om), true);
     CHECK(occupied(ent), true);
-    CHECK(size(&om).count, i + 2);
+    CHECK(count(&om).count, i + 2);
     v = unwrap(ent);
     CHECK(v != NULL, true);
     CHECK(v->val, i + 1);
@@ -472,16 +472,16 @@ CHECK_BEGIN_STATIC_FN(omap_test_entry_and_modify)
     CHECK(validate(&om), true);
     CHECK(occupied(ent), false);
     CHECK(unwrap(ent) == NULL, true);
-    CHECK(size(&om).count, 0);
+    CHECK(count(&om).count, 0);
     ent = and_modify(ent, plus);
     CHECK(occupied(ent), false);
     CHECK(unwrap(ent) == NULL, true);
-    CHECK(size(&om).count, 0);
+    CHECK(count(&om).count, 0);
     (void)om_insert_or_assign_w(&om, -1, val(-1));
     CHECK(validate(&om), true);
     ent = entry_r(&om, &(int){-1});
     CHECK(occupied(ent), true);
-    CHECK(size(&om).count, 1);
+    CHECK(count(&om).count, 1);
     struct val *v = unwrap(ent);
     CHECK(v != NULL, true);
     CHECK(v->val, -1);
@@ -499,12 +499,12 @@ CHECK_BEGIN_STATIC_FN(omap_test_entry_and_modify)
     ent = entry_r(&om, &i);
     CHECK(occupied(ent), false);
     CHECK(unwrap(ent) == NULL, true);
-    CHECK(size(&om).count, i + 1);
+    CHECK(count(&om).count, i + 1);
     (void)om_insert_or_assign_w(&om, i, val(i));
     CHECK(validate(&om), true);
     ent = entry_r(&om, &i);
     CHECK(occupied(ent), true);
-    CHECK(size(&om).count, i + 2);
+    CHECK(count(&om).count, i + 2);
     ent = and_modify(ent, plus);
     v = unwrap(ent);
     CHECK(v != NULL, true);
@@ -518,12 +518,12 @@ CHECK_BEGIN_STATIC_FN(omap_test_entry_and_modify)
     ent = entry_r(&om, &i);
     CHECK(occupied(ent), false);
     CHECK(unwrap(ent) == NULL, true);
-    CHECK(size(&om).count, i + 1);
+    CHECK(count(&om).count, i + 1);
     (void)om_insert_or_assign_w(&om, i, val(i));
     CHECK(validate(&om), true);
     ent = entry_r(&om, &i);
     CHECK(occupied(ent), true);
-    CHECK(size(&om).count, i + 2);
+    CHECK(count(&om).count, i + 2);
     ent = and_modify(ent, plus);
     v = unwrap(ent);
     CHECK(v != NULL, true);
@@ -544,12 +544,12 @@ CHECK_BEGIN_STATIC_FN(omap_test_entry_and_modify_aux)
     ent = and_modify_aux(ent, plusaux, &aux);
     CHECK(occupied(ent), false);
     CHECK(unwrap(ent) == NULL, true);
-    CHECK(size(&om).count, 0);
+    CHECK(count(&om).count, 0);
     (void)om_insert_or_assign_w(&om, -1, val(-1));
     CHECK(validate(&om), true);
     ent = entry_r(&om, &(int){-1});
     CHECK(occupied(ent), true);
-    CHECK(size(&om).count, 1);
+    CHECK(count(&om).count, 1);
     struct val *v = unwrap(ent);
     CHECK(v != NULL, true);
     CHECK(v->val, -1);
@@ -568,7 +568,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_entry_and_modify_aux)
     ent = and_modify_aux(ent, plusaux, &aux);
     CHECK(occupied(ent), false);
     CHECK(unwrap(ent) == NULL, true);
-    CHECK(size(&om).count, i + 1);
+    CHECK(count(&om).count, i + 1);
     (void)om_insert_or_assign_w(&om, i, val(i));
     CHECK(validate(&om), true);
     ent = entry_r(&om, &i);
@@ -577,7 +577,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_entry_and_modify_aux)
     CHECK(v != NULL, true);
     CHECK(v->val, i + 1);
     CHECK(v->key, i);
-    CHECK(size(&om).count, i + 2);
+    CHECK(count(&om).count, i + 2);
     ++i;
 
     CHECK(fill_n(&om, size - i, i), PASS);
@@ -587,7 +587,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_entry_and_modify_aux)
     ent = and_modify_aux(ent, plusaux, &aux);
     CHECK(occupied(ent), false);
     CHECK(unwrap(ent) == NULL, true);
-    CHECK(size(&om).count, i + 1);
+    CHECK(count(&om).count, i + 1);
     (void)om_insert_or_assign_w(&om, i, val(i));
     CHECK(validate(&om), true);
     ent = entry_r(&om, &i);
@@ -596,7 +596,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_entry_and_modify_aux)
     CHECK(v != NULL, true);
     CHECK(v->val, i + 1);
     CHECK(v->key, i);
-    CHECK(size(&om).count, i + 2);
+    CHECK(count(&om).count, i + 2);
     CHECK_END_FN();
 }
 
@@ -609,10 +609,10 @@ CHECK_BEGIN_STATIC_FN(omap_test_entry_and_modify_with)
     int size = 30;
     ccc_omap_entry *ent = entry_r(&om, &(int){-1});
     ent = om_and_modify_w(ent, struct val, { T->val++; });
-    CHECK(size(&om).count, 0);
+    CHECK(count(&om).count, 0);
     CHECK(occupied(ent), false);
     CHECK(unwrap(ent) == NULL, true);
-    CHECK(size(&om).count, 0);
+    CHECK(count(&om).count, 0);
     (void)om_insert_or_assign_w(&om, -1, val(-1));
     CHECK(validate(&om), true);
     ent = entry_r(&om, &(int){-1});
@@ -625,7 +625,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_entry_and_modify_with)
     CHECK(v != NULL, true);
     CHECK(v->key, -1);
     CHECK(v->val, 0);
-    CHECK(size(&om).count, 1);
+    CHECK(count(&om).count, 1);
     int i = 0;
 
     CHECK(fill_n(&om, size / 2, i), PASS);
@@ -635,7 +635,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_entry_and_modify_with)
     ent = om_and_modify_w(ent, struct val, { T->val++; });
     CHECK(occupied(ent), false);
     CHECK(unwrap(ent) == NULL, true);
-    CHECK(size(&om).count, i + 1);
+    CHECK(count(&om).count, i + 1);
     (void)om_insert_or_assign_w(&om, i, val(i));
     CHECK(validate(&om), true);
     ent = entry_r(&om, &i);
@@ -644,7 +644,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_entry_and_modify_with)
     CHECK(v != NULL, true);
     CHECK(v->val, i + 1);
     CHECK(v->key, i);
-    CHECK(size(&om).count, i + 2);
+    CHECK(count(&om).count, i + 2);
     ++i;
 
     CHECK(fill_n(&om, size - i, i), PASS);
@@ -654,7 +654,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_entry_and_modify_with)
     ent = om_and_modify_w(ent, struct val, { T->val++; });
     CHECK(occupied(ent), false);
     CHECK(unwrap(ent) == NULL, true);
-    CHECK(size(&om).count, i + 1);
+    CHECK(count(&om).count, i + 1);
     (void)om_insert_or_assign_w(&om, i, val(i));
     CHECK(validate(&om), true);
     ent = entry_r(&om, &i);
@@ -663,7 +663,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_entry_and_modify_with)
     CHECK(v != NULL, true);
     CHECK(v->val, i + 1);
     CHECK(v->key, i);
-    CHECK(size(&om).count, i + 2);
+    CHECK(count(&om).count, i + 2);
     CHECK_END_FN();
 }
 
@@ -680,13 +680,13 @@ CHECK_BEGIN_STATIC_FN(omap_test_or_insert)
     CHECK(v != NULL, true);
     CHECK(v->key, -1);
     CHECK(v->val, -1);
-    CHECK(size(&om).count, 1);
+    CHECK(count(&om).count, 1);
     v = or_insert(entry_r(&om, &(int){-1}),
                   &(struct val){.key = -1, .val = -2}.elem);
     CHECK(v != NULL, true);
     CHECK(v->key, -1);
     CHECK(v->val, -1);
-    CHECK(size(&om).count, 1);
+    CHECK(count(&om).count, 1);
     int i = 0;
 
     CHECK(fill_n(&om, size / 2, i), PASS);
@@ -697,12 +697,12 @@ CHECK_BEGIN_STATIC_FN(omap_test_or_insert)
     CHECK(v != NULL, true);
     CHECK(v->key, i);
     CHECK(v->val, i);
-    CHECK(size(&om).count, i + 2);
+    CHECK(count(&om).count, i + 2);
     v = or_insert(entry_r(&om, &i), &(struct val){.key = i, .val = i + 1}.elem);
     CHECK(v != NULL, true);
     CHECK(v->key, i);
     CHECK(v->val, i);
-    CHECK(size(&om).count, i + 2);
+    CHECK(count(&om).count, i + 2);
     ++i;
 
     CHECK(fill_n(&om, size - i, i), PASS);
@@ -713,12 +713,12 @@ CHECK_BEGIN_STATIC_FN(omap_test_or_insert)
     CHECK(v != NULL, true);
     CHECK(v->key, i);
     CHECK(v->val, i);
-    CHECK(size(&om).count, i + 2);
+    CHECK(count(&om).count, i + 2);
     v = or_insert(entry_r(&om, &i), &(struct val){.key = i, .val = i + 1}.elem);
     CHECK(v != NULL, true);
     CHECK(v->key, i);
     CHECK(v->val, i);
-    CHECK(size(&om).count, i + 2);
+    CHECK(count(&om).count, i + 2);
     CHECK_END_FN();
 }
 
@@ -734,12 +734,12 @@ CHECK_BEGIN_STATIC_FN(omap_test_or_insert_with)
     CHECK(v != NULL, true);
     CHECK(v->key, -1);
     CHECK(v->val, -1);
-    CHECK(size(&om).count, 1);
+    CHECK(count(&om).count, 1);
     v = om_or_insert_w(entry_r(&om, &(int){-1}), idval(-1, -2));
     CHECK(v != NULL, true);
     CHECK(v->key, -1);
     CHECK(v->val, -1);
-    CHECK(size(&om).count, 1);
+    CHECK(count(&om).count, 1);
     int i = 0;
 
     CHECK(fill_n(&om, size / 2, i), PASS);
@@ -750,12 +750,12 @@ CHECK_BEGIN_STATIC_FN(omap_test_or_insert_with)
     CHECK(v != NULL, true);
     CHECK(v->key, i);
     CHECK(v->val, i);
-    CHECK(size(&om).count, i + 2);
+    CHECK(count(&om).count, i + 2);
     v = om_or_insert_w(entry_r(&om, &i), idval(i, i + 1));
     CHECK(v != NULL, true);
     CHECK(v->key, i);
     CHECK(v->val, i);
-    CHECK(size(&om).count, i + 2);
+    CHECK(count(&om).count, i + 2);
     ++i;
 
     CHECK(fill_n(&om, size - i, i), PASS);
@@ -766,12 +766,12 @@ CHECK_BEGIN_STATIC_FN(omap_test_or_insert_with)
     CHECK(v != NULL, true);
     CHECK(v->key, i);
     CHECK(v->val, i);
-    CHECK(size(&om).count, i + 2);
+    CHECK(count(&om).count, i + 2);
     v = om_or_insert_w(entry_r(&om, &i), idval(i, i + 1));
     CHECK(v != NULL, true);
     CHECK(v->key, i);
     CHECK(v->val, i);
-    CHECK(size(&om).count, i + 2);
+    CHECK(count(&om).count, i + 2);
     CHECK_END_FN();
 }
 
@@ -788,13 +788,13 @@ CHECK_BEGIN_STATIC_FN(omap_test_insert_entry)
     CHECK(v != NULL, true);
     CHECK(v->key, -1);
     CHECK(v->val, -1);
-    CHECK(size(&om).count, 1);
+    CHECK(count(&om).count, 1);
     v = insert_entry(entry_r(&om, &(int){-1}),
                      &(struct val){.key = -1, .val = -2}.elem);
     CHECK(v != NULL, true);
     CHECK(v->key, -1);
     CHECK(v->val, -2);
-    CHECK(size(&om).count, 1);
+    CHECK(count(&om).count, 1);
     int i = 0;
 
     CHECK(fill_n(&om, size / 2, i), PASS);
@@ -805,13 +805,13 @@ CHECK_BEGIN_STATIC_FN(omap_test_insert_entry)
     CHECK(v != NULL, true);
     CHECK(v->key, i);
     CHECK(v->val, i);
-    CHECK(size(&om).count, i + 2);
+    CHECK(count(&om).count, i + 2);
     v = insert_entry(entry_r(&om, &i),
                      &(struct val){.key = i, .val = i + 1}.elem);
     CHECK(v != NULL, true);
     CHECK(v->key, i);
     CHECK(v->val, i + 1);
-    CHECK(size(&om).count, i + 2);
+    CHECK(count(&om).count, i + 2);
     ++i;
 
     CHECK(fill_n(&om, size - i, i), PASS);
@@ -822,13 +822,13 @@ CHECK_BEGIN_STATIC_FN(omap_test_insert_entry)
     CHECK(v != NULL, true);
     CHECK(v->key, i);
     CHECK(v->val, i);
-    CHECK(size(&om).count, i + 2);
+    CHECK(count(&om).count, i + 2);
     v = insert_entry(entry_r(&om, &i),
                      &(struct val){.key = i, .val = i + 1}.elem);
     CHECK(v != NULL, true);
     CHECK(v->key, i);
     CHECK(v->val, i + 1);
-    CHECK(size(&om).count, i + 2);
+    CHECK(count(&om).count, i + 2);
     CHECK_END_FN();
 }
 
@@ -844,12 +844,12 @@ CHECK_BEGIN_STATIC_FN(omap_test_insert_entry_with)
     CHECK(v != NULL, true);
     CHECK(v->key, -1);
     CHECK(v->val, -1);
-    CHECK(size(&om).count, 1);
+    CHECK(count(&om).count, 1);
     v = om_insert_entry_w(entry_r(&om, &(int){-1}), idval(-1, -2));
     CHECK(v != NULL, true);
     CHECK(v->key, -1);
     CHECK(v->val, -2);
-    CHECK(size(&om).count, 1);
+    CHECK(count(&om).count, 1);
     int i = 0;
 
     CHECK(fill_n(&om, size / 2, i), PASS);
@@ -860,12 +860,12 @@ CHECK_BEGIN_STATIC_FN(omap_test_insert_entry_with)
     CHECK(v != NULL, true);
     CHECK(v->key, i);
     CHECK(v->val, i);
-    CHECK(size(&om).count, i + 2);
+    CHECK(count(&om).count, i + 2);
     v = om_insert_entry_w(entry_r(&om, &i), idval(i, i + 1));
     CHECK(v != NULL, true);
     CHECK(v->key, i);
     CHECK(v->val, i + 1);
-    CHECK(size(&om).count, i + 2);
+    CHECK(count(&om).count, i + 2);
     ++i;
 
     CHECK(fill_n(&om, size - i, i), PASS);
@@ -876,12 +876,12 @@ CHECK_BEGIN_STATIC_FN(omap_test_insert_entry_with)
     CHECK(v != NULL, true);
     CHECK(v->key, i);
     CHECK(v->val, i);
-    CHECK(size(&om).count, i + 2);
+    CHECK(count(&om).count, i + 2);
     v = om_insert_entry_w(entry_r(&om, &i), idval(i, i + 1));
     CHECK(v != NULL, true);
     CHECK(v->key, i);
     CHECK(v->val, i + 1);
-    CHECK(size(&om).count, i + 2);
+    CHECK(count(&om).count, i + 2);
     CHECK_END_FN();
 }
 
@@ -898,11 +898,11 @@ CHECK_BEGIN_STATIC_FN(omap_test_remove_entry)
     CHECK(v != NULL, true);
     CHECK(v->key, -1);
     CHECK(v->val, -1);
-    CHECK(size(&om).count, 1);
+    CHECK(count(&om).count, 1);
     ccc_entry *e = remove_entry_r(entry_r(&om, &(int){-1}));
     CHECK(validate(&om), true);
     CHECK(occupied(e), true);
-    CHECK(size(&om).count, 0);
+    CHECK(count(&om).count, 0);
     int i = 0;
 
     CHECK(fill_n(&om, size / 2, i), PASS);
@@ -913,11 +913,11 @@ CHECK_BEGIN_STATIC_FN(omap_test_remove_entry)
     CHECK(v != NULL, true);
     CHECK(v->key, i);
     CHECK(v->val, i);
-    CHECK(size(&om).count, i + 1);
+    CHECK(count(&om).count, i + 1);
     e = remove_entry_r(entry_r(&om, &i));
     CHECK(validate(&om), true);
     CHECK(occupied(e), true);
-    CHECK(size(&om).count, i);
+    CHECK(count(&om).count, i);
 
     CHECK(fill_n(&om, size - i, i), PASS);
 
@@ -927,11 +927,11 @@ CHECK_BEGIN_STATIC_FN(omap_test_remove_entry)
     CHECK(v != NULL, true);
     CHECK(v->key, i);
     CHECK(v->val, i);
-    CHECK(size(&om).count, i + 1);
+    CHECK(count(&om).count, i + 1);
     e = remove_entry_r(entry_r(&om, &i));
     CHECK(validate(&om), true);
     CHECK(occupied(e), true);
-    CHECK(size(&om).count, i);
+    CHECK(count(&om).count, i);
     CHECK_END_FN();
 }
 

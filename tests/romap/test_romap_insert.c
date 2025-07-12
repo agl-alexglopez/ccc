@@ -35,7 +35,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_insert)
                                &(struct val){}.elem);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
-    CHECK(size(&rom).count, 1);
+    CHECK(count(&rom).count, 1);
     CHECK_END_FN();
 }
 
@@ -48,7 +48,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_insert_macros)
         entry_r(&rom, &(int){2}), (struct val){.key = 2, .val = 0});
     CHECK(ins != NULL, true);
     CHECK(validate(&rom), true);
-    CHECK(size(&rom).count, 1);
+    CHECK(count(&rom).count, 1);
     ins = rom_insert_entry_w(entry_r(&rom, &(int){2}),
                              (struct val){.key = 2, .val = 0});
     CHECK(validate(&rom), true);
@@ -63,23 +63,23 @@ CHECK_BEGIN_STATIC_FN(romap_test_insert_macros)
     CHECK(ins == NULL, false);
     CHECK(validate(&rom), true);
     CHECK(ins->val, 99);
-    CHECK(size(&rom).count, 3);
+    CHECK(count(&rom).count, 3);
     ins = ccc_entry_unwrap(
         rom_insert_or_assign_w(&rom, 3, (struct val){.val = 98}));
     CHECK(validate(&rom), true);
     CHECK(ins == NULL, false);
     CHECK(ins->val, 98);
-    CHECK(size(&rom).count, 3);
+    CHECK(count(&rom).count, 3);
     ins = ccc_entry_unwrap(rom_try_insert_w(&rom, 3, (struct val){.val = 100}));
     CHECK(ins == NULL, false);
     CHECK(validate(&rom), true);
     CHECK(ins->val, 98);
-    CHECK(size(&rom).count, 3);
+    CHECK(count(&rom).count, 3);
     ins = ccc_entry_unwrap(rom_try_insert_w(&rom, 4, (struct val){.val = 100}));
     CHECK(ins == NULL, false);
     CHECK(validate(&rom), true);
     CHECK(ins->val, 100);
-    CHECK(size(&rom).count, 4);
+    CHECK(count(&rom).count, 4);
     CHECK_END_FN(ccc_rom_clear(&rom, NULL););
 }
 
@@ -166,7 +166,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_entry_api_functional)
         CHECK(d->key, i);
         CHECK(d->val, i);
     }
-    CHECK(size(&rom).count, (size / 2) / 2);
+    CHECK(count(&rom).count, (size / 2) / 2);
     /* The default insertion should not occur every other element. */
     for (size_t i = 0; i < size / 2; ++i)
     {
@@ -191,7 +191,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_entry_api_functional)
         }
         CHECK(d->val % 2, true);
     }
-    CHECK(size(&rom).count, (size / 2));
+    CHECK(count(&rom).count, (size / 2));
     /* More simply modifications don't require the and modify function. All
        should be switched back to even now. */
     for (size_t i = 0; i < size / 2; ++i)
@@ -203,7 +203,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_entry_api_functional)
         /* All values in the array should be odd now */
         CHECK((in->val % 2 == 0), true);
     }
-    CHECK(size(&rom).count, (size / 2));
+    CHECK(count(&rom).count, (size / 2));
     CHECK_END_FN(rom_clear(&rom, NULL););
 }
 
@@ -228,7 +228,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_insert_via_entry)
         CHECK(d->key, i);
         CHECK(d->val, i);
     }
-    CHECK(size(&rom).count, (size / 2) / 2);
+    CHECK(count(&rom).count, (size / 2) / 2);
     /* The default insertion should not occur every other element. */
     for (size_t i = 0; i < size / 2; ++i)
     {
@@ -248,7 +248,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_insert_via_entry)
             CHECK(d->val % 2, true);
         }
     }
-    CHECK(size(&rom).count, (size / 2));
+    CHECK(count(&rom).count, (size / 2));
     CHECK_END_FN(rom_clear(&rom, NULL););
 }
 
@@ -270,7 +270,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_insert_via_entry_macros)
         CHECK(d->key, i);
         CHECK(d->val, i);
     }
-    CHECK(size(&rom).count, (size / 2) / 2);
+    CHECK(count(&rom).count, (size / 2) / 2);
     /* The default insertion should not occur every other element. */
     for (size_t i = 0; i < size / 2; ++i)
     {
@@ -288,7 +288,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_insert_via_entry_macros)
             CHECK(d->val % 2, true);
         }
     }
-    CHECK(size(&rom).count, (size / 2));
+    CHECK(count(&rom).count, (size / 2));
     CHECK_END_FN(rom_clear(&rom, NULL););
 }
 
@@ -312,7 +312,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_entry_api_macros)
         CHECK(d->key, i);
         CHECK(d->val, i);
     }
-    CHECK(size(&rom).count, (size / 2) / 2);
+    CHECK(count(&rom).count, (size / 2) / 2);
     /* The default insertion should not occur every other element. */
     for (int i = 0; i < size / 2; ++i)
     {
@@ -331,7 +331,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_entry_api_macros)
         }
         CHECK(d->val % 2, true);
     }
-    CHECK(size(&rom).count, (size / 2));
+    CHECK(count(&rom).count, (size / 2));
     /* More simply modifications don't require the and modify function. All
        should be switched back to even now. */
     for (int i = 0; i < size / 2; ++i)
@@ -342,7 +342,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_entry_api_macros)
         /* All values in the array should be odd now */
         CHECK(v->val % 2 == 0, true);
     }
-    CHECK(size(&rom).count, (size / 2));
+    CHECK(count(&rom).count, (size / 2));
     CHECK_END_FN(rom_clear(&rom, NULL););
 }
 
@@ -389,7 +389,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_resize)
         CHECK(v->val, i);
         CHECK(validate(&rom), true);
     }
-    CHECK(size(&rom).count, to_insert);
+    CHECK(count(&rom).count, to_insert);
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
@@ -418,7 +418,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_resize_macros)
         CHECK(v->key, shuffled_index);
         CHECK(v->val, i);
     }
-    CHECK(size(&rom).count, to_insert);
+    CHECK(count(&rom).count, to_insert);
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
@@ -457,7 +457,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_resize_from_null)
         CHECK(v->key, shuffled_index);
         CHECK(v->val, i);
     }
-    CHECK(size(&rom).count, to_insert);
+    CHECK(count(&rom).count, to_insert);
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
@@ -486,7 +486,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_resize_from_null_macros)
         CHECK(v->key, shuffled_index);
         CHECK(v->val, i);
     }
-    CHECK(size(&rom).count, to_insert);
+    CHECK(count(&rom).count, to_insert);
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
@@ -576,7 +576,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_insert_weak_srand)
         CHECK(insert_error(&e), false);
         CHECK(validate(&rom), true);
     }
-    CHECK(size(&rom).count, (size_t)num_nodes);
+    CHECK(count(&rom).count, (size_t)num_nodes);
     CHECK_END_FN(rom_clear(&rom, NULL););
 }
 

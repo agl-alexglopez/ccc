@@ -308,11 +308,11 @@ print_top_n(FILE *const f, int n)
        O(lgN) runtime for heap pop is pretty good. */
     flat_priority_queue fpq
         = fpq_heapify_init(freqs.arr, struct frequency, CCC_GRT, cmp_freqs,
-                           std_alloc, &a, freqs.cap, size(&map).count);
-    check(size(&fpq).count == size(&map).count);
+                           std_alloc, &a, freqs.cap, count(&map).count);
+    check(count(&fpq).count == count(&map).count);
     if (!n)
     {
-        n = size(&fpq).count;
+        n = count(&fpq).count;
     }
     print_n(&fpq, &a, n);
     str_arena_free(&a);
@@ -331,11 +331,11 @@ print_last_n(FILE *const f, int n)
     check(freqs.cap);
     flat_priority_queue fpq
         = fpq_heapify_init(freqs.arr, struct frequency, CCC_LES, cmp_freqs,
-                           std_alloc, &a, freqs.cap, size(&map).count);
-    check(size(&fpq).count == size(&map).count);
+                           std_alloc, &a, freqs.cap, count(&map).count);
+    check(count(&fpq).count == count(&map).count);
     if (!n)
     {
-        n = size(&fpq).count;
+        n = count(&fpq).count;
     }
     print_n(&fpq, &a, n);
     str_arena_free(&a);
@@ -352,7 +352,7 @@ print_alpha_n(FILE *const f, int n)
     check(!is_empty(&map));
     if (!n)
     {
-        n = size(&map).count;
+        n = count(&map).count;
     }
     int i = 0;
     /* The ordered nature of the map comes in handy for alpha printing. */
@@ -373,7 +373,7 @@ print_ralpha_n(FILE *const f, int n)
     check(!is_empty(&map));
     if (!n)
     {
-        n = size(&map).count;
+        n = count(&map).count;
     }
     int i = 0;
     /* The ordered nature of the map comes in handy for reverse iteration. */
@@ -390,7 +390,7 @@ static struct frequency_alloc
 copy_frequencies(handle_ordered_map const *const map)
 {
     check(!is_empty(map));
-    size_t const cap = sizeof(struct frequency) * (size(map).count + 1);
+    size_t const cap = sizeof(struct frequency) * (count(map).count + 1);
     struct frequency *const freqs = malloc(cap);
     check(freqs);
     size_t i = 0;

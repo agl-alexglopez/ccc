@@ -327,7 +327,7 @@ ccc_buf_pop_back(ccc_buffer *const buf)
 }
 
 ccc_ucount
-ccc_buf_size(ccc_buffer const *const buf)
+ccc_buf_count(ccc_buffer const *const buf)
 {
     if (!buf)
     {
@@ -525,7 +525,7 @@ ccc_buf_size_set(ccc_buffer *const buf, size_t const n)
 }
 
 ccc_ucount
-ccc_buf_size_bytes(ccc_buffer const *buf)
+ccc_buf_count_bytes(ccc_buffer const *buf)
 {
     if (!buf)
     {

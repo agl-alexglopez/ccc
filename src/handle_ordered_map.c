@@ -482,11 +482,11 @@ ccc_hom_is_empty(ccc_handle_ordered_map const *const hom)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    return !ccc_hom_size(hom).count;
+    return !ccc_hom_count(hom).count;
 }
 
 ccc_ucount
-ccc_hom_size(ccc_handle_ordered_map const *const hom)
+ccc_hom_count(ccc_handle_ordered_map const *const hom)
 {
     if (!hom)
     {
@@ -1307,14 +1307,14 @@ struct tree_range
 };
 
 static size_t
-recursive_size(struct ccc_homap const *const t, size_t const r)
+recursive_count(struct ccc_homap const *const t, size_t const r)
 {
     if (!r)
     {
         return 0;
     }
-    return 1 + recursive_size(t, branch_i(t, r, R))
-         + recursive_size(t, branch_i(t, r, L));
+    return 1 + recursive_count(t, branch_i(t, r, R))
+         + recursive_count(t, branch_i(t, r, L));
 }
 
 static ccc_tribool
@@ -1383,7 +1383,7 @@ validate(struct ccc_homap const *const hom)
     {
         return CCC_FALSE;
     }
-    size_t const size = recursive_size(hom, hom->root);
+    size_t const size = recursive_count(hom, hom->root);
     if (size && size != hom->count - 1)
     {
         return CCC_FALSE;

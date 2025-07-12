@@ -110,7 +110,7 @@ CHECK_BEGIN_STATIC_FN(fpq_test_priority_update)
             CHECK(validate(&fpq), true);
         }
     }
-    CHECK(size(&fpq).count, num_nodes);
+    CHECK(count(&fpq).count, num_nodes);
     CHECK_END_FN();
 }
 
@@ -151,7 +151,7 @@ CHECK_BEGIN_STATIC_FN(fpq_test_priority_update_with)
             CHECK(validate(&fpq), true);
         }
     }
-    CHECK(size(&fpq).count, num_nodes);
+    CHECK(count(&fpq).count, num_nodes);
     CHECK_END_FN();
 }
 

@@ -198,7 +198,7 @@ static void bitq_push_back(struct bitq *, ccc_tribool);
 static ccc_tribool bitq_pop_back(struct bitq *bq);
 static ccc_tribool bitq_pop_front(struct bitq *);
 static ccc_tribool bitq_test(struct bitq const *, size_t i);
-static size_t bitq_size(struct bitq const *bq);
+static size_t bitq_count(struct bitq const *bq);
 static void bitq_clear_and_free(struct bitq *);
 static ccc_result bitq_reserve(struct bitq *, size_t to_add);
 static uint64_t hash_char(ccc_any_key to_hash);
@@ -339,7 +339,7 @@ zip_file(str_view const to_compress)
         .blueprint = compress_tree(&tree),
     };
     encoding.leaves_minus_one = encoding.blueprint.leaf_string.len - 1,
-    encoding.file_bits_count = bitq_size(&encoding.file_bits),
+    encoding.file_bits_count = bitq_count(&encoding.file_bits),
     write_to_file(to_compress, fsize, &encoding);
     free_encode_tree(&tree);
     bitq_clear_and_free(&encoding.file_bits);
@@ -365,7 +365,7 @@ build_encoding_tree(FILE *const f)
         .root = 0,
     };
     flat_priority_queue pq = build_encoding_pq(f, &ret);
-    while (size(&pq).count >= 2)
+    while (count(&pq).count >= 2)
     {
         /* Small elements and we need the pair so we can't hold references. */
         struct fpq_elem zero = *(struct fpq_elem *)front(&pq);
@@ -418,7 +418,7 @@ build_encoding_pq(FILE *const f, struct huffman_tree *const tree)
             });
         check(ins);
     });
-    size_t const leaves = size(&fh).count;
+    size_t const leaves = count(&fh).count;
     check(leaves >= 2);
     tree->num_leaves = leaves;
     tree->num_nodes = (2 * leaves) - 1;
@@ -432,7 +432,7 @@ build_encoding_pq(FILE *const f, struct huffman_tree *const tree)
     /* Use a buffer to simply push back elements we will heapify at the end. */
     buffer buf = buf_init(NULL, struct fpq_elem, NULL, NULL, 0);
     /* Add one to reservation for the flat priority queue swap slot. */
-    r = reserve(&buf, size(&fh).count + 1, std_alloc);
+    r = reserve(&buf, count(&fh).count + 1, std_alloc);
     check(r == CCC_RESULT_OK);
     for (struct char_freq const *i = begin(&fh); i != end(&fh);
          i = next(&fh, i))
@@ -451,7 +451,8 @@ build_encoding_pq(FILE *const f, struct huffman_tree *const tree)
        needed to be in the flat priority queue. Now we take its memory and
        heapify the data in O(N) time rather than pushing each element. */
     return fpq_heapify_init(begin(&buf), struct fpq_elem, CCC_LES, cmp_freqs,
-                            NULL, NULL, capacity(&buf).count, size(&buf).count);
+                            NULL, NULL, capacity(&buf).count,
+                            count(&buf).count);
 }
 
 /** Returns the bit queue representing the bit path to every character in the
@@ -502,7 +503,7 @@ memoize_path(struct huffman_tree *const tree, flat_hash_map *const fh,
 {
     struct path_memo *const path = insert_entry(
         entry_r(fh, &c),
-        &(struct path_memo){.ch = c, .path_start_index = bitq_size(bq)});
+        &(struct path_memo){.ch = c, .path_start_index = bitq_count(bq)});
     check(path);
     size_t cur = tree->root;
     /* An iterative depth first search is convenient because the bit path in
@@ -536,7 +537,7 @@ memoize_path(struct huffman_tree *const tree, flat_hash_map *const fh,
     {
         node_at(tree, cur)->iter = 0;
     }
-    path->path_len = bitq_size(bq) - path->path_start_index;
+    path->path_len = bitq_count(bq) - path->path_start_index;
 }
 
 /** Compresses the Huffman tree by creating its representation as a Pre-Order
@@ -658,7 +659,7 @@ write_bitq(FILE *const cccz, struct bitq *const bq)
     static_assert(sizeof(uint8_t) == sizeof(ccc_tribool));
     uint8_t buf = 0;
     uint8_t i = 0;
-    while (bitq_size(bq))
+    while (bitq_count(bq))
     {
         buf |= (bitq_pop_front(bq) << i);
         ++i;
@@ -790,7 +791,7 @@ reconstruct_tree(struct compressed_huffman_tree *const blueprint)
     struct huffman_tree ret = {
         .bump_arena
         = ccc_buf_init(NULL, struct huffman_node, std_alloc, NULL, 0),
-        .num_nodes = bitq_size(&blueprint->tree_paths),
+        .num_nodes = bitq_count(&blueprint->tree_paths),
     };
     ccc_result r = reserve(&ret.bump_arena, ret.num_nodes + 1, std_alloc);
     check(r == CCC_RESULT_OK);
@@ -807,7 +808,7 @@ reconstruct_tree(struct compressed_huffman_tree *const blueprint)
     size_t parent = ret.root;
     size_t node = 0;
     size_t ch_i = blueprint->leaf_string.start;
-    while (bitq_size(&blueprint->tree_paths))
+    while (bitq_count(&blueprint->tree_paths))
     {
         ccc_tribool bit = CCC_TRUE;
         if (!node)
@@ -848,7 +849,7 @@ reconstruct_text(FILE *const f, struct huffman_tree const *const tree,
                  struct bitq *const bq)
 {
     size_t cur = tree->root;
-    while (bitq_size(bq))
+    while (bitq_count(bq))
     {
         /* All paths started from the root during encoding and chose a direction
            first so popping is OK here. Root 1 node never was pushed to q. */
@@ -1058,7 +1059,7 @@ is_leaf(struct huffman_tree const *const tree, size_t const node)
 [[maybe_unused]] static void
 print_bitq(struct bitq const *const bq)
 {
-    for (size_t i = 0, col = 1, end = bitq_size(bq); i < end; ++i, ++col)
+    for (size_t i = 0, col = 1, end = bitq_count(bq); i < end; ++i, ++col)
     {
         bitq_test(bq, i) ? printf("1") : printf("0");
         if (col % 50 == 0)
@@ -1076,7 +1077,7 @@ print_bitq(struct bitq const *const bq)
 static void
 bitq_push_back(struct bitq *const bq, ccc_tribool const bit)
 {
-    if (bq->size == bs_size(&bq->bs).count)
+    if (bq->size == bs_count(&bq->bs).count)
     {
         ccc_result const r = push_back(&bq->bs, bit);
         check(r == CCC_RESULT_OK);
@@ -1113,7 +1114,7 @@ bitq_pop_front(struct bitq *const bq)
     }
     ccc_tribool const bit = bs_test(&bq->bs, bq->front);
     check(bit != CCC_TRIBOOL_ERROR);
-    bq->front = (bq->front + 1) % size(&bq->bs).count;
+    bq->front = (bq->front + 1) % count(&bq->bs).count;
     --bq->size;
     return bit;
 }
@@ -1129,7 +1130,7 @@ bitq_test(struct bitq const *const bq, size_t const i)
 }
 
 static size_t
-bitq_size(struct bitq const *const bq)
+bitq_count(struct bitq const *const bq)
 {
     return bq->size;
 }

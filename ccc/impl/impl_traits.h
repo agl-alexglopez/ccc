@@ -729,31 +729,31 @@ limitations under the License.
 
 /*===================    Standard Getters Interface   =======================*/
 
-#define ccc_impl_size(container_ptr)                                           \
+#define ccc_impl_count(container_ptr)                                          \
     _Generic((container_ptr),                                                  \
-        ccc_bitset *: ccc_bs_size,                                             \
-        ccc_buffer *: ccc_buf_size,                                            \
-        ccc_flat_hash_map *: ccc_fhm_size,                                     \
-        ccc_ordered_map *: ccc_om_size,                                        \
-        ccc_handle_ordered_map *: ccc_hom_size,                                \
-        ccc_flat_priority_queue *: ccc_fpq_size,                               \
-        ccc_flat_double_ended_queue *: ccc_fdeq_size,                          \
-        ccc_priority_queue *: ccc_pq_size,                                     \
-        ccc_singly_linked_list *: ccc_sll_size,                                \
-        ccc_doubly_linked_list *: ccc_dll_size,                                \
-        ccc_realtime_ordered_map *: ccc_rom_size,                              \
-        ccc_handle_realtime_ordered_map *: ccc_hrm_size,                       \
-        ccc_buffer const *: ccc_buf_size,                                      \
-        ccc_flat_hash_map const *: ccc_fhm_size,                               \
-        ccc_ordered_map const *: ccc_om_size,                                  \
-        ccc_handle_ordered_map const *: ccc_hom_size,                          \
-        ccc_flat_priority_queue const *: ccc_fpq_size,                         \
-        ccc_flat_double_ended_queue const *: ccc_fdeq_size,                    \
-        ccc_priority_queue const *: ccc_pq_size,                               \
-        ccc_singly_linked_list const *: ccc_sll_size,                          \
-        ccc_doubly_linked_list const *: ccc_dll_size,                          \
-        ccc_handle_realtime_ordered_map const *: ccc_hrm_size,                 \
-        ccc_realtime_ordered_map const *: ccc_rom_size)((container_ptr))
+        ccc_bitset *: ccc_bs_count,                                            \
+        ccc_buffer *: ccc_buf_count,                                           \
+        ccc_flat_hash_map *: ccc_fhm_count,                                    \
+        ccc_ordered_map *: ccc_om_count,                                       \
+        ccc_handle_ordered_map *: ccc_hom_count,                               \
+        ccc_flat_priority_queue *: ccc_fpq_count,                              \
+        ccc_flat_double_ended_queue *: ccc_fdeq_count,                         \
+        ccc_priority_queue *: ccc_pq_count,                                    \
+        ccc_singly_linked_list *: ccc_sll_count,                               \
+        ccc_doubly_linked_list *: ccc_dll_count,                               \
+        ccc_realtime_ordered_map *: ccc_rom_count,                             \
+        ccc_handle_realtime_ordered_map *: ccc_hrm_count,                      \
+        ccc_buffer const *: ccc_buf_count,                                     \
+        ccc_flat_hash_map const *: ccc_fhm_count,                              \
+        ccc_ordered_map const *: ccc_om_count,                                 \
+        ccc_handle_ordered_map const *: ccc_hom_count,                         \
+        ccc_flat_priority_queue const *: ccc_fpq_count,                        \
+        ccc_flat_double_ended_queue const *: ccc_fdeq_count,                   \
+        ccc_priority_queue const *: ccc_pq_count,                              \
+        ccc_singly_linked_list const *: ccc_sll_count,                         \
+        ccc_doubly_linked_list const *: ccc_dll_count,                         \
+        ccc_handle_realtime_ordered_map const *: ccc_hrm_count,                \
+        ccc_realtime_ordered_map const *: ccc_rom_count)((container_ptr))
 
 #define ccc_impl_capacity(container_ptr)                                       \
     _Generic((container_ptr),                                                  \

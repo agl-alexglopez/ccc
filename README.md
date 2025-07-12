@@ -607,8 +607,8 @@ main(void)
     size_t j = 7 % size;
     for (size_t i = 0; i < size; ++i, j = (j + 7) % size)
     {
-        nodes[size(&om).count].name = sorted_names[j];
-        ccc_entry e = insert_or_assign(&om, &nodes[size(&om).count].e);
+        nodes[count(&om).count].name = sorted_names[j];
+        ccc_entry e = insert_or_assign(&om, &nodes[count(&om).count].e);
         assert(!insert_error(&e) && !occupied(&e));
     }
     j = 0;
@@ -618,9 +618,9 @@ main(void)
         assert(strcmp(n->name, sorted_names[j]) == 0);
         ++j;
     }
-    assert(size(&om).count == size);
+    assert(count(&om).count == size);
     ccc_entry e = try_insert(&om, &(struct name){.name = "Ferris"}.e);
-    assert(size(&om).count == size);
+    assert(count(&om).count == size);
     assert(occupied(&e));
     return 0;
 }

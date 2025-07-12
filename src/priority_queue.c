@@ -25,7 +25,7 @@ static struct ccc_pq_elem *merge(struct ccc_pq *, struct ccc_pq_elem *old,
                                  struct ccc_pq_elem *new);
 static void link_child(struct ccc_pq_elem *parent, struct ccc_pq_elem *child);
 static void init_node(struct ccc_pq_elem *);
-static size_t traversal_size(struct ccc_pq_elem const *);
+static size_t traversal_count(struct ccc_pq_elem const *);
 static ccc_tribool has_valid_links(struct ccc_pq const *,
                                    struct ccc_pq_elem const *parent,
                                    struct ccc_pq_elem const *child);
@@ -159,7 +159,7 @@ ccc_pq_is_empty(ccc_priority_queue const *const pq)
 }
 
 ccc_ucount
-ccc_pq_size(ccc_priority_queue const *const pq)
+ccc_pq_count(ccc_priority_queue const *const pq)
 {
     if (!pq)
     {
@@ -225,7 +225,7 @@ ccc_pq_validate(ccc_priority_queue const *const pq)
     {
         return CCC_FALSE;
     }
-    if (traversal_size(pq->root) != pq->count)
+    if (traversal_count(pq->root) != pq->count)
     {
         return CCC_FALSE;
     }
@@ -549,7 +549,7 @@ clear_node(struct ccc_pq_elem *const e)
 /* NOLINTBEGIN(*misc-no-recursion) */
 
 static size_t
-traversal_size(struct ccc_pq_elem const *const root)
+traversal_count(struct ccc_pq_elem const *const root)
 {
     if (!root)
     {
@@ -559,7 +559,7 @@ traversal_size(struct ccc_pq_elem const *const root)
     struct ccc_pq_elem const *cur = root;
     do
     {
-        count += 1 + traversal_size(cur->child);
+        count += 1 + traversal_count(cur->child);
     }
     while ((cur = cur->next) != root);
     return count;
