@@ -40,8 +40,34 @@ CHECK_BEGIN_STATIC_FN(buf_test_iter_reverse)
     CHECK_END_FN();
 }
 
+CHECK_BEGIN_STATIC_FN(buf_test_reverse_buf)
+{
+    buffer b = buf_init(((int[6]){1, 2, 3, 4, 5, 6}), int, NULL, NULL, 6, 6);
+    int prev = 0;
+    for (int const *i = buf_begin(&b); i != buf_end(&b); i = buf_next(&b, i))
+    {
+        CHECK(i != NULL, CCC_TRUE);
+        CHECK(*i > prev, CCC_TRUE);
+    }
+    for (int *f = buf_begin(&b), *r = buf_rbegin(&b); f < r;
+         f = buf_next(&b, f), r = buf_rnext(&b, r))
+    {
+        ccc_result const res
+            = buf_swap(&b, &(int){}, buf_i(&b, f).count, buf_i(&b, r).count);
+        CHECK(res, CCC_RESULT_OK);
+    }
+    prev = 7;
+    for (int const *i = buf_begin(&b); i != buf_end(&b); i = buf_next(&b, i))
+    {
+        CHECK(i != NULL, CCC_TRUE);
+        CHECK(*i < prev, CCC_TRUE);
+    }
+    CHECK_END_FN();
+}
+
 int
 main(void)
 {
-    return CHECK_RUN(buf_test_iter_forward(), buf_test_iter_reverse());
+    return CHECK_RUN(buf_test_iter_forward(), buf_test_iter_reverse(),
+                     buf_test_reverse_buf());
 }
