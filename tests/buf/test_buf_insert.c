@@ -77,9 +77,9 @@ CHECK_BEGIN_STATIC_FN(buf_test_push_qsort)
     iota(ref, BUF_SORT_CAP, 0);
     iota(buf_begin(&b), BUF_SORT_CAP, 0);
     CHECK(memcmp(ref, buf_begin(&b), BUF_SORT_CAP * sizeof(*ref)), CCC_EQL);
-    rand_shuffle(sizeof(*ref), ref, BUF_SORT_CAP, &(int){});
+    rand_shuffle(sizeof(*ref), ref, BUF_SORT_CAP, &(int){0});
     rand_shuffle(buf_sizeof_type(&b).count, buf_begin(&b), buf_size(&b).count,
-                 &(int){});
+                 &(int){0});
     qsort(ref, BUF_SORT_CAP, sizeof(*ref), cmp_ints);
     qsort(buf_begin(&b), buf_capacity(&b).count, buf_sizeof_type(&b).count,
           cmp_ints);
@@ -143,8 +143,8 @@ CHECK_BEGIN_STATIC_FN(buf_test_push_sort)
                         BUF_SORT_CAP);
     iota(buf_begin(&b), BUF_SORT_CAP, 0);
     rand_shuffle(buf_sizeof_type(&b).count, buf_begin(&b), buf_size(&b).count,
-                 &(int){});
-    (void)sort(&b, ccc_cmp_ints, &(int){});
+                 &(int){0});
+    (void)sort(&b, ccc_cmp_ints, &(int){0});
     int prev = INT_MIN;
     size_t count = 0;
     for (int const *i = buf_begin(&b); i != buf_end(&b); i = buf_next(&b, i))

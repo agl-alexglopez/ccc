@@ -132,7 +132,7 @@ CHECK_BEGIN_STATIC_FN(buf_test_car_fleet)
     buffer car_idx
         = buf_init((int[CARCAP]){}, int, NULL, &positions, CARCAP, CARCAP);
     iota(buf_begin(&car_idx), CARCAP, 0);
-    sort(&car_idx, cmp_car_idx, &(int){});
+    sort(&car_idx, cmp_car_idx, &(int){0});
     int target = 12;
     int fleets = 1;
     double slowest_time_to_target
