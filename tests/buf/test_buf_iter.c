@@ -54,7 +54,7 @@ CHECK_BEGIN_STATIC_FN(buf_test_reverse_buf)
          l = buf_next(&b, l), r = buf_rnext(&b, r))
     {
         ccc_result const res
-            = buf_swap(&b, &(int){}, buf_i(&b, l).count, buf_i(&b, r).count);
+            = buf_swap(&b, &(int){0}, buf_i(&b, l).count, buf_i(&b, r).count);
         CHECK(res, CCC_RESULT_OK);
     }
     prev = 7;
