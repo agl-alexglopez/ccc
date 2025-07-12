@@ -158,13 +158,13 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_increase)
         struct val *const i = &vals[val];
         int inc = (limit * 2) + 1;
         int dec = (i->val / 2) - 1;
-        if (i->val >= limit && dec < i->val)
+        if (i->val > limit && dec < i->val)
         {
             CHECK(ccc_pq_decrease(&pq, &i->elem, val_update, &dec) != NULL,
                   true);
             CHECK(validate(&pq), true);
         }
-        else
+        else if (i->val < limit && inc > i->val)
         {
             CHECK(ccc_pq_increase(&pq, &i->elem, val_update, &inc) != NULL,
                   true);
@@ -197,13 +197,13 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_increase_with)
     {
         int inc = (limit * 2) + 1;
         int dec = (vals[val].val / 2) - 1;
-        if (vals[val].val >= limit)
+        if (vals[val].val > limit && dec < vals[val].val)
         {
             CHECK(ccc_pq_decrease_w(&pq, &vals[val], { T->val = dec; }) != NULL,
                   true);
             CHECK(validate(&pq), true);
         }
-        else
+        else if (vals[val].val < limit && inc > vals[val].val)
         {
             CHECK(ccc_pq_increase_w(&pq, &vals[val], { T->val = inc; }) != NULL,
                   true);
@@ -237,13 +237,13 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_decrease)
         struct val *const i = &vals[val];
         int inc = (limit * 2) + 1;
         int dec = (i->val / 2) - 1;
-        if (i->val < limit)
+        if (i->val < limit && inc > i->val)
         {
             CHECK(ccc_pq_increase(&pq, &i->elem, val_update, &inc) != NULL,
                   true);
             CHECK(validate(&pq), true);
         }
-        else
+        else if (i->val > limit && dec < i->val)
         {
             CHECK(ccc_pq_decrease(&pq, &i->elem, val_update, &dec) != NULL,
                   true);
@@ -276,13 +276,13 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_decrease_with)
     {
         int inc = (limit * 2) + 1;
         int dec = (vals[val].val / 2) - 1;
-        if (vals[val].val < limit)
+        if (vals[val].val < limit && inc > vals[val].val)
         {
             CHECK(ccc_pq_increase_w(&pq, &vals[val], { T->val = inc; }) != NULL,
                   true);
             CHECK(validate(&pq), true);
         }
-        else
+        else if (vals[val].val > limit && dec < vals[val].val)
         {
             CHECK(ccc_pq_decrease_w(&pq, &vals[val], { T->val = dec; }) != NULL,
                   true);
