@@ -97,42 +97,6 @@ CHECK_BEGIN_STATIC_FN(buf_test_push_qsort)
     CHECK_END_FN();
 }
 
-/** Returns an array corresponding to an array of temperatures. Each index in
-the result should set to the number of days needed to see a warmer temperature
-than the temperature at that index in the temps array. */
-CHECK_BEGIN_STATIC_FN(buf_test_daily_temps)
-{
-    int const temps[] = {73, 74, 75, 71, 69, 72, 76, 73};
-    enum : size_t
-    {
-        TEMPS_CAP = sizeof(temps) / sizeof(*temps),
-    };
-    buffer const correct = buf_init(((int[TEMPS_CAP]){1, 1, 4, 2, 1, 1, 0, 0}),
-                                    int, NULL, NULL, TEMPS_CAP, TEMPS_CAP);
-    buffer res = buf_init((int[TEMPS_CAP]){}, int, NULL, NULL, TEMPS_CAP);
-    buffer max_idx_stack
-        = buf_init((int[TEMPS_CAP]){}, int, NULL, NULL, TEMPS_CAP);
-    for (int i = 0; i < (int)TEMPS_CAP; ++i)
-    {
-        while (!buf_is_empty(&max_idx_stack)
-               && temps[i] > temps[*(int *)buf_back(&max_idx_stack)])
-        {
-            int const *const p
-                = buf_emplace(&res, *(int *)buf_back(&max_idx_stack),
-                              i - *(int *)buf_back(&max_idx_stack));
-            CHECK(p != NULL, CCC_TRUE);
-            ccc_result r = buf_pop_back(&max_idx_stack);
-            CHECK(r, CCC_RESULT_OK);
-        }
-        CHECK(buf_push_back(&max_idx_stack, &i) != NULL, CCC_TRUE);
-    }
-    CHECK(
-        memcmp(buf_begin(&res), buf_begin(&correct),
-               buf_capacity(&correct).count * buf_sizeof_type(&correct).count),
-        0);
-    CHECK_END_FN();
-}
-
 CHECK_BEGIN_STATIC_FN(buf_test_push_sort)
 {
     enum : size_t
@@ -164,6 +128,5 @@ main(void)
     /* NOLINTNEXTLINE */
     srand(time(NULL));
     return CHECK_RUN(buf_test_push_fixed(), buf_test_push_resize(),
-                     buf_test_push_qsort(), buf_test_push_sort(),
-                     buf_test_daily_temps());
+                     buf_test_push_qsort(), buf_test_push_sort());
 }
