@@ -307,7 +307,7 @@ size of the buffer. */
 /** @brief Access en element at the specified index as the stored type.
 @param [in] buf_ptr the pointer to the buffer.
 @param [in] type_name the name of the stored type.
-@param [in] i the index within capacity range of the buffer.
+@param [in] index the index within capacity range of the buffer.
 @return a pointer to the element in the slot at position i or NULL if i is out
 of capacity range.
 
