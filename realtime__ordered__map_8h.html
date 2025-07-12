@@ -278,9 +278,9 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader">State Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Obtain the container state. </p>
 </td></tr>
-<tr class="memitem:a00667ff16ca30c2f0cd8c227fe1d7add"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="realtime__ordered__map_8h.html#a00667ff16ca30c2f0cd8c227fe1d7add">ccc_rom_size</a> (<a class="el" href="realtime__ordered__map_8h.html#a099245e103e5457b5da3606e87b6ecb5">ccc_realtime_ordered_map</a> const *rom)</td></tr>
-<tr class="memdesc:a00667ff16ca30c2f0cd8c227fe1d7add"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size of the map.  <br /></td></tr>
-<tr class="separator:a00667ff16ca30c2f0cd8c227fe1d7add"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a81747db6e278f1c99b88142b58652c41"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="realtime__ordered__map_8h.html#a81747db6e278f1c99b88142b58652c41">ccc_rom_count</a> (<a class="el" href="realtime__ordered__map_8h.html#a099245e103e5457b5da3606e87b6ecb5">ccc_realtime_ordered_map</a> const *rom)</td></tr>
+<tr class="memdesc:a81747db6e278f1c99b88142b58652c41"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the count of map occupied nodes.  <br /></td></tr>
+<tr class="separator:a81747db6e278f1c99b88142b58652c41"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a76ecd3f9123633f58c0cc7d00226b710"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="realtime__ordered__map_8h.html#a76ecd3f9123633f58c0cc7d00226b710">ccc_rom_is_empty</a> (<a class="el" href="realtime__ordered__map_8h.html#a099245e103e5457b5da3606e87b6ecb5">ccc_realtime_ordered_map</a> const *rom)</td></tr>
 <tr class="memdesc:a76ecd3f9123633f58c0cc7d00226b710"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size status of the map.  <br /></td></tr>
 <tr class="separator:a76ecd3f9123633f58c0cc7d00226b710"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1154,6 +1154,33 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
+<a id="a81747db6e278f1c99b88142b58652c41" name="a81747db6e278f1c99b88142b58652c41"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a81747db6e278f1c99b88142b58652c41">&#9670;&#160;</a></span>ccc_rom_count()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_rom_count </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="realtime__ordered__map_8h.html#a099245e103e5457b5da3606e87b6ecb5">ccc_realtime_ordered_map</a> const *&#160;</td>
+          <td class="paramname"><em>rom</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Returns the count of map occupied nodes. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">rom</td><td>the map. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the size or an argument is set if rom is NULL. </dd></dl>
+
+</div>
+</div>
 <a id="a9bfbf21f54f6fcc5324bac794ffd33cf" name="a9bfbf21f54f6fcc5324bac794ffd33cf"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a9bfbf21f54f6fcc5324bac794ffd33cf">&#9670;&#160;</a></span>ccc_rom_end()</h2>
 
@@ -1778,33 +1805,6 @@ This graph shows which files directly or indirectly include this file:</div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the rnext user type stored in the map in a reverse inorder traversal. </dd></dl>
-
-</div>
-</div>
-<a id="a00667ff16ca30c2f0cd8c227fe1d7add" name="a00667ff16ca30c2f0cd8c227fe1d7add"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a00667ff16ca30c2f0cd8c227fe1d7add">&#9670;&#160;</a></span>ccc_rom_size()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_rom_size </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="realtime__ordered__map_8h.html#a099245e103e5457b5da3606e87b6ecb5">ccc_realtime_ordered_map</a> const *&#160;</td>
-          <td class="paramname"><em>rom</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Returns the size of the map. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">rom</td><td>the map. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>the size or an argument is set if rom is NULL. </dd></dl>
 
 </div>
 </div>

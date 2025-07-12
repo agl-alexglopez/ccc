@@ -249,9 +249,9 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memitem:a5bcc2bddcba3de980eff5c3142ba3687"><td class="memItemLeft" align="right" valign="top">ccc_dll_elem *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="doubly__linked__list_8h.html#a5bcc2bddcba3de980eff5c3142ba3687">ccc_dll_end_sentinel</a> (<a class="el" href="doubly__linked__list_8h.html#a242216a4880ae2513dbbcfd181a71ad7">ccc_doubly_linked_list</a> const *l)</td></tr>
 <tr class="memdesc:a5bcc2bddcba3de980eff5c3142ba3687"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a pointer to the sentinel node at the back of the list.  <br /></td></tr>
 <tr class="separator:a5bcc2bddcba3de980eff5c3142ba3687"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5b577a366604b3fec516672cbc8dc370"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="doubly__linked__list_8h.html#a5b577a366604b3fec516672cbc8dc370">ccc_dll_size</a> (<a class="el" href="doubly__linked__list_8h.html#a242216a4880ae2513dbbcfd181a71ad7">ccc_doubly_linked_list</a> const *l)</td></tr>
-<tr class="memdesc:a5b577a366604b3fec516672cbc8dc370"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the size of the list. O(1).  <br /></td></tr>
-<tr class="separator:a5b577a366604b3fec516672cbc8dc370"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7fc82eca16ee8053e6418e0094b1dde3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="doubly__linked__list_8h.html#a7fc82eca16ee8053e6418e0094b1dde3">ccc_dll_count</a> (<a class="el" href="doubly__linked__list_8h.html#a242216a4880ae2513dbbcfd181a71ad7">ccc_doubly_linked_list</a> const *l)</td></tr>
+<tr class="memdesc:a7fc82eca16ee8053e6418e0094b1dde3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the count of elements in the list. O(1).  <br /></td></tr>
+<tr class="separator:a7fc82eca16ee8053e6418e0094b1dde3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a26fadbf1179184c38de32f7f34388784"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="doubly__linked__list_8h.html#a26fadbf1179184c38de32f7f34388784">ccc_dll_is_empty</a> (<a class="el" href="doubly__linked__list_8h.html#a242216a4880ae2513dbbcfd181a71ad7">ccc_doubly_linked_list</a> const *l)</td></tr>
 <tr class="memdesc:a26fadbf1179184c38de32f7f34388784"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return if the size of the list is equal to 0. O(1).  <br /></td></tr>
 <tr class="separator:a26fadbf1179184c38de32f7f34388784"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -561,6 +561,33 @@ This graph shows which files directly or indirectly include this file:</div>
 <dl class="section return"><dt>Returns</dt><dd>ok if the clearing was a success or an input error if l or fn is NULL.</dd></dl>
 <p>Note that if the list is initialized with allocation permission it will free elements for the user and the destructor function should only perform auxiliary cleanup, otherwise a double free will occur.</p>
 <p>If the list has not been given allocation permission the user should free the list elements with the destructor if they wish to do so. The implementation ensures the function is called after the element is removed. Otherwise, the user must manage their elements at their discretion after the list is emptied in this function. </p>
+
+</div>
+</div>
+<a id="a7fc82eca16ee8053e6418e0094b1dde3" name="a7fc82eca16ee8053e6418e0094b1dde3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7fc82eca16ee8053e6418e0094b1dde3">&#9670;&#160;</a></span>ccc_dll_count()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_dll_count </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="doubly__linked__list_8h.html#a242216a4880ae2513dbbcfd181a71ad7">ccc_doubly_linked_list</a> const *&#160;</td>
+          <td class="paramname"><em>l</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Return the count of elements in the list. O(1). </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">l</td><td>a pointer to the doubly linked list. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the size of the list. An argument error is set if l is NULL. </dd></dl>
 
 </div>
 </div>
@@ -1238,33 +1265,6 @@ This graph shows which files directly or indirectly include this file:</div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>a pointer to the element following elem from back to front or NULL if no elements follow or bad input is provided. </dd></dl>
-
-</div>
-</div>
-<a id="a5b577a366604b3fec516672cbc8dc370" name="a5b577a366604b3fec516672cbc8dc370"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5b577a366604b3fec516672cbc8dc370">&#9670;&#160;</a></span>ccc_dll_size()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_dll_size </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="doubly__linked__list_8h.html#a242216a4880ae2513dbbcfd181a71ad7">ccc_doubly_linked_list</a> const *&#160;</td>
-          <td class="paramname"><em>l</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Return the size of the list. O(1). </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">l</td><td>a pointer to the doubly linked list. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>the size of the list. An argument error is set if l is NULL. </dd></dl>
 
 </div>
 </div>

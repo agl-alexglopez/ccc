@@ -199,9 +199,9 @@ N) increase/decrease key.  <br /></td></tr>
 <tr class="memitem:a901fa6f9f04367739484a733f888093b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#a901fa6f9f04367739484a733f888093b">ccc_pq_is_empty</a> (<a class="el" href="priority__queue_8h.html#a53a826a19b684827cc3cda7a5517406b">ccc_priority_queue</a> const *pq)</td></tr>
 <tr class="memdesc:a901fa6f9f04367739484a733f888093b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if the priority queue is empty false if not. O(1).  <br /></td></tr>
 <tr class="separator:a901fa6f9f04367739484a733f888093b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a62aaade66dff6a9328767e1c5ceaef5a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#a62aaade66dff6a9328767e1c5ceaef5a">ccc_pq_size</a> (<a class="el" href="priority__queue_8h.html#a53a826a19b684827cc3cda7a5517406b">ccc_priority_queue</a> const *pq)</td></tr>
-<tr class="memdesc:a62aaade66dff6a9328767e1c5ceaef5a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size of the priority queue.  <br /></td></tr>
-<tr class="separator:a62aaade66dff6a9328767e1c5ceaef5a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad4b5466c7be94b7cdcdd5bfb76356146"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#ad4b5466c7be94b7cdcdd5bfb76356146">ccc_pq_count</a> (<a class="el" href="priority__queue_8h.html#a53a826a19b684827cc3cda7a5517406b">ccc_priority_queue</a> const *pq)</td></tr>
+<tr class="memdesc:ad4b5466c7be94b7cdcdd5bfb76356146"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the count of priority queue occupied nodes.  <br /></td></tr>
+<tr class="separator:ad4b5466c7be94b7cdcdd5bfb76356146"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a832c4c57933999f1dd86887c337fd4a5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#a832c4c57933999f1dd86887c337fd4a5">ccc_pq_validate</a> (<a class="el" href="priority__queue_8h.html#a53a826a19b684827cc3cda7a5517406b">ccc_priority_queue</a> const *pq)</td></tr>
 <tr class="memdesc:a832c4c57933999f1dd86887c337fd4a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Verifies the internal invariants of the pq hold.  <br /></td></tr>
 <tr class="separator:a832c4c57933999f1dd86887c337fd4a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -562,6 +562,33 @@ N) increase/decrease key. </p>
 
 </div>
 </div>
+<a id="ad4b5466c7be94b7cdcdd5bfb76356146" name="ad4b5466c7be94b7cdcdd5bfb76356146"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad4b5466c7be94b7cdcdd5bfb76356146">&#9670;&#160;</a></span>ccc_pq_count()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_pq_count </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="priority__queue_8h.html#a53a826a19b684827cc3cda7a5517406b">ccc_priority_queue</a> const *&#160;</td>
+          <td class="paramname"><em>pq</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Returns the count of priority queue occupied nodes. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">pq</td><td>a pointer to the priority queue. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the size of the pq or an argument error is set if pq is NULL. </dd></dl>
+
+</div>
+</div>
 <a id="a17434c0141c85e588fd3758dfef32576" name="a17434c0141c85e588fd3758dfef32576"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a17434c0141c85e588fd3758dfef32576">&#9670;&#160;</a></span>ccc_pq_decrease()</h2>
 
@@ -892,33 +919,6 @@ N) increase/decrease key. </p>
 <dl class="section return"><dt>Returns</dt><dd>a reference to the newly inserted user type or NULL if NULL arguments are provided or allocation fails when permitted.</dd></dl>
 <p>Note that if allocation is permitted the user type is copied into a newly allocated node.</p>
 <p>If allocation is not permitted this function assumes the memory wrapping elem has been allocated with the appropriate lifetime for the user's needs. </p>
-
-</div>
-</div>
-<a id="a62aaade66dff6a9328767e1c5ceaef5a" name="a62aaade66dff6a9328767e1c5ceaef5a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a62aaade66dff6a9328767e1c5ceaef5a">&#9670;&#160;</a></span>ccc_pq_size()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_pq_size </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="priority__queue_8h.html#a53a826a19b684827cc3cda7a5517406b">ccc_priority_queue</a> const *&#160;</td>
-          <td class="paramname"><em>pq</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Returns the size of the priority queue. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">pq</td><td>a pointer to the priority queue. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>the size of the pq or an argument error is set if pq is NULL. </dd></dl>
 
 </div>
 </div>

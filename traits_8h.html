@@ -345,9 +345,9 @@ Include dependency graph for traits.h:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader">State Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Obtain the container state. </p>
 </td></tr>
-<tr class="memitem:a8ea3c5bf94e993a25b0e7a81ed27e6f2"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="traits_8h.html#a8ea3c5bf94e993a25b0e7a81ed27e6f2">ccc_size</a>(container_ptr)&#160;&#160;&#160;ccc_impl_size(container_ptr)</td></tr>
-<tr class="memdesc:a8ea3c5bf94e993a25b0e7a81ed27e6f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the size of the container.  <br /></td></tr>
-<tr class="separator:a8ea3c5bf94e993a25b0e7a81ed27e6f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a131aef550b03abf4e8f46a9e4b77a3a6"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="traits_8h.html#a131aef550b03abf4e8f46a9e4b77a3a6">ccc_count</a>(container_ptr)&#160;&#160;&#160;ccc_impl_count(container_ptr)</td></tr>
+<tr class="memdesc:a131aef550b03abf4e8f46a9e4b77a3a6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the count of elements in the container.  <br /></td></tr>
+<tr class="separator:a131aef550b03abf4e8f46a9e4b77a3a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aae688bdaa0dcc56b89e62081bcca734b"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="traits_8h.html#aae688bdaa0dcc56b89e62081bcca734b">ccc_capacity</a>(container_ptr)&#160;&#160;&#160;ccc_impl_capacity(container_ptr)</td></tr>
 <tr class="memdesc:aae688bdaa0dcc56b89e62081bcca734b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the capacity of the container.  <br /></td></tr>
 <tr class="separator:aae688bdaa0dcc56b89e62081bcca734b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -726,6 +726,34 @@ Include dependency graph for traits.h:</div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the result of the operation.</dd></dl>
+<p>See container documentation for specific behavior. </p>
+
+</div>
+</div>
+<a id="a131aef550b03abf4e8f46a9e4b77a3a6" name="a131aef550b03abf4e8f46a9e4b77a3a6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a131aef550b03abf4e8f46a9e4b77a3a6">&#9670;&#160;</a></span>ccc_count</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define ccc_count</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">container_ptr</td><td>)</td>
+          <td>&#160;&#160;&#160;ccc_impl_count(container_ptr)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Return the count of elements in the container. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">container_ptr</td><td>a pointer to the container. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the size or an argument error is set if container_ptr is NULL.</dd></dl>
 <p>See container documentation for specific behavior. </p>
 
 </div>
@@ -2173,34 +2201,6 @@ Include dependency graph for traits.h:</div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>a reference to the user type stored rnext.</dd></dl>
-<p>See container documentation for specific behavior. </p>
-
-</div>
-</div>
-<a id="a8ea3c5bf94e993a25b0e7a81ed27e6f2" name="a8ea3c5bf94e993a25b0e7a81ed27e6f2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8ea3c5bf94e993a25b0e7a81ed27e6f2">&#9670;&#160;</a></span>ccc_size</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define ccc_size</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">container_ptr</td><td>)</td>
-          <td>&#160;&#160;&#160;ccc_impl_size(container_ptr)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Return the size of the container. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">container_ptr</td><td>a pointer to the container. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>the size or an argument error is set if container_ptr is NULL.</dd></dl>
 <p>See container documentation for specific behavior. </p>
 
 </div>

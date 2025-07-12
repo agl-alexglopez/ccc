@@ -218,9 +218,9 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memitem:a0c76f3d7e3ed207ff526c07b759ce4c5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a0c76f3d7e3ed207ff526c07b759ce4c5">ccc_fpq_is_empty</a> (<a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> const *fpq)</td></tr>
 <tr class="memdesc:a0c76f3d7e3ed207ff526c07b759ce4c5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if the fpq is empty false if not. O(1).  <br /></td></tr>
 <tr class="separator:a0c76f3d7e3ed207ff526c07b759ce4c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a51abc8e082ea3ba3c2bf198525ee4151"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a51abc8e082ea3ba3c2bf198525ee4151">ccc_fpq_size</a> (<a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> const *fpq)</td></tr>
-<tr class="memdesc:a51abc8e082ea3ba3c2bf198525ee4151"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size of the fpq representing active slots.  <br /></td></tr>
-<tr class="separator:a51abc8e082ea3ba3c2bf198525ee4151"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af0c1ca80feb4ade1bdf383e7cb21f735"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#af0c1ca80feb4ade1bdf383e7cb21f735">ccc_fpq_count</a> (<a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> const *fpq)</td></tr>
+<tr class="memdesc:af0c1ca80feb4ade1bdf383e7cb21f735"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the count of the fpq active slots.  <br /></td></tr>
+<tr class="separator:af0c1ca80feb4ade1bdf383e7cb21f735"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af1180cd15477e5b1f0a2ebc3b5bc015a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#af1180cd15477e5b1f0a2ebc3b5bc015a">ccc_fpq_capacity</a> (<a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> const *fpq)</td></tr>
 <tr class="memdesc:af1180cd15477e5b1f0a2ebc3b5bc015a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the capacity of the fpq representing total possible slots.  <br /></td></tr>
 <tr class="separator:af1180cd15477e5b1f0a2ebc3b5bc015a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -878,6 +878,33 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
+<a id="af0c1ca80feb4ade1bdf383e7cb21f735" name="af0c1ca80feb4ade1bdf383e7cb21f735"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af0c1ca80feb4ade1bdf383e7cb21f735">&#9670;&#160;</a></span>ccc_fpq_count()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_fpq_count </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> const *&#160;</td>
+          <td class="paramname"><em>fpq</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Returns the count of the fpq active slots. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">fpq</td><td>a pointer to the flat priority queue. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the size of the fpq or an argument error is set if fpq is NULL. </dd></dl>
+
+</div>
+</div>
 <a id="a005d37789d5cc821356252292cba646b" name="a005d37789d5cc821356252292cba646b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a005d37789d5cc821356252292cba646b">&#9670;&#160;</a></span>ccc_fpq_data()</h2>
 
@@ -1336,33 +1363,6 @@ This graph shows which files directly or indirectly include this file:</div>
 <dl class="section note"><dt>Note</dt><dd>see the ccc_fpq_clear_and_free_reserve function if this function is being used for a one-time dynamic reservation.</dd></dl>
 <p>This function can be used for a dynamic fpq with or without allocation permission. If the fpq has allocation permission, it will reserve the required space and later resize if more space is needed.</p>
 <p>If the fpq has been initialized with no allocation permission and no memory this function can serve as a one-time reservation. This is helpful when a fixed size is needed but that size is only known dynamically at runtime. To free the fpq in such a case see the ccc_fpq_clear_and_free_reserve function. </p>
-
-</div>
-</div>
-<a id="a51abc8e082ea3ba3c2bf198525ee4151" name="a51abc8e082ea3ba3c2bf198525ee4151"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a51abc8e082ea3ba3c2bf198525ee4151">&#9670;&#160;</a></span>ccc_fpq_size()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_fpq_size </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> const *&#160;</td>
-          <td class="paramname"><em>fpq</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Returns the size of the fpq representing active slots. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">fpq</td><td>a pointer to the flat priority queue. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>the size of the fpq or an argument error is set if fpq is NULL. </dd></dl>
 
 </div>
 </div>

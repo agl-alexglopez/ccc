@@ -281,9 +281,9 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memitem:ae5b85bb751a40e00f7277d6303c0a42b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__map_8h.html#ae5b85bb751a40e00f7277d6303c0a42b">ccc_om_is_empty</a> (<a class="el" href="ordered__map_8h.html#a1517154aa54bb6d3a74cb88c75376b49">ccc_ordered_map</a> const *om)</td></tr>
 <tr class="memdesc:ae5b85bb751a40e00f7277d6303c0a42b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size status of the map.  <br /></td></tr>
 <tr class="separator:ae5b85bb751a40e00f7277d6303c0a42b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a35750d263680c0e4a6c18bcd18e921fb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__map_8h.html#a35750d263680c0e4a6c18bcd18e921fb">ccc_om_size</a> (<a class="el" href="ordered__map_8h.html#a1517154aa54bb6d3a74cb88c75376b49">ccc_ordered_map</a> const *om)</td></tr>
-<tr class="memdesc:a35750d263680c0e4a6c18bcd18e921fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size of the map.  <br /></td></tr>
-<tr class="separator:a35750d263680c0e4a6c18bcd18e921fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a87b8d7c0ebdda72688afd7136b186df4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__map_8h.html#a87b8d7c0ebdda72688afd7136b186df4">ccc_om_count</a> (<a class="el" href="ordered__map_8h.html#a1517154aa54bb6d3a74cb88c75376b49">ccc_ordered_map</a> const *om)</td></tr>
+<tr class="memdesc:a87b8d7c0ebdda72688afd7136b186df4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the count of occupied map nodes.  <br /></td></tr>
+<tr class="separator:a87b8d7c0ebdda72688afd7136b186df4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a023a210902012edae578022f65704f00"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ordered__map_8h.html#a023a210902012edae578022f65704f00">ccc_om_validate</a> (<a class="el" href="ordered__map_8h.html#a1517154aa54bb6d3a74cb88c75376b49">ccc_ordered_map</a> const *om)</td></tr>
 <tr class="memdesc:a023a210902012edae578022f65704f00"><td class="mdescLeft">&#160;</td><td class="mdescRight">Validation of invariants for the map.  <br /></td></tr>
 <tr class="separator:a023a210902012edae578022f65704f00"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1144,6 +1144,33 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
+<a id="a87b8d7c0ebdda72688afd7136b186df4" name="a87b8d7c0ebdda72688afd7136b186df4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a87b8d7c0ebdda72688afd7136b186df4">&#9670;&#160;</a></span>ccc_om_count()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_om_count </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="ordered__map_8h.html#a1517154aa54bb6d3a74cb88c75376b49">ccc_ordered_map</a> const *&#160;</td>
+          <td class="paramname"><em>om</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Returns the count of occupied map nodes. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">om</td><td>the map. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the size or an argument error is set if om is NULL. </dd></dl>
+
+</div>
+</div>
 <a id="af806ac45be451e0f1022b7efe2e1ad67" name="af806ac45be451e0f1022b7efe2e1ad67"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#af806ac45be451e0f1022b7efe2e1ad67">&#9670;&#160;</a></span>ccc_om_end()</h2>
 
@@ -1774,33 +1801,6 @@ This graph shows which files directly or indirectly include this file:</div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the rnext user type stored in the map in a reverse inorder traversal. </dd></dl>
-
-</div>
-</div>
-<a id="a35750d263680c0e4a6c18bcd18e921fb" name="a35750d263680c0e4a6c18bcd18e921fb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a35750d263680c0e4a6c18bcd18e921fb">&#9670;&#160;</a></span>ccc_om_size()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_om_size </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="ordered__map_8h.html#a1517154aa54bb6d3a74cb88c75376b49">ccc_ordered_map</a> const *&#160;</td>
-          <td class="paramname"><em>om</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Returns the size of the map. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">om</td><td>the map. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>the size or an argument error is set if om is NULL. </dd></dl>
 
 </div>
 </div>

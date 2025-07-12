@@ -229,9 +229,9 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memitem:a891865ef2a715297974c2def5671d5bb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a891865ef2a715297974c2def5671d5bb">ccc_fdeq_is_empty</a> (<a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> const *fdeq)</td></tr>
 <tr class="memdesc:a891865ef2a715297974c2def5671d5bb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return true if the size of the fdeq is 0. O(1).  <br /></td></tr>
 <tr class="separator:a891865ef2a715297974c2def5671d5bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5204b7da6c5f33c0fb68d00db4516600"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a5204b7da6c5f33c0fb68d00db4516600">ccc_fdeq_size</a> (<a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> const *fdeq)</td></tr>
-<tr class="memdesc:a5204b7da6c5f33c0fb68d00db4516600"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the size of the fdeq representing active slots. O(1).  <br /></td></tr>
-<tr class="separator:a5204b7da6c5f33c0fb68d00db4516600"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af90f60ae10191ef5557994ec75d8a45a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#af90f60ae10191ef5557994ec75d8a45a">ccc_fdeq_count</a> (<a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> const *fdeq)</td></tr>
+<tr class="memdesc:af90f60ae10191ef5557994ec75d8a45a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the count of active fdeq slots. O(1).  <br /></td></tr>
+<tr class="separator:af90f60ae10191ef5557994ec75d8a45a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adadb60693f86fd0157f1b7795a948cbb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#adadb60693f86fd0157f1b7795a948cbb">ccc_fdeq_capacity</a> (<a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> const *fdeq)</td></tr>
 <tr class="memdesc:adadb60693f86fd0157f1b7795a948cbb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the capacity representing total possible slots. O(1).  <br /></td></tr>
 <tr class="separator:adadb60693f86fd0157f1b7795a948cbb"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -719,6 +719,33 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="line"><a class="code hl_enumeration" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> res = fdeq_copy(&amp;dst, &amp;src, std_alloc);</div>
 </div><!-- fragment --><p>The above sets up dst as a ring buffer while src is a dynamic fdeq. Because an allocation function is provided, the dst is resized once for the copy and retains its fixed size after the copy is complete. This would require the user to manually free the underlying buffer at dst eventually if this method is used. Usually it is better to allocate the memory explicitly before the copy if copying between ring buffers.</p>
 <p>These options allow users to stay consistent across containers with their memory management strategies. </p>
+
+</div>
+</div>
+<a id="af90f60ae10191ef5557994ec75d8a45a" name="af90f60ae10191ef5557994ec75d8a45a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af90f60ae10191ef5557994ec75d8a45a">&#9670;&#160;</a></span>ccc_fdeq_count()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_fdeq_count </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> const *&#160;</td>
+          <td class="paramname"><em>fdeq</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Return the count of active fdeq slots. O(1). </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">fdeq</td><td>a pointer to the fdeq. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the size of the fdeq or an argument error is set if fdeq is NULL. </dd></dl>
 
 </div>
 </div>
@@ -1294,33 +1321,6 @@ This graph shows which files directly or indirectly include this file:</div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the element preceding iter_ptr or NULL if no elements follow. </dd></dl>
-
-</div>
-</div>
-<a id="a5204b7da6c5f33c0fb68d00db4516600" name="a5204b7da6c5f33c0fb68d00db4516600"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5204b7da6c5f33c0fb68d00db4516600">&#9670;&#160;</a></span>ccc_fdeq_size()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_fdeq_size </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> const *&#160;</td>
-          <td class="paramname"><em>fdeq</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Return the size of the fdeq representing active slots. O(1). </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">fdeq</td><td>a pointer to the fdeq. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>the size of the fdeq or an argument error is set if fdeq is NULL. </dd></dl>
 
 </div>
 </div>

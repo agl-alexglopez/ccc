@@ -305,9 +305,9 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memitem:ad6365a31caaf7f191ea454faaa02e3b6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="handle__realtime__ordered__map_8h.html#ad6365a31caaf7f191ea454faaa02e3b6">ccc_hrm_is_empty</a> (<a class="el" href="handle__realtime__ordered__map_8h.html#a43f96a9739fe845509c6b76a55287734">ccc_handle_realtime_ordered_map</a> const *hrm)</td></tr>
 <tr class="memdesc:ad6365a31caaf7f191ea454faaa02e3b6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size status of the map.  <br /></td></tr>
 <tr class="separator:ad6365a31caaf7f191ea454faaa02e3b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a94d257a79149ca2a1157f15d2dde93fd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="handle__realtime__ordered__map_8h.html#a94d257a79149ca2a1157f15d2dde93fd">ccc_hrm_size</a> (<a class="el" href="handle__realtime__ordered__map_8h.html#a43f96a9739fe845509c6b76a55287734">ccc_handle_realtime_ordered_map</a> const *hrm)</td></tr>
-<tr class="memdesc:a94d257a79149ca2a1157f15d2dde93fd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size of the map representing active slots.  <br /></td></tr>
-<tr class="separator:a94d257a79149ca2a1157f15d2dde93fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8d4f1b3576bc9666d775879ebe96b1f9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="handle__realtime__ordered__map_8h.html#a8d4f1b3576bc9666d775879ebe96b1f9">ccc_hrm_count</a> (<a class="el" href="handle__realtime__ordered__map_8h.html#a43f96a9739fe845509c6b76a55287734">ccc_handle_realtime_ordered_map</a> const *hrm)</td></tr>
+<tr class="memdesc:a8d4f1b3576bc9666d775879ebe96b1f9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the count of map occupied slots.  <br /></td></tr>
+<tr class="separator:a8d4f1b3576bc9666d775879ebe96b1f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0a96ad2d38b1d152a7b609dfd7babb5a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="handle__realtime__ordered__map_8h.html#a0a96ad2d38b1d152a7b609dfd7babb5a">ccc_hrm_capacity</a> (<a class="el" href="handle__realtime__ordered__map_8h.html#a43f96a9739fe845509c6b76a55287734">ccc_handle_realtime_ordered_map</a> const *hrm)</td></tr>
 <tr class="memdesc:a0a96ad2d38b1d152a7b609dfd7babb5a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the capacity of the map representing total available slots.  <br /></td></tr>
 <tr class="separator:a0a96ad2d38b1d152a7b609dfd7babb5a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1581,6 +1581,33 @@ do not try to access data in the table manually with a handle. Always use this p
 
 </div>
 </div>
+<a id="a8d4f1b3576bc9666d775879ebe96b1f9" name="a8d4f1b3576bc9666d775879ebe96b1f9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8d4f1b3576bc9666d775879ebe96b1f9">&#9670;&#160;</a></span>ccc_hrm_count()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_hrm_count </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="handle__realtime__ordered__map_8h.html#a43f96a9739fe845509c6b76a55287734">ccc_handle_realtime_ordered_map</a> const *&#160;</td>
+          <td class="paramname"><em>hrm</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Returns the count of map occupied slots. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">hrm</td><td>the map. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the size of the map or an argument error is set if hrm is NULL. </dd></dl>
+
+</div>
+</div>
 <a id="a5e11665ec2dd7ba93aaa4c6bc8ea1dc6" name="a5e11665ec2dd7ba93aaa4c6bc8ea1dc6"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a5e11665ec2dd7ba93aaa4c6bc8ea1dc6">&#9670;&#160;</a></span>ccc_hrm_data()</h2>
 
@@ -2287,33 +2314,6 @@ do not try to access data in the table manually with a handle. Always use this p
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the rnext user type stored in the map in a reverse inorder traversal. </dd></dl>
-
-</div>
-</div>
-<a id="a94d257a79149ca2a1157f15d2dde93fd" name="a94d257a79149ca2a1157f15d2dde93fd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a94d257a79149ca2a1157f15d2dde93fd">&#9670;&#160;</a></span>ccc_hrm_size()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_hrm_size </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="handle__realtime__ordered__map_8h.html#a43f96a9739fe845509c6b76a55287734">ccc_handle_realtime_ordered_map</a> const *&#160;</td>
-          <td class="paramname"><em>hrm</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Returns the size of the map representing active slots. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">hrm</td><td>the map. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>the size of the map or an argument error is set if hrm is NULL. </dd></dl>
 
 </div>
 </div>

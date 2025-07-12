@@ -8,6 +8,7 @@ var priority__queue_8h =
     [ "ccc_pq_elem", "priority__queue_8h.html#adc48dcaac2fca30a260e319fe12c259c", null ],
     [ "ccc_priority_queue", "priority__queue_8h.html#a53a826a19b684827cc3cda7a5517406b", null ],
     [ "ccc_pq_clear", "priority__queue_8h.html#a5769ba899672364e962e6ea290728307", null ],
+    [ "ccc_pq_count", "priority__queue_8h.html#ad4b5466c7be94b7cdcdd5bfb76356146", null ],
     [ "ccc_pq_decrease", "priority__queue_8h.html#a17434c0141c85e588fd3758dfef32576", null ],
     [ "ccc_pq_erase", "priority__queue_8h.html#a58950b81644cdc83ff6e6dc2df186630", null ],
     [ "ccc_pq_extract", "priority__queue_8h.html#a29cc715f304411cd2ee83568bcdc0c22", null ],
@@ -17,7 +18,6 @@ var priority__queue_8h =
     [ "ccc_pq_order", "priority__queue_8h.html#ac93c8b051f2c6d02f706b7d71ce9bed5", null ],
     [ "ccc_pq_pop", "priority__queue_8h.html#aed66e1a4ed0e9ed2de60147cda9394d8", null ],
     [ "ccc_pq_push", "priority__queue_8h.html#a17fc73bd17733632f5712e3220f3216a", null ],
-    [ "ccc_pq_size", "priority__queue_8h.html#a62aaade66dff6a9328767e1c5ceaef5a", null ],
     [ "ccc_pq_update", "priority__queue_8h.html#a00be9b8276bedd5baa735f5caf350837", null ],
     [ "ccc_pq_validate", "priority__queue_8h.html#a832c4c57933999f1dd86887c337fd4a5", null ]
 ];

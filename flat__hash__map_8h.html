@@ -284,9 +284,9 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memitem:a42427fab615a1366b09a518931c73434"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a42427fab615a1366b09a518931c73434">ccc_fhm_is_empty</a> (<a class="el" href="flat__hash__map_8h.html#a16a7808cff5a3e445e18a830e3ef3e40">ccc_flat_hash_map</a> const *h)</td></tr>
 <tr class="memdesc:a42427fab615a1366b09a518931c73434"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size status of the table.  <br /></td></tr>
 <tr class="separator:a42427fab615a1366b09a518931c73434"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7e48bf928c47a2a974d5ca7e98e51aad"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a7e48bf928c47a2a974d5ca7e98e51aad">ccc_fhm_size</a> (<a class="el" href="flat__hash__map_8h.html#a16a7808cff5a3e445e18a830e3ef3e40">ccc_flat_hash_map</a> const *h)</td></tr>
-<tr class="memdesc:a7e48bf928c47a2a974d5ca7e98e51aad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size of the table representing active slots.  <br /></td></tr>
-<tr class="separator:a7e48bf928c47a2a974d5ca7e98e51aad"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4086cb359baa879734847e2989642a73"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a4086cb359baa879734847e2989642a73">ccc_fhm_count</a> (<a class="el" href="flat__hash__map_8h.html#a16a7808cff5a3e445e18a830e3ef3e40">ccc_flat_hash_map</a> const *h)</td></tr>
+<tr class="memdesc:a4086cb359baa879734847e2989642a73"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the count of table occupied slots.  <br /></td></tr>
+<tr class="separator:a4086cb359baa879734847e2989642a73"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac09ee8b33c9f3e2d98d010185557e070"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#ac09ee8b33c9f3e2d98d010185557e070">ccc_fhm_capacity</a> (<a class="el" href="flat__hash__map_8h.html#a16a7808cff5a3e445e18a830e3ef3e40">ccc_flat_hash_map</a> const *h)</td></tr>
 <tr class="memdesc:ac09ee8b33c9f3e2d98d010185557e070"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the full capacity of the backing storage.  <br /></td></tr>
 <tr class="separator:ac09ee8b33c9f3e2d98d010185557e070"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1496,6 +1496,33 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
+<a id="a4086cb359baa879734847e2989642a73" name="a4086cb359baa879734847e2989642a73"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4086cb359baa879734847e2989642a73">&#9670;&#160;</a></span>ccc_fhm_count()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_fhm_count </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="flat__hash__map_8h.html#a16a7808cff5a3e445e18a830e3ef3e40">ccc_flat_hash_map</a> const *&#160;</td>
+          <td class="paramname"><em>h</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Returns the count of table occupied slots. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">h</td><td>the hash table. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the size of the map or an argument error is set if h is NULL. </dd></dl>
+
+</div>
+</div>
 <a id="afa2b797b90c223882d91781d56f3351e" name="afa2b797b90c223882d91781d56f3351e"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#afa2b797b90c223882d91781d56f3351e">&#9670;&#160;</a></span>ccc_fhm_data()</h2>
 
@@ -2008,33 +2035,6 @@ This graph shows which files directly or indirectly include this file:</div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the result of the reserving operation, OK if successful or an error code to indicate the specific failure.</dd></dl>
 <p>If the map has already been initialized with allocation permission simply provide the same function that was passed upon initialization. </p>
-
-</div>
-</div>
-<a id="a7e48bf928c47a2a974d5ca7e98e51aad" name="a7e48bf928c47a2a974d5ca7e98e51aad"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7e48bf928c47a2a974d5ca7e98e51aad">&#9670;&#160;</a></span>ccc_fhm_size()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_fhm_size </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="flat__hash__map_8h.html#a16a7808cff5a3e445e18a830e3ef3e40">ccc_flat_hash_map</a> const *&#160;</td>
-          <td class="paramname"><em>h</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Returns the size of the table representing active slots. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">h</td><td>the hash table. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>the size of the map or an argument error is set if h is NULL. </dd></dl>
 
 </div>
 </div>

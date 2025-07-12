@@ -11,12 +11,13 @@ var bitset_8h =
     [ "ccc_bs_any", "bitset_8h.html#a71449b35a6c312275536affc28b68d13", null ],
     [ "ccc_bs_any_range", "bitset_8h.html#a45bec2b3f42ebc989d9db52b11d50296", null ],
     [ "ccc_bs_blocks_capacity", "bitset_8h.html#adc0efc2ec22410e9cf24e2e23ef21e69", null ],
-    [ "ccc_bs_blocks_size", "bitset_8h.html#a08debe571c0179a6f436102c88c40a7f", null ],
+    [ "ccc_bs_blocks_count", "bitset_8h.html#a93f3e5fc476b9a53866e6778667833b1", null ],
     [ "ccc_bs_capacity", "bitset_8h.html#a03d6315f23faa4d7019f1faa5d0d7da3", null ],
     [ "ccc_bs_clear", "bitset_8h.html#a1475807011f61e6dea5cc74524b77a85", null ],
     [ "ccc_bs_clear_and_free", "bitset_8h.html#a86a6e73f368594a889954bc41aa55ba1", null ],
     [ "ccc_bs_clear_and_free_reserve", "bitset_8h.html#a2ddb48b6b6b694bac567a67cac8d2359", null ],
     [ "ccc_bs_copy", "bitset_8h.html#a9f42bf8a5dcb20b35ba23d80be0be324", null ],
+    [ "ccc_bs_count", "bitset_8h.html#acc86c9f5499f771415aff7fffdf1273d", null ],
     [ "ccc_bs_data", "bitset_8h.html#a4357b8c95413a63a01cac5794dcd7ea9", null ],
     [ "ccc_bs_empty", "bitset_8h.html#a65bbaf204dfdf055e6c99592bbe001a6", null ],
     [ "ccc_bs_eq", "bitset_8h.html#ae3c370560cfbcc8113f6362336971613", null ],
@@ -57,7 +58,6 @@ var bitset_8h =
     [ "ccc_bs_set_range", "bitset_8h.html#ac4d931194dc1e8f43098dab462865779", null ],
     [ "ccc_bs_shiftl", "bitset_8h.html#aebdf3b2f9a9a5d94d6b1594a239bf885", null ],
     [ "ccc_bs_shiftr", "bitset_8h.html#a0df76650520a8e15222337b4daa0af33", null ],
-    [ "ccc_bs_size", "bitset_8h.html#aa76271db4c6269eb4b7a6df26019bfef", null ],
     [ "ccc_bs_test", "bitset_8h.html#a80670173528bf5e7d869af97267588fb", null ],
     [ "ccc_bs_xor", "bitset_8h.html#abc7d69c14933420697660958ab6f58e8", null ]
 ];

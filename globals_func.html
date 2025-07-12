@@ -100,12 +100,13 @@ $(document).ready(function(){initNavTree('globals_func.html',''); initResizable(
 <li>ccc_bs_any()&#160;:&#160;<a class="el" href="bitset_8h.html#a71449b35a6c312275536affc28b68d13">bitset.h</a></li>
 <li>ccc_bs_any_range()&#160;:&#160;<a class="el" href="bitset_8h.html#a45bec2b3f42ebc989d9db52b11d50296">bitset.h</a></li>
 <li>ccc_bs_blocks_capacity()&#160;:&#160;<a class="el" href="bitset_8h.html#adc0efc2ec22410e9cf24e2e23ef21e69">bitset.h</a></li>
-<li>ccc_bs_blocks_size()&#160;:&#160;<a class="el" href="bitset_8h.html#a08debe571c0179a6f436102c88c40a7f">bitset.h</a></li>
+<li>ccc_bs_blocks_count()&#160;:&#160;<a class="el" href="bitset_8h.html#a93f3e5fc476b9a53866e6778667833b1">bitset.h</a></li>
 <li>ccc_bs_capacity()&#160;:&#160;<a class="el" href="bitset_8h.html#a03d6315f23faa4d7019f1faa5d0d7da3">bitset.h</a></li>
 <li>ccc_bs_clear()&#160;:&#160;<a class="el" href="bitset_8h.html#a1475807011f61e6dea5cc74524b77a85">bitset.h</a></li>
 <li>ccc_bs_clear_and_free()&#160;:&#160;<a class="el" href="bitset_8h.html#a86a6e73f368594a889954bc41aa55ba1">bitset.h</a></li>
 <li>ccc_bs_clear_and_free_reserve()&#160;:&#160;<a class="el" href="bitset_8h.html#a2ddb48b6b6b694bac567a67cac8d2359">bitset.h</a></li>
 <li>ccc_bs_copy()&#160;:&#160;<a class="el" href="bitset_8h.html#a9f42bf8a5dcb20b35ba23d80be0be324">bitset.h</a></li>
+<li>ccc_bs_count()&#160;:&#160;<a class="el" href="bitset_8h.html#acc86c9f5499f771415aff7fffdf1273d">bitset.h</a></li>
 <li>ccc_bs_data()&#160;:&#160;<a class="el" href="bitset_8h.html#a4357b8c95413a63a01cac5794dcd7ea9">bitset.h</a></li>
 <li>ccc_bs_empty()&#160;:&#160;<a class="el" href="bitset_8h.html#a65bbaf204dfdf055e6c99592bbe001a6">bitset.h</a></li>
 <li>ccc_bs_eq()&#160;:&#160;<a class="el" href="bitset_8h.html#ae3c370560cfbcc8113f6362336971613">bitset.h</a></li>
@@ -146,7 +147,6 @@ $(document).ready(function(){initNavTree('globals_func.html',''); initResizable(
 <li>ccc_bs_set_range()&#160;:&#160;<a class="el" href="bitset_8h.html#ac4d931194dc1e8f43098dab462865779">bitset.h</a></li>
 <li>ccc_bs_shiftl()&#160;:&#160;<a class="el" href="bitset_8h.html#aebdf3b2f9a9a5d94d6b1594a239bf885">bitset.h</a></li>
 <li>ccc_bs_shiftr()&#160;:&#160;<a class="el" href="bitset_8h.html#a0df76650520a8e15222337b4daa0af33">bitset.h</a></li>
-<li>ccc_bs_size()&#160;:&#160;<a class="el" href="bitset_8h.html#aa76271db4c6269eb4b7a6df26019bfef">bitset.h</a></li>
 <li>ccc_bs_test()&#160;:&#160;<a class="el" href="bitset_8h.html#a80670173528bf5e7d869af97267588fb">bitset.h</a></li>
 <li>ccc_bs_xor()&#160;:&#160;<a class="el" href="bitset_8h.html#abc7d69c14933420697660958ab6f58e8">bitset.h</a></li>
 <li>ccc_buf_alloc()&#160;:&#160;<a class="el" href="buffer_8h.html#af19f6df15e7f313da0d76bf7443906bb">buffer.h</a></li>
@@ -161,6 +161,8 @@ $(document).ready(function(){initNavTree('globals_func.html',''); initResizable(
 <li>ccc_buf_clear_and_free()&#160;:&#160;<a class="el" href="buffer_8h.html#a151879bad404ddd776f65c5dcad882eb">buffer.h</a></li>
 <li>ccc_buf_clear_and_free_reserve()&#160;:&#160;<a class="el" href="buffer_8h.html#acd72f0206a0acea011780e77009a558c">buffer.h</a></li>
 <li>ccc_buf_copy()&#160;:&#160;<a class="el" href="buffer_8h.html#a09fced08bf309c6f32be6332d33ed186">buffer.h</a></li>
+<li>ccc_buf_count()&#160;:&#160;<a class="el" href="buffer_8h.html#a31b8298eafbc49338c4f9fcabf264df2">buffer.h</a></li>
+<li>ccc_buf_count_bytes()&#160;:&#160;<a class="el" href="buffer_8h.html#abdae0cb0ada9da053593862293111450">buffer.h</a></li>
 <li>ccc_buf_end()&#160;:&#160;<a class="el" href="buffer_8h.html#a80b30824e5b5244058aa4bbf8d9d4660">buffer.h</a></li>
 <li>ccc_buf_erase()&#160;:&#160;<a class="el" href="buffer_8h.html#acd3fe998c43ec179e503d9f7c98f2b83">buffer.h</a></li>
 <li>ccc_buf_front()&#160;:&#160;<a class="el" href="buffer_8h.html#a910cea92529561713753a3450e34c436">buffer.h</a></li>
@@ -177,8 +179,6 @@ $(document).ready(function(){initNavTree('globals_func.html',''); initResizable(
 <li>ccc_buf_rend()&#160;:&#160;<a class="el" href="buffer_8h.html#a4d000d8e2b263a44fd0d754a98513931">buffer.h</a></li>
 <li>ccc_buf_reserve()&#160;:&#160;<a class="el" href="buffer_8h.html#a7b8f3da9cd649e160260684bf53a9c87">buffer.h</a></li>
 <li>ccc_buf_rnext()&#160;:&#160;<a class="el" href="buffer_8h.html#a61080f33c02ed033f249e6639e6b4ec6">buffer.h</a></li>
-<li>ccc_buf_size()&#160;:&#160;<a class="el" href="buffer_8h.html#ad93634769bf57469d89310325e93e425">buffer.h</a></li>
-<li>ccc_buf_size_bytes()&#160;:&#160;<a class="el" href="buffer_8h.html#a9a7f41ace3e4bcb84a6ce53910b496cf">buffer.h</a></li>
 <li>ccc_buf_size_minus()&#160;:&#160;<a class="el" href="buffer_8h.html#a12150474cd794575ba4eb7442247d327">buffer.h</a></li>
 <li>ccc_buf_size_plus()&#160;:&#160;<a class="el" href="buffer_8h.html#a771c734d199d4cc35654bcd5d62b3fb3">buffer.h</a></li>
 <li>ccc_buf_size_set()&#160;:&#160;<a class="el" href="buffer_8h.html#a38ddb0477e6fb68d75086489a973afc4">buffer.h</a></li>
@@ -189,6 +189,7 @@ $(document).ready(function(){initNavTree('globals_func.html',''); initResizable(
 <li>ccc_dll_begin()&#160;:&#160;<a class="el" href="doubly__linked__list_8h.html#a6659ba404965e290896edf2db6f85520">doubly_linked_list.h</a></li>
 <li>ccc_dll_begin_elem()&#160;:&#160;<a class="el" href="doubly__linked__list_8h.html#a1cd9b16a6fe36296e4d95e2791b31a9e">doubly_linked_list.h</a></li>
 <li>ccc_dll_clear()&#160;:&#160;<a class="el" href="doubly__linked__list_8h.html#ab69969a0a08b347d3c28ce4ba96fde84">doubly_linked_list.h</a></li>
+<li>ccc_dll_count()&#160;:&#160;<a class="el" href="doubly__linked__list_8h.html#a7fc82eca16ee8053e6418e0094b1dde3">doubly_linked_list.h</a></li>
 <li>ccc_dll_end()&#160;:&#160;<a class="el" href="doubly__linked__list_8h.html#aeb49ed9a729d52de6624f37e1931b7f8">doubly_linked_list.h</a></li>
 <li>ccc_dll_end_elem()&#160;:&#160;<a class="el" href="doubly__linked__list_8h.html#a4af4285ea65140865e2509f0ac1674be">doubly_linked_list.h</a></li>
 <li>ccc_dll_end_sentinel()&#160;:&#160;<a class="el" href="doubly__linked__list_8h.html#a5bcc2bddcba3de980eff5c3142ba3687">doubly_linked_list.h</a></li>
@@ -209,7 +210,6 @@ $(document).ready(function(){initNavTree('globals_func.html',''); initResizable(
 <li>ccc_dll_rbegin()&#160;:&#160;<a class="el" href="doubly__linked__list_8h.html#ab41ce312d610eff4154f1e08b96862d2">doubly_linked_list.h</a></li>
 <li>ccc_dll_rend()&#160;:&#160;<a class="el" href="doubly__linked__list_8h.html#ad294dc09ecea5d46a8b69a88d184f924">doubly_linked_list.h</a></li>
 <li>ccc_dll_rnext()&#160;:&#160;<a class="el" href="doubly__linked__list_8h.html#a2226a51c3cf014707df4eb3bd057e8cb">doubly_linked_list.h</a></li>
-<li>ccc_dll_size()&#160;:&#160;<a class="el" href="doubly__linked__list_8h.html#a5b577a366604b3fec516672cbc8dc370">doubly_linked_list.h</a></li>
 <li>ccc_dll_sort()&#160;:&#160;<a class="el" href="doubly__linked__list_8h.html#a5a2c45400ceeddd0376e4e99b6bdee72">doubly_linked_list.h</a></li>
 <li>ccc_dll_splice()&#160;:&#160;<a class="el" href="doubly__linked__list_8h.html#a0a1b232ed253168f82607ffd416dc026">doubly_linked_list.h</a></li>
 <li>ccc_dll_splice_range()&#160;:&#160;<a class="el" href="doubly__linked__list_8h.html#a55605c7f76a60c25889cee3520365d04">doubly_linked_list.h</a></li>
@@ -228,6 +228,7 @@ $(document).ready(function(){initNavTree('globals_func.html',''); initResizable(
 <li>ccc_fdeq_clear_and_free()&#160;:&#160;<a class="el" href="flat__double__ended__queue_8h.html#ae6dc5380b47e494d209da744a4b5ae89">flat_double_ended_queue.h</a></li>
 <li>ccc_fdeq_clear_and_free_reserve()&#160;:&#160;<a class="el" href="flat__double__ended__queue_8h.html#a50a041829849ec5380a61fb8d0c7f55f">flat_double_ended_queue.h</a></li>
 <li>ccc_fdeq_copy()&#160;:&#160;<a class="el" href="flat__double__ended__queue_8h.html#a65978652c26e3d1878e343a5c618e300">flat_double_ended_queue.h</a></li>
+<li>ccc_fdeq_count()&#160;:&#160;<a class="el" href="flat__double__ended__queue_8h.html#af90f60ae10191ef5557994ec75d8a45a">flat_double_ended_queue.h</a></li>
 <li>ccc_fdeq_data()&#160;:&#160;<a class="el" href="flat__double__ended__queue_8h.html#ab49f9096ecd1127d3f8501613ab45602">flat_double_ended_queue.h</a></li>
 <li>ccc_fdeq_end()&#160;:&#160;<a class="el" href="flat__double__ended__queue_8h.html#a9264ced538427697983cdaf42ff8ff27">flat_double_ended_queue.h</a></li>
 <li>ccc_fdeq_front()&#160;:&#160;<a class="el" href="flat__double__ended__queue_8h.html#a88d9f08549c2ce4edf9d575caccb3fb4">flat_double_ended_queue.h</a></li>
@@ -244,7 +245,6 @@ $(document).ready(function(){initNavTree('globals_func.html',''); initResizable(
 <li>ccc_fdeq_rend()&#160;:&#160;<a class="el" href="flat__double__ended__queue_8h.html#a91d5c7871381b4bd11eae774ad999962">flat_double_ended_queue.h</a></li>
 <li>ccc_fdeq_reserve()&#160;:&#160;<a class="el" href="flat__double__ended__queue_8h.html#a59fca02b8832c42a1490244f9d291379">flat_double_ended_queue.h</a></li>
 <li>ccc_fdeq_rnext()&#160;:&#160;<a class="el" href="flat__double__ended__queue_8h.html#af62103b1ef7d05fd9daa66c956c352bf">flat_double_ended_queue.h</a></li>
-<li>ccc_fdeq_size()&#160;:&#160;<a class="el" href="flat__double__ended__queue_8h.html#a5204b7da6c5f33c0fb68d00db4516600">flat_double_ended_queue.h</a></li>
 <li>ccc_fdeq_validate()&#160;:&#160;<a class="el" href="flat__double__ended__queue_8h.html#a996af112cdbfa57d1511a82489b0f074">flat_double_ended_queue.h</a></li>
 <li>ccc_fhm_and_modify()&#160;:&#160;<a class="el" href="flat__hash__map_8h.html#a27ac70169258adb25584039594619b0d">flat_hash_map.h</a></li>
 <li>ccc_fhm_and_modify_aux()&#160;:&#160;<a class="el" href="flat__hash__map_8h.html#a2cae3e7233b91ade039b36bdeb903afd">flat_hash_map.h</a></li>
@@ -255,6 +255,7 @@ $(document).ready(function(){initNavTree('globals_func.html',''); initResizable(
 <li>ccc_fhm_clear_and_free_reserve()&#160;:&#160;<a class="el" href="flat__hash__map_8h.html#afd2d87f7b79ac50f6dac9255233cabb8">flat_hash_map.h</a></li>
 <li>ccc_fhm_contains()&#160;:&#160;<a class="el" href="flat__hash__map_8h.html#a45270f0e8566ee4969bacdc697fb4934">flat_hash_map.h</a></li>
 <li>ccc_fhm_copy()&#160;:&#160;<a class="el" href="flat__hash__map_8h.html#a6b68e62760766164ae30d8c4adb314dc">flat_hash_map.h</a></li>
+<li>ccc_fhm_count()&#160;:&#160;<a class="el" href="flat__hash__map_8h.html#a4086cb359baa879734847e2989642a73">flat_hash_map.h</a></li>
 <li>ccc_fhm_data()&#160;:&#160;<a class="el" href="flat__hash__map_8h.html#afa2b797b90c223882d91781d56f3351e">flat_hash_map.h</a></li>
 <li>ccc_fhm_end()&#160;:&#160;<a class="el" href="flat__hash__map_8h.html#aded7d796d07299df27793836cb566b81">flat_hash_map.h</a></li>
 <li>ccc_fhm_entry()&#160;:&#160;<a class="el" href="flat__hash__map_8h.html#ada83753a5e8c45b3daa127a6f70eb96f">flat_hash_map.h</a></li>
@@ -270,7 +271,6 @@ $(document).ready(function(){initNavTree('globals_func.html',''); initResizable(
 <li>ccc_fhm_remove()&#160;:&#160;<a class="el" href="flat__hash__map_8h.html#a97bc88c9b82285486418f7e56c8a7511">flat_hash_map.h</a></li>
 <li>ccc_fhm_remove_entry()&#160;:&#160;<a class="el" href="flat__hash__map_8h.html#ad8c4a0948272d97ceb1d8219388aedeb">flat_hash_map.h</a></li>
 <li>ccc_fhm_reserve()&#160;:&#160;<a class="el" href="flat__hash__map_8h.html#afd8dc18ef193bb1cfdd580578d93afb2">flat_hash_map.h</a></li>
-<li>ccc_fhm_size()&#160;:&#160;<a class="el" href="flat__hash__map_8h.html#a7e48bf928c47a2a974d5ca7e98e51aad">flat_hash_map.h</a></li>
 <li>ccc_fhm_swap_entry()&#160;:&#160;<a class="el" href="flat__hash__map_8h.html#a7f6d8911df876e3b223caf32e06010ee">flat_hash_map.h</a></li>
 <li>ccc_fhm_try_insert()&#160;:&#160;<a class="el" href="flat__hash__map_8h.html#aad6850e23f5ec7c7e54d1566c2b6e5d8">flat_hash_map.h</a></li>
 <li>ccc_fhm_unwrap()&#160;:&#160;<a class="el" href="flat__hash__map_8h.html#ae6ddbf73bfeed2721c35d7a374edf7c1">flat_hash_map.h</a></li>
@@ -281,6 +281,7 @@ $(document).ready(function(){initNavTree('globals_func.html',''); initResizable(
 <li>ccc_fpq_clear_and_free()&#160;:&#160;<a class="el" href="flat__priority__queue_8h.html#a7f8a4c0c941d14f8a721cc529eb64fce">flat_priority_queue.h</a></li>
 <li>ccc_fpq_clear_and_free_reserve()&#160;:&#160;<a class="el" href="flat__priority__queue_8h.html#aca2387a268f99be1f8cf3672e964af4a">flat_priority_queue.h</a></li>
 <li>ccc_fpq_copy()&#160;:&#160;<a class="el" href="flat__priority__queue_8h.html#ad65d783f01bd17614486b178bb2c7015">flat_priority_queue.h</a></li>
+<li>ccc_fpq_count()&#160;:&#160;<a class="el" href="flat__priority__queue_8h.html#af0c1ca80feb4ade1bdf383e7cb21f735">flat_priority_queue.h</a></li>
 <li>ccc_fpq_data()&#160;:&#160;<a class="el" href="flat__priority__queue_8h.html#a005d37789d5cc821356252292cba646b">flat_priority_queue.h</a></li>
 <li>ccc_fpq_decrease()&#160;:&#160;<a class="el" href="flat__priority__queue_8h.html#ab0d8a8e7b73f1274d1088572c39678d7">flat_priority_queue.h</a></li>
 <li>ccc_fpq_erase()&#160;:&#160;<a class="el" href="flat__priority__queue_8h.html#afc193b31385a3a97002e77d833340c31">flat_priority_queue.h</a></li>
@@ -293,7 +294,6 @@ $(document).ready(function(){initNavTree('globals_func.html',''); initResizable(
 <li>ccc_fpq_pop()&#160;:&#160;<a class="el" href="flat__priority__queue_8h.html#aaec4e075f10f8b6ee6bd99c50fb53d2d">flat_priority_queue.h</a></li>
 <li>ccc_fpq_push()&#160;:&#160;<a class="el" href="flat__priority__queue_8h.html#af3629428e2a5117d810852fc70c283c8">flat_priority_queue.h</a></li>
 <li>ccc_fpq_reserve()&#160;:&#160;<a class="el" href="flat__priority__queue_8h.html#ab1ad4f0ed5e05f3582d37c8306b57358">flat_priority_queue.h</a></li>
-<li>ccc_fpq_size()&#160;:&#160;<a class="el" href="flat__priority__queue_8h.html#a51abc8e082ea3ba3c2bf198525ee4151">flat_priority_queue.h</a></li>
 <li>ccc_fpq_update()&#160;:&#160;<a class="el" href="flat__priority__queue_8h.html#a9c223a3f8653b7c334bba5cc5ee30f2f">flat_priority_queue.h</a></li>
 <li>ccc_fpq_validate()&#160;:&#160;<a class="el" href="flat__priority__queue_8h.html#abd9aa3fe7a477f99fb0abc69bbdf67f0">flat_priority_queue.h</a></li>
 <li>ccc_get_entry_status()&#160;:&#160;<a class="el" href="types_8h.html#ae903680190e65b29c45401e76e9fcf85">types.h</a></li>
@@ -313,6 +313,7 @@ $(document).ready(function(){initNavTree('globals_func.html',''); initResizable(
 <li>ccc_hom_clear_and_free_reserve()&#160;:&#160;<a class="el" href="handle__ordered__map_8h.html#a3ce427ddcf56ca49b02bd496f8a9e1f1">handle_ordered_map.h</a></li>
 <li>ccc_hom_contains()&#160;:&#160;<a class="el" href="handle__ordered__map_8h.html#afc087fac67d7ccc93d659793e87a063c">handle_ordered_map.h</a></li>
 <li>ccc_hom_copy()&#160;:&#160;<a class="el" href="handle__ordered__map_8h.html#a358440f1ba3699b6b529c164b3a19e67">handle_ordered_map.h</a></li>
+<li>ccc_hom_count()&#160;:&#160;<a class="el" href="handle__ordered__map_8h.html#abd8df820dd32bece26999588b1fc94a7">handle_ordered_map.h</a></li>
 <li>ccc_hom_data()&#160;:&#160;<a class="el" href="handle__ordered__map_8h.html#a100009c0ac27907f1fc0dd243fd61aed">handle_ordered_map.h</a></li>
 <li>ccc_hom_end()&#160;:&#160;<a class="el" href="handle__ordered__map_8h.html#a8e4b418ebdbe410566b661b6b12ecffa">handle_ordered_map.h</a></li>
 <li>ccc_hom_equal_range()&#160;:&#160;<a class="el" href="handle__ordered__map_8h.html#ae182b4ba55848ba910c411c496f28f13">handle_ordered_map.h</a></li>
@@ -333,7 +334,6 @@ $(document).ready(function(){initNavTree('globals_func.html',''); initResizable(
 <li>ccc_hom_rend()&#160;:&#160;<a class="el" href="handle__ordered__map_8h.html#a62d43705f106cd0b99122e81089de5e2">handle_ordered_map.h</a></li>
 <li>ccc_hom_reserve()&#160;:&#160;<a class="el" href="handle__ordered__map_8h.html#af2a51d1f4429693769af788b18010782">handle_ordered_map.h</a></li>
 <li>ccc_hom_rnext()&#160;:&#160;<a class="el" href="handle__ordered__map_8h.html#a0f3a66a8f91a35d95953c727cf661ca3">handle_ordered_map.h</a></li>
-<li>ccc_hom_size()&#160;:&#160;<a class="el" href="handle__ordered__map_8h.html#af37a05b55bb4d0fac13d3f6d622b1f72">handle_ordered_map.h</a></li>
 <li>ccc_hom_swap_handle()&#160;:&#160;<a class="el" href="handle__ordered__map_8h.html#adc6f7f71c662912169bf6a7fdbb278d6">handle_ordered_map.h</a></li>
 <li>ccc_hom_try_insert()&#160;:&#160;<a class="el" href="handle__ordered__map_8h.html#a15e72007021a57a4dfefc024a7078bbb">handle_ordered_map.h</a></li>
 <li>ccc_hom_unwrap()&#160;:&#160;<a class="el" href="handle__ordered__map_8h.html#a539c40442ac374337bc8b85f125c47a5">handle_ordered_map.h</a></li>
@@ -348,6 +348,7 @@ $(document).ready(function(){initNavTree('globals_func.html',''); initResizable(
 <li>ccc_hrm_clear_and_free_reserve()&#160;:&#160;<a class="el" href="handle__realtime__ordered__map_8h.html#a9eff93c7c6e5cd0b99209098d3293535">handle_realtime_ordered_map.h</a></li>
 <li>ccc_hrm_contains()&#160;:&#160;<a class="el" href="handle__realtime__ordered__map_8h.html#aa0972b03027bcc83d02dbb1b140add81">handle_realtime_ordered_map.h</a></li>
 <li>ccc_hrm_copy()&#160;:&#160;<a class="el" href="handle__realtime__ordered__map_8h.html#a1a34c8898f75c02c108a111ba458dbae">handle_realtime_ordered_map.h</a></li>
+<li>ccc_hrm_count()&#160;:&#160;<a class="el" href="handle__realtime__ordered__map_8h.html#a8d4f1b3576bc9666d775879ebe96b1f9">handle_realtime_ordered_map.h</a></li>
 <li>ccc_hrm_data()&#160;:&#160;<a class="el" href="handle__realtime__ordered__map_8h.html#a5e11665ec2dd7ba93aaa4c6bc8ea1dc6">handle_realtime_ordered_map.h</a></li>
 <li>ccc_hrm_end()&#160;:&#160;<a class="el" href="handle__realtime__ordered__map_8h.html#a6eecb1bb1f617d74fe8b0a80f54a68c2">handle_realtime_ordered_map.h</a></li>
 <li>ccc_hrm_equal_range()&#160;:&#160;<a class="el" href="handle__realtime__ordered__map_8h.html#a0dd07dad9d0a2c1a7f961c91ac62bdab">handle_realtime_ordered_map.h</a></li>
@@ -368,7 +369,6 @@ $(document).ready(function(){initNavTree('globals_func.html',''); initResizable(
 <li>ccc_hrm_rend()&#160;:&#160;<a class="el" href="handle__realtime__ordered__map_8h.html#a2a7361053927974df17bd92a72690733">handle_realtime_ordered_map.h</a></li>
 <li>ccc_hrm_reserve()&#160;:&#160;<a class="el" href="handle__realtime__ordered__map_8h.html#a91c2963303930b61c8f531019ed42fbe">handle_realtime_ordered_map.h</a></li>
 <li>ccc_hrm_rnext()&#160;:&#160;<a class="el" href="handle__realtime__ordered__map_8h.html#aa7ee201cc904502fc83c5e619e3923cd">handle_realtime_ordered_map.h</a></li>
-<li>ccc_hrm_size()&#160;:&#160;<a class="el" href="handle__realtime__ordered__map_8h.html#a94d257a79149ca2a1157f15d2dde93fd">handle_realtime_ordered_map.h</a></li>
 <li>ccc_hrm_swap_handle()&#160;:&#160;<a class="el" href="handle__realtime__ordered__map_8h.html#a96c9918c98769cc881780ec69f6889c8">handle_realtime_ordered_map.h</a></li>
 <li>ccc_hrm_try_insert()&#160;:&#160;<a class="el" href="handle__realtime__ordered__map_8h.html#add8740e01c09799e11229c226e10e2ea">handle_realtime_ordered_map.h</a></li>
 <li>ccc_hrm_unwrap()&#160;:&#160;<a class="el" href="handle__realtime__ordered__map_8h.html#a14ac4bc03d1cece3c339e54406c3b919">handle_realtime_ordered_map.h</a></li>
@@ -378,6 +378,7 @@ $(document).ready(function(){initNavTree('globals_func.html',''); initResizable(
 <li>ccc_om_begin()&#160;:&#160;<a class="el" href="ordered__map_8h.html#a7958920265a8e31e0c6bb8a97ae6cbf2">ordered_map.h</a></li>
 <li>ccc_om_clear()&#160;:&#160;<a class="el" href="ordered__map_8h.html#a31eb5df179e6018f8980cef04a358859">ordered_map.h</a></li>
 <li>ccc_om_contains()&#160;:&#160;<a class="el" href="ordered__map_8h.html#a520aaebd534c74314ef71a169cd01fbb">ordered_map.h</a></li>
+<li>ccc_om_count()&#160;:&#160;<a class="el" href="ordered__map_8h.html#a87b8d7c0ebdda72688afd7136b186df4">ordered_map.h</a></li>
 <li>ccc_om_end()&#160;:&#160;<a class="el" href="ordered__map_8h.html#af806ac45be451e0f1022b7efe2e1ad67">ordered_map.h</a></li>
 <li>ccc_om_entry()&#160;:&#160;<a class="el" href="ordered__map_8h.html#aff49753b6d6e63597cddc5cbd27f75bf">ordered_map.h</a></li>
 <li>ccc_om_entry_status()&#160;:&#160;<a class="el" href="ordered__map_8h.html#a37be0896d2ae80e927cf6626d4d87ab3">ordered_map.h</a></li>
@@ -396,12 +397,12 @@ $(document).ready(function(){initNavTree('globals_func.html',''); initResizable(
 <li>ccc_om_remove_entry()&#160;:&#160;<a class="el" href="ordered__map_8h.html#af5dca5e6fb2c76ab960b64b4a1bfec9b">ordered_map.h</a></li>
 <li>ccc_om_rend()&#160;:&#160;<a class="el" href="ordered__map_8h.html#a29368f1e1b994e651944b6b8af91b6f3">ordered_map.h</a></li>
 <li>ccc_om_rnext()&#160;:&#160;<a class="el" href="ordered__map_8h.html#a3445d6c77b955cfa167451bce0c4b6f6">ordered_map.h</a></li>
-<li>ccc_om_size()&#160;:&#160;<a class="el" href="ordered__map_8h.html#a35750d263680c0e4a6c18bcd18e921fb">ordered_map.h</a></li>
 <li>ccc_om_swap_entry()&#160;:&#160;<a class="el" href="ordered__map_8h.html#ad9696efa20e34d7207e2cd68f45a2c35">ordered_map.h</a></li>
 <li>ccc_om_try_insert()&#160;:&#160;<a class="el" href="ordered__map_8h.html#a045be328ffa0c57713f35148fe53bc57">ordered_map.h</a></li>
 <li>ccc_om_unwrap()&#160;:&#160;<a class="el" href="ordered__map_8h.html#a79150aec716cb6b3fc214e902e80bd46">ordered_map.h</a></li>
 <li>ccc_om_validate()&#160;:&#160;<a class="el" href="ordered__map_8h.html#a023a210902012edae578022f65704f00">ordered_map.h</a></li>
 <li>ccc_pq_clear()&#160;:&#160;<a class="el" href="priority__queue_8h.html#a5769ba899672364e962e6ea290728307">priority_queue.h</a></li>
+<li>ccc_pq_count()&#160;:&#160;<a class="el" href="priority__queue_8h.html#ad4b5466c7be94b7cdcdd5bfb76356146">priority_queue.h</a></li>
 <li>ccc_pq_decrease()&#160;:&#160;<a class="el" href="priority__queue_8h.html#a17434c0141c85e588fd3758dfef32576">priority_queue.h</a></li>
 <li>ccc_pq_erase()&#160;:&#160;<a class="el" href="priority__queue_8h.html#a58950b81644cdc83ff6e6dc2df186630">priority_queue.h</a></li>
 <li>ccc_pq_extract()&#160;:&#160;<a class="el" href="priority__queue_8h.html#a29cc715f304411cd2ee83568bcdc0c22">priority_queue.h</a></li>
@@ -411,7 +412,6 @@ $(document).ready(function(){initNavTree('globals_func.html',''); initResizable(
 <li>ccc_pq_order()&#160;:&#160;<a class="el" href="priority__queue_8h.html#ac93c8b051f2c6d02f706b7d71ce9bed5">priority_queue.h</a></li>
 <li>ccc_pq_pop()&#160;:&#160;<a class="el" href="priority__queue_8h.html#aed66e1a4ed0e9ed2de60147cda9394d8">priority_queue.h</a></li>
 <li>ccc_pq_push()&#160;:&#160;<a class="el" href="priority__queue_8h.html#a17fc73bd17733632f5712e3220f3216a">priority_queue.h</a></li>
-<li>ccc_pq_size()&#160;:&#160;<a class="el" href="priority__queue_8h.html#a62aaade66dff6a9328767e1c5ceaef5a">priority_queue.h</a></li>
 <li>ccc_pq_update()&#160;:&#160;<a class="el" href="priority__queue_8h.html#a00be9b8276bedd5baa735f5caf350837">priority_queue.h</a></li>
 <li>ccc_pq_validate()&#160;:&#160;<a class="el" href="priority__queue_8h.html#a832c4c57933999f1dd86887c337fd4a5">priority_queue.h</a></li>
 <li>ccc_rbegin_rrange()&#160;:&#160;<a class="el" href="types_8h.html#ae9efbe3d5a2e7066add960fc334dab30">types.h</a></li>
@@ -422,6 +422,7 @@ $(document).ready(function(){initNavTree('globals_func.html',''); initResizable(
 <li>ccc_rom_begin()&#160;:&#160;<a class="el" href="realtime__ordered__map_8h.html#ab611b7c4d19efeac1a64d0ac19edbc62">realtime_ordered_map.h</a></li>
 <li>ccc_rom_clear()&#160;:&#160;<a class="el" href="realtime__ordered__map_8h.html#abab25b9d4edd98435c0cf88ddeca15d3">realtime_ordered_map.h</a></li>
 <li>ccc_rom_contains()&#160;:&#160;<a class="el" href="realtime__ordered__map_8h.html#a61469b8efd88c9f0e4b90eb0712cf468">realtime_ordered_map.h</a></li>
+<li>ccc_rom_count()&#160;:&#160;<a class="el" href="realtime__ordered__map_8h.html#a81747db6e278f1c99b88142b58652c41">realtime_ordered_map.h</a></li>
 <li>ccc_rom_end()&#160;:&#160;<a class="el" href="realtime__ordered__map_8h.html#a9bfbf21f54f6fcc5324bac794ffd33cf">realtime_ordered_map.h</a></li>
 <li>ccc_rom_entry()&#160;:&#160;<a class="el" href="realtime__ordered__map_8h.html#a099ad3e2844c3b0efe75bc5660e04bd5">realtime_ordered_map.h</a></li>
 <li>ccc_rom_entry_status()&#160;:&#160;<a class="el" href="realtime__ordered__map_8h.html#adcad91b2ffccc366d506ab88d70a9713">realtime_ordered_map.h</a></li>
@@ -440,7 +441,6 @@ $(document).ready(function(){initNavTree('globals_func.html',''); initResizable(
 <li>ccc_rom_remove_entry()&#160;:&#160;<a class="el" href="realtime__ordered__map_8h.html#a0cd38634bcd8b02c518435097fda4fd0">realtime_ordered_map.h</a></li>
 <li>ccc_rom_rend()&#160;:&#160;<a class="el" href="realtime__ordered__map_8h.html#a924f5aea2a3f9c80ecd23051ac2f19c6">realtime_ordered_map.h</a></li>
 <li>ccc_rom_rnext()&#160;:&#160;<a class="el" href="realtime__ordered__map_8h.html#ae150c0c09428d34bc28190387583cfb9">realtime_ordered_map.h</a></li>
-<li>ccc_rom_size()&#160;:&#160;<a class="el" href="realtime__ordered__map_8h.html#a00667ff16ca30c2f0cd8c227fe1d7add">realtime_ordered_map.h</a></li>
 <li>ccc_rom_swap_entry()&#160;:&#160;<a class="el" href="realtime__ordered__map_8h.html#a1d15ba73c756a2b6c6ea0fc16773b75d">realtime_ordered_map.h</a></li>
 <li>ccc_rom_try_insert()&#160;:&#160;<a class="el" href="realtime__ordered__map_8h.html#aa1da68db33d8f45d178b2e8e2f8e22e7">realtime_ordered_map.h</a></li>
 <li>ccc_rom_unwrap()&#160;:&#160;<a class="el" href="realtime__ordered__map_8h.html#a6737f9b1c9980fb717d69be0d84b2aba">realtime_ordered_map.h</a></li>
@@ -449,6 +449,7 @@ $(document).ready(function(){initNavTree('globals_func.html',''); initResizable(
 <li>ccc_sll_begin_elem()&#160;:&#160;<a class="el" href="singly__linked__list_8h.html#a96a2fa2efc460be38875c7893b1416e2">singly_linked_list.h</a></li>
 <li>ccc_sll_begin_sentinel()&#160;:&#160;<a class="el" href="singly__linked__list_8h.html#a8a3332d20b463538ad83abc752858a37">singly_linked_list.h</a></li>
 <li>ccc_sll_clear()&#160;:&#160;<a class="el" href="singly__linked__list_8h.html#ab18aa3a1edaf12b45a4cdfbf1a4bd775">singly_linked_list.h</a></li>
+<li>ccc_sll_count()&#160;:&#160;<a class="el" href="singly__linked__list_8h.html#aedf3a1ae056059437cc0da6ef878ccd8">singly_linked_list.h</a></li>
 <li>ccc_sll_end()&#160;:&#160;<a class="el" href="singly__linked__list_8h.html#a3a023a3175530b417a5827a03dff95d7">singly_linked_list.h</a></li>
 <li>ccc_sll_erase()&#160;:&#160;<a class="el" href="singly__linked__list_8h.html#a22a146bc93e08c20b82e36fcf079fa08">singly_linked_list.h</a></li>
 <li>ccc_sll_erase_range()&#160;:&#160;<a class="el" href="singly__linked__list_8h.html#a8b7d968ad70c8a7eb3e31fe7e91cecf2">singly_linked_list.h</a></li>
@@ -461,7 +462,6 @@ $(document).ready(function(){initNavTree('globals_func.html',''); initResizable(
 <li>ccc_sll_next()&#160;:&#160;<a class="el" href="singly__linked__list_8h.html#ab4724b83877b5582774c6f5d138edf6a">singly_linked_list.h</a></li>
 <li>ccc_sll_pop_front()&#160;:&#160;<a class="el" href="singly__linked__list_8h.html#a2924476c4e07b64703ba579e9126ff7b">singly_linked_list.h</a></li>
 <li>ccc_sll_push_front()&#160;:&#160;<a class="el" href="singly__linked__list_8h.html#a20652f3d5f4e73dd77b3490c7534a54b">singly_linked_list.h</a></li>
-<li>ccc_sll_size()&#160;:&#160;<a class="el" href="singly__linked__list_8h.html#a69a89032d3cb969e8a83fc46f9bffc86">singly_linked_list.h</a></li>
 <li>ccc_sll_sort()&#160;:&#160;<a class="el" href="singly__linked__list_8h.html#a34a08f7c899bde051aadb54d26e1a0fa">singly_linked_list.h</a></li>
 <li>ccc_sll_splice()&#160;:&#160;<a class="el" href="singly__linked__list_8h.html#afbf05230243224dbf4d344e852f1cce9">singly_linked_list.h</a></li>
 <li>ccc_sll_splice_range()&#160;:&#160;<a class="el" href="singly__linked__list_8h.html#a0a78d6739651c7609a0dc73b7e367062">singly_linked_list.h</a></li>

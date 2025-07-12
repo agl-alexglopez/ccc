@@ -222,9 +222,9 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memitem:a8a3332d20b463538ad83abc752858a37"><td class="memItemLeft" align="right" valign="top">ccc_sll_elem *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="singly__linked__list_8h.html#a8a3332d20b463538ad83abc752858a37">ccc_sll_begin_sentinel</a> (<a class="el" href="singly__linked__list_8h.html#ae76c86dea3ed2d9344bdb9068e8562ea">ccc_singly_linked_list</a> const *sll)</td></tr>
 <tr class="memdesc:a8a3332d20b463538ad83abc752858a37"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a pointer to the sentinel node at the front of the list.  <br /></td></tr>
 <tr class="separator:a8a3332d20b463538ad83abc752858a37"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a69a89032d3cb969e8a83fc46f9bffc86"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="singly__linked__list_8h.html#a69a89032d3cb969e8a83fc46f9bffc86">ccc_sll_size</a> (<a class="el" href="singly__linked__list_8h.html#ae76c86dea3ed2d9344bdb9068e8562ea">ccc_singly_linked_list</a> const *sll)</td></tr>
-<tr class="memdesc:a69a89032d3cb969e8a83fc46f9bffc86"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the size of the list. O(1).  <br /></td></tr>
-<tr class="separator:a69a89032d3cb969e8a83fc46f9bffc86"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aedf3a1ae056059437cc0da6ef878ccd8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="singly__linked__list_8h.html#aedf3a1ae056059437cc0da6ef878ccd8">ccc_sll_count</a> (<a class="el" href="singly__linked__list_8h.html#ae76c86dea3ed2d9344bdb9068e8562ea">ccc_singly_linked_list</a> const *sll)</td></tr>
+<tr class="memdesc:aedf3a1ae056059437cc0da6ef878ccd8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the count of nodes in the list. O(1).  <br /></td></tr>
+<tr class="separator:aedf3a1ae056059437cc0da6ef878ccd8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4dbfd58e30f0bad9bf9c2df30adfe74d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="singly__linked__list_8h.html#a4dbfd58e30f0bad9bf9c2df30adfe74d">ccc_sll_is_empty</a> (<a class="el" href="singly__linked__list_8h.html#ae76c86dea3ed2d9344bdb9068e8562ea">ccc_singly_linked_list</a> const *sll)</td></tr>
 <tr class="memdesc:a4dbfd58e30f0bad9bf9c2df30adfe74d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return true if the list is empty. O(1).  <br /></td></tr>
 <tr class="separator:a4dbfd58e30f0bad9bf9c2df30adfe74d"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -495,6 +495,33 @@ This graph shows which files directly or indirectly include this file:</div>
 <dl class="section return"><dt>Returns</dt><dd>ok if the clear succeeded or an input error if sll or fn are NULL.</dd></dl>
 <p>Note that if allocation is allowed, the container will free the user types wrapping each intrusive element in the list after calling fn. Therefore, fn should not free memory if the container has been given allocation permission. It should only perform other necessary cleanup or state management.</p>
 <p>If allocation is not allowed fn may free memory or not as the user sees fit. The user is responsible for managing the memory that wraps each intrusive handle as the elements are simply removed from the list. </p>
+
+</div>
+</div>
+<a id="aedf3a1ae056059437cc0da6ef878ccd8" name="aedf3a1ae056059437cc0da6ef878ccd8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aedf3a1ae056059437cc0da6ef878ccd8">&#9670;&#160;</a></span>ccc_sll_count()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_sll_count </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="singly__linked__list_8h.html#ae76c86dea3ed2d9344bdb9068e8562ea">ccc_singly_linked_list</a> const *&#160;</td>
+          <td class="paramname"><em>sll</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Return the count of nodes in the list. O(1). </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">sll</td><td>a pointer to the singly linked list. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the size or an argument error is set if sll is NULL. </dd></dl>
 
 </div>
 </div>
@@ -922,33 +949,6 @@ This graph shows which files directly or indirectly include this file:</div>
 <dl class="section return"><dt>Returns</dt><dd>a pointer to the inserted element or NULL if allocation failed.</dd></dl>
 <p>Note that if allocation is not allowed the container assumes the memory wrapping elem has been allocated appropriately and with the correct lifetime by the user.</p>
 <p>If allocation is allowed the provided element is copied to a new allocation. </p>
-
-</div>
-</div>
-<a id="a69a89032d3cb969e8a83fc46f9bffc86" name="a69a89032d3cb969e8a83fc46f9bffc86"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a69a89032d3cb969e8a83fc46f9bffc86">&#9670;&#160;</a></span>ccc_sll_size()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_sll_size </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="singly__linked__list_8h.html#ae76c86dea3ed2d9344bdb9068e8562ea">ccc_singly_linked_list</a> const *&#160;</td>
-          <td class="paramname"><em>sll</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Return the size of the list. O(1). </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">sll</td><td>a pointer to the singly linked list. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>the size or an argument error is set if sll is NULL. </dd></dl>
 
 </div>
 </div>

@@ -810,31 +810,31 @@ $(document).ready(function(){initNavTree('impl__traits_8h_source.html',''); init
 <div class="line"><a id="l00729" name="l00729"></a><span class="lineno">  729</span> </div>
 <div class="line"><a id="l00730" name="l00730"></a><span class="lineno">  730</span><span class="comment">/*===================    Standard Getters Interface   =======================*/</span></div>
 <div class="line"><a id="l00731" name="l00731"></a><span class="lineno">  731</span> </div>
-<div class="line"><a id="l00732" name="l00732"></a><span class="lineno">  732</span><span class="preprocessor">#define ccc_impl_size(container_ptr)                                           \</span></div>
+<div class="line"><a id="l00732" name="l00732"></a><span class="lineno">  732</span><span class="preprocessor">#define ccc_impl_count(container_ptr)                                          \</span></div>
 <div class="line"><a id="l00733" name="l00733"></a><span class="lineno">  733</span><span class="preprocessor">    _Generic((container_ptr),                                                  \</span></div>
-<div class="line"><a id="l00734" name="l00734"></a><span class="lineno">  734</span><span class="preprocessor">        ccc_bitset *: ccc_bs_size,                                             \</span></div>
-<div class="line"><a id="l00735" name="l00735"></a><span class="lineno">  735</span><span class="preprocessor">        ccc_buffer *: ccc_buf_size,                                            \</span></div>
-<div class="line"><a id="l00736" name="l00736"></a><span class="lineno">  736</span><span class="preprocessor">        ccc_flat_hash_map *: ccc_fhm_size,                                     \</span></div>
-<div class="line"><a id="l00737" name="l00737"></a><span class="lineno">  737</span><span class="preprocessor">        ccc_ordered_map *: ccc_om_size,                                        \</span></div>
-<div class="line"><a id="l00738" name="l00738"></a><span class="lineno">  738</span><span class="preprocessor">        ccc_handle_ordered_map *: ccc_hom_size,                                \</span></div>
-<div class="line"><a id="l00739" name="l00739"></a><span class="lineno">  739</span><span class="preprocessor">        ccc_flat_priority_queue *: ccc_fpq_size,                               \</span></div>
-<div class="line"><a id="l00740" name="l00740"></a><span class="lineno">  740</span><span class="preprocessor">        ccc_flat_double_ended_queue *: ccc_fdeq_size,                          \</span></div>
-<div class="line"><a id="l00741" name="l00741"></a><span class="lineno">  741</span><span class="preprocessor">        ccc_priority_queue *: ccc_pq_size,                                     \</span></div>
-<div class="line"><a id="l00742" name="l00742"></a><span class="lineno">  742</span><span class="preprocessor">        ccc_singly_linked_list *: ccc_sll_size,                                \</span></div>
-<div class="line"><a id="l00743" name="l00743"></a><span class="lineno">  743</span><span class="preprocessor">        ccc_doubly_linked_list *: ccc_dll_size,                                \</span></div>
-<div class="line"><a id="l00744" name="l00744"></a><span class="lineno">  744</span><span class="preprocessor">        ccc_realtime_ordered_map *: ccc_rom_size,                              \</span></div>
-<div class="line"><a id="l00745" name="l00745"></a><span class="lineno">  745</span><span class="preprocessor">        ccc_handle_realtime_ordered_map *: ccc_hrm_size,                       \</span></div>
-<div class="line"><a id="l00746" name="l00746"></a><span class="lineno">  746</span><span class="preprocessor">        ccc_buffer const *: ccc_buf_size,                                      \</span></div>
-<div class="line"><a id="l00747" name="l00747"></a><span class="lineno">  747</span><span class="preprocessor">        ccc_flat_hash_map const *: ccc_fhm_size,                               \</span></div>
-<div class="line"><a id="l00748" name="l00748"></a><span class="lineno">  748</span><span class="preprocessor">        ccc_ordered_map const *: ccc_om_size,                                  \</span></div>
-<div class="line"><a id="l00749" name="l00749"></a><span class="lineno">  749</span><span class="preprocessor">        ccc_handle_ordered_map const *: ccc_hom_size,                          \</span></div>
-<div class="line"><a id="l00750" name="l00750"></a><span class="lineno">  750</span><span class="preprocessor">        ccc_flat_priority_queue const *: ccc_fpq_size,                         \</span></div>
-<div class="line"><a id="l00751" name="l00751"></a><span class="lineno">  751</span><span class="preprocessor">        ccc_flat_double_ended_queue const *: ccc_fdeq_size,                    \</span></div>
-<div class="line"><a id="l00752" name="l00752"></a><span class="lineno">  752</span><span class="preprocessor">        ccc_priority_queue const *: ccc_pq_size,                               \</span></div>
-<div class="line"><a id="l00753" name="l00753"></a><span class="lineno">  753</span><span class="preprocessor">        ccc_singly_linked_list const *: ccc_sll_size,                          \</span></div>
-<div class="line"><a id="l00754" name="l00754"></a><span class="lineno">  754</span><span class="preprocessor">        ccc_doubly_linked_list const *: ccc_dll_size,                          \</span></div>
-<div class="line"><a id="l00755" name="l00755"></a><span class="lineno">  755</span><span class="preprocessor">        ccc_handle_realtime_ordered_map const *: ccc_hrm_size,                 \</span></div>
-<div class="line"><a id="l00756" name="l00756"></a><span class="lineno">  756</span><span class="preprocessor">        ccc_realtime_ordered_map const *: ccc_rom_size)((container_ptr))</span></div>
+<div class="line"><a id="l00734" name="l00734"></a><span class="lineno">  734</span><span class="preprocessor">        ccc_bitset *: ccc_bs_count,                                            \</span></div>
+<div class="line"><a id="l00735" name="l00735"></a><span class="lineno">  735</span><span class="preprocessor">        ccc_buffer *: ccc_buf_count,                                           \</span></div>
+<div class="line"><a id="l00736" name="l00736"></a><span class="lineno">  736</span><span class="preprocessor">        ccc_flat_hash_map *: ccc_fhm_count,                                    \</span></div>
+<div class="line"><a id="l00737" name="l00737"></a><span class="lineno">  737</span><span class="preprocessor">        ccc_ordered_map *: ccc_om_count,                                       \</span></div>
+<div class="line"><a id="l00738" name="l00738"></a><span class="lineno">  738</span><span class="preprocessor">        ccc_handle_ordered_map *: ccc_hom_count,                               \</span></div>
+<div class="line"><a id="l00739" name="l00739"></a><span class="lineno">  739</span><span class="preprocessor">        ccc_flat_priority_queue *: ccc_fpq_count,                              \</span></div>
+<div class="line"><a id="l00740" name="l00740"></a><span class="lineno">  740</span><span class="preprocessor">        ccc_flat_double_ended_queue *: ccc_fdeq_count,                         \</span></div>
+<div class="line"><a id="l00741" name="l00741"></a><span class="lineno">  741</span><span class="preprocessor">        ccc_priority_queue *: ccc_pq_count,                                    \</span></div>
+<div class="line"><a id="l00742" name="l00742"></a><span class="lineno">  742</span><span class="preprocessor">        ccc_singly_linked_list *: ccc_sll_count,                               \</span></div>
+<div class="line"><a id="l00743" name="l00743"></a><span class="lineno">  743</span><span class="preprocessor">        ccc_doubly_linked_list *: ccc_dll_count,                               \</span></div>
+<div class="line"><a id="l00744" name="l00744"></a><span class="lineno">  744</span><span class="preprocessor">        ccc_realtime_ordered_map *: ccc_rom_count,                             \</span></div>
+<div class="line"><a id="l00745" name="l00745"></a><span class="lineno">  745</span><span class="preprocessor">        ccc_handle_realtime_ordered_map *: ccc_hrm_count,                      \</span></div>
+<div class="line"><a id="l00746" name="l00746"></a><span class="lineno">  746</span><span class="preprocessor">        ccc_buffer const *: ccc_buf_count,                                     \</span></div>
+<div class="line"><a id="l00747" name="l00747"></a><span class="lineno">  747</span><span class="preprocessor">        ccc_flat_hash_map const *: ccc_fhm_count,                              \</span></div>
+<div class="line"><a id="l00748" name="l00748"></a><span class="lineno">  748</span><span class="preprocessor">        ccc_ordered_map const *: ccc_om_count,                                 \</span></div>
+<div class="line"><a id="l00749" name="l00749"></a><span class="lineno">  749</span><span class="preprocessor">        ccc_handle_ordered_map const *: ccc_hom_count,                         \</span></div>
+<div class="line"><a id="l00750" name="l00750"></a><span class="lineno">  750</span><span class="preprocessor">        ccc_flat_priority_queue const *: ccc_fpq_count,                        \</span></div>
+<div class="line"><a id="l00751" name="l00751"></a><span class="lineno">  751</span><span class="preprocessor">        ccc_flat_double_ended_queue const *: ccc_fdeq_count,                   \</span></div>
+<div class="line"><a id="l00752" name="l00752"></a><span class="lineno">  752</span><span class="preprocessor">        ccc_priority_queue const *: ccc_pq_count,                              \</span></div>
+<div class="line"><a id="l00753" name="l00753"></a><span class="lineno">  753</span><span class="preprocessor">        ccc_singly_linked_list const *: ccc_sll_count,                         \</span></div>
+<div class="line"><a id="l00754" name="l00754"></a><span class="lineno">  754</span><span class="preprocessor">        ccc_doubly_linked_list const *: ccc_dll_count,                         \</span></div>
+<div class="line"><a id="l00755" name="l00755"></a><span class="lineno">  755</span><span class="preprocessor">        ccc_handle_realtime_ordered_map const *: ccc_hrm_count,                \</span></div>
+<div class="line"><a id="l00756" name="l00756"></a><span class="lineno">  756</span><span class="preprocessor">        ccc_realtime_ordered_map const *: ccc_rom_count)((container_ptr))</span></div>
 <div class="line"><a id="l00757" name="l00757"></a><span class="lineno">  757</span> </div>
 <div class="line"><a id="l00758" name="l00758"></a><span class="lineno">  758</span><span class="preprocessor">#define ccc_impl_capacity(container_ptr)                                       \</span></div>
 <div class="line"><a id="l00759" name="l00759"></a><span class="lineno">  759</span><span class="preprocessor">    _Generic((container_ptr),                                                  \</span></div>

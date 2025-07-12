@@ -263,15 +263,15 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memitem:a5221e60bac73187c0154af05dc230904"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a5221e60bac73187c0154af05dc230904">ccc_buf_sizeof_type</a> (ccc_buffer const *buf)</td></tr>
 <tr class="memdesc:a5221e60bac73187c0154af05dc230904"><td class="mdescLeft">&#160;</td><td class="mdescRight">The size of the type being stored contiguously in the buffer.  <br /></td></tr>
 <tr class="separator:a5221e60bac73187c0154af05dc230904"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9a7f41ace3e4bcb84a6ce53910b496cf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a9a7f41ace3e4bcb84a6ce53910b496cf">ccc_buf_size_bytes</a> (ccc_buffer const *buf)</td></tr>
-<tr class="memdesc:a9a7f41ace3e4bcb84a6ce53910b496cf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the bytes in the buffer given the current count of active elements.  <br /></td></tr>
-<tr class="separator:a9a7f41ace3e4bcb84a6ce53910b496cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abdae0cb0ada9da053593862293111450"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#abdae0cb0ada9da053593862293111450">ccc_buf_count_bytes</a> (ccc_buffer const *buf)</td></tr>
+<tr class="memdesc:abdae0cb0ada9da053593862293111450"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the bytes in the buffer given the current count of active elements.  <br /></td></tr>
+<tr class="separator:abdae0cb0ada9da053593862293111450"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a10f937d25fed71a32c7e8fc8bda9a354"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a10f937d25fed71a32c7e8fc8bda9a354">ccc_buf_capacity_bytes</a> (ccc_buffer const *buf)</td></tr>
 <tr class="memdesc:a10f937d25fed71a32c7e8fc8bda9a354"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the bytes in the buffer given the current capacity elements.  <br /></td></tr>
 <tr class="separator:a10f937d25fed71a32c7e8fc8bda9a354"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad93634769bf57469d89310325e93e425"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#ad93634769bf57469d89310325e93e425">ccc_buf_size</a> (ccc_buffer const *buf)</td></tr>
-<tr class="memdesc:ad93634769bf57469d89310325e93e425"><td class="mdescLeft">&#160;</td><td class="mdescRight">obtain the size of the buffer representing active slots.  <br /></td></tr>
-<tr class="separator:ad93634769bf57469d89310325e93e425"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a31b8298eafbc49338c4f9fcabf264df2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a31b8298eafbc49338c4f9fcabf264df2">ccc_buf_count</a> (ccc_buffer const *buf)</td></tr>
+<tr class="memdesc:a31b8298eafbc49338c4f9fcabf264df2"><td class="mdescLeft">&#160;</td><td class="mdescRight">obtain the count of buffer active slots.  <br /></td></tr>
+<tr class="separator:a31b8298eafbc49338c4f9fcabf264df2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2b808c7a344ba63cee75c95aeaaabebe"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a2b808c7a344ba63cee75c95aeaaabebe">ccc_buf_is_empty</a> (ccc_buffer const *buf)</td></tr>
 <tr class="memdesc:a2b808c7a344ba63cee75c95aeaaabebe"><td class="mdescLeft">&#160;</td><td class="mdescRight">return true if the size of the buffer is 0.  <br /></td></tr>
 <tr class="separator:a2b808c7a344ba63cee75c95aeaaabebe"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -810,7 +810,7 @@ This graph shows which files directly or indirectly include this file:</div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the number of bytes occupied by the current capacity elements.</dd></dl>
-<p>For total possible bytes that can be stored in the buffer given the current element count see ccc_buf_size_bytes. </p>
+<p>For total possible bytes that can be stored in the buffer given the current element count see ccc_buf_count_bytes. </p>
 
 </div>
 </div>
@@ -1033,6 +1033,62 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="line"><a class="code hl_enumeration" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> res = buf_copy(&amp;dst, &amp;src, std_alloc);</div>
 </div><!-- fragment --><p>Because an allocation function is provided, the dst is resized once for the copy and retains its fixed size after the copy is complete. This would require the user to manually free the underlying buffer at dst eventually if this method is used. Usually it is better to allocate the memory explicitly before the copy if copying between ring buffers.</p>
 <p>These options allow users to stay consistent across containers with their memory management strategies. </p>
+
+</div>
+</div>
+<a id="a31b8298eafbc49338c4f9fcabf264df2" name="a31b8298eafbc49338c4f9fcabf264df2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a31b8298eafbc49338c4f9fcabf264df2">&#9670;&#160;</a></span>ccc_buf_count()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_buf_count </td>
+          <td>(</td>
+          <td class="paramtype">ccc_buffer const *&#160;</td>
+          <td class="paramname"><em>buf</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>obtain the count of buffer active slots. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">buf</td><td>the pointer to the buffer. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the quantity of elements stored in the buffer. An argument error is set if buf is NULL.</dd></dl>
+<p>Note that size must be less than or equal to capacity. </p>
+
+</div>
+</div>
+<a id="abdae0cb0ada9da053593862293111450" name="abdae0cb0ada9da053593862293111450"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abdae0cb0ada9da053593862293111450">&#9670;&#160;</a></span>ccc_buf_count_bytes()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_buf_count_bytes </td>
+          <td>(</td>
+          <td class="paramtype">ccc_buffer const *&#160;</td>
+          <td class="paramname"><em>buf</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Return the bytes in the buffer given the current count of active elements. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">buf</td><td>the pointer to the buffer. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the number of bytes occupied by the current count of elements.</dd></dl>
+<p>For total possible bytes that can be stored in the buffer see ccc_buf_capacity_bytes. </p>
 
 </div>
 </div>
@@ -1599,62 +1655,6 @@ This graph shows which files directly or indirectly include this file:</div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the next iterator position according to size and in reverse order. NULL is returned if bad input is provided or the buffer has not been allocated. </dd></dl>
-
-</div>
-</div>
-<a id="ad93634769bf57469d89310325e93e425" name="ad93634769bf57469d89310325e93e425"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad93634769bf57469d89310325e93e425">&#9670;&#160;</a></span>ccc_buf_size()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_buf_size </td>
-          <td>(</td>
-          <td class="paramtype">ccc_buffer const *&#160;</td>
-          <td class="paramname"><em>buf</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>obtain the size of the buffer representing active slots. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">buf</td><td>the pointer to the buffer. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>the quantity of elements stored in the buffer. An argument error is set if buf is NULL.</dd></dl>
-<p>Note that size must be less than or equal to capacity. </p>
-
-</div>
-</div>
-<a id="a9a7f41ace3e4bcb84a6ce53910b496cf" name="a9a7f41ace3e4bcb84a6ce53910b496cf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9a7f41ace3e4bcb84a6ce53910b496cf">&#9670;&#160;</a></span>ccc_buf_size_bytes()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_buf_size_bytes </td>
-          <td>(</td>
-          <td class="paramtype">ccc_buffer const *&#160;</td>
-          <td class="paramname"><em>buf</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Return the bytes in the buffer given the current count of active elements. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">buf</td><td>the pointer to the buffer. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>the number of bytes occupied by the current count of elements.</dd></dl>
-<p>For total possible bytes that can be stored in the buffer see ccc_buf_capacity_bytes. </p>
 
 </div>
 </div>
