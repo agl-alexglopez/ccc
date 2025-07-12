@@ -384,7 +384,7 @@ ccc_buf_rbegin(ccc_buffer const *const buf)
     {
         return NULL;
     }
-    return (char *)buf->mem + (buf->count * buf->sizeof_type);
+    return (char *)buf->mem + ((buf->count - 1) * buf->sizeof_type);
 }
 
 void *

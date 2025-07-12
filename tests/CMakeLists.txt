@@ -85,6 +85,7 @@ endmacro()
 add_buf_test(test_buf_construct)
 add_buf_test(test_buf_insert)
 add_buf_test(test_buf_erase)
+add_buf_test(test_buf_iter)
 
 #############  Heap Priority Queue  ##########################
 add_library(fpq_util fpq/fpq_util.h fpq/fpq_util.c)
