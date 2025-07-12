@@ -277,8 +277,8 @@ ccc_buf_erase(ccc_buffer *const buf, size_t const i)
         --buf->count;
         return CCC_RESULT_OK;
     }
-    (void)memcpy(at(buf, i), at(buf, i + 1),
-                 buf->sizeof_type * (buf->count - (i + 1)));
+    (void)memmove(at(buf, i), at(buf, i + 1),
+                  buf->sizeof_type * (buf->count - (i + 1)));
     --buf->count;
     return CCC_RESULT_OK;
 }
