@@ -80,7 +80,7 @@ CHECK_BEGIN_STATIC_FN(buf_test_daily_temperatures)
                                     int, NULL, NULL, TMPCAP, TMPCAP);
     buffer res = buf_init((int[TMPCAP]){}, int, NULL, NULL, TMPCAP, TMPCAP);
     buffer idx_stack = buf_init((int[TMPCAP]){}, int, NULL, NULL, TMPCAP);
-    for (int i = 0, end = buf_size(&temps).count; i < end; ++i)
+    for (int i = 0, end = (int)buf_size(&temps).count; i < end; ++i)
     {
         while (!buf_is_empty(&idx_stack)
                && *(int *)buf_at(&temps, i)

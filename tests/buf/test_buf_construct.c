@@ -1,3 +1,5 @@
+#include <stddef.h>
+
 #define BUFFER_USING_NAMESPACE_CCC
 
 #include "alloc.h"
