@@ -59,7 +59,10 @@ CHECK_BEGIN_STATIC_FN(buf_test_push_resize)
     }
     CHECK(buf_size(&b).count, cap);
     CHECK(buf_capacity(&b).count >= cap, CCC_TRUE);
-    CHECK_END_FN((void)buf_clear_and_free(&b, NULL););
+    CHECK_END_FN({
+        (void)buf_clear_and_free(&b, NULL);
+        free(many);
+    });
 }
 
 CHECK_BEGIN_STATIC_FN(buf_test_push_qsort)

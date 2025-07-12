@@ -77,7 +77,7 @@ CHECK_BEGIN_STATIC_FN(fdeq_test_copy_alloc)
     CHECK(is_empty(&q1), is_empty(&q2));
     CHECK_END_FN({
         (void)fdeq_clear_and_free(&q1, NULL);
-        (void)ccc_fdeq_clear_and_free_reserve(&q1, NULL, std_alloc);
+        (void)ccc_fdeq_clear_and_free_reserve(&q2, NULL, std_alloc);
     });
 }
 
