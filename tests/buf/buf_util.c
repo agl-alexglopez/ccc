@@ -1,3 +1,6 @@
+#include <stddef.h>
+#include <string.h>
+
 #define BUFFER_USING_NAMESPACE_CCC
 
 #include "buf_util.h"
@@ -66,6 +69,49 @@ sort(ccc_buffer *const b, ccc_any_type_cmp_fn *const fn, void *const swap)
     if (buf_size(b).count)
     {
         sort_rec(b, fn, swap, 0, buf_size(b).count - 1);
+    }
+    return CCC_RESULT_OK;
+}
+
+ccc_threeway_cmp
+bufcmp(ccc_buffer const *const lhs, size_t const rhs_count,
+       void const *const rhs)
+{
+    size_t const type_size = buf_sizeof_type(lhs).count;
+    size_t const buf_size = buf_size(lhs).count;
+    if (buf_size < rhs_count)
+    {
+        return CCC_LES;
+    }
+    if (buf_size < rhs_count)
+    {
+        return CCC_GRT;
+    }
+    int const cmp = memcmp(buf_begin(lhs), rhs, buf_size * type_size);
+    if (cmp == 0)
+    {
+        return CCC_EQL;
+    }
+    if (cmp < 0)
+    {
+        return CCC_LES;
+    }
+    return CCC_GRT;
+}
+
+ccc_result
+append_range(ccc_buffer *const b, size_t range_count, void const *const range)
+{
+    unsigned char const *p = range;
+    size_t const sizeof_type = buf_sizeof_type(b).count;
+    while (range_count--)
+    {
+        void const *const appended = ccc_buf_push_back(b, p);
+        if (!appended)
+        {
+            return CCC_RESULT_FAIL;
+        }
+        p += sizeof_type;
     }
     return CCC_RESULT_OK;
 }
