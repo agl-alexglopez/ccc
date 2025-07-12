@@ -26,7 +26,7 @@ CHECK_BEGIN_STATIC_FN(fdeq_test_copy_no_alloc)
     CHECK(size(&q1).count, 3);
     CHECK(*(int *)front(&q1), 0);
     CHECK(is_empty(&q2), true);
-    ccc_result res = fdeq_copy(&q2, &q1, NULL);
+    ccc_result const res = fdeq_copy(&q2, &q1, NULL);
     CHECK(res, CCC_RESULT_OK);
     CHECK(size(&q2).count, 3);
     while (!is_empty(&q1) && !is_empty(&q2))
@@ -50,7 +50,7 @@ CHECK_BEGIN_STATIC_FN(fdeq_test_copy_no_alloc_fail)
     CHECK(size(&q1).count, 3);
     CHECK(*(int *)front(&q1), 0);
     CHECK(is_empty(&q2), true);
-    ccc_result res = fdeq_copy(&q2, &q1, NULL);
+    ccc_result const res = fdeq_copy(&q2, &q1, NULL);
     CHECK(res != CCC_RESULT_OK, true);
     CHECK_END_FN();
 }
@@ -68,8 +68,8 @@ CHECK_BEGIN_STATIC_FN(fdeq_test_copy_alloc)
     CHECK(size(&q2).count, 5);
     while (!is_empty(&q1) && !is_empty(&q2))
     {
-        int f1 = *(int *)front(&q1);
-        int f2 = *(int *)front(&q2);
+        int const f1 = *(int *)front(&q1);
+        int const f2 = *(int *)front(&q2);
         (void)pop_front(&q1);
         (void)pop_front(&q2);
         CHECK(f1, f2);
@@ -77,7 +77,7 @@ CHECK_BEGIN_STATIC_FN(fdeq_test_copy_alloc)
     CHECK(is_empty(&q1), is_empty(&q2));
     CHECK_END_FN({
         (void)fdeq_clear_and_free(&q1, NULL);
-        std_alloc(fdeq_data(&q2), 0, NULL);
+        (void)ccc_fdeq_clear_and_free_reserve(&q1, NULL, std_alloc);
     });
 }
 

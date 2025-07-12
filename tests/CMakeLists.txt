@@ -51,6 +51,30 @@ add_bs_test(test_bs_insert)
 add_bs_test(test_bs_erase)
 add_bs_test(test_bs_test_and_set)
 
+#############  Buffer ##########################
+macro(add_buf_test TEST_NAME)
+  add_executable(${TEST_NAME} buf/${TEST_NAME}.c)
+  target_include_directories(${TEST_NAME} PRIVATE "../util")
+  target_link_libraries(${TEST_NAME}
+    PRIVATE
+      ccc
+      checkers
+      alloc
+      random
+  )
+  set_target_properties(${TEST_NAME} 
+    PROPERTIES 
+      RUNTIME_OUTPUT_DIRECTORY 
+        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/tests
+  )
+  add_dependencies(tests ${TEST_NAME})
+endmacro()
+
+# Add tests below here by the name of the c file without the .c suffix
+add_buf_test(test_buf_construct)
+add_buf_test(test_buf_insert)
+#add_buf_test(test_buf_erase)
+
 #############  Heap Priority Queue  ##########################
 add_library(fpq_util fpq/fpq_util.h fpq/fpq_util.c)
 target_link_libraries(fpq_util

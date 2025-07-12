@@ -683,6 +683,6 @@ See container documentation for specific behavior. */
 #    define capacity(args...) ccc_capacity(args)
 #    define is_empty(args...) ccc_is_empty(args)
 #    define validate(args...) ccc_validate(args)
-#endif /* CCC_USING_NAMESPACE_CCC */
+#endif /* TRAITS_USING_NAMESPACE_CCC */
 
 #endif /* CCC_TRAITS_H */

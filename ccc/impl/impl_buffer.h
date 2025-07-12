@@ -69,30 +69,28 @@ are contiguous. */
     }
 
 /** @private */
-#define ccc_impl_buf_emplace(buf_ptr, index, type_initializer...)              \
+#define ccc_impl_buf_emplace(impl_buf_ptr, index, impl_type_initializer...)    \
     (__extension__({                                                           \
-        typeof(type_initializer) *impl_buf_res = NULL;                         \
+        typeof(impl_type_initializer) *impl_buf_res = NULL;                    \
         __auto_type impl_i = (index);                                          \
-        __auto_type impl_emplace_buff_ptr = (buf_ptr);                         \
+        __auto_type impl_emplace_buff_ptr = (impl_buf_ptr);                    \
         impl_buf_res = ccc_buf_at(impl_emplace_buff_ptr, index);               \
         if (impl_buf_res)                                                      \
         {                                                                      \
-            *impl_buf_res = type_initializer;                                  \
+            *impl_buf_res = impl_type_initializer;                             \
         }                                                                      \
         impl_buf_res;                                                          \
     }))
 
 /** @private */
-#define ccc_impl_buf_emplace_back(buf_ptr, type_initializer...)                \
+#define ccc_impl_buf_emplace_back(impl_buf_ptr, impl_type_initializer...)      \
     (__extension__({                                                           \
-        typeof(type_initializer) *impl_buf_res = NULL;                         \
-        __auto_type impl_emplace_back_buf_ptr = (buf_ptr);                     \
-        assert(sizeof(*impl_buf_res)                                           \
-               == ccc_buf_sizeof_type(impl_emplace_back_buf_ptr));             \
-        impl_buf_res = ccc_buf_alloc_back((impl_emplace_back_buf_ptr));        \
+        typeof(impl_type_initializer) *impl_buf_res = NULL;                    \
+        __auto_type impl_emplace_back_impl_buf_ptr = (impl_buf_ptr);           \
+        impl_buf_res = ccc_buf_alloc_back((impl_emplace_back_impl_buf_ptr));   \
         if (impl_buf_res)                                                      \
         {                                                                      \
-            *impl_buf_res = type_initializer;                                  \
+            *impl_buf_res = impl_type_initializer;                             \
         }                                                                      \
         impl_buf_res;                                                          \
     }))

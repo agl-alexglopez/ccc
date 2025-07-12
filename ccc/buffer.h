@@ -23,13 +23,14 @@ is often used as the lower level abstraction for the flat data structures
 in this library that provide more specialized operations. A buffer does not
 require the user accommodate any intrusive elements.
 
-A buffer with allocation permission will re-size when a new element is inserted
-in a contiguous fashion. Interface in the allocation management section assume
-elements are stored contiguously and adjust size accordingly.
+A buffer with allocation permission will re-size as required when a new element
+is inserted in a contiguous fashion. Interface functions in the allocation
+management section assume elements are stored contiguously and adjust size
+accordingly.
 
-Interface in the slot management section offer data movement and writing
-operations that do not affect the size of the container. If writing a more
-complex higher level container that does not need size management these
+Interface functions in the slot management section offer data movement and
+writing operations that do not affect the size of the container. If writing a
+more complex higher level container that does not need size management these
 functions offer more custom control over the buffer.
 
 If allocation is not permitted, resizing will not occur and the insertion
@@ -96,13 +97,6 @@ occurred with the provided allocation function. */
     ccc_impl_buf_init(mem_ptr, any_type_name, alloc_fn, aux_data, capacity,    \
                       optional_size)
 
-/**@}*/
-
-/** @name Insert and Remove Interface
-These functions assume contiguity of elements in the buffer and increase or
-decrease size accordingly. */
-/**@{*/
-
 /** @brief Reserves space for at least to_add more elements.
 @param [in] buf a pointer to the buffer.
 @param [in] to_add the number of elements to add to the current size.
@@ -122,62 +116,73 @@ case see the ccc_buf_clear_and_free_reserve function. */
 [[nodiscard]] ccc_result ccc_buf_reserve(ccc_buffer *buf, size_t to_add,
                                          ccc_any_alloc_fn *fn);
 
-/** @brief Frees all slots in the buf and frees the underlying buffer that was
-previously dynamically reserved with the reserve function.
-@param [in] buf the buffer to be cleared.
-@param [in] destructor the destructor for each element. NULL can be passed if no
-maintenance is required on the elements in the buf before their slots are
-dropped.
-@param [in] alloc the required allocation function to provide to a dynamically
-reserved buf. Any auxiliary data provided upon initialization will be passed to
-the allocation function when called.
-@return the result of free operation. OK if success, or an error status to
-indicate the error.
-@warning It is an error to call this function on a buf that was not reserved
-with the provided ccc_any_alloc_fn. The buf must have existing memory to free.
+/** @brief Copy the buf from src to newly initialized dst.
+@param [in] dst the destination that will copy the source buf.
+@param [in] src the source of the buf.
+@param [in] fn the allocation function in case resizing of dst is needed.
+@return the result of the copy operation. If the destination capacity is less
+than the source capacity and no allocation function is provided an input error
+is returned. If resizing is required and resizing of dst fails a memory error
+is returned.
+@note dst must have capacity greater than or equal to src. If dst capacity is
+less than src, an allocation function must be provided with the fn argument.
 
-This function covers the edge case of reserving a dynamic capacity for a buf
-at runtime but denying the buf allocation permission to resize. This can help
-prevent a buf from growing unbounded. The user in this case knows the buf does
-not have allocation permission and therefore no further memory will be dedicated
-to the buf.
+Note that there are two ways to copy data from source to destination: provide
+sufficient memory and pass NULL as fn, or allow the copy function to take care
+of allocation for the copy.
 
-However, to free the buf in such a case this function must be used because the
-buf has no ability to free itself. Just as the allocation function is required
-to reserve memory so to is it required to free memory.
+Manual memory management with no allocation function provided.
 
-This function will work normally if called on a buf with allocation permission
-however the normal ccc_buf_clear_and_free is sufficient for that use case.
-Elements are assumed to be contiguous from the 0th index to index at size - 1.*/
-ccc_result
-ccc_buf_clear_and_free_reserve(ccc_buffer *buf,
-                               ccc_any_type_destructor_fn *destructor,
-                               ccc_any_alloc_fn *alloc);
+```
+#define BUFFER_USING_NAMESPACE_CCC
+buffer src = buf_init((int[10]){}, int, NULL, NULL, 10);
+int *new_mem = malloc(sizeof(int) * buf_capacity(&src).count);
+buffer dst
+    = buf_init(new_mem, int, NULL, NULL, buf_capacity(&src).count);
+ccc_result res = buf_copy(&dst, &src, NULL);
+```
 
-/** @brief Set size of buf to 0 and call destructor on each element if needed.
-Free the underlying buffer setting the capacity to 0. O(1) if no destructor is
-provided, else O(N).
-@param [in] buf a pointer to the buf.
-@param [in] destructor the destructor if needed or NULL.
+The above requires dst capacity be greater than or equal to src capacity. Here
+is memory management handed over to the copy function.
 
-Note that if destructor is non-NULL it will be called on each element in the
-buf. After all elements are processed the buffer is freed and capacity is 0.
-If destructor is NULL the buffer is freed directly and capacity is 0. Elements
-are assumed to be contiguous from the 0th index to index at size - 1.*/
-ccc_result ccc_buf_clear_and_free(ccc_buffer *buf,
-                                  ccc_any_type_destructor_fn *destructor);
+```
+#define BUFFER_USING_NAMESPACE_CCC
+buffer src = buf_init(NULL, int, std_alloc, NULL, 0);
+(void)ccc_buf_push_back_range(&src, 5, (int[5]){0,1,2,3,4});
+buffer dst = buf_init(NULL, int, std_alloc, NULL, 0);
+ccc_result res = buf_copy(&dst, &src, std_alloc);
+```
 
-/** @brief Set size of buf to 0 and call destructor on each element if needed.
-O(1) if no destructor is provided, else O(N).
-@param [in] buf a pointer to the buf.
-@param [in] destructor the destructor if needed or NULL.
+The above allows dst to have a capacity less than that of the src as long as
+copy has been provided an allocation function to resize dst. Note that this
+would still work if copying to a destination that the user wants as a fixed
+size buf (ring buffer).
 
-Note that if destructor is non-NULL it will be called on each element in the
-buf. However, the underlying buffer for the buf is not freed. If the
-destructor is NULL, setting the size to 0 is O(1). Elements are assumed to be
-contiguous from the 0th index to index at size - 1.*/
-ccc_result ccc_buf_clear(ccc_buffer *buf,
-                         ccc_any_type_destructor_fn *destructor);
+```
+#define BUFFER_USING_NAMESPACE_CCC
+buffer src = buf_init(NULL, int, std_alloc, NULL, 0);
+(void)ccc_buf_push_back_range(&src, 5, (int[5]){0,1,2,3,4});
+buffer dst = buf_init(NULL, int, NULL, NULL, 0);
+ccc_result res = buf_copy(&dst, &src, std_alloc);
+```
+
+Because an allocation function is provided, the dst is resized once for the copy
+and retains its fixed size after the copy is complete. This would require the
+user to manually free the underlying buffer at dst eventually if this method is
+used. Usually it is better to allocate the memory explicitly before the copy if
+copying between ring buffers.
+
+These options allow users to stay consistent across containers with their
+memory management strategies. */
+[[nodiscard]] ccc_result ccc_buf_copy(ccc_buffer *dst, ccc_buffer const *src,
+                                      ccc_any_alloc_fn *fn);
+
+/**@}*/
+
+/** @name Insert and Remove Interface
+These functions assume contiguity of elements in the buffer and increase or
+decrease size accordingly. */
+/**@{*/
 
 /** @brief allocates the buffer to the specified size according to the user
 defined allocation function.
@@ -220,6 +225,18 @@ capacity. If size is equal to capacity resizing will be attempted but may
 fail if no allocation function is provided or the allocator provided is
 exhausted. */
 [[nodiscard]] void *ccc_buf_push_back(ccc_buffer *buf, void const *data);
+
+/** @brief Pushes the user provided compound literal directly to back of buffer
+and increments the size to reflect the newly added element.
+@param [in] buf_ptr a pointer to the buffer.
+@param [in] type_compound_literal the direct compound literal as provided.
+@return a pointer to the inserted element or NULL if insertion failed.
+
+Any function calls that set fields of the compound literal will not be evaluated
+if the buffer fails to allocate a slot at the back of the buffer. This may occur
+if resizing fails or is prohibited. */
+#define ccc_buf_emplace_back(buf_ptr, type_compound_literal...)                \
+    ccc_impl_buf_emplace_back(buf_ptr, type_compound_literal)
 
 /** @brief insert data at slot i according to size of the buffer maintaining
 contiguous storage of elements between 0 and size.
@@ -306,7 +323,7 @@ size or NULL if the buffer does not exist or is empty. */
 or is empty. */
 [[nodiscard]] void *ccc_buf_front(ccc_buffer const *buf);
 
-/** @brief copy data at index src to dst according to capacity.
+/** @brief Move data at index src to dst according to capacity.
 @param [in] buf the pointer to the buffer.
 @param [in] dst the index of destination within bounds of capacity.
 @param [in] src the index of source within bounds of capacity.
@@ -315,8 +332,8 @@ or is empty. */
 
 Note that destination and source are only required to be valid within bounds
 of capacity of the buffer. It is up to the user to ensure destination and
-source are within the size bounds of the buffer. */
-void *ccc_buf_copy(ccc_buffer *buf, size_t dst, size_t src);
+source are within the size bounds of the buffer, if required. */
+void *ccc_buf_move(ccc_buffer *buf, size_t dst, size_t src);
 
 /** @brief write data to buffer at slot at index i according to capacity.
 @param [in] buf the pointer to the buffer.
@@ -333,6 +350,20 @@ of the buffer if such behavior is desired. No elements are moved to be
 preserved meaning any data at i is overwritten. */
 ccc_result ccc_buf_write(ccc_buffer *buf, size_t i, void const *data);
 
+/** @brief Writes a user provided compound literal directly to a buffer slot.
+@param [in] buf_ptr a pointer to the buffer.
+@param [in] index the desired index at which to insert an element.
+@param [in] type_compound_literal the direct compound literal as provided.
+@return a pointer to the inserted element or NULL if insertion failed.
+@warning The index provided is only checked to be within capacity bounds so it
+is the user's responsibility to ensure the index is within the contiguous range
+of [0, size). This insert method does not increment the size of the buffer.
+
+Any function calls that set fields of the compound literal will not be evaluated
+if the provided index is out of range of the buffer capacity. */
+#define ccc_buf_emplace(buf_ptr, index, type_compound_literal...)              \
+    ccc_impl_buf_emplace(buf_ptr, index, type_compound_literal)
+
 /** @brief swap elements at i and j according to capacity of the bufer.
 @param [in] buf the pointer to the buffer.
 @param [in] tmp the pointer to the temporary buffer of the same size as an
@@ -347,7 +378,7 @@ range, an input error is returned.
 Note that i and j are only checked to be within capacity range of the buffer.
 It is the user's responsibility to check for i and j within bounds of size
 if such behavior is needed. */
-ccc_result ccc_buf_swap(ccc_buffer *buf, char tmp[], size_t i, size_t j);
+ccc_result ccc_buf_swap(ccc_buffer *buf, void *tmp, size_t i, size_t j);
 
 /**@}*/
 
@@ -479,6 +510,69 @@ Note that size must be less than or equal to capacity. */
 
 /**@}*/
 
+/** @name Deallocation Interface
+Free the elements of the container and the underlying buffer. */
+/**@{*/
+
+/** @brief Frees all slots in the buf and frees the underlying buffer that was
+previously dynamically reserved with the reserve function.
+@param [in] buf the buffer to be cleared.
+@param [in] destructor the destructor for each element. NULL can be passed if no
+maintenance is required on the elements in the buf before their slots are
+dropped.
+@param [in] alloc the required allocation function to provide to a dynamically
+reserved buf. Any auxiliary data provided upon initialization will be passed to
+the allocation function when called.
+@return the result of free operation. OK if success, or an error status to
+indicate the error.
+@warning It is an error to call this function on a buf that was not reserved
+with the provided ccc_any_alloc_fn. The buf must have existing memory to free.
+
+This function covers the edge case of reserving a dynamic capacity for a buf
+at runtime but denying the buf allocation permission to resize. This can help
+prevent a buf from growing unbounded. The user in this case knows the buf does
+not have allocation permission and therefore no further memory will be dedicated
+to the buf.
+
+However, to free the buf in such a case this function must be used because the
+buf has no ability to free itself. Just as the allocation function is required
+to reserve memory so to is it required to free memory.
+
+This function will work normally if called on a buf with allocation permission
+however the normal ccc_buf_clear_and_free is sufficient for that use case.
+Elements are assumed to be contiguous from the 0th index to index at size - 1.*/
+ccc_result
+ccc_buf_clear_and_free_reserve(ccc_buffer *buf,
+                               ccc_any_type_destructor_fn *destructor,
+                               ccc_any_alloc_fn *alloc);
+
+/** @brief Set size of buf to 0 and call destructor on each element if needed.
+Free the underlying buffer setting the capacity to 0. O(1) if no destructor is
+provided, else O(N).
+@param [in] buf a pointer to the buf.
+@param [in] destructor the destructor if needed or NULL.
+
+Note that if destructor is non-NULL it will be called on each element in the
+buf. After all elements are processed the buffer is freed and capacity is 0.
+If destructor is NULL the buffer is freed directly and capacity is 0. Elements
+are assumed to be contiguous from the 0th index to index at size - 1.*/
+ccc_result ccc_buf_clear_and_free(ccc_buffer *buf,
+                                  ccc_any_type_destructor_fn *destructor);
+
+/** @brief Set size of buf to 0 and call destructor on each element if needed.
+O(1) if no destructor is provided, else O(N).
+@param [in] buf a pointer to the buf.
+@param [in] destructor the destructor if needed or NULL.
+
+Note that if destructor is non-NULL it will be called on each element in the
+buf. However, the underlying buffer for the buf is not freed. If the
+destructor is NULL, setting the size to 0 is O(1). Elements are assumed to be
+contiguous from the 0th index to index at size - 1.*/
+ccc_result ccc_buf_clear(ccc_buffer *buf,
+                         ccc_any_type_destructor_fn *destructor);
+
+/**@}*/
+
 /** Define this preprocessor directive to drop the ccc prefix from all buffer
 related types and methods. By default the prefix is required but may be
 dropped with this directive if one is sure no namespace collisions occur. */
@@ -487,6 +581,7 @@ typedef ccc_buffer buffer;
 #    define buf_init(args...) ccc_buf_init(args)
 #    define buf_alloc(args...) ccc_buf_alloc(args)
 #    define buf_reserve(args...) ccc_buf_reserve(args)
+#    define buf_copy(args...) ccc_buf_copy(args)
 #    define buf_clear(args...) ccc_buf_clear(args)
 #    define buf_clear_and_free(args...) ccc_buf_clear_and_free(args)
 #    define buf_clear_and_free_reserve(args...)                                \
@@ -504,10 +599,12 @@ typedef ccc_buffer buffer;
 #    define buf_back(args...) ccc_buf_back(args)
 #    define buf_front(args...) ccc_buf_front(args)
 #    define buf_alloc_back(args...) ccc_buf_alloc_back(args)
+#    define buf_emplace(args...) ccc_buf_emplace(args)
+#    define buf_emplace_back(args...) ccc_buf_emplace_back(args)
 #    define buf_push_back(args...) ccc_buf_push_back(args)
 #    define buf_pop_back(args...) ccc_buf_pop_back(args)
 #    define buf_pop_back_n(args...) ccc_buf_pop_back_n(args)
-#    define buf_copy(args...) ccc_buf_copy(args)
+#    define buf_move(args...) ccc_buf_move(args)
 #    define buf_swap(args...) ccc_buf_swap(args)
 #    define buf_write(args...) ccc_buf_write(args)
 #    define buf_erase(args...) ccc_buf_erase(args)
