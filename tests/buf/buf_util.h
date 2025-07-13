@@ -1,6 +1,8 @@
 #ifndef BUF_UTIL_H
 #define BUF_UTIL_H
 
+#include <stddef.h>
+
 #include "ccc/buffer.h"
 #include "ccc/types.h"
 
