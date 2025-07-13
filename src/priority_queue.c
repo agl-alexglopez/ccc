@@ -357,6 +357,10 @@ decrease_fixup(struct ccc_pq *const pq, struct ccc_pq_elem *const e,
     pq->root = merge(pq, pq->root, e);
 }
 
+/** Cuts the child out of its current sibling list and redirects parent if
+this child is directly pointed to by parent. The child is then made into its
+own circular sibling list. The left child of this child, if one exists, is
+still pointed to and not modified by this function. */
 static void
 cut_child(struct ccc_pq_elem *const child)
 {
@@ -367,6 +371,7 @@ cut_child(struct ccc_pq_elem *const child)
         child->parent->child = child->next == child ? NULL : child->next;
     }
     child->parent = NULL;
+    child->next = child->prev = child;
 }
 
 static struct ccc_pq_elem *
