@@ -17,7 +17,7 @@ limitations under the License. */
 #include "types.h"
 
 /** @private */
-static char const *const result_msgs[CCC_RESULT_SIZE] = {
+static char const *const result_msgs[CCC_RESULT_COUNT] = {
     [CCC_RESULT_OK] = "",
     [CCC_RESULT_FAIL]
     = "An operation ran on a container but the desired result could not be "
@@ -143,7 +143,7 @@ ccc_rend_rrange(ccc_rrange const *const r)
 char const *
 ccc_result_msg(ccc_result const res)
 {
-    if (res >= CCC_RESULT_SIZE)
+    if (res >= CCC_RESULT_COUNT)
     {
         return "error: invalid result provided no message exists";
     }
@@ -185,20 +185,20 @@ ccc_entry_status_msg(ccc_entry_status const status)
             return "vacant with no errors";
             break;
         case CCC_ENTRY_OCCUPIED:
-            return "occupied and non-NULL";
+            return "occupied and non-NULL with no errors";
             break;
         case CCC_ENTRY_INSERT_ERROR:
-            return "insert error has occurred or will occur on insert "
-                   "attempted";
+            return "insert error has occurred or will occur on next insert";
             break;
         case CCC_ENTRY_ARG_ERROR:
             return "could not proceed due to bad arguments to a function";
             break;
         case CCC_ENTRY_NO_UNWRAP:
-            return "unwrap prohibited in order to protect container";
+            return "unwrap prohibited in order to protect container integrity";
             break;
         default:
-            return "error: encountered an unknown combination of flags";
+            return "error: encountered an unknown combination of entry/handle "
+                   "flags";
             break;
     }
 }

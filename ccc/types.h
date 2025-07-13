@@ -141,7 +141,7 @@ typedef enum : uint8_t
     /** Bad arguments have been provided and operation returned early. */
     CCC_RESULT_ARG_ERROR,
     /** Internal helper, never returned to user. Always last result. */
-    CCC_RESULT_SIZE,
+    CCC_RESULT_COUNT,
 } ccc_result;
 
 /** @brief A three-way comparison for comparison functions.
