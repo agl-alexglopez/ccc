@@ -153,11 +153,10 @@ A fixed or dynamic contiguous array of a single user defined type.
 #define TRAITS_USING_NAMESPACE_CCC
 #include "ccc/buffer.h"
 #include "ccc/traits.h"
-#include "ccc/types.h"
 
 enum : size_t
 {
-    HCAP = 6,
+    HCAP = 12,
 };
 
 static inline int
@@ -166,32 +165,37 @@ maxint(int const a, int const b)
     return a > b ? a : b;
 }
 
-/* Maximum rectangle in histogram Leetcode problem. */
+/* Trapping rainwater Leetcode problem with iterators */
 int
 main(void)
 {
-    buffer const heights = buf_init(((int[HCAP]){2, 1, 5, 6, 2, 3}), int, NULL,
-                                    NULL, HCAP, HCAP);
-    int const correct_max_rectangle = 10;
-    int max_rectangle = 0;
-    buffer bars_idx = buf_init((int[HCAP]){}, int, NULL, NULL, HCAP);
-    for (int i = 0, end = count(&heights).count; i <= end; ++i)
+    buffer const heights
+        = buf_init(((int[HCAP]){0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1}), int, NULL,
+                   NULL, HCAP, HCAP);
+    int const correct_trapped = 6;
+    int trapped = 0;
+    int lpeak = *buf_front_as(&heights, int);
+    int rpeak = *buf_back_as(&heights, int);
+    /* Easy way to have a "skip first" iterator because the iterator is
+       returned from each iterator function. */
+    int const *l = next(&heights, begin(&heights));
+    int const *r = rnext(&heights, rbegin(&heights));
+    while (l <= r)
     {
-        while (!buf_is_empty(&bars_idx)
-               && (i == end
-                   || *buf_as(&heights, int, i) < *buf_as(
-                          &heights, int, *buf_back_as(&bars_idx, int))))
+        if (lpeak < rpeak)
         {
-            int const *const h = buf_at(&heights, *buf_back_as(&bars_idx, int));
-            (void)pop_back(&bars_idx);
-            int const w = is_empty(&bars_idx)
-                            ? 1
-                            : i - *buf_back_as(&bars_idx, int) - 1;
-            max_rectangle = maxint(max_rectangle, *h * w);
+            lpeak = maxint(lpeak, *l);
+            trapped += (lpeak - *l);
+            l = next(&heights, l);
         }
-        (void)push_back(&bars_idx, &i);
+        else
+        {
+            rpeak = maxint(rpeak, *r);
+            trapped += (rpeak - *r);
+            r = rnext(&heights, r);
+        }
     }
-    assert(max_rectangle == correct_max_rectangle);
+    assert(trapped == correct_trapped);
     return 0;
 }
 ```
