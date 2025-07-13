@@ -128,8 +128,9 @@ This graph shows which files directly or indirectly include this file:</div>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The Buffer Interface. </p>
 <p>Buffer usage is similar to a C++ vector, with more flexible functions provided to support higher level containers and abstractions. While useful on its own&ndash;a stack could be implemented with the provided functions&ndash;a buffer is often used as the lower level abstraction for the flat data structures in this library that provide more specialized operations. A buffer does not require the user accommodate any intrusive elements.</p>
-<p>A buffer with allocation permission will re-size as required when a new element is inserted in a contiguous fashion. Interface functions in the allocation management section assume elements are stored contiguously and adjust size accordingly.</p>
+<p>A buffer offers a more flexible interface than a standard C++ vector. There are functions that assume elements are stored contiguously from [0, N) where N is the count of elements. However, there are also functions that let the user access any buffer slot that is within the bounds of buffer capacity. This requires the user pay closer attention to buffer usage but ultimately allows them to build a wider variety of abstractions on top of the buffer.</p>
 <p>Interface functions in the slot management section offer data movement and writing operations that do not affect the size of the container. If writing a more complex higher level container that does not need size management these functions offer more custom control over the buffer.</p>
+<p>A buffer with allocation permission will re-size as required when a new element is inserted in a contiguous fashion. Interface functions in the allocation management section assume elements are stored contiguously and adjust size accordingly.</p>
 <p>If allocation is not permitted, resizing will not occur and the insertion function will fail when capacity is reached, returning some value to indicate failure.</p>
 <p>If shorter names are desired, define the following preprocessor directive.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define BUFFER_USING_NAMESPACE_CCC</span></div>
@@ -177,7 +178,7 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="separator:acd3fe998c43ec179e503d9f7c98f2b83"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Slot Management Interface</h2></td></tr>
-<tr><td class="ititle" colspan="2"><p>These functions interact with slots in the buffer directly and do not modify the size of the buffer. These are best used for custom container implementations operating at a higher level of abstraction. </p>
+<tr><td class="ititle" colspan="2"><p>These functions interact with slots in the buffer directly and do not modify the size of the buffer. These are best used for custom container types operating at a higher level of abstraction. </p>
 </td></tr>
 <tr class="memitem:a0a4ebe4610f3f5e68235658b0d47992e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a0a4ebe4610f3f5e68235658b0d47992e">ccc_buf_as</a>(buf_ptr,  type_name,  index)&#160;&#160;&#160;    ((type_name *)<a class="el" href="buffer_8h.html#a5f45a54a635295a962f520afcf61f3ad">ccc_buf_at</a>(buf_ptr, index))</td></tr>
 <tr class="memdesc:a0a4ebe4610f3f5e68235658b0d47992e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Access en element at the specified index as the stored type.  <br /></td></tr>
@@ -257,6 +258,9 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memitem:a38ddb0477e6fb68d75086489a973afc4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a38ddb0477e6fb68d75086489a973afc4">ccc_buf_size_set</a> (ccc_buffer *buf, size_t n)</td></tr>
 <tr class="memdesc:a38ddb0477e6fb68d75086489a973afc4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the buffer size to n.  <br /></td></tr>
 <tr class="separator:a38ddb0477e6fb68d75086489a973afc4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a31b8298eafbc49338c4f9fcabf264df2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a31b8298eafbc49338c4f9fcabf264df2">ccc_buf_count</a> (ccc_buffer const *buf)</td></tr>
+<tr class="memdesc:a31b8298eafbc49338c4f9fcabf264df2"><td class="mdescLeft">&#160;</td><td class="mdescRight">obtain the count of buffer active slots.  <br /></td></tr>
+<tr class="separator:a31b8298eafbc49338c4f9fcabf264df2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8c12071400603b3e786588eb3cdd8b8b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a8c12071400603b3e786588eb3cdd8b8b">ccc_buf_capacity</a> (ccc_buffer const *buf)</td></tr>
 <tr class="memdesc:a8c12071400603b3e786588eb3cdd8b8b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the current capacity of total possible slots.  <br /></td></tr>
 <tr class="separator:a8c12071400603b3e786588eb3cdd8b8b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -269,9 +273,6 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memitem:a10f937d25fed71a32c7e8fc8bda9a354"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a10f937d25fed71a32c7e8fc8bda9a354">ccc_buf_capacity_bytes</a> (ccc_buffer const *buf)</td></tr>
 <tr class="memdesc:a10f937d25fed71a32c7e8fc8bda9a354"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the bytes in the buffer given the current capacity elements.  <br /></td></tr>
 <tr class="separator:a10f937d25fed71a32c7e8fc8bda9a354"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a31b8298eafbc49338c4f9fcabf264df2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a31b8298eafbc49338c4f9fcabf264df2">ccc_buf_count</a> (ccc_buffer const *buf)</td></tr>
-<tr class="memdesc:a31b8298eafbc49338c4f9fcabf264df2"><td class="mdescLeft">&#160;</td><td class="mdescRight">obtain the count of buffer active slots.  <br /></td></tr>
-<tr class="separator:a31b8298eafbc49338c4f9fcabf264df2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2b808c7a344ba63cee75c95aeaaabebe"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="buffer_8h.html#a2b808c7a344ba63cee75c95aeaaabebe">ccc_buf_is_empty</a> (ccc_buffer const *buf)</td></tr>
 <tr class="memdesc:a2b808c7a344ba63cee75c95aeaaabebe"><td class="mdescLeft">&#160;</td><td class="mdescRight">return true if the size of the buffer is 0.  <br /></td></tr>
 <tr class="separator:a2b808c7a344ba63cee75c95aeaaabebe"><td class="memSeparator" colspan="2">&#160;</td></tr>
