@@ -1342,5 +1342,5 @@ A few containers are based off of important work by other data structure develop
     - https://github.com/rust-lang/hashbrown
 - Phil Vachon's implementation of a WAVL tree was the inspiration for the `realtime_ordered_map.h` containers.
     - https://github.com/pvachon/wavl_tree
-- Research by Daniel Sleator in implementations of Splay Trees helped shape the `ordered_map.h` and `ordered_multimap.h` containers.
+- Research by Daniel Sleator in implementations of Splay Trees helped shape the `ordered_map.h` containers.
     - https://www.link.cs.cmu.edu/splay/
