@@ -25,7 +25,7 @@ var types_8h =
       [ "CCC_RESULT_NO_ALLOC", "types_8h.html#a51d6f078a83d667aff5016609d9146efaffee78d55817c7a0d5106e55ab66107f", null ],
       [ "CCC_RESULT_MEM_ERROR", "types_8h.html#a51d6f078a83d667aff5016609d9146efa162b1930618f98fd111ae5a46ddb6b29", null ],
       [ "CCC_RESULT_ARG_ERROR", "types_8h.html#a51d6f078a83d667aff5016609d9146efa0b3ff9dd93c87ee61e2202f76d1c2ec3", null ],
-      [ "CCC_RESULT_SIZE", "types_8h.html#a51d6f078a83d667aff5016609d9146efac252acd054776d456a9c120df6952c28", null ]
+      [ "CCC_RESULT_COUNT", "types_8h.html#a51d6f078a83d667aff5016609d9146efaf7846fca6ae33199da92335f1d523eb8", null ]
     ] ],
     [ "ccc_threeway_cmp", "types_8h.html#afa7f5d9756840807860490d28e345955", [
       [ "CCC_LES", "types_8h.html#afa7f5d9756840807860490d28e345955a813ea7b9e526748af7efa9a83da12ee8", null ],
