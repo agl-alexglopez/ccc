@@ -23,15 +23,23 @@ is often used as the lower level abstraction for the flat data structures
 in this library that provide more specialized operations. A buffer does not
 require the user accommodate any intrusive elements.
 
-A buffer with allocation permission will re-size as required when a new element
-is inserted in a contiguous fashion. Interface functions in the allocation
-management section assume elements are stored contiguously and adjust size
-accordingly.
+A buffer offers a more flexible interface than a standard C++ vector. There are
+functions that assume elements are stored contiguously from [0, N) where N is
+the count of elements. However, there are also functions that let the user
+access any buffer slot that is within the bounds of buffer capacity. This
+requires the user pay closer attention to buffer usage but ultimately allows
+them to build a wider variety of abstractions on top of the buffer.
 
 Interface functions in the slot management section offer data movement and
 writing operations that do not affect the size of the container. If writing a
 more complex higher level container that does not need size management these
 functions offer more custom control over the buffer.
+
+
+A buffer with allocation permission will re-size as required when a new element
+is inserted in a contiguous fashion. Interface functions in the allocation
+management section assume elements are stored contiguously and adjust size
+accordingly.
 
 If allocation is not permitted, resizing will not occur and the insertion
 function will fail when capacity is reached, returning some value to indicate
@@ -288,8 +296,8 @@ ccc_result ccc_buf_erase(ccc_buffer *buf, size_t i);
 
 /** @name Slot Management Interface
 These functions interact with slots in the buffer directly and do not modify
-the size of the buffer. These are best used for custom container
-implementations operating at a higher level of abstraction. */
+the size of the buffer. These are best used for custom container types operating
+at a higher level of abstraction. */
 /**@{*/
 
 /** @brief return the element at slot i in buf.
@@ -506,6 +514,14 @@ If n is larger than the capacity of the buffer the size is set equal to the
 capacity and an error is returned. */
 ccc_result ccc_buf_size_set(ccc_buffer *buf, size_t n);
 
+/** @brief obtain the count of buffer active slots.
+@param [in] buf the pointer to the buffer.
+@return the quantity of elements stored in the buffer. An argument error is set
+if buf is NULL.
+
+Note that size must be less than or equal to capacity. */
+[[nodiscard]] ccc_ucount ccc_buf_count(ccc_buffer const *buf);
+
 /** @brief Return the current capacity of total possible slots.
 @param [in] buf the pointer to the buffer.
 @return the total number of elements the can be stored in the buffer. This
@@ -535,14 +551,6 @@ ccc_buf_capacity_bytes. */
 For total possible bytes that can be stored in the buffer given the current
 element count see ccc_buf_count_bytes. */
 [[nodiscard]] ccc_ucount ccc_buf_capacity_bytes(ccc_buffer const *buf);
-
-/** @brief obtain the count of buffer active slots.
-@param [in] buf the pointer to the buffer.
-@return the quantity of elements stored in the buffer. An argument error is set
-if buf is NULL.
-
-Note that size must be less than or equal to capacity. */
-[[nodiscard]] ccc_ucount ccc_buf_count(ccc_buffer const *buf);
 
 /** @brief return true if the size of the buffer is 0.
 @param [in] buf the pointer to the buffer.
