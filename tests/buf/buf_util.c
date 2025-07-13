@@ -6,59 +6,78 @@
 #include "buf_util.h"
 #include "ccc/buffer.h"
 #include "ccc/types.h"
-#include "random.h"
 
-static int
-partition(buffer *const b, ccc_any_type_cmp_fn *const fn, void *const swap,
-          int lo, int hi)
+static inline void
+swap(void *const tmp, void *const a, void *const b, size_t const absize)
 {
-    /* Many people suggest random pivot over high index pivot. */
-    (void)buf_swap(b, swap, rand_range(lo, hi), hi);
-    void *const pivot_val = buf_at(b, hi);
-    int i = lo;
-    for (int j = lo; j < hi; ++j)
+    if (a != b)
+    {
+        (void)memcpy(tmp, a, absize);
+        (void)memcpy(a, b, absize);
+        (void)memcpy(b, tmp, absize);
+    }
+}
+
+static int *
+partition(buffer *const b, ccc_any_type_cmp_fn *const fn, void *const tmp,
+          void *lo, void *hi)
+{
+    void *const pivot_val = hi;
+    void *i = lo;
+    for (void *j = lo; j < hi; j = buf_next(b, j))
     {
         ccc_threeway_cmp const cmp = fn((ccc_any_type_cmp){
-            .any_type_lhs = buf_at(b, j),
+            .any_type_lhs = j,
             .any_type_rhs = pivot_val,
             .aux = b->aux,
         });
         if (cmp != CCC_GRT)
         {
-            (void)buf_swap(b, swap, i, j);
-            ++i;
+            swap(tmp, i, j, b->sizeof_type);
+            i = buf_next(b, i);
         }
     }
-    (void)buf_swap(b, swap, i, hi);
+    swap(tmp, i, hi, b->sizeof_type);
     return i;
 }
 
 /* NOLINTBEGIN(*misc-no-recursion*) */
 
-/** Canonical C quicksort. See Wikipedia for the pseudocode.
-https://en.wikipedia.org/wiki/Quicksort */
+/** Canonical C quicksort. See Wikipedia for the pseudocode or a breakdown of
+different trade offs. See CLRS extra problems for eliminating two recursive
+calls and reducing stack space to O(log(N)).
+
+    https://en.wikipedia.org/wiki/Quicksort
+
+This implementation does not try to be special or efficient. In fact because
+this is meant to test the buffer container, it uses iterators only to swap and
+sort data. This is a fun way to test that part of the buffer interface for
+correctness and turns out to be pretty nice and clean. */
 static void
-sort_rec(buffer *const b, ccc_any_type_cmp_fn *const fn, void *const swap,
-         int lo, int hi)
+sort_rec(buffer *const b, ccc_any_type_cmp_fn *const fn, void *const tmp,
+         void *lo, void *hi)
 {
     while (lo < hi)
     {
-        int const pivot_i = partition(b, fn, swap, lo, hi);
-        if (pivot_i - lo < hi - pivot_i)
+        void *pivot_i = partition(b, fn, tmp, lo, hi);
+        if ((char *)pivot_i - (char *)lo < (char *)hi - (char *)pivot_i)
         {
-            sort_rec(b, fn, swap, lo, pivot_i - 1);
-            lo = pivot_i + 1;
+            sort_rec(b, fn, tmp, lo, buf_rnext(b, pivot_i));
+            lo = buf_next(b, pivot_i);
         }
         else
         {
-            sort_rec(b, fn, swap, pivot_i + 1, hi);
-            hi = pivot_i - 1;
+            sort_rec(b, fn, tmp, buf_next(b, pivot_i), hi);
+            hi = buf_rnext(b, pivot_i);
         }
     }
 }
 
 /* NOLINTEND(*misc-no-recursion*) */
 
+/** Sorts the provided buffer in average time O(N * log(N)) and O(log(N))
+stack space. This implementation does not try to be hyper efficient. In fact, we
+test out using iterators here rather than indices. */
 ccc_result
 sort(ccc_buffer *const b, ccc_any_type_cmp_fn *const fn, void *const swap)
 {
@@ -68,7 +87,7 @@ sort(ccc_buffer *const b, ccc_any_type_cmp_fn *const fn, void *const swap)
     }
     if (buf_count(b).count)
     {
-        sort_rec(b, fn, swap, 0, buf_count(b).count - 1);
+        sort_rec(b, fn, swap, buf_begin(b), buf_rbegin(b));
     }
     return CCC_RESULT_OK;
 }
