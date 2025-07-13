@@ -153,18 +153,45 @@ A fixed or dynamic contiguous array of a single user defined type.
 #define TRAITS_USING_NAMESPACE_CCC
 #include "ccc/buffer.h"
 #include "ccc/traits.h"
+#include "ccc/types.h"
 
+enum : size_t
+{
+    HCAP = 6,
+};
+
+static inline int
+maxint(int const a, int const b)
+{
+    return a > b ? a : b;
+}
+
+/* Maximum rectangle in histogram Leetcode problem. */
 int
 main(void)
 {
-    /* stack array, no allocation permission, no aux data, capacity 5 */
-    buffer b = buf_init((int[5]){}, NULL, NULL, 5);
-    (void)push_back(&b, &(int){3});
-    (void)push_back(&b, &(int){2});
-    (void)push_back(&b, &(int){1});
-    (void)pop_back(&b);
-    int *i = back(&b);
-    assert(*i == 2);
+    buffer const heights = buf_init(((int[HCAP]){2, 1, 5, 6, 2, 3}), int, NULL,
+                                    NULL, HCAP, HCAP);
+    int const correct_max_rectangle = 10;
+    int max_rectangle = 0;
+    buffer bars_idx = buf_init((int[HCAP]){}, int, NULL, NULL, HCAP);
+    for (int i = 0, end = count(&heights).count; i <= end; ++i)
+    {
+        while (!buf_is_empty(&bars_idx)
+               && (i == end
+                   || *buf_as(&heights, int, i) < *buf_as(
+                          &heights, int, *buf_back_as(&bars_idx, int))))
+        {
+            int const *const h = buf_at(&heights, *buf_back_as(&bars_idx, int));
+            (void)pop_back(&bars_idx);
+            int const w = is_empty(&bars_idx)
+                            ? 1
+                            : i - *buf_back_as(&bars_idx, int) - 1;
+            max_rectangle = maxint(max_rectangle, *h * w);
+        }
+        (void)push_back(&bars_idx, &i);
+    }
+    assert(max_rectangle == correct_max_rectangle);
     return 0;
 }
 ```

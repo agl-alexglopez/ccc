@@ -172,13 +172,13 @@ CHECK_BEGIN_STATIC_FN(buf_test_largest_rectangle_in_histogram)
                    || *buf_as(&heights, int, i) < *buf_as(
                           &heights, int, *buf_back_as(&bars_idx, int))))
         {
-            int const h = *buf_as(&heights, int, *buf_back_as(&bars_idx, int));
+            int const *const h = buf_at(&heights, *buf_back_as(&bars_idx, int));
             ccc_result const r = buf_pop_back(&bars_idx);
             CHECK(r, CCC_RESULT_OK);
             int const w = buf_is_empty(&bars_idx)
                             ? 1
                             : i - *buf_back_as(&bars_idx, int) - 1;
-            max_rectangle = maxint(max_rectangle, h * w);
+            max_rectangle = maxint(max_rectangle, *h * w);
         }
         int const *const ptr = buf_push_back(&bars_idx, &i);
         CHECK(ptr != NULL, CCC_TRUE);
