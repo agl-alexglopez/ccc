@@ -747,6 +747,7 @@ alloc_insert(struct ccc_omap *const t, struct ccc_omap_elem *out_handle)
         }
         (void)memcpy(node, struct_base(t, out_handle), t->sizeof_type);
         out_handle = elem_in_slot(t, node);
+        init_node(t, out_handle);
     }
     if (empty(t))
     {

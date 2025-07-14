@@ -692,6 +692,25 @@ entry(struct ccc_romap const *const rom, void const *const key)
 }
 
 static void *
+maybe_alloc_insert(struct ccc_romap *const rom,
+                   struct ccc_romap_elem *const parent,
+                   ccc_threeway_cmp const last_cmp,
+                   struct ccc_romap_elem *out_handle)
+{
+    if (rom->alloc)
+    {
+        void *const new = rom->alloc(NULL, rom->sizeof_type, rom->aux);
+        if (!new)
+        {
+            return NULL;
+        }
+        memcpy(new, struct_base(rom, out_handle), rom->sizeof_type);
+        out_handle = elem_in_slot(rom, new);
+    }
+    return insert(rom, parent, last_cmp, out_handle);
+}
+
+static void *
 insert(struct ccc_romap *const rom, struct ccc_romap_elem *const parent,
        ccc_threeway_cmp const last_cmp, struct ccc_romap_elem *const out_handle)
 {
@@ -713,25 +732,6 @@ insert(struct ccc_romap *const rom, struct ccc_romap_elem *const parent,
     }
     ++rom->count;
     return struct_base(rom, out_handle);
-}
-
-static void *
-maybe_alloc_insert(struct ccc_romap *const rom,
-                   struct ccc_romap_elem *const parent,
-                   ccc_threeway_cmp const last_cmp,
-                   struct ccc_romap_elem *out_handle)
-{
-    if (rom->alloc)
-    {
-        void *const new = rom->alloc(NULL, rom->sizeof_type, rom->aux);
-        if (!new)
-        {
-            return NULL;
-        }
-        memcpy(new, struct_base(rom, out_handle), rom->sizeof_type);
-        out_handle = elem_in_slot(rom, new);
-    }
-    return insert(rom, parent, last_cmp, out_handle);
 }
 
 static struct romap_query
