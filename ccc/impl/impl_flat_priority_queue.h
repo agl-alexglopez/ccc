@@ -45,7 +45,7 @@ struct ccc_fpq
 /*========================    Private Interface     =========================*/
 
 /** @private */
-size_t ccc_impl_fpq_bubble_up(struct ccc_fpq *, char[const], size_t);
+size_t ccc_impl_fpq_bubble_up(struct ccc_fpq *, void *, size_t);
 /** @private */
 void ccc_impl_fpq_in_place_heapify(struct ccc_fpq *, size_t n);
 /** @private */

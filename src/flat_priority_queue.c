@@ -34,9 +34,9 @@ static void *at(struct ccc_fpq const *, size_t);
 static size_t index_of(struct ccc_fpq const *, void const *);
 static ccc_tribool wins(struct ccc_fpq const *, size_t winner, size_t loser);
 static ccc_threeway_cmp cmp(struct ccc_fpq const *, size_t lhs, size_t rhs);
-static void swap(struct ccc_fpq *, char tmp[const], size_t, size_t);
-static size_t bubble_up(struct ccc_fpq *fpq, char tmp[const], size_t i);
-static size_t bubble_down(struct ccc_fpq *, char tmp[const], size_t);
+static void swap(struct ccc_fpq *, void *tmp, size_t, size_t);
+static size_t bubble_up(struct ccc_fpq *fpq, void *tmp, size_t i);
+static size_t bubble_down(struct ccc_fpq *, void *tmp, size_t);
 static size_t update_fixup(struct ccc_fpq *, void *e);
 static void heapify(struct ccc_fpq *fpq, size_t n);
 static size_t max(size_t, size_t);
@@ -392,7 +392,7 @@ ccc_fpq_validate(ccc_flat_priority_queue const *const fpq)
 /*===================     Private Interface     =============================*/
 
 size_t
-ccc_impl_fpq_bubble_up(struct ccc_fpq *const fpq, char tmp[const], size_t i)
+ccc_impl_fpq_bubble_up(struct ccc_fpq *const fpq, void *const tmp, size_t i)
 {
     return bubble_up(fpq, tmp, i);
 }
@@ -452,7 +452,7 @@ update_fixup(struct ccc_fpq *const fpq, void *const e)
 
 /* Returns the sorted position of the element starting at position i. */
 static size_t
-bubble_up(struct ccc_fpq *const fpq, char tmp[const], size_t i)
+bubble_up(struct ccc_fpq *const fpq, void *const tmp, size_t i)
 {
     for (size_t parent = (i - 1) / 2; i; i = parent, parent = (parent - 1) / 2)
     {
@@ -468,7 +468,7 @@ bubble_up(struct ccc_fpq *const fpq, char tmp[const], size_t i)
 
 /* Returns the sorted position of the element starting at position i. */
 static size_t
-bubble_down(struct ccc_fpq *const fpq, char tmp[const], size_t i)
+bubble_down(struct ccc_fpq *const fpq, void *const tmp, size_t i)
 {
     size_t const count = fpq->buf.count;
     for (size_t next = i, left = (i * 2) + 1, right = left + 1; left < count;
@@ -510,7 +510,7 @@ cmp(struct ccc_fpq const *const fpq, size_t lhs, size_t rhs)
 /* Swaps i and j using the underlying buffer capabilities. Not checked for
    an error in release. */
 static inline void
-swap(struct ccc_fpq *const fpq, char tmp[const], size_t const i, size_t const j)
+swap(struct ccc_fpq *const fpq, void *const tmp, size_t const i, size_t const j)
 {
     [[maybe_unused]] ccc_result const res = ccc_buf_swap(&fpq->buf, tmp, i, j);
     assert(res == CCC_RESULT_OK);

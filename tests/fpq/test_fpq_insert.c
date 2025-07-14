@@ -165,14 +165,14 @@ CHECK_BEGIN_STATIC_FN(fpq_test_read_max_min)
                        (sizeof(vals) / sizeof(vals[0])));
     for (size_t i = 0; i < size; ++i)
     {
-        vals[i].val = (int)i;
+        vals[i].val = (int)size - (int)i;
         (void)push(&fpq, &vals[i]);
         CHECK(validate(&fpq), true);
         CHECK(ccc_fpq_count(&fpq).count, i + 1);
     }
     CHECK(ccc_fpq_count(&fpq).count, (size_t)10);
     struct val const *min = front(&fpq);
-    CHECK(min->val, 0);
+    CHECK(min->val, size - (size - 1));
     CHECK_END_FN();
 }
 
