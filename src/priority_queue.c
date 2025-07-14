@@ -402,7 +402,9 @@ cut_child(struct ccc_pq_elem *const child)
     child->prev->next = child->next;
     if (child->parent && child == child->parent->child)
     {
-        child->parent->child = child->next == child ? NULL : child->next;
+        /* To preserve the shuffle down properties the prev child should
+           become the new child as that is the next youngest node. */
+        child->parent->child = child->prev == child ? NULL : child->prev;
     }
     child->parent = NULL;
     child->next = child->prev = child;
