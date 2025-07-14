@@ -701,15 +701,13 @@ ccc_fhm_clear(ccc_flat_hash_map *const h, ccc_any_type_destructor_fn *const fn)
         h->count = 0;
         return CCC_RESULT_OK;
     }
-    for (size_t i = 0; i < (h->mask + 1); ++i)
+    for (void *i = ccc_fhm_begin(h); i != ccc_fhm_end(h);
+         i = ccc_fhm_next(h, i))
     {
-        if (tag_full(h->tag[i]))
-        {
-            fn((ccc_any_type){
-                .any_type = data_at(h, i),
-                .aux = h->aux,
-            });
-        }
+        fn((ccc_any_type){
+            .any_type = i,
+            .aux = h->aux,
+        });
     }
     (void)memset(h->tag, TAG_EMPTY, mask_to_tag_bytes(h->mask));
     h->remain = mask_to_load_factor_cap(h->mask);
@@ -732,15 +730,13 @@ ccc_fhm_clear_and_free(ccc_flat_hash_map *const h,
     }
     if (fn)
     {
-        for (size_t i = 0; i < (h->mask + 1); ++i)
+        for (void *i = ccc_fhm_begin(h); i != ccc_fhm_end(h);
+             i = ccc_fhm_next(h, i))
         {
-            if (tag_full(h->tag[i]))
-            {
-                fn((ccc_any_type){
-                    .any_type = data_at(h, i),
-                    .aux = h->aux,
-                });
-            }
+            fn((ccc_any_type){
+                .any_type = i,
+                .aux = h->aux,
+            });
         }
     }
     h->remain = 0;
@@ -769,15 +765,13 @@ ccc_fhm_clear_and_free_reserve(ccc_flat_hash_map *const h,
     }
     if (destructor)
     {
-        for (size_t i = 0; i < (h->mask + 1); ++i)
+        for (void *i = ccc_fhm_begin(h); i != ccc_fhm_end(h);
+             i = ccc_fhm_next(h, i))
         {
-            if (tag_full(h->tag[i]))
-            {
-                destructor((ccc_any_type){
-                    .any_type = data_at(h, i),
-                    .aux = h->aux,
-                });
-            }
+            destructor((ccc_any_type){
+                .any_type = i,
+                .aux = h->aux,
+            });
         }
     }
     h->remain = 0;
