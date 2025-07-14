@@ -1,5 +1,6 @@
 #define TRAITS_USING_NAMESPACE_CCC
 
+#include "alloc.h"
 #include "checkers.h"
 #include "pq_util.h"
 #include "priority_queue.h"
@@ -196,12 +197,35 @@ CHECK_BEGIN_STATIC_FN(pq_test_weak_srand)
     CHECK_END_FN();
 }
 
+CHECK_BEGIN_STATIC_FN(pq_test_weak_srand_alloc)
+{
+    ccc_priority_queue ppq
+        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, std_alloc, NULL);
+    /* Seed the test with any integer for reproducible random test sequence
+       currently this will change every test. NOLINTNEXTLINE */
+    srand(time(NULL));
+    int const num_heap_elems = 100;
+    for (int i = 0; i < num_heap_elems; ++i)
+    {
+        CHECK(push(&ppq,
+                   &(struct val){
+                       .id = i,
+                       .val = rand() /*NOLINT*/,
+                   }
+                        .elem)
+                  != NULL,
+              true);
+        CHECK(validate(&ppq), true);
+    }
+    CHECK_END_FN(ccc_pq_clear(&ppq, NULL););
+}
+
 int
 main()
 {
-    return CHECK_RUN(pq_test_insert_remove_four_dups(),
-                     pq_test_insert_extract_shuffled(), pq_test_pop_max(),
-                     pq_test_pop_min(),
-                     pq_test_delete_prime_shuffle_duplicates(),
-                     pq_test_prime_shuffle(), pq_test_weak_srand());
+    return CHECK_RUN(
+        pq_test_insert_remove_four_dups(), pq_test_insert_extract_shuffled(),
+        pq_test_pop_max(), pq_test_pop_min(),
+        pq_test_delete_prime_shuffle_duplicates(), pq_test_prime_shuffle(),
+        pq_test_weak_srand(), pq_test_weak_srand_alloc());
 }

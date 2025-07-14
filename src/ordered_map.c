@@ -487,6 +487,8 @@ ccc_om_equal_rrange(ccc_ordered_map *const om, void const *const rbegin_key,
     return (ccc_rrange){equal_range(om, rbegin_key, rend_key, R_INORDER)};
 }
 
+/** This is a linear time constant space deletion of tree nodes via left
+rotations so element fields are modified during progression of deletes. */
 ccc_result
 ccc_om_clear(ccc_ordered_map *const om,
              ccc_any_type_destructor_fn *const destructor)
@@ -495,20 +497,33 @@ ccc_om_clear(ccc_ordered_map *const om,
     {
         return CCC_RESULT_ARG_ERROR;
     }
-    while (!ccc_om_is_empty(om))
+    struct ccc_omap_elem *node = om->root;
+    while (node != &om->end)
     {
-        void *const popped = erase(om, key_from_node(om, om->root));
+        if (node->branch[L] != &om->end)
+        {
+            struct ccc_omap_elem *const l = node->branch[L];
+            node->branch[L] = l->branch[R];
+            l->branch[R] = node;
+            node = l;
+            continue;
+        }
+        struct ccc_omap_elem *const next = node->branch[R];
+        node->branch[L] = node->branch[R] = NULL;
+        node->parent = NULL;
+        void *const del = struct_base(om, node);
         if (destructor)
         {
             destructor((ccc_any_type){
-                .any_type = popped,
+                .any_type = del,
                 .aux = om->aux,
             });
         }
         if (om->alloc)
         {
-            (void)om->alloc(popped, 0, om->aux);
+            (void)om->alloc(del, 0, om->aux);
         }
+        node = next;
     }
     return CCC_RESULT_OK;
 }

@@ -197,6 +197,7 @@ static size_t maybe_alloc_insert(struct ccc_hromap *hrm, size_t parent,
                                  void const *user_type);
 static size_t remove_fixup(struct ccc_hromap *t, size_t remove);
 static size_t alloc_slot(struct ccc_hromap *t);
+static void delete_nodes(struct ccc_hromap *t, ccc_any_type_destructor_fn *fn);
 /* Returning the user key with stored offsets. */
 static void *key_at(struct ccc_hromap const *t, size_t i);
 static void *key_in_slot(struct ccc_hromap const *t, void const *user_struct);
@@ -790,15 +791,7 @@ ccc_hrm_clear(ccc_handle_realtime_ordered_map *const hrm,
         hrm->count = 1;
         return CCC_RESULT_OK;
     }
-    while (!ccc_hrm_is_empty(hrm))
-    {
-        size_t const i = remove_fixup(hrm, hrm->root);
-        assert(i);
-        fn((ccc_any_type){
-            .any_type = data_at(hrm, i),
-            .aux = hrm->aux,
-        });
-    }
+    delete_nodes(hrm, fn);
     hrm->count = 1;
     hrm->root = 0;
     return CCC_RESULT_OK;
@@ -823,15 +816,7 @@ ccc_hrm_clear_and_free(ccc_handle_realtime_ordered_map *const hrm,
         hrm->parity = NULL;
         return CCC_RESULT_OK;
     }
-    while (!ccc_hrm_is_empty(hrm))
-    {
-        size_t const i = remove_fixup(hrm, hrm->root);
-        assert(i);
-        fn((ccc_any_type){
-            .any_type = data_at(hrm, i),
-            .aux = hrm->aux,
-        });
-    }
+    delete_nodes(hrm, fn);
     hrm->root = 0;
     hrm->capacity = 0;
     (void)hrm->alloc(hrm->data, 0, hrm->aux);
@@ -859,15 +844,7 @@ ccc_hrm_clear_and_free_reserve(ccc_handle_realtime_ordered_map *const hrm,
         hrm->data = NULL;
         return CCC_RESULT_OK;
     }
-    while (!ccc_hrm_is_empty(hrm))
-    {
-        size_t const i = remove_fixup(hrm, hrm->root);
-        assert(i);
-        destructor((ccc_any_type){
-            .any_type = data_at(hrm, i),
-            .aux = hrm->aux,
-        });
-    }
+    delete_nodes(hrm, destructor);
     hrm->root = 0;
     hrm->capacity = 0;
     (void)alloc(hrm->data, 0, hrm->aux);
@@ -1140,6 +1117,39 @@ min_max_from(struct ccc_hromap const *const t, size_t start,
     for (; branch_i(t, start, dir); start = branch_i(t, start, dir))
     {}
     return start;
+}
+
+/** Deletes all nodes in the tree by calling destructor function on them in
+linear time and constant space. This function modifies nodes as it deletes the
+tree elements. Assumes the destructor function is non-null.
+
+This function does not update any count or capacity fields of the map, it
+simply calls the destructor on each node and removes the nodes references to
+other tree elements. */
+static void
+delete_nodes(struct ccc_hromap *const t, ccc_any_type_destructor_fn *const fn)
+{
+    size_t node = t->root;
+    while (node)
+    {
+        struct ccc_hromap_elem *const e = node_at(t, node);
+        if (e->branch[L])
+        {
+            size_t const l = e->branch[L];
+            e->branch[L] = node_at(t, l)->branch[R];
+            node_at(t, l)->branch[R] = node;
+            node = l;
+            continue;
+        }
+        size_t const next = e->branch[R];
+        e->branch[L] = e->branch[R] = 0;
+        e->parent = 0;
+        fn((ccc_any_type){
+            .any_type = data_at(t, node),
+            .aux = t->aux,
+        });
+        node = next;
+    }
 }
 
 static inline ccc_threeway_cmp

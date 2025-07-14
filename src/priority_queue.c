@@ -20,7 +20,7 @@ limitations under the License. */
 
 /*=========================  Function Prototypes   ==========================*/
 
-static void *elem_in(struct ccc_pq const *, struct ccc_pq_elem const *);
+static struct ccc_pq_elem *elem_in(struct ccc_pq const *, void const *);
 static struct ccc_pq_elem *merge(struct ccc_pq *, struct ccc_pq_elem *old,
                                  struct ccc_pq_elem *new);
 static void link_child(struct ccc_pq_elem *parent, struct ccc_pq_elem *child);
@@ -62,7 +62,6 @@ ccc_pq_push(ccc_priority_queue *const pq, ccc_pq_elem *e)
     {
         return NULL;
     }
-    init_node(e);
     void *ret = struct_base(pq, e);
     if (pq->alloc)
     {
@@ -73,8 +72,9 @@ ccc_pq_push(ccc_priority_queue *const pq, ccc_pq_elem *e)
         }
         (void)memcpy(node, ret, pq->sizeof_type);
         ret = node;
-        e = elem_in(pq, e);
+        e = elem_in(pq, ret);
     }
+    init_node(e);
     pq->root = merge(pq, pq->root, e);
     ++pq->count;
     return ret;
@@ -127,6 +127,10 @@ ccc_pq_erase(ccc_priority_queue *const pq, ccc_pq_elem *const e)
     return CCC_RESULT_OK;
 }
 
+/** Deletes all nodes in the heap in linear time and constant space. This is
+achieved by continually bringing up any child lists and splicing them into the
+current child list being considered. We are avoiding recursion or amortized
+O(log(N)) pops with this method. */
 ccc_result
 ccc_pq_clear(ccc_priority_queue *const pq, ccc_any_type_destructor_fn *const fn)
 {
@@ -134,16 +138,46 @@ ccc_pq_clear(ccc_priority_queue *const pq, ccc_any_type_destructor_fn *const fn)
     {
         return CCC_RESULT_ARG_ERROR;
     }
-    while (!ccc_pq_is_empty(pq))
+    struct ccc_pq_elem *e = pq->root;
+    while (e)
     {
+        /* The child and its siblings cut to the front of the line and we start
+           again as if the child is the first in this sibling list. */
+        if (e->child)
+        {
+            struct ccc_pq_elem *const child = e->child;
+            struct ccc_pq_elem *const e_end = e->next;
+            /* Final element of e child list picks up child as head of list. */
+            e_end->prev = child;
+            /* Now e picks up the last (wrapping) element of child list. */
+            e->next = child->next;
+            /* Child has a list so don't just set child's prev to e. */
+            child->next->prev = e;
+            /* Child list wrapping element is now end of e list. */
+            child->next = e_end;
+            /* Our traversal now jumps to start of list we spliced in. */
+            e->child = NULL;
+            e = child;
+            continue;
+        }
+        /* No more child lists to splice in so this node is done.  */
+        struct ccc_pq_elem *const prev = e->prev == e ? NULL : e->prev;
+        e->next->prev = e->prev;
+        e->prev->next = e->next;
+        e->parent = e->next = e->prev = e->child = NULL;
+        void *const del = struct_base(pq, e);
         if (fn)
         {
             fn((ccc_any_type){
-                .any_type = ccc_pq_front(pq),
+                .any_type = del,
                 .aux = pq->aux,
             });
         }
-        (void)ccc_pq_pop(pq);
+        if (pq->alloc)
+        {
+            (void)pq->alloc(del, 0, pq->aux);
+        }
+        e = prev;
     }
     return CCC_RESULT_OK;
 }
@@ -530,10 +564,10 @@ struct_base(struct ccc_pq const *const pq, struct ccc_pq_elem const *const e)
     return ((char *)&(e->child)) - pq->pq_elem_offset;
 }
 
-static inline void *
-elem_in(struct ccc_pq const *const pq, struct ccc_pq_elem const *const e)
+static inline struct ccc_pq_elem *
+elem_in(struct ccc_pq const *const pq, void const *const any_struct)
 {
-    return ((char *)&(e->child)) + pq->pq_elem_offset;
+    return (struct ccc_pq_elem *)((char *)any_struct + pq->pq_elem_offset);
 }
 
 static inline void
