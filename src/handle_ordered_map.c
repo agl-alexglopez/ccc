@@ -174,6 +174,7 @@ static void swap(char tmp[const], void *a, void *b, size_t sizeof_type);
 static void link(struct ccc_homap *t, size_t parent, enum hom_branch dir,
                  size_t subtree);
 static size_t max(size_t, size_t);
+static void delete_nodes(struct ccc_homap *t, ccc_any_type_destructor_fn *fn);
 
 /*==============================  Interface    ==============================*/
 
@@ -695,15 +696,7 @@ ccc_hom_clear(ccc_handle_ordered_map *const hom,
         hom->count = 1;
         return CCC_RESULT_OK;
     }
-    while (!ccc_hom_is_empty(hom))
-    {
-        size_t const i = remove_from_tree(hom, hom->root);
-        assert(i);
-        fn((ccc_any_type){
-            .any_type = data_at(hom, i),
-            .aux = hom->aux,
-        });
-    }
+    delete_nodes(hom, fn);
     hom->count = 1;
     hom->root = 0;
     return CCC_RESULT_OK;
@@ -727,16 +720,9 @@ ccc_hom_clear_and_free(ccc_handle_ordered_map *const hom,
         hom->nodes = NULL;
         return CCC_RESULT_OK;
     }
-    while (!ccc_hom_is_empty(hom))
-    {
-        size_t const i = remove_from_tree(hom, hom->root);
-        assert(i);
-        fn((ccc_any_type){
-            .any_type = data_at(hom, i),
-            .aux = hom->aux,
-        });
-    }
+    delete_nodes(hom, fn);
     hom->root = 0;
+    hom->count = 0;
     hom->capacity = 0;
     (void)hom->alloc(hom->data, 0, hom->aux);
     hom->data = NULL;
@@ -762,16 +748,9 @@ ccc_hom_clear_and_free_reserve(ccc_handle_ordered_map *const hom,
         hom->data = NULL;
         return CCC_RESULT_OK;
     }
-    while (!ccc_hom_is_empty(hom))
-    {
-        size_t const i = remove_from_tree(hom, hom->root);
-        assert(i);
-        destructor((ccc_any_type){
-            .any_type = data_at(hom, i),
-            .aux = hom->aux,
-        });
-    }
+    delete_nodes(hom, destructor);
     hom->root = 0;
+    hom->count = 0;
     hom->capacity = 0;
     (void)alloc(hom->data, 0, hom->aux);
     hom->data = NULL;
@@ -1126,6 +1105,32 @@ next(struct ccc_homap const *const t, size_t n, enum hom_branch const traversal)
     for (; p && branch_i(t, p, !traversal) != n; n = p, p = parent_i(t, p))
     {}
     return p;
+}
+
+static void
+delete_nodes(struct ccc_homap *const t, ccc_any_type_destructor_fn *const fn)
+{
+    size_t node = t->root;
+    while (node)
+    {
+        struct ccc_homap_elem *const e = node_at(t, node);
+        if (e->branch[L])
+        {
+            size_t const l = e->branch[L];
+            e->branch[L] = node_at(t, l)->branch[R];
+            node_at(t, l)->branch[R] = node;
+            node = l;
+            continue;
+        }
+        size_t const next = e->branch[R];
+        e->branch[L] = e->branch[R] = 0;
+        e->parent = 0;
+        fn((ccc_any_type){
+            .any_type = data_at(t, node),
+            .aux = t->aux,
+        });
+        node = next;
+    }
 }
 
 static inline ccc_threeway_cmp

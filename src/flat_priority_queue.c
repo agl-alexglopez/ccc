@@ -40,6 +40,7 @@ static size_t bubble_down(struct ccc_fpq *, char tmp[const], size_t);
 static size_t update_fixup(struct ccc_fpq *, void *e);
 static void heapify(struct ccc_fpq *fpq, size_t n);
 static size_t max(size_t, size_t);
+static void destroy_each(struct ccc_fpq *fpq, ccc_any_type_destructor_fn *fn);
 
 /*=====================       Interface      ================================*/
 
@@ -320,14 +321,7 @@ ccc_fpq_clear(ccc_flat_priority_queue *const fpq,
     }
     if (fn)
     {
-        size_t const count = fpq->buf.count;
-        for (size_t i = 0; i < count; ++i)
-        {
-            fn((ccc_any_type){
-                .any_type = at(fpq, i),
-                .aux = fpq->buf.aux,
-            });
-        }
+        destroy_each(fpq, fn);
     }
     return ccc_buf_size_set(&fpq->buf, 0);
 }
@@ -342,14 +336,7 @@ ccc_fpq_clear_and_free(ccc_flat_priority_queue *const fpq,
     }
     if (fn)
     {
-        size_t const count = fpq->buf.count;
-        for (size_t i = 0; i < count; ++i)
-        {
-            fn((ccc_any_type){
-                .any_type = at(fpq, i),
-                .aux = fpq->buf.aux,
-            });
-        }
+        destroy_each(fpq, fn);
     }
     return ccc_buf_alloc(&fpq->buf, 0, fpq->buf.alloc);
 }
@@ -365,14 +352,7 @@ ccc_fpq_clear_and_free_reserve(ccc_flat_priority_queue *const fpq,
     }
     if (destructor)
     {
-        size_t const count = fpq->buf.count;
-        for (size_t i = 0; i < count; ++i)
-        {
-            destructor((ccc_any_type){
-                .any_type = at(fpq, i),
-                .aux = fpq->buf.aux,
-            });
-        }
+        destroy_each(fpq, destructor);
     }
     return ccc_buf_alloc(&fpq->buf, 0, alloc);
 }
@@ -557,6 +537,19 @@ index_of(struct ccc_fpq const *const fpq, void const *const slot)
                       / fpq->buf.sizeof_type);
     assert(i < fpq->buf.count);
     return i;
+}
+
+static inline void
+destroy_each(struct ccc_fpq *const fpq, ccc_any_type_destructor_fn *const fn)
+{
+    size_t const count = fpq->buf.count;
+    for (size_t i = 0; i < count; ++i)
+    {
+        fn((ccc_any_type){
+            .any_type = at(fpq, i),
+            .aux = fpq->buf.aux,
+        });
+    }
 }
 
 static inline size_t

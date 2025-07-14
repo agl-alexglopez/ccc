@@ -579,6 +579,8 @@ ccc_rom_validate(ccc_realtime_ordered_map const *rom)
     return validate(rom);
 }
 
+/** This is a linear time constant space deletion of tree nodes via left
+rotations so element fields are modified during progression of deletes. */
 ccc_result
 ccc_rom_clear(ccc_realtime_ordered_map *const rom,
               ccc_any_type_destructor_fn *const destructor)
@@ -587,24 +589,33 @@ ccc_rom_clear(ccc_realtime_ordered_map *const rom,
     {
         return CCC_RESULT_ARG_ERROR;
     }
-    while (!ccc_rom_is_empty(rom))
+    struct ccc_romap_elem *node = rom->root;
+    while (node != &rom->end)
     {
-        if (!rom->root->branch[L] || !rom->root->branch[R])
+        if (node->branch[L] != &rom->end)
         {
-            return CCC_RESULT_ARG_ERROR;
+            struct ccc_romap_elem *const l = node->branch[L];
+            node->branch[L] = l->branch[R];
+            l->branch[R] = node;
+            node = l;
+            continue;
         }
-        void *const deleted = remove_fixup(rom, rom->root);
+        struct ccc_romap_elem *const next = node->branch[R];
+        node->branch[L] = node->branch[R] = NULL;
+        node->parent = NULL;
+        void *const del = struct_base(rom, node);
         if (destructor)
         {
             destructor((ccc_any_type){
-                .any_type = deleted,
+                .any_type = del,
                 .aux = rom->aux,
             });
         }
         if (rom->alloc)
         {
-            (void)rom->alloc(deleted, 0, rom->aux);
+            (void)rom->alloc(del, 0, rom->aux);
         }
+        node = next;
     }
     return CCC_RESULT_OK;
 }
