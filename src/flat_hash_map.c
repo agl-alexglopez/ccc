@@ -346,6 +346,7 @@ static size_t next_power_of_two(size_t n);
 static ccc_tribool is_power_of_two(size_t n);
 static size_t to_power_of_two(size_t n);
 static ccc_tribool is_uninitialized(struct ccc_fhmap const *);
+static void destory_each(struct ccc_fhmap *h, ccc_any_type_destructor_fn *);
 
 /*===========================    Interface   ================================*/
 
@@ -701,14 +702,7 @@ ccc_fhm_clear(ccc_flat_hash_map *const h, ccc_any_type_destructor_fn *const fn)
         h->count = 0;
         return CCC_RESULT_OK;
     }
-    for (void *i = ccc_fhm_begin(h); i != ccc_fhm_end(h);
-         i = ccc_fhm_next(h, i))
-    {
-        fn((ccc_any_type){
-            .any_type = i,
-            .aux = h->aux,
-        });
-    }
+    destory_each(h, fn);
     (void)memset(h->tag, TAG_EMPTY, mask_to_tag_bytes(h->mask));
     h->remain = mask_to_load_factor_cap(h->mask);
     h->count = 0;
@@ -730,14 +724,7 @@ ccc_fhm_clear_and_free(ccc_flat_hash_map *const h,
     }
     if (fn)
     {
-        for (void *i = ccc_fhm_begin(h); i != ccc_fhm_end(h);
-             i = ccc_fhm_next(h, i))
-        {
-            fn((ccc_any_type){
-                .any_type = i,
-                .aux = h->aux,
-            });
-        }
+        destory_each(h, fn);
     }
     h->remain = 0;
     h->mask = 0;
@@ -765,14 +752,7 @@ ccc_fhm_clear_and_free_reserve(ccc_flat_hash_map *const h,
     }
     if (destructor)
     {
-        for (void *i = ccc_fhm_begin(h); i != ccc_fhm_end(h);
-             i = ccc_fhm_next(h, i))
-        {
-            destructor((ccc_any_type){
-                .any_type = i,
-                .aux = h->aux,
-            });
-        }
+        destory_each(h, destructor);
     }
     h->remain = 0;
     h->mask = 0;
@@ -1441,6 +1421,19 @@ check_init(struct ccc_fhmap *const h, size_t required_total_cap,
         (void)memset(h->tag, TAG_EMPTY, mask_to_tag_bytes(h->mask));
     }
     return CCC_RESULT_OK;
+}
+
+static inline void
+destory_each(struct ccc_fhmap *const h, ccc_any_type_destructor_fn *const fn)
+{
+    for (void *i = ccc_fhm_begin(h); i != ccc_fhm_end(h);
+         i = ccc_fhm_next(h, i))
+    {
+        fn((ccc_any_type){
+            .any_type = i,
+            .aux = h->aux,
+        });
+    }
 }
 
 static inline uint64_t
