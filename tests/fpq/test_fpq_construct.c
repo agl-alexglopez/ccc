@@ -89,15 +89,17 @@ CHECK_BEGIN_STATIC_FN(fpq_test_raw_type)
 CHECK_BEGIN_STATIC_FN(fpq_test_heapify_init)
 {
     srand(time(NULL)); /* NOLINT */
-    int heap[100] = {};
-    size_t const size = 99;
-    for (size_t i = 0; i < size; ++i)
+    enum : size_t
     {
-        heap[i] = rand_range(-99, size); /* NOLINT */
+        HEAPIFY_CAP = 100,
+    };
+    int heap[HEAPIFY_CAP] = {};
+    for (size_t i = 0; i < HEAPIFY_CAP; ++i)
+    {
+        heap[i] = rand_range(-99, (int)HEAPIFY_CAP); /* NOLINT */
     }
-    flat_priority_queue pq
-        = fpq_heapify_init(heap, int, CCC_LES, int_cmp, NULL, NULL,
-                           (sizeof(heap) / sizeof(int)), size);
+    flat_priority_queue pq = fpq_heapify_init(heap, int, CCC_LES, int_cmp, NULL,
+                                              NULL, HEAPIFY_CAP, HEAPIFY_CAP);
     int prev = *((int *)fpq_front(&pq));
     (void)pop(&pq, &(int){0});
     while (!fpq_is_empty(&pq))
@@ -113,18 +115,21 @@ CHECK_BEGIN_STATIC_FN(fpq_test_heapify_init)
 CHECK_BEGIN_STATIC_FN(fpq_test_heapify_copy)
 {
     srand(time(NULL)); /* NOLINT */
-    int heap[100] = {};
-    flat_priority_queue pq = fpq_init(heap, int, CCC_LES, int_cmp, NULL, NULL,
-                                      (sizeof(heap) / sizeof(int)));
-    int input[99] = {};
-    for (size_t i = 0; i < (size_t)(sizeof(input) / sizeof(int)); ++i)
+    enum : size_t
+    {
+        HEAPIFY_COPY_CAP = 100,
+    };
+    int heap[HEAPIFY_COPY_CAP] = {};
+    flat_priority_queue pq
+        = fpq_init(heap, int, CCC_LES, int_cmp, NULL, NULL, HEAPIFY_COPY_CAP);
+    int input[HEAPIFY_COPY_CAP] = {};
+    for (size_t i = 0; i < HEAPIFY_COPY_CAP; ++i)
     {
         input[i] = rand_range(-99, 99); /* NOLINT */
     }
-    CHECK(fpq_heapify(&pq, &(int){0}, input, sizeof(input) / sizeof(int),
-                      sizeof(int)),
+    CHECK(fpq_heapify(&pq, &(int){0}, input, HEAPIFY_COPY_CAP, sizeof(int)),
           CCC_RESULT_OK);
-    CHECK(fpq_count(&pq).count, sizeof(input) / sizeof(int));
+    CHECK(fpq_count(&pq).count, HEAPIFY_COPY_CAP);
     int prev = *((int *)fpq_front(&pq));
     (void)pop(&pq, &(int){0});
     while (!fpq_is_empty(&pq))
@@ -145,16 +150,16 @@ CHECK_BEGIN_STATIC_FN(fpq_test_heapsort)
     };
     srand(time(NULL)); /* NOLINT */
     int heap[HPSORTCAP] = {};
-    for (size_t i = 0; i < HPSORTCAP - 1; ++i)
+    for (size_t i = 0; i < HPSORTCAP; ++i)
     {
-        heap[i] = rand_range(-99, (int)(HPSORTCAP - 1)); /* NOLINT */
+        heap[i] = rand_range(-99, (int)(HPSORTCAP)); /* NOLINT */
     }
     flat_priority_queue pq = fpq_heapify_init(heap, int, CCC_LES, int_cmp, NULL,
-                                              NULL, HPSORTCAP, HPSORTCAP - 1);
+                                              NULL, HPSORTCAP, HPSORTCAP);
     ccc_buffer const b = ccc_fpq_heapsort(&pq, &(int){0});
     int const *prev = begin(&b);
     CHECK(prev != NULL, true);
-    CHECK(ccc_buf_count(&b).count, HPSORTCAP - 1);
+    CHECK(ccc_buf_count(&b).count, HPSORTCAP);
     size_t count = 1;
     for (int const *cur = next(&b, prev); cur != end(&b); cur = next(&b, cur))
     {
@@ -162,7 +167,7 @@ CHECK_BEGIN_STATIC_FN(fpq_test_heapsort)
         prev = cur;
         ++count;
     }
-    CHECK(count, HPSORTCAP - 1);
+    CHECK(count, HPSORTCAP);
     CHECK_END_FN();
 }
 

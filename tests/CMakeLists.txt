@@ -89,6 +89,7 @@ add_buf_test(test_buf_iter)
 
 #############  Heap Priority Queue  ##########################
 add_library(fpq_util fpq/fpq_util.h fpq/fpq_util.c)
+target_include_directories(fpq_util PRIVATE "../util")
 target_link_libraries(fpq_util
   PRIVATE
     ccc

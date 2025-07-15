@@ -395,6 +395,7 @@ main(void)
 #include <assert.h>
 #define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
 #define TRAITS_USING_NAMESPACE_CCC
+#include "ccc/buffer.h"
 #include "ccc/flat_priority_queue.h"
 #include "ccc/traits.h"
 
@@ -412,21 +413,24 @@ main(void)
 {
     int heap[20] = {12, 61, -39, 76, 48, -93, -77, -81, 35, 21,
                     -3, 90, 20,  27, 97, -22, -20, -19, 70, 76};
-    /* Heapify existing array of values, with capacity, size one less than
-       capacity for swap space, min priority queue, no allocation, no aux. */
-    flat_priority_queue pq
-        = fpq_heapify_init(heap, int, CCC_LES, int_cmp, NULL, NULL,
-                           (sizeof(heap) / sizeof(int)), 19);
-    (void)fpq_update_w(&pq, &heap[5], { heap[5] -= 4; });
-    int prev = *((int *)front(&pq));
-    (void)pop(&pq);
-    while (!is_empty(&pq))
+    enum : size_t
     {
-        int cur = *((int *)front(&pq));
-        (void)pop(&pq);
-        assert(cur >= prev);
+        HCAP = sizeof(heap) / sizeof(*heap),
+    };
+    flat_priority_queue pq = fpq_heapify_init(heap, int, CCC_LES, int_cmp, NULL,
+                                              NULL, HCAP, HCAP);
+    ccc_buffer const b = ccc_fpq_heapsort(&pq, &(int){0});
+    int const *prev = begin(&b);
+    assert(prev != NULL);
+    assert(ccc_buf_count(&b).count == HCAP);
+    size_t count = 1;
+    for (int const *cur = next(&b, prev); cur != end(&b); cur = next(&b, cur))
+    {
+        assert(*prev >= *cur);
         prev = cur;
+        ++count;
     }
+    assert(count == HCAP);
     return 0;
 }
 ```

@@ -556,6 +556,8 @@ typedef ccc_flat_priority_queue flat_priority_queue;
 #    define fpq_copy(args...) ccc_fpq_copy(args)
 #    define fpq_reserve(args...) ccc_fpq_reserve(args)
 #    define fpq_heapify(args...) ccc_fpq_heapify(args)
+#    define fpq_heapify_inplace(args...) ccc_fpq_heapify_inplace(args)
+#    define fpq_heapsort(args...) ccc_fpq_heapsort(args)
 #    define fpq_emplace(args...) ccc_fpq_emplace(args)
 #    define fpq_realloc(args...) ccc_fpq_realloc(args)
 #    define fpq_push(args...) ccc_fpq_push(args)
