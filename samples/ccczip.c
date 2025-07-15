@@ -877,7 +877,7 @@ fill_bitq(FILE *const f, struct bitq *const bq, size_t expected_bits)
 {
     uint8_t buf = 0;
     uint8_t i = CHAR_BIT;
-    while (expected_bits)
+    while (expected_bits--)
     {
         if (i == CHAR_BIT)
         {
@@ -889,7 +889,6 @@ fill_bitq(FILE *const f, struct bitq *const bq, size_t expected_bits)
         ccc_tribool const bit = (buf & ((uint8_t)1 << i)) != 0;
         bitq_push_back(bq, bit);
         ++i;
-        --expected_bits;
     }
 }
 
