@@ -217,6 +217,9 @@ provided. A permission error will occur if no allocation is allowed and the
 input array is larger than the fixed fpq capacity. A memory error will
 occur if reallocation is required to fit all elements but reallocation fails.
 
+A simple way to provide a temp for swapping is with an inline compound literal
+reference provided directly to the function argument `&(name_of_type){}`.
+
 Note that this version of heapify copies elements from the input array. If an
 in place heapify is required use the initializer version of this method. */
 ccc_result ccc_fpq_heapify(ccc_flat_priority_queue *fpq, void *tmp,
@@ -229,6 +232,9 @@ ccc_result ccc_fpq_heapify(ccc_flat_priority_queue *fpq, void *tmp,
 @param [in] n the number n of elements where  0 < (n + 1) <= capacity.
 @return the result of the heapify operation, ok if successful or an error if
 fpq is NULL or n is larger than the initialized capacity of the fpq.
+
+A simple way to provide a temp for swapping is with an inline compound literal
+reference provided directly to the function argument `&(name_of_type){}`.
 
 This is another method to order a heap that already has all the elements one
 needs sorted. The underlying buffer will be interpreted to have n valid elements
@@ -250,14 +256,20 @@ ccc_result ccc_fpq_alloc(ccc_flat_priority_queue *fpq, size_t new_capacity,
 @param [in] tmp a pointer to a dummy user type that will be used for swapping.
 @return a pointer to the inserted element or NULl if NULL args are provided or
 push required more memory and failed. Failure can occur if the fpq is full and
-allocation is not allowed or a resize failed when allocation is allowed. */
+allocation is not allowed or a resize failed when allocation is allowed.
+
+A simple way to provide a temp for swapping is with an inline compound literal
+reference provided directly to the function argument `&(name_of_type){}`. */
 [[nodiscard]] void *ccc_fpq_push(ccc_flat_priority_queue *fpq, void const *elem,
                                  void *tmp);
 
 /** @brief Pop the front element (min or max) element in the fpq. O(lgN).
 @param [in] fpq a pointer to the priority queue.
 @param [in] tmp a pointer to a dummy user type that will be used for swapping.
-@return OK if the pop succeeds or an input error if fpq is NULL or empty. */
+@return OK if the pop succeeds or an input error if fpq is NULL or empty.
+
+A simple way to provide a temp for swapping is with an inline compound literal
+reference provided directly to the function argument `&(name_of_type){}`. */
 ccc_result ccc_fpq_pop(ccc_flat_priority_queue *fpq, void *tmp);
 
 /** @brief Erase element e that is a handle to the stored fpq element.
@@ -268,7 +280,10 @@ ccc_result ccc_fpq_pop(ccc_flat_priority_queue *fpq, void *tmp);
 provided or the fpq is empty.
 @warning the user must ensure e is in the fpq.
 
-Note that the reference to e is invalidated after this call. */
+A simple way to provide a temp for swapping is with an inline compound literal
+reference provided directly to the function argument `&(name_of_type){}`.
+
+Note that the reference to elem is invalidated after this call. */
 ccc_result ccc_fpq_erase(ccc_flat_priority_queue *fpq, void *elem, void *tmp);
 
 /** @brief Update e that is a handle to the stored fpq element. O(lgN).
@@ -279,7 +294,10 @@ ccc_result ccc_fpq_erase(ccc_flat_priority_queue *fpq, void *elem, void *tmp);
 @param [in] aux any auxiliary data needed for the update function.
 @return a reference to the element at its new position in the fpq on success,
 NULL if parameters are invalid or fpq is empty.
-@warning the user must ensure e is in the fpq. */
+@warning the user must ensure e is in the fpq.
+
+A simple way to provide a temp for swapping is with an inline compound literal
+reference provided directly to the function argument `&(name_of_type){}`. */
 void *ccc_fpq_update(ccc_flat_priority_queue *fpq, void *elem, void *tmp,
                      ccc_any_type_update_fn *fn, void *aux);
 
@@ -312,7 +330,10 @@ Note that whether the key increases or decreases does not affect runtime. */
 @param [in] aux any auxiliary data needed for the update function.
 @return a reference to the element at its new position in the fpq on success,
 NULL if parameters are invalid or fpq is empty.
-@warning the user must ensure e is in the fpq. */
+@warning the user must ensure e is in the fpq.
+
+A simple way to provide a temp for swapping is with an inline compound literal
+reference provided directly to the function argument `&(name_of_type){}`. */
 void *ccc_fpq_increase(ccc_flat_priority_queue *fpq, void *elem, void *tmp,
                        ccc_any_type_update_fn *fn, void *aux);
 
@@ -345,7 +366,10 @@ Note that if this priority queue is min or max, the runtime is the same. */
 @param [in] aux any auxiliary data needed for the update function.
 @return a reference to the element at its new position in the fpq on success,
 NULL if parameters are invalid or fpq is empty.
-@warning the user must ensure e is in the fpq. */
+@warning the user must ensure e is in the fpq.
+
+A simple way to provide a temp for swapping is with an inline compound literal
+reference provided directly to the function argument `&(name_of_type){}`. */
 void *ccc_fpq_decrease(ccc_flat_priority_queue *fpq, void *e, void *tmp,
                        ccc_any_type_update_fn *fn, void *aux);
 
@@ -389,6 +413,9 @@ initialized and unusable.
 the fpq is unusable as a container after sorting. This function assumes the fpq
 has been previously initialized. Therefore, if the returned buffer value is not
 used the fpq memory is leaked.
+
+A simple way to provide a temp for swapping is with an inline compound literal
+reference provided directly to the function argument `&(name_of_type){}`.
 
 The underlying memory storage source for the fpq, a buffer, is not moved or
 copied during the sort. The sort is not inherently stable and uses the provided
