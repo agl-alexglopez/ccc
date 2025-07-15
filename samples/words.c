@@ -364,7 +364,7 @@ static struct frequency_alloc
 copy_frequencies(handle_ordered_map const *const map)
 {
     check(!is_empty(map));
-    size_t const cap = sizeof(struct frequency) * (count(map).count + 1);
+    size_t const cap = sizeof(struct frequency) * count(map).count;
     struct frequency *const freqs = malloc(cap);
     check(freqs);
     size_t i = 0;
