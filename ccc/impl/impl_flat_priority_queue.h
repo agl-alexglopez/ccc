@@ -74,7 +74,7 @@ void *ccc_impl_fpq_update_fixup(struct ccc_fpq *, void *, void *tmp);
             impl_fpq_heapify_mem, impl_any_type_name, impl_cmp_order,          \
             impl_cmp_fn, impl_alloc_fn, impl_aux_data, impl_capacity);         \
         ccc_impl_fpq_in_place_heapify(&impl_fpq_heapify_res, (impl_size),      \
-                                      &(impl_any_type_name){});                \
+                                      &(impl_any_type_name){0});               \
         impl_fpq_heapify_res;                                                  \
     }))
 
@@ -94,7 +94,7 @@ void *ccc_impl_fpq_update_fixup(struct ccc_fpq *, void *, void *tmp);
                 impl_fpq_res                                                   \
                     = ccc_buf_at(&impl_fpq->buf,                               \
                                  ccc_impl_fpq_bubble_up(                       \
-                                     impl_fpq, &(typeof(type_initializer)){},  \
+                                     impl_fpq, &(typeof(type_initializer)){0}, \
                                      impl_fpq->buf.count - 1));                \
             }                                                                  \
             else                                                               \
@@ -113,8 +113,8 @@ void *ccc_impl_fpq_update_fixup(struct ccc_fpq *, void *, void *tmp);
         typeof(*T_ptr) *T = (T_ptr);                                           \
         if (impl_fpq && !ccc_buf_is_empty(&impl_fpq->buf) && T)                \
         {                                                                      \
-            {update_closure_over_T} T                                          \
-                = ccc_impl_fpq_update_fixup(impl_fpq, T, &(typeof(*T_ptr)){}); \
+            {update_closure_over_T} T = ccc_impl_fpq_update_fixup(             \
+                impl_fpq, T, &(typeof(*T_ptr)){0});                            \
         }                                                                      \
         T;                                                                     \
     }))
