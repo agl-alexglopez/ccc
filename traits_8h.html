@@ -245,9 +245,9 @@ Include dependency graph for traits.h:</div>
 <tr class="memitem:a735bd49bbb6e0419aef7a60d36d22331"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="traits_8h.html#a735bd49bbb6e0419aef7a60d36d22331">ccc_push_front</a>(container_ptr,  push_args...)&#160;&#160;&#160;    ccc_impl_push_front(container_ptr, push_args)</td></tr>
 <tr class="memdesc:a735bd49bbb6e0419aef7a60d36d22331"><td class="mdescLeft">&#160;</td><td class="mdescRight">Push an element to the front of a container.  <br /></td></tr>
 <tr class="separator:a735bd49bbb6e0419aef7a60d36d22331"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab32522105f9b753ead056d3d4eb5b843"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="traits_8h.html#ab32522105f9b753ead056d3d4eb5b843">ccc_pop</a>(container_ptr)&#160;&#160;&#160;ccc_impl_pop(container_ptr)</td></tr>
-<tr class="memdesc:ab32522105f9b753ead056d3d4eb5b843"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pop an element from a container.  <br /></td></tr>
-<tr class="separator:ab32522105f9b753ead056d3d4eb5b843"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab500aee0366b6347aef97ff30d3a87a7"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="traits_8h.html#ab500aee0366b6347aef97ff30d3a87a7">ccc_pop</a>(container_ptr,  pop_args...)&#160;&#160;&#160;    ccc_impl_pop(container_ptr, pop_args)</td></tr>
+<tr class="memdesc:ab500aee0366b6347aef97ff30d3a87a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pop an element from a container.  <br /></td></tr>
+<tr class="separator:ab500aee0366b6347aef97ff30d3a87a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abda0efcc7e89a4325bf4b46392b545f4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="traits_8h.html#abda0efcc7e89a4325bf4b46392b545f4">ccc_pop_front</a>(container_ptr)&#160;&#160;&#160;ccc_impl_pop_front(container_ptr)</td></tr>
 <tr class="memdesc:abda0efcc7e89a4325bf4b46392b545f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pop an element from the front of a container.  <br /></td></tr>
 <tr class="separator:abda0efcc7e89a4325bf4b46392b545f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1673,8 +1673,8 @@ Include dependency graph for traits.h:</div>
 
 </div>
 </div>
-<a id="ab32522105f9b753ead056d3d4eb5b843" name="ab32522105f9b753ead056d3d4eb5b843"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab32522105f9b753ead056d3d4eb5b843">&#9670;&#160;</a></span>ccc_pop</h2>
+<a id="ab500aee0366b6347aef97ff30d3a87a7" name="ab500aee0366b6347aef97ff30d3a87a7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab500aee0366b6347aef97ff30d3a87a7">&#9670;&#160;</a></span>ccc_pop</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1683,8 +1683,18 @@ Include dependency graph for traits.h:</div>
           <td class="memname">#define ccc_pop</td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">container_ptr</td><td>)</td>
-          <td>&#160;&#160;&#160;ccc_impl_pop(container_ptr)</td>
+          <td class="paramname">container_ptr, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">pop_args...&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;    ccc_impl_pop(container_ptr, pop_args)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1693,6 +1703,7 @@ Include dependency graph for traits.h:</div>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">container_ptr</td><td>a pointer to the container. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">pop_args</td><td>any supplementary args a container may have for the pop. </td></tr>
   </table>
   </dd>
 </dl>

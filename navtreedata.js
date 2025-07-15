@@ -60,7 +60,7 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "annotated.html",
-"flat__priority__queue_8h.html#ae25b1b64e02e35686cc1a138b20208b4",
+"flat__priority__queue_8h.html#aca2387a268f99be1f8cf3672e964af4a",
 "realtime__ordered__map_8h.html#ab611b7c4d19efeac1a64d0ac19edbc62"
 ];
 

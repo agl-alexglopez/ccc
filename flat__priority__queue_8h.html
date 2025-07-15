@@ -128,6 +128,12 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="textblock"><p>The Flat Priority Queue Interface. </p>
 <p>A flat priority queue is a contiguous container storing elements in heap order. This offers tightly packed data for efficient push, pop, min/max operations in O(lg N) time.</p>
 <p>A flat priority queue can use memory sources from the stack, heap, or data segment and can be initialized at compile or runtime. The container offers efficient initialization options such as an <code>O(N)</code> heap building initializer. The flat priority queue also offers a destructive heap sort option if the user desires an in-place strict <code>O(N * log(N))</code> and <code>O(1)</code> space sort that does not use recursion.</p>
+<p>Many functions in the interface request a temporary argument be passed as a swap slot. This is because a flat priority queue is backed by a binary heap and swaps elements to maintain its properties. Because the user may decide the flat priority queue has no allocation permission, the user must provide this swap slot. An easy way to do this in C99 and later is with anonymous compound literal references. For example, if we have a <code>int</code> flat priority queue we can provide a temporary slot inline to a function as follows.</p>
+<div class="fragment"><div class="line"><a class="code hl_function" href="flat__priority__queue_8h.html#a799aff19d6b94ce1a4aeee4b491b23fe">ccc_fpq_push</a>(&amp;pq, &amp;(<span class="keywordtype">int</span>){0});</div>
+<div class="ttc" id="aflat__priority__queue_8h_html_a799aff19d6b94ce1a4aeee4b491b23fe"><div class="ttname"><a href="flat__priority__queue_8h.html#a799aff19d6b94ce1a4aeee4b491b23fe">ccc_fpq_push</a></div><div class="ttdeci">void * ccc_fpq_push(ccc_flat_priority_queue *fpq, void const *elem, void *tmp)</div><div class="ttdoc">Pushes element pointed to at e into fpq. O(lgN).</div></div>
+</div><!-- fragment --><p>Any user defined struct can also use this technique.</p>
+<div class="fragment"><div class="line"><a class="code hl_function" href="flat__priority__queue_8h.html#a799aff19d6b94ce1a4aeee4b491b23fe">ccc_fpq_push</a>(&amp;pq, &amp;(<span class="keyword">struct</span> my_type){});</div>
+</div><!-- fragment --><p>This is the preferred method because the storage remains anonymous and inaccessible to other code in the calling scope.</p>
 <p>To shorten names in the interface, define the following preprocessor directive at the top of your file.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC</span></div>
 </div><!-- fragment --><p>All types and functions can then be written without the <code>ccc_</code> prefix. </p>
@@ -163,33 +169,33 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memitem:abab50c378df48872ce942ac89e4a11c9"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#abab50c378df48872ce942ac89e4a11c9">ccc_fpq_decrease_w</a>(fpq_ptr,  any_type_ptr,  decrease_closure_over_T...)&#160;&#160;&#160;    ccc_impl_fpq_decrease_w(fpq_ptr, any_type_ptr, decrease_closure_over_T)</td></tr>
 <tr class="memdesc:abab50c378df48872ce942ac89e4a11c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Increase the user type stored in the priority queue directly. O(lgN).  <br /></td></tr>
 <tr class="separator:abab50c378df48872ce942ac89e4a11c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3c03845f1ccf579f3eab485086c77131"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a3c03845f1ccf579f3eab485086c77131">ccc_fpq_heapify</a> (<a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> *fpq, void *input_array, size_t input_n, size_t input_sizeof_type)</td></tr>
-<tr class="memdesc:a3c03845f1ccf579f3eab485086c77131"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy input array into the fpq, organizing into heap. O(N).  <br /></td></tr>
-<tr class="separator:a3c03845f1ccf579f3eab485086c77131"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0f90ef3349b3ec122d044be793a2ba73"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a0f90ef3349b3ec122d044be793a2ba73">ccc_fpq_heapify_inplace</a> (<a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> *fpq, size_t n)</td></tr>
-<tr class="memdesc:a0f90ef3349b3ec122d044be793a2ba73"><td class="mdescLeft">&#160;</td><td class="mdescRight">Order n elements of the underlying fpq buffer as an fpq.  <br /></td></tr>
-<tr class="separator:a0f90ef3349b3ec122d044be793a2ba73"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a096f3b99abc3d0a612593403fab5c5b0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a096f3b99abc3d0a612593403fab5c5b0">ccc_fpq_heapify</a> (<a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> *fpq, void *tmp, void *input_array, size_t input_n, size_t input_sizeof_type)</td></tr>
+<tr class="memdesc:a096f3b99abc3d0a612593403fab5c5b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy input array into the fpq, organizing into heap. O(N).  <br /></td></tr>
+<tr class="separator:a096f3b99abc3d0a612593403fab5c5b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a29efc554db0ce8b27e13e09f39835ca5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a29efc554db0ce8b27e13e09f39835ca5">ccc_fpq_heapify_inplace</a> (<a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> *fpq, void *tmp, size_t n)</td></tr>
+<tr class="memdesc:a29efc554db0ce8b27e13e09f39835ca5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Order n elements of the underlying fpq buffer as an fpq.  <br /></td></tr>
+<tr class="separator:a29efc554db0ce8b27e13e09f39835ca5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae25b1b64e02e35686cc1a138b20208b4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#ae25b1b64e02e35686cc1a138b20208b4">ccc_fpq_alloc</a> (<a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> *fpq, size_t new_capacity, <a class="el" href="types_8h.html#a3e73202894869d2840fb21ff912bbd96">ccc_any_alloc_fn</a> *fn)</td></tr>
 <tr class="memdesc:ae25b1b64e02e35686cc1a138b20208b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Many allocate memory for the fpq.  <br /></td></tr>
 <tr class="separator:ae25b1b64e02e35686cc1a138b20208b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af3629428e2a5117d810852fc70c283c8"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#af3629428e2a5117d810852fc70c283c8">ccc_fpq_push</a> (<a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> *fpq, void const *e)</td></tr>
-<tr class="memdesc:af3629428e2a5117d810852fc70c283c8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pushes element pointed to at e into fpq. O(lgN).  <br /></td></tr>
-<tr class="separator:af3629428e2a5117d810852fc70c283c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaec4e075f10f8b6ee6bd99c50fb53d2d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#aaec4e075f10f8b6ee6bd99c50fb53d2d">ccc_fpq_pop</a> (<a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> *fpq)</td></tr>
-<tr class="memdesc:aaec4e075f10f8b6ee6bd99c50fb53d2d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pop the front element (min or max) element in the fpq. O(lgN).  <br /></td></tr>
-<tr class="separator:aaec4e075f10f8b6ee6bd99c50fb53d2d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afc193b31385a3a97002e77d833340c31"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#afc193b31385a3a97002e77d833340c31">ccc_fpq_erase</a> (<a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> *fpq, void *e)</td></tr>
-<tr class="memdesc:afc193b31385a3a97002e77d833340c31"><td class="mdescLeft">&#160;</td><td class="mdescRight">Erase element e that is a handle to the stored fpq element.  <br /></td></tr>
-<tr class="separator:afc193b31385a3a97002e77d833340c31"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9c223a3f8653b7c334bba5cc5ee30f2f"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a9c223a3f8653b7c334bba5cc5ee30f2f">ccc_fpq_update</a> (<a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> *fpq, void *e, <a class="el" href="types_8h.html#ada79c0d2b3cfeee31b9990c23a187d12">ccc_any_type_update_fn</a> *fn, void *aux)</td></tr>
-<tr class="memdesc:a9c223a3f8653b7c334bba5cc5ee30f2f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update e that is a handle to the stored fpq element. O(lgN).  <br /></td></tr>
-<tr class="separator:a9c223a3f8653b7c334bba5cc5ee30f2f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af476beafc16e6f4209f65c9105407056"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#af476beafc16e6f4209f65c9105407056">ccc_fpq_increase</a> (<a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> *fpq, void *e, <a class="el" href="types_8h.html#ada79c0d2b3cfeee31b9990c23a187d12">ccc_any_type_update_fn</a> *fn, void *aux)</td></tr>
-<tr class="memdesc:af476beafc16e6f4209f65c9105407056"><td class="mdescLeft">&#160;</td><td class="mdescRight">Increase e that is a handle to the stored fpq element. O(lgN).  <br /></td></tr>
-<tr class="separator:af476beafc16e6f4209f65c9105407056"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab0d8a8e7b73f1274d1088572c39678d7"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#ab0d8a8e7b73f1274d1088572c39678d7">ccc_fpq_decrease</a> (<a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> *fpq, void *e, <a class="el" href="types_8h.html#ada79c0d2b3cfeee31b9990c23a187d12">ccc_any_type_update_fn</a> *fn, void *aux)</td></tr>
-<tr class="memdesc:ab0d8a8e7b73f1274d1088572c39678d7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decrease e that is a handle to the stored fpq element. O(lgN).  <br /></td></tr>
-<tr class="separator:ab0d8a8e7b73f1274d1088572c39678d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a799aff19d6b94ce1a4aeee4b491b23fe"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a799aff19d6b94ce1a4aeee4b491b23fe">ccc_fpq_push</a> (<a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> *fpq, void const *elem, void *tmp)</td></tr>
+<tr class="memdesc:a799aff19d6b94ce1a4aeee4b491b23fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pushes element pointed to at e into fpq. O(lgN).  <br /></td></tr>
+<tr class="separator:a799aff19d6b94ce1a4aeee4b491b23fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a68b14ac07255f984b838843fd0a3e761"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a68b14ac07255f984b838843fd0a3e761">ccc_fpq_pop</a> (<a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> *fpq, void *tmp)</td></tr>
+<tr class="memdesc:a68b14ac07255f984b838843fd0a3e761"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pop the front element (min or max) element in the fpq. O(lgN).  <br /></td></tr>
+<tr class="separator:a68b14ac07255f984b838843fd0a3e761"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae8343add4d01790de653f7b0f58afcfb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#ae8343add4d01790de653f7b0f58afcfb">ccc_fpq_erase</a> (<a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> *fpq, void *elem, void *tmp)</td></tr>
+<tr class="memdesc:ae8343add4d01790de653f7b0f58afcfb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Erase element e that is a handle to the stored fpq element.  <br /></td></tr>
+<tr class="separator:ae8343add4d01790de653f7b0f58afcfb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1c11b1f31545af6406fc77fa670de9ad"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a1c11b1f31545af6406fc77fa670de9ad">ccc_fpq_update</a> (<a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> *fpq, void *elem, void *tmp, <a class="el" href="types_8h.html#ada79c0d2b3cfeee31b9990c23a187d12">ccc_any_type_update_fn</a> *fn, void *aux)</td></tr>
+<tr class="memdesc:a1c11b1f31545af6406fc77fa670de9ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update e that is a handle to the stored fpq element. O(lgN).  <br /></td></tr>
+<tr class="separator:a1c11b1f31545af6406fc77fa670de9ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3cfb11ac2654304582dce575ae738861"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a3cfb11ac2654304582dce575ae738861">ccc_fpq_increase</a> (<a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> *fpq, void *elem, void *tmp, <a class="el" href="types_8h.html#ada79c0d2b3cfeee31b9990c23a187d12">ccc_any_type_update_fn</a> *fn, void *aux)</td></tr>
+<tr class="memdesc:a3cfb11ac2654304582dce575ae738861"><td class="mdescLeft">&#160;</td><td class="mdescRight">Increase e that is a handle to the stored fpq element. O(lgN).  <br /></td></tr>
+<tr class="separator:a3cfb11ac2654304582dce575ae738861"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa39a2c39c54275a2ff29b82a13d4a089"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#aa39a2c39c54275a2ff29b82a13d4a089">ccc_fpq_decrease</a> (<a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> *fpq, void *elem, void *tmp, <a class="el" href="types_8h.html#ada79c0d2b3cfeee31b9990c23a187d12">ccc_any_type_update_fn</a> *fn, void *aux)</td></tr>
+<tr class="memdesc:aa39a2c39c54275a2ff29b82a13d4a089"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decrease e that is a handle to the stored fpq element. O(lgN).  <br /></td></tr>
+<tr class="separator:aa39a2c39c54275a2ff29b82a13d4a089"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Container Types</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Types available in the container interface. </p>
@@ -201,9 +207,9 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Deallocation Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Deallocate the container or destroy the heap invariants. </p>
 </td></tr>
-<tr class="memitem:a0a33ceda65b2102183b52311d4d07f5b"><td class="memItemLeft" align="right" valign="top">ccc_buffer&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a0a33ceda65b2102183b52311d4d07f5b">ccc_fpq_heapsort</a> (<a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> *fpq)</td></tr>
-<tr class="memdesc:a0a33ceda65b2102183b52311d4d07f5b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroys the fpq by sorting its data and returning a buffer. The data is sorted in <code>O(N * log(N))</code> time and <code>O(1)</code> space.  <br /></td></tr>
-<tr class="separator:a0a33ceda65b2102183b52311d4d07f5b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a46f0ae8fcbfd9f3d6cb1667c5e428826"><td class="memItemLeft" align="right" valign="top">ccc_buffer&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a46f0ae8fcbfd9f3d6cb1667c5e428826">ccc_fpq_heapsort</a> (<a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> *fpq, void *tmp)</td></tr>
+<tr class="memdesc:a46f0ae8fcbfd9f3d6cb1667c5e428826"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroys the fpq by sorting its data and returning a buffer. The data is sorted in <code>O(N * log(N))</code> time and <code>O(1)</code> space.  <br /></td></tr>
+<tr class="separator:a46f0ae8fcbfd9f3d6cb1667c5e428826"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8ae67e38b248056c21865d20978d42bf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a8ae67e38b248056c21865d20978d42bf">ccc_fpq_clear</a> (<a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> *fpq, <a class="el" href="types_8h.html#a97f231bd3df31cb2730e3304d4cc1dd2">ccc_any_type_destructor_fn</a> *fn)</td></tr>
 <tr class="memdesc:a8ae67e38b248056c21865d20978d42bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clears the fpq calling fn on every element if provided. O(1)-O(N).  <br /></td></tr>
 <tr class="separator:a8ae67e38b248056c21865d20978d42bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -406,8 +412,7 @@ This graph shows which files directly or indirectly include this file:</div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the initialized priority queue on the right hand side of an equality operator. (i.e. ccc_flat_priority_queue q = <a class="el" href="flat__priority__queue_8h.html#a7a3542f48eda623e55b72e8ef4cc7ae3" title="Partial order an array of elements as a min or max heap. O(N).">ccc_fpq_heapify_init(...)</a>;).</dd></dl>
-<p>Note that to avoid temporary or unpredictable allocation the fpq requires one slot for swapping. Therefore if the user wants a fixed size fpq of size N, N + 1 capacity is required. </p>
+<dl class="section return"><dt>Returns</dt><dd>the initialized priority queue on the right hand side of an equality operator. (i.e. ccc_flat_priority_queue q = <a class="el" href="flat__priority__queue_8h.html#a7a3542f48eda623e55b72e8ef4cc7ae3" title="Partial order an array of elements as a min or max heap. O(N).">ccc_fpq_heapify_init(...)</a>;). </dd></dl>
 
 </div>
 </div>
@@ -532,8 +537,7 @@ This graph shows which files directly or indirectly include this file:</div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the initialized priority queue on the right hand side of an equality operator. (i.e. ccc_flat_priority_queue q = <a class="el" href="flat__priority__queue_8h.html#abb90b4408d828e1f2820858c6523f289" title="Initialize a fpq as a min or max heap.">ccc_fpq_init(...)</a>;).</dd></dl>
-<p>Note that to avoid temporary or unpredictable allocation the fpq requires one slot for swapping. Therefore if the user wants a fixed size fpq of size N, N + 1 capacity is required. </p>
+<dl class="section return"><dt>Returns</dt><dd>the initialized priority queue on the right hand side of an equality operator. (i.e. ccc_flat_priority_queue q = <a class="el" href="flat__priority__queue_8h.html#abb90b4408d828e1f2820858c6523f289" title="Initialize a fpq as a min or max heap.">ccc_fpq_init(...)</a>;). </dd></dl>
 
 </div>
 </div>
@@ -939,8 +943,8 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="ab0d8a8e7b73f1274d1088572c39678d7" name="ab0d8a8e7b73f1274d1088572c39678d7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab0d8a8e7b73f1274d1088572c39678d7">&#9670;&#160;</a></span>ccc_fpq_decrease()</h2>
+<a id="aa39a2c39c54275a2ff29b82a13d4a089" name="aa39a2c39c54275a2ff29b82a13d4a089"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa39a2c39c54275a2ff29b82a13d4a089">&#9670;&#160;</a></span>ccc_fpq_decrease()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -955,7 +959,13 @@ This graph shows which files directly or indirectly include this file:</div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>e</em>, </td>
+          <td class="paramname"><em>elem</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>tmp</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -981,19 +991,21 @@ This graph shows which files directly or indirectly include this file:</div>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">fpq</td><td>a pointer to the flat priority queue. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">e</td><td>a handle to the stored fpq element. Must be in the fpq. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">elem</td><td>a pointer to the stored fpq element. Must be in the fpq. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">tmp</td><td>a pointer to a dummy user type that will be used for swapping. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">fn</td><td>the update function to act on e. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">aux</td><td>any auxiliary data needed for the update function. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>a reference to the element at its new position in the fpq on success, NULL if parameters are invalid or fpq is empty. </dd></dl>
-<dl class="section warning"><dt>Warning</dt><dd>the user must ensure e is in the fpq. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>the user must ensure e is in the fpq.</dd></dl>
+<p>A simple way to provide a temp for swapping is with an inline compound literal reference provided directly to the function argument <code>&amp;(name_of_type){}</code>. </p>
 
 </div>
 </div>
-<a id="afc193b31385a3a97002e77d833340c31" name="afc193b31385a3a97002e77d833340c31"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afc193b31385a3a97002e77d833340c31">&#9670;&#160;</a></span>ccc_fpq_erase()</h2>
+<a id="ae8343add4d01790de653f7b0f58afcfb" name="ae8343add4d01790de653f7b0f58afcfb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae8343add4d01790de653f7b0f58afcfb">&#9670;&#160;</a></span>ccc_fpq_erase()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1008,7 +1020,13 @@ This graph shows which files directly or indirectly include this file:</div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>e</em>&#160;</td>
+          <td class="paramname"><em>elem</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>tmp</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1022,13 +1040,15 @@ This graph shows which files directly or indirectly include this file:</div>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">fpq</td><td>a pointer to the priority queue. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">e</td><td>a handle to the stored fpq element. Must be in the fpq. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">elem</td><td>a pointer to the stored fpq element. Must be in the fpq. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">tmp</td><td>a pointer to a dummy user type that will be used for swapping. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>OK if the erase is successful or an input error if NULL args are provided or the fpq is empty. </dd></dl>
 <dl class="section warning"><dt>Warning</dt><dd>the user must ensure e is in the fpq.</dd></dl>
-<p>Note that the reference to e is invalidated after this call. </p>
+<p>A simple way to provide a temp for swapping is with an inline compound literal reference provided directly to the function argument <code>&amp;(name_of_type){}</code>.</p>
+<p>Note that the reference to elem is invalidated after this call. </p>
 
 </div>
 </div>
@@ -1059,8 +1079,8 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="a3c03845f1ccf579f3eab485086c77131" name="a3c03845f1ccf579f3eab485086c77131"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3c03845f1ccf579f3eab485086c77131">&#9670;&#160;</a></span>ccc_fpq_heapify()</h2>
+<a id="a096f3b99abc3d0a612593403fab5c5b0" name="a096f3b99abc3d0a612593403fab5c5b0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a096f3b99abc3d0a612593403fab5c5b0">&#9670;&#160;</a></span>ccc_fpq_heapify()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1070,6 +1090,12 @@ This graph shows which files directly or indirectly include this file:</div>
           <td>(</td>
           <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> *&#160;</td>
           <td class="paramname"><em>fpq</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>tmp</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1101,6 +1127,7 @@ This graph shows which files directly or indirectly include this file:</div>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">fpq</td><td>a pointer to the priority queue. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">tmp</td><td>a pointer to an additional element of array type for swapping. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">input_array</td><td>an array of elements of the same size as the type used to initialize fpq. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">input_n</td><td>the number of contiguous elements at input_array. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">input_sizeof_type</td><td>size of each element in input_array matching element size of fpq. </td></tr>
@@ -1108,12 +1135,13 @@ This graph shows which files directly or indirectly include this file:</div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>OK if sorting was successful or an input error if bad input is provided. A permission error will occur if no allocation is allowed and the input array is larger than the fixed fpq capacity. A memory error will occur if reallocation is required to fit all elements but reallocation fails.</dd></dl>
+<p>A simple way to provide a temp for swapping is with an inline compound literal reference provided directly to the function argument <code>&amp;(name_of_type){}</code>.</p>
 <p>Note that this version of heapify copies elements from the input array. If an in place heapify is required use the initializer version of this method. </p>
 
 </div>
 </div>
-<a id="a0f90ef3349b3ec122d044be793a2ba73" name="a0f90ef3349b3ec122d044be793a2ba73"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0f90ef3349b3ec122d044be793a2ba73">&#9670;&#160;</a></span>ccc_fpq_heapify_inplace()</h2>
+<a id="a29efc554db0ce8b27e13e09f39835ca5" name="a29efc554db0ce8b27e13e09f39835ca5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a29efc554db0ce8b27e13e09f39835ca5">&#9670;&#160;</a></span>ccc_fpq_heapify_inplace()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1123,6 +1151,12 @@ This graph shows which files directly or indirectly include this file:</div>
           <td>(</td>
           <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> *&#160;</td>
           <td class="paramname"><em>fpq</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>tmp</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1142,17 +1176,19 @@ This graph shows which files directly or indirectly include this file:</div>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">fpq</td><td>a pointer to the flat priority queue. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">tmp</td><td>a pointer to a dummy user type that will be used for swapping. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">n</td><td>the number n of elements where 0 &lt; (n + 1) &lt;= capacity. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the result of the heapify operation, ok if successful or an error if fpq is NULL or n is larger than the initialized capacity of the fpq.</dd></dl>
+<p>A simple way to provide a temp for swapping is with an inline compound literal reference provided directly to the function argument <code>&amp;(name_of_type){}</code>.</p>
 <p>This is another method to order a heap that already has all the elements one needs sorted. The underlying buffer will be interpreted to have n valid elements starting at index 0 to index n - 1. </p>
 
 </div>
 </div>
-<a id="a0a33ceda65b2102183b52311d4d07f5b" name="a0a33ceda65b2102183b52311d4d07f5b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0a33ceda65b2102183b52311d4d07f5b">&#9670;&#160;</a></span>ccc_fpq_heapsort()</h2>
+<a id="a46f0ae8fcbfd9f3d6cb1667c5e428826" name="a46f0ae8fcbfd9f3d6cb1667c5e428826"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a46f0ae8fcbfd9f3d6cb1667c5e428826">&#9670;&#160;</a></span>ccc_fpq_heapsort()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1161,8 +1197,18 @@ This graph shows which files directly or indirectly include this file:</div>
           <td class="memname">ccc_buffer ccc_fpq_heapsort </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> *&#160;</td>
-          <td class="paramname"><em>fpq</em></td><td>)</td>
+          <td class="paramname"><em>fpq</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>tmp</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1171,17 +1217,19 @@ This graph shows which files directly or indirectly include this file:</div>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">fpq</td><td>the fpq to be sorted and destroyed. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">tmp</td><td>a pointer to a dummy user type that will be used for swapping. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>a buffer filled from the back to the front by the fpq order. If the fpq is initialized CCC_LES the returned buffer is sorted in non-increasing order from index [0, N). If the fpq is initialized CCC_GRT the buffer is sorted in non-descending order from index [0, N). If fpq is NULL, the buffer is default initialized and unusable. </dd></dl>
 <dl class="section warning"><dt>Warning</dt><dd>all fields of the fpq are cleared or otherwise default initialized so the fpq is unusable as a container after sorting. This function assumes the fpq has been previously initialized. Therefore, if the returned buffer value is not used the fpq memory is leaked.</dd></dl>
+<p>A simple way to provide a temp for swapping is with an inline compound literal reference provided directly to the function argument <code>&amp;(name_of_type){}</code>.</p>
 <p>The underlying memory storage source for the fpq, a buffer, is not moved or copied during the sort. The sort is not inherently stable and uses the provided comparison function to the priority queue to order the elements. </p>
 
 </div>
 </div>
-<a id="af476beafc16e6f4209f65c9105407056" name="af476beafc16e6f4209f65c9105407056"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af476beafc16e6f4209f65c9105407056">&#9670;&#160;</a></span>ccc_fpq_increase()</h2>
+<a id="a3cfb11ac2654304582dce575ae738861" name="a3cfb11ac2654304582dce575ae738861"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3cfb11ac2654304582dce575ae738861">&#9670;&#160;</a></span>ccc_fpq_increase()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1196,7 +1244,13 @@ This graph shows which files directly or indirectly include this file:</div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>e</em>, </td>
+          <td class="paramname"><em>elem</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>tmp</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1222,14 +1276,16 @@ This graph shows which files directly or indirectly include this file:</div>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">fpq</td><td>a pointer to the flat priority queue. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">e</td><td>a handle to the stored fpq element. Must be in the fpq. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">elem</td><td>a pointer to the stored fpq element. Must be in the fpq. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">tmp</td><td>a pointer to a dummy user type that will be used for swapping. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">fn</td><td>the update function to act on e. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">aux</td><td>any auxiliary data needed for the update function. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>a reference to the element at its new position in the fpq on success, NULL if parameters are invalid or fpq is empty. </dd></dl>
-<dl class="section warning"><dt>Warning</dt><dd>the user must ensure e is in the fpq. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>the user must ensure e is in the fpq.</dd></dl>
+<p>A simple way to provide a temp for swapping is with an inline compound literal reference provided directly to the function argument <code>&amp;(name_of_type){}</code>. </p>
 
 </div>
 </div>
@@ -1287,8 +1343,8 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="aaec4e075f10f8b6ee6bd99c50fb53d2d" name="aaec4e075f10f8b6ee6bd99c50fb53d2d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aaec4e075f10f8b6ee6bd99c50fb53d2d">&#9670;&#160;</a></span>ccc_fpq_pop()</h2>
+<a id="a68b14ac07255f984b838843fd0a3e761" name="a68b14ac07255f984b838843fd0a3e761"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a68b14ac07255f984b838843fd0a3e761">&#9670;&#160;</a></span>ccc_fpq_pop()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1297,8 +1353,18 @@ This graph shows which files directly or indirectly include this file:</div>
           <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_fpq_pop </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> *&#160;</td>
-          <td class="paramname"><em>fpq</em></td><td>)</td>
+          <td class="paramname"><em>fpq</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>tmp</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1307,15 +1373,17 @@ This graph shows which files directly or indirectly include this file:</div>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">fpq</td><td>a pointer to the priority queue. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">tmp</td><td>a pointer to a dummy user type that will be used for swapping. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>OK if the pop succeeds or an input error if fpq is NULL or empty. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>OK if the pop succeeds or an input error if fpq is NULL or empty.</dd></dl>
+<p>A simple way to provide a temp for swapping is with an inline compound literal reference provided directly to the function argument <code>&amp;(name_of_type){}</code>. </p>
 
 </div>
 </div>
-<a id="af3629428e2a5117d810852fc70c283c8" name="af3629428e2a5117d810852fc70c283c8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af3629428e2a5117d810852fc70c283c8">&#9670;&#160;</a></span>ccc_fpq_push()</h2>
+<a id="a799aff19d6b94ce1a4aeee4b491b23fe" name="a799aff19d6b94ce1a4aeee4b491b23fe"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a799aff19d6b94ce1a4aeee4b491b23fe">&#9670;&#160;</a></span>ccc_fpq_push()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1330,7 +1398,13 @@ This graph shows which files directly or indirectly include this file:</div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">void const *&#160;</td>
-          <td class="paramname"><em>e</em>&#160;</td>
+          <td class="paramname"><em>elem</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>tmp</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1344,11 +1418,13 @@ This graph shows which files directly or indirectly include this file:</div>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">fpq</td><td>a pointer to the priority queue. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">e</td><td>a pointer to the user element of same type as in fpq. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">elem</td><td>a pointer to the user element of same type as in fpq. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">tmp</td><td>a pointer to a dummy user type that will be used for swapping. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>a pointer to the inserted element or NULl if NULL args are provided or push required more memory and failed. Failure can occur if the fpq is full and allocation is not allowed or a resize failed when allocation is allowed. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>a pointer to the inserted element or NULl if NULL args are provided or push required more memory and failed. Failure can occur if the fpq is full and allocation is not allowed or a resize failed when allocation is allowed.</dd></dl>
+<p>A simple way to provide a temp for swapping is with an inline compound literal reference provided directly to the function argument <code>&amp;(name_of_type){}</code>. </p>
 
 </div>
 </div>
@@ -1400,8 +1476,8 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="a9c223a3f8653b7c334bba5cc5ee30f2f" name="a9c223a3f8653b7c334bba5cc5ee30f2f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9c223a3f8653b7c334bba5cc5ee30f2f">&#9670;&#160;</a></span>ccc_fpq_update()</h2>
+<a id="a1c11b1f31545af6406fc77fa670de9ad" name="a1c11b1f31545af6406fc77fa670de9ad"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1c11b1f31545af6406fc77fa670de9ad">&#9670;&#160;</a></span>ccc_fpq_update()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1416,7 +1492,13 @@ This graph shows which files directly or indirectly include this file:</div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>e</em>, </td>
+          <td class="paramname"><em>elem</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>tmp</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1442,14 +1524,16 @@ This graph shows which files directly or indirectly include this file:</div>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">fpq</td><td>a pointer to the flat priority queue. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">e</td><td>a handle to the stored fpq element. Must be in the fpq. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">elem</td><td>a pointer to the stored fpq element. Must be in the fpq. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">tmp</td><td>a pointer to a dummy user type that will be used for swapping. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">fn</td><td>the update function to act on e. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">aux</td><td>any auxiliary data needed for the update function. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>a reference to the element at its new position in the fpq on success, NULL if parameters are invalid or fpq is empty. </dd></dl>
-<dl class="section warning"><dt>Warning</dt><dd>the user must ensure e is in the fpq. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>the user must ensure e is in the fpq.</dd></dl>
+<p>A simple way to provide a temp for swapping is with an inline compound literal reference provided directly to the function argument <code>&amp;(name_of_type){}</code>. </p>
 
 </div>
 </div>
