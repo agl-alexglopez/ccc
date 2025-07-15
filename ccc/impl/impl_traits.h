@@ -425,10 +425,11 @@ limitations under the License.
         ccc_singly_linked_list *: ccc_sll_push_front)((container_ptr),         \
                                                       container_handle_ptr)
 
-#define ccc_impl_pop(container_ptr)                                            \
+#define ccc_impl_pop(container_ptr, ...)                                       \
     _Generic((container_ptr),                                                  \
         ccc_flat_priority_queue *: ccc_fpq_pop,                                \
-        ccc_priority_queue *: ccc_pq_pop)((container_ptr))
+        ccc_priority_queue                                                     \
+            *: ccc_pq_pop)((container_ptr)__VA_OPT__(, __VA_ARGS__))
 
 #define ccc_impl_pop_front(container_ptr)                                      \
     _Generic((container_ptr),                                                  \

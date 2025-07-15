@@ -261,7 +261,7 @@ animate_maze(struct maze *maze)
         entry_r(&cost_map, &s),
         (struct prim_cell){.cell = s, .cost = rand_range(0, 100)});
     check(first);
-    (void)push(&cell_pq, first);
+    (void)push(&cell_pq, first, &(struct prim_cell){});
     while (!is_empty(&cell_pq))
     {
         struct prim_cell const *const c = front(&cell_pq);
@@ -289,11 +289,11 @@ animate_maze(struct maze *maze)
         if (min != INT_MAX)
         {
             join_squares_animated(maze, c->cell, min_cell.cell, speed);
-            (void)push(&cell_pq, &min_cell);
+            (void)push(&cell_pq, &min_cell, &(struct prim_cell){});
         }
         else
         {
-            (void)pop(&cell_pq);
+            (void)pop(&cell_pq, &(struct prim_cell){});
         }
     }
     /* If a container is reserved without allocation permission it has no way

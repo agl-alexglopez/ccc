@@ -47,9 +47,9 @@ struct ccc_fpq
 /** @private */
 size_t ccc_impl_fpq_bubble_up(struct ccc_fpq *, void *, size_t);
 /** @private */
-void ccc_impl_fpq_in_place_heapify(struct ccc_fpq *, size_t n);
+void ccc_impl_fpq_in_place_heapify(struct ccc_fpq *, size_t n, void *tmp);
 /** @private */
-void *ccc_impl_fpq_update_fixup(struct ccc_fpq *, void *);
+void *ccc_impl_fpq_update_fixup(struct ccc_fpq *, void *, void *tmp);
 
 /*======================    Macro Implementations    ========================*/
 
@@ -73,7 +73,8 @@ void *ccc_impl_fpq_update_fixup(struct ccc_fpq *, void *);
         struct ccc_fpq impl_fpq_heapify_res = ccc_impl_fpq_init(               \
             impl_fpq_heapify_mem, impl_any_type_name, impl_cmp_order,          \
             impl_cmp_fn, impl_alloc_fn, impl_aux_data, impl_capacity);         \
-        ccc_impl_fpq_in_place_heapify(&impl_fpq_heapify_res, (impl_size));     \
+        ccc_impl_fpq_in_place_heapify(&impl_fpq_heapify_res, (impl_size),      \
+                                      &(impl_any_type_name){});                \
         impl_fpq_heapify_res;                                                  \
     }))
 
@@ -82,35 +83,19 @@ void *ccc_impl_fpq_update_fixup(struct ccc_fpq *, void *);
    details of the macro are hidden here in the impl header. */
 #define ccc_impl_fpq_emplace(fpq, type_initializer...)                         \
     (__extension__({                                                           \
-        typeof(type_initializer) *impl_fpq_res = NULL;                         \
         struct ccc_fpq *impl_fpq = (fpq);                                      \
-        assert(sizeof(*impl_fpq_res) == impl_fpq->buf.sizeof_type);            \
-        if (impl_fpq->buf.count + 1 >= impl_fpq->buf.capacity)                 \
-        {                                                                      \
-            ccc_result const impl_extra_space = ccc_buf_alloc(                 \
-                &impl_fpq->buf,                                                \
-                impl_fpq->buf.capacity ? impl_fpq->buf.capacity * 2 : 8,       \
-                impl_fpq->buf.alloc);                                          \
-            if (impl_extra_space == CCC_RESULT_OK)                             \
-            {                                                                  \
-                impl_fpq_res = ccc_buf_alloc_back(&impl_fpq->buf);             \
-            }                                                                  \
-        }                                                                      \
-        else                                                                   \
-        {                                                                      \
-            impl_fpq_res = ccc_buf_alloc_back(&impl_fpq->buf);                 \
-        }                                                                      \
+        typeof(type_initializer) *impl_fpq_res                                 \
+            = ccc_buf_alloc_back(&impl_fpq->buf);                              \
         if (impl_fpq_res)                                                      \
         {                                                                      \
             *impl_fpq_res = type_initializer;                                  \
             if (impl_fpq->buf.count > 1)                                       \
             {                                                                  \
-                void *impl_fpq_tmp                                             \
-                    = ccc_buf_at(&impl_fpq->buf, impl_fpq->buf.count);         \
-                impl_fpq_res = ccc_buf_at(                                     \
-                    &impl_fpq->buf,                                            \
-                    ccc_impl_fpq_bubble_up(impl_fpq, impl_fpq_tmp,             \
-                                           impl_fpq->buf.count - 1));          \
+                impl_fpq_res                                                   \
+                    = ccc_buf_at(&impl_fpq->buf,                               \
+                                 ccc_impl_fpq_bubble_up(                       \
+                                     impl_fpq, &(typeof(type_initializer)){},  \
+                                     impl_fpq->buf.count - 1));                \
             }                                                                  \
             else                                                               \
             {                                                                  \
@@ -129,7 +114,7 @@ void *ccc_impl_fpq_update_fixup(struct ccc_fpq *, void *);
         if (impl_fpq && !ccc_buf_is_empty(&impl_fpq->buf) && T)                \
         {                                                                      \
             {update_closure_over_T} T                                          \
-                = ccc_impl_fpq_update_fixup(impl_fpq, T);                      \
+                = ccc_impl_fpq_update_fixup(impl_fpq, T, &(typeof(*T_ptr)){}); \
         }                                                                      \
         T;                                                                     \
     }))

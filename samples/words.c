@@ -391,7 +391,7 @@ print_n(ccc_handle_ordered_map *const map, ccc_threeway_cmp const ord,
     {
         n = count(&fpq).count;
     }
-    ccc_buffer b = ccc_fpq_heapsort(&fpq);
+    ccc_buffer b = ccc_fpq_heapsort(&fpq, &(struct frequency){});
     check(!fpq.buf.mem);
     int w = 0;
     /* Heap sort puts the root most nodes at the back of the buffer. */
