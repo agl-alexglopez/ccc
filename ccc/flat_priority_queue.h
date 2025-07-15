@@ -359,8 +359,8 @@ Deallocate the container or destroy the heap invariants. */
 /**@{*/
 
 /** @brief Destroys the fpq by sorting its data and returning a buffer. The data
-is sorted in `O(N * log(N))` time and `O(1)` space. The underlying storage
-source for the fpq does not move from its currently allocated location.
+is sorted in `O(N * log(N))` time and `O(1)` space. The underlying memory
+storage source for the fpq, a buffer, is not moved or copied during the sort.
 @param [in] fpq the fpq to be sorted and destroyed.
 @return a buffer filled from the back to the front by the fpq order. If the fpq
 is initialized CCC_LES the returned buffer is sorted in non-increasing order
