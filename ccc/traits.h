@@ -323,10 +323,12 @@ See container documentation for specific behavior. */
 
 /** @brief Pop an element from a container.
 @param [in] container_ptr a pointer to the container.
+@param [in] pop_args any supplementary args a container may have for the pop.
 @return a result of the pop operation.
 
 See container documentation for specific behavior. */
-#define ccc_pop(container_ptr) ccc_impl_pop(container_ptr)
+#define ccc_pop(container_ptr, pop_args...)                                    \
+    ccc_impl_pop(container_ptr, pop_args)
 
 /** @brief Pop an element from the front of a container.
 @param [in] container_ptr a pointer to the container.

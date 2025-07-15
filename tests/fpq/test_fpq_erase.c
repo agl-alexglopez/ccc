@@ -20,7 +20,7 @@ CHECK_BEGIN_STATIC_FN(fpq_test_insert_remove_four_dups)
     for (int i = 0; i < 4; ++i)
     {
         three_vals[i].val = 0;
-        CHECK(push(&fpq, &three_vals[i]) != NULL, true);
+        CHECK(push(&fpq, &three_vals[i], &(struct val){}) != NULL, true);
         CHECK(validate(&fpq), true);
         size_t const size_check = i + 1;
         CHECK(ccc_fpq_count(&fpq).count, size_check);
@@ -29,7 +29,7 @@ CHECK_BEGIN_STATIC_FN(fpq_test_insert_remove_four_dups)
     for (int i = 0; i < 4; ++i)
     {
         three_vals[i].val = 0;
-        (void)pop(&fpq);
+        (void)pop(&fpq, &(struct val){});
         CHECK(validate(&fpq), true);
     }
     CHECK(ccc_fpq_count(&fpq).count, (size_t)0);
@@ -57,7 +57,7 @@ CHECK_BEGIN_STATIC_FN(fpq_test_insert_erase_shuffled)
     {
         size_t const rand_index
             = rand_range(0, (int)ccc_fpq_count(&fpq).count - 1);
-        (void)ccc_fpq_erase(&fpq, &vals[rand_index]);
+        (void)ccc_fpq_erase(&fpq, &vals[rand_index], &(struct val){});
         CHECK(validate(&fpq), true);
     }
     CHECK(ccc_fpq_count(&fpq).count, (size_t)0);
@@ -82,7 +82,7 @@ CHECK_BEGIN_STATIC_FN(fpq_test_pop_max)
     {
         struct val const *const front = front(&fpq);
         CHECK(front->val, sorted_check[i]);
-        (void)pop(&fpq);
+        (void)pop(&fpq, &(struct val){});
     }
     CHECK(ccc_fpq_is_empty(&fpq), true);
     CHECK_END_FN();
@@ -106,7 +106,7 @@ CHECK_BEGIN_STATIC_FN(fpq_test_pop_min)
     {
         struct val const *const front = front(&fpq);
         CHECK(front->val, sorted_check[i]);
-        (void)pop(&fpq);
+        (void)pop(&fpq, &(struct val){});
     }
     CHECK(ccc_fpq_is_empty(&fpq), true);
     CHECK_END_FN();
@@ -130,7 +130,7 @@ CHECK_BEGIN_STATIC_FN(fpq_test_delete_prime_shuffle_duplicates)
     {
         vals[i].val = shuffled_index;
         vals[i].id = i;
-        CHECK(push(&fpq, &vals[i]) != NULL, true);
+        CHECK(push(&fpq, &vals[i], &(struct val){}) != NULL, true);
         CHECK(validate(&fpq), true);
         size_t const s = i + 1;
         CHECK(ccc_fpq_count(&fpq).count, s);
@@ -142,7 +142,7 @@ CHECK_BEGIN_STATIC_FN(fpq_test_delete_prime_shuffle_duplicates)
     {
         size_t const rand_index
             = rand_range(0, (int)ccc_fpq_count(&fpq).count - 1);
-        (void)ccc_fpq_erase(&fpq, &vals[rand_index]);
+        (void)ccc_fpq_erase(&fpq, &vals[rand_index], &(struct val){});
         CHECK(validate(&fpq), true);
         --cur_size;
         CHECK(ccc_fpq_count(&fpq).count, cur_size);
@@ -166,7 +166,7 @@ CHECK_BEGIN_STATIC_FN(fpq_test_prime_shuffle)
     {
         vals[i].val = shuffled_index;
         vals[i].id = shuffled_index;
-        CHECK(push(&fpq, &vals[i]) != NULL, true);
+        CHECK(push(&fpq, &vals[i], &(struct val){}) != NULL, true);
         CHECK(validate(&fpq), true);
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
@@ -177,7 +177,9 @@ CHECK_BEGIN_STATIC_FN(fpq_test_prime_shuffle)
     {
         size_t const rand_index
             = rand_range(0, (int)ccc_fpq_count(&fpq).count - 1);
-        CHECK(ccc_fpq_erase(&fpq, &vals[rand_index]) == CCC_RESULT_OK, true);
+        CHECK(ccc_fpq_erase(&fpq, &vals[rand_index], &(struct val){})
+                  == CCC_RESULT_OK,
+              true);
         CHECK(validate(&fpq), true);
         --cur_size;
         CHECK(ccc_fpq_count(&fpq).count, cur_size);
@@ -199,14 +201,16 @@ CHECK_BEGIN_STATIC_FN(fpq_test_weak_srand)
     {
         vals[i].val = rand(); // NOLINT
         vals[i].id = i;
-        CHECK(push(&fpq, &vals[i]) != NULL, true);
+        CHECK(push(&fpq, &vals[i], &(struct val){}) != NULL, true);
         CHECK(validate(&fpq), true);
     }
     while (!ccc_fpq_is_empty(&fpq))
     {
         size_t const rand_index
             = rand_range(0, (int)ccc_fpq_count(&fpq).count - 1);
-        CHECK(ccc_fpq_erase(&fpq, &vals[rand_index]) == CCC_RESULT_OK, true);
+        CHECK(ccc_fpq_erase(&fpq, &vals[rand_index], &(struct val){})
+                  == CCC_RESULT_OK,
+              true);
         CHECK(validate(&fpq), true);
     }
     CHECK(ccc_fpq_is_empty(&fpq), true);

@@ -41,7 +41,7 @@ CHECK_BEGIN_STATIC_FN(fpq_test_macro)
     CHECK(res != NULL, true);
     CHECK(fpq_is_empty(&pq), false);
     struct val *res2 = fpq_emplace(&pq, (struct val){.val = 0, .id = 0});
-    CHECK(res2 == NULL, true);
+    CHECK(res2 != NULL, true);
     CHECK_END_FN();
 }
 
@@ -63,7 +63,7 @@ CHECK_BEGIN_STATIC_FN(fpq_test_push)
     flat_priority_queue pq
         = fpq_init(vals, struct val, CCC_LES, val_cmp, NULL, NULL,
                    (sizeof(vals) / sizeof(struct val)));
-    struct val *res = push(&pq, &vals[0]);
+    struct val *res = push(&pq, &vals[0], &(struct val){});
     CHECK(res != NULL, true);
     CHECK(fpq_is_empty(&pq), false);
     CHECK_END_FN();
@@ -75,7 +75,7 @@ CHECK_BEGIN_STATIC_FN(fpq_test_raw_type)
     flat_priority_queue pq = fpq_init(vals, int, CCC_LES, int_cmp, NULL, NULL,
                                       (sizeof(vals) / sizeof(int)));
     int val = 1;
-    int *res = push(&pq, &val);
+    int *res = push(&pq, &val, &(int){0});
     CHECK(res != NULL, true);
     CHECK(fpq_is_empty(&pq), false);
     res = fpq_emplace(&pq, -1);
@@ -99,11 +99,11 @@ CHECK_BEGIN_STATIC_FN(fpq_test_heapify_init)
         = fpq_heapify_init(heap, int, CCC_LES, int_cmp, NULL, NULL,
                            (sizeof(heap) / sizeof(int)), size);
     int prev = *((int *)fpq_front(&pq));
-    (void)pop(&pq);
+    (void)pop(&pq, &(int){0});
     while (!fpq_is_empty(&pq))
     {
         int cur = *((int *)fpq_front(&pq));
-        (void)pop(&pq);
+        (void)pop(&pq, &(int){0});
         CHECK(cur >= prev, true);
         prev = cur;
     }
@@ -121,15 +121,16 @@ CHECK_BEGIN_STATIC_FN(fpq_test_heapify_copy)
     {
         input[i] = rand_range(-99, 99); /* NOLINT */
     }
-    CHECK(fpq_heapify(&pq, input, sizeof(input) / sizeof(int), sizeof(int)),
+    CHECK(fpq_heapify(&pq, &(int){0}, input, sizeof(input) / sizeof(int),
+                      sizeof(int)),
           CCC_RESULT_OK);
     CHECK(fpq_count(&pq).count, sizeof(input) / sizeof(int));
     int prev = *((int *)fpq_front(&pq));
-    (void)pop(&pq);
+    (void)pop(&pq, &(int){0});
     while (!fpq_is_empty(&pq))
     {
         int cur = *((int *)fpq_front(&pq));
-        (void)pop(&pq);
+        (void)pop(&pq, &(int){0});
         CHECK(cur >= prev, true);
         prev = cur;
     }
@@ -150,7 +151,7 @@ CHECK_BEGIN_STATIC_FN(fpq_test_heapsort)
     }
     flat_priority_queue pq = fpq_heapify_init(heap, int, CCC_LES, int_cmp, NULL,
                                               NULL, HPSORTCAP, HPSORTCAP - 1);
-    ccc_buffer const b = ccc_fpq_heapsort(&pq);
+    ccc_buffer const b = ccc_fpq_heapsort(&pq, &(int){0});
     int const *prev = begin(&b);
     CHECK(prev != NULL, true);
     CHECK(ccc_buf_count(&b).count, HPSORTCAP - 1);
@@ -171,9 +172,9 @@ CHECK_BEGIN_STATIC_FN(fpq_test_copy_no_alloc)
         = fpq_init((int[4]){}, int, CCC_LES, int_cmp, NULL, NULL, 4);
     flat_priority_queue dst
         = fpq_init((int[5]){}, int, CCC_LES, int_cmp, NULL, NULL, 5);
-    (void)push(&src, &(int){0});
-    (void)push(&src, &(int){1});
-    (void)push(&src, &(int){2});
+    (void)push(&src, &(int){0}, &(int){0});
+    (void)push(&src, &(int){1}, &(int){0});
+    (void)push(&src, &(int){2}, &(int){0});
     CHECK(count(&src).count, 3);
     CHECK(*(int *)front(&src), 0);
     CHECK(is_empty(&dst), true);
@@ -184,8 +185,8 @@ CHECK_BEGIN_STATIC_FN(fpq_test_copy_no_alloc)
     {
         int f1 = *(int *)front(&src);
         int f2 = *(int *)front(&dst);
-        (void)pop(&src);
-        (void)pop(&dst);
+        (void)pop(&src, &(int){0});
+        (void)pop(&dst, &(int){0});
         CHECK(f1, f2);
     }
     CHECK(is_empty(&src), is_empty(&dst));
@@ -198,9 +199,9 @@ CHECK_BEGIN_STATIC_FN(fpq_test_copy_no_alloc_fail)
         = fpq_init((int[4]){}, int, CCC_LES, int_cmp, NULL, NULL, 4);
     flat_priority_queue dst
         = fpq_init((int[2]){}, int, CCC_LES, int_cmp, NULL, NULL, 2);
-    (void)push(&src, &(int){0});
-    (void)push(&src, &(int){1});
-    (void)push(&src, &(int){2});
+    (void)push(&src, &(int){0}, &(int){0});
+    (void)push(&src, &(int){1}, &(int){0});
+    (void)push(&src, &(int){2}, &(int){0});
     CHECK(count(&src).count, 3);
     CHECK(*(int *)front(&src), 0);
     CHECK(is_empty(&dst), true);
@@ -215,9 +216,9 @@ CHECK_BEGIN_STATIC_FN(fpq_test_copy_alloc)
         = fpq_init(NULL, int, CCC_LES, int_cmp, std_alloc, NULL, 0);
     flat_priority_queue dst
         = fpq_init(NULL, int, CCC_LES, int_cmp, std_alloc, NULL, 0);
-    (void)push(&src, &(int){0});
-    (void)push(&src, &(int){1});
-    (void)push(&src, &(int){2});
+    (void)push(&src, &(int){0}, &(int){0});
+    (void)push(&src, &(int){1}, &(int){0});
+    (void)push(&src, &(int){2}, &(int){0});
     CHECK(*(int *)front(&src), 0);
     CHECK(is_empty(&dst), true);
     ccc_result res = fpq_copy(&dst, &src, std_alloc);
@@ -227,8 +228,8 @@ CHECK_BEGIN_STATIC_FN(fpq_test_copy_alloc)
     {
         int f1 = *(int *)front(&src);
         int f2 = *(int *)front(&dst);
-        (void)pop(&src);
-        (void)pop(&dst);
+        (void)pop(&src, &(int){0});
+        (void)pop(&dst, &(int){0});
         CHECK(f1, f2);
     }
     CHECK(is_empty(&src), is_empty(&dst));
@@ -244,9 +245,9 @@ CHECK_BEGIN_STATIC_FN(fpq_test_copy_alloc_fail)
         = fpq_init(NULL, int, CCC_LES, int_cmp, std_alloc, NULL, 0);
     flat_priority_queue dst
         = fpq_init(NULL, int, CCC_LES, int_cmp, std_alloc, NULL, 0);
-    (void)push(&src, &(int){0});
-    (void)push(&src, &(int){1});
-    (void)push(&src, &(int){2});
+    (void)push(&src, &(int){0}, &(int){0});
+    (void)push(&src, &(int){1}, &(int){0});
+    (void)push(&src, &(int){2}, &(int){0});
     CHECK(*(int *)front(&src), 0);
     CHECK(is_empty(&dst), true);
     ccc_result res = fpq_copy(&dst, &src, NULL);

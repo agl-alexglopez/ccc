@@ -43,7 +43,7 @@ CHECK_BEGIN_FN(insert_shuffled, ccc_flat_priority_queue *pq, struct val vals[],
     for (size_t i = 0; i < size; ++i)
     {
         vals[i].id = vals[i].val = (int)shuffled_index;
-        CHECK(push(pq, &vals[i]) != NULL, CCC_TRUE);
+        CHECK(push(pq, &vals[i], &(struct val){}) != NULL, CCC_TRUE);
         CHECK(ccc_fpq_count(pq).count, i + 1);
         CHECK(validate(pq), true);
         shuffled_index = (shuffled_index + larger_prime) % size;
@@ -76,7 +76,7 @@ CHECK_BEGIN_FN(inorder_fill, int vals[], size_t size,
             &fpq_copy, (struct val){.id = front->id, .val = front->val});
         CHECK(v != NULL, true);
         CHECK(prev < ccc_fpq_count(&fpq_copy).count, true);
-        (void)pop(fpq);
+        (void)pop(fpq, &(struct val){});
     }
     i = 0;
     while (!ccc_fpq_is_empty(&fpq_copy) && i < size)
@@ -88,7 +88,7 @@ CHECK_BEGIN_FN(inorder_fill, int vals[], size_t size,
         CHECK(e != NULL, true);
         CHECK(prev < ccc_fpq_count(fpq).count, true);
         CHECK(vals[i++], v->val);
-        (void)pop(&fpq_copy);
+        (void)pop(&fpq_copy, &(struct val){});
     };
     CHECK_END_FN(free(copy_buf););
 }

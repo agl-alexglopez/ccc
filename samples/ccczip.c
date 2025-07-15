@@ -369,10 +369,10 @@ build_encoding_tree(FILE *const f)
     {
         /* Small elements and we need the pair so we can't hold references. */
         struct fpq_elem zero = *(struct fpq_elem *)front(&pq);
-        ccc_result r = pop(&pq);
+        ccc_result r = pop(&pq, &(struct fpq_elem){});
         check(r == CCC_RESULT_OK);
         struct fpq_elem one = *(struct fpq_elem *)front(&pq);
-        r = pop(&pq);
+        r = pop(&pq, &(struct fpq_elem){});
         check(r == CCC_RESULT_OK);
         struct huffman_node *const internal_one
             = push_back(&ret.bump_arena, &(struct huffman_node){
@@ -383,10 +383,12 @@ build_encoding_tree(FILE *const f)
         node_at(&ret, zero.node)->parent = new_root;
         node_at(&ret, one.node)->parent = new_root;
         struct fpq_elem const *const pushed
-            = push(&pq, &(struct fpq_elem){
-                            .freq = zero.freq + one.freq,
-                            .node = new_root,
-                        });
+            = push(&pq,
+                   &(struct fpq_elem){
+                       .freq = zero.freq + one.freq,
+                       .node = new_root,
+                   },
+                   &(struct fpq_elem){});
         check(pushed);
         ret.root = new_root;
     }

@@ -18,7 +18,7 @@ CHECK_BEGIN_STATIC_FN(fpq_test_insert_one)
         = ccc_fpq_init(single, struct val, CCC_LES, val_cmp, NULL, NULL,
                        (sizeof(single) / sizeof(single[0])));
     single[0].val = 0;
-    (void)push(&fpq, &single[0]);
+    (void)push(&fpq, &single[0], &(struct val){});
     CHECK(ccc_fpq_is_empty(&fpq), false);
     CHECK_END_FN();
 }
@@ -33,7 +33,7 @@ CHECK_BEGIN_STATIC_FN(fpq_test_insert_three)
     for (size_t i = 0; i < size; ++i)
     {
         three_vals[i].val = (int)i;
-        (void)push(&fpq, &three_vals[i]);
+        (void)push(&fpq, &three_vals[i], &(struct val){});
         CHECK(validate(&fpq), true);
         CHECK(ccc_fpq_count(&fpq).count, i + 1);
     }
@@ -80,7 +80,7 @@ CHECK_BEGIN_STATIC_FN(fpq_test_insert_three_dups)
     for (int i = 0; i < 3; ++i)
     {
         three_vals[i].val = 0;
-        (void)push(&fpq, &three_vals[i]);
+        (void)push(&fpq, &three_vals[i], &(struct val){});
         CHECK(validate(&fpq), true);
         CHECK(ccc_fpq_count(&fpq).count, (size_t)i + 1);
     }
@@ -166,7 +166,7 @@ CHECK_BEGIN_STATIC_FN(fpq_test_read_max_min)
     for (size_t i = 0; i < size; ++i)
     {
         vals[i].val = (int)size - (int)i;
-        (void)push(&fpq, &vals[i]);
+        (void)push(&fpq, &vals[i], &(struct val){});
         CHECK(validate(&fpq), true);
         CHECK(ccc_fpq_count(&fpq).count, i + 1);
     }

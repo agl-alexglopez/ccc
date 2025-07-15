@@ -26,13 +26,13 @@ CHECK_BEGIN_STATIC_FN(fpq_test_insert_iterate_pop)
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
-        CHECK(push(&fpq, &vals[i]) != NULL, true);
+        CHECK(push(&fpq, &vals[i], &(struct val){}) != NULL, true);
         CHECK(validate(&fpq), true);
     }
     size_t pop_count = 0;
     while (!is_empty(&fpq))
     {
-        (void)pop(&fpq);
+        (void)pop(&fpq, &(struct val){});
         ++pop_count;
         CHECK(validate(&fpq), true);
     }
@@ -67,7 +67,7 @@ CHECK_BEGIN_STATIC_FN(fpq_test_priority_removal)
         struct val *cur = &vals[seen];
         if (cur->val > limit)
         {
-            (void)erase(&fpq, cur);
+            (void)erase(&fpq, cur, &(struct val){});
             CHECK(validate(&fpq), true);
             --remaining;
         }
@@ -104,7 +104,7 @@ CHECK_BEGIN_STATIC_FN(fpq_test_priority_update)
         if (cur->val > limit)
         {
             struct val const *const updated
-                = update(&fpq, cur, val_update, &backoff);
+                = update(&fpq, cur, &(struct val){}, val_update, &backoff);
             CHECK(updated != NULL, true);
             CHECK(updated->val, backoff);
             CHECK(validate(&fpq), true);

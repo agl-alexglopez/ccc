@@ -206,6 +206,7 @@ Insert or remove elements from the flat priority queue. */
 
 /** @brief Copy input array into the fpq, organizing into heap. O(N).
 @param [in] fpq a pointer to the priority queue.
+@param [in] tmp a pointer to an additional element of array type for swapping.
 @param [in] input_array an array of elements of the same size as the type used
 to initialize fpq.
 @param [in] input_n the number of contiguous elements at input_array.
@@ -218,11 +219,13 @@ occur if reallocation is required to fit all elements but reallocation fails.
 
 Note that this version of heapify copies elements from the input array. If an
 in place heapify is required use the initializer version of this method. */
-ccc_result ccc_fpq_heapify(ccc_flat_priority_queue *fpq, void *input_array,
-                           size_t input_n, size_t input_sizeof_type);
+ccc_result ccc_fpq_heapify(ccc_flat_priority_queue *fpq, void *tmp,
+                           void *input_array, size_t input_n,
+                           size_t input_sizeof_type);
 
 /** @brief Order n elements of the underlying fpq buffer as an fpq.
 @param [in] fpq a pointer to the flat priority queue.
+@param [in] tmp a pointer to a dummy user type that will be used for swapping.
 @param [in] n the number n of elements where  0 < (n + 1) <= capacity.
 @return the result of the heapify operation, ok if successful or an error if
 fpq is NULL or n is larger than the initialized capacity of the fpq.
@@ -230,7 +233,8 @@ fpq is NULL or n is larger than the initialized capacity of the fpq.
 This is another method to order a heap that already has all the elements one
 needs sorted. The underlying buffer will be interpreted to have n valid elements
 starting at index 0 to index n - 1. */
-ccc_result ccc_fpq_heapify_inplace(ccc_flat_priority_queue *fpq, size_t n);
+ccc_result ccc_fpq_heapify_inplace(ccc_flat_priority_queue *fpq, void *tmp,
+                                   size_t n);
 
 /** @brief Many allocate memory for the fpq.
 @param [in] fpq a pointer to the priority queue.
@@ -242,36 +246,41 @@ ccc_result ccc_fpq_alloc(ccc_flat_priority_queue *fpq, size_t new_capacity,
 
 /** @brief Pushes element pointed to at e into fpq. O(lgN).
 @param [in] fpq a pointer to the priority queue.
-@param [in] e a pointer to the user element of same type as in fpq.
+@param [in] elem a pointer to the user element of same type as in fpq.
+@param [in] tmp a pointer to a dummy user type that will be used for swapping.
 @return a pointer to the inserted element or NULl if NULL args are provided or
 push required more memory and failed. Failure can occur if the fpq is full and
 allocation is not allowed or a resize failed when allocation is allowed. */
-[[nodiscard]] void *ccc_fpq_push(ccc_flat_priority_queue *fpq, void const *e);
+[[nodiscard]] void *ccc_fpq_push(ccc_flat_priority_queue *fpq, void const *elem,
+                                 void *tmp);
 
 /** @brief Pop the front element (min or max) element in the fpq. O(lgN).
 @param [in] fpq a pointer to the priority queue.
+@param [in] tmp a pointer to a dummy user type that will be used for swapping.
 @return OK if the pop succeeds or an input error if fpq is NULL or empty. */
-ccc_result ccc_fpq_pop(ccc_flat_priority_queue *fpq);
+ccc_result ccc_fpq_pop(ccc_flat_priority_queue *fpq, void *tmp);
 
 /** @brief Erase element e that is a handle to the stored fpq element.
 @param [in] fpq a pointer to the priority queue.
-@param [in] e a handle to the stored fpq element. Must be in the fpq.
+@param [in] elem a pointer to the stored fpq element. Must be in the fpq.
+@param [in] tmp a pointer to a dummy user type that will be used for swapping.
 @return OK if the erase is successful or an input error if NULL args are
 provided or the fpq is empty.
 @warning the user must ensure e is in the fpq.
 
 Note that the reference to e is invalidated after this call. */
-ccc_result ccc_fpq_erase(ccc_flat_priority_queue *fpq, void *e);
+ccc_result ccc_fpq_erase(ccc_flat_priority_queue *fpq, void *elem, void *tmp);
 
 /** @brief Update e that is a handle to the stored fpq element. O(lgN).
 @param [in] fpq a pointer to the flat priority queue.
-@param [in] e a handle to the stored fpq element. Must be in the fpq.
+@param [in] elem a pointer to the stored fpq element. Must be in the fpq.
+@param [in] tmp a pointer to a dummy user type that will be used for swapping.
 @param [in] fn the update function to act on e.
 @param [in] aux any auxiliary data needed for the update function.
 @return a reference to the element at its new position in the fpq on success,
 NULL if parameters are invalid or fpq is empty.
 @warning the user must ensure e is in the fpq. */
-void *ccc_fpq_update(ccc_flat_priority_queue *fpq, void *e,
+void *ccc_fpq_update(ccc_flat_priority_queue *fpq, void *elem, void *tmp,
                      ccc_any_type_update_fn *fn, void *aux);
 
 /** @brief Update the user type stored in the priority queue directly. O(lgN).
@@ -297,13 +306,14 @@ Note that whether the key increases or decreases does not affect runtime. */
 
 /** @brief Increase e that is a handle to the stored fpq element. O(lgN).
 @param [in] fpq a pointer to the flat priority queue.
-@param [in] e a handle to the stored fpq element. Must be in the fpq.
+@param [in] elem a pointer to the stored fpq element. Must be in the fpq.
+@param [in] tmp a pointer to a dummy user type that will be used for swapping.
 @param [in] fn the update function to act on e.
 @param [in] aux any auxiliary data needed for the update function.
 @return a reference to the element at its new position in the fpq on success,
 NULL if parameters are invalid or fpq is empty.
 @warning the user must ensure e is in the fpq. */
-void *ccc_fpq_increase(ccc_flat_priority_queue *fpq, void *e,
+void *ccc_fpq_increase(ccc_flat_priority_queue *fpq, void *elem, void *tmp,
                        ccc_any_type_update_fn *fn, void *aux);
 
 /** @brief Increase the user type stored in the priority queue directly. O(lgN).
@@ -330,12 +340,13 @@ Note that if this priority queue is min or max, the runtime is the same. */
 /** @brief Decrease e that is a handle to the stored fpq element. O(lgN).
 @param [in] fpq a pointer to the flat priority queue.
 @param [in] e a handle to the stored fpq element. Must be in the fpq.
+@param [in] tmp a pointer to a dummy user type that will be used for swapping.
 @param [in] fn the update function to act on e.
 @param [in] aux any auxiliary data needed for the update function.
 @return a reference to the element at its new position in the fpq on success,
 NULL if parameters are invalid or fpq is empty.
 @warning the user must ensure e is in the fpq. */
-void *ccc_fpq_decrease(ccc_flat_priority_queue *fpq, void *e,
+void *ccc_fpq_decrease(ccc_flat_priority_queue *fpq, void *e, void *tmp,
                        ccc_any_type_update_fn *fn, void *aux);
 
 /** @brief Increase the user type stored in the priority queue directly. O(lgN).
@@ -368,6 +379,7 @@ Deallocate the container or destroy the heap invariants. */
 /** @brief Destroys the fpq by sorting its data and returning a buffer. The data
 is sorted in `O(N * log(N))` time and `O(1)` space.
 @param [in] fpq the fpq to be sorted and destroyed.
+@param [in] tmp a pointer to a dummy user type that will be used for swapping.
 @return a buffer filled from the back to the front by the fpq order. If the fpq
 is initialized CCC_LES the returned buffer is sorted in non-increasing order
 from index [0, N). If the fpq is initialized CCC_GRT the buffer is sorted in
@@ -381,7 +393,8 @@ used the fpq memory is leaked.
 The underlying memory storage source for the fpq, a buffer, is not moved or
 copied during the sort. The sort is not inherently stable and uses the provided
 comparison function to the priority queue to order the elements. */
-[[nodiscard]] ccc_buffer ccc_fpq_heapsort(ccc_flat_priority_queue *fpq);
+[[nodiscard]] ccc_buffer ccc_fpq_heapsort(ccc_flat_priority_queue *fpq,
+                                          void *tmp);
 
 /** @brief Clears the fpq calling fn on every element if provided.
 O(1)-O(N).

@@ -24,7 +24,6 @@ limitations under the License. */
 
 enum : size_t
 {
-    SWAP_SLOT = 1,
     START_CAP = 8,
 };
 
@@ -37,9 +36,8 @@ static ccc_threeway_cmp cmp(struct ccc_fpq const *, size_t lhs, size_t rhs);
 static void swap(struct ccc_fpq *, void *tmp, size_t, size_t);
 static size_t bubble_up(struct ccc_fpq *fpq, void *tmp, size_t i);
 static size_t bubble_down(struct ccc_fpq *, void *tmp, size_t, size_t);
-static size_t update_fixup(struct ccc_fpq *, void *e);
-static void heapify(struct ccc_fpq *fpq, size_t n);
-static size_t max(size_t, size_t);
+static size_t update_fixup(struct ccc_fpq *, void *e, void *tmp);
+static void heapify(struct ccc_fpq *fpq, size_t n, void *);
 static void destroy_each(struct ccc_fpq *fpq, ccc_any_type_destructor_fn *fn);
 
 /*=====================       Interface      ================================*/
@@ -56,51 +54,52 @@ ccc_fpq_alloc(ccc_flat_priority_queue *const fpq, size_t const new_capacity,
 }
 
 ccc_result
-ccc_fpq_heapify(ccc_flat_priority_queue *const fpq, void *const array,
-                size_t const n, size_t const input_sizeof_type)
+ccc_fpq_heapify(ccc_flat_priority_queue *const fpq, void *const tmp,
+                void *const array, size_t const n,
+                size_t const input_sizeof_type)
 {
-    if (!fpq || !array || array == ccc_buf_begin(&fpq->buf)
+    if (!fpq || !array || !tmp || array == ccc_buf_begin(&fpq->buf)
         || input_sizeof_type != fpq->buf.sizeof_type)
     {
         return CCC_RESULT_ARG_ERROR;
     }
-    if (n + SWAP_SLOT > fpq->buf.capacity)
+    if (n > fpq->buf.capacity)
     {
         ccc_result const resize_res
-            = ccc_buf_alloc(&fpq->buf, n + SWAP_SLOT, fpq->buf.alloc);
+            = ccc_buf_alloc(&fpq->buf, n, fpq->buf.alloc);
         if (resize_res != CCC_RESULT_OK)
         {
             return resize_res;
         }
     }
     (void)memcpy(ccc_buf_begin(&fpq->buf), array, n * input_sizeof_type);
-    heapify(fpq, n);
+    heapify(fpq, n, tmp);
     return CCC_RESULT_OK;
 }
 
 ccc_result
-ccc_fpq_heapify_inplace(ccc_flat_priority_queue *fpq, size_t const n)
+ccc_fpq_heapify_inplace(ccc_flat_priority_queue *fpq, void *const tmp,
+                        size_t const n)
 {
-    if (!fpq || n + SWAP_SLOT > fpq->buf.capacity)
+    if (!fpq || !tmp || n > fpq->buf.capacity)
     {
         return CCC_RESULT_ARG_ERROR;
     }
-    heapify(fpq, n);
+    heapify(fpq, n, tmp);
     return CCC_RESULT_OK;
 }
 
 ccc_buffer
-ccc_fpq_heapsort(ccc_flat_priority_queue *const fpq)
+ccc_fpq_heapsort(ccc_flat_priority_queue *const fpq, void *const tmp)
 {
     ccc_buffer ret = {};
-    if (!fpq || fpq->buf.count >= fpq->buf.capacity)
+    if (!fpq || !tmp || fpq->buf.count >= fpq->buf.capacity)
     {
         return ret;
     }
     ret = fpq->buf;
     if (fpq->buf.count > 1)
     {
-        void *const tmp = ccc_buf_at(&fpq->buf, fpq->buf.count);
         size_t end = fpq->buf.count;
         while (--end)
         {
@@ -113,31 +112,22 @@ ccc_fpq_heapsort(ccc_flat_priority_queue *const fpq)
 }
 
 void *
-ccc_fpq_push(ccc_flat_priority_queue *const fpq, void const *const e)
+ccc_fpq_push(ccc_flat_priority_queue *const fpq, void const *const elem,
+             void *const tmp)
 {
-    if (!fpq || !e)
+    if (!fpq || !elem || !tmp)
     {
         return NULL;
-    }
-    if (fpq->buf.count + SWAP_SLOT >= fpq->buf.capacity)
-    {
-        ccc_result const r = ccc_buf_reserve(
-            &fpq->buf, max(fpq->buf.capacity, START_CAP), fpq->buf.alloc);
-        if (r != CCC_RESULT_OK)
-        {
-            return NULL;
-        }
     }
     void *const new = ccc_buf_alloc_back(&fpq->buf);
     if (!new)
     {
         return NULL;
     }
-    if (new != e)
+    if (new != elem)
     {
-        (void)memcpy(new, e, fpq->buf.sizeof_type);
+        (void)memcpy(new, elem, fpq->buf.sizeof_type);
     }
-    void *const tmp = ccc_buf_at(&fpq->buf, fpq->buf.count);
     assert(tmp);
     size_t const i = bubble_up(fpq, tmp, fpq->buf.count - 1);
     assert(i < fpq->buf.count);
@@ -145,9 +135,9 @@ ccc_fpq_push(ccc_flat_priority_queue *const fpq, void const *const e)
 }
 
 ccc_result
-ccc_fpq_pop(ccc_flat_priority_queue *const fpq)
+ccc_fpq_pop(ccc_flat_priority_queue *const fpq, void *const tmp)
 {
-    if (!fpq || !fpq->buf.count)
+    if (!fpq || !tmp || !fpq->buf.count)
     {
         return CCC_RESULT_ARG_ERROR;
     }
@@ -156,8 +146,6 @@ ccc_fpq_pop(ccc_flat_priority_queue *const fpq)
         (void)ccc_buf_pop_back(&fpq->buf);
         return CCC_RESULT_OK;
     }
-    void *const tmp = ccc_buf_at(&fpq->buf, fpq->buf.count);
-    assert(tmp);
     swap(fpq, tmp, 0, fpq->buf.count - 1);
     [[maybe_unused]] ccc_result const r = ccc_buf_pop_back(&fpq->buf);
     assert(r == CCC_RESULT_OK);
@@ -166,9 +154,10 @@ ccc_fpq_pop(ccc_flat_priority_queue *const fpq)
 }
 
 ccc_result
-ccc_fpq_erase(ccc_flat_priority_queue *const fpq, void *const e)
+ccc_fpq_erase(ccc_flat_priority_queue *const fpq, void *const e,
+              void *const tmp)
 {
-    if (!fpq || !e || !fpq->buf.count)
+    if (!fpq || !e || !tmp || !fpq->buf.count)
     {
         return CCC_RESULT_ARG_ERROR;
     }
@@ -181,7 +170,6 @@ ccc_fpq_erase(ccc_flat_priority_queue *const fpq, void *const e)
     {
         return ccc_buf_pop_back(&fpq->buf);
     }
-    void *const tmp = ccc_buf_at(&fpq->buf, fpq->buf.count);
     swap(fpq, tmp, i, fpq->buf.count - 1);
     ccc_threeway_cmp const cmp_res = cmp(fpq, i, fpq->buf.count - 1);
     (void)ccc_buf_pop_back(&fpq->buf);
@@ -198,34 +186,37 @@ ccc_fpq_erase(ccc_flat_priority_queue *const fpq, void *const e)
 }
 
 void *
-ccc_fpq_update(ccc_flat_priority_queue *const fpq, void *const e,
-               ccc_any_type_update_fn *const fn, void *const aux)
+ccc_fpq_update(ccc_flat_priority_queue *const fpq, void *const elem,
+               void *const tmp, ccc_any_type_update_fn *const fn,
+               void *const aux)
 {
-    if (!fpq || !e || !fn || !fpq->buf.count)
+    if (!fpq || !elem || !tmp || !fn || !fpq->buf.count)
     {
         return NULL;
     }
     fn((ccc_any_type){
-        .any_type = e,
+        .any_type = elem,
         .aux = aux,
     });
-    return ccc_buf_at(&fpq->buf, update_fixup(fpq, e));
+    return ccc_buf_at(&fpq->buf, update_fixup(fpq, elem, tmp));
 }
 
 /* There are no efficiency benefits in knowing an increase will occur. */
 void *
-ccc_fpq_increase(ccc_flat_priority_queue *const fpq, void *const e,
-                 ccc_any_type_update_fn *const fn, void *const aux)
+ccc_fpq_increase(ccc_flat_priority_queue *const fpq, void *const elem,
+                 void *const tmp, ccc_any_type_update_fn *const fn,
+                 void *const aux)
 {
-    return ccc_fpq_update(fpq, e, fn, aux);
+    return ccc_fpq_update(fpq, elem, tmp, fn, aux);
 }
 
 /* There are no efficiency benefits in knowing an decrease will occur. */
 void *
-ccc_fpq_decrease(ccc_flat_priority_queue *const fpq, void *const e,
-                 ccc_any_type_update_fn *const fn, void *const aux)
+ccc_fpq_decrease(ccc_flat_priority_queue *const fpq, void *const elem,
+                 void *const tmp, ccc_any_type_update_fn *const fn,
+                 void *const aux)
 {
-    return ccc_fpq_update(fpq, e, fn, aux);
+    return ccc_fpq_update(fpq, elem, tmp, fn, aux);
 }
 
 void *
@@ -288,7 +279,7 @@ ccc_fpq_reserve(ccc_flat_priority_queue *const fpq, size_t const to_add,
     {
         return CCC_RESULT_ARG_ERROR;
     }
-    return ccc_buf_reserve(&fpq->buf, fpq->buf.count + to_add + SWAP_SLOT, fn);
+    return ccc_buf_reserve(&fpq->buf, to_add, fn);
 }
 
 ccc_result
@@ -421,30 +412,31 @@ ccc_impl_fpq_bubble_up(struct ccc_fpq *const fpq, void *const tmp, size_t i)
 }
 
 void *
-ccc_impl_fpq_update_fixup(struct ccc_fpq *const fpq, void *const e)
+ccc_impl_fpq_update_fixup(struct ccc_fpq *const fpq, void *const elem,
+                          void *const tmp)
 {
-    return ccc_buf_at(&fpq->buf, update_fixup(fpq, e));
+    return ccc_buf_at(&fpq->buf, update_fixup(fpq, elem, tmp));
 }
 
 void
-ccc_impl_fpq_in_place_heapify(struct ccc_fpq *const fpq, size_t const n)
+ccc_impl_fpq_in_place_heapify(struct ccc_fpq *const fpq, size_t const n,
+                              void *const tmp)
 {
-    if (!fpq || fpq->buf.capacity < n + SWAP_SLOT)
+    if (!fpq || fpq->buf.capacity < n)
     {
         return;
     }
-    heapify(fpq, n);
+    heapify(fpq, n, tmp);
 }
 
 /*====================     Static Helpers     ===============================*/
 
 /* Orders the provided priority queue in O(N) time. */
 static void
-heapify(struct ccc_fpq *const fpq, size_t const n)
+heapify(struct ccc_fpq *const fpq, size_t const n, void *const tmp)
 {
     (void)ccc_buf_size_set(&fpq->buf, n);
-    void *const tmp = ccc_buf_at(&fpq->buf, n);
-    for (size_t i = (n / 2) + 1; i--;)
+    for (size_t i = ((n - 1) / 2) + 1; i--;)
     {
         (void)bubble_down(fpq, tmp, i, fpq->buf.count);
     }
@@ -452,9 +444,8 @@ heapify(struct ccc_fpq *const fpq, size_t const n)
 
 /* Fixes the position of element e after its key value has been changed. */
 static size_t
-update_fixup(struct ccc_fpq *const fpq, void *const e)
+update_fixup(struct ccc_fpq *const fpq, void *const e, void *const tmp)
 {
-    void *const tmp = ccc_buf_at(&fpq->buf, fpq->buf.count);
     size_t const i = index_of(fpq, e);
     if (!i)
     {
@@ -573,10 +564,4 @@ destroy_each(struct ccc_fpq *const fpq, ccc_any_type_destructor_fn *const fn)
             .aux = fpq->buf.aux,
         });
     }
-}
-
-static inline size_t
-max(size_t const a, size_t const b)
-{
-    return a > b ? a : b;
 }
