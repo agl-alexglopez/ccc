@@ -275,7 +275,7 @@ ccc_result
 ccc_fpq_reserve(ccc_flat_priority_queue *const fpq, size_t const to_add,
                 ccc_any_alloc_fn *const fn)
 {
-    if (!fpq || !fn)
+    if (!fpq)
     {
         return CCC_RESULT_ARG_ERROR;
     }
