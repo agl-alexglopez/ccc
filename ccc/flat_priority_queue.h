@@ -27,6 +27,27 @@ The flat priority queue also offers a destructive heap sort option if the user
 desires an in-place strict `O(N * log(N))` and `O(1)` space sort that does not
 use recursion.
 
+Many functions in the interface request a temporary argument be passed as a swap
+slot. This is because a flat priority queue is backed by a binary heap and
+swaps elements to maintain its properties. Because the user may decide the
+flat priority queue has no allocation permission, the user must provide this
+swap slot. An easy way to do this in C99 and later is with anonymous compound
+literal references. For example, if we have a `int` flat priority queue we can
+provide a temporary slot inline to a function as follows.
+
+```
+ccc_fpq_push(&pq, &(int){0});
+```
+
+Any user defined struct can also use this technique.
+
+```
+ccc_fpq_push(&pq, &(struct my_type){});
+```
+
+This is the preferred method because the storage remains anonymous and
+inaccessible to other code in the calling scope.
+
 To shorten names in the interface, define the following preprocessor directive
 at the top of your file.
 
@@ -73,11 +94,7 @@ Initialize the container with memory, callbacks, and permissions. */
 @param [in] aux_data any auxiliary data needed for destruction of elements.
 @param [in] capacity the capacity of contiguous elements at mem_ptr.
 @return the initialized priority queue on the right hand side of an equality
-operator. (i.e. ccc_flat_priority_queue q = ccc_fpq_init(...);).
-
-Note that to avoid temporary or unpredictable allocation the fpq requires one
-slot for swapping. Therefore if the user wants a fixed size fpq of size N,
-N + 1 capacity is required. */
+operator. (i.e. ccc_flat_priority_queue q = ccc_fpq_init(...);). */
 #define ccc_fpq_init(mem_ptr, any_type_name, cmp_order, cmp_fn, alloc_fn,      \
                      aux_data, capacity)                                       \
     ccc_impl_fpq_init(mem_ptr, any_type_name, cmp_order, cmp_fn, alloc_fn,     \
@@ -93,11 +110,7 @@ N + 1 capacity is required. */
 @param [in] capacity the capacity of contiguous elements at mem_ptr.
 @param [in] size the size <= capacity.
 @return the initialized priority queue on the right hand side of an equality
-operator. (i.e. ccc_flat_priority_queue q = ccc_fpq_heapify_init(...);).
-
-Note that to avoid temporary or unpredictable allocation the fpq requires one
-slot for swapping. Therefore if the user wants a fixed size fpq of size N,
-N + 1 capacity is required. */
+operator. (i.e. ccc_flat_priority_queue q = ccc_fpq_heapify_init(...);). */
 #define ccc_fpq_heapify_init(mem_ptr, any_type_name, cmp_order, cmp_fn,        \
                              alloc_fn, aux_data, capacity, size)               \
     ccc_impl_fpq_heapify_init(mem_ptr, any_type_name, cmp_order, cmp_fn,       \
