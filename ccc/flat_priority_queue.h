@@ -359,12 +359,14 @@ Deallocate the container or destroy the heap invariants. */
 /**@{*/
 
 /** @brief Destroys the fpq by sorting its data and returning a buffer. The data
-is sorted in `O(N*log(N))` time and `O(1)` space.
+is sorted in `O(N * log(N))` time and `O(1)` space. The underlying storage
+source for the fpq does not move from its currently allocated location.
 @param [in] fpq the fpq to be sorted and destroyed.
-@return a buffer sorted in the reverse order of that held by the fpq. If the
-fpq is CCC_LES the buffer is sorted in non-increasing order from [0, N). If the
-fpq is CCC_GRT the buffer is sorted in non-descending order from [0, N). If fpq
-is NULL, the buffer is default initialized and unusable.
+@return a buffer filled from the back to the front by the fpq order. If the fpq
+is initialized CCC_LES the returned buffer is sorted in non-increasing order
+from index [0, N). If the fpq is initialized CCC_GRT the buffer is sorted in
+non-descending order from index [0, N). If fpq is NULL, the buffer is default
+initialized and unusable.
 @warning all fields of the fpq are cleared or otherwise default initialized so
 the fpq is unusable as a container after sorting. This function assumes the fpq
 has been previously initialized. Therefore, if the returned buffer value is not
