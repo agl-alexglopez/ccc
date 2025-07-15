@@ -432,19 +432,20 @@ build_encoding_pq(FILE *const f, struct huffman_tree *const tree)
         = push_back(&tree->bump_arena, &(struct huffman_node){});
     check(nil);
     /* Use a buffer to simply push back elements we will heapify at the end. */
-    buffer buf = buf_init(NULL, struct fpq_elem, NULL, NULL, 0);
+    buffer fpq_buf = buf_init(NULL, struct fpq_elem, NULL, NULL, 0);
     /* Add one to reservation for the flat priority queue swap slot. */
-    r = reserve(&buf, count(&fh).count + 1, std_alloc);
+    r = reserve(&fpq_buf, count(&fh).count, std_alloc);
     check(r == CCC_RESULT_OK);
     for (struct char_freq const *i = begin(&fh); i != end(&fh);
          i = next(&fh, i))
     {
         struct huffman_node const *const node
             = push_back(&tree->bump_arena, &(struct huffman_node){.ch = i->ch});
-        (void)push_back(&buf, &(struct fpq_elem){
-                                  .freq = i->freq,
-                                  .node = buf_i(&tree->bump_arena, node).count,
-                              });
+        (void)push_back(&fpq_buf,
+                        &(struct fpq_elem){
+                            .freq = i->freq,
+                            .node = buf_i(&tree->bump_arena, node).count,
+                        });
     }
     /* Free map but not the buffer because the priority queue took buffer. */
     r = clear_and_free(&fh, NULL);
@@ -452,9 +453,9 @@ build_encoding_pq(FILE *const f, struct huffman_tree *const tree)
     /* The buffer had no allocation permission and set up all the elements we
        needed to be in the flat priority queue. Now we take its memory and
        heapify the data in O(N) time rather than pushing each element. */
-    return fpq_heapify_init(begin(&buf), struct fpq_elem, CCC_LES, cmp_freqs,
-                            NULL, NULL, capacity(&buf).count,
-                            count(&buf).count);
+    return fpq_heapify_init(begin(&fpq_buf), struct fpq_elem, CCC_LES,
+                            cmp_freqs, NULL, NULL, capacity(&fpq_buf).count,
+                            count(&fpq_buf).count);
 }
 
 /** Returns the bit queue representing the bit path to every character in the
