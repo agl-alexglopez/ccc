@@ -36,13 +36,13 @@ literal references. For example, if we have a `int` flat priority queue we can
 provide a temporary slot inline to a function as follows.
 
 ```
-ccc_fpq_push(&pq, &(int){0});
+ccc_fpq_pop(&pq, &(int){0});
 ```
 
 Any user defined struct can also use this technique.
 
 ```
-ccc_fpq_push(&pq, &(struct my_type){});
+ccc_fpq_pop(&pq, &(struct my_type){});
 ```
 
 This is the preferred method because the storage remains anonymous and
