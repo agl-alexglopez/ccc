@@ -366,8 +366,7 @@ Deallocate the container or destroy the heap invariants. */
 /**@{*/
 
 /** @brief Destroys the fpq by sorting its data and returning a buffer. The data
-is sorted in `O(N * log(N))` time and `O(1)` space. The underlying memory
-storage source for the fpq, a buffer, is not moved or copied during the sort.
+is sorted in `O(N * log(N))` time and `O(1)` space.
 @param [in] fpq the fpq to be sorted and destroyed.
 @return a buffer filled from the back to the front by the fpq order. If the fpq
 is initialized CCC_LES the returned buffer is sorted in non-increasing order
@@ -377,7 +376,11 @@ initialized and unusable.
 @warning all fields of the fpq are cleared or otherwise default initialized so
 the fpq is unusable as a container after sorting. This function assumes the fpq
 has been previously initialized. Therefore, if the returned buffer value is not
-used the fpq memory is leaked. */
+used the fpq memory is leaked.
+
+The underlying memory storage source for the fpq, a buffer, is not moved or
+copied during the sort. The sort is not inherently stable and uses the provided
+comparison function to the priority queue to order the elements. */
 [[nodiscard]] ccc_buffer ccc_fpq_heapsort(ccc_flat_priority_queue *fpq);
 
 /** @brief Clears the fpq calling fn on every element if provided.

@@ -93,7 +93,7 @@ ccc_buffer
 ccc_fpq_heapsort(ccc_flat_priority_queue *const fpq)
 {
     ccc_buffer ret = {};
-    if (!fpq)
+    if (!fpq || fpq->buf.count >= fpq->buf.capacity)
     {
         return ret;
     }
