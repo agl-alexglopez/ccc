@@ -20,6 +20,7 @@ var flat__priority__queue_8h =
     [ "ccc_fpq_front", "flat__priority__queue_8h.html#a51c6495321c6d46093b06ef01f0c6360", null ],
     [ "ccc_fpq_heapify", "flat__priority__queue_8h.html#a3c03845f1ccf579f3eab485086c77131", null ],
     [ "ccc_fpq_heapify_inplace", "flat__priority__queue_8h.html#a0f90ef3349b3ec122d044be793a2ba73", null ],
+    [ "ccc_fpq_heapsort", "flat__priority__queue_8h.html#a0a33ceda65b2102183b52311d4d07f5b", null ],
     [ "ccc_fpq_increase", "flat__priority__queue_8h.html#af476beafc16e6f4209f65c9105407056", null ],
     [ "ccc_fpq_is_empty", "flat__priority__queue_8h.html#a0c76f3d7e3ed207ff526c07b759ce4c5", null ],
     [ "ccc_fpq_order", "flat__priority__queue_8h.html#a422acb75de11ece2ae4d9725fc4a468b", null ],
