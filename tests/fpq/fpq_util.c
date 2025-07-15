@@ -78,5 +78,6 @@ CHECK_BEGIN_FN(inorder_fill, int vals[const], size_t const size,
         CHECK(prev->val <= v->val, CCC_TRUE);
         vals[i++] = v->val;
     }
+    CHECK(i, fpq_count(fpq).count);
     CHECK_END_FN(clear_and_free(&b, NULL););
 }
