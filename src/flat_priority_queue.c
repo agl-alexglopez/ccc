@@ -36,7 +36,7 @@ static ccc_tribool wins(struct ccc_fpq const *, size_t winner, size_t loser);
 static ccc_threeway_cmp cmp(struct ccc_fpq const *, size_t lhs, size_t rhs);
 static void swap(struct ccc_fpq *, void *tmp, size_t, size_t);
 static size_t bubble_up(struct ccc_fpq *fpq, void *tmp, size_t i);
-static size_t bubble_down(struct ccc_fpq *, void *tmp, size_t);
+static size_t bubble_down(struct ccc_fpq *, void *tmp, size_t, size_t);
 static size_t update_fixup(struct ccc_fpq *, void *e);
 static void heapify(struct ccc_fpq *fpq, size_t n);
 static size_t max(size_t, size_t);
@@ -89,6 +89,29 @@ ccc_fpq_heapify_inplace(ccc_flat_priority_queue *fpq, size_t const n)
     return CCC_RESULT_OK;
 }
 
+ccc_buffer
+ccc_fpq_heapsort(ccc_flat_priority_queue *const fpq)
+{
+    ccc_buffer ret = {};
+    if (!fpq)
+    {
+        return ret;
+    }
+    ret = fpq->buf;
+    if (fpq->buf.count > 1)
+    {
+        void *const tmp = ccc_buf_at(&fpq->buf, fpq->buf.count);
+        size_t end = fpq->buf.count;
+        while (--end)
+        {
+            swap(fpq, tmp, 0, end);
+            (void)bubble_down(fpq, tmp, 0, end);
+        }
+    }
+    *fpq = (ccc_flat_priority_queue){};
+    return ret;
+}
+
 void *
 ccc_fpq_push(ccc_flat_priority_queue *const fpq, void const *const e)
 {
@@ -138,7 +161,7 @@ ccc_fpq_pop(ccc_flat_priority_queue *const fpq)
     swap(fpq, tmp, 0, fpq->buf.count - 1);
     [[maybe_unused]] ccc_result const r = ccc_buf_pop_back(&fpq->buf);
     assert(r == CCC_RESULT_OK);
-    (void)bubble_down(fpq, tmp, 0);
+    (void)bubble_down(fpq, tmp, 0, fpq->buf.count);
     return CCC_RESULT_OK;
 }
 
@@ -168,7 +191,7 @@ ccc_fpq_erase(ccc_flat_priority_queue *const fpq, void *const e)
     }
     else if (cmp_res != CCC_EQL)
     {
-        (void)bubble_down(fpq, tmp, i);
+        (void)bubble_down(fpq, tmp, i, fpq->buf.count);
     }
     /* If the comparison is equal do nothing. Element is in right spot. */
     return CCC_RESULT_OK;
@@ -423,7 +446,7 @@ heapify(struct ccc_fpq *const fpq, size_t const n)
     void *const tmp = ccc_buf_at(&fpq->buf, n);
     for (size_t i = (n / 2) + 1; i--;)
     {
-        (void)bubble_down(fpq, tmp, i);
+        (void)bubble_down(fpq, tmp, i, fpq->buf.count);
     }
 }
 
@@ -435,7 +458,7 @@ update_fixup(struct ccc_fpq *const fpq, void *const e)
     size_t const i = index_of(fpq, e);
     if (!i)
     {
-        return bubble_down(fpq, tmp, 0);
+        return bubble_down(fpq, tmp, 0, fpq->buf.count);
     }
     ccc_threeway_cmp const parent_cmp = cmp(fpq, i, (i - 1) / 2);
     if (parent_cmp == fpq->order)
@@ -444,7 +467,7 @@ update_fixup(struct ccc_fpq *const fpq, void *const e)
     }
     if (parent_cmp != CCC_EQL)
     {
-        return bubble_down(fpq, tmp, i);
+        return bubble_down(fpq, tmp, i, fpq->buf.count);
     }
     /* If the comparison is equal do nothing. Element is in right spot. */
     return i;
@@ -468,9 +491,9 @@ bubble_up(struct ccc_fpq *const fpq, void *const tmp, size_t i)
 
 /* Returns the sorted position of the element starting at position i. */
 static size_t
-bubble_down(struct ccc_fpq *const fpq, void *const tmp, size_t i)
+bubble_down(struct ccc_fpq *const fpq, void *const tmp, size_t i,
+            size_t const count)
 {
-    size_t const count = fpq->buf.count;
     for (size_t next = i, left = (i * 2) + 1, right = left + 1; left < count;
          i = next, left = (i * 2) + 1, right = left + 1)
     {

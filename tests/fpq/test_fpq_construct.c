@@ -6,6 +6,7 @@
 #define TRAITS_USING_NAMESPACE_CCC
 #define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
 #include "alloc.h"
+#include "buffer.h"
 #include "checkers.h"
 #include "flat_priority_queue.h"
 #include "fpq_util.h"
@@ -135,6 +136,30 @@ CHECK_BEGIN_STATIC_FN(fpq_test_heapify_copy)
     CHECK_END_FN();
 }
 
+CHECK_BEGIN_STATIC_FN(fpq_test_heapsort)
+{
+    srand(time(NULL)); /* NOLINT */
+    int heap[100] = {};
+    size_t const size = 99;
+    for (size_t i = 0; i < size; ++i)
+    {
+        heap[i] = rand_range(-99, size); /* NOLINT */
+    }
+    flat_priority_queue pq
+        = fpq_heapify_init(heap, int, CCC_LES, int_cmp, NULL, NULL,
+                           (sizeof(heap) / sizeof(int)), size);
+    ccc_buffer const b = ccc_fpq_heapsort(&pq);
+    int const *prev = begin(&b);
+    CHECK(prev != NULL, true);
+    CHECK(ccc_buf_count(&b).count, size);
+    for (int const *cur = next(&b, prev); cur != end(&b); cur = next(&b, cur))
+    {
+        CHECK(*prev >= *cur, true);
+        prev = cur;
+    }
+    CHECK_END_FN();
+}
+
 CHECK_BEGIN_STATIC_FN(fpq_test_copy_no_alloc)
 {
     flat_priority_queue src
@@ -231,5 +256,6 @@ main()
                      fpq_test_push(), fpq_test_raw_type(),
                      fpq_test_heapify_init(), fpq_test_heapify_copy(),
                      fpq_test_copy_no_alloc(), fpq_test_copy_no_alloc_fail(),
-                     fpq_test_copy_alloc(), fpq_test_copy_alloc_fail());
+                     fpq_test_copy_alloc(), fpq_test_copy_alloc_fail(),
+                     fpq_test_heapsort());
 }

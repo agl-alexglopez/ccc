@@ -26,6 +26,7 @@ Please specify a command as follows:
 #define TRAITS_USING_NAMESPACE_CCC
 #define TYPES_USING_NAMESPACE_CCC
 #include "alloc.h"
+#include "ccc/buffer.h"
 #include "ccc/flat_priority_queue.h"
 #include "ccc/handle_ordered_map.h"
 #include "ccc/traits.h"
@@ -145,7 +146,8 @@ static void print_last_n(FILE *file, int n);
 static void print_alpha_n(FILE *file, int n);
 static void print_ralpha_n(FILE *file, int n);
 static struct frequency_alloc copy_frequencies(handle_ordered_map const *map);
-static void print_n(flat_priority_queue *, struct str_arena const *, int n);
+static void print_n(handle_ordered_map *, ccc_threeway_cmp, struct str_arena *,
+                    int n);
 static struct int_conversion parse_n_ranks(str_view arg);
 
 /* String Helper Functions */
@@ -298,25 +300,8 @@ print_top_n(FILE *const f, int n)
     check(a.arena);
     handle_ordered_map map = create_frequency_map(&a, f);
     check(!is_empty(&map));
-    /* O(n) copy */
-    struct frequency_alloc freqs = copy_frequencies(&map);
-    check(freqs.cap);
-    /* O(n) sort kind of. Pops will be O(nlgn). But we don't have stdlib qsort
-       space overhead to emulate why someone in an embedded or OS
-       environment might choose this approach for sorting. Granted any O(1)
-       space approach to sorting may beat the slower pop operation but strict
-       O(lgN) runtime for heap pop is pretty good. */
-    flat_priority_queue fpq
-        = fpq_heapify_init(freqs.arr, struct frequency, CCC_GRT, cmp_freqs,
-                           std_alloc, &a, freqs.cap, count(&map).count);
-    check(count(&fpq).count == count(&map).count);
-    if (!n)
-    {
-        n = count(&fpq).count;
-    }
-    print_n(&fpq, &a, n);
+    print_n(&map, CCC_GRT, &a, n);
     str_arena_free(&a);
-    (void)clear_and_free(&fpq, NULL);
     (void)clear_and_free(&map, NULL);
 }
 
@@ -327,19 +312,8 @@ print_last_n(FILE *const f, int n)
     check(a.arena);
     handle_ordered_map map = create_frequency_map(&a, f);
     check(!is_empty(&map));
-    struct frequency_alloc freqs = copy_frequencies(&map);
-    check(freqs.cap);
-    flat_priority_queue fpq
-        = fpq_heapify_init(freqs.arr, struct frequency, CCC_LES, cmp_freqs,
-                           std_alloc, &a, freqs.cap, count(&map).count);
-    check(count(&fpq).count == count(&map).count);
-    if (!n)
-    {
-        n = count(&fpq).count;
-    }
-    print_n(&fpq, &a, n);
+    print_n(&map, CCC_LES, &a, n);
     str_arena_free(&a);
-    (void)clear_and_free(&fpq, NULL);
     (void)clear_and_free(&map, NULL);
 }
 
@@ -404,23 +378,33 @@ copy_frequencies(handle_ordered_map const *const map)
 }
 
 static void
-print_n(flat_priority_queue *const fpq, struct str_arena const *const a,
-        int const n)
+print_n(ccc_handle_ordered_map *const map, ccc_threeway_cmp const ord,
+        struct str_arena *const a, int n)
 {
-    if (n <= 0)
+    struct frequency_alloc freqs = copy_frequencies(map);
+    check(freqs.cap);
+    flat_priority_queue fpq
+        = fpq_heapify_init(freqs.arr, struct frequency, ord, cmp_freqs, NULL, a,
+                           freqs.cap, count(map).count);
+    check(count(&fpq).count == count(map).count);
+    if (!n)
     {
-        return;
+        n = count(&fpq).count;
     }
-    for (int w = 0; w < n && !is_empty(fpq); ++w)
+    ccc_buffer b = ccc_fpq_heapsort(&fpq);
+    check(!fpq.buf.mem);
+    int w = 0;
+    /* Heap sort puts the root most nodes at the back of the buffer. */
+    for (struct frequency const *i = rbegin(&b); i != rend(&b) && w < n;
+         i = rnext(&b, i), ++w)
     {
-        struct frequency *const front_w = front(fpq);
-        char const *const arena_str = str_arena_at(a, front_w->ofs);
+        char const *const arena_str = str_arena_at(a, i->ofs);
         if (arena_str)
         {
-            printf("%d. %s %d\n", w + 1, arena_str, front_w->freq);
+            printf("%d. %s %d\n", w + 1, arena_str, i->freq);
         }
-        (void)pop(fpq);
     }
+    (void)ccc_buf_clear_and_free_reserve(&b, NULL, std_alloc);
 }
 
 /*=====================    Container Construction     =======================*/

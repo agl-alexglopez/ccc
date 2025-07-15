@@ -35,6 +35,7 @@ All types and functions can then be written without the `ccc_` prefix. */
 #include <stddef.h>
 /** @endcond */
 
+#include "buffer.h"
 #include "impl/impl_flat_priority_queue.h"
 #include "types.h"
 
@@ -64,7 +65,7 @@ Initialize the container with memory, callbacks, and permissions. */
 @param [in] alloc_fn the allocation function or NULL if no allocation.
 @param [in] aux_data any auxiliary data needed for destruction of elements.
 @param [in] capacity the capacity of contiguous elements at mem_ptr.
-@return the initilialized priority queue on the right hand side of an equality
+@return the initialized priority queue on the right hand side of an equality
 operator. (i.e. ccc_flat_priority_queue q = ccc_fpq_init(...);).
 
 Note that to avoid temporary or unpredictable allocation the fpq requires one
@@ -75,7 +76,7 @@ N + 1 capacity is required. */
     ccc_impl_fpq_init(mem_ptr, any_type_name, cmp_order, cmp_fn, alloc_fn,     \
                       aux_data, capacity)
 
-/** @brief Order an existing array of elements as a min or max heap. O(N).
+/** @brief Partial order an array of elements as a min or max heap. O(N).
 @param [in] mem_ptr a pointer to an array of user types or NULL.
 @param [in] any_type_name the name of the user type.
 @param [in] cmp_order CCC_LES or CCC_GRT for min or max heap, respectively.
@@ -84,7 +85,7 @@ N + 1 capacity is required. */
 @param [in] aux_data any auxiliary data needed for destruction of elements.
 @param [in] capacity the capacity of contiguous elements at mem_ptr.
 @param [in] size the size <= capacity.
-@return the initilialized priority queue on the right hand side of an equality
+@return the initialized priority queue on the right hand side of an equality
 operator. (i.e. ccc_flat_priority_queue q = ccc_fpq_heapify_init(...);).
 
 Note that to avoid temporary or unpredictable allocation the fpq requires one
@@ -354,17 +355,32 @@ Note that if this priority queue is min or max, the runtime is the same. */
 /**@}*/
 
 /** @name Deallocation Interface
-Deallocate the container. */
+Deallocate the container or destroy the heap invariants. */
 /**@{*/
 
-/** @brief Clears the fpq calling fn on every element if provided. O(1)-O(N).
+/** @brief Destroys the fpq by sorting its data and returning a buffer. The data
+is sorted in `O(N*log(N))` time and `O(1)` space.
+@param [in] fpq the fpq to be sorted and destroyed.
+@return a buffer sorted in the reverse order of that held by the fpq. If the
+fpq is CCC_LES the buffer is sorted in non-increasing order from [0, N). If the
+fpq is CCC_GRT the buffer is sorted in non-descending order from [0, N). If fpq
+is NULL, the buffer is default initialized and unusable.
+@warning all fields of the fpq are cleared or otherwise default initialized so
+the fpq is unusable as a container after sorting. This function assumes the fpq
+has been previously initialized. Therefore, if the returned buffer value is not
+used the fpq memory is leaked. */
+[[nodiscard]] ccc_buffer ccc_fpq_heapsort(ccc_flat_priority_queue *fpq);
+
+/** @brief Clears the fpq calling fn on every element if provided.
+O(1)-O(N).
 @param [in] fpq a pointer to the flat priority queue.
 @param [in] fn the destructor function or NULL if not needed.
 @return OK if input is valid and clear succeeds, otherwise input error.
 
-Note that because the priority queue is flat there is no need to free elements
-stored in the fpq. However, the destructor is free to manage cleanup in other
-parts of user code as needed upon destruction of each element.
+Note that because the priority queue is flat there is no need to free
+elements stored in the fpq. However, the destructor is free to manage
+cleanup in other parts of user code as needed upon destruction of each
+element.
 
 If the destructor is NULL, the function is O(1) and no attempt is made to
 free capacity of the fpq. */
