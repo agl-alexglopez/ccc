@@ -154,10 +154,10 @@ ccc_fpq_pop(ccc_flat_priority_queue *const fpq, void *const tmp)
 }
 
 ccc_result
-ccc_fpq_erase(ccc_flat_priority_queue *const fpq, void *const e,
+ccc_fpq_erase(ccc_flat_priority_queue *const fpq, void *const elem,
               void *const tmp)
 {
-    if (!fpq || !e || !tmp || !fpq->buf.count)
+    if (!fpq || !elem || !tmp || !fpq->buf.count)
     {
         return CCC_RESULT_ARG_ERROR;
     }
@@ -165,7 +165,7 @@ ccc_fpq_erase(ccc_flat_priority_queue *const fpq, void *const e,
     {
         return ccc_buf_pop_back(&fpq->buf);
     }
-    size_t const i = index_of(fpq, e);
+    size_t const i = index_of(fpq, elem);
     if (i == fpq->buf.count - 1)
     {
         return ccc_buf_pop_back(&fpq->buf);

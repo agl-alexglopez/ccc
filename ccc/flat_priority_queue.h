@@ -373,7 +373,7 @@ Note that if this priority queue is min or max, the runtime is the same. */
 
 /** @brief Decrease e that is a handle to the stored fpq element. O(lgN).
 @param [in] fpq a pointer to the flat priority queue.
-@param [in] e a handle to the stored fpq element. Must be in the fpq.
+@param [in] elem a pointer to the stored fpq element. Must be in the fpq.
 @param [in] tmp a pointer to a dummy user type that will be used for swapping.
 @param [in] fn the update function to act on e.
 @param [in] aux any auxiliary data needed for the update function.
@@ -383,7 +383,7 @@ NULL if parameters are invalid or fpq is empty.
 
 A simple way to provide a temp for swapping is with an inline compound literal
 reference provided directly to the function argument `&(name_of_type){}`. */
-void *ccc_fpq_decrease(ccc_flat_priority_queue *fpq, void *e, void *tmp,
+void *ccc_fpq_decrease(ccc_flat_priority_queue *fpq, void *elem, void *tmp,
                        ccc_any_type_update_fn *fn, void *aux);
 
 /** @brief Increase the user type stored in the priority queue directly. O(lgN).
