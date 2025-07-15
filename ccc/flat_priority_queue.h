@@ -16,9 +16,16 @@ limitations under the License.
 /** @file
 @brief The Flat Priority Queue Interface
 
-A flat priority queue is a contiguous container storing storing elements in
-heap order. This offers tightly packed data for efficient push, pop, min/max
-operations in O(lg N). Also, this container requires no intrusive elements.
+A flat priority queue is a contiguous container storing elements in heap order.
+This offers tightly packed data for efficient push, pop, min/max operations in
+O(lg N) time.
+
+A flat priority queue can use memory sources from the stack, heap, or data
+segment and can be initialized at compile or runtime. The container offers
+efficient initialization options such as an `O(N)` heap building initializer.
+The flat priority queue also offers a destructive heap sort option if the user
+desires an in-place strict `O(N * log(N))` and `O(1)` space sort that does not
+use recursion.
 
 To shorten names in the interface, define the following preprocessor directive
 at the top of your file.
