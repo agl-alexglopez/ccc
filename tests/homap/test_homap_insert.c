@@ -1,17 +1,17 @@
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdlib.h>
+#include <time.h>
+
 #define TRAITS_USING_NAMESPACE_CCC
 #define HANDLE_ORDERED_MAP_USING_NAMESPACE_CCC
 
-#include "alloc.h"
 #include "checkers.h"
 #include "handle_ordered_map.h"
 #include "homap_util.h"
 #include "traits.h"
 #include "types.h"
-
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdlib.h>
-#include <time.h>
+#include "util/alloc.h"
 
 static inline struct val
 homap_create(int const id, int const val)

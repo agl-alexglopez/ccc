@@ -1,6 +1,10 @@
 /** This file dedicated to testing the Entry Interface. The interface has
 grown significantly requiring a dedicated file to test all code paths in all
 the entry functions. */
+#include <assert.h>
+#include <stddef.h>
+#include <stdlib.h>
+
 #define REALTIME_ORDERED_MAP_USING_NAMESPACE_CCC
 #define TRAITS_USING_NAMESPACE_CCC
 
@@ -9,10 +13,6 @@ the entry functions. */
 #include "romap_util.h"
 #include "traits.h"
 #include "types.h"
-
-#include <assert.h>
-#include <stddef.h>
-#include <stdlib.h>
 
 static inline struct val
 val(int const val)

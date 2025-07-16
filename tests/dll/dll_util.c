@@ -1,14 +1,14 @@
+#include <stddef.h>
+#include <stdio.h>
+
 #define TRAITS_USING_NAMESPACE_CCC
 #define DOUBLY_LINKED_LIST_USING_NAMESPACE_CCC
 
-#include "dll_util.h"
 #include "checkers.h"
+#include "dll_util.h"
 #include "doubly_linked_list.h"
 #include "traits.h"
 #include "types.h"
-
-#include <stddef.h>
-#include <stdio.h>
 
 ccc_threeway_cmp
 val_cmp(ccc_any_type_cmp const c)

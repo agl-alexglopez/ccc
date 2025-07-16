@@ -3,6 +3,7 @@
 #include <stdio.h>
 
 #define TRAITS_USING_NAMESPACE_CCC
+
 #include "checkers.h"
 #include "omap_util.h"
 #include "ordered_map.h"

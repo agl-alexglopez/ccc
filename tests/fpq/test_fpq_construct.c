@@ -5,13 +5,14 @@
 
 #define TRAITS_USING_NAMESPACE_CCC
 #define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
-#include "alloc.h"
+
 #include "buffer.h"
 #include "checkers.h"
 #include "flat_priority_queue.h"
 #include "fpq_util.h"
 #include "traits.h"
 #include "types.h"
+#include "util/alloc.h"
 
 static ccc_threeway_cmp
 int_cmp(ccc_any_type_cmp const cmp)

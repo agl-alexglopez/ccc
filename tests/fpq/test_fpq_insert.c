@@ -1,15 +1,15 @@
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdlib.h>
+
 #define TRAITS_USING_NAMESPACE_CCC
 
-#include "alloc.h"
 #include "checkers.h"
 #include "flat_priority_queue.h"
 #include "fpq_util.h"
 #include "traits.h"
 #include "types.h"
-
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdlib.h>
+#include "util/alloc.h"
 
 CHECK_BEGIN_STATIC_FN(fpq_test_insert_one)
 {

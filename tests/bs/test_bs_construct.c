@@ -1,9 +1,9 @@
 #include <stddef.h>
 
-#include "alloc.h"
 #include "ccc/bitset.h"
 #include "ccc/types.h"
 #include "checkers.h"
+#include "util/alloc.h"
 
 CHECK_BEGIN_STATIC_FN(bs_test_construct)
 {

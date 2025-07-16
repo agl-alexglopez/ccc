@@ -1,21 +1,21 @@
 /** File: lru.c
 The leetcode lru problem in C. */
+#include <assert.h>
+#include <stddef.h>
+#include <stdio.h>
+#include <stdlib.h>
+
 #define FLAT_HASH_MAP_USING_NAMESPACE_CCC
 #define DOUBLY_LINKED_LIST_USING_NAMESPACE_CCC
 #define TRAITS_USING_NAMESPACE_CCC
 
-#include "alloc.h"
 #include "checkers.h"
 #include "doubly_linked_list.h"
 #include "fhmap/fhmap_util.h"
 #include "flat_hash_map.h"
 #include "traits.h"
 #include "types.h"
-
-#include <assert.h>
-#include <stddef.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include "util/alloc.h"
 
 #define REQS 11
 

@@ -16,7 +16,6 @@ add_dependencies(tests checkers)
 
 
 add_executable(run_tests run_tests.c)
-target_include_directories(run_tests PRIVATE "../util")
 target_link_libraries(run_tests PRIVATE checkers str_view)
 add_dependencies(tests run_tests)
 
@@ -30,7 +29,6 @@ add_dependencies(tests run_tests)
 #############  Bit Set ##########################
 macro(add_bs_test TEST_NAME)
   add_executable(${TEST_NAME} bs/${TEST_NAME}.c)
-  target_include_directories(${TEST_NAME} PRIVATE "../util")
   target_link_libraries(${TEST_NAME}
     PRIVATE
       ccc
@@ -53,7 +51,6 @@ add_bs_test(test_bs_test_and_set)
 
 #############  Buffer ##########################
 add_library(buf_util buf/buf_util.h buf/buf_util.c)
-target_include_directories(buf_util PRIVATE "../util")
 target_link_libraries(buf_util
   PRIVATE
     ccc
@@ -64,7 +61,6 @@ add_dependencies(tests buf_util)
 
 macro(add_buf_test TEST_NAME)
   add_executable(${TEST_NAME} buf/${TEST_NAME}.c)
-  target_include_directories(${TEST_NAME} PRIVATE "../util")
   target_link_libraries(${TEST_NAME}
     PRIVATE
       ccc
@@ -89,7 +85,6 @@ add_buf_test(test_buf_iter)
 
 #############  Heap Priority Queue  ##########################
 add_library(fpq_util fpq/fpq_util.h fpq/fpq_util.c)
-target_include_directories(fpq_util PRIVATE "../util")
 target_link_libraries(fpq_util
   PRIVATE
     ccc
@@ -100,7 +95,6 @@ add_dependencies(tests fpq_util)
 
 macro(add_fpq_test TEST_NAME)
   add_executable(${TEST_NAME} fpq/${TEST_NAME}.c)
-  target_include_directories(${TEST_NAME} PRIVATE "../util")
   target_link_libraries(${TEST_NAME}
     PRIVATE
       fpq_util
@@ -133,7 +127,6 @@ add_dependencies(tests pq_util)
 
 macro(add_pq_test TEST_NAME)
   add_executable(${TEST_NAME} pq/${TEST_NAME}.c)
-  target_include_directories(${TEST_NAME} PRIVATE "../util")
   target_link_libraries(${TEST_NAME}
     PRIVATE
       pq_util
@@ -166,7 +159,6 @@ add_dependencies(tests omap_util)
 
 macro(add_omap_test TEST_NAME)
   add_executable(${TEST_NAME} omap/${TEST_NAME}.c)
-  target_include_directories(${TEST_NAME} PRIVATE "../util")
   target_link_libraries(${TEST_NAME}
     PRIVATE
       omap_util
@@ -200,7 +192,6 @@ add_dependencies(tests homap_util)
 
 macro(add_homap_test TEST_NAME)
   add_executable(${TEST_NAME} homap/${TEST_NAME}.c)
-  target_include_directories(${TEST_NAME} PRIVATE "../util")
   target_link_libraries(${TEST_NAME}
     PRIVATE
       homap_util
@@ -234,7 +225,6 @@ add_dependencies(tests romap_util)
 
 macro(add_romap_test TEST_NAME)
   add_executable(${TEST_NAME} romap/${TEST_NAME}.c)
-  target_include_directories(${TEST_NAME} PRIVATE "../util")
   target_link_libraries(${TEST_NAME}
     PRIVATE
       romap_util
@@ -268,7 +258,6 @@ add_dependencies(tests hromap_util)
 
 macro(add_hromap_test TEST_NAME)
   add_executable(${TEST_NAME} hromap/${TEST_NAME}.c)
-  target_include_directories(${TEST_NAME} PRIVATE "../util")
   target_link_libraries(${TEST_NAME}
     PRIVATE
       hromap_util
@@ -301,7 +290,6 @@ add_dependencies(tests fhmap_util)
 
 macro(add_fhmap_test TEST_NAME)
   add_executable(${TEST_NAME} fhmap/${TEST_NAME}.c)
-  target_include_directories(${TEST_NAME} PRIVATE "../util")
   target_link_libraries(${TEST_NAME}
     PRIVATE
       checkers
@@ -335,7 +323,6 @@ add_dependencies(tests dll_util)
 
 macro(add_dll_test TEST_NAME)
   add_executable(${TEST_NAME} dll/${TEST_NAME}.c)
-  target_include_directories(${TEST_NAME} PRIVATE "../util")
   target_link_libraries(${TEST_NAME}
     PRIVATE
       ccc
@@ -365,7 +352,6 @@ add_dependencies(tests sll_util)
 
 macro(add_sll_test TEST_NAME)
   add_executable(${TEST_NAME} sll/${TEST_NAME}.c)
-  target_include_directories(${TEST_NAME} PRIVATE "../util")
   target_link_libraries(${TEST_NAME}
     PRIVATE
       ccc
@@ -395,7 +381,6 @@ add_dependencies(tests fdeq_util)
 
 macro(add_fdeq_test TEST_NAME)
   add_executable(${TEST_NAME} fdeq/${TEST_NAME}.c)
-  target_include_directories(${TEST_NAME} PRIVATE "../util")
   target_link_libraries(${TEST_NAME}
     PRIVATE
       ccc

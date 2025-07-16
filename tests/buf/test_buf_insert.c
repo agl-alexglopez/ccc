@@ -6,12 +6,12 @@
 
 #define BUFFER_USING_NAMESPACE_CCC
 
-#include "alloc.h"
 #include "buf_util.h"
 #include "ccc/buffer.h"
 #include "ccc/types.h"
 #include "checkers.h"
-#include "random.h"
+#include "util/alloc.h"
+#include "util/random.h"
 
 static int
 cmp_ints(void const *const lhs, void const *const rhs)

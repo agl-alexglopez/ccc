@@ -1,3 +1,5 @@
+#include <stddef.h>
+
 #define TRAITS_USING_NAMESPACE_CCC
 #define SINGLY_LINKED_LIST_USING_NAMESPACE_CCC
 
@@ -6,8 +8,6 @@
 #include "sll_util.h"
 #include "traits.h"
 #include "types.h"
-
-#include <stddef.h>
 
 CHECK_BEGIN_STATIC_FN(sll_test_pop_empty)
 {

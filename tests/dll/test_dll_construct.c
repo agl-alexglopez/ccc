@@ -1,3 +1,5 @@
+#include <stddef.h>
+
 #define TRAITS_USING_NAMESPACE_CCC
 #define DOUBLY_LINKED_LIST_USING_NAMESPACE_CCC
 
@@ -5,8 +7,6 @@
 #include "dll_util.h"
 #include "doubly_linked_list.h"
 #include "traits.h"
-
-#include <stddef.h>
 
 CHECK_BEGIN_STATIC_FN(dll_test_construct)
 {

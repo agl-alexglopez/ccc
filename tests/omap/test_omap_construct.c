@@ -1,12 +1,12 @@
+#include <stdbool.h>
+#include <stddef.h>
+
 #define TRAITS_USING_NAMESPACE_CCC
 
 #include "checkers.h"
 #include "omap_util.h"
 #include "ordered_map.h"
 #include "traits.h"
-
-#include <stdbool.h>
-#include <stddef.h>
 
 CHECK_BEGIN_STATIC_FN(omap_test_empty)
 {

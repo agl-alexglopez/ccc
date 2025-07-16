@@ -6,12 +6,12 @@
 #define TRAITS_USING_NAMESPACE_CCC
 #define ORDERED_MAP_USING_NAMESPACE_CCC
 
-#include "alloc.h"
 #include "checkers.h"
 #include "omap_util.h"
 #include "ordered_map.h"
 #include "traits.h"
 #include "types.h"
+#include "util/alloc.h"
 
 static inline struct val
 omap_create(int const id, int const val)

@@ -1,3 +1,9 @@
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+
 #define REALTIME_ORDERED_MAP_USING_NAMESPACE_CCC
 #define TRAITS_USING_NAMESPACE_CCC
 
@@ -6,12 +12,6 @@
 #include "romap_util.h"
 #include "traits.h"
 #include "types.h"
-
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
 
 CHECK_BEGIN_STATIC_FN(romap_test_insert_erase_shuffled)
 {

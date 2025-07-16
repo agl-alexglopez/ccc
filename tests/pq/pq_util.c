@@ -1,12 +1,12 @@
+#include <stddef.h>
+
 #define TRAITS_USING_NAMESPACE_CCC
 
-#include "pq_util.h"
 #include "checkers.h"
+#include "pq_util.h"
 #include "priority_queue.h"
 #include "traits.h"
 #include "types.h"
-
-#include <stddef.h>
 
 ccc_threeway_cmp
 val_cmp(ccc_any_type_cmp const cmp)

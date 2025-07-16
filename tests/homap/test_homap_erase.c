@@ -1,18 +1,18 @@
-#define HANDLE_ORDERED_MAP_USING_NAMESPACE_CCC
-#define TRAITS_USING_NAMESPACE_CCC
-
-#include "alloc.h"
-#include "checkers.h"
-#include "handle_ordered_map.h"
-#include "homap_util.h"
-#include "traits.h"
-#include "types.h"
-
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+
+#define HANDLE_ORDERED_MAP_USING_NAMESPACE_CCC
+#define TRAITS_USING_NAMESPACE_CCC
+
+#include "checkers.h"
+#include "handle_ordered_map.h"
+#include "homap_util.h"
+#include "traits.h"
+#include "types.h"
+#include "util/alloc.h"
 
 CHECK_BEGIN_STATIC_FN(homap_test_insert_erase_shuffled)
 {

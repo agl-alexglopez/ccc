@@ -2,11 +2,12 @@
 
 #define TRAITS_USING_NAMESPACE_CCC
 #define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC
-#include "alloc.h"
+
 #include "checkers.h"
 #include "flat_double_ended_queue.h"
 #include "traits.h"
 #include "types.h"
+#include "util/alloc.h"
 
 CHECK_BEGIN_STATIC_FN(fdeq_test_construct)
 {
