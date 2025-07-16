@@ -12,23 +12,6 @@ algorithms use a wide range of data structures. */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#define BITSET_USING_NAMESPACE_CCC
-#define BUFFER_USING_NAMESPACE_CCC
-#define FLAT_HASH_MAP_USING_NAMESPACE_CCC
-#define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
-#define TRAITS_USING_NAMESPACE_CCC
-
-#include "alloc.h"
-#include "ccc/bitset.h"
-#include "ccc/buffer.h"
-#include "ccc/flat_hash_map.h"
-#include "ccc/flat_priority_queue.h"
-#include "ccc/traits.h"
-#include "ccc/types.h"
-#include "str_arena.h"
-#include "str_view.h"
-
 #ifdef __linux__
 #    include <linux/limits.h>
 #    define FILESYS_MAX_PATH PATH_MAX
@@ -37,6 +20,22 @@ algorithms use a wide range of data structures. */
 #    include <sys/syslimits.h>
 #    define FILESYS_MAX_PATH NAME_MAX
 #endif
+
+#define BITSET_USING_NAMESPACE_CCC
+#define BUFFER_USING_NAMESPACE_CCC
+#define FLAT_HASH_MAP_USING_NAMESPACE_CCC
+#define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
+#define TRAITS_USING_NAMESPACE_CCC
+
+#include "ccc/bitset.h"
+#include "ccc/buffer.h"
+#include "ccc/flat_hash_map.h"
+#include "ccc/flat_priority_queue.h"
+#include "ccc/traits.h"
+#include "ccc/types.h"
+#include "util/alloc.h"
+#include "util/str_arena.h"
+#include "util/str_view.h"
 
 /*===========================   Type Declarations  ==========================*/
 

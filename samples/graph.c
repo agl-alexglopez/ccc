@@ -31,15 +31,16 @@ Enter 'q' to quit. */
 #define PRIORITY_QUEUE_USING_NAMESPACE_CCC
 #define TRAITS_USING_NAMESPACE_CCC
 #define TYPES_USING_NAMESPACE_CCC
-#include "alloc.h"
+
 #include "ccc/flat_double_ended_queue.h"
 #include "ccc/flat_hash_map.h"
 #include "ccc/priority_queue.h"
 #include "ccc/traits.h"
 #include "ccc/types.h"
-#include "cli.h"
-#include "random.h"
-#include "str_view.h"
+#include "util/alloc.h"
+#include "util/cli.h"
+#include "util/random.h"
+#include "util/str_view.h"
 
 #define CYN "\033[38;5;14m"
 #define RED "\033[38;5;9m"
