@@ -1,9 +1,9 @@
+#include <stdbool.h>
+#include <stddef.h>
+
 #include "checkers.h"
 #include "realtime_ordered_map.h"
 #include "romap_util.h"
-
-#include <stdbool.h>
-#include <stddef.h>
 
 CHECK_BEGIN_STATIC_FN(romap_test_empty)
 {

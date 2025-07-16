@@ -1,8 +1,8 @@
-#include "fhmap_util.h"
-#include "types.h"
-
 #include <stdbool.h>
 #include <stdint.h>
+
+#include "fhmap_util.h"
+#include "types.h"
 
 uint64_t
 fhmap_int_zero(ccc_any_key const)

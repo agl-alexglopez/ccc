@@ -1,3 +1,9 @@
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
 #define TRAITS_USING_NAMESPACE_CCC
 #define HANDLE_REALTIME_ORDERED_MAP_USING_NAMESPACE_CCC
 #define TYPES_USING_NAMESPACE_CCC
@@ -7,12 +13,6 @@
 #include "hromap_util.h"
 #include "traits.h"
 #include "types.h"
-
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
 
 CHECK_BEGIN_STATIC_FN(check_range, handle_realtime_ordered_map const *const hrm,
                       range const *const r, size_t const n,

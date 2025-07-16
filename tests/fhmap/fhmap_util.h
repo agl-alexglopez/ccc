@@ -1,11 +1,11 @@
 #ifndef CCC_FHMAP_UTIL_H
 #define CCC_FHMAP_UTIL_H
 
-#include "flat_hash_map.h"
-#include "types.h"
-
 #include <stddef.h>
 #include <stdint.h>
+
+#include "flat_hash_map.h"
+#include "types.h"
 
 struct val
 {

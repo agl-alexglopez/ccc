@@ -3,11 +3,11 @@
 
 #define TRAITS_USING_NAMESPACE_CCC
 
-#include "alloc.h"
 #include "bitset.h"
 #include "checkers.h"
 #include "traits.h"
 #include "types.h"
+#include "util/alloc.h"
 
 CHECK_BEGIN_STATIC_FN(bs_test_push_back_no_realloc)
 {

@@ -53,8 +53,8 @@ See checkers.h for the testing framework all tests agree to use. */
 #include <sys/wait.h>
 #include <unistd.h>
 
+#include "../util/str_view.h"
 #include "checkers.h"
-#include "str_view.h"
 
 struct path_bin
 {
@@ -63,9 +63,9 @@ struct path_bin
 };
 
 static str_view const test_prefix = SV("test_");
-char const *const pass_mark = "⬤";
-char const *const fail_mark = "X";
-char const *const err_msg = "Test process was unexpectedly killed.";
+static char const *const pass_mark = "⬤";
+static char const *const fail_mark = "X";
+static char const *const err_msg = "Test process was unexpectedly killed.";
 
 static enum check_result run(str_view);
 static enum check_result run_test_process(struct path_bin);

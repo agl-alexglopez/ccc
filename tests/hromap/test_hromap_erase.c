@@ -1,18 +1,18 @@
-#define HANDLE_REALTIME_ORDERED_MAP_USING_NAMESPACE_CCC
-#define TRAITS_USING_NAMESPACE_CCC
-
-#include "alloc.h"
-#include "checkers.h"
-#include "handle_realtime_ordered_map.h"
-#include "hromap_util.h"
-#include "traits.h"
-#include "types.h"
-
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+
+#define HANDLE_REALTIME_ORDERED_MAP_USING_NAMESPACE_CCC
+#define TRAITS_USING_NAMESPACE_CCC
+
+#include "checkers.h"
+#include "handle_realtime_ordered_map.h"
+#include "hromap_util.h"
+#include "traits.h"
+#include "types.h"
+#include "util/alloc.h"
 
 CHECK_BEGIN_STATIC_FN(hromap_test_insert_erase_shuffled)
 {

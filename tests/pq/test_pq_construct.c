@@ -1,10 +1,10 @@
+#include <stdbool.h>
+#include <stddef.h>
+
 #include "checkers.h"
 #include "pq_util.h"
 #include "priority_queue.h"
 #include "types.h"
-
-#include <stdbool.h>
-#include <stddef.h>
 
 CHECK_BEGIN_STATIC_FN(pq_test_empty)
 {

@@ -1,6 +1,9 @@
 /** This file dedicated to testing the Handle Interface. The interface has
 grown significantly requiring a dedicated file to test all code paths in all
 the handle functions. */
+#include <stddef.h>
+#include <stdlib.h>
+
 #define HANDLE_ORDERED_MAP_USING_NAMESPACE_CCC
 #define TRAITS_USING_NAMESPACE_CCC
 
@@ -9,9 +12,6 @@ the handle functions. */
 #include "homap_util.h"
 #include "traits.h"
 #include "types.h"
-
-#include <stddef.h>
-#include <stdlib.h>
 
 static inline struct val
 val(int const val)

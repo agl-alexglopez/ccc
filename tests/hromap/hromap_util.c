@@ -1,6 +1,7 @@
 #include <stddef.h>
 
 #define TRAITS_USING_NAMESPACE_CCC
+
 #include "checkers.h"
 #include "handle_realtime_ordered_map.h"
 #include "hromap_util.h"

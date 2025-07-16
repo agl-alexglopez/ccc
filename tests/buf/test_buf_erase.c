@@ -4,12 +4,12 @@
 
 #define BUFFER_USING_NAMESPACE_CCC
 
-#include "alloc.h"
 #include "buf_util.h"
 #include "ccc/buffer.h"
 #include "ccc/types.h"
 #include "checkers.h"
-#include "random.h"
+#include "util/alloc.h"
+#include "util/random.h"
 
 CHECK_BEGIN_STATIC_FN(buf_test_push_pop_fixed)
 {

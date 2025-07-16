@@ -1,14 +1,14 @@
+#include <stddef.h>
+
 #define TRAITS_USING_NAMESPACE_CCC
 #define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC
 
-#include "alloc.h"
 #include "checkers.h"
 #include "fdeq_util.h"
 #include "flat_double_ended_queue.h"
 #include "traits.h"
 #include "types.h"
-
-#include <stddef.h>
+#include "util/alloc.h"
 
 CHECK_BEGIN_STATIC_FN(pop_front_n, flat_double_ended_queue *const q, size_t n)
 {

@@ -1,16 +1,16 @@
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdlib.h>
+#include <time.h>
+
 #define TRAITS_USING_NAMESPACE_CCC
 
-#include "alloc.h"
 #include "checkers.h"
 #include "pq_util.h"
 #include "priority_queue.h"
 #include "traits.h"
 #include "types.h"
-
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdlib.h>
-#include <time.h>
+#include "util/alloc.h"
 
 CHECK_BEGIN_STATIC_FN(pq_test_insert_remove_four_dups)
 {

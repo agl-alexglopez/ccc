@@ -3,6 +3,7 @@
 #include <stdio.h>
 
 #define TRAITS_USING_NAMESPACE_CCC
+
 #include "checkers.h"
 #include "realtime_ordered_map.h"
 #include "romap_util.h"

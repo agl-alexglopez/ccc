@@ -1,11 +1,11 @@
 #ifndef CCC_HROMAP_UTIL_H
 #define CCC_HROMAP_UTIL_H
 
+#include <stddef.h>
+
 #include "checkers.h"
 #include "handle_realtime_ordered_map.h"
 #include "types.h"
-
-#include <stddef.h>
 
 struct val
 {

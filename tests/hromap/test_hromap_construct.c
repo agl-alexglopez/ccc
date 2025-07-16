@@ -3,12 +3,13 @@
 
 #define TRAITS_USING_NAMESPACE_CCC
 #define HANDLE_REALTIME_ORDERED_MAP_USING_NAMESPACE_CCC
-#include "alloc.h"
+
 #include "checkers.h"
 #include "handle_realtime_ordered_map.h"
 #include "hromap_util.h"
 #include "traits.h"
 #include "types.h"
+#include "util/alloc.h"
 
 CHECK_BEGIN_STATIC_FN(hromap_test_empty)
 {

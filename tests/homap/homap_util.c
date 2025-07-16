@@ -1,6 +1,7 @@
 #include <stddef.h>
 
 #define TRAITS_USING_NAMESPACE_CCC
+
 #include "checkers.h"
 #include "handle_ordered_map.h"
 #include "homap_util.h"

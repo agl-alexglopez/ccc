@@ -1,11 +1,11 @@
 #ifndef CCC_OMAP_UTIL_H
 #define CCC_OMAP_UTIL_H
 
+#include <stddef.h>
+
 #include "checkers.h"
 #include "ordered_map.h"
 #include "types.h"
-
-#include <stddef.h>
 
 struct val
 {

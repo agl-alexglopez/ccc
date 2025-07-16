@@ -8,12 +8,12 @@ The leetcode lru problem in C. */
 #define DOUBLY_LINKED_LIST_USING_NAMESPACE_CCC
 #define TRAITS_USING_NAMESPACE_CCC
 
-#include "alloc.h"
 #include "checkers.h"
 #include "doubly_linked_list.h"
 #include "ordered_map.h"
 #include "traits.h"
 #include "types.h"
+#include "util/alloc.h"
 
 #define REQS 11
 

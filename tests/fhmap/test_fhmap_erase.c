@@ -1,16 +1,16 @@
+#include <stddef.h>
+#include <stdlib.h>
+
 #define FLAT_HASH_MAP_USING_NAMESPACE_CCC
 #define TRAITS_USING_NAMESPACE_CCC
 
-#include "alloc.h"
 #include "checkers.h"
 #include "fhmap_util.h"
 #include "flat_hash_map.h"
-#include "random.h"
 #include "traits.h"
 #include "types.h"
-
-#include <stddef.h>
-#include <stdlib.h>
+#include "util/alloc.h"
+#include "util/random.h"
 
 CHECK_BEGIN_STATIC_FN(fhmap_test_erase)
 {
