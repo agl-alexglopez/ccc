@@ -25,15 +25,16 @@ Please specify a command as follows:
 #define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
 #define TRAITS_USING_NAMESPACE_CCC
 #define TYPES_USING_NAMESPACE_CCC
-#include "alloc.h"
+
 #include "ccc/buffer.h"
 #include "ccc/flat_priority_queue.h"
 #include "ccc/handle_ordered_map.h"
 #include "ccc/traits.h"
 #include "ccc/types.h"
-#include "cli.h"
-#include "str_arena.h"
-#include "str_view.h"
+#include "util/alloc.h"
+#include "util/cli.h"
+#include "util/str_arena.h"
+#include "util/str_view.h"
 
 enum action_type
 {

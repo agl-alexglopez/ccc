@@ -26,14 +26,15 @@ Example:
 #define TYPES_USING_NAMESPACE_CCC
 #define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
 #define FLAT_HASH_MAP_USING_NAMESPACE_CCC
-#include "alloc.h"
+
 #include "ccc/flat_hash_map.h"
 #include "ccc/flat_priority_queue.h"
 #include "ccc/traits.h"
 #include "ccc/types.h"
-#include "cli.h"
-#include "random.h"
-#include "str_view.h"
+#include "util/alloc.h"
+#include "util/cli.h"
+#include "util/random.h"
+#include "util/str_view.h"
 
 /*=======================   Maze Helper Types   =============================*/
 
