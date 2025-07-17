@@ -141,14 +141,12 @@ ccc_fpq_pop(ccc_flat_priority_queue *const fpq, void *const tmp)
     {
         return CCC_RESULT_ARG_ERROR;
     }
-    if (fpq->buf.count == 1)
+    --fpq->buf.count;
+    if (!fpq->buf.count)
     {
-        (void)ccc_buf_pop_back(&fpq->buf);
         return CCC_RESULT_OK;
     }
-    swap(fpq, tmp, 0, fpq->buf.count - 1);
-    [[maybe_unused]] ccc_result const r = ccc_buf_pop_back(&fpq->buf);
-    assert(r == CCC_RESULT_OK);
+    swap(fpq, tmp, 0, fpq->buf.count);
     (void)bubble_down(fpq, tmp, 0, fpq->buf.count);
     return CCC_RESULT_OK;
 }
@@ -161,18 +159,14 @@ ccc_fpq_erase(ccc_flat_priority_queue *const fpq, void *const elem,
     {
         return CCC_RESULT_ARG_ERROR;
     }
-    if (fpq->buf.count == 1)
-    {
-        return ccc_buf_pop_back(&fpq->buf);
-    }
     size_t const i = index_of(fpq, elem);
-    if (i == fpq->buf.count - 1)
+    --fpq->buf.count;
+    if (i == fpq->buf.count)
     {
-        return ccc_buf_pop_back(&fpq->buf);
+        return CCC_RESULT_OK;
     }
-    swap(fpq, tmp, i, fpq->buf.count - 1);
-    ccc_threeway_cmp const cmp_res = cmp(fpq, i, fpq->buf.count - 1);
-    (void)ccc_buf_pop_back(&fpq->buf);
+    swap(fpq, tmp, i, fpq->buf.count);
+    ccc_threeway_cmp const cmp_res = cmp(fpq, i, fpq->buf.count);
     if (cmp_res == fpq->order)
     {
         (void)bubble_up(fpq, tmp, i);
