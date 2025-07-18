@@ -4,8 +4,10 @@
 
 #include "str_arena.h"
 
-static int str_arena_maybe_resize(struct str_arena *a, size_t byte_request);
-static int str_arena_maybe_resize_pos(struct str_arena *a, size_t furthest_pos);
+static enum str_arena_result str_arena_maybe_resize(struct str_arena *a,
+                                                    size_t byte_request);
+static enum str_arena_result str_arena_maybe_resize_pos(struct str_arena *a,
+                                                        size_t furthest_pos);
 
 /*=======================   Str Arena Allocator   ===========================*/
 
@@ -25,53 +27,60 @@ str_arena_create(size_t const cap)
 
 /* Allocates exactly bytes bytes from the arena. Do not forget the null
    terminator in requests if a string is requested. */
-str_ofs
+struct str_ofs
 str_arena_alloc(struct str_arena *const a, size_t const bytes)
 {
-    if (str_arena_maybe_resize(a, bytes) == -1)
+    enum str_arena_result const res = str_arena_maybe_resize(a, bytes);
+    if (res)
     {
-        return -1;
+        return (struct str_ofs){.error = res};
     }
     size_t const ret = a->next_free_pos;
     a->next_free_pos += bytes;
-    return (ptrdiff_t)ret;
+    return (struct str_ofs){.ofs = ret, .len = bytes ? bytes - 1 : bytes};
 }
 
-bool
-str_arena_push_back(struct str_arena *const a, str_ofs const str,
-                    size_t const str_len, char const c)
+enum str_arena_result
+str_arena_push_back(struct str_arena *const a, struct str_ofs *const str,
+                    char const c)
 {
-    size_t const new_pos = str + str_len + 1;
-    if (str_arena_maybe_resize_pos(a, new_pos) == -1)
+    if (!a || !str || str->error)
     {
-        return false;
+        return STR_ARENA_ARG_ERROR;
+    }
+    size_t const new_pos = str->ofs + str->len + 1;
+    enum str_arena_result const res = str_arena_maybe_resize_pos(a, new_pos);
+    if (res)
+    {
+        return res;
     }
     char *const string = str_arena_at(a, str);
-    *(string + str_len) = c;
-    *(string + str_len + 1) = '\0';
+    *(string + str->len) = c;
+    *(string + str->len + 1) = '\0';
     if (new_pos >= a->next_free_pos)
     {
         a->next_free_pos += ((new_pos + 1) - a->next_free_pos);
     }
-    return true;
+    ++str->len;
+    return STR_ARENA_OK;
 }
 
-static int
+static enum str_arena_result
 str_arena_maybe_resize(struct str_arena *const a, size_t const byte_request)
 {
     if (!a)
     {
-        return -1;
+        return STR_ARENA_ARG_ERROR;
     }
     return str_arena_maybe_resize_pos(a, a->next_free_pos + byte_request);
 }
 
-static int
+static enum str_arena_result
 str_arena_maybe_resize_pos(struct str_arena *const a, size_t const furthest_pos)
 {
     if (!a)
     {
-        return -1;
+        return STR_ARENA_ARG_ERROR;
     }
     if (furthest_pos >= a->cap)
     {
@@ -79,36 +88,61 @@ str_arena_maybe_resize_pos(struct str_arena *const a, size_t const furthest_pos)
         void *const moved_arena = realloc(a->arena, new_cap);
         if (!moved_arena)
         {
-            return -1;
+            return STR_ARENA_ALLOC_FAIL;
         }
         memset((char *)moved_arena + a->cap, '\0', new_cap - a->cap);
         a->arena = moved_arena;
         a->cap = new_cap;
     }
-    return 0;
+    return STR_ARENA_OK;
 }
 
-void
-str_arena_free_to_pos(struct str_arena *const a, str_ofs const last_str,
-                      size_t const str_len)
+enum str_arena_result
+str_arena_pop_str(struct str_arena *const a, struct str_ofs *const last_str)
 {
-    if (!a || !a->arena || !a->cap || !a->next_free_pos)
+    if (!a || !a->arena || !a->cap || !a->next_free_pos || !last_str
+        || last_str->error)
     {
-        return;
+        return STR_ARENA_ARG_ERROR;
     }
-    if (str_len)
+    if (last_str->len)
     {
-        memset(a->arena + last_str, '\0', str_len);
+        memset(a->arena + last_str->ofs, '\0', last_str->len);
     }
-    a->next_free_pos = last_str;
+    if (last_str->ofs + last_str->len + 1 == a->next_free_pos)
+    {
+        a->next_free_pos = last_str->ofs;
+        last_str->len = 0;
+    }
+    else
+    {
+        *last_str = (struct str_ofs){.error = STR_ARENA_INVALID};
+    }
+    return STR_ARENA_OK;
 }
 
-void
+enum str_arena_result
+str_arena_clear(struct str_arena *const a)
+{
+    if (!a)
+    {
+        return STR_ARENA_ARG_ERROR;
+    }
+    if (a->arena)
+    {
+        memset(a->arena, '\0', a->cap);
+    }
+    a->next_free_pos = 0;
+    a->cap = 0;
+    return STR_ARENA_OK;
+}
+
+enum str_arena_result
 str_arena_free(struct str_arena *const a)
 {
     if (!a)
     {
-        return;
+        return STR_ARENA_ARG_ERROR;
     }
     if (a->arena)
     {
@@ -117,14 +151,15 @@ str_arena_free(struct str_arena *const a)
     }
     a->next_free_pos = 0;
     a->cap = 0;
+    return STR_ARENA_OK;
 }
 
 char *
-str_arena_at(struct str_arena const *const a, str_ofs const i)
+str_arena_at(struct str_arena const *const a, struct str_ofs const *const i)
 {
-    if (!a || (size_t)i >= a->cap)
+    if (!a || !i || i->error || i->ofs >= a->cap)
     {
         return NULL;
     }
-    return a->arena + i;
+    return a->arena + i->ofs;
 }
