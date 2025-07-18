@@ -57,9 +57,9 @@ struct str_ofs str_arena_alloc(struct str_arena *, size_t bytes);
 starting position of last_str. If the last_str argument is the last string
 previously allocated from the arena its length is reset to zero but its position
 remains valid. If this function is called on a string that is not the most
-recently allocated that region is simply zeroed out and the arena next free
-arena allocation remains unchanged; the last_str argument is then made invalid
-and will not be usable in further API functions. */
+recently allocated that region is simply zeroed out and the arena's next free
+position remains unchanged; in this case the last_str argument is then made
+invalid and will not be usable in further API functions. */
 enum str_arena_result str_arena_pop_str(struct str_arena *,
                                         struct str_ofs *last_str);
 
