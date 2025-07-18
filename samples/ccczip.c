@@ -133,17 +133,6 @@ enum : size_t
     START_STR_ARENA_CAP = 256,
 };
 
-/** During the encoding phase we must build the sequence of leaves we encounter
-in an in-order traversal of the encoding tree. This is done when we are encoding
-a tree we have formed into its more compact representation. */
-struct leaf_string
-{
-    /** The string arena hands out offsets not pointers to strings. */
-    str_ofs start;
-    /** We should know the length of the leaf string for safety. */
-    size_t len;
-};
-
 /** The compact representation of the tree structure we will encode to a
 compressed file for later reconstruction. */
 struct compressed_huffman_tree
@@ -154,7 +143,7 @@ struct compressed_huffman_tree
     /** The arena that allows us to form the dynamic string of leaves. */
     struct str_arena arena;
     /** The handle to the leaf string in the string arena. */
-    struct leaf_string leaf_string;
+    struct str_ofs leaf_string;
 };
 
 /** The header representing the compressed file structure of a compressed file
@@ -556,7 +545,7 @@ compress_tree(struct huffman_tree *const tree)
         .arena = str_arena_create(START_STR_ARENA_CAP),
     };
     check(ret.arena.arena);
-    ret.leaf_string.start = str_arena_alloc(&ret.arena, 0);
+    ret.leaf_string = str_arena_alloc(&ret.arena, 0);
     ccc_result const r = bitq_reserve(&ret.tree_paths, tree->num_nodes);
     check(r == CCC_RESULT_OK);
     size_t cur = tree->root;
@@ -570,9 +559,8 @@ compress_tree(struct huffman_tree *const tree)
         {
             /* A leaf is always pushed because it is only seen once. */
             bitq_push_back(&ret.tree_paths, CCC_FALSE);
-            str_arena_push_back(&ret.arena, ret.leaf_string.start,
-                                ret.leaf_string.len, node->ch);
-            ++ret.leaf_string.len;
+            check(str_arena_push_back(&ret.arena, &ret.leaf_string, node->ch)
+                  == STR_ARENA_OK);
             cur = node->parent;
         }
         else if (node->iter < ITER_END)
@@ -632,7 +620,7 @@ write_to_file(str_view const original_filepath, size_t const original_filesize,
                       sizeof(header->leaves_minus_one));
     check(writ == sizeof(header->leaves_minus_one));
     char const *leaf_string = str_arena_at(&header->blueprint.arena,
-                                           header->blueprint.leaf_string.start);
+                                           &header->blueprint.leaf_string);
     writ = writebytes(cccz, leaf_string, header->leaves_minus_one + 1);
     check(writ == (size_t)(header->leaves_minus_one + 1));
     writ = writebytes(cccz, &header->file_bits_count,
@@ -767,11 +755,11 @@ read_from_file(str_view const unzip)
     read = readbytes(cccz, &ret.leaves_minus_one, sizeof(ret.leaves_minus_one));
     check(read == sizeof(ret.leaves_minus_one));
     struct str_arena *const arena = &ret.blueprint.arena;
-    struct leaf_string *const leaves = &ret.blueprint.leaf_string;
-    leaves->start = str_arena_alloc(arena, ret.leaves_minus_one + 1);
-    check(leaves->start >= 0);
-    leaves->len = ret.leaves_minus_one + 1;
-    read = readbytes(cccz, str_arena_at(arena, leaves->start), leaves->len);
+    struct str_ofs *const leaves = &ret.blueprint.leaf_string;
+    /* Add 2: one for being minus 1 already and one for NULL terminator. */
+    *leaves = str_arena_alloc(arena, ret.leaves_minus_one + 2);
+    check(!leaves->error);
+    read = readbytes(cccz, str_arena_at(arena, leaves), leaves->len);
     check(read == (size_t)(ret.leaves_minus_one + 1));
     read = readbytes(cccz, &ret.file_bits_count, sizeof(ret.file_bits_count));
     check(read == sizeof(ret.file_bits_count));
@@ -809,7 +797,8 @@ reconstruct_tree(struct compressed_huffman_tree *const blueprint)
     (void)bitq_pop_front(&blueprint->tree_paths);
     size_t parent = ret.root;
     size_t node = 0;
-    size_t ch_i = blueprint->leaf_string.start;
+    char const *leaves
+        = str_arena_at(&blueprint->arena, &blueprint->leaf_string);
     while (bitq_count(&blueprint->tree_paths))
     {
         ccc_tribool bit = CCC_TRUE;
@@ -823,8 +812,8 @@ reconstruct_tree(struct compressed_huffman_tree *const blueprint)
             parent_r->link[parent_r->iter++] = node;
             if (!bit)
             {
-                pushed->ch = *str_arena_at(&blueprint->arena, (str_ofs)ch_i);
-                ++ch_i;
+                pushed->ch = *leaves;
+                ++leaves;
                 ++ret.num_leaves;
             }
         }

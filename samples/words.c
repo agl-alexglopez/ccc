@@ -51,7 +51,7 @@ enum word_clean_status
 
 struct clean_word
 {
-    str_ofs str;
+    struct str_ofs str;
     enum word_clean_status stat;
 };
 
@@ -59,7 +59,7 @@ struct clean_word
 struct frequency
 {
     /* If arena resizes, string is not lost. This is an offset. */
-    str_ofs ofs;
+    struct str_ofs ofs;
     /* How many times the word is encountered. Key for priority queue. */
     int freq;
 };
@@ -67,7 +67,7 @@ struct frequency
 /* Map element for logging frequencies by string key, freq value. */
 typedef struct
 {
-    str_ofs ofs;
+    struct str_ofs ofs;
     int cnt;
 } word;
 
@@ -287,7 +287,7 @@ print_found(FILE *const f, str_view w)
         word const *const found_w = hom_at(&map, get_key_val(&map, &wc.str));
         if (found_w)
         {
-            printf("%s %d\n", str_arena_at(&a, found_w->ofs), found_w->cnt);
+            printf("%s %d\n", str_arena_at(&a, &found_w->ofs), found_w->cnt);
         }
     }
     str_arena_free(&a);
@@ -333,7 +333,7 @@ print_alpha_n(FILE *const f, int n)
     /* The ordered nature of the map comes in handy for alpha printing. */
     for (word *w = begin(&map); w != end(&map) && i < n; w = next(&map, w), ++i)
     {
-        printf("%s %d\n", str_arena_at(&a, w->ofs), w->cnt);
+        printf("%s %d\n", str_arena_at(&a, &w->ofs), w->cnt);
     }
     str_arena_free(&a);
     (void)clear_and_free(&map, NULL);
@@ -355,7 +355,7 @@ print_ralpha_n(FILE *const f, int n)
     for (word *w = rbegin(&map); w != rend(&map) && i < n;
          w = rnext(&map, w), ++i)
     {
-        printf("%s %d\n", str_arena_at(&a, w->ofs), w->cnt);
+        printf("%s %d\n", str_arena_at(&a, &w->ofs), w->cnt);
     }
     str_arena_free(&a);
     (void)clear_and_free(&map, NULL);
@@ -399,7 +399,7 @@ print_n(ccc_handle_ordered_map *const map, ccc_threeway_cmp const ord,
     for (struct frequency const *i = rbegin(&b); i != rend(&b) && w < n;
          i = rnext(&b, i), ++w)
     {
-        char const *const arena_str = str_arena_at(a, i->ofs);
+        char const *const arena_str = str_arena_at(a, &i->ofs);
         if (arena_str)
         {
             printf("%d. %s %d\n", w + 1, arena_str, i->freq);
@@ -459,33 +459,33 @@ clean_word(struct str_arena *const a, str_view wv)
 {
     /* It is hard to know how many characters will make it to a cleaned word
        and one pass is ideal so arena api allows push back on last alloc. */
-    str_ofs const str = str_arena_alloc(a, 0);
-    if (str < 0)
+    struct str_ofs str = str_arena_alloc(a, 0);
+    if (str.error)
     {
         return (struct clean_word){.stat = WC_ARENA_ERR};
     }
-    size_t str_len = 0;
     for (char const *c = sv_begin(wv); c != sv_end(wv); c = sv_next(c))
     {
         if (!isalpha(*c) && *c != '-')
         {
-            str_arena_free_to_pos(a, str, str_len);
+            str_arena_pop_str(a, &str);
             return (struct clean_word){.stat = WC_NOT_WORD};
         }
-        [[maybe_unused]] bool const pushed_char
-            = str_arena_push_back(a, str, str_len, (char)tolower(*c));
-        check(pushed_char);
-        ++str_len;
+        [[maybe_unused]] enum str_arena_result const pushed_char
+            = str_arena_push_back(a, &str, (char)tolower(*c));
+        check(pushed_char == STR_ARENA_OK);
     }
-    if (!str_len)
+    if (!str.len)
     {
         return (struct clean_word){.stat = WC_NOT_WORD};
     }
-    char const *const w = str_arena_at(a, str);
+    char const *const w = str_arena_at(a, &str);
     check(w);
-    if (!isalpha(*w) || !isalpha(*(w + (str_len - 1))))
+    if (!isalpha(*w) || !isalpha(*(w + (str.len - 1))))
     {
-        str_arena_free_to_pos(a, str, str_len);
+        [[maybe_unused]] enum str_arena_result const pop
+            = str_arena_pop_str(a, &str);
+        check(pop == STR_ARENA_OK);
         return (struct clean_word){.stat = WC_NOT_WORD};
     }
     return (struct clean_word){.str = str, .stat = WC_CLEAN_WORD};
@@ -498,9 +498,9 @@ cmp_string_keys(any_key_cmp const c)
 {
     word const *const w = c.any_type_rhs;
     struct str_arena const *const a = c.aux;
-    str_ofs const *const id = c.any_key_lhs;
-    char const *const key_word = str_arena_at(a, *id);
-    char const *const struct_word = str_arena_at(a, w->ofs);
+    struct str_ofs const *const id = c.any_key_lhs;
+    char const *const key_word = str_arena_at(a, id);
+    char const *const struct_word = str_arena_at(a, &w->ofs);
     check(key_word && struct_word);
     int const res = strcmp(key_word, struct_word);
     return (res > 0) - (res < 0);
@@ -518,8 +518,8 @@ cmp_freqs(any_type_cmp const c)
         return freq_cmp;
     }
     struct str_arena const *const arena = c.aux;
-    char const *const lhs_word = str_arena_at(arena, lhs->ofs);
-    char const *const rhs_word = str_arena_at(arena, rhs->ofs);
+    char const *const lhs_word = str_arena_at(arena, &lhs->ofs);
+    char const *const rhs_word = str_arena_at(arena, &rhs->ofs);
     check(lhs_word && rhs_word);
     int const res = strcmp(lhs_word, rhs_word);
     /* Looks like we have chosen wrong order to return but not so: greater
