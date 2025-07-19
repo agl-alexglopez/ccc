@@ -21,6 +21,7 @@ Please specify a command as follows:
 #include <stdlib.h>
 #include <string.h>
 
+#define BUFFER_USING_NAMESPACE_CCC
 #define HANDLE_ORDERED_MAP_USING_NAMESPACE_CCC
 #define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
 #define TRAITS_USING_NAMESPACE_CCC
@@ -55,27 +56,14 @@ struct clean_word
     enum word_clean_status stat;
 };
 
-/* Type that will serve as key val for both map and priority queue. */
-struct frequency
-{
-    /* If arena resizes, string is not lost. This is an offset. */
-    struct str_ofs ofs;
-    /* How many times the word is encountered. Key for priority queue. */
-    int freq;
-};
-
-/* Map element for logging frequencies by string key, freq value. */
+/* A word will be counted with a map and then sorted with a buffer and flat
+priority queue. One type works well for both because they don't need intrusive
+elements to operate those containers. */
 typedef struct
 {
     struct str_ofs ofs;
-    int cnt;
+    int freq;
 } word;
-
-struct frequency_alloc
-{
-    struct frequency *arr;
-    size_t cap;
-};
 
 struct action_pack
 {
@@ -146,7 +134,7 @@ static void print_top_n(FILE *file, int n);
 static void print_last_n(FILE *file, int n);
 static void print_alpha_n(FILE *file, int n);
 static void print_ralpha_n(FILE *file, int n);
-static struct frequency_alloc copy_frequencies(handle_ordered_map const *map);
+static buffer copy_frequencies(handle_ordered_map const *map);
 static void print_n(handle_ordered_map *, ccc_threeway_cmp, struct str_arena *,
                     int n);
 static struct int_conversion parse_n_ranks(str_view arg);
@@ -157,7 +145,7 @@ static struct clean_word clean_word(struct str_arena *, str_view wv);
 /* Container Functions */
 static handle_ordered_map create_frequency_map(struct str_arena *, FILE *);
 static threeway_cmp cmp_string_keys(any_key_cmp);
-static threeway_cmp cmp_freqs(any_type_cmp);
+static threeway_cmp cmp_words(any_type_cmp);
 
 /* Misc. Functions */
 static FILE *open_file(str_view file);
@@ -287,7 +275,7 @@ print_found(FILE *const f, str_view w)
         word const *const found_w = hom_at(&map, get_key_val(&map, &wc.str));
         if (found_w)
         {
-            printf("%s %d\n", str_arena_at(&a, &found_w->ofs), found_w->cnt);
+            printf("%s %d\n", str_arena_at(&a, &found_w->ofs), found_w->freq);
         }
     }
     str_arena_free(&a);
@@ -333,7 +321,7 @@ print_alpha_n(FILE *const f, int n)
     /* The ordered nature of the map comes in handy for alpha printing. */
     for (word *w = begin(&map); w != end(&map) && i < n; w = next(&map, w), ++i)
     {
-        printf("%s %d\n", str_arena_at(&a, &w->ofs), w->cnt);
+        printf("%s %d\n", str_arena_at(&a, &w->ofs), w->freq);
     }
     str_arena_free(&a);
     (void)clear_and_free(&map, NULL);
@@ -355,49 +343,52 @@ print_ralpha_n(FILE *const f, int n)
     for (word *w = rbegin(&map); w != rend(&map) && i < n;
          w = rnext(&map, w), ++i)
     {
-        printf("%s %d\n", str_arena_at(&a, &w->ofs), w->cnt);
+        printf("%s %d\n", str_arena_at(&a, &w->ofs), w->freq);
     }
     str_arena_free(&a);
     (void)clear_and_free(&map, NULL);
 }
 
-static struct frequency_alloc
+static buffer
 copy_frequencies(handle_ordered_map const *const map)
 {
     check(!is_empty(map));
-    size_t const cap = sizeof(struct frequency) * count(map).count;
-    struct frequency *const freqs = malloc(cap);
-    check(freqs);
+    buffer freqs = buf_init(NULL, word, std_alloc, NULL, 0);
+    ccc_result const r = buf_reserve(&freqs, count(map).count, std_alloc);
+    check(r == CCC_RESULT_OK);
+    size_t const cap = capacity(&freqs).count;
     size_t i = 0;
     for (word const *w = begin(map); w != end(map) && i < cap;
          w = next(map, w), ++i)
     {
-        freqs[i].ofs = w->ofs;
-        freqs[i].freq = w->cnt;
+        word const *const pushed = buf_push_back(&freqs, w);
+        check(pushed);
     }
-    return (struct frequency_alloc){.arr = freqs, .cap = cap};
+    return freqs;
 }
 
 static void
 print_n(ccc_handle_ordered_map *const map, ccc_threeway_cmp const ord,
         struct str_arena *const a, int n)
 {
-    struct frequency_alloc freqs = copy_frequencies(map);
-    check(freqs.cap);
+    buffer freqs = copy_frequencies(map);
+    check(!buf_is_empty(&freqs));
     flat_priority_queue fpq
-        = fpq_heapify_init(freqs.arr, struct frequency, ord, cmp_freqs, NULL, a,
-                           freqs.cap, count(map).count);
-    check(count(&fpq).count == count(map).count);
+        = fpq_heapify_init(begin(&freqs), word, ord, cmp_words, NULL, a,
+                           capacity(&freqs).count, count(&freqs).count);
+    check(count(&fpq).count == count(&freqs).count);
     if (!n)
     {
         n = count(&fpq).count;
     }
-    ccc_buffer b = ccc_fpq_heapsort(&fpq, &(struct frequency){});
+    /* Because all CCC containers are complete they can be treated as copyable
+       types like this. There is no opaque container in CCC. */
+    freqs = ccc_fpq_heapsort(&fpq, &(word){});
     check(!fpq.buf.mem);
     int w = 0;
     /* Heap sort puts the root most nodes at the back of the buffer. */
-    for (struct frequency const *i = rbegin(&b); i != rend(&b) && w < n;
-         i = rnext(&b, i), ++w)
+    for (word const *i = rbegin(&freqs); i != rend(&freqs) && w < n;
+         i = rnext(&freqs, i), ++w)
     {
         char const *const arena_str = str_arena_at(a, &i->ofs);
         if (arena_str)
@@ -405,7 +396,7 @@ print_n(ccc_handle_ordered_map *const map, ccc_threeway_cmp const ord,
             printf("%d. %s %d\n", w + 1, arena_str, i->freq);
         }
     }
-    (void)ccc_buf_clear_and_free_reserve(&b, NULL, std_alloc);
+    (void)clear_and_free(&freqs, NULL);
 }
 
 /*=====================    Container Construction     =======================*/
@@ -429,23 +420,10 @@ create_frequency_map(struct str_arena *const a, FILE *const f)
             check(cw.stat != WC_ARENA_ERR);
             if (cw.stat == WC_CLEAN_WORD)
             {
-                /* There are a few idiomatic ways we could tackle this step.
-                   However, this demonstrates the user of "closures" in the
-                   and modify with macro. The and modify macro gives a closure
-                   over the user type T if the entry is Occupied. If the entry
-                   is Vacant the closure does not execute. You can uncomment
-                   the below code if you prefer a different style. */
-                /*
+                homap_handle const *e = handle_r(&hom, &cw.str);
+                e = hom_and_modify_w(e, word, { T->freq++; });
                 word const *const w = hom_at(
-                    &hom,
-                    hom_or_insert_w(hom_and_modify_w(handle_r(&hom, &cw.str),
-                                                     word, { T->cnt++; }),
-                                    (word){.ofs = cw.str, .cnt = 1}));
-                 */
-                homap_handle *e = handle_r(&hom, &cw.str);
-                e = hom_and_modify_w(e, word, { T->cnt++; });
-                word const *const w = hom_at(
-                    &hom, hom_or_insert_w(e, (word){.ofs = cw.str, .cnt = 1}));
+                    &hom, hom_or_insert_w(e, (word){.ofs = cw.str, .freq = 1}));
                 check(w);
             }
         }
@@ -508,10 +486,10 @@ cmp_string_keys(any_key_cmp const c)
 
 /* Sorts by frequency then alphabetic order if frequencies are tied. */
 static threeway_cmp
-cmp_freqs(any_type_cmp const c)
+cmp_words(any_type_cmp const c)
 {
-    struct frequency const *const lhs = c.any_type_lhs;
-    struct frequency const *const rhs = c.any_type_rhs;
+    word const *const lhs = c.any_type_lhs;
+    word const *const rhs = c.any_type_rhs;
     threeway_cmp freq_cmp = (lhs->freq > rhs->freq) - (lhs->freq < rhs->freq);
     if (freq_cmp != CCC_EQL)
     {
