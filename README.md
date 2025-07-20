@@ -407,7 +407,7 @@ int_cmp(ccc_any_type_cmp const ints)
     return (lhs > rhs) - (lhs < rhs);
 }
 
-/* In place O(n) time O(1) space partial sort. */
+/* In place O(N * log(N)) time O(1) space sort. */
 int
 main(void)
 {
@@ -419,7 +419,7 @@ main(void)
     };
     flat_priority_queue pq = fpq_heapify_init(heap, int, CCC_LES, int_cmp, NULL,
                                               NULL, HCAP, HCAP);
-    ccc_buffer const b = ccc_fpq_heapsort(&pq, &(int){0});
+    ccc_buffer const b = fpq_heapsort(&pq, &(int){0});
     int const *prev = begin(&b);
     assert(prev != NULL);
     assert(ccc_buf_count(&b).count == HCAP);
