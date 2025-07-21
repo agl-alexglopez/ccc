@@ -393,6 +393,7 @@ main(void)
 
 ```c
 #include <assert.h>
+#define BUFFER_USING_NAMESPACE_CCC
 #define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
 #define TRAITS_USING_NAMESPACE_CCC
 #include "ccc/buffer.h"
@@ -419,10 +420,10 @@ main(void)
     };
     flat_priority_queue pq = fpq_heapify_init(heap, int, CCC_LES, int_cmp, NULL,
                                               NULL, HCAP, HCAP);
-    ccc_buffer const b = fpq_heapsort(&pq, &(int){0});
+    buffer const b = fpq_heapsort(&pq, &(int){0});
     int const *prev = begin(&b);
     assert(prev != NULL);
-    assert(ccc_buf_count(&b).count == HCAP);
+    assert(buf_count(&b).count == HCAP);
     size_t count = 1;
     for (int const *cur = next(&b, prev); cur != end(&b); cur = next(&b, cur))
     {
