@@ -425,11 +425,11 @@ ccc_impl_fpq_in_place_heapify(struct ccc_fpq *const fpq, size_t const n,
 
 /*====================     Static Helpers     ===============================*/
 
-/* Orders the provided priority queue in O(N) time. */
+/* Orders the provided priority queue in O(N) time. Assumes n <= capacity. */
 static void
 heapify(struct ccc_fpq *const fpq, size_t const n, void *const tmp)
 {
-    (void)ccc_buf_size_set(&fpq->buf, n);
+    fpq->buf.count = n;
     for (size_t i = ((n - 1) / 2) + 1; i--;)
     {
         (void)bubble_down(fpq, tmp, i, fpq->buf.count);
