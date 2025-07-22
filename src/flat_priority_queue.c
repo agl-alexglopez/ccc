@@ -480,7 +480,7 @@ static size_t
 bubble_down(struct ccc_fpq *const fpq, void *const tmp, size_t i,
             size_t const count)
 {
-    for (size_t next = i, left = (i * 2) + 1, right = left + 1; left < count;
+    for (size_t next = 0, left = (i * 2) + 1, right = left + 1; left < count;
          i = next, left = (i * 2) + 1, right = left + 1)
     {
         /* Avoid one comparison call if there is no right child. */
