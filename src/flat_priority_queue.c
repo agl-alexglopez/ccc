@@ -72,7 +72,7 @@ ccc_fpq_heapify(ccc_flat_priority_queue *const fpq, void *const tmp,
             return resize_res;
         }
     }
-    (void)memcpy(ccc_buf_begin(&fpq->buf), array, n * input_sizeof_type);
+    (void)memcpy(fpq->buf.mem, array, n * input_sizeof_type);
     heapify(fpq, n, tmp);
     return CCC_RESULT_OK;
 }
@@ -541,9 +541,9 @@ at(struct ccc_fpq const *const fpq, size_t const i)
 static inline size_t
 index_of(struct ccc_fpq const *const fpq, void const *const slot)
 {
-    assert(slot >= ccc_buf_begin(&fpq->buf));
-    size_t const i = ((((char *)slot) - ((char *)ccc_buf_begin(&fpq->buf)))
-                      / fpq->buf.sizeof_type);
+    assert(slot >= fpq->buf.mem);
+    size_t const i
+        = ((char *)slot - (char *)fpq->buf.mem) / fpq->buf.sizeof_type;
     assert(i < fpq->buf.count);
     return i;
 }
