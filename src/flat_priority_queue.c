@@ -58,7 +58,7 @@ ccc_fpq_heapify(ccc_flat_priority_queue *const fpq, void *const tmp,
                 void *const array, size_t const n,
                 size_t const input_sizeof_type)
 {
-    if (!fpq || !array || !tmp || array == ccc_buf_begin(&fpq->buf)
+    if (!fpq || !array || !tmp || array == fpq->buf.mem
         || input_sizeof_type != fpq->buf.sizeof_type)
     {
         return CCC_RESULT_ARG_ERROR;
