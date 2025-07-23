@@ -83,10 +83,17 @@ struct action_pack
 
 /*=======================     Constants    ==================================*/
 
-static size_t arena_start_cap = 4096;
-static int const all_frequencies = 0;
-static str_view const space = SV(" ");
+enum : size_t
+{
+    ARENA_START_CAP = 4096,
+};
 
+enum : int
+{
+    ALL_FREQUENCIES = 0,
+};
+
+static str_view const space = SV(" ");
 static str_view const directions
     = SV("\nPlease specify a command as follows:\n"
          "./build/[debug/]bin/words [flag] -f=[path/to/file]\n"
@@ -172,13 +179,13 @@ main(int argc, char *argv[])
         {
             exe.type = COUNT;
             exe.freq_fn = print_top_n;
-            exe.n = all_frequencies;
+            exe.n = ALL_FREQUENCIES;
         }
         else if (sv_starts_with(sv_arg, SV("-rc")))
         {
             exe.type = COUNT;
             exe.freq_fn = print_last_n;
-            exe.n = all_frequencies;
+            exe.n = ALL_FREQUENCIES;
         }
         else if (sv_starts_with(sv_arg, SV("-top=")))
         {
@@ -265,7 +272,7 @@ main(int argc, char *argv[])
 static void
 print_found(FILE *const f, str_view w)
 {
-    struct str_arena a = str_arena_create(arena_start_cap);
+    struct str_arena a = str_arena_create(ARENA_START_CAP);
     check(a.arena);
     handle_ordered_map map = create_frequency_map(&a, f);
     check(!is_empty(&map));
@@ -285,7 +292,7 @@ print_found(FILE *const f, str_view w)
 static void
 print_top_n(FILE *const f, int n)
 {
-    struct str_arena a = str_arena_create(arena_start_cap);
+    struct str_arena a = str_arena_create(ARENA_START_CAP);
     check(a.arena);
     handle_ordered_map map = create_frequency_map(&a, f);
     check(!is_empty(&map));
@@ -297,7 +304,7 @@ print_top_n(FILE *const f, int n)
 static void
 print_last_n(FILE *const f, int n)
 {
-    struct str_arena a = str_arena_create(arena_start_cap);
+    struct str_arena a = str_arena_create(ARENA_START_CAP);
     check(a.arena);
     handle_ordered_map map = create_frequency_map(&a, f);
     check(!is_empty(&map));
@@ -309,7 +316,7 @@ print_last_n(FILE *const f, int n)
 static void
 print_alpha_n(FILE *const f, int n)
 {
-    struct str_arena a = str_arena_create(arena_start_cap);
+    struct str_arena a = str_arena_create(ARENA_START_CAP);
     check(a.arena);
     handle_ordered_map map = create_frequency_map(&a, f);
     check(!is_empty(&map));
@@ -330,7 +337,7 @@ print_alpha_n(FILE *const f, int n)
 static void
 print_ralpha_n(FILE *const f, int n)
 {
-    struct str_arena a = str_arena_create(arena_start_cap);
+    struct str_arena a = str_arena_create(ARENA_START_CAP);
     check(a.arena);
     handle_ordered_map map = create_frequency_map(&a, f);
     check(!is_empty(&map));
