@@ -16,6 +16,7 @@ AB
 A->B
 CtoD
 Enter 'q' to quit. */
+#include <assert.h>
 #include <limits.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -47,46 +48,55 @@ Enter 'q' to quit. */
 #define MAG "\033[38;5;13m"
 #define NIL "\033[0m"
 
-/* The highest order 16 bits in the grid shall be reserved for the edge
-   id if the square is a path. An edge ID is a concatenation of two
-   vertex names. Vertex names are 8 bit characters, so two vertices can
-   fit into a uint16_t which we have room for in a Cell. The concatenation
-   shall always be sorted alphabetically so an edge connecting vertex A and
-   Z will be uint16_t=AZ. Here is the breakdown of bits currently.
+/** 16 bits in the grid shall be reserved for the edge id if the square is a
+path. An edge ID is a concatenation of two vertex names. Vertex names are 8 bit
+characters, so two vertices can fit into a uint16_t which we have room for in a
+Cell. The concatenation shall always be sorted alphabetically so an edge
+connecting vertex A and Z will be uint16_t=AZ. Here is the breakdown of bits
+currently.
 
-   path shape bits───────────────────────────────────┬──┐
-   path_bit────────────────────────────────────────┐ │  │
-   vertex bit────────────────────────────────────┐ │ │  │
-   paint bit───────────────────────────────────┐ │ │ │  │
-   digit bit─────────────────────────────────┐ │ │ │ │  │
-   edge cost digit──────────────────────↓──↓ │ │ │ │ │  │
-   vertex title────────────────────┬───────┐ │ │ │ │ │  │
-   edge id───────┬───────────────┐ │       │ │ │ │ │ │  │
-   unused─────┬─┐↓               ↓ ↓       ↓ ↓ ↓ ↓ ↓ ↓  ↓
-            0b...00000000 00000000 0000 0000 0 0 0 0 0000
-   If various signal bits such as paint or digit are turned on we know
-   which bits to look at and how to interpret them.
-     - path shape bits determine how edges join as they run and turn.
-     - path bit marks a cell as a path
-     - vertex bit marks a cell as a vertex meaning it holds a vertex title.
-     - paint bit is a single bit to mark a path should have a color.
-     - digit bit marks that one digit of an edge cost is stored in a edge cell.
-     - edge cost digit is stored in at most four bits. 9 is highest digit
-       in base 10.
-     - unused is not currently used but could be in the future.
-     - edge id is the concatenation of two vertex titles in an edge to signify
-       which vertices are connected. The edge id is sorted lexicographical
-       with the lower value in the leftmost bits.
-     - the vertex title is stored in 8 bits if the cell is a vertex. */
+path shape bits───────────────────────────────────┬──┐
+path_bit────────────────────────────────────────┐ │  │
+vertex bit────────────────────────────────────┐ │ │  │
+paint bit───────────────────────────────────┐ │ │ │  │
+digit bit─────────────────────────────────┐ │ │ │ │  │
+edge cost digit──────────────────────↓──↓ │ │ │ │ │  │
+vertex title────────────────────┬───────┐ │ │ │ │ │  │
+edge id───────┬───────────────┐ │       │ │ │ │ │ │  │
+unused─────┬─┐↓               ↓ ↓       ↓ ↓ ↓ ↓ ↓ ↓  ↓
+        0b...00000000 00000000 0000 0000 0 0 0 0 0000
+
+If various signal bits such as paint or digit are turned on we know
+which bits to look at and how to interpret them.
+
+  - path shape bits determine how edges join as they run and turn.
+  - path bit marks a cell as a path
+  - vertex bit marks a cell as a vertex meaning it holds a vertex title.
+  - paint bit is a single bit to mark a path should have a color.
+  - digit bit marks that one digit of an edge cost is stored in a edge cell.
+  - edge cost digit is stored in at most four bits. 9 is highest digit
+    in base 10.
+  - unused is not currently used but could be in the future.
+  - edge id is the concatenation of two vertex titles in an edge to signify
+    which vertices are connected. The edge id is sorted lexicographical
+    with the lower value in the leftmost bits.
+  - the vertex title is stored in 8 bits if the cell is a vertex.
+
+This way of organizing bits comes from maze building practices which are
+technically an extension of graph building and searching algorithms. */
 typedef uint32_t cell;
 
 enum
 {
     DIRS_SIZE = 4,
-    MAX_VERTICES = 26,
+    MAX_VERTICES = 'Z' - 'A' + 1,
     MAX_DEGREE = 4,
     MAX_SPEED = 7,
 };
+
+static_assert(
+    MAX_VERTICES == 26,
+    "maximum number of graph vertices should equal letters of the alphabet");
 
 struct point
 {
@@ -185,15 +195,58 @@ static char const *paths[] = {
 };
 
 /* Animation speed for edge coloring during solving phase. */
-int const speeds[8] = {
+static int const speeds[8] = {
     0, 500000000, 250000000, 100000000, 50000000, 25000000, 10000000, 1000000,
 };
 
 /* North, East, South, West */
 static struct point const dirs[DIRS_SIZE] = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
+
 /* Graphs are limited to 26 vertices. */
-static char const start_vertex_title = 'A';
-static char const end_vertex_title = 'Z';
+enum : char
+{
+    BEGIN_VERTICES = 'A',
+    END_VERTICES = 'Z',
+};
+
+enum : int
+{
+    DEFAULT_ROWS = 33,
+    DEFAULT_COLS = 111,
+    DEFAULT_VERTICES = 4,
+    ROW_COL_MIN = 7,
+    VERTEX_PLACEMENT_PADDING = 3,
+};
+
+enum : cell
+{
+    VERTEX_CELL_TITLE_SHIFT = 8,
+    VERTEX_TITLE_MASK = 0xFF00,
+    EDGE_ID_SHIFT = 16,
+    EDGE_ID_MASK = 0xFFFF0000,
+    L_EDGE_ID_MASK = 0xFF000000,
+    L_EDGE_ID_SHIFT = 24,
+    R_EDGE_ID_MASK = 0x00FF0000,
+    R_EDGE_ID_SHIFT = 16,
+    PATH_MASK = 0b1111,
+    NORTH_PATH = 0b0001,
+    EAST_PATH = 0b0010,
+    SOUTH_PATH = 0b0100,
+    WEST_PATH = 0b1000,
+    PATH_BIT = 0b10000,
+    VERTEXT_BIT = 0b100000,
+    PAINT_BIT = 0b1000000,
+    DIGIT_BIT = 0b10000000,
+    DIGIT_SHIFT = 8,
+    DIGIT_MASK = 0xF00,
+};
+
+static str_view const prompt_msg
+    = SV("Enter two vertices to find the shortest path between them (i.e. "
+         "A-Z). Enter q to quit:");
+static str_view const quit_cmd = SV("q");
+
+/*==========================   Prototypes  ================================= */
 
 #define check(cond, ...)                                                       \
     do                                                                         \
@@ -207,39 +260,6 @@ static char const end_vertex_title = 'Z';
         }                                                                      \
     }                                                                          \
     while (0)
-
-static int const default_rows = 33;
-static int const default_cols = 111;
-static int const default_vertices = 4;
-static int const row_col_min = 7;
-static int const vertex_placement_padding = 3;
-
-static size_t const vertex_cell_title_shift = 8;
-static cell const vertex_title_mask = 0xFF00;
-static size_t const edge_id_shift = 16;
-static cell const edge_id_mask = 0xFFFF0000;
-static cell const l_edge_id_mask = 0xFF000000;
-static cell const l_edge_id_shift = 24;
-static cell const r_edge_id_mask = 0x00FF0000;
-static cell const r_edge_id_shift = 16;
-static cell const path_mask = 0b1111;
-static cell const north_path = 0b0001;
-static cell const east_path = 0b0010;
-static cell const south_path = 0b0100;
-static cell const west_path = 0b1000;
-static cell const path_bit = 0b10000;
-static cell const vertex_bit = 0b100000;
-static cell const paint_bit = 0b1000000;
-static cell const digit_bit = 0b10000000;
-static size_t const digit_shift = 8;
-static cell const digit_mask = 0xF00;
-
-static str_view const prompt_msg
-    = SV("Enter two vertices to find the shortest path between them (i.e. "
-         "A-Z). Enter q to quit:");
-static str_view const quit_cmd = SV("q");
-
-/*==========================   Prototypes  ================================= */
 
 static void build_graph(struct graph *);
 static void find_shortest_paths(struct graph *);
@@ -298,13 +318,12 @@ int
 main(int argc, char **argv)
 {
     /* Randomness will be used throughout the program but it need not be
-       perfect. It only helps build graphs.
-       NOLINTNEXTLINE(cert-msc32-c, cert-msc51-cpp) */
-    srand(time(NULL));
+       perfect. It only helps build graphs. */
+    srand(time(NULL)); /* NOLINT */
     struct graph graph = {
-        .rows = default_rows,
-        .cols = default_cols,
-        .vertices = default_vertices,
+        .rows = DEFAULT_ROWS,
+        .cols = DEFAULT_COLS,
+        .vertices = DEFAULT_VERTICES,
         .speed = {},
         .grid = NULL,
         .graph = network,
@@ -315,14 +334,14 @@ main(int argc, char **argv)
         if (sv_starts_with(arg, SV("-r=")))
         {
             struct int_conversion const row_arg
-                = parse_digits(arg, row_col_min, INT_MAX,
+                = parse_digits(arg, ROW_COL_MIN, INT_MAX,
                                "rows_below required minimum or negative\n");
             graph.rows = row_arg.conversion;
         }
         else if (sv_starts_with(arg, SV("-c=")))
         {
             struct int_conversion const col_arg
-                = parse_digits(arg, row_col_min, INT_MAX,
+                = parse_digits(arg, ROW_COL_MIN, INT_MAX,
                                "cols below required minimum or negative.\n");
             graph.cols = col_arg.conversion;
         }
@@ -381,19 +400,19 @@ build_graph(struct graph *const graph)
 {
     build_path_outline(graph);
     clear_and_flush_graph(graph, MAG);
-    for (int vertex = 0, vertex_title = start_vertex_title;
+    for (int vertex = 0, vertex_title = BEGIN_VERTICES;
          vertex < graph->vertices; ++vertex, ++vertex_title)
     {
         struct point rand_point = random_vertex_placement(graph);
         *grid_at_mut(graph, rand_point.r, rand_point.c)
-            = vertex_bit | path_bit
-            | ((cell)vertex_title << vertex_cell_title_shift);
+            = VERTEXT_BIT | PATH_BIT
+            | ((cell)vertex_title << VERTEX_CELL_TITLE_SHIFT);
         *vertex_at(graph, (char)vertex_title) = (struct vertex){
             .name = (char)vertex_title,
             .pos = rand_point,
         };
     }
-    for (int vertex = 0, vertex_title = start_vertex_title;
+    for (int vertex = 0, vertex_title = BEGIN_VERTICES;
          vertex < graph->vertices; ++vertex, ++vertex_title)
     {
         char key = (char)vertex_title;
@@ -522,13 +541,13 @@ add_edge_cost_label(struct graph *const g, struct vertex *const src,
             struct point next
                 = {.r = cur.r + dirs[i].r, .c = cur.c + dirs[i].c};
             cell const next_cell = grid_at(g, next.r, next.c);
-            if ((next_cell & vertex_bit)
+            if ((next_cell & VERTEXT_BIT)
                 && get_cell_vertex_title(next_cell) == e->n.name)
             {
                 return;
             }
             /* Always make forward progress, no backtracking. */
-            if ((grid_at(g, next.r, next.c) & edge_id_mask) == edge_id
+            if ((grid_at(g, next.r, next.c) & EDGE_ID_MASK) == edge_id
                 && (prev.r != next.r || prev.c != next.c))
             {
                 direction = get_direction(&prev, &next);
@@ -557,9 +576,9 @@ encode_digits(struct graph const *const g, struct digit_encoding *const e)
                        : e->start.r - 1;
         for (uintmax_t digits = e->cost; digits; digits /= 10, --e->start.r)
         {
-            *grid_at_mut(g, e->start.r, e->start.c) |= digit_bit;
+            *grid_at_mut(g, e->start.r, e->start.c) |= DIGIT_BIT;
             *grid_at_mut(g, e->start.r, e->start.c)
-                |= ((digits % 10) << digit_shift);
+                |= ((digits % 10) << DIGIT_SHIFT);
         }
     }
     else
@@ -569,9 +588,9 @@ encode_digits(struct graph const *const g, struct digit_encoding *const e)
                        : e->start.c - 1;
         for (uintmax_t digits = e->cost; digits; digits /= 10, --e->start.c)
         {
-            *grid_at_mut(g, e->start.r, e->start.c) |= digit_bit;
+            *grid_at_mut(g, e->start.r, e->start.c) |= DIGIT_BIT;
             *grid_at_mut(g, e->start.r, e->start.c)
-                |= ((digits % 10) << digit_shift);
+                |= ((digits % 10) << DIGIT_SHIFT);
         }
     }
 }
@@ -604,30 +623,30 @@ random_vertex_placement(struct graph const *const graph)
 {
     int const row_end = graph->rows - 2;
     int const col_end = graph->cols - 2;
-    if (row_end < row_col_min || col_end < row_col_min)
+    if (row_end < ROW_COL_MIN || col_end < ROW_COL_MIN)
     {
         quit("rows and cols are below minimum quitting now.\n", 1);
         exit(1);
     }
     /* No vertices should be close to the edge of the map. */
-    int const row_start = rand_range(vertex_placement_padding,
-                                     graph->rows - vertex_placement_padding);
-    int const col_start = rand_range(vertex_placement_padding,
-                                     graph->cols - vertex_placement_padding);
+    int const row_start = rand_range(VERTEX_PLACEMENT_PADDING,
+                                     graph->rows - VERTEX_PLACEMENT_PADDING);
+    int const col_start = rand_range(VERTEX_PLACEMENT_PADDING,
+                                     graph->cols - VERTEX_PLACEMENT_PADDING);
     bool exhausted = false;
     for (int row = row_start; !exhausted && row < row_end;
          row = (row + 1) % row_end)
     {
         if (!row)
         {
-            row = vertex_placement_padding;
+            row = VERTEX_PLACEMENT_PADDING;
         }
         for (int col = col_start; !exhausted && col < col_end;
              col = (col + 1) % col_end)
         {
             if (!col)
             {
-                col = vertex_placement_padding;
+                col = VERTEX_PLACEMENT_PADDING;
             }
             struct point const cur = {.r = row, .c = col};
             if (is_valid_vertex_pos(graph, cur.r, cur.c))
@@ -721,7 +740,7 @@ dijkstra_shortest_path(struct graph *const graph, char const src,
     struct cost map_pq[MAX_VERTICES] = {};
     priority_queue costs
         = pq_init(struct cost, pq_elem, CCC_LES, cmp_pq_costs, NULL, NULL);
-    for (int i = 0, vx = start_vertex_title; i < graph->vertices; ++i, ++vx)
+    for (int i = 0, vx = BEGIN_VERTICES; i < graph->vertices; ++i, ++vx)
     {
         *map_pq_at(map_pq, (char)vx) = (struct cost){
             .name = (char)vx,
@@ -794,8 +813,8 @@ paint_shortest_path(struct graph *const graph, struct cost const *const map_pq,
 static inline struct cost *
 map_pq_at(struct cost const *const dj_arr, char const vertex)
 {
-    check(vertex >= start_vertex_title && vertex <= end_vertex_title);
-    return (struct cost *)&dj_arr[vertex - start_vertex_title];
+    check(vertex >= BEGIN_VERTICES && vertex <= END_VERTICES);
+    return (struct cost *)&dj_arr[vertex - BEGIN_VERTICES];
 }
 
 /* Paints the edge and flushes the specified color at that position. If NULL
@@ -814,11 +833,11 @@ paint_edge(struct graph *const g, char const src_name, char const dst_name,
     {
         if (edge_color)
         {
-            *grid_at_mut(g, cur.r, cur.c) |= paint_bit;
+            *grid_at_mut(g, cur.r, cur.c) |= PAINT_BIT;
         }
         else
         {
-            *grid_at_mut(g, cur.r, cur.c) &= ~paint_bit;
+            *grid_at_mut(g, cur.r, cur.c) &= ~PAINT_BIT;
         }
         flush_at(g, cur.r, cur.c, edge_color);
         for (size_t i = 0; i < DIRS_SIZE; ++i)
@@ -828,13 +847,13 @@ paint_edge(struct graph *const g, char const src_name, char const dst_name,
                 .c = cur.c + dirs[i].c,
             };
             cell const next_cell = grid_at(g, next.r, next.c);
-            if ((next_cell & vertex_bit)
+            if ((next_cell & VERTEXT_BIT)
                 && get_cell_vertex_title(next_cell) == dst->name)
             {
                 return;
             }
             /* Always make forward progress, no backtracking. */
-            if ((grid_at(g, next.r, next.c) & edge_id_mask) == edge_id
+            if ((grid_at(g, next.r, next.c) & EDGE_ID_MASK) == edge_id
                 && (prev.r != next.r || prev.c != next.c))
             {
                 prev = cur;
@@ -850,9 +869,8 @@ paint_edge(struct graph *const g, char const src_name, char const dst_name,
 static struct vertex *
 vertex_at(struct graph const *const g, char const name)
 {
-    check(name >= start_vertex_title
-          && name < start_vertex_title + g->vertices);
-    return &((struct vertex *)g->graph)[((size_t)name - start_vertex_title)];
+    check(name >= BEGIN_VERTICES && name < BEGIN_VERTICES + g->vertices);
+    return &((struct vertex *)g->graph)[((size_t)name - BEGIN_VERTICES)];
 }
 
 /* This function assumes that checking one cell in any direction is safe
@@ -861,11 +879,11 @@ vertex_at(struct graph const *const g, char const name)
 static inline bool
 is_valid_vertex_pos(struct graph const *graph, int const r, int const c)
 {
-    return !(grid_at(graph, r, c) & vertex_bit)
-        && !(grid_at(graph, r + 1, c) & vertex_bit)
-        && !(grid_at(graph, r - 1, c) & vertex_bit)
-        && !(grid_at(graph, r, c - 1) & vertex_bit)
-        && !(grid_at(graph, r, c + 1) & vertex_bit);
+    return !(grid_at(graph, r, c) & VERTEXT_BIT)
+        && !(grid_at(graph, r + 1, c) & VERTEXT_BIT)
+        && !(grid_at(graph, r - 1, c) & VERTEXT_BIT)
+        && !(grid_at(graph, r, c - 1) & VERTEXT_BIT)
+        && !(grid_at(graph, r, c + 1) & VERTEXT_BIT);
 }
 
 static int
@@ -881,7 +899,7 @@ vertex_degree(struct vertex const *const v)
 static inline cell
 make_edge(char const src, char const dst)
 {
-    return sort_vertices(src, dst) << edge_id_shift;
+    return sort_vertices(src, dst) << EDGE_ID_SHIFT;
 }
 
 static inline cell *
@@ -905,7 +923,7 @@ sort_vertices(char a, char b)
 static char
 get_cell_vertex_title(cell const c)
 {
-    return (char)((c & vertex_title_mask) >> vertex_cell_title_shift);
+    return (char)((c & VERTEX_TITLE_MASK) >> VERTEX_CELL_TITLE_SHIFT);
 }
 
 static bool
@@ -941,13 +959,13 @@ add_edge(struct vertex *const v, struct edge const *const e)
 static inline bool
 is_vertex(cell c)
 {
-    return (c & vertex_bit) != 0;
+    return (c & VERTEXT_BIT) != 0;
 }
 
 static bool
 is_path_cell(cell c)
 {
-    return (c & path_bit) != 0;
+    return (c & PATH_BIT) != 0;
 }
 
 static void
@@ -973,7 +991,7 @@ clear_paint(struct graph *const graph)
     {
         for (int c = 0; c < graph->cols; ++c)
         {
-            *grid_at_mut(graph, r, c) &= ~paint_bit;
+            *grid_at_mut(graph, r, c) &= ~PAINT_BIT;
         }
     }
 }
@@ -991,21 +1009,21 @@ static inline void
 print_cell(cell const c, char const *const edge_color)
 {
 
-    if (c & vertex_bit)
+    if (c & VERTEXT_BIT)
     {
-        printf("%s%c%s", CYN, (char)(c >> vertex_cell_title_shift), NIL);
+        printf("%s%c%s", CYN, (char)(c >> VERTEX_CELL_TITLE_SHIFT), NIL);
     }
-    else if (c & digit_bit)
+    else if (c & DIGIT_BIT)
     {
-        printf("%d", (c & digit_mask) >> digit_shift);
+        printf("%d", (c & DIGIT_MASK) >> DIGIT_SHIFT);
     }
-    else if (c & path_bit)
+    else if (c & PATH_BIT)
     {
-        (c & paint_bit) ? printf("%s%s%s", edge_color ? edge_color : NIL,
-                                 paths[c & path_mask], NIL)
-                        : printf("%s", paths[c & path_mask]);
+        (c & PAINT_BIT) ? printf("%s%s%s", edge_color ? edge_color : NIL,
+                                 paths[c & PATH_MASK], NIL)
+                        : printf("%s", paths[c & PATH_MASK]);
     }
-    else if (!(c & path_bit))
+    else if (!(c & PATH_BIT))
     {
         printf(" ");
     }
@@ -1020,42 +1038,42 @@ is_edge_vertex(cell const square, cell edge_id)
 {
     char const vertex_name = get_cell_vertex_title(square);
     char const edge_vertex1
-        = (char)((edge_id & l_edge_id_mask) >> l_edge_id_shift);
+        = (char)((edge_id & L_EDGE_ID_MASK) >> L_EDGE_ID_SHIFT);
     char const edge_vertex2
-        = (char)((edge_id & r_edge_id_mask) >> r_edge_id_shift);
+        = (char)((edge_id & R_EDGE_ID_MASK) >> R_EDGE_ID_SHIFT);
     return vertex_name == edge_vertex1 || vertex_name == edge_vertex2;
 }
 
 static bool
 is_valid_edge_cell(cell const square, cell const edge_id)
 {
-    return ((square & vertex_bit) && is_edge_vertex(square, edge_id))
-        || ((square & path_bit) && (square & edge_id_mask) == edge_id);
+    return ((square & VERTEXT_BIT) && is_edge_vertex(square, edge_id))
+        || ((square & PATH_BIT) && (square & EDGE_ID_MASK) == edge_id);
 }
 
 static void
 build_path_cell(struct graph *g, int const r, int const c, cell const edge_id)
 {
-    cell path = path_bit;
+    cell path = PATH_BIT;
     if (r - 1 >= 0 && is_valid_edge_cell(grid_at(g, r - 1, c), edge_id))
     {
-        path |= north_path;
-        *grid_at_mut(g, r - 1, c) |= south_path;
+        path |= NORTH_PATH;
+        *grid_at_mut(g, r - 1, c) |= SOUTH_PATH;
     }
     if (r + 1 < g->rows && is_valid_edge_cell(grid_at(g, r + 1, c), edge_id))
     {
-        path |= south_path;
-        *grid_at_mut(g, r + 1, c) |= north_path;
+        path |= SOUTH_PATH;
+        *grid_at_mut(g, r + 1, c) |= NORTH_PATH;
     }
     if (c - 1 >= 0 && is_valid_edge_cell(grid_at(g, r, c - 1), edge_id))
     {
-        path |= west_path;
-        *grid_at_mut(g, r, c - 1) |= east_path;
+        path |= WEST_PATH;
+        *grid_at_mut(g, r, c - 1) |= EAST_PATH;
     }
     if (c + 1 < g->cols && is_valid_edge_cell(grid_at(g, r, c + 1), edge_id))
     {
-        path |= east_path;
-        *grid_at_mut(g, r, c + 1) |= west_path;
+        path |= EAST_PATH;
+        *grid_at_mut(g, r, c + 1) |= WEST_PATH;
     }
     *grid_at_mut(g, r, c) |= path;
 }
@@ -1125,10 +1143,10 @@ parse_path_request(struct graph *const g, str_view r)
         return (struct path_request){'q', 'q'};
     }
     struct path_request res = {};
-    char const end_title = (char)(start_vertex_title + g->vertices - 1);
+    char const end_title = (char)(BEGIN_VERTICES + g->vertices - 1);
     for (char const *c = sv_begin(r); c != sv_end(r); c = sv_next(c))
     {
-        if (*c >= start_vertex_title && *c <= end_title)
+        if (*c >= BEGIN_VERTICES && *c <= end_title)
         {
             struct vertex *v = vertex_at(g, *c);
             check(v);
