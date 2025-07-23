@@ -67,10 +67,8 @@ struct char_freq
 
 enum : uint8_t
 {
-    /** There are two children for every Huffman tree node. */
-    LINK_SIZE = 2,
     /** Caching for iterative traversals uses this position as end sentinel. */
-    ITER_END = LINK_SIZE,
+    ITER_END = 2,
 };
 
 /** Tree nodes will be pushed into a ccc_buffer. This is the same concept as
@@ -85,7 +83,7 @@ struct huffman_node
     /** The parent for backtracking during DFS and Pre-Order traversal. */
     size_t parent;
     /** The necessary links needed to build the encoding tree. */
-    size_t link[LINK_SIZE];
+    size_t link[ITER_END];
     /** The leaf character if this node is a leaf. */
     char ch;
     /** The caching iterator to help emulate recursion with iteration. */
@@ -146,6 +144,12 @@ struct compressed_huffman_tree
     struct str_ofs leaf_string;
 };
 
+enum : uint32_t
+{
+    /** File format "cccz" in header. */
+    CCCZ_MAGIC = 0x6363637A,
+};
+
 /** The header representing the compressed file structure of a compressed file
 via Huffman Encoding. The fields of this struct should be handled in order as
 we write to or read from a file. It is not strictly necessary to use this but
@@ -173,8 +177,6 @@ struct ccczip_actions
     str_view unzip;
 };
 
-/** File format "cccz" in header. */
-static uint32_t const cccz_magic = 0x6363637A;
 static str_view const output_dir = SV("samples/output/");
 static str_view const cccz_suffix = SV(".cccz");
 
@@ -322,7 +324,7 @@ zip_file(str_view const to_compress)
     printf("Zip %s (%zu bytes).\n", sv_begin(to_compress), fsize);
     struct huffman_tree tree = build_encoding_tree(f);
     struct huffman_encoding encoding = {
-        .magic = cccz_magic,
+        .magic = CCCZ_MAGIC,
         .file_bits = build_encoding_bitq(f, &tree),
         .blueprint = compress_tree(&tree),
     };
@@ -363,20 +365,16 @@ build_encoding_tree(FILE *const f)
         r = pop(&pq, &(struct fpq_elem){});
         check(r == CCC_RESULT_OK);
         struct huffman_node *const internal_one
-            = push_back(&ret.bump_arena, &(struct huffman_node){
-                                             .link = {zero.node, one.node},
-                                         });
+            = push_back(&ret.bump_arena,
+                        &(struct huffman_node){.link = {zero.node, one.node}});
         size_t const new_root = buf_i(&ret.bump_arena, internal_one).count;
         check(internal_one);
         node_at(&ret, zero.node)->parent = new_root;
         node_at(&ret, one.node)->parent = new_root;
-        struct fpq_elem const *const pushed
-            = push(&pq,
-                   &(struct fpq_elem){
-                       .freq = zero.freq + one.freq,
-                       .node = new_root,
-                   },
-                   &(struct fpq_elem){});
+        struct fpq_elem const *const pushed = push(
+            &pq,
+            &(struct fpq_elem){.freq = zero.freq + one.freq, .node = new_root},
+            &(struct fpq_elem){});
         check(pushed);
         ret.root = new_root;
     }
@@ -751,7 +749,7 @@ read_from_file(str_view const unzip)
         },
     };
     size_t read = readbytes(cccz, &ret.magic, sizeof(ret.magic));
-    check(read == sizeof(ret.magic) && ret.magic == cccz_magic);
+    check(read == sizeof(ret.magic) && ret.magic == CCCZ_MAGIC);
     read = readbytes(cccz, &ret.leaves_minus_one, sizeof(ret.leaves_minus_one));
     check(read == sizeof(ret.leaves_minus_one));
     struct str_arena *const arena = &ret.blueprint.arena;
@@ -936,9 +934,7 @@ free_encode_tree(struct huffman_tree *tree)
     ccc_result const r
         = clear_and_free_reserve(&tree->bump_arena, NULL, std_alloc);
     check(r == CCC_RESULT_OK);
-    tree->num_leaves = 0;
-    tree->num_nodes = 0;
-    tree->root = 0;
+    *tree = (struct huffman_tree){};
 }
 
 static size_t
