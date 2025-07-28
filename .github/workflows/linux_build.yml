@@ -51,7 +51,7 @@ jobs:
 
     - name: Build Debug Clang and Ninja
       run: |
-        cmake --preset=clang-deb -G "Ninja" && cmake --build build --target ccc tests samples
+        cmake --preset=clang-deb -G "Ninja" && cmake --build build -j$(nproc) --target ccc tests samples
         cmake --build build --target install
     
     - name: Test Debug
@@ -61,7 +61,7 @@ jobs:
     - name: Build Release Clang and Ninja
       run: |
         make clean
-        cmake --preset=clang-rel -G "Ninja" && cmake --build build --target ccc tests samples
+        cmake --preset=clang-rel -G "Ninja" && cmake --build build -j$(nproc) --target ccc tests samples
         cmake --build build --target install
         
     - name: Test Release
