@@ -229,14 +229,21 @@ main(int argc, char *argv[])
         }
         else
         {
-            logerr("unrecognized argument: %s\n", sv_begin(sv_arg));
+            if (sv_begin(sv_arg))
+            {
+                logerr("unrecognized argument: %s\n", sv_begin(sv_arg));
+            }
             return 1;
         }
     }
     FILE *const f = open_file(exe.file);
     if (!f)
     {
-        logerr("error opening: %s\n", exe.file.s);
+        if (exe.file.s)
+        {
+            logerr("error opening: %s\n", exe.file.s);
+        }
+        (void)fclose(f);
         return 1;
     }
     if (exe.type == COUNT)
@@ -250,6 +257,7 @@ main(int argc, char *argv[])
     else
     {
         logerr("invalid count or empty word searched\n");
+        (void)fclose(f);
         return 1;
     }
     (void)fclose(f);
