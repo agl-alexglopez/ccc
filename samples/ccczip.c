@@ -395,18 +395,16 @@ decrease the size of the priority queue. */
 static flat_priority_queue
 build_encoding_pq(FILE *const f, struct huffman_tree *const tree)
 {
-    flat_hash_map fh = fhm_init(NULL, struct char_freq, ch, hash_char, char_eq,
-                                std_alloc, NULL, 0);
+    flat_hash_map frequencies = fhm_init(NULL, struct char_freq, ch, hash_char,
+                                         char_eq, std_alloc, NULL, 0);
     foreach_filechar(f, c, {
-        struct char_freq *const ins = or_insert(
-            fhm_and_modify_w(entry_r(&fh, c), struct char_freq, ++T->freq;),
-            &(struct char_freq){
-                .ch = *c,
-                .freq = 1,
-            });
+        struct char_freq *const ins
+            = or_insert(fhm_and_modify_w(entry_r(&frequencies, c),
+                                         struct char_freq, ++T->freq;),
+                        &(struct char_freq){.ch = *c, .freq = 1});
         check(ins);
     });
-    size_t const leaves = count(&fh).count;
+    size_t const leaves = count(&frequencies).count;
     check(leaves >= 2);
     tree->num_leaves = leaves;
     tree->num_nodes = (2 * leaves) - 1;
@@ -418,30 +416,30 @@ build_encoding_pq(FILE *const f, struct huffman_tree *const tree)
         = push_back(&tree->bump_arena, &(struct huffman_node){});
     check(nil);
     /* Use a buffer to simply push back elements we will heapify at the end. */
-    buffer fpq_buf = buf_init(NULL, struct fpq_elem, NULL, NULL, 0);
+    buffer fpq_storage = buf_init(NULL, struct fpq_elem, NULL, NULL, 0);
     /* Add one to reservation for the flat priority queue swap slot. */
-    r = reserve(&fpq_buf, count(&fh).count, std_alloc);
+    r = reserve(&fpq_storage, count(&frequencies).count, std_alloc);
     check(r == CCC_RESULT_OK);
-    for (struct char_freq const *i = begin(&fh); i != end(&fh);
-         i = next(&fh, i))
+    for (struct char_freq const *i = begin(&frequencies);
+         i != end(&frequencies); i = next(&frequencies, i))
     {
         struct huffman_node const *const node
             = push_back(&tree->bump_arena, &(struct huffman_node){.ch = i->ch});
-        (void)push_back(&fpq_buf,
-                        &(struct fpq_elem){
-                            .freq = i->freq,
-                            .node = buf_i(&tree->bump_arena, node).count,
-                        });
+        check(node);
+        size_t const node_i = buf_i(&tree->bump_arena, node).count;
+        struct fpq_elem const *const pushed = push_back(
+            &fpq_storage, &(struct fpq_elem){.freq = i->freq, .node = node_i});
+        check(pushed);
     }
     /* Free map but not the buffer because the priority queue took buffer. */
-    r = clear_and_free(&fh, NULL);
+    r = clear_and_free(&frequencies, NULL);
     check(r == CCC_RESULT_OK);
     /* The buffer had no allocation permission and set up all the elements we
        needed to be in the flat priority queue. Now we take its memory and
        heapify the data in O(N) time rather than pushing each element. */
-    return fpq_heapify_init(begin(&fpq_buf), struct fpq_elem, CCC_LES,
-                            cmp_freqs, NULL, NULL, capacity(&fpq_buf).count,
-                            count(&fpq_buf).count);
+    return fpq_heapify_init(begin(&fpq_storage), struct fpq_elem, CCC_LES,
+                            cmp_freqs, NULL, NULL, capacity(&fpq_storage).count,
+                            count(&fpq_storage).count);
 }
 
 /** Returns the bit queue representing the bit path to every character in the
