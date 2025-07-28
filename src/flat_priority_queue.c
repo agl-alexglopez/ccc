@@ -429,6 +429,8 @@ ccc_impl_fpq_in_place_heapify(struct ccc_fpq *const fpq, size_t const n,
 static void
 heapify(struct ccc_fpq *const fpq, size_t const n, void *const tmp)
 {
+    assert(n);
+    assert(n <= fpq->buf.capacity);
     fpq->buf.count = n;
     size_t i = ((n - 1) / 2) + 1;
     while (i--)
