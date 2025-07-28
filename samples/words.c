@@ -43,19 +43,6 @@ enum action_type
     FIND,
 };
 
-enum word_clean_status
-{
-    WC_CLEAN_WORD,
-    WC_NOT_WORD,
-    WC_ARENA_ERR,
-};
-
-struct clean_word
-{
-    struct str_ofs str;
-    enum word_clean_status stat;
-};
-
 /* A word will be counted with a map and then sorted with a buffer and flat
 priority queue. One type works well for both because they don't need intrusive
 elements to operate those containers. */
@@ -147,7 +134,7 @@ static void print_n(handle_ordered_map *, ccc_threeway_cmp, struct str_arena *,
 static struct int_conversion parse_n_ranks(str_view arg);
 
 /* String Helper Functions */
-static struct clean_word clean_word(struct str_arena *, str_view wv);
+static struct str_ofs clean_word(struct str_arena *, str_view wv);
 
 /* Container Functions */
 static handle_ordered_map create_frequency_map(struct str_arena *, FILE *);
@@ -276,10 +263,10 @@ print_found(FILE *const f, str_view w)
     check(a.arena);
     handle_ordered_map map = create_frequency_map(&a, f);
     check(!is_empty(&map));
-    struct clean_word wc = clean_word(&a, w);
-    if (wc.stat == WC_CLEAN_WORD)
+    struct str_ofs wc = clean_word(&a, w);
+    if (!wc.error)
     {
-        word const *const found_w = hom_at(&map, get_key_val(&map, &wc.str));
+        word const *const found_w = hom_at(&map, get_key_val(&map, &wc));
         if (found_w)
         {
             printf("%s %d\n", str_arena_at(&a, &found_w->ofs), found_w->freq);
@@ -423,14 +410,13 @@ create_frequency_map(struct str_arena *const a, FILE *const f)
              !sv_end_tok(line, word_view);
              word_view = sv_next_tok(line, word_view, space))
         {
-            struct clean_word const cw = clean_word(a, word_view);
-            check(cw.stat != WC_ARENA_ERR);
-            if (cw.stat == WC_CLEAN_WORD)
+            struct str_ofs const cw = clean_word(a, word_view);
+            if (!cw.error)
             {
-                homap_handle const *e = handle_r(&hom, &cw.str);
+                homap_handle const *e = handle_r(&hom, &cw);
                 e = hom_and_modify_w(e, word, { T->freq++; });
                 word const *const w = hom_at(
-                    &hom, hom_or_insert_w(e, (word){.ofs = cw.str, .freq = 1}));
+                    &hom, hom_or_insert_w(e, (word){.ofs = cw, .freq = 1}));
                 check(w);
             }
         }
@@ -439,7 +425,7 @@ create_frequency_map(struct str_arena *const a, FILE *const f)
     return hom;
 }
 
-static struct clean_word
+static struct str_ofs
 clean_word(struct str_arena *const a, str_view wv)
 {
     /* It is hard to know how many characters will make it to a cleaned word
@@ -447,33 +433,32 @@ clean_word(struct str_arena *const a, str_view wv)
     struct str_ofs str = str_arena_alloc(a, 0);
     if (str.error)
     {
-        return (struct clean_word){.stat = WC_ARENA_ERR};
+        return str;
     }
     for (char const *c = sv_begin(wv); c != sv_end(wv); c = sv_next(c))
     {
         if (!isalpha(*c) && *c != '-')
         {
             str_arena_pop_str(a, &str);
-            return (struct clean_word){.stat = WC_NOT_WORD};
+            return (struct str_ofs){.error = STR_ARENA_INVALID};
         }
-        [[maybe_unused]] enum str_arena_result const pushed_char
+        enum str_arena_result const pushed_char
             = str_arena_push_back(a, &str, (char)tolower(*c));
         check(pushed_char == STR_ARENA_OK);
     }
     if (!str.len)
     {
-        return (struct clean_word){.stat = WC_NOT_WORD};
+        return (struct str_ofs){.error = STR_ARENA_INVALID};
     }
     char const *const w = str_arena_at(a, &str);
     check(w);
     if (!isalpha(*w) || !isalpha(*(w + (str.len - 1))))
     {
-        [[maybe_unused]] enum str_arena_result const pop
-            = str_arena_pop_str(a, &str);
+        enum str_arena_result const pop = str_arena_pop_str(a, &str);
         check(pop == STR_ARENA_OK);
-        return (struct clean_word){.stat = WC_NOT_WORD};
+        return (struct str_ofs){.error = STR_ARENA_INVALID};
     }
-    return (struct clean_word){.str = str, .stat = WC_CLEAN_WORD};
+    return str;
 }
 
 /*=======================   Container Helpers    ============================*/

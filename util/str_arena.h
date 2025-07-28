@@ -39,8 +39,11 @@ in a resizing operation. This is why indices are returned not pointers. Pointers
 into the arena should only be accessed for reading or writing, not saved. */
 struct str_arena
 {
+    /** The underlying base of allocation all strings are offset from. */
     char *arena;
+    /** The front of the free list or next position in arena available. */
     size_t next_free_pos;
+    /** The total bytes in this arena. */
     size_t cap;
 };
 
