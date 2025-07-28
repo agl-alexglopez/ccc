@@ -44,11 +44,11 @@ clang-deb:
 	$(MAKE) build
 
 rsan:
-	cmake --preset=rsan -DCMAKE_INSTALL_PREFIX=$(PREFIX)
+	cmake --preset=gcc-rsan -DCMAKE_INSTALL_PREFIX=$(PREFIX)
 	$(MAKE) build
 
 dsan:
-	cmake --preset=dsan -DCMAKE_INSTALL_PREFIX=$(PREFIX)
+	cmake --preset=gcc-dsan -DCMAKE_INSTALL_PREFIX=$(PREFIX)
 	$(MAKE) build
 
 format:
@@ -73,10 +73,10 @@ all-gcc-rel:
 	cmake --preset=gcc-rel -DCMAKE_INSTALL_PREFIX=$(PREFIX) && cmake --build build $(JOBS) --target ccc tests samples
 
 all-dsan:
-	cmake --preset=dsan -DCMAKE_INSTALL_PREFIX=$(PREFIX) && cmake --build build $(JOBS) --target ccc tests samples
+	cmake --preset=gcc-dsan -DCMAKE_INSTALL_PREFIX=$(PREFIX) && cmake --build build $(JOBS) --target ccc tests samples
 
 all-rsan:
-	cmake --preset=rsan -DCMAKE_INSTALL_PREFIX=$(PREFIX) && cmake --build build $(JOBS) --target ccc tests samples
+	cmake --preset=gcc-rsan -DCMAKE_INSTALL_PREFIX=$(PREFIX) && cmake --build build $(JOBS) --target ccc tests samples
 
 all-clang-deb:
 	cmake --preset=clang-deb -DCMAKE_INSTALL_PREFIX=$(PREFIX) && cmake --build build $(JOBS) --target ccc tests samples
