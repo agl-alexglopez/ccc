@@ -504,7 +504,7 @@ alloc_front(struct ccc_fdeq *const fdeq)
     ccc_tribool const full
         = maybe_resize(fdeq, 1, fdeq->buf.alloc) != CCC_RESULT_OK;
     /* Should have been able to resize. Bad error. */
-    if (fdeq->buf.alloc != NULL && full)
+    if (fdeq->buf.alloc && full)
     {
         return NULL;
     }
