@@ -87,7 +87,7 @@ Add a `CMakeUserPresets.json` file so that you can run the sanitizer presets fou
 }
 ```
 
-Now, I am able to run the `dsan` and `rsan` sanitizer builds. Those configurations are hidden by default because `-fanalyzer` and sanitizer flags can be highly dependent on compilers, so it is best to get them set up based on one's own environment.
+Now, I am able to run the `dsan` and `rsan` sanitizer builds. There is a default sanitizer preset that is provided but setting up a custom preset with the most recent GCC compiler, preferably 14+, provides the most robust `-fanalyzer` and sanitizer diagnostics. GCC has been improving these diagnostic tools rapidly since version 14.
 
 ## Workflow
 
@@ -125,7 +125,9 @@ Formatting should be taken care of by the tools. Clang tidy will settle some sma
 
 Because this is a 3rd party library, we are responsible for avoiding undefined behavior and mysterious crashes from the user's perspective. This means checking any inputs to the user facing interface functions as non-NULL and valid for the operations we must complete.
 
-Every function has some way to return early. In the worst case we must return `NULL` early. In functions that let us return a result or status, we can return the type of error we encountered to the user and there are mechanisms in `types.h` for viewing or logging more detailed error messages. This library does not use `errno` style reporting and it does not crash the user program if compiled in release mode with any assert style mechanism. Using `assert` is only acceptable in this library code where internal invariants of the data structure are being checked and documentation for all functions must be written as if those asserts do not exist (they do not exist in releases). Asserts help in the development and testing stage rather than the user-facing releases.
+Every function has some way to return early. In the worst case we must return `NULL` early. In functions that let us return a result or status, we can return the type of error we encountered to the user and there are mechanisms in `types.h` for viewing or logging more detailed error messages. This library does not use `errno` style reporting and it does not crash the user program if compiled in release mode with any assert style mechanism. We also do not use an optional error reporting parameter to all functions. While this is a valid approach, it would detract from one of the design goals of this library: detailed initialization leads to cleaner container operations. Cluttering every container function call site with NULL parameters or allowing a container to provide a function that ignores errors is currently not a design priority.
+
+Using `assert` is only acceptable in this library code where internal invariants of the data structure are being checked and documentation for all functions must be written as if those asserts do not exist (they do not exist in releases). Asserts help in the development and testing stage rather than the user-facing releases.
 
 If an error can be checked and reported to the user in a meaningful way, there should be a direct if branch and return in the code rather than an assert. See the Entry Interface implementations in any of the associative containers for examples of this reporting style. There can still be improvements made to the current code in this regard.
 
@@ -163,17 +165,29 @@ Early returns make it easier to find and reason about the happy path. The only e
 
 Variable length arrays are strictly prohibited. All containers must be designed to accommodate a non-allocating mode. This means the user can initialize the container to have no allocation permissions. However, for some containers this poses a challenge.
 
-For example, a flat priority queue is a binary heap that operates by swapping elements. To swap elements we need a temporary space the size of one of the elements in the heap. To avoid dynamically allocating such a space--we might not have permission to do so--the heap simply saves the last slot in the array for swapping.
+For example, a flat priority queue is a binary heap that operates by swapping elements. To swap elements we need a temporary space the size of one of the elements in the heap. To ensure the user can store exactly as many elements as they wish in the flat array all signatures for functions that require swapping internally ask for a swap slot. For example here is the pop operation signature.
 
-Other containers must find other solutions. The ordered map for example is a node based container that offers the `swap_entry` function.
+```c
+ccc_result ccc_fpq_pop(ccc_flat_priority_queue *fpq, void *tmp);
+
+```
+
+Other containers may do the same or be able to avoid pushing this space requirement to the user. Here is the ordered map swap entry operation that requires a swap slot.
 
 ```c
 [[nodiscard]] ccc_entry ccc_om_swap_entry(ccc_ordered_map *om,
-                                          ccc_omap_elem *key_val_handle,
+                                          ccc_omap_elem *key_val_output,
                                           ccc_omap_elem *tmp);
 ```
 
-The `swap_entry` function promises to return the old entry in the map if one existed and is now being replaced by the new key value. If the map has no allocation permission it cannot create space for this swap to occur. Therefore, it asks the user to decide where this space should come from by providing space for one of their type. However, containers try to avoid passing these space requirements on to the user when possible.
+For the equivalent handle version of this container the space requirement is handled internally.
+
+```c
+[[nodiscard]] ccc_handle ccc_hom_swap_handle(ccc_handle_ordered_map *hom,
+                                             void *key_val_output);
+```
+
+The handle version of the container is required to preserve the 0th slot in the array as the nil node so it is able to swap when needed with this extra slot.
 
 Variable length arrays are prohibited because they could cause hard to find bugs if the array caused a stack overflow in our library code for the user.
 
