@@ -46,8 +46,7 @@ jobs:
 
     - name: Build Debug Sanitized Checks GCC
       run: |
-        cmake --preset=gcc-dsan && cmake --build build --target ccc tests
-        cmake --build build --target install
+        cmake --preset=gcc-dsan && cmake --build build -j$(nproc) --target ccc tests
     
     - name: Test Debug Sanitized
       run: |
@@ -56,8 +55,7 @@ jobs:
     - name: Build Release Sanitized Checks GCC
       run: |
         make clean
-        cmake --preset=clang-rel && cmake --build build --target ccc tests
-        cmake --build build --target install
+        cmake --preset=gcc-rsan && cmake --build build -j$(nproc) --target ccc tests
         
     - name: Test Release Sanitized
       run: |
