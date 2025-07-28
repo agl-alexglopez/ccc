@@ -103,23 +103,18 @@ static str_view const directions
 
 /*=======================   Prototypes     ==================================*/
 
+#define logerr(string...) (void)fprintf(stderr, string)
+
 #define check(cond, ...)                                                       \
     do                                                                         \
     {                                                                          \
         if (!(cond))                                                           \
         {                                                                      \
-            __VA_OPT__((void)fprintf(stderr, __VA_ARGS__);)                    \
-            sv_print(stderr, directions);                                      \
+            __VA_OPT__(__VA_ARGS__)                                            \
+            (void)fprintf(stderr, "%s, %d, condition is false: %s\n",          \
+                          __FILE__, __LINE__, #cond);                          \
             exit(1);                                                           \
         }                                                                      \
-    }                                                                          \
-    while (0)
-
-#define QUIT_MSG(file, msg...)                                                 \
-    do                                                                         \
-    {                                                                          \
-        (void)fprintf(file, msg);                                              \
-        exit(1);                                                               \
     }                                                                          \
     while (0)
 
@@ -179,7 +174,8 @@ main(int argc, char *argv[])
             exe.type = COUNT;
             exe.freq_fn = print_top_n;
             struct int_conversion c = parse_n_ranks(sv_arg);
-            check(c.status != CONV_ER, "cannot convert -top= flag to int");
+            check(c.status != CONV_ER,
+                  logerr("cannot convert -top= flag to int"););
             exe.n = c.conversion;
         }
         else if (sv_starts_with(sv_arg, SV("-last=")))
@@ -187,7 +183,8 @@ main(int argc, char *argv[])
             exe.type = COUNT;
             exe.freq_fn = print_last_n;
             struct int_conversion c = parse_n_ranks(sv_arg);
-            check(c.status != CONV_ER, "cannot convert -last= flat to int");
+            check(c.status != CONV_ER,
+                  logerr("cannot convert -last= flat to int"););
             exe.n = c.conversion;
         }
         else if (sv_starts_with(sv_arg, SV("-alph=")))
@@ -195,7 +192,8 @@ main(int argc, char *argv[])
             exe.type = COUNT;
             exe.freq_fn = print_alpha_n;
             struct int_conversion c = parse_n_ranks(sv_arg);
-            check(c.status != CONV_ER, "cannot convert -alph= flag to int");
+            check(c.status != CONV_ER,
+                  logerr("cannot convert -alph= flag to int"););
             exe.n = c.conversion;
         }
         else if (sv_starts_with(sv_arg, SV("-ralph=")))
@@ -203,14 +201,16 @@ main(int argc, char *argv[])
             exe.type = COUNT;
             exe.freq_fn = print_ralpha_n;
             struct int_conversion c = parse_n_ranks(sv_arg);
-            check(c.status != CONV_ER, "cannot convert -ralph= flat to int");
+            check(c.status != CONV_ER,
+                  logerr("cannot convert -ralph= flat to int"););
             exe.n = c.conversion;
         }
         else if (sv_starts_with(sv_arg, SV("-find=")))
         {
             str_view const raw_word = sv_substr(
                 sv_arg, sv_find(sv_arg, 0, SV("=")) + 1, sv_len(sv_arg));
-            check(!sv_empty(raw_word), "-find= flag has invalid entry");
+            check(!sv_empty(raw_word),
+                  logerr("-find= flag has invalid entry"););
             exe.type = FIND;
             exe.find_fn = print_found;
             exe.w = raw_word;
@@ -219,7 +219,7 @@ main(int argc, char *argv[])
         {
             str_view const raw_file = sv_substr(
                 sv_arg, sv_find(sv_arg, 0, SV("=")) + 1, sv_len(sv_arg));
-            check(!sv_empty(raw_file), "file string is empty");
+            check(!sv_empty(raw_file), logerr("file string is empty"););
             exe.file = raw_file;
         }
         else if (sv_starts_with(sv_arg, SV("-h")))
@@ -229,13 +229,14 @@ main(int argc, char *argv[])
         }
         else
         {
-            QUIT_MSG(stderr, "unrecognized argument: %s\n", sv_begin(sv_arg));
+            logerr("unrecognized argument: %s\n", sv_begin(sv_arg));
+            return 1;
         }
     }
     FILE *const f = open_file(exe.file);
     if (!f)
     {
-        (void)fprintf(stderr, "error opening: %s\n", exe.file.s);
+        logerr("error opening: %s\n", exe.file.s);
         return 1;
     }
     if (exe.type == COUNT)
@@ -248,7 +249,8 @@ main(int argc, char *argv[])
     }
     else
     {
-        (void)fprintf(stderr, "invalid count or empty word searched\n");
+        logerr("invalid count or empty word searched\n");
+        return 1;
     }
     (void)fclose(f);
     return 0;
