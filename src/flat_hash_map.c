@@ -1058,7 +1058,7 @@ set_insert_tag(struct ccc_fhmap *const h, ccc_fhm_tag const m, size_t const i)
 
 /** Erases an element at the provided index from the tag array, forfeiting its
 data in the data array for re-use later. The erase procedure decides how to mark
-a removal from the table: deleted, or empty. Which option to choose is
+a removal from the table: deleted or empty. Which option to choose is
 determined by what is required to ensure the probing sequence works correctly in
 all future cases. */
 static inline void
