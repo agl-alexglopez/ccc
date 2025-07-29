@@ -413,8 +413,8 @@ Note that if this priority queue is min or max, the runtime is the same. */
 Deallocate the container or destroy the heap invariants. */
 /**@{*/
 
-/** @brief Destroys the fpq by sorting its data and returning a buffer. The data
-is sorted in `O(N * log(N))` time and `O(1)` space.
+/** @brief Destroys the fpq by sorting its data and returning the underlying
+buffer. The data is sorted in `O(N * log(N))` time and `O(1)` space.
 @param [in] fpq the fpq to be sorted and destroyed.
 @param [in] tmp a pointer to a dummy user type that will be used for swapping.
 @return a buffer filled from the back to the front by the fpq order. If the fpq
@@ -431,8 +431,12 @@ A simple way to provide a temp for swapping is with an inline compound literal
 reference provided directly to the function argument `&(name_of_type){}`.
 
 The underlying memory storage source for the fpq, a buffer, is not moved or
-copied during the sort. The sort is not inherently stable and uses the provided
-comparison function to the priority queue to order the elements. */
+copied during the sort. If a copy of the sorted data is preferred copy the data
+the data to another initialized fpq with the `ccc_fpq_copy` function first then
+sort that copy.
+
+The sort is not inherently stable and uses the provided comparison function to
+the fpq to order the elements. */
 [[nodiscard]] ccc_buffer ccc_fpq_heapsort(ccc_flat_priority_queue *fpq,
                                           void *tmp);
 
