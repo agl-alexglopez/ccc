@@ -692,12 +692,12 @@ ccc_fhm_clear(ccc_flat_hash_map *const h, ccc_any_type_destructor_fn *const fn)
     {
         return CCC_RESULT_ARG_ERROR;
     }
+    if (unlikely(is_uninitialized(h) || !h->mask || !h->tag))
+    {
+        return CCC_RESULT_OK;
+    }
     if (!fn)
     {
-        if (unlikely(is_uninitialized(h) || !h->mask || !h->tag))
-        {
-            return CCC_RESULT_OK;
-        }
         (void)memset(h->tag, TAG_EMPTY, mask_to_tag_bytes(h->mask));
         h->remain = mask_to_load_factor_cap(h->mask);
         h->count = 0;
@@ -1336,7 +1336,7 @@ rehash_resize(struct ccc_fhmap *const h, size_t const to_add,
               ccc_any_alloc_fn *const fn)
 {
     assert(((h->mask + 1) & h->mask) == 0);
-    size_t const new_pow2_cap = next_power_of_two(h->mask + 1 + to_add) << 1;
+    size_t const new_pow2_cap = next_power_of_two((h->mask + 1 + to_add) << 1);
     if (new_pow2_cap < (h->mask + 1))
     {
         return CCC_RESULT_MEM_ERROR;
@@ -1542,23 +1542,35 @@ is_power_of_two(size_t const n)
 /** Returns the total bytes used by the map in the contiguous allocation. This
 includes the bytes for the user data array (swap slot included) and the tag
 array. The tag array also has an duplicate group at the end that must be
-counted. */
+counted.
+
+This calculation includes any unusable padding bytes added to the end of the
+user data array. Padding may be required if the alignment of the user type is
+less than that of a group size. This will allow aligned group loads.
+
+This number of bytes should be consistently correct whether the map we are
+dealing with is fixed size or dynamic. A fixed size map could technically have
+more bytes as padding after the tag array but we never need or access those
+bytes so we are only interested in contiguous bytes from start of user data to
+last byte of tag array. */
 static inline size_t
 mask_to_total_bytes(size_t const sizeof_type, size_t const mask)
 {
-    return mask_to_data_bytes(sizeof_type, mask) + mask_to_tag_bytes(mask);
-}
-
-/** Returns the bytes needed for the tag metadata array. This includes the
-bytes for the duplicate group that is at the end of the tag array. */
-static inline size_t
-mask_to_tag_bytes(size_t const mask)
-{
-    static_assert(sizeof(ccc_fhm_tag) == sizeof(uint8_t));
     if (unlikely(!mask))
     {
         return 0;
     }
+    return mask_to_data_bytes(sizeof_type, mask) + mask_to_tag_bytes(mask);
+}
+
+/** Returns the bytes needed for the tag metadata array. This includes the
+bytes for the duplicate group that is at the end of the tag array.
+
+Assumes the mask is non-zero. */
+static inline size_t
+mask_to_tag_bytes(size_t const mask)
+{
+    static_assert(sizeof(ccc_fhm_tag) == sizeof(uint8_t));
     return mask + 1 + CCC_FHM_GROUP_SIZE;
 }
 
@@ -1566,7 +1578,9 @@ mask_to_tag_bytes(size_t const mask)
 87.5% percent. The returned count is the maximum allowable capacity that can
 store user tags and data before the load factor is reached. The total capacity
 of the table is (mask + 1) which is not the capacity that this function
-calculates. For example, if (mask + 1 = 64), then this function returns 56. */
+calculates. For example, if (mask + 1 = 64), then this function returns 56.
+
+Assumes the mask is non-zero. */
 static inline size_t
 mask_to_load_factor_cap(size_t const mask)
 {
@@ -1576,14 +1590,16 @@ mask_to_load_factor_cap(size_t const mask)
 /** Returns the number of bytes taken by the user data array. This includes the
 extra swap slot provided at the start of the array. This swap slot is never
 accounted for in load factor or capacity calculations but must be remembered in
-cases like this for resizing and allocation purposes. */
+cases like this for resizing and allocation purposes.
+
+Any unusable extra alignment padding bytes added to the end of the user data
+array are also accounted for here so that the tag array position starts after
+the correct number of aligned user data bytes. This allows aligned group loads.
+
+Assumes the mask is non-zero. */
 static inline size_t
 mask_to_data_bytes(size_t const sizeof_type, size_t const mask)
 {
-    if (unlikely(!mask))
-    {
-        return 0;
-    }
     /* Add two because there is always a bonus user data type at the 0th index
        of the data array for swapping purposes. */
     return ((sizeof_type * (mask + 2)) + CCC_FHM_GROUP_SIZE - 1)
