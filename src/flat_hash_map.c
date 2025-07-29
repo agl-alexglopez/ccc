@@ -169,7 +169,7 @@ requirement: it is only a byte so any address following the data array will be
 aligned. */
 struct fixed_map_test_type
 {
-    struct
+    alignas(CCC_FHM_GROUP_SIZE) struct
     {
         int i;
     } data[2 + 1];
@@ -332,8 +332,9 @@ static size_t match_next_one(match_mask *m);
 static ccc_tribool tag_full(ccc_fhm_tag m);
 static ccc_tribool tag_constant(ccc_fhm_tag m);
 static ccc_fhm_tag tag_from(uint64_t hash);
-static group group_load(ccc_fhm_tag const *src);
-static void group_store(ccc_fhm_tag *dst, group src);
+static group group_loadu(ccc_fhm_tag const *src);
+static group group_loada(ccc_fhm_tag const *src);
+static void group_storea(ccc_fhm_tag *dst, group src);
 static match_mask match_tag(group g, ccc_fhm_tag m);
 static match_mask match_empty(group g);
 static match_mask match_empty_deleted(group g);
@@ -624,7 +625,7 @@ ccc_fhm_begin(ccc_flat_hash_map const *const h)
     for (size_t i = 0; i < (h->mask + 1); i += CCC_FHM_GROUP_SIZE)
     {
         size_t const full
-            = match_trailing_one(match_full(group_load(&h->tag[i])));
+            = match_trailing_one(match_full(group_loada(&h->tag[i])));
         if (full != CCC_FHM_GROUP_SIZE)
         {
             return data_at(h, (i + full));
@@ -653,7 +654,7 @@ ccc_fhm_next(ccc_flat_hash_map const *const h,
     for (++i.count; i.count < (h->mask + 1); i.count += CCC_FHM_GROUP_SIZE)
     {
         size_t const full
-            = match_trailing_one(match_full(group_load(&h->tag[i.count])));
+            = match_trailing_one(match_full(group_loadu(&h->tag[i.count])));
         if (full != CCC_FHM_GROUP_SIZE)
         {
             size_t const next_i = (i.count + full);
@@ -1066,8 +1067,8 @@ erase(struct ccc_fhmap *const h, size_t const i)
 {
     assert(i <= h->mask);
     size_t const prev_i = (i - CCC_FHM_GROUP_SIZE) & h->mask;
-    match_mask const prev_empties = match_empty(group_load(&h->tag[prev_i]));
-    match_mask const empties = match_empty(group_load(&h->tag[i]));
+    match_mask const prev_empties = match_empty(group_loadu(&h->tag[prev_i]));
+    match_mask const empties = match_empty(group_loadu(&h->tag[i]));
     /* Leading means start at most significant bit aka last group member.
        Trailing means start at the least significant bit aka first group member.
 
@@ -1080,8 +1081,8 @@ erase(struct ccc_fhmap *const h, size_t const i)
        not stop too early. All the other entries in this group are either full
        or deleted and empty would incorrectly signal to search functions that
        the requested value does not exist in the table. Instead, the request
-       needs to see that hash collisions have created displacements that must
-       be probed past to be sure the element in question is absent.
+       needs to see that hash collisions or removals have created displacements
+       that must be probed past to be sure the element in question is absent.
 
        Because probing operates on groups this check ensures that any group
        load at any position that includes this item will continue as long as
@@ -1116,7 +1117,7 @@ find_key_or_slot(struct ccc_fhmap const *const h, void const *const key,
     ccc_ucount empty_deleted = {.error = CCC_RESULT_FAIL};
     do
     {
-        group const g = group_load(&h->tag[p.i]);
+        group const g = group_loadu(&h->tag[p.i]);
         match_mask m = match_tag(g, tag);
         for (size_t i_match = match_trailing_one(m);
              i_match != CCC_FHM_GROUP_SIZE; i_match = match_next_one(&m))
@@ -1175,7 +1176,7 @@ find_key_or_fail(struct ccc_fhmap const *const h, void const *const key,
     };
     do
     {
-        group const g = group_load(&h->tag[p.i]);
+        group const g = group_loadu(&h->tag[p.i]);
         match_mask m = match_tag(g, tag);
         for (size_t i_match = match_trailing_one(m);
              i_match != CCC_FHM_GROUP_SIZE; i_match = match_next_one(&m))
@@ -1209,8 +1210,8 @@ find_slot_or_noreturn(struct ccc_fhmap const *const h, uint64_t const hash)
     };
     do
     {
-        size_t const i
-            = match_trailing_one(match_empty_deleted(group_load(&h->tag[p.i])));
+        size_t const i = match_trailing_one(
+            match_empty_deleted(group_loadu(&h->tag[p.i])));
         if (likely(i != CCC_FHM_GROUP_SIZE))
         {
             return (p.i + i) & mask;
@@ -1275,8 +1276,8 @@ rehash_in_place(struct ccc_fhmap *const h)
     size_t const mask = h->mask;
     for (size_t i = 0; i < mask + 1; i += CCC_FHM_GROUP_SIZE)
     {
-        group_store(&h->tag[i], group_constant_to_empty_full_to_deleted(
-                                    group_load(&h->tag[i])));
+        group_storea(&h->tag[i], group_constant_to_empty_full_to_deleted(
+                                     group_loada(&h->tag[i])));
     }
     (void)memcpy(h->tag + (mask + 1), h->tag, CCC_FHM_GROUP_SIZE);
     for (size_t i = 0; i < mask + 1; ++i)
@@ -1358,9 +1359,7 @@ rehash_resize(struct ccc_fhmap *const h, size_t const to_add,
     new_h.remain = mask_to_load_factor_cap(new_h.mask);
     new_h.data = new_buf;
     /* Our static assertions at start of file guarantee this is correct. */
-    new_h.tag
-        = (ccc_fhm_tag *)((char *)new_buf
-                          + mask_to_data_bytes(new_h.sizeof_type, new_h.mask));
+    new_h.tag = tag_pos(new_h.sizeof_type, new_buf, new_h.mask);
     (void)memset(new_h.tag, TAG_EMPTY, mask_to_tag_bytes(new_h.mask));
     for (size_t i = 0; i < (h->mask + 1); ++i)
     {
@@ -1547,12 +1546,7 @@ counted. */
 static inline size_t
 mask_to_total_bytes(size_t const sizeof_type, size_t const mask)
 {
-    if (!sizeof_type || !mask)
-    {
-        return 0;
-    }
-    /* Add two to mask at first due to swap slot. */
-    return ((mask + 2) * sizeof_type) + ((mask + 1) + CCC_FHM_GROUP_SIZE);
+    return mask_to_data_bytes(sizeof_type, mask) + mask_to_tag_bytes(mask);
 }
 
 /** Returns the bytes needed for the tag metadata array. This includes the
@@ -1561,7 +1555,7 @@ static inline size_t
 mask_to_tag_bytes(size_t const mask)
 {
     static_assert(sizeof(ccc_fhm_tag) == sizeof(uint8_t));
-    if (!mask)
+    if (unlikely(!mask))
     {
         return 0;
     }
@@ -1586,9 +1580,14 @@ cases like this for resizing and allocation purposes. */
 static inline size_t
 mask_to_data_bytes(size_t const sizeof_type, size_t const mask)
 {
+    if (unlikely(!mask))
+    {
+        return 0;
+    }
     /* Add two because there is always a bonus user data type at the 0th index
        of the data array for swapping purposes. */
-    return sizeof_type * (mask + 2);
+    return ((sizeof_type * (mask + 2)) + CCC_FHM_GROUP_SIZE - 1)
+         & ~(CCC_FHM_GROUP_SIZE - 1);
 }
 
 /** Returns the correct position of the start of the tag array given the base
@@ -1791,21 +1790,30 @@ match_full(group const g)
 
 /*=========================  Group Implementations   ========================*/
 
+/** Loads a group starting at src into a 128 bit vector. This is a aligned
+load and the user must ensure the load will not go off then end of the tag
+array. */
+static inline group
+group_loada(ccc_fhm_tag const *const src)
+{
+    return (group){_mm_load_si128((__m128i *)src)};
+}
+
+/** Stores the src group to dst. The store is aligned and the user must ensure
+the store will not go off the end of the tag array. */
+static inline void
+group_storea(ccc_fhm_tag *const dst, group const src)
+{
+    _mm_store_si128((__m128i *)dst, src.v);
+}
+
 /** Loads a group starting at src into a 128 bit vector. This is an unaligned
 load and the user must ensure the load will not go off then end of the tag
 array. */
 static inline group
-group_load(ccc_fhm_tag const *const src)
+group_loadu(ccc_fhm_tag const *const src)
 {
     return (group){_mm_loadu_si128((__m128i *)src)};
-}
-
-/** Stores the src group to dst. The store is unaligned and the user must ensure
-the store will not go off the end of the tag array. */
-static inline void
-group_store(ccc_fhm_tag *const dst, group const src)
-{
-    _mm_storeu_si128((__m128i *)dst, src.v);
 }
 
 /** Converts the empty and deleted constants all TAG_EMPTY and the full
@@ -1902,20 +1910,29 @@ match_full(group const g)
 /*=========================  Group Implementations   ========================*/
 
 /** Loads a group starting at src into a 8x8 (64) bit vector. This is an
-unaligned load and the user must ensure the load will not go off then end of the
+aligned load and the user must ensure the load will not go off then end of the
 tag array. */
 static inline group
-group_load(ccc_fhm_tag const *const src)
+group_loada(ccc_fhm_tag const *const src)
 {
     return (group){vld1_u8(&src->v)};
 }
 
-/** Stores the src group to dst. The store is unaligned and the user must ensure
+/** Stores the src group to dst. The store is aligned and the user must ensure
 the store will not go off the end of the tag array. */
 static inline void
-group_store(ccc_fhm_tag *const dst, group const src)
+group_storea(ccc_fhm_tag *const dst, group const src)
 {
     vst1_u8(&dst->v, src.v);
+}
+
+/** Loads a group starting at src into a 8x8 (64) bit vector. This is an
+unaligned load and the user must ensure the load will not go off then end of the
+tag array. */
+static inline group
+group_loadu(ccc_fhm_tag const *const src)
+{
+    return (group){vld1_u8(&src->v)};
 }
 
 /** Converts the empty and deleted constants all TAG_EMPTY and the full
@@ -2033,7 +2050,7 @@ match_full(group const g)
 
 /** Loads tags into a group without violating strict aliasing. */
 static inline group
-group_load(ccc_fhm_tag const *const src)
+group_loada(ccc_fhm_tag const *const src)
 {
     group g;
     (void)memcpy(&g, src, sizeof(g));
@@ -2042,9 +2059,18 @@ group_load(ccc_fhm_tag const *const src)
 
 /** Stores a group back into the tag array without violating strict aliasing. */
 static inline void
-group_store(ccc_fhm_tag *const dst, group const src)
+group_storea(ccc_fhm_tag *const dst, group const src)
 {
     (void)memcpy(dst, &src, sizeof(src));
+}
+
+/** Loads tags into a group without violating strict aliasing. */
+static inline group
+group_loadu(ccc_fhm_tag const *const src)
+{
+    group g;
+    (void)memcpy(&g, src, sizeof(g));
+    return g;
 }
 
 /** Converts the empty and deleted constants all TAG_EMPTY and the full

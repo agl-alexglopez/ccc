@@ -18,6 +18,7 @@ limitations under the License.
 
 /** @cond */
 #include <assert.h>
+#include <stdalign.h>
 #include <stddef.h>
 #include <stdint.h>
 /** @endcond */
@@ -203,7 +204,7 @@ declared and initialized containers which is very convenient in C. */
                   "128, 256, etc.)");                                          \
     typedef struct                                                             \
     {                                                                          \
-        key_val_type_name data[(capacity) + 1];                                \
+        alignas(CCC_FHM_GROUP_SIZE) key_val_type_name data[(capacity) + 1];    \
         ccc_fhm_tag tag[(capacity) + CCC_FHM_GROUP_SIZE];                      \
     }(fixed_map_type_name)
 
