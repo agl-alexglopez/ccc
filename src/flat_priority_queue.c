@@ -297,7 +297,7 @@ ccc_fpq_copy(ccc_flat_priority_queue *const dst,
     dst->buf.mem = dst_mem;
     dst->buf.capacity = dst_cap;
     dst->buf.alloc = dst_alloc;
-    if (!src->buf.capacity)
+    if (!src->buf.count)
     {
         return CCC_RESULT_OK;
     }
@@ -314,8 +314,10 @@ ccc_fpq_copy(ccc_flat_priority_queue *const dst,
     {
         return CCC_RESULT_ARG_ERROR;
     }
+    /* It is ok to only copy count elements because we know that all elements
+       in a binary heap are contiguous from [0, C), where C is count. */
     (void)memcpy(dst->buf.mem, src->buf.mem,
-                 src->buf.capacity * src->buf.sizeof_type);
+                 src->buf.count * src->buf.sizeof_type);
     return CCC_RESULT_OK;
 }
 
