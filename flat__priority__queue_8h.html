@@ -208,7 +208,7 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr><td class="ititle" colspan="2"><p>Deallocate the container or destroy the heap invariants. </p>
 </td></tr>
 <tr class="memitem:a46f0ae8fcbfd9f3d6cb1667c5e428826"><td class="memItemLeft" align="right" valign="top">ccc_buffer&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a46f0ae8fcbfd9f3d6cb1667c5e428826">ccc_fpq_heapsort</a> (<a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> *fpq, void *tmp)</td></tr>
-<tr class="memdesc:a46f0ae8fcbfd9f3d6cb1667c5e428826"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroys the fpq by sorting its data and returning a buffer. The data is sorted in <code>O(N * log(N))</code> time and <code>O(1)</code> space.  <br /></td></tr>
+<tr class="memdesc:a46f0ae8fcbfd9f3d6cb1667c5e428826"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroys the fpq by sorting its data and returning the underlying buffer. The data is sorted in <code>O(N * log(N))</code> time and <code>O(1)</code> space.  <br /></td></tr>
 <tr class="separator:a46f0ae8fcbfd9f3d6cb1667c5e428826"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8ae67e38b248056c21865d20978d42bf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__priority__queue_8h.html#a8ae67e38b248056c21865d20978d42bf">ccc_fpq_clear</a> (<a class="el" href="flat__priority__queue_8h.html#a5fd5a6ed6546b30a2f61de13d7f97817">ccc_flat_priority_queue</a> *fpq, <a class="el" href="types_8h.html#a97f231bd3df31cb2730e3304d4cc1dd2">ccc_any_type_destructor_fn</a> *fn)</td></tr>
 <tr class="memdesc:a8ae67e38b248056c21865d20978d42bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clears the fpq calling fn on every element if provided. O(1)-O(N).  <br /></td></tr>
@@ -1213,7 +1213,7 @@ This graph shows which files directly or indirectly include this file:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Destroys the fpq by sorting its data and returning a buffer. The data is sorted in <code>O(N * log(N))</code> time and <code>O(1)</code> space. </p>
+<p>Destroys the fpq by sorting its data and returning the underlying buffer. The data is sorted in <code>O(N * log(N))</code> time and <code>O(1)</code> space. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">fpq</td><td>the fpq to be sorted and destroyed. </td></tr>
@@ -1224,7 +1224,8 @@ This graph shows which files directly or indirectly include this file:</div>
 <dl class="section return"><dt>Returns</dt><dd>a buffer filled from the back to the front by the fpq order. If the fpq is initialized CCC_LES the returned buffer is sorted in non-increasing order from index [0, N). If the fpq is initialized CCC_GRT the buffer is sorted in non-descending order from index [0, N). If fpq is NULL, the buffer is default initialized and unusable. </dd></dl>
 <dl class="section warning"><dt>Warning</dt><dd>all fields of the fpq are cleared or otherwise default initialized so the fpq is unusable as a container after sorting. This function assumes the fpq has been previously initialized. Therefore, if the returned buffer value is not used the fpq memory is leaked.</dd></dl>
 <p>A simple way to provide a temp for swapping is with an inline compound literal reference provided directly to the function argument <code>&amp;(name_of_type){}</code>.</p>
-<p>The underlying memory storage source for the fpq, a buffer, is not moved or copied during the sort. The sort is not inherently stable and uses the provided comparison function to the priority queue to order the elements. </p>
+<p>The underlying memory storage source for the fpq, a buffer, is not moved or copied during the sort. If a copy of the sorted data is preferred copy the data the data to another initialized fpq with the <code>ccc_fpq_copy</code> function first then sort that copy.</p>
+<p>The sort is not inherently stable and uses the provided comparison function to the fpq to order the elements. </p>
 
 </div>
 </div>
