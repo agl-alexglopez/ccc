@@ -85,6 +85,7 @@ enum : typeof((match_mask){}.v)
 {
     /** @private MSB tag bit used for static assert. */
     MATCH_MASK_MSB = 0x8000,
+    MATCH_MASK_ALL_ON_BUT_0TH_TAG = 0xFFFE,
 };
 
 #elif defined(CCC_HAS_ARM_SIMD)
@@ -115,6 +116,14 @@ enum : uint64_t
     MATCH_MASK_TAGS_LSBS = 0x101010101010101,
     /** @private Debug mode check for bits that must be off in match. */
     MATCH_MASK_TAGS_OFF_BITS = 0x7F7F7F7F7F7F7F7F,
+    /** @private All bits on for each tag except for the 0th tag. */
+    MATCH_MASK_ALL_ON_BUT_0TH_TAG = 0xFFFFFFFFFFFFFF00,
+};
+
+enum : typeof((ccc_fhm_tag){}.v)
+{
+    /** @private Bits in a tag used to help in creating a group of one tag. */
+    TAG_BITS = sizeof(ccc_fhm_tag) * CHAR_BIT,
 };
 
 #else /* PORTABLE FALLBACK */
@@ -146,6 +155,8 @@ enum : typeof((group){}.v)
     MATCH_MASK_TAGS_LSBS = 0x101010101010101,
     /** @private Debug mode check for bits that must be off in match. */
     MATCH_MASK_TAGS_OFF_BITS = 0x7F7F7F7F7F7F7F7F,
+    /** @private All bits on for each tag except for the 0th tag. */
+    MATCH_MASK_ALL_ON_BUT_0TH_TAG = 0xFFFFFFFFFFFFFF00,
 };
 
 enum : typeof((ccc_fhm_tag){}.v)
@@ -342,6 +353,7 @@ static match_mask match_tag(group g, ccc_fhm_tag m);
 static match_mask match_empty(group g);
 static match_mask match_empty_deleted(group g);
 static match_mask match_full(group g);
+static match_mask match_leading_full(group g, size_t start_tag);
 static group group_constant_to_empty_full_to_deleted(group g);
 static unsigned ctz(match_mask m);
 static unsigned clz(match_mask m);
@@ -619,8 +631,7 @@ ccc_fhm_remove(ccc_flat_hash_map *const h, void *const key_val_type_output)
 void *
 ccc_fhm_begin(ccc_flat_hash_map const *const h)
 {
-    if (unlikely(!h || !h->mask || is_uninitialized(h) || !h->mask
-                 || !h->count))
+    if (unlikely(!h || !h->mask || is_uninitialized(h) || !h->count))
     {
         return NULL;
     }
@@ -650,22 +661,26 @@ ccc_fhm_next(ccc_flat_hash_map const *const h,
     {
         return NULL;
     }
+    size_t const group_base_i
+        = i.count & ~((typeof(i.count))(CCC_FHM_GROUP_SIZE - 1));
+    match_mask m = match_leading_full(group_loada(&h->tag[group_base_i]),
+                                      i.count % CCC_FHM_GROUP_SIZE);
+    size_t const bit = match_next_one(&m);
+    if (bit != CCC_FHM_GROUP_SIZE)
+    {
+        return data_at(h, group_base_i + bit);
+    }
     /* It is OK to start at iterating group by group because we have the replica
        group at the end of the tag array so even loading a group from the last
        possible slot in the map will result in a safe load. */
-    for (++i.count; i.count < (h->mask + 1); i.count += CCC_FHM_GROUP_SIZE)
+    for (i.count = group_base_i + CCC_FHM_GROUP_SIZE; i.count < (h->mask + 1);
+         i.count += CCC_FHM_GROUP_SIZE)
     {
         size_t const full
-            = match_trailing_one(match_full(group_loadu(&h->tag[i.count])));
+            = match_trailing_one(match_full(group_loada(&h->tag[i.count])));
         if (full != CCC_FHM_GROUP_SIZE)
         {
-            size_t const next_i = (i.count + full);
-            /* This would be the replica group at the end of the tag array. */
-            if (next_i >= (h->mask + 1))
-            {
-                return NULL;
-            }
-            return data_at(h, next_i);
+            return data_at(h, i.count + full);
         }
     }
     return NULL;
@@ -1809,6 +1824,18 @@ match_full(group const g)
     return (match_mask){~match_empty_deleted(g).v};
 }
 
+/** Matches all full tag slots into a mask excluding the starting position and
+only considering the leading full slots from this position. Assumes start bit
+is 0 indexed such that only the exclusive range of leading bits is considered
+(start_tag, CCC_FHM_GROUP_SIZE). All trailing bits in the inclusive range from
+[0, start_tag] are zeroed out in the mask. */
+static inline match_mask
+match_leading_full(group const g, size_t const start_tag)
+{
+    return (match_mask){(~match_empty_deleted(g).v)
+                        & (MATCH_MASK_ALL_ON_BUT_0TH_TAG << start_tag)};
+}
+
 /*=========================  Group Implementations   ========================*/
 
 /** Loads a group starting at src into a 128 bit vector. This is a aligned
@@ -1919,6 +1946,28 @@ match_full(group const g)
     uint8x8_t const cmp = vcgez_s8(vreinterpret_s8_u8(g.v));
     match_mask const res = {
         vget_lane_u64(vreinterpret_u64_u8(cmp), 0) & MATCH_MASK_TAGS_MSBS,
+    };
+    assert(
+        (res.v & MATCH_MASK_TAGS_OFF_BITS) == 0
+        && "For bit counting and iteration purposes the most significant bit "
+           "in every byte will indicate a match for a tag has occurred.");
+    return res;
+}
+
+/** Returns a 0 based match with every bit on representing those tags in the
+group that are occupied by a user hash value leading from the provided start
+bit. These are those tags that have the most significant bit off and the lower 7
+bits occupied by user hash. All bits in the tags from [0, start_tag] are zeroed
+out such that only the tags in the range (start_tag, CCC_FHM_GROUP_SIZE) are
+considered. */
+static inline match_mask
+match_leading_full(group const g, size_t const start_tag)
+{
+    uint8x8_t const cmp = vcgez_s8(vreinterpret_s8_u8(g.v));
+    match_mask const res = {
+        (vget_lane_u64(vreinterpret_u64_u8(cmp), 0)
+         & (MATCH_MASK_ALL_ON_BUT_0TH_TAG << (start_tag * TAG_BITS)))
+            & MATCH_MASK_TAGS_MSBS,
     };
     assert(
         (res.v & MATCH_MASK_TAGS_OFF_BITS) == 0
@@ -2064,6 +2113,21 @@ static inline match_mask
 match_full(group const g)
 {
     return to_little_endian((match_mask){(~g.v) & MATCH_MASK_TAGS_MSBS});
+}
+
+/** Returns a 0 based match with every bit on representing those tags in the
+group that are occupied by a user hash value leading from the provided start
+bit. These are those tags that have the most significant bit off and the lower 7
+bits occupied by user hash. All bits in the tags from [0, start_tag] are zeroed
+out such that only the tags in the range (start_tag, CCC_FHM_GROUP_SIZE) are
+considered. */
+static inline match_mask
+match_leading_full(group const g, size_t const start_tag)
+{
+    return to_little_endian((match_mask){
+        ((~g.v) & (MATCH_MASK_ALL_ON_BUT_0TH_TAG << (start_tag * TAG_BITS)))
+            & MATCH_MASK_TAGS_MSBS,
+    });
 }
 
 /*=========================  Group Implementations   ========================*/
