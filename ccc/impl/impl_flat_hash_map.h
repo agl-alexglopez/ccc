@@ -185,14 +185,10 @@ The declaration specifies that we have one extra data slot for swapping during
 in place rehashing and some interface functions and an extra duplicate group
 of tags at the end of the tag array for safer group loading.
 
-Finally, we must align the leading user type to an alignment at least as strict
-as that of the group size. If the alignment of the leading user data array is a
-multiple greater than or equal to that of a group size, that is OK and the tag
-array will be aligned. If the leading user data type has a lower alignment than
-the group size, this technique brings the alignment up to the required size. For
-dynamic maps we also add the necessary byte padding at the end of the data array
-before the tag array at runtime so all code should not care whether the map is
-of fixed or dynamic size. */
+Finally, we must align the tag array to start on an aligned group size byte
+boundary to be able to perform aligned loads and stores. This allows the user
+data array to be tightly packed and any padding will be added after the last
+user data element to ensure the tag array is aligned to the group size. */
 #define ccc_impl_fhm_declare_fixed_map(fixed_map_type_name, key_val_type_name, \
                                        capacity)                               \
     static_assert((capacity) > 0,                                              \
@@ -205,8 +201,9 @@ of fixed or dynamic size. */
                   "128, 256, etc.)");                                          \
     typedef struct                                                             \
     {                                                                          \
-        alignas(CCC_FHM_GROUP_SIZE) key_val_type_name data[(capacity) + 1];    \
-        ccc_fhm_tag tag[(capacity) + CCC_FHM_GROUP_SIZE];                      \
+        key_val_type_name data[(capacity) + 1];                                \
+        alignas(CCC_FHM_GROUP_SIZE)                                            \
+            ccc_fhm_tag tag[(capacity) + CCC_FHM_GROUP_SIZE];                  \
     }(fixed_map_type_name)
 
 /** @private If the user does not want to remember the capacity they chose
