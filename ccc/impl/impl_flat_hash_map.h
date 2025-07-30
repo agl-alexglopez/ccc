@@ -91,23 +91,34 @@ case the arrays are in one contiguous allocation but split as follows:
 
 (N == capacity - 1) Where capacity is a power of 2. (G == group size - 1).
 
-┌────┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┐
-│Swap│D_N│...│D_1│D_0│T_0│T_1│...│T_N│R_0│R_1│...│R_G│
-└─┬──┴───┴───┴───┴───┼───┴───┴───┴───┼───┴───┴───┴───┘
-┌─┴───────────┐ ┌────┴────────┐ ┌────┴─────────────────────────────────────┐
-│Swap slot for│ │Shared base  │ │Start of replica of first group to support│
-│in place     │ │address of   │ │a group load that starts at T_N as well as│
-│rehashing.   │ │Data and Tag.│ │erase and inserts. This means R_G is never│
-│Size = 1 data│ │arrays.      │ │needed but duplicated for branchless ops. │
-└─────────────┘ └─────────────┘ └──────────────────────────────────────────┘
+┌───┬───┬───┬───┬────┬───┬───┬───┬───┬───┬───┬───┬───┐
+│D_0│D_1│...│D_N│Swap│T_0│T_1│...│T_N│R_0│R_1│...│R_G│
+└───┴───┴───┴───┴─┬──┼───┴───┴───┴───┼───┴───┴───┴───┘
+  ┌───────────────┘  │               │
+┌─┴───────────┐ ┌────┴─────────┐ ┌───┴──────────────────────────────────────┐
+│Swap slot for│ │Base address  │ │Start of replica of first group to support│
+│in place     │ │of Tag array. │ │a group load that starts at T_N as well as│
+│rehashing.   │ │Possible pad  │ │erase and inserts. This means R_G is never│
+│Size = 1 data│ │bytes between.│ │needed but duplicated for branchless ops. │
+└─────────────┘ └──────────────┘ └──────────────────────────────────────────┘
 
-The Data array has a reverse layout so that indices will be found as a
-subtracted address offset from the shared base location. Individual elements are
-still written into the slots in a normal fashion--such that functions like
-memcpy work normally--we simply count backwards from the shared base.The
-tag array ascends normally. The tag array is located on the next byte address
-from the 0th data element because it's size is only a byte meaning a shared base
-address is possible with no alignment issues. */
+This is a different layout than Rust's Hashbrown table. Instead of a shared
+base address of the data and tag arrays with padding at the start of the data
+array, we use a normal two array layout with padding between. This is because
+we must allow the user to allocate a hash table at compile time in the data
+segment or on the stack. The fixed size map defined at compile time is a struct
+and structs in the C standard are specified to have no padding at the start.
+Therefore, so that the code within the map does not care whether it deals with
+a fixed or dynamic map, we must assume data starts at the base address and that
+there may be zero or more bytes of padding between the data and tag arrays for
+alignment.
+
+We may lose some of the assembly optimizations in indexing that Rust's table
+gets by adding and subtracting from a shared base address. However, this table
+still needs to use byte offset multiplication because the data is stored as
+`void *` so we don't have the same optimizations available to us as Rust's
+template generic system. Simple 0 based indexing makes the addition and
+multiplication we perform as simple as possible. */
 struct ccc_fhmap
 {
     /** Reversed user type data array. */
@@ -186,9 +197,7 @@ in place rehashing and some interface functions and an extra duplicate group
 of tags at the end of the tag array for safer group loading.
 
 Finally, we must align the tag array to start on an aligned group size byte
-boundary to be able to perform aligned loads and stores. This allows the user
-data array to be tightly packed and any padding will be added after the last
-user data element to ensure the tag array is aligned to the group size. */
+boundary to be able to perform aligned loads and stores. */
 #define ccc_impl_fhm_declare_fixed_map(fixed_map_type_name, key_val_type_name, \
                                        capacity)                               \
     static_assert((capacity) > 0,                                              \

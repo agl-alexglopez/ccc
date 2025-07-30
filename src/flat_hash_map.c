@@ -163,8 +163,6 @@ for calculating bytes. This way we can use in static asserts. */
 #define comptime_roundup(bytes_to_round)                                       \
     (((bytes_to_round) + CCC_FHM_GROUP_SIZE - 1) & ~(CCC_FHM_GROUP_SIZE - 1))
 
-#define comptime_padding(bytes) (-(bytes) & (CCC_FHM_GROUP_SIZE - 1))
-
 /** @private The following test should ensure some safety in assumptions we make
 when the user defines a fixed size map type. This is just a small type that
 will remain internal to this translation unit. The tag array is not given a
@@ -223,65 +221,6 @@ static_assert(
                + comptime_roundup((sizeof(data_tag_layout_test.data))),
     "Manual pointer arithmetic from the base of data array to find "
     "tag array should result in correct location.");
-/** Here is an example of how we access user data slots. We take whatever the
-index is of the tag element and add one. Then we subtract the bytes needed to
-access this user data slot. We add one because our shared base index is at the
-next byte boundary AFTER the final user data element (consider the error of
-subtracting 0 from the tag array for the 0th array element!).
-
-We also always have an extra allocation of the user type at the start of the
-data array for swapping purposes because variable length arrays are banned and
-allocation might not be permitted. */
-static_assert(
-    (char *)(data_tag_layout_test.tag
-             - comptime_padding(sizeof(data_tag_layout_test.data))
-             - (sizeof(*data_tag_layout_test.data) * (0 + 1)))
-        == (char *)&data_tag_layout_test.data[2],
-    "With a perfectly aligned shared user data and tag array base address, "
-    "pointer subtraction for user data must work as expected.");
-static_assert(
-    (char *)(data_tag_layout_test.tag
-             - comptime_padding(sizeof(data_tag_layout_test.data))
-             - (sizeof(*data_tag_layout_test.data) * (1 + 1)))
-        == (char *)&data_tag_layout_test.data[1],
-    "With a perfectly aligned shared user data and tag array base address, "
-    "pointer subtraction for user data must work as expected.");
-static_assert(
-    (char *)(data_tag_layout_test.tag
-             - comptime_padding(sizeof(data_tag_layout_test.data))
-             - (sizeof(*data_tag_layout_test.data) * (2 + 1)))
-        == (char *)&data_tag_layout_test.data[0],
-    "With a perfectly aligned shared user data and tag array base address, "
-    "pointer subtraction for user data must work as expected.");
-
-/** On rare occasions we have to calculate the index of a user data element.
-This uses pointer difference calculations but the pointer difference between
-the base of the tag array and an element will be incorrect if we don't account
-for padding. */
-static_assert(((((char *)data_tag_layout_test.tag
-                 - (char *)&data_tag_layout_test.data[2])
-                - comptime_padding(sizeof(data_tag_layout_test.data)))
-               / sizeof(*data_tag_layout_test.data))
-                      - 1
-                  == 0,
-              "The last element in the data array is the 0th index given our "
-              "reverse indexing.");
-static_assert(((((char *)data_tag_layout_test.tag
-                 - (char *)&data_tag_layout_test.data[1])
-                - comptime_padding(sizeof(data_tag_layout_test.data)))
-               / sizeof(*data_tag_layout_test.data))
-                      - 1
-                  == 1,
-              "The middle element in the data array is the 1st index given our "
-              "reverse indexing.");
-static_assert(((((char *)data_tag_layout_test.tag
-                 - (char *)&data_tag_layout_test.data[0])
-                - comptime_padding(sizeof(data_tag_layout_test.data)))
-               / sizeof(*data_tag_layout_test.data))
-                      - 1
-                  == 2,
-              "The first element in the data array is the 2nd index given our "
-              "reverse indexing.");
 /** We only want to align the tag array to the correct byte boundary otherwise
 we could be aligning all the user data elements to a larger alignment than
 needed, wasting space. This makes other code slightly more complicated but it
@@ -413,7 +352,6 @@ static size_t to_power_of_two(size_t n);
 static ccc_tribool is_uninitialized(struct ccc_fhmap const *);
 static void destory_each(struct ccc_fhmap *h, ccc_any_type_destructor_fn *);
 static size_t roundup(size_t bytes);
-static size_t padding(size_t bytes);
 
 /*===========================    Interface   ================================*/
 
@@ -1528,33 +1466,27 @@ static inline void *
 data_at(struct ccc_fhmap const *const h, size_t const i)
 {
     assert(i <= h->mask);
-    return h->tag - padding(h->sizeof_type * (h->mask + 2))
-         - ((i + 1) * h->sizeof_type);
+    return (char *)h->data + (i * h->sizeof_type);
 }
 
 static inline ccc_ucount
 data_i(struct ccc_fhmap const *const h, void const *const data_slot)
 {
-    if ((char *)data_slot >= (char *)h->tag
-        || (char *)data_slot <= (char *)h->data)
+    if (unlikely((char *)data_slot
+                     >= (char *)h->data + (h->sizeof_type * (h->mask + 1))
+                 || (char *)data_slot < (char *)h->data))
     {
         return (ccc_ucount){.error = CCC_RESULT_ARG_ERROR};
     }
-    /* Subtract one to account for the base of the 0th element in the data
-       array being one size of type away from the tag array address. The 0th
-       data element is NOT at the same address at the tag array address. */
     return (ccc_ucount){
-        .count = ((((char *)h->tag - padding(h->sizeof_type * (h->mask + 2)))
-                   - (char *)data_slot)
-                  / h->sizeof_type)
-               - 1,
+        .count = ((char *)data_slot - (char *)h->data) / h->sizeof_type,
     };
 }
 
 static inline void *
 swap_slot(struct ccc_fhmap const *h)
 {
-    return h->data;
+    return (char *)h->data + (h->sizeof_type * (h->mask + 1));
 }
 
 static inline void
@@ -1701,16 +1633,6 @@ static inline size_t
 roundup(size_t const bytes)
 {
     return (bytes + CCC_FHM_GROUP_SIZE - 1) & ~(CCC_FHM_GROUP_SIZE - 1);
-}
-
-/** Returns the padding that would be added to the given bytes to bring its
-alignment up to that of the group size of the map. Expects bytes provided not
-to have already been rounded up but such an input would only result in 0
-bytes of padding. */
-static inline size_t
-padding(size_t bytes)
-{
-    return -bytes & (CCC_FHM_GROUP_SIZE - 1);
 }
 
 /*=====================   Intrinsics and Generics   =========================*/
