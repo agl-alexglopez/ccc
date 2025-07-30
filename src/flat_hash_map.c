@@ -1828,10 +1828,13 @@ match_full(group const g)
 only considering the leading full slots from this position. Assumes start bit
 is 0 indexed such that only the exclusive range of leading bits is considered
 (start_tag, CCC_FHM_GROUP_SIZE). All trailing bits in the inclusive range from
-[0, start_tag] are zeroed out in the mask. */
+[0, start_tag] are zeroed out in the mask.
+
+Assumes start tag is less than group size. */
 static inline match_mask
 match_leading_full(group const g, size_t const start_tag)
 {
+    assert(start_tag < CCC_FHM_GROUP_SIZE);
     return (match_mask){(~match_empty_deleted(g).v)
                         & (MATCH_MASK_ALL_ON_BUT_0TH_TAG << start_tag)};
 }
@@ -1959,10 +1962,13 @@ group that are occupied by a user hash value leading from the provided start
 bit. These are those tags that have the most significant bit off and the lower 7
 bits occupied by user hash. All bits in the tags from [0, start_tag] are zeroed
 out such that only the tags in the range (start_tag, CCC_FHM_GROUP_SIZE) are
-considered. */
+considered.
+
+Assumes start tag is less than group size. */
 static inline match_mask
 match_leading_full(group const g, size_t const start_tag)
 {
+    assert(start_tag < CCC_FHM_GROUP_SIZE);
     uint8x8_t const cmp = vcgez_s8(vreinterpret_s8_u8(g.v));
     match_mask const res = {
         (vget_lane_u64(vreinterpret_u64_u8(cmp), 0)
@@ -2120,10 +2126,13 @@ group that are occupied by a user hash value leading from the provided start
 bit. These are those tags that have the most significant bit off and the lower 7
 bits occupied by user hash. All bits in the tags from [0, start_tag] are zeroed
 out such that only the tags in the range (start_tag, CCC_FHM_GROUP_SIZE) are
-considered. */
+considered.
+
+Assumes start_tag is less than group size. */
 static inline match_mask
 match_leading_full(group const g, size_t const start_tag)
 {
+    assert(start_tag < CCC_FHM_GROUP_SIZE);
     return to_little_endian((match_mask){
         ((~g.v) & (MATCH_MASK_ALL_ON_BUT_0TH_TAG << (start_tag * TAG_BITS)))
             & MATCH_MASK_TAGS_MSBS,
