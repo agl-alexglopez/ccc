@@ -311,6 +311,7 @@ static struct query find_key_or_slot(struct ccc_fhmap const *h, void const *key,
 static ccc_ucount find_key_or_fail(struct ccc_fhmap const *h, void const *key,
                                    uint64_t hash);
 static size_t find_slot_or_noreturn(struct ccc_fhmap const *h, uint64_t hash);
+static void *find_first_full_slot(struct ccc_fhmap const *h, size_t start);
 static ccc_result maybe_rehash(struct ccc_fhmap *h, size_t to_add,
                                ccc_any_alloc_fn);
 static void insert_and_copy(struct ccc_fhmap *h, void const *key_val_type,
@@ -635,16 +636,7 @@ ccc_fhm_begin(ccc_flat_hash_map const *const h)
     {
         return NULL;
     }
-    for (size_t i = 0; i < (h->mask + 1); i += CCC_FHM_GROUP_SIZE)
-    {
-        size_t const full
-            = match_trailing_one(match_full(group_loada(&h->tag[i])));
-        if (full != CCC_FHM_GROUP_SIZE)
-        {
-            return data_at(h, (i + full));
-        }
-    }
-    return NULL;
+    return find_first_full_slot(h, 0);
 }
 
 void *
@@ -661,29 +653,16 @@ ccc_fhm_next(ccc_flat_hash_map const *const h,
     {
         return NULL;
     }
-    size_t const group_base_i
+    size_t const aligned_group_start
         = i.count & ~((typeof(i.count))(CCC_FHM_GROUP_SIZE - 1));
-    match_mask m = match_leading_full(group_loada(&h->tag[group_base_i]),
+    match_mask m = match_leading_full(group_loada(&h->tag[aligned_group_start]),
                                       i.count % CCC_FHM_GROUP_SIZE);
     size_t const bit = match_next_one(&m);
     if (bit != CCC_FHM_GROUP_SIZE)
     {
-        return data_at(h, group_base_i + bit);
+        return data_at(h, aligned_group_start + bit);
     }
-    /* It is OK to start at iterating group by group because we have the replica
-       group at the end of the tag array so even loading a group from the last
-       possible slot in the map will result in a safe load. */
-    for (i.count = group_base_i + CCC_FHM_GROUP_SIZE; i.count < (h->mask + 1);
-         i.count += CCC_FHM_GROUP_SIZE)
-    {
-        size_t const full
-            = match_trailing_one(match_full(group_loada(&h->tag[i.count])));
-        if (full != CCC_FHM_GROUP_SIZE)
-        {
-            return data_at(h, i.count + full);
-        }
-    }
-    return NULL;
+    return find_first_full_slot(h, aligned_group_start + CCC_FHM_GROUP_SIZE);
 }
 
 void *
@@ -1238,6 +1217,27 @@ find_slot_or_noreturn(struct ccc_fhmap const *const h, uint64_t const hash)
         p.i &= mask;
     }
     while (1);
+}
+
+/** Finds the first occupied slot in the table. The full slot is one where the
+user has hash bits occupying the lower 7 bits of the tag. Assumes that the start
+index is the base index of a group of tags such that as we scan groups the
+loads are aligned for performance. */
+static void *
+find_first_full_slot(struct ccc_fhmap const *const h, size_t start)
+{
+    assert((start & ~((size_t)(CCC_FHM_GROUP_SIZE - 1))) == start);
+    while (start < (h->mask + 1))
+    {
+        size_t const full
+            = match_trailing_one(match_full(group_loada(&h->tag[start])));
+        if (full != CCC_FHM_GROUP_SIZE)
+        {
+            return data_at(h, start + full);
+        }
+        start += CCC_FHM_GROUP_SIZE;
+    }
+    return NULL;
 }
 
 /** Accepts the map, elements to add, and an allocation function if resizing
