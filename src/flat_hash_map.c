@@ -158,6 +158,13 @@ enum : typeof((ccc_fhm_tag){}.v)
 
 /*=======================   Data Alignment Test   ===========================*/
 
+/** @private A macro version of the runtime alignment operations we perform
+for calculating bytes. This way we can use in static asserts. */
+#define comptime_roundup(bytes_to_round)                                       \
+    (((bytes_to_round) + CCC_FHM_GROUP_SIZE - 1) & ~(CCC_FHM_GROUP_SIZE - 1))
+
+#define comptime_padding(bytes) (-(bytes) & (CCC_FHM_GROUP_SIZE - 1))
+
 /** @private The following test should ensure some safety in assumptions we make
 when the user defines a fixed size map type. This is just a small type that
 will remain internal to this translation unit. The tag array is not given a
@@ -169,17 +176,17 @@ requirement: it is only a byte so any address following the data array will be
 aligned. */
 struct fixed_map_test_type
 {
-    alignas(CCC_FHM_GROUP_SIZE) struct
+    struct
     {
         int i;
     } data[2 + 1];
-    ccc_fhm_tag tag[2];
+    alignas(CCC_FHM_GROUP_SIZE) ccc_fhm_tag tag[2];
 };
-/* The type must actually get an allocation on the given platform to validate
+/** The type must actually get an allocation on the given platform to validate
 some memory layout assumptions. This should be sufficient and the assumptions
 will hold if the user happens to allocate a fixed size map on the stack. */
 static struct fixed_map_test_type data_tag_layout_test;
-/* The size of the user data and tags should be what we expect. No hidden
+/** The size of the user data and tags should be what we expect. No hidden
 padding should violate our mental model of the bytes occupied by contiguous user
 data and metadata tags. We don't care about padding after the tag array which
 may very well exist. The continuity from the base of the user data to the start
@@ -190,11 +197,12 @@ Over index the tag array to get the end address for pointer differences. The
 first byte of the struct with no padding BEFORE this first element. */
 static_assert(
     (char *)&data_tag_layout_test.tag[2] - (char *)&data_tag_layout_test.data[0]
-        == ((sizeof(*data_tag_layout_test.data) * 3) + sizeof(ccc_fhm_tag) * 2),
+        == (comptime_roundup((sizeof(data_tag_layout_test.data)))
+            + sizeof(ccc_fhm_tag) * 2),
     "The size in bytes of the contiguous user data to tag array must be what "
     "we would expect with no padding that will interfere with pointer "
     "arithmetic.");
-/* We must ensure that the tags array starts at the exact next byte boundary
+/** We must ensure that the tags array starts at the exact next byte boundary
 after the user data type. This is required due to how we access tags and user
 data via indexing. Data is accessed with pointer subtraction from the tags
 array. The tags array 0th element is the shared base for both arrays.
@@ -202,18 +210,20 @@ array. The tags array 0th element is the shared base for both arrays.
 Data has decreasing indices and tags have ascending indices. Here we index too
 far for our type with padding to ensure the next assertion will hold when we
 index from the shared tags base address and subtract to find user data. */
-static_assert((char *)&data_tag_layout_test.data[3]
+static_assert((char *)&data_tag_layout_test.data
+                      + comptime_roundup((sizeof(data_tag_layout_test.data)))
                   == (char *)&data_tag_layout_test.tag,
               "The start of the tag array must align perfectly with the next "
               "byte past the final user data element.");
-/* Same as the above test but this is how the location of the tag array would be
-found in normal runtime code. */
-static_assert((char *)&data_tag_layout_test.tag
-                  == (char *)&data_tag_layout_test.data
-                         + (sizeof(*data_tag_layout_test.data) * 3),
-              "Manual pointer arithmetic from the base of data array to find "
-              "tag array should result in correct location.");
-/* Here is an example of how we access user data slots. We take whatever the
+/** Same as the above test but this is how the location of the tag array would
+be found in normal runtime code. */
+static_assert(
+    (char *)&data_tag_layout_test.tag
+        == (char *)&data_tag_layout_test.data
+               + comptime_roundup((sizeof(data_tag_layout_test.data))),
+    "Manual pointer arithmetic from the base of data array to find "
+    "tag array should result in correct location.");
+/** Here is an example of how we access user data slots. We take whatever the
 index is of the tag element and add one. Then we subtract the bytes needed to
 access this user data slot. We add one because our shared base index is at the
 next byte boundary AFTER the final user data element (consider the error of
@@ -224,10 +234,64 @@ data array for swapping purposes because variable length arrays are banned and
 allocation might not be permitted. */
 static_assert(
     (char *)(data_tag_layout_test.tag
-             - ((2 + 1) * sizeof(*data_tag_layout_test.data)))
+             - comptime_padding(sizeof(data_tag_layout_test.data))
+             - (sizeof(*data_tag_layout_test.data) * (0 + 1)))
+        == (char *)&data_tag_layout_test.data[2],
+    "With a perfectly aligned shared user data and tag array base address, "
+    "pointer subtraction for user data must work as expected.");
+static_assert(
+    (char *)(data_tag_layout_test.tag
+             - comptime_padding(sizeof(data_tag_layout_test.data))
+             - (sizeof(*data_tag_layout_test.data) * (1 + 1)))
+        == (char *)&data_tag_layout_test.data[1],
+    "With a perfectly aligned shared user data and tag array base address, "
+    "pointer subtraction for user data must work as expected.");
+static_assert(
+    (char *)(data_tag_layout_test.tag
+             - comptime_padding(sizeof(data_tag_layout_test.data))
+             - (sizeof(*data_tag_layout_test.data) * (2 + 1)))
         == (char *)&data_tag_layout_test.data[0],
     "With a perfectly aligned shared user data and tag array base address, "
     "pointer subtraction for user data must work as expected.");
+
+/** On rare occasions we have to calculate the index of a user data element.
+This uses pointer difference calculations but the pointer difference between
+the base of the tag array and an element will be incorrect if we don't account
+for padding. */
+static_assert(((((char *)data_tag_layout_test.tag
+                 - (char *)&data_tag_layout_test.data[2])
+                - comptime_padding(sizeof(data_tag_layout_test.data)))
+               / sizeof(*data_tag_layout_test.data))
+                      - 1
+                  == 0,
+              "The last element in the data array is the 0th index given our "
+              "reverse indexing.");
+static_assert(((((char *)data_tag_layout_test.tag
+                 - (char *)&data_tag_layout_test.data[1])
+                - comptime_padding(sizeof(data_tag_layout_test.data)))
+               / sizeof(*data_tag_layout_test.data))
+                      - 1
+                  == 1,
+              "The middle element in the data array is the 1st index given our "
+              "reverse indexing.");
+static_assert(((((char *)data_tag_layout_test.tag
+                 - (char *)&data_tag_layout_test.data[0])
+                - comptime_padding(sizeof(data_tag_layout_test.data)))
+               / sizeof(*data_tag_layout_test.data))
+                      - 1
+                  == 2,
+              "The first element in the data array is the 2nd index given our "
+              "reverse indexing.");
+/** We only want to align the tag array to the correct byte boundary otherwise
+we could be aligning all the user data elements to a larger alignment than
+needed, wasting space. This makes other code slightly more complicated but it
+is better for space usage and aligned performance. We must be careful to account
+for the padding between the end of the data array and the base for pointer
+arithmetic and difference calculations. */
+static_assert((offsetof(struct fixed_map_test_type, tag) % CCC_FHM_GROUP_SIZE)
+                  == 0,
+              "The tag array starts at an aligned group size byte boundary "
+              "within the struct.");
 
 /*=======================    Special Constants    ===========================*/
 
@@ -348,6 +412,8 @@ static ccc_tribool is_power_of_two(size_t n);
 static size_t to_power_of_two(size_t n);
 static ccc_tribool is_uninitialized(struct ccc_fhmap const *);
 static void destory_each(struct ccc_fhmap *h, ccc_any_type_destructor_fn *);
+static size_t roundup(size_t bytes);
+static size_t padding(size_t bytes);
 
 /*===========================    Interface   ================================*/
 
@@ -423,7 +489,6 @@ ccc_fhm_entry(ccc_flat_hash_map *const h, void const *const key)
 void *
 ccc_fhm_or_insert(ccc_fhmap_entry const *const e, void const *key_val_type)
 {
-
     if (unlikely(!e || !key_val_type))
     {
         return NULL;
@@ -443,7 +508,6 @@ ccc_fhm_or_insert(ccc_fhmap_entry const *const e, void const *key_val_type)
 void *
 ccc_fhm_insert_entry(ccc_fhmap_entry const *const e, void const *key_val_type)
 {
-
     if (unlikely(!e || !key_val_type))
     {
         return NULL;
@@ -1457,15 +1521,15 @@ eq_fn(struct ccc_fhmap const *const h, void const *const key, size_t const i)
 static inline void *
 key_at(struct ccc_fhmap const *const h, size_t const i)
 {
-    assert(i <= h->mask);
-    return (char *)(h->tag - ((i + 1) * h->sizeof_type)) + h->key_offset;
+    return (char *)data_at(h, i) + h->key_offset;
 }
 
 static inline void *
 data_at(struct ccc_fhmap const *const h, size_t const i)
 {
     assert(i <= h->mask);
-    return h->tag - ((i + 1) * h->sizeof_type);
+    return h->tag - padding(h->sizeof_type * (h->mask + 2))
+         - ((i + 1) * h->sizeof_type);
 }
 
 static inline ccc_ucount
@@ -1480,7 +1544,10 @@ data_i(struct ccc_fhmap const *const h, void const *const data_slot)
        array being one size of type away from the tag array address. The 0th
        data element is NOT at the same address at the tag array address. */
     return (ccc_ucount){
-        .count = (((char *)h->tag - (char *)data_slot) / h->sizeof_type) - 1,
+        .count = ((((char *)h->tag - padding(h->sizeof_type * (h->mask + 2)))
+                   - (char *)data_slot)
+                  / h->sizeof_type)
+               - 1,
     };
 }
 
@@ -1602,8 +1669,7 @@ mask_to_data_bytes(size_t const sizeof_type, size_t const mask)
 {
     /* Add two because there is always a bonus user data type at the 0th index
        of the data array for swapping purposes. */
-    return ((sizeof_type * (mask + 2)) + CCC_FHM_GROUP_SIZE - 1)
-         & ~(CCC_FHM_GROUP_SIZE - 1);
+    return roundup(sizeof_type * (mask + 2));
 }
 
 /** Returns the correct position of the start of the tag array given the base
@@ -1628,6 +1694,23 @@ static inline ccc_tribool
 is_uninitialized(struct ccc_fhmap const *const h)
 {
     return !h->data || !h->tag;
+}
+
+/** Rounds up the provided bytes to a valid alignment for group size. */
+static inline size_t
+roundup(size_t const bytes)
+{
+    return (bytes + CCC_FHM_GROUP_SIZE - 1) & ~(CCC_FHM_GROUP_SIZE - 1);
+}
+
+/** Returns the padding that would be added to the given bytes to bring its
+alignment up to that of the group size of the map. Expects bytes provided not
+to have already been rounded up but such an input would only result in 0
+bytes of padding. */
+static inline size_t
+padding(size_t bytes)
+{
+    return -bytes & (CCC_FHM_GROUP_SIZE - 1);
 }
 
 /*=====================   Intrinsics and Generics   =========================*/
@@ -1867,7 +1950,6 @@ masks is easier and counting bits make sense in the find loops. */
 static inline match_mask
 match_tag(group const g, ccc_fhm_tag const m)
 {
-
     match_mask const res = {
         vget_lane_u64(vreinterpret_u64_u8(vceq_u8(g.v, vdup_n_u8(m.v))), 0)
             & MATCH_MASK_TAGS_MSBS,
