@@ -313,6 +313,8 @@ static ccc_ucount find_key_or_fail(struct ccc_fhmap const *h, void const *key,
                                    uint64_t hash);
 static size_t find_slot_or_noreturn(struct ccc_fhmap const *h, uint64_t hash);
 static void *find_first_full_slot(struct ccc_fhmap const *h, size_t start);
+static match_mask find_first_full_group(struct ccc_fhmap const *h,
+                                        size_t *start);
 static ccc_result maybe_rehash(struct ccc_fhmap *h, size_t to_add,
                                ccc_any_alloc_fn);
 static void insert_and_copy(struct ccc_fhmap *h, void const *key_val_type,
@@ -353,6 +355,7 @@ static group group_loada(ccc_fhm_tag const *src);
 static void group_storea(ccc_fhm_tag *dst, group src);
 static match_mask match_tag(group g, ccc_fhm_tag m);
 static match_mask match_empty(group g);
+static match_mask match_deleted(group g);
 static match_mask match_empty_deleted(group g);
 static match_mask match_full(group g);
 static match_mask match_leading_full(group g, size_t start_tag);
@@ -1116,8 +1119,8 @@ find_key_or_slot(struct ccc_fhmap const *const h, void const *const key,
     {
         group const g = group_loadu(&h->tag[p.i]);
         match_mask m = match_tag(g, tag);
-        for (size_t i_match = match_trailing_one(m);
-             i_match != CCC_FHM_GROUP_SIZE; i_match = match_next_one(&m))
+        for (size_t i_match = match_next_one(&m); i_match != CCC_FHM_GROUP_SIZE;
+             i_match = match_next_one(&m))
         {
             i_match = (p.i + i_match) & mask;
             if (likely(eq_fn(h, key, i_match)))
@@ -1175,8 +1178,8 @@ find_key_or_fail(struct ccc_fhmap const *const h, void const *const key,
     {
         group const g = group_loadu(&h->tag[p.i]);
         match_mask m = match_tag(g, tag);
-        for (size_t i_match = match_trailing_one(m);
-             i_match != CCC_FHM_GROUP_SIZE; i_match = match_next_one(&m))
+        for (size_t i_match = match_next_one(&m); i_match != CCC_FHM_GROUP_SIZE;
+             i_match = match_next_one(&m))
         {
             i_match = (p.i + i_match) & mask;
             if (likely(eq_fn(h, key, i_match)))
@@ -1195,8 +1198,9 @@ find_key_or_fail(struct ccc_fhmap const *const h, void const *const key,
     while (1);
 }
 
-/** Finds an insert slot or loops forever. The caller of this function must know
-that there is an available empty or deleted slot in the table. */
+/** Finds the first available empty or deleted insert slot or loops forever. The
+caller of this function must know that there is an available empty or deleted
+slot in the table. */
 static size_t
 find_slot_or_noreturn(struct ccc_fhmap const *const h, uint64_t const hash)
 {
@@ -1224,7 +1228,7 @@ find_slot_or_noreturn(struct ccc_fhmap const *const h, uint64_t const hash)
 user has hash bits occupying the lower 7 bits of the tag. Assumes that the start
 index is the base index of a group of tags such that as we scan groups the
 loads are aligned for performance. */
-static void *
+static inline void *
 find_first_full_slot(struct ccc_fhmap const *const h, size_t start)
 {
     assert((start & ~((size_t)(CCC_FHM_GROUP_SIZE - 1))) == start);
@@ -1239,6 +1243,52 @@ find_first_full_slot(struct ccc_fhmap const *const h, size_t start)
         start += CCC_FHM_GROUP_SIZE;
     }
     return NULL;
+}
+
+/** Returns the first full group mask if found and progresses the start index
+as needed to find the index corresponding to the first element of this group.
+If no group with a full slot is found a 0 mask is returned and the index will
+have been progressed past mask + 1 aka capacity.
+
+Assumes that start is aligned to the 0th tag of a group and only progresses
+start by the size of a group such that it is always aligned. */
+static inline match_mask
+find_first_full_group(struct ccc_fhmap const *const h, size_t *const start)
+{
+    assert((*start & ~((size_t)(CCC_FHM_GROUP_SIZE - 1))) == *start);
+    while (*start < (h->mask + 1))
+    {
+        match_mask const full = match_full(group_loada(&h->tag[*start]));
+        if (full.v)
+        {
+            return full;
+        }
+        *start += CCC_FHM_GROUP_SIZE;
+    }
+    return (match_mask){};
+}
+
+/** Returns the first deleted group mask if found and progresses the start index
+as needed to find the index corresponding to the first deleted element of this
+group. If no group with a deleted slot is found a 0 mask is returned and the
+index will have been progressed past mask + 1 aka capacity.
+
+Assumes that start is aligned to the 0th tag of a group and only progresses
+start by the size of a group such that it is always aligned. */
+static inline match_mask
+find_first_deleted_group(struct ccc_fhmap const *const h, size_t *const start)
+{
+    assert((*start & ~((size_t)(CCC_FHM_GROUP_SIZE - 1))) == *start);
+    while (*start < (h->mask + 1))
+    {
+        match_mask const full = match_deleted(group_loada(&h->tag[*start]));
+        if (full.v)
+        {
+            return full;
+        }
+        *start += CCC_FHM_GROUP_SIZE;
+    }
+    return (match_mask){};
 }
 
 /** Accepts the map, elements to add, and an allocation function if resizing
@@ -1298,41 +1348,61 @@ rehash_in_place(struct ccc_fhmap *const h)
                                      group_loada(&h->tag[i])));
     }
     (void)memcpy(h->tag + (mask + 1), h->tag, CCC_FHM_GROUP_SIZE);
-    for (size_t i = 0; i < mask + 1; ++i)
+    size_t group_start = 0;
+    match_mask deleted = {};
+    /* Due to the load factor being roughly 87% we could have large spans of
+       unoccupied slots in large tables (full slots we have converted to deleted
+       tags). We can speed things up by performing aligned group scans checking
+       for any groups with elements that need to be rehashed. */
+    while ((deleted = find_first_deleted_group(h, &group_start)).v)
     {
-        if (h->tag[i].v != TAG_DELETED)
+        for (size_t tag = match_next_one(&deleted); tag != CCC_FHM_GROUP_SIZE;
+             tag = match_next_one(&deleted))
         {
-            continue;
-        }
-        do
-        {
-            uint64_t const hash = hash_fn(h, key_at(h, i));
-            size_t const new_i = find_slot_or_noreturn(h, hash);
-            ccc_fhm_tag const hash_tag = tag_from(hash);
-            /* We analyze groups not slots. Do not move the element to another
-               slot in the same group load. The tag is in the proper group for a
-               load and match and does not need relocation. */
-            if (likely(is_same_group(i, new_i, hash, mask)))
+            size_t const i = group_start + tag;
+            /* The inner loop swap case may have made a previously deleted entry
+               in this group filled with the swapped element's hash. The mask
+               cannot be updated to notice this and the swapped element was
+               taken care of by retrying to find a slot in the innermost loop.
+               Therefore skip this slot. It no longer needs processing. */
+            if (h->tag[i].v != TAG_DELETED)
             {
-                tag_set(h, hash_tag, i);
-                break; /* continues outer loop */
+                continue;
             }
-            ccc_fhm_tag const occupant = h->tag[new_i];
-            tag_set(h, hash_tag, new_i);
-            if (occupant.v == TAG_EMPTY)
+            do
             {
-                tag_set(h, (ccc_fhm_tag){TAG_EMPTY}, i);
-                (void)memcpy(data_at(h, new_i), data_at(h, i), h->sizeof_type);
-                break; /* continues outer loop */
+                uint64_t const hash = hash_fn(h, key_at(h, i));
+                size_t const new_i = find_slot_or_noreturn(h, hash);
+                ccc_fhm_tag const hash_tag = tag_from(hash);
+                /* We analyze groups not slots. Do not move the element to
+                   another slot in the same unaligned group load. The tag is in
+                   the proper group for an unaligned load based on where the
+                   hashed value will start its loads and the match and does not
+                   need relocation. */
+                if (likely(is_same_group(i, new_i, hash, mask)))
+                {
+                    tag_set(h, hash_tag, i);
+                    break; /* continues outer loop */
+                }
+                ccc_fhm_tag const occupant = h->tag[new_i];
+                tag_set(h, hash_tag, new_i);
+                if (occupant.v == TAG_EMPTY)
+                {
+                    tag_set(h, (ccc_fhm_tag){TAG_EMPTY}, i);
+                    (void)memcpy(data_at(h, new_i), data_at(h, i),
+                                 h->sizeof_type);
+                    break; /* continues outer loop */
+                }
+                /* The other slots data has been swapped and we rehash every
+                   element for this algorithm so there is no need to write its
+                   tag to this slot. It's data is correct location already. */
+                assert(occupant.v == TAG_DELETED);
+                swap(swap_slot(h), data_at(h, i), data_at(h, new_i),
+                     h->sizeof_type);
             }
-            /* The other slots data has been swapped and we rehash every
-               element for this algorithm so there is no need to write its
-               tag to this slot. It's data is in correct location already. */
-            assert(occupant.v == TAG_DELETED);
-            swap(swap_slot(h), data_at(h, i), data_at(h, new_i),
-                 h->sizeof_type);
+            while (1);
         }
-        while (1);
+        group_start += CCC_FHM_GROUP_SIZE;
     }
     h->remain = mask_to_load_factor_cap(mask) - h->count;
 }
@@ -1379,16 +1449,21 @@ rehash_resize(struct ccc_fhmap *const h, size_t const to_add,
     /* Our static assertions at start of file guarantee this is correct. */
     new_h.tag = tag_pos(new_h.sizeof_type, new_buf, new_h.mask);
     (void)memset(new_h.tag, TAG_EMPTY, mask_to_tag_bytes(new_h.mask));
-    for (size_t i = 0; i < (h->mask + 1); ++i)
+    size_t group_start = 0;
+    match_mask full = {};
+    while ((full = find_first_full_group(h, &group_start)).v)
     {
-        if (tag_full(h->tag[i]))
+        for (size_t tag = match_next_one(&full); tag != CCC_FHM_GROUP_SIZE;
+             tag = match_next_one(&full))
         {
+            size_t const i = group_start + tag;
             uint64_t const hash = hash_fn(h, key_at(h, i));
             size_t const new_i = find_slot_or_noreturn(&new_h, hash);
             tag_set(&new_h, tag_from(hash), new_i);
             (void)memcpy(data_at(&new_h, new_i), data_at(h, i),
                          new_h.sizeof_type);
         }
+        group_start += CCC_FHM_GROUP_SIZE;
     }
     new_h.remain -= h->count;
     new_h.count = h->count;
@@ -1723,9 +1798,9 @@ match_trailing_one(match_mask const m)
 }
 
 /** A function to aid in iterating over on bits/indices in a match. The
-function returns the 0-based next on index and then adjusts the mask
-appropriately for future iteration by removing the lowest on index bit. If no
-on bits are found the width of the mask is returned and iteration should end. */
+function returns the 0-based index of the current on index and then adjusts the
+mask appropriately for future iteration by removing the lowest on index bit. If
+no bits are found the width of the mask is returned. */
 static inline size_t
 match_next_one(match_mask *const m)
 {
@@ -1805,6 +1880,15 @@ match_empty(group const g)
     return match_tag(g, (ccc_fhm_tag){TAG_EMPTY});
 }
 
+/** Returns 0 based match with every bit on representing those tags in
+group g that are the deleted special constant. The user must interpret this 0
+based index in the context of the probe sequence. */
+static inline match_mask
+match_deleted(group const g)
+{
+    return match_tag(g, (ccc_fhm_tag){TAG_DELETED});
+}
+
 /** Returns a 0 based match with every bit on representing those tags
 in the group that are the special constant empty or deleted. These are easy
 to find because they are the one tags in a group with the most significant
@@ -1868,10 +1952,22 @@ group_loadu(ccc_fhm_tag const *const src)
     return (group){_mm_loadu_si128((__m128i *)src)};
 }
 
-/** Converts the empty and deleted constants all TAG_EMPTY and the full
-tags representing hashed user data TAG_DELETED. Making the hashed data
-deleted is OK because it will only turn on the previously unused most
-significant bit. This does not affect user hashed data. */
+/** Converts the empty and deleted constants all TAG_EMPTY and the full tags
+representing hashed user data TAG_DELETED. This will result in the hashed
+fingerprint lower 7 bits of the user data being lost, so a rehash will be
+required for the data corresponding to this slot.
+
+For example, both of the special constant tags will be converted as follows.
+
+TAG_EMPTY   = 0b1111_1111 -> 0b1111_1111
+TAG_DELETED = 0b1000_0000 -> 0b1111_1111
+
+The full tags with hashed user data will be converted as follows.
+
+TAG_FULL = 0b0101_1101 -> 0b1000_000
+
+The hashed bits are lost because the full slot has the high bit off and
+therefore is not a match for the constants mask. */
 static inline group
 group_constant_to_empty_full_to_deleted(group const g)
 {
@@ -1921,6 +2017,15 @@ static inline match_mask
 match_empty(group const g)
 {
     return match_tag(g, (ccc_fhm_tag){TAG_EMPTY});
+}
+
+/** Returns 0 based match_mask with every bit on representing those tags in
+group g that are the empty special constant. The user must interpret this 0
+based index in the context of the probe sequence. */
+static inline match_mask
+match_deleted(group const g)
+{
+    return match_tag(g, (ccc_fhm_tag){TAG_DELETED});
 }
 
 /** Returns a 0 based match with every bit on representing those tags
@@ -2011,10 +2116,22 @@ group_loadu(ccc_fhm_tag const *const src)
     return (group){vld1_u8(&src->v)};
 }
 
-/** Converts the empty and deleted constants all TAG_EMPTY and the full
-tags representing hashed user data TAG_DELETED. Making the hashed data
-deleted is OK because it will only turn on the previously unused most
-significant bit. This does not affect user hashed data. */
+/** Converts the empty and deleted constants all TAG_EMPTY and the full tags
+representing hashed user data TAG_DELETED. This will result in the hashed
+fingerprint lower 7 bits of the user data being lost, so a rehash will be
+required for the data corresponding to this slot.
+
+For example, both of the special constant tags will be converted as follows.
+
+TAG_EMPTY   = 0b1111_1111 -> 0b1111_1111
+TAG_DELETED = 0b1000_0000 -> 0b1111_1111
+
+The full tags with hashed user data will be converted as follows.
+
+TAG_FULL = 0b0101_1101 -> 0b1000_000
+
+The hashed bits are lost because the full slot has the high bit off and
+therefore is not a match for the constants mask. */
 static inline group
 group_constant_to_empty_full_to_deleted(group const g)
 {
@@ -2105,6 +2222,14 @@ match_empty(group const g)
     });
 }
 
+/** Returns a match_mask with the most significant bit in every byte on if
+that tag in g is empty. */
+static inline match_mask
+match_deleted(group const g)
+{
+    return match_tag(g, (ccc_fhm_tag){TAG_DELETED});
+}
+
 /** Returns a match with the most significant bit in every byte on if
 that tag in g is empty or deleted. This is found by the most significant bit. */
 static inline match_mask
@@ -2167,10 +2292,22 @@ group_loadu(ccc_fhm_tag const *const src)
     return g;
 }
 
-/** Converts the empty and deleted constants all TAG_EMPTY and the full
-tags representing hashed user data TAG_DELETED. Making the hashed data
-deleted is OK because it will only turn on the previously unused most
-significant bit. This does not affect user hashed data. */
+/** Converts the empty and deleted constants all TAG_EMPTY and the full tags
+representing hashed user data TAG_DELETED. This will result in the hashed
+fingerprint lower 7 bits of the user data being lost, so a rehash will be
+required for the data corresponding to this slot.
+
+For example, both of the special constant tags will be converted as follows.
+
+TAG_EMPTY   = 0b1111_1111 -> 0b1111_1111
+TAG_DELETED = 0b1000_0000 -> 0b1111_1111
+
+The full tags with hashed user data will be converted as follows.
+
+TAG_FULL = 0b0101_1101 -> 0b1000_000
+
+The hashed bits are lost because the full slot has the high bit off and
+therefore is not a match for the constants mask. */
 static inline group
 group_constant_to_empty_full_to_deleted(group g)
 {
