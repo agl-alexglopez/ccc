@@ -249,9 +249,14 @@ static_assert((offsetof(struct fixed_map_test_type, tag) % CCC_FHM_GROUP_SIZE)
 /** @private Range of constants specified as special for this hash table. Same
 general design as Rust Hashbrown table. Importantly, we know these are special
 constants because the most significant bit is on and then empty can be easily
-distinguished from deleted by the least significant bit. The full case occurs
-when the most significant bit is off and the next 7 bits are available for the
-fingerprint of the user hash. */
+distinguished from deleted by the least significant bit.
+
+The full case is implicit in the table as it cannot be quantified by a simple
+enum value.
+
+TAG_FULL = 0b0???_????
+
+The most significant bit is off and the lower 7 make up the hash bits. */
 enum : typeof((ccc_fhm_tag){}.v)
 {
     /** @private Deleted is applied when a removed value in a group must signal
@@ -260,7 +265,6 @@ enum : typeof((ccc_fhm_tag){}.v)
     /** @private Empty is the starting tag value and applied when other empties
     are in a group upon removal. */
     TAG_EMPTY = 0xFF,
-    /* TAG_FULL = 0b0???????, */
     /** @private Used to verify if tag is constant or hash data. */
     TAG_MSB = TAG_DELETED,
     /** @private Used to create a one byte fingerprint of user hash. */
