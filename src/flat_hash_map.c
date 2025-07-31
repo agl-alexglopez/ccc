@@ -85,6 +85,7 @@ enum : typeof((match_mask){}.v)
 {
     /** @private MSB tag bit used for static assert. */
     MATCH_MASK_MSB = 0x8000,
+    /** @private All bits on in a mask except for the 0th tag bit. */
     MATCH_MASK_0TH_TAG_OFF = 0xFFFE,
 };
 
