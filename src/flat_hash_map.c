@@ -1399,7 +1399,8 @@ rehash_in_place(struct ccc_fhmap *const h)
                 }
                 /* The other slots data has been swapped and we rehash every
                    element for this algorithm so there is no need to write its
-                   tag to this slot. It's data is correct location already. */
+                   tag to this slot. It's data is in the correct location and
+                   we now will loop to try to find it a rehashed slot. */
                 assert(occupant.v == TAG_DELETED);
                 swap(swap_slot(h), data_at(h, i), data_at(h, new_i),
                      h->sizeof_type);
