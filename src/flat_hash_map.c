@@ -85,7 +85,7 @@ enum : typeof((match_mask){}.v)
 {
     /** @private MSB tag bit used for static assert. */
     MATCH_MASK_MSB = 0x8000,
-    MATCH_MASK_ALL_ON_BUT_0TH_TAG = 0xFFFE,
+    MATCH_MASK_0TH_TAG_OFF = 0xFFFE,
 };
 
 #elif defined(CCC_HAS_ARM_SIMD)
@@ -117,7 +117,7 @@ enum : uint64_t
     /** @private Debug mode check for bits that must be off in match. */
     MATCH_MASK_TAGS_OFF_BITS = 0x7F7F7F7F7F7F7F7F,
     /** @private All bits on for each tag except for the 0th tag. */
-    MATCH_MASK_ALL_ON_BUT_0TH_TAG = 0xFFFFFFFFFFFFFF00,
+    MATCH_MASK_0TH_TAG_OFF = 0xFFFFFFFFFFFFFF00,
 };
 
 enum : typeof((ccc_fhm_tag){}.v)
@@ -156,7 +156,7 @@ enum : typeof((group){}.v)
     /** @private Debug mode check for bits that must be off in match. */
     MATCH_MASK_TAGS_OFF_BITS = 0x7F7F7F7F7F7F7F7F,
     /** @private All bits on for each tag except for the 0th tag. */
-    MATCH_MASK_ALL_ON_BUT_0TH_TAG = 0xFFFFFFFFFFFFFF00,
+    MATCH_MASK_0TH_TAG_OFF = 0xFFFFFFFFFFFFFF00,
 };
 
 enum : typeof((ccc_fhm_tag){}.v)
@@ -1836,7 +1836,7 @@ match_leading_full(group const g, size_t const start_tag)
 {
     assert(start_tag < CCC_FHM_GROUP_SIZE);
     return (match_mask){(~match_empty_deleted(g).v)
-                        & (MATCH_MASK_ALL_ON_BUT_0TH_TAG << start_tag)};
+                        & (MATCH_MASK_0TH_TAG_OFF << start_tag)};
 }
 
 /*=========================  Group Implementations   ========================*/
@@ -1972,7 +1972,7 @@ match_leading_full(group const g, size_t const start_tag)
     uint8x8_t const cmp = vcgez_s8(vreinterpret_s8_u8(g.v));
     match_mask const res = {
         (vget_lane_u64(vreinterpret_u64_u8(cmp), 0)
-         & (MATCH_MASK_ALL_ON_BUT_0TH_TAG << (start_tag * TAG_BITS)))
+         & (MATCH_MASK_0TH_TAG_OFF << (start_tag * TAG_BITS)))
             & MATCH_MASK_TAGS_MSBS,
     };
     assert(
@@ -2134,7 +2134,7 @@ match_leading_full(group const g, size_t const start_tag)
 {
     assert(start_tag < CCC_FHM_GROUP_SIZE);
     return to_little_endian((match_mask){
-        ((~g.v) & (MATCH_MASK_ALL_ON_BUT_0TH_TAG << (start_tag * TAG_BITS)))
+        ((~g.v) & (MATCH_MASK_0TH_TAG_OFF << (start_tag * TAG_BITS)))
             & MATCH_MASK_TAGS_MSBS,
     });
 }
