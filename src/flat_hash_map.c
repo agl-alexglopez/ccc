@@ -309,7 +309,7 @@ struct query
 
 /*===========================   Prototypes   ================================*/
 
-static void swap(char tmp[const], void *a, void *b, size_t ab_size);
+static void swap(void *tmp, void *a, void *b, size_t ab_size);
 static struct ccc_fhash_entry container_entry(struct ccc_fhmap *h,
                                               void const *key);
 static struct query find(struct ccc_fhmap *h, void const *key, uint64_t hash);
@@ -1595,7 +1595,7 @@ swap_slot(struct ccc_fhmap const *h)
 }
 
 static inline void
-swap(char tmp[const], void *const a, void *const b, size_t const ab_size)
+swap(void *const tmp, void *const a, void *const b, size_t const ab_size)
 {
     if (unlikely(!a || !b || a == b))
     {
