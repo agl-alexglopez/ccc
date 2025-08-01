@@ -664,7 +664,7 @@ ccc_fhm_next(ccc_flat_hash_map const *const h,
     size_t const aligned_group_start
         = i.count & ~((typeof(i.count))(CCC_FHM_GROUP_SIZE - 1));
     match_mask m = match_leading_full(group_loada(&h->tag[aligned_group_start]),
-                                      i.count % CCC_FHM_GROUP_SIZE);
+                                      i.count & (CCC_FHM_GROUP_SIZE - 1));
     size_t const bit = match_next_one(&m);
     if (bit != CCC_FHM_GROUP_SIZE)
     {
