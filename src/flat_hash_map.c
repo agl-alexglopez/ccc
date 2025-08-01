@@ -863,14 +863,14 @@ ccc_fhm_copy(ccc_flat_hash_map *const dst, ccc_flat_hash_map const *const src,
     match_mask full = {};
     while ((full = find_first_full_group(src, &group_start)).v)
     {
-        size_t tag = 0;
-        while ((tag = match_next_one(&full)) != CCC_FHM_GROUP_SIZE)
+        size_t tag_i = 0;
+        while ((tag_i = match_next_one(&full)) != CCC_FHM_GROUP_SIZE)
         {
-            size_t const i = group_start + tag;
-            uint64_t const hash = hash_fn(src, key_at(src, i));
+            tag_i += group_start;
+            uint64_t const hash = hash_fn(src, key_at(src, tag_i));
             size_t const new_i = find_slot_or_noreturn(dst, hash);
             tag_set(dst, tag_from(hash), new_i);
-            (void)memcpy(data_at(dst, new_i), data_at(src, i),
+            (void)memcpy(data_at(dst, new_i), data_at(src, tag_i),
                          dst->sizeof_type);
         }
         group_start += CCC_FHM_GROUP_SIZE;
@@ -1128,14 +1128,14 @@ find_key_or_slot(struct ccc_fhmap const *const h, void const *const key,
     {
         group const g = group_loadu(&h->tag[p.i]);
         match_mask m = match_tag(g, tag);
-        size_t i_match = 0;
-        while ((i_match = match_next_one(&m)) != CCC_FHM_GROUP_SIZE)
+        size_t tag_i = 0;
+        while ((tag_i = match_next_one(&m)) != CCC_FHM_GROUP_SIZE)
         {
-            i_match = (p.i + i_match) & mask;
-            if (likely(eq_fn(h, key, i_match)))
+            tag_i = (p.i + tag_i) & mask;
+            if (likely(eq_fn(h, key, tag_i)))
             {
                 return (struct query){
-                    .i = i_match,
+                    .i = tag_i,
                     .stats = CCC_ENTRY_OCCUPIED,
                 };
             }
@@ -1187,13 +1187,13 @@ find_key_or_fail(struct ccc_fhmap const *const h, void const *const key,
     {
         group const g = group_loadu(&h->tag[p.i]);
         match_mask m = match_tag(g, tag);
-        size_t i_match = 0;
-        while ((i_match = match_next_one(&m)) != CCC_FHM_GROUP_SIZE)
+        size_t tag_i = 0;
+        while ((tag_i = match_next_one(&m)) != CCC_FHM_GROUP_SIZE)
         {
-            i_match = (p.i + i_match) & mask;
-            if (likely(eq_fn(h, key, i_match)))
+            tag_i = (p.i + tag_i) & mask;
+            if (likely(eq_fn(h, key, tag_i)))
             {
-                return (ccc_ucount){.count = i_match};
+                return (ccc_ucount){.count = tag_i};
             }
         }
         if (likely(match_has_one(match_empty(g))))
@@ -1365,22 +1365,22 @@ rehash_in_place(struct ccc_fhmap *const h)
        for any groups with elements that need to be rehashed. */
     while ((deleted = find_first_deleted_group(h, &group_start)).v)
     {
-        size_t tag = 0;
-        while ((tag = match_next_one(&deleted)) != CCC_FHM_GROUP_SIZE)
+        size_t tag_i = 0;
+        while ((tag_i = match_next_one(&deleted)) != CCC_FHM_GROUP_SIZE)
         {
-            size_t const i = group_start + tag;
+            tag_i += group_start;
             /* The inner loop swap case may have made a previously deleted entry
                in this group filled with the swapped element's hash. The mask
                cannot be updated to notice this and the swapped element was
                taken care of by retrying to find a slot in the innermost loop.
                Therefore skip this slot. It no longer needs processing. */
-            if (h->tag[i].v != TAG_DELETED)
+            if (h->tag[tag_i].v != TAG_DELETED)
             {
                 continue;
             }
             do
             {
-                uint64_t const hash = hash_fn(h, key_at(h, i));
+                uint64_t const hash = hash_fn(h, key_at(h, tag_i));
                 size_t const new_i = find_slot_or_noreturn(h, hash);
                 ccc_fhm_tag const hash_tag = tag_from(hash);
                 /* We analyze groups not slots. Do not move the element to
@@ -1388,17 +1388,17 @@ rehash_in_place(struct ccc_fhmap *const h)
                    the proper group for an unaligned load based on where the
                    hashed value will start its loads and the match and does not
                    need relocation. */
-                if (likely(is_same_group(i, new_i, hash, mask)))
+                if (likely(is_same_group(tag_i, new_i, hash, mask)))
                 {
-                    tag_set(h, hash_tag, i);
+                    tag_set(h, hash_tag, tag_i);
                     break; /* continues outer loop */
                 }
                 ccc_fhm_tag const occupant = h->tag[new_i];
                 tag_set(h, hash_tag, new_i);
                 if (occupant.v == TAG_EMPTY)
                 {
-                    tag_set(h, (ccc_fhm_tag){TAG_EMPTY}, i);
-                    (void)memcpy(data_at(h, new_i), data_at(h, i),
+                    tag_set(h, (ccc_fhm_tag){TAG_EMPTY}, tag_i);
+                    (void)memcpy(data_at(h, new_i), data_at(h, tag_i),
                                  h->sizeof_type);
                     break; /* continues outer loop */
                 }
@@ -1407,7 +1407,7 @@ rehash_in_place(struct ccc_fhmap *const h)
                    tag to this slot. It's data is in the correct location and
                    we now will loop to try to find it a rehashed slot. */
                 assert(occupant.v == TAG_DELETED);
-                swap(swap_slot(h), data_at(h, i), data_at(h, new_i),
+                swap(swap_slot(h), data_at(h, tag_i), data_at(h, new_i),
                      h->sizeof_type);
             }
             while (1);
@@ -1463,14 +1463,14 @@ rehash_resize(struct ccc_fhmap *const h, size_t const to_add,
     match_mask full = {};
     while ((full = find_first_full_group(h, &group_start)).v)
     {
-        size_t tag = 0;
-        while ((tag = match_next_one(&full)) != CCC_FHM_GROUP_SIZE)
+        size_t tag_i = 0;
+        while ((tag_i = match_next_one(&full)) != CCC_FHM_GROUP_SIZE)
         {
-            size_t const i = group_start + tag;
-            uint64_t const hash = hash_fn(h, key_at(h, i));
+            tag_i += group_start;
+            uint64_t const hash = hash_fn(h, key_at(h, tag_i));
             size_t const new_i = find_slot_or_noreturn(&new_h, hash);
             tag_set(&new_h, tag_from(hash), new_i);
-            (void)memcpy(data_at(&new_h, new_i), data_at(h, i),
+            (void)memcpy(data_at(&new_h, new_i), data_at(h, tag_i),
                          new_h.sizeof_type);
         }
         group_start += CCC_FHM_GROUP_SIZE;
