@@ -863,8 +863,8 @@ ccc_fhm_copy(ccc_flat_hash_map *const dst, ccc_flat_hash_map const *const src,
     match_mask full = {};
     while ((full = find_first_full_group(src, &group_start)).v)
     {
-        for (size_t tag = match_next_one(&full); tag != CCC_FHM_GROUP_SIZE;
-             tag = match_next_one(&full))
+        size_t tag = 0;
+        while ((tag = match_next_one(&full)) != CCC_FHM_GROUP_SIZE)
         {
             size_t const i = group_start + tag;
             uint64_t const hash = hash_fn(src, key_at(src, i));
@@ -1128,8 +1128,8 @@ find_key_or_slot(struct ccc_fhmap const *const h, void const *const key,
     {
         group const g = group_loadu(&h->tag[p.i]);
         match_mask m = match_tag(g, tag);
-        for (size_t i_match = match_next_one(&m); i_match != CCC_FHM_GROUP_SIZE;
-             i_match = match_next_one(&m))
+        size_t i_match = 0;
+        while ((i_match = match_next_one(&m)) != CCC_FHM_GROUP_SIZE)
         {
             i_match = (p.i + i_match) & mask;
             if (likely(eq_fn(h, key, i_match)))
@@ -1187,8 +1187,8 @@ find_key_or_fail(struct ccc_fhmap const *const h, void const *const key,
     {
         group const g = group_loadu(&h->tag[p.i]);
         match_mask m = match_tag(g, tag);
-        for (size_t i_match = match_next_one(&m); i_match != CCC_FHM_GROUP_SIZE;
-             i_match = match_next_one(&m))
+        size_t i_match = 0;
+        while ((i_match = match_next_one(&m)) != CCC_FHM_GROUP_SIZE)
         {
             i_match = (p.i + i_match) & mask;
             if (likely(eq_fn(h, key, i_match)))
@@ -1365,8 +1365,8 @@ rehash_in_place(struct ccc_fhmap *const h)
        for any groups with elements that need to be rehashed. */
     while ((deleted = find_first_deleted_group(h, &group_start)).v)
     {
-        for (size_t tag = match_next_one(&deleted); tag != CCC_FHM_GROUP_SIZE;
-             tag = match_next_one(&deleted))
+        size_t tag = 0;
+        while ((tag = match_next_one(&deleted)) != CCC_FHM_GROUP_SIZE)
         {
             size_t const i = group_start + tag;
             /* The inner loop swap case may have made a previously deleted entry
@@ -1463,8 +1463,8 @@ rehash_resize(struct ccc_fhmap *const h, size_t const to_add,
     match_mask full = {};
     while ((full = find_first_full_group(h, &group_start)).v)
     {
-        for (size_t tag = match_next_one(&full); tag != CCC_FHM_GROUP_SIZE;
-             tag = match_next_one(&full))
+        size_t tag = 0;
+        while ((tag = match_next_one(&full)) != CCC_FHM_GROUP_SIZE)
         {
             size_t const i = group_start + tag;
             uint64_t const hash = hash_fn(h, key_at(h, i));
