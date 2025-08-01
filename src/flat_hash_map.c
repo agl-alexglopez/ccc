@@ -859,16 +859,21 @@ ccc_fhm_copy(ccc_flat_hash_map *const dst, ccc_flat_hash_map const *const src,
     (void)memset(dst->tag, TAG_EMPTY, mask_to_tag_bytes(dst->mask));
     dst->remain = mask_to_load_factor_cap(dst->mask);
     dst->count = 0;
-    for (size_t i = 0; i < (src->mask + 1); ++i)
+    size_t group_start = 0;
+    match_mask full = {};
+    while ((full = find_first_full_group(src, &group_start)).v)
     {
-        if (tag_full(src->tag[i]))
+        for (size_t tag = match_next_one(&full); tag != CCC_FHM_GROUP_SIZE;
+             tag = match_next_one(&full))
         {
+            size_t const i = group_start + tag;
             uint64_t const hash = hash_fn(src, key_at(src, i));
             size_t const new_i = find_slot_or_noreturn(dst, hash);
             tag_set(dst, tag_from(hash), new_i);
             (void)memcpy(data_at(dst, new_i), data_at(src, i),
                          dst->sizeof_type);
         }
+        group_start += CCC_FHM_GROUP_SIZE;
     }
     dst->remain -= src->count;
     dst->count = src->count;
