@@ -118,7 +118,7 @@ enum : uint64_t
     /** @private Debug mode check for bits that must be off in match. */
     MATCH_MASK_TAGS_OFF_BITS = 0x7F7F7F7F7F7F7F7F,
     /** @private All bits on for each tag except for the 0th tag. */
-    MATCH_MASK_0TH_TAG_OFF = 0xFFFFFFFFFFFFFF00,
+    MATCH_MASK_0TH_TAG_OFF = 0x8080808080808000,
 };
 
 enum : typeof((ccc_fhm_tag){}.v)
@@ -2091,9 +2091,8 @@ match_leading_full(group const g, size_t const start_tag)
     assert(start_tag < CCC_FHM_GROUP_SIZE);
     uint8x8_t const cmp = vcgez_s8(vreinterpret_s8_u8(g.v));
     match_mask const res = {
-        (vget_lane_u64(vreinterpret_u64_u8(cmp), 0)
-         & (MATCH_MASK_0TH_TAG_OFF << (start_tag * TAG_BITS)))
-            & MATCH_MASK_TAGS_MSBS,
+        vget_lane_u64(vreinterpret_u64_u8(cmp), 0)
+            & (MATCH_MASK_0TH_TAG_OFF << (start_tag * TAG_BITS)),
     };
     assert(
         (res.v & MATCH_MASK_TAGS_OFF_BITS) == 0
