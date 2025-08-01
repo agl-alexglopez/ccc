@@ -1292,10 +1292,10 @@ find_first_deleted_group(struct ccc_fhmap const *const h, size_t *const start)
     assert((*start & ~((size_t)(CCC_FHM_GROUP_SIZE - 1))) == *start);
     while (*start < (h->mask + 1))
     {
-        match_mask const full = match_deleted(group_loada(&h->tag[*start]));
-        if (full.v)
+        match_mask const deleted = match_deleted(group_loada(&h->tag[*start]));
+        if (deleted.v)
         {
-            return full;
+            return deleted;
         }
         *start += CCC_FHM_GROUP_SIZE;
     }
