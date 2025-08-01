@@ -117,7 +117,7 @@ enum : uint64_t
     MATCH_MASK_TAGS_LSBS = 0x101010101010101,
     /** @private Debug mode check for bits that must be off in match. */
     MATCH_MASK_TAGS_OFF_BITS = 0x7F7F7F7F7F7F7F7F,
-    /** @private All bits on for each tag except for the 0th tag. */
+    /** @private The MSB of each byte on except 0th is 0x00. */
     MATCH_MASK_0TH_TAG_OFF = 0x8080808080808000,
 };
 
