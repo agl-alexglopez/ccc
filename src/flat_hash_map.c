@@ -158,8 +158,8 @@ enum : typeof((group){}.v)
     MATCH_MASK_TAGS_LSBS = 0x101010101010101,
     /** @private Debug mode check for bits that must be off in match. */
     MATCH_MASK_TAGS_OFF_BITS = 0x7F7F7F7F7F7F7F7F,
-    /** @private All bits on for each tag except for the 0th tag. */
-    MATCH_MASK_0TH_TAG_OFF = 0xFFFFFFFFFFFFFF00,
+    /** @private The MSB of each byte on except 0th is 0x00. */
+    MATCH_MASK_0TH_TAG_OFF = 0x8080808080808000,
 };
 
 enum : typeof((ccc_fhm_tag){}.v)
@@ -2303,9 +2303,10 @@ static inline match_mask
 match_leading_full(group const g, size_t const start_tag)
 {
     assert(start_tag < CCC_FHM_GROUP_SIZE);
+    /* The 0th tag off mask we use also happens to ensure only the MSB in each
+       byte of a match is on as the assert confirms after. */
     match_mask const res = to_little_endian((match_mask){
-        ((~g.v) & (MATCH_MASK_0TH_TAG_OFF << (start_tag * TAG_BITS)))
-            & MATCH_MASK_TAGS_MSBS,
+        (~g.v) & (MATCH_MASK_0TH_TAG_OFF << (start_tag * TAG_BITS)),
     });
     assert(
         (res.v & MATCH_MASK_TAGS_OFF_BITS) == 0
