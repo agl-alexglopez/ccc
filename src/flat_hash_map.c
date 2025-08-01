@@ -152,6 +152,8 @@ enum : typeof((group){}.v)
     MATCH_MASK_MSB = 0x8000000000000000,
     /** @private MSB tag bits used for byte and word level masking. */
     MATCH_MASK_TAGS_MSBS = 0x8080808080808080,
+    /** @private The EMPTY special constant tag in every byte of the mask. */
+    MATCH_MASK_TAGS_EMPTY = 0x8080808080808080,
     /** @private LSB tag bits used for byte and word level masking. */
     MATCH_MASK_TAGS_LSBS = 0x101010101010101,
     /** @private Debug mode check for bits that must be off in match. */
@@ -2228,10 +2230,17 @@ static inline match_mask
 match_empty(group const g)
 {
     /* EMPTY has all bits on and DELETED has the most significant bit on so
-       EMPTY must have the top 2 bits on. Make sure the mask is only MSB's. */
-    return to_little_endian((match_mask){
-        g.v & (g.v << 1) & MATCH_MASK_TAGS_MSBS,
+       EMPTY must have the top 2 bits on. Because the empty mask has only
+       the most significant bit on this also ensure the mask has only the
+       MSB on to indicate a match. */
+    match_mask const res = to_little_endian((match_mask){
+        g.v & (g.v << 1) & MATCH_MASK_TAGS_EMPTY,
     });
+    assert(
+        (res.v & MATCH_MASK_TAGS_OFF_BITS) == 0
+        && "For bit counting and iteration purposes the most significant bit "
+           "in every byte will indicate a match for a tag has occurred.");
+    return res;
 }
 
 /** Returns a match_mask with the most significant bit in every byte on if
@@ -2239,7 +2248,18 @@ that tag in g is empty. */
 static inline match_mask
 match_deleted(group const g)
 {
-    return match_tag(g, (ccc_fhm_tag){TAG_DELETED});
+    /* This is the same process as matching a tag but easier because we can
+       make the empty mask a constant at compile time instead of runtime. */
+    group const empty_cmp = {g.v ^ MATCH_MASK_TAGS_EMPTY};
+    match_mask const res = to_little_endian((match_mask){
+        (empty_cmp.v - MATCH_MASK_TAGS_LSBS) & ~empty_cmp.v
+            & MATCH_MASK_TAGS_MSBS,
+    });
+    assert(
+        (res.v & MATCH_MASK_TAGS_OFF_BITS) == 0
+        && "For bit counting and iteration purposes the most significant bit "
+           "in every byte will indicate a match for a tag has occurred.");
+    return res;
 }
 
 /** Returns a match with the most significant bit in every byte on if
@@ -2247,7 +2267,13 @@ that tag in g is empty or deleted. This is found by the most significant bit. */
 static inline match_mask
 match_empty_deleted(group const g)
 {
-    return to_little_endian((match_mask){g.v & MATCH_MASK_TAGS_MSBS});
+    match_mask const res
+        = to_little_endian((match_mask){g.v & MATCH_MASK_TAGS_MSBS});
+    assert(
+        (res.v & MATCH_MASK_TAGS_OFF_BITS) == 0
+        && "For bit counting and iteration purposes the most significant bit "
+           "in every byte will indicate a match for a tag has occurred.");
+    return res;
 }
 
 /** Returns a 0 based match with every bit on representing those tags in the
@@ -2256,7 +2282,13 @@ the most significant bit off and the lower 7 bits occupied by user hash. */
 static inline match_mask
 match_full(group const g)
 {
-    return to_little_endian((match_mask){(~g.v) & MATCH_MASK_TAGS_MSBS});
+    match_mask const res
+        = to_little_endian((match_mask){(~g.v) & MATCH_MASK_TAGS_MSBS});
+    assert(
+        (res.v & MATCH_MASK_TAGS_OFF_BITS) == 0
+        && "For bit counting and iteration purposes the most significant bit "
+           "in every byte will indicate a match for a tag has occurred.");
+    return res;
 }
 
 /** Returns a 0 based match with every bit on representing those tags in the
@@ -2271,10 +2303,15 @@ static inline match_mask
 match_leading_full(group const g, size_t const start_tag)
 {
     assert(start_tag < CCC_FHM_GROUP_SIZE);
-    return to_little_endian((match_mask){
+    match_mask const res = to_little_endian((match_mask){
         ((~g.v) & (MATCH_MASK_0TH_TAG_OFF << (start_tag * TAG_BITS)))
             & MATCH_MASK_TAGS_MSBS,
     });
+    assert(
+        (res.v & MATCH_MASK_TAGS_OFF_BITS) == 0
+        && "For bit counting and iteration purposes the most significant bit "
+           "in every byte will indicate a match for a tag has occurred.");
+    return res;
 }
 
 /*=========================  Group Implementations   ========================*/
