@@ -1359,10 +1359,12 @@ rehash_in_place(struct ccc_fhmap *const h)
     (void)memcpy(h->tag + (mask + 1), h->tag, CCC_FHM_GROUP_SIZE);
     size_t group_start = 0;
     match_mask deleted = {};
-    /* Due to the load factor being roughly 87% we could have large spans of
-       unoccupied slots in large tables (full slots we have converted to deleted
-       tags). We can speed things up by performing aligned group scans checking
-       for any groups with elements that need to be rehashed. */
+    /* Because the load factor is roughly 87% we could have large spans of
+       unoccupied slots in large tables due to full slots we have converted to
+       deleted tags. There could also be many tombstones that were just
+       converted to empty slots in the prep loop earlier. We can speed things up
+       by performing aligned group scans checking for any groups with elements
+       that need to be rehashed. */
     while ((deleted = find_first_deleted_group(h, &group_start)).v)
     {
         size_t tag_i = 0;
