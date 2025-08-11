@@ -839,7 +839,7 @@ splay(struct ccc_omap *const t, struct ccc_omap_elem *root,
        as our helper tree because we don't need its Left Right fields. */
     t->end.branch[L] = t->end.branch[R] = t->end.parent = &t->end;
     struct ccc_omap_elem *l_r_subtrees[LR] = {&t->end, &t->end};
-    do
+    for (;;)
     {
         ccc_threeway_cmp const root_cmp = cmp(t, key, root, cmp_fn);
         om_branch const dir = CCC_GRT == root_cmp;
@@ -867,7 +867,6 @@ splay(struct ccc_omap *const t, struct ccc_omap_elem *root,
         l_r_subtrees[!dir] = root;
         root = root->branch[dir];
     }
-    while (1);
     link(l_r_subtrees[L], R, root->branch[L]);
     link(l_r_subtrees[R], L, root->branch[R]);
     link(root, L, t->end.branch[R]);

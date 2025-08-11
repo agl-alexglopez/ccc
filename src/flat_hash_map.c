@@ -1126,7 +1126,7 @@ find_key_or_slot(struct ccc_fhmap const *const h, void const *const key,
         .stride = 0,
     };
     ccc_ucount empty_deleted = {.error = CCC_RESULT_FAIL};
-    do
+    for (;;)
     {
         group const g = group_loadu(&h->tag[p.i]);
         match_mask m = match_tag(g, tag);
@@ -1164,7 +1164,6 @@ find_key_or_slot(struct ccc_fhmap const *const h, void const *const key,
         p.i += p.stride;
         p.i &= mask;
     }
-    while (1);
 }
 
 /** Finds key or fails when first empty slot is encountered after a group fails
@@ -1185,7 +1184,7 @@ find_key_or_fail(struct ccc_fhmap const *const h, void const *const key,
         .i = hash & mask,
         .stride = 0,
     };
-    do
+    for (;;)
     {
         group const g = group_loadu(&h->tag[p.i]);
         match_mask m = match_tag(g, tag);
@@ -1206,7 +1205,6 @@ find_key_or_fail(struct ccc_fhmap const *const h, void const *const key,
         p.i += p.stride;
         p.i &= mask;
     }
-    while (1);
 }
 
 /** Finds the first available empty or deleted insert slot or loops forever. The
@@ -1220,7 +1218,7 @@ find_slot_or_noreturn(struct ccc_fhmap const *const h, uint64_t const hash)
         .i = hash & mask,
         .stride = 0,
     };
-    do
+    for (;;)
     {
         size_t const i = match_trailing_one(
             match_empty_deleted(group_loadu(&h->tag[p.i])));
@@ -1232,7 +1230,6 @@ find_slot_or_noreturn(struct ccc_fhmap const *const h, uint64_t const hash)
         p.i += p.stride;
         p.i &= mask;
     }
-    while (1);
 }
 
 /** Finds the first occupied slot in the table. The full slot is one where the
@@ -1382,7 +1379,7 @@ rehash_in_place(struct ccc_fhmap *const h)
             {
                 continue;
             }
-            do
+            for (;;)
             {
                 uint64_t const hash = hash_fn(h, key_at(h, tag_i));
                 size_t const new_i = find_slot_or_noreturn(h, hash);
@@ -1414,7 +1411,6 @@ rehash_in_place(struct ccc_fhmap *const h)
                 swap(swap_slot(h), data_at(h, tag_i), data_at(h, new_i),
                      h->sizeof_type);
             }
-            while (1);
         }
         group_start += CCC_FHM_GROUP_SIZE;
     }

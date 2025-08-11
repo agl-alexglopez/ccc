@@ -1022,7 +1022,7 @@ splay(struct ccc_homap *const t, size_t root, void const *const key,
     struct ccc_homap_elem *const nil = node_at(t, 0);
     nil->branch[L] = nil->branch[R] = nil->parent = 0;
     size_t l_r_subtrees[LR] = {0, 0};
-    do
+    for (;;)
     {
         ccc_threeway_cmp const key_cmp = cmp_elems(t, key, root, cmp_fn);
         enum hom_branch const child_link = CCC_GRT == key_cmp;
@@ -1050,7 +1050,6 @@ splay(struct ccc_homap *const t, size_t root, void const *const key,
         l_r_subtrees[!child_link] = root;
         root = branch_i(t, root, child_link);
     }
-    while (1);
     link(t, l_r_subtrees[L], R, branch_i(t, root, L));
     link(t, l_r_subtrees[R], L, branch_i(t, root, R));
     link(t, root, L, nil->branch[R]);

@@ -670,7 +670,7 @@ find_shortest_paths(struct graph *const graph)
     char *lineptr = NULL;
     size_t len = 0;
     int total_cost = 0;
-    do
+    for (;;)
     {
         set_cursor_position(graph->rows, 0);
         clear_line();
@@ -718,7 +718,6 @@ find_shortest_paths(struct graph *const graph)
             break;
         }
     }
-    while (1);
 }
 
 /** Returns the distance of the shortest path from src to dst in the graph. If
