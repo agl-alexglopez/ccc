@@ -387,7 +387,7 @@ print_n(ccc_handle_ordered_map *const map, ccc_threeway_cmp const ord,
     }
     /* Because all CCC containers are complete they can be treated as copyable
        types like this. There is no opaque container in CCC. */
-    buffer sorted_freqs = ccc_fpq_heapsort(&fpq, &(word){});
+    buffer const sorted_freqs = ccc_fpq_heapsort(&fpq, &(word){});
     check(!fpq.buf.mem);
     int w = 0;
     /* Heap sort puts the root most nodes at the back of the buffer. */
