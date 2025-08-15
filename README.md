@@ -888,10 +888,10 @@ ccc_flat_priority_queue fpq
 Notice that we need to help the container by casting to the type we are storing. The interface then looks like this.
 
 ```c
-void *ccc_fpq_push(ccc_flat_priority_queue *fpq, void const *e);
+void *ccc_fpq_push(ccc_flat_priority_queue *fpq, void const *e, void *tmp);
 ```
 
-The element `e` here is just a generic reference to whatever type the user stores in the container.
+The element `e` here is just a generic reference to whatever type the user stores in the container and `tmp` is a swap slot provided by the user.
 
 ### Non-Allocating Containers
 
