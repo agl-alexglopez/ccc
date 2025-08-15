@@ -1031,7 +1031,8 @@ is_id_a_less(struct list_elem const *const a,
     return a_->id < b_->id;
 }
 
-int main(void)
+int
+main(void)
 {
     static struct list id_list = LIST_INIT(id_list);
     /* ...fill list... */
@@ -1058,7 +1059,8 @@ id_cmp(ccc_any_type_cmp const cmp)
     return (lhs->id > rhs->id) - (lhs->id < rhs->id);
 }
 
-int main (void)
+int
+main (void)
 {
     static ccc_doubly_linked_list id_list
         = ccc_dll_init(id_list, struct id, id_elem, id_cmp, NULL, NULL);
