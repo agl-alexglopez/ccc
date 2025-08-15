@@ -1138,8 +1138,7 @@ bitq_reserve(struct bitq *const bq, size_t const to_add)
 /** The flat hash map documentation mentions we should have good bit diversity
 in the high and low byte of our hash but we are only hashing characters which
 are their own unique value across all characters we will encounter. So the
-hashed value will just be the character repeated at the high and low byte. We
-should not expect any collisions for such a value and data set. */
+hashed value will just be the character repeated at the high and low byte. */
 static uint64_t
 hash_char(ccc_any_key const to_hash)
 {
