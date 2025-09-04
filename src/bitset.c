@@ -1163,7 +1163,6 @@ first_trailing_bits_range(struct ccc_bitset const *const bs, size_t const i,
                           : (~bs->blocks[cur_block]) & (BITBLOCK_ON << bit_i);
         if (cur_end > range_end)
         {
-            /* Modulo at most once entire function, not every loop cycle. */
             bits &= ~(BITBLOCK_ON << ubit_index(range_end));
         }
         struct ugroup const ones
