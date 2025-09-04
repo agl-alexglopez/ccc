@@ -1313,7 +1313,8 @@ maybe_rehash(struct ccc_fhmap *const h, size_t const to_add,
     {
         return CCC_RESULT_NO_ALLOC;
     }
-    size_t required_total_cap = to_power_of_two(((h->count + to_add) * 8) / 7);
+    size_t const required_total_cap
+        = to_power_of_two(((h->count + to_add) * 8) / 7);
     if (!required_total_cap)
     {
         return CCC_RESULT_ARG_ERROR;
