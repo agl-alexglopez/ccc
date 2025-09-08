@@ -1308,7 +1308,10 @@ block_at(struct ccc_hromap const *const t, size_t const i)
 static inline pblock
 bit_on(size_t const i)
 {
-    return ((pblock)1) << (i % PBLOCK_BITS);
+    static_assert((PBLOCK_BITS & (PBLOCK_BITS - 1)) == 0,
+                  "the number of bits in a block is always a power of two, "
+                  "avoiding modulo operations.");
+    return ((pblock)1) << (i & (PBLOCK_BITS - 1));
 }
 
 static inline size_t

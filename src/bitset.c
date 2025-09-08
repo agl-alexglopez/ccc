@@ -1722,7 +1722,10 @@ This index will always be between [0, BITBLOCK_BITS - 1). */
 static inline ubit
 ubit_index(size_t const bitset_index)
 {
-    return bitset_index % BITBLOCK_BITS;
+    static_assert((BITBLOCK_BITS & (BITBLOCK_BITS - 1)) == 0,
+                  "the number of bits in a block is always a power of two, "
+                  "avoiding modulo operations when possible.");
+    return bitset_index & (BITBLOCK_BITS - 1);
 }
 
 /** Returns the number of blocks required to store the given bits. Assumes bits
