@@ -943,8 +943,12 @@ ccc_fhm_validate(ccc_flat_hash_map const *const h)
         {
             ++deleted;
         }
-        else if (tag_full(t))
+        else
         {
+            if (!tag_full(t))
+            {
+                return CCC_FALSE;
+            }
             if (tag_from(hash_fn(h, data_at(h, i))).v != t.v)
             {
                 return CCC_FALSE;
@@ -953,10 +957,17 @@ ccc_fhm_validate(ccc_flat_hash_map const *const h)
         }
     }
     /* Do our tags agree with our manually tracked and set state? */
-    if (occupied != h->count || occupied + remain + deleted != h->mask + 1
-        || mask_to_load_factor_cap(occupied + remain + deleted) - occupied
-                   - deleted
-               != h->remain)
+    if (occupied != h->count)
+    {
+        return CCC_FALSE;
+    }
+    if (occupied + remain + deleted != h->mask + 1)
+    {
+        return CCC_FALSE;
+    }
+    if (mask_to_load_factor_cap(occupied + remain + deleted) - occupied
+            - deleted
+        != h->remain)
     {
         return CCC_FALSE;
     }
