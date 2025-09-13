@@ -118,9 +118,9 @@ $(document).ready(function(){initNavTree('impl__flat__hash__map_8h_source.html',
 <div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span> </div>
 <div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>enum : typeof((ccc_fhm_tag){}.v)</div>
 <div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>{</div>
-<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span><span class="preprocessor">#if defined(CCC_HAS_X86_SIMD)</span></div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span><span class="preprocessor">#ifdef CCC_HAS_X86_SIMD</span></div>
 <div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>    CCC_FHM_GROUP_SIZE = 16,</div>
-<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span><span class="preprocessor">#elif defined(CCC_HAS_ARM_SIMD)</span></div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span><span class="preprocessor">#elifdef CCC_HAS_ARM_SIMD</span></div>
 <div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>    CCC_FHM_GROUP_SIZE = 8,</div>
 <div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span><span class="preprocessor">#else  </span><span class="comment">/* PORTABLE FALLBACK */</span><span class="preprocessor"></span></div>
 <div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>    CCC_FHM_GROUP_SIZE = 8,</div>
