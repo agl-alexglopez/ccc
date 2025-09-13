@@ -71,10 +71,10 @@ that means uint64_t is widest default integer widely supported. That width
 is still valid on 32-bit but probably very slow due to emulation. */
 enum : typeof((ccc_fhm_tag){}.v)
 {
-#if defined(CCC_HAS_X86_SIMD)
+#ifdef CCC_HAS_X86_SIMD
     /** A group of tags that can be loaded into a 128 bit vector. */
     CCC_FHM_GROUP_SIZE = 16,
-#elif defined(CCC_HAS_ARM_SIMD)
+#elifdef CCC_HAS_ARM_SIMD
     /** A group of tags that can be loded into a 64 bit integer. */
     CCC_FHM_GROUP_SIZE = 8,
 #else  /* PORTABLE FALLBACK */
