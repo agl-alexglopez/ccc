@@ -9,7 +9,7 @@
    attributes provide more string safety and opportunities to optimize.
    Credit Harith on Code Review Stack Exchange. */
 #if defined(__GNUC__) || defined(__clang__) || defined(__INTEL_LLVM_COMPILER)
-#    if defined __has_attribute
+#    ifdef __has_attribute
 #        if __has_attribute(pure)
 #            define ATTRIB_PURE __attribute__((pure))
 #        else
@@ -45,9 +45,9 @@
 #endif /* __GNUC__ || __clang__ || __INTEL_LLVM_COMPILER */
 
 #if defined(_MSVC_VER) || defined(_WIN32) || defined(_WIN64)
-#    if defined(SV_BUILD_DLL)
+#    ifdef SV_BUILD_DLL
 #        define SV_API __declspec(dllexport)
-#    elif defined(SV_CONSUME_DLL)
+#    elifdef SV_CONSUME_DLL
 #        define SV_API __declspec(dllimport)
 #    else
 #        define SV_API /**/

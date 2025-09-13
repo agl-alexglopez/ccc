@@ -48,9 +48,9 @@ better capabilities for 128 bit group operations. */
 /** Note that these includes must come after inclusion of the
 `impl/impl_flat_hash_map.h` header. Two platforms offer some form of vector
 instructions we can try. */
-#if defined(CCC_HAS_X86_SIMD)
+#ifdef CCC_HAS_X86_SIMD
 #    include <immintrin.h>
-#elif defined(CCC_HAS_ARM_SIMD)
+#elifdef CCC_HAS_ARM_SIMD
 #    include <arm_neon.h>
 #endif /* defined(CCC_HAS_X86_SIMD) */
 
@@ -65,7 +65,7 @@ instructions we can try. */
 
 /* Can we vectorize instructions? Also it is possible to specify we want a
 portable implementation. Consider exposing to user in header docs. */
-#if defined(CCC_HAS_X86_SIMD)
+#ifdef CCC_HAS_X86_SIMD
 
 /** @private The 128 bit vector type for efficient SIMD group scanning. 16 one
 byte large tags fit in this type. */
@@ -89,7 +89,7 @@ enum : typeof((match_mask){}.v)
     MATCH_MASK_0TH_TAG_OFF = 0xFFFE,
 };
 
-#elif defined(CCC_HAS_ARM_SIMD)
+#elifdef CCC_HAS_ARM_SIMD
 
 /** @private The 64 bit vector is used on NEON due to a lack of ability to
 compress a 128 bit vector to a smaller int efficiently. */
@@ -210,7 +210,7 @@ first byte of the struct with no padding BEFORE this first element. */
 static_assert(
     (char *)&data_tag_layout_test.tag[2] - (char *)&data_tag_layout_test.data[0]
         == (comptime_roundup((sizeof(data_tag_layout_test.data)))
-            + sizeof(ccc_fhm_tag) * 2),
+            + (sizeof(ccc_fhm_tag) * 2)),
     "The size in bytes of the contiguous user data to tag array must be what "
     "we would expect with no padding that will interfere with pointer "
     "arithmetic.");
@@ -375,6 +375,7 @@ static size_t to_power_of_two(size_t n);
 static ccc_tribool is_uninitialized(struct ccc_fhmap const *);
 static void destory_each(struct ccc_fhmap *h, ccc_any_type_destructor_fn *);
 static size_t roundup(size_t bytes);
+static ccc_tribool check_replica_group(struct ccc_fhmap const *h);
 
 /*===========================    Interface   ================================*/
 
@@ -915,14 +916,9 @@ ccc_fhm_validate(ccc_flat_hash_map const *const h)
     {
         return CCC_FALSE;
     }
-    /* The replica group should be in sync. */
-    for (size_t original = 0, clone = (h->mask + 1);
-         original < CCC_FHM_GROUP_SIZE; ++original, ++clone)
+    if (!check_replica_group(h))
     {
-        if (h->tag[original].v != h->tag[clone].v)
-        {
-            return CCC_FALSE;
-        }
+        return CCC_FALSE;
     }
     size_t occupied = 0;
     size_t remain = 0;
@@ -970,6 +966,20 @@ ccc_fhm_validate(ccc_flat_hash_map const *const h)
         != h->remain)
     {
         return CCC_FALSE;
+    }
+    return CCC_TRUE;
+}
+
+static ccc_tribool
+check_replica_group(struct ccc_fhmap const *const h)
+{
+    for (size_t original = 0, clone = (h->mask + 1);
+         original < CCC_FHM_GROUP_SIZE; ++original, ++clone)
+    {
+        if (h->tag[original].v != h->tag[clone].v)
+        {
+            return CCC_FALSE;
+        }
     }
     return CCC_TRUE;
 }
@@ -1850,7 +1860,7 @@ match_trailing_zeros(match_mask const m)
 
 /** We have abstracted at much as we can before this point. Now implementations
 will need to vary based on availability of vectorized instructions. */
-#if defined(CCC_HAS_X86_SIMD)
+#ifdef CCC_HAS_X86_SIMD
 
 /*=========================   Match SIMD Matching    ========================*/
 
@@ -2000,7 +2010,7 @@ group_constant_to_empty_full_to_deleted(group const g)
     };
 }
 
-#elif defined(CCC_HAS_ARM_SIMD)
+#elifdef CCC_HAS_ARM_SIMD
 
 /** Below is the experimental NEON implementation for ARM architectures. This
 implementation assumes a little endian architecture as that is the norm in
@@ -2383,7 +2393,7 @@ implementations can simply rely on counting zeros that yields correct results
 for their implementation. Each implementation attempts to use the built-ins
 first and then falls back to manual bit counting. */
 
-#if defined(CCC_HAS_X86_SIMD)
+#ifdef CCC_HAS_X86_SIMD
 
 #    if defined(__has_builtin) && __has_builtin(__builtin_ctz)                 \
         && __has_builtin(__builtin_clz) && __has_builtin(__builtin_clzl)
