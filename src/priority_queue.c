@@ -555,9 +555,11 @@ static inline ccc_threeway_cmp
 cmp(struct ccc_pq const *const pq, struct ccc_pq_elem const *const lhs,
     struct ccc_pq_elem const *const rhs)
 {
-    return pq->cmp((ccc_any_type_cmp){.any_type_lhs = struct_base(pq, lhs),
-                                      .any_type_rhs = struct_base(pq, rhs),
-                                      .aux = pq->aux});
+    return pq->cmp((ccc_any_type_cmp){
+        .any_type_lhs = struct_base(pq, lhs),
+        .any_type_rhs = struct_base(pq, rhs),
+        .aux = pq->aux,
+    });
 }
 
 static inline void *
