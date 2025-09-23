@@ -1106,19 +1106,28 @@ next(struct ccc_homap const *const t, size_t n, enum hom_branch const traversal)
     return p;
 }
 
+/** Deletes all nodes in the tree by calling destructor function on them in
+linear time and constant space. This function modifies nodes as it deletes the
+tree elements. Assumes the destructor function is non-null.
+
+This function does not update any count or capacity fields of the map, it
+simply calls the destructor on each node and removes the nodes references to
+other tree elements. */
 static void
 delete_nodes(struct ccc_homap *const t, ccc_any_type_destructor_fn *const fn)
 {
+    assert(t);
+    assert(fn);
     size_t node = t->root;
     while (node)
     {
         struct ccc_homap_elem *const e = node_at(t, node);
         if (e->branch[L])
         {
-            size_t const l = e->branch[L];
-            e->branch[L] = node_at(t, l)->branch[R];
-            node_at(t, l)->branch[R] = node;
-            node = l;
+            size_t const left = e->branch[L];
+            e->branch[L] = node_at(t, left)->branch[R];
+            node_at(t, left)->branch[R] = node;
+            node = left;
             continue;
         }
         size_t const next = e->branch[R];

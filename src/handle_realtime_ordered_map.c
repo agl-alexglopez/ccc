@@ -1129,16 +1129,18 @@ other tree elements. */
 static void
 delete_nodes(struct ccc_hromap *const t, ccc_any_type_destructor_fn *const fn)
 {
+    assert(t);
+    assert(fn);
     size_t node = t->root;
     while (node)
     {
         struct ccc_hromap_elem *const e = node_at(t, node);
         if (e->branch[L])
         {
-            size_t const l = e->branch[L];
-            e->branch[L] = node_at(t, l)->branch[R];
-            node_at(t, l)->branch[R] = node;
-            node = l;
+            size_t const left = e->branch[L];
+            e->branch[L] = node_at(t, left)->branch[R];
+            node_at(t, left)->branch[R] = node;
+            node = left;
             continue;
         }
         size_t const next = e->branch[R];

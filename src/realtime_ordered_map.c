@@ -594,26 +594,26 @@ ccc_rom_clear(ccc_realtime_ordered_map *const rom,
     {
         if (node->branch[L] != &rom->end)
         {
-            struct ccc_romap_elem *const l = node->branch[L];
-            node->branch[L] = l->branch[R];
-            l->branch[R] = node;
-            node = l;
+            struct ccc_romap_elem *const left = node->branch[L];
+            node->branch[L] = left->branch[R];
+            left->branch[R] = node;
+            node = left;
             continue;
         }
         struct ccc_romap_elem *const next = node->branch[R];
         node->branch[L] = node->branch[R] = NULL;
         node->parent = NULL;
-        void *const del = struct_base(rom, node);
+        void *const destroy = struct_base(rom, node);
         if (destructor)
         {
             destructor((ccc_any_type){
-                .any_type = del,
+                .any_type = destroy,
                 .aux = rom->aux,
             });
         }
         if (rom->alloc)
         {
-            (void)rom->alloc(del, 0, rom->aux);
+            (void)rom->alloc(destroy, 0, rom->aux);
         }
         node = next;
     }
