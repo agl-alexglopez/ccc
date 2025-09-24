@@ -164,23 +164,24 @@ CHECK_BEGIN_STATIC_FN(buf_test_largest_rectangle_in_histogram)
                                     NULL, HCAP, HCAP);
     int const correct_max_rectangle = 10;
     int max_rectangle = 0;
-    buffer bars_idx = buf_init((int[HCAP]){}, int, NULL, NULL, HCAP);
+    buffer bar_indices = buf_init((int[HCAP]){}, int, NULL, NULL, HCAP);
     for (int i = 0, end = buf_count(&heights).count; i <= end; ++i)
     {
-        while (!buf_is_empty(&bars_idx)
+        while (!buf_is_empty(&bar_indices)
                && (i == end
                    || *buf_as(&heights, int, i) < *buf_as(
-                          &heights, int, *buf_back_as(&bars_idx, int))))
+                          &heights, int, *buf_back_as(&bar_indices, int))))
         {
-            int const *const h = buf_at(&heights, *buf_back_as(&bars_idx, int));
-            ccc_result const r = buf_pop_back(&bars_idx);
+            int const stack_top_i = *buf_back_as(&bar_indices, int);
+            int const stack_top_height = *buf_as(&heights, int, stack_top_i);
+            ccc_result const r = buf_pop_back(&bar_indices);
             CHECK(r, CCC_RESULT_OK);
-            int const w = buf_is_empty(&bars_idx)
-                            ? 1
-                            : i - *buf_back_as(&bars_idx, int) - 1;
-            max_rectangle = maxint(max_rectangle, *h * w);
+            int const w = buf_is_empty(&bar_indices)
+                            ? i
+                            : i - *buf_back_as(&bar_indices, int) - 1;
+            max_rectangle = maxint(max_rectangle, stack_top_height * w);
         }
-        int const *const ptr = buf_push_back(&bars_idx, &i);
+        int const *const ptr = buf_push_back(&bar_indices, &i);
         CHECK(ptr != NULL, CCC_TRUE);
     }
     CHECK(max_rectangle, correct_max_rectangle);
