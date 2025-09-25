@@ -18,6 +18,9 @@ swap(void *const tmp, void *const a, void *const b, size_t const absize)
     }
 }
 
+/** For now we do not use randomization for the partition selection meaning we
+fall prey to the O(N^2) worst case runtime more easily. With void and iterators
+it is complicated to select a randomized slot but it would still be possible.*/
 static int *
 partition(buffer *const b, ccc_any_type_cmp_fn *const fn, void *const tmp,
           void *lo, void *hi)
@@ -59,8 +62,9 @@ sort_rec(buffer *const b, ccc_any_type_cmp_fn *const fn, void *const tmp,
 {
     while (lo < hi)
     {
-        void *pivot_i = partition(b, fn, tmp, lo, hi);
-        if ((char *)pivot_i - (char *)lo < (char *)hi - (char *)pivot_i)
+        void const *const pivot_i = partition(b, fn, tmp, lo, hi);
+        if ((char const *)pivot_i - (char const *)lo
+            < (char const *)hi - (char const *)pivot_i)
         {
             sort_rec(b, fn, tmp, lo, buf_rnext(b, pivot_i));
             lo = buf_next(b, pivot_i);
