@@ -81,7 +81,7 @@ static ccc_threeway_cmp cmp(struct ccc_romap const *, void const *key,
 static void *struct_base(struct ccc_romap const *,
                          struct ccc_romap_elem const *);
 static struct romap_query find(struct ccc_romap const *, void const *key);
-static void swap(char tmp[], void *a, void *b, size_t sizeof_type);
+static void swap(void *tmp, void *a, void *b, size_t sizeof_type);
 static void *maybe_alloc_insert(struct ccc_romap *,
                                 struct ccc_romap_elem *parent,
                                 ccc_threeway_cmp last_cmp,
@@ -816,7 +816,7 @@ init_node(struct ccc_romap *const rom, struct ccc_romap_elem *const e)
 }
 
 static inline void
-swap(char tmp[const], void *const a, void *const b, size_t const sizeof_type)
+swap(void *const tmp, void *const a, void *const b, size_t const sizeof_type)
 {
     if (a == b || !a || !b)
     {
@@ -991,7 +991,7 @@ rebalance_3_child(struct ccc_romap *const rom, struct ccc_romap_elem *z,
             demote(rom, z);
             demote(rom, y);
         }
-        else /* p(x) is 1,3, y is not a 2,2 parent, and x is 3-child.*/
+        else /* parent of x is 1,3, y is not a 2,2 parent, and x is 3-child. */
         {
             assert(is_3_child(rom, z, x));
             enum romap_link const z_to_x_dir = z->branch[R] == x;
