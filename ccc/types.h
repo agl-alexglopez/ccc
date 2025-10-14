@@ -170,14 +170,11 @@ indicated by any non-zero value in the error field.
 
 ```
 ccc_ucount res = ccc_bs_first_trailing_one(&my_bitset);
-if (!res.error)
-{
-    (void)ccc_bs_set(&my_bitset, res.count, CCC_TRUE);
-}
-else
+if (res.error)
 {
     // handle errors...
 }
+(void)ccc_bs_set(&my_bitset, res.count, CCC_TRUE);
 ```
 
 Full string explanations of the exact ccc_result error types can be provided via
