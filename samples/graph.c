@@ -438,9 +438,10 @@ found_dst(struct graph *const graph, struct vertex *const src)
                    eq_parent_cells, std_alloc, NULL, 0);
     flat_double_ended_queue bfs
         = fdeq_init(NULL, struct point, std_alloc, NULL, 0);
-    entry *e = fhm_insert_or_assign_w(
-        &parent_map, src->pos,
-        (struct path_backtrack_cell){.parent = {-1, -1}});
+    entry *e = fhm_insert_or_assign_w(&parent_map, src->pos,
+                                      (struct path_backtrack_cell){
+                                          .parent = {-1, -1},
+                                      });
     check(!insert_error(e));
     (void)push_back(&bfs, &src->pos);
     bool dst_connection = false;
@@ -450,9 +451,14 @@ found_dst(struct graph *const graph, struct vertex *const src)
         (void)pop_front(&bfs);
         for (size_t i = 0; i < DIRS_SIZE; ++i)
         {
-            struct point next
-                = {.r = cur.r + dirs[i].r, .c = cur.c + dirs[i].c};
-            struct path_backtrack_cell push = {.current = next, .parent = cur};
+            struct point next = {
+                .r = cur.r + dirs[i].r,
+                .c = cur.c + dirs[i].c,
+            };
+            struct path_backtrack_cell push = {
+                .current = next,
+                .parent = cur,
+            };
             cell const next_cell = grid_at(graph, next.r, next.c);
             if (is_vertex(next_cell))
             {
@@ -493,7 +499,13 @@ edge_construct(struct graph *const g, flat_hash_map *const parent_map,
     struct point cur = dst->pos;
     struct path_backtrack_cell const *c = get_key_val(parent_map, &cur);
     check(c);
-    struct edge edge = {.n = {.name = dst->name, .cost = 0}, .pos = dst->pos};
+    struct edge edge = {
+        .n = {
+            .name = dst->name,
+            .cost = 0,
+        },
+        .pos = dst->pos,
+    };
     while (c->parent.r > 0)
     {
         c = get_key_val(parent_map, &c->parent);
@@ -538,8 +550,10 @@ add_edge_cost_label(struct graph *const g, struct vertex *const src,
         }
         for (size_t i = 0; i < DIRS_SIZE; ++i)
         {
-            struct point next
-                = {.r = cur.r + dirs[i].r, .c = cur.c + dirs[i].c};
+            struct point next = {
+                .r = cur.r + dirs[i].r,
+                .c = cur.c + dirs[i].c,
+            };
             cell const next_cell = grid_at(g, next.r, next.c);
             if ((next_cell & VERTEXT_BIT)
                 && get_cell_vertex_title(next_cell) == e->n.name)
@@ -648,7 +662,10 @@ random_vertex_placement(struct graph const *const graph)
             {
                 col = VERTEX_PLACEMENT_PADDING;
             }
-            struct point const cur = {.r = row, .c = col};
+            struct point const cur = {
+                .r = row,
+                .c = col,
+            };
             if (is_valid_vertex_pos(graph, cur.r, cur.c))
             {
                 return cur;
@@ -890,8 +907,10 @@ vertex_degree(struct vertex const *const v)
 {
     int n = 0;
     /* Vertexes are initialized with zeroed out edge array. Falsey. */
-    for (int i = 0; i < MAX_DEGREE && v->edges[i].name; ++i, ++n)
-    {}
+    while (n < MAX_DEGREE && v->edges[n].name)
+    {
+        ++n;
+    }
     return n;
 }
 
@@ -1185,8 +1204,11 @@ static unsigned
 count_digits(uintmax_t n)
 {
     unsigned res = 0;
-    for (; n; ++res, n /= 10)
-    {}
+    while (n)
+    {
+        n /= 10;
+        ++res;
+    }
     return res;
 }
 
