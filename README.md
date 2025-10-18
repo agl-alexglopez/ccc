@@ -863,8 +863,6 @@ The interface may then ask for a handle to this type for certain operations. For
 void *ccc_pq_push(ccc_priority_queue *pq, ccc_pq_elem *elem);
 ```
 
-Here, the user is trying to push an new `struct cost` into the priority queue and the `cost` field should already be set appropriately by the user.
-
 Non-Intrusive containers exist when a flat container can operate without such help from the user. The `flat_priority_queue` is a good example of this. When initializing we give it the following information.
 
 ```c
@@ -885,7 +883,7 @@ ccc_flat_priority_queue fpq
     = ccc_fpq_init(NULL, int, CCC_LES, int_cmp, std_alloc, NULL, 0);
 ```
 
-Notice that we need to help the container by casting to the type we are storing. The interface then looks like this.
+The interface then looks like this.
 
 ```c
 void *ccc_fpq_push(ccc_flat_priority_queue *fpq, void const *e, void *tmp);
@@ -918,7 +916,7 @@ ccc_doubly_linked_list dll
     = ccc_dll_init(dll, struct id_val, e, val_cmp, NULL, NULL);
 ```
 
-All interface functions now expect the memory containing the intrusive elements to exist with the appropriate scope and lifetime for the programmer's needs.
+All interface functions now expect the memory containing the intrusive elements to exist with the appropriate scope and lifetime for the programmer's needs. Consider the following classic problem with scoping in C.
 
 ```c
 /* !WARNING: THIS IS A BAD IDEA FOR DEMONSTRATION PURPOSES! */
@@ -1137,11 +1135,17 @@ struct prim_cell *const cell = or_insert(entry_r(&cost_map, &next), &new);
 The lazily evaluated macro version.
 
 ```c
-struct point const next = {.r = c->cell.r + dir_offsets[i].r,
-                           .c = c->cell.c + dir_offsets[i].c};
+struct point const next = {
+    .r = c->cell.r + dir_offsets[i].r,
+    .c = c->cell.c + dir_offsets[i].c,
+};
 struct prim_cell const *const cell = fhm_or_insert_w(
     entry_r(&cost_map, &next),
-    (struct prim_cell){.cell = next, .cost = rand_range(0, 100)});
+    (struct prim_cell){
+        .cell = next,
+        .cost = rand_range(0, 100),
+    }
+);
 ```
 
 The second example is slightly more convenient and efficient. The compound literal is provided to be directly assigned to a Vacant memory location allowing the compiler to decide how the copy should be performed; it is only constructed if there is no entry present. This also means the random generation function is only called if a Vacant entry requires the insertion of a new value. So, expensive function calls can be lazily evaluated only when needed.
