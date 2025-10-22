@@ -472,7 +472,7 @@ merge(ccc_singly_linked_list *const sll, struct list_link a_0,
         if (cmp(sll, a_n_b_0.i, a_0.i) == CCC_LES)
         {
             /* The i element is the lesser element that must be spliced out.
-               However, a_n_b_0.prev is not updated because only i been spliced
+               However, a_n_b_0.prev is not updated because only i is spliced
                out. Algorithm will continue with new i, but same prev. */
             struct ccc_sll_elem *const lesser = a_n_b_0.i;
             a_n_b_0.i = lesser->n;
