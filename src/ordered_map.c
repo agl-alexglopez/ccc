@@ -988,39 +988,21 @@ are_subtrees_valid(struct ccc_omap const *const t, struct tree_range const r,
                               nil);
 }
 
-static struct parent_status
-child_tracks_parent(struct ccc_omap_elem const *const parent,
-                    struct ccc_omap_elem const *const root)
-{
-    if (root->parent != parent)
-    {
-        struct ccc_omap_elem *p = root->parent->parent;
-        return (struct parent_status){
-            CCC_FALSE,
-            p,
-        };
-    }
-    return (struct parent_status){
-        CCC_TRUE,
-        parent,
-    };
-}
-
 static ccc_tribool
-is_duplicate_storing_parent(struct ccc_omap const *const t,
-                            struct ccc_omap_elem const *const parent,
-                            struct ccc_omap_elem const *const root)
+is_parent_correct(struct ccc_omap const *const t,
+                  struct ccc_omap_elem const *const parent,
+                  struct ccc_omap_elem const *const root)
 {
     if (root == &t->end)
     {
         return CCC_TRUE;
     }
-    if (!child_tracks_parent(parent, root).correct)
+    if (root->parent != parent)
     {
         return CCC_FALSE;
     }
-    return is_duplicate_storing_parent(t, root, root->branch[L])
-        && is_duplicate_storing_parent(t, root, root->branch[R]);
+    return is_parent_correct(t, root, root->branch[L])
+        && is_parent_correct(t, root, root->branch[R]);
 }
 
 /* Validate tree prefers to use recursion to examine the tree over the
@@ -1042,7 +1024,7 @@ ccc_omap_validate(struct ccc_omap const *const t)
     {
         return CCC_FALSE;
     }
-    if (!is_duplicate_storing_parent(t, &t->end, t->root))
+    if (!is_parent_correct(t, &t->end, t->root))
     {
         return CCC_FALSE;
     }
