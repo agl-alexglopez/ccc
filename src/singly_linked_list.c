@@ -484,7 +484,7 @@ merge(ccc_singly_linked_list *const sll, struct list_link a_0,
             }
             a_0.prev->n = lesser;
             lesser->n = a_0.i;
-            /* Another update only reflected in our links, not the list. */
+            /* Another critical update reflected in our links, not the list. */
             a_0.prev = lesser;
         }
         else
