@@ -306,7 +306,7 @@ static struct path_request parse_path_request(struct graph *, str_view);
 static void help(void);
 
 static threeway_cmp cmp_pq_costs(any_type_cmp);
-static ccc_tribool eq_parent_cells(any_key_cmp);
+static ccc_threeway_cmp cmp_parent_cells(any_key_cmp);
 static uint64_t hash_parent_cells(any_key point_struct);
 static uint64_t hash_64_bits(uint64_t);
 
@@ -435,7 +435,7 @@ found_dst(struct graph *const graph, struct vertex *const src)
 {
     flat_hash_map parent_map
         = fhm_init(NULL, struct path_backtrack_cell, current, hash_parent_cells,
-                   eq_parent_cells, std_alloc, NULL, 0);
+                   cmp_parent_cells, std_alloc, NULL, 0);
     flat_double_ended_queue bfs
         = fdeq_init(NULL, struct point, std_alloc, NULL, 0);
     entry *e = fhm_insert_or_assign_w(&parent_map, src->pos,
@@ -1114,12 +1114,18 @@ build_path_outline(struct graph *graph)
 
 /*====================    Data Structure Helpers    =========================*/
 
-static ccc_tribool
-eq_parent_cells(any_key_cmp const c)
+static ccc_threeway_cmp
+cmp_parent_cells(any_key_cmp const c)
 {
-    struct point const *const p = c.any_key_lhs;
-    struct path_backtrack_cell const *const pc = c.any_type_rhs;
-    return pc->current.r == p->r && pc->current.c == p->c;
+    struct point const *const lhs = c.any_key_lhs;
+    struct path_backtrack_cell const *const rhs = c.any_type_rhs;
+    ccc_threeway_cmp const cmp
+        = ((lhs->r < rhs->current.r) - (lhs->r > rhs->current.r));
+    if (cmp != CCC_EQL)
+    {
+        return cmp;
+    }
+    return ((lhs->c < rhs->current.c) - (lhs->c > rhs->current.c));
 }
 
 static uint64_t

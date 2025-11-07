@@ -343,14 +343,6 @@ desired; any program state can be maintained then the element can be freed by
 the user in this function as the final step. */
 typedef void ccc_any_type_destructor_fn(ccc_any_type);
 
-/** @brief A callback function to determining equality between two stored keys.
-
-The function should return CCC_TRUE if the key and key field in the user type
-are equivalent, else CCC_FALSE.
-@note a callback need not return CCC_TRIBOOL_ERROR as the container code always
-provides data to the arguments of the function invariantly. */
-typedef ccc_tribool ccc_any_key_eq_fn(ccc_any_key_cmp);
-
 /** @brief A callback function for three-way comparing two stored keys.
 
 The key is considered the left hand side of the comparison. The function should
@@ -557,7 +549,6 @@ typedef ccc_any_alloc_fn any_alloc_fn;
 typedef ccc_any_type_cmp_fn any_type_cmp_fn;
 typedef ccc_any_type_update_fn any_type_update_fn;
 typedef ccc_any_type_destructor_fn any_type_destructor_fn;
-typedef ccc_any_key_eq_fn any_key_eq_fn;
 typedef ccc_any_key_cmp_fn any_key_cmp_fn;
 typedef ccc_any_key_hash_fn any_key_hash_fn;
 #    define entry_occupied(entry_ptr) ccc_entry_occupied(entry_ptr)

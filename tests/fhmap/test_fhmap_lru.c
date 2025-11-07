@@ -71,11 +71,12 @@ static bool const quiet = true;
     }                                                                          \
     while (0)
 
-static ccc_tribool
+static ccc_threeway_cmp
 lru_lookup_cmp(ccc_any_key_cmp const cmp)
 {
-    struct lru_lookup const *const lookup = cmp.any_type_rhs;
-    return lookup->key == *((int *)cmp.any_key_lhs);
+    struct lru_lookup const *const rhs = cmp.any_type_rhs;
+    int const lhs = *((int *)cmp.any_key_lhs);
+    return (lhs > rhs->key) - (lhs < rhs->key);
 }
 
 static ccc_threeway_cmp

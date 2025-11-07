@@ -155,7 +155,7 @@ static void help(void);
 static struct point rand_point(struct maze const *);
 static threeway_cmp cmp_prim_cells(any_type_cmp);
 static struct int_conversion parse_digits(str_view);
-static ccc_tribool prim_cell_eq(any_key_cmp);
+static ccc_threeway_cmp prim_cell_cmp(any_key_cmp);
 static uint64_t prim_cell_hash_fn(any_key);
 static uint64_t hash_64_bits(uint64_t);
 
@@ -257,7 +257,7 @@ animate_maze(struct maze *maze)
        exactly the needed memory and no more over lifetime of program. */
     flat_hash_map cost_map
         = fhm_init(NULL, struct prim_cell, cell, prim_cell_hash_fn,
-                   prim_cell_eq, NULL, NULL, 0);
+                   prim_cell_cmp, NULL, NULL, 0);
     result r
         = reserve(&cost_map, ((maze->rows * maze->cols) / 2) + 1, std_alloc);
     check(r == CCC_RESULT_OK);
@@ -314,12 +314,18 @@ animate_maze(struct maze *maze)
 
 /*===================     Container Support Code     ========================*/
 
-static ccc_tribool
-prim_cell_eq(any_key_cmp const c)
+static ccc_threeway_cmp
+prim_cell_cmp(any_key_cmp const c)
 {
     struct point const *const lhs = c.any_key_lhs;
     struct prim_cell const *const rhs = c.any_type_rhs;
-    return lhs->r == rhs->cell.r && lhs->c == rhs->cell.c;
+    ccc_threeway_cmp const cmp
+        = (lhs->r < rhs->cell.r) - (lhs->r > rhs->cell.r);
+    if (cmp != CCC_EQL)
+    {
+        return cmp;
+    }
+    return (lhs->c > rhs->cell.c) - (lhs->c < rhs->cell.c);
 }
 
 static uint64_t
