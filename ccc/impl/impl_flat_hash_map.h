@@ -245,7 +245,7 @@ because we can't initialize the tag array at compile time. By setting the tag
 field to NULL we will be able to tell if our map is initialized whether it is
 fixed size and has data or is dynamic and has not yet been given allocation. */
 #define ccc_impl_fhm_init(impl_fixed_map_ptr, impl_any_type_name,              \
-                          impl_key_field, impl_hash_fn, impl_key_eq_fn,        \
+                          impl_key_field, impl_hash_fn, impl_key_cmp_fn,       \
                           impl_alloc_fn, impl_aux_data, impl_capacity)         \
     {                                                                          \
         .data = (impl_fixed_map_ptr),                                          \
@@ -256,7 +256,7 @@ fixed size and has data or is dynamic and has not yet been given allocation. */
                                                : (size_t)0),                   \
         .sizeof_type = sizeof(impl_any_type_name),                             \
         .key_offset = offsetof(impl_any_type_name, impl_key_field),            \
-        .eq_fn = (impl_key_eq_fn),                                             \
+        .eq_fn = (impl_key_cmp_fn),                                            \
         .hash_fn = (impl_hash_fn),                                             \
         .alloc_fn = (impl_alloc_fn),                                           \
         .aux = (impl_aux_data),                                                \
