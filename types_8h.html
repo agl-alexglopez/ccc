@@ -227,9 +227,6 @@ Data Structures</h2></td></tr>
 <tr class="memitem:a97f231bd3df31cb2730e3304d4cc1dd2"><td class="memItemLeft" align="right" valign="top">typedef void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a97f231bd3df31cb2730e3304d4cc1dd2">ccc_any_type_destructor_fn</a>(<a class="el" href="structccc__any__type.html">ccc_any_type</a>)</td></tr>
 <tr class="memdesc:a97f231bd3df31cb2730e3304d4cc1dd2"><td class="mdescLeft">&#160;</td><td class="mdescRight">A callback function for destroying an element in the container.  <br /></td></tr>
 <tr class="separator:a97f231bd3df31cb2730e3304d4cc1dd2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abd6c43b9490eddff5f310353415856bc"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#abd6c43b9490eddff5f310353415856bc">ccc_any_key_eq_fn</a>(<a class="el" href="structccc__any__key__cmp.html">ccc_any_key_cmp</a>)</td></tr>
-<tr class="memdesc:abd6c43b9490eddff5f310353415856bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">A callback function to determining equality between two stored keys.  <br /></td></tr>
-<tr class="separator:abd6c43b9490eddff5f310353415856bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac003168686163e58d4a0347ba027c536"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="types_8h.html#afa7f5d9756840807860490d28e345955">ccc_threeway_cmp</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#ac003168686163e58d4a0347ba027c536">ccc_any_key_cmp_fn</a>(<a class="el" href="structccc__any__key__cmp.html">ccc_any_key_cmp</a>)</td></tr>
 <tr class="memdesc:ac003168686163e58d4a0347ba027c536"><td class="mdescLeft">&#160;</td><td class="mdescRight">A callback function for three-way comparing two stored keys.  <br /></td></tr>
 <tr class="separator:ac003168686163e58d4a0347ba027c536"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -359,23 +356,6 @@ Data Structures</h2></td></tr>
 
 <p>A callback function for three-way comparing two stored keys. </p>
 <p>The key is considered the left hand side of the comparison. The function should return CCC_LES if the key is less than the key in key field of user type, CCC_EQL if equal, and CCC_GRT if greater. </p>
-
-</div>
-</div>
-<a id="abd6c43b9490eddff5f310353415856bc" name="abd6c43b9490eddff5f310353415856bc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abd6c43b9490eddff5f310353415856bc">&#9670;&#160;</a></span>ccc_any_key_eq_fn</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> ccc_any_key_eq_fn(<a class="el" href="structccc__any__key__cmp.html">ccc_any_key_cmp</a>)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>A callback function to determining equality between two stored keys. </p>
-<p>The function should return CCC_TRUE if the key and key field in the user type are equivalent, else CCC_FALSE. </p><dl class="section note"><dt>Note</dt><dd>a callback need not return CCC_TRIBOOL_ERROR as the container code always provides data to the arguments of the function invariantly. </dd></dl>
 
 </div>
 </div>

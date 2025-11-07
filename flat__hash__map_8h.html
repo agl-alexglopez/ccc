@@ -143,9 +143,9 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memitem:ae33caa2a02f7dee60e61c146296db357"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#ae33caa2a02f7dee60e61c146296db357">ccc_fhm_fixed_capacity</a>(fixed_map_type_name)&#160;&#160;&#160;    ccc_impl_fhm_fixed_capacity(fixed_map_type_name)</td></tr>
 <tr class="memdesc:ae33caa2a02f7dee60e61c146296db357"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain the capacity previously chosen for the fixed size map type.  <br /></td></tr>
 <tr class="separator:ae33caa2a02f7dee60e61c146296db357"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a069c316044b54538c086596d01585410"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a069c316044b54538c086596d01585410">ccc_fhm_init</a>(map_ptr,  any_type_name,  key_field,  hash_fn,  key_eq_fn,  alloc_fn,  aux_data,  capacity)</td></tr>
-<tr class="memdesc:a069c316044b54538c086596d01585410"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a map with a buffer of types at compile time or runtime.  <br /></td></tr>
-<tr class="separator:a069c316044b54538c086596d01585410"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a522a8ae76cc559b1f18fe773bea8154b"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a522a8ae76cc559b1f18fe773bea8154b">ccc_fhm_init</a>(map_ptr,  any_type_name,  key_field,  hash_fn,  key_cmp_fn,  alloc_fn,  aux_data,  capacity)</td></tr>
+<tr class="memdesc:a522a8ae76cc559b1f18fe773bea8154b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a map with a buffer of types at compile time or runtime.  <br /></td></tr>
+<tr class="separator:a522a8ae76cc559b1f18fe773bea8154b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6b68e62760766164ae30d8c4adb314dc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__hash__map_8h.html#a6b68e62760766164ae30d8c4adb314dc">ccc_fhm_copy</a> (<a class="el" href="flat__hash__map_8h.html#a16a7808cff5a3e445e18a830e3ef3e40">ccc_flat_hash_map</a> *dst, <a class="el" href="flat__hash__map_8h.html#a16a7808cff5a3e445e18a830e3ef3e40">ccc_flat_hash_map</a> const *src, <a class="el" href="types_8h.html#a3e73202894869d2840fb21ff912bbd96">ccc_any_alloc_fn</a> *fn)</td></tr>
 <tr class="memdesc:a6b68e62760766164ae30d8c4adb314dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy the map at source to destination.  <br /></td></tr>
 <tr class="separator:a6b68e62760766164ae30d8c4adb314dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -412,7 +412,7 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="line">    <span class="keyword">struct </span>val,</div>
 <div class="line">    key,</div>
 <div class="line">    fhmap_int_to_u64,</div>
-<div class="line">    fhmap_id_eq,</div>
+<div class="line">    fhmap_id_cmp,</div>
 <div class="line">    NULL,</div>
 <div class="line">    NULL,</div>
 <div class="line">    fhm_fixed_capacity(small_fixed_map)</div>
@@ -432,7 +432,7 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="line">        <span class="keyword">struct </span>val,</div>
 <div class="line">        key,</div>
 <div class="line">        fhmap_int_to_u64,</div>
-<div class="line">        fhmap_id_eq,</div>
+<div class="line">        fhmap_id_cmp,</div>
 <div class="line">        NULL,</div>
 <div class="line">        NULL,</div>
 <div class="line">        fhm_fixed_capacity(small_fixed_map)</div>
@@ -516,8 +516,8 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="a069c316044b54538c086596d01585410" name="a069c316044b54538c086596d01585410"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a069c316044b54538c086596d01585410">&#9670;&#160;</a></span>ccc_fhm_init</h2>
+<a id="a522a8ae76cc559b1f18fe773bea8154b" name="a522a8ae76cc559b1f18fe773bea8154b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a522a8ae76cc559b1f18fe773bea8154b">&#9670;&#160;</a></span>ccc_fhm_init</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -550,7 +550,7 @@ This graph shows which files directly or indirectly include this file:</div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">key_eq_fn, </td>
+          <td class="paramname">key_cmp_fn, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -577,7 +577,7 @@ This graph shows which files directly or indirectly include this file:</div>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    ccc_impl_fhm_init(map_ptr, any_type_name, key_field, hash_fn, key_eq_fn,   \</div>
+<b>Value:</b><div class="fragment"><div class="line">    ccc_impl_fhm_init(map_ptr, any_type_name, key_field, hash_fn, key_cmp_fn,  \</div>
 <div class="line">                      alloc_fn, aux_data, capacity)</div>
 </div><!-- fragment -->
 <p>Initialize a map with a buffer of types at compile time or runtime. </p>
@@ -587,14 +587,14 @@ This graph shows which files directly or indirectly include this file:</div>
     <tr><td class="paramdir">[in]</td><td class="paramname">any_type_name</td><td>the name of the user defined type stored in the map. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">key_field</td><td>the field of the struct used for key storage. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">hash_fn</td><td>the ccc_any_key_hash_fn function the user desires for the table. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">key_eq_fn</td><td>the ccc_any_key_eq_fn the user intends to use. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">key_cmp_fn</td><td>the ccc_any_key_cmp_fn the user intends to use. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">alloc_fn</td><td>the allocation function for resizing or NULL if no resizing is allowed. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">aux_data</td><td>auxiliary data that is needed for hashing or comparison. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">capacity</td><td>the capacity of a fixed size map or 0. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the flat hash map directly initialized on the right hand side of the equality operator (i.e. ccc_flat_hash_map fh = <a class="el" href="flat__hash__map_8h.html#a069c316044b54538c086596d01585410" title="Initialize a map with a buffer of types at compile time or runtime.">ccc_fhm_init(...)</a>;) </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the flat hash map directly initialized on the right hand side of the equality operator (i.e. ccc_flat_hash_map fh = <a class="el" href="flat__hash__map_8h.html#a522a8ae76cc559b1f18fe773bea8154b" title="Initialize a map with a buffer of types at compile time or runtime.">ccc_fhm_init(...)</a>;) </dd></dl>
 <dl class="section note"><dt>Note</dt><dd>if a dynamic resizing map is required provide NULL as the map_ptr.</dd></dl>
 <p>Initialize a static fixed size hash map at compile time that has no allocation permission or auxiliary data needed.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_HASH_MAP_USING_NAMESPACE_CCC</span></div>
@@ -609,7 +609,7 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="line">    <span class="keyword">struct </span>val,</div>
 <div class="line">    key,</div>
 <div class="line">    fhmap_int_to_u64,</div>
-<div class="line">    fhmap_key_eq,</div>
+<div class="line">    fhmap_key_cmp,</div>
 <div class="line">    NULL,</div>
 <div class="line">    NULL,</div>
 <div class="line">    fhm_fixed_capacity(small_fixed_map)</div>
@@ -626,7 +626,7 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="line">    <span class="keyword">struct</span> val,</div>
 <div class="line">    key,</div>
 <div class="line">    fhmap_int_to_u64,</div>
-<div class="line">    fhmap_key_eq,</div>
+<div class="line">    fhmap_key_cmp,</div>
 <div class="line">    std_alloc,</div>
 <div class="line">    NULL,</div>
 <div class="line">    0</div>
@@ -1414,7 +1414,7 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="line">    <span class="keyword">struct </span>val,</div>
 <div class="line">    key,</div>
 <div class="line">    fhmap_int_to_u64,</div>
-<div class="line">    fhmap_key_eq,</div>
+<div class="line">    fhmap_key_cmp,</div>
 <div class="line">    NULL,</div>
 <div class="line">    NULL,</div>
 <div class="line">    <a class="code hl_define" href="flat__hash__map_8h.html#ae33caa2a02f7dee60e61c146296db357">ccc_fhm_fixed_capacity</a>(small_fixed_map)</div>
@@ -1425,7 +1425,7 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="line">    <span class="keyword">struct </span>val,</div>
 <div class="line">    key,</div>
 <div class="line">    fhmap_int_to_u64,</div>
-<div class="line">    fhmap_key_eq,</div>
+<div class="line">    fhmap_key_cmp,</div>
 <div class="line">    NULL,</div>
 <div class="line">    NULL,</div>
 <div class="line">    <a class="code hl_define" href="flat__hash__map_8h.html#ae33caa2a02f7dee60e61c146296db357">ccc_fhm_fixed_capacity</a>(small_fixed_map)</div>
@@ -1445,7 +1445,7 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="line">    <span class="keyword">struct</span> val,</div>
 <div class="line">    key,</div>
 <div class="line">    fhmap_int_to_u64,</div>
-<div class="line">    fhmap_key_eq,</div>
+<div class="line">    fhmap_key_cmp,</div>
 <div class="line">    std_alloc,</div>
 <div class="line">    NULL,</div>
 <div class="line">    0</div>
@@ -1456,7 +1456,7 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="line">    <span class="keyword">struct</span> val,</div>
 <div class="line">    key,</div>
 <div class="line">    fhmap_int_to_u64,</div>
-<div class="line">    fhmap_key_eq,</div>
+<div class="line">    fhmap_key_cmp,</div>
 <div class="line">    std_alloc,</div>
 <div class="line">    NULL,</div>
 <div class="line">    0</div>
@@ -1474,7 +1474,7 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="line">    <span class="keyword">struct</span> val,</div>
 <div class="line">    key,</div>
 <div class="line">    fhmap_int_to_u64,</div>
-<div class="line">    fhmap_key_eq,</div>
+<div class="line">    fhmap_key_cmp,</div>
 <div class="line">    std_alloc,</div>
 <div class="line">    NULL,</div>
 <div class="line">    0</div>
@@ -1485,7 +1485,7 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="line">    <span class="keyword">struct</span> val,</div>
 <div class="line">    key,</div>
 <div class="line">    fhmap_int_to_u64,</div>
-<div class="line">    fhmap_key_eq,</div>
+<div class="line">    fhmap_key_cmp,</div>
 <div class="line">    NULL,</div>
 <div class="line">    NULL,</div>
 <div class="line">    0</div>

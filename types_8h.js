@@ -7,7 +7,6 @@ var types_8h =
     [ "ccc_any_key", "structccc__any__key.html", "structccc__any__key" ],
     [ "ccc_any_alloc_fn", "types_8h.html#a3e73202894869d2840fb21ff912bbd96", null ],
     [ "ccc_any_key_cmp_fn", "types_8h.html#ac003168686163e58d4a0347ba027c536", null ],
-    [ "ccc_any_key_eq_fn", "types_8h.html#abd6c43b9490eddff5f310353415856bc", null ],
     [ "ccc_any_key_hash_fn", "types_8h.html#ac1cb788d8d6e0a1dcceb3485aa2aa37a", null ],
     [ "ccc_any_type_cmp_fn", "types_8h.html#a36055bd5f8a938ab6ffb246fa0fa8f6a", null ],
     [ "ccc_any_type_destructor_fn", "types_8h.html#a97f231bd3df31cb2730e3304d4cc1dd2", null ],
