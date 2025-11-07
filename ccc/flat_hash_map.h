@@ -108,7 +108,7 @@ static flat_hash_map static_fh = fhm_init(
     struct val,
     key,
     fhmap_int_to_u64,
-    fhmap_id_eq,
+    fhmap_id_cmp,
     NULL,
     NULL,
     fhm_fixed_capacity(small_fixed_map)
@@ -131,7 +131,7 @@ int main(void)
         struct val,
         key,
         fhmap_int_to_u64,
-        fhmap_id_eq,
+        fhmap_id_cmp,
         NULL,
         NULL,
         fhm_fixed_capacity(small_fixed_map)
@@ -165,7 +165,7 @@ restrictions. */
 @param [in] key_field the field of the struct used for key storage.
 @param [in] hash_fn the ccc_any_key_hash_fn function the user desires for the
 table.
-@param [in] key_eq_fn the ccc_any_key_eq_fn the user intends to use.
+@param [in] key_cmp_fn the ccc_any_key_cmp_fn the user intends to use.
 @param [in] alloc_fn the allocation function for resizing or NULL if no
 resizing is allowed.
 @param [in] aux_data auxiliary data that is needed for hashing or comparison.
@@ -190,7 +190,7 @@ static flat_hash_map static_fh = fhm_init(
     struct val,
     key,
     fhmap_int_to_u64,
-    fhmap_key_eq,
+    fhmap_key_cmp,
     NULL,
     NULL,
     fhm_fixed_capacity(small_fixed_map)
@@ -212,7 +212,7 @@ static flat_hash_map static_fh = fhm_init(
     struct val,
     key,
     fhmap_int_to_u64,
-    fhmap_key_eq,
+    fhmap_key_cmp,
     std_alloc,
     NULL,
     0
@@ -221,9 +221,9 @@ static flat_hash_map static_fh = fhm_init(
 
 Initialization at runtime is also possible. Stack-based or dynamic maps are
 identical to the provided examples. Omit `static` in a runtime context. */
-#define ccc_fhm_init(map_ptr, any_type_name, key_field, hash_fn, key_eq_fn,    \
+#define ccc_fhm_init(map_ptr, any_type_name, key_field, hash_fn, key_cmp_fn,   \
                      alloc_fn, aux_data, capacity)                             \
-    ccc_impl_fhm_init(map_ptr, any_type_name, key_field, hash_fn, key_eq_fn,   \
+    ccc_impl_fhm_init(map_ptr, any_type_name, key_field, hash_fn, key_cmp_fn,  \
                       alloc_fn, aux_data, capacity)
 
 /** @brief Copy the map at source to destination.
@@ -256,7 +256,7 @@ flat_hash_map src = fhm_init(
     struct val,
     key,
     fhmap_int_to_u64,
-    fhmap_key_eq,
+    fhmap_key_cmp,
     NULL,
     NULL,
     ccc_fhm_fixed_capacity(small_fixed_map)
@@ -267,7 +267,7 @@ flat_hash_map dst = fhm_init(
     struct val,
     key,
     fhmap_int_to_u64,
-    fhmap_key_eq,
+    fhmap_key_cmp,
     NULL,
     NULL,
     ccc_fhm_fixed_capacity(small_fixed_map)
@@ -290,7 +290,7 @@ flat_hash_map src = fhm_init(
     struct val,
     key,
     fhmap_int_to_u64,
-    fhmap_key_eq,
+    fhmap_key_cmp,
     std_alloc,
     NULL,
     0
@@ -301,7 +301,7 @@ flat_hash_map dst = fhm_init(
     struct val,
     key,
     fhmap_int_to_u64,
-    fhmap_key_eq,
+    fhmap_key_cmp,
     std_alloc,
     NULL,
     0
@@ -326,7 +326,7 @@ flat_hash_map src = fhm_init(
     struct val,
     key,
     fhmap_int_to_u64,
-    fhmap_key_eq,
+    fhmap_key_cmp,
     std_alloc,
     NULL,
     0
@@ -337,7 +337,7 @@ flat_hash_map dst = fhm_init(
     struct val,
     key,
     fhmap_int_to_u64,
-    fhmap_key_eq,
+    fhmap_key_cmp,
     NULL,
     NULL,
     0

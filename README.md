@@ -309,11 +309,12 @@ fhmap_int_to_u64(ccc_any_key const k)
     return x;
 }
 
-ccc_tribool
-fhmap_id_eq(ccc_any_key_cmp const cmp)
+ccc_threeway_cmp
+fhmap_id_cmp(ccc_any_key_cmp const cmp)
 {
-    struct key_val const *const va = cmp.any_type_rhs;
-    return va->key == *((int *)cmp.any_key_lhs);
+    struct key_val const *const rhs = cmp.any_type_rhs;
+    int const lhs = *((int *)cmp.any_key_lhs;
+    return (lhs > rhs->key) - (lhs < rhs->key);
 }
 
 fhm_declare_fixed_map(standard_fixed_map, struct key_val, 1024);
@@ -332,7 +333,7 @@ main(void)
         struct key_val,
         key,
         fhmap_int_to_u64,
-        fhmap_id_eq,
+        fhmap_id_cmp,
         NULL,
         NULL,
         STANDARD_FIXED_CAP
@@ -956,7 +957,7 @@ static flat_hash_map static_fh = fhm_init(
     struct val,
     key,
     fhmap_int_to_u64,
-    fhmap_id_eq,
+    fhmap_id_cmp,
     NULL,
     NULL,
     fhm_fixed_capacity(val_fixed_map)
@@ -977,7 +978,7 @@ static flat_hash_map static_fh = fhm_init(
     struct val,
     key,
     fhmap_int_to_u64,
-    fhmap_id_eq,
+    fhmap_id_cmp,
     std_alloc,
     NULL,
     0
