@@ -209,15 +209,14 @@ typedef struct
 /** @brief A key comparison helper to avoid argument swapping.
 
 The key is considered the left hand side of the operation if three-way
-comparison is needed. Left and right do not matter if equality is needed. Note
-a comparison is taking place between the key on the left hand side and the
-complete user type on the right hand side. This means the right hand side will
-need to manually access its key field.
+comparison is needed. Note a comparison is taking place between the key on the
+left hand side and the complete user type on the right hand side. This means the
+right hand side will need to manually access its key field.
 
 ```
-int const *const my_key = cmp.any_key_lhs;
-struct key_val const *const my_type  = cmp.any_type_rhs;
-return *my_key == my_type->key;
+int const *const my_key_lhs = cmp.any_key_lhs;
+struct key_val const *const my_type_rhs  = cmp.any_type_rhs;
+return (*my_key_lhs > my_type_rhs->key) - (*my_key_lhs < my_type_rhs->key);
 ```
 
 Notice that the user type must access its key field of its struct. Comparison
