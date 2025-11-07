@@ -17,12 +17,12 @@ struct owner
     void *allocation;
 };
 
-ccc_tribool
+ccc_threeway_cmp
 owners_eq(ccc_any_key_cmp const cmp)
 {
-    int const *const key = cmp.any_key_lhs;
-    struct owner const *const o = cmp.any_type_rhs;
-    return *key == o->key;
+    int const *const lhs = cmp.any_key_lhs;
+    struct owner const *const rhs = cmp.any_type_rhs;
+    return (*lhs > rhs->key) - (*lhs < rhs->key);
 }
 
 void
@@ -36,7 +36,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert_then_iterate)
 {
     ccc_flat_hash_map fh
         = fhm_init(&(standard_fixed_map){}, struct val, key, fhmap_int_to_u64,
-                   fhmap_id_eq, NULL, NULL, STANDARD_FIXED_CAP);
+                   fhmap_id_cmp, NULL, NULL, STANDARD_FIXED_CAP);
     int const size = STANDARD_FIXED_CAP;
     for (int i = 0; i < size; i += 2)
     {

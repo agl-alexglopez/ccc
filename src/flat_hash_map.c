@@ -1573,10 +1573,11 @@ static inline ccc_tribool
 eq_fn(struct ccc_fhmap const *const h, void const *const key, size_t const i)
 {
     return h->eq_fn((ccc_any_key_cmp){
-        .any_key_lhs = key,
-        .any_type_rhs = data_at(h, i),
-        .aux = h->aux,
-    });
+               .any_key_lhs = key,
+               .any_type_rhs = data_at(h, i),
+               .aux = h->aux,
+           })
+        == CCC_EQL;
 }
 
 static inline void *

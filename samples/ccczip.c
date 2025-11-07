@@ -192,9 +192,9 @@ static size_t bitq_count(struct bitq const *bq);
 static void bitq_clear_and_free(struct bitq *);
 static ccc_result bitq_reserve(struct bitq *, size_t to_add);
 static uint64_t hash_char(ccc_any_key to_hash);
-static ccc_tribool char_eq(ccc_any_key_cmp);
+static ccc_threeway_cmp char_eq(ccc_any_key_cmp);
 static ccc_threeway_cmp cmp_freqs(ccc_any_type_cmp cmp);
-static ccc_tribool path_memo_eq(ccc_any_key_cmp cmp);
+static ccc_threeway_cmp path_memo_cmp(ccc_any_key_cmp cmp);
 static void memoize_path(struct huffman_tree *tree, flat_hash_map *fh,
                          struct bitq *, char c);
 static struct bitq build_encoding_bitq(FILE *f, struct huffman_tree *tree);
@@ -455,7 +455,7 @@ build_encoding_bitq(FILE *const f, struct huffman_tree *const tree)
        could achieve the same result faster but it would waste much more space.
        It is rare to have a file use all 256 possible character values. */
     flat_hash_map memo = ccc_fhm_init(NULL, struct path_memo, ch, hash_char,
-                                      path_memo_eq, NULL, NULL, 0);
+                                      path_memo_cmp, NULL, NULL, 0);
     ccc_result r = reserve(&memo, tree->num_leaves, std_alloc);
     check(r == CCC_RESULT_OK);
     foreach_filechar(f, c, {
@@ -1146,11 +1146,12 @@ hash_char(ccc_any_key const to_hash)
     return ((uint64_t)key << 55) | key;
 }
 
-static ccc_tribool
+static ccc_threeway_cmp
 char_eq(ccc_any_key_cmp const cmp)
 {
-    struct char_freq const *const type = (struct char_freq *)cmp.any_type_rhs;
-    return *(char *)cmp.any_key_lhs == type->ch;
+    struct char_freq const *const rhs = (struct char_freq *)cmp.any_type_rhs;
+    char const lhs = *(char *)cmp.any_key_lhs;
+    return (lhs > rhs->ch) - (lhs < rhs->ch);
 }
 
 static ccc_threeway_cmp
@@ -1161,11 +1162,12 @@ cmp_freqs(ccc_any_type_cmp const cmp)
     return (lhs->freq > rhs->freq) - (lhs->freq < rhs->freq);
 }
 
-static ccc_tribool
-path_memo_eq(ccc_any_key_cmp const cmp)
+static ccc_threeway_cmp
+path_memo_cmp(ccc_any_key_cmp const cmp)
 {
-    struct path_memo const *const type = (struct path_memo *)cmp.any_type_rhs;
-    return *(char *)cmp.any_key_lhs == type->ch;
+    struct path_memo const *const rhs = (struct path_memo *)cmp.any_type_rhs;
+    char const lhs = *(char *)cmp.any_key_lhs;
+    return (lhs > rhs->ch) - (lhs < rhs->ch);
 }
 
 /*=========================     Help Message      ===========================*/
