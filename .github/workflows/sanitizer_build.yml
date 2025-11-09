@@ -63,7 +63,7 @@ jobs:
 
     - name: Build Portable Debug Sanitized
       run: |
-        cmake --preset=gcc-dsan -DCCC_FHM_PORTABLE=1 && cmake --build build -j$(nproc) --target ccc tests
+        cmake --preset=gcc-dsan -DCCC_FHM_PORTABLE=ON && cmake --build build -j$(nproc) --target ccc tests
         cmake --build build --target install
     
     - name: Test Portable Debug Sanitized
@@ -73,7 +73,7 @@ jobs:
     - name: Build Portable Release Sanitized
       run: |
         make clean
-        cmake --preset=gcc-rsan -DCCC_FHM_PORTABLE=1 && cmake --build build -j$(nproc) --target ccc tests
+        cmake --preset=gcc-rsan -DCCC_FHM_PORTABLE=ON && cmake --build build -j$(nproc) --target ccc tests
         cmake --build build --target install
         
     - name: Test Portable Release Sanitized
