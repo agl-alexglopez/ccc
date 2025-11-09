@@ -22,17 +22,54 @@ especially when rehashing occurs, so no pointer stability is available in this
 implementation.
 
 A flat hash map requires the user to provide a pointer to the map, a type, a key
-field, a hash function, and a key comparator function. The hash function should
-be well tailored to the key being stored in the table to prevent collisions.
-Good variety in the upper bits of the hashed value will also result in faster
-performance. Currently, the flat hash map does not offer any default hash
-functions or hash strengthening algorithms so strong hash functions should be
-obtained by the user for the data set.
+field, a hash function, and a key three way comparison function. The hash
+function should be well tailored to the key being stored in the table to prevent
+collisions. Good variety in the upper bits of the hashed value will also result
+in faster performance. Currently, the flat hash map does not offer any default
+hash functions or hash strengthening algorithms so strong hash functions should
+be obtained by the user for the data set.
 
 The current implementation will seek to use the best platform specific SIMD or
 SRMD instructions available. However, if for any reason the user wishes to use
-the most portable Single Register Multiple Data fallback implementation, define
-the following flag before including the `ccc/flat_hash_map.h` header.
+the most portable Single Register Multiple Data fallback implementation, there
+are many options.
+
+If building this library separately to include it's library file, add the
+flag to the build (and read INSTALL.md for more details).
+
+```
+cmake --preset=clang-rel -DCCC_FHM_PORTABLE
+```
+
+If an install location other than the release folder is desired don't forget
+to add the install prefix.
+
+```
+cmake --preset=clang-rel -DCCC_FHM_PORTABLE -DCMAKE_INSTALL_PREFIX=/my/path/
+```
+
+If this library is being built as part of your project then define the flag
+as part of your configuration.
+
+```
+cmake --preset=my-preset -DCCC_FHM_PORTABLE
+```
+
+Or, add the flag to your `CMakePresets.json`.
+
+```
+"cacheVariables": {
+    "CCC_FHM_PORTABLE": "ON"
+}
+```
+
+Or, enable on a per target basis in your `CMakeLists.txt`.
+
+```
+target_compile_definitions(my_target PRIVATE CCC_FHM_PORTABLE)
+```
+
+Or finally, just define it before including the flat hash map header.
 
 ```
 #define CCC_FHM_PORTABLE
