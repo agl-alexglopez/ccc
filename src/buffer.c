@@ -587,7 +587,7 @@ ccc_buf_copy(ccc_buffer *const dst, ccc_buffer const *const src,
 /*======================  Static Helpers  ==================================*/
 
 static inline void *
-at(ccc_buffer const *const buf, size_t const i)
+at(struct ccc_buffer const *const buf, size_t const i)
 {
     return ((char *)buf->mem + (i * buf->sizeof_type));
 }

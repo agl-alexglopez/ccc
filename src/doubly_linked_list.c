@@ -675,7 +675,7 @@ push_front(struct ccc_dll *const l, struct ccc_dll_elem *const e)
 }
 
 static inline void
-push_back(ccc_doubly_linked_list *const l, struct ccc_dll_elem *const e)
+push_back(struct ccc_dll *const l, struct ccc_dll_elem *const e)
 {
     e->n = &l->nil;
     e->p = l->nil.p;
@@ -760,7 +760,7 @@ struct_base(struct ccc_dll const *const l, struct ccc_dll_elem const *const e)
 }
 
 static inline struct ccc_dll_elem *
-elem_in(ccc_doubly_linked_list const *const dll, void const *const struct_base)
+elem_in(struct ccc_dll const *const dll, void const *const struct_base)
 {
     return (struct ccc_dll_elem *)((char *)struct_base + dll->dll_elem_offset);
 }

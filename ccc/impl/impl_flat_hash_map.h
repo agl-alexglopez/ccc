@@ -58,18 +58,18 @@ other state. Wrap a byte in a struct to avoid strict-aliasing exceptions that
 are granted to `uint8_t` (usually unsigned char) and `int8_t` (usually char)
 when passed to functions as pointers. Maybe nets performance gain but depends on
 aggressiveness of compiler. */
-typedef struct
+struct ccc_fhm_tag
 {
     /** Can be set to DELETED or EMPTY or an arbitrary hash 0b0???????. */
     uint8_t v;
-} ccc_fhm_tag;
+};
 
 /** @private Vectorized group scanning allows more parallel scans but a
 fallback of 8 is good for a portable implementation that will use the widest
 word on a platform for group scanning. Right now, this lib targets 64-bit so
 that means uint64_t is widest default integer widely supported. That width
 is still valid on 32-bit but probably very slow due to emulation. */
-enum : typeof((ccc_fhm_tag){}.v)
+enum : typeof((struct ccc_fhm_tag){}.v)
 {
 #ifdef CCC_HAS_X86_SIMD
     /** A group of tags that can be loaded into a 128 bit vector. */
@@ -124,7 +124,7 @@ struct ccc_fhmap
     /** Reversed user type data array. */
     void *data;
     /** Tag array on byte following data(0). */
-    ccc_fhm_tag *tag;
+    struct ccc_fhm_tag *tag;
     /** The number of user active slots. */
     size_t count;
     /** Track available slots given load factor constrains. When 0, rehash. */
@@ -154,7 +154,7 @@ struct ccc_fhash_entry
     /** The index in the data/tag array of this entry. */
     size_t i;
     /** The saved tag from the current query hash value. */
-    ccc_fhm_tag tag;
+    struct ccc_fhm_tag tag;
     /** The status of this entry. */
     enum ccc_entry_status stats;
 };
@@ -176,7 +176,7 @@ and debugging the macros easier. It also cuts down on repeated logic. */
 
 struct ccc_fhash_entry ccc_impl_fhm_entry(struct ccc_fhmap *h, void const *key);
 void ccc_impl_fhm_insert(struct ccc_fhmap *h, void const *key_val_type,
-                         ccc_fhm_tag m, size_t i);
+                         struct ccc_fhm_tag m, size_t i);
 void ccc_impl_fhm_erase(struct ccc_fhmap *h, size_t i);
 void *ccc_impl_fhm_data_at(struct ccc_fhmap const *h, size_t i);
 void *ccc_impl_fhm_key_at(struct ccc_fhmap const *h, size_t i);
@@ -211,8 +211,8 @@ boundary to be able to perform aligned loads and stores. */
     typedef struct                                                             \
     {                                                                          \
         key_val_type_name data[(capacity) + 1];                                \
-        alignas(CCC_FHM_GROUP_SIZE)                                            \
-            ccc_fhm_tag tag[(capacity) + CCC_FHM_GROUP_SIZE];                  \
+        alignas(CCC_FHM_GROUP_SIZE) struct ccc_fhm_tag                         \
+            tag[(capacity) + CCC_FHM_GROUP_SIZE];                              \
     }(fixed_map_type_name)
 
 /** @private If the user does not want to remember the capacity they chose

@@ -121,6 +121,26 @@ Now that tooling is set up, the workflow is roughly as follows.
 
 Formatting should be taken care of by the tools. Clang tidy will settle some small style matters. Defer to clang tidy suggestions when it makes them. Here are more general guidelines.
 
+### Naming
+
+We present as clean an interface to the user as possible. Because we don't have C++ private fields, and because we cannot make our types opaque pointers, we must use other strategies to hide our implementation. All types must be complete. Complete means all fields of all types are visible to the user at compile time. This allows them to store our types on the stack or data segment which is core goal of this library.
+
+Given these constraints we use the following naming conventions.
+
+- All types intentionally available to the user in a container `.h` file are `typedef`. For example, the flat hash map is `typedef struct ccc_fhmap ccc_flat_hash_map`. This is to discourage the user from thinking too hard about what the underlying types are because opaque pointers are not available.
+- All types internal to the developers shall not use `typedef`. Internally, we want to know exactly what every type is no matter how long the name. Implementation helper functions that operate within the interface functions should not use the user facing `typedef`. Use the true underlying type name so the code carries as much information as possible while reading.
+
+The exceptions to the user and developer naming split are as follows.
+
+- When the internal implementation uses types from `types.h` that have been `typedef`.
+    - For example, it improves code clarity to use the same `typedef` available to users for our function pointer types.
+- When we `typedef` platform specific types such as integers. For example, in the bit set, we work with many different integer widths. The integers communicate nothing about their intent or purpose in the overall code so we `typedef` for clarity of variables and function arguments.
+
+The reason there are exceptions to the rules that may seem confusing is to maintain the following principle.
+
+> [!IMPORTANT]
+> Code for the user simplifies and minimizes implementation details. Code for the developer specifies and maximizes implementation details.
+
 ### Validate Parameters
 
 Because this is a 3rd party library, we are responsible for avoiding undefined behavior and mysterious crashes from the user's perspective. This means checking any inputs to the user facing interface functions as non-NULL and valid for the operations we must complete.
