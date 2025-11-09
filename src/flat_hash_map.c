@@ -803,12 +803,6 @@ ccc_fhm_entry_status(ccc_fhmap_entry const *const e)
     return e->impl.stats;
 }
 
-void *
-ccc_fhm_data(ccc_flat_hash_map const *h)
-{
-    return h ? h->data : NULL;
-}
-
 ccc_result
 ccc_fhm_copy(ccc_flat_hash_map *const dst, ccc_flat_hash_map const *const src,
              ccc_any_alloc_fn *const fn)

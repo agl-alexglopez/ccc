@@ -903,15 +903,6 @@ Obtain the container state. */
 @return the capacity of the map or an argument error is set if h is NULL. */
 [[nodiscard]] ccc_ucount ccc_fhm_capacity(ccc_flat_hash_map const *h);
 
-/** @brief Return a reference to the base of backing array. O(1).
-@param [in] h a pointer to the map.
-@return a reference to the base of the backing array.
-@note the reference is to the base of the backing array at index 0 with no
-consideration for the organization of map.
-@warning it is the users responsibility to ensure that access to any data is
-within the capacity of the backing buffer. */
-[[nodiscard]] void *ccc_fhm_data(ccc_flat_hash_map const *h);
-
 /** @brief Validation of invariants for the hash table.
 @param [in] h the table to validate.
 @return true if all invariants hold, false if corruption occurs. Error if h is
@@ -959,7 +950,6 @@ typedef ccc_fhmap_entry fhmap_entry;
 #    define fhm_begin(args...) ccc_fhm_begin(args)
 #    define fhm_next(args...) ccc_fhm_next(args)
 #    define fhm_end(args...) ccc_fhm_end(args)
-#    define fhm_data(args...) ccc_fhm_data(args)
 #    define fhm_is_empty(args...) ccc_fhm_is_empty(args)
 #    define fhm_count(args...) ccc_fhm_count(args)
 #    define fhm_clear(args...) ccc_fhm_clear(args)
