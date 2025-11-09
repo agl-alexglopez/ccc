@@ -15,6 +15,7 @@ limitations under the License. */
 #include <string.h>
 
 #include "buffer.h"
+#include "impl/impl_buffer.h"
 #include "types.h"
 
 enum : size_t
