@@ -130,6 +130,8 @@ Given these constraints we use the following naming conventions.
 - All types intentionally available to the user in a container `.h` file are `typedef`. For example, the flat hash map is `typedef struct ccc_fhmap ccc_flat_hash_map`. This is to discourage the user from thinking too hard about what the underlying types are because opaque pointers are not available.
 - All types internal to the developers shall not use `typedef`. Internally, we want to know exactly what every type is no matter how long the name. Implementation helper functions that operate within the interface functions should not use the user facing `typedef`. Use the true underlying type name so the code carries as much information as possible while reading.
 - To aid in the prior point, all functions internal to an implementation `src/*.c` file should be marked `static`. This will also help signal that you should be using the full type name in parameters and inside that function, not the user facing `typedef`.
+- The implementation of macros is always completed in the `ccc/impl/` directory, and wrapper macros are provided in the `ccc/*.h` headers. The user should not be distracted with macro details.
+- The `impl_` and `ccc_impl_` prefix is used in macros in the `ccc/impl/*.h` headers.
 
 The exceptions to the user and developer naming split are as follows.
 
@@ -186,7 +188,7 @@ Early returns make it easier to find and reason about the happy path. The only e
 
 Variable length arrays are strictly prohibited. All containers must be designed to accommodate a non-allocating mode. This means the user can initialize the container to have no allocation permissions. However, for some containers this poses a challenge.
 
-For example, a flat priority queue is a binary heap that operates by swapping elements. To swap elements we need a temporary space the size of one of the elements in the heap. To ensure the user can store exactly as many elements as they wish in the flat array all signatures for functions that require swapping internally ask for a swap slot. For example here is the pop operation signature.
+For example, a flat priority queue is a binary heap that operates by swapping elements. To swap elements we need a temporary space the size of one of the elements in the heap. We are not a header only template-style library so we must find space across an interface boundary. To ensure the user can store exactly as many elements as they wish in the flat array all signatures for functions that require swapping internally ask for a swap slot. For example here is the pop operation signature.
 
 ```c
 ccc_result ccc_fpq_pop(ccc_flat_priority_queue *fpq, void *tmp);
