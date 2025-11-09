@@ -1939,8 +1939,8 @@ match_empty_deleted(struct group const g)
 }
 
 /** Returns a 0 based match with every bit on representing those tags in the
-group that are occupied by a user hash value. These are those tags that have
-the most significant bit off and the lower 7 bits occupied by user hash. */
+group that are occupied by a hashed value. These are those tags that have the
+most significant bit off and the lower 7 bits occupied by user hash. */
 static inline struct match_mask
 match_full(struct group const g)
 {
