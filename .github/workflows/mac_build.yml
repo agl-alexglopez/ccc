@@ -62,3 +62,22 @@ jobs:
     - name: Test Release
       run: |
         make rtest
+
+    - name: Build Portable Debug Clang and Ninja
+      run: |
+        cmake --preset=clang-deb -DCCC_FHM_PORTABLE=1 -G "Ninja" && cmake --build build -j$(nproc) --target ccc tests samples
+        cmake --build build --target install
+    
+    - name: Test Debug
+      run: |
+        make dtest
+
+    - name: Build Portable Release Clang and Ninja
+      run: |
+        make clean
+        cmake --preset=clang-rel -DCCC_FHM_PORTABLE=1 -G "Ninja" && cmake --build build -j$(nproc) --target ccc tests samples
+        cmake --build build --target install
+        
+    - name: Test Release
+      run: |
+        make rtest
