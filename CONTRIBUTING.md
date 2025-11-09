@@ -129,6 +129,7 @@ Given these constraints we use the following naming conventions.
 
 - All types intentionally available to the user in a container `.h` file are `typedef`. For example, the flat hash map is `typedef struct ccc_fhmap ccc_flat_hash_map`. This is to discourage the user from thinking too hard about what the underlying types are because opaque pointers are not available.
 - All types internal to the developers shall not use `typedef`. Internally, we want to know exactly what every type is no matter how long the name. Implementation helper functions that operate within the interface functions should not use the user facing `typedef`. Use the true underlying type name so the code carries as much information as possible while reading.
+- To aid in the prior point, all functions internal to an implementation `src/*.c` file should be marked `static`. This will also help signal that you should be using the full type name in parameters and inside that function, not the user facing `typedef`.
 
 The exceptions to the user and developer naming split are as follows.
 
@@ -136,7 +137,7 @@ The exceptions to the user and developer naming split are as follows.
     - For example, it improves code clarity to use the same `typedef` available to users for our function pointer types.
 - When we `typedef` platform specific types such as integers. For example, in the bit set, we work with many different integer widths. The integers communicate nothing about their intent or purpose in the overall code so we `typedef` for clarity of variables and function arguments.
 
-The reason there are exceptions to the rules that may seem confusing is to maintain the following principle.
+The reason for this naming split, and for the few exceptions to the rules, is to maintain the following principle.
 
 > [!IMPORTANT]
 > Code for the user simplifies and minimizes implementation details. Code for the developer specifies and maximizes implementation details.

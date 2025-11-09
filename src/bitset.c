@@ -127,7 +127,8 @@ struct igroup
 /*=========================      Prototypes      ============================*/
 
 static size_t ublock_index(size_t bitset_index);
-static inline bitblock *block_at(ccc_bitset const *bs, size_t bitset_index);
+static inline bitblock *block_at(struct ccc_bitset const *bs,
+                                 size_t bitset_index);
 static void set(bitblock *, size_t bitset_index, ccc_tribool);
 static bitblock on(size_t bitset_index);
 static void fix_end(struct ccc_bitset *);
@@ -1640,7 +1641,7 @@ all_range(struct ccc_bitset const *const bs, size_t const i, size_t const count)
 reference to the block that such a bit belongs to. This block reference will
 point to some block at index [0, count of blocks used in the set). */
 static inline bitblock *
-block_at(ccc_bitset const *const bs, size_t const bitset_index)
+block_at(struct ccc_bitset const *const bs, size_t const bitset_index)
 {
     return &bs->blocks[ublock_index(bitset_index)];
 }
