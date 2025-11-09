@@ -123,7 +123,7 @@ Formatting should be taken care of by the tools. Clang tidy will settle some sma
 
 ### Naming
 
-We present as clean an interface to the user as possible. Because we don't have C++ private fields, and because we cannot make our types opaque pointers, we must use other strategies to hide our implementation. All types must be complete. Complete means all fields of all types are visible to the user at compile time. This allows them to store our types on the stack or data segment which is core goal of this library.
+We present as clean an interface to the user as possible. Because we don't have C++ private fields, and because we cannot make our types opaque pointers, we must use other strategies to hide our implementation. All types must be complete. Complete means all fields of all types are visible to the user at compile time. This allows them to store our types on the stack or data segment which is a core goal of this library.
 
 Given these constraints we use the following naming conventions.
 
