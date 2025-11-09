@@ -255,14 +255,6 @@ starting at index 0 to index n - 1. */
 ccc_result ccc_fpq_heapify_inplace(ccc_flat_priority_queue *fpq, void *tmp,
                                    size_t n);
 
-/** @brief Many allocate memory for the fpq.
-@param [in] fpq a pointer to the priority queue.
-@param [in] new_capacity the desired capacity for the fpq.
-@param [in] fn the allocation function. May be the same as used on init.
-@return OK if allocation was successful or a memory error on failure. */
-ccc_result ccc_fpq_alloc(ccc_flat_priority_queue *fpq, size_t new_capacity,
-                         ccc_any_alloc_fn *fn);
-
 /** @brief Pushes element pointed to at e into fpq. O(lgN).
 @param [in] fpq a pointer to the priority queue.
 @param [in] elem a pointer to the user element of same type as in fpq.
@@ -563,10 +555,8 @@ typedef ccc_flat_priority_queue flat_priority_queue;
 #    define fpq_heapify_inplace(args...) ccc_fpq_heapify_inplace(args)
 #    define fpq_heapsort(args...) ccc_fpq_heapsort(args)
 #    define fpq_emplace(args...) ccc_fpq_emplace(args)
-#    define fpq_realloc(args...) ccc_fpq_realloc(args)
 #    define fpq_push(args...) ccc_fpq_push(args)
 #    define fpq_front(args...) ccc_fpq_front(args)
-#    define fpq_i(args...) ccc_fpq_i(args)
 #    define fpq_pop(args...) ccc_fpq_pop(args)
 #    define fpq_extract(args...) ccc_fpq_extract(args)
 #    define fpq_update(args...) ccc_fpq_update(args)

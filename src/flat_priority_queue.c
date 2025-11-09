@@ -43,17 +43,6 @@ static void destroy_each(struct ccc_fpq *fpq, ccc_any_type_destructor_fn *fn);
 /*=====================       Interface      ================================*/
 
 ccc_result
-ccc_fpq_alloc(ccc_flat_priority_queue *const fpq, size_t const new_capacity,
-              ccc_any_alloc_fn *const fn)
-{
-    if (!fpq || !fn)
-    {
-        return CCC_RESULT_ARG_ERROR;
-    }
-    return ccc_buf_alloc(&fpq->buf, new_capacity, fn);
-}
-
-ccc_result
 ccc_fpq_heapify(ccc_flat_priority_queue *const fpq, void *const tmp,
                 void *const array, size_t const n,
                 size_t const input_sizeof_type)
