@@ -263,6 +263,59 @@ identical to the provided examples. Omit `static` in a runtime context. */
     ccc_impl_fhm_init(map_ptr, any_type_name, key_field, hash_fn, key_cmp_fn,  \
                       alloc_fn, aux_data, capacity)
 
+/** @brief Initialize a dynamic map at runtime.
+@param [in] key_field the field of the struct used for key storage.
+@param [in] hash_fn the ccc_any_key_hash_fn function the user desires for the
+table.
+@param [in] key_cmp_fn the ccc_any_key_cmp_fn the user intends to use.
+@param [in] alloc_fn the required allocation function.
+@param [in] aux_data auxiliary data that is needed for hashing or comparison.
+@param [in] initializer_list a list of key value pairs of the type intended to
+be stored in the map, using array compound literal initialization syntax (e.g
+`(struct my_type[]){{.k = 0, .v 0}, {.k = 1, .v = 1}}`).
+@return the flat hash map directly initialized on the right hand side of the
+equality operator (i.e. ccc_flat_hash_map fh = ccc_fhm_init_from(...);)
+@warning An allocation function is required. This initializer is only available
+for dynamic maps.
+@warning If elements with duplicate keys are inserted, the earlier entry is
+overwritten completely by all fields of the newer element.
+
+Initialize a dynamic hash table at run time. This example requires no auxiliary
+data for initialization.
+
+```
+#define FLAT_HASH_MAP_USING_NAMESPACE_CCC
+struct val
+{
+    int key;
+    int val;
+};
+int
+main(void)
+{
+    flat_hash_map static_fh = fhm_from(
+        key,
+        fhmap_int_to_u64,
+        fhmap_key_cmp,
+        std_alloc,
+        NULL,
+        (struct val[]) {
+            {.key = 1, .val = 1},
+            {.key = 2, .val = 2},
+            {.key = 3, .val = 3},
+        },
+    );
+    return 0;
+}
+```
+
+Only dynamic maps may be initialized this way due the inability of the hash
+map to protect its invariants from user error at compile time. */
+#define ccc_fhm_from(key_field, hash_fn, key_cmp_fn, alloc_fn, aux_data,       \
+                     initializer_list...)                                      \
+    ccc_impl_fhm_from(key_field, hash_fn, key_cmp_fn, alloc_fn, aux_data,      \
+                      initializer_list)
+
 /** @brief Copy the map at source to destination.
 @param [in] dst the initialized destination for the copy of the src map.
 @param [in] src the initialized source of the map.
@@ -920,6 +973,7 @@ typedef ccc_fhmap_entry fhmap_entry;
 #    define fhm_fixed_capacity(args...) ccc_fhm_fixed_capacity(args)
 #    define fhm_reserve(args...) ccc_fhm_reserve(args)
 #    define fhm_init(args...) ccc_fhm_init(args)
+#    define fhm_from(args...) ccc_fhm_from(args)
 #    define fhm_copy(args...) ccc_fhm_copy(args)
 #    define fhm_and_modify_w(args...) ccc_fhm_and_modify_w(args)
 #    define fhm_or_insert_w(args...) ccc_fhm_or_insert_w(args)

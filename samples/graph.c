@@ -433,16 +433,17 @@ build_graph(struct graph *const graph)
 static bool
 found_dst(struct graph *const graph, struct vertex *const src)
 {
-    flat_hash_map parent_map
-        = fhm_init(NULL, struct path_backtrack_cell, current, hash_parent_cells,
-                   cmp_parent_cells, std_alloc, NULL, 0);
+
+    flat_hash_map parent_map = fhm_init_from(current, hash_parent_cells,
+                                             cmp_parent_cells, std_alloc, NULL,
+                                             (struct path_backtrack_cell[]){
+                                                 {
+                                                     .current = src->pos,
+                                                     .parent = {-1, -1},
+                                                 },
+                                             });
     flat_double_ended_queue bfs
         = fdeq_init(NULL, struct point, std_alloc, NULL, 0);
-    entry *e = fhm_insert_or_assign_w(&parent_map, src->pos,
-                                      (struct path_backtrack_cell){
-                                          .parent = {-1, -1},
-                                      });
-    check(!insert_error(e));
     (void)push_back(&bfs, &src->pos);
     bool dst_connection = false;
     while (!is_empty(&bfs))

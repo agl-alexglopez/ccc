@@ -83,6 +83,12 @@ enum : typeof((struct ccc_fhm_tag){}.v)
 #endif /* defined(CCC_HAS_X86_SIMD) */
 };
 
+struct ccc_fhmap_soa
+{
+    void *data;
+    struct ccc_fhm_tag tag[];
+};
+
 /** @private The layout of the map uses only pointers to account for the
 possibility of memory provided from the data segment, stack, or heap. When the
 map is allowed to allocate it will take care of aligning pointers appropriately.
@@ -121,6 +127,7 @@ template generic system. Simple 0 based indexing makes the addition and
 multiplication we perform as simple as possible. */
 struct ccc_fhmap
 {
+    struct ccc_fhmap_soa *soa;
     /** Reversed user type data array. */
     void *data;
     /** Tag array on byte following data(0). */
@@ -261,6 +268,36 @@ fixed size and has data or is dynamic and has not yet been given allocation. */
         .alloc_fn = (impl_alloc_fn),                                           \
         .aux = (impl_aux_data),                                                \
     }
+
+#define ccc_impl_fhm_from(impl_key_field, impl_hash_fn, impl_key_cmp_fn,       \
+                          impl_alloc_fn, impl_aux_data,                        \
+                          impl_initializer_list...)                            \
+    (__extension__({                                                           \
+        typeof(*impl_initializer_list) impl_fhm_initializer_list[]             \
+            = impl_initializer_list;                                           \
+        struct ccc_fhmap impl_map = ccc_impl_fhm_init(                         \
+            NULL, typeof(*impl_fhm_initializer_list), impl_key_field,          \
+            impl_hash_fn, impl_key_cmp_fn, impl_alloc_fn, impl_aux_data, 0);   \
+        for (size_t i = 0; i < sizeof(impl_fhm_initializer_list)               \
+                                   / sizeof(*impl_fhm_initializer_list);       \
+             ++i)                                                              \
+        {                                                                      \
+            struct ccc_fhash_entry impl_ent = ccc_impl_fhm_entry(              \
+                &impl_map,                                                     \
+                (void *)&impl_fhm_initializer_list[i].impl_key_field);         \
+            if (!(impl_ent.stats & CCC_ENTRY_INSERT_ERROR))                    \
+            {                                                                  \
+                *((typeof(*impl_fhm_initializer_list) *)ccc_impl_fhm_data_at(  \
+                    impl_ent.h, impl_ent.i))                                   \
+                    = impl_fhm_initializer_list[i];                            \
+                if (impl_ent.stats == CCC_ENTRY_VACANT)                        \
+                {                                                              \
+                    ccc_impl_fhm_set_insert(&impl_ent);                        \
+                }                                                              \
+            }                                                                  \
+        }                                                                      \
+        impl_map;                                                              \
+    }))
 
 /*========================    Construct In Place    =========================*/
 

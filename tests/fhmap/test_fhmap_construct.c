@@ -166,10 +166,86 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_empty)
     CHECK_END_FN();
 }
 
+CHECK_BEGIN_STATIC_FN(fhmap_test_init_from)
+{
+    flat_hash_map map_from_list
+        = fhm_from(key, fhmap_int_to_u64, fhmap_id_cmp, std_alloc, NULL,
+                   (struct val[]){
+                       {.key = 0, .val = 0},
+                       {.key = 1, .val = 1},
+                       {.key = 2, .val = 2},
+                   });
+    CHECK(validate(&map_from_list), true);
+    CHECK(count(&map_from_list).count, 3);
+    size_t seen = 0;
+    for (struct val const *i = begin(&map_from_list); i != end(&map_from_list);
+         i = next(&map_from_list, i))
+    {
+        CHECK((i->key == 0 && i->val == 0) || (i->key == 1 && i->val == 1)
+                  || (i->key == 2 && i->val == 2),
+              true);
+        ++seen;
+    }
+    CHECK(seen, 3);
+    CHECK_END_FN();
+}
+
+CHECK_BEGIN_STATIC_FN(fhmap_test_init_from_overwrite)
+{
+    flat_hash_map map_from_list
+        = fhm_from(key, fhmap_int_to_u64, fhmap_id_cmp, std_alloc, NULL,
+                   (struct val[]){
+                       {.key = 0, .val = 0},
+                       {.key = 0, .val = 1},
+                       {.key = 0, .val = 2},
+                   });
+    CHECK(validate(&map_from_list), true);
+    CHECK(count(&map_from_list).count, 1);
+    size_t seen = 0;
+    for (struct val const *i = begin(&map_from_list); i != end(&map_from_list);
+         i = next(&map_from_list, i))
+    {
+        CHECK(i->key, 0);
+        CHECK(i->val, 2);
+        ++seen;
+    }
+    CHECK(seen, 1);
+    CHECK_END_FN();
+}
+
+CHECK_BEGIN_STATIC_FN(fhmap_test_init_from_fail)
+{
+    // Whoops forgot an allocation function.
+    flat_hash_map map_from_list
+        = fhm_from(key, fhmap_int_to_u64, fhmap_id_cmp, NULL, NULL,
+                   (struct val[]){
+                       {.key = 0, .val = 0},
+                       {.key = 0, .val = 1},
+                       {.key = 0, .val = 2},
+                   });
+    CHECK(validate(&map_from_list), true);
+    CHECK(count(&map_from_list).count, 0);
+    size_t seen = 0;
+    for (struct val const *i = begin(&map_from_list); i != end(&map_from_list);
+         i = next(&map_from_list, i))
+    {
+        CHECK(i->key, 0);
+        CHECK(i->val, 2);
+        ++seen;
+    }
+    CHECK(seen, 0);
+    ccc_entry e = ccc_fhm_insert_or_assign(&map_from_list,
+                                           &(struct val){.key = 1, .val = 1});
+    CHECK(ccc_entry_insert_error(&e), CCC_TRUE);
+    CHECK_END_FN();
+}
+
 int
 main()
 {
     return CHECK_RUN(fhmap_test_static_init(), fhmap_test_copy_no_alloc(),
                      fhmap_test_copy_no_alloc_fail(), fhmap_test_copy_alloc(),
-                     fhmap_test_copy_alloc_fail(), fhmap_test_empty());
+                     fhmap_test_copy_alloc_fail(), fhmap_test_empty(),
+                     fhmap_test_init_from(), fhmap_test_init_from_overwrite(),
+                     fhmap_test_init_from_fail());
 }

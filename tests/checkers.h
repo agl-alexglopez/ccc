@@ -151,7 +151,7 @@ though the braces are not required. */
                              check_impl_expected, #test_expected);             \
             check_impl_macro_res = FAIL;                                       \
             __VA_OPT__((void)({__VA_ARGS__});)                                 \
-            goto use_a_check_and_end_fn_with_one_of_the_CHECK_END_macros;      \
+            goto please_use_at_least_one_CHECK_and_a_CHECK_END_macro;          \
         }                                                                      \
     }                                                                          \
     while (0)
@@ -190,7 +190,7 @@ though the braces are not required. */
                              check_impl_expected, #test_expected);             \
             check_impl_macro_res = ERROR;                                      \
             __VA_OPT__((void)({__VA_ARGS__});)                                 \
-            goto use_a_check_and_end_fn_with_one_of_the_CHECK_END_macros;      \
+            goto please_use_at_least_one_CHECK_and_a_CHECK_END_macro;          \
         }                                                                      \
     }                                                                          \
     while (0)
@@ -240,7 +240,7 @@ operates at function scope so does not have access to nested conditionals,
 loops, or blocks from earlier in the test. See the check macro if more fine
 grained control over nested scope is required upon a failure.*/
 #define CHECK_END_FN(...)                                                      \
-use_a_check_and_end_fn_with_one_of_the_CHECK_END_macros:                       \
+please_use_at_least_one_CHECK_and_a_CHECK_END_macro:                           \
     __VA_OPT__((void)({__VA_ARGS__});)                                         \
     return check_impl_macro_res;                                               \
     }
@@ -261,7 +261,7 @@ nested conditionals, loops, or blocks from earlier in the test. See the check
 macro if more fine grained control over nested scope is required upon a failure.
 */
 #define CHECK_END_FN_PASS(...)                                                 \
-use_a_check_and_end_fn_with_one_of_the_CHECK_END_macros:                       \
+please_use_at_least_one_CHECK_and_a_CHECK_END_macro:                           \
     __VA_OPT__((void)({                                                        \
                    if (check_impl_macro_res == PASS)                           \
                    {                                                           \
@@ -287,7 +287,7 @@ nested conditionals, loops, or blocks from earlier in the test. See the check
 macro if more fine grained control over nested scope is required upon a
 failure.*/
 #define CHECK_END_FN_FAIL(...)                                                 \
-use_a_check_and_end_fn_with_one_of_the_CHECK_END_macros:                       \
+please_use_at_least_one_CHECK_and_a_CHECK_END_macro:                           \
     __VA_OPT__((void)({                                                        \
                    if (check_impl_macro_res == FAIL)                           \
                    {                                                           \
@@ -313,7 +313,7 @@ nested conditionals, loops, or blocks from earlier in the test. See the check
 macro if more fine grained control over nested scope is required upon a
 failure.*/
 #define CHECK_END_FN_ERROR(...)                                                \
-use_a_check_and_end_fn_with_one_of_the_CHECK_END_macros:                       \
+please_use_at_least_one_CHECK_and_a_CHECK_END_macro:                           \
     __VA_OPT__((void)({                                                        \
                    if (check_impl_macro_res == ERROR)                          \
                    {                                                           \

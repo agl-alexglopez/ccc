@@ -1046,21 +1046,27 @@ an entry is occupied, vacant, or some error has occurred. */
 static struct query
 find(struct ccc_fhmap *const h, void const *const key, uint64_t const hash)
 {
-    ccc_entry_status upcoming_insertion_error = 0;
-    switch (maybe_rehash(h, 1, h->alloc_fn))
+    ccc_result const res = maybe_rehash(h, 1, h->alloc_fn);
+    if (res == CCC_RESULT_OK)
     {
-        case CCC_RESULT_OK:
-            break;
-        case CCC_RESULT_ARG_ERROR:
-            return (struct query){.stats = CCC_ENTRY_ARG_ERROR};
-            break;
-        default:
-            upcoming_insertion_error = CCC_ENTRY_INSERT_ERROR;
-            break;
-    };
-    struct query res = find_key_or_slot(h, key, hash);
-    res.stats |= upcoming_insertion_error;
-    return res;
+        return find_key_or_slot(h, key, hash);
+    }
+    // Map was not initialized correctly or cannot allocate.
+    if (!h->mask)
+    {
+        return (struct query){.stats = CCC_ENTRY_INSERT_ERROR};
+    }
+    struct query q = find_key_or_slot(h, key, hash);
+    // It's OK to find an occupied value when the map has resizing or memory
+    // permission errors. If insertion occurs it will be to slot that exists.
+    if (q.stats == CCC_ENTRY_OCCUPIED)
+    {
+        return q;
+    }
+    // We need to warn the user that we did not find the key and they cannot
+    // insert a new element due to fixed size, permissions, or exhaustion.
+    q.stats = CCC_ENTRY_INSERT_ERROR;
+    return q;
 }
 
 /** Sets the insert tag meta data and copies the user type into the associated
@@ -1337,7 +1343,7 @@ maybe_rehash(struct ccc_fhmap *const h, size_t const to_add,
         = to_power_of_two(((h->count + to_add) * 8) / 7);
     if (!required_total_cap)
     {
-        return CCC_RESULT_ARG_ERROR;
+        return CCC_RESULT_MEM_ERROR;
     }
     ccc_result const init = check_init(h, required_total_cap, fn);
     if (init != CCC_RESULT_OK)
