@@ -570,12 +570,6 @@ ccc_hom_rend(ccc_handle_ordered_map const *const hom)
     return data_at(hom, 0);
 }
 
-void *
-ccc_hom_data(ccc_handle_ordered_map const *const hom)
-{
-    return hom ? hom->data : NULL;
-}
-
 ccc_range
 ccc_hom_equal_range(ccc_handle_ordered_map *const hom,
                     void const *const begin_key, void const *const end_key)

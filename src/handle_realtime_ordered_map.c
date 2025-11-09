@@ -619,12 +619,6 @@ ccc_hrm_capacity(ccc_handle_realtime_ordered_map const *const hrm)
 }
 
 void *
-ccc_hrm_data(ccc_handle_realtime_ordered_map const *const hrm)
-{
-    return hrm->data;
-}
-
-void *
 ccc_hrm_begin(ccc_handle_realtime_ordered_map const *const hrm)
 {
     if (!hrm || !hrm->capacity)

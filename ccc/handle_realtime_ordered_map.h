@@ -892,15 +892,6 @@ ccc_hrm_count(ccc_handle_realtime_ordered_map const *hrm);
 [[nodiscard]] ccc_ucount
 ccc_hrm_capacity(ccc_handle_realtime_ordered_map const *hrm);
 
-/** @brief Return a reference to the base of backing array. O(1).
-@param [in] hrm a pointer to the map.
-@return a reference to the base of the backing array.
-@note the reference is to the base of the backing array at index 0 with no
-consideration for the organization of map and contains capacity elements.
-@warning it is the users responsibility to ensure that access to any data is
-within the capacity of the backing buffer. */
-[[nodiscard]] void *ccc_hrm_data(ccc_handle_realtime_ordered_map const *hrm);
-
 /** @brief Validation of invariants for the map.
 @param [in] hrm the map to validate.
 @return true if all invariants hold, false if corruption occurs. Error if hrm is
@@ -937,7 +928,6 @@ typedef ccc_hromap_handle hromap_handle;
 #    define hrm_rnext(args...) ccc_hrm_rnext(args)
 #    define hrm_end(args...) ccc_hrm_end(args)
 #    define hrm_rend(args...) ccc_hrm_rend(args)
-#    define hrm_data(args...) ccc_hrm_data(args)
 #    define hrm_is_empty(args...) ccc_hrm_is_empty(args)
 #    define hrm_count(args...) ccc_hrm_count(args)
 #    define hrm_clear(args...) ccc_hrm_clear(args)

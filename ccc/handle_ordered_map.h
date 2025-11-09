@@ -857,17 +857,6 @@ Obtain the container state. */
 @return the capacity or an argument error is set if hom is NULL. */
 [[nodiscard]] ccc_ucount ccc_hom_capacity(ccc_handle_ordered_map const *hom);
 
-/** @brief Return a reference to the base of backing array. O(1).
-@param [in] hom a pointer to the map.
-@return a reference to the base of the backing array.
-@note the reference is to the base of the backing array at index 0 with no
-consideration for the organization of map. However, all nodes of the map
-are guaranteed to be stored contiguously starting at index 1. Index 0 is
-reserved for the sentinel node.
-@warning it is the users responsibility to ensure that access to any data is
-within the capacity of the backing buffer. */
-[[nodiscard]] void *ccc_hom_data(ccc_handle_ordered_map const *hom);
-
 /** @brief Returns the size status of the map.
 @param [in] hom the map.
 @return true if empty else false. Error if hom is NULL. */
@@ -928,7 +917,6 @@ typedef ccc_homap_handle homap_handle;
 #    define hom_rend(args...) ccc_hom_rend(args)
 #    define hom_next(args...) ccc_hom_next(args)
 #    define hom_rnext(args...) ccc_hom_rnext(args)
-#    define hom_data(args...) ccc_hom_data(args)
 #    define hom_count(args...) ccc_hom_count(args)
 #    define hom_is_empty(args...) ccc_hom_is_empty(args)
 #    define hom_validate(args...) ccc_hom_validate(args)
