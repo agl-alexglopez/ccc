@@ -187,7 +187,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_init_from)
         ++seen;
     }
     CHECK(seen, 3);
-    CHECK_END_FN();
+    CHECK_END_FN(fhm_clear_and_free(&map_from_list, NULL););
 }
 
 CHECK_BEGIN_STATIC_FN(fhmap_test_init_from_overwrite)
@@ -210,7 +210,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_init_from_overwrite)
         ++seen;
     }
     CHECK(seen, 1);
-    CHECK_END_FN();
+    CHECK_END_FN(fhm_clear_and_free(&map_from_list, NULL););
 }
 
 CHECK_BEGIN_STATIC_FN(fhmap_test_init_from_fail)
@@ -237,7 +237,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_init_from_fail)
     ccc_entry e = ccc_fhm_insert_or_assign(&map_from_list,
                                            &(struct val){.key = 1, .val = 1});
     CHECK(ccc_entry_insert_error(&e), CCC_TRUE);
-    CHECK_END_FN();
+    CHECK_END_FN(fhm_clear_and_free(&map_from_list, NULL););
 }
 
 int

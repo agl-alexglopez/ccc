@@ -271,15 +271,15 @@ fixed size and has data or is dynamic and has not yet been given allocation. */
 
 #define ccc_impl_fhm_from(impl_key_field, impl_hash_fn, impl_key_cmp_fn,       \
                           impl_alloc_fn, impl_aux_data,                        \
-                          impl_initializer_list...)                            \
+                          impl_array_compound_literal...)                      \
     (__extension__({                                                           \
-        typeof(*impl_initializer_list) impl_fhm_initializer_list[]             \
-            = impl_initializer_list;                                           \
+        typeof(*impl_array_compound_literal) *impl_fhm_initializer_list        \
+            = impl_array_compound_literal;                                     \
         struct ccc_fhmap impl_map = ccc_impl_fhm_init(                         \
             NULL, typeof(*impl_fhm_initializer_list), impl_key_field,          \
             impl_hash_fn, impl_key_cmp_fn, impl_alloc_fn, impl_aux_data, 0);   \
-        for (size_t i = 0; i < sizeof(impl_fhm_initializer_list)               \
-                                   / sizeof(*impl_fhm_initializer_list);       \
+        for (size_t i = 0; i < sizeof(impl_array_compound_literal)             \
+                                   / sizeof(*impl_array_compound_literal);     \
              ++i)                                                              \
         {                                                                      \
             struct ccc_fhash_entry impl_ent = ccc_impl_fhm_entry(              \

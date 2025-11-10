@@ -200,8 +200,7 @@ restrictions. */
 @param [in] map_ptr a pointer to a fixed map allocation or NULL.
 @param [in] any_type_name the name of the user defined type stored in the map.
 @param [in] key_field the field of the struct used for key storage.
-@param [in] hash_fn the ccc_any_key_hash_fn function the user desires for the
-table.
+@param [in] hash_fn the ccc_any_key_hash_fn function provided by the user.
 @param [in] key_cmp_fn the ccc_any_key_cmp_fn the user intends to use.
 @param [in] alloc_fn the allocation function for resizing or NULL if no
 resizing is allowed.
@@ -265,14 +264,13 @@ identical to the provided examples. Omit `static` in a runtime context. */
 
 /** @brief Initialize a dynamic map at runtime.
 @param [in] key_field the field of the struct used for key storage.
-@param [in] hash_fn the ccc_any_key_hash_fn function the user desires for the
-table.
+@param [in] hash_fn the ccc_any_key_hash_fn function provided by the user.
 @param [in] key_cmp_fn the ccc_any_key_cmp_fn the user intends to use.
 @param [in] alloc_fn the required allocation function.
 @param [in] aux_data auxiliary data that is needed for hashing or comparison.
-@param [in] initializer_list a list of key value pairs of the type intended to
-be stored in the map, using array compound literal initialization syntax (e.g
-`(struct my_type[]){{.k = 0, .v 0}, {.k = 1, .v = 1}}`).
+@param [in] array_compound_literal a list of key value pairs of the type
+intended to be stored in the map, using array compound literal initialization
+syntax (e.g `(struct my_type[]){{.k = 0, .v 0}, {.k = 1, .v = 1}}`).
 @return the flat hash map directly initialized on the right hand side of the
 equality operator (i.e. ccc_flat_hash_map fh = ccc_fhm_init_from(...);)
 @warning An allocation function is required. This initializer is only available
@@ -312,9 +310,9 @@ main(void)
 Only dynamic maps may be initialized this way due the inability of the hash
 map to protect its invariants from user error at compile time. */
 #define ccc_fhm_from(key_field, hash_fn, key_cmp_fn, alloc_fn, aux_data,       \
-                     initializer_list...)                                      \
+                     array_compound_literal...)                                \
     ccc_impl_fhm_from(key_field, hash_fn, key_cmp_fn, alloc_fn, aux_data,      \
-                      initializer_list)
+                      array_compound_literal)
 
 /** @brief Copy the map at source to destination.
 @param [in] dst the initialized destination for the copy of the src map.
