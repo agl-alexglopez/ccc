@@ -115,13 +115,15 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_copy_no_alloc_fail)
 
 CHECK_BEGIN_STATIC_FN(fhmap_test_copy_alloc)
 {
-    flat_hash_map src = fhm_init(NULL, struct val, key, fhmap_int_zero,
-                                 fhmap_id_cmp, std_alloc, NULL, 0);
     flat_hash_map dst = fhm_init(NULL, struct val, key, fhmap_int_zero,
                                  fhmap_id_cmp, std_alloc, NULL, 0);
-    (void)swap_entry(&src, &(struct val){.key = 0});
-    (void)swap_entry(&src, &(struct val){.key = 1, .val = 1});
-    (void)swap_entry(&src, &(struct val){.key = 2, .val = 2});
+    flat_hash_map src
+        = fhm_from(key, fhmap_int_zero, fhmap_id_cmp, std_alloc, NULL,
+                   (struct val[]){
+                       {.key = 0},
+                       {.key = 1, .val = 1},
+                       {.key = 2, .val = 2},
+                   });
     CHECK(count(&src).count, 3);
     CHECK(is_empty(&dst), true);
     ccc_result res = fhm_copy(&dst, &src, std_alloc);
