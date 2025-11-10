@@ -269,6 +269,7 @@ fixed size and has data or is dynamic and has not yet been given allocation. */
         .aux = (impl_aux_data),                                                \
     }
 
+/** @private Initialize a dynamic container with an initial compound literal. */
 #define ccc_impl_fhm_from(impl_key_field, impl_hash_fn, impl_key_cmp_fn,       \
                           impl_alloc_fn, impl_aux_data,                        \
                           impl_array_compound_literal...)                      \
@@ -278,21 +279,25 @@ fixed size and has data or is dynamic and has not yet been given allocation. */
         struct ccc_fhmap impl_map = ccc_impl_fhm_init(                         \
             NULL, typeof(*impl_fhm_initializer_list), impl_key_field,          \
             impl_hash_fn, impl_key_cmp_fn, impl_alloc_fn, impl_aux_data, 0);   \
-        for (size_t i = 0; i < sizeof(impl_array_compound_literal)             \
-                                   / sizeof(*impl_array_compound_literal);     \
-             ++i)                                                              \
+        size_t const impl_n = sizeof(impl_array_compound_literal)              \
+                            / sizeof(*impl_array_compound_literal);            \
+        if (ccc_fhm_reserve(&impl_map, impl_n, impl_alloc_fn)                  \
+            == CCC_RESULT_OK)                                                  \
         {                                                                      \
-            struct ccc_fhash_entry impl_ent = ccc_impl_fhm_entry(              \
-                &impl_map,                                                     \
-                (void const *)&impl_fhm_initializer_list[i].impl_key_field);   \
-            if (!(impl_ent.stats & CCC_ENTRY_INSERT_ERROR))                    \
+            for (size_t i = 0; i < impl_n; ++i)                                \
             {                                                                  \
-                *((typeof(*impl_fhm_initializer_list) *)ccc_impl_fhm_data_at(  \
-                    impl_ent.h, impl_ent.i))                                   \
-                    = impl_fhm_initializer_list[i];                            \
-                if (impl_ent.stats == CCC_ENTRY_VACANT)                        \
+                struct ccc_fhash_entry impl_ent = ccc_impl_fhm_entry(          \
+                    &impl_map, (void const *)&impl_fhm_initializer_list[i]     \
+                                   .impl_key_field);                           \
+                if (!(impl_ent.stats & CCC_ENTRY_INSERT_ERROR))                \
                 {                                                              \
-                    ccc_impl_fhm_set_insert(&impl_ent);                        \
+                    *((typeof(*impl_fhm_initializer_list) *)                   \
+                          ccc_impl_fhm_data_at(impl_ent.h, impl_ent.i))        \
+                        = impl_fhm_initializer_list[i];                        \
+                    if (impl_ent.stats == CCC_ENTRY_VACANT)                    \
+                    {                                                          \
+                        ccc_impl_fhm_set_insert(&impl_ent);                    \
+                    }                                                          \
                 }                                                              \
             }                                                                  \
         }                                                                      \

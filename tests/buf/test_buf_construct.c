@@ -105,10 +105,44 @@ CHECK_BEGIN_STATIC_FN(buf_test_copy_alloc_fail)
     CHECK_END_FN({ (void)buf_clear_and_free(&src, NULL); });
 }
 
+CHECK_BEGIN_STATIC_FN(buf_test_init_from)
+{
+    ccc_buffer b = ccc_buf_from(std_alloc, NULL, (int[]){1, 2, 3, 4, 5, 6, 7});
+    int elem = 1;
+    for (int const *i = ccc_buf_begin(&b); i != ccc_buf_end(&b);
+         i = ccc_buf_next(&b, i))
+    {
+        CHECK(elem, *i);
+        ++elem;
+    }
+    CHECK(elem, 8);
+    CHECK(ccc_buf_count(&b).count, elem - 1);
+    CHECK_END_FN((void)ccc_buf_clear_and_free(&b, NULL););
+}
+
+CHECK_BEGIN_STATIC_FN(buf_test_init_from_fail)
+{
+    /* Whoops forgot allocation function. */
+    ccc_buffer b = ccc_buf_from(NULL, NULL, (int[]){1, 2, 3, 4, 5, 6, 7});
+    int elem = 1;
+    for (int const *i = ccc_buf_begin(&b); i != ccc_buf_end(&b);
+         i = ccc_buf_next(&b, i))
+    {
+        CHECK(elem, *i);
+        ++elem;
+    }
+    CHECK(elem, 1);
+    CHECK(ccc_buf_count(&b).count, 0);
+    CHECK(ccc_buf_capacity(&b).count, 0);
+    CHECK(ccc_buf_push_back(&b, &(int){}), NULL);
+    CHECK_END_FN((void)ccc_buf_clear_and_free(&b, NULL););
+}
+
 int
 main(void)
 {
     return CHECK_RUN(buf_test_empty(), buf_test_full(), buf_test_reserve(),
                      buf_test_copy_no_alloc(), buf_test_copy_no_alloc_fail(),
-                     buf_test_copy_alloc(), buf_test_copy_alloc_fail());
+                     buf_test_copy_alloc(), buf_test_copy_alloc_fail(),
+                     buf_test_init_from(), buf_test_init_from_fail());
 }

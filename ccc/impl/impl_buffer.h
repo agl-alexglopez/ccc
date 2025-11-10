@@ -68,6 +68,30 @@ are contiguous. */
         .aux = (impl_aux_data),                                                \
     }
 
+/** @private For dynamic containers to perform the allocation and
+initialization in one convenient step for user. */
+#define ccc_impl_buf_from(impl_alloc_fn, impl_aux_data,                        \
+                          impl_compound_literal_array...)                      \
+    (__extension__({                                                           \
+        typeof(*impl_compound_literal_array) *impl_buf_initializer_list        \
+            = impl_compound_literal_array;                                     \
+        struct ccc_buffer impl_buf                                             \
+            = ccc_impl_buf_init(NULL, typeof(*impl_buf_initializer_list),      \
+                                impl_alloc_fn, impl_aux_data, 0);              \
+        size_t const impl_n = sizeof(impl_compound_literal_array)              \
+                            / sizeof(*impl_compound_literal_array);            \
+        if (ccc_buf_reserve(&impl_buf, impl_n, impl_alloc_fn)                  \
+            == CCC_RESULT_OK)                                                  \
+        {                                                                      \
+            for (size_t i = 0; i < impl_n; ++i)                                \
+            {                                                                  \
+                *((typeof(*impl_buf_initializer_list) *)ccc_buf_push_back(     \
+                    &impl_buf, &impl_buf_initializer_list[i]));                \
+            }                                                                  \
+        }                                                                      \
+        impl_buf;                                                              \
+    }))
+
 /** @private */
 #define ccc_impl_buf_emplace(impl_buf_ptr, index, impl_type_initializer...)    \
     (__extension__({                                                           \

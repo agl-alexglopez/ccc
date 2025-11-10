@@ -105,6 +105,9 @@ occurred with the provided allocation function. */
     ccc_impl_buf_init(mem_ptr, any_type_name, alloc_fn, aux_data, capacity,    \
                       optional_size)
 
+#define ccc_buf_from(alloc_fn, aux_data, compound_literal_array...)            \
+    ccc_impl_buf_from(alloc_fn, aux_data, compound_literal_array)
+
 /** @brief Reserves space for at least to_add more elements.
 @param [in] buf a pointer to the buffer.
 @param [in] to_add the number of elements to add to the current size.
