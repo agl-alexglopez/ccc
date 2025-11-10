@@ -116,7 +116,7 @@ CHECK_BEGIN_STATIC_FN(bs_test_init_from)
 CHECK_BEGIN_STATIC_FN(bs_test_init_from_with_cap)
 {
     char input[] = {'1', '1', '0', '1', '1', '0', '\0'};
-    ccc_bitset b = ccc_bs_from(std_alloc, NULL, 0, sizeof(input), '1', "110110",
+    ccc_bitset b = ccc_bs_from(std_alloc, NULL, 0, sizeof(input), '1', input,
                                (sizeof(input) - 1) * 2);
     CHECK(ccc_bs_count(&b).count, sizeof(input) - 1);
     CHECK(ccc_bs_capacity(&b).count, (sizeof(input) - 1) * 2);
@@ -134,7 +134,7 @@ CHECK_BEGIN_STATIC_FN(bs_test_init_from_fail)
 {
     char input[] = {'1', '1', '0', '1', '1', '0', '\0'};
     /* Forgot allocation function. */
-    ccc_bitset b = ccc_bs_from(NULL, NULL, 0, sizeof(input) - 1, '1', "110110");
+    ccc_bitset b = ccc_bs_from(NULL, NULL, 0, sizeof(input) - 1, '1', input);
     CHECK(ccc_bs_count(&b).count, 0);
     CHECK(ccc_bs_capacity(&b).count, 0);
     CHECK(ccc_bs_popcount(&b).count, 0);
@@ -148,7 +148,7 @@ CHECK_BEGIN_STATIC_FN(bs_test_init_from_with_cap_fail)
     char input[] = {'1', '1', '0', '1', '1', '0', '\0'};
     /* Forgot allocation function. */
     ccc_bitset b
-        = ccc_bs_from(NULL, NULL, 0, sizeof(input) - 1, '1', "110110", 99);
+        = ccc_bs_from(NULL, NULL, 0, sizeof(input) - 1, '1', input, 99);
     CHECK(ccc_bs_count(&b).count, 0);
     CHECK(ccc_bs_capacity(&b).count, 0);
     CHECK(ccc_bs_popcount(&b).count, 0);
