@@ -272,7 +272,7 @@ identical to the provided examples. Omit `static` in a runtime context. */
 intended to be stored in the map, using array compound literal initialization
 syntax (e.g `(struct my_type[]){{.k = 0, .v 0}, {.k = 1, .v = 1}}`).
 @return the flat hash map directly initialized on the right hand side of the
-equality operator (i.e. ccc_flat_hash_map fh = ccc_fhm_init_from(...);)
+equality operator (i.e. ccc_flat_hash_map fh = ccc_fhm_from(...);)
 @warning An allocation function is required. This initializer is only available
 for dynamic maps.
 @warning If elements with duplicate keys are inserted, the earlier entry is
