@@ -1023,6 +1023,22 @@ ccc_bs_eq(ccc_bitset const *const a, ccc_bitset const *const b)
         == 0;
 }
 
+/*=========================     Private Interface   =========================*/
+
+ccc_result
+ccc_impl_bs_reserve(struct ccc_bitset *const bs, size_t const to_add,
+                    ccc_any_alloc_fn *const fn)
+{
+    return ccc_bs_reserve(bs, to_add, fn);
+}
+
+ccc_tribool
+ccc_impl_bs_set(struct ccc_bitset *const bs, size_t const i,
+                ccc_tribool const b)
+{
+    return ccc_bs_set(bs, i, b);
+}
+
 /*=======================    Static Helpers    ==============================*/
 
 /** Assumes set size is greater than or equal to subset size. */
@@ -1067,12 +1083,17 @@ maybe_resize(struct ccc_bitset *const bs, size_t const to_add,
     {
         bits_needed = bs->capacity * 2;
     }
+    size_t const new_bytes
+        = ublock_count(bits_needed - bs->count) * SIZEOF_BLOCK;
+    size_t const old_bytes
+        = bs->count ? ublock_count(bs->count) * SIZEOF_BLOCK : 0;
     bitblock *const new_mem
         = fn(bs->blocks, ublock_count(bits_needed) * SIZEOF_BLOCK, bs->aux);
     if (!new_mem)
     {
         return CCC_RESULT_MEM_ERROR;
     }
+    (void)memset((char *)new_mem + old_bytes, 0, new_bytes);
     bs->capacity = bits_needed;
     bs->blocks = new_mem;
     return CCC_RESULT_OK;

@@ -100,9 +100,40 @@ CHECK_BEGIN_STATIC_FN(bs_test_copy_alloc)
     });
 }
 
+CHECK_BEGIN_STATIC_FN(bs_test_init_from)
+{
+    char input[] = {'1', '1', '0', '1', '1', '0', '\0'};
+    ccc_bitset b
+        = ccc_bs_from(std_alloc, NULL, 0, sizeof(input) - 1, '1', "110110");
+    CHECK(ccc_bs_count(&b).count, sizeof(input) - 1);
+    CHECK(ccc_bs_capacity(&b).count, sizeof(input) - 1);
+    CHECK(ccc_bs_popcount(&b).count, 4);
+    CHECK(ccc_bs_test(&b, 0), CCC_TRUE);
+    CHECK(ccc_bs_test(&b, sizeof(input) - 2), CCC_FALSE);
+    CHECK_END_FN(ccc_bs_clear_and_free(&b););
+}
+
+CHECK_BEGIN_STATIC_FN(bs_test_init_from_with_cap)
+{
+    char input[] = {'1', '1', '0', '1', '1', '0', '\0'};
+    ccc_bitset b = ccc_bs_from(std_alloc, NULL, 0, sizeof(input), '1', "110110",
+                               (sizeof(input) - 1) * 2);
+    CHECK(ccc_bs_count(&b).count, sizeof(input) - 1);
+    CHECK(ccc_bs_capacity(&b).count, (sizeof(input) - 1) * 2);
+    CHECK(ccc_bs_popcount(&b).count, 4);
+    CHECK(ccc_bs_test(&b, 0), CCC_TRUE);
+    CHECK(ccc_bs_test(&b, sizeof(input) - 2), CCC_FALSE);
+    CHECK(CCC_TRIBOOL_ERROR, ccc_bs_test(&b, sizeof(input) - 1));
+    CHECK(ccc_bs_push_back(&b, CCC_TRUE), CCC_RESULT_OK);
+    CHECK(CCC_TRUE, ccc_bs_test(&b, sizeof(input) - 1));
+    CHECK(ccc_bs_capacity(&b).count, (sizeof(input) - 1) * 2);
+    CHECK_END_FN(ccc_bs_clear_and_free(&b););
+}
+
 int
 main(void)
 {
     return CHECK_RUN(bs_test_construct(), bs_test_copy_no_alloc(),
-                     bs_test_copy_alloc());
+                     bs_test_copy_alloc(), bs_test_init_from(),
+                     bs_test_init_from_with_cap());
 }

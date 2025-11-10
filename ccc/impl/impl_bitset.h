@@ -49,6 +49,14 @@ enum : size_t
     CCC_IMPL_BS_BLOCK_BITS = (sizeof(*(struct ccc_bitset){}.blocks) * CHAR_BIT),
 };
 
+/*=========================     Private Interface   =========================*/
+
+ccc_result ccc_impl_bs_reserve(struct ccc_bitset *, size_t to_add,
+                               ccc_any_alloc_fn *);
+ccc_tribool ccc_impl_bs_set(struct ccc_bitset *bs, size_t i, ccc_tribool b);
+
+/*================================     Macros     ===========================*/
+
 /** @private Returns the number of blocks needed to support a given capacity
 of bits. Assumes the given capacity is greater than 0. Classic div round up. */
 #define ccc_impl_bs_block_count(impl_bit_cap)                                  \
@@ -87,5 +95,34 @@ user wants a fixed size dynamic bit set they provide 0 as size argument. */
         .alloc = (impl_alloc_fn),                                              \
         .aux = (impl_aux),                                                     \
     }
+
+/** @private Rare instance where we don't need typing or macro trickery and
+we get to use static inline for improved functionality. Once the macro learns
+whether the user wants a capacity we pass the functionality of parsing the
+input string to this function. */
+static inline struct ccc_bitset
+ccc_impl_bs_from_fn(ccc_any_alloc_fn *const fn, void *const aux, size_t i,
+                    size_t const count, size_t cap, char const on_char,
+                    char const *string)
+{
+    struct ccc_bitset bs = ccc_impl_bs_init(NULL, fn, aux, 0);
+    (void)ccc_impl_bs_reserve(&bs, cap < count ? count : cap, fn);
+    bs.count = count;
+    while (i < count && string[i])
+    {
+        (void)ccc_impl_bs_set(&bs, i, string[i] == on_char);
+        ++i;
+    }
+    bs.count = i;
+    return bs;
+}
+
+/** @private Determine if user wants capacity different than count. Then pass
+to inline function for bit set construction. */
+#define ccc_impl_bs_from(impl_alloc_fn, impl_aux, impl_start_index,            \
+                         impl_count, impl_on_char, impl_string, ...)           \
+    ccc_impl_bs_from_fn(impl_alloc_fn, impl_aux, impl_start_index, impl_count, \
+                        IMPL_BS_OPTIONAL_SIZE((impl_count), __VA_ARGS__),      \
+                        impl_on_char, impl_string)
 
 #endif /* CCC_IMPL_BITSET */

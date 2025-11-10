@@ -284,7 +284,7 @@ fixed size and has data or is dynamic and has not yet been given allocation. */
         {                                                                      \
             struct ccc_fhash_entry impl_ent = ccc_impl_fhm_entry(              \
                 &impl_map,                                                     \
-                (void *)&impl_fhm_initializer_list[i].impl_key_field);         \
+                (void const *)&impl_fhm_initializer_list[i].impl_key_field);   \
             if (!(impl_ent.stats & CCC_ENTRY_INSERT_ERROR))                    \
             {                                                                  \
                 *((typeof(*impl_fhm_initializer_list) *)ccc_impl_fhm_data_at(  \
