@@ -776,20 +776,20 @@ reconstruct_tree(struct compressed_huffman_tree *const blueprint)
 {
     struct huffman_tree ret = {
         .bump_arena
-        = ccc_buf_init(NULL, struct huffman_node, std_alloc, NULL, 0),
+        /* 0 index is NULL so real data can't be there. */
+        = ccc_buf_from(std_alloc, NULL,
+                       (struct huffman_node[]){
+                           {}, // nil
+                           {}, // root
+                       }),
+        /* By creating the root outside of the main loop we can be sure we
+           always have valid prev node. Don't need to check on every loop
+           iteration. */
+        .root = 1,
         .num_nodes = bitq_count(&blueprint->tree_paths),
     };
     ccc_result r = reserve(&ret.bump_arena, ret.num_nodes + 1, std_alloc);
     check(r == CCC_RESULT_OK);
-    /* 0 index is NULL so real data can't be there. */
-    struct huffman_node const *const nil
-        = push_back(&ret.bump_arena, &(struct huffman_node){});
-    check(nil);
-    /* By creating the root outside of the main loop we can be sure we always
-       have valid prev node. Don't need to check on every loop iteration. */
-    struct huffman_node const *const first
-        = push_back(&ret.bump_arena, &(struct huffman_node){});
-    ret.root = buf_i(&ret.bump_arena, first).count;
     (void)bitq_pop_front(&blueprint->tree_paths);
     size_t parent = ret.root;
     size_t node = 0;

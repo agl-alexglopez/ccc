@@ -60,10 +60,14 @@ ccc_buf_reserve(ccc_buffer *const buf, size_t const to_add,
     {
         return CCC_RESULT_ARG_ERROR;
     }
-    size_t const needed = buf->count + to_add;
+    size_t needed = buf->count + to_add;
     if (needed <= buf->capacity)
     {
         return CCC_RESULT_OK;
+    }
+    if (needed < START_CAPACITY)
+    {
+        needed = START_CAPACITY;
     }
     void *const new_mem = fn(buf->mem, buf->sizeof_type * needed, buf->aux);
     if (!new_mem)
