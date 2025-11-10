@@ -106,7 +106,11 @@ ccc_impl_bs_from_fn(ccc_any_alloc_fn *const fn, void *const aux, size_t i,
                     char const *string)
 {
     struct ccc_bitset bs = ccc_impl_bs_init(NULL, fn, aux, 0);
-    (void)ccc_impl_bs_reserve(&bs, cap < count ? count : cap, fn);
+    if (ccc_impl_bs_reserve(&bs, cap < count ? count : cap, fn)
+        != CCC_RESULT_OK)
+    {
+        return bs;
+    }
     bs.count = count;
     while (i < count && string[i])
     {

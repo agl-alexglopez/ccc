@@ -130,10 +130,38 @@ CHECK_BEGIN_STATIC_FN(bs_test_init_from_with_cap)
     CHECK_END_FN(ccc_bs_clear_and_free(&b););
 }
 
+CHECK_BEGIN_STATIC_FN(bs_test_init_from_fail)
+{
+    char input[] = {'1', '1', '0', '1', '1', '0', '\0'};
+    /* Forgot allocation function. */
+    ccc_bitset b = ccc_bs_from(NULL, NULL, 0, sizeof(input) - 1, '1', "110110");
+    CHECK(ccc_bs_count(&b).count, 0);
+    CHECK(ccc_bs_capacity(&b).count, 0);
+    CHECK(ccc_bs_popcount(&b).count, 0);
+    CHECK(CCC_TRIBOOL_ERROR, ccc_bs_test(&b, 0));
+    CHECK(CCC_TRIBOOL_ERROR, ccc_bs_test(&b, 99));
+    CHECK_END_FN();
+}
+
+CHECK_BEGIN_STATIC_FN(bs_test_init_from_with_cap_fail)
+{
+    char input[] = {'1', '1', '0', '1', '1', '0', '\0'};
+    /* Forgot allocation function. */
+    ccc_bitset b
+        = ccc_bs_from(NULL, NULL, 0, sizeof(input) - 1, '1', "110110", 99);
+    CHECK(ccc_bs_count(&b).count, 0);
+    CHECK(ccc_bs_capacity(&b).count, 0);
+    CHECK(ccc_bs_popcount(&b).count, 0);
+    CHECK(CCC_TRIBOOL_ERROR, ccc_bs_test(&b, 0));
+    CHECK(CCC_TRIBOOL_ERROR, ccc_bs_test(&b, 99));
+    CHECK_END_FN();
+}
+
 int
 main(void)
 {
     return CHECK_RUN(bs_test_construct(), bs_test_copy_no_alloc(),
                      bs_test_copy_alloc(), bs_test_init_from(),
-                     bs_test_init_from_with_cap());
+                     bs_test_init_from_with_cap(), bs_test_init_from_fail(),
+                     bs_test_init_from_with_cap_fail());
 }
