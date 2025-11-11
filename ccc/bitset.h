@@ -305,9 +305,7 @@ or CCC_FALSE).
 @param [in] bs a pointer to the bit set.
 @param [in] i the index identifying the bit to set.
 @return the state of the bit, or CCC_TRIBOOL_ERROR if bs is
-NULL.
-@note this function performs bounds checking in the release
-target. */
+NULL or i is out of range. */
 ccc_tribool ccc_bs_test(ccc_bitset const *bs, size_t i);
 
 /**@}*/
@@ -324,9 +322,7 @@ false).
 CCC_FALSE).
 @return the state of the bit before the set operation, true if
 it was previously true, false if it was previously false, or
-error if bs is NULL or i is out of range.
-@note this function performs bounds checking in the release
-target. */
+error if bs is NULL or i is out of range. */
 ccc_tribool ccc_bs_set(ccc_bitset *bs, size_t i, ccc_tribool b);
 
 /** @brief Set all the bits to the provided value (CCC_TRUE or
@@ -360,9 +356,7 @@ ccc_result ccc_bs_set_range(ccc_bitset *bs, size_t i, size_t count,
 @param [in] i the valid index identifying the bit to set.
 @return the state of the bit before the set operation, true if
 it was previously true, false if it was previously false, or
-error if bs is NULL or i is out of range.
-@note this function performs bounds checking in the release
-target. */
+error if bs is NULL or i is out of range. */
 ccc_tribool ccc_bs_reset(ccc_bitset *bs, size_t i);
 
 /** @brief Set all the bits to CCC_FALSE.
@@ -391,9 +385,7 @@ ccc_result ccc_bs_reset_range(ccc_bitset *bs, size_t i, size_t count);
 @param [in] i the index identifying the bit to toggle
 @return the state of the bit before the toggle operation, true
 if it was previously true, false if it was previously false, or
-error if bs is NULL or i is out of range.
-@note this function performs bounds checking in the release
-target. */
+error if bs is NULL or i is out of range. */
 ccc_tribool ccc_bs_flip(ccc_bitset *bs, size_t i);
 
 /** @brief Toggle all of the bits to their opposing boolean
