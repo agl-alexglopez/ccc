@@ -83,12 +83,6 @@ enum : typeof((struct ccc_fhm_tag){}.v)
 #endif /* defined(CCC_HAS_X86_SIMD) */
 };
 
-struct ccc_fhmap_soa
-{
-    void *data;
-    struct ccc_fhm_tag tag[];
-};
-
 /** @private The layout of the map uses only pointers to account for the
 possibility of memory provided from the data segment, stack, or heap. When the
 map is allowed to allocate it will take care of aligning pointers appropriately.
@@ -127,7 +121,6 @@ template generic system. Simple 0 based indexing makes the addition and
 multiplication we perform as simple as possible. */
 struct ccc_fhmap
 {
-    struct ccc_fhmap_soa *soa;
     /** Reversed user type data array. */
     void *data;
     /** Tag array on byte following data(0). */
