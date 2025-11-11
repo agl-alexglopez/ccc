@@ -105,8 +105,27 @@ occurred with the provided allocation function. */
     ccc_impl_buf_init(mem_ptr, any_type_name, alloc_fn, aux_data, capacity,    \
                       optional_size)
 
-#define ccc_buf_from(alloc_fn, aux_data, compound_literal_array...)            \
-    ccc_impl_buf_from(alloc_fn, aux_data, compound_literal_array)
+/** @brief Initialize a buffer from a compound literal array initializer.
+@param [in] alloc_fn ccc_any_alloc_fn or NULL if no allocation is permitted.
+@param [in] aux_data any auxiliary data needed for managing buffer memory.
+@param [in] optional_capacity optionally specify the capacity of the buffer if
+different from the size of the compound literal array initializer. If the
+capacity is greater than the size of the compound literal array initializer, it
+is respected and the capacity is reserved. If the capacity is less than the size
+of the compound array initializer, the compound literal array initializer size
+is set as the capacity. Therefore, 0 is valid if one is not concerned with the
+underlying reservation.
+@param [in] compound_literal_array the initializer of the type stored in buffer.
+@return the initialized buffer. Directly assign to buffer on the right hand
+side of the equality operator (e.g. ccc_buffer b = ccc_buf_from(...);).
+
+Initialize
+
+ */
+#define ccc_buf_from(alloc_fn, aux_data, optional_capacity,                    \
+                     compound_literal_array...)                                \
+    ccc_impl_buf_from(alloc_fn, aux_data, optional_capacity,                   \
+                      compound_literal_array)
 
 /** @brief Reserves space for at least to_add more elements.
 @param [in] buf a pointer to the buffer.

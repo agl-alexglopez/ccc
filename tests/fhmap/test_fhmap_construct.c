@@ -118,7 +118,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_copy_alloc)
     flat_hash_map dst = fhm_init(NULL, struct val, key, fhmap_int_zero,
                                  fhmap_id_cmp, std_alloc, NULL, 0);
     flat_hash_map src
-        = fhm_from(key, fhmap_int_zero, fhmap_id_cmp, std_alloc, NULL,
+        = fhm_from(key, fhmap_int_zero, fhmap_id_cmp, std_alloc, NULL, 0,
                    (struct val[]){
                        {.key = 0},
                        {.key = 1, .val = 1},
@@ -171,7 +171,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_empty)
 CHECK_BEGIN_STATIC_FN(fhmap_test_init_from)
 {
     flat_hash_map map_from_list
-        = fhm_from(key, fhmap_int_to_u64, fhmap_id_cmp, std_alloc, NULL,
+        = fhm_from(key, fhmap_int_to_u64, fhmap_id_cmp, std_alloc, NULL, 0,
                    (struct val[]){
                        {.key = 0, .val = 0},
                        {.key = 1, .val = 1},
@@ -195,7 +195,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_init_from)
 CHECK_BEGIN_STATIC_FN(fhmap_test_init_from_overwrite)
 {
     flat_hash_map map_from_list
-        = fhm_from(key, fhmap_int_to_u64, fhmap_id_cmp, std_alloc, NULL,
+        = fhm_from(key, fhmap_int_to_u64, fhmap_id_cmp, std_alloc, NULL, 0,
                    (struct val[]){
                        {.key = 0, .val = 0},
                        {.key = 0, .val = 1},
@@ -219,7 +219,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_init_from_fail)
 {
     // Whoops forgot an allocation function.
     flat_hash_map map_from_list
-        = fhm_from(key, fhmap_int_to_u64, fhmap_id_cmp, NULL, NULL,
+        = fhm_from(key, fhmap_int_to_u64, fhmap_id_cmp, NULL, NULL, 0,
                    (struct val[]){
                        {.key = 0, .val = 0},
                        {.key = 0, .val = 1},

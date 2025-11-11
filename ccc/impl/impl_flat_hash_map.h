@@ -271,7 +271,7 @@ fixed size and has data or is dynamic and has not yet been given allocation. */
 
 /** @private Initialize a dynamic container with an initial compound literal. */
 #define ccc_impl_fhm_from(impl_key_field, impl_hash_fn, impl_key_cmp_fn,       \
-                          impl_alloc_fn, impl_aux_data,                        \
+                          impl_alloc_fn, impl_aux_data, impl_optional_cap,     \
                           impl_array_compound_literal...)                      \
     (__extension__({                                                           \
         typeof(*impl_array_compound_literal) *impl_fhm_initializer_list        \
@@ -280,8 +280,11 @@ fixed size and has data or is dynamic and has not yet been given allocation. */
             NULL, typeof(*impl_fhm_initializer_list), impl_key_field,          \
             impl_hash_fn, impl_key_cmp_fn, impl_alloc_fn, impl_aux_data, 0);   \
         size_t const impl_n = sizeof(impl_array_compound_literal)              \
-                            / sizeof(*impl_array_compound_literal);            \
-        if (ccc_fhm_reserve(&impl_map, impl_n, impl_alloc_fn)                  \
+                            / sizeof(*impl_fhm_initializer_list);              \
+        size_t const impl_cap = impl_optional_cap;                             \
+        if (ccc_fhm_reserve(&impl_map,                                         \
+                            (impl_n > impl_cap ? impl_n : impl_cap),           \
+                            impl_alloc_fn)                                     \
             == CCC_RESULT_OK)                                                  \
         {                                                                      \
             for (size_t i = 0; i < impl_n; ++i)                                \

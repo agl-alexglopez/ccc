@@ -19,6 +19,7 @@ limitations under the License.
 /** @cond */
 #include <assert.h>
 #include <stddef.h>
+#include <string.h>
 /** @endcond */
 
 #include "../types.h"
@@ -71,6 +72,7 @@ are contiguous. */
 /** @private For dynamic containers to perform the allocation and
 initialization in one convenient step for user. */
 #define ccc_impl_buf_from(impl_alloc_fn, impl_aux_data,                        \
+                          impl_optional_capacity,                              \
                           impl_compound_literal_array...)                      \
     (__extension__({                                                           \
         typeof(*impl_compound_literal_array) *impl_buf_initializer_list        \
@@ -79,15 +81,16 @@ initialization in one convenient step for user. */
             = ccc_impl_buf_init(NULL, typeof(*impl_buf_initializer_list),      \
                                 impl_alloc_fn, impl_aux_data, 0);              \
         size_t const impl_n = sizeof(impl_compound_literal_array)              \
-                            / sizeof(*impl_compound_literal_array);            \
-        if (ccc_buf_reserve(&impl_buf, impl_n, impl_alloc_fn)                  \
+                            / sizeof(*impl_buf_initializer_list);              \
+        size_t const impl_cap = impl_optional_capacity;                        \
+        if (ccc_buf_reserve(&impl_buf,                                         \
+                            (impl_n > impl_cap ? impl_n : impl_cap),           \
+                            impl_alloc_fn)                                     \
             == CCC_RESULT_OK)                                                  \
         {                                                                      \
-            for (size_t i = 0; i < impl_n; ++i)                                \
-            {                                                                  \
-                *((typeof(*impl_buf_initializer_list) *)ccc_buf_push_back(     \
-                    &impl_buf, &impl_buf_initializer_list[i]));                \
-            }                                                                  \
+            (void)memcpy(impl_buf.mem, impl_buf_initializer_list,              \
+                         impl_n * sizeof(*impl_buf_initializer_list));         \
+            impl_buf.count = impl_n;                                           \
         }                                                                      \
         impl_buf;                                                              \
     }))

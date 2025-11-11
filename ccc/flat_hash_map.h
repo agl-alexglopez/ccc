@@ -268,6 +268,13 @@ identical to the provided examples. Omit `static` in a runtime context. */
 @param [in] key_cmp_fn the ccc_any_key_cmp_fn the user intends to use.
 @param [in] alloc_fn the required allocation function.
 @param [in] aux_data auxiliary data that is needed for hashing or comparison.
+@param [in] optional_capacity optionally specify the capacity of the map if
+different from the size of the compound literal array initializer. If the
+capacity is greater than the size of the compound literal array initializer, it
+is respected and the capacity is reserved. If the capacity is less than the size
+of the compound array initializer, the compound literal array initializer size
+is set as the capacity. Therefore, 0 is valid if one is not concerned with the
+size of the underlying reservation.
 @param [in] array_compound_literal a list of key value pairs of the type
 intended to be stored in the map, using array compound literal initialization
 syntax (e.g `(struct my_type[]){{.k = 0, .v 0}, {.k = 1, .v = 1}}`).
@@ -275,8 +282,8 @@ syntax (e.g `(struct my_type[]){{.k = 0, .v 0}, {.k = 1, .v = 1}}`).
 equality operator (i.e. ccc_flat_hash_map fh = ccc_fhm_from(...);)
 @warning An allocation function is required. This initializer is only available
 for dynamic maps.
-@warning If elements with duplicate keys are inserted, the earlier entry is
-overwritten completely by all fields of the newer element.
+@warning When duplicate keys appear in the initializer list, the last occurrence
+replaces earlier ones by value (all fields are overwritten).
 
 Initialize a dynamic hash table at run time. This example requires no auxiliary
 data for initialization.
@@ -297,6 +304,7 @@ main(void)
         fhmap_key_cmp,
         std_alloc,
         NULL,
+        0,
         (struct val[]) {
             {.key = 1, .val = 1},
             {.key = 2, .val = 2},
@@ -310,9 +318,9 @@ main(void)
 Only dynamic maps may be initialized this way due the inability of the hash
 map to protect its invariants from user error at compile time. */
 #define ccc_fhm_from(key_field, hash_fn, key_cmp_fn, alloc_fn, aux_data,       \
-                     array_compound_literal...)                                \
+                     optional_capacity, array_compound_literal...)             \
     ccc_impl_fhm_from(key_field, hash_fn, key_cmp_fn, alloc_fn, aux_data,      \
-                      array_compound_literal)
+                      optional_capacity, array_compound_literal)
 
 /** @brief Copy the map at source to destination.
 @param [in] dst the initialized destination for the copy of the src map.

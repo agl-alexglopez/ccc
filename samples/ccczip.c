@@ -774,10 +774,11 @@ being allocated. */
 static struct huffman_tree
 reconstruct_tree(struct compressed_huffman_tree *const blueprint)
 {
+    size_t const bq_count = bitq_count(&blueprint->tree_paths);
     struct huffman_tree ret = {
         .bump_arena
         /* 0 index is NULL so real data can't be there. */
-        = ccc_buf_from(std_alloc, NULL,
+        = ccc_buf_from(std_alloc, NULL, bq_count,
                        (struct huffman_node[]){
                            {}, // nil
                            {}, // root
@@ -786,10 +787,9 @@ reconstruct_tree(struct compressed_huffman_tree *const blueprint)
            always have valid prev node. Don't need to check on every loop
            iteration. */
         .root = 1,
-        .num_nodes = bitq_count(&blueprint->tree_paths),
+        .num_nodes = bq_count,
     };
-    ccc_result r = reserve(&ret.bump_arena, ret.num_nodes + 1, std_alloc);
-    check(r == CCC_RESULT_OK);
+    check(!ccc_buf_is_empty(&ret.bump_arena));
     (void)bitq_pop_front(&blueprint->tree_paths);
     size_t parent = ret.root;
     size_t node = 0;
