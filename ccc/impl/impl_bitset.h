@@ -105,20 +105,33 @@ ccc_impl_bs_from_fn(ccc_any_alloc_fn *const fn, void *const aux, size_t i,
                     size_t const count, size_t cap, char const on_char,
                     char const *string)
 {
-    struct ccc_bitset bs = ccc_impl_bs_init(NULL, fn, aux, 0);
-    if (ccc_impl_bs_reserve(&bs, cap < count ? count : cap, fn)
-        != CCC_RESULT_OK)
+    struct ccc_bitset b = ccc_impl_bs_init(NULL, fn, aux, 0);
+    if (ccc_impl_bs_reserve(&b, cap < count ? count : cap, fn) != CCC_RESULT_OK)
     {
-        return bs;
+        return b;
     }
-    bs.count = count;
+    b.count = count;
     while (i < count && string[i])
     {
-        (void)ccc_impl_bs_set(&bs, i, string[i] == on_char);
+        (void)ccc_impl_bs_set(&b, i, string[i] == on_char);
         ++i;
     }
-    bs.count = i;
-    return bs;
+    b.count = i;
+    return b;
+}
+
+/** @private Returns a bit set with the memory reserved for the blocks and
+the size set. */
+static inline struct ccc_bitset
+ccc_impl_bs_with_capacity_fn(ccc_any_alloc_fn *const fn, void *const aux,
+                             size_t const cap, size_t const count)
+{
+    struct ccc_bitset b = ccc_impl_bs_init(NULL, fn, aux, 0);
+    if (ccc_impl_bs_reserve(&b, cap, fn) == CCC_RESULT_OK)
+    {
+        b.count = count;
+    }
+    return b;
 }
 
 /** @private Determine if user wants capacity different than count. Then pass
@@ -128,5 +141,11 @@ to inline function for bit set construction. */
     ccc_impl_bs_from_fn(impl_alloc_fn, impl_aux, impl_start_index, impl_count, \
                         IMPL_BS_OPTIONAL_SIZE((impl_count), __VA_ARGS__),      \
                         impl_on_char, impl_string)
+
+/** @private Macro wrapper allowing user to optionally specify size. */
+#define ccc_impl_bs_with_capacity(impl_alloc_fn, impl_aux, impl_cap, ...)      \
+    ccc_impl_bs_with_capacity_fn(                                              \
+        impl_alloc_fn, impl_aux, impl_cap,                                     \
+        IMPL_BS_OPTIONAL_SIZE((impl_cap), __VA_ARGS__))
 
 #endif /* CCC_IMPL_BITSET */

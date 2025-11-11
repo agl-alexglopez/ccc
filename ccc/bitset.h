@@ -208,6 +208,42 @@ run such input code at compile time. */
     ccc_impl_bs_from(alloc_fn, aux, start_string_index, count, bit_on_char,    \
                      input_string, optional_capacity)
 
+/** @brief Initialize the bit set with a starting capacity and size at runtime.
+@param [in] alloc_fn the allocation function for a dynamic bit.
+@param [in] aux auxiliary data needed for allocation of the bit set.
+@param [in] capacity the number of bits that will be stored in this bit set.
+@param [in] optional_size an optional starting size <= capacity. This value
+defaults to the same value as capacity which is appropriate for most cases. For
+any case where this is not desirable, set the size manually (for example, a
+bit set that will push bits back would have a non-zero capacity and 0 size).
+@return the initialized bit set on the right hand side of an equality operator
+
+A fixed size bit set with size equal to capacity.
+
+```
+#define BITSET_USING_NAMESPACE_CCC
+int
+main(void)
+{
+    bitset bs = bs_with_capacity(std_alloc, NULL, 4096);
+}
+```
+A bit set with dynamic push and pop.
+
+```
+#define BITSET_USING_NAMESPACE_CCC
+int
+main(void)
+{
+    bitset bs = bs_with_capacity(std_alloc, NULL, 4096, 0);
+}
+```
+
+This initialization can only be used at runtime. See the normal initializer for
+static and stack based initialization options. */
+#define ccc_bs_with_capacity(alloc_fn, aux, capacity, optional_size...)        \
+    ccc_impl_bs_with_capacity(alloc_fn, aux, capacity, optional_size)
+
 /** @brief Copy the bit set at source to destination.
 @param [in] dst the initialized destination for the copy of the src set.
 @param [in] src the initialized source of the set.

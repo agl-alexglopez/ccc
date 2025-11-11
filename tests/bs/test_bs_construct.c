@@ -113,7 +113,7 @@ CHECK_BEGIN_STATIC_FN(bs_test_init_from)
     CHECK_END_FN(ccc_bs_clear_and_free(&b););
 }
 
-CHECK_BEGIN_STATIC_FN(bs_test_init_from_with_cap)
+CHECK_BEGIN_STATIC_FN(bs_test_init_from_cap)
 {
     char input[] = {'1', '1', '0', '1', '1', '0', '\0'};
     ccc_bitset b = ccc_bs_from(std_alloc, NULL, 0, sizeof(input), '1', input,
@@ -140,10 +140,10 @@ CHECK_BEGIN_STATIC_FN(bs_test_init_from_fail)
     CHECK(ccc_bs_popcount(&b).count, 0);
     CHECK(CCC_TRIBOOL_ERROR, ccc_bs_test(&b, 0));
     CHECK(CCC_TRIBOOL_ERROR, ccc_bs_test(&b, 99));
-    CHECK_END_FN();
+    CHECK_END_FN(ccc_bs_clear_and_free(&b););
 }
 
-CHECK_BEGIN_STATIC_FN(bs_test_init_from_with_cap_fail)
+CHECK_BEGIN_STATIC_FN(bs_test_init_from_cap_fail)
 {
     char input[] = {'1', '1', '0', '1', '1', '0', '\0'};
     /* Forgot allocation function. */
@@ -154,7 +154,29 @@ CHECK_BEGIN_STATIC_FN(bs_test_init_from_with_cap_fail)
     CHECK(ccc_bs_popcount(&b).count, 0);
     CHECK(CCC_TRIBOOL_ERROR, ccc_bs_test(&b, 0));
     CHECK(CCC_TRIBOOL_ERROR, ccc_bs_test(&b, 99));
-    CHECK_END_FN();
+    CHECK_END_FN(ccc_bs_clear_and_free(&b););
+}
+
+CHECK_BEGIN_STATIC_FN(bs_test_init_with_capacity)
+{
+    ccc_bitset b = ccc_bs_with_capacity(std_alloc, NULL, 10);
+    CHECK(ccc_bs_popcount(&b).count, 0);
+    CHECK(ccc_bs_set(&b, 0, CCC_TRUE), CCC_FALSE);
+    CHECK(ccc_bs_set(&b, 9, CCC_TRUE), CCC_FALSE);
+    CHECK(ccc_bs_test(&b, 0), CCC_TRUE);
+    CHECK(ccc_bs_test(&b, 9), CCC_TRUE);
+    CHECK_END_FN(ccc_bs_clear_and_free(&b););
+}
+
+CHECK_BEGIN_STATIC_FN(bs_test_init_with_capacity_fail)
+{
+    ccc_bitset b = ccc_bs_with_capacity(NULL, NULL, 10);
+    CHECK(ccc_bs_popcount(&b).count, 0);
+    CHECK(CCC_TRIBOOL_ERROR, ccc_bs_set(&b, 0, CCC_TRUE));
+    CHECK(CCC_TRIBOOL_ERROR, ccc_bs_set(&b, 9, CCC_TRUE));
+    CHECK(CCC_TRIBOOL_ERROR, ccc_bs_test(&b, 0));
+    CHECK(CCC_TRIBOOL_ERROR, ccc_bs_test(&b, 9));
+    CHECK_END_FN(ccc_bs_clear_and_free(&b););
 }
 
 int
@@ -162,6 +184,7 @@ main(void)
 {
     return CHECK_RUN(bs_test_construct(), bs_test_copy_no_alloc(),
                      bs_test_copy_alloc(), bs_test_init_from(),
-                     bs_test_init_from_with_cap(), bs_test_init_from_fail(),
-                     bs_test_init_from_with_cap_fail());
+                     bs_test_init_from_cap(), bs_test_init_from_fail(),
+                     bs_test_init_from_cap_fail(), bs_test_init_with_capacity(),
+                     bs_test_init_with_capacity_fail());
 }
