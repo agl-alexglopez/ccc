@@ -242,6 +242,80 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_init_from_fail)
     CHECK_END_FN(fhm_clear_and_free(&map_from_list, NULL););
 }
 
+CHECK_BEGIN_STATIC_FN(fhmap_test_init_with_capacity)
+{
+    flat_hash_map fh = fhm_with_capacity(struct val, key, fhmap_int_to_u64,
+                                         fhmap_id_cmp, std_alloc, NULL, 32);
+    CHECK(validate(&fh), true);
+    CHECK(fhm_capacity(&fh).count >= 32, true);
+    for (int i = 0; i < 10; ++i)
+    {
+        ccc_entry const e
+            = ccc_fhm_insert_or_assign(&fh, &(struct val){.key = i, .val = i});
+        CHECK(ccc_entry_insert_error(&e), CCC_FALSE);
+        CHECK(fhm_validate(&fh), CCC_TRUE);
+    }
+    CHECK(fhm_count(&fh).count, 10);
+    size_t seen = 0;
+    for (struct val const *i = begin(&fh); i != end(&fh); i = next(&fh, i))
+    {
+        CHECK(i->key >= 0 && i->key < 10, true);
+        CHECK(i->val >= 0 && i->val < 10, true);
+        CHECK(i->val, i->key);
+        ++seen;
+    }
+    CHECK(seen, 10);
+    CHECK_END_FN(fhm_clear_and_free(&fh, NULL););
+}
+
+CHECK_BEGIN_STATIC_FN(fhmap_test_init_with_capacity_no_op)
+{
+    /* Initialize with 0 cap is OK just does nothing. */
+    flat_hash_map fh = fhm_with_capacity(struct val, key, fhmap_int_to_u64,
+                                         fhmap_id_cmp, std_alloc, NULL, 0);
+    CHECK(validate(&fh), true);
+    CHECK(fhm_capacity(&fh).count, 0);
+    CHECK(fhm_count(&fh).count, 0);
+    ccc_entry const e
+        = ccc_fhm_insert_or_assign(&fh, &(struct val){.key = 1, .val = 1});
+    CHECK(ccc_entry_insert_error(&e), CCC_FALSE);
+    CHECK(fhm_validate(&fh), CCC_TRUE);
+    CHECK(fhm_count(&fh).count, 1);
+    size_t seen = 0;
+    for (struct val const *i = begin(&fh); i != end(&fh); i = next(&fh, i))
+    {
+        CHECK(i->key, i->val);
+        ++seen;
+    }
+    CHECK(fhm_count(&fh).count, 1);
+    CHECK(fhm_capacity(&fh).count > 0, true);
+    CHECK(seen, 1);
+    CHECK_END_FN(fhm_clear_and_free(&fh, NULL););
+}
+
+CHECK_BEGIN_STATIC_FN(fhmap_test_init_with_capacity_fail)
+{
+    /* Forgot allocation function. */
+    flat_hash_map fh = fhm_with_capacity(struct val, key, fhmap_int_to_u64,
+                                         fhmap_id_cmp, NULL, NULL, 32);
+    CHECK(validate(&fh), true);
+    CHECK(fhm_capacity(&fh).count, 0);
+    ccc_entry const e
+        = ccc_fhm_insert_or_assign(&fh, &(struct val){.key = 1, .val = 1});
+    CHECK(ccc_entry_insert_error(&e), CCC_TRUE);
+    CHECK(fhm_validate(&fh), CCC_TRUE);
+    CHECK(fhm_count(&fh).count, 0);
+    size_t seen = 0;
+    for (struct val const *i = begin(&fh); i != end(&fh); i = next(&fh, i))
+    {
+        CHECK(i->key, i->val);
+        ++seen;
+    }
+    CHECK(fhm_count(&fh).count, 0);
+    CHECK(seen, 0);
+    CHECK_END_FN(fhm_clear_and_free(&fh, NULL););
+}
+
 int
 main()
 {
@@ -249,5 +323,8 @@ main()
                      fhmap_test_copy_no_alloc_fail(), fhmap_test_copy_alloc(),
                      fhmap_test_copy_alloc_fail(), fhmap_test_empty(),
                      fhmap_test_init_from(), fhmap_test_init_from_overwrite(),
-                     fhmap_test_init_from_fail());
+                     fhmap_test_init_from_fail(),
+                     fhmap_test_init_with_capacity(),
+                     fhmap_test_init_with_capacity_no_op(),
+                     fhmap_test_init_with_capacity_fail());
 }

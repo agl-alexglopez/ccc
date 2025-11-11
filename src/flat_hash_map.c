@@ -393,7 +393,7 @@ ccc_fhm_is_empty(ccc_flat_hash_map const *const h)
 ccc_ucount
 ccc_fhm_count(ccc_flat_hash_map const *const h)
 {
-    if (!h)
+    if (!h || h->mask < (CCC_FHM_GROUP_SIZE - 1))
     {
         return (ccc_ucount){.error = CCC_RESULT_ARG_ERROR};
     }
@@ -403,11 +403,11 @@ ccc_fhm_count(ccc_flat_hash_map const *const h)
 ccc_ucount
 ccc_fhm_capacity(ccc_flat_hash_map const *const h)
 {
-    if (!h)
+    if (!h || (!h->data && h->mask))
     {
         return (ccc_ucount){.error = CCC_RESULT_ARG_ERROR};
     }
-    return (ccc_ucount){.count = h->mask + 1};
+    return (ccc_ucount){.count = h->mask ? h->mask + 1 : 0};
 }
 
 ccc_tribool

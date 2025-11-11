@@ -307,6 +307,18 @@ fixed size and has data or is dynamic and has not yet been given allocation. */
         impl_map;                                                              \
     }))
 
+/** @private Initializes the flat hash map with the specified capacity. */
+#define ccc_impl_fhm_with_capacity(impl_type_name, impl_key_field,             \
+                                   impl_hash_fn, impl_key_cmp_fn,              \
+                                   impl_alloc_fn, impl_aux_data, impl_cap)     \
+    (__extension__({                                                           \
+        struct ccc_fhmap impl_map = ccc_impl_fhm_init(                         \
+            NULL, impl_type_name, impl_key_field, impl_hash_fn,                \
+            impl_key_cmp_fn, impl_alloc_fn, impl_aux_data, 0);                 \
+        (void)ccc_fhm_reserve(&impl_map, impl_cap, impl_alloc_fn);             \
+        impl_map;                                                              \
+    }))
+
 /*========================    Construct In Place    =========================*/
 
 /** @private A fairly good approximation of closures given C23 capabilities.

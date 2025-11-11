@@ -262,7 +262,7 @@ identical to the provided examples. Omit `static` in a runtime context. */
     ccc_impl_fhm_init(map_ptr, any_type_name, key_field, hash_fn, key_cmp_fn,  \
                       alloc_fn, aux_data, capacity)
 
-/** @brief Initialize a dynamic map at runtime.
+/** @brief Initialize a dynamic map at runtime from an initializer list.
 @param [in] key_field the field of the struct used for key storage.
 @param [in] hash_fn the ccc_any_key_hash_fn function provided by the user.
 @param [in] key_cmp_fn the ccc_any_key_cmp_fn the user intends to use.
@@ -284,6 +284,9 @@ equality operator (i.e. ccc_flat_hash_map fh = ccc_fhm_from(...);)
 for dynamic maps.
 @warning When duplicate keys appear in the initializer list, the last occurrence
 replaces earlier ones by value (all fields are overwritten).
+@warning If initialization fails all subsequent queries, insertions, or
+removals will indicate the error: either memory related or lack of an
+allocation function provided.
 
 Initialize a dynamic hash table at run time. This example requires no auxiliary
 data for initialization.
@@ -321,6 +324,57 @@ map to protect its invariants from user error at compile time. */
                      optional_capacity, array_compound_literal...)             \
     ccc_impl_fhm_from(key_field, hash_fn, key_cmp_fn, alloc_fn, aux_data,      \
                       optional_capacity, array_compound_literal)
+
+/** @brief Initialize a dynamic map at runtime with at least the specified
+capacity.
+@param [in] type_name the name of the type being stored in the map.
+@param [in] key_field the field of the struct used for key storage.
+@param [in] hash_fn the ccc_any_key_hash_fn function provided by the user.
+@param [in] key_cmp_fn the ccc_any_key_cmp_fn the user intends to use.
+@param [in] alloc_fn the required allocation function.
+@param [in] aux_data auxiliary data that is needed for hashing or comparison.
+@param [in] capacity the desired capacity for the map. A capacity of 0 results
+in an argument error and is a no-op after the map is initialized empty.
+@return the flat hash map directly initialized on the right hand side of the
+equality operator (i.e. ccc_flat_hash_map fh = ccc_fhm_with_capacity(...);)
+@warning An allocation function is required. This initializer is only available
+for dynamic maps.
+@warning If initialization fails all subsequent queries, insertions, or
+removals will indicate the error: either memory related or lack of an
+allocation function provided.
+
+Initialize a dynamic hash table at run time. This example requires no auxiliary
+data for initialization.
+
+```
+#define FLAT_HASH_MAP_USING_NAMESPACE_CCC
+struct val
+{
+    int key;
+    int val;
+};
+int
+main(void)
+{
+    flat_hash_map static_fh = fhm_from(
+        struct val,
+        key,
+        fhmap_int_to_u64,
+        fhmap_key_cmp,
+        std_alloc,
+        NULL,
+        4096
+    );
+    return 0;
+}
+```
+
+Only dynamic maps may be initialized this way as it simply combines the steps
+of initialization and reservation. */
+#define ccc_fhm_with_capacity(type_name, key_field, hash_fn, key_cmp_fn,       \
+                              alloc_fn, aux_data, capacity)                    \
+    ccc_impl_fhm_with_capacity(type_name, key_field, hash_fn, key_cmp_fn,      \
+                               alloc_fn, aux_data, capacity)
 
 /** @brief Copy the map at source to destination.
 @param [in] dst the initialized destination for the copy of the src map.
@@ -980,6 +1034,7 @@ typedef ccc_fhmap_entry fhmap_entry;
 #    define fhm_reserve(args...) ccc_fhm_reserve(args)
 #    define fhm_init(args...) ccc_fhm_init(args)
 #    define fhm_from(args...) ccc_fhm_from(args)
+#    define fhm_with_capacity(args...) ccc_fhm_with_capacity(args)
 #    define fhm_copy(args...) ccc_fhm_copy(args)
 #    define fhm_and_modify_w(args...) ccc_fhm_and_modify_w(args)
 #    define fhm_or_insert_w(args...) ccc_fhm_or_insert_w(args)
