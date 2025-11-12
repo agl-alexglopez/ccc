@@ -22,8 +22,8 @@ enum : size_t
 
 struct lru_cache
 {
-    ccc_handle_realtime_ordered_map map;
-    ccc_doubly_linked_list l;
+    CCC_handle_realtime_ordered_map map;
+    CCC_doubly_linked_list l;
     size_t cap;
 };
 
@@ -62,8 +62,8 @@ hrm_declare_fixed_map(lru_fixed_map, struct lru_elem, LRU_CAP);
 
 /*===========================   Prototypes   ================================*/
 
-static ccc_threeway_cmp cmp_by_key(ccc_any_key_cmp cmp);
-static ccc_threeway_cmp cmp_list_elems(ccc_any_type_cmp ccmp);
+static CCC_threeway_cmp cmp_by_key(CCC_any_key_cmp cmp);
+static CCC_threeway_cmp cmp_list_elems(CCC_any_type_cmp ccmp);
 static struct lru_elem *lru_head(struct lru_cache *lru);
 static enum check_result lru_put(struct lru_cache *lru, int key, int val);
 static enum check_result lru_get(struct lru_cache *lru, int key, int *val);
@@ -158,19 +158,19 @@ CHECK_BEGIN_STATIC_FN(run_lru_cache)
                 break;
         }
     }
-    CHECK_END_FN({ (void)ccc_hrm_clear(&lru_cache.map, NULL); });
+    CHECK_END_FN({ (void)CCC_hrm_clear(&lru_cache.map, NULL); });
 }
 
 CHECK_BEGIN_STATIC_FN(lru_put, struct lru_cache *const lru, int const key,
                       int const val)
 {
-    ccc_hromap_handle const *const ent = handle_r(&lru->map, &key);
+    CCC_hromap_handle const *const ent = handle_r(&lru->map, &key);
     if (occupied(ent))
     {
         struct lru_elem *const found = hrm_at(&lru->map, unwrap(ent));
         found->key = key;
         found->val = val;
-        ccc_result r = dll_splice(&lru->l, dll_begin_elem(&lru->l), &lru->l,
+        CCC_result r = dll_splice(&lru->l, dll_begin_elem(&lru->l), &lru->l,
                                   &found->list_elem);
         CHECK(r, CCC_RESULT_OK);
     }
@@ -187,7 +187,7 @@ CHECK_BEGIN_STATIC_FN(lru_put, struct lru_cache *const lru, int const key,
             struct lru_elem const *const to_drop = back(&lru->l);
             CHECK(to_drop == NULL, false);
             (void)pop_back(&lru->l);
-            ccc_handle const e
+            CCC_handle const e
                 = remove_handle(handle_r(&lru->map, &to_drop->key));
             CHECK(occupied(&e), true);
         }
@@ -207,7 +207,7 @@ CHECK_BEGIN_STATIC_FN(lru_get, struct lru_cache *const lru, int const key,
     }
     else
     {
-        ccc_result r = dll_splice(&lru->l, dll_begin_elem(&lru->l), &lru->l,
+        CCC_result r = dll_splice(&lru->l, dll_begin_elem(&lru->l), &lru->l,
                                   &found->list_elem);
         CHECK(r, CCC_RESULT_OK);
         *val = found->val;
@@ -221,16 +221,16 @@ lru_head(struct lru_cache *const lru)
     return dll_front(&lru->l);
 }
 
-static ccc_threeway_cmp
-cmp_by_key(ccc_any_key_cmp const cmp)
+static CCC_threeway_cmp
+cmp_by_key(CCC_any_key_cmp const cmp)
 {
     int const key_lhs = *(int *)cmp.any_key_lhs;
     struct lru_elem const *const kv = cmp.any_type_rhs;
     return (key_lhs > kv->key) - (key_lhs < kv->key);
 }
 
-static ccc_threeway_cmp
-cmp_list_elems(ccc_any_type_cmp const cmp)
+static CCC_threeway_cmp
+cmp_list_elems(CCC_any_type_cmp const cmp)
 {
     struct lru_elem const *const kv_a = cmp.any_type_lhs;
     struct lru_elem const *const kv_b = cmp.any_type_rhs;

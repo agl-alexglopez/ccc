@@ -29,7 +29,7 @@ in cache friendly storage and operations.
 By default a bit set is initialized with size equal to capacity but the user may
 select to initialize a 0 sized bit set with non-zero capacity for pushing bits
 back dynamically. */
-struct ccc_bitset
+struct CCC_Bitset
 {
     /** The array of bit blocks, a platform defined standard bit width. */
     unsigned *blocks;
@@ -38,7 +38,7 @@ struct ccc_bitset
     /** The number of bits capable of being tracked in the bit block array. */
     size_t capacity;
     /** The user provided allocation function for resizing, if any. */
-    ccc_any_alloc_fn *alloc;
+    CCC_any_alloc_fn *alloc;
     /** Auxiliary data for resizing, if any. */
     void *aux;
 };
@@ -46,32 +46,32 @@ struct ccc_bitset
 enum : size_t
 {
     /** @private The number of bits in a bit block. In sync with set type. */
-    CCC_IMPL_BS_BLOCK_BITS = (sizeof(*(struct ccc_bitset){}.blocks) * CHAR_BIT),
+    CCC_IMPL_BS_BLOCK_BITS = (sizeof(*(struct CCC_Bitset){}.blocks) * CHAR_BIT),
 };
 
 /*=========================     Private Interface   =========================*/
 
-ccc_result ccc_impl_bs_reserve(struct ccc_bitset *, size_t to_add,
-                               ccc_any_alloc_fn *);
-ccc_tribool ccc_impl_bs_set(struct ccc_bitset *bs, size_t i, ccc_tribool b);
+CCC_result CCC_impl_bs_reserve(struct CCC_Bitset *, size_t to_add,
+                               CCC_any_alloc_fn *);
+CCC_tribool CCC_impl_bs_set(struct CCC_Bitset *bs, size_t i, CCC_tribool b);
 
 /*================================     Macros     ===========================*/
 
 /** @private Returns the number of blocks needed to support a given capacity
 of bits. Assumes the given capacity is greater than 0. Classic div round up. */
-#define ccc_impl_bs_block_count(impl_bit_cap)                                  \
+#define CCC_impl_bs_block_count(impl_bit_cap)                                  \
     (((impl_bit_cap) + (CCC_IMPL_BS_BLOCK_BITS - 1)) / CCC_IMPL_BS_BLOCK_BITS)
 
 /** @private Returns the number of bytes needed for the required blocks. */
-#define ccc_impl_bs_block_bytes(impl_bit_cap)                                  \
-    (sizeof(*(struct ccc_bitset){}.blocks) * (impl_bit_cap))
+#define CCC_impl_bs_block_bytes(impl_bit_cap)                                  \
+    (sizeof(*(struct CCC_Bitset){}.blocks) * (impl_bit_cap))
 
 /** @private Allocates a compound literal bit block array in the scope at which
 the macro is used. However, the optional parameter supports storage duration
 specifiers which is a feature of C23. Not all compilers support this yet. */
-#define ccc_impl_bs_blocks(impl_bit_cap, ...)                                  \
+#define CCC_impl_bs_blocks(impl_bit_cap, ...)                                  \
     (__VA_OPT__(__VA_ARGS__) typeof (                                          \
-        *(struct ccc_bitset){}.blocks)[ccc_impl_bs_block_count(impl_bit_cap)]) \
+        *(struct CCC_Bitset){}.blocks)[CCC_impl_bs_block_count(impl_bit_cap)]) \
     {}
 
 /** @private */
@@ -86,7 +86,7 @@ specifiers which is a feature of C23. Not all compilers support this yet. */
 The optional size param defaults equal to capacity if not provided. This covers
 most common cases--fixed size bit set, 0 sized dynamic bit set--and when the
 user wants a fixed size dynamic bit set they provide 0 as size argument. */
-#define ccc_impl_bs_init(impl_bitblock_ptr, impl_alloc_fn, impl_aux, impl_cap, \
+#define CCC_impl_bs_init(impl_bitblock_ptr, impl_alloc_fn, impl_aux, impl_cap, \
                          ...)                                                  \
     {                                                                          \
         .blocks = (impl_bitblock_ptr),                                         \
@@ -100,20 +100,20 @@ user wants a fixed size dynamic bit set they provide 0 as size argument. */
 we get to use static inline for improved functionality. Once the macro learns
 whether the user wants a capacity we pass the functionality of parsing the
 input string to this function. */
-static inline struct ccc_bitset
-ccc_impl_bs_from_fn(ccc_any_alloc_fn *const fn, void *const aux, size_t i,
+static inline struct CCC_Bitset
+CCC_impl_bs_from_fn(CCC_any_alloc_fn *const fn, void *const aux, size_t i,
                     size_t const count, size_t cap, char const on_char,
                     char const *string)
 {
-    struct ccc_bitset b = ccc_impl_bs_init(NULL, fn, aux, 0);
-    if (ccc_impl_bs_reserve(&b, cap < count ? count : cap, fn) != CCC_RESULT_OK)
+    struct CCC_Bitset b = CCC_impl_bs_init(NULL, fn, aux, 0);
+    if (CCC_impl_bs_reserve(&b, cap < count ? count : cap, fn) != CCC_RESULT_OK)
     {
         return b;
     }
     b.count = count;
     while (i < count && string[i])
     {
-        (void)ccc_impl_bs_set(&b, i, string[i] == on_char);
+        (void)CCC_impl_bs_set(&b, i, string[i] == on_char);
         ++i;
     }
     b.count = i;
@@ -122,12 +122,12 @@ ccc_impl_bs_from_fn(ccc_any_alloc_fn *const fn, void *const aux, size_t i,
 
 /** @private Returns a bit set with the memory reserved for the blocks and
 the size set. */
-static inline struct ccc_bitset
-ccc_impl_bs_with_capacity_fn(ccc_any_alloc_fn *const fn, void *const aux,
+static inline struct CCC_Bitset
+CCC_impl_bs_with_capacity_fn(CCC_any_alloc_fn *const fn, void *const aux,
                              size_t const cap, size_t const count)
 {
-    struct ccc_bitset b = ccc_impl_bs_init(NULL, fn, aux, 0);
-    if (ccc_impl_bs_reserve(&b, cap, fn) == CCC_RESULT_OK)
+    struct CCC_Bitset b = CCC_impl_bs_init(NULL, fn, aux, 0);
+    if (CCC_impl_bs_reserve(&b, cap, fn) == CCC_RESULT_OK)
     {
         b.count = count;
     }
@@ -136,15 +136,15 @@ ccc_impl_bs_with_capacity_fn(ccc_any_alloc_fn *const fn, void *const aux,
 
 /** @private Determine if user wants capacity different than count. Then pass
 to inline function for bit set construction. */
-#define ccc_impl_bs_from(impl_alloc_fn, impl_aux, impl_start_index,            \
+#define CCC_impl_bs_from(impl_alloc_fn, impl_aux, impl_start_index,            \
                          impl_count, impl_on_char, impl_string, ...)           \
-    ccc_impl_bs_from_fn(impl_alloc_fn, impl_aux, impl_start_index, impl_count, \
+    CCC_impl_bs_from_fn(impl_alloc_fn, impl_aux, impl_start_index, impl_count, \
                         IMPL_BS_OPTIONAL_SIZE((impl_count), __VA_ARGS__),      \
                         impl_on_char, impl_string)
 
 /** @private Macro wrapper allowing user to optionally specify size. */
-#define ccc_impl_bs_with_capacity(impl_alloc_fn, impl_aux, impl_cap, ...)      \
-    ccc_impl_bs_with_capacity_fn(                                              \
+#define CCC_impl_bs_with_capacity(impl_alloc_fn, impl_aux, impl_cap, ...)      \
+    CCC_impl_bs_with_capacity_fn(                                              \
         impl_alloc_fn, impl_aux, impl_cap,                                     \
         IMPL_BS_OPTIONAL_SIZE((impl_cap), __VA_ARGS__))
 

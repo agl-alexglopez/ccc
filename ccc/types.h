@@ -41,7 +41,7 @@ A range provides a view all elements that fit the equals range criteria
 of search-by-key containers. Use the provided range iteration functions in
 this header to iterate from beginning to end in forward order relative to
 the containers default ordering. */
-typedef union ccc_range ccc_range;
+typedef union CCC_range CCC_range;
 
 /** @brief The result of a rrange query on iterable containers.
 
@@ -49,7 +49,7 @@ A rrange provides a view all elements that fit the equals rrange criteria
 of search-by-key containers. Use the provided range iteration functions in
 this header to iterate from beginning to end in reverse order relative to
 the containers default ordering. */
-typedef union ccc_rrange ccc_rrange;
+typedef union CCC_rrange CCC_rrange;
 
 /** @brief An Occupied or Vacant position in a searchable container.
 
@@ -58,27 +58,27 @@ all search-by-key containers. An entry is returned from various operations
 to provide both a reference to data and any auxiliary status that is
 important for the user. An entry can be Occupied or Vacant. See individual
 headers for containers that return this type for its meaning in context. */
-typedef union ccc_entry ccc_entry;
+typedef union CCC_entry CCC_entry;
 
 /** @brief The status monitoring and entry state once it is obtained.
 
 To manage safe and efficient views into associative containers entries use
 status flags internally. The provided functions in the Entry Interface for
 each container are sufficient to obtain the needed status. However if more
-information is needed, the status can be passed to the ccc_entry_status_msg()
+information is needed, the status can be passed to the CCC_entry_status_msg()
 function for detailed string messages regarding the entry status. This may
 be helpful for debugging or logging. */
-typedef enum ccc_entry_status ccc_entry_status;
+typedef enum CCC_entry_status CCC_entry_status;
 
 /** @brief An Occupied or Vacant handle to a flat searchable container entry.
 
 A handle uses the same semantics as an entry. However, the wrapped value is
-a ccc_handle_i index. When this type is returned the container interface is
+a CCC_handle_i index. When this type is returned the container interface is
 promising that this element will remain at the returned handle index until the
 element is removed by the user. This is similar to pointer stability but offers
 a stronger guarantee that will hold even if the underlying container is
 resized. */
-typedef union ccc_handle ccc_handle;
+typedef union CCC_handle CCC_handle;
 
 /** @brief A stable index to user data in a container that uses a flat array as
 the underlying storage method.
@@ -90,17 +90,17 @@ may occur, but the handle index remains valid regardless.
 This is similar to pointer stability except that pointers would not remain valid
 when the underlying array is resized; a handle remains valid because it is an
 index not a pointer. */
-typedef size_t ccc_handle_i;
+typedef size_t CCC_handle_i;
 
 /** @brief The status monitoring and handle state once it is obtained.
 
 To manage safe and efficient views into associative containers entries use
 status flags internally. The provided functions in the Handle Interface for
 each container are sufficient to obtain the needed status. However if more
-information is needed, the status can be passed to the ccc_entry_status_msg()
+information is needed, the status can be passed to the CCC_entry_status_msg()
 function for detailed string messages regarding the handle status. This may
 be helpful for debugging or logging. */
-typedef enum ccc_entry_status ccc_handle_status;
+typedef enum CCC_entry_status CCC_handle_status;
 
 /** @brief A three state boolean to allow for an error state. Error is -1, False
 is 0, and True is 1.
@@ -121,7 +121,7 @@ typedef enum : int8_t
     CCC_FALSE,
     /** Equivalent to boolean true, guaranteed to be truthy aka 1. */
     CCC_TRUE,
-} ccc_tribool;
+} CCC_tribool;
 
 /** @brief A result of actions on containers.
 
@@ -142,7 +142,7 @@ typedef enum : uint8_t
     CCC_RESULT_ARG_ERROR,
     /** Internal helper, never returned to user. Always last result. */
     CCC_RESULT_COUNT,
-} ccc_result;
+} CCC_result;
 
 /** @brief A three-way comparison for comparison functions.
 
@@ -159,7 +159,7 @@ typedef enum : int8_t
     CCC_GRT,
     /** Comparison is not possible or other error has occurred. */
     CCC_CMP_ERROR,
-} ccc_threeway_cmp;
+} CCC_threeway_cmp;
 
 /** @brief A type for returning an unsigned integer from a container for
 counting. Intended to count sizes, capacities, and 0-based indices.
@@ -169,24 +169,24 @@ returned index. If an error has occurred, the index is invalid. An error will be
 indicated by any non-zero value in the error field.
 
 ```
-ccc_ucount res = ccc_bs_first_trailing_one(&my_bitset);
+CCC_ucount res = CCC_bs_first_trailing_one(&my_bitset);
 if (res.error)
 {
     // handle errors...
 }
-(void)ccc_bs_set(&my_bitset, res.count, CCC_TRUE);
+(void)CCC_bs_set(&my_bitset, res.count, CCC_TRUE);
 ```
 
-Full string explanations of the exact ccc_result error types can be provided via
-the ccc_result_msg function if the enum itself does not provide sufficient
+Full string explanations of the exact CCC_result error types can be provided via
+the CCC_result_msg function if the enum itself does not provide sufficient
 explanation. */
 typedef struct
 {
     /** The error that occurred indicated by a status. 0 (falsey) means OK. */
-    ccc_result error;
+    CCC_result error;
     /** The count returned by the operation. */
     size_t count;
-} ccc_ucount;
+} CCC_ucount;
 
 /** @brief An element comparison helper.
 
@@ -204,7 +204,7 @@ typedef struct
     void const *const any_type_rhs;
     /** A reference to aux data provided to container on initialization. */
     void *aux;
-} ccc_any_type_cmp;
+} CCC_any_type_cmp;
 
 /** @brief A key comparison helper to avoid argument swapping.
 
@@ -231,7 +231,7 @@ typedef struct
     void const *const any_type_rhs;
     /** A reference to aux data provided to the container on initialization. */
     void *aux;
-} ccc_any_key_cmp;
+} CCC_any_key_cmp;
 
 /** @brief A reference to a user type within the container.
 
@@ -243,7 +243,7 @@ typedef struct
     void *any_type;
     /** A reference to aux data provided to the container on initialization. */
     void *aux;
-} ccc_any_type;
+} CCC_any_type;
 
 /** @brief A read only reference to a key type matching the key field type used
 for hash containers.
@@ -256,7 +256,7 @@ typedef struct
     void const *const any_key;
     /** A reference to aux data provided to the container on initialization. */
     void *aux;
-} ccc_any_key;
+} CCC_any_key;
 
 /** @brief An allocation function at the core of all containers.
 
@@ -305,7 +305,7 @@ is used. Any allocator that implements the required behavior is sufficient.
 For example programs that utilize the aux parameter, see the sample programs.
 Using custom arena allocators or container compositions are cases when aux is
 needed. */
-typedef void *ccc_any_alloc_fn(void *ptr, size_t size, void *aux);
+typedef void *CCC_any_alloc_fn(void *ptr, size_t size, void *aux);
 
 /** @brief A callback function for comparing two elements in a container.
 
@@ -313,7 +313,7 @@ A three-way comparison return value is expected and the two containers being
 compared are guaranteed to be non-NULL and pointing to the base of the user type
 stored in the container. Aux may be NULL if no aux is provided on
 initialization. */
-typedef ccc_threeway_cmp ccc_any_type_cmp_fn(ccc_any_type_cmp);
+typedef CCC_threeway_cmp CCC_any_type_cmp_fn(CCC_any_type_cmp);
 
 /** @brief A callback function for modifying an element in the container.
 
@@ -322,7 +322,7 @@ is available. The container pointer points to the base of the user type and is
 not NULL. Aux may be NULL if no aux is provided on initialization. An update
 function is used when a container Interface exposes functions to modify the key
 or value used to determine sorted order of elements in the container. */
-typedef void ccc_any_type_update_fn(ccc_any_type);
+typedef void CCC_any_type_update_fn(CCC_any_type);
 
 /** @brief A callback function for destroying an element in the container.
 
@@ -340,20 +340,20 @@ container frees. If the user has not given permission to the container to
 allocate memory, this a good function in which to free each element, if
 desired; any program state can be maintained then the element can be freed by
 the user in this function as the final step. */
-typedef void ccc_any_type_destructor_fn(ccc_any_type);
+typedef void CCC_any_type_destructor_fn(CCC_any_type);
 
 /** @brief A callback function for three-way comparing two stored keys.
 
 The key is considered the left hand side of the comparison. The function should
 return CCC_LES if the key is less than the key in key field of user type,
 CCC_EQL if equal, and CCC_GRT if greater. */
-typedef ccc_threeway_cmp ccc_any_key_cmp_fn(ccc_any_key_cmp);
+typedef CCC_threeway_cmp CCC_any_key_cmp_fn(CCC_any_key_cmp);
 
 /** @brief A callback function to hash the key type used in a container.
 
 A reference to any aux data provided on initialization is also available.
 Return the complete hash value as determined by the user hashing algorithm. */
-typedef uint64_t ccc_any_key_hash_fn(ccc_any_key to_hash);
+typedef uint64_t CCC_any_key_hash_fn(CCC_any_key to_hash);
 
 /**@}*/
 
@@ -364,7 +364,7 @@ The generic interface for associative container entries. */
 /** @brief Determine if an entry is Occupied in the container.
 @param [in] e the pointer to the entry obtained from a container.
 @return true if Occupied false if Vacant. Error if e is NULL. */
-ccc_tribool ccc_entry_occupied(ccc_entry const *e);
+CCC_tribool CCC_entry_occupied(CCC_entry const *e);
 
 /** @brief Determine if an insertion error has occurred when a function that
 attempts to insert a value in a container is used.
@@ -372,14 +372,14 @@ attempts to insert a value in a container is used.
 @return true if an insertion error occurred usually meaning a insertion should
 have occurred but the container did not have permission to allocate new memory
 or allocation failed. Error if e is NULL. */
-ccc_tribool ccc_entry_insert_error(ccc_entry const *e);
+CCC_tribool CCC_entry_insert_error(CCC_entry const *e);
 
 /** @brief Determine if an input error has occurred for a function that
 generates an entry.
 @param [in] e the pointer to the entry obtained from a container function.
 @return true if an input error occurred usually meaning an invalid argument such
 as a NULL pointer was provided to a function. Error if e is NULL. */
-ccc_tribool ccc_entry_input_error(ccc_entry const *e);
+CCC_tribool CCC_entry_input_error(CCC_entry const *e);
 
 /** @brief Unwraps the provided entry providing a reference to the user type
 obtained from the operation that provides the entry.
@@ -391,12 +391,12 @@ The expected return value from unwrapping a value will change depending on the
 container from which the entry is obtained. Read the documentation for the
 container being used to understand what to expect from this function once an
 entry is obtained. */
-void *ccc_entry_unwrap(ccc_entry const *e);
+void *CCC_entry_unwrap(CCC_entry const *e);
 
 /** @brief Determine if an handle is Occupied in the container.
 @param [in] e the pointer to the handle obtained from a container.
 @return true if Occupied false if Vacant. Error if e is NULL. */
-ccc_tribool ccc_handle_occupied(ccc_handle const *e);
+CCC_tribool CCC_handle_occupied(CCC_handle const *e);
 
 /** @brief Determine if an insertion error has occurred when a function that
 attempts to insert a value in a container is used.
@@ -404,14 +404,14 @@ attempts to insert a value in a container is used.
 @return true if an insertion error occurred usually meaning a insertion should
 have occurred but the container did not have permission to allocate new memory
 or allocation failed. Error if e is NULL. */
-ccc_tribool ccc_handle_insert_error(ccc_handle const *e);
+CCC_tribool CCC_handle_insert_error(CCC_handle const *e);
 
 /** @brief Determine if an input error has occurred for a function that
 generates an handle.
 @param [in] e the pointer to the handle obtained from a container function.
 @return true if an input error occurred usually meaning an invalid argument such
 as a NULL pointer was provided to a function. Error if e is NULL. */
-ccc_tribool ccc_handle_input_error(ccc_handle const *e);
+CCC_tribool CCC_handle_input_error(CCC_handle const *e);
 
 /** @brief Unwraps the provided handle providing a reference to the user type
 obtained from the operation that provides the handle.
@@ -423,7 +423,7 @@ The expected return value from unwrapping a value will change depending on the
 container from which the handle is obtained. Read the documentation for the
 container being used to understand what to expect from this function once an
 handle is obtained. */
-ccc_handle_i ccc_handle_unwrap(ccc_handle const *e);
+CCC_handle_i CCC_handle_unwrap(CCC_handle const *e);
 
 /**@}*/
 
@@ -438,7 +438,7 @@ container in the provided range.
 the beginning of the range.
 
 Note the beginning of a range may be equivalent to the end or NULL. */
-void *ccc_begin_range(ccc_range const *r);
+void *CCC_begin_range(CCC_range const *r);
 
 /** @brief Obtain a reference to the end user element stored in a
 container in the provided range.
@@ -449,7 +449,7 @@ the end of the range.
 Note the end of a range may be equivalent to the beginning or NULL. Functions
 that obtain ranges treat the end as an exclusive bound and therefore it is
 undefined to access this element. */
-void *ccc_end_range(ccc_range const *r);
+void *CCC_end_range(CCC_range const *r);
 
 /** @brief Obtain a reference to the reverse beginning user element stored in a
 container in the provided range.
@@ -459,7 +459,7 @@ the reverse beginning of the range.
 
 Note the reverse beginning of a range may be equivalent to the reverse end or
 NULL. */
-void *ccc_rbegin_rrange(ccc_rrange const *r);
+void *CCC_rbegin_rrange(CCC_rrange const *r);
 
 /** @brief Obtain a reference to the reverse end user element stored in a
 container in the provided range.
@@ -470,7 +470,7 @@ the reverse end of the range.
 Note the reverse end of a range may be equivalent to the reverse beginning or
 NULL. Functions that obtain ranges treat the reverse end as an exclusive bound
 and therefore it is undefined to access this element. */
-void *ccc_rend_rrange(ccc_rrange const *r);
+void *CCC_rend_rrange(CCC_rrange const *r);
 
 /**@}*/
 
@@ -486,21 +486,21 @@ string, the falsey NULL terminator. All other results have a string message.
 
 These messages can be used for logging or to help with debugging by providing
 more information for why such a result might be obtained from a container. */
-char const *ccc_result_msg(ccc_result res);
+char const *CCC_result_msg(CCC_result res);
 
 /** @brief Obtain the entry status from a generic entry.
 @param [in] e a pointer to the entry.
 @return the status stored in the entry after the required action on the
 container completes. If e is NULL an entry input error is returned so ensure
 e is non-NULL to avoid an inaccurate status returned. */
-ccc_entry_status ccc_get_entry_status(ccc_entry const *e);
+CCC_entry_status CCC_get_entry_status(CCC_entry const *e);
 
 /** @brief Obtain the handle status from a generic handle.
 @param [in] e a pointer to the handle.
 @return the status stored in the handle after the required action on the
 container completes. If e is NULL an handle input error is returned so ensure
 e is non-NULL to avoid an inaccurate status returned. */
-ccc_handle_status ccc_get_handle_status(ccc_handle const *e);
+CCC_handle_status CCC_get_handle_status(CCC_handle const *e);
 
 /** @brief Obtain a string message with a description of the entry status.
 @param [in] status the status obtained from an entry.
@@ -513,7 +513,7 @@ occurred. If a function tries to complete an action like insertion or removal
 the status can reflect if any errors occurred in this process as well. Usually,
 the provided interface gives all the functions needed to check status but these
 strings can be used when more details are required. */
-char const *ccc_entry_status_msg(ccc_entry_status status);
+char const *CCC_entry_status_msg(CCC_entry_status status);
 
 /** @brief Obtain a string message with a description of the handle status.
 @param [in] status the status obtained from an handle.
@@ -526,45 +526,45 @@ occurred. If a function tries to complete an action like insertion or removal
 the status can reflect if any errors occurred in this process as well. Usually,
 the provided interface gives all the functions needed to check status but these
 strings can be used when more details are required. */
-char const *ccc_handle_status_msg(ccc_handle_status status);
+char const *CCC_handle_status_msg(CCC_handle_status status);
 
 /**@}*/
 
 /** Define this directive at the top of a translation unit if shorter names are
 desired. By default the ccc prefix is used to avoid namespace clashes. */
 #ifdef TYPES_USING_NAMESPACE_CCC
-typedef ccc_range range;
-typedef ccc_rrange rrange;
-typedef ccc_entry entry;
-typedef ccc_handle handle;
-typedef ccc_handle_i handle_i;
-typedef ccc_result result;
-typedef ccc_threeway_cmp threeway_cmp;
-typedef ccc_any_type any_type;
-typedef ccc_any_type_cmp any_type_cmp;
-typedef ccc_any_key any_key;
-typedef ccc_any_key_cmp any_key_cmp;
-typedef ccc_any_alloc_fn any_alloc_fn;
-typedef ccc_any_type_cmp_fn any_type_cmp_fn;
-typedef ccc_any_type_update_fn any_type_update_fn;
-typedef ccc_any_type_destructor_fn any_type_destructor_fn;
-typedef ccc_any_key_cmp_fn any_key_cmp_fn;
-typedef ccc_any_key_hash_fn any_key_hash_fn;
-#    define entry_occupied(entry_ptr) ccc_entry_occupied(entry_ptr)
-#    define entry_insert_error(entry_ptr) ccc_entry_insert_error(entry_ptr)
-#    define entry_unwrap(entry_ptr) ccc_entry_unwrap(entry_ptr)
-#    define get_entry_status(entry_ptr) ccc_get_entry_status(entry_ptr)
-#    define entry_status_msg(status) ccc_entry_status_msg(status)
-#    define handle_occupied(handle_ptr) ccc_handle_occupied(handle_ptr)
-#    define handle_insert_error(handle_ptr) ccc_handle_insert_error(handle_ptr)
-#    define handle_unwrap(handle_ptr) ccc_handle_unwrap(handle_ptr)
-#    define get_handle_status(handle_ptr) ccc_get_handle_status(handle_ptr)
-#    define handle_status_msg(status) ccc_handle_status_msg(status)
-#    define begin_range(range_ptr) ccc_begin_range(range_ptr)
-#    define end_range(range_ptr) ccc_end_range(range_ptr)
-#    define rbegin_rrange(range_ptr) ccc_rbegin_rrange(range_ptr)
-#    define rend_rrange(range_ptr) ccc_rend_rrange(range_ptr)
-#    define result_msg(res) ccc_result_msg(res)
+typedef CCC_range range;
+typedef CCC_rrange rrange;
+typedef CCC_entry entry;
+typedef CCC_handle handle;
+typedef CCC_handle_i handle_i;
+typedef CCC_result result;
+typedef CCC_threeway_cmp threeway_cmp;
+typedef CCC_any_type any_type;
+typedef CCC_any_type_cmp any_type_cmp;
+typedef CCC_any_key any_key;
+typedef CCC_any_key_cmp any_key_cmp;
+typedef CCC_any_alloc_fn any_alloc_fn;
+typedef CCC_any_type_cmp_fn any_type_cmp_fn;
+typedef CCC_any_type_update_fn any_type_update_fn;
+typedef CCC_any_type_destructor_fn any_type_destructor_fn;
+typedef CCC_any_key_cmp_fn any_key_cmp_fn;
+typedef CCC_any_key_hash_fn any_key_hash_fn;
+#    define entry_occupied(entry_ptr) CCC_entry_occupied(entry_ptr)
+#    define entry_insert_error(entry_ptr) CCC_entry_insert_error(entry_ptr)
+#    define entry_unwrap(entry_ptr) CCC_entry_unwrap(entry_ptr)
+#    define get_entry_status(entry_ptr) CCC_get_entry_status(entry_ptr)
+#    define entry_status_msg(status) CCC_entry_status_msg(status)
+#    define handle_occupied(handle_ptr) CCC_handle_occupied(handle_ptr)
+#    define handle_insert_error(handle_ptr) CCC_handle_insert_error(handle_ptr)
+#    define handle_unwrap(handle_ptr) CCC_handle_unwrap(handle_ptr)
+#    define get_handle_status(handle_ptr) CCC_get_handle_status(handle_ptr)
+#    define handle_status_msg(status) CCC_handle_status_msg(status)
+#    define begin_range(range_ptr) CCC_begin_range(range_ptr)
+#    define end_range(range_ptr) CCC_end_range(range_ptr)
+#    define rbegin_rrange(range_ptr) CCC_rbegin_rrange(range_ptr)
+#    define rend_rrange(range_ptr) CCC_rend_rrange(range_ptr)
+#    define result_msg(res) CCC_result_msg(res)
 #endif /* TYPES_USING_NAMESPACE_CCC */
 
 #endif /* CCC_TYPES_H */

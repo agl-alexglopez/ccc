@@ -28,12 +28,12 @@ limitations under the License.
 /** @private An ordered map element in a splay tree requires no special fields.
 In fact the parent could be eliminated, but it is important in providing clean
 iterative traversals with the begin, end, next abstraction for the user. */
-struct ccc_omap_elem
+struct CCC_omap_elem
 {
     /** @private The child nodes in a array unite left and right cases. */
-    struct ccc_omap_elem *branch[2];
+    struct CCC_omap_elem *branch[2];
     /** @private The parent is useful for iteration. Not required for splay. */
-    struct ccc_omap_elem *parent;
+    struct CCC_omap_elem *parent;
 };
 
 /** @private Runs the top down splay tree algorithm over a node based tree. A
@@ -43,12 +43,12 @@ assumptions result in frequently accessed elements remaining a constant distance
 from the root for O(1) access. However, anti-patterns can arise that harm
 performance. The user should carefully consider if their data access pattern
 can benefit from a skewed distribution before choosing this container. */
-struct ccc_omap
+struct CCC_omap
 {
     /** @private The root of the splay tree. The "hot" node after a query. */
-    struct ccc_omap_elem *root;
+    struct CCC_omap_elem *root;
     /** @private The sentinel used to eliminate branches. */
-    struct ccc_omap_elem end;
+    struct CCC_omap_elem end;
     /** @private The number of stored tree nodes. */
     size_t size;
     /** @private The size of the user type stored in the tree. */
@@ -58,9 +58,9 @@ struct ccc_omap
     /** @private The byte offset of the user key in the user type. */
     size_t key_offset;
     /** @private The user defined comparison callback function. */
-    ccc_any_key_cmp_fn *cmp;
+    CCC_any_key_cmp_fn *cmp;
     /** @private The user defined allocation function, if any. */
-    ccc_any_alloc_fn *alloc;
+    CCC_any_alloc_fn *alloc;
     /** @private Auxiliary data, if any. */
     void *aux;
 };
@@ -79,39 +79,39 @@ new element, the best fit will still be close to the root and splaying it again
 and then inserting this new element will not be too expensive. Intervening
 operations unrelated this entry would also be considered an anti pattern of the
 Entry API. */
-struct ccc_otree_entry
+struct CCC_otree_entry
 {
     /** @private The tree associated with this query. */
-    struct ccc_omap *t;
+    struct CCC_omap *t;
     /** @private The stored node or empty if not found. */
-    struct ccc_ent entry;
+    struct CCC_ent entry;
 };
 
 /** @private Enable return by compound literal reference on the stack. Think
 of this method as return by value but with the additional ability to pass by
-pointer in a functional style. `fnB(&(union ccc_omap_entry){fnA().impl});` */
-union ccc_omap_entry
+pointer in a functional style. `fnB(&(union CCC_omap_entry){fnA().impl});` */
+union CCC_omap_entry
 {
     /** @private The field containing the entry struct. */
-    struct ccc_otree_entry impl;
+    struct CCC_otree_entry impl;
 };
 
 /*==========================  Private Interface  ============================*/
 
 /** @private */
-void *ccc_impl_om_key_in_slot(struct ccc_omap const *t, void const *slot);
+void *CCC_impl_om_key_in_slot(struct CCC_omap const *t, void const *slot);
 /** @private */
-struct ccc_omap_elem *ccc_impl_omap_elem_in_slot(struct ccc_omap const *t,
+struct CCC_omap_elem *CCC_impl_omap_elem_in_slot(struct CCC_omap const *t,
                                                  void const *slot);
 /** @private */
-struct ccc_otree_entry ccc_impl_om_entry(struct ccc_omap *t, void const *key);
+struct CCC_otree_entry CCC_impl_om_entry(struct CCC_omap *t, void const *key);
 /** @private */
-void *ccc_impl_om_insert(struct ccc_omap *t, struct ccc_omap_elem *n);
+void *CCC_impl_om_insert(struct CCC_omap *t, struct CCC_omap_elem *n);
 
 /*======================   Macro Implementations     ========================*/
 
 /** @private */
-#define ccc_impl_om_init(impl_tree_name, impl_struct_name,                     \
+#define CCC_impl_om_init(impl_tree_name, impl_struct_name,                     \
                          impl_node_elem_field, impl_key_elem_field,            \
                          impl_key_cmp_fn, impl_alloc_fn, impl_aux_data)        \
     {                                                                          \
@@ -128,7 +128,7 @@ void *ccc_impl_om_insert(struct ccc_omap *t, struct ccc_omap_elem *n);
     }
 
 /** @private */
-#define ccc_impl_om_new(ordered_map_entry)                                     \
+#define CCC_impl_om_new(ordered_map_entry)                                     \
     (__extension__({                                                           \
         void *impl_om_ins_alloc_ret = NULL;                                    \
         if ((ordered_map_entry)->t->alloc)                                     \
@@ -142,37 +142,37 @@ void *ccc_impl_om_insert(struct ccc_omap *t, struct ccc_omap_elem *n);
     }))
 
 /** @private */
-#define ccc_impl_om_insert_key_val(ordered_map_entry, new_mem,                 \
+#define CCC_impl_om_insert_key_val(ordered_map_entry, new_mem,                 \
                                    lazy_key_value...)                          \
     (__extension__({                                                           \
         if (new_mem)                                                           \
         {                                                                      \
             *new_mem = lazy_key_value;                                         \
-            new_mem = ccc_impl_om_insert(                                      \
+            new_mem = CCC_impl_om_insert(                                      \
                 (ordered_map_entry)->t,                                        \
-                ccc_impl_omap_elem_in_slot((ordered_map_entry)->t, new_mem));  \
+                CCC_impl_omap_elem_in_slot((ordered_map_entry)->t, new_mem));  \
         }                                                                      \
     }))
 
 /** @private */
-#define ccc_impl_om_insert_and_copy_key(om_insert_entry, om_insert_entry_ret,  \
+#define CCC_impl_om_insert_and_copy_key(om_insert_entry, om_insert_entry_ret,  \
                                         key, lazy_value...)                    \
     (__extension__({                                                           \
         typeof(lazy_value) *impl_om_new_ins_base                               \
-            = ccc_impl_om_new((&om_insert_entry));                             \
-        om_insert_entry_ret = (struct ccc_ent){                                \
+            = CCC_impl_om_new((&om_insert_entry));                             \
+        om_insert_entry_ret = (struct CCC_ent){                                \
             .e = impl_om_new_ins_base,                                         \
             .stats = CCC_ENTRY_INSERT_ERROR,                                   \
         };                                                                     \
         if (impl_om_new_ins_base)                                              \
         {                                                                      \
             *((typeof(lazy_value) *)impl_om_new_ins_base) = lazy_value;        \
-            *((typeof(key) *)ccc_impl_om_key_in_slot(om_insert_entry.t,        \
+            *((typeof(key) *)CCC_impl_om_key_in_slot(om_insert_entry.t,        \
                                                      impl_om_new_ins_base))    \
                 = key;                                                         \
-            (void)ccc_impl_om_insert(                                          \
+            (void)CCC_impl_om_insert(                                          \
                 om_insert_entry.t,                                             \
-                ccc_impl_omap_elem_in_slot(om_insert_entry.t,                  \
+                CCC_impl_omap_elem_in_slot(om_insert_entry.t,                  \
                                            impl_om_new_ins_base));             \
         }                                                                      \
     }))
@@ -180,11 +180,11 @@ void *ccc_impl_om_insert(struct ccc_omap *t, struct ccc_omap_elem *n);
 /*=====================     Core Macro Implementations     ==================*/
 
 /** @private */
-#define ccc_impl_om_and_modify_w(ordered_map_entry_ptr, type_name,             \
+#define CCC_impl_om_and_modify_w(ordered_map_entry_ptr, type_name,             \
                                  closure_over_T...)                            \
     (__extension__({                                                           \
         __auto_type impl_om_ent_ptr = (ordered_map_entry_ptr);                 \
-        struct ccc_otree_entry impl_om_mod_ent                                 \
+        struct CCC_otree_entry impl_om_mod_ent                                 \
             = {.entry = {.stats = CCC_ENTRY_ARG_ERROR}};                       \
         if (impl_om_ent_ptr)                                                   \
         {                                                                      \
@@ -202,7 +202,7 @@ void *ccc_impl_om_insert(struct ccc_omap *t, struct ccc_omap_elem *n);
     }))
 
 /** @private */
-#define ccc_impl_om_or_insert_w(ordered_map_entry_ptr, lazy_key_value...)      \
+#define CCC_impl_om_or_insert_w(ordered_map_entry_ptr, lazy_key_value...)      \
     (__extension__({                                                           \
         __auto_type impl_or_ins_entry_ptr = (ordered_map_entry_ptr);           \
         typeof(lazy_key_value) *impl_or_ins_ret = NULL;                        \
@@ -215,8 +215,8 @@ void *ccc_impl_om_insert(struct ccc_omap *t, struct ccc_omap_elem *n);
             else                                                               \
             {                                                                  \
                 impl_or_ins_ret                                                \
-                    = ccc_impl_om_new(&impl_or_ins_entry_ptr->impl);           \
-                ccc_impl_om_insert_key_val(&impl_or_ins_entry_ptr->impl,       \
+                    = CCC_impl_om_new(&impl_or_ins_entry_ptr->impl);           \
+                CCC_impl_om_insert_key_val(&impl_or_ins_entry_ptr->impl,       \
                                            impl_or_ins_ret, lazy_key_value);   \
             }                                                                  \
         }                                                                      \
@@ -224,7 +224,7 @@ void *ccc_impl_om_insert(struct ccc_omap *t, struct ccc_omap_elem *n);
     }))
 
 /** @private */
-#define ccc_impl_om_insert_entry_w(ordered_map_entry_ptr, lazy_key_value...)   \
+#define CCC_impl_om_insert_entry_w(ordered_map_entry_ptr, lazy_key_value...)   \
     (__extension__({                                                           \
         __auto_type impl_ins_entry_ptr = (ordered_map_entry_ptr);              \
         typeof(lazy_key_value) *impl_om_ins_ent_ret = NULL;                    \
@@ -233,21 +233,21 @@ void *ccc_impl_om_insert(struct ccc_omap *t, struct ccc_omap_elem *n);
             if (!(impl_ins_entry_ptr->impl.entry.stats & CCC_ENTRY_OCCUPIED))  \
             {                                                                  \
                 impl_om_ins_ent_ret                                            \
-                    = ccc_impl_om_new(&impl_ins_entry_ptr->impl);              \
-                ccc_impl_om_insert_key_val(&impl_ins_entry_ptr->impl,          \
+                    = CCC_impl_om_new(&impl_ins_entry_ptr->impl);              \
+                CCC_impl_om_insert_key_val(&impl_ins_entry_ptr->impl,          \
                                            impl_om_ins_ent_ret,                \
                                            lazy_key_value);                    \
             }                                                                  \
             else if (impl_ins_entry_ptr->impl.entry.stats                      \
                      == CCC_ENTRY_OCCUPIED)                                    \
             {                                                                  \
-                struct ccc_omap_elem impl_ins_ent_saved                        \
-                    = *ccc_impl_omap_elem_in_slot(                             \
+                struct CCC_omap_elem impl_ins_ent_saved                        \
+                    = *CCC_impl_omap_elem_in_slot(                             \
                         impl_ins_entry_ptr->impl.t,                            \
                         impl_ins_entry_ptr->impl.entry.e);                     \
                 *((typeof(lazy_key_value) *)impl_ins_entry_ptr->impl.entry.e)  \
                     = lazy_key_value;                                          \
-                *ccc_impl_omap_elem_in_slot(impl_ins_entry_ptr->impl.t,        \
+                *CCC_impl_omap_elem_in_slot(impl_ins_entry_ptr->impl.t,        \
                                             impl_ins_entry_ptr->impl.entry.e)  \
                     = impl_ins_ent_saved;                                      \
                 impl_om_ins_ent_ret = impl_ins_entry_ptr->impl.entry.e;        \
@@ -257,19 +257,19 @@ void *ccc_impl_om_insert(struct ccc_omap *t, struct ccc_omap_elem *n);
     }))
 
 /** @private */
-#define ccc_impl_om_try_insert_w(ordered_map_ptr, key, lazy_value...)          \
+#define CCC_impl_om_try_insert_w(ordered_map_ptr, key, lazy_value...)          \
     (__extension__({                                                           \
         __auto_type impl_try_ins_map_ptr = (ordered_map_ptr);                  \
-        struct ccc_ent impl_om_try_ins_ent_ret                                 \
+        struct CCC_ent impl_om_try_ins_ent_ret                                 \
             = {.stats = CCC_ENTRY_ARG_ERROR};                                  \
         if (impl_try_ins_map_ptr)                                              \
         {                                                                      \
             __auto_type impl_om_key = (key);                                   \
-            struct ccc_otree_entry impl_om_try_ins_ent = ccc_impl_om_entry(    \
+            struct CCC_otree_entry impl_om_try_ins_ent = CCC_impl_om_entry(    \
                 impl_try_ins_map_ptr, (void *)&impl_om_key);                   \
             if (!(impl_om_try_ins_ent.entry.stats & CCC_ENTRY_OCCUPIED))       \
             {                                                                  \
-                ccc_impl_om_insert_and_copy_key(impl_om_try_ins_ent,           \
+                CCC_impl_om_insert_and_copy_key(impl_om_try_ins_ent,           \
                                                 impl_om_try_ins_ent_ret,       \
                                                 impl_om_key, lazy_value);      \
             }                                                                  \
@@ -282,38 +282,38 @@ void *ccc_impl_om_insert(struct ccc_omap *t, struct ccc_omap_elem *n);
     }))
 
 /** @private */
-#define ccc_impl_om_insert_or_assign_w(ordered_map_ptr, key, lazy_value...)    \
+#define CCC_impl_om_insert_or_assign_w(ordered_map_ptr, key, lazy_value...)    \
     (__extension__({                                                           \
         __auto_type impl_ins_or_assign_map_ptr = (ordered_map_ptr);            \
-        struct ccc_ent impl_om_ins_or_assign_ent_ret                           \
+        struct CCC_ent impl_om_ins_or_assign_ent_ret                           \
             = {.stats = CCC_ENTRY_ARG_ERROR};                                  \
         if (impl_ins_or_assign_map_ptr)                                        \
         {                                                                      \
             __auto_type impl_om_key = (key);                                   \
-            struct ccc_otree_entry impl_om_ins_or_assign_ent                   \
-                = ccc_impl_om_entry(impl_ins_or_assign_map_ptr,                \
+            struct CCC_otree_entry impl_om_ins_or_assign_ent                   \
+                = CCC_impl_om_entry(impl_ins_or_assign_map_ptr,                \
                                     (void *)&impl_om_key);                     \
             if (!(impl_om_ins_or_assign_ent.entry.stats & CCC_ENTRY_OCCUPIED)) \
             {                                                                  \
-                ccc_impl_om_insert_and_copy_key(impl_om_ins_or_assign_ent,     \
+                CCC_impl_om_insert_and_copy_key(impl_om_ins_or_assign_ent,     \
                                                 impl_om_ins_or_assign_ent_ret, \
                                                 impl_om_key, lazy_value);      \
             }                                                                  \
             else if (impl_om_ins_or_assign_ent.entry.stats                     \
                      == CCC_ENTRY_OCCUPIED)                                    \
             {                                                                  \
-                struct ccc_omap_elem impl_ins_ent_saved                        \
-                    = *ccc_impl_omap_elem_in_slot(                             \
+                struct CCC_omap_elem impl_ins_ent_saved                        \
+                    = *CCC_impl_omap_elem_in_slot(                             \
                         impl_om_ins_or_assign_ent.t,                           \
                         impl_om_ins_or_assign_ent.entry.e);                    \
                 *((typeof(lazy_value) *)impl_om_ins_or_assign_ent.entry.e)     \
                     = lazy_value;                                              \
-                *ccc_impl_omap_elem_in_slot(impl_om_ins_or_assign_ent.t,       \
+                *CCC_impl_omap_elem_in_slot(impl_om_ins_or_assign_ent.t,       \
                                             impl_om_ins_or_assign_ent.entry.e) \
                     = impl_ins_ent_saved;                                      \
                 impl_om_ins_or_assign_ent_ret                                  \
                     = impl_om_ins_or_assign_ent.entry;                         \
-                *((typeof(impl_om_key) *)ccc_impl_om_key_in_slot(              \
+                *((typeof(impl_om_key) *)CCC_impl_om_key_in_slot(              \
                     impl_ins_or_assign_map_ptr,                                \
                     impl_om_ins_or_assign_ent_ret.e))                          \
                     = impl_om_key;                                             \

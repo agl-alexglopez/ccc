@@ -27,13 +27,13 @@ idval(int const id, int const val)
 }
 
 static inline void
-plus(ccc_any_type const t)
+plus(CCC_any_type const t)
 {
     ((struct val *)t.any_type)->val++;
 }
 
 static inline void
-plusaux(ccc_any_type const t)
+plusaux(CCC_any_type const t)
 {
     ((struct val *)t.any_type)->val += *(int *)t.aux;
 }
@@ -52,7 +52,7 @@ CHECK_BEGIN_STATIC_FN(fill_n, ordered_map *const om, size_t const n,
 {
     for (size_t i = 0; i < n; ++i, ++id_and_val)
     {
-        ccc_entry ent = swap_entry(
+        CCC_entry ent = swap_entry(
             om, &(struct val){.key = id_and_val, .val = id_and_val}.elem,
             &(struct val){}.elem);
         CHECK(insert_error(&ent), false);
@@ -70,7 +70,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_validate)
         = {.vals = (struct val[3]){}, .next_free = 0, .capacity = 3};
     ordered_map om
         = om_init(om, struct val, elem, key, id_cmp, val_bump_alloc, &vals);
-    ccc_entry ent = swap_entry(&om, &(struct val){.key = -1, .val = -1}.elem,
+    CCC_entry ent = swap_entry(&om, &(struct val){.key = -1, .val = -1}.elem,
                                &(struct val){}.elem);
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), false);
@@ -95,7 +95,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_insert)
     ordered_map om
         = om_init(om, struct val, elem, key, id_cmp, val_bump_alloc, &vals);
     int size = 30;
-    ccc_entry ent = swap_entry(&om, &(struct val){.key = -1, .val = -1}.elem,
+    CCC_entry ent = swap_entry(&om, &(struct val){.key = -1, .val = -1}.elem,
                                &(struct val){}.elem);
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), false);
@@ -160,7 +160,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_remove)
     ordered_map om
         = om_init(om, struct val, elem, key, id_cmp, val_bump_alloc, &vals);
     int size = 30;
-    ccc_entry ent = ccc_remove(&om, &(struct val){.key = -1, .val = -1}.elem);
+    CCC_entry ent = CCC_remove(&om, &(struct val){.key = -1, .val = -1}.elem);
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
@@ -171,7 +171,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_remove)
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
     CHECK(count(&om).count, 1);
-    ent = ccc_remove(&om, &(struct val){.key = -1, .val = -1}.elem);
+    ent = CCC_remove(&om, &(struct val){.key = -1, .val = -1}.elem);
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), true);
     CHECK(count(&om).count, 0);
@@ -184,7 +184,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_remove)
     CHECK(fill_n(&om, size / 2, i), PASS);
 
     i += (size / 2);
-    ent = ccc_remove(&om, &(struct val){.key = i, .val = i}.elem);
+    ent = CCC_remove(&om, &(struct val){.key = i, .val = i}.elem);
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), false);
     CHECK(count(&om).count, i);
@@ -194,7 +194,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_remove)
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
     CHECK(count(&om).count, i + 1);
-    ent = ccc_remove(&om, &(struct val){.key = i, .val = i}.elem);
+    ent = CCC_remove(&om, &(struct val){.key = i, .val = i}.elem);
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), true);
     CHECK(count(&om).count, i);
@@ -206,7 +206,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_remove)
     CHECK(fill_n(&om, size - i, i), PASS);
 
     i = size;
-    ent = ccc_remove(&om, &(struct val){.key = i, .val = i}.elem);
+    ent = CCC_remove(&om, &(struct val){.key = i, .val = i}.elem);
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), false);
     CHECK(count(&om).count, i);
@@ -216,7 +216,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_remove)
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
     CHECK(count(&om).count, i + 1);
-    ent = ccc_remove(&om, &(struct val){.key = i, .val = i}.elem);
+    ent = CCC_remove(&om, &(struct val){.key = i, .val = i}.elem);
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), true);
     CHECK(count(&om).count, i);
@@ -234,7 +234,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_try_insert)
     ordered_map om
         = om_init(om, struct val, elem, key, id_cmp, val_bump_alloc, &vals);
     int size = 30;
-    ccc_entry ent = try_insert(&om, &(struct val){.key = -1, .val = -1}.elem);
+    CCC_entry ent = try_insert(&om, &(struct val){.key = -1, .val = -1}.elem);
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent) != NULL, true);
@@ -292,7 +292,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_try_insert_with)
     ordered_map om
         = om_init(om, struct val, elem, key, id_cmp, val_bump_alloc, &vals);
     int size = 30;
-    ccc_entry *ent = om_try_insert_w(&om, -1, val(-1));
+    CCC_entry *ent = om_try_insert_w(&om, -1, val(-1));
     CHECK(validate(&om), true);
     CHECK(occupied(ent), false);
     CHECK(unwrap(ent) != NULL, true);
@@ -351,7 +351,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_insert_or_assign)
     ordered_map om
         = om_init(om, struct val, elem, key, id_cmp, val_bump_alloc, &vals);
     int size = 30;
-    ccc_entry ent
+    CCC_entry ent
         = insert_or_assign(&om, &(struct val){.key = -1, .val = -1}.elem);
     CHECK(validate(&om), true);
     CHECK(occupied(&ent), false);
@@ -410,7 +410,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_insert_or_assign_with)
     ordered_map om
         = om_init(om, struct val, elem, key, id_cmp, val_bump_alloc, &vals);
     int size = 30;
-    ccc_entry *ent = om_insert_or_assign_w(&om, -1, val(-1));
+    CCC_entry *ent = om_insert_or_assign_w(&om, -1, val(-1));
     CHECK(validate(&om), true);
     CHECK(occupied(ent), false);
     CHECK(unwrap(ent) != NULL, true);
@@ -468,7 +468,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_entry_and_modify)
     ordered_map om
         = om_init(om, struct val, elem, key, id_cmp, val_bump_alloc, &vals);
     int size = 30;
-    ccc_omap_entry *ent = entry_r(&om, &(int){-1});
+    CCC_omap_entry *ent = entry_r(&om, &(int){-1});
     CHECK(validate(&om), true);
     CHECK(occupied(ent), false);
     CHECK(unwrap(ent) == NULL, true);
@@ -540,7 +540,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_entry_and_modify_aux)
         = om_init(om, struct val, elem, key, id_cmp, val_bump_alloc, &vals);
     int size = 30;
     int aux = 1;
-    ccc_omap_entry *ent = entry_r(&om, &(int){-1});
+    CCC_omap_entry *ent = entry_r(&om, &(int){-1});
     ent = and_modify_aux(ent, plusaux, &aux);
     CHECK(occupied(ent), false);
     CHECK(unwrap(ent) == NULL, true);
@@ -607,7 +607,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_entry_and_modify_with)
     ordered_map om
         = om_init(om, struct val, elem, key, id_cmp, val_bump_alloc, &vals);
     int size = 30;
-    ccc_omap_entry *ent = entry_r(&om, &(int){-1});
+    CCC_omap_entry *ent = entry_r(&om, &(int){-1});
     ent = om_and_modify_w(ent, struct val, { T->val++; });
     CHECK(count(&om).count, 0);
     CHECK(occupied(ent), false);
@@ -899,7 +899,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_remove_entry)
     CHECK(v->key, -1);
     CHECK(v->val, -1);
     CHECK(count(&om).count, 1);
-    ccc_entry *e = remove_entry_r(entry_r(&om, &(int){-1}));
+    CCC_entry *e = remove_entry_r(entry_r(&om, &(int){-1}));
     CHECK(validate(&om), true);
     CHECK(occupied(e), true);
     CHECK(count(&om).count, 0);

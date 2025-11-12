@@ -9,7 +9,7 @@
 
 struct val
 {
-    ccc_dll_elem e;
+    CCC_dll_elem e;
     int id;
     int val;
 };
@@ -20,11 +20,11 @@ enum push_end
     UTIL_PUSH_BACK,
 };
 
-ccc_threeway_cmp val_cmp(ccc_any_type_cmp);
+CCC_threeway_cmp val_cmp(CCC_any_type_cmp);
 
-enum check_result check_order(ccc_doubly_linked_list const *, size_t n,
+enum check_result check_order(CCC_doubly_linked_list const *, size_t n,
                               int const order[]);
-enum check_result create_list(ccc_doubly_linked_list *, enum push_end, size_t n,
+enum check_result create_list(CCC_doubly_linked_list *, enum push_end, size_t n,
                               struct val vals[]);
 
 #endif /* DLL_UTIL_H */

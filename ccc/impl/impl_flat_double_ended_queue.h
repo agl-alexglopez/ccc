@@ -26,44 +26,44 @@ limitations under the License.
 
 /** @private A flat doubled ended queue is a single buffer with push and pop
 at the front and back. If no allocation is permitted it is a ring buffer.
-Because the `ccc_buffer` abstraction already exists, the fdeq can be
+Because the `CCC_buffer` abstraction already exists, the fdeq can be
 implemented with a single additional field rather than a front and back pointer.
 The back of the fdeq is always known if we know where the front is and how
 many elements are stored in the buffer. */
-struct ccc_fdeq
+struct CCC_fdeq
 {
     /** @private The helper buffer abstraction the fdeq owns. */
-    ccc_buffer buf;
+    CCC_buffer buf;
     /** @private The front of the fdeq. The back is implicit given the size. */
     size_t front;
 };
 
 /*=======================    Private Interface   ============================*/
 /** @private */
-void *ccc_impl_fdeq_alloc_front(struct ccc_fdeq *);
+void *CCC_impl_fdeq_alloc_front(struct CCC_fdeq *);
 /** @private */
-void *ccc_impl_fdeq_alloc_back(struct ccc_fdeq *);
+void *CCC_impl_fdeq_alloc_back(struct CCC_fdeq *);
 
 /*=======================  Macro Implementations   ==========================*/
 
 /** @private */
-#define ccc_impl_fdeq_init(impl_mem_ptr, impl_any_type_name, impl_alloc_fn,    \
+#define CCC_impl_fdeq_init(impl_mem_ptr, impl_any_type_name, impl_alloc_fn,    \
                            impl_aux_data, impl_capacity, optional_size...)     \
     {                                                                          \
-        .buf = ccc_buf_init(impl_mem_ptr, impl_any_type_name, impl_alloc_fn,   \
+        .buf = CCC_buf_init(impl_mem_ptr, impl_any_type_name, impl_alloc_fn,   \
                             impl_aux_data, impl_capacity, optional_size),      \
         .front = 0,                                                            \
     }
 
 /** @private */
-#define ccc_impl_fdeq_emplace_back(fdeq_ptr, value...)                         \
+#define CCC_impl_fdeq_emplace_back(fdeq_ptr, value...)                         \
     (__extension__({                                                           \
         __auto_type impl_fdeq_ptr = (fdeq_ptr);                                \
         void *const impl_fdeq_emplace_ret = NULL;                              \
         if (impl_fdeq_ptr)                                                     \
         {                                                                      \
             void *const impl_fdeq_emplace_ret                                  \
-                = ccc_impl_fdeq_alloc_back(impl_fdeq_ptr);                     \
+                = CCC_impl_fdeq_alloc_back(impl_fdeq_ptr);                     \
             if (impl_fdeq_emplace_ret)                                         \
             {                                                                  \
                 *((typeof(value) *)impl_fdeq_emplace_ret) = value;             \
@@ -73,14 +73,14 @@ void *ccc_impl_fdeq_alloc_back(struct ccc_fdeq *);
     }))
 
 /** @private */
-#define ccc_impl_fdeq_emplace_front(fdeq_ptr, value...)                        \
+#define CCC_impl_fdeq_emplace_front(fdeq_ptr, value...)                        \
     (__extension__({                                                           \
         __auto_type impl_fdeq_ptr = (fdeq_ptr);                                \
         void *const impl_fdeq_emplace_ret = NULL;                              \
         if (impl_fdeq_ptr)                                                     \
         {                                                                      \
             void *const impl_fdeq_emplace_ret                                  \
-                = ccc_impl_fdeq_alloc_front(impl_fdeq_ptr);                    \
+                = CCC_impl_fdeq_alloc_front(impl_fdeq_ptr);                    \
             if (impl_fdeq_emplace_ret)                                         \
             {                                                                  \
                 *((typeof(value) *)impl_fdeq_emplace_ret) = value;             \

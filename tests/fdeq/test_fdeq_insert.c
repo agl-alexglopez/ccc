@@ -21,18 +21,18 @@ CHECK_BEGIN_STATIC_FN(fdeq_test_insert_three)
 CHECK_BEGIN_STATIC_FN(fdeq_test_insert_overwrite)
 {
     flat_double_ended_queue q = fdeq_init((int[2]){}, int, NULL, NULL, 2);
-    (void)ccc_fdeq_push_back(&q, &(int){3});
-    CHECK(*(int *)ccc_fdeq_back(&q), 3);
-    (void)ccc_fdeq_push_front(&q, &(int){2});
-    CHECK(*(int *)ccc_fdeq_front(&q), 2);
-    CHECK(*(int *)ccc_fdeq_back(&q), 3);
-    (void)ccc_fdeq_push_back(&q, &(int){1});
-    CHECK(*(int *)ccc_fdeq_back(&q), 1);
-    CHECK(*(int *)ccc_fdeq_front(&q), 3);
-    (void)ccc_fdeq_pop_back(&q);
-    int *i = ccc_fdeq_back(&q);
+    (void)CCC_fdeq_push_back(&q, &(int){3});
+    CHECK(*(int *)CCC_fdeq_back(&q), 3);
+    (void)CCC_fdeq_push_front(&q, &(int){2});
+    CHECK(*(int *)CCC_fdeq_front(&q), 2);
+    CHECK(*(int *)CCC_fdeq_back(&q), 3);
+    (void)CCC_fdeq_push_back(&q, &(int){1});
+    CHECK(*(int *)CCC_fdeq_back(&q), 1);
+    CHECK(*(int *)CCC_fdeq_front(&q), 3);
+    (void)CCC_fdeq_pop_back(&q);
+    int *i = CCC_fdeq_back(&q);
     CHECK(*i, 3);
-    i = ccc_fdeq_front(&q);
+    i = CCC_fdeq_front(&q);
     CHECK(*i, 3);
     CHECK_END_FN();
 }
@@ -150,7 +150,7 @@ CHECK_BEGIN_STATIC_FN(fdeq_test_insert_ranges)
 CHECK_BEGIN_STATIC_FN(fdeq_test_insert_ranges_reserve)
 {
     flat_double_ended_queue q = fdeq_init(NULL, int, NULL, NULL, 0);
-    ccc_result const r = fdeq_reserve(&q, 6, std_alloc);
+    CCC_result const r = fdeq_reserve(&q, 6, std_alloc);
     CHECK(r, CCC_RESULT_OK);
     (void)fdeq_push_back_range(&q, 3, (int[3]){0, 1, 2});
     CHECK(check_order(&q, 3, (int[3]){0, 1, 2}), PASS);

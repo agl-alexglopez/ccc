@@ -7,44 +7,44 @@
 
 CHECK_BEGIN_STATIC_FN(bs_test_construct)
 {
-    ccc_bitset bs = ccc_bs_init(ccc_bs_blocks(10), NULL, NULL, 10);
-    CHECK(ccc_bs_popcount(&bs).count, 0);
-    for (size_t i = 0; i < ccc_bs_capacity(&bs).count; ++i)
+    CCC_bitset bs = CCC_bs_init(CCC_bs_blocks(10), NULL, NULL, 10);
+    CHECK(CCC_bs_popcount(&bs).count, 0);
+    for (size_t i = 0; i < CCC_bs_capacity(&bs).count; ++i)
     {
-        CHECK(ccc_bs_test(&bs, i), CCC_FALSE);
-        CHECK(ccc_bs_test(&bs, i), CCC_FALSE);
+        CHECK(CCC_bs_test(&bs, i), CCC_FALSE);
+        CHECK(CCC_bs_test(&bs, i), CCC_FALSE);
     }
     CHECK_END_FN();
 }
 
 CHECK_BEGIN_STATIC_FN(bs_test_copy_no_alloc)
 {
-    ccc_bitset src = ccc_bs_init(ccc_bs_blocks(512), NULL, NULL, 512, 0);
-    CHECK(ccc_bs_capacity(&src).count, 512);
-    CHECK(ccc_bs_count(&src).count, 0);
-    ccc_result push_status = CCC_RESULT_OK;
+    CCC_bitset src = CCC_bs_init(CCC_bs_blocks(512), NULL, NULL, 512, 0);
+    CHECK(CCC_bs_capacity(&src).count, 512);
+    CHECK(CCC_bs_count(&src).count, 0);
+    CCC_result push_status = CCC_RESULT_OK;
     for (size_t i = 0; push_status == CCC_RESULT_OK; ++i)
     {
         if (i % 2)
         {
-            push_status = ccc_bs_push_back(&src, CCC_TRUE);
+            push_status = CCC_bs_push_back(&src, CCC_TRUE);
         }
         else
         {
-            push_status = ccc_bs_push_back(&src, CCC_FALSE);
+            push_status = CCC_bs_push_back(&src, CCC_FALSE);
         }
     }
     CHECK(push_status, CCC_RESULT_NO_ALLOC);
-    ccc_bitset dst = ccc_bs_init(ccc_bs_blocks(513), NULL, NULL, 513, 0);
-    ccc_result r = ccc_bs_copy(&dst, &src, NULL);
+    CCC_bitset dst = CCC_bs_init(CCC_bs_blocks(513), NULL, NULL, 513, 0);
+    CCC_result r = CCC_bs_copy(&dst, &src, NULL);
     CHECK(r, CCC_RESULT_OK);
-    CHECK(ccc_bs_popcount(&src).count, ccc_bs_popcount(&dst).count);
-    CHECK(ccc_bs_count(&src).count, ccc_bs_count(&dst).count);
-    while (!ccc_bs_empty(&src) && !ccc_bs_empty(&dst))
+    CHECK(CCC_bs_popcount(&src).count, CCC_bs_popcount(&dst).count);
+    CHECK(CCC_bs_count(&src).count, CCC_bs_count(&dst).count);
+    while (!CCC_bs_empty(&src) && !CCC_bs_empty(&dst))
     {
-        ccc_tribool const src_msb = ccc_bs_pop_back(&src);
-        ccc_tribool const dst_msb = ccc_bs_pop_back(&dst);
-        if (ccc_bs_count(&src).count % 2)
+        CCC_tribool const src_msb = CCC_bs_pop_back(&src);
+        CCC_tribool const dst_msb = CCC_bs_pop_back(&dst);
+        if (CCC_bs_count(&src).count % 2)
         {
             CHECK(src_msb, CCC_TRUE);
             CHECK(src_msb, dst_msb);
@@ -55,34 +55,34 @@ CHECK_BEGIN_STATIC_FN(bs_test_copy_no_alloc)
             CHECK(src_msb, dst_msb);
         }
     }
-    CHECK(ccc_bs_empty(&src), ccc_bs_empty(&dst));
+    CHECK(CCC_bs_empty(&src), CCC_bs_empty(&dst));
     CHECK_END_FN();
 }
 
 CHECK_BEGIN_STATIC_FN(bs_test_copy_alloc)
 {
-    ccc_bitset src = ccc_bs_init(NULL, std_alloc, NULL, 0);
+    CCC_bitset src = CCC_bs_init(NULL, std_alloc, NULL, 0);
     for (size_t i = 0; i < 512; ++i)
     {
         if (i % 2)
         {
-            CHECK(ccc_bs_push_back(&src, CCC_TRUE), CCC_RESULT_OK);
+            CHECK(CCC_bs_push_back(&src, CCC_TRUE), CCC_RESULT_OK);
         }
         else
         {
-            CHECK(ccc_bs_push_back(&src, CCC_FALSE), CCC_RESULT_OK);
+            CHECK(CCC_bs_push_back(&src, CCC_FALSE), CCC_RESULT_OK);
         }
     }
-    ccc_bitset dst = ccc_bs_init(NULL, std_alloc, NULL, 0);
-    ccc_result r = ccc_bs_copy(&dst, &src, std_alloc);
+    CCC_bitset dst = CCC_bs_init(NULL, std_alloc, NULL, 0);
+    CCC_result r = CCC_bs_copy(&dst, &src, std_alloc);
     CHECK(r, CCC_RESULT_OK);
-    CHECK(ccc_bs_popcount(&src).count, ccc_bs_popcount(&dst).count);
-    CHECK(ccc_bs_count(&src).count, ccc_bs_count(&dst).count);
-    while (!ccc_bs_empty(&src) && !ccc_bs_empty(&dst))
+    CHECK(CCC_bs_popcount(&src).count, CCC_bs_popcount(&dst).count);
+    CHECK(CCC_bs_count(&src).count, CCC_bs_count(&dst).count);
+    while (!CCC_bs_empty(&src) && !CCC_bs_empty(&dst))
     {
-        ccc_tribool const src_msb = ccc_bs_pop_back(&src);
-        ccc_tribool const dst_msb = ccc_bs_pop_back(&dst);
-        if (ccc_bs_count(&src).count % 2)
+        CCC_tribool const src_msb = CCC_bs_pop_back(&src);
+        CCC_tribool const dst_msb = CCC_bs_pop_back(&dst);
+        if (CCC_bs_count(&src).count % 2)
         {
             CHECK(src_msb, CCC_TRUE);
             CHECK(src_msb, dst_msb);
@@ -93,90 +93,90 @@ CHECK_BEGIN_STATIC_FN(bs_test_copy_alloc)
             CHECK(src_msb, dst_msb);
         }
     }
-    CHECK(ccc_bs_empty(&src), ccc_bs_empty(&dst));
+    CHECK(CCC_bs_empty(&src), CCC_bs_empty(&dst));
     CHECK_END_FN({
-        (void)ccc_bs_clear_and_free(&src);
-        (void)ccc_bs_clear_and_free(&dst);
+        (void)CCC_bs_clear_and_free(&src);
+        (void)CCC_bs_clear_and_free(&dst);
     });
 }
 
 CHECK_BEGIN_STATIC_FN(bs_test_init_from)
 {
     char input[] = {'1', '1', '0', '1', '1', '0', '\0'};
-    ccc_bitset b
-        = ccc_bs_from(std_alloc, NULL, 0, sizeof(input) - 1, '1', "110110");
-    CHECK(ccc_bs_count(&b).count, sizeof(input) - 1);
-    CHECK(ccc_bs_capacity(&b).count, sizeof(input) - 1);
-    CHECK(ccc_bs_popcount(&b).count, 4);
-    CHECK(ccc_bs_test(&b, 0), CCC_TRUE);
-    CHECK(ccc_bs_test(&b, sizeof(input) - 2), CCC_FALSE);
-    CHECK_END_FN(ccc_bs_clear_and_free(&b););
+    CCC_bitset b
+        = CCC_bs_from(std_alloc, NULL, 0, sizeof(input) - 1, '1', "110110");
+    CHECK(CCC_bs_count(&b).count, sizeof(input) - 1);
+    CHECK(CCC_bs_capacity(&b).count, sizeof(input) - 1);
+    CHECK(CCC_bs_popcount(&b).count, 4);
+    CHECK(CCC_bs_test(&b, 0), CCC_TRUE);
+    CHECK(CCC_bs_test(&b, sizeof(input) - 2), CCC_FALSE);
+    CHECK_END_FN(CCC_bs_clear_and_free(&b););
 }
 
 CHECK_BEGIN_STATIC_FN(bs_test_init_from_cap)
 {
     char input[] = {'1', '1', '0', '1', '1', '0', '\0'};
-    ccc_bitset b = ccc_bs_from(std_alloc, NULL, 0, sizeof(input), '1', input,
+    CCC_bitset b = CCC_bs_from(std_alloc, NULL, 0, sizeof(input), '1', input,
                                (sizeof(input) - 1) * 2);
-    CHECK(ccc_bs_count(&b).count, sizeof(input) - 1);
-    CHECK(ccc_bs_capacity(&b).count, (sizeof(input) - 1) * 2);
-    CHECK(ccc_bs_popcount(&b).count, 4);
-    CHECK(ccc_bs_test(&b, 0), CCC_TRUE);
-    CHECK(ccc_bs_test(&b, sizeof(input) - 2), CCC_FALSE);
-    CHECK(CCC_TRIBOOL_ERROR, ccc_bs_test(&b, sizeof(input) - 1));
-    CHECK(ccc_bs_push_back(&b, CCC_TRUE), CCC_RESULT_OK);
-    CHECK(CCC_TRUE, ccc_bs_test(&b, sizeof(input) - 1));
-    CHECK(ccc_bs_capacity(&b).count, (sizeof(input) - 1) * 2);
-    CHECK_END_FN(ccc_bs_clear_and_free(&b););
+    CHECK(CCC_bs_count(&b).count, sizeof(input) - 1);
+    CHECK(CCC_bs_capacity(&b).count, (sizeof(input) - 1) * 2);
+    CHECK(CCC_bs_popcount(&b).count, 4);
+    CHECK(CCC_bs_test(&b, 0), CCC_TRUE);
+    CHECK(CCC_bs_test(&b, sizeof(input) - 2), CCC_FALSE);
+    CHECK(CCC_TRIBOOL_ERROR, CCC_bs_test(&b, sizeof(input) - 1));
+    CHECK(CCC_bs_push_back(&b, CCC_TRUE), CCC_RESULT_OK);
+    CHECK(CCC_TRUE, CCC_bs_test(&b, sizeof(input) - 1));
+    CHECK(CCC_bs_capacity(&b).count, (sizeof(input) - 1) * 2);
+    CHECK_END_FN(CCC_bs_clear_and_free(&b););
 }
 
 CHECK_BEGIN_STATIC_FN(bs_test_init_from_fail)
 {
     char input[] = {'1', '1', '0', '1', '1', '0', '\0'};
     /* Forgot allocation function. */
-    ccc_bitset b = ccc_bs_from(NULL, NULL, 0, sizeof(input) - 1, '1', input);
-    CHECK(ccc_bs_count(&b).count, 0);
-    CHECK(ccc_bs_capacity(&b).count, 0);
-    CHECK(ccc_bs_popcount(&b).count, 0);
-    CHECK(CCC_TRIBOOL_ERROR, ccc_bs_test(&b, 0));
-    CHECK(CCC_TRIBOOL_ERROR, ccc_bs_test(&b, 99));
-    CHECK_END_FN(ccc_bs_clear_and_free(&b););
+    CCC_bitset b = CCC_bs_from(NULL, NULL, 0, sizeof(input) - 1, '1', input);
+    CHECK(CCC_bs_count(&b).count, 0);
+    CHECK(CCC_bs_capacity(&b).count, 0);
+    CHECK(CCC_bs_popcount(&b).count, 0);
+    CHECK(CCC_TRIBOOL_ERROR, CCC_bs_test(&b, 0));
+    CHECK(CCC_TRIBOOL_ERROR, CCC_bs_test(&b, 99));
+    CHECK_END_FN(CCC_bs_clear_and_free(&b););
 }
 
 CHECK_BEGIN_STATIC_FN(bs_test_init_from_cap_fail)
 {
     char input[] = {'1', '1', '0', '1', '1', '0', '\0'};
     /* Forgot allocation function. */
-    ccc_bitset b
-        = ccc_bs_from(NULL, NULL, 0, sizeof(input) - 1, '1', input, 99);
-    CHECK(ccc_bs_count(&b).count, 0);
-    CHECK(ccc_bs_capacity(&b).count, 0);
-    CHECK(ccc_bs_popcount(&b).count, 0);
-    CHECK(CCC_TRIBOOL_ERROR, ccc_bs_test(&b, 0));
-    CHECK(CCC_TRIBOOL_ERROR, ccc_bs_test(&b, 99));
-    CHECK_END_FN(ccc_bs_clear_and_free(&b););
+    CCC_bitset b
+        = CCC_bs_from(NULL, NULL, 0, sizeof(input) - 1, '1', input, 99);
+    CHECK(CCC_bs_count(&b).count, 0);
+    CHECK(CCC_bs_capacity(&b).count, 0);
+    CHECK(CCC_bs_popcount(&b).count, 0);
+    CHECK(CCC_TRIBOOL_ERROR, CCC_bs_test(&b, 0));
+    CHECK(CCC_TRIBOOL_ERROR, CCC_bs_test(&b, 99));
+    CHECK_END_FN(CCC_bs_clear_and_free(&b););
 }
 
 CHECK_BEGIN_STATIC_FN(bs_test_init_with_capacity)
 {
-    ccc_bitset b = ccc_bs_with_capacity(std_alloc, NULL, 10);
-    CHECK(ccc_bs_popcount(&b).count, 0);
-    CHECK(ccc_bs_set(&b, 0, CCC_TRUE), CCC_FALSE);
-    CHECK(ccc_bs_set(&b, 9, CCC_TRUE), CCC_FALSE);
-    CHECK(ccc_bs_test(&b, 0), CCC_TRUE);
-    CHECK(ccc_bs_test(&b, 9), CCC_TRUE);
-    CHECK_END_FN(ccc_bs_clear_and_free(&b););
+    CCC_bitset b = CCC_bs_with_capacity(std_alloc, NULL, 10);
+    CHECK(CCC_bs_popcount(&b).count, 0);
+    CHECK(CCC_bs_set(&b, 0, CCC_TRUE), CCC_FALSE);
+    CHECK(CCC_bs_set(&b, 9, CCC_TRUE), CCC_FALSE);
+    CHECK(CCC_bs_test(&b, 0), CCC_TRUE);
+    CHECK(CCC_bs_test(&b, 9), CCC_TRUE);
+    CHECK_END_FN(CCC_bs_clear_and_free(&b););
 }
 
 CHECK_BEGIN_STATIC_FN(bs_test_init_with_capacity_fail)
 {
-    ccc_bitset b = ccc_bs_with_capacity(NULL, NULL, 10);
-    CHECK(ccc_bs_popcount(&b).count, 0);
-    CHECK(CCC_TRIBOOL_ERROR, ccc_bs_set(&b, 0, CCC_TRUE));
-    CHECK(CCC_TRIBOOL_ERROR, ccc_bs_set(&b, 9, CCC_TRUE));
-    CHECK(CCC_TRIBOOL_ERROR, ccc_bs_test(&b, 0));
-    CHECK(CCC_TRIBOOL_ERROR, ccc_bs_test(&b, 9));
-    CHECK_END_FN(ccc_bs_clear_and_free(&b););
+    CCC_bitset b = CCC_bs_with_capacity(NULL, NULL, 10);
+    CHECK(CCC_bs_popcount(&b).count, 0);
+    CHECK(CCC_TRIBOOL_ERROR, CCC_bs_set(&b, 0, CCC_TRUE));
+    CHECK(CCC_TRIBOOL_ERROR, CCC_bs_set(&b, 9, CCC_TRUE));
+    CHECK(CCC_TRIBOOL_ERROR, CCC_bs_test(&b, 0));
+    CHECK(CCC_TRIBOOL_ERROR, CCC_bs_test(&b, 9));
+    CHECK_END_FN(CCC_bs_clear_and_free(&b););
 }
 
 int

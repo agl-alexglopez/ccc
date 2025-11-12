@@ -30,7 +30,7 @@ list for providing new nodes within the buffer. The parent field normally
 tracks parent when in the tree for iteration purposes. When a node is removed
 from the tree it is added to the free singly linked list. The free list is a
 LIFO push to front stack. */
-struct ccc_homap_elem
+struct CCC_homap_elem
 {
     /** @private Child nodes in array to unify Left and Right. */
     size_t branch[2];
@@ -66,12 +66,12 @@ top down splay operation. However, the benefit of space saving and no wasted
 padding bytes between element fields or multiple elements in an array is the
 goal of this implementation. Speed is a secondary goal to space for these
 implementations as the space savings can be significant. */
-struct ccc_homap
+struct CCC_homap
 {
     /** @private The contiguous array of user data. */
     void *data;
     /** @private The contiguous array of WAVL tree meta data. */
-    struct ccc_homap_elem *nodes;
+    struct CCC_homap_elem *nodes;
     /** @private The current capacity. */
     size_t capacity;
     /** @private The current size. */
@@ -85,71 +85,71 @@ struct ccc_homap
     /** @private Where user key can be found in type. */
     size_t key_offset;
     /** @private The provided key comparison function. */
-    ccc_any_key_cmp_fn *cmp;
+    CCC_any_key_cmp_fn *cmp;
     /** @private The provided allocation function, if any. */
-    ccc_any_alloc_fn *alloc;
+    CCC_any_alloc_fn *alloc;
     /** @private The provided auxiliary data, if any. */
     void *aux;
 };
 
 /** @private A handle is like an entry but if the handle is Occupied, we can
 guarantee the user that their element will not move from the provided index. */
-struct ccc_htree_handle
+struct CCC_htree_handle
 {
     /** @private Map associated with this handle. */
-    struct ccc_homap *hom;
+    struct CCC_homap *hom;
     /** @private Current index of the handle. */
     size_t i;
     /** @private Saves last comparison direction. */
-    ccc_threeway_cmp last_cmp;
+    CCC_threeway_cmp last_cmp;
     /** @private The entry status flag. */
-    ccc_entry_status stats;
+    CCC_entry_status stats;
 };
 
 /** @private Enable return by compound literal reference on the stack. Think
 of this method as return by value but with the additional ability to pass by
-pointer in a functional style. `fnB(&(union ccc_homap_handle){fnA().impl});` */
-union ccc_homap_handle
+pointer in a functional style. `fnB(&(union CCC_homap_handle){fnA().impl});` */
+union CCC_homap_handle
 {
     /** @private The field containing the handle struct. */
-    struct ccc_htree_handle impl;
+    struct CCC_htree_handle impl;
 };
 
 /*===========================   Private Interface ===========================*/
 
 /** @private */
-void ccc_impl_hom_insert(struct ccc_homap *hom, size_t elem_i);
+void CCC_impl_hom_insert(struct CCC_homap *hom, size_t elem_i);
 /** @private */
-struct ccc_htree_handle ccc_impl_hom_handle(struct ccc_homap *hom,
+struct CCC_htree_handle CCC_impl_hom_handle(struct CCC_homap *hom,
                                             void const *key);
 /** @private */
-void *ccc_impl_hom_data_at(struct ccc_homap const *hom, size_t slot);
+void *CCC_impl_hom_data_at(struct CCC_homap const *hom, size_t slot);
 /** @private */
-void *ccc_impl_hom_key_at(struct ccc_homap const *hom, size_t slot);
+void *CCC_impl_hom_key_at(struct CCC_homap const *hom, size_t slot);
 /** @private */
-size_t ccc_impl_hom_alloc_slot(struct ccc_homap *hom);
+size_t CCC_impl_hom_alloc_slot(struct CCC_homap *hom);
 
 /*========================     Initialization       =========================*/
 
 /** @private The user can declare a fixed size ordered map with the help of
 static asserts to ensure the layout is compatible with our internal metadata. */
-#define ccc_impl_hom_declare_fixed_map(impl_fixed_map_type_name,               \
+#define CCC_impl_hom_declare_fixed_map(impl_fixed_map_type_name,               \
                                        impl_key_val_type_name, impl_capacity)  \
     static_assert((impl_capacity) > 1,                                         \
                   "fixed size map must have capacity greater than 1");         \
     typedef struct                                                             \
     {                                                                          \
         impl_key_val_type_name data[(impl_capacity)];                          \
-        struct ccc_homap_elem nodes[(impl_capacity)];                          \
+        struct CCC_homap_elem nodes[(impl_capacity)];                          \
     }(impl_fixed_map_type_name)
 
 /** @private Taking the size of the array actually works here because the field
 is of a known fixed size defined at compile time, not just a pointer. */
-#define ccc_impl_hom_fixed_capacity(fixed_map_type_name)                       \
-    (sizeof((fixed_map_type_name){}.nodes) / sizeof(struct ccc_homap_elem))
+#define CCC_impl_hom_fixed_capacity(fixed_map_type_name)                       \
+    (sizeof((fixed_map_type_name){}.nodes) / sizeof(struct CCC_homap_elem))
 
 /** @private */
-#define ccc_impl_hom_init(impl_memory_ptr, impl_type_name,                     \
+#define CCC_impl_hom_init(impl_memory_ptr, impl_type_name,                     \
                           impl_key_elem_field, impl_key_cmp_fn, impl_alloc_fn, \
                           impl_aux_data, impl_capacity)                        \
     {                                                                          \
@@ -167,24 +167,24 @@ is of a known fixed size defined at compile time, not just a pointer. */
     }
 
 /** @private */
-#define ccc_impl_hom_as(handle_ordered_map_ptr, type_name, handle...)          \
-    ((type_name *)ccc_impl_hom_data_at((handle_ordered_map_ptr), (handle)))
+#define CCC_impl_hom_as(handle_ordered_map_ptr, type_name, handle...)          \
+    ((type_name *)CCC_impl_hom_data_at((handle_ordered_map_ptr), (handle)))
 
 /*==================     Core Macro Implementations     =====================*/
 
 /** @private */
-#define ccc_impl_hom_and_modify_w(handle_ordered_map_handle_ptr, type_name,    \
+#define CCC_impl_hom_and_modify_w(handle_ordered_map_handle_ptr, type_name,    \
                                   closure_over_T...)                           \
     (__extension__({                                                           \
         __auto_type impl_hom_mod_hndl_ptr = (handle_ordered_map_handle_ptr);   \
-        struct ccc_htree_handle impl_hom_mod_hndl                              \
+        struct CCC_htree_handle impl_hom_mod_hndl                              \
             = {.stats = CCC_ENTRY_ARG_ERROR};                                  \
         if (impl_hom_mod_hndl_ptr)                                             \
         {                                                                      \
             impl_hom_mod_hndl = impl_hom_mod_hndl_ptr->impl;                   \
             if (impl_hom_mod_hndl.stats & CCC_ENTRY_OCCUPIED)                  \
             {                                                                  \
-                type_name *const T = ccc_impl_hom_data_at(                     \
+                type_name *const T = CCC_impl_hom_data_at(                     \
                     impl_hom_mod_hndl.hom, impl_hom_mod_hndl.i);               \
                 if (T)                                                         \
                 {                                                              \
@@ -196,12 +196,12 @@ is of a known fixed size defined at compile time, not just a pointer. */
     }))
 
 /** @private */
-#define ccc_impl_hom_or_insert_w(handle_ordered_map_handle_ptr,                \
+#define CCC_impl_hom_or_insert_w(handle_ordered_map_handle_ptr,                \
                                  lazy_key_value...)                            \
     (__extension__({                                                           \
         __auto_type impl_hom_or_ins_hndl_ptr                                   \
             = (handle_ordered_map_handle_ptr);                                 \
-        ccc_handle_i impl_hom_or_ins_ret = 0;                                  \
+        CCC_handle_i impl_hom_or_ins_ret = 0;                                  \
         if (impl_hom_or_ins_hndl_ptr)                                          \
         {                                                                      \
             if (impl_hom_or_ins_hndl_ptr->impl.stats == CCC_ENTRY_OCCUPIED)    \
@@ -210,15 +210,15 @@ is of a known fixed size defined at compile time, not just a pointer. */
             }                                                                  \
             else                                                               \
             {                                                                  \
-                impl_hom_or_ins_ret = ccc_impl_hom_alloc_slot(                 \
+                impl_hom_or_ins_ret = CCC_impl_hom_alloc_slot(                 \
                     impl_hom_or_ins_hndl_ptr->impl.hom);                       \
                 if (impl_hom_or_ins_ret)                                       \
                 {                                                              \
-                    *((typeof(lazy_key_value) *)ccc_impl_hom_data_at(          \
+                    *((typeof(lazy_key_value) *)CCC_impl_hom_data_at(          \
                         impl_hom_or_ins_hndl_ptr->impl.hom,                    \
                         impl_hom_or_ins_ret))                                  \
                         = lazy_key_value;                                      \
-                    ccc_impl_hom_insert(impl_hom_or_ins_hndl_ptr->impl.hom,    \
+                    CCC_impl_hom_insert(impl_hom_or_ins_hndl_ptr->impl.hom,    \
                                         impl_hom_or_ins_ret);                  \
                 }                                                              \
             }                                                                  \
@@ -227,30 +227,30 @@ is of a known fixed size defined at compile time, not just a pointer. */
     }))
 
 /** @private */
-#define ccc_impl_hom_insert_handle_w(handle_ordered_map_handle_ptr,            \
+#define CCC_impl_hom_insert_handle_w(handle_ordered_map_handle_ptr,            \
                                      lazy_key_value...)                        \
     (__extension__({                                                           \
         __auto_type impl_hom_ins_hndl_ptr = (handle_ordered_map_handle_ptr);   \
-        ccc_handle_i impl_hom_ins_hndl_ret = 0;                                \
+        CCC_handle_i impl_hom_ins_hndl_ret = 0;                                \
         if (impl_hom_ins_hndl_ptr)                                             \
         {                                                                      \
             if (!(impl_hom_ins_hndl_ptr->impl.stats & CCC_ENTRY_OCCUPIED))     \
             {                                                                  \
-                impl_hom_ins_hndl_ret = ccc_impl_hom_alloc_slot(               \
+                impl_hom_ins_hndl_ret = CCC_impl_hom_alloc_slot(               \
                     impl_hom_ins_hndl_ptr->impl.hom);                          \
                 if (impl_hom_ins_hndl_ret)                                     \
                 {                                                              \
-                    *((typeof(lazy_key_value) *)ccc_impl_hom_data_at(          \
+                    *((typeof(lazy_key_value) *)CCC_impl_hom_data_at(          \
                         impl_hom_ins_hndl_ptr->impl.hom,                       \
                         impl_hom_ins_hndl_ret))                                \
                         = lazy_key_value;                                      \
-                    ccc_impl_hom_insert(impl_hom_ins_hndl_ptr->impl.hom,       \
+                    CCC_impl_hom_insert(impl_hom_ins_hndl_ptr->impl.hom,       \
                                         impl_hom_ins_hndl_ret);                \
                 }                                                              \
             }                                                                  \
             else if (impl_hom_ins_hndl_ptr->impl.stats == CCC_ENTRY_OCCUPIED)  \
             {                                                                  \
-                *((typeof(lazy_key_value) *)ccc_impl_hom_data_at(              \
+                *((typeof(lazy_key_value) *)CCC_impl_hom_data_at(              \
                     impl_hom_ins_hndl_ptr->impl.hom,                           \
                     impl_hom_ins_hndl_ptr->impl.i))                            \
                     = lazy_key_value;                                          \
@@ -261,41 +261,41 @@ is of a known fixed size defined at compile time, not just a pointer. */
     }))
 
 /** @private */
-#define ccc_impl_hom_try_insert_w(handle_ordered_map_ptr, key, lazy_value...)  \
+#define CCC_impl_hom_try_insert_w(handle_ordered_map_ptr, key, lazy_value...)  \
     (__extension__({                                                           \
         __auto_type impl_hom_try_ins_map_ptr = (handle_ordered_map_ptr);       \
-        struct ccc_handl impl_hom_try_ins_hndl_ret                             \
+        struct CCC_handl impl_hom_try_ins_hndl_ret                             \
             = {.stats = CCC_ENTRY_ARG_ERROR};                                  \
         if (impl_hom_try_ins_map_ptr)                                          \
         {                                                                      \
             __auto_type impl_hom_key = (key);                                  \
-            struct ccc_htree_handle impl_hom_try_ins_hndl                      \
-                = ccc_impl_hom_handle(impl_hom_try_ins_map_ptr,                \
+            struct CCC_htree_handle impl_hom_try_ins_hndl                      \
+                = CCC_impl_hom_handle(impl_hom_try_ins_map_ptr,                \
                                       (void *)&impl_hom_key);                  \
             if (!(impl_hom_try_ins_hndl.stats & CCC_ENTRY_OCCUPIED))           \
             {                                                                  \
-                impl_hom_try_ins_hndl_ret = (struct ccc_handl){                \
-                    .i = ccc_impl_hom_alloc_slot(impl_hom_try_ins_hndl.hom),   \
+                impl_hom_try_ins_hndl_ret = (struct CCC_handl){                \
+                    .i = CCC_impl_hom_alloc_slot(impl_hom_try_ins_hndl.hom),   \
                     .stats = CCC_ENTRY_INSERT_ERROR,                           \
                 };                                                             \
                 if (impl_hom_try_ins_hndl_ret.i)                               \
                 {                                                              \
-                    *((typeof(lazy_value) *)ccc_impl_hom_data_at(              \
+                    *((typeof(lazy_value) *)CCC_impl_hom_data_at(              \
                         impl_hom_try_ins_map_ptr,                              \
                         impl_hom_try_ins_hndl_ret.i))                          \
                         = lazy_value;                                          \
-                    *((typeof(impl_hom_key) *)ccc_impl_hom_key_at(             \
+                    *((typeof(impl_hom_key) *)CCC_impl_hom_key_at(             \
                         impl_hom_try_ins_hndl.hom,                             \
                         impl_hom_try_ins_hndl_ret.i))                          \
                         = impl_hom_key;                                        \
-                    ccc_impl_hom_insert(impl_hom_try_ins_hndl.hom,             \
+                    CCC_impl_hom_insert(impl_hom_try_ins_hndl.hom,             \
                                         impl_hom_try_ins_hndl_ret.i);          \
                     impl_hom_try_ins_hndl_ret.stats = CCC_ENTRY_VACANT;        \
                 }                                                              \
             }                                                                  \
             else if (impl_hom_try_ins_hndl.stats == CCC_ENTRY_OCCUPIED)        \
             {                                                                  \
-                impl_hom_try_ins_hndl_ret = (struct ccc_handl){                \
+                impl_hom_try_ins_hndl_ret = (struct CCC_handl){                \
                     .i = impl_hom_try_ins_hndl.i,                              \
                     .stats = impl_hom_try_ins_hndl.stats};                     \
             }                                                                  \
@@ -304,51 +304,51 @@ is of a known fixed size defined at compile time, not just a pointer. */
     }))
 
 /** @private */
-#define ccc_impl_hom_insert_or_assign_w(handle_ordered_map_ptr, key,           \
+#define CCC_impl_hom_insert_or_assign_w(handle_ordered_map_ptr, key,           \
                                         lazy_value...)                         \
     (__extension__({                                                           \
         __auto_type impl_hom_ins_or_assign_map_ptr = (handle_ordered_map_ptr); \
-        struct ccc_handl impl_hom_ins_or_assign_hndl_ret                       \
+        struct CCC_handl impl_hom_ins_or_assign_hndl_ret                       \
             = {.stats = CCC_ENTRY_ARG_ERROR};                                  \
         if (impl_hom_ins_or_assign_map_ptr)                                    \
         {                                                                      \
             __auto_type impl_hom_key = (key);                                  \
-            struct ccc_htree_handle impl_hom_ins_or_assign_hndl                \
-                = ccc_impl_hom_handle(impl_hom_ins_or_assign_map_ptr,          \
+            struct CCC_htree_handle impl_hom_ins_or_assign_hndl                \
+                = CCC_impl_hom_handle(impl_hom_ins_or_assign_map_ptr,          \
                                       (void *)&impl_hom_key);                  \
             if (!(impl_hom_ins_or_assign_hndl.stats & CCC_ENTRY_OCCUPIED))     \
             {                                                                  \
-                impl_hom_ins_or_assign_hndl_ret = (struct ccc_handl){          \
-                    .i = ccc_impl_hom_alloc_slot(                              \
+                impl_hom_ins_or_assign_hndl_ret = (struct CCC_handl){          \
+                    .i = CCC_impl_hom_alloc_slot(                              \
                         impl_hom_ins_or_assign_hndl.hom),                      \
                     .stats = CCC_ENTRY_INSERT_ERROR,                           \
                 };                                                             \
                 if (impl_hom_ins_or_assign_hndl_ret.i)                         \
                 {                                                              \
-                    *((typeof(lazy_value) *)ccc_impl_hom_data_at(              \
+                    *((typeof(lazy_value) *)CCC_impl_hom_data_at(              \
                         impl_hom_ins_or_assign_map_ptr,                        \
                         impl_hom_ins_or_assign_hndl_ret.i))                    \
                         = lazy_value;                                          \
-                    *((typeof(impl_hom_key) *)ccc_impl_hom_key_at(             \
+                    *((typeof(impl_hom_key) *)CCC_impl_hom_key_at(             \
                         impl_hom_ins_or_assign_hndl.hom,                       \
                         impl_hom_ins_or_assign_hndl_ret.i))                    \
                         = impl_hom_key;                                        \
-                    ccc_impl_hom_insert(impl_hom_ins_or_assign_hndl.hom,       \
+                    CCC_impl_hom_insert(impl_hom_ins_or_assign_hndl.hom,       \
                                         impl_hom_ins_or_assign_hndl_ret.i);    \
                     impl_hom_ins_or_assign_hndl_ret.stats = CCC_ENTRY_VACANT;  \
                 }                                                              \
             }                                                                  \
             else if (impl_hom_ins_or_assign_hndl.stats == CCC_ENTRY_OCCUPIED)  \
             {                                                                  \
-                *((typeof(lazy_value) *)ccc_impl_hom_data_at(                  \
+                *((typeof(lazy_value) *)CCC_impl_hom_data_at(                  \
                     impl_hom_ins_or_assign_hndl.hom,                           \
                     impl_hom_ins_or_assign_hndl.i))                            \
                     = lazy_value;                                              \
-                impl_hom_ins_or_assign_hndl_ret = (struct ccc_handl){          \
+                impl_hom_ins_or_assign_hndl_ret = (struct CCC_handl){          \
                     .i = impl_hom_ins_or_assign_hndl.i,                        \
                     .stats = impl_hom_ins_or_assign_hndl.stats,                \
                 };                                                             \
-                *((typeof(impl_hom_key) *)ccc_impl_hom_key_at(                 \
+                *((typeof(impl_hom_key) *)CCC_impl_hom_key_at(                 \
                     impl_hom_ins_or_assign_hndl.hom,                           \
                     impl_hom_ins_or_assign_hndl.i))                            \
                     = impl_hom_key;                                            \

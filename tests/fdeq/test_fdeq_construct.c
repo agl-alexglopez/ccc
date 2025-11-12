@@ -23,11 +23,11 @@ CHECK_BEGIN_STATIC_FN(fdeq_test_copy_no_alloc)
     flat_double_ended_queue q1
         = fdeq_init(((int[3]){0, 1, 2}), int, NULL, NULL, 3, 3);
     flat_double_ended_queue q2
-        = ccc_fdeq_init(((int[5]){}), int, NULL, NULL, 5);
+        = CCC_fdeq_init(((int[5]){}), int, NULL, NULL, 5);
     CHECK(count(&q1).count, 3);
     CHECK(*(int *)front(&q1), 0);
     CHECK(is_empty(&q2), true);
-    ccc_result const res = fdeq_copy(&q2, &q1, NULL);
+    CCC_result const res = fdeq_copy(&q2, &q1, NULL);
     CHECK(res, CCC_RESULT_OK);
     CHECK(count(&q2).count, 3);
     while (!is_empty(&q1) && !is_empty(&q2))
@@ -47,11 +47,11 @@ CHECK_BEGIN_STATIC_FN(fdeq_test_copy_no_alloc_fail)
     flat_double_ended_queue q1
         = fdeq_init(((int[3]){0, 1, 2}), int, NULL, NULL, 3, 3);
     flat_double_ended_queue q2
-        = ccc_fdeq_init(((int[2]){}), int, NULL, NULL, 2);
+        = CCC_fdeq_init(((int[2]){}), int, NULL, NULL, 2);
     CHECK(count(&q1).count, 3);
     CHECK(*(int *)front(&q1), 0);
     CHECK(is_empty(&q2), true);
-    ccc_result const res = fdeq_copy(&q2, &q1, NULL);
+    CCC_result const res = fdeq_copy(&q2, &q1, NULL);
     CHECK(res != CCC_RESULT_OK, true);
     CHECK_END_FN();
 }
@@ -59,8 +59,8 @@ CHECK_BEGIN_STATIC_FN(fdeq_test_copy_no_alloc_fail)
 CHECK_BEGIN_STATIC_FN(fdeq_test_copy_alloc)
 {
     flat_double_ended_queue q1 = fdeq_init(NULL, int, std_alloc, NULL, 0);
-    flat_double_ended_queue q2 = ccc_fdeq_init(NULL, int, NULL, NULL, 0);
-    ccc_result res = fdeq_push_back_range(&q1, 5, (int[5]){0, 1, 2, 3, 4});
+    flat_double_ended_queue q2 = CCC_fdeq_init(NULL, int, NULL, NULL, 0);
+    CCC_result res = fdeq_push_back_range(&q1, 5, (int[5]){0, 1, 2, 3, 4});
     CHECK(res, CCC_RESULT_OK);
     CHECK(*(int *)front(&q1), 0);
     CHECK(is_empty(&q2), true);
@@ -78,15 +78,15 @@ CHECK_BEGIN_STATIC_FN(fdeq_test_copy_alloc)
     CHECK(is_empty(&q1), is_empty(&q2));
     CHECK_END_FN({
         (void)fdeq_clear_and_free(&q1, NULL);
-        (void)ccc_fdeq_clear_and_free_reserve(&q2, NULL, std_alloc);
+        (void)CCC_fdeq_clear_and_free_reserve(&q2, NULL, std_alloc);
     });
 }
 
 CHECK_BEGIN_STATIC_FN(fdeq_test_copy_alloc_fail)
 {
     flat_double_ended_queue q1 = fdeq_init(NULL, int, std_alloc, NULL, 0);
-    flat_double_ended_queue q2 = ccc_fdeq_init(NULL, int, NULL, NULL, 0);
-    ccc_result res = fdeq_push_back_range(&q1, 5, (int[5]){0, 1, 2, 3, 4});
+    flat_double_ended_queue q2 = CCC_fdeq_init(NULL, int, NULL, NULL, 0);
+    CCC_result res = fdeq_push_back_range(&q1, 5, (int[5]){0, 1, 2, 3, 4});
     CHECK(res, CCC_RESULT_OK);
     CHECK(*(int *)front(&q1), 0);
     CHECK(is_empty(&q2), true);

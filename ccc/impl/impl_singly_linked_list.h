@@ -29,10 +29,10 @@ limitations under the License.
 linked list. Supports O(1) insert and delete at the front. Elements always have
 a valid element to point to in the list due to the user of a sentinel so these
 pointers are never NULL if an element is in the list. */
-struct ccc_sll_elem
+struct CCC_sll_elem
 {
     /** @private The next element. Non-null if elem is in list. */
-    struct ccc_sll_elem *n;
+    struct CCC_sll_elem *n;
 };
 
 /** @private A singly linked list is a good stack based abstraction for push
@@ -44,10 +44,10 @@ support O(1) push and pop at the front see the flat double ended queue. However,
 there are some specific abstractions that someone could hack on top of this
 list, either on top of or by hacking on the provided implementation
 (non-blocking linked list, concurrent hash table, etc). */
-struct ccc_sll
+struct CCC_sll
 {
     /** @private The sentinel with storage in the actual list struct. */
-    struct ccc_sll_elem nil;
+    struct CCC_sll_elem nil;
     /** @private The number of elements constantly tracked for O(1) check. */
     size_t count;
     /** @private The size in bytes of the type which wraps this handle. */
@@ -55,9 +55,9 @@ struct ccc_sll
     /** @private The offset in bytes of the intrusive element in user type. */
     size_t sll_elem_offset;
     /** @private The user provided comparison callback for sorting. */
-    ccc_any_type_cmp_fn *cmp;
+    CCC_any_type_cmp_fn *cmp;
     /** @private The user provided allocation function, if any. */
-    ccc_any_alloc_fn *alloc;
+    CCC_any_alloc_fn *alloc;
     /** @private User provided auxiliary data, if any. */
     void *aux;
 };
@@ -65,12 +65,12 @@ struct ccc_sll
 /*=========================   Private Interface  ============================*/
 
 /** @private */
-void ccc_impl_sll_push_front(struct ccc_sll *, struct ccc_sll_elem *);
+void CCC_impl_sll_push_front(struct CCC_sll *, struct CCC_sll_elem *);
 
 /*======================   Macro Implementations     ========================*/
 
 /** @private */
-#define ccc_impl_sll_init(impl_sll_name, impl_struct_name,                     \
+#define CCC_impl_sll_init(impl_sll_name, impl_struct_name,                     \
                           impl_sll_elem_field, impl_cmp_fn, impl_alloc_fn,     \
                           impl_aux_data)                                       \
     {                                                                          \
@@ -84,10 +84,10 @@ void ccc_impl_sll_push_front(struct ccc_sll *, struct ccc_sll_elem *);
     }
 
 /** @private */
-#define ccc_impl_sll_emplace_front(list_ptr, struct_initializer...)            \
+#define CCC_impl_sll_emplace_front(list_ptr, struct_initializer...)            \
     (__extension__({                                                           \
         typeof(struct_initializer) *impl_sll_res = NULL;                       \
-        struct ccc_sll *impl_sll = (list_ptr);                                 \
+        struct CCC_sll *impl_sll = (list_ptr);                                 \
         if (impl_sll)                                                          \
         {                                                                      \
             if (!impl_sll->alloc)                                              \
@@ -100,8 +100,8 @@ void ccc_impl_sll_push_front(struct ccc_sll *, struct ccc_sll_elem *);
                 if (impl_sll_res)                                              \
                 {                                                              \
                     *impl_sll_res = struct_initializer;                        \
-                    ccc_impl_sll_push_front(                                   \
-                        impl_sll, ccc_sll_elem_in(impl_sll, impl_sll_res));    \
+                    CCC_impl_sll_push_front(                                   \
+                        impl_sll, CCC_sll_elem_in(impl_sll, impl_sll_res));    \
                 }                                                              \
             }                                                                  \
         }                                                                      \

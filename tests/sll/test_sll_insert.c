@@ -116,7 +116,7 @@ CHECK_BEGIN_STATIC_FN(sll_test_sort_reverse)
     CHECK(check_order(&sll, 6, (int[6]){5, 4, 3, 2, 1, 0}), PASS);
     CHECK(validate(&sll), true);
     CHECK(sll_is_sorted(&sll), false);
-    ccc_result const r = ccc_sll_sort(&sll);
+    CCC_result const r = CCC_sll_sort(&sll);
     CHECK(sll_is_sorted(&sll), true);
     CHECK(r, CCC_RESULT_OK);
     CHECK(check_order(&sll, 6, (int[6]){0, 1, 2, 3, 4, 5}), PASS);
@@ -136,7 +136,7 @@ CHECK_BEGIN_STATIC_FN(sll_test_sort_even)
     CHECK(validate(&sll), true);
     CHECK(check_order(&sll, 8, (int[8]){9, 4, 1, 3, 99, -55, 5, 2}), PASS);
     CHECK(sll_is_sorted(&sll), false);
-    ccc_result const r = ccc_sll_sort(&sll);
+    CCC_result const r = CCC_sll_sort(&sll);
     CHECK(sll_is_sorted(&sll), true);
     CHECK(r, CCC_RESULT_OK);
     CHECK(check_order(&sll, 8, (int[8]){-55, 1, 2, 3, 4, 5, 9, 99}), PASS);
@@ -157,7 +157,7 @@ CHECK_BEGIN_STATIC_FN(sll_test_sort_odd)
     CHECK(validate(&sll), true);
     CHECK(check_order(&sll, 9, (int[9]){10, 9, 4, 1, 1, 99, -55, 5, 2}), PASS);
     CHECK(sll_is_sorted(&sll), false);
-    ccc_result const r = ccc_sll_sort(&sll);
+    CCC_result const r = CCC_sll_sort(&sll);
     CHECK(sll_is_sorted(&sll), true);
     CHECK(r, CCC_RESULT_OK);
     CHECK(check_order(&sll, 9, (int[9]){-55, 1, 1, 2, 4, 5, 9, 10, 99}), PASS);
@@ -179,7 +179,7 @@ CHECK_BEGIN_STATIC_FN(sll_test_sort_runs)
                     (int[12]){10, 7, 3, -55, -55, -99, 9, 8, 4, 103, 101, 99});
     CHECK(t, PASS);
     CHECK(sll_is_sorted(&sll), false);
-    ccc_result const r = ccc_sll_sort(&sll);
+    CCC_result const r = CCC_sll_sort(&sll);
     CHECK(sll_is_sorted(&sll), true);
     CHECK(r, CCC_RESULT_OK);
     t = check_order(&sll, 12,
@@ -202,7 +202,7 @@ CHECK_BEGIN_STATIC_FN(sll_test_sort_halves)
                     (int[12]){25, 20, 18, 15, 12, 8, 21, 19, 17, 13, 10, 7});
     CHECK(t, PASS);
     CHECK(sll_is_sorted(&sll), false);
-    ccc_result const r = ccc_sll_sort(&sll);
+    CCC_result const r = CCC_sll_sort(&sll);
     CHECK(sll_is_sorted(&sll), true);
     CHECK(r, CCC_RESULT_OK);
     t = check_order(&sll, 12,
@@ -219,7 +219,7 @@ CHECK_BEGIN_STATIC_FN(sll_test_sort_insert)
         = sll_insert_sorted(&sll, &(struct val){.val = -99999}.e);
     CHECK(inserted->val, -99999);
     CHECK(validate(&sll), true);
-    (void)ccc_sll_pop_front(&sll);
+    (void)CCC_sll_pop_front(&sll);
     CHECK(validate(&sll), true);
     struct val vals[9] = {
         [8] = {.val = 9}, [7] = {.val = 4},  [6] = {.val = 1},
@@ -231,7 +231,7 @@ CHECK_BEGIN_STATIC_FN(sll_test_sort_insert)
     CHECK(validate(&sll), true);
     CHECK(check_order(&sll, 9, (int[9]){9, 4, 1, 1, 99, -55, 5, 2, -99}), PASS);
     CHECK(sll_is_sorted(&sll), false);
-    ccc_result const r = sll_sort(&sll);
+    CCC_result const r = sll_sort(&sll);
     CHECK(sll_is_sorted(&sll), true);
     CHECK(r, CCC_RESULT_OK);
     CHECK(validate(&sll), true);

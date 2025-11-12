@@ -8,9 +8,9 @@
 
 CHECK_BEGIN_STATIC_FN(pq_test_empty)
 {
-    ccc_priority_queue pq
-        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
-    CHECK(ccc_pq_is_empty(&pq), true);
+    CCC_priority_queue pq
+        = CCC_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
+    CHECK(CCC_pq_is_empty(&pq), true);
     CHECK_END_FN();
 }
 

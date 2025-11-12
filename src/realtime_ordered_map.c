@@ -64,103 +64,103 @@ or its parent. Preserving the known parent is what makes the Entry Interface
 No further look ups are required for insertions, modification, or removal. */
 struct romap_query
 {
-    ccc_threeway_cmp last_cmp;
+    CCC_threeway_cmp last_cmp;
     union
     {
-        struct ccc_romap_elem *found;
-        struct ccc_romap_elem *parent;
+        struct CCC_romap_elem *found;
+        struct CCC_romap_elem *parent;
     };
 };
 
 /*==============================  Prototypes   ==============================*/
 
-static void init_node(struct ccc_romap *, struct ccc_romap_elem *);
-static ccc_threeway_cmp cmp(struct ccc_romap const *, void const *key,
-                            struct ccc_romap_elem const *node,
-                            ccc_any_key_cmp_fn *);
-static void *struct_base(struct ccc_romap const *,
-                         struct ccc_romap_elem const *);
-static struct romap_query find(struct ccc_romap const *, void const *key);
+static void init_node(struct CCC_romap *, struct CCC_romap_elem *);
+static CCC_threeway_cmp cmp(struct CCC_romap const *, void const *key,
+                            struct CCC_romap_elem const *node,
+                            CCC_any_key_cmp_fn *);
+static void *struct_base(struct CCC_romap const *,
+                         struct CCC_romap_elem const *);
+static struct romap_query find(struct CCC_romap const *, void const *key);
 static void swap(void *tmp, void *a, void *b, size_t sizeof_type);
-static void *maybe_alloc_insert(struct ccc_romap *,
-                                struct ccc_romap_elem *parent,
-                                ccc_threeway_cmp last_cmp,
-                                struct ccc_romap_elem *);
-static void *remove_fixup(struct ccc_romap *, struct ccc_romap_elem *);
-static void insert_fixup(struct ccc_romap *, struct ccc_romap_elem *z,
-                         struct ccc_romap_elem *x);
-static void transplant(struct ccc_romap *, struct ccc_romap_elem *remove,
-                       struct ccc_romap_elem *replacement);
-static void rebalance_3_child(struct ccc_romap *rom, struct ccc_romap_elem *z,
-                              struct ccc_romap_elem *x);
-static ccc_tribool is_0_child(struct ccc_romap const *,
-                              struct ccc_romap_elem const *p,
-                              struct ccc_romap_elem const *x);
-static ccc_tribool is_1_child(struct ccc_romap const *,
-                              struct ccc_romap_elem const *p,
-                              struct ccc_romap_elem const *x);
-static ccc_tribool is_2_child(struct ccc_romap const *,
-                              struct ccc_romap_elem const *p,
-                              struct ccc_romap_elem const *x);
-static ccc_tribool is_3_child(struct ccc_romap const *,
-                              struct ccc_romap_elem const *p,
-                              struct ccc_romap_elem const *x);
-static ccc_tribool is_01_parent(struct ccc_romap const *,
-                                struct ccc_romap_elem const *x,
-                                struct ccc_romap_elem const *p,
-                                struct ccc_romap_elem const *y);
-static ccc_tribool is_11_parent(struct ccc_romap const *,
-                                struct ccc_romap_elem const *x,
-                                struct ccc_romap_elem const *p,
-                                struct ccc_romap_elem const *y);
-static ccc_tribool is_02_parent(struct ccc_romap const *,
-                                struct ccc_romap_elem const *x,
-                                struct ccc_romap_elem const *p,
-                                struct ccc_romap_elem const *y);
-static ccc_tribool is_22_parent(struct ccc_romap const *,
-                                struct ccc_romap_elem const *x,
-                                struct ccc_romap_elem const *p,
-                                struct ccc_romap_elem const *y);
-static ccc_tribool is_leaf(struct ccc_romap const *rom,
-                           struct ccc_romap_elem const *x);
-static struct ccc_romap_elem *sibling_of(struct ccc_romap const *rom,
-                                         struct ccc_romap_elem const *x);
-static void promote(struct ccc_romap const *rom, struct ccc_romap_elem *x);
-static void demote(struct ccc_romap const *rom, struct ccc_romap_elem *x);
-static void double_promote(struct ccc_romap const *rom,
-                           struct ccc_romap_elem *x);
-static void double_demote(struct ccc_romap const *rom,
-                          struct ccc_romap_elem *x);
+static void *maybe_alloc_insert(struct CCC_romap *,
+                                struct CCC_romap_elem *parent,
+                                CCC_threeway_cmp last_cmp,
+                                struct CCC_romap_elem *);
+static void *remove_fixup(struct CCC_romap *, struct CCC_romap_elem *);
+static void insert_fixup(struct CCC_romap *, struct CCC_romap_elem *z,
+                         struct CCC_romap_elem *x);
+static void transplant(struct CCC_romap *, struct CCC_romap_elem *remove,
+                       struct CCC_romap_elem *replacement);
+static void rebalance_3_child(struct CCC_romap *rom, struct CCC_romap_elem *z,
+                              struct CCC_romap_elem *x);
+static CCC_tribool is_0_child(struct CCC_romap const *,
+                              struct CCC_romap_elem const *p,
+                              struct CCC_romap_elem const *x);
+static CCC_tribool is_1_child(struct CCC_romap const *,
+                              struct CCC_romap_elem const *p,
+                              struct CCC_romap_elem const *x);
+static CCC_tribool is_2_child(struct CCC_romap const *,
+                              struct CCC_romap_elem const *p,
+                              struct CCC_romap_elem const *x);
+static CCC_tribool is_3_child(struct CCC_romap const *,
+                              struct CCC_romap_elem const *p,
+                              struct CCC_romap_elem const *x);
+static CCC_tribool is_01_parent(struct CCC_romap const *,
+                                struct CCC_romap_elem const *x,
+                                struct CCC_romap_elem const *p,
+                                struct CCC_romap_elem const *y);
+static CCC_tribool is_11_parent(struct CCC_romap const *,
+                                struct CCC_romap_elem const *x,
+                                struct CCC_romap_elem const *p,
+                                struct CCC_romap_elem const *y);
+static CCC_tribool is_02_parent(struct CCC_romap const *,
+                                struct CCC_romap_elem const *x,
+                                struct CCC_romap_elem const *p,
+                                struct CCC_romap_elem const *y);
+static CCC_tribool is_22_parent(struct CCC_romap const *,
+                                struct CCC_romap_elem const *x,
+                                struct CCC_romap_elem const *p,
+                                struct CCC_romap_elem const *y);
+static CCC_tribool is_leaf(struct CCC_romap const *rom,
+                           struct CCC_romap_elem const *x);
+static struct CCC_romap_elem *sibling_of(struct CCC_romap const *rom,
+                                         struct CCC_romap_elem const *x);
+static void promote(struct CCC_romap const *rom, struct CCC_romap_elem *x);
+static void demote(struct CCC_romap const *rom, struct CCC_romap_elem *x);
+static void double_promote(struct CCC_romap const *rom,
+                           struct CCC_romap_elem *x);
+static void double_demote(struct CCC_romap const *rom,
+                          struct CCC_romap_elem *x);
 
-static void rotate(struct ccc_romap *rom, struct ccc_romap_elem *z,
-                   struct ccc_romap_elem *x, struct ccc_romap_elem *y,
+static void rotate(struct CCC_romap *rom, struct CCC_romap_elem *z,
+                   struct CCC_romap_elem *x, struct CCC_romap_elem *y,
                    enum romap_link dir);
-static void double_rotate(struct ccc_romap *rom, struct ccc_romap_elem *z,
-                          struct ccc_romap_elem *x, struct ccc_romap_elem *y,
+static void double_rotate(struct CCC_romap *rom, struct CCC_romap_elem *z,
+                          struct CCC_romap_elem *x, struct CCC_romap_elem *y,
                           enum romap_link dir);
-static ccc_tribool validate(struct ccc_romap const *rom);
-static struct ccc_romap_elem *
-next(struct ccc_romap const *, struct ccc_romap_elem const *, enum romap_link);
-static struct ccc_romap_elem *min_max_from(struct ccc_romap const *,
-                                           struct ccc_romap_elem *start,
+static CCC_tribool validate(struct CCC_romap const *rom);
+static struct CCC_romap_elem *
+next(struct CCC_romap const *, struct CCC_romap_elem const *, enum romap_link);
+static struct CCC_romap_elem *min_max_from(struct CCC_romap const *,
+                                           struct CCC_romap_elem *start,
                                            enum romap_link);
-static struct ccc_range_u equal_range(struct ccc_romap const *, void const *,
+static struct CCC_range_u equal_range(struct CCC_romap const *, void const *,
                                       void const *, enum romap_link);
-static struct ccc_rtree_entry entry(struct ccc_romap const *rom,
+static struct CCC_rtree_entry entry(struct CCC_romap const *rom,
                                     void const *key);
-static void *insert(struct ccc_romap *rom, struct ccc_romap_elem *parent,
-                    ccc_threeway_cmp last_cmp,
-                    struct ccc_romap_elem *out_handle);
-static void *key_from_node(struct ccc_romap const *rom,
-                           struct ccc_romap_elem const *elem);
-static void *key_in_slot(struct ccc_romap const *rom, void const *slot);
-static struct ccc_romap_elem *elem_in_slot(struct ccc_romap const *rom,
+static void *insert(struct CCC_romap *rom, struct CCC_romap_elem *parent,
+                    CCC_threeway_cmp last_cmp,
+                    struct CCC_romap_elem *out_handle);
+static void *key_from_node(struct CCC_romap const *rom,
+                           struct CCC_romap_elem const *elem);
+static void *key_in_slot(struct CCC_romap const *rom, void const *slot);
+static struct CCC_romap_elem *elem_in_slot(struct CCC_romap const *rom,
                                            void const *slot);
 
 /*==============================  Interface    ==============================*/
 
-ccc_tribool
-ccc_rom_contains(ccc_realtime_ordered_map const *const rom,
+CCC_tribool
+CCC_rom_contains(CCC_realtime_ordered_map const *const rom,
                  void const *const key)
 {
     if (!rom || !key)
@@ -171,7 +171,7 @@ ccc_rom_contains(ccc_realtime_ordered_map const *const rom,
 }
 
 void *
-ccc_rom_get_key_val(ccc_realtime_ordered_map const *const rom,
+CCC_rom_get_key_val(CCC_realtime_ordered_map const *const rom,
                     void const *const key)
 {
     if (!rom || !key)
@@ -182,14 +182,14 @@ ccc_rom_get_key_val(ccc_realtime_ordered_map const *const rom,
     return (CCC_EQL == q.last_cmp) ? struct_base(rom, q.found) : NULL;
 }
 
-ccc_entry
-ccc_rom_swap_entry(ccc_realtime_ordered_map *const rom,
-                   ccc_romap_elem *const key_val_handle,
-                   ccc_romap_elem *const tmp)
+CCC_entry
+CCC_rom_swap_entry(CCC_realtime_ordered_map *const rom,
+                   CCC_romap_elem *const key_val_handle,
+                   CCC_romap_elem *const tmp)
 {
     if (!rom || !key_val_handle || !tmp)
     {
-        return (ccc_entry){{.stats = CCC_ENTRY_ARG_ERROR}};
+        return (CCC_entry){{.stats = CCC_ENTRY_ARG_ERROR}};
     }
     struct romap_query const q = find(rom, key_from_node(rom, key_val_handle));
     if (CCC_EQL == q.last_cmp)
@@ -202,36 +202,36 @@ ccc_rom_swap_entry(ccc_realtime_ordered_map *const rom,
         key_val_handle->branch[L] = key_val_handle->branch[R]
             = key_val_handle->parent = NULL;
         tmp->branch[L] = tmp->branch[R] = tmp->parent = NULL;
-        return (ccc_entry){{
+        return (CCC_entry){{
             .e = old_val,
             .stats = CCC_ENTRY_OCCUPIED,
         }};
     }
     if (!maybe_alloc_insert(rom, q.parent, q.last_cmp, key_val_handle))
     {
-        return (ccc_entry){{
+        return (CCC_entry){{
             .e = NULL,
             .stats = CCC_ENTRY_INSERT_ERROR,
         }};
     }
-    return (ccc_entry){{
+    return (CCC_entry){{
         .e = NULL,
         .stats = CCC_ENTRY_VACANT,
     }};
 }
 
-ccc_entry
-ccc_rom_try_insert(ccc_realtime_ordered_map *const rom,
-                   ccc_romap_elem *const key_val_handle)
+CCC_entry
+CCC_rom_try_insert(CCC_realtime_ordered_map *const rom,
+                   CCC_romap_elem *const key_val_handle)
 {
     if (!rom || !key_val_handle)
     {
-        return (ccc_entry){{.stats = CCC_ENTRY_ARG_ERROR}};
+        return (CCC_entry){{.stats = CCC_ENTRY_ARG_ERROR}};
     }
     struct romap_query const q = find(rom, key_from_node(rom, key_val_handle));
     if (CCC_EQL == q.last_cmp)
     {
-        return (ccc_entry){{
+        return (CCC_entry){{
             .e = struct_base(rom, q.found),
             .stats = CCC_ENTRY_OCCUPIED,
         }};
@@ -240,24 +240,24 @@ ccc_rom_try_insert(ccc_realtime_ordered_map *const rom,
         = maybe_alloc_insert(rom, q.parent, q.last_cmp, key_val_handle);
     if (!inserted)
     {
-        return (ccc_entry){{
+        return (CCC_entry){{
             .e = NULL,
             .stats = CCC_ENTRY_INSERT_ERROR,
         }};
     }
-    return (ccc_entry){{
+    return (CCC_entry){{
         .e = inserted,
         .stats = CCC_ENTRY_VACANT,
     }};
 }
 
-ccc_entry
-ccc_rom_insert_or_assign(ccc_realtime_ordered_map *const rom,
-                         ccc_romap_elem *const key_val_handle)
+CCC_entry
+CCC_rom_insert_or_assign(CCC_realtime_ordered_map *const rom,
+                         CCC_romap_elem *const key_val_handle)
 {
     if (!rom || !key_val_handle)
     {
-        return (ccc_entry){{.stats = CCC_ENTRY_ARG_ERROR}};
+        return (CCC_entry){{.stats = CCC_ENTRY_ARG_ERROR}};
     }
     struct romap_query const q = find(rom, key_from_node(rom, key_val_handle));
     if (CCC_EQL == q.last_cmp)
@@ -265,7 +265,7 @@ ccc_rom_insert_or_assign(ccc_realtime_ordered_map *const rom,
         void *const found = struct_base(rom, q.found);
         *key_val_handle = *elem_in_slot(rom, found);
         memcpy(found, struct_base(rom, key_val_handle), rom->sizeof_type);
-        return (ccc_entry){{
+        return (CCC_entry){{
             .e = found,
             .stats = CCC_ENTRY_OCCUPIED,
         }};
@@ -274,29 +274,29 @@ ccc_rom_insert_or_assign(ccc_realtime_ordered_map *const rom,
         = maybe_alloc_insert(rom, q.parent, q.last_cmp, key_val_handle);
     if (!inserted)
     {
-        return (ccc_entry){{
+        return (CCC_entry){{
             .e = NULL,
             .stats = CCC_ENTRY_INSERT_ERROR,
         }};
     }
-    return (ccc_entry){{
+    return (CCC_entry){{
         .e = inserted,
         .stats = CCC_ENTRY_VACANT,
     }};
 }
 
-ccc_romap_entry
-ccc_rom_entry(ccc_realtime_ordered_map const *const rom, void const *const key)
+CCC_romap_entry
+CCC_rom_entry(CCC_realtime_ordered_map const *const rom, void const *const key)
 {
     if (!rom || !key)
     {
-        return (ccc_romap_entry){{.entry = {.stats = CCC_ENTRY_ARG_ERROR}}};
+        return (CCC_romap_entry){{.entry = {.stats = CCC_ENTRY_ARG_ERROR}}};
     }
-    return (ccc_romap_entry){entry(rom, key)};
+    return (CCC_romap_entry){entry(rom, key)};
 }
 
 void *
-ccc_rom_or_insert(ccc_romap_entry const *const e, ccc_romap_elem *const elem)
+CCC_rom_or_insert(CCC_romap_entry const *const e, CCC_romap_elem *const elem)
 {
     if (!e || !elem || !e->impl.entry.e)
     {
@@ -312,7 +312,7 @@ ccc_rom_or_insert(ccc_romap_entry const *const e, ccc_romap_elem *const elem)
 }
 
 void *
-ccc_rom_insert_entry(ccc_romap_entry const *const e, ccc_romap_elem *const elem)
+CCC_rom_insert_entry(CCC_romap_entry const *const e, CCC_romap_elem *const elem)
 {
     if (!e || !elem || !e->impl.entry.e)
     {
@@ -330,12 +330,12 @@ ccc_rom_insert_entry(ccc_romap_entry const *const e, ccc_romap_elem *const elem)
                               e->impl.last_cmp, elem);
 }
 
-ccc_entry
-ccc_rom_remove_entry(ccc_romap_entry const *const e)
+CCC_entry
+CCC_rom_remove_entry(CCC_romap_entry const *const e)
 {
     if (!e || !e->impl.entry.e)
     {
-        return (ccc_entry){{.stats = CCC_ENTRY_ARG_ERROR}};
+        return (CCC_entry){{.stats = CCC_ENTRY_ARG_ERROR}};
     }
     if (e->impl.entry.stats == CCC_ENTRY_OCCUPIED)
     {
@@ -345,34 +345,34 @@ ccc_rom_remove_entry(ccc_romap_entry const *const e)
         if (e->impl.rom->alloc)
         {
             e->impl.rom->alloc(erased, 0, e->impl.rom->aux);
-            return (ccc_entry){{
+            return (CCC_entry){{
                 .e = NULL,
                 .stats = CCC_ENTRY_OCCUPIED,
             }};
         }
-        return (ccc_entry){{
+        return (CCC_entry){{
             .e = erased,
             .stats = CCC_ENTRY_OCCUPIED,
         }};
     }
-    return (ccc_entry){{
+    return (CCC_entry){{
         .e = NULL,
         .stats = CCC_ENTRY_VACANT,
     }};
 }
 
-ccc_entry
-ccc_rom_remove(ccc_realtime_ordered_map *const rom,
-               ccc_romap_elem *const out_handle)
+CCC_entry
+CCC_rom_remove(CCC_realtime_ordered_map *const rom,
+               CCC_romap_elem *const out_handle)
 {
     if (!rom || !out_handle)
     {
-        return (ccc_entry){{.stats = CCC_ENTRY_ARG_ERROR}};
+        return (CCC_entry){{.stats = CCC_ENTRY_ARG_ERROR}};
     }
     struct romap_query const q = find(rom, key_from_node(rom, out_handle));
     if (q.last_cmp != CCC_EQL)
     {
-        return (ccc_entry){{
+        return (CCC_entry){{
             .e = NULL,
             .stats = CCC_ENTRY_VACANT,
         }};
@@ -383,19 +383,19 @@ ccc_rom_remove(ccc_realtime_ordered_map *const rom,
         void *const any_struct = struct_base(rom, out_handle);
         memcpy(any_struct, removed, rom->sizeof_type);
         rom->alloc(removed, 0, rom->aux);
-        return (ccc_entry){{
+        return (CCC_entry){{
             .e = any_struct,
             .stats = CCC_ENTRY_OCCUPIED,
         }};
     }
-    return (ccc_entry){{
+    return (CCC_entry){{
         .e = removed,
         .stats = CCC_ENTRY_OCCUPIED,
     }};
 }
 
-ccc_romap_entry *
-ccc_rom_and_modify(ccc_romap_entry *e, ccc_any_type_update_fn *fn)
+CCC_romap_entry *
+CCC_rom_and_modify(CCC_romap_entry *e, CCC_any_type_update_fn *fn)
 {
     if (!e)
     {
@@ -403,7 +403,7 @@ ccc_rom_and_modify(ccc_romap_entry *e, ccc_any_type_update_fn *fn)
     }
     if (fn && e->impl.entry.stats & CCC_ENTRY_OCCUPIED && e->impl.entry.e)
     {
-        fn((ccc_any_type){
+        fn((CCC_any_type){
             .any_type = e->impl.entry.e,
             NULL,
         });
@@ -411,8 +411,8 @@ ccc_rom_and_modify(ccc_romap_entry *e, ccc_any_type_update_fn *fn)
     return e;
 }
 
-ccc_romap_entry *
-ccc_rom_and_modify_aux(ccc_romap_entry *e, ccc_any_type_update_fn *fn,
+CCC_romap_entry *
+CCC_rom_and_modify_aux(CCC_romap_entry *e, CCC_any_type_update_fn *fn,
                        void *aux)
 {
     if (!e)
@@ -421,7 +421,7 @@ ccc_rom_and_modify_aux(ccc_romap_entry *e, ccc_any_type_update_fn *fn,
     }
     if (fn && e->impl.entry.stats & CCC_ENTRY_OCCUPIED && e->impl.entry.e)
     {
-        fn((ccc_any_type){
+        fn((CCC_any_type){
             .any_type = e->impl.entry.e,
             aux,
         });
@@ -430,7 +430,7 @@ ccc_rom_and_modify_aux(ccc_romap_entry *e, ccc_any_type_update_fn *fn,
 }
 
 void *
-ccc_rom_unwrap(ccc_romap_entry const *const e)
+CCC_rom_unwrap(CCC_romap_entry const *const e)
 {
     if (e && e->impl.entry.stats & CCC_ENTRY_OCCUPIED)
     {
@@ -439,8 +439,8 @@ ccc_rom_unwrap(ccc_romap_entry const *const e)
     return NULL;
 }
 
-ccc_tribool
-ccc_rom_occupied(ccc_romap_entry const *const e)
+CCC_tribool
+CCC_rom_occupied(CCC_romap_entry const *const e)
 {
     if (!e)
     {
@@ -449,8 +449,8 @@ ccc_rom_occupied(ccc_romap_entry const *const e)
     return (e->impl.entry.stats & CCC_ENTRY_OCCUPIED) != 0;
 }
 
-ccc_tribool
-ccc_rom_insert_error(ccc_romap_entry const *const e)
+CCC_tribool
+CCC_rom_insert_error(CCC_romap_entry const *const e)
 {
     if (!e)
     {
@@ -459,32 +459,32 @@ ccc_rom_insert_error(ccc_romap_entry const *const e)
     return (e->impl.entry.stats & CCC_ENTRY_INSERT_ERROR) != 0;
 }
 
-ccc_entry_status
-ccc_rom_entry_status(ccc_romap_entry const *const e)
+CCC_entry_status
+CCC_rom_entry_status(CCC_romap_entry const *const e)
 {
     return e ? e->impl.entry.stats : CCC_ENTRY_ARG_ERROR;
 }
 
 void *
-ccc_rom_begin(ccc_realtime_ordered_map const *rom)
+CCC_rom_begin(CCC_realtime_ordered_map const *rom)
 {
     if (!rom)
     {
         return NULL;
     }
-    struct ccc_romap_elem *const m = min_max_from(rom, rom->root, L);
+    struct CCC_romap_elem *const m = min_max_from(rom, rom->root, L);
     return m == &rom->end ? NULL : struct_base(rom, m);
 }
 
 void *
-ccc_rom_next(ccc_realtime_ordered_map const *const rom,
-             ccc_romap_elem const *const e)
+CCC_rom_next(CCC_realtime_ordered_map const *const rom,
+             CCC_romap_elem const *const e)
 {
     if (!rom || !e)
     {
         return NULL;
     }
-    struct ccc_romap_elem const *const n = next(rom, e, INORDER);
+    struct CCC_romap_elem const *const n = next(rom, e, INORDER);
     if (n == &rom->end)
     {
         return NULL;
@@ -493,74 +493,74 @@ ccc_rom_next(ccc_realtime_ordered_map const *const rom,
 }
 
 void *
-ccc_rom_rbegin(ccc_realtime_ordered_map const *const rom)
+CCC_rom_rbegin(CCC_realtime_ordered_map const *const rom)
 {
     if (!rom)
     {
         return NULL;
     }
-    struct ccc_romap_elem *const m = min_max_from(rom, rom->root, R);
+    struct CCC_romap_elem *const m = min_max_from(rom, rom->root, R);
     return m == &rom->end ? NULL : struct_base(rom, m);
 }
 
 void *
-ccc_rom_end(ccc_realtime_ordered_map const *const)
+CCC_rom_end(CCC_realtime_ordered_map const *const)
 {
     return NULL;
 }
 
 void *
-ccc_rom_rend(ccc_realtime_ordered_map const *const)
+CCC_rom_rend(CCC_realtime_ordered_map const *const)
 {
     return NULL;
 }
 
 void *
-ccc_rom_rnext(ccc_realtime_ordered_map const *const rom,
-              ccc_romap_elem const *const e)
+CCC_rom_rnext(CCC_realtime_ordered_map const *const rom,
+              CCC_romap_elem const *const e)
 {
     if (!rom || !e)
     {
         return NULL;
     }
-    struct ccc_romap_elem const *const n = next(rom, e, R_INORDER);
+    struct CCC_romap_elem const *const n = next(rom, e, R_INORDER);
     return (n == &rom->end) ? NULL : struct_base(rom, n);
 }
 
-ccc_range
-ccc_rom_equal_range(ccc_realtime_ordered_map const *const rom,
+CCC_range
+CCC_rom_equal_range(CCC_realtime_ordered_map const *const rom,
                     void const *const begin_key, void const *const end_key)
 {
     if (!rom || !begin_key || !end_key)
     {
-        return (ccc_range){};
+        return (CCC_range){};
     }
-    return (ccc_range){equal_range(rom, begin_key, end_key, INORDER)};
+    return (CCC_range){equal_range(rom, begin_key, end_key, INORDER)};
 }
 
-ccc_rrange
-ccc_rom_equal_rrange(ccc_realtime_ordered_map const *const rom,
+CCC_rrange
+CCC_rom_equal_rrange(CCC_realtime_ordered_map const *const rom,
                      void const *const rbegin_key, void const *const rend_key)
 {
     if (!rom || !rbegin_key || !rend_key)
     {
-        return (ccc_rrange){};
+        return (CCC_rrange){};
     }
-    return (ccc_rrange){equal_range(rom, rbegin_key, rend_key, R_INORDER)};
+    return (CCC_rrange){equal_range(rom, rbegin_key, rend_key, R_INORDER)};
 }
 
-ccc_ucount
-ccc_rom_count(ccc_realtime_ordered_map const *const rom)
+CCC_ucount
+CCC_rom_count(CCC_realtime_ordered_map const *const rom)
 {
     if (!rom)
     {
-        return (ccc_ucount){.error = CCC_RESULT_ARG_ERROR};
+        return (CCC_ucount){.error = CCC_RESULT_ARG_ERROR};
     }
-    return (ccc_ucount){.count = rom->count};
+    return (CCC_ucount){.count = rom->count};
 }
 
-ccc_tribool
-ccc_rom_is_empty(ccc_realtime_ordered_map const *const rom)
+CCC_tribool
+CCC_rom_is_empty(CCC_realtime_ordered_map const *const rom)
 {
     if (!rom)
     {
@@ -569,8 +569,8 @@ ccc_rom_is_empty(ccc_realtime_ordered_map const *const rom)
     return !rom->count;
 }
 
-ccc_tribool
-ccc_rom_validate(ccc_realtime_ordered_map const *rom)
+CCC_tribool
+CCC_rom_validate(CCC_realtime_ordered_map const *rom)
 {
     if (!rom)
     {
@@ -581,32 +581,32 @@ ccc_rom_validate(ccc_realtime_ordered_map const *rom)
 
 /** This is a linear time constant space deletion of tree nodes via left
 rotations so element fields are modified during progression of deletes. */
-ccc_result
-ccc_rom_clear(ccc_realtime_ordered_map *const rom,
-              ccc_any_type_destructor_fn *const destructor)
+CCC_result
+CCC_rom_clear(CCC_realtime_ordered_map *const rom,
+              CCC_any_type_destructor_fn *const destructor)
 {
     if (!rom)
     {
         return CCC_RESULT_ARG_ERROR;
     }
-    struct ccc_romap_elem *node = rom->root;
+    struct CCC_romap_elem *node = rom->root;
     while (node != &rom->end)
     {
         if (node->branch[L] != &rom->end)
         {
-            struct ccc_romap_elem *const left = node->branch[L];
+            struct CCC_romap_elem *const left = node->branch[L];
             node->branch[L] = left->branch[R];
             left->branch[R] = node;
             node = left;
             continue;
         }
-        struct ccc_romap_elem *const next = node->branch[R];
+        struct CCC_romap_elem *const next = node->branch[R];
         node->branch[L] = node->branch[R] = NULL;
         node->parent = NULL;
         void *const destroy = struct_base(rom, node);
         if (destructor)
         {
-            destructor((ccc_any_type){
+            destructor((CCC_any_type){
                 .any_type = destroy,
                 .aux = rom->aux,
             });
@@ -622,30 +622,30 @@ ccc_rom_clear(ccc_realtime_ordered_map *const rom,
 
 /*=========================   Private Interface  ============================*/
 
-struct ccc_rtree_entry
-ccc_impl_rom_entry(struct ccc_romap const *const rom, void const *const key)
+struct CCC_rtree_entry
+CCC_impl_rom_entry(struct CCC_romap const *const rom, void const *const key)
 {
     return entry(rom, key);
 }
 
 void *
-ccc_impl_rom_insert(struct ccc_romap *const rom,
-                    struct ccc_romap_elem *const parent,
-                    ccc_threeway_cmp const last_cmp,
-                    struct ccc_romap_elem *const out_handle)
+CCC_impl_rom_insert(struct CCC_romap *const rom,
+                    struct CCC_romap_elem *const parent,
+                    CCC_threeway_cmp const last_cmp,
+                    struct CCC_romap_elem *const out_handle)
 {
     return insert(rom, parent, last_cmp, out_handle);
 }
 
 void *
-ccc_impl_rom_key_in_slot(struct ccc_romap const *const rom,
+CCC_impl_rom_key_in_slot(struct CCC_romap const *const rom,
                          void const *const slot)
 {
     return key_in_slot(rom, slot);
 }
 
-struct ccc_romap_elem *
-ccc_impl_romap_elem_in_slot(struct ccc_romap const *const rom,
+struct CCC_romap_elem *
+CCC_impl_romap_elem_in_slot(struct CCC_romap const *const rom,
                             void const *const slot)
 {
     return elem_in_slot(rom, slot);
@@ -653,8 +653,8 @@ ccc_impl_romap_elem_in_slot(struct ccc_romap const *const rom,
 
 /*=========================    Static Helpers    ============================*/
 
-static struct ccc_romap_elem *
-min_max_from(struct ccc_romap const *const rom, struct ccc_romap_elem *start,
+static struct CCC_romap_elem *
+min_max_from(struct CCC_romap const *const rom, struct CCC_romap_elem *start,
              enum romap_link const dir)
 {
     if (start == &rom->end)
@@ -666,14 +666,14 @@ min_max_from(struct ccc_romap const *const rom, struct ccc_romap_elem *start,
     return start;
 }
 
-static struct ccc_rtree_entry
-entry(struct ccc_romap const *const rom, void const *const key)
+static struct CCC_rtree_entry
+entry(struct CCC_romap const *const rom, void const *const key)
 {
     struct romap_query const q = find(rom, key);
     if (CCC_EQL == q.last_cmp)
     {
-        return (struct ccc_rtree_entry){
-            .rom = (struct ccc_romap *)rom,
+        return (struct CCC_rtree_entry){
+            .rom = (struct CCC_romap *)rom,
             .last_cmp = q.last_cmp,
             .entry = {
                 .e = struct_base(rom, q.found),
@@ -681,8 +681,8 @@ entry(struct ccc_romap const *const rom, void const *const key)
             },
         };
     }
-    return (struct ccc_rtree_entry){
-        .rom = (struct ccc_romap *)rom,
+    return (struct CCC_rtree_entry){
+        .rom = (struct CCC_romap *)rom,
         .last_cmp = q.last_cmp,
         .entry = {
             .e = struct_base(rom, q.parent),
@@ -692,10 +692,10 @@ entry(struct ccc_romap const *const rom, void const *const key)
 }
 
 static void *
-maybe_alloc_insert(struct ccc_romap *const rom,
-                   struct ccc_romap_elem *const parent,
-                   ccc_threeway_cmp const last_cmp,
-                   struct ccc_romap_elem *out_handle)
+maybe_alloc_insert(struct CCC_romap *const rom,
+                   struct CCC_romap_elem *const parent,
+                   CCC_threeway_cmp const last_cmp,
+                   struct CCC_romap_elem *out_handle)
 {
     if (rom->alloc)
     {
@@ -711,8 +711,8 @@ maybe_alloc_insert(struct ccc_romap *const rom,
 }
 
 static void *
-insert(struct ccc_romap *const rom, struct ccc_romap_elem *const parent,
-       ccc_threeway_cmp const last_cmp, struct ccc_romap_elem *const out_handle)
+insert(struct CCC_romap *const rom, struct CCC_romap_elem *const parent,
+       CCC_threeway_cmp const last_cmp, struct CCC_romap_elem *const out_handle)
 {
     init_node(rom, out_handle);
     if (!rom->count)
@@ -722,7 +722,7 @@ insert(struct ccc_romap *const rom, struct ccc_romap_elem *const parent,
         return struct_base(rom, out_handle);
     }
     assert(last_cmp == CCC_GRT || last_cmp == CCC_LES);
-    ccc_tribool const rank_rule_break
+    CCC_tribool const rank_rule_break
         = parent->branch[L] == &rom->end && parent->branch[R] == &rom->end;
     parent->branch[CCC_GRT == last_cmp] = out_handle;
     out_handle->parent = parent;
@@ -735,9 +735,9 @@ insert(struct ccc_romap *const rom, struct ccc_romap_elem *const parent,
 }
 
 static struct romap_query
-find(struct ccc_romap const *const rom, void const *const key)
+find(struct CCC_romap const *const rom, void const *const key)
 {
-    struct ccc_romap_elem const *parent = &rom->end;
+    struct CCC_romap_elem const *parent = &rom->end;
     struct romap_query q = {
         .last_cmp = CCC_CMP_ERROR,
         .found = rom->root,
@@ -753,17 +753,17 @@ find(struct ccc_romap const *const rom, void const *const key)
         q.found = q.found->branch[CCC_GRT == q.last_cmp];
     }
     /* Type punning here OK as both union members have same type and size. */
-    q.parent = (struct ccc_romap_elem *)parent;
+    q.parent = (struct CCC_romap_elem *)parent;
     return q;
 }
 
-static struct ccc_romap_elem *
-next(struct ccc_romap const *const rom, struct ccc_romap_elem const *n,
+static struct CCC_romap_elem *
+next(struct CCC_romap const *const rom, struct CCC_romap_elem const *n,
      enum romap_link const traversal)
 {
     if (!n || n == &rom->end)
     {
-        return (struct ccc_romap_elem *)&rom->end;
+        return (struct CCC_romap_elem *)&rom->end;
     }
     assert(rom->root->parent == &rom->end);
     /* The node is an internal one that has a sub-tree to explore first. */
@@ -773,7 +773,7 @@ next(struct ccc_romap const *const rom, struct ccc_romap_elem const *n,
         for (n = n->branch[traversal]; n->branch[!traversal] != &rom->end;
              n = n->branch[!traversal])
         {}
-        return (struct ccc_romap_elem *)n;
+        return (struct CCC_romap_elem *)n;
     }
     for (; n->parent != &rom->end && n->parent->branch[!traversal] != n;
          n = n->parent)
@@ -781,15 +781,15 @@ next(struct ccc_romap const *const rom, struct ccc_romap_elem const *n,
     return n->parent;
 }
 
-static struct ccc_range_u
-equal_range(struct ccc_romap const *const rom, void const *const begin_key,
+static struct CCC_range_u
+equal_range(struct CCC_romap const *const rom, void const *const begin_key,
             void const *const end_key, enum romap_link const traversal)
 {
     if (!rom->count)
     {
-        return (struct ccc_range_u){};
+        return (struct CCC_range_u){};
     }
-    ccc_threeway_cmp const les_or_grt[2] = {CCC_LES, CCC_GRT};
+    CCC_threeway_cmp const les_or_grt[2] = {CCC_LES, CCC_GRT};
     struct romap_query b = find(rom, begin_key);
     if (b.last_cmp == les_or_grt[traversal])
     {
@@ -800,14 +800,14 @@ equal_range(struct ccc_romap const *const rom, void const *const begin_key,
     {
         e.found = next(rom, e.found, traversal);
     }
-    return (struct ccc_range_u){
+    return (struct CCC_range_u){
         .begin = b.found == &rom->end ? NULL : struct_base(rom, b.found),
         .end = e.found == &rom->end ? NULL : struct_base(rom, e.found),
     };
 }
 
 static inline void
-init_node(struct ccc_romap *const rom, struct ccc_romap_elem *const e)
+init_node(struct CCC_romap *const rom, struct CCC_romap_elem *const e)
 {
     assert(e != NULL);
     assert(rom != NULL);
@@ -827,11 +827,11 @@ swap(void *const tmp, void *const a, void *const b, size_t const sizeof_type)
     (void)memcpy(b, tmp, sizeof_type);
 }
 
-static inline ccc_threeway_cmp
-cmp(struct ccc_romap const *const rom, void const *const key,
-    struct ccc_romap_elem const *const node, ccc_any_key_cmp_fn *const fn)
+static inline CCC_threeway_cmp
+cmp(struct CCC_romap const *const rom, void const *const key,
+    struct CCC_romap_elem const *const node, CCC_any_key_cmp_fn *const fn)
 {
-    return fn((ccc_any_key_cmp){
+    return fn((CCC_any_key_cmp){
         .any_key_lhs = key,
         .any_type_rhs = struct_base(rom, node),
         .aux = rom->aux,
@@ -839,36 +839,36 @@ cmp(struct ccc_romap const *const rom, void const *const key,
 }
 
 static inline void *
-struct_base(struct ccc_romap const *const rom,
-            struct ccc_romap_elem const *const e)
+struct_base(struct CCC_romap const *const rom,
+            struct CCC_romap_elem const *const e)
 {
     return ((char *)e->branch) - rom->node_elem_offset;
 }
 
 static inline void *
-key_from_node(struct ccc_romap const *const rom,
-              struct ccc_romap_elem const *const elem)
+key_from_node(struct CCC_romap const *const rom,
+              struct CCC_romap_elem const *const elem)
 {
     return (char *)struct_base(rom, elem) + rom->key_offset;
 }
 
 static inline void *
-key_in_slot(struct ccc_romap const *const rom, void const *const slot)
+key_in_slot(struct CCC_romap const *const rom, void const *const slot)
 {
     return (char *)slot + rom->key_offset;
 }
 
-static inline struct ccc_romap_elem *
-elem_in_slot(struct ccc_romap const *const rom, void const *const slot)
+static inline struct CCC_romap_elem *
+elem_in_slot(struct CCC_romap const *const rom, void const *const slot)
 {
-    return (struct ccc_romap_elem *)((char *)slot + rom->node_elem_offset);
+    return (struct CCC_romap_elem *)((char *)slot + rom->node_elem_offset);
 }
 
 /*=======================   WAVL Tree Maintenance   =========================*/
 
 static void
-insert_fixup(struct ccc_romap *const rom, struct ccc_romap_elem *z,
-             struct ccc_romap_elem *x)
+insert_fixup(struct CCC_romap *const rom, struct CCC_romap_elem *z,
+             struct CCC_romap_elem *x)
 {
     do
     {
@@ -889,7 +889,7 @@ insert_fixup(struct ccc_romap *const rom, struct ccc_romap_elem *z,
     assert(x != &rom->end);
     assert(is_0_child(rom, z, x));
     enum romap_link const p_to_x_dir = z->branch[R] == x;
-    struct ccc_romap_elem *const y = x->branch[!p_to_x_dir];
+    struct CCC_romap_elem *const y = x->branch[!p_to_x_dir];
     if (y == &rom->end || is_2_child(rom, z, y))
     {
         rotate(rom, z, x, y, !p_to_x_dir);
@@ -906,13 +906,13 @@ insert_fixup(struct ccc_romap *const rom, struct ccc_romap_elem *z,
 }
 
 static void *
-remove_fixup(struct ccc_romap *const rom, struct ccc_romap_elem *const remove)
+remove_fixup(struct CCC_romap *const rom, struct CCC_romap_elem *const remove)
 {
     assert(remove->branch[R] && remove->branch[L]);
-    struct ccc_romap_elem *y = NULL;
-    struct ccc_romap_elem *x = NULL;
-    struct ccc_romap_elem *p_of_xy = NULL;
-    ccc_tribool two_child = CCC_FALSE;
+    struct CCC_romap_elem *y = NULL;
+    struct CCC_romap_elem *x = NULL;
+    struct CCC_romap_elem *p_of_xy = NULL;
+    CCC_tribool two_child = CCC_FALSE;
     if (remove->branch[L] == &rom->end || remove->branch[R] == &rom->end)
     {
         y = remove;
@@ -955,7 +955,7 @@ remove_fixup(struct ccc_romap *const rom, struct ccc_romap_elem *const remove)
         else if (x == &rom->end && p_of_xy->branch[L] == p_of_xy->branch[R])
         {
             assert(p_of_xy != &rom->end);
-            ccc_tribool const demote_makes_3_child
+            CCC_tribool const demote_makes_3_child
                 = is_2_child(rom, p_of_xy->parent, p_of_xy);
             demote(rom, p_of_xy);
             if (demote_makes_3_child)
@@ -972,15 +972,15 @@ remove_fixup(struct ccc_romap *const rom, struct ccc_romap_elem *const remove)
 }
 
 static void
-rebalance_3_child(struct ccc_romap *const rom, struct ccc_romap_elem *z,
-                  struct ccc_romap_elem *x)
+rebalance_3_child(struct CCC_romap *const rom, struct CCC_romap_elem *z,
+                  struct CCC_romap_elem *x)
 {
     assert(z != &rom->end);
-    ccc_tribool made_3_child = CCC_FALSE;
+    CCC_tribool made_3_child = CCC_FALSE;
     do
     {
-        struct ccc_romap_elem *const g = z->parent;
-        struct ccc_romap_elem *const y = z->branch[z->branch[L] == x];
+        struct CCC_romap_elem *const g = z->parent;
+        struct CCC_romap_elem *const y = z->branch[z->branch[L] == x];
         made_3_child = is_2_child(rom, g, z);
         if (is_2_child(rom, z, y))
         {
@@ -995,7 +995,7 @@ rebalance_3_child(struct ccc_romap *const rom, struct ccc_romap_elem *z,
         {
             assert(is_3_child(rom, z, x));
             enum romap_link const z_to_x_dir = z->branch[R] == x;
-            struct ccc_romap_elem *const w = y->branch[!z_to_x_dir];
+            struct CCC_romap_elem *const w = y->branch[!z_to_x_dir];
             if (is_1_child(rom, y, w))
             {
                 rotate(rom, z, y, y->branch[z_to_x_dir], z_to_x_dir);
@@ -1008,7 +1008,7 @@ rebalance_3_child(struct ccc_romap *const rom, struct ccc_romap_elem *z,
             }
             else /* w is a 2-child and v will be a 1-child. */
             {
-                struct ccc_romap_elem *const v = y->branch[z_to_x_dir];
+                struct CCC_romap_elem *const v = y->branch[z_to_x_dir];
                 assert(is_2_child(rom, y, w));
                 assert(is_1_child(rom, y, v));
                 double_rotate(rom, z, y, v, !z_to_x_dir);
@@ -1042,8 +1042,8 @@ rebalance_3_child(struct ccc_romap *const rom, struct ccc_romap_elem *z,
 }
 
 static void
-transplant(struct ccc_romap *const rom, struct ccc_romap_elem *const remove,
-           struct ccc_romap_elem *const replacement)
+transplant(struct CCC_romap *const rom, struct CCC_romap_elem *const remove,
+           struct CCC_romap_elem *const replacement)
 {
     assert(remove != &rom->end);
     assert(replacement != &rom->end);
@@ -1074,12 +1074,12 @@ and uppercase are arbitrary subtrees.
        │              │
        B              B*/
 static void
-rotate(struct ccc_romap *const rom, struct ccc_romap_elem *const z,
-       struct ccc_romap_elem *const x, struct ccc_romap_elem *const y,
+rotate(struct CCC_romap *const rom, struct CCC_romap_elem *const z,
+       struct CCC_romap_elem *const x, struct CCC_romap_elem *const y,
        enum romap_link dir)
 {
     assert(z != &rom->end);
-    struct ccc_romap_elem *const g = z->parent;
+    struct CCC_romap_elem *const g = z->parent;
     x->parent = g;
     if (g == &rom->end)
     {
@@ -1107,14 +1107,14 @@ Lowercase are nodes and uppercase are arbitrary subtrees.
      ╭─┴─╮
      B   C */
 static void
-double_rotate(struct ccc_romap *const rom, struct ccc_romap_elem *const z,
-              struct ccc_romap_elem *const x, struct ccc_romap_elem *const y,
+double_rotate(struct CCC_romap *const rom, struct CCC_romap_elem *const z,
+              struct CCC_romap_elem *const x, struct CCC_romap_elem *const y,
               enum romap_link dir)
 {
     assert(z != &rom->end);
     assert(x != &rom->end);
     assert(y != &rom->end);
-    struct ccc_romap_elem *const g = z->parent;
+    struct CCC_romap_elem *const g = z->parent;
     y->parent = g;
     if (g == &rom->end)
     {
@@ -1139,10 +1139,10 @@ double_rotate(struct ccc_romap *const rom, struct ccc_romap_elem *const z,
          p
       1╭─╯
        x */
-[[maybe_unused]] static inline ccc_tribool
-is_0_child(struct ccc_romap const *const rom,
-           struct ccc_romap_elem const *const p,
-           struct ccc_romap_elem const *const x)
+[[maybe_unused]] static inline CCC_tribool
+is_0_child(struct CCC_romap const *const rom,
+           struct CCC_romap_elem const *const p,
+           struct CCC_romap_elem const *const x)
 {
     return p != &rom->end && p->parity == x->parity;
 }
@@ -1151,10 +1151,10 @@ is_0_child(struct ccc_romap const *const rom,
          p
        1/
        x*/
-static inline ccc_tribool
-is_1_child(struct ccc_romap const *const rom,
-           struct ccc_romap_elem const *const p,
-           struct ccc_romap_elem const *const x)
+static inline CCC_tribool
+is_1_child(struct CCC_romap const *const rom,
+           struct CCC_romap_elem const *const p,
+           struct CCC_romap_elem const *const x)
 {
     return p != &rom->end && p->parity != x->parity;
 }
@@ -1163,10 +1163,10 @@ is_1_child(struct ccc_romap const *const rom,
          p
       2╭─╯
        x */
-static inline ccc_tribool
-is_2_child(struct ccc_romap const *const rom,
-           struct ccc_romap_elem const *const p,
-           struct ccc_romap_elem const *const x)
+static inline CCC_tribool
+is_2_child(struct CCC_romap const *const rom,
+           struct CCC_romap_elem const *const p,
+           struct CCC_romap_elem const *const x)
 {
     return p != &rom->end && p->parity == x->parity;
 }
@@ -1175,10 +1175,10 @@ is_2_child(struct ccc_romap const *const rom,
          p
       3╭─╯
        x */
-[[maybe_unused]] static inline ccc_tribool
-is_3_child(struct ccc_romap const *const rom,
-           struct ccc_romap_elem const *const p,
-           struct ccc_romap_elem const *const x)
+[[maybe_unused]] static inline CCC_tribool
+is_3_child(struct CCC_romap const *const rom,
+           struct CCC_romap_elem const *const p,
+           struct CCC_romap_elem const *const x)
 {
     return p != &rom->end && p->parity != x->parity;
 }
@@ -1188,11 +1188,11 @@ is_3_child(struct ccc_romap const *const rom,
          p
       0╭─┴─╮1
        x   y */
-static inline ccc_tribool
-is_01_parent([[maybe_unused]] struct ccc_romap const *const rom,
-             struct ccc_romap_elem const *const x,
-             struct ccc_romap_elem const *const p,
-             struct ccc_romap_elem const *const y)
+static inline CCC_tribool
+is_01_parent([[maybe_unused]] struct CCC_romap const *const rom,
+             struct CCC_romap_elem const *const x,
+             struct CCC_romap_elem const *const p,
+             struct CCC_romap_elem const *const y)
 {
     assert(p != &rom->end);
     return (!x->parity && !p->parity && y->parity)
@@ -1204,11 +1204,11 @@ is_01_parent([[maybe_unused]] struct ccc_romap const *const rom,
          p
       1╭─┴─╮1
        x   y */
-static inline ccc_tribool
-is_11_parent([[maybe_unused]] struct ccc_romap const *const rom,
-             struct ccc_romap_elem const *const x,
-             struct ccc_romap_elem const *const p,
-             struct ccc_romap_elem const *const y)
+static inline CCC_tribool
+is_11_parent([[maybe_unused]] struct CCC_romap const *const rom,
+             struct CCC_romap_elem const *const x,
+             struct CCC_romap_elem const *const p,
+             struct CCC_romap_elem const *const y)
 {
     assert(p != &rom->end);
     return (!x->parity && p->parity && !y->parity)
@@ -1220,11 +1220,11 @@ is_11_parent([[maybe_unused]] struct ccc_romap const *const rom,
          p
       0╭─┴─╮2
        x   y */
-static inline ccc_tribool
-is_02_parent([[maybe_unused]] struct ccc_romap const *const rom,
-             struct ccc_romap_elem const *const x,
-             struct ccc_romap_elem const *const p,
-             struct ccc_romap_elem const *const y)
+static inline CCC_tribool
+is_02_parent([[maybe_unused]] struct CCC_romap const *const rom,
+             struct CCC_romap_elem const *const x,
+             struct CCC_romap_elem const *const p,
+             struct CCC_romap_elem const *const y)
 {
     assert(p != &rom->end);
     return (x->parity == p->parity) && (p->parity == y->parity);
@@ -1238,18 +1238,18 @@ is_02_parent([[maybe_unused]] struct ccc_romap const *const rom,
          p
       2╭─┴─╮2
        x   y */
-static inline ccc_tribool
-is_22_parent([[maybe_unused]] struct ccc_romap const *const rom,
-             struct ccc_romap_elem const *const x,
-             struct ccc_romap_elem const *const p,
-             struct ccc_romap_elem const *const y)
+static inline CCC_tribool
+is_22_parent([[maybe_unused]] struct CCC_romap const *const rom,
+             struct CCC_romap_elem const *const x,
+             struct CCC_romap_elem const *const p,
+             struct CCC_romap_elem const *const y)
 {
     assert(p != &rom->end);
     return (x->parity == p->parity) && (p->parity == y->parity);
 }
 
 static inline void
-promote(struct ccc_romap const *const rom, struct ccc_romap_elem *const x)
+promote(struct CCC_romap const *const rom, struct CCC_romap_elem *const x)
 {
     if (x != &rom->end)
     {
@@ -1258,7 +1258,7 @@ promote(struct ccc_romap const *const rom, struct ccc_romap_elem *const x)
 }
 
 static inline void
-demote(struct ccc_romap const *const rom, struct ccc_romap_elem *const x)
+demote(struct CCC_romap const *const rom, struct CCC_romap_elem *const x)
 {
     promote(rom, x);
 }
@@ -1267,25 +1267,25 @@ demote(struct ccc_romap const *const rom, struct ccc_romap_elem *const x)
    meaningful, but two parity changes are the same as a no-op. Leave for
    clarity of what the code is meant to do through certain sections. */
 static inline void
-double_promote(struct ccc_romap const *const, struct ccc_romap_elem *const)
+double_promote(struct CCC_romap const *const, struct CCC_romap_elem *const)
 {}
 
 /* One could imagine non-parity based rank tracking making this function
    meaningful, but two parity changes are the same as a no-op. Leave for
    clarity of what the code is meant to do through certain sections. */
 static inline void
-double_demote(struct ccc_romap const *const, struct ccc_romap_elem *const)
+double_demote(struct CCC_romap const *const, struct CCC_romap_elem *const)
 {}
 
-static inline ccc_tribool
-is_leaf(struct ccc_romap const *const rom, struct ccc_romap_elem const *const x)
+static inline CCC_tribool
+is_leaf(struct CCC_romap const *const rom, struct CCC_romap_elem const *const x)
 {
     return x->branch[L] == &rom->end && x->branch[R] == &rom->end;
 }
 
-static inline struct ccc_romap_elem *
-sibling_of([[maybe_unused]] struct ccc_romap const *const rom,
-           struct ccc_romap_elem const *const x)
+static inline struct CCC_romap_elem *
+sibling_of([[maybe_unused]] struct CCC_romap const *const rom,
+           struct CCC_romap_elem const *const x)
 {
     assert(x->parent != &rom->end);
     /* We want the sibling so we need the truthy value to be opposite of x. */
@@ -1299,14 +1299,14 @@ sibling_of([[maybe_unused]] struct ccc_romap const *const rom,
 /** @private */
 struct tree_range
 {
-    struct ccc_romap_elem const *low;
-    struct ccc_romap_elem const *root;
-    struct ccc_romap_elem const *high;
+    struct CCC_romap_elem const *low;
+    struct CCC_romap_elem const *root;
+    struct CCC_romap_elem const *high;
 };
 
 static size_t
-recursive_count(struct ccc_romap const *const rom,
-                struct ccc_romap_elem const *const r)
+recursive_count(struct CCC_romap const *const rom,
+                struct CCC_romap_elem const *const r)
 {
     if (r == &rom->end)
     {
@@ -1316,9 +1316,9 @@ recursive_count(struct ccc_romap const *const rom,
          + recursive_count(rom, r->branch[L]);
 }
 
-static ccc_tribool
-are_subtrees_valid(struct ccc_romap const *t, struct tree_range const r,
-                   struct ccc_romap_elem const *const nil)
+static CCC_tribool
+are_subtrees_valid(struct CCC_romap const *t, struct tree_range const r,
+                   struct CCC_romap_elem const *const nil)
 {
     if (!r.root)
     {
@@ -1354,10 +1354,10 @@ are_subtrees_valid(struct ccc_romap const *t, struct tree_range const r,
                               nil);
 }
 
-static ccc_tribool
-is_storing_parent(struct ccc_romap const *const t,
-                  struct ccc_romap_elem const *const parent,
-                  struct ccc_romap_elem const *const root)
+static CCC_tribool
+is_storing_parent(struct CCC_romap const *const t,
+                  struct CCC_romap_elem const *const parent,
+                  struct CCC_romap_elem const *const root)
 {
     if (root == &t->end)
     {
@@ -1371,8 +1371,8 @@ is_storing_parent(struct ccc_romap const *const t,
         && is_storing_parent(t, root, root->branch[R]);
 }
 
-static ccc_tribool
-validate(struct ccc_romap const *const rom)
+static CCC_tribool
+validate(struct CCC_romap const *const rom)
 {
     if (!rom->end.parity)
     {

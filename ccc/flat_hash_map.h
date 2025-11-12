@@ -84,7 +84,7 @@ at the top of your file.
 #include "ccc/flat_hash_map.h"
 ```
 
-All types and functions can then be written without the `ccc_` prefix. */
+All types and functions can then be written without the `CCC_` prefix. */
 #ifndef CCC_FLAT_HASH_MAP_H
 #define CCC_FLAT_HASH_MAP_H
 
@@ -104,13 +104,13 @@ a contiguous buffer.
 
 A flat hash map can be initialized on the stack, heap, or data segment at
 runtime or compile time. */
-typedef struct ccc_fhmap ccc_flat_hash_map;
+typedef struct CCC_fhmap CCC_flat_hash_map;
 
 /** @brief A container specific entry used to implement the Entry Interface.
 
 The Entry Interface offers efficient search and subsequent insertion, deletion,
 or value update based on the needs of the user. */
-typedef union ccc_fhmap_entry ccc_fhmap_entry;
+typedef union CCC_fhmap_entry CCC_fhmap_entry;
 
 /**@}*/
 
@@ -139,7 +139,7 @@ struct val
     int key;
     int val;
 };
-ccc_fhm_declare_fixed_map(small_fixed_map, struct val, 64);
+CCC_fhm_declare_fixed_map(small_fixed_map, struct val, 64);
 static flat_hash_map static_fh = fhm_init(
     &(static small_fixed_map){},
     struct val,
@@ -160,7 +160,7 @@ struct val
     int key;
     int val;
 };
-ccc_fhm_declare_fixed_map(small_fixed_map, struct val, 64);
+CCC_fhm_declare_fixed_map(small_fixed_map, struct val, 64);
 int main(void)
 {
     flat_hash_map static_fh = fhm_init(
@@ -177,37 +177,37 @@ int main(void)
 }
 ```
 
-The ccc_fhm_fixed_capacity macro can be used to obtain the previously provided
+The CCC_fhm_fixed_capacity macro can be used to obtain the previously provided
 capacity when declaring the fixed map type. Finally, one could allocate a fixed
 size map on the heap; however, it is usually better to initialize a dynamic
-map and use the ccc_fhm_reserve function for such a use case.
+map and use the CCC_fhm_reserve function for such a use case.
 
 This macro is not needed when a dynamic resizing flat hash map is needed. For
 dynamic maps, simply pass NULL and 0 capacity to the initialization macro. */
-#define ccc_fhm_declare_fixed_map(fixed_map_type_name, key_val_type_name,      \
+#define CCC_fhm_declare_fixed_map(fixed_map_type_name, key_val_type_name,      \
                                   capacity)                                    \
-    ccc_impl_fhm_declare_fixed_map(fixed_map_type_name, key_val_type_name,     \
+    CCC_impl_fhm_declare_fixed_map(fixed_map_type_name, key_val_type_name,     \
                                    capacity)
 
 /** @brief Obtain the capacity previously chosen for the fixed size map type.
 @param [in] fixed_map_type_name the name of a previously declared map.
 @return the size_t capacity. This is the full capacity without any load factor
 restrictions. */
-#define ccc_fhm_fixed_capacity(fixed_map_type_name)                            \
-    ccc_impl_fhm_fixed_capacity(fixed_map_type_name)
+#define CCC_fhm_fixed_capacity(fixed_map_type_name)                            \
+    CCC_impl_fhm_fixed_capacity(fixed_map_type_name)
 
 /** @brief Initialize a map with a buffer of types at compile time or runtime.
 @param [in] map_ptr a pointer to a fixed map allocation or NULL.
 @param [in] any_type_name the name of the user defined type stored in the map.
 @param [in] key_field the field of the struct used for key storage.
-@param [in] hash_fn the ccc_any_key_hash_fn function provided by the user.
-@param [in] key_cmp_fn the ccc_any_key_cmp_fn the user intends to use.
+@param [in] hash_fn the CCC_any_key_hash_fn function provided by the user.
+@param [in] key_cmp_fn the CCC_any_key_cmp_fn the user intends to use.
 @param [in] alloc_fn the allocation function for resizing or NULL if no
 resizing is allowed.
 @param [in] aux_data auxiliary data that is needed for hashing or comparison.
 @param [in] capacity the capacity of a fixed size map or 0.
 @return the flat hash map directly initialized on the right hand side of the
-equality operator (i.e. ccc_flat_hash_map fh = ccc_fhm_init(...);)
+equality operator (i.e. CCC_flat_hash_map fh = CCC_fhm_init(...);)
 @note if a dynamic resizing map is required provide NULL as the map_ptr.
 
 Initialize a static fixed size hash map at compile time that has
@@ -257,15 +257,15 @@ static flat_hash_map static_fh = fhm_init(
 
 Initialization at runtime is also possible. Stack-based or dynamic maps are
 identical to the provided examples. Omit `static` in a runtime context. */
-#define ccc_fhm_init(map_ptr, any_type_name, key_field, hash_fn, key_cmp_fn,   \
+#define CCC_fhm_init(map_ptr, any_type_name, key_field, hash_fn, key_cmp_fn,   \
                      alloc_fn, aux_data, capacity)                             \
-    ccc_impl_fhm_init(map_ptr, any_type_name, key_field, hash_fn, key_cmp_fn,  \
+    CCC_impl_fhm_init(map_ptr, any_type_name, key_field, hash_fn, key_cmp_fn,  \
                       alloc_fn, aux_data, capacity)
 
 /** @brief Initialize a dynamic map at runtime from an initializer list.
 @param [in] key_field the field of the struct used for key storage.
-@param [in] hash_fn the ccc_any_key_hash_fn function provided by the user.
-@param [in] key_cmp_fn the ccc_any_key_cmp_fn the user intends to use.
+@param [in] hash_fn the CCC_any_key_hash_fn function provided by the user.
+@param [in] key_cmp_fn the CCC_any_key_cmp_fn the user intends to use.
 @param [in] alloc_fn the required allocation function.
 @param [in] aux_data auxiliary data that is needed for hashing or comparison.
 @param [in] optional_capacity optionally specify the capacity of the map if
@@ -279,7 +279,7 @@ size of the underlying reservation.
 intended to be stored in the map, using array compound literal initialization
 syntax (e.g `(struct my_type[]){{.k = 0, .v 0}, {.k = 1, .v = 1}}`).
 @return the flat hash map directly initialized on the right hand side of the
-equality operator (i.e. ccc_flat_hash_map fh = ccc_fhm_from(...);)
+equality operator (i.e. CCC_flat_hash_map fh = CCC_fhm_from(...);)
 @warning An allocation function is required. This initializer is only available
 for dynamic maps.
 @warning When duplicate keys appear in the initializer list, the last occurrence
@@ -320,23 +320,23 @@ main(void)
 
 Only dynamic maps may be initialized this way due the inability of the hash
 map to protect its invariants from user error at compile time. */
-#define ccc_fhm_from(key_field, hash_fn, key_cmp_fn, alloc_fn, aux_data,       \
+#define CCC_fhm_from(key_field, hash_fn, key_cmp_fn, alloc_fn, aux_data,       \
                      optional_capacity, array_compound_literal...)             \
-    ccc_impl_fhm_from(key_field, hash_fn, key_cmp_fn, alloc_fn, aux_data,      \
+    CCC_impl_fhm_from(key_field, hash_fn, key_cmp_fn, alloc_fn, aux_data,      \
                       optional_capacity, array_compound_literal)
 
 /** @brief Initialize a dynamic map at runtime with at least the specified
 capacity.
 @param [in] type_name the name of the type being stored in the map.
 @param [in] key_field the field of the struct used for key storage.
-@param [in] hash_fn the ccc_any_key_hash_fn function provided by the user.
-@param [in] key_cmp_fn the ccc_any_key_cmp_fn the user intends to use.
+@param [in] hash_fn the CCC_any_key_hash_fn function provided by the user.
+@param [in] key_cmp_fn the CCC_any_key_cmp_fn the user intends to use.
 @param [in] alloc_fn the required allocation function.
 @param [in] aux_data auxiliary data that is needed for hashing or comparison.
 @param [in] capacity the desired capacity for the map. A capacity of 0 results
 in an argument error and is a no-op after the map is initialized empty.
 @return the flat hash map directly initialized on the right hand side of the
-equality operator (i.e. ccc_flat_hash_map fh = ccc_fhm_with_capacity(...);)
+equality operator (i.e. CCC_flat_hash_map fh = CCC_fhm_with_capacity(...);)
 @warning An allocation function is required. This initializer is only available
 for dynamic maps.
 @warning If initialization fails all subsequent queries, insertions, or
@@ -371,9 +371,9 @@ main(void)
 
 Only dynamic maps may be initialized this way as it simply combines the steps
 of initialization and reservation. */
-#define ccc_fhm_with_capacity(type_name, key_field, hash_fn, key_cmp_fn,       \
+#define CCC_fhm_with_capacity(type_name, key_field, hash_fn, key_cmp_fn,       \
                               alloc_fn, aux_data, capacity)                    \
-    ccc_impl_fhm_with_capacity(type_name, key_field, hash_fn, key_cmp_fn,      \
+    CCC_impl_fhm_with_capacity(type_name, key_field, hash_fn, key_cmp_fn,      \
                                alloc_fn, aux_data, capacity)
 
 /** @brief Copy the map at source to destination.
@@ -409,7 +409,7 @@ flat_hash_map src = fhm_init(
     fhmap_key_cmp,
     NULL,
     NULL,
-    ccc_fhm_fixed_capacity(small_fixed_map)
+    CCC_fhm_fixed_capacity(small_fixed_map)
 );
 insert_rand_vals(&src);
 flat_hash_map dst = fhm_init(
@@ -420,9 +420,9 @@ flat_hash_map dst = fhm_init(
     fhmap_key_cmp,
     NULL,
     NULL,
-    ccc_fhm_fixed_capacity(small_fixed_map)
+    CCC_fhm_fixed_capacity(small_fixed_map)
 );
-ccc_result res = fhm_copy(&dst, &src, NULL);
+CCC_result res = fhm_copy(&dst, &src, NULL);
 ```
 
 The above requires dst capacity be greater than or equal to src capacity. Here
@@ -456,7 +456,7 @@ flat_hash_map dst = fhm_init(
     NULL,
     0
 );
-ccc_result res = fhm_copy(&dst, &src, std_alloc);
+CCC_result res = fhm_copy(&dst, &src, std_alloc);
 ```
 
 The above allows dst to have a capacity less than that of the src as long as
@@ -492,7 +492,7 @@ flat_hash_map dst = fhm_init(
     NULL,
     0
 );
-ccc_result res = fhm_copy(&dst, &src, std_alloc);
+CCC_result res = fhm_copy(&dst, &src, std_alloc);
 ```
 
 The above sets up dst with fixed size while src is a dynamic map. Because an
@@ -504,8 +504,8 @@ size dynamic maps are required.
 
 These options allow users to stay consistent across containers with their
 memory management strategies. */
-ccc_result ccc_fhm_copy(ccc_flat_hash_map *dst, ccc_flat_hash_map const *src,
-                        ccc_any_alloc_fn *fn);
+CCC_result CCC_fhm_copy(CCC_flat_hash_map *dst, CCC_flat_hash_map const *src,
+                        CCC_any_alloc_fn *fn);
 
 /** @brief Reserve space required to add a specified number of elements to the
 map. If the current capacity is sufficient, do nothing.
@@ -522,8 +522,8 @@ code to indicate the specific failure.
 
 If the map has already been initialized with allocation permission simply
 provide the same function that was passed upon initialization. */
-ccc_result ccc_fhm_reserve(ccc_flat_hash_map *h, size_t to_add,
-                           ccc_any_alloc_fn *fn);
+CCC_result CCC_fhm_reserve(CCC_flat_hash_map *h, size_t to_add,
+                           CCC_any_alloc_fn *fn);
 
 /**@}*/
 
@@ -536,14 +536,14 @@ Test membership or obtain references to stored user types directly. */
 @param [in] key pointer to the key matching the key type of the user struct.
 @return true if the struct containing key is stored, false if not. Error if h or
 key is NULL. */
-[[nodiscard]] ccc_tribool ccc_fhm_contains(ccc_flat_hash_map const *h,
+[[nodiscard]] CCC_tribool CCC_fhm_contains(CCC_flat_hash_map const *h,
                                            void const *key);
 
 /** @brief Returns a reference into the table at entry key.
 @param [in] h the flat hash map to search.
 @param [in] key the key to search matching stored key type.
 @return a view of the table entry if it is present, else NULL. */
-[[nodiscard]] void *ccc_fhm_get_key_val(ccc_flat_hash_map const *h,
+[[nodiscard]] void *CCC_fhm_get_key_val(CCC_flat_hash_map const *h,
                                         void const *key);
 
 /**@}*/
@@ -568,7 +568,7 @@ where in the table such an element should be inserted.
 
 An entry is rarely useful on its own. It should be passed in a functional style
 to subsequent calls in the Entry Interface.*/
-[[nodiscard]] ccc_fhmap_entry ccc_fhm_entry(ccc_flat_hash_map *h,
+[[nodiscard]] CCC_fhmap_entry CCC_fhm_entry(CCC_flat_hash_map *h,
                                             void const *key);
 
 /** @brief Obtains an entry for the provided key in the table for future use.
@@ -587,10 +587,10 @@ where in the table such an element should be inserted.
 
 An entry is most often passed in a functional style to subsequent calls in the
 Entry Interface.*/
-#define ccc_fhm_entry_r(map_ptr, key_ptr)                                      \
-    &(ccc_fhmap_entry)                                                         \
+#define CCC_fhm_entry_r(map_ptr, key_ptr)                                      \
+    &(CCC_fhmap_entry)                                                         \
     {                                                                          \
-        ccc_fhm_entry(map_ptr, key_ptr).impl                                   \
+        CCC_fhm_entry(map_ptr, key_ptr).impl                                   \
     }
 
 /** @brief Modifies the provided entry if it is Occupied.
@@ -600,10 +600,10 @@ Entry Interface.*/
 
 This function is intended to make the function chaining in the Entry Interface
 more succinct if the entry will be modified in place based on its own value
-without the need of the auxiliary argument a ccc_any_type_update_fn can provide.
+without the need of the auxiliary argument a CCC_any_type_update_fn can provide.
 */
-[[nodiscard]] ccc_fhmap_entry *ccc_fhm_and_modify(ccc_fhmap_entry *e,
-                                                  ccc_any_type_update_fn *fn);
+[[nodiscard]] CCC_fhmap_entry *CCC_fhm_and_modify(CCC_fhmap_entry *e,
+                                                  CCC_any_type_update_fn *fn);
 
 /** @brief Modifies the provided entry if it is Occupied.
 @param [in] e the entry obtained from an entry function or macro.
@@ -611,10 +611,10 @@ without the need of the auxiliary argument a ccc_any_type_update_fn can provide.
 @param [in] aux auxiliary data required for the update.
 @return the updated entry if it was Occupied or the unmodified vacant entry.
 
-This function makes full use of a ccc_any_type_update_fn capability, meaning a
-complete ccc_update object will be passed to the update function callback. */
-[[nodiscard]] ccc_fhmap_entry *
-ccc_fhm_and_modify_aux(ccc_fhmap_entry *e, ccc_any_type_update_fn *fn,
+This function makes full use of a CCC_any_type_update_fn capability, meaning a
+complete CCC_update object will be passed to the update function callback. */
+[[nodiscard]] CCC_fhmap_entry *
+CCC_fhm_and_modify_aux(CCC_fhmap_entry *e, CCC_any_type_update_fn *fn,
                        void *aux);
 
 /** @brief Modify an Occupied entry with a closure over user type T.
@@ -641,10 +641,10 @@ word *w = fhm_or_insert_w(fhm_and_modify_w(entry_r(&fhm, &k), word,
 Note that any code written is only evaluated if the entry is Occupied and the
 container can deliver the user type T. This means any function calls are lazily
 evaluated in the closure scope. */
-#define ccc_fhm_and_modify_w(map_entry_ptr, type_name, closure_over_T...)      \
-    &(ccc_fhmap_entry)                                                         \
+#define CCC_fhm_and_modify_w(map_entry_ptr, type_name, closure_over_T...)      \
+    &(CCC_fhmap_entry)                                                         \
     {                                                                          \
-        ccc_impl_fhm_and_modify_w(map_entry_ptr, type_name, closure_over_T)    \
+        CCC_impl_fhm_and_modify_w(map_entry_ptr, type_name, closure_over_T)    \
     }
 
 /** @brief Inserts the struct with handle elem if the entry is Vacant.
@@ -656,7 +656,7 @@ Because this functions takes an entry and inserts if it is Vacant, the only
 reason NULL shall be returned is when an insertion error will occur, usually
 due to a resizing memory error. This can happen if the table is not allowed
 to resize because no allocation function is provided. */
-[[nodiscard]] void *ccc_fhm_or_insert(ccc_fhmap_entry const *e,
+[[nodiscard]] void *CCC_fhm_or_insert(CCC_fhmap_entry const *e,
                                       void const *key_val_type);
 
 /** @brief lazily insert the desired key value into the entry if it is Vacant.
@@ -670,8 +670,8 @@ is not allowed.
 
 Note that if the compound literal uses any function calls to generate values
 or other data, such functions will not be called if the entry is Occupied. */
-#define ccc_fhm_or_insert_w(map_entry_ptr, lazy_key_value...)                  \
-    ccc_impl_fhm_or_insert_w(map_entry_ptr, lazy_key_value)
+#define CCC_fhm_or_insert_w(map_entry_ptr, lazy_key_value...)                  \
+    CCC_impl_fhm_or_insert_w(map_entry_ptr, lazy_key_value)
 
 /** @brief Inserts the provided entry invariantly.
 @param [in] e the entry returned from a call obtaining an entry.
@@ -684,7 +684,7 @@ This method can be used when the old value in the table does not need to
 be preserved. See the regular insert method if the old value is of interest.
 If an error occurs during the insertion process due to memory limitations
 or a search error NULL is returned. Otherwise insertion should not fail. */
-[[nodiscard]] void *ccc_fhm_insert_entry(ccc_fhmap_entry const *e,
+[[nodiscard]] void *CCC_fhm_insert_entry(CCC_fhmap_entry const *e,
                                          void const *key_val_type);
 
 /** @brief write the contents of the compound literal lazy_key_value to a slot.
@@ -692,8 +692,8 @@ or a search error NULL is returned. Otherwise insertion should not fail. */
 @param [in] lazy_key_value the compound literal to write to a new slot.
 @return a reference to the newly inserted or overwritten user type. NULL is
 returned if resizing is required but fails or is not allowed. */
-#define ccc_fhm_insert_entry_w(map_entry_ptr, lazy_key_value...)               \
-    ccc_impl_fhm_insert_entry_w(map_entry_ptr, lazy_key_value)
+#define CCC_fhm_insert_entry_w(map_entry_ptr, lazy_key_value...)               \
+    CCC_impl_fhm_insert_entry_w(map_entry_ptr, lazy_key_value)
 
 /** @brief Invariantly inserts the key value wrapping out_handle.
 @param [in] h the pointer to the flat hash map.
@@ -706,7 +706,7 @@ needed but allocation fails or has been forbidden, an insert error is set.
 Note that this function may write to the struct containing the second parameter
 and wraps it in an entry to provide information about the old value. */
 [[nodiscard]]
-ccc_entry ccc_fhm_swap_entry(ccc_flat_hash_map *h, void *key_val_type_output);
+CCC_entry CCC_fhm_swap_entry(CCC_flat_hash_map *h, void *key_val_type_output);
 
 /** @brief Invariantly inserts the key value wrapping out_handle.
 @param [in] map_ptr the pointer to the flat hash map.
@@ -719,27 +719,27 @@ forbidden, an insert error is set.
 
 Note that this function may write to the struct containing the second parameter
 and wraps it in an entry to provide information about the old value. */
-#define ccc_fhm_swap_entry_r(map_ptr, key_val_type_ptr)                        \
-    &(ccc_entry)                                                               \
+#define CCC_fhm_swap_entry_r(map_ptr, key_val_type_ptr)                        \
+    &(CCC_entry)                                                               \
     {                                                                          \
-        ccc_fhm_swap_entry(map_ptr, key_val_type_ptr).impl                     \
+        CCC_fhm_swap_entry(map_ptr, key_val_type_ptr).impl                     \
     }
 
 /** @brief Remove the entry from the table if Occupied.
 @param [in] e a pointer to the table entry.
 @return an entry containing NULL. If Occupied an entry in the table existed and
 was removed. If Vacant, no prior entry existed to be removed. */
-[[nodiscard]] ccc_entry ccc_fhm_remove_entry(ccc_fhmap_entry const *e);
+[[nodiscard]] CCC_entry CCC_fhm_remove_entry(CCC_fhmap_entry const *e);
 
 /** @brief Remove the entry from the table if Occupied.
 @param [in] map_entry_ptr a pointer to the table entry.
 @return a compound liter to an entry containing NULL. If Occupied an entry in
 the table existed and was removed. If Vacant, no prior entry existed to be
 removed. */
-#define ccc_fhm_remove_entry_r(map_entry_ptr)                                  \
-    &(ccc_entry)                                                               \
+#define CCC_fhm_remove_entry_r(map_entry_ptr)                                  \
+    &(CCC_entry)                                                               \
     {                                                                          \
-        ccc_fhm_remove_entry(map_entry_ptr).impl                               \
+        CCC_fhm_remove_entry(map_entry_ptr).impl                               \
     }
 
 /** @brief Attempts to insert the key value wrapping key_val_handle
@@ -752,7 +752,7 @@ allocation fails or has been forbidden, an insert error is set.
 @warning because this function returns a reference to a user type in the table
 any subsequent insertions or deletions invalidate this reference. */
 [[nodiscard]]
-ccc_entry ccc_fhm_try_insert(ccc_flat_hash_map *h, void const *key_val_type);
+CCC_entry CCC_fhm_try_insert(CCC_flat_hash_map *h, void const *key_val_type);
 
 /** @brief Attempts to insert the key value wrapping key_val_handle_ptr.
 @param [in] map_ptr the pointer to the flat hash map.
@@ -764,10 +764,10 @@ entry in the table. If more space is needed but allocation fails or has been
 forbidden, an insert error is set.
 @warning because this function returns a reference to a user type in the table
 any subsequent insertions or deletions invalidate this reference. */
-#define ccc_fhm_try_insert_r(map_ptr, key_val_type_ptr)                        \
-    &(ccc_entry)                                                               \
+#define CCC_fhm_try_insert_r(map_ptr, key_val_type_ptr)                        \
+    &(CCC_entry)                                                               \
     {                                                                          \
-        ccc_fhm_try_insert(map_ptr, key_val_type_ptr).impl                     \
+        CCC_fhm_try_insert(map_ptr, key_val_type_ptr).impl                     \
     }
 
 /** @brief lazily insert lazy_value into the map at key if key is absent.
@@ -785,10 +785,10 @@ key argument, you will overwrite adjacent bytes of your struct.
 Note that for brevity and convenience the user need not write the key to the
 lazy value compound literal as well. This function ensures the key in the
 compound literal matches the searched key. */
-#define ccc_fhm_try_insert_w(map_ptr, key, lazy_value...)                      \
-    &(ccc_entry)                                                               \
+#define CCC_fhm_try_insert_w(map_ptr, key, lazy_value...)                      \
+    &(CCC_entry)                                                               \
     {                                                                          \
-        ccc_impl_fhm_try_insert_w(map_ptr, key, lazy_value)                    \
+        CCC_impl_fhm_try_insert_w(map_ptr, key, lazy_value)                    \
     }
 
 /** @brief Invariantly inserts or overwrites a user struct into the table.
@@ -800,7 +800,7 @@ Vacant no prior table entry existed.
 Note that this function can be used when the old user type is not needed but
 the information regarding its presence is helpful. */
 [[nodiscard]]
-ccc_entry ccc_fhm_insert_or_assign(ccc_flat_hash_map *h,
+CCC_entry CCC_fhm_insert_or_assign(CCC_flat_hash_map *h,
                                    void const *key_val_type);
 
 /** @brief Invariantly inserts or overwrites a user struct into the table.
@@ -811,10 +811,10 @@ overwritten by the new key value. If Vacant no prior table entry existed.
 
 Note that this function can be used when the old user type is not needed but
 the information regarding its presence is helpful. */
-#define ccc_fhm_insert_or_assign_r(map_ptr, key_val_type_ptr)                  \
-    &(ccc_entry)                                                               \
+#define CCC_fhm_insert_or_assign_r(map_ptr, key_val_type_ptr)                  \
+    &(CCC_entry)                                                               \
     {                                                                          \
-        ccc_fhm_insert_or_assign(map_ptr, key_val_type_ptr).impl               \
+        CCC_fhm_insert_or_assign(map_ptr, key_val_type_ptr).impl               \
     }
 
 /** @brief Inserts a new key value pair or overwrites the existing entry.
@@ -829,10 +829,10 @@ occurs that prevents insertion. An insertion error will flag such a case.
 Note that for brevity and convenience the user need not write the key to the
 lazy value compound literal as well. This function ensures the key in the
 compound literal matches the searched key. */
-#define ccc_fhm_insert_or_assign_w(map_ptr, key, lazy_value...)                \
-    &(ccc_entry)                                                               \
+#define CCC_fhm_insert_or_assign_w(map_ptr, key, lazy_value...)                \
+    &(CCC_entry)                                                               \
     {                                                                          \
-        ccc_impl_fhm_insert_or_assign_w(map_ptr, key, lazy_value)              \
+        CCC_impl_fhm_insert_or_assign_w(map_ptr, key, lazy_value)              \
     }
 
 /** @brief Removes the key value in the map storing the old value, if present,
@@ -847,7 +847,7 @@ to the provided space.
 
 Note that this function may write to the struct containing the second parameter
 and wraps it in an entry to provide information about the old value. */
-[[nodiscard]] ccc_entry ccc_fhm_remove(ccc_flat_hash_map *h,
+[[nodiscard]] CCC_entry CCC_fhm_remove(CCC_flat_hash_map *h,
                                        void *key_val_type_output);
 
 /** @brief Removes the key value in the map storing the old value, if present,
@@ -863,21 +863,21 @@ because the data has been written to the provided space.
 
 Note that this function may write to the struct containing the second parameter
 and wraps it in an entry to provide information about the old value. */
-#define ccc_fhm_remove_r(map_ptr, key_val_type_output_ptr)                     \
-    &(ccc_entry)                                                               \
+#define CCC_fhm_remove_r(map_ptr, key_val_type_output_ptr)                     \
+    &(CCC_entry)                                                               \
     {                                                                          \
-        ccc_fhm_remove(map_ptr, key_val_type_output_ptr).impl                  \
+        CCC_fhm_remove(map_ptr, key_val_type_output_ptr).impl                  \
     }
 
 /** @brief Unwraps the provided entry to obtain a view into the table element.
 @param [in] e the entry from a query to the table via function or macro.
 @return an view into the table entry if one is present, or NULL. */
-[[nodiscard]] void *ccc_fhm_unwrap(ccc_fhmap_entry const *e);
+[[nodiscard]] void *CCC_fhm_unwrap(CCC_fhmap_entry const *e);
 
 /** @brief Returns the Vacant or Occupied status of the entry.
 @param [in] e the entry from a query to the table via function or macro.
 @return true if the entry is occupied, false if not. Error if e is NULL. */
-[[nodiscard]] ccc_tribool ccc_fhm_occupied(ccc_fhmap_entry const *e);
+[[nodiscard]] CCC_tribool CCC_fhm_occupied(CCC_fhmap_entry const *e);
 
 /** @brief Provides the status of the entry should an insertion follow.
 @param [in] e the entry from a query to the table via function or macro.
@@ -894,7 +894,7 @@ is used, it will not work if resizing has failed and the return of those
 functions will indicate such a failure. One can also confirm an insertion error
 will occur from an entry with this function. For example, leaving this function
 in an assert for debug builds can be a helpful sanity check. */
-[[nodiscard]] ccc_tribool ccc_fhm_insert_error(ccc_fhmap_entry const *e);
+[[nodiscard]] CCC_tribool CCC_fhm_insert_error(CCC_fhmap_entry const *e);
 
 /** @brief Obtain the entry status from a container entry.
 @param [in] e a pointer to the entry.
@@ -903,9 +903,9 @@ container completes. If e is NULL an entry input error is returned so ensure
 e is non-NULL to avoid an inaccurate status returned.
 
 Note that this function can be useful for debugging or if more detailed
-messages are needed for logging purposes. See ccc_entry_status_msg() in
+messages are needed for logging purposes. See CCC_entry_status_msg() in
 ccc/types.h for more information on detailed entry statuses. */
-[[nodiscard]] ccc_entry_status ccc_fhm_entry_status(ccc_fhmap_entry const *e);
+[[nodiscard]] CCC_entry_status CCC_fhm_entry_status(CCC_fhmap_entry const *e);
 
 /**@}*/
 
@@ -920,7 +920,7 @@ maintenance is required on the elements in the table before their slots are
 forfeit.
 
 If NULL is passed as the destructor function time is O(1), else O(capacity). */
-ccc_result ccc_fhm_clear(ccc_flat_hash_map *h, ccc_any_type_destructor_fn *fn);
+CCC_result CCC_fhm_clear(CCC_flat_hash_map *h, CCC_any_type_destructor_fn *fn);
 
 /** @brief Frees all slots in the table and frees the underlying buffer.
 @param [in] h the table to be cleared.
@@ -930,8 +930,8 @@ forfeit.
 @return the result of free operation. If no alloc function is provided it is
 an error to attempt to free the buffer and a memory error is returned.
 Otherwise, an OK result is returned. */
-ccc_result ccc_fhm_clear_and_free(ccc_flat_hash_map *h,
-                                  ccc_any_type_destructor_fn *fn);
+CCC_result CCC_fhm_clear_and_free(CCC_flat_hash_map *h,
+                                  CCC_any_type_destructor_fn *fn);
 
 /** @brief Frees all slots in the table and frees the underlying buffer that was
 previously dynamically reserved with the reserve function.
@@ -945,7 +945,7 @@ the allocation function when called.
 @return the result of free operation. CCC_RESULT_OK if success, or an error
 status to indicate the error.
 @warning It is an error to call this function on a map that was not reserved
-with the provided ccc_any_alloc_fn. The map must have existing memory to free.
+with the provided CCC_any_alloc_fn. The map must have existing memory to free.
 
 This function covers the edge case of reserving a dynamic capacity for a map
 at runtime but denying the map allocation permission to resize. This can help
@@ -958,11 +958,11 @@ map has no ability to free itself. Just as the allocation function is required
 to reserve memory so to is it required to free memory.
 
 This function will work normally if called on a map with allocation permission
-however the normal ccc_fhm_clear_and_free is sufficient for that use case. */
-ccc_result
-ccc_fhm_clear_and_free_reserve(ccc_flat_hash_map *h,
-                               ccc_any_type_destructor_fn *destructor,
-                               ccc_any_alloc_fn *alloc);
+however the normal CCC_fhm_clear_and_free is sufficient for that use case. */
+CCC_result
+CCC_fhm_clear_and_free_reserve(CCC_flat_hash_map *h,
+                               CCC_any_type_destructor_fn *destructor,
+                               CCC_any_alloc_fn *alloc);
 
 /**@}*/
 
@@ -978,7 +978,7 @@ resizing occurs which would lead to undefined behavior. O(capacity).
 
 Iteration starts from index 0 by capacity of the table so iteration order is
 not obvious to the user, nor should any specific order be relied on. */
-[[nodiscard]] void *ccc_fhm_begin(ccc_flat_hash_map const *h);
+[[nodiscard]] void *CCC_fhm_begin(CCC_flat_hash_map const *h);
 
 /** @brief Advances the iterator to the next occupied table slot.
 @param [in] h the table being iterated upon.
@@ -986,14 +986,14 @@ not obvious to the user, nor should any specific order be relied on. */
 @return a pointer that can be cast directly to the user type that is stored.
 @warning erasing or inserting during iteration may invalidate iterators if
 resizing occurs which would lead to undefined behavior. O(capacity). */
-[[nodiscard]] void *ccc_fhm_next(ccc_flat_hash_map const *h,
+[[nodiscard]] void *CCC_fhm_next(CCC_flat_hash_map const *h,
                                  void const *key_val_type_iter);
 
 /** @brief Check the current iterator against the end for loop termination.
 @param [in] h the table being iterated upon.
 @return the end address of the hash table.
 @warning It is undefined behavior to access or modify the end address. */
-[[nodiscard]] void *ccc_fhm_end(ccc_flat_hash_map const *h);
+[[nodiscard]] void *CCC_fhm_end(CCC_flat_hash_map const *h);
 
 /**@}*/
 
@@ -1004,75 +1004,75 @@ Obtain the container state. */
 /** @brief Returns the size status of the table.
 @param [in] h the hash table.
 @return true if empty else false. Error if h is NULL. */
-[[nodiscard]] ccc_tribool ccc_fhm_is_empty(ccc_flat_hash_map const *h);
+[[nodiscard]] CCC_tribool CCC_fhm_is_empty(CCC_flat_hash_map const *h);
 
 /** @brief Returns the count of table occupied slots.
 @param [in] h the hash table.
 @return the size of the map or an argument error is set if h is NULL. */
-[[nodiscard]] ccc_ucount ccc_fhm_count(ccc_flat_hash_map const *h);
+[[nodiscard]] CCC_ucount CCC_fhm_count(CCC_flat_hash_map const *h);
 
 /** @brief Return the full capacity of the backing storage.
 @param [in] h the hash table.
 @return the capacity of the map or an argument error is set if h is NULL. */
-[[nodiscard]] ccc_ucount ccc_fhm_capacity(ccc_flat_hash_map const *h);
+[[nodiscard]] CCC_ucount CCC_fhm_capacity(CCC_flat_hash_map const *h);
 
 /** @brief Validation of invariants for the hash table.
 @param [in] h the table to validate.
 @return true if all invariants hold, false if corruption occurs. Error if h is
 NULL. */
-[[nodiscard]] ccc_tribool ccc_fhm_validate(ccc_flat_hash_map const *h);
+[[nodiscard]] CCC_tribool CCC_fhm_validate(CCC_flat_hash_map const *h);
 
 /**@}*/
 
 /** Define this preprocessor directive if shorter names are helpful. Ensure
  no namespace clashes occur before shortening. */
 #ifdef FLAT_HASH_MAP_USING_NAMESPACE_CCC
-typedef ccc_flat_hash_map flat_hash_map;
-typedef ccc_fhmap_entry fhmap_entry;
-#    define fhm_declare_fixed_map(args...) ccc_fhm_declare_fixed_map(args)
-#    define fhm_fixed_capacity(args...) ccc_fhm_fixed_capacity(args)
-#    define fhm_reserve(args...) ccc_fhm_reserve(args)
-#    define fhm_init(args...) ccc_fhm_init(args)
-#    define fhm_from(args...) ccc_fhm_from(args)
-#    define fhm_with_capacity(args...) ccc_fhm_with_capacity(args)
-#    define fhm_copy(args...) ccc_fhm_copy(args)
-#    define fhm_and_modify_w(args...) ccc_fhm_and_modify_w(args)
-#    define fhm_or_insert_w(args...) ccc_fhm_or_insert_w(args)
-#    define fhm_insert_entry_w(args...) ccc_fhm_insert_entry_w(args)
-#    define fhm_try_insert_w(args...) ccc_fhm_try_insert_w(args)
-#    define fhm_insert_or_assign_w(args...) ccc_fhm_insert_or_assign_w(args)
-#    define fhm_contains(args...) ccc_fhm_contains(args)
-#    define fhm_get_key_val(args...) ccc_fhm_get_key_val(args)
-#    define fhm_remove_r(args...) ccc_fhm_remove_r(args)
-#    define fhm_swap_entry_r(args...) ccc_fhm_swap_entry_r(args)
-#    define fhm_try_insert_r(args...) ccc_fhm_try_insert_r(args)
-#    define fhm_insert_or_assign_r(args...) ccc_fhm_insert_or_assign_r(args)
-#    define fhm_remove_entry_r(args...) ccc_fhm_remove_entry_r(args)
-#    define fhm_remove(args...) ccc_fhm_remove(args)
-#    define fhm_swap_entry(args...) ccc_fhm_swap_entry(args)
-#    define fhm_try_insert(args...) ccc_fhm_try_insert(args)
-#    define fhm_insert_or_assign(args...) ccc_fhm_insert_or_assign(args)
-#    define fhm_remove_entry(args...) ccc_fhm_remove_entry(args)
-#    define fhm_entry_r(args...) ccc_fhm_entry_r(args)
-#    define fhm_entry(args...) ccc_fhm_entry(args)
-#    define fhm_and_modify(args...) ccc_fhm_and_modify(args)
-#    define fhm_and_modify_aux(args...) ccc_fhm_and_modify_aux(args)
-#    define fhm_or_insert(args...) ccc_fhm_or_insert(args)
-#    define fhm_insert_entry(args...) ccc_fhm_insert_entry(args)
-#    define fhm_unwrap(args...) ccc_fhm_unwrap(args)
-#    define fhm_occupied(args...) ccc_fhm_occupied(args)
-#    define fhm_insert_error(args...) ccc_fhm_insert_error(args)
-#    define fhm_begin(args...) ccc_fhm_begin(args)
-#    define fhm_next(args...) ccc_fhm_next(args)
-#    define fhm_end(args...) ccc_fhm_end(args)
-#    define fhm_is_empty(args...) ccc_fhm_is_empty(args)
-#    define fhm_count(args...) ccc_fhm_count(args)
-#    define fhm_clear(args...) ccc_fhm_clear(args)
-#    define fhm_clear_and_free(args...) ccc_fhm_clear_and_free(args)
+typedef CCC_flat_hash_map flat_hash_map;
+typedef CCC_fhmap_entry fhmap_entry;
+#    define fhm_declare_fixed_map(args...) CCC_fhm_declare_fixed_map(args)
+#    define fhm_fixed_capacity(args...) CCC_fhm_fixed_capacity(args)
+#    define fhm_reserve(args...) CCC_fhm_reserve(args)
+#    define fhm_init(args...) CCC_fhm_init(args)
+#    define fhm_from(args...) CCC_fhm_from(args)
+#    define fhm_with_capacity(args...) CCC_fhm_with_capacity(args)
+#    define fhm_copy(args...) CCC_fhm_copy(args)
+#    define fhm_and_modify_w(args...) CCC_fhm_and_modify_w(args)
+#    define fhm_or_insert_w(args...) CCC_fhm_or_insert_w(args)
+#    define fhm_insert_entry_w(args...) CCC_fhm_insert_entry_w(args)
+#    define fhm_try_insert_w(args...) CCC_fhm_try_insert_w(args)
+#    define fhm_insert_or_assign_w(args...) CCC_fhm_insert_or_assign_w(args)
+#    define fhm_contains(args...) CCC_fhm_contains(args)
+#    define fhm_get_key_val(args...) CCC_fhm_get_key_val(args)
+#    define fhm_remove_r(args...) CCC_fhm_remove_r(args)
+#    define fhm_swap_entry_r(args...) CCC_fhm_swap_entry_r(args)
+#    define fhm_try_insert_r(args...) CCC_fhm_try_insert_r(args)
+#    define fhm_insert_or_assign_r(args...) CCC_fhm_insert_or_assign_r(args)
+#    define fhm_remove_entry_r(args...) CCC_fhm_remove_entry_r(args)
+#    define fhm_remove(args...) CCC_fhm_remove(args)
+#    define fhm_swap_entry(args...) CCC_fhm_swap_entry(args)
+#    define fhm_try_insert(args...) CCC_fhm_try_insert(args)
+#    define fhm_insert_or_assign(args...) CCC_fhm_insert_or_assign(args)
+#    define fhm_remove_entry(args...) CCC_fhm_remove_entry(args)
+#    define fhm_entry_r(args...) CCC_fhm_entry_r(args)
+#    define fhm_entry(args...) CCC_fhm_entry(args)
+#    define fhm_and_modify(args...) CCC_fhm_and_modify(args)
+#    define fhm_and_modify_aux(args...) CCC_fhm_and_modify_aux(args)
+#    define fhm_or_insert(args...) CCC_fhm_or_insert(args)
+#    define fhm_insert_entry(args...) CCC_fhm_insert_entry(args)
+#    define fhm_unwrap(args...) CCC_fhm_unwrap(args)
+#    define fhm_occupied(args...) CCC_fhm_occupied(args)
+#    define fhm_insert_error(args...) CCC_fhm_insert_error(args)
+#    define fhm_begin(args...) CCC_fhm_begin(args)
+#    define fhm_next(args...) CCC_fhm_next(args)
+#    define fhm_end(args...) CCC_fhm_end(args)
+#    define fhm_is_empty(args...) CCC_fhm_is_empty(args)
+#    define fhm_count(args...) CCC_fhm_count(args)
+#    define fhm_clear(args...) CCC_fhm_clear(args)
+#    define fhm_clear_and_free(args...) CCC_fhm_clear_and_free(args)
 #    define fhm_clear_and_free_reserve(args...)                                \
-        ccc_fhm_clear_and_free_reserve(args)
-#    define fhm_capacity(args...) ccc_fhm_capacity(args)
-#    define fhm_validate(args...) ccc_fhm_validate(args)
+        CCC_fhm_clear_and_free_reserve(args)
+#    define fhm_capacity(args...) CCC_fhm_capacity(args)
+#    define fhm_validate(args...) CCC_fhm_validate(args)
 #endif
 
 #endif /* CCC_FLAT_HASH_MAP_H */

@@ -21,8 +21,8 @@ cmp_ints(void const *const lhs, void const *const rhs)
     return (lhs_int > rhs_int) - (lhs_int < rhs_int);
 }
 
-static ccc_threeway_cmp
-ccc_cmp_ints(ccc_any_type_cmp const cmp)
+static CCC_threeway_cmp
+CCC_cmp_ints(CCC_any_type_cmp const cmp)
 {
     int const lhs_int = *(int *)cmp.any_type_lhs;
     int const rhs_int = *(int *)cmp.any_type_rhs;
@@ -108,7 +108,7 @@ CHECK_BEGIN_STATIC_FN(buf_test_push_sort)
     iota(buf_begin(&b), BUF_SORT_CAP, 0);
     rand_shuffle(buf_sizeof_type(&b).count, buf_begin(&b), buf_count(&b).count,
                  &(int){0});
-    (void)sort(&b, ccc_cmp_ints, &(int){0});
+    (void)sort(&b, CCC_cmp_ints, &(int){0});
     int prev = INT_MIN;
     size_t count = 0;
     for (int const *i = buf_begin(&b); i != buf_end(&b); i = buf_next(&b, i))
@@ -134,7 +134,7 @@ CHECK_BEGIN_STATIC_FN(buf_test_insert_no_alloc)
     int const *const three = buf_insert(&b, 2, &(int){3});
     CHECK(three != NULL, CCC_TRUE);
     CHECK(*three, 3);
-    ccc_threeway_cmp cmp
+    CCC_threeway_cmp cmp
         = bufcmp(&b, BUFINSCAP - 2, (int[BUFINSCAP - 2]){1, 2, 3, 4, 5});
     CHECK(cmp, CCC_EQL);
     CHECK(buf_count(&b).count, BUFINSCAP - 2);
@@ -172,7 +172,7 @@ CHECK_BEGIN_STATIC_FN(buf_test_insert_no_alloc_fail)
 CHECK_BEGIN_STATIC_FN(buf_test_insert_alloc)
 {
     buffer b = buf_init(NULL, int, std_alloc, NULL, 0);
-    ccc_result r = buf_reserve(&b, 6, std_alloc);
+    CCC_result r = buf_reserve(&b, 6, std_alloc);
     CHECK(r, CCC_RESULT_OK);
     r = append_range(&b, 6, (int[6]){1, 2, 4, 5, 6, 7});
     CHECK(r, CCC_RESULT_OK);
@@ -180,7 +180,7 @@ CHECK_BEGIN_STATIC_FN(buf_test_insert_alloc)
     int const *const three = buf_insert(&b, 2, &(int){3});
     CHECK(three != NULL, CCC_TRUE);
     CHECK(*three, 3);
-    ccc_threeway_cmp cmp = bufcmp(&b, 7, (int[7]){1, 2, 3, 4, 5, 6, 7});
+    CCC_threeway_cmp cmp = bufcmp(&b, 7, (int[7]){1, 2, 3, 4, 5, 6, 7});
     CHECK(cmp, CCC_EQL);
     CHECK(buf_count(&b).count, 7);
     int const *const zero = buf_insert(&b, 0, &(int){0});

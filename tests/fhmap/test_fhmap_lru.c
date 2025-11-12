@@ -21,8 +21,8 @@ The leetcode lru problem in C. */
 
 struct lru_cache
 {
-    ccc_flat_hash_map fh;
-    ccc_doubly_linked_list l;
+    CCC_flat_hash_map fh;
+    CCC_doubly_linked_list l;
     size_t cap;
 };
 
@@ -71,16 +71,16 @@ static bool const quiet = true;
     }                                                                          \
     while (0)
 
-static ccc_threeway_cmp
-lru_lookup_cmp(ccc_any_key_cmp const cmp)
+static CCC_threeway_cmp
+lru_lookup_cmp(CCC_any_key_cmp const cmp)
 {
     struct lru_lookup const *const rhs = cmp.any_type_rhs;
     int const lhs = *((int *)cmp.any_key_lhs);
     return (lhs > rhs->key) - (lhs < rhs->key);
 }
 
-static ccc_threeway_cmp
-cmp_by_key(ccc_any_type_cmp const cmp)
+static CCC_threeway_cmp
+cmp_by_key(CCC_any_type_cmp const cmp)
 {
     struct key_val const *const kv_a = cmp.any_type_lhs;
     struct key_val const *const kv_b = cmp.any_type_rhs;
@@ -113,13 +113,13 @@ static struct lru_cache lru_cache = {
 CHECK_BEGIN_STATIC_FN(lru_put, struct lru_cache *const lru, int const key,
                       int const val)
 {
-    ccc_fhmap_entry *const ent = entry_r(&lru->fh, &key);
+    CCC_fhmap_entry *const ent = entry_r(&lru->fh, &key);
     if (occupied(ent))
     {
         struct lru_lookup const *const found = unwrap(ent);
         found->kv_in_list->key = key;
         found->kv_in_list->val = val;
-        ccc_result r = dll_splice(&lru->l, dll_begin_elem(&lru->l), &lru->l,
+        CCC_result r = dll_splice(&lru->l, dll_begin_elem(&lru->l), &lru->l,
                                   &found->kv_in_list->list_elem);
         CHECK(r, CCC_RESULT_OK);
     }
@@ -135,7 +135,7 @@ CHECK_BEGIN_STATIC_FN(lru_put, struct lru_cache *const lru, int const key,
         {
             struct key_val const *const to_drop = back(&lru->l);
             CHECK(to_drop == NULL, false);
-            ccc_entry const e = remove_entry(entry_r(&lru->fh, &to_drop->key));
+            CCC_entry const e = remove_entry(entry_r(&lru->fh, &to_drop->key));
             CHECK(occupied(&e), true);
             (void)pop_back(&lru->l);
         }
@@ -154,7 +154,7 @@ CHECK_BEGIN_STATIC_FN(lru_get, struct lru_cache *const lru, int const key,
     }
     else
     {
-        ccc_result r = dll_splice(&lru->l, dll_begin_elem(&lru->l), &lru->l,
+        CCC_result r = dll_splice(&lru->l, dll_begin_elem(&lru->l), &lru->l,
                                   &found->kv_in_list->list_elem);
         CHECK(r, CCC_RESULT_OK);
         *val = found->kv_in_list->val;
@@ -219,7 +219,7 @@ CHECK_BEGIN_STATIC_FN(run_lru_cache)
         }
     }
     CHECK_END_FN({
-        (void)ccc_fhm_clear_and_free(&lru_cache.fh, NULL);
+        (void)CCC_fhm_clear_and_free(&lru_cache.fh, NULL);
         (void)dll_clear(&lru_cache.l, NULL);
     });
 }

@@ -8,8 +8,8 @@
 #include "traits.h"
 #include "types.h"
 
-ccc_threeway_cmp
-val_cmp(ccc_any_type_cmp const cmp)
+CCC_threeway_cmp
+val_cmp(CCC_any_type_cmp const cmp)
 {
     struct val const *const lhs = cmp.any_type_lhs;
     struct val const *const rhs = cmp.any_type_rhs;
@@ -17,13 +17,13 @@ val_cmp(ccc_any_type_cmp const cmp)
 }
 
 void
-val_update(ccc_any_type const u)
+val_update(CCC_any_type const u)
 {
     struct val *const old = u.any_type;
     old->val = *(int *)u.aux;
 }
 
-CHECK_BEGIN_FN(insert_shuffled, ccc_priority_queue *ppq, struct val vals[],
+CHECK_BEGIN_FN(insert_shuffled, CCC_priority_queue *ppq, struct val vals[],
                size_t const size, int const larger_prime)
 {
     /* Math magic ahead so that we iterate over every index
@@ -45,12 +45,12 @@ CHECK_BEGIN_FN(insert_shuffled, ccc_priority_queue *ppq, struct val vals[],
 }
 
 /* Iterative inorder traversal to check the heap is sorted. */
-CHECK_BEGIN_FN(inorder_fill, int vals[], size_t size, ccc_priority_queue *ppq)
+CHECK_BEGIN_FN(inorder_fill, int vals[], size_t size, CCC_priority_queue *ppq)
 {
     CHECK(count(ppq).count, size);
     size_t i = 0;
-    ccc_priority_queue copy
-        = ccc_pq_init(struct val, elem, ccc_pq_order(ppq), val_cmp, NULL, NULL);
+    CCC_priority_queue copy
+        = CCC_pq_init(struct val, elem, CCC_pq_order(ppq), val_cmp, NULL, NULL);
     while (!is_empty(ppq))
     {
         struct val *const front = front(ppq);

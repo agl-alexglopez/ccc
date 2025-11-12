@@ -43,7 +43,7 @@ at the top of your file.
 #define HANDLE_ORDERED_MAP_USING_NAMESPACE_CCC
 ```
 
-All types and functions can then be written without the `ccc_` prefix. */
+All types and functions can then be written without the `CCC_` prefix. */
 #ifndef CCC_HANDLE_ORDERED_MAP_H
 #define CCC_HANDLE_ORDERED_MAP_H
 
@@ -64,13 +64,13 @@ insert, and erase.
 
 A handle ordered map can be initialized on the stack, heap, or data segment at
 runtime or compile time.*/
-typedef struct ccc_homap ccc_handle_ordered_map;
+typedef struct CCC_homap CCC_handle_ordered_map;
 
 /** @brief A container specific handle used to implement the Handle Interface.
 
 The Handle Interface offers efficient search and subsequent insertion, deletion,
 or value update based on the needs of the user. */
-typedef union ccc_homap_handle ccc_homap_handle;
+typedef union CCC_homap_handle CCC_homap_handle;
 
 /**@}*/
 
@@ -98,7 +98,7 @@ struct val
     int key;
     int val;
 };
-ccc_hom_declare_fixed_map(small_fixed_map, struct val, 64);
+CCC_hom_declare_fixed_map(small_fixed_map, struct val, 64);
 static handle_ordered_map static_map = hom_init(
     &(static small_fixed_map){},
     struct val,
@@ -118,7 +118,7 @@ struct val
     int key;
     int val;
 };
-ccc_hom_declare_fixed_map(small_fixed_map, struct val, 64);
+CCC_hom_declare_fixed_map(small_fixed_map, struct val, 64);
 int main(void)
 {
     handle_ordered_map static_fh = hom_init(
@@ -134,24 +134,24 @@ int main(void)
 }
 ```
 
-The ccc_hom_fixed_capacity macro can be used to obtain the previously provided
+The CCC_hom_fixed_capacity macro can be used to obtain the previously provided
 capacity when declaring the fixed map type. Finally, one could allocate a fixed
 size map on the heap; however, it is usually better to initialize a dynamic
-map and use the ccc_hom_reserve function for such a use case.
+map and use the CCC_hom_reserve function for such a use case.
 
 This macro is not needed when a dynamic resizing map is needed. For dynamic
 maps, pass NULL and 0 capacity to the initialization macro along with the
 desired allocation function. */
-#define ccc_hom_declare_fixed_map(fixed_map_type_name, key_val_type_name,      \
+#define CCC_hom_declare_fixed_map(fixed_map_type_name, key_val_type_name,      \
                                   capacity)                                    \
-    ccc_impl_hom_declare_fixed_map(fixed_map_type_name, key_val_type_name,     \
+    CCC_impl_hom_declare_fixed_map(fixed_map_type_name, key_val_type_name,     \
                                    capacity)
 
 /** @brief Obtain the capacity previously chosen for the fixed size map type.
 @param [in] fixed_map_type_name the name of a previously declared map.
 @return the size_t capacity previously specified for this type by user. */
-#define ccc_hom_fixed_capacity(fixed_map_type_name)                            \
-    ccc_impl_hom_fixed_capacity(fixed_map_type_name)
+#define CCC_hom_fixed_capacity(fixed_map_type_name)                            \
+    CCC_impl_hom_fixed_capacity(fixed_map_type_name)
 
 /** @brief Initializes the map at runtime or compile time.
 @param [in] memory_ptr a pointer to the contiguous user types or ((T *)NULL).
@@ -163,10 +163,10 @@ desired allocation function. */
 destruction.
 @param [in] capacity the capacity at mem_ptr or 0.
 @return the struct initialized ordered map for direct assignment
-(i.e. ccc_handle_ordered_map m = ccc_hom_init(...);). */
-#define ccc_hom_init(memory_ptr, any_type_name, key_elem_field, key_cmp_fn,    \
+(i.e. CCC_handle_ordered_map m = CCC_hom_init(...);). */
+#define CCC_hom_init(memory_ptr, any_type_name, key_elem_field, key_cmp_fn,    \
                      alloc_fn, aux_data, capacity)                             \
-    ccc_impl_hom_init(memory_ptr, any_type_name, key_elem_field, key_cmp_fn,   \
+    CCC_impl_hom_init(memory_ptr, any_type_name, key_elem_field, key_cmp_fn,   \
                       alloc_fn, aux_data, capacity)
 
 /** @brief Copy the map at source to destination.
@@ -193,7 +193,7 @@ struct val
     int key;
     int val;
 };
-ccc_hom_declare_fixed_map(small_fixed_map, struct val, 64);
+CCC_hom_declare_fixed_map(small_fixed_map, struct val, 64);
 static handle_realtime_ordered_map src = hom_init(
     &(static small_fixed_map){},
     struct val,
@@ -213,7 +213,7 @@ static handle_realtime_ordered_map dst = hom_init(
     NULL,
     hom_fixed_capacity(small_fixed_map)
 );
-ccc_result res = hom_copy(&dst, &src, NULL);
+CCC_result res = hom_copy(&dst, &src, NULL);
 ```
 
 The above requires dst capacity be greater than or equal to src capacity. Here
@@ -231,7 +231,7 @@ static handle_ordered_map src
 insert_rand_vals(&src);
 static handle_ordered_map dst
     = hom_init(NULL, struct val, key, key_cmp, std_alloc, NULL, 0);
-ccc_result res = hom_copy(&dst, &src, std_alloc);
+CCC_result res = hom_copy(&dst, &src, std_alloc);
 ```
 
 The above allows dst to have a capacity less than that of the src as long as
@@ -251,7 +251,7 @@ static handle_ordered_map src
 insert_rand_vals(&src);
 static handle_ordered_map dst
     = hom_init(NULL, struct val, key, key_cmp, NULL, NULL, 0);
-ccc_result res = hom_copy(&dst, &src, std_alloc);
+CCC_result res = hom_copy(&dst, &src, std_alloc);
 ```
 
 The above sets up dst with fixed size while src is a dynamic map. Because an
@@ -263,9 +263,9 @@ copying between maps without allocation permission.
 
 These options allow users to stay consistent across containers with their
 memory management strategies. */
-ccc_result ccc_hom_copy(ccc_handle_ordered_map *dst,
-                        ccc_handle_ordered_map const *src,
-                        ccc_any_alloc_fn *fn);
+CCC_result CCC_hom_copy(CCC_handle_ordered_map *dst,
+                        CCC_handle_ordered_map const *src,
+                        CCC_any_alloc_fn *fn);
 
 /** @brief Reserves space for at least to_add more elements.
 @param [in] hom a pointer to the handle ordered map.
@@ -273,7 +273,7 @@ ccc_result ccc_hom_copy(ccc_handle_ordered_map *dst,
 @param [in] fn the allocation function to use to reserve memory.
 @return the result of the reservation. OK if successful, otherwise an error
 status is returned.
-@note see the ccc_hom_clear_and_free_reserve function if this function is
+@note see the CCC_hom_clear_and_free_reserve function if this function is
 being used for a one-time dynamic reservation.
 
 This function can be used for a dynamic hom with or without allocation
@@ -283,9 +283,9 @@ space and later resize if more space is needed.
 If the hom has been initialized with no allocation permission and no memory
 this function can serve as a one-time reservation. This is helpful when a fixed
 size is needed but that size is only known dynamically at runtime. To free the
-hom in such a case see the ccc_hom_clear_and_free_reserve function. */
-ccc_result ccc_hom_reserve(ccc_handle_ordered_map *hom, size_t to_add,
-                           ccc_any_alloc_fn *fn);
+hom in such a case see the CCC_hom_clear_and_free_reserve function. */
+CCC_result CCC_hom_reserve(CCC_handle_ordered_map *hom, size_t to_add,
+                           CCC_any_alloc_fn *fn);
 
 /**@}*/
 
@@ -304,7 +304,7 @@ old one has been removed that new element data will be returned.
 @warning do not try to access data in the table manually with a handle.
 Always use this provided interface function when a reference to data is
 needed. */
-[[nodiscard]] void *ccc_hom_at(ccc_handle_ordered_map const *h, ccc_handle_i i);
+[[nodiscard]] void *CCC_hom_at(CCC_handle_ordered_map const *h, CCC_handle_i i);
 
 /** @brief Returns a reference to the user type in the table at the handle.
 @param [in] handle_ordered_map_ptr a pointer to the map.
@@ -312,22 +312,22 @@ needed. */
 @param [in] handle_i the index handle obtained from previous map operations.
 @return a reference to the handle at handle in the map as the type the user has
 stored in the map. */
-#define ccc_hom_as(handle_ordered_map_ptr, type_name, handle_i...)             \
-    ccc_impl_hom_as(handle_ordered_map_ptr, type_name, handle_i)
+#define CCC_hom_as(handle_ordered_map_ptr, type_name, handle_i...)             \
+    CCC_impl_hom_as(handle_ordered_map_ptr, type_name, handle_i)
 
 /** @brief Searches the map for the presence of key.
 @param [in] hom the map to be searched.
 @param [in] key pointer to the key matching the key type of the user struct.
 @return true if the struct containing key is stored, false if not. Error if hom
 or key is NULL. */
-[[nodiscard]] ccc_tribool ccc_hom_contains(ccc_handle_ordered_map *hom,
+[[nodiscard]] CCC_tribool CCC_hom_contains(CCC_handle_ordered_map *hom,
                                            void const *key);
 
 /** @brief Returns a reference into the map at handle key.
 @param [in] hom the ordered map to search.
 @param [in] key the key to search matching stored key type.
 @return a view of the map handle if it is present, else NULL. */
-[[nodiscard]] ccc_handle_i ccc_hom_get_key_val(ccc_handle_ordered_map *hom,
+[[nodiscard]] CCC_handle_i CCC_hom_get_key_val(CCC_handle_ordered_map *hom,
                                                void const *key);
 
 /**@}*/
@@ -347,7 +347,7 @@ is needed but allocation fails or has been forbidden, an insert error is set.
 
 Note that this function may write to the struct containing key_val_output and
 wraps it in a handle to provide information about the old value. */
-[[nodiscard]] ccc_handle ccc_hom_swap_handle(ccc_handle_ordered_map *hom,
+[[nodiscard]] CCC_handle CCC_hom_swap_handle(CCC_handle_ordered_map *hom,
                                              void *key_val_output);
 
 /** @brief Invariantly inserts the key value wrapping key_val_type.
@@ -361,10 +361,10 @@ forbidden, an insert error is set.
 
 Note that this function may write to the struct containing key_val_output and
 wraps it in a handle to provide information about the old value. */
-#define ccc_hom_swap_handle_r(handle_ordered_map_ptr, key_val_output_ptr)      \
-    &(ccc_handle)                                                              \
+#define CCC_hom_swap_handle_r(handle_ordered_map_ptr, key_val_output_ptr)      \
+    &(CCC_handle)                                                              \
     {                                                                          \
-        ccc_hom_swap_handle((handle_ordered_map_ptr), (key_val_output_ptr))    \
+        CCC_hom_swap_handle((handle_ordered_map_ptr), (key_val_output_ptr))    \
             .impl                                                              \
     }
 
@@ -375,7 +375,7 @@ wraps it in a handle to provide information about the old value. */
 user type in the map and may be unwrapped. If Vacant the handle contains a
 reference to the newly inserted handle in the map. If more space is needed but
 allocation fails, an insert error is set. */
-[[nodiscard]] ccc_handle ccc_hom_try_insert(ccc_handle_ordered_map *hom,
+[[nodiscard]] CCC_handle CCC_hom_try_insert(CCC_handle_ordered_map *hom,
                                             void const *key_val_type);
 
 /** @brief Attempts to insert the key value wrapping key_val_type.
@@ -385,10 +385,10 @@ allocation fails, an insert error is set. */
 contains a reference to the key value user type in the map and may be unwrapped.
 If Vacant the handle contains a reference to the newly inserted handle in the
 map. If more space is needed but allocation fails an insert error is set. */
-#define ccc_hom_try_insert_r(handle_ordered_map_ptr, key_val_type_ptr)         \
-    &(ccc_handle)                                                              \
+#define CCC_hom_try_insert_r(handle_ordered_map_ptr, key_val_type_ptr)         \
+    &(CCC_handle)                                                              \
     {                                                                          \
-        ccc_hom_try_insert((handle_ordered_map_ptr), (key_val_type_ptr)).impl  \
+        CCC_hom_try_insert((handle_ordered_map_ptr), (key_val_type_ptr)).impl  \
     }
 
 /** @brief lazily insert lazy_value into the map at key if key is absent.
@@ -403,10 +403,10 @@ occurs that prevents insertion. An insertion error will flag such a case.
 Note that for brevity and convenience the user need not write the key to the
 lazy value compound literal as well. This function ensures the key in the
 compound literal matches the searched key. */
-#define ccc_hom_try_insert_w(handle_ordered_map_ptr, key, lazy_value...)       \
-    &(ccc_handle)                                                              \
+#define CCC_hom_try_insert_w(handle_ordered_map_ptr, key, lazy_value...)       \
+    &(CCC_handle)                                                              \
     {                                                                          \
-        ccc_impl_hom_try_insert_w(handle_ordered_map_ptr, key, lazy_value)     \
+        CCC_impl_hom_try_insert_w(handle_ordered_map_ptr, key, lazy_value)     \
     }
 
 /** @brief Invariantly inserts or overwrites a user struct into the map.
@@ -417,7 +417,7 @@ If Vacant no prior map handle existed.
 
 Note that this function can be used when the old user type is not needed but
 the information regarding its presence is helpful. */
-[[nodiscard]] ccc_handle ccc_hom_insert_or_assign(ccc_handle_ordered_map *hom,
+[[nodiscard]] CCC_handle CCC_hom_insert_or_assign(CCC_handle_ordered_map *hom,
                                                   void const *key_val_type);
 
 /** @brief Inserts a new key value pair or overwrites the existing handle.
@@ -432,10 +432,10 @@ occurs that prevents insertion. An insertion error will flag such a case.
 Note that for brevity and convenience the user need not write the key to the
 lazy value compound literal as well. This function ensures the key in the
 compound literal matches the searched key. */
-#define ccc_hom_insert_or_assign_w(handle_ordered_map_ptr, key, lazy_value...) \
-    &(ccc_handle)                                                              \
+#define CCC_hom_insert_or_assign_w(handle_ordered_map_ptr, key, lazy_value...) \
+    &(CCC_handle)                                                              \
     {                                                                          \
-        ccc_impl_hom_insert_or_assign_w(handle_ordered_map_ptr, key,           \
+        CCC_impl_hom_insert_or_assign_w(handle_ordered_map_ptr, key,           \
                                         lazy_value)                            \
     }
 
@@ -449,7 +449,7 @@ bad input is provided an input error is set.
 
 Note that this function may write to the struct containing the second parameter
 and wraps it in a handle to provide information about the old value. */
-[[nodiscard]] ccc_handle ccc_hom_remove(ccc_handle_ordered_map *hom,
+[[nodiscard]] CCC_handle CCC_hom_remove(CCC_handle_ordered_map *hom,
                                         void *key_val_output);
 
 /** @brief Removes the key value in the map storing the old value, if present,
@@ -462,10 +462,10 @@ not stored in the map. If bad input is provided an input error is set.
 
 Note that this function may write to the struct containing the second parameter
 and wraps it in a handle to provide information about the old value. */
-#define ccc_hom_remove_r(handle_ordered_map_ptr, key_val_output_ptr)           \
-    &(ccc_handle)                                                              \
+#define CCC_hom_remove_r(handle_ordered_map_ptr, key_val_output_ptr)           \
+    &(CCC_handle)                                                              \
     {                                                                          \
-        ccc_hom_remove((handle_ordered_map_ptr), (key_val_output_ptr)).impl    \
+        CCC_hom_remove((handle_ordered_map_ptr), (key_val_output_ptr)).impl    \
     }
 
 /** @brief Obtains a handle for the provided key in the map for future use.
@@ -483,7 +483,7 @@ where in the map such an element should be inserted.
 
 a handle is rarely useful on its own. It should be passed in a functional style
 to subsequent calls in the Handle Interface. */
-[[nodiscard]] ccc_homap_handle ccc_hom_handle(ccc_handle_ordered_map *hom,
+[[nodiscard]] CCC_homap_handle CCC_hom_handle(CCC_handle_ordered_map *hom,
                                               void const *key);
 
 /** @brief Obtains a handle for the provided key in the map for future use.
@@ -501,10 +501,10 @@ where in the map such an element should be inserted.
 
 a handle is rarely useful on its own. It should be passed in a functional style
 to subsequent calls in the Handle Interface. */
-#define ccc_hom_handle_r(handle_ordered_map_ptr, key_ptr)                      \
-    &(ccc_homap_handle)                                                        \
+#define CCC_hom_handle_r(handle_ordered_map_ptr, key_ptr)                      \
+    &(CCC_homap_handle)                                                        \
     {                                                                          \
-        ccc_hom_handle((handle_ordered_map_ptr), (key_ptr)).impl               \
+        CCC_hom_handle((handle_ordered_map_ptr), (key_ptr)).impl               \
     }
 
 /** @brief Modifies the provided handle if it is Occupied.
@@ -514,10 +514,10 @@ to subsequent calls in the Handle Interface. */
 
 This function is intended to make the function chaining in the Handle Interface
 more succinct if the handle will be modified in place based on its own value
-without the need of the auxiliary argument a ccc_any_type_update_fn can provide.
+without the need of the auxiliary argument a CCC_any_type_update_fn can provide.
 */
-[[nodiscard]] ccc_homap_handle *ccc_hom_and_modify(ccc_homap_handle *h,
-                                                   ccc_any_type_update_fn *fn);
+[[nodiscard]] CCC_homap_handle *CCC_hom_and_modify(CCC_homap_handle *h,
+                                                   CCC_any_type_update_fn *fn);
 
 /** @brief Modifies the provided handle if it is Occupied.
 @param [in] h the handle obtained from a handle function or macro.
@@ -525,10 +525,10 @@ without the need of the auxiliary argument a ccc_any_type_update_fn can provide.
 @param [in] aux auxiliary data required for the update.
 @return the updated handle if it was Occupied or the unmodified vacant handle.
 
-This function makes full use of a ccc_any_type_update_fn capability, meaning a
-complete ccc_update object will be passed to the update function callback. */
-[[nodiscard]] ccc_homap_handle *
-ccc_hom_and_modify_aux(ccc_homap_handle *h, ccc_any_type_update_fn *fn,
+This function makes full use of a CCC_any_type_update_fn capability, meaning a
+complete CCC_update object will be passed to the update function callback. */
+[[nodiscard]] CCC_homap_handle *
+CCC_hom_and_modify_aux(CCC_homap_handle *h, CCC_any_type_update_fn *fn,
                        void *aux);
 
 /** @brief Modify an Occupied handle with a closure over user type T.
@@ -557,11 +557,11 @@ handle_i w = hom_or_insert_w(hom_and_modify_w(handle_r(&hom, &k), word,
 Note that any code written is only evaluated if the handle is Occupied and the
 container can deliver the user type T. This means any function calls are lazily
 evaluated in the closure scope. */
-#define ccc_hom_and_modify_w(handle_ordered_map_handle_ptr, type_name,         \
+#define CCC_hom_and_modify_w(handle_ordered_map_handle_ptr, type_name,         \
                              closure_over_T...)                                \
-    &(ccc_homap_handle)                                                        \
+    &(CCC_homap_handle)                                                        \
     {                                                                          \
-        ccc_impl_hom_and_modify_w(handle_ordered_map_handle_ptr, type_name,    \
+        CCC_impl_hom_and_modify_w(handle_ordered_map_handle_ptr, type_name,    \
                                   closure_over_T)                              \
     }
 
@@ -576,7 +576,7 @@ a user struct allocation failure.
 
 If no allocation is permitted, this function assumes the user struct wrapping
 elem has been allocated with the appropriate lifetime and scope by the user. */
-[[nodiscard]] ccc_handle_i ccc_hom_or_insert(ccc_homap_handle const *h,
+[[nodiscard]] CCC_handle_i CCC_hom_or_insert(CCC_homap_handle const *h,
                                              void const *key_val_type);
 
 /** @brief Lazily insert the desired key value into the handle if it is Vacant.
@@ -590,8 +590,8 @@ is not allowed.
 
 Note that if the compound literal uses any function calls to generate values
 or other data, such functions will not be called if the handle is Occupied. */
-#define ccc_hom_or_insert_w(handle_ordered_map_handle_ptr, lazy_key_value...)  \
-    ccc_impl_hom_or_insert_w(handle_ordered_map_handle_ptr, lazy_key_value)
+#define CCC_hom_or_insert_w(handle_ordered_map_handle_ptr, lazy_key_value...)  \
+    CCC_impl_hom_or_insert_w(handle_ordered_map_handle_ptr, lazy_key_value)
 
 /** @brief Inserts the provided handle invariantly.
 @param [in] h the handle returned from a call obtaining a handle.
@@ -600,7 +600,7 @@ or other data, such functions will not be called if the handle is Occupied. */
 
 This method can be used when the old value in the map does not need to
 be preserved. See the regular insert method if the old value is of interest. */
-[[nodiscard]] ccc_handle_i ccc_hom_insert_handle(ccc_homap_handle const *h,
+[[nodiscard]] CCC_handle_i CCC_hom_insert_handle(CCC_homap_handle const *h,
                                                  void const *key_val_type);
 
 /** @brief Write the contents of the compound literal lazy_key_value to a node.
@@ -608,44 +608,44 @@ be preserved. See the regular insert method if the old value is of interest. */
 @param [in] lazy_key_value the compound literal to write to a new slot.
 @return a reference to the newly inserted or overwritten user type. NULL is
 returned if allocation failed or is not allowed when required. */
-#define ccc_hom_insert_handle_w(handle_ordered_map_handle_ptr,                 \
+#define CCC_hom_insert_handle_w(handle_ordered_map_handle_ptr,                 \
                                 lazy_key_value...)                             \
-    ccc_impl_hom_insert_handle_w(handle_ordered_map_handle_ptr, lazy_key_value)
+    CCC_impl_hom_insert_handle_w(handle_ordered_map_handle_ptr, lazy_key_value)
 
 /** @brief Remove the handle from the map if Occupied.
 @param [in] h a pointer to the map handle.
 @return a handle containing no valid reference but information about removed
 element. If Occupied a handle in the map existed and was removed. If Vacant, no
 prior handle existed to be removed. */
-[[nodiscard]] ccc_handle ccc_hom_remove_handle(ccc_homap_handle *h);
+[[nodiscard]] CCC_handle CCC_hom_remove_handle(CCC_homap_handle *h);
 
 /** @brief Remove the handle from the map if Occupied.
 @param [in] handle_ordered_map_handle_ptr a pointer to the map handle.
 @return a compound literal reference containing no valid reference but
 information about the old handle. If Occupied a handle in the map existed and
 was removed. If Vacant, no prior handle existed to be removed. */
-#define ccc_hom_remove_handle_r(handle_ordered_map_handle_ptr)                 \
-    &(ccc_handle)                                                              \
+#define CCC_hom_remove_handle_r(handle_ordered_map_handle_ptr)                 \
+    &(CCC_handle)                                                              \
     {                                                                          \
-        ccc_hom_remove_handle((handle_ordered_map_handle_ptr)).impl            \
+        CCC_hom_remove_handle((handle_ordered_map_handle_ptr)).impl            \
     }
 
 /** @brief Unwraps the provided handle to obtain a view into the map element.
 @param [in] h the handle from a query to the map via function or macro.
 @return a view into the table handle if one is present, or NULL. */
-[[nodiscard]] ccc_handle_i ccc_hom_unwrap(ccc_homap_handle const *h);
+[[nodiscard]] CCC_handle_i CCC_hom_unwrap(CCC_homap_handle const *h);
 
 /** @brief Returns the Vacant or Occupied status of the handle.
 @param [in] h the handle from a query to the map via function or macro.
 @return true if the handle is occupied, false if not. Error if h is NULL. */
-[[nodiscard]] ccc_tribool ccc_hom_occupied(ccc_homap_handle const *h);
+[[nodiscard]] CCC_tribool CCC_hom_occupied(CCC_homap_handle const *h);
 
 /** @brief Provides the status of the handle should an insertion follow.
 @param [in] h the handle from a query to the table via function or macro.
 @return true if a handle obtained from an insertion attempt failed to insert
 due to an allocation failure when allocation success was expected. Error if h is
 NULL. */
-[[nodiscard]] ccc_tribool ccc_hom_insert_error(ccc_homap_handle const *h);
+[[nodiscard]] CCC_tribool CCC_hom_insert_error(CCC_homap_handle const *h);
 
 /** @brief Obtain the handle status from a container handle.
 @param [in] h a pointer to the handle.
@@ -654,10 +654,10 @@ container completes. If h is NULL a handle input error is returned so ensure
 e is non-NULL to avoid an inaccurate status returned.
 
 Note that this function can be useful for debugging or if more detailed
-messages are needed for logging purposes. See ccc_handle_status_msg() in
+messages are needed for logging purposes. See CCC_handle_status_msg() in
 ccc/types.h for more information on detailed handle statuses. */
-[[nodiscard]] ccc_handle_status
-ccc_hom_handle_status(ccc_homap_handle const *h);
+[[nodiscard]] CCC_handle_status
+CCC_hom_handle_status(CCC_homap_handle const *h);
 
 /**@}*/
 
@@ -685,7 +685,7 @@ for (struct val *i = range_begin(&range);
 
 This avoids any possible errors in handling an end range element that is in the
 map versus the end map sentinel. */
-[[nodiscard]] ccc_range ccc_hom_equal_range(ccc_handle_ordered_map *hom,
+[[nodiscard]] CCC_range CCC_hom_equal_range(CCC_handle_ordered_map *hom,
                                             void const *begin_key,
                                             void const *end_key);
 
@@ -695,11 +695,11 @@ O(lg N).
 @param [in] begin_and_end_key_ptrs pointers to the begin and end of the range.
 @return a compound literal reference to the produced range associated with the
 enclosing scope. This reference is always be valid. */
-#define ccc_hom_equal_range_r(handle_ordered_map_ptr,                          \
+#define CCC_hom_equal_range_r(handle_ordered_map_ptr,                          \
                               begin_and_end_key_ptrs...)                       \
-    &(ccc_range)                                                               \
+    &(CCC_range)                                                               \
     {                                                                          \
-        ccc_hom_equal_range(handle_ordered_map_ptr, begin_and_end_key_ptrs)    \
+        CCC_hom_equal_range(handle_ordered_map_ptr, begin_and_end_key_ptrs)    \
             .impl                                                              \
     }
 
@@ -723,7 +723,7 @@ for (struct val *i = rrange_begin(&rrange);
 
 This avoids any possible errors in handling an rend rrange element that is in
 the map versus the end map sentinel. */
-[[nodiscard]] ccc_rrange ccc_hom_equal_rrange(ccc_handle_ordered_map *hom,
+[[nodiscard]] CCC_rrange CCC_hom_equal_rrange(CCC_handle_ordered_map *hom,
                                               void const *rbegin_key,
                                               void const *rend_key);
 
@@ -734,11 +734,11 @@ O(lg N).
 range.
 @return a compound literal reference to the produced rrange associated with the
 enclosing scope. This reference is always valid. */
-#define ccc_hom_equal_rrange_r(handle_ordered_map_ptr,                         \
+#define CCC_hom_equal_rrange_r(handle_ordered_map_ptr,                         \
                                rbegin_and_rend_key_ptrs...)                    \
-    &(ccc_rrange)                                                              \
+    &(CCC_rrange)                                                              \
     {                                                                          \
-        ccc_hom_equal_rrange(handle_ordered_map_ptr, rbegin_and_rend_key_ptrs) \
+        CCC_hom_equal_rrange(handle_ordered_map_ptr, rbegin_and_rend_key_ptrs) \
             .impl                                                              \
     }
 
@@ -746,20 +746,20 @@ enclosing scope. This reference is always valid. */
 O(lg N).
 @param [in] hom a pointer to the map.
 @return the oldest minimum element of the map. */
-[[nodiscard]] void *ccc_hom_begin(ccc_handle_ordered_map const *hom);
+[[nodiscard]] void *CCC_hom_begin(CCC_handle_ordered_map const *hom);
 
 /** @brief Return the start of a reverse inorder traversal of the map.
 Amortized O(lg N).
 @param [in] hom a pointer to the map.
 @return the oldest maximum element of the map. */
-[[nodiscard]] void *ccc_hom_rbegin(ccc_handle_ordered_map const *hom);
+[[nodiscard]] void *CCC_hom_rbegin(CCC_handle_ordered_map const *hom);
 
 /** @brief Return the next element in an inorder traversal of the map. O(1).
 @param [in] hom a pointer to the map.
 @param [in] iter_handle a pointer to the intrusive map element of the
 current iterator.
 @return the next user type stored in the map in an inorder traversal. */
-[[nodiscard]] void *ccc_hom_next(ccc_handle_ordered_map const *hom,
+[[nodiscard]] void *CCC_hom_next(CCC_handle_ordered_map const *hom,
                                  void const *iter_handle);
 
 /** @brief Return the rnext element in a reverse inorder traversal of the map.
@@ -768,18 +768,18 @@ O(1).
 @param [in] iter_handle a pointer to the intrusive map element of the
 current iterator.
 @return the rnext user type stored in the map in a reverse inorder traversal. */
-[[nodiscard]] void *ccc_hom_rnext(ccc_handle_ordered_map const *hom,
+[[nodiscard]] void *CCC_hom_rnext(CCC_handle_ordered_map const *hom,
                                   void const *iter_handle);
 
 /** @brief Return the end of an inorder traversal of the map. O(1).
 @param [in] hom a pointer to the map.
 @return the newest maximum element of the map. */
-[[nodiscard]] void *ccc_hom_end(ccc_handle_ordered_map const *hom);
+[[nodiscard]] void *CCC_hom_end(CCC_handle_ordered_map const *hom);
 
 /** @brief Return the rend of a reverse inorder traversal of the map. O(1).
 @param [in] hom a pointer to the map.
 @return the newest minimum element of the map. */
-[[nodiscard]] void *ccc_hom_rend(ccc_handle_ordered_map const *hom);
+[[nodiscard]] void *CCC_hom_rend(CCC_handle_ordered_map const *hom);
 
 /**@}*/
 
@@ -794,8 +794,8 @@ maintenance is required on the elements in the map before their slots are
 forfeit.
 
 If NULL is passed as the destructor function time is O(1), else O(size). */
-ccc_result ccc_hom_clear(ccc_handle_ordered_map *hom,
-                         ccc_any_type_destructor_fn *fn);
+CCC_result CCC_hom_clear(CCC_handle_ordered_map *hom,
+                         CCC_any_type_destructor_fn *fn);
 
 /** @brief Frees all slots in the map and frees the underlying buffer.
 @param [in] hom the map to be cleared.
@@ -807,8 +807,8 @@ an error to attempt to free the buffer and a memory error is returned.
 Otherwise, an OK result is returned.
 
 If NULL is passed as the destructor function time is O(1), else O(size). */
-ccc_result ccc_hom_clear_and_free(ccc_handle_ordered_map *hom,
-                                  ccc_any_type_destructor_fn *fn);
+CCC_result CCC_hom_clear_and_free(CCC_handle_ordered_map *hom,
+                                  CCC_any_type_destructor_fn *fn);
 
 /** @brief Frees all slots in the hom and frees the underlying buffer that was
 previously dynamically reserved with the reserve function.
@@ -822,7 +822,7 @@ the allocation function when called.
 @return the result of free operation. OK if success, or an error status to
 indicate the error.
 @warning It is an error to call this function on a hom that was not reserved
-with the provided ccc_any_alloc_fn. The hom must have existing memory to free.
+with the provided CCC_any_alloc_fn. The hom must have existing memory to free.
 
 This function covers the edge case of reserving a dynamic capacity for a hom
 at runtime but denying the hom allocation permission to resize. This can help
@@ -835,11 +835,11 @@ hom has no ability to free itself. Just as the allocation function is required
 to reserve memory so to is it required to free memory.
 
 This function will work normally if called on a hom with allocation permission
-however the normal ccc_hom_clear_and_free is sufficient for that use case. */
-ccc_result
-ccc_hom_clear_and_free_reserve(ccc_handle_ordered_map *hom,
-                               ccc_any_type_destructor_fn *destructor,
-                               ccc_any_alloc_fn *alloc);
+however the normal CCC_hom_clear_and_free is sufficient for that use case. */
+CCC_result
+CCC_hom_clear_and_free_reserve(CCC_handle_ordered_map *hom,
+                               CCC_any_type_destructor_fn *destructor,
+                               CCC_any_alloc_fn *alloc);
 
 /**@}*/
 
@@ -850,76 +850,76 @@ Obtain the container state. */
 /** @brief Returns the count of map occupied slots.
 @param [in] hom the map.
 @return the size of the map or an argument error is set if hom is NULL. */
-[[nodiscard]] ccc_ucount ccc_hom_count(ccc_handle_ordered_map const *hom);
+[[nodiscard]] CCC_ucount CCC_hom_count(CCC_handle_ordered_map const *hom);
 
 /** @brief Returns the capacity of the map representing total possible slots.
 @param [in] hom the map.
 @return the capacity or an argument error is set if hom is NULL. */
-[[nodiscard]] ccc_ucount ccc_hom_capacity(ccc_handle_ordered_map const *hom);
+[[nodiscard]] CCC_ucount CCC_hom_capacity(CCC_handle_ordered_map const *hom);
 
 /** @brief Returns the size status of the map.
 @param [in] hom the map.
 @return true if empty else false. Error if hom is NULL. */
-[[nodiscard]] ccc_tribool ccc_hom_is_empty(ccc_handle_ordered_map const *hom);
+[[nodiscard]] CCC_tribool CCC_hom_is_empty(CCC_handle_ordered_map const *hom);
 
 /** @brief Validation of invariants for the map.
 @param [in] hom the map to validate.
 @return true if all invariants hold, false if corruption occurs. Error if home
 is NULL.  */
-[[nodiscard]] ccc_tribool ccc_hom_validate(ccc_handle_ordered_map const *hom);
+[[nodiscard]] CCC_tribool CCC_hom_validate(CCC_handle_ordered_map const *hom);
 
 /**@}*/
 
 /** Define this preprocessor directive if shorter names are helpful. Ensure
  no namespace clashes occur before shortening. */
 #ifdef HANDLE_ORDERED_MAP_USING_NAMESPACE_CCC
-typedef ccc_handle_ordered_map handle_ordered_map;
-typedef ccc_homap_handle homap_handle;
-#    define hom_declare_fixed_map(args...) ccc_hom_declare_fixed_map(args)
-#    define hom_fixed_capacity(args...) ccc_hom_fixed_capacity(args)
-#    define hom_init(args...) ccc_hom_init(args)
-#    define hom_at(args...) ccc_hom_at(args)
-#    define hom_as(args...) ccc_hom_as(args)
-#    define hom_and_modify_w(args...) ccc_hom_and_modify_w(args)
-#    define hom_or_insert_w(args...) ccc_hom_or_insert_w(args)
-#    define hom_insert_handle_w(args...) ccc_hom_insert_handle_w(args)
-#    define hom_try_insert_w(args...) ccc_hom_try_insert_w(args)
-#    define hom_insert_or_assign_w(args...) ccc_hom_insert_or_assign_w(args)
-#    define hom_copy(args...) ccc_hom_copy(args)
-#    define hom_reserve(args...) ccc_hom_reserve(args)
-#    define hom_contains(args...) ccc_hom_contains(args)
-#    define hom_get_key_val(args...) ccc_hom_get_key_val(args)
-#    define hom_swap_handle_r(args...) ccc_hom_swap_handle_r(args)
-#    define hom_try_insert_r(args...) ccc_hom_try_insert_r(args)
-#    define hom_remove_r(args...) ccc_hom_remove_r(args)
-#    define hom_remove_handle_r(args...) ccc_hom_remove_handle_r(args)
-#    define hom_swap_handle(args...) ccc_hom_swap_handle(args)
-#    define hom_try_insert(args...) ccc_hom_try_insert(args)
-#    define hom_insert_or_assign(args...) ccc_hom_insert_or_assign(args)
-#    define hom_remove(args...) ccc_hom_remove(args)
-#    define hom_remove_handle(args...) ccc_hom_remove_handle(args)
-#    define hom_handle_r(args...) ccc_hom_handle_r(args)
-#    define hom_handle(args...) ccc_hom_handle(args)
-#    define hom_and_modify(args...) ccc_hom_and_modify(args)
-#    define hom_and_modify_aux(args...) ccc_hom_and_modify_aux(args)
-#    define hom_or_insert(args...) ccc_hom_or_insert(args)
-#    define hom_insert_handle(args...) ccc_hom_insert_handle(args)
-#    define hom_unwrap(args...) ccc_hom_unwrap(args)
-#    define hom_insert_error(args...) ccc_hom_insert_error(args)
-#    define hom_occupied(args...) ccc_hom_occupied(args)
-#    define hom_clear(args...) ccc_hom_clear(args)
-#    define hom_clear_and_free(args...) ccc_hom_clear_and_free(args)
+typedef CCC_handle_ordered_map handle_ordered_map;
+typedef CCC_homap_handle homap_handle;
+#    define hom_declare_fixed_map(args...) CCC_hom_declare_fixed_map(args)
+#    define hom_fixed_capacity(args...) CCC_hom_fixed_capacity(args)
+#    define hom_init(args...) CCC_hom_init(args)
+#    define hom_at(args...) CCC_hom_at(args)
+#    define hom_as(args...) CCC_hom_as(args)
+#    define hom_and_modify_w(args...) CCC_hom_and_modify_w(args)
+#    define hom_or_insert_w(args...) CCC_hom_or_insert_w(args)
+#    define hom_insert_handle_w(args...) CCC_hom_insert_handle_w(args)
+#    define hom_try_insert_w(args...) CCC_hom_try_insert_w(args)
+#    define hom_insert_or_assign_w(args...) CCC_hom_insert_or_assign_w(args)
+#    define hom_copy(args...) CCC_hom_copy(args)
+#    define hom_reserve(args...) CCC_hom_reserve(args)
+#    define hom_contains(args...) CCC_hom_contains(args)
+#    define hom_get_key_val(args...) CCC_hom_get_key_val(args)
+#    define hom_swap_handle_r(args...) CCC_hom_swap_handle_r(args)
+#    define hom_try_insert_r(args...) CCC_hom_try_insert_r(args)
+#    define hom_remove_r(args...) CCC_hom_remove_r(args)
+#    define hom_remove_handle_r(args...) CCC_hom_remove_handle_r(args)
+#    define hom_swap_handle(args...) CCC_hom_swap_handle(args)
+#    define hom_try_insert(args...) CCC_hom_try_insert(args)
+#    define hom_insert_or_assign(args...) CCC_hom_insert_or_assign(args)
+#    define hom_remove(args...) CCC_hom_remove(args)
+#    define hom_remove_handle(args...) CCC_hom_remove_handle(args)
+#    define hom_handle_r(args...) CCC_hom_handle_r(args)
+#    define hom_handle(args...) CCC_hom_handle(args)
+#    define hom_and_modify(args...) CCC_hom_and_modify(args)
+#    define hom_and_modify_aux(args...) CCC_hom_and_modify_aux(args)
+#    define hom_or_insert(args...) CCC_hom_or_insert(args)
+#    define hom_insert_handle(args...) CCC_hom_insert_handle(args)
+#    define hom_unwrap(args...) CCC_hom_unwrap(args)
+#    define hom_insert_error(args...) CCC_hom_insert_error(args)
+#    define hom_occupied(args...) CCC_hom_occupied(args)
+#    define hom_clear(args...) CCC_hom_clear(args)
+#    define hom_clear_and_free(args...) CCC_hom_clear_and_free(args)
 #    define hom_clear_and_free_reserve(args...)                                \
-        ccc_hom_clear_and_free_reserve(args)
-#    define hom_begin(args...) ccc_hom_begin(args)
-#    define hom_rbegin(args...) ccc_hom_rbegin(args)
-#    define hom_end(args...) ccc_hom_end(args)
-#    define hom_rend(args...) ccc_hom_rend(args)
-#    define hom_next(args...) ccc_hom_next(args)
-#    define hom_rnext(args...) ccc_hom_rnext(args)
-#    define hom_count(args...) ccc_hom_count(args)
-#    define hom_is_empty(args...) ccc_hom_is_empty(args)
-#    define hom_validate(args...) ccc_hom_validate(args)
+        CCC_hom_clear_and_free_reserve(args)
+#    define hom_begin(args...) CCC_hom_begin(args)
+#    define hom_rbegin(args...) CCC_hom_rbegin(args)
+#    define hom_end(args...) CCC_hom_end(args)
+#    define hom_rend(args...) CCC_hom_rend(args)
+#    define hom_next(args...) CCC_hom_next(args)
+#    define hom_rnext(args...) CCC_hom_rnext(args)
+#    define hom_count(args...) CCC_hom_count(args)
+#    define hom_is_empty(args...) CCC_hom_is_empty(args)
+#    define hom_validate(args...) CCC_hom_validate(args)
 #endif /* HANDLE_ORDERED_MAP_USING_NAMESPACE_CCC */
 
 #endif /* CCC_HANDLE_ORDERED_MAP_H */

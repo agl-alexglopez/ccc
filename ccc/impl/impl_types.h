@@ -22,7 +22,7 @@ limitations under the License.
 /** @endcond */
 
 /** @private */
-enum ccc_entry_status : uint8_t
+enum CCC_entry_status : uint8_t
 {
     CCC_ENTRY_VACANT = 0,
     CCC_ENTRY_OCCUPIED = 0x1,
@@ -32,33 +32,33 @@ enum ccc_entry_status : uint8_t
 };
 
 /** @private */
-struct ccc_ent
+struct CCC_ent
 {
     void *e;
-    enum ccc_entry_status stats;
+    enum CCC_entry_status stats;
 };
 
 /** @private */
-union ccc_entry
+union CCC_entry
 {
-    struct ccc_ent impl;
+    struct CCC_ent impl;
 };
 
 /** @private */
-struct ccc_handl
+struct CCC_handl
 {
     size_t i;
-    enum ccc_entry_status stats;
+    enum CCC_entry_status stats;
 };
 
 /** @private */
-union ccc_handle
+union CCC_handle
 {
-    struct ccc_handl impl;
+    struct CCC_handl impl;
 };
 
 /** @private */
-struct ccc_range_u
+struct CCC_range_u
 {
     union
     {
@@ -73,15 +73,15 @@ struct ccc_range_u
 };
 
 /** @private */
-union ccc_range
+union CCC_range
 {
-    struct ccc_range_u impl;
+    struct CCC_range_u impl;
 };
 
 /** @private */
-union ccc_rrange
+union CCC_rrange
 {
-    struct ccc_range_u impl;
+    struct CCC_range_u impl;
 };
 
 #endif /* CCC_IMPL_TYPES_H */

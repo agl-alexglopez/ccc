@@ -30,7 +30,7 @@ limitations under the License.
 specify any type. The buffer can be fixed size if no allocation permission is
 given or dynamic if allocation permission is granted. The buffer can also be
 manually resized via the interface. */
-struct ccc_buffer
+struct CCC_buffer
 {
     /** @private The contiguous memory of uniform type. */
     void *mem;
@@ -41,7 +41,7 @@ struct ccc_buffer
     /** @private The size of the type the user stores in the buffer. */
     size_t sizeof_type;
     /** @private An allocation function for resizing, if allowed. */
-    ccc_any_alloc_fn *alloc;
+    CCC_any_alloc_fn *alloc;
     /** @private Auxiliary data, if any. */
     void *aux;
 };
@@ -58,7 +58,7 @@ struct ccc_buffer
 can specify that the buffer has some count of elements from index
 `[0, capacity - 1)` at initialization time. The buffer assumes these elements
 are contiguous. */
-#define ccc_impl_buf_init(impl_mem, impl_any_type_name, impl_alloc_fn,         \
+#define CCC_impl_buf_init(impl_mem, impl_any_type_name, impl_alloc_fn,         \
                           impl_aux_data, impl_capacity, ...)                   \
     {                                                                          \
         .mem = (impl_mem),                                                     \
@@ -71,19 +71,19 @@ are contiguous. */
 
 /** @private For dynamic containers to perform the allocation and
 initialization in one convenient step for user. */
-#define ccc_impl_buf_from(impl_alloc_fn, impl_aux_data,                        \
+#define CCC_impl_buf_from(impl_alloc_fn, impl_aux_data,                        \
                           impl_optional_capacity,                              \
                           impl_compound_literal_array...)                      \
     (__extension__({                                                           \
         typeof(*impl_compound_literal_array) *impl_buf_initializer_list        \
             = impl_compound_literal_array;                                     \
-        struct ccc_buffer impl_buf                                             \
-            = ccc_impl_buf_init(NULL, typeof(*impl_buf_initializer_list),      \
+        struct CCC_buffer impl_buf                                             \
+            = CCC_impl_buf_init(NULL, typeof(*impl_buf_initializer_list),      \
                                 impl_alloc_fn, impl_aux_data, 0);              \
         size_t const impl_n = sizeof(impl_compound_literal_array)              \
                             / sizeof(*impl_buf_initializer_list);              \
         size_t const impl_cap = impl_optional_capacity;                        \
-        if (ccc_buf_reserve(&impl_buf,                                         \
+        if (CCC_buf_reserve(&impl_buf,                                         \
                             (impl_n > impl_cap ? impl_n : impl_cap),           \
                             impl_alloc_fn)                                     \
             == CCC_RESULT_OK)                                                  \
@@ -97,22 +97,22 @@ initialization in one convenient step for user. */
 
 /** @private For dynamic containers to perform initialization and reservation
 of memory in one step. */
-#define ccc_impl_buf_with_capacity(impl_any_type_name, impl_alloc_fn,          \
+#define CCC_impl_buf_with_capacity(impl_any_type_name, impl_alloc_fn,          \
                                    impl_aux_data, impl_capacity)               \
     (__extension__({                                                           \
-        struct ccc_buffer impl_buf = ccc_impl_buf_init(                        \
+        struct CCC_buffer impl_buf = CCC_impl_buf_init(                        \
             NULL, impl_any_type_name, impl_alloc_fn, impl_aux_data, 0);        \
-        (void)ccc_buf_reserve(&impl_buf, (impl_capacity), impl_alloc_fn);      \
+        (void)CCC_buf_reserve(&impl_buf, (impl_capacity), impl_alloc_fn);      \
         impl_buf;                                                              \
     }))
 
 /** @private */
-#define ccc_impl_buf_emplace(impl_buf_ptr, index, impl_type_initializer...)    \
+#define CCC_impl_buf_emplace(impl_buf_ptr, index, impl_type_initializer...)    \
     (__extension__({                                                           \
         typeof(impl_type_initializer) *impl_buf_res = NULL;                    \
         __auto_type impl_i = (index);                                          \
         __auto_type impl_emplace_buff_ptr = (impl_buf_ptr);                    \
-        impl_buf_res = ccc_buf_at(impl_emplace_buff_ptr, impl_i);              \
+        impl_buf_res = CCC_buf_at(impl_emplace_buff_ptr, impl_i);              \
         if (impl_buf_res)                                                      \
         {                                                                      \
             *impl_buf_res = impl_type_initializer;                             \
@@ -121,11 +121,11 @@ of memory in one step. */
     }))
 
 /** @private */
-#define ccc_impl_buf_emplace_back(impl_buf_ptr, impl_type_initializer...)      \
+#define CCC_impl_buf_emplace_back(impl_buf_ptr, impl_type_initializer...)      \
     (__extension__({                                                           \
         typeof(impl_type_initializer) *impl_buf_res = NULL;                    \
         __auto_type impl_emplace_back_impl_buf_ptr = (impl_buf_ptr);           \
-        impl_buf_res = ccc_buf_alloc_back((impl_emplace_back_impl_buf_ptr));   \
+        impl_buf_res = CCC_buf_alloc_back((impl_emplace_back_impl_buf_ptr));   \
         if (impl_buf_res)                                                      \
         {                                                                      \
             *impl_buf_res = impl_type_initializer;                             \

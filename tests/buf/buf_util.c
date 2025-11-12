@@ -22,14 +22,14 @@ swap(void *const tmp, void *const a, void *const b, size_t const absize)
 fall prey to the O(N^2) worst case runtime more easily. With void and iterators
 it is complicated to select a randomized slot but it would still be possible.*/
 static int *
-partition(buffer *const b, ccc_any_type_cmp_fn *const fn, void *const tmp,
+partition(buffer *const b, CCC_any_type_cmp_fn *const fn, void *const tmp,
           void *lo, void *hi)
 {
     void *const pivot_val = hi;
     void *i = lo;
     for (void *j = lo; j < hi; j = buf_next(b, j))
     {
-        ccc_threeway_cmp const cmp = fn((ccc_any_type_cmp){
+        CCC_threeway_cmp const cmp = fn((CCC_any_type_cmp){
             .any_type_lhs = j,
             .any_type_rhs = pivot_val,
             .aux = b->aux,
@@ -57,7 +57,7 @@ this is meant to test the buffer container, it uses iterators only to swap and
 sort data. This is a fun way to test that part of the buffer interface for
 correctness and turns out to be pretty nice and clean. */
 static void
-sort_rec(buffer *const b, ccc_any_type_cmp_fn *const fn, void *const tmp,
+sort_rec(buffer *const b, CCC_any_type_cmp_fn *const fn, void *const tmp,
          void *lo, void *hi)
 {
     while (lo < hi)
@@ -82,8 +82,8 @@ sort_rec(buffer *const b, ccc_any_type_cmp_fn *const fn, void *const tmp,
 /** Sorts the provided buffer in average time O(N * log(N)) and O(log(N))
 stack space. This implementation does not try to be hyper efficient. In fact, we
 test out using iterators here rather than indices. */
-ccc_result
-sort(ccc_buffer *const b, ccc_any_type_cmp_fn *const fn, void *const swap)
+CCC_result
+sort(CCC_buffer *const b, CCC_any_type_cmp_fn *const fn, void *const swap)
 {
     if (!b || !fn || !swap)
     {
@@ -96,8 +96,8 @@ sort(ccc_buffer *const b, ccc_any_type_cmp_fn *const fn, void *const swap)
     return CCC_RESULT_OK;
 }
 
-ccc_threeway_cmp
-bufcmp(ccc_buffer const *const lhs, size_t const rhs_count,
+CCC_threeway_cmp
+bufcmp(CCC_buffer const *const lhs, size_t const rhs_count,
        void const *const rhs)
 {
     size_t const type_size = buf_sizeof_type(lhs).count;
@@ -122,14 +122,14 @@ bufcmp(ccc_buffer const *const lhs, size_t const rhs_count,
     return CCC_GRT;
 }
 
-ccc_result
-append_range(ccc_buffer *const b, size_t range_count, void const *const range)
+CCC_result
+append_range(CCC_buffer *const b, size_t range_count, void const *const range)
 {
     unsigned char const *p = range;
     size_t const sizeof_type = buf_sizeof_type(b).count;
     while (range_count--)
     {
-        void const *const appended = ccc_buf_push_back(b, p);
+        void const *const appended = CCC_buf_push_back(b, p);
         if (!appended)
         {
             return CCC_RESULT_FAIL;

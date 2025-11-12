@@ -698,7 +698,7 @@ CHECK_BEGIN_STATIC_FN(bs_test_first_leading_zero)
     {
         CHECK(bs_set(&bs, i, CCC_TRUE), CCC_FALSE);
         CHECK(bs_first_leading_zero(&bs).count, i - 1);
-        ccc_ucount const r = bs_first_leading_zero_range(&bs, last_i, 512 - i);
+        CCC_ucount const r = bs_first_leading_zero_range(&bs, last_i, 512 - i);
         CHECK(r.error != CCC_RESULT_OK, true);
         CHECK(bs_first_leading_zero_range(&bs, i, i + 1).count, i - 1);
     }
@@ -1052,13 +1052,13 @@ CHECK_BEGIN_STATIC_FN(bs_test_proper_subset)
 }
 
 /* Returns if the box is valid. 1 for valid, 0 for invalid, -1 for an error */
-ccc_tribool
+CCC_tribool
 validate_sudoku_box(int board[9][9], bitset *const row_check,
                     bitset *const col_check, size_t const row_start,
                     size_t const col_start)
 {
     bitset box_check = bs_init(bs_blocks(9), NULL, NULL, 9);
-    ccc_tribool was_on = CCC_FALSE;
+    CCC_tribool was_on = CCC_FALSE;
     for (size_t r = row_start; r < row_start + 3; ++r)
     {
         for (size_t c = col_start; c < col_start + 3; ++c)
@@ -1130,7 +1130,7 @@ CHECK_BEGIN_STATIC_FN(bs_test_valid_sudoku)
     {
         for (size_t col = 0; col < 9; col += box_step)
         {
-            ccc_tribool const valid = validate_sudoku_box(
+            CCC_tribool const valid = validate_sudoku_box(
                 valid_board, &row_check, &col_check, row, col);
             CHECK(valid, CCC_TRUE);
         }
@@ -1157,7 +1157,7 @@ CHECK_BEGIN_STATIC_FN(bs_test_invalid_sudoku)
     bitset row_check = bs_init(bs_blocks(9L * 9L), NULL, NULL, 9L * 9L);
     bitset col_check = bs_init(bs_blocks(9L * 9L), NULL, NULL, 9L * 9L);
     size_t const box_step = 3;
-    ccc_tribool pass = CCC_TRUE;
+    CCC_tribool pass = CCC_TRUE;
     for (size_t row = 0; row < 9; row += box_step)
     {
         for (size_t col = 0; col < 9; col += box_step)

@@ -28,7 +28,7 @@ at the top of your file.
 #define REALTIME_ORDERED_MAP_USING_NAMESPACE_CCC
 ```
 
-All types and functions can then be written without the `ccc_` prefix. */
+All types and functions can then be written without the `CCC_` prefix. */
 #ifndef CCC_REALTIME_ORDERED_MAP_H
 #define CCC_REALTIME_ORDERED_MAP_H
 
@@ -49,7 +49,7 @@ pointer stability.
 
 A realtime ordered map can be initialized on the stack, heap, or data segment at
 runtime or compile time.*/
-typedef struct ccc_romap ccc_realtime_ordered_map;
+typedef struct CCC_romap CCC_realtime_ordered_map;
 
 /** @brief The intrusive element of the user defined struct being stored in the
 map.
@@ -60,13 +60,13 @@ memory with the appropriate lifetime and scope for the user's needs; the
 container does not allocate or free in this case. If allocation is allowed
 the container will handle copying the data wrapping the element to allocations
 and deallocating when necessary. */
-typedef struct ccc_romap_elem ccc_romap_elem;
+typedef struct CCC_romap_elem CCC_romap_elem;
 
 /** @brief A container specific entry used to implement the Entry Interface.
 
 The Entry Interface offers efficient search and subsequent insertion, deletion,
 or value update based on the needs of the user. */
-typedef union ccc_romap_entry ccc_romap_entry;
+typedef union CCC_romap_entry CCC_romap_entry;
 
 /**@}*/
 
@@ -84,10 +84,10 @@ Initialize the container with memory, callbacks, and permissions. */
 @param [in] aux_data a pointer to any auxiliary data for comparison or
 destruction.
 @return the struct initialized ordered map for direct assignment
-(i.e. ccc_realtime_ordered_map m = ccc_rom_init(...);). */
-#define ccc_rom_init(rom_name, struct_name, rom_elem_field, key_elem_field,    \
+(i.e. CCC_realtime_ordered_map m = CCC_rom_init(...);). */
+#define CCC_rom_init(rom_name, struct_name, rom_elem_field, key_elem_field,    \
                      key_cmp_fn, alloc_fn, aux_data)                           \
-    ccc_impl_rom_init(rom_name, struct_name, rom_elem_field, key_elem_field,   \
+    CCC_impl_rom_init(rom_name, struct_name, rom_elem_field, key_elem_field,   \
                       key_cmp_fn, alloc_fn, aux_data)
 
 /**@}*/
@@ -101,14 +101,14 @@ Test membership or obtain references to stored user types directly. */
 @param [in] key pointer to the key matching the key type of the user struct.
 @return true if the struct containing key is stored, false if not. Error if rom
 or key is NULL.*/
-[[nodiscard]] ccc_tribool ccc_rom_contains(ccc_realtime_ordered_map const *rom,
+[[nodiscard]] CCC_tribool CCC_rom_contains(CCC_realtime_ordered_map const *rom,
                                            void const *key);
 
 /** @brief Returns a reference into the map at entry key.
 @param [in] rom the ordered map to search.
 @param [in] key the key to search matching stored key type.
 @return a view of the map entry if it is present, else NULL. */
-[[nodiscard]] void *ccc_rom_get_key_val(ccc_realtime_ordered_map const *rom,
+[[nodiscard]] void *CCC_rom_get_key_val(CCC_realtime_ordered_map const *rom,
                                         void const *key);
 
 /**@}*/
@@ -130,9 +130,9 @@ is needed but allocation fails or has been forbidden, an insert error is set.
 
 Note that this function may write to the struct containing tmp and wraps it in
 an entry to provide information about the old value. */
-[[nodiscard]] ccc_entry ccc_rom_swap_entry(ccc_realtime_ordered_map *rom,
-                                           ccc_romap_elem *key_val_handle,
-                                           ccc_romap_elem *tmp);
+[[nodiscard]] CCC_entry CCC_rom_swap_entry(CCC_realtime_ordered_map *rom,
+                                           CCC_romap_elem *key_val_handle,
+                                           CCC_romap_elem *tmp);
 
 /** @brief Invariantly inserts the key value wrapping key_val_handle_ptr.
 @param [in] realtime_ordered_map_ptr the pointer to the ordered map.
@@ -147,11 +147,11 @@ insert error is set.
 
 Note that this function may write to the struct containing tmp_ptr and wraps it
 in an entry to provide information about the old value. */
-#define ccc_rom_swap_entry_r(realtime_ordered_map_ptr, key_val_handle_ptr,     \
+#define CCC_rom_swap_entry_r(realtime_ordered_map_ptr, key_val_handle_ptr,     \
                              tmp_ptr)                                          \
-    &(ccc_entry)                                                               \
+    &(CCC_entry)                                                               \
     {                                                                          \
-        ccc_rom_swap_entry((realtime_ordered_map_ptr), (key_val_handle_ptr),   \
+        CCC_rom_swap_entry((realtime_ordered_map_ptr), (key_val_handle_ptr),   \
                            (tmp_ptr))                                          \
             .impl                                                              \
     }
@@ -163,8 +163,8 @@ in an entry to provide information about the old value. */
 user type in the map and may be unwrapped. If Vacant the entry contains a
 reference to the newly inserted entry in the map. If more space is needed but
 allocation fails, an insert error is set. */
-[[nodiscard]] ccc_entry ccc_rom_try_insert(ccc_realtime_ordered_map *rom,
-                                           ccc_romap_elem *key_val_handle);
+[[nodiscard]] CCC_entry CCC_rom_try_insert(CCC_realtime_ordered_map *rom,
+                                           CCC_romap_elem *key_val_handle);
 
 /** @brief Attempts to insert the key value wrapping key_val_handle.
 @param [in] realtime_ordered_map_ptr the pointer to the map.
@@ -174,10 +174,10 @@ contains a reference to the key value user type in the map and may be unwrapped.
 If Vacant the entry contains a reference to the newly inserted entry in the map.
 If more space is needed but allocation fails or has been forbidden, an insert
 error is set. */
-#define ccc_rom_try_insert_r(realtime_ordered_map_ptr, key_val_handle_ptr)     \
-    &(ccc_entry)                                                               \
+#define CCC_rom_try_insert_r(realtime_ordered_map_ptr, key_val_handle_ptr)     \
+    &(CCC_entry)                                                               \
     {                                                                          \
-        ccc_rom_try_insert((realtime_ordered_map_ptr), (key_val_handle_ptr))   \
+        CCC_rom_try_insert((realtime_ordered_map_ptr), (key_val_handle_ptr))   \
             .impl                                                              \
     }
 
@@ -193,10 +193,10 @@ occurs that prevents insertion. An insertion error will flag such a case.
 Note that for brevity and convenience the user need not write the key to the
 lazy value compound literal as well. This function ensures the key in the
 compound literal matches the searched key. */
-#define ccc_rom_try_insert_w(realtime_ordered_map_ptr, key, lazy_value...)     \
-    &(ccc_entry)                                                               \
+#define CCC_rom_try_insert_w(realtime_ordered_map_ptr, key, lazy_value...)     \
+    &(CCC_entry)                                                               \
     {                                                                          \
-        ccc_impl_rom_try_insert_w(realtime_ordered_map_ptr, key, lazy_value)   \
+        CCC_impl_rom_try_insert_w(realtime_ordered_map_ptr, key, lazy_value)   \
     }
 
 /** @brief Invariantly inserts or overwrites a user struct into the map.
@@ -207,9 +207,9 @@ Vacant no prior map entry existed.
 
 Note that this function can be used when the old user type is not needed but
 the information regarding its presence is helpful. */
-[[nodiscard]] ccc_entry
-ccc_rom_insert_or_assign(ccc_realtime_ordered_map *rom,
-                         ccc_romap_elem *key_val_handle);
+[[nodiscard]] CCC_entry
+CCC_rom_insert_or_assign(CCC_realtime_ordered_map *rom,
+                         CCC_romap_elem *key_val_handle);
 
 /** @brief Inserts a new key value pair or overwrites the existing entry.
 @param [in] realtime_ordered_map_ptr the pointer to the flat hash map.
@@ -223,11 +223,11 @@ occurs that prevents insertion. An insertion error will flag such a case.
 Note that for brevity and convenience the user need not write the key to the
 lazy value compound literal as well. This function ensures the key in the
 compound literal matches the searched key. */
-#define ccc_rom_insert_or_assign_w(realtime_ordered_map_ptr, key,              \
+#define CCC_rom_insert_or_assign_w(realtime_ordered_map_ptr, key,              \
                                    lazy_value...)                              \
-    &(ccc_entry)                                                               \
+    &(CCC_entry)                                                               \
     {                                                                          \
-        ccc_impl_rom_insert_or_assign_w(realtime_ordered_map_ptr, key,         \
+        CCC_impl_rom_insert_or_assign_w(realtime_ordered_map_ptr, key,         \
                                         lazy_value)                            \
     }
 
@@ -246,8 +246,8 @@ If allocation has been prohibited upon initialization then the entry returned
 contains the previously stored user type, if any, and nothing is written to
 the out_handle. It is then the user's responsibility to manage their previously
 stored memory as they see fit. */
-[[nodiscard]] ccc_entry ccc_rom_remove(ccc_realtime_ordered_map *rom,
-                                       ccc_romap_elem *out_handle);
+[[nodiscard]] CCC_entry CCC_rom_remove(CCC_realtime_ordered_map *rom,
+                                       CCC_romap_elem *out_handle);
 
 /** @brief Removes the key value in the map storing the old value, if present,
 in the struct containing out_handle_ptr provided by the user.
@@ -264,10 +264,10 @@ If allocation has been prohibited upon initialization then the entry returned
 contains the previously stored user type, if any, and nothing is written to
 the out_handle_ptr. It is then the user's responsibility to manage their
 previously stored memory as they see fit. */
-#define ccc_rom_remove_r(realtime_ordered_map_ptr, out_handle_ptr)             \
-    &(ccc_entry)                                                               \
+#define CCC_rom_remove_r(realtime_ordered_map_ptr, out_handle_ptr)             \
+    &(CCC_entry)                                                               \
     {                                                                          \
-        ccc_rom_remove((realtime_ordered_map_ptr), (out_handle_ptr)).impl      \
+        CCC_rom_remove((realtime_ordered_map_ptr), (out_handle_ptr)).impl      \
     }
 
 /** @brief Obtains an entry for the provided key in the map for future use.
@@ -284,7 +284,7 @@ where in the map such an element should be inserted.
 
 An entry is rarely useful on its own. It should be passed in a functional style
 to subsequent calls in the Entry Interface. */
-[[nodiscard]] ccc_romap_entry ccc_rom_entry(ccc_realtime_ordered_map const *rom,
+[[nodiscard]] CCC_romap_entry CCC_rom_entry(CCC_realtime_ordered_map const *rom,
                                             void const *key);
 
 /** @brief Obtains an entry for the provided key in the map for future use.
@@ -302,10 +302,10 @@ where in the map such an element should be inserted.
 
 An entry is rarely useful on its own. It should be passed in a functional style
 to subsequent calls in the Entry Interface. */
-#define ccc_rom_entry_r(realtime_ordered_map_ptr, key_ptr)                     \
-    &(ccc_romap_entry)                                                         \
+#define CCC_rom_entry_r(realtime_ordered_map_ptr, key_ptr)                     \
+    &(CCC_romap_entry)                                                         \
     {                                                                          \
-        ccc_rom_entry((realtime_ordered_map_ptr), (key_ptr)).impl              \
+        CCC_rom_entry((realtime_ordered_map_ptr), (key_ptr)).impl              \
     }
 
 /** @brief Modifies the provided entry if it is Occupied.
@@ -315,10 +315,10 @@ to subsequent calls in the Entry Interface. */
 
 This function is intended to make the function chaining in the Entry Interface
 more succinct if the entry will be modified in place based on its own value
-without the need of the auxiliary argument a ccc_any_type_update_fn can provide.
+without the need of the auxiliary argument a CCC_any_type_update_fn can provide.
 */
-[[nodiscard]] ccc_romap_entry *ccc_rom_and_modify(ccc_romap_entry *e,
-                                                  ccc_any_type_update_fn *fn);
+[[nodiscard]] CCC_romap_entry *CCC_rom_and_modify(CCC_romap_entry *e,
+                                                  CCC_any_type_update_fn *fn);
 
 /** @brief Modifies the provided entry if it is Occupied.
 @param [in] e the entry obtained from an entry function or macro.
@@ -326,10 +326,10 @@ without the need of the auxiliary argument a ccc_any_type_update_fn can provide.
 @param [in] aux auxiliary data required for the update.
 @return the updated entry if it was Occupied or the unmodified vacant entry.
 
-This function makes full use of a ccc_any_type_update_fn capability, meaning a
-complete ccc_update object will be passed to the update function callback. */
-[[nodiscard]] ccc_romap_entry *
-ccc_rom_and_modify_aux(ccc_romap_entry *e, ccc_any_type_update_fn *fn,
+This function makes full use of a CCC_any_type_update_fn capability, meaning a
+complete CCC_update object will be passed to the update function callback. */
+[[nodiscard]] CCC_romap_entry *
+CCC_rom_and_modify_aux(CCC_romap_entry *e, CCC_any_type_update_fn *fn,
                        void *aux);
 
 /** @brief Modify an Occupied entry with a closure over user type T.
@@ -358,11 +358,11 @@ word *w = rom_or_insert_w(rom_and_modify_w(entry_r(&rom, &k), word,
 Note that any code written is only evaluated if the entry is Occupied and the
 container can deliver the user type T. This means any function calls are lazily
 evaluated in the closure scope. */
-#define ccc_rom_and_modify_w(realtime_ordered_map_entry_ptr, type_name,        \
+#define CCC_rom_and_modify_w(realtime_ordered_map_entry_ptr, type_name,        \
                              closure_over_T...)                                \
-    &(ccc_romap_entry)                                                         \
+    &(CCC_romap_entry)                                                         \
     {                                                                          \
-        ccc_impl_rom_and_modify_w(realtime_ordered_map_entry_ptr, type_name,   \
+        CCC_impl_rom_and_modify_w(realtime_ordered_map_entry_ptr, type_name,   \
                                   closure_over_T)                              \
     }
 
@@ -377,8 +377,8 @@ a user struct allocation failure.
 
 If no allocation is permitted, this function assumes the user struct wrapping
 elem has been allocated with the appropriate lifetime and scope by the user. */
-[[nodiscard]] void *ccc_rom_or_insert(ccc_romap_entry const *e,
-                                      ccc_romap_elem *elem);
+[[nodiscard]] void *CCC_rom_or_insert(CCC_romap_entry const *e,
+                                      CCC_romap_elem *elem);
 
 /** @brief Lazily insert the desired key value into the entry if it is Vacant.
 @param [in] realtime_ordered_map_entry_ptr a pointer to the obtained entry.
@@ -391,8 +391,8 @@ is not allowed.
 
 Note that if the compound literal uses any function calls to generate values
 or other data, such functions will not be called if the entry is Occupied. */
-#define ccc_rom_or_insert_w(realtime_ordered_map_entry_ptr, lazy_key_value...) \
-    ccc_impl_rom_or_insert_w(realtime_ordered_map_entry_ptr, lazy_key_value)
+#define CCC_rom_or_insert_w(realtime_ordered_map_entry_ptr, lazy_key_value...) \
+    CCC_impl_rom_or_insert_w(realtime_ordered_map_entry_ptr, lazy_key_value)
 
 /** @brief Inserts the provided entry invariantly.
 @param [in] e the entry returned from a call obtaining an entry.
@@ -401,17 +401,17 @@ or other data, such functions will not be called if the entry is Occupied. */
 
 This method can be used when the old value in the map does not need to
 be preserved. See the regular insert method if the old value is of interest. */
-[[nodiscard]] void *ccc_rom_insert_entry(ccc_romap_entry const *e,
-                                         ccc_romap_elem *elem);
+[[nodiscard]] void *CCC_rom_insert_entry(CCC_romap_entry const *e,
+                                         CCC_romap_elem *elem);
 
 /** @brief Write the contents of the compound literal lazy_key_value to a node.
 @param [in] realtime_ordered_map_entry_ptr a pointer to the obtained entry.
 @param [in] lazy_key_value the compound literal to write to a new slot.
 @return a reference to the newly inserted or overwritten user type. NULL is
 returned if allocation failed or is not allowed when required. */
-#define ccc_rom_insert_entry_w(realtime_ordered_map_entry_ptr,                 \
+#define CCC_rom_insert_entry_w(realtime_ordered_map_entry_ptr,                 \
                                lazy_key_value...)                              \
-    ccc_impl_rom_insert_entry_w(realtime_ordered_map_entry_ptr, lazy_key_value)
+    CCC_impl_rom_insert_entry_w(realtime_ordered_map_entry_ptr, lazy_key_value)
 
 /** @brief Remove the entry from the map if Occupied.
 @param [in] e a pointer to the map entry.
@@ -423,7 +423,7 @@ Note that if allocation is permitted the old element is freed and the entry
 will contain a NULL reference. If allocation is prohibited the entry can be
 unwrapped to obtain the old user struct stored in the map and the user may
 free or use as needed. */
-[[nodiscard]] ccc_entry ccc_rom_remove_entry(ccc_romap_entry const *e);
+[[nodiscard]] CCC_entry CCC_rom_remove_entry(CCC_romap_entry const *e);
 
 /** @brief Remove the entry from the map if Occupied.
 @param [in] realtime_ordered_map_entry_ptr a pointer to the map entry.
@@ -435,28 +435,28 @@ Note that if allocation is permitted the old element is freed and the entry
 will contain a NULL reference. If allocation is prohibited the entry can be
 unwrapped to obtain the old user struct stored in the map and the user may
 free or use as needed. */
-#define ccc_rom_remove_entry_r(realtime_ordered_map_entry_ptr)                 \
-    &(ccc_entry)                                                               \
+#define CCC_rom_remove_entry_r(realtime_ordered_map_entry_ptr)                 \
+    &(CCC_entry)                                                               \
     {                                                                          \
-        ccc_rom_remove_entry((realtime_ordered_map_entry_ptr)).impl            \
+        CCC_rom_remove_entry((realtime_ordered_map_entry_ptr)).impl            \
     }
 
 /** @brief Unwraps the provided entry to obtain a view into the map element.
 @param [in] e the entry from a query to the map via function or macro.
 @return a view into the table entry if one is present, or NULL. */
-[[nodiscard]] void *ccc_rom_unwrap(ccc_romap_entry const *e);
+[[nodiscard]] void *CCC_rom_unwrap(CCC_romap_entry const *e);
 
 /** @brief Returns the Vacant or Occupied status of the entry.
 @param [in] e the entry from a query to the map via function or macro.
 @return true if the entry is occupied, false if not. Error if e is NULL. */
-[[nodiscard]] ccc_tribool ccc_rom_insert_error(ccc_romap_entry const *e);
+[[nodiscard]] CCC_tribool CCC_rom_insert_error(CCC_romap_entry const *e);
 
 /** @brief Provides the status of the entry should an insertion follow.
 @param [in] e the entry from a query to the table via function or macro.
 @return true if an entry obtained from an insertion attempt failed to insert
 due to an allocation failure when allocation success was expected. Error if e is
 NULL. */
-[[nodiscard]] ccc_tribool ccc_rom_occupied(ccc_romap_entry const *e);
+[[nodiscard]] CCC_tribool CCC_rom_occupied(CCC_romap_entry const *e);
 
 /** @brief Obtain the entry status from a container entry.
 @param [in] e a pointer to the entry.
@@ -465,9 +465,9 @@ container completes. If e is NULL an entry input error is returned so ensure
 e is non-NULL to avoid an inaccurate status returned.
 
 Note that this function can be useful for debugging or if more detailed
-messages are needed for logging purposes. See ccc_entry_status_msg() in
+messages are needed for logging purposes. See CCC_entry_status_msg() in
 ccc/types.h for more information on detailed entry statuses. */
-[[nodiscard]] ccc_entry_status ccc_rom_entry_status(ccc_romap_entry const *e);
+[[nodiscard]] CCC_entry_status CCC_rom_entry_status(CCC_romap_entry const *e);
 
 /**@}*/
 
@@ -489,8 +489,8 @@ will occur.
 If the container has not been given allocation permission, then the destructor
 may free elements or not depending on how and when the user wishes to free
 elements of the map according to their own memory management schemes. */
-ccc_result ccc_rom_clear(ccc_realtime_ordered_map *rom,
-                         ccc_any_type_destructor_fn *destructor);
+CCC_result CCC_rom_clear(CCC_realtime_ordered_map *rom,
+                         CCC_any_type_destructor_fn *destructor);
 
 /**@}*/
 
@@ -516,7 +516,7 @@ for (struct val *i = range_begin(&range);
 
 This avoids any possible errors in handling an end range element that is in the
 map versus the end map sentinel. */
-[[nodiscard]] ccc_range ccc_rom_equal_range(ccc_realtime_ordered_map const *rom,
+[[nodiscard]] CCC_range CCC_rom_equal_range(CCC_realtime_ordered_map const *rom,
                                             void const *begin_key,
                                             void const *end_key);
 
@@ -527,11 +527,11 @@ O(lg N).
 range the second to the end of the range.
 @return a compound literal reference to the produced range associated with the
 enclosing scope. This reference is always non-NULL. */
-#define ccc_rom_equal_range_r(realtime_ordered_map_ptr,                        \
+#define CCC_rom_equal_range_r(realtime_ordered_map_ptr,                        \
                               begin_and_end_key_ptrs...)                       \
-    &(ccc_range)                                                               \
+    &(CCC_range)                                                               \
     {                                                                          \
-        ccc_rom_equal_range((realtime_ordered_map_ptr),                        \
+        CCC_rom_equal_range((realtime_ordered_map_ptr),                        \
                             (begin_and_end_key_ptrs))                          \
             .impl                                                              \
     }
@@ -554,8 +554,8 @@ for (struct val *i = rrange_begin(&rrange);
 
 This avoids any possible errors in handling an rend rrange element that is in
 the map versus the end map sentinel. */
-[[nodiscard]] ccc_rrange
-ccc_rom_equal_rrange(ccc_realtime_ordered_map const *rom,
+[[nodiscard]] CCC_rrange
+CCC_rom_equal_rrange(CCC_realtime_ordered_map const *rom,
                      void const *rbegin_key, void const *rend_key);
 
 /** @brief Returns a compound literal reference to the desired rrange. Amortized
@@ -565,11 +565,11 @@ O(lg N).
 rrange the second to the end of the rrange.
 @return a compound literal reference to the produced rrange associated with the
 enclosing scope. This reference is always non-NULL. */
-#define ccc_rom_equal_rrange_r(realtime_ordered_map_ptr,                       \
+#define CCC_rom_equal_rrange_r(realtime_ordered_map_ptr,                       \
                                rbegin_and_rend_key_ptrs...)                    \
-    &(ccc_rrange)                                                              \
+    &(CCC_rrange)                                                              \
     {                                                                          \
-        ccc_rom_equal_rrange((realtime_ordered_map_ptr),                       \
+        CCC_rom_equal_rrange((realtime_ordered_map_ptr),                       \
                              (rbegin_and_rend_key_ptrs))                       \
             .impl                                                              \
     }
@@ -578,21 +578,21 @@ enclosing scope. This reference is always non-NULL. */
 O(lg N).
 @param [in] rom a pointer to the map.
 @return the oldest minimum element of the map. */
-[[nodiscard]] void *ccc_rom_begin(ccc_realtime_ordered_map const *rom);
+[[nodiscard]] void *CCC_rom_begin(CCC_realtime_ordered_map const *rom);
 
 /** @brief Return the start of a reverse inorder traversal of the map.
 Amortized O(lg N).
 @param [in] rom a pointer to the map.
 @return the oldest maximum element of the map. */
-[[nodiscard]] void *ccc_rom_rbegin(ccc_realtime_ordered_map const *rom);
+[[nodiscard]] void *CCC_rom_rbegin(CCC_realtime_ordered_map const *rom);
 
 /** @brief Return the next element in an inorder traversal of the map. O(1).
 @param [in] rom a pointer to the map.
 @param [in] iter_handle a pointer to the intrusive map element of the
 current iterator.
 @return the next user type stored in the map in an inorder traversal. */
-[[nodiscard]] void *ccc_rom_next(ccc_realtime_ordered_map const *rom,
-                                 ccc_romap_elem const *iter_handle);
+[[nodiscard]] void *CCC_rom_next(CCC_realtime_ordered_map const *rom,
+                                 CCC_romap_elem const *iter_handle);
 
 /** @brief Return the rnext element in a reverse inorder traversal of the map.
 O(1).
@@ -600,18 +600,18 @@ O(1).
 @param [in] iter_handle a pointer to the intrusive map element of the
 current iterator.
 @return the rnext user type stored in the map in a reverse inorder traversal. */
-[[nodiscard]] void *ccc_rom_rnext(ccc_realtime_ordered_map const *rom,
-                                  ccc_romap_elem const *iter_handle);
+[[nodiscard]] void *CCC_rom_rnext(CCC_realtime_ordered_map const *rom,
+                                  CCC_romap_elem const *iter_handle);
 
 /** @brief Return the end of an inorder traversal of the map. O(1).
 @param [in] rom a pointer to the map.
 @return the newest maximum element of the map. */
-[[nodiscard]] void *ccc_rom_end(ccc_realtime_ordered_map const *rom);
+[[nodiscard]] void *CCC_rom_end(CCC_realtime_ordered_map const *rom);
 
 /** @brief Return the rend of a reverse inorder traversal of the map. O(1).
 @param [in] rom a pointer to the map.
 @return the newest minimum element of the map. */
-[[nodiscard]] void *ccc_rom_rend(ccc_realtime_ordered_map const *rom);
+[[nodiscard]] void *CCC_rom_rend(CCC_realtime_ordered_map const *rom);
 
 /**@}*/
 
@@ -622,60 +622,60 @@ Obtain the container state. */
 /** @brief Returns the count of map occupied nodes.
 @param [in] rom the map.
 @return the size or an argument is set if rom is NULL. */
-[[nodiscard]] ccc_ucount ccc_rom_count(ccc_realtime_ordered_map const *rom);
+[[nodiscard]] CCC_ucount CCC_rom_count(CCC_realtime_ordered_map const *rom);
 
 /** @brief Returns the size status of the map.
 @param [in] rom the map.
 @return true if empty else false. Error if rom is NULL. */
-[[nodiscard]] ccc_tribool ccc_rom_is_empty(ccc_realtime_ordered_map const *rom);
+[[nodiscard]] CCC_tribool CCC_rom_is_empty(CCC_realtime_ordered_map const *rom);
 
 /** @brief Validation of invariants for the map.
 @param [in] rom the map to validate.
 @return true if all invariants hold, false if corruption occurs. Error if rom is
 NULL. */
-[[nodiscard]] ccc_tribool ccc_rom_validate(ccc_realtime_ordered_map const *rom);
+[[nodiscard]] CCC_tribool CCC_rom_validate(CCC_realtime_ordered_map const *rom);
 
 /**@}*/
 
 /** Define this preprocessor directive if shorter names are helpful. Ensure
  no namespace clashes occur before shortening. */
 #ifdef REALTIME_ORDERED_MAP_USING_NAMESPACE_CCC
-typedef ccc_romap_elem romap_elem;
-typedef ccc_realtime_ordered_map realtime_ordered_map;
-typedef ccc_romap_entry romap_entry;
-#    define rom_init(args...) ccc_rom_init(args)
-#    define rom_and_modify_w(args...) ccc_rom_and_modify_w(args)
-#    define rom_or_insert_w(args...) ccc_rom_or_insert_w(args)
-#    define rom_insert_entry_w(args...) ccc_rom_insert_entry_w(args)
-#    define rom_try_insert_w(args...) ccc_rom_try_insert_w(args)
-#    define rom_insert_or_assign_w(args...) ccc_rom_insert_or_assign_w(args)
-#    define rom_swap_entry_r(args...) ccc_rom_swap_entry_r(args)
-#    define rom_remove_r(args...) ccc_rom_remove_r(args)
-#    define rom_remove_entry_r(args...) ccc_rom_remove_entry_r(args)
-#    define rom_entry_r(args...) ccc_rom_entry_r(args)
-#    define rom_and_modify_r(args...) ccc_rom_and_modify_r(args)
-#    define rom_and_modify_aux_r(args...) ccc_rom_and_modify_aux_r(args)
-#    define rom_contains(args...) ccc_rom_contains(args)
-#    define rom_get_key_val(args...) ccc_rom_get_key_val(args)
-#    define rom_get_mut(args...) ccc_rom_get_mut(args)
-#    define rom_swap_entry(args...) ccc_rom_swap_entry(args)
-#    define rom_remove(args...) ccc_rom_remove(args)
-#    define rom_entry(args...) ccc_rom_entry(args)
-#    define rom_remove_entry(args...) ccc_rom_remove_entry(args)
-#    define rom_or_insert(args...) ccc_rom_or_insert(args)
-#    define rom_insert_entry(args...) ccc_rom_insert_entry(args)
-#    define rom_unwrap(args...) ccc_rom_unwrap(args)
-#    define rom_unwrap_mut(args...) ccc_rom_unwrap_mut(args)
-#    define rom_begin(args...) ccc_rom_begin(args)
-#    define rom_next(args...) ccc_rom_next(args)
-#    define rom_rbegin(args...) ccc_rom_rbegin(args)
-#    define rom_rnext(args...) ccc_rom_rnext(args)
-#    define rom_end(args...) ccc_rom_end(args)
-#    define rom_rend(args...) ccc_rom_rend(args)
-#    define rom_count(args...) ccc_rom_count(args)
-#    define rom_is_empty(args...) ccc_rom_is_empty(args)
-#    define rom_clear(args...) ccc_rom_clear(args)
-#    define rom_validate(args...) ccc_rom_validate(args)
+typedef CCC_romap_elem romap_elem;
+typedef CCC_realtime_ordered_map realtime_ordered_map;
+typedef CCC_romap_entry romap_entry;
+#    define rom_init(args...) CCC_rom_init(args)
+#    define rom_and_modify_w(args...) CCC_rom_and_modify_w(args)
+#    define rom_or_insert_w(args...) CCC_rom_or_insert_w(args)
+#    define rom_insert_entry_w(args...) CCC_rom_insert_entry_w(args)
+#    define rom_try_insert_w(args...) CCC_rom_try_insert_w(args)
+#    define rom_insert_or_assign_w(args...) CCC_rom_insert_or_assign_w(args)
+#    define rom_swap_entry_r(args...) CCC_rom_swap_entry_r(args)
+#    define rom_remove_r(args...) CCC_rom_remove_r(args)
+#    define rom_remove_entry_r(args...) CCC_rom_remove_entry_r(args)
+#    define rom_entry_r(args...) CCC_rom_entry_r(args)
+#    define rom_and_modify_r(args...) CCC_rom_and_modify_r(args)
+#    define rom_and_modify_aux_r(args...) CCC_rom_and_modify_aux_r(args)
+#    define rom_contains(args...) CCC_rom_contains(args)
+#    define rom_get_key_val(args...) CCC_rom_get_key_val(args)
+#    define rom_get_mut(args...) CCC_rom_get_mut(args)
+#    define rom_swap_entry(args...) CCC_rom_swap_entry(args)
+#    define rom_remove(args...) CCC_rom_remove(args)
+#    define rom_entry(args...) CCC_rom_entry(args)
+#    define rom_remove_entry(args...) CCC_rom_remove_entry(args)
+#    define rom_or_insert(args...) CCC_rom_or_insert(args)
+#    define rom_insert_entry(args...) CCC_rom_insert_entry(args)
+#    define rom_unwrap(args...) CCC_rom_unwrap(args)
+#    define rom_unwrap_mut(args...) CCC_rom_unwrap_mut(args)
+#    define rom_begin(args...) CCC_rom_begin(args)
+#    define rom_next(args...) CCC_rom_next(args)
+#    define rom_rbegin(args...) CCC_rom_rbegin(args)
+#    define rom_rnext(args...) CCC_rom_rnext(args)
+#    define rom_end(args...) CCC_rom_end(args)
+#    define rom_rend(args...) CCC_rom_rend(args)
+#    define rom_count(args...) CCC_rom_count(args)
+#    define rom_is_empty(args...) CCC_rom_is_empty(args)
+#    define rom_clear(args...) CCC_rom_clear(args)
+#    define rom_validate(args...) CCC_rom_validate(args)
 #endif
 
 #endif /* CCC_REALTIME_ORDERED_MAP_H */

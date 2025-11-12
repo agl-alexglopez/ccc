@@ -10,15 +10,15 @@
 #include "traits.h"
 #include "types.h"
 
-ccc_threeway_cmp
-id_cmp(ccc_any_key_cmp const cmp)
+CCC_threeway_cmp
+id_cmp(CCC_any_key_cmp const cmp)
 {
     struct val const *const c = cmp.any_type_rhs;
     int const key = *((int *)cmp.any_key_lhs);
     return (key > c->key) - (key < c->key);
 }
 
-CHECK_BEGIN_FN(insert_shuffled, ccc_ordered_map *m, struct val vals[],
+CHECK_BEGIN_FN(insert_shuffled, CCC_ordered_map *m, struct val vals[],
                size_t const size, int const larger_prime)
 {
     size_t shuffled_index = larger_prime % size;
@@ -36,7 +36,7 @@ CHECK_BEGIN_FN(insert_shuffled, ccc_ordered_map *m, struct val vals[],
 
 /* Iterative inorder traversal to check the heap is sorted. */
 size_t
-inorder_fill(int vals[], size_t size, ccc_ordered_map *m)
+inorder_fill(int vals[], size_t size, CCC_ordered_map *m)
 {
     if (count(m).count != size)
     {

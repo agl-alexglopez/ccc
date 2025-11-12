@@ -11,37 +11,37 @@
 
 CHECK_BEGIN_STATIC_FN(pq_test_insert_one)
 {
-    ccc_priority_queue pq
-        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
+    CCC_priority_queue pq
+        = CCC_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
     struct val single;
     single.val = 0;
     CHECK(push(&pq, &single.elem) != NULL, true);
-    CHECK(ccc_pq_is_empty(&pq), false);
+    CHECK(CCC_pq_is_empty(&pq), false);
     CHECK_END_FN();
 }
 
 CHECK_BEGIN_STATIC_FN(pq_test_insert_three)
 {
-    ccc_priority_queue pq
-        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
+    CCC_priority_queue pq
+        = CCC_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
     struct val three_vals[3];
     for (int i = 0; i < 3; ++i)
     {
         three_vals[i].val = i;
         CHECK(push(&pq, &three_vals[i].elem) != NULL, true);
         CHECK(validate(&pq), true);
-        CHECK(ccc_pq_count(&pq).count, (size_t)i + 1);
+        CHECK(CCC_pq_count(&pq).count, (size_t)i + 1);
     }
-    CHECK(ccc_pq_count(&pq).count, (size_t)3);
+    CHECK(CCC_pq_count(&pq).count, (size_t)3);
     CHECK_END_FN();
 }
 
 CHECK_BEGIN_STATIC_FN(pq_test_struct_getter)
 {
-    ccc_priority_queue pq
-        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
-    ccc_priority_queue pq_tester_clone
-        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
+    CCC_priority_queue pq
+        = CCC_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
+    CCC_priority_queue pq_tester_clone
+        = CCC_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
     struct val vals[10];
     struct val tester_clone[10];
     for (int i = 0; i < 10; ++i)
@@ -57,30 +57,30 @@ CHECK_BEGIN_STATIC_FN(pq_test_struct_getter)
         struct val const *get = &tester_clone[i];
         CHECK(get->val, vals[i].val);
     }
-    CHECK(ccc_pq_count(&pq).count, (size_t)10);
+    CHECK(CCC_pq_count(&pq).count, (size_t)10);
     CHECK_END_FN();
 }
 
 CHECK_BEGIN_STATIC_FN(pq_test_insert_three_dups)
 {
-    ccc_priority_queue pq
-        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
+    CCC_priority_queue pq
+        = CCC_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
     struct val three_vals[3];
     for (int i = 0; i < 3; ++i)
     {
         three_vals[i].val = 0;
         CHECK(push(&pq, &three_vals[i].elem) != NULL, true);
         CHECK(validate(&pq), true);
-        CHECK(ccc_pq_count(&pq).count, (size_t)i + 1);
+        CHECK(CCC_pq_count(&pq).count, (size_t)i + 1);
     }
-    CHECK(ccc_pq_count(&pq).count, (size_t)3);
+    CHECK(CCC_pq_count(&pq).count, (size_t)3);
     CHECK_END_FN();
 }
 
 CHECK_BEGIN_STATIC_FN(pq_test_insert_shuffle)
 {
-    ccc_priority_queue pq
-        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
+    CCC_priority_queue pq
+        = CCC_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
     /* Math magic ahead... */
     size_t const size = 50;
     int const prime = 53;
@@ -95,17 +95,17 @@ CHECK_BEGIN_STATIC_FN(pq_test_insert_shuffle)
 
 CHECK_BEGIN_STATIC_FN(pq_test_read_max_min)
 {
-    ccc_priority_queue pq
-        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
+    CCC_priority_queue pq
+        = CCC_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
     struct val vals[10];
     for (int i = 0; i < 10; ++i)
     {
         vals[i].val = i;
         CHECK(push(&pq, &vals[i].elem) != NULL, true);
         CHECK(validate(&pq), true);
-        CHECK(ccc_pq_count(&pq).count, (size_t)i + 1);
+        CHECK(CCC_pq_count(&pq).count, (size_t)i + 1);
     }
-    CHECK(ccc_pq_count(&pq).count, (size_t)10);
+    CHECK(CCC_pq_count(&pq).count, (size_t)10);
     struct val const *min = front(&pq);
     CHECK(min->val, 0);
     CHECK_END_FN();

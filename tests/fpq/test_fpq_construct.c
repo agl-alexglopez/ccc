@@ -14,8 +14,8 @@
 #include "types.h"
 #include "util/alloc.h"
 
-static ccc_threeway_cmp
-int_cmp(ccc_any_type_cmp const cmp)
+static CCC_threeway_cmp
+int_cmp(CCC_any_type_cmp const cmp)
 {
     int a = *((int const *const)cmp.any_type_lhs);
     int b = *((int const *const)cmp.any_type_rhs);
@@ -55,7 +55,7 @@ CHECK_BEGIN_STATIC_FN(fpq_test_macro_grow)
     CHECK(fpq_is_empty(&pq), false);
     struct val *res2 = fpq_emplace(&pq, (struct val){.val = 0, .id = 0});
     CHECK(res2 != NULL, true);
-    CHECK_END_FN((void)ccc_fpq_clear_and_free(&pq, NULL););
+    CHECK_END_FN((void)CCC_fpq_clear_and_free(&pq, NULL););
 }
 
 CHECK_BEGIN_STATIC_FN(fpq_test_push)
@@ -157,10 +157,10 @@ CHECK_BEGIN_STATIC_FN(fpq_test_heapsort)
     }
     flat_priority_queue pq = fpq_heapify_init(heap, int, CCC_LES, int_cmp, NULL,
                                               NULL, HPSORTCAP, HPSORTCAP);
-    ccc_buffer const b = ccc_fpq_heapsort(&pq, &(int){0});
+    CCC_buffer const b = CCC_fpq_heapsort(&pq, &(int){0});
     int const *prev = begin(&b);
     CHECK(prev != NULL, true);
-    CHECK(ccc_buf_count(&b).count, HPSORTCAP);
+    CHECK(CCC_buf_count(&b).count, HPSORTCAP);
     size_t count = 1;
     for (int const *cur = next(&b, prev); cur != end(&b); cur = next(&b, cur))
     {
@@ -184,7 +184,7 @@ CHECK_BEGIN_STATIC_FN(fpq_test_copy_no_alloc)
     CHECK(count(&src).count, 3);
     CHECK(*(int *)front(&src), 0);
     CHECK(is_empty(&dst), true);
-    ccc_result res = fpq_copy(&dst, &src, NULL);
+    CCC_result res = fpq_copy(&dst, &src, NULL);
     CHECK(res, CCC_RESULT_OK);
     CHECK(count(&dst).count, 3);
     while (!is_empty(&src) && !is_empty(&dst))
@@ -211,7 +211,7 @@ CHECK_BEGIN_STATIC_FN(fpq_test_copy_no_alloc_fail)
     CHECK(count(&src).count, 3);
     CHECK(*(int *)front(&src), 0);
     CHECK(is_empty(&dst), true);
-    ccc_result res = fpq_copy(&dst, &src, NULL);
+    CCC_result res = fpq_copy(&dst, &src, NULL);
     CHECK(res != CCC_RESULT_OK, true);
     CHECK_END_FN();
 }
@@ -227,7 +227,7 @@ CHECK_BEGIN_STATIC_FN(fpq_test_copy_alloc)
     (void)push(&src, &(int){2}, &(int){0});
     CHECK(*(int *)front(&src), 0);
     CHECK(is_empty(&dst), true);
-    ccc_result res = fpq_copy(&dst, &src, std_alloc);
+    CCC_result res = fpq_copy(&dst, &src, std_alloc);
     CHECK(res, CCC_RESULT_OK);
     CHECK(count(&dst).count, 3);
     while (!is_empty(&src) && !is_empty(&dst))
@@ -256,7 +256,7 @@ CHECK_BEGIN_STATIC_FN(fpq_test_copy_alloc_fail)
     (void)push(&src, &(int){2}, &(int){0});
     CHECK(*(int *)front(&src), 0);
     CHECK(is_empty(&dst), true);
-    ccc_result res = fpq_copy(&dst, &src, NULL);
+    CCC_result res = fpq_copy(&dst, &src, NULL);
     CHECK(res != CCC_RESULT_OK, true);
     CHECK_END_FN({ (void)fpq_clear_and_free(&src, NULL); });
 }

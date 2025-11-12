@@ -30,15 +30,15 @@ CHECK_BEGIN_STATIC_FN(homap_test_copy_no_alloc)
     (void)swap_handle(&src, &(struct val){.id = 2, .val = 2});
     CHECK(count(&src).count, 3);
     CHECK(is_empty(&dst), true);
-    ccc_result res = hom_copy(&dst, &src, NULL);
+    CCC_result res = hom_copy(&dst, &src, NULL);
     CHECK(res, CCC_RESULT_OK);
     CHECK(count(&dst).count, count(&src).count);
     for (int i = 0; i < 3; ++i)
     {
         struct val src_v = {.id = i};
         struct val dst_v = {.id = i};
-        ccc_handle src_e = ccc_remove(&src, &src_v);
-        ccc_handle dst_e = ccc_remove(&dst, &dst_v);
+        CCC_handle src_e = CCC_remove(&src, &src_v);
+        CCC_handle dst_e = CCC_remove(&dst, &dst_v);
         CHECK(occupied(&src_e), occupied(&dst_e));
         CHECK(src_v.id, dst_v.id);
         CHECK(src_v.val, dst_v.val);
@@ -59,7 +59,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_copy_no_alloc_fail)
     (void)swap_handle(&src, &(struct val){.id = 2, .val = 2});
     CHECK(count(&src).count, 3);
     CHECK(is_empty(&dst), true);
-    ccc_result res = hom_copy(&dst, &src, NULL);
+    CCC_result res = hom_copy(&dst, &src, NULL);
     CHECK(res != CCC_RESULT_OK, true);
     CHECK_END_FN();
 }
@@ -75,15 +75,15 @@ CHECK_BEGIN_STATIC_FN(homap_test_copy_alloc)
     (void)swap_handle(&src, &(struct val){.id = 2, .val = 2});
     CHECK(count(&src).count, 3);
     CHECK(is_empty(&dst), true);
-    ccc_result res = hom_copy(&dst, &src, std_alloc);
+    CCC_result res = hom_copy(&dst, &src, std_alloc);
     CHECK(res, CCC_RESULT_OK);
     CHECK(count(&dst).count, count(&src).count);
     for (int i = 0; i < 3; ++i)
     {
         struct val src_v = {.id = i};
         struct val dst_v = {.id = i};
-        ccc_handle src_e = ccc_remove(&src, &src_v);
-        ccc_handle dst_e = ccc_remove(&dst, &dst_v);
+        CCC_handle src_e = CCC_remove(&src, &src_v);
+        CCC_handle dst_e = CCC_remove(&dst, &dst_v);
         CHECK(occupied(&src_e), occupied(&dst_e));
         CHECK(src_v.id, dst_v.id);
         CHECK(src_v.val, dst_v.val);
@@ -107,7 +107,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_copy_alloc_fail)
     (void)swap_handle(&src, &(struct val){.id = 2, .val = 2});
     CHECK(count(&src).count, 3);
     CHECK(is_empty(&dst), true);
-    ccc_result res = hom_copy(&dst, &src, NULL);
+    CCC_result res = hom_copy(&dst, &src, NULL);
     CHECK(res != CCC_RESULT_OK, true);
     CHECK_END_FN({ (void)hom_clear_and_free(&src, NULL); });
 }

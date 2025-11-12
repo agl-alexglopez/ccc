@@ -132,7 +132,7 @@ CHECK_BEGIN_STATIC_FN(check_rrange, ordered_map const *const rom,
     });
 }
 
-CHECK_BEGIN_STATIC_FN(iterator_check, ccc_ordered_map *s)
+CHECK_BEGIN_STATIC_FN(iterator_check, CCC_ordered_map *s)
 {
     size_t const size = count(s).count;
     size_t iter_count = 0;
@@ -154,8 +154,8 @@ CHECK_BEGIN_STATIC_FN(iterator_check, ccc_ordered_map *s)
 
 CHECK_BEGIN_STATIC_FN(omap_test_forward_iter)
 {
-    ccc_ordered_map s
-        = ccc_om_init(s, struct val, elem, key, id_cmp, NULL, NULL);
+    CCC_ordered_map s
+        = CCC_om_init(s, struct val, elem, key, id_cmp, NULL, NULL);
     /* We should have the expected behavior iteration over empty tree. */
     int j = 0;
     for (struct val *e = begin(&s); e != end(&s); e = next(&s, &e->elem), ++j)
@@ -186,8 +186,8 @@ CHECK_BEGIN_STATIC_FN(omap_test_forward_iter)
 
 CHECK_BEGIN_STATIC_FN(omap_test_iterate_removal)
 {
-    ccc_ordered_map s
-        = ccc_om_init(s, struct val, elem, key, id_cmp, NULL, NULL);
+    CCC_ordered_map s
+        = CCC_om_init(s, struct val, elem, key, id_cmp, NULL, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -217,8 +217,8 @@ CHECK_BEGIN_STATIC_FN(omap_test_iterate_removal)
 
 CHECK_BEGIN_STATIC_FN(omap_test_iterate_remove_reinsert)
 {
-    ccc_ordered_map s
-        = ccc_om_init(s, struct val, elem, key, id_cmp, NULL, NULL);
+    CCC_ordered_map s
+        = CCC_om_init(s, struct val, elem, key, id_cmp, NULL, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -254,8 +254,8 @@ CHECK_BEGIN_STATIC_FN(omap_test_iterate_remove_reinsert)
 
 CHECK_BEGIN_STATIC_FN(omap_test_valid_range)
 {
-    ccc_ordered_map s
-        = ccc_om_init(s, struct val, elem, key, id_cmp, NULL, NULL);
+    CCC_ordered_map s
+        = CCC_om_init(s, struct val, elem, key, id_cmp, NULL, NULL);
 
     int const num_nodes = 25;
     struct val vals[25];
@@ -284,8 +284,8 @@ CHECK_BEGIN_STATIC_FN(omap_test_valid_range)
 
 CHECK_BEGIN_STATIC_FN(omap_test_valid_range_equals)
 {
-    ccc_ordered_map s
-        = ccc_om_init(s, struct val, elem, key, id_cmp, NULL, NULL);
+    CCC_ordered_map s
+        = CCC_om_init(s, struct val, elem, key, id_cmp, NULL, NULL);
 
     int const num_nodes = 25;
     struct val vals[25];
@@ -308,8 +308,8 @@ CHECK_BEGIN_STATIC_FN(omap_test_valid_range_equals)
 
 CHECK_BEGIN_STATIC_FN(omap_test_invalid_range)
 {
-    ccc_ordered_map s
-        = ccc_om_init(s, struct val, elem, key, id_cmp, NULL, NULL);
+    CCC_ordered_map s
+        = CCC_om_init(s, struct val, elem, key, id_cmp, NULL, NULL);
     int const num_nodes = 25;
     struct val vals[25];
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
@@ -337,8 +337,8 @@ CHECK_BEGIN_STATIC_FN(omap_test_invalid_range)
 
 CHECK_BEGIN_STATIC_FN(omap_test_empty_range)
 {
-    ccc_ordered_map s
-        = ccc_om_init(s, struct val, elem, key, id_cmp, NULL, NULL);
+    CCC_ordered_map s
+        = CCC_om_init(s, struct val, elem, key, id_cmp, NULL, NULL);
     int const num_nodes = 25;
     struct val vals[25];
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
@@ -352,10 +352,10 @@ CHECK_BEGIN_STATIC_FN(omap_test_empty_range)
     /* Nonexistant range returns end [begin, end) in both positions.
        which may not be the end element but a value in the tree. However,
        Normal iteration patterns would consider this empty. */
-    ccc_range const forward_range = equal_range(&s, &(int){-50}, &(int){-25});
+    CCC_range const forward_range = equal_range(&s, &(int){-50}, &(int){-25});
     CHECK(((struct val *)begin_range(&forward_range))->key, vals[0].key);
     CHECK(((struct val *)end_range(&forward_range))->key, vals[0].key);
-    ccc_rrange const rev_range = equal_rrange(&s, &(int){150}, &(int){999});
+    CCC_rrange const rev_range = equal_rrange(&s, &(int){150}, &(int){999});
     CHECK(((struct val *)rbegin_rrange(&rev_range))->key,
           vals[num_nodes - 1].key);
     CHECK(((struct val *)rend_rrange(&rev_range))->key,

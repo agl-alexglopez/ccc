@@ -16,7 +16,7 @@
 
 CHECK_BEGIN_STATIC_FN(hromap_test_insert_erase_shuffled)
 {
-    ccc_handle_realtime_ordered_map s
+    CCC_handle_realtime_ordered_map s
         = hrm_init(&(small_fixed_map){}, struct val, id, id_cmp, NULL, NULL,
                    SMALL_FIXED_CAP);
     size_t const size = 50;
@@ -31,7 +31,7 @@ CHECK_BEGIN_STATIC_FN(hromap_test_insert_erase_shuffled)
     /* Now let's delete everything with no errors. */
     for (size_t i = 0; i < size; ++i)
     {
-        ccc_handle const *const h = remove_r(&s, &(struct val){.id = (int)i});
+        CCC_handle const *const h = remove_r(&s, &(struct val){.id = (int)i});
         CHECK(occupied(h), true);
         CHECK(validate(&s), true);
     }
@@ -41,7 +41,7 @@ CHECK_BEGIN_STATIC_FN(hromap_test_insert_erase_shuffled)
 
 CHECK_BEGIN_STATIC_FN(hromap_test_prime_shuffle)
 {
-    ccc_handle_realtime_ordered_map s
+    CCC_handle_realtime_ordered_map s
         = hrm_init(&(small_fixed_map){}, struct val, id, id_cmp, NULL, NULL,
                    SMALL_FIXED_CAP);
     size_t const size = 50;
@@ -66,7 +66,7 @@ CHECK_BEGIN_STATIC_FN(hromap_test_prime_shuffle)
     CHECK(hrm_count(&s).count < size, true);
     for (size_t i = 0; i < size; ++i)
     {
-        ccc_handle const *const e = remove_handle_r(handle_r(&s, &i));
+        CCC_handle const *const e = remove_handle_r(handle_r(&s, &i));
         CHECK(occupied(e) || repeats[i], true);
         CHECK(validate(&s), true);
     }
@@ -75,7 +75,7 @@ CHECK_BEGIN_STATIC_FN(hromap_test_prime_shuffle)
 
 CHECK_BEGIN_STATIC_FN(hromap_test_weak_srand)
 {
-    ccc_handle_realtime_ordered_map s
+    CCC_handle_realtime_ordered_map s
         = hrm_init(&(standard_fixed_map){}, struct val, id, id_cmp, NULL, NULL,
                    STANDARD_FIXED_CAP);
     srand(time(NULL)); /* NOLINT */
@@ -90,7 +90,7 @@ CHECK_BEGIN_STATIC_FN(hromap_test_weak_srand)
     }
     for (int i = 0; i < num_nodes; ++i)
     {
-        ccc_handle const h = ccc_remove(&s, &(struct val){.id = id_keys[i]});
+        CCC_handle const h = CCC_remove(&s, &(struct val){.id = id_keys[i]});
         CHECK(occupied(&h), true);
         CHECK(validate(&s), true);
     }
@@ -100,7 +100,7 @@ CHECK_BEGIN_STATIC_FN(hromap_test_weak_srand)
 
 CHECK_BEGIN_STATIC_FN(hromap_test_insert_erase_cycles_no_alloc)
 {
-    ccc_handle_realtime_ordered_map s
+    CCC_handle_realtime_ordered_map s
         = hrm_init(&(standard_fixed_map){}, struct val, id, id_cmp, NULL, NULL,
                    STANDARD_FIXED_CAP);
     srand(time(NULL)); /* NOLINT */
@@ -115,19 +115,19 @@ CHECK_BEGIN_STATIC_FN(hromap_test_insert_erase_cycles_no_alloc)
     }
     for (int i = 0; i < num_nodes / 2; ++i)
     {
-        ccc_handle h = ccc_remove(&s, &(struct val){.id = id_keys[i]});
+        CCC_handle h = CCC_remove(&s, &(struct val){.id = id_keys[i]});
         CHECK(occupied(&h), true);
         CHECK(validate(&s), true);
     }
     for (int i = 0; i < num_nodes / 2; ++i)
     {
-        ccc_handle h = insert_or_assign(&s, &(struct val){.id = id_keys[i]});
+        CCC_handle h = insert_or_assign(&s, &(struct val){.id = id_keys[i]});
         CHECK(occupied(&h), false);
         CHECK(validate(&s), true);
     }
     for (int i = 0; i < num_nodes; ++i)
     {
-        ccc_handle h = ccc_remove(&s, &(struct val){.id = id_keys[i]});
+        CCC_handle h = CCC_remove(&s, &(struct val){.id = id_keys[i]});
         CHECK(occupied(&h), true);
         CHECK(validate(&s), true);
     }
@@ -137,7 +137,7 @@ CHECK_BEGIN_STATIC_FN(hromap_test_insert_erase_cycles_no_alloc)
 
 CHECK_BEGIN_STATIC_FN(hromap_test_insert_erase_cycles_alloc)
 {
-    ccc_handle_realtime_ordered_map s
+    CCC_handle_realtime_ordered_map s
         = hrm_init(NULL, struct val, id, id_cmp, std_alloc, NULL, 0);
     srand(time(NULL)); /* NOLINT */
     int const num_nodes = 1000;
@@ -151,19 +151,19 @@ CHECK_BEGIN_STATIC_FN(hromap_test_insert_erase_cycles_alloc)
     }
     for (int i = 0; i < num_nodes / 2; ++i)
     {
-        ccc_handle h = ccc_remove(&s, &(struct val){.id = id_keys[i]});
+        CCC_handle h = CCC_remove(&s, &(struct val){.id = id_keys[i]});
         CHECK(occupied(&h), true);
         CHECK(validate(&s), true);
     }
     for (int i = 0; i < num_nodes / 2; ++i)
     {
-        ccc_handle h = insert_or_assign(&s, &(struct val){.id = id_keys[i]});
+        CCC_handle h = insert_or_assign(&s, &(struct val){.id = id_keys[i]});
         CHECK(occupied(&h), false);
         CHECK(validate(&s), true);
     }
     for (int i = 0; i < num_nodes; ++i)
     {
-        ccc_handle h = ccc_remove(&s, &(struct val){.id = id_keys[i]});
+        CCC_handle h = CCC_remove(&s, &(struct val){.id = id_keys[i]});
         CHECK(occupied(&h), true);
         CHECK(validate(&s), true);
     }

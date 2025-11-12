@@ -25,14 +25,14 @@ enum : size_t
 
 /*==========================   Prototypes    ================================*/
 
-static void *at(ccc_buffer const *, size_t);
+static void *at(CCC_buffer const *, size_t);
 static size_t max(size_t a, size_t b);
 
 /*==========================    Interface    ================================*/
 
-ccc_result
-ccc_buf_alloc(ccc_buffer *const buf, size_t const capacity,
-              ccc_any_alloc_fn *const fn)
+CCC_result
+CCC_buf_alloc(CCC_buffer *const buf, size_t const capacity,
+              CCC_any_alloc_fn *const fn)
 {
     if (!buf)
     {
@@ -52,9 +52,9 @@ ccc_buf_alloc(ccc_buffer *const buf, size_t const capacity,
     return CCC_RESULT_OK;
 }
 
-ccc_result
-ccc_buf_reserve(ccc_buffer *const buf, size_t const to_add,
-                ccc_any_alloc_fn *const fn)
+CCC_result
+CCC_buf_reserve(CCC_buffer *const buf, size_t const to_add,
+                CCC_any_alloc_fn *const fn)
 {
     if (!buf || !fn)
     {
@@ -79,9 +79,9 @@ ccc_buf_reserve(ccc_buffer *const buf, size_t const to_add,
     return CCC_RESULT_OK;
 }
 
-ccc_result
-ccc_buf_clear(ccc_buffer *const buf,
-              ccc_any_type_destructor_fn *const destructor)
+CCC_result
+CCC_buf_clear(CCC_buffer *const buf,
+              CCC_any_type_destructor_fn *const destructor)
 {
     if (!buf)
     {
@@ -92,10 +92,10 @@ ccc_buf_clear(ccc_buffer *const buf,
         buf->count = 0;
         return CCC_RESULT_OK;
     }
-    for (void *i = ccc_buf_begin(buf); i != ccc_buf_end(buf);
-         i = ccc_buf_next(buf, i))
+    for (void *i = CCC_buf_begin(buf); i != CCC_buf_end(buf);
+         i = CCC_buf_next(buf, i))
     {
-        destructor((ccc_any_type){
+        destructor((CCC_any_type){
             .any_type = i,
             .aux = buf->aux,
         });
@@ -104,9 +104,9 @@ ccc_buf_clear(ccc_buffer *const buf,
     return CCC_RESULT_OK;
 }
 
-ccc_result
-ccc_buf_clear_and_free(ccc_buffer *const buf,
-                       ccc_any_type_destructor_fn *const destructor)
+CCC_result
+CCC_buf_clear_and_free(CCC_buffer *const buf,
+                       CCC_any_type_destructor_fn *const destructor)
 {
     if (!buf || !buf->alloc)
     {
@@ -120,10 +120,10 @@ ccc_buf_clear_and_free(ccc_buffer *const buf,
         buf->capacity = 0;
         return CCC_RESULT_OK;
     }
-    for (void *i = ccc_buf_begin(buf); i != ccc_buf_end(buf);
-         i = ccc_buf_next(buf, i))
+    for (void *i = CCC_buf_begin(buf); i != CCC_buf_end(buf);
+         i = CCC_buf_next(buf, i))
     {
-        destructor((ccc_any_type){
+        destructor((CCC_any_type){
             .any_type = i,
             .aux = buf->aux,
         });
@@ -135,10 +135,10 @@ ccc_buf_clear_and_free(ccc_buffer *const buf,
     return CCC_RESULT_OK;
 }
 
-ccc_result
-ccc_buf_clear_and_free_reserve(ccc_buffer *const buf,
-                               ccc_any_type_destructor_fn *const destructor,
-                               ccc_any_alloc_fn *const alloc)
+CCC_result
+CCC_buf_clear_and_free_reserve(CCC_buffer *const buf,
+                               CCC_any_type_destructor_fn *const destructor,
+                               CCC_any_alloc_fn *const alloc)
 {
     if (!buf || !alloc)
     {
@@ -152,10 +152,10 @@ ccc_buf_clear_and_free_reserve(ccc_buffer *const buf,
         buf->capacity = 0;
         return CCC_RESULT_OK;
     }
-    for (void *i = ccc_buf_begin(buf); i != ccc_buf_end(buf);
-         i = ccc_buf_next(buf, i))
+    for (void *i = CCC_buf_begin(buf); i != CCC_buf_end(buf);
+         i = CCC_buf_next(buf, i))
     {
-        destructor((ccc_any_type){
+        destructor((CCC_any_type){
             .any_type = i,
             .aux = buf->aux,
         });
@@ -168,7 +168,7 @@ ccc_buf_clear_and_free_reserve(ccc_buffer *const buf,
 }
 
 void *
-ccc_buf_at(ccc_buffer const *const buf, size_t const i)
+CCC_buf_at(CCC_buffer const *const buf, size_t const i)
 {
     if (!buf || i >= buf->capacity)
     {
@@ -178,19 +178,19 @@ ccc_buf_at(ccc_buffer const *const buf, size_t const i)
 }
 
 void *
-ccc_buf_back(ccc_buffer const *const buf)
+CCC_buf_back(CCC_buffer const *const buf)
 {
-    return ccc_buf_at(buf, buf->count - 1);
+    return CCC_buf_at(buf, buf->count - 1);
 }
 
 void *
-ccc_buf_front(ccc_buffer const *const buf)
+CCC_buf_front(CCC_buffer const *const buf)
 {
-    return ccc_buf_at(buf, 0);
+    return CCC_buf_at(buf, 0);
 }
 
 void *
-ccc_buf_alloc_back(ccc_buffer *const buf)
+CCC_buf_alloc_back(CCC_buffer *const buf)
 {
     if (!buf)
     {
@@ -198,7 +198,7 @@ ccc_buf_alloc_back(ccc_buffer *const buf)
     }
     if (buf->count == buf->capacity)
     {
-        ccc_result const resize_res = ccc_buf_alloc(
+        CCC_result const resize_res = CCC_buf_alloc(
             buf, max(buf->capacity * 2, START_CAPACITY), buf->alloc);
         if (resize_res != CCC_RESULT_OK)
         {
@@ -211,9 +211,9 @@ ccc_buf_alloc_back(ccc_buffer *const buf)
 }
 
 void *
-ccc_buf_push_back(ccc_buffer *const buf, void const *const data)
+CCC_buf_push_back(CCC_buffer *const buf, void const *const data)
 {
-    void *const mem = ccc_buf_alloc_back(buf);
+    void *const mem = CCC_buf_alloc_back(buf);
     if (mem)
     {
         (void)memcpy(mem, data, buf->sizeof_type);
@@ -221,8 +221,8 @@ ccc_buf_push_back(ccc_buffer *const buf, void const *const data)
     return mem;
 }
 
-ccc_result
-ccc_buf_swap(ccc_buffer *const buf, void *const tmp, size_t const i,
+CCC_result
+CCC_buf_swap(CCC_buffer *const buf, void *const tmp, size_t const i,
              size_t const j)
 {
     if (!buf || !tmp || i >= buf->capacity || j >= buf->capacity || j == i)
@@ -236,7 +236,7 @@ ccc_buf_swap(ccc_buffer *const buf, void *const tmp, size_t const i,
 }
 
 void *
-ccc_buf_move(ccc_buffer *const buf, size_t const dst, size_t const src)
+CCC_buf_move(CCC_buffer *const buf, size_t const dst, size_t const src)
 {
     if (!buf || dst >= buf->capacity || src >= buf->capacity)
     {
@@ -249,14 +249,14 @@ ccc_buf_move(ccc_buffer *const buf, size_t const dst, size_t const src)
     return memcpy(at(buf, dst), at(buf, src), buf->sizeof_type);
 }
 
-ccc_result
-ccc_buf_write(ccc_buffer *const buf, size_t const i, void const *const data)
+CCC_result
+CCC_buf_write(CCC_buffer *const buf, size_t const i, void const *const data)
 {
     if (!buf || !buf->mem || !data)
     {
         return CCC_RESULT_ARG_ERROR;
     }
-    void *const pos = ccc_buf_at(buf, i);
+    void *const pos = CCC_buf_at(buf, i);
     if (!pos || data == pos)
     {
         return CCC_RESULT_ARG_ERROR;
@@ -265,8 +265,8 @@ ccc_buf_write(ccc_buffer *const buf, size_t const i, void const *const data)
     return CCC_RESULT_OK;
 }
 
-ccc_result
-ccc_buf_erase(ccc_buffer *const buf, size_t const i)
+CCC_result
+CCC_buf_erase(CCC_buffer *const buf, size_t const i)
 {
     if (!buf || !buf->count || i >= buf->count)
     {
@@ -289,7 +289,7 @@ ccc_buf_erase(ccc_buffer *const buf, size_t const i)
 }
 
 void *
-ccc_buf_insert(ccc_buffer *const buf, size_t const i, void const *const data)
+CCC_buf_insert(CCC_buffer *const buf, size_t const i, void const *const data)
 {
     if (!buf || !buf->mem || i > buf->count)
     {
@@ -297,11 +297,11 @@ ccc_buf_insert(ccc_buffer *const buf, size_t const i, void const *const data)
     }
     if (i == buf->count)
     {
-        return ccc_buf_push_back(buf, data);
+        return CCC_buf_push_back(buf, data);
     }
     if (buf->count == buf->capacity)
     {
-        ccc_result const r = ccc_buf_alloc(
+        CCC_result const r = CCC_buf_alloc(
             buf, max(buf->count * 2, START_CAPACITY), buf->alloc);
         if (r != CCC_RESULT_OK)
         {
@@ -314,8 +314,8 @@ ccc_buf_insert(ccc_buffer *const buf, size_t const i, void const *const data)
     return memcpy(at(buf, i), data, buf->sizeof_type);
 }
 
-ccc_result
-ccc_buf_pop_back_n(ccc_buffer *const buf, size_t n)
+CCC_result
+CCC_buf_pop_back_n(CCC_buffer *const buf, size_t n)
 {
     if (!buf || n > buf->count)
     {
@@ -325,44 +325,44 @@ ccc_buf_pop_back_n(ccc_buffer *const buf, size_t n)
     return CCC_RESULT_OK;
 }
 
-ccc_result
-ccc_buf_pop_back(ccc_buffer *const buf)
+CCC_result
+CCC_buf_pop_back(CCC_buffer *const buf)
 {
-    return ccc_buf_pop_back_n(buf, 1);
+    return CCC_buf_pop_back_n(buf, 1);
 }
 
-ccc_ucount
-ccc_buf_count(ccc_buffer const *const buf)
-{
-    if (!buf)
-    {
-        return (ccc_ucount){.error = CCC_RESULT_ARG_ERROR};
-    }
-    return (ccc_ucount){.count = buf->count};
-}
-
-ccc_ucount
-ccc_buf_capacity(ccc_buffer const *const buf)
+CCC_ucount
+CCC_buf_count(CCC_buffer const *const buf)
 {
     if (!buf)
     {
-        return (ccc_ucount){.error = CCC_RESULT_ARG_ERROR};
+        return (CCC_ucount){.error = CCC_RESULT_ARG_ERROR};
     }
-    return (ccc_ucount){.count = buf->capacity};
+    return (CCC_ucount){.count = buf->count};
 }
 
-ccc_ucount
-ccc_buf_sizeof_type(ccc_buffer const *const buf)
+CCC_ucount
+CCC_buf_capacity(CCC_buffer const *const buf)
 {
     if (!buf)
     {
-        return (ccc_ucount){.error = CCC_RESULT_ARG_ERROR};
+        return (CCC_ucount){.error = CCC_RESULT_ARG_ERROR};
     }
-    return (ccc_ucount){.count = buf->sizeof_type};
+    return (CCC_ucount){.count = buf->capacity};
 }
 
-ccc_tribool
-ccc_buf_is_empty(ccc_buffer const *const buf)
+CCC_ucount
+CCC_buf_sizeof_type(CCC_buffer const *const buf)
+{
+    if (!buf)
+    {
+        return (CCC_ucount){.error = CCC_RESULT_ARG_ERROR};
+    }
+    return (CCC_ucount){.count = buf->sizeof_type};
+}
+
+CCC_tribool
+CCC_buf_is_empty(CCC_buffer const *const buf)
 {
     if (!buf)
     {
@@ -371,8 +371,8 @@ ccc_buf_is_empty(ccc_buffer const *const buf)
     return !buf->count;
 }
 
-ccc_tribool
-ccc_buf_is_full(ccc_buffer const *const buf)
+CCC_tribool
+CCC_buf_is_full(CCC_buffer const *const buf)
 {
     if (!buf)
     {
@@ -386,13 +386,13 @@ ccc_buf_is_full(ccc_buffer const *const buf)
 }
 
 void *
-ccc_buf_begin(ccc_buffer const *const buf)
+CCC_buf_begin(CCC_buffer const *const buf)
 {
     return buf ? buf->mem : NULL;
 }
 
 void *
-ccc_buf_rbegin(ccc_buffer const *const buf)
+CCC_buf_rbegin(CCC_buffer const *const buf)
 {
     if (!buf || !buf->mem)
     {
@@ -403,36 +403,36 @@ ccc_buf_rbegin(ccc_buffer const *const buf)
 }
 
 void *
-ccc_buf_next(ccc_buffer const *const buf, void const *const iter)
+CCC_buf_next(CCC_buffer const *const buf, void const *const iter)
 {
     if (!buf || !buf->mem)
     {
         return NULL;
     }
-    if (iter >= ccc_buf_capacity_end(buf))
+    if (iter >= CCC_buf_capacity_end(buf))
     {
-        return ccc_buf_end(buf);
+        return CCC_buf_end(buf);
     }
     return (unsigned char *)iter + buf->sizeof_type;
 }
 
 void *
-ccc_buf_rnext(ccc_buffer const *const buf, void const *const iter)
+CCC_buf_rnext(CCC_buffer const *const buf, void const *const iter)
 {
     if (!buf || !buf->mem)
     {
         return NULL;
     }
-    if (iter <= ccc_buf_rend(buf))
+    if (iter <= CCC_buf_rend(buf))
     {
-        return ccc_buf_rend(buf);
+        return CCC_buf_rend(buf);
     }
     return (char *)iter - buf->sizeof_type;
 }
 
 /** We accept that end may be the address past buffer capacity. */
 void *
-ccc_buf_end(ccc_buffer const *const buf)
+CCC_buf_end(CCC_buffer const *const buf)
 {
     if (!buf || !buf->mem)
     {
@@ -446,7 +446,7 @@ the array base was somehow 0 and wrapping occurred upon subtraction the iterator
 would eventually reach this same address through rnext and be compared to it
 in the main user loop. */
 void *
-ccc_buf_rend(ccc_buffer const *const buf)
+CCC_buf_rend(CCC_buffer const *const buf)
 {
     if (!buf || !buf->mem)
     {
@@ -457,7 +457,7 @@ ccc_buf_rend(ccc_buffer const *const buf)
 
 /** Will always be the address after capacity. */
 void *
-ccc_buf_capacity_end(ccc_buffer const *const buf)
+CCC_buf_capacity_end(CCC_buffer const *const buf)
 {
     if (!buf || !buf->mem)
     {
@@ -466,22 +466,22 @@ ccc_buf_capacity_end(ccc_buffer const *const buf)
     return (unsigned char *)buf->mem + (buf->sizeof_type * buf->capacity);
 }
 
-ccc_ucount
-ccc_buf_i(ccc_buffer const *const buf, void const *const slot)
+CCC_ucount
+CCC_buf_i(CCC_buffer const *const buf, void const *const slot)
 {
     if (!buf || !buf->mem || !slot || slot < buf->mem
         || (char *)slot
                >= ((char *)buf->mem + (buf->capacity * buf->sizeof_type)))
     {
-        return (ccc_ucount){.error = CCC_RESULT_ARG_ERROR};
+        return (CCC_ucount){.error = CCC_RESULT_ARG_ERROR};
     }
-    return (ccc_ucount){
+    return (CCC_ucount){
         .count = (((char *)slot - ((char *)buf->mem)) / buf->sizeof_type),
     };
 }
 
-ccc_result
-ccc_buf_size_plus(ccc_buffer *const buf, size_t const n)
+CCC_result
+CCC_buf_size_plus(CCC_buffer *const buf, size_t const n)
 {
     if (!buf)
     {
@@ -497,8 +497,8 @@ ccc_buf_size_plus(ccc_buffer *const buf, size_t const n)
     return CCC_RESULT_OK;
 }
 
-ccc_result
-ccc_buf_size_minus(ccc_buffer *const buf, size_t const n)
+CCC_result
+CCC_buf_size_minus(CCC_buffer *const buf, size_t const n)
 {
     if (!buf)
     {
@@ -513,8 +513,8 @@ ccc_buf_size_minus(ccc_buffer *const buf, size_t const n)
     return CCC_RESULT_OK;
 }
 
-ccc_result
-ccc_buf_size_set(ccc_buffer *const buf, size_t const n)
+CCC_result
+CCC_buf_size_set(CCC_buffer *const buf, size_t const n)
 {
     if (!buf)
     {
@@ -529,29 +529,29 @@ ccc_buf_size_set(ccc_buffer *const buf, size_t const n)
     return CCC_RESULT_OK;
 }
 
-ccc_ucount
-ccc_buf_count_bytes(ccc_buffer const *buf)
+CCC_ucount
+CCC_buf_count_bytes(CCC_buffer const *buf)
 {
     if (!buf)
     {
-        return (ccc_ucount){.error = CCC_RESULT_ARG_ERROR};
+        return (CCC_ucount){.error = CCC_RESULT_ARG_ERROR};
     }
-    return (ccc_ucount){.count = buf->count * buf->sizeof_type};
+    return (CCC_ucount){.count = buf->count * buf->sizeof_type};
 }
 
-ccc_ucount
-ccc_buf_capacity_bytes(ccc_buffer const *buf)
+CCC_ucount
+CCC_buf_capacity_bytes(CCC_buffer const *buf)
 {
     if (!buf)
     {
-        return (ccc_ucount){.error = CCC_RESULT_ARG_ERROR};
+        return (CCC_ucount){.error = CCC_RESULT_ARG_ERROR};
     }
-    return (ccc_ucount){.count = buf->capacity * buf->sizeof_type};
+    return (CCC_ucount){.count = buf->capacity * buf->sizeof_type};
 }
 
-ccc_result
-ccc_buf_copy(ccc_buffer *const dst, ccc_buffer const *const src,
-             ccc_any_alloc_fn *const fn)
+CCC_result
+CCC_buf_copy(CCC_buffer *const dst, CCC_buffer const *const src,
+             CCC_any_alloc_fn *const fn)
 {
     if (!dst || !src || src == dst || (dst->capacity < src->capacity && !fn))
     {
@@ -563,7 +563,7 @@ ccc_buf_copy(ccc_buffer *const dst, ccc_buffer const *const src,
        same as in dst initialization because that controls permission. */
     void *const dst_mem = dst->mem;
     size_t const dst_cap = dst->capacity;
-    ccc_any_alloc_fn *const dst_alloc = dst->alloc;
+    CCC_any_alloc_fn *const dst_alloc = dst->alloc;
     *dst = *src;
     dst->mem = dst_mem;
     dst->capacity = dst_cap;
@@ -574,7 +574,7 @@ ccc_buf_copy(ccc_buffer *const dst, ccc_buffer const *const src,
     }
     if (dst->capacity < src->capacity)
     {
-        ccc_result const r = ccc_buf_alloc(dst, src->capacity, fn);
+        CCC_result const r = CCC_buf_alloc(dst, src->capacity, fn);
         if (r != CCC_RESULT_OK)
         {
             return r;
@@ -592,7 +592,7 @@ ccc_buf_copy(ccc_buffer *const dst, ccc_buffer const *const src,
 /*======================  Static Helpers  ==================================*/
 
 static inline void *
-at(struct ccc_buffer const *const buf, size_t const i)
+at(struct CCC_buffer const *const buf, size_t const i)
 {
     return ((char *)buf->mem + (i * buf->sizeof_type));
 }

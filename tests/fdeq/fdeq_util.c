@@ -15,7 +15,7 @@ CHECK_BEGIN_FN(create_queue, flat_double_ended_queue *const q, size_t const n,
 {
     if (n)
     {
-        ccc_result const res = fdeq_push_back_range(q, n, vals);
+        CCC_result const res = fdeq_push_back_range(q, n, vals);
         CHECK(res, CCC_RESULT_OK);
         CHECK(validate(q), true);
     }

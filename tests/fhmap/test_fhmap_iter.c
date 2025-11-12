@@ -17,8 +17,8 @@ struct owner
     void *allocation;
 };
 
-ccc_threeway_cmp
-owners_eq(ccc_any_key_cmp const cmp)
+CCC_threeway_cmp
+owners_eq(CCC_any_key_cmp const cmp)
 {
     int const *const lhs = cmp.any_key_lhs;
     struct owner const *const rhs = cmp.any_type_rhs;
@@ -26,7 +26,7 @@ owners_eq(ccc_any_key_cmp const cmp)
 }
 
 void
-destroy_owner_allocation(ccc_any_type const t)
+destroy_owner_allocation(CCC_any_type const t)
 {
     struct owner const *const o = t.any_type;
     free(o->allocation);
@@ -34,13 +34,13 @@ destroy_owner_allocation(ccc_any_type const t)
 
 CHECK_BEGIN_STATIC_FN(fhmap_test_insert_then_iterate)
 {
-    ccc_flat_hash_map fh
+    CCC_flat_hash_map fh
         = fhm_init(&(standard_fixed_map){}, struct val, key, fhmap_int_to_u64,
                    fhmap_id_cmp, NULL, NULL, STANDARD_FIXED_CAP);
     int const size = STANDARD_FIXED_CAP;
     for (int i = 0; i < size; i += 2)
     {
-        ccc_entry e = try_insert(&fh, &(struct val){.key = i, .val = i});
+        CCC_entry e = try_insert(&fh, &(struct val){.key = i, .val = i});
         CHECK(occupied(&e), false);
         CHECK(validate(&fh), true);
         e = try_insert(&fh, &(struct val){.key = i, .val = i});
@@ -75,19 +75,19 @@ efficient iterator is able to free all elements allocated with no leaks when
 run under sanitizers. */
 CHECK_BEGIN_STATIC_FN(fhmap_test_insert_allocate_clear_free)
 {
-    ccc_flat_hash_map fh = fhm_init(NULL, struct owner, key, fhmap_int_to_u64,
+    CCC_flat_hash_map fh = fhm_init(NULL, struct owner, key, fhmap_int_to_u64,
                                     owners_eq, std_alloc, NULL, 0);
     int const size = 32;
     for (int i = 0; i < size; ++i)
     {
-        ccc_entry *e = fhm_try_insert_w(
+        CCC_entry *e = fhm_try_insert_w(
             &fh, i, (struct owner){.allocation = malloc(sizeof(size_t))});
         CHECK(occupied(e), CCC_FALSE);
         struct owner const *const o = unwrap(e);
         CHECK(o != NULL, CCC_TRUE);
         CHECK(o->allocation != NULL, CCC_TRUE);
     }
-    CHECK_END_FN(ccc_fhm_clear_and_free(&fh, destroy_owner_allocation););
+    CHECK_END_FN(CCC_fhm_clear_and_free(&fh, destroy_owner_allocation););
 }
 
 int

@@ -10,8 +10,8 @@
 #include "traits.h"
 #include "types.h"
 
-ccc_threeway_cmp
-val_cmp(ccc_any_type_cmp const c)
+CCC_threeway_cmp
+val_cmp(CCC_any_type_cmp const c)
 {
     struct val const *const a = c.any_type_lhs;
     struct val const *const b = c.any_type_rhs;
@@ -61,7 +61,7 @@ CHECK_BEGIN_FN(check_order, singly_linked_list const *const sll, size_t const n,
     });
 }
 
-CHECK_BEGIN_FN(create_list, ccc_singly_linked_list *const sll, size_t const n,
+CHECK_BEGIN_FN(create_list, CCC_singly_linked_list *const sll, size_t const n,
                struct val vals[])
 {
     for (size_t i = 0; i < n; ++i)

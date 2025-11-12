@@ -357,10 +357,10 @@ CHECK_BEGIN_STATIC_FN(romap_test_empty_range)
     /* Nonexistant range returns end [begin, end) in both positions.
        which may not be the end element but a value in the tree. However,
        Normal iteration patterns would consider this empty. */
-    ccc_range const forward_range = equal_range(&s, &(int){-50}, &(int){-25});
+    CCC_range const forward_range = equal_range(&s, &(int){-50}, &(int){-25});
     CHECK(((struct val *)begin_range(&forward_range))->key, vals[0].key);
     CHECK(((struct val *)end_range(&forward_range))->key, vals[0].key);
-    ccc_rrange const rev_range = equal_rrange(&s, &(int){150}, &(int){999});
+    CCC_rrange const rev_range = equal_rrange(&s, &(int){150}, &(int){999});
     CHECK(((struct val *)rbegin_rrange(&rev_range))->key,
           vals[num_nodes - 1].key);
     CHECK(((struct val *)rend_rrange(&rev_range))->key,

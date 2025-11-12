@@ -32,48 +32,48 @@ storing an implicit complete binary tree; elements are stored contiguously from
 / 2`, the left child is at `(i * 2) + 1`, and the right child is at `(i * 2) +
 2`. The heap can be initialized as a min or max heap due to the use of the three
 way comparison function. */
-struct ccc_fpq
+struct CCC_fpq
 {
     /** @private The underlying buffer owned by the fpq. */
-    ccc_buffer buf;
+    CCC_buffer buf;
     /** @private The order `CCC_LES` (min) or `CCC_GRT` (max) of the fpq. */
-    ccc_threeway_cmp order;
+    CCC_threeway_cmp order;
     /** @private The user defined three way comparison function. */
-    ccc_any_type_cmp_fn *cmp;
+    CCC_any_type_cmp_fn *cmp;
 };
 
 /*========================    Private Interface     =========================*/
 
 /** @private */
-size_t ccc_impl_fpq_bubble_up(struct ccc_fpq *, void *, size_t);
+size_t CCC_impl_fpq_bubble_up(struct CCC_fpq *, void *, size_t);
 /** @private */
-void ccc_impl_fpq_in_place_heapify(struct ccc_fpq *, size_t n, void *tmp);
+void CCC_impl_fpq_in_place_heapify(struct CCC_fpq *, size_t n, void *tmp);
 /** @private */
-void *ccc_impl_fpq_update_fixup(struct ccc_fpq *, void *, void *tmp);
+void *CCC_impl_fpq_update_fixup(struct CCC_fpq *, void *, void *tmp);
 
 /*======================    Macro Implementations    ========================*/
 
 /** @private */
-#define ccc_impl_fpq_init(impl_mem_ptr, impl_any_type_name, impl_cmp_order,    \
+#define CCC_impl_fpq_init(impl_mem_ptr, impl_any_type_name, impl_cmp_order,    \
                           impl_cmp_fn, impl_alloc_fn, impl_aux_data,           \
                           impl_capacity)                                       \
     {                                                                          \
-        .buf = ccc_buf_init(impl_mem_ptr, impl_any_type_name, impl_alloc_fn,   \
+        .buf = CCC_buf_init(impl_mem_ptr, impl_any_type_name, impl_alloc_fn,   \
                             impl_aux_data, impl_capacity),                     \
         .cmp = (impl_cmp_fn),                                                  \
         .order = (impl_cmp_order),                                             \
     }
 
 /** @private */
-#define ccc_impl_fpq_heapify_init(impl_mem_ptr, impl_any_type_name,            \
+#define CCC_impl_fpq_heapify_init(impl_mem_ptr, impl_any_type_name,            \
                                   impl_cmp_order, impl_cmp_fn, impl_alloc_fn,  \
                                   impl_aux_data, impl_capacity, impl_size)     \
     (__extension__({                                                           \
         __auto_type impl_fpq_heapify_mem = (impl_mem_ptr);                     \
-        struct ccc_fpq impl_fpq_heapify_res = ccc_impl_fpq_init(               \
+        struct CCC_fpq impl_fpq_heapify_res = CCC_impl_fpq_init(               \
             impl_fpq_heapify_mem, impl_any_type_name, impl_cmp_order,          \
             impl_cmp_fn, impl_alloc_fn, impl_aux_data, impl_capacity);         \
-        ccc_impl_fpq_in_place_heapify(&impl_fpq_heapify_res, (impl_size),      \
+        CCC_impl_fpq_in_place_heapify(&impl_fpq_heapify_res, (impl_size),      \
                                       &(impl_any_type_name){0});               \
         impl_fpq_heapify_res;                                                  \
     }))
@@ -81,25 +81,25 @@ void *ccc_impl_fpq_update_fixup(struct ccc_fpq *, void *, void *tmp);
 /** @private This macro "returns" a value thanks to clang and gcc statement
    expressions. See documentation in the flat pqueue header for usage. The ugly
    details of the macro are hidden here in the impl header. */
-#define ccc_impl_fpq_emplace(fpq, type_initializer...)                         \
+#define CCC_impl_fpq_emplace(fpq, type_initializer...)                         \
     (__extension__({                                                           \
-        struct ccc_fpq *impl_fpq = (fpq);                                      \
+        struct CCC_fpq *impl_fpq = (fpq);                                      \
         typeof(type_initializer) *impl_fpq_res                                 \
-            = ccc_buf_alloc_back(&impl_fpq->buf);                              \
+            = CCC_buf_alloc_back(&impl_fpq->buf);                              \
         if (impl_fpq_res)                                                      \
         {                                                                      \
             *impl_fpq_res = type_initializer;                                  \
             if (impl_fpq->buf.count > 1)                                       \
             {                                                                  \
                 impl_fpq_res                                                   \
-                    = ccc_buf_at(&impl_fpq->buf,                               \
-                                 ccc_impl_fpq_bubble_up(                       \
+                    = CCC_buf_at(&impl_fpq->buf,                               \
+                                 CCC_impl_fpq_bubble_up(                       \
                                      impl_fpq, &(typeof(type_initializer)){0}, \
                                      impl_fpq->buf.count - 1));                \
             }                                                                  \
             else                                                               \
             {                                                                  \
-                impl_fpq_res = ccc_buf_at(&impl_fpq->buf, 0);                  \
+                impl_fpq_res = CCC_buf_at(&impl_fpq->buf, 0);                  \
             }                                                                  \
         }                                                                      \
         impl_fpq_res;                                                          \
@@ -107,25 +107,25 @@ void *ccc_impl_fpq_update_fixup(struct ccc_fpq *, void *, void *tmp);
 
 /** @private Only one update fn is needed because there is no advantage to
    updates if it is known they are min/max increase/decrease etc. */
-#define ccc_impl_fpq_update_w(fpq_ptr, T_ptr, update_closure_over_T...)        \
+#define CCC_impl_fpq_update_w(fpq_ptr, T_ptr, update_closure_over_T...)        \
     (__extension__({                                                           \
-        struct ccc_fpq *const impl_fpq = (fpq_ptr);                            \
+        struct CCC_fpq *const impl_fpq = (fpq_ptr);                            \
         typeof(*T_ptr) *T = (T_ptr);                                           \
-        if (impl_fpq && !ccc_buf_is_empty(&impl_fpq->buf) && T)                \
+        if (impl_fpq && !CCC_buf_is_empty(&impl_fpq->buf) && T)                \
         {                                                                      \
-            {update_closure_over_T} T = ccc_impl_fpq_update_fixup(             \
+            {update_closure_over_T} T = CCC_impl_fpq_update_fixup(             \
                 impl_fpq, T, &(typeof(*T_ptr)){0});                            \
         }                                                                      \
         T;                                                                     \
     }))
 
 /** @private */
-#define ccc_impl_fpq_increase_w(fpq_ptr, T_ptr, increase_closure_over_T...)    \
-    ccc_impl_fpq_update_w(fpq_ptr, T_ptr, increase_closure_over_T)
+#define CCC_impl_fpq_increase_w(fpq_ptr, T_ptr, increase_closure_over_T...)    \
+    CCC_impl_fpq_update_w(fpq_ptr, T_ptr, increase_closure_over_T)
 
 /** @private */
-#define ccc_impl_fpq_decrease_w(fpq_ptr, T_ptr, decrease_closure_over_T...)    \
-    ccc_impl_fpq_update_w(fpq_ptr, T_ptr, decrease_closure_over_T)
+#define CCC_impl_fpq_decrease_w(fpq_ptr, T_ptr, decrease_closure_over_T...)    \
+    CCC_impl_fpq_update_w(fpq_ptr, T_ptr, decrease_closure_over_T)
 
 /* NOLINTEND(readability-identifier-naming) */
 

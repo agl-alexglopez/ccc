@@ -124,7 +124,7 @@ static void print_last_n(FILE *file, int n);
 static void print_alpha_n(FILE *file, int n);
 static void print_ralpha_n(FILE *file, int n);
 static buffer copy_frequencies(handle_ordered_map const *map);
-static void print_n(handle_ordered_map *, ccc_threeway_cmp, struct str_arena *,
+static void print_n(handle_ordered_map *, CCC_threeway_cmp, struct str_arena *,
                     int n);
 static struct int_conversion parse_n_ranks(str_view arg);
 
@@ -358,7 +358,7 @@ copy_frequencies(handle_ordered_map const *const map)
 {
     check(!is_empty(map));
     buffer freqs = buf_init(NULL, word, std_alloc, NULL, 0);
-    ccc_result const r = buf_reserve(&freqs, count(map).count, std_alloc);
+    CCC_result const r = buf_reserve(&freqs, count(map).count, std_alloc);
     check(r == CCC_RESULT_OK);
     size_t const cap = capacity(&freqs).count;
     size_t i = 0;
@@ -372,7 +372,7 @@ copy_frequencies(handle_ordered_map const *const map)
 }
 
 static void
-print_n(ccc_handle_ordered_map *const map, ccc_threeway_cmp const ord,
+print_n(CCC_handle_ordered_map *const map, CCC_threeway_cmp const ord,
         struct str_arena *const a, int n)
 {
     buffer freqs = copy_frequencies(map);
@@ -387,7 +387,7 @@ print_n(ccc_handle_ordered_map *const map, ccc_threeway_cmp const ord,
     }
     /* Because all CCC containers are complete they can be treated as copyable
        types like this. There is no opaque container in CCC. */
-    buffer const sorted_freqs = ccc_fpq_heapsort(&fpq, &(word){});
+    buffer const sorted_freqs = CCC_fpq_heapsort(&fpq, &(word){});
     check(!fpq.buf.mem);
     int w = 0;
     /* Heap sort puts the root most nodes at the back of the buffer. */

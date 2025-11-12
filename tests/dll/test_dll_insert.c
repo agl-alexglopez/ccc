@@ -119,7 +119,7 @@ CHECK_BEGIN_STATIC_FN(dll_test_sort_even)
     CHECK(validate(&dll), true);
     CHECK(check_order(&dll, 8, (int[8]){9, 4, 1, 1, 99, -55, 5, 2}), PASS);
     CHECK(dll_is_sorted(&dll), false);
-    ccc_result const r = ccc_dll_sort(&dll);
+    CCC_result const r = CCC_dll_sort(&dll);
     CHECK(dll_is_sorted(&dll), true);
     CHECK(r, CCC_RESULT_OK);
     CHECK(validate(&dll), true);
@@ -138,7 +138,7 @@ CHECK_BEGIN_STATIC_FN(dll_test_sort_odd)
     CHECK(validate(&dll), true);
     CHECK(check_order(&dll, 9, (int[9]){9, 4, 1, 1, 99, -55, 5, 2, -99}), PASS);
     CHECK(dll_is_sorted(&dll), false);
-    ccc_result const r = ccc_dll_sort(&dll);
+    CCC_result const r = CCC_dll_sort(&dll);
     CHECK(dll_is_sorted(&dll), true);
     CHECK(r, CCC_RESULT_OK);
     CHECK(validate(&dll), true);
@@ -156,7 +156,7 @@ CHECK_BEGIN_STATIC_FN(dll_test_sort_reverse)
     CHECK(validate(&dll), true);
     CHECK(check_order(&dll, 8, (int[8]){9, 8, 7, 6, 5, 4, 3, 2}), PASS);
     CHECK(dll_is_sorted(&dll), false);
-    ccc_result const r = ccc_dll_sort(&dll);
+    CCC_result const r = CCC_dll_sort(&dll);
     CHECK(dll_is_sorted(&dll), true);
     CHECK(r, CCC_RESULT_OK);
     CHECK(validate(&dll), true);
@@ -178,7 +178,7 @@ CHECK_BEGIN_STATIC_FN(dll_test_sort_runs)
                     (int[12]){99, 101, 103, 4, 8, 9, -99, -55, -55, 3, 7, 10});
     CHECK(t, PASS);
     CHECK(dll_is_sorted(&dll), false);
-    ccc_result const r = ccc_dll_sort(&dll);
+    CCC_result const r = CCC_dll_sort(&dll);
     CHECK(dll_is_sorted(&dll), true);
     CHECK(r, CCC_RESULT_OK);
     CHECK(validate(&dll), true);
@@ -201,7 +201,7 @@ CHECK_BEGIN_STATIC_FN(dll_test_sort_halves)
                     (int[12]){25, 20, 18, 15, 12, 8, 21, 19, 17, 13, 10, 7});
     CHECK(t, PASS);
     CHECK(dll_is_sorted(&dll), false);
-    ccc_result const r = ccc_dll_sort(&dll);
+    CCC_result const r = CCC_dll_sort(&dll);
     CHECK(dll_is_sorted(&dll), true);
     CHECK(r, CCC_RESULT_OK);
     t = check_order(&dll, 12,
@@ -218,7 +218,7 @@ CHECK_BEGIN_STATIC_FN(dll_test_sort_insert)
         = dll_insert_sorted(&dll, &(struct val){.val = -99999}.e);
     CHECK(inserted->val, -99999);
     CHECK(validate(&dll), true);
-    (void)ccc_dll_pop_front(&dll);
+    (void)CCC_dll_pop_front(&dll);
     CHECK(validate(&dll), true);
     struct val vals[9] = {
         [0] = {.val = 9}, [1] = {.val = 4},  [2] = {.val = 1},
@@ -230,7 +230,7 @@ CHECK_BEGIN_STATIC_FN(dll_test_sort_insert)
     CHECK(validate(&dll), true);
     CHECK(check_order(&dll, 9, (int[9]){9, 4, 1, 1, 99, -55, 5, 2, -99}), PASS);
     CHECK(dll_is_sorted(&dll), false);
-    ccc_result const r = dll_sort(&dll);
+    CCC_result const r = dll_sort(&dll);
     CHECK(dll_is_sorted(&dll), true);
     CHECK(r, CCC_RESULT_OK);
     CHECK(validate(&dll), true);

@@ -71,7 +71,7 @@ enum : uint8_t
     ITER_END = 2,
 };
 
-/** Tree nodes will be pushed into a ccc_buffer. This is the same concept as
+/** Tree nodes will be pushed into a CCC_buffer. This is the same concept as
 freely allocating them in the heap, but much more efficient and convenient. We
 push elements to the back of the buffer to allocate and because we never free
 any nodes until we are done with the entire tree this is an optimal bump
@@ -104,7 +104,7 @@ struct fpq_elem
 reserving the appropriate space for helper data structures. */
 struct huffman_tree
 {
-    ccc_buffer bump_arena;
+    CCC_buffer bump_arena;
     size_t root;
     size_t num_nodes;
     size_t num_leaves;
@@ -184,17 +184,17 @@ static str_view const cccz_suffix = SV(".cccz");
 
 static void zip_file(str_view to_compress);
 static flat_priority_queue build_encoding_pq(FILE *f, struct huffman_tree *);
-static void bitq_push_back(struct bitq *, ccc_tribool);
-static ccc_tribool bitq_pop_back(struct bitq *bq);
-static ccc_tribool bitq_pop_front(struct bitq *);
-static ccc_tribool bitq_test(struct bitq const *, size_t i);
+static void bitq_push_back(struct bitq *, CCC_tribool);
+static CCC_tribool bitq_pop_back(struct bitq *bq);
+static CCC_tribool bitq_pop_front(struct bitq *);
+static CCC_tribool bitq_test(struct bitq const *, size_t i);
 static size_t bitq_count(struct bitq const *bq);
 static void bitq_clear_and_free(struct bitq *);
-static ccc_result bitq_reserve(struct bitq *, size_t to_add);
-static uint64_t hash_char(ccc_any_key to_hash);
-static ccc_threeway_cmp char_eq(ccc_any_key_cmp);
-static ccc_threeway_cmp cmp_freqs(ccc_any_type_cmp cmp);
-static ccc_threeway_cmp path_memo_cmp(ccc_any_key_cmp cmp);
+static CCC_result bitq_reserve(struct bitq *, size_t to_add);
+static uint64_t hash_char(CCC_any_key to_hash);
+static CCC_threeway_cmp char_eq(CCC_any_key_cmp);
+static CCC_threeway_cmp cmp_freqs(CCC_any_type_cmp cmp);
+static CCC_threeway_cmp path_memo_cmp(CCC_any_key_cmp cmp);
 static void memoize_path(struct huffman_tree *tree, flat_hash_map *fh,
                          struct bitq *, char c);
 static struct bitq build_encoding_bitq(FILE *f, struct huffman_tree *tree);
@@ -359,7 +359,7 @@ build_encoding_tree(FILE *const f)
     {
         /* Small elements and we need the pair so we can't hold references. */
         struct fpq_elem zero = *(struct fpq_elem *)front(&pq);
-        ccc_result r = pop(&pq, &(struct fpq_elem){});
+        CCC_result r = pop(&pq, &(struct fpq_elem){});
         check(r == CCC_RESULT_OK);
         struct fpq_elem one = *(struct fpq_elem *)front(&pq);
         r = pop(&pq, &(struct fpq_elem){});
@@ -382,7 +382,7 @@ build_encoding_tree(FILE *const f)
        needs was already allocated by the buffer it stole from. The priority
        queue only gets smaller as the algorithms progresses so we didn't need
        to worry about growth. Provide same function used to reserve buffer. */
-    ccc_result const r = clear_and_free_reserve(&pq, NULL, std_alloc);
+    CCC_result const r = clear_and_free_reserve(&pq, NULL, std_alloc);
     check(r == CCC_RESULT_OK);
     return ret;
 }
@@ -408,7 +408,7 @@ build_encoding_pq(FILE *const f, struct huffman_tree *const tree)
     check(leaves >= 2);
     tree->num_leaves = leaves;
     tree->num_nodes = (2 * leaves) - 1;
-    ccc_result r = reserve(&tree->bump_arena, tree->num_nodes + 1, std_alloc);
+    CCC_result r = reserve(&tree->bump_arena, tree->num_nodes + 1, std_alloc);
     check(r == CCC_RESULT_OK);
     /* For a buffer based tree 0 is the NULL node so we can't have actual data
        we want at that index in the tree. */
@@ -454,9 +454,9 @@ build_encoding_bitq(FILE *const f, struct huffman_tree *const tree)
        alphabets aka trees with many leaves. An array of 0-256 elements as a map
        could achieve the same result faster but it would waste much more space.
        It is rare to have a file use all 256 possible character values. */
-    flat_hash_map memo = ccc_fhm_init(NULL, struct path_memo, ch, hash_char,
+    flat_hash_map memo = CCC_fhm_init(NULL, struct path_memo, ch, hash_char,
                                       path_memo_cmp, NULL, NULL, 0);
-    ccc_result r = reserve(&memo, tree->num_leaves, std_alloc);
+    CCC_result r = reserve(&memo, tree->num_leaves, std_alloc);
     check(r == CCC_RESULT_OK);
     foreach_filechar(f, c, {
         struct path_memo const *path = get_key_val(&memo, c);
@@ -465,7 +465,7 @@ build_encoding_bitq(FILE *const f, struct huffman_tree *const tree)
             size_t const end = path->path_start_index + path->path_len;
             for (size_t i = path->path_start_index; i < end; ++i)
             {
-                ccc_tribool const bit = bitq_test(&ret, i);
+                CCC_tribool const bit = bitq_test(&ret, i);
                 check(bit != CCC_TRIBOOL_ERROR);
                 bitq_push_back(&ret, bit);
             }
@@ -542,7 +542,7 @@ compress_tree(struct huffman_tree *const tree)
     };
     check(ret.arena.arena);
     ret.leaf_string = str_arena_alloc(&ret.arena, 0);
-    ccc_result const r = bitq_reserve(&ret.tree_paths, tree->num_nodes);
+    CCC_result const r = bitq_reserve(&ret.tree_paths, tree->num_nodes);
     check(r == CCC_RESULT_OK);
     size_t cur = tree->root;
     /* To properly emulate a recursive Pre-Order traversal with iteration we
@@ -642,7 +642,7 @@ represents a bit in the bit queue. */
 static void
 write_bitq(FILE *const cccz, struct bitq *const bq)
 {
-    static_assert(sizeof(uint8_t) == sizeof(ccc_tribool));
+    static_assert(sizeof(uint8_t) == sizeof(CCC_tribool));
     uint8_t buf = 0;
     uint8_t i = 0;
     while (bitq_count(bq))
@@ -699,7 +699,7 @@ unzip_file(str_view unzip)
 
     /* This means the compressed file was valid so write a new one to output. */
     char path[FILESYS_MAX_PATH];
-    ccc_tribool has_suf = sv_ends_with(unzip, cccz_suffix);
+    CCC_tribool has_suf = sv_ends_with(unzip, cccz_suffix);
     check(has_suf);
     unzip = sv_remove_suffix(unzip, sv_len(cccz_suffix));
     size_t const dir_delim = sv_rfind(unzip, sv_len(unzip), SV("/"));
@@ -734,7 +734,7 @@ the tree and write out a copy of the original file to the output directory. */
 static struct huffman_encoding
 read_from_file(str_view const unzip)
 {
-    ccc_tribool has_suffix = sv_ends_with(unzip, SV(".cccz"));
+    CCC_tribool has_suffix = sv_ends_with(unzip, SV(".cccz"));
     check(has_suffix);
     FILE *const cccz = fopen(sv_begin(unzip), "r");
     check(cccz, (void)fprintf(stderr, "%s", strerror(errno)););
@@ -778,7 +778,7 @@ reconstruct_tree(struct compressed_huffman_tree *const blueprint)
     struct huffman_tree ret = {
         .bump_arena
         /* 0 index is NULL so real data can't be there. */
-        = ccc_buf_from(std_alloc, NULL, bq_count,
+        = CCC_buf_from(std_alloc, NULL, bq_count,
                        (struct huffman_node[]){
                            {}, // nil
                            {}, // root
@@ -789,7 +789,7 @@ reconstruct_tree(struct compressed_huffman_tree *const blueprint)
         .root = 1,
         .num_nodes = bq_count,
     };
-    check(!ccc_buf_is_empty(&ret.bump_arena));
+    check(!CCC_buf_is_empty(&ret.bump_arena));
     (void)bitq_pop_front(&blueprint->tree_paths);
     size_t parent = ret.root;
     size_t node = 0;
@@ -797,14 +797,14 @@ reconstruct_tree(struct compressed_huffman_tree *const blueprint)
         = str_arena_at(&blueprint->arena, &blueprint->leaf_string);
     while (bitq_count(&blueprint->tree_paths))
     {
-        ccc_tribool bit = CCC_TRUE;
+        CCC_tribool bit = CCC_TRUE;
         if (!node)
         {
             struct huffman_node *const parent_r = node_at(&ret, parent);
             bit = bitq_pop_front(&blueprint->tree_paths);
             struct huffman_node *const pushed = push_back(
                 &ret.bump_arena, &(struct huffman_node){.parent = parent});
-            node = ccc_buf_i(&ret.bump_arena, pushed).count;
+            node = CCC_buf_i(&ret.bump_arena, pushed).count;
             parent_r->link[parent_r->iter++] = node;
             if (!bit)
             {
@@ -840,7 +840,7 @@ reconstruct_text(FILE *const f, struct huffman_tree const *const tree,
     {
         /* All paths started from the root during encoding and chose a direction
            first so popping is OK here. Root 1 node never was pushed to q. */
-        ccc_tribool const bit = bitq_pop_front(bq);
+        CCC_tribool const bit = bitq_pop_front(bq);
         check(bit != CCC_TRIBOOL_ERROR);
         cur = branch_i(tree, cur, bit);
         if (!branch_i(tree, cur, 1))
@@ -869,8 +869,8 @@ fill_bitq(FILE *const f, struct bitq *const bq, size_t expected_bits)
             check(byte);
             i = 0;
         }
-        static_assert(sizeof(ccc_tribool) == sizeof(uint8_t));
-        ccc_tribool const bit = (buf & ((uint8_t)1 << i)) != 0;
+        static_assert(sizeof(CCC_tribool) == sizeof(uint8_t));
+        CCC_tribool const bit = (buf & ((uint8_t)1 << i)) != 0;
         bitq_push_back(bq, bit);
         ++i;
     }
@@ -929,7 +929,7 @@ char_i(struct huffman_tree const *const t, size_t const node)
 static void
 free_encode_tree(struct huffman_tree *tree)
 {
-    ccc_result const r
+    CCC_result const r
         = clear_and_free_reserve(&tree->bump_arena, NULL, std_alloc);
     check(r == CCC_RESULT_OK);
     *tree = (struct huffman_tree){};
@@ -1059,23 +1059,23 @@ print_bitq(struct bitq const *const bq)
 /*=====================       Bit Queue Helper Code     =====================*/
 
 static void
-bitq_push_back(struct bitq *const bq, ccc_tribool const bit)
+bitq_push_back(struct bitq *const bq, CCC_tribool const bit)
 {
     if (bq->size == bs_count(&bq->bs).count)
     {
-        ccc_result const r = push_back(&bq->bs, bit);
+        CCC_result const r = push_back(&bq->bs, bit);
         check(r == CCC_RESULT_OK);
     }
     else
     {
-        ccc_tribool const was = bs_set(
+        CCC_tribool const was = bs_set(
             &bq->bs, (bq->front + bq->size) % capacity(&bq->bs).count, bit);
         check(was != CCC_TRIBOOL_ERROR);
     }
     ++bq->size;
 }
 
-static ccc_tribool
+static CCC_tribool
 bitq_pop_back(struct bitq *const bq)
 {
     if (!bq->size)
@@ -1083,27 +1083,27 @@ bitq_pop_back(struct bitq *const bq)
         return CCC_TRIBOOL_ERROR;
     }
     size_t const i = (bq->front + bq->size - 1) % capacity(&bq->bs).count;
-    ccc_tribool const bit = bs_test(&bq->bs, i);
+    CCC_tribool const bit = bs_test(&bq->bs, i);
     check(bit != CCC_TRIBOOL_ERROR);
     --bq->size;
     return bit;
 }
 
-static ccc_tribool
+static CCC_tribool
 bitq_pop_front(struct bitq *const bq)
 {
     if (!bq->size)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    ccc_tribool const bit = bs_test(&bq->bs, bq->front);
+    CCC_tribool const bit = bs_test(&bq->bs, bq->front);
     check(bit != CCC_TRIBOOL_ERROR);
     bq->front = (bq->front + 1) % count(&bq->bs).count;
     --bq->size;
     return bit;
 }
 
-static ccc_tribool
+static CCC_tribool
 bitq_test(struct bitq const *const bq, size_t const i)
 {
     if (!bq->size)
@@ -1123,11 +1123,11 @@ static void
 bitq_clear_and_free(struct bitq *const bq)
 {
     check(bq);
-    ccc_result const r = clear_and_free(&bq->bs);
+    CCC_result const r = clear_and_free(&bq->bs);
     check(r == CCC_RESULT_OK);
 }
 
-static ccc_result
+static CCC_result
 bitq_reserve(struct bitq *const bq, size_t const to_add)
 {
     return reserve(&bq->bs, to_add, std_alloc);
@@ -1140,30 +1140,30 @@ in the high and low byte of our hash but we are only hashing characters which
 are their own unique value across all characters we will encounter. So the
 hashed value will just be the character repeated at the high and low byte. */
 static uint64_t
-hash_char(ccc_any_key const to_hash)
+hash_char(CCC_any_key const to_hash)
 {
     char const key = *(char *)to_hash.any_key;
     return ((uint64_t)key << 55) | key;
 }
 
-static ccc_threeway_cmp
-char_eq(ccc_any_key_cmp const cmp)
+static CCC_threeway_cmp
+char_eq(CCC_any_key_cmp const cmp)
 {
     struct char_freq const *const rhs = (struct char_freq *)cmp.any_type_rhs;
     char const lhs = *(char *)cmp.any_key_lhs;
     return (lhs > rhs->ch) - (lhs < rhs->ch);
 }
 
-static ccc_threeway_cmp
-cmp_freqs(ccc_any_type_cmp const cmp)
+static CCC_threeway_cmp
+cmp_freqs(CCC_any_type_cmp const cmp)
 {
     struct fpq_elem const *const lhs = (struct fpq_elem *)cmp.any_type_lhs;
     struct fpq_elem const *const rhs = (struct fpq_elem *)cmp.any_type_rhs;
     return (lhs->freq > rhs->freq) - (lhs->freq < rhs->freq);
 }
 
-static ccc_threeway_cmp
-path_memo_cmp(ccc_any_key_cmp const cmp)
+static CCC_threeway_cmp
+path_memo_cmp(CCC_any_key_cmp const cmp)
 {
     struct path_memo const *const rhs = (struct path_memo *)cmp.any_type_rhs;
     char const lhs = *(char *)cmp.any_key_lhs;

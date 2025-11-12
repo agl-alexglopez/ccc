@@ -18,8 +18,8 @@ CHECK_BEGIN_STATIC_FN(fpq_test_insert_iterate_pop)
     srand(1);
     size_t const num_nodes = 1000;
     struct val vals[1000 + 1];
-    ccc_flat_priority_queue fpq
-        = ccc_fpq_init(vals, struct val, CCC_LES, val_cmp, NULL, NULL,
+    CCC_flat_priority_queue fpq
+        = CCC_fpq_init(vals, struct val, CCC_LES, val_cmp, NULL, NULL,
                        (sizeof(vals) / sizeof(vals[0])));
     for (size_t i = 0; i < num_nodes; ++i)
     {
@@ -47,13 +47,13 @@ CHECK_BEGIN_STATIC_FN(fpq_test_priority_removal)
     srand(time(NULL));
     size_t const num_nodes = 1000;
     struct val vals[1000 + 1];
-    ccc_flat_priority_queue fpq
-        = ccc_fpq_init(vals, struct val, CCC_LES, val_cmp, NULL, NULL,
+    CCC_flat_priority_queue fpq
+        = CCC_fpq_init(vals, struct val, CCC_LES, val_cmp, NULL, NULL,
                        (sizeof(vals) / sizeof(vals[0])));
     for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
-        struct val const *res = ccc_fpq_emplace(
+        struct val const *res = CCC_fpq_emplace(
             &fpq, (struct val){
                       .val = rand() % (num_nodes + 1), /*NOLINT*/
                       .id = (int)i,
@@ -82,13 +82,13 @@ CHECK_BEGIN_STATIC_FN(fpq_test_priority_update)
     srand(time(NULL));
     size_t const num_nodes = 1000;
     struct val vals[1000 + 1];
-    ccc_flat_priority_queue fpq
-        = ccc_fpq_init(vals, struct val, CCC_LES, val_cmp, NULL, NULL,
+    CCC_flat_priority_queue fpq
+        = CCC_fpq_init(vals, struct val, CCC_LES, val_cmp, NULL, NULL,
                        (sizeof(vals) / sizeof(vals[0])));
     for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
-        struct val const *res = ccc_fpq_emplace(
+        struct val const *res = CCC_fpq_emplace(
             &fpq, (struct val){
                       .val = rand() % (num_nodes + 1), /*NOLINT*/
                       .id = (int)i,
@@ -121,13 +121,13 @@ CHECK_BEGIN_STATIC_FN(fpq_test_priority_update_with)
     srand(time(NULL));
     size_t const num_nodes = 1000;
     struct val vals[1000 + 1];
-    ccc_flat_priority_queue fpq
-        = ccc_fpq_init(vals, struct val, CCC_LES, val_cmp, NULL, NULL,
+    CCC_flat_priority_queue fpq
+        = CCC_fpq_init(vals, struct val, CCC_LES, val_cmp, NULL, NULL,
                        (sizeof(vals) / sizeof(vals[0])));
     for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
-        struct val const *res = ccc_fpq_emplace(
+        struct val const *res = CCC_fpq_emplace(
             &fpq, (struct val){
                       .val = rand() % (num_nodes + 1), /*NOLINT*/
                       .id = (int)i,
@@ -142,7 +142,7 @@ CHECK_BEGIN_STATIC_FN(fpq_test_priority_update_with)
         if (vals[val].val > limit)
         {
             struct val const *const updated
-                = ccc_fpq_update_w(&fpq, &vals[val],
+                = CCC_fpq_update_w(&fpq, &vals[val],
                                    {
                                        T->val = backoff;
                                    });

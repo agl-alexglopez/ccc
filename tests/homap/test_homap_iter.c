@@ -137,7 +137,7 @@ CHECK_BEGIN_STATIC_FN(iterator_check, handle_ordered_map *s)
 
 CHECK_BEGIN_STATIC_FN(homap_test_forward_iter)
 {
-    ccc_handle_ordered_map s = hom_init(&(small_fixed_map){}, struct val, id,
+    CCC_handle_ordered_map s = hom_init(&(small_fixed_map){}, struct val, id,
                                         id_cmp, NULL, NULL, SMALL_FIXED_CAP);
     /* We should have the expected behavior iteration over empty tree. */
     int j = 0;
@@ -167,7 +167,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_forward_iter)
 
 CHECK_BEGIN_STATIC_FN(homap_test_iterate_removal)
 {
-    ccc_handle_ordered_map s = hom_init(&(standard_fixed_map){}, struct val, id,
+    CCC_handle_ordered_map s = hom_init(&(standard_fixed_map){}, struct val, id,
                                         id_cmp, NULL, NULL, STANDARD_FIXED_CAP);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
@@ -198,7 +198,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_iterate_removal)
 
 CHECK_BEGIN_STATIC_FN(homap_test_iterate_remove_reinsert)
 {
-    ccc_handle_ordered_map s = hom_init(&(standard_fixed_map){}, struct val, id,
+    CCC_handle_ordered_map s = hom_init(&(standard_fixed_map){}, struct val, id,
                                         id_cmp, NULL, NULL, STANDARD_FIXED_CAP);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
@@ -223,7 +223,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_iterate_remove_reinsert)
             struct val new_val = {.id = i->id};
             (void)remove(&s, &new_val);
             new_val.id = new_unique_handle_id;
-            ccc_handle e = insert_or_assign(&s, &new_val);
+            CCC_handle e = insert_or_assign(&s, &new_val);
             CHECK(unwrap(&e) != 0, true);
             CHECK(validate(&s), true);
             ++new_unique_handle_id;
@@ -235,7 +235,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_iterate_remove_reinsert)
 
 CHECK_BEGIN_STATIC_FN(homap_test_valid_range)
 {
-    ccc_handle_ordered_map s = hom_init(&(small_fixed_map){}, struct val, id,
+    CCC_handle_ordered_map s = hom_init(&(small_fixed_map){}, struct val, id,
                                         id_cmp, NULL, NULL, SMALL_FIXED_CAP);
 
     int const num_nodes = 25;
@@ -262,7 +262,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_valid_range)
 
 CHECK_BEGIN_STATIC_FN(homap_test_valid_range_equals)
 {
-    ccc_handle_ordered_map s = hom_init(&(small_fixed_map){}, struct val, id,
+    CCC_handle_ordered_map s = hom_init(&(small_fixed_map){}, struct val, id,
                                         id_cmp, NULL, NULL, SMALL_FIXED_CAP);
     int const num_nodes = 25;
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
@@ -287,7 +287,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_valid_range_equals)
 
 CHECK_BEGIN_STATIC_FN(homap_test_invalid_range)
 {
-    ccc_handle_ordered_map s = hom_init(&(small_fixed_map){}, struct val, id,
+    CCC_handle_ordered_map s = hom_init(&(small_fixed_map){}, struct val, id,
                                         id_cmp, NULL, NULL, SMALL_FIXED_CAP);
     int const num_nodes = 25;
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
@@ -313,7 +313,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_invalid_range)
 
 CHECK_BEGIN_STATIC_FN(homap_test_empty_range)
 {
-    ccc_handle_ordered_map s = hom_init(&(small_fixed_map){}, struct val, id,
+    CCC_handle_ordered_map s = hom_init(&(small_fixed_map){}, struct val, id,
                                         id_cmp, NULL, NULL, SMALL_FIXED_CAP);
     int const num_nodes = 25;
     int const step = 5;
@@ -326,11 +326,11 @@ CHECK_BEGIN_STATIC_FN(homap_test_empty_range)
     /* Nonexistant range returns end [begin, end) in both positions.
        which may not be the end element but a value in the tree. However,
        Normal iteration patterns would consider this empty. */
-    ccc_range const forward_range = equal_range(&s, &(int){-50}, &(int){-25});
+    CCC_range const forward_range = equal_range(&s, &(int){-50}, &(int){-25});
     CHECK(((struct val *)begin_range(&forward_range))->id, 0);
     CHECK(((struct val *)end_range(&forward_range))->id, 0);
     CHECK(begin_range(&forward_range), end_range(&forward_range));
-    ccc_rrange const rev_range = equal_rrange(&s, &(int){150}, &(int){999});
+    CCC_rrange const rev_range = equal_rrange(&s, &(int){150}, &(int){999});
     CHECK(rbegin_rrange(&rev_range), rend_rrange(&rev_range));
     CHECK(((struct val *)rbegin_rrange(&rev_range))->id,
           (num_nodes * step) - step);

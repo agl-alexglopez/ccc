@@ -94,7 +94,7 @@ CHECK_BEGIN_STATIC_FN(buf_test_daily_temperatures)
                 = buf_emplace(&res, *buf_back_as(&idx_stack, int),
                               i - *buf_back_as(&idx_stack, int));
             CHECK(ptr != NULL, CCC_TRUE);
-            ccc_result const r = buf_pop_back(&idx_stack);
+            CCC_result const r = buf_pop_back(&idx_stack);
             CHECK(r, CCC_RESULT_OK);
         }
         int const *const ptr = buf_push_back(&idx_stack, &i);
@@ -106,8 +106,8 @@ CHECK_BEGIN_STATIC_FN(buf_test_daily_temperatures)
     CHECK_END_FN();
 }
 
-static ccc_threeway_cmp
-cmp_car_idx(ccc_any_type_cmp const cmp)
+static CCC_threeway_cmp
+cmp_car_idx(CCC_any_type_cmp const cmp)
 {
     buffer const *const positions = cmp.aux;
     int const *const lhs_pos = buf_at(positions, *(int *)cmp.any_type_lhs);
@@ -174,7 +174,7 @@ CHECK_BEGIN_STATIC_FN(buf_test_largest_rectangle_in_histogram)
         {
             int const stack_top_i = *buf_back_as(&bar_indices, int);
             int const stack_top_height = *buf_as(&heights, int, stack_top_i);
-            ccc_result const r = buf_pop_back(&bar_indices);
+            CCC_result const r = buf_pop_back(&bar_indices);
             CHECK(r, CCC_RESULT_OK);
             int const w = buf_is_empty(&bar_indices)
                             ? i
@@ -197,9 +197,9 @@ CHECK_BEGIN_STATIC_FN(buf_test_erase)
     buffer b = buf_init(((int[BECAP]){0, 1, 2, 3, 4, 5, 6, 7}), int, NULL, NULL,
                         BECAP, BECAP);
     CHECK(buf_count(&b).count, BECAP);
-    ccc_result r = buf_erase(&b, 4);
+    CCC_result r = buf_erase(&b, 4);
     CHECK(r, CCC_RESULT_OK);
-    ccc_threeway_cmp cmp
+    CCC_threeway_cmp cmp
         = bufcmp(&b, BECAP - 1, (int[BECAP - 1]){0, 1, 2, 3, 5, 6, 7});
     CHECK(cmp, CCC_EQL);
     CHECK(buf_count(&b).count, BECAP - 1);

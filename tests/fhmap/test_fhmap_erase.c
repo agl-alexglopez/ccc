@@ -14,16 +14,16 @@
 
 CHECK_BEGIN_STATIC_FN(fhmap_test_erase)
 {
-    ccc_flat_hash_map fh
+    CCC_flat_hash_map fh
         = fhm_init(&(small_fixed_map){}, struct val, key, fhmap_int_zero,
                    fhmap_id_cmp, NULL, NULL, SMALL_FIXED_CAP);
     struct val query = {.key = 137, .val = 99};
     /* Nothing was there before so nothing is in the entry. */
-    ccc_entry ent = swap_entry(&fh, &query);
+    CCC_entry ent = swap_entry(&fh, &query);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent) != NULL, true);
     CHECK(count(&fh).count, 1);
-    ent = ccc_remove(&fh, &query);
+    ent = CCC_remove(&fh, &query);
     CHECK(occupied(&ent), true);
     struct val *v = unwrap(&ent);
     CHECK(v != NULL, true);
@@ -31,10 +31,10 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_erase)
     CHECK(v->val, 99);
     CHECK(count(&fh).count, 0);
     query.key = 101;
-    ent = ccc_remove(&fh, &query);
+    ent = CCC_remove(&fh, &query);
     CHECK(occupied(&ent), false);
     CHECK(count(&fh).count, 0);
-    ccc_fhm_insert_entry_w(entry_r(&fh, &(int){137}),
+    CCC_fhm_insert_entry_w(entry_r(&fh, &(int){137}),
                            (struct val){.key = 137, .val = 99});
     CHECK(count(&fh).count, 1);
     CHECK(occupied(remove_entry_r(entry_r(&fh, &(int){137}))), true);
@@ -44,7 +44,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_erase)
 
 CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_insert_erase)
 {
-    ccc_flat_hash_map h = fhm_init(NULL, struct val, key, fhmap_int_to_u64,
+    CCC_flat_hash_map h = fhm_init(NULL, struct val, key, fhmap_int_to_u64,
                                    fhmap_id_cmp, std_alloc, NULL, 0);
     int const to_insert = 100;
     int const larger_prime = 101;
@@ -73,7 +73,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_insert_erase)
         }
         else
         {
-            ccc_entry removed = remove_entry(entry_r(&h, &i));
+            CCC_entry removed = remove_entry(entry_r(&h, &i));
             CHECK(occupied(&removed), true);
         }
         --cur_size;
@@ -88,7 +88,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_insert_erase)
 /* This test will force us to test our in place hashing algorithm. */
 CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_erase_fixed)
 {
-    ccc_flat_hash_map h
+    CCC_flat_hash_map h
         = fhm_init(&(standard_fixed_map){}, struct val, key, fhmap_int_to_u64,
                    fhmap_id_cmp, NULL, NULL, STANDARD_FIXED_CAP);
     int to_insert[STANDARD_FIXED_CAP];
@@ -116,9 +116,9 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_erase_fixed)
     for (; i < (int)(full_size / 2); ++i)
     {
         int const cur = to_insert[i];
-        ccc_tribool const check = contains(&h, &cur);
+        CCC_tribool const check = contains(&h, &cur);
         CHECK(check, true);
-        ccc_entry removed = remove_entry(entry_r(&h, &cur));
+        CCC_entry removed = remove_entry(entry_r(&h, &cur));
         CHECK(occupied(&removed), true);
         CHECK(validate(&h), true);
     }
@@ -126,7 +126,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_erase_fixed)
     for (; i < (int)(full_size / 2); ++i)
     {
         int const cur = to_insert[i];
-        ccc_entry const *const e
+        CCC_entry const *const e
             = fhm_insert_or_assign_w(&h, cur, (struct val){.val = i});
         CHECK(occupied(e), false);
         CHECK(validate(&h), true);
@@ -136,7 +136,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_erase_fixed)
     while (!is_empty(&h) && cur_size)
     {
         int const cur = to_insert[i];
-        ccc_tribool const check = contains(&h, &cur);
+        CCC_tribool const check = contains(&h, &cur);
         CHECK(check, true);
         if (i % 2)
         {
@@ -147,7 +147,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_erase_fixed)
         }
         else
         {
-            ccc_entry removed = remove_entry(entry_r(&h, &cur));
+            CCC_entry removed = remove_entry(entry_r(&h, &cur));
             CHECK(occupied(&removed), true);
         }
         --cur_size;
@@ -164,10 +164,10 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_erase_reserved)
     /* The map will be given dynamically reserved space but no ability to
        resize. All algorithms should function normally and in place rehashing
        should take effect. */
-    ccc_flat_hash_map h = fhm_init(NULL, struct val, key, fhmap_int_to_u64,
+    CCC_flat_hash_map h = fhm_init(NULL, struct val, key, fhmap_int_to_u64,
                                    fhmap_id_cmp, NULL, NULL, 0);
     int const test_amount = 896;
-    ccc_result const res_check = ccc_fhm_reserve(&h, test_amount, std_alloc);
+    CCC_result const res_check = CCC_fhm_reserve(&h, test_amount, std_alloc);
     CHECK(res_check, CCC_RESULT_OK);
 
     /* Give ourselves plenty more to insert so we don't run out before cap. */
@@ -196,9 +196,9 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_erase_reserved)
     for (; i < (int)(full_size / 2); ++i)
     {
         int const cur = to_insert[i];
-        ccc_tribool const check = contains(&h, &cur);
+        CCC_tribool const check = contains(&h, &cur);
         CHECK(check, true);
-        ccc_entry const removed = remove_entry(entry_r(&h, &cur));
+        CCC_entry const removed = remove_entry(entry_r(&h, &cur));
         CHECK(occupied(&removed), true);
         CHECK(validate(&h), true);
     }
@@ -206,7 +206,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_erase_reserved)
     for (; i < (int)(full_size / 2); ++i)
     {
         int const cur = to_insert[i];
-        ccc_entry const *const e
+        CCC_entry const *const e
             = fhm_insert_or_assign_w(&h, cur, (struct val){.val = i});
         CHECK(occupied(e), false);
         CHECK(validate(&h), true);
@@ -216,7 +216,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_erase_reserved)
     while (!is_empty(&h) && cur_size)
     {
         int const cur = to_insert[i];
-        ccc_tribool const check = contains(&h, &cur);
+        CCC_tribool const check = contains(&h, &cur);
         CHECK(check, true);
         if (i % 2)
         {
@@ -227,7 +227,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_erase_reserved)
         }
         else
         {
-            ccc_entry removed = remove_entry(entry_r(&h, &cur));
+            CCC_entry removed = remove_entry(entry_r(&h, &cur));
             CHECK(occupied(&removed), true);
         }
         --cur_size;
@@ -236,12 +236,12 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_erase_reserved)
         CHECK(validate(&h), true);
     }
     CHECK(count(&h).count, 0);
-    CHECK_END_FN((void)ccc_fhm_clear_and_free_reserve(&h, NULL, std_alloc););
+    CHECK_END_FN((void)CCC_fhm_clear_and_free_reserve(&h, NULL, std_alloc););
 }
 
 CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_erase_dynamic)
 {
-    ccc_flat_hash_map h = fhm_init(NULL, struct val, key, fhmap_int_to_u64,
+    CCC_flat_hash_map h = fhm_init(NULL, struct val, key, fhmap_int_to_u64,
                                    fhmap_id_cmp, std_alloc, NULL, 0);
     int to_insert[1024];
     iota(to_insert, 1024, 0);
@@ -262,9 +262,9 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_erase_dynamic)
     for (; i < (int)(full_size / 2); ++i)
     {
         int const cur = to_insert[i];
-        ccc_tribool const check = contains(&h, &cur);
+        CCC_tribool const check = contains(&h, &cur);
         CHECK(check, true);
-        ccc_entry removed = remove_entry(entry_r(&h, &cur));
+        CCC_entry removed = remove_entry(entry_r(&h, &cur));
         CHECK(occupied(&removed), true);
         CHECK(validate(&h), true);
     }
@@ -272,7 +272,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_erase_dynamic)
     for (; i < (int)(full_size / 2); ++i)
     {
         int const cur = to_insert[i];
-        ccc_entry const *const e
+        CCC_entry const *const e
             = fhm_insert_or_assign_w(&h, cur, (struct val){.val = i});
         CHECK(occupied(e), false);
         CHECK(validate(&h), true);
@@ -282,7 +282,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_erase_dynamic)
     while (!is_empty(&h) && cur_size)
     {
         int const cur = to_insert[i];
-        ccc_tribool const check = contains(&h, &cur);
+        CCC_tribool const check = contains(&h, &cur);
         CHECK(check, true);
         if (i % 2)
         {
@@ -293,7 +293,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_erase_dynamic)
         }
         else
         {
-            ccc_entry removed = remove_entry(entry_r(&h, &cur));
+            CCC_entry removed = remove_entry(entry_r(&h, &cur));
             CHECK(occupied(&removed), true);
         }
         --cur_size;

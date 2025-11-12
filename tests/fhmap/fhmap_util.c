@@ -5,19 +5,19 @@
 #include "types.h"
 
 uint64_t
-fhmap_int_zero(ccc_any_key const)
+fhmap_int_zero(CCC_any_key const)
 {
     return 0;
 }
 
 uint64_t
-fhmap_int_last_digit(ccc_any_key const n)
+fhmap_int_last_digit(CCC_any_key const n)
 {
     return *((int *)n.any_key) % 10;
 }
 
-ccc_threeway_cmp
-fhmap_id_cmp(ccc_any_key_cmp const cmp)
+CCC_threeway_cmp
+fhmap_id_cmp(CCC_any_key_cmp const cmp)
 {
     struct val const *const rhs = cmp.any_type_rhs;
     int const lhs = *((int *)cmp.any_key_lhs);
@@ -25,7 +25,7 @@ fhmap_id_cmp(ccc_any_key_cmp const cmp)
 }
 
 uint64_t
-fhmap_int_to_u64(ccc_any_key const k)
+fhmap_int_to_u64(CCC_any_key const k)
 {
     int const id_int = *((int *)k.any_key);
     uint64_t x = id_int;
@@ -36,7 +36,7 @@ fhmap_int_to_u64(ccc_any_key const k)
 }
 
 void
-fhmap_modplus(ccc_any_type const mod)
+fhmap_modplus(CCC_any_type const mod)
 {
     ((struct val *)mod.any_type)->val++;
 }
@@ -48,7 +48,7 @@ fhmap_create(int const id, int const val)
 }
 
 void
-fhmap_swap_val(ccc_any_type const u)
+fhmap_swap_val(CCC_any_type const u)
 {
     struct val *v = u.any_type;
     v->val = *((int *)u.aux);

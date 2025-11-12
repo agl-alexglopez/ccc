@@ -20,18 +20,18 @@ homap_create(int const id, int const val)
 }
 
 static inline void
-homap_modplus(ccc_any_type const t)
+homap_modplus(CCC_any_type const t)
 {
     ((struct val *)t.any_type)->val++;
 }
 
 CHECK_BEGIN_STATIC_FN(homap_test_insert)
 {
-    ccc_handle_ordered_map hom = hom_init(&(small_fixed_map){}, struct val, id,
+    CCC_handle_ordered_map hom = hom_init(&(small_fixed_map){}, struct val, id,
                                           id_cmp, NULL, NULL, SMALL_FIXED_CAP);
 
     /* Nothing was there before so nothing is in the handle. */
-    ccc_handle *hndl = swap_handle_r(&hom, &(struct val){.id = 137, .val = 99});
+    CCC_handle *hndl = swap_handle_r(&hom, &(struct val){.id = 137, .val = 99});
     CHECK(occupied(hndl), false);
     CHECK(count(&hom).count, 1);
     CHECK_END_FN();
@@ -39,11 +39,11 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert)
 
 CHECK_BEGIN_STATIC_FN(homap_test_insert_macros)
 {
-    ccc_handle_ordered_map hom = hom_init(&(small_fixed_map){}, struct val, id,
+    CCC_handle_ordered_map hom = hom_init(&(small_fixed_map){}, struct val, id,
                                           id_cmp, NULL, NULL, SMALL_FIXED_CAP);
 
     struct val const *ins
-        = hom_at(&hom, ccc_hom_or_insert_w(handle_r(&hom, &(int){2}),
+        = hom_at(&hom, CCC_hom_or_insert_w(handle_r(&hom, &(int){2}),
                                            (struct val){.id = 2, .val = 0}));
     CHECK(ins != NULL, true);
     CHECK(validate(&hom), true);
@@ -63,7 +63,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert_macros)
     CHECK(validate(&hom), true);
     CHECK(ins->val, 99);
     CHECK(count(&hom).count, 3);
-    ins = hom_at(&hom, ccc_handle_unwrap(hom_insert_or_assign_w(
+    ins = hom_at(&hom, CCC_handle_unwrap(hom_insert_or_assign_w(
                            &hom, 3, (struct val){.val = 98})));
     CHECK(validate(&hom), true);
     CHECK(ins == NULL, false);
@@ -75,7 +75,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert_macros)
     CHECK(validate(&hom), true);
     CHECK(ins->val, 98);
     CHECK(count(&hom).count, 3);
-    ins = hom_at(&hom, ccc_handle_unwrap(hom_try_insert_w(
+    ins = hom_at(&hom, CCC_handle_unwrap(hom_try_insert_w(
                            &hom, 4, (struct val){.val = 100})));
     CHECK(ins == NULL, false);
     CHECK(validate(&hom), true);
@@ -86,11 +86,11 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert_macros)
 
 CHECK_BEGIN_STATIC_FN(homap_test_insert_overwrite)
 {
-    ccc_handle_ordered_map hom = hom_init(&(small_fixed_map){}, struct val, id,
+    CCC_handle_ordered_map hom = hom_init(&(small_fixed_map){}, struct val, id,
                                           id_cmp, NULL, NULL, SMALL_FIXED_CAP);
 
     struct val q = {.id = 137, .val = 99};
-    ccc_handle hndl = swap_handle(&hom, &q);
+    CCC_handle hndl = swap_handle(&hom, &q);
     CHECK(occupied(&hndl), false);
 
     struct val const *v = hom_at(&hom, unwrap(handle_r(&hom, &q.id)));
@@ -102,7 +102,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert_overwrite)
     q = (struct val){.id = 137, .val = 100};
 
     /* The contents of q are now in the table. */
-    ccc_handle in_table = swap_handle(&hom, &q);
+    CCC_handle in_table = swap_handle(&hom, &q);
     CHECK(occupied(&in_table), true);
 
     /* The old contents are now in q and the handle is in the table. */
@@ -118,10 +118,10 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert_overwrite)
 
 CHECK_BEGIN_STATIC_FN(homap_test_insert_then_bad_ideas)
 {
-    ccc_handle_ordered_map hom = hom_init(&(small_fixed_map){}, struct val, id,
+    CCC_handle_ordered_map hom = hom_init(&(small_fixed_map){}, struct val, id,
                                           id_cmp, NULL, NULL, SMALL_FIXED_CAP);
     struct val q = {.id = 137, .val = 99};
-    ccc_handle hndl = swap_handle(&hom, &q);
+    CCC_handle hndl = swap_handle(&hom, &q);
     CHECK(occupied(&hndl), false);
     struct val const *v = hom_at(&hom, unwrap(handle_r(&hom, &q.id)));
     CHECK(v != NULL, true);
@@ -147,7 +147,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert_then_bad_ideas)
 CHECK_BEGIN_STATIC_FN(homap_test_handle_api_functional)
 {
     /* Over allocate size now because we don't want to worry about resizing. */
-    ccc_handle_ordered_map hom
+    CCC_handle_ordered_map hom
         = hom_init(&(standard_fixed_map){}, struct val, id, id_cmp, NULL, NULL,
                    STANDARD_FIXED_CAP);
     size_t const size = 200;
@@ -172,7 +172,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_handle_api_functional)
     {
         def.id = (int)i;
         def.val = (int)i;
-        ccc_handle_i const h
+        CCC_handle_i const h
             = or_insert(hom_and_modify_w(handle_r(&hom, &def.id), struct val,
                                          { T->val++; }),
                         &def);
@@ -210,7 +210,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_handle_api_functional)
 CHECK_BEGIN_STATIC_FN(homap_test_insert_via_handle)
 {
     /* Over allocate size now because we don't want to worry about resizing. */
-    ccc_handle_ordered_map hom
+    CCC_handle_ordered_map hom
         = hom_init(&(standard_fixed_map){}, struct val, id, id_cmp, NULL, NULL,
                    STANDARD_FIXED_CAP);
     size_t const size = 200;
@@ -256,7 +256,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert_via_handle)
 CHECK_BEGIN_STATIC_FN(homap_test_insert_via_handle_macros)
 {
     /* Over allocate size now because we don't want to worry about resizing. */
-    ccc_handle_ordered_map hom
+    CCC_handle_ordered_map hom
         = hom_init(&(standard_fixed_map){}, struct val, id, id_cmp, NULL, NULL,
                    STANDARD_FIXED_CAP);
     size_t const size = 200;
@@ -297,7 +297,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert_via_handle_macros)
 CHECK_BEGIN_STATIC_FN(homap_test_handle_api_macros)
 {
     /* Over allocate size now because we don't want to worry about resizing. */
-    ccc_handle_ordered_map hom
+    CCC_handle_ordered_map hom
         = hom_init(&(standard_fixed_map){}, struct val, id, id_cmp, NULL, NULL,
                    STANDARD_FIXED_CAP);
     int const size = 200;
@@ -353,7 +353,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_handle_api_macros)
 
 CHECK_BEGIN_STATIC_FN(homap_test_two_sum)
 {
-    ccc_handle_ordered_map hom = hom_init(&(small_fixed_map){}, struct val, id,
+    CCC_handle_ordered_map hom = hom_init(&(small_fixed_map){}, struct val, id,
                                           id_cmp, NULL, NULL, SMALL_FIXED_CAP);
     int const addends[10] = {1, 3, -980, 6, 7, 13, 44, 32, 995, -1};
     int const target = 15;
@@ -368,7 +368,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_two_sum)
             solution_indices[1] = other_addend->val;
             break;
         }
-        ccc_handle const e
+        CCC_handle const e
             = insert_or_assign(&hom, &(struct val){.id = addends[i], .val = i});
         CHECK(insert_error(&e), false);
     }
@@ -379,7 +379,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_two_sum)
 
 CHECK_BEGIN_STATIC_FN(homap_test_resize)
 {
-    ccc_handle_ordered_map hom
+    CCC_handle_ordered_map hom
         = hom_init(NULL, struct val, id, id_cmp, std_alloc, NULL, 0);
     int const to_insert = 1000;
     int const larger_prime = 1009;
@@ -411,9 +411,9 @@ CHECK_BEGIN_STATIC_FN(homap_test_resize)
 CHECK_BEGIN_STATIC_FN(homap_test_reserve)
 {
     int const to_insert = 1000;
-    ccc_handle_ordered_map hom
+    CCC_handle_ordered_map hom
         = hom_init(NULL, struct val, id, id_cmp, NULL, NULL, 0);
-    ccc_result const r = hom_reserve(&hom, to_insert, std_alloc);
+    CCC_result const r = hom_reserve(&hom, to_insert, std_alloc);
     CHECK(r, CCC_RESULT_OK);
     int const larger_prime = 1009;
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
@@ -442,7 +442,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_reserve)
 
 CHECK_BEGIN_STATIC_FN(homap_test_resize_macros)
 {
-    ccc_handle_ordered_map hom
+    CCC_handle_ordered_map hom
         = hom_init(NULL, struct val, id, id_cmp, std_alloc, NULL, 0);
     int const to_insert = 1000;
     int const larger_prime = 1009;
@@ -460,7 +460,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_resize_macros)
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
-        ccc_handle_i const h = hom_or_insert_w(
+        CCC_handle_i const h = hom_or_insert_w(
             hom_and_modify_w(handle_r(&hom, &shuffled_index), struct val,
                              { T->val = shuffled_index; }),
             (struct val){});
@@ -482,7 +482,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_resize_macros)
 
 CHECK_BEGIN_STATIC_FN(homap_test_resize_from_null)
 {
-    ccc_handle_ordered_map hom
+    CCC_handle_ordered_map hom
         = hom_init(NULL, struct val, id, id_cmp, std_alloc, NULL, 0);
     int const to_insert = 1000;
     int const larger_prime = 1009;
@@ -512,7 +512,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_resize_from_null)
 
 CHECK_BEGIN_STATIC_FN(homap_test_resize_from_null_macros)
 {
-    ccc_handle_ordered_map hom
+    CCC_handle_ordered_map hom
         = hom_init(NULL, struct val, id, id_cmp, std_alloc, NULL, 0);
     int const to_insert = 1000;
     int const larger_prime = 1009;
@@ -530,7 +530,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_resize_from_null_macros)
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
-        ccc_handle_i const h = hom_or_insert_w(
+        CCC_handle_i const h = hom_or_insert_w(
             hom_and_modify_w(handle_r(&hom, &shuffled_index), struct val,
                              { T->val = shuffled_index; }),
             (struct val){});
@@ -553,7 +553,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_resize_from_null_macros)
 CHECK_BEGIN_STATIC_FN(homap_test_insert_limit)
 {
     int const size = SMALL_FIXED_CAP;
-    ccc_handle_ordered_map hom = hom_init(&(small_fixed_map){}, struct val, id,
+    CCC_handle_ordered_map hom = hom_init(&(small_fixed_map){}, struct val, id,
                                           id_cmp, NULL, NULL, SMALL_FIXED_CAP);
 
     int const larger_prime = 103;
@@ -576,7 +576,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert_limit)
     size_t const final_size = count(&hom).count;
     /* The last successful handle is still in the table and is overwritten. */
     struct val v = {.id = last_index, .val = -1};
-    ccc_handle hndl = swap_handle(&hom, &v);
+    CCC_handle hndl = swap_handle(&hom, &v);
     CHECK(unwrap(&hndl) != 0, true);
     CHECK(insert_error(&hndl), false);
     CHECK(count(&hom).count, final_size);
@@ -617,12 +617,12 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert_limit)
 CHECK_BEGIN_STATIC_FN(homap_test_insert_and_find)
 {
     int const size = SMALL_FIXED_CAP;
-    ccc_handle_ordered_map hom = hom_init(&(small_fixed_map){}, struct val, id,
+    CCC_handle_ordered_map hom = hom_init(&(small_fixed_map){}, struct val, id,
                                           id_cmp, NULL, NULL, SMALL_FIXED_CAP);
 
     for (int i = 0; i < size; i += 2)
     {
-        ccc_handle e = try_insert(&hom, &(struct val){.id = i, .val = i});
+        CCC_handle e = try_insert(&hom, &(struct val){.id = i, .val = i});
         CHECK(occupied(&e), false);
         CHECK(validate(&hom), true);
         e = try_insert(&hom, &(struct val){.id = i, .val = i});
@@ -651,7 +651,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert_and_find)
 CHECK_BEGIN_STATIC_FN(homap_test_insert_shuffle)
 {
     size_t const size = SMALL_FIXED_CAP - 1;
-    ccc_handle_ordered_map hom = hom_init(&(small_fixed_map){}, struct val, id,
+    CCC_handle_ordered_map hom = hom_init(&(small_fixed_map){}, struct val, id,
                                           id_cmp, NULL, NULL, SMALL_FIXED_CAP);
     CHECK(size > 1, true);
     int const prime = 67;
@@ -668,13 +668,13 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert_shuffle)
 CHECK_BEGIN_STATIC_FN(homap_test_insert_weak_srand)
 {
     int const num_nodes = STANDARD_FIXED_CAP - 1;
-    ccc_handle_ordered_map hom
+    CCC_handle_ordered_map hom
         = hom_init(&(standard_fixed_map){}, struct val, id, id_cmp, NULL, NULL,
                    STANDARD_FIXED_CAP);
     srand(time(NULL)); /* NOLINT */
     for (int i = 0; i < num_nodes; ++i)
     {
-        ccc_handle const e = swap_handle(
+        CCC_handle const e = swap_handle(
             &hom, &(struct val){.id = rand() /* NOLINT */, .val = i});
         CHECK(insert_error(&e), false);
         CHECK(validate(&hom), true);

@@ -13,8 +13,8 @@
 
 CHECK_BEGIN_STATIC_FN(pq_test_insert_iterate_pop)
 {
-    ccc_priority_queue pq
-        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
+    CCC_priority_queue pq
+        = CCC_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -29,7 +29,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_insert_iterate_pop)
         CHECK(validate(&pq), true);
     }
     size_t pop_count = 0;
-    while (!ccc_pq_is_empty(&pq))
+    while (!CCC_pq_is_empty(&pq))
     {
         CHECK(pop(&pq), CCC_RESULT_OK);
         ++pop_count;
@@ -41,8 +41,8 @@ CHECK_BEGIN_STATIC_FN(pq_test_insert_iterate_pop)
 
 CHECK_BEGIN_STATIC_FN(pq_test_priority_removal)
 {
-    ccc_priority_queue pq
-        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
+    CCC_priority_queue pq
+        = CCC_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -62,7 +62,7 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_removal)
         struct val *i = &vals[val];
         if (i->val > limit)
         {
-            (void)ccc_pq_extract(&pq, &i->elem);
+            (void)CCC_pq_extract(&pq, &i->elem);
             CHECK(validate(&pq), true);
         }
     }
@@ -71,8 +71,8 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_removal)
 
 CHECK_BEGIN_STATIC_FN(pq_test_priority_update)
 {
-    ccc_priority_queue pq
-        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
+    CCC_priority_queue pq
+        = CCC_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -93,19 +93,19 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_update)
         int backoff = i->val / 2;
         if (i->val > limit)
         {
-            CHECK(ccc_pq_update(&pq, &i->elem, val_update, &backoff) != NULL,
+            CHECK(CCC_pq_update(&pq, &i->elem, val_update, &backoff) != NULL,
                   true);
             CHECK(validate(&pq), true);
         }
     }
-    CHECK(ccc_pq_count(&pq).count, num_nodes);
+    CHECK(CCC_pq_count(&pq).count, num_nodes);
     CHECK_END_FN();
 }
 
 CHECK_BEGIN_STATIC_FN(pq_test_priority_update_with)
 {
-    ccc_priority_queue pq
-        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
+    CCC_priority_queue pq
+        = CCC_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -125,20 +125,20 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_update_with)
         int backoff = vals[val].val / 2;
         if (vals[val].val > limit)
         {
-            CHECK(ccc_pq_update_w(&pq, &vals[val], { T->val = backoff; })
+            CHECK(CCC_pq_update_w(&pq, &vals[val], { T->val = backoff; })
                       != NULL,
                   true);
             CHECK(validate(&pq), true);
         }
     }
-    CHECK(ccc_pq_count(&pq).count, num_nodes);
+    CHECK(CCC_pq_count(&pq).count, num_nodes);
     CHECK_END_FN();
 }
 
 CHECK_BEGIN_STATIC_FN(pq_test_priority_increase)
 {
-    ccc_priority_queue pq
-        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
+    CCC_priority_queue pq
+        = CCC_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -160,25 +160,25 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_increase)
         int dec = (i->val / 2) - 1;
         if (i->val > limit && dec < i->val)
         {
-            CHECK(ccc_pq_decrease(&pq, &i->elem, val_update, &dec) != NULL,
+            CHECK(CCC_pq_decrease(&pq, &i->elem, val_update, &dec) != NULL,
                   true);
             CHECK(validate(&pq), true);
         }
         else if (i->val < limit && inc > i->val)
         {
-            CHECK(ccc_pq_increase(&pq, &i->elem, val_update, &inc) != NULL,
+            CHECK(CCC_pq_increase(&pq, &i->elem, val_update, &inc) != NULL,
                   true);
             CHECK(validate(&pq), true);
         }
     }
-    CHECK(ccc_pq_count(&pq).count, num_nodes);
+    CHECK(CCC_pq_count(&pq).count, num_nodes);
     CHECK_END_FN();
 }
 
 CHECK_BEGIN_STATIC_FN(pq_test_priority_increase_with)
 {
-    ccc_priority_queue pq
-        = ccc_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
+    CCC_priority_queue pq
+        = CCC_pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -199,25 +199,25 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_increase_with)
         int dec = (vals[val].val / 2) - 1;
         if (vals[val].val > limit && dec < vals[val].val)
         {
-            CHECK(ccc_pq_decrease_w(&pq, &vals[val], { T->val = dec; }) != NULL,
+            CHECK(CCC_pq_decrease_w(&pq, &vals[val], { T->val = dec; }) != NULL,
                   true);
             CHECK(validate(&pq), true);
         }
         else if (vals[val].val < limit && inc > vals[val].val)
         {
-            CHECK(ccc_pq_increase_w(&pq, &vals[val], { T->val = inc; }) != NULL,
+            CHECK(CCC_pq_increase_w(&pq, &vals[val], { T->val = inc; }) != NULL,
                   true);
             CHECK(validate(&pq), true);
         }
     }
-    CHECK(ccc_pq_count(&pq).count, num_nodes);
+    CHECK(CCC_pq_count(&pq).count, num_nodes);
     CHECK_END_FN();
 }
 
 CHECK_BEGIN_STATIC_FN(pq_test_priority_decrease)
 {
-    ccc_priority_queue pq
-        = ccc_pq_init(struct val, elem, CCC_GRT, val_cmp, NULL, NULL);
+    CCC_priority_queue pq
+        = CCC_pq_init(struct val, elem, CCC_GRT, val_cmp, NULL, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -239,25 +239,25 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_decrease)
         int dec = (i->val / 2) - 1;
         if (i->val < limit && inc > i->val)
         {
-            CHECK(ccc_pq_increase(&pq, &i->elem, val_update, &inc) != NULL,
+            CHECK(CCC_pq_increase(&pq, &i->elem, val_update, &inc) != NULL,
                   true);
             CHECK(validate(&pq), true);
         }
         else if (i->val > limit && dec < i->val)
         {
-            CHECK(ccc_pq_decrease(&pq, &i->elem, val_update, &dec) != NULL,
+            CHECK(CCC_pq_decrease(&pq, &i->elem, val_update, &dec) != NULL,
                   true);
             CHECK(validate(&pq), true);
         }
     }
-    CHECK(ccc_pq_count(&pq).count, num_nodes);
+    CHECK(CCC_pq_count(&pq).count, num_nodes);
     CHECK_END_FN();
 }
 
 CHECK_BEGIN_STATIC_FN(pq_test_priority_decrease_with)
 {
-    ccc_priority_queue pq
-        = ccc_pq_init(struct val, elem, CCC_GRT, val_cmp, NULL, NULL);
+    CCC_priority_queue pq
+        = CCC_pq_init(struct val, elem, CCC_GRT, val_cmp, NULL, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -278,18 +278,18 @@ CHECK_BEGIN_STATIC_FN(pq_test_priority_decrease_with)
         int dec = (vals[val].val / 2) - 1;
         if (vals[val].val < limit && inc > vals[val].val)
         {
-            CHECK(ccc_pq_increase_w(&pq, &vals[val], { T->val = inc; }) != NULL,
+            CHECK(CCC_pq_increase_w(&pq, &vals[val], { T->val = inc; }) != NULL,
                   true);
             CHECK(validate(&pq), true);
         }
         else if (vals[val].val > limit && dec < vals[val].val)
         {
-            CHECK(ccc_pq_decrease_w(&pq, &vals[val], { T->val = dec; }) != NULL,
+            CHECK(CCC_pq_decrease_w(&pq, &vals[val], { T->val = dec; }) != NULL,
                   true);
             CHECK(validate(&pq), true);
         }
     }
-    CHECK(ccc_pq_count(&pq).count, num_nodes);
+    CHECK(CCC_pq_count(&pq).count, num_nodes);
     CHECK_END_FN();
 }
 

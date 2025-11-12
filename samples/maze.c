@@ -155,7 +155,7 @@ static void help(void);
 static struct point rand_point(struct maze const *);
 static threeway_cmp cmp_prim_cells(any_type_cmp);
 static struct int_conversion parse_digits(str_view);
-static ccc_threeway_cmp prim_cell_cmp(any_key_cmp);
+static CCC_threeway_cmp prim_cell_cmp(any_key_cmp);
 static uint64_t prim_cell_hash_fn(any_key);
 static uint64_t hash_64_bits(uint64_t);
 
@@ -314,12 +314,12 @@ animate_maze(struct maze *maze)
 
 /*===================     Container Support Code     ========================*/
 
-static ccc_threeway_cmp
+static CCC_threeway_cmp
 prim_cell_cmp(any_key_cmp const c)
 {
     struct point const *const lhs = c.any_key_lhs;
     struct prim_cell const *const rhs = c.any_type_rhs;
-    ccc_threeway_cmp const cmp
+    CCC_threeway_cmp const cmp
         = (lhs->r < rhs->cell.r) - (lhs->r > rhs->cell.r);
     if (cmp != CCC_EQL)
     {

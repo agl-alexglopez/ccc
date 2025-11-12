@@ -26,13 +26,13 @@ idval(int const id, int const val)
 }
 
 static inline void
-plus(ccc_any_type const t)
+plus(CCC_any_type const t)
 {
     ((struct val *)t.any_type)->val++;
 }
 
 static inline void
-plusaux(ccc_any_type const t)
+plusaux(CCC_any_type const t)
 {
     ((struct val *)t.any_type)->val += *(int *)t.aux;
 }
@@ -46,12 +46,12 @@ plusaux(ccc_any_type const t)
 /* Fills the container with n elements with id and val starting at the provided
    value and incrementing by 1 until n is reached. Assumes id_and_val are
    not present by key in the table and all subsequent inserts are unique. */
-CHECK_BEGIN_STATIC_FN(fill_n, ccc_handle_ordered_map *const hom, size_t const n,
+CHECK_BEGIN_STATIC_FN(fill_n, CCC_handle_ordered_map *const hom, size_t const n,
                       int id_and_val)
 {
     for (size_t i = 0; i < n; ++i, ++id_and_val)
     {
-        ccc_handle hndl = swap_handle(
+        CCC_handle hndl = swap_handle(
             hom, &(struct val){.id = id_and_val, .val = id_and_val});
         CHECK(insert_error(&hndl), false);
         CHECK(occupied(&hndl), false);
@@ -64,9 +64,9 @@ CHECK_BEGIN_STATIC_FN(fill_n, ccc_handle_ordered_map *const hom, size_t const n,
    the user on insert. Leave this test here to always catch this. */
 CHECK_BEGIN_STATIC_FN(homap_test_validate)
 {
-    ccc_handle_ordered_map hom = hom_init(&(small_fixed_map){}, struct val, id,
+    CCC_handle_ordered_map hom = hom_init(&(small_fixed_map){}, struct val, id,
                                           id_cmp, NULL, NULL, SMALL_FIXED_CAP);
-    ccc_handle hndl = swap_handle(&hom, &(struct val){.id = -1, .val = -1});
+    CCC_handle hndl = swap_handle(&hom, &(struct val){.id = -1, .val = -1});
     CHECK(validate(&hom), true);
     CHECK(occupied(&hndl), false);
     CHECK(count(&hom).count, 1);
@@ -83,10 +83,10 @@ CHECK_BEGIN_STATIC_FN(homap_test_validate)
 
 CHECK_BEGIN_STATIC_FN(homap_test_insert)
 {
-    ccc_handle_ordered_map hom = hom_init(&(small_fixed_map){}, struct val, id,
+    CCC_handle_ordered_map hom = hom_init(&(small_fixed_map){}, struct val, id,
                                           id_cmp, NULL, NULL, SMALL_FIXED_CAP);
     int size = 30;
-    ccc_handle hndl = swap_handle(&hom, &(struct val){.id = -1, .val = -1});
+    CCC_handle hndl = swap_handle(&hom, &(struct val){.id = -1, .val = -1});
     CHECK(validate(&hom), true);
     CHECK(occupied(&hndl), false);
     CHECK(count(&hom).count, 1);
@@ -137,10 +137,10 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert)
 
 CHECK_BEGIN_STATIC_FN(homap_test_remove)
 {
-    ccc_handle_ordered_map hom = hom_init(&(small_fixed_map){}, struct val, id,
+    CCC_handle_ordered_map hom = hom_init(&(small_fixed_map){}, struct val, id,
                                           id_cmp, NULL, NULL, SMALL_FIXED_CAP);
     int size = 30;
-    ccc_handle hndl = ccc_remove(&hom, &(struct val){.id = -1, .val = -1});
+    CCC_handle hndl = CCC_remove(&hom, &(struct val){.id = -1, .val = -1});
     CHECK(validate(&hom), true);
     CHECK(occupied(&hndl), false);
     CHECK(count(&hom).count, 0);
@@ -149,7 +149,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_remove)
     CHECK(occupied(&hndl), false);
     CHECK(count(&hom).count, 1);
     struct val old = {.id = -1};
-    hndl = ccc_remove(&hom, &old);
+    hndl = CCC_remove(&hom, &old);
     CHECK(validate(&hom), true);
     CHECK(occupied(&hndl), true);
     CHECK(count(&hom).count, 0);
@@ -159,7 +159,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_remove)
     CHECK(fill_n(&hom, size / 2, i), PASS);
 
     i += (size / 2);
-    hndl = ccc_remove(&hom, &(struct val){.id = i, .val = i});
+    hndl = CCC_remove(&hom, &(struct val){.id = i, .val = i});
     CHECK(validate(&hom), true);
     CHECK(occupied(&hndl), false);
     CHECK(count(&hom).count, i);
@@ -168,7 +168,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_remove)
     CHECK(occupied(&hndl), false);
     CHECK(count(&hom).count, i + 1);
     old = (struct val){.id = i};
-    hndl = ccc_remove(&hom, &old);
+    hndl = CCC_remove(&hom, &old);
     CHECK(validate(&hom), true);
     CHECK(occupied(&hndl), true);
     CHECK(count(&hom).count, i);
@@ -178,7 +178,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_remove)
     CHECK(fill_n(&hom, size - i, i), PASS);
 
     i = size;
-    hndl = ccc_remove(&hom, &(struct val){.id = i, .val = i});
+    hndl = CCC_remove(&hom, &(struct val){.id = i, .val = i});
     CHECK(validate(&hom), true);
     CHECK(occupied(&hndl), false);
     CHECK(count(&hom).count, i);
@@ -187,7 +187,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_remove)
     CHECK(occupied(&hndl), false);
     CHECK(count(&hom).count, i + 1);
     old = (struct val){.id = i};
-    hndl = ccc_remove(&hom, &old);
+    hndl = CCC_remove(&hom, &old);
     CHECK(validate(&hom), true);
     CHECK(occupied(&hndl), true);
     CHECK(count(&hom).count, i);
@@ -198,10 +198,10 @@ CHECK_BEGIN_STATIC_FN(homap_test_remove)
 
 CHECK_BEGIN_STATIC_FN(homap_test_try_insert)
 {
-    ccc_handle_ordered_map hom = hom_init(&(small_fixed_map){}, struct val, id,
+    CCC_handle_ordered_map hom = hom_init(&(small_fixed_map){}, struct val, id,
                                           id_cmp, NULL, NULL, SMALL_FIXED_CAP);
     int size = 30;
-    ccc_handle hndl = try_insert(&hom, &(struct val){.id = -1, .val = -1});
+    CCC_handle hndl = try_insert(&hom, &(struct val){.id = -1, .val = -1});
     CHECK(validate(&hom), true);
     CHECK(occupied(&hndl), false);
     CHECK(count(&hom).count, 1);
@@ -251,10 +251,10 @@ CHECK_BEGIN_STATIC_FN(homap_test_try_insert)
 
 CHECK_BEGIN_STATIC_FN(homap_test_try_insert_with)
 {
-    ccc_handle_ordered_map hom = hom_init(&(small_fixed_map){}, struct val, id,
+    CCC_handle_ordered_map hom = hom_init(&(small_fixed_map){}, struct val, id,
                                           id_cmp, NULL, NULL, SMALL_FIXED_CAP);
     int size = 30;
-    ccc_handle *hndl = hom_try_insert_w(&hom, -1, val(-1));
+    CCC_handle *hndl = hom_try_insert_w(&hom, -1, val(-1));
     CHECK(validate(&hom), true);
     CHECK(occupied(hndl), false);
     CHECK(count(&hom).count, 1);
@@ -305,10 +305,10 @@ CHECK_BEGIN_STATIC_FN(homap_test_try_insert_with)
 
 CHECK_BEGIN_STATIC_FN(homap_test_insert_or_assign)
 {
-    ccc_handle_ordered_map hom = hom_init(&(small_fixed_map){}, struct val, id,
+    CCC_handle_ordered_map hom = hom_init(&(small_fixed_map){}, struct val, id,
                                           id_cmp, NULL, NULL, SMALL_FIXED_CAP);
     int size = 30;
-    ccc_handle hndl
+    CCC_handle hndl
         = insert_or_assign(&hom, &(struct val){.id = -1, .val = -1});
     CHECK(validate(&hom), true);
     CHECK(occupied(&hndl), false);
@@ -359,10 +359,10 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert_or_assign)
 
 CHECK_BEGIN_STATIC_FN(homap_test_insert_or_assign_with)
 {
-    ccc_handle_ordered_map hom = hom_init(&(small_fixed_map){}, struct val, id,
+    CCC_handle_ordered_map hom = hom_init(&(small_fixed_map){}, struct val, id,
                                           id_cmp, NULL, NULL, SMALL_FIXED_CAP);
     int size = 30;
-    ccc_handle *hndl = hom_insert_or_assign_w(&hom, -1, val(-1));
+    CCC_handle *hndl = hom_insert_or_assign_w(&hom, -1, val(-1));
     CHECK(validate(&hom), true);
     CHECK(occupied(hndl), false);
     CHECK(count(&hom).count, 1);
@@ -412,10 +412,10 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert_or_assign_with)
 
 CHECK_BEGIN_STATIC_FN(homap_test_handle_and_modify)
 {
-    ccc_handle_ordered_map hom = hom_init(&(small_fixed_map){}, struct val, id,
+    CCC_handle_ordered_map hom = hom_init(&(small_fixed_map){}, struct val, id,
                                           id_cmp, NULL, NULL, SMALL_FIXED_CAP);
     int size = 30;
-    ccc_homap_handle *hndl = handle_r(&hom, &(int){-1});
+    CCC_homap_handle *hndl = handle_r(&hom, &(int){-1});
     CHECK(validate(&hom), true);
     CHECK(occupied(hndl), false);
     CHECK(count(&hom).count, 0);
@@ -477,11 +477,11 @@ CHECK_BEGIN_STATIC_FN(homap_test_handle_and_modify)
 
 CHECK_BEGIN_STATIC_FN(homap_test_handle_and_modify_aux)
 {
-    ccc_handle_ordered_map hom = hom_init(&(small_fixed_map){}, struct val, id,
+    CCC_handle_ordered_map hom = hom_init(&(small_fixed_map){}, struct val, id,
                                           id_cmp, NULL, NULL, SMALL_FIXED_CAP);
     int size = 30;
     int aux = 1;
-    ccc_homap_handle *hndl = handle_r(&hom, &(int){-1});
+    CCC_homap_handle *hndl = handle_r(&hom, &(int){-1});
     hndl = and_modify_aux(hndl, plusaux, &aux);
     CHECK(occupied(hndl), false);
     CHECK(count(&hom).count, 0);
@@ -540,10 +540,10 @@ CHECK_BEGIN_STATIC_FN(homap_test_handle_and_modify_aux)
 
 CHECK_BEGIN_STATIC_FN(homap_test_handle_and_modify_with)
 {
-    ccc_handle_ordered_map hom = hom_init(&(small_fixed_map){}, struct val, id,
+    CCC_handle_ordered_map hom = hom_init(&(small_fixed_map){}, struct val, id,
                                           id_cmp, NULL, NULL, SMALL_FIXED_CAP);
     int size = 30;
-    ccc_homap_handle *hndl = handle_r(&hom, &(int){-1});
+    CCC_homap_handle *hndl = handle_r(&hom, &(int){-1});
     hndl = hom_and_modify_w(hndl, struct val, { T->val++; });
     CHECK(count(&hom).count, 0);
     CHECK(occupied(hndl), false);
@@ -602,7 +602,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_handle_and_modify_with)
 
 CHECK_BEGIN_STATIC_FN(homap_test_or_insert)
 {
-    ccc_handle_ordered_map hom = hom_init(&(small_fixed_map){}, struct val, id,
+    CCC_handle_ordered_map hom = hom_init(&(small_fixed_map){}, struct val, id,
                                           id_cmp, NULL, NULL, SMALL_FIXED_CAP);
     int size = 30;
     struct val *v = hom_at(&hom, or_insert(handle_r(&hom, &(int){-1}),
@@ -659,7 +659,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_or_insert)
 
 CHECK_BEGIN_STATIC_FN(homap_test_or_insert_with)
 {
-    ccc_handle_ordered_map hom = hom_init(&(small_fixed_map){}, struct val, id,
+    CCC_handle_ordered_map hom = hom_init(&(small_fixed_map){}, struct val, id,
                                           id_cmp, NULL, NULL, SMALL_FIXED_CAP);
     int size = 30;
     struct val *v = hom_at(
@@ -712,7 +712,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_or_insert_with)
 
 CHECK_BEGIN_STATIC_FN(homap_test_insert_handle)
 {
-    ccc_handle_ordered_map hom = hom_init(&(small_fixed_map){}, struct val, id,
+    CCC_handle_ordered_map hom = hom_init(&(small_fixed_map){}, struct val, id,
                                           id_cmp, NULL, NULL, SMALL_FIXED_CAP);
     int size = 30;
     struct val *v
@@ -770,7 +770,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert_handle)
 
 CHECK_BEGIN_STATIC_FN(homap_test_insert_handle_with)
 {
-    ccc_handle_ordered_map hom = hom_init(&(small_fixed_map){}, struct val, id,
+    CCC_handle_ordered_map hom = hom_init(&(small_fixed_map){}, struct val, id,
                                           id_cmp, NULL, NULL, SMALL_FIXED_CAP);
     int size = 30;
     struct val *v = hom_at(
@@ -823,7 +823,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert_handle_with)
 
 CHECK_BEGIN_STATIC_FN(homap_test_remove_handle)
 {
-    ccc_handle_ordered_map hom = hom_init(&(small_fixed_map){}, struct val, id,
+    CCC_handle_ordered_map hom = hom_init(&(small_fixed_map){}, struct val, id,
                                           id_cmp, NULL, NULL, SMALL_FIXED_CAP);
     int size = 30;
     struct val *v = hom_at(&hom, or_insert(handle_r(&hom, &(int){-1}),
@@ -833,7 +833,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_remove_handle)
     CHECK(v->id, -1);
     CHECK(v->val, -1);
     CHECK(count(&hom).count, 1);
-    ccc_handle *e = remove_handle_r(handle_r(&hom, &(int){-1}));
+    CCC_handle *e = remove_handle_r(handle_r(&hom, &(int){-1}));
     CHECK(validate(&hom), true);
     CHECK(occupied(e), true);
     v = hom_at(&hom, unwrap(e));

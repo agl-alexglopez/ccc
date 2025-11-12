@@ -11,20 +11,20 @@
 #include "util/alloc.h"
 
 static void
-mod(ccc_any_type const u)
+mod(CCC_any_type const u)
 {
     struct val *v = u.any_type;
     v->val += 5;
 }
 
 static void
-modw(ccc_any_type const u)
+modw(CCC_any_type const u)
 {
     struct val *v = u.any_type;
     v->val = *((int *)u.aux);
 }
 
-static ccc_flat_hash_map static_fh
+static CCC_flat_hash_map static_fh
     = fhm_init(&(small_fixed_map){}, struct val, key, fhmap_int_to_u64,
                fhmap_id_cmp, NULL, NULL, SMALL_FIXED_CAP);
 
@@ -81,13 +81,13 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_copy_no_alloc)
     (void)swap_entry(&src, &(struct val){.key = 2, .val = 2});
     CHECK(count(&src).count, 3);
     CHECK(is_empty(&dst), true);
-    ccc_result res = fhm_copy(&dst, &src, NULL);
+    CCC_result res = fhm_copy(&dst, &src, NULL);
     CHECK(res, CCC_RESULT_OK);
     CHECK(count(&dst).count, count(&src).count);
     for (int i = 0; i < 3; ++i)
     {
-        ccc_entry src_e = ccc_remove(&src, &(struct val){.key = i});
-        ccc_entry dst_e = ccc_remove(&dst, &(struct val){.key = i});
+        CCC_entry src_e = CCC_remove(&src, &(struct val){.key = i});
+        CCC_entry dst_e = CCC_remove(&dst, &(struct val){.key = i});
         CHECK(occupied(&src_e), occupied(&dst_e));
     }
     CHECK(is_empty(&src), is_empty(&dst));
@@ -108,7 +108,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_copy_no_alloc_fail)
     (void)swap_entry(&src, &(struct val){.key = 2, .val = 2});
     CHECK(count(&src).count, 3);
     CHECK(is_empty(&dst), true);
-    ccc_result res = fhm_copy(&dst, &src, NULL);
+    CCC_result res = fhm_copy(&dst, &src, NULL);
     CHECK(res != CCC_RESULT_OK, true);
     CHECK_END_FN();
 }
@@ -126,13 +126,13 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_copy_alloc)
                    });
     CHECK(count(&src).count, 3);
     CHECK(is_empty(&dst), true);
-    ccc_result res = fhm_copy(&dst, &src, std_alloc);
+    CCC_result res = fhm_copy(&dst, &src, std_alloc);
     CHECK(res, CCC_RESULT_OK);
     CHECK(count(&dst).count, count(&src).count);
     for (int i = 0; i < 3; ++i)
     {
-        ccc_entry src_e = ccc_remove(&src, &(struct val){.key = i});
-        ccc_entry dst_e = ccc_remove(&dst, &(struct val){.key = i});
+        CCC_entry src_e = CCC_remove(&src, &(struct val){.key = i});
+        CCC_entry dst_e = CCC_remove(&dst, &(struct val){.key = i});
         CHECK(occupied(&src_e), occupied(&dst_e));
     }
     CHECK(is_empty(&src), is_empty(&dst));
@@ -154,7 +154,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_copy_alloc_fail)
     (void)swap_entry(&src, &(struct val){.key = 2, .val = 2});
     CHECK(count(&src).count, 3);
     CHECK(is_empty(&dst), true);
-    ccc_result res = fhm_copy(&dst, &src, NULL);
+    CCC_result res = fhm_copy(&dst, &src, NULL);
     CHECK(res != CCC_RESULT_OK, true);
     CHECK_END_FN({ (void)fhm_clear_and_free(&src, NULL); });
 }
@@ -236,9 +236,9 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_init_from_fail)
         ++seen;
     }
     CHECK(seen, 0);
-    ccc_entry e = ccc_fhm_insert_or_assign(&map_from_list,
+    CCC_entry e = CCC_fhm_insert_or_assign(&map_from_list,
                                            &(struct val){.key = 1, .val = 1});
-    CHECK(ccc_entry_insert_error(&e), CCC_TRUE);
+    CHECK(CCC_entry_insert_error(&e), CCC_TRUE);
     CHECK_END_FN(fhm_clear_and_free(&map_from_list, NULL););
 }
 
@@ -250,9 +250,9 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_init_with_capacity)
     CHECK(fhm_capacity(&fh).count >= 32, true);
     for (int i = 0; i < 10; ++i)
     {
-        ccc_entry const e
-            = ccc_fhm_insert_or_assign(&fh, &(struct val){.key = i, .val = i});
-        CHECK(ccc_entry_insert_error(&e), CCC_FALSE);
+        CCC_entry const e
+            = CCC_fhm_insert_or_assign(&fh, &(struct val){.key = i, .val = i});
+        CHECK(CCC_entry_insert_error(&e), CCC_FALSE);
         CHECK(fhm_validate(&fh), CCC_TRUE);
     }
     CHECK(fhm_count(&fh).count, 10);
@@ -276,9 +276,9 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_init_with_capacity_no_op)
     CHECK(validate(&fh), true);
     CHECK(fhm_capacity(&fh).count, 0);
     CHECK(fhm_count(&fh).count, 0);
-    ccc_entry const e
-        = ccc_fhm_insert_or_assign(&fh, &(struct val){.key = 1, .val = 1});
-    CHECK(ccc_entry_insert_error(&e), CCC_FALSE);
+    CCC_entry const e
+        = CCC_fhm_insert_or_assign(&fh, &(struct val){.key = 1, .val = 1});
+    CHECK(CCC_entry_insert_error(&e), CCC_FALSE);
     CHECK(fhm_validate(&fh), CCC_TRUE);
     CHECK(fhm_count(&fh).count, 1);
     size_t seen = 0;
@@ -300,9 +300,9 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_init_with_capacity_fail)
                                          fhmap_id_cmp, NULL, NULL, 32);
     CHECK(validate(&fh), true);
     CHECK(fhm_capacity(&fh).count, 0);
-    ccc_entry const e
-        = ccc_fhm_insert_or_assign(&fh, &(struct val){.key = 1, .val = 1});
-    CHECK(ccc_entry_insert_error(&e), CCC_TRUE);
+    CCC_entry const e
+        = CCC_fhm_insert_or_assign(&fh, &(struct val){.key = 1, .val = 1});
+    CHECK(CCC_entry_insert_error(&e), CCC_TRUE);
     CHECK(fhm_validate(&fh), CCC_TRUE);
     CHECK(fhm_count(&fh).count, 0);
     size_t seen = 0;
