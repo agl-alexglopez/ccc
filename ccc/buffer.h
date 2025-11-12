@@ -94,6 +94,19 @@ Initialization of a buffer can occur at compile time or run time depending
 on the arguments. The memory pointer should be of the same type one intends to
 store in the buffer.
 
+```
+#define BUFFER_USING_NAMESPACE_CCC
+static buffer stack = buf_init(&(static int[4096]){}, int, NULL, NULL, 4096);
+```
+
+Initialize a fixed buffer with some elements occupied.
+
+```
+#define BUFFER_USING_NAMESPACE_CCC
+static buffer stack
+    = buf_init(&(static int[4096]){0, 1, 2, 3}, int, NULL, NULL, 4096, 4);
+```
+
 This initializer determines memory control for the lifetime of the buffer. If
 the buffer points to memory of a predetermined and fixed capacity do not
 provide an allocation function. If a dynamic buffer is preferred, provide the
@@ -119,13 +132,66 @@ underlying reservation.
 @return the initialized buffer. Directly assign to buffer on the right hand
 side of the equality operator (e.g. ccc_buffer b = ccc_buf_from(...);).
 
-Initialize
+Initialize a dynamic buffer with a compound literal array.
 
- */
+```
+#define BUFFER_USING_NAMESPACE_CCC
+int
+main(void)
+{
+    buffer b = buf_from(std_alloc, NULL, 0,
+        (int[]){ 0, 1, 2, 3 }
+    );
+    return 0;
+}
+```
+
+Initialize a dynamic buffer with a compound literal array with capacity.
+
+```
+#define BUFFER_USING_NAMESPACE_CCC
+int
+main(void)
+{
+    buffer b = buf_from(std_alloc, NULL, 4096,
+        (int[]){ 0, 1, 2, 3 }
+    );
+    return 0;
+}
+```
+
+Only dynamic buffers may be initialized this way. For static or stack based
+initialization of fixed buffers with contents known at compile time, see the
+ccc_buf_init() macro. */
 #define ccc_buf_from(alloc_fn, aux_data, optional_capacity,                    \
                      compound_literal_array...)                                \
     ccc_impl_buf_from(alloc_fn, aux_data, optional_capacity,                   \
                       compound_literal_array)
+
+/** @brief Initialize a buffer with a capacity.
+@param [in] alloc_fn ccc_any_alloc_fn or NULL if no allocation is permitted.
+@param [in] aux_data any auxiliary data needed for managing buffer memory.
+@param [in] capacity the capacity of the buffer to reserve.
+@return the initialized buffer. Directly assign to buffer on the right hand
+side of the equality operator (e.g. ccc_buffer b = ccc_buf_with_capacity(...);).
+
+Initialize a dynamic buffer.
+
+```
+#define BUFFER_USING_NAMESPACE_CCC
+int
+main(void)
+{
+    buffer b = buf_from(std_alloc, NULL, 4096);
+    return 0;
+}
+```
+
+Only dynamic buffers may be initialized this way. For static or stack based
+initialization of fixed buffers with contents known at compile time, see the
+ccc_buf_init() macro. */
+#define ccc_buf_with_capacity(any_type_name, alloc_fn, aux_data, capacity)     \
+    ccc_impl_buf_with_capacity(any_type_name, alloc_fn, aux_data, capacity)
 
 /** @brief Reserves space for at least to_add more elements.
 @param [in] buf a pointer to the buffer.

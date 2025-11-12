@@ -95,6 +95,17 @@ initialization in one convenient step for user. */
         impl_buf;                                                              \
     }))
 
+/** @private For dynamic containers to perform initialization and reservation
+of memory in one step. */
+#define ccc_impl_buf_with_capacity(impl_any_type_name, impl_alloc_fn,          \
+                                   impl_aux_data, impl_capacity)               \
+    (__extension__({                                                           \
+        struct ccc_buffer impl_buf = ccc_impl_buf_init(                        \
+            NULL, impl_any_type_name, impl_alloc_fn, impl_aux_data, 0);        \
+        (void)ccc_buf_reserve(&impl_buf, (impl_capacity), impl_alloc_fn);      \
+        impl_buf;                                                              \
+    }))
+
 /** @private */
 #define ccc_impl_buf_emplace(impl_buf_ptr, index, impl_type_initializer...)    \
     (__extension__({                                                           \
