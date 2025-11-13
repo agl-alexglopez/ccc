@@ -16,10 +16,10 @@ limitations under the License.
 /** @file
 @brief The Flat Hash Map Interface
 
-A Flat Hash Map stores elements by hash value and allows the user to retrieve
-them by key in amortized O(1). Elements in the table may be copied and moved,
-especially when rehashing occurs, so no pointer stability is available in this
-implementation.
+A Flat Hash Map stores elements in a contiguous buffer and allows the user to
+retrieve them by key in amortized O(1). Elements in the table may be copied and
+moved, especially when rehashing occurs, so no pointer stability is available in
+this implementation.
 
 A flat hash map requires the user to provide a pointer to the map, a type, a key
 field, a hash function, and a key three way comparison function. The hash
