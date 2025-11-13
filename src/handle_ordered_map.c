@@ -52,12 +52,12 @@ enum : size_t
 /** @private Use an int because that will force the nodes array to be wary of
 where to start. The nodes are 8 byte aligned but an int is 4. This means the
 nodes need to start after a 4 byte Buffer of padding at end of data array. */
-struct test_data_type
+struct Test_data_type
 {
     int i;
 };
 CCC_handle_ordered_map_declare_fixed_map(fixed_map_test_type,
-                                         struct test_data_type, TCAP);
+                                         struct Test_data_type, TCAP);
 /** @private This is a static fixed size map exclusive to this translation unit
 used to ensure assumptions about data layout are correct. The following static
 asserts must be true in order to support the Struct of Array style layout we
@@ -101,7 +101,7 @@ enum
 };
 
 /** @private */
-enum handle_ordered_map_branch
+enum Branch
 {
     L = 0,
     R,
@@ -126,7 +126,7 @@ static struct CCC_Handle_ordered_map_node *
 node_at(struct CCC_Handle_ordered_map const *, size_t);
 static void *data_at(struct CCC_Handle_ordered_map const *, size_t);
 /* Returning the user struct type with stored offsets. */
-static struct CCC_htree_handle
+static struct CCC_Handle_ordered_map_handle
 handle(struct CCC_Handle_ordered_map *handle_ordered_map, void const *key);
 static size_t erase(struct CCC_Handle_ordered_map *t, void const *key);
 static size_t
@@ -148,10 +148,9 @@ static void *key_in_slot(struct CCC_Handle_ordered_map const *t,
                          void const *user_struct);
 static size_t alloc_slot(struct CCC_Handle_ordered_map *t);
 static size_t total_bytes(size_t sizeof_type, size_t capacity);
-static struct CCC_range_u equal_range(struct CCC_Handle_ordered_map *t,
-                                      void const *begin_key,
-                                      void const *end_key,
-                                      enum handle_ordered_map_branch traversal);
+static struct CCC_Range equal_range(struct CCC_Handle_ordered_map *t,
+                                    void const *begin_key, void const *end_key,
+                                    enum Branch traversal);
 /* Returning the user key with stored offsets. */
 static void *key_at(struct CCC_Handle_ordered_map const *t, size_t i);
 /* Returning threeway comparison with user callback. */
@@ -161,17 +160,17 @@ cmp_nodes(struct CCC_Handle_ordered_map const *handle_ordered_map,
 /* Returning read only indices for tree nodes. */
 static size_t remove_from_tree(struct CCC_Handle_ordered_map *t, size_t ret);
 static size_t min_max_from(struct CCC_Handle_ordered_map const *t, size_t start,
-                           enum handle_ordered_map_branch dir);
+                           enum Branch dir);
 static size_t next(struct CCC_Handle_ordered_map const *t, size_t n,
-                   enum handle_ordered_map_branch traversal);
+                   enum Branch traversal);
 static size_t branch_i(struct CCC_Handle_ordered_map const *t, size_t parent,
-                       enum handle_ordered_map_branch dir);
+                       enum Branch dir);
 static size_t parent_i(struct CCC_Handle_ordered_map const *t, size_t child);
 static size_t index_of(struct CCC_Handle_ordered_map const *t,
                        void const *key_val_type);
 /* Returning references to index fields for tree nodes. */
 static size_t *branch_ref(struct CCC_Handle_ordered_map const *t, size_t node,
-                          enum handle_ordered_map_branch branch);
+                          enum Branch branch);
 static size_t *parent_ref(struct CCC_Handle_ordered_map const *t, size_t node);
 
 static CCC_Tribool
@@ -182,7 +181,7 @@ static void init_node(struct CCC_Handle_ordered_map const *handle_ordered_map,
                       size_t node);
 static void swap(char tmp[const], void *a, void *b, size_t sizeof_type);
 static void link(struct CCC_Handle_ordered_map *t, size_t parent,
-                 enum handle_ordered_map_branch dir, size_t subtree);
+                 enum Branch dir, size_t subtree);
 static size_t max(size_t, size_t);
 static void delete_nodes(struct CCC_Handle_ordered_map *t,
                          CCC_Type_destructor *fn);
@@ -766,8 +765,11 @@ CCC_handle_ordered_map_clear_and_free(
         handle_ordered_map->root = 0;
         handle_ordered_map->count = 0;
         handle_ordered_map->capacity = 0;
-        (void)handle_ordered_map->alloc(handle_ordered_map->data, 0,
-                                        handle_ordered_map->context);
+        (void)handle_ordered_map->alloc((CCC_Allocator_context){
+            .input = handle_ordered_map->data,
+            .bytes = 0,
+            .context = handle_ordered_map->context,
+        });
         handle_ordered_map->data = NULL;
         handle_ordered_map->nodes = NULL;
         return CCC_RESULT_OK;
@@ -776,8 +778,11 @@ CCC_handle_ordered_map_clear_and_free(
     handle_ordered_map->root = 0;
     handle_ordered_map->count = 0;
     handle_ordered_map->capacity = 0;
-    (void)handle_ordered_map->alloc(handle_ordered_map->data, 0,
-                                    handle_ordered_map->context);
+    (void)handle_ordered_map->alloc((CCC_Allocator_context){
+        .input = handle_ordered_map->data,
+        .bytes = 0,
+        .context = handle_ordered_map->context,
+    });
     handle_ordered_map->data = NULL;
     handle_ordered_map->nodes = NULL;
     return CCC_RESULT_OK;
@@ -797,7 +802,11 @@ CCC_handle_ordered_map_clear_and_free_reserve(
         handle_ordered_map->root = 0;
         handle_ordered_map->count = 0;
         handle_ordered_map->capacity = 0;
-        (void)alloc(handle_ordered_map->data, 0, handle_ordered_map->context);
+        (void)alloc((CCC_Allocator_context){
+            .input = handle_ordered_map->data,
+            .bytes = 0,
+            .context = handle_ordered_map->context,
+        });
         handle_ordered_map->data = NULL;
         return CCC_RESULT_OK;
     }
@@ -805,7 +814,11 @@ CCC_handle_ordered_map_clear_and_free_reserve(
     handle_ordered_map->root = 0;
     handle_ordered_map->count = 0;
     handle_ordered_map->capacity = 0;
-    (void)alloc(handle_ordered_map->data, 0, handle_ordered_map->context);
+    (void)alloc((CCC_Allocator_context){
+        .input = handle_ordered_map->data,
+        .bytes = 0,
+        .context = handle_ordered_map->context,
+    });
     handle_ordered_map->data = NULL;
     return CCC_RESULT_OK;
 }
@@ -831,7 +844,7 @@ CCC_private_handle_ordered_map_insert(
     insert(handle_ordered_map, elem_i);
 }
 
-struct CCC_htree_handle
+struct CCC_Handle_ordered_map_handle
 CCC_private_handle_ordered_map_handle(
     struct CCC_Handle_ordered_map *const handle_ordered_map,
     void const *const key)
@@ -864,14 +877,13 @@ CCC_private_handle_ordered_map_alloc_slot(
 
 /*===========================   Static Helpers    ===========================*/
 
-static struct CCC_range_u
+static struct CCC_Range
 equal_range(struct CCC_Handle_ordered_map *const t, void const *const begin_key,
-            void const *const end_key,
-            enum handle_ordered_map_branch const traversal)
+            void const *const end_key, enum Branch const traversal)
 {
     if (CCC_handle_ordered_map_is_empty(t))
     {
-        return (struct CCC_range_u){};
+        return (struct CCC_Range){};
     }
     /* As with most BST code the cases are perfectly symmetrical. If we
        are seeking an increasing or decreasing range we need to make sure
@@ -889,26 +901,26 @@ equal_range(struct CCC_Handle_ordered_map *const t, void const *const begin_key,
     {
         e = next(t, e, traversal);
     }
-    return (struct CCC_range_u){
+    return (struct CCC_Range){
         .begin = data_at(t, b),
         .end = data_at(t, e),
     };
 }
 
-static struct CCC_htree_handle
+static struct CCC_Handle_ordered_map_handle
 handle(struct CCC_Handle_ordered_map *const handle_ordered_map,
        void const *const key)
 {
     size_t const found = find(handle_ordered_map, key);
     if (found)
     {
-        return (struct CCC_htree_handle){
+        return (struct CCC_Handle_ordered_map_handle){
             .handle_ordered_map = handle_ordered_map,
             .i = found,
             .stats = CCC_ENTRY_OCCUPIED,
         };
     }
-    return (struct CCC_htree_handle){
+    return (struct CCC_Handle_ordered_map_handle){
         .handle_ordered_map = handle_ordered_map,
         .i = 0,
         .stats = CCC_ENTRY_VACANT,
@@ -986,9 +998,11 @@ resize(struct CCC_Handle_ordered_map *const handle_ordered_map,
     {
         return CCC_RESULT_NO_ALLOCATION_FUNCTION;
     }
-    void *const new_data
-        = fn(NULL, total_bytes(handle_ordered_map->sizeof_type, new_capacity),
-             handle_ordered_map->context);
+    void *const new_data = fn((CCC_Allocator_context){
+        .input = NULL,
+        .bytes = total_bytes(handle_ordered_map->sizeof_type, new_capacity),
+        .context = handle_ordered_map->context,
+    });
     if (!new_data)
     {
         return CCC_RESULT_ALLOCATOR_ERROR;
@@ -996,7 +1010,11 @@ resize(struct CCC_Handle_ordered_map *const handle_ordered_map,
     copy_soa(handle_ordered_map, new_data, new_capacity);
     handle_ordered_map->nodes
         = node_pos(handle_ordered_map->sizeof_type, new_data, new_capacity);
-    fn(handle_ordered_map->data, 0, handle_ordered_map->context);
+    fn((CCC_Allocator_context){
+        .input = handle_ordered_map->data,
+        .bytes = 0,
+        .context = handle_ordered_map->context,
+    });
     handle_ordered_map->data = new_data;
     handle_ordered_map->capacity = new_capacity;
     return CCC_RESULT_OK;
@@ -1061,7 +1079,7 @@ static size_t
 connect_new_root(struct CCC_Handle_ordered_map *const t, size_t const new_root,
                  CCC_Order const cmp_result)
 {
-    enum handle_ordered_map_branch const dir = CCC_ORDER_GREATER == cmp_result;
+    enum Branch const dir = CCC_ORDER_GREATER == cmp_result;
     link(t, new_root, dir, branch_i(t, t->root, dir));
     link(t, new_root, !dir, t->root);
     *branch_ref(t, t->root, dir) = 0;
@@ -1095,16 +1113,14 @@ splay(struct CCC_Handle_ordered_map *const t, size_t root,
     for (;;)
     {
         CCC_Order const key_cmp = cmp_nodes(t, key, root, cmp_fn);
-        enum handle_ordered_map_branch const child_link
-            = CCC_ORDER_GREATER == key_cmp;
+        enum Branch const child_link = CCC_ORDER_GREATER == key_cmp;
         if (CCC_ORDER_EQUAL == key_cmp || !branch_i(t, root, child_link))
         {
             break;
         }
         CCC_Order const child_cmp
             = cmp_nodes(t, key, branch_i(t, root, child_link), cmp_fn);
-        enum handle_ordered_map_branch const grandchild_link
-            = CCC_ORDER_GREATER == child_cmp;
+        enum Branch const grandchild_link = CCC_ORDER_GREATER == child_cmp;
         /* A straight line has formed from root->child->grandchild. An
            opportunity to splay and heal the tree arises. */
         if (CCC_ORDER_EQUAL != child_cmp && child_link == grandchild_link)
@@ -1135,7 +1151,7 @@ splay(struct CCC_Handle_ordered_map *const t, size_t root,
 updates the parent of the child being picked up by the new parent as well. */
 static inline void
 link(struct CCC_Handle_ordered_map *const t, size_t const parent,
-     enum handle_ordered_map_branch const dir, size_t const subtree)
+     enum Branch const dir, size_t const subtree)
 {
     *branch_ref(t, parent, dir) = subtree;
     *parent_ref(t, subtree) = parent;
@@ -1143,7 +1159,7 @@ link(struct CCC_Handle_ordered_map *const t, size_t const parent,
 
 static size_t
 min_max_from(struct CCC_Handle_ordered_map const *const t, size_t start,
-             enum handle_ordered_map_branch const dir)
+             enum Branch const dir)
 {
     if (!start)
     {
@@ -1156,7 +1172,7 @@ min_max_from(struct CCC_Handle_ordered_map const *const t, size_t start,
 
 static size_t
 next(struct CCC_Handle_ordered_map const *const t, size_t n,
-     enum handle_ordered_map_branch const traversal)
+     enum Branch const traversal)
 {
     if (!n)
     {
@@ -1335,7 +1351,7 @@ data_at(struct CCC_Handle_ordered_map const *const t, size_t const i)
 
 static inline size_t
 branch_i(struct CCC_Handle_ordered_map const *const t, size_t const parent,
-         enum handle_ordered_map_branch const dir)
+         enum Branch const dir)
 {
     return node_at(t, parent)->branch[dir];
 }
@@ -1358,7 +1374,7 @@ index_of(struct CCC_Handle_ordered_map const *const t,
 
 static inline size_t *
 branch_ref(struct CCC_Handle_ordered_map const *const t, size_t const node,
-           enum handle_ordered_map_branch const branch)
+           enum Branch const branch)
 {
     return &node_at(t, node)->branch[branch];
 }
@@ -1393,7 +1409,7 @@ max(size_t const a, size_t const b)
 /* NOLINTBEGIN(*misc-no-recursion) */
 
 /** @private */
-struct tree_range
+struct Tree_range
 {
     size_t low;
     size_t root;
@@ -1413,7 +1429,7 @@ recursive_count(struct CCC_Handle_ordered_map const *const t, size_t const r)
 
 static CCC_Tribool
 are_subtrees_valid(struct CCC_Handle_ordered_map const *t,
-                   struct tree_range const r)
+                   struct Tree_range const r)
 {
     if (!r.root)
     {
@@ -1430,11 +1446,11 @@ are_subtrees_valid(struct CCC_Handle_ordered_map const *t,
         return CCC_FALSE;
     }
     return are_subtrees_valid(
-               t, (struct tree_range){.low = r.low,
+               t, (struct Tree_range){.low = r.low,
                                       .root = branch_i(t, r.root, L),
                                       .high = r.root})
         && are_subtrees_valid(
-               t, (struct tree_range){.low = r.root,
+               t, (struct Tree_range){.low = r.root,
                                       .root = branch_i(t, r.root, R),
                                       .high = r.high});
 }
@@ -1478,7 +1494,7 @@ validate(struct CCC_Handle_ordered_map const *const handle_ordered_map)
     }
     if (!are_subtrees_valid(
             handle_ordered_map,
-            (struct tree_range){.root = handle_ordered_map->root}))
+            (struct Tree_range){.root = handle_ordered_map->root}))
     {
         return CCC_FALSE;
     }

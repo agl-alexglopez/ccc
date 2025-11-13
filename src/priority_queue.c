@@ -78,8 +78,11 @@ CCC_priority_queue_push(CCC_Priority_queue *const priority_queue,
     void *ret = struct_base(priority_queue, e);
     if (priority_queue->alloc)
     {
-        void *const node = priority_queue->alloc(
-            NULL, priority_queue->sizeof_type, priority_queue->context);
+        void *const node = priority_queue->alloc((CCC_Allocator_context){
+            .input = NULL,
+            .bytes = priority_queue->sizeof_type,
+            .context = priority_queue->context,
+        });
         if (!node)
         {
             return NULL;
@@ -107,8 +110,11 @@ CCC_priority_queue_pop(CCC_Priority_queue *const priority_queue)
     clear_node(popped);
     if (priority_queue->alloc)
     {
-        (void)priority_queue->alloc(struct_base(priority_queue, popped), 0,
-                                    priority_queue->context);
+        (void)priority_queue->alloc((CCC_Allocator_context){
+            .input = struct_base(priority_queue, popped),
+            .bytes = 0,
+            .context = priority_queue->context,
+        });
     }
     return CCC_RESULT_OK;
 }
@@ -139,8 +145,11 @@ CCC_priority_queue_erase(CCC_Priority_queue *const priority_queue,
     priority_queue->count--;
     if (priority_queue->alloc)
     {
-        (void)priority_queue->alloc(struct_base(priority_queue, e), 0,
-                                    priority_queue->context);
+        (void)priority_queue->alloc((CCC_Allocator_context){
+            .input = struct_base(priority_queue, e),
+            .bytes = 0,
+            .context = priority_queue->context,
+        });
     }
     return CCC_RESULT_OK;
 }
@@ -195,7 +204,11 @@ CCC_priority_queue_clear(CCC_Priority_queue *const priority_queue,
         }
         if (priority_queue->alloc)
         {
-            (void)priority_queue->alloc(del, 0, priority_queue->context);
+            (void)priority_queue->alloc((CCC_Allocator_context){
+                .input = del,
+                .bytes = 0,
+                .context = priority_queue->context,
+            });
         }
         e = prev;
     }

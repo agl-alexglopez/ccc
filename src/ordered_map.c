@@ -38,11 +38,11 @@ constant time queries for frequently accessed elements. */
 /** @private Instead of thinking about left and right consider only links
     in the abstract sense. Put them in an array and then flip
     this enum and left and right code paths can be united into one */
-typedef enum
+enum Branch
 {
     L = 0,
     R,
-} om_branch;
+};
 
 #define INORDER R
 #define R_INORDER L
@@ -54,56 +54,63 @@ enum
 
 /* Container entry return value. */
 
-static struct CCC_otree_entry container_entry(struct CCC_omap *t,
-                                              void const *key);
+static struct CCC_Ordered_map_entry container_entry(struct CCC_Ordered_map *t,
+                                                    void const *key);
 
 /* No return value. */
 
-static void init_node(struct CCC_omap *, struct CCC_omap_node *);
+static void init_node(struct CCC_Ordered_map *, struct CCC_Ordered_map_node *);
 static void swap(char tmp[const], void *, void *, size_t);
-static void link(struct CCC_omap_node *, om_branch, struct CCC_omap_node *);
+static void link(struct CCC_Ordered_map_node *, enum Branch,
+                 struct CCC_Ordered_map_node *);
 
 /* Boolean returns */
 
-static CCC_Tribool empty(struct CCC_omap const *);
-static CCC_Tribool contains(struct CCC_omap *, void const *);
-static CCC_Tribool CCC_omap_validate(struct CCC_omap const *);
+static CCC_Tribool empty(struct CCC_Ordered_map const *);
+static CCC_Tribool contains(struct CCC_Ordered_map *, void const *);
+static CCC_Tribool validate(struct CCC_Ordered_map const *);
 
 /* Returning the user type that is stored in data structure. */
 
-static void *struct_base(struct CCC_omap const *, struct CCC_omap_node const *);
-static void *find(struct CCC_omap *, void const *);
-static void *erase(struct CCC_omap *, void const *key);
-static void *alloc_insert(struct CCC_omap *, struct CCC_omap_node *);
-static void *insert(struct CCC_omap *, struct CCC_omap_node *);
-static void *connect_new_root(struct CCC_omap *, struct CCC_omap_node *,
-                              CCC_Order);
-static void *max(struct CCC_omap const *);
-static void *min(struct CCC_omap const *);
-static void *key_in_slot(struct CCC_omap const *t, void const *slot);
-static void *key_from_node(struct CCC_omap const *, CCC_omap_node const *);
-static struct CCC_range_u equal_range(struct CCC_omap *, void const *,
-                                      void const *, om_branch);
+static void *struct_base(struct CCC_Ordered_map const *,
+                         struct CCC_Ordered_map_node const *);
+static void *find(struct CCC_Ordered_map *, void const *);
+static void *erase(struct CCC_Ordered_map *, void const *key);
+static void *alloc_insert(struct CCC_Ordered_map *,
+                          struct CCC_Ordered_map_node *);
+static void *insert(struct CCC_Ordered_map *, struct CCC_Ordered_map_node *);
+static void *connect_new_root(struct CCC_Ordered_map *,
+                              struct CCC_Ordered_map_node *, CCC_Order);
+static void *max(struct CCC_Ordered_map const *);
+static void *min(struct CCC_Ordered_map const *);
+static void *key_in_slot(struct CCC_Ordered_map const *t, void const *slot);
+static void *key_from_node(struct CCC_Ordered_map const *,
+                           CCC_Ordered_map_node const *);
+static struct CCC_Range equal_range(struct CCC_Ordered_map *, void const *,
+                                    void const *, enum Branch);
 
 /* Internal operations that take and return nodes for the tree. */
 
-static struct CCC_omap_node *remove_from_tree(struct CCC_omap *,
-                                              struct CCC_omap_node *);
-static struct CCC_omap_node const *
-next(struct CCC_omap const *, struct CCC_omap_node const *, om_branch);
-static struct CCC_omap_node *splay(struct CCC_omap *, struct CCC_omap_node *,
-                                   void const *key, CCC_Key_comparator *);
-static struct CCC_omap_node *elem_in_slot(struct CCC_omap const *t,
-                                          void const *slot);
+static struct CCC_Ordered_map_node *
+remove_from_tree(struct CCC_Ordered_map *, struct CCC_Ordered_map_node *);
+static struct CCC_Ordered_map_node const *
+next(struct CCC_Ordered_map const *, struct CCC_Ordered_map_node const *,
+     enum Branch);
+static struct CCC_Ordered_map_node *splay(struct CCC_Ordered_map *,
+                                          struct CCC_Ordered_map_node *,
+                                          void const *key,
+                                          CCC_Key_comparator *);
+static struct CCC_Ordered_map_node *
+elem_in_slot(struct CCC_Ordered_map const *t, void const *slot);
 
 /* The key comes first. It is the "left hand side" of the comparison. */
-static CCC_Order cmp(struct CCC_omap const *, void const *key,
-                     struct CCC_omap_node const *, CCC_Key_comparator *);
+static CCC_Order cmp(struct CCC_Ordered_map const *, void const *key,
+                     struct CCC_Ordered_map_node const *, CCC_Key_comparator *);
 
 /* ======================        Map Interface      ====================== */
 
 CCC_Tribool
-CCC_om_is_empty(CCC_Ordered_map const *const om)
+CCC_ordered_map_is_empty(CCC_Ordered_map const *const om)
 {
     if (!om)
     {
@@ -113,7 +120,7 @@ CCC_om_is_empty(CCC_Ordered_map const *const om)
 }
 
 CCC_Count
-CCC_om_count(CCC_Ordered_map const *const om)
+CCC_ordered_map_count(CCC_Ordered_map const *const om)
 {
     if (!om)
     {
@@ -123,7 +130,7 @@ CCC_om_count(CCC_Ordered_map const *const om)
 }
 
 CCC_Tribool
-CCC_om_contains(CCC_Ordered_map *const om, void const *const key)
+CCC_ordered_map_contains(CCC_Ordered_map *const om, void const *const key)
 {
     if (!om || !key)
     {
@@ -132,18 +139,20 @@ CCC_om_contains(CCC_Ordered_map *const om, void const *const key)
     return contains(om, key);
 }
 
-CCC_omap_entry
-CCC_om_entry(CCC_Ordered_map *const om, void const *const key)
+CCC_Ordered_map_entry
+CCC_ordered_map_entry(CCC_Ordered_map *const om, void const *const key)
 {
     if (!om || !key)
     {
-        return (CCC_omap_entry){{.entry = {.stats = CCC_ENTRY_ARG_ERROR}}};
+        return (CCC_Ordered_map_entry){
+            {.entry = {.stats = CCC_ENTRY_ARG_ERROR}}};
     }
-    return (CCC_omap_entry){container_entry(om, key)};
+    return (CCC_Ordered_map_entry){container_entry(om, key)};
 }
 
 void *
-CCC_om_insert_entry(CCC_omap_entry const *const e, CCC_omap_node *const elem)
+CCC_ordered_map_insert_entry(CCC_Ordered_map_entry const *const e,
+                             CCC_Ordered_map_node *const elem)
 {
     if (!e || !elem)
     {
@@ -163,7 +172,8 @@ CCC_om_insert_entry(CCC_omap_entry const *const e, CCC_omap_node *const elem)
 }
 
 void *
-CCC_om_or_insert(CCC_omap_entry const *const e, CCC_omap_node *const elem)
+CCC_ordered_map_or_insert(CCC_Ordered_map_entry const *const e,
+                          CCC_Ordered_map_node *const elem)
 {
     if (!e || !elem)
     {
@@ -176,8 +186,9 @@ CCC_om_or_insert(CCC_omap_entry const *const e, CCC_omap_node *const elem)
     return alloc_insert(e->impl.t, elem);
 }
 
-CCC_omap_entry *
-CCC_om_and_modify(CCC_omap_entry *const e, CCC_Type_updater *const fn)
+CCC_Ordered_map_entry *
+CCC_ordered_map_and_modify(CCC_Ordered_map_entry *const e,
+                           CCC_Type_updater *const fn)
 {
     if (!e)
     {
@@ -193,9 +204,10 @@ CCC_om_and_modify(CCC_omap_entry *const e, CCC_Type_updater *const fn)
     return e;
 }
 
-CCC_omap_entry *
-CCC_om_and_modify_context(CCC_omap_entry *const e, CCC_Type_updater *const fn,
-                          void *const context)
+CCC_Ordered_map_entry *
+CCC_ordered_map_and_modify_context(CCC_Ordered_map_entry *const e,
+                                   CCC_Type_updater *const fn,
+                                   void *const context)
 {
     if (e && fn && e->impl.entry.stats & CCC_ENTRY_OCCUPIED && e->impl.entry.e)
     {
@@ -208,8 +220,9 @@ CCC_om_and_modify_context(CCC_omap_entry *const e, CCC_Type_updater *const fn,
 }
 
 CCC_Entry
-CCC_om_swap_entry(CCC_Ordered_map *const om,
-                  CCC_omap_node *const key_val_handle, CCC_omap_node *const tmp)
+CCC_ordered_map_swap_entry(CCC_Ordered_map *const om,
+                           CCC_Ordered_map_node *const key_val_handle,
+                           CCC_Ordered_map_node *const tmp)
 {
     if (!om || !key_val_handle || !tmp)
     {
@@ -247,8 +260,8 @@ CCC_om_swap_entry(CCC_Ordered_map *const om,
 }
 
 CCC_Entry
-CCC_om_try_insert(CCC_Ordered_map *const om,
-                  CCC_omap_node *const key_val_handle)
+CCC_ordered_map_try_insert(CCC_Ordered_map *const om,
+                           CCC_Ordered_map_node *const key_val_handle)
 {
     if (!om || !key_val_handle)
     {
@@ -278,8 +291,8 @@ CCC_om_try_insert(CCC_Ordered_map *const om,
 }
 
 CCC_Entry
-CCC_om_insert_or_assign(CCC_Ordered_map *const om,
-                        CCC_omap_node *const key_val_handle)
+CCC_ordered_map_insert_or_assign(CCC_Ordered_map *const om,
+                                 CCC_Ordered_map_node *const key_val_handle)
 {
     if (!om || !key_val_handle)
     {
@@ -311,7 +324,8 @@ CCC_om_insert_or_assign(CCC_Ordered_map *const om,
 }
 
 CCC_Entry
-CCC_om_remove(CCC_Ordered_map *const om, CCC_omap_node *const out_handle)
+CCC_ordered_map_remove(CCC_Ordered_map *const om,
+                       CCC_Ordered_map_node *const out_handle)
 {
     if (!om || !out_handle)
     {
@@ -329,7 +343,11 @@ CCC_om_remove(CCC_Ordered_map *const om, CCC_omap_node *const out_handle)
     {
         void *const any_struct = struct_base(om, out_handle);
         memcpy(any_struct, n, om->sizeof_type);
-        om->alloc(n, 0, om->context);
+        om->alloc((CCC_Allocator_context){
+            .input = n,
+            .bytes = 0,
+            .context = om->context,
+        });
         return (CCC_Entry){{
             .e = any_struct,
             .stats = CCC_ENTRY_OCCUPIED,
@@ -342,7 +360,7 @@ CCC_om_remove(CCC_Ordered_map *const om, CCC_omap_node *const out_handle)
 }
 
 CCC_Entry
-CCC_om_remove_entry(CCC_omap_entry *const e)
+CCC_ordered_map_remove_entry(CCC_Ordered_map_entry *const e)
 {
     if (!e)
     {
@@ -355,7 +373,11 @@ CCC_om_remove_entry(CCC_omap_entry *const e)
         assert(erased);
         if (e->impl.t->alloc)
         {
-            e->impl.t->alloc(erased, 0, e->impl.t->context);
+            e->impl.t->alloc((CCC_Allocator_context){
+                .input = erased,
+                .bytes = 0,
+                .context = e->impl.t->context,
+            });
             return (CCC_Entry){{
                 .e = NULL,
                 .stats = CCC_ENTRY_OCCUPIED,
@@ -373,7 +395,7 @@ CCC_om_remove_entry(CCC_omap_entry *const e)
 }
 
 void *
-CCC_om_get_key_val(CCC_Ordered_map *const om, void const *const key)
+CCC_ordered_map_get_key_val(CCC_Ordered_map *const om, void const *const key)
 {
     if (!om || !key)
     {
@@ -383,7 +405,7 @@ CCC_om_get_key_val(CCC_Ordered_map *const om, void const *const key)
 }
 
 void *
-CCC_om_unwrap(CCC_omap_entry const *const e)
+CCC_ordered_map_unwrap(CCC_Ordered_map_entry const *const e)
 {
     if (!e)
     {
@@ -393,7 +415,7 @@ CCC_om_unwrap(CCC_omap_entry const *const e)
 }
 
 CCC_Tribool
-CCC_om_insert_error(CCC_omap_entry const *const e)
+CCC_ordered_map_insert_error(CCC_Ordered_map_entry const *const e)
 {
     if (!e)
     {
@@ -403,7 +425,7 @@ CCC_om_insert_error(CCC_omap_entry const *const e)
 }
 
 CCC_Tribool
-CCC_om_occupied(CCC_omap_entry const *const e)
+CCC_ordered_map_occupied(CCC_Ordered_map_entry const *const e)
 {
     if (!e)
     {
@@ -413,60 +435,63 @@ CCC_om_occupied(CCC_omap_entry const *const e)
 }
 
 CCC_Entry_status
-CCC_om_entry_status(CCC_omap_entry const *const e)
+CCC_ordered_map_entry_status(CCC_Ordered_map_entry const *const e)
 {
     return e ? e->impl.entry.stats : CCC_ENTRY_ARG_ERROR;
 }
 
 void *
-CCC_om_begin(CCC_Ordered_map const *const om)
+CCC_ordered_map_begin(CCC_Ordered_map const *const om)
 {
     return om ? min(om) : NULL;
 }
 
 void *
-CCC_om_rbegin(CCC_Ordered_map const *const om)
+CCC_ordered_map_rbegin(CCC_Ordered_map const *const om)
 {
     return om ? max(om) : NULL;
 }
 
 void *
-CCC_om_end(CCC_Ordered_map const *const)
+CCC_ordered_map_end(CCC_Ordered_map const *const)
 {
     return NULL;
 }
 
 void *
-CCC_om_rend(CCC_Ordered_map const *const)
+CCC_ordered_map_rend(CCC_Ordered_map const *const)
 {
     return NULL;
 }
 
 void *
-CCC_om_next(CCC_Ordered_map const *const om, CCC_omap_node const *const e)
+CCC_ordered_map_next(CCC_Ordered_map const *const om,
+                     CCC_Ordered_map_node const *const e)
 {
     if (!om || !e)
     {
         return NULL;
     }
-    struct CCC_omap_node const *n = next(om, e, INORDER);
+    struct CCC_Ordered_map_node const *n = next(om, e, INORDER);
     return n == &om->end ? NULL : struct_base(om, n);
 }
 
 void *
-CCC_om_rnext(CCC_Ordered_map const *const om, CCC_omap_node const *const e)
+CCC_ordered_map_rnext(CCC_Ordered_map const *const om,
+                      CCC_Ordered_map_node const *const e)
 {
     if (!om || !e)
     {
         return NULL;
     }
-    struct CCC_omap_node const *n = next(om, e, R_INORDER);
+    struct CCC_Ordered_map_node const *n = next(om, e, R_INORDER);
     return n == &om->end ? NULL : struct_base(om, n);
 }
 
 CCC_Range
-CCC_om_equal_range(CCC_Ordered_map *const om, void const *const begin_key,
-                   void const *const end_key)
+CCC_ordered_map_equal_range(CCC_Ordered_map *const om,
+                            void const *const begin_key,
+                            void const *const end_key)
 {
     if (!om || !begin_key || !end_key)
     {
@@ -476,8 +501,9 @@ CCC_om_equal_range(CCC_Ordered_map *const om, void const *const begin_key,
 }
 
 CCC_Reverse_range
-CCC_om_equal_rrange(CCC_Ordered_map *const om, void const *const rbegin_key,
-                    void const *const rend_key)
+CCC_ordered_map_equal_rrange(CCC_Ordered_map *const om,
+                             void const *const rbegin_key,
+                             void const *const rend_key)
 
 {
     if (!om || !rbegin_key || !rend_key)
@@ -491,24 +517,25 @@ CCC_om_equal_rrange(CCC_Ordered_map *const om, void const *const rbegin_key,
 /** This is a linear time constant space deletion of tree nodes via left
 rotations so element fields are modified during progression of deletes. */
 CCC_Result
-CCC_om_clear(CCC_Ordered_map *const om, CCC_Type_destructor *const destructor)
+CCC_ordered_map_clear(CCC_Ordered_map *const om,
+                      CCC_Type_destructor *const destructor)
 {
     if (!om)
     {
         return CCC_RESULT_ARGUMENT_ERROR;
     }
-    struct CCC_omap_node *node = om->root;
+    struct CCC_Ordered_map_node *node = om->root;
     while (node != &om->end)
     {
         if (node->branch[L] != &om->end)
         {
-            struct CCC_omap_node *const l = node->branch[L];
+            struct CCC_Ordered_map_node *const l = node->branch[L];
             node->branch[L] = l->branch[R];
             l->branch[R] = node;
             node = l;
             continue;
         }
-        struct CCC_omap_node *const next = node->branch[R];
+        struct CCC_Ordered_map_node *const next = node->branch[R];
         node->branch[L] = node->branch[R] = NULL;
         node->parent = NULL;
         void *const del = struct_base(om, node);
@@ -521,7 +548,11 @@ CCC_om_clear(CCC_Ordered_map *const om, CCC_Type_destructor *const destructor)
         }
         if (om->alloc)
         {
-            (void)om->alloc(del, 0, om->context);
+            (void)om->alloc((CCC_Allocator_context){
+                .input = del,
+                .bytes = 0,
+                .context = om->context,
+            });
         }
         node = next;
     }
@@ -529,38 +560,41 @@ CCC_om_clear(CCC_Ordered_map *const om, CCC_Type_destructor *const destructor)
 }
 
 CCC_Tribool
-CCC_om_validate(CCC_Ordered_map const *const om)
+CCC_ordered_map_validate(CCC_Ordered_map const *const om)
 {
     if (!om)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    return CCC_omap_validate(om);
+    return validate(om);
 }
 
 /*==========================  Private Interface  ============================*/
 
-struct CCC_otree_entry
-CCC_private_om_entry(struct CCC_omap *const t, void const *const key)
+struct CCC_Ordered_map_entry
+CCC_private_ordered_map_entry(struct CCC_Ordered_map *const t,
+                              void const *const key)
 {
     return container_entry(t, key);
 }
 
 void *
-CCC_private_om_insert(struct CCC_omap *const t, struct CCC_omap_node *n)
+CCC_private_ordered_map_insert(struct CCC_Ordered_map *const t,
+                               struct CCC_Ordered_map_node *n)
 {
     return insert(t, n);
 }
 
 void *
-CCC_private_om_key_in_slot(struct CCC_omap const *const t,
-                           void const *const slot)
+CCC_private_ordered_map_key_in_slot(struct CCC_Ordered_map const *const t,
+                                    void const *const slot)
 {
     return key_in_slot(t, slot);
 }
 
-struct CCC_omap_node *
-CCC_private_omap_node_in_slot(struct CCC_omap const *const t, void const *slot)
+struct CCC_Ordered_map_node *
+CCC_private_Ordered_map_node_in_slot(struct CCC_Ordered_map const *const t,
+                                     void const *slot)
 {
 
     return elem_in_slot(t, slot);
@@ -568,13 +602,13 @@ CCC_private_omap_node_in_slot(struct CCC_omap const *const t, void const *slot)
 
 /*======================  Static Splay Tree Helpers  ========================*/
 
-static struct CCC_otree_entry
-container_entry(struct CCC_omap *const t, void const *const key)
+static struct CCC_Ordered_map_entry
+container_entry(struct CCC_Ordered_map *const t, void const *const key)
 {
     void *const found = find(t, key);
     if (found)
     {
-        return (struct CCC_otree_entry){
+        return (struct CCC_Ordered_map_entry){
             .t = t,
             .entry = {
                 .e = found,
@@ -582,7 +616,7 @@ container_entry(struct CCC_omap *const t, void const *const key)
             },
         };
     }
-    return (struct CCC_otree_entry){
+    return (struct CCC_Ordered_map_entry){
         .t = t,
         .entry = {
             .e = found,
@@ -592,26 +626,27 @@ container_entry(struct CCC_omap *const t, void const *const key)
 }
 
 static inline void *
-key_from_node(struct CCC_omap const *const t, CCC_omap_node const *const n)
+key_from_node(struct CCC_Ordered_map const *const t,
+              CCC_Ordered_map_node const *const n)
 {
     return (char *)struct_base(t, n) + t->key_offset;
 }
 
 static inline void *
-key_in_slot(struct CCC_omap const *const t, void const *const slot)
+key_in_slot(struct CCC_Ordered_map const *const t, void const *const slot)
 {
     return (char *)slot + t->key_offset;
 }
 
-static inline struct CCC_omap_node *
-elem_in_slot(struct CCC_omap const *const t, void const *const slot)
+static inline struct CCC_Ordered_map_node *
+elem_in_slot(struct CCC_Ordered_map const *const t, void const *const slot)
 {
 
-    return (struct CCC_omap_node *)((char *)slot + t->node_node_offset);
+    return (struct CCC_Ordered_map_node *)((char *)slot + t->node_node_offset);
 }
 
 static inline void
-init_node(struct CCC_omap *const t, struct CCC_omap_node *const n)
+init_node(struct CCC_Ordered_map *const t, struct CCC_Ordered_map_node *const n)
 {
     n->branch[L] = &t->end;
     n->branch[R] = &t->end;
@@ -619,40 +654,40 @@ init_node(struct CCC_omap *const t, struct CCC_omap_node *const n)
 }
 
 static inline CCC_Tribool
-empty(struct CCC_omap const *const t)
+empty(struct CCC_Ordered_map const *const t)
 {
     return !t->size || !t->root || t->root == &t->end;
 }
 
 static void *
-max(struct CCC_omap const *const t)
+max(struct CCC_Ordered_map const *const t)
 {
     if (!t->size)
     {
         return NULL;
     }
-    struct CCC_omap_node *m = t->root;
+    struct CCC_Ordered_map_node *m = t->root;
     for (; m->branch[R] != &t->end; m = m->branch[R])
     {}
     return struct_base(t, m);
 }
 
 static void *
-min(struct CCC_omap const *t)
+min(struct CCC_Ordered_map const *t)
 {
     if (!t->size)
     {
         return NULL;
     }
-    struct CCC_omap_node *m = t->root;
+    struct CCC_Ordered_map_node *m = t->root;
     for (; m->branch[L] != &t->end; m = m->branch[L])
     {}
     return struct_base(t, m);
 }
 
-static struct CCC_omap_node const *
-next(struct CCC_omap const *const t, struct CCC_omap_node const *n,
-     om_branch const traversal)
+static struct CCC_Ordered_map_node const *
+next(struct CCC_Ordered_map const *const t,
+     struct CCC_Ordered_map_node const *n, enum Branch const traversal)
 {
     if (!n || n == &t->end)
     {
@@ -669,19 +704,19 @@ next(struct CCC_omap const *const t, struct CCC_omap_node const *n,
         return n;
     }
     /* This is how to return internal nodes on the way back up from a leaf. */
-    struct CCC_omap_node const *p = n->parent;
+    struct CCC_Ordered_map_node const *p = n->parent;
     for (; p != &t->end && p->branch[!traversal] != n; n = p, p = n->parent)
     {}
     return p;
 }
 
-static struct CCC_range_u
-equal_range(struct CCC_omap *const t, void const *const begin_key,
-            void const *const end_key, om_branch const traversal)
+static struct CCC_Range
+equal_range(struct CCC_Ordered_map *const t, void const *const begin_key,
+            void const *const end_key, enum Branch const traversal)
 {
     if (!t->size)
     {
-        return (struct CCC_range_u){};
+        return (struct CCC_Range){};
     }
     /* As with most BST code the cases are perfectly symmetrical. If we
        are seeking an increasing or decreasing range we need to make sure
@@ -689,24 +724,24 @@ equal_range(struct CCC_omap *const t, void const *const begin_key,
        checking we don't need to progress to the next greatest or next
        lesser element depending on the direction we are traversing. */
     CCC_Order const les_or_grt[2] = {CCC_ORDER_LESSER, CCC_ORDER_GREATER};
-    struct CCC_omap_node const *b = splay(t, t->root, begin_key, t->cmp);
+    struct CCC_Ordered_map_node const *b = splay(t, t->root, begin_key, t->cmp);
     if (cmp(t, begin_key, b, t->cmp) == les_or_grt[traversal])
     {
         b = next(t, b, traversal);
     }
-    struct CCC_omap_node const *e = splay(t, t->root, end_key, t->cmp);
+    struct CCC_Ordered_map_node const *e = splay(t, t->root, end_key, t->cmp);
     if (cmp(t, end_key, e, t->cmp) != les_or_grt[!traversal])
     {
         e = next(t, e, traversal);
     }
-    return (struct CCC_range_u){
+    return (struct CCC_Range){
         .begin = b == &t->end ? NULL : struct_base(t, b),
         .end = e == &t->end ? NULL : struct_base(t, e),
     };
 }
 
 static void *
-find(struct CCC_omap *const t, void const *const key)
+find(struct CCC_Ordered_map *const t, void const *const key)
 {
     if (t->root == &t->end)
     {
@@ -719,14 +754,15 @@ find(struct CCC_omap *const t, void const *const key)
 }
 
 static CCC_Tribool
-contains(struct CCC_omap *const t, void const *const key)
+contains(struct CCC_Ordered_map *const t, void const *const key)
 {
     t->root = splay(t, t->root, key, t->cmp);
     return cmp(t, key, t->root, t->cmp) == CCC_ORDER_EQUAL;
 }
 
 static void *
-alloc_insert(struct CCC_omap *const t, struct CCC_omap_node *out_handle)
+alloc_insert(struct CCC_Ordered_map *const t,
+             struct CCC_Ordered_map_node *out_handle)
 {
     init_node(t, out_handle);
     CCC_Order root_cmp = CCC_ORDER_ERROR;
@@ -742,7 +778,11 @@ alloc_insert(struct CCC_omap *const t, struct CCC_omap_node *out_handle)
     }
     if (t->alloc)
     {
-        void *const node = t->alloc(NULL, t->sizeof_type, t->context);
+        void *const node = t->alloc((CCC_Allocator_context){
+            .input = NULL,
+            .bytes = t->sizeof_type,
+            .context = t->context,
+        });
         if (!node)
         {
             return NULL;
@@ -763,7 +803,7 @@ alloc_insert(struct CCC_omap *const t, struct CCC_omap_node *out_handle)
 }
 
 static void *
-insert(struct CCC_omap *const t, struct CCC_omap_node *const n)
+insert(struct CCC_Ordered_map *const t, struct CCC_Ordered_map_node *const n)
 {
     init_node(t, n);
     if (empty(t))
@@ -784,10 +824,11 @@ insert(struct CCC_omap *const t, struct CCC_omap_node *const n)
 }
 
 static void *
-connect_new_root(struct CCC_omap *const t, struct CCC_omap_node *const new_root,
+connect_new_root(struct CCC_Ordered_map *const t,
+                 struct CCC_Ordered_map_node *const new_root,
                  CCC_Order const cmp_result)
 {
-    om_branch const dir = CCC_ORDER_GREATER == cmp_result;
+    enum Branch const dir = CCC_ORDER_GREATER == cmp_result;
     link(new_root, dir, t->root->branch[dir]);
     link(new_root, !dir, t->root);
     t->root->branch[dir] = &t->end;
@@ -798,13 +839,13 @@ connect_new_root(struct CCC_omap *const t, struct CCC_omap_node *const new_root,
 }
 
 static void *
-erase(struct CCC_omap *const t, void const *const key)
+erase(struct CCC_Ordered_map *const t, void const *const key)
 {
     if (empty(t))
     {
         return NULL;
     }
-    struct CCC_omap_node *ret = splay(t, t->root, key, t->cmp);
+    struct CCC_Ordered_map_node *ret = splay(t, t->root, key, t->cmp);
     CCC_Order const found = cmp(t, key, ret, t->cmp);
     if (found != CCC_ORDER_EQUAL)
     {
@@ -816,8 +857,9 @@ erase(struct CCC_omap *const t, void const *const key)
     return struct_base(t, ret);
 }
 
-static struct CCC_omap_node *
-remove_from_tree(struct CCC_omap *const t, struct CCC_omap_node *const ret)
+static struct CCC_Ordered_map_node *
+remove_from_tree(struct CCC_Ordered_map *const t,
+                 struct CCC_Ordered_map_node *const ret)
 {
     if (ret->branch[L] == &t->end)
     {
@@ -832,30 +874,30 @@ remove_from_tree(struct CCC_omap *const t, struct CCC_omap_node *const ret)
     return ret;
 }
 
-static struct CCC_omap_node *
-splay(struct CCC_omap *const t, struct CCC_omap_node *root,
+static struct CCC_Ordered_map_node *
+splay(struct CCC_Ordered_map *const t, struct CCC_Ordered_map_node *root,
       void const *const key, CCC_Key_comparator *const cmp_fn)
 {
     /* Pointers in an array and we can use the symmetric enum and flip it to
        choose the Left or Right subtree. Another benefit of our nil node: use it
        as our helper tree because we don't need its Left Right fields. */
     t->end.branch[L] = t->end.branch[R] = t->end.parent = &t->end;
-    struct CCC_omap_node *l_r_subtrees[LR] = {&t->end, &t->end};
+    struct CCC_Ordered_map_node *l_r_subtrees[LR] = {&t->end, &t->end};
     for (;;)
     {
         CCC_Order const root_cmp = cmp(t, key, root, cmp_fn);
-        om_branch const dir = CCC_ORDER_GREATER == root_cmp;
+        enum Branch const dir = CCC_ORDER_GREATER == root_cmp;
         if (CCC_ORDER_EQUAL == root_cmp || root->branch[dir] == &t->end)
         {
             break;
         }
         CCC_Order const child_cmp = cmp(t, key, root->branch[dir], cmp_fn);
-        om_branch const dir_from_child = CCC_ORDER_GREATER == child_cmp;
+        enum Branch const dir_from_child = CCC_ORDER_GREATER == child_cmp;
         /* A straight line has formed from root->child->elem. An opportunity
            to splay and heal the tree arises. */
         if (CCC_ORDER_EQUAL != child_cmp && dir == dir_from_child)
         {
-            struct CCC_omap_node *const pivot = root->branch[dir];
+            struct CCC_Ordered_map_node *const pivot = root->branch[dir];
             link(root, dir, pivot->branch[!dir]);
             link(pivot, !dir, root);
             root = pivot;
@@ -878,7 +920,8 @@ splay(struct CCC_omap *const t, struct CCC_omap_node *root,
 }
 
 static inline void *
-struct_base(struct CCC_omap const *const t, struct CCC_omap_node const *const n)
+struct_base(struct CCC_Ordered_map const *const t,
+            struct CCC_Ordered_map_node const *const n)
 {
     /* Link is the first field of the struct and is an array so no need to get
        pointer address of [0] element of array. That's the same as just the
@@ -887,8 +930,8 @@ struct_base(struct CCC_omap const *const t, struct CCC_omap_node const *const n)
 }
 
 static inline CCC_Order
-cmp(struct CCC_omap const *const t, void const *const key,
-    struct CCC_omap_node const *const node, CCC_Key_comparator *const fn)
+cmp(struct CCC_Ordered_map const *const t, void const *const key,
+    struct CCC_Ordered_map_node const *const node, CCC_Key_comparator *const fn)
 {
     return fn((CCC_Key_comparator_context){
         .any_key_lhs = key,
@@ -910,8 +953,8 @@ swap(char tmp[const], void *const a, void *const b, size_t sizeof_type)
 }
 
 static inline void
-link(struct CCC_omap_node *const parent, om_branch const dir,
-     struct CCC_omap_node *const subtree)
+link(struct CCC_Ordered_map_node *const parent, enum Branch const dir,
+     struct CCC_Ordered_map_node *const subtree)
 {
     parent->branch[dir] = subtree;
     subtree->parent = parent;
@@ -925,23 +968,23 @@ link(struct CCC_omap_node *const parent, om_branch const dir,
 that does not rely upon the implementation of iterators or any other possibly
 buggy implementation. A pure functional range check will provide the most
 reliable check regardless of implementation changes throughout code base. */
-struct tree_range
+struct Tree_range
 {
-    struct CCC_omap_node const *low;
-    struct CCC_omap_node const *root;
-    struct CCC_omap_node const *high;
+    struct CCC_Ordered_map_node const *low;
+    struct CCC_Ordered_map_node const *root;
+    struct CCC_Ordered_map_node const *high;
 };
 
 /** @private */
-struct parent_status
+struct Parent_status
 {
     CCC_Tribool correct;
-    struct CCC_omap_node const *parent;
+    struct CCC_Ordered_map_node const *parent;
 };
 
 static size_t
-recursive_count(struct CCC_omap const *const t,
-                struct CCC_omap_node const *const r)
+recursive_count(struct CCC_Ordered_map const *const t,
+                struct CCC_Ordered_map_node const *const r)
 {
     if (r == &t->end)
     {
@@ -952,8 +995,9 @@ recursive_count(struct CCC_omap const *const t,
 }
 
 static CCC_Tribool
-are_subtrees_valid(struct CCC_omap const *const t, struct tree_range const r,
-                   struct CCC_omap_node const *const nil)
+are_subtrees_valid(struct CCC_Ordered_map const *const t,
+                   struct Tree_range const r,
+                   struct CCC_Ordered_map_node const *const nil)
 {
     if (!r.root)
     {
@@ -975,14 +1019,14 @@ are_subtrees_valid(struct CCC_omap const *const t, struct tree_range const r,
         return CCC_FALSE;
     }
     return are_subtrees_valid(t,
-                              (struct tree_range){
+                              (struct Tree_range){
                                   .low = r.low,
                                   .root = r.root->branch[L],
                                   .high = r.root,
                               },
                               nil)
         && are_subtrees_valid(t,
-                              (struct tree_range){
+                              (struct Tree_range){
                                   .low = r.root,
                                   .root = r.root->branch[R],
                                   .high = r.high,
@@ -991,9 +1035,9 @@ are_subtrees_valid(struct CCC_omap const *const t, struct tree_range const r,
 }
 
 static CCC_Tribool
-is_parent_correct(struct CCC_omap const *const t,
-                  struct CCC_omap_node const *const parent,
-                  struct CCC_omap_node const *const root)
+is_parent_correct(struct CCC_Ordered_map const *const t,
+                  struct CCC_Ordered_map_node const *const parent,
+                  struct CCC_Ordered_map_node const *const root)
 {
     if (root == &t->end)
     {
@@ -1014,10 +1058,10 @@ is_parent_correct(struct CCC_omap const *const t,
    truth of the provided pointers with its own stack as backtracking
    information. */
 static CCC_Tribool
-CCC_omap_validate(struct CCC_omap const *const t)
+validate(struct CCC_Ordered_map const *const t)
 {
     if (!are_subtrees_valid(t,
-                            (struct tree_range){
+                            (struct Tree_range){
                                 .low = &t->end,
                                 .root = t->root,
                                 .high = &t->end,

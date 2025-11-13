@@ -70,7 +70,11 @@ CCC_doubly_linked_list_push_front(CCC_Doubly_linked_list *const l,
     }
     if (l->alloc)
     {
-        void *const node = l->alloc(NULL, l->sizeof_type, l->context);
+        void *const node = l->alloc((CCC_Allocator_context){
+            .input = NULL,
+            .bytes = l->sizeof_type,
+            .context = l->context,
+        });
         if (!node)
         {
             return NULL;
@@ -92,7 +96,11 @@ CCC_doubly_linked_list_push_back(CCC_Doubly_linked_list *const l,
     }
     if (l->alloc)
     {
-        void *const node = l->alloc(NULL, l->sizeof_type, l->context);
+        void *const node = l->alloc((CCC_Allocator_context){
+            .input = NULL,
+            .bytes = l->sizeof_type,
+            .context = l->context,
+        });
         if (!node)
         {
             return NULL;
@@ -134,7 +142,11 @@ CCC_doubly_linked_list_pop_front(CCC_Doubly_linked_list *const l)
     struct CCC_Doubly_linked_list_node *remove = pop_front(l);
     if (l->alloc)
     {
-        (void)l->alloc(struct_base(l, remove), 0, l->context);
+        (void)l->alloc((CCC_Allocator_context){
+            .input = struct_base(l, remove),
+            .bytes = 0,
+            .context = l->context,
+        });
     }
     return CCC_RESULT_OK;
 }
@@ -155,7 +167,11 @@ CCC_doubly_linked_list_pop_back(CCC_Doubly_linked_list *const l)
     }
     if (l->alloc)
     {
-        (void)l->alloc(struct_base(l, remove), 0, l->context);
+        (void)l->alloc((CCC_Allocator_context){
+            .input = struct_base(l, remove),
+            .bytes = 0,
+            .context = l->context,
+        });
     }
     --l->count;
     return CCC_RESULT_OK;
@@ -172,7 +188,11 @@ CCC_doubly_linked_list_insert(CCC_Doubly_linked_list *const l,
     }
     if (l->alloc)
     {
-        void *const node = l->alloc(NULL, l->sizeof_type, l->context);
+        void *const node = l->alloc((CCC_Allocator_context){
+            .input = NULL,
+            .bytes = l->sizeof_type,
+            .context = l->context,
+        });
         if (!node)
         {
             return NULL;
@@ -202,7 +222,11 @@ CCC_doubly_linked_list_erase(CCC_Doubly_linked_list *const l,
     void *const ret = elem->n == &l->nil ? NULL : struct_base(l, elem);
     if (l->alloc)
     {
-        (void)l->alloc(struct_base(l, elem), 0, l->context);
+        (void)l->alloc((CCC_Allocator_context){
+            .input = struct_base(l, elem),
+            .bytes = 0,
+            .context = l->context,
+        });
     }
     --l->count;
     return ret;
@@ -236,13 +260,13 @@ CCC_doubly_linked_list_erase_range(
 }
 
 CCC_Doubly_linked_list_node *
-CCC_Doubly_linked_list_node_begin(CCC_Doubly_linked_list const *const l)
+CCC_doubly_linked_list_node_begin(CCC_Doubly_linked_list const *const l)
 {
     return l ? l->nil.n : NULL;
 }
 
 CCC_Doubly_linked_list_node *
-CCC_Doubly_linked_list_node_end(CCC_Doubly_linked_list const *const l)
+CCC_doubly_linked_list_node_end(CCC_Doubly_linked_list const *const l)
 {
     return l ? l->nil.p : NULL;
 }
@@ -449,7 +473,11 @@ CCC_doubly_linked_list_clear(CCC_Doubly_linked_list *const l,
         }
         if (l->alloc)
         {
-            (void)l->alloc(node, 0, l->context);
+            (void)l->alloc((CCC_Allocator_context){
+                .input = node,
+                .bytes = 0,
+                .context = l->context,
+            });
         }
     }
     return CCC_RESULT_OK;
@@ -521,8 +549,11 @@ CCC_doubly_linked_list_insert_sorted(
     }
     if (doubly_linked_list->alloc)
     {
-        void *const node = doubly_linked_list->alloc(
-            NULL, doubly_linked_list->sizeof_type, doubly_linked_list->context);
+        void *const node = doubly_linked_list->alloc((CCC_Allocator_context){
+            .input = NULL,
+            .bytes = doubly_linked_list->sizeof_type,
+            .context = doubly_linked_list->context,
+        });
         if (!node)
         {
             return NULL;
@@ -788,10 +819,18 @@ erase_range(struct CCC_Doubly_linked_list const *const l,
     {
         assert(count <= l->count);
         struct CCC_Doubly_linked_list_node *const next = begin->n;
-        (void)l->alloc(struct_base(l, begin), 0, l->context);
+        (void)l->alloc((CCC_Allocator_context){
+            .input = struct_base(l, begin),
+            .bytes = 0,
+            .context = l->context,
+        });
         begin = next;
     }
-    (void)l->alloc(struct_base(l, end), 0, l->context);
+    (void)l->alloc((CCC_Allocator_context){
+        .input = struct_base(l, end),
+        .bytes = 0,
+        .context = l->context,
+    });
     return count;
 }
 

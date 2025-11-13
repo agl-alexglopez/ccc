@@ -42,8 +42,11 @@ CCC_buffer_alloc(CCC_Buffer *const buf, size_t const capacity,
     {
         return CCC_RESULT_NO_ALLOCATION_FUNCTION;
     }
-    void *const new_mem
-        = fn(buf->mem, buf->sizeof_type * capacity, buf->context);
+    void *const new_mem = fn((CCC_Allocator_context){
+        .input = buf->mem,
+        .bytes = buf->sizeof_type * capacity,
+        .context = buf->context,
+    });
     if (capacity && !new_mem)
     {
         return CCC_RESULT_ALLOCATOR_ERROR;
@@ -70,7 +73,11 @@ CCC_buffer_reserve(CCC_Buffer *const buf, size_t const to_add,
     {
         needed = START_CAPACITY;
     }
-    void *const new_mem = fn(buf->mem, buf->sizeof_type * needed, buf->context);
+    void *const new_mem = fn((CCC_Allocator_context){
+        .input = buf->mem,
+        .bytes = buf->sizeof_type * needed,
+        .context = buf->context,
+    });
     if (!new_mem)
     {
         return CCC_RESULT_ALLOCATOR_ERROR;
@@ -114,7 +121,11 @@ CCC_buffer_clear_and_free(CCC_Buffer *const buf,
     }
     if (!destructor)
     {
-        (void)buf->alloc(buf->mem, 0, buf->context);
+        (void)buf->alloc((CCC_Allocator_context){
+            .input = buf->mem,
+            .bytes = 0,
+            .context = buf->context,
+        });
         buf->mem = NULL;
         buf->count = 0;
         buf->capacity = 0;
@@ -128,7 +139,11 @@ CCC_buffer_clear_and_free(CCC_Buffer *const buf,
             .context = buf->context,
         });
     }
-    (void)buf->alloc(buf->mem, 0, buf->context);
+    (void)buf->alloc((CCC_Allocator_context){
+        .input = buf->mem,
+        .bytes = 0,
+        .context = buf->context,
+    });
     buf->mem = NULL;
     buf->count = 0;
     buf->capacity = 0;
@@ -146,7 +161,11 @@ CCC_buffer_clear_and_free_reserve(CCC_Buffer *const buf,
     }
     if (!destructor)
     {
-        (void)alloc(buf->mem, 0, buf->context);
+        (void)alloc((CCC_Allocator_context){
+            .input = buf->mem,
+            .bytes = 0,
+            .context = buf->context,
+        });
         buf->mem = NULL;
         buf->count = 0;
         buf->capacity = 0;
@@ -160,7 +179,11 @@ CCC_buffer_clear_and_free_reserve(CCC_Buffer *const buf,
             .context = buf->context,
         });
     }
-    (void)alloc(buf->mem, 0, buf->context);
+    (void)alloc((CCC_Allocator_context){
+        .input = buf->mem,
+        .bytes = 0,
+        .context = buf->context,
+    });
     buf->mem = NULL;
     buf->count = 0;
     buf->capacity = 0;

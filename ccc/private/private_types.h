@@ -52,7 +52,7 @@ struct CCC_Handle
 };
 
 /** @private */
-union CCC_Handle_wrape
+union CCC_Handle_wrap
 {
     struct CCC_Handle impl;
 };

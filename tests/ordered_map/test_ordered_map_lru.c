@@ -28,7 +28,7 @@ struct lru_cache
    in the same struct. */
 struct lru_node
 {
-    CCC_omap_node map_node;
+    CCC_Ordered_map_node map_node;
     doubly_linked_list_node list_node;
     int key;
     int val;
@@ -101,7 +101,7 @@ static struct lru_cache lru_cache = {
 CHECK_BEGIN_STATIC_FN(lru_put, struct lru_cache *const lru, int const key,
                       int const val)
 {
-    CCC_omap_entry *const ent = entry_r(&lru->map, &key);
+    CCC_Ordered_map_entry *const ent = entry_r(&lru->map, &key);
     if (occupied(ent))
     {
         struct lru_node *const found = unwrap(ent);
@@ -208,7 +208,7 @@ CHECK_BEGIN_STATIC_FN(run_lru_cache)
                 break;
         }
     }
-    CHECK_END_FN({ (void)CCC_om_clear(&lru_cache.map, NULL); });
+    CHECK_END_FN({ (void)CCC_ordered_map_clear(&lru_cache.map, NULL); });
 }
 
 int

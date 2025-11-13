@@ -87,7 +87,7 @@ CCC_flat_priority_queue_heapify_inplace(
     return CCC_RESULT_OK;
 }
 
-CCC_buffer
+CCC_Buffer
 CCC_flat_priority_queue_heapsort(
     CCC_Flat_priority_queue *const flat_priority_queue, void *const tmp)
 {

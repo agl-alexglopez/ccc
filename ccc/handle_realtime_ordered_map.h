@@ -79,7 +79,7 @@ or value update based on the needs of the user. Handles obtained via the Handle
 Interface are stable until the user removes the element at the provided handle.
 Insertions and deletions of other elements do not affect handle stability.
 Resizing of the table does not affect handle stability. */
-typedef union CCC_Handle_realtime_ordered_map_handle
+typedef union CCC_Handle_realtime_ordered_map_handle_wrap
     CCC_Handle_realtime_ordered_map_handle;
 
 /**@}*/

@@ -73,12 +73,12 @@ enum : size_t
 /** @private Use an int because that will force the nodes array to be wary of
 where to start. The nodes are 8 byte aligned but an int is 4. This means the
 nodes need to start after a 4 byte Buffer of padding at end of data array. */
-struct test_data_type
+struct Test_data_type
 {
     int i;
 };
 CCC_handle_realtime_ordered_map_declare_fixed_map(fixed_map_test_type,
-                                                  struct test_data_type, TCAP);
+                                                  struct Test_data_type, TCAP);
 /** @private This is a static fixed size map exclusive to this translation unit
 used to ensure assumptions about data layout are correct. The following static
 asserts must be true in order to support the Struct of Array style layout we
@@ -135,7 +135,7 @@ static_assert(
 /*==========================  Type Declarations   ===========================*/
 
 /** @private */
-enum handle_realtime_ordered_map_branch
+enum Branch
 {
     L = 0,
     R,
@@ -146,7 +146,7 @@ last node encountered on the search for the requested node. It will either be
 the correct node or the parent of the missing node if it is not found. This
 means insertions will not need a second search of the tree and we can insert
 immediately by adding the child. */
-struct handle_realtime_ordered_map_query
+struct Query
 {
     /** The last branch direction we took to the found or missing node. */
     CCC_Order last_cmp;
@@ -170,12 +170,12 @@ enum
 };
 
 /** @private A block of parity bits. */
-typedef typeof(*(struct CCC_Handle_realtime_ordered_map){}.parity) pblock;
+typedef typeof(*(struct CCC_Handle_realtime_ordered_map){}.parity) Parity_block;
 
 enum : size_t
 {
     /** @private The number of bits in a block of parity bits. */
-    PBLOCK_BITS = sizeof(pblock) * CHAR_BIT,
+    PARITY_BLOCK_BITS = sizeof(Parity_block) * CHAR_BIT,
 };
 
 /*==============================  Prototypes   ==============================*/
@@ -194,8 +194,8 @@ static size_t node_bytes(size_t capacity);
 static size_t parity_bytes(size_t capacity);
 static struct CCC_Handle_realtime_ordered_map_node *
 node_pos(size_t sizeof_type, void const *data, size_t capacity);
-static pblock *parity_pos(size_t sizeof_type, void const *data,
-                          size_t capacity);
+static Parity_block *parity_pos(size_t sizeof_type, void const *data,
+                                size_t capacity);
 static size_t maybe_alloc_insert(
     struct CCC_Handle_realtime_ordered_map *handle_realtime_ordered_map,
     size_t parent, CCC_Order last_cmp, void const *user_type);
@@ -213,17 +213,17 @@ static struct CCC_Handle_realtime_ordered_map_node *
 node_at(struct CCC_Handle_realtime_ordered_map const *, size_t);
 static void *data_at(struct CCC_Handle_realtime_ordered_map const *, size_t);
 /* Returning the internal query helper to aid in handle handling. */
-static struct handle_realtime_ordered_map_query
+static struct Query
 find(struct CCC_Handle_realtime_ordered_map const *handle_realtime_ordered_map,
      void const *key);
 /* Returning the handle core to the Handle Interface. */
-static inline struct CCC_hrtree_handle handle(
+static inline struct CCC_Handle_realtime_ordered_map_handle handle(
     struct CCC_Handle_realtime_ordered_map const *handle_realtime_ordered_map,
     void const *key);
 /* Returning a generic range that can be use for range or rrange. */
-static struct CCC_range_u
+static struct CCC_Range
 equal_range(struct CCC_Handle_realtime_ordered_map const *, void const *,
-            void const *, enum handle_realtime_ordered_map_branch);
+            void const *, enum Branch);
 /* Returning threeway comparison with user callback. */
 static CCC_Order cmp_nodes(
     struct CCC_Handle_realtime_ordered_map const *handle_realtime_ordered_map,
@@ -232,21 +232,18 @@ static CCC_Order cmp_nodes(
 static size_t sibling_of(struct CCC_Handle_realtime_ordered_map const *t,
                          size_t x);
 static size_t next(struct CCC_Handle_realtime_ordered_map const *t, size_t n,
-                   enum handle_realtime_ordered_map_branch traversal);
+                   enum Branch traversal);
 static size_t min_max_from(struct CCC_Handle_realtime_ordered_map const *t,
-                           size_t start,
-                           enum handle_realtime_ordered_map_branch dir);
+                           size_t start, enum Branch dir);
 static size_t branch_i(struct CCC_Handle_realtime_ordered_map const *t,
-                       size_t parent,
-                       enum handle_realtime_ordered_map_branch dir);
+                       size_t parent, enum Branch dir);
 static size_t parent_i(struct CCC_Handle_realtime_ordered_map const *t,
                        size_t child);
 static size_t index_of(struct CCC_Handle_realtime_ordered_map const *t,
                        void const *key_val_type);
 /* Returning references to index fields for tree nodes. */
 static size_t *branch_r(struct CCC_Handle_realtime_ordered_map const *t,
-                        size_t node,
-                        enum handle_realtime_ordered_map_branch branch);
+                        size_t node, enum Branch branch);
 static size_t *parent_r(struct CCC_Handle_realtime_ordered_map const *t,
                         size_t node);
 /* Returning WAVL tree status. */
@@ -293,11 +290,9 @@ static void double_demote(struct CCC_Handle_realtime_ordered_map const *t,
                           size_t x);
 
 static void rotate(struct CCC_Handle_realtime_ordered_map *t, size_t z,
-                   size_t x, size_t y,
-                   enum handle_realtime_ordered_map_branch dir);
+                   size_t x, size_t y, enum Branch dir);
 static void double_rotate(struct CCC_Handle_realtime_ordered_map *t, size_t z,
-                          size_t x, size_t y,
-                          enum handle_realtime_ordered_map_branch dir);
+                          size_t x, size_t y, enum Branch dir);
 /* Returning void as miscellaneous helpers. */
 static void swap(char tmp[const], void *a, void *b, size_t sizeof_type);
 static size_t max(size_t, size_t);
@@ -336,8 +331,7 @@ CCC_handle_realtime_ordered_map_get_key_val(
     {
         return 0;
     }
-    struct handle_realtime_ordered_map_query const q
-        = find(handle_realtime_ordered_map, key);
+    struct Query const q = find(handle_realtime_ordered_map, key);
     return (CCC_ORDER_EQUAL == q.last_cmp) ? q.found : 0;
 }
 
@@ -350,7 +344,7 @@ CCC_handle_realtime_ordered_map_swap_handle(
     {
         return (CCC_Handle){{.stats = CCC_ENTRY_ARG_ERROR}};
     }
-    struct handle_realtime_ordered_map_query const q
+    struct Query const q
         = find(handle_realtime_ordered_map,
                key_in_slot(handle_realtime_ordered_map, key_val_type_output));
     if (CCC_ORDER_EQUAL == q.last_cmp)
@@ -388,7 +382,7 @@ CCC_handle_realtime_ordered_map_try_insert(
     {
         return (CCC_Handle){{.stats = CCC_ENTRY_ARG_ERROR}};
     }
-    struct handle_realtime_ordered_map_query const q
+    struct Query const q
         = find(handle_realtime_ordered_map,
                key_in_slot(handle_realtime_ordered_map, key_val_type));
     if (CCC_ORDER_EQUAL == q.last_cmp)
@@ -422,7 +416,7 @@ CCC_handle_realtime_ordered_map_insert_or_assign(
     {
         return (CCC_Handle){{.stats = CCC_ENTRY_ARG_ERROR}};
     }
-    struct handle_realtime_ordered_map_query const q
+    struct Query const q
         = find(handle_realtime_ordered_map,
                key_in_slot(handle_realtime_ordered_map, key_val_type));
     if (CCC_ORDER_EQUAL == q.last_cmp)
@@ -566,7 +560,7 @@ CCC_handle_realtime_ordered_map_remove(
     {
         return (CCC_Handle){{.stats = CCC_ENTRY_ARG_ERROR}};
     }
-    struct handle_realtime_ordered_map_query const q
+    struct Query const q
         = find(handle_realtime_ordered_map,
                key_in_slot(handle_realtime_ordered_map, key_val_type_output));
     if (q.last_cmp != CCC_ORDER_EQUAL)
@@ -829,7 +823,7 @@ CCC_handle_realtime_ordered_map_copy(
     }
     void *const dst_mem = dst->data;
     struct CCC_Handle_realtime_ordered_map_node *const dst_nodes = dst->nodes;
-    pblock *const dst_parity = dst->parity;
+    Parity_block *const dst_parity = dst->parity;
     size_t const dst_cap = dst->capacity;
     CCC_Allocator *const dst_alloc = dst->alloc;
     *dst = *src;
@@ -899,9 +893,11 @@ CCC_handle_realtime_ordered_map_clear_and_free(
         handle_realtime_ordered_map->root = 0;
         handle_realtime_ordered_map->count = 0;
         handle_realtime_ordered_map->capacity = 0;
-        (void)handle_realtime_ordered_map->alloc(
-            handle_realtime_ordered_map->data, 0,
-            handle_realtime_ordered_map->context);
+        (void)handle_realtime_ordered_map->alloc((CCC_Allocator_context){
+            .input = handle_realtime_ordered_map->data,
+            .bytes = 0,
+            .context = handle_realtime_ordered_map->context,
+        });
         handle_realtime_ordered_map->data = NULL;
         handle_realtime_ordered_map->nodes = NULL;
         handle_realtime_ordered_map->parity = NULL;
@@ -910,9 +906,10 @@ CCC_handle_realtime_ordered_map_clear_and_free(
     delete_nodes(handle_realtime_ordered_map, fn);
     handle_realtime_ordered_map->root = 0;
     handle_realtime_ordered_map->capacity = 0;
-    (void)handle_realtime_ordered_map->alloc(
-        handle_realtime_ordered_map->data, 0,
-        handle_realtime_ordered_map->context);
+    (void)handle_realtime_ordered_map->alloc((CCC_Allocator_context){
+        .input = handle_realtime_ordered_map->data,
+        .bytes = 0,
+        .context = handle_realtime_ordered_map->context});
     handle_realtime_ordered_map->data = NULL;
     handle_realtime_ordered_map->nodes = NULL;
     handle_realtime_ordered_map->parity = NULL;
@@ -933,16 +930,22 @@ CCC_handle_realtime_ordered_map_clear_and_free_reserve(
         handle_realtime_ordered_map->root = 0;
         handle_realtime_ordered_map->count = 0;
         handle_realtime_ordered_map->capacity = 0;
-        (void)alloc(handle_realtime_ordered_map->data, 0,
-                    handle_realtime_ordered_map->context);
+        (void)alloc((CCC_Allocator_context){
+            .input = handle_realtime_ordered_map->data,
+            .bytes = 0,
+            .context = handle_realtime_ordered_map->context,
+        });
         handle_realtime_ordered_map->data = NULL;
         return CCC_RESULT_OK;
     }
     delete_nodes(handle_realtime_ordered_map, destructor);
     handle_realtime_ordered_map->root = 0;
     handle_realtime_ordered_map->capacity = 0;
-    (void)alloc(handle_realtime_ordered_map->data, 0,
-                handle_realtime_ordered_map->context);
+    (void)alloc((CCC_Allocator_context){
+        .input = handle_realtime_ordered_map->data,
+        .bytes = 0,
+        .context = handle_realtime_ordered_map->context,
+    });
     handle_realtime_ordered_map->data = NULL;
     handle_realtime_ordered_map->nodes = NULL;
     handle_realtime_ordered_map->parity = NULL;
@@ -970,7 +973,7 @@ CCC_private_handle_realtime_ordered_map_insert(
     insert(handle_realtime_ordered_map, parent_i, last_cmp, elem_i);
 }
 
-struct CCC_hrtree_handle
+struct CCC_Handle_realtime_ordered_map_handle
 CCC_private_handle_realtime_ordered_map_handle(
     struct CCC_Handle_realtime_ordered_map const *const
         handle_realtime_ordered_map,
@@ -1044,7 +1047,7 @@ alloc_slot(struct CCC_Handle_realtime_ordered_map *const t)
         assert(!t->free_list);
         if (old_count == old_cap)
         {
-            if (resize(t, max(old_cap * 2, PBLOCK_BITS), t->alloc)
+            if (resize(t, max(old_cap * 2, PARITY_BLOCK_BITS), t->alloc)
                 != CCC_RESULT_OK)
             {
                 return 0;
@@ -1090,10 +1093,12 @@ resize(
     {
         return CCC_RESULT_NO_ALLOCATION_FUNCTION;
     }
-    void *const new_data = fn(
-        NULL,
-        total_bytes(handle_realtime_ordered_map->sizeof_type, new_capacity),
-        handle_realtime_ordered_map->context);
+    void *const new_data = fn((CCC_Allocator_context){
+        .input = NULL,
+        .bytes
+        = total_bytes(handle_realtime_ordered_map->sizeof_type, new_capacity),
+        .context = handle_realtime_ordered_map->context,
+    });
     if (!new_data)
     {
         return CCC_RESULT_ALLOCATOR_ERROR;
@@ -1103,8 +1108,11 @@ resize(
         handle_realtime_ordered_map->sizeof_type, new_data, new_capacity);
     handle_realtime_ordered_map->parity = parity_pos(
         handle_realtime_ordered_map->sizeof_type, new_data, new_capacity);
-    fn(handle_realtime_ordered_map->data, 0,
-       handle_realtime_ordered_map->context);
+    fn((CCC_Allocator_context){
+        .input = handle_realtime_ordered_map->data,
+        .bytes = 0,
+        .context = handle_realtime_ordered_map->context,
+    });
     handle_realtime_ordered_map->data = new_data;
     handle_realtime_ordered_map->capacity = new_capacity;
     return CCC_RESULT_OK;
@@ -1136,16 +1144,15 @@ insert(
     }
 }
 
-static struct CCC_hrtree_handle
+static struct CCC_Handle_realtime_ordered_map_handle
 handle(struct CCC_Handle_realtime_ordered_map const *const
            handle_realtime_ordered_map,
        void const *const key)
 {
-    struct handle_realtime_ordered_map_query const q
-        = find(handle_realtime_ordered_map, key);
+    struct Query const q = find(handle_realtime_ordered_map, key);
     if (CCC_ORDER_EQUAL == q.last_cmp)
     {
-        return (struct CCC_hrtree_handle){
+        return (struct CCC_Handle_realtime_ordered_map_handle){
             .handle_realtime_ordered_map
             = (struct CCC_Handle_realtime_ordered_map *)
                 handle_realtime_ordered_map,
@@ -1154,7 +1161,7 @@ handle(struct CCC_Handle_realtime_ordered_map const *const
             .stats = CCC_ENTRY_OCCUPIED,
         };
     }
-    return (struct CCC_hrtree_handle){
+    return (struct CCC_Handle_realtime_ordered_map_handle){
         .handle_realtime_ordered_map
         = (struct CCC_Handle_realtime_ordered_map *)handle_realtime_ordered_map,
         .last_cmp = q.last_cmp,
@@ -1163,15 +1170,14 @@ handle(struct CCC_Handle_realtime_ordered_map const *const
     };
 }
 
-static struct handle_realtime_ordered_map_query
+static struct Query
 find(struct CCC_Handle_realtime_ordered_map const *const
          handle_realtime_ordered_map,
      void const *const key)
 {
     size_t parent = 0;
-    struct handle_realtime_ordered_map_query q
-        = {.last_cmp = CCC_ORDER_ERROR,
-           .found = handle_realtime_ordered_map->root};
+    struct Query q = {.last_cmp = CCC_ORDER_ERROR,
+                      .found = handle_realtime_ordered_map->root};
     while (q.found)
     {
         q.last_cmp = cmp_nodes(handle_realtime_ordered_map, key, q.found,
@@ -1191,7 +1197,7 @@ find(struct CCC_Handle_realtime_ordered_map const *const
 
 static size_t
 next(struct CCC_Handle_realtime_ordered_map const *const t, size_t n,
-     enum handle_realtime_ordered_map_branch const traversal)
+     enum Branch const traversal)
 {
     if (!n)
     {
@@ -1214,27 +1220,27 @@ next(struct CCC_Handle_realtime_ordered_map const *const t, size_t n,
     return p;
 }
 
-static struct CCC_range_u
+static struct CCC_Range
 equal_range(struct CCC_Handle_realtime_ordered_map const *const t,
             void const *const begin_key, void const *const end_key,
-            enum handle_realtime_ordered_map_branch const traversal)
+            enum Branch const traversal)
 {
     if (CCC_handle_realtime_ordered_map_is_empty(t))
     {
-        return (struct CCC_range_u){};
+        return (struct CCC_Range){};
     }
     CCC_Order const les_or_grt[2] = {CCC_ORDER_LESSER, CCC_ORDER_GREATER};
-    struct handle_realtime_ordered_map_query b = find(t, begin_key);
+    struct Query b = find(t, begin_key);
     if (b.last_cmp == les_or_grt[traversal])
     {
         b.found = next(t, b.found, traversal);
     }
-    struct handle_realtime_ordered_map_query e = find(t, end_key);
+    struct Query e = find(t, end_key);
     if (e.last_cmp != les_or_grt[!traversal])
     {
         e.found = next(t, e.found, traversal);
     }
-    return (struct CCC_range_u){
+    return (struct CCC_Range){
         .begin = data_at(t, b.found),
         .end = data_at(t, e.found),
     };
@@ -1242,7 +1248,7 @@ equal_range(struct CCC_Handle_realtime_ordered_map const *const t,
 
 static size_t
 min_max_from(struct CCC_Handle_realtime_ordered_map const *const t,
-             size_t start, enum handle_realtime_ordered_map_branch const dir)
+             size_t start, enum Branch const dir)
 {
     if (!start)
     {
@@ -1336,7 +1342,7 @@ in the allocation. */
 static inline size_t
 parity_bytes(size_t capacity)
 {
-    return sizeof(pblock) * block_count(capacity);
+    return sizeof(Parity_block) * block_count(capacity);
 }
 
 /** Calculates the number of bytes needed for all arrays in the Struct of Arrays
@@ -1374,12 +1380,12 @@ positions is guaranteed to be the first aligned byte given the alignment of the
 parity block type after the data and node arrays. The node array has added any
 necessary padding after it to ensure that the base of the parity block array is
 aligned for its type. */
-static inline pblock *
+static inline Parity_block *
 parity_pos(size_t const sizeof_type, void const *const data,
            size_t const capacity)
 {
-    return (pblock *)((char *)data + data_bytes(sizeof_type, capacity)
-                      + node_bytes(capacity));
+    return (Parity_block *)((char *)data + data_bytes(sizeof_type, capacity)
+                            + node_bytes(capacity));
 }
 
 /** Copies over the Struct of Arrays contained within the one contiguous
@@ -1442,24 +1448,24 @@ data_at(struct CCC_Handle_realtime_ordered_map const *const t, size_t const i)
     return (char *)t->data + (t->sizeof_type * i);
 }
 
-static inline pblock *
+static inline Parity_block *
 block_at(struct CCC_Handle_realtime_ordered_map const *const t, size_t const i)
 {
-    return &t->parity[i / PBLOCK_BITS];
+    return &t->parity[i / PARITY_BLOCK_BITS];
 }
 
-static inline pblock
+static inline Parity_block
 bit_on(size_t const i)
 {
-    static_assert((PBLOCK_BITS & (PBLOCK_BITS - 1)) == 0,
+    static_assert((PARITY_BLOCK_BITS & (PARITY_BLOCK_BITS - 1)) == 0,
                   "the number of bits in a block is always a power of two, "
                   "avoiding modulo operations.");
-    return ((pblock)1) << (i & (PBLOCK_BITS - 1));
+    return ((Parity_block)1) << (i & (PARITY_BLOCK_BITS - 1));
 }
 
 static inline size_t
 branch_i(struct CCC_Handle_realtime_ordered_map const *const t,
-         size_t const parent, enum handle_realtime_ordered_map_branch const dir)
+         size_t const parent, enum Branch const dir)
 {
     return node_at(t, parent)->branch[dir];
 }
@@ -1504,12 +1510,12 @@ set_parity(struct CCC_Handle_realtime_ordered_map const *const t,
 static inline size_t
 block_count(size_t const node_count)
 {
-    return (node_count + (PBLOCK_BITS - 1)) / PBLOCK_BITS;
+    return (node_count + (PARITY_BLOCK_BITS - 1)) / PARITY_BLOCK_BITS;
 }
 
 static inline size_t *
 branch_r(struct CCC_Handle_realtime_ordered_map const *t, size_t const node,
-         enum handle_realtime_ordered_map_branch const branch)
+         enum Branch const branch)
 {
     return &node_at(t, node)->branch[branch];
 }
@@ -1558,8 +1564,7 @@ insert_fixup(struct CCC_Handle_realtime_ordered_map *const t, size_t z,
     }
     assert(x);
     assert(is_0_child(t, z, x));
-    enum handle_realtime_ordered_map_branch const p_to_x_dir
-        = branch_i(t, z, R) == x;
+    enum Branch const p_to_x_dir = branch_i(t, z, R) == x;
     size_t const y = branch_i(t, x, !p_to_x_dir);
     if (!y || is_2_child(t, z, y))
     {
@@ -1692,8 +1697,7 @@ rebalance_3_child(struct CCC_Handle_realtime_ordered_map *const t, size_t z,
         else /* p(x) is 1,3, y is not a 2,2 parent, and x is 3-child.*/
         {
             assert(is_3_child(t, z, x));
-            enum handle_realtime_ordered_map_branch const z_to_x_dir
-                = branch_i(t, z, R) == x;
+            enum Branch const z_to_x_dir = branch_i(t, z, R) == x;
             size_t const w = branch_i(t, y, !z_to_x_dir);
             if (is_1_child(t, y, w))
             {
@@ -1752,8 +1756,7 @@ and uppercase are arbitrary subtrees.
        B              B */
 static void
 rotate(struct CCC_Handle_realtime_ordered_map *const t, size_t const z,
-       size_t const x, size_t const y,
-       enum handle_realtime_ordered_map_branch const dir)
+       size_t const x, size_t const y, enum Branch const dir)
 {
     assert(z);
     struct CCC_Handle_realtime_ordered_map_node *const z_r = node_at(t, z);
@@ -1788,8 +1791,7 @@ Lowercase are nodes and uppercase are arbitrary subtrees.
      B   C */
 static void
 double_rotate(struct CCC_Handle_realtime_ordered_map *const t, size_t const z,
-              size_t const x, size_t const y,
-              enum handle_realtime_ordered_map_branch const dir)
+              size_t const x, size_t const y, enum Branch const dir)
 {
     assert(z && x && y);
     struct CCC_Handle_realtime_ordered_map_node *const z_r = node_at(t, z);
@@ -1973,7 +1975,7 @@ max(size_t const a, size_t const b)
 /* NOLINTBEGIN(*misc-no-recursion) */
 
 /** @private */
-struct tree_range
+struct Tree_range
 {
     size_t low;
     size_t root;
@@ -1994,7 +1996,7 @@ recursive_count(struct CCC_Handle_realtime_ordered_map const *const t,
 
 static CCC_Tribool
 are_subtrees_valid(struct CCC_Handle_realtime_ordered_map const *t,
-                   struct tree_range const r)
+                   struct Tree_range const r)
 {
     if (!r.root)
     {
@@ -2011,12 +2013,12 @@ are_subtrees_valid(struct CCC_Handle_realtime_ordered_map const *t,
         return CCC_FALSE;
     }
     return are_subtrees_valid(t,
-                              (struct tree_range){
+                              (struct Tree_range){
                                   .low = r.low,
                                   .root = branch_i(t, r.root, L),
                                   .high = r.root,
                               })
-        && are_subtrees_valid(t, (struct tree_range){
+        && are_subtrees_valid(t, (struct Tree_range){
                                      .low = r.root,
                                      .root = branch_i(t, r.root, R),
                                      .high = r.high,
@@ -2071,7 +2073,7 @@ validate(struct CCC_Handle_realtime_ordered_map const *const
     }
     if (!are_subtrees_valid(
             handle_realtime_ordered_map,
-            (struct tree_range){.root = handle_realtime_ordered_map->root}))
+            (struct Tree_range){.root = handle_realtime_ordered_map->root}))
     {
         return CCC_FALSE;
     }

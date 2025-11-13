@@ -10,8 +10,8 @@
 
 CHECK_BEGIN_STATIC_FN(omap_test_empty)
 {
-    CCC_Ordered_map s
-        = CCC_om_initialize(s, struct val, elem, key, id_cmp, NULL, NULL);
+    CCC_Ordered_map s = CCC_ordered_map_initialize(s, struct val, elem, key,
+                                                   id_cmp, NULL, NULL);
     CHECK(is_empty(&s), true);
     CHECK_END_FN();
 }

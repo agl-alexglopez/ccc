@@ -22,7 +22,7 @@ static char const *const result_msgs[CCC_PRIVATE_RESULT_COUNT] = {
     [CCC_RESULT_FAIL]
     = "An operation ran on a container but the desired result could not be "
       "returned, meaning no valid value can be given to the user.",
-    [CCC_RESULT_NO_ALLOC]
+    [CCC_RESULT_NO_ALLOCATION_FUNCTION]
     = "A container performed an operation requiring new allocation of "
       "memory, but no allocation function was provided upon initialization.",
     [CCC_RESULT_ALLOCATOR_ERROR]
@@ -141,7 +141,7 @@ CCC_rrange_rend(CCC_Reverse_range const *const r)
 }
 
 char const *
-CCC_Result_msg(CCC_Result const res)
+CCC_result_msg(CCC_Result const res)
 {
     if (res >= CCC_PRIVATE_RESULT_COUNT)
     {
@@ -173,11 +173,11 @@ CCC_get_handle_status(CCC_Handle const *e)
 char const *
 CCC_handle_status_msg(CCC_Handle_status const status)
 {
-    return CCC_Entry_status_msg(status);
+    return CCC_entry_status_msg(status);
 }
 
 char const *
-CCC_Entry_status_msg(CCC_Entry_status const status)
+CCC_entry_status_msg(CCC_Entry_status const status)
 {
     switch (status)
     {

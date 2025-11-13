@@ -27,7 +27,7 @@ they refactor. */
 /** @brief When sorting, a singly linked list is at a disadvantage for iterative
 O(1) space merge sort: it doesn't have a prev pointer. This will help list
 elements remember their previous element for splicing and merging. */
-struct list_link
+struct Link
 {
     /** The previous element of cur. Must manually update and manage. */
     struct CCC_Singly_linked_list_node *prev;
@@ -57,10 +57,10 @@ static struct CCC_Singly_linked_list_node *
 pop_front(struct CCC_Singly_linked_list *);
 static struct CCC_Singly_linked_list_node *
 elem_in(struct CCC_Singly_linked_list const *, void const *any_struct);
-static struct list_link merge(struct CCC_Singly_linked_list *, struct list_link,
-                              struct list_link, struct list_link);
-static struct list_link first_less(struct CCC_Singly_linked_list const *,
-                                   struct list_link);
+static struct Link merge(struct CCC_Singly_linked_list *, struct Link,
+                         struct Link, struct Link);
+static struct Link first_less(struct CCC_Singly_linked_list const *,
+                              struct Link);
 static CCC_Order cmp(struct CCC_Singly_linked_list const *singly_linked_list,
                      struct CCC_Singly_linked_list_node const *lhs,
                      struct CCC_Singly_linked_list_node const *rhs);
@@ -78,8 +78,11 @@ CCC_singly_linked_list_push_front(
     }
     if (singly_linked_list->alloc)
     {
-        void *const node = singly_linked_list->alloc(
-            NULL, singly_linked_list->sizeof_type, singly_linked_list->context);
+        void *const node = singly_linked_list->alloc((CCC_Allocator_context){
+            .input = NULL,
+            .bytes = singly_linked_list->sizeof_type,
+            .context = singly_linked_list->context,
+        });
         if (!node)
         {
             return NULL;
@@ -132,8 +135,11 @@ CCC_singly_linked_list_pop_front(
         = pop_front(singly_linked_list);
     if (singly_linked_list->alloc)
     {
-        (void)singly_linked_list->alloc(struct_base(singly_linked_list, remove),
-                                        0, singly_linked_list->context);
+        (void)singly_linked_list->alloc((CCC_Allocator_context){
+            .input = struct_base(singly_linked_list, remove),
+            .bytes = 0,
+            .context = singly_linked_list->context,
+        });
     }
     return CCC_RESULT_OK;
 }
@@ -220,8 +226,11 @@ CCC_singly_linked_list_erase(CCC_Singly_linked_list *const singly_linked_list,
     }
     if (singly_linked_list->alloc)
     {
-        (void)singly_linked_list->alloc(struct_base(singly_linked_list, elem),
-                                        0, singly_linked_list->context);
+        (void)singly_linked_list->alloc((CCC_Allocator_context){
+            .input = struct_base(singly_linked_list, elem),
+            .bytes = 0,
+            .context = singly_linked_list->context,
+        });
     }
     --singly_linked_list->count;
     return ret == &singly_linked_list->nil
@@ -339,8 +348,11 @@ CCC_singly_linked_list_clear(CCC_Singly_linked_list *const singly_linked_list,
         }
         if (singly_linked_list->alloc)
         {
-            (void)singly_linked_list->alloc(mem, 0,
-                                            singly_linked_list->context);
+            (void)singly_linked_list->alloc((CCC_Allocator_context){
+                .input = mem,
+                .bytes = 0,
+                .context = singly_linked_list->context,
+            });
         }
     }
     return CCC_RESULT_OK;
@@ -436,8 +448,11 @@ CCC_singly_linked_list_insert_sorted(CCC_Singly_linked_list *singly_linked_list,
     }
     if (singly_linked_list->alloc)
     {
-        void *const node = singly_linked_list->alloc(
-            NULL, singly_linked_list->sizeof_type, singly_linked_list->context);
+        void *const node = singly_linked_list->alloc((CCC_Allocator_context){
+            .input = NULL,
+            .bytes = singly_linked_list->sizeof_type,
+            .context = singly_linked_list->context,
+        });
         if (!node)
         {
             return NULL;
@@ -496,12 +511,12 @@ CCC_singly_linked_list_sort(CCC_Singly_linked_list *const singly_linked_list)
     {
         merging = CCC_FALSE;
         /* 0th index of the A list. The start of one list to merge. */
-        struct list_link a_0 = {.prev = &singly_linked_list->nil,
-                                .i = singly_linked_list->nil.n};
+        struct Link a_0 = {.prev = &singly_linked_list->nil,
+                           .i = singly_linked_list->nil.n};
         while (a_0.i != &singly_linked_list->nil)
         {
             /* The Nth index of list A (its size) aka 0th index of B list. */
-            struct list_link a_n_b_0 = first_less(singly_linked_list, a_0);
+            struct Link a_n_b_0 = first_less(singly_linked_list, a_0);
             if (a_n_b_0.i == &singly_linked_list->nil)
             {
                 break;
@@ -526,9 +541,9 @@ Notice that all ranges treat the end of their range as an exclusive sentinel for
 consistency. This function assumes the provided lists are already sorted
 separately. A list link must be returned because the `b_n` previous field may be
 updated due to arbitrary splices during comparison sorting. */
-static inline struct list_link
-merge(CCC_Singly_linked_list *const singly_linked_list, struct list_link a_0,
-      struct list_link a_n_b_0, struct list_link b_n)
+static inline struct Link
+merge(CCC_Singly_linked_list *const singly_linked_list, struct Link a_0,
+      struct Link a_n_b_0, struct Link b_n)
 {
     while (a_0.i != a_n_b_0.i && a_n_b_0.i != b_n.i)
     {
@@ -564,9 +579,9 @@ its previous `CCC_ORDER_LESSER` according to the user comparison callback. The
 list_link returned will have the out of order element as cur and the last
 remaining in order element as prev. The cur element may be the sentinel if the
 run is sorted. */
-static inline struct list_link
+static inline struct Link
 first_less(CCC_Singly_linked_list const *const singly_linked_list,
-           struct list_link k)
+           struct Link k)
 {
     do
     {
@@ -656,11 +671,17 @@ erase_range(struct CCC_Singly_linked_list *const singly_linked_list,
     {
         assert(count <= singly_linked_list->count);
         next = begin->n;
-        (void)singly_linked_list->alloc(struct_base(singly_linked_list, begin),
-                                        0, singly_linked_list->context);
+        (void)singly_linked_list->alloc((CCC_Allocator_context){
+            .input = struct_base(singly_linked_list, begin),
+            .bytes = 0,
+            .context = singly_linked_list->context,
+        });
     }
-    (void)singly_linked_list->alloc(struct_base(singly_linked_list, end), 0,
-                                    singly_linked_list->context);
+    (void)singly_linked_list->alloc((CCC_Allocator_context){
+        .input = struct_base(singly_linked_list, end),
+        .bytes = 0,
+        .context = singly_linked_list->context,
+    });
     return count;
 }
 

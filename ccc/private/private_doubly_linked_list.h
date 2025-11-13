@@ -95,7 +95,7 @@ struct CCC_Doubly_linked_list
     /** @private The offset in bytes of the intrusive element in user type. */
     size_t doubly_linked_list_node_offset;
     /** @private The user provided comparison callback for sorting. */
-    CCC_Type_comparator_context *cmp;
+    CCC_Type_comparator *cmp;
     /** @private The user provided allocation function, if any. */
     CCC_Allocator *alloc;
     /** @private User provided context data, if any. */

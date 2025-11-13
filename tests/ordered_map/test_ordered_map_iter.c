@@ -154,8 +154,8 @@ CHECK_BEGIN_STATIC_FN(iterator_check, CCC_Ordered_map *s)
 
 CHECK_BEGIN_STATIC_FN(omap_test_forward_iter)
 {
-    CCC_Ordered_map s
-        = CCC_om_initialize(s, struct val, elem, key, id_cmp, NULL, NULL);
+    CCC_Ordered_map s = CCC_ordered_map_initialize(s, struct val, elem, key,
+                                                   id_cmp, NULL, NULL);
     /* We should have the expected behavior iteration over empty tree. */
     int j = 0;
     for (struct val *e = begin(&s); e != end(&s); e = next(&s, &e->elem), ++j)
@@ -186,8 +186,8 @@ CHECK_BEGIN_STATIC_FN(omap_test_forward_iter)
 
 CHECK_BEGIN_STATIC_FN(omap_test_iterate_removal)
 {
-    CCC_Ordered_map s
-        = CCC_om_initialize(s, struct val, elem, key, id_cmp, NULL, NULL);
+    CCC_Ordered_map s = CCC_ordered_map_initialize(s, struct val, elem, key,
+                                                   id_cmp, NULL, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -217,8 +217,8 @@ CHECK_BEGIN_STATIC_FN(omap_test_iterate_removal)
 
 CHECK_BEGIN_STATIC_FN(omap_test_iterate_remove_reinsert)
 {
-    CCC_Ordered_map s
-        = CCC_om_initialize(s, struct val, elem, key, id_cmp, NULL, NULL);
+    CCC_Ordered_map s = CCC_ordered_map_initialize(s, struct val, elem, key,
+                                                   id_cmp, NULL, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -254,8 +254,8 @@ CHECK_BEGIN_STATIC_FN(omap_test_iterate_remove_reinsert)
 
 CHECK_BEGIN_STATIC_FN(omap_test_valid_range)
 {
-    CCC_Ordered_map s
-        = CCC_om_initialize(s, struct val, elem, key, id_cmp, NULL, NULL);
+    CCC_Ordered_map s = CCC_ordered_map_initialize(s, struct val, elem, key,
+                                                   id_cmp, NULL, NULL);
 
     int const num_nodes = 25;
     struct val vals[25];
@@ -284,8 +284,8 @@ CHECK_BEGIN_STATIC_FN(omap_test_valid_range)
 
 CHECK_BEGIN_STATIC_FN(omap_test_valid_range_equals)
 {
-    CCC_Ordered_map s
-        = CCC_om_initialize(s, struct val, elem, key, id_cmp, NULL, NULL);
+    CCC_Ordered_map s = CCC_ordered_map_initialize(s, struct val, elem, key,
+                                                   id_cmp, NULL, NULL);
 
     int const num_nodes = 25;
     struct val vals[25];
@@ -308,8 +308,8 @@ CHECK_BEGIN_STATIC_FN(omap_test_valid_range_equals)
 
 CHECK_BEGIN_STATIC_FN(omap_test_invalid_range)
 {
-    CCC_Ordered_map s
-        = CCC_om_initialize(s, struct val, elem, key, id_cmp, NULL, NULL);
+    CCC_Ordered_map s = CCC_ordered_map_initialize(s, struct val, elem, key,
+                                                   id_cmp, NULL, NULL);
     int const num_nodes = 25;
     struct val vals[25];
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
@@ -337,8 +337,8 @@ CHECK_BEGIN_STATIC_FN(omap_test_invalid_range)
 
 CHECK_BEGIN_STATIC_FN(omap_test_empty_range)
 {
-    CCC_Ordered_map s
-        = CCC_om_initialize(s, struct val, elem, key, id_cmp, NULL, NULL);
+    CCC_Ordered_map s = CCC_ordered_map_initialize(s, struct val, elem, key,
+                                                   id_cmp, NULL, NULL);
     int const num_nodes = 25;
     struct val vals[25];
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */

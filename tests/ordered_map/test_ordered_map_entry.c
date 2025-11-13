@@ -468,7 +468,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_entry_and_modify)
     ordered_map om = om_initialize(om, struct val, elem, key, id_cmp,
                                    val_bump_alloc, &vals);
     int size = 30;
-    CCC_omap_entry *ent = entry_r(&om, &(int){-1});
+    CCC_Ordered_map_entry *ent = entry_r(&om, &(int){-1});
     CHECK(validate(&om), true);
     CHECK(occupied(ent), false);
     CHECK(unwrap(ent) == NULL, true);
@@ -540,7 +540,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_entry_and_modify_context)
                                    val_bump_alloc, &vals);
     int size = 30;
     int context = 1;
-    CCC_omap_entry *ent = entry_r(&om, &(int){-1});
+    CCC_Ordered_map_entry *ent = entry_r(&om, &(int){-1});
     ent = and_modify_context(ent, pluscontext, &context);
     CHECK(occupied(ent), false);
     CHECK(unwrap(ent) == NULL, true);
@@ -607,7 +607,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_entry_and_modify_with)
     ordered_map om = om_initialize(om, struct val, elem, key, id_cmp,
                                    val_bump_alloc, &vals);
     int size = 30;
-    CCC_omap_entry *ent = entry_r(&om, &(int){-1});
+    CCC_Ordered_map_entry *ent = entry_r(&om, &(int){-1});
     ent = om_and_modify_w(ent, struct val, { T->val++; });
     CHECK(count(&om).count, 0);
     CHECK(occupied(ent), false);

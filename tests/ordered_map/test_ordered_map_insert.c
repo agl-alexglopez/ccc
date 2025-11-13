@@ -44,7 +44,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_insert_macros)
     CCC_Ordered_map om
         = om_initialize(om, struct val, elem, key, id_cmp, std_alloc, NULL);
 
-    struct val const *ins = CCC_om_or_insert_w(
+    struct val const *ins = CCC_ordered_map_or_insert_w(
         entry_r(&om, &(int){2}), (struct val){.key = 2, .val = 0});
     CHECK(ins != NULL, true);
     CHECK(validate(&om), true);
@@ -80,7 +80,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_insert_macros)
     CHECK(validate(&om), true);
     CHECK(ins->val, 100);
     CHECK(count(&om).count, 4);
-    CHECK_END_FN(CCC_om_clear(&om, NULL););
+    CHECK_END_FN(CCC_ordered_map_clear(&om, NULL););
 }
 
 CHECK_BEGIN_STATIC_FN(omap_test_insert_overwrite)

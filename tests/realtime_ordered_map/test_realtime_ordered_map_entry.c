@@ -468,7 +468,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_entry_and_modify)
     CCC_Realtime_ordered_map rom = rom_initialize(
         rom, struct val, elem, key, id_cmp, val_bump_alloc, &vals);
     int size = 30;
-    CCC_romap_entry *ent = entry_r(&rom, &(int){-1});
+    CCC_Realtime_ordered_map_entry *ent = entry_r(&rom, &(int){-1});
     CHECK(validate(&rom), true);
     CHECK(occupied(ent), false);
     CHECK(unwrap(ent) == NULL, true);
@@ -540,7 +540,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_entry_and_modify_context)
         rom, struct val, elem, key, id_cmp, val_bump_alloc, &vals);
     int size = 30;
     int context = 1;
-    CCC_romap_entry *ent = entry_r(&rom, &(int){-1});
+    CCC_Realtime_ordered_map_entry *ent = entry_r(&rom, &(int){-1});
     ent = and_modify_context(ent, pluscontext, &context);
     CHECK(occupied(ent), false);
     CHECK(unwrap(ent) == NULL, true);
@@ -607,7 +607,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_entry_and_modify_with)
     CCC_Realtime_ordered_map rom = rom_initialize(
         rom, struct val, elem, key, id_cmp, val_bump_alloc, &vals);
     int size = 30;
-    CCC_romap_entry *ent = entry_r(&rom, &(int){-1});
+    CCC_Realtime_ordered_map_entry *ent = entry_r(&rom, &(int){-1});
     ent = rom_and_modify_w(ent, struct val, { T->val++; });
     CHECK(count(&rom).count, 0);
     CHECK(occupied(ent), false);

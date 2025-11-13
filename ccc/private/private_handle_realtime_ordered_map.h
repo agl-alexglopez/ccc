@@ -76,7 +76,7 @@ Here is the layout in one contiguous array.
 Consider how this layout saves space. Here is a more traditional approach.
 
 ```
-struct CCC_romap_node
+struct CCC_Realtime_ordered_map_node
 {
     size_t branch[2];
     union
@@ -143,7 +143,7 @@ struct CCC_Handle_realtime_ordered_map
 };
 
 /** @private */
-struct CCC_hrtree_handle
+struct CCC_Handle_realtime_ordered_map_handle
 {
     /** @private Map associated with this handle. */
     struct CCC_Handle_realtime_ordered_map *handle_realtime_ordered_map;
@@ -156,10 +156,10 @@ struct CCC_hrtree_handle
 };
 
 /** @private Wrapper for return by pointer on the stack in C23. */
-union CCC_Handle_realtime_ordered_map_handle
+union CCC_Handle_realtime_ordered_map_handle_wrap
 {
     /** @private Single field to enable return by compound literal reference. */
-    struct CCC_hrtree_handle impl;
+    struct CCC_Handle_realtime_ordered_map_handle impl;
 };
 
 /*========================  Private Interface  ==============================*/
@@ -178,7 +178,8 @@ CCC_private_handle_realtime_ordered_map_node_at(
     struct CCC_Handle_realtime_ordered_map const *handle_realtime_ordered_map,
     size_t i);
 /** @private */
-struct CCC_hrtree_handle CCC_private_handle_realtime_ordered_map_handle(
+struct CCC_Handle_realtime_ordered_map_handle
+CCC_private_handle_realtime_ordered_map_handle(
     struct CCC_Handle_realtime_ordered_map const *handle_realtime_ordered_map,
     void const *key);
 /** @private */
@@ -263,7 +264,8 @@ runtime. */
     (__extension__({                                                           \
         __auto_type private_handle_realtime_ordered_map_hndl_ptr               \
             = (Handle_realtime_ordered_map_handle_ptr);                        \
-        struct CCC_hrtree_handle private_handle_realtime_ordered_map_mod_hndl  \
+        struct CCC_Handle_realtime_ordered_map_handle                          \
+            private_handle_realtime_ordered_map_mod_hndl                       \
             = {.stats = CCC_ENTRY_ARG_ERROR};                                  \
         if (private_handle_realtime_ordered_map_hndl_ptr)                      \
         {                                                                      \
@@ -383,7 +385,7 @@ runtime. */
         if (private_try_ins_map_ptr)                                               \
         {                                                                          \
             __auto_type private_handle_realtime_ordered_map_key = (key);           \
-            struct CCC_hrtree_handle                                               \
+            struct CCC_Handle_realtime_ordered_map_handle                          \
                 private_handle_realtime_ordered_map_try_ins_hndl                   \
                 = CCC_private_handle_realtime_ordered_map_handle(                  \
                     private_try_ins_map_ptr,                                       \
@@ -453,7 +455,7 @@ runtime. */
         if (private_ins_or_assign_map_ptr)                                               \
         {                                                                                \
             __auto_type private_handle_realtime_ordered_map_key = (key);                 \
-            struct CCC_hrtree_handle                                                     \
+            struct CCC_Handle_realtime_ordered_map_handle                                \
                 private_handle_realtime_ordered_map_ins_or_assign_hndl                   \
                 = CCC_private_handle_realtime_ordered_map_handle(                        \
                     private_ins_or_assign_map_ptr,                                       \

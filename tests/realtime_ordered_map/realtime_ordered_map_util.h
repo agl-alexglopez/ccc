@@ -11,7 +11,7 @@ struct val
 {
     int key;
     int val;
-    CCC_romap_node elem;
+    CCC_Realtime_ordered_map_node elem;
 };
 
 /** Use this type to set up a simple bump allocator. The pool of values can
