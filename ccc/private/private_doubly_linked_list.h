@@ -13,8 +13,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 @endcond */
-#ifndef CCC_IMPL_DOUBLY_LINKED_LIST_H
-#define CCC_IMPL_DOUBLY_LINKED_LIST_H
+#ifndef CCC_PRIVATE_DOUBLY_LINKED_LIST_H
+#define CCC_PRIVATE_DOUBLY_LINKED_LIST_H
 
 /** @cond */
 #include <assert.h>
@@ -206,4 +206,4 @@ name of the list being on the left hand side of the assignment operator. */
 
 /* NOLINTEND(readability-identifier-naming) */
 
-#endif /* CCC_IMPL_DOUBLY_LINKED_LIST_H */
+#endif /* CCC_PRIVATE_DOUBLY_LINKED_LIST_H */

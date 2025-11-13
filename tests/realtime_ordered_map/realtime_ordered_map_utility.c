@@ -18,8 +18,8 @@ id_order(CCC_Key_comparator_context const order)
     return (key > c->key) - (key < c->key);
 }
 
-CHECK_BEGIN_FN(insert_shuffled, CCC_Realtime_ordered_map *m, struct Val vals[],
-               size_t const size, int const larger_prime)
+check_begin(insert_shuffled, CCC_Realtime_ordered_map *m, struct Val vals[],
+            size_t const size, int const larger_prime)
 {
     size_t shuffled_index = larger_prime % size;
     for (size_t i = 0; i < size; ++i)
@@ -28,11 +28,11 @@ CHECK_BEGIN_FN(insert_shuffled, CCC_Realtime_ordered_map *m, struct Val vals[],
         vals[shuffled_index].val = (int)i;
         (void)CCC_realtime_ordered_map_swap_entry(m, &vals[shuffled_index].elem,
                                                   &(struct Val){}.elem);
-        CHECK(validate(m), true);
+        check(validate(m), true);
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
-    CHECK(CCC_realtime_ordered_map_count(m).count, size);
-    CHECK_END_FN();
+    check(CCC_realtime_ordered_map_count(m).count, size);
+    check_end();
 }
 
 /* Iterative inorder traversal to check the heap is sorted. */

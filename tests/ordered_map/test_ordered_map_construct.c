@@ -8,16 +8,16 @@
 #include "ordered_map_utility.h"
 #include "traits.h"
 
-CHECK_BEGIN_STATIC_FN(ordered_map_test_empty)
+check_static_begin(ordered_map_test_empty)
 {
     CCC_Ordered_map s = CCC_ordered_map_initialize(s, struct Val, elem, key,
                                                    id_order, NULL, NULL);
-    CHECK(is_empty(&s), true);
-    CHECK_END_FN();
+    check(is_empty(&s), true);
+    check_end();
 }
 
 int
 main()
 {
-    return CHECK_RUN(ordered_map_test_empty());
+    return check_run(ordered_map_test_empty());
 }

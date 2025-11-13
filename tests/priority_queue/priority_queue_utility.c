@@ -23,8 +23,8 @@ val_update(CCC_Type_context const u)
     old->val = *(int *)u.context;
 }
 
-CHECK_BEGIN_FN(insert_shuffled, CCC_Priority_queue *ppriority_queue,
-               struct Val vals[], size_t const size, int const larger_prime)
+check_begin(insert_shuffled, CCC_Priority_queue *ppriority_queue,
+            struct Val vals[], size_t const size, int const larger_prime)
 {
     /* Math magic ahead so that we iterate over every index
        eventually but in a shuffled order. Not necessarily
@@ -36,19 +36,19 @@ CHECK_BEGIN_FN(insert_shuffled, CCC_Priority_queue *ppriority_queue,
     {
         vals[shuffled_index].val = (int)shuffled_index;
         (void)push(ppriority_queue, &vals[shuffled_index].elem);
-        CHECK(count(ppriority_queue).count, i + 1);
-        CHECK(validate(ppriority_queue), true);
+        check(count(ppriority_queue).count, i + 1);
+        check(validate(ppriority_queue), true);
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
-    CHECK(count(ppriority_queue).count, size);
-    CHECK_END_FN();
+    check(count(ppriority_queue).count, size);
+    check_end();
 }
 
 /* Iterative inorder traversal to check the heap is sorted. */
-CHECK_BEGIN_FN(inorder_fill, int vals[], size_t size,
-               CCC_Priority_queue *ppriority_queue)
+check_begin(inorder_fill, int vals[], size_t size,
+            CCC_Priority_queue *ppriority_queue)
 {
-    CHECK(count(ppriority_queue).count, size);
+    check(count(ppriority_queue).count, size);
     size_t i = 0;
     CCC_Priority_queue copy = CCC_priority_queue_initialize(
         struct Val, elem, CCC_priority_queue_order(ppriority_queue), val_order,
@@ -57,8 +57,8 @@ CHECK_BEGIN_FN(inorder_fill, int vals[], size_t size,
     {
         struct Val *const front = front(ppriority_queue);
         (void)pop(ppriority_queue);
-        CHECK(validate(ppriority_queue), true);
-        CHECK(validate(&copy), true);
+        check(validate(ppriority_queue), true);
+        check(validate(&copy), true);
         vals[i++] = front->val;
         (void)push(&copy, &front->elem);
     }
@@ -66,11 +66,11 @@ CHECK_BEGIN_FN(inorder_fill, int vals[], size_t size,
     while (!is_empty(&copy))
     {
         struct Val *v = front(&copy);
-        CHECK(v->val, vals[i++]);
+        check(v->val, vals[i++]);
         (void)pop(&copy);
         (void)push(ppriority_queue, &v->elem);
-        CHECK(validate(ppriority_queue), true);
-        CHECK(validate(&copy), true);
+        check(validate(ppriority_queue), true);
+        check(validate(&copy), true);
     }
-    CHECK_END_FN();
+    check_end();
 }

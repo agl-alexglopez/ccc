@@ -9,7 +9,7 @@
 #include "ccc/types.h"
 #include "checkers.h"
 
-CHECK_BEGIN_STATIC_FN(buffer_test_iter_forward)
+check_static_begin(buffer_test_iter_forward)
 {
     Buffer const b = buffer_initialize(((int[6]){1, 2, 3, 4, 5, 6}), int, NULL,
                                        NULL, 6, 6);
@@ -18,15 +18,15 @@ CHECK_BEGIN_STATIC_FN(buffer_test_iter_forward)
     for (int const *i = buffer_begin(&b); i != buffer_end(&b);
          i = buffer_next(&b, i))
     {
-        CHECK(i != NULL, CCC_TRUE);
-        CHECK(*i > prev, CCC_TRUE);
+        check(i != NULL, CCC_TRUE);
+        check(*i > prev, CCC_TRUE);
         ++count;
     }
-    CHECK(count, 6);
-    CHECK_END_FN();
+    check(count, 6);
+    check_end();
 }
 
-CHECK_BEGIN_STATIC_FN(buffer_test_iter_reverse)
+check_static_begin(buffer_test_iter_reverse)
 {
     Buffer const b = buffer_initialize(((int[6]){1, 2, 3, 4, 5, 6}), int, NULL,
                                        NULL, 6, 6);
@@ -35,15 +35,15 @@ CHECK_BEGIN_STATIC_FN(buffer_test_iter_reverse)
     for (int const *i = buffer_rbegin(&b); i != buffer_rend(&b);
          i = buffer_rnext(&b, i))
     {
-        CHECK(i != NULL, CCC_TRUE);
-        CHECK(*i < prev, CCC_TRUE);
+        check(i != NULL, CCC_TRUE);
+        check(*i < prev, CCC_TRUE);
         ++count;
     }
-    CHECK(count, 6);
-    CHECK_END_FN();
+    check(count, 6);
+    check_end();
 }
 
-CHECK_BEGIN_STATIC_FN(buffer_test_reverse_buf)
+check_static_begin(buffer_test_reverse_buf)
 {
     Buffer b = buffer_initialize(((int[6]){1, 2, 3, 4, 5, 6}), int, NULL, NULL,
                                  6, 6);
@@ -51,30 +51,30 @@ CHECK_BEGIN_STATIC_FN(buffer_test_reverse_buf)
     for (int const *i = buffer_begin(&b); i != buffer_end(&b);
          i = buffer_next(&b, i))
     {
-        CHECK(i != NULL, CCC_TRUE);
-        CHECK(*i > prev, CCC_TRUE);
+        check(i != NULL, CCC_TRUE);
+        check(*i > prev, CCC_TRUE);
     }
     for (int *l = buffer_begin(&b), *r = buffer_rbegin(&b); l < r;
          l = buffer_next(&b, l), r = buffer_rnext(&b, r))
     {
         CCC_Result const res = buffer_swap(&b, &(int){0}, buffer_i(&b, l).count,
                                            buffer_i(&b, r).count);
-        CHECK(res, CCC_RESULT_OK);
+        check(res, CCC_RESULT_OK);
     }
     prev = 7;
     for (int const *i = buffer_begin(&b); i != buffer_end(&b);
          i = buffer_next(&b, i))
     {
-        CHECK(i != NULL, CCC_TRUE);
-        CHECK(*i < prev, CCC_TRUE);
+        check(i != NULL, CCC_TRUE);
+        check(*i < prev, CCC_TRUE);
     }
-    CHECK_END_FN();
+    check_end();
 }
 
 /** The concept of two pointers can be implemented quite cleanly with the buffer
 iterator abstraction, especially because we don't force a foreach macro use
 onto the user. They are able to set up a while/for loop freely. */
-CHECK_BEGIN_STATIC_FN(buffer_test_trap_rainwater_two_pointers)
+check_static_begin(buffer_test_trap_rainwater_two_pointers)
 {
     enum : size_t
     {
@@ -85,7 +85,7 @@ CHECK_BEGIN_STATIC_FN(buffer_test_trap_rainwater_two_pointers)
                             int, NULL, NULL, HCAP, HCAP);
     int const correct_trapped = 6;
     int trapped = 0;
-    CHECK(buffer_is_empty(&heights), CCC_FALSE);
+    check(buffer_is_empty(&heights), CCC_FALSE);
     int lpeak = *buffer_front_as(&heights, int);
     int rpeak = *buffer_back_as(&heights, int);
     /* Easy way to have a "skip first" iterator because the iterator is
@@ -107,14 +107,14 @@ CHECK_BEGIN_STATIC_FN(buffer_test_trap_rainwater_two_pointers)
             r = buffer_rnext(&heights, r);
         }
     }
-    CHECK(trapped, correct_trapped);
-    CHECK_END_FN();
+    check(trapped, correct_trapped);
+    check_end();
 }
 
 int
 main(void)
 {
-    return CHECK_RUN(buffer_test_iter_forward(), buffer_test_iter_reverse(),
+    return check_run(buffer_test_iter_forward(), buffer_test_iter_reverse(),
                      buffer_test_reverse_buf(),
                      buffer_test_trap_rainwater_two_pointers());
 }

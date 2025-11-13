@@ -5,25 +5,25 @@
 #include "checkers.h"
 #include "utility/allocate.h"
 
-CHECK_BEGIN_STATIC_FN(bitset_test_construct)
+check_static_begin(bitset_test_construct)
 {
     CCC_Bitset bs
         = CCC_bitset_initialize(CCC_bitset_blocks(10), NULL, NULL, 10);
-    CHECK(CCC_bitset_popcount(&bs).count, 0);
+    check(CCC_bitset_popcount(&bs).count, 0);
     for (size_t i = 0; i < CCC_bitset_capacity(&bs).count; ++i)
     {
-        CHECK(CCC_bitset_test(&bs, i), CCC_FALSE);
-        CHECK(CCC_bitset_test(&bs, i), CCC_FALSE);
+        check(CCC_bitset_test(&bs, i), CCC_FALSE);
+        check(CCC_bitset_test(&bs, i), CCC_FALSE);
     }
-    CHECK_END_FN();
+    check_end();
 }
 
-CHECK_BEGIN_STATIC_FN(bitset_test_copy_no_allocate)
+check_static_begin(bitset_test_copy_no_allocate)
 {
     CCC_Bitset src
         = CCC_bitset_initialize(CCC_bitset_blocks(512), NULL, NULL, 512, 0);
-    CHECK(CCC_bitset_capacity(&src).count, 512);
-    CHECK(CCC_bitset_count(&src).count, 0);
+    check(CCC_bitset_capacity(&src).count, 512);
+    check(CCC_bitset_count(&src).count, 0);
     CCC_Result push_status = CCC_RESULT_OK;
     for (size_t i = 0; push_status == CCC_RESULT_OK; ++i)
     {
@@ -36,157 +36,157 @@ CHECK_BEGIN_STATIC_FN(bitset_test_copy_no_allocate)
             push_status = CCC_bitset_push_back(&src, CCC_FALSE);
         }
     }
-    CHECK(push_status, CCC_RESULT_NO_ALLOCATION_FUNCTION);
+    check(push_status, CCC_RESULT_NO_ALLOCATION_FUNCTION);
     CCC_Bitset dst
         = CCC_bitset_initialize(CCC_bitset_blocks(513), NULL, NULL, 513, 0);
     CCC_Result r = CCC_bitset_copy(&dst, &src, NULL);
-    CHECK(r, CCC_RESULT_OK);
-    CHECK(CCC_bitset_popcount(&src).count, CCC_bitset_popcount(&dst).count);
-    CHECK(CCC_bitset_count(&src).count, CCC_bitset_count(&dst).count);
+    check(r, CCC_RESULT_OK);
+    check(CCC_bitset_popcount(&src).count, CCC_bitset_popcount(&dst).count);
+    check(CCC_bitset_count(&src).count, CCC_bitset_count(&dst).count);
     while (!CCC_bitset_empty(&src) && !CCC_bitset_empty(&dst))
     {
         CCC_Tribool const src_msb = CCC_bitset_pop_back(&src);
         CCC_Tribool const dst_msb = CCC_bitset_pop_back(&dst);
         if (CCC_bitset_count(&src).count % 2)
         {
-            CHECK(src_msb, CCC_TRUE);
-            CHECK(src_msb, dst_msb);
+            check(src_msb, CCC_TRUE);
+            check(src_msb, dst_msb);
         }
         else
         {
-            CHECK(src_msb, CCC_FALSE);
-            CHECK(src_msb, dst_msb);
+            check(src_msb, CCC_FALSE);
+            check(src_msb, dst_msb);
         }
     }
-    CHECK(CCC_bitset_empty(&src), CCC_bitset_empty(&dst));
-    CHECK_END_FN();
+    check(CCC_bitset_empty(&src), CCC_bitset_empty(&dst));
+    check_end();
 }
 
-CHECK_BEGIN_STATIC_FN(bitset_test_copy_allocate)
+check_static_begin(bitset_test_copy_allocate)
 {
     CCC_Bitset src = CCC_bitset_initialize(NULL, std_allocate, NULL, 0);
     for (size_t i = 0; i < 512; ++i)
     {
         if (i % 2)
         {
-            CHECK(CCC_bitset_push_back(&src, CCC_TRUE), CCC_RESULT_OK);
+            check(CCC_bitset_push_back(&src, CCC_TRUE), CCC_RESULT_OK);
         }
         else
         {
-            CHECK(CCC_bitset_push_back(&src, CCC_FALSE), CCC_RESULT_OK);
+            check(CCC_bitset_push_back(&src, CCC_FALSE), CCC_RESULT_OK);
         }
     }
     CCC_Bitset dst = CCC_bitset_initialize(NULL, std_allocate, NULL, 0);
     CCC_Result r = CCC_bitset_copy(&dst, &src, std_allocate);
-    CHECK(r, CCC_RESULT_OK);
-    CHECK(CCC_bitset_popcount(&src).count, CCC_bitset_popcount(&dst).count);
-    CHECK(CCC_bitset_count(&src).count, CCC_bitset_count(&dst).count);
+    check(r, CCC_RESULT_OK);
+    check(CCC_bitset_popcount(&src).count, CCC_bitset_popcount(&dst).count);
+    check(CCC_bitset_count(&src).count, CCC_bitset_count(&dst).count);
     while (!CCC_bitset_empty(&src) && !CCC_bitset_empty(&dst))
     {
         CCC_Tribool const src_msb = CCC_bitset_pop_back(&src);
         CCC_Tribool const dst_msb = CCC_bitset_pop_back(&dst);
         if (CCC_bitset_count(&src).count % 2)
         {
-            CHECK(src_msb, CCC_TRUE);
-            CHECK(src_msb, dst_msb);
+            check(src_msb, CCC_TRUE);
+            check(src_msb, dst_msb);
         }
         else
         {
-            CHECK(src_msb, CCC_FALSE);
-            CHECK(src_msb, dst_msb);
+            check(src_msb, CCC_FALSE);
+            check(src_msb, dst_msb);
         }
     }
-    CHECK(CCC_bitset_empty(&src), CCC_bitset_empty(&dst));
-    CHECK_END_FN({
+    check(CCC_bitset_empty(&src), CCC_bitset_empty(&dst));
+    check_end({
         (void)CCC_bitset_clear_and_free(&src);
         (void)CCC_bitset_clear_and_free(&dst);
     });
 }
 
-CHECK_BEGIN_STATIC_FN(bitset_test_init_from)
+check_static_begin(bitset_test_init_from)
 {
     char input[] = {'1', '1', '0', '1', '1', '0', '\0'};
     CCC_Bitset b = CCC_bitset_from(std_allocate, NULL, 0, sizeof(input) - 1,
                                    '1', "110110");
-    CHECK(CCC_bitset_count(&b).count, sizeof(input) - 1);
-    CHECK(CCC_bitset_capacity(&b).count, sizeof(input) - 1);
-    CHECK(CCC_bitset_popcount(&b).count, 4);
-    CHECK(CCC_bitset_test(&b, 0), CCC_TRUE);
-    CHECK(CCC_bitset_test(&b, sizeof(input) - 2), CCC_FALSE);
-    CHECK_END_FN(CCC_bitset_clear_and_free(&b););
+    check(CCC_bitset_count(&b).count, sizeof(input) - 1);
+    check(CCC_bitset_capacity(&b).count, sizeof(input) - 1);
+    check(CCC_bitset_popcount(&b).count, 4);
+    check(CCC_bitset_test(&b, 0), CCC_TRUE);
+    check(CCC_bitset_test(&b, sizeof(input) - 2), CCC_FALSE);
+    check_end(CCC_bitset_clear_and_free(&b););
 }
 
-CHECK_BEGIN_STATIC_FN(bitset_test_init_from_cap)
+check_static_begin(bitset_test_init_from_cap)
 {
     char input[] = {'1', '1', '0', '1', '1', '0', '\0'};
     CCC_Bitset b = CCC_bitset_from(std_allocate, NULL, 0, sizeof(input), '1',
                                    input, (sizeof(input) - 1) * 2);
-    CHECK(CCC_bitset_count(&b).count, sizeof(input) - 1);
-    CHECK(CCC_bitset_capacity(&b).count, (sizeof(input) - 1) * 2);
-    CHECK(CCC_bitset_popcount(&b).count, 4);
-    CHECK(CCC_bitset_test(&b, 0), CCC_TRUE);
-    CHECK(CCC_bitset_test(&b, sizeof(input) - 2), CCC_FALSE);
-    CHECK(CCC_TRIBOOL_ERROR, CCC_bitset_test(&b, sizeof(input) - 1));
-    CHECK(CCC_bitset_push_back(&b, CCC_TRUE), CCC_RESULT_OK);
-    CHECK(CCC_TRUE, CCC_bitset_test(&b, sizeof(input) - 1));
-    CHECK(CCC_bitset_capacity(&b).count, (sizeof(input) - 1) * 2);
-    CHECK_END_FN(CCC_bitset_clear_and_free(&b););
+    check(CCC_bitset_count(&b).count, sizeof(input) - 1);
+    check(CCC_bitset_capacity(&b).count, (sizeof(input) - 1) * 2);
+    check(CCC_bitset_popcount(&b).count, 4);
+    check(CCC_bitset_test(&b, 0), CCC_TRUE);
+    check(CCC_bitset_test(&b, sizeof(input) - 2), CCC_FALSE);
+    check(CCC_TRIBOOL_ERROR, CCC_bitset_test(&b, sizeof(input) - 1));
+    check(CCC_bitset_push_back(&b, CCC_TRUE), CCC_RESULT_OK);
+    check(CCC_TRUE, CCC_bitset_test(&b, sizeof(input) - 1));
+    check(CCC_bitset_capacity(&b).count, (sizeof(input) - 1) * 2);
+    check_end(CCC_bitset_clear_and_free(&b););
 }
 
-CHECK_BEGIN_STATIC_FN(bitset_test_init_from_fail)
+check_static_begin(bitset_test_init_from_fail)
 {
     char input[] = {'1', '1', '0', '1', '1', '0', '\0'};
     /* Forgot allocation function. */
     CCC_Bitset b
         = CCC_bitset_from(NULL, NULL, 0, sizeof(input) - 1, '1', input);
-    CHECK(CCC_bitset_count(&b).count, 0);
-    CHECK(CCC_bitset_capacity(&b).count, 0);
-    CHECK(CCC_bitset_popcount(&b).count, 0);
-    CHECK(CCC_TRIBOOL_ERROR, CCC_bitset_test(&b, 0));
-    CHECK(CCC_TRIBOOL_ERROR, CCC_bitset_test(&b, 99));
-    CHECK_END_FN(CCC_bitset_clear_and_free(&b););
+    check(CCC_bitset_count(&b).count, 0);
+    check(CCC_bitset_capacity(&b).count, 0);
+    check(CCC_bitset_popcount(&b).count, 0);
+    check(CCC_TRIBOOL_ERROR, CCC_bitset_test(&b, 0));
+    check(CCC_TRIBOOL_ERROR, CCC_bitset_test(&b, 99));
+    check_end(CCC_bitset_clear_and_free(&b););
 }
 
-CHECK_BEGIN_STATIC_FN(bitset_test_init_from_cap_fail)
+check_static_begin(bitset_test_init_from_cap_fail)
 {
     char input[] = {'1', '1', '0', '1', '1', '0', '\0'};
     /* Forgot allocation function. */
     CCC_Bitset b
         = CCC_bitset_from(NULL, NULL, 0, sizeof(input) - 1, '1', input, 99);
-    CHECK(CCC_bitset_count(&b).count, 0);
-    CHECK(CCC_bitset_capacity(&b).count, 0);
-    CHECK(CCC_bitset_popcount(&b).count, 0);
-    CHECK(CCC_TRIBOOL_ERROR, CCC_bitset_test(&b, 0));
-    CHECK(CCC_TRIBOOL_ERROR, CCC_bitset_test(&b, 99));
-    CHECK_END_FN(CCC_bitset_clear_and_free(&b););
+    check(CCC_bitset_count(&b).count, 0);
+    check(CCC_bitset_capacity(&b).count, 0);
+    check(CCC_bitset_popcount(&b).count, 0);
+    check(CCC_TRIBOOL_ERROR, CCC_bitset_test(&b, 0));
+    check(CCC_TRIBOOL_ERROR, CCC_bitset_test(&b, 99));
+    check_end(CCC_bitset_clear_and_free(&b););
 }
 
-CHECK_BEGIN_STATIC_FN(bitset_test_init_with_capacity)
+check_static_begin(bitset_test_init_with_capacity)
 {
     CCC_Bitset b = CCC_bitset_with_capacity(std_allocate, NULL, 10);
-    CHECK(CCC_bitset_popcount(&b).count, 0);
-    CHECK(CCC_bitset_set(&b, 0, CCC_TRUE), CCC_FALSE);
-    CHECK(CCC_bitset_set(&b, 9, CCC_TRUE), CCC_FALSE);
-    CHECK(CCC_bitset_test(&b, 0), CCC_TRUE);
-    CHECK(CCC_bitset_test(&b, 9), CCC_TRUE);
-    CHECK_END_FN(CCC_bitset_clear_and_free(&b););
+    check(CCC_bitset_popcount(&b).count, 0);
+    check(CCC_bitset_set(&b, 0, CCC_TRUE), CCC_FALSE);
+    check(CCC_bitset_set(&b, 9, CCC_TRUE), CCC_FALSE);
+    check(CCC_bitset_test(&b, 0), CCC_TRUE);
+    check(CCC_bitset_test(&b, 9), CCC_TRUE);
+    check_end(CCC_bitset_clear_and_free(&b););
 }
 
-CHECK_BEGIN_STATIC_FN(bitset_test_init_with_capacity_fail)
+check_static_begin(bitset_test_init_with_capacity_fail)
 {
     CCC_Bitset b = CCC_bitset_with_capacity(NULL, NULL, 10);
-    CHECK(CCC_bitset_popcount(&b).count, 0);
-    CHECK(CCC_TRIBOOL_ERROR, CCC_bitset_set(&b, 0, CCC_TRUE));
-    CHECK(CCC_TRIBOOL_ERROR, CCC_bitset_set(&b, 9, CCC_TRUE));
-    CHECK(CCC_TRIBOOL_ERROR, CCC_bitset_test(&b, 0));
-    CHECK(CCC_TRIBOOL_ERROR, CCC_bitset_test(&b, 9));
-    CHECK_END_FN(CCC_bitset_clear_and_free(&b););
+    check(CCC_bitset_popcount(&b).count, 0);
+    check(CCC_TRIBOOL_ERROR, CCC_bitset_set(&b, 0, CCC_TRUE));
+    check(CCC_TRIBOOL_ERROR, CCC_bitset_set(&b, 9, CCC_TRUE));
+    check(CCC_TRIBOOL_ERROR, CCC_bitset_test(&b, 0));
+    check(CCC_TRIBOOL_ERROR, CCC_bitset_test(&b, 9));
+    check_end(CCC_bitset_clear_and_free(&b););
 }
 
 int
 main(void)
 {
-    return CHECK_RUN(bitset_test_construct(), bitset_test_copy_no_allocate(),
+    return check_run(bitset_test_construct(), bitset_test_copy_no_allocate(),
                      bitset_test_copy_allocate(), bitset_test_init_from(),
                      bitset_test_init_from_cap(), bitset_test_init_from_fail(),
                      bitset_test_init_from_cap_fail(),

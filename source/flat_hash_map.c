@@ -457,7 +457,7 @@ CCC_flat_hash_map_entry(CCC_Flat_hash_map *const h, void const *const key)
 {
     if (unlikely(!h || !key))
     {
-        return (CCC_Flat_hash_map_entry){{.stats = CCC_ENTRY_ARG_ERROR}};
+        return (CCC_Flat_hash_map_entry){{.stats = CCC_ENTRY_ARGUMENT_ERROR}};
     }
     return (CCC_Flat_hash_map_entry){container_entry(h, key)};
 }
@@ -509,7 +509,7 @@ CCC_flat_hash_map_remove_entry(CCC_Flat_hash_map_entry const *const e)
 {
     if (unlikely(!e))
     {
-        return (CCC_Entry){{.stats = CCC_ENTRY_ARG_ERROR}};
+        return (CCC_Entry){{.stats = CCC_ENTRY_ARGUMENT_ERROR}};
     }
     if (!(e->private.stats & CCC_ENTRY_OCCUPIED))
     {
@@ -554,7 +554,7 @@ CCC_flat_hash_map_swap_entry(CCC_Flat_hash_map *const h,
 {
     if (unlikely(!h || !key_val_type_output))
     {
-        return (CCC_Entry){{.stats = CCC_ENTRY_ARG_ERROR}};
+        return (CCC_Entry){{.stats = CCC_ENTRY_ARGUMENT_ERROR}};
     }
     void *const key = key_in_slot(h, key_val_type_output);
     struct CCC_Flat_hash_map_entry ent = container_entry(h, key);
@@ -584,7 +584,7 @@ CCC_flat_hash_map_try_insert(CCC_Flat_hash_map *const h,
 {
     if (unlikely(!h || !key_val_type))
     {
-        return (CCC_Entry){{.stats = CCC_ENTRY_ARG_ERROR}};
+        return (CCC_Entry){{.stats = CCC_ENTRY_ARGUMENT_ERROR}};
     }
     void *const key = key_in_slot(h, key_val_type);
     struct CCC_Flat_hash_map_entry ent = container_entry(h, key);
@@ -612,7 +612,7 @@ CCC_flat_hash_map_insert_or_assign(CCC_Flat_hash_map *const h,
 {
     if (unlikely(!h || !key_val_type))
     {
-        return (CCC_Entry){{.stats = CCC_ENTRY_ARG_ERROR}};
+        return (CCC_Entry){{.stats = CCC_ENTRY_ARGUMENT_ERROR}};
     }
     void *const key = key_in_slot(h, key_val_type);
     struct CCC_Flat_hash_map_entry ent = container_entry(h, key);
@@ -641,7 +641,7 @@ CCC_flat_hash_map_remove(CCC_Flat_hash_map *const h,
 {
     if (unlikely(!h || !key_val_type_output))
     {
-        return (CCC_Entry){{.stats = CCC_ENTRY_ARG_ERROR}};
+        return (CCC_Entry){{.stats = CCC_ENTRY_ARGUMENT_ERROR}};
     }
     if (unlikely(is_uninitialized(h) || !h->count))
     {
@@ -828,7 +828,7 @@ CCC_flat_hash_map_entry_status(CCC_Flat_hash_map_entry const *const e)
 {
     if (unlikely(!e))
     {
-        return CCC_ENTRY_ARG_ERROR;
+        return CCC_ENTRY_ARGUMENT_ERROR;
     }
     return e->private.stats;
 }

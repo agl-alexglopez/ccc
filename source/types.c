@@ -63,7 +63,7 @@ CCC_entry_input_error(CCC_Entry const *const e)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    return (e->private.stats & CCC_ENTRY_ARG_ERROR) != 0;
+    return (e->private.stats & CCC_ENTRY_ARGUMENT_ERROR) != 0;
 }
 
 void *
@@ -103,7 +103,7 @@ CCC_handle_input_error(CCC_Handle const *const e)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    return (e->private.stats & CCC_ENTRY_ARG_ERROR) != 0;
+    return (e->private.stats & CCC_ENTRY_ARGUMENT_ERROR) != 0;
 }
 
 CCC_Handle_index
@@ -155,7 +155,7 @@ CCC_get_entry_status(CCC_Entry const *e)
 {
     if (!e)
     {
-        return CCC_ENTRY_ARG_ERROR;
+        return CCC_ENTRY_ARGUMENT_ERROR;
     }
     return e->private.stats;
 }
@@ -165,7 +165,7 @@ CCC_get_handle_status(CCC_Handle const *e)
 {
     if (!e)
     {
-        return CCC_ENTRY_ARG_ERROR;
+        return CCC_ENTRY_ARGUMENT_ERROR;
     }
     return e->private.stats;
 }
@@ -190,7 +190,7 @@ CCC_entry_status_msg(CCC_Entry_status const status)
         case CCC_ENTRY_INSERT_ERROR:
             return "insert error has occurred or will occur on next insert";
             break;
-        case CCC_ENTRY_ARG_ERROR:
+        case CCC_ENTRY_ARGUMENT_ERROR:
             return "could not proceed due to bad arguments to a function";
             break;
         case CCC_ENTRY_NO_UNWRAP:

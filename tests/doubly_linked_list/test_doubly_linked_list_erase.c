@@ -9,101 +9,101 @@
 #include "traits.h"
 #include "types.h"
 
-CHECK_BEGIN_STATIC_FN(doubly_linked_list_test_pop_empty)
+check_static_begin(doubly_linked_list_test_pop_empty)
 {
     Doubly_linked_list doubly_linked_list = doubly_linked_list_initialize(
         doubly_linked_list, struct Val, e, val_order, NULL, NULL);
-    CHECK(is_empty(&doubly_linked_list), true);
-    CHECK(doubly_linked_list_pop_front(&doubly_linked_list),
+    check(is_empty(&doubly_linked_list), true);
+    check(doubly_linked_list_pop_front(&doubly_linked_list),
           CCC_RESULT_ARGUMENT_ERROR);
-    CHECK(doubly_linked_list_validate(&doubly_linked_list), true);
-    CHECK(doubly_linked_list_pop_back(&doubly_linked_list),
+    check(doubly_linked_list_validate(&doubly_linked_list), true);
+    check(doubly_linked_list_pop_back(&doubly_linked_list),
           CCC_RESULT_ARGUMENT_ERROR);
-    CHECK(doubly_linked_list_validate(&doubly_linked_list), true);
-    CHECK(doubly_linked_list_front(&doubly_linked_list), NULL);
-    CHECK(doubly_linked_list_back(&doubly_linked_list), NULL);
-    CHECK(is_empty(&doubly_linked_list), true);
-    CHECK_END_FN();
+    check(doubly_linked_list_validate(&doubly_linked_list), true);
+    check(doubly_linked_list_front(&doubly_linked_list), NULL);
+    check(doubly_linked_list_back(&doubly_linked_list), NULL);
+    check(is_empty(&doubly_linked_list), true);
+    check_end();
 }
 
-CHECK_BEGIN_STATIC_FN(doubly_linked_list_test_push_pop_front)
+check_static_begin(doubly_linked_list_test_push_pop_front)
 {
     Doubly_linked_list doubly_linked_list = doubly_linked_list_initialize(
         doubly_linked_list, struct Val, e, val_order, NULL, NULL);
     struct Val vals[3] = {{.val = 0}, {.val = 1}, {.val = 2}};
     enum Check_result const t
         = create_list(&doubly_linked_list, UTIL_PUSH_BACK, 3, vals);
-    CHECK(t, PASS);
-    CHECK(count(&doubly_linked_list).count, 3);
+    check(t, CHECK_PASS);
+    check(count(&doubly_linked_list).count, 3);
     struct Val *v = doubly_linked_list_front(&doubly_linked_list);
-    CHECK(v == NULL, false);
-    CHECK(v->val, 0);
-    CHECK(pop_front(&doubly_linked_list), CCC_RESULT_OK);
-    CHECK(validate(&doubly_linked_list), true);
+    check(v == NULL, false);
+    check(v->val, 0);
+    check(pop_front(&doubly_linked_list), CCC_RESULT_OK);
+    check(validate(&doubly_linked_list), true);
     v = doubly_linked_list_front(&doubly_linked_list);
-    CHECK(v == NULL, false);
-    CHECK(v->val, 1);
-    CHECK(pop_front(&doubly_linked_list), CCC_RESULT_OK);
+    check(v == NULL, false);
+    check(v->val, 1);
+    check(pop_front(&doubly_linked_list), CCC_RESULT_OK);
     v = doubly_linked_list_front(&doubly_linked_list);
-    CHECK(validate(&doubly_linked_list), true);
-    CHECK(v == NULL, false);
-    CHECK(v->val, 2);
-    CHECK(pop_front(&doubly_linked_list), CCC_RESULT_OK);
-    CHECK(is_empty(&doubly_linked_list), true);
-    CHECK_END_FN();
+    check(validate(&doubly_linked_list), true);
+    check(v == NULL, false);
+    check(v->val, 2);
+    check(pop_front(&doubly_linked_list), CCC_RESULT_OK);
+    check(is_empty(&doubly_linked_list), true);
+    check_end();
 }
 
-CHECK_BEGIN_STATIC_FN(doubly_linked_list_test_push_pop_back)
+check_static_begin(doubly_linked_list_test_push_pop_back)
 {
     Doubly_linked_list doubly_linked_list = doubly_linked_list_initialize(
         doubly_linked_list, struct Val, e, val_order, NULL, NULL);
     struct Val vals[3] = {{.val = 0}, {.val = 1}, {.val = 2}};
     enum Check_result const t
         = create_list(&doubly_linked_list, UTIL_PUSH_BACK, 3, vals);
-    CHECK(t, PASS);
-    CHECK(count(&doubly_linked_list).count, 3);
+    check(t, CHECK_PASS);
+    check(count(&doubly_linked_list).count, 3);
     struct Val *v = doubly_linked_list_back(&doubly_linked_list);
-    CHECK(v == NULL, false);
-    CHECK(v->val, 2);
-    CHECK(pop_back(&doubly_linked_list), CCC_RESULT_OK);
-    CHECK(validate(&doubly_linked_list), true);
+    check(v == NULL, false);
+    check(v->val, 2);
+    check(pop_back(&doubly_linked_list), CCC_RESULT_OK);
+    check(validate(&doubly_linked_list), true);
     v = doubly_linked_list_back(&doubly_linked_list);
-    CHECK(v == NULL, false);
-    CHECK(v->val, 1);
-    CHECK(pop_back(&doubly_linked_list), CCC_RESULT_OK);
-    CHECK(validate(&doubly_linked_list), true);
+    check(v == NULL, false);
+    check(v->val, 1);
+    check(pop_back(&doubly_linked_list), CCC_RESULT_OK);
+    check(validate(&doubly_linked_list), true);
     v = doubly_linked_list_back(&doubly_linked_list);
-    CHECK(v == NULL, false);
-    CHECK(v->val, 0);
-    CHECK(pop_back(&doubly_linked_list), CCC_RESULT_OK);
-    CHECK(is_empty(&doubly_linked_list), true);
-    CHECK_END_FN();
+    check(v == NULL, false);
+    check(v->val, 0);
+    check(pop_back(&doubly_linked_list), CCC_RESULT_OK);
+    check(is_empty(&doubly_linked_list), true);
+    check_end();
 }
 
-CHECK_BEGIN_STATIC_FN(doubly_linked_list_test_push_pop_middle)
+check_static_begin(doubly_linked_list_test_push_pop_middle)
 {
     Doubly_linked_list doubly_linked_list = doubly_linked_list_initialize(
         doubly_linked_list, struct Val, e, val_order, NULL, NULL);
     struct Val vals[4] = {{.val = 0}, {.val = 1}, {.val = 2}, {.val = 3}};
     enum Check_result const t
         = create_list(&doubly_linked_list, UTIL_PUSH_BACK, 4, vals);
-    CHECK(t, PASS);
-    CHECK(extract(&doubly_linked_list, &vals[2].e) != NULL, true);
-    CHECK(validate(&doubly_linked_list), true);
-    CHECK(check_order(&doubly_linked_list, 3, (int[3]){0, 1, 3}), PASS);
+    check(t, CHECK_PASS);
+    check(extract(&doubly_linked_list, &vals[2].e) != NULL, true);
+    check(validate(&doubly_linked_list), true);
+    check(check_order(&doubly_linked_list, 3, (int[3]){0, 1, 3}), CHECK_PASS);
     (void)extract(&doubly_linked_list, &vals[1].e);
-    CHECK(validate(&doubly_linked_list), true);
-    CHECK(check_order(&doubly_linked_list, 2, (int[2]){0, 3}), PASS);
+    check(validate(&doubly_linked_list), true);
+    check(check_order(&doubly_linked_list, 2, (int[2]){0, 3}), CHECK_PASS);
     (void)extract(&doubly_linked_list, &vals[3].e);
-    CHECK(validate(&doubly_linked_list), true);
-    CHECK(check_order(&doubly_linked_list, 1, (int[1]){0}), PASS);
+    check(validate(&doubly_linked_list), true);
+    check(check_order(&doubly_linked_list, 1, (int[1]){0}), CHECK_PASS);
     (void)extract(&doubly_linked_list, &vals[0].e);
-    CHECK(validate(&doubly_linked_list), true);
-    CHECK(is_empty(&doubly_linked_list), true);
-    CHECK_END_FN();
+    check(validate(&doubly_linked_list), true);
+    check(is_empty(&doubly_linked_list), true);
+    check_end();
 }
 
-CHECK_BEGIN_STATIC_FN(doubly_linked_list_test_push_pop_middle_range)
+check_static_begin(doubly_linked_list_test_push_pop_middle_range)
 {
     Doubly_linked_list doubly_linked_list = doubly_linked_list_initialize(
         doubly_linked_list, struct Val, e, val_order, NULL, NULL);
@@ -111,21 +111,21 @@ CHECK_BEGIN_STATIC_FN(doubly_linked_list_test_push_pop_middle_range)
         = {{.val = 0}, {.val = 1}, {.val = 2}, {.val = 3}, {.val = 4}};
     enum Check_result const t
         = create_list(&doubly_linked_list, UTIL_PUSH_BACK, 5, vals);
-    CHECK(t, PASS);
+    check(t, CHECK_PASS);
     (void)doubly_linked_list_extract_range(&doubly_linked_list, &vals[1].e,
                                            &vals[4].e);
-    CHECK(validate(&doubly_linked_list), true);
-    CHECK(count(&doubly_linked_list).count, 2);
-    CHECK(check_order(&doubly_linked_list, 2, (int[2]){0, 4}), PASS);
+    check(validate(&doubly_linked_list), true);
+    check(count(&doubly_linked_list).count, 2);
+    check(check_order(&doubly_linked_list, 2, (int[2]){0, 4}), CHECK_PASS);
     (void)doubly_linked_list_extract_range(
         &doubly_linked_list, &vals[0].e,
         doubly_linked_list_sentinel_end(&doubly_linked_list));
-    CHECK(validate(&doubly_linked_list), true);
-    CHECK(count(&doubly_linked_list).count, 0);
-    CHECK_END_FN();
+    check(validate(&doubly_linked_list), true);
+    check(count(&doubly_linked_list).count, 0);
+    check_end();
 }
 
-CHECK_BEGIN_STATIC_FN(doubly_linked_list_test_splice_two_lists)
+check_static_begin(doubly_linked_list_test_splice_two_lists)
 {
     Doubly_linked_list to_lose = doubly_linked_list_initialize(
         to_lose, struct Val, e, val_order, NULL, NULL);
@@ -133,40 +133,40 @@ CHECK_BEGIN_STATIC_FN(doubly_linked_list_test_splice_two_lists)
         = {{.val = 0}, {.val = 1}, {.val = 2}, {.val = 3}, {.val = 4}};
     enum Check_result t
         = create_list(&to_lose, UTIL_PUSH_BACK, 5, to_lose_vals);
-    CHECK(t, PASS);
+    check(t, CHECK_PASS);
     Doubly_linked_list to_gain = doubly_linked_list_initialize(
         to_gain, struct Val, e, val_order, NULL, NULL);
     struct Val to_gain_vals[2] = {{.val = 0}, {.val = 1}};
     t = create_list(&to_gain, UTIL_PUSH_BACK, 2, to_gain_vals);
-    CHECK(t, PASS);
-    CHECK(check_order(&to_lose, 5, (int[5]){0, 1, 2, 3, 4}), PASS);
-    CHECK(doubly_linked_list_splice(&to_gain,
+    check(t, CHECK_PASS);
+    check(check_order(&to_lose, 5, (int[5]){0, 1, 2, 3, 4}), CHECK_PASS);
+    check(doubly_linked_list_splice(&to_gain,
                                     doubly_linked_list_sentinel_end(&to_gain),
                                     &to_lose, &to_lose_vals[0].e),
           CCC_RESULT_OK);
-    CHECK(validate(&to_gain), true);
-    CHECK(validate(&to_lose), true);
-    CHECK(count(&to_gain).count, 3);
-    CHECK(count(&to_lose).count, 4);
-    CHECK(check_order(&to_gain, 3, (int[3]){0, 1, 0}), PASS);
-    CHECK(check_order(&to_lose, 4, (int[4]){1, 2, 3, 4}), PASS);
-    CHECK(doubly_linked_list_splice_range(
+    check(validate(&to_gain), true);
+    check(validate(&to_lose), true);
+    check(count(&to_gain).count, 3);
+    check(count(&to_lose).count, 4);
+    check(check_order(&to_gain, 3, (int[3]){0, 1, 0}), CHECK_PASS);
+    check(check_order(&to_lose, 4, (int[4]){1, 2, 3, 4}), CHECK_PASS);
+    check(doubly_linked_list_splice_range(
               &to_gain, doubly_linked_list_node_end(&to_gain), &to_lose,
               doubly_linked_list_node_begin(&to_lose),
               doubly_linked_list_sentinel_end(&to_lose)),
           CCC_RESULT_OK);
-    CHECK(validate(&to_gain), true);
-    CHECK(validate(&to_lose), true);
-    CHECK(count(&to_gain).count, 7);
-    CHECK(count(&to_lose).count, 0);
-    CHECK(check_order(&to_gain, 7, (int[7]){0, 1, 1, 2, 3, 4, 0}), PASS);
-    CHECK_END_FN();
+    check(validate(&to_gain), true);
+    check(validate(&to_lose), true);
+    check(count(&to_gain).count, 7);
+    check(count(&to_lose).count, 0);
+    check(check_order(&to_gain, 7, (int[7]){0, 1, 1, 2, 3, 4, 0}), CHECK_PASS);
+    check_end();
 }
 
 int
 main()
 {
-    return CHECK_RUN(doubly_linked_list_test_pop_empty(),
+    return check_run(doubly_linked_list_test_pop_empty(),
                      doubly_linked_list_test_push_pop_front(),
                      doubly_linked_list_test_push_pop_back(),
                      doubly_linked_list_test_push_pop_middle(),

@@ -81,7 +81,7 @@ Initialize and create containers with memory and permissions. */
 enum : size_t
 {
     /** @brief The number of bits in a block of the bit set. */
-    CCC_BITSET_BLOCK_BITS = CCC_IMPL_BITSET_BLOCK_BITS,
+    CCC_BITSET_BLOCK_BITS = CCC_PRIVATE_BITSET_BLOCK_BITS,
 };
 
 /** @brief Get the number of bit blocks needed for the desired bit set capacity.

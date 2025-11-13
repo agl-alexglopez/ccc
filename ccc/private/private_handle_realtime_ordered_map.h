@@ -13,8 +13,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 @endcond */
-#ifndef IMPL_HANDLE_REALTIME_ORDERED_MAP_H
-#define IMPL_HANDLE_REALTIME_ORDERED_MAP_H
+#ifndef PRIVATE_HANDLE_REALTIME_ORDERED_MAP_H
+#define PRIVATE_HANDLE_REALTIME_ORDERED_MAP_H
 
 /** @cond */
 #include <limits.h>
@@ -266,7 +266,7 @@ runtime. */
             = (Handle_realtime_ordered_map_handle_ptr);                        \
         struct CCC_Handle_realtime_ordered_map_handle                          \
             private_handle_realtime_ordered_map_mod_hndl                       \
-            = {.stats = CCC_ENTRY_ARG_ERROR};                                  \
+            = {.stats = CCC_ENTRY_ARGUMENT_ERROR};                             \
         if (private_handle_realtime_ordered_map_hndl_ptr)                      \
         {                                                                      \
             private_handle_realtime_ordered_map_mod_hndl                       \
@@ -383,7 +383,7 @@ runtime. */
         __auto_type private_try_ins_map_ptr                                        \
             = (Handle_realtime_ordered_map_ptr);                                   \
         struct CCC_Handle private_handle_realtime_ordered_map_try_ins_hndl_ret     \
-            = {.stats = CCC_ENTRY_ARG_ERROR};                                      \
+            = {.stats = CCC_ENTRY_ARGUMENT_ERROR};                                 \
         if (private_try_ins_map_ptr)                                               \
         {                                                                          \
             __auto_type private_handle_realtime_ordered_map_key = (key);           \
@@ -453,7 +453,7 @@ runtime. */
             = (Handle_realtime_ordered_map_ptr);                                         \
         struct CCC_Handle                                                                \
             private_handle_realtime_ordered_map_ins_or_assign_hndl_ret                   \
-            = {.stats = CCC_ENTRY_ARG_ERROR};                                            \
+            = {.stats = CCC_ENTRY_ARGUMENT_ERROR};                                       \
         if (private_ins_or_assign_map_ptr)                                               \
         {                                                                                \
             __auto_type private_handle_realtime_ordered_map_key = (key);                 \
@@ -538,4 +538,4 @@ runtime. */
 
 /* NOLINTEND(readability-identifier-naming) */
 
-#endif /* IMPL_HANDLE_REALTIME_ORDERED_MAP_H */
+#endif /* PRIVATE_HANDLE_REALTIME_ORDERED_MAP_H */

@@ -8,16 +8,16 @@
 #include "singly_linked_list_utility.h"
 #include "traits.h"
 
-CHECK_BEGIN_STATIC_FN(singly_linked_list_test_construct)
+check_static_begin(singly_linked_list_test_construct)
 {
     Singly_linked_list singly_linked_list = singly_linked_list_initialize(
         singly_linked_list, struct Val, e, val_order, NULL, NULL);
-    CHECK(is_empty(&singly_linked_list), true);
-    CHECK_END_FN();
+    check(is_empty(&singly_linked_list), true);
+    check_end();
 }
 
 int
 main()
 {
-    return CHECK_RUN(singly_linked_list_test_construct());
+    return check_run(singly_linked_list_test_construct());
 }

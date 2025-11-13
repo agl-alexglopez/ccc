@@ -13,8 +13,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 @endcond */
-#ifndef CCC_IMPL_ORDERED_MAP_H
-#define CCC_IMPL_ORDERED_MAP_H
+#ifndef CCC_PRIVATE_ORDERED_MAP_H
+#define CCC_PRIVATE_ORDERED_MAP_H
 
 /** @cond */
 #include <stddef.h>
@@ -197,7 +197,7 @@ void *CCC_private_ordered_map_insert(struct CCC_Ordered_map *t,
     (__extension__({                                                           \
         __auto_type private_ordered_map_ent_ptr = (ordered_map_entry_ptr);     \
         struct CCC_Ordered_map_entry private_ordered_map_mod_ent               \
-            = {.entry = {.stats = CCC_ENTRY_ARG_ERROR}};                       \
+            = {.entry = {.stats = CCC_ENTRY_ARGUMENT_ERROR}};                  \
         if (private_ordered_map_ent_ptr)                                       \
         {                                                                      \
             private_ordered_map_mod_ent                                        \
@@ -284,7 +284,7 @@ void *CCC_private_ordered_map_insert(struct CCC_Ordered_map *t,
     (__extension__({                                                           \
         __auto_type private_try_ins_map_ptr = (ordered_map_ptr);               \
         struct CCC_Entry private_ordered_map_try_ins_ent_ret                   \
-            = {.stats = CCC_ENTRY_ARG_ERROR};                                  \
+            = {.stats = CCC_ENTRY_ARGUMENT_ERROR};                             \
         if (private_try_ins_map_ptr)                                           \
         {                                                                      \
             __auto_type private_ordered_map_key = (key);                       \
@@ -316,7 +316,7 @@ void *CCC_private_ordered_map_insert(struct CCC_Ordered_map *t,
     (__extension__({                                                           \
         __auto_type private_ins_or_assign_map_ptr = (ordered_map_ptr);         \
         struct CCC_Entry private_ordered_map_ins_or_assign_ent_ret             \
-            = {.stats = CCC_ENTRY_ARG_ERROR};                                  \
+            = {.stats = CCC_ENTRY_ARGUMENT_ERROR};                             \
         if (private_ins_or_assign_map_ptr)                                     \
         {                                                                      \
             __auto_type private_ordered_map_key = (key);                       \
@@ -360,4 +360,4 @@ void *CCC_private_ordered_map_insert(struct CCC_Ordered_map *t,
 
 /* NOLINTEND(readability-identifier-naming) */
 
-#endif /* CCC_IMPL_ORDERED_MAP_H */
+#endif /* CCC_PRIVATE_ORDERED_MAP_H */

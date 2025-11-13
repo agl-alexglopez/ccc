@@ -13,8 +13,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 @endcond */
-#ifndef CCC_IMPL_BUFFER_H
-#define CCC_IMPL_BUFFER_H
+#ifndef CCC_PRIVATE_BUFFER_H
+#define CCC_PRIVATE_BUFFER_H
 
 /** @cond */
 #include <assert.h>
@@ -47,12 +47,12 @@ struct CCC_Buffer
 };
 
 /** @private */
-#define IMPL_BUF_NON_IMPL_BUF_DEFAULT_SIZE(...) __VA_ARGS__
+#define CCC_private_buf_non_CCC_private_buf_default_size(...) __VA_ARGS__
 /** @private */
-#define IMPL_BUF_DEFAULT_SIZE(...) 0
+#define CCC_private_buf_default_size(...) 0
 /** @private */
-#define IMPL_BUF_OPTIONAL_SIZE(...)                                            \
-    __VA_OPT__(IMPL_BUF_NON_)##IMPL_BUF_DEFAULT_SIZE(__VA_ARGS__)
+#define CCC_private_buf_optional_size(...)                                     \
+    __VA_OPT__(CCC_private_buf_non_)##CCC_private_buf_default_size(__VA_ARGS__)
 
 /** @private Initializes the Buffer with a default size of 0. However the user
 can specify that the Buffer has some count of elements from index
@@ -64,7 +64,7 @@ are contiguous. */
     {                                                                          \
         .mem = (private_mem),                                                  \
         .sizeof_type = sizeof(private_any_type_name),                          \
-        .count = IMPL_BUF_OPTIONAL_SIZE(__VA_ARGS__),                          \
+        .count = CCC_private_buf_optional_size(__VA_ARGS__),                   \
         .capacity = (private_capacity),                                        \
         .allocate = (private_allocate),                                        \
         .context = (private_context_data),                                     \
@@ -147,4 +147,4 @@ of memory in one step. */
 
 /* NOLINTEND(readability-identifier-naming) */
 
-#endif /* CCC_IMPL_BUF_H */
+#endif /* CCC_PRIVATE_BUF_H */

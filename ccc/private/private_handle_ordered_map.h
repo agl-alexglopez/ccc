@@ -13,8 +13,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 @endcond */
-#ifndef CCC_IMPL_HANDLE_ORDERED_MAP_H
-#define CCC_IMPL_HANDLE_ORDERED_MAP_H
+#ifndef CCC_PRIVATE_HANDLE_ORDERED_MAP_H
+#define CCC_PRIVATE_HANDLE_ORDERED_MAP_H
 
 /** @cond */
 #include <stddef.h>
@@ -189,7 +189,7 @@ is of a known fixed size defined at compile time, not just a pointer. */
             = (Handle_ordered_map_handle_ptr);                                 \
         struct CCC_Handle_ordered_map_handle                                   \
             private_handle_ordered_map_mod_hndl                                \
-            = {.stats = CCC_ENTRY_ARG_ERROR};                                  \
+            = {.stats = CCC_ENTRY_ARGUMENT_ERROR};                             \
         if (private_handle_ordered_map_mod_hndl_ptr)                           \
         {                                                                      \
             private_handle_ordered_map_mod_hndl                                \
@@ -301,7 +301,7 @@ is of a known fixed size defined at compile time, not just a pointer. */
         __auto_type private_handle_ordered_map_try_ins_map_ptr                 \
             = (Handle_ordered_map_ptr);                                        \
         struct CCC_Handle private_handle_ordered_map_try_ins_hndl_ret          \
-            = {.stats = CCC_ENTRY_ARG_ERROR};                                  \
+            = {.stats = CCC_ENTRY_ARGUMENT_ERROR};                             \
         if (private_handle_ordered_map_try_ins_map_ptr)                        \
         {                                                                      \
             __auto_type private_handle_ordered_map_key = (key);                \
@@ -361,7 +361,7 @@ is of a known fixed size defined at compile time, not just a pointer. */
         __auto_type private_handle_ordered_map_ins_or_assign_map_ptr            \
             = (Handle_ordered_map_ptr);                                         \
         struct CCC_Handle private_handle_ordered_map_ins_or_assign_hndl_ret     \
-            = {.stats = CCC_ENTRY_ARG_ERROR};                                   \
+            = {.stats = CCC_ENTRY_ARGUMENT_ERROR};                              \
         if (private_handle_ordered_map_ins_or_assign_map_ptr)                   \
         {                                                                       \
             __auto_type private_handle_ordered_map_key = (key);                 \
@@ -431,4 +431,4 @@ is of a known fixed size defined at compile time, not just a pointer. */
 
 /* NOLINTEND(readability-identifier-naming) */
 
-#endif /* CCC_IMPL_HANDLE_ORDERED_MAP_H */
+#endif /* CCC_PRIVATE_HANDLE_ORDERED_MAP_H */

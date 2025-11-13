@@ -13,8 +13,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 @endcond */
-#ifndef CCC_IMPL_PRIORITY_QUEUE_H
-#define CCC_IMPL_PRIORITY_QUEUE_H
+#ifndef CCC_PRIVATE_PRIORITY_QUEUE_H
+#define CCC_PRIVATE_PRIORITY_QUEUE_H
 
 /** @cond */
 #include <stddef.h>
@@ -305,4 +305,4 @@ CCC_private_priority_queue_struct_base(struct CCC_Priority_queue const *,
 
 /* NOLINTEND(readability-identifier-naming) */
 
-#endif /* CCC_IMPL_PRIORITY_QUEUE_H */
+#endif /* CCC_PRIVATE_PRIORITY_QUEUE_H */

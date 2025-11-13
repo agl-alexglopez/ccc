@@ -11,7 +11,7 @@
 #include "traits.h"
 #include "types.h"
 
-CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_insert_remove_four_dups)
+check_static_begin(flat_priority_queue_test_insert_remove_four_dups)
 {
     struct Val three_vals[4 + 1];
     CCC_Flat_priority_queue flat_priority_queue
@@ -21,26 +21,26 @@ CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_insert_remove_four_dups)
     for (int i = 0; i < 4; ++i)
     {
         three_vals[i].val = 0;
-        CHECK(push(&flat_priority_queue, &three_vals[i], &(struct Val){})
+        check(push(&flat_priority_queue, &three_vals[i], &(struct Val){})
                   != NULL,
               true);
-        CHECK(validate(&flat_priority_queue), true);
+        check(validate(&flat_priority_queue), true);
         size_t const size_check = i + 1;
-        CHECK(CCC_flat_priority_queue_count(&flat_priority_queue).count,
+        check(CCC_flat_priority_queue_count(&flat_priority_queue).count,
               size_check);
     }
-    CHECK(CCC_flat_priority_queue_count(&flat_priority_queue).count, (size_t)4);
+    check(CCC_flat_priority_queue_count(&flat_priority_queue).count, (size_t)4);
     for (int i = 0; i < 4; ++i)
     {
         three_vals[i].val = 0;
         (void)pop(&flat_priority_queue, &(struct Val){});
-        CHECK(validate(&flat_priority_queue), true);
+        check(validate(&flat_priority_queue), true);
     }
-    CHECK(CCC_flat_priority_queue_count(&flat_priority_queue).count, (size_t)0);
-    CHECK_END_FN();
+    check(CCC_flat_priority_queue_count(&flat_priority_queue).count, (size_t)0);
+    check_end();
 }
 
-CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_insert_erase_shuffled)
+check_static_begin(flat_priority_queue_test_insert_erase_shuffled)
 {
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
@@ -52,11 +52,11 @@ CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_insert_erase_shuffled)
         = CCC_flat_priority_queue_initialize(vals, struct Val, CCC_ORDER_LESSER,
                                              val_order, NULL, NULL,
                                              (sizeof(vals) / sizeof(vals[0])));
-    CHECK(insert_shuffled(&flat_priority_queue, vals, size, prime), PASS);
+    check(insert_shuffled(&flat_priority_queue, vals, size, prime), CHECK_PASS);
     struct Val const *min = front(&flat_priority_queue);
-    CHECK(min->val, 0);
+    check(min->val, 0);
     int sorted_check[50];
-    CHECK(inorder_fill(sorted_check, size, &flat_priority_queue), PASS);
+    check(inorder_fill(sorted_check, size, &flat_priority_queue), CHECK_PASS);
     /* Now let's delete everything with no errors. */
     while (!CCC_flat_priority_queue_is_empty(&flat_priority_queue))
     {
@@ -65,13 +65,13 @@ CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_insert_erase_shuffled)
             (int)CCC_flat_priority_queue_count(&flat_priority_queue).count - 1);
         (void)CCC_flat_priority_queue_erase(&flat_priority_queue,
                                             &vals[rand_index], &(struct Val){});
-        CHECK(validate(&flat_priority_queue), true);
+        check(validate(&flat_priority_queue), true);
     }
-    CHECK(CCC_flat_priority_queue_count(&flat_priority_queue).count, (size_t)0);
-    CHECK_END_FN();
+    check(CCC_flat_priority_queue_count(&flat_priority_queue).count, (size_t)0);
+    check_end();
 }
 
-CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_pop_max)
+check_static_begin(flat_priority_queue_test_pop_max)
 {
     size_t const size = 50;
     int const prime = 53;
@@ -80,23 +80,23 @@ CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_pop_max)
         = CCC_flat_priority_queue_initialize(vals, struct Val, CCC_ORDER_LESSER,
                                              val_order, NULL, NULL,
                                              (sizeof(vals) / sizeof(vals[0])));
-    CHECK(insert_shuffled(&flat_priority_queue, vals, size, prime), PASS);
+    check(insert_shuffled(&flat_priority_queue, vals, size, prime), CHECK_PASS);
     struct Val const *min = front(&flat_priority_queue);
-    CHECK(min->val, 0);
+    check(min->val, 0);
     int sorted_check[50];
-    CHECK(inorder_fill(sorted_check, size, &flat_priority_queue), PASS);
+    check(inorder_fill(sorted_check, size, &flat_priority_queue), CHECK_PASS);
     /* Now let's pop from the front of the queue until empty. */
     for (size_t i = 0; i < size; ++i)
     {
         struct Val const *const front = front(&flat_priority_queue);
-        CHECK(front->val, sorted_check[i]);
+        check(front->val, sorted_check[i]);
         (void)pop(&flat_priority_queue, &(struct Val){});
     }
-    CHECK(CCC_flat_priority_queue_is_empty(&flat_priority_queue), true);
-    CHECK_END_FN();
+    check(CCC_flat_priority_queue_is_empty(&flat_priority_queue), true);
+    check_end();
 }
 
-CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_pop_min)
+check_static_begin(flat_priority_queue_test_pop_min)
 {
     size_t const size = 50;
     int const prime = 53;
@@ -105,23 +105,23 @@ CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_pop_min)
         = CCC_flat_priority_queue_initialize(vals, struct Val, CCC_ORDER_LESSER,
                                              val_order, NULL, NULL,
                                              (sizeof(vals) / sizeof(vals[0])));
-    CHECK(insert_shuffled(&flat_priority_queue, vals, size, prime), PASS);
+    check(insert_shuffled(&flat_priority_queue, vals, size, prime), CHECK_PASS);
     struct Val const *min = front(&flat_priority_queue);
-    CHECK(min->val, 0);
+    check(min->val, 0);
     int sorted_check[50];
-    CHECK(inorder_fill(sorted_check, size, &flat_priority_queue), PASS);
+    check(inorder_fill(sorted_check, size, &flat_priority_queue), CHECK_PASS);
     /* Now let's pop from the front of the queue until empty. */
     for (size_t i = 0; i < size; ++i)
     {
         struct Val const *const front = front(&flat_priority_queue);
-        CHECK(front->val, sorted_check[i]);
+        check(front->val, sorted_check[i]);
         (void)pop(&flat_priority_queue, &(struct Val){});
     }
-    CHECK(CCC_flat_priority_queue_is_empty(&flat_priority_queue), true);
-    CHECK_END_FN();
+    check(CCC_flat_priority_queue_is_empty(&flat_priority_queue), true);
+    check_end();
 }
 
-CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_delete_prime_shuffle_duplicates)
+check_static_begin(flat_priority_queue_test_delete_prime_shuffle_duplicates)
 {
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
@@ -140,11 +140,11 @@ CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_delete_prime_shuffle_duplicates)
     {
         vals[i].val = shuffled_index;
         vals[i].id = i;
-        CHECK(push(&flat_priority_queue, &vals[i], &(struct Val){}) != NULL,
+        check(push(&flat_priority_queue, &vals[i], &(struct Val){}) != NULL,
               true);
-        CHECK(validate(&flat_priority_queue), true);
+        check(validate(&flat_priority_queue), true);
         size_t const s = i + 1;
-        CHECK(CCC_flat_priority_queue_count(&flat_priority_queue).count, s);
+        check(CCC_flat_priority_queue_count(&flat_priority_queue).count, s);
         /* Shuffle like this only on insertions to create more dups. */
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
@@ -156,15 +156,15 @@ CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_delete_prime_shuffle_duplicates)
             (int)CCC_flat_priority_queue_count(&flat_priority_queue).count - 1);
         (void)CCC_flat_priority_queue_erase(&flat_priority_queue,
                                             &vals[rand_index], &(struct Val){});
-        CHECK(validate(&flat_priority_queue), true);
+        check(validate(&flat_priority_queue), true);
         --cur_size;
-        CHECK(CCC_flat_priority_queue_count(&flat_priority_queue).count,
+        check(CCC_flat_priority_queue_count(&flat_priority_queue).count,
               cur_size);
     }
-    CHECK_END_FN();
+    check_end();
 }
 
-CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_prime_shuffle)
+check_static_begin(flat_priority_queue_test_prime_shuffle)
 {
     int const size = 50;
     int const prime = 53;
@@ -181,9 +181,9 @@ CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_prime_shuffle)
     {
         vals[i].val = shuffled_index;
         vals[i].id = shuffled_index;
-        CHECK(push(&flat_priority_queue, &vals[i], &(struct Val){}) != NULL,
+        check(push(&flat_priority_queue, &vals[i], &(struct Val){}) != NULL,
               true);
-        CHECK(validate(&flat_priority_queue), true);
+        check(validate(&flat_priority_queue), true);
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
     /* Now we go through and free all the elements in order but
@@ -194,19 +194,19 @@ CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_prime_shuffle)
         size_t const rand_index = rand_range(
             0,
             (int)CCC_flat_priority_queue_count(&flat_priority_queue).count - 1);
-        CHECK(CCC_flat_priority_queue_erase(&flat_priority_queue,
+        check(CCC_flat_priority_queue_erase(&flat_priority_queue,
                                             &vals[rand_index], &(struct Val){})
                   == CCC_RESULT_OK,
               true);
-        CHECK(validate(&flat_priority_queue), true);
+        check(validate(&flat_priority_queue), true);
         --cur_size;
-        CHECK(CCC_flat_priority_queue_count(&flat_priority_queue).count,
+        check(CCC_flat_priority_queue_count(&flat_priority_queue).count,
               cur_size);
     }
-    CHECK_END_FN();
+    check_end();
 }
 
-CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_weak_srand)
+check_static_begin(flat_priority_queue_test_weak_srand)
 {
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
@@ -221,29 +221,29 @@ CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_weak_srand)
     {
         vals[i].val = rand(); // NOLINT
         vals[i].id = i;
-        CHECK(push(&flat_priority_queue, &vals[i], &(struct Val){}) != NULL,
+        check(push(&flat_priority_queue, &vals[i], &(struct Val){}) != NULL,
               true);
-        CHECK(validate(&flat_priority_queue), true);
+        check(validate(&flat_priority_queue), true);
     }
     while (!CCC_flat_priority_queue_is_empty(&flat_priority_queue))
     {
         size_t const rand_index = rand_range(
             0,
             (int)CCC_flat_priority_queue_count(&flat_priority_queue).count - 1);
-        CHECK(CCC_flat_priority_queue_erase(&flat_priority_queue,
+        check(CCC_flat_priority_queue_erase(&flat_priority_queue,
                                             &vals[rand_index], &(struct Val){})
                   == CCC_RESULT_OK,
               true);
-        CHECK(validate(&flat_priority_queue), true);
+        check(validate(&flat_priority_queue), true);
     }
-    CHECK(CCC_flat_priority_queue_is_empty(&flat_priority_queue), true);
-    CHECK_END_FN();
+    check(CCC_flat_priority_queue_is_empty(&flat_priority_queue), true);
+    check_end();
 }
 
 int
 main()
 {
-    return CHECK_RUN(flat_priority_queue_test_insert_remove_four_dups(),
+    return check_run(flat_priority_queue_test_insert_remove_four_dups(),
                      flat_priority_queue_test_insert_erase_shuffled(),
                      flat_priority_queue_test_pop_max(),
                      flat_priority_queue_test_pop_min(),

@@ -205,7 +205,7 @@ CCC_realtime_ordered_map_swap_entry(
 {
     if (!rom || !key_val_handle || !tmp)
     {
-        return (CCC_Entry){{.stats = CCC_ENTRY_ARG_ERROR}};
+        return (CCC_Entry){{.stats = CCC_ENTRY_ARGUMENT_ERROR}};
     }
     struct Query const q = find(rom, key_from_node(rom, key_val_handle));
     if (CCC_ORDER_EQUAL == q.last_order)
@@ -243,7 +243,7 @@ CCC_realtime_ordered_map_try_insert(
 {
     if (!rom || !key_val_handle)
     {
-        return (CCC_Entry){{.stats = CCC_ENTRY_ARG_ERROR}};
+        return (CCC_Entry){{.stats = CCC_ENTRY_ARGUMENT_ERROR}};
     }
     struct Query const q = find(rom, key_from_node(rom, key_val_handle));
     if (CCC_ORDER_EQUAL == q.last_order)
@@ -275,7 +275,7 @@ CCC_realtime_ordered_map_insert_or_assign(
 {
     if (!rom || !key_val_handle)
     {
-        return (CCC_Entry){{.stats = CCC_ENTRY_ARG_ERROR}};
+        return (CCC_Entry){{.stats = CCC_ENTRY_ARGUMENT_ERROR}};
     }
     struct Query const q = find(rom, key_from_node(rom, key_val_handle));
     if (CCC_ORDER_EQUAL == q.last_order)
@@ -310,7 +310,7 @@ CCC_realtime_ordered_map_entry(CCC_Realtime_ordered_map const *const rom,
     if (!rom || !key)
     {
         return (CCC_Realtime_ordered_map_entry){
-            {.entry = {.stats = CCC_ENTRY_ARG_ERROR}}};
+            {.entry = {.stats = CCC_ENTRY_ARGUMENT_ERROR}}};
     }
     return (CCC_Realtime_ordered_map_entry){entry(rom, key)};
 }
@@ -360,7 +360,7 @@ CCC_realtime_ordered_map_remove_entry(
 {
     if (!e || !e->private.entry.e)
     {
-        return (CCC_Entry){{.stats = CCC_ENTRY_ARG_ERROR}};
+        return (CCC_Entry){{.stats = CCC_ENTRY_ARGUMENT_ERROR}};
     }
     if (e->private.entry.stats == CCC_ENTRY_OCCUPIED)
     {
@@ -396,7 +396,7 @@ CCC_realtime_ordered_map_remove(CCC_Realtime_ordered_map *const rom,
 {
     if (!rom || !out_handle)
     {
-        return (CCC_Entry){{.stats = CCC_ENTRY_ARG_ERROR}};
+        return (CCC_Entry){{.stats = CCC_ENTRY_ARGUMENT_ERROR}};
     }
     struct Query const q = find(rom, key_from_node(rom, out_handle));
     if (q.last_order != CCC_ORDER_EQUAL)
@@ -498,7 +498,7 @@ CCC_Entry_status
 CCC_realtime_ordered_map_entry_status(
     CCC_Realtime_ordered_map_entry const *const e)
 {
-    return e ? e->private.entry.stats : CCC_ENTRY_ARG_ERROR;
+    return e ? e->private.entry.stats : CCC_ENTRY_ARGUMENT_ERROR;
 }
 
 void *

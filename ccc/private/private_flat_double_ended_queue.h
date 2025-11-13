@@ -13,8 +13,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 @endcond */
-#ifndef CCC_IMPL_FLAT_DOUBLE_ENDED_QUEUE_H
-#define CCC_IMPL_FLAT_DOUBLE_ENDED_QUEUE_H
+#ifndef CCC_PRIVATE_FLAT_DOUBLE_ENDED_QUEUE_H
+#define CCC_PRIVATE_FLAT_DOUBLE_ENDED_QUEUE_H
 
 /** @cond */
 #include <stddef.h>
@@ -107,4 +107,4 @@ void *CCC_private_flat_double_ended_queue_allocate_back(
 
 /* NOLINTEND(readability-identifier-naming) */
 
-#endif /* CCC_IMPL_FLAT_DOUBLE_ENDED_QUEUE_H */
+#endif /* CCC_PRIVATE_FLAT_DOUBLE_ENDED_QUEUE_H */

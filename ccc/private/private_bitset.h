@@ -13,8 +13,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 @endcond */
-#ifndef CCC_IMPL_BITSET
-#define CCC_IMPL_BITSET
+#ifndef CCC_PRIVATE_BITSET
+#define CCC_PRIVATE_BITSET
 
 /** @cond */
 #include <limits.h>
@@ -46,7 +46,7 @@ struct CCC_Bitset
 enum : size_t
 {
     /** @private The number of bits in a bit block. In sync with set type. */
-    CCC_IMPL_BITSET_BLOCK_BITS
+    CCC_PRIVATE_BITSET_BLOCK_BITS
         = (sizeof(*(struct CCC_Bitset){}.blocks) * CHAR_BIT),
 };
 
@@ -62,8 +62,8 @@ CCC_Tribool CCC_private_bitset_set(struct CCC_Bitset *bs, size_t i,
 /** @private Returns the number of blocks needed to support a given capacity
 of bits. Assumes the given capacity is greater than 0. Classic div round up. */
 #define CCC_private_bitset_block_count(private_bit_cap)                        \
-    (((private_bit_cap) + (CCC_IMPL_BITSET_BLOCK_BITS - 1))                    \
-     / CCC_IMPL_BITSET_BLOCK_BITS)
+    (((private_bit_cap) + (CCC_PRIVATE_BITSET_BLOCK_BITS - 1))                 \
+     / CCC_PRIVATE_BITSET_BLOCK_BITS)
 
 /** @private Returns the number of bytes needed for the required blocks. */
 #define CCC_private_bitset_block_bytes(private_bit_cap)                        \
@@ -78,14 +78,16 @@ specifiers which is a feature of C23. Not all compilers support this yet. */
              .blocks)[CCC_private_bitset_block_count(private_bit_cap)])        \
     {}
 
+/** @private NOLINTNEXTLINE */
+#define CCC_private_bitset_non_CCC_private_bitset_default_size(private_cap,    \
+                                                               ...)            \
+    __VA_ARGS__
 /** @private */
-#define IMPL_BITSET_NON_IMPL_BITSET_DEFAULT_SIZE(private_cap, ...) __VA_ARGS__
+#define CCC_private_bitset_default_size(private_cap, ...) private_cap
 /** @private */
-#define IMPL_BITSET_DEFAULT_SIZE(private_cap, ...) private_cap
-/** @private */
-#define IMPL_BITSET_OPTIONAL_SIZE(private_cap, ...)                            \
-    __VA_OPT__(IMPL_BITSET_NON_)                                               \
-    ##IMPL_BITSET_DEFAULT_SIZE(private_cap, __VA_ARGS__)
+#define CCC_private_bitset_optional_size(private_cap, ...)                     \
+    __VA_OPT__(CCC_private_bitset_non_)                                        \
+    ##CCC_private_bitset_default_size(private_cap, __VA_ARGS__)
 
 /** @private Capacity is required argument from the user while size is optional.
 The optional size param defaults equal to capacity if not provided. This covers
@@ -95,7 +97,7 @@ user wants a fixed size dynamic bit set they provide 0 as size argument. */
                                       private_context, private_cap, ...)       \
     {                                                                          \
         .blocks = (private_bitblock_ptr),                                      \
-        .count = IMPL_BITSET_OPTIONAL_SIZE((private_cap), __VA_ARGS__),        \
+        .count = CCC_private_bitset_optional_size((private_cap), __VA_ARGS__), \
         .capacity = (private_cap),                                             \
         .allocate = (private_allocate),                                        \
         .context = (private_context),                                          \
@@ -148,7 +150,7 @@ to inline function for bit set construction. */
                                 private_on_char, private_string, ...)          \
     CCC_private_bitset_from_fn(                                                \
         private_allocate, private_context, private_start_index, private_count, \
-        IMPL_BITSET_OPTIONAL_SIZE((private_count), __VA_ARGS__),               \
+        CCC_private_bitset_optional_size((private_count), __VA_ARGS__),        \
         private_on_char, private_string)
 
 /** @private Macro wrapper allowing user to optionally specify size. */
@@ -156,6 +158,6 @@ to inline function for bit set construction. */
                                          private_cap, ...)                     \
     CCC_private_bitset_with_capacity_fn(                                       \
         private_allocate, private_context, private_cap,                        \
-        IMPL_BITSET_OPTIONAL_SIZE((private_cap), __VA_ARGS__))
+        CCC_private_bitset_optional_size((private_cap), __VA_ARGS__))
 
-#endif /* CCC_IMPL_BITSET */
+#endif /* CCC_PRIVATE_BITSET */

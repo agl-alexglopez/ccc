@@ -342,7 +342,7 @@ CCC_handle_realtime_ordered_map_swap_handle(
 {
     if (!handle_realtime_ordered_map || !key_val_type_output)
     {
-        return (CCC_Handle){{.stats = CCC_ENTRY_ARG_ERROR}};
+        return (CCC_Handle){{.stats = CCC_ENTRY_ARGUMENT_ERROR}};
     }
     struct Query const q
         = find(handle_realtime_ordered_map,
@@ -381,7 +381,7 @@ CCC_handle_realtime_ordered_map_try_insert(
 {
     if (!handle_realtime_ordered_map || !key_val_type)
     {
-        return (CCC_Handle){{.stats = CCC_ENTRY_ARG_ERROR}};
+        return (CCC_Handle){{.stats = CCC_ENTRY_ARGUMENT_ERROR}};
     }
     struct Query const q
         = find(handle_realtime_ordered_map,
@@ -415,7 +415,7 @@ CCC_handle_realtime_ordered_map_insert_or_assign(
 {
     if (!handle_realtime_ordered_map || !key_val_type)
     {
-        return (CCC_Handle){{.stats = CCC_ENTRY_ARG_ERROR}};
+        return (CCC_Handle){{.stats = CCC_ENTRY_ARGUMENT_ERROR}};
     }
     struct Query const q
         = find(handle_realtime_ordered_map,
@@ -528,7 +528,7 @@ CCC_handle_realtime_ordered_map_handle(
     if (!handle_realtime_ordered_map || !key)
     {
         return (CCC_Handle_realtime_ordered_map_handle){
-            {.stats = CCC_ENTRY_ARG_ERROR}};
+            {.stats = CCC_ENTRY_ARGUMENT_ERROR}};
     }
     return (CCC_Handle_realtime_ordered_map_handle){
         handle(handle_realtime_ordered_map, key)};
@@ -540,7 +540,7 @@ CCC_handle_realtime_ordered_map_remove_handle(
 {
     if (!h)
     {
-        return (CCC_Handle){{.stats = CCC_ENTRY_ARG_ERROR}};
+        return (CCC_Handle){{.stats = CCC_ENTRY_ARGUMENT_ERROR}};
     }
     if (h->private.stats == CCC_ENTRY_OCCUPIED)
     {
@@ -564,7 +564,7 @@ CCC_handle_realtime_ordered_map_remove(
 {
     if (!handle_realtime_ordered_map || !key_val_type_output)
     {
-        return (CCC_Handle){{.stats = CCC_ENTRY_ARG_ERROR}};
+        return (CCC_Handle){{.stats = CCC_ENTRY_ARGUMENT_ERROR}};
     }
     struct Query const q
         = find(handle_realtime_ordered_map,
@@ -653,7 +653,7 @@ CCC_Handle_status
 CCC_handle_realtime_ordered_map_handle_status(
     CCC_Handle_realtime_ordered_map_handle const *const h)
 {
-    return h ? h->private.stats : CCC_ENTRY_ARG_ERROR;
+    return h ? h->private.stats : CCC_ENTRY_ARGUMENT_ERROR;
 }
 
 CCC_Tribool

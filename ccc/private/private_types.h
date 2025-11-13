@@ -13,8 +13,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 @endcond */
-#ifndef CCC_IMPL_TYPES_H
-#define CCC_IMPL_TYPES_H
+#ifndef CCC_PRIVATE_TYPES_H
+#define CCC_PRIVATE_TYPES_H
 
 /** @cond */
 #include <stddef.h>
@@ -27,7 +27,7 @@ enum CCC_Entry_status : uint8_t
     CCC_ENTRY_VACANT = 0,
     CCC_ENTRY_OCCUPIED = 0x1,
     CCC_ENTRY_INSERT_ERROR = 0x2,
-    CCC_ENTRY_ARG_ERROR = 0x4,
+    CCC_ENTRY_ARGUMENT_ERROR = 0x4,
     CCC_ENTRY_NO_UNWRAP = 0x8,
 };
 
@@ -84,4 +84,4 @@ union CCC_Reverse_range
     struct CCC_Range private;
 };
 
-#endif /* CCC_IMPL_TYPES_H */
+#endif /* CCC_PRIVATE_TYPES_H */

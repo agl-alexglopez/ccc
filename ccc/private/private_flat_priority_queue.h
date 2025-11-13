@@ -13,8 +13,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 @endcond */
-#ifndef CCC_IMPL_FLAT_PRIORITY_QUEUE_H
-#define CCC_IMPL_FLAT_PRIORITY_QUEUE_H
+#ifndef CCC_PRIVATE_FLAT_PRIORITY_QUEUE_H
+#define CCC_PRIVATE_FLAT_PRIORITY_QUEUE_H
 
 /** @cond */
 #include <assert.h>
@@ -154,4 +154,4 @@ CCC_private_flat_priority_queue_update_fixup(struct CCC_Flat_priority_queue *,
 
 /* NOLINTEND(readability-identifier-naming) */
 
-#endif /* CCC_IMPL_FLAT_PRIORITY_QUEUE_H */
+#endif /* CCC_PRIVATE_FLAT_PRIORITY_QUEUE_H */

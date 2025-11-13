@@ -232,7 +232,8 @@ CCC_handle_ordered_map_handle(CCC_Handle_ordered_map *const handle_ordered_map,
 {
     if (!handle_ordered_map || !key)
     {
-        return (CCC_Handle_ordered_map_handle){{.stats = CCC_ENTRY_ARG_ERROR}};
+        return (CCC_Handle_ordered_map_handle){
+            {.stats = CCC_ENTRY_ARGUMENT_ERROR}};
     }
     return (CCC_Handle_ordered_map_handle){handle(handle_ordered_map, key)};
 }
@@ -318,7 +319,7 @@ CCC_handle_ordered_map_swap_handle(
 {
     if (!handle_ordered_map || !key_val_output)
     {
-        return (CCC_Handle){{.stats = CCC_ENTRY_ARG_ERROR}};
+        return (CCC_Handle){{.stats = CCC_ENTRY_ARGUMENT_ERROR}};
     }
     size_t const found = find(handle_ordered_map,
                               key_in_slot(handle_ordered_map, key_val_output));
@@ -355,7 +356,7 @@ CCC_handle_ordered_map_try_insert(
 {
     if (!handle_ordered_map || !key_val_type)
     {
-        return (CCC_Handle){{.stats = CCC_ENTRY_ARG_ERROR}};
+        return (CCC_Handle){{.stats = CCC_ENTRY_ARGUMENT_ERROR}};
     }
     size_t const found = find(handle_ordered_map,
                               key_in_slot(handle_ordered_map, key_val_type));
@@ -389,7 +390,7 @@ CCC_handle_ordered_map_insert_or_assign(
 {
     if (!handle_ordered_map || !key_val_type)
     {
-        return (CCC_Handle){{.stats = CCC_ENTRY_ARG_ERROR}};
+        return (CCC_Handle){{.stats = CCC_ENTRY_ARGUMENT_ERROR}};
     }
     size_t const found = find(handle_ordered_map,
                               key_in_slot(handle_ordered_map, key_val_type));
@@ -427,7 +428,7 @@ CCC_handle_ordered_map_remove(CCC_Handle_ordered_map *const handle_ordered_map,
 {
     if (!handle_ordered_map || !key_val_output)
     {
-        return (CCC_Handle){{.stats = CCC_ENTRY_ARG_ERROR}};
+        return (CCC_Handle){{.stats = CCC_ENTRY_ARGUMENT_ERROR}};
     }
     size_t const removed = erase(
         handle_ordered_map, key_in_slot(handle_ordered_map, key_val_output));
@@ -455,7 +456,7 @@ CCC_handle_ordered_map_remove_handle(CCC_Handle_ordered_map_handle *const h)
 {
     if (!h)
     {
-        return (CCC_Handle){{.stats = CCC_ENTRY_ARG_ERROR}};
+        return (CCC_Handle){{.stats = CCC_ENTRY_ARGUMENT_ERROR}};
     }
     if (h->private.stats == CCC_ENTRY_OCCUPIED)
     {
@@ -509,7 +510,7 @@ CCC_Handle_status
 CCC_handle_ordered_map_handle_status(
     CCC_Handle_ordered_map_handle const *const h)
 {
-    return h ? h->private.stats : CCC_ENTRY_ARG_ERROR;
+    return h ? h->private.stats : CCC_ENTRY_ARGUMENT_ERROR;
 }
 
 CCC_Tribool

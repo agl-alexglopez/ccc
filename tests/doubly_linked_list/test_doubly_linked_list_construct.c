@@ -8,21 +8,21 @@
 #include "doubly_linked_list_utility.h"
 #include "traits.h"
 
-CHECK_BEGIN_STATIC_FN(doubly_linked_list_test_construct)
+check_static_begin(doubly_linked_list_test_construct)
 {
     struct Val val = {};
     Doubly_linked_list doubly_linked_list = doubly_linked_list_initialize(
         doubly_linked_list, struct Val, e, val_order, NULL, NULL);
-    CHECK(is_empty(&doubly_linked_list), true);
-    CHECK(doubly_linked_list_push_front(&doubly_linked_list, &val.e) != NULL,
+    check(is_empty(&doubly_linked_list), true);
+    check(doubly_linked_list_push_front(&doubly_linked_list, &val.e) != NULL,
           true);
-    CHECK(is_empty(&doubly_linked_list), false);
-    CHECK(count(&doubly_linked_list).count, 1);
-    CHECK_END_FN();
+    check(is_empty(&doubly_linked_list), false);
+    check(count(&doubly_linked_list).count, 1);
+    check_end();
 }
 
 int
 main()
 {
-    return CHECK_RUN(doubly_linked_list_test_construct());
+    return check_run(doubly_linked_list_test_construct());
 }

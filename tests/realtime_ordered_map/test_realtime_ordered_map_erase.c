@@ -13,33 +13,33 @@
 #include "traits.h"
 #include "types.h"
 
-CHECK_BEGIN_STATIC_FN(realtime_ordered_map_test_insert_erase_shuffled)
+check_static_begin(realtime_ordered_map_test_insert_erase_shuffled)
 {
     CCC_Realtime_ordered_map s = realtime_ordered_map_initialize(
         s, struct Val, elem, key, id_order, NULL, NULL);
     size_t const size = 50;
     int const prime = 53;
     struct Val vals[50];
-    CHECK(insert_shuffled(&s, vals, size, prime), PASS);
+    check(insert_shuffled(&s, vals, size, prime), CHECK_PASS);
     int sorted_check[50];
-    CHECK(inorder_fill(sorted_check, size, &s), size);
+    check(inorder_fill(sorted_check, size, &s), size);
     for (size_t i = 0; i < size; ++i)
     {
-        CHECK(vals[i].key, sorted_check[i]);
+        check(vals[i].key, sorted_check[i]);
     }
     /* Now let's delete everything with no errors. */
     for (size_t i = 0; i < size; ++i)
     {
         struct Val *v = unwrap(remove_r(&s, &vals[i].elem));
-        CHECK(v != NULL, true);
-        CHECK(v->key, vals[i].key);
-        CHECK(validate(&s), true);
+        check(v != NULL, true);
+        check(v->key, vals[i].key);
+        check(validate(&s), true);
     }
-    CHECK(is_empty(&s), true);
-    CHECK_END_FN();
+    check(is_empty(&s), true);
+    check_end();
 }
 
-CHECK_BEGIN_STATIC_FN(realtime_ordered_map_test_prime_shuffle)
+check_static_begin(realtime_ordered_map_test_prime_shuffle)
 {
     CCC_Realtime_ordered_map s = realtime_ordered_map_initialize(
         s, struct Val, elem, key, id_order, NULL, NULL);
@@ -61,21 +61,21 @@ CHECK_BEGIN_STATIC_FN(realtime_ordered_map_test_prime_shuffle)
         {
             repeats[i] = true;
         }
-        CHECK(validate(&s), true);
+        check(validate(&s), true);
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
     /* One test can use our printer function as test output */
-    CHECK(realtime_ordered_map_count(&s).count < size, true);
+    check(realtime_ordered_map_count(&s).count < size, true);
     for (size_t i = 0; i < size; ++i)
     {
-        CHECK(occupied(remove_entry_r(entry_r(&s, &vals[i].key))) || repeats[i],
+        check(occupied(remove_entry_r(entry_r(&s, &vals[i].key))) || repeats[i],
               true);
-        CHECK(validate(&s), true);
+        check(validate(&s), true);
     }
-    CHECK_END_FN();
+    check_end();
 }
 
-CHECK_BEGIN_STATIC_FN(realtime_ordered_map_test_weak_srand)
+check_static_begin(realtime_ordered_map_test_weak_srand)
 {
     CCC_Realtime_ordered_map s = realtime_ordered_map_initialize(
         s, struct Val, elem, key, id_order, NULL, NULL);
@@ -89,22 +89,22 @@ CHECK_BEGIN_STATIC_FN(realtime_ordered_map_test_weak_srand)
         vals[i].key = rand(); // NOLINT
         vals[i].val = i;
         (void)swap_entry(&s, &vals[i].elem, &(struct Val){}.elem);
-        CHECK(validate(&s), true);
+        check(validate(&s), true);
     }
     for (int i = 0; i < num_nodes; ++i)
     {
-        CHECK(realtime_ordered_map_contains(&s, &vals[i].key), true);
+        check(realtime_ordered_map_contains(&s, &vals[i].key), true);
         (void)CCC_remove(&s, &vals[i].elem);
-        CHECK(validate(&s), true);
+        check(validate(&s), true);
     }
-    CHECK(is_empty(&s), true);
-    CHECK_END_FN();
+    check(is_empty(&s), true);
+    check_end();
 }
 
 int
 main()
 {
-    return CHECK_RUN(realtime_ordered_map_test_insert_erase_shuffled(),
+    return check_run(realtime_ordered_map_test_insert_erase_shuffled(),
                      realtime_ordered_map_test_prime_shuffle(),
                      realtime_ordered_map_test_weak_srand());
 }

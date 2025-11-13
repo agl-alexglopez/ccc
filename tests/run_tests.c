@@ -85,13 +85,13 @@ main(int argc, char **argv)
         return 0;
     }
     SV_String_view arg_view = SV_sv(argv[1]);
-    return CHECK_RUN(run(arg_view));
+    return check_run(run(arg_view));
 }
 
-CHECK_BEGIN_STATIC_FN(run, SV_String_view const tests_dir)
+check_static_begin(run, SV_String_view const tests_dir)
 {
     DIR *dir_ptr = open_test_dir(tests_dir);
-    CHECK(dir_ptr != NULL, true);
+    check(dir_ptr != NULL, true);
     char absolute_path[FILESYS_MAX_PATH];
     size_t tests_ran = 0;
     size_t tests_passed = 0;
@@ -103,63 +103,66 @@ CHECK_BEGIN_STATIC_FN(run, SV_String_view const tests_dir)
         {
             continue;
         }
-        CHECK(fill_path(absolute_path, tests_dir, entry), true);
-        printf("%s(%s%s", CYAN, SV_begin(entry), NONE);
+        check(fill_path(absolute_path, tests_dir, entry), true);
+        printf("%s(%s%s", CHECK_CYAN, SV_begin(entry), CHECK_NONE);
         (void)fflush(stdout);
         enum Check_result const res
             = run_test_process((struct Path_bin){SV_sv(absolute_path), entry});
         switch (res)
         {
-            case ERROR:
-                logerr("\n%s%s%s\n%s %s%s%s)%s\n", RED, err_msg, CYAN,
-                       SV_begin(entry), RED, fail_mark, CYAN, NONE);
+            case CHECK_ERROR:
+                logerr("\n%s%s%s\n%s %s%s%s)%s\n", CHECK_RED, err_msg,
+                       CHECK_CYAN, SV_begin(entry), CHECK_RED, fail_mark,
+                       CHECK_CYAN, CHECK_NONE);
                 break;
-            case PASS:
-                logout(" %s%s%s)%s\n", GREEN, pass_mark, CYAN, NONE);
+            case CHECK_PASS:
+                logout(" %s%s%s)%s\n", CHECK_GREEN, pass_mark, CHECK_CYAN,
+                       CHECK_NONE);
                 break;
-            case FAIL:
-                logout("\n%s%s%s)%s\n", RED, fail_mark, CYAN, NONE);
+            case CHECK_FAIL:
+                logout("\n%s%s%s)%s\n", CHECK_RED, fail_mark, CHECK_CYAN,
+                       CHECK_NONE);
                 break;
         }
-        if (res == PASS)
+        if (res == CHECK_PASS)
         {
             ++tests_passed;
         }
         ++tests_ran;
     }
-    CHECK(tests_passed, tests_ran);
-    CHECK_END_FN(closedir(dir_ptr););
+    check(tests_passed, tests_ran);
+    check_end(closedir(dir_ptr););
 }
 
-CHECK_BEGIN_STATIC_FN(run_test_process, struct Path_bin pb)
+check_static_begin(run_test_process, struct Path_bin pb)
 {
-    CHECK_ERROR(SV_empty(pb.path), false, { logerr("No test provided.\n"); });
+    check_error(SV_empty(pb.path), false, { logerr("No test provided.\n"); });
     pid_t const test_proc = fork();
     if (test_proc == 0)
     {
         (void)execl(SV_begin(pb.path), SV_begin(pb.bin), NULL);
-        CHECK_ERROR(0, 1, { logerr("Child test process could not start.\n"); });
+        check_error(0, 1, { logerr("Child test process could not start.\n"); });
     }
     int status = 0;
-    CHECK_ERROR(waitpid(test_proc, &status, 0) >= 0, true,
+    check_error(waitpid(test_proc, &status, 0) >= 0, true,
                 { logerr("Error running test: %s\n", SV_begin(pb.bin)); });
-    CHECK_ERROR(WIFSIGNALED(status), false, {
+    check_error(WIFSIGNALED(status), false, {
         int const sig = WTERMSIG(status);
         char const *const msg = strsignal(sig);
         if (msg)
         {
-            logerr("%sProcess killed with signal %d: %s%s\n", RED, sig, msg,
-                   NONE);
+            logerr("%sProcess killed with signal %d: %s%s\n", CHECK_RED, sig,
+                   msg, CHECK_NONE);
         }
         else
         {
             logerr("%sProcess killed with signal %d: unknown signal code%s\n",
-                   RED, sig, NONE);
+                   CHECK_RED, sig, CHECK_NONE);
         }
     });
-    CHECK(WIFEXITED(status), true);
+    check(WIFEXITED(status), true);
     CHECK_STATUS = WEXITSTATUS(status);
-    CHECK_END_FN();
+    check_end();
 }
 
 static DIR *

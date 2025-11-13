@@ -12,7 +12,7 @@
 #include "types.h"
 #include "utility/allocate.h"
 
-CHECK_BEGIN_STATIC_FN(priority_queue_test_insert_remove_four_dups)
+check_static_begin(priority_queue_test_insert_remove_four_dups)
 {
     CCC_Priority_queue ppriority_queue = CCC_priority_queue_initialize(
         struct Val, elem, CCC_ORDER_LESSER, val_order, NULL, NULL);
@@ -20,91 +20,91 @@ CHECK_BEGIN_STATIC_FN(priority_queue_test_insert_remove_four_dups)
     for (int i = 0; i < 4; ++i)
     {
         three_vals[i].val = 0;
-        CHECK(push(&ppriority_queue, &three_vals[i].elem) != NULL, true);
-        CHECK(validate(&ppriority_queue), true);
+        check(push(&ppriority_queue, &three_vals[i].elem) != NULL, true);
+        check(validate(&ppriority_queue), true);
         size_t const size = i + 1;
-        CHECK(CCC_priority_queue_count(&ppriority_queue).count, size);
+        check(CCC_priority_queue_count(&ppriority_queue).count, size);
     }
-    CHECK(CCC_priority_queue_count(&ppriority_queue).count, (size_t)4);
+    check(CCC_priority_queue_count(&ppriority_queue).count, (size_t)4);
     for (int i = 0; i < 4; ++i)
     {
         three_vals[i].val = 0;
-        CHECK(pop(&ppriority_queue), CCC_RESULT_OK);
-        CHECK(validate(&ppriority_queue), true);
+        check(pop(&ppriority_queue), CCC_RESULT_OK);
+        check(validate(&ppriority_queue), true);
     }
-    CHECK(CCC_priority_queue_count(&ppriority_queue).count, (size_t)0);
-    CHECK_END_FN();
+    check(CCC_priority_queue_count(&ppriority_queue).count, (size_t)0);
+    check_end();
 }
 
-CHECK_BEGIN_STATIC_FN(priority_queue_test_insert_extract_shuffled)
+check_static_begin(priority_queue_test_insert_extract_shuffled)
 {
     CCC_Priority_queue ppriority_queue = CCC_priority_queue_initialize(
         struct Val, elem, CCC_ORDER_LESSER, val_order, NULL, NULL);
     size_t const size = 50;
     int const prime = 53;
     struct Val vals[50];
-    CHECK(insert_shuffled(&ppriority_queue, vals, size, prime), PASS);
+    check(insert_shuffled(&ppriority_queue, vals, size, prime), CHECK_PASS);
     struct Val const *min = front(&ppriority_queue);
-    CHECK(min->val, 0);
+    check(min->val, 0);
     int sorted_check[50];
-    CHECK(inorder_fill(sorted_check, size, &ppriority_queue), PASS);
+    check(inorder_fill(sorted_check, size, &ppriority_queue), CHECK_PASS);
     /* Now let's delete everything with no errors. */
     for (size_t i = 0; i < size; ++i)
     {
         (void)CCC_priority_queue_extract(&ppriority_queue, &vals[i].elem);
-        CHECK(validate(&ppriority_queue), true);
+        check(validate(&ppriority_queue), true);
     }
-    CHECK(CCC_priority_queue_count(&ppriority_queue).count, (size_t)0);
-    CHECK_END_FN();
+    check(CCC_priority_queue_count(&ppriority_queue).count, (size_t)0);
+    check_end();
 }
 
-CHECK_BEGIN_STATIC_FN(priority_queue_test_pop_max)
+check_static_begin(priority_queue_test_pop_max)
 {
     CCC_Priority_queue ppriority_queue = CCC_priority_queue_initialize(
         struct Val, elem, CCC_ORDER_LESSER, val_order, NULL, NULL);
     size_t const size = 50;
     int const prime = 53;
     struct Val vals[50];
-    CHECK(insert_shuffled(&ppriority_queue, vals, size, prime), PASS);
+    check(insert_shuffled(&ppriority_queue, vals, size, prime), CHECK_PASS);
     struct Val const *min = front(&ppriority_queue);
-    CHECK(min->val, 0);
+    check(min->val, 0);
     int sorted_check[50];
-    CHECK(inorder_fill(sorted_check, size, &ppriority_queue), PASS);
+    check(inorder_fill(sorted_check, size, &ppriority_queue), CHECK_PASS);
     /* Now let's pop from the front of the queue until empty. */
     for (size_t i = 0; i < size; ++i)
     {
         struct Val const *front = front(&ppriority_queue);
-        CHECK(front->val, vals[i].val);
-        CHECK(pop(&ppriority_queue), CCC_RESULT_OK);
+        check(front->val, vals[i].val);
+        check(pop(&ppriority_queue), CCC_RESULT_OK);
     }
-    CHECK(CCC_priority_queue_is_empty(&ppriority_queue), true);
-    CHECK_END_FN();
+    check(CCC_priority_queue_is_empty(&ppriority_queue), true);
+    check_end();
 }
 
-CHECK_BEGIN_STATIC_FN(priority_queue_test_pop_min)
+check_static_begin(priority_queue_test_pop_min)
 {
     CCC_Priority_queue ppriority_queue = CCC_priority_queue_initialize(
         struct Val, elem, CCC_ORDER_LESSER, val_order, NULL, NULL);
     size_t const size = 50;
     int const prime = 53;
     struct Val vals[50];
-    CHECK(insert_shuffled(&ppriority_queue, vals, size, prime), PASS);
+    check(insert_shuffled(&ppriority_queue, vals, size, prime), CHECK_PASS);
     struct Val const *min = front(&ppriority_queue);
-    CHECK(min->val, 0);
+    check(min->val, 0);
     int sorted_check[50];
-    CHECK(inorder_fill(sorted_check, size, &ppriority_queue), PASS);
+    check(inorder_fill(sorted_check, size, &ppriority_queue), CHECK_PASS);
     /* Now let's pop from the front of the queue until empty. */
     for (size_t i = 0; i < size; ++i)
     {
         struct Val const *front = front(&ppriority_queue);
-        CHECK(front->val, vals[i].val);
-        CHECK(pop(&ppriority_queue), CCC_RESULT_OK);
+        check(front->val, vals[i].val);
+        check(pop(&ppriority_queue), CCC_RESULT_OK);
     }
-    CHECK(CCC_priority_queue_is_empty(&ppriority_queue), true);
-    CHECK_END_FN();
+    check(CCC_priority_queue_is_empty(&ppriority_queue), true);
+    check_end();
 }
 
-CHECK_BEGIN_STATIC_FN(priority_queue_test_delete_prime_shuffle_duplicates)
+check_static_begin(priority_queue_test_delete_prime_shuffle_duplicates)
 {
     CCC_Priority_queue ppriority_queue = CCC_priority_queue_initialize(
         struct Val, elem, CCC_ORDER_LESSER, val_order, NULL, NULL);
@@ -118,10 +118,10 @@ CHECK_BEGIN_STATIC_FN(priority_queue_test_delete_prime_shuffle_duplicates)
     {
         vals[i].val = shuffled_index;
         vals[i].id = i;
-        CHECK(push(&ppriority_queue, &vals[i].elem) != NULL, true);
-        CHECK(validate(&ppriority_queue), true);
+        check(push(&ppriority_queue, &vals[i].elem) != NULL, true);
+        check(validate(&ppriority_queue), true);
         size_t const s = i + 1;
-        CHECK(CCC_priority_queue_count(&ppriority_queue).count, s);
+        check(CCC_priority_queue_count(&ppriority_queue).count, s);
         /* Shuffle like this only on insertions to create more dups. */
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
@@ -132,16 +132,16 @@ CHECK_BEGIN_STATIC_FN(priority_queue_test_delete_prime_shuffle_duplicates)
     {
         (void)CCC_priority_queue_extract(&ppriority_queue,
                                          &vals[shuffled_index].elem);
-        CHECK(validate(&ppriority_queue), true);
+        check(validate(&ppriority_queue), true);
         --cur_size;
-        CHECK(CCC_priority_queue_count(&ppriority_queue).count, cur_size);
+        check(CCC_priority_queue_count(&ppriority_queue).count, cur_size);
         /* Shuffle normally here so we only remove each elem once. */
         shuffled_index = (shuffled_index + prime) % size;
     }
-    CHECK_END_FN();
+    check_end();
 }
 
-CHECK_BEGIN_STATIC_FN(priority_queue_test_prime_shuffle)
+check_static_begin(priority_queue_test_prime_shuffle)
 {
     CCC_Priority_queue ppriority_queue = CCC_priority_queue_initialize(
         struct Val, elem, CCC_ORDER_LESSER, val_order, NULL, NULL);
@@ -156,8 +156,8 @@ CHECK_BEGIN_STATIC_FN(priority_queue_test_prime_shuffle)
     {
         vals[i].val = shuffled_index;
         vals[i].id = shuffled_index;
-        CHECK(push(&ppriority_queue, &vals[i].elem) != NULL, true);
-        CHECK(validate(&ppriority_queue), true);
+        check(push(&ppriority_queue, &vals[i].elem) != NULL, true);
+        check(validate(&ppriority_queue), true);
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
     /* Now we go through and free all the elements in order but
@@ -166,14 +166,14 @@ CHECK_BEGIN_STATIC_FN(priority_queue_test_prime_shuffle)
     for (int i = 0; i < size; ++i)
     {
         (void)CCC_priority_queue_extract(&ppriority_queue, &vals[i].elem);
-        CHECK(validate(&ppriority_queue), true);
+        check(validate(&ppriority_queue), true);
         --cur_size;
-        CHECK(CCC_priority_queue_count(&ppriority_queue).count, cur_size);
+        check(CCC_priority_queue_count(&ppriority_queue).count, cur_size);
     }
-    CHECK_END_FN();
+    check_end();
 }
 
-CHECK_BEGIN_STATIC_FN(priority_queue_test_weak_srand)
+check_static_begin(priority_queue_test_weak_srand)
 {
     CCC_Priority_queue ppriority_queue = CCC_priority_queue_initialize(
         struct Val, elem, CCC_ORDER_LESSER, val_order, NULL, NULL);
@@ -186,19 +186,19 @@ CHECK_BEGIN_STATIC_FN(priority_queue_test_weak_srand)
     {
         vals[i].val = rand(); // NOLINT
         vals[i].id = i;
-        CHECK(push(&ppriority_queue, &vals[i].elem) != NULL, true);
-        CHECK(validate(&ppriority_queue), true);
+        check(push(&ppriority_queue, &vals[i].elem) != NULL, true);
+        check(validate(&ppriority_queue), true);
     }
     for (int i = 0; i < num_heap_nodes; ++i)
     {
         (void)CCC_priority_queue_extract(&ppriority_queue, &vals[i].elem);
-        CHECK(validate(&ppriority_queue), true);
+        check(validate(&ppriority_queue), true);
     }
-    CHECK(CCC_priority_queue_is_empty(&ppriority_queue), true);
-    CHECK_END_FN();
+    check(CCC_priority_queue_is_empty(&ppriority_queue), true);
+    check_end();
 }
 
-CHECK_BEGIN_STATIC_FN(priority_queue_test_weak_srand_allocate)
+check_static_begin(priority_queue_test_weak_srand_allocate)
 {
     CCC_Priority_queue ppriority_queue = CCC_priority_queue_initialize(
         struct Val, elem, CCC_ORDER_LESSER, val_order, std_allocate, NULL);
@@ -208,7 +208,7 @@ CHECK_BEGIN_STATIC_FN(priority_queue_test_weak_srand_allocate)
     int const num_heap_nodes = 100;
     for (int i = 0; i < num_heap_nodes; ++i)
     {
-        CHECK(push(&ppriority_queue,
+        check(push(&ppriority_queue,
                    &(struct Val){
                        .id = i,
                        .val = rand() /*NOLINT*/,
@@ -216,15 +216,15 @@ CHECK_BEGIN_STATIC_FN(priority_queue_test_weak_srand_allocate)
                         .elem)
                   != NULL,
               true);
-        CHECK(validate(&ppriority_queue), true);
+        check(validate(&ppriority_queue), true);
     }
-    CHECK_END_FN(CCC_priority_queue_clear(&ppriority_queue, NULL););
+    check_end(CCC_priority_queue_clear(&ppriority_queue, NULL););
 }
 
 int
 main()
 {
-    return CHECK_RUN(
+    return check_run(
         priority_queue_test_insert_remove_four_dups(),
         priority_queue_test_insert_extract_shuffled(),
         priority_queue_test_pop_max(), priority_queue_test_pop_min(),

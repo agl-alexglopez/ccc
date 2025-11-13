@@ -13,8 +13,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 @endcond */
-#ifndef CCC_IMPL_FLAT_HASH_MAP_H
-#define CCC_IMPL_FLAT_HASH_MAP_H
+#ifndef CCC_PRIVATE_FLAT_HASH_MAP_H
+#define CCC_PRIVATE_FLAT_HASH_MAP_H
 
 /** @cond */
 #include <assert.h>
@@ -347,7 +347,7 @@ desired data if occupied. */
         __auto_type private_flat_hash_map_mod_ent_ptr                          \
             = (Flat_hash_map_entry_ptr);                                       \
         struct CCC_Flat_hash_map_entry private_flat_hash_map_mod_with_ent      \
-            = {.stats = CCC_ENTRY_ARG_ERROR};                                  \
+            = {.stats = CCC_ENTRY_ARGUMENT_ERROR};                             \
         if (private_flat_hash_map_mod_ent_ptr)                                 \
         {                                                                      \
             private_flat_hash_map_mod_with_ent                                 \
@@ -435,7 +435,7 @@ Importantly, this function makes sure the key is in sync with key in table. */
         struct CCC_Flat_hash_map *private_Flat_hash_map_ptr                    \
             = (Flat_hash_map_ptr);                                             \
         struct CCC_Entry private_flat_hash_map_try_insert_res                  \
-            = {.stats = CCC_ENTRY_ARG_ERROR};                                  \
+            = {.stats = CCC_ENTRY_ARGUMENT_ERROR};                             \
         if (private_Flat_hash_map_ptr)                                         \
         {                                                                      \
             __auto_type private_flat_hash_map_key = key;                       \
@@ -487,7 +487,7 @@ Similar to insert entry this will overwrite. */
         struct CCC_Flat_hash_map *private_Flat_hash_map_ptr                    \
             = (Flat_hash_map_ptr);                                             \
         struct CCC_Entry private_flat_hash_map_insert_or_assign_res            \
-            = {.stats = CCC_ENTRY_ARG_ERROR};                                  \
+            = {.stats = CCC_ENTRY_ARGUMENT_ERROR};                             \
         if (private_Flat_hash_map_ptr)                                         \
         {                                                                      \
             private_flat_hash_map_insert_or_assign_res.stats                   \
@@ -530,4 +530,4 @@ Similar to insert entry this will overwrite. */
 
 /* NOLINTEND(readability-identifier-naming) */
 
-#endif /* CCC_IMPL_FLAT_HASH_MAP_H */
+#endif /* CCC_PRIVATE_FLAT_HASH_MAP_H */

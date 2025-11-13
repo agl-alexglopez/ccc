@@ -11,7 +11,7 @@
 #include "traits.h"
 #include "types.h"
 
-CHECK_BEGIN_STATIC_FN(priority_queue_test_insert_iterate_pop)
+check_static_begin(priority_queue_test_insert_iterate_pop)
 {
     CCC_Priority_queue priority_queue = CCC_priority_queue_initialize(
         struct Val, elem, CCC_ORDER_LESSER, val_order, NULL, NULL);
@@ -25,21 +25,21 @@ CHECK_BEGIN_STATIC_FN(priority_queue_test_insert_iterate_pop)
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
-        CHECK(push(&priority_queue, &vals[i].elem) != NULL, true);
-        CHECK(validate(&priority_queue), true);
+        check(push(&priority_queue, &vals[i].elem) != NULL, true);
+        check(validate(&priority_queue), true);
     }
     size_t pop_count = 0;
     while (!CCC_priority_queue_is_empty(&priority_queue))
     {
-        CHECK(pop(&priority_queue), CCC_RESULT_OK);
+        check(pop(&priority_queue), CCC_RESULT_OK);
         ++pop_count;
-        CHECK(validate(&priority_queue), true);
+        check(validate(&priority_queue), true);
     }
-    CHECK(pop_count, num_nodes);
-    CHECK_END_FN();
+    check(pop_count, num_nodes);
+    check_end();
 }
 
-CHECK_BEGIN_STATIC_FN(priority_queue_test_priority_removal)
+check_static_begin(priority_queue_test_priority_removal)
 {
     CCC_Priority_queue priority_queue = CCC_priority_queue_initialize(
         struct Val, elem, CCC_ORDER_LESSER, val_order, NULL, NULL);
@@ -53,8 +53,8 @@ CHECK_BEGIN_STATIC_FN(priority_queue_test_priority_removal)
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
-        CHECK(push(&priority_queue, &vals[i].elem) != NULL, true);
-        CHECK(validate(&priority_queue), true);
+        check(push(&priority_queue, &vals[i].elem) != NULL, true);
+        check(validate(&priority_queue), true);
     }
     int const limit = 400;
     for (size_t val = 0; val < num_nodes; ++val)
@@ -63,13 +63,13 @@ CHECK_BEGIN_STATIC_FN(priority_queue_test_priority_removal)
         if (i->val > limit)
         {
             (void)CCC_priority_queue_extract(&priority_queue, &i->elem);
-            CHECK(validate(&priority_queue), true);
+            check(validate(&priority_queue), true);
         }
     }
-    CHECK_END_FN();
+    check_end();
 }
 
-CHECK_BEGIN_STATIC_FN(priority_queue_test_priority_update)
+check_static_begin(priority_queue_test_priority_update)
 {
     CCC_Priority_queue priority_queue = CCC_priority_queue_initialize(
         struct Val, elem, CCC_ORDER_LESSER, val_order, NULL, NULL);
@@ -83,8 +83,8 @@ CHECK_BEGIN_STATIC_FN(priority_queue_test_priority_update)
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
-        CHECK(push(&priority_queue, &vals[i].elem) != NULL, true);
-        CHECK(validate(&priority_queue), true);
+        check(push(&priority_queue, &vals[i].elem) != NULL, true);
+        check(validate(&priority_queue), true);
     }
     int const limit = 400;
     for (size_t val = 0; val < num_nodes; ++val)
@@ -93,18 +93,18 @@ CHECK_BEGIN_STATIC_FN(priority_queue_test_priority_update)
         int backoff = i->val / 2;
         if (i->val > limit)
         {
-            CHECK(CCC_priority_queue_update(&priority_queue, &i->elem,
+            check(CCC_priority_queue_update(&priority_queue, &i->elem,
                                             val_update, &backoff)
                       != NULL,
                   true);
-            CHECK(validate(&priority_queue), true);
+            check(validate(&priority_queue), true);
         }
     }
-    CHECK(CCC_priority_queue_count(&priority_queue).count, num_nodes);
-    CHECK_END_FN();
+    check(CCC_priority_queue_count(&priority_queue).count, num_nodes);
+    check_end();
 }
 
-CHECK_BEGIN_STATIC_FN(priority_queue_test_priority_update_with)
+check_static_begin(priority_queue_test_priority_update_with)
 {
     CCC_Priority_queue priority_queue = CCC_priority_queue_initialize(
         struct Val, elem, CCC_ORDER_LESSER, val_order, NULL, NULL);
@@ -118,8 +118,8 @@ CHECK_BEGIN_STATIC_FN(priority_queue_test_priority_update_with)
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
-        CHECK(push(&priority_queue, &vals[i].elem) != NULL, true);
-        CHECK(validate(&priority_queue), true);
+        check(push(&priority_queue, &vals[i].elem) != NULL, true);
+        check(validate(&priority_queue), true);
     }
     int const limit = 400;
     for (size_t val = 0; val < num_nodes; ++val)
@@ -127,18 +127,18 @@ CHECK_BEGIN_STATIC_FN(priority_queue_test_priority_update_with)
         int backoff = vals[val].val / 2;
         if (vals[val].val > limit)
         {
-            CHECK(CCC_priority_queue_update_w(&priority_queue, &vals[val],
+            check(CCC_priority_queue_update_w(&priority_queue, &vals[val],
                                               { T->val = backoff; })
                       != NULL,
                   true);
-            CHECK(validate(&priority_queue), true);
+            check(validate(&priority_queue), true);
         }
     }
-    CHECK(CCC_priority_queue_count(&priority_queue).count, num_nodes);
-    CHECK_END_FN();
+    check(CCC_priority_queue_count(&priority_queue).count, num_nodes);
+    check_end();
 }
 
-CHECK_BEGIN_STATIC_FN(priority_queue_test_priority_increase)
+check_static_begin(priority_queue_test_priority_increase)
 {
     CCC_Priority_queue priority_queue = CCC_priority_queue_initialize(
         struct Val, elem, CCC_ORDER_LESSER, val_order, NULL, NULL);
@@ -152,8 +152,8 @@ CHECK_BEGIN_STATIC_FN(priority_queue_test_priority_increase)
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
-        CHECK(push(&priority_queue, &vals[i].elem) != NULL, true);
-        CHECK(validate(&priority_queue), true);
+        check(push(&priority_queue, &vals[i].elem) != NULL, true);
+        check(validate(&priority_queue), true);
     }
     int const limit = 400;
     for (size_t val = 0; val < num_nodes; ++val)
@@ -163,26 +163,26 @@ CHECK_BEGIN_STATIC_FN(priority_queue_test_priority_increase)
         int dec = (i->val / 2) - 1;
         if (i->val > limit && dec < i->val)
         {
-            CHECK(CCC_priority_queue_decrease(&priority_queue, &i->elem,
+            check(CCC_priority_queue_decrease(&priority_queue, &i->elem,
                                               val_update, &dec)
                       != NULL,
                   true);
-            CHECK(validate(&priority_queue), true);
+            check(validate(&priority_queue), true);
         }
         else if (i->val < limit && inc > i->val)
         {
-            CHECK(CCC_priority_queue_increase(&priority_queue, &i->elem,
+            check(CCC_priority_queue_increase(&priority_queue, &i->elem,
                                               val_update, &inc)
                       != NULL,
                   true);
-            CHECK(validate(&priority_queue), true);
+            check(validate(&priority_queue), true);
         }
     }
-    CHECK(CCC_priority_queue_count(&priority_queue).count, num_nodes);
-    CHECK_END_FN();
+    check(CCC_priority_queue_count(&priority_queue).count, num_nodes);
+    check_end();
 }
 
-CHECK_BEGIN_STATIC_FN(priority_queue_test_priority_increase_with)
+check_static_begin(priority_queue_test_priority_increase_with)
 {
     CCC_Priority_queue priority_queue = CCC_priority_queue_initialize(
         struct Val, elem, CCC_ORDER_LESSER, val_order, NULL, NULL);
@@ -196,8 +196,8 @@ CHECK_BEGIN_STATIC_FN(priority_queue_test_priority_increase_with)
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
-        CHECK(push(&priority_queue, &vals[i].elem) != NULL, true);
-        CHECK(validate(&priority_queue), true);
+        check(push(&priority_queue, &vals[i].elem) != NULL, true);
+        check(validate(&priority_queue), true);
     }
     int const limit = 400;
     for (size_t val = 0; val < num_nodes; ++val)
@@ -206,26 +206,26 @@ CHECK_BEGIN_STATIC_FN(priority_queue_test_priority_increase_with)
         int dec = (vals[val].val / 2) - 1;
         if (vals[val].val > limit && dec < vals[val].val)
         {
-            CHECK(CCC_priority_queue_decrease_w(&priority_queue, &vals[val],
+            check(CCC_priority_queue_decrease_w(&priority_queue, &vals[val],
                                                 { T->val = dec; })
                       != NULL,
                   true);
-            CHECK(validate(&priority_queue), true);
+            check(validate(&priority_queue), true);
         }
         else if (vals[val].val < limit && inc > vals[val].val)
         {
-            CHECK(CCC_priority_queue_increase_w(&priority_queue, &vals[val],
+            check(CCC_priority_queue_increase_w(&priority_queue, &vals[val],
                                                 { T->val = inc; })
                       != NULL,
                   true);
-            CHECK(validate(&priority_queue), true);
+            check(validate(&priority_queue), true);
         }
     }
-    CHECK(CCC_priority_queue_count(&priority_queue).count, num_nodes);
-    CHECK_END_FN();
+    check(CCC_priority_queue_count(&priority_queue).count, num_nodes);
+    check_end();
 }
 
-CHECK_BEGIN_STATIC_FN(priority_queue_test_priority_decrease)
+check_static_begin(priority_queue_test_priority_decrease)
 {
     CCC_Priority_queue priority_queue = CCC_priority_queue_initialize(
         struct Val, elem, CCC_ORDER_GREATER, val_order, NULL, NULL);
@@ -239,8 +239,8 @@ CHECK_BEGIN_STATIC_FN(priority_queue_test_priority_decrease)
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
-        CHECK(push(&priority_queue, &vals[i].elem) != NULL, true);
-        CHECK(validate(&priority_queue), true);
+        check(push(&priority_queue, &vals[i].elem) != NULL, true);
+        check(validate(&priority_queue), true);
     }
     int const limit = 400;
     for (size_t val = 0; val < num_nodes; ++val)
@@ -250,26 +250,26 @@ CHECK_BEGIN_STATIC_FN(priority_queue_test_priority_decrease)
         int dec = (i->val / 2) - 1;
         if (i->val < limit && inc > i->val)
         {
-            CHECK(CCC_priority_queue_increase(&priority_queue, &i->elem,
+            check(CCC_priority_queue_increase(&priority_queue, &i->elem,
                                               val_update, &inc)
                       != NULL,
                   true);
-            CHECK(validate(&priority_queue), true);
+            check(validate(&priority_queue), true);
         }
         else if (i->val > limit && dec < i->val)
         {
-            CHECK(CCC_priority_queue_decrease(&priority_queue, &i->elem,
+            check(CCC_priority_queue_decrease(&priority_queue, &i->elem,
                                               val_update, &dec)
                       != NULL,
                   true);
-            CHECK(validate(&priority_queue), true);
+            check(validate(&priority_queue), true);
         }
     }
-    CHECK(CCC_priority_queue_count(&priority_queue).count, num_nodes);
-    CHECK_END_FN();
+    check(CCC_priority_queue_count(&priority_queue).count, num_nodes);
+    check_end();
 }
 
-CHECK_BEGIN_STATIC_FN(priority_queue_test_priority_decrease_with)
+check_static_begin(priority_queue_test_priority_decrease_with)
 {
     CCC_Priority_queue priority_queue = CCC_priority_queue_initialize(
         struct Val, elem, CCC_ORDER_GREATER, val_order, NULL, NULL);
@@ -283,8 +283,8 @@ CHECK_BEGIN_STATIC_FN(priority_queue_test_priority_decrease_with)
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
-        CHECK(push(&priority_queue, &vals[i].elem) != NULL, true);
-        CHECK(validate(&priority_queue), true);
+        check(push(&priority_queue, &vals[i].elem) != NULL, true);
+        check(validate(&priority_queue), true);
     }
     int const limit = 400;
     for (size_t val = 0; val < num_nodes; ++val)
@@ -293,29 +293,29 @@ CHECK_BEGIN_STATIC_FN(priority_queue_test_priority_decrease_with)
         int dec = (vals[val].val / 2) - 1;
         if (vals[val].val < limit && inc > vals[val].val)
         {
-            CHECK(CCC_priority_queue_increase_w(&priority_queue, &vals[val],
+            check(CCC_priority_queue_increase_w(&priority_queue, &vals[val],
                                                 { T->val = inc; })
                       != NULL,
                   true);
-            CHECK(validate(&priority_queue), true);
+            check(validate(&priority_queue), true);
         }
         else if (vals[val].val > limit && dec < vals[val].val)
         {
-            CHECK(CCC_priority_queue_decrease_w(&priority_queue, &vals[val],
+            check(CCC_priority_queue_decrease_w(&priority_queue, &vals[val],
                                                 { T->val = dec; })
                       != NULL,
                   true);
-            CHECK(validate(&priority_queue), true);
+            check(validate(&priority_queue), true);
         }
     }
-    CHECK(CCC_priority_queue_count(&priority_queue).count, num_nodes);
-    CHECK_END_FN();
+    check(CCC_priority_queue_count(&priority_queue).count, num_nodes);
+    check_end();
 }
 
 int
 main()
 {
-    return CHECK_RUN(priority_queue_test_insert_iterate_pop(),
+    return check_run(priority_queue_test_insert_iterate_pop(),
                      priority_queue_test_priority_update(),
                      priority_queue_test_priority_update_with(),
                      priority_queue_test_priority_removal(),

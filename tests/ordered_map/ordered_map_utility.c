@@ -18,20 +18,20 @@ id_order(CCC_Key_comparator_context const order)
     return (key > c->key) - (key < c->key);
 }
 
-CHECK_BEGIN_FN(insert_shuffled, CCC_Ordered_map *m, struct Val vals[],
-               size_t const size, int const larger_prime)
+check_begin(insert_shuffled, CCC_Ordered_map *m, struct Val vals[],
+            size_t const size, int const larger_prime)
 {
     size_t shuffled_index = larger_prime % size;
     for (size_t i = 0; i < size; ++i)
     {
         vals[shuffled_index].key = (int)shuffled_index;
         (void)swap_entry(m, &vals[shuffled_index].elem, &(struct Val){}.elem);
-        CHECK(count(m).count, i + 1);
-        CHECK(validate(m), true);
+        check(count(m).count, i + 1);
+        check(validate(m), true);
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
-    CHECK(count(m).count, size);
-    CHECK_END_FN();
+    check(count(m).count, size);
+    check_end();
 }
 
 /* Iterative inorder traversal to check the heap is sorted. */

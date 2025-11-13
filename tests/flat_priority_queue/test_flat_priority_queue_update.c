@@ -11,7 +11,7 @@
 #include "traits.h"
 #include "types.h"
 
-CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_insert_iterate_pop)
+check_static_begin(flat_priority_queue_test_insert_iterate_pop)
 {
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
@@ -27,22 +27,22 @@ CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_insert_iterate_pop)
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
-        CHECK(push(&flat_priority_queue, &vals[i], &(struct Val){}) != NULL,
+        check(push(&flat_priority_queue, &vals[i], &(struct Val){}) != NULL,
               true);
-        CHECK(validate(&flat_priority_queue), true);
+        check(validate(&flat_priority_queue), true);
     }
     size_t pop_count = 0;
     while (!is_empty(&flat_priority_queue))
     {
         (void)pop(&flat_priority_queue, &(struct Val){});
         ++pop_count;
-        CHECK(validate(&flat_priority_queue), true);
+        check(validate(&flat_priority_queue), true);
     }
-    CHECK(pop_count, num_nodes);
-    CHECK_END_FN();
+    check(pop_count, num_nodes);
+    check_end();
 }
 
-CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_priority_removal)
+check_static_begin(flat_priority_queue_test_priority_removal)
 {
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
@@ -62,8 +62,8 @@ CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_priority_removal)
                 .val = rand() % (num_nodes + 1), /*NOLINT*/
                 .id = (int)i,
             });
-        CHECK(res != NULL, true);
-        CHECK(validate(&flat_priority_queue), true);
+        check(res != NULL, true);
+        check(validate(&flat_priority_queue), true);
     }
     int const limit = 400;
     for (size_t seen = 0, remaining = num_nodes; seen < remaining; ++seen)
@@ -72,14 +72,14 @@ CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_priority_removal)
         if (cur->val > limit)
         {
             (void)erase(&flat_priority_queue, cur, &(struct Val){});
-            CHECK(validate(&flat_priority_queue), true);
+            check(validate(&flat_priority_queue), true);
             --remaining;
         }
     }
-    CHECK_END_FN();
+    check_end();
 }
 
-CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_priority_update)
+check_static_begin(flat_priority_queue_test_priority_update)
 {
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
@@ -99,8 +99,8 @@ CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_priority_update)
                 .val = rand() % (num_nodes + 1), /*NOLINT*/
                 .id = (int)i,
             });
-        CHECK(res != NULL, true);
-        CHECK(validate(&flat_priority_queue), true);
+        check(res != NULL, true);
+        check(validate(&flat_priority_queue), true);
     }
     int const limit = 400;
     for (size_t val = 0; val < num_nodes; ++val)
@@ -112,16 +112,16 @@ CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_priority_update)
             struct Val const *const updated
                 = update(&flat_priority_queue, cur, &(struct Val){}, val_update,
                          &backoff);
-            CHECK(updated != NULL, true);
-            CHECK(updated->val, backoff);
-            CHECK(validate(&flat_priority_queue), true);
+            check(updated != NULL, true);
+            check(updated->val, backoff);
+            check(validate(&flat_priority_queue), true);
         }
     }
-    CHECK(count(&flat_priority_queue).count, num_nodes);
-    CHECK_END_FN();
+    check(count(&flat_priority_queue).count, num_nodes);
+    check_end();
 }
 
-CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_priority_update_with)
+check_static_begin(flat_priority_queue_test_priority_update_with)
 {
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
@@ -141,8 +141,8 @@ CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_priority_update_with)
                 .val = rand() % (num_nodes + 1), /*NOLINT*/
                 .id = (int)i,
             });
-        CHECK(res != NULL, true);
-        CHECK(validate(&flat_priority_queue), true);
+        check(res != NULL, true);
+        check(validate(&flat_priority_queue), true);
     }
     int const limit = 400;
     for (size_t val = 0; val < num_nodes; ++val)
@@ -155,19 +155,19 @@ CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_priority_update_with)
                 {
                     T->val = backoff;
                 });
-            CHECK(updated != NULL, true);
-            CHECK(updated->val, backoff);
-            CHECK(validate(&flat_priority_queue), true);
+            check(updated != NULL, true);
+            check(updated->val, backoff);
+            check(validate(&flat_priority_queue), true);
         }
     }
-    CHECK(count(&flat_priority_queue).count, num_nodes);
-    CHECK_END_FN();
+    check(count(&flat_priority_queue).count, num_nodes);
+    check_end();
 }
 
 int
 main()
 {
-    return CHECK_RUN(flat_priority_queue_test_insert_iterate_pop(),
+    return check_run(flat_priority_queue_test_insert_iterate_pop(),
                      flat_priority_queue_test_priority_update(),
                      flat_priority_queue_test_priority_update_with(),
                      flat_priority_queue_test_priority_removal());

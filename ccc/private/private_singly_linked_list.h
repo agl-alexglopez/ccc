@@ -13,8 +13,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 @endcond */
-#ifndef CCC_IMPL_SINGLY_LINKED_LIST_H
-#define CCC_IMPL_SINGLY_LINKED_LIST_H
+#ifndef CCC_PRIVATE_SINGLY_LINKED_LIST_H
+#define CCC_PRIVATE_SINGLY_LINKED_LIST_H
 
 /** @cond */
 #include <assert.h>
@@ -125,4 +125,4 @@ CCC_private_singly_linked_list_push_front(struct CCC_Singly_linked_list *,
 
 /* NOLINTEND(readability-identifier-naming) */
 
-#endif /* CCC_IMPL_SINGLY_LINKED_LIST_H */
+#endif /* CCC_PRIVATE_SINGLY_LINKED_LIST_H */

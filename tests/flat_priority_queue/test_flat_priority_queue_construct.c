@@ -22,17 +22,17 @@ int_order(CCC_Type_comparator_context const order)
     return (a > b) - (a < b);
 }
 
-CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_empty)
+check_static_begin(flat_priority_queue_test_empty)
 {
     struct Val vals[2] = {};
     Flat_priority_queue priority_queue = flat_priority_queue_initialize(
         vals, struct Val, CCC_ORDER_LESSER, val_order, NULL, NULL,
         (sizeof(vals) / sizeof(struct Val)));
-    CHECK(flat_priority_queue_is_empty(&priority_queue), true);
-    CHECK_END_FN();
+    check(flat_priority_queue_is_empty(&priority_queue), true);
+    check_end();
 }
 
-CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_macro)
+check_static_begin(flat_priority_queue_test_macro)
 {
     struct Val vals[2] = {};
     Flat_priority_queue priority_queue = flat_priority_queue_initialize(
@@ -40,42 +40,42 @@ CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_macro)
         (sizeof(vals) / sizeof(struct Val)));
     struct Val *res = flat_priority_queue_emplace(
         &priority_queue, (struct Val){.val = 0, .id = 0});
-    CHECK(res != NULL, true);
-    CHECK(flat_priority_queue_is_empty(&priority_queue), false);
+    check(res != NULL, true);
+    check(flat_priority_queue_is_empty(&priority_queue), false);
     struct Val *res2 = flat_priority_queue_emplace(
         &priority_queue, (struct Val){.val = 0, .id = 0});
-    CHECK(res2 != NULL, true);
-    CHECK_END_FN();
+    check(res2 != NULL, true);
+    check_end();
 }
 
-CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_macro_grow)
+check_static_begin(flat_priority_queue_test_macro_grow)
 {
     Flat_priority_queue priority_queue = flat_priority_queue_initialize(
         NULL, struct Val, CCC_ORDER_LESSER, val_order, std_allocate, NULL, 0);
     struct Val *res = flat_priority_queue_emplace(
         &priority_queue, (struct Val){.val = 0, .id = 0});
-    CHECK(res != NULL, true);
-    CHECK(flat_priority_queue_is_empty(&priority_queue), false);
+    check(res != NULL, true);
+    check(flat_priority_queue_is_empty(&priority_queue), false);
     struct Val *res2 = flat_priority_queue_emplace(
         &priority_queue, (struct Val){.val = 0, .id = 0});
-    CHECK(res2 != NULL, true);
-    CHECK_END_FN(
+    check(res2 != NULL, true);
+    check_end(
         (void)CCC_flat_priority_queue_clear_and_free(&priority_queue, NULL););
 }
 
-CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_push)
+check_static_begin(flat_priority_queue_test_push)
 {
     struct Val vals[3] = {};
     Flat_priority_queue priority_queue = flat_priority_queue_initialize(
         vals, struct Val, CCC_ORDER_LESSER, val_order, NULL, NULL,
         (sizeof(vals) / sizeof(struct Val)));
     struct Val *res = push(&priority_queue, &vals[0], &(struct Val){});
-    CHECK(res != NULL, true);
-    CHECK(flat_priority_queue_is_empty(&priority_queue), false);
-    CHECK_END_FN();
+    check(res != NULL, true);
+    check(flat_priority_queue_is_empty(&priority_queue), false);
+    check_end();
 }
 
-CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_raw_type)
+check_static_begin(flat_priority_queue_test_raw_type)
 {
     int vals[4] = {};
     Flat_priority_queue priority_queue = flat_priority_queue_initialize(
@@ -83,17 +83,17 @@ CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_raw_type)
         (sizeof(vals) / sizeof(int)));
     int val = 1;
     int *res = push(&priority_queue, &val, &(int){0});
-    CHECK(res != NULL, true);
-    CHECK(flat_priority_queue_is_empty(&priority_queue), false);
+    check(res != NULL, true);
+    check(flat_priority_queue_is_empty(&priority_queue), false);
     res = flat_priority_queue_emplace(&priority_queue, -1);
-    CHECK(res != NULL, true);
-    CHECK(flat_priority_queue_count(&priority_queue).count, 2);
+    check(res != NULL, true);
+    check(flat_priority_queue_count(&priority_queue).count, 2);
     int *popped = front(&priority_queue);
-    CHECK(*popped, -1);
-    CHECK_END_FN();
+    check(*popped, -1);
+    check_end();
 }
 
-CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_heapify_initialize)
+check_static_begin(flat_priority_queue_test_heapify_initialize)
 {
     srand(time(NULL)); /* NOLINT */
     enum : size_t
@@ -114,13 +114,13 @@ CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_heapify_initialize)
     {
         int cur = *((int *)flat_priority_queue_front(&priority_queue));
         (void)pop(&priority_queue, &(int){0});
-        CHECK(cur >= prev, true);
+        check(cur >= prev, true);
         prev = cur;
     }
-    CHECK_END_FN();
+    check_end();
 }
 
-CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_heapify_copy)
+check_static_begin(flat_priority_queue_test_heapify_copy)
 {
     srand(time(NULL)); /* NOLINT */
     enum : size_t
@@ -135,23 +135,23 @@ CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_heapify_copy)
     {
         input[i] = rand_range(-99, 99); /* NOLINT */
     }
-    CHECK(flat_priority_queue_heapify(&priority_queue, &(int){0}, input,
+    check(flat_priority_queue_heapify(&priority_queue, &(int){0}, input,
                                       HEAPIFY_COPY_CAP, sizeof(int)),
           CCC_RESULT_OK);
-    CHECK(flat_priority_queue_count(&priority_queue).count, HEAPIFY_COPY_CAP);
+    check(flat_priority_queue_count(&priority_queue).count, HEAPIFY_COPY_CAP);
     int prev = *((int *)flat_priority_queue_front(&priority_queue));
     (void)pop(&priority_queue, &(int){0});
     while (!flat_priority_queue_is_empty(&priority_queue))
     {
         int cur = *((int *)flat_priority_queue_front(&priority_queue));
         (void)pop(&priority_queue, &(int){0});
-        CHECK(cur >= prev, true);
+        check(cur >= prev, true);
         prev = cur;
     }
-    CHECK_END_FN();
+    check_end();
 }
 
-CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_heapsort)
+check_static_begin(flat_priority_queue_test_heapsort)
 {
     enum : size_t
     {
@@ -169,20 +169,20 @@ CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_heapsort)
     CCC_Buffer const b
         = CCC_flat_priority_queue_heapsort(&priority_queue, &(int){0});
     int const *prev = begin(&b);
-    CHECK(prev != NULL, true);
-    CHECK(CCC_buffer_count(&b).count, HPSORTCAP);
+    check(prev != NULL, true);
+    check(CCC_buffer_count(&b).count, HPSORTCAP);
     size_t count = 1;
     for (int const *cur = next(&b, prev); cur != end(&b); cur = next(&b, cur))
     {
-        CHECK(*prev >= *cur, true);
+        check(*prev >= *cur, true);
         prev = cur;
         ++count;
     }
-    CHECK(count, HPSORTCAP);
-    CHECK_END_FN();
+    check(count, HPSORTCAP);
+    check_end();
 }
 
-CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_copy_no_allocate)
+check_static_begin(flat_priority_queue_test_copy_no_allocate)
 {
     Flat_priority_queue src = flat_priority_queue_initialize(
         (int[4]){}, int, CCC_ORDER_LESSER, int_order, NULL, NULL, 4);
@@ -191,25 +191,25 @@ CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_copy_no_allocate)
     (void)push(&src, &(int){0}, &(int){0});
     (void)push(&src, &(int){1}, &(int){0});
     (void)push(&src, &(int){2}, &(int){0});
-    CHECK(count(&src).count, 3);
-    CHECK(*(int *)front(&src), 0);
-    CHECK(is_empty(&dst), true);
+    check(count(&src).count, 3);
+    check(*(int *)front(&src), 0);
+    check(is_empty(&dst), true);
     CCC_Result res = flat_priority_queue_copy(&dst, &src, NULL);
-    CHECK(res, CCC_RESULT_OK);
-    CHECK(count(&dst).count, 3);
+    check(res, CCC_RESULT_OK);
+    check(count(&dst).count, 3);
     while (!is_empty(&src) && !is_empty(&dst))
     {
         int f1 = *(int *)front(&src);
         int f2 = *(int *)front(&dst);
         (void)pop(&src, &(int){0});
         (void)pop(&dst, &(int){0});
-        CHECK(f1, f2);
+        check(f1, f2);
     }
-    CHECK(is_empty(&src), is_empty(&dst));
-    CHECK_END_FN();
+    check(is_empty(&src), is_empty(&dst));
+    check_end();
 }
 
-CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_copy_no_allocate_fail)
+check_static_begin(flat_priority_queue_test_copy_no_allocate_fail)
 {
     Flat_priority_queue src = flat_priority_queue_initialize(
         (int[4]){}, int, CCC_ORDER_LESSER, int_order, NULL, NULL, 4);
@@ -218,15 +218,15 @@ CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_copy_no_allocate_fail)
     (void)push(&src, &(int){0}, &(int){0});
     (void)push(&src, &(int){1}, &(int){0});
     (void)push(&src, &(int){2}, &(int){0});
-    CHECK(count(&src).count, 3);
-    CHECK(*(int *)front(&src), 0);
-    CHECK(is_empty(&dst), true);
+    check(count(&src).count, 3);
+    check(*(int *)front(&src), 0);
+    check(is_empty(&dst), true);
     CCC_Result res = flat_priority_queue_copy(&dst, &src, NULL);
-    CHECK(res != CCC_RESULT_OK, true);
-    CHECK_END_FN();
+    check(res != CCC_RESULT_OK, true);
+    check_end();
 }
 
-CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_copy_allocate)
+check_static_begin(flat_priority_queue_test_copy_allocate)
 {
     Flat_priority_queue src = flat_priority_queue_initialize(
         NULL, int, CCC_ORDER_LESSER, int_order, std_allocate, NULL, 0);
@@ -235,27 +235,27 @@ CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_copy_allocate)
     (void)push(&src, &(int){0}, &(int){0});
     (void)push(&src, &(int){1}, &(int){0});
     (void)push(&src, &(int){2}, &(int){0});
-    CHECK(*(int *)front(&src), 0);
-    CHECK(is_empty(&dst), true);
+    check(*(int *)front(&src), 0);
+    check(is_empty(&dst), true);
     CCC_Result res = flat_priority_queue_copy(&dst, &src, std_allocate);
-    CHECK(res, CCC_RESULT_OK);
-    CHECK(count(&dst).count, 3);
+    check(res, CCC_RESULT_OK);
+    check(count(&dst).count, 3);
     while (!is_empty(&src) && !is_empty(&dst))
     {
         int f1 = *(int *)front(&src);
         int f2 = *(int *)front(&dst);
         (void)pop(&src, &(int){0});
         (void)pop(&dst, &(int){0});
-        CHECK(f1, f2);
+        check(f1, f2);
     }
-    CHECK(is_empty(&src), is_empty(&dst));
-    CHECK_END_FN({
+    check(is_empty(&src), is_empty(&dst));
+    check_end({
         (void)flat_priority_queue_clear_and_free(&src, NULL);
         (void)flat_priority_queue_clear_and_free(&dst, NULL);
     });
 }
 
-CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_copy_allocate_fail)
+check_static_begin(flat_priority_queue_test_copy_allocate_fail)
 {
     Flat_priority_queue src = flat_priority_queue_initialize(
         NULL, int, CCC_ORDER_LESSER, int_order, std_allocate, NULL, 0);
@@ -264,17 +264,17 @@ CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_copy_allocate_fail)
     (void)push(&src, &(int){0}, &(int){0});
     (void)push(&src, &(int){1}, &(int){0});
     (void)push(&src, &(int){2}, &(int){0});
-    CHECK(*(int *)front(&src), 0);
-    CHECK(is_empty(&dst), true);
+    check(*(int *)front(&src), 0);
+    check(is_empty(&dst), true);
     CCC_Result res = flat_priority_queue_copy(&dst, &src, NULL);
-    CHECK(res != CCC_RESULT_OK, true);
-    CHECK_END_FN({ (void)flat_priority_queue_clear_and_free(&src, NULL); });
+    check(res != CCC_RESULT_OK, true);
+    check_end({ (void)flat_priority_queue_clear_and_free(&src, NULL); });
 }
 
 int
 main()
 {
-    return CHECK_RUN(
+    return check_run(
         flat_priority_queue_test_empty(), flat_priority_queue_test_macro(),
         flat_priority_queue_test_macro_grow(), flat_priority_queue_test_push(),
         flat_priority_queue_test_raw_type(),

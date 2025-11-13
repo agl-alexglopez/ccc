@@ -14,32 +14,32 @@
 #include "types.h"
 #include "utility/allocate.h"
 
-CHECK_BEGIN_STATIC_FN(handle_realtime_ordered_map_test_insert_erase_shuffled)
+check_static_begin(handle_realtime_ordered_map_test_insert_erase_shuffled)
 {
     CCC_Handle_realtime_ordered_map s = handle_realtime_ordered_map_initialize(
         &(small_fixed_map){}, struct Val, id, id_order, NULL, NULL,
         SMALL_FIXED_CAP);
     size_t const size = 50;
     int const prime = 53;
-    CHECK(insert_shuffled(&s, size, prime), PASS);
+    check(insert_shuffled(&s, size, prime), CHECK_PASS);
     int sorted_check[50];
-    CHECK(inorder_fill(sorted_check, size, &s), size);
+    check(inorder_fill(sorted_check, size, &s), size);
     for (size_t i = 0; i + 1 < size; ++i)
     {
-        CHECK(sorted_check[i] <= sorted_check[i + 1], true);
+        check(sorted_check[i] <= sorted_check[i + 1], true);
     }
     /* Now let's delete everything with no errors. */
     for (size_t i = 0; i < size; ++i)
     {
         CCC_Handle const *const h = remove_r(&s, &(struct Val){.id = (int)i});
-        CHECK(occupied(h), true);
-        CHECK(validate(&s), true);
+        check(occupied(h), true);
+        check(validate(&s), true);
     }
-    CHECK(is_empty(&s), true);
-    CHECK_END_FN();
+    check(is_empty(&s), true);
+    check_end();
 }
 
-CHECK_BEGIN_STATIC_FN(handle_realtime_ordered_map_test_prime_shuffle)
+check_static_begin(handle_realtime_ordered_map_test_prime_shuffle)
 {
     CCC_Handle_realtime_ordered_map s = handle_realtime_ordered_map_initialize(
         &(small_fixed_map){}, struct Val, id, id_order, NULL, NULL,
@@ -60,20 +60,20 @@ CHECK_BEGIN_STATIC_FN(handle_realtime_ordered_map_test_prime_shuffle)
         {
             repeats[i] = true;
         }
-        CHECK(validate(&s), true);
+        check(validate(&s), true);
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
-    CHECK(handle_realtime_ordered_map_count(&s).count < size, true);
+    check(handle_realtime_ordered_map_count(&s).count < size, true);
     for (size_t i = 0; i < size; ++i)
     {
         CCC_Handle const *const e = remove_handle_r(handle_r(&s, &i));
-        CHECK(occupied(e) || repeats[i], true);
-        CHECK(validate(&s), true);
+        check(occupied(e) || repeats[i], true);
+        check(validate(&s), true);
     }
-    CHECK_END_FN();
+    check_end();
 }
 
-CHECK_BEGIN_STATIC_FN(handle_realtime_ordered_map_test_weak_srand)
+check_static_begin(handle_realtime_ordered_map_test_weak_srand)
 {
     CCC_Handle_realtime_ordered_map s = handle_realtime_ordered_map_initialize(
         &(standard_fixed_map){}, struct Val, id, id_order, NULL, NULL,
@@ -86,19 +86,19 @@ CHECK_BEGIN_STATIC_FN(handle_realtime_ordered_map_test_weak_srand)
         int const rand_i = rand(); /* NOLINT */
         (void)swap_handle(&s, &(struct Val){.id = rand_i, .val = i});
         id_keys[i] = rand_i;
-        CHECK(validate(&s), true);
+        check(validate(&s), true);
     }
     for (int i = 0; i < num_nodes; ++i)
     {
         CCC_Handle const h = CCC_remove(&s, &(struct Val){.id = id_keys[i]});
-        CHECK(occupied(&h), true);
-        CHECK(validate(&s), true);
+        check(occupied(&h), true);
+        check(validate(&s), true);
     }
-    CHECK(is_empty(&s), true);
-    CHECK_END_FN();
+    check(is_empty(&s), true);
+    check_end();
 }
 
-CHECK_BEGIN_STATIC_FN(
+check_static_begin(
     handle_realtime_ordered_map_test_insert_erase_cycles_no_allocate)
 {
     CCC_Handle_realtime_ordered_map s = handle_realtime_ordered_map_initialize(
@@ -112,31 +112,31 @@ CHECK_BEGIN_STATIC_FN(
         int const rand_i = rand(); /* NOLINT */
         (void)insert_or_assign(&s, &(struct Val){.id = rand_i, .val = i});
         id_keys[i] = rand_i;
-        CHECK(validate(&s), true);
+        check(validate(&s), true);
     }
     for (int i = 0; i < num_nodes / 2; ++i)
     {
         CCC_Handle h = CCC_remove(&s, &(struct Val){.id = id_keys[i]});
-        CHECK(occupied(&h), true);
-        CHECK(validate(&s), true);
+        check(occupied(&h), true);
+        check(validate(&s), true);
     }
     for (int i = 0; i < num_nodes / 2; ++i)
     {
         CCC_Handle h = insert_or_assign(&s, &(struct Val){.id = id_keys[i]});
-        CHECK(occupied(&h), false);
-        CHECK(validate(&s), true);
+        check(occupied(&h), false);
+        check(validate(&s), true);
     }
     for (int i = 0; i < num_nodes; ++i)
     {
         CCC_Handle h = CCC_remove(&s, &(struct Val){.id = id_keys[i]});
-        CHECK(occupied(&h), true);
-        CHECK(validate(&s), true);
+        check(occupied(&h), true);
+        check(validate(&s), true);
     }
-    CHECK(is_empty(&s), true);
-    CHECK_END_FN();
+    check(is_empty(&s), true);
+    check_end();
 }
 
-CHECK_BEGIN_STATIC_FN(
+check_static_begin(
     handle_realtime_ordered_map_test_insert_erase_cycles_allocate)
 {
     CCC_Handle_realtime_ordered_map s = handle_realtime_ordered_map_initialize(
@@ -149,34 +149,34 @@ CHECK_BEGIN_STATIC_FN(
         int const rand_i = rand(); /* NOLINT */
         (void)insert_or_assign(&s, &(struct Val){.id = rand_i, .val = i});
         id_keys[i] = rand_i;
-        CHECK(validate(&s), true);
+        check(validate(&s), true);
     }
     for (int i = 0; i < num_nodes / 2; ++i)
     {
         CCC_Handle h = CCC_remove(&s, &(struct Val){.id = id_keys[i]});
-        CHECK(occupied(&h), true);
-        CHECK(validate(&s), true);
+        check(occupied(&h), true);
+        check(validate(&s), true);
     }
     for (int i = 0; i < num_nodes / 2; ++i)
     {
         CCC_Handle h = insert_or_assign(&s, &(struct Val){.id = id_keys[i]});
-        CHECK(occupied(&h), false);
-        CHECK(validate(&s), true);
+        check(occupied(&h), false);
+        check(validate(&s), true);
     }
     for (int i = 0; i < num_nodes; ++i)
     {
         CCC_Handle h = CCC_remove(&s, &(struct Val){.id = id_keys[i]});
-        CHECK(occupied(&h), true);
-        CHECK(validate(&s), true);
+        check(occupied(&h), true);
+        check(validate(&s), true);
     }
-    CHECK(is_empty(&s), true);
-    CHECK_END_FN(handle_realtime_ordered_map_clear_and_free(&s, NULL););
+    check(is_empty(&s), true);
+    check_end(handle_realtime_ordered_map_clear_and_free(&s, NULL););
 }
 
 int
 main()
 {
-    return CHECK_RUN(
+    return check_run(
         handle_realtime_ordered_map_test_insert_erase_shuffled(),
         handle_realtime_ordered_map_test_prime_shuffle(),
         handle_realtime_ordered_map_test_weak_srand(),

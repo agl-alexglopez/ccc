@@ -12,7 +12,7 @@
 #include "utility/allocate.h"
 #include "utility/random.h"
 
-CHECK_BEGIN_STATIC_FN(flat_hash_map_test_erase)
+check_static_begin(flat_hash_map_test_erase)
 {
     CCC_Flat_hash_map fh = flat_hash_map_initialize(
         &(small_fixed_map){}, struct Val, key, flat_hash_map_int_zero,
@@ -20,29 +20,29 @@ CHECK_BEGIN_STATIC_FN(flat_hash_map_test_erase)
     struct Val query = {.key = 137, .val = 99};
     /* Nothing was there before so nothing is in the entry. */
     CCC_Entry ent = swap_entry(&fh, &query);
-    CHECK(occupied(&ent), false);
-    CHECK(unwrap(&ent) != NULL, true);
-    CHECK(count(&fh).count, 1);
+    check(occupied(&ent), false);
+    check(unwrap(&ent) != NULL, true);
+    check(count(&fh).count, 1);
     ent = CCC_remove(&fh, &query);
-    CHECK(occupied(&ent), true);
+    check(occupied(&ent), true);
     struct Val *v = unwrap(&ent);
-    CHECK(v != NULL, true);
-    CHECK(v->key, 137);
-    CHECK(v->val, 99);
-    CHECK(count(&fh).count, 0);
+    check(v != NULL, true);
+    check(v->key, 137);
+    check(v->val, 99);
+    check(count(&fh).count, 0);
     query.key = 101;
     ent = CCC_remove(&fh, &query);
-    CHECK(occupied(&ent), false);
-    CHECK(count(&fh).count, 0);
+    check(occupied(&ent), false);
+    check(count(&fh).count, 0);
     CCC_flat_hash_map_insert_entry_w(entry_r(&fh, &(int){137}),
                                      (struct Val){.key = 137, .val = 99});
-    CHECK(count(&fh).count, 1);
-    CHECK(occupied(remove_entry_r(entry_r(&fh, &(int){137}))), true);
-    CHECK(count(&fh).count, 0);
-    CHECK_END_FN();
+    check(count(&fh).count, 1);
+    check(occupied(remove_entry_r(entry_r(&fh, &(int){137}))), true);
+    check(count(&fh).count, 0);
+    check_end();
 }
 
-CHECK_BEGIN_STATIC_FN(flat_hash_map_test_shuffle_insert_erase)
+check_static_begin(flat_hash_map_test_shuffle_insert_erase)
 {
     CCC_Flat_hash_map h = flat_hash_map_initialize(
         NULL, struct Val, key, flat_hash_map_int_to_u64, flat_hash_map_id_order,
@@ -54,40 +54,40 @@ CHECK_BEGIN_STATIC_FN(flat_hash_map_test_shuffle_insert_erase)
     {
         struct Val *v = unwrap(flat_hash_map_insert_or_assign_w(
             &h, shuffle, (struct Val){.val = i}));
-        CHECK(v != NULL, true);
-        CHECK(v->key, shuffle);
-        CHECK(v->val, i);
-        CHECK(validate(&h), true);
+        check(v != NULL, true);
+        check(v->key, shuffle);
+        check(v->val, i);
+        check(validate(&h), true);
     }
-    CHECK(count(&h).count, to_insert);
+    check(count(&h).count, to_insert);
     size_t cur_size = count(&h).count;
     int i = 0;
     while (!is_empty(&h) && cur_size)
     {
-        CHECK(contains(&h, &i), true);
+        check(contains(&h, &i), true);
         if (i % 2)
         {
             struct Val const *const old_val
                 = unwrap(remove_r(&h, &(struct Val){.key = i}));
-            CHECK(old_val != NULL, true);
-            CHECK(old_val->key, i);
+            check(old_val != NULL, true);
+            check(old_val->key, i);
         }
         else
         {
             CCC_Entry removed = remove_entry(entry_r(&h, &i));
-            CHECK(occupied(&removed), true);
+            check(occupied(&removed), true);
         }
         --cur_size;
         ++i;
-        CHECK(count(&h).count, cur_size);
-        CHECK(validate(&h), true);
+        check(count(&h).count, cur_size);
+        check(validate(&h), true);
     }
-    CHECK(count(&h).count, 0);
-    CHECK_END_FN(flat_hash_map_clear_and_free(&h, NULL););
+    check(count(&h).count, 0);
+    check_end(flat_hash_map_clear_and_free(&h, NULL););
 }
 
 /* This test will force us to test our in place hashing algorithm. */
-CHECK_BEGIN_STATIC_FN(flat_hash_map_test_shuffle_erase_fixed)
+check_static_begin(flat_hash_map_test_shuffle_erase_fixed)
 {
     CCC_Flat_hash_map h = flat_hash_map_initialize(
         &(standard_fixed_map){}, struct Val, key, flat_hash_map_int_to_u64,
@@ -105,9 +105,9 @@ CHECK_BEGIN_STATIC_FN(flat_hash_map_test_shuffle_erase_fixed)
         {
             break;
         }
-        CHECK(v->key, to_insert[i]);
-        CHECK(v->val, i);
-        CHECK(validate(&h), true);
+        check(v->key, to_insert[i]);
+        check(v->val, i);
+        check(validate(&h), true);
         ++i;
     }
     while (1);
@@ -118,10 +118,10 @@ CHECK_BEGIN_STATIC_FN(flat_hash_map_test_shuffle_erase_fixed)
     {
         int const cur = to_insert[i];
         CCC_Tribool const check = contains(&h, &cur);
-        CHECK(check, true);
+        check(check, true);
         CCC_Entry removed = remove_entry(entry_r(&h, &cur));
-        CHECK(occupied(&removed), true);
-        CHECK(validate(&h), true);
+        check(occupied(&removed), true);
+        check(validate(&h), true);
     }
     i = 0;
     for (; i < (int)(full_size / 2); ++i)
@@ -129,38 +129,38 @@ CHECK_BEGIN_STATIC_FN(flat_hash_map_test_shuffle_erase_fixed)
         int const cur = to_insert[i];
         CCC_Entry const *const e
             = flat_hash_map_insert_or_assign_w(&h, cur, (struct Val){.val = i});
-        CHECK(occupied(e), false);
-        CHECK(validate(&h), true);
+        check(occupied(e), false);
+        check(validate(&h), true);
     }
-    CHECK(full_size, cur_size);
+    check(full_size, cur_size);
     i = 0;
     while (!is_empty(&h) && cur_size)
     {
         int const cur = to_insert[i];
         CCC_Tribool const check = contains(&h, &cur);
-        CHECK(check, true);
+        check(check, true);
         if (i % 2)
         {
             struct Val const *const old_val
                 = unwrap(remove_r(&h, &(struct Val){.key = cur}));
-            CHECK(old_val != NULL, true);
-            CHECK(old_val->key, to_insert[i]);
+            check(old_val != NULL, true);
+            check(old_val->key, to_insert[i]);
         }
         else
         {
             CCC_Entry removed = remove_entry(entry_r(&h, &cur));
-            CHECK(occupied(&removed), true);
+            check(occupied(&removed), true);
         }
         --cur_size;
         ++i;
-        CHECK(count(&h).count, cur_size);
-        CHECK(validate(&h), true);
+        check(count(&h).count, cur_size);
+        check(validate(&h), true);
     }
-    CHECK(count(&h).count, 0);
-    CHECK_END_FN();
+    check(count(&h).count, 0);
+    check_end();
 }
 
-CHECK_BEGIN_STATIC_FN(flat_hash_map_test_shuffle_erase_reserved)
+check_static_begin(flat_hash_map_test_shuffle_erase_reserved)
 {
     /* The map will be given dynamically reserved space but no ability to
        resize. All algorithms should function normally and in place rehashing
@@ -171,7 +171,7 @@ CHECK_BEGIN_STATIC_FN(flat_hash_map_test_shuffle_erase_reserved)
     int const test_amount = 896;
     CCC_Result const res_check
         = CCC_flat_hash_map_reserve(&h, test_amount, std_allocate);
-    CHECK(res_check, CCC_RESULT_OK);
+    check(res_check, CCC_RESULT_OK);
 
     /* Give ourselves plenty more to insert so we don't run out before cap. */
     int to_insert[1024];
@@ -187,9 +187,9 @@ CHECK_BEGIN_STATIC_FN(flat_hash_map_test_shuffle_erase_reserved)
         {
             break;
         }
-        CHECK(v->key, cur);
-        CHECK(v->val, i);
-        CHECK(validate(&h), true);
+        check(v->key, cur);
+        check(v->val, i);
+        check(validate(&h), true);
         ++i;
     }
     while (1);
@@ -200,10 +200,10 @@ CHECK_BEGIN_STATIC_FN(flat_hash_map_test_shuffle_erase_reserved)
     {
         int const cur = to_insert[i];
         CCC_Tribool const check = contains(&h, &cur);
-        CHECK(check, true);
+        check(check, true);
         CCC_Entry const removed = remove_entry(entry_r(&h, &cur));
-        CHECK(occupied(&removed), true);
-        CHECK(validate(&h), true);
+        check(occupied(&removed), true);
+        check(validate(&h), true);
     }
     i = 0;
     for (; i < (int)(full_size / 2); ++i)
@@ -211,39 +211,39 @@ CHECK_BEGIN_STATIC_FN(flat_hash_map_test_shuffle_erase_reserved)
         int const cur = to_insert[i];
         CCC_Entry const *const e
             = flat_hash_map_insert_or_assign_w(&h, cur, (struct Val){.val = i});
-        CHECK(occupied(e), false);
-        CHECK(validate(&h), true);
+        check(occupied(e), false);
+        check(validate(&h), true);
     }
-    CHECK(full_size, cur_size);
+    check(full_size, cur_size);
     i = 0;
     while (!is_empty(&h) && cur_size)
     {
         int const cur = to_insert[i];
         CCC_Tribool const check = contains(&h, &cur);
-        CHECK(check, true);
+        check(check, true);
         if (i % 2)
         {
             struct Val const *const old_val
                 = unwrap(remove_r(&h, &(struct Val){.key = cur}));
-            CHECK(old_val != NULL, true);
-            CHECK(old_val->key, to_insert[i]);
+            check(old_val != NULL, true);
+            check(old_val->key, to_insert[i]);
         }
         else
         {
             CCC_Entry removed = remove_entry(entry_r(&h, &cur));
-            CHECK(occupied(&removed), true);
+            check(occupied(&removed), true);
         }
         --cur_size;
         ++i;
-        CHECK(count(&h).count, cur_size);
-        CHECK(validate(&h), true);
+        check(count(&h).count, cur_size);
+        check(validate(&h), true);
     }
-    CHECK(count(&h).count, 0);
-    CHECK_END_FN((void)CCC_flat_hash_map_clear_and_free_reserve(&h, NULL,
-                                                                std_allocate););
+    check(count(&h).count, 0);
+    check_end((void)CCC_flat_hash_map_clear_and_free_reserve(&h, NULL,
+                                                             std_allocate););
 }
 
-CHECK_BEGIN_STATIC_FN(flat_hash_map_test_shuffle_erase_dynamic)
+check_static_begin(flat_hash_map_test_shuffle_erase_dynamic)
 {
     CCC_Flat_hash_map h = flat_hash_map_initialize(
         NULL, struct Val, key, flat_hash_map_int_to_u64, flat_hash_map_id_order,
@@ -257,9 +257,9 @@ CHECK_BEGIN_STATIC_FN(flat_hash_map_test_shuffle_erase_dynamic)
         int const cur = to_insert[inserted];
         struct Val const *const v = unwrap(flat_hash_map_insert_or_assign_w(
             &h, cur, (struct Val){.val = inserted}));
-        CHECK(v->key, to_insert[inserted]);
-        CHECK(v->val, inserted);
-        CHECK(validate(&h), true);
+        check(v->key, to_insert[inserted]);
+        check(v->val, inserted);
+        check(validate(&h), true);
     }
     size_t const full_size = count(&h).count;
     size_t cur_size = count(&h).count;
@@ -268,10 +268,10 @@ CHECK_BEGIN_STATIC_FN(flat_hash_map_test_shuffle_erase_dynamic)
     {
         int const cur = to_insert[i];
         CCC_Tribool const check = contains(&h, &cur);
-        CHECK(check, true);
+        check(check, true);
         CCC_Entry removed = remove_entry(entry_r(&h, &cur));
-        CHECK(occupied(&removed), true);
-        CHECK(validate(&h), true);
+        check(occupied(&removed), true);
+        check(validate(&h), true);
     }
     i = 0;
     for (; i < (int)(full_size / 2); ++i)
@@ -279,41 +279,41 @@ CHECK_BEGIN_STATIC_FN(flat_hash_map_test_shuffle_erase_dynamic)
         int const cur = to_insert[i];
         CCC_Entry const *const e
             = flat_hash_map_insert_or_assign_w(&h, cur, (struct Val){.val = i});
-        CHECK(occupied(e), false);
-        CHECK(validate(&h), true);
+        check(occupied(e), false);
+        check(validate(&h), true);
     }
-    CHECK(full_size, cur_size);
+    check(full_size, cur_size);
     i = 0;
     while (!is_empty(&h) && cur_size)
     {
         int const cur = to_insert[i];
         CCC_Tribool const check = contains(&h, &cur);
-        CHECK(check, true);
+        check(check, true);
         if (i % 2)
         {
             struct Val const *const old_val
                 = unwrap(remove_r(&h, &(struct Val){.key = cur}));
-            CHECK(old_val != NULL, true);
-            CHECK(old_val->key, to_insert[i]);
+            check(old_val != NULL, true);
+            check(old_val->key, to_insert[i]);
         }
         else
         {
             CCC_Entry removed = remove_entry(entry_r(&h, &cur));
-            CHECK(occupied(&removed), true);
+            check(occupied(&removed), true);
         }
         --cur_size;
         ++i;
-        CHECK(count(&h).count, cur_size);
-        CHECK(validate(&h), true);
+        check(count(&h).count, cur_size);
+        check(validate(&h), true);
     }
-    CHECK(count(&h).count, 0);
-    CHECK_END_FN(flat_hash_map_clear_and_free(&h, NULL););
+    check(count(&h).count, 0);
+    check_end(flat_hash_map_clear_and_free(&h, NULL););
 }
 
 int
 main()
 {
-    return CHECK_RUN(flat_hash_map_test_erase(),
+    return check_run(flat_hash_map_test_erase(),
                      flat_hash_map_test_shuffle_insert_erase(),
                      flat_hash_map_test_shuffle_erase_fixed(),
                      flat_hash_map_test_shuffle_erase_reserved(),

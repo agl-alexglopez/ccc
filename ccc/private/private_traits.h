@@ -13,8 +13,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 @endcond */
-#ifndef CCC_IMPL_TRAITS_H
-#define CCC_IMPL_TRAITS_H
+#ifndef CCC_PRIVATE_TRAITS_H
+#define CCC_PRIVATE_TRAITS_H
 
 /* NOLINTBEGIN */
 #include "../bitset.h"
@@ -937,4 +937,4 @@ limitations under the License.
         CCC_Realtime_ordered_map const *: CCC_realtime_ordered_map_validate)(  \
         (container_ptr))
 
-#endif /* CCC_IMPL_TRAITS_H */
+#endif /* CCC_PRIVATE_TRAITS_H */

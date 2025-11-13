@@ -146,7 +146,7 @@ CCC_ordered_map_entry(CCC_Ordered_map *const om, void const *const key)
     if (!om || !key)
     {
         return (CCC_Ordered_map_entry){
-            {.entry = {.stats = CCC_ENTRY_ARG_ERROR}}};
+            {.entry = {.stats = CCC_ENTRY_ARGUMENT_ERROR}}};
     }
     return (CCC_Ordered_map_entry){container_entry(om, key)};
 }
@@ -228,7 +228,7 @@ CCC_ordered_map_swap_entry(CCC_Ordered_map *const om,
 {
     if (!om || !key_val_handle || !tmp)
     {
-        return (CCC_Entry){{.stats = CCC_ENTRY_ARG_ERROR}};
+        return (CCC_Entry){{.stats = CCC_ENTRY_ARGUMENT_ERROR}};
     }
     void *const found = find(om, key_from_node(om, key_val_handle));
     if (found)
@@ -267,7 +267,7 @@ CCC_ordered_map_try_insert(CCC_Ordered_map *const om,
 {
     if (!om || !key_val_handle)
     {
-        return (CCC_Entry){{.stats = CCC_ENTRY_ARG_ERROR}};
+        return (CCC_Entry){{.stats = CCC_ENTRY_ARGUMENT_ERROR}};
     }
     void *const found = find(om, key_from_node(om, key_val_handle));
     if (found)
@@ -298,7 +298,7 @@ CCC_ordered_map_insert_or_assign(CCC_Ordered_map *const om,
 {
     if (!om || !key_val_handle)
     {
-        return (CCC_Entry){{.stats = CCC_ENTRY_ARG_ERROR}};
+        return (CCC_Entry){{.stats = CCC_ENTRY_ARGUMENT_ERROR}};
     }
     void *const found = find(om, key_from_node(om, key_val_handle));
     if (found)
@@ -331,7 +331,7 @@ CCC_ordered_map_remove(CCC_Ordered_map *const om,
 {
     if (!om || !out_handle)
     {
-        return (CCC_Entry){{.stats = CCC_ENTRY_ARG_ERROR}};
+        return (CCC_Entry){{.stats = CCC_ENTRY_ARGUMENT_ERROR}};
     }
     void *const n = erase(om, key_from_node(om, out_handle));
     if (!n)
@@ -366,7 +366,7 @@ CCC_ordered_map_remove_entry(CCC_Ordered_map_entry *const e)
 {
     if (!e)
     {
-        return (CCC_Entry){{.stats = CCC_ENTRY_ARG_ERROR}};
+        return (CCC_Entry){{.stats = CCC_ENTRY_ARGUMENT_ERROR}};
     }
     if (e->private.entry.stats == CCC_ENTRY_OCCUPIED && e->private.entry.e)
     {
@@ -440,7 +440,7 @@ CCC_ordered_map_occupied(CCC_Ordered_map_entry const *const e)
 CCC_Entry_status
 CCC_ordered_map_entry_status(CCC_Ordered_map_entry const *const e)
 {
-    return e ? e->private.entry.stats : CCC_ENTRY_ARG_ERROR;
+    return e ? e->private.entry.stats : CCC_ENTRY_ARGUMENT_ERROR;
 }
 
 void *

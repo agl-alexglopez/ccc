@@ -18,26 +18,27 @@ val_order(CCC_Type_comparator_context const c)
     return (a->val > b->val) - (a->val < b->val);
 }
 
-CHECK_BEGIN_FN(check_order, Singly_linked_list const *const singly_linked_list,
-               size_t const n, int const order[])
+check_begin(check_order, Singly_linked_list const *const singly_linked_list,
+            size_t const n, int const order[])
 {
     size_t i = 0;
     struct Val const *v = begin(singly_linked_list);
     for (; v != end(singly_linked_list) && i < n;
          v = next(singly_linked_list, &v->e), ++i)
     {
-        CHECK(v == NULL, false);
-        CHECK(v->val, order[i]);
+        check(v == NULL, false);
+        check(v->val, order[i]);
     }
-    CHECK(i, n);
-    CHECK_END_FN_FAIL({
-        (void)fprintf(stderr, "%sCHECK: (int[%zu]){", GREEN, n);
+    check(i, n);
+    check_fail_end({
+        (void)fprintf(stderr, "%sCHECK: (int[%zu]){", CHECK_GREEN, n);
         for (size_t j = 0; j < n; ++j)
         {
             (void)fprintf(stderr, "%d, ", order[j]);
         }
-        (void)fprintf(stderr, "}\n%s", NONE);
-        (void)fprintf(stderr, "%sERROR:%s (int[%zu]){", RED, GREEN, n);
+        (void)fprintf(stderr, "}\n%s", CHECK_NONE);
+        (void)fprintf(stderr, "%sCHECK_ERROR:%s (int[%zu]){", CHECK_RED,
+                      CHECK_GREEN, n);
         v = begin(singly_linked_list);
         for (size_t j = 0; j < n && v != end(singly_linked_list);
              ++j, v = next(singly_linked_list, &v->e))
@@ -48,29 +49,31 @@ CHECK_BEGIN_FN(check_order, Singly_linked_list const *const singly_linked_list,
             }
             if (order[j] == v->val)
             {
-                (void)fprintf(stderr, "%s%d, %s", GREEN, order[j], NONE);
+                (void)fprintf(stderr, "%s%d, %s", CHECK_GREEN, order[j],
+                              CHECK_NONE);
             }
             else
             {
-                (void)fprintf(stderr, "%s%d, %s", RED, v->val, NONE);
+                (void)fprintf(stderr, "%s%d, %s", CHECK_RED, v->val,
+                              CHECK_NONE);
             }
         }
         for (; v != end(singly_linked_list);
              v = next(singly_linked_list, &v->e))
         {
-            (void)fprintf(stderr, "%s%d, %s", RED, v->val, NONE);
+            (void)fprintf(stderr, "%s%d, %s", CHECK_RED, v->val, CHECK_NONE);
         }
-        (void)fprintf(stderr, "%s}\n%s", GREEN, NONE);
+        (void)fprintf(stderr, "%s}\n%s", CHECK_GREEN, CHECK_NONE);
     });
 }
 
-CHECK_BEGIN_FN(create_list, CCC_Singly_linked_list *const singly_linked_list,
-               size_t const n, struct Val vals[])
+check_begin(create_list, CCC_Singly_linked_list *const singly_linked_list,
+            size_t const n, struct Val vals[])
 {
     for (size_t i = 0; i < n; ++i)
     {
-        CHECK(push_front(singly_linked_list, &vals[i].e) == NULL, false);
+        check(push_front(singly_linked_list, &vals[i].e) == NULL, false);
     }
-    CHECK(validate(singly_linked_list), true);
-    CHECK_END_FN();
+    check(validate(singly_linked_list), true);
+    check_end();
 }

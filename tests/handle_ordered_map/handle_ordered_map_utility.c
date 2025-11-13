@@ -16,19 +16,19 @@ id_order(CCC_Key_comparator_context const order)
     return (key > c->id) - (key < c->id);
 }
 
-CHECK_BEGIN_FN(insert_shuffled, CCC_Handle_ordered_map *m, size_t const size,
-               int const larger_prime)
+check_begin(insert_shuffled, CCC_Handle_ordered_map *m, size_t const size,
+            int const larger_prime)
 {
     size_t shuffled_index = larger_prime % size;
     for (size_t i = 0; i < size; ++i)
     {
         (void)insert_or_assign(
             m, &(struct Val){.id = (int)shuffled_index, .val = (int)i});
-        CHECK(validate(m), true);
+        check(validate(m), true);
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
-    CHECK(count(m).count, size);
-    CHECK_END_FN();
+    check(count(m).count, size);
+    check_end();
 }
 
 /* Iterative inorder traversal to check the heap is sorted. */
