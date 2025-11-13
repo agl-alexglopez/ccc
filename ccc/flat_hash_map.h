@@ -22,7 +22,7 @@ moved, especially when rehashing occurs, so no pointer stability is available in
 this implementation.
 
 A flat hash map requires the user to provide a pointer to the map, a type, a key
-field, a hash function, and a key three way comparison function. The hash
+field, a hash function, and a key three way comparator function. The hash
 function should be well tailored to the key being stored in the table to prevent
 collisions. Good variety in the upper bits of the hashed value will also result
 in faster performance. Currently, the flat hash map does not offer any default
