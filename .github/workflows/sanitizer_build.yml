@@ -46,7 +46,7 @@ jobs:
 
     - name: Build Debug Sanitized Checks GCC
       run: |
-        cmake --preset=gcc-dsan && cmake --build build -j$(nproc) --target ccc tests
+        cmake --preset=gcc-sanitize-debug && cmake --build build -j$(nproc) --target ccc tests
     
     - name: Test Debug Sanitized
       run: |
@@ -55,8 +55,27 @@ jobs:
     - name: Build Release Sanitized Checks GCC
       run: |
         make clean
-        cmake --preset=gcc-rsan && cmake --build build -j$(nproc) --target ccc tests
+        cmake --preset=gcc-sanitize-release && cmake --build build -j$(nproc) --target ccc tests
         
     - name: Test Release Sanitized
+      run: |
+        make rtest
+
+    - name: Build Portable Debug Sanitized
+      run: |
+        cmake --preset=gcc-sanitize-debug -DCCC_FLAT_HASH_MAP_PORTABLE=ON && cmake --build build -j$(nproc) --target ccc tests
+        cmake --build build --target install
+    
+    - name: Test Portable Debug Sanitized
+      run: |
+        make dtest
+
+    - name: Build Portable Release Sanitized
+      run: |
+        make clean
+        cmake --preset=gcc-sanitize-release -DCCC_FLAT_HASH_MAP_PORTABLE=ON && cmake --build build -j$(nproc) --target ccc tests
+        cmake --build build --target install
+        
+    - name: Test Portable Release Sanitized
       run: |
         make rtest
