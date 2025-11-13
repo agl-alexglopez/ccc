@@ -1,5 +1,5 @@
 /** The words program is a simple word counter that aims to demonstrate
-the benefits of flexible memory layouts and auxiliary data.
+the benefits of flexible memory layouts and context data.
 
 Please specify a command as follows:
 ./build/[debug/]bin/words [flag] -f=[path/to/file]
@@ -123,15 +123,15 @@ static void print_top_n(FILE *file, int n);
 static void print_last_n(FILE *file, int n);
 static void print_alpha_n(FILE *file, int n);
 static void print_ralpha_n(FILE *file, int n);
-static Buffer copy_frequencies(handle_ordered_map const *map);
-static void print_n(handle_ordered_map *, CCC_Order, struct str_arena *, int n);
+static Buffer copy_frequencies(Handle_ordered_map const *map);
+static void print_n(Handle_ordered_map *, CCC_Order, struct str_arena *, int n);
 static struct int_conversion parse_n_ranks(str_view arg);
 
 /* String Helper Functions */
 static struct str_ofs clean_word(struct str_arena *, str_view wv);
 
 /* Container Functions */
-static handle_ordered_map create_frequency_map(struct str_arena *, FILE *);
+static Handle_ordered_map create_frequency_map(struct str_arena *, FILE *);
 static Order cmp_string_keys(Key_comparator_context);
 static Order cmp_words(Type_comparator_context);
 
@@ -270,19 +270,20 @@ print_found(FILE *const f, str_view w)
 {
     struct str_arena a = str_arena_create(ARENA_START_CAP);
     check(a.arena);
-    handle_ordered_map map = create_frequency_map(&a, f);
+    Handle_ordered_map map = create_frequency_map(&a, f);
     check(!is_empty(&map));
     struct str_ofs wc = clean_word(&a, w);
     if (!wc.error)
     {
-        Word const *const found_w = hom_at(&map, get_key_val(&map, &wc));
+        Word const *const found_w
+            = handle_ordered_map_at(&map, get_key_val(&map, &wc));
         if (found_w)
         {
             printf("%s %d\n", str_arena_at(&a, &found_w->ofs), found_w->freq);
         }
     }
     str_arena_free(&a);
-    (void)hom_clear_and_free(&map, NULL);
+    (void)handle_ordered_map_clear_and_free(&map, NULL);
 }
 
 static void
@@ -290,7 +291,7 @@ print_top_n(FILE *const f, int n)
 {
     struct str_arena a = str_arena_create(ARENA_START_CAP);
     check(a.arena);
-    handle_ordered_map map = create_frequency_map(&a, f);
+    Handle_ordered_map map = create_frequency_map(&a, f);
     check(!is_empty(&map));
     print_n(&map, CCC_ORDER_GREATER, &a, n);
     str_arena_free(&a);
@@ -302,9 +303,9 @@ print_last_n(FILE *const f, int n)
 {
     struct str_arena a = str_arena_create(ARENA_START_CAP);
     check(a.arena);
-    handle_ordered_map map = create_frequency_map(&a, f);
+    Handle_ordered_map map = create_frequency_map(&a, f);
     check(!is_empty(&map));
-    print_n(&map, CCC_ORDER_LESS, &a, n);
+    print_n(&map, CCC_ORDER_LESSER, &a, n);
     str_arena_free(&a);
     (void)clear_and_free(&map, NULL);
 }
@@ -314,7 +315,7 @@ print_alpha_n(FILE *const f, int n)
 {
     struct str_arena a = str_arena_create(ARENA_START_CAP);
     check(a.arena);
-    handle_ordered_map map = create_frequency_map(&a, f);
+    Handle_ordered_map map = create_frequency_map(&a, f);
     check(!is_empty(&map));
     if (!n)
     {
@@ -335,7 +336,7 @@ print_ralpha_n(FILE *const f, int n)
 {
     struct str_arena a = str_arena_create(ARENA_START_CAP);
     check(a.arena);
-    handle_ordered_map map = create_frequency_map(&a, f);
+    Handle_ordered_map map = create_frequency_map(&a, f);
     check(!is_empty(&map));
     if (!n)
     {
@@ -353,7 +354,7 @@ print_ralpha_n(FILE *const f, int n)
 }
 
 static buffer
-copy_frequencies(handle_ordered_map const *const map)
+copy_frequencies(Handle_ordered_map const *const map)
 {
     check(!is_empty(map));
     Buffer freqs = buffer_initialize(NULL, Word, std_alloc, NULL, 0);
@@ -371,23 +372,25 @@ copy_frequencies(handle_ordered_map const *const map)
 }
 
 static void
-print_n(CCC_handle_ordered_map *const map, CCC_Order const ord,
+print_n(CCC_Handle_ordered_map *const map, CCC_Order const ord,
         struct str_arena *const a, int n)
 {
     Buffer freqs = copy_frequencies(map);
     check(!buffer_is_empty(&freqs));
-    flat_priority_queue fpq
-        = fpq_heapify_initialize(begin(&freqs), Word, ord, cmp_words, NULL, a,
-                                 capacity(&freqs).count, count(&freqs).count);
-    check(count(&fpq).count == count(&freqs).count);
+    Flat_priority_queue flat_priority_queue
+        = flat_priority_queue_heapify_initialize(
+            begin(&freqs), Word, ord, cmp_words, NULL, a,
+            capacity(&freqs).count, count(&freqs).count);
+    check(count(&flat_priority_queue).count == count(&freqs).count);
     if (!n)
     {
-        n = count(&fpq).count;
+        n = count(&flat_priority_queue).count;
     }
     /* Because all CCC containers are complete they can be treated as copyable
        types like this. There is no opaque container in CCC. */
-    Buffer const sorted_freqs = CCC_fpq_heapsort(&fpq, &(Word){});
-    check(!fpq.buf.mem);
+    Buffer const sorted_freqs
+        = CCC_flat_priority_queue_heapsort(&flat_priority_queue, &(Word){});
+    check(!flat_priority_queue.buf.mem);
     int w = 0;
     /* Heap sort puts the root most nodes at the back of the buffer. */
     for (Word const *i = rbegin(&sorted_freqs);
@@ -404,14 +407,14 @@ print_n(CCC_handle_ordered_map *const map, CCC_Order const ord,
 
 /*=====================    Container Construction     =======================*/
 
-static handle_ordered_map
+static Handle_ordered_map
 create_frequency_map(struct str_arena *const a, FILE *const f)
 {
     char *lineptr = NULL;
     size_t len = 0;
     ptrdiff_t read = 0;
-    handle_ordered_map hom
-        = hom_initialize(NULL, Word, ofs, cmp_string_keys, std_alloc, a, 0);
+    Handle_ordered_map handle_ordered_map = handle_ordered_map_initialize(
+        NULL, Word, ofs, cmp_string_keys, std_alloc, a, 0);
     while ((read = getline(&lineptr, &len, f)) > 0)
     {
         str_view const line = {.s = lineptr, .len = read - 1};
@@ -422,16 +425,18 @@ create_frequency_map(struct str_arena *const a, FILE *const f)
             struct str_ofs const cw = clean_word(a, word_view);
             if (!cw.error)
             {
-                homap_handle const *e = handle_r(&hom, &cw);
-                e = hom_and_modify_w(e, Word, { T->freq++; });
-                Word const *const w = hom_at(
-                    &hom, hom_or_insert_w(e, (Word){.ofs = cw, .freq = 1}));
+                Handle_ordered_map_handle const *e
+                    = handle_r(&handle_ordered_map, &cw);
+                e = handle_ordered_map_and_modify_w(e, Word, { T->freq++; });
+                Word const *const w = handle_ordered_map_at(
+                    &handle_ordered_map, handle_ordered_map_or_insert_w(
+                                             e, (Word){.ofs = cw, .freq = 1}));
                 check(w);
             }
         }
     }
     free(lineptr);
-    return hom;
+    return handle_ordered_map;
 }
 
 static struct str_ofs
@@ -476,7 +481,7 @@ static Order
 cmp_string_keys(Key_comparator_context const c)
 {
     Word const *const w = c.any_type_rhs;
-    struct str_arena const *const a = c.aux;
+    struct str_arena const *const a = c.context;
     struct str_ofs const *const id = c.any_key_lhs;
     char const *const key_word = str_arena_at(a, id);
     char const *const struct_word = str_arena_at(a, &w->ofs);
@@ -496,14 +501,14 @@ cmp_words(Type_comparator_context const c)
     {
         return freq_cmp;
     }
-    struct str_arena const *const arena = c.aux;
+    struct str_arena const *const arena = c.context;
     char const *const lhs_word = str_arena_at(arena, &lhs->ofs);
     char const *const rhs_word = str_arena_at(arena, &rhs->ofs);
     check(lhs_word && rhs_word);
     int const res = strcmp(lhs_word, rhs_word);
     /* Looks like we have chosen wrong order to return but not so: greater
        lexicographic order is sorted first in a min priority queue or
-       CCC_ORDER_LESS in this case. */
+       CCC_ORDER_LESSER in this case. */
     return (res < 0) - (res > 0);
 }
 

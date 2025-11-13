@@ -1,5 +1,5 @@
-#ifndef CCC_FPQ_UTIL_H
-#define CCC_FPQ_UTIL_H
+#ifndef CCC_FLAT_PRIORITY_QUEUE_UTIL_H
+#define CCC_FLAT_PRIORITY_QUEUE_UTIL_H
 
 #include <stddef.h>
 
@@ -16,9 +16,9 @@ struct val
 CCC_Order val_cmp(CCC_Type_comparator_context);
 void val_update(CCC_Type_context);
 size_t rand_range(size_t min, size_t max);
-enum check_result inorder_fill(int[], size_t, CCC_flat_priority_queue const *);
-enum check_result insert_shuffled(CCC_flat_priority_queue *pq,
+enum check_result inorder_fill(int[], size_t, CCC_Flat_priority_queue const *);
+enum check_result insert_shuffled(CCC_Flat_priority_queue *priority_queue,
                                   struct val vals[], size_t size,
                                   int larger_prime);
 
-#endif /* CCC_FPQ_UTIL_H */
+#endif /* CCC_FLAT_PRIORITY_QUEUE_UTIL_H */

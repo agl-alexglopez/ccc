@@ -11,8 +11,8 @@ The leetcode lru problem in C. */
 
 #include "checkers.h"
 #include "doubly_linked_list.h"
-#include "fhmap/fhmap_util.h"
 #include "flat_hash_map.h"
+#include "flat_hash_map/flat_hash_map_util.h"
 #include "traits.h"
 #include "types.h"
 #include "util/alloc.h"
@@ -21,8 +21,8 @@ The leetcode lru problem in C. */
 
 struct lru_cache
 {
-    CCC_flat_hash_map fh;
-    CCC_doubly_linked_list l;
+    CCC_Flat_hash_map fh;
+    CCC_Doubly_linked_listl;
     size_t cap;
 };
 
@@ -30,7 +30,7 @@ struct key_val
 {
     int key;
     int val;
-    dll_elem list_elem;
+    doubly_linked_list_node list_node;
 };
 
 struct lru_lookup
@@ -90,7 +90,7 @@ cmp_by_key(CCC_Type_comparator_context const cmp)
 static struct key_val *
 lru_head(struct lru_cache *const lru)
 {
-    return dll_front(&lru->l);
+    return doubly_linked_list_front(&lru->l);
 }
 
 enum : size_t
@@ -104,24 +104,25 @@ static_assert(CAP * 1UL < SMALL_FIXED_CAP * 1UL);
    of the hash table and list. */
 static struct lru_cache lru_cache = {
     .cap = CAP,
-    .l = dll_initialize(lru_cache.l, struct key_val, list_elem, cmp_by_key,
-                        std_alloc, NULL),
-    .fh
-    = fhm_initialize(&(small_fixed_map){}, struct val, key, fhmap_int_to_u64,
-                     lru_lookup_cmp, NULL, NULL, SMALL_FIXED_CAP),
+    .l = doubly_linked_list_initialize(lru_cache.l, struct key_val, list_node,
+                                       cmp_by_key, std_alloc, NULL),
+    .fh = flat_hash_map_initialize(&(small_fixed_map){}, struct val, key,
+                                   flat_hash_map_int_to_u64, lru_lookup_cmp,
+                                   NULL, NULL, SMALL_FIXED_CAP),
 };
 
 CHECK_BEGIN_STATIC_FN(lru_put, struct lru_cache *const lru, int const key,
                       int const val)
 {
-    CCC_fhmap_entry *const ent = entry_r(&lru->fh, &key);
+    CCC_Flat_hash_map_entry *const ent = entry_r(&lru->fh, &key);
     if (occupied(ent))
     {
         struct lru_lookup const *const found = unwrap(ent);
         found->kv_in_list->key = key;
         found->kv_in_list->val = val;
-        CCC_Result r = dll_splice(&lru->l, dll_elem_begin(&lru->l), &lru->l,
-                                  &found->kv_in_list->list_elem);
+        CCC_Result r = doubly_linked_list_splice(
+            &lru->l, doubly_linked_list_node_begin(&lru->l), &lru->l,
+            &found->kv_in_list->list_node);
         CHECK(r, CCC_RESULT_OK);
     }
     else
@@ -129,7 +130,7 @@ CHECK_BEGIN_STATIC_FN(lru_put, struct lru_cache *const lru, int const key,
         struct lru_lookup *const new
             = insert_entry(ent, &(struct lru_lookup){.key = key});
         CHECK(new == NULL, false);
-        new->kv_in_list = dll_emplace_front(
+        new->kv_in_list = doubly_linked_list_emplace_front(
             &lru->l, (struct key_val){.key = key, .val = val});
         CHECK(new->kv_in_list == NULL, false);
         if (count(&lru->l).count > lru->cap)
@@ -155,8 +156,9 @@ CHECK_BEGIN_STATIC_FN(lru_get, struct lru_cache *const lru, int const key,
     }
     else
     {
-        CCC_Result r = dll_splice(&lru->l, dll_elem_begin(&lru->l), &lru->l,
-                                  &found->kv_in_list->list_elem);
+        CCC_Result r = doubly_linked_list_splice(
+            &lru->l, doubly_linked_list_node_begin(&lru->l), &lru->l,
+            &found->kv_in_list->list_node);
         CHECK(r, CCC_RESULT_OK);
         *val = found->kv_in_list->val;
     }
@@ -220,8 +222,8 @@ CHECK_BEGIN_STATIC_FN(run_lru_cache)
         }
     }
     CHECK_END_FN({
-        (void)CCC_fhm_clear_and_free(&lru_cache.fh, NULL);
-        (void)dll_clear(&lru_cache.l, NULL);
+        (void)CCC_flat_hash_map_clear_and_free(&lru_cache.fh, NULL);
+        (void)doubly_linked_list_clear(&lru_cache.l, NULL);
     });
 }
 

@@ -4,7 +4,7 @@
 
 #include "checkers.h"
 #include "handle_ordered_map.h"
-#include "homap_util.h"
+#include "handle_ordered_mapap_util.h"
 #include "traits.h"
 #include "types.h"
 
@@ -16,7 +16,7 @@ id_cmp(CCC_Key_comparator_context const cmp)
     return (key > c->id) - (key < c->id);
 }
 
-CHECK_BEGIN_FN(insert_shuffled, CCC_handle_ordered_map *m, size_t const size,
+CHECK_BEGIN_FN(insert_shuffled, CCC_Handle_ordered_map *m, size_t const size,
                int const larger_prime)
 {
     size_t shuffled_index = larger_prime % size;
@@ -33,7 +33,7 @@ CHECK_BEGIN_FN(insert_shuffled, CCC_handle_ordered_map *m, size_t const size,
 
 /* Iterative inorder traversal to check the heap is sorted. */
 size_t
-inorder_fill(int vals[], size_t size, CCC_handle_ordered_map const *const m)
+inorder_fill(int vals[], size_t size, CCC_Handle_ordered_map const *const m)
 {
     if (count(m).count != size)
     {

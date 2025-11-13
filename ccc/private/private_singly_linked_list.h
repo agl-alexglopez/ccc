@@ -29,10 +29,10 @@ limitations under the License.
 linked list. Supports O(1) insert and delete at the front. Elements always have
 a valid element to point to in the list due to the user of a sentinel so these
 pointers are never NULL if an element is in the list. */
-struct CCC_sll_elem
+struct CCC_Singly_linked_list_node
 {
     /** @private The next element. Non-null if elem is in list. */
-    struct CCC_sll_elem *n;
+    struct CCC_Singly_linked_list_node *n;
 };
 
 /** @private A singly linked list is a good stack based abstraction for push
@@ -44,71 +44,79 @@ support O(1) push and pop at the front see the flat double ended queue. However,
 there are some specific abstractions that someone could hack on top of this
 list, either on top of or by hacking on the provided implementation
 (non-blocking linked list, concurrent hash table, etc). */
-struct CCC_sll
+struct CCC_Singly_linked_list
 {
     /** @private The sentinel with storage in the actual list struct. */
-    struct CCC_sll_elem nil;
+    struct CCC_Singly_linked_list_node nil;
     /** @private The number of elements constantly tracked for O(1) check. */
     size_t count;
     /** @private The size in bytes of the type which wraps this handle. */
     size_t sizeof_type;
     /** @private The offset in bytes of the intrusive element in user type. */
-    size_t sll_elem_offset;
+    size_t singly_linked_list_node_offset;
     /** @private The user provided comparison callback for sorting. */
-    CCC_Type_comparison_context_fn *cmp;
+    CCC_Type_comparator_context *cmp;
     /** @private The user provided allocation function, if any. */
     CCC_Allocator *alloc;
-    /** @private User provided auxiliary data, if any. */
-    void *aux;
+    /** @private User provided context data, if any. */
+    void *context;
 };
 
 /*=========================   Private Interface  ============================*/
 
 /** @private */
-void CCC_private_sll_push_front(struct CCC_sll *, struct CCC_sll_elem *);
+void
+CCC_private_singly_linked_list_push_front(struct CCC_Singly_linked_list *,
+                                          struct CCC_Singly_linked_list_node *);
 
 /*======================   Macro Implementations     ========================*/
 
 /** @private */
-#define CCC_private_sll_initialize(private_sll_name, private_struct_name,      \
-                                   private_sll_elem_field, private_cmp_fn,     \
-                                   private_alloc_fn, private_aux_data)         \
+#define CCC_private_singly_linked_list_initialize(                             \
+    private_singly_linked_list_name, private_struct_name,                      \
+    private_singly_linked_list_node_field, private_cmp_fn, private_alloc_fn,   \
+    private_context_data)                                                      \
     {                                                                          \
-        .nil.n = &(private_sll_name).nil,                                      \
+        .nil.n = &(private_singly_linked_list_name).nil,                       \
         .sizeof_type = sizeof(private_struct_name),                            \
-        .sll_elem_offset                                                       \
-        = offsetof(private_struct_name, private_sll_elem_field),               \
+        .singly_linked_list_node_offset = offsetof(                            \
+            private_struct_name, private_singly_linked_list_node_field),       \
         .count = 0,                                                            \
         .alloc = (private_alloc_fn),                                           \
         .cmp = (private_cmp_fn),                                               \
-        .aux = (private_aux_data),                                             \
+        .context = (private_context_data),                                     \
     }
 
 /** @private */
-#define CCC_private_sll_emplace_front(list_ptr, struct_initializer...)         \
+#define CCC_private_singly_linked_list_emplace_front(list_ptr,                 \
+                                                     struct_initializer...)    \
     (__extension__({                                                           \
-        typeof(struct_initializer) *private_sll_res = NULL;                    \
-        struct CCC_sll *private_sll = (list_ptr);                              \
-        if (private_sll)                                                       \
+        typeof(struct_initializer) *private_singly_linked_list_res = NULL;     \
+        struct CCC_Singly_linked_list *private_singly_linked_list              \
+            = (list_ptr);                                                      \
+        if (private_singly_linked_list)                                        \
         {                                                                      \
-            if (!private_sll->alloc)                                           \
+            if (!private_singly_linked_list->alloc)                            \
             {                                                                  \
-                private_sll_res = NULL;                                        \
+                private_singly_linked_list_res = NULL;                         \
             }                                                                  \
             else                                                               \
             {                                                                  \
-                private_sll_res                                                \
-                    = private_sll->alloc(NULL, private_sll->sizeof_type);      \
-                if (private_sll_res)                                           \
+                private_singly_linked_list_res                                 \
+                    = private_singly_linked_list->alloc(                       \
+                        NULL, private_singly_linked_list->sizeof_type);        \
+                if (private_singly_linked_list_res)                            \
                 {                                                              \
-                    *private_sll_res = struct_initializer;                     \
-                    CCC_private_sll_push_front(                                \
-                        private_sll,                                           \
-                        CCC_sll_elem_in(private_sll, private_sll_res));        \
+                    *private_singly_linked_list_res = struct_initializer;      \
+                    CCC_private_singly_linked_list_push_front(                 \
+                        private_singly_linked_list,                            \
+                        CCC_singly_linked_list_node_in(                        \
+                            private_singly_linked_list,                        \
+                            private_singly_linked_list_res));                  \
                 }                                                              \
             }                                                                  \
         }                                                                      \
-        private_sll_res;                                                       \
+        private_singly_linked_list_res;                                        \
     }))
 
 /* NOLINTEND(readability-identifier-naming) */

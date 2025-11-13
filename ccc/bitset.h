@@ -131,7 +131,7 @@ interface. */
 /** @brief Initialize the bit set with memory and allocation permissions.
 @param [in] bitblock_ptr the pointer to existing blocks or NULL.
 @param [in] alloc_fn the allocation function for a dynamic bit set or NULL.
-@param [in] aux auxiliary data needed for allocation of the bit set.
+@param [in] context context data needed for allocation of the bit set.
 @param [in] cap the number of bits that will be stored in this bit set.
 @param [in] optional_size an optional starting size <= capacity. This value
 defaults to the same value as capacity which is appropriate for most cases. For
@@ -149,31 +149,31 @@ A fixed size bit set with size equal to capacity.
 
 ```
 #define BITSET_USING_NAMESPACE_CCC
-bitset bs = bitset_initialize(bitset_blocks(9), NULL, NULL, 9);
+Bitset bs = bitset_initialize(bitset_blocks(9), NULL, NULL, 9);
 ```
 A fixed size bit set with dynamic push and pop.
 
 ```
 #define BITSET_USING_NAMESPACE_CCC
-bitset bs = bitset_initialize(bitset_blocks(9), NULL, NULL, 9, 0);
+Bitset bs = bitset_initialize(bitset_blocks(9), NULL, NULL, 9, 0);
 ```
 
 A dynamic bit set initialization.
 
 ```
 #define BITSET_USING_NAMESPACE_CCC
-bitset bs = bitset_initialize(NULL, std_alloc, NULL, 0);
+Bitset bs = bitset_initialize(NULL, std_alloc, NULL, 0);
 ```
 
 See types.h for more on allocation functions. */
-#define CCC_bitset_initialize(bitblock_ptr, alloc_fn, aux, cap,                \
+#define CCC_bitset_initialize(bitblock_ptr, alloc_fn, context, cap,            \
                               optional_size...)                                \
-    CCC_private_bitset_initialize(bitblock_ptr, alloc_fn, aux, cap,            \
+    CCC_private_bitset_initialize(bitblock_ptr, alloc_fn, context, cap,        \
                                   optional_size)
 
 /** @brief Initialize the bit set with a custom input string.
 @param [in] alloc_fn the allocation function for the dynamic bit set.
-@param [in] aux auxiliary data needed for allocation of the bit set.
+@param [in] context context data needed for allocation of the bit set.
 @param [in] start_string_index the index of the input string to start reading
 is CCC_Tribool input.
 @param [in] count number of characters to read from start_string_index.
@@ -197,25 +197,25 @@ A dynamic bit set with input string pushed.
 
 ```
 #define BITSET_USING_NAMESPACE_CCC
-bitset bs = bitset_from(std_alloc, NULL, 0, 4, '1', "1011");
+Bitset bs = bitset_from(std_alloc, NULL, 0, 4, '1', "1011");
 ```
 A dynamic bit set that allocates greater capacity.
 
 ```
 #define BITSET_USING_NAMESPACE_CCC
-bitset bs = bitset_from(std_alloc, NULL, 0, 4, 'A', "GCAT", 4096);
+Bitset bs = bitset_from(std_alloc, NULL, 0, 4, 'A', "GCAT", 4096);
 ```
 
 This initializer is only available to dynamic bit sets due to the inability to
 run such input code at compile time. */
-#define CCC_bitset_from(alloc_fn, aux, start_string_index, count, bit_on_char, \
-                        input_string, optional_capacity...)                    \
-    CCC_private_bitset_from(alloc_fn, aux, start_string_index, count,          \
+#define CCC_bitset_from(alloc_fn, context, start_string_index, count,          \
+                        bit_on_char, input_string, optional_capacity...)       \
+    CCC_private_bitset_from(alloc_fn, context, start_string_index, count,      \
                             bit_on_char, input_string, optional_capacity)
 
 /** @brief Initialize the bit set with a starting capacity and size at runtime.
 @param [in] alloc_fn the allocation function for a dynamic bit.
-@param [in] aux auxiliary data needed for allocation of the bit set.
+@param [in] context context data needed for allocation of the bit set.
 @param [in] capacity the number of bits that will be stored in this bit set.
 @param [in] optional_size an optional starting size <= capacity. This value
 defaults to the same value as capacity which is appropriate for most cases. For
@@ -230,7 +230,7 @@ A fixed size bit set with size equal to capacity.
 int
 main(void)
 {
-    bitset bs = bitset_with_capacity(std_alloc, NULL, 4096);
+    Bitset bs = bitset_with_capacity(std_alloc, NULL, 4096);
 }
 ```
 A bit set with dynamic push and pop.
@@ -240,14 +240,15 @@ A bit set with dynamic push and pop.
 int
 main(void)
 {
-    bitset bs = bitset_with_capacity(std_alloc, NULL, 4096, 0);
+    Bitset bs = bitset_with_capacity(std_alloc, NULL, 4096, 0);
 }
 ```
 
 This initialization can only be used at runtime. See the normal initializer for
 static and stack based initialization options. */
-#define CCC_bitset_with_capacity(alloc_fn, aux, capacity, optional_size...)    \
-    CCC_private_bitset_with_capacity(alloc_fn, aux, capacity, optional_size)
+#define CCC_bitset_with_capacity(alloc_fn, context, capacity,                  \
+                                 optional_size...)                             \
+    CCC_private_bitset_with_capacity(alloc_fn, context, capacity, optional_size)
 
 /** @brief Copy the bit set at source to destination.
 @param [in] dst the initialized destination for the copy of the src set.
@@ -269,8 +270,8 @@ Manual memory management with no allocation function provided.
 
 ```
 #define BITSET_USING_NAMESPACE_CCC
-static bitset src = bitset_initialize(bitset_blocks(11, static), NULL, NULL,
-11); set_rand_bits(&src); static bitset src =
+static Bitset src = bitset_initialize(bitset_blocks(11, static), NULL, NULL,
+11); set_rand_bits(&src); static Bitset src =
 bitset_initialize(bitset_blocks(13, static), NULL, NULL, 13); CCC_Result res =
 bitset_copy(&dst, &src, NULL);
 ```
@@ -280,9 +281,9 @@ Here is memory management handed over to the copy function.
 
 ```
 #define BITSET_USING_NAMESPACE_CCC
-static bitset src = bitset_initialize(NULL, std_alloc, NULL, 0);
+static Bitset src = bitset_initialize(NULL, std_alloc, NULL, 0);
 push_rand_bits(&src);
-static bitset src = bitset_initialize(NULL, std_alloc, NULL, 0);
+static Bitset src = bitset_initialize(NULL, std_alloc, NULL, 0);
 CCC_Result res = bitset_copy(&dst, &src, std_alloc);
 ```
 
@@ -293,9 +294,9 @@ size map.
 
 ```
 #define BITSET_USING_NAMESPACE_CCC
-static bitset src = bitset_initialize(NULL, std_alloc, NULL, 0);
+static Bitset src = bitset_initialize(NULL, std_alloc, NULL, 0);
 push_rand_bits(&src);
-static bitset src = bitset_initialize(NULL, NULL, NULL, 0);
+static Bitset src = bitset_initialize(NULL, NULL, NULL, 0);
 CCC_Result res = bitset_copy(&dst, &src, std_alloc);
 ```
 
@@ -758,7 +759,7 @@ CCC_Result CCC_bitset_xor(CCC_Bitset *dst, CCC_Bitset const *src);
 @param [in] bs a pointer to the bit set.
 @param [in] left_shifts the number of left shifts to perform.
 @return an ok result if the operation was successful or an
-error if the bitset is NULL.
+error if the Bitset is NULL.
 
 Note that if the number of shifts is greater than the bit set
 size the bit set is zeroed out rather than exhibiting undefined
@@ -769,7 +770,7 @@ CCC_Result CCC_bitset_shiftl(CCC_Bitset *bs, size_t left_shifts);
 @param [in] bs a pointer to the bit set.
 @param [in] right_shifts the number of right shifts to perform.
 @return an ok result if the operation was successful or an
-error if the bitset is NULL.
+error if the Bitset is NULL.
 
 Note that if the number of shifts is greater than the bit set
 size the bit set is zeroed out rather than exhibiting undefined
@@ -927,7 +928,7 @@ CCC_Result CCC_bitset_clear_and_free(CCC_Bitset *bs);
 dynamically reserved with the reserve function.
 @param [in] bs the bs to be cleared.
 @param [in] fn the required allocation function to provide to a
-dynamically reserved bs. Any auxiliary data provided upon
+dynamically reserved bs. Any context data provided upon
 initialization will be passed to the allocation function when
 called.
 @return the result of free operation. OK if success, or an

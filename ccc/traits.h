@@ -172,7 +172,7 @@ See container documentation for specific behavior. */
 
 /** @brief Modify an entry if Occupied.
 @param [in] entry_ptr a pointer to the container.
-@param [in] mod_fn a modification function that does not need aux.
+@param [in] mod_fn a modification function that does not need context.
 @return a reference to the modified entry if Occupied or original if Vacant.
 
 See container documentation for specific behavior. */
@@ -182,12 +182,12 @@ See container documentation for specific behavior. */
 /** @brief Modify an entry if Occupied.
 @param [in] entry_ptr a pointer to the container.
 @param [in] mod_fn a modification function.
-@param [in] aux_args auxiliary data for mod_fn.
+@param [in] context_args context data for mod_fn.
 @return a reference to the modified entry if Occupied or original if Vacant.
 
 See container documentation for specific behavior. */
-#define CCC_and_modify_aux(entry_ptr, mod_fn, aux_args...)                     \
-    CCC_private_and_modify_aux(entry_ptr, mod_fn, aux_args)
+#define CCC_and_modify_context(entry_ptr, mod_fn, context_args...)             \
+    CCC_private_and_modify_context(entry_ptr, mod_fn, context_args)
 
 /** @brief Insert new element or overwrite old element.
 @param [in] entry_ptr a pointer to the container.
@@ -638,7 +638,7 @@ See container documentation for specific behavior. */
 #    define insert_entry(args...) CCC_insert_entry(args)
 #    define insert_handle(args...) CCC_insert_handle(args)
 #    define and_modify(args...) CCC_and_modify(args)
-#    define and_modify_aux(args...) CCC_and_modify_aux(args)
+#    define and_modify_context(args...) CCC_and_modify_context(args)
 #    define occupied(args...) CCC_occupied(args)
 #    define insert_error(args...) CCC_insert_error(args)
 #    define unwrap(args...) CCC_unwrap(args)

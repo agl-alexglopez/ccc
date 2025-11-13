@@ -53,7 +53,7 @@ insert, and erase and pointer stability.
 
 An ordered map can be initialized on the stack, heap, or data segment at
 runtime or compile time.*/
-typedef struct CCC_omap CCC_ordered_map;
+typedef struct CCC_Ordered_map CCC_Ordered_map;
 
 /** @brief The intrusive element for the user defined struct being stored in the
 map.
@@ -62,13 +62,13 @@ Note that if allocation is not permitted, insertions functions accepting this
 type as an argument assume it to exist in pre-allocated memory that will exist
 with the appropriate lifetime and scope for the user's needs; the container does
 not allocate or free in this case. */
-typedef struct CCC_omap_elem CCC_omap_elem;
+typedef struct CCC_Ordered_map_node CCC_Ordered_map_node;
 
 /** @brief A container specific entry used to implement the Entry Interface.
 
 The Entry Interface offers efficient search and subsequent insertion, deletion,
 or value update based on the needs of the user. */
-typedef union CCC_omap_entry CCC_omap_entry;
+typedef union CCC_Ordered_map_entry CCC_Ordered_map_entry;
 
 /**@}*/
 
@@ -79,17 +79,17 @@ Initialize the container with memory, callbacks, and permissions. */
 /** @brief Initializes the ordered map at runtime or compile time.
 @param [in] om_name the name of the ordered map being initialized.
 @param [in] struct_name the user type wrapping the intrusive element.
-@param [in] om_elem_field the name of the intrusive map elem field.
-@param [in] key_elem_field the name of the field in user type used as key.
+@param [in] om_node_field the name of the intrusive map elem field.
+@param [in] key_node_field the name of the field in user type used as key.
 @param [in] key_cmp the key comparison function (see types.h).
 @param [in] alloc_fn the allocation function or NULL if allocation is banned.
-@param [in] aux a pointer to any auxiliary data for comparison or destruction.
+@param [in] context a pointer to any context data for comparison or destruction.
 @return the struct initialized ordered map for direct assignment
-(i.e. CCC_ordered_map m = CCC_om_initialize(...);). */
-#define CCC_om_initialize(om_name, struct_name, om_elem_field, key_elem_field, \
-                          key_cmp, alloc_fn, aux)                              \
-    CCC_private_om_initialize(om_name, struct_name, om_elem_field,             \
-                              key_elem_field, key_cmp, alloc_fn, aux)
+(i.e. CCC_Ordered_map m = CCC_om_initialize(...);). */
+#define CCC_om_initialize(om_name, struct_name, om_node_field, key_node_field, \
+                          key_cmp, alloc_fn, context)                          \
+    CCC_private_om_initialize(om_name, struct_name, om_node_field,             \
+                              key_node_field, key_cmp, alloc_fn, context)
 
 /**@}*/
 
@@ -102,13 +102,13 @@ Test membership or obtain references to stored user types directly. */
 @param [in] key pointer to the key matching the key type of the user struct.
 @return true if the struct containing key is stored, false if not. Error if om
 or key is NULL. */
-[[nodiscard]] CCC_Tribool CCC_om_contains(CCC_ordered_map *om, void const *key);
+[[nodiscard]] CCC_Tribool CCC_om_contains(CCC_Ordered_map *om, void const *key);
 
 /** @brief Returns a reference into the map at entry key.
 @param [in] om the ordered map to search.
 @param [in] key the key to search matching stored key type.
 @return a view of the map entry if it is present, else NULL. */
-[[nodiscard]] void *CCC_om_get_key_val(CCC_ordered_map *om, void const *key);
+[[nodiscard]] void *CCC_om_get_key_val(CCC_Ordered_map *om, void const *key);
 
 /**@}*/
 
@@ -129,9 +129,9 @@ is needed but allocation fails or has been forbidden, an insert error is set.
 
 Note that this function may write to the struct containing tmp and wraps it in
 an entry to provide information about the old value. */
-[[nodiscard]] CCC_Entry CCC_om_swap_entry(CCC_ordered_map *om,
-                                          CCC_omap_elem *key_val_handle,
-                                          CCC_omap_elem *tmp);
+[[nodiscard]] CCC_Entry CCC_om_swap_entry(CCC_Ordered_map *om,
+                                          CCC_Ordered_map_node *key_val_handle,
+                                          CCC_Ordered_map_node *tmp);
 
 /** @brief Invariantly inserts the key value wrapping key_val_handle_ptr.
 @param [in] ordered_map_ptr the pointer to the ordered map.
@@ -160,8 +160,8 @@ in an entry to provide information about the old value. */
 user type in the map and may be unwrapped. If Vacant the entry contains a
 reference to the newly inserted entry in the map. If more space is needed but
 allocation fails, an insert error is set. */
-[[nodiscard]] CCC_Entry CCC_om_try_insert(CCC_ordered_map *om,
-                                          CCC_omap_elem *key_val_handle);
+[[nodiscard]] CCC_Entry CCC_om_try_insert(CCC_Ordered_map *om,
+                                          CCC_Ordered_map_node *key_val_handle);
 
 /** @brief Attempts to insert the key value wrapping key_val_handle.
 @param [in] ordered_map_ptr the pointer to the map.
@@ -203,8 +203,9 @@ Vacant no prior map entry existed.
 
 Note that this function can be used when the old user type is not needed but
 the information regarding its presence is helpful. */
-[[nodiscard]] CCC_Entry CCC_om_insert_or_assign(CCC_ordered_map *om,
-                                                CCC_omap_elem *key_val_handle);
+[[nodiscard]] CCC_Entry
+CCC_om_insert_or_assign(CCC_Ordered_map *om,
+                        CCC_Ordered_map_node *key_val_handle);
 
 /** @brief Inserts a new key value pair or overwrites the existing entry.
 @param [in] ordered_map_ptr the pointer to the flat hash map.
@@ -239,8 +240,8 @@ If allocation has been prohibited upon initialization then the entry returned
 contains the previously stored user type, if any, and nothing is written to
 the out_handle. It is then the user's responsibility to manage their previously
 stored memory as they see fit. */
-[[nodiscard]] CCC_Entry CCC_om_remove(CCC_ordered_map *om,
-                                      CCC_omap_elem *out_handle);
+[[nodiscard]] CCC_Entry CCC_om_remove(CCC_Ordered_map *om,
+                                      CCC_Ordered_map_node *out_handle);
 
 /** @brief Removes the key value in the map storing the old value, if present,
 in the struct containing out_handle provided by the user.
@@ -277,7 +278,8 @@ where in the map such an element should be inserted.
 
 An entry is rarely useful on its own. It should be passed in a functional style
 to subsequent calls in the Entry Interface. */
-[[nodiscard]] CCC_omap_entry CCC_om_entry(CCC_ordered_map *om, void const *key);
+[[nodiscard]] CCC_Ordered_map_entry CCC_om_entry(CCC_Ordered_map *om,
+                                                 void const *key);
 
 /** @brief Obtains an entry for the provided key in the map for future use.
 @param [in] ordered_map_ptr the map to be searched.
@@ -295,33 +297,34 @@ where in the map such an element should be inserted.
 An entry is rarely useful on its own. It should be passed in a functional style
 to subsequent calls in the Entry Interface. */
 #define CCC_om_entry_r(ordered_map_ptr, key_ptr)                               \
-    &(CCC_omap_entry)                                                          \
+    &(CCC_Ordered_map_entry)                                                   \
     {                                                                          \
         CCC_om_entry((ordered_map_ptr), (key_ptr)).impl                        \
     }
 
 /** @brief Modifies the provided entry if it is Occupied.
 @param [in] e the entry obtained from an entry function or macro.
-@param [in] fn an update function in which the auxiliary argument is unused.
+@param [in] fn an update function in which the context argument is unused.
 @return the updated entry if it was Occupied or the unmodified vacant entry.
 
 This function is intended to make the function chaining in the Entry Interface
 more succinct if the entry will be modified in place based on its own value
-without the need of the auxiliary argument a CCC_Type_updater can provide.
+without the need of the context argument a CCC_Type_updater can provide.
 */
-[[nodiscard]] CCC_omap_entry *CCC_om_and_modify(CCC_omap_entry *e,
-                                                CCC_Type_updater *fn);
+[[nodiscard]] CCC_Ordered_map_entry *CCC_om_and_modify(CCC_Ordered_map_entry *e,
+                                                       CCC_Type_updater *fn);
 
 /** @brief Modifies the provided entry if it is Occupied.
 @param [in] e the entry obtained from an entry function or macro.
-@param [in] fn an update function that requires auxiliary data.
-@param [in] aux auxiliary data required for the update.
+@param [in] fn an update function that requires context data.
+@param [in] context context data required for the update.
 @return the updated entry if it was Occupied or the unmodified vacant entry.
 
 This function makes full use of a CCC_Type_updater capability, meaning a
 complete CCC_update object will be passed to the update function callback. */
-[[nodiscard]] CCC_omap_entry *
-CCC_om_and_modify_aux(CCC_omap_entry *e, CCC_Type_updater *fn, void *aux);
+[[nodiscard]] CCC_Ordered_map_entry *
+CCC_om_and_modify_context(CCC_Ordered_map_entry *e, CCC_Type_updater *fn,
+                          void *context);
 
 /** @brief Modify an Occupied entry with a closure over user type T.
 @param [in] ordered_map_entry_ptr a pointer to the obtained entry.
@@ -348,7 +351,7 @@ container can deliver the user type T. This means any function calls are lazily
 evaluated in the closure scope. */
 #define CCC_om_and_modify_w(ordered_map_entry_ptr, type_name,                  \
                             closure_over_T...)                                 \
-    &(CCC_omap_entry)                                                          \
+    &(CCC_Ordered_map_entry)                                                   \
     {                                                                          \
         CCC_private_om_and_modify_w(ordered_map_entry_ptr, type_name,          \
                                     closure_over_T)                            \
@@ -365,8 +368,8 @@ a user struct allocation failure.
 
 If no allocation is permitted, this function assumes the user struct wrapping
 elem has been allocated with the appropriate lifetime and scope by the user. */
-[[nodiscard]] void *CCC_om_or_insert(CCC_omap_entry const *e,
-                                     CCC_omap_elem *elem);
+[[nodiscard]] void *CCC_om_or_insert(CCC_Ordered_map_entry const *e,
+                                     CCC_Ordered_map_node *elem);
 
 /** @brief Lazily insert the desired key value into the entry if it is Vacant.
 @param [in] ordered_map_entry_ptr a pointer to the obtained entry.
@@ -389,8 +392,8 @@ or other data, such functions will not be called if the entry is Occupied. */
 
 This method can be used when the old value in the map does not need to
 be preserved. See the regular insert method if the old value is of interest. */
-[[nodiscard]] void *CCC_om_insert_entry(CCC_omap_entry const *e,
-                                        CCC_omap_elem *elem);
+[[nodiscard]] void *CCC_om_insert_entry(CCC_Ordered_map_entry const *e,
+                                        CCC_Ordered_map_node *elem);
 
 /** @brief Write the contents of the compound literal lazy_key_value to a node.
 @param [in] ordered_map_entry_ptr a pointer to the obtained entry.
@@ -410,7 +413,7 @@ Note that if allocation is permitted the old element is freed and the entry
 will contain a NULL reference. If allocation is prohibited the entry can be
 unwrapped to obtain the old user struct stored in the map and the user may
 free or use as needed. */
-[[nodiscard]] CCC_Entry CCC_om_remove_entry(CCC_omap_entry *e);
+[[nodiscard]] CCC_Entry CCC_om_remove_entry(CCC_Ordered_map_entry *e);
 
 /** @brief Remove the entry from the map if Occupied.
 @param [in] ordered_map_entry_ptr a pointer to the map entry.
@@ -431,19 +434,19 @@ free or use as needed. */
 /** @brief Unwraps the provided entry to obtain a view into the map element.
 @param [in] e the entry from a query to the map via function or macro.
 @return a view into the table entry if one is present, or NULL. */
-[[nodiscard]] void *CCC_om_unwrap(CCC_omap_entry const *e);
+[[nodiscard]] void *CCC_om_unwrap(CCC_Ordered_map_entry const *e);
 
 /** @brief Returns the Vacant or Occupied status of the entry.
 @param [in] e the entry from a query to the map via function or macro.
 @return true if the entry is occupied, false if not. Error if e is NULL. */
-[[nodiscard]] CCC_Tribool CCC_om_occupied(CCC_omap_entry const *e);
+[[nodiscard]] CCC_Tribool CCC_om_occupied(CCC_Ordered_map_entry const *e);
 
 /** @brief Provides the status of the entry should an insertion follow.
 @param [in] e the entry from a query to the table via function or macro.
 @return true if an entry obtained from an insertion attempt failed to insert
 due to an allocation failure when allocation success was expected. Error if e is
 NULL. */
-[[nodiscard]] CCC_Tribool CCC_om_insert_error(CCC_omap_entry const *e);
+[[nodiscard]] CCC_Tribool CCC_om_insert_error(CCC_Ordered_map_entry const *e);
 
 /** @brief Obtain the entry status from a container entry.
 @param [in] e a pointer to the entry.
@@ -454,7 +457,8 @@ e is non-NULL to avoid an inaccurate status returned.
 Note that this function can be useful for debugging or if more detailed
 messages are needed for logging purposes. See CCC_Entry_status_msg() in
 ccc/types.h for more information on detailed entry statuses. */
-[[nodiscard]] CCC_Entry_status CCC_om_entry_status(CCC_omap_entry const *e);
+[[nodiscard]] CCC_Entry_status
+CCC_om_entry_status(CCC_Ordered_map_entry const *e);
 
 /**@}*/
 
@@ -482,7 +486,7 @@ for (struct val *i = range_begin(&range);
 
 This avoids any possible errors in handling an end range element that is in the
 map versus the end map sentinel. */
-[[nodiscard]] CCC_Range CCC_om_equal_range(CCC_ordered_map *om,
+[[nodiscard]] CCC_Range CCC_om_equal_range(CCC_Ordered_map *om,
                                            void const *begin_key,
                                            void const *end_key);
 
@@ -519,7 +523,7 @@ for (struct val *i = rrange_begin(&rrange);
 
 This avoids any possible errors in handling an rend rrange element that is in
 the map versus the end map sentinel. */
-[[nodiscard]] CCC_Reverse_range CCC_om_equal_rrange(CCC_ordered_map *om,
+[[nodiscard]] CCC_Reverse_range CCC_om_equal_rrange(CCC_Ordered_map *om,
                                                     void const *rbegin_key,
                                                     void const *rend_key);
 
@@ -540,21 +544,21 @@ enclosing scope. This reference is always non-NULL. */
 O(lg N).
 @param [in] om a pointer to the map.
 @return the oldest minimum element of the map. */
-[[nodiscard]] void *CCC_om_begin(CCC_ordered_map const *om);
+[[nodiscard]] void *CCC_om_begin(CCC_Ordered_map const *om);
 
 /** @brief Return the start of a reverse inorder traversal of the map.
 Amortized O(lg N).
 @param [in] om a pointer to the map.
 @return the oldest maximum element of the map. */
-[[nodiscard]] void *CCC_om_rbegin(CCC_ordered_map const *om);
+[[nodiscard]] void *CCC_om_rbegin(CCC_Ordered_map const *om);
 
 /** @brief Return the next element in an inorder traversal of the map. O(1).
 @param [in] om a pointer to the map.
 @param [in] iter_handle a pointer to the intrusive map element of the
 current iterator.
 @return the next user type stored in the map in an inorder traversal. */
-[[nodiscard]] void *CCC_om_next(CCC_ordered_map const *om,
-                                CCC_omap_elem const *iter_handle);
+[[nodiscard]] void *CCC_om_next(CCC_Ordered_map const *om,
+                                CCC_Ordered_map_node const *iter_handle);
 
 /** @brief Return the rnext element in a reverse inorder traversal of the map.
 O(1).
@@ -562,18 +566,18 @@ O(1).
 @param [in] iter_handle a pointer to the intrusive map element of the
 current iterator.
 @return the rnext user type stored in the map in a reverse inorder traversal. */
-[[nodiscard]] void *CCC_om_rnext(CCC_ordered_map const *om,
-                                 CCC_omap_elem const *iter_handle);
+[[nodiscard]] void *CCC_om_rnext(CCC_Ordered_map const *om,
+                                 CCC_Ordered_map_node const *iter_handle);
 
 /** @brief Return the end of an inorder traversal of the map. O(1).
 @param [in] om a pointer to the map.
 @return the newest maximum element of the map. */
-[[nodiscard]] void *CCC_om_end(CCC_ordered_map const *om);
+[[nodiscard]] void *CCC_om_end(CCC_Ordered_map const *om);
 
 /** @brief Return the rend of a reverse inorder traversal of the map. O(1).
 @param [in] om a pointer to the map.
 @return the newest minimum element of the map. */
-[[nodiscard]] void *CCC_om_rend(CCC_ordered_map const *om);
+[[nodiscard]] void *CCC_om_rend(CCC_Ordered_map const *om);
 
 /**@}*/
 
@@ -595,7 +599,7 @@ will occur.
 If the container has not been given allocation permission, then the destructor
 may free elements or not depending on how and when the user wishes to free
 elements of the map according to their own memory management schemes. */
-CCC_Result CCC_om_clear(CCC_ordered_map *om, CCC_Type_destructor *destructor);
+CCC_Result CCC_om_clear(CCC_Ordered_map *om, CCC_Type_destructor *destructor);
 
 /**@}*/
 
@@ -606,27 +610,27 @@ Obtain the container state. */
 /** @brief Returns the size status of the map.
 @param [in] om the map.
 @return true if empty else false. Error if om is NULL. */
-[[nodiscard]] CCC_Tribool CCC_om_is_empty(CCC_ordered_map const *om);
+[[nodiscard]] CCC_Tribool CCC_om_is_empty(CCC_Ordered_map const *om);
 
 /** @brief Returns the count of occupied map nodes.
 @param [in] om the map.
 @return the size or an argument error is set if om is NULL. */
-[[nodiscard]] CCC_Count CCC_om_count(CCC_ordered_map const *om);
+[[nodiscard]] CCC_Count CCC_om_count(CCC_Ordered_map const *om);
 
 /** @brief Validation of invariants for the map.
 @param [in] om the map to validate.
 @return true if all invariants hold, false if corruption occurs. Error if om is
 NULL. */
-[[nodiscard]] CCC_Tribool CCC_om_validate(CCC_ordered_map const *om);
+[[nodiscard]] CCC_Tribool CCC_om_validate(CCC_Ordered_map const *om);
 
 /**@}*/
 
 /** Define this preprocessor directive if shorter names are helpful. Ensure
  no namespace clashes occur before shortening. */
 #ifdef ORDERED_MAP_USING_NAMESPACE_CCC
-typedef CCC_omap_elem omap_elem;
-typedef CCC_ordered_map ordered_map;
-typedef CCC_omap_entry omap_entry;
+typedef CCC_Ordered_map_node Ordered_map_node;
+typedef CCC_Ordered_map Ordered_map;
+typedef CCC_Ordered_map_entry Ordered_map_entry;
 #    define om_initialize(args...) CCC_om_initialize(args)
 #    define om_and_modify_w(args...) CCC_om_and_modify_w(args)
 #    define om_or_insert_w(args...) CCC_om_or_insert_w(args)
@@ -638,7 +642,7 @@ typedef CCC_omap_entry omap_entry;
 #    define om_remove_entry_r(args...) CCC_om_remove_entry_r(args)
 #    define om_entry_r(args...) CCC_om_entry_r(args)
 #    define om_and_modify_r(args...) CCC_om_and_modify_r(args)
-#    define om_and_modify_aux_r(args...) CCC_om_and_modify_aux_r(args)
+#    define om_and_modify_context_r(args...) CCC_om_and_modify_context_r(args)
 #    define om_contains(args...) CCC_om_contains(args)
 #    define om_get_key_val(args...) CCC_om_get_key_val(args)
 #    define om_get_mut(args...) CCC_om_get_mut(args)

@@ -28,12 +28,12 @@ limitations under the License.
 /** @private An ordered map element in a splay tree requires no special fields.
 In fact the parent could be eliminated, but it is important in providing clean
 iterative traversals with the begin, end, next abstraction for the user. */
-struct CCC_omap_elem
+struct CCC_omap_node
 {
     /** @private The child nodes in a array unite left and right cases. */
-    struct CCC_omap_elem *branch[2];
+    struct CCC_omap_node *branch[2];
     /** @private The parent is useful for iteration. Not required for splay. */
-    struct CCC_omap_elem *parent;
+    struct CCC_omap_node *parent;
 };
 
 /** @private Runs the top down splay tree algorithm over a node based tree. A
@@ -46,23 +46,23 @@ can benefit from a skewed distribution before choosing this container. */
 struct CCC_omap
 {
     /** @private The root of the splay tree. The "hot" node after a query. */
-    struct CCC_omap_elem *root;
+    struct CCC_omap_node *root;
     /** @private The sentinel used to eliminate branches. */
-    struct CCC_omap_elem end;
+    struct CCC_omap_node end;
     /** @private The number of stored tree nodes. */
     size_t size;
     /** @private The size of the user type stored in the tree. */
     size_t sizeof_type;
     /** @private The byte offset of the intrusive element. */
-    size_t node_elem_offset;
+    size_t node_node_offset;
     /** @private The byte offset of the user key in the user type. */
     size_t key_offset;
     /** @private The user defined comparison callback function. */
-    CCC_any_key_cmp_fn *cmp;
+    CCC_Key_comparator *cmp;
     /** @private The user defined allocation function, if any. */
     CCC_Allocator *alloc;
     /** @private Auxiliary data, if any. */
-    void *aux;
+    void *context;
 };
 
 /** @private An entry is a way to store a node or the information needed to
@@ -84,7 +84,7 @@ struct CCC_otree_entry
     /** @private The tree associated with this query. */
     struct CCC_omap *t;
     /** @private The stored node or empty if not found. */
-    struct CCC_ent entry;
+    struct CCC_Entry entry;
 };
 
 /** @private Enable return by compound literal reference on the stack. Think
@@ -101,21 +101,21 @@ union CCC_omap_entry
 /** @private */
 void *CCC_private_om_key_in_slot(struct CCC_omap const *t, void const *slot);
 /** @private */
-struct CCC_omap_elem *CCC_private_omap_elem_in_slot(struct CCC_omap const *t,
+struct CCC_omap_node *CCC_private_omap_node_in_slot(struct CCC_omap const *t,
                                                     void const *slot);
 /** @private */
 struct CCC_otree_entry CCC_private_om_entry(struct CCC_omap *t,
                                             void const *key);
 /** @private */
-void *CCC_private_om_insert(struct CCC_omap *t, struct CCC_omap_elem *n);
+void *CCC_private_om_insert(struct CCC_omap *t, struct CCC_omap_node *n);
 
 /*======================   Macro Implementations     ========================*/
 
 /** @private */
 #define CCC_private_om_initialize(private_tree_name, private_struct_name,      \
-                                  private_node_elem_field,                     \
-                                  private_key_elem_field, private_key_cmp_fn,  \
-                                  private_alloc_fn, private_aux_data)          \
+                                  private_node_node_field,                     \
+                                  private_key_node_field, private_key_cmp_fn,  \
+                                  private_alloc_fn, private_context_data)      \
     {                                                                          \
         .root = &(private_tree_name).end,                                      \
         .end                                                                   \
@@ -123,12 +123,12 @@ void *CCC_private_om_insert(struct CCC_omap *t, struct CCC_omap_elem *n);
            .parent = &(private_tree_name).end},                                \
         .alloc = (private_alloc_fn),                                           \
         .cmp = (private_key_cmp_fn),                                           \
-        .aux = (private_aux_data),                                             \
+        .context = (private_context_data),                                     \
         .size = 0,                                                             \
         .sizeof_type = sizeof(private_struct_name),                            \
-        .node_elem_offset                                                      \
-        = offsetof(private_struct_name, private_node_elem_field),              \
-        .key_offset = offsetof(private_struct_name, private_key_elem_field),   \
+        .node_node_offset                                                      \
+        = offsetof(private_struct_name, private_node_node_field),              \
+        .key_offset = offsetof(private_struct_name, private_key_node_field),   \
     }
 
 /** @private */
@@ -140,7 +140,7 @@ void *CCC_private_om_insert(struct CCC_omap *t, struct CCC_omap_elem *n);
             private_om_ins_alloc_ret                                           \
                 = (ordered_map_entry)                                          \
                       ->t->alloc(NULL, (ordered_map_entry)->t->sizeof_type,    \
-                                 (ordered_map_entry)->t->aux);                 \
+                                 (ordered_map_entry)->t->context);             \
         }                                                                      \
         private_om_ins_alloc_ret;                                              \
     }))
@@ -153,7 +153,7 @@ void *CCC_private_om_insert(struct CCC_omap *t, struct CCC_omap_elem *n);
         {                                                                      \
             *new_mem = lazy_key_value;                                         \
             new_mem = CCC_private_om_insert(                                   \
-                (ordered_map_entry)->t, CCC_private_omap_elem_in_slot(         \
+                (ordered_map_entry)->t, CCC_private_omap_node_in_slot(         \
                                             (ordered_map_entry)->t, new_mem)); \
         }                                                                      \
     }))
@@ -176,7 +176,7 @@ void *CCC_private_om_insert(struct CCC_omap *t, struct CCC_omap_elem *n);
                 = key;                                                         \
             (void)CCC_private_om_insert(                                       \
                 om_insert_entry.t,                                             \
-                CCC_private_omap_elem_in_slot(om_insert_entry.t,               \
+                CCC_private_omap_node_in_slot(om_insert_entry.t,               \
                                               private_om_new_ins_base));       \
         }                                                                      \
     }))
@@ -249,14 +249,14 @@ void *CCC_private_om_insert(struct CCC_omap *t, struct CCC_omap_elem *n);
             else if (private_ins_entry_ptr->impl.entry.stats                   \
                      == CCC_ENTRY_OCCUPIED)                                    \
             {                                                                  \
-                struct CCC_omap_elem private_ins_ent_saved                     \
-                    = *CCC_private_omap_elem_in_slot(                          \
+                struct CCC_omap_node private_ins_ent_saved                     \
+                    = *CCC_private_omap_node_in_slot(                          \
                         private_ins_entry_ptr->impl.t,                         \
                         private_ins_entry_ptr->impl.entry.e);                  \
                 *((typeof(lazy_key_value) *)                                   \
                       private_ins_entry_ptr->impl.entry.e)                     \
                     = lazy_key_value;                                          \
-                *CCC_private_omap_elem_in_slot(                                \
+                *CCC_private_omap_node_in_slot(                                \
                     private_ins_entry_ptr->impl.t,                             \
                     private_ins_entry_ptr->impl.entry.e)                       \
                     = private_ins_ent_saved;                                   \
@@ -270,7 +270,7 @@ void *CCC_private_om_insert(struct CCC_omap *t, struct CCC_omap_elem *n);
 #define CCC_private_om_try_insert_w(ordered_map_ptr, key, lazy_value...)       \
     (__extension__({                                                           \
         __auto_type private_try_ins_map_ptr = (ordered_map_ptr);               \
-        struct CCC_ent private_om_try_ins_ent_ret                              \
+        struct CCC_Entry private_om_try_ins_ent_ret                            \
             = {.stats = CCC_ENTRY_ARG_ERROR};                                  \
         if (private_try_ins_map_ptr)                                           \
         {                                                                      \
@@ -296,7 +296,7 @@ void *CCC_private_om_insert(struct CCC_omap *t, struct CCC_omap_elem *n);
 #define CCC_private_om_insert_or_assign_w(ordered_map_ptr, key, lazy_value...) \
     (__extension__({                                                           \
         __auto_type private_ins_or_assign_map_ptr = (ordered_map_ptr);         \
-        struct CCC_ent private_om_ins_or_assign_ent_ret                        \
+        struct CCC_Entry private_om_ins_or_assign_ent_ret                      \
             = {.stats = CCC_ENTRY_ARG_ERROR};                                  \
         if (private_ins_or_assign_map_ptr)                                     \
         {                                                                      \
@@ -315,13 +315,13 @@ void *CCC_private_om_insert(struct CCC_omap *t, struct CCC_omap_elem *n);
             else if (private_om_ins_or_assign_ent.entry.stats                  \
                      == CCC_ENTRY_OCCUPIED)                                    \
             {                                                                  \
-                struct CCC_omap_elem private_ins_ent_saved                     \
-                    = *CCC_private_omap_elem_in_slot(                          \
+                struct CCC_omap_node private_ins_ent_saved                     \
+                    = *CCC_private_omap_node_in_slot(                          \
                         private_om_ins_or_assign_ent.t,                        \
                         private_om_ins_or_assign_ent.entry.e);                 \
                 *((typeof(lazy_value) *)private_om_ins_or_assign_ent.entry.e)  \
                     = lazy_value;                                              \
-                *CCC_private_omap_elem_in_slot(                                \
+                *CCC_private_omap_node_in_slot(                                \
                     private_om_ins_or_assign_ent.t,                            \
                     private_om_ins_or_assign_ent.entry.e)                      \
                     = private_ins_ent_saved;                                   \

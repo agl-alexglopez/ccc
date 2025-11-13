@@ -84,7 +84,7 @@ policy, capacity, and optional starting size.
 @param [in] mem_ptr the pointer to existing memory or NULL.
 @param [in] any_type_name the name of the user type in the buffer.
 @param [in] alloc_fn CCC_Allocator or NULL if no allocation is permitted.
-@param [in] aux_data any auxiliary data needed for managing Buffer memory.
+@param [in] context_data any context data needed for managing Buffer memory.
 @param [in] capacity the capacity of memory at mem_ptr.
 @param [in] optional_size optional starting size of the Buffer <= capacity.
 @return the initialized buffer. Directly assign to Buffer on the right hand
@@ -115,14 +115,14 @@ provide an allocation function. If a dynamic Buffer is preferred, provide the
 allocation function as defined by the signature in types.h. If resizing is
 desired on memory that has already been allocated, ensure allocation has
 occurred with the provided allocation function. */
-#define CCC_buffer_initialize(mem_ptr, any_type_name, alloc_fn, aux_data,      \
+#define CCC_buffer_initialize(mem_ptr, any_type_name, alloc_fn, context_data,  \
                               capacity, optional_size...)                      \
-    CCC_private_buffer_initialize(mem_ptr, any_type_name, alloc_fn, aux_data,  \
-                                  capacity, optional_size)
+    CCC_private_buffer_initialize(mem_ptr, any_type_name, alloc_fn,            \
+                                  context_data, capacity, optional_size)
 
 /** @brief Initialize a Buffer from a compound literal array initializer.
 @param [in] alloc_fn CCC_Allocator or NULL if no allocation is permitted.
-@param [in] aux_data any auxiliary data needed for managing Buffer memory.
+@param [in] context_data any context data needed for managing Buffer memory.
 @param [in] optional_capacity optionally specify the capacity of the Buffer if
 different from the size of the compound literal array initializer. If the
 capacity is greater than the size of the compound literal array initializer, it
@@ -165,14 +165,14 @@ main(void)
 Only dynamic buffers may be initialized this way. For static or stack based
 initialization of fixed buffers with contents known at compile time, see the
 CCC_buffer_initialize() macro. */
-#define CCC_buffer_from(alloc_fn, aux_data, optional_capacity,                 \
+#define CCC_buffer_from(alloc_fn, context_data, optional_capacity,             \
                         compound_literal_array...)                             \
-    CCC_private_buffer_from(alloc_fn, aux_data, optional_capacity,             \
+    CCC_private_buffer_from(alloc_fn, context_data, optional_capacity,         \
                             compound_literal_array)
 
 /** @brief Initialize a Buffer with a capacity.
 @param [in] alloc_fn CCC_Allocator or NULL if no allocation is permitted.
-@param [in] aux_data any auxiliary data needed for managing Buffer memory.
+@param [in] context_data any context data needed for managing Buffer memory.
 @param [in] capacity the capacity of the Buffer to reserve.
 @return the initialized buffer. Directly assign to Buffer on the right hand
 side of the equality operator (e.g. CCC_Buffer b =
@@ -193,8 +193,9 @@ main(void)
 Only dynamic buffers may be initialized this way. For static or stack based
 initialization of fixed buffers with contents known at compile time, see the
 CCC_buffer_initialize() macro. */
-#define CCC_buffer_with_capacity(any_type_name, alloc_fn, aux_data, capacity)  \
-    CCC_private_buffer_with_capacity(any_type_name, alloc_fn, aux_data,        \
+#define CCC_buffer_with_capacity(any_type_name, alloc_fn, context_data,        \
+                                 capacity)                                     \
+    CCC_private_buffer_with_capacity(any_type_name, alloc_fn, context_data,    \
                                      capacity)
 
 /** @brief Reserves space for at least to_add more elements.
@@ -669,7 +670,7 @@ previously dynamically reserved with the reserve function.
 maintenance is required on the elements in the buf before their slots are
 dropped.
 @param [in] alloc the required allocation function to provide to a dynamically
-reserved buf. Any auxiliary data provided upon initialization will be passed to
+reserved buf. Any context data provided upon initialization will be passed to
 the allocation function when called.
 @return the result of free operation. OK if success, or an error status to
 indicate the error.

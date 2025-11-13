@@ -112,7 +112,7 @@ CHECK_BEGIN_STATIC_FN(buffer_test_daily_temperatures)
 static CCC_Order
 cmp_car_idx(CCC_Type_comparator_context const cmp)
 {
-    Buffer const *const positions = cmp.aux;
+    Buffer const *const positions = cmp.context;
     int const *const lhs_pos = buffer_at(positions, *(int *)cmp.any_type_lhs);
     int const *const rhs_pos = buffer_at(positions, *(int *)cmp.any_type_rhs);
     /* Reversed sort. We want descending not ascending order. We ask how many

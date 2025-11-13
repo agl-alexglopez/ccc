@@ -255,26 +255,28 @@ animate_maze(struct maze *maze)
     clear_and_flush_maze(maze);
     /* Test use case of reserve without reallocation permission. Guarantees
        exactly the needed memory and no more over lifetime of program. */
-    flat_hash_map cost_map
-        = fhm_initialize(NULL, struct prim_cell, cell, prim_cell_hash_fn,
-                         prim_cell_cmp, NULL, NULL, 0);
+    Flat_hash_map cost_map = flat_hash_map_initialize(
+        NULL, struct prim_cell, cell, prim_cell_hash_fn, prim_cell_cmp, NULL,
+        NULL, 0);
     result r
         = reserve(&cost_map, ((maze->rows * maze->cols) / 2) + 1, std_alloc);
     check(r == CCC_RESULT_OK);
     /* Priority queue gets same reserve interface. */
-    flat_priority_queue cell_pq = fpq_initialize(
-        NULL, struct prim_cell, CCC_ORDER_LESS, cmp_prim_cells, NULL, NULL, 0);
-    r = reserve(&cell_pq, ((maze->rows * maze->cols) / 2) + 1, std_alloc);
+    Flat_priority_queue cell_priority_queue = flat_priority_queue_initialize(
+        NULL, struct prim_cell, CCC_ORDER_LESSER, cmp_prim_cells, NULL, NULL,
+        0);
+    r = reserve(&cell_priority_queue, ((maze->rows * maze->cols) / 2) + 1,
+                std_alloc);
     check(r == CCC_RESULT_OK);
     struct point s = rand_point(maze);
-    struct prim_cell const *const first = fhm_insert_entry_w(
+    struct prim_cell const *const first = flat_hash_map_insert_entry_w(
         entry_r(&cost_map, &s),
         (struct prim_cell){.cell = s, .cost = rand_range(0, 100)});
     check(first);
-    (void)push(&cell_pq, first, &(struct prim_cell){});
-    while (!is_empty(&cell_pq))
+    (void)push(&cell_priority_queue, first, &(struct prim_cell){});
+    while (!is_empty(&cell_priority_queue))
     {
-        struct prim_cell const *const c = front(&cell_pq);
+        struct prim_cell const *const c = front(&cell_priority_queue);
         *maze_at_r(maze, c->cell.r, c->cell.c) |= CACHE_BIT;
         /* 0 is an invalid row and column in any maze. */
         struct prim_cell min_cell = {};
@@ -285,7 +287,7 @@ animate_maze(struct maze *maze)
                                     .c = c->cell.c + dir_offsets[i].c};
             if (can_build_new_square(maze, n.r, n.c))
             {
-                struct prim_cell const *const cell = fhm_or_insert_w(
+                struct prim_cell const *const cell = flat_hash_map_or_insert_w(
                     entry_r(&cost_map, &n),
                     (struct prim_cell){.cell = n, .cost = rand_range(0, 100)});
                 check(cell);
@@ -299,17 +301,17 @@ animate_maze(struct maze *maze)
         if (min != INT_MAX)
         {
             join_squares_animated(maze, c->cell, min_cell.cell, speed);
-            (void)push(&cell_pq, &min_cell, &(struct prim_cell){});
+            (void)push(&cell_priority_queue, &min_cell, &(struct prim_cell){});
         }
         else
         {
-            (void)pop(&cell_pq, &(struct prim_cell){});
+            (void)pop(&cell_priority_queue, &(struct prim_cell){});
         }
     }
     /* If a container is reserved without allocation permission it has no way
        to free itself. Give it the same allocation function used to reserve. */
     (void)clear_and_free_reserve(&cost_map, NULL, std_alloc);
-    (void)clear_and_free_reserve(&cell_pq, NULL, std_alloc);
+    (void)clear_and_free_reserve(&cell_priority_queue, NULL, std_alloc);
 }
 
 /*===================     Container Support Code     ========================*/

@@ -17,7 +17,7 @@ limitations under the License. */
 #include "types.h"
 
 /** @private */
-static char const *const result_msgs[CCC_RESULT_COUNT] = {
+static char const *const result_msgs[CCC_PRIVATE_RESULT_COUNT] = {
     [CCC_RESULT_OK] = "",
     [CCC_RESULT_FAIL]
     = "An operation ran on a container but the desired result could not be "
@@ -25,10 +25,10 @@ static char const *const result_msgs[CCC_RESULT_COUNT] = {
     [CCC_RESULT_NO_ALLOC]
     = "A container performed an operation requiring new allocation of "
       "memory, but no allocation function was provided upon initialization.",
-    [CCC_RESULT_MEM_ERROR]
+    [CCC_RESULT_ALLOCATOR_ERROR]
     = "A container performed an operation requiring new allocation of memory, "
       "but the allocator function provided on initialization failed.",
-    [CCC_RESULT_ARG_ERROR]
+    [CCC_RESULT_ARGUMENT_ERROR]
     = "A container function received bad arguments such as NULL pointers, out "
       "of range values, or arguments that cannot be processed in the context "
       "of an operation.",
@@ -106,7 +106,7 @@ CCC_handle_input_error(CCC_Handle const *const e)
     return (e->impl.stats & CCC_ENTRY_ARG_ERROR) != 0;
 }
 
-CCC_handle_i
+CCC_Handle_index
 CCC_handle_unwrap(CCC_Handle const *const e)
 {
     if (!e)
@@ -143,7 +143,7 @@ CCC_rrange_rend(CCC_Reverse_range const *const r)
 char const *
 CCC_Result_msg(CCC_Result const res)
 {
-    if (res >= CCC_RESULT_COUNT)
+    if (res >= CCC_PRIVATE_RESULT_COUNT)
     {
         return "error: invalid result provided no message exists";
     }
@@ -160,7 +160,7 @@ CCC_get_entry_status(CCC_Entry const *e)
     return e->impl.stats;
 }
 
-CCC_handle_status
+CCC_Handle_status
 CCC_get_handle_status(CCC_Handle const *e)
 {
     if (!e)

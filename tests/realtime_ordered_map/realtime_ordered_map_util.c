@@ -18,7 +18,7 @@ id_cmp(CCC_Key_comparator_context const cmp)
     return (key > c->key) - (key < c->key);
 }
 
-CHECK_BEGIN_FN(insert_shuffled, CCC_realtime_ordered_map *m, struct val vals[],
+CHECK_BEGIN_FN(insert_shuffled, CCC_Realtime_ordered_map *m, struct val vals[],
                size_t const size, int const larger_prime)
 {
     size_t shuffled_index = larger_prime % size;
@@ -26,20 +26,20 @@ CHECK_BEGIN_FN(insert_shuffled, CCC_realtime_ordered_map *m, struct val vals[],
     {
         vals[shuffled_index].key = (int)shuffled_index;
         vals[shuffled_index].val = (int)i;
-        (void)CCC_rom_swap_entry(m, &vals[shuffled_index].elem,
-                                 &(struct val){}.elem);
+        (void)CCC_realtime_ordered_map_swap_entry(m, &vals[shuffled_index].elem,
+                                                  &(struct val){}.elem);
         CHECK(validate(m), true);
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
-    CHECK(CCC_rom_count(m).count, size);
+    CHECK(CCC_realtime_ordered_map_count(m).count, size);
     CHECK_END_FN();
 }
 
 /* Iterative inorder traversal to check the heap is sorted. */
 size_t
-inorder_fill(int vals[], size_t size, CCC_realtime_ordered_map const *const m)
+inorder_fill(int vals[], size_t size, CCC_Realtime_ordered_map const *const m)
 {
-    if (CCC_rom_count(m).count != size)
+    if (CCC_realtime_ordered_map_count(m).count != size)
     {
         return 0;
     }
@@ -52,7 +52,7 @@ inorder_fill(int vals[], size_t size, CCC_realtime_ordered_map const *const m)
 }
 
 void *
-val_bump_alloc(void *const ptr, size_t const size, void *const aux)
+val_bump_alloc(void *const ptr, size_t const size, void *const context)
 {
     if (!ptr && !size)
     {
@@ -62,7 +62,7 @@ val_bump_alloc(void *const ptr, size_t const size, void *const aux)
     {
         assert(size == sizeof(struct val)
                && "stack allocator for struct val only.");
-        struct val_pool *vals = aux;
+        struct val_pool *vals = context;
         if (vals->next_free >= vals->capacity)
         {
             return NULL;

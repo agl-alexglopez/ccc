@@ -5,8 +5,8 @@
 #define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC
 
 #include "checkers.h"
-#include "fdeq_util.h"
 #include "flat_double_ended_queue.h"
+#include "flat_double_ended_queue_util.h"
 #include "traits.h"
 #include "types.h"
 
@@ -15,7 +15,8 @@ CHECK_BEGIN_FN(create_queue, flat_double_ended_queue *const q, size_t const n,
 {
     if (n)
     {
-        CCC_Result const res = fdeq_push_back_range(q, n, vals);
+        CCC_Result const res
+            = flat_double_ended_queue_push_back_range(q, n, vals);
         CHECK(res, CCC_RESULT_OK);
         CHECK(validate(q), true);
     }

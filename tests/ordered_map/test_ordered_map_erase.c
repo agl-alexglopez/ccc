@@ -13,7 +13,7 @@
 
 CHECK_BEGIN_STATIC_FN(omap_test_prime_shuffle)
 {
-    CCC_ordered_map s
+    CCC_Ordered_map s
         = CCC_om_initialize(s, struct val, elem, key, id_cmp, NULL, NULL);
     size_t const size = 50;
     size_t const prime = 53;
@@ -47,7 +47,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_prime_shuffle)
 
 CHECK_BEGIN_STATIC_FN(omap_test_insert_erase_shuffled)
 {
-    CCC_ordered_map s
+    CCC_Ordered_map s
         = CCC_om_initialize(s, struct val, elem, key, id_cmp, NULL, NULL);
     size_t const size = 50;
     int const prime = 53;
@@ -73,7 +73,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_insert_erase_shuffled)
 
 CHECK_BEGIN_STATIC_FN(omap_test_weak_srand)
 {
-    CCC_ordered_map s
+    CCC_Ordered_map s
         = CCC_om_initialize(s, struct val, elem, key, id_cmp, NULL, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */

@@ -9,7 +9,7 @@
 
 struct val
 {
-    CCC_dll_elem e;
+    CCC_Doubly_linked_list_node e;
     int id;
     int val;
 };
@@ -22,9 +22,9 @@ enum push_end
 
 CCC_Order val_cmp(CCC_Type_comparison_context);
 
-enum check_result check_order(CCC_doubly_linked_list const *, size_t n,
+enum check_result check_order(CCC_Doubly_linked_list const *, size_t n,
                               int const order[]);
-enum check_result create_list(CCC_doubly_linked_list *, enum push_end, size_t n,
+enum check_result create_list(CCC_Doubly_linked_list *, enum push_end, size_t n,
                               struct val vals[]);
 
 #endif /* DLL_UTIL_H */

@@ -26,69 +26,83 @@ limitations under the License.
 
 /** @private A flat doubled ended queue is a single Buffer with push and pop
 at the front and back. If no allocation is permitted it is a ring buffer.
-Because the `CCC_Buffer` abstraction already exists, the fdeq can be
-implemented with a single additional field rather than a front and back pointer.
-The back of the fdeq is always known if we know where the front is and how
-many elements are stored in the buffer. */
-struct CCC_fdeq
+Because the `CCC_Buffer` abstraction already exists, the flat_double_ended_queue
+can be implemented with a single additional field rather than a front and back
+pointer. The back of the flat_double_ended_queue is always known if we know
+where the front is and how many elements are stored in the buffer. */
+struct CCC_Flat_double_ended_queue
 {
-    /** @private The helper Buffer abstraction the fdeq owns. */
+    /** @private The helper Buffer abstraction the flat_double_ended_queue owns.
+     */
     CCC_Buffer buf;
-    /** @private The front of the fdeq. The back is implicit given the size. */
+    /** @private The front of the flat_double_ended_queue. The back is implicit
+     * given the size. */
     size_t front;
 };
 
 /*=======================    Private Interface   ============================*/
 /** @private */
-void *CCC_private_fdeq_alloc_front(struct CCC_fdeq *);
+void *CCC_private_flat_double_ended_queue_alloc_front(
+    struct CCC_Flat_double_ended_queue *);
 /** @private */
-void *CCC_private_fdeq_alloc_back(struct CCC_fdeq *);
+void *CCC_private_flat_double_ended_queue_alloc_back(
+    struct CCC_Flat_double_ended_queue *);
 
 /*=======================  Macro Implementations   ==========================*/
 
 /** @private */
-#define CCC_private_fdeq_initialize(private_mem_ptr, private_any_type_name,    \
-                                    private_alloc_fn, private_aux_data,        \
-                                    private_capacity, optional_size...)        \
+#define CCC_private_flat_double_ended_queue_initialize(                        \
+    private_mem_ptr, private_any_type_name, private_alloc_fn,                  \
+    private_context_data, private_capacity, optional_size...)                  \
     {                                                                          \
         .buf = CCC_buffer_initialize(private_mem_ptr, private_any_type_name,   \
-                                     private_alloc_fn, private_aux_data,       \
+                                     private_alloc_fn, private_context_data,   \
                                      private_capacity, optional_size),         \
         .front = 0,                                                            \
     }
 
 /** @private */
-#define CCC_private_fdeq_emplace_back(fdeq_ptr, value...)                      \
+#define CCC_private_flat_double_ended_queue_emplace_back(                      \
+    flat_double_ended_queue_ptr, value...)                                     \
     (__extension__({                                                           \
-        __auto_type private_fdeq_ptr = (fdeq_ptr);                             \
-        void *const private_fdeq_emplace_ret = NULL;                           \
-        if (private_fdeq_ptr)                                                  \
+        __auto_type private_flat_double_ended_queue_ptr                        \
+            = (flat_double_ended_queue_ptr);                                   \
+        void *const private_flat_double_ended_queue_emplace_ret = NULL;        \
+        if (private_flat_double_ended_queue_ptr)                               \
         {                                                                      \
-            void *const private_fdeq_emplace_ret                               \
-                = CCC_private_fdeq_alloc_back(private_fdeq_ptr);               \
-            if (private_fdeq_emplace_ret)                                      \
+            void *const private_flat_double_ended_queue_emplace_ret            \
+                = CCC_private_flat_double_ended_queue_alloc_back(              \
+                    private_flat_double_ended_queue_ptr);                      \
+            if (private_flat_double_ended_queue_emplace_ret)                   \
             {                                                                  \
-                *((typeof(value) *)private_fdeq_emplace_ret) = value;          \
+                *((typeof(value) *)                                            \
+                      private_flat_double_ended_queue_emplace_ret)             \
+                    = value;                                                   \
             }                                                                  \
         }                                                                      \
-        private_fdeq_emplace_ret;                                              \
+        private_flat_double_ended_queue_emplace_ret;                           \
     }))
 
 /** @private */
-#define CCC_private_fdeq_emplace_front(fdeq_ptr, value...)                     \
+#define CCC_private_flat_double_ended_queue_emplace_front(                     \
+    flat_double_ended_queue_ptr, value...)                                     \
     (__extension__({                                                           \
-        __auto_type private_fdeq_ptr = (fdeq_ptr);                             \
-        void *const private_fdeq_emplace_ret = NULL;                           \
-        if (private_fdeq_ptr)                                                  \
+        __auto_type private_flat_double_ended_queue_ptr                        \
+            = (flat_double_ended_queue_ptr);                                   \
+        void *const private_flat_double_ended_queue_emplace_ret = NULL;        \
+        if (private_flat_double_ended_queue_ptr)                               \
         {                                                                      \
-            void *const private_fdeq_emplace_ret                               \
-                = CCC_private_fdeq_alloc_front(private_fdeq_ptr);              \
-            if (private_fdeq_emplace_ret)                                      \
+            void *const private_flat_double_ended_queue_emplace_ret            \
+                = CCC_private_flat_double_ended_queue_alloc_front(             \
+                    private_flat_double_ended_queue_ptr);                      \
+            if (private_flat_double_ended_queue_emplace_ret)                   \
             {                                                                  \
-                *((typeof(value) *)private_fdeq_emplace_ret) = value;          \
+                *((typeof(value) *)                                            \
+                      private_flat_double_ended_queue_emplace_ret)             \
+                    = value;                                                   \
             }                                                                  \
         }                                                                      \
-        private_fdeq_emplace_ret;                                              \
+        private_flat_double_ended_queue_emplace_ret;                           \
     }))
 
 /* NOLINTEND(readability-identifier-naming) */

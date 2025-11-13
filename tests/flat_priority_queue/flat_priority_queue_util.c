@@ -7,7 +7,7 @@
 #include "buffer.h"
 #include "checkers.h"
 #include "flat_priority_queue.h"
-#include "fpq_util.h"
+#include "flat_priority_queue_util.h"
 #include "traits.h"
 #include "types.h"
 #include "util/alloc.h"
@@ -24,7 +24,7 @@ void
 val_update(CCC_Type_context const u)
 {
     struct val *const old = u.any_type;
-    old->val = *(int *)u.aux;
+    old->val = *(int *)u.context;
 }
 
 size_t
@@ -34,7 +34,7 @@ rand_range(size_t const min, size_t const max)
     return min + (rand() / (RAND_MAX / (max - min + 1) + 1));
 }
 
-CHECK_BEGIN_FN(insert_shuffled, CCC_flat_priority_queue *const pq,
+CHECK_BEGIN_FN(insert_shuffled, CCC_Flat_priority_queue *const priority_queue,
                struct val vals[const], size_t const size,
                int const larger_prime)
 {
@@ -47,28 +47,32 @@ CHECK_BEGIN_FN(insert_shuffled, CCC_flat_priority_queue *const pq,
     for (size_t i = 0; i < size; ++i)
     {
         vals[i].id = vals[i].val = (int)shuffled_index;
-        CHECK(push(pq, &vals[i], &(struct val){}) != NULL, CCC_TRUE);
-        CHECK(CCC_fpq_count(pq).count, i + 1);
-        CHECK(validate(pq), true);
+        CHECK(push(priority_queue, &vals[i], &(struct val){}) != NULL,
+              CCC_TRUE);
+        CHECK(CCC_flat_priority_queue_count(priority_queue).count, i + 1);
+        CHECK(validate(priority_queue), true);
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
-    CHECK(CCC_fpq_count(pq).count, size);
+    CHECK(CCC_flat_priority_queue_count(priority_queue).count, size);
     CHECK_END_FN();
 }
 
 /* Iterative inorder traversal to check the heap is sorted. */
 CHECK_BEGIN_FN(inorder_fill, int vals[const], size_t const size,
-               CCC_flat_priority_queue const *const fpq)
+               CCC_Flat_priority_queue const *const flat_priority_queue)
 {
-    if (CCC_fpq_count(fpq).count != size)
+    if (CCC_flat_priority_queue_count(flat_priority_queue).count != size)
     {
         return FAIL;
     }
-    CCC_flat_priority_queue fpq_cpy = CCC_fpq_initialize(
-        NULL, struct val, CCC_ORDER_LESS, val_cmp, std_alloc, NULL, 0);
-    CCC_Result const r = fpq_copy(&fpq_cpy, fpq, std_alloc);
+    CCC_Flat_priority_queue flat_priority_queue_cpy
+        = CCC_flat_priority_queue_initialize(NULL, struct val, CCC_ORDER_LESSER,
+                                             val_cmp, std_alloc, NULL, 0);
+    CCC_Result const r = flat_priority_queue_copy(
+        &flat_priority_queue_cpy, flat_priority_queue, std_alloc);
     CHECK(r, CCC_RESULT_OK);
-    CCC_Buffer b = fpq_heapsort(&fpq_cpy, &(struct val){});
+    CCC_Buffer b = flat_priority_queue_heapsort(&flat_priority_queue_cpy,
+                                                &(struct val){});
     CHECK(CCC_buffer_is_empty(&b), CCC_FALSE);
     vals[0] = *CCC_buffer_back_as(&b, int);
     size_t i = 1;
@@ -78,6 +82,6 @@ CHECK_BEGIN_FN(inorder_fill, int vals[const], size_t const size,
         CHECK(prev->val <= v->val, CCC_TRUE);
         vals[i++] = v->val;
     }
-    CHECK(i, fpq_count(fpq).count);
+    CHECK(i, flat_priority_queue_count(flat_priority_queue).count);
     CHECK_END_FN(clear_and_free(&b, NULL););
 }

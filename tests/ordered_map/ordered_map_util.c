@@ -18,7 +18,7 @@ id_cmp(CCC_Key_comparator_context const cmp)
     return (key > c->key) - (key < c->key);
 }
 
-CHECK_BEGIN_FN(insert_shuffled, CCC_ordered_map *m, struct val vals[],
+CHECK_BEGIN_FN(insert_shuffled, CCC_Ordered_map *m, struct val vals[],
                size_t const size, int const larger_prime)
 {
     size_t shuffled_index = larger_prime % size;
@@ -36,7 +36,7 @@ CHECK_BEGIN_FN(insert_shuffled, CCC_ordered_map *m, struct val vals[],
 
 /* Iterative inorder traversal to check the heap is sorted. */
 size_t
-inorder_fill(int vals[], size_t size, CCC_ordered_map *m)
+inorder_fill(int vals[], size_t size, CCC_Ordered_map *m)
 {
     if (count(m).count != size)
     {
@@ -51,7 +51,7 @@ inorder_fill(int vals[], size_t size, CCC_ordered_map *m)
 }
 
 void *
-val_bump_alloc(void *const ptr, size_t const size, void *const aux)
+val_bump_alloc(void *const ptr, size_t const size, void *const context)
 {
     if (!ptr && !size)
     {
@@ -61,7 +61,7 @@ val_bump_alloc(void *const ptr, size_t const size, void *const aux)
     {
         assert(size == sizeof(struct val)
                && "stack allocator for struct val only.");
-        struct val_pool *vals = aux;
+        struct val_pool *vals = context;
         if (vals->next_free >= vals->capacity)
         {
             return NULL;

@@ -55,7 +55,7 @@ typedef union CCC_Reverse_range CCC_Reverse_range;
 
 A entry is the basis for more complex container specific Entry Interface for
 all search-by-key containers. An entry is returned from various operations
-to provide both a reference to data and any auxiliary status that is
+to provide both a reference to data and any context status that is
 important for the user. An entry can be Occupied or Vacant. See individual
 headers for containers that return this type for its meaning in context. */
 typedef union CCC_Entry_wrap CCC_Entry;
@@ -137,23 +137,24 @@ typedef enum : uint8_t
     /** Memory is needed but the container lacks allocation permission. */
     CCC_RESULT_NO_ALLOCATION_FUNCTION,
     /** The container has allocation permission, but allocation failed. */
-    CCC_RESULT_MEM_ERROR,
+    CCC_RESULT_ALLOCATOR_ERROR,
     /** Bad arguments have been provided and operation returned early. */
-    CCC_RESULT_ARG_ERROR,
+    CCC_RESULT_ARGUMENT_ERROR,
     /** Internal helper, never returned to user. Always last result. */
-    CCC_RESULT_COUNT,
+    CCC_PRIVATE_RESULT_COUNT,
 } CCC_Result;
 
 /** @brief A three-way comparison for comparison functions.
 
-A C style three way comparison value (e.g. ((a > b) - (a < b))). CCC_ORDER_LESS
-if left hand side is less than right hand side, CCC_ORDER_EQUAL if they are
-equal, and CCC_ORDER_GREATER if left hand side is greater than right hand side.
+A C style three way comparison value (e.g. ((a > b) - (a < b))).
+CCC_ORDER_LESSER if left hand side is less than right hand side, CCC_ORDER_EQUAL
+if they are equal, and CCC_ORDER_GREATER if left hand side is greater than right
+hand side.
 */
 typedef enum : int8_t
 {
     /** The left hand side is less than the right hand side. */
-    CCC_ORDER_LESS = -1,
+    CCC_ORDER_LESSER = -1,
     /** The left hand side and right hand side are equal. */
     CCC_ORDER_EQUAL,
     /** The left hand side is greater than the right hand side. */
@@ -195,7 +196,7 @@ This type helps the user define the comparison callback function, if the
 container takes a standard element comparison function, and helps avoid
 swappable argument errors. Any type LHS is considered the left hand side and
 any type RHS is the right hand side when considering three-way comparison
-return values. Aux data is a reference to any auxiliary data provided upon
+return values. Aux data is a reference to any context data provided upon
 container initialization. */
 typedef struct
 {
@@ -203,8 +204,8 @@ typedef struct
     void const *const any_type_lhs;
     /** The right hand side for a three-way comparison operation. */
     void const *const any_type_rhs;
-    /** A reference to aux data provided to container on initialization. */
-    void *aux;
+    /** A reference to context data provided to container on initialization. */
+    void *context;
 } CCC_Type_comparator_context;
 
 /** @brief A key comparison helper to avoid argument swapping.
@@ -230,8 +231,9 @@ typedef struct
     void const *const any_key_lhs;
     /** The complete user type stored in the container. */
     void const *const any_type_rhs;
-    /** A reference to aux data provided to the container on initialization. */
-    void *aux;
+    /** A reference to context data provided to the container on initialization.
+     */
+    void *context;
 } CCC_Key_comparator_context;
 
 /** @brief A reference to a user type within the container.
@@ -242,28 +244,30 @@ typedef struct
 {
     /** The user type being stored in the container. */
     void *any_type;
-    /** A reference to aux data provided to the container on initialization. */
-    void *aux;
+    /** A reference to context data provided to the container on initialization.
+     */
+    void *context;
 } CCC_Type_context;
 
 /** @brief A read only reference to a key type matching the key field type used
 for hash containers.
 
-A reference to any auxiliary data is also provided. This the struct one can use
+A reference to any context data is also provided. This the struct one can use
 to hash their values with their hash function. */
 typedef struct
 {
     /** A reference to the same type used for keys in the container. */
     void const *const any_key;
-    /** A reference to aux data provided to the container on initialization. */
-    void *aux;
+    /** A reference to context data provided to the container on initialization.
+     */
+    void *context;
 } CCC_Key_context;
 
 typedef struct
 {
     void *input;
     size_t bytes;
-    void *aux;
+    void *context;
 
 } CCC_Allocator_context;
 
@@ -272,7 +276,7 @@ typedef struct
 An allocation function implements the following behavior, when it has been
 passed an allocator context. Aux is passed to a container upon its
 initialization and the programmer may choose how to best utilize this reference
-(more on aux later).
+(more on context later).
 
 - If input is NULL and bytes 0, NULL is returned.
 - If input is NULL with non-zero bytes, new memory is allocated/returned.
@@ -283,9 +287,10 @@ initialization and the programmer may choose how to best utilize this reference
 - If input is non-NULL and size is 0, input is freed and NULL is returned.
 
 One may be tempted to use realloc to check all of these boxes but realloc is
-implementation defined on some of these points. So, the aux parameter also
+implementation defined on some of these points. So, the context parameter also
 discourages users from providing realloc. For example, one solution using the
-standard library allocator might be implemented as follows (aux is not needed):
+standard library allocator might be implemented as follows (context is not
+needed):
 
 ```
 void *
@@ -310,56 +315,57 @@ std_alloc(CCC_Allocator_context const context)
 
 However, the above example is only useful if the standard library allocator
 is used. Any allocator that implements the required behavior is sufficient.
-For example programs that utilize the aux parameter, see the sample programs.
-Using custom arena allocators or container compositions are cases when aux is
-needed. */
+For example programs that utilize the context parameter, see the sample
+programs. Using custom arena allocators or container compositions are cases when
+context is needed. */
 typedef void *CCC_Allocator(CCC_Allocator_context);
 
 /** @brief A callback function for comparing two elements in a container.
 
 A three-way comparison return value is expected and the two containers being
 compared are guaranteed to be non-NULL and pointing to the base of the user type
-stored in the container. Aux may be NULL if no aux is provided on
+stored in the container. Aux may be NULL if no context is provided on
 initialization. */
 typedef CCC_Order CCC_Type_comparator(CCC_Type_comparator_context);
 
 /** @brief A callback function for modifying an element in the container.
 
-A reference to the container type and any aux data provided on initialization
-is available. The container pointer points to the base of the user type and is
-not NULL. Aux may be NULL if no aux is provided on initialization. An update
-function is used when a container Interface exposes functions to modify the key
-or value used to determine sorted order of elements in the container. */
+A reference to the container type and any context data provided on
+initialization is available. The container pointer points to the base of the
+user type and is not NULL. Aux may be NULL if no context is provided on
+initialization. An update function is used when a container Interface exposes
+functions to modify the key or value used to determine sorted order of elements
+in the container. */
 typedef void CCC_Type_updater(CCC_Type_context);
 
 /** @brief A callback function for destroying an element in the container.
 
-A reference to the container type and any aux data provided on initialization
-is available. The container pointer points to the base of the user type and is
-not NULL. Aux may be NULL if no aux is provided on initialization. A destructor
-function is used to act on each element of the container when it is being
-emptied and destroyed. The function will be called on each type after it
-removed from the container and before it is freed by the container, if
-allocation permission is provided to the container. Therefore, if the user
-has given permission to the container to allocate memory they can assume the
-container will free each element with the provided allocation function; this
-function can be used for any other program state to be maintained before the
-container frees. If the user has not given permission to the container to
-allocate memory, this a good function in which to free each element, if
-desired; any program state can be maintained then the element can be freed by
-the user in this function as the final step. */
+A reference to the container type and any context data provided on
+initialization is available. The container pointer points to the base of the
+user type and is not NULL. Aux may be NULL if no context is provided on
+initialization. A destructor function is used to act on each element of the
+container when it is being emptied and destroyed. The function will be called on
+each type after it removed from the container and before it is freed by the
+container, if allocation permission is provided to the container. Therefore, if
+the user has given permission to the container to allocate memory they can
+assume the container will free each element with the provided allocation
+function; this function can be used for any other program state to be maintained
+before the container frees. If the user has not given permission to the
+container to allocate memory, this a good function in which to free each
+element, if desired; any program state can be maintained then the element can be
+freed by the user in this function as the final step. */
 typedef void CCC_Type_destructor(CCC_Type_context);
 
 /** @brief A callback function for three-way comparing two stored keys.
 
 The key is considered the left hand side of the comparison. The function should
-return CCC_ORDER_LESS if the key is less than the key in key field of user type,
-CCC_ORDER_EQUAL if equal, and CCC_ORDER_GREATER if greater. */
+return CCC_ORDER_LESSER if the key is less than the key in key field of user
+type, CCC_ORDER_EQUAL if equal, and CCC_ORDER_GREATER if greater. */
 typedef CCC_Order CCC_Key_comparator(CCC_Key_comparator_context);
 
 /** @brief A callback function to hash the key type used in a container.
 
-A reference to any aux data provided on initialization is also available.
+A reference to any context data provided on initialization is also available.
 Return the complete hash value as determined by the user hashing algorithm. */
 typedef uint64_t CCC_Key_hasher(CCC_Key_context to_hash);
 

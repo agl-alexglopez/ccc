@@ -5,17 +5,17 @@
 #define TRAITS_USING_NAMESPACE_CCC
 
 #include "checkers.h"
-#include "fhmap_util.h"
 #include "flat_hash_map.h"
+#include "flat_hash_map_util.h"
 #include "traits.h"
 #include "types.h"
 #include "util/alloc.h"
 
-CHECK_BEGIN_STATIC_FN(fhmap_test_insert)
+CHECK_BEGIN_STATIC_FN(flat_hash_map_test_insert)
 {
-    CCC_flat_hash_map fh
-        = fhm_initialize(&(small_fixed_map){}, struct val, key, fhmap_int_zero,
-                         fhmap_id_cmp, NULL, NULL, SMALL_FIXED_CAP);
+    CCC_Flat_hash_map fh = flat_hash_map_initialize(
+        &(small_fixed_map){}, struct val, key, flat_hash_map_int_zero,
+        flat_hash_map_id_cmp, NULL, NULL, SMALL_FIXED_CAP);
 
     /* Nothing was there before so nothing is in the entry. */
     CCC_Entry ent = swap_entry(&fh, &(struct val){.key = 137, .val = 99});
@@ -25,44 +25,46 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(fhmap_test_insert_macros)
+CHECK_BEGIN_STATIC_FN(flat_hash_map_test_insert_macros)
 {
-    CCC_flat_hash_map fh = CCC_fhm_initialize(&(small_fixed_map){}, struct val,
-                                              key, fhmap_int_zero, fhmap_id_cmp,
-                                              NULL, NULL, SMALL_FIXED_CAP);
+    CCC_Flat_hash_map fh = CCC_flat_hash_map_initialize(
+        &(small_fixed_map){}, struct val, key, flat_hash_map_int_zero,
+        flat_hash_map_id_cmp, NULL, NULL, SMALL_FIXED_CAP);
 
-    struct val const *ins = CCC_fhm_or_insert_w(
+    struct val const *ins = CCC_flat_hash_map_or_insert_w(
         entry_r(&fh, &(int){2}), (struct val){.key = 2, .val = 0});
     CHECK(ins != NULL, true);
     CHECK(validate(&fh), true);
     CHECK(count(&fh).count, 1);
-    ins = fhm_insert_entry_w(entry_r(&fh, &(int){2}),
-                             (struct val){.key = 2, .val = 0});
+    ins = flat_hash_map_insert_entry_w(entry_r(&fh, &(int){2}),
+                                       (struct val){.key = 2, .val = 0});
     CHECK(validate(&fh), true);
     CHECK(ins != NULL, true);
-    ins = fhm_insert_entry_w(entry_r(&fh, &(int){9}),
-                             (struct val){.key = 9, .val = 1});
+    ins = flat_hash_map_insert_entry_w(entry_r(&fh, &(int){9}),
+                                       (struct val){.key = 9, .val = 1});
     CHECK(validate(&fh), true);
     CHECK(ins != NULL, true);
     ins = CCC_entry_unwrap(
-        fhm_insert_or_assign_w(&fh, 3, (struct val){.val = 99}));
+        flat_hash_map_insert_or_assign_w(&fh, 3, (struct val){.val = 99}));
     CHECK(validate(&fh), true);
     CHECK(ins == NULL, false);
     CHECK(validate(&fh), true);
     CHECK(ins->val, 99);
     CHECK(count(&fh).count, 3);
     ins = CCC_entry_unwrap(
-        fhm_insert_or_assign_w(&fh, 3, (struct val){.val = 98}));
+        flat_hash_map_insert_or_assign_w(&fh, 3, (struct val){.val = 98}));
     CHECK(validate(&fh), true);
     CHECK(ins == NULL, false);
     CHECK(ins->val, 98);
     CHECK(count(&fh).count, 3);
-    ins = CCC_entry_unwrap(fhm_try_insert_w(&fh, 3, (struct val){.val = 100}));
+    ins = CCC_entry_unwrap(
+        flat_hash_map_try_insert_w(&fh, 3, (struct val){.val = 100}));
     CHECK(ins == NULL, false);
     CHECK(validate(&fh), true);
     CHECK(ins->val, 98);
     CHECK(count(&fh).count, 3);
-    ins = CCC_entry_unwrap(fhm_try_insert_w(&fh, 4, (struct val){.val = 100}));
+    ins = CCC_entry_unwrap(
+        flat_hash_map_try_insert_w(&fh, 4, (struct val){.val = 100}));
     CHECK(ins == NULL, false);
     CHECK(validate(&fh), true);
     CHECK(ins->val, 100);
@@ -70,11 +72,11 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert_macros)
     CHECK_END_FN(clear_and_free(&fh, NULL););
 }
 
-CHECK_BEGIN_STATIC_FN(fhmap_test_insert_overwrite)
+CHECK_BEGIN_STATIC_FN(flat_hash_map_test_insert_overwrite)
 {
-    CCC_flat_hash_map fh
-        = fhm_initialize(&(small_fixed_map){}, struct val, key, fhmap_int_zero,
-                         fhmap_id_cmp, NULL, NULL, SMALL_FIXED_CAP);
+    CCC_Flat_hash_map fh = flat_hash_map_initialize(
+        &(small_fixed_map){}, struct val, key, flat_hash_map_int_zero,
+        flat_hash_map_id_cmp, NULL, NULL, SMALL_FIXED_CAP);
 
     struct val q = {.key = 137, .val = 99};
     CCC_Entry ent = swap_entry(&fh, &q);
@@ -104,11 +106,11 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert_overwrite)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(fhmap_test_insert_then_bad_ideas)
+CHECK_BEGIN_STATIC_FN(flat_hash_map_test_insert_then_bad_ideas)
 {
-    CCC_flat_hash_map fh
-        = fhm_initialize(&(small_fixed_map){}, struct val, key, fhmap_int_zero,
-                         fhmap_id_cmp, NULL, NULL, SMALL_FIXED_CAP);
+    CCC_Flat_hash_map fh = flat_hash_map_initialize(
+        &(small_fixed_map){}, struct val, key, flat_hash_map_int_zero,
+        flat_hash_map_id_cmp, NULL, NULL, SMALL_FIXED_CAP);
     struct val q = {.key = 137, .val = 99};
     CCC_Entry ent = swap_entry(&fh, &q);
     CHECK(occupied(&ent), false);
@@ -134,12 +136,12 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert_then_bad_ideas)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(fhmap_test_entry_api_functional)
+CHECK_BEGIN_STATIC_FN(flat_hash_map_test_entry_api_functional)
 {
     /* Over allocate size now because we don't want to worry about resizing. */
-    CCC_flat_hash_map fh = fhm_initialize(
-        &(standard_fixed_map){}, struct val, key, fhmap_int_last_digit,
-        fhmap_id_cmp, NULL, NULL, STANDARD_FIXED_CAP);
+    CCC_Flat_hash_map fh = flat_hash_map_initialize(
+        &(standard_fixed_map){}, struct val, key, flat_hash_map_int_last_digit,
+        flat_hash_map_id_cmp, NULL, NULL, STANDARD_FIXED_CAP);
     size_t const size = 200;
 
     /* Test entry or insert with for all even values. Default should be
@@ -162,7 +164,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_entry_api_functional)
         def.key = (int)i;
         def.val = (int)i;
         struct val const *const d = or_insert(
-            and_modify(entry_r(&fh, &def.key), fhmap_modplus), &def);
+            and_modify(entry_r(&fh, &def.key), flat_hash_map_modplus), &def);
         /* All values in the array should be odd now */
         CHECK((d != NULL), true);
         CHECK(d->key, i);
@@ -192,13 +194,13 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_entry_api_functional)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(fhmap_test_insert_via_entry)
+CHECK_BEGIN_STATIC_FN(flat_hash_map_test_insert_via_entry)
 {
     /* Over allocate size now because we don't want to worry about resizing. */
     size_t const size = 200;
-    CCC_flat_hash_map fh = fhm_initialize(
-        &(standard_fixed_map){}, struct val, key, fhmap_int_last_digit,
-        fhmap_id_cmp, NULL, NULL, STANDARD_FIXED_CAP);
+    CCC_Flat_hash_map fh = flat_hash_map_initialize(
+        &(standard_fixed_map){}, struct val, key, flat_hash_map_int_last_digit,
+        flat_hash_map_id_cmp, NULL, NULL, STANDARD_FIXED_CAP);
 
     /* Test entry or insert with for all even values. Default should be
        inserted. All entries are hashed to last digit so many spread out
@@ -236,13 +238,13 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert_via_entry)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(fhmap_test_insert_via_entry_macros)
+CHECK_BEGIN_STATIC_FN(flat_hash_map_test_insert_via_entry_macros)
 {
     /* Over allocate size now because we don't want to worry about resizing. */
     size_t const size = 200;
-    CCC_flat_hash_map fh = fhm_initialize(
-        &(standard_fixed_map){}, struct val, key, fhmap_int_last_digit,
-        fhmap_id_cmp, NULL, NULL, STANDARD_FIXED_CAP);
+    CCC_Flat_hash_map fh = flat_hash_map_initialize(
+        &(standard_fixed_map){}, struct val, key, flat_hash_map_int_last_digit,
+        flat_hash_map_id_cmp, NULL, NULL, STANDARD_FIXED_CAP);
 
     /* Test entry or insert with for all even values. Default should be
        inserted. All entries are hashed to last digit so many spread out
@@ -277,13 +279,13 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert_via_entry_macros)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(fhmap_test_entry_api_macros)
+CHECK_BEGIN_STATIC_FN(flat_hash_map_test_entry_api_macros)
 {
     /* Over allocate size now because we don't want to worry about resizing. */
     int const size = 200;
-    CCC_flat_hash_map fh = fhm_initialize(
-        &(standard_fixed_map){}, struct val, key, fhmap_int_last_digit,
-        fhmap_id_cmp, NULL, NULL, STANDARD_FIXED_CAP);
+    CCC_Flat_hash_map fh = flat_hash_map_initialize(
+        &(standard_fixed_map){}, struct val, key, flat_hash_map_int_last_digit,
+        flat_hash_map_id_cmp, NULL, NULL, STANDARD_FIXED_CAP);
 
     /* Test entry or insert with for all even values. Default should be
        inserted. All entries are hashed to last digit so many spread out
@@ -292,8 +294,8 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_entry_api_macros)
     {
         /* The macros support functions that will only execute if the or
            insert branch executes. */
-        struct val const *const d
-            = fhm_or_insert_w(entry_r(&fh, &i), fhmap_create(i, i));
+        struct val const *const d = flat_hash_map_or_insert_w(
+            entry_r(&fh, &i), flat_hash_map_create(i, i));
         CHECK((d != NULL), true);
         CHECK(d->key, i);
         CHECK(d->val, i);
@@ -302,8 +304,9 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_entry_api_macros)
     /* The default insertion should not occur every other element. */
     for (int i = 0; i < size / 2; ++i)
     {
-        struct val const *const d = fhm_or_insert_w(
-            and_modify(entry_r(&fh, &i), fhmap_modplus), fhmap_create(i, i));
+        struct val const *const d = flat_hash_map_or_insert_w(
+            and_modify(entry_r(&fh, &i), flat_hash_map_modplus),
+            flat_hash_map_create(i, i));
         /* All values in the array should be odd now */
         CHECK((d != NULL), true);
         CHECK(d->key, i);
@@ -322,7 +325,8 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_entry_api_macros)
        should be switched back to even now. */
     for (int i = 0; i < size / 2; ++i)
     {
-        struct val *v = fhm_or_insert_w(entry_r(&fh, &i), (struct val){});
+        struct val *v
+            = flat_hash_map_or_insert_w(entry_r(&fh, &i), (struct val){});
         CHECK(v != NULL, true);
         v->val++;
         /* All values in the array should be odd now */
@@ -332,11 +336,11 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_entry_api_macros)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(fhmap_test_two_sum)
+CHECK_BEGIN_STATIC_FN(flat_hash_map_test_two_sum)
 {
-    CCC_flat_hash_map fh = fhm_initialize(&(small_fixed_map){}, struct val, key,
-                                          fhmap_int_to_u64, fhmap_id_cmp, NULL,
-                                          NULL, SMALL_FIXED_CAP);
+    CCC_Flat_hash_map fh = flat_hash_map_initialize(
+        &(small_fixed_map){}, struct val, key, flat_hash_map_int_to_u64,
+        flat_hash_map_id_cmp, NULL, NULL, SMALL_FIXED_CAP);
     int const addends[10] = {1, 3, -980, 6, 7, 13, 44, 32, 995, -1};
     int const target = 15;
     int solution_indices[2] = {-1, -1};
@@ -359,11 +363,11 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_two_sum)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(fhmap_test_longest_consecutive_sequence)
+CHECK_BEGIN_STATIC_FN(flat_hash_map_test_longest_consecutive_sequence)
 {
-    CCC_flat_hash_map fh = fhm_initialize(&(standard_fixed_map){}, struct val,
-                                          key, fhmap_int_to_u64, fhmap_id_cmp,
-                                          NULL, NULL, STANDARD_FIXED_CAP);
+    CCC_Flat_hash_map fh = flat_hash_map_initialize(
+        &(standard_fixed_map){}, struct val, key, flat_hash_map_int_to_u64,
+        flat_hash_map_id_cmp, NULL, NULL, STANDARD_FIXED_CAP);
     /* Longest sequence is 1,2,3,4,5,6,7,8,9,10 of length 10. */
     int const nums[] = {
         99, 54, 1, 4, 9,  2, 3,   4,  8,  271, 32, 45, 86, 44, 7,  777, 6,  20,
@@ -411,11 +415,11 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_longest_consecutive_sequence)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(fhmap_test_resize)
+CHECK_BEGIN_STATIC_FN(flat_hash_map_test_resize)
 {
-    CCC_flat_hash_map fh
-        = fhm_initialize(NULL, struct val, key, fhmap_int_to_u64, fhmap_id_cmp,
-                         std_alloc, NULL, 0);
+    CCC_Flat_hash_map fh = flat_hash_map_initialize(
+        NULL, struct val, key, flat_hash_map_int_to_u64, flat_hash_map_id_cmp,
+        std_alloc, NULL, 0);
     int const to_insert = 1000;
     int const larger_prime = 1009;
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
@@ -439,15 +443,15 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_resize)
         CHECK(in_table->val, shuffled_index);
     }
     CHECK(count(&fh).count, to_insert);
-    CHECK(fhm_clear_and_free(&fh, NULL), CCC_RESULT_OK);
+    CHECK(flat_hash_map_clear_and_free(&fh, NULL), CCC_RESULT_OK);
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(fhmap_test_resize_macros)
+CHECK_BEGIN_STATIC_FN(flat_hash_map_test_resize_macros)
 {
-    CCC_flat_hash_map fh
-        = fhm_initialize(NULL, struct val, key, fhmap_int_to_u64, fhmap_id_cmp,
-                         std_alloc, NULL, 0);
+    CCC_Flat_hash_map fh = flat_hash_map_initialize(
+        NULL, struct val, key, flat_hash_map_int_to_u64, flat_hash_map_id_cmp,
+        std_alloc, NULL, 0);
     int const to_insert = 1000;
     int const larger_prime = 1009;
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
@@ -463,31 +467,32 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_resize_macros)
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
-        struct val const *const in_table = fhm_or_insert_w(
-            fhm_and_modify_w(entry_r(&fh, &shuffled_index), struct val,
-                             {
-                                 T->val = shuffled_index;
-                             }),
+        struct val const *const in_table = flat_hash_map_or_insert_w(
+            flat_hash_map_and_modify_w(entry_r(&fh, &shuffled_index),
+                                       struct val,
+                                       {
+                                           T->val = shuffled_index;
+                                       }),
             (struct val){});
         CHECK(in_table != NULL, true);
         CHECK(in_table->val, shuffled_index);
-        struct val *v
-            = fhm_or_insert_w(entry_r(&fh, &shuffled_index), (struct val){});
+        struct val *v = flat_hash_map_or_insert_w(entry_r(&fh, &shuffled_index),
+                                                  (struct val){});
         CHECK(v == NULL, false);
         v->val = i;
         v = get_key_val(&fh, &shuffled_index);
         CHECK(v != NULL, true);
         CHECK(v->val, i);
     }
-    CHECK(fhm_clear_and_free(&fh, NULL), CCC_RESULT_OK);
+    CHECK(flat_hash_map_clear_and_free(&fh, NULL), CCC_RESULT_OK);
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(fhmap_test_resize_from_null)
+CHECK_BEGIN_STATIC_FN(flat_hash_map_test_resize_from_null)
 {
-    CCC_flat_hash_map fh
-        = fhm_initialize(NULL, struct val, key, fhmap_int_to_u64, fhmap_id_cmp,
-                         std_alloc, NULL, 0);
+    CCC_Flat_hash_map fh = flat_hash_map_initialize(
+        NULL, struct val, key, flat_hash_map_int_to_u64, flat_hash_map_id_cmp,
+        std_alloc, NULL, 0);
     int const to_insert = 1000;
     int const larger_prime = 1009;
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
@@ -509,15 +514,15 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_resize_from_null)
         CHECK(in_table != NULL, true);
         CHECK(in_table->val, shuffled_index);
     }
-    CHECK(fhm_clear_and_free(&fh, NULL), CCC_RESULT_OK);
+    CHECK(flat_hash_map_clear_and_free(&fh, NULL), CCC_RESULT_OK);
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(fhmap_test_resize_from_null_macros)
+CHECK_BEGIN_STATIC_FN(flat_hash_map_test_resize_from_null_macros)
 {
-    CCC_flat_hash_map fh
-        = fhm_initialize(NULL, struct val, key, fhmap_int_to_u64, fhmap_id_cmp,
-                         std_alloc, NULL, 0);
+    CCC_Flat_hash_map fh = flat_hash_map_initialize(
+        NULL, struct val, key, flat_hash_map_int_to_u64, flat_hash_map_id_cmp,
+        std_alloc, NULL, 0);
     int const to_insert = 1000;
     int const larger_prime = 1009;
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
@@ -533,31 +538,32 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_resize_from_null_macros)
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
-        struct val const *const in_table = fhm_or_insert_w(
-            fhm_and_modify_w(entry_r(&fh, &shuffled_index), struct val,
-                             {
-                                 T->val = shuffled_index;
-                             }),
+        struct val const *const in_table = flat_hash_map_or_insert_w(
+            flat_hash_map_and_modify_w(entry_r(&fh, &shuffled_index),
+                                       struct val,
+                                       {
+                                           T->val = shuffled_index;
+                                       }),
             (struct val){});
         CHECK(in_table != NULL, true);
         CHECK(in_table->val, shuffled_index);
-        struct val *v
-            = fhm_or_insert_w(entry_r(&fh, &shuffled_index), (struct val){});
+        struct val *v = flat_hash_map_or_insert_w(entry_r(&fh, &shuffled_index),
+                                                  (struct val){});
         CHECK(v == NULL, false);
         v->val = i;
         v = get_key_val(&fh, &shuffled_index);
         CHECK(v == NULL, false);
         CHECK(v->val, i);
     }
-    CHECK(fhm_clear_and_free(&fh, NULL), CCC_RESULT_OK);
+    CHECK(flat_hash_map_clear_and_free(&fh, NULL), CCC_RESULT_OK);
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(fhmap_test_insert_limit)
+CHECK_BEGIN_STATIC_FN(flat_hash_map_test_insert_limit)
 {
-    CCC_flat_hash_map fh = fhm_initialize(&(small_fixed_map){}, struct val, key,
-                                          fhmap_int_to_u64, fhmap_id_cmp, NULL,
-                                          NULL, SMALL_FIXED_CAP);
+    CCC_Flat_hash_map fh = flat_hash_map_initialize(
+        &(small_fixed_map){}, struct val, key, flat_hash_map_int_to_u64,
+        flat_hash_map_id_cmp, NULL, NULL, SMALL_FIXED_CAP);
 
     int const size = SMALL_FIXED_CAP;
     int const larger_prime = 1097;
@@ -614,11 +620,11 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert_limit)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(fhmap_test_insert_and_find)
+CHECK_BEGIN_STATIC_FN(flat_hash_map_test_insert_and_find)
 {
-    CCC_flat_hash_map fh = fhm_initialize(&(small_fixed_map){}, struct val, key,
-                                          fhmap_int_to_u64, fhmap_id_cmp, NULL,
-                                          NULL, SMALL_FIXED_CAP);
+    CCC_Flat_hash_map fh = flat_hash_map_initialize(
+        &(small_fixed_map){}, struct val, key, flat_hash_map_int_to_u64,
+        flat_hash_map_id_cmp, NULL, NULL, SMALL_FIXED_CAP);
     int const size = SMALL_FIXED_CAP;
 
     for (int i = 0; i < size; i += 2)
@@ -649,16 +655,16 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert_and_find)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(fhmap_test_reserve_without_permissions)
+CHECK_BEGIN_STATIC_FN(flat_hash_map_test_reserve_without_permissions)
 {
-    CCC_flat_hash_map fh
-        = fhm_initialize(NULL, struct val, key, fhmap_int_to_u64, fhmap_id_cmp,
-                         std_alloc, NULL, 0);
+    CCC_Flat_hash_map fh = flat_hash_map_initialize(
+        NULL, struct val, key, flat_hash_map_int_to_u64, flat_hash_map_id_cmp,
+        std_alloc, NULL, 0);
     /* The map must insert all of the requested elements but has no permission
        to resize. This ensures the reserve function works as expected. */
     int const to_insert = 1000;
     int const larger_prime = 1009;
-    CCC_Result const res = CCC_fhm_reserve(&fh, to_insert, std_alloc);
+    CCC_Result const res = CCC_flat_hash_map_reserve(&fh, to_insert, std_alloc);
     CHECK(res, CCC_RESULT_OK);
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
@@ -677,20 +683,25 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_reserve_without_permissions)
         CHECK(check, true);
     }
     CHECK(count(&fh).count, to_insert);
-    CHECK_END_FN(fhm_clear_and_free_reserve(&fh, NULL, std_alloc););
+    CHECK_END_FN(flat_hash_map_clear_and_free_reserve(&fh, NULL, std_alloc););
 }
 
 int
 main(void)
 {
     return CHECK_RUN(
-        fhmap_test_insert(), fhmap_test_insert_macros(),
-        fhmap_test_insert_and_find(), fhmap_test_insert_overwrite(),
-        fhmap_test_insert_then_bad_ideas(), fhmap_test_insert_via_entry(),
-        fhmap_test_insert_via_entry_macros(), fhmap_test_entry_api_functional(),
-        fhmap_test_entry_api_macros(), fhmap_test_two_sum(),
-        fhmap_test_longest_consecutive_sequence(), fhmap_test_resize(),
-        fhmap_test_resize_macros(), fhmap_test_resize_from_null(),
-        fhmap_test_resize_from_null_macros(), fhmap_test_insert_limit(),
-        fhmap_test_reserve_without_permissions());
+        flat_hash_map_test_insert(), flat_hash_map_test_insert_macros(),
+        flat_hash_map_test_insert_and_find(),
+        flat_hash_map_test_insert_overwrite(),
+        flat_hash_map_test_insert_then_bad_ideas(),
+        flat_hash_map_test_insert_via_entry(),
+        flat_hash_map_test_insert_via_entry_macros(),
+        flat_hash_map_test_entry_api_functional(),
+        flat_hash_map_test_entry_api_macros(), flat_hash_map_test_two_sum(),
+        flat_hash_map_test_longest_consecutive_sequence(),
+        flat_hash_map_test_resize(), flat_hash_map_test_resize_macros(),
+        flat_hash_map_test_resize_from_null(),
+        flat_hash_map_test_resize_from_null_macros(),
+        flat_hash_map_test_insert_limit(),
+        flat_hash_map_test_reserve_without_permissions());
 }

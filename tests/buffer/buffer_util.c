@@ -32,7 +32,7 @@ partition(Buffer *const b, CCC_Type_comparator *const fn, void *const tmp,
         CCC_Order const cmp = fn((CCC_Type_comparator_context){
             .any_type_lhs = j,
             .any_type_rhs = pivot_val,
-            .aux = b->aux,
+            .context = b->context,
         });
         if (cmp != CCC_ORDER_GREATER)
         {
@@ -87,7 +87,7 @@ sort(CCC_Buffer *const b, CCC_Type_comparator *const fn, void *const swap)
 {
     if (!b || !fn || !swap)
     {
-        return CCC_RESULT_ARG_ERROR;
+        return CCC_RESULT_ARGUMENT_ERROR;
     }
     if (buffer_count(b).count)
     {
@@ -104,7 +104,7 @@ bufcmp(CCC_Buffer const *const lhs, size_t const rhs_count,
     size_t const buffer_size = buffer_count(lhs).count;
     if (buffer_size < rhs_count)
     {
-        return CCC_ORDER_LESS;
+        return CCC_ORDER_LESSER;
     }
     if (buffer_size < rhs_count)
     {
@@ -117,7 +117,7 @@ bufcmp(CCC_Buffer const *const lhs, size_t const rhs_count,
     }
     if (cmp < 0)
     {
-        return CCC_ORDER_LESS;
+        return CCC_ORDER_LESSER;
     }
     return CCC_ORDER_GREATER;
 }

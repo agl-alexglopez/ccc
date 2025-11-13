@@ -1,23 +1,23 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "fhmap_util.h"
+#include "Flat_hash_map_util.h"
 #include "types.h"
 
 uint64_t
-fhmap_int_zero(CCC_Key_context const)
+flat_hash_mapap_int_zero(CCC_Key_context const)
 {
     return 0;
 }
 
 uint64_t
-fhmap_int_last_digit(CCC_Key_context const n)
+flat_hash_mapap_int_last_digit(CCC_Key_context const n)
 {
     return *((int *)n.any_key) % 10;
 }
 
 CCC_Order
-fhmap_id_cmp(CCC_Key_comparator_context const cmp)
+flat_hash_mapap_id_cmp(CCC_Key_comparator_context const cmp)
 {
     struct val const *const rhs = cmp.any_type_rhs;
     int const lhs = *((int *)cmp.any_key_lhs);
@@ -25,7 +25,7 @@ fhmap_id_cmp(CCC_Key_comparator_context const cmp)
 }
 
 uint64_t
-fhmap_int_to_u64(CCC_Key_context const k)
+flat_hash_mapap_int_to_u64(CCC_Key_context const k)
 {
     int const id_int = *((int *)k.any_key);
     uint64_t x = id_int;
@@ -36,20 +36,20 @@ fhmap_int_to_u64(CCC_Key_context const k)
 }
 
 void
-fhmap_modplus(CCC_Type_context const mod)
+flat_hash_mapap_modplus(CCC_Type_context const mod)
 {
     ((struct val *)mod.any_type)->val++;
 }
 
 struct val
-fhmap_create(int const id, int const val)
+flat_hash_mapap_create(int const id, int const val)
 {
     return (struct val){.key = id, .val = val};
 }
 
 void
-fhmap_swap_val(CCC_Type_context const u)
+flat_hash_mapap_swap_val(CCC_Type_context const u)
 {
     struct val *v = u.any_type;
-    v->val = *((int *)u.aux);
+    v->val = *((int *)u.context);
 }

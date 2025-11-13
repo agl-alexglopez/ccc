@@ -11,7 +11,7 @@ struct val
 {
     int key;
     int val;
-    CCC_romap_elem elem;
+    CCC_romap_node elem;
 };
 
 /** Use this type to set up a simple bump allocator. The pool of values can
@@ -26,15 +26,15 @@ struct val_pool
     size_t capacity;  /* Total. Exhausted when next_free == capacity. */
 };
 
-/** The bump allocator will point to the val pool as its auxiliary data. It
+/** The bump allocator will point to the val pool as its context data. It
 can only allocate. Freeing is a No Op. Reallocation will kill the program. */
-void *val_bump_alloc(void *ptr, size_t size, void *aux);
+void *val_bump_alloc(void *ptr, size_t size, void *context);
 
 CCC_Order id_cmp(CCC_any_key_cmp);
 
-enum check_result insert_shuffled(CCC_realtime_ordered_map *m,
+enum check_result insert_shuffled(CCC_Realtime_ordered_map *m,
                                   struct val vals[], size_t size,
                                   int larger_prime);
-size_t inorder_fill(int vals[], size_t size, CCC_realtime_ordered_map const *m);
+size_t inorder_fill(int vals[], size_t size, CCC_Realtime_ordered_map const *m);
 
 #endif /* CCC_ROMAP_UTIL_H */

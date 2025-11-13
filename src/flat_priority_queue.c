@@ -29,247 +29,280 @@ enum : size_t
 
 /*=====================      Prototypes      ================================*/
 
-static void *at(struct CCC_fpq const *, size_t);
-static size_t index_of(struct CCC_fpq const *, void const *);
-static CCC_Tribool wins(struct CCC_fpq const *, size_t winner, size_t loser);
-static CCC_Order cmp(struct CCC_fpq const *, size_t lhs, size_t rhs);
-static void swap(struct CCC_fpq *, void *tmp, size_t, size_t);
-static size_t bubble_up(struct CCC_fpq *fpq, void *tmp, size_t i);
-static size_t bubble_down(struct CCC_fpq *, void *tmp, size_t, size_t);
-static size_t update_fixup(struct CCC_fpq *, void *e, void *tmp);
-static void heapify(struct CCC_fpq *fpq, size_t n, void *);
-static void destroy_each(struct CCC_fpq *fpq, CCC_Type_destructor *fn);
+static void *at(struct CCC_Flat_priority_queue const *, size_t);
+static size_t index_of(struct CCC_Flat_priority_queue const *, void const *);
+static CCC_Tribool wins(struct CCC_Flat_priority_queue const *, size_t winner,
+                        size_t loser);
+static CCC_Order cmp(struct CCC_Flat_priority_queue const *, size_t lhs,
+                     size_t rhs);
+static void swap(struct CCC_Flat_priority_queue *, void *tmp, size_t, size_t);
+static size_t bubble_up(struct CCC_Flat_priority_queue *flat_priority_queue,
+                        void *tmp, size_t i);
+static size_t bubble_down(struct CCC_Flat_priority_queue *, void *tmp, size_t,
+                          size_t);
+static size_t update_fixup(struct CCC_Flat_priority_queue *, void *e,
+                           void *tmp);
+static void heapify(struct CCC_Flat_priority_queue *flat_priority_queue,
+                    size_t n, void *);
+static void destroy_each(struct CCC_Flat_priority_queue *flat_priority_queue,
+                         CCC_Type_destructor *fn);
 
 /*=====================       Interface      ================================*/
 
 CCC_Result
-CCC_fpq_heapify(CCC_flat_priority_queue *const fpq, void *const tmp,
-                void *const array, size_t const n,
-                size_t const input_sizeof_type)
+CCC_flat_priority_queue_heapify(
+    CCC_Flat_priority_queue *const flat_priority_queue, void *const tmp,
+    void *const array, size_t const n, size_t const input_sizeof_type)
 {
-    if (!fpq || !array || !tmp || array == fpq->buf.mem
-        || input_sizeof_type != fpq->buf.sizeof_type)
+    if (!flat_priority_queue || !array || !tmp
+        || array == flat_priority_queue->buf.mem
+        || input_sizeof_type != flat_priority_queue->buf.sizeof_type)
     {
-        return CCC_RESULT_ARG_ERROR;
+        return CCC_RESULT_ARGUMENT_ERROR;
     }
-    if (n > fpq->buf.capacity)
+    if (n > flat_priority_queue->buf.capacity)
     {
-        CCC_Result const resize_res
-            = CCC_buffer_alloc(&fpq->buf, n, fpq->buf.alloc);
+        CCC_Result const resize_res = CCC_buffer_alloc(
+            &flat_priority_queue->buf, n, flat_priority_queue->buf.alloc);
         if (resize_res != CCC_RESULT_OK)
         {
             return resize_res;
         }
     }
-    (void)memcpy(fpq->buf.mem, array, n * input_sizeof_type);
-    heapify(fpq, n, tmp);
+    (void)memcpy(flat_priority_queue->buf.mem, array, n * input_sizeof_type);
+    heapify(flat_priority_queue, n, tmp);
     return CCC_RESULT_OK;
 }
 
 CCC_Result
-CCC_fpq_heapify_inplace(CCC_flat_priority_queue *fpq, void *const tmp,
-                        size_t const n)
+CCC_flat_priority_queue_heapify_inplace(
+    CCC_Flat_priority_queue *flat_priority_queue, void *const tmp,
+    size_t const n)
 {
-    if (!fpq || !tmp || n > fpq->buf.capacity)
+    if (!flat_priority_queue || !tmp || n > flat_priority_queue->buf.capacity)
     {
-        return CCC_RESULT_ARG_ERROR;
+        return CCC_RESULT_ARGUMENT_ERROR;
     }
-    heapify(fpq, n, tmp);
+    heapify(flat_priority_queue, n, tmp);
     return CCC_RESULT_OK;
 }
 
 CCC_buffer
-CCC_fpq_heapsort(CCC_flat_priority_queue *const fpq, void *const tmp)
+CCC_flat_priority_queue_heapsort(
+    CCC_Flat_priority_queue *const flat_priority_queue, void *const tmp)
 {
     CCC_Buffer ret = {};
-    if (!fpq || !tmp)
+    if (!flat_priority_queue || !tmp)
     {
         return ret;
     }
-    ret = fpq->buf;
-    if (fpq->buf.count > 1)
+    ret = flat_priority_queue->buf;
+    if (flat_priority_queue->buf.count > 1)
     {
-        size_t end = fpq->buf.count;
+        size_t end = flat_priority_queue->buf.count;
         while (--end)
         {
-            swap(fpq, tmp, 0, end);
-            (void)bubble_down(fpq, tmp, 0, end);
+            swap(flat_priority_queue, tmp, 0, end);
+            (void)bubble_down(flat_priority_queue, tmp, 0, end);
         }
     }
-    *fpq = (CCC_flat_priority_queue){};
+    *flat_priority_queue = (CCC_Flat_priority_queue){};
     return ret;
 }
 
 void *
-CCC_fpq_push(CCC_flat_priority_queue *const fpq, void const *const elem,
-             void *const tmp)
+CCC_flat_priority_queue_push(CCC_Flat_priority_queue *const flat_priority_queue,
+                             void const *const elem, void *const tmp)
 {
-    if (!fpq || !elem || !tmp)
+    if (!flat_priority_queue || !elem || !tmp)
     {
         return NULL;
     }
-    void *const new = CCC_buffer_alloc_back(&fpq->buf);
+    void *const new = CCC_buffer_alloc_back(&flat_priority_queue->buf);
     if (!new)
     {
         return NULL;
     }
     if (new != elem)
     {
-        (void)memcpy(new, elem, fpq->buf.sizeof_type);
+        (void)memcpy(new, elem, flat_priority_queue->buf.sizeof_type);
     }
     assert(tmp);
-    size_t const i = bubble_up(fpq, tmp, fpq->buf.count - 1);
-    assert(i < fpq->buf.count);
-    return CCC_buffer_at(&fpq->buf, i);
+    size_t const i = bubble_up(flat_priority_queue, tmp,
+                               flat_priority_queue->buf.count - 1);
+    assert(i < flat_priority_queue->buf.count);
+    return CCC_buffer_at(&flat_priority_queue->buf, i);
 }
 
 CCC_Result
-CCC_fpq_pop(CCC_flat_priority_queue *const fpq, void *const tmp)
+CCC_flat_priority_queue_pop(CCC_Flat_priority_queue *const flat_priority_queue,
+                            void *const tmp)
 {
-    if (!fpq || !tmp || !fpq->buf.count)
+    if (!flat_priority_queue || !tmp || !flat_priority_queue->buf.count)
     {
-        return CCC_RESULT_ARG_ERROR;
+        return CCC_RESULT_ARGUMENT_ERROR;
     }
-    --fpq->buf.count;
-    if (!fpq->buf.count)
+    --flat_priority_queue->buf.count;
+    if (!flat_priority_queue->buf.count)
     {
         return CCC_RESULT_OK;
     }
-    swap(fpq, tmp, 0, fpq->buf.count);
-    (void)bubble_down(fpq, tmp, 0, fpq->buf.count);
+    swap(flat_priority_queue, tmp, 0, flat_priority_queue->buf.count);
+    (void)bubble_down(flat_priority_queue, tmp, 0,
+                      flat_priority_queue->buf.count);
     return CCC_RESULT_OK;
 }
 
 CCC_Result
-CCC_fpq_erase(CCC_flat_priority_queue *const fpq, void *const elem,
-              void *const tmp)
+CCC_flat_priority_queue_erase(
+    CCC_Flat_priority_queue *const flat_priority_queue, void *const elem,
+    void *const tmp)
 {
-    if (!fpq || !elem || !tmp || !fpq->buf.count)
+    if (!flat_priority_queue || !elem || !tmp
+        || !flat_priority_queue->buf.count)
     {
-        return CCC_RESULT_ARG_ERROR;
+        return CCC_RESULT_ARGUMENT_ERROR;
     }
-    size_t const i = index_of(fpq, elem);
-    --fpq->buf.count;
-    if (i == fpq->buf.count)
+    size_t const i = index_of(flat_priority_queue, elem);
+    --flat_priority_queue->buf.count;
+    if (i == flat_priority_queue->buf.count)
     {
         return CCC_RESULT_OK;
     }
-    swap(fpq, tmp, i, fpq->buf.count);
-    CCC_Order const cmp_res = cmp(fpq, i, fpq->buf.count);
-    if (cmp_res == fpq->order)
+    swap(flat_priority_queue, tmp, i, flat_priority_queue->buf.count);
+    CCC_Order const cmp_res
+        = cmp(flat_priority_queue, i, flat_priority_queue->buf.count);
+    if (cmp_res == flat_priority_queue->order)
     {
-        (void)bubble_up(fpq, tmp, i);
+        (void)bubble_up(flat_priority_queue, tmp, i);
     }
     else if (cmp_res != CCC_ORDER_EQUAL)
     {
-        (void)bubble_down(fpq, tmp, i, fpq->buf.count);
+        (void)bubble_down(flat_priority_queue, tmp, i,
+                          flat_priority_queue->buf.count);
     }
     /* If the comparison is equal do nothing. Element is in right spot. */
     return CCC_RESULT_OK;
 }
 
 void *
-CCC_fpq_update(CCC_flat_priority_queue *const fpq, void *const elem,
-               void *const tmp, CCC_Type_updater *const fn, void *const aux)
+CCC_flat_priority_queue_update(
+    CCC_Flat_priority_queue *const flat_priority_queue, void *const elem,
+    void *const tmp, CCC_Type_updater *const fn, void *const context)
 {
-    if (!fpq || !elem || !tmp || !fn || !fpq->buf.count)
+    if (!flat_priority_queue || !elem || !tmp || !fn
+        || !flat_priority_queue->buf.count)
     {
         return NULL;
     }
     fn((CCC_Type_context){
         .any_type = elem,
-        .aux = aux,
+        .context = context,
     });
-    return CCC_buffer_at(&fpq->buf, update_fixup(fpq, elem, tmp));
+    return CCC_buffer_at(&flat_priority_queue->buf,
+                         update_fixup(flat_priority_queue, elem, tmp));
 }
 
 /* There are no efficiency benefits in knowing an increase will occur. */
 void *
-CCC_fpq_increase(CCC_flat_priority_queue *const fpq, void *const elem,
-                 void *const tmp, CCC_Type_updater *const fn, void *const aux)
+CCC_flat_priority_queue_increase(
+    CCC_Flat_priority_queue *const flat_priority_queue, void *const elem,
+    void *const tmp, CCC_Type_updater *const fn, void *const context)
 {
-    return CCC_fpq_update(fpq, elem, tmp, fn, aux);
+    return CCC_flat_priority_queue_update(flat_priority_queue, elem, tmp, fn,
+                                          context);
 }
 
 /* There are no efficiency benefits in knowing an decrease will occur. */
 void *
-CCC_fpq_decrease(CCC_flat_priority_queue *const fpq, void *const elem,
-                 void *const tmp, CCC_Type_updater *const fn, void *const aux)
+CCC_flat_priority_queue_decrease(
+    CCC_Flat_priority_queue *const flat_priority_queue, void *const elem,
+    void *const tmp, CCC_Type_updater *const fn, void *const context)
 {
-    return CCC_fpq_update(fpq, elem, tmp, fn, aux);
+    return CCC_flat_priority_queue_update(flat_priority_queue, elem, tmp, fn,
+                                          context);
 }
 
 void *
-CCC_fpq_front(CCC_flat_priority_queue const *const fpq)
+CCC_flat_priority_queue_front(
+    CCC_Flat_priority_queue const *const flat_priority_queue)
 {
-    if (!fpq || !fpq->buf.count)
+    if (!flat_priority_queue || !flat_priority_queue->buf.count)
     {
         return NULL;
     }
-    return at(fpq, 0);
+    return at(flat_priority_queue, 0);
 }
 
 CCC_Tribool
-CCC_fpq_is_empty(CCC_flat_priority_queue const *const fpq)
+CCC_flat_priority_queue_is_empty(
+    CCC_Flat_priority_queue const *const flat_priority_queue)
 {
-    if (!fpq)
+    if (!flat_priority_queue)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    return CCC_buffer_is_empty(&fpq->buf);
+    return CCC_buffer_is_empty(&flat_priority_queue->buf);
 }
 
 CCC_Count
-CCC_fpq_count(CCC_flat_priority_queue const *const fpq)
+CCC_flat_priority_queue_count(
+    CCC_Flat_priority_queue const *const flat_priority_queue)
 {
-    if (!fpq)
+    if (!flat_priority_queue)
     {
-        return (CCC_Count){.error = CCC_RESULT_ARG_ERROR};
+        return (CCC_Count){.error = CCC_RESULT_ARGUMENT_ERROR};
     }
-    return CCC_buffer_count(&fpq->buf);
+    return CCC_buffer_count(&flat_priority_queue->buf);
 }
 
 CCC_Count
-CCC_fpq_capacity(CCC_flat_priority_queue const *const fpq)
+CCC_flat_priority_queue_capacity(
+    CCC_Flat_priority_queue const *const flat_priority_queue)
 {
-    if (!fpq)
+    if (!flat_priority_queue)
     {
-        return (CCC_Count){.error = CCC_RESULT_ARG_ERROR};
+        return (CCC_Count){.error = CCC_RESULT_ARGUMENT_ERROR};
     }
-    return CCC_buffer_capacity(&fpq->buf);
+    return CCC_buffer_capacity(&flat_priority_queue->buf);
 }
 
 void *
-CCC_fpq_data(CCC_flat_priority_queue const *const fpq)
+CCC_flat_priority_queue_data(
+    CCC_Flat_priority_queue const *const flat_priority_queue)
 {
-    return fpq ? CCC_buffer_begin(&fpq->buf) : NULL;
+    return flat_priority_queue ? CCC_buffer_begin(&flat_priority_queue->buf)
+                               : NULL;
 }
 
 CCC_Order
-CCC_fpq_order(CCC_flat_priority_queue const *const fpq)
+CCC_flat_priority_queue_order(
+    CCC_Flat_priority_queue const *const flat_priority_queue)
 {
-    return fpq ? fpq->order : CCC_ORDER_ERROR;
+    return flat_priority_queue ? flat_priority_queue->order : CCC_ORDER_ERROR;
 }
 
 CCC_Result
-CCC_fpq_reserve(CCC_flat_priority_queue *const fpq, size_t const to_add,
-                CCC_Allocator *const fn)
+CCC_flat_priority_queue_reserve(
+    CCC_Flat_priority_queue *const flat_priority_queue, size_t const to_add,
+    CCC_Allocator *const fn)
 {
-    if (!fpq)
+    if (!flat_priority_queue)
     {
-        return CCC_RESULT_ARG_ERROR;
+        return CCC_RESULT_ARGUMENT_ERROR;
     }
-    return CCC_buffer_reserve(&fpq->buf, to_add, fn);
+    return CCC_buffer_reserve(&flat_priority_queue->buf, to_add, fn);
 }
 
 CCC_Result
-CCC_fpq_copy(CCC_flat_priority_queue *const dst,
-             CCC_flat_priority_queue const *const src, CCC_Allocator *const fn)
+CCC_flat_priority_queue_copy(CCC_Flat_priority_queue *const dst,
+                             CCC_Flat_priority_queue const *const src,
+                             CCC_Allocator *const fn)
 {
     if (!dst || !src || src == dst
         || (dst->buf.capacity < src->buf.capacity && !fn))
     {
-        return CCC_RESULT_ARG_ERROR;
+        return CCC_RESULT_ARGUMENT_ERROR;
     }
     /* Copy everything so we don't worry about staying in sync with future
        changes to buf container. But we have to give back original destination
@@ -297,7 +330,7 @@ CCC_fpq_copy(CCC_flat_priority_queue *const dst,
     }
     if (!src->buf.mem || !dst->buf.mem)
     {
-        return CCC_RESULT_ARG_ERROR;
+        return CCC_RESULT_ARGUMENT_ERROR;
     }
     /* It is ok to only copy count elements because we know that all elements
        in a binary heap are contiguous from [0, C), where C is count. */
@@ -307,58 +340,63 @@ CCC_fpq_copy(CCC_flat_priority_queue *const dst,
 }
 
 CCC_Result
-CCC_fpq_clear(CCC_flat_priority_queue *const fpq, CCC_Type_destructor *const fn)
+CCC_flat_priority_queue_clear(
+    CCC_Flat_priority_queue *const flat_priority_queue,
+    CCC_Type_destructor *const fn)
 {
-    if (!fpq)
+    if (!flat_priority_queue)
     {
-        return CCC_RESULT_ARG_ERROR;
+        return CCC_RESULT_ARGUMENT_ERROR;
     }
     if (fn)
     {
-        destroy_each(fpq, fn);
+        destroy_each(flat_priority_queue, fn);
     }
-    return CCC_buffer_size_set(&fpq->buf, 0);
+    return CCC_buffer_size_set(&flat_priority_queue->buf, 0);
 }
 
 CCC_Result
-CCC_fpq_clear_and_free(CCC_flat_priority_queue *const fpq,
-                       CCC_Type_destructor *const fn)
+CCC_flat_priority_queue_clear_and_free(
+    CCC_Flat_priority_queue *const flat_priority_queue,
+    CCC_Type_destructor *const fn)
 {
-    if (!fpq)
+    if (!flat_priority_queue)
     {
-        return CCC_RESULT_ARG_ERROR;
+        return CCC_RESULT_ARGUMENT_ERROR;
     }
     if (fn)
     {
-        destroy_each(fpq, fn);
+        destroy_each(flat_priority_queue, fn);
     }
-    return CCC_buffer_alloc(&fpq->buf, 0, fpq->buf.alloc);
+    return CCC_buffer_alloc(&flat_priority_queue->buf, 0,
+                            flat_priority_queue->buf.alloc);
 }
 
 CCC_Result
-CCC_fpq_clear_and_free_reserve(CCC_flat_priority_queue *const fpq,
-                               CCC_Type_destructor *const destructor,
-                               CCC_Allocator *const alloc)
+CCC_flat_priority_queue_clear_and_free_reserve(
+    CCC_Flat_priority_queue *const flat_priority_queue,
+    CCC_Type_destructor *const destructor, CCC_Allocator *const alloc)
 {
-    if (!fpq)
+    if (!flat_priority_queue)
     {
-        return CCC_RESULT_ARG_ERROR;
+        return CCC_RESULT_ARGUMENT_ERROR;
     }
     if (destructor)
     {
-        destroy_each(fpq, destructor);
+        destroy_each(flat_priority_queue, destructor);
     }
-    return CCC_buffer_alloc(&fpq->buf, 0, alloc);
+    return CCC_buffer_alloc(&flat_priority_queue->buf, 0, alloc);
 }
 
 CCC_Tribool
-CCC_fpq_validate(CCC_flat_priority_queue const *const fpq)
+CCC_flat_priority_queue_validate(
+    CCC_Flat_priority_queue const *const flat_priority_queue)
 {
-    if (!fpq)
+    if (!flat_priority_queue)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    size_t const count = fpq->buf.count;
+    size_t const count = flat_priority_queue->buf.count;
     if (count <= 1)
     {
         return CCC_TRUE;
@@ -371,11 +409,11 @@ CCC_fpq_validate(CCC_flat_priority_queue const *const fpq)
            the child's three way comparison in relation to the parent. If
            the child beats the parent in total ordering (min/max) something
            has gone wrong. */
-        if (left < count && wins(fpq, left, i))
+        if (left < count && wins(flat_priority_queue, left, i))
         {
             return CCC_FALSE;
         }
-        if (right < count && wins(fpq, right, i))
+        if (right < count && wins(flat_priority_queue, right, i))
         {
             return CCC_FALSE;
         }
@@ -386,62 +424,72 @@ CCC_fpq_validate(CCC_flat_priority_queue const *const fpq)
 /*===================     Private Interface     =============================*/
 
 size_t
-CCC_private_fpq_bubble_up(struct CCC_fpq *const fpq, void *const tmp, size_t i)
+CCC_private_flat_priority_queue_bubble_up(
+    struct CCC_Flat_priority_queue *const flat_priority_queue, void *const tmp,
+    size_t i)
 {
-    return bubble_up(fpq, tmp, i);
+    return bubble_up(flat_priority_queue, tmp, i);
 }
 
 void *
-CCC_private_fpq_update_fixup(struct CCC_fpq *const fpq, void *const elem,
-                             void *const tmp)
+CCC_private_flat_priority_queue_update_fixup(
+    struct CCC_Flat_priority_queue *const flat_priority_queue, void *const elem,
+    void *const tmp)
 {
-    return CCC_buffer_at(&fpq->buf, update_fixup(fpq, elem, tmp));
+    return CCC_buffer_at(&flat_priority_queue->buf,
+                         update_fixup(flat_priority_queue, elem, tmp));
 }
 
 void
-CCC_private_fpq_in_place_heapify(struct CCC_fpq *const fpq, size_t const n,
-                                 void *const tmp)
+CCC_private_flat_priority_queue_in_place_heapify(
+    struct CCC_Flat_priority_queue *const flat_priority_queue, size_t const n,
+    void *const tmp)
 {
-    if (!fpq || fpq->buf.capacity < n)
+    if (!flat_priority_queue || flat_priority_queue->buf.capacity < n)
     {
         return;
     }
-    heapify(fpq, n, tmp);
+    heapify(flat_priority_queue, n, tmp);
 }
 
 /*====================     Static Helpers     ===============================*/
 
 /* Orders the heap in O(N) time. Assumes n > 0 and n <= capacity. */
 static void
-heapify(struct CCC_fpq *const fpq, size_t const n, void *const tmp)
+heapify(struct CCC_Flat_priority_queue *const flat_priority_queue,
+        size_t const n, void *const tmp)
 {
     assert(n);
-    assert(n <= fpq->buf.capacity);
-    fpq->buf.count = n;
+    assert(n <= flat_priority_queue->buf.capacity);
+    flat_priority_queue->buf.count = n;
     size_t i = ((n - 1) / 2) + 1;
     while (i--)
     {
-        (void)bubble_down(fpq, tmp, i, fpq->buf.count);
+        (void)bubble_down(flat_priority_queue, tmp, i,
+                          flat_priority_queue->buf.count);
     }
 }
 
 /* Fixes the position of element e after its key value has been changed. */
 static size_t
-update_fixup(struct CCC_fpq *const fpq, void *const e, void *const tmp)
+update_fixup(struct CCC_Flat_priority_queue *const flat_priority_queue,
+             void *const e, void *const tmp)
 {
-    size_t const i = index_of(fpq, e);
+    size_t const i = index_of(flat_priority_queue, e);
     if (!i)
     {
-        return bubble_down(fpq, tmp, 0, fpq->buf.count);
+        return bubble_down(flat_priority_queue, tmp, 0,
+                           flat_priority_queue->buf.count);
     }
-    CCC_Order const parent_cmp = cmp(fpq, i, (i - 1) / 2);
-    if (parent_cmp == fpq->order)
+    CCC_Order const parent_cmp = cmp(flat_priority_queue, i, (i - 1) / 2);
+    if (parent_cmp == flat_priority_queue->order)
     {
-        return bubble_up(fpq, tmp, i);
+        return bubble_up(flat_priority_queue, tmp, i);
     }
     if (parent_cmp != CCC_ORDER_EQUAL)
     {
-        return bubble_down(fpq, tmp, i, fpq->buf.count);
+        return bubble_down(flat_priority_queue, tmp, i,
+                           flat_priority_queue->buf.count);
     }
     /* If the comparison is equal do nothing. Element is in right spot. */
     return i;
@@ -449,36 +497,38 @@ update_fixup(struct CCC_fpq *const fpq, void *const e, void *const tmp)
 
 /* Returns the sorted position of the element starting at position i. */
 static size_t
-bubble_up(struct CCC_fpq *const fpq, void *const tmp, size_t i)
+bubble_up(struct CCC_Flat_priority_queue *const flat_priority_queue,
+          void *const tmp, size_t i)
 {
     for (size_t parent = (i - 1) / 2; i; i = parent, parent = (parent - 1) / 2)
     {
         /* Not winning here means we are in correct order or equal. */
-        if (!wins(fpq, i, parent))
+        if (!wins(flat_priority_queue, i, parent))
         {
             return i;
         }
-        swap(fpq, tmp, i, parent);
+        swap(flat_priority_queue, tmp, i, parent);
     }
     return 0;
 }
 
 /* Returns the sorted position of the element starting at position i. */
 static size_t
-bubble_down(struct CCC_fpq *const fpq, void *const tmp, size_t i,
-            size_t const count)
+bubble_down(struct CCC_Flat_priority_queue *const flat_priority_queue,
+            void *const tmp, size_t i, size_t const count)
 {
     for (size_t next = 0, left = (i * 2) + 1, right = left + 1; left < count;
          i = next, left = (i * 2) + 1, right = left + 1)
     {
         /* Avoid one comparison call if there is no right child. */
-        next = (right < count && wins(fpq, right, left)) ? right : left;
+        next = (right < count && wins(flat_priority_queue, right, left)) ? right
+                                                                         : left;
         /* If the child beats the parent we must swap. Equal is OK to break. */
-        if (!wins(fpq, next, i))
+        if (!wins(flat_priority_queue, next, i))
         {
             return i;
         }
-        swap(fpq, tmp, next, i);
+        swap(flat_priority_queue, tmp, next, i);
     }
     return i;
 }
@@ -489,37 +539,42 @@ bubble_down(struct CCC_fpq *const fpq, void *const tmp, size_t i,
    function would return false. If the winner is in the wrong order, thus
    losing the total order comparison, the function also returns false. */
 static inline CCC_Tribool
-wins(struct CCC_fpq const *const fpq, size_t const winner, size_t const loser)
+wins(struct CCC_Flat_priority_queue const *const flat_priority_queue,
+     size_t const winner, size_t const loser)
 {
-    return cmp(fpq, winner, loser) == fpq->order;
+    return cmp(flat_priority_queue, winner, loser)
+        == flat_priority_queue->order;
 }
 
 static inline CCC_Order
-cmp(struct CCC_fpq const *const fpq, size_t lhs, size_t rhs)
+cmp(struct CCC_Flat_priority_queue const *const flat_priority_queue, size_t lhs,
+    size_t rhs)
 {
-    return fpq->cmp((CCC_Type_comparator_context){
-        .any_type_lhs = at(fpq, lhs),
-        .any_type_rhs = at(fpq, rhs),
-        .aux = fpq->buf.aux,
+    return flat_priority_queue->cmp((CCC_Type_comparator_context){
+        .any_type_lhs = at(flat_priority_queue, lhs),
+        .any_type_rhs = at(flat_priority_queue, rhs),
+        .context = flat_priority_queue->buf.context,
     });
 }
 
 /* Swaps i and j using the underlying Buffer capabilities. Not checked for
    an error in release. */
 static inline void
-swap(struct CCC_fpq *const fpq, void *const tmp, size_t const i, size_t const j)
+swap(struct CCC_Flat_priority_queue *const flat_priority_queue, void *const tmp,
+     size_t const i, size_t const j)
 {
     [[maybe_unused]] CCC_Result const res
-        = CCC_buffer_swap(&fpq->buf, tmp, i, j);
+        = CCC_buffer_swap(&flat_priority_queue->buf, tmp, i, j);
     assert(res == CCC_RESULT_OK);
 }
 
 /* Thin wrapper just for sanity checking in debug mode as index should always
    be valid when this function is used. */
 static inline void *
-at(struct CCC_fpq const *const fpq, size_t const i)
+at(struct CCC_Flat_priority_queue const *const flat_priority_queue,
+   size_t const i)
 {
-    void *const addr = CCC_buffer_at(&fpq->buf, i);
+    void *const addr = CCC_buffer_at(&flat_priority_queue->buf, i);
     assert(addr);
     return addr;
 }
@@ -528,24 +583,26 @@ at(struct CCC_fpq const *const fpq, size_t const i)
    always be within the Buffer range. It should never exceed the current size
    and start at or after the Buffer base. Only checked in debug. */
 static inline size_t
-index_of(struct CCC_fpq const *const fpq, void const *const slot)
+index_of(struct CCC_Flat_priority_queue const *const flat_priority_queue,
+         void const *const slot)
 {
-    assert(slot >= fpq->buf.mem);
-    size_t const i
-        = ((char *)slot - (char *)fpq->buf.mem) / fpq->buf.sizeof_type;
-    assert(i < fpq->buf.count);
+    assert(slot >= flat_priority_queue->buf.mem);
+    size_t const i = ((char *)slot - (char *)flat_priority_queue->buf.mem)
+                   / flat_priority_queue->buf.sizeof_type;
+    assert(i < flat_priority_queue->buf.count);
     return i;
 }
 
 static inline void
-destroy_each(struct CCC_fpq *const fpq, CCC_Type_destructor *const fn)
+destroy_each(struct CCC_Flat_priority_queue *const flat_priority_queue,
+             CCC_Type_destructor *const fn)
 {
-    size_t const count = fpq->buf.count;
+    size_t const count = flat_priority_queue->buf.count;
     for (size_t i = 0; i < count; ++i)
     {
         fn((CCC_Type_context){
-            .any_type = at(fpq, i),
-            .aux = fpq->buf.aux,
+            .any_type = at(flat_priority_queue, i),
+            .context = flat_priority_queue->buf.context,
         });
     }
 }

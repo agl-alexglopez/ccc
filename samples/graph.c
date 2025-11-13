@@ -111,13 +111,13 @@ struct path_backtrack_cell
 };
 
 /** A cost optimizes the problem so that we can store the path
-rebuilding map implicitly in an array of cost[A-Z]. Then the pq
+rebuilding map implicitly in an array of cost[A-Z]. Then the priority_queue
 element can run the efficient push and decrease key operations with pointer
 stability guaranteed. Finally these can be allocated on the stack because
 there will be at most 26 of them which is very small. */
 struct cost
 {
-    pq_elem pq_elem;
+    priority_queue_node priority_queue_node;
     int cost;
     char name;
     char from;
@@ -264,7 +264,7 @@ static str_view const quit_cmd = SV("q");
 static void build_graph(struct graph *);
 static void find_shortest_paths(struct graph *);
 static bool found_dst(struct graph *, struct vertex *);
-static void edge_construct(struct graph *g, flat_hash_map *parent_map,
+static void edge_construct(struct graph *g, Flat_hash_map *parent_map,
                            struct vertex *src, struct vertex *dst);
 static int dijkstra_shortest_path(struct graph *, char src, char dst);
 static void paint_edge(struct graph *, char, char, char const *edge_color);
@@ -293,7 +293,8 @@ static void clear_paint(struct graph *);
 static bool is_vertex(cell);
 static bool is_path_cell(cell);
 static struct vertex *vertex_at(struct graph const *g, char name);
-static struct cost *map_pq_at(struct cost const *dj_arr, char vertex);
+static struct cost *map_priority_queue_at(struct cost const *dj_arr,
+                                          char vertex);
 static int paint_shortest_path(struct graph *, struct cost const *,
                                struct cost const *);
 
@@ -305,7 +306,7 @@ static struct int_conversion parse_digits(str_view, int lower_bound,
 static struct path_request parse_path_request(struct graph *, str_view);
 static void help(void);
 
-static Order cmp_pq_costs(Type_comparator_context);
+static Order cmp_priority_queue_costs(Type_comparator_context);
 static CCC_Order cmp_parent_cells(Key_comparator_context);
 static uint64_t hash_parent_cells(Key_contextpoint_struct);
 static uint64_t hash_64_bits(uint64_t);
@@ -434,16 +435,16 @@ static bool
 found_dst(struct graph *const graph, struct vertex *const src)
 {
 
-    flat_hash_map parent_map = fhm_from(current, hash_parent_cells,
-                                        cmp_parent_cells, std_alloc, NULL, 0,
-                                        (struct path_backtrack_cell[]){
-                                            {
-                                                .current = src->pos,
-                                                .parent = {-1, -1},
-                                            },
-                                        });
-    flat_double_ended_queue bfs
-        = fdeq_initialize(NULL, struct point, std_alloc, NULL, 0);
+    Flat_hash_map parent_map = flat_hash_map_from(
+        current, hash_parent_cells, cmp_parent_cells, std_alloc, NULL, 0,
+        (struct path_backtrack_cell[]){
+            {
+                .current = src->pos,
+                .parent = {-1, -1},
+            },
+        });
+    flat_double_ended_queue bfs = flat_double_ended_queue_initialize(
+        NULL, struct point, std_alloc, NULL, 0);
     (void)push_back(&bfs, &src->pos);
     bool dst_connection = false;
     while (!is_empty(&bfs))
@@ -493,7 +494,7 @@ done:
    the terminal cells via edge ids. Creates the appropriate edge and updates the
    edge lists of src and dst. */
 static void
-edge_construct(struct graph *const g, flat_hash_map *const parent_map,
+edge_construct(struct graph *const g, Flat_hash_map *const parent_map,
                struct vertex *const src, struct vertex *const dst)
 {
     cell const edge_id = make_edge(src->name, dst->name);
@@ -748,30 +749,34 @@ dijkstra_shortest_path(struct graph *const graph, char const src,
     clear_paint(graph);
     clear_and_flush_graph(graph, NIL);
     /* One struct cost will represent the path rebuilding map and the
-       priority queue. The intrusive pq elem will give us an O(1) (technically
-       o(lg N)) decrease key. The pq element is not given allocation permissions
-       so that push and pop from the pq only affects the priority queue data
-       structure not the memory that is used to store the elements; the path
-       rebuild map remains accessible. Best of all, maximum pq/map size is known
-       to be small [A-Z] so provide memory on the stack for speed and safety. */
-    struct cost map_pq[MAX_VERTICES] = {};
-    priority_queue costs = pq_initialize(struct cost, pq_elem, CCC_ORDER_LESS,
-                                         cmp_pq_costs, NULL, NULL);
+       priority queue. The intrusive priority_queue elem will give us an O(1)
+       (technically o(lg N)) decrease key. The priority_queue element is not
+       given allocation permissions so that push and pop from the priority_queue
+       only affects the priority queue data structure not the memory that is
+       used to store the elements; the path rebuild map remains accessible. Best
+       of all, maximum priority_queue/map size is known to be small [A-Z] so
+       provide memory on the stack for speed and safety. */
+    struct cost map_priority_queue[MAX_VERTICES] = {};
+    priority_queue costs = priority_queue_initialize(
+        struct cost, priority_queue_node, CCC_ORDER_LESSER,
+        cmp_priority_queue_costs, NULL, NULL);
     for (int i = 0, vx = BEGIN_VERTICES; i < graph->vertices; ++i, ++vx)
     {
-        *map_pq_at(map_pq, (char)vx) = (struct cost){
+        *map_priority_queue_at(map_priority_queue, (char)vx) = (struct cost){
             .name = (char)vx,
             .from = '\0',
             .cost = (char)vx == src ? 0 : INT_MAX,
         };
         struct cost const *const v
-            = push(&costs, &map_pq_at(map_pq, (char)vx)->pq_elem);
+            = push(&costs, &map_priority_queue_at(map_priority_queue, (char)vx)
+                                ->priority_queue_node);
         check(v);
     }
     while (!is_empty(&costs))
     {
         /* The reference to u is valid after the pop because the pop does not
-           deallocate any memory. The pq has no allocation permissions. */
+           deallocate any memory. The priority_queue has no allocation
+           permissions. */
         struct cost const *u = front(&costs);
         (void)pop(&costs);
         if (u->cost == INT_MAX)
@@ -780,22 +785,23 @@ dijkstra_shortest_path(struct graph *const graph, char const src,
         }
         if (u->name == dst)
         {
-            return paint_shortest_path(graph, map_pq, u);
+            return paint_shortest_path(graph, map_priority_queue, u);
         }
         struct node const *const edges = vertex_at(graph, u->name)->edges;
         for (int i = 0; i < MAX_DEGREE && edges[i].name; ++i)
         {
-            struct cost *const v = map_pq_at(map_pq, edges[i].name);
+            struct cost *const v
+                = map_priority_queue_at(map_priority_queue, edges[i].name);
             int const alt = u->cost + edges[i].cost;
             if (alt < v->cost)
             {
                 /* Build the map with the appropriate best candidate parent. */
                 struct cost const *const relax
-                    = pq_decrease_w(&costs, v,
-                                    {
-                                        T->cost = alt;
-                                        T->from = u->name;
-                                    });
+                    = priority_queue_decrease_w(&costs, v,
+                                                {
+                                                    T->cost = alt;
+                                                    T->from = u->name;
+                                                });
                 check(relax == v);
                 paint_edge(graph, u->name, v->name, MAG);
                 nanosleep(&graph->speed, NULL);
@@ -809,11 +815,12 @@ dijkstra_shortest_path(struct graph *const graph, char const src,
 effect of this process. The edges will be painted a color different than the
 color used while considering paths to clearly indicate it is the shortest. */
 static int
-paint_shortest_path(struct graph *const graph, struct cost const *const map_pq,
+paint_shortest_path(struct graph *const graph,
+                    struct cost const *const map_priority_queue,
                     struct cost const *u)
 {
     int total = 0;
-    for (; u->from; u = map_pq_at(map_pq, u->from))
+    for (; u->from; u = map_priority_queue_at(map_priority_queue, u->from))
     {
         struct node const *const edges = vertex_at(graph, u->name)->edges;
         int i = 0;
@@ -828,7 +835,7 @@ paint_shortest_path(struct graph *const graph, struct cost const *const map_pq,
 }
 
 static inline struct cost *
-map_pq_at(struct cost const *const dj_arr, char const vertex)
+map_priority_queue_at(struct cost const *const dj_arr, char const vertex)
 {
     check(vertex >= BEGIN_VERTICES && vertex <= END_VERTICES);
     return (struct cost *)&dj_arr[vertex - BEGIN_VERTICES];
@@ -1138,7 +1145,7 @@ hash_parent_cells(Key_contextconst point_struct)
 }
 
 static Order
-cmp_pq_costs(Type_comparator_context const cost_cmp)
+cmp_priority_queue_costs(Type_comparator_context const cost_cmp)
 {
     struct cost const *const a = cost_cmp.any_type_lhs;
     struct cost const *const b = cost_cmp.any_type_rhs;

@@ -5,18 +5,18 @@
 #define TRAITS_USING_NAMESPACE_CCC
 
 #include "checkers.h"
-#include "fhmap_util.h"
 #include "flat_hash_map.h"
+#include "flat_hash_map_util.h"
 #include "traits.h"
 #include "types.h"
 #include "util/alloc.h"
 #include "util/random.h"
 
-CHECK_BEGIN_STATIC_FN(fhmap_test_erase)
+CHECK_BEGIN_STATIC_FN(flat_hash_map_test_erase)
 {
-    CCC_flat_hash_map fh
-        = fhm_initialize(&(small_fixed_map){}, struct val, key, fhmap_int_zero,
-                         fhmap_id_cmp, NULL, NULL, SMALL_FIXED_CAP);
+    CCC_Flat_hash_map fh = flat_hash_map_initialize(
+        &(small_fixed_map){}, struct val, key, flat_hash_map_int_zero,
+        flat_hash_map_id_cmp, NULL, NULL, SMALL_FIXED_CAP);
     struct val query = {.key = 137, .val = 99};
     /* Nothing was there before so nothing is in the entry. */
     CCC_Entry ent = swap_entry(&fh, &query);
@@ -34,26 +34,26 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_erase)
     ent = CCC_remove(&fh, &query);
     CHECK(occupied(&ent), false);
     CHECK(count(&fh).count, 0);
-    CCC_fhm_insert_entry_w(entry_r(&fh, &(int){137}),
-                           (struct val){.key = 137, .val = 99});
+    CCC_flat_hash_map_insert_entry_w(entry_r(&fh, &(int){137}),
+                                     (struct val){.key = 137, .val = 99});
     CHECK(count(&fh).count, 1);
     CHECK(occupied(remove_entry_r(entry_r(&fh, &(int){137}))), true);
     CHECK(count(&fh).count, 0);
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_insert_erase)
+CHECK_BEGIN_STATIC_FN(flat_hash_map_test_shuffle_insert_erase)
 {
-    CCC_flat_hash_map h
-        = fhm_initialize(NULL, struct val, key, fhmap_int_to_u64, fhmap_id_cmp,
-                         std_alloc, NULL, 0);
+    CCC_Flat_hash_map h = flat_hash_map_initialize(
+        NULL, struct val, key, flat_hash_map_int_to_u64, flat_hash_map_id_cmp,
+        std_alloc, NULL, 0);
     int const to_insert = 100;
     int const larger_prime = 101;
     for (int i = 0, shuffle = larger_prime % to_insert; i < to_insert;
          ++i, shuffle = (shuffle + larger_prime) % to_insert)
     {
-        struct val *v = unwrap(
-            fhm_insert_or_assign_w(&h, shuffle, (struct val){.val = i}));
+        struct val *v = unwrap(flat_hash_map_insert_or_assign_w(
+            &h, shuffle, (struct val){.val = i}));
         CHECK(v != NULL, true);
         CHECK(v->key, shuffle);
         CHECK(v->val, i);
@@ -83,15 +83,15 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_insert_erase)
         CHECK(validate(&h), true);
     }
     CHECK(count(&h).count, 0);
-    CHECK_END_FN(fhm_clear_and_free(&h, NULL););
+    CHECK_END_FN(flat_hash_map_clear_and_free(&h, NULL););
 }
 
 /* This test will force us to test our in place hashing algorithm. */
-CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_erase_fixed)
+CHECK_BEGIN_STATIC_FN(flat_hash_map_test_shuffle_erase_fixed)
 {
-    CCC_flat_hash_map h = fhm_initialize(&(standard_fixed_map){}, struct val,
-                                         key, fhmap_int_to_u64, fhmap_id_cmp,
-                                         NULL, NULL, STANDARD_FIXED_CAP);
+    CCC_Flat_hash_map h = flat_hash_map_initialize(
+        &(standard_fixed_map){}, struct val, key, flat_hash_map_int_to_u64,
+        flat_hash_map_id_cmp, NULL, NULL, STANDARD_FIXED_CAP);
     int to_insert[STANDARD_FIXED_CAP];
     iota(to_insert, STANDARD_FIXED_CAP, 0);
     rand_shuffle(sizeof(int), to_insert, STANDARD_FIXED_CAP, &(int){0});
@@ -99,8 +99,8 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_erase_fixed)
     do
     {
         int const cur = to_insert[i];
-        struct val const *const v
-            = unwrap(fhm_insert_or_assign_w(&h, cur, (struct val){.val = i}));
+        struct val const *const v = unwrap(
+            flat_hash_map_insert_or_assign_w(&h, cur, (struct val){.val = i}));
         if (!v)
         {
             break;
@@ -128,7 +128,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_erase_fixed)
     {
         int const cur = to_insert[i];
         CCC_Entry const *const e
-            = fhm_insert_or_assign_w(&h, cur, (struct val){.val = i});
+            = flat_hash_map_insert_or_assign_w(&h, cur, (struct val){.val = i});
         CHECK(occupied(e), false);
         CHECK(validate(&h), true);
     }
@@ -160,15 +160,17 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_erase_fixed)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_erase_reserved)
+CHECK_BEGIN_STATIC_FN(flat_hash_map_test_shuffle_erase_reserved)
 {
     /* The map will be given dynamically reserved space but no ability to
        resize. All algorithms should function normally and in place rehashing
        should take effect. */
-    CCC_flat_hash_map h = fhm_initialize(
-        NULL, struct val, key, fhmap_int_to_u64, fhmap_id_cmp, NULL, NULL, 0);
+    CCC_Flat_hash_map h = flat_hash_map_initialize(
+        NULL, struct val, key, flat_hash_map_int_to_u64, flat_hash_map_id_cmp,
+        NULL, NULL, 0);
     int const test_amount = 896;
-    CCC_Result const res_check = CCC_fhm_reserve(&h, test_amount, std_alloc);
+    CCC_Result const res_check
+        = CCC_flat_hash_map_reserve(&h, test_amount, std_alloc);
     CHECK(res_check, CCC_RESULT_OK);
 
     /* Give ourselves plenty more to insert so we don't run out before cap. */
@@ -179,8 +181,8 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_erase_reserved)
     do
     {
         int const cur = to_insert[i];
-        struct val const *const v
-            = unwrap(fhm_insert_or_assign_w(&h, cur, (struct val){.val = i}));
+        struct val const *const v = unwrap(
+            flat_hash_map_insert_or_assign_w(&h, cur, (struct val){.val = i}));
         if (!v)
         {
             break;
@@ -208,7 +210,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_erase_reserved)
     {
         int const cur = to_insert[i];
         CCC_Entry const *const e
-            = fhm_insert_or_assign_w(&h, cur, (struct val){.val = i});
+            = flat_hash_map_insert_or_assign_w(&h, cur, (struct val){.val = i});
         CHECK(occupied(e), false);
         CHECK(validate(&h), true);
     }
@@ -237,14 +239,15 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_erase_reserved)
         CHECK(validate(&h), true);
     }
     CHECK(count(&h).count, 0);
-    CHECK_END_FN((void)CCC_fhm_clear_and_free_reserve(&h, NULL, std_alloc););
+    CHECK_END_FN(
+        (void)CCC_flat_hash_map_clear_and_free_reserve(&h, NULL, std_alloc););
 }
 
-CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_erase_dynamic)
+CHECK_BEGIN_STATIC_FN(flat_hash_map_test_shuffle_erase_dynamic)
 {
-    CCC_flat_hash_map h
-        = fhm_initialize(NULL, struct val, key, fhmap_int_to_u64, fhmap_id_cmp,
-                         std_alloc, NULL, 0);
+    CCC_Flat_hash_map h = flat_hash_map_initialize(
+        NULL, struct val, key, flat_hash_map_int_to_u64, flat_hash_map_id_cmp,
+        std_alloc, NULL, 0);
     int to_insert[1024];
     iota(to_insert, 1024, 0);
     rand_shuffle(sizeof(int), to_insert, 1024, &(int){0});
@@ -252,8 +255,8 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_erase_dynamic)
     for (; inserted < 1024; ++inserted)
     {
         int const cur = to_insert[inserted];
-        struct val const *const v = unwrap(
-            fhm_insert_or_assign_w(&h, cur, (struct val){.val = inserted}));
+        struct val const *const v = unwrap(flat_hash_map_insert_or_assign_w(
+            &h, cur, (struct val){.val = inserted}));
         CHECK(v->key, to_insert[inserted]);
         CHECK(v->val, inserted);
         CHECK(validate(&h), true);
@@ -275,7 +278,7 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_erase_dynamic)
     {
         int const cur = to_insert[i];
         CCC_Entry const *const e
-            = fhm_insert_or_assign_w(&h, cur, (struct val){.val = i});
+            = flat_hash_map_insert_or_assign_w(&h, cur, (struct val){.val = i});
         CHECK(occupied(e), false);
         CHECK(validate(&h), true);
     }
@@ -304,14 +307,15 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_shuffle_erase_dynamic)
         CHECK(validate(&h), true);
     }
     CHECK(count(&h).count, 0);
-    CHECK_END_FN(fhm_clear_and_free(&h, NULL););
+    CHECK_END_FN(flat_hash_map_clear_and_free(&h, NULL););
 }
 
 int
 main()
 {
-    return CHECK_RUN(fhmap_test_erase(), fhmap_test_shuffle_insert_erase(),
-                     fhmap_test_shuffle_erase_fixed(),
-                     fhmap_test_shuffle_erase_reserved(),
-                     fhmap_test_shuffle_erase_dynamic());
+    return CHECK_RUN(flat_hash_map_test_erase(),
+                     flat_hash_map_test_shuffle_insert_erase(),
+                     flat_hash_map_test_shuffle_erase_fixed(),
+                     flat_hash_map_test_shuffle_erase_reserved(),
+                     flat_hash_map_test_shuffle_erase_dynamic());
 }

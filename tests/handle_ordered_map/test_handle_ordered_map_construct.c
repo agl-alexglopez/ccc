@@ -6,33 +6,34 @@
 
 #include "checkers.h"
 #include "handle_ordered_map.h"
-#include "homap_util.h"
+#include "handle_ordered_map_util.h"
 #include "traits.h"
 #include "types.h"
 #include "util/alloc.h"
 
-CHECK_BEGIN_STATIC_FN(homap_test_empty)
+CHECK_BEGIN_STATIC_FN(handle_ordered_map_test_empty)
 {
-    handle_ordered_map s = hom_initialize(&(small_fixed_map){}, struct val, id,
-                                          id_cmp, NULL, NULL, SMALL_FIXED_CAP);
+    Handle_ordered_map s
+        = handle_ordered_map_initialize(&(small_fixed_map){}, struct val, id,
+                                        id_cmp, NULL, NULL, SMALL_FIXED_CAP);
     CHECK(is_empty(&s), true);
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(homap_test_copy_no_alloc)
+CHECK_BEGIN_STATIC_FN(handle_ordered_map_test_copy_no_alloc)
 {
-    handle_ordered_map src
-        = hom_initialize(&(small_fixed_map){}, struct val, id, id_cmp, NULL,
-                         NULL, SMALL_FIXED_CAP);
-    handle_ordered_map dst
-        = hom_initialize(&(small_fixed_map){}, struct val, id, id_cmp, NULL,
-                         NULL, SMALL_FIXED_CAP);
+    Handle_ordered_map src
+        = handle_ordered_map_initialize(&(small_fixed_map){}, struct val, id,
+                                        id_cmp, NULL, NULL, SMALL_FIXED_CAP);
+    Handle_ordered_map dst
+        = handle_ordered_map_initialize(&(small_fixed_map){}, struct val, id,
+                                        id_cmp, NULL, NULL, SMALL_FIXED_CAP);
     (void)swap_handle(&src, &(struct val){.id = 0});
     (void)swap_handle(&src, &(struct val){.id = 1, .val = 1});
     (void)swap_handle(&src, &(struct val){.id = 2, .val = 2});
     CHECK(count(&src).count, 3);
     CHECK(is_empty(&dst), true);
-    CCC_Result res = hom_copy(&dst, &src, NULL);
+    CCC_Result res = handle_ordered_map_copy(&dst, &src, NULL);
     CHECK(res, CCC_RESULT_OK);
     CHECK(count(&dst).count, count(&src).count);
     for (int i = 0; i < 3; ++i)
@@ -50,36 +51,36 @@ CHECK_BEGIN_STATIC_FN(homap_test_copy_no_alloc)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(homap_test_copy_no_alloc_fail)
+CHECK_BEGIN_STATIC_FN(handle_ordered_map_test_copy_no_alloc_fail)
 {
-    handle_ordered_map src
-        = hom_initialize(&(standard_fixed_map){}, struct val, id, id_cmp, NULL,
-                         NULL, STANDARD_FIXED_CAP);
-    handle_ordered_map dst
-        = hom_initialize(&(small_fixed_map){}, struct val, id, id_cmp, NULL,
-                         NULL, SMALL_FIXED_CAP);
+    Handle_ordered_map src
+        = handle_ordered_map_initialize(&(standard_fixed_map){}, struct val, id,
+                                        id_cmp, NULL, NULL, STANDARD_FIXED_CAP);
+    Handle_ordered_map dst
+        = handle_ordered_map_initialize(&(small_fixed_map){}, struct val, id,
+                                        id_cmp, NULL, NULL, SMALL_FIXED_CAP);
     (void)swap_handle(&src, &(struct val){.id = 0});
     (void)swap_handle(&src, &(struct val){.id = 1, .val = 1});
     (void)swap_handle(&src, &(struct val){.id = 2, .val = 2});
     CHECK(count(&src).count, 3);
     CHECK(is_empty(&dst), true);
-    CCC_Result res = hom_copy(&dst, &src, NULL);
+    CCC_Result res = handle_ordered_map_copy(&dst, &src, NULL);
     CHECK(res != CCC_RESULT_OK, true);
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(homap_test_copy_alloc)
+CHECK_BEGIN_STATIC_FN(handle_ordered_map_test_copy_alloc)
 {
-    handle_ordered_map src
-        = hom_initialize(NULL, struct val, id, id_cmp, std_alloc, NULL, 0);
-    handle_ordered_map dst
-        = hom_initialize(NULL, struct val, id, id_cmp, std_alloc, NULL, 0);
+    Handle_ordered_map src = handle_ordered_map_initialize(
+        NULL, struct val, id, id_cmp, std_alloc, NULL, 0);
+    Handle_ordered_map dst = handle_ordered_map_initialize(
+        NULL, struct val, id, id_cmp, std_alloc, NULL, 0);
     (void)swap_handle(&src, &(struct val){.id = 0});
     (void)swap_handle(&src, &(struct val){.id = 1, .val = 1});
     (void)swap_handle(&src, &(struct val){.id = 2, .val = 2});
     CHECK(count(&src).count, 3);
     CHECK(is_empty(&dst), true);
-    CCC_Result res = hom_copy(&dst, &src, std_alloc);
+    CCC_Result res = handle_ordered_map_copy(&dst, &src, std_alloc);
     CHECK(res, CCC_RESULT_OK);
     CHECK(count(&dst).count, count(&src).count);
     for (int i = 0; i < 3; ++i)
@@ -95,31 +96,33 @@ CHECK_BEGIN_STATIC_FN(homap_test_copy_alloc)
     CHECK(is_empty(&src), is_empty(&dst));
     CHECK(is_empty(&dst), true);
     CHECK_END_FN({
-        (void)hom_clear_and_free(&src, NULL);
-        (void)hom_clear_and_free(&dst, NULL);
+        (void)handle_ordered_map_clear_and_free(&src, NULL);
+        (void)handle_ordered_map_clear_and_free(&dst, NULL);
     });
 }
 
-CHECK_BEGIN_STATIC_FN(homap_test_copy_alloc_fail)
+CHECK_BEGIN_STATIC_FN(handle_ordered_map_test_copy_alloc_fail)
 {
-    handle_ordered_map src
-        = hom_initialize(NULL, struct val, id, id_cmp, std_alloc, NULL, 0);
-    handle_ordered_map dst
-        = hom_initialize(NULL, struct val, id, id_cmp, std_alloc, NULL, 0);
+    Handle_ordered_map src = handle_ordered_map_initialize(
+        NULL, struct val, id, id_cmp, std_alloc, NULL, 0);
+    Handle_ordered_map dst = handle_ordered_map_initialize(
+        NULL, struct val, id, id_cmp, std_alloc, NULL, 0);
     (void)swap_handle(&src, &(struct val){.id = 0});
     (void)swap_handle(&src, &(struct val){.id = 1, .val = 1});
     (void)swap_handle(&src, &(struct val){.id = 2, .val = 2});
     CHECK(count(&src).count, 3);
     CHECK(is_empty(&dst), true);
-    CCC_Result res = hom_copy(&dst, &src, NULL);
+    CCC_Result res = handle_ordered_map_copy(&dst, &src, NULL);
     CHECK(res != CCC_RESULT_OK, true);
-    CHECK_END_FN({ (void)hom_clear_and_free(&src, NULL); });
+    CHECK_END_FN({ (void)handle_ordered_map_clear_and_free(&src, NULL); });
 }
 
 int
 main()
 {
-    return CHECK_RUN(homap_test_empty(), homap_test_copy_no_alloc(),
-                     homap_test_copy_no_alloc_fail(), homap_test_copy_alloc(),
-                     homap_test_copy_alloc_fail());
+    return CHECK_RUN(handle_ordered_map_test_empty(),
+                     handle_ordered_map_test_copy_no_alloc(),
+                     handle_ordered_map_test_copy_no_alloc_fail(),
+                     handle_ordered_map_test_copy_alloc(),
+                     handle_ordered_map_test_copy_alloc_fail());
 }

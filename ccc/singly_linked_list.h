@@ -20,8 +20,8 @@ A singly linked list is well suited for list or stack structures that only need
 access to the front or most recently added elements. When compared to a doubly
 linked list, the memory overhead per node is smaller but some operations will
 have O(N) runtime implications when compared to a similar operation in a doubly
-linked list. Review function documentation when unsure of the runtime of an sll
-operation.
+linked list. Review function documentation when unsure of the runtime of an
+singly_linked_list operation.
 
 This container offers pointer stability. Also, if the container is not
 permitted to allocate all insertion code assumes that the user has allocated
@@ -57,7 +57,7 @@ Types available in the container interface. */
 A singly linked list may be stored in the stack, heap, or data segment. Once
 Initialized it is passed by reference to all functions. A singly linked list
 can be initialized at compile time or runtime. */
-typedef struct CCC_sll CCC_singly_linked_list;
+typedef struct CCC_Singly_linked_list CCC_Singly_linked_list;
 
 /** @brief A singly linked list intrusive element to embedded in a user type.
 
@@ -67,7 +67,7 @@ memory with the appropriate lifetime and scope for the user's needs; the
 container does not allocate or free in this case. If allocation is allowed
 the container will handle copying the data wrapping the element to allocations
 and deallocating when necessary. */
-typedef struct CCC_sll_elem CCC_sll_elem;
+typedef struct CCC_Singly_linked_list_node CCC_Singly_linked_list_node;
 
 /**@}*/
 
@@ -77,19 +77,21 @@ Initialize the container with memory, callbacks, and permissions. */
 
 /** @brief Initialize a singly linked list at compile or runtime.
 @param [in] list_name the name the user has chosen for the list.
-@param [in] struct_name the user type wrapping the intrusive sll elem.
-@param [in] list_elem_field the name of the field in the user type storing the
+@param [in] struct_name the user type wrapping the intrusive singly_linked_list
+elem.
+@param [in] list_node_field the name of the field in the user type storing the
 intrusive list elem.
 @param [in] cmp_fn a comparison function for searching or sorting the list.
 @param [in] alloc_fn an allocation function if allocation is allowed.
-@param [in] aux_data a pointer to any auxiliary data needed for comparison or
+@param [in] context_data a pointer to any context data needed for comparison or
 destruction.
 @return a stuct initializer for the singly linked list to be assigned
-(e.g. CCC_singly_linked_list l = CCC_sll_initialize(...);). */
-#define CCC_sll_initialize(list_name, struct_name, list_elem_field, cmp_fn,    \
-                           alloc_fn, aux_data)                                 \
-    CCC_private_sll_initialize(list_name, struct_name, list_elem_field,        \
-                               cmp_fn, alloc_fn, aux_data)
+(e.g. CCC_Singly_linked_list l = CCC_singly_linked_list_initialize(...);). */
+#define CCC_singly_linked_list_initialize(                                     \
+    list_name, struct_name, list_node_field, cmp_fn, alloc_fn, context_data)   \
+    CCC_private_singly_linked_list_initialize(list_name, struct_name,          \
+                                              list_node_field, cmp_fn,         \
+                                              alloc_fn, context_data)
 
 /**@}*/
 
@@ -98,7 +100,7 @@ Add or remove elements from the container. */
 /**@{*/
 
 /** @brief Push the type wrapping elem to the front of the list. O(1).
-@param [in] sll a pointer to the singly linked list.
+@param [in] singly_linked_list a pointer to the singly linked list.
 @param [in] elem a pointer to the intrusive handle in the user type.
 @return a pointer to the inserted element or NULL if allocation failed.
 
@@ -106,8 +108,9 @@ Note that if allocation is not allowed the container assumes the memory wrapping
 elem has been allocated appropriately and with the correct lifetime by the user.
 
 If allocation is allowed the provided element is copied to a new allocation. */
-[[nodiscard]] void *CCC_sll_push_front(CCC_singly_linked_list *sll,
-                                       CCC_sll_elem *elem);
+[[nodiscard]] void *
+CCC_singly_linked_list_push_front(CCC_Singly_linked_list *singly_linked_list,
+                                  CCC_Singly_linked_list_node *elem);
 
 /** @brief Write a compound literal directly to allocated memory at the front.
 O(1).
@@ -120,49 +123,55 @@ failed.
 Note that it only makes sense to use this method when the container is given
 allocation permission. Otherwise NULL is returned due to an inability for the
 container to allocate memory. */
-#define CCC_sll_emplace_front(list_ptr, struct_initializer...)                 \
-    CCC_private_sll_emplace_front(list_ptr, struct_initializer)
+#define CCC_singly_linked_list_emplace_front(list_ptr, struct_initializer...)  \
+    CCC_private_singly_linked_list_emplace_front(list_ptr, struct_initializer)
 
 /** @brief Pop the front element from the list. O(1).
-@param [in] sll a pointer to the singly linked list.
+@param [in] singly_linked_list a pointer to the singly linked list.
 @return ok if the list is non-empty and the pop is successful. An input error
-is returned if sll is NULL or the list is empty. */
-CCC_Result CCC_sll_pop_front(CCC_singly_linked_list *sll);
+is returned if singly_linked_list is NULL or the list is empty. */
+CCC_Result
+CCC_singly_linked_list_pop_front(CCC_Singly_linked_list *singly_linked_list);
 
 /** @brief Inserts splice element after pos. O(N).
-@param [in] pos_sll the list to which pos belongs.
+@param [in] pos_singly_linked_list the list to which pos belongs.
 @param [in] pos the position after which splice will be inserted.
-@param [in] splice_sll the list to which splice belongs.
+@param [in] splice_singly_linked_list the list to which splice belongs.
 @param [in] splice the element to be moved before pos.
 @return ok if the operations is successful. An input error is provided if any
 input pointers are NULL.
 
-Note that pos_sll and splice_sll may be the same or different lists and the
-invariants of each or the same list will be maintained by the function. */
-CCC_Result CCC_sll_splice(CCC_singly_linked_list *pos_sll, CCC_sll_elem *pos,
-                          CCC_singly_linked_list *splice_sll,
-                          CCC_sll_elem *splice);
+Note that pos_singly_linked_list and splice_singly_linked_list may be the same
+or different lists and the invariants of each or the same list will be
+maintained by the function. */
+CCC_Result
+CCC_singly_linked_list_splice(CCC_Singly_linked_list *pos_singly_linked_list,
+                              CCC_Singly_linked_list_node *pos,
+                              CCC_Singly_linked_list *splice_singly_linked_list,
+                              CCC_Singly_linked_list_node *splice);
 
 /** @brief Inserts the `[begin, end]` of spliced elements after pos. `O(N)`.
-@param [in] pos_sll the list to which pos belongs.
+@param [in] pos_singly_linked_list the list to which pos belongs.
 @param [in] pos the position after which the range will be inserted.
-@param [in] splice_sll the list to which the range belongs.
+@param [in] splice_singly_linked_list the list to which the range belongs.
 @param [in] begin the start of the range.
 @param [in] end the inclusive end of the range.
 @return OK if the operations is successful. An input error is provided if any
 input pointers are NULL.
-@warning pos must not be inside of the range `[begin, end]` if pos_sll is the
-same list as splice_sll.
+@warning pos must not be inside of the range `[begin, end]` if
+pos_singly_linked_list is the same list as splice_singly_linked_list.
 
-Note that pos_sll and splice_sll may be the same or different lists and the
-invariants of each or the same list will be maintained by the function. */
-CCC_Result CCC_sll_splice_range(CCC_singly_linked_list *pos_sll,
-                                CCC_sll_elem *pos,
-                                CCC_singly_linked_list *splice_sll,
-                                CCC_sll_elem *begin, CCC_sll_elem *end);
+Note that pos_singly_linked_list and splice_singly_linked_list may be the same
+or different lists and the invariants of each or the same list will be
+maintained by the function. */
+CCC_Result CCC_singly_linked_list_splice_range(
+    CCC_Singly_linked_list *pos_singly_linked_list,
+    CCC_Singly_linked_list_node *pos,
+    CCC_Singly_linked_list *splice_singly_linked_list,
+    CCC_Singly_linked_list_node *begin, CCC_Singly_linked_list_node *end);
 
 /** @brief Erases elem from the list returning the following element. O(N).
-@param [in] sll a pointer to the singly linked list.
+@param [in] singly_linked_list a pointer to the singly linked list.
 @param [in] elem a handle to the intrusive element known to be in the list.
 @return a pointer to the element following elem in the list or NULL if the
 list is empty or any bad input is provided to the function.
@@ -171,10 +180,11 @@ list is empty or any bad input is provided to the function.
 Note that if allocation permission is given to the container it will free the
 element. Otherwise, it is the user's responsibility to free the type wrapping
 elem. */
-void *CCC_sll_erase(CCC_singly_linked_list *sll, CCC_sll_elem *elem);
+void *CCC_singly_linked_list_erase(CCC_Singly_linked_list *singly_linked_list,
+                                   CCC_Singly_linked_list_node *elem);
 
 /** @brief Erases a range from the list returning the element after end. O(N).
-@param [in] sll a pointer to the singly linked list.
+@param [in] singly_linked_list a pointer to the singly linked list.
 @param [in] begin the start of the range in the list.
 @param [in] end the exclusive end of the range in the list.
 @return a pointer to the element following the range in the list or NULL if the
@@ -184,21 +194,24 @@ list is empty or any bad input is provided to the function.
 Note that if allocation permission is given to the container it will free the
 elements in the range. Otherwise, it is the user's responsibility to free the
 types wrapping the range of elements. */
-void *CCC_sll_erase_range(CCC_singly_linked_list *sll, CCC_sll_elem *begin,
-                          CCC_sll_elem *end);
+void *
+CCC_singly_linked_list_erase_range(CCC_Singly_linked_list *singly_linked_list,
+                                   CCC_Singly_linked_list_node *begin,
+                                   CCC_Singly_linked_list_node *end);
 
 /** @brief Extracts an element from the list without freeing it. O(N).
-@param [in] sll a pointer to the singly linked list.
+@param [in] singly_linked_list a pointer to the singly linked list.
 @param [in] elem a handle to the intrusive element known to be in the list.
 @return a pointer to the element following elem in the list.
 
 Note that regardless of allocation permission this method will not free the
 type wrapping elem. It only removes it from the list. */
-void *CCC_sll_extract(CCC_singly_linked_list *sll, CCC_sll_elem *elem);
+void *CCC_singly_linked_list_extract(CCC_Singly_linked_list *singly_linked_list,
+                                     CCC_Singly_linked_list_node *elem);
 
 /** @brief Extracts a range of elements from the list without freeing them.
 O(N).
-@param [in] sll a pointer to the singly linked list.
+@param [in] singly_linked_list a pointer to the singly linked list.
 @param [in] begin the start of the range in the list.
 @param [in] end the exclusive end of the range in the list.
 @return a pointer to the element following the range of elements in the list.
@@ -206,8 +219,10 @@ O(N).
 Note that the range remains in tact and can be iterated as one would iterate
 a normal list. However, insertions and removals from a range are not possible
 as they no longer belong to any list. */
-void *CCC_sll_extract_range(CCC_singly_linked_list *sll, CCC_sll_elem *begin,
-                            CCC_sll_elem *end);
+void *
+CCC_singly_linked_list_extract_range(CCC_Singly_linked_list *singly_linked_list,
+                                     CCC_Singly_linked_list_node *begin,
+                                     CCC_Singly_linked_list_node *end);
 
 /**@}*/
 
@@ -217,32 +232,38 @@ Sort the container. */
 
 /** @brief Sorts the singly linked list in non-decreasing order as defined by
 the provided comparison function. `O(N * log(N))` time, `O(1)` space.
-@param [in] sll a pointer to the singly linked list to sort.
-@return the result of the sort, usually OK. An arg error if sll is null. */
-CCC_Result CCC_sll_sort(CCC_singly_linked_list *sll);
+@param [in] singly_linked_list a pointer to the singly linked list to sort.
+@return the result of the sort, usually OK. An arg error if singly_linked_list
+is null. */
+CCC_Result
+CCC_singly_linked_list_sort(CCC_Singly_linked_list *singly_linked_list);
 
 /** @brief Inserts e in sorted position according to the non-decreasing order
 of the list determined by the user provided comparison function.
-@param [in] sll a pointer to the singly linked list.
+@param [in] singly_linked_list a pointer to the singly linked list.
 @param [in] e a pointer to the element to be inserted in order.
 @return a pointer to the element that has been inserted or NULL if allocation
 is required and has failed.
 @warning this function assumes the list is sorted.
 
 If a non-increasing order is desired, return opposite results from the user
-comparison function. If an element is CCC_ORDER_LESS return CCC_ORDER_GREATER
+comparison function. If an element is CCC_ORDER_LESSER return CCC_ORDER_GREATER
 and vice versa. If elements are equal, return CCC_ORDER_EQUAL. */
-void *CCC_sll_insert_sorted(CCC_singly_linked_list *sll, CCC_sll_elem *e);
+void *
+CCC_singly_linked_list_insert_sorted(CCC_Singly_linked_list *singly_linked_list,
+                                     CCC_Singly_linked_list_node *e);
 
 /** @brief Returns true if the list is sorted in non-decreasing order according
 to the user provided comparison function.
-@param [in] sll a pointer to the singly linked list.
-@return CCC_TRUE if the list is sorted CCC_FALSE if not. Error if sll is NULL.
+@param [in] singly_linked_list a pointer to the singly linked list.
+@return CCC_TRUE if the list is sorted CCC_FALSE if not. Error if
+singly_linked_list is NULL.
 
 If a non-increasing order is desired, return opposite results from the user
-comparison function. If an element is CCC_ORDER_LESS return CCC_ORDER_GREATER
+comparison function. If an element is CCC_ORDER_LESSER return CCC_ORDER_GREATER
 and vice versa. If elements are equal, return CCC_ORDER_EQUAL. */
-CCC_Tribool CCC_sll_is_sorted(CCC_singly_linked_list const *sll);
+CCC_Tribool CCC_singly_linked_list_is_sorted(
+    CCC_Singly_linked_list const *singly_linked_list);
 
 /**@}*/
 
@@ -251,9 +272,10 @@ Deallocate the container. */
 /**@{*/
 
 /** @brief Clears the list freeing memory if needed. O(N).
-@param [in] sll a pointer to the singly linked list.
+@param [in] singly_linked_list a pointer to the singly linked list.
 @param [in] fn a destructor function or NULL if not needed.
-@return ok if the clear succeeded or an input error if sll or fn are NULL.
+@return ok if the clear succeeded or an input error if singly_linked_list or fn
+are NULL.
 
 Note that if allocation is allowed, the container will free the user types
 wrapping each intrusive element in the list after calling fn. Therefore, fn
@@ -263,7 +285,9 @@ It should only perform other necessary cleanup or state management.
 If allocation is not allowed fn may free memory or not as the user sees fit.
 The user is responsible for managing the memory that wraps each intrusive
 handle as the elements are simply removed from the list. */
-CCC_Result CCC_sll_clear(CCC_singly_linked_list *sll, CCC_Type_destructor *fn);
+CCC_Result
+CCC_singly_linked_list_clear(CCC_Singly_linked_list *singly_linked_list,
+                             CCC_Type_destructor *fn);
 
 /**@}*/
 
@@ -272,25 +296,28 @@ Iterate through the doubly linked list. */
 /**@{*/
 
 /** @brief Return the user type at the front of the list. O(1).
-@param [in] sll a pointer to the singly linked list.
+@param [in] singly_linked_list a pointer to the singly linked list.
 @return a pointer to the user type at the start of the list or the end sentinel.
-NULL is returned if sll is NULL. */
-[[nodiscard]] void *CCC_sll_begin(CCC_singly_linked_list const *sll);
+NULL is returned if singly_linked_list is NULL. */
+[[nodiscard]] void *
+CCC_singly_linked_list_begin(CCC_Singly_linked_list const *singly_linked_list);
 
 /** @brief Return the sentinel at the end of the list. Do not access sentinel.
 O(1).
-@param [in] sll a pointer to the singly linked list.
+@param [in] singly_linked_list a pointer to the singly linked list.
 @return a pointer to the sentinel at the end of the list. It is undefined to
-access the sentinel. NULL is returned if sll is NULL.  */
-[[nodiscard]] void *CCC_sll_end(CCC_singly_linked_list const *sll);
+access the sentinel. NULL is returned if singly_linked_list is NULL.  */
+[[nodiscard]] void *
+CCC_singly_linked_list_end(CCC_Singly_linked_list const *singly_linked_list);
 
 /** @brief Return the user type following elem in the list. O(1).
-@param [in] sll a pointer to the singly linked list.
+@param [in] singly_linked_list a pointer to the singly linked list.
 @param [in] elem a pointer to the intrusive handle known to be in the list.
 @return the user type following elem or the end sentinel if none follow. NULL
-is returned if sll or elem are NULL. */
-[[nodiscard]] void *CCC_sll_next(CCC_singly_linked_list const *sll,
-                                 CCC_sll_elem const *elem);
+is returned if singly_linked_list or elem are NULL. */
+[[nodiscard]] void *
+CCC_singly_linked_list_next(CCC_Singly_linked_list const *singly_linked_list,
+                            CCC_Singly_linked_list_node const *elem);
 
 /**@}*/
 
@@ -299,74 +326,98 @@ Obtain state from the doubly linked list. */
 /**@{*/
 
 /** @brief Return a pointer to the element at the front of the list. O(1).
-@param [in] sll a pointer to the singly linked list.
-@return a reference to the front element or NULL if empty or sll is NULL. */
-[[nodiscard]] void *CCC_sll_front(CCC_singly_linked_list const *sll);
+@param [in] singly_linked_list a pointer to the singly linked list.
+@return a reference to the front element or NULL if empty or singly_linked_list
+is NULL. */
+[[nodiscard]] void *
+CCC_singly_linked_list_front(CCC_Singly_linked_list const *singly_linked_list);
 
 /** @brief Return a pointer to the first intrusive handle in the list. O(1).
-@param [in] sll a pointer to the singly linked list.
+@param [in] singly_linked_list a pointer to the singly linked list.
 @return a pointer to the first handle to a user type in the list or NULL if
 empty. */
-[[nodiscard]] CCC_sll_elem *
-CCC_sll_elem_begin(CCC_singly_linked_list const *sll);
+[[nodiscard]] CCC_Singly_linked_list_node *CCC_singly_linked_list_node_begin(
+    CCC_Singly_linked_list const *singly_linked_list);
 
 /** @brief Return a pointer to the sentinel node at the front of the list.
-@param [in] sll a pointer to the singly linked list.
+@param [in] singly_linked_list a pointer to the singly linked list.
 @return a pointer to the sentinel node that always points to the first list
-element or itself. It will not be NULL unless the sll pointer provided is NULL.
+element or itself. It will not be NULL unless the singly_linked_list pointer
+provided is NULL.
 
 This functions can be used when the user wishes to splice an element or range
 of elements to the front of the list. Because the interface only allows the user
 to splice an element or range AFTER a position having access to the sentinel
 makes it possible to splice to the front of the list. */
-[[nodiscard]] CCC_sll_elem *
-CCC_sll_sentinel_begin(CCC_singly_linked_list const *sll);
+[[nodiscard]] CCC_Singly_linked_list_node *
+CCC_singly_linked_list_sentinel_begin(
+    CCC_Singly_linked_list const *singly_linked_list);
 
 /** @brief Return the count of nodes in the list. O(1).
-@param [in] sll a pointer to the singly linked list.
-@return the size or an argument error is set if sll is NULL. */
-[[nodiscard]] CCC_Count CCC_sll_count(CCC_singly_linked_list const *sll);
+@param [in] singly_linked_list a pointer to the singly linked list.
+@return the size or an argument error is set if singly_linked_list is NULL. */
+[[nodiscard]] CCC_Count
+CCC_singly_linked_list_count(CCC_Singly_linked_list const *singly_linked_list);
 
 /** @brief Return true if the list is empty. O(1).
-@param [in] sll a pointer to the singly linked list.
-@return true if size is 0 otherwise false. Error returned if sll is NULL. */
-[[nodiscard]] CCC_Tribool CCC_sll_is_empty(CCC_singly_linked_list const *sll);
+@param [in] singly_linked_list a pointer to the singly linked list.
+@return true if size is 0 otherwise false. Error returned if singly_linked_list
+is NULL. */
+[[nodiscard]] CCC_Tribool CCC_singly_linked_list_is_empty(
+    CCC_Singly_linked_list const *singly_linked_list);
 
 /** @brief Returns true if the invariants of the list hold.
-@param [in] sll a pointer to the singly linked list.
-@return true if list is valid, else false. Error returned if sll is NULL. */
-[[nodiscard]] CCC_Tribool CCC_sll_validate(CCC_singly_linked_list const *sll);
+@param [in] singly_linked_list a pointer to the singly linked list.
+@return true if list is valid, else false. Error returned if singly_linked_list
+is NULL. */
+[[nodiscard]] CCC_Tribool CCC_singly_linked_list_validate(
+    CCC_Singly_linked_list const *singly_linked_list);
 
 /**@}*/
 
 /** Define this preprocessor macro if shorter names are desired for the singly
 linked list container. Check for namespace clashes before name shortening. */
 #ifdef SINGLY_LINKED_LIST_USING_NAMESPACE_CCC
-typedef CCC_sll_elem sll_elem;
-typedef CCC_singly_linked_list singly_linked_list;
-#    define sll_initialize(args...) CCC_sll_initialize(args)
-#    define sll_emplace_front(args...) CCC_sll_emplace_front(args)
-#    define sll_push_front(args...) CCC_sll_push_front(args)
-#    define sll_front(args...) CCC_sll_front(args)
-#    define sll_pop_front(args...) CCC_sll_pop_front(args)
-#    define sll_splice(args...) CCC_sll_splice(args)
-#    define sll_splice_range(args...) CCC_sll_splice_range(args)
-#    define sll_extract(args...) CCC_sll_extract(args)
-#    define sll_extract_range(args...) CCC_sll_extract_range(args)
-#    define sll_erase(args...) CCC_sll_erase(args)
-#    define sll_erase_range(args...) CCC_sll_erase_range(args)
-#    define sll_sort(args...) CCC_sll_sort(args)
-#    define sll_insert_sorted(args...) CCC_sll_insert_sorted(args)
-#    define sll_is_sorted(args...) CCC_sll_is_sorted(args)
-#    define sll_begin(args...) CCC_sll_begin(args)
-#    define sll_end(args...) CCC_sll_end(args)
-#    define sll_next(args...) CCC_sll_next(args)
-#    define sll_elem_begin(args...) CCC_sll_elem_begin(args)
-#    define sll_sentinel_begin(args...) CCC_sll_sentinel_begin(args)
-#    define sll_count(args...) CCC_sll_count(args)
-#    define sll_is_empty(args...) CCC_sll_is_empty(args)
-#    define sll_validate(args...) CCC_sll_validate(args)
-#    define sll_clear(args...) CCC_sll_clear(args)
+typedef CCC_Singly_linked_list_node singly_linked_list_node;
+typedef CCC_Singly_linked_list Singly_linked_list;
+#    define singly_linked_list_initialize(args...)                             \
+        CCC_singly_linked_list_initialize(args)
+#    define singly_linked_list_emplace_front(args...)                          \
+        CCC_singly_linked_list_emplace_front(args)
+#    define singly_linked_list_push_front(args...)                             \
+        CCC_singly_linked_list_push_front(args)
+#    define singly_linked_list_front(args...) CCC_singly_linked_list_front(args)
+#    define singly_linked_list_pop_front(args...)                              \
+        CCC_singly_linked_list_pop_front(args)
+#    define singly_linked_list_splice(args...)                                 \
+        CCC_singly_linked_list_splice(args)
+#    define singly_linked_list_splice_range(args...)                           \
+        CCC_singly_linked_list_splice_range(args)
+#    define singly_linked_list_extract(args...)                                \
+        CCC_singly_linked_list_extract(args)
+#    define singly_linked_list_extract_range(args...)                          \
+        CCC_singly_linked_list_extract_range(args)
+#    define singly_linked_list_erase(args...) CCC_singly_linked_list_erase(args)
+#    define singly_linked_list_erase_range(args...)                            \
+        CCC_singly_linked_list_erase_range(args)
+#    define singly_linked_list_sort(args...) CCC_singly_linked_list_sort(args)
+#    define singly_linked_list_insert_sorted(args...)                          \
+        CCC_singly_linked_list_insert_sorted(args)
+#    define singly_linked_list_is_sorted(args...)                              \
+        CCC_singly_linked_list_is_sorted(args)
+#    define singly_linked_list_begin(args...) CCC_singly_linked_list_begin(args)
+#    define singly_linked_list_end(args...) CCC_singly_linked_list_end(args)
+#    define singly_linked_list_next(args...) CCC_singly_linked_list_next(args)
+#    define singly_linked_list_node_begin(args...)                             \
+        CCC_singly_linked_list_node_begin(args)
+#    define singly_linked_list_sentinel_begin(args...)                         \
+        CCC_singly_linked_list_sentinel_begin(args)
+#    define singly_linked_list_count(args...) CCC_singly_linked_list_count(args)
+#    define singly_linked_list_is_empty(args...)                               \
+        CCC_singly_linked_list_is_empty(args)
+#    define singly_linked_list_validate(args...)                               \
+        CCC_singly_linked_list_validate(args)
+#    define singly_linked_list_clear(args...) CCC_singly_linked_list_clear(args)
 #endif /* SINGLY_LINKED_LIST_USING_NAMESPACE_CCC */
 
 #endif /* CCC_FORWARD_LIST_H */

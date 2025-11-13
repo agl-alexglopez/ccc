@@ -53,7 +53,7 @@ we pop from bit set but do not manually decrease the size of the underlying bit
 set container. Instead we manage our own front and size fields. */
 struct bitq
 {
-    bitset bs;
+    Bitset bs;
     size_t front;
     size_t size;
 };
@@ -94,7 +94,7 @@ struct huffman_node
 Having a small simple type in the contiguous flat priority queue is good for
 performance and the entire Buffer can be freed when the algorithm completes.
 The priority queue is only needed while building the tree. */
-struct fpq_elem
+struct flat_priority_queue_node
 {
     size_t freq;
     size_t node;
@@ -183,7 +183,8 @@ static str_view const cccz_suffix = SV(".cccz");
 /*===========================      Prototypes      ==========================*/
 
 static void zip_file(str_view to_compress);
-static flat_priority_queue build_encoding_pq(FILE *f, struct huffman_tree *);
+static Flat_priority_queue build_encoding_priority_queue(FILE *f,
+                                                         struct huffman_tree *);
 static void bitq_push_back(struct bitq *, CCC_Tribool);
 static CCC_Tribool bitq_pop_back(struct bitq *bq);
 static CCC_Tribool bitq_pop_front(struct bitq *);
@@ -195,7 +196,7 @@ static uint64_t hash_char(CCC_Key_context to_hash);
 static CCC_Order char_eq(CCC_Key_comparator_context);
 static CCC_Order cmp_freqs(CCC_Type_comparator_context cmp);
 static CCC_Order path_memo_cmp(CCC_Key_comparator_context cmp);
-static void memoize_path(struct huffman_tree *tree, flat_hash_map *fh,
+static void memoize_path(struct huffman_tree *tree, Flat_hash_map *fh,
                          struct bitq *, char c);
 static struct bitq build_encoding_bitq(FILE *f, struct huffman_tree *tree);
 static struct huffman_tree build_encoding_tree(FILE *f);
@@ -355,15 +356,18 @@ build_encoding_tree(FILE *const f)
         = buffer_initialize(NULL, struct huffman_node, std_alloc, NULL, 0),
         .root = 0,
     };
-    flat_priority_queue pq = build_encoding_pq(f, &ret);
-    while (count(&pq).count >= 2)
+    Flat_priority_queue priority_queue = build_encoding_priority_queue(f, &ret);
+    while (count(&priority_queue).count >= 2)
     {
         /* Small elements and we need the pair so we can't hold references. */
-        struct fpq_elem zero = *(struct fpq_elem *)front(&pq);
-        CCC_Result r = pop(&pq, &(struct fpq_elem){});
+        struct flat_priority_queue_node zero
+            = *(struct flat_priority_queue_node *)front(&priority_queue);
+        CCC_Result r
+            = pop(&priority_queue, &(struct flat_priority_queue_node){});
         check(r == CCC_RESULT_OK);
-        struct fpq_elem one = *(struct fpq_elem *)front(&pq);
-        r = pop(&pq, &(struct fpq_elem){});
+        struct flat_priority_queue_node one
+            = *(struct flat_priority_queue_node *)front(&priority_queue);
+        r = pop(&priority_queue, &(struct flat_priority_queue_node){});
         check(r == CCC_RESULT_OK);
         struct huffman_node *const internal_one
             = push_back(&ret.bump_arena,
@@ -372,18 +376,21 @@ build_encoding_tree(FILE *const f)
         check(internal_one);
         node_at(&ret, zero.node)->parent = new_root;
         node_at(&ret, one.node)->parent = new_root;
-        struct fpq_elem const *const pushed = push(
-            &pq,
-            &(struct fpq_elem){.freq = zero.freq + one.freq, .node = new_root},
-            &(struct fpq_elem){});
+        struct flat_priority_queue_node const *const pushed
+            = push(&priority_queue,
+                   &(struct flat_priority_queue_node){
+                       .freq = zero.freq + one.freq, .node = new_root},
+                   &(struct flat_priority_queue_node){});
         check(pushed);
         ret.root = new_root;
     }
-    /* The flat pq was given no allocation permission because the memory it
-       needs was already allocated by the Buffer it stole from. The priority
-       queue only gets smaller as the algorithms progresses so we didn't need
-       to worry about growth. Provide same function used to reserve buffer. */
-    CCC_Result const r = clear_and_free_reserve(&pq, NULL, std_alloc);
+    /* The flat priority_queue was given no allocation permission because the
+       memory it needs was already allocated by the Buffer it stole from. The
+       priority queue only gets smaller as the algorithms progresses so we
+       didn't need to worry about growth. Provide same function used to reserve
+       buffer. */
+    CCC_Result const r
+        = clear_and_free_reserve(&priority_queue, NULL, std_alloc);
     check(r == CCC_RESULT_OK);
     return ret;
 }
@@ -393,16 +400,16 @@ character will be the root. The priority queue is built in O(N) time. The
 priority queue has no allocation permission, knowing the space it needs to
 reserve ahead of time and assuming the tree building algorithm will strictly
 decrease the size of the priority queue. */
-static flat_priority_queue
-build_encoding_pq(FILE *const f, struct huffman_tree *const tree)
+static Flat_priority_queue
+build_encoding_priority_queue(FILE *const f, struct huffman_tree *const tree)
 {
-    flat_hash_map frequencies = fhm_initialize(
+    Flat_hash_map frequencies = flat_hash_map_initialize(
         NULL, struct char_freq, ch, hash_char, char_eq, std_alloc, NULL, 0);
     foreach_filechar(f, c, {
-        struct char_freq *const ins
-            = or_insert(fhm_and_modify_w(entry_r(&frequencies, c),
-                                         struct char_freq, ++T->freq;),
-                        &(struct char_freq){.ch = *c, .freq = 1});
+        struct char_freq *const ins = or_insert(
+            flat_hash_map_and_modify_w(entry_r(&frequencies, c),
+                                       struct char_freq, ++T->freq;),
+            &(struct char_freq){.ch = *c, .freq = 1});
         check(ins);
     });
     size_t const leaves = count(&frequencies).count;
@@ -417,10 +424,11 @@ build_encoding_pq(FILE *const f, struct huffman_tree *const tree)
         = push_back(&tree->bump_arena, &(struct huffman_node){});
     check(nil);
     /* Use a Buffer to simply push back elements we will heapify at the end. */
-    Buffer fpq_storage
-        = buffer_initialize(NULL, struct fpq_elem, NULL, NULL, 0);
+    Buffer flat_priority_queue_storage = buffer_initialize(
+        NULL, struct flat_priority_queue_node, NULL, NULL, 0);
     /* Add one to reservation for the flat priority queue swap slot. */
-    r = reserve(&fpq_storage, count(&frequencies).count, std_alloc);
+    r = reserve(&flat_priority_queue_storage, count(&frequencies).count,
+                std_alloc);
     check(r == CCC_RESULT_OK);
     for (struct char_freq const *i = begin(&frequencies);
          i != end(&frequencies); i = next(&frequencies, i))
@@ -429,8 +437,9 @@ build_encoding_pq(FILE *const f, struct huffman_tree *const tree)
             = push_back(&tree->bump_arena, &(struct huffman_node){.ch = i->ch});
         check(node);
         size_t const node_i = buffer_i(&tree->bump_arena, node).count;
-        struct fpq_elem const *const pushed = push_back(
-            &fpq_storage, &(struct fpq_elem){.freq = i->freq, .node = node_i});
+        struct flat_priority_queue_node const *const pushed = push_back(
+            &flat_priority_queue_storage, &(struct flat_priority_queue_node){
+                                              .freq = i->freq, .node = node_i});
         check(pushed);
     }
     /* Free map but not the Buffer because the priority queue took buffer. */
@@ -439,9 +448,11 @@ build_encoding_pq(FILE *const f, struct huffman_tree *const tree)
     /* The Buffer had no allocation permission and set up all the elements we
        needed to be in the flat priority queue. Now we take its memory and
        heapify the data in O(N) time rather than pushing each element. */
-    return fpq_heapify_initialize(
-        begin(&fpq_storage), struct fpq_elem, CCC_ORDER_LESS, cmp_freqs, NULL,
-        NULL, capacity(&fpq_storage).count, count(&fpq_storage).count);
+    return flat_priority_queue_heapify_initialize(
+        begin(&flat_priority_queue_storage), struct flat_priority_queue_node,
+        CCC_ORDER_LESSER, cmp_freqs, NULL, NULL,
+        capacity(&flat_priority_queue_storage).count,
+        count(&flat_priority_queue_storage).count);
 }
 
 /** Returns the bit queue representing the bit path to every character in the
@@ -456,7 +467,7 @@ build_encoding_bitq(FILE *const f, struct huffman_tree *const tree)
        alphabets aka trees with many leaves. An array of 0-256 elements as a map
        could achieve the same result faster but it would waste much more space.
        It is rare to have a file use all 256 possible character values. */
-    flat_hash_map memo = CCC_fhm_initialize(
+    Flat_hash_map memo = CCC_flat_hash_map_initialize(
         NULL, struct path_memo, ch, hash_char, path_memo_cmp, NULL, NULL, 0);
     CCC_Result r = reserve(&memo, tree->num_leaves, std_alloc);
     check(r == CCC_RESULT_OK);
@@ -487,7 +498,7 @@ as an entry in the path memo map. This function modifies the tree nodes by
 altering their iterator field during the DFS, but it restores all nodes to their
 original state before returning. */
 static void
-memoize_path(struct huffman_tree *const tree, flat_hash_map *const fh,
+memoize_path(struct huffman_tree *const tree, Flat_hash_map *const fh,
              struct bitq *const bq, char const c)
 {
     struct path_memo *const path = insert_entry(
@@ -1159,8 +1170,10 @@ char_eq(CCC_Key_comparator_context const cmp)
 static CCC_Order
 cmp_freqs(CCC_Type_comparator_context const cmp)
 {
-    struct fpq_elem const *const lhs = (struct fpq_elem *)cmp.any_type_lhs;
-    struct fpq_elem const *const rhs = (struct fpq_elem *)cmp.any_type_rhs;
+    struct flat_priority_queue_node const *const lhs
+        = (struct flat_priority_queue_node *)cmp.any_type_lhs;
+    struct flat_priority_queue_node const *const rhs
+        = (struct flat_priority_queue_node *)cmp.any_type_rhs;
     return (lhs->freq > rhs->freq) - (lhs->freq < rhs->freq);
 }
 

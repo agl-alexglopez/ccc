@@ -9,16 +9,16 @@
 
 #include "checkers.h"
 #include "handle_ordered_map.h"
-#include "homap_util.h"
+#include "handle_ordered_map_util.h"
 #include "traits.h"
 #include "types.h"
 #include "util/alloc.h"
 
-CHECK_BEGIN_STATIC_FN(homap_test_insert_erase_shuffled)
+CHECK_BEGIN_STATIC_FN(handle_ordered_map_test_insert_erase_shuffled)
 {
-    CCC_handle_ordered_map s
-        = hom_initialize(&(small_fixed_map){}, struct val, id, id_cmp, NULL,
-                         NULL, SMALL_FIXED_CAP);
+    CCC_Handle_ordered_map s
+        = handle_ordered_map_initialize(&(small_fixed_map){}, struct val, id,
+                                        id_cmp, NULL, NULL, SMALL_FIXED_CAP);
     size_t const size = 50;
     int const prime = 53;
     CHECK(insert_shuffled(&s, size, prime), PASS);
@@ -39,11 +39,11 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert_erase_shuffled)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(homap_test_prime_shuffle)
+CHECK_BEGIN_STATIC_FN(handle_ordered_map_test_prime_shuffle)
 {
-    CCC_handle_ordered_map s
-        = hom_initialize(&(small_fixed_map){}, struct val, id, id_cmp, NULL,
-                         NULL, SMALL_FIXED_CAP);
+    CCC_Handle_ordered_map s
+        = handle_ordered_map_initialize(&(small_fixed_map){}, struct val, id,
+                                        id_cmp, NULL, NULL, SMALL_FIXED_CAP);
     size_t const size = 50;
     size_t const prime = 53;
     size_t const less = 10;
@@ -63,7 +63,7 @@ CHECK_BEGIN_STATIC_FN(homap_test_prime_shuffle)
         CHECK(validate(&s), true);
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
-    CHECK(hom_count(&s).count < size, true);
+    CHECK(handle_ordered_map_count(&s).count < size, true);
     for (size_t i = 0; i < size; ++i)
     {
         CCC_handle const *const e = remove_handle_r(handle_r(&s, &i));
@@ -73,11 +73,11 @@ CHECK_BEGIN_STATIC_FN(homap_test_prime_shuffle)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(homap_test_weak_srand)
+CHECK_BEGIN_STATIC_FN(handle_ordered_map_test_weak_srand)
 {
-    CCC_handle_ordered_map s
-        = hom_initialize(&(standard_fixed_map){}, struct val, id, id_cmp, NULL,
-                         NULL, STANDARD_FIXED_CAP);
+    CCC_Handle_ordered_map s
+        = handle_ordered_map_initialize(&(standard_fixed_map){}, struct val, id,
+                                        id_cmp, NULL, NULL, STANDARD_FIXED_CAP);
     srand(time(NULL)); /* NOLINT */
     int const num_nodes = 1000;
     int id_keys[1000];
@@ -98,11 +98,11 @@ CHECK_BEGIN_STATIC_FN(homap_test_weak_srand)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(homap_test_insert_erase_cycles_no_alloc)
+CHECK_BEGIN_STATIC_FN(handle_ordered_map_test_insert_erase_cycles_no_alloc)
 {
-    CCC_handle_ordered_map s
-        = hom_initialize(&(standard_fixed_map){}, struct val, id, id_cmp, NULL,
-                         NULL, STANDARD_FIXED_CAP);
+    CCC_Handle_ordered_map s
+        = handle_ordered_map_initialize(&(standard_fixed_map){}, struct val, id,
+                                        id_cmp, NULL, NULL, STANDARD_FIXED_CAP);
     srand(time(NULL)); /* NOLINT */
     int const num_nodes = 1000;
     int id_keys[1000];
@@ -135,10 +135,10 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert_erase_cycles_no_alloc)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(homap_test_insert_erase_cycles_alloc)
+CHECK_BEGIN_STATIC_FN(handle_ordered_map_test_insert_erase_cycles_alloc)
 {
-    CCC_handle_ordered_map s
-        = hom_initialize(NULL, struct val, id, id_cmp, std_alloc, NULL, 0);
+    CCC_Handle_ordered_map s = handle_ordered_map_initialize(
+        NULL, struct val, id, id_cmp, std_alloc, NULL, 0);
     srand(time(NULL)); /* NOLINT */
     int const num_nodes = 1000;
     int id_keys[1000];
@@ -168,14 +168,15 @@ CHECK_BEGIN_STATIC_FN(homap_test_insert_erase_cycles_alloc)
         CHECK(validate(&s), true);
     }
     CHECK(is_empty(&s), true);
-    CHECK_END_FN(hom_clear_and_free(&s, NULL););
+    CHECK_END_FN(handle_ordered_map_clear_and_free(&s, NULL););
 }
 
 int
 main()
 {
-    return CHECK_RUN(homap_test_insert_erase_shuffled(),
-                     homap_test_prime_shuffle(), homap_test_weak_srand(),
-                     homap_test_insert_erase_cycles_no_alloc(),
-                     homap_test_insert_erase_cycles_alloc());
+    return CHECK_RUN(handle_ordered_map_test_insert_erase_shuffled(),
+                     handle_ordered_map_test_prime_shuffle(),
+                     handle_ordered_map_test_weak_srand(),
+                     handle_ordered_map_test_insert_erase_cycles_no_alloc(),
+                     handle_ordered_map_test_insert_erase_cycles_alloc());
 }

@@ -33,9 +33,9 @@ plus(CCC_Type_context const t)
 }
 
 static inline void
-plusaux(CCC_Type_context const t)
+pluscontext(CCC_Type_context const t)
 {
-    ((struct val *)t.any_type)->val += *(int *)t.aux;
+    ((struct val *)t.any_type)->val += *(int *)t.context;
 }
 
 /* Every test should have three uses of each tested function: one when the
@@ -532,16 +532,16 @@ CHECK_BEGIN_STATIC_FN(omap_test_entry_and_modify)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(omap_test_entry_and_modify_aux)
+CHECK_BEGIN_STATIC_FN(omap_test_entry_and_modify_context)
 {
     struct val_pool vals
         = {.vals = (struct val[35]){}, .next_free = 0, .capacity = 35};
     ordered_map om = om_initialize(om, struct val, elem, key, id_cmp,
                                    val_bump_alloc, &vals);
     int size = 30;
-    int aux = 1;
+    int context = 1;
     CCC_omap_entry *ent = entry_r(&om, &(int){-1});
-    ent = and_modify_aux(ent, plusaux, &aux);
+    ent = and_modify_context(ent, pluscontext, &context);
     CHECK(occupied(ent), false);
     CHECK(unwrap(ent) == NULL, true);
     CHECK(count(&om).count, 0);
@@ -554,7 +554,7 @@ CHECK_BEGIN_STATIC_FN(omap_test_entry_and_modify_aux)
     CHECK(v != NULL, true);
     CHECK(v->val, -1);
     CHECK(v->key, -1);
-    ent = and_modify_aux(ent, plusaux, &aux);
+    ent = and_modify_context(ent, pluscontext, &context);
     v = unwrap(ent);
     CHECK(v != NULL, true);
     CHECK(v->key, -1);
@@ -565,14 +565,14 @@ CHECK_BEGIN_STATIC_FN(omap_test_entry_and_modify_aux)
 
     i += (size / 2);
     ent = entry_r(&om, &i);
-    ent = and_modify_aux(ent, plusaux, &aux);
+    ent = and_modify_context(ent, pluscontext, &context);
     CHECK(occupied(ent), false);
     CHECK(unwrap(ent) == NULL, true);
     CHECK(count(&om).count, i + 1);
     (void)om_insert_or_assign_w(&om, i, val(i));
     CHECK(validate(&om), true);
     ent = entry_r(&om, &i);
-    ent = and_modify_aux(ent, plusaux, &aux);
+    ent = and_modify_context(ent, pluscontext, &context);
     v = unwrap(ent);
     CHECK(v != NULL, true);
     CHECK(v->val, i + 1);
@@ -584,14 +584,14 @@ CHECK_BEGIN_STATIC_FN(omap_test_entry_and_modify_aux)
 
     i = size;
     ent = entry_r(&om, &i);
-    ent = and_modify_aux(ent, plusaux, &aux);
+    ent = and_modify_context(ent, pluscontext, &context);
     CHECK(occupied(ent), false);
     CHECK(unwrap(ent) == NULL, true);
     CHECK(count(&om).count, i + 1);
     (void)om_insert_or_assign_w(&om, i, val(i));
     CHECK(validate(&om), true);
     ent = entry_r(&om, &i);
-    ent = and_modify_aux(ent, plusaux, &aux);
+    ent = and_modify_context(ent, pluscontext, &context);
     v = unwrap(ent);
     CHECK(v != NULL, true);
     CHECK(v->val, i + 1);
@@ -942,7 +942,7 @@ main(void)
         omap_test_insert(), omap_test_remove(), omap_test_validate(),
         omap_test_try_insert(), omap_test_try_insert_with(),
         omap_test_insert_or_assign(), omap_test_insert_or_assign_with(),
-        omap_test_entry_and_modify(), omap_test_entry_and_modify_aux(),
+        omap_test_entry_and_modify(), omap_test_entry_and_modify_context(),
         omap_test_entry_and_modify_with(), omap_test_or_insert(),
         omap_test_or_insert_with(), omap_test_insert_entry(),
         omap_test_insert_entry_with(), omap_test_remove_entry());

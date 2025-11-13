@@ -5,8 +5,8 @@
 #define TRAITS_USING_NAMESPACE_CCC
 
 #include "checkers.h"
-#include "fhmap_util.h"
 #include "flat_hash_map.h"
+#include "flat_hash_map_util.h"
 #include "traits.h"
 #include "types.h"
 #include "util/alloc.h"
@@ -32,11 +32,11 @@ destroy_owner_allocation(CCC_Type_context const t)
     free(o->allocation);
 }
 
-CHECK_BEGIN_STATIC_FN(fhmap_test_insert_then_iterate)
+CHECK_BEGIN_STATIC_FN(flat_hash_map_test_insert_then_iterate)
 {
-    CCC_flat_hash_map fh = fhm_initialize(&(standard_fixed_map){}, struct val,
-                                          key, fhmap_int_to_u64, fhmap_id_cmp,
-                                          NULL, NULL, STANDARD_FIXED_CAP);
+    CCC_Flat_hash_map fh = flat_hash_map_initialize(
+        &(standard_fixed_map){}, struct val, key, flat_hash_map_int_to_u64,
+        flat_hash_map_id_cmp, NULL, NULL, STANDARD_FIXED_CAP);
     int const size = STANDARD_FIXED_CAP;
     for (int i = 0; i < size; i += 2)
     {
@@ -73,27 +73,28 @@ CHECK_BEGIN_STATIC_FN(fhmap_test_insert_then_iterate)
 /** We want to make sure the clear and free method that uses the more
 efficient iterator is able to free all elements allocated with no leaks when
 run under sanitizers. */
-CHECK_BEGIN_STATIC_FN(fhmap_test_insert_allocate_clear_free)
+CHECK_BEGIN_STATIC_FN(flat_hash_map_test_insert_allocate_clear_free)
 {
-    CCC_flat_hash_map fh
-        = fhm_initialize(NULL, struct owner, key, fhmap_int_to_u64, owners_eq,
-                         std_alloc, NULL, 0);
+    CCC_Flat_hash_map fh = flat_hash_map_initialize(
+        NULL, struct owner, key, flat_hash_map_int_to_u64, owners_eq, std_alloc,
+        NULL, 0);
     int const size = 32;
     for (int i = 0; i < size; ++i)
     {
-        CCC_Entry *e = fhm_try_insert_w(
+        CCC_Entry *e = flat_hash_map_try_insert_w(
             &fh, i, (struct owner){.allocation = malloc(sizeof(size_t))});
         CHECK(occupied(e), CCC_FALSE);
         struct owner const *const o = unwrap(e);
         CHECK(o != NULL, CCC_TRUE);
         CHECK(o->allocation != NULL, CCC_TRUE);
     }
-    CHECK_END_FN(CCC_fhm_clear_and_free(&fh, destroy_owner_allocation););
+    CHECK_END_FN(
+        CCC_flat_hash_map_clear_and_free(&fh, destroy_owner_allocation););
 }
 
 int
 main(void)
 {
-    return CHECK_RUN(fhmap_test_insert_then_iterate(),
-                     fhmap_test_insert_allocate_clear_free());
+    return CHECK_RUN(flat_hash_map_test_insert_then_iterate(),
+                     flat_hash_map_test_insert_allocate_clear_free());
 }

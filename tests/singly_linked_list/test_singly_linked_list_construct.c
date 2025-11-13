@@ -5,19 +5,19 @@
 
 #include "checkers.h"
 #include "singly_linked_list.h"
-#include "sll_util.h"
+#include "singly_linked_list_util.h"
 #include "traits.h"
 
-CHECK_BEGIN_STATIC_FN(sll_test_construct)
+CHECK_BEGIN_STATIC_FN(singly_linked_list_test_construct)
 {
-    singly_linked_list sll
-        = sll_initialize(sll, struct val, e, val_cmp, NULL, NULL);
-    CHECK(is_empty(&sll), true);
+    Singly_linked_list singly_linked_list = singly_linked_list_initialize(
+        singly_linked_list, struct val, e, val_cmp, NULL, NULL);
+    CHECK(is_empty(&singly_linked_list), true);
     CHECK_END_FN();
 }
 
 int
 main()
 {
-    return CHECK_RUN(sll_test_construct());
+    return CHECK_RUN(singly_linked_list_test_construct());
 }

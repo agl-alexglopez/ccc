@@ -204,7 +204,7 @@ CCC_bitset_or(CCC_Bitset *const dst, CCC_Bitset const *const src)
 {
     if (!dst || !src)
     {
-        return CCC_RESULT_ARG_ERROR;
+        return CCC_RESULT_ARGUMENT_ERROR;
     }
     if (!dst->count || !src->count)
     {
@@ -224,7 +224,7 @@ CCC_bitset_xor(CCC_Bitset *const dst, CCC_Bitset const *const src)
 {
     if (!dst || !src)
     {
-        return CCC_RESULT_ARG_ERROR;
+        return CCC_RESULT_ARGUMENT_ERROR;
     }
     if (!dst->count || !src->count)
     {
@@ -244,7 +244,7 @@ CCC_bitset_and(CCC_Bitset *dst, CCC_Bitset const *src)
 {
     if (!dst || !src)
     {
-        return CCC_RESULT_ARG_ERROR;
+        return CCC_RESULT_ARGUMENT_ERROR;
     }
     if (!src->count)
     {
@@ -277,7 +277,7 @@ CCC_bitset_shiftl(CCC_Bitset *const bs, size_t const left_shifts)
 {
     if (!bs)
     {
-        return CCC_RESULT_ARG_ERROR;
+        return CCC_RESULT_ARGUMENT_ERROR;
     }
     if (!bs->count || !left_shifts)
     {
@@ -323,7 +323,7 @@ CCC_bitset_shiftr(CCC_Bitset *const bs, size_t const right_shifts)
 {
     if (!bs)
     {
-        return CCC_RESULT_ARG_ERROR;
+        return CCC_RESULT_ARGUMENT_ERROR;
     }
     if (!bs->count || !right_shifts)
     {
@@ -407,7 +407,7 @@ CCC_bitset_set_all(CCC_Bitset *const bs, CCC_Tribool const b)
 {
     if (!bs)
     {
-        return CCC_RESULT_ARG_ERROR;
+        return CCC_RESULT_ARGUMENT_ERROR;
     }
     if (bs->count)
     {
@@ -428,7 +428,7 @@ CCC_bitset_set_range(CCC_Bitset *const bs, size_t const i, size_t const count,
 {
     if (!bs || i >= bs->count || i + count < i)
     {
-        return CCC_RESULT_ARG_ERROR;
+        return CCC_RESULT_ARGUMENT_ERROR;
     }
     size_t const end_i = i + count;
     ublock start_block = ublock_index(i);
@@ -491,7 +491,7 @@ CCC_bitset_reset_all(CCC_Bitset *const bs)
 {
     if (!bs)
     {
-        return CCC_RESULT_ARG_ERROR;
+        return CCC_RESULT_ARGUMENT_ERROR;
     }
     if (bs->count)
     {
@@ -508,7 +508,7 @@ CCC_bitset_reset_range(CCC_Bitset *const bs, size_t const i, size_t const count)
 {
     if (!bs || i >= bs->count || i + count < i || i + count > bs->count)
     {
-        return CCC_RESULT_ARG_ERROR;
+        return CCC_RESULT_ARGUMENT_ERROR;
     }
     size_t const end_i = i + count;
     ublock start_block = ublock_index(i);
@@ -562,7 +562,7 @@ CCC_bitset_flip_all(CCC_Bitset *const bs)
 {
     if (!bs)
     {
-        return CCC_RESULT_ARG_ERROR;
+        return CCC_RESULT_ARGUMENT_ERROR;
     }
     if (!bs->count)
     {
@@ -585,7 +585,7 @@ CCC_bitset_flip_range(CCC_Bitset *const bs, size_t const i, size_t const count)
 {
     if (!bs || i >= bs->count || i + count < i || i + count > bs->count)
     {
-        return CCC_RESULT_ARG_ERROR;
+        return CCC_RESULT_ARGUMENT_ERROR;
     }
     size_t const end_i = i + count;
     ublock start_block = ublock_index(i);
@@ -619,7 +619,7 @@ CCC_bitset_capacity(CCC_Bitset const *const bs)
 {
     if (!bs)
     {
-        return (CCC_Count){.error = CCC_RESULT_ARG_ERROR};
+        return (CCC_Count){.error = CCC_RESULT_ARGUMENT_ERROR};
     }
     return (CCC_Count){.count = bs->capacity};
 }
@@ -629,7 +629,7 @@ CCC_bitset_blocks_capacity(CCC_Bitset const *const bs)
 {
     if (!bs)
     {
-        return (CCC_Count){.error = CCC_RESULT_ARG_ERROR};
+        return (CCC_Count){.error = CCC_RESULT_ARGUMENT_ERROR};
     }
     return (CCC_Count){.count = ublock_count(bs->capacity)};
 }
@@ -639,7 +639,7 @@ CCC_bitset_count(CCC_Bitset const *const bs)
 {
     if (!bs)
     {
-        return (CCC_Count){.error = CCC_RESULT_ARG_ERROR};
+        return (CCC_Count){.error = CCC_RESULT_ARGUMENT_ERROR};
     }
     return (CCC_Count){.count = bs->count};
 }
@@ -649,7 +649,7 @@ CCC_bitset_blocks_count(CCC_Bitset const *const bs)
 {
     if (!bs)
     {
-        return (CCC_Count){.error = CCC_RESULT_ARG_ERROR};
+        return (CCC_Count){.error = CCC_RESULT_ARGUMENT_ERROR};
     }
     return (CCC_Count){.count = ublock_count(bs->count)};
 }
@@ -669,7 +669,7 @@ CCC_bitset_popcount(CCC_Bitset const *const bs)
 {
     if (!bs)
     {
-        return (CCC_Count){.error = CCC_RESULT_ARG_ERROR};
+        return (CCC_Count){.error = CCC_RESULT_ARGUMENT_ERROR};
     }
     if (!bs->count)
     {
@@ -688,7 +688,7 @@ CCC_bitset_popcount_range(CCC_Bitset const *const bs, size_t const i,
 {
     if (!bs || i >= bs->count || i + count < i || i + count > bs->count)
     {
-        return (CCC_Count){.error = CCC_RESULT_ARG_ERROR};
+        return (CCC_Count){.error = CCC_RESULT_ARGUMENT_ERROR};
     }
     size_t const end_i = i + count;
     size_t popped = 0;
@@ -720,7 +720,7 @@ CCC_bitset_push_back(CCC_Bitset *const bs, CCC_Tribool const b)
 {
     if (!bs || b > CCC_TRUE || b < CCC_FALSE)
     {
-        return CCC_RESULT_ARG_ERROR;
+        return CCC_RESULT_ARGUMENT_ERROR;
     }
     CCC_Result const check_resize = maybe_resize(bs, 1, bs->alloc);
     if (check_resize != CCC_RESULT_OK)
@@ -900,7 +900,7 @@ CCC_bitset_clear(CCC_Bitset *const bs)
 {
     if (!bs)
     {
-        return CCC_RESULT_ARG_ERROR;
+        return CCC_RESULT_ARGUMENT_ERROR;
     }
     if (bs->blocks)
     {
@@ -917,7 +917,7 @@ CCC_bitset_clear_and_free(CCC_Bitset *const bs)
 {
     if (!bs)
     {
-        return CCC_RESULT_ARG_ERROR;
+        return CCC_RESULT_ARGUMENT_ERROR;
     }
     if (!bs->alloc)
     {
@@ -925,7 +925,7 @@ CCC_bitset_clear_and_free(CCC_Bitset *const bs)
     }
     if (bs->blocks)
     {
-        (void)bs->alloc(bs->blocks, 0, bs->aux);
+        (void)bs->alloc(bs->blocks, 0, bs->context);
     }
     bs->count = 0;
     bs->capacity = 0;
@@ -938,11 +938,11 @@ CCC_bitset_clear_and_free_reserve(CCC_Bitset *const bs, CCC_Allocator *const fn)
 {
     if (!bs || !fn)
     {
-        return CCC_RESULT_ARG_ERROR;
+        return CCC_RESULT_ARGUMENT_ERROR;
     }
     if (bs->blocks)
     {
-        (void)fn(bs->blocks, 0, bs->aux);
+        (void)fn(bs->blocks, 0, bs->context);
     }
     bs->count = 0;
     bs->capacity = 0;
@@ -956,7 +956,7 @@ CCC_bitset_reserve(CCC_Bitset *const bs, size_t const to_add,
 {
     if (!bs || !fn)
     {
-        return CCC_RESULT_ARG_ERROR;
+        return CCC_RESULT_ARGUMENT_ERROR;
     }
     return maybe_resize(bs, to_add, fn);
 }
@@ -967,7 +967,7 @@ CCC_bitset_copy(CCC_Bitset *const dst, CCC_Bitset const *const src,
 {
     if (!dst || !src || (dst->capacity < src->capacity && !fn))
     {
-        return CCC_RESULT_ARG_ERROR;
+        return CCC_RESULT_ARGUMENT_ERROR;
     }
     /* Whatever future changes we make to bit set members should not fall out
        of sync with this code so save what we need to restore and then copy
@@ -985,18 +985,19 @@ CCC_bitset_copy(CCC_Bitset *const dst, CCC_Bitset const *const src,
     }
     if (dst->capacity < src->capacity)
     {
-        bitblock *const new_mem = fn(
-            dst->blocks, ublock_count(src->capacity) * SIZEOF_BLOCK, dst->aux);
+        bitblock *const new_mem
+            = fn(dst->blocks, ublock_count(src->capacity) * SIZEOF_BLOCK,
+                 dst->context);
         if (!new_mem)
         {
-            return CCC_RESULT_MEM_ERROR;
+            return CCC_RESULT_ALLOCATOR_ERROR;
         }
         dst->blocks = new_mem;
         dst->capacity = src->capacity;
     }
     if (!src->blocks || !dst->blocks)
     {
-        return CCC_RESULT_ARG_ERROR;
+        return CCC_RESULT_ARGUMENT_ERROR;
     }
     (void)memcpy(dst->blocks, src->blocks,
                  ublock_count(src->capacity) * SIZEOF_BLOCK);
@@ -1071,7 +1072,7 @@ maybe_resize(struct CCC_Bitset *const bs, size_t const to_add,
     size_t bits_needed = bs->count + to_add;
     if (bits_needed < bs->count)
     {
-        return CCC_RESULT_ARG_ERROR;
+        return CCC_RESULT_ARGUMENT_ERROR;
     }
     if (bits_needed <= bs->capacity)
     {
@@ -1094,10 +1095,10 @@ maybe_resize(struct CCC_Bitset *const bs, size_t const to_add,
     size_t const old_bytes
         = bs->count ? ublock_count(bs->count) * SIZEOF_BLOCK : 0;
     bitblock *const new_mem
-        = fn(bs->blocks, ublock_count(bits_needed) * SIZEOF_BLOCK, bs->aux);
+        = fn(bs->blocks, ublock_count(bits_needed) * SIZEOF_BLOCK, bs->context);
     if (!new_mem)
     {
-        return CCC_RESULT_MEM_ERROR;
+        return CCC_RESULT_ALLOCATOR_ERROR;
     }
     (void)memset((char *)new_mem + old_bytes, 0, new_bytes);
     bs->capacity = bits_needed;
@@ -1117,7 +1118,7 @@ first_trailing_one_range(struct CCC_Bitset const *const bs, size_t const i,
 {
     if (!bs || i >= bs->count || i + count < i || i + count > bs->count)
     {
-        return (CCC_Count){.error = CCC_RESULT_ARG_ERROR};
+        return (CCC_Count){.error = CCC_RESULT_ARGUMENT_ERROR};
     }
     size_t const end_i = i + count;
     ublock start_block = ublock_index(i);
@@ -1172,7 +1173,7 @@ first_trailing_bits_range(struct CCC_Bitset const *const bs, size_t const i,
     if (!bs || i >= bs->count || num_bits > count || i + count < i
         || i + count > bs->count)
     {
-        return (CCC_Count){.error = CCC_RESULT_ARG_ERROR};
+        return (CCC_Count){.error = CCC_RESULT_ARGUMENT_ERROR};
     }
     size_t const range_end = i + count;
     size_t num_found = 0;
@@ -1291,7 +1292,7 @@ first_trailing_zero_range(struct CCC_Bitset const *const bs, size_t const i,
 {
     if (!bs || i >= bs->count || i + count < i || i + count > bs->count)
     {
-        return (CCC_Count){.error = CCC_RESULT_ARG_ERROR};
+        return (CCC_Count){.error = CCC_RESULT_ARGUMENT_ERROR};
     }
     size_t const end_i = i + count;
     ublock start_block = ublock_index(i);
@@ -1348,7 +1349,7 @@ first_leading_one_range(struct CCC_Bitset const *const bs, size_t const i,
 {
     if (!bs || i >= bs->count || count > bs->count || i + 1 < count)
     {
-        return (CCC_Count){.error = CCC_RESULT_ARG_ERROR};
+        return (CCC_Count){.error = CCC_RESULT_ARGUMENT_ERROR};
     }
     size_t const end_i = (i + 1 - count);
     ubit const start_bit = ubit_index(i);
@@ -1415,7 +1416,7 @@ first_leading_bits_range(struct CCC_Bitset const *const bs, size_t const i,
     if (!bs || num_bits > PTRDIFF_MAX || i > PTRDIFF_MAX || i >= bs->count
         || !num_bits || num_bits > count || range_end < -1)
     {
-        return (CCC_Count){.error = CCC_RESULT_ARG_ERROR};
+        return (CCC_Count){.error = CCC_RESULT_ARGUMENT_ERROR};
     }
     size_t num_found = 0;
     ptrdiff_t bits_start = (ptrdiff_t)i;
@@ -1524,7 +1525,7 @@ first_leading_zero_range(struct CCC_Bitset const *const bs, size_t const i,
 {
     if (!bs || i >= bs->count || count > bs->count || i + 1 < count)
     {
-        return (CCC_Count){.error = CCC_RESULT_ARG_ERROR};
+        return (CCC_Count){.error = CCC_RESULT_ARGUMENT_ERROR};
     }
     size_t const end_i = i + 1 - count;
     ublock start_block = ublock_index(i);

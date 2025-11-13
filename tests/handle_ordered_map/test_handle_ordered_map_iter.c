@@ -10,23 +10,25 @@
 
 #include "checkers.h"
 #include "handle_ordered_map.h"
-#include "homap_util.h"
+#include "handle_ordered_map_util.h"
 #include "traits.h"
 #include "types.h"
 
-CHECK_BEGIN_STATIC_FN(check_range, handle_ordered_map const *const hom,
+CHECK_BEGIN_STATIC_FN(check_range,
+                      Handle_ordered_map const *const handle_ordered_map,
                       range const *const r, size_t const n,
                       int const expect_range[])
 {
     size_t index = 0;
     struct val *iter = range_begin(r);
-    for (; iter != range_end(r) && index < n; iter = next(hom, iter), ++index)
+    for (; iter != range_end(r) && index < n;
+         iter = next(handle_ordered_map, iter), ++index)
     {
         int const cur_id = iter->id;
         CHECK(expect_range[index], cur_id);
     }
     CHECK(iter, range_end(r));
-    if (iter != end(hom))
+    if (iter != end(handle_ordered_map))
     {
         CHECK(((struct val *)iter)->id, expect_range[n - 1]);
     }
@@ -40,9 +42,9 @@ CHECK_BEGIN_STATIC_FN(check_range, handle_ordered_map const *const hom,
         (void)fprintf(stderr, "%sERROR:%s (int[%zu]){", RED, GREEN, n);
         iter = range_begin(r);
         for (size_t j = 0; j < n && iter != range_end(r);
-             ++j, iter = next(hom, iter))
+             ++j, iter = next(handle_ordered_map, iter))
         {
-            if (iter == end(hom) || !iter)
+            if (iter == end(handle_ordered_map) || !iter)
             {
                 return CHECK_STATUS;
             }
@@ -55,7 +57,7 @@ CHECK_BEGIN_STATIC_FN(check_range, handle_ordered_map const *const hom,
                 (void)fprintf(stderr, "%s%d, %s", RED, iter->id, NONE);
             }
         }
-        for (; iter != range_end(r); iter = next(hom, iter))
+        for (; iter != range_end(r); iter = next(handle_ordered_map, iter))
         {
             (void)fprintf(stderr, "%s%d, %s", RED, iter->id, NONE);
         }
@@ -63,20 +65,21 @@ CHECK_BEGIN_STATIC_FN(check_range, handle_ordered_map const *const hom,
     });
 }
 
-CHECK_BEGIN_STATIC_FN(check_rrange, handle_ordered_map const *const hom,
+CHECK_BEGIN_STATIC_FN(check_rrange,
+                      Handle_ordered_map const *const handle_ordered_map,
                       rrange const *const r, size_t const n,
                       int const expect_rrange[])
 {
     struct val *iter = rrange_rbegin(r);
     size_t index = 0;
-    for (; iter != rrange_rend(r); iter = rnext(hom, iter))
+    for (; iter != rrange_rend(r); iter = rnext(handle_ordered_map, iter))
     {
         int const cur_id = iter->id;
         CHECK(expect_rrange[index], cur_id);
         ++index;
     }
     CHECK(iter, rrange_rend(r));
-    if (iter != rend(hom))
+    if (iter != rend(handle_ordered_map))
     {
         CHECK(((struct val *)iter)->id, expect_rrange[n - 1]);
     }
@@ -91,9 +94,9 @@ CHECK_BEGIN_STATIC_FN(check_rrange, handle_ordered_map const *const hom,
         (void)fprintf(stderr, "%sERROR:%s (int[%zu]){", RED, GREEN, n);
         iter = rrange_rbegin(r);
         for (j = 0; j < n && iter != rrange_rend(r);
-             ++j, iter = rnext(hom, iter))
+             ++j, iter = rnext(handle_ordered_map, iter))
         {
-            if (iter == rend(hom) || !iter)
+            if (iter == rend(handle_ordered_map) || !iter)
             {
                 return CHECK_STATUS;
             }
@@ -107,7 +110,7 @@ CHECK_BEGIN_STATIC_FN(check_rrange, handle_ordered_map const *const hom,
                 (void)fprintf(stderr, "%s%d, %s", RED, iter->id, NONE);
             }
         }
-        for (; iter != rrange_rend(r); iter = rnext(hom, iter))
+        for (; iter != rrange_rend(r); iter = rnext(handle_ordered_map, iter))
         {
             (void)fprintf(stderr, "%s%d, %s", RED, iter->id, NONE);
         }
@@ -115,7 +118,7 @@ CHECK_BEGIN_STATIC_FN(check_rrange, handle_ordered_map const *const hom,
     });
 }
 
-CHECK_BEGIN_STATIC_FN(iterator_check, handle_ordered_map *s)
+CHECK_BEGIN_STATIC_FN(iterator_check, Handle_ordered_map *s)
 {
     size_t const size = count(s).count;
     size_t iter_count = 0;
@@ -135,11 +138,11 @@ CHECK_BEGIN_STATIC_FN(iterator_check, handle_ordered_map *s)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(homap_test_forward_iter)
+CHECK_BEGIN_STATIC_FN(handle_ordered_map_test_forward_iter)
 {
-    CCC_handle_ordered_map s
-        = hom_initialize(&(small_fixed_map){}, struct val, id, id_cmp, NULL,
-                         NULL, SMALL_FIXED_CAP);
+    CCC_Handle_ordered_map s
+        = handle_ordered_map_initialize(&(small_fixed_map){}, struct val, id,
+                                        id_cmp, NULL, NULL, SMALL_FIXED_CAP);
     /* We should have the expected behavior iteration over empty tree. */
     int j = 0;
     for (struct val *e = begin(&s); e != end(&s); e = next(&s, e), ++j)
@@ -166,11 +169,11 @@ CHECK_BEGIN_STATIC_FN(homap_test_forward_iter)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(homap_test_iterate_removal)
+CHECK_BEGIN_STATIC_FN(handle_ordered_map_test_iterate_removal)
 {
-    CCC_handle_ordered_map s
-        = hom_initialize(&(standard_fixed_map){}, struct val, id, id_cmp, NULL,
-                         NULL, STANDARD_FIXED_CAP);
+    CCC_Handle_ordered_map s
+        = handle_ordered_map_initialize(&(standard_fixed_map){}, struct val, id,
+                                        id_cmp, NULL, NULL, STANDARD_FIXED_CAP);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(1);
@@ -198,11 +201,11 @@ CHECK_BEGIN_STATIC_FN(homap_test_iterate_removal)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(homap_test_iterate_remove_reinsert)
+CHECK_BEGIN_STATIC_FN(handle_ordered_map_test_iterate_remove_reinsert)
 {
-    CCC_handle_ordered_map s
-        = hom_initialize(&(standard_fixed_map){}, struct val, id, id_cmp, NULL,
-                         NULL, STANDARD_FIXED_CAP);
+    CCC_Handle_ordered_map s
+        = handle_ordered_map_initialize(&(standard_fixed_map){}, struct val, id,
+                                        id_cmp, NULL, NULL, STANDARD_FIXED_CAP);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -236,11 +239,11 @@ CHECK_BEGIN_STATIC_FN(homap_test_iterate_remove_reinsert)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(homap_test_valid_range)
+CHECK_BEGIN_STATIC_FN(handle_ordered_map_test_valid_range)
 {
-    CCC_handle_ordered_map s
-        = hom_initialize(&(small_fixed_map){}, struct val, id, id_cmp, NULL,
-                         NULL, SMALL_FIXED_CAP);
+    CCC_Handle_ordered_map s
+        = handle_ordered_map_initialize(&(small_fixed_map){}, struct val, id,
+                                        id_cmp, NULL, NULL, SMALL_FIXED_CAP);
 
     int const num_nodes = 25;
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
@@ -264,11 +267,11 @@ CHECK_BEGIN_STATIC_FN(homap_test_valid_range)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(homap_test_valid_range_equals)
+CHECK_BEGIN_STATIC_FN(handle_ordered_map_test_valid_range_equals)
 {
-    CCC_handle_ordered_map s
-        = hom_initialize(&(small_fixed_map){}, struct val, id, id_cmp, NULL,
-                         NULL, SMALL_FIXED_CAP);
+    CCC_Handle_ordered_map s
+        = handle_ordered_map_initialize(&(small_fixed_map){}, struct val, id,
+                                        id_cmp, NULL, NULL, SMALL_FIXED_CAP);
     int const num_nodes = 25;
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
     for (int i = 0, id = 0; i < num_nodes; ++i, id += 5)
@@ -290,11 +293,11 @@ CHECK_BEGIN_STATIC_FN(homap_test_valid_range_equals)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(homap_test_invalid_range)
+CHECK_BEGIN_STATIC_FN(handle_ordered_map_test_invalid_range)
 {
-    CCC_handle_ordered_map s
-        = hom_initialize(&(small_fixed_map){}, struct val, id, id_cmp, NULL,
-                         NULL, SMALL_FIXED_CAP);
+    CCC_Handle_ordered_map s
+        = handle_ordered_map_initialize(&(small_fixed_map){}, struct val, id,
+                                        id_cmp, NULL, NULL, SMALL_FIXED_CAP);
     int const num_nodes = 25;
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
     for (int i = 0, id = 0; i < num_nodes; ++i, id += 5)
@@ -317,11 +320,11 @@ CHECK_BEGIN_STATIC_FN(homap_test_invalid_range)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(homap_test_empty_range)
+CHECK_BEGIN_STATIC_FN(handle_ordered_map_test_empty_range)
 {
-    CCC_handle_ordered_map s
-        = hom_initialize(&(small_fixed_map){}, struct val, id, id_cmp, NULL,
-                         NULL, SMALL_FIXED_CAP);
+    CCC_Handle_ordered_map s
+        = handle_ordered_map_initialize(&(small_fixed_map){}, struct val, id,
+                                        id_cmp, NULL, NULL, SMALL_FIXED_CAP);
     int const num_nodes = 25;
     int const step = 5;
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
@@ -350,8 +353,11 @@ CHECK_BEGIN_STATIC_FN(homap_test_empty_range)
 int
 main()
 {
-    return CHECK_RUN(homap_test_forward_iter(), homap_test_iterate_removal(),
-                     homap_test_valid_range(), homap_test_valid_range_equals(),
-                     homap_test_invalid_range(), homap_test_empty_range(),
-                     homap_test_iterate_remove_reinsert());
+    return CHECK_RUN(handle_ordered_map_test_forward_iter(),
+                     handle_ordered_map_test_iterate_removal(),
+                     handle_ordered_map_test_valid_range(),
+                     handle_ordered_map_test_valid_range_equals(),
+                     handle_ordered_map_test_invalid_range(),
+                     handle_ordered_map_test_empty_range(),
+                     handle_ordered_map_test_iterate_remove_reinsert());
 }

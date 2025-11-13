@@ -11,13 +11,13 @@ struct val
 {
     int id;
     int val;
-    CCC_pq_elem elem;
+    CCC_Priority_queue_node elem;
 };
 
 void val_update(CCC_Type_context);
 CCC_Order val_cmp(CCC_Type_comparator_context);
-enum check_result insert_shuffled(CCC_priority_queue *, struct val[], size_t,
+enum check_result insert_shuffled(CCC_Priority_queue *, struct val[], size_t,
                                   int);
-enum check_result inorder_fill(int[], size_t, CCC_priority_queue *);
+enum check_result inorder_fill(int[], size_t, CCC_Priority_queue *);
 
 #endif /* CCC_PQ_UTIL_H */
