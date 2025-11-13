@@ -11,42 +11,42 @@
 #include "types.h"
 #include "util/alloc.h"
 
-struct owner
+struct Owner
 {
     int key;
     void *allocation;
 };
 
 CCC_Order
-owners_eq(CCC_Key_comparator_context const cmp)
+owners_eq(CCC_Key_comparator_context const order)
 {
-    int const *const lhs = cmp.any_key_lhs;
-    struct owner const *const rhs = cmp.any_type_rhs;
+    int const *const lhs = order.key_lhs;
+    struct Owner const *const rhs = order.type_rhs;
     return (*lhs > rhs->key) - (*lhs < rhs->key);
 }
 
 void
 destroy_owner_allocation(CCC_Type_context const t)
 {
-    struct owner const *const o = t.any_type;
+    struct Owner const *const o = t.type;
     free(o->allocation);
 }
 
 CHECK_BEGIN_STATIC_FN(flat_hash_map_test_insert_then_iterate)
 {
     CCC_Flat_hash_map fh = flat_hash_map_initialize(
-        &(standard_fixed_map){}, struct val, key, flat_hash_map_int_to_u64,
-        flat_hash_map_id_cmp, NULL, NULL, STANDARD_FIXED_CAP);
+        &(standard_fixed_map){}, struct Val, key, flat_hash_map_int_to_u64,
+        flat_hash_map_id_order, NULL, NULL, STANDARD_FIXED_CAP);
     int const size = STANDARD_FIXED_CAP;
     for (int i = 0; i < size; i += 2)
     {
-        CCC_Entry e = try_insert(&fh, &(struct val){.key = i, .val = i});
+        CCC_Entry e = try_insert(&fh, &(struct Val){.key = i, .val = i});
         CHECK(occupied(&e), false);
         CHECK(validate(&fh), true);
-        e = try_insert(&fh, &(struct val){.key = i, .val = i});
+        e = try_insert(&fh, &(struct Val){.key = i, .val = i});
         CHECK(occupied(&e), true);
         CHECK(validate(&fh), true);
-        struct val const *const v = unwrap(&e);
+        struct Val const *const v = unwrap(&e);
         CHECK(v == NULL, false);
         CHECK(v->key, i);
         CHECK(v->val, i);
@@ -61,7 +61,7 @@ CHECK_BEGIN_STATIC_FN(flat_hash_map_test_insert_then_iterate)
     }
     CHECK((size_t)seen, count(&fh).count);
     int seen2 = 0;
-    for (struct val const *i = begin(&fh); i != end(&fh); i = next(&fh, i))
+    for (struct Val const *i = begin(&fh); i != end(&fh); i = next(&fh, i))
     {
         CHECK(i->val % 2 == 0, true);
         ++seen2;
@@ -76,15 +76,15 @@ run under sanitizers. */
 CHECK_BEGIN_STATIC_FN(flat_hash_map_test_insert_allocate_clear_free)
 {
     CCC_Flat_hash_map fh = flat_hash_map_initialize(
-        NULL, struct owner, key, flat_hash_map_int_to_u64, owners_eq, std_alloc,
-        NULL, 0);
+        NULL, struct Owner, key, flat_hash_map_int_to_u64, owners_eq,
+        std_allocate, NULL, 0);
     int const size = 32;
     for (int i = 0; i < size; ++i)
     {
         CCC_Entry *e = flat_hash_map_try_insert_w(
-            &fh, i, (struct owner){.allocation = malloc(sizeof(size_t))});
+            &fh, i, (struct Owner){.allocation = malloc(sizeof(size_t))});
         CHECK(occupied(e), CCC_FALSE);
-        struct owner const *const o = unwrap(e);
+        struct Owner const *const o = unwrap(e);
         CHECK(o != NULL, CCC_TRUE);
         CHECK(o->allocation != NULL, CCC_TRUE);
     }

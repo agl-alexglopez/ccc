@@ -43,7 +43,7 @@ CCC_entry_occupied(CCC_Entry const *const e)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    return (e->impl.stats & CCC_ENTRY_OCCUPIED) != 0;
+    return (e->private.stats & CCC_ENTRY_OCCUPIED) != 0;
 }
 
 CCC_Tribool
@@ -53,7 +53,7 @@ CCC_entry_insert_error(CCC_Entry const *const e)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    return (e->impl.stats & CCC_ENTRY_INSERT_ERROR) != 0;
+    return (e->private.stats & CCC_ENTRY_INSERT_ERROR) != 0;
 }
 
 CCC_Tribool
@@ -63,7 +63,7 @@ CCC_entry_input_error(CCC_Entry const *const e)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    return (e->impl.stats & CCC_ENTRY_ARG_ERROR) != 0;
+    return (e->private.stats & CCC_ENTRY_ARG_ERROR) != 0;
 }
 
 void *
@@ -73,7 +73,7 @@ CCC_entry_unwrap(CCC_Entry const *const e)
     {
         return NULL;
     }
-    return e->impl.stats & CCC_ENTRY_NO_UNWRAP ? NULL : e->impl.e;
+    return e->private.stats & CCC_ENTRY_NO_UNWRAP ? NULL : e->private.e;
 }
 
 CCC_Tribool
@@ -83,7 +83,7 @@ CCC_handle_occupied(CCC_Handle const *const e)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    return (e->impl.stats & CCC_ENTRY_OCCUPIED) != 0;
+    return (e->private.stats & CCC_ENTRY_OCCUPIED) != 0;
 }
 
 CCC_Tribool
@@ -93,7 +93,7 @@ CCC_handle_insert_error(CCC_Handle const *const e)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    return (e->impl.stats & CCC_ENTRY_INSERT_ERROR) != 0;
+    return (e->private.stats & CCC_ENTRY_INSERT_ERROR) != 0;
 }
 
 CCC_Tribool
@@ -103,7 +103,7 @@ CCC_handle_input_error(CCC_Handle const *const e)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    return (e->impl.stats & CCC_ENTRY_ARG_ERROR) != 0;
+    return (e->private.stats & CCC_ENTRY_ARG_ERROR) != 0;
 }
 
 CCC_Handle_index
@@ -113,31 +113,31 @@ CCC_handle_unwrap(CCC_Handle const *const e)
     {
         return 0;
     }
-    return e->impl.stats & CCC_ENTRY_NO_UNWRAP ? 0 : e->impl.i;
+    return e->private.stats & CCC_ENTRY_NO_UNWRAP ? 0 : e->private.i;
 }
 
 void *
 CCC_range_begin(CCC_Range const *const r)
 {
-    return r ? r->impl.begin : NULL;
+    return r ? r->private.begin : NULL;
 }
 
 void *
 CCC_range_end(CCC_Range const *const r)
 {
-    return r ? r->impl.end : NULL;
+    return r ? r->private.end : NULL;
 }
 
 void *
 CCC_rrange_rbegin(CCC_Reverse_range const *const r)
 {
-    return r ? r->impl.rbegin : NULL;
+    return r ? r->private.rbegin : NULL;
 }
 
 void *
 CCC_rrange_rend(CCC_Reverse_range const *const r)
 {
-    return r ? r->impl.rend : NULL;
+    return r ? r->private.rend : NULL;
 }
 
 char const *
@@ -157,7 +157,7 @@ CCC_get_entry_status(CCC_Entry const *e)
     {
         return CCC_ENTRY_ARG_ERROR;
     }
-    return e->impl.stats;
+    return e->private.stats;
 }
 
 CCC_Handle_status
@@ -167,7 +167,7 @@ CCC_get_handle_status(CCC_Handle const *e)
     {
         return CCC_ENTRY_ARG_ERROR;
     }
-    return e->impl.stats;
+    return e->private.stats;
 }
 
 char const *

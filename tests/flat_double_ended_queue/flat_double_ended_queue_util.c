@@ -10,7 +10,7 @@
 #include "traits.h"
 #include "types.h"
 
-CHECK_BEGIN_FN(create_queue, flat_double_ended_queue *const q, size_t const n,
+CHECK_BEGIN_FN(create_queue, Flat_double_ended_queue *const q, size_t const n,
                int const vals[])
 {
     if (n)
@@ -23,7 +23,7 @@ CHECK_BEGIN_FN(create_queue, flat_double_ended_queue *const q, size_t const n,
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_FN(check_order, flat_double_ended_queue const *const q,
+CHECK_BEGIN_FN(check_order, Flat_double_ended_queue const *const q,
                size_t const n, int const order[])
 {
     size_t i = 0;

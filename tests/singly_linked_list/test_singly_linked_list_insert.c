@@ -12,20 +12,20 @@
 CHECK_BEGIN_STATIC_FN(singly_linked_list_test_insert_three)
 {
     Singly_linked_list singly_linked_list = singly_linked_list_initialize(
-        singly_linked_list, struct val, e, val_cmp, NULL, NULL);
-    struct val v0 = (struct val){};
+        singly_linked_list, struct Val, e, val_order, NULL, NULL);
+    struct Val v0 = (struct Val){};
     CHECK(push_front(&singly_linked_list, &v0.e) != NULL, true);
-    struct val *v = front(&singly_linked_list);
+    struct Val *v = front(&singly_linked_list);
     CHECK(validate(&singly_linked_list), true);
     CHECK(v == NULL, false);
     CHECK(v->val, 0);
-    struct val v1 = (struct val){.val = 1};
+    struct Val v1 = (struct Val){.val = 1};
     CHECK(push_front(&singly_linked_list, &v1.e) != NULL, true);
     CHECK(validate(&singly_linked_list), true);
     v = front(&singly_linked_list);
     CHECK(v == NULL, false);
     CHECK(v->val, 1);
-    struct val v2 = (struct val){.val = 2};
+    struct Val v2 = (struct Val){.val = 2};
     CHECK(push_front(&singly_linked_list, &v2.e) != NULL, true);
     CHECK(validate(&singly_linked_list), true);
     v = front(&singly_linked_list);
@@ -39,9 +39,9 @@ CHECK_BEGIN_STATIC_FN(singly_linked_list_test_insert_three)
 CHECK_BEGIN_STATIC_FN(singly_linked_list_test_push_and_splice)
 {
     Singly_linked_list singly_linked_list = singly_linked_list_initialize(
-        singly_linked_list, struct val, e, val_cmp, NULL, NULL);
-    struct val vals[4] = {{.val = 0}, {.val = 1}, {.val = 2}, {.val = 3}};
-    enum check_result const t = create_list(&singly_linked_list, 4, vals);
+        singly_linked_list, struct Val, e, val_order, NULL, NULL);
+    struct Val vals[4] = {{.val = 0}, {.val = 1}, {.val = 2}, {.val = 3}};
+    enum Check_result const t = create_list(&singly_linked_list, 4, vals);
     CHECK(t, PASS);
     CHECK(check_order(&singly_linked_list, 4, (int[4]){3, 2, 1, 0}), PASS);
     CHECK(splice(&singly_linked_list,
@@ -66,10 +66,10 @@ CHECK_BEGIN_STATIC_FN(singly_linked_list_test_push_and_splice)
 CHECK_BEGIN_STATIC_FN(singly_linked_list_test_push_and_splice_range)
 {
     Singly_linked_list singly_linked_list = singly_linked_list_initialize(
-        singly_linked_list, struct val, e, val_cmp, NULL, NULL);
-    struct val vals[5]
+        singly_linked_list, struct Val, e, val_order, NULL, NULL);
+    struct Val vals[5]
         = {{.val = 0}, {.val = 1}, {.val = 2}, {.val = 3}, {.val = 4}};
-    enum check_result const t = create_list(&singly_linked_list, 5, vals);
+    enum Check_result const t = create_list(&singly_linked_list, 5, vals);
     CHECK(t, PASS);
     CHECK(check_order(&singly_linked_list, 5, (int[5]){4, 3, 2, 1, 0}), PASS);
     CHECK(splice_range(&singly_linked_list,
@@ -104,10 +104,10 @@ CHECK_BEGIN_STATIC_FN(singly_linked_list_test_push_and_splice_range)
 CHECK_BEGIN_STATIC_FN(singly_linked_list_test_push_and_splice_range_no_ops)
 {
     Singly_linked_list singly_linked_list = singly_linked_list_initialize(
-        singly_linked_list, struct val, e, val_cmp, NULL, NULL);
-    struct val vals[5]
+        singly_linked_list, struct Val, e, val_order, NULL, NULL);
+    struct Val vals[5]
         = {{.val = 0}, {.val = 1}, {.val = 2}, {.val = 3}, {.val = 4}};
-    enum check_result const t = create_list(&singly_linked_list, 5, vals);
+    enum Check_result const t = create_list(&singly_linked_list, 5, vals);
     CHECK(t, PASS);
     CHECK(check_order(&singly_linked_list, 5, (int[5]){4, 3, 2, 1, 0}), PASS);
     CHECK(splice(&singly_linked_list, &vals[2].e, &singly_linked_list,
@@ -132,10 +132,10 @@ CHECK_BEGIN_STATIC_FN(singly_linked_list_test_push_and_splice_range_no_ops)
 CHECK_BEGIN_STATIC_FN(singly_linked_list_test_sort_reverse)
 {
     Singly_linked_list singly_linked_list = singly_linked_list_initialize(
-        singly_linked_list, struct val, e, val_cmp, NULL, NULL);
-    struct val vals[6] = {{.val = 0}, {.val = 1}, {.val = 2},
+        singly_linked_list, struct Val, e, val_order, NULL, NULL);
+    struct Val vals[6] = {{.val = 0}, {.val = 1}, {.val = 2},
                           {.val = 3}, {.val = 4}, {.val = 5}};
-    enum check_result const t = create_list(&singly_linked_list, 6, vals);
+    enum Check_result const t = create_list(&singly_linked_list, 6, vals);
     CHECK(t, PASS);
     CHECK(check_order(&singly_linked_list, 6, (int[6]){5, 4, 3, 2, 1, 0}),
           PASS);
@@ -152,13 +152,13 @@ CHECK_BEGIN_STATIC_FN(singly_linked_list_test_sort_reverse)
 CHECK_BEGIN_STATIC_FN(singly_linked_list_test_sort_even)
 {
     Singly_linked_list singly_linked_list = singly_linked_list_initialize(
-        singly_linked_list, struct val, e, val_cmp, NULL, NULL);
-    struct val vals[8] = {
+        singly_linked_list, struct Val, e, val_order, NULL, NULL);
+    struct Val vals[8] = {
         [7] = {.val = 9}, [6] = {.val = 4},  [5] = {.val = 1},
         [4] = {.val = 3}, [3] = {.val = 99}, [2] = {.val = -55},
         [1] = {.val = 5}, [0] = {.val = 2},
     };
-    enum check_result const t = create_list(&singly_linked_list, 8, vals);
+    enum Check_result const t = create_list(&singly_linked_list, 8, vals);
     CHECK(t, PASS);
     CHECK(validate(&singly_linked_list), true);
     CHECK(check_order(&singly_linked_list, 8,
@@ -178,13 +178,13 @@ CHECK_BEGIN_STATIC_FN(singly_linked_list_test_sort_even)
 CHECK_BEGIN_STATIC_FN(singly_linked_list_test_sort_odd)
 {
     Singly_linked_list singly_linked_list = singly_linked_list_initialize(
-        singly_linked_list, struct val, e, val_cmp, NULL, NULL);
-    struct val vals[9] = {
+        singly_linked_list, struct Val, e, val_order, NULL, NULL);
+    struct Val vals[9] = {
         [8] = {.val = 10},  [7] = {.val = 9}, [6] = {.val = 4},
         [5] = {.val = 1},   [4] = {.val = 1}, [3] = {.val = 99},
         [2] = {.val = -55}, [1] = {.val = 5}, [0] = {.val = 2},
     };
-    enum check_result const t = create_list(&singly_linked_list, 9, vals);
+    enum Check_result const t = create_list(&singly_linked_list, 9, vals);
     CHECK(t, PASS);
     CHECK(validate(&singly_linked_list), true);
     CHECK(check_order(&singly_linked_list, 9,
@@ -204,12 +204,12 @@ CHECK_BEGIN_STATIC_FN(singly_linked_list_test_sort_odd)
 CHECK_BEGIN_STATIC_FN(singly_linked_list_test_sort_runs)
 {
     Singly_linked_list singly_linked_list = singly_linked_list_initialize(
-        singly_linked_list, struct val, e, val_cmp, NULL, NULL);
-    struct val vals[12]
+        singly_linked_list, struct Val, e, val_order, NULL, NULL);
+    struct Val vals[12]
         = {{.val = 99},  {.val = 101}, {.val = 103}, {.val = 4},
            {.val = 8},   {.val = 9},   {.val = -99}, {.val = -55},
            {.val = -55}, {.val = 3},   {.val = 7},   {.val = 10}};
-    enum check_result t = create_list(&singly_linked_list, 12, vals);
+    enum Check_result t = create_list(&singly_linked_list, 12, vals);
     CHECK(t, PASS);
     CHECK(validate(&singly_linked_list), true);
     t = check_order(&singly_linked_list, 12,
@@ -229,11 +229,11 @@ CHECK_BEGIN_STATIC_FN(singly_linked_list_test_sort_runs)
 CHECK_BEGIN_STATIC_FN(singly_linked_list_test_sort_halves)
 {
     Singly_linked_list singly_linked_list = singly_linked_list_initialize(
-        singly_linked_list, struct val, e, val_cmp, NULL, NULL);
-    struct val vals[12] = {{.val = 7},  {.val = 10}, {.val = 13}, {.val = 17},
+        singly_linked_list, struct Val, e, val_order, NULL, NULL);
+    struct Val vals[12] = {{.val = 7},  {.val = 10}, {.val = 13}, {.val = 17},
                            {.val = 19}, {.val = 21}, {.val = 8},  {.val = 12},
                            {.val = 15}, {.val = 18}, {.val = 20}, {.val = 25}};
-    enum check_result t = create_list(&singly_linked_list, 12, vals);
+    enum Check_result t = create_list(&singly_linked_list, 12, vals);
     CHECK(t, PASS);
     CHECK(validate(&singly_linked_list), true);
     t = check_order(&singly_linked_list, 12,
@@ -253,19 +253,19 @@ CHECK_BEGIN_STATIC_FN(singly_linked_list_test_sort_halves)
 CHECK_BEGIN_STATIC_FN(singly_linked_list_test_sort_insert)
 {
     Singly_linked_list singly_linked_list = singly_linked_list_initialize(
-        singly_linked_list, struct val, e, val_cmp, NULL, NULL);
-    struct val *inserted = singly_linked_list_insert_sorted(
-        &singly_linked_list, &(struct val){.val = -99999}.e);
+        singly_linked_list, struct Val, e, val_order, NULL, NULL);
+    struct Val *inserted = singly_linked_list_insert_sorted(
+        &singly_linked_list, &(struct Val){.val = -99999}.e);
     CHECK(inserted->val, -99999);
     CHECK(validate(&singly_linked_list), true);
     (void)CCC_singly_linked_list_pop_front(&singly_linked_list);
     CHECK(validate(&singly_linked_list), true);
-    struct val vals[9] = {
+    struct Val vals[9] = {
         [8] = {.val = 9}, [7] = {.val = 4},  [6] = {.val = 1},
         [5] = {.val = 1}, [4] = {.val = 99}, [3] = {.val = -55},
         [2] = {.val = 5}, [1] = {.val = 2},  [0] = {.val = -99},
     };
-    enum check_result const t = create_list(&singly_linked_list, 9, vals);
+    enum Check_result const t = create_list(&singly_linked_list, 9, vals);
     CHECK(t, PASS);
     CHECK(validate(&singly_linked_list), true);
     CHECK(check_order(&singly_linked_list, 9,
@@ -279,7 +279,7 @@ CHECK_BEGIN_STATIC_FN(singly_linked_list_test_sort_insert)
     CHECK(check_order(&singly_linked_list, 9,
                       (int[9]){-99, -55, 1, 1, 2, 4, 5, 9, 99}),
           PASS);
-    struct val to_insert[5] = {
+    struct Val to_insert[5] = {
         [0] = {.val = -101}, [1] = {.val = -65}, [2] = {.val = 3},
         [3] = {.val = 20},   [4] = {.val = 101},
     };

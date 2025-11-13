@@ -17,8 +17,8 @@
 CHECK_BEGIN_STATIC_FN(handle_ordered_map_test_insert_erase_shuffled)
 {
     CCC_Handle_ordered_map s
-        = handle_ordered_map_initialize(&(small_fixed_map){}, struct val, id,
-                                        id_cmp, NULL, NULL, SMALL_FIXED_CAP);
+        = handle_ordered_map_initialize(&(small_fixed_map){}, struct Val, id,
+                                        id_order, NULL, NULL, SMALL_FIXED_CAP);
     size_t const size = 50;
     int const prime = 53;
     CHECK(insert_shuffled(&s, size, prime), PASS);
@@ -31,7 +31,7 @@ CHECK_BEGIN_STATIC_FN(handle_ordered_map_test_insert_erase_shuffled)
     /* Now let's delete everything with no errors. */
     for (size_t i = 0; i < size; ++i)
     {
-        CCC_handle const *const h = remove_r(&s, &(struct val){.id = (int)i});
+        CCC_Handle const *const h = remove_r(&s, &(struct Val){.id = (int)i});
         CHECK(occupied(h), true);
         CHECK(validate(&s), true);
     }
@@ -42,8 +42,8 @@ CHECK_BEGIN_STATIC_FN(handle_ordered_map_test_insert_erase_shuffled)
 CHECK_BEGIN_STATIC_FN(handle_ordered_map_test_prime_shuffle)
 {
     CCC_Handle_ordered_map s
-        = handle_ordered_map_initialize(&(small_fixed_map){}, struct val, id,
-                                        id_cmp, NULL, NULL, SMALL_FIXED_CAP);
+        = handle_ordered_map_initialize(&(small_fixed_map){}, struct Val, id,
+                                        id_order, NULL, NULL, SMALL_FIXED_CAP);
     size_t const size = 50;
     size_t const prime = 53;
     size_t const less = 10;
@@ -55,7 +55,7 @@ CHECK_BEGIN_STATIC_FN(handle_ordered_map_test_prime_shuffle)
     for (size_t i = 0; i < size; ++i)
     {
         if (occupied(
-                try_insert_r(&s, &(struct val){.id = (int)shuffled_index,
+                try_insert_r(&s, &(struct Val){.id = (int)shuffled_index,
                                                .val = (int)shuffled_index})))
         {
             repeats[i] = true;
@@ -66,7 +66,7 @@ CHECK_BEGIN_STATIC_FN(handle_ordered_map_test_prime_shuffle)
     CHECK(handle_ordered_map_count(&s).count < size, true);
     for (size_t i = 0; i < size; ++i)
     {
-        CCC_handle const *const e = remove_handle_r(handle_r(&s, &i));
+        CCC_Handle const *const e = remove_handle_r(handle_r(&s, &i));
         CHECK(occupied(e) || repeats[i], true);
         CHECK(validate(&s), true);
     }
@@ -75,22 +75,22 @@ CHECK_BEGIN_STATIC_FN(handle_ordered_map_test_prime_shuffle)
 
 CHECK_BEGIN_STATIC_FN(handle_ordered_map_test_weak_srand)
 {
-    CCC_Handle_ordered_map s
-        = handle_ordered_map_initialize(&(standard_fixed_map){}, struct val, id,
-                                        id_cmp, NULL, NULL, STANDARD_FIXED_CAP);
+    CCC_Handle_ordered_map s = handle_ordered_map_initialize(
+        &(standard_fixed_map){}, struct Val, id, id_order, NULL, NULL,
+        STANDARD_FIXED_CAP);
     srand(time(NULL)); /* NOLINT */
     int const num_nodes = 1000;
     int id_keys[1000];
     for (int i = 0; i < num_nodes; ++i)
     {
         int const rand_i = rand(); /* NOLINT */
-        (void)swap_handle(&s, &(struct val){.id = rand_i, .val = i});
+        (void)swap_handle(&s, &(struct Val){.id = rand_i, .val = i});
         id_keys[i] = rand_i;
         CHECK(validate(&s), true);
     }
     for (int i = 0; i < num_nodes; ++i)
     {
-        CCC_handle const h = CCC_remove(&s, &(struct val){.id = id_keys[i]});
+        CCC_Handle const h = CCC_remove(&s, &(struct Val){.id = id_keys[i]});
         CHECK(occupied(&h), true);
         CHECK(validate(&s), true);
     }
@@ -100,34 +100,34 @@ CHECK_BEGIN_STATIC_FN(handle_ordered_map_test_weak_srand)
 
 CHECK_BEGIN_STATIC_FN(handle_ordered_map_test_insert_erase_cycles_no_alloc)
 {
-    CCC_Handle_ordered_map s
-        = handle_ordered_map_initialize(&(standard_fixed_map){}, struct val, id,
-                                        id_cmp, NULL, NULL, STANDARD_FIXED_CAP);
+    CCC_Handle_ordered_map s = handle_ordered_map_initialize(
+        &(standard_fixed_map){}, struct Val, id, id_order, NULL, NULL,
+        STANDARD_FIXED_CAP);
     srand(time(NULL)); /* NOLINT */
     int const num_nodes = 1000;
     int id_keys[1000];
     for (int i = 0; i < num_nodes; ++i)
     {
         int const rand_i = rand(); /* NOLINT */
-        (void)insert_or_assign(&s, &(struct val){.id = rand_i, .val = i});
+        (void)insert_or_assign(&s, &(struct Val){.id = rand_i, .val = i});
         id_keys[i] = rand_i;
         CHECK(validate(&s), true);
     }
     for (int i = 0; i < num_nodes / 2; ++i)
     {
-        CCC_handle h = CCC_remove(&s, &(struct val){.id = id_keys[i]});
+        CCC_Handle h = CCC_remove(&s, &(struct Val){.id = id_keys[i]});
         CHECK(occupied(&h), true);
         CHECK(validate(&s), true);
     }
     for (int i = 0; i < num_nodes / 2; ++i)
     {
-        CCC_handle h = insert_or_assign(&s, &(struct val){.id = id_keys[i]});
+        CCC_Handle h = insert_or_assign(&s, &(struct Val){.id = id_keys[i]});
         CHECK(occupied(&h), false);
         CHECK(validate(&s), true);
     }
     for (int i = 0; i < num_nodes; ++i)
     {
-        CCC_handle h = CCC_remove(&s, &(struct val){.id = id_keys[i]});
+        CCC_Handle h = CCC_remove(&s, &(struct Val){.id = id_keys[i]});
         CHECK(occupied(&h), true);
         CHECK(validate(&s), true);
     }
@@ -138,32 +138,32 @@ CHECK_BEGIN_STATIC_FN(handle_ordered_map_test_insert_erase_cycles_no_alloc)
 CHECK_BEGIN_STATIC_FN(handle_ordered_map_test_insert_erase_cycles_alloc)
 {
     CCC_Handle_ordered_map s = handle_ordered_map_initialize(
-        NULL, struct val, id, id_cmp, std_alloc, NULL, 0);
+        NULL, struct Val, id, id_order, std_allocate, NULL, 0);
     srand(time(NULL)); /* NOLINT */
     int const num_nodes = 1000;
     int id_keys[1000];
     for (int i = 0; i < num_nodes; ++i)
     {
         int const rand_i = rand(); /* NOLINT */
-        (void)insert_or_assign(&s, &(struct val){.id = rand_i, .val = i});
+        (void)insert_or_assign(&s, &(struct Val){.id = rand_i, .val = i});
         id_keys[i] = rand_i;
         CHECK(validate(&s), true);
     }
     for (int i = 0; i < num_nodes / 2; ++i)
     {
-        CCC_handle h = CCC_remove(&s, &(struct val){.id = id_keys[i]});
+        CCC_Handle h = CCC_remove(&s, &(struct Val){.id = id_keys[i]});
         CHECK(occupied(&h), true);
         CHECK(validate(&s), true);
     }
     for (int i = 0; i < num_nodes / 2; ++i)
     {
-        CCC_handle h = insert_or_assign(&s, &(struct val){.id = id_keys[i]});
+        CCC_Handle h = insert_or_assign(&s, &(struct Val){.id = id_keys[i]});
         CHECK(occupied(&h), false);
         CHECK(validate(&s), true);
     }
     for (int i = 0; i < num_nodes; ++i)
     {
-        CCC_handle h = CCC_remove(&s, &(struct val){.id = id_keys[i]});
+        CCC_Handle h = CCC_remove(&s, &(struct Val){.id = id_keys[i]});
         CHECK(occupied(&h), true);
         CHECK(validate(&s), true);
     }

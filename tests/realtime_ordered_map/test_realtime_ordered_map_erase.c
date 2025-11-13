@@ -9,17 +9,17 @@
 
 #include "checkers.h"
 #include "realtime_ordered_map.h"
-#include "romap_util.h"
+#include "realtime_ordered_map_util.h"
 #include "traits.h"
 #include "types.h"
 
-CHECK_BEGIN_STATIC_FN(romap_test_insert_erase_shuffled)
+CHECK_BEGIN_STATIC_FN(realtime_ordered_map_test_insert_erase_shuffled)
 {
-    CCC_Realtime_ordered_map s
-        = rom_initialize(s, struct val, elem, key, id_cmp, NULL, NULL);
+    CCC_Realtime_ordered_map s = realtime_ordered_map_initialize(
+        s, struct Val, elem, key, id_order, NULL, NULL);
     size_t const size = 50;
     int const prime = 53;
-    struct val vals[50];
+    struct Val vals[50];
     CHECK(insert_shuffled(&s, vals, size, prime), PASS);
     int sorted_check[50];
     CHECK(inorder_fill(sorted_check, size, &s), size);
@@ -30,7 +30,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_insert_erase_shuffled)
     /* Now let's delete everything with no errors. */
     for (size_t i = 0; i < size; ++i)
     {
-        struct val *v = unwrap(remove_r(&s, &vals[i].elem));
+        struct Val *v = unwrap(remove_r(&s, &vals[i].elem));
         CHECK(v != NULL, true);
         CHECK(v->key, vals[i].key);
         CHECK(validate(&s), true);
@@ -39,24 +39,24 @@ CHECK_BEGIN_STATIC_FN(romap_test_insert_erase_shuffled)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(romap_test_prime_shuffle)
+CHECK_BEGIN_STATIC_FN(realtime_ordered_map_test_prime_shuffle)
 {
-    CCC_Realtime_ordered_map s
-        = rom_initialize(s, struct val, elem, key, id_cmp, NULL, NULL);
+    CCC_Realtime_ordered_map s = realtime_ordered_map_initialize(
+        s, struct Val, elem, key, id_order, NULL, NULL);
     size_t const size = 50;
     size_t const prime = 53;
     size_t const less = 10;
     /* We want the tree to have a smattering of duplicates so
        reduce the shuffle range so it will repeat some values. */
     size_t shuffled_index = prime % (size - less);
-    struct val vals[50];
+    struct Val vals[50];
     bool repeats[50];
     memset(repeats, false, sizeof(bool) * size);
     for (size_t i = 0; i < size; ++i)
     {
         vals[i].val = (int)shuffled_index;
         vals[i].key = (int)shuffled_index;
-        CCC_entry e = swap_entry(&s, &vals[i].elem, &(struct val){}.elem);
+        CCC_Entry e = swap_entry(&s, &vals[i].elem, &(struct Val){}.elem);
         if (unwrap(&e))
         {
             repeats[i] = true;
@@ -65,7 +65,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_prime_shuffle)
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
     /* One test can use our printer function as test output */
-    CHECK(rom_count(&s).count < size, true);
+    CHECK(realtime_ordered_map_count(&s).count < size, true);
     for (size_t i = 0; i < size; ++i)
     {
         CHECK(occupied(remove_entry_r(entry_r(&s, &vals[i].key))) || repeats[i],
@@ -75,25 +75,25 @@ CHECK_BEGIN_STATIC_FN(romap_test_prime_shuffle)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(romap_test_weak_srand)
+CHECK_BEGIN_STATIC_FN(realtime_ordered_map_test_weak_srand)
 {
-    CCC_Realtime_ordered_map s
-        = rom_initialize(s, struct val, elem, key, id_cmp, NULL, NULL);
+    CCC_Realtime_ordered_map s = realtime_ordered_map_initialize(
+        s, struct Val, elem, key, id_order, NULL, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
     int const num_nodes = 1000;
-    struct val vals[1000];
+    struct Val vals[1000];
     for (int i = 0; i < num_nodes; ++i)
     {
         vals[i].key = rand(); // NOLINT
         vals[i].val = i;
-        (void)swap_entry(&s, &vals[i].elem, &(struct val){}.elem);
+        (void)swap_entry(&s, &vals[i].elem, &(struct Val){}.elem);
         CHECK(validate(&s), true);
     }
     for (int i = 0; i < num_nodes; ++i)
     {
-        CHECK(rom_contains(&s, &vals[i].key), true);
+        CHECK(realtime_ordered_map_contains(&s, &vals[i].key), true);
         (void)CCC_remove(&s, &vals[i].elem);
         CHECK(validate(&s), true);
     }
@@ -104,6 +104,7 @@ CHECK_BEGIN_STATIC_FN(romap_test_weak_srand)
 int
 main()
 {
-    return CHECK_RUN(romap_test_insert_erase_shuffled(),
-                     romap_test_prime_shuffle(), romap_test_weak_srand());
+    return CHECK_RUN(realtime_ordered_map_test_insert_erase_shuffled(),
+                     realtime_ordered_map_test_prime_shuffle(),
+                     realtime_ordered_map_test_weak_srand());
 }

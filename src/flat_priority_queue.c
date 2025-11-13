@@ -33,8 +33,8 @@ static void *at(struct CCC_Flat_priority_queue const *, size_t);
 static size_t index_of(struct CCC_Flat_priority_queue const *, void const *);
 static CCC_Tribool wins(struct CCC_Flat_priority_queue const *, size_t winner,
                         size_t loser);
-static CCC_Order cmp(struct CCC_Flat_priority_queue const *, size_t lhs,
-                     size_t rhs);
+static CCC_Order order(struct CCC_Flat_priority_queue const *, size_t lhs,
+                       size_t rhs);
 static void swap(struct CCC_Flat_priority_queue *, void *tmp, size_t, size_t);
 static size_t bubble_up(struct CCC_Flat_priority_queue *flat_priority_queue,
                         void *tmp, size_t i);
@@ -170,13 +170,13 @@ CCC_flat_priority_queue_erase(
         return CCC_RESULT_OK;
     }
     swap(flat_priority_queue, tmp, i, flat_priority_queue->buf.count);
-    CCC_Order const cmp_res
-        = cmp(flat_priority_queue, i, flat_priority_queue->buf.count);
-    if (cmp_res == flat_priority_queue->order)
+    CCC_Order const order_res
+        = order(flat_priority_queue, i, flat_priority_queue->buf.count);
+    if (order_res == flat_priority_queue->order)
     {
         (void)bubble_up(flat_priority_queue, tmp, i);
     }
-    else if (cmp_res != CCC_ORDER_EQUAL)
+    else if (order_res != CCC_ORDER_EQUAL)
     {
         (void)bubble_down(flat_priority_queue, tmp, i,
                           flat_priority_queue->buf.count);
@@ -196,7 +196,7 @@ CCC_flat_priority_queue_update(
         return NULL;
     }
     fn((CCC_Type_context){
-        .any_type = elem,
+        .type = elem,
         .context = context,
     });
     return CCC_buffer_at(&flat_priority_queue->buf,
@@ -481,12 +481,12 @@ update_fixup(struct CCC_Flat_priority_queue *const flat_priority_queue,
         return bubble_down(flat_priority_queue, tmp, 0,
                            flat_priority_queue->buf.count);
     }
-    CCC_Order const parent_cmp = cmp(flat_priority_queue, i, (i - 1) / 2);
-    if (parent_cmp == flat_priority_queue->order)
+    CCC_Order const parent_order = order(flat_priority_queue, i, (i - 1) / 2);
+    if (parent_order == flat_priority_queue->order)
     {
         return bubble_up(flat_priority_queue, tmp, i);
     }
-    if (parent_cmp != CCC_ORDER_EQUAL)
+    if (parent_order != CCC_ORDER_EQUAL)
     {
         return bubble_down(flat_priority_queue, tmp, i,
                            flat_priority_queue->buf.count);
@@ -542,17 +542,17 @@ static inline CCC_Tribool
 wins(struct CCC_Flat_priority_queue const *const flat_priority_queue,
      size_t const winner, size_t const loser)
 {
-    return cmp(flat_priority_queue, winner, loser)
+    return order(flat_priority_queue, winner, loser)
         == flat_priority_queue->order;
 }
 
 static inline CCC_Order
-cmp(struct CCC_Flat_priority_queue const *const flat_priority_queue, size_t lhs,
-    size_t rhs)
+order(struct CCC_Flat_priority_queue const *const flat_priority_queue,
+      size_t lhs, size_t rhs)
 {
-    return flat_priority_queue->cmp((CCC_Type_comparator_context){
-        .any_type_lhs = at(flat_priority_queue, lhs),
-        .any_type_rhs = at(flat_priority_queue, rhs),
+    return flat_priority_queue->compare((CCC_Type_comparator_context){
+        .type_lhs = at(flat_priority_queue, lhs),
+        .type_rhs = at(flat_priority_queue, rhs),
         .context = flat_priority_queue->buf.context,
     });
 }
@@ -601,7 +601,7 @@ destroy_each(struct CCC_Flat_priority_queue *const flat_priority_queue,
     for (size_t i = 0; i < count; ++i)
     {
         fn((CCC_Type_context){
-            .any_type = at(flat_priority_queue, i),
+            .type = at(flat_priority_queue, i),
             .context = flat_priority_queue->buf.context,
         });
     }

@@ -14,12 +14,12 @@
 CHECK_BEGIN_STATIC_FN(priority_queue_test_insert_iterate_pop)
 {
     CCC_Priority_queue priority_queue = CCC_priority_queue_initialize(
-        struct val, elem, CCC_ORDER_LESSER, val_cmp, NULL, NULL);
+        struct Val, elem, CCC_ORDER_LESSER, val_order, NULL, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
     size_t const num_nodes = 1000;
-    struct val vals[1000];
+    struct Val vals[1000];
     for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
@@ -42,12 +42,12 @@ CHECK_BEGIN_STATIC_FN(priority_queue_test_insert_iterate_pop)
 CHECK_BEGIN_STATIC_FN(priority_queue_test_priority_removal)
 {
     CCC_Priority_queue priority_queue = CCC_priority_queue_initialize(
-        struct val, elem, CCC_ORDER_LESSER, val_cmp, NULL, NULL);
+        struct Val, elem, CCC_ORDER_LESSER, val_order, NULL, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
     size_t const num_nodes = 1000;
-    struct val vals[1000];
+    struct Val vals[1000];
     for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
@@ -59,7 +59,7 @@ CHECK_BEGIN_STATIC_FN(priority_queue_test_priority_removal)
     int const limit = 400;
     for (size_t val = 0; val < num_nodes; ++val)
     {
-        struct val *i = &vals[val];
+        struct Val *i = &vals[val];
         if (i->val > limit)
         {
             (void)CCC_priority_queue_extract(&priority_queue, &i->elem);
@@ -72,12 +72,12 @@ CHECK_BEGIN_STATIC_FN(priority_queue_test_priority_removal)
 CHECK_BEGIN_STATIC_FN(priority_queue_test_priority_update)
 {
     CCC_Priority_queue priority_queue = CCC_priority_queue_initialize(
-        struct val, elem, CCC_ORDER_LESSER, val_cmp, NULL, NULL);
+        struct Val, elem, CCC_ORDER_LESSER, val_order, NULL, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
     size_t const num_nodes = 1000;
-    struct val vals[1000];
+    struct Val vals[1000];
     for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
@@ -89,7 +89,7 @@ CHECK_BEGIN_STATIC_FN(priority_queue_test_priority_update)
     int const limit = 400;
     for (size_t val = 0; val < num_nodes; ++val)
     {
-        struct val *i = &vals[val];
+        struct Val *i = &vals[val];
         int backoff = i->val / 2;
         if (i->val > limit)
         {
@@ -107,12 +107,12 @@ CHECK_BEGIN_STATIC_FN(priority_queue_test_priority_update)
 CHECK_BEGIN_STATIC_FN(priority_queue_test_priority_update_with)
 {
     CCC_Priority_queue priority_queue = CCC_priority_queue_initialize(
-        struct val, elem, CCC_ORDER_LESSER, val_cmp, NULL, NULL);
+        struct Val, elem, CCC_ORDER_LESSER, val_order, NULL, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
     size_t const num_nodes = 1000;
-    struct val vals[1000];
+    struct Val vals[1000];
     for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
@@ -141,12 +141,12 @@ CHECK_BEGIN_STATIC_FN(priority_queue_test_priority_update_with)
 CHECK_BEGIN_STATIC_FN(priority_queue_test_priority_increase)
 {
     CCC_Priority_queue priority_queue = CCC_priority_queue_initialize(
-        struct val, elem, CCC_ORDER_LESSER, val_cmp, NULL, NULL);
+        struct Val, elem, CCC_ORDER_LESSER, val_order, NULL, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
     size_t const num_nodes = 1000;
-    struct val vals[1000];
+    struct Val vals[1000];
     for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
@@ -158,7 +158,7 @@ CHECK_BEGIN_STATIC_FN(priority_queue_test_priority_increase)
     int const limit = 400;
     for (size_t val = 0; val < num_nodes; ++val)
     {
-        struct val *const i = &vals[val];
+        struct Val *const i = &vals[val];
         int inc = (limit * 2) + 1;
         int dec = (i->val / 2) - 1;
         if (i->val > limit && dec < i->val)
@@ -185,12 +185,12 @@ CHECK_BEGIN_STATIC_FN(priority_queue_test_priority_increase)
 CHECK_BEGIN_STATIC_FN(priority_queue_test_priority_increase_with)
 {
     CCC_Priority_queue priority_queue = CCC_priority_queue_initialize(
-        struct val, elem, CCC_ORDER_LESSER, val_cmp, NULL, NULL);
+        struct Val, elem, CCC_ORDER_LESSER, val_order, NULL, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
     size_t const num_nodes = 1000;
-    struct val vals[1000];
+    struct Val vals[1000];
     for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
@@ -228,12 +228,12 @@ CHECK_BEGIN_STATIC_FN(priority_queue_test_priority_increase_with)
 CHECK_BEGIN_STATIC_FN(priority_queue_test_priority_decrease)
 {
     CCC_Priority_queue priority_queue = CCC_priority_queue_initialize(
-        struct val, elem, CCC_GRT, val_cmp, NULL, NULL);
+        struct Val, elem, CCC_ORDER_GREATER, val_order, NULL, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
     size_t const num_nodes = 1000;
-    struct val vals[1000];
+    struct Val vals[1000];
     for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
@@ -245,7 +245,7 @@ CHECK_BEGIN_STATIC_FN(priority_queue_test_priority_decrease)
     int const limit = 400;
     for (size_t val = 0; val < num_nodes; ++val)
     {
-        struct val *const i = &vals[val];
+        struct Val *const i = &vals[val];
         int inc = (limit * 2) + 1;
         int dec = (i->val / 2) - 1;
         if (i->val < limit && inc > i->val)
@@ -272,12 +272,12 @@ CHECK_BEGIN_STATIC_FN(priority_queue_test_priority_decrease)
 CHECK_BEGIN_STATIC_FN(priority_queue_test_priority_decrease_with)
 {
     CCC_Priority_queue priority_queue = CCC_priority_queue_initialize(
-        struct val, elem, CCC_GRT, val_cmp, NULL, NULL);
+        struct Val, elem, CCC_ORDER_GREATER, val_order, NULL, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
     size_t const num_nodes = 1000;
-    struct val vals[1000];
+    struct Val vals[1000];
     for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */

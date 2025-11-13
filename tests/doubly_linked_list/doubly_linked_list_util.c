@@ -11,14 +11,14 @@
 #include "types.h"
 
 CCC_Order
-val_cmp(CCC_Type_comparator_context const c)
+val_order(CCC_Type_comparator_context const c)
 {
-    struct val const *const a = c.any_type_lhs;
-    struct val const *const b = c.any_type_rhs;
+    struct Val const *const a = c.type_lhs;
+    struct Val const *const b = c.type_rhs;
     return (a->val > b->val) - (a->val < b->val);
 }
 
-CHECK_BEGIN_FN(check_order, doubly_linked_list const *const doubly_linked_list,
+CHECK_BEGIN_FN(check_order, Doubly_linked_list const *const doubly_linked_list,
                size_t const n, int const order[])
 {
     if (!n)
@@ -26,7 +26,7 @@ CHECK_BEGIN_FN(check_order, doubly_linked_list const *const doubly_linked_list,
         return PASS;
     }
     size_t i = 0;
-    struct val *v = begin(doubly_linked_list);
+    struct Val *v = begin(doubly_linked_list);
     for (; v != end(doubly_linked_list) && i < n;
          v = next(doubly_linked_list, &v->e), ++i)
     {
@@ -75,7 +75,7 @@ CHECK_BEGIN_FN(check_order, doubly_linked_list const *const doubly_linked_list,
 }
 
 CHECK_BEGIN_FN(create_list, CCC_Doubly_linked_list *const doubly_linked_list,
-               enum push_end const dir, size_t const n, struct val vals[])
+               enum Push_direction const dir, size_t const n, struct Val vals[])
 {
     for (size_t i = 0; i < n; ++i)
     {

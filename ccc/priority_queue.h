@@ -50,7 +50,7 @@ N) increase/decrease key.
 
 A priority queue can be initialized on the stack, heap, or data segment at
 runtime or compile time.*/
-typedef struct CCC_priority_queue CCC_Priority_queue;
+typedef struct CCC_Priority_queue CCC_Priority_queue;
 
 /** @brief The embedded struct type for operation of the priority queue.
 
@@ -74,18 +74,18 @@ Initialize the container with memory, callbacks, and permissions. */
 priority_queue elem.
 @param [in] priority_queue_order CCC_ORDER_LESSER for a min priority_queue or
 CCC_ORDER_GREATER for a max priority_queue.
-@param [in] cmp_fn the function used to compare two user types.
+@param [in] order_fn the function used to compare two user types.
 @param [in] alloc_fn the allocation function or NULL if allocation is banned.
 @param [in] context_data context data needed for comparison or destruction.
 @return the initialized priority_queue on the right side of an equality operator
 (e.g. CCC_Priority_queue priority_queue = CCC_priority_queue_initialize(...);)
 */
 #define CCC_priority_queue_initialize(struct_name, priority_queue_node_field,  \
-                                      priority_queue_order, cmp_fn, alloc_fn,  \
-                                      context_data)                            \
+                                      priority_queue_order, order_fn,          \
+                                      alloc_fn, context_data)                  \
     CCC_private_priority_queue_initialize(                                     \
-        struct_name, priority_queue_node_field, priority_queue_order, cmp_fn,  \
-        alloc_fn, context_data)
+        struct_name, priority_queue_node_field, priority_queue_order,          \
+        order_fn, alloc_fn, context_data)
 
 /**@}*/
 
@@ -177,7 +177,7 @@ the type actively stored in the priority queue.
 
 ```
 #define PRIORITY_QUEUE_USING_NAMESPACE_CCC
-struct val
+struct Val
 {
     priority_queue_node e;
     int key;
@@ -233,7 +233,7 @@ invalid state if the user decreases the priority by mistake in this function.
 
 ```
 #define PRIORITY_QUEUE_USING_NAMESPACE_CCC
-struct val
+struct Val
 {
     priority_queue_node e;
     int key;
@@ -291,7 +291,7 @@ invalid state if the user decreases the priority by mistake in this function.
 
 ```
 #define PRIORITY_QUEUE_USING_NAMESPACE_CCC
-struct val
+struct Val
 {
     priority_queue_node e;
     int key;

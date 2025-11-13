@@ -121,7 +121,7 @@ enum
 
 /* Returning the internal elem type with stored offsets. */
 static size_t splay(struct CCC_Handle_ordered_map *t, size_t root,
-                    void const *key, CCC_Key_comparator *cmp_fn);
+                    void const *key, CCC_Key_comparator *order_fn);
 static struct CCC_Handle_ordered_map_node *
 node_at(struct CCC_Handle_ordered_map const *, size_t);
 static void *data_at(struct CCC_Handle_ordered_map const *, size_t);
@@ -142,7 +142,7 @@ static struct CCC_Handle_ordered_map_node *
 node_pos(size_t sizeof_type, void const *data, size_t capacity);
 static size_t find(struct CCC_Handle_ordered_map *, void const *key);
 static size_t connect_new_root(struct CCC_Handle_ordered_map *t,
-                               size_t new_root, CCC_Order cmp_result);
+                               size_t new_root, CCC_Order order_result);
 static void insert(struct CCC_Handle_ordered_map *t, size_t n);
 static void *key_in_slot(struct CCC_Handle_ordered_map const *t,
                          void const *user_struct);
@@ -155,8 +155,8 @@ static struct CCC_Range equal_range(struct CCC_Handle_ordered_map *t,
 static void *key_at(struct CCC_Handle_ordered_map const *t, size_t i);
 /* Returning threeway comparison with user callback. */
 static CCC_Order
-cmp_nodes(struct CCC_Handle_ordered_map const *handle_ordered_map,
-          void const *key, size_t node, CCC_Key_comparator *fn);
+order_nodes(struct CCC_Handle_ordered_map const *handle_ordered_map,
+            void const *key, size_t node, CCC_Key_comparator *fn);
 /* Returning read only indices for tree nodes. */
 static size_t remove_from_tree(struct CCC_Handle_ordered_map *t, size_t ret);
 static size_t min_max_from(struct CCC_Handle_ordered_map const *t, size_t start,
@@ -209,9 +209,9 @@ CCC_handle_ordered_map_contains(
     }
     handle_ordered_map->root
         = splay(handle_ordered_map, handle_ordered_map->root, key,
-                handle_ordered_map->cmp);
-    return cmp_nodes(handle_ordered_map, key, handle_ordered_map->root,
-                     handle_ordered_map->cmp)
+                handle_ordered_map->order);
+    return order_nodes(handle_ordered_map, key, handle_ordered_map->root,
+                       handle_ordered_map->order)
         == CCC_ORDER_EQUAL;
 }
 
@@ -246,17 +246,17 @@ CCC_handle_ordered_map_insert_handle(
     {
         return 0;
     }
-    if (h->impl.stats == CCC_ENTRY_OCCUPIED)
+    if (h->private.stats == CCC_ENTRY_OCCUPIED)
     {
-        void *const ret = data_at(h->impl.handle_ordered_map, h->impl.i);
+        void *const ret = data_at(h->private.handle_ordered_map, h->private.i);
         if (key_val_type != ret)
         {
             (void)memcpy(ret, key_val_type,
-                         h->impl.handle_ordered_map->sizeof_type);
+                         h->private.handle_ordered_map->sizeof_type);
         }
-        return h->impl.i;
+        return h->private.i;
     }
-    return maybe_alloc_insert(h->impl.handle_ordered_map, key_val_type);
+    return maybe_alloc_insert(h->private.handle_ordered_map, key_val_type);
 }
 
 CCC_Handle_ordered_map_handle *
@@ -267,10 +267,10 @@ CCC_handle_ordered_map_and_modify(CCC_Handle_ordered_map_handle *const h,
     {
         return NULL;
     }
-    if (fn && h->impl.stats & CCC_ENTRY_OCCUPIED)
+    if (fn && h->private.stats & CCC_ENTRY_OCCUPIED)
     {
         fn((CCC_Type_context){
-            .any_type = data_at(h->impl.handle_ordered_map, h->impl.i),
+            .type = data_at(h->private.handle_ordered_map, h->private.i),
             .context = NULL,
         });
     }
@@ -286,10 +286,10 @@ CCC_handle_ordered_map_and_modify_context(
     {
         return NULL;
     }
-    if (fn && h->impl.stats & CCC_ENTRY_OCCUPIED)
+    if (fn && h->private.stats & CCC_ENTRY_OCCUPIED)
     {
         fn((CCC_Type_context){
-            .any_type = data_at(h->impl.handle_ordered_map, h->impl.i),
+            .type = data_at(h->private.handle_ordered_map, h->private.i),
             .context = context,
         });
     }
@@ -304,11 +304,11 @@ CCC_handle_ordered_map_or_insert(CCC_Handle_ordered_map_handle const *const h,
     {
         return 0;
     }
-    if (h->impl.stats & CCC_ENTRY_OCCUPIED)
+    if (h->private.stats & CCC_ENTRY_OCCUPIED)
     {
-        return h->impl.i;
+        return h->private.i;
     }
-    return maybe_alloc_insert(h->impl.handle_ordered_map, key_val_type);
+    return maybe_alloc_insert(h->private.handle_ordered_map, key_val_type);
 }
 
 CCC_Handle
@@ -457,11 +457,11 @@ CCC_handle_ordered_map_remove_handle(CCC_Handle_ordered_map_handle *const h)
     {
         return (CCC_Handle){{.stats = CCC_ENTRY_ARG_ERROR}};
     }
-    if (h->impl.stats == CCC_ENTRY_OCCUPIED)
+    if (h->private.stats == CCC_ENTRY_OCCUPIED)
     {
         size_t const erased
-            = erase(h->impl.handle_ordered_map,
-                    key_at(h->impl.handle_ordered_map, h->impl.i));
+            = erase(h->private.handle_ordered_map,
+                    key_at(h->private.handle_ordered_map, h->private.i));
         assert(erased);
         return (CCC_Handle){{
             .i = erased,
@@ -481,7 +481,7 @@ CCC_handle_ordered_map_unwrap(CCC_Handle_ordered_map_handle const *const h)
     {
         return 0;
     }
-    return h->impl.stats == CCC_ENTRY_OCCUPIED ? h->impl.i : 0;
+    return h->private.stats == CCC_ENTRY_OCCUPIED ? h->private.i : 0;
 }
 
 CCC_Tribool
@@ -492,7 +492,7 @@ CCC_handle_ordered_map_insert_error(
     {
         return CCC_TRIBOOL_ERROR;
     }
-    return (h->impl.stats & CCC_ENTRY_INSERT_ERROR) != 0;
+    return (h->private.stats & CCC_ENTRY_INSERT_ERROR) != 0;
 }
 
 CCC_Tribool
@@ -502,14 +502,14 @@ CCC_handle_ordered_map_occupied(CCC_Handle_ordered_map_handle const *const h)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    return (h->impl.stats & CCC_ENTRY_OCCUPIED) != 0;
+    return (h->private.stats & CCC_ENTRY_OCCUPIED) != 0;
 }
 
 CCC_Handle_status
 CCC_handle_ordered_map_handle_status(
     CCC_Handle_ordered_map_handle const *const h)
 {
-    return h ? h->impl.stats : CCC_ENTRY_ARG_ERROR;
+    return h ? h->private.stats : CCC_ENTRY_ARG_ERROR;
 }
 
 CCC_Tribool
@@ -891,13 +891,13 @@ equal_range(struct CCC_Handle_ordered_map *const t, void const *const begin_key,
        checking we don't need to progress to the next greatest or next
        lesser element depending on the direction we are traversing. */
     CCC_Order const les_or_grt[2] = {CCC_ORDER_LESSER, CCC_ORDER_GREATER};
-    size_t b = splay(t, t->root, begin_key, t->cmp);
-    if (cmp_nodes(t, begin_key, b, t->cmp) == les_or_grt[traversal])
+    size_t b = splay(t, t->root, begin_key, t->order);
+    if (order_nodes(t, begin_key, b, t->order) == les_or_grt[traversal])
     {
         b = next(t, b, traversal);
     }
-    size_t e = splay(t, t->root, end_key, t->cmp);
-    if (cmp_nodes(t, end_key, e, t->cmp) != les_or_grt[!traversal])
+    size_t e = splay(t, t->root, end_key, t->order);
+    if (order_nodes(t, end_key, e, t->order) != les_or_grt[!traversal])
     {
         e = next(t, e, traversal);
     }
@@ -1030,13 +1030,13 @@ insert(struct CCC_Handle_ordered_map *const t, size_t const n)
         return;
     }
     void const *const key = key_at(t, n);
-    t->root = splay(t, t->root, key, t->cmp);
-    CCC_Order const root_cmp = cmp_nodes(t, key, t->root, t->cmp);
-    if (CCC_ORDER_EQUAL == root_cmp)
+    t->root = splay(t, t->root, key, t->order);
+    CCC_Order const root_order = order_nodes(t, key, t->root, t->order);
+    if (CCC_ORDER_EQUAL == root_order)
     {
         return;
     }
-    (void)connect_new_root(t, n, root_cmp);
+    (void)connect_new_root(t, n, root_order);
 }
 
 static size_t
@@ -1046,8 +1046,8 @@ erase(struct CCC_Handle_ordered_map *const t, void const *const key)
     {
         return 0;
     }
-    size_t ret = splay(t, t->root, key, t->cmp);
-    CCC_Order const found = cmp_nodes(t, key, ret, t->cmp);
+    size_t ret = splay(t, t->root, key, t->order);
+    CCC_Order const found = order_nodes(t, key, ret, t->order);
     if (found != CCC_ORDER_EQUAL)
     {
         return 0;
@@ -1066,7 +1066,7 @@ remove_from_tree(struct CCC_Handle_ordered_map *const t, size_t const ret)
     }
     else
     {
-        t->root = splay(t, branch_i(t, ret, L), key_at(t, ret), t->cmp);
+        t->root = splay(t, branch_i(t, ret, L), key_at(t, ret), t->order);
         link(t, t->root, R, branch_i(t, ret, R));
     }
     node_at(t, ret)->next_free = t->free_list;
@@ -1077,9 +1077,9 @@ remove_from_tree(struct CCC_Handle_ordered_map *const t, size_t const ret)
 
 static size_t
 connect_new_root(struct CCC_Handle_ordered_map *const t, size_t const new_root,
-                 CCC_Order const cmp_result)
+                 CCC_Order const order_result)
 {
-    enum Branch const dir = CCC_ORDER_GREATER == cmp_result;
+    enum Branch const dir = CCC_ORDER_GREATER == order_result;
     link(t, new_root, dir, branch_i(t, t->root, dir));
     link(t, new_root, !dir, t->root);
     *branch_ref(t, t->root, dir) = 0;
@@ -1096,13 +1096,14 @@ find(struct CCC_Handle_ordered_map *const t, void const *const key)
     {
         return 0;
     }
-    t->root = splay(t, t->root, key, t->cmp);
-    return cmp_nodes(t, key, t->root, t->cmp) == CCC_ORDER_EQUAL ? t->root : 0;
+    t->root = splay(t, t->root, key, t->order);
+    return order_nodes(t, key, t->root, t->order) == CCC_ORDER_EQUAL ? t->root
+                                                                     : 0;
 }
 
 static size_t
 splay(struct CCC_Handle_ordered_map *const t, size_t root,
-      void const *const key, CCC_Key_comparator *const cmp_fn)
+      void const *const key, CCC_Key_comparator *const order_fn)
 {
     /* Pointers in an array and we can use the symmetric enum and flip it to
        choose the Left or Right subtree. Another benefit of our nil node: use it
@@ -1112,18 +1113,18 @@ splay(struct CCC_Handle_ordered_map *const t, size_t root,
     size_t l_r_subtrees[LR] = {0, 0};
     for (;;)
     {
-        CCC_Order const key_cmp = cmp_nodes(t, key, root, cmp_fn);
-        enum Branch const child_link = CCC_ORDER_GREATER == key_cmp;
-        if (CCC_ORDER_EQUAL == key_cmp || !branch_i(t, root, child_link))
+        CCC_Order const key_order = order_nodes(t, key, root, order_fn);
+        enum Branch const child_link = CCC_ORDER_GREATER == key_order;
+        if (CCC_ORDER_EQUAL == key_order || !branch_i(t, root, child_link))
         {
             break;
         }
-        CCC_Order const child_cmp
-            = cmp_nodes(t, key, branch_i(t, root, child_link), cmp_fn);
-        enum Branch const grandchild_link = CCC_ORDER_GREATER == child_cmp;
+        CCC_Order const child_order
+            = order_nodes(t, key, branch_i(t, root, child_link), order_fn);
+        enum Branch const grandchild_link = CCC_ORDER_GREATER == child_order;
         /* A straight line has formed from root->child->grandchild. An
            opportunity to splay and heal the tree arises. */
-        if (CCC_ORDER_EQUAL != child_cmp && child_link == grandchild_link)
+        if (CCC_ORDER_EQUAL != child_order && child_link == grandchild_link)
         {
             size_t const child_node = branch_i(t, root, child_link);
             link(t, root, child_link, branch_i(t, child_node, !child_link));
@@ -1224,7 +1225,7 @@ delete_nodes(struct CCC_Handle_ordered_map *const t,
         e->branch[L] = e->branch[R] = 0;
         e->parent = 0;
         fn((CCC_Type_context){
-            .any_type = data_at(t, node),
+            .type = data_at(t, node),
             .context = t->context,
         });
         node = next;
@@ -1232,13 +1233,13 @@ delete_nodes(struct CCC_Handle_ordered_map *const t,
 }
 
 static inline CCC_Order
-cmp_nodes(struct CCC_Handle_ordered_map const *const handle_ordered_map,
-          void const *const key, size_t const node,
-          CCC_Key_comparator *const fn)
+order_nodes(struct CCC_Handle_ordered_map const *const handle_ordered_map,
+            void const *const key, size_t const node,
+            CCC_Key_comparator *const fn)
 {
     return fn((CCC_Key_comparator_context){
-        .any_key_lhs = key,
-        .any_type_rhs = data_at(handle_ordered_map, node),
+        .key_lhs = key,
+        .type_rhs = data_at(handle_ordered_map, node),
         .context = handle_ordered_map->context,
     });
 }
@@ -1436,12 +1437,14 @@ are_subtrees_valid(struct CCC_Handle_ordered_map const *t,
         return CCC_TRUE;
     }
     if (r.low
-        && cmp_nodes(t, key_at(t, r.low), r.root, t->cmp) != CCC_ORDER_LESSER)
+        && order_nodes(t, key_at(t, r.low), r.root, t->order)
+               != CCC_ORDER_LESSER)
     {
         return CCC_FALSE;
     }
     if (r.high
-        && cmp_nodes(t, key_at(t, r.high), r.root, t->cmp) != CCC_ORDER_GREATER)
+        && order_nodes(t, key_at(t, r.high), r.root, t->order)
+               != CCC_ORDER_GREATER)
     {
         return CCC_FALSE;
     }

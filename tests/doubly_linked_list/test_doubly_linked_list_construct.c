@@ -10,9 +10,9 @@
 
 CHECK_BEGIN_STATIC_FN(doubly_linked_list_test_construct)
 {
-    struct val val = {};
-    doubly_linked_list doubly_linked_list = doubly_linked_list_initialize(
-        doubly_linked_list, struct val, e, val_cmp, NULL, NULL);
+    struct Val val = {};
+    Doubly_linked_list doubly_linked_list = doubly_linked_list_initialize(
+        doubly_linked_list, struct Val, e, val_order, NULL, NULL);
     CHECK(is_empty(&doubly_linked_list), true);
     CHECK(doubly_linked_list_push_front(&doubly_linked_list, &val.e) != NULL,
           true);

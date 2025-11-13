@@ -64,7 +64,7 @@ or its parent. Preserving the known parent is what makes the Entry Interface
 No further look ups are required for insertions, modification, or removal. */
 struct Query
 {
-    CCC_Order last_cmp;
+    CCC_Order last_order;
     union
     {
         struct CCC_Realtime_ordered_map_node *found;
@@ -76,9 +76,9 @@ struct Query
 
 static void init_node(struct CCC_Realtime_ordered_map *,
                       struct CCC_Realtime_ordered_map_node *);
-static CCC_Order cmp(struct CCC_Realtime_ordered_map const *, void const *key,
-                     struct CCC_Realtime_ordered_map_node const *node,
-                     CCC_Key_comparator *);
+static CCC_Order order(struct CCC_Realtime_ordered_map const *, void const *key,
+                       struct CCC_Realtime_ordered_map_node const *node,
+                       CCC_Key_comparator *);
 static void *struct_base(struct CCC_Realtime_ordered_map const *,
                          struct CCC_Realtime_ordered_map_node const *);
 static struct Query find(struct CCC_Realtime_ordered_map const *,
@@ -86,7 +86,7 @@ static struct Query find(struct CCC_Realtime_ordered_map const *,
 static void swap(void *tmp, void *a, void *b, size_t sizeof_type);
 static void *maybe_alloc_insert(struct CCC_Realtime_ordered_map *,
                                 struct CCC_Realtime_ordered_map_node *parent,
-                                CCC_Order last_cmp,
+                                CCC_Order last_order,
                                 struct CCC_Realtime_ordered_map_node *);
 static void *remove_fixup(struct CCC_Realtime_ordered_map *,
                           struct CCC_Realtime_ordered_map_node *);
@@ -163,7 +163,7 @@ static struct CCC_rtree_entry entry(struct CCC_Realtime_ordered_map const *rom,
                                     void const *key);
 static void *insert(struct CCC_Realtime_ordered_map *rom,
                     struct CCC_Realtime_ordered_map_node *parent,
-                    CCC_Order last_cmp,
+                    CCC_Order last_order,
                     struct CCC_Realtime_ordered_map_node *out_handle);
 static void *key_from_node(struct CCC_Realtime_ordered_map const *rom,
                            struct CCC_Realtime_ordered_map_node const *elem);
@@ -182,7 +182,7 @@ CCC_realtime_ordered_map_contains(CCC_Realtime_ordered_map const *const rom,
     {
         return CCC_TRIBOOL_ERROR;
     }
-    return CCC_ORDER_EQUAL == find(rom, key).last_cmp;
+    return CCC_ORDER_EQUAL == find(rom, key).last_order;
 }
 
 void *
@@ -194,7 +194,7 @@ CCC_realtime_ordered_map_get_key_val(CCC_Realtime_ordered_map const *const rom,
         return NULL;
     }
     struct Query const q = find(rom, key);
-    return (CCC_ORDER_EQUAL == q.last_cmp) ? struct_base(rom, q.found) : NULL;
+    return (CCC_ORDER_EQUAL == q.last_order) ? struct_base(rom, q.found) : NULL;
 }
 
 CCC_Entry
@@ -208,7 +208,7 @@ CCC_realtime_ordered_map_swap_entry(
         return (CCC_Entry){{.stats = CCC_ENTRY_ARG_ERROR}};
     }
     struct Query const q = find(rom, key_from_node(rom, key_val_handle));
-    if (CCC_ORDER_EQUAL == q.last_cmp)
+    if (CCC_ORDER_EQUAL == q.last_order)
     {
         *key_val_handle = *q.found;
         void *const found = struct_base(rom, q.found);
@@ -223,7 +223,7 @@ CCC_realtime_ordered_map_swap_entry(
             .stats = CCC_ENTRY_OCCUPIED,
         }};
     }
-    if (!maybe_alloc_insert(rom, q.parent, q.last_cmp, key_val_handle))
+    if (!maybe_alloc_insert(rom, q.parent, q.last_order, key_val_handle))
     {
         return (CCC_Entry){{
             .e = NULL,
@@ -246,7 +246,7 @@ CCC_realtime_ordered_map_try_insert(
         return (CCC_Entry){{.stats = CCC_ENTRY_ARG_ERROR}};
     }
     struct Query const q = find(rom, key_from_node(rom, key_val_handle));
-    if (CCC_ORDER_EQUAL == q.last_cmp)
+    if (CCC_ORDER_EQUAL == q.last_order)
     {
         return (CCC_Entry){{
             .e = struct_base(rom, q.found),
@@ -254,7 +254,7 @@ CCC_realtime_ordered_map_try_insert(
         }};
     }
     void *const inserted
-        = maybe_alloc_insert(rom, q.parent, q.last_cmp, key_val_handle);
+        = maybe_alloc_insert(rom, q.parent, q.last_order, key_val_handle);
     if (!inserted)
     {
         return (CCC_Entry){{
@@ -278,7 +278,7 @@ CCC_realtime_ordered_map_insert_or_assign(
         return (CCC_Entry){{.stats = CCC_ENTRY_ARG_ERROR}};
     }
     struct Query const q = find(rom, key_from_node(rom, key_val_handle));
-    if (CCC_ORDER_EQUAL == q.last_cmp)
+    if (CCC_ORDER_EQUAL == q.last_order)
     {
         void *const found = struct_base(rom, q.found);
         *key_val_handle = *elem_in_slot(rom, found);
@@ -289,7 +289,7 @@ CCC_realtime_ordered_map_insert_or_assign(
         }};
     }
     void *const inserted
-        = maybe_alloc_insert(rom, q.parent, q.last_cmp, key_val_handle);
+        = maybe_alloc_insert(rom, q.parent, q.last_order, key_val_handle);
     if (!inserted)
     {
         return (CCC_Entry){{
@@ -320,17 +320,17 @@ CCC_realtime_ordered_map_or_insert(
     CCC_Realtime_ordered_map_entry const *const e,
     CCC_Realtime_ordered_map_node *const elem)
 {
-    if (!e || !elem || !e->impl.entry.e)
+    if (!e || !elem || !e->private.entry.e)
     {
         return NULL;
     }
-    if (e->impl.entry.stats == CCC_ENTRY_OCCUPIED)
+    if (e->private.entry.stats == CCC_ENTRY_OCCUPIED)
     {
-        return e->impl.entry.e;
+        return e->private.entry.e;
     }
-    return maybe_alloc_insert(e->impl.rom,
-                              elem_in_slot(e->impl.rom, e->impl.entry.e),
-                              e->impl.last_cmp, elem);
+    return maybe_alloc_insert(e->private.rom,
+                              elem_in_slot(e->private.rom, e->private.entry.e),
+                              e->private.last_order, elem);
 }
 
 void *
@@ -338,41 +338,41 @@ CCC_realtime_ordered_map_insert_entry(
     CCC_Realtime_ordered_map_entry const *const e,
     CCC_Realtime_ordered_map_node *const elem)
 {
-    if (!e || !elem || !e->impl.entry.e)
+    if (!e || !elem || !e->private.entry.e)
     {
         return NULL;
     }
-    if (e->impl.entry.stats == CCC_ENTRY_OCCUPIED)
+    if (e->private.entry.stats == CCC_ENTRY_OCCUPIED)
     {
-        *elem = *elem_in_slot(e->impl.rom, e->impl.entry.e);
-        memcpy(e->impl.entry.e, struct_base(e->impl.rom, elem),
-               e->impl.rom->sizeof_type);
-        return e->impl.entry.e;
+        *elem = *elem_in_slot(e->private.rom, e->private.entry.e);
+        memcpy(e->private.entry.e, struct_base(e->private.rom, elem),
+               e->private.rom->sizeof_type);
+        return e->private.entry.e;
     }
-    return maybe_alloc_insert(e->impl.rom,
-                              elem_in_slot(e->impl.rom, e->impl.entry.e),
-                              e->impl.last_cmp, elem);
+    return maybe_alloc_insert(e->private.rom,
+                              elem_in_slot(e->private.rom, e->private.entry.e),
+                              e->private.last_order, elem);
 }
 
 CCC_Entry
 CCC_realtime_ordered_map_remove_entry(
     CCC_Realtime_ordered_map_entry const *const e)
 {
-    if (!e || !e->impl.entry.e)
+    if (!e || !e->private.entry.e)
     {
         return (CCC_Entry){{.stats = CCC_ENTRY_ARG_ERROR}};
     }
-    if (e->impl.entry.stats == CCC_ENTRY_OCCUPIED)
+    if (e->private.entry.stats == CCC_ENTRY_OCCUPIED)
     {
         void *const erased = remove_fixup(
-            e->impl.rom, elem_in_slot(e->impl.rom, e->impl.entry.e));
+            e->private.rom, elem_in_slot(e->private.rom, e->private.entry.e));
         assert(erased);
-        if (e->impl.rom->alloc)
+        if (e->private.rom->alloc)
         {
-            e->impl.rom->alloc((CCC_Allocator_context){
+            e->private.rom->alloc((CCC_Allocator_context){
                 .input = erased,
                 .bytes = 0,
-                .context = e->impl.rom->context,
+                .context = e->private.rom->context,
             });
             return (CCC_Entry){{
                 .e = NULL,
@@ -399,7 +399,7 @@ CCC_realtime_ordered_map_remove(CCC_Realtime_ordered_map *const rom,
         return (CCC_Entry){{.stats = CCC_ENTRY_ARG_ERROR}};
     }
     struct Query const q = find(rom, key_from_node(rom, out_handle));
-    if (q.last_cmp != CCC_ORDER_EQUAL)
+    if (q.last_order != CCC_ORDER_EQUAL)
     {
         return (CCC_Entry){{
             .e = NULL,
@@ -435,10 +435,10 @@ CCC_realtime_ordered_map_and_modify(CCC_Realtime_ordered_map_entry *e,
     {
         return NULL;
     }
-    if (fn && e->impl.entry.stats & CCC_ENTRY_OCCUPIED && e->impl.entry.e)
+    if (fn && e->private.entry.stats & CCC_ENTRY_OCCUPIED && e->private.entry.e)
     {
         fn((CCC_Type_context){
-            .any_type = e->impl.entry.e,
+            .type = e->private.entry.e,
             NULL,
         });
     }
@@ -453,10 +453,10 @@ CCC_realtime_ordered_map_and_modify_context(CCC_Realtime_ordered_map_entry *e,
     {
         return NULL;
     }
-    if (fn && e->impl.entry.stats & CCC_ENTRY_OCCUPIED && e->impl.entry.e)
+    if (fn && e->private.entry.stats & CCC_ENTRY_OCCUPIED && e->private.entry.e)
     {
         fn((CCC_Type_context){
-            .any_type = e->impl.entry.e,
+            .type = e->private.entry.e,
             context,
         });
     }
@@ -466,9 +466,9 @@ CCC_realtime_ordered_map_and_modify_context(CCC_Realtime_ordered_map_entry *e,
 void *
 CCC_realtime_ordered_map_unwrap(CCC_Realtime_ordered_map_entry const *const e)
 {
-    if (e && e->impl.entry.stats & CCC_ENTRY_OCCUPIED)
+    if (e && e->private.entry.stats & CCC_ENTRY_OCCUPIED)
     {
-        return e->impl.entry.e;
+        return e->private.entry.e;
     }
     return NULL;
 }
@@ -480,7 +480,7 @@ CCC_realtime_ordered_map_occupied(CCC_Realtime_ordered_map_entry const *const e)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    return (e->impl.entry.stats & CCC_ENTRY_OCCUPIED) != 0;
+    return (e->private.entry.stats & CCC_ENTRY_OCCUPIED) != 0;
 }
 
 CCC_Tribool
@@ -491,14 +491,14 @@ CCC_realtime_ordered_map_insert_error(
     {
         return CCC_TRIBOOL_ERROR;
     }
-    return (e->impl.entry.stats & CCC_ENTRY_INSERT_ERROR) != 0;
+    return (e->private.entry.stats & CCC_ENTRY_INSERT_ERROR) != 0;
 }
 
 CCC_Entry_status
 CCC_realtime_ordered_map_entry_status(
     CCC_Realtime_ordered_map_entry const *const e)
 {
-    return e ? e->impl.entry.stats : CCC_ENTRY_ARG_ERROR;
+    return e ? e->private.entry.stats : CCC_ENTRY_ARG_ERROR;
 }
 
 void *
@@ -649,7 +649,7 @@ CCC_realtime_ordered_map_clear(CCC_Realtime_ordered_map *const rom,
         if (destructor)
         {
             destructor((CCC_Type_context){
-                .any_type = destroy,
+                .type = destroy,
                 .context = rom->context,
             });
         }
@@ -679,10 +679,10 @@ void *
 CCC_private_realtime_ordered_map_insert(
     struct CCC_Realtime_ordered_map *const rom,
     struct CCC_Realtime_ordered_map_node *const parent,
-    CCC_Order const last_cmp,
+    CCC_Order const last_order,
     struct CCC_Realtime_ordered_map_node *const out_handle)
 {
-    return insert(rom, parent, last_cmp, out_handle);
+    return insert(rom, parent, last_order, out_handle);
 }
 
 void *
@@ -718,11 +718,11 @@ static struct CCC_rtree_entry
 entry(struct CCC_Realtime_ordered_map const *const rom, void const *const key)
 {
     struct Query const q = find(rom, key);
-    if (CCC_ORDER_EQUAL == q.last_cmp)
+    if (CCC_ORDER_EQUAL == q.last_order)
     {
         return (struct CCC_rtree_entry){
             .rom = (struct CCC_Realtime_ordered_map *)rom,
-            .last_cmp = q.last_cmp,
+            .last_order = q.last_order,
             .entry = {
                 .e = struct_base(rom, q.found),
                 .stats = CCC_ENTRY_OCCUPIED,
@@ -731,7 +731,7 @@ entry(struct CCC_Realtime_ordered_map const *const rom, void const *const key)
     }
     return (struct CCC_rtree_entry){
         .rom = (struct CCC_Realtime_ordered_map *)rom,
-        .last_cmp = q.last_cmp,
+        .last_order = q.last_order,
         .entry = {
             .e = struct_base(rom, q.parent),
             .stats = CCC_ENTRY_VACANT | CCC_ENTRY_NO_UNWRAP,
@@ -742,7 +742,7 @@ entry(struct CCC_Realtime_ordered_map const *const rom, void const *const key)
 static void *
 maybe_alloc_insert(struct CCC_Realtime_ordered_map *const rom,
                    struct CCC_Realtime_ordered_map_node *const parent,
-                   CCC_Order const last_cmp,
+                   CCC_Order const last_order,
                    struct CCC_Realtime_ordered_map_node *out_handle)
 {
     if (rom->alloc)
@@ -759,13 +759,13 @@ maybe_alloc_insert(struct CCC_Realtime_ordered_map *const rom,
         memcpy(new, struct_base(rom, out_handle), rom->sizeof_type);
         out_handle = elem_in_slot(rom, new);
     }
-    return insert(rom, parent, last_cmp, out_handle);
+    return insert(rom, parent, last_order, out_handle);
 }
 
 static void *
 insert(struct CCC_Realtime_ordered_map *const rom,
        struct CCC_Realtime_ordered_map_node *const parent,
-       CCC_Order const last_cmp,
+       CCC_Order const last_order,
        struct CCC_Realtime_ordered_map_node *const out_handle)
 {
     init_node(rom, out_handle);
@@ -775,10 +775,10 @@ insert(struct CCC_Realtime_ordered_map *const rom,
         ++rom->count;
         return struct_base(rom, out_handle);
     }
-    assert(last_cmp == CCC_ORDER_GREATER || last_cmp == CCC_ORDER_LESSER);
+    assert(last_order == CCC_ORDER_GREATER || last_order == CCC_ORDER_LESSER);
     CCC_Tribool const rank_rule_break
         = parent->branch[L] == &rom->end && parent->branch[R] == &rom->end;
-    parent->branch[CCC_ORDER_GREATER == last_cmp] = out_handle;
+    parent->branch[CCC_ORDER_GREATER == last_order] = out_handle;
     out_handle->parent = parent;
     if (rank_rule_break)
     {
@@ -793,18 +793,18 @@ find(struct CCC_Realtime_ordered_map const *const rom, void const *const key)
 {
     struct CCC_Realtime_ordered_map_node const *parent = &rom->end;
     struct Query q = {
-        .last_cmp = CCC_ORDER_ERROR,
+        .last_order = CCC_ORDER_ERROR,
         .found = rom->root,
     };
     while (q.found != &rom->end)
     {
-        q.last_cmp = cmp(rom, key, q.found, rom->cmp);
-        if (CCC_ORDER_EQUAL == q.last_cmp)
+        q.last_order = order(rom, key, q.found, rom->order);
+        if (CCC_ORDER_EQUAL == q.last_order)
         {
             return q;
         }
         parent = q.found;
-        q.found = q.found->branch[CCC_ORDER_GREATER == q.last_cmp];
+        q.found = q.found->branch[CCC_ORDER_GREATER == q.last_order];
     }
     /* Type punning here OK as both union members have same type and size. */
     q.parent = (struct CCC_Realtime_ordered_map_node *)parent;
@@ -846,12 +846,12 @@ equal_range(struct CCC_Realtime_ordered_map const *const rom,
     }
     CCC_Order const les_or_grt[2] = {CCC_ORDER_LESSER, CCC_ORDER_GREATER};
     struct Query b = find(rom, begin_key);
-    if (b.last_cmp == les_or_grt[traversal])
+    if (b.last_order == les_or_grt[traversal])
     {
         b.found = next(rom, b.found, traversal);
     }
     struct Query e = find(rom, end_key);
-    if (e.last_cmp != les_or_grt[!traversal])
+    if (e.last_order != les_or_grt[!traversal])
     {
         e.found = next(rom, e.found, traversal);
     }
@@ -884,13 +884,13 @@ swap(void *const tmp, void *const a, void *const b, size_t const sizeof_type)
 }
 
 static inline CCC_Order
-cmp(struct CCC_Realtime_ordered_map const *const rom, void const *const key,
-    struct CCC_Realtime_ordered_map_node const *const node,
-    CCC_Key_comparator *const fn)
+order(struct CCC_Realtime_ordered_map const *const rom, void const *const key,
+      struct CCC_Realtime_ordered_map_node const *const node,
+      CCC_Key_comparator *const fn)
 {
     return fn((CCC_Key_comparator_context){
-        .any_key_lhs = key,
-        .any_type_rhs = struct_base(rom, node),
+        .key_lhs = key,
+        .type_rhs = struct_base(rom, node),
         .context = rom->context,
     });
 }
@@ -1404,12 +1404,13 @@ are_subtrees_valid(struct CCC_Realtime_ordered_map const *t,
         return CCC_TRUE;
     }
     if (r.low != nil
-        && cmp(t, key_from_node(t, r.low), r.root, t->cmp) != CCC_ORDER_LESSER)
+        && order(t, key_from_node(t, r.low), r.root, t->order)
+               != CCC_ORDER_LESSER)
     {
         return CCC_FALSE;
     }
     if (r.high != nil
-        && cmp(t, key_from_node(t, r.high), r.root, t->cmp)
+        && order(t, key_from_node(t, r.high), r.root, t->order)
                != CCC_ORDER_GREATER)
     {
         return CCC_FALSE;

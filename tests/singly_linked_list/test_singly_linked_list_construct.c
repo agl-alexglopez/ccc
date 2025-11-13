@@ -11,7 +11,7 @@
 CHECK_BEGIN_STATIC_FN(singly_linked_list_test_construct)
 {
     Singly_linked_list singly_linked_list = singly_linked_list_initialize(
-        singly_linked_list, struct val, e, val_cmp, NULL, NULL);
+        singly_linked_list, struct Val, e, val_order, NULL, NULL);
     CHECK(is_empty(&singly_linked_list), true);
     CHECK_END_FN();
 }

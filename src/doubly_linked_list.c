@@ -54,9 +54,9 @@ static struct CCC_Doubly_linked_list_node *
 merge(struct CCC_Doubly_linked_list *, struct CCC_Doubly_linked_list_node *,
       struct CCC_Doubly_linked_list_node *,
       struct CCC_Doubly_linked_list_node *);
-static CCC_Order cmp(struct CCC_Doubly_linked_list const *doubly_linked_list,
-                     struct CCC_Doubly_linked_list_node const *lhs,
-                     struct CCC_Doubly_linked_list_node const *rhs);
+static CCC_Order order(struct CCC_Doubly_linked_list const *doubly_linked_list,
+                       struct CCC_Doubly_linked_list_node const *lhs,
+                       struct CCC_Doubly_linked_list_node const *rhs);
 
 /*===========================     Interface   ===============================*/
 
@@ -469,7 +469,7 @@ CCC_doubly_linked_list_clear(CCC_Doubly_linked_list *const l,
         void *const node = struct_base(l, pop_front(l));
         if (fn)
         {
-            fn((CCC_Type_context){.any_type = node, .context = l->context});
+            fn((CCC_Type_context){.type = node, .context = l->context});
         }
         if (l->alloc)
         {
@@ -527,7 +527,7 @@ CCC_doubly_linked_list_is_sorted(
          = doubly_linked_list->nil.n->n;
          cur != &doubly_linked_list->nil; cur = cur->n)
     {
-        if (cmp(doubly_linked_list, cur->p, cur) == CCC_ORDER_GREATER)
+        if (order(doubly_linked_list, cur->p, cur) == CCC_ORDER_GREATER)
         {
             return CCC_FALSE;
         }
@@ -564,7 +564,7 @@ CCC_doubly_linked_list_insert_sorted(
     }
     struct CCC_Doubly_linked_list_node *pos = doubly_linked_list->nil.n;
     for (; pos != &doubly_linked_list->nil
-           && cmp(doubly_linked_list, e, pos) != CCC_ORDER_LESSER;
+           && order(doubly_linked_list, e, pos) != CCC_ORDER_LESSER;
          pos = pos->n)
     {}
     e->n = pos;
@@ -650,7 +650,7 @@ merge(struct CCC_Doubly_linked_list *const doubly_linked_list,
     assert(doubly_linked_list && a_0 && a_n_b_0 && b_n);
     while (a_0 != a_n_b_0 && a_n_b_0 != b_n)
     {
-        if (cmp(doubly_linked_list, a_n_b_0, a_0) == CCC_ORDER_LESSER)
+        if (order(doubly_linked_list, a_n_b_0, a_0) == CCC_ORDER_LESSER)
         {
             struct CCC_Doubly_linked_list_node *const lesser = a_n_b_0;
             a_n_b_0 = lesser->n;
@@ -682,7 +682,7 @@ first_less(struct CCC_Doubly_linked_list const *const doubly_linked_list,
         start = start->n;
     }
     while (start != &doubly_linked_list->nil
-           && cmp(doubly_linked_list, start, start->p) != CCC_ORDER_LESSER);
+           && order(doubly_linked_list, start, start->p) != CCC_ORDER_LESSER);
     return start;
 }
 
@@ -865,13 +865,13 @@ elem_in(struct CCC_Doubly_linked_list const *const doubly_linked_list,
 type wrapping the provided intrusive handles. Returns the three way comparison
 result value. */
 static inline CCC_Order
-cmp(struct CCC_Doubly_linked_list const *const doubly_linked_list,
-    struct CCC_Doubly_linked_list_node const *const lhs,
-    struct CCC_Doubly_linked_list_node const *const rhs)
+order(struct CCC_Doubly_linked_list const *const doubly_linked_list,
+      struct CCC_Doubly_linked_list_node const *const lhs,
+      struct CCC_Doubly_linked_list_node const *const rhs)
 {
-    return doubly_linked_list->cmp((CCC_Type_comparator_context){
-        .any_type_lhs = struct_base(doubly_linked_list, lhs),
-        .any_type_rhs = struct_base(doubly_linked_list, rhs),
+    return doubly_linked_list->compare((CCC_Type_comparator_context){
+        .type_lhs = struct_base(doubly_linked_list, lhs),
+        .type_rhs = struct_base(doubly_linked_list, rhs),
         .context = doubly_linked_list->context,
     });
 }

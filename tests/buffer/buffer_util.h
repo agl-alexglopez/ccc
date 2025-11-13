@@ -12,12 +12,12 @@ comparison function from the user and one swap slot equivalent to the size of an
 element stored in the buffer. Elements are sorted in a non-decreasing order.
 Therefore if a non-increasing list is needed simply reverse the return of
 the comparison function for non-equivalent values. */
-CCC_Result sort(CCC_Buffer *b, CCC_Type_comparator_context *fn, void *swap);
+CCC_Result sort(CCC_Buffer *b, CCC_Type_comparator *fn, void *swap);
 
 /** Compares the Buffer contents as left hand side to the provided sequence of
 elements as the right hand side. The sequence type must match the type stored in
 the Buffer because that type will be used to iterate through the sequence. */
-CCC_Order bufcmp(CCC_Buffer const *lhs, size_t rhs_count, void const *rhs);
+CCC_Order buforder(CCC_Buffer const *lhs, size_t rhs_count, void const *rhs);
 
 /** Appends the provided range into the buffer. If the range will exceed
 capacity of a fixed size buffer, only those elements which fit will be pushed

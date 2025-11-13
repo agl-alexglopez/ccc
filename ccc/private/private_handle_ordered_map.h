@@ -85,7 +85,7 @@ struct CCC_Handle_ordered_map
     /** @private Where user key can be found in type. */
     size_t key_offset;
     /** @private The provided key comparison function. */
-    CCC_Key_comparator *cmp;
+    CCC_Key_comparator *order;
     /** @private The provided allocation function, if any. */
     CCC_Allocator *alloc;
     /** @private The provided context data, if any. */
@@ -101,7 +101,7 @@ struct CCC_Handle_ordered_map_handle
     /** @private Current index of the handle. */
     size_t i;
     /** @private Saves last comparison direction. */
-    CCC_Order last_cmp;
+    CCC_Order last_order;
     /** @private The entry status flag. */
     CCC_Entry_status stats;
 };
@@ -109,11 +109,11 @@ struct CCC_Handle_ordered_map_handle
 /** @private Enable return by compound literal reference on the stack. Think
 of this method as return by value but with the additional ability to pass by
 pointer in a functional style. `fnB(&(union
-CCC_Handle_ordered_map_handle_wrap){fnA().impl});` */
+CCC_Handle_ordered_map_handle_wrap){fnA().private});` */
 union CCC_Handle_ordered_map_handle_wrap
 {
     /** @private The field containing the handle struct. */
-    struct CCC_Handle_ordered_map_handle impl;
+    struct CCC_Handle_ordered_map_handle private;
 };
 
 /*===========================   Private Interface ===========================*/
@@ -157,7 +157,7 @@ is of a known fixed size defined at compile time, not just a pointer. */
 /** @private */
 #define CCC_private_handle_ordered_map_initialize(                             \
     private_memory_ptr, private_type_name, private_key_node_field,             \
-    private_key_cmp_fn, private_alloc_fn, private_context_data,                \
+    private_key_order_fn, private_alloc_fn, private_context_data,              \
     private_capacity)                                                          \
     {                                                                          \
         .data = (private_memory_ptr),                                          \
@@ -168,7 +168,7 @@ is of a known fixed size defined at compile time, not just a pointer. */
         .free_list = 0,                                                        \
         .sizeof_type = sizeof(private_type_name),                              \
         .key_offset = offsetof(private_type_name, private_key_node_field),     \
-        .cmp = (private_key_cmp_fn),                                           \
+        .order = (private_key_order_fn),                                       \
         .alloc = (private_alloc_fn),                                           \
         .context = (private_context_data),                                     \
     }
@@ -193,7 +193,7 @@ is of a known fixed size defined at compile time, not just a pointer. */
         if (private_handle_ordered_map_mod_hndl_ptr)                           \
         {                                                                      \
             private_handle_ordered_map_mod_hndl                                \
-                = private_handle_ordered_map_mod_hndl_ptr->impl;               \
+                = private_handle_ordered_map_mod_hndl_ptr->private;            \
             if (private_handle_ordered_map_mod_hndl.stats                      \
                 & CCC_ENTRY_OCCUPIED)                                          \
             {                                                                  \
@@ -218,28 +218,28 @@ is of a known fixed size defined at compile time, not just a pointer. */
         CCC_Handle_index private_handle_ordered_map_or_ins_ret = 0;            \
         if (private_handle_ordered_map_or_ins_hndl_ptr)                        \
         {                                                                      \
-            if (private_handle_ordered_map_or_ins_hndl_ptr->impl.stats         \
+            if (private_handle_ordered_map_or_ins_hndl_ptr->private.stats      \
                 == CCC_ENTRY_OCCUPIED)                                         \
             {                                                                  \
                 private_handle_ordered_map_or_ins_ret                          \
-                    = private_handle_ordered_map_or_ins_hndl_ptr->impl.i;      \
+                    = private_handle_ordered_map_or_ins_hndl_ptr->private.i;   \
             }                                                                  \
             else                                                               \
             {                                                                  \
                 private_handle_ordered_map_or_ins_ret                          \
                     = CCC_private_handle_ordered_map_alloc_slot(               \
-                        private_handle_ordered_map_or_ins_hndl_ptr->impl       \
+                        private_handle_ordered_map_or_ins_hndl_ptr->private    \
                             .handle_ordered_map);                              \
                 if (private_handle_ordered_map_or_ins_ret)                     \
                 {                                                              \
                     *((typeof(lazy_key_value) *)                               \
                           CCC_private_handle_ordered_map_data_at(              \
-                              private_handle_ordered_map_or_ins_hndl_ptr->impl \
-                                  .handle_ordered_map,                         \
+                              private_handle_ordered_map_or_ins_hndl_ptr       \
+                                  ->private.handle_ordered_map,                \
                               private_handle_ordered_map_or_ins_ret))          \
                         = lazy_key_value;                                      \
                     CCC_private_handle_ordered_map_insert(                     \
-                        private_handle_ordered_map_or_ins_hndl_ptr->impl       \
+                        private_handle_ordered_map_or_ins_hndl_ptr->private    \
                             .handle_ordered_map,                               \
                         private_handle_ordered_map_or_ins_ret);                \
                 }                                                              \
@@ -257,38 +257,38 @@ is of a known fixed size defined at compile time, not just a pointer. */
         CCC_Handle_index private_handle_ordered_map_ins_hndl_ret = 0;          \
         if (private_handle_ordered_map_ins_hndl_ptr)                           \
         {                                                                      \
-            if (!(private_handle_ordered_map_ins_hndl_ptr->impl.stats          \
+            if (!(private_handle_ordered_map_ins_hndl_ptr->private.stats       \
                   & CCC_ENTRY_OCCUPIED))                                       \
             {                                                                  \
                 private_handle_ordered_map_ins_hndl_ret                        \
                     = CCC_private_handle_ordered_map_alloc_slot(               \
-                        private_handle_ordered_map_ins_hndl_ptr->impl          \
+                        private_handle_ordered_map_ins_hndl_ptr->private       \
                             .handle_ordered_map);                              \
                 if (private_handle_ordered_map_ins_hndl_ret)                   \
                 {                                                              \
                     *((typeof(lazy_key_value) *)                               \
                           CCC_private_handle_ordered_map_data_at(              \
-                              private_handle_ordered_map_ins_hndl_ptr->impl    \
+                              private_handle_ordered_map_ins_hndl_ptr->private \
                                   .handle_ordered_map,                         \
                               private_handle_ordered_map_ins_hndl_ret))        \
                         = lazy_key_value;                                      \
                     CCC_private_handle_ordered_map_insert(                     \
-                        private_handle_ordered_map_ins_hndl_ptr->impl          \
+                        private_handle_ordered_map_ins_hndl_ptr->private       \
                             .handle_ordered_map,                               \
                         private_handle_ordered_map_ins_hndl_ret);              \
                 }                                                              \
             }                                                                  \
-            else if (private_handle_ordered_map_ins_hndl_ptr->impl.stats       \
+            else if (private_handle_ordered_map_ins_hndl_ptr->private.stats    \
                      == CCC_ENTRY_OCCUPIED)                                    \
             {                                                                  \
                 *((typeof(lazy_key_value) *)                                   \
                       CCC_private_handle_ordered_map_data_at(                  \
-                          private_handle_ordered_map_ins_hndl_ptr->impl        \
+                          private_handle_ordered_map_ins_hndl_ptr->private     \
                               .handle_ordered_map,                             \
-                          private_handle_ordered_map_ins_hndl_ptr->impl.i))    \
+                          private_handle_ordered_map_ins_hndl_ptr->private.i)) \
                     = lazy_key_value;                                          \
                 private_handle_ordered_map_ins_hndl_ret                        \
-                    = private_handle_ordered_map_ins_hndl_ptr->impl.i;         \
+                    = private_handle_ordered_map_ins_hndl_ptr->private.i;      \
             }                                                                  \
         }                                                                      \
         private_handle_ordered_map_ins_hndl_ret;                               \

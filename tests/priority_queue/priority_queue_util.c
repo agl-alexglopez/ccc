@@ -9,22 +9,22 @@
 #include "types.h"
 
 CCC_Order
-val_cmp(CCC_Type_comparator_context const cmp)
+val_order(CCC_Type_comparator_context const order)
 {
-    struct val const *const lhs = cmp.any_type_lhs;
-    struct val const *const rhs = cmp.any_type_rhs;
+    struct Val const *const lhs = order.type_lhs;
+    struct Val const *const rhs = order.type_rhs;
     return (lhs->val > rhs->val) - (lhs->val < rhs->val);
 }
 
 void
 val_update(CCC_Type_context const u)
 {
-    struct val *const old = u.any_type;
+    struct Val *const old = u.type;
     old->val = *(int *)u.context;
 }
 
 CHECK_BEGIN_FN(insert_shuffled, CCC_Priority_queue *ppriority_queue,
-               struct val vals[], size_t const size, int const larger_prime)
+               struct Val vals[], size_t const size, int const larger_prime)
 {
     /* Math magic ahead so that we iterate over every index
        eventually but in a shuffled order. Not necessarily
@@ -51,11 +51,11 @@ CHECK_BEGIN_FN(inorder_fill, int vals[], size_t size,
     CHECK(count(ppriority_queue).count, size);
     size_t i = 0;
     CCC_Priority_queue copy = CCC_priority_queue_initialize(
-        struct val, elem, CCC_priority_queue_order(ppriority_queue), val_cmp,
+        struct Val, elem, CCC_priority_queue_order(ppriority_queue), val_order,
         NULL, NULL);
     while (!is_empty(ppriority_queue))
     {
-        struct val *const front = front(ppriority_queue);
+        struct Val *const front = front(ppriority_queue);
         (void)pop(ppriority_queue);
         CHECK(validate(ppriority_queue), true);
         CHECK(validate(&copy), true);
@@ -65,7 +65,7 @@ CHECK_BEGIN_FN(inorder_fill, int vals[], size_t size,
     i = 0;
     while (!is_empty(&copy))
     {
-        struct val *v = front(&copy);
+        struct Val *v = front(&copy);
         CHECK(v->val, vals[i++]);
         (void)pop(&copy);
         (void)push(ppriority_queue, &v->elem);

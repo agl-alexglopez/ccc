@@ -11,19 +11,19 @@
 
 CHECK_BEGIN_STATIC_FN(doubly_linked_list_test_push_three_front)
 {
-    doubly_linked_list doubly_linked_list = doubly_linked_list_initialize(
-        doubly_linked_list, struct val, e, val_cmp, NULL, NULL);
-    struct val v0 = {};
+    Doubly_linked_list doubly_linked_list = doubly_linked_list_initialize(
+        doubly_linked_list, struct Val, e, val_order, NULL, NULL);
+    struct Val v0 = {};
     CHECK(push_front(&doubly_linked_list, &v0.e) != NULL, true);
     CHECK(validate(&doubly_linked_list), true);
-    struct val v1 = {.id = 1, .val = 1};
+    struct Val v1 = {.id = 1, .val = 1};
     CHECK(push_front(&doubly_linked_list, &v1.e) != NULL, true);
     CHECK(validate(&doubly_linked_list), true);
-    struct val v2 = {.id = 2, .val = 2};
+    struct Val v2 = {.id = 2, .val = 2};
     CHECK(push_front(&doubly_linked_list, &v2.e) != NULL, true);
     CHECK(validate(&doubly_linked_list), true);
     CHECK(count(&doubly_linked_list).count, 3);
-    struct val *v = doubly_linked_list_front(&doubly_linked_list);
+    struct Val *v = doubly_linked_list_front(&doubly_linked_list);
     CHECK(v == NULL, false);
     CHECK(v->id, 2);
     v = doubly_linked_list_back(&doubly_linked_list);
@@ -34,19 +34,19 @@ CHECK_BEGIN_STATIC_FN(doubly_linked_list_test_push_three_front)
 
 CHECK_BEGIN_STATIC_FN(doubly_linked_list_test_push_three_back)
 {
-    doubly_linked_list doubly_linked_list = doubly_linked_list_initialize(
-        doubly_linked_list, struct val, e, val_cmp, NULL, NULL);
-    struct val v0 = {};
+    Doubly_linked_list doubly_linked_list = doubly_linked_list_initialize(
+        doubly_linked_list, struct Val, e, val_order, NULL, NULL);
+    struct Val v0 = {};
     CHECK(push_back(&doubly_linked_list, &v0.e) != NULL, true);
     CHECK(validate(&doubly_linked_list), true);
-    struct val v1 = {.id = 1, .val = 1};
+    struct Val v1 = {.id = 1, .val = 1};
     CHECK(push_back(&doubly_linked_list, &v1.e) != NULL, true);
     CHECK(validate(&doubly_linked_list), true);
-    struct val v2 = {.id = 2, .val = 2};
+    struct Val v2 = {.id = 2, .val = 2};
     CHECK(push_back(&doubly_linked_list, &v2.e) != NULL, true);
     CHECK(validate(&doubly_linked_list), true);
     CHECK(count(&doubly_linked_list).count, 3);
-    struct val *v = doubly_linked_list_front(&doubly_linked_list);
+    struct Val *v = doubly_linked_list_front(&doubly_linked_list);
     CHECK(v->id, 0);
     CHECK(v == NULL, false);
     v = doubly_linked_list_back(&doubly_linked_list);
@@ -57,10 +57,10 @@ CHECK_BEGIN_STATIC_FN(doubly_linked_list_test_push_three_back)
 
 CHECK_BEGIN_STATIC_FN(doubly_linked_list_test_push_and_splice)
 {
-    doubly_linked_list doubly_linked_list = doubly_linked_list_initialize(
-        doubly_linked_list, struct val, e, val_cmp, NULL, NULL);
-    struct val vals[4] = {{.val = 0}, {.val = 1}, {.val = 2}, {.val = 3}};
-    enum check_result const t
+    Doubly_linked_list doubly_linked_list = doubly_linked_list_initialize(
+        doubly_linked_list, struct Val, e, val_order, NULL, NULL);
+    struct Val vals[4] = {{.val = 0}, {.val = 1}, {.val = 2}, {.val = 3}};
+    enum Check_result const t
         = create_list(&doubly_linked_list, UTIL_PUSH_BACK, 4, vals);
     CHECK(t, PASS);
     CHECK(splice(&doubly_linked_list,
@@ -79,10 +79,10 @@ CHECK_BEGIN_STATIC_FN(doubly_linked_list_test_push_and_splice)
 
 CHECK_BEGIN_STATIC_FN(doubly_linked_list_test_push_and_splice_range)
 {
-    doubly_linked_list doubly_linked_list = doubly_linked_list_initialize(
-        doubly_linked_list, struct val, e, val_cmp, NULL, NULL);
-    struct val vals[4] = {{.val = 0}, {.val = 1}, {.val = 2}, {.val = 3}};
-    enum check_result const t
+    Doubly_linked_list doubly_linked_list = doubly_linked_list_initialize(
+        doubly_linked_list, struct Val, e, val_order, NULL, NULL);
+    struct Val vals[4] = {{.val = 0}, {.val = 1}, {.val = 2}, {.val = 3}};
+    enum Check_result const t
         = create_list(&doubly_linked_list, UTIL_PUSH_BACK, 4, vals);
     CHECK(t, PASS);
     CHECK(splice_range(&doubly_linked_list,
@@ -109,10 +109,10 @@ CHECK_BEGIN_STATIC_FN(doubly_linked_list_test_push_and_splice_range)
 
 CHECK_BEGIN_STATIC_FN(doubly_linked_list_test_push_and_splice_no_ops)
 {
-    doubly_linked_list doubly_linked_list = doubly_linked_list_initialize(
-        doubly_linked_list, struct val, e, val_cmp, NULL, NULL);
-    struct val vals[4] = {{.val = 0}, {.val = 1}, {.val = 2}, {.val = 3}};
-    enum check_result const t
+    Doubly_linked_list doubly_linked_list = doubly_linked_list_initialize(
+        doubly_linked_list, struct Val, e, val_order, NULL, NULL);
+    struct Val vals[4] = {{.val = 0}, {.val = 1}, {.val = 2}, {.val = 3}};
+    enum Check_result const t
         = create_list(&doubly_linked_list, UTIL_PUSH_BACK, 4, vals);
     CHECK(t, PASS);
     CHECK(splice_range(&doubly_linked_list, &vals[0].e, &doubly_linked_list,
@@ -131,11 +131,11 @@ CHECK_BEGIN_STATIC_FN(doubly_linked_list_test_push_and_splice_no_ops)
 
 CHECK_BEGIN_STATIC_FN(doubly_linked_list_test_sort_even)
 {
-    doubly_linked_list doubly_linked_list = doubly_linked_list_initialize(
-        doubly_linked_list, struct val, e, val_cmp, NULL, NULL);
-    struct val vals[8] = {{.val = 9},  {.val = 4},   {.val = 1}, {.val = 1},
+    Doubly_linked_list doubly_linked_list = doubly_linked_list_initialize(
+        doubly_linked_list, struct Val, e, val_order, NULL, NULL);
+    struct Val vals[8] = {{.val = 9},  {.val = 4},   {.val = 1}, {.val = 1},
                           {.val = 99}, {.val = -55}, {.val = 5}, {.val = 2}};
-    enum check_result const t
+    enum Check_result const t
         = create_list(&doubly_linked_list, UTIL_PUSH_BACK, 8, vals);
     CHECK(t, PASS);
     CHECK(validate(&doubly_linked_list), true);
@@ -155,12 +155,12 @@ CHECK_BEGIN_STATIC_FN(doubly_linked_list_test_sort_even)
 
 CHECK_BEGIN_STATIC_FN(doubly_linked_list_test_sort_odd)
 {
-    doubly_linked_list doubly_linked_list = doubly_linked_list_initialize(
-        doubly_linked_list, struct val, e, val_cmp, NULL, NULL);
-    struct val vals[9]
+    Doubly_linked_list doubly_linked_list = doubly_linked_list_initialize(
+        doubly_linked_list, struct Val, e, val_order, NULL, NULL);
+    struct Val vals[9]
         = {{.val = 9},   {.val = 4}, {.val = 1}, {.val = 1},  {.val = 99},
            {.val = -55}, {.val = 5}, {.val = 2}, {.val = -99}};
-    enum check_result const t
+    enum Check_result const t
         = create_list(&doubly_linked_list, UTIL_PUSH_BACK, 9, vals);
     CHECK(t, PASS);
     CHECK(validate(&doubly_linked_list), true);
@@ -180,11 +180,11 @@ CHECK_BEGIN_STATIC_FN(doubly_linked_list_test_sort_odd)
 
 CHECK_BEGIN_STATIC_FN(doubly_linked_list_test_sort_reverse)
 {
-    doubly_linked_list doubly_linked_list = doubly_linked_list_initialize(
-        doubly_linked_list, struct val, e, val_cmp, NULL, NULL);
-    struct val vals[8] = {{.val = 9}, {.val = 8}, {.val = 7}, {.val = 6},
+    Doubly_linked_list doubly_linked_list = doubly_linked_list_initialize(
+        doubly_linked_list, struct Val, e, val_order, NULL, NULL);
+    struct Val vals[8] = {{.val = 9}, {.val = 8}, {.val = 7}, {.val = 6},
                           {.val = 5}, {.val = 4}, {.val = 3}, {.val = 2}};
-    enum check_result const t
+    enum Check_result const t
         = create_list(&doubly_linked_list, UTIL_PUSH_BACK, 8, vals);
     CHECK(t, PASS);
     CHECK(validate(&doubly_linked_list), true);
@@ -202,13 +202,13 @@ CHECK_BEGIN_STATIC_FN(doubly_linked_list_test_sort_reverse)
 
 CHECK_BEGIN_STATIC_FN(doubly_linked_list_test_sort_runs)
 {
-    doubly_linked_list doubly_linked_list = doubly_linked_list_initialize(
-        doubly_linked_list, struct val, e, val_cmp, NULL, NULL);
-    struct val vals[12]
+    Doubly_linked_list doubly_linked_list = doubly_linked_list_initialize(
+        doubly_linked_list, struct Val, e, val_order, NULL, NULL);
+    struct Val vals[12]
         = {{.val = 99},  {.val = 101}, {.val = 103}, {.val = 4},
            {.val = 8},   {.val = 9},   {.val = -99}, {.val = -55},
            {.val = -55}, {.val = 3},   {.val = 7},   {.val = 10}};
-    enum check_result t
+    enum Check_result t
         = create_list(&doubly_linked_list, UTIL_PUSH_BACK, 12, vals);
     CHECK(t, PASS);
     CHECK(validate(&doubly_linked_list), true);
@@ -228,12 +228,12 @@ CHECK_BEGIN_STATIC_FN(doubly_linked_list_test_sort_runs)
 
 CHECK_BEGIN_STATIC_FN(doubly_linked_list_test_sort_halves)
 {
-    doubly_linked_list doubly_linked_list = doubly_linked_list_initialize(
-        doubly_linked_list, struct val, e, val_cmp, NULL, NULL);
-    struct val vals[12] = {{.val = 7},  {.val = 10}, {.val = 13}, {.val = 17},
+    Doubly_linked_list doubly_linked_list = doubly_linked_list_initialize(
+        doubly_linked_list, struct Val, e, val_order, NULL, NULL);
+    struct Val vals[12] = {{.val = 7},  {.val = 10}, {.val = 13}, {.val = 17},
                            {.val = 19}, {.val = 21}, {.val = 8},  {.val = 12},
                            {.val = 15}, {.val = 18}, {.val = 20}, {.val = 25}};
-    enum check_result t
+    enum Check_result t
         = create_list(&doubly_linked_list, UTIL_PUSH_FRONT, 12, vals);
     CHECK(t, PASS);
     CHECK(validate(&doubly_linked_list), true);
@@ -253,20 +253,20 @@ CHECK_BEGIN_STATIC_FN(doubly_linked_list_test_sort_halves)
 
 CHECK_BEGIN_STATIC_FN(doubly_linked_list_test_sort_insert)
 {
-    doubly_linked_list doubly_linked_list = doubly_linked_list_initialize(
-        doubly_linked_list, struct val, e, val_cmp, NULL, NULL);
-    struct val *inserted = doubly_linked_list_insert_sorted(
-        &doubly_linked_list, &(struct val){.val = -99999}.e);
+    Doubly_linked_list doubly_linked_list = doubly_linked_list_initialize(
+        doubly_linked_list, struct Val, e, val_order, NULL, NULL);
+    struct Val *inserted = doubly_linked_list_insert_sorted(
+        &doubly_linked_list, &(struct Val){.val = -99999}.e);
     CHECK(inserted->val, -99999);
     CHECK(validate(&doubly_linked_list), true);
     (void)CCC_doubly_linked_list_pop_front(&doubly_linked_list);
     CHECK(validate(&doubly_linked_list), true);
-    struct val vals[9] = {
+    struct Val vals[9] = {
         [0] = {.val = 9}, [1] = {.val = 4},  [2] = {.val = 1},
         [3] = {.val = 1}, [4] = {.val = 99}, [5] = {.val = -55},
         [6] = {.val = 5}, [7] = {.val = 2},  [8] = {.val = -99},
     };
-    enum check_result const t
+    enum Check_result const t
         = create_list(&doubly_linked_list, UTIL_PUSH_BACK, 9, vals);
     CHECK(t, PASS);
     CHECK(validate(&doubly_linked_list), true);
@@ -281,7 +281,7 @@ CHECK_BEGIN_STATIC_FN(doubly_linked_list_test_sort_insert)
     CHECK(check_order(&doubly_linked_list, 9,
                       (int[9]){-99, -55, 1, 1, 2, 4, 5, 9, 99}),
           PASS);
-    struct val to_insert[5] = {
+    struct Val to_insert[5] = {
         [0] = {.val = -101}, [1] = {.val = -65}, [2] = {.val = 3},
         [3] = {.val = 20},   [4] = {.val = 101},
     };

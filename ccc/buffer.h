@@ -141,7 +141,7 @@ Initialize a dynamic Buffer with a compound literal array.
 int
 main(void)
 {
-    Buffer b = buffer_from(std_alloc, NULL, 0,
+    Buffer b = buffer_from(std_allocate, NULL, 0,
         (int[]){ 0, 1, 2, 3 }
     );
     return 0;
@@ -155,7 +155,7 @@ Initialize a dynamic Buffer with a compound literal array with capacity.
 int
 main(void)
 {
-    Buffer b = buffer_from(std_alloc, NULL, 4096,
+    Buffer b = buffer_from(std_allocate, NULL, 4096,
         (int[]){ 0, 1, 2, 3 }
     );
     return 0;
@@ -185,7 +185,7 @@ Initialize a dynamic buffer.
 int
 main(void)
 {
-    Buffer b = buffer_from(std_alloc, NULL, 4096);
+    Buffer b = buffer_from(std_allocate, NULL, 4096);
     return 0;
 }
 ```
@@ -248,10 +248,10 @@ is memory management handed over to the copy function.
 
 ```
 #define BUFFER_USING_NAMESPACE_CCC
-Buffer src = buffer_initialize(NULL, int, std_alloc, NULL, 0);
+Buffer src = buffer_initialize(NULL, int, std_allocate, NULL, 0);
 (void)CCC_buffer_push_back_range(&src, 5, (int[5]){0,1,2,3,4});
-Buffer dst = buffer_initialize(NULL, int, std_alloc, NULL, 0);
-CCC_Result res = buffer_copy(&dst, &src, std_alloc);
+Buffer dst = buffer_initialize(NULL, int, std_allocate, NULL, 0);
+CCC_Result res = buffer_copy(&dst, &src, std_allocate);
 ```
 
 The above allows dst to have a capacity less than that of the src as long as
@@ -261,10 +261,10 @@ size buf (ring buffer).
 
 ```
 #define BUFFER_USING_NAMESPACE_CCC
-Buffer src = buffer_initialize(NULL, int, std_alloc, NULL, 0);
+Buffer src = buffer_initialize(NULL, int, std_allocate, NULL, 0);
 (void)CCC_buffer_push_back_range(&src, 5, (int[5]){0,1,2,3,4});
 Buffer dst = buffer_initialize(NULL, int, NULL, NULL, 0);
-CCC_Result res = buffer_copy(&dst, &src, std_alloc);
+CCC_Result res = buffer_copy(&dst, &src, std_allocate);
 ```
 
 Because an allocation function is provided, the dst is resized once for the copy

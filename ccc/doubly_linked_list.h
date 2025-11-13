@@ -84,7 +84,7 @@ for comparison, printing, or destructors.
 element.
 @param [in] list_node_field name of the Doubly_linked_list element in the
 containing type.
-@param [in] cmp_fn the CCC_Type_comparator used to compare list
+@param [in] order_fn the CCC_Type_comparator used to compare list
 elements.
 @param [in] context_data any contextilliary data that will be needed for
 comparison, printing, or destruction of elements.
@@ -93,9 +93,9 @@ comparison, printing, or destruction of elements.
 side of an equality operator. Initialization can occur at runtime or compile
 time (e.g. CCC_doubly_linked l = CCC_doubly_linked_list_initialize(...);). */
 #define CCC_doubly_linked_list_initialize(                                     \
-    list_name, struct_name, list_node_field, cmp_fn, alloc_fn, context_data)   \
+    list_name, struct_name, list_node_field, order_fn, alloc_fn, context_data) \
     CCC_private_doubly_linked_list_initialize(list_name, struct_name,          \
-                                              list_node_field, cmp_fn,         \
+                                              list_node_field, order_fn,       \
                                               alloc_fn, context_data)
 
 /**@}*/
@@ -489,12 +489,12 @@ typedef CCC_Doubly_linked_list Doubly_linked_list;
 #    define doubly_linked_list_rnext(args...) CCC_doubly_linked_list_rnext(args)
 #    define doubly_linked_list_end(args...) CCC_doubly_linked_list_end(args)
 #    define doubly_linked_list_node_end(args...)                               \
-        CCC_Doubly_linked_list_node_end(args)
+        CCC_doubly_linked_list_node_end(args)
 #    define doubly_linked_list_rend(args...) CCC_doubly_linked_list_rend(args)
 #    define doubly_linked_list_node_begin(args...)                             \
-        CCC_Doubly_linked_list_node_begin(args)
+        CCC_doubly_linked_list_node_begin(args)
 #    define doubly_linked_list_node_end(args...)                               \
-        CCC_Doubly_linked_list_node_end(args)
+        CCC_doubly_linked_list_node_end(args)
 #    define doubly_linked_list_sentinel_end(args...)                           \
         CCC_doubly_linked_list_sentinel_end(args)
 #    define doubly_linked_list_count(args...) CCC_doubly_linked_list_count(args)

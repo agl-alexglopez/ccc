@@ -40,7 +40,7 @@ CHECK_BEGIN_STATIC_FN(buffer_test_push_pop_fixed)
 
 CHECK_BEGIN_STATIC_FN(buffer_test_push_resize_pop)
 {
-    Buffer b = buffer_initialize(NULL, int, std_alloc, NULL, 0);
+    Buffer b = buffer_initialize(NULL, int, std_allocate, NULL, 0);
     size_t const cap = 32;
     int *const many = malloc(sizeof(int) * cap);
     iota(many, cap, 0);
@@ -110,11 +110,11 @@ CHECK_BEGIN_STATIC_FN(buffer_test_daily_temperatures)
 }
 
 static CCC_Order
-cmp_car_idx(CCC_Type_comparator_context const cmp)
+order_car_idx(CCC_Type_comparator_context const order)
 {
-    Buffer const *const positions = cmp.context;
-    int const *const lhs_pos = buffer_at(positions, *(int *)cmp.any_type_lhs);
-    int const *const rhs_pos = buffer_at(positions, *(int *)cmp.any_type_rhs);
+    Buffer const *const positions = order.context;
+    int const *const lhs_pos = buffer_at(positions, *(int *)order.type_lhs);
+    int const *const rhs_pos = buffer_at(positions, *(int *)order.type_rhs);
     /* Reversed sort. We want descending not ascending order. We ask how many
        car fleets there will be by starting at the cars furthest away that may
        catch up to those ahead. */
@@ -135,7 +135,7 @@ CHECK_BEGIN_STATIC_FN(buffer_test_car_fleet)
     Buffer car_idx = buffer_initialize((int[CARCAP]){}, int, NULL, &positions,
                                        CARCAP, CARCAP);
     iota(buffer_begin(&car_idx), CARCAP, 0);
-    sort(&car_idx, cmp_car_idx, &(int){0});
+    sort(&car_idx, order_car_idx, &(int){0});
     int target = 12;
     int fleets = 1;
     double slowest_time_to_target
@@ -203,19 +203,19 @@ CHECK_BEGIN_STATIC_FN(buffer_test_erase)
     CHECK(buffer_count(&b).count, BECAP);
     CCC_Result r = buffer_erase(&b, 4);
     CHECK(r, CCC_RESULT_OK);
-    CCC_Order cmp
-        = bufcmp(&b, BECAP - 1, (int[BECAP - 1]){0, 1, 2, 3, 5, 6, 7});
-    CHECK(cmp, CCC_ORDER_EQUAL);
+    CCC_Order order
+        = buforder(&b, BECAP - 1, (int[BECAP - 1]){0, 1, 2, 3, 5, 6, 7});
+    CHECK(order, CCC_ORDER_EQUAL);
     CHECK(buffer_count(&b).count, BECAP - 1);
     r = buffer_erase(&b, 0);
     CHECK(r, CCC_RESULT_OK);
-    cmp = bufcmp(&b, BECAP - 2, (int[BECAP - 2]){1, 2, 3, 5, 6, 7});
-    CHECK(cmp, CCC_ORDER_EQUAL);
+    order = buforder(&b, BECAP - 2, (int[BECAP - 2]){1, 2, 3, 5, 6, 7});
+    CHECK(order, CCC_ORDER_EQUAL);
     CHECK(buffer_count(&b).count, BECAP - 2);
     r = buffer_erase(&b, BECAP - 3);
     CHECK(r, CCC_RESULT_OK);
-    cmp = bufcmp(&b, BECAP - 3, (int[BECAP - 3]){1, 2, 3, 5, 6});
-    CHECK(cmp, CCC_ORDER_EQUAL);
+    order = buforder(&b, BECAP - 3, (int[BECAP - 3]){1, 2, 3, 5, 6});
+    CHECK(order, CCC_ORDER_EQUAL);
     CHECK(buffer_count(&b).count, BECAP - 3);
     CHECK_END_FN();
 }

@@ -11,10 +11,10 @@
 #include "types.h"
 
 CCC_Order
-val_cmp(CCC_Type_comparator_context const c)
+val_order(CCC_Type_comparator_context const c)
 {
-    struct val const *const a = c.any_type_lhs;
-    struct val const *const b = c.any_type_rhs;
+    struct Val const *const a = c.type_lhs;
+    struct Val const *const b = c.type_rhs;
     return (a->val > b->val) - (a->val < b->val);
 }
 
@@ -22,7 +22,7 @@ CHECK_BEGIN_FN(check_order, Singly_linked_list const *const singly_linked_list,
                size_t const n, int const order[])
 {
     size_t i = 0;
-    struct val const *v = begin(singly_linked_list);
+    struct Val const *v = begin(singly_linked_list);
     for (; v != end(singly_linked_list) && i < n;
          v = next(singly_linked_list, &v->e), ++i)
     {
@@ -65,7 +65,7 @@ CHECK_BEGIN_FN(check_order, Singly_linked_list const *const singly_linked_list,
 }
 
 CHECK_BEGIN_FN(create_list, CCC_Singly_linked_list *const singly_linked_list,
-               size_t const n, struct val vals[])
+               size_t const n, struct Val vals[])
 {
     for (size_t i = 0; i < n; ++i)
     {

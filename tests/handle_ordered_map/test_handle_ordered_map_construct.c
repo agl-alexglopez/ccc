@@ -14,8 +14,8 @@
 CHECK_BEGIN_STATIC_FN(handle_ordered_map_test_empty)
 {
     Handle_ordered_map s
-        = handle_ordered_map_initialize(&(small_fixed_map){}, struct val, id,
-                                        id_cmp, NULL, NULL, SMALL_FIXED_CAP);
+        = handle_ordered_map_initialize(&(small_fixed_map){}, struct Val, id,
+                                        id_order, NULL, NULL, SMALL_FIXED_CAP);
     CHECK(is_empty(&s), true);
     CHECK_END_FN();
 }
@@ -23,14 +23,14 @@ CHECK_BEGIN_STATIC_FN(handle_ordered_map_test_empty)
 CHECK_BEGIN_STATIC_FN(handle_ordered_map_test_copy_no_alloc)
 {
     Handle_ordered_map src
-        = handle_ordered_map_initialize(&(small_fixed_map){}, struct val, id,
-                                        id_cmp, NULL, NULL, SMALL_FIXED_CAP);
+        = handle_ordered_map_initialize(&(small_fixed_map){}, struct Val, id,
+                                        id_order, NULL, NULL, SMALL_FIXED_CAP);
     Handle_ordered_map dst
-        = handle_ordered_map_initialize(&(small_fixed_map){}, struct val, id,
-                                        id_cmp, NULL, NULL, SMALL_FIXED_CAP);
-    (void)swap_handle(&src, &(struct val){.id = 0});
-    (void)swap_handle(&src, &(struct val){.id = 1, .val = 1});
-    (void)swap_handle(&src, &(struct val){.id = 2, .val = 2});
+        = handle_ordered_map_initialize(&(small_fixed_map){}, struct Val, id,
+                                        id_order, NULL, NULL, SMALL_FIXED_CAP);
+    (void)swap_handle(&src, &(struct Val){.id = 0});
+    (void)swap_handle(&src, &(struct Val){.id = 1, .val = 1});
+    (void)swap_handle(&src, &(struct Val){.id = 2, .val = 2});
     CHECK(count(&src).count, 3);
     CHECK(is_empty(&dst), true);
     CCC_Result res = handle_ordered_map_copy(&dst, &src, NULL);
@@ -38,8 +38,8 @@ CHECK_BEGIN_STATIC_FN(handle_ordered_map_test_copy_no_alloc)
     CHECK(count(&dst).count, count(&src).count);
     for (int i = 0; i < 3; ++i)
     {
-        struct val src_v = {.id = i};
-        struct val dst_v = {.id = i};
+        struct Val src_v = {.id = i};
+        struct Val dst_v = {.id = i};
         CCC_Handle src_e = CCC_remove(&src, &src_v);
         CCC_Handle dst_e = CCC_remove(&dst, &dst_v);
         CHECK(occupied(&src_e), occupied(&dst_e));
@@ -53,15 +53,15 @@ CHECK_BEGIN_STATIC_FN(handle_ordered_map_test_copy_no_alloc)
 
 CHECK_BEGIN_STATIC_FN(handle_ordered_map_test_copy_no_alloc_fail)
 {
-    Handle_ordered_map src
-        = handle_ordered_map_initialize(&(standard_fixed_map){}, struct val, id,
-                                        id_cmp, NULL, NULL, STANDARD_FIXED_CAP);
+    Handle_ordered_map src = handle_ordered_map_initialize(
+        &(standard_fixed_map){}, struct Val, id, id_order, NULL, NULL,
+        STANDARD_FIXED_CAP);
     Handle_ordered_map dst
-        = handle_ordered_map_initialize(&(small_fixed_map){}, struct val, id,
-                                        id_cmp, NULL, NULL, SMALL_FIXED_CAP);
-    (void)swap_handle(&src, &(struct val){.id = 0});
-    (void)swap_handle(&src, &(struct val){.id = 1, .val = 1});
-    (void)swap_handle(&src, &(struct val){.id = 2, .val = 2});
+        = handle_ordered_map_initialize(&(small_fixed_map){}, struct Val, id,
+                                        id_order, NULL, NULL, SMALL_FIXED_CAP);
+    (void)swap_handle(&src, &(struct Val){.id = 0});
+    (void)swap_handle(&src, &(struct Val){.id = 1, .val = 1});
+    (void)swap_handle(&src, &(struct Val){.id = 2, .val = 2});
     CHECK(count(&src).count, 3);
     CHECK(is_empty(&dst), true);
     CCC_Result res = handle_ordered_map_copy(&dst, &src, NULL);
@@ -72,21 +72,21 @@ CHECK_BEGIN_STATIC_FN(handle_ordered_map_test_copy_no_alloc_fail)
 CHECK_BEGIN_STATIC_FN(handle_ordered_map_test_copy_alloc)
 {
     Handle_ordered_map src = handle_ordered_map_initialize(
-        NULL, struct val, id, id_cmp, std_alloc, NULL, 0);
+        NULL, struct Val, id, id_order, std_allocate, NULL, 0);
     Handle_ordered_map dst = handle_ordered_map_initialize(
-        NULL, struct val, id, id_cmp, std_alloc, NULL, 0);
-    (void)swap_handle(&src, &(struct val){.id = 0});
-    (void)swap_handle(&src, &(struct val){.id = 1, .val = 1});
-    (void)swap_handle(&src, &(struct val){.id = 2, .val = 2});
+        NULL, struct Val, id, id_order, std_allocate, NULL, 0);
+    (void)swap_handle(&src, &(struct Val){.id = 0});
+    (void)swap_handle(&src, &(struct Val){.id = 1, .val = 1});
+    (void)swap_handle(&src, &(struct Val){.id = 2, .val = 2});
     CHECK(count(&src).count, 3);
     CHECK(is_empty(&dst), true);
-    CCC_Result res = handle_ordered_map_copy(&dst, &src, std_alloc);
+    CCC_Result res = handle_ordered_map_copy(&dst, &src, std_allocate);
     CHECK(res, CCC_RESULT_OK);
     CHECK(count(&dst).count, count(&src).count);
     for (int i = 0; i < 3; ++i)
     {
-        struct val src_v = {.id = i};
-        struct val dst_v = {.id = i};
+        struct Val src_v = {.id = i};
+        struct Val dst_v = {.id = i};
         CCC_Handle src_e = CCC_remove(&src, &src_v);
         CCC_Handle dst_e = CCC_remove(&dst, &dst_v);
         CHECK(occupied(&src_e), occupied(&dst_e));
@@ -104,12 +104,12 @@ CHECK_BEGIN_STATIC_FN(handle_ordered_map_test_copy_alloc)
 CHECK_BEGIN_STATIC_FN(handle_ordered_map_test_copy_alloc_fail)
 {
     Handle_ordered_map src = handle_ordered_map_initialize(
-        NULL, struct val, id, id_cmp, std_alloc, NULL, 0);
+        NULL, struct Val, id, id_order, std_allocate, NULL, 0);
     Handle_ordered_map dst = handle_ordered_map_initialize(
-        NULL, struct val, id, id_cmp, std_alloc, NULL, 0);
-    (void)swap_handle(&src, &(struct val){.id = 0});
-    (void)swap_handle(&src, &(struct val){.id = 1, .val = 1});
-    (void)swap_handle(&src, &(struct val){.id = 2, .val = 2});
+        NULL, struct Val, id, id_order, std_allocate, NULL, 0);
+    (void)swap_handle(&src, &(struct Val){.id = 0});
+    (void)swap_handle(&src, &(struct Val){.id = 1, .val = 1});
+    (void)swap_handle(&src, &(struct Val){.id = 2, .val = 2});
     CHECK(count(&src).count, 3);
     CHECK(is_empty(&dst), true);
     CCC_Result res = handle_ordered_map_copy(&dst, &src, NULL);

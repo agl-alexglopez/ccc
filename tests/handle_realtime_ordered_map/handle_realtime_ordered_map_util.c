@@ -9,10 +9,10 @@
 #include "types.h"
 
 CCC_Order
-id_cmp(CCC_Key_comparator_context const cmp)
+id_order(CCC_Key_comparator_context const order)
 {
-    struct val const *const c = cmp.any_type_rhs;
-    int const key = *((int *)cmp.any_key_lhs);
+    struct Val const *const c = order.type_rhs;
+    int const key = *((int *)order.key_lhs);
     return (key > c->id) - (key < c->id);
 }
 
@@ -23,7 +23,7 @@ CHECK_BEGIN_FN(insert_shuffled, CCC_Handle_realtime_ordered_map *m,
     for (size_t i = 0; i < size; ++i)
     {
         (void)insert_or_assign(
-            m, &(struct val){.id = (int)shuffled_index, .val = (int)i});
+            m, &(struct Val){.id = (int)shuffled_index, .val = (int)i});
         CHECK(validate(m), true);
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
@@ -41,7 +41,7 @@ inorder_fill(int vals[], size_t size,
         return 0;
     }
     size_t i = 0;
-    for (struct val *e = begin(m); e != end(m); e = next(m, e))
+    for (struct Val *e = begin(m); e != end(m); e = next(m, e))
     {
         vals[i++] = e->id;
     }

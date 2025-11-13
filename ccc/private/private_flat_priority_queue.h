@@ -40,7 +40,7 @@ struct CCC_Flat_priority_queue
      * of the flat_priority_queue. */
     CCC_Order order;
     /** @private The user defined three way comparison function. */
-    CCC_Type_comparator *cmp;
+    CCC_Type_comparator *compare;
 };
 
 /*========================    Private Interface     =========================*/
@@ -61,27 +61,29 @@ CCC_private_flat_priority_queue_update_fixup(struct CCC_Flat_priority_queue *,
 
 /** @private */
 #define CCC_private_flat_priority_queue_initialize(                            \
-    private_mem_ptr, private_any_type_name, private_cmp_order, private_cmp_fn, \
-    private_alloc_fn, private_context_data, private_capacity)                  \
+    private_mem_ptr, private_any_type_name, private_order_order,               \
+    private_order_fn, private_alloc_fn, private_context_data,                  \
+    private_capacity)                                                          \
     {                                                                          \
         .buf = CCC_buffer_initialize(private_mem_ptr, private_any_type_name,   \
                                      private_alloc_fn, private_context_data,   \
                                      private_capacity),                        \
-        .cmp = (private_cmp_fn),                                               \
-        .order = (private_cmp_order),                                          \
+        .order = (private_order_order),                                        \
+        .compare = (private_order_fn),                                         \
     }
 
 /** @private */
 #define CCC_private_flat_priority_queue_heapify_initialize(                    \
-    private_mem_ptr, private_any_type_name, private_cmp_order, private_cmp_fn, \
-    private_alloc_fn, private_context_data, private_capacity, private_size)    \
+    private_mem_ptr, private_any_type_name, private_order_order,               \
+    private_order_fn, private_alloc_fn, private_context_data,                  \
+    private_capacity, private_size)                                            \
     (__extension__({                                                           \
         __auto_type private_flat_priority_queue_heapify_mem                    \
             = (private_mem_ptr);                                               \
         struct CCC_Flat_priority_queue private_flat_priority_queue_heapify_res \
             = CCC_private_flat_priority_queue_initialize(                      \
                 private_flat_priority_queue_heapify_mem,                       \
-                private_any_type_name, private_cmp_order, private_cmp_fn,      \
+                private_any_type_name, private_order_order, private_order_fn,  \
                 private_alloc_fn, private_context_data, private_capacity);     \
         CCC_private_flat_priority_queue_in_place_heapify(                      \
             &private_flat_priority_queue_heapify_res, (private_size),          \

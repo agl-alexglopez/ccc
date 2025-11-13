@@ -19,43 +19,43 @@ The leetcode lru problem in C. */
 
 #define REQS 11
 
-struct lru_cache
+struct Lru_cache
 {
     CCC_Flat_hash_map fh;
-    CCC_Doubly_linked_listl;
+    CCC_Doubly_linked_list l;
     size_t cap;
 };
 
-struct key_val
+struct Key_val
 {
     int key;
     int val;
-    doubly_linked_list_node list_node;
+    Doubly_linked_list_node list_node;
 };
 
-struct lru_lookup
+struct Lru_lookup
 {
     int key;
-    struct key_val *kv_in_list;
+    struct Key_val *kv_in_list;
 };
 
-enum lru_call
+enum Lru_call
 {
     PUT,
     GET,
     HED,
 };
 
-struct lru_request
+struct Lru_request
 {
-    enum lru_call call;
+    enum Lru_call call;
     int key;
     int val;
     union
     {
-        enum check_result (*putter)(struct lru_cache *, int, int);
-        enum check_result (*getter)(struct lru_cache *, int, int *);
-        struct key_val *(*header)(struct lru_cache *);
+        enum Check_result (*putter)(struct Lru_cache *, int, int);
+        enum Check_result (*getter)(struct Lru_cache *, int, int *);
+        struct Key_val *(*header)(struct Lru_cache *);
     };
 };
 
@@ -72,23 +72,23 @@ static bool const quiet = true;
     while (0)
 
 static CCC_Order
-lru_lookup_cmp(CCC_Key_comparator_context const cmp)
+lru_lookup_order(CCC_Key_comparator_context const order)
 {
-    struct lru_lookup const *const rhs = cmp.any_type_rhs;
-    int const lhs = *((int *)cmp.any_key_lhs);
+    struct Lru_lookup const *const rhs = order.type_rhs;
+    int const lhs = *((int *)order.key_lhs);
     return (lhs > rhs->key) - (lhs < rhs->key);
 }
 
 static CCC_Order
-cmp_by_key(CCC_Type_comparator_context const cmp)
+order_by_key(CCC_Type_comparator_context const order)
 {
-    struct key_val const *const kv_a = cmp.any_type_lhs;
-    struct key_val const *const kv_b = cmp.any_type_rhs;
+    struct Key_val const *const kv_a = order.type_lhs;
+    struct Key_val const *const kv_b = order.type_rhs;
     return (kv_a->key > kv_b->key) - (kv_a->key < kv_b->key);
 }
 
-static struct key_val *
-lru_head(struct lru_cache *const lru)
+static struct Key_val *
+lru_head(struct Lru_cache *const lru)
 {
     return doubly_linked_list_front(&lru->l);
 }
@@ -102,22 +102,22 @@ static_assert(CAP * 1UL < SMALL_FIXED_CAP * 1UL);
 
 /* This is a good opportunity to test the static initialization capabilities
    of the hash table and list. */
-static struct lru_cache lru_cache = {
+static struct Lru_cache lru_cache = {
     .cap = CAP,
-    .l = doubly_linked_list_initialize(lru_cache.l, struct key_val, list_node,
-                                       cmp_by_key, std_alloc, NULL),
-    .fh = flat_hash_map_initialize(&(small_fixed_map){}, struct val, key,
-                                   flat_hash_map_int_to_u64, lru_lookup_cmp,
+    .l = doubly_linked_list_initialize(lru_cache.l, struct Key_val, list_node,
+                                       order_by_key, std_allocate, NULL),
+    .fh = flat_hash_map_initialize(&(small_fixed_map){}, struct Val, key,
+                                   flat_hash_map_int_to_u64, lru_lookup_order,
                                    NULL, NULL, SMALL_FIXED_CAP),
 };
 
-CHECK_BEGIN_STATIC_FN(lru_put, struct lru_cache *const lru, int const key,
+CHECK_BEGIN_STATIC_FN(lru_put, struct Lru_cache *const lru, int const key,
                       int const val)
 {
     CCC_Flat_hash_map_entry *const ent = entry_r(&lru->fh, &key);
     if (occupied(ent))
     {
-        struct lru_lookup const *const found = unwrap(ent);
+        struct Lru_lookup const *const found = unwrap(ent);
         found->kv_in_list->key = key;
         found->kv_in_list->val = val;
         CCC_Result r = doubly_linked_list_splice(
@@ -127,15 +127,15 @@ CHECK_BEGIN_STATIC_FN(lru_put, struct lru_cache *const lru, int const key,
     }
     else
     {
-        struct lru_lookup *const new
-            = insert_entry(ent, &(struct lru_lookup){.key = key});
+        struct Lru_lookup *const new
+            = insert_entry(ent, &(struct Lru_lookup){.key = key});
         CHECK(new == NULL, false);
         new->kv_in_list = doubly_linked_list_emplace_front(
-            &lru->l, (struct key_val){.key = key, .val = val});
+            &lru->l, (struct Key_val){.key = key, .val = val});
         CHECK(new->kv_in_list == NULL, false);
         if (count(&lru->l).count > lru->cap)
         {
-            struct key_val const *const to_drop = back(&lru->l);
+            struct Key_val const *const to_drop = back(&lru->l);
             CHECK(to_drop == NULL, false);
             CCC_Entry const e = remove_entry(entry_r(&lru->fh, &to_drop->key));
             CHECK(occupied(&e), true);
@@ -145,11 +145,11 @@ CHECK_BEGIN_STATIC_FN(lru_put, struct lru_cache *const lru, int const key,
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(lru_get, struct lru_cache *const lru, int const key,
+CHECK_BEGIN_STATIC_FN(lru_get, struct Lru_cache *const lru, int const key,
                       int *val)
 {
     CHECK_ERROR(val != NULL, true);
-    struct lru_lookup const *const found = get_key_val(&lru->fh, &key);
+    struct Lru_lookup const *const found = get_key_val(&lru->fh, &key);
     if (!found)
     {
         *val = -1;
@@ -168,7 +168,7 @@ CHECK_BEGIN_STATIC_FN(lru_get, struct lru_cache *const lru, int const key,
 CHECK_BEGIN_STATIC_FN(run_lru_cache)
 {
     QUIET_PRINT("LRU CAPACITY -> %zu\n", lru_cache.cap);
-    struct lru_request requests[REQS] = {
+    struct Lru_request requests[REQS] = {
         {PUT, .key = 1, .val = 1, .putter = lru_put},
         {PUT, .key = 2, .val = 2, .putter = lru_put},
         {GET, .key = 1, .val = 1, .getter = lru_get},
@@ -211,7 +211,7 @@ CHECK_BEGIN_STATIC_FN(run_lru_cache)
             {
                 QUIET_PRINT("HED -> {key: %d, val: %d}\n", requests[i].key,
                             requests[i].val);
-                struct key_val const *const kv = requests[i].header(&lru_cache);
+                struct Key_val const *const kv = requests[i].header(&lru_cache);
                 CHECK(kv != NULL, true);
                 CHECK(kv->key, requests[i].key);
                 CHECK(kv->val, requests[i].val);

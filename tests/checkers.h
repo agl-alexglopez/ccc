@@ -8,14 +8,14 @@
 #define CYAN "\033[38;5;14m"
 #define NONE "\033[0m"
 
-enum check_result
+enum Check_result
 {
     ERROR = -1,
     PASS,
     FAIL,
 };
 
-typedef enum check_result (*test_fn)(void);
+typedef enum Check_result (*Tester)(void);
 
 #define CHECK_FAIL_PRINT(result, result_string, expected, expected_string)     \
     do                                                                         \
@@ -63,7 +63,7 @@ typedef enum check_result (*test_fn)(void);
 additional parameters that one may wish to define for a test function.
 @param [in] test_name the name of the static function.
 @param [in] ... any additional parameters required for the function.
-@return see the end test macro. This will return a enum check_result that is
+@return see the end test macro. This will return a enum Check_result that is
 PASS or FAIL to be handled as the user sees fit.
 
 It is possible to return early from a test before the end test macro, but it
@@ -74,10 +74,10 @@ Example with no additional parameters:
 
 CHECK_BEGIN_STATIC_FN(fhash_test_empty)
 {
-    struct val vals[5] = {};
+    struct Val vals[5] = {};
     ccc_flat_hash_map fh;
     ccc_result const res
-        = fhm_init(&fh, vals, sizeof(vals) / sizeof(vals[0]), struct val, id, e,
+        = fhm_init(&fh, vals, sizeof(vals) / sizeof(vals[0]), struct Val, id, e,
                    NULL, fhash_int_zero, fhash_id_eq, NULL);
     CHECK(is_empty(&fh), true);
     CHECK_END_FN();
@@ -85,11 +85,11 @@ CHECK_BEGIN_STATIC_FN(fhash_test_empty)
 
 Example with multiple parameters:
 
-enum check_result insert_shuffled(ccc_ordered_multimap *,
-                                 struct val[], size_t, int);
+enum Check_result insert_shuffled(ccc_ordered_multimap *,
+                                 struct Val[], size_t, int);
 
 CHECK_BEGIN_STATIC_FN(insert_shuffled, ccc_ordered_multimap *pq,
-                      struct val vals[], size_t const size,
+                      struct Val vals[], size_t const size,
                       int const larger_prime)
 {
     for (int i = 0 shuffled_index = larger_prime % size; i < size; ++i)
@@ -102,23 +102,23 @@ CHECK_BEGIN_STATIC_FN(insert_shuffled, ccc_ordered_multimap *pq,
     CHECK_END_FN();
 }*/
 #define CHECK_BEGIN_STATIC_FN(test_name, ...)                                  \
-    static enum check_result(test_name)(OPTIONAL_PARAMS(__VA_ARGS__))          \
+    static enum Check_result(test_name)(OPTIONAL_PARAMS(__VA_ARGS__))          \
     {                                                                          \
-        enum check_result check_impl_macro_res = PASS;
+        enum Check_result check_impl_macro_res = PASS;
 
 /** @brief Define a test function that has a name and optionally
 additional parameters that one may wish to define a test function.
 @param [in] test_name the name of the function.
 @param [in] ... any additional parameters required for the function.
-@return see the end test macro. This will return a enum check_result.
+@return see the end test macro. This will return a enum Check_result.
 
 It is possible to return early from a test before the end test macro, but it
 is discouraged, especially if any memory allocations need to be cleaned up if
 a test fails. See begin static test for examples. */
 #define CHECK_BEGIN_FN(test_name, ...)                                         \
-    enum check_result(test_name)(OPTIONAL_PARAMS(__VA_ARGS__))                 \
+    enum Check_result(test_name)(OPTIONAL_PARAMS(__VA_ARGS__))                 \
     {                                                                          \
-        enum check_result check_impl_macro_res = PASS;
+        enum Check_result check_impl_macro_res = PASS;
 
 /** @brief execute a check within the context of a test.
 @param [in] test_result the result value of some action.
@@ -330,16 +330,16 @@ All tests to completion even if the overall result is a failure.
 
 Return this macro from the main function of the test program. All tests
 will run but the testing result for the entire program will be set to FAIL
-upon the first failure. All functions must return an enum check_result though
+upon the first failure. All functions must return an enum Check_result though
 their argument signatures may vary. If a test fails with an error, this runner
 will simply set the overall test state to fail and the user should examine the
 individual test that failed with FAIL or ERROR. */
 #define CHECK_RUN(test_fn_list...)                                             \
     ({                                                                         \
-        enum check_result const check_impl_all_checks[] = {test_fn_list};      \
-        enum check_result check_impl_all_checks_res = PASS;                    \
+        enum Check_result const check_impl_all_checks[] = {test_fn_list};      \
+        enum Check_result check_impl_all_checks_res = PASS;                    \
         for (unsigned long long i = 0;                                         \
-             i < sizeof(check_impl_all_checks) / sizeof(enum check_result);    \
+             i < sizeof(check_impl_all_checks) / sizeof(enum Check_result);    \
              ++i)                                                              \
         {                                                                      \
             if (check_impl_all_checks[i] != PASS)                              \

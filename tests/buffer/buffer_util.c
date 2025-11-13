@@ -29,12 +29,12 @@ partition(Buffer *const b, CCC_Type_comparator *const fn, void *const tmp,
     void *i = lo;
     for (void *j = lo; j < hi; j = buffer_next(b, j))
     {
-        CCC_Order const cmp = fn((CCC_Type_comparator_context){
-            .any_type_lhs = j,
-            .any_type_rhs = pivot_val,
+        CCC_Order const order = fn((CCC_Type_comparator_context){
+            .type_lhs = j,
+            .type_rhs = pivot_val,
             .context = b->context,
         });
-        if (cmp != CCC_ORDER_GREATER)
+        if (order != CCC_ORDER_GREATER)
         {
             swap(tmp, i, j, b->sizeof_type);
             i = buffer_next(b, i);
@@ -97,8 +97,8 @@ sort(CCC_Buffer *const b, CCC_Type_comparator *const fn, void *const swap)
 }
 
 CCC_Order
-bufcmp(CCC_Buffer const *const lhs, size_t const rhs_count,
-       void const *const rhs)
+buforder(CCC_Buffer const *const lhs, size_t const rhs_count,
+         void const *const rhs)
 {
     size_t const type_size = buffer_sizeof_type(lhs).count;
     size_t const buffer_size = buffer_count(lhs).count;
@@ -110,12 +110,12 @@ bufcmp(CCC_Buffer const *const lhs, size_t const rhs_count,
     {
         return CCC_ORDER_GREATER;
     }
-    int const cmp = memcmp(buffer_begin(lhs), rhs, buffer_size * type_size);
-    if (cmp == 0)
+    int const order = memcmp(buffer_begin(lhs), rhs, buffer_size * type_size);
+    if (order == 0)
     {
         return CCC_ORDER_EQUAL;
     }
-    if (cmp < 0)
+    if (order < 0)
     {
         return CCC_ORDER_LESSER;
     }

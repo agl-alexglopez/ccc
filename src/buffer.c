@@ -103,7 +103,7 @@ CCC_buffer_clear(CCC_Buffer *const buf, CCC_Type_destructor *const destructor)
          i = CCC_buffer_next(buf, i))
     {
         destructor((CCC_Type_context){
-            .any_type = i,
+            .type = i,
             .context = buf->context,
         });
     }
@@ -135,7 +135,7 @@ CCC_buffer_clear_and_free(CCC_Buffer *const buf,
          i = CCC_buffer_next(buf, i))
     {
         destructor((CCC_Type_context){
-            .any_type = i,
+            .type = i,
             .context = buf->context,
         });
     }
@@ -175,7 +175,7 @@ CCC_buffer_clear_and_free_reserve(CCC_Buffer *const buf,
          i = CCC_buffer_next(buf, i))
     {
         destructor((CCC_Type_context){
-            .any_type = i,
+            .type = i,
             .context = buf->context,
         });
     }

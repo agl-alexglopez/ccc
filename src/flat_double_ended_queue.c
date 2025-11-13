@@ -423,7 +423,7 @@ CCC_flat_double_ended_queue_clear(
          i = increment(flat_double_ended_queue, i))
     {
         destructor((CCC_Type_context){
-            .any_type = CCC_buffer_at(&flat_double_ended_queue->buf, i),
+            .type = CCC_buffer_at(&flat_double_ended_queue->buf, i),
             .context = flat_double_ended_queue->buf.context,
         });
     }
@@ -450,7 +450,7 @@ CCC_flat_double_ended_queue_clear_and_free(
          i = increment(flat_double_ended_queue, i))
     {
         destructor((CCC_Type_context){
-            .any_type = CCC_buffer_at(&flat_double_ended_queue->buf, i),
+            .type = CCC_buffer_at(&flat_double_ended_queue->buf, i),
             .context = flat_double_ended_queue->buf.context,
         });
     }
@@ -482,7 +482,7 @@ CCC_flat_double_ended_queue_clear_and_free_reserve(
          i = increment(flat_double_ended_queue, i))
     {
         destructor((CCC_Type_context){
-            .any_type = CCC_buffer_at(&flat_double_ended_queue->buf, i),
+            .type = CCC_buffer_at(&flat_double_ended_queue->buf, i),
             .context = flat_double_ended_queue->buf.context,
         });
     }

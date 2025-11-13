@@ -39,7 +39,7 @@ algorithms use a wide range of data structures. */
 
 /*===========================   Type Declarations  ==========================*/
 
-enum print_branch
+enum Print_branch
 {
     BRANCH = 0, /* ├── */
     LEAF = 1    /* └── */
@@ -51,7 +51,7 @@ front so we don't need the full suite of deq functionality. The bit set provides
 almost all the functionality needed we just need to manage what happens when
 we pop from bit set but do not manually decrease the size of the underlying bit
 set container. Instead we manage our own front and size fields. */
-struct bitq
+struct Bit_queue
 {
     Bitset bs;
     size_t front;
@@ -59,7 +59,7 @@ struct bitq
 };
 
 /** Simple entry in the flat hash map while counting character occurrences. */
-struct char_freq
+struct Character_frequency
 {
     char ch;
     size_t freq;
@@ -78,7 +78,7 @@ any nodes until we are done with the entire tree this is an optimal bump
 allocator. All memory is freed at once in one contiguous allocation. The only
 detail to manage is that due to resizing of the Buffer elements must track each
 other through indices not pointers. */
-struct huffman_node
+struct Huffman_node
 {
     /** The parent for backtracking during DFS and Pre-Order traversal. */
     size_t parent;
@@ -94,7 +94,7 @@ struct huffman_node
 Having a small simple type in the contiguous flat priority queue is good for
 performance and the entire Buffer can be freed when the algorithm completes.
 The priority queue is only needed while building the tree. */
-struct flat_priority_queue_node
+struct Flat_priority_queue_node
 {
     size_t freq;
     size_t node;
@@ -102,7 +102,7 @@ struct flat_priority_queue_node
 
 /** It is helpful to know how many leaves and total nodes there are for
 reserving the appropriate space for helper data structures. */
-struct huffman_tree
+struct Huffman_tree
 {
     CCC_Buffer bump_arena;
     size_t root;
@@ -115,7 +115,7 @@ text we encode, we can memoize known sequences we have already seen in the
 bit queue. We will record the first encounter with every character in the bit
 queue and simply append this range of bits to the end of the queue as we build
 the sequence. */
-struct path_memo
+struct Path_memo
 {
     /** The key for the path memo. */
     char ch;
@@ -133,15 +133,15 @@ enum : size_t
 
 /** The compact representation of the tree structure we will encode to a
 compressed file for later reconstruction. */
-struct compressed_huffman_tree
+struct Compressed_huffman_tree
 {
     /** The Pre-Order traversal of internal nodes and leaves. Every internal
     node encountered on the way down is a 1 and every leaf is a 0. */
-    struct bitq tree_paths;
+    struct Bit_queue tree_paths;
     /** The arena that allows us to form the dynamic string of leaves. */
-    struct str_arena arena;
+    struct String_arena arena;
     /** The handle to the leaf string in the string arena. */
-    struct str_ofs leaf_string;
+    struct String_offset leaf_string;
 };
 
 enum : uint32_t
@@ -154,7 +154,7 @@ enum : uint32_t
 via Huffman Encoding. The fields of this struct should be handled in order as
 we write to or read from a file. It is not strictly necessary to use this but
 it helps keep logic consistent across compression and decompression. */
-struct huffman_encoding
+struct Huffman_encoding
 {
     /** Magic to recognize our cccz files "cccz" */
     uint32_t magic;
@@ -165,13 +165,13 @@ struct huffman_encoding
     /** Number of bits in the file content bit queue we encoded. */
     size_t file_bits_count;
     /** The compact representation of the tree to be reconstructed later. */
-    struct compressed_huffman_tree blueprint;
+    struct Compressed_huffman_tree blueprint;
     /** The path to every character encountered in the file text in order. */
-    struct bitq file_bits;
+    struct Bit_queue file_bits;
 };
 
 /** Files the user wants zipped or unzipped. */
-struct ccczip_actions
+struct Ccczip_actions
 {
     str_view zip;
     str_view unzip;
@@ -184,47 +184,47 @@ static str_view const cccz_suffix = SV(".cccz");
 
 static void zip_file(str_view to_compress);
 static Flat_priority_queue build_encoding_priority_queue(FILE *f,
-                                                         struct huffman_tree *);
-static void bitq_push_back(struct bitq *, CCC_Tribool);
-static CCC_Tribool bitq_pop_back(struct bitq *bq);
-static CCC_Tribool bitq_pop_front(struct bitq *);
-static CCC_Tribool bitq_test(struct bitq const *, size_t i);
-static size_t bitq_count(struct bitq const *bq);
-static void bitq_clear_and_free(struct bitq *);
-static CCC_Result bitq_reserve(struct bitq *, size_t to_add);
+                                                         struct Huffman_tree *);
+static void bitq_push_back(struct Bit_queue *, CCC_Tribool);
+static CCC_Tribool bitq_pop_back(struct Bit_queue *bq);
+static CCC_Tribool bitq_pop_front(struct Bit_queue *);
+static CCC_Tribool bitq_test(struct Bit_queue const *, size_t i);
+static size_t bitq_count(struct Bit_queue const *bq);
+static void bitq_clear_and_free(struct Bit_queue *);
+static CCC_Result bitq_reserve(struct Bit_queue *, size_t to_add);
 static uint64_t hash_char(CCC_Key_context to_hash);
-static CCC_Order char_eq(CCC_Key_comparator_context);
-static CCC_Order cmp_freqs(CCC_Type_comparator_context cmp);
-static CCC_Order path_memo_cmp(CCC_Key_comparator_context cmp);
-static void memoize_path(struct huffman_tree *tree, Flat_hash_map *fh,
-                         struct bitq *, char c);
-static struct bitq build_encoding_bitq(FILE *f, struct huffman_tree *tree);
-static struct huffman_tree build_encoding_tree(FILE *f);
-static struct compressed_huffman_tree compress_tree(struct huffman_tree *tree);
-static void free_encode_tree(struct huffman_tree *);
-static void print_tree(struct huffman_tree const *tree, size_t node);
-static void print_inner_tree(struct huffman_tree const *tree, size_t node,
-                             enum print_branch, char const *prefix);
-static void print_node(struct huffman_tree const *tree, size_t node);
-static bool is_leaf(struct huffman_tree const *tree, size_t node);
-static void print_bitq(struct bitq const *bq);
+static CCC_Order char_order(CCC_Key_comparator_context);
+static CCC_Order order_freqs(CCC_Type_comparator_context order);
+static CCC_Order path_memo_order(CCC_Key_comparator_context order);
+static void memoize_path(struct Huffman_tree *tree, Flat_hash_map *fh,
+                         struct Bit_queue *, char c);
+static struct Bit_queue build_encoding_bitq(FILE *f, struct Huffman_tree *tree);
+static struct Huffman_tree build_encoding_tree(FILE *f);
+static struct Compressed_huffman_tree compress_tree(struct Huffman_tree *tree);
+static void free_encode_tree(struct Huffman_tree *);
+static void print_tree(struct Huffman_tree const *tree, size_t node);
+static void print_inner_tree(struct Huffman_tree const *tree, size_t node,
+                             enum Print_branch, char const *prefix);
+static void print_node(struct Huffman_tree const *tree, size_t node);
+static bool is_leaf(struct Huffman_tree const *tree, size_t node);
+static void print_bitq(struct Bit_queue const *bq);
 static void unzip_file(str_view unzip);
-static struct huffman_tree
-reconstruct_tree(struct compressed_huffman_tree *blueprint);
-static void reconstruct_text(FILE *f, struct huffman_tree const *,
-                             struct bitq *);
+static struct Huffman_tree
+reconstruct_tree(struct Compressed_huffman_tree *blueprint);
+static void reconstruct_text(FILE *f, struct Huffman_tree const *,
+                             struct Bit_queue *);
 static void print_help(void);
-static size_t branch_i(struct huffman_tree const *t, size_t node, uint8_t dir);
-static size_t parent_i(struct huffman_tree const *t, size_t node);
-static char char_i(struct huffman_tree const *t, size_t node);
-static struct huffman_node *node_at(struct huffman_tree const *t, size_t node);
+static size_t branch_i(struct Huffman_tree const *t, size_t node, uint8_t dir);
+static size_t parent_i(struct Huffman_tree const *t, size_t node);
+static char char_i(struct Huffman_tree const *t, size_t node);
+static struct Huffman_node *node_at(struct Huffman_tree const *t, size_t node);
 static void write_to_file(str_view original_filepath, size_t original_filesize,
-                          struct huffman_encoding *);
-static void write_bitq(FILE *cccz, struct bitq *bq);
-static struct huffman_encoding read_from_file(str_view unzip);
+                          struct Huffman_encoding *);
+static void write_bitq(FILE *cccz, struct Bit_queue *bq);
+static struct Huffman_encoding read_from_file(str_view unzip);
 static size_t readbytes(FILE *f, void *base, size_t to_read);
 static size_t writebytes(FILE *f, void const *base, size_t to_write);
-static void fill_bitq(FILE *f, struct bitq *bq, size_t expected_bits);
+static void fill_bitq(FILE *f, struct Bit_queue *bq, size_t expected_bits);
 static size_t file_size(FILE *f);
 
 /** Asserts even in release mode. Run code in the second argument if needed. */
@@ -277,7 +277,7 @@ main(int argc, char **argv)
     {
         return 0;
     }
-    struct ccczip_actions todo = {};
+    struct Ccczip_actions todo = {};
     for (int arg = 1; arg < argc; ++arg)
     {
         str_view const sv_arg = sv(argv[arg]);
@@ -323,8 +323,8 @@ zip_file(str_view const to_compress)
     check(f, printf("%s", strerror(errno)););
     size_t const fsize = file_size(f);
     printf("Zip %s (%zu bytes).\n", sv_begin(to_compress), fsize);
-    struct huffman_tree tree = build_encoding_tree(f);
-    struct huffman_encoding encoding = {
+    struct Huffman_tree tree = build_encoding_tree(f);
+    struct Huffman_encoding encoding = {
         .magic = CCCZ_MAGIC,
         .file_bits = build_encoding_bitq(f, &tree),
         .blueprint = compress_tree(&tree),
@@ -348,39 +348,39 @@ at each step.
 Because the priority queue is a min queue this means that high frequency
 elements will be paired later in the algorithm and thus closer to the root of
 the encoding tree. */
-static struct huffman_tree
+static struct Huffman_tree
 build_encoding_tree(FILE *const f)
 {
-    struct huffman_tree ret = {
+    struct Huffman_tree ret = {
         .bump_arena
-        = buffer_initialize(NULL, struct huffman_node, std_alloc, NULL, 0),
+        = buffer_initialize(NULL, struct Huffman_node, std_allocate, NULL, 0),
         .root = 0,
     };
     Flat_priority_queue priority_queue = build_encoding_priority_queue(f, &ret);
     while (count(&priority_queue).count >= 2)
     {
         /* Small elements and we need the pair so we can't hold references. */
-        struct flat_priority_queue_node zero
-            = *(struct flat_priority_queue_node *)front(&priority_queue);
+        struct Flat_priority_queue_node zero
+            = *(struct Flat_priority_queue_node *)front(&priority_queue);
         CCC_Result r
-            = pop(&priority_queue, &(struct flat_priority_queue_node){});
+            = pop(&priority_queue, &(struct Flat_priority_queue_node){});
         check(r == CCC_RESULT_OK);
-        struct flat_priority_queue_node one
-            = *(struct flat_priority_queue_node *)front(&priority_queue);
-        r = pop(&priority_queue, &(struct flat_priority_queue_node){});
+        struct Flat_priority_queue_node one
+            = *(struct Flat_priority_queue_node *)front(&priority_queue);
+        r = pop(&priority_queue, &(struct Flat_priority_queue_node){});
         check(r == CCC_RESULT_OK);
-        struct huffman_node *const internal_one
+        struct Huffman_node *const internal_one
             = push_back(&ret.bump_arena,
-                        &(struct huffman_node){.link = {zero.node, one.node}});
+                        &(struct Huffman_node){.link = {zero.node, one.node}});
         size_t const new_root = buffer_i(&ret.bump_arena, internal_one).count;
         check(internal_one);
         node_at(&ret, zero.node)->parent = new_root;
         node_at(&ret, one.node)->parent = new_root;
-        struct flat_priority_queue_node const *const pushed
+        struct Flat_priority_queue_node const *const pushed
             = push(&priority_queue,
-                   &(struct flat_priority_queue_node){
+                   &(struct Flat_priority_queue_node){
                        .freq = zero.freq + one.freq, .node = new_root},
-                   &(struct flat_priority_queue_node){});
+                   &(struct Flat_priority_queue_node){});
         check(pushed);
         ret.root = new_root;
     }
@@ -390,7 +390,7 @@ build_encoding_tree(FILE *const f)
        didn't need to worry about growth. Provide same function used to reserve
        buffer. */
     CCC_Result const r
-        = clear_and_free_reserve(&priority_queue, NULL, std_alloc);
+        = clear_and_free_reserve(&priority_queue, NULL, std_allocate);
     check(r == CCC_RESULT_OK);
     return ret;
 }
@@ -401,44 +401,46 @@ priority queue has no allocation permission, knowing the space it needs to
 reserve ahead of time and assuming the tree building algorithm will strictly
 decrease the size of the priority queue. */
 static Flat_priority_queue
-build_encoding_priority_queue(FILE *const f, struct huffman_tree *const tree)
+build_encoding_priority_queue(FILE *const f, struct Huffman_tree *const tree)
 {
     Flat_hash_map frequencies = flat_hash_map_initialize(
-        NULL, struct char_freq, ch, hash_char, char_eq, std_alloc, NULL, 0);
+        NULL, struct Character_frequency, ch, hash_char, char_order,
+        std_allocate, NULL, 0);
     foreach_filechar(f, c, {
-        struct char_freq *const ins = or_insert(
+        struct Character_frequency *const ins = or_insert(
             flat_hash_map_and_modify_w(entry_r(&frequencies, c),
-                                       struct char_freq, ++T->freq;),
-            &(struct char_freq){.ch = *c, .freq = 1});
+                                       struct Character_frequency, ++T->freq;),
+            &(struct Character_frequency){.ch = *c, .freq = 1});
         check(ins);
     });
     size_t const leaves = count(&frequencies).count;
     check(leaves >= 2);
     tree->num_leaves = leaves;
     tree->num_nodes = (2 * leaves) - 1;
-    CCC_Result r = reserve(&tree->bump_arena, tree->num_nodes + 1, std_alloc);
+    CCC_Result r
+        = reserve(&tree->bump_arena, tree->num_nodes + 1, std_allocate);
     check(r == CCC_RESULT_OK);
     /* For a Buffer based tree 0 is the NULL node so we can't have actual data
        we want at that index in the tree. */
-    struct huffman_node const *const nil
-        = push_back(&tree->bump_arena, &(struct huffman_node){});
+    struct Huffman_node const *const nil
+        = push_back(&tree->bump_arena, &(struct Huffman_node){});
     check(nil);
     /* Use a Buffer to simply push back elements we will heapify at the end. */
     Buffer flat_priority_queue_storage = buffer_initialize(
-        NULL, struct flat_priority_queue_node, NULL, NULL, 0);
+        NULL, struct Flat_priority_queue_node, NULL, NULL, 0);
     /* Add one to reservation for the flat priority queue swap slot. */
     r = reserve(&flat_priority_queue_storage, count(&frequencies).count,
-                std_alloc);
+                std_allocate);
     check(r == CCC_RESULT_OK);
-    for (struct char_freq const *i = begin(&frequencies);
+    for (struct Character_frequency const *i = begin(&frequencies);
          i != end(&frequencies); i = next(&frequencies, i))
     {
-        struct huffman_node const *const node
-            = push_back(&tree->bump_arena, &(struct huffman_node){.ch = i->ch});
+        struct Huffman_node const *const node
+            = push_back(&tree->bump_arena, &(struct Huffman_node){.ch = i->ch});
         check(node);
         size_t const node_i = buffer_i(&tree->bump_arena, node).count;
-        struct flat_priority_queue_node const *const pushed = push_back(
-            &flat_priority_queue_storage, &(struct flat_priority_queue_node){
+        struct Flat_priority_queue_node const *const pushed = push_back(
+            &flat_priority_queue_storage, &(struct Flat_priority_queue_node){
                                               .freq = i->freq, .node = node_i});
         check(pushed);
     }
@@ -449,8 +451,8 @@ build_encoding_priority_queue(FILE *const f, struct huffman_tree *const tree)
        needed to be in the flat priority queue. Now we take its memory and
        heapify the data in O(N) time rather than pushing each element. */
     return flat_priority_queue_heapify_initialize(
-        begin(&flat_priority_queue_storage), struct flat_priority_queue_node,
-        CCC_ORDER_LESSER, cmp_freqs, NULL, NULL,
+        begin(&flat_priority_queue_storage), struct Flat_priority_queue_node,
+        CCC_ORDER_LESSER, order_freqs, NULL, NULL,
         capacity(&flat_priority_queue_storage).count,
         count(&flat_priority_queue_storage).count);
 }
@@ -458,21 +460,22 @@ build_encoding_priority_queue(FILE *const f, struct huffman_tree *const tree)
 /** Returns the bit queue representing the bit path to every character in the
 file. This queue represents each byte of the file in order; the first path in
 at the front of the queue represents the first character. */
-static struct bitq
-build_encoding_bitq(FILE *const f, struct huffman_tree *const tree)
+static struct Bit_queue
+build_encoding_bitq(FILE *const f, struct Huffman_tree *const tree)
 {
-    struct bitq ret = {.bs = bitset_initialize(NULL, std_alloc, NULL, 0)};
+    struct Bit_queue ret
+        = {.bs = bitset_initialize(NULL, std_allocate, NULL, 0)};
     /* By memoizing known bit sequences we can save significant time by not
        performing a DFS over the tree. This is especially helpful for large
        alphabets aka trees with many leaves. An array of 0-256 elements as a map
        could achieve the same result faster but it would waste much more space.
        It is rare to have a file use all 256 possible character values. */
     Flat_hash_map memo = CCC_flat_hash_map_initialize(
-        NULL, struct path_memo, ch, hash_char, path_memo_cmp, NULL, NULL, 0);
-    CCC_Result r = reserve(&memo, tree->num_leaves, std_alloc);
+        NULL, struct Path_memo, ch, hash_char, path_memo_order, NULL, NULL, 0);
+    CCC_Result r = reserve(&memo, tree->num_leaves, std_allocate);
     check(r == CCC_RESULT_OK);
     foreach_filechar(f, c, {
-        struct path_memo const *path = get_key_val(&memo, c);
+        struct Path_memo const *path = get_key_val(&memo, c);
         if (path)
         {
             size_t const end = path->path_start_index + path->path_len;
@@ -488,7 +491,7 @@ build_encoding_bitq(FILE *const f, struct huffman_tree *const tree)
             memoize_path(tree, &memo, &ret, *c);
         }
     });
-    r = clear_and_free_reserve(&memo, NULL, std_alloc);
+    r = clear_and_free_reserve(&memo, NULL, std_allocate);
     check(r == CCC_RESULT_OK);
     return ret;
 }
@@ -498,12 +501,12 @@ as an entry in the path memo map. This function modifies the tree nodes by
 altering their iterator field during the DFS, but it restores all nodes to their
 original state before returning. */
 static void
-memoize_path(struct huffman_tree *const tree, Flat_hash_map *const fh,
-             struct bitq *const bq, char const c)
+memoize_path(struct Huffman_tree *const tree, Flat_hash_map *const fh,
+             struct Bit_queue *const bq, char const c)
 {
-    struct path_memo *const path = insert_entry(
+    struct Path_memo *const path = insert_entry(
         entry_r(fh, &c),
-        &(struct path_memo){.ch = c, .path_start_index = bitq_count(bq)});
+        &(struct Path_memo){.ch = c, .path_start_index = bitq_count(bq)});
     check(path);
     size_t cur = tree->root;
     /* An iterative depth first search is convenient because the bit path in
@@ -511,7 +514,7 @@ memoize_path(struct huffman_tree *const tree, Flat_hash_map *const fh,
        sure to backtrack up the path to cleanup iterators. */
     while (cur)
     {
-        struct huffman_node *const node = node_at(tree, cur);
+        struct Huffman_node *const node = node_at(tree, cur);
         /* This is the leaf we want. */
         if (!node->link[1] && node->ch == c)
         {
@@ -546,11 +549,11 @@ the leaves to a string as they are encountered during this traversal. By the
 end of the operation, we have a bit queue of our traversal where every internal
 node encountered on the way down is a 1 and every leaf is a 0. We also have a
 string of leaf characters that we encountered in order. */
-static struct compressed_huffman_tree
-compress_tree(struct huffman_tree *const tree)
+static struct Compressed_huffman_tree
+compress_tree(struct Huffman_tree *const tree)
 {
-    struct compressed_huffman_tree ret = {
-        .tree_paths = {.bs = bitset_initialize(NULL, std_alloc, NULL, 0)},
+    struct Compressed_huffman_tree ret = {
+        .tree_paths = {.bs = bitset_initialize(NULL, std_allocate, NULL, 0)},
         .arena = str_arena_create(START_STR_ARENA_CAP),
     };
     check(ret.arena.arena);
@@ -563,7 +566,7 @@ compress_tree(struct huffman_tree *const tree)
        progression. */
     while (cur)
     {
-        struct huffman_node *const node = node_at(tree, cur);
+        struct Huffman_node *const node = node_at(tree, cur);
         if (!node->link[1])
         {
             /* A leaf is always pushed because it is only seen once. */
@@ -597,7 +600,7 @@ compress_tree(struct huffman_tree *const tree)
 later file reconstruction. */
 static void
 write_to_file(str_view const original_filepath, size_t const original_filesize,
-              struct huffman_encoding *const header)
+              struct Huffman_encoding *const header)
 {
     /* We write all new files to output directory so create the new path. */
     char path_to_cccz[FILESYS_MAX_PATH];
@@ -653,7 +656,7 @@ tell us the number of tree bits and file text bits we write to the file. The
 information written to file is on a per byte basis where every bit of the byte
 represents a bit in the bit queue. */
 static void
-write_bitq(FILE *const cccz, struct bitq *const bq)
+write_bitq(FILE *const cccz, struct Bit_queue *const bq)
 {
     static_assert(sizeof(uint8_t) == sizeof(CCC_Tribool));
     uint8_t buf = 0;
@@ -707,8 +710,8 @@ static void
 unzip_file(str_view unzip)
 {
     /* First we verify the compressed file is correct before creating new. */
-    struct huffman_encoding he = read_from_file(unzip);
-    struct huffman_tree tree = reconstruct_tree(&he.blueprint);
+    struct Huffman_encoding he = read_from_file(unzip);
+    struct Huffman_tree tree = reconstruct_tree(&he.blueprint);
 
     /* This means the compressed file was valid so write a new one to output. */
     char path[FILESYS_MAX_PATH];
@@ -744,7 +747,7 @@ unzip_file(str_view unzip)
 /** Reconstructs the Huffman encoding queues from the header of the specified
 file. Once complete this function returns all information needed to reconstruct
 the tree and write out a copy of the original file to the output directory. */
-static struct huffman_encoding
+static struct Huffman_encoding
 read_from_file(str_view const unzip)
 {
     CCC_Tribool has_suffix = sv_ends_with(unzip, SV(".cccz"));
@@ -752,19 +755,19 @@ read_from_file(str_view const unzip)
     FILE *const cccz = fopen(sv_begin(unzip), "r");
     check(cccz, (void)fprintf(stderr, "%s", strerror(errno)););
     printf("Unzip %s (%zu bytes).\n", sv_begin(unzip), file_size(cccz));
-    struct huffman_encoding ret = {
-        .file_bits = {.bs = bitset_initialize(NULL, std_alloc, NULL, 0)},
+    struct Huffman_encoding ret = {
+        .file_bits = {.bs = bitset_initialize(NULL, std_allocate, NULL, 0)},
         .blueprint = {
             .arena = str_arena_create(START_STR_ARENA_CAP),
-            .tree_paths = {.bs = bitset_initialize(NULL, std_alloc, NULL, 0)},
+            .tree_paths = {.bs = bitset_initialize(NULL, std_allocate, NULL, 0)},
         },
     };
     size_t read = readbytes(cccz, &ret.magic, sizeof(ret.magic));
     check(read == sizeof(ret.magic) && ret.magic == CCCZ_MAGIC);
     read = readbytes(cccz, &ret.leaves_minus_one, sizeof(ret.leaves_minus_one));
     check(read == sizeof(ret.leaves_minus_one));
-    struct str_arena *const arena = &ret.blueprint.arena;
-    struct str_ofs *const leaves = &ret.blueprint.leaf_string;
+    struct String_arena *const arena = &ret.blueprint.arena;
+    struct String_offset *const leaves = &ret.blueprint.leaf_string;
     /* Add 2: one for being minus 1 already and one for NULL terminator. */
     *leaves = str_arena_alloc(arena, ret.leaves_minus_one + 2);
     check(!leaves->error);
@@ -784,15 +787,15 @@ read_from_file(str_view const unzip)
 /** Reconstructs a Huffman encoding tree based on the blueprint provided. The
 tree is constructed in linear time and constant space additional to the nodes
 being allocated. */
-static struct huffman_tree
-reconstruct_tree(struct compressed_huffman_tree *const blueprint)
+static struct Huffman_tree
+reconstruct_tree(struct Compressed_huffman_tree *const blueprint)
 {
     size_t const bq_count = bitq_count(&blueprint->tree_paths);
-    struct huffman_tree ret = {
+    struct Huffman_tree ret = {
         .bump_arena
         /* 0 index is NULL so real data can't be there. */
-        = CCC_buffer_from(std_alloc, NULL, bq_count,
-                          (struct huffman_node[]){
+        = CCC_buffer_from(std_allocate, NULL, bq_count,
+                          (struct Huffman_node[]){
                               {}, // nil
                               {}, // root
                           }),
@@ -813,10 +816,10 @@ reconstruct_tree(struct compressed_huffman_tree *const blueprint)
         CCC_Tribool bit = CCC_TRUE;
         if (!node)
         {
-            struct huffman_node *const parent_r = node_at(&ret, parent);
+            struct Huffman_node *const parent_r = node_at(&ret, parent);
             bit = bitq_pop_front(&blueprint->tree_paths);
-            struct huffman_node *const pushed = push_back(
-                &ret.bump_arena, &(struct huffman_node){.parent = parent});
+            struct Huffman_node *const pushed = push_back(
+                &ret.bump_arena, &(struct Huffman_node){.parent = parent});
             node = CCC_buffer_i(&ret.bump_arena, pushed).count;
             parent_r->link[parent_r->iter++] = node;
             if (!bit)
@@ -826,7 +829,7 @@ reconstruct_tree(struct compressed_huffman_tree *const blueprint)
                 ++ret.num_leaves;
             }
         }
-        struct huffman_node *const node_r = node_at(&ret, node);
+        struct Huffman_node *const node_r = node_at(&ret, node);
         /* An internal node has further child subtrees to build. */
         if (bit && node_r->iter < ITER_END)
         {
@@ -845,8 +848,8 @@ reconstruct_tree(struct compressed_huffman_tree *const blueprint)
 bit queue. Bits are written on a per byte basis to the file and each bit of
 the byte corresponds to a bit in the bit queue. */
 void
-reconstruct_text(FILE *const f, struct huffman_tree const *const tree,
-                 struct bitq *const bq)
+reconstruct_text(FILE *const f, struct Huffman_tree const *const tree,
+                 struct Bit_queue *const bq)
 {
     size_t cur = tree->root;
     while (bitq_count(bq))
@@ -870,7 +873,7 @@ reconstruct_text(FILE *const f, struct huffman_tree const *const tree,
 are read in on a per byte basis where every bit of a file byte represents a bit
 in the bit queue. Exits if not enough bits are found in the file. */
 static void
-fill_bitq(FILE *const f, struct bitq *const bq, size_t expected_bits)
+fill_bitq(FILE *const f, struct Bit_queue *const bq, size_t expected_bits)
 {
     uint8_t buf = 0;
     uint8_t i = CHAR_BIT;
@@ -913,39 +916,39 @@ readbytes(FILE *const f, void *const base, size_t const to_read)
 
 /*=========================      Huffman Helpers    =========================*/
 
-static struct huffman_node *
-node_at(struct huffman_tree const *const t, size_t const node)
+static struct Huffman_node *
+node_at(struct Huffman_tree const *const t, size_t const node)
 {
-    return ((struct huffman_node *)buffer_at(&t->bump_arena, node));
+    return ((struct Huffman_node *)buffer_at(&t->bump_arena, node));
 }
 
 static size_t
-branch_i(struct huffman_tree const *const t, size_t const node,
+branch_i(struct Huffman_tree const *const t, size_t const node,
          uint8_t const dir)
 {
-    return ((struct huffman_node *)buffer_at(&t->bump_arena, node))->link[dir];
+    return ((struct Huffman_node *)buffer_at(&t->bump_arena, node))->link[dir];
 }
 
 static size_t
-parent_i(struct huffman_tree const *const t, size_t node)
+parent_i(struct Huffman_tree const *const t, size_t node)
 {
-    return ((struct huffman_node *)buffer_at(&t->bump_arena, node))->parent;
+    return ((struct Huffman_node *)buffer_at(&t->bump_arena, node))->parent;
 }
 
 static char
-char_i(struct huffman_tree const *const t, size_t const node)
+char_i(struct Huffman_tree const *const t, size_t const node)
 {
-    return ((struct huffman_node *)buffer_at(&t->bump_arena, node))->ch;
+    return ((struct Huffman_node *)buffer_at(&t->bump_arena, node))->ch;
 }
 
 /** Frees all encoding nodes from the tree provided. */
 static void
-free_encode_tree(struct huffman_tree *tree)
+free_encode_tree(struct Huffman_tree *tree)
 {
     CCC_Result const r
-        = clear_and_free_reserve(&tree->bump_arena, NULL, std_alloc);
+        = clear_and_free_reserve(&tree->bump_arena, NULL, std_allocate);
     check(r == CCC_RESULT_OK);
-    *tree = (struct huffman_tree){};
+    *tree = (struct Huffman_tree){};
 }
 
 static size_t
@@ -960,7 +963,7 @@ file_size(FILE *f)
 /* NOLINTBEGIN(*misc-no-recursion) */
 
 [[maybe_unused]] static void
-print_tree(struct huffman_tree const *const tree, size_t const node)
+print_tree(struct Huffman_tree const *const tree, size_t const node)
 {
     if (!tree)
     {
@@ -972,8 +975,8 @@ print_tree(struct huffman_tree const *const tree, size_t const node)
 }
 
 [[maybe_unused]] static void
-print_inner_tree(struct huffman_tree const *const tree, size_t const node,
-                 enum print_branch const branch_type, char const *const prefix)
+print_inner_tree(struct Huffman_tree const *const tree, size_t const node,
+                 enum Print_branch const branch_type, char const *const prefix)
 {
     if (!node)
     {
@@ -994,7 +997,7 @@ print_inner_tree(struct huffman_tree const *const tree, size_t const node,
                        branch_type == LEAF ? "     " : " │   ");
     }
     check(str);
-    struct huffman_node const *const root = node_at(tree, node);
+    struct Huffman_node const *const root = node_at(tree, node);
     if (!root->link[1])
     {
         print_inner_tree(tree, root->link[0], LEAF, str);
@@ -1012,7 +1015,7 @@ print_inner_tree(struct huffman_tree const *const tree, size_t const node,
 }
 
 [[maybe_unused]] static void
-print_node(struct huffman_tree const *const tree, size_t const node)
+print_node(struct Huffman_tree const *const tree, size_t const node)
 {
     if (is_leaf(tree, node))
     {
@@ -1047,14 +1050,14 @@ print_node(struct huffman_tree const *const tree, size_t const node)
 }
 
 [[maybe_unused]] static bool
-is_leaf(struct huffman_tree const *const tree, size_t const node)
+is_leaf(struct Huffman_tree const *const tree, size_t const node)
 {
-    struct huffman_node const *const root = node_at(tree, node);
+    struct Huffman_node const *const root = node_at(tree, node);
     return !root->link[0] && !root->link[1];
 }
 
 [[maybe_unused]] static void
-print_bitq(struct bitq const *const bq)
+print_bitq(struct Bit_queue const *const bq)
 {
     for (size_t i = 0, col = 1, end = bitq_count(bq); i < end; ++i, ++col)
     {
@@ -1072,7 +1075,7 @@ print_bitq(struct bitq const *const bq)
 /*=====================       Bit Queue Helper Code     =====================*/
 
 static void
-bitq_push_back(struct bitq *const bq, CCC_Tribool const bit)
+bitq_push_back(struct Bit_queue *const bq, CCC_Tribool const bit)
 {
     if (bq->size == bitset_count(&bq->bs).count)
     {
@@ -1089,7 +1092,7 @@ bitq_push_back(struct bitq *const bq, CCC_Tribool const bit)
 }
 
 static CCC_Tribool
-bitq_pop_back(struct bitq *const bq)
+bitq_pop_back(struct Bit_queue *const bq)
 {
     if (!bq->size)
     {
@@ -1103,7 +1106,7 @@ bitq_pop_back(struct bitq *const bq)
 }
 
 static CCC_Tribool
-bitq_pop_front(struct bitq *const bq)
+bitq_pop_front(struct Bit_queue *const bq)
 {
     if (!bq->size)
     {
@@ -1117,7 +1120,7 @@ bitq_pop_front(struct bitq *const bq)
 }
 
 static CCC_Tribool
-bitq_test(struct bitq const *const bq, size_t const i)
+bitq_test(struct Bit_queue const *const bq, size_t const i)
 {
     if (!bq->size)
     {
@@ -1127,13 +1130,13 @@ bitq_test(struct bitq const *const bq, size_t const i)
 }
 
 static size_t
-bitq_count(struct bitq const *const bq)
+bitq_count(struct Bit_queue const *const bq)
 {
     return bq->size;
 }
 
 static void
-bitq_clear_and_free(struct bitq *const bq)
+bitq_clear_and_free(struct Bit_queue *const bq)
 {
     check(bq);
     CCC_Result const r = clear_and_free(&bq->bs);
@@ -1141,9 +1144,9 @@ bitq_clear_and_free(struct bitq *const bq)
 }
 
 static CCC_Result
-bitq_reserve(struct bitq *const bq, size_t const to_add)
+bitq_reserve(struct Bit_queue *const bq, size_t const to_add)
 {
-    return reserve(&bq->bs, to_add, std_alloc);
+    return reserve(&bq->bs, to_add, std_allocate);
 }
 
 /*=====================       Container Helper Code     =====================*/
@@ -1155,33 +1158,34 @@ hashed value will just be the character repeated at the high and low byte. */
 static uint64_t
 hash_char(CCC_Key_context const to_hash)
 {
-    char const key = *(char *)to_hash.any_key;
+    char const key = *(char const *)to_hash.key;
     return ((uint64_t)key << 55) | key;
 }
 
 static CCC_Order
-char_eq(CCC_Key_comparator_context const cmp)
+char_order(CCC_Key_comparator_context const order)
 {
-    struct char_freq const *const rhs = (struct char_freq *)cmp.any_type_rhs;
-    char const lhs = *(char *)cmp.any_key_lhs;
+    struct Character_frequency const *const rhs
+        = (struct Character_frequency *)order.type_rhs;
+    char const lhs = *(char *)order.key_lhs;
     return (lhs > rhs->ch) - (lhs < rhs->ch);
 }
 
 static CCC_Order
-cmp_freqs(CCC_Type_comparator_context const cmp)
+order_freqs(CCC_Type_comparator_context const order)
 {
-    struct flat_priority_queue_node const *const lhs
-        = (struct flat_priority_queue_node *)cmp.any_type_lhs;
-    struct flat_priority_queue_node const *const rhs
-        = (struct flat_priority_queue_node *)cmp.any_type_rhs;
+    struct Flat_priority_queue_node const *const lhs
+        = (struct Flat_priority_queue_node *)order.type_lhs;
+    struct Flat_priority_queue_node const *const rhs
+        = (struct Flat_priority_queue_node *)order.type_rhs;
     return (lhs->freq > rhs->freq) - (lhs->freq < rhs->freq);
 }
 
 static CCC_Order
-path_memo_cmp(CCC_Key_comparator_context const cmp)
+path_memo_order(CCC_Key_comparator_context const order)
 {
-    struct path_memo const *const rhs = (struct path_memo *)cmp.any_type_rhs;
-    char const lhs = *(char *)cmp.any_key_lhs;
+    struct Path_memo const *const rhs = (struct Path_memo *)order.type_rhs;
+    char const lhs = *(char *)order.key_lhs;
     return (lhs > rhs->ch) - (lhs < rhs->ch);
 }
 

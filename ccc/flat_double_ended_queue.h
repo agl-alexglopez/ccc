@@ -118,10 +118,10 @@ is memory management handed over to the copy function.
 ```
 #define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC
 flat_double_ended_queue src = flat_double_ended_queue_initialize(NULL, int,
-std_alloc, NULL, 0); (void)CCC_flat_double_ended_queue_push_back_range(&src, 5,
-(int[5]){0,1,2,3,4}); flat_double_ended_queue dst =
-flat_double_ended_queue_initialize(NULL, int, std_alloc, NULL, 0); CCC_Result
-res = flat_double_ended_queue_copy(&dst, &src, std_alloc);
+std_allocate, NULL, 0); (void)CCC_flat_double_ended_queue_push_back_range(&src,
+5, (int[5]){0,1,2,3,4}); flat_double_ended_queue dst =
+flat_double_ended_queue_initialize(NULL, int, std_allocate, NULL, 0); CCC_Result
+res = flat_double_ended_queue_copy(&dst, &src, std_allocate);
 ```
 
 The above allows dst to have a capacity less than that of the src as long as
@@ -132,10 +132,10 @@ size flat_double_ended_queue (ring buffer).
 ```
 #define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC
 flat_double_ended_queue src = flat_double_ended_queue_initialize(NULL, int,
-std_alloc, NULL, 0); (void)CCC_flat_double_ended_queue_push_back_range(&src, 5,
-(int[5]){0,1,2,3,4}); flat_double_ended_queue dst =
+std_allocate, NULL, 0); (void)CCC_flat_double_ended_queue_push_back_range(&src,
+5, (int[5]){0,1,2,3,4}); flat_double_ended_queue dst =
 flat_double_ended_queue_initialize(NULL, int, NULL, NULL, 0); CCC_Result res =
-flat_double_ended_queue_copy(&dst, &src, std_alloc);
+flat_double_ended_queue_copy(&dst, &src, std_allocate);
 ```
 
 The above sets up dst as a ring Buffer while src is a dynamic

@@ -17,24 +17,24 @@ CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_insert_iterate_pop)
        currently this will change every test. NOLINTNEXTLINE */
     srand(1);
     size_t const num_nodes = 1000;
-    struct val vals[1000 + 1];
+    struct Val vals[1000 + 1];
     CCC_Flat_priority_queue flat_priority_queue
-        = CCC_flat_priority_queue_initialize(vals, struct val, CCC_LES, val_cmp,
-                                             NULL, NULL,
+        = CCC_flat_priority_queue_initialize(vals, struct Val, CCC_ORDER_LESSER,
+                                             val_order, NULL, NULL,
                                              (sizeof(vals) / sizeof(vals[0])));
     for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
         vals[i].val = rand() % (num_nodes + 1); // NOLINT
         vals[i].id = (int)i;
-        CHECK(push(&flat_priority_queue, &vals[i], &(struct val){}) != NULL,
+        CHECK(push(&flat_priority_queue, &vals[i], &(struct Val){}) != NULL,
               true);
         CHECK(validate(&flat_priority_queue), true);
     }
     size_t pop_count = 0;
     while (!is_empty(&flat_priority_queue))
     {
-        (void)pop(&flat_priority_queue, &(struct val){});
+        (void)pop(&flat_priority_queue, &(struct Val){});
         ++pop_count;
         CHECK(validate(&flat_priority_queue), true);
     }
@@ -48,17 +48,17 @@ CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_priority_removal)
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
     size_t const num_nodes = 1000;
-    struct val vals[1000 + 1];
+    struct Val vals[1000 + 1];
     CCC_Flat_priority_queue flat_priority_queue
-        = CCC_flat_priority_queue_initialize(vals, struct val, CCC_LES, val_cmp,
-                                             NULL, NULL,
+        = CCC_flat_priority_queue_initialize(vals, struct Val, CCC_ORDER_LESSER,
+                                             val_order, NULL, NULL,
                                              (sizeof(vals) / sizeof(vals[0])));
     for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
-        struct val const *res = CCC_flat_priority_queue_emplace(
+        struct Val const *res = CCC_flat_priority_queue_emplace(
             &flat_priority_queue,
-            (struct val){
+            (struct Val){
                 .val = rand() % (num_nodes + 1), /*NOLINT*/
                 .id = (int)i,
             });
@@ -68,10 +68,10 @@ CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_priority_removal)
     int const limit = 400;
     for (size_t seen = 0, remaining = num_nodes; seen < remaining; ++seen)
     {
-        struct val *cur = &vals[seen];
+        struct Val *cur = &vals[seen];
         if (cur->val > limit)
         {
-            (void)erase(&flat_priority_queue, cur, &(struct val){});
+            (void)erase(&flat_priority_queue, cur, &(struct Val){});
             CHECK(validate(&flat_priority_queue), true);
             --remaining;
         }
@@ -85,17 +85,17 @@ CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_priority_update)
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
     size_t const num_nodes = 1000;
-    struct val vals[1000 + 1];
+    struct Val vals[1000 + 1];
     CCC_Flat_priority_queue flat_priority_queue
-        = CCC_flat_priority_queue_initialize(vals, struct val, CCC_LES, val_cmp,
-                                             NULL, NULL,
+        = CCC_flat_priority_queue_initialize(vals, struct Val, CCC_ORDER_LESSER,
+                                             val_order, NULL, NULL,
                                              (sizeof(vals) / sizeof(vals[0])));
     for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
-        struct val const *res = CCC_flat_priority_queue_emplace(
+        struct Val const *res = CCC_flat_priority_queue_emplace(
             &flat_priority_queue,
-            (struct val){
+            (struct Val){
                 .val = rand() % (num_nodes + 1), /*NOLINT*/
                 .id = (int)i,
             });
@@ -105,12 +105,12 @@ CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_priority_update)
     int const limit = 400;
     for (size_t val = 0; val < num_nodes; ++val)
     {
-        struct val *cur = &vals[val];
+        struct Val *cur = &vals[val];
         int backoff = cur->val / 2;
         if (cur->val > limit)
         {
-            struct val const *const updated
-                = update(&flat_priority_queue, cur, &(struct val){}, val_update,
+            struct Val const *const updated
+                = update(&flat_priority_queue, cur, &(struct Val){}, val_update,
                          &backoff);
             CHECK(updated != NULL, true);
             CHECK(updated->val, backoff);
@@ -127,17 +127,17 @@ CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_priority_update_with)
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
     size_t const num_nodes = 1000;
-    struct val vals[1000 + 1];
+    struct Val vals[1000 + 1];
     CCC_Flat_priority_queue flat_priority_queue
-        = CCC_flat_priority_queue_initialize(vals, struct val, CCC_LES, val_cmp,
-                                             NULL, NULL,
+        = CCC_flat_priority_queue_initialize(vals, struct Val, CCC_ORDER_LESSER,
+                                             val_order, NULL, NULL,
                                              (sizeof(vals) / sizeof(vals[0])));
     for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
-        struct val const *res = CCC_flat_priority_queue_emplace(
+        struct Val const *res = CCC_flat_priority_queue_emplace(
             &flat_priority_queue,
-            (struct val){
+            (struct Val){
                 .val = rand() % (num_nodes + 1), /*NOLINT*/
                 .id = (int)i,
             });
@@ -150,7 +150,7 @@ CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_priority_update_with)
         int backoff = vals[val].val / 2;
         if (vals[val].val > limit)
         {
-            struct val const *const updated = CCC_flat_priority_queue_update_w(
+            struct Val const *const updated = CCC_flat_priority_queue_update_w(
                 &flat_priority_queue, &vals[val],
                 {
                     T->val = backoff;

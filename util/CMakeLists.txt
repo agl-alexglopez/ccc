@@ -19,6 +19,7 @@ target_link_libraries(cli PUBLIC
 add_dependencies(util cli)
 
 add_library(alloc alloc.h alloc.c)
+target_link_libraries(alloc ccc)
 add_dependencies(util alloc)
 
 add_library(str_arena str_arena.h str_arena.c)

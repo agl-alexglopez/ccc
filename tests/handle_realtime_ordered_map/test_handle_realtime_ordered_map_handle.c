@@ -13,28 +13,28 @@ the handle functions. */
 #include "traits.h"
 #include "types.h"
 
-static inline struct val
+static inline struct Val
 val(int const val)
 {
-    return (struct val){.val = val};
+    return (struct Val){.val = val};
 }
 
-static inline struct val
+static inline struct Val
 idval(int const id, int const val)
 {
-    return (struct val){.id = id, .val = val};
+    return (struct Val){.id = id, .val = val};
 }
 
 static inline void
 plus(CCC_Type_context const t)
 {
-    ((struct val *)t.any_type)->val++;
+    ((struct Val *)t.type)->val++;
 }
 
 static inline void
 pluscontext(CCC_Type_context const t)
 {
-    ((struct val *)t.any_type)->val += *(int *)t.context;
+    ((struct Val *)t.type)->val += *(int *)t.context;
 }
 
 /* Every test should have three uses of each tested function: one when the
@@ -54,7 +54,7 @@ CHECK_BEGIN_STATIC_FN(
     {
         CCC_Handle hndl
             = swap_handle(handle_realtime_ordered_map,
-                          &(struct val){.id = id_and_val, .val = id_and_val});
+                          &(struct Val){.id = id_and_val, .val = id_and_val});
         CHECK(insert_error(&hndl), false);
         CHECK(occupied(&hndl), false);
         CHECK(validate(handle_realtime_ordered_map), true);
@@ -64,23 +64,23 @@ CHECK_BEGIN_STATIC_FN(
 
 /* Internally there is some maintenance to perform when swapping values for
    the user on insert. Leave this test here to always catch this. */
-CHECK_BEGIN_STATIC_FN(Handle_realtime_ordered_map_test_validate)
+CHECK_BEGIN_STATIC_FN(handle_realtime_ordered_map_test_validate)
 {
     CCC_Handle_realtime_ordered_map handle_realtime_ordered_map
         = handle_realtime_ordered_map_initialize(&(small_fixed_map){},
-                                                 struct val, id, id_cmp, NULL,
+                                                 struct Val, id, id_order, NULL,
                                                  NULL, SMALL_FIXED_CAP);
     CCC_Handle hndl = swap_handle(&handle_realtime_ordered_map,
-                                  &(struct val){.id = -1, .val = -1});
+                                  &(struct Val){.id = -1, .val = -1});
     CHECK(validate(&handle_realtime_ordered_map), true);
     CHECK(occupied(&hndl), false);
     CHECK(count(&handle_realtime_ordered_map).count, 1);
     hndl = swap_handle(&handle_realtime_ordered_map,
-                       &(struct val){.id = -1, .val = -1});
+                       &(struct Val){.id = -1, .val = -1});
     CHECK(validate(&handle_realtime_ordered_map), true);
     CHECK(occupied(&hndl), true);
     CHECK(count(&handle_realtime_ordered_map).count, 1);
-    struct val *v = handle_realtime_ordered_map_at(&handle_realtime_ordered_map,
+    struct Val *v = handle_realtime_ordered_map_at(&handle_realtime_ordered_map,
                                                    unwrap(&hndl));
     CHECK(v != NULL, true);
     CHECK(v->val, -1);
@@ -88,24 +88,24 @@ CHECK_BEGIN_STATIC_FN(Handle_realtime_ordered_map_test_validate)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(Handle_realtime_ordered_map_test_insert)
+CHECK_BEGIN_STATIC_FN(handle_realtime_ordered_map_test_insert)
 {
     CCC_Handle_realtime_ordered_map handle_realtime_ordered_map
         = handle_realtime_ordered_map_initialize(&(small_fixed_map){},
-                                                 struct val, id, id_cmp, NULL,
+                                                 struct Val, id, id_order, NULL,
                                                  NULL, SMALL_FIXED_CAP);
     int size = 30;
     CCC_Handle hndl = swap_handle(&handle_realtime_ordered_map,
-                                  &(struct val){.id = -1, .val = -1});
+                                  &(struct Val){.id = -1, .val = -1});
     CHECK(validate(&handle_realtime_ordered_map), true);
     CHECK(occupied(&hndl), false);
     CHECK(count(&handle_realtime_ordered_map).count, 1);
     hndl = swap_handle(&handle_realtime_ordered_map,
-                       &(struct val){.id = -1, .val = -1});
+                       &(struct Val){.id = -1, .val = -1});
     CHECK(validate(&handle_realtime_ordered_map), true);
     CHECK(occupied(&hndl), true);
     CHECK(count(&handle_realtime_ordered_map).count, 1);
-    struct val *v = handle_realtime_ordered_map_at(&handle_realtime_ordered_map,
+    struct Val *v = handle_realtime_ordered_map_at(&handle_realtime_ordered_map,
                                                    unwrap(&hndl));
     CHECK(v != NULL, true);
     CHECK(v->val, -1);
@@ -116,12 +116,12 @@ CHECK_BEGIN_STATIC_FN(Handle_realtime_ordered_map_test_insert)
 
     i += (size / 2);
     hndl = swap_handle(&handle_realtime_ordered_map,
-                       &(struct val){.id = i, .val = i});
+                       &(struct Val){.id = i, .val = i});
     CHECK(validate(&handle_realtime_ordered_map), true);
     CHECK(occupied(&hndl), false);
     CHECK(count(&handle_realtime_ordered_map).count, i + 2);
     hndl = swap_handle(&handle_realtime_ordered_map,
-                       &(struct val){.id = i, .val = i});
+                       &(struct Val){.id = i, .val = i});
     CHECK(validate(&handle_realtime_ordered_map), true);
     CHECK(occupied(&hndl), true);
     CHECK(count(&handle_realtime_ordered_map).count, i + 2);
@@ -136,12 +136,12 @@ CHECK_BEGIN_STATIC_FN(Handle_realtime_ordered_map_test_insert)
 
     i = size;
     hndl = swap_handle(&handle_realtime_ordered_map,
-                       &(struct val){.id = i, .val = i});
+                       &(struct Val){.id = i, .val = i});
     CHECK(validate(&handle_realtime_ordered_map), true);
     CHECK(occupied(&hndl), false);
     CHECK(count(&handle_realtime_ordered_map).count, i + 2);
     hndl = swap_handle(&handle_realtime_ordered_map,
-                       &(struct val){.id = i, .val = i});
+                       &(struct Val){.id = i, .val = i});
     CHECK(validate(&handle_realtime_ordered_map), true);
     CHECK(occupied(&hndl), true);
     CHECK(count(&handle_realtime_ordered_map).count, i + 2);
@@ -153,24 +153,24 @@ CHECK_BEGIN_STATIC_FN(Handle_realtime_ordered_map_test_insert)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(Handle_realtime_ordered_map_test_remove)
+CHECK_BEGIN_STATIC_FN(handle_realtime_ordered_map_test_remove)
 {
     CCC_Handle_realtime_ordered_map handle_realtime_ordered_map
         = handle_realtime_ordered_map_initialize(&(small_fixed_map){},
-                                                 struct val, id, id_cmp, NULL,
+                                                 struct Val, id, id_order, NULL,
                                                  NULL, SMALL_FIXED_CAP);
     int size = 30;
     CCC_Handle hndl = CCC_remove(&handle_realtime_ordered_map,
-                                 &(struct val){.id = -1, .val = -1});
+                                 &(struct Val){.id = -1, .val = -1});
     CHECK(validate(&handle_realtime_ordered_map), true);
     CHECK(occupied(&hndl), false);
     CHECK(count(&handle_realtime_ordered_map).count, 0);
     hndl = swap_handle(&handle_realtime_ordered_map,
-                       &(struct val){.id = -1, .val = -1});
+                       &(struct Val){.id = -1, .val = -1});
     CHECK(validate(&handle_realtime_ordered_map), true);
     CHECK(occupied(&hndl), false);
     CHECK(count(&handle_realtime_ordered_map).count, 1);
-    struct val old = {.id = -1};
+    struct Val old = {.id = -1};
     hndl = CCC_remove(&handle_realtime_ordered_map, &old);
     CHECK(validate(&handle_realtime_ordered_map), true);
     CHECK(occupied(&hndl), true);
@@ -182,16 +182,16 @@ CHECK_BEGIN_STATIC_FN(Handle_realtime_ordered_map_test_remove)
 
     i += (size / 2);
     hndl = CCC_remove(&handle_realtime_ordered_map,
-                      &(struct val){.id = i, .val = i});
+                      &(struct Val){.id = i, .val = i});
     CHECK(validate(&handle_realtime_ordered_map), true);
     CHECK(occupied(&hndl), false);
     CHECK(count(&handle_realtime_ordered_map).count, i);
     hndl = swap_handle(&handle_realtime_ordered_map,
-                       &(struct val){.id = i, .val = i});
+                       &(struct Val){.id = i, .val = i});
     CHECK(validate(&handle_realtime_ordered_map), true);
     CHECK(occupied(&hndl), false);
     CHECK(count(&handle_realtime_ordered_map).count, i + 1);
-    old = (struct val){.id = i};
+    old = (struct Val){.id = i};
     hndl = CCC_remove(&handle_realtime_ordered_map, &old);
     CHECK(validate(&handle_realtime_ordered_map), true);
     CHECK(occupied(&hndl), true);
@@ -203,16 +203,16 @@ CHECK_BEGIN_STATIC_FN(Handle_realtime_ordered_map_test_remove)
 
     i = size;
     hndl = CCC_remove(&handle_realtime_ordered_map,
-                      &(struct val){.id = i, .val = i});
+                      &(struct Val){.id = i, .val = i});
     CHECK(validate(&handle_realtime_ordered_map), true);
     CHECK(occupied(&hndl), false);
     CHECK(count(&handle_realtime_ordered_map).count, i);
     hndl = swap_handle(&handle_realtime_ordered_map,
-                       &(struct val){.id = i, .val = i});
+                       &(struct Val){.id = i, .val = i});
     CHECK(validate(&handle_realtime_ordered_map), true);
     CHECK(occupied(&hndl), false);
     CHECK(count(&handle_realtime_ordered_map).count, i + 1);
-    old = (struct val){.id = i};
+    old = (struct Val){.id = i};
     hndl = CCC_remove(&handle_realtime_ordered_map, &old);
     CHECK(validate(&handle_realtime_ordered_map), true);
     CHECK(occupied(&hndl), true);
@@ -222,24 +222,24 @@ CHECK_BEGIN_STATIC_FN(Handle_realtime_ordered_map_test_remove)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(Handle_realtime_ordered_map_test_try_insert)
+CHECK_BEGIN_STATIC_FN(handle_realtime_ordered_map_test_try_insert)
 {
     CCC_Handle_realtime_ordered_map handle_realtime_ordered_map
         = handle_realtime_ordered_map_initialize(&(small_fixed_map){},
-                                                 struct val, id, id_cmp, NULL,
+                                                 struct Val, id, id_order, NULL,
                                                  NULL, SMALL_FIXED_CAP);
     int size = 30;
     CCC_Handle hndl = try_insert(&handle_realtime_ordered_map,
-                                 &(struct val){.id = -1, .val = -1});
+                                 &(struct Val){.id = -1, .val = -1});
     CHECK(validate(&handle_realtime_ordered_map), true);
     CHECK(occupied(&hndl), false);
     CHECK(count(&handle_realtime_ordered_map).count, 1);
     hndl = try_insert(&handle_realtime_ordered_map,
-                      &(struct val){.id = -1, .val = -1});
+                      &(struct Val){.id = -1, .val = -1});
     CHECK(validate(&handle_realtime_ordered_map), true);
     CHECK(occupied(&hndl), true);
     CHECK(count(&handle_realtime_ordered_map).count, 1);
-    struct val *v = handle_realtime_ordered_map_at(&handle_realtime_ordered_map,
+    struct Val *v = handle_realtime_ordered_map_at(&handle_realtime_ordered_map,
                                                    unwrap(&hndl));
     CHECK(v != NULL, true);
     CHECK(v->val, -1);
@@ -250,12 +250,12 @@ CHECK_BEGIN_STATIC_FN(Handle_realtime_ordered_map_test_try_insert)
 
     i += (size / 2);
     hndl = try_insert(&handle_realtime_ordered_map,
-                      &(struct val){.id = i, .val = i});
+                      &(struct Val){.id = i, .val = i});
     CHECK(validate(&handle_realtime_ordered_map), true);
     CHECK(occupied(&hndl), false);
     CHECK(count(&handle_realtime_ordered_map).count, i + 2);
     hndl = try_insert(&handle_realtime_ordered_map,
-                      &(struct val){.id = i, .val = i});
+                      &(struct Val){.id = i, .val = i});
     CHECK(validate(&handle_realtime_ordered_map), true);
     CHECK(occupied(&hndl), true);
     CHECK(count(&handle_realtime_ordered_map).count, i + 2);
@@ -270,12 +270,12 @@ CHECK_BEGIN_STATIC_FN(Handle_realtime_ordered_map_test_try_insert)
 
     i = size;
     hndl = try_insert(&handle_realtime_ordered_map,
-                      &(struct val){.id = i, .val = i});
+                      &(struct Val){.id = i, .val = i});
     CHECK(validate(&handle_realtime_ordered_map), true);
     CHECK(occupied(&hndl), false);
     CHECK(count(&handle_realtime_ordered_map).count, i + 2);
     hndl = try_insert(&handle_realtime_ordered_map,
-                      &(struct val){.id = i, .val = i});
+                      &(struct Val){.id = i, .val = i});
     CHECK(occupied(&hndl), true);
     CHECK(count(&handle_realtime_ordered_map).count, i + 2);
     v = handle_realtime_ordered_map_at(&handle_realtime_ordered_map,
@@ -286,11 +286,11 @@ CHECK_BEGIN_STATIC_FN(Handle_realtime_ordered_map_test_try_insert)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(Handle_realtime_ordered_map_test_try_insert_with)
+CHECK_BEGIN_STATIC_FN(handle_realtime_ordered_map_test_try_insert_with)
 {
     CCC_Handle_realtime_ordered_map handle_realtime_ordered_map
         = handle_realtime_ordered_map_initialize(&(small_fixed_map){},
-                                                 struct val, id, id_cmp, NULL,
+                                                 struct Val, id, id_order, NULL,
                                                  NULL, SMALL_FIXED_CAP);
     int size = 30;
     CCC_Handle *hndl = handle_realtime_ordered_map_try_insert_w(
@@ -303,7 +303,7 @@ CHECK_BEGIN_STATIC_FN(Handle_realtime_ordered_map_test_try_insert_with)
     CHECK(validate(&handle_realtime_ordered_map), true);
     CHECK(occupied(hndl), true);
     CHECK(count(&handle_realtime_ordered_map).count, 1);
-    struct val *v = handle_realtime_ordered_map_at(&handle_realtime_ordered_map,
+    struct Val *v = handle_realtime_ordered_map_at(&handle_realtime_ordered_map,
                                                    unwrap(hndl));
     CHECK(v != NULL, true);
     CHECK(v->val, -1);
@@ -351,24 +351,24 @@ CHECK_BEGIN_STATIC_FN(Handle_realtime_ordered_map_test_try_insert_with)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(Handle_realtime_ordered_map_test_insert_or_assign)
+CHECK_BEGIN_STATIC_FN(handle_realtime_ordered_map_test_insert_or_assign)
 {
     CCC_Handle_realtime_ordered_map handle_realtime_ordered_map
         = handle_realtime_ordered_map_initialize(&(small_fixed_map){},
-                                                 struct val, id, id_cmp, NULL,
+                                                 struct Val, id, id_order, NULL,
                                                  NULL, SMALL_FIXED_CAP);
     int size = 30;
     CCC_Handle hndl = insert_or_assign(&handle_realtime_ordered_map,
-                                       &(struct val){.id = -1, .val = -1});
+                                       &(struct Val){.id = -1, .val = -1});
     CHECK(validate(&handle_realtime_ordered_map), true);
     CHECK(occupied(&hndl), false);
     CHECK(count(&handle_realtime_ordered_map).count, 1);
     hndl = insert_or_assign(&handle_realtime_ordered_map,
-                            &(struct val){.id = -1, .val = -2});
+                            &(struct Val){.id = -1, .val = -2});
     CHECK(validate(&handle_realtime_ordered_map), true);
     CHECK(occupied(&hndl), true);
     CHECK(count(&handle_realtime_ordered_map).count, 1);
-    struct val *v = handle_realtime_ordered_map_at(&handle_realtime_ordered_map,
+    struct Val *v = handle_realtime_ordered_map_at(&handle_realtime_ordered_map,
                                                    unwrap(&hndl));
     CHECK(v != NULL, true);
     CHECK(v->val, -2);
@@ -379,12 +379,12 @@ CHECK_BEGIN_STATIC_FN(Handle_realtime_ordered_map_test_insert_or_assign)
 
     i += (size / 2);
     hndl = insert_or_assign(&handle_realtime_ordered_map,
-                            &(struct val){.id = i, .val = i});
+                            &(struct Val){.id = i, .val = i});
     CHECK(validate(&handle_realtime_ordered_map), true);
     CHECK(occupied(&hndl), false);
     CHECK(count(&handle_realtime_ordered_map).count, i + 2);
     hndl = insert_or_assign(&handle_realtime_ordered_map,
-                            &(struct val){.id = i, .val = i + 1});
+                            &(struct Val){.id = i, .val = i + 1});
     CHECK(occupied(&hndl), true);
     CHECK(count(&handle_realtime_ordered_map).count, i + 2);
     v = handle_realtime_ordered_map_at(&handle_realtime_ordered_map,
@@ -398,12 +398,12 @@ CHECK_BEGIN_STATIC_FN(Handle_realtime_ordered_map_test_insert_or_assign)
 
     i = size;
     hndl = insert_or_assign(&handle_realtime_ordered_map,
-                            &(struct val){.id = i, .val = i});
+                            &(struct Val){.id = i, .val = i});
     CHECK(validate(&handle_realtime_ordered_map), true);
     CHECK(occupied(&hndl), false);
     CHECK(count(&handle_realtime_ordered_map).count, i + 2);
     hndl = insert_or_assign(&handle_realtime_ordered_map,
-                            &(struct val){.id = i, .val = i + 1});
+                            &(struct Val){.id = i, .val = i + 1});
     CHECK(validate(&handle_realtime_ordered_map), true);
     CHECK(occupied(&hndl), true);
     CHECK(count(&handle_realtime_ordered_map).count, i + 2);
@@ -415,11 +415,11 @@ CHECK_BEGIN_STATIC_FN(Handle_realtime_ordered_map_test_insert_or_assign)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(Handle_realtime_ordered_map_test_insert_or_assign_with)
+CHECK_BEGIN_STATIC_FN(handle_realtime_ordered_map_test_insert_or_assign_with)
 {
     CCC_Handle_realtime_ordered_map handle_realtime_ordered_map
         = handle_realtime_ordered_map_initialize(&(small_fixed_map){},
-                                                 struct val, id, id_cmp, NULL,
+                                                 struct Val, id, id_order, NULL,
                                                  NULL, SMALL_FIXED_CAP);
     int size = 30;
     CCC_Handle *hndl = handle_realtime_ordered_map_insert_or_assign_w(
@@ -432,7 +432,7 @@ CHECK_BEGIN_STATIC_FN(Handle_realtime_ordered_map_test_insert_or_assign_with)
     CHECK(validate(&handle_realtime_ordered_map), true);
     CHECK(occupied(hndl), true);
     CHECK(count(&handle_realtime_ordered_map).count, 1);
-    struct val *v = handle_realtime_ordered_map_at(&handle_realtime_ordered_map,
+    struct Val *v = handle_realtime_ordered_map_at(&handle_realtime_ordered_map,
                                                    unwrap(hndl));
     CHECK(v != NULL, true);
     CHECK(v->val, -2);
@@ -479,11 +479,11 @@ CHECK_BEGIN_STATIC_FN(Handle_realtime_ordered_map_test_insert_or_assign_with)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(Handle_realtime_ordered_map_test_handle_and_modify)
+CHECK_BEGIN_STATIC_FN(handle_realtime_ordered_map_test_handle_and_modify)
 {
     CCC_Handle_realtime_ordered_map handle_realtime_ordered_map
         = handle_realtime_ordered_map_initialize(&(small_fixed_map){},
-                                                 struct val, id, id_cmp, NULL,
+                                                 struct Val, id, id_order, NULL,
                                                  NULL, SMALL_FIXED_CAP);
     int size = 30;
     CCC_Handle_realtime_ordered_map_handle *hndl
@@ -500,7 +500,7 @@ CHECK_BEGIN_STATIC_FN(Handle_realtime_ordered_map_test_handle_and_modify)
     hndl = handle_r(&handle_realtime_ordered_map, &(int){-1});
     CHECK(occupied(hndl), true);
     CHECK(count(&handle_realtime_ordered_map).count, 1);
-    struct val *v = handle_realtime_ordered_map_at(&handle_realtime_ordered_map,
+    struct Val *v = handle_realtime_ordered_map_at(&handle_realtime_ordered_map,
                                                    unwrap(hndl));
     CHECK(v != NULL, true);
     CHECK(v->val, -1);
@@ -555,11 +555,11 @@ CHECK_BEGIN_STATIC_FN(Handle_realtime_ordered_map_test_handle_and_modify)
 }
 
 CHECK_BEGIN_STATIC_FN(
-    Handle_realtime_ordered_map_test_handle_and_modify_context)
+    handle_realtime_ordered_map_test_handle_and_modify_context)
 {
     CCC_Handle_realtime_ordered_map handle_realtime_ordered_map
         = handle_realtime_ordered_map_initialize(&(small_fixed_map){},
-                                                 struct val, id, id_cmp, NULL,
+                                                 struct Val, id, id_order, NULL,
                                                  NULL, SMALL_FIXED_CAP);
     int size = 30;
     int context = 1;
@@ -574,7 +574,7 @@ CHECK_BEGIN_STATIC_FN(
     hndl = handle_r(&handle_realtime_ordered_map, &(int){-1});
     CHECK(occupied(hndl), true);
     CHECK(count(&handle_realtime_ordered_map).count, 1);
-    struct val *v = handle_realtime_ordered_map_at(&handle_realtime_ordered_map,
+    struct Val *v = handle_realtime_ordered_map_at(&handle_realtime_ordered_map,
                                                    unwrap(hndl));
     CHECK(v != NULL, true);
     CHECK(v->val, -1);
@@ -628,16 +628,16 @@ CHECK_BEGIN_STATIC_FN(
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(Handle_realtime_ordered_map_test_handle_and_modify_with)
+CHECK_BEGIN_STATIC_FN(handle_realtime_ordered_map_test_handle_and_modify_with)
 {
     CCC_Handle_realtime_ordered_map handle_realtime_ordered_map
         = handle_realtime_ordered_map_initialize(&(small_fixed_map){},
-                                                 struct val, id, id_cmp, NULL,
+                                                 struct Val, id, id_order, NULL,
                                                  NULL, SMALL_FIXED_CAP);
     int size = 30;
     CCC_Handle_realtime_ordered_map_handle *hndl
         = handle_r(&handle_realtime_ordered_map, &(int){-1});
-    hndl = handle_realtime_ordered_map_and_modify_w(hndl, struct val,
+    hndl = handle_realtime_ordered_map_and_modify_w(hndl, struct Val,
                                                     { T->val++; });
     CHECK(count(&handle_realtime_ordered_map).count, 0);
     CHECK(occupied(hndl), false);
@@ -646,12 +646,12 @@ CHECK_BEGIN_STATIC_FN(Handle_realtime_ordered_map_test_handle_and_modify_with)
         &handle_realtime_ordered_map, -1, val(-1));
     CHECK(validate(&handle_realtime_ordered_map), true);
     hndl = handle_r(&handle_realtime_ordered_map, &(int){-1});
-    struct val *v = handle_realtime_ordered_map_at(&handle_realtime_ordered_map,
+    struct Val *v = handle_realtime_ordered_map_at(&handle_realtime_ordered_map,
                                                    unwrap(hndl));
     CHECK(v != NULL, true);
     CHECK(v->val, -1);
     CHECK(v->id, -1);
-    hndl = handle_realtime_ordered_map_and_modify_w(hndl, struct val,
+    hndl = handle_realtime_ordered_map_and_modify_w(hndl, struct Val,
                                                     { T->val++; });
     v = handle_realtime_ordered_map_at(&handle_realtime_ordered_map,
                                        unwrap(hndl));
@@ -665,7 +665,7 @@ CHECK_BEGIN_STATIC_FN(Handle_realtime_ordered_map_test_handle_and_modify_with)
 
     i += (size / 2);
     hndl = handle_r(&handle_realtime_ordered_map, &i);
-    hndl = handle_realtime_ordered_map_and_modify_w(hndl, struct val,
+    hndl = handle_realtime_ordered_map_and_modify_w(hndl, struct Val,
                                                     { T->val++; });
     CHECK(occupied(hndl), false);
     CHECK(count(&handle_realtime_ordered_map).count, i + 1);
@@ -673,7 +673,7 @@ CHECK_BEGIN_STATIC_FN(Handle_realtime_ordered_map_test_handle_and_modify_with)
         &handle_realtime_ordered_map, i, val(i));
     CHECK(validate(&handle_realtime_ordered_map), true);
     hndl = handle_r(&handle_realtime_ordered_map, &i);
-    hndl = handle_realtime_ordered_map_and_modify_w(hndl, struct val,
+    hndl = handle_realtime_ordered_map_and_modify_w(hndl, struct Val,
                                                     { T->val++; });
     v = handle_realtime_ordered_map_at(&handle_realtime_ordered_map,
                                        unwrap(hndl));
@@ -687,7 +687,7 @@ CHECK_BEGIN_STATIC_FN(Handle_realtime_ordered_map_test_handle_and_modify_with)
 
     i = size;
     hndl = handle_r(&handle_realtime_ordered_map, &i);
-    hndl = handle_realtime_ordered_map_and_modify_w(hndl, struct val,
+    hndl = handle_realtime_ordered_map_and_modify_w(hndl, struct Val,
                                                     { T->val++; });
     CHECK(occupied(hndl), false);
     CHECK(count(&handle_realtime_ordered_map).count, i + 1);
@@ -695,7 +695,7 @@ CHECK_BEGIN_STATIC_FN(Handle_realtime_ordered_map_test_handle_and_modify_with)
         &handle_realtime_ordered_map, i, val(i));
     CHECK(validate(&handle_realtime_ordered_map), true);
     hndl = handle_r(&handle_realtime_ordered_map, &i);
-    hndl = handle_realtime_ordered_map_and_modify_w(hndl, struct val,
+    hndl = handle_realtime_ordered_map_and_modify_w(hndl, struct Val,
                                                     { T->val++; });
     v = handle_realtime_ordered_map_at(&handle_realtime_ordered_map,
                                        unwrap(hndl));
@@ -706,17 +706,17 @@ CHECK_BEGIN_STATIC_FN(Handle_realtime_ordered_map_test_handle_and_modify_with)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(Handle_realtime_ordered_map_test_or_insert)
+CHECK_BEGIN_STATIC_FN(handle_realtime_ordered_map_test_or_insert)
 {
     CCC_Handle_realtime_ordered_map handle_realtime_ordered_map
         = handle_realtime_ordered_map_initialize(&(small_fixed_map){},
-                                                 struct val, id, id_cmp, NULL,
+                                                 struct Val, id, id_order, NULL,
                                                  NULL, SMALL_FIXED_CAP);
     int size = 30;
-    struct val *v = handle_realtime_ordered_map_at(
+    struct Val *v = handle_realtime_ordered_map_at(
         &handle_realtime_ordered_map,
         or_insert(handle_r(&handle_realtime_ordered_map, &(int){-1}),
-                  &(struct val){.id = -1, .val = -1}));
+                  &(struct Val){.id = -1, .val = -1}));
     CHECK(validate(&handle_realtime_ordered_map), true);
     CHECK(v != NULL, true);
     CHECK(v->id, -1);
@@ -725,7 +725,7 @@ CHECK_BEGIN_STATIC_FN(Handle_realtime_ordered_map_test_or_insert)
     v = handle_realtime_ordered_map_at(
         &handle_realtime_ordered_map,
         or_insert(handle_r(&handle_realtime_ordered_map, &(int){-1}),
-                  &(struct val){.id = -1, .val = -2}));
+                  &(struct Val){.id = -1, .val = -2}));
     CHECK(v != NULL, true);
     CHECK(v->id, -1);
     CHECK(v->val, -1);
@@ -738,7 +738,7 @@ CHECK_BEGIN_STATIC_FN(Handle_realtime_ordered_map_test_or_insert)
     v = handle_realtime_ordered_map_at(
         &handle_realtime_ordered_map,
         or_insert(handle_r(&handle_realtime_ordered_map, &i),
-                  &(struct val){.id = i, .val = i}));
+                  &(struct Val){.id = i, .val = i}));
     CHECK(validate(&handle_realtime_ordered_map), true);
     CHECK(v != NULL, true);
     CHECK(v->id, i);
@@ -747,7 +747,7 @@ CHECK_BEGIN_STATIC_FN(Handle_realtime_ordered_map_test_or_insert)
     v = handle_realtime_ordered_map_at(
         &handle_realtime_ordered_map,
         or_insert(handle_r(&handle_realtime_ordered_map, &i),
-                  &(struct val){.id = i, .val = i + 1}));
+                  &(struct Val){.id = i, .val = i + 1}));
     CHECK(v != NULL, true);
     CHECK(v->id, i);
     CHECK(v->val, i);
@@ -760,7 +760,7 @@ CHECK_BEGIN_STATIC_FN(Handle_realtime_ordered_map_test_or_insert)
     v = handle_realtime_ordered_map_at(
         &handle_realtime_ordered_map,
         or_insert(handle_r(&handle_realtime_ordered_map, &i),
-                  &(struct val){.id = i, .val = i}));
+                  &(struct Val){.id = i, .val = i}));
     CHECK(validate(&handle_realtime_ordered_map), true);
     CHECK(v != NULL, true);
     CHECK(v->id, i);
@@ -769,7 +769,7 @@ CHECK_BEGIN_STATIC_FN(Handle_realtime_ordered_map_test_or_insert)
     v = handle_realtime_ordered_map_at(
         &handle_realtime_ordered_map,
         or_insert(handle_r(&handle_realtime_ordered_map, &i),
-                  &(struct val){.id = i, .val = i + 1}));
+                  &(struct Val){.id = i, .val = i + 1}));
     CHECK(v != NULL, true);
     CHECK(v->id, i);
     CHECK(v->val, i);
@@ -777,14 +777,14 @@ CHECK_BEGIN_STATIC_FN(Handle_realtime_ordered_map_test_or_insert)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(Handle_realtime_ordered_map_test_or_insert_with)
+CHECK_BEGIN_STATIC_FN(handle_realtime_ordered_map_test_or_insert_with)
 {
     CCC_Handle_realtime_ordered_map handle_realtime_ordered_map
         = handle_realtime_ordered_map_initialize(&(small_fixed_map){},
-                                                 struct val, id, id_cmp, NULL,
+                                                 struct Val, id, id_order, NULL,
                                                  NULL, SMALL_FIXED_CAP);
     int size = 30;
-    struct val *v = handle_realtime_ordered_map_at(
+    struct Val *v = handle_realtime_ordered_map_at(
         &handle_realtime_ordered_map,
         handle_realtime_ordered_map_or_insert_w(
             handle_r(&handle_realtime_ordered_map, &(int){-1}), idval(-1, -1)));
@@ -848,17 +848,17 @@ CHECK_BEGIN_STATIC_FN(Handle_realtime_ordered_map_test_or_insert_with)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(Handle_realtime_ordered_map_test_insert_handle)
+CHECK_BEGIN_STATIC_FN(handle_realtime_ordered_map_test_insert_handle)
 {
     CCC_Handle_realtime_ordered_map handle_realtime_ordered_map
         = handle_realtime_ordered_map_initialize(&(small_fixed_map){},
-                                                 struct val, id, id_cmp, NULL,
+                                                 struct Val, id, id_order, NULL,
                                                  NULL, SMALL_FIXED_CAP);
     int size = 30;
-    struct val *v = handle_realtime_ordered_map_at(
+    struct Val *v = handle_realtime_ordered_map_at(
         &handle_realtime_ordered_map,
         insert_handle(handle_r(&handle_realtime_ordered_map, &(int){-1}),
-                      &(struct val){.id = -1, .val = -1}));
+                      &(struct Val){.id = -1, .val = -1}));
     CHECK(validate(&handle_realtime_ordered_map), true);
     CHECK(v != NULL, true);
     CHECK(v->id, -1);
@@ -867,7 +867,7 @@ CHECK_BEGIN_STATIC_FN(Handle_realtime_ordered_map_test_insert_handle)
     v = handle_realtime_ordered_map_at(
         &handle_realtime_ordered_map,
         insert_handle(handle_r(&handle_realtime_ordered_map, &(int){-1}),
-                      &(struct val){.id = -1, .val = -2}));
+                      &(struct Val){.id = -1, .val = -2}));
     CHECK(v != NULL, true);
     CHECK(v->id, -1);
     CHECK(v->val, -2);
@@ -880,7 +880,7 @@ CHECK_BEGIN_STATIC_FN(Handle_realtime_ordered_map_test_insert_handle)
     v = handle_realtime_ordered_map_at(
         &handle_realtime_ordered_map,
         insert_handle(handle_r(&handle_realtime_ordered_map, &i),
-                      &(struct val){.id = i, .val = i}));
+                      &(struct Val){.id = i, .val = i}));
     CHECK(validate(&handle_realtime_ordered_map), true);
     CHECK(v != NULL, true);
     CHECK(v->id, i);
@@ -889,7 +889,7 @@ CHECK_BEGIN_STATIC_FN(Handle_realtime_ordered_map_test_insert_handle)
     v = handle_realtime_ordered_map_at(
         &handle_realtime_ordered_map,
         insert_handle(handle_r(&handle_realtime_ordered_map, &i),
-                      &(struct val){.id = i, .val = i + 1}));
+                      &(struct Val){.id = i, .val = i + 1}));
     CHECK(v != NULL, true);
     CHECK(v->id, i);
     CHECK(v->val, i + 1);
@@ -902,7 +902,7 @@ CHECK_BEGIN_STATIC_FN(Handle_realtime_ordered_map_test_insert_handle)
     v = handle_realtime_ordered_map_at(
         &handle_realtime_ordered_map,
         insert_handle(handle_r(&handle_realtime_ordered_map, &i),
-                      &(struct val){.id = i, .val = i}));
+                      &(struct Val){.id = i, .val = i}));
     CHECK(validate(&handle_realtime_ordered_map), true);
     CHECK(v != NULL, true);
     CHECK(v->id, i);
@@ -911,7 +911,7 @@ CHECK_BEGIN_STATIC_FN(Handle_realtime_ordered_map_test_insert_handle)
     v = handle_realtime_ordered_map_at(
         &handle_realtime_ordered_map,
         insert_handle(handle_r(&handle_realtime_ordered_map, &i),
-                      &(struct val){.id = i, .val = i + 1}));
+                      &(struct Val){.id = i, .val = i + 1}));
     CHECK(v != NULL, true);
     CHECK(v->id, i);
     CHECK(v->val, i + 1);
@@ -919,14 +919,14 @@ CHECK_BEGIN_STATIC_FN(Handle_realtime_ordered_map_test_insert_handle)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(Handle_realtime_ordered_map_test_insert_handle_with)
+CHECK_BEGIN_STATIC_FN(handle_realtime_ordered_map_test_insert_handle_with)
 {
     CCC_Handle_realtime_ordered_map handle_realtime_ordered_map
         = handle_realtime_ordered_map_initialize(&(small_fixed_map){},
-                                                 struct val, id, id_cmp, NULL,
+                                                 struct Val, id, id_order, NULL,
                                                  NULL, SMALL_FIXED_CAP);
     int size = 30;
-    struct val *v = handle_realtime_ordered_map_at(
+    struct Val *v = handle_realtime_ordered_map_at(
         &handle_realtime_ordered_map,
         handle_realtime_ordered_map_insert_handle_w(
             handle_r(&handle_realtime_ordered_map, &(int){-1}), idval(-1, -1)));
@@ -990,17 +990,17 @@ CHECK_BEGIN_STATIC_FN(Handle_realtime_ordered_map_test_insert_handle_with)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(Handle_realtime_ordered_map_test_remove_handle)
+CHECK_BEGIN_STATIC_FN(handle_realtime_ordered_map_test_remove_handle)
 {
     CCC_Handle_realtime_ordered_map handle_realtime_ordered_map
         = handle_realtime_ordered_map_initialize(&(small_fixed_map){},
-                                                 struct val, id, id_cmp, NULL,
+                                                 struct Val, id, id_order, NULL,
                                                  NULL, SMALL_FIXED_CAP);
     int size = 30;
-    struct val *v = handle_realtime_ordered_map_at(
+    struct Val *v = handle_realtime_ordered_map_at(
         &handle_realtime_ordered_map,
         or_insert(handle_r(&handle_realtime_ordered_map, &(int){-1}),
-                  &(struct val){.id = -1, .val = -1}));
+                  &(struct Val){.id = -1, .val = -1}));
     CHECK(validate(&handle_realtime_ordered_map), true);
     CHECK(v != NULL, true);
     CHECK(v->id, -1);
@@ -1023,7 +1023,7 @@ CHECK_BEGIN_STATIC_FN(Handle_realtime_ordered_map_test_remove_handle)
     v = handle_realtime_ordered_map_at(
         &handle_realtime_ordered_map,
         or_insert(handle_r(&handle_realtime_ordered_map, &i),
-                  &(struct val){.id = i, .val = i}));
+                  &(struct Val){.id = i, .val = i}));
     CHECK(validate(&handle_realtime_ordered_map), true);
     CHECK(v != NULL, true);
     CHECK(v->id, i);
@@ -1044,7 +1044,7 @@ CHECK_BEGIN_STATIC_FN(Handle_realtime_ordered_map_test_remove_handle)
     v = handle_realtime_ordered_map_at(
         &handle_realtime_ordered_map,
         or_insert(handle_r(&handle_realtime_ordered_map, &i),
-                  &(struct val){.id = i, .val = i}));
+                  &(struct Val){.id = i, .val = i}));
     CHECK(validate(&handle_realtime_ordered_map), true);
     CHECK(v != NULL, true);
     CHECK(v->id, i);
@@ -1065,19 +1065,19 @@ int
 main(void)
 {
     return CHECK_RUN(
-        Handle_realtime_ordered_map_test_insert(),
-        Handle_realtime_ordered_map_test_remove(),
-        Handle_realtime_ordered_map_test_validate(),
-        Handle_realtime_ordered_map_test_try_insert(),
-        Handle_realtime_ordered_map_test_try_insert_with(),
-        Handle_realtime_ordered_map_test_insert_or_assign(),
-        Handle_realtime_ordered_map_test_insert_or_assign_with(),
-        Handle_realtime_ordered_map_test_handle_and_modify(),
-        Handle_realtime_ordered_map_test_handle_and_modify_context(),
-        Handle_realtime_ordered_map_test_handle_and_modify_with(),
-        Handle_realtime_ordered_map_test_or_insert(),
-        Handle_realtime_ordered_map_test_or_insert_with(),
-        Handle_realtime_ordered_map_test_insert_handle(),
-        Handle_realtime_ordered_map_test_insert_handle_with(),
-        Handle_realtime_ordered_map_test_remove_handle());
+        handle_realtime_ordered_map_test_insert(),
+        handle_realtime_ordered_map_test_remove(),
+        handle_realtime_ordered_map_test_validate(),
+        handle_realtime_ordered_map_test_try_insert(),
+        handle_realtime_ordered_map_test_try_insert_with(),
+        handle_realtime_ordered_map_test_insert_or_assign(),
+        handle_realtime_ordered_map_test_insert_or_assign_with(),
+        handle_realtime_ordered_map_test_handle_and_modify(),
+        handle_realtime_ordered_map_test_handle_and_modify_context(),
+        handle_realtime_ordered_map_test_handle_and_modify_with(),
+        handle_realtime_ordered_map_test_or_insert(),
+        handle_realtime_ordered_map_test_or_insert_with(),
+        handle_realtime_ordered_map_test_insert_handle(),
+        handle_realtime_ordered_map_test_insert_handle_with(),
+        handle_realtime_ordered_map_test_remove_handle());
 }

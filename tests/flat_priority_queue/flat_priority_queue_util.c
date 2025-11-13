@@ -13,17 +13,17 @@
 #include "util/alloc.h"
 
 CCC_Order
-val_cmp(CCC_Type_comparator_context const cmp)
+val_order(CCC_Type_comparator_context const order)
 {
-    struct val const *const lhs = cmp.any_type_lhs;
-    struct val const *const rhs = cmp.any_type_rhs;
+    struct Val const *const lhs = order.type_lhs;
+    struct Val const *const rhs = order.type_rhs;
     return (lhs->val > rhs->val) - (lhs->val < rhs->val);
 }
 
 void
 val_update(CCC_Type_context const u)
 {
-    struct val *const old = u.any_type;
+    struct Val *const old = u.type;
     old->val = *(int *)u.context;
 }
 
@@ -35,7 +35,7 @@ rand_range(size_t const min, size_t const max)
 }
 
 CHECK_BEGIN_FN(insert_shuffled, CCC_Flat_priority_queue *const priority_queue,
-               struct val vals[const], size_t const size,
+               struct Val vals[const], size_t const size,
                int const larger_prime)
 {
     /* Math magic ahead so that we iterate over every index
@@ -47,7 +47,7 @@ CHECK_BEGIN_FN(insert_shuffled, CCC_Flat_priority_queue *const priority_queue,
     for (size_t i = 0; i < size; ++i)
     {
         vals[i].id = vals[i].val = (int)shuffled_index;
-        CHECK(push(priority_queue, &vals[i], &(struct val){}) != NULL,
+        CHECK(push(priority_queue, &vals[i], &(struct Val){}) != NULL,
               CCC_TRUE);
         CHECK(CCC_flat_priority_queue_count(priority_queue).count, i + 1);
         CHECK(validate(priority_queue), true);
@@ -66,17 +66,17 @@ CHECK_BEGIN_FN(inorder_fill, int vals[const], size_t const size,
         return FAIL;
     }
     CCC_Flat_priority_queue flat_priority_queue_cpy
-        = CCC_flat_priority_queue_initialize(NULL, struct val, CCC_ORDER_LESSER,
-                                             val_cmp, std_alloc, NULL, 0);
+        = CCC_flat_priority_queue_initialize(NULL, struct Val, CCC_ORDER_LESSER,
+                                             val_order, std_allocate, NULL, 0);
     CCC_Result const r = flat_priority_queue_copy(
-        &flat_priority_queue_cpy, flat_priority_queue, std_alloc);
+        &flat_priority_queue_cpy, flat_priority_queue, std_allocate);
     CHECK(r, CCC_RESULT_OK);
     CCC_Buffer b = flat_priority_queue_heapsort(&flat_priority_queue_cpy,
-                                                &(struct val){});
+                                                &(struct Val){});
     CHECK(CCC_buffer_is_empty(&b), CCC_FALSE);
     vals[0] = *CCC_buffer_back_as(&b, int);
     size_t i = 1;
-    for (struct val const *prev = rbegin(&b), *v = rnext(&b, prev);
+    for (struct Val const *prev = rbegin(&b), *v = rnext(&b, prev);
          v != rend(&b); prev = v, v = rnext(&b, v))
     {
         CHECK(prev->val <= v->val, CCC_TRUE);

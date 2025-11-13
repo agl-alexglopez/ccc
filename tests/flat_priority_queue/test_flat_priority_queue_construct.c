@@ -15,35 +15,35 @@
 #include "util/alloc.h"
 
 static CCC_Order
-int_cmp(CCC_Type_comparator_context const cmp)
+int_order(CCC_Type_comparator_context const order)
 {
-    int a = *((int const *const)cmp.any_type_lhs);
-    int b = *((int const *const)cmp.any_type_rhs);
+    int a = *((int const *const)order.type_lhs);
+    int b = *((int const *const)order.type_rhs);
     return (a > b) - (a < b);
 }
 
 CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_empty)
 {
-    struct val vals[2] = {};
+    struct Val vals[2] = {};
     Flat_priority_queue priority_queue = flat_priority_queue_initialize(
-        vals, struct val, CCC_ORDER_LESSER, val_cmp, NULL, NULL,
-        (sizeof(vals) / sizeof(struct val)));
+        vals, struct Val, CCC_ORDER_LESSER, val_order, NULL, NULL,
+        (sizeof(vals) / sizeof(struct Val)));
     CHECK(flat_priority_queue_is_empty(&priority_queue), true);
     CHECK_END_FN();
 }
 
 CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_macro)
 {
-    struct val vals[2] = {};
+    struct Val vals[2] = {};
     Flat_priority_queue priority_queue = flat_priority_queue_initialize(
-        vals, struct val, CCC_ORDER_LESSER, val_cmp, NULL, NULL,
-        (sizeof(vals) / sizeof(struct val)));
-    struct val *res = flat_priority_queue_emplace(
-        &priority_queue, (struct val){.val = 0, .id = 0});
+        vals, struct Val, CCC_ORDER_LESSER, val_order, NULL, NULL,
+        (sizeof(vals) / sizeof(struct Val)));
+    struct Val *res = flat_priority_queue_emplace(
+        &priority_queue, (struct Val){.val = 0, .id = 0});
     CHECK(res != NULL, true);
     CHECK(flat_priority_queue_is_empty(&priority_queue), false);
-    struct val *res2 = flat_priority_queue_emplace(
-        &priority_queue, (struct val){.val = 0, .id = 0});
+    struct Val *res2 = flat_priority_queue_emplace(
+        &priority_queue, (struct Val){.val = 0, .id = 0});
     CHECK(res2 != NULL, true);
     CHECK_END_FN();
 }
@@ -51,13 +51,13 @@ CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_macro)
 CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_macro_grow)
 {
     Flat_priority_queue priority_queue = flat_priority_queue_initialize(
-        NULL, struct val, CCC_ORDER_LESSER, val_cmp, std_alloc, NULL, 0);
-    struct val *res = flat_priority_queue_emplace(
-        &priority_queue, (struct val){.val = 0, .id = 0});
+        NULL, struct Val, CCC_ORDER_LESSER, val_order, std_allocate, NULL, 0);
+    struct Val *res = flat_priority_queue_emplace(
+        &priority_queue, (struct Val){.val = 0, .id = 0});
     CHECK(res != NULL, true);
     CHECK(flat_priority_queue_is_empty(&priority_queue), false);
-    struct val *res2 = flat_priority_queue_emplace(
-        &priority_queue, (struct val){.val = 0, .id = 0});
+    struct Val *res2 = flat_priority_queue_emplace(
+        &priority_queue, (struct Val){.val = 0, .id = 0});
     CHECK(res2 != NULL, true);
     CHECK_END_FN(
         (void)CCC_flat_priority_queue_clear_and_free(&priority_queue, NULL););
@@ -65,11 +65,11 @@ CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_macro_grow)
 
 CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_push)
 {
-    struct val vals[3] = {};
+    struct Val vals[3] = {};
     Flat_priority_queue priority_queue = flat_priority_queue_initialize(
-        vals, struct val, CCC_ORDER_LESSER, val_cmp, NULL, NULL,
-        (sizeof(vals) / sizeof(struct val)));
-    struct val *res = push(&priority_queue, &vals[0], &(struct val){});
+        vals, struct Val, CCC_ORDER_LESSER, val_order, NULL, NULL,
+        (sizeof(vals) / sizeof(struct Val)));
+    struct Val *res = push(&priority_queue, &vals[0], &(struct Val){});
     CHECK(res != NULL, true);
     CHECK(flat_priority_queue_is_empty(&priority_queue), false);
     CHECK_END_FN();
@@ -79,7 +79,7 @@ CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_raw_type)
 {
     int vals[4] = {};
     Flat_priority_queue priority_queue = flat_priority_queue_initialize(
-        vals, int, CCC_ORDER_LESSER, int_cmp, NULL, NULL,
+        vals, int, CCC_ORDER_LESSER, int_order, NULL, NULL,
         (sizeof(vals) / sizeof(int)));
     int val = 1;
     int *res = push(&priority_queue, &val, &(int){0});
@@ -93,7 +93,7 @@ CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_raw_type)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_heapify_init)
+CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_heapify_initialize)
 {
     srand(time(NULL)); /* NOLINT */
     enum : size_t
@@ -106,7 +106,7 @@ CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_heapify_init)
         heap[i] = rand_range(-99, (int)HEAPIFY_CAP); /* NOLINT */
     }
     Flat_priority_queue priority_queue = flat_priority_queue_heapify_initialize(
-        heap, int, CCC_ORDER_LESSER, int_cmp, NULL, NULL, HEAPIFY_CAP,
+        heap, int, CCC_ORDER_LESSER, int_order, NULL, NULL, HEAPIFY_CAP,
         HEAPIFY_CAP);
     int prev = *((int *)flat_priority_queue_front(&priority_queue));
     (void)pop(&priority_queue, &(int){0});
@@ -129,7 +129,7 @@ CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_heapify_copy)
     };
     int heap[HEAPIFY_COPY_CAP] = {};
     Flat_priority_queue priority_queue = flat_priority_queue_initialize(
-        heap, int, CCC_ORDER_LESSER, int_cmp, NULL, NULL, HEAPIFY_COPY_CAP);
+        heap, int, CCC_ORDER_LESSER, int_order, NULL, NULL, HEAPIFY_COPY_CAP);
     int input[HEAPIFY_COPY_CAP] = {};
     for (size_t i = 0; i < HEAPIFY_COPY_CAP; ++i)
     {
@@ -164,7 +164,8 @@ CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_heapsort)
         heap[i] = rand_range(-99, (int)(HPSORTCAP)); /* NOLINT */
     }
     Flat_priority_queue priority_queue = flat_priority_queue_heapify_initialize(
-        heap, int, CCC_ORDER_LESSER, int_cmp, NULL, NULL, HPSORTCAP, HPSORTCAP);
+        heap, int, CCC_ORDER_LESSER, int_order, NULL, NULL, HPSORTCAP,
+        HPSORTCAP);
     CCC_Buffer const b
         = CCC_flat_priority_queue_heapsort(&priority_queue, &(int){0});
     int const *prev = begin(&b);
@@ -184,9 +185,9 @@ CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_heapsort)
 CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_copy_no_alloc)
 {
     Flat_priority_queue src = flat_priority_queue_initialize(
-        (int[4]){}, int, CCC_ORDER_LESSER, int_cmp, NULL, NULL, 4);
+        (int[4]){}, int, CCC_ORDER_LESSER, int_order, NULL, NULL, 4);
     Flat_priority_queue dst = flat_priority_queue_initialize(
-        (int[5]){}, int, CCC_ORDER_LESSER, int_cmp, NULL, NULL, 5);
+        (int[5]){}, int, CCC_ORDER_LESSER, int_order, NULL, NULL, 5);
     (void)push(&src, &(int){0}, &(int){0});
     (void)push(&src, &(int){1}, &(int){0});
     (void)push(&src, &(int){2}, &(int){0});
@@ -211,9 +212,9 @@ CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_copy_no_alloc)
 CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_copy_no_alloc_fail)
 {
     Flat_priority_queue src = flat_priority_queue_initialize(
-        (int[4]){}, int, CCC_ORDER_LESSER, int_cmp, NULL, NULL, 4);
+        (int[4]){}, int, CCC_ORDER_LESSER, int_order, NULL, NULL, 4);
     Flat_priority_queue dst = flat_priority_queue_initialize(
-        (int[2]){}, int, CCC_ORDER_LESSER, int_cmp, NULL, NULL, 2);
+        (int[2]){}, int, CCC_ORDER_LESSER, int_order, NULL, NULL, 2);
     (void)push(&src, &(int){0}, &(int){0});
     (void)push(&src, &(int){1}, &(int){0});
     (void)push(&src, &(int){2}, &(int){0});
@@ -228,15 +229,15 @@ CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_copy_no_alloc_fail)
 CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_copy_alloc)
 {
     Flat_priority_queue src = flat_priority_queue_initialize(
-        NULL, int, CCC_ORDER_LESSER, int_cmp, std_alloc, NULL, 0);
+        NULL, int, CCC_ORDER_LESSER, int_order, std_allocate, NULL, 0);
     Flat_priority_queue dst = flat_priority_queue_initialize(
-        NULL, int, CCC_ORDER_LESSER, int_cmp, std_alloc, NULL, 0);
+        NULL, int, CCC_ORDER_LESSER, int_order, std_allocate, NULL, 0);
     (void)push(&src, &(int){0}, &(int){0});
     (void)push(&src, &(int){1}, &(int){0});
     (void)push(&src, &(int){2}, &(int){0});
     CHECK(*(int *)front(&src), 0);
     CHECK(is_empty(&dst), true);
-    CCC_Result res = flat_priority_queue_copy(&dst, &src, std_alloc);
+    CCC_Result res = flat_priority_queue_copy(&dst, &src, std_allocate);
     CHECK(res, CCC_RESULT_OK);
     CHECK(count(&dst).count, 3);
     while (!is_empty(&src) && !is_empty(&dst))
@@ -257,9 +258,9 @@ CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_copy_alloc)
 CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_copy_alloc_fail)
 {
     Flat_priority_queue src = flat_priority_queue_initialize(
-        NULL, int, CCC_ORDER_LESSER, int_cmp, std_alloc, NULL, 0);
+        NULL, int, CCC_ORDER_LESSER, int_order, std_allocate, NULL, 0);
     Flat_priority_queue dst = flat_priority_queue_initialize(
-        NULL, int, CCC_ORDER_LESSER, int_cmp, std_alloc, NULL, 0);
+        NULL, int, CCC_ORDER_LESSER, int_order, std_allocate, NULL, 0);
     (void)push(&src, &(int){0}, &(int){0});
     (void)push(&src, &(int){1}, &(int){0});
     (void)push(&src, &(int){2}, &(int){0});

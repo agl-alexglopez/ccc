@@ -1,24 +1,25 @@
-#include "alloc.h"
-
 #include <stddef.h>
 #include <stdlib.h>
 
+#include "alloc.h"
+#include "types.h"
+
 void *
-std_alloc(void *const ptr, size_t const size, void *const)
+std_allocate(CCC_Allocator_context const context)
 {
 
-    if (!ptr && !size)
+    if (!context.input && !context.bytes)
     {
         return NULL;
     }
-    if (!ptr)
+    if (!context.input)
     {
-        return malloc(size);
+        return malloc(context.bytes);
     }
-    if (!size)
+    if (!context.bytes)
     {
-        free(ptr);
+        free(context.input);
         return NULL;
     }
-    return realloc(ptr, size);
+    return realloc(context.input, context.bytes);
 }

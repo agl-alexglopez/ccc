@@ -10,7 +10,7 @@
 #include "types.h"
 #include "util/alloc.h"
 
-CHECK_BEGIN_STATIC_FN(pop_front_n, flat_double_ended_queue *const q, size_t n)
+CHECK_BEGIN_STATIC_FN(pop_front_n, Flat_double_ended_queue *const q, size_t n)
 {
     for (; n-- && !is_empty(q); (void)pop_front(q))
     {
@@ -19,7 +19,7 @@ CHECK_BEGIN_STATIC_FN(pop_front_n, flat_double_ended_queue *const q, size_t n)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(pop_back_n, flat_double_ended_queue *const q, size_t n)
+CHECK_BEGIN_STATIC_FN(pop_back_n, Flat_double_ended_queue *const q, size_t n)
 {
     for (; n-- && !is_empty(q); (void)pop_back(q))
     {
@@ -30,7 +30,7 @@ CHECK_BEGIN_STATIC_FN(pop_back_n, flat_double_ended_queue *const q, size_t n)
 
 CHECK_BEGIN_STATIC_FN(flat_double_ended_queue_test_push_pop_back_three)
 {
-    flat_double_ended_queue q
+    Flat_double_ended_queue q
         = flat_double_ended_queue_initialize((int[3]){}, int, NULL, NULL, 3);
     CHECK(create_queue(&q, 3, (int[3]){0, 1, 2}), PASS);
     while (!is_empty(&q))
@@ -50,7 +50,7 @@ CHECK_BEGIN_STATIC_FN(
     {
         SM_FIXED_Q = 64,
     };
-    flat_double_ended_queue q = flat_double_ended_queue_initialize(
+    Flat_double_ended_queue q = flat_double_ended_queue_initialize(
         (int[SM_FIXED_Q]){}, int, NULL, NULL, SM_FIXED_Q);
     /* Move the front pointer back a bit so that pushing to both sides wraps. */
     (void)CCC_flat_double_ended_queue_push_back_range(
@@ -99,8 +99,8 @@ CHECK_BEGIN_STATIC_FN(
     flat_double_ended_queue_test_push_pop_front_and_back_singles_dynamic)
 {
     size_t const sm_dyn_q = 128;
-    flat_double_ended_queue q
-        = flat_double_ended_queue_initialize(NULL, int, std_alloc, NULL, 0);
+    Flat_double_ended_queue q
+        = flat_double_ended_queue_initialize(NULL, int, std_allocate, NULL, 0);
     /* Move the front pointer back a bit so that pushing to both sides wraps. */
     (void)CCC_flat_double_ended_queue_push_back_range(
         &q, 20,
@@ -146,7 +146,7 @@ CHECK_BEGIN_STATIC_FN(
 
 CHECK_BEGIN_STATIC_FN(flat_double_ended_queue_test_push_pop_front_three)
 {
-    flat_double_ended_queue q
+    Flat_double_ended_queue q
         = flat_double_ended_queue_initialize((int[3]){}, int, NULL, NULL, 3);
     CHECK(create_queue(&q, 3, (int[3]){0, 1, 2}), PASS);
     while (!is_empty(&q))
@@ -160,7 +160,7 @@ CHECK_BEGIN_STATIC_FN(flat_double_ended_queue_test_push_pop_front_three)
 
 CHECK_BEGIN_STATIC_FN(flat_double_ended_queue_test_push_pop_front_back)
 {
-    flat_double_ended_queue q
+    Flat_double_ended_queue q
         = flat_double_ended_queue_initialize((int[6]){}, int, NULL, NULL, 6);
     CHECK(create_queue(&q, 6, (int[6]){0, 1, 2, 3, 4, 5}), PASS);
     while (!is_empty(&q))
@@ -181,7 +181,7 @@ CHECK_BEGIN_STATIC_FN(flat_double_ended_queue_test_push_pop_front_back)
 
 CHECK_BEGIN_STATIC_FN(flat_double_ended_queue_test_push_pop_front_ranges)
 {
-    flat_double_ended_queue q
+    Flat_double_ended_queue q
         = flat_double_ended_queue_initialize((int[10]){}, int, NULL, NULL, 10);
     CHECK(create_queue(&q, 6, (int[6]){0, 1, 2, 3, 4, 5}), PASS);
     CHECK(pop_back_n(&q, 4), PASS);
@@ -206,7 +206,7 @@ CHECK_BEGIN_STATIC_FN(flat_double_ended_queue_test_push_pop_front_ranges)
 
 CHECK_BEGIN_STATIC_FN(flat_double_ended_queue_test_push_pop_back_ranges)
 {
-    flat_double_ended_queue q
+    Flat_double_ended_queue q
         = flat_double_ended_queue_initialize((int[10]){}, int, NULL, NULL, 10);
     CHECK(create_queue(&q, 6, (int[6]){0, 1, 2, 3, 4, 5}), PASS);
     CHECK(pop_front_n(&q, 4), PASS);
@@ -231,7 +231,7 @@ CHECK_BEGIN_STATIC_FN(flat_double_ended_queue_test_push_pop_back_ranges)
 
 CHECK_BEGIN_STATIC_FN(flat_double_ended_queue_test_push_pop_middle_ranges)
 {
-    flat_double_ended_queue q
+    Flat_double_ended_queue q
         = flat_double_ended_queue_initialize((int[10]){}, int, NULL, NULL, 10);
     CHECK(create_queue(&q, 6, (int[6]){0, 1, 2, 3, 4, 5}), PASS);
     CHECK(pop_front_n(&q, 3), PASS);

@@ -135,7 +135,7 @@ struct CCC_Handle_realtime_ordered_map
     /** @private Where user key can be found in type. */
     size_t key_offset;
     /** @private The provided key comparison function. */
-    CCC_Key_comparator *cmp;
+    CCC_Key_comparator *order;
     /** @private The provided allocation function, if any. */
     CCC_Allocator *alloc;
     /** @private The provided context data, if any. */
@@ -150,7 +150,7 @@ struct CCC_Handle_realtime_ordered_map_handle
     /** @private Current index of the handle. */
     size_t i;
     /** @private Saves last comparison direction. */
-    CCC_Order last_cmp;
+    CCC_Order last_order;
     /** @private The entry status flag. */
     CCC_Entry_status stats;
 };
@@ -159,7 +159,7 @@ struct CCC_Handle_realtime_ordered_map_handle
 union CCC_Handle_realtime_ordered_map_handle_wrap
 {
     /** @private Single field to enable return by compound literal reference. */
-    struct CCC_Handle_realtime_ordered_map_handle impl;
+    struct CCC_Handle_realtime_ordered_map_handle private;
 };
 
 /*========================  Private Interface  ==============================*/
@@ -185,7 +185,7 @@ CCC_private_handle_realtime_ordered_map_handle(
 /** @private */
 void CCC_private_handle_realtime_ordered_map_insert(
     struct CCC_Handle_realtime_ordered_map *handle_realtime_ordered_map,
-    size_t parent_i, CCC_Order last_cmp, size_t elem_i);
+    size_t parent_i, CCC_Order last_order, size_t elem_i);
 /** @private */
 size_t CCC_private_handle_realtime_ordered_map_alloc_slot(
     struct CCC_Handle_realtime_ordered_map *handle_realtime_ordered_map);
@@ -233,7 +233,7 @@ memory provided to the data pointer to come from any source at compile or
 runtime. */
 #define CCC_private_handle_realtime_ordered_map_initialize(                    \
     private_memory_ptr, private_type_name, private_key_node_field,             \
-    private_key_cmp_fn, private_alloc_fn, private_context_data,                \
+    private_key_order_fn, private_alloc_fn, private_context_data,              \
     private_capacity)                                                          \
     {                                                                          \
         .data = (private_memory_ptr),                                          \
@@ -245,7 +245,7 @@ runtime. */
         .free_list = 0,                                                        \
         .sizeof_type = sizeof(private_type_name),                              \
         .key_offset = offsetof(private_type_name, private_key_node_field),     \
-        .cmp = (private_key_cmp_fn),                                           \
+        .order = (private_key_order_fn),                                       \
         .alloc = (private_alloc_fn),                                           \
         .context = (private_context_data),                                     \
     }
@@ -270,7 +270,7 @@ runtime. */
         if (private_handle_realtime_ordered_map_hndl_ptr)                      \
         {                                                                      \
             private_handle_realtime_ordered_map_mod_hndl                       \
-                = private_handle_realtime_ordered_map_hndl_ptr->impl;          \
+                = private_handle_realtime_ordered_map_hndl_ptr->private;       \
             if (private_handle_realtime_ordered_map_mod_hndl.stats             \
                 & CCC_ENTRY_OCCUPIED)                                          \
             {                                                                  \
@@ -297,30 +297,31 @@ runtime. */
         CCC_Handle_index private_handle_realtime_ordered_map_or_ins_ret = 0;   \
         if (private_or_ins_handle_ptr)                                         \
         {                                                                      \
-            if (private_or_ins_handle_ptr->impl.stats == CCC_ENTRY_OCCUPIED)   \
+            if (private_or_ins_handle_ptr->private.stats                       \
+                == CCC_ENTRY_OCCUPIED)                                         \
             {                                                                  \
                 private_handle_realtime_ordered_map_or_ins_ret                 \
-                    = private_or_ins_handle_ptr->impl.i;                       \
+                    = private_or_ins_handle_ptr->private.i;                    \
             }                                                                  \
             else                                                               \
             {                                                                  \
                 private_handle_realtime_ordered_map_or_ins_ret                 \
                     = CCC_private_handle_realtime_ordered_map_alloc_slot(      \
-                        private_or_ins_handle_ptr->impl                        \
+                        private_or_ins_handle_ptr->private                     \
                             .handle_realtime_ordered_map);                     \
                 if (private_handle_realtime_ordered_map_or_ins_ret)            \
                 {                                                              \
                     *((typeof(lazy_key_value) *)                               \
                           CCC_private_handle_realtime_ordered_map_data_at(     \
-                              private_or_ins_handle_ptr->impl                  \
+                              private_or_ins_handle_ptr->private               \
                                   .handle_realtime_ordered_map,                \
                               private_handle_realtime_ordered_map_or_ins_ret)) \
                         = lazy_key_value;                                      \
                     CCC_private_handle_realtime_ordered_map_insert(            \
-                        private_or_ins_handle_ptr->impl                        \
+                        private_or_ins_handle_ptr->private                     \
                             .handle_realtime_ordered_map,                      \
-                        private_or_ins_handle_ptr->impl.i,                     \
-                        private_or_ins_handle_ptr->impl.last_cmp,              \
+                        private_or_ins_handle_ptr->private.i,                  \
+                        private_or_ins_handle_ptr->private.last_order,         \
                         private_handle_realtime_ordered_map_or_ins_ret);       \
                 }                                                              \
             }                                                                  \
@@ -337,35 +338,36 @@ runtime. */
         CCC_Handle_index private_handle_realtime_ordered_map_ins_hndl_ret = 0;   \
         if (private_ins_handle_ptr)                                              \
         {                                                                        \
-            if (!(private_ins_handle_ptr->impl.stats & CCC_ENTRY_OCCUPIED))      \
+            if (!(private_ins_handle_ptr->private.stats & CCC_ENTRY_OCCUPIED))   \
             {                                                                    \
                 private_handle_realtime_ordered_map_ins_hndl_ret                 \
                     = CCC_private_handle_realtime_ordered_map_alloc_slot(        \
-                        private_ins_handle_ptr->impl                             \
+                        private_ins_handle_ptr->private                          \
                             .handle_realtime_ordered_map);                       \
                 if (private_handle_realtime_ordered_map_ins_hndl_ret)            \
                 {                                                                \
                     *((typeof(lazy_key_value) *)                                 \
                           CCC_private_handle_realtime_ordered_map_data_at(       \
-                              private_ins_handle_ptr->impl                       \
+                              private_ins_handle_ptr->private                    \
                                   .handle_realtime_ordered_map,                  \
                               private_handle_realtime_ordered_map_ins_hndl_ret)) \
                         = lazy_key_value;                                        \
                     CCC_private_handle_realtime_ordered_map_insert(              \
-                        private_ins_handle_ptr->impl                             \
+                        private_ins_handle_ptr->private                          \
                             .handle_realtime_ordered_map,                        \
-                        private_ins_handle_ptr->impl.i,                          \
-                        private_ins_handle_ptr->impl.last_cmp,                   \
+                        private_ins_handle_ptr->private.i,                       \
+                        private_ins_handle_ptr->private.last_order,              \
                         private_handle_realtime_ordered_map_ins_hndl_ret);       \
                 }                                                                \
             }                                                                    \
-            else if (private_ins_handle_ptr->impl.stats == CCC_ENTRY_OCCUPIED)   \
+            else if (private_ins_handle_ptr->private.stats                       \
+                     == CCC_ENTRY_OCCUPIED)                                      \
             {                                                                    \
                 private_handle_realtime_ordered_map_ins_hndl_ret                 \
-                    = private_ins_handle_ptr->impl.i;                            \
+                    = private_ins_handle_ptr->private.i;                         \
                 *((typeof(lazy_key_value) *)                                     \
                       CCC_private_handle_realtime_ordered_map_data_at(           \
-                          private_ins_handle_ptr->impl                           \
+                          private_ins_handle_ptr->private                        \
                               .handle_realtime_ordered_map,                      \
                           private_handle_realtime_ordered_map_ins_hndl_ret))     \
                     = lazy_key_value;                                            \
@@ -420,7 +422,7 @@ runtime. */
                             .handle_realtime_ordered_map,                          \
                         private_handle_realtime_ordered_map_try_ins_hndl.i,        \
                         private_handle_realtime_ordered_map_try_ins_hndl           \
-                            .last_cmp,                                             \
+                            .last_order,                                           \
                         private_handle_realtime_ordered_map_try_ins_hndl_ret       \
                             .i);                                                   \
                     private_handle_realtime_ordered_map_try_ins_hndl_ret.stats     \
@@ -494,7 +496,7 @@ runtime. */
                         private_handle_realtime_ordered_map_ins_or_assign_hndl           \
                             .i,                                                          \
                         private_handle_realtime_ordered_map_ins_or_assign_hndl           \
-                            .last_cmp,                                                   \
+                            .last_order,                                                 \
                         private_handle_realtime_ordered_map_ins_or_assign_hndl_ret       \
                             .i);                                                         \
                     private_handle_realtime_ordered_map_ins_or_assign_hndl_ret           \

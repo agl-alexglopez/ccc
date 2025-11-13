@@ -55,7 +55,7 @@ struct CCC_Singly_linked_list
     /** @private The offset in bytes of the intrusive element in user type. */
     size_t singly_linked_list_node_offset;
     /** @private The user provided comparison callback for sorting. */
-    CCC_Type_comparator *cmp;
+    CCC_Type_comparator *compare;
     /** @private The user provided allocation function, if any. */
     CCC_Allocator *alloc;
     /** @private User provided context data, if any. */
@@ -74,8 +74,8 @@ CCC_private_singly_linked_list_push_front(struct CCC_Singly_linked_list *,
 /** @private */
 #define CCC_private_singly_linked_list_initialize(                             \
     private_singly_linked_list_name, private_struct_name,                      \
-    private_singly_linked_list_node_field, private_cmp_fn, private_alloc_fn,   \
-    private_context_data)                                                      \
+    private_singly_linked_list_node_field, private_compare_fn,                 \
+    private_alloc_fn, private_context_data)                                    \
     {                                                                          \
         .nil.n = &(private_singly_linked_list_name).nil,                       \
         .sizeof_type = sizeof(private_struct_name),                            \
@@ -83,7 +83,7 @@ CCC_private_singly_linked_list_push_front(struct CCC_Singly_linked_list *,
             private_struct_name, private_singly_linked_list_node_field),       \
         .count = 0,                                                            \
         .alloc = (private_alloc_fn),                                           \
-        .cmp = (private_cmp_fn),                                               \
+        .compare = (private_compare_fn),                                       \
         .context = (private_context_data),                                     \
     }
 
@@ -104,7 +104,11 @@ CCC_private_singly_linked_list_push_front(struct CCC_Singly_linked_list *,
             {                                                                  \
                 private_singly_linked_list_res                                 \
                     = private_singly_linked_list->alloc(                       \
-                        NULL, private_singly_linked_list->sizeof_type);        \
+                        (CCC_Allocator_context){                               \
+                            .input = NULL,                                     \
+                            .bytes = private_singly_linked_list->sizeof_type,  \
+                            .context = private_singly_linked_list->context,    \
+                        });                                                    \
                 if (private_singly_linked_list_res)                            \
                 {                                                              \
                     *private_singly_linked_list_res = struct_initializer;      \

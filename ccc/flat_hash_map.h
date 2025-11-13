@@ -135,18 +135,18 @@ Once the location for the fixed size map is chosen--stack, heap, or data
 segment--provide a pointer to the map for the initialization macro.
 
 ```
-struct val
+struct Val
 {
     int key;
     int val;
 };
-CCC_flat_hash_map_declare_fixed_map(small_fixed_map, struct val, 64);
+CCC_flat_hash_map_declare_fixed_map(small_fixed_map, struct Val, 64);
 static Flat_hash_map static_fh = flat_hash_map_initialize(
     &(static small_fixed_map){},
-    struct val,
+    struct Val,
     key,
     Flat_hash_map_int_to_u64,
-    flat_hash_mapap_id_cmp,
+    flat_hash_mapap_id_order,
     NULL,
     NULL,
     flat_hash_map_fixed_capacity(small_fixed_map)
@@ -156,20 +156,20 @@ static Flat_hash_map static_fh = flat_hash_map_initialize(
 Similarly, a fixed size map can be used on the stack.
 
 ```
-struct val
+struct Val
 {
     int key;
     int val;
 };
-CCC_flat_hash_map_declare_fixed_map(small_fixed_map, struct val, 64);
+CCC_flat_hash_map_declare_fixed_map(small_fixed_map, struct Val, 64);
 int main(void)
 {
     Flat_hash_map static_fh = flat_hash_map_initialize(
         &(small_fixed_map){},
-        struct val,
+        struct Val,
         key,
         flat_hash_mapap_int_to_u64,
-        flat_hash_mapap_id_cmp,
+        flat_hash_mapap_id_order,
         NULL,
         NULL,
         flat_hash_map_fixed_capacity(small_fixed_map)
@@ -202,7 +202,7 @@ restrictions. */
 @param [in] any_type_name the name of the user defined type stored in the map.
 @param [in] key_field the field of the struct used for key storage.
 @param [in] hash_fn the CCC_Key_hasher function provided by the user.
-@param [in] key_cmp_fn the CCC_Key_comparator the user intends to
+@param [in] key_order_fn the CCC_Key_comparator the user intends to
 use.
 @param [in] alloc_fn the allocation function for resizing or NULL if no
 resizing is allowed.
@@ -218,18 +218,18 @@ no allocation permission or context data needed.
 
 ```
 #define FLAT_HASH_MAP_USING_NAMESPACE_CCC
-struct val
+struct Val
 {
     int key;
     int val;
 };
-flat_hash_map_declare_fixed_map(small_fixed_map, struct val, 64);
+flat_hash_map_declare_fixed_map(small_fixed_map, struct Val, 64);
 static Flat_hash_map static_fh = flat_hash_map_initialize(
     &(static small_fixed_map){},
-    struct val,
+    struct Val,
     key,
     flat_hash_mapap_int_to_u64,
-    flat_hash_mapap_key_cmp,
+    flat_hash_mapap_key_order,
     NULL,
     NULL,
     flat_hash_map_fixed_capacity(small_fixed_map)
@@ -241,18 +241,18 @@ no context data. Use the same type as the previous example.
 
 ```
 #define FLAT_HASH_MAP_USING_NAMESPACE_CCC
-struct val
+struct Val
 {
     int key;
     int val;
 };
 static Flat_hash_map static_fh = flat_hash_map_initialize(
     NULL,
-    struct val,
+    struct Val,
     key,
     flat_hash_mapap_int_to_u64,
-    flat_hash_mapap_key_cmp,
-    std_alloc,
+    flat_hash_mapap_key_order,
+    std_allocate,
     NULL,
     0
 );
@@ -261,16 +261,16 @@ static Flat_hash_map static_fh = flat_hash_map_initialize(
 Initialization at runtime is also possible. Stack-based or dynamic maps are
 identical to the provided examples. Omit `static` in a runtime context. */
 #define CCC_flat_hash_map_initialize(map_ptr, any_type_name, key_field,        \
-                                     hash_fn, key_cmp_fn, alloc_fn,            \
+                                     hash_fn, key_order_fn, alloc_fn,          \
                                      context_data, capacity)                   \
     CCC_private_flat_hash_map_initialize(map_ptr, any_type_name, key_field,    \
-                                         hash_fn, key_cmp_fn, alloc_fn,        \
+                                         hash_fn, key_order_fn, alloc_fn,      \
                                          context_data, capacity)
 
 /** @brief Initialize a dynamic map at runtime from an initializer list.
 @param [in] key_field the field of the struct used for key storage.
 @param [in] hash_fn the CCC_Key_hasher function provided by the user.
-@param [in] key_cmp_fn the CCC_Key_comparator the user intends to
+@param [in] key_order_fn the CCC_Key_comparator the user intends to
 use.
 @param [in] alloc_fn the required allocation function.
 @param [in] context_data context data that is needed for hashing or comparison.
@@ -299,7 +299,7 @@ data for initialization.
 
 ```
 #define FLAT_HASH_MAP_USING_NAMESPACE_CCC
-struct val
+struct Val
 {
     int key;
     int val;
@@ -310,11 +310,11 @@ main(void)
     Flat_hash_map static_fh = flat_hash_map_from(
         key,
         flat_hash_mapap_int_to_u64,
-        flat_hash_mapap_key_cmp,
-        std_alloc,
+        flat_hash_mapap_key_order,
+        std_allocate,
         NULL,
         0,
-        (struct val[]) {
+        (struct Val[]) {
             {.key = 1, .val = 1},
             {.key = 2, .val = 2},
             {.key = 3, .val = 3},
@@ -326,10 +326,10 @@ main(void)
 
 Only dynamic maps may be initialized this way due the inability of the hash
 map to protect its invariants from user error at compile time. */
-#define CCC_flat_hash_map_from(key_field, hash_fn, key_cmp_fn, alloc_fn,       \
+#define CCC_flat_hash_map_from(key_field, hash_fn, key_order_fn, alloc_fn,     \
                                context_data, optional_capacity,                \
                                array_compound_literal...)                      \
-    CCC_private_flat_hash_map_from(key_field, hash_fn, key_cmp_fn, alloc_fn,   \
+    CCC_private_flat_hash_map_from(key_field, hash_fn, key_order_fn, alloc_fn, \
                                    context_data, optional_capacity,            \
                                    array_compound_literal)
 
@@ -338,7 +338,7 @@ capacity.
 @param [in] type_name the name of the type being stored in the map.
 @param [in] key_field the field of the struct used for key storage.
 @param [in] hash_fn the CCC_Key_hasher function provided by the user.
-@param [in] key_cmp_fn the CCC_Key_comparator the user intends to
+@param [in] key_order_fn the CCC_Key_comparator the user intends to
 use.
 @param [in] alloc_fn the required allocation function.
 @param [in] context_data context data that is needed for hashing or comparison.
@@ -358,7 +358,7 @@ data for initialization.
 
 ```
 #define FLAT_HASH_MAP_USING_NAMESPACE_CCC
-struct val
+struct Val
 {
     int key;
     int val;
@@ -367,11 +367,11 @@ int
 main(void)
 {
     Flat_hash_map static_fh = flat_hash_map_from(
-        struct val,
+        struct Val,
         key,
         flat_hash_mapap_int_to_u64,
-        flat_hash_mapap_key_cmp,
-        std_alloc,
+        flat_hash_mapap_key_order,
+        std_allocate,
         NULL,
         4096
     );
@@ -382,10 +382,10 @@ main(void)
 Only dynamic maps may be initialized this way as it simply combines the steps
 of initialization and reservation. */
 #define CCC_flat_hash_map_with_capacity(type_name, key_field, hash_fn,         \
-                                        key_cmp_fn, alloc_fn, context_data,    \
+                                        key_order_fn, alloc_fn, context_data,  \
                                         capacity)                              \
     CCC_private_flat_hash_map_with_capacity(type_name, key_field, hash_fn,     \
-                                            key_cmp_fn, alloc_fn,              \
+                                            key_order_fn, alloc_fn,            \
                                             context_data, capacity)
 
 /** @brief Copy the map at source to destination.
@@ -407,18 +407,18 @@ Manual memory management with no allocation function provided.
 
 ```
 #define FLAT_HASH_MAP_USING_NAMESPACE_CCC
-struct val
+struct Val
 {
     int key;
     int val;
 };
-flat_hash_map_declare_fixed_map(small_fixed_map, struct val, 64);
+flat_hash_map_declare_fixed_map(small_fixed_map, struct Val, 64);
 Flat_hash_map src = flat_hash_map_initialize(
     &(static small_fixed_map){},
-    struct val,
+    struct Val,
     key,
     flat_hash_mapap_int_to_u64,
-    flat_hash_mapap_key_cmp,
+    flat_hash_mapap_key_order,
     NULL,
     NULL,
     CCC_flat_hash_map_fixed_capacity(small_fixed_map)
@@ -426,10 +426,10 @@ Flat_hash_map src = flat_hash_map_initialize(
 insert_rand_vals(&src);
 Flat_hash_map dst = flat_hash_map_initialize(
     &(static small_fixed_map){},
-    struct val,
+    struct Val,
     key,
     flat_hash_mapap_int_to_u64,
-    flat_hash_mapap_key_cmp,
+    flat_hash_mapap_key_order,
     NULL,
     NULL,
     CCC_flat_hash_map_fixed_capacity(small_fixed_map)
@@ -442,33 +442,33 @@ is memory management handed over to the copy function.
 
 ```
 #define FLAT_HASH_MAP_USING_NAMESPACE_CCC
-struct val
+struct Val
 {
     int key;
     int val;
 };
 Flat_hash_map src = flat_hash_map_initialize(
     NULL,
-    struct val,
+    struct Val,
     key,
     flat_hash_mapap_int_to_u64,
-    flat_hash_mapap_key_cmp,
-    std_alloc,
+    flat_hash_mapap_key_order,
+    std_allocate,
     NULL,
     0
 );
 insert_rand_vals(&src);
 Flat_hash_map dst = flat_hash_map_initialize(
     NULL,
-    struct val,
+    struct Val,
     key,
     flat_hash_mapap_int_to_u64,
-    flat_hash_mapap_key_cmp,
-    std_alloc,
+    flat_hash_mapap_key_order,
+    std_allocate,
     NULL,
     0
 );
-CCC_Result res = flat_hash_map_copy(&dst, &src, std_alloc);
+CCC_Result res = flat_hash_map_copy(&dst, &src, std_allocate);
 ```
 
 The above allows dst to have a capacity less than that of the src as long as
@@ -478,33 +478,33 @@ size map.
 
 ```
 #define FLAT_HASH_MAP_USING_NAMESPACE_CCC
-struct val
+struct Val
 {
     int key;
     int val;
 };
 Flat_hash_map src = flat_hash_map_initialize(
     NULL,
-    struct val,
+    struct Val,
     key,
     flat_hash_mapap_int_to_u64,
-    flat_hash_mapap_key_cmp,
-    std_alloc,
+    flat_hash_mapap_key_order,
+    std_allocate,
     NULL,
     0
 );
 insert_rand_vals(&src);
 Flat_hash_map dst = flat_hash_map_initialize(
     NULL,
-    struct val,
+    struct Val,
     key,
     flat_hash_mapap_int_to_u64,
-    flat_hash_mapap_key_cmp,
+    flat_hash_mapap_key_order,
     NULL,
     NULL,
     0
 );
-CCC_Result res = flat_hash_map_copy(&dst, &src, std_alloc);
+CCC_Result res = flat_hash_map_copy(&dst, &src, std_allocate);
 ```
 
 The above sets up dst with fixed size while src is a dynamic map. Because an
@@ -603,7 +603,7 @@ Entry Interface.*/
 #define CCC_flat_hash_map_entry_r(map_ptr, key_ptr)                            \
     &(CCC_Flat_hash_map_entry)                                                 \
     {                                                                          \
-        CCC_flat_hash_map_entry(map_ptr, key_ptr).impl                         \
+        CCC_flat_hash_map_entry(map_ptr, key_ptr).private                      \
     }
 
 /** @brief Modifies the provided entry if it is Occupied.
@@ -741,7 +741,7 @@ and wraps it in an entry to provide information about the old value. */
 #define CCC_flat_hash_map_swap_entry_r(map_ptr, key_val_type_ptr)              \
     &(CCC_Entry)                                                               \
     {                                                                          \
-        CCC_flat_hash_map_swap_entry(map_ptr, key_val_type_ptr).impl           \
+        CCC_flat_hash_map_swap_entry(map_ptr, key_val_type_ptr).private        \
     }
 
 /** @brief Remove the entry from the table if Occupied.
@@ -759,7 +759,7 @@ removed. */
 #define CCC_flat_hash_map_remove_entry_r(map_entry_ptr)                        \
     &(CCC_Entry)                                                               \
     {                                                                          \
-        CCC_flat_hash_map_remove_entry(map_entry_ptr).impl                     \
+        CCC_flat_hash_map_remove_entry(map_entry_ptr).private                  \
     }
 
 /** @brief Attempts to insert the key value wrapping key_val_handle
@@ -788,7 +788,7 @@ any subsequent insertions or deletions invalidate this reference. */
 #define CCC_flat_hash_map_try_insert_r(map_ptr, key_val_type_ptr)              \
     &(CCC_Entry)                                                               \
     {                                                                          \
-        CCC_flat_hash_map_try_insert(map_ptr, key_val_type_ptr).impl           \
+        CCC_flat_hash_map_try_insert(map_ptr, key_val_type_ptr).private        \
     }
 
 /** @brief lazily insert lazy_value into the map at key if key is absent.
@@ -835,7 +835,7 @@ the information regarding its presence is helpful. */
 #define CCC_flat_hash_map_insert_or_assign_r(map_ptr, key_val_type_ptr)        \
     &(CCC_Entry)                                                               \
     {                                                                          \
-        CCC_flat_hash_map_insert_or_assign(map_ptr, key_val_type_ptr).impl     \
+        CCC_flat_hash_map_insert_or_assign(map_ptr, key_val_type_ptr).private  \
     }
 
 /** @brief Inserts a new key value pair or overwrites the existing entry.
@@ -887,7 +887,7 @@ and wraps it in an entry to provide information about the old value. */
 #define CCC_flat_hash_map_remove_r(map_ptr, key_val_type_output_ptr)           \
     &(CCC_Entry)                                                               \
     {                                                                          \
-        CCC_flat_hash_map_remove(map_ptr, key_val_type_output_ptr).impl        \
+        CCC_flat_hash_map_remove(map_ptr, key_val_type_output_ptr).private     \
     }
 
 /** @brief Unwraps the provided entry to obtain a view into the table element.

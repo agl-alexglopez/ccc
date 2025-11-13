@@ -41,7 +41,7 @@ struct CCC_Entry
 /** @private */
 union CCC_Entry_wrap
 {
-    struct CCC_Entry impl;
+    struct CCC_Entry private;
 };
 
 /** @private */
@@ -54,7 +54,7 @@ struct CCC_Handle
 /** @private */
 union CCC_Handle_wrap
 {
-    struct CCC_Handle impl;
+    struct CCC_Handle private;
 };
 
 /** @private */
@@ -75,13 +75,13 @@ struct CCC_Range
 /** @private */
 union CCC_Range_wrap
 {
-    struct CCC_Range impl;
+    struct CCC_Range private;
 };
 
 /** @private */
 union CCC_Reverse_range
 {
-    struct CCC_Range impl;
+    struct CCC_Range private;
 };
 
 #endif /* CCC_IMPL_TYPES_H */

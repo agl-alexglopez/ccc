@@ -36,7 +36,7 @@ CHECK_BEGIN_STATIC_FN(bitset_test_copy_no_alloc)
             push_status = CCC_bitset_push_back(&src, CCC_FALSE);
         }
     }
-    CHECK(push_status, CCC_RESULT_NO_ALLOC);
+    CHECK(push_status, CCC_RESULT_NO_ALLOCATION_FUNCTION);
     CCC_Bitset dst
         = CCC_bitset_initialize(CCC_bitset_blocks(513), NULL, NULL, 513, 0);
     CCC_Result r = CCC_bitset_copy(&dst, &src, NULL);
@@ -64,7 +64,7 @@ CHECK_BEGIN_STATIC_FN(bitset_test_copy_no_alloc)
 
 CHECK_BEGIN_STATIC_FN(bitset_test_copy_alloc)
 {
-    CCC_Bitset src = CCC_bitset_initialize(NULL, std_alloc, NULL, 0);
+    CCC_Bitset src = CCC_bitset_initialize(NULL, std_allocate, NULL, 0);
     for (size_t i = 0; i < 512; ++i)
     {
         if (i % 2)
@@ -76,8 +76,8 @@ CHECK_BEGIN_STATIC_FN(bitset_test_copy_alloc)
             CHECK(CCC_bitset_push_back(&src, CCC_FALSE), CCC_RESULT_OK);
         }
     }
-    CCC_Bitset dst = CCC_bitset_initialize(NULL, std_alloc, NULL, 0);
-    CCC_Result r = CCC_bitset_copy(&dst, &src, std_alloc);
+    CCC_Bitset dst = CCC_bitset_initialize(NULL, std_allocate, NULL, 0);
+    CCC_Result r = CCC_bitset_copy(&dst, &src, std_allocate);
     CHECK(r, CCC_RESULT_OK);
     CHECK(CCC_bitset_popcount(&src).count, CCC_bitset_popcount(&dst).count);
     CHECK(CCC_bitset_count(&src).count, CCC_bitset_count(&dst).count);
@@ -106,8 +106,8 @@ CHECK_BEGIN_STATIC_FN(bitset_test_copy_alloc)
 CHECK_BEGIN_STATIC_FN(bitset_test_init_from)
 {
     char input[] = {'1', '1', '0', '1', '1', '0', '\0'};
-    CCC_Bitset b
-        = CCC_bitset_from(std_alloc, NULL, 0, sizeof(input) - 1, '1', "110110");
+    CCC_Bitset b = CCC_bitset_from(std_allocate, NULL, 0, sizeof(input) - 1,
+                                   '1', "110110");
     CHECK(CCC_bitset_count(&b).count, sizeof(input) - 1);
     CHECK(CCC_bitset_capacity(&b).count, sizeof(input) - 1);
     CHECK(CCC_bitset_popcount(&b).count, 4);
@@ -119,7 +119,7 @@ CHECK_BEGIN_STATIC_FN(bitset_test_init_from)
 CHECK_BEGIN_STATIC_FN(bitset_test_init_from_cap)
 {
     char input[] = {'1', '1', '0', '1', '1', '0', '\0'};
-    CCC_Bitset b = CCC_bitset_from(std_alloc, NULL, 0, sizeof(input), '1',
+    CCC_Bitset b = CCC_bitset_from(std_allocate, NULL, 0, sizeof(input), '1',
                                    input, (sizeof(input) - 1) * 2);
     CHECK(CCC_bitset_count(&b).count, sizeof(input) - 1);
     CHECK(CCC_bitset_capacity(&b).count, (sizeof(input) - 1) * 2);
@@ -163,7 +163,7 @@ CHECK_BEGIN_STATIC_FN(bitset_test_init_from_cap_fail)
 
 CHECK_BEGIN_STATIC_FN(bitset_test_init_with_capacity)
 {
-    CCC_Bitset b = CCC_bitset_with_capacity(std_alloc, NULL, 10);
+    CCC_Bitset b = CCC_bitset_with_capacity(std_allocate, NULL, 10);
     CHECK(CCC_bitset_popcount(&b).count, 0);
     CHECK(CCC_bitset_set(&b, 0, CCC_TRUE), CCC_FALSE);
     CHECK(CCC_bitset_set(&b, 9, CCC_TRUE), CCC_FALSE);

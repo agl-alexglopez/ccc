@@ -162,7 +162,7 @@ A dynamic bit set initialization.
 
 ```
 #define BITSET_USING_NAMESPACE_CCC
-Bitset bs = bitset_initialize(NULL, std_alloc, NULL, 0);
+Bitset bs = bitset_initialize(NULL, std_allocate, NULL, 0);
 ```
 
 See types.h for more on allocation functions. */
@@ -197,13 +197,13 @@ A dynamic bit set with input string pushed.
 
 ```
 #define BITSET_USING_NAMESPACE_CCC
-Bitset bs = bitset_from(std_alloc, NULL, 0, 4, '1', "1011");
+Bitset bs = bitset_from(std_allocate, NULL, 0, 4, '1', "1011");
 ```
 A dynamic bit set that allocates greater capacity.
 
 ```
 #define BITSET_USING_NAMESPACE_CCC
-Bitset bs = bitset_from(std_alloc, NULL, 0, 4, 'A', "GCAT", 4096);
+Bitset bs = bitset_from(std_allocate, NULL, 0, 4, 'A', "GCAT", 4096);
 ```
 
 This initializer is only available to dynamic bit sets due to the inability to
@@ -230,7 +230,7 @@ A fixed size bit set with size equal to capacity.
 int
 main(void)
 {
-    Bitset bs = bitset_with_capacity(std_alloc, NULL, 4096);
+    Bitset bs = bitset_with_capacity(std_allocate, NULL, 4096);
 }
 ```
 A bit set with dynamic push and pop.
@@ -240,7 +240,7 @@ A bit set with dynamic push and pop.
 int
 main(void)
 {
-    Bitset bs = bitset_with_capacity(std_alloc, NULL, 4096, 0);
+    Bitset bs = bitset_with_capacity(std_allocate, NULL, 4096, 0);
 }
 ```
 
@@ -281,10 +281,10 @@ Here is memory management handed over to the copy function.
 
 ```
 #define BITSET_USING_NAMESPACE_CCC
-static Bitset src = bitset_initialize(NULL, std_alloc, NULL, 0);
+static Bitset src = bitset_initialize(NULL, std_allocate, NULL, 0);
 push_rand_bits(&src);
-static Bitset src = bitset_initialize(NULL, std_alloc, NULL, 0);
-CCC_Result res = bitset_copy(&dst, &src, std_alloc);
+static Bitset src = bitset_initialize(NULL, std_allocate, NULL, 0);
+CCC_Result res = bitset_copy(&dst, &src, std_allocate);
 ```
 
 The above allows dst to have a capacity less than that of the src as long as
@@ -294,10 +294,10 @@ size map.
 
 ```
 #define BITSET_USING_NAMESPACE_CCC
-static Bitset src = bitset_initialize(NULL, std_alloc, NULL, 0);
+static Bitset src = bitset_initialize(NULL, std_allocate, NULL, 0);
 push_rand_bits(&src);
 static Bitset src = bitset_initialize(NULL, NULL, NULL, 0);
-CCC_Result res = bitset_copy(&dst, &src, std_alloc);
+CCC_Result res = bitset_copy(&dst, &src, std_allocate);
 ```
 
 The above sets up dst with fixed size while src is a dynamic map. Because an

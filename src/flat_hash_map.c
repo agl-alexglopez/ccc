@@ -470,16 +470,16 @@ CCC_flat_hash_map_or_insert(CCC_Flat_hash_map_entry const *const e,
     {
         return NULL;
     }
-    if (e->impl.stats & CCC_ENTRY_OCCUPIED)
+    if (e->private.stats & CCC_ENTRY_OCCUPIED)
     {
-        return data_at(e->impl.h, e->impl.i);
+        return data_at(e->private.h, e->private.i);
     }
-    if (e->impl.stats & CCC_ENTRY_INSERT_ERROR)
+    if (e->private.stats & CCC_ENTRY_INSERT_ERROR)
     {
         return NULL;
     }
-    insert_and_copy(e->impl.h, key_val_type, e->impl.tag, e->impl.i);
-    return data_at(e->impl.h, e->impl.i);
+    insert_and_copy(e->private.h, key_val_type, e->private.tag, e->private.i);
+    return data_at(e->private.h, e->private.i);
 }
 
 void *
@@ -490,18 +490,18 @@ CCC_flat_hash_map_insert_entry(CCC_Flat_hash_map_entry const *const e,
     {
         return NULL;
     }
-    if (e->impl.stats & CCC_ENTRY_OCCUPIED)
+    if (e->private.stats & CCC_ENTRY_OCCUPIED)
     {
-        void *const slot = data_at(e->impl.h, e->impl.i);
-        (void)memcpy(slot, key_val_type, e->impl.h->sizeof_type);
+        void *const slot = data_at(e->private.h, e->private.i);
+        (void)memcpy(slot, key_val_type, e->private.h->sizeof_type);
         return slot;
     }
-    if (e->impl.stats & CCC_ENTRY_INSERT_ERROR)
+    if (e->private.stats & CCC_ENTRY_INSERT_ERROR)
     {
         return NULL;
     }
-    insert_and_copy(e->impl.h, key_val_type, e->impl.tag, e->impl.i);
-    return data_at(e->impl.h, e->impl.i);
+    insert_and_copy(e->private.h, key_val_type, e->private.tag, e->private.i);
+    return data_at(e->private.h, e->private.i);
 }
 
 CCC_Entry
@@ -511,11 +511,11 @@ CCC_flat_hash_map_remove_entry(CCC_Flat_hash_map_entry const *const e)
     {
         return (CCC_Entry){{.stats = CCC_ENTRY_ARG_ERROR}};
     }
-    if (!(e->impl.stats & CCC_ENTRY_OCCUPIED))
+    if (!(e->private.stats & CCC_ENTRY_OCCUPIED))
     {
         return (CCC_Entry){{.stats = CCC_ENTRY_VACANT}};
     }
-    erase(e->impl.h, e->impl.i);
+    erase(e->private.h, e->private.i);
     return (CCC_Entry){{.stats = CCC_ENTRY_OCCUPIED}};
 }
 
@@ -523,10 +523,10 @@ CCC_Flat_hash_map_entry *
 CCC_flat_hash_map_and_modify(CCC_Flat_hash_map_entry *const e,
                              CCC_Type_updater *const fn)
 {
-    if (e && fn && (e->impl.stats & CCC_ENTRY_OCCUPIED) != 0)
+    if (e && fn && (e->private.stats & CCC_ENTRY_OCCUPIED) != 0)
     {
         fn((CCC_Type_context){
-            .any_type = data_at(e->impl.h, e->impl.i),
+            .type = data_at(e->private.h, e->private.i),
             .context = NULL,
         });
     }
@@ -538,10 +538,10 @@ CCC_flat_hash_map_and_modify_context(CCC_Flat_hash_map_entry *const e,
                                      CCC_Type_updater *const fn,
                                      void *const context)
 {
-    if (e && fn && (e->impl.stats & CCC_ENTRY_OCCUPIED) != 0)
+    if (e && fn && (e->private.stats & CCC_ENTRY_OCCUPIED) != 0)
     {
         fn((CCC_Type_context){
-            .any_type = data_at(e->impl.h, e->impl.i),
+            .type = data_at(e->private.h, e->private.i),
             .context = context,
         });
     }
@@ -708,11 +708,11 @@ CCC_flat_hash_map_end(CCC_Flat_hash_map const *const)
 void *
 CCC_flat_hash_map_unwrap(CCC_Flat_hash_map_entry const *const e)
 {
-    if (unlikely(!e) || !(e->impl.stats & CCC_ENTRY_OCCUPIED))
+    if (unlikely(!e) || !(e->private.stats & CCC_ENTRY_OCCUPIED))
     {
         return NULL;
     }
-    return data_at(e->impl.h, e->impl.i);
+    return data_at(e->private.h, e->private.i);
 }
 
 CCC_Result
@@ -810,7 +810,7 @@ CCC_flat_hash_map_occupied(CCC_Flat_hash_map_entry const *const e)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    return (e->impl.stats & CCC_ENTRY_OCCUPIED) != 0;
+    return (e->private.stats & CCC_ENTRY_OCCUPIED) != 0;
 }
 
 CCC_Tribool
@@ -820,7 +820,7 @@ CCC_flat_hash_map_insert_error(CCC_Flat_hash_map_entry const *const e)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    return (e->impl.stats & CCC_ENTRY_INSERT_ERROR) != 0;
+    return (e->private.stats & CCC_ENTRY_INSERT_ERROR) != 0;
 }
 
 CCC_Entry_status
@@ -830,7 +830,7 @@ CCC_flat_hash_map_entry_status(CCC_Flat_hash_map_entry const *const e)
     {
         return CCC_ENTRY_ARG_ERROR;
     }
-    return e->impl.stats;
+    return e->private.stats;
 }
 
 CCC_Result
@@ -1620,7 +1620,7 @@ destory_each(struct CCC_Flat_hash_map *const h, CCC_Type_destructor *const fn)
          i = CCC_flat_hash_map_next(h, i))
     {
         fn((CCC_Type_context){
-            .any_type = i,
+            .type = i,
             .context = h->context,
         });
     }
@@ -1630,7 +1630,7 @@ static inline uint64_t
 hash_fn(struct CCC_Flat_hash_map const *const h, void const *const any_key)
 {
     return h->hash_fn((CCC_Key_context){
-        .any_key = any_key,
+        .key = any_key,
         .context = h->context,
     });
 }
@@ -1640,8 +1640,8 @@ eq_fn(struct CCC_Flat_hash_map const *const h, void const *const key,
       size_t const i)
 {
     return h->eq_fn((CCC_Key_comparator_context){
-               .any_key_lhs = key,
-               .any_type_rhs = data_at(h, i),
+               .key_lhs = key,
+               .type_rhs = data_at(h, i),
                .context = h->context,
            })
         == CCC_ORDER_EQUAL;

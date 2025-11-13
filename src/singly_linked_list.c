@@ -61,9 +61,9 @@ static struct Link merge(struct CCC_Singly_linked_list *, struct Link,
                          struct Link, struct Link);
 static struct Link first_less(struct CCC_Singly_linked_list const *,
                               struct Link);
-static CCC_Order cmp(struct CCC_Singly_linked_list const *singly_linked_list,
-                     struct CCC_Singly_linked_list_node const *lhs,
-                     struct CCC_Singly_linked_list_node const *rhs);
+static CCC_Order order(struct CCC_Singly_linked_list const *singly_linked_list,
+                       struct CCC_Singly_linked_list_node const *lhs,
+                       struct CCC_Singly_linked_list_node const *rhs);
 
 /*===========================     Interface     =============================*/
 
@@ -343,7 +343,7 @@ CCC_singly_linked_list_clear(CCC_Singly_linked_list *const singly_linked_list,
             = struct_base(singly_linked_list, pop_front(singly_linked_list));
         if (fn)
         {
-            fn((CCC_Type_context){.any_type = mem,
+            fn((CCC_Type_context){.type = mem,
                                   .context = singly_linked_list->context});
         }
         if (singly_linked_list->alloc)
@@ -427,7 +427,7 @@ CCC_singly_linked_list_is_sorted(
          *cur = singly_linked_list->nil.n->n;
          cur != &singly_linked_list->nil; prev = cur, cur = cur->n)
     {
-        if (cmp(singly_linked_list, prev, cur) == CCC_ORDER_GREATER)
+        if (order(singly_linked_list, prev, cur) == CCC_ORDER_GREATER)
         {
             return CCC_FALSE;
         }
@@ -464,7 +464,7 @@ CCC_singly_linked_list_insert_sorted(CCC_Singly_linked_list *singly_linked_list,
     struct CCC_Singly_linked_list_node *prev = &singly_linked_list->nil;
     struct CCC_Singly_linked_list_node *i = singly_linked_list->nil.n;
     for (; i != &singly_linked_list->nil
-           && cmp(singly_linked_list, e, i) != CCC_ORDER_LESSER;
+           && order(singly_linked_list, e, i) != CCC_ORDER_LESSER;
          prev = i, i = i->n)
     {}
     e->n = i;
@@ -547,7 +547,7 @@ merge(CCC_Singly_linked_list *const singly_linked_list, struct Link a_0,
 {
     while (a_0.i != a_n_b_0.i && a_n_b_0.i != b_n.i)
     {
-        if (cmp(singly_linked_list, a_n_b_0.i, a_0.i) == CCC_ORDER_LESSER)
+        if (order(singly_linked_list, a_n_b_0.i, a_0.i) == CCC_ORDER_LESSER)
         {
             /* The i element is the lesser element that must be spliced out.
                However, a_n_b_0.prev is not updated because only i is spliced
@@ -589,7 +589,7 @@ first_less(CCC_Singly_linked_list const *const singly_linked_list,
         k.i = k.i->n;
     }
     while (k.i != &singly_linked_list->nil
-           && cmp(singly_linked_list, k.i, k.prev) != CCC_ORDER_LESSER);
+           && order(singly_linked_list, k.i, k.prev) != CCC_ORDER_LESSER);
     return k;
 }
 
@@ -718,13 +718,13 @@ elem_in(struct CCC_Singly_linked_list const *const singly_linked_list,
 type wrapping the provided intrusive handles. Returns the three way comparison
 result value. */
 static inline CCC_Order
-cmp(struct CCC_Singly_linked_list const *const singly_linked_list,
-    struct CCC_Singly_linked_list_node const *const lhs,
-    struct CCC_Singly_linked_list_node const *const rhs)
+order(struct CCC_Singly_linked_list const *const singly_linked_list,
+      struct CCC_Singly_linked_list_node const *const lhs,
+      struct CCC_Singly_linked_list_node const *const rhs)
 {
-    return singly_linked_list->cmp((CCC_Type_comparator_context){
-        .any_type_lhs = struct_base(singly_linked_list, lhs),
-        .any_type_rhs = struct_base(singly_linked_list, rhs),
+    return singly_linked_list->compare((CCC_Type_comparator_context){
+        .type_lhs = struct_base(singly_linked_list, lhs),
+        .type_rhs = struct_base(singly_linked_list, rhs),
         .context = singly_linked_list->context,
     });
 }

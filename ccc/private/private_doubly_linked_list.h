@@ -95,7 +95,7 @@ struct CCC_Doubly_linked_list
     /** @private The offset in bytes of the intrusive element in user type. */
     size_t doubly_linked_list_node_offset;
     /** @private The user provided comparison callback for sorting. */
-    CCC_Type_comparator *cmp;
+    CCC_Type_comparator *compare;
     /** @private The user provided allocation function, if any. */
     CCC_Allocator *alloc;
     /** @private User provided context data, if any. */
@@ -123,8 +123,8 @@ CCC_private_doubly_linked_list_node_in(struct CCC_Doubly_linked_list const *,
 name of the list being on the left hand side of the assignment operator. */
 #define CCC_private_doubly_linked_list_initialize(                             \
     private_doubly_linked_list_name, private_struct_name,                      \
-    private_doubly_linked_list_node_field, private_cmp_fn, private_alloc_fn,   \
-    private_context_data)                                                      \
+    private_doubly_linked_list_node_field, private_compare_fn,                 \
+    private_alloc_fn, private_context_data)                                    \
     {                                                                          \
         .nil.n = &(private_doubly_linked_list_name).nil,                       \
         .nil.p = &(private_doubly_linked_list_name).nil,                       \
@@ -133,7 +133,7 @@ name of the list being on the left hand side of the assignment operator. */
             private_struct_name, private_doubly_linked_list_node_field),       \
         .count = 0,                                                            \
         .alloc = (private_alloc_fn),                                           \
-        .cmp = (private_cmp_fn),                                               \
+        .compare = (private_compare_fn),                                       \
         .context = (private_context_data),                                     \
     }
 
@@ -150,8 +150,11 @@ name of the list being on the left hand side of the assignment operator. */
             {                                                                  \
                 private_doubly_linked_list_res                                 \
                     = private_doubly_linked_list->alloc(                       \
-                        NULL, private_doubly_linked_list->sizeof_type,         \
-                        private_doubly_linked_list->context);                  \
+                        (CCC_Allocator_context){                               \
+                            .input = NULL,                                     \
+                            .bytes = private_doubly_linked_list->sizeof_type,  \
+                            .context = private_doubly_linked_list->context,    \
+                        });                                                    \
                 if (private_doubly_linked_list_res)                            \
                 {                                                              \
                     *private_doubly_linked_list_res                            \
@@ -182,9 +185,11 @@ name of the list being on the left hand side of the assignment operator. */
         else                                                                   \
         {                                                                      \
             private_doubly_linked_list_res                                     \
-                = private_doubly_linked_list->alloc(                           \
-                    NULL, private_doubly_linked_list->sizeof_type,             \
-                    private_doubly_linked_list->context);                      \
+                = private_doubly_linked_list->alloc((CCC_Allocator_context){   \
+                    .input = NULL,                                             \
+                    .bytes = private_doubly_linked_list->sizeof_type,          \
+                    .context = private_doubly_linked_list->context,            \
+                });                                                            \
             if (private_doubly_linked_list_res)                                \
             {                                                                  \
                 *private_doubly_linked_list_res = struct_initializer;          \

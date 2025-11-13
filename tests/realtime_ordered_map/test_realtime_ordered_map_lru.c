@@ -17,40 +17,40 @@ The leetcode lru problem in C. */
 
 #define REQS 11
 
-struct lru_cache
+struct Lru_cache
 {
     CCC_Realtime_ordered_map map;
-    CCC_Doubly_linked_listl;
+    CCC_Doubly_linked_list l;
     size_t cap;
 };
 
 /* This map is pointer stable allowing us to have the lru cache represented
    in the same struct. */
-struct lru_node
+struct Lru_node
 {
     CCC_Realtime_ordered_map_node map_node;
-    doubly_linked_list_node list_node;
+    Doubly_linked_list_node list_node;
     int key;
     int val;
 };
 
-enum lru_call
+enum Lru_call
 {
     PUT,
     GET,
     HED,
 };
 
-struct lru_request
+struct Lru_request
 {
-    enum lru_call call;
+    enum Lru_call call;
     int key;
     int val;
     union
     {
-        enum check_result (*putter)(struct lru_cache *, int, int);
-        enum check_result (*getter)(struct lru_cache *, int, int *);
-        struct lru_node *(*header)(struct lru_cache *);
+        enum Check_result (*putter)(struct Lru_cache *, int, int);
+        enum Check_result (*getter)(struct Lru_cache *, int, int *);
+        struct Lru_node *(*header)(struct Lru_cache *);
     };
 };
 
@@ -67,44 +67,45 @@ static bool const quiet = true;
     while (0)
 
 static CCC_Order
-cmp_by_key(CCC_Key_comparator_context const cmp)
+order_by_key(CCC_Key_comparator_context const order)
 {
-    int const key_lhs = *(int *)cmp.any_key_lhs;
-    struct lru_node const *const kv = cmp.any_type_rhs;
+    int const key_lhs = *(int *)order.key_lhs;
+    struct Lru_node const *const kv = order.type_rhs;
     return (key_lhs > kv->key) - (key_lhs < kv->key);
 }
 
 static CCC_Order
-cmp_list_nodes(CCC_Type_comparator_context const cmp)
+order_list_nodes(CCC_Type_comparator_context const order)
 {
-    struct lru_node const *const kv_a = cmp.any_type_lhs;
-    struct lru_node const *const kv_b = cmp.any_type_rhs;
+    struct Lru_node const *const kv_a = order.type_lhs;
+    struct Lru_node const *const kv_b = order.type_rhs;
     return (kv_a->key > kv_b->key) - (kv_a->key < kv_b->key);
 }
 
-static struct lru_node *
-lru_head(struct lru_cache *const lru)
+static struct Lru_node *
+lru_head(struct Lru_cache *const lru)
 {
     return doubly_linked_list_front(&lru->l);
 }
 
 /* This is a good opportunity to test the static initialization capabilities
    of the hash table and list. */
-static struct lru_cache lru_cache = {
+static struct Lru_cache lru_cache = {
     .cap = 3,
-    .l = doubly_linked_list_initialize(lru_cache.l, struct lru_node, list_node,
-                                       cmp_list_nodes, NULL, NULL),
-    .map = rom_initialize(lru_cache.map, struct lru_node, map_node, key,
-                          cmp_by_key, std_alloc, NULL),
+    .l = doubly_linked_list_initialize(lru_cache.l, struct Lru_node, list_node,
+                                       order_list_nodes, NULL, NULL),
+    .map
+    = realtime_ordered_map_initialize(lru_cache.map, struct Lru_node, map_node,
+                                      key, order_by_key, std_allocate, NULL),
 };
 
-CHECK_BEGIN_STATIC_FN(lru_put, struct lru_cache *const lru, int const key,
+CHECK_BEGIN_STATIC_FN(lru_put, struct Lru_cache *const lru, int const key,
                       int const val)
 {
     CCC_Realtime_ordered_map_entry *const ent = entry_r(&lru->map, &key);
     if (occupied(ent))
     {
-        struct lru_node *const found = unwrap(ent);
+        struct Lru_node *const found = unwrap(ent);
         found->key = key;
         found->val = val;
         CCC_Result r = doubly_linked_list_splice(
@@ -114,14 +115,14 @@ CHECK_BEGIN_STATIC_FN(lru_put, struct lru_cache *const lru, int const key,
     }
     else
     {
-        struct lru_node *new = insert_entry(
-            ent, &(struct lru_node){.key = key, .val = val}.map_node);
+        struct Lru_node *new = insert_entry(
+            ent, &(struct Lru_node){.key = key, .val = val}.map_node);
         CHECK(new == NULL, false);
         new = doubly_linked_list_push_front(&lru->l, &new->list_node);
         CHECK(new == NULL, false);
         if (count(&lru->l).count > lru->cap)
         {
-            struct lru_node const *const to_drop = back(&lru->l);
+            struct Lru_node const *const to_drop = back(&lru->l);
             CHECK(to_drop == NULL, false);
             (void)pop_back(&lru->l);
             CCC_Entry const e = remove_entry(entry_r(&lru->map, &to_drop->key));
@@ -131,11 +132,11 @@ CHECK_BEGIN_STATIC_FN(lru_put, struct lru_cache *const lru, int const key,
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(lru_get, struct lru_cache *const lru, int const key,
+CHECK_BEGIN_STATIC_FN(lru_get, struct Lru_cache *const lru, int const key,
                       int *val)
 {
     CHECK_ERROR(val != NULL, true);
-    struct lru_node *const found = get_key_val(&lru->map, &key);
+    struct Lru_node *const found = get_key_val(&lru->map, &key);
     if (!found)
     {
         *val = -1;
@@ -154,7 +155,7 @@ CHECK_BEGIN_STATIC_FN(lru_get, struct lru_cache *const lru, int const key,
 CHECK_BEGIN_STATIC_FN(run_lru_cache)
 {
     QUIET_PRINT("LRU CAPACITY -> %zu\n", lru_cache.cap);
-    struct lru_request requests[REQS] = {
+    struct Lru_request requests[REQS] = {
         {PUT, .key = 1, .val = 1, .putter = lru_put},
         {PUT, .key = 2, .val = 2, .putter = lru_put},
         {GET, .key = 1, .val = 1, .getter = lru_get},
@@ -197,7 +198,7 @@ CHECK_BEGIN_STATIC_FN(run_lru_cache)
             {
                 QUIET_PRINT("HED -> {key: %d, val: %d}\n", requests[i].key,
                             requests[i].val);
-                struct lru_node const *const kv
+                struct Lru_node const *const kv
                     = requests[i].header(&lru_cache);
                 CHECK(kv != NULL, true);
                 CHECK(kv->key, requests[i].key);

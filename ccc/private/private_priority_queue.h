@@ -83,7 +83,7 @@ implementation keeps the pairing heap fast and easy to understand. In fact, if
 nodes are allocated ahead of time in a buffer, the pairing heap beats the
 binary flat priority queue in the C Container Collection across many operations
 with the trade-off being more memory consumed. */
-struct CCC_priority_queue
+struct CCC_Priority_queue
 {
     /** @private The node at the root of the heap. No parent. */
     struct CCC_Priority_queue_node *root;
@@ -97,7 +97,7 @@ struct CCC_priority_queue
      * `CCC_ORDER_GREATER` (max).*/
     CCC_Order order;
     /** @private The comparison function to enforce ordering. */
-    CCC_Type_comparator *cmp;
+    CCC_Type_comparator *compare;
     /** @private The allocation function, if any. */
     CCC_Allocator *alloc;
     /** @private Auxiliary data, if any. */
@@ -107,20 +107,20 @@ struct CCC_priority_queue
 /*=========================  Private Interface     ==========================*/
 
 /** @private */
-void CCC_private_priority_queue_push(struct CCC_priority_queue *,
+void CCC_private_priority_queue_push(struct CCC_Priority_queue *,
                                      struct CCC_Priority_queue_node *);
 /** @private */
 struct CCC_Priority_queue_node *
-CCC_private_priority_queue_node_in(struct CCC_priority_queue const *,
+CCC_private_priority_queue_node_in(struct CCC_Priority_queue const *,
                                    void const *);
 /** @private */
 CCC_Order
-CCC_private_priority_queue_cmp(struct CCC_priority_queue const *,
-                               struct CCC_Priority_queue_node const *,
-                               struct CCC_Priority_queue_node const *);
+CCC_private_priority_queue_order(struct CCC_Priority_queue const *,
+                                 struct CCC_Priority_queue_node const *,
+                                 struct CCC_Priority_queue_node const *);
 /** @private */
 struct CCC_Priority_queue_node *
-CCC_private_priority_queue_merge(struct CCC_priority_queue *priority_queue,
+CCC_private_priority_queue_merge(struct CCC_Priority_queue *priority_queue,
                                  struct CCC_Priority_queue_node *old,
                                  struct CCC_Priority_queue_node *new);
 /** @private */
@@ -129,11 +129,11 @@ void CCC_private_priority_queue_cut_child(struct CCC_Priority_queue_node *);
 void CCC_private_priority_queue_init_node(struct CCC_Priority_queue_node *);
 /** @private */
 struct CCC_Priority_queue_node *
-CCC_private_priority_queue_delete_node(struct CCC_priority_queue *,
+CCC_private_priority_queue_delete_node(struct CCC_Priority_queue *,
                                        struct CCC_Priority_queue_node *);
 /** @private */
 void *
-CCC_private_priority_queue_struct_base(struct CCC_priority_queue const *,
+CCC_private_priority_queue_struct_base(struct CCC_Priority_queue const *,
                                        struct CCC_Priority_queue_node const *);
 
 /*=========================  Macro Implementations     ======================*/
@@ -141,7 +141,7 @@ CCC_private_priority_queue_struct_base(struct CCC_priority_queue const *,
 /** @private */
 #define CCC_private_priority_queue_initialize(                                 \
     private_struct_name, private_priority_queue_node_field,                    \
-    private_priority_queue_order, private_cmp_fn, private_alloc_fn,            \
+    private_priority_queue_order, private_order_fn, private_alloc_fn,          \
     private_context_data)                                                      \
     {                                                                          \
         .root = NULL,                                                          \
@@ -149,9 +149,9 @@ CCC_private_priority_queue_struct_base(struct CCC_priority_queue const *,
         .priority_queue_node_offset                                            \
         = offsetof(private_struct_name, private_priority_queue_node_field),    \
         .sizeof_type = sizeof(private_struct_name),                            \
-        .alloc = (private_alloc_fn),                                           \
-        .cmp = (private_cmp_fn),                                               \
         .order = (private_priority_queue_order),                               \
+        .compare = (private_order_fn),                                         \
+        .alloc = (private_alloc_fn),                                           \
         .context = (private_context_data),                                     \
     }
 
@@ -159,7 +159,7 @@ CCC_private_priority_queue_struct_base(struct CCC_priority_queue const *,
 #define CCC_private_priority_queue_emplace(priority_queue_ptr, lazy_value...)  \
     (__extension__({                                                           \
         typeof(lazy_value) *private_priority_queue_res = NULL;                 \
-        struct CCC_priority_queue *private_priority_queue                      \
+        struct CCC_Priority_queue *private_priority_queue                      \
             = (priority_queue_ptr);                                            \
         if (private_priority_queue)                                            \
         {                                                                      \
@@ -169,9 +169,12 @@ CCC_private_priority_queue_struct_base(struct CCC_priority_queue const *,
             }                                                                  \
             else                                                               \
             {                                                                  \
-                private_priority_queue_res = private_priority_queue->alloc(    \
-                    NULL, private_priority_queue->sizeof_type,                 \
-                    private_priority_queue->context);                          \
+                private_priority_queue_res                                     \
+                    = private_priority_queue->alloc((CCC_Allocator_context){   \
+                        .input = NULL,                                         \
+                        .bytes = private_priority_queue->sizeof_type,          \
+                        .context = private_priority_queue->context,            \
+                    });                                                        \
                 if (private_priority_queue_res)                                \
                 {                                                              \
                     *private_priority_queue_res = lazy_value;                  \
@@ -190,7 +193,7 @@ CCC_private_priority_queue_struct_base(struct CCC_priority_queue const *,
 #define CCC_private_priority_queue_update_w(priority_queue_ptr, any_type_ptr,  \
                                             update_closure_over_T...)          \
     (__extension__({                                                           \
-        struct CCC_priority_queue *const private_priority_queue                \
+        struct CCC_Priority_queue *const private_priority_queue                \
             = (priority_queue_ptr);                                            \
         typeof(*any_type_ptr) *T = (any_type_ptr);                             \
         if (private_priority_queue && T)                                       \
@@ -200,7 +203,7 @@ CCC_private_priority_queue_struct_base(struct CCC_priority_queue const *,
                 = CCC_private_priority_queue_node_in(private_priority_queue,   \
                                                      T);                       \
             if (private_priority_queue_node_ptr->parent                        \
-                && CCC_private_priority_queue_cmp(                             \
+                && CCC_private_priority_queue_order(                           \
                        private_priority_queue,                                 \
                        private_priority_queue_node_ptr,                        \
                        private_priority_queue_node_ptr->parent)                \
@@ -234,7 +237,7 @@ CCC_private_priority_queue_struct_base(struct CCC_priority_queue const *,
 #define CCC_private_priority_queue_increase_w(                                 \
     priority_queue_ptr, any_type_ptr, increase_closure_over_T...)              \
     (__extension__({                                                           \
-        struct CCC_priority_queue *const private_priority_queue                \
+        struct CCC_Priority_queue *const private_priority_queue                \
             = (priority_queue_ptr);                                            \
         typeof(*any_type_ptr) *T = (any_type_ptr);                             \
         if (private_priority_queue && T)                                       \
@@ -269,7 +272,7 @@ CCC_private_priority_queue_struct_base(struct CCC_priority_queue const *,
 #define CCC_private_priority_queue_decrease_w(                                 \
     priority_queue_ptr, any_type_ptr, decrease_closure_over_T...)              \
     (__extension__({                                                           \
-        struct CCC_priority_queue *const private_priority_queue                \
+        struct CCC_Priority_queue *const private_priority_queue                \
             = (priority_queue_ptr);                                            \
         typeof(*any_type_ptr) *T = (any_type_ptr);                             \
         if (private_priority_queue && T)                                       \

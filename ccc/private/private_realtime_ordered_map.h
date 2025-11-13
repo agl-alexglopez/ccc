@@ -67,7 +67,7 @@ struct CCC_Realtime_ordered_map
     /** @private An allocation function, if any. */
     CCC_Allocator *alloc;
     /** @private The comparison function for three way comparison. */
-    CCC_Key_comparator *cmp;
+    CCC_Key_comparator *order;
     /** @private Auxiliary data, if any. */
     void *context;
 };
@@ -82,7 +82,7 @@ struct CCC_rtree_entry
     /** @private The result of the last comparison to find the user specified
     node. Equal if found or indicates the direction the node should be
     inserted from the parent we currently store in the entry. */
-    CCC_Order last_cmp;
+    CCC_Order last_order;
     /** @private The stored node or it's parent if it does not exist. */
     struct CCC_Entry entry;
 };
@@ -90,11 +90,11 @@ struct CCC_rtree_entry
 /** @private Enable return by compound literal reference on the stack. Think
 of this method as return by value but with the additional ability to pass by
 pointer in a functional style. `fnB(&(union
-CCC_Realtime_ordered_map_entry){fnA().impl});` */
+CCC_Realtime_ordered_map_entry){fnA().private});` */
 union CCC_Realtime_ordered_map_entry
 {
     /** @private The field containing the entry struct. */
-    struct CCC_rtree_entry impl;
+    struct CCC_rtree_entry private;
 };
 
 /*=========================   Private Interface  ============================*/
@@ -112,7 +112,7 @@ struct CCC_rtree_entry CCC_private_realtime_ordered_map_entry(
 /** @private */
 void *CCC_private_realtime_ordered_map_insert(
     struct CCC_Realtime_ordered_map *rom,
-    struct CCC_Realtime_ordered_map_node *parent, CCC_Order last_cmp,
+    struct CCC_Realtime_ordered_map_node *parent, CCC_Order last_order,
     struct CCC_Realtime_ordered_map_node *out_handle);
 
 /*==========================   Initialization     ===========================*/
@@ -120,7 +120,7 @@ void *CCC_private_realtime_ordered_map_insert(
 /** @private */
 #define CCC_private_realtime_ordered_map_initialize(                           \
     private_map_name, private_struct_name, private_node_node_field,            \
-    private_key_node_field, private_key_cmp_fn, private_alloc_fn,              \
+    private_key_node_field, private_key_order_fn, private_alloc_fn,            \
     private_context_data)                                                      \
     {                                                                          \
         .root = &(private_map_name).end,                                       \
@@ -133,7 +133,7 @@ void *CCC_private_realtime_ordered_map_insert(
         = offsetof(private_struct_name, private_node_node_field),              \
         .sizeof_type = sizeof(private_struct_name),                            \
         .alloc = (private_alloc_fn),                                           \
-        .cmp = (private_key_cmp_fn),                                           \
+        .order = (private_key_order_fn),                                       \
         .context = (private_context_data),                                     \
     }
 
@@ -147,10 +147,13 @@ void *CCC_private_realtime_ordered_map_insert(
         {                                                                      \
             private_realtime_ordered_map_ins_alloc_ret                         \
                 = (Realtime_ordered_map_entry)                                 \
-                      ->rom->alloc(                                            \
-                          NULL,                                                \
-                          (Realtime_ordered_map_entry)->rom->sizeof_type,      \
-                          (Realtime_ordered_map_entry)->rom->context);         \
+                      ->rom->alloc((CCC_Allocator_context){                    \
+                          .input = NULL,                                       \
+                          .bytes                                               \
+                          = (Realtime_ordered_map_entry)->rom->sizeof_type,    \
+                          .context                                             \
+                          = (Realtime_ordered_map_entry)->rom->context,        \
+                      });                                                      \
         }                                                                      \
         private_realtime_ordered_map_ins_alloc_ret;                            \
     }))
@@ -167,7 +170,7 @@ void *CCC_private_realtime_ordered_map_insert(
                 CCC_private_Realtime_ordered_map_node_in_slot(                 \
                     (Realtime_ordered_map_entry)->rom,                         \
                     (Realtime_ordered_map_entry)->entry.e),                    \
-                (Realtime_ordered_map_entry)->last_cmp,                        \
+                (Realtime_ordered_map_entry)->last_order,                      \
                 CCC_private_Realtime_ordered_map_node_in_slot(                 \
                     (Realtime_ordered_map_entry)->rom, new_mem));              \
         }                                                                      \
@@ -181,7 +184,7 @@ void *CCC_private_realtime_ordered_map_insert(
         typeof(lazy_value) *private_realtime_ordered_map_new_ins_base          \
             = CCC_private_realtime_ordered_map_new(                            \
                 (&realtime_ordered_map_insert_entry));                         \
-        realtime_ordered_map_insert_entry_ret = (struct CCC_ent){              \
+        realtime_ordered_map_insert_entry_ret = (struct CCC_Entry){            \
             .e = private_realtime_ordered_map_new_ins_base,                    \
             .stats = CCC_ENTRY_INSERT_ERROR,                                   \
         };                                                                     \
@@ -197,7 +200,7 @@ void *CCC_private_realtime_ordered_map_insert(
                 CCC_private_Realtime_ordered_map_node_in_slot(                 \
                     realtime_ordered_map_insert_entry.rom,                     \
                     realtime_ordered_map_insert_entry.entry.e),                \
-                realtime_ordered_map_insert_entry.last_cmp,                    \
+                realtime_ordered_map_insert_entry.last_order,                  \
                 CCC_private_Realtime_ordered_map_node_in_slot(                 \
                     realtime_ordered_map_insert_entry.rom,                     \
                     private_realtime_ordered_map_new_ins_base));               \
@@ -217,7 +220,7 @@ void *CCC_private_realtime_ordered_map_insert(
         if (private_realtime_ordered_map_ent_ptr)                              \
         {                                                                      \
             private_realtime_ordered_map_mod_ent                               \
-                = private_realtime_ordered_map_ent_ptr->impl;                  \
+                = private_realtime_ordered_map_ent_ptr->private;               \
             if (private_realtime_ordered_map_mod_ent.entry.stats               \
                 & CCC_ENTRY_OCCUPIED)                                          \
             {                                                                  \
@@ -242,19 +245,19 @@ void *CCC_private_realtime_ordered_map_insert(
             = NULL;                                                            \
         if (private_or_ins_entry_ptr)                                          \
         {                                                                      \
-            if (private_or_ins_entry_ptr->impl.entry.stats                     \
+            if (private_or_ins_entry_ptr->private.entry.stats                  \
                 == CCC_ENTRY_OCCUPIED)                                         \
             {                                                                  \
                 private_realtime_ordered_map_or_ins_ret                        \
-                    = private_or_ins_entry_ptr->impl.entry.e;                  \
+                    = private_or_ins_entry_ptr->private.entry.e;               \
             }                                                                  \
             else                                                               \
             {                                                                  \
                 private_realtime_ordered_map_or_ins_ret                        \
                     = CCC_private_realtime_ordered_map_new(                    \
-                        &private_or_ins_entry_ptr->impl);                      \
+                        &private_or_ins_entry_ptr->private);                   \
                 CCC_private_realtime_ordered_map_insert_key_val(               \
-                    &private_or_ins_entry_ptr->impl,                           \
+                    &private_or_ins_entry_ptr->private,                        \
                     private_realtime_ordered_map_or_ins_ret, lazy_key_value);  \
             }                                                                  \
         }                                                                      \
@@ -270,32 +273,32 @@ void *CCC_private_realtime_ordered_map_insert(
             = NULL;                                                            \
         if (private_ins_entry_ptr)                                             \
         {                                                                      \
-            if (!(private_ins_entry_ptr->impl.entry.stats                      \
+            if (!(private_ins_entry_ptr->private.entry.stats                   \
                   & CCC_ENTRY_OCCUPIED))                                       \
             {                                                                  \
                 private_realtime_ordered_map_ins_ent_ret                       \
                     = CCC_private_realtime_ordered_map_new(                    \
-                        &private_ins_entry_ptr->impl);                         \
+                        &private_ins_entry_ptr->private);                      \
                 CCC_private_realtime_ordered_map_insert_key_val(               \
-                    &private_ins_entry_ptr->impl,                              \
+                    &private_ins_entry_ptr->private,                           \
                     private_realtime_ordered_map_ins_ent_ret, lazy_key_value); \
             }                                                                  \
-            else if (private_ins_entry_ptr->impl.entry.stats                   \
+            else if (private_ins_entry_ptr->private.entry.stats                \
                      == CCC_ENTRY_OCCUPIED)                                    \
             {                                                                  \
                 struct CCC_Realtime_ordered_map_node private_ins_ent_saved     \
                     = *CCC_private_Realtime_ordered_map_node_in_slot(          \
-                        private_ins_entry_ptr->impl.rom,                       \
-                        private_ins_entry_ptr->impl.entry.e);                  \
+                        private_ins_entry_ptr->private.rom,                    \
+                        private_ins_entry_ptr->private.entry.e);               \
                 *((typeof(private_realtime_ordered_map_ins_ent_ret))           \
-                      private_ins_entry_ptr->impl.entry.e)                     \
+                      private_ins_entry_ptr->private.entry.e)                  \
                     = lazy_key_value;                                          \
                 *CCC_private_Realtime_ordered_map_node_in_slot(                \
-                    private_ins_entry_ptr->impl.rom,                           \
-                    private_ins_entry_ptr->impl.entry.e)                       \
+                    private_ins_entry_ptr->private.rom,                        \
+                    private_ins_entry_ptr->private.entry.e)                    \
                     = private_ins_ent_saved;                                   \
                 private_realtime_ordered_map_ins_ent_ret                       \
-                    = private_ins_entry_ptr->impl.entry.e;                     \
+                    = private_ins_entry_ptr->private.entry.e;                  \
             }                                                                  \
         }                                                                      \
         private_realtime_ordered_map_ins_ent_ret;                              \

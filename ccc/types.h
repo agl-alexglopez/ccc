@@ -201,9 +201,9 @@ container initialization. */
 typedef struct
 {
     /** The left hand side for a three-way comparison operation. */
-    void const *const any_type_lhs;
+    void const *const type_lhs;
     /** The right hand side for a three-way comparison operation. */
-    void const *const any_type_rhs;
+    void const *const type_rhs;
     /** A reference to context data provided to container on initialization. */
     void *context;
 } CCC_Type_comparator_context;
@@ -216,8 +216,8 @@ left hand side and the complete user type on the right hand side. This means the
 right hand side will need to manually access its key field.
 
 ```
-int const *const my_key_lhs = cmp.any_key_lhs;
-struct key_val const *const my_type_rhs  = cmp.any_type_rhs;
+int const *const my_key_lhs = order.key_lhs;
+struct key_val const *const my_type_rhs  = order.type_rhs;
 return (*my_key_lhs > my_type_rhs->key) - (*my_key_lhs < my_type_rhs->key);
 ```
 
@@ -228,9 +228,9 @@ significant memory for a search depending on the size of the user type. */
 typedef struct
 {
     /** Key matching the key field of the provided type to the container. */
-    void const *const any_key_lhs;
+    void const *const key_lhs;
     /** The complete user type stored in the container. */
-    void const *const any_type_rhs;
+    void const *const type_rhs;
     /** A reference to context data provided to the container on initialization.
      */
     void *context;
@@ -243,7 +243,7 @@ container. For example, a destruct function will use this type. */
 typedef struct
 {
     /** The user type being stored in the container. */
-    void *any_type;
+    void *type;
     /** A reference to context data provided to the container on initialization.
      */
     void *context;
@@ -257,7 +257,7 @@ to hash their values with their hash function. */
 typedef struct
 {
     /** A reference to the same type used for keys in the container. */
-    void const *const any_key;
+    void const *const key;
     /** A reference to context data provided to the container on initialization.
      */
     void *context;
@@ -294,7 +294,7 @@ needed):
 
 ```
 void *
-std_alloc(CCC_Allocator_context const context)
+std_allocate(CCC_Allocator_context const context)
 {
     if (!context.input && !context.bytes)
     {

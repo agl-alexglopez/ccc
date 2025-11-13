@@ -7,7 +7,7 @@
 #include "priority_queue.h"
 #include "types.h"
 
-struct val
+struct Val
 {
     int id;
     int val;
@@ -15,9 +15,9 @@ struct val
 };
 
 void val_update(CCC_Type_context);
-CCC_Order val_cmp(CCC_Type_comparator_context);
-enum check_result insert_shuffled(CCC_Priority_queue *, struct val[], size_t,
+CCC_Order val_order(CCC_Type_comparator_context);
+enum Check_result insert_shuffled(CCC_Priority_queue *, struct Val[], size_t,
                                   int);
-enum check_result inorder_fill(int[], size_t, CCC_Priority_queue *);
+enum Check_result inorder_fill(int[], size_t, CCC_Priority_queue *);
 
 #endif /* CCC_PQ_UTIL_H */

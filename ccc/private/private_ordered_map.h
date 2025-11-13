@@ -58,7 +58,7 @@ struct CCC_Ordered_map
     /** @private The byte offset of the user key in the user type. */
     size_t key_offset;
     /** @private The user defined comparison callback function. */
-    CCC_Key_comparator *cmp;
+    CCC_Key_comparator *order;
     /** @private The user defined allocation function, if any. */
     CCC_Allocator *alloc;
     /** @private Auxiliary data, if any. */
@@ -90,11 +90,11 @@ struct CCC_Ordered_map_entry
 /** @private Enable return by compound literal reference on the stack. Think
 of this method as return by value but with the additional ability to pass by
 pointer in a functional style. `fnB(&(union
-CCC_Ordered_map_entry){fnA().impl});` */
+CCC_Ordered_map_entry){fnA().private});` */
 union CCC_Ordered_map_entry_wrap
 {
     /** @private The field containing the entry struct. */
-    struct CCC_Ordered_map_entry impl;
+    struct CCC_Ordered_map_entry private;
 };
 
 /*==========================  Private Interface  ============================*/
@@ -118,7 +118,7 @@ void *CCC_private_ordered_map_insert(struct CCC_Ordered_map *t,
 /** @private */
 #define CCC_private_ordered_map_initialize(                                    \
     private_tree_name, private_struct_name, private_node_node_field,           \
-    private_key_node_field, private_key_cmp_fn, private_alloc_fn,              \
+    private_key_node_field, private_key_order_fn, private_alloc_fn,            \
     private_context_data)                                                      \
     {                                                                          \
         .root = &(private_tree_name).end,                                      \
@@ -126,7 +126,7 @@ void *CCC_private_ordered_map_insert(struct CCC_Ordered_map *t,
         = {.branch = {&(private_tree_name).end, &(private_tree_name).end},     \
            .parent = &(private_tree_name).end},                                \
         .alloc = (private_alloc_fn),                                           \
-        .cmp = (private_key_cmp_fn),                                           \
+        .order = (private_key_order_fn),                                       \
         .context = (private_context_data),                                     \
         .size = 0,                                                             \
         .sizeof_type = sizeof(private_struct_name),                            \
@@ -143,8 +143,11 @@ void *CCC_private_ordered_map_insert(struct CCC_Ordered_map *t,
         {                                                                      \
             private_ordered_map_ins_alloc_ret                                  \
                 = (ordered_map_entry)                                          \
-                      ->t->alloc(NULL, (ordered_map_entry)->t->sizeof_type,    \
-                                 (ordered_map_entry)->t->context);             \
+                      ->t->alloc((CCC_Allocator_context){                      \
+                          .input = NULL,                                       \
+                          .bytes = (ordered_map_entry)->t->sizeof_type,        \
+                          .context = (ordered_map_entry)->t->context,          \
+                      });                                                      \
         }                                                                      \
         private_ordered_map_ins_alloc_ret;                                     \
     }))
@@ -168,7 +171,7 @@ void *CCC_private_ordered_map_insert(struct CCC_Ordered_map *t,
     (__extension__({                                                           \
         typeof(lazy_value) *private_ordered_map_new_ins_base                   \
             = CCC_private_ordered_map_new((&om_insert_entry));                 \
-        om_insert_entry_ret = (struct CCC_ent){                                \
+        om_insert_entry_ret = (struct CCC_Entry){                              \
             .e = private_ordered_map_new_ins_base,                             \
             .stats = CCC_ENTRY_INSERT_ERROR,                                   \
         };                                                                     \
@@ -197,7 +200,8 @@ void *CCC_private_ordered_map_insert(struct CCC_Ordered_map *t,
             = {.entry = {.stats = CCC_ENTRY_ARG_ERROR}};                       \
         if (private_ordered_map_ent_ptr)                                       \
         {                                                                      \
-            private_ordered_map_mod_ent = private_ordered_map_ent_ptr->impl;   \
+            private_ordered_map_mod_ent                                        \
+                = private_ordered_map_ent_ptr->private;                        \
             if (private_ordered_map_mod_ent.entry.stats & CCC_ENTRY_OCCUPIED)  \
             {                                                                  \
                 type_name *const T = private_ordered_map_mod_ent.entry.e;      \
@@ -218,17 +222,18 @@ void *CCC_private_ordered_map_insert(struct CCC_Ordered_map *t,
         typeof(lazy_key_value) *private_or_ins_ret = NULL;                     \
         if (private_or_ins_entry_ptr)                                          \
         {                                                                      \
-            if (private_or_ins_entry_ptr->impl.entry.stats                     \
+            if (private_or_ins_entry_ptr->private.entry.stats                  \
                 == CCC_ENTRY_OCCUPIED)                                         \
             {                                                                  \
-                private_or_ins_ret = private_or_ins_entry_ptr->impl.entry.e;   \
+                private_or_ins_ret                                             \
+                    = private_or_ins_entry_ptr->private.entry.e;               \
             }                                                                  \
             else                                                               \
             {                                                                  \
                 private_or_ins_ret = CCC_private_ordered_map_new(              \
-                    &private_or_ins_entry_ptr->impl);                          \
+                    &private_or_ins_entry_ptr->private);                       \
                 CCC_private_ordered_map_insert_key_val(                        \
-                    &private_or_ins_entry_ptr->impl, private_or_ins_ret,       \
+                    &private_or_ins_entry_ptr->private, private_or_ins_ret,    \
                     lazy_key_value);                                           \
             }                                                                  \
         }                                                                      \
@@ -243,31 +248,31 @@ void *CCC_private_ordered_map_insert(struct CCC_Ordered_map *t,
         typeof(lazy_key_value) *private_ordered_map_ins_ent_ret = NULL;        \
         if (private_ins_entry_ptr)                                             \
         {                                                                      \
-            if (!(private_ins_entry_ptr->impl.entry.stats                      \
+            if (!(private_ins_entry_ptr->private.entry.stats                   \
                   & CCC_ENTRY_OCCUPIED))                                       \
             {                                                                  \
                 private_ordered_map_ins_ent_ret = CCC_private_ordered_map_new( \
-                    &private_ins_entry_ptr->impl);                             \
+                    &private_ins_entry_ptr->private);                          \
                 CCC_private_ordered_map_insert_key_val(                        \
-                    &private_ins_entry_ptr->impl,                              \
+                    &private_ins_entry_ptr->private,                           \
                     private_ordered_map_ins_ent_ret, lazy_key_value);          \
             }                                                                  \
-            else if (private_ins_entry_ptr->impl.entry.stats                   \
+            else if (private_ins_entry_ptr->private.entry.stats                \
                      == CCC_ENTRY_OCCUPIED)                                    \
             {                                                                  \
                 struct CCC_Ordered_map_node private_ins_ent_saved              \
                     = *CCC_private_Ordered_map_node_in_slot(                   \
-                        private_ins_entry_ptr->impl.t,                         \
-                        private_ins_entry_ptr->impl.entry.e);                  \
+                        private_ins_entry_ptr->private.t,                      \
+                        private_ins_entry_ptr->private.entry.e);               \
                 *((typeof(lazy_key_value) *)                                   \
-                      private_ins_entry_ptr->impl.entry.e)                     \
+                      private_ins_entry_ptr->private.entry.e)                  \
                     = lazy_key_value;                                          \
                 *CCC_private_Ordered_map_node_in_slot(                         \
-                    private_ins_entry_ptr->impl.t,                             \
-                    private_ins_entry_ptr->impl.entry.e)                       \
+                    private_ins_entry_ptr->private.t,                          \
+                    private_ins_entry_ptr->private.entry.e)                    \
                     = private_ins_ent_saved;                                   \
                 private_ordered_map_ins_ent_ret                                \
-                    = private_ins_entry_ptr->impl.entry.e;                     \
+                    = private_ins_entry_ptr->private.entry.e;                  \
             }                                                                  \
         }                                                                      \
         private_ordered_map_ins_ent_ret;                                       \

@@ -32,8 +32,8 @@ CHECK_BEGIN_STATIC_FN(buffer_test_full)
 
 CHECK_BEGIN_STATIC_FN(buffer_test_reserve)
 {
-    Buffer b = buffer_initialize(NULL, int, std_alloc, NULL, 0);
-    CHECK(buffer_reserve(&b, 8, std_alloc), CCC_RESULT_OK);
+    Buffer b = buffer_initialize(NULL, int, std_allocate, NULL, 0);
+    CHECK(buffer_reserve(&b, 8, std_allocate), CCC_RESULT_OK);
     CHECK(buffer_count(&b).count, 0);
     CHECK(buffer_capacity(&b).count, 8);
     CHECK_END_FN(buffer_clear_and_free(&b, NULL););
@@ -66,7 +66,7 @@ CHECK_BEGIN_STATIC_FN(buffer_test_copy_no_alloc_fail)
 
 CHECK_BEGIN_STATIC_FN(buffer_test_copy_alloc)
 {
-    Buffer src = buffer_initialize(NULL, int, std_alloc, NULL, 0);
+    Buffer src = buffer_initialize(NULL, int, std_allocate, NULL, 0);
     Buffer dst = buffer_initialize(NULL, int, NULL, NULL, 0);
     CHECK(buffer_is_empty(&dst), CCC_TRUE);
     enum : size_t
@@ -78,7 +78,7 @@ CHECK_BEGIN_STATIC_FN(buffer_test_copy_alloc)
     {
         CHECK(buffer_push_back(&src, &push[i]) != NULL, CCC_TRUE);
     }
-    CCC_Result const res = buffer_copy(&dst, &src, std_alloc);
+    CCC_Result const res = buffer_copy(&dst, &src, std_allocate);
     CHECK(res, CCC_RESULT_OK);
     CHECK(*(int *)buffer_begin(&src), 0);
     CHECK(buffer_count(&dst).count, 5);
@@ -93,13 +93,13 @@ CHECK_BEGIN_STATIC_FN(buffer_test_copy_alloc)
     CHECK(buffer_is_empty(&src), buffer_is_empty(&dst));
     CHECK_END_FN({
         (void)buffer_clear_and_free(&src, NULL);
-        (void)buffer_clear_and_free_reserve(&dst, NULL, std_alloc);
+        (void)buffer_clear_and_free_reserve(&dst, NULL, std_allocate);
     });
 }
 
 CHECK_BEGIN_STATIC_FN(buffer_test_copy_alloc_fail)
 {
-    Buffer src = buffer_initialize(NULL, int, std_alloc, NULL, 0);
+    Buffer src = buffer_initialize(NULL, int, std_allocate, NULL, 0);
     Buffer dst = buffer_initialize(NULL, int, NULL, NULL, 0);
     CHECK(buffer_push_back(&src, &(int){88}) != NULL, CCC_TRUE);
     CCC_Result const res = buffer_copy(&dst, &src, NULL);
@@ -110,7 +110,7 @@ CHECK_BEGIN_STATIC_FN(buffer_test_copy_alloc_fail)
 CHECK_BEGIN_STATIC_FN(buffer_test_init_from)
 {
     CCC_Buffer b
-        = CCC_buffer_from(std_alloc, NULL, 8, (int[]){1, 2, 3, 4, 5, 6, 7});
+        = CCC_buffer_from(std_allocate, NULL, 8, (int[]){1, 2, 3, 4, 5, 6, 7});
     int elem = 1;
     for (int const *i = CCC_buffer_begin(&b); i != CCC_buffer_end(&b);
          i = CCC_buffer_next(&b, i))
@@ -144,7 +144,7 @@ CHECK_BEGIN_STATIC_FN(buffer_test_init_from_fail)
 
 CHECK_BEGIN_STATIC_FN(buffer_test_init_with_capacity)
 {
-    CCC_Buffer b = CCC_buffer_with_capacity(int, std_alloc, NULL, 8);
+    CCC_Buffer b = CCC_buffer_with_capacity(int, std_allocate, NULL, 8);
     CHECK(CCC_buffer_capacity(&b).count, 8);
     CHECK(CCC_buffer_push_back(&b, &(int){9}) != NULL, CCC_TRUE);
     size_t count = 0;

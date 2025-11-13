@@ -81,15 +81,16 @@ Initialize the container with memory, callbacks, and permissions. */
 @param [in] struct_name the user type wrapping the intrusive element.
 @param [in] om_node_field the name of the intrusive map elem field.
 @param [in] key_node_field the name of the field in user type used as key.
-@param [in] key_cmp the key comparison function (see types.h).
+@param [in] key_order the key comparison function (see types.h).
 @param [in] alloc_fn the allocation function or NULL if allocation is banned.
 @param [in] context a pointer to any context data for comparison or destruction.
 @return the struct initialized ordered map for direct assignment
 (i.e. CCC_Ordered_map m = CCC_ordered_map_initialize(...);). */
 #define CCC_ordered_map_initialize(om_name, struct_name, om_node_field,        \
-                                   key_node_field, key_cmp, alloc_fn, context) \
+                                   key_node_field, key_order, alloc_fn,        \
+                                   context)                                    \
     CCC_private_ordered_map_initialize(om_name, struct_name, om_node_field,    \
-                                       key_node_field, key_cmp, alloc_fn,      \
+                                       key_node_field, key_order, alloc_fn,    \
                                        context)
 
 /**@}*/
@@ -156,7 +157,7 @@ in an entry to provide information about the old value. */
     {                                                                          \
         CCC_ordered_map_swap_entry((ordered_map_ptr), (key_val_handle_ptr),    \
                                    (tmp_ptr))                                  \
-            .impl                                                              \
+            .private                                                           \
     }
 
 /** @brief Attempts to insert the key value wrapping key_val_handle.
@@ -182,7 +183,7 @@ error is set. */
     &(CCC_Entry)                                                               \
     {                                                                          \
         CCC_ordered_map_try_insert((ordered_map_ptr), (key_val_handle_ptr))    \
-            .impl                                                              \
+            .private                                                           \
     }
 
 /** @brief lazily insert lazy_value into the map at key if key is absent.
@@ -271,7 +272,7 @@ stored memory as they see fit. */
 #define CCC_ordered_map_remove_r(ordered_map_ptr, out_handle_ptr)              \
     &(CCC_Entry)                                                               \
     {                                                                          \
-        CCC_ordered_map_remove((ordered_map_ptr), (out_handle_ptr)).impl       \
+        CCC_ordered_map_remove((ordered_map_ptr), (out_handle_ptr)).private    \
     }
 
 /** @brief Obtains an entry for the provided key in the map for future use.
@@ -309,7 +310,7 @@ to subsequent calls in the Entry Interface. */
 #define CCC_ordered_map_entry_r(ordered_map_ptr, key_ptr)                      \
     &(CCC_Ordered_map_entry)                                                   \
     {                                                                          \
-        CCC_ordered_map_entry((ordered_map_ptr), (key_ptr)).impl               \
+        CCC_ordered_map_entry((ordered_map_ptr), (key_ptr)).private            \
     }
 
 /** @brief Modifies the provided entry if it is Occupied.
@@ -440,7 +441,7 @@ free or use as needed. */
 #define CCC_ordered_map_remove_entry_r(ordered_map_entry_ptr)                  \
     &(CCC_Entry)                                                               \
     {                                                                          \
-        CCC_ordered_map_remove_entry((ordered_map_entry_ptr)).impl             \
+        CCC_ordered_map_remove_entry((ordered_map_entry_ptr)).private          \
     }
 
 /** @brief Unwraps the provided entry to obtain a view into the map element.
@@ -492,7 +493,7 @@ Note that due to the variety of values that can be returned in the range, using
 the provided range iteration functions from types.h is recommended for example:
 
 ```
-for (struct val *i = range_begin(&range);
+for (struct Val *i = range_begin(&range);
      i != range_end(&range);
      i = next(&om, &i->elem))
 {}
@@ -516,7 +517,7 @@ enclosing scope. This reference is always non-NULL. */
     &(CCC_Range)                                                               \
     {                                                                          \
         CCC_ordered_map_equal_range(ordered_map_ptr, begin_and_end_key_ptrs)   \
-            .impl                                                              \
+            .private                                                           \
     }
 
 /** @brief Return an iterable rrange of values from [begin_key, end_key).
@@ -531,7 +532,7 @@ Note that due to the variety of values that can be returned in the rrange, using
 the provided rrange iteration functions from types.h is recommended for example:
 
 ```
-for (struct val *i = rrange_begin(&rrange);
+for (struct Val *i = rrange_begin(&rrange);
      i != rrange_rend(&rrange);
      i = rnext(&om, &i->elem))
 {}
@@ -556,7 +557,7 @@ enclosing scope. This reference is always non-NULL. */
     {                                                                          \
         CCC_ordered_map_equal_rrange(ordered_map_ptr,                          \
                                      rbegin_and_rend_key_ptrs)                 \
-            .impl                                                              \
+            .private                                                           \
     }
 
 /** @brief Return the start of an inorder traversal of the map. Amortized
@@ -653,41 +654,43 @@ NULL. */
 typedef CCC_Ordered_map_node Ordered_map_node;
 typedef CCC_Ordered_map Ordered_map;
 typedef CCC_Ordered_map_entry Ordered_map_entry;
-#    define om_initialize(args...) CCC_ordered_map_initialize(args)
-#    define om_and_modify_w(args...) CCC_ordered_map_and_modify_w(args)
-#    define om_or_insert_w(args...) CCC_ordered_map_or_insert_w(args)
-#    define om_insert_entry_w(args...) CCC_ordered_map_insert_entry_w(args)
-#    define om_try_insert_w(args...) CCC_ordered_map_try_insert_w(args)
-#    define om_insert_or_assign_w(args...)                                     \
+#    define ordered_map_initialize(args...) CCC_ordered_map_initialize(args)
+#    define ordered_map_and_modify_w(args...) CCC_ordered_map_and_modify_w(args)
+#    define ordered_map_or_insert_w(args...) CCC_ordered_map_or_insert_w(args)
+#    define ordered_map_insert_entry_w(args...)                                \
+        CCC_ordered_map_insert_entry_w(args)
+#    define ordered_map_try_insert_w(args...) CCC_ordered_map_try_insert_w(args)
+#    define ordered_map_insert_or_assign_w(args...)                            \
         CCC_ordered_map_insert_or_assign_w(args)
-#    define om_swap_entry_r(args...) CCC_ordered_map_swap_entry_r(args)
-#    define om_remove_r(args...) CCC_ordered_map_remove_r(args)
-#    define om_remove_entry_r(args...) CCC_ordered_map_remove_entry_r(args)
-#    define om_entry_r(args...) CCC_ordered_map_entry_r(args)
-#    define om_and_modify_r(args...) CCC_ordered_map_and_modify_r(args)
-#    define om_and_modify_context_r(args...)                                   \
+#    define ordered_map_swap_entry_r(args...) CCC_ordered_map_swap_entry_r(args)
+#    define ordered_map_remove_r(args...) CCC_ordered_map_remove_r(args)
+#    define ordered_map_remove_entry_r(args...)                                \
+        CCC_ordered_map_remove_entry_r(args)
+#    define ordered_map_entry_r(args...) CCC_ordered_map_entry_r(args)
+#    define ordered_map_and_modify_r(args...) CCC_ordered_map_and_modify_r(args)
+#    define ordered_map_and_modify_context_r(args...)                          \
         CCC_ordered_map_and_modify_context_r(args)
-#    define om_contains(args...) CCC_ordered_map_contains(args)
-#    define om_get_key_val(args...) CCC_ordered_map_get_key_val(args)
-#    define om_get_mut(args...) CCC_ordered_map_get_mut(args)
-#    define om_swap_entry(args...) CCC_ordered_map_swap_entry(args)
-#    define om_remove(args...) CCC_ordered_map_remove(args)
-#    define om_entry(args...) CCC_ordered_map_entry(args)
-#    define om_remove_entry(args...) CCC_ordered_map_remove_entry(args)
-#    define om_or_insert(args...) CCC_ordered_map_or_insert(args)
-#    define om_insert_entry(args...) CCC_ordered_map_insert_entry(args)
-#    define om_unwrap(args...) CCC_ordered_map_unwrap(args)
-#    define om_unwrap_mut(args...) CCC_ordered_map_unwrap_mut(args)
-#    define om_begin(args...) CCC_ordered_map_begin(args)
-#    define om_next(args...) CCC_ordered_map_next(args)
-#    define om_rbegin(args...) CCC_ordered_map_rbegin(args)
-#    define om_rnext(args...) CCC_ordered_map_rnext(args)
-#    define om_end(args...) CCC_ordered_map_end(args)
-#    define om_rend(args...) CCC_ordered_map_rend(args)
-#    define om_count(args...) CCC_ordered_map_count(args)
-#    define om_is_empty(args...) CCC_ordered_map_is_empty(args)
-#    define om_clear(args...) CCC_ordered_map_clear(args)
-#    define om_validate(args...) CCC_ordered_map_validate(args)
+#    define ordered_map_contains(args...) CCC_ordered_map_contains(args)
+#    define ordered_map_get_key_val(args...) CCC_ordered_map_get_key_val(args)
+#    define ordered_map_get_mut(args...) CCC_ordered_map_get_mut(args)
+#    define ordered_map_swap_entry(args...) CCC_ordered_map_swap_entry(args)
+#    define ordered_map_remove(args...) CCC_ordered_map_remove(args)
+#    define ordered_map_entry(args...) CCC_ordered_map_entry(args)
+#    define ordered_map_remove_entry(args...) CCC_ordered_map_remove_entry(args)
+#    define ordered_map_or_insert(args...) CCC_ordered_map_or_insert(args)
+#    define ordered_map_insert_entry(args...) CCC_ordered_map_insert_entry(args)
+#    define ordered_map_unwrap(args...) CCC_ordered_map_unwrap(args)
+#    define ordered_map_unwrap_mut(args...) CCC_ordered_map_unwrap_mut(args)
+#    define ordered_map_begin(args...) CCC_ordered_map_begin(args)
+#    define ordered_map_next(args...) CCC_ordered_map_next(args)
+#    define ordered_map_rbegin(args...) CCC_ordered_map_rbegin(args)
+#    define ordered_map_rnext(args...) CCC_ordered_map_rnext(args)
+#    define ordered_map_end(args...) CCC_ordered_map_end(args)
+#    define ordered_map_rend(args...) CCC_ordered_map_rend(args)
+#    define ordered_map_count(args...) CCC_ordered_map_count(args)
+#    define ordered_map_is_empty(args...) CCC_ordered_map_is_empty(args)
+#    define ordered_map_clear(args...) CCC_ordered_map_clear(args)
+#    define ordered_map_validate(args...) CCC_ordered_map_validate(args)
 #endif
 
 #endif /* CCC_ORDERED_MAP_H */

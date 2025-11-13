@@ -9,7 +9,7 @@
 CHECK_BEGIN_STATIC_FN(priority_queue_test_empty)
 {
     CCC_Priority_queue priority_queue = CCC_priority_queue_initialize(
-        struct val, elem, CCC_LES, val_cmp, NULL, NULL);
+        struct Val, elem, CCC_ORDER_LESSER, val_order, NULL, NULL);
     CHECK(CCC_priority_queue_is_empty(&priority_queue), true);
     CHECK_END_FN();
 }

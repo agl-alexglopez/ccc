@@ -88,28 +88,28 @@ Initialize the container with memory, callbacks, and permissions. */
 /** @brief Initialize a flat_priority_queue as a min or max heap.
 @param [in] mem_ptr a pointer to an array of user types or NULL.
 @param [in] any_type_name the name of the user type.
-@param [in] cmp_order CCC_ORDER_LESSER or CCC_ORDER_GREATER for min or max heap,
-respectively.
-@param [in] cmp_fn the user defined comarison function for user types.
+@param [in] order_order CCC_ORDER_LESSER or CCC_ORDER_GREATER for min or max
+heap, respectively.
+@param [in] order_fn the user defined comarison function for user types.
 @param [in] alloc_fn the allocation function or NULL if no allocation.
 @param [in] context_data any context data needed for destruction of elements.
 @param [in] capacity the capacity of contiguous elements at mem_ptr.
 @return the initialized priority queue on the right hand side of an equality
 operator. (i.e. CCC_Flat_priority_queue q =
 CCC_flat_priority_queue_initialize(...);). */
-#define CCC_flat_priority_queue_initialize(mem_ptr, any_type_name, cmp_order,  \
-                                           cmp_fn, alloc_fn, context_data,     \
-                                           capacity)                           \
-    CCC_private_flat_priority_queue_initialize(mem_ptr, any_type_name,         \
-                                               cmp_order, cmp_fn, alloc_fn,    \
-                                               context_data, capacity)
+#define CCC_flat_priority_queue_initialize(mem_ptr, any_type_name,             \
+                                           order_order, order_fn, alloc_fn,    \
+                                           context_data, capacity)             \
+    CCC_private_flat_priority_queue_initialize(                                \
+        mem_ptr, any_type_name, order_order, order_fn, alloc_fn, context_data, \
+        capacity)
 
 /** @brief Partial order an array of elements as a min or max heap. O(N).
 @param [in] mem_ptr a pointer to an array of user types or NULL.
 @param [in] any_type_name the name of the user type.
-@param [in] cmp_order CCC_ORDER_LESSER or CCC_ORDER_GREATER for min or max heap,
-respectively.
-@param [in] cmp_fn the user defined comparison function for user types.
+@param [in] order_order CCC_ORDER_LESSER or CCC_ORDER_GREATER for min or max
+heap, respectively.
+@param [in] order_fn the user defined comparison function for user types.
 @param [in] alloc_fn the allocation function or NULL if no allocation.
 @param [in] context_data any context data needed for destruction of elements.
 @param [in] capacity the capacity of contiguous elements at mem_ptr.
@@ -119,10 +119,10 @@ operator. (i.e. CCC_Flat_priority_queue q =
 CCC_flat_priority_queue_heapify_initialize(...);).
 */
 #define CCC_flat_priority_queue_heapify_initialize(                            \
-    mem_ptr, any_type_name, cmp_order, cmp_fn, alloc_fn, context_data,         \
+    mem_ptr, any_type_name, order_order, order_fn, alloc_fn, context_data,     \
     capacity, size)                                                            \
     CCC_private_flat_priority_queue_heapify_initialize(                        \
-        mem_ptr, any_type_name, cmp_order, cmp_fn, alloc_fn, context_data,     \
+        mem_ptr, any_type_name, order_order, order_fn, alloc_fn, context_data, \
         capacity, size)
 
 /** @brief Copy the flat_priority_queue from src to newly initialized dst.
@@ -146,8 +146,8 @@ Manual memory management with no allocation function provided.
 #define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
 Flat_priority_queue src
     = flat_priority_queue_initialize((int[10]){}, CCC_ORDER_LESSER, NULL,
-int_cmp, NULL, 10); push_rand_ints(&src); Flat_priority_queue dst =
-flat_priority_queue_initialize((int[11]){}, CCC_ORDER_LESSER, NULL, int_cmp,
+int_order, NULL, 10); push_rand_ints(&src); Flat_priority_queue dst =
+flat_priority_queue_initialize((int[11]){}, CCC_ORDER_LESSER, NULL, int_order,
 NULL, 11); CCC_Result res = flat_priority_queue_copy(&dst, &src, NULL);
 ```
 
@@ -157,11 +157,11 @@ is memory management handed over to the copy function.
 ```
 #define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
 Flat_priority_queue src
-    = flat_priority_queue_initialize((int *)NULL, CCC_ORDER_LESSER, std_alloc,
-int_cmp, NULL, 0); push_rand_ints(&src); Flat_priority_queue dst =
-flat_priority_queue_initialize((int *)NULL, CCC_ORDER_LESSER, std_alloc,
-int_cmp, NULL, 0); CCC_Result res = flat_priority_queue_copy(&dst, &src,
-std_alloc);
+    = flat_priority_queue_initialize((int *)NULL, CCC_ORDER_LESSER,
+std_allocate, int_order, NULL, 0); push_rand_ints(&src); Flat_priority_queue dst
+= flat_priority_queue_initialize((int *)NULL, CCC_ORDER_LESSER, std_allocate,
+int_order, NULL, 0); CCC_Result res = flat_priority_queue_copy(&dst, &src,
+std_allocate);
 ```
 
 The above allows dst to have a capacity less than that of the src as long as
@@ -172,10 +172,10 @@ size flat_priority_queue.
 ```
 #define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
 Flat_priority_queue src
-    = flat_priority_queue_initialize((int *)NULL, CCC_ORDER_LESSER, std_alloc,
-int_cmp, NULL, 0); push_rand_ints(&src); Flat_priority_queue dst =
-flat_priority_queue_initialize((int *)NULL, CCC_ORDER_LESSER, NULL, int_cmp,
-NULL, 0); CCC_Result res = flat_priority_queue_copy(&dst, &src, std_alloc);
+    = flat_priority_queue_initialize((int *)NULL, CCC_ORDER_LESSER,
+std_allocate, int_order, NULL, 0); push_rand_ints(&src); Flat_priority_queue dst
+= flat_priority_queue_initialize((int *)NULL, CCC_ORDER_LESSER, NULL, int_order,
+NULL, 0); CCC_Result res = flat_priority_queue_copy(&dst, &src, std_allocate);
 ```
 
 The above sets up dst with fixed size while src is a dynamic

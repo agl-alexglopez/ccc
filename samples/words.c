@@ -48,7 +48,7 @@ priority queue. One type works well for both because they don't need intrusive
 elements to operate those containers. */
 typedef struct
 {
-    struct str_ofs ofs;
+    struct String_offset ofs;
     int freq;
 } Word;
 
@@ -124,16 +124,17 @@ static void print_last_n(FILE *file, int n);
 static void print_alpha_n(FILE *file, int n);
 static void print_ralpha_n(FILE *file, int n);
 static Buffer copy_frequencies(Handle_ordered_map const *map);
-static void print_n(Handle_ordered_map *, CCC_Order, struct str_arena *, int n);
+static void print_n(Handle_ordered_map *, CCC_Order, struct String_arena *,
+                    int n);
 static struct int_conversion parse_n_ranks(str_view arg);
 
 /* String Helper Functions */
-static struct str_ofs clean_word(struct str_arena *, str_view wv);
+static struct String_offset clean_word(struct String_arena *, str_view wv);
 
 /* Container Functions */
-static Handle_ordered_map create_frequency_map(struct str_arena *, FILE *);
-static Order cmp_string_keys(Key_comparator_context);
-static Order cmp_words(Type_comparator_context);
+static Handle_ordered_map create_frequency_map(struct String_arena *, FILE *);
+static Order order_string_keys(Key_comparator_context);
+static Order order_words(Type_comparator_context);
 
 /* Misc. Functions */
 static FILE *open_file(str_view file);
@@ -268,11 +269,11 @@ main(int argc, char *argv[])
 static void
 print_found(FILE *const f, str_view w)
 {
-    struct str_arena a = str_arena_create(ARENA_START_CAP);
+    struct String_arena a = str_arena_create(ARENA_START_CAP);
     check(a.arena);
     Handle_ordered_map map = create_frequency_map(&a, f);
     check(!is_empty(&map));
-    struct str_ofs wc = clean_word(&a, w);
+    struct String_offset wc = clean_word(&a, w);
     if (!wc.error)
     {
         Word const *const found_w
@@ -289,7 +290,7 @@ print_found(FILE *const f, str_view w)
 static void
 print_top_n(FILE *const f, int n)
 {
-    struct str_arena a = str_arena_create(ARENA_START_CAP);
+    struct String_arena a = str_arena_create(ARENA_START_CAP);
     check(a.arena);
     Handle_ordered_map map = create_frequency_map(&a, f);
     check(!is_empty(&map));
@@ -301,7 +302,7 @@ print_top_n(FILE *const f, int n)
 static void
 print_last_n(FILE *const f, int n)
 {
-    struct str_arena a = str_arena_create(ARENA_START_CAP);
+    struct String_arena a = str_arena_create(ARENA_START_CAP);
     check(a.arena);
     Handle_ordered_map map = create_frequency_map(&a, f);
     check(!is_empty(&map));
@@ -313,7 +314,7 @@ print_last_n(FILE *const f, int n)
 static void
 print_alpha_n(FILE *const f, int n)
 {
-    struct str_arena a = str_arena_create(ARENA_START_CAP);
+    struct String_arena a = str_arena_create(ARENA_START_CAP);
     check(a.arena);
     Handle_ordered_map map = create_frequency_map(&a, f);
     check(!is_empty(&map));
@@ -334,7 +335,7 @@ print_alpha_n(FILE *const f, int n)
 static void
 print_ralpha_n(FILE *const f, int n)
 {
-    struct str_arena a = str_arena_create(ARENA_START_CAP);
+    struct String_arena a = str_arena_create(ARENA_START_CAP);
     check(a.arena);
     Handle_ordered_map map = create_frequency_map(&a, f);
     check(!is_empty(&map));
@@ -353,12 +354,12 @@ print_ralpha_n(FILE *const f, int n)
     (void)clear_and_free(&map, NULL);
 }
 
-static buffer
+static Buffer
 copy_frequencies(Handle_ordered_map const *const map)
 {
     check(!is_empty(map));
-    Buffer freqs = buffer_initialize(NULL, Word, std_alloc, NULL, 0);
-    CCC_Result const r = buffer_reserve(&freqs, count(map).count, std_alloc);
+    Buffer freqs = buffer_initialize(NULL, Word, std_allocate, NULL, 0);
+    CCC_Result const r = buffer_reserve(&freqs, count(map).count, std_allocate);
     check(r == CCC_RESULT_OK);
     size_t const cap = capacity(&freqs).count;
     size_t i = 0;
@@ -373,13 +374,13 @@ copy_frequencies(Handle_ordered_map const *const map)
 
 static void
 print_n(CCC_Handle_ordered_map *const map, CCC_Order const ord,
-        struct str_arena *const a, int n)
+        struct String_arena *const a, int n)
 {
     Buffer freqs = copy_frequencies(map);
     check(!buffer_is_empty(&freqs));
     Flat_priority_queue flat_priority_queue
         = flat_priority_queue_heapify_initialize(
-            begin(&freqs), Word, ord, cmp_words, NULL, a,
+            begin(&freqs), Word, ord, order_words, NULL, a,
             capacity(&freqs).count, count(&freqs).count);
     check(count(&flat_priority_queue).count == count(&freqs).count);
     if (!n)
@@ -408,13 +409,13 @@ print_n(CCC_Handle_ordered_map *const map, CCC_Order const ord,
 /*=====================    Container Construction     =======================*/
 
 static Handle_ordered_map
-create_frequency_map(struct str_arena *const a, FILE *const f)
+create_frequency_map(struct String_arena *const a, FILE *const f)
 {
     char *lineptr = NULL;
     size_t len = 0;
     ptrdiff_t read = 0;
     Handle_ordered_map handle_ordered_map = handle_ordered_map_initialize(
-        NULL, Word, ofs, cmp_string_keys, std_alloc, a, 0);
+        NULL, Word, ofs, order_string_keys, std_allocate, a, 0);
     while ((read = getline(&lineptr, &len, f)) > 0)
     {
         str_view const line = {.s = lineptr, .len = read - 1};
@@ -422,7 +423,7 @@ create_frequency_map(struct str_arena *const a, FILE *const f)
              !sv_end_tok(line, word_view);
              word_view = sv_next_tok(line, word_view, space))
         {
-            struct str_ofs const cw = clean_word(a, word_view);
+            struct String_offset const cw = clean_word(a, word_view);
             if (!cw.error)
             {
                 Handle_ordered_map_handle const *e
@@ -439,12 +440,12 @@ create_frequency_map(struct str_arena *const a, FILE *const f)
     return handle_ordered_map;
 }
 
-static struct str_ofs
-clean_word(struct str_arena *const a, str_view wv)
+static struct String_offset
+clean_word(struct String_arena *const a, str_view wv)
 {
     /* It is hard to know how many characters will make it to a cleaned word
        and one pass is ideal so arena api allows push back on last alloc. */
-    struct str_ofs str = str_arena_alloc(a, 0);
+    struct String_offset str = str_arena_alloc(a, 0);
     if (str.error)
     {
         return str;
@@ -454,23 +455,23 @@ clean_word(struct str_arena *const a, str_view wv)
         if (!isalpha(*c) && *c != '-')
         {
             str_arena_pop_str(a, &str);
-            return (struct str_ofs){.error = STR_ARENA_INVALID};
+            return (struct String_offset){.error = STR_ARENA_INVALID};
         }
-        enum str_arena_result const pushed_char
+        enum String_arena_result const pushed_char
             = str_arena_push_back(a, &str, (char)tolower(*c));
         check(pushed_char == STR_ARENA_OK);
     }
     if (!str.len)
     {
-        return (struct str_ofs){.error = STR_ARENA_INVALID};
+        return (struct String_offset){.error = STR_ARENA_INVALID};
     }
     char const *const w = str_arena_at(a, &str);
     check(w);
     if (!isalpha(*w) || !isalpha(*(w + (str.len - 1))))
     {
-        enum str_arena_result const pop = str_arena_pop_str(a, &str);
+        enum String_arena_result const pop = str_arena_pop_str(a, &str);
         check(pop == STR_ARENA_OK);
-        return (struct str_ofs){.error = STR_ARENA_INVALID};
+        return (struct String_offset){.error = STR_ARENA_INVALID};
     }
     return str;
 }
@@ -478,11 +479,11 @@ clean_word(struct str_arena *const a, str_view wv)
 /*=======================   Container Helpers    ============================*/
 
 static Order
-cmp_string_keys(Key_comparator_context const c)
+order_string_keys(Key_comparator_context const c)
 {
-    Word const *const w = c.any_type_rhs;
-    struct str_arena const *const a = c.context;
-    struct str_ofs const *const id = c.any_key_lhs;
+    Word const *const w = c.type_rhs;
+    struct String_arena const *const a = c.context;
+    struct String_offset const *const id = c.key_lhs;
     char const *const key_word = str_arena_at(a, id);
     char const *const struct_word = str_arena_at(a, &w->ofs);
     check(key_word && struct_word);
@@ -492,16 +493,16 @@ cmp_string_keys(Key_comparator_context const c)
 
 /* Sorts by frequency then alphabetic order if frequencies are tied. */
 static Order
-cmp_words(Type_comparator_context const c)
+order_words(Type_comparator_context const c)
 {
-    Word const *const lhs = c.any_type_lhs;
-    Word const *const rhs = c.any_type_rhs;
-    Order freq_cmp = (lhs->freq > rhs->freq) - (lhs->freq < rhs->freq);
-    if (freq_cmp != CCC_ORDER_EQUAL)
+    Word const *const lhs = c.type_lhs;
+    Word const *const rhs = c.type_rhs;
+    Order freq_order = (lhs->freq > rhs->freq) - (lhs->freq < rhs->freq);
+    if (freq_order != CCC_ORDER_EQUAL)
     {
-        return freq_cmp;
+        return freq_order;
     }
-    struct str_arena const *const arena = c.context;
+    struct String_arena const *const arena = c.context;
     char const *const lhs_word = str_arena_at(arena, &lhs->ofs);
     char const *const rhs_word = str_arena_at(arena, &rhs->ofs);
     check(lhs_word && rhs_word);

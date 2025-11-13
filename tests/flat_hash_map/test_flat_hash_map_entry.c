@@ -7,34 +7,34 @@ the entry functions. */
 #define FLAT_HASH_MAP_USING_NAMESPACE_CCC
 #define TRAITS_USING_NAMESPACE_CCC
 
-#include "Flat_hash_map_util.h"
 #include "checkers.h"
 #include "flat_hash_map.h"
+#include "flat_hash_map_util.h"
 #include "traits.h"
 #include "types.h"
 
-static inline struct val
+static inline struct Val
 val(int const val)
 {
-    return (struct val){.val = val};
+    return (struct Val){.val = val};
 }
 
-static inline struct val
+static inline struct Val
 idval(int const key, int const val)
 {
-    return (struct val){.key = key, .val = val};
+    return (struct Val){.key = key, .val = val};
 }
 
 static inline void
 plus(CCC_Type_context const t)
 {
-    ((struct val *)t.any_type)->val++;
+    ((struct Val *)t.type)->val++;
 }
 
 static inline void
 pluscontext(CCC_Type_context const t)
 {
-    ((struct val *)t.any_type)->val += *(int *)t.context;
+    ((struct Val *)t.type)->val += *(int *)t.context;
 }
 
 /* Every test should have three uses of each tested function: one when the
@@ -52,7 +52,7 @@ CHECK_BEGIN_STATIC_FN(fill_n, CCC_Flat_hash_map *const fh, size_t const n,
     for (size_t i = 0; i < n; ++i, ++id_and_val)
     {
         CCC_Entry ent = swap_entry(
-            fh, &(struct val){.key = id_and_val, .val = id_and_val});
+            fh, &(struct Val){.key = id_and_val, .val = id_and_val});
         CHECK(insert_error(&ent), false);
         CHECK(occupied(&ent), false);
         CHECK(validate(fh), true);
@@ -65,19 +65,19 @@ CHECK_BEGIN_STATIC_FN(fill_n, CCC_Flat_hash_map *const fh, size_t const n,
 CHECK_BEGIN_STATIC_FN(flat_hash_map_test_validate)
 {
     CCC_Flat_hash_map fh = flat_hash_map_initialize(
-        &(small_fixed_map){}, struct val, key, flat_hash_map_int_to_u64,
-        flat_hash_map_id_cmp, NULL, NULL, SMALL_FIXED_CAP);
+        &(small_fixed_map){}, struct Val, key, flat_hash_map_int_to_u64,
+        flat_hash_map_id_order, NULL, NULL, SMALL_FIXED_CAP);
 
-    CCC_Entry ent = swap_entry(&fh, &(struct val){.key = -1, .val = -1});
+    CCC_Entry ent = swap_entry(&fh, &(struct Val){.key = -1, .val = -1});
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent) != NULL, true);
     CHECK(count(&fh).count, 1);
-    ent = swap_entry(&fh, &(struct val){.key = -1, .val = -1});
+    ent = swap_entry(&fh, &(struct Val){.key = -1, .val = -1});
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), true);
     CHECK(count(&fh).count, 1);
-    struct val *v = unwrap(&ent);
+    struct Val *v = unwrap(&ent);
     CHECK(v != NULL, true);
     CHECK(v->val, -1);
     CHECK(v->key, -1);
@@ -88,18 +88,18 @@ CHECK_BEGIN_STATIC_FN(flat_hash_map_test_insert)
 {
     int const size = 30;
     CCC_Flat_hash_map fh = flat_hash_map_initialize(
-        &(small_fixed_map){}, struct val, key, flat_hash_map_int_to_u64,
-        flat_hash_map_id_cmp, NULL, NULL, SMALL_FIXED_CAP);
-    CCC_Entry ent = swap_entry(&fh, &(struct val){.key = -1, .val = -1});
+        &(small_fixed_map){}, struct Val, key, flat_hash_map_int_to_u64,
+        flat_hash_map_id_order, NULL, NULL, SMALL_FIXED_CAP);
+    CCC_Entry ent = swap_entry(&fh, &(struct Val){.key = -1, .val = -1});
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent) != NULL, true);
     CHECK(count(&fh).count, 1);
-    ent = swap_entry(&fh, &(struct val){.key = -1, .val = -1});
+    ent = swap_entry(&fh, &(struct Val){.key = -1, .val = -1});
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), true);
     CHECK(count(&fh).count, 1);
-    struct val *v = unwrap(&ent);
+    struct Val *v = unwrap(&ent);
     CHECK(v != NULL, true);
     CHECK(v->val, -1);
     CHECK(v->key, -1);
@@ -108,12 +108,12 @@ CHECK_BEGIN_STATIC_FN(flat_hash_map_test_insert)
     CHECK(fill_n(&fh, size / 2, i), PASS);
 
     i += (size / 2);
-    ent = swap_entry(&fh, &(struct val){.key = i, .val = i});
+    ent = swap_entry(&fh, &(struct Val){.key = i, .val = i});
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent) != NULL, true);
     CHECK(count(&fh).count, i + 2);
-    ent = swap_entry(&fh, &(struct val){.key = i, .val = i});
+    ent = swap_entry(&fh, &(struct Val){.key = i, .val = i});
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), true);
     CHECK(count(&fh).count, i + 2);
@@ -126,12 +126,12 @@ CHECK_BEGIN_STATIC_FN(flat_hash_map_test_insert)
     CHECK(fill_n(&fh, size - i, i), PASS);
 
     i = size;
-    ent = swap_entry(&fh, &(struct val){.key = i, .val = i});
+    ent = swap_entry(&fh, &(struct Val){.key = i, .val = i});
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent) != NULL, true);
     CHECK(count(&fh).count, i + 2);
-    ent = swap_entry(&fh, &(struct val){.key = i, .val = i});
+    ent = swap_entry(&fh, &(struct Val){.key = i, .val = i});
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), true);
     CHECK(count(&fh).count, i + 2);
@@ -146,23 +146,23 @@ CHECK_BEGIN_STATIC_FN(flat_hash_map_test_remove)
 {
     int const size = 30;
     CCC_Flat_hash_map fh = flat_hash_map_initialize(
-        &(small_fixed_map){}, struct val, key, flat_hash_map_int_to_u64,
-        flat_hash_map_id_cmp, NULL, NULL, SMALL_FIXED_CAP);
-    CCC_Entry ent = CCC_remove(&fh, &(struct val){.key = -1, .val = -1});
+        &(small_fixed_map){}, struct Val, key, flat_hash_map_int_to_u64,
+        flat_hash_map_id_order, NULL, NULL, SMALL_FIXED_CAP);
+    CCC_Entry ent = CCC_remove(&fh, &(struct Val){.key = -1, .val = -1});
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent), NULL);
     CHECK(count(&fh).count, 0);
-    ent = swap_entry(&fh, &(struct val){.key = -1, .val = -1});
+    ent = swap_entry(&fh, &(struct Val){.key = -1, .val = -1});
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent) != NULL, true);
     CHECK(count(&fh).count, 1);
-    ent = CCC_remove(&fh, &(struct val){.key = -1, .val = -1});
+    ent = CCC_remove(&fh, &(struct Val){.key = -1, .val = -1});
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), true);
     CHECK(count(&fh).count, 0);
-    struct val *v = unwrap(&ent);
+    struct Val *v = unwrap(&ent);
     CHECK(v != NULL, true);
     CHECK(v->val, -1);
     CHECK(v->key, -1);
@@ -171,16 +171,16 @@ CHECK_BEGIN_STATIC_FN(flat_hash_map_test_remove)
     CHECK(fill_n(&fh, size / 2, i), PASS);
 
     i += (size / 2);
-    ent = CCC_remove(&fh, &(struct val){.key = i, .val = i});
+    ent = CCC_remove(&fh, &(struct Val){.key = i, .val = i});
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), false);
     CHECK(count(&fh).count, i);
-    ent = swap_entry(&fh, &(struct val){.key = i, .val = i});
+    ent = swap_entry(&fh, &(struct Val){.key = i, .val = i});
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent) != NULL, true);
     CHECK(count(&fh).count, i + 1);
-    ent = CCC_remove(&fh, &(struct val){.key = i, .val = i});
+    ent = CCC_remove(&fh, &(struct Val){.key = i, .val = i});
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), true);
     CHECK(count(&fh).count, i);
@@ -192,16 +192,16 @@ CHECK_BEGIN_STATIC_FN(flat_hash_map_test_remove)
     CHECK(fill_n(&fh, size - i, i), PASS);
 
     i = size;
-    ent = CCC_remove(&fh, &(struct val){.key = i, .val = i});
+    ent = CCC_remove(&fh, &(struct Val){.key = i, .val = i});
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), false);
     CHECK(count(&fh).count, i);
-    ent = swap_entry(&fh, &(struct val){.key = i, .val = i});
+    ent = swap_entry(&fh, &(struct Val){.key = i, .val = i});
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent) != NULL, true);
     CHECK(count(&fh).count, i + 1);
-    ent = CCC_remove(&fh, &(struct val){.key = i, .val = i});
+    ent = CCC_remove(&fh, &(struct Val){.key = i, .val = i});
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), true);
     CHECK(count(&fh).count, i);
@@ -216,18 +216,18 @@ CHECK_BEGIN_STATIC_FN(flat_hash_map_test_try_insert)
 {
     int const size = 30;
     CCC_Flat_hash_map fh = flat_hash_map_initialize(
-        &(small_fixed_map){}, struct val, key, flat_hash_map_int_to_u64,
-        flat_hash_map_id_cmp, NULL, NULL, SMALL_FIXED_CAP);
-    CCC_Entry ent = try_insert(&fh, &(struct val){.key = -1, .val = -1});
+        &(small_fixed_map){}, struct Val, key, flat_hash_map_int_to_u64,
+        flat_hash_map_id_order, NULL, NULL, SMALL_FIXED_CAP);
+    CCC_Entry ent = try_insert(&fh, &(struct Val){.key = -1, .val = -1});
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent) != NULL, true);
     CHECK(count(&fh).count, 1);
-    ent = try_insert(&fh, &(struct val){.key = -1, .val = -1});
+    ent = try_insert(&fh, &(struct Val){.key = -1, .val = -1});
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), true);
     CHECK(count(&fh).count, 1);
-    struct val *v = unwrap(&ent);
+    struct Val *v = unwrap(&ent);
     CHECK(v != NULL, true);
     CHECK(v->val, -1);
     CHECK(v->key, -1);
@@ -236,12 +236,12 @@ CHECK_BEGIN_STATIC_FN(flat_hash_map_test_try_insert)
     CHECK(fill_n(&fh, size / 2, i), PASS);
 
     i += (size / 2);
-    ent = try_insert(&fh, &(struct val){.key = i, .val = i});
+    ent = try_insert(&fh, &(struct Val){.key = i, .val = i});
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent) != NULL, true);
     CHECK(count(&fh).count, i + 2);
-    ent = try_insert(&fh, &(struct val){.key = i, .val = i});
+    ent = try_insert(&fh, &(struct Val){.key = i, .val = i});
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), true);
     CHECK(count(&fh).count, i + 2);
@@ -254,12 +254,12 @@ CHECK_BEGIN_STATIC_FN(flat_hash_map_test_try_insert)
     CHECK(fill_n(&fh, size - i, i), PASS);
 
     i = size;
-    ent = try_insert(&fh, &(struct val){.key = i, .val = i});
+    ent = try_insert(&fh, &(struct Val){.key = i, .val = i});
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent) != NULL, true);
     CHECK(count(&fh).count, i + 2);
-    ent = try_insert(&fh, &(struct val){.key = i, .val = i});
+    ent = try_insert(&fh, &(struct Val){.key = i, .val = i});
     CHECK(occupied(&ent), true);
     CHECK(count(&fh).count, i + 2);
     v = unwrap(&ent);
@@ -273,8 +273,8 @@ CHECK_BEGIN_STATIC_FN(flat_hash_map_test_try_insert_with)
 {
     int const size = 30;
     CCC_Flat_hash_map fh = flat_hash_map_initialize(
-        &(small_fixed_map){}, struct val, key, flat_hash_map_int_to_u64,
-        flat_hash_map_id_cmp, NULL, NULL, SMALL_FIXED_CAP);
+        &(small_fixed_map){}, struct Val, key, flat_hash_map_int_to_u64,
+        flat_hash_map_id_order, NULL, NULL, SMALL_FIXED_CAP);
     CCC_Entry *ent = flat_hash_map_try_insert_w(&fh, -1, val(-1));
     CHECK(validate(&fh), true);
     CHECK(occupied(ent), false);
@@ -284,7 +284,7 @@ CHECK_BEGIN_STATIC_FN(flat_hash_map_test_try_insert_with)
     CHECK(validate(&fh), true);
     CHECK(occupied(ent), true);
     CHECK(count(&fh).count, 1);
-    struct val *v = unwrap(ent);
+    struct Val *v = unwrap(ent);
     CHECK(v != NULL, true);
     CHECK(v->val, -1);
     CHECK(v->key, -1);
@@ -331,18 +331,18 @@ CHECK_BEGIN_STATIC_FN(flat_hash_map_test_insert_or_assign)
 {
     int const size = 30;
     CCC_Flat_hash_map fh = flat_hash_map_initialize(
-        &(small_fixed_map){}, struct val, key, flat_hash_map_int_to_u64,
-        flat_hash_map_id_cmp, NULL, NULL, SMALL_FIXED_CAP);
-    CCC_Entry ent = insert_or_assign(&fh, &(struct val){.key = -1, .val = -1});
+        &(small_fixed_map){}, struct Val, key, flat_hash_map_int_to_u64,
+        flat_hash_map_id_order, NULL, NULL, SMALL_FIXED_CAP);
+    CCC_Entry ent = insert_or_assign(&fh, &(struct Val){.key = -1, .val = -1});
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent) != NULL, true);
     CHECK(count(&fh).count, 1);
-    ent = insert_or_assign(&fh, &(struct val){.key = -1, .val = -2});
+    ent = insert_or_assign(&fh, &(struct Val){.key = -1, .val = -2});
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), true);
     CHECK(count(&fh).count, 1);
-    struct val *v = unwrap(&ent);
+    struct Val *v = unwrap(&ent);
     CHECK(v != NULL, true);
     CHECK(v->val, -2);
     CHECK(v->key, -1);
@@ -351,12 +351,12 @@ CHECK_BEGIN_STATIC_FN(flat_hash_map_test_insert_or_assign)
     CHECK(fill_n(&fh, size / 2, i), PASS);
 
     i += (size / 2);
-    ent = insert_or_assign(&fh, &(struct val){.key = i, .val = i});
+    ent = insert_or_assign(&fh, &(struct Val){.key = i, .val = i});
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent) != NULL, true);
     CHECK(count(&fh).count, i + 2);
-    ent = insert_or_assign(&fh, &(struct val){.key = i, .val = i + 1});
+    ent = insert_or_assign(&fh, &(struct Val){.key = i, .val = i + 1});
     CHECK(occupied(&ent), true);
     CHECK(count(&fh).count, i + 2);
     v = unwrap(&ent);
@@ -368,12 +368,12 @@ CHECK_BEGIN_STATIC_FN(flat_hash_map_test_insert_or_assign)
     CHECK(fill_n(&fh, size - i, i), PASS);
 
     i = size;
-    ent = insert_or_assign(&fh, &(struct val){.key = i, .val = i});
+    ent = insert_or_assign(&fh, &(struct Val){.key = i, .val = i});
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), false);
     CHECK(unwrap(&ent) != NULL, true);
     CHECK(count(&fh).count, i + 2);
-    ent = insert_or_assign(&fh, &(struct val){.key = i, .val = i + 1});
+    ent = insert_or_assign(&fh, &(struct Val){.key = i, .val = i + 1});
     CHECK(validate(&fh), true);
     CHECK(occupied(&ent), true);
     CHECK(count(&fh).count, i + 2);
@@ -388,8 +388,8 @@ CHECK_BEGIN_STATIC_FN(flat_hash_map_test_insert_or_assign_with)
 {
     int const size = 30;
     CCC_Flat_hash_map fh = flat_hash_map_initialize(
-        &(small_fixed_map){}, struct val, key, flat_hash_map_int_to_u64,
-        flat_hash_map_id_cmp, NULL, NULL, SMALL_FIXED_CAP);
+        &(small_fixed_map){}, struct Val, key, flat_hash_map_int_to_u64,
+        flat_hash_map_id_order, NULL, NULL, SMALL_FIXED_CAP);
     CCC_Entry *ent = flat_hash_map_insert_or_assign_w(&fh, -1, val(-1));
     CHECK(validate(&fh), true);
     CHECK(occupied(ent), false);
@@ -399,7 +399,7 @@ CHECK_BEGIN_STATIC_FN(flat_hash_map_test_insert_or_assign_with)
     CHECK(validate(&fh), true);
     CHECK(occupied(ent), true);
     CHECK(count(&fh).count, 1);
-    struct val *v = unwrap(ent);
+    struct Val *v = unwrap(ent);
     CHECK(v != NULL, true);
     CHECK(v->val, 0);
     CHECK(v->key, -1);
@@ -445,8 +445,8 @@ CHECK_BEGIN_STATIC_FN(flat_hash_map_test_entry_and_modify)
 {
     int const size = 30;
     CCC_Flat_hash_map fh = flat_hash_map_initialize(
-        &(small_fixed_map){}, struct val, key, flat_hash_map_int_to_u64,
-        flat_hash_map_id_cmp, NULL, NULL, SMALL_FIXED_CAP);
+        &(small_fixed_map){}, struct Val, key, flat_hash_map_int_to_u64,
+        flat_hash_map_id_order, NULL, NULL, SMALL_FIXED_CAP);
     CCC_Flat_hash_map_entry *ent = entry_r(&fh, &(int){-1});
     CHECK(validate(&fh), true);
     CHECK(occupied(ent), false);
@@ -461,7 +461,7 @@ CHECK_BEGIN_STATIC_FN(flat_hash_map_test_entry_and_modify)
     ent = entry_r(&fh, &(int){-1});
     CHECK(occupied(ent), true);
     CHECK(count(&fh).count, 1);
-    struct val *v = unwrap(ent);
+    struct Val *v = unwrap(ent);
     CHECK(v != NULL, true);
     CHECK(v->val, -1);
     CHECK(v->key, -1);
@@ -515,8 +515,8 @@ CHECK_BEGIN_STATIC_FN(flat_hash_map_test_entry_and_modify_context)
 {
     int const size = 30;
     CCC_Flat_hash_map fh = flat_hash_map_initialize(
-        &(small_fixed_map){}, struct val, key, flat_hash_map_int_to_u64,
-        flat_hash_map_id_cmp, NULL, NULL, SMALL_FIXED_CAP);
+        &(small_fixed_map){}, struct Val, key, flat_hash_map_int_to_u64,
+        flat_hash_map_id_order, NULL, NULL, SMALL_FIXED_CAP);
     int context = 1;
     CCC_Flat_hash_map_entry *ent = entry_r(&fh, &(int){-1});
     ent = and_modify_context(ent, pluscontext, &context);
@@ -528,7 +528,7 @@ CHECK_BEGIN_STATIC_FN(flat_hash_map_test_entry_and_modify_context)
     ent = entry_r(&fh, &(int){-1});
     CHECK(occupied(ent), true);
     CHECK(count(&fh).count, 1);
-    struct val *v = unwrap(ent);
+    struct Val *v = unwrap(ent);
     CHECK(v != NULL, true);
     CHECK(v->val, -1);
     CHECK(v->key, -1);
@@ -582,10 +582,10 @@ CHECK_BEGIN_STATIC_FN(flat_hash_map_test_entry_and_modify_with)
 {
     int const size = 30;
     CCC_Flat_hash_map fh = flat_hash_map_initialize(
-        &(small_fixed_map){}, struct val, key, flat_hash_map_int_to_u64,
-        flat_hash_map_id_cmp, NULL, NULL, SMALL_FIXED_CAP);
+        &(small_fixed_map){}, struct Val, key, flat_hash_map_int_to_u64,
+        flat_hash_map_id_order, NULL, NULL, SMALL_FIXED_CAP);
     CCC_Flat_hash_map_entry *ent = entry_r(&fh, &(int){-1});
-    ent = flat_hash_map_and_modify_w(ent, struct val, { T->val++; });
+    ent = flat_hash_map_and_modify_w(ent, struct Val, { T->val++; });
     CHECK(count(&fh).count, 0);
     CHECK(occupied(ent), false);
     CHECK(unwrap(ent) == NULL, true);
@@ -593,11 +593,11 @@ CHECK_BEGIN_STATIC_FN(flat_hash_map_test_entry_and_modify_with)
     (void)flat_hash_map_insert_or_assign_w(&fh, -1, val(-1));
     CHECK(validate(&fh), true);
     ent = entry_r(&fh, &(int){-1});
-    struct val *v = unwrap(ent);
+    struct Val *v = unwrap(ent);
     CHECK(v != NULL, true);
     CHECK(v->val, -1);
     CHECK(v->key, -1);
-    ent = flat_hash_map_and_modify_w(ent, struct val, { T->val++; });
+    ent = flat_hash_map_and_modify_w(ent, struct Val, { T->val++; });
     v = unwrap(ent);
     CHECK(v != NULL, true);
     CHECK(v->key, -1);
@@ -609,14 +609,14 @@ CHECK_BEGIN_STATIC_FN(flat_hash_map_test_entry_and_modify_with)
 
     i += (size / 2);
     ent = entry_r(&fh, &i);
-    ent = flat_hash_map_and_modify_w(ent, struct val, { T->val++; });
+    ent = flat_hash_map_and_modify_w(ent, struct Val, { T->val++; });
     CHECK(occupied(ent), false);
     CHECK(unwrap(ent) == NULL, true);
     CHECK(count(&fh).count, i + 1);
     (void)flat_hash_map_insert_or_assign_w(&fh, i, val(i));
     CHECK(validate(&fh), true);
     ent = entry_r(&fh, &i);
-    ent = flat_hash_map_and_modify_w(ent, struct val, { T->val++; });
+    ent = flat_hash_map_and_modify_w(ent, struct Val, { T->val++; });
     v = unwrap(ent);
     CHECK(v != NULL, true);
     CHECK(v->val, i + 1);
@@ -628,14 +628,14 @@ CHECK_BEGIN_STATIC_FN(flat_hash_map_test_entry_and_modify_with)
 
     i = size;
     ent = entry_r(&fh, &i);
-    ent = flat_hash_map_and_modify_w(ent, struct val, { T->val++; });
+    ent = flat_hash_map_and_modify_w(ent, struct Val, { T->val++; });
     CHECK(occupied(ent), false);
     CHECK(unwrap(ent) == NULL, true);
     CHECK(count(&fh).count, i + 1);
     (void)flat_hash_map_insert_or_assign_w(&fh, i, val(i));
     CHECK(validate(&fh), true);
     ent = entry_r(&fh, &i);
-    ent = flat_hash_map_and_modify_w(ent, struct val, { T->val++; });
+    ent = flat_hash_map_and_modify_w(ent, struct Val, { T->val++; });
     v = unwrap(ent);
     CHECK(v != NULL, true);
     CHECK(v->val, i + 1);
@@ -648,17 +648,17 @@ CHECK_BEGIN_STATIC_FN(flat_hash_map_test_or_insert)
 {
     int const size = 30;
     CCC_Flat_hash_map fh = flat_hash_map_initialize(
-        &(small_fixed_map){}, struct val, key, flat_hash_map_int_to_u64,
-        flat_hash_map_id_cmp, NULL, NULL, SMALL_FIXED_CAP);
-    struct val *v = or_insert(entry_r(&fh, &(int){-1}),
-                              &(struct val){.key = -1, .val = -1});
+        &(small_fixed_map){}, struct Val, key, flat_hash_map_int_to_u64,
+        flat_hash_map_id_order, NULL, NULL, SMALL_FIXED_CAP);
+    struct Val *v = or_insert(entry_r(&fh, &(int){-1}),
+                              &(struct Val){.key = -1, .val = -1});
     CHECK(validate(&fh), true);
     CHECK(v != NULL, true);
     CHECK(v->key, -1);
     CHECK(v->val, -1);
     CHECK(count(&fh).count, 1);
     v = or_insert(entry_r(&fh, &(int){-1}),
-                  &(struct val){.key = -1, .val = -2});
+                  &(struct Val){.key = -1, .val = -2});
     CHECK(v != NULL, true);
     CHECK(v->key, -1);
     CHECK(v->val, -1);
@@ -668,13 +668,13 @@ CHECK_BEGIN_STATIC_FN(flat_hash_map_test_or_insert)
     CHECK(fill_n(&fh, size / 2, i), PASS);
 
     i += (size / 2);
-    v = or_insert(entry_r(&fh, &i), &(struct val){.key = i, .val = i});
+    v = or_insert(entry_r(&fh, &i), &(struct Val){.key = i, .val = i});
     CHECK(validate(&fh), true);
     CHECK(v != NULL, true);
     CHECK(v->key, i);
     CHECK(v->val, i);
     CHECK(count(&fh).count, i + 2);
-    v = or_insert(entry_r(&fh, &i), &(struct val){.key = i, .val = i + 1});
+    v = or_insert(entry_r(&fh, &i), &(struct Val){.key = i, .val = i + 1});
     CHECK(v != NULL, true);
     CHECK(v->key, i);
     CHECK(v->val, i);
@@ -684,13 +684,13 @@ CHECK_BEGIN_STATIC_FN(flat_hash_map_test_or_insert)
     CHECK(fill_n(&fh, size - i, i), PASS);
 
     i = size;
-    v = or_insert(entry_r(&fh, &i), &(struct val){.key = i, .val = i});
+    v = or_insert(entry_r(&fh, &i), &(struct Val){.key = i, .val = i});
     CHECK(validate(&fh), true);
     CHECK(v != NULL, true);
     CHECK(v->key, i);
     CHECK(v->val, i);
     CHECK(count(&fh).count, i + 2);
-    v = or_insert(entry_r(&fh, &i), &(struct val){.key = i, .val = i + 1});
+    v = or_insert(entry_r(&fh, &i), &(struct Val){.key = i, .val = i + 1});
     CHECK(v != NULL, true);
     CHECK(v->key, i);
     CHECK(v->val, i);
@@ -702,9 +702,9 @@ CHECK_BEGIN_STATIC_FN(flat_hash_map_test_or_insert_with)
 {
     int const size = 30;
     CCC_Flat_hash_map fh = flat_hash_map_initialize(
-        &(small_fixed_map){}, struct val, key, flat_hash_map_int_to_u64,
-        flat_hash_map_id_cmp, NULL, NULL, SMALL_FIXED_CAP);
-    struct val *v
+        &(small_fixed_map){}, struct Val, key, flat_hash_map_int_to_u64,
+        flat_hash_map_id_order, NULL, NULL, SMALL_FIXED_CAP);
+    struct Val *v
         = flat_hash_map_or_insert_w(entry_r(&fh, &(int){-1}), idval(-1, -1));
     CHECK(validate(&fh), true);
     CHECK(v != NULL, true);
@@ -755,17 +755,17 @@ CHECK_BEGIN_STATIC_FN(flat_hash_map_test_insert_entry)
 {
     int const size = 30;
     CCC_Flat_hash_map fh = flat_hash_map_initialize(
-        &(small_fixed_map){}, struct val, key, flat_hash_map_int_to_u64,
-        flat_hash_map_id_cmp, NULL, NULL, SMALL_FIXED_CAP);
-    struct val *v = insert_entry(entry_r(&fh, &(int){-1}),
-                                 &(struct val){.key = -1, .val = -1});
+        &(small_fixed_map){}, struct Val, key, flat_hash_map_int_to_u64,
+        flat_hash_map_id_order, NULL, NULL, SMALL_FIXED_CAP);
+    struct Val *v = insert_entry(entry_r(&fh, &(int){-1}),
+                                 &(struct Val){.key = -1, .val = -1});
     CHECK(validate(&fh), true);
     CHECK(v != NULL, true);
     CHECK(v->key, -1);
     CHECK(v->val, -1);
     CHECK(count(&fh).count, 1);
     v = insert_entry(entry_r(&fh, &(int){-1}),
-                     &(struct val){.key = -1, .val = -2});
+                     &(struct Val){.key = -1, .val = -2});
     CHECK(v != NULL, true);
     CHECK(v->key, -1);
     CHECK(v->val, -2);
@@ -775,13 +775,13 @@ CHECK_BEGIN_STATIC_FN(flat_hash_map_test_insert_entry)
     CHECK(fill_n(&fh, size / 2, i), PASS);
 
     i += (size / 2);
-    v = insert_entry(entry_r(&fh, &i), &(struct val){.key = i, .val = i});
+    v = insert_entry(entry_r(&fh, &i), &(struct Val){.key = i, .val = i});
     CHECK(validate(&fh), true);
     CHECK(v != NULL, true);
     CHECK(v->key, i);
     CHECK(v->val, i);
     CHECK(count(&fh).count, i + 2);
-    v = insert_entry(entry_r(&fh, &i), &(struct val){.key = i, .val = i + 1});
+    v = insert_entry(entry_r(&fh, &i), &(struct Val){.key = i, .val = i + 1});
     CHECK(v != NULL, true);
     CHECK(v->key, i);
     CHECK(v->val, i + 1);
@@ -791,13 +791,13 @@ CHECK_BEGIN_STATIC_FN(flat_hash_map_test_insert_entry)
     CHECK(fill_n(&fh, size - i, i), PASS);
 
     i = size;
-    v = insert_entry(entry_r(&fh, &i), &(struct val){.key = i, .val = i});
+    v = insert_entry(entry_r(&fh, &i), &(struct Val){.key = i, .val = i});
     CHECK(validate(&fh), true);
     CHECK(v != NULL, true);
     CHECK(v->key, i);
     CHECK(v->val, i);
     CHECK(count(&fh).count, i + 2);
-    v = insert_entry(entry_r(&fh, &i), &(struct val){.key = i, .val = i + 1});
+    v = insert_entry(entry_r(&fh, &i), &(struct Val){.key = i, .val = i + 1});
     CHECK(v != NULL, true);
     CHECK(v->key, i);
     CHECK(v->val, i + 1);
@@ -809,9 +809,9 @@ CHECK_BEGIN_STATIC_FN(flat_hash_map_test_insert_entry_with)
 {
     int const size = 30;
     CCC_Flat_hash_map fh = flat_hash_map_initialize(
-        &(small_fixed_map){}, struct val, key, flat_hash_map_int_to_u64,
-        flat_hash_map_id_cmp, NULL, NULL, SMALL_FIXED_CAP);
-    struct val *v
+        &(small_fixed_map){}, struct Val, key, flat_hash_map_int_to_u64,
+        flat_hash_map_id_order, NULL, NULL, SMALL_FIXED_CAP);
+    struct Val *v
         = flat_hash_map_insert_entry_w(entry_r(&fh, &(int){-1}), idval(-1, -1));
     CHECK(validate(&fh), true);
     CHECK(v != NULL, true);
@@ -862,10 +862,10 @@ CHECK_BEGIN_STATIC_FN(flat_hash_map_test_remove_entry)
 {
     int const size = 30;
     CCC_Flat_hash_map fh = flat_hash_map_initialize(
-        &(small_fixed_map){}, struct val, key, flat_hash_map_int_to_u64,
-        flat_hash_map_id_cmp, NULL, NULL, SMALL_FIXED_CAP);
-    struct val *v = or_insert(entry_r(&fh, &(int){-1}),
-                              &(struct val){.key = -1, .val = -1});
+        &(small_fixed_map){}, struct Val, key, flat_hash_map_int_to_u64,
+        flat_hash_map_id_order, NULL, NULL, SMALL_FIXED_CAP);
+    struct Val *v = or_insert(entry_r(&fh, &(int){-1}),
+                              &(struct Val){.key = -1, .val = -1});
     CHECK(validate(&fh), true);
     CHECK(v != NULL, true);
     CHECK(v->key, -1);
@@ -881,7 +881,7 @@ CHECK_BEGIN_STATIC_FN(flat_hash_map_test_remove_entry)
     CHECK(fill_n(&fh, size / 2, i), PASS);
 
     i += (size / 2);
-    v = or_insert(entry_r(&fh, &i), &(struct val){.key = i, .val = i});
+    v = or_insert(entry_r(&fh, &i), &(struct Val){.key = i, .val = i});
     CHECK(validate(&fh), true);
     CHECK(v != NULL, true);
     CHECK(v->key, i);
@@ -896,7 +896,7 @@ CHECK_BEGIN_STATIC_FN(flat_hash_map_test_remove_entry)
     CHECK(fill_n(&fh, size - i, i), PASS);
 
     i = size;
-    v = or_insert(entry_r(&fh, &i), &(struct val){.key = i, .val = i});
+    v = or_insert(entry_r(&fh, &i), &(struct Val){.key = i, .val = i});
     CHECK(validate(&fh), true);
     CHECK(v != NULL, true);
     CHECK(v->key, i);

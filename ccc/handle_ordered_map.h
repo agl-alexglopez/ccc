@@ -93,17 +93,17 @@ Once the location for the fixed size map is chosen--stack, heap, or data
 segment--provide a pointer to the map for the initialization macro.
 
 ```
-struct val
+struct Val
 {
     int key;
     int val;
 };
-CCC_handle_ordered_map_declare_fixed_map(small_fixed_map, struct val, 64);
+CCC_handle_ordered_map_declare_fixed_map(small_fixed_map, struct Val, 64);
 static Handle_ordered_map static_map = handle_ordered_map_initialize(
     &(static small_fixed_map){},
-    struct val,
+    struct Val,
     key,
-    handle_ordered_mapap_key_cmp,
+    handle_ordered_mapap_key_order,
     NULL,
     NULL,
     handle_ordered_map_fixed_capacity(small_fixed_map)
@@ -113,19 +113,19 @@ static Handle_ordered_map static_map = handle_ordered_map_initialize(
 Similarly, a fixed size map can be used on the stack.
 
 ```
-struct val
+struct Val
 {
     int key;
     int val;
 };
-CCC_handle_ordered_map_declare_fixed_map(small_fixed_map, struct val, 64);
+CCC_handle_ordered_map_declare_fixed_map(small_fixed_map, struct Val, 64);
 int main(void)
 {
     Handle_ordered_map static_fh = handle_ordered_map_initialize(
         &(small_fixed_map){},
-        struct val,
+        struct Val,
         key,
-        handle_ordered_mapap_key_cmp,
+        handle_ordered_mapap_key_order,
         NULL,
         NULL,
         handle_ordered_map_fixed_capacity(small_fixed_map)
@@ -158,7 +158,7 @@ desired allocation function. */
 @param [in] memory_ptr a pointer to the contiguous user types or ((T *)NULL).
 @param [in] any_type_name the name of the user type stored in the map.
 @param [in] key_node_field the name of the field in user type used as key.
-@param [in] key_cmp_fn the key comparison function (see types.h).
+@param [in] key_order_fn the key comparison function (see types.h).
 @param [in] alloc_fn the allocation function or NULL if allocation is banned.
 @param [in] context_data a pointer to any context data for comparison or
 destruction.
@@ -166,10 +166,10 @@ destruction.
 @return the struct initialized ordered map for direct assignment
 (i.e. CCC_Handle_ordered_map m = CCC_handle_ordered_map_initialize(...);). */
 #define CCC_handle_ordered_map_initialize(memory_ptr, any_type_name,           \
-                                          key_node_field, key_cmp_fn,          \
+                                          key_node_field, key_order_fn,        \
                                           alloc_fn, context_data, capacity)    \
     CCC_private_handle_ordered_map_initialize(                                 \
-        memory_ptr, any_type_name, key_node_field, key_cmp_fn, alloc_fn,       \
+        memory_ptr, any_type_name, key_node_field, key_order_fn, alloc_fn,     \
         context_data, capacity)
 
 /** @brief Copy the map at source to destination.
@@ -191,17 +191,17 @@ Manual memory management with no allocation function provided.
 
 ```
 #define HANDLE_ORDERED_MAP_USING_NAMESPACE_CCC
-struct val
+struct Val
 {
     int key;
     int val;
 };
-CCC_handle_ordered_map_declare_fixed_map(small_fixed_map, struct val, 64);
+CCC_handle_ordered_map_declare_fixed_map(small_fixed_map, struct Val, 64);
 static Handle_realtime_ordered_map src = handle_ordered_map_initialize(
     &(static small_fixed_map){},
-    struct val,
+    struct Val,
     key,
-    handle_ordered_mapap_key_cmp,
+    handle_ordered_mapap_key_order,
     NULL,
     NULL,
     handle_ordered_map_fixed_capacity(small_fixed_map)
@@ -209,9 +209,9 @@ static Handle_realtime_ordered_map src = handle_ordered_map_initialize(
 insert_rand_vals(&src);
 static Handle_realtime_ordered_map dst = handle_ordered_map_initialize(
     &(static small_fixed_map){},
-    struct val,
+    struct Val,
     key,
-    handle_ordered_mapap_key_cmp,
+    handle_ordered_mapap_key_order,
     NULL,
     NULL,
     handle_ordered_map_fixed_capacity(small_fixed_map)
@@ -224,16 +224,16 @@ is memory management handed over to the copy function.
 
 ```
 #define HANDLE_ORDERED_MAP_USING_NAMESPACE_CCC
-struct val
+struct Val
 {
     int key;
     int val;
 };
 static Handle_ordered_map src
-    = handle_ordered_map_initialize(NULL, struct val, key, key_cmp, std_alloc,
-NULL, 0); insert_rand_vals(&src); static Handle_ordered_map dst =
-handle_ordered_map_initialize(NULL, struct val, key, key_cmp, std_alloc, NULL,
-0); CCC_Result res = handle_ordered_map_copy(&dst, &src, std_alloc);
+    = handle_ordered_map_initialize(NULL, struct Val, key, key_order,
+std_allocate, NULL, 0); insert_rand_vals(&src); static Handle_ordered_map dst =
+handle_ordered_map_initialize(NULL, struct Val, key, key_order, std_allocate,
+NULL, 0); CCC_Result res = handle_ordered_map_copy(&dst, &src, std_allocate);
 ```
 
 The above allows dst to have a capacity less than that of the src as long as
@@ -243,16 +243,16 @@ size map.
 
 ```
 #define HANDLE_ORDERED_MAP_USING_NAMESPACE_CCC
-struct val
+struct Val
 {
     int key;
     int val;
 };
 static Handle_ordered_map src
-    = handle_ordered_map_initialize(NULL, struct val, key, key_cmp, std_alloc,
-NULL, 0); insert_rand_vals(&src); static Handle_ordered_map dst =
-handle_ordered_map_initialize(NULL, struct val, key, key_cmp, NULL, NULL, 0);
-CCC_Result res = handle_ordered_map_copy(&dst, &src, std_alloc);
+    = handle_ordered_map_initialize(NULL, struct Val, key, key_order,
+std_allocate, NULL, 0); insert_rand_vals(&src); static Handle_ordered_map dst =
+handle_ordered_map_initialize(NULL, struct Val, key, key_order, NULL, NULL, 0);
+CCC_Result res = handle_ordered_map_copy(&dst, &src, std_allocate);
 ```
 
 The above sets up dst with fixed size while src is a dynamic map. Because an
@@ -376,7 +376,7 @@ wraps it in a handle to provide information about the old value. */
     {                                                                          \
         CCC_handle_ordered_map_swap_handle((Handle_ordered_map_ptr),           \
                                            (key_val_output_ptr))               \
-            .impl                                                              \
+            .private                                                           \
     }
 
 /** @brief Attempts to insert the key value wrapping key_val_type.
@@ -403,7 +403,7 @@ map. If more space is needed but allocation fails an insert error is set. */
     {                                                                          \
         CCC_handle_ordered_map_try_insert((Handle_ordered_map_ptr),            \
                                           (key_val_type_ptr))                  \
-            .impl                                                              \
+            .private                                                           \
     }
 
 /** @brief lazily insert lazy_value into the map at key if key is absent.
@@ -487,7 +487,7 @@ and wraps it in a handle to provide information about the old value. */
     {                                                                          \
         CCC_handle_ordered_map_remove((Handle_ordered_map_ptr),                \
                                       (key_val_output_ptr))                    \
-            .impl                                                              \
+            .private                                                           \
     }
 
 /** @brief Obtains a handle for the provided key in the map for future use.
@@ -528,7 +528,7 @@ to subsequent calls in the Handle Interface. */
     &(CCC_Handle_ordered_map_handle)                                           \
     {                                                                          \
         CCC_handle_ordered_map_handle((Handle_ordered_map_ptr), (key_ptr))     \
-            .impl                                                              \
+            .private                                                           \
     }
 
 /** @brief Modifies the provided handle if it is Occupied.
@@ -661,7 +661,7 @@ was removed. If Vacant, no prior handle existed to be removed. */
     &(CCC_Handle)                                                              \
     {                                                                          \
         CCC_handle_ordered_map_remove_handle((Handle_ordered_map_handle_ptr))  \
-            .impl                                                              \
+            .private                                                           \
     }
 
 /** @brief Unwraps the provided handle to obtain a view into the map element.
@@ -714,7 +714,7 @@ Note that due to the variety of values that can be returned in the range, using
 the provided range iteration functions from types.h is recommended for example:
 
 ```
-for (struct val *i = range_begin(&range);
+for (struct Val *i = range_begin(&range);
      i != range_end(&range);
      i = next(&handle_ordered_map, i))
 {}
@@ -738,7 +738,7 @@ enclosing scope. This reference is always be valid. */
     {                                                                          \
         CCC_handle_ordered_map_equal_range(Handle_ordered_map_ptr,             \
                                            begin_and_end_key_ptrs)             \
-            .impl                                                              \
+            .private                                                           \
     }
 
 /** @brief Return an iterable rrange of values from [rbegin_key, end_key).
@@ -753,7 +753,7 @@ Note that due to the variety of values that can be returned in the rrange, using
 the provided rrange iteration functions from types.h is recommended for example:
 
 ```
-for (struct val *i = rrange_begin(&rrange);
+for (struct Val *i = rrange_begin(&rrange);
      i != rrange_rend(&rrange);
      i = rnext(&handle_ordered_map, i))
 {}
@@ -779,7 +779,7 @@ enclosing scope. This reference is always valid. */
     {                                                                          \
         CCC_handle_ordered_map_equal_rrange(Handle_ordered_map_ptr,            \
                                             rbegin_and_rend_key_ptrs)          \
-            .impl                                                              \
+            .private                                                           \
     }
 
 /** @brief Return the start of an inorder traversal of the map. Amortized

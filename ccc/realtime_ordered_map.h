@@ -81,7 +81,7 @@ initialized.
 @param [in] realtime_ordered_map_node_field the name of the intrusive map elem
 field.
 @param [in] key_node_field the name of the field in user type used as key.
-@param [in] key_cmp_fn the key comparison function (see types.h).
+@param [in] key_order_fn the key comparison function (see types.h).
 @param [in] alloc_fn the allocation function or NULL if allocation is banned.
 @param [in] context_data a pointer to any context data for comparison or
 destruction.
@@ -90,11 +90,11 @@ destruction.
 */
 #define CCC_realtime_ordered_map_initialize(                                   \
     realtime_ordered_map_name, struct_name, realtime_ordered_map_node_field,   \
-    key_node_field, key_cmp_fn, alloc_fn, context_data)                        \
+    key_node_field, key_order_fn, alloc_fn, context_data)                      \
     CCC_private_realtime_ordered_map_initialize(                               \
         realtime_ordered_map_name, struct_name,                                \
-        realtime_ordered_map_node_field, key_node_field, key_cmp_fn, alloc_fn, \
-        context_data)
+        realtime_ordered_map_node_field, key_node_field, key_order_fn,         \
+        alloc_fn, context_data)
 
 /**@}*/
 
@@ -162,7 +162,7 @@ in an entry to provide information about the old value. */
     {                                                                          \
         CCC_realtime_ordered_map_swap_entry((Realtime_ordered_map_ptr),        \
                                             (key_val_handle_ptr), (tmp_ptr))   \
-            .impl                                                              \
+            .private                                                           \
     }
 
 /** @brief Attempts to insert the key value wrapping key_val_handle.
@@ -190,7 +190,7 @@ error is set. */
     {                                                                          \
         CCC_realtime_ordered_map_try_insert((Realtime_ordered_map_ptr),        \
                                             (key_val_handle_ptr))              \
-            .impl                                                              \
+            .private                                                           \
     }
 
 /** @brief lazily insert lazy_value into the map at key if key is absent.
@@ -285,7 +285,7 @@ previously stored memory as they see fit. */
     {                                                                          \
         CCC_realtime_ordered_map_remove((Realtime_ordered_map_ptr),            \
                                         (out_handle_ptr))                      \
-            .impl                                                              \
+            .private                                                           \
     }
 
 /** @brief Obtains an entry for the provided key in the map for future use.
@@ -325,7 +325,7 @@ to subsequent calls in the Entry Interface. */
     &(CCC_Realtime_ordered_map_entry)                                          \
     {                                                                          \
         CCC_realtime_ordered_map_entry((Realtime_ordered_map_ptr), (key_ptr))  \
-            .impl                                                              \
+            .private                                                           \
     }
 
 /** @brief Modifies the provided entry if it is Occupied.
@@ -470,7 +470,7 @@ free or use as needed. */
     {                                                                          \
         CCC_realtime_ordered_map_remove_entry(                                 \
             (Realtime_ordered_map_entry_ptr))                                  \
-            .impl                                                              \
+            .private                                                           \
     }
 
 /** @brief Unwraps the provided entry to obtain a view into the map element.
@@ -545,7 +545,7 @@ the first element GREATER than end_key.
 Note that due to the variety of values that can be returned in the range, using
 the provided range iteration functions from types.h is recommended for example:
 
-for (struct val *i = range_begin(&range);
+for (struct Val *i = range_begin(&range);
      i != range_end(&range);
      i = next(&omm, &i->elem))
 {}
@@ -570,7 +570,7 @@ enclosing scope. This reference is always non-NULL. */
     {                                                                          \
         CCC_realtime_ordered_map_equal_range((Realtime_ordered_map_ptr),       \
                                              (begin_and_end_key_ptrs))         \
-            .impl                                                              \
+            .private                                                           \
     }
 
 /** @brief Return an iterable rrange of values from [begin_key, end_key).
@@ -584,7 +584,7 @@ the first element LESS than rend_key.
 Note that due to the variety of values that can be returned in the rrange, using
 the provided rrange iteration functions from types.h is recommended for example:
 
-for (struct val *i = rrange_begin(&rrange);
+for (struct Val *i = rrange_begin(&rrange);
      i != rrange_rend(&rrange);
      i = rnext(&omm, &i->elem))
 {}
@@ -609,7 +609,7 @@ enclosing scope. This reference is always non-NULL. */
     {                                                                          \
         CCC_realtime_ordered_map_equal_rrange((Realtime_ordered_map_ptr),      \
                                               (rbegin_and_rend_key_ptrs))      \
-            .impl                                                              \
+            .private                                                           \
     }
 
 /** @brief Return the start of an inorder traversal of the map. Amortized
