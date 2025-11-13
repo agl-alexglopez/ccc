@@ -335,7 +335,7 @@ A simple way to provide a temp for swapping is with an inline compound literal
 reference provided directly to the function argument `&(name_of_type){}`. */
 void *
 CCC_flat_priority_queue_update(CCC_Flat_priority_queue *flat_priority_queue,
-                               void *elem, void *tmp, CCC_Type_updater *fn,
+                               void *elem, void *tmp, CCC_Type_modifier *fn,
                                void *context);
 
 /** @brief Update the user type stored in the priority queue directly. O(lgN).
@@ -380,7 +380,7 @@ A simple way to provide a temp for swapping is with an inline compound literal
 reference provided directly to the function argument `&(name_of_type){}`. */
 void *
 CCC_flat_priority_queue_increase(CCC_Flat_priority_queue *flat_priority_queue,
-                                 void *elem, void *tmp, CCC_Type_updater *fn,
+                                 void *elem, void *tmp, CCC_Type_modifier *fn,
                                  void *context);
 
 /** @brief Increase the user type stored in the priority queue directly. O(lgN).
@@ -425,7 +425,7 @@ A simple way to provide a temp for swapping is with an inline compound literal
 reference provided directly to the function argument `&(name_of_type){}`. */
 void *
 CCC_flat_priority_queue_decrease(CCC_Flat_priority_queue *flat_priority_queue,
-                                 void *elem, void *tmp, CCC_Type_updater *fn,
+                                 void *elem, void *tmp, CCC_Type_modifier *fn,
                                  void *context);
 
 /** @brief Increase the user type stored in the priority queue directly. O(lgN).

@@ -66,13 +66,13 @@ sort_rec(Buffer *const b, CCC_Type_comparator *const fn, void *const tmp,
         if ((char const *)pivot_i - (char const *)lo
             < (char const *)hi - (char const *)pivot_i)
         {
-            sort_rec(b, fn, tmp, lo, buffer_rnext(b, pivot_i));
+            sort_rec(b, fn, tmp, lo, buffer_reverse_next(b, pivot_i));
             lo = buffer_next(b, pivot_i);
         }
         else
         {
             sort_rec(b, fn, tmp, buffer_next(b, pivot_i), hi);
-            hi = buffer_rnext(b, pivot_i);
+            hi = buffer_reverse_next(b, pivot_i);
         }
     }
 }
@@ -91,7 +91,7 @@ sort(CCC_Buffer *const b, CCC_Type_comparator *const fn, void *const swap)
     }
     if (buffer_count(b).count)
     {
-        sort_rec(b, fn, swap, buffer_begin(b), buffer_rbegin(b));
+        sort_rec(b, fn, swap, buffer_begin(b), buffer_reverse_begin(b));
     }
     return CCC_RESULT_OK;
 }

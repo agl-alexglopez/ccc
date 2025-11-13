@@ -34,8 +34,9 @@ check_begin(check_order, Doubly_linked_list const *const doubly_linked_list,
         check(order[i], v->val);
     }
     i = n;
-    for (v = rbegin(doubly_linked_list); v != rend(doubly_linked_list) && i--;
-         v = rnext(doubly_linked_list, &v->e))
+    for (v = reverse_begin(doubly_linked_list);
+         v != reverse_end(doubly_linked_list) && i--;
+         v = reverse_next(doubly_linked_list, &v->e))
     {
         check(v == NULL, false);
         check(order[i], v->val);

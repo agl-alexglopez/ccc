@@ -65,7 +65,7 @@ struct Path_bin
 static SV_String_view const test_prefix = SV("test_");
 static char const *const pass_mark = "⬤";
 static char const *const fail_mark = "X";
-static char const *const err_msg = "Test process was unexpectedly killed.";
+static char const *const err_message = "Test process was unexpectedly killed.";
 
 static enum Check_result run(SV_String_view);
 static enum Check_result run_test_process(struct Path_bin);
@@ -111,7 +111,7 @@ check_static_begin(run, SV_String_view const tests_dir)
         switch (res)
         {
             case CHECK_ERROR:
-                logerr("\n%s%s%s\n%s %s%s%s)%s\n", CHECK_RED, err_msg,
+                logerr("\n%s%s%s\n%s %s%s%s)%s\n", CHECK_RED, err_message,
                        CHECK_CYAN, SV_begin(entry), CHECK_RED, fail_mark,
                        CHECK_CYAN, CHECK_NONE);
                 break;
@@ -148,11 +148,11 @@ check_static_begin(run_test_process, struct Path_bin pb)
                 { logerr("Error running test: %s\n", SV_begin(pb.bin)); });
     check_error(WIFSIGNALED(status), false, {
         int const sig = WTERMSIG(status);
-        char const *const msg = strsignal(sig);
-        if (msg)
+        char const *const message = strsignal(sig);
+        if (message)
         {
             logerr("%sProcess killed with signal %d: %s%s\n", CHECK_RED, sig,
-                   msg, CHECK_NONE);
+                   message, CHECK_NONE);
         }
         else
         {

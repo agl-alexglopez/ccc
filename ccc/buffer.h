@@ -554,9 +554,9 @@ until a resize has occured, if permitted. */
 for iteration according to size.
 @param [in] buf the pointer to the buffer.
 @return the address of the last element buffer. This will be equivalent to the
-Buffer rend iterator if the Buffer size is 0. NULL is returned if a NULL
+Buffer reverse_end iterator if the Buffer size is 0. NULL is returned if a NULL
 argument is provided or the Buffer has not yet been allocated. */
-[[nodiscard]] void *CCC_buffer_rbegin(CCC_Buffer const *buf);
+[[nodiscard]] void *CCC_buffer_reverse_begin(CCC_Buffer const *buf);
 
 /** @brief advance the iter to the next slot in the Buffer according to size and
 in reverse order.
@@ -564,14 +564,15 @@ in reverse order.
 @param [in] iter the pointer to the current slot of the buffer.
 @return the next iterator position according to size and in reverse order. NULL
 is returned if bad input is provided or the Buffer has not been allocated. */
-[[nodiscard]] void *CCC_buffer_rnext(CCC_Buffer const *buf, void const *iter);
+[[nodiscard]] void *CCC_buffer_reverse_next(CCC_Buffer const *buf,
+                                            void const *iter);
 
-/** @brief return the rend position of the buffer.
+/** @brief return the reverse_end position of the buffer.
 @param [in] buf the pointer to the buffer.
-@return the address of the rend position. It is undefined to access this
+@return the address of the reverse_end position. It is undefined to access this
 position for any reason. NULL is returned if NULL is provided or Buffer has
 not yet been allocated. */
-[[nodiscard]] void *CCC_buffer_rend(CCC_Buffer const *buf);
+[[nodiscard]] void *CCC_buffer_reverse_end(CCC_Buffer const *buf);
 
 /**@}*/
 
@@ -764,9 +765,9 @@ typedef CCC_Buffer Buffer;
 #    define buffer_begin(args...) CCC_buffer_begin(args)
 #    define buffer_next(args...) CCC_buffer_next(args)
 #    define buffer_end(args...) CCC_buffer_end(args)
-#    define buffer_rbegin(args...) CCC_buffer_rbegin(args)
-#    define buffer_rnext(args...) CCC_buffer_rnext(args)
-#    define buffer_rend(args...) CCC_buffer_rend(args)
+#    define buffer_reverse_begin(args...) CCC_buffer_reverse_begin(args)
+#    define buffer_reverse_next(args...) CCC_buffer_reverse_next(args)
+#    define buffer_reverse_end(args...) CCC_buffer_reverse_end(args)
 #    define buffer_capacity_end(args...) CCC_buffer_capacity_end(args)
 #endif /* BUFFER_USING_NAMESPACE_CCC */
 

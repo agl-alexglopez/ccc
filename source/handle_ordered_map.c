@@ -233,7 +233,7 @@ CCC_handle_ordered_map_handle(CCC_Handle_ordered_map *const handle_ordered_map,
     if (!handle_ordered_map || !key)
     {
         return (CCC_Handle_ordered_map_handle){
-            {.stats = CCC_ENTRY_ARGUMENT_ERROR}};
+            {.status = CCC_ENTRY_ARGUMENT_ERROR}};
     }
     return (CCC_Handle_ordered_map_handle){handle(handle_ordered_map, key)};
 }
@@ -247,31 +247,30 @@ CCC_handle_ordered_map_insert_handle(
     {
         return 0;
     }
-    if (h->private.stats == CCC_ENTRY_OCCUPIED)
+    if (h->private.status == CCC_ENTRY_OCCUPIED)
     {
-        void *const ret = data_at(h->private.handle_ordered_map, h->private.i);
+        void *const ret = data_at(h->private.map, h->private.index);
         if (key_val_type != ret)
         {
-            (void)memcpy(ret, key_val_type,
-                         h->private.handle_ordered_map->sizeof_type);
+            (void)memcpy(ret, key_val_type, h->private.map->sizeof_type);
         }
-        return h->private.i;
+        return h->private.index;
     }
-    return maybe_allocate_insert(h->private.handle_ordered_map, key_val_type);
+    return maybe_allocate_insert(h->private.map, key_val_type);
 }
 
 CCC_Handle_ordered_map_handle *
 CCC_handle_ordered_map_and_modify(CCC_Handle_ordered_map_handle *const h,
-                                  CCC_Type_updater *const fn)
+                                  CCC_Type_modifier *const fn)
 {
     if (!h)
     {
         return NULL;
     }
-    if (fn && h->private.stats & CCC_ENTRY_OCCUPIED)
+    if (fn && h->private.status & CCC_ENTRY_OCCUPIED)
     {
         fn((CCC_Type_context){
-            .type = data_at(h->private.handle_ordered_map, h->private.i),
+            .type = data_at(h->private.map, h->private.index),
             .context = NULL,
         });
     }
@@ -280,17 +279,17 @@ CCC_handle_ordered_map_and_modify(CCC_Handle_ordered_map_handle *const h,
 
 CCC_Handle_ordered_map_handle *
 CCC_handle_ordered_map_and_modify_context(
-    CCC_Handle_ordered_map_handle *const h, CCC_Type_updater *const fn,
+    CCC_Handle_ordered_map_handle *const h, CCC_Type_modifier *const fn,
     void *const context)
 {
     if (!h)
     {
         return NULL;
     }
-    if (fn && h->private.stats & CCC_ENTRY_OCCUPIED)
+    if (fn && h->private.status & CCC_ENTRY_OCCUPIED)
     {
         fn((CCC_Type_context){
-            .type = data_at(h->private.handle_ordered_map, h->private.i),
+            .type = data_at(h->private.map, h->private.index),
             .context = context,
         });
     }
@@ -305,11 +304,11 @@ CCC_handle_ordered_map_or_insert(CCC_Handle_ordered_map_handle const *const h,
     {
         return 0;
     }
-    if (h->private.stats & CCC_ENTRY_OCCUPIED)
+    if (h->private.status & CCC_ENTRY_OCCUPIED)
     {
-        return h->private.i;
+        return h->private.index;
     }
-    return maybe_allocate_insert(h->private.handle_ordered_map, key_val_type);
+    return maybe_allocate_insert(h->private.map, key_val_type);
 }
 
 CCC_Handle
@@ -319,7 +318,7 @@ CCC_handle_ordered_map_swap_handle(
 {
     if (!handle_ordered_map || !key_val_output)
     {
-        return (CCC_Handle){{.stats = CCC_ENTRY_ARGUMENT_ERROR}};
+        return (CCC_Handle){{.status = CCC_ENTRY_ARGUMENT_ERROR}};
     }
     size_t const found = find(handle_ordered_map,
                               key_in_slot(handle_ordered_map, key_val_output));
@@ -330,8 +329,8 @@ CCC_handle_ordered_map_swap_handle(
         void *const tmp = data_at(handle_ordered_map, 0);
         swap(tmp, key_val_output, ret, handle_ordered_map->sizeof_type);
         return (CCC_Handle){{
-            .i = found,
-            .stats = CCC_ENTRY_OCCUPIED,
+            .index = found,
+            .status = CCC_ENTRY_OCCUPIED,
         }};
     }
     size_t const inserted
@@ -339,13 +338,13 @@ CCC_handle_ordered_map_swap_handle(
     if (!inserted)
     {
         return (CCC_Handle){{
-            .i = 0,
-            .stats = CCC_ENTRY_INSERT_ERROR,
+            .index = 0,
+            .status = CCC_ENTRY_INSERT_ERROR,
         }};
     }
     return (CCC_Handle){{
-        .i = inserted,
-        .stats = CCC_ENTRY_VACANT,
+        .index = inserted,
+        .status = CCC_ENTRY_VACANT,
     }};
 }
 
@@ -356,7 +355,7 @@ CCC_handle_ordered_map_try_insert(
 {
     if (!handle_ordered_map || !key_val_type)
     {
-        return (CCC_Handle){{.stats = CCC_ENTRY_ARGUMENT_ERROR}};
+        return (CCC_Handle){{.status = CCC_ENTRY_ARGUMENT_ERROR}};
     }
     size_t const found = find(handle_ordered_map,
                               key_in_slot(handle_ordered_map, key_val_type));
@@ -364,8 +363,8 @@ CCC_handle_ordered_map_try_insert(
     {
         assert(handle_ordered_map->root);
         return (CCC_Handle){{
-            .i = found,
-            .stats = CCC_ENTRY_OCCUPIED,
+            .index = found,
+            .status = CCC_ENTRY_OCCUPIED,
         }};
     }
     size_t const inserted
@@ -373,13 +372,13 @@ CCC_handle_ordered_map_try_insert(
     if (!inserted)
     {
         return (CCC_Handle){{
-            .i = 0,
-            .stats = CCC_ENTRY_INSERT_ERROR,
+            .index = 0,
+            .status = CCC_ENTRY_INSERT_ERROR,
         }};
     }
     return (CCC_Handle){{
-        .i = inserted,
-        .stats = CCC_ENTRY_VACANT,
+        .index = inserted,
+        .status = CCC_ENTRY_VACANT,
     }};
 }
 
@@ -390,7 +389,7 @@ CCC_handle_ordered_map_insert_or_assign(
 {
     if (!handle_ordered_map || !key_val_type)
     {
-        return (CCC_Handle){{.stats = CCC_ENTRY_ARGUMENT_ERROR}};
+        return (CCC_Handle){{.status = CCC_ENTRY_ARGUMENT_ERROR}};
     }
     size_t const found = find(handle_ordered_map,
                               key_in_slot(handle_ordered_map, key_val_type));
@@ -403,8 +402,8 @@ CCC_handle_ordered_map_insert_or_assign(
             memcpy(f_base, key_val_type, handle_ordered_map->sizeof_type);
         }
         return (CCC_Handle){{
-            .i = found,
-            .stats = CCC_ENTRY_OCCUPIED,
+            .index = found,
+            .status = CCC_ENTRY_OCCUPIED,
         }};
     }
     size_t const inserted
@@ -412,13 +411,13 @@ CCC_handle_ordered_map_insert_or_assign(
     if (!inserted)
     {
         return (CCC_Handle){{
-            .i = 0,
-            .stats = CCC_ENTRY_INSERT_ERROR,
+            .index = 0,
+            .status = CCC_ENTRY_INSERT_ERROR,
         }};
     }
     return (CCC_Handle){{
-        .i = inserted,
-        .stats = CCC_ENTRY_VACANT,
+        .index = inserted,
+        .status = CCC_ENTRY_VACANT,
     }};
 }
 
@@ -428,15 +427,15 @@ CCC_handle_ordered_map_remove(CCC_Handle_ordered_map *const handle_ordered_map,
 {
     if (!handle_ordered_map || !key_val_output)
     {
-        return (CCC_Handle){{.stats = CCC_ENTRY_ARGUMENT_ERROR}};
+        return (CCC_Handle){{.status = CCC_ENTRY_ARGUMENT_ERROR}};
     }
     size_t const removed = erase(
         handle_ordered_map, key_in_slot(handle_ordered_map, key_val_output));
     if (!removed)
     {
         return (CCC_Handle){{
-            .i = 0,
-            .stats = CCC_ENTRY_VACANT,
+            .index = 0,
+            .status = CCC_ENTRY_VACANT,
         }};
     }
     assert(removed);
@@ -446,8 +445,8 @@ CCC_handle_ordered_map_remove(CCC_Handle_ordered_map *const handle_ordered_map,
         (void)memcpy(key_val_output, r, handle_ordered_map->sizeof_type);
     }
     return (CCC_Handle){{
-        .i = 0,
-        .stats = CCC_ENTRY_OCCUPIED,
+        .index = 0,
+        .status = CCC_ENTRY_OCCUPIED,
     }};
 }
 
@@ -456,22 +455,21 @@ CCC_handle_ordered_map_remove_handle(CCC_Handle_ordered_map_handle *const h)
 {
     if (!h)
     {
-        return (CCC_Handle){{.stats = CCC_ENTRY_ARGUMENT_ERROR}};
+        return (CCC_Handle){{.status = CCC_ENTRY_ARGUMENT_ERROR}};
     }
-    if (h->private.stats == CCC_ENTRY_OCCUPIED)
+    if (h->private.status == CCC_ENTRY_OCCUPIED)
     {
         size_t const erased
-            = erase(h->private.handle_ordered_map,
-                    key_at(h->private.handle_ordered_map, h->private.i));
+            = erase(h->private.map, key_at(h->private.map, h->private.index));
         assert(erased);
         return (CCC_Handle){{
-            .i = erased,
-            .stats = CCC_ENTRY_OCCUPIED,
+            .index = erased,
+            .status = CCC_ENTRY_OCCUPIED,
         }};
     }
     return (CCC_Handle){{
-        .i = 0,
-        .stats = CCC_ENTRY_VACANT,
+        .index = 0,
+        .status = CCC_ENTRY_VACANT,
     }};
 }
 
@@ -482,7 +480,7 @@ CCC_handle_ordered_map_unwrap(CCC_Handle_ordered_map_handle const *const h)
     {
         return 0;
     }
-    return h->private.stats == CCC_ENTRY_OCCUPIED ? h->private.i : 0;
+    return h->private.status == CCC_ENTRY_OCCUPIED ? h->private.index : 0;
 }
 
 CCC_Tribool
@@ -493,7 +491,7 @@ CCC_handle_ordered_map_insert_error(
     {
         return CCC_TRIBOOL_ERROR;
     }
-    return (h->private.stats & CCC_ENTRY_INSERT_ERROR) != 0;
+    return (h->private.status & CCC_ENTRY_INSERT_ERROR) != 0;
 }
 
 CCC_Tribool
@@ -503,14 +501,14 @@ CCC_handle_ordered_map_occupied(CCC_Handle_ordered_map_handle const *const h)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    return (h->private.stats & CCC_ENTRY_OCCUPIED) != 0;
+    return (h->private.status & CCC_ENTRY_OCCUPIED) != 0;
 }
 
 CCC_Handle_status
 CCC_handle_ordered_map_handle_status(
     CCC_Handle_ordered_map_handle const *const h)
 {
-    return h ? h->private.stats : CCC_ENTRY_ARGUMENT_ERROR;
+    return h ? h->private.status : CCC_ENTRY_ARGUMENT_ERROR;
 }
 
 CCC_Tribool
@@ -561,7 +559,7 @@ CCC_handle_ordered_map_begin(
 }
 
 void *
-CCC_handle_ordered_map_rbegin(
+CCC_handle_ordered_map_reverse_begin(
     CCC_Handle_ordered_map const *const handle_ordered_map)
 {
     if (!handle_ordered_map || !handle_ordered_map->capacity)
@@ -587,7 +585,7 @@ CCC_handle_ordered_map_next(
 }
 
 void *
-CCC_handle_ordered_map_rnext(
+CCC_handle_ordered_map_reverse_next(
     CCC_Handle_ordered_map const *const handle_ordered_map, void const *const e)
 {
     if (!handle_ordered_map || !e || !handle_ordered_map->capacity)
@@ -611,7 +609,7 @@ CCC_handle_ordered_map_end(
 }
 
 void *
-CCC_handle_ordered_map_rend(
+CCC_handle_ordered_map_reverse_end(
     CCC_Handle_ordered_map const *const handle_ordered_map)
 {
     if (!handle_ordered_map || !handle_ordered_map->capacity)
@@ -634,18 +632,18 @@ CCC_handle_ordered_map_equal_range(
         equal_range(handle_ordered_map, begin_key, end_key, INORDER)};
 }
 
-CCC_Reverse_range
-CCC_handle_ordered_map_equal_rrange(
+CCC_Range_reverse
+CCC_handle_ordered_map_equal_range_reverse(
     CCC_Handle_ordered_map *const handle_ordered_map,
-    void const *const rbegin_key, void const *const rend_key)
+    void const *const reverse_begin_key, void const *const reverse_end_key)
 
 {
-    if (!handle_ordered_map || !rbegin_key || !rend_key)
+    if (!handle_ordered_map || !reverse_begin_key || !reverse_end_key)
     {
-        return (CCC_Reverse_range){};
+        return (CCC_Range_reverse){};
     }
-    return (CCC_Reverse_range){
-        equal_range(handle_ordered_map, rbegin_key, rend_key, R_INORDER)};
+    return (CCC_Range_reverse){equal_range(
+        handle_ordered_map, reverse_begin_key, reverse_end_key, R_INORDER)};
 }
 
 CCC_Result
@@ -916,15 +914,15 @@ handle(struct CCC_Handle_ordered_map *const handle_ordered_map,
     if (found)
     {
         return (struct CCC_Handle_ordered_map_handle){
-            .handle_ordered_map = handle_ordered_map,
-            .i = found,
-            .stats = CCC_ENTRY_OCCUPIED,
+            .map = handle_ordered_map,
+            .index = found,
+            .status = CCC_ENTRY_OCCUPIED,
         };
     }
     return (struct CCC_Handle_ordered_map_handle){
-        .handle_ordered_map = handle_ordered_map,
-        .i = 0,
-        .stats = CCC_ENTRY_VACANT,
+        .map = handle_ordered_map,
+        .index = 0,
+        .status = CCC_ENTRY_VACANT,
     };
 }
 

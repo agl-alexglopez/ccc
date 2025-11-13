@@ -34,8 +34,8 @@ check_begin(check_order, Flat_double_ended_queue const *const q, size_t const n,
         check(*v, order[i]);
     }
     i = n;
-    v = rbegin(q);
-    for (; v != rend(q) && i--; v = rnext(q, v))
+    v = reverse_begin(q);
+    for (; v != reverse_end(q) && i--; v = reverse_next(q, v))
     {
         check(v == NULL, false);
         check(*v, order[i]);

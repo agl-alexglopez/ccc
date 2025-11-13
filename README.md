@@ -179,7 +179,7 @@ main(void)
     /* Easy way to have a "skip first" iterator because the iterator is
        returned from each iterator function. */
     int const *l = next(&heights, begin(&heights));
-    int const *r = rnext(&heights, rbegin(&heights));
+    int const *r = reverse_next(&heights, reverse_begin(&heights));
     while (l <= r)
     {
         if (lpeak < rpeak)
@@ -192,7 +192,7 @@ main(void)
         {
             rpeak = maxint(rpeak, *r);
             trapped += (rpeak - *r);
-            r = rnext(&heights, r);
+            r = reverse_next(&heights, r);
         }
     }
     assert(trapped == correct_trapped);
@@ -495,7 +495,7 @@ main(void)
     int range_keys[8] = {10, 15, 20, 25, 30, 35, 40, 45};
     Range r = equal_range(&s, &(int){6}, &(int){44});
     int index = 0;
-    for (struct Key_val *i = begin_range(&r); i != end_range(&r); i = next(&s, i))
+    for (struct Key_val *i = range_begin(&r); i != range_end(&r); i = next(&s, i))
     {
         assert(i->key == range_keys[index]);
         ++index;
@@ -503,13 +503,13 @@ main(void)
     /* This should be the following Range [119,84). 119 should be
        dropped to first value not greater than 119 and last should
        be dropped to first value less than 84. */
-    int rrange_keys[8] = {115, 110, 105, 100, 95, 90, 85, 80};
-    Reverse_range rr = equal_rrange(&s, &(int){119}, &(int){84});
+    int range_reverse_keys[8] = {115, 110, 105, 100, 95, 90, 85, 80};
+    Range_reverse rr = equal_range_reverse(&s, &(int){119}, &(int){84});
     index = 0;
-    for (struct Key_val *i = rbegin_rrange(&rr); i != rend_rrange(&rr);
-         i = rnext(&s, i))
+    for (struct Key_val *i = reverse_begin_range_reverse(&rr); i != reverse_end_range_reverse(&rr);
+         i = reverse_next(&s, i))
     {
-        assert(i->key == rrange_keys[index]);
+        assert(i->key == range_reverse_keys[index]);
         ++index;
     }
     return 0;
@@ -572,7 +572,7 @@ main(void)
     int range_keys[8] = {10, 15, 20, 25, 30, 35, 40, 45};
     Range r = equal_range(&s, &(int){6}, &(int){44});
     int index = 0;
-    for (struct Key_val *i = begin_range(&r); i != end_range(&r);
+    for (struct Key_val *i = range_begin(&r); i != range_end(&r);
          i = next(&s, &i->elem))
     {
         assert(i->key == range_keys[index]);
@@ -581,13 +581,13 @@ main(void)
     /* This should be the following Range [119,84). 119 should be
        dropped to first value not greater than 119 and last should
        be dropped to first value less than 84. */
-    int rrange_keys[8] = {115, 110, 105, 100, 95, 90, 85, 80};
-    Reverse_range rr = equal_rrange(&s, &(int){119}, &(int){84});
+    int range_reverse_keys[8] = {115, 110, 105, 100, 95, 90, 85, 80};
+    Range_reverse rr = equal_range_reverse(&s, &(int){119}, &(int){84});
     index = 0;
-    for (struct Key_val *i = rbegin_rrange(&rr); i != rend_rrange(&rr);
-         i = rnext(&s, &i->elem))
+    for (struct Key_val *i = reverse_begin_range_reverse(&rr); i != reverse_end_range_reverse(&rr);
+         i = reverse_next(&s, &i->elem))
     {
-        assert(i->key == rrange_keys[index]);
+        assert(i->key == range_reverse_keys[index]);
         ++index;
     }
     return 0;
@@ -764,7 +764,7 @@ main(void)
     int range_keys[8] = {10, 15, 20, 25, 30, 35, 40, 45};
     Range r = equal_range(&s, &(int){6}, &(int){44});
     int index = 0;
-    for (struct Key_val *i = begin_range(&r); i != end_range(&r);
+    for (struct Key_val *i = range_begin(&r); i != range_end(&r);
          i = next(&s, &i->elem))
     {
         assert(i->key == range_keys[index]);
@@ -773,13 +773,13 @@ main(void)
     /* This should be the following Range [119,84). 119 should be
        dropped to first value not greater than 119 and last should
        be dropped to first value less than 84. */
-    int rrange_keys[8] = {115, 110, 105, 100, 95, 90, 85, 80};
-    Reverse_range rr = equal_rrange(&s, &(int){119}, &(int){84});
+    int range_reverse_keys[8] = {115, 110, 105, 100, 95, 90, 85, 80};
+    Range_reverse rr = equal_range_reverse(&s, &(int){119}, &(int){84});
     index = 0;
-    for (struct Key_val *i = rbegin_rrange(&rr); i != rend_rrange(&rr);
-         i = rnext(&s, &i->elem))
+    for (struct Key_val *i = range_reverse_begin(&rr); i != range_reverse_end(&rr);
+         i = reverse_next(&s, &i->elem))
     {
-        assert(i->key == rrange_keys[index]);
+        assert(i->key == range_reverse_keys[index]);
         ++index;
     }
     return 0;
@@ -802,7 +802,7 @@ A low overhead push-to-front container. When contiguity is not possible and the 
 struct Int_node
 {
     int i;
-    singly_linked_list_node e;
+    Singly_linked_list_node e;
 };
 
 static CCC_Order

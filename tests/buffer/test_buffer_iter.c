@@ -32,8 +32,8 @@ check_static_begin(buffer_test_iter_reverse)
                                        NULL, 6, 6);
     size_t count = 0;
     int prev = 7;
-    for (int const *i = buffer_rbegin(&b); i != buffer_rend(&b);
-         i = buffer_rnext(&b, i))
+    for (int const *i = buffer_reverse_begin(&b); i != buffer_reverse_end(&b);
+         i = buffer_reverse_next(&b, i))
     {
         check(i != NULL, CCC_TRUE);
         check(*i < prev, CCC_TRUE);
@@ -54,8 +54,8 @@ check_static_begin(buffer_test_reverse_buf)
         check(i != NULL, CCC_TRUE);
         check(*i > prev, CCC_TRUE);
     }
-    for (int *l = buffer_begin(&b), *r = buffer_rbegin(&b); l < r;
-         l = buffer_next(&b, l), r = buffer_rnext(&b, r))
+    for (int *l = buffer_begin(&b), *r = buffer_reverse_begin(&b); l < r;
+         l = buffer_next(&b, l), r = buffer_reverse_next(&b, r))
     {
         CCC_Result const res = buffer_swap(&b, &(int){0}, buffer_i(&b, l).count,
                                            buffer_i(&b, r).count);
@@ -91,7 +91,8 @@ check_static_begin(buffer_test_trap_rainwater_two_pointers)
     /* Easy way to have a "skip first" iterator because the iterator is
        returned from each iterator function. */
     int const *l = buffer_next(&heights, buffer_begin(&heights));
-    int const *r = buffer_rnext(&heights, buffer_rbegin(&heights));
+    int const *r
+        = buffer_reverse_next(&heights, buffer_reverse_begin(&heights));
     while (l <= r)
     {
         if (lpeak < rpeak)
@@ -104,7 +105,7 @@ check_static_begin(buffer_test_trap_rainwater_two_pointers)
         {
             rpeak = maxint(rpeak, *r);
             trapped += (rpeak - *r);
-            r = buffer_rnext(&heights, r);
+            r = buffer_reverse_next(&heights, r);
         }
     }
     check(trapped, correct_trapped);

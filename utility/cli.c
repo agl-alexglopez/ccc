@@ -23,9 +23,9 @@ set_cursor_position(int const row, int const col)
 }
 
 void
-quit(char const *const msg, int code)
+quit(char const *const message, int code)
 {
-    (void)fprintf(stdout, "%s", msg);
+    (void)fprintf(stdout, "%s", message);
     exit(code);
 }
 

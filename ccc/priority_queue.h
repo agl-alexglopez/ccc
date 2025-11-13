@@ -159,7 +159,7 @@ deduce if an increase or decrease is occurring. See the increase and decrease
 operations. O(1) best case, O(lgN) worst case. */
 void *CCC_priority_queue_update(CCC_Priority_queue *priority_queue,
                                 CCC_Priority_queue_node *elem,
-                                CCC_Type_updater *fn, void *context);
+                                CCC_Type_modifier *fn, void *context);
 
 /** @brief Update the priority in the user type stored in the container.
 @param [in] priority_queue_ptr a pointer to the priority queue.
@@ -214,7 +214,7 @@ from the priority_queue creates an amortized o(lgN) runtime for this function.
 */
 void *CCC_priority_queue_increase(CCC_Priority_queue *priority_queue,
                                   CCC_Priority_queue_node *elem,
-                                  CCC_Type_updater *fn, void *context);
+                                  CCC_Type_modifier *fn, void *context);
 
 /** @brief Increases the priority of the user type stored in the container.
 @param [in] priority_queue_ptr a pointer to the priority queue.
@@ -272,7 +272,7 @@ from the priority_queue creates an amortized o(lgN) runtime for this function.
 */
 void *CCC_priority_queue_decrease(CCC_Priority_queue *priority_queue,
                                   CCC_Priority_queue_node *elem,
-                                  CCC_Type_updater *fn, void *context);
+                                  CCC_Type_modifier *fn, void *context);
 
 /** @brief Decreases the priority of the user type stored in the container.
 @param [in] priority_queue_ptr a pointer to the priority queue.

@@ -557,11 +557,11 @@ to subsequent calls in the Handle Interface. */
 
 This function is intended to make the function chaining in the Handle Interface
 more succinct if the handle will be modified in place based on its own value
-without the need of the context argument a CCC_Type_updater can provide.
+without the need of the context argument a CCC_Type_modifier can provide.
 */
 [[nodiscard]] CCC_Handle_realtime_ordered_map_handle *
 CCC_handle_realtime_ordered_map_and_modify(
-    CCC_Handle_realtime_ordered_map_handle *h, CCC_Type_updater *fn);
+    CCC_Handle_realtime_ordered_map_handle *h, CCC_Type_modifier *fn);
 
 /** @brief Modifies the provided handle if it is Occupied.
 @param [in] h the handle obtained from a handle function or macro.
@@ -569,11 +569,11 @@ CCC_handle_realtime_ordered_map_and_modify(
 @param [in] context context data required for the update.
 @return the updated handle if it was Occupied or the unmodified vacant handle.
 
-This function makes full use of a CCC_Type_updater capability, meaning a
+This function makes full use of a CCC_Type_modifier capability, meaning a
 complete CCC_update object will be passed to the update function callback. */
 [[nodiscard]] CCC_Handle_realtime_ordered_map_handle *
 CCC_handle_realtime_ordered_map_and_modify_context(
-    CCC_Handle_realtime_ordered_map_handle *h, CCC_Type_updater *fn,
+    CCC_Handle_realtime_ordered_map_handle *h, CCC_Type_modifier *fn,
     void *context);
 
 /** @brief Modify an Occupied handle with a closure over user type T.
@@ -715,7 +715,7 @@ container completes. If h is NULL a handle input error is returned so ensure
 e is non-NULL to avoid an inaccurate status returned.
 
 Note that this function can be useful for debugging or if more detailed
-messages are needed for logging purposes. See CCC_handle_status_msg() in
+messages are needed for logging purposes. See CCC_handle_status_message() in
 ccc/types.h for more information on detailed handle statuses. */
 [[nodiscard]] CCC_Handle_status CCC_handle_realtime_ordered_map_handle_status(
     CCC_Handle_realtime_ordered_map_handle const *h);
@@ -832,43 +832,49 @@ enclosing scope. This reference is always non-NULL. */
             .private                                                           \
     }
 
-/** @brief Return an iterable rrange of values from [begin_key, end_key).
+/** @brief Return an iterable range_reverse of values from [begin_key, end_key).
 O(lg N).
 @param [in] handle_realtime_ordered_map a pointer to the map.
-@param [in] rbegin_key a pointer to the key intended as the start of the rrange.
-@param [in] rend_key a pointer to the key intended as the end of the rrange.
-@return a rrange containing the first element NOT GREATER than the begin_key and
-the first element LESS than rend_key.
+@param [in] reverse_begin_key a pointer to the key intended as the start of the
+range_reverse.
+@param [in] reverse_end_key a pointer to the key intended as the end of the
+range_reverse.
+@return a range_reverse containing the first element NOT GREATER than the
+begin_key and the first element LESS than reverse_end_key.
 
-Note that due to the variety of values that can be returned in the rrange, using
-the provided rrange iteration functions from types.h is recommended for example:
+Note that due to the variety of values that can be returned in the
+range_reverse, using the provided range_reverse iteration functions from types.h
+is recommended for example:
 
 ```
-for (struct Val *i = rrange_begin(&rrange);
-     i != rrange_rend(&rrange);
-     i = rnext(&fom, i))
+for (struct Val *i = range_reverse_begin(&range_reverse);
+     i != range_reverse_end(&range_reverse);
+     i = reverse_next(&fom, i))
 {}
 ```
 
-This avoids any possible errors in handling an rend rrange element that is in
-the map versus the end map sentinel. */
-[[nodiscard]] CCC_Reverse_range CCC_handle_realtime_ordered_map_equal_rrange(
+This avoids any possible errors in handling an reverse_end range_reverse element
+that is in the map versus the end map sentinel. */
+[[nodiscard]] CCC_Range_reverse
+CCC_handle_realtime_ordered_map_equal_range_reverse(
     CCC_Handle_realtime_ordered_map const *handle_realtime_ordered_map,
-    void const *rbegin_key, void const *rend_key);
+    void const *reverse_begin_key, void const *reverse_end_key);
 
-/** @brief Returns a compound literal reference to the desired rrange.
+/** @brief Returns a compound literal reference to the desired range_reverse.
 O(lg N).
 @param [in] Handle_realtime_ordered_map_ptr a pointer to the map.
-@param [in] rbegin_and_rend_key_ptrs two pointers, the first to the start of the
-rrange the second to the end of the rrange.
-@return a compound literal reference to the produced rrange associated with the
-enclosing scope. This reference is always non-NULL. */
-#define CCC_handle_realtime_ordered_map_equal_rrange_r(                        \
-    Handle_realtime_ordered_map_ptr, rbegin_and_rend_key_ptrs...)              \
-    &(CCC_Reverse_range)                                                       \
+@param [in] reverse_begin_and_reverse_end_key_ptrs two pointers, the first to
+the start of the range_reverse the second to the end of the range_reverse.
+@return a compound literal reference to the produced range_reverse associated
+with the enclosing scope. This reference is always non-NULL. */
+#define CCC_handle_realtime_ordered_map_equal_range_reverse_r(                 \
+    Handle_realtime_ordered_map_ptr,                                           \
+    reverse_begin_and_reverse_end_key_ptrs...)                                 \
+    &(CCC_Range_reverse)                                                       \
     {                                                                          \
-        CCC_handle_realtime_ordered_map_equal_rrange(                          \
-            (Handle_realtime_ordered_map_ptr), (rbegin_and_rend_key_ptrs))     \
+        CCC_handle_realtime_ordered_map_equal_range_reverse(                   \
+            (Handle_realtime_ordered_map_ptr),                                 \
+            (reverse_begin_and_reverse_end_key_ptrs))                          \
             .private                                                           \
     }
 
@@ -881,7 +887,7 @@ enclosing scope. This reference is always non-NULL. */
 /** @brief Return the start of a reverse inorder traversal of the map. O(lg N).
 @param [in] handle_realtime_ordered_map a pointer to the map.
 @return the oldest maximum element of the map. */
-[[nodiscard]] void *CCC_handle_realtime_ordered_map_rbegin(
+[[nodiscard]] void *CCC_handle_realtime_ordered_map_reverse_begin(
     CCC_Handle_realtime_ordered_map const *handle_realtime_ordered_map);
 
 /** @brief Return the next element in an inorder traversal of the map. O(1).
@@ -893,13 +899,14 @@ current iterator.
     CCC_Handle_realtime_ordered_map const *handle_realtime_ordered_map,
     void const *key_val_type_iter);
 
-/** @brief Return the rnext element in a reverse inorder traversal of the map.
-O(1).
+/** @brief Return the reverse_next element in a reverse inorder traversal of the
+map. O(1).
 @param [in] handle_realtime_ordered_map a pointer to the map.
 @param [in] key_val_type_iter a pointer to the intrusive map element of the
 current iterator.
-@return the rnext user type stored in the map in a reverse inorder traversal. */
-[[nodiscard]] void *CCC_handle_realtime_ordered_map_rnext(
+@return the reverse_next user type stored in the map in a reverse inorder
+traversal. */
+[[nodiscard]] void *CCC_handle_realtime_ordered_map_reverse_next(
     CCC_Handle_realtime_ordered_map const *handle_realtime_ordered_map,
     void const *key_val_type_iter);
 
@@ -909,10 +916,11 @@ current iterator.
 [[nodiscard]] void *CCC_handle_realtime_ordered_map_end(
     CCC_Handle_realtime_ordered_map const *handle_realtime_ordered_map);
 
-/** @brief Return the rend of a reverse inorder traversal of the map. O(1).
+/** @brief Return the reverse_end of a reverse inorder traversal of the map.
+O(1).
 @param [in] handle_realtime_ordered_map a pointer to the map.
 @return the newest minimum element of the map. */
-[[nodiscard]] void *CCC_handle_realtime_ordered_map_rend(
+[[nodiscard]] void *CCC_handle_realtime_ordered_map_reverse_end(
     CCC_Handle_realtime_ordered_map const *handle_realtime_ordered_map);
 
 /**@}*/
@@ -991,16 +999,16 @@ typedef CCC_Handle_realtime_ordered_map_handle
         CCC_handle_realtime_ordered_map_swap_handle_r(args)
 #    define handle_realtime_ordered_map_begin(args...)                         \
         CCC_handle_realtime_ordered_map_begin(args)
-#    define handle_realtime_ordered_map_rbegin(args...)                        \
-        CCC_handle_realtime_ordered_map_rbegin(args)
+#    define handle_realtime_ordered_map_reverse_begin(args...)                 \
+        CCC_handle_realtime_ordered_map_reverse_begin(args)
 #    define handle_realtime_ordered_map_next(args...)                          \
         CCC_handle_realtime_ordered_map_next(args)
-#    define handle_realtime_ordered_map_rnext(args...)                         \
-        CCC_handle_realtime_ordered_map_rnext(args)
+#    define handle_realtime_ordered_map_reverse_next(args...)                  \
+        CCC_handle_realtime_ordered_map_reverse_next(args)
 #    define handle_realtime_ordered_map_end(args...)                           \
         CCC_handle_realtime_ordered_map_end(args)
-#    define handle_realtime_ordered_map_rend(args...)                          \
-        CCC_handle_realtime_ordered_map_rend(args)
+#    define handle_realtime_ordered_map_reverse_end(args...)                   \
+        CCC_handle_realtime_ordered_map_reverse_end(args)
 #    define handle_realtime_ordered_map_is_empty(args...)                      \
         CCC_handle_realtime_ordered_map_is_empty(args)
 #    define handle_realtime_ordered_map_count(args...)                         \

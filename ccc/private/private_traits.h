@@ -593,26 +593,27 @@ limitations under the License.
         CCC_Realtime_ordered_map const *: CCC_realtime_ordered_map_begin)(     \
         (container_ptr))
 
-#define CCC_private_rbegin(container_ptr)                                      \
+#define CCC_private_reverse_begin(container_ptr)                               \
     _Generic((container_ptr),                                                  \
-        CCC_Buffer *: CCC_buffer_rbegin,                                       \
-        CCC_Ordered_map *: CCC_ordered_map_rbegin,                             \
-        CCC_Handle_ordered_map *: CCC_handle_ordered_map_rbegin,               \
-        CCC_Flat_double_ended_queue *: CCC_flat_double_ended_queue_rbegin,     \
-        CCC_Doubly_linked_list *: CCC_doubly_linked_list_rbegin,               \
-        CCC_Realtime_ordered_map *: CCC_realtime_ordered_map_rbegin,           \
+        CCC_Buffer *: CCC_buffer_reverse_begin,                                \
+        CCC_Ordered_map *: CCC_ordered_map_reverse_begin,                      \
+        CCC_Handle_ordered_map *: CCC_handle_ordered_map_reverse_begin,        \
+        CCC_Flat_double_ended_queue                                            \
+            *: CCC_flat_double_ended_queue_reverse_begin,                      \
+        CCC_Doubly_linked_list *: CCC_doubly_linked_list_reverse_begin,        \
+        CCC_Realtime_ordered_map *: CCC_realtime_ordered_map_reverse_begin,    \
         CCC_Handle_realtime_ordered_map                                        \
-            *: CCC_handle_realtime_ordered_map_rbegin,                         \
-        CCC_Buffer const *: CCC_buffer_rbegin,                                 \
-        CCC_Ordered_map const *: CCC_ordered_map_rbegin,                       \
-        CCC_Handle_ordered_map const *: CCC_handle_ordered_map_rbegin,         \
+            *: CCC_handle_realtime_ordered_map_reverse_begin,                  \
+        CCC_Buffer const *: CCC_buffer_reverse_begin,                          \
+        CCC_Ordered_map const *: CCC_ordered_map_reverse_begin,                \
+        CCC_Handle_ordered_map const *: CCC_handle_ordered_map_reverse_begin,  \
         CCC_Flat_double_ended_queue const                                      \
-            *: CCC_flat_double_ended_queue_rbegin,                             \
-        CCC_Doubly_linked_list const *: CCC_doubly_linked_list_rbegin,         \
+            *: CCC_flat_double_ended_queue_reverse_begin,                      \
+        CCC_Doubly_linked_list const *: CCC_doubly_linked_list_reverse_begin,  \
         CCC_Handle_realtime_ordered_map const                                  \
-            *: CCC_handle_realtime_ordered_map_rbegin,                         \
-        CCC_Realtime_ordered_map const *: CCC_realtime_ordered_map_rbegin)(    \
-        (container_ptr))
+            *: CCC_handle_realtime_ordered_map_reverse_begin,                  \
+        CCC_Realtime_ordered_map const                                         \
+            *: CCC_realtime_ordered_map_reverse_begin)((container_ptr))
 
 #define CCC_private_next(container_ptr, void_iter_ptr)                         \
     _Generic((container_ptr),                                                  \
@@ -638,26 +639,28 @@ limitations under the License.
         CCC_Realtime_ordered_map const *: CCC_realtime_ordered_map_next)(      \
         (container_ptr), (void_iter_ptr))
 
-#define CCC_private_rnext(container_ptr, void_iter_ptr)                        \
+#define CCC_private_reverse_next(container_ptr, void_iter_ptr)                 \
     _Generic((container_ptr),                                                  \
-        CCC_Buffer *: CCC_buffer_rnext,                                        \
-        CCC_Ordered_map *: CCC_ordered_map_rnext,                              \
-        CCC_Handle_ordered_map *: CCC_handle_ordered_map_rnext,                \
-        CCC_Flat_double_ended_queue *: CCC_flat_double_ended_queue_rnext,      \
-        CCC_Doubly_linked_list *: CCC_doubly_linked_list_rnext,                \
-        CCC_Realtime_ordered_map *: CCC_realtime_ordered_map_rnext,            \
+        CCC_Buffer *: CCC_buffer_reverse_next,                                 \
+        CCC_Ordered_map *: CCC_ordered_map_reverse_next,                       \
+        CCC_Handle_ordered_map *: CCC_handle_ordered_map_reverse_next,         \
+        CCC_Flat_double_ended_queue                                            \
+            *: CCC_flat_double_ended_queue_reverse_next,                       \
+        CCC_Doubly_linked_list *: CCC_doubly_linked_list_reverse_next,         \
+        CCC_Realtime_ordered_map *: CCC_realtime_ordered_map_reverse_next,     \
         CCC_Handle_realtime_ordered_map                                        \
-            *: CCC_handle_realtime_ordered_map_rnext,                          \
-        CCC_Buffer const *: CCC_buffer_rnext,                                  \
-        CCC_Ordered_map const *: CCC_ordered_map_rnext,                        \
-        CCC_Handle_ordered_map const *: CCC_handle_ordered_map_rnext,          \
+            *: CCC_handle_realtime_ordered_map_reverse_next,                   \
+        CCC_Buffer const *: CCC_buffer_reverse_next,                           \
+        CCC_Ordered_map const *: CCC_ordered_map_reverse_next,                 \
+        CCC_Handle_ordered_map const *: CCC_handle_ordered_map_reverse_next,   \
         CCC_Flat_double_ended_queue const                                      \
-            *: CCC_flat_double_ended_queue_rnext,                              \
-        CCC_Doubly_linked_list const *: CCC_doubly_linked_list_rnext,          \
+            *: CCC_flat_double_ended_queue_reverse_next,                       \
+        CCC_Doubly_linked_list const *: CCC_doubly_linked_list_reverse_next,   \
         CCC_Handle_realtime_ordered_map const                                  \
-            *: CCC_handle_realtime_ordered_map_rnext,                          \
-        CCC_Realtime_ordered_map const *: CCC_realtime_ordered_map_rnext)(     \
-        (container_ptr), (void_iter_ptr))
+            *: CCC_handle_realtime_ordered_map_reverse_next,                   \
+        CCC_Realtime_ordered_map const                                         \
+            *: CCC_realtime_ordered_map_reverse_next)((container_ptr),         \
+                                                      (void_iter_ptr))
 
 #define CCC_private_end(container_ptr)                                         \
     _Generic((container_ptr),                                                  \
@@ -683,25 +686,27 @@ limitations under the License.
         CCC_Realtime_ordered_map const *: CCC_realtime_ordered_map_end)(       \
         (container_ptr))
 
-#define CCC_private_rend(container_ptr)                                        \
+#define CCC_private_reverse_end(container_ptr)                                 \
     _Generic((container_ptr),                                                  \
-        CCC_Buffer *: CCC_buffer_rend,                                         \
-        CCC_Ordered_map *: CCC_ordered_map_rend,                               \
-        CCC_Handle_ordered_map *: CCC_handle_ordered_map_rend,                 \
-        CCC_Flat_double_ended_queue *: CCC_flat_double_ended_queue_rend,       \
-        CCC_Doubly_linked_list *: CCC_doubly_linked_list_rend,                 \
-        CCC_Realtime_ordered_map *: CCC_realtime_ordered_map_rend,             \
+        CCC_Buffer *: CCC_buffer_reverse_end,                                  \
+        CCC_Ordered_map *: CCC_ordered_map_reverse_end,                        \
+        CCC_Handle_ordered_map *: CCC_handle_ordered_map_reverse_end,          \
+        CCC_Flat_double_ended_queue                                            \
+            *: CCC_flat_double_ended_queue_reverse_end,                        \
+        CCC_Doubly_linked_list *: CCC_doubly_linked_list_reverse_end,          \
+        CCC_Realtime_ordered_map *: CCC_realtime_ordered_map_reverse_end,      \
         CCC_Handle_realtime_ordered_map                                        \
-            *: CCC_handle_realtime_ordered_map_rend,                           \
-        CCC_Buffer const *: CCC_buffer_rend,                                   \
-        CCC_Ordered_map const *: CCC_ordered_map_rend,                         \
-        CCC_Handle_ordered_map const *: CCC_handle_ordered_map_rend,           \
-        CCC_Flat_double_ended_queue const *: CCC_flat_double_ended_queue_rend, \
-        CCC_Doubly_linked_list const *: CCC_doubly_linked_list_rend,           \
+            *: CCC_handle_realtime_ordered_map_reverse_end,                    \
+        CCC_Buffer const *: CCC_buffer_reverse_end,                            \
+        CCC_Ordered_map const *: CCC_ordered_map_reverse_end,                  \
+        CCC_Handle_ordered_map const *: CCC_handle_ordered_map_reverse_end,    \
+        CCC_Flat_double_ended_queue const                                      \
+            *: CCC_flat_double_ended_queue_reverse_end,                        \
+        CCC_Doubly_linked_list const *: CCC_doubly_linked_list_reverse_end,    \
         CCC_Handle_realtime_ordered_map const                                  \
-            *: CCC_handle_realtime_ordered_map_rend,                           \
-        CCC_Realtime_ordered_map const *: CCC_realtime_ordered_map_rend)(      \
-        (container_ptr))
+            *: CCC_handle_realtime_ordered_map_reverse_end,                    \
+        CCC_Realtime_ordered_map const                                         \
+            *: CCC_realtime_ordered_map_reverse_end)((container_ptr))
 
 #define CCC_private_equal_range(container_ptr, begin_and_end_key_ptr...)       \
     _Generic((container_ptr),                                                  \
@@ -722,23 +727,27 @@ limitations under the License.
         CCC_private_equal_range(container_ptr, begin_and_end_key_ptr).private  \
     }
 
-#define CCC_private_equal_rrange(container_ptr, rbegin_and_rend_key_ptr...)    \
+#define CCC_private_equal_range_reverse(                                       \
+    container_ptr, reverse_begin_and_reverse_end_key_ptr...)                   \
     _Generic((container_ptr),                                                  \
-        CCC_Ordered_map *: CCC_ordered_map_equal_rrange,                       \
-        CCC_Handle_ordered_map *: CCC_handle_ordered_map_equal_rrange,         \
+        CCC_Ordered_map *: CCC_ordered_map_equal_range_reverse,                \
+        CCC_Handle_ordered_map *: CCC_handle_ordered_map_equal_range_reverse,  \
         CCC_Handle_realtime_ordered_map                                        \
-            *: CCC_handle_realtime_ordered_map_equal_rrange,                   \
+            *: CCC_handle_realtime_ordered_map_equal_range_reverse,            \
         CCC_Handle_realtime_ordered_map const                                  \
-            *: CCC_handle_realtime_ordered_map_equal_rrange,                   \
-        CCC_Realtime_ordered_map *: CCC_realtime_ordered_map_equal_rrange,     \
+            *: CCC_handle_realtime_ordered_map_equal_range_reverse,            \
+        CCC_Realtime_ordered_map                                               \
+            *: CCC_realtime_ordered_map_equal_range_reverse,                   \
         CCC_Realtime_ordered_map const                                         \
-            *: CCC_realtime_ordered_map_equal_rrange)((container_ptr),         \
-                                                      rbegin_and_rend_key_ptr)
+            *: CCC_realtime_ordered_map_equal_range_reverse)(                  \
+        (container_ptr), reverse_begin_and_reverse_end_key_ptr)
 
-#define CCC_private_equal_rrange_r(container_ptr, rbegin_and_rend_key_ptr...)  \
-    &(CCC_Reverse_range)                                                       \
+#define CCC_private_equal_range_reverse_r(                                     \
+    container_ptr, reverse_begin_and_reverse_end_key_ptr...)                   \
+    &(CCC_Range_reverse)                                                       \
     {                                                                          \
-        CCC_private_equal_rrange(container_ptr, rbegin_and_rend_key_ptr)       \
+        CCC_private_equal_range_reverse(container_ptr,                         \
+                                        reverse_begin_and_reverse_end_key_ptr) \
             .private                                                           \
     }
 

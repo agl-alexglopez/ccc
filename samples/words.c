@@ -347,8 +347,8 @@ print_ralpha_n(FILE *const f, int n)
     }
     int i = 0;
     /* The ordered nature of the map comes in handy for reverse iteration. */
-    for (Word *w = rbegin(&map); w != rend(&map) && i < n;
-         w = rnext(&map, w), ++i)
+    for (Word *w = reverse_begin(&map); w != reverse_end(&map) && i < n;
+         w = reverse_next(&map, w), ++i)
     {
         printf("%s %d\n", string_arena_at(&a, &w->ofs), w->freq);
     }
@@ -396,8 +396,9 @@ print_n(CCC_Handle_ordered_map *const map, CCC_Order const ord,
     check(!flat_priority_queue.buf.mem);
     int w = 0;
     /* Heap sort puts the root most nodes at the back of the buffer. */
-    for (Word const *i = rbegin(&sorted_freqs);
-         i != rend(&sorted_freqs) && w < n; i = rnext(&sorted_freqs, i), ++w)
+    for (Word const *i = reverse_begin(&sorted_freqs);
+         i != reverse_end(&sorted_freqs) && w < n;
+         i = reverse_next(&sorted_freqs, i), ++w)
     {
         char const *const arena_str = string_arena_at(a, &i->ofs);
         if (arena_str)

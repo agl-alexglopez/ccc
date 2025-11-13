@@ -614,10 +614,10 @@ Entry Interface.*/
 
 This function is intended to make the function chaining in the Entry Interface
 more succinct if the entry will be modified in place based on its own value
-without the need of the context argument a CCC_Type_updater can provide.
+without the need of the context argument a CCC_Type_modifier can provide.
 */
 [[nodiscard]] CCC_Flat_hash_map_entry *
-CCC_flat_hash_map_and_modify(CCC_Flat_hash_map_entry *e, CCC_Type_updater *fn);
+CCC_flat_hash_map_and_modify(CCC_Flat_hash_map_entry *e, CCC_Type_modifier *fn);
 
 /** @brief Modifies the provided entry if it is Occupied.
 @param [in] e the entry obtained from an entry function or macro.
@@ -625,11 +625,11 @@ CCC_flat_hash_map_and_modify(CCC_Flat_hash_map_entry *e, CCC_Type_updater *fn);
 @param [in] context context data required for the update.
 @return the updated entry if it was Occupied or the unmodified vacant entry.
 
-This function makes full use of a CCC_Type_updater capability, meaning a
+This function makes full use of a CCC_Type_modifier capability, meaning a
 complete CCC_update object will be passed to the update function callback. */
 [[nodiscard]] CCC_Flat_hash_map_entry *
 CCC_flat_hash_map_and_modify_context(CCC_Flat_hash_map_entry *e,
-                                     CCC_Type_updater *fn, void *context);
+                                     CCC_Type_modifier *fn, void *context);
 
 /** @brief Modify an Occupied entry with a closure over user type T.
 @param [in] map_entry_ptr a pointer to the obtained entry.
@@ -927,7 +927,7 @@ container completes. If e is NULL an entry input error is returned so ensure
 e is non-NULL to avoid an inaccurate status returned.
 
 Note that this function can be useful for debugging or if more detailed
-messages are needed for logging purposes. See CCC_Entry_status_msg() in
+messages are needed for logging purposes. See CCC_Entry_status_message() in
 ccc/types.h for more information on detailed entry statuses. */
 [[nodiscard]] CCC_Entry_status
 CCC_flat_hash_map_entry_status(CCC_Flat_hash_map_entry const *e);

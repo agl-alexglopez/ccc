@@ -43,13 +43,13 @@ this header to iterate from beginning to end in forward order relative to
 the containers default ordering. */
 typedef union CCC_Range_wrap CCC_Range;
 
-/** @brief The result of a rrange query on iterable containers.
+/** @brief The result of a range_reverse query on iterable containers.
 
-A rrange provides a view all elements that fit the equals rrange criteria
-of search-by-key containers. Use the provided range iteration functions in
-this header to iterate from beginning to end in reverse order relative to
-the containers default ordering. */
-typedef union CCC_Reverse_range CCC_Reverse_range;
+A range_reverse provides a view all elements that fit the equals range_reverse
+criteria of search-by-key containers. Use the provided range iteration functions
+in this header to iterate from beginning to end in reverse order relative to the
+containers default ordering. */
+typedef union CCC_Range_reverse CCC_Range_reverse;
 
 /** @brief An Occupied or Vacant position in a searchable container.
 
@@ -65,9 +65,9 @@ typedef union CCC_Entry_wrap CCC_Entry;
 To manage safe and efficient views into associative containers entries use
 status flags internally. The provided functions in the Entry Interface for
 each container are sufficient to obtain the needed status. However if more
-information is needed, the status can be passed to the CCC_Entry_status_msg()
-function for detailed string messages regarding the entry status. This may
-be helpful for debugging or logging. */
+information is needed, the status can be passed to the
+CCC_Entry_status_message() function for detailed string messages regarding the
+entry status. This may be helpful for debugging or logging. */
 typedef enum CCC_Entry_status CCC_Entry_status;
 
 /** @brief An Occupied or Vacant handle to a flat searchable container entry.
@@ -97,9 +97,9 @@ typedef size_t CCC_Handle_index;
 To manage safe and efficient views into associative containers entries use
 status flags internally. The provided functions in the Handle Interface for
 each container are sufficient to obtain the needed status. However if more
-information is needed, the status can be passed to the CCC_Entry_status_msg()
-function for detailed string messages regarding the handle status. This may
-be helpful for debugging or logging. */
+information is needed, the status can be passed to the
+CCC_Entry_status_message() function for detailed string messages regarding the
+handle status. This may be helpful for debugging or logging. */
 typedef enum CCC_Entry_status CCC_Handle_status;
 
 /** @brief A three state boolean to allow for an error state. Error is -1, False
@@ -180,7 +180,7 @@ if (res.error)
 ```
 
 Full string explanations of the exact CCC_Result error types can be provided via
-the CCC_result_msg function if the enum itself does not provide sufficient
+the CCC_result_message function if the enum itself does not provide sufficient
 explanation. */
 typedef struct
 {
@@ -342,7 +342,7 @@ user type and is not NULL. Context may be NULL if no context is provided on
 initialization. An update function is used when a container Interface exposes
 functions to modify the key or value used to determine sorted order of elements
 in the container. */
-typedef void CCC_Type_updater(CCC_Type_context);
+typedef void CCC_Type_modifier(CCC_Type_context);
 
 /** @brief A callback function for destroying an element in the container.
 
@@ -479,7 +479,7 @@ the reverse beginning of the range.
 
 Note the reverse beginning of a range may be equivalent to the reverse end or
 NULL. */
-void *CCC_rrange_rbegin(CCC_Reverse_range const *r);
+void *CCC_range_reverse_begin(CCC_Range_reverse const *r);
 
 /** @brief Obtain a reference to the reverse end user element stored in a
 container in the provided range.
@@ -490,7 +490,7 @@ the reverse end of the range.
 Note the reverse end of a range may be equivalent to the reverse beginning or
 NULL. Functions that obtain ranges treat the reverse end as an exclusive bound
 and therefore it is undefined to access this element. */
-void *CCC_rrange_rend(CCC_Reverse_range const *r);
+void *CCC_range_reverse_end(CCC_Range_reverse const *r);
 
 /**@}*/
 
@@ -506,7 +506,7 @@ string, the falsey NULL terminator. All other results have a string message.
 
 These messages can be used for logging or to help with debugging by providing
 more information for why such a result might be obtained from a container. */
-char const *CCC_result_msg(CCC_Result res);
+char const *CCC_result_message(CCC_Result res);
 
 /** @brief Obtain the entry status from a generic entry.
 @param [in] e a pointer to the entry.
@@ -533,7 +533,7 @@ occurred. If a function tries to complete an action like insertion or removal
 the status can reflect if any errors occurred in this process as well. Usually,
 the provided interface gives all the functions needed to check status but these
 strings can be used when more details are required. */
-char const *CCC_entry_status_msg(CCC_Entry_status status);
+char const *CCC_entry_status_message(CCC_Entry_status status);
 
 /** @brief Obtain a string message with a description of the handle status.
 @param [in] status the status obtained from an handle.
@@ -546,7 +546,7 @@ occurred. If a function tries to complete an action like insertion or removal
 the status can reflect if any errors occurred in this process as well. Usually,
 the provided interface gives all the functions needed to check status but these
 strings can be used when more details are required. */
-char const *CCC_handle_status_msg(CCC_Handle_status status);
+char const *CCC_handle_status_message(CCC_Handle_status status);
 
 /**@}*/
 
@@ -554,7 +554,7 @@ char const *CCC_handle_status_msg(CCC_Handle_status status);
 desired. By default the ccc prefix is used to avoid namespace clashes. */
 #ifdef TYPES_USING_NAMESPACE_CCC
 typedef CCC_Range Range;
-typedef CCC_Reverse_range Reverse_range;
+typedef CCC_Range_reverse Range_reverse;
 typedef CCC_Entry Entry;
 typedef CCC_Handle Handle;
 typedef CCC_Handle_index Handle_index;
@@ -566,7 +566,7 @@ typedef CCC_Key_context Key_context;
 typedef CCC_Key_comparator_context Key_comparator_context;
 typedef CCC_Allocator Allocator;
 typedef CCC_Type_comparator Type_comparator;
-typedef CCC_Type_updater Type_updater;
+typedef CCC_Type_modifier Type_modifier;
 typedef CCC_Type_destructor Type_destructor;
 typedef CCC_Key_comparator Key_comparator;
 typedef CCC_Key_hasher Key_hasher;
@@ -574,17 +574,17 @@ typedef CCC_Key_hasher Key_hasher;
 #    define entry_insert_error(entry_ptr) CCC_entry_insert_error(entry_ptr)
 #    define entry_unwrap(entry_ptr) CCC_entry_unwrap(entry_ptr)
 #    define get_entry_status(entry_ptr) CCC_get_entry_status(entry_ptr)
-#    define entry_status_msg(status) CCC_entry_status_msg(status)
+#    define entry_status_message(status) CCC_entry_status_message(status)
 #    define handle_occupied(handle_ptr) CCC_handle_occupied(handle_ptr)
 #    define handle_insert_error(handle_ptr) CCC_handle_insert_error(handle_ptr)
 #    define handle_unwrap(handle_ptr) CCC_handle_unwrap(handle_ptr)
 #    define get_handle_status(handle_ptr) CCC_get_handle_status(handle_ptr)
-#    define handle_status_msg(status) CCC_handle_status_msg(status)
+#    define handle_status_message(status) CCC_handle_status_message(status)
 #    define range_begin(range_ptr) CCC_range_begin(range_ptr)
 #    define range_end(range_ptr) CCC_range_end(range_ptr)
-#    define rrange_rbegin(range_ptr) CCC_rrange_rbegin(range_ptr)
-#    define rrange_rend(range_ptr) CCC_rrange_rend(range_ptr)
-#    define result_msg(res) CCC_result_msg(res)
+#    define range_reverse_begin(range_ptr) CCC_range_reverse_begin(range_ptr)
+#    define range_reverse_end(range_ptr) CCC_range_reverse_end(range_ptr)
+#    define result_message(res) CCC_result_message(res)
 #endif /* TYPES_USING_NAMESPACE_CCC */
 
 #endif /* CCC_TYPES_H */

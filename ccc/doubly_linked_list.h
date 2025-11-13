@@ -344,7 +344,7 @@ CCC_doubly_linked_list_begin(CCC_Doubly_linked_list const *l);
 @param [in] l a pointer to the doubly linked list.
 @return a pointer to the user type or NULL if empty or bad input. */
 [[nodiscard]] void *
-CCC_doubly_linked_list_rbegin(CCC_Doubly_linked_list const *l);
+CCC_doubly_linked_list_reverse_begin(CCC_Doubly_linked_list const *l);
 
 /** @brief Return the user type following the element known to be in the list.
 O(1).
@@ -363,8 +363,8 @@ moving from back to front. O(1).
 @return a pointer to the element following elem from back to front or NULL if no
 elements follow or bad input is provided. */
 [[nodiscard]] void *
-CCC_doubly_linked_list_rnext(CCC_Doubly_linked_list const *l,
-                             CCC_Doubly_linked_list_node const *elem);
+CCC_doubly_linked_list_reverse_next(CCC_Doubly_linked_list const *l,
+                                    CCC_Doubly_linked_list_node const *elem);
 
 /** @brief Return the end sentinel with no accessible fields. O(1).
 @param [in] l a pointer to the doubly linked list.
@@ -375,7 +375,7 @@ CCC_doubly_linked_list_rnext(CCC_Doubly_linked_list const *l,
 @param [in] l a pointer to the doubly linked list.
 @return a pointer to the start sentinel with no accessible fields. */
 [[nodiscard]] void *
-CCC_doubly_linked_list_rend(CCC_Doubly_linked_list const *l);
+CCC_doubly_linked_list_reverse_end(CCC_Doubly_linked_list const *l);
 
 /**@}*/
 
@@ -484,13 +484,15 @@ typedef CCC_Doubly_linked_list Doubly_linked_list;
         CCC_doubly_linked_list_is_sorted(args)
 #    define doubly_linked_list_begin(args...) CCC_doubly_linked_list_begin(args)
 #    define doubly_linked_list_next(args...) CCC_doubly_linked_list_next(args)
-#    define doubly_linked_list_rbegin(args...)                                 \
-        CCC_doubly_linked_list_rbegin(args)
-#    define doubly_linked_list_rnext(args...) CCC_doubly_linked_list_rnext(args)
+#    define doubly_linked_list_reverse_begin(args...)                          \
+        CCC_doubly_linked_list_reverse_begin(args)
+#    define doubly_linked_list_reverse_next(args...)                           \
+        CCC_doubly_linked_list_reverse_next(args)
 #    define doubly_linked_list_end(args...) CCC_doubly_linked_list_end(args)
 #    define doubly_linked_list_node_end(args...)                               \
         CCC_doubly_linked_list_node_end(args)
-#    define doubly_linked_list_rend(args...) CCC_doubly_linked_list_rend(args)
+#    define doubly_linked_list_reverse_end(args...)                            \
+        CCC_doubly_linked_list_reverse_end(args)
 #    define doubly_linked_list_node_begin(args...)                             \
         CCC_doubly_linked_list_node_begin(args)
 #    define doubly_linked_list_node_end(args...)                               \

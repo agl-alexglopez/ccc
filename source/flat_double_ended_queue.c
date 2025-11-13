@@ -263,7 +263,7 @@ CCC_flat_double_ended_queue_begin(
 }
 
 void *
-CCC_flat_double_ended_queue_rbegin(
+CCC_flat_double_ended_queue_reverse_begin(
     CCC_Flat_double_ended_queue const *const flat_double_ended_queue)
 {
     if (!flat_double_ended_queue || !flat_double_ended_queue->buf.count)
@@ -292,15 +292,15 @@ CCC_flat_double_ended_queue_next(
 }
 
 void *
-CCC_flat_double_ended_queue_rnext(
+CCC_flat_double_ended_queue_reverse_next(
     CCC_Flat_double_ended_queue const *const flat_double_ended_queue,
     void const *const iter_ptr)
 {
     size_t const cur_i = index_of(flat_double_ended_queue, iter_ptr);
     size_t const next_i = decrement(flat_double_ended_queue, cur_i);
-    size_t const rbegin = last_node_index(flat_double_ended_queue);
-    if (next_i == rbegin
-        || rdistance(flat_double_ended_queue, next_i, rbegin)
+    size_t const reverse_begin = last_node_index(flat_double_ended_queue);
+    if (next_i == reverse_begin
+        || rdistance(flat_double_ended_queue, next_i, reverse_begin)
                >= flat_double_ended_queue->buf.count)
     {
         return NULL;
@@ -315,7 +315,8 @@ CCC_flat_double_ended_queue_end(CCC_Flat_double_ended_queue const *const)
 }
 
 void *
-CCC_flat_double_ended_queue_rend(CCC_Flat_double_ended_queue const *const)
+CCC_flat_double_ended_queue_reverse_end(
+    CCC_Flat_double_ended_queue const *const)
 {
     return NULL;
 }
@@ -531,15 +532,16 @@ CCC_flat_double_ended_queue_validate(
         return CCC_FALSE;
     }
     size = 0;
-    iter = CCC_flat_double_ended_queue_rbegin(flat_double_ended_queue);
+    iter = CCC_flat_double_ended_queue_reverse_begin(flat_double_ended_queue);
     if (CCC_buffer_i(&flat_double_ended_queue->buf, iter).count
         != last_node_index(flat_double_ended_queue))
     {
         return CCC_FALSE;
     }
-    for (; iter != CCC_flat_double_ended_queue_rend(flat_double_ended_queue);
-         iter
-         = CCC_flat_double_ended_queue_rnext(flat_double_ended_queue, iter),
+    for (; iter
+           != CCC_flat_double_ended_queue_reverse_end(flat_double_ended_queue);
+         iter = CCC_flat_double_ended_queue_reverse_next(
+             flat_double_ended_queue, iter),
          ++size)
     {
         if (size

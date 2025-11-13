@@ -34,8 +34,8 @@ enum CCC_Entry_status : uint8_t
 /** @private */
 struct CCC_Entry
 {
-    void *e;
-    enum CCC_Entry_status stats;
+    void *type;
+    enum CCC_Entry_status status;
 };
 
 /** @private */
@@ -47,8 +47,8 @@ union CCC_Entry_wrap
 /** @private */
 struct CCC_Handle
 {
-    size_t i;
-    enum CCC_Entry_status stats;
+    size_t index;
+    enum CCC_Entry_status status;
 };
 
 /** @private */
@@ -63,12 +63,12 @@ struct CCC_Range
     union
     {
         void *begin;
-        void *rbegin;
+        void *reverse_begin;
     };
     union
     {
         void *end;
-        void *rend;
+        void *reverse_end;
     };
 };
 
@@ -79,7 +79,7 @@ union CCC_Range_wrap
 };
 
 /** @private */
-union CCC_Reverse_range
+union CCC_Range_reverse
 {
     struct CCC_Range private;
 };

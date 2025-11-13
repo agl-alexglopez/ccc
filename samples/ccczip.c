@@ -1196,7 +1196,7 @@ path_memo_order(CCC_Key_comparator_context const order)
 static void
 print_help(void)
 {
-    static char const *const msg
+    static char const *const message
         = "Compress and Decompress Files:\n\n\t-c=/file/name - [c]ompress the "
           "file to create a samples/output/name.ccc file\n\t"
           "-d=/samples/output/name.ccc - [d]ecompress the file to "
@@ -1205,5 +1205,5 @@ print_help(void)
           "decompresses it.\nThe final copy of the original file is in the "
           "output directory.\nSample Command:\n./build/bin/ccczip "
           "-c=README.md -d=samples/output/README.md.ccc\n";
-    printf("%s", msg);
+    printf("%s", message);
 }

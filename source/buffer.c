@@ -415,13 +415,13 @@ CCC_buffer_begin(CCC_Buffer const *const buf)
 }
 
 void *
-CCC_buffer_rbegin(CCC_Buffer const *const buf)
+CCC_buffer_reverse_begin(CCC_Buffer const *const buf)
 {
     if (!buf || !buf->mem)
     {
         return NULL;
     }
-    /* OK if count is 0. Negative offset puts at rend anyway. */
+    /* OK if count is 0. Negative offset puts at reverse_end anyway. */
     return (unsigned char *)buf->mem + ((buf->count - 1) * buf->sizeof_type);
 }
 
@@ -440,15 +440,15 @@ CCC_buffer_next(CCC_Buffer const *const buf, void const *const iter)
 }
 
 void *
-CCC_buffer_rnext(CCC_Buffer const *const buf, void const *const iter)
+CCC_buffer_reverse_next(CCC_Buffer const *const buf, void const *const iter)
 {
     if (!buf || !buf->mem)
     {
         return NULL;
     }
-    if (iter <= CCC_buffer_rend(buf))
+    if (iter <= CCC_buffer_reverse_end(buf))
     {
-        return CCC_buffer_rend(buf);
+        return CCC_buffer_reverse_end(buf);
     }
     return (char *)iter - buf->sizeof_type;
 }
@@ -464,12 +464,12 @@ CCC_buffer_end(CCC_Buffer const *const buf)
     return (unsigned char *)buf->mem + (buf->count * buf->sizeof_type);
 }
 
-/** We accept that rend is out of bounds and the address before start. Even if
-the array base was somehow 0 and wrapping occurred upon subtraction the iterator
-would eventually reach this same address through rnext and be compared to it
-in the main user loop. */
+/** We accept that reverse_end is out of bounds and the address before start.
+Even if the array base was somehow 0 and wrapping occurred upon subtraction the
+iterator would eventually reach this same address through reverse_next and be
+compared to it in the main user loop. */
 void *
-CCC_buffer_rend(CCC_Buffer const *const buf)
+CCC_buffer_reverse_end(CCC_Buffer const *const buf)
 {
     if (!buf || !buf->mem)
     {

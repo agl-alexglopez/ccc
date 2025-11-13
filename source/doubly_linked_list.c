@@ -397,7 +397,7 @@ CCC_doubly_linked_list_begin(CCC_Doubly_linked_list const *const l)
 }
 
 void *
-CCC_doubly_linked_list_rbegin(CCC_Doubly_linked_list const *const l)
+CCC_doubly_linked_list_reverse_begin(CCC_Doubly_linked_list const *const l)
 {
     if (!l || l->nil.p == &l->nil)
     {
@@ -413,7 +413,7 @@ CCC_doubly_linked_list_end(CCC_Doubly_linked_list const *const)
 }
 
 void *
-CCC_doubly_linked_list_rend(CCC_Doubly_linked_list const *const)
+CCC_doubly_linked_list_reverse_end(CCC_Doubly_linked_list const *const)
 {
     return NULL;
 }
@@ -430,8 +430,8 @@ CCC_doubly_linked_list_next(CCC_Doubly_linked_list const *const l,
 }
 
 void *
-CCC_doubly_linked_list_rnext(CCC_Doubly_linked_list const *const l,
-                             CCC_Doubly_linked_list_node const *e)
+CCC_doubly_linked_list_reverse_next(CCC_Doubly_linked_list const *const l,
+                                    CCC_Doubly_linked_list_node const *e)
 {
     if (!l || !e || e->p == &l->nil)
     {

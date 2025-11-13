@@ -75,53 +75,55 @@ check_static_begin(check_range, Realtime_ordered_map const *const rom,
     });
 }
 
-check_static_begin(check_rrange, Realtime_ordered_map const *const rom,
-                   Reverse_range const *const r, size_t const n,
-                   int const expect_rrange[])
+check_static_begin(check_range_reverse, Realtime_ordered_map const *const rom,
+                   Range_reverse const *const r, size_t const n,
+                   int const expect_range_reverse[])
 {
-    if (rrange_rbegin(r))
+    if (range_reverse_begin(r))
     {
-        check(((struct Val *)rrange_rbegin(r))->key, expect_rrange[0]);
+        check(((struct Val *)range_reverse_begin(r))->key,
+              expect_range_reverse[0]);
     }
-    if (rrange_rend(r))
+    if (range_reverse_end(r))
     {
-        check(((struct Val *)rrange_rend(r))->key, expect_rrange[n - 1]);
+        check(((struct Val *)range_reverse_end(r))->key,
+              expect_range_reverse[n - 1]);
     }
-    struct Val *iter = rrange_rbegin(r);
+    struct Val *iter = range_reverse_begin(r);
     size_t index = 0;
-    for (; iter != rrange_rend(r); iter = rnext(rom, &iter->elem))
+    for (; iter != range_reverse_end(r); iter = reverse_next(rom, &iter->elem))
     {
         int const cur_val = iter->key;
-        check(expect_rrange[index], cur_val);
+        check(expect_range_reverse[index], cur_val);
         ++index;
     }
-    check(iter, rrange_rend(r));
+    check(iter, range_reverse_end(r));
     if (iter)
     {
-        check(((struct Val *)iter)->key, expect_rrange[n - 1]);
+        check(((struct Val *)iter)->key, expect_range_reverse[n - 1]);
     }
     check_fail_end({
         (void)fprintf(stderr, "%sCHECK: (int[%zu]){", CHECK_GREEN, n);
         size_t j = 0;
         for (; j < n; ++j)
         {
-            (void)fprintf(stderr, "%d, ", expect_rrange[j]);
+            (void)fprintf(stderr, "%d, ", expect_range_reverse[j]);
         }
         (void)fprintf(stderr, "}\n%s", CHECK_NONE);
         (void)fprintf(stderr, "%sCHECK_ERROR:%s (int[%zu]){", CHECK_RED,
                       CHECK_GREEN, n);
-        iter = rrange_rbegin(r);
-        for (j = 0; j < n && iter != rrange_rend(r);
-             ++j, iter = rnext(rom, &iter->elem))
+        iter = range_reverse_begin(r);
+        for (j = 0; j < n && iter != range_reverse_end(r);
+             ++j, iter = reverse_next(rom, &iter->elem))
         {
             if (!iter)
             {
                 return CHECK_STATUS;
             }
-            if (expect_rrange[j] == iter->key)
+            if (expect_range_reverse[j] == iter->key)
             {
-                (void)fprintf(stderr, "%s%d, %s", CHECK_GREEN, expect_rrange[j],
-                              CHECK_NONE);
+                (void)fprintf(stderr, "%s%d, %s", CHECK_GREEN,
+                              expect_range_reverse[j], CHECK_NONE);
             }
             else
             {
@@ -129,7 +131,8 @@ check_static_begin(check_rrange, Realtime_ordered_map const *const rom,
                               CHECK_NONE);
             }
         }
-        for (; iter != rrange_rend(r); iter = rnext(rom, &iter->elem))
+        for (; iter != range_reverse_end(r);
+             iter = reverse_next(rom, &iter->elem))
         {
             (void)fprintf(stderr, "%s%d, %s", CHECK_RED, iter->key, CHECK_NONE);
         }
@@ -148,7 +151,8 @@ check_static_begin(iterator_check, Realtime_ordered_map *s)
     }
     check(iter_count, size);
     iter_count = 0;
-    for (struct Val *e = rbegin(s); e != end(s); e = rnext(s, &e->elem))
+    for (struct Val *e = reverse_begin(s); e != end(s);
+         e = reverse_next(s, &e->elem))
     {
         ++iter_count;
         check(iter_count <= size, true);
@@ -281,8 +285,9 @@ check_static_begin(realtime_ordered_map_test_valid_range)
     /* This should be the following range [119,84). 119 should be
        dropped to first value not greater than 119 and last should
        be dropped to first value less than 84. */
-    check(check_rrange(&s, equal_rrange_r(&s, &(int){119}, &(int){84}), 8,
-                       (int[8]){115, 110, 105, 100, 95, 90, 85, 80}),
+    check(check_range_reverse(
+              &s, equal_range_reverse_r(&s, &(int){119}, &(int){84}), 8,
+              (int[8]){115, 110, 105, 100, 95, 90, 85, 80}),
           CHECK_PASS);
     check_end();
 }
@@ -310,8 +315,9 @@ check_static_begin(realtime_ordered_map_test_valid_range_equals)
     /* This should be the following range [115,84). 115 should be
        is a valid start to the range and 85 is eqal to end key so must
        be dropped to first value less than 85, 80. */
-    check(check_rrange(&s, equal_rrange_r(&s, &(int){115}, &(int){85}), 8,
-                       (int[8]){115, 110, 105, 100, 95, 90, 85, 80}),
+    check(check_range_reverse(
+              &s, equal_range_reverse_r(&s, &(int){115}, &(int){85}), 8,
+              (int[8]){115, 110, 105, 100, 95, 90, 85, 80}),
           CHECK_PASS);
     check_end();
 }
@@ -339,8 +345,9 @@ check_static_begin(realtime_ordered_map_test_invalid_range)
     /* This should be the following range [36,-999). 36 should be
        dropped to first value not greater than 36 and last should
        be dropped to first value less than -999 which is end. */
-    check(check_rrange(&s, equal_rrange_r(&s, &(int){36}, &(int){-999}), 8,
-                       (int[8]){35, 30, 25, 20, 15, 10, 5, 0}),
+    check(check_range_reverse(
+              &s, equal_range_reverse_r(&s, &(int){36}, &(int){-999}), 8,
+              (int[8]){35, 30, 25, 20, 15, 10, 5, 0}),
           CHECK_PASS);
     check_end();
 }
@@ -365,11 +372,11 @@ check_static_begin(realtime_ordered_map_test_empty_range)
     CCC_Range const forward_range = equal_range(&s, &(int){-50}, &(int){-25});
     check(((struct Val *)range_begin(&forward_range))->key, vals[0].key);
     check(((struct Val *)range_end(&forward_range))->key, vals[0].key);
-    CCC_Reverse_range const rev_range
-        = equal_rrange(&s, &(int){150}, &(int){999});
-    check(((struct Val *)rrange_rbegin(&rev_range))->key,
+    CCC_Range_reverse const rev_range
+        = equal_range_reverse(&s, &(int){150}, &(int){999});
+    check(((struct Val *)range_reverse_begin(&rev_range))->key,
           vals[num_nodes - 1].key);
-    check(((struct Val *)rrange_rend(&rev_range))->key,
+    check(((struct Val *)range_reverse_end(&rev_range))->key,
           vals[num_nodes - 1].key);
     check_end();
 }

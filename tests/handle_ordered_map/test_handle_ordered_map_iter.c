@@ -68,46 +68,47 @@ check_static_begin(check_range,
     });
 }
 
-check_static_begin(check_rrange,
+check_static_begin(check_range_reverse,
                    Handle_ordered_map const *const handle_ordered_map,
-                   Reverse_range const *const r, size_t const n,
-                   int const expect_rrange[])
+                   Range_reverse const *const r, size_t const n,
+                   int const expect_range_reverse[])
 {
-    struct Val *iter = rrange_rbegin(r);
+    struct Val *iter = range_reverse_begin(r);
     size_t index = 0;
-    for (; iter != rrange_rend(r); iter = rnext(handle_ordered_map, iter))
+    for (; iter != range_reverse_end(r);
+         iter = reverse_next(handle_ordered_map, iter))
     {
         int const cur_id = iter->id;
-        check(expect_rrange[index], cur_id);
+        check(expect_range_reverse[index], cur_id);
         ++index;
     }
-    check(iter, rrange_rend(r));
-    if (iter != rend(handle_ordered_map))
+    check(iter, range_reverse_end(r));
+    if (iter != reverse_end(handle_ordered_map))
     {
-        check(((struct Val *)iter)->id, expect_rrange[n - 1]);
+        check(((struct Val *)iter)->id, expect_range_reverse[n - 1]);
     }
     check_fail_end({
         (void)fprintf(stderr, "%sCHECK: (int[%zu]){", CHECK_GREEN, n);
         size_t j = 0;
         for (; j < n; ++j)
         {
-            (void)fprintf(stderr, "%d, ", expect_rrange[j]);
+            (void)fprintf(stderr, "%d, ", expect_range_reverse[j]);
         }
         (void)fprintf(stderr, "}\n%s", CHECK_NONE);
         (void)fprintf(stderr, "%sCHECK_ERROR:%s (int[%zu]){", CHECK_RED,
                       CHECK_GREEN, n);
-        iter = rrange_rbegin(r);
-        for (j = 0; j < n && iter != rrange_rend(r);
-             ++j, iter = rnext(handle_ordered_map, iter))
+        iter = range_reverse_begin(r);
+        for (j = 0; j < n && iter != range_reverse_end(r);
+             ++j, iter = reverse_next(handle_ordered_map, iter))
         {
-            if (iter == rend(handle_ordered_map) || !iter)
+            if (iter == reverse_end(handle_ordered_map) || !iter)
             {
                 return CHECK_STATUS;
             }
-            if (expect_rrange[j] == iter->id)
+            if (expect_range_reverse[j] == iter->id)
             {
-                (void)fprintf(stderr, "%s%d, %s", CHECK_GREEN, expect_rrange[j],
-                              CHECK_NONE);
+                (void)fprintf(stderr, "%s%d, %s", CHECK_GREEN,
+                              expect_range_reverse[j], CHECK_NONE);
             }
             else
             {
@@ -115,7 +116,8 @@ check_static_begin(check_rrange,
                               CHECK_NONE);
             }
         }
-        for (; iter != rrange_rend(r); iter = rnext(handle_ordered_map, iter))
+        for (; iter != range_reverse_end(r);
+             iter = reverse_next(handle_ordered_map, iter))
         {
             (void)fprintf(stderr, "%s%d, %s", CHECK_RED, iter->id, CHECK_NONE);
         }
@@ -134,7 +136,7 @@ check_static_begin(iterator_check, Handle_ordered_map *s)
     }
     check(iter_count, size);
     iter_count = 0;
-    for (struct Val *e = rbegin(s); e != end(s); e = rnext(s, e))
+    for (struct Val *e = reverse_begin(s); e != end(s); e = reverse_next(s, e))
     {
         ++iter_count;
         check(iter_count <= size, true);
@@ -266,8 +268,9 @@ check_static_begin(handle_ordered_map_test_valid_range)
     /* This should be the following range [119,84). 119 should be
        dropped to first value not greater than 119 and last should
        be dropped to first value less than 84. */
-    check(check_rrange(&s, equal_rrange_r(&s, &(int){119}, &(int){84}), 8,
-                       (int[8]){115, 110, 105, 100, 95, 90, 85, 80}),
+    check(check_range_reverse(
+              &s, equal_range_reverse_r(&s, &(int){119}, &(int){84}), 8,
+              (int[8]){115, 110, 105, 100, 95, 90, 85, 80}),
           CHECK_PASS);
     check_end();
 }
@@ -292,8 +295,9 @@ check_static_begin(handle_ordered_map_test_valid_range_equals)
     /* This should be the following range [115,84). 115 should be
        is a valid start to the range and 85 is eqal to end key so must
        be dropped to first value less than 85, 80. */
-    check(check_rrange(&s, equal_rrange_r(&s, &(int){115}, &(int){85}), 8,
-                       (int[8]){115, 110, 105, 100, 95, 90, 85, 80}),
+    check(check_range_reverse(
+              &s, equal_range_reverse_r(&s, &(int){115}, &(int){85}), 8,
+              (int[8]){115, 110, 105, 100, 95, 90, 85, 80}),
           CHECK_PASS);
     check_end();
 }
@@ -319,8 +323,9 @@ check_static_begin(handle_ordered_map_test_invalid_range)
     /* This should be the following range [36,-999). 36 should be
        dropped to first value not greater than 36 and last should
        be dropped to first value less than -999 which is end. */
-    check(check_rrange(&s, equal_rrange_r(&s, &(int){36}, &(int){-999}), 8,
-                       (int[8]){35, 30, 25, 20, 15, 10, 5, 0}),
+    check(check_range_reverse(
+              &s, equal_range_reverse_r(&s, &(int){36}, &(int){-999}), 8,
+              (int[8]){35, 30, 25, 20, 15, 10, 5, 0}),
           CHECK_PASS);
     check_end();
 }
@@ -345,12 +350,12 @@ check_static_begin(handle_ordered_map_test_empty_range)
     check(((struct Val *)range_begin(&forward_range))->id, 0);
     check(((struct Val *)range_end(&forward_range))->id, 0);
     check(range_begin(&forward_range), range_end(&forward_range));
-    CCC_Reverse_range const rev_range
-        = equal_rrange(&s, &(int){150}, &(int){999});
-    check(rrange_rbegin(&rev_range), rrange_rend(&rev_range));
-    check(((struct Val *)rrange_rbegin(&rev_range))->id,
+    CCC_Range_reverse const rev_range
+        = equal_range_reverse(&s, &(int){150}, &(int){999});
+    check(range_reverse_begin(&rev_range), range_reverse_end(&rev_range));
+    check(((struct Val *)range_reverse_begin(&rev_range))->id,
           (num_nodes * step) - step);
-    check(((struct Val *)rrange_rend(&rev_range))->id,
+    check(((struct Val *)range_reverse_end(&rev_range))->id,
           (num_nodes * step) - step);
     check_end();
 }

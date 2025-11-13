@@ -188,7 +188,7 @@ CCC_flat_priority_queue_erase(
 void *
 CCC_flat_priority_queue_update(
     CCC_Flat_priority_queue *const flat_priority_queue, void *const elem,
-    void *const tmp, CCC_Type_updater *const fn, void *const context)
+    void *const tmp, CCC_Type_modifier *const fn, void *const context)
 {
     if (!flat_priority_queue || !elem || !tmp || !fn
         || !flat_priority_queue->buf.count)
@@ -207,7 +207,7 @@ CCC_flat_priority_queue_update(
 void *
 CCC_flat_priority_queue_increase(
     CCC_Flat_priority_queue *const flat_priority_queue, void *const elem,
-    void *const tmp, CCC_Type_updater *const fn, void *const context)
+    void *const tmp, CCC_Type_modifier *const fn, void *const context)
 {
     return CCC_flat_priority_queue_update(flat_priority_queue, elem, tmp, fn,
                                           context);
@@ -217,7 +217,7 @@ CCC_flat_priority_queue_increase(
 void *
 CCC_flat_priority_queue_decrease(
     CCC_Flat_priority_queue *const flat_priority_queue, void *const elem,
-    void *const tmp, CCC_Type_updater *const fn, void *const context)
+    void *const tmp, CCC_Type_modifier *const fn, void *const context)
 {
     return CCC_flat_priority_queue_update(flat_priority_queue, elem, tmp, fn,
                                           context);

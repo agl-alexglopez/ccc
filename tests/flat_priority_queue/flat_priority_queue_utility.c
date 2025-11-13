@@ -75,8 +75,9 @@ check_begin(inorder_fill, int vals[const], size_t const size,
     check(CCC_buffer_is_empty(&b), CCC_FALSE);
     vals[0] = *CCC_buffer_back_as(&b, int);
     size_t i = 1;
-    for (struct Val const *prev = rbegin(&b), *v = rnext(&b, prev);
-         v != rend(&b); prev = v, v = rnext(&b, v))
+    for (struct Val const *prev = reverse_begin(&b),
+                          *v = reverse_next(&b, prev);
+         v != reverse_end(&b); prev = v, v = reverse_next(&b, v))
     {
         check(prev->val <= v->val, CCC_TRUE);
         vals[i++] = v->val;

@@ -290,8 +290,8 @@ check_static_begin(doubly_linked_list_test_sort_insert)
                                                 &to_insert[0].e);
     check(inserted != NULL, true);
     check(validate(&doubly_linked_list), true);
-    check(doubly_linked_list_rnext(&doubly_linked_list, &inserted->e),
-          doubly_linked_list_rend(&doubly_linked_list));
+    check(doubly_linked_list_reverse_next(&doubly_linked_list, &inserted->e),
+          doubly_linked_list_reverse_end(&doubly_linked_list));
     check(doubly_linked_list_next(&doubly_linked_list, &inserted->e), &vals[8]);
 
     /* After -99. */
@@ -299,7 +299,7 @@ check_static_begin(doubly_linked_list_test_sort_insert)
                                                 &to_insert[1].e);
     check(inserted != NULL, true);
     check(validate(&doubly_linked_list), true);
-    check(doubly_linked_list_rnext(&doubly_linked_list, &inserted->e),
+    check(doubly_linked_list_reverse_next(&doubly_linked_list, &inserted->e),
           &vals[8]);
     check(doubly_linked_list_next(&doubly_linked_list, &inserted->e), &vals[5]);
 
@@ -308,7 +308,7 @@ check_static_begin(doubly_linked_list_test_sort_insert)
                                                 &to_insert[2].e);
     check(inserted != NULL, true);
     check(validate(&doubly_linked_list), true);
-    check(doubly_linked_list_rnext(&doubly_linked_list, &inserted->e),
+    check(doubly_linked_list_reverse_next(&doubly_linked_list, &inserted->e),
           &vals[7]);
     check(doubly_linked_list_next(&doubly_linked_list, &inserted->e), &vals[1]);
 
@@ -317,7 +317,7 @@ check_static_begin(doubly_linked_list_test_sort_insert)
                                                 &to_insert[3].e);
     check(inserted != NULL, true);
     check(validate(&doubly_linked_list), true);
-    check(doubly_linked_list_rnext(&doubly_linked_list, &inserted->e),
+    check(doubly_linked_list_reverse_next(&doubly_linked_list, &inserted->e),
           &vals[0]);
     check(doubly_linked_list_next(&doubly_linked_list, &inserted->e), &vals[4]);
 
@@ -326,7 +326,7 @@ check_static_begin(doubly_linked_list_test_sort_insert)
                                                 &to_insert[4].e);
     check(inserted != NULL, true);
     check(validate(&doubly_linked_list), true);
-    check(doubly_linked_list_rnext(&doubly_linked_list, &inserted->e),
+    check(doubly_linked_list_reverse_next(&doubly_linked_list, &inserted->e),
           &vals[4]);
     check(doubly_linked_list_next(&doubly_linked_list, &inserted->e),
           doubly_linked_list_end(&doubly_linked_list));

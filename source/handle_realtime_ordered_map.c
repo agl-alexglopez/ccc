@@ -220,7 +220,7 @@ find(struct CCC_Handle_realtime_ordered_map const *handle_realtime_ordered_map,
 static inline struct CCC_Handle_realtime_ordered_map_handle handle(
     struct CCC_Handle_realtime_ordered_map const *handle_realtime_ordered_map,
     void const *key);
-/* Returning a generic range that can be use for range or rrange. */
+/* Returning a generic range that can be use for range or range_reverse. */
 static struct CCC_Range
 equal_range(struct CCC_Handle_realtime_ordered_map const *, void const *,
             void const *, enum Branch);
@@ -342,7 +342,7 @@ CCC_handle_realtime_ordered_map_swap_handle(
 {
     if (!handle_realtime_ordered_map || !key_val_type_output)
     {
-        return (CCC_Handle){{.stats = CCC_ENTRY_ARGUMENT_ERROR}};
+        return (CCC_Handle){{.status = CCC_ENTRY_ARGUMENT_ERROR}};
     }
     struct Query const q
         = find(handle_realtime_ordered_map,
@@ -354,8 +354,8 @@ CCC_handle_realtime_ordered_map_swap_handle(
         swap(tmp, key_val_type_output, slot,
              handle_realtime_ordered_map->sizeof_type);
         return (CCC_Handle){{
-            .i = q.found,
-            .stats = CCC_ENTRY_OCCUPIED,
+            .index = q.found,
+            .status = CCC_ENTRY_OCCUPIED,
         }};
     }
     size_t const i
@@ -364,13 +364,13 @@ CCC_handle_realtime_ordered_map_swap_handle(
     if (!i)
     {
         return (CCC_Handle){{
-            .i = 0,
-            .stats = CCC_ENTRY_INSERT_ERROR,
+            .index = 0,
+            .status = CCC_ENTRY_INSERT_ERROR,
         }};
     }
     return (CCC_Handle){{
-        .i = i,
-        .stats = CCC_ENTRY_VACANT,
+        .index = i,
+        .status = CCC_ENTRY_VACANT,
     }};
 }
 
@@ -381,7 +381,7 @@ CCC_handle_realtime_ordered_map_try_insert(
 {
     if (!handle_realtime_ordered_map || !key_val_type)
     {
-        return (CCC_Handle){{.stats = CCC_ENTRY_ARGUMENT_ERROR}};
+        return (CCC_Handle){{.status = CCC_ENTRY_ARGUMENT_ERROR}};
     }
     struct Query const q
         = find(handle_realtime_ordered_map,
@@ -389,8 +389,8 @@ CCC_handle_realtime_ordered_map_try_insert(
     if (CCC_ORDER_EQUAL == q.last_order)
     {
         return (CCC_Handle){{
-            .i = q.found,
-            .stats = CCC_ENTRY_OCCUPIED,
+            .index = q.found,
+            .status = CCC_ENTRY_OCCUPIED,
         }};
     }
     size_t const i = maybe_allocate_insert(
@@ -398,13 +398,13 @@ CCC_handle_realtime_ordered_map_try_insert(
     if (!i)
     {
         return (CCC_Handle){{
-            .i = 0,
-            .stats = CCC_ENTRY_INSERT_ERROR,
+            .index = 0,
+            .status = CCC_ENTRY_INSERT_ERROR,
         }};
     }
     return (CCC_Handle){{
-        .i = i,
-        .stats = CCC_ENTRY_VACANT,
+        .index = i,
+        .status = CCC_ENTRY_VACANT,
     }};
 }
 
@@ -415,7 +415,7 @@ CCC_handle_realtime_ordered_map_insert_or_assign(
 {
     if (!handle_realtime_ordered_map || !key_val_type)
     {
-        return (CCC_Handle){{.stats = CCC_ENTRY_ARGUMENT_ERROR}};
+        return (CCC_Handle){{.status = CCC_ENTRY_ARGUMENT_ERROR}};
     }
     struct Query const q
         = find(handle_realtime_ordered_map,
@@ -426,8 +426,8 @@ CCC_handle_realtime_ordered_map_insert_or_assign(
         (void)memcpy(found, key_val_type,
                      handle_realtime_ordered_map->sizeof_type);
         return (CCC_Handle){{
-            .i = q.found,
-            .stats = CCC_ENTRY_OCCUPIED,
+            .index = q.found,
+            .status = CCC_ENTRY_OCCUPIED,
         }};
     }
     size_t const i = maybe_allocate_insert(
@@ -435,25 +435,26 @@ CCC_handle_realtime_ordered_map_insert_or_assign(
     if (!i)
     {
         return (CCC_Handle){{
-            .i = 0,
-            .stats = CCC_ENTRY_INSERT_ERROR,
+            .index = 0,
+            .status = CCC_ENTRY_INSERT_ERROR,
         }};
     }
     return (CCC_Handle){{
-        .i = i,
-        .stats = CCC_ENTRY_VACANT,
+        .index = i,
+        .status = CCC_ENTRY_VACANT,
     }};
 }
 
 CCC_Handle_realtime_ordered_map_handle *
 CCC_handle_realtime_ordered_map_and_modify(
-    CCC_Handle_realtime_ordered_map_handle *const h, CCC_Type_updater *const fn)
+    CCC_Handle_realtime_ordered_map_handle *const h,
+    CCC_Type_modifier *const fn)
 {
-    if (h && fn && h->private.stats & CCC_ENTRY_OCCUPIED && h->private.i > 0)
+    if (h && fn && h->private.status & CCC_ENTRY_OCCUPIED
+        && h->private.index > 0)
     {
         fn((CCC_Type_context){
-            .type
-            = data_at(h->private.handle_realtime_ordered_map, h->private.i),
+            .type = data_at(h->private.map, h->private.index),
             NULL,
         });
     }
@@ -462,15 +463,14 @@ CCC_handle_realtime_ordered_map_and_modify(
 
 CCC_Handle_realtime_ordered_map_handle *
 CCC_handle_realtime_ordered_map_and_modify_context(
-    CCC_Handle_realtime_ordered_map_handle *const h, CCC_Type_updater *const fn,
-    void *const context)
+    CCC_Handle_realtime_ordered_map_handle *const h,
+    CCC_Type_modifier *const fn, void *const context)
 {
-    if (h && fn && h->private.stats & CCC_ENTRY_OCCUPIED
-        && h->private.stats > 0)
+    if (h && fn && h->private.status & CCC_ENTRY_OCCUPIED
+        && h->private.status > 0)
     {
         fn((CCC_Type_context){
-            .type
-            = data_at(h->private.handle_realtime_ordered_map, h->private.i),
+            .type = data_at(h->private.map, h->private.index),
             context,
         });
     }
@@ -486,13 +486,12 @@ CCC_handle_realtime_ordered_map_or_insert(
     {
         return 0;
     }
-    if (h->private.stats == CCC_ENTRY_OCCUPIED)
+    if (h->private.status == CCC_ENTRY_OCCUPIED)
     {
-        return h->private.i;
+        return h->private.index;
     }
-    return maybe_allocate_insert(h->private.handle_realtime_ordered_map,
-                                 h->private.i, h->private.last_order,
-                                 key_val_type);
+    return maybe_allocate_insert(h->private.map, h->private.index,
+                                 h->private.last_order, key_val_type);
 }
 
 CCC_Handle_index
@@ -504,20 +503,17 @@ CCC_handle_realtime_ordered_map_insert_handle(
     {
         return 0;
     }
-    if (h->private.stats == CCC_ENTRY_OCCUPIED)
+    if (h->private.status == CCC_ENTRY_OCCUPIED)
     {
-        void *const slot
-            = data_at(h->private.handle_realtime_ordered_map, h->private.i);
+        void *const slot = data_at(h->private.map, h->private.index);
         if (slot != key_val_type)
         {
-            (void)memcpy(slot, key_val_type,
-                         h->private.handle_realtime_ordered_map->sizeof_type);
+            (void)memcpy(slot, key_val_type, h->private.map->sizeof_type);
         }
-        return h->private.i;
+        return h->private.index;
     }
-    return maybe_allocate_insert(h->private.handle_realtime_ordered_map,
-                                 h->private.i, h->private.last_order,
-                                 key_val_type);
+    return maybe_allocate_insert(h->private.map, h->private.index,
+                                 h->private.last_order, key_val_type);
 }
 
 CCC_Handle_realtime_ordered_map_handle
@@ -528,7 +524,7 @@ CCC_handle_realtime_ordered_map_handle(
     if (!handle_realtime_ordered_map || !key)
     {
         return (CCC_Handle_realtime_ordered_map_handle){
-            {.stats = CCC_ENTRY_ARGUMENT_ERROR}};
+            {.status = CCC_ENTRY_ARGUMENT_ERROR}};
     }
     return (CCC_Handle_realtime_ordered_map_handle){
         handle(handle_realtime_ordered_map, key)};
@@ -540,20 +536,19 @@ CCC_handle_realtime_ordered_map_remove_handle(
 {
     if (!h)
     {
-        return (CCC_Handle){{.stats = CCC_ENTRY_ARGUMENT_ERROR}};
+        return (CCC_Handle){{.status = CCC_ENTRY_ARGUMENT_ERROR}};
     }
-    if (h->private.stats == CCC_ENTRY_OCCUPIED)
+    if (h->private.status == CCC_ENTRY_OCCUPIED)
     {
-        size_t const ret = remove_fixup(h->private.handle_realtime_ordered_map,
-                                        h->private.i);
+        size_t const ret = remove_fixup(h->private.map, h->private.index);
         return (CCC_Handle){{
-            .i = ret,
-            .stats = CCC_ENTRY_OCCUPIED,
+            .index = ret,
+            .status = CCC_ENTRY_OCCUPIED,
         }};
     }
     return (CCC_Handle){{
-        .i = 0,
-        .stats = CCC_ENTRY_VACANT,
+        .index = 0,
+        .status = CCC_ENTRY_VACANT,
     }};
 }
 
@@ -564,7 +559,7 @@ CCC_handle_realtime_ordered_map_remove(
 {
     if (!handle_realtime_ordered_map || !key_val_type_output)
     {
-        return (CCC_Handle){{.stats = CCC_ENTRY_ARGUMENT_ERROR}};
+        return (CCC_Handle){{.status = CCC_ENTRY_ARGUMENT_ERROR}};
     }
     struct Query const q
         = find(handle_realtime_ordered_map,
@@ -572,8 +567,8 @@ CCC_handle_realtime_ordered_map_remove(
     if (q.last_order != CCC_ORDER_EQUAL)
     {
         return (CCC_Handle){{
-            .i = 0,
-            .stats = CCC_ENTRY_VACANT,
+            .index = 0,
+            .status = CCC_ENTRY_VACANT,
         }};
     }
     size_t const removed = remove_fixup(handle_realtime_ordered_map, q.found);
@@ -585,8 +580,8 @@ CCC_handle_realtime_ordered_map_remove(
                      handle_realtime_ordered_map->sizeof_type);
     }
     return (CCC_Handle){{
-        .i = 0,
-        .stats = CCC_ENTRY_OCCUPIED,
+        .index = 0,
+        .status = CCC_ENTRY_OCCUPIED,
     }};
 }
 
@@ -603,26 +598,27 @@ CCC_handle_realtime_ordered_map_equal_range(
         equal_range(handle_realtime_ordered_map, begin_key, end_key, INORDER)};
 }
 
-CCC_Reverse_range
-CCC_handle_realtime_ordered_map_equal_rrange(
+CCC_Range_reverse
+CCC_handle_realtime_ordered_map_equal_range_reverse(
     CCC_Handle_realtime_ordered_map const *const handle_realtime_ordered_map,
-    void const *const rbegin_key, void const *const rend_key)
+    void const *const reverse_begin_key, void const *const reverse_end_key)
 {
-    if (!handle_realtime_ordered_map || !rbegin_key || !rend_key)
+    if (!handle_realtime_ordered_map || !reverse_begin_key || !reverse_end_key)
     {
-        return (CCC_Reverse_range){};
+        return (CCC_Range_reverse){};
     }
-    return (CCC_Reverse_range){equal_range(handle_realtime_ordered_map,
-                                           rbegin_key, rend_key, RINORDER)};
+    return (CCC_Range_reverse){equal_range(handle_realtime_ordered_map,
+                                           reverse_begin_key, reverse_end_key,
+                                           RINORDER)};
 }
 
 CCC_Handle_index
 CCC_handle_realtime_ordered_map_unwrap(
     CCC_Handle_realtime_ordered_map_handle const *const h)
 {
-    if (h && h->private.stats & CCC_ENTRY_OCCUPIED && h->private.i > 0)
+    if (h && h->private.status & CCC_ENTRY_OCCUPIED && h->private.index > 0)
     {
-        return h->private.i;
+        return h->private.index;
     }
     return 0;
 }
@@ -635,7 +631,7 @@ CCC_handle_realtime_ordered_map_insert_error(
     {
         return CCC_TRIBOOL_ERROR;
     }
-    return (h->private.stats & CCC_ENTRY_INSERT_ERROR) != 0;
+    return (h->private.status & CCC_ENTRY_INSERT_ERROR) != 0;
 }
 
 CCC_Tribool
@@ -646,14 +642,14 @@ CCC_handle_realtime_ordered_map_occupied(
     {
         return CCC_TRIBOOL_ERROR;
     }
-    return (h->private.stats & CCC_ENTRY_OCCUPIED) != 0;
+    return (h->private.status & CCC_ENTRY_OCCUPIED) != 0;
 }
 
 CCC_Handle_status
 CCC_handle_realtime_ordered_map_handle_status(
     CCC_Handle_realtime_ordered_map_handle const *const h)
 {
-    return h ? h->private.stats : CCC_ENTRY_ARGUMENT_ERROR;
+    return h ? h->private.status : CCC_ENTRY_ARGUMENT_ERROR;
 }
 
 CCC_Tribool
@@ -709,7 +705,7 @@ CCC_handle_realtime_ordered_map_begin(
 }
 
 void *
-CCC_handle_realtime_ordered_map_rbegin(
+CCC_handle_realtime_ordered_map_reverse_begin(
     CCC_Handle_realtime_ordered_map const *const handle_realtime_ordered_map)
 {
     if (!handle_realtime_ordered_map || !handle_realtime_ordered_map->capacity)
@@ -738,7 +734,7 @@ CCC_handle_realtime_ordered_map_next(
 }
 
 void *
-CCC_handle_realtime_ordered_map_rnext(
+CCC_handle_realtime_ordered_map_reverse_next(
     CCC_Handle_realtime_ordered_map const *const handle_realtime_ordered_map,
     void const *const key_val_type_iter)
 {
@@ -765,7 +761,7 @@ CCC_handle_realtime_ordered_map_end(
 }
 
 void *
-CCC_handle_realtime_ordered_map_rend(
+CCC_handle_realtime_ordered_map_reverse_end(
     CCC_Handle_realtime_ordered_map const *const handle_realtime_ordered_map)
 {
     if (!handle_realtime_ordered_map || !handle_realtime_ordered_map->capacity)
@@ -1160,20 +1156,19 @@ handle(struct CCC_Handle_realtime_ordered_map const *const
     if (CCC_ORDER_EQUAL == q.last_order)
     {
         return (struct CCC_Handle_realtime_ordered_map_handle){
-            .handle_realtime_ordered_map
-            = (struct CCC_Handle_realtime_ordered_map *)
+            .map = (struct CCC_Handle_realtime_ordered_map *)
                 handle_realtime_ordered_map,
             .last_order = q.last_order,
-            .i = q.found,
-            .stats = CCC_ENTRY_OCCUPIED,
+            .index = q.found,
+            .status = CCC_ENTRY_OCCUPIED,
         };
     }
     return (struct CCC_Handle_realtime_ordered_map_handle){
-        .handle_realtime_ordered_map
+        .map
         = (struct CCC_Handle_realtime_ordered_map *)handle_realtime_ordered_map,
         .last_order = q.last_order,
-        .i = q.parent,
-        .stats = CCC_ENTRY_NO_UNWRAP | CCC_ENTRY_VACANT,
+        .index = q.parent,
+        .status = CCC_ENTRY_NO_UNWRAP | CCC_ENTRY_VACANT,
     };
 }
 
@@ -1188,7 +1183,7 @@ find(struct CCC_Handle_realtime_ordered_map const *const
     while (q.found)
     {
         q.last_order = order_nodes(handle_realtime_ordered_map, key, q.found,
-                                   handle_realtime_ordered_map->order);
+                                   handle_realtime_ordered_map->compare);
         if (CCC_ORDER_EQUAL == q.last_order)
         {
             return q;
@@ -2010,13 +2005,13 @@ are_subtrees_valid(struct CCC_Handle_realtime_ordered_map const *t,
         return CCC_TRUE;
     }
     if (r.low
-        && order_nodes(t, key_at(t, r.low), r.root, t->order)
+        && order_nodes(t, key_at(t, r.low), r.root, t->compare)
                != CCC_ORDER_LESSER)
     {
         return CCC_FALSE;
     }
     if (r.high
-        && order_nodes(t, key_at(t, r.high), r.root, t->order)
+        && order_nodes(t, key_at(t, r.high), r.root, t->compare)
                != CCC_ORDER_GREATER)
     {
         return CCC_FALSE;

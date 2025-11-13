@@ -451,7 +451,8 @@ See container documentation for specific behavior. */
 @return a reference to the user type stored at the reversed start.
 
 See container documentation for specific behavior. */
-#define CCC_rbegin(container_ptr) CCC_private_rbegin(container_ptr)
+#define CCC_reverse_begin(container_ptr)                                       \
+    CCC_private_reverse_begin(container_ptr)
 
 /** @brief Obtain a reference to the next element in the container.
 @param [in] container_ptr a pointer to the container.
@@ -462,14 +463,14 @@ See container documentation for specific behavior. */
 #define CCC_next(container_ptr, void_iterator_ptr)                             \
     CCC_private_next(container_ptr, void_iterator_ptr)
 
-/** @brief Obtain a reference to the rnext element in the container.
+/** @brief Obtain a reference to the reverse_next element in the container.
 @param [in] container_ptr a pointer to the container.
 @param [in] void_iterator_ptr the user type returned from the last iteration.
-@return a reference to the user type stored rnext.
+@return a reference to the user type stored reverse_next.
 
 See container documentation for specific behavior. */
-#define CCC_rnext(container_ptr, void_iterator_ptr)                            \
-    CCC_private_rnext(container_ptr, void_iterator_ptr)
+#define CCC_reverse_next(container_ptr, void_iterator_ptr)                     \
+    CCC_private_reverse_next(container_ptr, void_iterator_ptr)
 
 /** @brief Obtain a reference to the end sentinel of a container.
 @param [in] container_ptr a pointer to the container.
@@ -478,12 +479,12 @@ See container documentation for specific behavior. */
 See container documentation for specific behavior. */
 #define CCC_end(container_ptr) CCC_private_end(container_ptr)
 
-/** @brief Obtain a reference to the rend sentinel of a container.
+/** @brief Obtain a reference to the reverse_end sentinel of a container.
 @param [in] container_ptr a pointer to the container.
-@return a reference to the rend sentinel.
+@return a reference to the reverse_end sentinel.
 
 See container documentation for specific behavior. */
-#define CCC_rend(container_ptr) CCC_private_rend(container_ptr)
+#define CCC_reverse_end(container_ptr) CCC_private_reverse_end(container_ptr)
 
 /** @brief Obtain a range of values from a container.
 @param [in] container_ptr a pointer to the container.
@@ -503,23 +504,23 @@ See container documentation for specific behavior. */
 #define CCC_equal_range_r(container_ptr, range_args...)                        \
     CCC_private_equal_range_r(container_ptr, range_args)
 
-/** @brief Obtain a rrange of values from a container.
+/** @brief Obtain a range_reverse of values from a container.
 @param [in] container_ptr a pointer to the container.
-@param rrange_args are container specific.
-@return the rrange.
+@param range_reverse_args are container specific.
+@return the range_reverse.
 
 See container documentation for specific behavior. */
-#define CCC_equal_rrange(container_ptr, rrange_args...)                        \
-    CCC_private_equal_rrange(container_ptr, rrange_args)
+#define CCC_equal_range_reverse(container_ptr, range_reverse_args...)          \
+    CCC_private_equal_range_reverse(container_ptr, range_reverse_args)
 
-/** @brief Obtain a rrange of values from a container.
+/** @brief Obtain a range_reverse of values from a container.
 @param [in] container_ptr a pointer to the container.
-@param rrange_args are container specific.
-@return a reference to the rrange.
+@param range_reverse_args are container specific.
+@return a reference to the range_reverse.
 
 See container documentation for specific behavior. */
-#define CCC_equal_rrange_r(container_ptr, rrange_args...)                      \
-    CCC_private_equal_rrange_r(container_ptr, rrange_args)
+#define CCC_equal_range_reverse_r(container_ptr, range_reverse_args...)        \
+    CCC_private_equal_range_reverse_r(container_ptr, range_reverse_args)
 
 /**@}*/
 
@@ -663,16 +664,16 @@ See container documentation for specific behavior. */
 #    define contains(args...) CCC_contains(args)
 
 #    define begin(args...) CCC_begin(args)
-#    define rbegin(args...) CCC_rbegin(args)
+#    define reverse_begin(args...) CCC_reverse_begin(args)
 #    define next(args...) CCC_next(args)
-#    define rnext(args...) CCC_rnext(args)
+#    define reverse_next(args...) CCC_reverse_next(args)
 #    define end(args...) CCC_end(args)
-#    define rend(args...) CCC_rend(args)
+#    define reverse_end(args...) CCC_reverse_end(args)
 
 #    define equal_range(args...) CCC_equal_range(args)
-#    define equal_rrange(args...) CCC_equal_rrange(args)
+#    define equal_range_reverse(args...) CCC_equal_range_reverse(args)
 #    define equal_range_r(args...) CCC_equal_range_r(args)
-#    define equal_rrange_r(args...) CCC_equal_rrange_r(args)
+#    define equal_range_reverse_r(args...) CCC_equal_range_reverse_r(args)
 #    define splice(args...) CCC_splice(args)
 #    define splice_range(args...) CCC_splice_range(args)
 

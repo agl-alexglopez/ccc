@@ -17,7 +17,7 @@ limitations under the License. */
 #include "types.h"
 
 /** @private */
-static char const *const result_msgs[CCC_PRIVATE_RESULT_COUNT] = {
+static char const *const result_messages[CCC_PRIVATE_RESULT_COUNT] = {
     [CCC_RESULT_OK] = "",
     [CCC_RESULT_FAIL]
     = "An operation ran on a container but the desired result could not be "
@@ -43,7 +43,7 @@ CCC_entry_occupied(CCC_Entry const *const e)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    return (e->private.stats & CCC_ENTRY_OCCUPIED) != 0;
+    return (e->private.status & CCC_ENTRY_OCCUPIED) != 0;
 }
 
 CCC_Tribool
@@ -53,7 +53,7 @@ CCC_entry_insert_error(CCC_Entry const *const e)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    return (e->private.stats & CCC_ENTRY_INSERT_ERROR) != 0;
+    return (e->private.status & CCC_ENTRY_INSERT_ERROR) != 0;
 }
 
 CCC_Tribool
@@ -63,7 +63,7 @@ CCC_entry_input_error(CCC_Entry const *const e)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    return (e->private.stats & CCC_ENTRY_ARGUMENT_ERROR) != 0;
+    return (e->private.status & CCC_ENTRY_ARGUMENT_ERROR) != 0;
 }
 
 void *
@@ -73,7 +73,7 @@ CCC_entry_unwrap(CCC_Entry const *const e)
     {
         return NULL;
     }
-    return e->private.stats & CCC_ENTRY_NO_UNWRAP ? NULL : e->private.e;
+    return e->private.status & CCC_ENTRY_NO_UNWRAP ? NULL : e->private.type;
 }
 
 CCC_Tribool
@@ -83,7 +83,7 @@ CCC_handle_occupied(CCC_Handle const *const e)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    return (e->private.stats & CCC_ENTRY_OCCUPIED) != 0;
+    return (e->private.status & CCC_ENTRY_OCCUPIED) != 0;
 }
 
 CCC_Tribool
@@ -93,7 +93,7 @@ CCC_handle_insert_error(CCC_Handle const *const e)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    return (e->private.stats & CCC_ENTRY_INSERT_ERROR) != 0;
+    return (e->private.status & CCC_ENTRY_INSERT_ERROR) != 0;
 }
 
 CCC_Tribool
@@ -103,7 +103,7 @@ CCC_handle_input_error(CCC_Handle const *const e)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    return (e->private.stats & CCC_ENTRY_ARGUMENT_ERROR) != 0;
+    return (e->private.status & CCC_ENTRY_ARGUMENT_ERROR) != 0;
 }
 
 CCC_Handle_index
@@ -113,7 +113,7 @@ CCC_handle_unwrap(CCC_Handle const *const e)
     {
         return 0;
     }
-    return e->private.stats & CCC_ENTRY_NO_UNWRAP ? 0 : e->private.i;
+    return e->private.status & CCC_ENTRY_NO_UNWRAP ? 0 : e->private.index;
 }
 
 void *
@@ -129,25 +129,25 @@ CCC_range_end(CCC_Range const *const r)
 }
 
 void *
-CCC_rrange_rbegin(CCC_Reverse_range const *const r)
+CCC_range_reverse_begin(CCC_Range_reverse const *const r)
 {
-    return r ? r->private.rbegin : NULL;
+    return r ? r->private.reverse_begin : NULL;
 }
 
 void *
-CCC_rrange_rend(CCC_Reverse_range const *const r)
+CCC_range_reverse_end(CCC_Range_reverse const *const r)
 {
-    return r ? r->private.rend : NULL;
+    return r ? r->private.reverse_end : NULL;
 }
 
 char const *
-CCC_result_msg(CCC_Result const res)
+CCC_result_message(CCC_Result const res)
 {
     if (res >= CCC_PRIVATE_RESULT_COUNT)
     {
         return "error: invalid result provided no message exists";
     }
-    return result_msgs[res];
+    return result_messages[res];
 }
 
 CCC_Entry_status
@@ -157,7 +157,7 @@ CCC_get_entry_status(CCC_Entry const *e)
     {
         return CCC_ENTRY_ARGUMENT_ERROR;
     }
-    return e->private.stats;
+    return e->private.status;
 }
 
 CCC_Handle_status
@@ -167,17 +167,17 @@ CCC_get_handle_status(CCC_Handle const *e)
     {
         return CCC_ENTRY_ARGUMENT_ERROR;
     }
-    return e->private.stats;
+    return e->private.status;
 }
 
 char const *
-CCC_handle_status_msg(CCC_Handle_status const status)
+CCC_handle_status_message(CCC_Handle_status const status)
 {
-    return CCC_entry_status_msg(status);
+    return CCC_entry_status_message(status);
 }
 
 char const *
-CCC_entry_status_msg(CCC_Entry_status const status)
+CCC_entry_status_message(CCC_Entry_status const status)
 {
     switch (status)
     {

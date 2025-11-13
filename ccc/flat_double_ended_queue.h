@@ -405,7 +405,7 @@ O(1).
 @param [in] flat_double_ended_queue a pointer to the flat_double_ended_queue.
 @return a pointer to the user type at the back of the flat_double_ended_queue.
 NULL if empty. */
-[[nodiscard]] void *CCC_flat_double_ended_queue_rbegin(
+[[nodiscard]] void *CCC_flat_double_ended_queue_reverse_begin(
     CCC_Flat_double_ended_queue const *flat_double_ended_queue);
 
 /** @brief Return the next element in the flat_double_ended_queue moving front
@@ -422,7 +422,7 @@ front. O(1).
 @param [in] flat_double_ended_queue a pointer to the flat_double_ended_queue.
 @param [in] iter_ptr the current element in the flat_double_ended_queue.
 @return the element preceding iter_ptr or NULL if no elements follow. */
-[[nodiscard]] void *CCC_flat_double_ended_queue_rnext(
+[[nodiscard]] void *CCC_flat_double_ended_queue_reverse_next(
     CCC_Flat_double_ended_queue const *flat_double_ended_queue,
     void const *iter_ptr);
 
@@ -435,7 +435,7 @@ front. O(1).
 /** @brief Return a pointer to the start element. It may not be accessed. O(1).
 @param [in] flat_double_ended_queue a pointer to the flat_double_ended_queue.
 @return a pointer to the start sentinel element that may not be accessed. */
-[[nodiscard]] void *CCC_flat_double_ended_queue_rend(
+[[nodiscard]] void *CCC_flat_double_ended_queue_reverse_end(
     CCC_Flat_double_ended_queue const *flat_double_ended_queue);
 
 /**@}*/
@@ -560,16 +560,16 @@ typedef CCC_Flat_double_ended_queue Flat_double_ended_queue;
         CCC_flat_double_ended_queue_data(args)
 #    define flat_double_ended_queue_begin(args...)                             \
         CCC_flat_double_ended_queue_begin(args)
-#    define flat_double_ended_queue_rbegin(args...)                            \
-        CCC_flat_double_ended_queue_rbegin(args)
+#    define flat_double_ended_queue_reverse_begin(args...)                     \
+        CCC_flat_double_ended_queue_reverse_begin(args)
 #    define flat_double_ended_queue_next(args...)                              \
         CCC_flat_double_ended_queue_next(args)
-#    define flat_double_ended_queue_rnext(args...)                             \
-        CCC_flat_double_ended_queue_rnext(args)
+#    define flat_double_ended_queue_reverse_next(args...)                      \
+        CCC_flat_double_ended_queue_reverse_next(args)
 #    define flat_double_ended_queue_end(args...)                               \
         CCC_flat_double_ended_queue_end(args)
-#    define flat_double_ended_queue_rend(args...)                              \
-        CCC_flat_double_ended_queue_rend(args)
+#    define flat_double_ended_queue_reverse_end(args...)                       \
+        CCC_flat_double_ended_queue_reverse_end(args)
 #    define flat_double_ended_queue_validate(args...)                          \
         CCC_flat_double_ended_queue_validate(args)
 #endif /* FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC */

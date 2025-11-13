@@ -320,10 +320,10 @@ to subsequent calls in the Entry Interface. */
 
 This function is intended to make the function chaining in the Entry Interface
 more succinct if the entry will be modified in place based on its own value
-without the need of the context argument a CCC_Type_updater can provide.
+without the need of the context argument a CCC_Type_modifier can provide.
 */
 [[nodiscard]] CCC_Ordered_map_entry *
-CCC_ordered_map_and_modify(CCC_Ordered_map_entry *e, CCC_Type_updater *fn);
+CCC_ordered_map_and_modify(CCC_Ordered_map_entry *e, CCC_Type_modifier *fn);
 
 /** @brief Modifies the provided entry if it is Occupied.
 @param [in] e the entry obtained from an entry function or macro.
@@ -331,11 +331,11 @@ CCC_ordered_map_and_modify(CCC_Ordered_map_entry *e, CCC_Type_updater *fn);
 @param [in] context context data required for the update.
 @return the updated entry if it was Occupied or the unmodified vacant entry.
 
-This function makes full use of a CCC_Type_updater capability, meaning a
+This function makes full use of a CCC_Type_modifier capability, meaning a
 complete CCC_update object will be passed to the update function callback. */
 [[nodiscard]] CCC_Ordered_map_entry *
 CCC_ordered_map_and_modify_context(CCC_Ordered_map_entry *e,
-                                   CCC_Type_updater *fn, void *context);
+                                   CCC_Type_modifier *fn, void *context);
 
 /** @brief Modify an Occupied entry with a closure over user type T.
 @param [in] ordered_map_entry_ptr a pointer to the obtained entry.
@@ -470,7 +470,7 @@ container completes. If e is NULL an entry input error is returned so ensure
 e is non-NULL to avoid an inaccurate status returned.
 
 Note that this function can be useful for debugging or if more detailed
-messages are needed for logging purposes. See CCC_Entry_status_msg() in
+messages are needed for logging purposes. See CCC_Entry_status_message() in
 ccc/types.h for more information on detailed entry statuses. */
 [[nodiscard]] CCC_Entry_status
 CCC_ordered_map_entry_status(CCC_Ordered_map_entry const *e);
@@ -520,43 +520,47 @@ enclosing scope. This reference is always non-NULL. */
             .private                                                           \
     }
 
-/** @brief Return an iterable rrange of values from [begin_key, end_key).
+/** @brief Return an iterable range_reverse of values from [begin_key, end_key).
 Amortized O(lg N).
 @param [in] om a pointer to the map.
-@param [in] rbegin_key a pointer to the key intended as the start of the rrange.
-@param [in] rend_key a pointer to the key intended as the end of the rrange.
-@return a rrange containing the first element NOT GREATER than the begin_key and
-the first element LESS than rend_key.
+@param [in] reverse_begin_key a pointer to the key intended as the start of the
+range_reverse.
+@param [in] reverse_end_key a pointer to the key intended as the end of the
+range_reverse.
+@return a range_reverse containing the first element NOT GREATER than the
+begin_key and the first element LESS than reverse_end_key.
 
-Note that due to the variety of values that can be returned in the rrange, using
-the provided rrange iteration functions from types.h is recommended for example:
+Note that due to the variety of values that can be returned in the
+range_reverse, using the provided range_reverse iteration functions from types.h
+is recommended for example:
 
 ```
-for (struct Val *i = rrange_begin(&rrange);
-     i != rrange_rend(&rrange);
-     i = rnext(&om, &i->elem))
+for (struct Val *i = range_reverse_begin(&range_reverse);
+     i != range_reverse_end(&range_reverse);
+     i = reverse_next(&om, &i->elem))
 {}
 ```
 
-This avoids any possible errors in handling an rend rrange element that is in
-the map versus the end map sentinel. */
-[[nodiscard]] CCC_Reverse_range
-CCC_ordered_map_equal_rrange(CCC_Ordered_map *om, void const *rbegin_key,
-                             void const *rend_key);
+This avoids any possible errors in handling an reverse_end range_reverse element
+that is in the map versus the end map sentinel. */
+[[nodiscard]] CCC_Range_reverse
+CCC_ordered_map_equal_range_reverse(CCC_Ordered_map *om,
+                                    void const *reverse_begin_key,
+                                    void const *reverse_end_key);
 
-/** @brief Returns a compound literal reference to the desired rrange. Amortized
-O(lg N).
+/** @brief Returns a compound literal reference to the desired range_reverse.
+Amortized O(lg N).
 @param [in] ordered_map_ptr a pointer to the map.
-@param [in] rbegin_and_rend_key_ptrs two pointers, one to the start of the
-rrange and a second to the end of the rrange.
-@return a compound literal reference to the produced rrange associated with the
-enclosing scope. This reference is always non-NULL. */
-#define CCC_ordered_map_equal_rrange_r(ordered_map_ptr,                        \
-                                       rbegin_and_rend_key_ptrs...)            \
-    &(CCC_Reverse_range)                                                       \
+@param [in] reverse_begin_and_reverse_end_key_ptrs two pointers, one to the
+start of the range_reverse and a second to the end of the range_reverse.
+@return a compound literal reference to the produced range_reverse associated
+with the enclosing scope. This reference is always non-NULL. */
+#define CCC_ordered_map_equal_range_reverse_r(                                 \
+    ordered_map_ptr, reverse_begin_and_reverse_end_key_ptrs...)                \
+    &(CCC_Range_reverse)                                                       \
     {                                                                          \
-        CCC_ordered_map_equal_rrange(ordered_map_ptr,                          \
-                                     rbegin_and_rend_key_ptrs)                 \
+        CCC_ordered_map_equal_range_reverse(                                   \
+            ordered_map_ptr, reverse_begin_and_reverse_end_key_ptrs)           \
             .private                                                           \
     }
 
@@ -570,7 +574,7 @@ O(lg N).
 Amortized O(lg N).
 @param [in] om a pointer to the map.
 @return the oldest maximum element of the map. */
-[[nodiscard]] void *CCC_ordered_map_rbegin(CCC_Ordered_map const *om);
+[[nodiscard]] void *CCC_ordered_map_reverse_begin(CCC_Ordered_map const *om);
 
 /** @brief Return the next element in an inorder traversal of the map. O(1).
 @param [in] om a pointer to the map.
@@ -581,25 +585,27 @@ current iterator.
 CCC_ordered_map_next(CCC_Ordered_map const *om,
                      CCC_Ordered_map_node const *iter_handle);
 
-/** @brief Return the rnext element in a reverse inorder traversal of the map.
-O(1).
+/** @brief Return the reverse_next element in a reverse inorder traversal of the
+map. O(1).
 @param [in] om a pointer to the map.
 @param [in] iter_handle a pointer to the intrusive map element of the
 current iterator.
-@return the rnext user type stored in the map in a reverse inorder traversal. */
+@return the reverse_next user type stored in the map in a reverse inorder
+traversal. */
 [[nodiscard]] void *
-CCC_ordered_map_rnext(CCC_Ordered_map const *om,
-                      CCC_Ordered_map_node const *iter_handle);
+CCC_ordered_map_reverse_next(CCC_Ordered_map const *om,
+                             CCC_Ordered_map_node const *iter_handle);
 
 /** @brief Return the end of an inorder traversal of the map. O(1).
 @param [in] om a pointer to the map.
 @return the newest maximum element of the map. */
 [[nodiscard]] void *CCC_ordered_map_end(CCC_Ordered_map const *om);
 
-/** @brief Return the rend of a reverse inorder traversal of the map. O(1).
+/** @brief Return the reverse_end of a reverse inorder traversal of the map.
+O(1).
 @param [in] om a pointer to the map.
 @return the newest minimum element of the map. */
-[[nodiscard]] void *CCC_ordered_map_rend(CCC_Ordered_map const *om);
+[[nodiscard]] void *CCC_ordered_map_reverse_end(CCC_Ordered_map const *om);
 
 /**@}*/
 
@@ -683,10 +689,11 @@ typedef CCC_Ordered_map_entry Ordered_map_entry;
 #    define ordered_map_unwrap_mut(args...) CCC_ordered_map_unwrap_mut(args)
 #    define ordered_map_begin(args...) CCC_ordered_map_begin(args)
 #    define ordered_map_next(args...) CCC_ordered_map_next(args)
-#    define ordered_map_rbegin(args...) CCC_ordered_map_rbegin(args)
-#    define ordered_map_rnext(args...) CCC_ordered_map_rnext(args)
+#    define ordered_map_reverse_begin(args...)                                 \
+        CCC_ordered_map_reverse_begin(args)
+#    define ordered_map_reverse_next(args...) CCC_ordered_map_reverse_next(args)
 #    define ordered_map_end(args...) CCC_ordered_map_end(args)
-#    define ordered_map_rend(args...) CCC_ordered_map_rend(args)
+#    define ordered_map_reverse_end(args...) CCC_ordered_map_reverse_end(args)
 #    define ordered_map_count(args...) CCC_ordered_map_count(args)
 #    define ordered_map_is_empty(args...) CCC_ordered_map_is_empty(args)
 #    define ordered_map_clear(args...) CCC_ordered_map_clear(args)

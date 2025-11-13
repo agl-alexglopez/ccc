@@ -241,7 +241,7 @@ enum : Cell
     DIGIT_MASK = 0xF00,
 };
 
-static SV_String_view const prompt_msg
+static SV_String_view const prompt_message
     = SV("Enter two vertices to find the shortest path between them (i.e. "
          "A-Z). Enter q to quit:");
 static SV_String_view const quit_cmd = SV("q");
@@ -302,7 +302,8 @@ static void encode_digits(struct Graph const *, struct Digit_encoding *);
 static enum Label_orientation get_direction(struct Point const *,
                                             struct Point const *);
 static struct Int_conversion parse_digits(SV_String_view, int lower_bound,
-                                          int upper_bound, char const *err_msg);
+                                          int upper_bound,
+                                          char const *err_message);
 static struct Path_request parse_path_request(struct Graph *, SV_String_view);
 static void help(void);
 
@@ -701,7 +702,7 @@ find_shortest_paths(struct Graph *const graph)
         {
             (void)fprintf(stdout, "Total Cost: %d\n", total_cost);
         }
-        SV_print(stdout, prompt_msg);
+        SV_print(stdout, prompt_message);
         ssize_t read = 0;
         while ((read = getline(&lineptr, &len, stdin)) > 0)
         {
@@ -1190,7 +1191,7 @@ parse_path_request(struct Graph *const g, SV_String_view r)
 
 static struct Int_conversion
 parse_digits(SV_String_view arg, int const lower_bound, int const upper_bound,
-             char const *const err_msg)
+             char const *const err_message)
 {
     size_t const eql = SV_rfind(arg, SV_npos(arg), SV("="));
     if (eql == SV_npos(arg))
@@ -1209,7 +1210,7 @@ parse_digits(SV_String_view arg, int const lower_bound, int const upper_bound,
     {
         printf("flag argument outside of valid range (%d-%d).\n", lower_bound,
                upper_bound);
-        quit(err_msg, 1);
+        quit(err_message, 1);
     }
     return res;
 }
