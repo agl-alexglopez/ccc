@@ -49,7 +49,7 @@ A range_reverse provides a view all elements that fit the equals range_reverse
 criteria of search-by-key containers. Use the provided range iteration functions
 in this header to iterate from beginning to end in reverse order relative to the
 containers default ordering. */
-typedef union CCC_Range_reverse CCC_Range_reverse;
+typedef union CCC_Range_reverse_wrap CCC_Range_reverse;
 
 /** @brief An Occupied or Vacant position in a searchable container.
 

@@ -79,7 +79,7 @@ union CCC_Range_wrap
 };
 
 /** @private */
-union CCC_Range_reverse
+union CCC_Range_reverse_wrap
 {
     struct CCC_Range private;
 };
