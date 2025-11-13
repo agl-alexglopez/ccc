@@ -130,7 +130,7 @@ interface. */
 
 /** @brief Initialize the bit set with memory and allocation permissions.
 @param [in] bitblock_ptr the pointer to existing blocks or NULL.
-@param [in] alloc_fn the allocation function for a dynamic bit set or NULL.
+@param [in] allocate the allocation function for a dynamic bit set or NULL.
 @param [in] context context data needed for allocation of the bit set.
 @param [in] cap the number of bits that will be stored in this bit set.
 @param [in] optional_size an optional starting size <= capacity. This value
@@ -166,13 +166,13 @@ Bitset bs = bitset_initialize(NULL, std_allocate, NULL, 0);
 ```
 
 See types.h for more on allocation functions. */
-#define CCC_bitset_initialize(bitblock_ptr, alloc_fn, context, cap,            \
+#define CCC_bitset_initialize(bitblock_ptr, allocate, context, cap,            \
                               optional_size...)                                \
-    CCC_private_bitset_initialize(bitblock_ptr, alloc_fn, context, cap,        \
+    CCC_private_bitset_initialize(bitblock_ptr, allocate, context, cap,        \
                                   optional_size)
 
 /** @brief Initialize the bit set with a custom input string.
-@param [in] alloc_fn the allocation function for the dynamic bit set.
+@param [in] allocate the allocation function for the dynamic bit set.
 @param [in] context context data needed for allocation of the bit set.
 @param [in] start_string_index the index of the input string to start reading
 is CCC_Tribool input.
@@ -208,13 +208,13 @@ Bitset bs = bitset_from(std_allocate, NULL, 0, 4, 'A', "GCAT", 4096);
 
 This initializer is only available to dynamic bit sets due to the inability to
 run such input code at compile time. */
-#define CCC_bitset_from(alloc_fn, context, start_string_index, count,          \
+#define CCC_bitset_from(allocate, context, start_string_index, count,          \
                         bit_on_char, input_string, optional_capacity...)       \
-    CCC_private_bitset_from(alloc_fn, context, start_string_index, count,      \
+    CCC_private_bitset_from(allocate, context, start_string_index, count,      \
                             bit_on_char, input_string, optional_capacity)
 
 /** @brief Initialize the bit set with a starting capacity and size at runtime.
-@param [in] alloc_fn the allocation function for a dynamic bit.
+@param [in] allocate the allocation function for a dynamic bit.
 @param [in] context context data needed for allocation of the bit set.
 @param [in] capacity the number of bits that will be stored in this bit set.
 @param [in] optional_size an optional starting size <= capacity. This value
@@ -246,9 +246,9 @@ main(void)
 
 This initialization can only be used at runtime. See the normal initializer for
 static and stack based initialization options. */
-#define CCC_bitset_with_capacity(alloc_fn, context, capacity,                  \
+#define CCC_bitset_with_capacity(allocate, context, capacity,                  \
                                  optional_size...)                             \
-    CCC_private_bitset_with_capacity(alloc_fn, context, capacity, optional_size)
+    CCC_private_bitset_with_capacity(allocate, context, capacity, optional_size)
 
 /** @brief Copy the bit set at source to destination.
 @param [in] dst the initialized destination for the copy of the src set.

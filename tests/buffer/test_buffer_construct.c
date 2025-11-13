@@ -5,7 +5,7 @@
 #include "ccc/buffer.h"
 #include "ccc/types.h"
 #include "checkers.h"
-#include "util/alloc.h"
+#include "util/allocate.h"
 
 CHECK_BEGIN_STATIC_FN(buffer_test_empty)
 {
@@ -39,7 +39,7 @@ CHECK_BEGIN_STATIC_FN(buffer_test_reserve)
     CHECK_END_FN(buffer_clear_and_free(&b, NULL););
 }
 
-CHECK_BEGIN_STATIC_FN(buffer_test_copy_no_alloc)
+CHECK_BEGIN_STATIC_FN(buffer_test_copy_no_allocate)
 {
     Buffer src
         = buffer_initialize(((int[5]){0, 1, 2, 3, 4}), int, NULL, NULL, 5, 5);
@@ -53,7 +53,7 @@ CHECK_BEGIN_STATIC_FN(buffer_test_copy_no_alloc)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(buffer_test_copy_no_alloc_fail)
+CHECK_BEGIN_STATIC_FN(buffer_test_copy_no_allocate_fail)
 {
     Buffer src = buffer_initialize(((int[3]){0, 1, 2}), int, NULL, NULL, 3, 3);
     Buffer bad_dst = buffer_initialize(((int[2]){}), int, NULL, NULL, 2);
@@ -64,7 +64,7 @@ CHECK_BEGIN_STATIC_FN(buffer_test_copy_no_alloc_fail)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(buffer_test_copy_alloc)
+CHECK_BEGIN_STATIC_FN(buffer_test_copy_allocate)
 {
     Buffer src = buffer_initialize(NULL, int, std_allocate, NULL, 0);
     Buffer dst = buffer_initialize(NULL, int, NULL, NULL, 0);
@@ -97,7 +97,7 @@ CHECK_BEGIN_STATIC_FN(buffer_test_copy_alloc)
     });
 }
 
-CHECK_BEGIN_STATIC_FN(buffer_test_copy_alloc_fail)
+CHECK_BEGIN_STATIC_FN(buffer_test_copy_allocate_fail)
 {
     Buffer src = buffer_initialize(NULL, int, std_allocate, NULL, 0);
     Buffer dst = buffer_initialize(NULL, int, NULL, NULL, 0);
@@ -176,11 +176,11 @@ CHECK_BEGIN_STATIC_FN(buffer_test_init_with_capacity_fail)
 int
 main(void)
 {
-    return CHECK_RUN(buffer_test_empty(), buffer_test_full(),
-                     buffer_test_reserve(), buffer_test_copy_no_alloc(),
-                     buffer_test_copy_no_alloc_fail(), buffer_test_copy_alloc(),
-                     buffer_test_copy_alloc_fail(), buffer_test_init_from(),
-                     buffer_test_init_from_fail(),
-                     buffer_test_init_with_capacity(),
-                     buffer_test_init_with_capacity_fail());
+    return CHECK_RUN(
+        buffer_test_empty(), buffer_test_full(), buffer_test_reserve(),
+        buffer_test_copy_no_allocate(), buffer_test_copy_no_allocate_fail(),
+        buffer_test_copy_allocate(), buffer_test_copy_allocate_fail(),
+        buffer_test_init_from(), buffer_test_init_from_fail(),
+        buffer_test_init_with_capacity(),
+        buffer_test_init_with_capacity_fail());
 }

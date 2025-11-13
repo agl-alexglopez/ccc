@@ -88,15 +88,15 @@ containing type.
 elements.
 @param [in] context_data any contextilliary data that will be needed for
 comparison, printing, or destruction of elements.
-@param [in] alloc_fn the optional allocation function or NULL.
+@param [in] allocate the optional allocation function or NULL.
 @return the initialized list. Assign to the list directly on the right hand
 side of an equality operator. Initialization can occur at runtime or compile
 time (e.g. CCC_doubly_linked l = CCC_doubly_linked_list_initialize(...);). */
 #define CCC_doubly_linked_list_initialize(                                     \
-    list_name, struct_name, list_node_field, order_fn, alloc_fn, context_data) \
+    list_name, struct_name, list_node_field, order_fn, allocate, context_data) \
     CCC_private_doubly_linked_list_initialize(list_name, struct_name,          \
                                               list_node_field, order_fn,       \
-                                              alloc_fn, context_data)
+                                              allocate, context_data)
 
 /**@}*/
 

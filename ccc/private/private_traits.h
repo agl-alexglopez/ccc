@@ -760,7 +760,7 @@ limitations under the License.
 
 /*===================         Memory Management       =======================*/
 
-#define CCC_private_copy(dst_container_ptr, src_container_ptr, alloc_fn_ptr)   \
+#define CCC_private_copy(dst_container_ptr, src_container_ptr, allocate_ptr)   \
     _Generic((dst_container_ptr),                                              \
         CCC_Bitset *: CCC_bitset_copy,                                         \
         CCC_Flat_hash_map *: CCC_flat_hash_map_copy,                           \
@@ -769,9 +769,9 @@ limitations under the License.
         CCC_Flat_double_ended_queue *: CCC_flat_double_ended_queue_copy,       \
         CCC_Handle_realtime_ordered_map                                        \
             *: CCC_handle_realtime_ordered_map_copy)(                          \
-        (dst_container_ptr), (src_container_ptr), (alloc_fn_ptr))
+        (dst_container_ptr), (src_container_ptr), (allocate_ptr))
 
-#define CCC_private_reserve(container_ptr, n_to_add, alloc_fn_ptr)             \
+#define CCC_private_reserve(container_ptr, n_to_add, allocate_ptr)             \
     _Generic((container_ptr),                                                  \
         CCC_Bitset *: CCC_bitset_reserve,                                      \
         CCC_Buffer *: CCC_buffer_reserve,                                      \
@@ -781,7 +781,7 @@ limitations under the License.
         CCC_Flat_double_ended_queue *: CCC_flat_double_ended_queue_reserve,    \
         CCC_Handle_realtime_ordered_map                                        \
             *: CCC_handle_realtime_ordered_map_reserve)(                       \
-        (container_ptr), (n_to_add), (alloc_fn_ptr))
+        (container_ptr), (n_to_add), (allocate_ptr))
 
 #define CCC_private_clear(container_ptr, ...)                                  \
     _Generic((container_ptr),                                                  \

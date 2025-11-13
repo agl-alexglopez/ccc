@@ -82,7 +82,7 @@ initialized.
 field.
 @param [in] key_node_field the name of the field in user type used as key.
 @param [in] key_order_fn the key comparison function (see types.h).
-@param [in] alloc_fn the allocation function or NULL if allocation is banned.
+@param [in] allocate the allocation function or NULL if allocation is banned.
 @param [in] context_data a pointer to any context data for comparison or
 destruction.
 @return the struct initialized ordered map for direct assignment
@@ -90,11 +90,11 @@ destruction.
 */
 #define CCC_realtime_ordered_map_initialize(                                   \
     realtime_ordered_map_name, struct_name, realtime_ordered_map_node_field,   \
-    key_node_field, key_order_fn, alloc_fn, context_data)                      \
+    key_node_field, key_order_fn, allocate, context_data)                      \
     CCC_private_realtime_ordered_map_initialize(                               \
         realtime_ordered_map_name, struct_name,                                \
         realtime_ordered_map_node_field, key_node_field, key_order_fn,         \
-        alloc_fn, context_data)
+        allocate, context_data)
 
 /**@}*/
 

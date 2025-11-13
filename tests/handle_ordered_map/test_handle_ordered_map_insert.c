@@ -11,7 +11,7 @@
 #include "handle_ordered_map_util.h"
 #include "traits.h"
 #include "types.h"
-#include "util/alloc.h"
+#include "util/allocate.h"
 
 static inline struct Val
 handle_ordered_map_create(int const id, int const val)

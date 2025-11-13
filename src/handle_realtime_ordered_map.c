@@ -196,12 +196,12 @@ static struct CCC_Handle_realtime_ordered_map_node *
 node_pos(size_t sizeof_type, void const *data, size_t capacity);
 static Parity_block *parity_pos(size_t sizeof_type, void const *data,
                                 size_t capacity);
-static size_t maybe_alloc_insert(
+static size_t maybe_allocate_insert(
     struct CCC_Handle_realtime_ordered_map *handle_realtime_ordered_map,
     size_t parent, CCC_Order last_order, void const *user_type);
 static size_t remove_fixup(struct CCC_Handle_realtime_ordered_map *t,
                            size_t remove);
-static size_t alloc_slot(struct CCC_Handle_realtime_ordered_map *t);
+static size_t allocate_slot(struct CCC_Handle_realtime_ordered_map *t);
 static void delete_nodes(struct CCC_Handle_realtime_ordered_map *t,
                          CCC_Type_destructor *fn);
 /* Returning the user key with stored offsets. */
@@ -358,8 +358,9 @@ CCC_handle_realtime_ordered_map_swap_handle(
             .stats = CCC_ENTRY_OCCUPIED,
         }};
     }
-    size_t const i = maybe_alloc_insert(handle_realtime_ordered_map, q.parent,
-                                        q.last_order, key_val_type_output);
+    size_t const i
+        = maybe_allocate_insert(handle_realtime_ordered_map, q.parent,
+                                q.last_order, key_val_type_output);
     if (!i)
     {
         return (CCC_Handle){{
@@ -392,8 +393,8 @@ CCC_handle_realtime_ordered_map_try_insert(
             .stats = CCC_ENTRY_OCCUPIED,
         }};
     }
-    size_t const i = maybe_alloc_insert(handle_realtime_ordered_map, q.parent,
-                                        q.last_order, key_val_type);
+    size_t const i = maybe_allocate_insert(
+        handle_realtime_ordered_map, q.parent, q.last_order, key_val_type);
     if (!i)
     {
         return (CCC_Handle){{
@@ -429,8 +430,8 @@ CCC_handle_realtime_ordered_map_insert_or_assign(
             .stats = CCC_ENTRY_OCCUPIED,
         }};
     }
-    size_t const i = maybe_alloc_insert(handle_realtime_ordered_map, q.parent,
-                                        q.last_order, key_val_type);
+    size_t const i = maybe_allocate_insert(
+        handle_realtime_ordered_map, q.parent, q.last_order, key_val_type);
     if (!i)
     {
         return (CCC_Handle){{
@@ -489,9 +490,9 @@ CCC_handle_realtime_ordered_map_or_insert(
     {
         return h->private.i;
     }
-    return maybe_alloc_insert(h->private.handle_realtime_ordered_map,
-                              h->private.i, h->private.last_order,
-                              key_val_type);
+    return maybe_allocate_insert(h->private.handle_realtime_ordered_map,
+                                 h->private.i, h->private.last_order,
+                                 key_val_type);
 }
 
 CCC_Handle_index
@@ -514,9 +515,9 @@ CCC_handle_realtime_ordered_map_insert_handle(
         }
         return h->private.i;
     }
-    return maybe_alloc_insert(h->private.handle_realtime_ordered_map,
-                              h->private.i, h->private.last_order,
-                              key_val_type);
+    return maybe_allocate_insert(h->private.handle_realtime_ordered_map,
+                                 h->private.i, h->private.last_order,
+                                 key_val_type);
 }
 
 CCC_Handle_realtime_ordered_map_handle
@@ -830,13 +831,13 @@ CCC_handle_realtime_ordered_map_copy(
     struct CCC_Handle_realtime_ordered_map_node *const dst_nodes = dst->nodes;
     Parity_block *const dst_parity = dst->parity;
     size_t const dst_cap = dst->capacity;
-    CCC_Allocator *const dst_alloc = dst->alloc;
+    CCC_Allocator *const dst_allocate = dst->allocate;
     *dst = *src;
     dst->data = dst_mem;
     dst->nodes = dst_nodes;
     dst->parity = dst_parity;
     dst->capacity = dst_cap;
-    dst->alloc = dst_alloc;
+    dst->allocate = dst_allocate;
     if (!src->capacity)
     {
         return CCC_RESULT_OK;
@@ -889,7 +890,7 @@ CCC_handle_realtime_ordered_map_clear_and_free(
     CCC_Handle_realtime_ordered_map *const handle_realtime_ordered_map,
     CCC_Type_destructor *const fn)
 {
-    if (!handle_realtime_ordered_map || !handle_realtime_ordered_map->alloc)
+    if (!handle_realtime_ordered_map || !handle_realtime_ordered_map->allocate)
     {
         return CCC_RESULT_ARGUMENT_ERROR;
     }
@@ -898,7 +899,7 @@ CCC_handle_realtime_ordered_map_clear_and_free(
         handle_realtime_ordered_map->root = 0;
         handle_realtime_ordered_map->count = 0;
         handle_realtime_ordered_map->capacity = 0;
-        (void)handle_realtime_ordered_map->alloc((CCC_Allocator_context){
+        (void)handle_realtime_ordered_map->allocate((CCC_Allocator_context){
             .input = handle_realtime_ordered_map->data,
             .bytes = 0,
             .context = handle_realtime_ordered_map->context,
@@ -911,7 +912,7 @@ CCC_handle_realtime_ordered_map_clear_and_free(
     delete_nodes(handle_realtime_ordered_map, fn);
     handle_realtime_ordered_map->root = 0;
     handle_realtime_ordered_map->capacity = 0;
-    (void)handle_realtime_ordered_map->alloc((CCC_Allocator_context){
+    (void)handle_realtime_ordered_map->allocate((CCC_Allocator_context){
         .input = handle_realtime_ordered_map->data,
         .bytes = 0,
         .context = handle_realtime_ordered_map->context});
@@ -924,9 +925,9 @@ CCC_handle_realtime_ordered_map_clear_and_free(
 CCC_Result
 CCC_handle_realtime_ordered_map_clear_and_free_reserve(
     CCC_Handle_realtime_ordered_map *const handle_realtime_ordered_map,
-    CCC_Type_destructor *const destructor, CCC_Allocator *const alloc)
+    CCC_Type_destructor *const destructor, CCC_Allocator *const allocate)
 {
-    if (!handle_realtime_ordered_map || !alloc)
+    if (!handle_realtime_ordered_map || !allocate)
     {
         return CCC_RESULT_ARGUMENT_ERROR;
     }
@@ -935,7 +936,7 @@ CCC_handle_realtime_ordered_map_clear_and_free_reserve(
         handle_realtime_ordered_map->root = 0;
         handle_realtime_ordered_map->count = 0;
         handle_realtime_ordered_map->capacity = 0;
-        (void)alloc((CCC_Allocator_context){
+        (void)allocate((CCC_Allocator_context){
             .input = handle_realtime_ordered_map->data,
             .bytes = 0,
             .context = handle_realtime_ordered_map->context,
@@ -946,7 +947,7 @@ CCC_handle_realtime_ordered_map_clear_and_free_reserve(
     delete_nodes(handle_realtime_ordered_map, destructor);
     handle_realtime_ordered_map->root = 0;
     handle_realtime_ordered_map->capacity = 0;
-    (void)alloc((CCC_Allocator_context){
+    (void)allocate((CCC_Allocator_context){
         .input = handle_realtime_ordered_map->data,
         .bytes = 0,
         .context = handle_realtime_ordered_map->context,
@@ -1014,23 +1015,23 @@ CCC_private_handle_realtime_ordered_map_node_at(
 }
 
 size_t
-CCC_private_handle_realtime_ordered_map_alloc_slot(
+CCC_private_handle_realtime_ordered_map_allocate_slot(
     struct CCC_Handle_realtime_ordered_map *const handle_realtime_ordered_map)
 {
-    return alloc_slot(handle_realtime_ordered_map);
+    return allocate_slot(handle_realtime_ordered_map);
 }
 
 /*==========================  Static Helpers   ==============================*/
 
 static size_t
-maybe_alloc_insert(
+maybe_allocate_insert(
     struct CCC_Handle_realtime_ordered_map *const handle_realtime_ordered_map,
     size_t const parent, CCC_Order const last_order,
     void const *const user_type)
 {
     /* The end sentinel node will always be at 0. This also means once
        initialized the internal size for implementer is always at least 1. */
-    size_t const node = alloc_slot(handle_realtime_ordered_map);
+    size_t const node = allocate_slot(handle_realtime_ordered_map);
     if (!node)
     {
         return 0;
@@ -1042,7 +1043,7 @@ maybe_alloc_insert(
 }
 
 static size_t
-alloc_slot(struct CCC_Handle_realtime_ordered_map *const t)
+allocate_slot(struct CCC_Handle_realtime_ordered_map *const t)
 {
     /* The end sentinel node will always be at 0. This also means once
        initialized the internal size for implementer is always at least 1. */
@@ -1053,7 +1054,7 @@ alloc_slot(struct CCC_Handle_realtime_ordered_map *const t)
         assert(!t->free_list);
         if (old_count == old_cap)
         {
-            if (resize(t, max(old_cap * 2, PARITY_BLOCK_BITS), t->alloc)
+            if (resize(t, max(old_cap * 2, PARITY_BLOCK_BITS), t->allocate)
                 != CCC_RESULT_OK)
             {
                 return 0;

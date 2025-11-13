@@ -60,7 +60,7 @@ struct CCC_Ordered_map
     /** @private The user defined comparison callback function. */
     CCC_Key_comparator *order;
     /** @private The user defined allocation function, if any. */
-    CCC_Allocator *alloc;
+    CCC_Allocator *allocate;
     /** @private Auxiliary data, if any. */
     void *context;
 };
@@ -118,14 +118,14 @@ void *CCC_private_ordered_map_insert(struct CCC_Ordered_map *t,
 /** @private */
 #define CCC_private_ordered_map_initialize(                                    \
     private_tree_name, private_struct_name, private_node_node_field,           \
-    private_key_node_field, private_key_order_fn, private_alloc_fn,            \
+    private_key_node_field, private_key_order_fn, private_allocate,            \
     private_context_data)                                                      \
     {                                                                          \
         .root = &(private_tree_name).end,                                      \
         .end                                                                   \
         = {.branch = {&(private_tree_name).end, &(private_tree_name).end},     \
            .parent = &(private_tree_name).end},                                \
-        .alloc = (private_alloc_fn),                                           \
+        .allocate = (private_allocate),                                        \
         .order = (private_key_order_fn),                                       \
         .context = (private_context_data),                                     \
         .size = 0,                                                             \
@@ -138,18 +138,18 @@ void *CCC_private_ordered_map_insert(struct CCC_Ordered_map *t,
 /** @private */
 #define CCC_private_ordered_map_new(ordered_map_entry)                         \
     (__extension__({                                                           \
-        void *private_ordered_map_ins_alloc_ret = NULL;                        \
-        if ((ordered_map_entry)->t->alloc)                                     \
+        void *private_ordered_map_ins_allocate_ret = NULL;                     \
+        if ((ordered_map_entry)->t->allocate)                                  \
         {                                                                      \
-            private_ordered_map_ins_alloc_ret                                  \
+            private_ordered_map_ins_allocate_ret                               \
                 = (ordered_map_entry)                                          \
-                      ->t->alloc((CCC_Allocator_context){                      \
+                      ->t->allocate((CCC_Allocator_context){                   \
                           .input = NULL,                                       \
                           .bytes = (ordered_map_entry)->t->sizeof_type,        \
                           .context = (ordered_map_entry)->t->context,          \
                       });                                                      \
         }                                                                      \
-        private_ordered_map_ins_alloc_ret;                                     \
+        private_ordered_map_ins_allocate_ret;                                  \
     }))
 
 /** @private */

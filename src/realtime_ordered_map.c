@@ -84,10 +84,10 @@ static void *struct_base(struct CCC_Realtime_ordered_map const *,
 static struct Query find(struct CCC_Realtime_ordered_map const *,
                          void const *key);
 static void swap(void *tmp, void *a, void *b, size_t sizeof_type);
-static void *maybe_alloc_insert(struct CCC_Realtime_ordered_map *,
-                                struct CCC_Realtime_ordered_map_node *parent,
-                                CCC_Order last_order,
-                                struct CCC_Realtime_ordered_map_node *);
+static void *maybe_allocate_insert(struct CCC_Realtime_ordered_map *,
+                                   struct CCC_Realtime_ordered_map_node *parent,
+                                   CCC_Order last_order,
+                                   struct CCC_Realtime_ordered_map_node *);
 static void *remove_fixup(struct CCC_Realtime_ordered_map *,
                           struct CCC_Realtime_ordered_map_node *);
 static void insert_fixup(struct CCC_Realtime_ordered_map *,
@@ -223,7 +223,7 @@ CCC_realtime_ordered_map_swap_entry(
             .stats = CCC_ENTRY_OCCUPIED,
         }};
     }
-    if (!maybe_alloc_insert(rom, q.parent, q.last_order, key_val_handle))
+    if (!maybe_allocate_insert(rom, q.parent, q.last_order, key_val_handle))
     {
         return (CCC_Entry){{
             .e = NULL,
@@ -254,7 +254,7 @@ CCC_realtime_ordered_map_try_insert(
         }};
     }
     void *const inserted
-        = maybe_alloc_insert(rom, q.parent, q.last_order, key_val_handle);
+        = maybe_allocate_insert(rom, q.parent, q.last_order, key_val_handle);
     if (!inserted)
     {
         return (CCC_Entry){{
@@ -289,7 +289,7 @@ CCC_realtime_ordered_map_insert_or_assign(
         }};
     }
     void *const inserted
-        = maybe_alloc_insert(rom, q.parent, q.last_order, key_val_handle);
+        = maybe_allocate_insert(rom, q.parent, q.last_order, key_val_handle);
     if (!inserted)
     {
         return (CCC_Entry){{
@@ -328,9 +328,9 @@ CCC_realtime_ordered_map_or_insert(
     {
         return e->private.entry.e;
     }
-    return maybe_alloc_insert(e->private.rom,
-                              elem_in_slot(e->private.rom, e->private.entry.e),
-                              e->private.last_order, elem);
+    return maybe_allocate_insert(
+        e->private.rom, elem_in_slot(e->private.rom, e->private.entry.e),
+        e->private.last_order, elem);
 }
 
 void *
@@ -349,9 +349,9 @@ CCC_realtime_ordered_map_insert_entry(
                e->private.rom->sizeof_type);
         return e->private.entry.e;
     }
-    return maybe_alloc_insert(e->private.rom,
-                              elem_in_slot(e->private.rom, e->private.entry.e),
-                              e->private.last_order, elem);
+    return maybe_allocate_insert(
+        e->private.rom, elem_in_slot(e->private.rom, e->private.entry.e),
+        e->private.last_order, elem);
 }
 
 CCC_Entry
@@ -367,9 +367,9 @@ CCC_realtime_ordered_map_remove_entry(
         void *const erased = remove_fixup(
             e->private.rom, elem_in_slot(e->private.rom, e->private.entry.e));
         assert(erased);
-        if (e->private.rom->alloc)
+        if (e->private.rom->allocate)
         {
-            e->private.rom->alloc((CCC_Allocator_context){
+            e->private.rom->allocate((CCC_Allocator_context){
                 .input = erased,
                 .bytes = 0,
                 .context = e->private.rom->context,
@@ -407,11 +407,11 @@ CCC_realtime_ordered_map_remove(CCC_Realtime_ordered_map *const rom,
         }};
     }
     void *const removed = remove_fixup(rom, q.found);
-    if (rom->alloc)
+    if (rom->allocate)
     {
         void *const any_struct = struct_base(rom, out_handle);
         memcpy(any_struct, removed, rom->sizeof_type);
-        rom->alloc((CCC_Allocator_context){
+        rom->allocate((CCC_Allocator_context){
             .input = removed,
             .bytes = 0,
             .context = rom->context,
@@ -653,9 +653,9 @@ CCC_realtime_ordered_map_clear(CCC_Realtime_ordered_map *const rom,
                 .context = rom->context,
             });
         }
-        if (rom->alloc)
+        if (rom->allocate)
         {
-            (void)rom->alloc((CCC_Allocator_context){
+            (void)rom->allocate((CCC_Allocator_context){
                 .input = destroy,
                 .bytes = 0,
                 .context = rom->context,
@@ -740,14 +740,14 @@ entry(struct CCC_Realtime_ordered_map const *const rom, void const *const key)
 }
 
 static void *
-maybe_alloc_insert(struct CCC_Realtime_ordered_map *const rom,
-                   struct CCC_Realtime_ordered_map_node *const parent,
-                   CCC_Order const last_order,
-                   struct CCC_Realtime_ordered_map_node *out_handle)
+maybe_allocate_insert(struct CCC_Realtime_ordered_map *const rom,
+                      struct CCC_Realtime_ordered_map_node *const parent,
+                      CCC_Order const last_order,
+                      struct CCC_Realtime_ordered_map_node *out_handle)
 {
-    if (rom->alloc)
+    if (rom->allocate)
     {
-        void *const new = rom->alloc((CCC_Allocator_context){
+        void *const new = rom->allocate((CCC_Allocator_context){
             .input = NULL,
             .bytes = rom->sizeof_type,
             .context = rom->context,

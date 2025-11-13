@@ -10,7 +10,7 @@
 #include "flat_priority_queue_util.h"
 #include "traits.h"
 #include "types.h"
-#include "util/alloc.h"
+#include "util/allocate.h"
 
 CCC_Order
 val_order(CCC_Type_comparator_context const order)

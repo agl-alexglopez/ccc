@@ -28,7 +28,7 @@ struct Val_pool
 
 /** The bump allocator will point to the val pool as its context data. It
 can only allocate. Freeing is a No Op. Reallocation will kill the program. */
-void *val_bump_alloc(CCC_Allocator_context);
+void *val_bump_allocate(CCC_Allocator_context);
 
 CCC_Order id_order(CCC_Key_comparator_context);
 

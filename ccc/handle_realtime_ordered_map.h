@@ -171,7 +171,7 @@ desired allocation function. */
 @param [in] any_type_name the name of the user type stored in the map.
 @param [in] key_node_field the name of the field in user type used as key.
 @param [in] key_order_fn the key comparison function (see types.h).
-@param [in] alloc_fn the allocation function or NULL if allocation is banned.
+@param [in] allocate the allocation function or NULL if allocation is banned.
 @param [in] context_data a pointer to any context data for comparison or
 destruction.
 @param [in] capacity the capacity at mem_ptr or 0.
@@ -179,10 +179,10 @@ destruction.
 (i.e. CCC_Handle_realtime_ordered_map m =
 CCC_handle_realtime_ordered_map_initialize(...);). */
 #define CCC_handle_realtime_ordered_map_initialize(                            \
-    memory_ptr, any_type_name, key_node_field, key_order_fn, alloc_fn,         \
+    memory_ptr, any_type_name, key_node_field, key_order_fn, allocate,         \
     context_data, capacity)                                                    \
     CCC_private_handle_realtime_ordered_map_initialize(                        \
-        memory_ptr, any_type_name, key_node_field, key_order_fn, alloc_fn,     \
+        memory_ptr, any_type_name, key_node_field, key_order_fn, allocate,     \
         context_data, capacity)
 
 /** @brief Copy the map at source to destination.
@@ -742,7 +742,7 @@ CCC_Result CCC_handle_realtime_ordered_map_clear(
 @param [in] fn the destructor for each element. NULL can be passed if no
 maintenance is required on the elements in the map before their slots are
 forfeit.
-@return the result of free operation. If no alloc function is provided it is
+@return the result of free operation. If no allocate function is provided it is
 an error to attempt to free the Buffer and a memory error is returned.
 Otherwise, an OK result is returned.
 
@@ -758,8 +758,8 @@ function.
 @param [in] destructor the destructor for each element. NULL can be passed if no
 maintenance is required on the elements in the handle_realtime_ordered_map
 before their slots are dropped.
-@param [in] alloc the required allocation function to provide to a dynamically
-reserved handle_realtime_ordered_map. Any context data provided upon
+@param [in] allocate the required allocation function to provide to a
+dynamically reserved handle_realtime_ordered_map. Any context data provided upon
 initialization will be passed to the allocation function when called.
 @return the result of free operation. OK if success, or an error status to
 indicate the error.
@@ -786,7 +786,7 @@ CCC_handle_realtime_ordered_map_clear_and_free is sufficient for that use case.
 */
 CCC_Result CCC_handle_realtime_ordered_map_clear_and_free_reserve(
     CCC_Handle_realtime_ordered_map *handle_realtime_ordered_map,
-    CCC_Type_destructor *destructor, CCC_Allocator *alloc);
+    CCC_Type_destructor *destructor, CCC_Allocator *allocate);
 
 /**@}*/
 

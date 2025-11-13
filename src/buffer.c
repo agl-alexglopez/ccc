@@ -31,8 +31,8 @@ static size_t max(size_t a, size_t b);
 /*==========================    Interface    ================================*/
 
 CCC_Result
-CCC_buffer_alloc(CCC_Buffer *const buf, size_t const capacity,
-                 CCC_Allocator *const fn)
+CCC_buffer_allocate(CCC_Buffer *const buf, size_t const capacity,
+                    CCC_Allocator *const fn)
 {
     if (!buf)
     {
@@ -115,13 +115,13 @@ CCC_Result
 CCC_buffer_clear_and_free(CCC_Buffer *const buf,
                           CCC_Type_destructor *const destructor)
 {
-    if (!buf || !buf->alloc)
+    if (!buf || !buf->allocate)
     {
         return CCC_RESULT_ARGUMENT_ERROR;
     }
     if (!destructor)
     {
-        (void)buf->alloc((CCC_Allocator_context){
+        (void)buf->allocate((CCC_Allocator_context){
             .input = buf->mem,
             .bytes = 0,
             .context = buf->context,
@@ -139,7 +139,7 @@ CCC_buffer_clear_and_free(CCC_Buffer *const buf,
             .context = buf->context,
         });
     }
-    (void)buf->alloc((CCC_Allocator_context){
+    (void)buf->allocate((CCC_Allocator_context){
         .input = buf->mem,
         .bytes = 0,
         .context = buf->context,
@@ -153,15 +153,15 @@ CCC_buffer_clear_and_free(CCC_Buffer *const buf,
 CCC_Result
 CCC_buffer_clear_and_free_reserve(CCC_Buffer *const buf,
                                   CCC_Type_destructor *const destructor,
-                                  CCC_Allocator *const alloc)
+                                  CCC_Allocator *const allocate)
 {
-    if (!buf || !alloc)
+    if (!buf || !allocate)
     {
         return CCC_RESULT_ARGUMENT_ERROR;
     }
     if (!destructor)
     {
-        (void)alloc((CCC_Allocator_context){
+        (void)allocate((CCC_Allocator_context){
             .input = buf->mem,
             .bytes = 0,
             .context = buf->context,
@@ -179,7 +179,7 @@ CCC_buffer_clear_and_free_reserve(CCC_Buffer *const buf,
             .context = buf->context,
         });
     }
-    (void)alloc((CCC_Allocator_context){
+    (void)allocate((CCC_Allocator_context){
         .input = buf->mem,
         .bytes = 0,
         .context = buf->context,
@@ -213,7 +213,7 @@ CCC_buffer_front(CCC_Buffer const *const buf)
 }
 
 void *
-CCC_buffer_alloc_back(CCC_Buffer *const buf)
+CCC_buffer_allocate_back(CCC_Buffer *const buf)
 {
     if (!buf)
     {
@@ -221,8 +221,8 @@ CCC_buffer_alloc_back(CCC_Buffer *const buf)
     }
     if (buf->count == buf->capacity)
     {
-        CCC_Result const resize_res = CCC_buffer_alloc(
-            buf, max(buf->capacity * 2, START_CAPACITY), buf->alloc);
+        CCC_Result const resize_res = CCC_buffer_allocate(
+            buf, max(buf->capacity * 2, START_CAPACITY), buf->allocate);
         if (resize_res != CCC_RESULT_OK)
         {
             return NULL;
@@ -236,7 +236,7 @@ CCC_buffer_alloc_back(CCC_Buffer *const buf)
 void *
 CCC_buffer_push_back(CCC_Buffer *const buf, void const *const data)
 {
-    void *const mem = CCC_buffer_alloc_back(buf);
+    void *const mem = CCC_buffer_allocate_back(buf);
     if (mem)
     {
         (void)memcpy(mem, data, buf->sizeof_type);
@@ -324,8 +324,8 @@ CCC_buffer_insert(CCC_Buffer *const buf, size_t const i, void const *const data)
     }
     if (buf->count == buf->capacity)
     {
-        CCC_Result const r = CCC_buffer_alloc(
-            buf, max(buf->count * 2, START_CAPACITY), buf->alloc);
+        CCC_Result const r = CCC_buffer_allocate(
+            buf, max(buf->count * 2, START_CAPACITY), buf->allocate);
         if (r != CCC_RESULT_OK)
         {
             return NULL;
@@ -586,18 +586,18 @@ CCC_buffer_copy(CCC_Buffer *const dst, CCC_Buffer const *const src,
        same as in dst initialization because that controls permission. */
     void *const dst_mem = dst->mem;
     size_t const dst_cap = dst->capacity;
-    CCC_Allocator *const dst_alloc = dst->alloc;
+    CCC_Allocator *const dst_allocate = dst->allocate;
     *dst = *src;
     dst->mem = dst_mem;
     dst->capacity = dst_cap;
-    dst->alloc = dst_alloc;
+    dst->allocate = dst_allocate;
     if (!src->capacity)
     {
         return CCC_RESULT_OK;
     }
     if (dst->capacity < src->capacity)
     {
-        CCC_Result const r = CCC_buffer_alloc(dst, src->capacity, fn);
+        CCC_Result const r = CCC_buffer_allocate(dst, src->capacity, fn);
         if (r != CCC_RESULT_OK)
         {
             return r;

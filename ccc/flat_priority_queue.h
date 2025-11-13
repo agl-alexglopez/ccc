@@ -91,17 +91,17 @@ Initialize the container with memory, callbacks, and permissions. */
 @param [in] order_order CCC_ORDER_LESSER or CCC_ORDER_GREATER for min or max
 heap, respectively.
 @param [in] order_fn the user defined comarison function for user types.
-@param [in] alloc_fn the allocation function or NULL if no allocation.
+@param [in] allocate the allocation function or NULL if no allocation.
 @param [in] context_data any context data needed for destruction of elements.
 @param [in] capacity the capacity of contiguous elements at mem_ptr.
 @return the initialized priority queue on the right hand side of an equality
 operator. (i.e. CCC_Flat_priority_queue q =
 CCC_flat_priority_queue_initialize(...);). */
 #define CCC_flat_priority_queue_initialize(mem_ptr, any_type_name,             \
-                                           order_order, order_fn, alloc_fn,    \
+                                           order_order, order_fn, allocate,    \
                                            context_data, capacity)             \
     CCC_private_flat_priority_queue_initialize(                                \
-        mem_ptr, any_type_name, order_order, order_fn, alloc_fn, context_data, \
+        mem_ptr, any_type_name, order_order, order_fn, allocate, context_data, \
         capacity)
 
 /** @brief Partial order an array of elements as a min or max heap. O(N).
@@ -110,7 +110,7 @@ CCC_flat_priority_queue_initialize(...);). */
 @param [in] order_order CCC_ORDER_LESSER or CCC_ORDER_GREATER for min or max
 heap, respectively.
 @param [in] order_fn the user defined comparison function for user types.
-@param [in] alloc_fn the allocation function or NULL if no allocation.
+@param [in] allocate the allocation function or NULL if no allocation.
 @param [in] context_data any context data needed for destruction of elements.
 @param [in] capacity the capacity of contiguous elements at mem_ptr.
 @param [in] size the size <= capacity.
@@ -119,10 +119,10 @@ operator. (i.e. CCC_Flat_priority_queue q =
 CCC_flat_priority_queue_heapify_initialize(...);).
 */
 #define CCC_flat_priority_queue_heapify_initialize(                            \
-    mem_ptr, any_type_name, order_order, order_fn, alloc_fn, context_data,     \
+    mem_ptr, any_type_name, order_order, order_fn, allocate, context_data,     \
     capacity, size)                                                            \
     CCC_private_flat_priority_queue_heapify_initialize(                        \
-        mem_ptr, any_type_name, order_order, order_fn, alloc_fn, context_data, \
+        mem_ptr, any_type_name, order_order, order_fn, allocate, context_data, \
         capacity, size)
 
 /** @brief Copy the flat_priority_queue from src to newly initialized dst.
@@ -513,7 +513,7 @@ provided and frees the underlying buffer. O(1)-O(N).
 @param [in] flat_priority_queue a pointer to the flat priority queue.
 @param [in] fn the destructor function or NULL if not needed.
 @return OK if input is valid and clear succeeds, otherwise input error. If the
-Buffer attempts to free but is not allowed a no alloc error is returned.
+Buffer attempts to free but is not allowed a no allocate error is returned.
 
 Note that because the priority queue is flat there is no need to free elements
 stored in the flat_priority_queue. However, the destructor is free to manage
@@ -530,9 +530,9 @@ Buffer that was previously dynamically reserved with the reserve function.
 @param [in] destructor the destructor for each element. NULL can be passed if no
 maintenance is required on the elements in the flat_priority_queue before their
 slots are dropped.
-@param [in] alloc the required allocation function to provide to a dynamically
-reserved flat_priority_queue. Any context data provided upon initialization will
-be passed to the allocation function when called.
+@param [in] allocate the required allocation function to provide to a
+dynamically reserved flat_priority_queue. Any context data provided upon
+initialization will be passed to the allocation function when called.
 @return the result of free operation. OK if success, or an error status to
 indicate the error.
 @warning It is an error to call this function on a flat_priority_queue that was
@@ -556,7 +556,7 @@ allocation permission however the normal CCC_flat_priority_queue_clear_and_free
 is sufficient for that use case. */
 CCC_Result CCC_flat_priority_queue_clear_and_free_reserve(
     CCC_Flat_priority_queue *flat_priority_queue,
-    CCC_Type_destructor *destructor, CCC_Allocator *alloc);
+    CCC_Type_destructor *destructor, CCC_Allocator *allocate);
 
 /**@}*/
 

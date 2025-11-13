@@ -10,7 +10,7 @@
 #include "ccc/buffer.h"
 #include "ccc/types.h"
 #include "checkers.h"
-#include "util/alloc.h"
+#include "util/allocate.h"
 #include "util/random.h"
 
 static int
@@ -126,7 +126,7 @@ CHECK_BEGIN_STATIC_FN(buffer_test_push_sort)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(buffer_test_insert_no_alloc)
+CHECK_BEGIN_STATIC_FN(buffer_test_insert_no_allocate)
 {
     enum : size_t
     {
@@ -157,7 +157,7 @@ CHECK_BEGIN_STATIC_FN(buffer_test_insert_no_alloc)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(buffer_test_insert_no_alloc_fail)
+CHECK_BEGIN_STATIC_FN(buffer_test_insert_no_allocate_fail)
 {
     enum : size_t
     {
@@ -173,7 +173,7 @@ CHECK_BEGIN_STATIC_FN(buffer_test_insert_no_alloc_fail)
 }
 
 /* Force a resize when inserting in middle forces shuffle down. */
-CHECK_BEGIN_STATIC_FN(buffer_test_insert_alloc)
+CHECK_BEGIN_STATIC_FN(buffer_test_insert_allocate)
 {
     Buffer b = buffer_initialize(NULL, int, std_allocate, NULL, 0);
     CCC_Result r = buffer_reserve(&b, 6, std_allocate);
@@ -209,7 +209,7 @@ main(void)
     srand(time(NULL));
     return CHECK_RUN(buffer_test_push_fixed(), buffer_test_push_resize(),
                      buffer_test_push_qsort(), buffer_test_push_sort(),
-                     buffer_test_insert_no_alloc(),
-                     buffer_test_insert_no_alloc_fail(),
-                     buffer_test_insert_alloc());
+                     buffer_test_insert_no_allocate(),
+                     buffer_test_insert_no_allocate_fail(),
+                     buffer_test_insert_allocate());
 }

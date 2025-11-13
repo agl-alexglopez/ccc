@@ -33,7 +33,7 @@ macro(add_bitset_test TEST_NAME)
     PRIVATE
       ccc
       checkers
-      alloc
+      allocate
   )
   set_target_properties(${TEST_NAME} 
     PROPERTIES 
@@ -66,7 +66,7 @@ macro(add_buffer_test TEST_NAME)
       ccc
       buffer_util
       checkers
-      alloc
+      allocate
       random
   )
   set_target_properties(${TEST_NAME} 
@@ -100,7 +100,7 @@ macro(add_flat_priority_queue_test TEST_NAME)
       flat_priority_queue_util
       ccc
       checkers
-      alloc
+      allocate
   )
   set_target_properties(${TEST_NAME} 
     PROPERTIES 
@@ -132,7 +132,7 @@ macro(add_priority_queue_test TEST_NAME)
       priority_queue_util
       ccc
       checkers
-      alloc
+      allocate
   )
   set_target_properties(${TEST_NAME} 
     PROPERTIES 
@@ -164,7 +164,7 @@ macro(add_ordered_map_test TEST_NAME)
       ordered_map_util
       ccc
       checkers 
-      alloc
+      allocate
   )
   set_target_properties(${TEST_NAME} 
     PROPERTIES 
@@ -197,7 +197,7 @@ macro(add_handle_ordered_map_test TEST_NAME)
       handle_ordered_map_util
       ccc
       checkers
-      alloc
+      allocate
   )
   set_target_properties(${TEST_NAME} 
     PROPERTIES 
@@ -230,7 +230,7 @@ macro(add_realtime_ordered_map_test TEST_NAME)
       realtime_ordered_map_util
       checkers
       ccc
-      alloc
+      allocate
   )
   set_target_properties(${TEST_NAME} 
     PROPERTIES 
@@ -263,7 +263,7 @@ macro(add_handle_realtime_ordered_map_test TEST_NAME)
       handle_realtime_ordered_map_util
       ccc
       checkers
-      alloc
+      allocate
   )
   set_target_properties(${TEST_NAME} 
     PROPERTIES 
@@ -296,7 +296,7 @@ macro(add_flat_hash_map_test TEST_NAME)
       flat_hash_map_util
       random
       ccc
-      alloc
+      allocate
   )
   set_target_properties(${TEST_NAME} 
     PROPERTIES 
@@ -328,7 +328,7 @@ macro(add_doubly_linked_list_test TEST_NAME)
       ccc
       checkers
       doubly_linked_list_util
-      alloc
+      allocate
   )
   set_target_properties(${TEST_NAME} 
     PROPERTIES 
@@ -357,7 +357,7 @@ macro(add_singly_linked_list_test TEST_NAME)
       ccc
       checkers 
       singly_linked_list_util
-      alloc
+      allocate
   )
   set_target_properties(${TEST_NAME} 
     PROPERTIES 
@@ -386,7 +386,7 @@ macro(add_flat_double_ended_queue_test TEST_NAME)
       ccc
       checkers 
       flat_double_ended_queue_util
-      alloc
+      allocate
   )
   set_target_properties(${TEST_NAME} 
     PROPERTIES 

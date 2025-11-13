@@ -729,7 +729,7 @@ CCC_bitset_push_back(CCC_Bitset *const bs, CCC_Tribool const b)
     {
         return CCC_RESULT_ARGUMENT_ERROR;
     }
-    CCC_Result const check_resize = maybe_resize(bs, 1, bs->alloc);
+    CCC_Result const check_resize = maybe_resize(bs, 1, bs->allocate);
     if (check_resize != CCC_RESULT_OK)
     {
         return check_resize;
@@ -926,13 +926,13 @@ CCC_bitset_clear_and_free(CCC_Bitset *const bs)
     {
         return CCC_RESULT_ARGUMENT_ERROR;
     }
-    if (!bs->alloc)
+    if (!bs->allocate)
     {
         return CCC_RESULT_NO_ALLOCATION_FUNCTION;
     }
     if (bs->blocks)
     {
-        (void)bs->alloc((CCC_Allocator_context){
+        (void)bs->allocate((CCC_Allocator_context){
             .input = bs->blocks,
             .bytes = 0,
             .context = bs->context,
@@ -989,11 +989,11 @@ CCC_bitset_copy(CCC_Bitset *const dst, CCC_Bitset const *const src,
        over everything else as a catch all. */
     Bitblock *const dst_mem = dst->blocks;
     size_t const dst_cap = dst->capacity;
-    CCC_Allocator *const dst_alloc = dst->alloc;
+    CCC_Allocator *const dst_allocate = dst->allocate;
     *dst = *src;
     dst->blocks = dst_mem;
     dst->capacity = dst_cap;
-    dst->alloc = dst_alloc;
+    dst->allocate = dst_allocate;
     if (!src->capacity)
     {
         return CCC_RESULT_OK;

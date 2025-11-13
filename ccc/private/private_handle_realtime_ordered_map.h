@@ -137,7 +137,7 @@ struct CCC_Handle_realtime_ordered_map
     /** @private The provided key comparison function. */
     CCC_Key_comparator *order;
     /** @private The provided allocation function, if any. */
-    CCC_Allocator *alloc;
+    CCC_Allocator *allocate;
     /** @private The provided context data, if any. */
     void *context;
 };
@@ -187,7 +187,7 @@ void CCC_private_handle_realtime_ordered_map_insert(
     struct CCC_Handle_realtime_ordered_map *handle_realtime_ordered_map,
     size_t parent_i, CCC_Order last_order, size_t elem_i);
 /** @private */
-size_t CCC_private_handle_realtime_ordered_map_alloc_slot(
+size_t CCC_private_handle_realtime_ordered_map_allocate_slot(
     struct CCC_Handle_realtime_ordered_map *handle_realtime_ordered_map);
 
 /*=========================      Initialization     =========================*/
@@ -233,7 +233,7 @@ memory provided to the data pointer to come from any source at compile or
 runtime. */
 #define CCC_private_handle_realtime_ordered_map_initialize(                    \
     private_memory_ptr, private_type_name, private_key_node_field,             \
-    private_key_order_fn, private_alloc_fn, private_context_data,              \
+    private_key_order_fn, private_allocate, private_context_data,              \
     private_capacity)                                                          \
     {                                                                          \
         .data = (private_memory_ptr),                                          \
@@ -246,7 +246,7 @@ runtime. */
         .sizeof_type = sizeof(private_type_name),                              \
         .key_offset = offsetof(private_type_name, private_key_node_field),     \
         .order = (private_key_order_fn),                                       \
-        .alloc = (private_alloc_fn),                                           \
+        .allocate = (private_allocate),                                        \
         .context = (private_context_data),                                     \
     }
 
@@ -306,7 +306,7 @@ runtime. */
             else                                                               \
             {                                                                  \
                 private_handle_realtime_ordered_map_or_ins_ret                 \
-                    = CCC_private_handle_realtime_ordered_map_alloc_slot(      \
+                    = CCC_private_handle_realtime_ordered_map_allocate_slot(   \
                         private_or_ins_handle_ptr->private                     \
                             .handle_realtime_ordered_map);                     \
                 if (private_handle_realtime_ordered_map_or_ins_ret)            \
@@ -341,7 +341,7 @@ runtime. */
             if (!(private_ins_handle_ptr->private.stats & CCC_ENTRY_OCCUPIED))   \
             {                                                                    \
                 private_handle_realtime_ordered_map_ins_hndl_ret                 \
-                    = CCC_private_handle_realtime_ordered_map_alloc_slot(        \
+                    = CCC_private_handle_realtime_ordered_map_allocate_slot(     \
                         private_ins_handle_ptr->private                          \
                             .handle_realtime_ordered_map);                       \
                 if (private_handle_realtime_ordered_map_ins_hndl_ret)            \
@@ -398,7 +398,7 @@ runtime. */
                 private_handle_realtime_ordered_map_try_ins_hndl_ret               \
                     = (struct CCC_Handle){                                         \
                         .i                                                         \
-                        = CCC_private_handle_realtime_ordered_map_alloc_slot(      \
+                        = CCC_private_handle_realtime_ordered_map_allocate_slot(   \
                             private_handle_realtime_ordered_map_try_ins_hndl       \
                                 .handle_realtime_ordered_map),                     \
                         .stats = CCC_ENTRY_INSERT_ERROR,                           \
@@ -468,7 +468,7 @@ runtime. */
                 private_handle_realtime_ordered_map_ins_or_assign_hndl_ret               \
                     = (struct CCC_Handle){                                               \
                         .i                                                               \
-                        = CCC_private_handle_realtime_ordered_map_alloc_slot(            \
+                        = CCC_private_handle_realtime_ordered_map_allocate_slot(         \
                             private_handle_realtime_ordered_map_ins_or_assign_hndl       \
                                 .handle_realtime_ordered_map),                           \
                         .stats = CCC_ENTRY_INSERT_ERROR,                                 \

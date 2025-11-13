@@ -76,8 +76,8 @@ static void *struct_base(struct CCC_Ordered_map const *,
                          struct CCC_Ordered_map_node const *);
 static void *find(struct CCC_Ordered_map *, void const *);
 static void *erase(struct CCC_Ordered_map *, void const *key);
-static void *alloc_insert(struct CCC_Ordered_map *,
-                          struct CCC_Ordered_map_node *);
+static void *allocate_insert(struct CCC_Ordered_map *,
+                             struct CCC_Ordered_map_node *);
 static void *insert(struct CCC_Ordered_map *, struct CCC_Ordered_map_node *);
 static void *connect_new_root(struct CCC_Ordered_map *,
                               struct CCC_Ordered_map_node *, CCC_Order);
@@ -169,7 +169,7 @@ CCC_ordered_map_insert_entry(CCC_Ordered_map_entry const *const e,
         }
         return e->private.entry.e;
     }
-    return alloc_insert(e->private.t, elem);
+    return allocate_insert(e->private.t, elem);
 }
 
 void *
@@ -184,7 +184,7 @@ CCC_ordered_map_or_insert(CCC_Ordered_map_entry const *const e,
     {
         return e->private.entry.e;
     }
-    return alloc_insert(e->private.t, elem);
+    return allocate_insert(e->private.t, elem);
 }
 
 CCC_Ordered_map_entry *
@@ -247,7 +247,7 @@ CCC_ordered_map_swap_entry(CCC_Ordered_map *const om,
             .stats = CCC_ENTRY_OCCUPIED,
         }};
     }
-    void *const inserted = alloc_insert(om, key_val_handle);
+    void *const inserted = allocate_insert(om, key_val_handle);
     if (!inserted)
     {
         return (CCC_Entry){{
@@ -278,7 +278,7 @@ CCC_ordered_map_try_insert(CCC_Ordered_map *const om,
             .stats = CCC_ENTRY_OCCUPIED,
         }};
     }
-    void *const inserted = alloc_insert(om, key_val_handle);
+    void *const inserted = allocate_insert(om, key_val_handle);
     if (!inserted)
     {
         return (CCC_Entry){{
@@ -311,7 +311,7 @@ CCC_ordered_map_insert_or_assign(CCC_Ordered_map *const om,
             .stats = CCC_ENTRY_OCCUPIED,
         }};
     }
-    void *const inserted = alloc_insert(om, key_val_handle);
+    void *const inserted = allocate_insert(om, key_val_handle);
     if (!inserted)
     {
         return (CCC_Entry){{
@@ -341,11 +341,11 @@ CCC_ordered_map_remove(CCC_Ordered_map *const om,
             .stats = CCC_ENTRY_VACANT,
         }};
     }
-    if (om->alloc)
+    if (om->allocate)
     {
         void *const any_struct = struct_base(om, out_handle);
         memcpy(any_struct, n, om->sizeof_type);
-        om->alloc((CCC_Allocator_context){
+        om->allocate((CCC_Allocator_context){
             .input = n,
             .bytes = 0,
             .context = om->context,
@@ -373,9 +373,9 @@ CCC_ordered_map_remove_entry(CCC_Ordered_map_entry *const e)
         void *const erased = erase(
             e->private.t, key_in_slot(e->private.t, e->private.entry.e));
         assert(erased);
-        if (e->private.t->alloc)
+        if (e->private.t->allocate)
         {
-            e->private.t->alloc((CCC_Allocator_context){
+            e->private.t->allocate((CCC_Allocator_context){
                 .input = erased,
                 .bytes = 0,
                 .context = e->private.t->context,
@@ -549,9 +549,9 @@ CCC_ordered_map_clear(CCC_Ordered_map *const om,
                 .context = om->context,
             });
         }
-        if (om->alloc)
+        if (om->allocate)
         {
-            (void)om->alloc((CCC_Allocator_context){
+            (void)om->allocate((CCC_Allocator_context){
                 .input = del,
                 .bytes = 0,
                 .context = om->context,
@@ -765,8 +765,8 @@ contains(struct CCC_Ordered_map *const t, void const *const key)
 }
 
 static void *
-alloc_insert(struct CCC_Ordered_map *const t,
-             struct CCC_Ordered_map_node *out_handle)
+allocate_insert(struct CCC_Ordered_map *const t,
+                struct CCC_Ordered_map_node *out_handle)
 {
     init_node(t, out_handle);
     CCC_Order root_order = CCC_ORDER_ERROR;
@@ -780,9 +780,9 @@ alloc_insert(struct CCC_Ordered_map *const t,
             return NULL;
         }
     }
-    if (t->alloc)
+    if (t->allocate)
     {
-        void *const node = t->alloc((CCC_Allocator_context){
+        void *const node = t->allocate((CCC_Allocator_context){
             .input = NULL,
             .bytes = t->sizeof_type,
             .context = t->context,

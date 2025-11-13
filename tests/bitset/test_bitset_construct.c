@@ -3,7 +3,7 @@
 #include "ccc/bitset.h"
 #include "ccc/types.h"
 #include "checkers.h"
-#include "util/alloc.h"
+#include "util/allocate.h"
 
 CHECK_BEGIN_STATIC_FN(bitset_test_construct)
 {
@@ -18,7 +18,7 @@ CHECK_BEGIN_STATIC_FN(bitset_test_construct)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(bitset_test_copy_no_alloc)
+CHECK_BEGIN_STATIC_FN(bitset_test_copy_no_allocate)
 {
     CCC_Bitset src
         = CCC_bitset_initialize(CCC_bitset_blocks(512), NULL, NULL, 512, 0);
@@ -62,7 +62,7 @@ CHECK_BEGIN_STATIC_FN(bitset_test_copy_no_alloc)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(bitset_test_copy_alloc)
+CHECK_BEGIN_STATIC_FN(bitset_test_copy_allocate)
 {
     CCC_Bitset src = CCC_bitset_initialize(NULL, std_allocate, NULL, 0);
     for (size_t i = 0; i < 512; ++i)
@@ -186,8 +186,8 @@ CHECK_BEGIN_STATIC_FN(bitset_test_init_with_capacity_fail)
 int
 main(void)
 {
-    return CHECK_RUN(bitset_test_construct(), bitset_test_copy_no_alloc(),
-                     bitset_test_copy_alloc(), bitset_test_init_from(),
+    return CHECK_RUN(bitset_test_construct(), bitset_test_copy_no_allocate(),
+                     bitset_test_copy_allocate(), bitset_test_init_from(),
                      bitset_test_init_from_cap(), bitset_test_init_from_fail(),
                      bitset_test_init_from_cap_fail(),
                      bitset_test_init_with_capacity(),

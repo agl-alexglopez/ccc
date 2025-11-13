@@ -70,7 +70,7 @@ Initialize and create containers with memory, callbacks, and permissions. */
 permission.
 @param [in] mem_ptr a pointer to existing memory or ((T *)NULL).
 @param [in] any_type_name the name of the user type.
-@param [in] alloc_fn the allocator function, if allocation is allowed.
+@param [in] allocate the allocator function, if allocation is allowed.
 @param [in] context_data any context data needed for element destruction.
 @param [in] capacity the number of contiguous elements at mem_ptr
 @param [in] optional_size an optional initial size between 1 and capacity.
@@ -78,10 +78,10 @@ permission.
 operator at runtime or compiletime (e.g. CCC_Flat_double_ended_queue q =
 CCC_flat_double_ended_queue_initialize(...);) */
 #define CCC_flat_double_ended_queue_initialize(mem_ptr, any_type_name,         \
-                                               alloc_fn, context_data,         \
+                                               allocate, context_data,         \
                                                capacity, optional_size...)     \
     CCC_private_flat_double_ended_queue_initialize(mem_ptr, any_type_name,     \
-                                                   alloc_fn, context_data,     \
+                                                   allocate, context_data,     \
                                                    capacity, optional_size)
 
 /** @brief Copy the flat_double_ended_queue from src to newly initialized dst.
@@ -358,9 +358,9 @@ function.
 @param [in] destructor the destructor for each element. NULL can be passed if no
 maintenance is required on the elements in the flat_double_ended_queue before
 their slots are dropped.
-@param [in] alloc the required allocation function to provide to a dynamically
-reserved flat_double_ended_queue. Any context data provided upon initialization
-will be passed to the allocation function when called.
+@param [in] allocate the required allocation function to provide to a
+dynamically reserved flat_double_ended_queue. Any context data provided upon
+initialization will be passed to the allocation function when called.
 @return the result of free operation. OK if success, or an error status to
 indicate the error.
 @warning It is an error to call this function on a flat_double_ended_queue that
@@ -384,7 +384,7 @@ allocation permission however the normal
 CCC_flat_double_ended_queue_clear_and_free is sufficient for that use case. */
 CCC_Result CCC_flat_double_ended_queue_clear_and_free_reserve(
     CCC_Flat_double_ended_queue *flat_double_ended_queue,
-    CCC_Type_destructor *destructor, CCC_Allocator *alloc);
+    CCC_Type_destructor *destructor, CCC_Allocator *allocate);
 
 /**@}*/
 

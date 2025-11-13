@@ -38,7 +38,7 @@ struct CCC_Bitset
     /** The number of bits capable of being tracked in the bit block array. */
     size_t capacity;
     /** The user provided allocation function for resizing, if any. */
-    CCC_Allocator *alloc;
+    CCC_Allocator *allocate;
     /** Auxiliary data for resizing, if any. */
     void *context;
 };
@@ -91,13 +91,13 @@ specifiers which is a feature of C23. Not all compilers support this yet. */
 The optional size param defaults equal to capacity if not provided. This covers
 most common cases--fixed size bit set, 0 sized dynamic bit set--and when the
 user wants a fixed size dynamic bit set they provide 0 as size argument. */
-#define CCC_private_bitset_initialize(private_bitblock_ptr, private_alloc_fn,  \
+#define CCC_private_bitset_initialize(private_bitblock_ptr, private_allocate,  \
                                       private_context, private_cap, ...)       \
     {                                                                          \
         .blocks = (private_bitblock_ptr),                                      \
         .count = IMPL_BITSET_OPTIONAL_SIZE((private_cap), __VA_ARGS__),        \
         .capacity = (private_cap),                                             \
-        .alloc = (private_alloc_fn),                                           \
+        .allocate = (private_allocate),                                        \
         .context = (private_context),                                          \
     }
 
@@ -143,19 +143,19 @@ CCC_private_bitset_with_capacity_fn(CCC_Allocator *const fn,
 
 /** @private Determine if user wants capacity different than count. Then pass
 to inline function for bit set construction. */
-#define CCC_private_bitset_from(private_alloc_fn, private_context,             \
+#define CCC_private_bitset_from(private_allocate, private_context,             \
                                 private_start_index, private_count,            \
                                 private_on_char, private_string, ...)          \
     CCC_private_bitset_from_fn(                                                \
-        private_alloc_fn, private_context, private_start_index, private_count, \
+        private_allocate, private_context, private_start_index, private_count, \
         IMPL_BITSET_OPTIONAL_SIZE((private_count), __VA_ARGS__),               \
         private_on_char, private_string)
 
 /** @private Macro wrapper allowing user to optionally specify size. */
-#define CCC_private_bitset_with_capacity(private_alloc_fn, private_context,    \
+#define CCC_private_bitset_with_capacity(private_allocate, private_context,    \
                                          private_cap, ...)                     \
     CCC_private_bitset_with_capacity_fn(                                       \
-        private_alloc_fn, private_context, private_cap,                        \
+        private_allocate, private_context, private_cap,                        \
         IMPL_BITSET_OPTIONAL_SIZE((private_cap), __VA_ARGS__))
 
 #endif /* CCC_IMPL_BITSET */

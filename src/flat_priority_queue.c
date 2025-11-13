@@ -62,8 +62,8 @@ CCC_flat_priority_queue_heapify(
     }
     if (n > flat_priority_queue->buf.capacity)
     {
-        CCC_Result const resize_res = CCC_buffer_alloc(
-            &flat_priority_queue->buf, n, flat_priority_queue->buf.alloc);
+        CCC_Result const resize_res = CCC_buffer_allocate(
+            &flat_priority_queue->buf, n, flat_priority_queue->buf.allocate);
         if (resize_res != CCC_RESULT_OK)
         {
             return resize_res;
@@ -118,7 +118,7 @@ CCC_flat_priority_queue_push(CCC_Flat_priority_queue *const flat_priority_queue,
     {
         return NULL;
     }
-    void *const new = CCC_buffer_alloc_back(&flat_priority_queue->buf);
+    void *const new = CCC_buffer_allocate_back(&flat_priority_queue->buf);
     if (!new)
     {
         return NULL;
@@ -310,18 +310,19 @@ CCC_flat_priority_queue_copy(CCC_Flat_priority_queue *const dst,
        same as in dst initialization because that controls permission. */
     void *const dst_mem = dst->buf.mem;
     size_t const dst_cap = dst->buf.capacity;
-    CCC_Allocator *const dst_alloc = dst->buf.alloc;
+    CCC_Allocator *const dst_allocate = dst->buf.allocate;
     *dst = *src;
     dst->buf.mem = dst_mem;
     dst->buf.capacity = dst_cap;
-    dst->buf.alloc = dst_alloc;
+    dst->buf.allocate = dst_allocate;
     if (!src->buf.count)
     {
         return CCC_RESULT_OK;
     }
     if (dst->buf.capacity < src->buf.capacity)
     {
-        CCC_Result const r = CCC_buffer_alloc(&dst->buf, src->buf.capacity, fn);
+        CCC_Result const r
+            = CCC_buffer_allocate(&dst->buf, src->buf.capacity, fn);
         if (r != CCC_RESULT_OK)
         {
             return r;
@@ -368,14 +369,14 @@ CCC_flat_priority_queue_clear_and_free(
     {
         destroy_each(flat_priority_queue, fn);
     }
-    return CCC_buffer_alloc(&flat_priority_queue->buf, 0,
-                            flat_priority_queue->buf.alloc);
+    return CCC_buffer_allocate(&flat_priority_queue->buf, 0,
+                               flat_priority_queue->buf.allocate);
 }
 
 CCC_Result
 CCC_flat_priority_queue_clear_and_free_reserve(
     CCC_Flat_priority_queue *const flat_priority_queue,
-    CCC_Type_destructor *const destructor, CCC_Allocator *const alloc)
+    CCC_Type_destructor *const destructor, CCC_Allocator *const allocate)
 {
     if (!flat_priority_queue)
     {
@@ -385,7 +386,7 @@ CCC_flat_priority_queue_clear_and_free_reserve(
     {
         destroy_each(flat_priority_queue, destructor);
     }
-    return CCC_buffer_alloc(&flat_priority_queue->buf, 0, alloc);
+    return CCC_buffer_allocate(&flat_priority_queue->buf, 0, allocate);
 }
 
 CCC_Tribool

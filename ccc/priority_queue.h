@@ -75,17 +75,17 @@ priority_queue elem.
 @param [in] priority_queue_order CCC_ORDER_LESSER for a min priority_queue or
 CCC_ORDER_GREATER for a max priority_queue.
 @param [in] order_fn the function used to compare two user types.
-@param [in] alloc_fn the allocation function or NULL if allocation is banned.
+@param [in] allocate the allocation function or NULL if allocation is banned.
 @param [in] context_data context data needed for comparison or destruction.
 @return the initialized priority_queue on the right side of an equality operator
 (e.g. CCC_Priority_queue priority_queue = CCC_priority_queue_initialize(...);)
 */
 #define CCC_priority_queue_initialize(struct_name, priority_queue_node_field,  \
                                       priority_queue_order, order_fn,          \
-                                      alloc_fn, context_data)                  \
+                                      allocate, context_data)                  \
     CCC_private_priority_queue_initialize(                                     \
         struct_name, priority_queue_node_field, priority_queue_order,          \
-        order_fn, alloc_fn, context_data)
+        order_fn, allocate, context_data)
 
 /**@}*/
 

@@ -749,7 +749,7 @@ CCC_flat_hash_map_clear_and_free(CCC_Flat_hash_map *const h,
     {
         return CCC_RESULT_ARGUMENT_ERROR;
     }
-    if (!h->alloc_fn)
+    if (!h->allocate)
     {
         (void)CCC_flat_hash_map_clear(h, fn);
         return CCC_RESULT_NO_ALLOCATION_FUNCTION;
@@ -762,7 +762,7 @@ CCC_flat_hash_map_clear_and_free(CCC_Flat_hash_map *const h,
     h->mask = 0;
     h->count = 0;
     h->tag = NULL;
-    (void)h->alloc_fn((CCC_Allocator_context){
+    (void)h->allocate((CCC_Allocator_context){
         .input = h->data,
         .bytes = 0,
         .context = h->context,
@@ -774,14 +774,14 @@ CCC_flat_hash_map_clear_and_free(CCC_Flat_hash_map *const h,
 CCC_Result
 CCC_flat_hash_map_clear_and_free_reserve(CCC_Flat_hash_map *const h,
                                          CCC_Type_destructor *const destructor,
-                                         CCC_Allocator *const alloc)
+                                         CCC_Allocator *const allocate)
 {
     if (unlikely(!h || !h->data || is_uninitialized(h) || !h->mask
-                 || (h->alloc_fn && h->alloc_fn != alloc)))
+                 || (h->allocate && h->allocate != allocate)))
     {
         return CCC_RESULT_ARGUMENT_ERROR;
     }
-    if (!alloc)
+    if (!allocate)
     {
         (void)CCC_flat_hash_map_clear(h, destructor);
         return CCC_RESULT_NO_ALLOCATION_FUNCTION;
@@ -794,7 +794,7 @@ CCC_flat_hash_map_clear_and_free_reserve(CCC_Flat_hash_map *const h,
     h->mask = 0;
     h->count = 0;
     h->tag = NULL;
-    (void)alloc((CCC_Allocator_context){
+    (void)allocate((CCC_Allocator_context){
         .input = h->data,
         .bytes = 0,
         .context = h->context,
@@ -859,13 +859,13 @@ CCC_flat_hash_map_copy(CCC_Flat_hash_map *const dst,
     void *const dst_tag = dst->tag;
     size_t const dst_mask = dst->mask;
     size_t const dst_remain = dst->remain;
-    CCC_Allocator *const dst_alloc = dst->alloc_fn;
+    CCC_Allocator *const dst_allocate = dst->allocate;
     *dst = *src;
     dst->data = dst_data;
     dst->tag = dst_tag;
     dst->mask = dst_mask;
     dst->remain = dst_remain;
-    dst->alloc_fn = dst_alloc;
+    dst->allocate = dst_allocate;
     if (!src->mask || is_uninitialized(src))
     {
         return CCC_RESULT_OK;
@@ -873,7 +873,7 @@ CCC_flat_hash_map_copy(CCC_Flat_hash_map *const dst,
     size_t const src_bytes = mask_to_total_bytes(src->sizeof_type, src->mask);
     if (dst->mask < src->mask)
     {
-        void *const new_mem = dst->alloc_fn((CCC_Allocator_context){
+        void *const new_mem = dst->allocate((CCC_Allocator_context){
             .input = dst->data,
             .bytes = src_bytes,
             .context = dst->context,
@@ -1087,7 +1087,7 @@ static struct Query
 find(struct CCC_Flat_hash_map *const h, void const *const key,
      uint64_t const hash)
 {
-    CCC_Result const res = maybe_rehash(h, 1, h->alloc_fn);
+    CCC_Result const res = maybe_rehash(h, 1, h->allocate);
     if (res == CCC_RESULT_OK)
     {
         return find_key_or_slot(h, key, hash);

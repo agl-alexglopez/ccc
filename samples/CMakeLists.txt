@@ -13,7 +13,7 @@ target_link_libraries(maze PRIVATE
   random
   string_view
   ccc
-  alloc
+  allocate
 )
 add_dependencies(samples maze)
 
@@ -23,7 +23,7 @@ target_link_libraries(graph PRIVATE
   random
   string_view
   ccc
-  alloc
+  allocate
 )
 add_dependencies(samples graph)
 
@@ -32,8 +32,8 @@ target_link_libraries(words PRIVATE
   cli
   string_view
   ccc
-  alloc
-  str_arena
+  allocate
+  string_arena
 )
 add_dependencies(samples words)
 
@@ -42,7 +42,7 @@ target_link_libraries(ccczip PRIVATE
   cli
   string_view
   ccc
-  alloc
-  str_arena
+  allocate
+  string_arena
 )
 add_dependencies(samples ccczip)

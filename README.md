@@ -867,8 +867,8 @@ void *CCC_priority_queue_push(CCC_Priority_queue *priority_queue, CCC_Priority_q
 Non-Intrusive containers exist when a flat container can operate without such help from the user. The `flat_priority_queue` is a good example of this. When initializing we give it the following information.
 
 ```c
-#define CCC_flat_priority_queue_initialize(mem_ptr, cmp_order, cmp_fn, alloc_fn, context_data, capacity) \
-    CCC_impl_flat_priority_queue_initialize(mem_ptr, cmp_order, cmp_fn, alloc_fn, context_data, capacity)
+#define CCC_flat_priority_queue_initialize(mem_ptr, cmp_order, cmp_fn, allocate, context_data, capacity) \
+    CCC_impl_flat_priority_queue_initialize(mem_ptr, cmp_order, cmp_fn, allocate, context_data, capacity)
 
 /* For example: */
 
@@ -881,7 +881,7 @@ Here a small min priority queue of integers with a maximum capacity of 40 has be
 
 ```c
 CCC_Flat_priority_queue flat_priority_queue
-    = CCC_flat_priority_queue_initialize(NULL, int, CCC_LES, int_cmp, std_alloc, NULL, 0);
+    = CCC_flat_priority_queue_initialize(NULL, int, CCC_LES, int_cmp, std_allocate, NULL, 0);
 ```
 
 The interface then looks like this.
@@ -979,7 +979,7 @@ static flat_hash_map static_fh = flat_hash_map_initialize(
     key,
     flat_hash_map_int_to_u64,
     flat_hash_map_id_cmp,
-    std_alloc,
+    std_allocate,
     NULL,
     0
 );
@@ -1234,7 +1234,7 @@ An allocation function implements the following behavior, where `input` is point
 
 - If NULL is provided with a `bytes` of 0, NULL is returned.
 - If NULL is provided with a non-zero `bytes`, new memory is allocated/returned.
-- If `input` is non-NULL it has been previously allocated by the alloc function.
+- If `input` is non-NULL it has been previously allocated by the allocate function.
 - If `input` is non-NULL with non-zero `bytes`, `input` is resized to at least `bytes`
   bytes. The pointer returned is NULL if resizing fails. Upon success, the
   pointer returned might not be equal to the pointer provided.

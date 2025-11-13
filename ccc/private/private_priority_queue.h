@@ -99,7 +99,7 @@ struct CCC_Priority_queue
     /** @private The comparison function to enforce ordering. */
     CCC_Type_comparator *compare;
     /** @private The allocation function, if any. */
-    CCC_Allocator *alloc;
+    CCC_Allocator *allocate;
     /** @private Auxiliary data, if any. */
     void *context;
 };
@@ -141,7 +141,7 @@ CCC_private_priority_queue_struct_base(struct CCC_Priority_queue const *,
 /** @private */
 #define CCC_private_priority_queue_initialize(                                 \
     private_struct_name, private_priority_queue_node_field,                    \
-    private_priority_queue_order, private_order_fn, private_alloc_fn,          \
+    private_priority_queue_order, private_order_fn, private_allocate,          \
     private_context_data)                                                      \
     {                                                                          \
         .root = NULL,                                                          \
@@ -151,7 +151,7 @@ CCC_private_priority_queue_struct_base(struct CCC_Priority_queue const *,
         .sizeof_type = sizeof(private_struct_name),                            \
         .order = (private_priority_queue_order),                               \
         .compare = (private_order_fn),                                         \
-        .alloc = (private_alloc_fn),                                           \
+        .allocate = (private_allocate),                                        \
         .context = (private_context_data),                                     \
     }
 
@@ -163,14 +163,14 @@ CCC_private_priority_queue_struct_base(struct CCC_Priority_queue const *,
             = (priority_queue_ptr);                                            \
         if (private_priority_queue)                                            \
         {                                                                      \
-            if (!private_priority_queue->alloc)                                \
+            if (!private_priority_queue->allocate)                             \
             {                                                                  \
                 private_priority_queue_res = NULL;                             \
             }                                                                  \
             else                                                               \
             {                                                                  \
-                private_priority_queue_res                                     \
-                    = private_priority_queue->alloc((CCC_Allocator_context){   \
+                private_priority_queue_res = private_priority_queue->allocate( \
+                    (CCC_Allocator_context){                                   \
                         .input = NULL,                                         \
                         .bytes = private_priority_queue->sizeof_type,          \
                         .context = private_priority_queue->context,            \

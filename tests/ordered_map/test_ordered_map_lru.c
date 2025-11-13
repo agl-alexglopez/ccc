@@ -13,7 +13,7 @@ The leetcode lru problem in C. */
 #include "ordered_map.h"
 #include "traits.h"
 #include "types.h"
-#include "util/alloc.h"
+#include "util/allocate.h"
 
 #define REQS 11
 

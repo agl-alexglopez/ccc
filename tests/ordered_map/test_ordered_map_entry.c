@@ -69,7 +69,7 @@ CHECK_BEGIN_STATIC_FN(ordered_map_test_validate)
     struct Val_pool vals
         = {.vals = (struct Val[3]){}, .next_free = 0, .capacity = 3};
     Ordered_map om = ordered_map_initialize(om, struct Val, elem, key, id_order,
-                                            val_bump_alloc, &vals);
+                                            val_bump_allocate, &vals);
     CCC_Entry ent = swap_entry(&om, &(struct Val){.key = -1, .val = -1}.elem,
                                &(struct Val){}.elem);
     CHECK(validate(&om), true);
@@ -93,7 +93,7 @@ CHECK_BEGIN_STATIC_FN(ordered_map_test_insert)
     struct Val_pool vals
         = {.vals = (struct Val[35]){}, .next_free = 0, .capacity = 35};
     Ordered_map om = ordered_map_initialize(om, struct Val, elem, key, id_order,
-                                            val_bump_alloc, &vals);
+                                            val_bump_allocate, &vals);
     int size = 30;
     CCC_Entry ent = swap_entry(&om, &(struct Val){.key = -1, .val = -1}.elem,
                                &(struct Val){}.elem);
@@ -158,7 +158,7 @@ CHECK_BEGIN_STATIC_FN(ordered_map_test_remove)
     struct Val_pool vals
         = {.vals = (struct Val[35]){}, .next_free = 0, .capacity = 35};
     Ordered_map om = ordered_map_initialize(om, struct Val, elem, key, id_order,
-                                            val_bump_alloc, &vals);
+                                            val_bump_allocate, &vals);
     int size = 30;
     CCC_Entry ent = CCC_remove(&om, &(struct Val){.key = -1, .val = -1}.elem);
     CHECK(validate(&om), true);
@@ -232,7 +232,7 @@ CHECK_BEGIN_STATIC_FN(ordered_map_test_try_insert)
     struct Val_pool vals
         = {.vals = (struct Val[35]){}, .next_free = 0, .capacity = 35};
     Ordered_map om = ordered_map_initialize(om, struct Val, elem, key, id_order,
-                                            val_bump_alloc, &vals);
+                                            val_bump_allocate, &vals);
     int size = 30;
     CCC_Entry ent = try_insert(&om, &(struct Val){.key = -1, .val = -1}.elem);
     CHECK(validate(&om), true);
@@ -290,7 +290,7 @@ CHECK_BEGIN_STATIC_FN(ordered_map_test_try_insert_with)
     struct Val_pool vals
         = {.vals = (struct Val[35]){}, .next_free = 0, .capacity = 35};
     Ordered_map om = ordered_map_initialize(om, struct Val, elem, key, id_order,
-                                            val_bump_alloc, &vals);
+                                            val_bump_allocate, &vals);
     int size = 30;
     CCC_Entry *ent = ordered_map_try_insert_w(&om, -1, val(-1));
     CHECK(validate(&om), true);
@@ -349,7 +349,7 @@ CHECK_BEGIN_STATIC_FN(ordered_map_test_insert_or_assign)
     struct Val_pool vals
         = {.vals = (struct Val[35]){}, .next_free = 0, .capacity = 35};
     Ordered_map om = ordered_map_initialize(om, struct Val, elem, key, id_order,
-                                            val_bump_alloc, &vals);
+                                            val_bump_allocate, &vals);
     int size = 30;
     CCC_Entry ent
         = insert_or_assign(&om, &(struct Val){.key = -1, .val = -1}.elem);
@@ -408,7 +408,7 @@ CHECK_BEGIN_STATIC_FN(ordered_map_test_insert_or_assign_with)
     struct Val_pool vals
         = {.vals = (struct Val[35]){}, .next_free = 0, .capacity = 35};
     Ordered_map om = ordered_map_initialize(om, struct Val, elem, key, id_order,
-                                            val_bump_alloc, &vals);
+                                            val_bump_allocate, &vals);
     int size = 30;
     CCC_Entry *ent = ordered_map_insert_or_assign_w(&om, -1, val(-1));
     CHECK(validate(&om), true);
@@ -466,7 +466,7 @@ CHECK_BEGIN_STATIC_FN(ordered_map_test_entry_and_modify)
     struct Val_pool vals
         = {.vals = (struct Val[35]){}, .next_free = 0, .capacity = 35};
     Ordered_map om = ordered_map_initialize(om, struct Val, elem, key, id_order,
-                                            val_bump_alloc, &vals);
+                                            val_bump_allocate, &vals);
     int size = 30;
     CCC_Ordered_map_entry *ent = entry_r(&om, &(int){-1});
     CHECK(validate(&om), true);
@@ -537,7 +537,7 @@ CHECK_BEGIN_STATIC_FN(ordered_map_test_entry_and_modify_context)
     struct Val_pool vals
         = {.vals = (struct Val[35]){}, .next_free = 0, .capacity = 35};
     Ordered_map om = ordered_map_initialize(om, struct Val, elem, key, id_order,
-                                            val_bump_alloc, &vals);
+                                            val_bump_allocate, &vals);
     int size = 30;
     int context = 1;
     CCC_Ordered_map_entry *ent = entry_r(&om, &(int){-1});
@@ -605,7 +605,7 @@ CHECK_BEGIN_STATIC_FN(ordered_map_test_entry_and_modify_with)
     struct Val_pool vals
         = {.vals = (struct Val[35]){}, .next_free = 0, .capacity = 35};
     Ordered_map om = ordered_map_initialize(om, struct Val, elem, key, id_order,
-                                            val_bump_alloc, &vals);
+                                            val_bump_allocate, &vals);
     int size = 30;
     CCC_Ordered_map_entry *ent = entry_r(&om, &(int){-1});
     ent = ordered_map_and_modify_w(ent, struct Val, { T->val++; });
@@ -672,7 +672,7 @@ CHECK_BEGIN_STATIC_FN(ordered_map_test_or_insert)
     struct Val_pool vals
         = {.vals = (struct Val[35]){}, .next_free = 0, .capacity = 35};
     Ordered_map om = ordered_map_initialize(om, struct Val, elem, key, id_order,
-                                            val_bump_alloc, &vals);
+                                            val_bump_allocate, &vals);
     int size = 30;
     struct Val *v = or_insert(entry_r(&om, &(int){-1}),
                               &(struct Val){.key = -1, .val = -1}.elem);
@@ -727,7 +727,7 @@ CHECK_BEGIN_STATIC_FN(ordered_map_test_or_insert_with)
     struct Val_pool vals
         = {.vals = (struct Val[35]){}, .next_free = 0, .capacity = 35};
     Ordered_map om = ordered_map_initialize(om, struct Val, elem, key, id_order,
-                                            val_bump_alloc, &vals);
+                                            val_bump_allocate, &vals);
     int size = 30;
     struct Val *v
         = ordered_map_or_insert_w(entry_r(&om, &(int){-1}), idval(-1, -1));
@@ -781,7 +781,7 @@ CHECK_BEGIN_STATIC_FN(ordered_map_test_insert_entry)
     struct Val_pool vals
         = {.vals = (struct Val[35]){}, .next_free = 0, .capacity = 35};
     Ordered_map om = ordered_map_initialize(om, struct Val, elem, key, id_order,
-                                            val_bump_alloc, &vals);
+                                            val_bump_allocate, &vals);
     int size = 30;
     struct Val *v = insert_entry(entry_r(&om, &(int){-1}),
                                  &(struct Val){.key = -1, .val = -1}.elem);
@@ -838,7 +838,7 @@ CHECK_BEGIN_STATIC_FN(ordered_map_test_insert_entry_with)
     struct Val_pool vals
         = {.vals = (struct Val[35]){}, .next_free = 0, .capacity = 35};
     Ordered_map om = ordered_map_initialize(om, struct Val, elem, key, id_order,
-                                            val_bump_alloc, &vals);
+                                            val_bump_allocate, &vals);
     int size = 30;
     struct Val *v
         = ordered_map_insert_entry_w(entry_r(&om, &(int){-1}), idval(-1, -1));
@@ -892,7 +892,7 @@ CHECK_BEGIN_STATIC_FN(ordered_map_test_remove_entry)
     struct Val_pool vals
         = {.vals = (struct Val[35]){}, .next_free = 0, .capacity = 35};
     Ordered_map om = ordered_map_initialize(om, struct Val, elem, key, id_order,
-                                            val_bump_alloc, &vals);
+                                            val_bump_allocate, &vals);
     int size = 30;
     struct Val *v = or_insert(entry_r(&om, &(int){-1}),
                               &(struct Val){.key = -1, .val = -1}.elem);

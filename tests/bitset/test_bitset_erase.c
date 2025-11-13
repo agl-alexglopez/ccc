@@ -4,9 +4,9 @@
 #include "ccc/bitset.h"
 #include "ccc/types.h"
 #include "checkers.h"
-#include "util/alloc.h"
+#include "util/allocate.h"
 
-CHECK_BEGIN_STATIC_FN(bitset_test_push_pop_back_no_realloc)
+CHECK_BEGIN_STATIC_FN(bitset_test_push_pop_back_no_reallocate)
 {
     CCC_Bitset bs
         = CCC_bitset_initialize(CCC_bitset_blocks(16), NULL, NULL, 16, 0);
@@ -50,7 +50,7 @@ CHECK_BEGIN_STATIC_FN(bitset_test_push_pop_back_no_realloc)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(bitset_test_push_pop_back_alloc)
+CHECK_BEGIN_STATIC_FN(bitset_test_push_pop_back_allocate)
 {
     CCC_Bitset bs = CCC_bitset_initialize(NULL, std_allocate, NULL, 0);
     CHECK(CCC_bitset_capacity(&bs).count, 0);
@@ -95,6 +95,6 @@ CHECK_BEGIN_STATIC_FN(bitset_test_push_pop_back_alloc)
 int
 main(void)
 {
-    return CHECK_RUN(bitset_test_push_pop_back_no_realloc(),
-                     bitset_test_push_pop_back_alloc());
+    return CHECK_RUN(bitset_test_push_pop_back_no_reallocate(),
+                     bitset_test_push_pop_back_allocate());
 }

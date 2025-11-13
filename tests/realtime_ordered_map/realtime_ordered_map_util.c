@@ -52,7 +52,7 @@ inorder_fill(int vals[], size_t size, CCC_Realtime_ordered_map const *const m)
 }
 
 void *
-val_bump_alloc(CCC_Allocator_context const context)
+val_bump_allocate(CCC_Allocator_context const context)
 {
     if (!context.input && !context.bytes)
     {
@@ -74,6 +74,6 @@ val_bump_alloc(CCC_Allocator_context const context)
         /* Don't do anything fancy on free, just bump forward so no op here. */
         return NULL;
     }
-    assert(!"Shouldn't attempt to realloc in bump allocator.");
+    assert(!"Shouldn't attempt to reallocate in bump allocator.");
     return NULL;
 }

@@ -8,7 +8,7 @@
 #include "flat_hash_map_util.h"
 #include "traits.h"
 #include "types.h"
-#include "util/alloc.h"
+#include "util/allocate.h"
 
 static void
 mod(CCC_Type_context const u)
@@ -69,7 +69,7 @@ CHECK_BEGIN_STATIC_FN(flat_hash_map_test_static_initialize)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(flat_hash_map_test_copy_no_alloc)
+CHECK_BEGIN_STATIC_FN(flat_hash_map_test_copy_no_allocate)
 {
     Flat_hash_map src = flat_hash_map_initialize(
         &(small_fixed_map){}, struct Val, key, flat_hash_map_int_zero,
@@ -96,7 +96,7 @@ CHECK_BEGIN_STATIC_FN(flat_hash_map_test_copy_no_alloc)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(flat_hash_map_test_copy_no_alloc_fail)
+CHECK_BEGIN_STATIC_FN(flat_hash_map_test_copy_no_allocate_fail)
 {
     Flat_hash_map src = flat_hash_map_initialize(
         &(standard_fixed_map){}, struct Val, key, flat_hash_map_int_zero,
@@ -114,7 +114,7 @@ CHECK_BEGIN_STATIC_FN(flat_hash_map_test_copy_no_alloc_fail)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(flat_hash_map_test_copy_alloc)
+CHECK_BEGIN_STATIC_FN(flat_hash_map_test_copy_allocate)
 {
     Flat_hash_map dst = flat_hash_map_initialize(
         NULL, struct Val, key, flat_hash_map_int_zero, flat_hash_map_id_order,
@@ -146,7 +146,7 @@ CHECK_BEGIN_STATIC_FN(flat_hash_map_test_copy_alloc)
     });
 }
 
-CHECK_BEGIN_STATIC_FN(flat_hash_map_test_copy_alloc_fail)
+CHECK_BEGIN_STATIC_FN(flat_hash_map_test_copy_allocate_fail)
 {
     Flat_hash_map src = flat_hash_map_initialize(
         NULL, struct Val, key, flat_hash_map_int_zero, flat_hash_map_id_order,
@@ -330,10 +330,10 @@ int
 main()
 {
     return CHECK_RUN(flat_hash_map_test_static_initialize(),
-                     flat_hash_map_test_copy_no_alloc(),
-                     flat_hash_map_test_copy_no_alloc_fail(),
-                     flat_hash_map_test_copy_alloc(),
-                     flat_hash_map_test_copy_alloc_fail(),
+                     flat_hash_map_test_copy_no_allocate(),
+                     flat_hash_map_test_copy_no_allocate_fail(),
+                     flat_hash_map_test_copy_allocate(),
+                     flat_hash_map_test_copy_allocate_fail(),
                      flat_hash_map_test_empty(), flat_hash_map_test_init_from(),
                      flat_hash_map_test_init_from_overwrite(),
                      flat_hash_map_test_init_from_fail(),

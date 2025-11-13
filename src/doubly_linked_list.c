@@ -68,9 +68,9 @@ CCC_doubly_linked_list_push_front(CCC_Doubly_linked_list *const l,
     {
         return NULL;
     }
-    if (l->alloc)
+    if (l->allocate)
     {
-        void *const node = l->alloc((CCC_Allocator_context){
+        void *const node = l->allocate((CCC_Allocator_context){
             .input = NULL,
             .bytes = l->sizeof_type,
             .context = l->context,
@@ -94,9 +94,9 @@ CCC_doubly_linked_list_push_back(CCC_Doubly_linked_list *const l,
     {
         return NULL;
     }
-    if (l->alloc)
+    if (l->allocate)
     {
-        void *const node = l->alloc((CCC_Allocator_context){
+        void *const node = l->allocate((CCC_Allocator_context){
             .input = NULL,
             .bytes = l->sizeof_type,
             .context = l->context,
@@ -140,9 +140,9 @@ CCC_doubly_linked_list_pop_front(CCC_Doubly_linked_list *const l)
         return CCC_RESULT_ARGUMENT_ERROR;
     }
     struct CCC_Doubly_linked_list_node *remove = pop_front(l);
-    if (l->alloc)
+    if (l->allocate)
     {
-        (void)l->alloc((CCC_Allocator_context){
+        (void)l->allocate((CCC_Allocator_context){
             .input = struct_base(l, remove),
             .bytes = 0,
             .context = l->context,
@@ -165,9 +165,9 @@ CCC_doubly_linked_list_pop_back(CCC_Doubly_linked_list *const l)
     {
         remove->n = remove->p = NULL;
     }
-    if (l->alloc)
+    if (l->allocate)
     {
-        (void)l->alloc((CCC_Allocator_context){
+        (void)l->allocate((CCC_Allocator_context){
             .input = struct_base(l, remove),
             .bytes = 0,
             .context = l->context,
@@ -186,9 +186,9 @@ CCC_doubly_linked_list_insert(CCC_Doubly_linked_list *const l,
     {
         return NULL;
     }
-    if (l->alloc)
+    if (l->allocate)
     {
-        void *const node = l->alloc((CCC_Allocator_context){
+        void *const node = l->allocate((CCC_Allocator_context){
             .input = NULL,
             .bytes = l->sizeof_type,
             .context = l->context,
@@ -220,9 +220,9 @@ CCC_doubly_linked_list_erase(CCC_Doubly_linked_list *const l,
     elem->n->p = elem->p;
     elem->p->n = elem->n;
     void *const ret = elem->n == &l->nil ? NULL : struct_base(l, elem);
-    if (l->alloc)
+    if (l->allocate)
     {
-        (void)l->alloc((CCC_Allocator_context){
+        (void)l->allocate((CCC_Allocator_context){
             .input = struct_base(l, elem),
             .bytes = 0,
             .context = l->context,
@@ -471,9 +471,9 @@ CCC_doubly_linked_list_clear(CCC_Doubly_linked_list *const l,
         {
             fn((CCC_Type_context){.type = node, .context = l->context});
         }
-        if (l->alloc)
+        if (l->allocate)
         {
-            (void)l->alloc((CCC_Allocator_context){
+            (void)l->allocate((CCC_Allocator_context){
                 .input = node,
                 .bytes = 0,
                 .context = l->context,
@@ -547,9 +547,9 @@ CCC_doubly_linked_list_insert_sorted(
     {
         return NULL;
     }
-    if (doubly_linked_list->alloc)
+    if (doubly_linked_list->allocate)
     {
-        void *const node = doubly_linked_list->alloc((CCC_Allocator_context){
+        void *const node = doubly_linked_list->allocate((CCC_Allocator_context){
             .input = NULL,
             .bytes = doubly_linked_list->sizeof_type,
             .context = doubly_linked_list->context,
@@ -805,7 +805,7 @@ erase_range(struct CCC_Doubly_linked_list const *const l,
     {
         begin->p = NULL;
     }
-    if (!l->alloc)
+    if (!l->allocate)
     {
         size_t const count = len(begin, end);
         if (end != &l->nil)
@@ -819,14 +819,14 @@ erase_range(struct CCC_Doubly_linked_list const *const l,
     {
         assert(count <= l->count);
         struct CCC_Doubly_linked_list_node *const next = begin->n;
-        (void)l->alloc((CCC_Allocator_context){
+        (void)l->allocate((CCC_Allocator_context){
             .input = struct_base(l, begin),
             .bytes = 0,
             .context = l->context,
         });
         begin = next;
     }
-    (void)l->alloc((CCC_Allocator_context){
+    (void)l->allocate((CCC_Allocator_context){
         .input = struct_base(l, end),
         .bytes = 0,
         .context = l->context,

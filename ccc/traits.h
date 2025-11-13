@@ -530,22 +530,22 @@ Manage underlying buffers for containers. */
 /** @brief Copy src containers memory to dst container.
 @param [in] dst_container_ptr a pointer to the destination container.
 @param [in] src_container_ptr a pointer to the source container.
-@param [in] alloc_fn_ptr the allocation function to use for resizing if needed.
+@param [in] allocate_ptr the allocation function to use for resizing if needed.
 @return the result of the operation.
 
 See container documentation for specific behavior. */
-#define CCC_copy(dst_container_ptr, src_container_ptr, alloc_fn_ptr)           \
-    CCC_private_copy(dst_container_ptr, src_container_ptr, alloc_fn_ptr)
+#define CCC_copy(dst_container_ptr, src_container_ptr, allocate_ptr)           \
+    CCC_private_copy(dst_container_ptr, src_container_ptr, allocate_ptr)
 
 /** @brief Reserve capacity for n_to_add new elements to be inserted.
 @param [in] container_ptr a pointer to the container.
 @param [in] n_to_add the number of elements to add to the container.
-@param [in] alloc_fn_ptr the allocation function to use for resizing if needed.
+@param [in] allocate_ptr the allocation function to use for resizing if needed.
 @return the result of the operation.
 
 See container documentation for specific behavior. */
-#define CCC_reserve(container_ptr, n_to_add, alloc_fn_ptr)                     \
-    CCC_private_reserve(container_ptr, n_to_add, alloc_fn_ptr)
+#define CCC_reserve(container_ptr, n_to_add, allocate_ptr)                     \
+    CCC_private_reserve(container_ptr, n_to_add, allocate_ptr)
 
 /** @brief Clears the container without freeing the underlying buffer.
 @param [in] container_ptr a pointer to the container.

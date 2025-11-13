@@ -130,8 +130,8 @@ static struct CCC_Handle_ordered_map_handle
 handle(struct CCC_Handle_ordered_map *handle_ordered_map, void const *key);
 static size_t erase(struct CCC_Handle_ordered_map *t, void const *key);
 static size_t
-maybe_alloc_insert(struct CCC_Handle_ordered_map *handle_ordered_map,
-                   void const *user_type);
+maybe_allocate_insert(struct CCC_Handle_ordered_map *handle_ordered_map,
+                      void const *user_type);
 static CCC_Result resize(struct CCC_Handle_ordered_map *handle_ordered_map,
                          size_t new_capacity, CCC_Allocator *fn);
 static void copy_soa(struct CCC_Handle_ordered_map const *src,
@@ -146,7 +146,7 @@ static size_t connect_new_root(struct CCC_Handle_ordered_map *t,
 static void insert(struct CCC_Handle_ordered_map *t, size_t n);
 static void *key_in_slot(struct CCC_Handle_ordered_map const *t,
                          void const *user_struct);
-static size_t alloc_slot(struct CCC_Handle_ordered_map *t);
+static size_t allocate_slot(struct CCC_Handle_ordered_map *t);
 static size_t total_bytes(size_t sizeof_type, size_t capacity);
 static struct CCC_Range equal_range(struct CCC_Handle_ordered_map *t,
                                     void const *begin_key, void const *end_key,
@@ -256,7 +256,7 @@ CCC_handle_ordered_map_insert_handle(
         }
         return h->private.i;
     }
-    return maybe_alloc_insert(h->private.handle_ordered_map, key_val_type);
+    return maybe_allocate_insert(h->private.handle_ordered_map, key_val_type);
 }
 
 CCC_Handle_ordered_map_handle *
@@ -308,7 +308,7 @@ CCC_handle_ordered_map_or_insert(CCC_Handle_ordered_map_handle const *const h,
     {
         return h->private.i;
     }
-    return maybe_alloc_insert(h->private.handle_ordered_map, key_val_type);
+    return maybe_allocate_insert(h->private.handle_ordered_map, key_val_type);
 }
 
 CCC_Handle
@@ -334,7 +334,7 @@ CCC_handle_ordered_map_swap_handle(
         }};
     }
     size_t const inserted
-        = maybe_alloc_insert(handle_ordered_map, key_val_output);
+        = maybe_allocate_insert(handle_ordered_map, key_val_output);
     if (!inserted)
     {
         return (CCC_Handle){{
@@ -368,7 +368,7 @@ CCC_handle_ordered_map_try_insert(
         }};
     }
     size_t const inserted
-        = maybe_alloc_insert(handle_ordered_map, key_val_type);
+        = maybe_allocate_insert(handle_ordered_map, key_val_type);
     if (!inserted)
     {
         return (CCC_Handle){{
@@ -407,7 +407,7 @@ CCC_handle_ordered_map_insert_or_assign(
         }};
     }
     size_t const inserted
-        = maybe_alloc_insert(handle_ordered_map, key_val_type);
+        = maybe_allocate_insert(handle_ordered_map, key_val_type);
     if (!inserted)
     {
         return (CCC_Handle){{
@@ -700,12 +700,12 @@ CCC_handle_ordered_map_copy(CCC_Handle_ordered_map *const dst,
     void *const dst_mem = dst->data;
     struct CCC_Handle_ordered_map_node *const dst_nodes = dst->nodes;
     size_t const dst_cap = dst->capacity;
-    CCC_Allocator *const dst_alloc = dst->alloc;
+    CCC_Allocator *const dst_allocate = dst->allocate;
     *dst = *src;
     dst->data = dst_mem;
     dst->nodes = dst_nodes;
     dst->capacity = dst_cap;
-    dst->alloc = dst_alloc;
+    dst->allocate = dst_allocate;
     if (!src->capacity)
     {
         return CCC_RESULT_OK;
@@ -756,7 +756,7 @@ CCC_handle_ordered_map_clear_and_free(
     CCC_Handle_ordered_map *const handle_ordered_map,
     CCC_Type_destructor *const fn)
 {
-    if (!handle_ordered_map || !handle_ordered_map->alloc)
+    if (!handle_ordered_map || !handle_ordered_map->allocate)
     {
         return CCC_RESULT_ARGUMENT_ERROR;
     }
@@ -765,7 +765,7 @@ CCC_handle_ordered_map_clear_and_free(
         handle_ordered_map->root = 0;
         handle_ordered_map->count = 0;
         handle_ordered_map->capacity = 0;
-        (void)handle_ordered_map->alloc((CCC_Allocator_context){
+        (void)handle_ordered_map->allocate((CCC_Allocator_context){
             .input = handle_ordered_map->data,
             .bytes = 0,
             .context = handle_ordered_map->context,
@@ -778,7 +778,7 @@ CCC_handle_ordered_map_clear_and_free(
     handle_ordered_map->root = 0;
     handle_ordered_map->count = 0;
     handle_ordered_map->capacity = 0;
-    (void)handle_ordered_map->alloc((CCC_Allocator_context){
+    (void)handle_ordered_map->allocate((CCC_Allocator_context){
         .input = handle_ordered_map->data,
         .bytes = 0,
         .context = handle_ordered_map->context,
@@ -791,9 +791,9 @@ CCC_handle_ordered_map_clear_and_free(
 CCC_Result
 CCC_handle_ordered_map_clear_and_free_reserve(
     CCC_Handle_ordered_map *const handle_ordered_map,
-    CCC_Type_destructor *const destructor, CCC_Allocator *const alloc)
+    CCC_Type_destructor *const destructor, CCC_Allocator *const allocate)
 {
-    if (!handle_ordered_map || !alloc)
+    if (!handle_ordered_map || !allocate)
     {
         return CCC_RESULT_ARGUMENT_ERROR;
     }
@@ -802,7 +802,7 @@ CCC_handle_ordered_map_clear_and_free_reserve(
         handle_ordered_map->root = 0;
         handle_ordered_map->count = 0;
         handle_ordered_map->capacity = 0;
-        (void)alloc((CCC_Allocator_context){
+        (void)allocate((CCC_Allocator_context){
             .input = handle_ordered_map->data,
             .bytes = 0,
             .context = handle_ordered_map->context,
@@ -814,7 +814,7 @@ CCC_handle_ordered_map_clear_and_free_reserve(
     handle_ordered_map->root = 0;
     handle_ordered_map->count = 0;
     handle_ordered_map->capacity = 0;
-    (void)alloc((CCC_Allocator_context){
+    (void)allocate((CCC_Allocator_context){
         .input = handle_ordered_map->data,
         .bytes = 0,
         .context = handle_ordered_map->context,
@@ -869,10 +869,10 @@ CCC_private_handle_ordered_map_data_at(
 }
 
 size_t
-CCC_private_handle_ordered_map_alloc_slot(
+CCC_private_handle_ordered_map_allocate_slot(
     struct CCC_Handle_ordered_map *const handle_ordered_map)
 {
-    return alloc_slot(handle_ordered_map);
+    return allocate_slot(handle_ordered_map);
 }
 
 /*===========================   Static Helpers    ===========================*/
@@ -928,12 +928,12 @@ handle(struct CCC_Handle_ordered_map *const handle_ordered_map,
 }
 
 static size_t
-maybe_alloc_insert(struct CCC_Handle_ordered_map *const handle_ordered_map,
-                   void const *const user_type)
+maybe_allocate_insert(struct CCC_Handle_ordered_map *const handle_ordered_map,
+                      void const *const user_type)
 {
     /* The end sentinel node will always be at 0. This also means once
        initialized the internal size for implementer is always at least 1. */
-    size_t const node = alloc_slot(handle_ordered_map);
+    size_t const node = allocate_slot(handle_ordered_map);
     if (!node)
     {
         return 0;
@@ -945,7 +945,7 @@ maybe_alloc_insert(struct CCC_Handle_ordered_map *const handle_ordered_map,
 }
 
 static size_t
-alloc_slot(struct CCC_Handle_ordered_map *const t)
+allocate_slot(struct CCC_Handle_ordered_map *const t)
 {
     /* The end sentinel node will always be at 0. This also means once
        initialized the internal size for implementer is always at least 1. */
@@ -956,7 +956,7 @@ alloc_slot(struct CCC_Handle_ordered_map *const t)
         assert(!t->free_list);
         if (old_count == old_cap)
         {
-            if (resize(t, max(old_cap * 2, 8), t->alloc) != CCC_RESULT_OK)
+            if (resize(t, max(old_cap * 2, 8), t->allocate) != CCC_RESULT_OK)
             {
                 return 0;
             }

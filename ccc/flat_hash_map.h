@@ -204,7 +204,7 @@ restrictions. */
 @param [in] hash_fn the CCC_Key_hasher function provided by the user.
 @param [in] key_order_fn the CCC_Key_comparator the user intends to
 use.
-@param [in] alloc_fn the allocation function for resizing or NULL if no
+@param [in] allocate the allocation function for resizing or NULL if no
 resizing is allowed.
 @param [in] context_data context data that is needed for hashing or comparison.
 @param [in] capacity the capacity of a fixed size map or 0.
@@ -261,10 +261,10 @@ static Flat_hash_map static_fh = flat_hash_map_initialize(
 Initialization at runtime is also possible. Stack-based or dynamic maps are
 identical to the provided examples. Omit `static` in a runtime context. */
 #define CCC_flat_hash_map_initialize(map_ptr, any_type_name, key_field,        \
-                                     hash_fn, key_order_fn, alloc_fn,          \
+                                     hash_fn, key_order_fn, allocate,          \
                                      context_data, capacity)                   \
     CCC_private_flat_hash_map_initialize(map_ptr, any_type_name, key_field,    \
-                                         hash_fn, key_order_fn, alloc_fn,      \
+                                         hash_fn, key_order_fn, allocate,      \
                                          context_data, capacity)
 
 /** @brief Initialize a dynamic map at runtime from an initializer list.
@@ -272,7 +272,7 @@ identical to the provided examples. Omit `static` in a runtime context. */
 @param [in] hash_fn the CCC_Key_hasher function provided by the user.
 @param [in] key_order_fn the CCC_Key_comparator the user intends to
 use.
-@param [in] alloc_fn the required allocation function.
+@param [in] allocate the required allocation function.
 @param [in] context_data context data that is needed for hashing or comparison.
 @param [in] optional_capacity optionally specify the capacity of the map if
 different from the size of the compound literal array initializer. If the
@@ -326,10 +326,10 @@ main(void)
 
 Only dynamic maps may be initialized this way due the inability of the hash
 map to protect its invariants from user error at compile time. */
-#define CCC_flat_hash_map_from(key_field, hash_fn, key_order_fn, alloc_fn,     \
+#define CCC_flat_hash_map_from(key_field, hash_fn, key_order_fn, allocate,     \
                                context_data, optional_capacity,                \
                                array_compound_literal...)                      \
-    CCC_private_flat_hash_map_from(key_field, hash_fn, key_order_fn, alloc_fn, \
+    CCC_private_flat_hash_map_from(key_field, hash_fn, key_order_fn, allocate, \
                                    context_data, optional_capacity,            \
                                    array_compound_literal)
 
@@ -340,7 +340,7 @@ capacity.
 @param [in] hash_fn the CCC_Key_hasher function provided by the user.
 @param [in] key_order_fn the CCC_Key_comparator the user intends to
 use.
-@param [in] alloc_fn the required allocation function.
+@param [in] allocate the required allocation function.
 @param [in] context_data context data that is needed for hashing or comparison.
 @param [in] capacity the desired capacity for the map. A capacity of 0 results
 in an argument error and is a no-op after the map is initialized empty.
@@ -382,10 +382,10 @@ main(void)
 Only dynamic maps may be initialized this way as it simply combines the steps
 of initialization and reservation. */
 #define CCC_flat_hash_map_with_capacity(type_name, key_field, hash_fn,         \
-                                        key_order_fn, alloc_fn, context_data,  \
+                                        key_order_fn, allocate, context_data,  \
                                         capacity)                              \
     CCC_private_flat_hash_map_with_capacity(type_name, key_field, hash_fn,     \
-                                            key_order_fn, alloc_fn,            \
+                                            key_order_fn, allocate,            \
                                             context_data, capacity)
 
 /** @brief Copy the map at source to destination.
@@ -952,7 +952,7 @@ CCC_Result CCC_flat_hash_map_clear(CCC_Flat_hash_map *h,
 @param [in] fn the destructor for each element. NULL can be passed if no
 maintenance is required on the elements in the table before their slots are
 forfeit.
-@return the result of free operation. If no alloc function is provided it is
+@return the result of free operation. If no allocate function is provided it is
 an error to attempt to free the Buffer and a memory error is returned.
 Otherwise, an OK result is returned. */
 CCC_Result CCC_flat_hash_map_clear_and_free(CCC_Flat_hash_map *h,
@@ -964,9 +964,9 @@ previously dynamically reserved with the reserve function.
 @param [in] destructor the destructor for each element. NULL can be passed if no
 maintenance is required on the elements in the table before their slots are
 forfeit.
-@param [in] alloc the required allocation function to provide to a dynamically
-reserved map. Any context data provided upon initialization will be passed to
-the allocation function when called.
+@param [in] allocate the required allocation function to provide to a
+dynamically reserved map. Any context data provided upon initialization will be
+passed to the allocation function when called.
 @return the result of free operation. CCC_RESULT_OK if success, or an error
 status to indicate the error.
 @warning It is an error to call this function on a map that was not reserved
@@ -988,7 +988,7 @@ case. */
 CCC_Result
 CCC_flat_hash_map_clear_and_free_reserve(CCC_Flat_hash_map *h,
                                          CCC_Type_destructor *destructor,
-                                         CCC_Allocator *alloc);
+                                         CCC_Allocator *allocate);
 
 /**@}*/
 

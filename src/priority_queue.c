@@ -76,9 +76,9 @@ CCC_priority_queue_push(CCC_Priority_queue *const priority_queue,
         return NULL;
     }
     void *ret = struct_base(priority_queue, e);
-    if (priority_queue->alloc)
+    if (priority_queue->allocate)
     {
-        void *const node = priority_queue->alloc((CCC_Allocator_context){
+        void *const node = priority_queue->allocate((CCC_Allocator_context){
             .input = NULL,
             .bytes = priority_queue->sizeof_type,
             .context = priority_queue->context,
@@ -108,9 +108,9 @@ CCC_priority_queue_pop(CCC_Priority_queue *const priority_queue)
     priority_queue->root = delete_min(priority_queue, priority_queue->root);
     priority_queue->count--;
     clear_node(popped);
-    if (priority_queue->alloc)
+    if (priority_queue->allocate)
     {
-        (void)priority_queue->alloc((CCC_Allocator_context){
+        (void)priority_queue->allocate((CCC_Allocator_context){
             .input = struct_base(priority_queue, popped),
             .bytes = 0,
             .context = priority_queue->context,
@@ -143,9 +143,9 @@ CCC_priority_queue_erase(CCC_Priority_queue *const priority_queue,
     }
     priority_queue->root = delete_node(priority_queue, e);
     priority_queue->count--;
-    if (priority_queue->alloc)
+    if (priority_queue->allocate)
     {
-        (void)priority_queue->alloc((CCC_Allocator_context){
+        (void)priority_queue->allocate((CCC_Allocator_context){
             .input = struct_base(priority_queue, e),
             .bytes = 0,
             .context = priority_queue->context,
@@ -202,9 +202,9 @@ CCC_priority_queue_clear(CCC_Priority_queue *const priority_queue,
                 .context = priority_queue->context,
             });
         }
-        if (priority_queue->alloc)
+        if (priority_queue->allocate)
         {
-            (void)priority_queue->alloc((CCC_Allocator_context){
+            (void)priority_queue->allocate((CCC_Allocator_context){
                 .input = del,
                 .bytes = 0,
                 .context = priority_queue->context,

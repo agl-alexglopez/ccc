@@ -65,7 +65,7 @@ struct CCC_Realtime_ordered_map
     /** @private The size of the user struct holding the intruder. */
     size_t sizeof_type;
     /** @private An allocation function, if any. */
-    CCC_Allocator *alloc;
+    CCC_Allocator *allocate;
     /** @private The comparison function for three way comparison. */
     CCC_Key_comparator *order;
     /** @private Auxiliary data, if any. */
@@ -120,7 +120,7 @@ void *CCC_private_realtime_ordered_map_insert(
 /** @private */
 #define CCC_private_realtime_ordered_map_initialize(                           \
     private_map_name, private_struct_name, private_node_node_field,            \
-    private_key_node_field, private_key_order_fn, private_alloc_fn,            \
+    private_key_node_field, private_key_order_fn, private_allocate,            \
     private_context_data)                                                      \
     {                                                                          \
         .root = &(private_map_name).end,                                       \
@@ -132,7 +132,7 @@ void *CCC_private_realtime_ordered_map_insert(
         .node_node_offset                                                      \
         = offsetof(private_struct_name, private_node_node_field),              \
         .sizeof_type = sizeof(private_struct_name),                            \
-        .alloc = (private_alloc_fn),                                           \
+        .allocate = (private_allocate),                                        \
         .order = (private_key_order_fn),                                       \
         .context = (private_context_data),                                     \
     }
@@ -142,12 +142,12 @@ void *CCC_private_realtime_ordered_map_insert(
 /** @private */
 #define CCC_private_realtime_ordered_map_new(Realtime_ordered_map_entry)       \
     (__extension__({                                                           \
-        void *private_realtime_ordered_map_ins_alloc_ret = NULL;               \
-        if ((Realtime_ordered_map_entry)->rom->alloc)                          \
+        void *private_realtime_ordered_map_ins_allocate_ret = NULL;            \
+        if ((Realtime_ordered_map_entry)->rom->allocate)                       \
         {                                                                      \
-            private_realtime_ordered_map_ins_alloc_ret                         \
+            private_realtime_ordered_map_ins_allocate_ret                      \
                 = (Realtime_ordered_map_entry)                                 \
-                      ->rom->alloc((CCC_Allocator_context){                    \
+                      ->rom->allocate((CCC_Allocator_context){                 \
                           .input = NULL,                                       \
                           .bytes                                               \
                           = (Realtime_ordered_map_entry)->rom->sizeof_type,    \
@@ -155,7 +155,7 @@ void *CCC_private_realtime_ordered_map_insert(
                           = (Realtime_ordered_map_entry)->rom->context,        \
                       });                                                      \
         }                                                                      \
-        private_realtime_ordered_map_ins_alloc_ret;                            \
+        private_realtime_ordered_map_ins_allocate_ret;                         \
     }))
 
 /** @private */

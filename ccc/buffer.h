@@ -83,7 +83,7 @@ Initialize the container with memory, callbacks, and permissions. */
 policy, capacity, and optional starting size.
 @param [in] mem_ptr the pointer to existing memory or NULL.
 @param [in] any_type_name the name of the user type in the buffer.
-@param [in] alloc_fn CCC_Allocator or NULL if no allocation is permitted.
+@param [in] allocate CCC_Allocator or NULL if no allocation is permitted.
 @param [in] context_data any context data needed for managing Buffer memory.
 @param [in] capacity the capacity of memory at mem_ptr.
 @param [in] optional_size optional starting size of the Buffer <= capacity.
@@ -115,13 +115,13 @@ provide an allocation function. If a dynamic Buffer is preferred, provide the
 allocation function as defined by the signature in types.h. If resizing is
 desired on memory that has already been allocated, ensure allocation has
 occurred with the provided allocation function. */
-#define CCC_buffer_initialize(mem_ptr, any_type_name, alloc_fn, context_data,  \
+#define CCC_buffer_initialize(mem_ptr, any_type_name, allocate, context_data,  \
                               capacity, optional_size...)                      \
-    CCC_private_buffer_initialize(mem_ptr, any_type_name, alloc_fn,            \
+    CCC_private_buffer_initialize(mem_ptr, any_type_name, allocate,            \
                                   context_data, capacity, optional_size)
 
 /** @brief Initialize a Buffer from a compound literal array initializer.
-@param [in] alloc_fn CCC_Allocator or NULL if no allocation is permitted.
+@param [in] allocate CCC_Allocator or NULL if no allocation is permitted.
 @param [in] context_data any context data needed for managing Buffer memory.
 @param [in] optional_capacity optionally specify the capacity of the Buffer if
 different from the size of the compound literal array initializer. If the
@@ -165,13 +165,13 @@ main(void)
 Only dynamic buffers may be initialized this way. For static or stack based
 initialization of fixed buffers with contents known at compile time, see the
 CCC_buffer_initialize() macro. */
-#define CCC_buffer_from(alloc_fn, context_data, optional_capacity,             \
+#define CCC_buffer_from(allocate, context_data, optional_capacity,             \
                         compound_literal_array...)                             \
-    CCC_private_buffer_from(alloc_fn, context_data, optional_capacity,         \
+    CCC_private_buffer_from(allocate, context_data, optional_capacity,         \
                             compound_literal_array)
 
 /** @brief Initialize a Buffer with a capacity.
-@param [in] alloc_fn CCC_Allocator or NULL if no allocation is permitted.
+@param [in] allocate CCC_Allocator or NULL if no allocation is permitted.
 @param [in] context_data any context data needed for managing Buffer memory.
 @param [in] capacity the capacity of the Buffer to reserve.
 @return the initialized buffer. Directly assign to Buffer on the right hand
@@ -193,9 +193,9 @@ main(void)
 Only dynamic buffers may be initialized this way. For static or stack based
 initialization of fixed buffers with contents known at compile time, see the
 CCC_buffer_initialize() macro. */
-#define CCC_buffer_with_capacity(any_type_name, alloc_fn, context_data,        \
+#define CCC_buffer_with_capacity(any_type_name, allocate, context_data,        \
                                  capacity)                                     \
-    CCC_private_buffer_with_capacity(any_type_name, alloc_fn, context_data,    \
+    CCC_private_buffer_with_capacity(any_type_name, allocate, context_data,    \
                                      capacity)
 
 /** @brief Reserves space for at least to_add more elements.
@@ -297,8 +297,8 @@ allocation function has been provided upon initialization and the user is
 managing allocations and resizing directly. If an allocation function has
 been provided than the use of this function should be rare as the buffer
 will reallocate more memory when necessary. */
-[[nodiscard]] CCC_Result CCC_buffer_alloc(CCC_Buffer *buf, size_t capacity,
-                                          CCC_Allocator *fn);
+[[nodiscard]] CCC_Result CCC_buffer_allocate(CCC_Buffer *buf, size_t capacity,
+                                             CCC_Allocator *fn);
 
 /** @brief allocates a new slot from the Buffer at the end of the contiguous
 array. A slot is equivalent to one of the element type specified when the
@@ -311,7 +311,7 @@ provided or the Buffer is unable to allocate more memory.
 A Buffer can be used as the backing for more complex data structures.
 Requesting new space from a Buffer as an allocator can be helpful for these
 higher level organizations. */
-[[nodiscard]] void *CCC_buffer_alloc_back(CCC_Buffer *buf);
+[[nodiscard]] void *CCC_buffer_allocate_back(CCC_Buffer *buf);
 
 /** @brief return the newly pushed data into the last slot of the buffer
 according to size.
@@ -669,9 +669,9 @@ previously dynamically reserved with the reserve function.
 @param [in] destructor the destructor for each element. NULL can be passed if no
 maintenance is required on the elements in the buf before their slots are
 dropped.
-@param [in] alloc the required allocation function to provide to a dynamically
-reserved buf. Any context data provided upon initialization will be passed to
-the allocation function when called.
+@param [in] allocate the required allocation function to provide to a
+dynamically reserved buf. Any context data provided upon initialization will be
+passed to the allocation function when called.
 @return the result of free operation. OK if success, or an error status to
 indicate the error.
 @warning It is an error to call this function on a buf that was not reserved
@@ -692,7 +692,7 @@ however the normal CCC_buffer_clear_and_free is sufficient for that use case.
 Elements are assumed to be contiguous from the 0th index to index at size - 1.*/
 CCC_Result CCC_buffer_clear_and_free_reserve(CCC_Buffer *buf,
                                              CCC_Type_destructor *destructor,
-                                             CCC_Allocator *alloc);
+                                             CCC_Allocator *allocate);
 
 /** @brief Set size of buf to 0 and call destructor on each element if needed.
 Free the underlying Buffer setting the capacity to 0. O(1) if no destructor is
@@ -726,7 +726,7 @@ dropped with this directive if one is sure no namespace collisions occur. */
 #ifdef BUFFER_USING_NAMESPACE_CCC
 typedef CCC_Buffer Buffer;
 #    define buffer_initialize(args...) CCC_buffer_initialize(args)
-#    define buffer_alloc(args...) CCC_buffer_alloc(args)
+#    define buffer_allocate(args...) CCC_buffer_allocate(args)
 #    define buffer_reserve(args...) CCC_buffer_reserve(args)
 #    define buffer_copy(args...) CCC_buffer_copy(args)
 #    define buffer_clear(args...) CCC_buffer_clear(args)
@@ -750,7 +750,7 @@ typedef CCC_Buffer Buffer;
 #    define buffer_back_as(args...) CCC_buffer_back_as(args)
 #    define buffer_front(args...) CCC_buffer_front(args)
 #    define buffer_front_as(args...) CCC_buffer_front_as(args)
-#    define buffer_alloc_back(args...) CCC_buffer_alloc_back(args)
+#    define buffer_allocate_back(args...) CCC_buffer_allocate_back(args)
 #    define buffer_emplace(args...) CCC_buffer_emplace(args)
 #    define buffer_emplace_back(args...) CCC_buffer_emplace_back(args)
 #    define buffer_push_back(args...) CCC_buffer_push_back(args)

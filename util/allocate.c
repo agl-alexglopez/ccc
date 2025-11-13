@@ -1,7 +1,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 
-#include "alloc.h"
+#include "allocate.h"
 #include "types.h"
 
 void *

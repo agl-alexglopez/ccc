@@ -82,16 +82,16 @@ elem.
 @param [in] list_node_field the name of the field in the user type storing the
 intrusive list elem.
 @param [in] order_fn a comparison function for searching or sorting the list.
-@param [in] alloc_fn an allocation function if allocation is allowed.
+@param [in] allocate an allocation function if allocation is allowed.
 @param [in] context_data a pointer to any context data needed for comparison or
 destruction.
 @return a stuct initializer for the singly linked list to be assigned
 (e.g. CCC_Singly_linked_list l = CCC_singly_linked_list_initialize(...);). */
 #define CCC_singly_linked_list_initialize(                                     \
-    list_name, struct_name, list_node_field, order_fn, alloc_fn, context_data) \
+    list_name, struct_name, list_node_field, order_fn, allocate, context_data) \
     CCC_private_singly_linked_list_initialize(list_name, struct_name,          \
                                               list_node_field, order_fn,       \
-                                              alloc_fn, context_data)
+                                              allocate, context_data)
 
 /**@}*/
 

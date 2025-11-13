@@ -38,7 +38,7 @@ Enter 'q' to quit. */
 #include "ccc/priority_queue.h"
 #include "ccc/traits.h"
 #include "ccc/types.h"
-#include "util/alloc.h"
+#include "util/allocate.h"
 #include "util/cli.h"
 #include "util/random.h"
 #include "util/string_view/string_view.h"

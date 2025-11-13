@@ -9,7 +9,7 @@
 #include "flat_priority_queue_util.h"
 #include "traits.h"
 #include "types.h"
-#include "util/alloc.h"
+#include "util/allocate.h"
 
 CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_insert_one)
 {

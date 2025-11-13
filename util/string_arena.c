@@ -2,17 +2,17 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "str_arena.h"
+#include "string_arena.h"
 
-static enum String_arena_result str_arena_maybe_resize(struct String_arena *a,
-                                                       size_t byte_request);
 static enum String_arena_result
-str_arena_maybe_resize_pos(struct String_arena *a, size_t furthest_pos);
+string_arena_maybe_resize(struct String_arena *a, size_t byte_request);
+static enum String_arena_result
+string_arena_maybe_resize_pos(struct String_arena *a, size_t furthest_pos);
 
 /*=======================   Str Arena Allocator   ===========================*/
 
 struct String_arena
-str_arena_create(size_t const cap)
+string_arena_create(size_t const cap)
 {
     struct String_arena a;
     a.arena = calloc(cap, sizeof(char));
@@ -28,9 +28,9 @@ str_arena_create(size_t const cap)
 /* Allocates exactly bytes bytes from the arena. Do not forget the null
    terminator in requests if a string is requested. */
 struct String_offset
-str_arena_alloc(struct String_arena *const a, size_t const bytes)
+string_arena_allocate(struct String_arena *const a, size_t const bytes)
 {
-    enum String_arena_result const res = str_arena_maybe_resize(a, bytes);
+    enum String_arena_result const res = string_arena_maybe_resize(a, bytes);
     if (res)
     {
         return (struct String_offset){.error = res};
@@ -41,20 +41,21 @@ str_arena_alloc(struct String_arena *const a, size_t const bytes)
 }
 
 enum String_arena_result
-str_arena_push_back(struct String_arena *const a,
-                    struct String_offset *const str, char const c)
+string_arena_push_back(struct String_arena *const a,
+                       struct String_offset *const str, char const c)
 {
     if (!a || !str || str->error)
     {
-        return STR_ARENA_ARG_ERROR;
+        return STRING_ARENA_ARG_ERROR;
     }
     size_t const new_pos = str->ofs + str->len + 1;
-    enum String_arena_result const res = str_arena_maybe_resize_pos(a, new_pos);
+    enum String_arena_result const res
+        = string_arena_maybe_resize_pos(a, new_pos);
     if (res)
     {
         return res;
     }
-    char *const string = str_arena_at(a, str);
+    char *const string = string_arena_at(a, str);
     *(string + str->len) = c;
     *(string + str->len + 1) = '\0';
     if (new_pos >= a->next_free_pos)
@@ -62,26 +63,27 @@ str_arena_push_back(struct String_arena *const a,
         a->next_free_pos += ((new_pos + 1) - a->next_free_pos);
     }
     ++str->len;
-    return STR_ARENA_OK;
+    return STRING_ARENA_OK;
 }
 
 static enum String_arena_result
-str_arena_maybe_resize(struct String_arena *const a, size_t const byte_request)
+string_arena_maybe_resize(struct String_arena *const a,
+                          size_t const byte_request)
 {
     if (!a)
     {
-        return STR_ARENA_ARG_ERROR;
+        return STRING_ARENA_ARG_ERROR;
     }
-    return str_arena_maybe_resize_pos(a, a->next_free_pos + byte_request);
+    return string_arena_maybe_resize_pos(a, a->next_free_pos + byte_request);
 }
 
 static enum String_arena_result
-str_arena_maybe_resize_pos(struct String_arena *const a,
-                           size_t const furthest_pos)
+string_arena_maybe_resize_pos(struct String_arena *const a,
+                              size_t const furthest_pos)
 {
     if (!a)
     {
-        return STR_ARENA_ARG_ERROR;
+        return STRING_ARENA_ARG_ERROR;
     }
     if (furthest_pos >= a->cap)
     {
@@ -89,23 +91,23 @@ str_arena_maybe_resize_pos(struct String_arena *const a,
         void *const moved_arena = realloc(a->arena, new_cap);
         if (!moved_arena)
         {
-            return STR_ARENA_ALLOC_FAIL;
+            return STRING_ARENA_ALLOC_FAIL;
         }
         memset((char *)moved_arena + a->cap, '\0', new_cap - a->cap);
         a->arena = moved_arena;
         a->cap = new_cap;
     }
-    return STR_ARENA_OK;
+    return STRING_ARENA_OK;
 }
 
 enum String_arena_result
-str_arena_pop_str(struct String_arena *const a,
-                  struct String_offset *const last_str)
+string_arena_pop_str(struct String_arena *const a,
+                     struct String_offset *const last_str)
 {
     if (!a || !a->arena || !a->cap || !a->next_free_pos || !last_str
         || last_str->error)
     {
-        return STR_ARENA_ARG_ERROR;
+        return STRING_ARENA_ARG_ERROR;
     }
     if (last_str->len)
     {
@@ -118,17 +120,17 @@ str_arena_pop_str(struct String_arena *const a,
     }
     else
     {
-        *last_str = (struct String_offset){.error = STR_ARENA_INVALID};
+        *last_str = (struct String_offset){.error = STRING_ARENA_INVALID};
     }
-    return STR_ARENA_OK;
+    return STRING_ARENA_OK;
 }
 
 enum String_arena_result
-str_arena_clear(struct String_arena *const a)
+string_arena_clear(struct String_arena *const a)
 {
     if (!a)
     {
-        return STR_ARENA_ARG_ERROR;
+        return STRING_ARENA_ARG_ERROR;
     }
     if (a->arena)
     {
@@ -136,15 +138,15 @@ str_arena_clear(struct String_arena *const a)
     }
     a->next_free_pos = 0;
     a->cap = 0;
-    return STR_ARENA_OK;
+    return STRING_ARENA_OK;
 }
 
 enum String_arena_result
-str_arena_free(struct String_arena *const a)
+string_arena_free(struct String_arena *const a)
 {
     if (!a)
     {
-        return STR_ARENA_ARG_ERROR;
+        return STRING_ARENA_ARG_ERROR;
     }
     if (a->arena)
     {
@@ -153,12 +155,12 @@ str_arena_free(struct String_arena *const a)
     }
     a->next_free_pos = 0;
     a->cap = 0;
-    return STR_ARENA_OK;
+    return STRING_ARENA_OK;
 }
 
 char *
-str_arena_at(struct String_arena const *const a,
-             struct String_offset const *const i)
+string_arena_at(struct String_arena const *const a,
+                struct String_offset const *const i)
 {
     if (!a || !i || i->error || i->ofs >= a->cap)
     {

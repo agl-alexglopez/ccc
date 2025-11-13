@@ -82,15 +82,15 @@ Initialize the container with memory, callbacks, and permissions. */
 @param [in] om_node_field the name of the intrusive map elem field.
 @param [in] key_node_field the name of the field in user type used as key.
 @param [in] key_order the key comparison function (see types.h).
-@param [in] alloc_fn the allocation function or NULL if allocation is banned.
+@param [in] allocate the allocation function or NULL if allocation is banned.
 @param [in] context a pointer to any context data for comparison or destruction.
 @return the struct initialized ordered map for direct assignment
 (i.e. CCC_Ordered_map m = CCC_ordered_map_initialize(...);). */
 #define CCC_ordered_map_initialize(om_name, struct_name, om_node_field,        \
-                                   key_node_field, key_order, alloc_fn,        \
+                                   key_node_field, key_order, allocate,        \
                                    context)                                    \
     CCC_private_ordered_map_initialize(om_name, struct_name, om_node_field,    \
-                                       key_node_field, key_order, alloc_fn,    \
+                                       key_node_field, key_order, allocate,    \
                                        context)
 
 /**@}*/

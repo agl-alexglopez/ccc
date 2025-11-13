@@ -76,9 +76,9 @@ CCC_singly_linked_list_push_front(
     {
         return NULL;
     }
-    if (singly_linked_list->alloc)
+    if (singly_linked_list->allocate)
     {
-        void *const node = singly_linked_list->alloc((CCC_Allocator_context){
+        void *const node = singly_linked_list->allocate((CCC_Allocator_context){
             .input = NULL,
             .bytes = singly_linked_list->sizeof_type,
             .context = singly_linked_list->context,
@@ -133,9 +133,9 @@ CCC_singly_linked_list_pop_front(
     }
     struct CCC_Singly_linked_list_node *const remove
         = pop_front(singly_linked_list);
-    if (singly_linked_list->alloc)
+    if (singly_linked_list->allocate)
     {
-        (void)singly_linked_list->alloc((CCC_Allocator_context){
+        (void)singly_linked_list->allocate((CCC_Allocator_context){
             .input = struct_base(singly_linked_list, remove),
             .bytes = 0,
             .context = singly_linked_list->context,
@@ -224,9 +224,9 @@ CCC_singly_linked_list_erase(CCC_Singly_linked_list *const singly_linked_list,
     {
         elem->n = NULL;
     }
-    if (singly_linked_list->alloc)
+    if (singly_linked_list->allocate)
     {
-        (void)singly_linked_list->alloc((CCC_Allocator_context){
+        (void)singly_linked_list->allocate((CCC_Allocator_context){
             .input = struct_base(singly_linked_list, elem),
             .bytes = 0,
             .context = singly_linked_list->context,
@@ -346,9 +346,9 @@ CCC_singly_linked_list_clear(CCC_Singly_linked_list *const singly_linked_list,
             fn((CCC_Type_context){.type = mem,
                                   .context = singly_linked_list->context});
         }
-        if (singly_linked_list->alloc)
+        if (singly_linked_list->allocate)
         {
-            (void)singly_linked_list->alloc((CCC_Allocator_context){
+            (void)singly_linked_list->allocate((CCC_Allocator_context){
                 .input = mem,
                 .bytes = 0,
                 .context = singly_linked_list->context,
@@ -446,9 +446,9 @@ CCC_singly_linked_list_insert_sorted(CCC_Singly_linked_list *singly_linked_list,
     {
         return NULL;
     }
-    if (singly_linked_list->alloc)
+    if (singly_linked_list->allocate)
     {
-        void *const node = singly_linked_list->alloc((CCC_Allocator_context){
+        void *const node = singly_linked_list->allocate((CCC_Allocator_context){
             .input = NULL,
             .bytes = singly_linked_list->sizeof_type,
             .context = singly_linked_list->context,
@@ -656,7 +656,7 @@ erase_range(struct CCC_Singly_linked_list *const singly_linked_list,
             struct CCC_Singly_linked_list_node const *begin,
             struct CCC_Singly_linked_list_node *const end)
 {
-    if (!singly_linked_list->alloc)
+    if (!singly_linked_list->allocate)
     {
         size_t const count = len(begin, end);
         if (end != &singly_linked_list->nil)
@@ -671,13 +671,13 @@ erase_range(struct CCC_Singly_linked_list *const singly_linked_list,
     {
         assert(count <= singly_linked_list->count);
         next = begin->n;
-        (void)singly_linked_list->alloc((CCC_Allocator_context){
+        (void)singly_linked_list->allocate((CCC_Allocator_context){
             .input = struct_base(singly_linked_list, begin),
             .bytes = 0,
             .context = singly_linked_list->context,
         });
     }
-    (void)singly_linked_list->alloc((CCC_Allocator_context){
+    (void)singly_linked_list->allocate((CCC_Allocator_context){
         .input = struct_base(singly_linked_list, end),
         .bytes = 0,
         .context = singly_linked_list->context,

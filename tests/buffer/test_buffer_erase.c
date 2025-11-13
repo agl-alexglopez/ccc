@@ -8,7 +8,7 @@
 #include "ccc/buffer.h"
 #include "ccc/types.h"
 #include "checkers.h"
-#include "util/alloc.h"
+#include "util/allocate.h"
 #include "util/random.h"
 
 CHECK_BEGIN_STATIC_FN(buffer_test_push_pop_fixed)

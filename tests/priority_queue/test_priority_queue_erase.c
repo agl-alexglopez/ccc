@@ -10,7 +10,7 @@
 #include "priority_queue_util.h"
 #include "traits.h"
 #include "types.h"
-#include "util/alloc.h"
+#include "util/allocate.h"
 
 CHECK_BEGIN_STATIC_FN(priority_queue_test_insert_remove_four_dups)
 {
@@ -198,7 +198,7 @@ CHECK_BEGIN_STATIC_FN(priority_queue_test_weak_srand)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(priority_queue_test_weak_srand_alloc)
+CHECK_BEGIN_STATIC_FN(priority_queue_test_weak_srand_allocate)
 {
     CCC_Priority_queue ppriority_queue = CCC_priority_queue_initialize(
         struct Val, elem, CCC_ORDER_LESSER, val_order, std_allocate, NULL);
@@ -230,5 +230,5 @@ main()
         priority_queue_test_pop_max(), priority_queue_test_pop_min(),
         priority_queue_test_delete_prime_shuffle_duplicates(),
         priority_queue_test_prime_shuffle(), priority_queue_test_weak_srand(),
-        priority_queue_test_weak_srand_alloc());
+        priority_queue_test_weak_srand_allocate());
 }

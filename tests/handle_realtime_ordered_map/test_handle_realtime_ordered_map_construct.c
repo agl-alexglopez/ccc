@@ -9,7 +9,7 @@
 #include "handle_realtime_ordered_map_util.h"
 #include "traits.h"
 #include "types.h"
-#include "util/alloc.h"
+#include "util/allocate.h"
 
 CHECK_BEGIN_STATIC_FN(handle_realtime_ordered_map_test_empty)
 {
@@ -20,7 +20,7 @@ CHECK_BEGIN_STATIC_FN(handle_realtime_ordered_map_test_empty)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(handle_realtime_ordered_map_test_copy_no_alloc)
+CHECK_BEGIN_STATIC_FN(handle_realtime_ordered_map_test_copy_no_allocate)
 {
     Handle_realtime_ordered_map src = handle_realtime_ordered_map_initialize(
         &(small_fixed_map){}, struct Val, id, id_order, NULL, NULL,
@@ -51,7 +51,7 @@ CHECK_BEGIN_STATIC_FN(handle_realtime_ordered_map_test_copy_no_alloc)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(handle_realtime_ordered_map_test_copy_no_alloc_fail)
+CHECK_BEGIN_STATIC_FN(handle_realtime_ordered_map_test_copy_no_allocate_fail)
 {
     Handle_realtime_ordered_map src = handle_realtime_ordered_map_initialize(
         &(standard_fixed_map){}, struct Val, id, id_order, NULL, NULL,
@@ -69,7 +69,7 @@ CHECK_BEGIN_STATIC_FN(handle_realtime_ordered_map_test_copy_no_alloc_fail)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(handle_realtime_ordered_map_test_copy_alloc)
+CHECK_BEGIN_STATIC_FN(handle_realtime_ordered_map_test_copy_allocate)
 {
     Handle_realtime_ordered_map src = handle_realtime_ordered_map_initialize(
         NULL, struct Val, id, id_order, std_allocate, NULL, 0);
@@ -101,7 +101,7 @@ CHECK_BEGIN_STATIC_FN(handle_realtime_ordered_map_test_copy_alloc)
     });
 }
 
-CHECK_BEGIN_STATIC_FN(handle_realtime_ordered_map_test_copy_alloc_fail)
+CHECK_BEGIN_STATIC_FN(handle_realtime_ordered_map_test_copy_allocate_fail)
 {
     Handle_realtime_ordered_map src = handle_realtime_ordered_map_initialize(
         NULL, struct Val, id, id_order, std_allocate, NULL, 0);
@@ -122,8 +122,8 @@ int
 main()
 {
     return CHECK_RUN(handle_realtime_ordered_map_test_empty(),
-                     handle_realtime_ordered_map_test_copy_no_alloc(),
-                     handle_realtime_ordered_map_test_copy_no_alloc_fail(),
-                     handle_realtime_ordered_map_test_copy_alloc(),
-                     handle_realtime_ordered_map_test_copy_alloc_fail());
+                     handle_realtime_ordered_map_test_copy_no_allocate(),
+                     handle_realtime_ordered_map_test_copy_no_allocate_fail(),
+                     handle_realtime_ordered_map_test_copy_allocate(),
+                     handle_realtime_ordered_map_test_copy_allocate_fail());
 }

@@ -9,7 +9,7 @@
 #include "flat_hash_map_util.h"
 #include "traits.h"
 #include "types.h"
-#include "util/alloc.h"
+#include "util/allocate.h"
 #include "util/random.h"
 
 CHECK_BEGIN_STATIC_FN(flat_hash_map_test_erase)

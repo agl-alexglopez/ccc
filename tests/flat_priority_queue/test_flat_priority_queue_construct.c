@@ -12,7 +12,7 @@
 #include "flat_priority_queue_util.h"
 #include "traits.h"
 #include "types.h"
-#include "util/alloc.h"
+#include "util/allocate.h"
 
 static CCC_Order
 int_order(CCC_Type_comparator_context const order)
@@ -182,7 +182,7 @@ CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_heapsort)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_copy_no_alloc)
+CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_copy_no_allocate)
 {
     Flat_priority_queue src = flat_priority_queue_initialize(
         (int[4]){}, int, CCC_ORDER_LESSER, int_order, NULL, NULL, 4);
@@ -209,7 +209,7 @@ CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_copy_no_alloc)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_copy_no_alloc_fail)
+CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_copy_no_allocate_fail)
 {
     Flat_priority_queue src = flat_priority_queue_initialize(
         (int[4]){}, int, CCC_ORDER_LESSER, int_order, NULL, NULL, 4);
@@ -226,7 +226,7 @@ CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_copy_no_alloc_fail)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_copy_alloc)
+CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_copy_allocate)
 {
     Flat_priority_queue src = flat_priority_queue_initialize(
         NULL, int, CCC_ORDER_LESSER, int_order, std_allocate, NULL, 0);
@@ -255,7 +255,7 @@ CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_copy_alloc)
     });
 }
 
-CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_copy_alloc_fail)
+CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_copy_allocate_fail)
 {
     Flat_priority_queue src = flat_priority_queue_initialize(
         NULL, int, CCC_ORDER_LESSER, int_order, std_allocate, NULL, 0);
@@ -280,9 +280,9 @@ main()
         flat_priority_queue_test_raw_type(),
         flat_priority_queue_test_heapify_initialize(),
         flat_priority_queue_test_heapify_copy(),
-        flat_priority_queue_test_copy_no_alloc(),
-        flat_priority_queue_test_copy_no_alloc_fail(),
-        flat_priority_queue_test_copy_alloc(),
-        flat_priority_queue_test_copy_alloc_fail(),
+        flat_priority_queue_test_copy_no_allocate(),
+        flat_priority_queue_test_copy_no_allocate_fail(),
+        flat_priority_queue_test_copy_allocate(),
+        flat_priority_queue_test_copy_allocate_fail(),
         flat_priority_queue_test_heapsort());
 }

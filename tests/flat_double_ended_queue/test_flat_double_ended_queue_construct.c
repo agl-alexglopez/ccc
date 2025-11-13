@@ -7,7 +7,7 @@
 #include "flat_double_ended_queue.h"
 #include "traits.h"
 #include "types.h"
-#include "util/alloc.h"
+#include "util/allocate.h"
 
 CHECK_BEGIN_STATIC_FN(flat_double_ended_queue_test_construct)
 {
@@ -18,7 +18,7 @@ CHECK_BEGIN_STATIC_FN(flat_double_ended_queue_test_construct)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(flat_double_ended_queue_test_copy_no_alloc)
+CHECK_BEGIN_STATIC_FN(flat_double_ended_queue_test_copy_no_allocate)
 {
     Flat_double_ended_queue q1 = flat_double_ended_queue_initialize(
         ((int[3]){0, 1, 2}), int, NULL, NULL, 3, 3);
@@ -42,7 +42,7 @@ CHECK_BEGIN_STATIC_FN(flat_double_ended_queue_test_copy_no_alloc)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(flat_double_ended_queue_test_copy_no_alloc_fail)
+CHECK_BEGIN_STATIC_FN(flat_double_ended_queue_test_copy_no_allocate_fail)
 {
     Flat_double_ended_queue q1 = flat_double_ended_queue_initialize(
         ((int[3]){0, 1, 2}), int, NULL, NULL, 3, 3);
@@ -56,7 +56,7 @@ CHECK_BEGIN_STATIC_FN(flat_double_ended_queue_test_copy_no_alloc_fail)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(flat_double_ended_queue_test_copy_alloc)
+CHECK_BEGIN_STATIC_FN(flat_double_ended_queue_test_copy_allocate)
 {
     Flat_double_ended_queue q1
         = flat_double_ended_queue_initialize(NULL, int, std_allocate, NULL, 0);
@@ -86,7 +86,7 @@ CHECK_BEGIN_STATIC_FN(flat_double_ended_queue_test_copy_alloc)
     });
 }
 
-CHECK_BEGIN_STATIC_FN(flat_double_ended_queue_test_copy_alloc_fail)
+CHECK_BEGIN_STATIC_FN(flat_double_ended_queue_test_copy_allocate_fail)
 {
     Flat_double_ended_queue q1
         = flat_double_ended_queue_initialize(NULL, int, std_allocate, NULL, 0);
@@ -106,8 +106,8 @@ int
 main()
 {
     return CHECK_RUN(flat_double_ended_queue_test_construct(),
-                     flat_double_ended_queue_test_copy_no_alloc(),
-                     flat_double_ended_queue_test_copy_no_alloc_fail(),
-                     flat_double_ended_queue_test_copy_alloc(),
-                     flat_double_ended_queue_test_copy_alloc_fail());
+                     flat_double_ended_queue_test_copy_no_allocate(),
+                     flat_double_ended_queue_test_copy_no_allocate_fail(),
+                     flat_double_ended_queue_test_copy_allocate(),
+                     flat_double_ended_queue_test_copy_allocate_fail());
 }

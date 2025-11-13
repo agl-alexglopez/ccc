@@ -12,7 +12,7 @@
 #include "handle_ordered_map_util.h"
 #include "traits.h"
 #include "types.h"
-#include "util/alloc.h"
+#include "util/allocate.h"
 
 CHECK_BEGIN_STATIC_FN(handle_ordered_map_test_insert_erase_shuffled)
 {
@@ -98,7 +98,7 @@ CHECK_BEGIN_STATIC_FN(handle_ordered_map_test_weak_srand)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(handle_ordered_map_test_insert_erase_cycles_no_alloc)
+CHECK_BEGIN_STATIC_FN(handle_ordered_map_test_insert_erase_cycles_no_allocate)
 {
     CCC_Handle_ordered_map s = handle_ordered_map_initialize(
         &(standard_fixed_map){}, struct Val, id, id_order, NULL, NULL,
@@ -135,7 +135,7 @@ CHECK_BEGIN_STATIC_FN(handle_ordered_map_test_insert_erase_cycles_no_alloc)
     CHECK_END_FN();
 }
 
-CHECK_BEGIN_STATIC_FN(handle_ordered_map_test_insert_erase_cycles_alloc)
+CHECK_BEGIN_STATIC_FN(handle_ordered_map_test_insert_erase_cycles_allocate)
 {
     CCC_Handle_ordered_map s = handle_ordered_map_initialize(
         NULL, struct Val, id, id_order, std_allocate, NULL, 0);
@@ -177,6 +177,6 @@ main()
     return CHECK_RUN(handle_ordered_map_test_insert_erase_shuffled(),
                      handle_ordered_map_test_prime_shuffle(),
                      handle_ordered_map_test_weak_srand(),
-                     handle_ordered_map_test_insert_erase_cycles_no_alloc(),
-                     handle_ordered_map_test_insert_erase_cycles_alloc());
+                     handle_ordered_map_test_insert_erase_cycles_no_allocate(),
+                     handle_ordered_map_test_insert_erase_cycles_allocate());
 }
