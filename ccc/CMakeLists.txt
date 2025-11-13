@@ -52,9 +52,9 @@ target_sources(${PROJECT_NAME}
               traits.h
 )
 
-option(CCC_FHM_PORTABLE "Fallback to portable implementation of flat hash map to improve cross platform compatibility while decreasing optimizations" OFF)
-if (CCC_FHM_PORTABLE)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE CCC_FHM_PORTABLE)
+option(CCC_FLAT_HASH_MAP_PORTABLE "Fallback to portable implementation of flat hash map to improve cross platform compatibility while decreasing optimizations" OFF)
+if (CCC_FLAT_HASH_MAP_PORTABLE)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE CCC_FLAT_HASH_MAP_PORTABLE)
 endif()
 target_compile_features(${PROJECT_NAME} PUBLIC c_std_23)
 
