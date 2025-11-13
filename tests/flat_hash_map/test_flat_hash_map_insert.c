@@ -6,10 +6,10 @@
 
 #include "checkers.h"
 #include "flat_hash_map.h"
-#include "flat_hash_map_util.h"
+#include "flat_hash_map_utility.h"
 #include "traits.h"
 #include "types.h"
-#include "util/allocate.h"
+#include "utility/allocate.h"
 
 CHECK_BEGIN_STATIC_FN(flat_hash_map_test_insert)
 {

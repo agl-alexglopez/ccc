@@ -15,7 +15,7 @@ Here is a description of the current repository organization.
 - `src` - The implementations for the containers listed in the `ccc/` headers.
 - `tests` - Testing code. The `run_tests.c` test runner. Also the `checkers.h` testing framework is well-documented for writing test cases.
     - `tests/[container]` - The folder for the container specific tests.
-- `util` - General helpers for the `tests` and `samples`. A `str_view` helper library is here to make `argc` and `argv` handling easier in the test runner and samples. Utilities for containers should not go here. If containers need to share utilities, they should find the header in `src`. The `util` folder is removed from releases.
+- `utility` - General helpers for the `tests` and `samples`. A `str_view` helper library is here to make `argc` and `argv` handling easier in the test runner and samples. Utilities for containers should not go here. If containers need to share utilities, they should find the header in `src`. The `utility` folder is removed from releases.
 
 ## Tooling
 

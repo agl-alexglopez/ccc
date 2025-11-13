@@ -4,19 +4,19 @@ add_library(${namespace}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 # File sets simplify install and allow isolation of only container files.
 target_sources(${PROJECT_NAME}
     PRIVATE
-        ${PROJECT_SOURCE_DIR}/src/types.c
-        ${PROJECT_SOURCE_DIR}/src/buffer.c
-        ${PROJECT_SOURCE_DIR}/src/flat_hash_map.c
-        ${PROJECT_SOURCE_DIR}/src/flat_double_ended_queue.c
-        ${PROJECT_SOURCE_DIR}/src/flat_priority_queue.c
-        ${PROJECT_SOURCE_DIR}/src/ordered_map.c
-        ${PROJECT_SOURCE_DIR}/src/handle_ordered_map.c
-        ${PROJECT_SOURCE_DIR}/src/priority_queue.c
-        ${PROJECT_SOURCE_DIR}/src/singly_linked_list.c
-        ${PROJECT_SOURCE_DIR}/src/doubly_linked_list.c
-        ${PROJECT_SOURCE_DIR}/src/realtime_ordered_map.c
-        ${PROJECT_SOURCE_DIR}/src/handle_realtime_ordered_map.c
-        ${PROJECT_SOURCE_DIR}/src/bitset.c
+        ${PROJECT_SOURCE_DIR}/source/types.c
+        ${PROJECT_SOURCE_DIR}/source/buffer.c
+        ${PROJECT_SOURCE_DIR}/source/flat_hash_map.c
+        ${PROJECT_SOURCE_DIR}/source/flat_double_ended_queue.c
+        ${PROJECT_SOURCE_DIR}/source/flat_priority_queue.c
+        ${PROJECT_SOURCE_DIR}/source/ordered_map.c
+        ${PROJECT_SOURCE_DIR}/source/handle_ordered_map.c
+        ${PROJECT_SOURCE_DIR}/source/priority_queue.c
+        ${PROJECT_SOURCE_DIR}/source/singly_linked_list.c
+        ${PROJECT_SOURCE_DIR}/source/doubly_linked_list.c
+        ${PROJECT_SOURCE_DIR}/source/realtime_ordered_map.c
+        ${PROJECT_SOURCE_DIR}/source/handle_realtime_ordered_map.c
+        ${PROJECT_SOURCE_DIR}/source/bitset.c
     PUBLIC 
         FILE_SET public_headers
             TYPE HEADERS

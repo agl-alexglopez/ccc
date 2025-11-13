@@ -9,10 +9,10 @@
 #include "buffer.h"
 #include "checkers.h"
 #include "flat_priority_queue.h"
-#include "flat_priority_queue_util.h"
+#include "flat_priority_queue_utility.h"
 #include "traits.h"
 #include "types.h"
-#include "util/allocate.h"
+#include "utility/allocate.h"
 
 static CCC_Order
 int_order(CCC_Type_comparator_context const order)

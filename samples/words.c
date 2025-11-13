@@ -32,10 +32,10 @@ Please specify a command as follows:
 #include "ccc/handle_ordered_map.h"
 #include "ccc/traits.h"
 #include "ccc/types.h"
-#include "util/allocate.h"
-#include "util/cli.h"
-#include "util/string_arena.h"
-#include "util/string_view/string_view.h"
+#include "utility/allocate.h"
+#include "utility/cli.h"
+#include "utility/string_arena.h"
+#include "utility/string_view/string_view.h"
 
 enum Action_type
 {

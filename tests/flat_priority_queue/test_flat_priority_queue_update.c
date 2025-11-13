@@ -7,7 +7,7 @@
 
 #include "checkers.h"
 #include "flat_priority_queue.h"
-#include "flat_priority_queue_util.h"
+#include "flat_priority_queue_utility.h"
 #include "traits.h"
 #include "types.h"
 

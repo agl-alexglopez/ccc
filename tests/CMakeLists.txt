@@ -50,21 +50,21 @@ add_bitset_test(test_bitset_erase)
 add_bitset_test(test_bitset_test_and_set)
 
 #############  Buffer ##########################
-add_library(buffer_util buffer/buffer_util.h buffer/buffer_util.c)
-target_link_libraries(buffer_util
+add_library(buffer_utility buffer/buffer_utility.h buffer/buffer_utility.c)
+target_link_libraries(buffer_utility
   PRIVATE
     ccc
     checkers
     random
 )
-add_dependencies(tests buffer_util)
+add_dependencies(tests buffer_utility)
 
 macro(add_buffer_test TEST_NAME)
   add_executable(${TEST_NAME} buffer/${TEST_NAME}.c)
   target_link_libraries(${TEST_NAME}
     PRIVATE
       ccc
-      buffer_util
+      buffer_utility
       checkers
       allocate
       random
@@ -84,20 +84,20 @@ add_buffer_test(test_buffer_erase)
 add_buffer_test(test_buffer_iter)
 
 #############  Heap Priority Queue  ##########################
-add_library(flat_priority_queue_util flat_priority_queue/flat_priority_queue_util.h flat_priority_queue/flat_priority_queue_util.c)
-target_link_libraries(flat_priority_queue_util
+add_library(flat_priority_queue_utility flat_priority_queue/flat_priority_queue_utility.h flat_priority_queue/flat_priority_queue_utility.c)
+target_link_libraries(flat_priority_queue_utility
   PRIVATE
     ccc
     checkers
 )
-add_dependencies(tests flat_priority_queue_util)
+add_dependencies(tests flat_priority_queue_utility)
 
 
 macro(add_flat_priority_queue_test TEST_NAME)
   add_executable(${TEST_NAME} flat_priority_queue/${TEST_NAME}.c)
   target_link_libraries(${TEST_NAME}
     PRIVATE
-      flat_priority_queue_util
+      flat_priority_queue_utility
       ccc
       checkers
       allocate
@@ -117,19 +117,19 @@ add_flat_priority_queue_test(test_flat_priority_queue_erase)
 add_flat_priority_queue_test(test_flat_priority_queue_update)
 
 #############  Pair Priority Queue  ##########################
-add_library(priority_queue_util priority_queue/priority_queue_util.h priority_queue/priority_queue_util.c)
-target_link_libraries(priority_queue_util
+add_library(priority_queue_utility priority_queue/priority_queue_utility.h priority_queue/priority_queue_utility.c)
+target_link_libraries(priority_queue_utility
   PRIVATE
     ccc
     checkers
 )
-add_dependencies(tests priority_queue_util)
+add_dependencies(tests priority_queue_utility)
 
 macro(add_priority_queue_test TEST_NAME)
   add_executable(${TEST_NAME} priority_queue/${TEST_NAME}.c)
   target_link_libraries(${TEST_NAME}
     PRIVATE
-      priority_queue_util
+      priority_queue_utility
       ccc
       checkers
       allocate
@@ -149,19 +149,19 @@ add_priority_queue_test(test_priority_queue_erase)
 add_priority_queue_test(test_priority_queue_update)
 
 #############  Map  ##########################
-add_library(ordered_map_util ordered_map/ordered_map_util.h ordered_map/ordered_map_util.c)
-target_link_libraries(ordered_map_util
+add_library(ordered_map_utility ordered_map/ordered_map_utility.h ordered_map/ordered_map_utility.c)
+target_link_libraries(ordered_map_utility
   PRIVATE
     ccc
     checkers
 )
-add_dependencies(tests ordered_map_util)
+add_dependencies(tests ordered_map_utility)
 
 macro(add_ordered_map_test TEST_NAME)
   add_executable(${TEST_NAME} ordered_map/${TEST_NAME}.c)
   target_link_libraries(${TEST_NAME}
     PRIVATE
-      ordered_map_util
+      ordered_map_utility
       ccc
       checkers 
       allocate
@@ -182,19 +182,19 @@ add_ordered_map_test(test_ordered_map_entry)
 add_ordered_map_test(test_ordered_map_lru)
 
 #############  Handle Map  ##########################
-add_library(handle_ordered_map_util handle_ordered_map/handle_ordered_map_util.h handle_ordered_map/handle_ordered_map_util.c)
-target_link_libraries(handle_ordered_map_util
+add_library(handle_ordered_map_utility handle_ordered_map/handle_ordered_map_utility.h handle_ordered_map/handle_ordered_map_utility.c)
+target_link_libraries(handle_ordered_map_utility
   PRIVATE
     ccc
     checkers
 )
-add_dependencies(tests handle_ordered_map_util)
+add_dependencies(tests handle_ordered_map_utility)
 
 macro(add_handle_ordered_map_test TEST_NAME)
   add_executable(${TEST_NAME} handle_ordered_map/${TEST_NAME}.c)
   target_link_libraries(${TEST_NAME}
     PRIVATE
-      handle_ordered_map_util
+      handle_ordered_map_utility
       ccc
       checkers
       allocate
@@ -215,19 +215,19 @@ add_handle_ordered_map_test(test_handle_ordered_map_entry)
 add_handle_ordered_map_test(test_handle_ordered_map_lru)
 
 #############  Realtime Map  ##########################
-add_library(realtime_ordered_map_util realtime_ordered_map/realtime_ordered_map_util.h realtime_ordered_map/realtime_ordered_map_util.c)
-target_link_libraries(realtime_ordered_map_util
+add_library(realtime_ordered_map_utility realtime_ordered_map/realtime_ordered_map_utility.h realtime_ordered_map/realtime_ordered_map_utility.c)
+target_link_libraries(realtime_ordered_map_utility
   PRIVATE
     ccc
     checkers
 )
-add_dependencies(tests realtime_ordered_map_util)
+add_dependencies(tests realtime_ordered_map_utility)
 
 macro(add_realtime_ordered_map_test TEST_NAME)
   add_executable(${TEST_NAME} realtime_ordered_map/${TEST_NAME}.c)
   target_link_libraries(${TEST_NAME}
     PRIVATE
-      realtime_ordered_map_util
+      realtime_ordered_map_utility
       checkers
       ccc
       allocate
@@ -248,19 +248,19 @@ add_realtime_ordered_map_test(test_realtime_ordered_map_entry)
 add_realtime_ordered_map_test(test_realtime_ordered_map_lru)
 
 #############  Handle Realtime Map  ##########################
-add_library(handle_realtime_ordered_map_util handle_realtime_ordered_map/handle_realtime_ordered_map_util.h handle_realtime_ordered_map/handle_realtime_ordered_map_util.c)
-target_link_libraries(handle_realtime_ordered_map_util
+add_library(handle_realtime_ordered_map_utility handle_realtime_ordered_map/handle_realtime_ordered_map_utility.h handle_realtime_ordered_map/handle_realtime_ordered_map_utility.c)
+target_link_libraries(handle_realtime_ordered_map_utility
   PRIVATE
     ccc
     checkers
 )
-add_dependencies(tests handle_realtime_ordered_map_util)
+add_dependencies(tests handle_realtime_ordered_map_utility)
 
 macro(add_handle_realtime_ordered_map_test TEST_NAME)
   add_executable(${TEST_NAME} handle_realtime_ordered_map/${TEST_NAME}.c)
   target_link_libraries(${TEST_NAME}
     PRIVATE
-      handle_realtime_ordered_map_util
+      handle_realtime_ordered_map_utility
       ccc
       checkers
       allocate
@@ -282,18 +282,18 @@ add_handle_realtime_ordered_map_test(test_handle_realtime_ordered_map_lru)
 
 #############  Flat Hash Map ##########################
 
-add_library(flat_hash_map_util flat_hash_map/flat_hash_map_util.h flat_hash_map/flat_hash_map_util.c)
-target_link_libraries(flat_hash_map_util
+add_library(flat_hash_map_utility flat_hash_map/flat_hash_map_utility.h flat_hash_map/flat_hash_map_utility.c)
+target_link_libraries(flat_hash_map_utility
     ccc
 )
-add_dependencies(tests flat_hash_map_util)
+add_dependencies(tests flat_hash_map_utility)
 
 macro(add_flat_hash_map_test TEST_NAME)
   add_executable(${TEST_NAME} flat_hash_map/${TEST_NAME}.c)
   target_link_libraries(${TEST_NAME}
     PRIVATE
       checkers
-      flat_hash_map_util
+      flat_hash_map_utility
       random
       ccc
       allocate
@@ -315,11 +315,11 @@ add_flat_hash_map_test(test_flat_hash_map_iter)
 
 #############  Doubly Linked List ##########################
 
-add_library(doubly_linked_list_util doubly_linked_list/doubly_linked_list_util.h doubly_linked_list/doubly_linked_list_util.c)
-target_link_libraries(doubly_linked_list_util
+add_library(doubly_linked_list_utility doubly_linked_list/doubly_linked_list_utility.h doubly_linked_list/doubly_linked_list_utility.c)
+target_link_libraries(doubly_linked_list_utility
   ccc
 )
-add_dependencies(tests doubly_linked_list_util)
+add_dependencies(tests doubly_linked_list_utility)
 
 macro(add_doubly_linked_list_test TEST_NAME)
   add_executable(${TEST_NAME} doubly_linked_list/${TEST_NAME}.c)
@@ -327,7 +327,7 @@ macro(add_doubly_linked_list_test TEST_NAME)
     PRIVATE
       ccc
       checkers
-      doubly_linked_list_util
+      doubly_linked_list_utility
       allocate
   )
   set_target_properties(${TEST_NAME} 
@@ -344,11 +344,11 @@ add_doubly_linked_list_test(test_doubly_linked_list_erase)
 
 #############  Singly Linked List ##########################
 
-add_library(singly_linked_list_util singly_linked_list/singly_linked_list_util.h singly_linked_list/singly_linked_list_util.c)
-target_link_libraries(singly_linked_list_util
+add_library(singly_linked_list_utility singly_linked_list/singly_linked_list_utility.h singly_linked_list/singly_linked_list_utility.c)
+target_link_libraries(singly_linked_list_utility
   ccc
 )
-add_dependencies(tests singly_linked_list_util)
+add_dependencies(tests singly_linked_list_utility)
 
 macro(add_singly_linked_list_test TEST_NAME)
   add_executable(${TEST_NAME} singly_linked_list/${TEST_NAME}.c)
@@ -356,7 +356,7 @@ macro(add_singly_linked_list_test TEST_NAME)
     PRIVATE
       ccc
       checkers 
-      singly_linked_list_util
+      singly_linked_list_utility
       allocate
   )
   set_target_properties(${TEST_NAME} 
@@ -373,11 +373,11 @@ add_singly_linked_list_test(test_singly_linked_list_erase)
 
 #############  Flat Double Ended Queue ##########################
 
-add_library(flat_double_ended_queue_util flat_double_ended_queue/flat_double_ended_queue_util.h flat_double_ended_queue/flat_double_ended_queue_util.c)
-target_link_libraries(flat_double_ended_queue_util
+add_library(flat_double_ended_queue_utility flat_double_ended_queue/flat_double_ended_queue_utility.h flat_double_ended_queue/flat_double_ended_queue_utility.c)
+target_link_libraries(flat_double_ended_queue_utility
   ccc
 )
-add_dependencies(tests flat_double_ended_queue_util)
+add_dependencies(tests flat_double_ended_queue_utility)
 
 macro(add_flat_double_ended_queue_test TEST_NAME)
   add_executable(${TEST_NAME} flat_double_ended_queue/${TEST_NAME}.c)
@@ -385,7 +385,7 @@ macro(add_flat_double_ended_queue_test TEST_NAME)
     PRIVATE
       ccc
       checkers 
-      flat_double_ended_queue_util
+      flat_double_ended_queue_utility
       allocate
   )
   set_target_properties(${TEST_NAME} 

@@ -7,7 +7,7 @@
 #include "flat_double_ended_queue.h"
 #include "traits.h"
 #include "types.h"
-#include "util/allocate.h"
+#include "utility/allocate.h"
 
 CHECK_BEGIN_STATIC_FN(flat_double_ended_queue_test_construct)
 {

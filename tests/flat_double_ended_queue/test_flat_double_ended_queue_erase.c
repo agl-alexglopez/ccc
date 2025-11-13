@@ -5,10 +5,10 @@
 
 #include "checkers.h"
 #include "flat_double_ended_queue.h"
-#include "flat_double_ended_queue_util.h"
+#include "flat_double_ended_queue_utility.h"
 #include "traits.h"
 #include "types.h"
-#include "util/allocate.h"
+#include "utility/allocate.h"
 
 CHECK_BEGIN_STATIC_FN(pop_front_n, Flat_double_ended_queue *const q, size_t n)
 {

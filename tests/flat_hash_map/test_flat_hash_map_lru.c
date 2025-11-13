@@ -12,10 +12,10 @@ The leetcode lru problem in C. */
 #include "checkers.h"
 #include "doubly_linked_list.h"
 #include "flat_hash_map.h"
-#include "flat_hash_map/flat_hash_map_util.h"
+#include "flat_hash_map/flat_hash_map_utility.h"
 #include "traits.h"
 #include "types.h"
-#include "util/allocate.h"
+#include "utility/allocate.h"
 
 #define REQS 11
 

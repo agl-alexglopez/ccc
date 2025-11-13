@@ -10,7 +10,7 @@ the entry functions. */
 
 #include "checkers.h"
 #include "realtime_ordered_map.h"
-#include "realtime_ordered_map_util.h"
+#include "realtime_ordered_map_utility.h"
 #include "traits.h"
 #include "types.h"
 

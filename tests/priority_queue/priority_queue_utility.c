@@ -4,7 +4,7 @@
 
 #include "checkers.h"
 #include "priority_queue.h"
-#include "priority_queue_util.h"
+#include "priority_queue_utility.h"
 #include "traits.h"
 #include "types.h"
 

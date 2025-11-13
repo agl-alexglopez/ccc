@@ -7,7 +7,7 @@
 #include "checkers.h"
 #include "traits.h"
 #include "types.h"
-#include "util/allocate.h"
+#include "utility/allocate.h"
 
 CHECK_BEGIN_STATIC_FN(bitset_test_push_back_no_reallocate)
 {

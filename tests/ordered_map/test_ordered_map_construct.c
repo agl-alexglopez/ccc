@@ -5,7 +5,7 @@
 
 #include "checkers.h"
 #include "ordered_map.h"
-#include "ordered_map_util.h"
+#include "ordered_map_utility.h"
 #include "traits.h"
 
 CHECK_BEGIN_STATIC_FN(ordered_map_test_empty)

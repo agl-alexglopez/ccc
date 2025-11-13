@@ -8,10 +8,10 @@
 
 #include "checkers.h"
 #include "handle_ordered_map.h"
-#include "handle_ordered_map_util.h"
+#include "handle_ordered_map_utility.h"
 #include "traits.h"
 #include "types.h"
-#include "util/allocate.h"
+#include "utility/allocate.h"
 
 static inline struct Val
 handle_ordered_map_create(int const id, int const val)

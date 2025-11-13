@@ -6,10 +6,10 @@
 
 #include "checkers.h"
 #include "handle_ordered_map.h"
-#include "handle_ordered_map_util.h"
+#include "handle_ordered_map_utility.h"
 #include "traits.h"
 #include "types.h"
-#include "util/allocate.h"
+#include "utility/allocate.h"
 
 CHECK_BEGIN_STATIC_FN(handle_ordered_map_test_empty)
 {

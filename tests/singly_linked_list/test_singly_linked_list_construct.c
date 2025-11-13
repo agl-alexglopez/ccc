@@ -5,7 +5,7 @@
 
 #include "checkers.h"
 #include "singly_linked_list.h"
-#include "singly_linked_list_util.h"
+#include "singly_linked_list_utility.h"
 #include "traits.h"
 
 CHECK_BEGIN_STATIC_FN(singly_linked_list_test_construct)

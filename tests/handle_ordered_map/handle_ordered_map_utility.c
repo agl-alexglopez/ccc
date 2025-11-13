@@ -3,8 +3,8 @@
 #define TRAITS_USING_NAMESPACE_CCC
 
 #include "checkers.h"
-#include "handle_realtime_ordered_map.h"
-#include "handle_realtime_ordered_map_util.h"
+#include "handle_ordered_map.h"
+#include "handle_ordered_map_utility.h"
 #include "traits.h"
 #include "types.h"
 
@@ -16,8 +16,8 @@ id_order(CCC_Key_comparator_context const order)
     return (key > c->id) - (key < c->id);
 }
 
-CHECK_BEGIN_FN(insert_shuffled, CCC_Handle_realtime_ordered_map *m,
-               size_t const size, int const larger_prime)
+CHECK_BEGIN_FN(insert_shuffled, CCC_Handle_ordered_map *m, size_t const size,
+               int const larger_prime)
 {
     size_t shuffled_index = larger_prime % size;
     for (size_t i = 0; i < size; ++i)
@@ -33,10 +33,9 @@ CHECK_BEGIN_FN(insert_shuffled, CCC_Handle_realtime_ordered_map *m,
 
 /* Iterative inorder traversal to check the heap is sorted. */
 size_t
-inorder_fill(int vals[], size_t size,
-             CCC_Handle_realtime_ordered_map const *const m)
+inorder_fill(int vals[], size_t size, CCC_Handle_ordered_map const *const m)
 {
-    if (CCC_handle_realtime_ordered_map_count(m).count != size)
+    if (count(m).count != size)
     {
         return 0;
     }

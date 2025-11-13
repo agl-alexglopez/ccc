@@ -6,10 +6,10 @@
 
 #include "checkers.h"
 #include "flat_priority_queue.h"
-#include "flat_priority_queue_util.h"
+#include "flat_priority_queue_utility.h"
 #include "traits.h"
 #include "types.h"
-#include "util/allocate.h"
+#include "utility/allocate.h"
 
 CHECK_BEGIN_STATIC_FN(flat_priority_queue_test_insert_one)
 {

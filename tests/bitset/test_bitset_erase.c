@@ -4,7 +4,7 @@
 #include "ccc/bitset.h"
 #include "ccc/types.h"
 #include "checkers.h"
-#include "util/allocate.h"
+#include "utility/allocate.h"
 
 CHECK_BEGIN_STATIC_FN(bitset_test_push_pop_back_no_reallocate)
 {

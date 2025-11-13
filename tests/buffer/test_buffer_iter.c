@@ -4,7 +4,7 @@
 
 #define BUFFER_USING_NAMESPACE_CCC
 
-#include "buffer_util.h"
+#include "buffer_utility.h"
 #include "ccc/buffer.h"
 #include "ccc/types.h"
 #include "checkers.h"

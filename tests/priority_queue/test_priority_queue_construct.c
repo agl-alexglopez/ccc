@@ -3,7 +3,7 @@
 
 #include "checkers.h"
 #include "priority_queue.h"
-#include "priority_queue_util.h"
+#include "priority_queue_utility.h"
 #include "types.h"
 
 CHECK_BEGIN_STATIC_FN(priority_queue_test_empty)

@@ -3,7 +3,7 @@
 
 #include "checkers.h"
 #include "realtime_ordered_map.h"
-#include "realtime_ordered_map_util.h"
+#include "realtime_ordered_map_utility.h"
 
 CHECK_BEGIN_STATIC_FN(romap_test_empty)
 {

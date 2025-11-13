@@ -33,9 +33,9 @@ algorithms use a wide range of data structures. */
 #include "ccc/flat_priority_queue.h"
 #include "ccc/traits.h"
 #include "ccc/types.h"
-#include "util/allocate.h"
-#include "util/string_arena.h"
-#include "util/string_view/string_view.h"
+#include "utility/allocate.h"
+#include "utility/string_arena.h"
+#include "utility/string_view/string_view.h"
 
 /*===========================   Type Declarations  ==========================*/
 

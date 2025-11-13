@@ -53,7 +53,7 @@ See checkers.h for the testing framework all tests agree to use. */
 #include <sys/wait.h>
 #include <unistd.h>
 
-#include "../util/string_view/string_view.h"
+#include "../utility/string_view/string_view.h"
 #include "checkers.h"
 
 struct Path_bin

@@ -5,7 +5,7 @@
 #include "ccc/buffer.h"
 #include "ccc/types.h"
 #include "checkers.h"
-#include "util/allocate.h"
+#include "utility/allocate.h"
 
 CHECK_BEGIN_STATIC_FN(buffer_test_empty)
 {

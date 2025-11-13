@@ -6,11 +6,11 @@
 
 #include "checkers.h"
 #include "flat_hash_map.h"
-#include "flat_hash_map_util.h"
+#include "flat_hash_map_utility.h"
 #include "traits.h"
 #include "types.h"
-#include "util/allocate.h"
-#include "util/random.h"
+#include "utility/allocate.h"
+#include "utility/random.h"
 
 CHECK_BEGIN_STATIC_FN(flat_hash_map_test_erase)
 {

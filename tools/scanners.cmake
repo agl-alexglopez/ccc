@@ -10,8 +10,8 @@ file (GLOB PROJ_C_FILES
   ${CMAKE_SOURCE_DIR}/tests/*.h
   ${CMAKE_SOURCE_DIR}/tests/*/*.c
   ${CMAKE_SOURCE_DIR}/tests/*/*.h
-  ${CMAKE_SOURCE_DIR}/util/*.c
-  ${CMAKE_SOURCE_DIR}/util/*.h
+  ${CMAKE_SOURCE_DIR}/utility/*.c
+  ${CMAKE_SOURCE_DIR}/utility/*.h
 )
 
 add_custom_target (format "clang-format" -i ${PROJ_C_FILES} --style=file COMMENT "Formatting source code...")

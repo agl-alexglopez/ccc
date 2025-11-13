@@ -127,13 +127,13 @@ If your system does not support Makefiles or the `make` command here are the CMa
 ```zsh
 # Configure the project cmake files.
 # Replace this preset with your own if you'd like.
-cmake --preset=clang-rel -DCMAKE_INSTALL_PREFIX=[DESIRED/INSTALL/LOCATION]
+cmake --preset=clang-release -DCMAKE_INSTALL_PREFIX=[DESIRED/INSTALL/LOCATION]
 cmake --build build --target install
 ```
 
 ### User Presets
 
-If you do not like the default presets, create a `CMakeUserPresets.json` in this folder and place your preferred configuration in that file. Here is my preferred configuration to get you started. I like to use the newest version of gcc that I have installed.
+If you do not like the default presets, create a `CMakeUserPresets.json` in this folder and place your preferred configuration in that file. Here is my preferred configuration to get you started. I like to use the newest version of GCC that I have installed.
 
 ```json
 {
@@ -145,33 +145,51 @@ If you do not like the default presets, create a `CMakeUserPresets.json` in this
     },
     "configurePresets": [
         {
-            "name": "deb",
-            "inherits": "default-deb",
+            "name": "my-gcc-debug",
+            "inherits": ["default-debug"],
+            "generator": "Ninja",
             "cacheVariables": {
-                "CMAKE_C_COMPILER": "gcc-14.2"
+                "CMAKE_C_COMPILER": "gcc-15.1"
             }
         },
         {
-            "name": "rel",
-            "inherits": "default-rel",
+            "name": "my-gcc-release",
+            "inherits": ["default-release"],
+            "generator": "Ninja",
             "cacheVariables": {
-                "CMAKE_C_COMPILER": "gcc-14.2"
+                "CMAKE_C_COMPILER": "gcc-15.1"
             }
         },
         {
-            "name": "cdeb",
-            "inherits": "default-deb",
+            "name": "my-clang-debug",
+            "inherits": ["default-debug"],
             "generator": "Ninja",
             "cacheVariables": {
                 "CMAKE_C_COMPILER": "clang"
             }
         },
         {
-            "name": "crel",
-            "inherits": "default-rel",
+            "name": "my-clang-release",
+            "inherits": ["default-release"],
             "generator": "Ninja",
             "cacheVariables": {
                 "CMAKE_C_COMPILER": "clang"
+            }
+        },
+        {
+            "name": "my-sanitize-debug",
+            "inherits": ["gcc-sanitize-debug"],
+            "generator": "Ninja",
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "gcc-15.1"
+            }
+        },
+        {
+            "name": "my-sanitize-release",
+            "inherits": ["gcc-sanitize-release"],
+            "generator": "Ninja",
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "gcc-15.1"
             }
         }
     ]
@@ -182,7 +200,7 @@ Then your preset can be invoked as follows:
 
 ```zsh
 # Your preferred preset with the same other steps as before.
-cmake --preset=rel -DCMAKE_INSTALL_PREFIX=[DESIRED/INSTALL/LOCATION]
+cmake --preset=my-clang-release -DCMAKE_INSTALL_PREFIX=[DESIRED/INSTALL/LOCATION]
 cmake --build build --target install
 ```
 
