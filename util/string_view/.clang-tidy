@@ -3,17 +3,17 @@ Checks: >
    readability-identifier-naming
 
 CheckOptions:
-   - { key: readability-identifier-naming.TypedefPrefix, value: CCC_ }
+   - { key: readability-identifier-naming.TypedefPrefix, value: SV_ }
    - { key: readability-identifier-naming.TypedefCase, value: Leading_upper_snake_case }
-   - { key: readability-identifier-naming.EnumPrefix, value: CCC_ }
+   - { key: readability-identifier-naming.EnumPrefix, value: SV_ }
    - { key: readability-identifier-naming.EnumCase, value: Leading_upper_snake_case }
-   - { key: readability-identifier-naming.EnumConstantPrefix, value: CCC_ }
+   - { key: readability-identifier-naming.EnumConstantPrefix, value: SV_ }
    - { key: readability-identifier-naming.EnumConstantCase, value: UPPER_CASE }
-   - { key: readability-identifier-naming.StructPrefix, value: CCC_ }
+   - { key: readability-identifier-naming.StructPrefix, value: SV_ }
    - { key: readability-identifier-naming.StructCase, value: Leading_upper_snake_case }
-   - { key: readability-identifier-naming.UnionPrefix, value: CCC_ }
+   - { key: readability-identifier-naming.UnionPrefix, value: SV_ }
    - { key: readability-identifier-naming.UnionCase, value: Leading_upper_snake_case }
-   - { key: readability-identifier-naming.FunctionPrefix, value: CCC_ }
+   - { key: readability-identifier-naming.FunctionPrefix, value: SV_ }
    - { key: readability-identifier-naming.FunctionCase, value: lower_case }
    - { key: readability-identifier-naming.MemberCase, value: lower_case }
 ---

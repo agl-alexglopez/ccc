@@ -34,7 +34,7 @@ Example:
 #include "util/alloc.h"
 #include "util/cli.h"
 #include "util/random.h"
-#include "util/str_view.h"
+#include "util/string_view/string_view.h"
 
 /*=======================   Maze Helper Types   =============================*/
 
@@ -116,13 +116,13 @@ enum : uint16_t
     CACHE_BIT = 0b0001000000000000,
 };
 
-str_view const row_flag = SV("-r=");
-str_view const col_flag = SV("-c=");
-str_view const speed_flag = SV("-s=");
-str_view const help_flag = SV("-h");
-str_view const escape = SV("\033[");
-str_view const semi_colon = SV(";");
-str_view const cursor_pos_specifier = SV("f");
+SV_String_view const row_flag = SV("-r=");
+SV_String_view const col_flag = SV("-c=");
+SV_String_view const speed_flag = SV("-s=");
+SV_String_view const help_flag = SV("-h");
+SV_String_view const escape = SV("\033[");
+SV_String_view const semi_colon = SV(";");
+SV_String_view const cursor_pos_specifier = SV("f");
 
 /*==========================   Prototypes  ================================= */
 
@@ -154,7 +154,7 @@ static bool can_build_new_square(struct Maze const *, int r, int c);
 static void help(void);
 static struct Point rand_point(struct Maze const *);
 static Order order_prim_cells(Type_comparator_context);
-static struct int_conversion parse_digits(str_view);
+static struct Int_conversion parse_digits(SV_String_view);
 static CCC_Order prim_cell_order(Key_comparator_context);
 static uint64_t prim_cell_hash_fn(Key_context);
 static uint64_t hash_64_bits(uint64_t);
@@ -176,10 +176,10 @@ main(int argc, char **argv)
     };
     for (int i = 1; i < argc; ++i)
     {
-        str_view const arg = sv(argv[i]);
-        if (sv_starts_with(arg, row_flag))
+        SV_String_view const arg = SV_sv(argv[i]);
+        if (SV_starts_with(arg, row_flag))
         {
-            struct int_conversion const row_arg = parse_digits(arg);
+            struct Int_conversion const row_arg = parse_digits(arg);
             if (row_arg.status == CONV_ER || row_arg.conversion < ROW_COL_MIN)
             {
                 quit("rows below required minimum or negative.\n", 1);
@@ -187,9 +187,9 @@ main(int argc, char **argv)
             }
             maze.rows = row_arg.conversion;
         }
-        else if (sv_starts_with(arg, col_flag))
+        else if (SV_starts_with(arg, col_flag))
         {
-            struct int_conversion const col_arg = parse_digits(arg);
+            struct Int_conversion const col_arg = parse_digits(arg);
             if (col_arg.status == CONV_ER || col_arg.conversion < ROW_COL_MIN)
             {
                 quit("cols below required minimum or negative.\n", 1);
@@ -197,9 +197,9 @@ main(int argc, char **argv)
             }
             maze.cols = col_arg.conversion;
         }
-        else if (sv_starts_with(arg, speed_flag))
+        else if (SV_starts_with(arg, speed_flag))
         {
-            struct int_conversion const speed_arg = parse_digits(arg);
+            struct Int_conversion const speed_arg = parse_digits(arg);
             if (speed_arg.status == CONV_ER || speed_arg.conversion > SPEED_7
                 || speed_arg.conversion < 0)
             {
@@ -208,7 +208,7 @@ main(int argc, char **argv)
             }
             maze.speed = speed_arg.conversion;
         }
-        else if (sv_starts_with(arg, help_flag))
+        else if (SV_starts_with(arg, help_flag))
         {
             help();
             return 0;
@@ -562,22 +562,22 @@ can_build_new_square(struct Maze const *const maze, int const r, int const c)
 
 /*===========================    Misc    ====================================*/
 
-static struct int_conversion
-parse_digits(str_view arg)
+static struct Int_conversion
+parse_digits(SV_String_view arg)
 {
-    size_t const eql = sv_rfind(arg, sv_npos(arg), SV("="));
-    if (eql == sv_npos(arg))
+    size_t const eql = SV_rfind(arg, SV_npos(arg), SV("="));
+    if (eql == SV_npos(arg))
     {
-        return (struct int_conversion){.status = CONV_ER};
+        return (struct Int_conversion){.status = CONV_ER};
     }
-    arg = sv_substr(arg, eql, ULLONG_MAX);
-    if (sv_empty(arg))
+    arg = SV_substr(arg, eql, ULLONG_MAX);
+    if (SV_empty(arg))
     {
         (void)fprintf(stderr, "please specify element to convert.\n");
-        return (struct int_conversion){.status = CONV_ER};
+        return (struct Int_conversion){.status = CONV_ER};
     }
-    arg = sv_remove_prefix(arg, 1);
-    return convert_to_int(sv_begin(arg));
+    arg = SV_remove_prefix(arg, 1);
+    return convert_to_int(SV_begin(arg));
 }
 
 static void

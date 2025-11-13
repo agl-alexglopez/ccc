@@ -1,15 +1,15 @@
 #ifndef CCC_CLI_H
 #define CCC_CLI_H
 
-enum conversion_status
+enum Conversion_status
 {
     CONV_OK,
     CONV_ER,
 };
 
-struct int_conversion
+struct Int_conversion
 {
-    enum conversion_status status;
+    enum Conversion_status status;
     int conversion;
 };
 
@@ -20,7 +20,7 @@ struct int_conversion
 
 /* Convert the provided text to an integer. Argument must be a valid
    integer greater than or equal to INT_MIN and less than or equal to INT_MAX */
-struct int_conversion convert_to_int(char const *);
+struct Int_conversion convert_to_int(char const *);
 void quit(char const *, int);
 
 void clear_screen(void);

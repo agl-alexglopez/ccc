@@ -16,7 +16,7 @@ add_dependencies(tests checkers)
 
 
 add_executable(run_tests run_tests.c)
-target_link_libraries(run_tests PRIVATE checkers str_view)
+target_link_libraries(run_tests PRIVATE checkers string_view)
 add_dependencies(tests run_tests)
 
 ###########   Add Test Files Below This Point   ###########

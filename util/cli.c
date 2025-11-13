@@ -29,7 +29,7 @@ quit(char const *const msg, int code)
     exit(code);
 }
 
-struct int_conversion
+struct Int_conversion
 convert_to_int(char const *const arg)
 {
     char *end;
@@ -37,17 +37,17 @@ convert_to_int(char const *const arg)
     if (errno == ERANGE)
     {
         (void)fprintf(stderr, "%s arg could not convert to int.\n", arg);
-        return (struct int_conversion){.status = CONV_ER};
+        return (struct Int_conversion){.status = CONV_ER};
     }
     if (conv > INT_MAX)
     {
         (void)fprintf(stderr, "%s arg cannot exceed INT_MAX.\n", arg);
-        return (struct int_conversion){.status = CONV_ER};
+        return (struct Int_conversion){.status = CONV_ER};
     }
     if (conv < INT_MIN)
     {
         (void)fprintf(stderr, "%s arg must exceed INT_MIN.\n", arg);
-        return (struct int_conversion){.status = CONV_ER};
+        return (struct Int_conversion){.status = CONV_ER};
     }
-    return (struct int_conversion){.status = CONV_OK, .conversion = (int)conv};
+    return (struct Int_conversion){.status = CONV_OK, .conversion = (int)conv};
 }
