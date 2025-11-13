@@ -38,14 +38,14 @@ If building this library separately to include it's library file, add the
 flag to the build (and read INSTALL.md for more details).
 
 ```
-cmake --preset=clang-rel -DCCC_FLAT_HASH_MAP_PORTABLE
+cmake --preset=clang-release -DCCC_FLAT_HASH_MAP_PORTABLE
 ```
 
 If an install location other than the release folder is desired don't forget
 to add the install prefix.
 
 ```
-cmake --preset=clang-rel -DCCC_FLAT_HASH_MAP_PORTABLE
+cmake --preset=clang-release -DCCC_FLAT_HASH_MAP_PORTABLE
 -DCMAKE_INSTALL_PREFIX=/my/path/
 ```
 
