@@ -2723,8 +2723,8 @@ Collection.
       designated in writing by the copyright owner as "Not a Contribution."
 
       "Contributor" shall mean Licensor and any individual or Legal Entity
-      on behalf of whandle_ordered_map a Contribution has been received by
-Licensor and subsequently incorporated within the Work.
+      on behalf of whom a Contribution has been received by Licensor and
+      subsequently incorporated within the Work.
 
    2. Grant of Copyright License. Subject to the terms and conditions of
       this License, each Contributor hereby grants to You a perpetual,
