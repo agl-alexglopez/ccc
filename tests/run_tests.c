@@ -67,8 +67,8 @@ static char const *const pass_mark = "⬤";
 static char const *const fail_mark = "X";
 static char const *const err_msg = "Test process was unexpectedly killed.";
 
-static enum check_result run(str_view);
-static enum check_result run_test_process(struct path_bin);
+static enum Check_result run(str_view);
+static enum Check_result run_test_process(struct path_bin);
 static DIR *open_test_dir(str_view);
 static bool fill_path(char *, str_view, str_view);
 
@@ -106,7 +106,7 @@ CHECK_BEGIN_STATIC_FN(run, str_view const tests_dir)
         CHECK(fill_path(absolute_path, tests_dir, entry), true);
         printf("%s(%s%s", CYAN, sv_begin(entry), NONE);
         (void)fflush(stdout);
-        enum check_result const res
+        enum Check_result const res
             = run_test_process((struct path_bin){sv(absolute_path), entry});
         switch (res)
         {

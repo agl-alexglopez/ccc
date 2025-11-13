@@ -146,7 +146,7 @@ static Flat_hash_map static_fh = flat_hash_map_initialize(
     struct Val,
     key,
     Flat_hash_map_int_to_u64,
-    flat_hash_mapap_id_order,
+    flat_hash_map_id_order,
     NULL,
     NULL,
     flat_hash_map_fixed_capacity(small_fixed_map)
@@ -168,8 +168,8 @@ int main(void)
         &(small_fixed_map){},
         struct Val,
         key,
-        flat_hash_mapap_int_to_u64,
-        flat_hash_mapap_id_order,
+        flat_hash_map_int_to_u64,
+        flat_hash_map_id_order,
         NULL,
         NULL,
         flat_hash_map_fixed_capacity(small_fixed_map)
@@ -228,8 +228,8 @@ static Flat_hash_map static_fh = flat_hash_map_initialize(
     &(static small_fixed_map){},
     struct Val,
     key,
-    flat_hash_mapap_int_to_u64,
-    flat_hash_mapap_key_order,
+    flat_hash_map_int_to_u64,
+    flat_hash_map_key_order,
     NULL,
     NULL,
     flat_hash_map_fixed_capacity(small_fixed_map)
@@ -250,8 +250,8 @@ static Flat_hash_map static_fh = flat_hash_map_initialize(
     NULL,
     struct Val,
     key,
-    flat_hash_mapap_int_to_u64,
-    flat_hash_mapap_key_order,
+    flat_hash_map_int_to_u64,
+    flat_hash_map_key_order,
     std_allocate,
     NULL,
     0
@@ -309,8 +309,8 @@ main(void)
 {
     Flat_hash_map static_fh = flat_hash_map_from(
         key,
-        flat_hash_mapap_int_to_u64,
-        flat_hash_mapap_key_order,
+        flat_hash_map_int_to_u64,
+        flat_hash_map_key_order,
         std_allocate,
         NULL,
         0,
@@ -369,8 +369,8 @@ main(void)
     Flat_hash_map static_fh = flat_hash_map_from(
         struct Val,
         key,
-        flat_hash_mapap_int_to_u64,
-        flat_hash_mapap_key_order,
+        flat_hash_map_int_to_u64,
+        flat_hash_map_key_order,
         std_allocate,
         NULL,
         4096
@@ -417,8 +417,8 @@ Flat_hash_map src = flat_hash_map_initialize(
     &(static small_fixed_map){},
     struct Val,
     key,
-    flat_hash_mapap_int_to_u64,
-    flat_hash_mapap_key_order,
+    flat_hash_map_int_to_u64,
+    flat_hash_map_key_order,
     NULL,
     NULL,
     CCC_flat_hash_map_fixed_capacity(small_fixed_map)
@@ -428,8 +428,8 @@ Flat_hash_map dst = flat_hash_map_initialize(
     &(static small_fixed_map){},
     struct Val,
     key,
-    flat_hash_mapap_int_to_u64,
-    flat_hash_mapap_key_order,
+    flat_hash_map_int_to_u64,
+    flat_hash_map_key_order,
     NULL,
     NULL,
     CCC_flat_hash_map_fixed_capacity(small_fixed_map)
@@ -451,8 +451,8 @@ Flat_hash_map src = flat_hash_map_initialize(
     NULL,
     struct Val,
     key,
-    flat_hash_mapap_int_to_u64,
-    flat_hash_mapap_key_order,
+    flat_hash_map_int_to_u64,
+    flat_hash_map_key_order,
     std_allocate,
     NULL,
     0
@@ -462,8 +462,8 @@ Flat_hash_map dst = flat_hash_map_initialize(
     NULL,
     struct Val,
     key,
-    flat_hash_mapap_int_to_u64,
-    flat_hash_mapap_key_order,
+    flat_hash_map_int_to_u64,
+    flat_hash_map_key_order,
     std_allocate,
     NULL,
     0
@@ -487,8 +487,8 @@ Flat_hash_map src = flat_hash_map_initialize(
     NULL,
     struct Val,
     key,
-    flat_hash_mapap_int_to_u64,
-    flat_hash_mapap_key_order,
+    flat_hash_map_int_to_u64,
+    flat_hash_map_key_order,
     std_allocate,
     NULL,
     0
@@ -498,8 +498,8 @@ Flat_hash_map dst = flat_hash_map_initialize(
     NULL,
     struct Val,
     key,
-    flat_hash_mapap_int_to_u64,
-    flat_hash_mapap_key_order,
+    flat_hash_map_int_to_u64,
+    flat_hash_map_key_order,
     NULL,
     NULL,
     0

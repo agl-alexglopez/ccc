@@ -182,19 +182,19 @@ add_ordered_map_test(test_ordered_map_entry)
 add_ordered_map_test(test_ordered_map_lru)
 
 #############  Handle Map  ##########################
-add_library(hordered_map_util hordered_map/hordered_map_util.h hordered_map/hordered_map_util.c)
-target_link_libraries(hordered_map_util
+add_library(handle_ordered_map_util handle_ordered_map/handle_ordered_map_util.h handle_ordered_map/handle_ordered_map_util.c)
+target_link_libraries(handle_ordered_map_util
   PRIVATE
     ccc
     checkers
 )
-add_dependencies(tests hordered_map_util)
+add_dependencies(tests handle_ordered_map_util)
 
-macro(add_hordered_map_test TEST_NAME)
-  add_executable(${TEST_NAME} hordered_map/${TEST_NAME}.c)
+macro(add_handle_ordered_map_test TEST_NAME)
+  add_executable(${TEST_NAME} handle_ordered_map/${TEST_NAME}.c)
   target_link_libraries(${TEST_NAME}
     PRIVATE
-      hordered_map_util
+      handle_ordered_map_util
       ccc
       checkers
       alloc
@@ -207,27 +207,27 @@ macro(add_hordered_map_test TEST_NAME)
   add_dependencies(tests ${TEST_NAME})
 endmacro()
 
-add_hordered_map_test(test_hordered_map_construct)
-add_hordered_map_test(test_hordered_map_insert)
-add_hordered_map_test(test_hordered_map_erase)
-add_hordered_map_test(test_hordered_map_iter)
-add_hordered_map_test(test_hordered_map_entry)
-add_hordered_map_test(test_hordered_map_lru)
+add_handle_ordered_map_test(test_handle_ordered_map_construct)
+add_handle_ordered_map_test(test_handle_ordered_map_insert)
+add_handle_ordered_map_test(test_handle_ordered_map_erase)
+add_handle_ordered_map_test(test_handle_ordered_map_iter)
+add_handle_ordered_map_test(test_handle_ordered_map_entry)
+add_handle_ordered_map_test(test_handle_ordered_map_lru)
 
 #############  Realtime Map  ##########################
-add_library(rordered_map_util rordered_map/rordered_map_util.h rordered_map/rordered_map_util.c)
-target_link_libraries(rordered_map_util
+add_library(realtime_ordered_map_util realtime_ordered_map/realtime_ordered_map_util.h realtime_ordered_map/realtime_ordered_map_util.c)
+target_link_libraries(realtime_ordered_map_util
   PRIVATE
     ccc
     checkers
 )
-add_dependencies(tests rordered_map_util)
+add_dependencies(tests realtime_ordered_map_util)
 
-macro(add_rordered_map_test TEST_NAME)
-  add_executable(${TEST_NAME} rordered_map/${TEST_NAME}.c)
+macro(add_realtime_ordered_map_test TEST_NAME)
+  add_executable(${TEST_NAME} realtime_ordered_map/${TEST_NAME}.c)
   target_link_libraries(${TEST_NAME}
     PRIVATE
-      rordered_map_util
+      realtime_ordered_map_util
       checkers
       ccc
       alloc
@@ -240,12 +240,12 @@ macro(add_rordered_map_test TEST_NAME)
   add_dependencies(tests ${TEST_NAME})
 endmacro()
 
-add_rordered_map_test(test_rordered_map_construct)
-add_rordered_map_test(test_rordered_map_insert)
-add_rordered_map_test(test_rordered_map_erase)
-add_rordered_map_test(test_rordered_map_iter)
-add_rordered_map_test(test_rordered_map_entry)
-add_rordered_map_test(test_rordered_map_lru)
+add_realtime_ordered_map_test(test_realtime_ordered_map_construct)
+add_realtime_ordered_map_test(test_realtime_ordered_map_insert)
+add_realtime_ordered_map_test(test_realtime_ordered_map_erase)
+add_realtime_ordered_map_test(test_realtime_ordered_map_iter)
+add_realtime_ordered_map_test(test_realtime_ordered_map_entry)
+add_realtime_ordered_map_test(test_realtime_ordered_map_lru)
 
 #############  Handle Realtime Map  ##########################
 add_library(handle_realtime_ordered_map_util handle_realtime_ordered_map/handle_realtime_ordered_map_util.h handle_realtime_ordered_map/handle_realtime_ordered_map_util.c)

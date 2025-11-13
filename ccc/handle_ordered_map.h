@@ -103,7 +103,7 @@ static Handle_ordered_map static_map = handle_ordered_map_initialize(
     &(static small_fixed_map){},
     struct Val,
     key,
-    handle_ordered_mapap_key_order,
+    handle_ordered_map_key_order,
     NULL,
     NULL,
     handle_ordered_map_fixed_capacity(small_fixed_map)
@@ -125,7 +125,7 @@ int main(void)
         &(small_fixed_map){},
         struct Val,
         key,
-        handle_ordered_mapap_key_order,
+        handle_ordered_map_key_order,
         NULL,
         NULL,
         handle_ordered_map_fixed_capacity(small_fixed_map)
@@ -201,7 +201,7 @@ static Handle_realtime_ordered_map src = handle_ordered_map_initialize(
     &(static small_fixed_map){},
     struct Val,
     key,
-    handle_ordered_mapap_key_order,
+    handle_ordered_map_key_order,
     NULL,
     NULL,
     handle_ordered_map_fixed_capacity(small_fixed_map)
@@ -211,7 +211,7 @@ static Handle_realtime_ordered_map dst = handle_ordered_map_initialize(
     &(static small_fixed_map){},
     struct Val,
     key,
-    handle_ordered_mapap_key_order,
+    handle_ordered_map_key_order,
     NULL,
     NULL,
     handle_ordered_map_fixed_capacity(small_fixed_map)
