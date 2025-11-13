@@ -45,7 +45,7 @@ jobs:
         uses: lukka/get-cmake@latest 
 
       - name: Generate Compile Commands
-        run: cmake --preset=clang-deb
+        run: cmake --preset=clang-debug
 
       - name: Review
         uses: ZedThree/clang-tidy-review@v0.20.1
