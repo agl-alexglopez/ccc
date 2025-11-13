@@ -46,7 +46,7 @@ jobs:
 
     - name: Build Debug Clang and Ninja
       run: |
-        cmake --preset=clang-deb -G "Ninja" && cmake --build build -j$(nproc) --target ccc tests samples
+        cmake --preset=clang-debug -G "Ninja" && cmake --build build -j$(nproc) --target ccc tests samples
         cmake --build build --target install
     
     - name: Test Debug
@@ -56,7 +56,7 @@ jobs:
     - name: Build Release Clang and Ninja
       run: |
         make clean
-        cmake --preset=clang-rel -G "Ninja" && cmake --build build -j$(nproc) --target ccc tests samples
+        cmake --preset=clang-release -G "Ninja" && cmake --build build -j$(nproc) --target ccc tests samples
         cmake --build build --target install
         
     - name: Test Release
@@ -65,7 +65,7 @@ jobs:
 
     - name: Build Portable Debug Clang and Ninja
       run: |
-        cmake --preset=clang-deb -DCCC_FHM_PORTABLE=ON -G "Ninja" && cmake --build build -j$(nproc) --target ccc tests samples
+        cmake --preset=clang-debug -DCCC_FLAT_HASH_MAP_PORTABLE=ON -G "Ninja" && cmake --build build -j$(nproc) --target ccc tests samples
         cmake --build build --target install
     
     - name: Test Portable Debug
@@ -75,7 +75,7 @@ jobs:
     - name: Build Portable Release Clang and Ninja
       run: |
         make clean
-        cmake --preset=clang-rel -DCCC_FHM_PORTABLE=ON -G "Ninja" && cmake --build build -j$(nproc) --target ccc tests samples
+        cmake --preset=clang-release -DCCC_FLAT_HASH_MAP_PORTABLE=ON -G "Ninja" && cmake --build build -j$(nproc) --target ccc tests samples
         cmake --build build --target install
         
     - name: Test Portable Release
