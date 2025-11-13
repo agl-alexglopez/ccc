@@ -64,7 +64,7 @@ All types and functions can then be written without the `CCC_` prefix. */
 /** @endcond */
 
 #include "buffer.h"
-#include "impl/impl_flat_priority_queue.h"
+#include "private/private_flat_priority_queue.h"
 #include "types.h"
 
 /** @name Container Types
@@ -88,33 +88,37 @@ Initialize the container with memory, callbacks, and permissions. */
 /** @brief Initialize a fpq as a min or max heap.
 @param [in] mem_ptr a pointer to an array of user types or NULL.
 @param [in] any_type_name the name of the user type.
-@param [in] cmp_order CCC_LES or CCC_GRT for min or max heap, respectively.
+@param [in] cmp_order CCC_ORDER_LESS or CCC_ORDER_GREATER for min or max heap,
+respectively.
 @param [in] cmp_fn the user defined comarison function for user types.
 @param [in] alloc_fn the allocation function or NULL if no allocation.
 @param [in] aux_data any auxiliary data needed for destruction of elements.
 @param [in] capacity the capacity of contiguous elements at mem_ptr.
 @return the initialized priority queue on the right hand side of an equality
-operator. (i.e. CCC_flat_priority_queue q = CCC_fpq_init(...);). */
-#define CCC_fpq_init(mem_ptr, any_type_name, cmp_order, cmp_fn, alloc_fn,      \
-                     aux_data, capacity)                                       \
-    CCC_impl_fpq_init(mem_ptr, any_type_name, cmp_order, cmp_fn, alloc_fn,     \
-                      aux_data, capacity)
+operator. (i.e. CCC_flat_priority_queue q = CCC_fpq_initialize(...);). */
+#define CCC_fpq_initialize(mem_ptr, any_type_name, cmp_order, cmp_fn,          \
+                           alloc_fn, aux_data, capacity)                       \
+    CCC_private_fpq_initialize(mem_ptr, any_type_name, cmp_order, cmp_fn,      \
+                               alloc_fn, aux_data, capacity)
 
 /** @brief Partial order an array of elements as a min or max heap. O(N).
 @param [in] mem_ptr a pointer to an array of user types or NULL.
 @param [in] any_type_name the name of the user type.
-@param [in] cmp_order CCC_LES or CCC_GRT for min or max heap, respectively.
+@param [in] cmp_order CCC_ORDER_LESS or CCC_ORDER_GREATER for min or max heap,
+respectively.
 @param [in] cmp_fn the user defined comparison function for user types.
 @param [in] alloc_fn the allocation function or NULL if no allocation.
 @param [in] aux_data any auxiliary data needed for destruction of elements.
 @param [in] capacity the capacity of contiguous elements at mem_ptr.
 @param [in] size the size <= capacity.
 @return the initialized priority queue on the right hand side of an equality
-operator. (i.e. CCC_flat_priority_queue q = CCC_fpq_heapify_init(...);). */
-#define CCC_fpq_heapify_init(mem_ptr, any_type_name, cmp_order, cmp_fn,        \
-                             alloc_fn, aux_data, capacity, size)               \
-    CCC_impl_fpq_heapify_init(mem_ptr, any_type_name, cmp_order, cmp_fn,       \
-                              alloc_fn, aux_data, capacity, size)
+operator. (i.e. CCC_flat_priority_queue q = CCC_fpq_heapify_initialize(...);).
+*/
+#define CCC_fpq_heapify_initialize(mem_ptr, any_type_name, cmp_order, cmp_fn,  \
+                                   alloc_fn, aux_data, capacity, size)         \
+    CCC_private_fpq_heapify_initialize(mem_ptr, any_type_name, cmp_order,      \
+                                       cmp_fn, alloc_fn, aux_data, capacity,   \
+                                       size)
 
 /** @brief Copy the fpq from src to newly initialized dst.
 @param [in] dst the destination that will copy the source fpq.
@@ -136,11 +140,11 @@ Manual memory management with no allocation function provided.
 ```
 #define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
 flat_priority_queue src
-    = fpq_init((int[10]){}, CCC_LES, NULL, int_cmp, NULL, 10);
+    = fpq_initialize((int[10]){}, CCC_ORDER_LESS, NULL, int_cmp, NULL, 10);
 push_rand_ints(&src);
 flat_priority_queue dst
-    = fpq_init((int[11]){}, CCC_LES, NULL, int_cmp, NULL, 11);
-CCC_result res = fpq_copy(&dst, &src, NULL);
+    = fpq_initialize((int[11]){}, CCC_ORDER_LESS, NULL, int_cmp, NULL, 11);
+CCC_Result res = fpq_copy(&dst, &src, NULL);
 ```
 
 The above requires dst capacity be greater than or equal to src capacity. Here
@@ -149,11 +153,11 @@ is memory management handed over to the copy function.
 ```
 #define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
 flat_priority_queue src
-    = fpq_init((int *)NULL, CCC_LES, std_alloc, int_cmp, NULL, 0);
+    = fpq_initialize((int *)NULL, CCC_ORDER_LESS, std_alloc, int_cmp, NULL, 0);
 push_rand_ints(&src);
 flat_priority_queue dst
-    = fpq_init((int *)NULL, CCC_LES, std_alloc, int_cmp, NULL, 0);
-CCC_result res = fpq_copy(&dst, &src, std_alloc);
+    = fpq_initialize((int *)NULL, CCC_ORDER_LESS, std_alloc, int_cmp, NULL, 0);
+CCC_Result res = fpq_copy(&dst, &src, std_alloc);
 ```
 
 The above allows dst to have a capacity less than that of the src as long as
@@ -164,25 +168,24 @@ size fpq.
 ```
 #define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
 flat_priority_queue src
-    = fpq_init((int *)NULL, CCC_LES, std_alloc, int_cmp, NULL, 0);
+    = fpq_initialize((int *)NULL, CCC_ORDER_LESS, std_alloc, int_cmp, NULL, 0);
 push_rand_ints(&src);
 flat_priority_queue dst
-    = fpq_init((int *)NULL, CCC_LES, NULL, int_cmp, NULL, 0);
-CCC_result res = fpq_copy(&dst, &src, std_alloc);
+    = fpq_initialize((int *)NULL, CCC_ORDER_LESS, NULL, int_cmp, NULL, 0);
+CCC_Result res = fpq_copy(&dst, &src, std_alloc);
 ```
 
 The above sets up dst with fixed size while src is a dynamic fpq. Because an
 allocation function is provided, the dst is resized once for the copy and
 retains its fixed size after the copy is complete. This would require the user
-to manually free the underlying buffer at dst eventually if this method is used.
+to manually free the underlying Buffer at dst eventually if this method is used.
 Usually it is better to allocate the memory explicitly before the copy if
 copying between ring buffers.
 
 These options allow users to stay consistent across containers with their
 memory management strategies. */
-CCC_result CCC_fpq_copy(CCC_flat_priority_queue *dst,
-                        CCC_flat_priority_queue const *src,
-                        CCC_any_alloc_fn *fn);
+CCC_Result CCC_fpq_copy(CCC_flat_priority_queue *dst,
+                        CCC_flat_priority_queue const *src, CCC_Allocator *fn);
 
 /** @brief Reserves space for at least to_add more elements.
 @param [in] fpq a pointer to the flat priority queue.
@@ -201,8 +204,8 @@ If the fpq has been initialized with no allocation permission and no memory
 this function can serve as a one-time reservation. This is helpful when a fixed
 size is needed but that size is only known dynamically at runtime. To free the
 fpq in such a case see the CCC_fpq_clear_and_free_reserve function. */
-CCC_result CCC_fpq_reserve(CCC_flat_priority_queue *fpq, size_t to_add,
-                           CCC_any_alloc_fn *fn);
+CCC_Result CCC_fpq_reserve(CCC_flat_priority_queue *fpq, size_t to_add,
+                           CCC_Allocator *fn);
 
 /**@}*/
 
@@ -215,7 +218,7 @@ Insert or remove elements from the flat priority queue. */
 @param [in] val_initializer the compound literal or direct scalar type.
 @return a reference to the inserted element or NULL if allocation failed. */
 #define CCC_fpq_emplace(fpq, val_initializer...)                               \
-    CCC_impl_fpq_emplace(fpq, val_initializer)
+    CCC_private_fpq_emplace(fpq, val_initializer)
 
 /** @brief Copy input array into the fpq, organizing into heap. O(N).
 @param [in] fpq a pointer to the priority queue.
@@ -235,11 +238,11 @@ reference provided directly to the function argument `&(name_of_type){}`.
 
 Note that this version of heapify copies elements from the input array. If an
 in place heapify is required use the initializer version of this method. */
-CCC_result CCC_fpq_heapify(CCC_flat_priority_queue *fpq, void *tmp,
+CCC_Result CCC_fpq_heapify(CCC_flat_priority_queue *fpq, void *tmp,
                            void *input_array, size_t input_n,
                            size_t input_sizeof_type);
 
-/** @brief Order n elements of the underlying fpq buffer as an fpq.
+/** @brief Order n elements of the underlying fpq Buffer as an fpq.
 @param [in] fpq a pointer to the flat priority queue.
 @param [in] tmp a pointer to a dummy user type that will be used for swapping.
 @param [in] n the number n of elements where  0 < (n + 1) <= capacity.
@@ -250,9 +253,9 @@ A simple way to provide a temp for swapping is with an inline compound literal
 reference provided directly to the function argument `&(name_of_type){}`.
 
 This is another method to order a heap that already has all the elements one
-needs sorted. The underlying buffer will be interpreted to have n valid elements
+needs sorted. The underlying Buffer will be interpreted to have n valid elements
 starting at index 0 to index n - 1. */
-CCC_result CCC_fpq_heapify_inplace(CCC_flat_priority_queue *fpq, void *tmp,
+CCC_Result CCC_fpq_heapify_inplace(CCC_flat_priority_queue *fpq, void *tmp,
                                    size_t n);
 
 /** @brief Pushes element pointed to at e into fpq. O(lgN).
@@ -275,7 +278,7 @@ reference provided directly to the function argument `&(name_of_type){}`. */
 
 A simple way to provide a temp for swapping is with an inline compound literal
 reference provided directly to the function argument `&(name_of_type){}`. */
-CCC_result CCC_fpq_pop(CCC_flat_priority_queue *fpq, void *tmp);
+CCC_Result CCC_fpq_pop(CCC_flat_priority_queue *fpq, void *tmp);
 
 /** @brief Erase element e that is a handle to the stored fpq element.
 @param [in] fpq a pointer to the priority queue.
@@ -289,7 +292,7 @@ A simple way to provide a temp for swapping is with an inline compound literal
 reference provided directly to the function argument `&(name_of_type){}`.
 
 Note that the reference to elem is invalidated after this call. */
-CCC_result CCC_fpq_erase(CCC_flat_priority_queue *fpq, void *elem, void *tmp);
+CCC_Result CCC_fpq_erase(CCC_flat_priority_queue *fpq, void *elem, void *tmp);
 
 /** @brief Update e that is a handle to the stored fpq element. O(lgN).
 @param [in] fpq a pointer to the flat priority queue.
@@ -304,7 +307,7 @@ NULL if parameters are invalid or fpq is empty.
 A simple way to provide a temp for swapping is with an inline compound literal
 reference provided directly to the function argument `&(name_of_type){}`. */
 void *CCC_fpq_update(CCC_flat_priority_queue *fpq, void *elem, void *tmp,
-                     CCC_any_type_update_fn *fn, void *aux);
+                     CCC_Type_updater *fn, void *aux);
 
 /** @brief Update the user type stored in the priority queue directly. O(lgN).
 @param [in] fpq_ptr a pointer to the flat priority queue.
@@ -325,7 +328,7 @@ flat_priority_queue fpq = build_rand_int_fpq();
 
 Note that whether the key increases or decreases does not affect runtime. */
 #define CCC_fpq_update_w(fpq_ptr, any_type_ptr, update_closure_over_T...)      \
-    CCC_impl_fpq_update_w(fpq_ptr, any_type_ptr, update_closure_over_T)
+    CCC_private_fpq_update_w(fpq_ptr, any_type_ptr, update_closure_over_T)
 
 /** @brief Increase e that is a handle to the stored fpq element. O(lgN).
 @param [in] fpq a pointer to the flat priority queue.
@@ -340,7 +343,7 @@ NULL if parameters are invalid or fpq is empty.
 A simple way to provide a temp for swapping is with an inline compound literal
 reference provided directly to the function argument `&(name_of_type){}`. */
 void *CCC_fpq_increase(CCC_flat_priority_queue *fpq, void *elem, void *tmp,
-                       CCC_any_type_update_fn *fn, void *aux);
+                       CCC_Type_updater *fn, void *aux);
 
 /** @brief Increase the user type stored in the priority queue directly. O(lgN).
 @param [in] fpq_ptr a pointer to the flat priority queue.
@@ -361,7 +364,7 @@ flat_priority_queue fpq = build_rand_int_fpq();
 
 Note that if this priority queue is min or max, the runtime is the same. */
 #define CCC_fpq_increase_w(fpq_ptr, any_type_ptr, increase_closure_over_T...)  \
-    CCC_impl_fpq_increase_w(fpq_ptr, any_type_ptr, increase_closure_over_T)
+    CCC_private_fpq_increase_w(fpq_ptr, any_type_ptr, increase_closure_over_T)
 
 /** @brief Decrease e that is a handle to the stored fpq element. O(lgN).
 @param [in] fpq a pointer to the flat priority queue.
@@ -376,7 +379,7 @@ NULL if parameters are invalid or fpq is empty.
 A simple way to provide a temp for swapping is with an inline compound literal
 reference provided directly to the function argument `&(name_of_type){}`. */
 void *CCC_fpq_decrease(CCC_flat_priority_queue *fpq, void *elem, void *tmp,
-                       CCC_any_type_update_fn *fn, void *aux);
+                       CCC_Type_updater *fn, void *aux);
 
 /** @brief Increase the user type stored in the priority queue directly. O(lgN).
 @param [in] fpq_ptr a pointer to the flat priority queue.
@@ -397,7 +400,7 @@ flat_priority_queue fpq = build_rand_int_fpq();
 
 Note that if this priority queue is min or max, the runtime is the same. */
 #define CCC_fpq_decrease_w(fpq_ptr, any_type_ptr, decrease_closure_over_T...)  \
-    CCC_impl_fpq_decrease_w(fpq_ptr, any_type_ptr, decrease_closure_over_T)
+    CCC_private_fpq_decrease_w(fpq_ptr, any_type_ptr, decrease_closure_over_T)
 
 /**@}*/
 
@@ -409,14 +412,14 @@ Deallocate the container or destroy the heap invariants. */
 buffer. The data is sorted in `O(N * log(N))` time and `O(1)` space.
 @param [in] fpq the fpq to be sorted and destroyed.
 @param [in] tmp a pointer to a dummy user type that will be used for swapping.
-@return a buffer filled from the back to the front by the fpq order. If the fpq
-is initialized CCC_LES the returned buffer is sorted in non-increasing order
-from index [0, N). If the fpq is initialized CCC_GRT the buffer is sorted in
-non-descending order from index [0, N). If fpq is NULL, the buffer is default
-initialized and unusable.
+@return a Buffer filled from the back to the front by the fpq order. If the fpq
+is initialized CCC_ORDER_LESS the returned Buffer is sorted in non-increasing
+order from index [0, N). If the fpq is initialized CCC_ORDER_GREATER the buffer
+is sorted in non-descending order from index [0, N). If fpq is NULL, the buffer
+is default initialized and unusable.
 @warning all fields of the fpq are cleared or otherwise default initialized so
 the fpq is unusable as a container after sorting. This function assumes the fpq
-has been previously initialized. Therefore, if the returned buffer value is not
+has been previously initialized. Therefore, if the returned Buffer value is not
 used the fpq memory is leaked.
 
 A simple way to provide a temp for swapping is with an inline compound literal
@@ -429,7 +432,7 @@ sort that copy.
 
 The sort is not inherently stable and uses the provided comparison function to
 the fpq to order the elements. */
-[[nodiscard]] CCC_buffer CCC_fpq_heapsort(CCC_flat_priority_queue *fpq,
+[[nodiscard]] CCC_Buffer CCC_fpq_heapsort(CCC_flat_priority_queue *fpq,
                                           void *tmp);
 
 /** @brief Clears the fpq calling fn on every element if provided.
@@ -445,15 +448,14 @@ element.
 
 If the destructor is NULL, the function is O(1) and no attempt is made to
 free capacity of the fpq. */
-CCC_result CCC_fpq_clear(CCC_flat_priority_queue *fpq,
-                         CCC_any_type_destructor_fn *fn);
+CCC_Result CCC_fpq_clear(CCC_flat_priority_queue *fpq, CCC_Type_destructor *fn);
 
 /** @brief Clears the fpq calling fn on every element if provided and frees the
 underlying buffer. O(1)-O(N).
 @param [in] fpq a pointer to the flat priority queue.
 @param [in] fn the destructor function or NULL if not needed.
 @return OK if input is valid and clear succeeds, otherwise input error. If the
-buffer attempts to free but is not allowed a no alloc error is returned.
+Buffer attempts to free but is not allowed a no alloc error is returned.
 
 Note that because the priority queue is flat there is no need to free elements
 stored in the fpq. However, the destructor is free to manage cleanup in other
@@ -461,10 +463,10 @@ parts of user code as needed upon destruction of each element.
 
 If the destructor is NULL, the function is O(1) and only relies on the runtime
 of the provided allocation function free operation. */
-CCC_result CCC_fpq_clear_and_free(CCC_flat_priority_queue *fpq,
-                                  CCC_any_type_destructor_fn *fn);
+CCC_Result CCC_fpq_clear_and_free(CCC_flat_priority_queue *fpq,
+                                  CCC_Type_destructor *fn);
 
-/** @brief Frees all slots in the fpq and frees the underlying buffer that was
+/** @brief Frees all slots in the fpq and frees the underlying Buffer that was
 previously dynamically reserved with the reserve function.
 @param [in] fpq the fpq to be cleared.
 @param [in] destructor the destructor for each element. NULL can be passed if no
@@ -476,7 +478,7 @@ the allocation function when called.
 @return the result of free operation. OK if success, or an error status to
 indicate the error.
 @warning It is an error to call this function on a fpq that was not reserved
-with the provided CCC_any_alloc_fn. The fpq must have existing memory to free.
+with the provided CCC_Allocator. The fpq must have existing memory to free.
 
 This function covers the edge case of reserving a dynamic capacity for a fpq
 at runtime but denying the fpq allocation permission to resize. This can help
@@ -490,10 +492,9 @@ to reserve memory so to is it required to free memory.
 
 This function will work normally if called on a fpq with allocation permission
 however the normal CCC_fpq_clear_and_free is sufficient for that use case. */
-CCC_result
-CCC_fpq_clear_and_free_reserve(CCC_flat_priority_queue *fpq,
-                               CCC_any_type_destructor_fn *destructor,
-                               CCC_any_alloc_fn *alloc);
+CCC_Result CCC_fpq_clear_and_free_reserve(CCC_flat_priority_queue *fpq,
+                                          CCC_Type_destructor *destructor,
+                                          CCC_Allocator *alloc);
 
 /**@}*/
 
@@ -509,17 +510,17 @@ Obtain state from the container. */
 /** @brief Returns true if the fpq is empty false if not. O(1).
 @param [in] fpq a pointer to the flat priority queue.
 @return true if the size is 0, false if not empty. Error if fpq is NULL. */
-[[nodiscard]] CCC_tribool CCC_fpq_is_empty(CCC_flat_priority_queue const *fpq);
+[[nodiscard]] CCC_Tribool CCC_fpq_is_empty(CCC_flat_priority_queue const *fpq);
 
 /** @brief Returns the count of the fpq active slots.
 @param [in] fpq a pointer to the flat priority queue.
 @return the size of the fpq or an argument error is set if fpq is NULL. */
-[[nodiscard]] CCC_ucount CCC_fpq_count(CCC_flat_priority_queue const *fpq);
+[[nodiscard]] CCC_Count CCC_fpq_count(CCC_flat_priority_queue const *fpq);
 
 /** @brief Returns the capacity of the fpq representing total possible slots.
 @param [in] fpq a pointer to the flat priority queue.
 @return the capacity of the fpq or an argument error is set if fpq is NULL. */
-[[nodiscard]] CCC_ucount CCC_fpq_capacity(CCC_flat_priority_queue const *fpq);
+[[nodiscard]] CCC_Count CCC_fpq_capacity(CCC_flat_priority_queue const *fpq);
 
 /** @brief Return a pointer to the base of the backing array. O(1).
 @param [in] fpq a pointer to the priority queue.
@@ -533,13 +534,12 @@ within the capacity of the backing buffer. */
 /** @brief Verifies the internal invariants of the fpq hold.
 @param [in] fpq a pointer to the flat priority queue.
 @return true if the fpq is valid false if invalid. Error if fpq is NULL. */
-[[nodiscard]] CCC_tribool CCC_fpq_validate(CCC_flat_priority_queue const *fpq);
+[[nodiscard]] CCC_Tribool CCC_fpq_validate(CCC_flat_priority_queue const *fpq);
 
 /** @brief Return the order used to initialize the fpq.
 @param [in] fpq a pointer to the flat priority queue.
 @return LES or GRT ordering. Any other ordering is invalid. */
-[[nodiscard]] CCC_threeway_cmp
-CCC_fpq_order(CCC_flat_priority_queue const *fpq);
+[[nodiscard]] CCC_Order CCC_fpq_order(CCC_flat_priority_queue const *fpq);
 
 /**@}*/
 
@@ -547,8 +547,8 @@ CCC_fpq_order(CCC_flat_priority_queue const *fpq);
 flat priority queue container. Check for collisions before name shortening. */
 #ifdef FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
 typedef CCC_flat_priority_queue flat_priority_queue;
-#    define fpq_init(args...) CCC_fpq_init(args)
-#    define fpq_heapify_init(args...) CCC_fpq_heapify_init(args)
+#    define fpq_initialize(args...) CCC_fpq_initialize(args)
+#    define fpq_heapify_initialize(args...) CCC_fpq_heapify_initialize(args)
 #    define fpq_copy(args...) CCC_fpq_copy(args)
 #    define fpq_reserve(args...) CCC_fpq_reserve(args)
 #    define fpq_heapify(args...) CCC_fpq_heapify(args)

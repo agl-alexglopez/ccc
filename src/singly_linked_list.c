@@ -20,7 +20,7 @@ they refactor. */
 #include <stddef.h>
 #include <string.h>
 
-#include "impl/impl_singly_linked_list.h"
+#include "private/private_singly_linked_list.h"
 #include "singly_linked_list.h"
 #include "types.h"
 
@@ -54,9 +54,8 @@ static struct CCC_sll_elem *elem_in(struct CCC_sll const *,
 static struct list_link merge(struct CCC_sll *, struct list_link,
                               struct list_link, struct list_link);
 static struct list_link first_less(struct CCC_sll const *, struct list_link);
-static CCC_threeway_cmp cmp(struct CCC_sll const *sll,
-                            struct CCC_sll_elem const *lhs,
-                            struct CCC_sll_elem const *rhs);
+static CCC_Order cmp(struct CCC_sll const *sll, struct CCC_sll_elem const *lhs,
+                     struct CCC_sll_elem const *rhs);
 
 /*===========================     Interface     =============================*/
 
@@ -92,18 +91,18 @@ CCC_sll_front(CCC_singly_linked_list const *const sll)
 }
 
 CCC_sll_elem *
-CCC_sll_begin_elem(CCC_singly_linked_list const *const sll)
+CCC_sll_elem_begin(CCC_singly_linked_list const *const sll)
 {
     return sll ? sll->nil.n : NULL;
 }
 
 CCC_sll_elem *
-CCC_sll_begin_sentinel(CCC_singly_linked_list const *const sll)
+CCC_sll_sentinel_begin(CCC_singly_linked_list const *const sll)
 {
     return sll ? (CCC_sll_elem *)&sll->nil : NULL;
 }
 
-CCC_result
+CCC_Result
 CCC_sll_pop_front(CCC_singly_linked_list *const sll)
 {
     if (!sll || !sll->count)
@@ -118,7 +117,7 @@ CCC_sll_pop_front(CCC_singly_linked_list *const sll)
     return CCC_RESULT_OK;
 }
 
-CCC_result
+CCC_Result
 CCC_sll_splice(CCC_singly_linked_list *const pos_sll, CCC_sll_elem *const pos,
                CCC_singly_linked_list *const to_splice_sll,
                CCC_sll_elem *const to_splice)
@@ -142,7 +141,7 @@ CCC_sll_splice(CCC_singly_linked_list *const pos_sll, CCC_sll_elem *const pos,
     return CCC_RESULT_OK;
 }
 
-CCC_result
+CCC_Result
 CCC_sll_splice_range(CCC_singly_linked_list *const pos_sll,
                      CCC_sll_elem *const pos,
                      CCC_singly_linked_list *const splice_sll,
@@ -274,9 +273,8 @@ CCC_sll_next(CCC_singly_linked_list const *const sll,
     return struct_base(sll, elem->n);
 }
 
-CCC_result
-CCC_sll_clear(CCC_singly_linked_list *const sll,
-              CCC_any_type_destructor_fn *const fn)
+CCC_Result
+CCC_sll_clear(CCC_singly_linked_list *const sll, CCC_Type_destructor *const fn)
 {
     if (!sll)
     {
@@ -287,7 +285,7 @@ CCC_sll_clear(CCC_singly_linked_list *const sll,
         void *const mem = struct_base(sll, pop_front(sll));
         if (fn)
         {
-            fn((CCC_any_type){.any_type = mem, .aux = sll->aux});
+            fn((CCC_Type_context){.any_type = mem, .aux = sll->aux});
         }
         if (sll->alloc)
         {
@@ -297,7 +295,7 @@ CCC_sll_clear(CCC_singly_linked_list *const sll,
     return CCC_RESULT_OK;
 }
 
-CCC_tribool
+CCC_Tribool
 CCC_sll_validate(CCC_singly_linked_list const *const sll)
 {
     if (!sll)
@@ -319,18 +317,18 @@ CCC_sll_validate(CCC_singly_linked_list const *const sll)
     return size == sll->count;
 }
 
-CCC_ucount
+CCC_Count
 CCC_sll_count(CCC_singly_linked_list const *const sll)
 {
 
     if (!sll)
     {
-        return (CCC_ucount){.error = CCC_RESULT_ARG_ERROR};
+        return (CCC_Count){.error = CCC_RESULT_ARG_ERROR};
     }
-    return (CCC_ucount){.count = sll->count};
+    return (CCC_Count){.count = sll->count};
 }
 
-CCC_tribool
+CCC_Tribool
 CCC_sll_is_empty(CCC_singly_linked_list const *const sll)
 {
     if (!sll)
@@ -345,7 +343,7 @@ CCC_sll_is_empty(CCC_singly_linked_list const *const sll)
 /** Returns true if the list is sorted in non-decreasing order. The user should
 flip the return values of their comparison function if they want a different
 order for elements.*/
-CCC_tribool
+CCC_Tribool
 CCC_sll_is_sorted(CCC_singly_linked_list const *const sll)
 {
     if (!sll)
@@ -359,7 +357,7 @@ CCC_sll_is_sorted(CCC_singly_linked_list const *const sll)
     for (struct CCC_sll_elem const *prev = sll->nil.n, *cur = sll->nil.n->n;
          cur != &sll->nil; prev = cur, cur = cur->n)
     {
-        if (cmp(sll, prev, cur) == CCC_GRT)
+        if (cmp(sll, prev, cur) == CCC_ORDER_GREATER)
         {
             return CCC_FALSE;
         }
@@ -389,7 +387,8 @@ CCC_sll_insert_sorted(CCC_singly_linked_list *sll, CCC_sll_elem *e)
     }
     struct CCC_sll_elem *prev = &sll->nil;
     struct CCC_sll_elem *i = sll->nil.n;
-    for (; i != &sll->nil && cmp(sll, e, i) != CCC_LES; prev = i, i = i->n)
+    for (; i != &sll->nil && cmp(sll, e, i) != CCC_ORDER_LESS;
+         prev = i, i = i->n)
     {}
     e->n = i;
     prev->n = e;
@@ -422,7 +421,7 @@ that need to be sorted by roughly "doubling" the length of a sorted range on
 each merge step. Therefore the number of times we must perform the merge step is
 `O(log(N))`. The most elements we would have to merge in the merge step is all
 `N` elements so together that gives us the runtime of `O(N * log(N))`. */
-CCC_result
+CCC_Result
 CCC_sll_sort(CCC_singly_linked_list *const sll)
 {
     if (!sll)
@@ -430,7 +429,7 @@ CCC_sll_sort(CCC_singly_linked_list *const sll)
         return CCC_RESULT_ARG_ERROR;
     }
     /* Algorithm is one pass if list is sorted. Merging is never true. */
-    CCC_tribool merging = CCC_FALSE;
+    CCC_Tribool merging = CCC_FALSE;
     do
     {
         merging = CCC_FALSE;
@@ -469,7 +468,7 @@ merge(CCC_singly_linked_list *const sll, struct list_link a_0,
 {
     while (a_0.i != a_n_b_0.i && a_n_b_0.i != b_n.i)
     {
-        if (cmp(sll, a_n_b_0.i, a_0.i) == CCC_LES)
+        if (cmp(sll, a_n_b_0.i, a_0.i) == CCC_ORDER_LESS)
         {
             /* The i element is the lesser element that must be spliced out.
                However, a_n_b_0.prev is not updated because only i is spliced
@@ -497,7 +496,7 @@ merge(CCC_singly_linked_list *const sll, struct list_link a_0,
 }
 
 /** Returns a pair of elements marking the first list elem that is smaller than
-its previous `CCC_LES` according to the user comparison callback. The
+its previous `CCC_ORDER_LESS` according to the user comparison callback. The
 list_link returned will have the out of order element as cur and the last
 remaining in order element as prev. The cur element may be the sentinel if the
 run is sorted. */
@@ -509,15 +508,15 @@ first_less(CCC_singly_linked_list const *const sll, struct list_link k)
         k.prev = k.i;
         k.i = k.i->n;
     }
-    while (k.i != &sll->nil && cmp(sll, k.i, k.prev) != CCC_LES);
+    while (k.i != &sll->nil && cmp(sll, k.i, k.prev) != CCC_ORDER_LESS);
     return k;
 }
 
 /*=========================    Private Interface   ==========================*/
 
 void
-CCC_impl_sll_push_front(struct CCC_sll *const sll,
-                        struct CCC_sll_elem *const elem)
+CCC_private_sll_push_front(struct CCC_sll *const sll,
+                           struct CCC_sll_elem *const elem)
 {
     push_front(sll, elem);
 }
@@ -619,11 +618,11 @@ elem_in(struct CCC_sll const *const sll, void const *const any_struct)
 /** Calls the user provided three way comparison callback function on the user
 type wrapping the provided intrusive handles. Returns the three way comparison
 result value. */
-static inline CCC_threeway_cmp
+static inline CCC_Order
 cmp(struct CCC_sll const *const sll, struct CCC_sll_elem const *const lhs,
     struct CCC_sll_elem const *const rhs)
 {
-    return sll->cmp((CCC_any_type_cmp){
+    return sll->cmp((CCC_Type_comparator_context){
         .any_type_lhs = struct_base(sll, lhs),
         .any_type_rhs = struct_base(sll, rhs),
         .aux = sll->aux,

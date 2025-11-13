@@ -44,7 +44,7 @@ All types and functions can then be written without the `CCC_` prefix. */
 #include <stddef.h>
 /** @endcond */
 
-#include "impl/impl_doubly_linked_list.h"
+#include "private/private_doubly_linked_list.h"
 #include "types.h"
 
 /** @name Container Types
@@ -82,17 +82,18 @@ destructors.
 @param [in] list_name the name of the list being initialized.
 @param [in] struct_name the type containing the intrusive dll element.
 @param [in] list_elem_field name of the dll element in the containing type.
-@param [in] cmp_fn the CCC_any_type_cmp_fn used to compare list elements.
+@param [in] cmp_fn the CCC_Type_comparator used to compare list
+elements.
 @param [in] aux_data any auxilliary data that will be needed for comparison,
 printing, or destruction of elements.
 @param [in] alloc_fn the optional allocation function or NULL.
 @return the initialized list. Assign to the list directly on the right hand
 side of an equality operator. Initialization can occur at runtime or compile
-time (e.g. CCC_doubly_linked l = CCC_dll_init(...);). */
-#define CCC_dll_init(list_name, struct_name, list_elem_field, cmp_fn,          \
-                     alloc_fn, aux_data)                                       \
-    CCC_impl_dll_init(list_name, struct_name, list_elem_field, cmp_fn,         \
-                      alloc_fn, aux_data)
+time (e.g. CCC_doubly_linked l = CCC_dll_initialize(...);). */
+#define CCC_dll_initialize(list_name, struct_name, list_elem_field, cmp_fn,    \
+                           alloc_fn, aux_data)                                 \
+    CCC_private_dll_initialize(list_name, struct_name, list_elem_field,        \
+                               cmp_fn, alloc_fn, aux_data)
 
 /**@}*/
 
@@ -114,7 +115,7 @@ initialized without an allocation function. If the user does not allow
 allocation, the contents of new elements to be inserted has been determined by
 the user prior to any inserts into the list. */
 #define CCC_dll_emplace_back(list_ptr, type_initializer...)                    \
-    CCC_impl_dll_emplace_back(list_ptr, type_initializer)
+    CCC_private_dll_emplace_back(list_ptr, type_initializer)
 
 /** @brief  writes contents of type initializer directly to allocated memory at
 the front of the list. O(1).
@@ -130,7 +131,7 @@ initialized without an allocation function. If the user does not allow
 allocation, the contents of new elements to be inserted has been determined by
 the user prior to any inserts into the list. */
 #define CCC_dll_emplace_front(list_ptr, type_initializer...)                   \
-    CCC_impl_dll_emplace_front(list_ptr, type_initializer)
+    CCC_private_dll_emplace_front(list_ptr, type_initializer)
 
 /** @brief Push user type wrapping elem to the front of the list. O(1).
 @param [in] l a pointer to the doubly linked list.
@@ -161,13 +162,13 @@ or allocation fails. */
 @param [in] l a pointer to the doubly linked list.
 @return an ok result if the pop was successful or an error if bad input is
 provided or the list is empty.*/
-CCC_result CCC_dll_pop_front(CCC_doubly_linked_list *l);
+CCC_Result CCC_dll_pop_front(CCC_doubly_linked_list *l);
 
 /** @brief Pop the user type at the back of the list. O(1).
 @param [in] l a pointer to the doubly linked list.
 @return an ok result if the pop was successful or an error if bad input is
 provided or the list is empty.*/
-CCC_result CCC_dll_pop_back(CCC_doubly_linked_list *l);
+CCC_Result CCC_dll_pop_back(CCC_doubly_linked_list *l);
 
 /** @brief Returns the element following an extracted element from the list
 without deallocating regardless of allocation permission provided to the
@@ -228,7 +229,7 @@ void *CCC_dll_extract_range(CCC_doubly_linked_list *l, CCC_dll_elem *elem_begin,
 @param [in] to_cut_dll the list to which to_cut belongs.
 @param [in] to_cut the element to cut.
 @return ok if the splice is successful or an error if bad input is provided. */
-CCC_result CCC_dll_splice(CCC_doubly_linked_list *pos_dll, CCC_dll_elem *pos,
+CCC_Result CCC_dll_splice(CCC_doubly_linked_list *pos_dll, CCC_dll_elem *pos,
                           CCC_doubly_linked_list *to_cut_dll,
                           CCC_dll_elem *to_cut);
 
@@ -240,7 +241,7 @@ O(N).
 @param [in] begin the start of the list to splice.
 @param [in] end the end of the list to splice.
 @return ok if the splice is successful or an error if bad input is provided. */
-CCC_result CCC_dll_splice_range(CCC_doubly_linked_list *pos_dll,
+CCC_Result CCC_dll_splice_range(CCC_doubly_linked_list *pos_dll,
                                 CCC_dll_elem *pos,
                                 CCC_doubly_linked_list *to_cut_dll,
                                 CCC_dll_elem *begin, CCC_dll_elem *end);
@@ -255,7 +256,7 @@ Sort the container. */
 the provided comparison function. `O(N * log(N))` time, `O(1)` space.
 @param [in] dll a pointer to the doubly linked list to sort.
 @return the result of the sort, usually OK. An arg error if dll is null. */
-CCC_result CCC_dll_sort(CCC_doubly_linked_list *dll);
+CCC_Result CCC_dll_sort(CCC_doubly_linked_list *dll);
 
 /** @brief Inserts e in sorted position according to the non-decreasing order
 of the list determined by the user provided comparison function. `O(1)`.
@@ -266,8 +267,8 @@ is required and has failed.
 @warning this function assumes the list is sorted.
 
 If a non-increasing order is desired, return opposite results from the user
-comparison function. If an element is CCC_LES return CCC_GRT and vice versa.
-If elements are equal, return CCC_EQL. */
+comparison function. If an element is CCC_ORDER_LESS return CCC_ORDER_GREATER
+and vice versa. If elements are equal, return CCC_ORDER_EQUAL. */
 void *CCC_dll_insert_sorted(CCC_doubly_linked_list *dll, CCC_dll_elem *e);
 
 /** @brief Returns true if the list is sorted in non-decreasing order according
@@ -276,9 +277,9 @@ to the user provided comparison function.
 @return CCC_TRUE if the list is sorted CCC_FALSE if not. Error if dll is NULL.
 
 If a non-increasing order is desired, return opposite results from the user
-comparison function. If an element is CCC_LES return CCC_GRT and vice versa.
-If elements are equal, return CCC_EQL. */
-CCC_tribool CCC_dll_is_sorted(CCC_doubly_linked_list const *dll);
+comparison function. If an element is CCC_ORDER_LESS return CCC_ORDER_GREATER
+and vice versa. If elements are equal, return CCC_ORDER_EQUAL. */
+CCC_Tribool CCC_dll_is_sorted(CCC_doubly_linked_list const *dll);
 
 /**@}*/
 
@@ -301,8 +302,7 @@ the list elements with the destructor if they wish to do so. The implementation
 ensures the function is called after the element is removed. Otherwise, the user
 must manage their elements at their discretion after the list is emptied in
 this function. */
-CCC_result CCC_dll_clear(CCC_doubly_linked_list *l,
-                         CCC_any_type_destructor_fn *fn);
+CCC_Result CCC_dll_clear(CCC_doubly_linked_list *l, CCC_Type_destructor *fn);
 
 /**@}*/
 
@@ -369,14 +369,14 @@ may be the sentinel. O(1).
 @param [in] l a pointer to the doubly linked list.
 @return a pointer to the list element at the beginning of the list which may be
 the sentinel but will not be NULL unless a NULL pointer is provided as l. */
-[[nodiscard]] CCC_dll_elem *CCC_dll_begin_elem(CCC_doubly_linked_list const *l);
+[[nodiscard]] CCC_dll_elem *CCC_dll_elem_begin(CCC_doubly_linked_list const *l);
 
 /** @brief Return a handle to the list element at the back of the list which
 may be the sentinel. O(1).
 @param [in] l a pointer to the doubly linked list.
 @return a pointer to the list element at the end of the list which may be
 the sentinel but will not be NULL unless a NULL pointer is provided as l. */
-[[nodiscard]] CCC_dll_elem *CCC_dll_end_elem(CCC_doubly_linked_list const *l);
+[[nodiscard]] CCC_dll_elem *CCC_dll_elem_end(CCC_doubly_linked_list const *l);
 
 /** @brief Return a pointer to the sentinel node at the back of the list.
 @param [in] l a pointer to the doubly linked list.
@@ -388,22 +388,22 @@ elements to the back of the list. Because the interface only allows the user
 to splice an element or elements BEFORE a position having access to the sentinel
 makes it possible to splice to the back of the list. */
 [[nodiscard]] CCC_dll_elem *
-CCC_dll_end_sentinel(CCC_doubly_linked_list const *l);
+CCC_dll_sentinel_end(CCC_doubly_linked_list const *l);
 
 /** @brief Return the count of elements in the list. O(1).
 @param [in] l a pointer to the doubly linked list.
 @return the size of the list. An argument error is set if l is NULL. */
-[[nodiscard]] CCC_ucount CCC_dll_count(CCC_doubly_linked_list const *l);
+[[nodiscard]] CCC_Count CCC_dll_count(CCC_doubly_linked_list const *l);
 
 /** @brief Return if the size of the list is equal to 0. O(1).
 @param [in] l a pointer to the doubly linked list.
 @return true if the size is 0, else false. Error if l is NULL. */
-[[nodiscard]] CCC_tribool CCC_dll_is_empty(CCC_doubly_linked_list const *l);
+[[nodiscard]] CCC_Tribool CCC_dll_is_empty(CCC_doubly_linked_list const *l);
 
 /** @brief Validates internal state of the list.
 @param [in] l a pointer to the doubly linked list.
 @return true if invariants hold, false if not. Error if l is NULL. */
-[[nodiscard]] CCC_tribool CCC_dll_validate(CCC_doubly_linked_list const *l);
+[[nodiscard]] CCC_Tribool CCC_dll_validate(CCC_doubly_linked_list const *l);
 
 /**@}*/
 
@@ -413,7 +413,7 @@ clashes exist prior to name shortening. */
 #ifdef DOUBLY_LINKED_LIST_USING_NAMESPACE_CCC
 typedef CCC_dll_elem dll_elem;
 typedef CCC_doubly_linked_list doubly_linked_list;
-#    define dll_init(args...) CCC_dll_init(args)
+#    define dll_initialize(args...) CCC_dll_initialize(args)
 #    define dll_emplace_back(args...) CCC_dll_emplace_back(args)
 #    define dll_emplace_front(args...) CCC_dll_emplace_front(args)
 #    define dll_push_front(args...) CCC_dll_push_front(args)
@@ -436,11 +436,11 @@ typedef CCC_doubly_linked_list doubly_linked_list;
 #    define dll_rbegin(args...) CCC_dll_rbegin(args)
 #    define dll_rnext(args...) CCC_dll_rnext(args)
 #    define dll_end(args...) CCC_dll_end(args)
-#    define dll_end_elem(args...) CCC_dll_end_elem(args)
+#    define dll_elem_end(args...) CCC_dll_elem_end(args)
 #    define dll_rend(args...) CCC_dll_rend(args)
-#    define dll_begin_elem(args...) CCC_dll_begin_elem(args)
-#    define dll_end_elem(args...) CCC_dll_end_elem(args)
-#    define dll_end_sentinel(args...) CCC_dll_end_sentinel(args)
+#    define dll_elem_begin(args...) CCC_dll_elem_begin(args)
+#    define dll_elem_end(args...) CCC_dll_elem_end(args)
+#    define dll_sentinel_end(args...) CCC_dll_sentinel_end(args)
 #    define dll_count(args...) CCC_dll_count(args)
 #    define dll_is_empty(args...) CCC_dll_is_empty(args)
 #    define dll_clear(args...) CCC_dll_clear(args)

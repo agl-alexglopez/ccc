@@ -19,7 +19,7 @@ limitations under the License. */
 
 #include "buffer.h"
 #include "flat_double_ended_queue.h"
-#include "impl/impl_flat_double_ended_queue.h"
+#include "private/private_flat_double_ended_queue.h"
 #include "types.h"
 
 enum : size_t
@@ -29,16 +29,16 @@ enum : size_t
 
 /*==========================    Prototypes    ===============================*/
 
-static CCC_result maybe_resize(struct CCC_fdeq *, size_t, CCC_any_alloc_fn *);
+static CCC_Result maybe_resize(struct CCC_fdeq *, size_t, CCC_Allocator *);
 static size_t index_of(struct CCC_fdeq const *, void const *);
 static void *at(struct CCC_fdeq const *, size_t i);
 static size_t increment(struct CCC_fdeq const *, size_t i);
 static size_t decrement(struct CCC_fdeq const *, size_t i);
 static size_t distance(struct CCC_fdeq const *, size_t, size_t);
 static size_t rdistance(struct CCC_fdeq const *, size_t, size_t);
-static CCC_result push_front_range(struct CCC_fdeq *fdeq, size_t n,
+static CCC_Result push_front_range(struct CCC_fdeq *fdeq, size_t n,
                                    char const *elems);
-static CCC_result push_back_range(struct CCC_fdeq *fdeq, size_t n,
+static CCC_Result push_back_range(struct CCC_fdeq *fdeq, size_t n,
                                   char const *elems);
 static size_t back_free_slot(struct CCC_fdeq const *);
 static size_t front_free_slot(size_t front, size_t cap);
@@ -83,7 +83,7 @@ CCC_fdeq_push_front(CCC_flat_double_ended_queue *const fdeq,
     return slot;
 }
 
-CCC_result
+CCC_Result
 CCC_fdeq_push_front_range(CCC_flat_double_ended_queue *const fdeq,
                           size_t const n, void const *const elems)
 {
@@ -94,7 +94,7 @@ CCC_fdeq_push_front_range(CCC_flat_double_ended_queue *const fdeq,
     return push_front_range(fdeq, n, elems);
 }
 
-CCC_result
+CCC_Result
 CCC_fdeq_push_back_range(CCC_flat_double_ended_queue *const fdeq,
                          size_t const n, void const *elems)
 {
@@ -132,52 +132,52 @@ CCC_fdeq_insert_range(CCC_flat_double_ended_queue *const fdeq, void *const pos,
     return push_range(fdeq, pos, n, elems);
 }
 
-CCC_result
+CCC_Result
 CCC_fdeq_pop_front(CCC_flat_double_ended_queue *const fdeq)
 {
     if (!fdeq)
     {
         return CCC_RESULT_ARG_ERROR;
     }
-    if (CCC_buf_is_empty(&fdeq->buf))
+    if (CCC_buffer_is_empty(&fdeq->buf))
     {
         return CCC_RESULT_ARG_ERROR;
     }
     fdeq->front = increment(fdeq, fdeq->front);
-    return CCC_buf_size_minus(&fdeq->buf, 1);
+    return CCC_buffer_size_minus(&fdeq->buf, 1);
 }
 
-CCC_result
+CCC_Result
 CCC_fdeq_pop_back(CCC_flat_double_ended_queue *const fdeq)
 {
     if (!fdeq)
     {
         return CCC_RESULT_ARG_ERROR;
     }
-    return CCC_buf_size_minus(&fdeq->buf, 1);
+    return CCC_buffer_size_minus(&fdeq->buf, 1);
 }
 
 void *
 CCC_fdeq_front(CCC_flat_double_ended_queue const *const fdeq)
 {
-    if (!fdeq || CCC_buf_is_empty(&fdeq->buf))
+    if (!fdeq || CCC_buffer_is_empty(&fdeq->buf))
     {
         return NULL;
     }
-    return CCC_buf_at(&fdeq->buf, fdeq->front);
+    return CCC_buffer_at(&fdeq->buf, fdeq->front);
 }
 
 void *
 CCC_fdeq_back(CCC_flat_double_ended_queue const *const fdeq)
 {
-    if (!fdeq || CCC_buf_is_empty(&fdeq->buf))
+    if (!fdeq || CCC_buffer_is_empty(&fdeq->buf))
     {
         return NULL;
     }
-    return CCC_buf_at(&fdeq->buf, last_elem_index(fdeq));
+    return CCC_buffer_at(&fdeq->buf, last_elem_index(fdeq));
 }
 
-CCC_tribool
+CCC_Tribool
 CCC_fdeq_is_empty(CCC_flat_double_ended_queue const *const fdeq)
 {
     if (!fdeq)
@@ -187,24 +187,24 @@ CCC_fdeq_is_empty(CCC_flat_double_ended_queue const *const fdeq)
     return !fdeq->buf.count;
 }
 
-CCC_ucount
+CCC_Count
 CCC_fdeq_count(CCC_flat_double_ended_queue const *const fdeq)
 {
     if (!fdeq)
     {
-        return (CCC_ucount){.error = CCC_RESULT_ARG_ERROR};
+        return (CCC_Count){.error = CCC_RESULT_ARG_ERROR};
     }
-    return (CCC_ucount){.count = fdeq->buf.count};
+    return (CCC_Count){.count = fdeq->buf.count};
 }
 
-CCC_ucount
+CCC_Count
 CCC_fdeq_capacity(CCC_flat_double_ended_queue const *const fdeq)
 {
     if (!fdeq)
     {
-        return (CCC_ucount){.error = CCC_RESULT_ARG_ERROR};
+        return (CCC_Count){.error = CCC_RESULT_ARG_ERROR};
     }
-    return (CCC_ucount){.count = fdeq->buf.capacity};
+    return (CCC_Count){.count = fdeq->buf.capacity};
 }
 
 void *
@@ -214,7 +214,7 @@ CCC_fdeq_at(CCC_flat_double_ended_queue const *const fdeq, size_t const i)
     {
         return NULL;
     }
-    return CCC_buf_at(&fdeq->buf, (fdeq->front + i) % fdeq->buf.capacity);
+    return CCC_buffer_at(&fdeq->buf, (fdeq->front + i) % fdeq->buf.capacity);
 }
 
 void *
@@ -224,7 +224,7 @@ CCC_fdeq_begin(CCC_flat_double_ended_queue const *const fdeq)
     {
         return NULL;
     }
-    return CCC_buf_at(&fdeq->buf, fdeq->front);
+    return CCC_buffer_at(&fdeq->buf, fdeq->front);
 }
 
 void *
@@ -234,7 +234,7 @@ CCC_fdeq_rbegin(CCC_flat_double_ended_queue const *const fdeq)
     {
         return NULL;
     }
-    return CCC_buf_at(&fdeq->buf, last_elem_index(fdeq));
+    return CCC_buffer_at(&fdeq->buf, last_elem_index(fdeq));
 }
 
 void *
@@ -247,7 +247,7 @@ CCC_fdeq_next(CCC_flat_double_ended_queue const *const fdeq,
     {
         return NULL;
     }
-    return CCC_buf_at(&fdeq->buf, next_i);
+    return CCC_buffer_at(&fdeq->buf, next_i);
 }
 
 void *
@@ -261,7 +261,7 @@ CCC_fdeq_rnext(CCC_flat_double_ended_queue const *const fdeq,
     {
         return NULL;
     }
-    return CCC_buf_at(&fdeq->buf, next_i);
+    return CCC_buffer_at(&fdeq->buf, next_i);
 }
 
 void *
@@ -279,13 +279,13 @@ CCC_fdeq_rend(CCC_flat_double_ended_queue const *const)
 void *
 CCC_fdeq_data(CCC_flat_double_ended_queue const *const fdeq)
 {
-    return fdeq ? CCC_buf_begin(&fdeq->buf) : NULL;
+    return fdeq ? CCC_buffer_begin(&fdeq->buf) : NULL;
 }
 
-CCC_result
+CCC_Result
 CCC_fdeq_copy(CCC_flat_double_ended_queue *const dst,
               CCC_flat_double_ended_queue const *const src,
-              CCC_any_alloc_fn *const fn)
+              CCC_Allocator *const fn)
 {
     if (!dst || !src || src == dst
         || (dst->buf.capacity < src->buf.capacity && !fn))
@@ -296,10 +296,10 @@ CCC_fdeq_copy(CCC_flat_double_ended_queue *const dst,
        changes to buf container. But we have to give back original destination
        memory in case it has already been allocated. Alloc will remain the
        same as in dst initialization because that controls whether the fdeq
-       is a ring buffer or dynamic fdeq. */
+       is a ring Buffer or dynamic fdeq. */
     void *const dst_mem = dst->buf.mem;
     size_t const dst_cap = dst->buf.capacity;
-    CCC_any_alloc_fn *const dst_alloc = dst->buf.alloc;
+    CCC_Allocator *const dst_alloc = dst->buf.alloc;
     *dst = *src;
     dst->buf.mem = dst_mem;
     dst->buf.capacity = dst_cap;
@@ -311,7 +311,8 @@ CCC_fdeq_copy(CCC_flat_double_ended_queue *const dst,
     }
     if (dst->buf.capacity < src->buf.capacity)
     {
-        CCC_result resize_res = CCC_buf_alloc(&dst->buf, src->buf.capacity, fn);
+        CCC_Result resize_res
+            = CCC_buffer_alloc(&dst->buf, src->buf.capacity, fn);
         if (resize_res != CCC_RESULT_OK)
         {
             return resize_res;
@@ -326,7 +327,7 @@ CCC_fdeq_copy(CCC_flat_double_ended_queue *const dst,
     {
         size_t const first_chunk
             = min(src->buf.count, src->buf.capacity - src->front);
-        (void)memcpy(dst->buf.mem, CCC_buf_at(&src->buf, src->front),
+        (void)memcpy(dst->buf.mem, CCC_buffer_at(&src->buf, src->front),
                      src->buf.sizeof_type * first_chunk);
         if (first_chunk < src->buf.count)
         {
@@ -343,9 +344,9 @@ CCC_fdeq_copy(CCC_flat_double_ended_queue *const dst,
     return CCC_RESULT_OK;
 }
 
-CCC_result
+CCC_Result
 CCC_fdeq_reserve(CCC_flat_double_ended_queue *const fdeq, size_t const to_add,
-                 CCC_any_alloc_fn *const fn)
+                 CCC_Allocator *const fn)
 {
     if (!fdeq || !fn)
     {
@@ -354,9 +355,9 @@ CCC_fdeq_reserve(CCC_flat_double_ended_queue *const fdeq, size_t const to_add,
     return maybe_resize(fdeq, to_add, fn);
 }
 
-CCC_result
+CCC_Result
 CCC_fdeq_clear(CCC_flat_double_ended_queue *const fdeq,
-               CCC_any_type_destructor_fn *const destructor)
+               CCC_Type_destructor *const destructor)
 {
     if (!fdeq)
     {
@@ -365,22 +366,22 @@ CCC_fdeq_clear(CCC_flat_double_ended_queue *const fdeq,
     if (!destructor)
     {
         fdeq->front = 0;
-        return CCC_buf_size_set(&fdeq->buf, 0);
+        return CCC_buffer_size_set(&fdeq->buf, 0);
     }
     size_t const back = back_free_slot(fdeq);
     for (size_t i = fdeq->front; i != back; i = increment(fdeq, i))
     {
-        destructor((CCC_any_type){
-            .any_type = CCC_buf_at(&fdeq->buf, i),
+        destructor((CCC_Type_context){
+            .any_type = CCC_buffer_at(&fdeq->buf, i),
             .aux = fdeq->buf.aux,
         });
     }
     return CCC_RESULT_OK;
 }
 
-CCC_result
+CCC_Result
 CCC_fdeq_clear_and_free(CCC_flat_double_ended_queue *const fdeq,
-                        CCC_any_type_destructor_fn *const destructor)
+                        CCC_Type_destructor *const destructor)
 {
     if (!fdeq)
     {
@@ -389,17 +390,17 @@ CCC_fdeq_clear_and_free(CCC_flat_double_ended_queue *const fdeq,
     if (!destructor)
     {
         fdeq->buf.count = fdeq->front = 0;
-        return CCC_buf_alloc(&fdeq->buf, 0, fdeq->buf.alloc);
+        return CCC_buffer_alloc(&fdeq->buf, 0, fdeq->buf.alloc);
     }
     size_t const back = back_free_slot(fdeq);
     for (size_t i = fdeq->front; i != back; i = increment(fdeq, i))
     {
-        destructor((CCC_any_type){
-            .any_type = CCC_buf_at(&fdeq->buf, i),
+        destructor((CCC_Type_context){
+            .any_type = CCC_buffer_at(&fdeq->buf, i),
             .aux = fdeq->buf.aux,
         });
     }
-    CCC_result const r = CCC_buf_alloc(&fdeq->buf, 0, fdeq->buf.alloc);
+    CCC_Result const r = CCC_buffer_alloc(&fdeq->buf, 0, fdeq->buf.alloc);
     if (r == CCC_RESULT_OK)
     {
         fdeq->buf.count = fdeq->front = 0;
@@ -407,10 +408,10 @@ CCC_fdeq_clear_and_free(CCC_flat_double_ended_queue *const fdeq,
     return r;
 }
 
-CCC_result
+CCC_Result
 CCC_fdeq_clear_and_free_reserve(CCC_flat_double_ended_queue *const fdeq,
-                                CCC_any_type_destructor_fn *const destructor,
-                                CCC_any_alloc_fn *const alloc)
+                                CCC_Type_destructor *const destructor,
+                                CCC_Allocator *const alloc)
 {
     if (!fdeq)
     {
@@ -419,17 +420,17 @@ CCC_fdeq_clear_and_free_reserve(CCC_flat_double_ended_queue *const fdeq,
     if (!destructor)
     {
         fdeq->buf.count = fdeq->front = 0;
-        return CCC_buf_alloc(&fdeq->buf, 0, alloc);
+        return CCC_buffer_alloc(&fdeq->buf, 0, alloc);
     }
     size_t const back = back_free_slot(fdeq);
     for (size_t i = fdeq->front; i != back; i = increment(fdeq, i))
     {
-        destructor((CCC_any_type){
-            .any_type = CCC_buf_at(&fdeq->buf, i),
+        destructor((CCC_Type_context){
+            .any_type = CCC_buffer_at(&fdeq->buf, i),
             .aux = fdeq->buf.aux,
         });
     }
-    CCC_result const r = CCC_buf_alloc(&fdeq->buf, 0, alloc);
+    CCC_Result const r = CCC_buffer_alloc(&fdeq->buf, 0, alloc);
     if (r == CCC_RESULT_OK)
     {
         fdeq->buf.count = fdeq->front = 0;
@@ -437,7 +438,7 @@ CCC_fdeq_clear_and_free_reserve(CCC_flat_double_ended_queue *const fdeq,
     return r;
 }
 
-CCC_tribool
+CCC_Tribool
 CCC_fdeq_validate(CCC_flat_double_ended_queue const *const fdeq)
 {
     if (!fdeq)
@@ -449,7 +450,7 @@ CCC_fdeq_validate(CCC_flat_double_ended_queue const *const fdeq)
         return CCC_TRUE;
     }
     void *iter = CCC_fdeq_begin(fdeq);
-    if (CCC_buf_i(&fdeq->buf, iter).count != fdeq->front)
+    if (CCC_buffer_i(&fdeq->buf, iter).count != fdeq->front)
     {
         return CCC_FALSE;
     }
@@ -467,7 +468,7 @@ CCC_fdeq_validate(CCC_flat_double_ended_queue const *const fdeq)
     }
     size = 0;
     iter = CCC_fdeq_rbegin(fdeq);
-    if (CCC_buf_i(&fdeq->buf, iter).count != last_elem_index(fdeq))
+    if (CCC_buffer_i(&fdeq->buf, iter).count != last_elem_index(fdeq))
     {
         return CCC_FALSE;
     }
@@ -485,13 +486,13 @@ CCC_fdeq_validate(CCC_flat_double_ended_queue const *const fdeq)
 /*======================   Private Interface   ==============================*/
 
 void *
-CCC_impl_fdeq_alloc_back(struct CCC_fdeq *const fdeq)
+CCC_private_fdeq_alloc_back(struct CCC_fdeq *const fdeq)
 {
     return alloc_back(fdeq);
 }
 
 void *
-CCC_impl_fdeq_alloc_front(struct CCC_fdeq *const fdeq)
+CCC_private_fdeq_alloc_front(struct CCC_fdeq *const fdeq)
 {
     return alloc_front(fdeq);
 }
@@ -501,7 +502,7 @@ CCC_impl_fdeq_alloc_front(struct CCC_fdeq *const fdeq)
 static void *
 alloc_front(struct CCC_fdeq *const fdeq)
 {
-    CCC_tribool const full
+    CCC_Tribool const full
         = maybe_resize(fdeq, 1, fdeq->buf.alloc) != CCC_RESULT_OK;
     /* Should have been able to resize. Bad error. */
     if (fdeq->buf.alloc && full)
@@ -509,10 +510,10 @@ alloc_front(struct CCC_fdeq *const fdeq)
         return NULL;
     }
     fdeq->front = front_free_slot(fdeq->front, fdeq->buf.capacity);
-    void *const new_slot = CCC_buf_at(&fdeq->buf, fdeq->front);
+    void *const new_slot = CCC_buffer_at(&fdeq->buf, fdeq->front);
     if (!full)
     {
-        (void)CCC_buf_size_plus(&fdeq->buf, 1);
+        (void)CCC_buffer_size_plus(&fdeq->buf, 1);
     }
     return new_slot;
 }
@@ -520,14 +521,14 @@ alloc_front(struct CCC_fdeq *const fdeq)
 static void *
 alloc_back(struct CCC_fdeq *const fdeq)
 {
-    CCC_tribool const full
+    CCC_Tribool const full
         = maybe_resize(fdeq, 1, fdeq->buf.alloc) != CCC_RESULT_OK;
     /* Should have been able to resize. Bad error. */
     if (fdeq->buf.alloc && full)
     {
         return NULL;
     }
-    void *const new_slot = CCC_buf_at(&fdeq->buf, back_free_slot(fdeq));
+    void *const new_slot = CCC_buffer_at(&fdeq->buf, back_free_slot(fdeq));
     /* If no reallocation policy is given we are a ring buffer. */
     if (full)
     {
@@ -535,16 +536,16 @@ alloc_back(struct CCC_fdeq *const fdeq)
     }
     else
     {
-        (void)CCC_buf_size_plus(&fdeq->buf, 1);
+        (void)CCC_buffer_size_plus(&fdeq->buf, 1);
     }
     return new_slot;
 }
 
-static CCC_result
+static CCC_Result
 push_back_range(struct CCC_fdeq *const fdeq, size_t const n, char const *elems)
 {
     size_t const sizeof_type = fdeq->buf.sizeof_type;
-    CCC_tribool const full
+    CCC_Tribool const full
         = maybe_resize(fdeq, n, fdeq->buf.alloc) != CCC_RESULT_OK;
     size_t const cap = fdeq->buf.capacity;
     if (fdeq->buf.alloc && full)
@@ -557,8 +558,8 @@ push_back_range(struct CCC_fdeq *const fdeq, size_t const n, char const *elems)
     {
         elems += ((n - cap) * sizeof_type);
         fdeq->front = 0;
-        (void)memcpy(CCC_buf_at(&fdeq->buf, 0), elems, sizeof_type * cap);
-        (void)CCC_buf_size_set(&fdeq->buf, cap);
+        (void)memcpy(CCC_buffer_at(&fdeq->buf, 0), elems, sizeof_type * cap);
+        (void)CCC_buffer_size_set(&fdeq->buf, cap);
         return CCC_RESULT_OK;
     }
     size_t const new_size = fdeq->buf.count + n;
@@ -567,25 +568,26 @@ push_back_range(struct CCC_fdeq *const fdeq, size_t const n, char const *elems)
     size_t const remainder_back_slot = (back_slot + chunk) % cap;
     size_t const remainder = (n - chunk);
     char const *const second_chunk = elems + (chunk * sizeof_type);
-    (void)memcpy(CCC_buf_at(&fdeq->buf, back_slot), elems, chunk * sizeof_type);
+    (void)memcpy(CCC_buffer_at(&fdeq->buf, back_slot), elems,
+                 chunk * sizeof_type);
     if (remainder)
     {
-        (void)memcpy(CCC_buf_at(&fdeq->buf, remainder_back_slot), second_chunk,
-                     remainder * sizeof_type);
+        (void)memcpy(CCC_buffer_at(&fdeq->buf, remainder_back_slot),
+                     second_chunk, remainder * sizeof_type);
     }
     if (new_size > cap)
     {
         fdeq->front = (fdeq->front + (new_size - cap)) % cap;
     }
-    (void)CCC_buf_size_set(&fdeq->buf, min(cap, new_size));
+    (void)CCC_buffer_size_set(&fdeq->buf, min(cap, new_size));
     return CCC_RESULT_OK;
 }
 
-static CCC_result
+static CCC_Result
 push_front_range(struct CCC_fdeq *const fdeq, size_t const n, char const *elems)
 {
     size_t const sizeof_type = fdeq->buf.sizeof_type;
-    CCC_tribool const full
+    CCC_Tribool const full
         = maybe_resize(fdeq, n, fdeq->buf.alloc) != CCC_RESULT_OK;
     size_t const cap = fdeq->buf.capacity;
     if (fdeq->buf.alloc && full)
@@ -598,8 +600,8 @@ push_front_range(struct CCC_fdeq *const fdeq, size_t const n, char const *elems)
     {
         elems += ((n - cap) * sizeof_type);
         fdeq->front = 0;
-        (void)memcpy(CCC_buf_at(&fdeq->buf, 0), elems, sizeof_type * cap);
-        (void)CCC_buf_size_set(&fdeq->buf, cap);
+        (void)memcpy(CCC_buffer_at(&fdeq->buf, 0), elems, sizeof_type * cap);
+        (void)CCC_buffer_size_set(&fdeq->buf, cap);
         return CCC_RESULT_OK;
     }
     size_t const space_ahead = front_free_slot(fdeq->front, cap) + 1;
@@ -607,13 +609,14 @@ push_front_range(struct CCC_fdeq *const fdeq, size_t const n, char const *elems)
     size_t const chunk = min(n, space_ahead);
     size_t const remainder = (n - chunk);
     char const *const first_chunk = elems + ((n - chunk) * sizeof_type);
-    (void)memcpy(CCC_buf_at(&fdeq->buf, i), first_chunk, chunk * sizeof_type);
+    (void)memcpy(CCC_buffer_at(&fdeq->buf, i), first_chunk,
+                 chunk * sizeof_type);
     if (remainder)
     {
-        (void)memcpy(CCC_buf_at(&fdeq->buf, cap - remainder), elems,
+        (void)memcpy(CCC_buffer_at(&fdeq->buf, cap - remainder), elems,
                      remainder * sizeof_type);
     }
-    (void)CCC_buf_size_set(&fdeq->buf, min(cap, fdeq->buf.count + n));
+    (void)CCC_buffer_size_set(&fdeq->buf, min(cap, fdeq->buf.count + n));
     fdeq->front = remainder ? cap - remainder : i;
     return CCC_RESULT_OK;
 }
@@ -623,7 +626,7 @@ push_range(struct CCC_fdeq *const fdeq, char const *const pos, size_t n,
            char const *elems)
 {
     size_t const sizeof_type = fdeq->buf.sizeof_type;
-    CCC_tribool const full
+    CCC_Tribool const full
         = maybe_resize(fdeq, n, fdeq->buf.alloc) != CCC_RESULT_OK;
     if (fdeq->buf.alloc && full)
     {
@@ -635,9 +638,9 @@ push_range(struct CCC_fdeq *const fdeq, char const *const pos, size_t n,
     {
         elems += ((n - cap) * sizeof_type);
         fdeq->front = 0;
-        void *const ret = CCC_buf_at(&fdeq->buf, 0);
+        void *const ret = CCC_buffer_at(&fdeq->buf, 0);
         (void)memcpy(ret, elems, sizeof_type * cap);
-        (void)CCC_buf_size_set(&fdeq->buf, cap);
+        (void)CCC_buffer_size_set(&fdeq->buf, cap);
         return ret;
     }
     size_t const pos_i = index_of(fdeq, pos);
@@ -648,25 +651,25 @@ push_range(struct CCC_fdeq *const fdeq, char const *const pos, size_t n,
     move_chunk = back < pos_i ? min(cap - pos_i, move_chunk)
                               : min(back - pos_i, move_chunk);
     size_t const move_remain = to_move - move_chunk;
-    (void)memmove(CCC_buf_at(&fdeq->buf, move_i), CCC_buf_at(&fdeq->buf, pos_i),
-                  move_chunk * sizeof_type);
+    (void)memmove(CCC_buffer_at(&fdeq->buf, move_i),
+                  CCC_buffer_at(&fdeq->buf, pos_i), move_chunk * sizeof_type);
     if (move_remain)
     {
         size_t const move_remain_i = (move_i + move_chunk) % cap;
         size_t const remaining_start_i = (pos_i + move_chunk) % cap;
-        (void)memmove(CCC_buf_at(&fdeq->buf, move_remain_i),
-                      CCC_buf_at(&fdeq->buf, remaining_start_i),
+        (void)memmove(CCC_buffer_at(&fdeq->buf, move_remain_i),
+                      CCC_buffer_at(&fdeq->buf, remaining_start_i),
                       move_remain * sizeof_type);
     }
     size_t const elems_chunk = min(n, cap - pos_i);
     size_t const elems_remain = n - elems_chunk;
-    (void)memcpy(CCC_buf_at(&fdeq->buf, pos_i), elems,
+    (void)memcpy(CCC_buffer_at(&fdeq->buf, pos_i), elems,
                  elems_chunk * sizeof_type);
     if (elems_remain)
     {
         char const *const second_chunk = elems + (elems_chunk * sizeof_type);
         size_t const second_chunk_i = (pos_i + elems_chunk) % cap;
-        (void)memcpy(CCC_buf_at(&fdeq->buf, second_chunk_i), second_chunk,
+        (void)memcpy(CCC_buffer_at(&fdeq->buf, second_chunk_i), second_chunk,
                      elems_remain * sizeof_type);
     }
     if (new_size > cap)
@@ -679,13 +682,13 @@ push_range(struct CCC_fdeq *const fdeq, char const *const pos, size_t n,
         size_t const front_to_pos_dist = (pos_i + cap - fdeq->front) % cap;
         fdeq->front = (fdeq->front + min(excess, front_to_pos_dist)) % cap;
     }
-    (void)CCC_buf_size_set(&fdeq->buf, min(cap, new_size));
-    return CCC_buf_at(&fdeq->buf, pos_i);
+    (void)CCC_buffer_size_set(&fdeq->buf, min(cap, new_size));
+    return CCC_buffer_at(&fdeq->buf, pos_i);
 }
 
-static CCC_result
+static CCC_Result
 maybe_resize(struct CCC_fdeq *const q, size_t const additional_elems_to_add,
-             CCC_any_alloc_fn *const fn)
+             CCC_Allocator *const fn)
 {
     size_t required = q->buf.count + additional_elems_to_add;
     if (required < q->buf.count)
@@ -698,7 +701,7 @@ maybe_resize(struct CCC_fdeq *const q, size_t const additional_elems_to_add,
     }
     if (!fn)
     {
-        return CCC_RESULT_NO_ALLOC;
+        return CCC_RESULT_NO_ALLOCATION_FUNCTION;
     }
     size_t const sizeof_type = q->buf.sizeof_type;
     if (!q->buf.capacity && additional_elems_to_add == 1)
@@ -718,16 +721,16 @@ maybe_resize(struct CCC_fdeq *const q, size_t const additional_elems_to_add,
     {
         size_t const first_chunk
             = min(q->buf.count, q->buf.capacity - q->front);
-        (void)memcpy(new_mem, CCC_buf_at(&q->buf, q->front),
+        (void)memcpy(new_mem, CCC_buffer_at(&q->buf, q->front),
                      sizeof_type * first_chunk);
         if (first_chunk < q->buf.count)
         {
             (void)memcpy((char *)new_mem + (sizeof_type * first_chunk),
-                         CCC_buf_begin(&q->buf),
+                         CCC_buffer_begin(&q->buf),
                          sizeof_type * (q->buf.count - first_chunk));
         }
     }
-    (void)CCC_buf_alloc(&q->buf, 0, fn);
+    (void)CCC_buffer_alloc(&q->buf, 0, fn);
     q->buf.mem = new_mem;
     q->front = 0;
     q->buf.capacity = required;
@@ -736,7 +739,7 @@ maybe_resize(struct CCC_fdeq *const q, size_t const additional_elems_to_add,
 
 /** Returns the distance between the current iter position and the origin
 position. Distance is calculated in ascending indices, meaning the result is
-the number of forward steps in the buffer origin would need to take reach iter,
+the number of forward steps in the Buffer origin would need to take reach iter,
 possibly accounting for wrapping around the end of the buffer. */
 static inline size_t
 distance(struct CCC_fdeq const *const fdeq, size_t const iter,
@@ -747,7 +750,7 @@ distance(struct CCC_fdeq const *const fdeq, size_t const iter,
 
 /** Returns the rdistance between the current iter position and the origin
 position. Rdistance is calculated in descending indices, meaning the result is
-the number of backward steps in the buffer origin would need to take to reach
+the number of backward steps in the Buffer origin would need to take to reach
 iter, possibly accounting for wrapping around the beginning of buffer. */
 static inline size_t
 rdistance(struct CCC_fdeq const *const fdeq, size_t const iter,
@@ -759,16 +762,16 @@ rdistance(struct CCC_fdeq const *const fdeq, size_t const iter,
 static inline size_t
 index_of(struct CCC_fdeq const *const fdeq, void const *const pos)
 {
-    assert(pos >= CCC_buf_begin(&fdeq->buf));
-    assert(pos < CCC_buf_capacity_end(&fdeq->buf));
-    return (size_t)(((char *)pos - (char *)CCC_buf_begin(&fdeq->buf))
+    assert(pos >= CCC_buffer_begin(&fdeq->buf));
+    assert(pos < CCC_buffer_capacity_end(&fdeq->buf));
+    return (size_t)(((char *)pos - (char *)CCC_buffer_begin(&fdeq->buf))
                     / fdeq->buf.sizeof_type);
 }
 
 static inline void *
 at(struct CCC_fdeq const *const fdeq, size_t const i)
 {
-    return CCC_buf_at(&fdeq->buf, (fdeq->front + i) % fdeq->buf.capacity);
+    return CCC_buffer_at(&fdeq->buf, (fdeq->front + i) % fdeq->buf.capacity);
 }
 
 static inline size_t

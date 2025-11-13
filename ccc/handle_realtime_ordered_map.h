@@ -26,7 +26,7 @@ element until that element is removed from the map. Handles remain valid even if
 resizing of the table, insertions of other elements, or removals of other
 elements occur. Active user elements may not be contiguous from index [0, N)
 where N is the size of map; there may be gaps between active elements in the
-buffer and it is only guaranteed that N elements are stored between index [0,
+Buffer and it is only guaranteed that N elements are stored between index [0,
 Capacity).
 
 All elements in the map track their relationships via indices in the buffer.
@@ -56,7 +56,7 @@ All types and functions can then be written without the `CCC_` prefix. */
 #include <stddef.h>
 /** @endcond */
 
-#include "impl/impl_handle_realtime_ordered_map.h"
+#include "private/private_handle_realtime_ordered_map.h"
 #include "types.h"
 
 /** @name Container Types
@@ -108,7 +108,7 @@ struct val
     int val;
 };
 CCC_hrm_declare_fixed_map(small_fixed_map, struct val, 64);
-static handle_realtime_ordered_map static_map = hrm_init(
+static handle_realtime_ordered_map static_map = hrm_initialize(
     &(static small_fixed_map){},
     struct val,
     key,
@@ -130,7 +130,7 @@ struct val
 CCC_hrm_declare_fixed_map(small_fixed_map, struct val, 64);
 int main(void)
 {
-    handle_realtime_ordered_map static_fh = hrm_init(
+    handle_realtime_ordered_map static_fh = hrm_initialize(
         &(small_fixed_map){},
         struct val,
         key,
@@ -153,14 +153,14 @@ maps, simply pass NULL and 0 capacity to the initialization macro along with the
 desired allocation function. */
 #define CCC_hrm_declare_fixed_map(fixed_map_type_name, key_val_type_name,      \
                                   capacity)                                    \
-    CCC_impl_hrm_declare_fixed_map(fixed_map_type_name, key_val_type_name,     \
-                                   capacity)
+    CCC_private_hrm_declare_fixed_map(fixed_map_type_name, key_val_type_name,  \
+                                      capacity)
 
 /** @brief Obtain the capacity previously chosen for the fixed size map type.
 @param [in] fixed_map_type_name the name of a previously declared map.
 @return the size_t capacity previously specified for this type by user. */
 #define CCC_hrm_fixed_capacity(fixed_map_type_name)                            \
-    CCC_impl_hrm_fixed_capacity(fixed_map_type_name)
+    CCC_private_hrm_fixed_capacity(fixed_map_type_name)
 
 /** @brief Initializes the map at runtime or compile time.
 @param [in] memory_ptr a pointer to the contiguous user types or ((T *)NULL).
@@ -172,11 +172,11 @@ desired allocation function. */
 destruction.
 @param [in] capacity the capacity at mem_ptr or 0.
 @return the struct initialized ordered map for direct assignment
-(i.e. CCC_handle_realtime_ordered_map m = CCC_hrm_init(...);). */
-#define CCC_hrm_init(memory_ptr, any_type_name, key_elem_field, key_cmp_fn,    \
-                     alloc_fn, aux_data, capacity)                             \
-    CCC_impl_hrm_init(memory_ptr, any_type_name, key_elem_field, key_cmp_fn,   \
-                      alloc_fn, aux_data, capacity)
+(i.e. CCC_handle_realtime_ordered_map m = CCC_hrm_initialize(...);). */
+#define CCC_hrm_initialize(memory_ptr, any_type_name, key_elem_field,          \
+                           key_cmp_fn, alloc_fn, aux_data, capacity)           \
+    CCC_private_hrm_initialize(memory_ptr, any_type_name, key_elem_field,      \
+                               key_cmp_fn, alloc_fn, aux_data, capacity)
 
 /** @brief Copy the map at source to destination.
 @param [in] dst the initialized destination for the copy of the src map.
@@ -203,7 +203,7 @@ struct val
     int val;
 };
 CCC_hrm_declare_fixed_map(small_fixed_map, struct val, 64);
-static handle_realtime_ordered_map src = hrm_init(
+static handle_realtime_ordered_map src = hrm_initialize(
     &(static small_fixed_map){},
     struct val,
     key,
@@ -213,7 +213,7 @@ static handle_realtime_ordered_map src = hrm_init(
     hrm_fixed_capacity(small_fixed_map)
 );
 insert_rand_vals(&src);
-static handle_realtime_ordered_map dst = hrm_init(
+static handle_realtime_ordered_map dst = hrm_initialize(
     &(static small_fixed_map){},
     struct val,
     key,
@@ -222,7 +222,7 @@ static handle_realtime_ordered_map dst = hrm_init(
     NULL,
     hrm_fixed_capacity(small_fixed_map)
 );
-CCC_result res = hrm_copy(&dst, &src, NULL);
+CCC_Result res = hrm_copy(&dst, &src, NULL);
 ```
 
 The above requires dst capacity be greater than or equal to src capacity. Here
@@ -236,11 +236,11 @@ struct val
     int val;
 };
 static handle_ordered_map src
-    = hrm_init(NULL, struct val, key, key_cmp, std_alloc, NULL, 0);
+    = hrm_initialize(NULL, struct val, key, key_cmp, std_alloc, NULL, 0);
 insert_rand_vals(&src);
 static handle_ordered_map dst
-    = hrm_init(NULL, struct val, key, key_cmp, std_alloc, NULL, 0);
-CCC_result res = hrm_copy(&dst, &src, std_alloc);
+    = hrm_initialize(NULL, struct val, key, key_cmp, std_alloc, NULL, 0);
+CCC_Result res = hrm_copy(&dst, &src, std_alloc);
 ```
 
 The above allows dst to have a capacity less than that of the src as long as
@@ -256,25 +256,25 @@ struct val
     int val;
 };
 static handle_ordered_map src
-    = hrm_init(NULL, struct val, key, key_cmp, std_alloc, NULL, 0);
+    = hrm_initialize(NULL, struct val, key, key_cmp, std_alloc, NULL, 0);
 insert_rand_vals(&src);
 static handle_ordered_map dst
-    = hrm_init(NULL, struct val, key, key_cmp, NULL, NULL, 0);
-CCC_result res = hrm_copy(&dst, &src, std_alloc);
+    = hrm_initialize(NULL, struct val, key, key_cmp, NULL, NULL, 0);
+CCC_Result res = hrm_copy(&dst, &src, std_alloc);
 ```
 
 The above sets up dst with fixed size while src is a dynamic map. Because an
 allocation function is provided, the dst is resized once for the copy and
 retains its fixed size after the copy is complete. This would require the user
-to manually free the underlying buffer at dst eventually if this method is used.
+to manually free the underlying Buffer at dst eventually if this method is used.
 Usually it is better to allocate the memory explicitly before the copy if
 copying between maps without allocation permission.
 
 These options allow users to stay consistent across containers with their
 memory management strategies. */
-CCC_result CCC_hrm_copy(CCC_handle_realtime_ordered_map *dst,
+CCC_Result CCC_hrm_copy(CCC_handle_realtime_ordered_map *dst,
                         CCC_handle_realtime_ordered_map const *src,
-                        CCC_any_alloc_fn *fn);
+                        CCC_Allocator *fn);
 
 /** @brief Reserves space for at least to_add more elements.
 @param [in] hrm a pointer to the handle realtime ordered map.
@@ -293,8 +293,8 @@ If the hrm has been initialized with no allocation permission and no memory
 this function can serve as a one-time reservation. This is helpful when a fixed
 size is needed but that size is only known dynamically at runtime. To free the
 hrm in such a case see the CCC_hrm_clear_and_free_reserve function. */
-CCC_result CCC_hrm_reserve(CCC_handle_realtime_ordered_map *hrm, size_t to_add,
-                           CCC_any_alloc_fn *fn);
+CCC_Result CCC_hrm_reserve(CCC_handle_realtime_ordered_map *hrm, size_t to_add,
+                           CCC_Allocator *fn);
 
 /**@}*/
 
@@ -313,7 +313,7 @@ one has been removed that new element data will be returned.
 @warning do not try to access data in the table manually with a handle. Always
 use this provided interface function when a reference to data is needed. */
 [[nodiscard]] void *CCC_hrm_at(CCC_handle_realtime_ordered_map const *h,
-                               CCC_handle_i i);
+                               CCC_Handle_index i);
 
 /** @brief Returns a reference to the user type in the table at the handle.
 @param [in] handle_realtime_ordered_map_ptr a pointer to the map.
@@ -322,14 +322,14 @@ use this provided interface function when a reference to data is needed. */
 @return a reference to the handle at handle in the map as the type the user has
 stored in the map. */
 #define CCC_hrm_as(handle_realtime_ordered_map_ptr, type_name, handle_i...)    \
-    CCC_impl_hrm_as(handle_realtime_ordered_map_ptr, type_name, handle_i)
+    CCC_private_hrm_as(handle_realtime_ordered_map_ptr, type_name, handle_i)
 
 /** @brief Searches the map for the presence of key.
 @param [in] hrm the map to be searched.
 @param [in] key pointer to the key matching the key type of the user struct.
 @return true if the struct containing key is stored, false if not. Error if hrm
 or key is NULL. */
-[[nodiscard]] CCC_tribool
+[[nodiscard]] CCC_Tribool
 CCC_hrm_contains(CCC_handle_realtime_ordered_map const *hrm, void const *key);
 
 /** @brief Returns a reference into the map at handle key.
@@ -372,7 +372,7 @@ forbidden, an insert error is set.
 Note that this function may write to the provided user type struct. */
 #define CCC_hrm_swap_handle_r(handle_realtime_ordered_map_ptr,                 \
                               key_val_type_output_ptr)                         \
-    &(CCC_handle)                                                              \
+    &(CCC_Handle)                                                              \
     {                                                                          \
         CCC_hrm_swap_handle((handle_realtime_ordered_map_ptr),                 \
                             (key_val_type_output_ptr))                         \
@@ -399,7 +399,7 @@ If Vacant the handle contains a reference to the newly inserted handle in the
 map. If more space is needed but allocation fails an insert error is set. */
 #define CCC_hrm_try_insert_r(handle_realtime_ordered_map_ptr,                  \
                              key_val_type_ptr)                                 \
-    &(CCC_handle)                                                              \
+    &(CCC_Handle)                                                              \
     {                                                                          \
         CCC_hrm_try_insert((handle_realtime_ordered_map_ptr),                  \
                            (key_val_type_ptr))                                 \
@@ -420,10 +420,10 @@ lazy value compound literal as well. This function ensures the key in the
 compound literal matches the searched key. */
 #define CCC_hrm_try_insert_w(handle_realtime_ordered_map_ptr, key,             \
                              lazy_value...)                                    \
-    &(CCC_handle)                                                              \
+    &(CCC_Handle)                                                              \
     {                                                                          \
-        CCC_impl_hrm_try_insert_w(handle_realtime_ordered_map_ptr, key,        \
-                                  lazy_value)                                  \
+        CCC_private_hrm_try_insert_w(handle_realtime_ordered_map_ptr, key,     \
+                                     lazy_value)                               \
     }
 
 /** @brief Invariantly inserts or overwrites a user struct into the map.
@@ -452,10 +452,10 @@ lazy value compound literal as well. This function ensures the key in the
 compound literal matches the searched key. */
 #define CCC_hrm_insert_or_assign_w(handle_realtime_ordered_map_ptr, key,       \
                                    lazy_value...)                              \
-    &(CCC_handle)                                                              \
+    &(CCC_Handle)                                                              \
     {                                                                          \
-        CCC_impl_hrm_insert_or_assign_w(handle_realtime_ordered_map_ptr, key,  \
-                                        lazy_value)                            \
+        CCC_private_hrm_insert_or_assign_w(handle_realtime_ordered_map_ptr,    \
+                                           key, lazy_value)                    \
     }
 
 /** @brief Removes the key value in the map storing the old value, if present,
@@ -467,7 +467,7 @@ pair. If Vacant the key value pair was not stored in the map. If bad input is
 provided an input error is set.
 
 Note that this function may write to the user type struct. */
-[[nodiscard]] CCC_handle CCC_hrm_remove(CCC_handle_realtime_ordered_map *hrm,
+[[nodiscard]] CCC_Handle CCC_hrm_remove(CCC_handle_realtime_ordered_map *hrm,
                                         void *key_val_type_output);
 
 /** @brief Removes the key value in the map storing the old value, if present,
@@ -481,7 +481,7 @@ pair was not stored in the map. If bad input is provided an input error is set.
 Note that this function may write to the user type struct. */
 #define CCC_hrm_remove_r(handle_realtime_ordered_map_ptr,                      \
                          key_val_type_output_ptr)                              \
-    &(CCC_handle)                                                              \
+    &(CCC_Handle)                                                              \
     {                                                                          \
         CCC_hrm_remove((handle_realtime_ordered_map_ptr),                      \
                        (key_val_type_output_ptr))                              \
@@ -534,10 +534,10 @@ to subsequent calls in the Handle Interface. */
 
 This function is intended to make the function chaining in the Handle Interface
 more succinct if the handle will be modified in place based on its own value
-without the need of the auxiliary argument a CCC_any_type_update_fn can provide.
+without the need of the auxiliary argument a CCC_Type_updater can provide.
 */
 [[nodiscard]] CCC_hromap_handle *CCC_hrm_and_modify(CCC_hromap_handle *h,
-                                                    CCC_any_type_update_fn *fn);
+                                                    CCC_Type_updater *fn);
 
 /** @brief Modifies the provided handle if it is Occupied.
 @param [in] h the handle obtained from a handle function or macro.
@@ -545,11 +545,10 @@ without the need of the auxiliary argument a CCC_any_type_update_fn can provide.
 @param [in] aux auxiliary data required for the update.
 @return the updated handle if it was Occupied or the unmodified vacant handle.
 
-This function makes full use of a CCC_any_type_update_fn capability, meaning a
+This function makes full use of a CCC_Type_updater capability, meaning a
 complete CCC_update object will be passed to the update function callback. */
 [[nodiscard]] CCC_hromap_handle *
-CCC_hrm_and_modify_aux(CCC_hromap_handle *h, CCC_any_type_update_fn *fn,
-                       void *aux);
+CCC_hrm_and_modify_aux(CCC_hromap_handle *h, CCC_Type_updater *fn, void *aux);
 
 /** @brief Modify an Occupied handle with a closure over user type T.
 @param [in] handle_realtime_ordered_map_handle_ptr a pointer to the obtained
@@ -579,8 +578,8 @@ evaluated in the closure scope. */
                              type_name, closure_over_T...)                     \
     &(CCC_hromap_handle)                                                       \
     {                                                                          \
-        CCC_impl_hrm_and_modify_w(handle_realtime_ordered_map_handle_ptr,      \
-                                  type_name, closure_over_T)                   \
+        CCC_private_hrm_and_modify_w(handle_realtime_ordered_map_handle_ptr,   \
+                                     type_name, closure_over_T)                \
     }
 
 /** @brief Inserts the provided user type if the handle is Vacant.
@@ -594,8 +593,8 @@ a user struct allocation failure.
 
 If no allocation is permitted, this function assumes the user struct wrapping
 elem has been allocated with the appropriate lifetime and scope by the user. */
-[[nodiscard]] CCC_handle_i CCC_hrm_or_insert(CCC_hromap_handle const *h,
-                                             void const *key_val_type);
+[[nodiscard]] CCC_Handle_index CCC_hrm_or_insert(CCC_hromap_handle const *h,
+                                                 void const *key_val_type);
 
 /** @brief Lazily insert the desired key value into the handle if it is Vacant.
 @param [in] handle_realtime_ordered_map_handle_ptr a pointer to the obtained
@@ -611,8 +610,8 @@ Note that if the compound literal uses any function calls to generate values
 or other data, such functions will not be called if the handle is Occupied. */
 #define CCC_hrm_or_insert_w(handle_realtime_ordered_map_handle_ptr,            \
                             lazy_key_value...)                                 \
-    CCC_impl_hrm_or_insert_w(handle_realtime_ordered_map_handle_ptr,           \
-                             lazy_key_value)
+    CCC_private_hrm_or_insert_w(handle_realtime_ordered_map_handle_ptr,        \
+                                lazy_key_value)
 
 /** @brief Inserts the provided user type invariantly.
 @param [in] h the handle returned from a call obtaining a handle.
@@ -621,8 +620,8 @@ or other data, such functions will not be called if the handle is Occupied. */
 
 This method can be used when the old value in the map does not need to
 be preserved. See the regular insert method if the old value is of interest. */
-[[nodiscard]] CCC_handle_i CCC_hrm_insert_handle(CCC_hromap_handle const *h,
-                                                 void const *key_val_type);
+[[nodiscard]] CCC_Handle_index CCC_hrm_insert_handle(CCC_hromap_handle const *h,
+                                                     void const *key_val_type);
 
 /** @brief Write the contents of the compound literal lazy_key_value to a node.
 @param [in] handle_realtime_ordered_map_handle_ptr a pointer to the obtained
@@ -632,8 +631,8 @@ handle.
 returned if allocation failed or is not allowed when required. */
 #define CCC_hrm_insert_handle_w(handle_realtime_ordered_map_handle_ptr,        \
                                 lazy_key_value...)                             \
-    CCC_impl_hrm_insert_handle_w(handle_realtime_ordered_map_handle_ptr,       \
-                                 lazy_key_value)
+    CCC_private_hrm_insert_handle_w(handle_realtime_ordered_map_handle_ptr,    \
+                                    lazy_key_value)
 
 /** @brief Remove the handle from the map if Occupied.
 @param [in] h a pointer to the map handle.
@@ -642,7 +641,7 @@ a handle in the map existed and was removed. If Vacant, no prior handle existed
 to be removed.
 @warning the reference to the removed handle is invalidated upon any further
 insertions. */
-CCC_handle CCC_hrm_remove_handle(CCC_hromap_handle const *h);
+CCC_Handle CCC_hrm_remove_handle(CCC_hromap_handle const *h);
 
 /** @brief Remove the handle from the map if Occupied.
 @param [in] handle_realtime_ordered_map_handle_ptr a pointer to the map handle.
@@ -653,7 +652,7 @@ Vacant, no prior handle existed to be removed.
 Note that the reference to the removed handle is invalidated upon any further
 insertions. */
 #define CCC_hrm_remove_handle_r(handle_realtime_ordered_map_handle_ptr)        \
-    &(CCC_handle)                                                              \
+    &(CCC_Handle)                                                              \
     {                                                                          \
         CCC_hrm_remove_handle((handle_realtime_ordered_map_handle_ptr)).impl   \
     }
@@ -661,19 +660,19 @@ insertions. */
 /** @brief Unwraps the provided handle to obtain a view into the map element.
 @param [in] h the handle from a query to the map via function or macro.
 @return a view into the table handle if one is present, or NULL. */
-[[nodiscard]] CCC_handle_i CCC_hrm_unwrap(CCC_hromap_handle const *h);
+[[nodiscard]] CCC_Handle_index CCC_hrm_unwrap(CCC_hromap_handle const *h);
 
 /** @brief Returns the Vacant or Occupied status of the handle.
 @param [in] h the handle from a query to the map via function or macro.
 @return true if the handle is occupied, false if not. Error if h is NULL. */
-[[nodiscard]] CCC_tribool CCC_hrm_occupied(CCC_hromap_handle const *h);
+[[nodiscard]] CCC_Tribool CCC_hrm_occupied(CCC_hromap_handle const *h);
 
 /** @brief Provides the status of the handle should an insertion follow.
 @param [in] h the handle from a query to the table via function or macro.
 @return true if a handle obtained from an insertion attempt failed to insert
 due to an allocation failure when allocation success was expected. Error if h is
 NULL. */
-[[nodiscard]] CCC_tribool CCC_hrm_insert_error(CCC_hromap_handle const *h);
+[[nodiscard]] CCC_Tribool CCC_hrm_insert_error(CCC_hromap_handle const *h);
 
 /** @brief Obtain the handle status from a container handle.
 @param [in] h a pointer to the handle.
@@ -700,8 +699,8 @@ maintenance is required on the elements in the map before their slots are
 forfeit.
 
 If NULL is passed as the destructor function time is O(1), else O(size). */
-CCC_result CCC_hrm_clear(CCC_handle_realtime_ordered_map *hrm,
-                         CCC_any_type_destructor_fn *fn);
+CCC_Result CCC_hrm_clear(CCC_handle_realtime_ordered_map *hrm,
+                         CCC_Type_destructor *fn);
 
 /** @brief Frees all slots in the map and frees the underlying buffer.
 @param [in] hrm the map to be cleared.
@@ -709,14 +708,14 @@ CCC_result CCC_hrm_clear(CCC_handle_realtime_ordered_map *hrm,
 maintenance is required on the elements in the map before their slots are
 forfeit.
 @return the result of free operation. If no alloc function is provided it is
-an error to attempt to free the buffer and a memory error is returned.
+an error to attempt to free the Buffer and a memory error is returned.
 Otherwise, an OK result is returned.
 
 If NULL is passed as the destructor function time is O(1), else O(size). */
-CCC_result CCC_hrm_clear_and_free(CCC_handle_realtime_ordered_map *hrm,
-                                  CCC_any_type_destructor_fn *fn);
+CCC_Result CCC_hrm_clear_and_free(CCC_handle_realtime_ordered_map *hrm,
+                                  CCC_Type_destructor *fn);
 
-/** @brief Frees all slots in the hrm and frees the underlying buffer that was
+/** @brief Frees all slots in the hrm and frees the underlying Buffer that was
 previously dynamically reserved with the reserve function.
 @param [in] hrm the map to be cleared.
 @param [in] destructor the destructor for each element. NULL can be passed if no
@@ -728,7 +727,7 @@ the allocation function when called.
 @return the result of free operation. OK if success, or an error status to
 indicate the error.
 @warning It is an error to call this function on a hrm that was not reserved
-with the provided CCC_any_alloc_fn. The hrm must have existing memory to free.
+with the provided CCC_Allocator. The hrm must have existing memory to free.
 
 This function covers the edge case of reserving a dynamic capacity for a hrm
 at runtime but denying the hrm allocation permission to resize. This can help
@@ -742,10 +741,9 @@ to reserve memory so to is it required to free memory.
 
 This function will work normally if called on a hrm with allocation permission
 however the normal CCC_hrm_clear_and_free is sufficient for that use case. */
-CCC_result
-CCC_hrm_clear_and_free_reserve(CCC_handle_realtime_ordered_map *hrm,
-                               CCC_any_type_destructor_fn *destructor,
-                               CCC_any_alloc_fn *alloc);
+CCC_Result CCC_hrm_clear_and_free_reserve(CCC_handle_realtime_ordered_map *hrm,
+                                          CCC_Type_destructor *destructor,
+                                          CCC_Allocator *alloc);
 
 /**@}*/
 
@@ -765,7 +763,7 @@ the provided range iteration functions from types.h is recommended for example:
 
 ```
 for (struct val *i = range_begin(&range);
-     i != end_range(&range);
+     i != range_end(&range);
      i = next(&hrm, i))
 {}
 ```
@@ -784,7 +782,7 @@ range the second to the end of the range.
 enclosing scope. This reference is always non-NULL. */
 #define CCC_hrm_equal_range_r(handle_realtime_ordered_map_ptr,                 \
                               begin_and_end_key_ptrs...)                       \
-    &(CCC_range)                                                               \
+    &(CCC_Range)                                                               \
     {                                                                          \
         CCC_hrm_equal_range((handle_realtime_ordered_map_ptr),                 \
                             (begin_and_end_key_ptrs))                          \
@@ -804,7 +802,7 @@ the provided rrange iteration functions from types.h is recommended for example:
 
 ```
 for (struct val *i = rrange_begin(&rrange);
-     i != rend_rrange(&rrange);
+     i != rrange_rend(&rrange);
      i = rnext(&fom, i))
 {}
 ```
@@ -824,7 +822,7 @@ rrange the second to the end of the rrange.
 enclosing scope. This reference is always non-NULL. */
 #define CCC_hrm_equal_rrange_r(handle_realtime_ordered_map_ptr,                \
                                rbegin_and_rend_key_ptrs...)                    \
-    &(CCC_rrange)                                                              \
+    &(CCC_Reverse_range)                                                       \
     {                                                                          \
         CCC_hrm_equal_rrange((handle_realtime_ordered_map_ptr),                \
                              (rbegin_and_rend_key_ptrs))                       \
@@ -877,26 +875,26 @@ Obtain the container state. */
 /** @brief Returns the size status of the map.
 @param [in] hrm the map.
 @return true if empty else false. Error if hrm is NULL. */
-[[nodiscard]] CCC_tribool
+[[nodiscard]] CCC_Tribool
 CCC_hrm_is_empty(CCC_handle_realtime_ordered_map const *hrm);
 
 /** @brief Returns the count of map occupied slots.
 @param [in] hrm the map.
 @return the size of the map or an argument error is set if hrm is NULL. */
-[[nodiscard]] CCC_ucount
+[[nodiscard]] CCC_Count
 CCC_hrm_count(CCC_handle_realtime_ordered_map const *hrm);
 
 /** @brief Returns the capacity of the map representing total available slots.
 @param [in] hrm the map.
 @return the capacity or an argument error is set if hrm is NULL. */
-[[nodiscard]] CCC_ucount
+[[nodiscard]] CCC_Count
 CCC_hrm_capacity(CCC_handle_realtime_ordered_map const *hrm);
 
 /** @brief Validation of invariants for the map.
 @param [in] hrm the map to validate.
 @return true if all invariants hold, false if corruption occurs. Error if hrm is
 NULL. */
-[[nodiscard]] CCC_tribool
+[[nodiscard]] CCC_Tribool
 CCC_hrm_validate(CCC_handle_realtime_ordered_map const *hrm);
 
 /**@}*/
@@ -907,7 +905,7 @@ CCC_hrm_validate(CCC_handle_realtime_ordered_map const *hrm);
 typedef CCC_handle_realtime_ordered_map handle_realtime_ordered_map;
 typedef CCC_hromap_handle hromap_handle;
 #    define hrm_declare_fixed_map(args...) CCC_hrm_declare_fixed_map(args)
-#    define hrm_init(args...) CCC_hrm_init(args)
+#    define hrm_initialize(args...) CCC_hrm_initialize(args)
 #    define hrm_fixed_capacity(args...) CCC_hrm_fixed_capacity(args)
 #    define hrm_copy(args...) CCC_hrm_copy(args)
 #    define hrm_reserve(args...) CCC_hrm_reserve(args)

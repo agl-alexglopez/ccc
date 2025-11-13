@@ -305,9 +305,9 @@ static struct int_conversion parse_digits(str_view, int lower_bound,
 static struct path_request parse_path_request(struct graph *, str_view);
 static void help(void);
 
-static threeway_cmp cmp_pq_costs(any_type_cmp);
-static CCC_threeway_cmp cmp_parent_cells(any_key_cmp);
-static uint64_t hash_parent_cells(any_key point_struct);
+static Order cmp_pq_costs(Type_comparator_context);
+static CCC_Order cmp_parent_cells(Key_comparator_context);
+static uint64_t hash_parent_cells(Key_contextpoint_struct);
 static uint64_t hash_64_bits(uint64_t);
 
 static unsigned count_digits(uintmax_t n);
@@ -443,7 +443,7 @@ found_dst(struct graph *const graph, struct vertex *const src)
                                             },
                                         });
     flat_double_ended_queue bfs
-        = fdeq_init(NULL, struct point, std_alloc, NULL, 0);
+        = fdeq_initialize(NULL, struct point, std_alloc, NULL, 0);
     (void)push_back(&bfs, &src->pos);
     bool dst_connection = false;
     while (!is_empty(&bfs))
@@ -532,7 +532,7 @@ add_edge_cost_label(struct graph *const g, struct vertex *const src,
     struct point cur = src->pos;
     cell const edge_id = make_edge(src->name, e->n.name);
     struct point prev = cur;
-    /* Add a two space buffer to either side of the label so direction of lines
+    /* Add a two space Buffer to either side of the label so direction of lines
        is not lost to writing of digits. Otherwise it would be unclear which
        edge a cost is associated with if close to other costs. */
     size_t const spaces_needed_for_cost = count_digits(e->n.cost) + 2;
@@ -755,8 +755,8 @@ dijkstra_shortest_path(struct graph *const graph, char const src,
        rebuild map remains accessible. Best of all, maximum pq/map size is known
        to be small [A-Z] so provide memory on the stack for speed and safety. */
     struct cost map_pq[MAX_VERTICES] = {};
-    priority_queue costs
-        = pq_init(struct cost, pq_elem, CCC_LES, cmp_pq_costs, NULL, NULL);
+    priority_queue costs = pq_initialize(struct cost, pq_elem, CCC_ORDER_LESS,
+                                         cmp_pq_costs, NULL, NULL);
     for (int i = 0, vx = BEGIN_VERTICES; i < graph->vertices; ++i, ++vx)
     {
         *map_pq_at(map_pq, (char)vx) = (struct cost){
@@ -1115,14 +1115,14 @@ build_path_outline(struct graph *graph)
 
 /*====================    Data Structure Helpers    =========================*/
 
-static CCC_threeway_cmp
-cmp_parent_cells(any_key_cmp const c)
+static CCC_Order
+cmp_parent_cells(Key_comparator_context const c)
 {
     struct point const *const lhs = c.any_key_lhs;
     struct path_backtrack_cell const *const rhs = c.any_type_rhs;
-    CCC_threeway_cmp const cmp
+    CCC_Order const cmp
         = ((lhs->r < rhs->current.r) - (lhs->r > rhs->current.r));
-    if (cmp != CCC_EQL)
+    if (cmp != CCC_ORDER_EQUAL)
     {
         return cmp;
     }
@@ -1130,15 +1130,15 @@ cmp_parent_cells(any_key_cmp const c)
 }
 
 static uint64_t
-hash_parent_cells(any_key const point_struct)
+hash_parent_cells(Key_contextconst point_struct)
 {
     struct point const *const p = point_struct.any_key;
     uint64_t const wr = p->r;
     return hash_64_bits((wr << 31) | p->c);
 }
 
-static threeway_cmp
-cmp_pq_costs(any_type_cmp const cost_cmp)
+static Order
+cmp_pq_costs(Type_comparator_context const cost_cmp)
 {
     struct cost const *const a = cost_cmp.any_type_lhs;
     struct cost const *const b = cost_cmp.any_type_rhs;

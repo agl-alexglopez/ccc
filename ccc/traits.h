@@ -35,7 +35,7 @@ All traits can then be written without the `CCC_` prefix. */
 #ifndef CCC_TRAITS_H
 #define CCC_TRAITS_H
 
-#include "impl/impl_traits.h"
+#include "private/private_traits.h"
 
 /** @name Entry Interface
 Obtain and operate on container entries for efficient queries when non-trivial
@@ -49,7 +49,7 @@ control flow is needed. */
 
 See container documentation for specific behavior. */
 #define CCC_swap_entry(container_ptr, swap_args...)                            \
-    CCC_impl_swap_entry(container_ptr, swap_args)
+    CCC_private_swap_entry(container_ptr, swap_args)
 
 /** @brief Insert an element and obtain the old value if Occupied.
 @param [in] container_ptr a pointer to the container.
@@ -58,7 +58,7 @@ See container documentation for specific behavior. */
 
 See container documentation for specific behavior. */
 #define CCC_swap_entry_r(container_ptr, swap_args...)                          \
-    CCC_impl_swap_entry_r(container_ptr, swap_args)
+    CCC_private_swap_entry_r(container_ptr, swap_args)
 
 /** @brief Insert an element and obtain the old value if Occupied.
 @param [in] container_ptr a pointer to the container.
@@ -67,7 +67,7 @@ See container documentation for specific behavior. */
 
 See container documentation for specific behavior. */
 #define CCC_swap_handle(container_ptr, swap_args...)                           \
-    CCC_impl_swap_handle(container_ptr, swap_args)
+    CCC_private_swap_handle(container_ptr, swap_args)
 
 /** @brief Insert an element and obtain the old value if Occupied.
 @param [in] container_ptr a pointer to the container.
@@ -76,7 +76,7 @@ See container documentation for specific behavior. */
 
 See container documentation for specific behavior. */
 #define CCC_swap_handle_r(container_ptr, swap_args...)                         \
-    CCC_impl_swap_handle_r(container_ptr, swap_args)
+    CCC_private_swap_handle_r(container_ptr, swap_args)
 
 /** @brief Insert an element if the entry is Vacant.
 @param [in] container_ptr a pointer to the container.
@@ -85,7 +85,7 @@ See container documentation for specific behavior. */
 
 See container documentation for specific behavior. */
 #define CCC_try_insert(container_ptr, try_insert_args...)                      \
-    CCC_impl_try_insert(container_ptr, try_insert_args)
+    CCC_private_try_insert(container_ptr, try_insert_args)
 
 /** @brief Insert an element if the entry is Vacant.
 @param [in] container_ptr a pointer to the container.
@@ -94,7 +94,7 @@ See container documentation for specific behavior. */
 
 See container documentation for specific behavior. */
 #define CCC_try_insert_r(container_ptr, try_insert_args...)                    \
-    CCC_impl_try_insert_r(container_ptr, try_insert_args)
+    CCC_private_try_insert_r(container_ptr, try_insert_args)
 
 /** @brief Insert an element or overwrite the Occupied entry.
 @param [in] container_ptr a pointer to the container.
@@ -103,7 +103,7 @@ See container documentation for specific behavior. */
 
 See container documentation for specific behavior. */
 #define CCC_insert_or_assign(container_ptr, insert_or_assign_args...)          \
-    CCC_impl_insert_or_assign(container_ptr, insert_or_assign_args)
+    CCC_private_insert_or_assign(container_ptr, insert_or_assign_args)
 
 /** @brief Insert an element or overwrite the Occupied entry.
 @param [in] container_ptr a pointer to the container.
@@ -112,7 +112,7 @@ See container documentation for specific behavior. */
 
 See container documentation for specific behavior. */
 #define CCC_insert_or_assign_r(container_ptr, insert_or_assign_args...)        \
-    CCC_impl_insert_or_assign_r(container_ptr, insert_or_assign_args)
+    CCC_private_insert_or_assign_r(container_ptr, insert_or_assign_args)
 
 /** @brief Remove an element and retain access to its value.
 @param [in] container_ptr a pointer to the container.
@@ -121,7 +121,7 @@ See container documentation for specific behavior. */
 
 See container documentation for specific behavior. */
 #define CCC_remove(container_ptr, remove_args...)                              \
-    CCC_impl_remove(container_ptr, remove_args)
+    CCC_private_remove(container_ptr, remove_args)
 
 /** @brief Remove an element and retain access to its value.
 @param [in] container_ptr a pointer to the container.
@@ -130,7 +130,7 @@ See container documentation for specific behavior. */
 
 See container documentation for specific behavior. */
 #define CCC_remove_r(container_ptr, remove_args...)                            \
-    CCC_impl_remove_r(container_ptr, remove_args)
+    CCC_private_remove_r(container_ptr, remove_args)
 
 /** @brief Obtain a container specific entry for the Entry Interface.
 @param [in] container_ptr a pointer to the container.
@@ -139,7 +139,7 @@ See container documentation for specific behavior. */
 
 See container documentation for specific behavior. */
 #define CCC_entry(container_ptr, key_ptr...)                                   \
-    CCC_impl_entry(container_ptr, key_ptr)
+    CCC_private_entry(container_ptr, key_ptr)
 
 /** @brief Obtain a container specific handle for the handle Interface.
 @param [in] container_ptr a pointer to the container.
@@ -148,7 +148,7 @@ See container documentation for specific behavior. */
 
 See container documentation for specific behavior. */
 #define CCC_handle(container_ptr, key_ptr...)                                  \
-    CCC_impl_handle(container_ptr, key_ptr)
+    CCC_private_handle(container_ptr, key_ptr)
 
 /** @brief Obtain a container specific entry for the Entry Interface.
 @param [in] container_ptr a pointer to the container.
@@ -158,7 +158,7 @@ context.
 
 See container documentation for specific behavior. */
 #define CCC_entry_r(container_ptr, key_ptr...)                                 \
-    CCC_impl_entry_r(container_ptr, key_ptr)
+    CCC_private_entry_r(container_ptr, key_ptr)
 
 /** @brief Obtain a container specific handle for the handle Interface.
 @param [in] container_ptr a pointer to the container.
@@ -168,7 +168,7 @@ context.
 
 See container documentation for specific behavior. */
 #define CCC_handle_r(container_ptr, key_ptr...)                                \
-    CCC_impl_handle_r(container_ptr, key_ptr)
+    CCC_private_handle_r(container_ptr, key_ptr)
 
 /** @brief Modify an entry if Occupied.
 @param [in] entry_ptr a pointer to the container.
@@ -176,7 +176,8 @@ See container documentation for specific behavior. */
 @return a reference to the modified entry if Occupied or original if Vacant.
 
 See container documentation for specific behavior. */
-#define CCC_and_modify(entry_ptr, mod_fn) CCC_impl_and_modify(entry_ptr, mod_fn)
+#define CCC_and_modify(entry_ptr, mod_fn)                                      \
+    CCC_private_and_modify(entry_ptr, mod_fn)
 
 /** @brief Modify an entry if Occupied.
 @param [in] entry_ptr a pointer to the container.
@@ -186,7 +187,7 @@ See container documentation for specific behavior. */
 
 See container documentation for specific behavior. */
 #define CCC_and_modify_aux(entry_ptr, mod_fn, aux_args...)                     \
-    CCC_impl_and_modify_aux(entry_ptr, mod_fn, aux_args)
+    CCC_private_and_modify_aux(entry_ptr, mod_fn, aux_args)
 
 /** @brief Insert new element or overwrite old element.
 @param [in] entry_ptr a pointer to the container.
@@ -195,7 +196,7 @@ See container documentation for specific behavior. */
 
 See container documentation for specific behavior. */
 #define CCC_insert_entry(entry_ptr, insert_entry_args...)                      \
-    CCC_impl_insert_entry(entry_ptr, insert_entry_args)
+    CCC_private_insert_entry(entry_ptr, insert_entry_args)
 
 /** @brief Insert new element or overwrite old element.
 @param [in] handle_ptr a pointer to the container.
@@ -204,7 +205,7 @@ See container documentation for specific behavior. */
 
 See container documentation for specific behavior. */
 #define CCC_insert_handle(handle_ptr, insert_handle_args...)                   \
-    CCC_impl_insert_handle(handle_ptr, insert_handle_args)
+    CCC_private_insert_handle(handle_ptr, insert_handle_args)
 
 /** @brief Insert new element if the entry is Vacant.
 @param [in] entry_ptr a pointer to the container.
@@ -213,56 +214,56 @@ See container documentation for specific behavior. */
 
 See container documentation for specific behavior. */
 #define CCC_or_insert(entry_ptr, or_insert_args...)                            \
-    CCC_impl_or_insert(entry_ptr, or_insert_args)
+    CCC_private_or_insert(entry_ptr, or_insert_args)
 
 /** @brief Remove the element if the entry is Occupied.
 @param [in] entry_ptr a pointer to the container.
 @return an entry depending on container specific context.
 
 See container documentation for specific behavior. */
-#define CCC_remove_entry(entry_ptr) CCC_impl_remove_entry(entry_ptr)
+#define CCC_remove_entry(entry_ptr) CCC_private_remove_entry(entry_ptr)
 
 /** @brief Remove the element if the entry is Occupied.
 @param [in] entry_ptr a pointer to the container.
 @return an entry depending on container specific context.
 
 See container documentation for specific behavior. */
-#define CCC_remove_entry_r(entry_ptr) CCC_impl_remove_entry_r(entry_ptr)
+#define CCC_remove_entry_r(entry_ptr) CCC_private_remove_entry_r(entry_ptr)
 
 /** @brief Remove the element if the handle is Occupied.
 @param [in] handle_ptr a pointer to the container.
 @return an handle depending on container specific context.
 
 See container documentation for specific behavior. */
-#define CCC_remove_handle(handle_ptr) CCC_impl_remove_handle(handle_ptr)
+#define CCC_remove_handle(handle_ptr) CCC_private_remove_handle(handle_ptr)
 
 /** @brief Remove the element if the handle is Occupied.
 @param [in] handle_ptr a pointer to the container.
 @return an handle depending on container specific context.
 
 See container documentation for specific behavior. */
-#define CCC_remove_handle_r(handle_ptr) CCC_impl_remove_handle_r(handle_ptr)
+#define CCC_remove_handle_r(handle_ptr) CCC_private_remove_handle_r(handle_ptr)
 
 /** @brief Unwrap user type in entry.
 @param [in] entry_ptr a pointer to the container.
 @return a valid reference if Occupied or NULL if vacant.
 
 See container documentation for specific behavior. */
-#define CCC_unwrap(entry_ptr) CCC_impl_unwrap(entry_ptr)
+#define CCC_unwrap(entry_ptr) CCC_private_unwrap(entry_ptr)
 
 /** @brief Check occupancy of entry.
 @param [in] entry_ptr a pointer to the container.
 @return true if Occupied, false if Vacant.
 
 See container documentation for specific behavior. */
-#define CCC_occupied(entry_ptr) CCC_impl_occupied(entry_ptr)
+#define CCC_occupied(entry_ptr) CCC_private_occupied(entry_ptr)
 
 /** @brief Check last insert status.
 @param [in] entry_ptr a pointer to the container.
 @return true if an insert error occurred false if not.
 
 See container documentation for specific behavior. */
-#define CCC_insert_error(entry_ptr) CCC_impl_insert_error(entry_ptr)
+#define CCC_insert_error(entry_ptr) CCC_private_insert_error(entry_ptr)
 
 /**@}*/
 
@@ -277,7 +278,7 @@ Test membership or obtain references to stored user types directly. */
 
 See container documentation for specific behavior. */
 #define CCC_get_key_val(container_ptr, key_ptr...)                             \
-    CCC_impl_get_key_val(container_ptr, key_ptr)
+    CCC_private_get_key_val(container_ptr, key_ptr)
 
 /** @brief Check for membership of the key.
 @param [in] container_ptr a pointer to the container.
@@ -286,7 +287,7 @@ See container documentation for specific behavior. */
 
 See container documentation for specific behavior. */
 #define CCC_contains(container_ptr, key_ptr...)                                \
-    CCC_impl_contains(container_ptr, key_ptr)
+    CCC_private_contains(container_ptr, key_ptr)
 
 /**@}*/
 
@@ -301,7 +302,7 @@ Push, pop, and view elements in sorted or unsorted containers. */
 
 See container documentation for specific behavior. */
 #define CCC_push(container_ptr, push_args...)                                  \
-    CCC_impl_push(container_ptr, push_args)
+    CCC_private_push(container_ptr, push_args)
 
 /** @brief Push an element to the back of a container.
 @param [in] container_ptr a pointer to the container.
@@ -310,7 +311,7 @@ See container documentation for specific behavior. */
 
 See container documentation for specific behavior. */
 #define CCC_push_back(container_ptr, push_args...)                             \
-    CCC_impl_push_back(container_ptr, push_args)
+    CCC_private_push_back(container_ptr, push_args)
 
 /** @brief Push an element to the front of a container.
 @param [in] container_ptr a pointer to the container.
@@ -319,7 +320,7 @@ See container documentation for specific behavior. */
 
 See container documentation for specific behavior. */
 #define CCC_push_front(container_ptr, push_args...)                            \
-    CCC_impl_push_front(container_ptr, push_args)
+    CCC_private_push_front(container_ptr, push_args)
 
 /** @brief Pop an element from a container.
 @param [in] container_ptr a pointer to the container.
@@ -328,35 +329,35 @@ See container documentation for specific behavior. */
 
 See container documentation for specific behavior. */
 #define CCC_pop(container_ptr, pop_args...)                                    \
-    CCC_impl_pop(container_ptr, pop_args)
+    CCC_private_pop(container_ptr, pop_args)
 
 /** @brief Pop an element from the front of a container.
 @param [in] container_ptr a pointer to the container.
 @return a result of the pop operation.
 
 See container documentation for specific behavior. */
-#define CCC_pop_front(container_ptr) CCC_impl_pop_front(container_ptr)
+#define CCC_pop_front(container_ptr) CCC_private_pop_front(container_ptr)
 
 /** @brief Pop an element from the back of a container.
 @param [in] container_ptr a pointer to the container.
 @return a result of the pop operation.
 
 See container documentation for specific behavior. */
-#define CCC_pop_back(container_ptr) CCC_impl_pop_back(container_ptr)
+#define CCC_pop_back(container_ptr) CCC_private_pop_back(container_ptr)
 
 /** @brief Obtain a reference the front element of a container.
 @param [in] container_ptr a pointer to the container.
 @return a reference to a user type.
 
 See container documentation for specific behavior. */
-#define CCC_front(container_ptr) CCC_impl_front(container_ptr)
+#define CCC_front(container_ptr) CCC_private_front(container_ptr)
 
 /** @brief Obtain a reference the back element of a container.
 @param [in] container_ptr a pointer to the container.
 @return a reference to a user type.
 
 See container documentation for specific behavior. */
-#define CCC_back(container_ptr) CCC_impl_back(container_ptr)
+#define CCC_back(container_ptr) CCC_private_back(container_ptr)
 
 /** @brief Splice an element from one position to another in the same or a
 different container.
@@ -366,7 +367,7 @@ different container.
 
 See container documentation for specific behavior. */
 #define CCC_splice(container_ptr, splice_args...)                              \
-    CCC_impl_splice(container_ptr, splice_args)
+    CCC_private_splice(container_ptr, splice_args)
 
 /** @brief Splice a range of elements from one position to another in the same
 or a different container.
@@ -376,7 +377,7 @@ or a different container.
 
 See container documentation for specific behavior. */
 #define CCC_splice_range(container_ptr, splice_args...)                        \
-    CCC_impl_splice_range(container_ptr, splice_args)
+    CCC_private_splice_range(container_ptr, splice_args)
 
 /**@}*/
 
@@ -390,7 +391,7 @@ Interface to support generic priority queue operations. */
 
 See container documentation for specific behavior. */
 #define CCC_update(container_ptr, update_args...)                              \
-    CCC_impl_update(container_ptr, update_args)
+    CCC_private_update(container_ptr, update_args)
 
 /** @brief Increase the value of an element known to be in a container.
 @param [in] container_ptr a pointer to the container.
@@ -398,7 +399,7 @@ See container documentation for specific behavior. */
 
 See container documentation for specific behavior. */
 #define CCC_increase(container_ptr, increase_args...)                          \
-    CCC_impl_increase(container_ptr, increase_args)
+    CCC_private_increase(container_ptr, increase_args)
 
 /** @brief Decrease the value of an element known to be in a container.
 @param [in] container_ptr a pointer to the container.
@@ -406,7 +407,7 @@ See container documentation for specific behavior. */
 
 See container documentation for specific behavior. */
 #define CCC_decrease(container_ptr, decrease_args...)                          \
-    CCC_impl_decrease(container_ptr, decrease_args)
+    CCC_private_decrease(container_ptr, decrease_args)
 
 /** @brief Erase an element known to be in a container.
 @param [in] container_ptr a pointer to the container.
@@ -414,7 +415,7 @@ See container documentation for specific behavior. */
 
 See container documentation for specific behavior. */
 #define CCC_erase(container_ptr, erase_args...)                                \
-    CCC_impl_erase(container_ptr, erase_args)
+    CCC_private_erase(container_ptr, erase_args)
 
 /** @brief Extract an element known to be in a container (does not free).
 @param [in] container_ptr a pointer to the container.
@@ -422,7 +423,7 @@ See container documentation for specific behavior. */
 
 See container documentation for specific behavior. */
 #define CCC_extract(container_ptr, extract_args...)                            \
-    CCC_impl_extract(container_ptr, extract_args)
+    CCC_private_extract(container_ptr, extract_args)
 
 /** @brief Extract elements known to be in a container (does not free).
 @param [in] container_ptr a pointer to the container.
@@ -430,7 +431,7 @@ See container documentation for specific behavior. */
 
 See container documentation for specific behavior. */
 #define CCC_extract_range(container_ptr, extract_args...)                      \
-    CCC_impl_extract_range(container_ptr, extract_args)
+    CCC_private_extract_range(container_ptr, extract_args)
 
 /**@}*/
 
@@ -443,14 +444,14 @@ Obtain and manage iterators over the container. */
 @return a reference to the user type stored at the start.
 
 See container documentation for specific behavior. */
-#define CCC_begin(container_ptr) CCC_impl_begin(container_ptr)
+#define CCC_begin(container_ptr) CCC_private_begin(container_ptr)
 
 /** @brief Obtain a reference to the reversed start of a container.
 @param [in] container_ptr a pointer to the container.
 @return a reference to the user type stored at the reversed start.
 
 See container documentation for specific behavior. */
-#define CCC_rbegin(container_ptr) CCC_impl_rbegin(container_ptr)
+#define CCC_rbegin(container_ptr) CCC_private_rbegin(container_ptr)
 
 /** @brief Obtain a reference to the next element in the container.
 @param [in] container_ptr a pointer to the container.
@@ -459,7 +460,7 @@ See container documentation for specific behavior. */
 
 See container documentation for specific behavior. */
 #define CCC_next(container_ptr, void_iterator_ptr)                             \
-    CCC_impl_next(container_ptr, void_iterator_ptr)
+    CCC_private_next(container_ptr, void_iterator_ptr)
 
 /** @brief Obtain a reference to the rnext element in the container.
 @param [in] container_ptr a pointer to the container.
@@ -468,21 +469,21 @@ See container documentation for specific behavior. */
 
 See container documentation for specific behavior. */
 #define CCC_rnext(container_ptr, void_iterator_ptr)                            \
-    CCC_impl_rnext(container_ptr, void_iterator_ptr)
+    CCC_private_rnext(container_ptr, void_iterator_ptr)
 
 /** @brief Obtain a reference to the end sentinel of a container.
 @param [in] container_ptr a pointer to the container.
 @return a reference to the end sentinel.
 
 See container documentation for specific behavior. */
-#define CCC_end(container_ptr) CCC_impl_end(container_ptr)
+#define CCC_end(container_ptr) CCC_private_end(container_ptr)
 
 /** @brief Obtain a reference to the rend sentinel of a container.
 @param [in] container_ptr a pointer to the container.
 @return a reference to the rend sentinel.
 
 See container documentation for specific behavior. */
-#define CCC_rend(container_ptr) CCC_impl_rend(container_ptr)
+#define CCC_rend(container_ptr) CCC_private_rend(container_ptr)
 
 /** @brief Obtain a range of values from a container.
 @param [in] container_ptr a pointer to the container.
@@ -491,7 +492,7 @@ See container documentation for specific behavior. */
 
 See container documentation for specific behavior. */
 #define CCC_equal_range(container_ptr, range_args...)                          \
-    CCC_impl_equal_range(container_ptr, range_args)
+    CCC_private_equal_range(container_ptr, range_args)
 
 /** @brief Obtain a range of values from a container.
 @param [in] container_ptr a pointer to the container.
@@ -500,7 +501,7 @@ See container documentation for specific behavior. */
 
 See container documentation for specific behavior. */
 #define CCC_equal_range_r(container_ptr, range_args...)                        \
-    CCC_impl_equal_range_r(container_ptr, range_args)
+    CCC_private_equal_range_r(container_ptr, range_args)
 
 /** @brief Obtain a rrange of values from a container.
 @param [in] container_ptr a pointer to the container.
@@ -509,7 +510,7 @@ See container documentation for specific behavior. */
 
 See container documentation for specific behavior. */
 #define CCC_equal_rrange(container_ptr, rrange_args...)                        \
-    CCC_impl_equal_rrange(container_ptr, rrange_args)
+    CCC_private_equal_rrange(container_ptr, rrange_args)
 
 /** @brief Obtain a rrange of values from a container.
 @param [in] container_ptr a pointer to the container.
@@ -518,7 +519,7 @@ See container documentation for specific behavior. */
 
 See container documentation for specific behavior. */
 #define CCC_equal_rrange_r(container_ptr, rrange_args...)                      \
-    CCC_impl_equal_rrange_r(container_ptr, rrange_args)
+    CCC_private_equal_rrange_r(container_ptr, rrange_args)
 
 /**@}*/
 
@@ -534,7 +535,7 @@ Manage underlying buffers for containers. */
 
 See container documentation for specific behavior. */
 #define CCC_copy(dst_container_ptr, src_container_ptr, alloc_fn_ptr)           \
-    CCC_impl_copy(dst_container_ptr, src_container_ptr, alloc_fn_ptr)
+    CCC_private_copy(dst_container_ptr, src_container_ptr, alloc_fn_ptr)
 
 /** @brief Reserve capacity for n_to_add new elements to be inserted.
 @param [in] container_ptr a pointer to the container.
@@ -544,7 +545,7 @@ See container documentation for specific behavior. */
 
 See container documentation for specific behavior. */
 #define CCC_reserve(container_ptr, n_to_add, alloc_fn_ptr)                     \
-    CCC_impl_reserve(container_ptr, n_to_add, alloc_fn_ptr)
+    CCC_private_reserve(container_ptr, n_to_add, alloc_fn_ptr)
 
 /** @brief Clears the container without freeing the underlying buffer.
 @param [in] container_ptr a pointer to the container.
@@ -553,7 +554,7 @@ See container documentation for specific behavior. */
 
 See container documentation for specific behavior. */
 #define CCC_clear(container_ptr, destructor_args...)                           \
-    CCC_impl_clear(container_ptr, destructor_args)
+    CCC_private_clear(container_ptr, destructor_args)
 
 /** @brief Clears the container and frees the underlying buffer.
 @param [in] container_ptr a pointer to the container.
@@ -563,7 +564,7 @@ element.
 
 See container documentation for specific behavior. */
 #define CCC_clear_and_free(container_ptr, destructor_and_free_args...)         \
-    CCC_impl_clear_and_free(container_ptr, destructor_and_free_args)
+    CCC_private_clear_and_free(container_ptr, destructor_and_free_args)
 
 /** @brief Clears the container previously reserved and frees its underlying
 buffer. Covers the case of a one-time memory reserved container that does not
@@ -575,7 +576,7 @@ on each element and the required allocation function to free memory.
 
 See container documentation for specific behavior. */
 #define CCC_clear_and_free_reserve(container_ptr, destructor_and_free_args...) \
-    CCC_impl_clear_and_free_reserve(container_ptr, destructor_and_free_args)
+    CCC_private_clear_and_free_reserve(container_ptr, destructor_and_free_args)
 
 /**@}*/
 
@@ -588,28 +589,28 @@ Obtain the container state. */
 @return the size or an argument error is set if container_ptr is NULL.
 
 See container documentation for specific behavior. */
-#define CCC_count(container_ptr) CCC_impl_count(container_ptr)
+#define CCC_count(container_ptr) CCC_private_count(container_ptr)
 
 /** @brief Return the capacity of the container.
 @param [in] container_ptr a pointer to the container.
 @return the capacity or an argument error is set if container_ptr is NULL.
 
 See container documentation for specific behavior. */
-#define CCC_capacity(container_ptr) CCC_impl_capacity(container_ptr)
+#define CCC_capacity(container_ptr) CCC_private_capacity(container_ptr)
 
 /** @brief Return the size status of a container.
 @param [in] container_ptr a pointer to the container.
 @return true if empty or NULL false if not.
 
 See container documentation for specific behavior. */
-#define CCC_is_empty(container_ptr) CCC_impl_is_empty(container_ptr)
+#define CCC_is_empty(container_ptr) CCC_private_is_empty(container_ptr)
 
 /** @brief Return the invariant statuses of the container.
 @param [in] container_ptr a pointer to the container.
 @return true if all invariants hold, false if not.
 
 See container documentation for specific behavior. */
-#define CCC_validate(container_ptr) CCC_impl_validate(container_ptr)
+#define CCC_validate(container_ptr) CCC_private_validate(container_ptr)
 
 /**@}*/
 

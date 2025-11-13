@@ -153,9 +153,9 @@ static void flush_cursor_maze_coordinate(struct maze const *, int r, int c);
 static bool can_build_new_square(struct maze const *, int r, int c);
 static void help(void);
 static struct point rand_point(struct maze const *);
-static threeway_cmp cmp_prim_cells(any_type_cmp);
+static Order cmp_prim_cells(Type_comparator_context);
 static struct int_conversion parse_digits(str_view);
-static CCC_threeway_cmp prim_cell_cmp(any_key_cmp);
+static CCC_Order prim_cell_cmp(Key_comparator_context);
 static uint64_t prim_cell_hash_fn(any_key);
 static uint64_t hash_64_bits(uint64_t);
 
@@ -256,14 +256,14 @@ animate_maze(struct maze *maze)
     /* Test use case of reserve without reallocation permission. Guarantees
        exactly the needed memory and no more over lifetime of program. */
     flat_hash_map cost_map
-        = fhm_init(NULL, struct prim_cell, cell, prim_cell_hash_fn,
-                   prim_cell_cmp, NULL, NULL, 0);
+        = fhm_initialize(NULL, struct prim_cell, cell, prim_cell_hash_fn,
+                         prim_cell_cmp, NULL, NULL, 0);
     result r
         = reserve(&cost_map, ((maze->rows * maze->cols) / 2) + 1, std_alloc);
     check(r == CCC_RESULT_OK);
     /* Priority queue gets same reserve interface. */
-    flat_priority_queue cell_pq = fpq_init(NULL, struct prim_cell, CCC_LES,
-                                           cmp_prim_cells, NULL, NULL, 0);
+    flat_priority_queue cell_pq = fpq_initialize(
+        NULL, struct prim_cell, CCC_ORDER_LESS, cmp_prim_cells, NULL, NULL, 0);
     r = reserve(&cell_pq, ((maze->rows * maze->cols) / 2) + 1, std_alloc);
     check(r == CCC_RESULT_OK);
     struct point s = rand_point(maze);
@@ -314,14 +314,13 @@ animate_maze(struct maze *maze)
 
 /*===================     Container Support Code     ========================*/
 
-static CCC_threeway_cmp
-prim_cell_cmp(any_key_cmp const c)
+static CCC_Order
+prim_cell_cmp(Key_comparator_context const c)
 {
     struct point const *const lhs = c.any_key_lhs;
     struct prim_cell const *const rhs = c.any_type_rhs;
-    CCC_threeway_cmp const cmp
-        = (lhs->r < rhs->cell.r) - (lhs->r > rhs->cell.r);
-    if (cmp != CCC_EQL)
+    CCC_Order const cmp = (lhs->r < rhs->cell.r) - (lhs->r > rhs->cell.r);
+    if (cmp != CCC_ORDER_EQUAL)
     {
         return cmp;
     }
@@ -329,7 +328,7 @@ prim_cell_cmp(any_key_cmp const c)
 }
 
 static uint64_t
-prim_cell_hash_fn(any_key const k)
+prim_cell_hash_fn(Key_contextconst k)
 {
     struct prim_cell const *const p = k.any_key;
     uint64_t const wr = p->cell.r;
@@ -348,8 +347,8 @@ hash_64_bits(uint64_t x)
     return x;
 }
 
-static threeway_cmp
-cmp_prim_cells(any_type_cmp const cmp_cells)
+static Order
+cmp_prim_cells(Type_comparator_context const cmp_cells)
 {
     struct prim_cell const *const lhs = cmp_cells.any_type_lhs;
     struct prim_cell const *const rhs = cmp_cells.any_type_rhs;

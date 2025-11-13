@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 #include <stddef.h>
 
-#include "impl/impl_types.h"
+#include "private/private_types.h"
 #include "types.h"
 
 /** @private */
@@ -36,8 +36,8 @@ static char const *const result_msgs[CCC_RESULT_COUNT] = {
 
 /*============================   Interface    ===============================*/
 
-CCC_tribool
-CCC_entry_occupied(CCC_entry const *const e)
+CCC_Tribool
+CCC_entry_occupied(CCC_Entry const *const e)
 {
     if (!e)
     {
@@ -46,8 +46,8 @@ CCC_entry_occupied(CCC_entry const *const e)
     return (e->impl.stats & CCC_ENTRY_OCCUPIED) != 0;
 }
 
-CCC_tribool
-CCC_entry_insert_error(CCC_entry const *const e)
+CCC_Tribool
+CCC_entry_insert_error(CCC_Entry const *const e)
 {
     if (!e)
     {
@@ -56,8 +56,8 @@ CCC_entry_insert_error(CCC_entry const *const e)
     return (e->impl.stats & CCC_ENTRY_INSERT_ERROR) != 0;
 }
 
-CCC_tribool
-CCC_entry_input_error(CCC_entry const *const e)
+CCC_Tribool
+CCC_entry_input_error(CCC_Entry const *const e)
 {
     if (!e)
     {
@@ -67,7 +67,7 @@ CCC_entry_input_error(CCC_entry const *const e)
 }
 
 void *
-CCC_entry_unwrap(CCC_entry const *const e)
+CCC_entry_unwrap(CCC_Entry const *const e)
 {
     if (!e)
     {
@@ -76,8 +76,8 @@ CCC_entry_unwrap(CCC_entry const *const e)
     return e->impl.stats & CCC_ENTRY_NO_UNWRAP ? NULL : e->impl.e;
 }
 
-CCC_tribool
-CCC_handle_occupied(CCC_handle const *const e)
+CCC_Tribool
+CCC_handle_occupied(CCC_Handle const *const e)
 {
     if (!e)
     {
@@ -86,8 +86,8 @@ CCC_handle_occupied(CCC_handle const *const e)
     return (e->impl.stats & CCC_ENTRY_OCCUPIED) != 0;
 }
 
-CCC_tribool
-CCC_handle_insert_error(CCC_handle const *const e)
+CCC_Tribool
+CCC_handle_insert_error(CCC_Handle const *const e)
 {
     if (!e)
     {
@@ -96,8 +96,8 @@ CCC_handle_insert_error(CCC_handle const *const e)
     return (e->impl.stats & CCC_ENTRY_INSERT_ERROR) != 0;
 }
 
-CCC_tribool
-CCC_handle_input_error(CCC_handle const *const e)
+CCC_Tribool
+CCC_handle_input_error(CCC_Handle const *const e)
 {
     if (!e)
     {
@@ -107,7 +107,7 @@ CCC_handle_input_error(CCC_handle const *const e)
 }
 
 CCC_handle_i
-CCC_handle_unwrap(CCC_handle const *const e)
+CCC_handle_unwrap(CCC_Handle const *const e)
 {
     if (!e)
     {
@@ -117,31 +117,31 @@ CCC_handle_unwrap(CCC_handle const *const e)
 }
 
 void *
-CCC_begin_range(CCC_range const *const r)
+CCC_range_begin(CCC_Range const *const r)
 {
     return r ? r->impl.begin : NULL;
 }
 
 void *
-CCC_end_range(CCC_range const *const r)
+CCC_range_end(CCC_Range const *const r)
 {
     return r ? r->impl.end : NULL;
 }
 
 void *
-CCC_rbegin_rrange(CCC_rrange const *const r)
+CCC_rrange_rbegin(CCC_Reverse_range const *const r)
 {
     return r ? r->impl.rbegin : NULL;
 }
 
 void *
-CCC_rend_rrange(CCC_rrange const *const r)
+CCC_rrange_rend(CCC_Reverse_range const *const r)
 {
     return r ? r->impl.rend : NULL;
 }
 
 char const *
-CCC_result_msg(CCC_result const res)
+CCC_Result_msg(CCC_Result const res)
 {
     if (res >= CCC_RESULT_COUNT)
     {
@@ -150,8 +150,8 @@ CCC_result_msg(CCC_result const res)
     return result_msgs[res];
 }
 
-CCC_entry_status
-CCC_get_entry_status(CCC_entry const *e)
+CCC_Entry_status
+CCC_get_entry_status(CCC_Entry const *e)
 {
     if (!e)
     {
@@ -161,7 +161,7 @@ CCC_get_entry_status(CCC_entry const *e)
 }
 
 CCC_handle_status
-CCC_get_handle_status(CCC_handle const *e)
+CCC_get_handle_status(CCC_Handle const *e)
 {
     if (!e)
     {
@@ -171,13 +171,13 @@ CCC_get_handle_status(CCC_handle const *e)
 }
 
 char const *
-CCC_handle_status_msg(CCC_handle_status const status)
+CCC_handle_status_msg(CCC_Handle_status const status)
 {
-    return CCC_entry_status_msg(status);
+    return CCC_Entry_status_msg(status);
 }
 
 char const *
-CCC_entry_status_msg(CCC_entry_status const status)
+CCC_Entry_status_msg(CCC_Entry_status const status)
 {
     switch (status)
     {

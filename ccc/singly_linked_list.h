@@ -45,7 +45,7 @@ All types and functions can then be written without the `CCC_` prefix. */
 #include <stddef.h>
 /** @endcond */
 
-#include "impl/impl_singly_linked_list.h"
+#include "private/private_singly_linked_list.h"
 #include "types.h"
 
 /** @name Container Types
@@ -85,11 +85,11 @@ intrusive list elem.
 @param [in] aux_data a pointer to any auxiliary data needed for comparison or
 destruction.
 @return a stuct initializer for the singly linked list to be assigned
-(e.g. CCC_singly_linked_list l = CCC_sll_init(...);). */
-#define CCC_sll_init(list_name, struct_name, list_elem_field, cmp_fn,          \
-                     alloc_fn, aux_data)                                       \
-    CCC_impl_sll_init(list_name, struct_name, list_elem_field, cmp_fn,         \
-                      alloc_fn, aux_data)
+(e.g. CCC_singly_linked_list l = CCC_sll_initialize(...);). */
+#define CCC_sll_initialize(list_name, struct_name, list_elem_field, cmp_fn,    \
+                           alloc_fn, aux_data)                                 \
+    CCC_private_sll_initialize(list_name, struct_name, list_elem_field,        \
+                               cmp_fn, alloc_fn, aux_data)
 
 /**@}*/
 
@@ -121,13 +121,13 @@ Note that it only makes sense to use this method when the container is given
 allocation permission. Otherwise NULL is returned due to an inability for the
 container to allocate memory. */
 #define CCC_sll_emplace_front(list_ptr, struct_initializer...)                 \
-    CCC_impl_sll_emplace_front(list_ptr, struct_initializer)
+    CCC_private_sll_emplace_front(list_ptr, struct_initializer)
 
 /** @brief Pop the front element from the list. O(1).
 @param [in] sll a pointer to the singly linked list.
 @return ok if the list is non-empty and the pop is successful. An input error
 is returned if sll is NULL or the list is empty. */
-CCC_result CCC_sll_pop_front(CCC_singly_linked_list *sll);
+CCC_Result CCC_sll_pop_front(CCC_singly_linked_list *sll);
 
 /** @brief Inserts splice element after pos. O(N).
 @param [in] pos_sll the list to which pos belongs.
@@ -139,7 +139,7 @@ input pointers are NULL.
 
 Note that pos_sll and splice_sll may be the same or different lists and the
 invariants of each or the same list will be maintained by the function. */
-CCC_result CCC_sll_splice(CCC_singly_linked_list *pos_sll, CCC_sll_elem *pos,
+CCC_Result CCC_sll_splice(CCC_singly_linked_list *pos_sll, CCC_sll_elem *pos,
                           CCC_singly_linked_list *splice_sll,
                           CCC_sll_elem *splice);
 
@@ -156,7 +156,7 @@ same list as splice_sll.
 
 Note that pos_sll and splice_sll may be the same or different lists and the
 invariants of each or the same list will be maintained by the function. */
-CCC_result CCC_sll_splice_range(CCC_singly_linked_list *pos_sll,
+CCC_Result CCC_sll_splice_range(CCC_singly_linked_list *pos_sll,
                                 CCC_sll_elem *pos,
                                 CCC_singly_linked_list *splice_sll,
                                 CCC_sll_elem *begin, CCC_sll_elem *end);
@@ -219,7 +219,7 @@ Sort the container. */
 the provided comparison function. `O(N * log(N))` time, `O(1)` space.
 @param [in] sll a pointer to the singly linked list to sort.
 @return the result of the sort, usually OK. An arg error if sll is null. */
-CCC_result CCC_sll_sort(CCC_singly_linked_list *sll);
+CCC_Result CCC_sll_sort(CCC_singly_linked_list *sll);
 
 /** @brief Inserts e in sorted position according to the non-decreasing order
 of the list determined by the user provided comparison function.
@@ -230,8 +230,8 @@ is required and has failed.
 @warning this function assumes the list is sorted.
 
 If a non-increasing order is desired, return opposite results from the user
-comparison function. If an element is CCC_LES return CCC_GRT and vice versa.
-If elements are equal, return CCC_EQL. */
+comparison function. If an element is CCC_ORDER_LESS return CCC_ORDER_GREATER
+and vice versa. If elements are equal, return CCC_ORDER_EQUAL. */
 void *CCC_sll_insert_sorted(CCC_singly_linked_list *sll, CCC_sll_elem *e);
 
 /** @brief Returns true if the list is sorted in non-decreasing order according
@@ -240,9 +240,9 @@ to the user provided comparison function.
 @return CCC_TRUE if the list is sorted CCC_FALSE if not. Error if sll is NULL.
 
 If a non-increasing order is desired, return opposite results from the user
-comparison function. If an element is CCC_LES return CCC_GRT and vice versa.
-If elements are equal, return CCC_EQL. */
-CCC_tribool CCC_sll_is_sorted(CCC_singly_linked_list const *sll);
+comparison function. If an element is CCC_ORDER_LESS return CCC_ORDER_GREATER
+and vice versa. If elements are equal, return CCC_ORDER_EQUAL. */
+CCC_Tribool CCC_sll_is_sorted(CCC_singly_linked_list const *sll);
 
 /**@}*/
 
@@ -263,8 +263,7 @@ It should only perform other necessary cleanup or state management.
 If allocation is not allowed fn may free memory or not as the user sees fit.
 The user is responsible for managing the memory that wraps each intrusive
 handle as the elements are simply removed from the list. */
-CCC_result CCC_sll_clear(CCC_singly_linked_list *sll,
-                         CCC_any_type_destructor_fn *fn);
+CCC_Result CCC_sll_clear(CCC_singly_linked_list *sll, CCC_Type_destructor *fn);
 
 /**@}*/
 
@@ -309,7 +308,7 @@ Obtain state from the doubly linked list. */
 @return a pointer to the first handle to a user type in the list or NULL if
 empty. */
 [[nodiscard]] CCC_sll_elem *
-CCC_sll_begin_elem(CCC_singly_linked_list const *sll);
+CCC_sll_elem_begin(CCC_singly_linked_list const *sll);
 
 /** @brief Return a pointer to the sentinel node at the front of the list.
 @param [in] sll a pointer to the singly linked list.
@@ -321,22 +320,22 @@ of elements to the front of the list. Because the interface only allows the user
 to splice an element or range AFTER a position having access to the sentinel
 makes it possible to splice to the front of the list. */
 [[nodiscard]] CCC_sll_elem *
-CCC_sll_begin_sentinel(CCC_singly_linked_list const *sll);
+CCC_sll_sentinel_begin(CCC_singly_linked_list const *sll);
 
 /** @brief Return the count of nodes in the list. O(1).
 @param [in] sll a pointer to the singly linked list.
 @return the size or an argument error is set if sll is NULL. */
-[[nodiscard]] CCC_ucount CCC_sll_count(CCC_singly_linked_list const *sll);
+[[nodiscard]] CCC_Count CCC_sll_count(CCC_singly_linked_list const *sll);
 
 /** @brief Return true if the list is empty. O(1).
 @param [in] sll a pointer to the singly linked list.
 @return true if size is 0 otherwise false. Error returned if sll is NULL. */
-[[nodiscard]] CCC_tribool CCC_sll_is_empty(CCC_singly_linked_list const *sll);
+[[nodiscard]] CCC_Tribool CCC_sll_is_empty(CCC_singly_linked_list const *sll);
 
 /** @brief Returns true if the invariants of the list hold.
 @param [in] sll a pointer to the singly linked list.
 @return true if list is valid, else false. Error returned if sll is NULL. */
-[[nodiscard]] CCC_tribool CCC_sll_validate(CCC_singly_linked_list const *sll);
+[[nodiscard]] CCC_Tribool CCC_sll_validate(CCC_singly_linked_list const *sll);
 
 /**@}*/
 
@@ -345,7 +344,7 @@ linked list container. Check for namespace clashes before name shortening. */
 #ifdef SINGLY_LINKED_LIST_USING_NAMESPACE_CCC
 typedef CCC_sll_elem sll_elem;
 typedef CCC_singly_linked_list singly_linked_list;
-#    define sll_init(args...) CCC_sll_init(args)
+#    define sll_initialize(args...) CCC_sll_initialize(args)
 #    define sll_emplace_front(args...) CCC_sll_emplace_front(args)
 #    define sll_push_front(args...) CCC_sll_push_front(args)
 #    define sll_front(args...) CCC_sll_front(args)
@@ -362,8 +361,8 @@ typedef CCC_singly_linked_list singly_linked_list;
 #    define sll_begin(args...) CCC_sll_begin(args)
 #    define sll_end(args...) CCC_sll_end(args)
 #    define sll_next(args...) CCC_sll_next(args)
-#    define sll_begin_elem(args...) CCC_sll_begin_elem(args)
-#    define sll_begin_sentinel(args...) CCC_sll_begin_sentinel(args)
+#    define sll_elem_begin(args...) CCC_sll_elem_begin(args)
+#    define sll_sentinel_begin(args...) CCC_sll_sentinel_begin(args)
 #    define sll_count(args...) CCC_sll_count(args)
 #    define sll_is_empty(args...) CCC_sll_is_empty(args)
 #    define sll_validate(args...) CCC_sll_validate(args)

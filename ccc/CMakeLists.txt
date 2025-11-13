@@ -22,20 +22,20 @@ target_sources(${PROJECT_NAME}
             TYPE HEADERS
             BASE_DIRS ${PROJECT_SOURCE_DIR}
             FILES 
-              impl/impl_types.h
-              impl/impl_flat_priority_queue.h
-              impl/impl_priority_queue.h
-              impl/impl_ordered_map.h
-              impl/impl_handle_ordered_map.h
-              impl/impl_singly_linked_list.h
-              impl/impl_doubly_linked_list.h
-              impl/impl_realtime_ordered_map.h
-              impl/impl_handle_realtime_ordered_map.h
-              impl/impl_traits.h
-              impl/impl_flat_double_ended_queue.h
-              impl/impl_flat_hash_map.h
-              impl/impl_buffer.h
-              impl/impl_bitset.h
+              private/private_types.h
+              private/private_flat_priority_queue.h
+              private/private_priority_queue.h
+              private/private_ordered_map.h
+              private/private_handle_ordered_map.h
+              private/private_singly_linked_list.h
+              private/private_doubly_linked_list.h
+              private/private_realtime_ordered_map.h
+              private/private_handle_realtime_ordered_map.h
+              private/private_traits.h
+              private/private_flat_double_ended_queue.h
+              private/private_flat_hash_map.h
+              private/private_buffer.h
+              private/private_bitset.h
               types.h
               buffer.h
               bitset.h

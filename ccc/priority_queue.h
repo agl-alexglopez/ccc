@@ -37,7 +37,7 @@ All types and functions can then be written without the `CCC_` prefix. */
 #include <stddef.h>
 /** @endcond */
 
-#include "impl/impl_priority_queue.h"
+#include "private/private_priority_queue.h"
 #include "types.h"
 
 /** @name Container Types
@@ -71,16 +71,17 @@ Initialize the container with memory, callbacks, and permissions. */
 /** @brief Initialize a priority queue at runtime or compile time.
 @param [in] struct_name the name of the user type wrapping pq elems.
 @param [in] pq_elem_field the name of the field for the pq elem.
-@param [in] pq_order CCC_LES for a min pq or CCC_GRT for a max pq.
+@param [in] pq_order CCC_ORDER_LESS for a min pq or CCC_ORDER_GREATER for a max
+pq.
 @param [in] cmp_fn the function used to compare two user types.
 @param [in] alloc_fn the allocation function or NULL if allocation is banned.
 @param [in] aux_data auxiliary data needed for comparison or destruction.
 @return the initialized pq on the right side of an equality operator
-(e.g. CCC_priority_queue pq = CCC_pq_init(...);) */
-#define CCC_pq_init(struct_name, pq_elem_field, pq_order, cmp_fn, alloc_fn,    \
-                    aux_data)                                                  \
-    CCC_impl_pq_init(struct_name, pq_elem_field, pq_order, cmp_fn, alloc_fn,   \
-                     aux_data)
+(e.g. CCC_priority_queue pq = CCC_pq_initialize(...);) */
+#define CCC_pq_initialize(struct_name, pq_elem_field, pq_order, cmp_fn,        \
+                          alloc_fn, aux_data)                                  \
+    CCC_private_pq_initialize(struct_name, pq_elem_field, pq_order, cmp_fn,    \
+                              alloc_fn, aux_data)
 
 /**@}*/
 
@@ -110,12 +111,12 @@ fails or is not allowed.
 Note that the priority queue must be initialized with allocation permission to
 use this macro. */
 #define CCC_pq_emplace(priority_queue_ptr, lazy_value...)                      \
-    CCC_impl_pq_emplace(priority_queue_ptr, lazy_value)
+    CCC_private_pq_emplace(priority_queue_ptr, lazy_value)
 
 /** @brief Pops the front element from the priority queue. Amortized O(lgN).
 @param [in] pq a pointer to the priority queue.
 @return ok if pop was successful or an input error if pq is NULL or empty. */
-CCC_result CCC_pq_pop(CCC_priority_queue *pq);
+CCC_Result CCC_pq_pop(CCC_priority_queue *pq);
 
 /** Extract the element known to be in the pq without freeing memory. Amortized
 O(lgN).
@@ -133,7 +134,7 @@ Note that the user must ensure that elem is in the priority queue. */
 pq is empty.
 
 Note that the user must ensure that elem is in the priority queue. */
-CCC_result CCC_pq_erase(CCC_priority_queue *pq, CCC_pq_elem *elem);
+CCC_Result CCC_pq_erase(CCC_priority_queue *pq, CCC_pq_elem *elem);
 
 /** @brief Update the priority in the user type wrapping elem.
 @param [in] pq a pointer to the priority queue.
@@ -148,7 +149,7 @@ Note that this operation may incur unnecessary overhead if the user can't
 deduce if an increase or decrease is occurring. See the increase and decrease
 operations. O(1) best case, O(lgN) worst case. */
 void *CCC_pq_update(CCC_priority_queue *pq, CCC_pq_elem *elem,
-                    CCC_any_type_update_fn *fn, void *aux);
+                    CCC_Type_updater *fn, void *aux);
 
 /** @brief Update the priority in the user type stored in the container.
 @param [in] pq_ptr a pointer to the priority queue.
@@ -178,7 +179,7 @@ Note that this operation may incur unnecessary overhead if the user can't
 deduce if an increase or decrease is occurring. See the increase and decrease
 operations. O(1) best case, O(lgN) worst case. */
 #define CCC_pq_update_w(pq_ptr, any_type_ptr, update_closure_over_T...)        \
-    CCC_impl_pq_update_w(pq_ptr, any_type_ptr, update_closure_over_T)
+    CCC_private_pq_update_w(pq_ptr, any_type_ptr, update_closure_over_T)
 
 /** @brief Increases the priority of the type wrapping elem. O(1) or O(lgN)
 @param [in] pq a pointer to the priority queue.
@@ -197,7 +198,7 @@ value. If this is a max heap O(1), otherwise O(lgN).
 While the best case operation is O(1) the impact of restructuring on future pops
 from the pq creates an amortized o(lgN) runtime for this function. */
 void *CCC_pq_increase(CCC_priority_queue *pq, CCC_pq_elem *elem,
-                      CCC_any_type_update_fn *fn, void *aux);
+                      CCC_Type_updater *fn, void *aux);
 
 /** @brief Increases the priority of the user type stored in the container.
 @param [in] pq_ptr a pointer to the priority queue.
@@ -231,7 +232,7 @@ value. If this is a max heap O(1), otherwise O(lgN).
 While the best case operation is O(1) the impact of restructuring on future pops
 from the pq creates an amortized o(lgN) runtime for this function. */
 #define CCC_pq_increase_w(pq_ptr, any_type_ptr, increase_closure_over_T...)    \
-    CCC_impl_pq_increase_w(pq_ptr, any_type_ptr, increase_closure_over_T)
+    CCC_private_pq_increase_w(pq_ptr, any_type_ptr, increase_closure_over_T)
 
 /** @brief Decreases the value of the type wrapping elem. O(1) or O(lgN)
 @param [in] pq a pointer to the priority queue.
@@ -248,7 +249,7 @@ value. If this is a min heap O(1), otherwise O(lgN).
 While the best case operation is O(1) the impact of restructuring on future pops
 from the pq creates an amortized o(lgN) runtime for this function. */
 void *CCC_pq_decrease(CCC_priority_queue *pq, CCC_pq_elem *elem,
-                      CCC_any_type_update_fn *fn, void *aux);
+                      CCC_Type_updater *fn, void *aux);
 
 /** @brief Decreases the priority of the user type stored in the container.
 @param [in] pq_ptr a pointer to the priority queue.
@@ -282,7 +283,7 @@ value. If this is a min heap O(1), otherwise O(lgN).
 While the best case operation is O(1) the impact of restructuring on future pops
 from the pq creates an amortized o(lgN) runtime for this function. */
 #define CCC_pq_decrease_w(pq_ptr, any_type_ptr, decrease_closure_over_T...)    \
-    CCC_impl_pq_decrease_w(pq_ptr, any_type_ptr, decrease_closure_over_T)
+    CCC_private_pq_decrease_w(pq_ptr, any_type_ptr, decrease_closure_over_T)
 
 /**@}*/
 
@@ -303,7 +304,7 @@ If allocation is not allowed, the user may free their stored types in the
 destructor function if they wish to do so. The container simply removes all
 the elements from the pq, calling fn on each user type if provided, and sets the
 size to zero. */
-CCC_result CCC_pq_clear(CCC_priority_queue *pq, CCC_any_type_destructor_fn *fn);
+CCC_Result CCC_pq_clear(CCC_priority_queue *pq, CCC_Type_destructor *fn);
 
 /**@}*/
 
@@ -319,22 +320,22 @@ Obtain state from the container. */
 /** @brief Returns true if the priority queue is empty false if not. O(1).
 @param [in] pq a pointer to the priority queue.
 @return true if the size is 0, false if not empty. Error if pq is NULL. */
-[[nodiscard]] CCC_tribool CCC_pq_is_empty(CCC_priority_queue const *pq);
+[[nodiscard]] CCC_Tribool CCC_pq_is_empty(CCC_priority_queue const *pq);
 
 /** @brief Returns the count of priority queue occupied nodes.
 @param [in] pq a pointer to the priority queue.
 @return the size of the pq or an argument error is set if pq is NULL. */
-[[nodiscard]] CCC_ucount CCC_pq_count(CCC_priority_queue const *pq);
+[[nodiscard]] CCC_Count CCC_pq_count(CCC_priority_queue const *pq);
 
 /** @brief Verifies the internal invariants of the pq hold.
 @param [in] pq a pointer to the priority queue.
 @return true if the pq is valid false if pq is invalid. Error if pq is NULL. */
-[[nodiscard]] CCC_tribool CCC_pq_validate(CCC_priority_queue const *pq);
+[[nodiscard]] CCC_Tribool CCC_pq_validate(CCC_priority_queue const *pq);
 
 /** @brief Return the order used to initialize the pq.
 @param [in] pq a pointer to the priority queue.
 @return LES or GRT ordering. Any other ordering is invalid. */
-[[nodiscard]] CCC_threeway_cmp CCC_pq_order(CCC_priority_queue const *pq);
+[[nodiscard]] CCC_Order CCC_pq_order(CCC_priority_queue const *pq);
 
 /**@}*/
 
@@ -343,7 +344,7 @@ priority queue container. Check for collisions before name shortening. */
 #ifdef PRIORITY_QUEUE_USING_NAMESPACE_CCC
 typedef CCC_pq_elem pq_elem;
 typedef CCC_priority_queue priority_queue;
-#    define pq_init(args...) CCC_pq_init(args)
+#    define pq_initialize(args...) CCC_pq_initialize(args)
 #    define pq_front(args...) CCC_pq_front(args)
 #    define pq_push(args...) CCC_pq_push(args)
 #    define pq_emplace(args...) CCC_pq_emplace(args)

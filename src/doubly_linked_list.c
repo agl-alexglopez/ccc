@@ -21,7 +21,7 @@ they refactor. */
 #include <string.h>
 
 #include "doubly_linked_list.h"
-#include "impl/impl_doubly_linked_list.h"
+#include "private/private_doubly_linked_list.h"
 #include "types.h"
 
 /*===========================   Prototypes    ===============================*/
@@ -44,9 +44,8 @@ static struct CCC_dll_elem *first_less(struct CCC_dll const *dll,
                                        struct CCC_dll_elem *);
 static struct CCC_dll_elem *merge(struct CCC_dll *, struct CCC_dll_elem *,
                                   struct CCC_dll_elem *, struct CCC_dll_elem *);
-static CCC_threeway_cmp cmp(struct CCC_dll const *dll,
-                            struct CCC_dll_elem const *lhs,
-                            struct CCC_dll_elem const *rhs);
+static CCC_Order cmp(struct CCC_dll const *dll, struct CCC_dll_elem const *lhs,
+                     struct CCC_dll_elem const *rhs);
 
 /*===========================     Interface   ===============================*/
 
@@ -112,7 +111,7 @@ CCC_dll_back(CCC_doubly_linked_list const *l)
     return struct_base(l, l->nil.p);
 }
 
-CCC_result
+CCC_Result
 CCC_dll_pop_front(CCC_doubly_linked_list *const l)
 {
     if (!l || !l->count)
@@ -127,7 +126,7 @@ CCC_dll_pop_front(CCC_doubly_linked_list *const l)
     return CCC_RESULT_OK;
 }
 
-CCC_result
+CCC_Result
 CCC_dll_pop_back(CCC_doubly_linked_list *const l)
 {
     if (!l || !l->count)
@@ -220,19 +219,19 @@ CCC_dll_erase_range(CCC_doubly_linked_list *const l,
 }
 
 CCC_dll_elem *
-CCC_dll_begin_elem(CCC_doubly_linked_list const *const l)
+CCC_dll_elem_begin(CCC_doubly_linked_list const *const l)
 {
     return l ? l->nil.n : NULL;
 }
 
 CCC_dll_elem *
-CCC_dll_end_elem(CCC_doubly_linked_list const *const l)
+CCC_dll_elem_end(CCC_doubly_linked_list const *const l)
 {
     return l ? l->nil.p : NULL;
 }
 
 CCC_dll_elem *
-CCC_dll_end_sentinel(CCC_doubly_linked_list const *const l)
+CCC_dll_sentinel_end(CCC_doubly_linked_list const *const l)
 {
     return l ? (CCC_dll_elem *)&l->nil : NULL;
 }
@@ -282,7 +281,7 @@ CCC_dll_extract_range(CCC_doubly_linked_list *const l,
     return ret == &l->nil ? NULL : struct_base(l, ret);
 }
 
-CCC_result
+CCC_Result
 CCC_dll_splice(CCC_doubly_linked_list *const pos_dll, CCC_dll_elem *pos,
                CCC_doubly_linked_list *const to_cut_dll,
                CCC_dll_elem *const to_cut)
@@ -310,7 +309,7 @@ CCC_dll_splice(CCC_doubly_linked_list *const pos_dll, CCC_dll_elem *pos,
     return CCC_RESULT_OK;
 }
 
-CCC_result
+CCC_Result
 CCC_dll_splice_range(CCC_doubly_linked_list *const pos_dll, CCC_dll_elem *pos,
                      CCC_doubly_linked_list *const to_cut_dll,
                      CCC_dll_elem *begin, CCC_dll_elem *end)
@@ -388,24 +387,24 @@ CCC_dll_rnext(CCC_doubly_linked_list const *const l, CCC_dll_elem const *e)
     return struct_base(l, e->p);
 }
 
-CCC_ucount
+CCC_Count
 CCC_dll_count(CCC_doubly_linked_list const *const l)
 {
     if (!l)
     {
-        return (CCC_ucount){.error = CCC_RESULT_ARG_ERROR};
+        return (CCC_Count){.error = CCC_RESULT_ARG_ERROR};
     }
-    return (CCC_ucount){.count = l->count};
+    return (CCC_Count){.count = l->count};
 }
 
-CCC_tribool
+CCC_Tribool
 CCC_dll_is_empty(CCC_doubly_linked_list const *const l)
 {
     return l ? !l->count : CCC_TRUE;
 }
 
-CCC_result
-CCC_dll_clear(CCC_doubly_linked_list *const l, CCC_any_type_destructor_fn *fn)
+CCC_Result
+CCC_dll_clear(CCC_doubly_linked_list *const l, CCC_Type_destructor *fn)
 {
     if (!l)
     {
@@ -416,7 +415,7 @@ CCC_dll_clear(CCC_doubly_linked_list *const l, CCC_any_type_destructor_fn *fn)
         void *const node = struct_base(l, pop_front(l));
         if (fn)
         {
-            fn((CCC_any_type){.any_type = node, .aux = l->aux});
+            fn((CCC_Type_context){.any_type = node, .aux = l->aux});
         }
         if (l->alloc)
         {
@@ -426,7 +425,7 @@ CCC_dll_clear(CCC_doubly_linked_list *const l, CCC_any_type_destructor_fn *fn)
     return CCC_RESULT_OK;
 }
 
-CCC_tribool
+CCC_Tribool
 CCC_dll_validate(CCC_doubly_linked_list const *const l)
 {
     if (!l)
@@ -454,7 +453,7 @@ CCC_dll_validate(CCC_doubly_linked_list const *const l)
 /** Returns true if the list is sorted in non-decreasing order. The user should
 flip the return values of their comparison function if they want a different
 order for elements.*/
-CCC_tribool
+CCC_Tribool
 CCC_dll_is_sorted(CCC_doubly_linked_list const *const dll)
 {
     if (!dll)
@@ -468,7 +467,7 @@ CCC_dll_is_sorted(CCC_doubly_linked_list const *const dll)
     for (struct CCC_dll_elem const *cur = dll->nil.n->n; cur != &dll->nil;
          cur = cur->n)
     {
-        if (cmp(dll, cur->p, cur) == CCC_GRT)
+        if (cmp(dll, cur->p, cur) == CCC_ORDER_GREATER)
         {
             return CCC_FALSE;
         }
@@ -497,7 +496,7 @@ CCC_dll_insert_sorted(CCC_doubly_linked_list *const dll, CCC_dll_elem *e)
         e = elem_in(dll, node);
     }
     struct CCC_dll_elem *pos = dll->nil.n;
-    for (; pos != &dll->nil && cmp(dll, e, pos) != CCC_LES; pos = pos->n)
+    for (; pos != &dll->nil && cmp(dll, e, pos) != CCC_ORDER_LESS; pos = pos->n)
     {}
     e->n = pos;
     e->p = pos->p;
@@ -531,7 +530,7 @@ that need to be sorted by roughly "doubling" the length of a sorted range on
 each merge step. Therefore the number of times we must perform the merge step is
 `O(log(N))`. The most elements we would have to merge in the merge step is all
 `N` elements so together that gives us the runtime of `O(N * log(N))`. */
-CCC_result
+CCC_Result
 CCC_dll_sort(CCC_doubly_linked_list *const dll)
 {
     if (!dll)
@@ -539,7 +538,7 @@ CCC_dll_sort(CCC_doubly_linked_list *const dll)
         return CCC_RESULT_ARG_ERROR;
     }
     /* Algorithm is one pass if list is sorted. Merging is never true. */
-    CCC_tribool merging = CCC_FALSE;
+    CCC_Tribool merging = CCC_FALSE;
     do
     {
         merging = CCC_FALSE;
@@ -578,7 +577,7 @@ merge(struct CCC_dll *const dll, struct CCC_dll_elem *a_0,
     assert(dll && a_0 && a_n_b_0 && b_n);
     while (a_0 != a_n_b_0 && a_n_b_0 != b_n)
     {
-        if (cmp(dll, a_n_b_0, a_0) == CCC_LES)
+        if (cmp(dll, a_n_b_0, a_0) == CCC_ORDER_LESS)
         {
             struct CCC_dll_elem *const lesser = a_n_b_0;
             a_n_b_0 = lesser->n;
@@ -608,14 +607,14 @@ first_less(struct CCC_dll const *const dll, struct CCC_dll_elem *start)
     {
         start = start->n;
     }
-    while (start != &dll->nil && cmp(dll, start, start->p) != CCC_LES);
+    while (start != &dll->nil && cmp(dll, start, start->p) != CCC_ORDER_LESS);
     return start;
 }
 
 /*=======================     Private Interface   ===========================*/
 
 void
-CCC_impl_dll_push_back(struct CCC_dll *const l, struct CCC_dll_elem *const e)
+CCC_private_dll_push_back(struct CCC_dll *const l, struct CCC_dll_elem *const e)
 {
     if (!l || !e)
     {
@@ -625,7 +624,8 @@ CCC_impl_dll_push_back(struct CCC_dll *const l, struct CCC_dll_elem *const e)
 }
 
 void
-CCC_impl_dll_push_front(struct CCC_dll *const l, struct CCC_dll_elem *const e)
+CCC_private_dll_push_front(struct CCC_dll *const l,
+                           struct CCC_dll_elem *const e)
 {
     if (!l || !e)
     {
@@ -635,8 +635,8 @@ CCC_impl_dll_push_front(struct CCC_dll *const l, struct CCC_dll_elem *const e)
 }
 
 struct CCC_dll_elem *
-CCC_impl_dll_elem_in(struct CCC_dll const *const l,
-                     void const *const any_struct)
+CCC_private_dll_elem_in(struct CCC_dll const *const l,
+                        void const *const any_struct)
 {
     return elem_in(l, any_struct);
 }
@@ -768,11 +768,11 @@ elem_in(struct CCC_dll const *const dll, void const *const struct_base)
 /** Calls the user provided three way comparison callback function on the user
 type wrapping the provided intrusive handles. Returns the three way comparison
 result value. */
-static inline CCC_threeway_cmp
+static inline CCC_Order
 cmp(struct CCC_dll const *const dll, struct CCC_dll_elem const *const lhs,
     struct CCC_dll_elem const *const rhs)
 {
-    return dll->cmp((CCC_any_type_cmp){
+    return dll->cmp((CCC_Type_comparator_context){
         .any_type_lhs = struct_base(dll, lhs),
         .any_type_rhs = struct_base(dll, rhs),
         .aux = dll->aux,
