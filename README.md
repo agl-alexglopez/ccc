@@ -16,7 +16,7 @@ Currently, this library supports a `FetchContent` or manual installation via CMa
 ## Quick Start
 
 - Read the [DOCS](https://agl-alexglopez.github.io/ccc).
-- Read [types.h](https://agl-alexglopez.github.io/ccc/types_8h.html) to understand the `ccc_any_alloc_fn` interface.
+- Read [types.h](https://agl-alexglopez.github.io/ccc/types_8h.html) to understand the `CCC_Allocator` interface.
 - Read the [header](https://agl-alexglopez.github.io/ccc/files.html) for the desired container to understand its functionality.
 - Read about generic [traits.h](https://agl-alexglopez.github.io/ccc/traits_8h.html) shared across containers to make code more succinct.
 - Read [CONTRIBUTING.md](CONTRIBUTING.md) if interested in project structure, tools, and todos.
@@ -24,7 +24,7 @@ Currently, this library supports a `FetchContent` or manual installation via CMa
 ## Containers
 
 <details>
-<summary>bitset.h (dropdown)</summary>
+<summary>Bitset.h (dropdown)</summary>
 A fixed or dynamic contiguous array of bits for set operations.
 
 ```c
@@ -32,8 +32,8 @@ A fixed or dynamic contiguous array of bits for set operations.
 #include <stdbool.h>
 #include <stddef.h>
 
-#define BITSET_USING_NAMESPACE_CCC
-#include "ccc/bitset.h"
+#define Bitset_USING_NAMESPACE_CCC
+#include "ccc/Bitset.h"
 #include "ccc/types.h"
 
 #define DIGITS 9L
@@ -70,13 +70,13 @@ static int const invalid_board[9][9] =
 /* clang-format on */
 
 /* Returns if the box is valid (CCC_TRUE if valid CCC_FALSE if not). */
-static ccc_tribool
-validate_sudoku_box(int const board[9][9], bitset *const row_check,
-                    bitset *const col_check, size_t const row_start,
+static CCC_Tribool
+validate_sudoku_box(int const board[9][9], Bitset *const row_check,
+                    Bitset *const col_check, size_t const row_start,
                     size_t const col_start)
 {
-    bitset box_check = bs_init(bs_blocks(DIGITS), NULL, NULL, DIGITS);
-    ccc_tribool was_on = CCC_FALSE;
+    Bitset box_check = bitset_initialize(bitset_blocks(DIGITS), NULL, NULL, DIGITS);
+    CCC_Tribool was_on = CCC_FALSE;
     for (size_t r = row_start; r < row_start + BOX_SIZE; ++r)
     {
         for (size_t c = col_start; c < col_start + BOX_SIZE; ++c)
@@ -87,17 +87,17 @@ validate_sudoku_box(int const board[9][9], bitset *const row_check,
             }
             /* Need the zero based digit. */
             size_t const digit = board[r][c] - 1;
-            was_on = bs_set(&box_check, digit, CCC_TRUE);
+            was_on = bitset_set(&box_check, digit, CCC_TRUE);
             if (was_on)
             {
                 return CCC_FALSE;
             }
-            was_on = bs_set(row_check, (r * DIGITS) + digit, CCC_TRUE);
+            was_on = bitset_set(row_check, (r * DIGITS) + digit, CCC_TRUE);
             if (was_on)
             {
                 return CCC_FALSE;
             }
-            was_on = bs_set(col_check, (c * DIGITS) + digit, CCC_TRUE);
+            was_on = bitset_set(col_check, (c * DIGITS) + digit, CCC_TRUE);
             if (was_on)
             {
                 return CCC_FALSE;
@@ -111,13 +111,13 @@ validate_sudoku_box(int const board[9][9], bitset *const row_check,
    All sizes are known at compile time meaning we get memory management for
    free and the optimal space and time complexity for this problem. */
 
-static ccc_tribool
+static CCC_Tribool
 is_valid_sudoku(int const board[9][9])
 {
-    bitset row_check
-        = bs_init(bs_blocks(ROWS * DIGITS), NULL, NULL, ROWS * DIGITS);
-    bitset col_check
-        = bs_init(bs_blocks(ROWS * DIGITS), NULL, NULL, COLS * DIGITS);
+    Bitset row_check
+        = bitset_initialize(bitset_blocks(ROWS * DIGITS), NULL, NULL, ROWS * DIGITS);
+    Bitset col_check
+        = bitset_initialize(bitset_blocks(ROWS * DIGITS), NULL, NULL, COLS * DIGITS);
     for (size_t row = 0; row < ROWS; row += BOX_SIZE)
     {
         for (size_t col = 0; col < COLS; col += BOX_SIZE)
@@ -134,7 +134,7 @@ is_valid_sudoku(int const board[9][9])
 int
 main(void)
 {
-    ccc_tribool result = is_valid_sudoku(valid_board);
+    CCC_Tribool result = is_valid_sudoku(valid_board);
     assert(result == CCC_TRUE);
     result = is_valid_sudoku(invalid_board);
     assert(result == CCC_FALSE);
@@ -169,13 +169,13 @@ maxint(int const a, int const b)
 int
 main(void)
 {
-    buffer const heights
-        = buf_init(((int[HCAP]){0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1}), int, NULL,
+    Buffer const heights
+        = buffer_initialize(((int[HCAP]){0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1}), int, NULL,
                    NULL, HCAP, HCAP);
     int const correct_trapped = 6;
     int trapped = 0;
-    int lpeak = *buf_front_as(&heights, int);
-    int rpeak = *buf_back_as(&heights, int);
+    int lpeak = *buffer_front_as(&heights, int);
+    int rpeak = *buffer_back_as(&heights, int);
     /* Easy way to have a "skip first" iterator because the iterator is
        returned from each iterator function. */
     int const *l = next(&heights, begin(&heights));
@@ -212,17 +212,17 @@ A dynamic container for efficient insertion and removal at any position.
 #include "ccc/doubly_linked_list.h"
 #include "ccc/traits.h"
 
-struct int_elem
+struct Int_node
 {
     int i;
-    dll_elem e;
+    Doubly_linked_list_node e;
 };
 
-static ccc_threeway_cmp
-int_cmp(ccc_any_type_cmp const cmp)
+static CCC_Order
+int_cmp(CCC_Type_comparator_context const cmp)
 {
-    struct int_elem const *const lhs = cmp.any_type_lhs;
-    struct int_elem const *const rhs = cmp.any_type_rhs;
+    struct Int_node const *const lhs = cmp.type_lhs;
+    struct Int_node const *const rhs = cmp.type_rhs;
     return (lhs->i > rhs->i) - (lhs->i < rhs->i);
 }
 
@@ -230,14 +230,14 @@ int
 main(void)
 {
     /* doubly linked list l, list elem field e, no allocation permission,
-       comparing integers, no auxiliary data. */
-    doubly_linked_list l = dll_init(l, struct int_elem, e, int_cmp, NULL, NULL);
-    struct int_elem elems[3] = {{.i = 3}, {.i = 2}, {.i = 1}};
+       comparing integers, no context data. */
+    Doubly_linked_list l = doubly_linked_list_initialize(l, struct Int_node, e, int_cmp, NULL, NULL);
+    struct Int_node elems[3] = {{.i = 3}, {.i = 2}, {.i = 1}};
     (void)push_back(&l, &elems[0].e);
     (void)push_front(&l, &elems[1].e);
     (void)push_back(&l, &elems[2].e);
     (void)pop_back(&l);
-    struct int_elem *e = back(&l);
+    struct Int_node *e = back(&l);
     assert(e->i == 3);
     return 0;
 }
@@ -246,7 +246,7 @@ main(void)
 </details>
 
 <details>
-<summary>flat_double_ended_queue.h (dropdown)</summary>
+<summary>flat_doubled_ended_queue.h (dropdown)</summary>
 A dynamic or fixed size double ended queue offering contiguously stored elements. When fixed size, its behavior is that of a ring buffer.
 
 ```c
@@ -259,8 +259,8 @@ A dynamic or fixed size double ended queue offering contiguously stored elements
 int
 main(void)
 {
-    /* stack array, no allocation permission, no aux data, capacity 2 */
-    flat_double_ended_queue q = fdeq_init((int[2]){}, int, NULL, NULL, 2);
+    /* stack array, no allocation permission, no context data, capacity 2 */
+    Flat_doubled_ended_queue q = flat_doubled_ended_queue_initialize((int[2]){}, int, NULL, NULL, 2);
     (void)push_back(&q, &(int){3});
     (void)push_front(&q, &(int){2});
     (void)push_back(&q, &(int){1}); /* Overwrite 2. */
@@ -292,14 +292,14 @@ Amortized O(1) access to elements stored in a flat array by key. Not pointer sta
 #include "ccc/flat_hash_map.h"
 #include "ccc/traits.h"
 
-struct key_val
+struct Key_val
 {
     int key;
     int val;
 };
 
 static uint64_t
-fhmap_int_to_u64(ccc_any_key const k)
+flat_hash_map_int_to_u64(CCC_any_key const k)
 {
     int const key_int = *((int *)k.any_key);
     uint64_t x = key_int;
@@ -309,31 +309,31 @@ fhmap_int_to_u64(ccc_any_key const k)
     return x;
 }
 
-ccc_threeway_cmp
-fhmap_id_cmp(ccc_any_key_cmp const cmp)
+CCC_Order
+flat_hash_map_id_cmp(CCC_Key_comparator_context const cmp)
 {
-    struct key_val const *const rhs = cmp.any_type_rhs;
+    struct Key_val const *const rhs = cmp.type_rhs;
     int const lhs = *((int *)cmp.any_key_lhs;
     return (lhs > rhs->key) - (lhs < rhs->key);
 }
 
-fhm_declare_fixed_map(standard_fixed_map, struct key_val, 1024);
+flat_hash_map_declare_fixed_map(Standard_fixed_map, struct Key_val, 1024);
 
 enum : size_t
 {
-    STANDARD_FIXED_CAP = fhm_fixed_capacity(standard_fixed_map),
+    STANDARD_FIXED_CAP = flat_hash_map_fixed_capacity(Standard_fixed_map),
 };
 
 /* Longest Consecutive Sequence Leetcode Problem */
 int
 main(void)
 {
-    ccc_flat_hash_map fh = fhm_init(
-        &(standard_fixed_map){},
-        struct key_val,
+    CCC_Flat_hash_map fh = flat_hash_map_initialize(
+        &(Standard_fixed_map){},
+        struct Key_val,
         key,
-        fhmap_int_to_u64,
-        fhmap_id_cmp,
+        flat_hash_map_int_to_u64,
+        flat_hash_map_id_cmp,
         NULL,
         NULL,
         STANDARD_FIXED_CAP
@@ -350,8 +350,8 @@ main(void)
     for (size_t i = 0; i < nums_size; ++i)
     {
         int const n = nums[i];
-        ccc_entry const *const seen_n
-            = try_insert_r(&fh, &(struct key_val){.key = n, .val = 1});
+        CCC_Entry const *const seen_n
+            = try_insert_r(&fh, &(struct Key_val){.key = n, .val = 1});
         /* We have already connected this run as much as possible. */
         if (occupied(seen_n))
         {
@@ -360,9 +360,9 @@ main(void)
         assert(!insert_error(seen_n));
 
         /* There may or may not be runs already existing to left and right. */
-        struct key_val const *const connect_left
+        struct Key_val const *const connect_left
             = get_key_val(&fh, &(int){n - 1});
-        struct key_val const *const connect_right
+        struct Key_val const *const connect_right
             = get_key_val(&fh, &(int){n + 1});
         int const left_run = connect_left ? connect_left->val : 0;
         int const right_run = connect_right ? connect_right->val : 0;
@@ -372,11 +372,11 @@ main(void)
         max_run = full_run > max_run ? full_run : max_run;
 
         /* Update the boundaries of the full run range. */
-        ((struct key_val *)unwrap(seen_n))->val = full_run;
-        ccc_entry const *const run_min = insert_or_assign_r(
-            &fh, &(struct key_val){.key = n - left_run, .val = full_run});
-        ccc_entry const *const run_max = insert_or_assign_r(
-            &fh, &(struct key_val){.key = n + right_run, .val = full_run});
+        ((struct Key_val *)unwrap(seen_n))->val = full_run;
+        CCC_Entry const *const run_min = insert_or_assign_r(
+            &fh, &(struct Key_val){.key = n - left_run, .val = full_run});
+        CCC_Entry const *const run_max = insert_or_assign_r(
+            &fh, &(struct Key_val){.key = n + right_run, .val = full_run});
         assert(occupied(run_min));
         assert(occupied(run_max));
         assert(!insert_error(run_min));
@@ -401,11 +401,11 @@ main(void)
 #include "ccc/flat_priority_queue.h"
 #include "ccc/traits.h"
 
-ccc_threeway_cmp
-int_cmp(ccc_any_type_cmp const ints)
+CCC_Order
+int_cmp(CCC_Type_comparator_context const ints)
 {
-    int const lhs = *(int *)ints.any_type_lhs;
-    int const rhs = *(int *)ints.any_type_rhs;
+    int const lhs = *(int *)ints.type_lhs;
+    int const rhs = *(int *)ints.type_rhs;
     return (lhs > rhs) - (lhs < rhs);
 }
 
@@ -419,12 +419,12 @@ main(void)
     {
         HCAP = sizeof(heap) / sizeof(*heap),
     };
-    flat_priority_queue pq = fpq_heapify_init(heap, int, CCC_LES, int_cmp, NULL,
+    Flat_priority_queue priority_queue = flat_priority_queue_heapify_initialize(heap, int, CCC_LES, int_cmp, NULL,
                                               NULL, HCAP, HCAP);
-    buffer const b = fpq_heapsort(&pq, &(int){0});
+    Buffer const b = flat_priority_queue_heapsort(&priority_queue, &(int){0});
     int const *prev = begin(&b);
     assert(prev != NULL);
-    assert(buf_count(&b).count == HCAP);
+    assert(buffer_count(&b).count == HCAP);
     size_t count = 1;
     for (int const *cur = next(&b, prev); cur != end(&b); cur = next(&b, cur))
     {
@@ -452,18 +452,18 @@ An ordered map implemented in array with an index based self-optimizing tree. Of
 #include "ccc/handle_ordered_map.h"
 #include "ccc/traits.h"
 
-struct kval
+struct Key_val
 {
     int key;
     int val;
 };
 
-hom_declare_fixed_map(kval_fixed_map, struct kval, 26);
+handle_ordered_map_declare_fixed_map(Key_val_fixed_map, struct Key_val, 26);
 
-static ccc_threeway_cmp
-kval_cmp(ccc_any_key_cmp const cmp)
+static CCC_Order
+Key_val_cmp(CCC_Key_comparator_context const cmp)
 {
-    struct kval const *const rhs = cmp.any_type_rhs;
+    struct Key_val const *const rhs = cmp.type_rhs;
     int const key_lhs = *((int *)cmp.any_key_lhs);
     return (key_lhs > rhs->key) - (key_lhs < rhs->key);
 }
@@ -473,40 +473,40 @@ main(void)
 {
     /* stack array of 25 elements with one slot for sentinel, intrusive field
        named elem, key field named key, no allocation permission, key comparison
-       function, no aux data. */
-    handle_ordered_map s = hom_init(
-        &(kval_fixed_map){},
-        struct kval,
+       function, no context data. */
+    Handle_ordered_map s = handle_ordered_map_initialize(
+        &(Key_val_fixed_map){},
+        struct Key_val,
         key,
-        kval_cmp,
+        Key_val_cmp,
         NULL,
         NULL,
-        hom_fixed_capacity(kval_fixed_map)
+        handle_ordered_map_fixed_capacity(Key_val_fixed_map)
     );
     int const num_nodes = 25;
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
     for (int i = 0, id = 0; i < num_nodes; ++i, id += 5)
     {
-        (void)insert_or_assign(&s, &(struct kval){.key = id, .val = i}.elem);
+        (void)insert_or_assign(&s, &(struct Key_val){.key = id, .val = i}.elem);
     }
-    /* This should be the following range [6,44). 6 should raise to
+    /* This should be the following Range [6,44). 6 should raise to
        next value not less than 6, 10 and 44 should be the first
        value greater than 44, 45. */
     int range_keys[8] = {10, 15, 20, 25, 30, 35, 40, 45};
-    range r = equal_range(&s, &(int){6}, &(int){44});
+    Range r = equal_range(&s, &(int){6}, &(int){44});
     int index = 0;
-    for (struct kval *i = begin_range(&r); i != end_range(&r); i = next(&s, i))
+    for (struct Key_val *i = begin_range(&r); i != end_range(&r); i = next(&s, i))
     {
         assert(i->key == range_keys[index]);
         ++index;
     }
-    /* This should be the following range [119,84). 119 should be
+    /* This should be the following Range [119,84). 119 should be
        dropped to first value not greater than 119 and last should
        be dropped to first value less than 84. */
     int rrange_keys[8] = {115, 110, 105, 100, 95, 90, 85, 80};
-    rrange rr = equal_rrange(&s, &(int){119}, &(int){84});
+    Reverse_range rr = equal_rrange(&s, &(int){119}, &(int){84});
     index = 0;
-    for (struct kval *i = rbegin_rrange(&rr); i != rend_rrange(&rr);
+    for (struct Key_val *i = rbegin_rrange(&rr); i != rend_rrange(&rr);
          i = rnext(&s, i))
     {
         assert(i->key == rrange_keys[index]);
@@ -531,17 +531,17 @@ An ordered map with strict runtime bounds implemented in an array with indices t
 #include "ccc/handle_realtime_ordered_map.h"
 #include "ccc/traits.h"
 
-struct kval
+struct Key_val
 {
     int key;
     int val;
 };
-ccc_hrm_declare_fixed_map(kval_fixed_map, struct val, 64);
+CCC_handle_realtime_ordered_map_declare_fixed_map(Key_val_fixed_map, struct Val, 64);
 
-static ccc_threeway_cmp
-kval_cmp(ccc_any_key_cmp const cmp)
+static CCC_Order
+Key_val_cmp(CCC_Key_comparator_context const cmp)
 {
-    struct kval const *const rhs = cmp.any_type_rhs;
+    struct Key_val const *const rhs = cmp.type_rhs;
     int const key_lhs = *((int *)cmp.any_key_lhs);
     return (key_lhs > rhs->key) - (key_lhs < rhs->key);
 }
@@ -550,41 +550,41 @@ int
 main(void)
 {
     /* stack array, user defined type, key field named key, no allocation
-       permission, key comparison function, no aux data. */
-    handle_realtime_ordered_map s = hrm_init(
-        &(kval_fixed_map){},
-        struct val,
+       permission, key comparison function, no context data. */
+    Handle_realtime_ordered_map s = handle_realtime_ordered_map_initialize(
+        &(Key_val_fixed_map){},
+        struct Val,
         key,
         hrmap_key_cmp,
         NULL,
         NULL,
-        hrm_fixed_capacity(kval_fixed_map)
+        handle_realtime_ordered_map_fixed_capacity(Key_val_fixed_map)
     );
     int const num_nodes = 25;
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
     for (int i = 0, id = 0; i < num_nodes; ++i, id += 5)
     {
-        (void)insert_or_assign(&s, &(struct kval){.key = id, .val = i}.elem);
+        (void)insert_or_assign(&s, &(struct Key_val){.key = id, .val = i}.elem);
     }
-    /* This should be the following range [6,44). 6 should raise to
+    /* This should be the following Range [6,44). 6 should raise to
        next value not less than 6, 10 and 44 should be the first
        value greater than 44, 45. */
     int range_keys[8] = {10, 15, 20, 25, 30, 35, 40, 45};
-    range r = equal_range(&s, &(int){6}, &(int){44});
+    Range r = equal_range(&s, &(int){6}, &(int){44});
     int index = 0;
-    for (struct kval *i = begin_range(&r); i != end_range(&r);
+    for (struct Key_val *i = begin_range(&r); i != end_range(&r);
          i = next(&s, &i->elem))
     {
         assert(i->key == range_keys[index]);
         ++index;
     }
-    /* This should be the following range [119,84). 119 should be
+    /* This should be the following Range [119,84). 119 should be
        dropped to first value not greater than 119 and last should
        be dropped to first value less than 84. */
     int rrange_keys[8] = {115, 110, 105, 100, 95, 90, 85, 80};
-    rrange rr = equal_rrange(&s, &(int){119}, &(int){84});
+    Reverse_range rr = equal_rrange(&s, &(int){119}, &(int){84});
     index = 0;
-    for (struct kval *i = rbegin_rrange(&rr); i != rend_rrange(&rr);
+    for (struct Key_val *i = rbegin_rrange(&rr); i != rend_rrange(&rr);
          i = rnext(&s, &i->elem))
     {
         assert(i->key == rrange_keys[index]);
@@ -610,15 +610,15 @@ A pointer stable ordered map that stores unique keys, implemented with a self-op
 
 struct name
 {
-    omap_elem e;
+    Ordered_map_node e;
     char const *name;
 };
 
-ccc_threeway_cmp
-kval_cmp(ccc_any_key_cmp cmp)
+CCC_Order
+Key_val_cmp(CCC_Key_comparator_context cmp)
 {
     char const *const key = *(char **)cmp.any_key_lhs;
-    struct name const *const rhs = cmp.any_type_rhs;
+    struct name const *const rhs = cmp.type_rhs;
     int const res = strcmp(key, rhs->name);
     if (res == 0)
     {
@@ -636,8 +636,8 @@ main(void)
 {
     struct name nodes[5];
     /* ordered_map named om, stores struct name, intrusive field e, key field
-       name, no allocation permission, comparison fn, no aux */
-    ordered_map om = om_init(om, struct name, e, name, kval_cmp, NULL, NULL);
+       name, no allocation permission, comparison fn, no context */
+    ordered_map om = om_initialize(om, struct name, e, name, Key_val_cmp, NULL, NULL);
     char const *const sorted_names[5]
         = {"Ferris", "Glenda", "Rocky", "Tux", "Ziggy"};
     size_t const size = sizeof(sorted_names) / sizeof(sorted_names[0]);
@@ -645,7 +645,7 @@ main(void)
     for (size_t i = 0; i < size; ++i, j = (j + 7) % size)
     {
         nodes[count(&om).count].name = sorted_names[j];
-        ccc_entry e = insert_or_assign(&om, &nodes[count(&om).count].e);
+        CCC_Entry e = insert_or_assign(&om, &nodes[count(&om).count].e);
         assert(!insert_error(&e) && !occupied(&e));
     }
     j = 0;
@@ -656,7 +656,7 @@ main(void)
         ++j;
     }
     assert(count(&om).count == size);
-    ccc_entry e = try_insert(&om, &(struct name){.name = "Ferris"}.e);
+    CCC_Entry e = try_insert(&om, &(struct name){.name = "Ferris"}.e);
     assert(count(&om).count == size);
     assert(occupied(&e));
     return 0;
@@ -678,35 +678,35 @@ A pointer stable priority queue offering O(1) push and efficient decrease, incre
 #include "ccc/priority_queue.h"
 #include "ccc/traits.h"
 
-struct val
+struct Val
 {
-    pq_elem elem;
+    Priority_queue_node elem;
     int val;
 };
 
-static ccc_threeway_cmp
-val_cmp(ccc_any_type_cmp const cmp)
+static CCC_Order
+val_cmp(CCC_Type_comparator_context const cmp)
 {
-    struct val const *const lhs = cmp.any_type_lhs;
-    struct val const *const rhs = cmp.any_type_rhs;
+    struct Val const *const lhs = cmp.type_lhs;
+    struct Val const *const rhs = cmp.type_rhs;
     return (lhs->val > rhs->val) - (lhs->val < rhs->val);
 }
 
 int
 main(void)
 {
-    struct val elems[5]
+    struct Val elems[5]
         = {{.val = 3}, {.val = 3}, {.val = 7}, {.val = -1}, {.val = 5}};
-    priority_queue pq = pq_init(struct val, elem, CCC_LES, val_cmp, NULL, NULL);
+    Priority_queue priority_queue = priority_queue_initialize(struct Val, elem, CCC_LES, val_cmp, NULL, NULL);
     for (size_t i = 0; i < (sizeof(elems) / sizeof(elems[0])); ++i)
     {
-        struct val const *const v = push(&pq, &elems[i].elem);
+        struct Val const *const v = push(&priority_queue, &elems[i].elem);
         assert(v && v->val == elems[i].val);
     }
-    bool const decreased = pq_decrease_w(&pq, &elems[4].elem,
+    bool const decreased = priority_queue_decrease_w(&priority_queue, &elems[4].elem,
                                          { elems[4].val = -99; });
     assert(decreased);
-    struct val const *const v = front(&pq);
+    struct Val const *const v = front(&priority_queue);
     assert(v->val == -99);
     return 0;
 }
@@ -726,17 +726,17 @@ A pointer stable ordered map meeting strict O(lg N) runtime bounds for realtime 
 #include "ccc/realtime_ordered_map.h"
 #include "ccc/traits.h"
 
-struct kval
+struct Key_val
 {
-    romap_elem elem;
+    Realtime_ordered_map_node elem;
     int key;
     int val;
 };
 
-static ccc_threeway_cmp
-kval_cmp(ccc_any_key_cmp const cmp)
+static CCC_Order
+Key_val_cmp(CCC_Key_comparator_context const cmp)
 {
-    struct kval const *const rhs = cmp.any_type_rhs;
+    struct Key_val const *const rhs = cmp.type_rhs;
     int const key_lhs = *((int *)cmp.any_key_lhs);
     return (key_lhs > rhs->key) - (key_lhs < rhs->key);
 }
@@ -744,12 +744,12 @@ kval_cmp(ccc_any_key_cmp const cmp)
 int
 main(void)
 {
-    struct kval elems[25];
+    struct Key_val elems[25];
     /* stack array of 25 elements with one slot for sentinel, intrusive field
        named elem, key field named key, no allocation permission, key comparison
-       function, no aux data. */
-    realtime_ordered_map s
-        = rom_init(s, struct kval, elem, key, kval_cmp, NULL, NULL);
+       function, no context data. */
+    Realtime_ordered_map s
+        = rom_initialize(s, struct Key_val, elem, key, Key_val_cmp, NULL, NULL);
     int const num_nodes = 25;
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
     for (int i = 0, id = 0; i < num_nodes; ++i, id += 5)
@@ -758,25 +758,25 @@ main(void)
         elems[i].val = i;
         (void)insert_or_assign(&s, &elems[i].elem);
     }
-    /* This should be the following range [6,44). 6 should raise to
+    /* This should be the following Range [6,44). 6 should raise to
        next value not less than 6, 10 and 44 should be the first
        value greater than 44, 45. */
     int range_keys[8] = {10, 15, 20, 25, 30, 35, 40, 45};
-    range r = equal_range(&s, &(int){6}, &(int){44});
+    Range r = equal_range(&s, &(int){6}, &(int){44});
     int index = 0;
-    for (struct kval *i = begin_range(&r); i != end_range(&r);
+    for (struct Key_val *i = begin_range(&r); i != end_range(&r);
          i = next(&s, &i->elem))
     {
         assert(i->key == range_keys[index]);
         ++index;
     }
-    /* This should be the following range [119,84). 119 should be
+    /* This should be the following Range [119,84). 119 should be
        dropped to first value not greater than 119 and last should
        be dropped to first value less than 84. */
     int rrange_keys[8] = {115, 110, 105, 100, 95, 90, 85, 80};
-    rrange rr = equal_rrange(&s, &(int){119}, &(int){84});
+    Reverse_range rr = equal_rrange(&s, &(int){119}, &(int){84});
     index = 0;
-    for (struct kval *i = rbegin_rrange(&rr); i != rend_rrange(&rr);
+    for (struct Key_val *i = rbegin_rrange(&rr); i != rend_rrange(&rr);
          i = rnext(&s, &i->elem))
     {
         assert(i->key == rrange_keys[index]);
@@ -799,17 +799,17 @@ A low overhead push-to-front container. When contiguity is not possible and the 
 #include "ccc/singly_linked_list.h"
 #include "ccc/traits.h"
 
-struct int_elem
+struct Int_node
 {
     int i;
-    sll_elem e;
+    singly_linked_list_node e;
 };
 
-static ccc_threeway_cmp
-int_cmp(ccc_any_type_cmp const cmp)
+static CCC_Order
+int_cmp(CCC_Type_comparator_context const cmp)
 {
-    struct int_elem const *const lhs = cmp.any_type_lhs;
-    struct int_elem const *const rhs = cmp.any_type_rhs;
+    struct Int_node const *const lhs = cmp.type_lhs;
+    struct Int_node const *const rhs = cmp.type_rhs;
     return (lhs->i > rhs->i) - (lhs->i < rhs->i);
 }
 
@@ -817,13 +817,13 @@ int
 main(void)
 {
     /* singly linked list l, list elem field e, no allocation permission,
-       comparing integers, no auxiliary data. */
-    singly_linked_list l = sll_init(l, struct int_elem, e, int_cmp, NULL, NULL);
-    struct int_elem elems[3] = {{.i = 3}, {.i = 2}, {.i = 1}};
+       comparing integers, no context data. */
+    Singly_linked_list l = singly_linked_list_initialize(l, struct Int_node, e, int_cmp, NULL, NULL);
+    struct Int_node elems[3] = {{.i = 3}, {.i = 2}, {.i = 1}};
     (void)push_front(&l, &elems[0].e);
     (void)push_front(&l, &elems[1].e);
     (void)push_front(&l, &elems[2].e);
-    struct int_elem const *i = front(&l);
+    struct Int_node const *i = front(&l);
     assert(i->i == 1);
     pop_front(&l);
     i = front(&l);
@@ -849,9 +849,9 @@ main(void)
 Currently, many associative containers ask the user to store an element in their type. This means wrapping an element in a struct such as this type found in `samples/graph.c` for the priority queue.
 
 ```c
-struct cost
+struct Cost
 {
-    pq_elem pq_elem;
+    CCC_Priority_queue_node node;
     int cost;
     char name;
     char from;
@@ -861,33 +861,33 @@ struct cost
 The interface may then ask for a handle to this type for certain operations. For example, a priority queue has the following interface for pushing an element.
 
 ```c
-void *ccc_pq_push(ccc_priority_queue *pq, ccc_pq_elem *elem);
+void *CCC_priority_queue_push(CCC_Priority_queue *priority_queue, CCC_Priority_queue_node *elem);
 ```
 
 Non-Intrusive containers exist when a flat container can operate without such help from the user. The `flat_priority_queue` is a good example of this. When initializing we give it the following information.
 
 ```c
-#define ccc_fpq_init(mem_ptr, cmp_order, cmp_fn, alloc_fn, aux_data, capacity) \
-    ccc_impl_fpq_init(mem_ptr, cmp_order, cmp_fn, alloc_fn, aux_data, capacity)
+#define CCC_flat_priority_queue_initialize(mem_ptr, cmp_order, cmp_fn, alloc_fn, context_data, capacity) \
+    CCC_impl_flat_priority_queue_initialize(mem_ptr, cmp_order, cmp_fn, alloc_fn, context_data, capacity)
 
 /* For example: */
 
-ccc_flat_priority_queue fpq
-    = ccc_fpq_init((int[40]){}, int, CCC_LES, int_cmp, NULL, NULL, 40);
+CCC_Flat_priority_queue flat_priority_queue
+    = CCC_flat_priority_queue_initialize((int[40]){}, int, CCC_LES, int_cmp, NULL, NULL, 40);
 
 ```
 
-Here a small min priority queue of integers with a maximum capacity of 40 has been allocated on the stack with no allocation permission and no auxiliary data needed. As long as the flat priority queue knows the type upon initialization no intrusive elements are needed. We could have also initialized this container as empty if we provide an allocation function (see [allocation](#allocation) for more on allocation permission).
+Here a small min priority queue of integers with a maximum capacity of 40 has been allocated on the stack with no allocation permission and no context data needed. As long as the flat priority queue knows the type upon initialization no intrusive elements are needed. We could have also initialized this container as empty if we provide an allocation function (see [allocation](#allocation) for more on allocation permission).
 
 ```c
-ccc_flat_priority_queue fpq
-    = ccc_fpq_init(NULL, int, CCC_LES, int_cmp, std_alloc, NULL, 0);
+CCC_Flat_priority_queue flat_priority_queue
+    = CCC_flat_priority_queue_initialize(NULL, int, CCC_LES, int_cmp, std_alloc, NULL, 0);
 ```
 
 The interface then looks like this.
 
 ```c
-void *ccc_fpq_push(ccc_flat_priority_queue *fpq, void const *e, void *tmp);
+void *CCC_flat_priority_queue_push(CCC_Flat_priority_queue *flat_priority_queue, void const *e, void *tmp);
 ```
 
 The element `e` here is just a generic reference to whatever type the user stores in the container and `tmp` is a swap slot provided by the user.
@@ -897,39 +897,39 @@ The element `e` here is just a generic reference to whatever type the user store
 As was mentioned in the previous section, all containers can be forbidden from allocating memory. In the flat priority queue example we had this initialization.
 
 ```c
-ccc_flat_priority_queue fpq
-    = ccc_fpq_init((int[40]){}, int, CCC_LES, int_cmp, NULL, NULL, 40);
+CCC_Flat_priority_queue flat_priority_queue
+    = CCC_flat_priority_queue_initialize((int[40]){}, int, CCC_LES, int_cmp, NULL, NULL, 40);
 ```
 
-For flat containers, fixed capacity is straightforward. Once space runs out, further insertion functions will fail and report that failure in different ways depending on the function used. If other behavior occurs when space runs out, such as ring buffer behavior for the flat double ended queue, it will be documented in the header of that container.
+For flat containers, fixed capacity is straightforward. Once space runs out, further insertion functions will fail and report that failure in different ways depending on the function used. If other behavior occurs when space runs out, such as ring Buffer behavior for the flat double ended queue, it will be documented in the header of that container.
 
 For non-flat containers that can't assume they are stored contiguously in memory, the initialization looks like this when allocation is prohibited.
 
 ```c
-struct id_val
+struct Id_val
 {
-    ccc_dll_elem e;
+    CCC_Doubly_linked_list_node e;
     int id;
     int val;
 };
 
-ccc_doubly_linked_list dll
-    = ccc_dll_init(dll, struct id_val, e, val_cmp, NULL, NULL);
+CCC_Doubly_linked_list dll
+    = CCC_doubly_linked_list_initialize(dll, struct Id_val, e, val_cmp, NULL, NULL);
 ```
 
 All interface functions now expect the memory containing the intrusive elements to exist with the appropriate scope and lifetime for the programmer's needs. Consider the following classic problem with scoping in C.
 
 ```c
 /* !WARNING: THIS IS A BAD IDEA FOR DEMONSTRATION PURPOSES! */
-void push_three(ccc_doubly_linked_list *const dll)
+void push_three(CCC_Doubly_linked_list *const dll)
 {
-    struct id_val v0 = {};
-    struct id_val *v = push_back(dll, &v0.e);
+    struct Id_val v0 = {};
+    struct Id_val *v = push_back(dll, &v0.e);
     assert(v == &v0);
-    struct id_val v1 = {.id = 1, .val = 1};
+    struct Id_val v1 = {.id = 1, .val = 1};
     v = push_back(dll, &v1.e);
     assert(v == &v1);
-    struct id_val v2 = {.id = 2, .val = 2};
+    struct Id_val v2 = {.id = 2, .val = 2};
     v = push_back(dll, &v2.e);
     assert(v == &v2);
     /* WHOOPS! FUNCTION IS ABOUT TO RETURN! */
@@ -946,21 +946,21 @@ A flat hash map may be initialized at compile time if the maximum size is fixed 
 
 ```c
 #define FLAT_HASH_MAP_USING_NAMESPACE_CCC
-struct val
+struct Val
 {
     int key;
     int val;
 };
-fhm_declare_fixed_map(val_fixed_map, struct val, 64);
-static flat_hash_map static_fh = fhm_init(
-    &(static val_fixed_map){},
-    struct val,
+flat_hash_map_declare_fixed_map(Val_fixed_map, struct Val, 64);
+static flat_hash_map static_fh = flat_hash_map_initialize(
+    &(static Val_fixed_map){},
+    struct Val,
     key,
-    fhmap_int_to_u64,
-    fhmap_id_cmp,
+    flat_hash_map_int_to_u64,
+    flat_hash_map_id_cmp,
     NULL,
     NULL,
-    fhm_fixed_capacity(val_fixed_map)
+    flat_hash_map_fixed_capacity(val_fixed_map)
 );
 ```
 
@@ -968,29 +968,29 @@ A flat hash map can also be initialized in preparation for dynamic allocation at
 
 ```c
 #define FLAT_HASH_MAP_USING_NAMESPACE_CCC
-struct val
+struct Val
 {
     int key;
     int val;
 };
-static flat_hash_map static_fh = fhm_init(
+static flat_hash_map static_fh = flat_hash_map_initialize(
     NULL,
-    struct val,
+    struct Val,
     key,
-    fhmap_int_to_u64,
-    fhmap_id_cmp,
+    flat_hash_map_int_to_u64,
+    flat_hash_map_id_cmp,
     std_alloc,
     NULL,
     0
 );
 ```
 
-All other containers provide default initialization macros that can be used at compile time or runtime. For example, initializing a ring buffer at compile time is simple.
+All other containers provide default initialization macros that can be used at compile time or runtime. For example, initializing a ring Buffer at compile time is simple.
 
 ```c
 #define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC
-static flat_double_ended_queue ring_buffer
-    = fdeq_init((static int[4096]){}, int, NULL, NULL, 4096);
+static Flat_doubled_ended_queue ring_buffer
+    = flat_doubled_ended_queue_initialize((static int[4096]){}, int, NULL, NULL, 4096);
 ```
 
 In all the preceding examples initializing at compile time simplifies the code, eliminates the need for initialization functions, and ensures that all containers are ready to operate when execution begins. Using compound literal initialization also helps create better ownership of memory for each container, eliminating named references to a container's memory that could be accessed by mistake.
@@ -1002,40 +1002,40 @@ Traditionally, intrusive containers provide the following macro.
 
 ```c
 /** list_entry - get the struct for this entry
-@ptr the &struct list_elem pointer.
+@ptr the &struct list_node pointer.
 @type the type of the struct this is embedded in.
-@member	the name of the list_elem within the struct. */
+@member	the name of the list_node within the struct. */
 #define list_entry(ptr, type, member) \
 	container_of(ptr, type, member)
 
 /* A provided function by the container. */
-struct list_elem *list_front(list *l);
+struct list_node *list_front(list *l);
 ```
 
 Then, the user code looks like this.
 
 ```c
-struct id
+struct Id
 {
     int id;
-    struct list_elem id_elem;
+    struct List_node id_node;
 };
 /* Or when writing a comparison callback. */
 bool
-is_id_a_less(struct list_elem const *const a,
-             struct list_elem const *const b, void *const aux)
+is_id_a_less(struct List_node const *const a,
+             struct List_node const *const b, void *const context)
 {
-    struct id const *const a_ = list_entry(a, struct id, id_elem);
-    struct id const *const b_ = list_entry(b, struct id, id_elem);
+    struct Id const *const a_ = list_entry(a, struct Id, id_node);
+    struct Id const *const b_ = list_entry(b, struct Id, id_node);
     return a_->id < b_->id;
 }
 
 int
 main(void)
 {
-    static struct list id_list = LIST_INIT(id_list);
+    static struct List id_list = list_initialize(id_list);
     /* ...fill list... */
-    struct id *front = list_entry(list_front(&id_list), struct id, id_elem);
+    struct Id *front = list_entry(list_front(&id_list), struct Id, id_node);
 }
 ```
 
@@ -1044,29 +1044,29 @@ Here, it may seem manageable to use such a macro, but it is required at every lo
 Here is the same list example in the C Container Collection.
 
 ```c
-struct id
+struct Id
 {
     int id;
-    ccc_dll_elem id_elem;
+    CCC_Doubly_linked_list_node id_node;
 };
 /* Or when writing a comparison callback. */
-ccc_threeway_cmp
-id_cmp(ccc_any_type_cmp const cmp)
+CCC_Order
+id_cmp(CCC_Type_comparator_context const cmp)
 {
-    struct id const *const lhs = cmp.any_type_lhs;
-    struct id const *const rhs = cmp.any_type_rhs;
+    struct Id const *const lhs = cmp.type_lhs;
+    struct Id const *const rhs = cmp.type_rhs;
     return (lhs->id > rhs->id) - (lhs->id < rhs->id);
 }
 
 int
 main (void)
 {
-    static ccc_doubly_linked_list id_list
-        = ccc_dll_init(id_list, struct id, id_elem, id_cmp, NULL, NULL);
+    static CCC_Doubly_linked_list id_list
+        = CCC_doubly_linked_list_initialize(id_list, struct Id, id_node, id_cmp, NULL, NULL);
     /* ...fill list... */
-    struct id *front = ccc_dll_front(&id_list);
-    struct id *new_id = generate_id();
-    struct id *new_front = ccc_dll_push_front(&id_list, &new_id->id_elem);
+    struct Id *front = CCC_doubly_linked_list_front(&id_list);
+    struct Id *new_id = generate_id();
+    struct Id *new_front = CCC_doubly_linked_list_push_front(&id_list, &new_id->id_node);
 }
 ```
 
@@ -1076,12 +1076,12 @@ Internally the containers will remember the offsets of the provided elements wit
 
 Rust has solid interfaces for associative containers, largely due to the Entry Interface. In the C Container Collection the core of all associative containers is inspired by the Entry Interface (these versions are found in `ccc/traits.h` but specific names, behaviors, and parameters can be read in each container's header).
 
-- `ccc_entry(container_ptr, key_ptr...)` - Obtains an entry, a view into an Occupied or Vacant user type stored in the container.
-- `ccc_and_modify(entry_ptr, mod_fn)` - Modify an occupied entry with a callback.
-- `ccc_and_modify_aux(entry_ptr, mod_fn, aux_args)` - Modify an Occupied entry with a callback that requires auxiliary data.
-- `ccc_or_insert(entry_ptr, or_insert_args)` - Insert a default key value if Vacant or return the Occupied entry.
-- `ccc_insert_entry(entry_ptr, insert_entry_args)` - Invariantly insert a new key value, overwriting an Occupied entry if needed.
-- `ccc_remove_entry(entry_ptr)` - Remove an Occupied entry from the container or do nothing.
+- `CCC_Entry(container_ptr, key_ptr...)` - Obtains an entry, a view into an Occupied or Vacant user type stored in the container.
+- `CCC_and_modify(entry_ptr, mod_fn)` - Modify an occupied entry with a callback.
+- `CCC_and_modify_context(entry_ptr, mod_fn, context_args)` - Modify an Occupied entry with a callback that requires context data.
+- `CCC_or_insert(entry_ptr, or_insert_args)` - Insert a default key value if Vacant or return the Occupied entry.
+- `CCC_insert_entry(entry_ptr, insert_entry_args)` - Invariantly insert a new key value, overwriting an Occupied entry if needed.
+- `CCC_remove_entry(entry_ptr)` - Remove an Occupied entry from the container or do nothing.
 
 Other Rust Interface functions like `get_key_val`, `insert`, and `remove` are included and can provide information about previous values stored in the container.
 
@@ -1092,15 +1092,14 @@ Each container offers it's own C version of "closures" for the `and_modify_w` ma
 ```c
 typedef struct
 {
-    str_ofs ofs;
+    String_offset ofs;
     int cnt;
-    homap_elem e;
-} word;
-/* Increment a found word or insert a default count of 1. */
-ccc_handle_i const h =
-hom_or_insert_w(
-    hom_and_modify_w(handle_r(&hom, &ofs), word, { T->cnt++; }),
-    (word){.ofs = ofs, .cnt = 1}
+} Word;
+/* Increment a found Word or insert a default count of 1. */
+CCC_Handle_index const h =
+handle_ordered_map_or_insert_w(
+    handle_ordered_map_and_modify_w(handle_r(&hom, &key_ofs), Word, { T->cnt++; }),
+    (Word){.ofs = ofs, .cnt = 1}
 );
 ```
 
@@ -1108,8 +1107,8 @@ This is possible because of the details discussed in the previous section. Conta
 
 Some C++ associative container interfaces have also been adapted to the Entry Interface.
 
-- `ccc_try_insert(container_ptr, try_insert_args)` - Inserts a new element if none was present and reports if a previous entry existed.
-- `ccc_insert_or_assign(container_ptr, insert_or_assign_args)` - Inserts a new element invariantly and reports if a previous entry existed.
+- `CCC_try_insert(container_ptr, try_insert_args)` - Inserts a new element if none was present and reports if a previous entry existed.
+- `CCC_insert_or_assign(container_ptr, insert_or_assign_args)` - Inserts a new element invariantly and reports if a previous entry existed.
 
 Many other containers fall back to C++ style interfaces when it makes sense to do so.
 
@@ -1122,27 +1121,27 @@ Here is an example for generating a maze with Prim's algorithm in the `samples/m
 The functional version.
 
 ```c
-struct point const next = {
+struct Point const next = {
     .r = c->cell.r + dir_offsets[i].r,
     .c = c->cell.c + dir_offsets[i].c,
 };
-struct prim_cell new = (struct prim_cell){
+struct Prim_cell new = (struct Prim_cell){
     .cell = next,
     .cost = rand_range(0, 100),
 };
-struct prim_cell *const cell = or_insert(entry_r(&cost_map, &next), &new);
+struct Prim_cell *const cell = or_insert(entry_r(&cost_map, &next), &new);
 ```
 
 The lazily evaluated macro version.
 
 ```c
-struct point const next = {
+struct Point const next = {
     .r = c->cell.r + dir_offsets[i].r,
     .c = c->cell.c + dir_offsets[i].c,
 };
-struct prim_cell const *const cell = fhm_or_insert_w(
+struct Prim_cell const *const cell = flat_hash_map_or_insert_w(
     entry_r(&cost_map, &next),
-    (struct prim_cell){
+    (struct Prim_cell){
         .cell = next,
         .cost = rand_range(0, 100),
     }
@@ -1154,26 +1153,26 @@ The second example is slightly more convenient and efficient. The compound liter
 Here is another example illustrating the difference between the two.
 
 ```c
-struct val
+struct Val
 {
-    omap_elem e;
+    Ordered_map_node e;
     int key;
     int val;
 };
 
-ccc_entry e = om_try_insert(&om, &(struct val){.key = 3, .val = 1}.e);
+CCC_Entry e = om_try_insert(&om, &(struct Val){.key = 3, .val = 1}.e);
 ```
 
 The same insertion with the "with" variant.
 
 ```c
-static inline struct val
+static inline struct Val
 val(int val_arg)
 {
-    return (struct val){.val = val_args};
+    return (struct Val){.val = val_args};
 }
 
-ccc_entry *e = om_try_insert_w(&om, 3, val(1));
+CCC_Entry *e = om_try_insert_w(&om, 3, val(1));
 ```
 
 This second version illustrates a few key points. R-values are provided directly as keys and values, not references to keys and values. Also, a function call to generate a value to be inserted is completely acceptable; the function is only called if insertion is required. Finally, the functions `try_insert_w` and `insert_or_assign_w` will ensure the key in the newly inserted value matches the key searched, saving the user some typing and ensuring they don't make a mistake in this regard.
@@ -1182,7 +1181,7 @@ The lazy evaluation of the `_w` family of functions offer an expressive way to w
 
 ### Traits
 
-Traits, found in `ccc/traits.h`, offer a more succinct way to use shared functionality across containers. Instead of calling `ccc_fhm_entry` when trying to obtain an entry from a flat hash map, one can simply call `entry`. Traits utilize `_Generic` in C to choose the correct container function based on parameters provided.
+Traits, found in `ccc/traits.h`, offer a more succinct way to use shared functionality across containers. Instead of calling `CCC_flat_hash_map_entry` when trying to obtain an entry from a flat hash map, one can simply call `entry`. Traits utilize `_Generic` in C to choose the correct container function based on parameters provided.
 
 Traits cost nothing at runtime but may increase compilation resources and time, though I have not been able to definitively measure a human noticeable difference in this regard. For example, consider two ways to use the entry interface.
 
@@ -1192,10 +1191,10 @@ typedef struct
 {
     str_ofs ofs;
     int cnt;
-} word;
+} Word;
 /* ... Elsewhere generate offset ofs as key. */
-word default = {.ofs = ofs, .cnt = 1};
-ccc_handle_i const h =
+Word default = {.ofs = ofs, .cnt = 1};
+CCC_Handle_index const h =
     or_insert(and_modify(handle_r(&hom, &ofs), increment), &default);
 ```
 
@@ -1207,12 +1206,12 @@ typedef struct
 {
     str_ofs ofs;
     int cnt;
-} word;
+} Word;
 /* ... Elsewhere generate offset ofs as key. */
-word default = {.ofs = ofs, .cnt = 1};
-homap_handle *h = handle_r(&hom, &ofs);
+Word default = {.ofs = ofs, .cnt = 1};
+handle_ordered_map_handle *h = handle_r(&hom, &ofs);
 h = and_modify(h, increment)
-word *w = hom_at(&hom, or_insert(h, &default));
+Word *w = handle_ordered_map_at(&hom, or_insert(h, &default));
 ```
 
 Using the first method in your code may expand the code evaluated in different `_Generic` cases greatly increasing compilation memory use and time (I have not yet measured the validity of these concerns). Such nesting concerns are not relevant if the container specific versions of these functions are used. Traits are completely opt-in by including the `traits.h` header.
@@ -1222,43 +1221,49 @@ Using the first method in your code may expand the code evaluated in different `
 When allocation is required, this collection offers the following interface. The user provides this function to containers upon initialization.
 
 ```c
-typedef void *ccc_any_alloc_fn(void *ptr, size_t size, void *aux);
+typedef struct
+{
+    void *input;
+    size_t bytes;
+    void *context;
+} CCC_Allocator_context;
+typedef void *CCC_Allocator(CCC_Allocator_context);
 ```
 
-An allocation function implements the following behavior, where ptr is pointer to memory, size is number of bytes to allocate, and aux is a reference to any supplementary information required for allocation, deallocation, or reallocation. The aux parameter is passed to a container upon its initialization and the programmer may choose how to best utilize this reference (read on for more on aux).
+An allocation function implements the following behavior, where `input` is pointer to memory, `bytes` is number of bytes to allocate, and `context` is a reference to any supplementary information required for allocation, deallocation, or reallocation. The `context` parameter is passed to a container upon its initialization and the programmer may choose how to best utilize this reference (read on for more on `context`).
 
-- If NULL is provided with a size of 0, NULL is returned.
-- If NULL is provided with a non-zero size, new memory is allocated/returned.
-- If ptr is non-NULL it has been previously allocated by the alloc function.
-- If ptr is non-NULL with non-zero size, ptr is resized to at least size
-  size. The pointer returned is NULL if resizing fails. Upon success, the
+- If NULL is provided with a `bytes` of 0, NULL is returned.
+- If NULL is provided with a non-zero `bytes`, new memory is allocated/returned.
+- If `input` is non-NULL it has been previously allocated by the alloc function.
+- If `input` is non-NULL with non-zero `bytes`, `input` is resized to at least `bytes`
+  bytes. The pointer returned is NULL if resizing fails. Upon success, the
   pointer returned might not be equal to the pointer provided.
-- If ptr is non-NULL and size is 0, ptr is freed and NULL is returned.
+- If `input` is non-NULL and `bytes` is 0, `input` is freed and NULL is returned.
 
-One may be tempted to use realloc to check all of these boxes but realloc is implementation defined on some of these points. The aux parameter also discourages users from providing realloc. For example, one solution using the standard library allocator might be implemented as follows (aux is not needed):
+One may be tempted to use realloc to check all of these boxes but realloc is implementation defined on some of these points. The `context` parameter also discourages users from providing realloc. For example, one solution using the standard library allocator might be implemented as follows (`context` is not needed):
 
 ```c
 void *
-std_alloc(void *const ptr, size_t const size, void *)
+std_allocator(CCC_Allocator_context const context)
 {
-    if (!ptr && !size)
+    if (!context.input && !context.bytes)
     {
         return NULL;
     }
-    if (!ptr)
+    if (!context.input)
     {
-        return malloc(size);
+        return malloc(context.bytes);
     }
-    if (!size)
+    if (!context.bytes)
     {
-        free(ptr);
+        free(context.input);
         return NULL;
     }
-    return realloc(ptr, size);
+    return realloc(context.input, context.bytes);
 }
 ```
 
-However, the above example is only useful if the standard library allocator is used. Any allocator that implements the required behavior is sufficient. For ideas of how to utilize the aux parameter, see the sample programs. Using custom arena allocators or container compositions are cases when aux is helpful in taming lifetimes and simplifying allocation.
+However, the above example is only useful if the standard library allocator is used. Any allocator that implements the required behavior is sufficient. For ideas of how to utilize the `context` parameter, see the sample programs. Using custom arena allocators or container compositions are cases when `context` is helpful in taming lifetimes and simplifying allocation.
 
 ### Constructors
 
@@ -1267,7 +1272,7 @@ Another concern for the programmer related to allocation may be constructors and
 Consider a constructor. If the container is allowed to allocate, and the user wants to insert a new element, they may see an interface like this (pseudocode as all containers are slightly different).
 
 ```c
-void *insert_or_assign(container *c, container_elem *e);
+void *insert_or_assign(Container *c, Container_node *e);
 ```
 
 Because the user has wrapped the intrusive container element in their type, the entire user type will be written to the new allocation. All interfaces can also confirm when insertion succeeds if global state needs to be set in this case. So, if some action beyond setting values needs to be performed, there are multiple opportunities to do so.
@@ -1279,13 +1284,13 @@ For destructors, the argument is similar but the container does offer more help.
 The clear function works for pointer stable containers and flat containers.
 
 ```c
-result clear(container *c, destructor_fn *fn);
+Result clear(Container *c, Destructor *fn);
 ```
 
 The clear and free function works for flat containers.
 
 ```c
-result clear_and_free(container *c, destructor_fn *fn);
+Result clear_and_free(Container *c, Destructor *fn);
 ```
 
 The above functions free the resources of the container. Because there is no way to access each element before it is freed when this function is called, a destructor callback can be passed to operate on each element before deallocation.
@@ -1332,7 +1337,7 @@ make rtest
 
 - Why are non-allocating containers needed? They are quite common in Operating Systems development. Kernel code may manage a process or thread that is part of many OS subsystems: the CPU scheduler, the virtual memory paging system, the child and parent process spawn and wait mechanisms. All of these systems require that the process use or be a part of some data structures. It is easiest to separate participation in these data structures from memory allocation. The process holds handles to intrusive elements to participate in these data structures because the thread/task/process will live until it has finished executing meaning its lifetime is greater than or equal to the longest lifetime data structure of which it is a part. Embedded developers also often seem interested in non-allocating containers when an entire program's memory use is known before execution begins. However, this library explores if non-allocating containers can have more general applications for creative C programming.
 - Why is initialization so ugly? Yes, this is a valid concern. Upfront complexity helps eliminate the need for a `container_of` macro for the user see the [no container_of macros](#no-container-of-macros) section for more. Later code becomes much cleaner and simpler.
-- Why callbacks? Freedom for more varied comparisons and allocations. Learn to love auxiliary data. Also you have the chance to craft the optimal function for your application; for example writing a perfectly tailored hash function for your data set.
+- Why callbacks? Freedom for more varied comparisons and allocations. Learn to love context data. Also you have the chance to craft the optimal function for your application; for example writing a perfectly tailored hash function for your data set.
 - Why not header only? Readability, maintainability, and update ability, for changing implementations in the source files. If the user wants to explore the implementation everything should be easily understandable. This can also be helpful if the user wants to fork and change a data structure to fit their needs. Smaller object size and easier modular compilation is also nice.
 - Why not opaque pointers and true implementation hiding? This is not possible in C if the user is in charge of memory. The container types must be complete if the user wishes to store them on the stack or data segment. I try to present a clean interface.
 - Why handle and flat maps? Mostly experimenting. A flat hash map offers the ability to pack user data and fingerprint meta data in separate contiguous arrays within the same allocation. The handle variants of containers offer the same benefit along with handle stability. Many also follow the example of Zig with its Struct of Arrays approach to many data structures. Struct of Array (SOA) style data structures focus on space optimizations due to perfect alignment of user types, container metadata, and any supplementary data in separate arrays but within the same allocation.

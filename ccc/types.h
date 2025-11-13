@@ -196,7 +196,7 @@ This type helps the user define the comparison callback function, if the
 container takes a standard element comparison function, and helps avoid
 swappable argument errors. Any type LHS is considered the left hand side and
 any type RHS is the right hand side when considering three-way comparison
-return values. Aux data is a reference to any context data provided upon
+return values. Context data is a reference to any context data provided upon
 container initialization. */
 typedef struct
 {
@@ -263,18 +263,24 @@ typedef struct
     void *context;
 } CCC_Key_context;
 
+/** @brief A bundle of arguments to pass to the user-implemented Allocator
+function interface. This ensures clarity in inputs and expected outputs to
+an allocator function the user wishes to use for managing containers.
+Additional context can be provided for more complex allocation schemes. */
 typedef struct
 {
+    /** The input to the allocation function. NULL or previously allocated. */
     void *input;
+    /** The bytes being requested from the allocator. 0 is a free request. */
     size_t bytes;
+    /** Additional state to pass to the allocator to help manage memory. */
     void *context;
-
 } CCC_Allocator_context;
 
 /** @brief An allocation function at the core of all containers.
 
 An allocation function implements the following behavior, when it has been
-passed an allocator context. Aux is passed to a container upon its
+passed an allocator context. Context is passed to a container upon its
 initialization and the programmer may choose how to best utilize this reference
 (more on context later).
 
@@ -324,7 +330,7 @@ typedef void *CCC_Allocator(CCC_Allocator_context);
 
 A three-way comparison return value is expected and the two containers being
 compared are guaranteed to be non-NULL and pointing to the base of the user type
-stored in the container. Aux may be NULL if no context is provided on
+stored in the container. Context may be NULL if no context is provided on
 initialization. */
 typedef CCC_Order CCC_Type_comparator(CCC_Type_comparator_context);
 
@@ -332,7 +338,7 @@ typedef CCC_Order CCC_Type_comparator(CCC_Type_comparator_context);
 
 A reference to the container type and any context data provided on
 initialization is available. The container pointer points to the base of the
-user type and is not NULL. Aux may be NULL if no context is provided on
+user type and is not NULL. Context may be NULL if no context is provided on
 initialization. An update function is used when a container Interface exposes
 functions to modify the key or value used to determine sorted order of elements
 in the container. */
@@ -342,7 +348,7 @@ typedef void CCC_Type_updater(CCC_Type_context);
 
 A reference to the container type and any context data provided on
 initialization is available. The container pointer points to the base of the
-user type and is not NULL. Aux may be NULL if no context is provided on
+user type and is not NULL. Context may be NULL if no context is provided on
 initialization. A destructor function is used to act on each element of the
 container when it is being emptied and destroyed. The function will be called on
 each type after it removed from the container and before it is freed by the
