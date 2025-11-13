@@ -78,7 +78,8 @@ Or finally, just define it before including the flat hash map header.
 ```
 
 To shorten names in the interface, define the following preprocessor directive
-at the top of your file.
+at the top of your file. The `CCC_` prefix may then be omitted for only this
+container.
 
 ```
 #define FLAT_HASH_MAP_USING_NAMESPACE_CCC
