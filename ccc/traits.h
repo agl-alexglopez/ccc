@@ -57,8 +57,8 @@ See container documentation for specific behavior. */
 @return an entry depending on container specific context.
 
 See container documentation for specific behavior. */
-#define CCC_swap_entry_r(container_pointer, swap_args...)                      \
-    CCC_private_swap_entry_r(container_pointer, swap_args)
+#define CCC_swap_entry_wrap(container_pointer, swap_args...)                   \
+    CCC_private_swap_entry_wrap(container_pointer, swap_args)
 
 /** @brief Insert an element and obtain the old value if Occupied.
 @param[in] container_pointer a pointer to the container.
@@ -75,8 +75,8 @@ See container documentation for specific behavior. */
 @return a handle depending on container specific context.
 
 See container documentation for specific behavior. */
-#define CCC_swap_handle_r(container_pointer, swap_args...)                     \
-    CCC_private_swap_handle_r(container_pointer, swap_args)
+#define CCC_swap_handle_wrap(container_pointer, swap_args...)                  \
+    CCC_private_swap_handle_wrap(container_pointer, swap_args)
 
 /** @brief Insert an element if the entry is Vacant.
 @param[in] container_pointer a pointer to the container.
@@ -93,8 +93,8 @@ See container documentation for specific behavior. */
 @return an entry depending on container specific context.
 
 See container documentation for specific behavior. */
-#define CCC_try_insert_r(container_pointer, try_insert_args...)                \
-    CCC_private_try_insert_r(container_pointer, try_insert_args)
+#define CCC_try_insert_wrap(container_pointer, try_insert_args...)             \
+    CCC_private_try_insert_wrap(container_pointer, try_insert_args)
 
 /** @brief Insert an element or overwrite the Occupied entry.
 @param[in] container_pointer a pointer to the container.
@@ -111,8 +111,8 @@ See container documentation for specific behavior. */
 @return an entry depending on container specific context.
 
 See container documentation for specific behavior. */
-#define CCC_insert_or_assign_r(container_pointer, insert_or_assign_args...)    \
-    CCC_private_insert_or_assign_r(container_pointer, insert_or_assign_args)
+#define CCC_insert_or_assign_wrap(container_pointer, insert_or_assign_args...) \
+    CCC_private_insert_or_assign_wrap(container_pointer, insert_or_assign_args)
 
 /** @brief Remove an element and retain access to its value.
 @param[in] container_pointer a pointer to the container.
@@ -129,8 +129,8 @@ See container documentation for specific behavior. */
 @return an entry depending on container specific context.
 
 See container documentation for specific behavior. */
-#define CCC_remove_r(container_pointer, remove_args...)                        \
-    CCC_private_remove_r(container_pointer, remove_args)
+#define CCC_remove_wrap(container_pointer, remove_args...)                     \
+    CCC_private_remove_wrap(container_pointer, remove_args)
 
 /** @brief Obtain a container specific entry for the Entry Interface.
 @param[in] container_pointer a pointer to the container.
@@ -157,8 +157,8 @@ See container documentation for specific behavior. */
 context.
 
 See container documentation for specific behavior. */
-#define CCC_entry_r(container_pointer, key_pointer...)                         \
-    CCC_private_entry_r(container_pointer, key_pointer)
+#define CCC_entry_wrap(container_pointer, key_pointer...)                      \
+    CCC_private_entry_wrap(container_pointer, key_pointer)
 
 /** @brief Obtain a container specific handle for the handle Interface.
 @param[in] container_pointer a pointer to the container.
@@ -167,8 +167,8 @@ See container documentation for specific behavior. */
 context.
 
 See container documentation for specific behavior. */
-#define CCC_handle_r(container_pointer, key_pointer...)                        \
-    CCC_private_handle_r(container_pointer, key_pointer)
+#define CCC_handle_wrap(container_pointer, key_pointer...)                     \
+    CCC_private_handle_wrap(container_pointer, key_pointer)
 
 /** @brief Modify an entry if Occupied.
 @param[in] entry_pointer a pointer to the container.
@@ -228,8 +228,8 @@ See container documentation for specific behavior. */
 @return an entry depending on container specific context.
 
 See container documentation for specific behavior. */
-#define CCC_remove_entry_r(entry_pointer)                                      \
-    CCC_private_remove_entry_r(entry_pointer)
+#define CCC_remove_entry_wrap(entry_pointer)                                   \
+    CCC_private_remove_entry_wrap(entry_pointer)
 
 /** @brief Remove the element if the handle is Occupied.
 @param[in] handle_pointer a pointer to the container.
@@ -244,8 +244,8 @@ See container documentation for specific behavior. */
 @return an handle depending on container specific context.
 
 See container documentation for specific behavior. */
-#define CCC_remove_handle_r(handle_pointer)                                    \
-    CCC_private_remove_handle_r(handle_pointer)
+#define CCC_remove_handle_wrap(handle_pointer)                                 \
+    CCC_private_remove_handle_wrap(handle_pointer)
 
 /** @brief Unwrap user type in entry.
 @param[in] entry_pointer a pointer to the container.
@@ -280,8 +280,8 @@ Test membership or obtain references to stored user types directly. */
 @return a reference to the stored user type or NULL of absent.
 
 See container documentation for specific behavior. */
-#define CCC_get_key_val(container_pointer, key_pointer...)                     \
-    CCC_private_get_key_val(container_pointer, key_pointer)
+#define CCC_get_key_value(container_pointer, key_pointer...)                   \
+    CCC_private_get_key_value(container_pointer, key_pointer)
 
 /** @brief Check for membership of the key.
 @param[in] container_pointer a pointer to the container.
@@ -508,8 +508,8 @@ See container documentation for specific behavior. */
 @return a reference to the range.
 
 See container documentation for specific behavior. */
-#define CCC_equal_range_r(container_pointer, range_args...)                    \
-    CCC_private_equal_range_r(container_pointer, range_args)
+#define CCC_equal_range_wrap(container_pointer, range_args...)                 \
+    CCC_private_equal_range_wrap(container_pointer, range_args)
 
 /** @brief Obtain a range_reverse of values from a container.
 @param[in] container_pointer a pointer to the container.
@@ -526,8 +526,8 @@ See container documentation for specific behavior. */
 @return a reference to the range_reverse.
 
 See container documentation for specific behavior. */
-#define CCC_equal_range_reverse_r(container_pointer, range_reverse_args...)    \
-    CCC_private_equal_range_reverse_r(container_pointer, range_reverse_args)
+#define CCC_equal_range_reverse_wrap(container_pointer, range_reverse_args...) \
+    CCC_private_equal_range_reverse_wrap(container_pointer, range_reverse_args)
 
 /**@}*/
 
@@ -631,23 +631,23 @@ See container documentation for specific behavior. */
 /** Define this preprocessor directive to shorten trait names. */
 #ifdef TRAITS_USING_NAMESPACE_CCC
 #    define swap_entry(args...) CCC_swap_entry(args)
-#    define swap_entry_r(args...) CCC_swap_entry_r(args)
+#    define swap_entry_wrap(args...) CCC_swap_entry_wrap(args)
 #    define swap_handle(args...) CCC_swap_handle(args)
-#    define swap_handle_r(args...) CCC_swap_handle_r(args)
+#    define swap_handle_wrap(args...) CCC_swap_handle_wrap(args)
 #    define try_insert(args...) CCC_try_insert(args)
 #    define insert_or_assign(args...) CCC_insert_or_assign(args)
-#    define insert_or_assign_r(args...) CCC_insert_or_assign_r(args)
-#    define try_insert_r(args...) CCC_try_insert_r(args)
+#    define insert_or_assign_wrap(args...) CCC_insert_or_assign_wrap(args)
+#    define try_insert_wrap(args...) CCC_try_insert_wrap(args)
 #    define remove(args...) CCC_remove(args)
-#    define remove_r(args...) CCC_remove_r(args)
+#    define remove_wrap(args...) CCC_remove_wrap(args)
 #    define remove_entry(args...) CCC_remove_entry(args)
-#    define remove_entry_r(args...) CCC_remove_entry_r(args)
+#    define remove_entry_wrap(args...) CCC_remove_entry_wrap(args)
 #    define remove_handle(args...) CCC_remove_handle(args)
-#    define remove_handle_r(args...) CCC_remove_handle_r(args)
+#    define remove_handle_wrap(args...) CCC_remove_handle_wrap(args)
 #    define entry(args...) CCC_entry(args)
-#    define entry_r(args...) CCC_entry_r(args)
+#    define entry_wrap(args...) CCC_entry_wrap(args)
 #    define handle(args...) CCC_handle(args)
-#    define handle_r(args...) CCC_handle_r(args)
+#    define handle_wrap(args...) CCC_handle_wrap(args)
 #    define or_insert(args...) CCC_or_insert(args)
 #    define insert_entry(args...) CCC_insert_entry(args)
 #    define insert_handle(args...) CCC_insert_handle(args)
@@ -672,8 +672,8 @@ See container documentation for specific behavior. */
 #    define extract(args...) CCC_extract(args)
 #    define extract_range(args...) CCC_extract_range(args)
 
-#    define get_key_val(args...) CCC_get_key_val(args)
-#    define get_mut(args...) CCC_get_key_val_mut(args)
+#    define get_key_value(args...) CCC_get_key_value(args)
+#    define get_mut(args...) CCC_get_key_value_mut(args)
 #    define contains(args...) CCC_contains(args)
 
 #    define begin(args...) CCC_begin(args)
@@ -685,8 +685,8 @@ See container documentation for specific behavior. */
 
 #    define equal_range(args...) CCC_equal_range(args)
 #    define equal_range_reverse(args...) CCC_equal_range_reverse(args)
-#    define equal_range_r(args...) CCC_equal_range_r(args)
-#    define equal_range_reverse_r(args...) CCC_equal_range_reverse_r(args)
+#    define equal_range_wrap(args...) CCC_equal_range_wrap(args)
+#    define equal_range_reverse_wrap(args...) CCC_equal_range_reverse_wrap(args)
 #    define splice(args...) CCC_splice(args)
 #    define splice_range(args...) CCC_splice_range(args)
 

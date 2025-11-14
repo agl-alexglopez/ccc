@@ -34,10 +34,10 @@ check_static_begin(flat_hash_map_test_erase)
     ent = CCC_remove(&fh, &query);
     check(occupied(&ent), false);
     check(count(&fh).count, 0);
-    CCC_flat_hash_map_insert_entry_w(entry_r(&fh, &(int){137}),
-                                     (struct Val){.key = 137, .val = 99});
+    CCC_flat_hash_map_insert_entry_with(entry_wrap(&fh, &(int){137}),
+                                        (struct Val){.key = 137, .val = 99});
     check(count(&fh).count, 1);
-    check(occupied(remove_entry_r(entry_r(&fh, &(int){137}))), true);
+    check(occupied(remove_entry_wrap(entry_wrap(&fh, &(int){137}))), true);
     check(count(&fh).count, 0);
     check_end();
 }
@@ -52,7 +52,7 @@ check_static_begin(flat_hash_map_test_shuffle_insert_erase)
     for (int i = 0, shuffle = larger_prime % to_insert; i < to_insert;
          ++i, shuffle = (shuffle + larger_prime) % to_insert)
     {
-        struct Val *v = unwrap(flat_hash_map_insert_or_assign_w(
+        struct Val *v = unwrap(flat_hash_map_insert_or_assign_with(
             &h, shuffle, (struct Val){.val = i}));
         check(v != NULL, true);
         check(v->key, shuffle);
@@ -68,13 +68,13 @@ check_static_begin(flat_hash_map_test_shuffle_insert_erase)
         if (i % 2)
         {
             struct Val const *const old_val
-                = unwrap(remove_r(&h, &(struct Val){.key = i}));
+                = unwrap(remove_wrap(&h, &(struct Val){.key = i}));
             check(old_val != NULL, true);
             check(old_val->key, i);
         }
         else
         {
-            CCC_Entry removed = remove_entry(entry_r(&h, &i));
+            CCC_Entry removed = remove_entry(entry_wrap(&h, &i));
             check(occupied(&removed), true);
         }
         --cur_size;
@@ -99,8 +99,8 @@ check_static_begin(flat_hash_map_test_shuffle_erase_fixed)
     do
     {
         int const cur = to_insert[i];
-        struct Val const *const v = unwrap(
-            flat_hash_map_insert_or_assign_w(&h, cur, (struct Val){.val = i}));
+        struct Val const *const v = unwrap(flat_hash_map_insert_or_assign_with(
+            &h, cur, (struct Val){.val = i}));
         if (!v)
         {
             break;
@@ -119,7 +119,7 @@ check_static_begin(flat_hash_map_test_shuffle_erase_fixed)
         int const cur = to_insert[i];
         CCC_Tribool const check = contains(&h, &cur);
         check(check, true);
-        CCC_Entry removed = remove_entry(entry_r(&h, &cur));
+        CCC_Entry removed = remove_entry(entry_wrap(&h, &cur));
         check(occupied(&removed), true);
         check(validate(&h), true);
     }
@@ -127,8 +127,8 @@ check_static_begin(flat_hash_map_test_shuffle_erase_fixed)
     for (; i < (int)(full_size / 2); ++i)
     {
         int const cur = to_insert[i];
-        CCC_Entry const *const e
-            = flat_hash_map_insert_or_assign_w(&h, cur, (struct Val){.val = i});
+        CCC_Entry const *const e = flat_hash_map_insert_or_assign_with(
+            &h, cur, (struct Val){.val = i});
         check(occupied(e), false);
         check(validate(&h), true);
     }
@@ -142,13 +142,13 @@ check_static_begin(flat_hash_map_test_shuffle_erase_fixed)
         if (i % 2)
         {
             struct Val const *const old_val
-                = unwrap(remove_r(&h, &(struct Val){.key = cur}));
+                = unwrap(remove_wrap(&h, &(struct Val){.key = cur}));
             check(old_val != NULL, true);
             check(old_val->key, to_insert[i]);
         }
         else
         {
-            CCC_Entry removed = remove_entry(entry_r(&h, &cur));
+            CCC_Entry removed = remove_entry(entry_wrap(&h, &cur));
             check(occupied(&removed), true);
         }
         --cur_size;
@@ -181,8 +181,8 @@ check_static_begin(flat_hash_map_test_shuffle_erase_reserved)
     do
     {
         int const cur = to_insert[i];
-        struct Val const *const v = unwrap(
-            flat_hash_map_insert_or_assign_w(&h, cur, (struct Val){.val = i}));
+        struct Val const *const v = unwrap(flat_hash_map_insert_or_assign_with(
+            &h, cur, (struct Val){.val = i}));
         if (!v)
         {
             break;
@@ -201,7 +201,7 @@ check_static_begin(flat_hash_map_test_shuffle_erase_reserved)
         int const cur = to_insert[i];
         CCC_Tribool const check = contains(&h, &cur);
         check(check, true);
-        CCC_Entry const removed = remove_entry(entry_r(&h, &cur));
+        CCC_Entry const removed = remove_entry(entry_wrap(&h, &cur));
         check(occupied(&removed), true);
         check(validate(&h), true);
     }
@@ -209,8 +209,8 @@ check_static_begin(flat_hash_map_test_shuffle_erase_reserved)
     for (; i < (int)(full_size / 2); ++i)
     {
         int const cur = to_insert[i];
-        CCC_Entry const *const e
-            = flat_hash_map_insert_or_assign_w(&h, cur, (struct Val){.val = i});
+        CCC_Entry const *const e = flat_hash_map_insert_or_assign_with(
+            &h, cur, (struct Val){.val = i});
         check(occupied(e), false);
         check(validate(&h), true);
     }
@@ -224,13 +224,13 @@ check_static_begin(flat_hash_map_test_shuffle_erase_reserved)
         if (i % 2)
         {
             struct Val const *const old_val
-                = unwrap(remove_r(&h, &(struct Val){.key = cur}));
+                = unwrap(remove_wrap(&h, &(struct Val){.key = cur}));
             check(old_val != NULL, true);
             check(old_val->key, to_insert[i]);
         }
         else
         {
-            CCC_Entry removed = remove_entry(entry_r(&h, &cur));
+            CCC_Entry removed = remove_entry(entry_wrap(&h, &cur));
             check(occupied(&removed), true);
         }
         --cur_size;
@@ -255,7 +255,7 @@ check_static_begin(flat_hash_map_test_shuffle_erase_dynamic)
     for (; inserted < 1024; ++inserted)
     {
         int const cur = to_insert[inserted];
-        struct Val const *const v = unwrap(flat_hash_map_insert_or_assign_w(
+        struct Val const *const v = unwrap(flat_hash_map_insert_or_assign_with(
             &h, cur, (struct Val){.val = inserted}));
         check(v->key, to_insert[inserted]);
         check(v->val, inserted);
@@ -269,7 +269,7 @@ check_static_begin(flat_hash_map_test_shuffle_erase_dynamic)
         int const cur = to_insert[i];
         CCC_Tribool const check = contains(&h, &cur);
         check(check, true);
-        CCC_Entry removed = remove_entry(entry_r(&h, &cur));
+        CCC_Entry removed = remove_entry(entry_wrap(&h, &cur));
         check(occupied(&removed), true);
         check(validate(&h), true);
     }
@@ -277,8 +277,8 @@ check_static_begin(flat_hash_map_test_shuffle_erase_dynamic)
     for (; i < (int)(full_size / 2); ++i)
     {
         int const cur = to_insert[i];
-        CCC_Entry const *const e
-            = flat_hash_map_insert_or_assign_w(&h, cur, (struct Val){.val = i});
+        CCC_Entry const *const e = flat_hash_map_insert_or_assign_with(
+            &h, cur, (struct Val){.val = i});
         check(occupied(e), false);
         check(validate(&h), true);
     }
@@ -292,13 +292,13 @@ check_static_begin(flat_hash_map_test_shuffle_erase_dynamic)
         if (i % 2)
         {
             struct Val const *const old_val
-                = unwrap(remove_r(&h, &(struct Val){.key = cur}));
+                = unwrap(remove_wrap(&h, &(struct Val){.key = cur}));
             check(old_val != NULL, true);
             check(old_val->key, to_insert[i]);
         }
         else
         {
-            CCC_Entry removed = remove_entry(entry_r(&h, &cur));
+            CCC_Entry removed = remove_entry(entry_wrap(&h, &cur));
             check(occupied(&removed), true);
         }
         --cur_size;

@@ -478,7 +478,7 @@ found_dst(struct Graph *const graph, struct Vertex *const src)
                 }
             }
             if (!is_path_cell(next_cell)
-                && !occupied(try_insert_r(&parent_map, &push)))
+                && !occupied(try_insert_wrap(&parent_map, &push)))
             {
                 struct Point const *const n = push_back(&bfs, &next);
                 check(n);
@@ -500,7 +500,7 @@ edge_construct(struct Graph *const g, Flat_hash_map *const parent_map,
 {
     Cell const edge_id = make_edge(src->name, dst->name);
     struct Point cur = dst->pos;
-    struct Path_backtrack_cell const *c = get_key_val(parent_map, &cur);
+    struct Path_backtrack_cell const *c = get_key_value(parent_map, &cur);
     check(c);
     struct Edge edge = {
         .n = {
@@ -511,7 +511,7 @@ edge_construct(struct Graph *const g, Flat_hash_map *const parent_map,
     };
     while (c->parent.r > 0)
     {
-        c = get_key_val(parent_map, &c->parent);
+        c = get_key_value(parent_map, &c->parent);
         check(c, printf("Cannot find cell parent to rebuild path.\n"););
         ++edge.n.cost;
         *grid_at_mut(g, c->current.r, c->current.c) |= edge_id;
@@ -798,11 +798,11 @@ dijkstra_shortest_path(struct Graph *const graph, char const src,
             {
                 /* Build the map with the appropriate best candidate parent. */
                 struct Cost const *const relax
-                    = priority_queue_decrease_w(&costs, v,
-                                                {
-                                                    T->cost = alt;
-                                                    T->from = u->name;
-                                                });
+                    = priority_queue_decrease_with(&costs, v,
+                                                   {
+                                                       T->cost = alt;
+                                                       T->from = u->name;
+                                                   });
                 check(relax == v);
                 paint_edge(graph, u->name, v->name, MAG);
                 nanosleep(&graph->speed, NULL);

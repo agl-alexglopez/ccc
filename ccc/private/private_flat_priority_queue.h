@@ -124,7 +124,7 @@ CCC_private_flat_priority_queue_update_fixup(struct CCC_Flat_priority_queue *,
 
 /** @internal Only one update fn is needed because there is no advantage to
    updates if it is known they are min/max increase/decrease etc. */
-#define CCC_private_flat_priority_queue_update_w(                              \
+#define CCC_private_flat_priority_queue_update_with(                           \
     flat_priority_queue_pointer, T_pointer, update_closure_over_T...)          \
     (__extension__({                                                           \
         struct CCC_Flat_priority_queue *const private_flat_priority_queue      \
@@ -141,15 +141,15 @@ CCC_private_flat_priority_queue_update_fixup(struct CCC_Flat_priority_queue *,
     }))
 
 /** @internal */
-#define CCC_private_flat_priority_queue_increase_w(                            \
+#define CCC_private_flat_priority_queue_increase_with(                         \
     flat_priority_queue_pointer, T_pointer, increase_closure_over_T...)        \
-    CCC_private_flat_priority_queue_update_w(                                  \
+    CCC_private_flat_priority_queue_update_with(                               \
         flat_priority_queue_pointer, T_pointer, increase_closure_over_T)
 
 /** @internal */
-#define CCC_private_flat_priority_queue_decrease_w(                            \
+#define CCC_private_flat_priority_queue_decrease_with(                         \
     flat_priority_queue_pointer, T_pointer, decrease_closure_over_T...)        \
-    CCC_private_flat_priority_queue_update_w(                                  \
+    CCC_private_flat_priority_queue_update_with(                               \
         flat_priority_queue_pointer, T_pointer, decrease_closure_over_T)
 
 /* NOLINTEND(readability-identifier-naming) */

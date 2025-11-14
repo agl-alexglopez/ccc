@@ -435,8 +435,8 @@ CCC_flat_hash_map_contains(CCC_Flat_hash_map const *const map,
 }
 
 void *
-CCC_flat_hash_map_get_key_val(CCC_Flat_hash_map const *const map,
-                              void const *const key)
+CCC_flat_hash_map_get_key_value(CCC_Flat_hash_map const *const map,
+                                void const *const key)
 {
     if (unlikely(!map || !key || is_uninitialized(map) || !map->count))
     {

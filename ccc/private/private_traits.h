@@ -41,8 +41,8 @@ limitations under the License.
         CCC_Bounded_map *: CCC_bounded_map_swap_entry)((container_pointer),    \
                                                        swap_args)
 
-#define CCC_private_swap_entry_r(container_pointer,                            \
-                                 key_val_container_handle_pointer...)          \
+#define CCC_private_swap_entry_wrap(container_pointer,                         \
+                                    key_val_container_handle_pointer...)       \
     &(CCC_Entry)                                                               \
     {                                                                          \
         CCC_private_swap_entry(container_pointer,                              \
@@ -56,8 +56,8 @@ limitations under the License.
         CCC_Handle_bounded_map *: CCC_handle_bounded_map_swap_handle)(         \
         (container_pointer), swap_args)
 
-#define CCC_private_swap_handle_r(container_pointer,                           \
-                                  key_val_container_handle_pointer...)         \
+#define CCC_private_swap_handle_wrap(container_pointer,                        \
+                                     key_val_container_handle_pointer...)      \
     &(CCC_Handle)                                                              \
     {                                                                          \
         CCC_private_swap_handle(container_pointer,                             \
@@ -74,7 +74,7 @@ limitations under the License.
         CCC_Bounded_map *: CCC_bounded_map_try_insert)((container_pointer),    \
                                                        try_insert_args)
 
-#define CCC_private_try_insert_r(container_pointer, try_insert_args...)        \
+#define CCC_private_try_insert_wrap(container_pointer, try_insert_args...)     \
     _Generic((container_pointer),                                              \
         CCC_Handle_adaptive_map *: &(                                          \
                  CCC_Handle){CCC_handle_adaptive_map_try_insert(               \
@@ -112,8 +112,8 @@ limitations under the License.
         CCC_Bounded_map *: CCC_bounded_map_insert_or_assign)(                  \
         (container_pointer), insert_or_assign_args)
 
-#define CCC_private_insert_or_assign_r(container_pointer,                      \
-                                       insert_or_assign_args...)               \
+#define CCC_private_insert_or_assign_wrap(container_pointer,                   \
+                                          insert_or_assign_args...)            \
     _Generic((container_pointer),                                              \
         CCC_Handle_adaptive_map *: &(                                          \
                  CCC_Handle){CCC_handle_adaptive_map_insert_or_assign(         \
@@ -152,8 +152,8 @@ limitations under the License.
         CCC_Bounded_map *: CCC_bounded_map_remove)(                            \
         (container_pointer), key_val_container_handle_pointer)
 
-#define CCC_private_remove_r(container_pointer,                                \
-                             key_val_container_handle_pointer...)              \
+#define CCC_private_remove_wrap(container_pointer,                             \
+                                key_val_container_handle_pointer...)           \
     _Generic((container_pointer),                                              \
         CCC_Handle_adaptive_map *: &(                                          \
                  CCC_Handle){CCC_handle_adaptive_map_remove(                   \
@@ -192,7 +192,7 @@ limitations under the License.
         CCC_Bounded_map_entry const *: CCC_bounded_map_remove_entry)(          \
         (container_entry_pointer))
 
-#define CCC_private_remove_entry_r(container_entry_pointer)                    \
+#define CCC_private_remove_entry_wrap(container_entry_pointer)                 \
     &(CCC_Entry)                                                               \
     {                                                                          \
         CCC_private_remove_entry(container_entry_pointer).private              \
@@ -209,7 +209,7 @@ limitations under the License.
             *: CCC_handle_bounded_map_remove_handle)(                          \
         (container_handle_pointer))
 
-#define CCC_private_remove_handle_r(container_handle_pointer)                  \
+#define CCC_private_remove_handle_wrap(container_handle_pointer)               \
     &(CCC_Handle)                                                              \
     {                                                                          \
         CCC_private_remove_handle(container_handle_pointer).private            \
@@ -224,7 +224,7 @@ limitations under the License.
         CCC_Bounded_map const *: CCC_bounded_map_entry)((container_pointer),   \
                                                         key_pointer)
 
-#define CCC_private_entry_r(container_pointer, key_pointer...)                 \
+#define CCC_private_entry_wrap(container_pointer, key_pointer...)              \
     _Generic((container_pointer),                                              \
         CCC_Flat_hash_map *: &(                                                \
                  CCC_Flat_hash_map_entry){CCC_flat_hash_map_entry(             \
@@ -262,7 +262,7 @@ limitations under the License.
         CCC_Handle_bounded_map const *: CCC_handle_bounded_map_handle)(        \
         (container_pointer), key_pointer)
 
-#define CCC_private_handle_r(container_pointer, key_pointer...)                \
+#define CCC_private_handle_wrap(container_pointer, key_pointer...)             \
     _Generic(                                                                  \
         (container_pointer),                                                   \
         CCC_Handle_adaptive_map *: &(                                          \
@@ -419,16 +419,16 @@ limitations under the License.
 
 /*======================    Misc Search Interface ===========================*/
 
-#define CCC_private_get_key_val(container_pointer, key_pointer...)             \
+#define CCC_private_get_key_value(container_pointer, key_pointer...)           \
     _Generic((container_pointer),                                              \
-        CCC_Flat_hash_map *: CCC_flat_hash_map_get_key_val,                    \
-        CCC_Flat_hash_map const *: CCC_flat_hash_map_get_key_val,              \
-        CCC_Adaptive_map *: CCC_adaptive_map_get_key_val,                      \
-        CCC_Handle_adaptive_map *: CCC_handle_adaptive_map_get_key_val,        \
-        CCC_Handle_bounded_map *: CCC_handle_bounded_map_get_key_val,          \
-        CCC_Handle_bounded_map const *: CCC_handle_bounded_map_get_key_val,    \
-        CCC_Bounded_map *: CCC_bounded_map_get_key_val,                        \
-        CCC_Bounded_map const *: CCC_bounded_map_get_key_val)(                 \
+        CCC_Flat_hash_map *: CCC_flat_hash_map_get_key_value,                  \
+        CCC_Flat_hash_map const *: CCC_flat_hash_map_get_key_value,            \
+        CCC_Adaptive_map *: CCC_adaptive_map_get_key_value,                    \
+        CCC_Handle_adaptive_map *: CCC_handle_adaptive_map_get_key_value,      \
+        CCC_Handle_bounded_map *: CCC_handle_bounded_map_get_key_value,        \
+        CCC_Handle_bounded_map const *: CCC_handle_bounded_map_get_key_value,  \
+        CCC_Bounded_map *: CCC_bounded_map_get_key_value,                      \
+        CCC_Bounded_map const *: CCC_bounded_map_get_key_value)(               \
         (container_pointer), key_pointer)
 
 #define CCC_private_contains(container_pointer, key_pointer...)                \
@@ -687,8 +687,8 @@ limitations under the License.
         CCC_Bounded_map const *: CCC_bounded_map_equal_range)(                 \
         (container_pointer), begin_and_end_key_pointer)
 
-#define CCC_private_equal_range_r(container_pointer,                           \
-                                  begin_and_end_key_pointer...)                \
+#define CCC_private_equal_range_wrap(container_pointer,                        \
+                                     begin_and_end_key_pointer...)             \
     &(CCC_Range)                                                               \
     {                                                                          \
         CCC_private_equal_range(container_pointer, begin_and_end_key_pointer)  \
@@ -708,7 +708,7 @@ limitations under the License.
         CCC_Bounded_map const *: CCC_bounded_map_equal_range_reverse)(         \
         (container_pointer), reverse_begin_and_reverse_end_key_pointer)
 
-#define CCC_private_equal_range_reverse_r(                                     \
+#define CCC_private_equal_range_reverse_wrap(                                  \
     container_pointer, reverse_begin_and_reverse_end_key_pointer...)           \
     &(CCC_Range_reverse)                                                       \
     {                                                                          \

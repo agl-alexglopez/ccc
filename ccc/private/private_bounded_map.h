@@ -208,8 +208,8 @@ void *CCC_private_bounded_map_insert(
 /*==================     Core Macro Implementations     =====================*/
 
 /** @internal */
-#define CCC_private_bounded_map_and_modify_w(Bounded_map_entry_pointer,        \
-                                             type_name, closure_over_T...)     \
+#define CCC_private_bounded_map_and_modify_with(Bounded_map_entry_pointer,     \
+                                                type_name, closure_over_T...)  \
     (__extension__({                                                           \
         __auto_type private_bounded_map_ent_pointer                            \
             = (Bounded_map_entry_pointer);                                     \
@@ -232,8 +232,8 @@ void *CCC_private_bounded_map_insert(
     }))
 
 /** @internal */
-#define CCC_private_bounded_map_or_insert_w(Bounded_map_entry_pointer,         \
-                                            type_compound_literal...)          \
+#define CCC_private_bounded_map_or_insert_with(Bounded_map_entry_pointer,      \
+                                               type_compound_literal...)       \
     (__extension__({                                                           \
         __auto_type private_or_ins_entry_pointer                               \
             = (Bounded_map_entry_pointer);                                     \
@@ -259,8 +259,8 @@ void *CCC_private_bounded_map_insert(
     }))
 
 /** @internal */
-#define CCC_private_bounded_map_insert_entry_w(Bounded_map_entry_pointer,      \
-                                               type_compound_literal...)       \
+#define CCC_private_bounded_map_insert_entry_with(Bounded_map_entry_pointer,   \
+                                                  type_compound_literal...)    \
     (__extension__({                                                           \
         __auto_type private_ins_entry_pointer = (Bounded_map_entry_pointer);   \
         typeof(type_compound_literal) *private_bounded_map_ins_ent_ret = NULL; \
@@ -297,8 +297,8 @@ void *CCC_private_bounded_map_insert(
     }))
 
 /** @internal */
-#define CCC_private_bounded_map_try_insert_w(Bounded_map_pointer, key,         \
-                                             type_compound_literal...)         \
+#define CCC_private_bounded_map_try_insert_with(Bounded_map_pointer, key,      \
+                                                type_compound_literal...)      \
     (__extension__({                                                           \
         struct CCC_Bounded_map *const private_try_ins_map_pointer              \
             = (Bounded_map_pointer);                                           \
@@ -330,8 +330,8 @@ void *CCC_private_bounded_map_insert(
     }))
 
 /** @internal */
-#define CCC_private_bounded_map_insert_or_assign_w(Bounded_map_pointer, key,   \
-                                                   type_compound_literal...)   \
+#define CCC_private_bounded_map_insert_or_assign_with(                         \
+    Bounded_map_pointer, key, type_compound_literal...)                        \
     (__extension__({                                                           \
         struct CCC_Bounded_map *const private_ins_or_assign_map_pointer        \
             = (Bounded_map_pointer);                                           \

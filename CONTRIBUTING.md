@@ -7,12 +7,12 @@ Not sure if this library will be used but might as well add this just in case. P
 Here is a description of the current repository organization.
 
 - `ccc` - The user-facing headers for each container. Documentation generation comes from these headers.
-    - `ccc/impl` - The type definitions for all containers. The macros used for initialization and more efficient insertion/construction can be found here. They are separated here to make the headers in `ccc` cleaner and more readable.
+    - `ccc/private` - The type definitions for all containers. The macros used for initialization and more efficient insertion/construction can be found here. They are separated here to make the headers in `ccc` cleaner and more readable. Intended for developer use. Documented internally and users may read the generated documentation if they wish.
 - `cmake` - Helper CMake files for installing the `ccc` library.
 - `docs` - Folder for generating Doxygen Documentation locally and hosting online on the `gh-pages` branch.
-- `etc` - The tools folder to make running `clang-format` and `clang-tidy` more convenient.
+- `tools` - The tools folder to make running `clang-format` and `clang-tidy` more convenient.
 - `samples` - The sample programs used to demonstrate library capabilities.
-- `src` - The implementations for the containers listed in the `ccc/` headers.
+- `source` - The implementations for the containers listed in the `ccc/` headers.
 - `tests` - Testing code. The `run_tests.c` test runner. Also the `checkers.h` testing framework is well-documented for writing test cases.
     - `tests/[container]` - The folder for the container specific tests.
 - `utility` - General helpers for the `tests` and `samples`. A `str_view` helper library is here to make `argc` and `argv` handling easier in the test runner and samples. Utilities for containers should not go here. If containers need to share utilities, they should find the header in `src`. The `utility` folder is removed from releases.
@@ -40,29 +40,29 @@ Add a `CMakeUserPresets.json` file so that you can run the sanitizer presets fou
     },
     "configurePresets": [
         {
-            "name": "deb",
-            "inherits": ["default-deb"],
+            "name": "my-gcc-debug",
+            "inherits": ["default-debug"],
             "cacheVariables": {
                 "CMAKE_C_COMPILER": "gcc-14.2"
             }
         },
         {
-            "name": "rel",
-            "inherits": ["default-rel"],
+            "name": "my-gcc-release",
+            "inherits": ["default-release"],
             "cacheVariables": {
                 "CMAKE_C_COMPILER": "gcc-14.2"
             }
         },
         {
-            "name": "cdeb",
-            "inherits": ["default-deb"],
+            "name": "my-clang-debug",
+            "inherits": ["default-debug"],
             "generator": "Ninja",
             "cacheVariables": {
                 "CMAKE_C_COMPILER": "clang"
             }
         },
         {
-            "name": "crel",
+            "name": "my-clang-release",
             "inherits": ["default-rel"],
             "generator": "Ninja",
             "cacheVariables": {
@@ -70,14 +70,14 @@ Add a `CMakeUserPresets.json` file so that you can run the sanitizer presets fou
             }
         },
         {
-            "name": "dsan",
+            "name": "my-sanitized-debug",
             "inherits": ["gcc-dsan"],
             "cacheVariables": {
                 "CMAKE_C_COMPILER": "gcc-14.2"
             }
         },
         {
-            "name": "rsan",
+            "name": "my-sanitized-release",
             "inherits": ["gcc-rsan"],
             "cacheVariables": {
                 "CMAKE_C_COMPILER": "gcc-14.2"
@@ -87,7 +87,7 @@ Add a `CMakeUserPresets.json` file so that you can run the sanitizer presets fou
 }
 ```
 
-Now, I am able to run the `dsan` and `rsan` sanitizer builds. There is a default sanitizer preset that is provided but setting up a custom preset with the most recent GCC compiler, preferably 14+, provides the most robust `-fanalyzer` and sanitizer diagnostics. GCC has been improving these diagnostic tools rapidly since version 14.
+Now, I am able to run the `my-sanitized-debug` and `my-sanitized-release` sanitizer builds. There is a default sanitizer preset that is provided but setting up a custom preset with the most recent GCC compiler, preferably 14+, provides the most robust `-fanalyzer` and sanitizer diagnostics. GCC has been improving these diagnostic tools rapidly since version 14.
 
 ## Workflow
 
@@ -96,7 +96,7 @@ Now that tooling is set up, the workflow is roughly as follows.
 - Checkout a branch and start working on changes.
 - When ready or almost ready, open a draft pr so CI can start running checks.
 - Before completion run the following tools. Most run remotely on the PR as well but feedback is faster locally.
-    - Run `make tidy` on debug and release builds and fix any issues from `clang-tidy`. This will also run as an action on any pull request in case you forget, but it only runs if it detects the most recent commit has changed a `.c` or `.h` file. It is also easier to quickly fix feedback locally.
+    - Run `make tidy` on debug and release builds and fix any issues from `clang-tidy`. This is not run on the remote repository.
     - Run `make clean && cmake --preset=dsan && cmake --build build -j8 --target ccc tests samples`. Replace the `-j8` flag with the number of cores on your system. This runs GCC's `-fanalyzer` and supplementary sanitizer flags. GCC's `-fanalyzer` will flag issues at compile time. Sanitizers requires you run actual programs so it can observe undefined behavior, buffer overflow, out of bounds memory access, etc. Run the tests `make dtest` and any samples your changes affect. Tests will run the PR remotely in case you forget, but feedback is faster locally.
     - Run `make clean && cmake --preset=rsan && cmake --build build -j8 --target ccc tests samples`. Replace the `-j8` flag with the number of cores on your system. This is the same as the previous step just in release mode. Sometimes the compiler can optimize in such a way to create different issues the sanitizer can catch. Run `make rtest`. Tests will run the PR remotely in case you forget, but feedback is faster locally.
 - Mark the pr as ready for review when all CI checks pass and tools show no errors locally.
@@ -123,26 +123,79 @@ Formatting should be taken care of by the tools. Clang tidy will settle some sma
 
 ### Naming
 
-We present as clean an interface to the user as possible. Because we don't have C++ private fields, and because we cannot make our types opaque pointers, we must use other strategies to hide our implementation. All types must be complete. Complete means all fields of all types are visible to the user at compile time. This allows them to store our types on the stack or data segment which is a core goal of this library.
+> [!IMPORTANT]
+> Prioritize code reading over writing. Code for the user assumes little, simplifies usage, and minimizes implementation details. Code for the developer is documented, specifies trade offs, and maximizes available implementation details.
 
 Given these constraints we use the following naming conventions.
 
-- All types intentionally available to the user in a container `.h` file are `typedef`. For example, the flat hash map is `typedef struct ccc_fhmap ccc_flat_hash_map`. This is to discourage the user from thinking too hard about what the underlying types are because opaque pointers are not available.
-- All types internal to the developers shall not use `typedef`. Internally, we want to know exactly what every type is no matter how long the name. Implementation helper functions that operate within the interface functions should not use the user facing `typedef`. Use the true underlying type name so the code carries as much information as possible while reading.
-- To aid in the prior point, all functions internal to an implementation `src/*.c` file should be marked `static`. This will also help signal that you should be using the full type name in parameters and inside that function, not the user facing `typedef`.
-- The implementation of macros is always completed in the `ccc/impl/` directory, and wrapper macros are provided in the `ccc/*.h` headers. The user should not be distracted with macro details.
-- The `impl_` and `ccc_impl_` prefix is used in macros in the `ccc/impl/*.h` headers.
-
-The exceptions to the user and developer naming split are as follows.
-
-- When the internal implementation uses types from `types.h` that have been `typedef`.
-    - For example, it improves code clarity to use the same `typedef` available to users for our function pointer types.
-- When we `typedef` platform specific types such as integers. For example, in the bit set, we work with many different integer widths. The integers communicate nothing about their intent or purpose in the overall code so we `typedef` for clarity of variables and function arguments.
-
-The reason for this naming split, and for the few exceptions to the rules, is to maintain the following principle.
+#### No Abbreviations or Jargon
 
 > [!IMPORTANT]
-> Code for the user simplifies and minimizes implementation details. Code for the developer specifies and maximizes implementation details.
+> Abbreviations in user facing headers included directly or transitively are prohibited.
+
+While line length was a valid concern in the early days of C, this is no longer the case with modern tooling. Any time the user spends decoding our abbreviations is time they are not spending using the collection to solve their own problems. We also do not assume the user is familiar with common programming or C jargon such as `deq`, `iter`, `ptr`, `i`, `ctx`, or `rbegin` to name a few. Therefore, the previous jargon becomes `double_ended_queue`, `iterator`, `pointer`, `index`, `context`, and `reverse_begin` in our headers. This style should continue through to the developer implementatios in `source/` files.
+
+This minimizes user processing time while reading code and ensures maximum understanding across a wide range of developer experience levels.
+
+> [!WARNING]
+> This is not enforceable with tooling.
+
+#### Namespace
+
+> [!IMPORTANT]
+> Prefix everything user facing with `CCC_`.
+
+All types, functions, and constants in headers that the user includes directly or transitively contain the `CCC_` prefix. This stands for `C_Container_Collection`. Many other libraries do something similar, such as SDL using the `SDL_` prefix. At this time, I am confident this is a unique prefix among the C library landscape.
+
+Users may omit this prefix with name shortening on a per module basis. Every header allows the user to turn off the prefixing for that specific header's types, constants, and functions with the following definition, `#define [INTERFACE]_USING_NAMESPACE_CCC`. For example, here the user wants all fundamental types and the flat hash map interface to omit the `CCC_` prefix.
+
+```c
+#define TYPES_USING_NAMESPACE_CCC
+#define FLAT_HASH_MAP_USING_NAMESPACE_CCC
+#include "ccc/types.h"
+#include "ccc/flat_hash_map.c"
+```
+
+> [!NOTE]
+> This is enforced by clang tidy.
+
+#### Types
+
+> [!IMPORTANT]
+> Types use `Leading_upper_snake_case`. Member fields use `snake_case`. Logical naming follows `[prefix][adjective][noun]`.
+
+Types, such as `struct`, `union`, and `enum`, that are defined by this library use `Leading_upper_snake_case`. While there are a few libraries in the C ecosystem that use `PascalCase` for types, see raylib or SDL, the pervasive style in C systems programming is `snake_case`. This library is intended for use in contexts such as kernels, compilers, or embedded environments. It should fit in to the best of its ability.
+
+However, C does not allow types and functions to have the same name. Consider the function to obtain an entry, following Rust's API design: `CCC_flat_hash_map_entry()`. The entry type cannot also be named `CCC_flat_hash_map_entry`. So, types simply capitalize the first letter to distinguish: `CCC_Flat_hash_map_entry`. This also improves code readability, grep-ability, and renaming via search and replace.
+
+Naming a type uses the prefix, any additional descriptors needed, and then the object being declared. For example the `CCC_Flat_hash_map` has the `CCC_` prefix, describes the map as `Flat` because it is in an array, and that it is a `hash_map`.
+
+> [!NOTE]
+> Capitalization is enforced by clang tidy. Logical naming is a convention.
+
+#### Functions and Function-like Macros
+
+> [!IMPORTANT]
+> Functions and function-like macros use `snake_case`. Logical naming follows `[prefix][interface][state/action]`
+
+This is the least visually invasive choice among a wide variety of code bases. It prioritizes readability. Function-like macros follow function style because they signal to the user that they must provide arguments. Also, any modern IDE or LSP configuration will trivially show the user that the macro is a macro not a function.
+
+Consider the flat hash map function to unwrap or obtain status regarding an entry. We have `CCC_flat_hash_map_occupied()` and `CCC_flat_hash_map_unwrap()`. Notice that the former omits the filler word `is` because there is no ambiguity when using this adjective to describe the current state. The `is` addition is helpful when the function would otherwise be ambiguous, such as `container_is_empty()` being more clear than `container_empty()`. The latter may suggest the container elements are being freed from memory.
+
+Use `get_`, `is_`, or `has_` only when the function would be ambiguous without them or the function implements a common API from another language. For example, Rust's `get_key_value` function for associative containers.
+
+> [!WARNING]
+> This is enforced by clang tidy for functions but cannot be enforced for function-like macros. Logical naming is a convention.
+
+#### Constants
+
+> ![!IMPORTANT]
+> Constants from `#define` declarations or `enum` members are `UPPER_CASE`. Static translation unit constant variables are prefixed `static_`; prefer anonymous `enum` if possible. Global constants are not allowed.
+
+This is a clear signal that the value is hard coded and the constant value is placed directly where it appears by the compiler.
+
+> [!NOTE]
+> This is enforced by clang tidy.
 
 ### Validate Parameters
 

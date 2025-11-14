@@ -402,7 +402,8 @@ CCC_adaptive_map_remove_entry(CCC_Adaptive_map_entry *const e)
 }
 
 void *
-CCC_adaptive_map_get_key_val(CCC_Adaptive_map *const map, void const *const key)
+CCC_adaptive_map_get_key_value(CCC_Adaptive_map *const map,
+                               void const *const key)
 {
     if (!map || !key)
     {
@@ -474,25 +475,28 @@ CCC_adaptive_map_reverse_end(CCC_Adaptive_map const *const)
 
 void *
 CCC_adaptive_map_next(CCC_Adaptive_map const *const map,
-                      CCC_Adaptive_map_node const *const e)
+                      CCC_Adaptive_map_node const *const iterator_intruder)
 {
-    if (!map || !e)
+    if (!map || !iterator_intruder)
     {
         return NULL;
     }
-    struct CCC_Adaptive_map_node const *n = next(map, e, INORDER);
+    struct CCC_Adaptive_map_node const *n
+        = next(map, iterator_intruder, INORDER);
     return n == &map->end ? NULL : struct_base(map, n);
 }
 
 void *
-CCC_adaptive_map_reverse_next(CCC_Adaptive_map const *const map,
-                              CCC_Adaptive_map_node const *const e)
+CCC_adaptive_map_reverse_next(
+    CCC_Adaptive_map const *const map,
+    CCC_Adaptive_map_node const *const iterator_intruder)
 {
-    if (!map || !e)
+    if (!map || !iterator_intruder)
     {
         return NULL;
     }
-    struct CCC_Adaptive_map_node const *n = next(map, e, R_INORDER);
+    struct CCC_Adaptive_map_node const *n
+        = next(map, iterator_intruder, R_INORDER);
     return n == &map->end ? NULL : struct_base(map, n);
 }
 

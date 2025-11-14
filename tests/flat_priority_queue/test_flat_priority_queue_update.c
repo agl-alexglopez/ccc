@@ -150,11 +150,12 @@ check_static_begin(flat_priority_queue_test_priority_update_with)
         int backoff = vals[val].val / 2;
         if (vals[val].val > limit)
         {
-            struct Val const *const updated = CCC_flat_priority_queue_update_w(
-                &flat_priority_queue, &vals[val],
-                {
-                    T->val = backoff;
-                });
+            struct Val const *const updated
+                = CCC_flat_priority_queue_update_with(&flat_priority_queue,
+                                                      &vals[val],
+                                                      {
+                                                          T->val = backoff;
+                                                      });
             check(updated != NULL, true);
             check(updated->val, backoff);
             check(validate(&flat_priority_queue), true);

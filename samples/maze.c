@@ -143,7 +143,7 @@ static void animate_maze(struct Maze *);
 static void fill_maze_with_walls(struct Maze *);
 static void build_wall(struct Maze *, int r, int c);
 static void print_square(struct Maze const *, int r, int c);
-static uint16_t *maze_at_r(struct Maze const *, int r, int c);
+static uint16_t *maze_at_wrap(struct Maze const *, int r, int c);
 static uint16_t maze_at(struct Maze const *, int r, int c);
 static void clear_and_flush_maze(struct Maze const *);
 static void carve_path_walls_animated(struct Maze *, struct Point, int);
@@ -269,15 +269,15 @@ animate_maze(struct Maze *maze)
                 std_allocate);
     check(r == CCC_RESULT_OK);
     struct Point s = rand_point(maze);
-    struct Prim_cell const *const first = flat_hash_map_insert_entry_w(
-        entry_r(&cost_map, &s),
+    struct Prim_cell const *const first = flat_hash_map_insert_entry_with(
+        entry_wrap(&cost_map, &s),
         (struct Prim_cell){.cell = s, .cost = rand_range(0, 100)});
     check(first);
     (void)push(&cell_priority_queue, first, &(struct Prim_cell){});
     while (!is_empty(&cell_priority_queue))
     {
         struct Prim_cell const *const c = front(&cell_priority_queue);
-        *maze_at_r(maze, c->cell.r, c->cell.c) |= CACHE_BIT;
+        *maze_at_wrap(maze, c->cell.r, c->cell.c) |= CACHE_BIT;
         /* 0 is an invalid row and column in any maze. */
         struct Prim_cell min_cell = {};
         int min = INT_MAX;
@@ -287,9 +287,11 @@ animate_maze(struct Maze *maze)
                                     .c = c->cell.c + dir_offsets[i].c};
             if (can_build_new_square(maze, n.r, n.c))
             {
-                struct Prim_cell const *const cell = flat_hash_map_or_insert_w(
-                    entry_r(&cost_map, &n),
-                    (struct Prim_cell){.cell = n, .cost = rand_range(0, 100)});
+                struct Prim_cell const *const cell
+                    = flat_hash_map_or_insert_with(
+                        entry_wrap(&cost_map, &n),
+                        (struct Prim_cell){.cell = n,
+                                           .cost = rand_range(0, 100)});
                 check(cell);
                 if (cell->cost < min)
                 {
@@ -429,35 +431,35 @@ static void
 carve_path_walls_animated(struct Maze *maze, struct Point const p,
                           int const time)
 {
-    *maze_at_r(maze, p.r, p.c) |= PATH_BIT;
+    *maze_at_wrap(maze, p.r, p.c) |= PATH_BIT;
     flush_cursor_maze_coordinate(maze, p.r, p.c);
     struct timespec ts = {.tv_sec = 0, .tv_nsec = time};
     nanosleep(&ts, NULL);
     if (p.r - 1 >= 0 && !(maze_at(maze, p.r - 1, p.c) & PATH_BIT))
     {
-        *maze_at_r(maze, p.r - 1, p.c) &= ~SOUTH_WALL;
+        *maze_at_wrap(maze, p.r - 1, p.c) &= ~SOUTH_WALL;
         flush_cursor_maze_coordinate(maze, p.r - 1, p.c);
         nanosleep(&ts, NULL);
     }
     if (p.r + 1 < maze->rows && !(maze_at(maze, p.r + 1, p.c) & PATH_BIT))
     {
-        *maze_at_r(maze, p.r + 1, p.c) &= ~NORTH_WALL;
+        *maze_at_wrap(maze, p.r + 1, p.c) &= ~NORTH_WALL;
         flush_cursor_maze_coordinate(maze, p.r + 1, p.c);
         nanosleep(&ts, NULL);
     }
     if (p.c - 1 >= 0 && !(maze_at(maze, p.r, p.c - 1) & PATH_BIT))
     {
-        *maze_at_r(maze, p.r, p.c - 1) &= ~EAST_WALL;
+        *maze_at_wrap(maze, p.r, p.c - 1) &= ~EAST_WALL;
         flush_cursor_maze_coordinate(maze, p.r, p.c - 1);
         nanosleep(&ts, NULL);
     }
     if (p.c + 1 < maze->cols && !(maze_at(maze, p.r, p.c + 1) & PATH_BIT))
     {
-        *maze_at_r(maze, p.r, p.c + 1) &= ~WEST_WALL;
+        *maze_at_wrap(maze, p.r, p.c + 1) &= ~WEST_WALL;
         flush_cursor_maze_coordinate(maze, p.r, p.c + 1);
         nanosleep(&ts, NULL);
     }
-    *maze_at_r(maze, p.r, p.c) |= CACHE_BIT;
+    *maze_at_wrap(maze, p.r, p.c) |= CACHE_BIT;
 }
 
 static void
@@ -480,8 +482,8 @@ build_wall(struct Maze *m, int const r, int const c)
     {
         wall |= EAST_WALL;
     }
-    *maze_at_r(m, r, c) |= wall;
-    *maze_at_r(m, r, c) &= ~PATH_BIT;
+    *maze_at_wrap(m, r, c) |= wall;
+    *maze_at_wrap(m, r, c) &= ~PATH_BIT;
 }
 
 static void
@@ -540,7 +542,7 @@ print_square(struct Maze const *m, int const r, int const c)
 
 /** Square by mutable reference. */
 static uint16_t *
-maze_at_r(struct Maze const *const maze, int const r, int const c)
+maze_at_wrap(struct Maze const *const maze, int const r, int const c)
 {
     return &maze->maze[(r * maze->cols) + c];
 }

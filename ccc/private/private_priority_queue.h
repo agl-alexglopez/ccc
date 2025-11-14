@@ -191,7 +191,7 @@ CCC_private_priority_queue_struct_base(struct CCC_Priority_queue const *,
     }))
 
 /** @internal */
-#define CCC_private_priority_queue_update_w(                                   \
+#define CCC_private_priority_queue_update_with(                                \
     priority_queue_pointer, type_pointer, update_closure_over_T...)            \
     (__extension__({                                                           \
         struct CCC_Priority_queue *const private_priority_queue                \
@@ -235,7 +235,7 @@ CCC_private_priority_queue_struct_base(struct CCC_Priority_queue const *,
     }))
 
 /** @internal */
-#define CCC_private_priority_queue_increase_w(                                 \
+#define CCC_private_priority_queue_increase_with(                              \
     priority_queue_pointer, type_pointer, increase_closure_over_T...)          \
     (__extension__({                                                           \
         struct CCC_Priority_queue *const private_priority_queue                \
@@ -270,7 +270,7 @@ CCC_private_priority_queue_struct_base(struct CCC_Priority_queue const *,
     }))
 
 /** @internal */
-#define CCC_private_priority_queue_decrease_w(                                 \
+#define CCC_private_priority_queue_decrease_with(                              \
     priority_queue_pointer, type_pointer, decrease_closure_over_T...)          \
     (__extension__({                                                           \
         struct CCC_Priority_queue *const private_priority_queue                \

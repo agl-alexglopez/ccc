@@ -292,12 +292,12 @@ check_static_begin(adaptive_map_test_try_insert_with)
     Adaptive_map om = adaptive_map_initialize(
         om, struct Val, elem, key, id_order, val_bump_allocate, &vals);
     int size = 30;
-    CCC_Entry *ent = adaptive_map_try_insert_w(&om, -1, val(-1));
+    CCC_Entry *ent = adaptive_map_try_insert_with(&om, -1, val(-1));
     check(validate(&om), true);
     check(occupied(ent), false);
     check(unwrap(ent) != NULL, true);
     check(count(&om).count, 1);
-    ent = adaptive_map_try_insert_w(&om, -1, val(-1));
+    ent = adaptive_map_try_insert_with(&om, -1, val(-1));
     check(validate(&om), true);
     check(occupied(ent), true);
     check(count(&om).count, 1);
@@ -310,12 +310,12 @@ check_static_begin(adaptive_map_test_try_insert_with)
     check(fill_n(&om, size / 2, i), CHECK_PASS);
 
     i += (size / 2);
-    ent = adaptive_map_try_insert_w(&om, i, val(i));
+    ent = adaptive_map_try_insert_with(&om, i, val(i));
     check(validate(&om), true);
     check(occupied(ent), false);
     check(unwrap(ent) != NULL, true);
     check(count(&om).count, i + 2);
-    ent = adaptive_map_try_insert_w(&om, i, val(i));
+    ent = adaptive_map_try_insert_with(&om, i, val(i));
     check(validate(&om), true);
     check(occupied(ent), true);
     check(count(&om).count, i + 2);
@@ -328,12 +328,12 @@ check_static_begin(adaptive_map_test_try_insert_with)
     check(fill_n(&om, size - i, i), CHECK_PASS);
 
     i = size;
-    ent = adaptive_map_try_insert_w(&om, i, val(i));
+    ent = adaptive_map_try_insert_with(&om, i, val(i));
     check(validate(&om), true);
     check(occupied(ent), false);
     check(unwrap(ent) != NULL, true);
     check(count(&om).count, i + 2);
-    ent = adaptive_map_try_insert_w(&om, i, val(i));
+    ent = adaptive_map_try_insert_with(&om, i, val(i));
     check(validate(&om), true);
     check(occupied(ent), true);
     check(count(&om).count, i + 2);
@@ -410,12 +410,12 @@ check_static_begin(adaptive_map_test_insert_or_assign_with)
     Adaptive_map om = adaptive_map_initialize(
         om, struct Val, elem, key, id_order, val_bump_allocate, &vals);
     int size = 30;
-    CCC_Entry *ent = adaptive_map_insert_or_assign_w(&om, -1, val(-1));
+    CCC_Entry *ent = adaptive_map_insert_or_assign_with(&om, -1, val(-1));
     check(validate(&om), true);
     check(occupied(ent), false);
     check(unwrap(ent) != NULL, true);
     check(count(&om).count, 1);
-    ent = adaptive_map_insert_or_assign_w(&om, -1, val(-2));
+    ent = adaptive_map_insert_or_assign_with(&om, -1, val(-2));
     check(validate(&om), true);
     check(occupied(ent), true);
     check(count(&om).count, 1);
@@ -428,12 +428,12 @@ check_static_begin(adaptive_map_test_insert_or_assign_with)
     check(fill_n(&om, size / 2, i), CHECK_PASS);
 
     i += (size / 2);
-    ent = adaptive_map_insert_or_assign_w(&om, i, val(i));
+    ent = adaptive_map_insert_or_assign_with(&om, i, val(i));
     check(validate(&om), true);
     check(occupied(ent), false);
     check(unwrap(ent) != NULL, true);
     check(count(&om).count, i + 2);
-    ent = adaptive_map_insert_or_assign_w(&om, i, val(i + 1));
+    ent = adaptive_map_insert_or_assign_with(&om, i, val(i + 1));
     check(occupied(ent), true);
     check(count(&om).count, i + 2);
     v = unwrap(ent);
@@ -445,12 +445,12 @@ check_static_begin(adaptive_map_test_insert_or_assign_with)
     check(fill_n(&om, size - i, i), CHECK_PASS);
 
     i = size;
-    ent = adaptive_map_insert_or_assign_w(&om, i, val(i));
+    ent = adaptive_map_insert_or_assign_with(&om, i, val(i));
     check(validate(&om), true);
     check(occupied(ent), false);
     check(unwrap(ent) != NULL, true);
     check(count(&om).count, i + 2);
-    ent = adaptive_map_insert_or_assign_w(&om, i, val(i + 1));
+    ent = adaptive_map_insert_or_assign_with(&om, i, val(i + 1));
     check(validate(&om), true);
     check(occupied(ent), true);
     check(count(&om).count, i + 2);
@@ -468,7 +468,7 @@ check_static_begin(adaptive_map_test_entry_and_modify)
     Adaptive_map om = adaptive_map_initialize(
         om, struct Val, elem, key, id_order, val_bump_allocate, &vals);
     int size = 30;
-    CCC_Adaptive_map_entry *ent = entry_r(&om, &(int){-1});
+    CCC_Adaptive_map_entry *ent = entry_wrap(&om, &(int){-1});
     check(validate(&om), true);
     check(occupied(ent), false);
     check(unwrap(ent) == NULL, true);
@@ -477,9 +477,9 @@ check_static_begin(adaptive_map_test_entry_and_modify)
     check(occupied(ent), false);
     check(unwrap(ent) == NULL, true);
     check(count(&om).count, 0);
-    (void)adaptive_map_insert_or_assign_w(&om, -1, val(-1));
+    (void)adaptive_map_insert_or_assign_with(&om, -1, val(-1));
     check(validate(&om), true);
-    ent = entry_r(&om, &(int){-1});
+    ent = entry_wrap(&om, &(int){-1});
     check(occupied(ent), true);
     check(count(&om).count, 1);
     struct Val *v = unwrap(ent);
@@ -496,13 +496,13 @@ check_static_begin(adaptive_map_test_entry_and_modify)
     check(fill_n(&om, size / 2, i), CHECK_PASS);
 
     i += (size / 2);
-    ent = entry_r(&om, &i);
+    ent = entry_wrap(&om, &i);
     check(occupied(ent), false);
     check(unwrap(ent) == NULL, true);
     check(count(&om).count, i + 1);
-    (void)adaptive_map_insert_or_assign_w(&om, i, val(i));
+    (void)adaptive_map_insert_or_assign_with(&om, i, val(i));
     check(validate(&om), true);
-    ent = entry_r(&om, &i);
+    ent = entry_wrap(&om, &i);
     check(occupied(ent), true);
     check(count(&om).count, i + 2);
     ent = and_modify(ent, plus);
@@ -515,13 +515,13 @@ check_static_begin(adaptive_map_test_entry_and_modify)
     check(fill_n(&om, size - i, i), CHECK_PASS);
 
     i = size;
-    ent = entry_r(&om, &i);
+    ent = entry_wrap(&om, &i);
     check(occupied(ent), false);
     check(unwrap(ent) == NULL, true);
     check(count(&om).count, i + 1);
-    (void)adaptive_map_insert_or_assign_w(&om, i, val(i));
+    (void)adaptive_map_insert_or_assign_with(&om, i, val(i));
     check(validate(&om), true);
-    ent = entry_r(&om, &i);
+    ent = entry_wrap(&om, &i);
     check(occupied(ent), true);
     check(count(&om).count, i + 2);
     ent = and_modify(ent, plus);
@@ -540,14 +540,14 @@ check_static_begin(adaptive_map_test_entry_and_modify_context)
         om, struct Val, elem, key, id_order, val_bump_allocate, &vals);
     int size = 30;
     int context = 1;
-    CCC_Adaptive_map_entry *ent = entry_r(&om, &(int){-1});
+    CCC_Adaptive_map_entry *ent = entry_wrap(&om, &(int){-1});
     ent = and_modify_context(ent, pluscontext, &context);
     check(occupied(ent), false);
     check(unwrap(ent) == NULL, true);
     check(count(&om).count, 0);
-    (void)adaptive_map_insert_or_assign_w(&om, -1, val(-1));
+    (void)adaptive_map_insert_or_assign_with(&om, -1, val(-1));
     check(validate(&om), true);
-    ent = entry_r(&om, &(int){-1});
+    ent = entry_wrap(&om, &(int){-1});
     check(occupied(ent), true);
     check(count(&om).count, 1);
     struct Val *v = unwrap(ent);
@@ -564,14 +564,14 @@ check_static_begin(adaptive_map_test_entry_and_modify_context)
     check(fill_n(&om, size / 2, i), CHECK_PASS);
 
     i += (size / 2);
-    ent = entry_r(&om, &i);
+    ent = entry_wrap(&om, &i);
     ent = and_modify_context(ent, pluscontext, &context);
     check(occupied(ent), false);
     check(unwrap(ent) == NULL, true);
     check(count(&om).count, i + 1);
-    (void)adaptive_map_insert_or_assign_w(&om, i, val(i));
+    (void)adaptive_map_insert_or_assign_with(&om, i, val(i));
     check(validate(&om), true);
-    ent = entry_r(&om, &i);
+    ent = entry_wrap(&om, &i);
     ent = and_modify_context(ent, pluscontext, &context);
     v = unwrap(ent);
     check(v != NULL, true);
@@ -583,14 +583,14 @@ check_static_begin(adaptive_map_test_entry_and_modify_context)
     check(fill_n(&om, size - i, i), CHECK_PASS);
 
     i = size;
-    ent = entry_r(&om, &i);
+    ent = entry_wrap(&om, &i);
     ent = and_modify_context(ent, pluscontext, &context);
     check(occupied(ent), false);
     check(unwrap(ent) == NULL, true);
     check(count(&om).count, i + 1);
-    (void)adaptive_map_insert_or_assign_w(&om, i, val(i));
+    (void)adaptive_map_insert_or_assign_with(&om, i, val(i));
     check(validate(&om), true);
-    ent = entry_r(&om, &i);
+    ent = entry_wrap(&om, &i);
     ent = and_modify_context(ent, pluscontext, &context);
     v = unwrap(ent);
     check(v != NULL, true);
@@ -607,20 +607,20 @@ check_static_begin(adaptive_map_test_entry_and_modify_with)
     Adaptive_map om = adaptive_map_initialize(
         om, struct Val, elem, key, id_order, val_bump_allocate, &vals);
     int size = 30;
-    CCC_Adaptive_map_entry *ent = entry_r(&om, &(int){-1});
-    ent = adaptive_map_and_modify_w(ent, struct Val, { T->val++; });
+    CCC_Adaptive_map_entry *ent = entry_wrap(&om, &(int){-1});
+    ent = adaptive_map_and_modify_with(ent, struct Val, { T->val++; });
     check(count(&om).count, 0);
     check(occupied(ent), false);
     check(unwrap(ent) == NULL, true);
     check(count(&om).count, 0);
-    (void)adaptive_map_insert_or_assign_w(&om, -1, val(-1));
+    (void)adaptive_map_insert_or_assign_with(&om, -1, val(-1));
     check(validate(&om), true);
-    ent = entry_r(&om, &(int){-1});
+    ent = entry_wrap(&om, &(int){-1});
     struct Val *v = unwrap(ent);
     check(v != NULL, true);
     check(v->val, -1);
     check(v->key, -1);
-    ent = adaptive_map_and_modify_w(ent, struct Val, { T->val++; });
+    ent = adaptive_map_and_modify_with(ent, struct Val, { T->val++; });
     v = unwrap(ent);
     check(v != NULL, true);
     check(v->key, -1);
@@ -631,15 +631,15 @@ check_static_begin(adaptive_map_test_entry_and_modify_with)
     check(fill_n(&om, size / 2, i), CHECK_PASS);
 
     i += (size / 2);
-    ent = entry_r(&om, &i);
-    ent = adaptive_map_and_modify_w(ent, struct Val, { T->val++; });
+    ent = entry_wrap(&om, &i);
+    ent = adaptive_map_and_modify_with(ent, struct Val, { T->val++; });
     check(occupied(ent), false);
     check(unwrap(ent) == NULL, true);
     check(count(&om).count, i + 1);
-    (void)adaptive_map_insert_or_assign_w(&om, i, val(i));
+    (void)adaptive_map_insert_or_assign_with(&om, i, val(i));
     check(validate(&om), true);
-    ent = entry_r(&om, &i);
-    ent = adaptive_map_and_modify_w(ent, struct Val, { T->val++; });
+    ent = entry_wrap(&om, &i);
+    ent = adaptive_map_and_modify_with(ent, struct Val, { T->val++; });
     v = unwrap(ent);
     check(v != NULL, true);
     check(v->val, i + 1);
@@ -650,15 +650,15 @@ check_static_begin(adaptive_map_test_entry_and_modify_with)
     check(fill_n(&om, size - i, i), CHECK_PASS);
 
     i = size;
-    ent = entry_r(&om, &i);
-    ent = adaptive_map_and_modify_w(ent, struct Val, { T->val++; });
+    ent = entry_wrap(&om, &i);
+    ent = adaptive_map_and_modify_with(ent, struct Val, { T->val++; });
     check(occupied(ent), false);
     check(unwrap(ent) == NULL, true);
     check(count(&om).count, i + 1);
-    (void)adaptive_map_insert_or_assign_w(&om, i, val(i));
+    (void)adaptive_map_insert_or_assign_with(&om, i, val(i));
     check(validate(&om), true);
-    ent = entry_r(&om, &i);
-    ent = adaptive_map_and_modify_w(ent, struct Val, { T->val++; });
+    ent = entry_wrap(&om, &i);
+    ent = adaptive_map_and_modify_with(ent, struct Val, { T->val++; });
     v = unwrap(ent);
     check(v != NULL, true);
     check(v->val, i + 1);
@@ -674,14 +674,14 @@ check_static_begin(adaptive_map_test_or_insert)
     Adaptive_map om = adaptive_map_initialize(
         om, struct Val, elem, key, id_order, val_bump_allocate, &vals);
     int size = 30;
-    struct Val *v = or_insert(entry_r(&om, &(int){-1}),
+    struct Val *v = or_insert(entry_wrap(&om, &(int){-1}),
                               &(struct Val){.key = -1, .val = -1}.elem);
     check(validate(&om), true);
     check(v != NULL, true);
     check(v->key, -1);
     check(v->val, -1);
     check(count(&om).count, 1);
-    v = or_insert(entry_r(&om, &(int){-1}),
+    v = or_insert(entry_wrap(&om, &(int){-1}),
                   &(struct Val){.key = -1, .val = -2}.elem);
     check(v != NULL, true);
     check(v->key, -1);
@@ -692,13 +692,14 @@ check_static_begin(adaptive_map_test_or_insert)
     check(fill_n(&om, size / 2, i), CHECK_PASS);
 
     i += (size / 2);
-    v = or_insert(entry_r(&om, &i), &(struct Val){.key = i, .val = i}.elem);
+    v = or_insert(entry_wrap(&om, &i), &(struct Val){.key = i, .val = i}.elem);
     check(validate(&om), true);
     check(v != NULL, true);
     check(v->key, i);
     check(v->val, i);
     check(count(&om).count, i + 2);
-    v = or_insert(entry_r(&om, &i), &(struct Val){.key = i, .val = i + 1}.elem);
+    v = or_insert(entry_wrap(&om, &i),
+                  &(struct Val){.key = i, .val = i + 1}.elem);
     check(v != NULL, true);
     check(v->key, i);
     check(v->val, i);
@@ -708,13 +709,14 @@ check_static_begin(adaptive_map_test_or_insert)
     check(fill_n(&om, size - i, i), CHECK_PASS);
 
     i = size;
-    v = or_insert(entry_r(&om, &i), &(struct Val){.key = i, .val = i}.elem);
+    v = or_insert(entry_wrap(&om, &i), &(struct Val){.key = i, .val = i}.elem);
     check(validate(&om), true);
     check(v != NULL, true);
     check(v->key, i);
     check(v->val, i);
     check(count(&om).count, i + 2);
-    v = or_insert(entry_r(&om, &i), &(struct Val){.key = i, .val = i + 1}.elem);
+    v = or_insert(entry_wrap(&om, &i),
+                  &(struct Val){.key = i, .val = i + 1}.elem);
     check(v != NULL, true);
     check(v->key, i);
     check(v->val, i);
@@ -729,14 +731,14 @@ check_static_begin(adaptive_map_test_or_insert_with)
     Adaptive_map om = adaptive_map_initialize(
         om, struct Val, elem, key, id_order, val_bump_allocate, &vals);
     int size = 30;
-    struct Val *v
-        = adaptive_map_or_insert_w(entry_r(&om, &(int){-1}), idval(-1, -1));
+    struct Val *v = adaptive_map_or_insert_with(entry_wrap(&om, &(int){-1}),
+                                                idval(-1, -1));
     check(validate(&om), true);
     check(v != NULL, true);
     check(v->key, -1);
     check(v->val, -1);
     check(count(&om).count, 1);
-    v = adaptive_map_or_insert_w(entry_r(&om, &(int){-1}), idval(-1, -2));
+    v = adaptive_map_or_insert_with(entry_wrap(&om, &(int){-1}), idval(-1, -2));
     check(v != NULL, true);
     check(v->key, -1);
     check(v->val, -1);
@@ -746,13 +748,13 @@ check_static_begin(adaptive_map_test_or_insert_with)
     check(fill_n(&om, size / 2, i), CHECK_PASS);
 
     i += (size / 2);
-    v = adaptive_map_or_insert_w(entry_r(&om, &i), idval(i, i));
+    v = adaptive_map_or_insert_with(entry_wrap(&om, &i), idval(i, i));
     check(validate(&om), true);
     check(v != NULL, true);
     check(v->key, i);
     check(v->val, i);
     check(count(&om).count, i + 2);
-    v = adaptive_map_or_insert_w(entry_r(&om, &i), idval(i, i + 1));
+    v = adaptive_map_or_insert_with(entry_wrap(&om, &i), idval(i, i + 1));
     check(v != NULL, true);
     check(v->key, i);
     check(v->val, i);
@@ -762,13 +764,13 @@ check_static_begin(adaptive_map_test_or_insert_with)
     check(fill_n(&om, size - i, i), CHECK_PASS);
 
     i = size;
-    v = adaptive_map_or_insert_w(entry_r(&om, &i), idval(i, i));
+    v = adaptive_map_or_insert_with(entry_wrap(&om, &i), idval(i, i));
     check(validate(&om), true);
     check(v != NULL, true);
     check(v->key, i);
     check(v->val, i);
     check(count(&om).count, i + 2);
-    v = adaptive_map_or_insert_w(entry_r(&om, &i), idval(i, i + 1));
+    v = adaptive_map_or_insert_with(entry_wrap(&om, &i), idval(i, i + 1));
     check(v != NULL, true);
     check(v->key, i);
     check(v->val, i);
@@ -783,14 +785,14 @@ check_static_begin(adaptive_map_test_insert_entry)
     Adaptive_map om = adaptive_map_initialize(
         om, struct Val, elem, key, id_order, val_bump_allocate, &vals);
     int size = 30;
-    struct Val *v = insert_entry(entry_r(&om, &(int){-1}),
+    struct Val *v = insert_entry(entry_wrap(&om, &(int){-1}),
                                  &(struct Val){.key = -1, .val = -1}.elem);
     check(validate(&om), true);
     check(v != NULL, true);
     check(v->key, -1);
     check(v->val, -1);
     check(count(&om).count, 1);
-    v = insert_entry(entry_r(&om, &(int){-1}),
+    v = insert_entry(entry_wrap(&om, &(int){-1}),
                      &(struct Val){.key = -1, .val = -2}.elem);
     check(v != NULL, true);
     check(v->key, -1);
@@ -801,13 +803,14 @@ check_static_begin(adaptive_map_test_insert_entry)
     check(fill_n(&om, size / 2, i), CHECK_PASS);
 
     i += (size / 2);
-    v = insert_entry(entry_r(&om, &i), &(struct Val){.key = i, .val = i}.elem);
+    v = insert_entry(entry_wrap(&om, &i),
+                     &(struct Val){.key = i, .val = i}.elem);
     check(validate(&om), true);
     check(v != NULL, true);
     check(v->key, i);
     check(v->val, i);
     check(count(&om).count, i + 2);
-    v = insert_entry(entry_r(&om, &i),
+    v = insert_entry(entry_wrap(&om, &i),
                      &(struct Val){.key = i, .val = i + 1}.elem);
     check(v != NULL, true);
     check(v->key, i);
@@ -818,13 +821,14 @@ check_static_begin(adaptive_map_test_insert_entry)
     check(fill_n(&om, size - i, i), CHECK_PASS);
 
     i = size;
-    v = insert_entry(entry_r(&om, &i), &(struct Val){.key = i, .val = i}.elem);
+    v = insert_entry(entry_wrap(&om, &i),
+                     &(struct Val){.key = i, .val = i}.elem);
     check(validate(&om), true);
     check(v != NULL, true);
     check(v->key, i);
     check(v->val, i);
     check(count(&om).count, i + 2);
-    v = insert_entry(entry_r(&om, &i),
+    v = insert_entry(entry_wrap(&om, &i),
                      &(struct Val){.key = i, .val = i + 1}.elem);
     check(v != NULL, true);
     check(v->key, i);
@@ -840,14 +844,15 @@ check_static_begin(adaptive_map_test_insert_entry_with)
     Adaptive_map om = adaptive_map_initialize(
         om, struct Val, elem, key, id_order, val_bump_allocate, &vals);
     int size = 30;
-    struct Val *v
-        = adaptive_map_insert_entry_w(entry_r(&om, &(int){-1}), idval(-1, -1));
+    struct Val *v = adaptive_map_insert_entry_with(entry_wrap(&om, &(int){-1}),
+                                                   idval(-1, -1));
     check(validate(&om), true);
     check(v != NULL, true);
     check(v->key, -1);
     check(v->val, -1);
     check(count(&om).count, 1);
-    v = adaptive_map_insert_entry_w(entry_r(&om, &(int){-1}), idval(-1, -2));
+    v = adaptive_map_insert_entry_with(entry_wrap(&om, &(int){-1}),
+                                       idval(-1, -2));
     check(v != NULL, true);
     check(v->key, -1);
     check(v->val, -2);
@@ -857,13 +862,13 @@ check_static_begin(adaptive_map_test_insert_entry_with)
     check(fill_n(&om, size / 2, i), CHECK_PASS);
 
     i += (size / 2);
-    v = adaptive_map_insert_entry_w(entry_r(&om, &i), idval(i, i));
+    v = adaptive_map_insert_entry_with(entry_wrap(&om, &i), idval(i, i));
     check(validate(&om), true);
     check(v != NULL, true);
     check(v->key, i);
     check(v->val, i);
     check(count(&om).count, i + 2);
-    v = adaptive_map_insert_entry_w(entry_r(&om, &i), idval(i, i + 1));
+    v = adaptive_map_insert_entry_with(entry_wrap(&om, &i), idval(i, i + 1));
     check(v != NULL, true);
     check(v->key, i);
     check(v->val, i + 1);
@@ -873,13 +878,13 @@ check_static_begin(adaptive_map_test_insert_entry_with)
     check(fill_n(&om, size - i, i), CHECK_PASS);
 
     i = size;
-    v = adaptive_map_insert_entry_w(entry_r(&om, &i), idval(i, i));
+    v = adaptive_map_insert_entry_with(entry_wrap(&om, &i), idval(i, i));
     check(validate(&om), true);
     check(v != NULL, true);
     check(v->key, i);
     check(v->val, i);
     check(count(&om).count, i + 2);
-    v = adaptive_map_insert_entry_w(entry_r(&om, &i), idval(i, i + 1));
+    v = adaptive_map_insert_entry_with(entry_wrap(&om, &i), idval(i, i + 1));
     check(v != NULL, true);
     check(v->key, i);
     check(v->val, i + 1);
@@ -894,14 +899,14 @@ check_static_begin(adaptive_map_test_remove_entry)
     Adaptive_map om = adaptive_map_initialize(
         om, struct Val, elem, key, id_order, val_bump_allocate, &vals);
     int size = 30;
-    struct Val *v = or_insert(entry_r(&om, &(int){-1}),
+    struct Val *v = or_insert(entry_wrap(&om, &(int){-1}),
                               &(struct Val){.key = -1, .val = -1}.elem);
     check(validate(&om), true);
     check(v != NULL, true);
     check(v->key, -1);
     check(v->val, -1);
     check(count(&om).count, 1);
-    CCC_Entry *e = remove_entry_r(entry_r(&om, &(int){-1}));
+    CCC_Entry *e = remove_entry_wrap(entry_wrap(&om, &(int){-1}));
     check(validate(&om), true);
     check(occupied(e), true);
     check(count(&om).count, 0);
@@ -910,13 +915,13 @@ check_static_begin(adaptive_map_test_remove_entry)
     check(fill_n(&om, size / 2, i), CHECK_PASS);
 
     i += (size / 2);
-    v = or_insert(entry_r(&om, &i), &(struct Val){.key = i, .val = i}.elem);
+    v = or_insert(entry_wrap(&om, &i), &(struct Val){.key = i, .val = i}.elem);
     check(validate(&om), true);
     check(v != NULL, true);
     check(v->key, i);
     check(v->val, i);
     check(count(&om).count, i + 1);
-    e = remove_entry_r(entry_r(&om, &i));
+    e = remove_entry_wrap(entry_wrap(&om, &i));
     check(validate(&om), true);
     check(occupied(e), true);
     check(count(&om).count, i);
@@ -924,13 +929,13 @@ check_static_begin(adaptive_map_test_remove_entry)
     check(fill_n(&om, size - i, i), CHECK_PASS);
 
     i = size;
-    v = or_insert(entry_r(&om, &i), &(struct Val){.key = i, .val = i}.elem);
+    v = or_insert(entry_wrap(&om, &i), &(struct Val){.key = i, .val = i}.elem);
     check(validate(&om), true);
     check(v != NULL, true);
     check(v->key, i);
     check(v->val, i);
     check(count(&om).count, i + 1);
-    e = remove_entry_r(entry_r(&om, &i));
+    e = remove_entry_wrap(entry_wrap(&om, &i));
     check(validate(&om), true);
     check(occupied(e), true);
     check(count(&om).count, i);

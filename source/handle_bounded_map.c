@@ -238,9 +238,10 @@ static size_t branch_i(struct CCC_Handle_bounded_map const *, size_t parent,
 static size_t parent_i(struct CCC_Handle_bounded_map const *, size_t child);
 static size_t index_of(struct CCC_Handle_bounded_map const *, void const *type);
 /* Returning references to index fields for tree nodes. */
-static size_t *branch_r(struct CCC_Handle_bounded_map const *, size_t node,
-                        enum Branch branch);
-static size_t *parent_r(struct CCC_Handle_bounded_map const *, size_t node);
+static size_t *branch_pointer(struct CCC_Handle_bounded_map const *,
+                              size_t node, enum Branch branch);
+static size_t *parent_pointer(struct CCC_Handle_bounded_map const *,
+                              size_t node);
 /* Returning WAVL tree status. */
 static CCC_Tribool is_0_child(struct CCC_Handle_bounded_map const *, size_t p,
                               size_t x);
@@ -310,8 +311,8 @@ CCC_handle_bounded_map_contains(CCC_Handle_bounded_map const *const map,
 }
 
 CCC_Handle_index
-CCC_handle_bounded_map_get_key_val(CCC_Handle_bounded_map const *const map,
-                                   void const *const key)
+CCC_handle_bounded_map_get_key_value(CCC_Handle_bounded_map const *const map,
+                                     void const *const key)
 {
     if (!map || !key)
     {
@@ -1422,14 +1423,14 @@ block_count(size_t const node_count)
 }
 
 static inline size_t *
-branch_r(struct CCC_Handle_bounded_map const *t, size_t const node,
-         enum Branch const branch)
+branch_pointer(struct CCC_Handle_bounded_map const *t, size_t const node,
+               enum Branch const branch)
 {
     return &node_at(t, node)->branch[branch];
 }
 
 static inline size_t *
-parent_r(struct CCC_Handle_bounded_map const *t, size_t const node)
+parent_pointer(struct CCC_Handle_bounded_map const *t, size_t const node)
 {
 
     return &node_at(t, node)->parent;
@@ -1500,26 +1501,26 @@ remove_fixup(struct CCC_Handle_bounded_map *const map, size_t const remove)
         y = remove;
         p = parent_i(map, y);
         x = branch_i(map, y, !branch_i(map, y, L));
-        *parent_r(map, x) = parent_i(map, y);
+        *parent_pointer(map, x) = parent_i(map, y);
         if (!p)
         {
             map->root = x;
         }
         two_child = is_2_child(map, p, y);
-        *branch_r(map, p, branch_i(map, p, R) == y) = x;
+        *branch_pointer(map, p, branch_i(map, p, R) == y) = x;
     }
     else
     {
         y = min_max_from(map, branch_i(map, remove, R), MINDIR);
         p = parent_i(map, y);
         x = branch_i(map, y, !branch_i(map, y, L));
-        *parent_r(map, x) = parent_i(map, y);
+        *parent_pointer(map, x) = parent_i(map, y);
 
         /* Save if check and improve readability by assuming this is true. */
         assert(p);
 
         two_child = is_2_child(map, p, y);
-        *branch_r(map, p, branch_i(map, p, R) == y) = x;
+        *branch_pointer(map, p, branch_i(map, p, R) == y) = x;
         transplant(map, remove, y);
         if (remove == p)
         {
@@ -1559,7 +1560,7 @@ transplant(struct CCC_Handle_bounded_map *const map, size_t const remove,
 {
     assert(remove);
     assert(replacement);
-    *parent_r(map, replacement) = parent_i(map, remove);
+    *parent_pointer(map, replacement) = parent_i(map, remove);
     if (!parent_i(map, remove))
     {
         map->root = replacement;
@@ -1567,13 +1568,13 @@ transplant(struct CCC_Handle_bounded_map *const map, size_t const remove,
     else
     {
         size_t const p = parent_i(map, remove);
-        *branch_r(map, p, branch_i(map, p, R) == remove) = replacement;
+        *branch_pointer(map, p, branch_i(map, p, R) == remove) = replacement;
     }
     struct CCC_Handle_bounded_map_node *const remove_r = node_at(map, remove);
     struct CCC_Handle_bounded_map_node *const replace_r
         = node_at(map, replacement);
-    *parent_r(map, remove_r->branch[R]) = replacement;
-    *parent_r(map, remove_r->branch[L]) = replacement;
+    *parent_pointer(map, remove_r->branch[R]) = replacement;
+    *parent_pointer(map, remove_r->branch[L]) = replacement;
     replace_r->branch[R] = remove_r->branch[R];
     replace_r->branch[L] = remove_r->branch[L];
     set_parity(map, replacement, parity(map, remove));
@@ -1680,7 +1681,7 @@ rotate(struct CCC_Handle_bounded_map *const map, size_t const z, size_t const x,
     x_r->branch[dir] = z;
     z_r->parent = x;
     z_r->branch[!dir] = y;
-    *parent_r(map, y) = z;
+    *parent_pointer(map, y) = z;
 }
 
 /** A double rotation shouldn't actually be two calls to rotate because that
@@ -1714,12 +1715,12 @@ double_rotate(struct CCC_Handle_bounded_map *const map, size_t const z,
         g_r->branch[g_r->branch[R] == z] = y;
     }
     x_r->branch[!dir] = y_r->branch[dir];
-    *parent_r(map, y_r->branch[dir]) = x;
+    *parent_pointer(map, y_r->branch[dir]) = x;
     y_r->branch[dir] = x;
     x_r->parent = y;
 
     z_r->branch[dir] = y_r->branch[!dir];
-    *parent_r(map, y_r->branch[!dir]) = z;
+    *parent_pointer(map, y_r->branch[!dir]) = z;
     y_r->branch[!dir] = z;
     z_r->parent = y;
 }

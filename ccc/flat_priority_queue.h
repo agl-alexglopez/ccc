@@ -353,14 +353,14 @@ flat_priority_queue is empty.
 ```
 #define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
 Flat_priority_queue flat_priority_queue = build_rand_int_flat_priority_queue();
-(void)flat_priority_queue_update_w(&flat_priority_queue,
+(void)flat_priority_queue_update_with(&flat_priority_queue,
 get_rand_flat_priority_queue_node(&flat_priority_queue), { *T = rand_key(); });
 ```
 
 Note that whether the key increases or decreases does not affect runtime. */
-#define CCC_flat_priority_queue_update_w(                                      \
+#define CCC_flat_priority_queue_update_with(                                   \
     flat_priority_queue_pointer, type_pointer, update_closure_over_T...)       \
-    CCC_private_flat_priority_queue_update_w(                                  \
+    CCC_private_flat_priority_queue_update_with(                               \
         flat_priority_queue_pointer, type_pointer, update_closure_over_T)
 
 /** @brief Increase e that is a handle to the stored flat_priority_queue
@@ -398,14 +398,14 @@ flat_priority_queue is empty.
 ```
 #define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
 Flat_priority_queue flat_priority_queue = build_rand_int_flat_priority_queue();
-(void)flat_priority_queue_increase_w(&flat_priority_queue,
+(void)flat_priority_queue_increase_with(&flat_priority_queue,
 get_rand_flat_priority_queue_node(&flat_priority_queue), { (*T)++; });
 ```
 
 Note that if this priority queue is min or max, the runtime is the same. */
-#define CCC_flat_priority_queue_increase_w(                                    \
+#define CCC_flat_priority_queue_increase_with(                                 \
     flat_priority_queue_pointer, type_pointer, increase_closure_over_T...)     \
-    CCC_private_flat_priority_queue_increase_w(                                \
+    CCC_private_flat_priority_queue_increase_with(                             \
         flat_priority_queue_pointer, type_pointer, increase_closure_over_T)
 
 /** @brief Decrease e that is a handle to the stored flat_priority_queue
@@ -443,14 +443,14 @@ flat_priority_queue is empty.
 ```
 #define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
 Flat_priority_queue flat_priority_queue = build_rand_int_flat_priority_queue();
-(void)flat_priority_queue_decrease_w(&flat_priority_queue,
+(void)flat_priority_queue_decrease_with(&flat_priority_queue,
 get_rand_flat_priority_queue_node(&flat_priority_queue), { (*T)--; });
 ```
 
 Note that if this priority queue is min or max, the runtime is the same. */
-#define CCC_flat_priority_queue_decrease_w(                                    \
+#define CCC_flat_priority_queue_decrease_with(                                 \
     flat_priority_queue_pointer, type_pointer, decrease_closure_over_T...)     \
-    CCC_private_flat_priority_queue_decrease_w(                                \
+    CCC_private_flat_priority_queue_decrease_with(                             \
         flat_priority_queue_pointer, type_pointer, decrease_closure_over_T)
 
 /**@}*/
@@ -652,12 +652,12 @@ typedef CCC_Flat_priority_queue Flat_priority_queue;
         CCC_flat_priority_queue_increase(args)
 #    define flat_priority_queue_decrease(args...)                              \
         CCC_flat_priority_queue_decrease(args)
-#    define flat_priority_queue_update_w(args...)                              \
-        CCC_flat_priority_queue_update_w(args)
-#    define flat_priority_queue_increase_w(args...)                            \
-        CCC_flat_priority_queue_increase_w(args)
-#    define flat_priority_queue_decrease_w(args...)                            \
-        CCC_flat_priority_queue_decrease_w(args)
+#    define flat_priority_queue_update_with(args...)                           \
+        CCC_flat_priority_queue_update_with(args)
+#    define flat_priority_queue_increase_with(args...)                         \
+        CCC_flat_priority_queue_increase_with(args)
+#    define flat_priority_queue_decrease_with(args...)                         \
+        CCC_flat_priority_queue_decrease_with(args)
 #    define flat_priority_queue_clear(args...)                                 \
         CCC_flat_priority_queue_clear(args)
 #    define flat_priority_queue_clear_and_free(args...)                        \

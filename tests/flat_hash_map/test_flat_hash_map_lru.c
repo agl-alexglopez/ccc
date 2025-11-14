@@ -114,7 +114,7 @@ static struct Lru_cache lru_cache = {
 check_static_begin(lru_put, struct Lru_cache *const lru, int const key,
                    int const val)
 {
-    CCC_Flat_hash_map_entry *const ent = entry_r(&lru->fh, &key);
+    CCC_Flat_hash_map_entry *const ent = entry_wrap(&lru->fh, &key);
     if (occupied(ent))
     {
         struct Lru_lookup const *const found = unwrap(ent);
@@ -137,7 +137,8 @@ check_static_begin(lru_put, struct Lru_cache *const lru, int const key,
         {
             struct Key_val const *const to_drop = back(&lru->l);
             check(to_drop == NULL, false);
-            CCC_Entry const e = remove_entry(entry_r(&lru->fh, &to_drop->key));
+            CCC_Entry const e
+                = remove_entry(entry_wrap(&lru->fh, &to_drop->key));
             check(occupied(&e), true);
             (void)pop_back(&lru->l);
         }
@@ -149,7 +150,7 @@ check_static_begin(lru_get, struct Lru_cache *const lru, int const key,
                    int *val)
 {
     check_error(val != NULL, true);
-    struct Lru_lookup const *const found = get_key_val(&lru->fh, &key);
+    struct Lru_lookup const *const found = get_key_value(&lru->fh, &key);
     if (!found)
     {
         *val = -1;

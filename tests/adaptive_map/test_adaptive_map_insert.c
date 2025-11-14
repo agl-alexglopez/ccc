@@ -44,40 +44,40 @@ check_static_begin(adaptive_map_test_insert_macros)
     CCC_Adaptive_map om = adaptive_map_initialize(om, struct Val, elem, key,
                                                   id_order, std_allocate, NULL);
 
-    struct Val const *ins = CCC_adaptive_map_or_insert_w(
-        entry_r(&om, &(int){2}), (struct Val){.key = 2, .val = 0});
+    struct Val const *ins = CCC_adaptive_map_or_insert_with(
+        entry_wrap(&om, &(int){2}), (struct Val){.key = 2, .val = 0});
     check(ins != NULL, true);
     check(validate(&om), true);
     check(count(&om).count, 1);
-    ins = adaptive_map_insert_entry_w(entry_r(&om, &(int){2}),
-                                      (struct Val){.key = 2, .val = 0});
+    ins = adaptive_map_insert_entry_with(entry_wrap(&om, &(int){2}),
+                                         (struct Val){.key = 2, .val = 0});
     check(validate(&om), true);
     check(ins != NULL, true);
-    ins = adaptive_map_insert_entry_w(entry_r(&om, &(int){9}),
-                                      (struct Val){.key = 9, .val = 1});
+    ins = adaptive_map_insert_entry_with(entry_wrap(&om, &(int){9}),
+                                         (struct Val){.key = 9, .val = 1});
     check(validate(&om), true);
     check(ins != NULL, true);
     ins = CCC_entry_unwrap(
-        adaptive_map_insert_or_assign_w(&om, 3, (struct Val){.val = 99}));
+        adaptive_map_insert_or_assign_with(&om, 3, (struct Val){.val = 99}));
     check(validate(&om), true);
     check(ins == NULL, false);
     check(validate(&om), true);
     check(ins->val, 99);
     check(count(&om).count, 3);
     ins = CCC_entry_unwrap(
-        adaptive_map_insert_or_assign_w(&om, 3, (struct Val){.val = 98}));
+        adaptive_map_insert_or_assign_with(&om, 3, (struct Val){.val = 98}));
     check(validate(&om), true);
     check(ins == NULL, false);
     check(ins->val, 98);
     check(count(&om).count, 3);
     ins = CCC_entry_unwrap(
-        adaptive_map_try_insert_w(&om, 3, (struct Val){.val = 100}));
+        adaptive_map_try_insert_with(&om, 3, (struct Val){.val = 100}));
     check(ins == NULL, false);
     check(validate(&om), true);
     check(ins->val, 98);
     check(count(&om).count, 3);
     ins = CCC_entry_unwrap(
-        adaptive_map_try_insert_w(&om, 4, (struct Val){.val = 100}));
+        adaptive_map_try_insert_with(&om, 4, (struct Val){.val = 100}));
     check(ins == NULL, false);
     check(validate(&om), true);
     check(ins->val, 100);
@@ -95,7 +95,7 @@ check_static_begin(adaptive_map_test_insert_overwrite)
     check(occupied(&ent), false);
     check(unwrap(&ent), NULL);
 
-    struct Val const *v = unwrap(entry_r(&om, &q.key));
+    struct Val const *v = unwrap(entry_wrap(&om, &q.key));
     check(v != NULL, true);
     check(v->val, 99);
 
@@ -112,7 +112,7 @@ check_static_begin(adaptive_map_test_insert_overwrite)
     check(v != NULL, true);
     check(v->val, 99);
     check(r.val, 99);
-    v = unwrap(entry_r(&om, &r.key));
+    v = unwrap(entry_wrap(&om, &r.key));
     check(v != NULL, true);
     check(v->val, 100);
     check_end();
@@ -126,7 +126,7 @@ check_static_begin(adaptive_map_test_insert_then_bad_ideas)
     CCC_Entry ent = swap_entry(&om, &q.elem, &(struct Val){}.elem);
     check(occupied(&ent), false);
     check(unwrap(&ent), NULL);
-    struct Val const *v = unwrap(entry_r(&om, &q.key));
+    struct Val const *v = unwrap(entry_wrap(&om, &q.key));
     check(v != NULL, true);
     check(v->val, 99);
 
@@ -140,7 +140,7 @@ check_static_begin(adaptive_map_test_insert_then_bad_ideas)
     check(r.val, 99);
     r.val -= 9;
 
-    v = get_key_val(&om, &q.key);
+    v = get_key_value(&om, &q.key);
     check(v != NULL, true);
     check(v->val, 100);
     check(r.val, 90);
@@ -163,7 +163,7 @@ check_static_begin(adaptive_map_test_entry_api_functional)
         def.key = (int)i;
         def.val = (int)i;
         struct Val const *const d
-            = or_insert(entry_r(&om, &def.key), &def.elem);
+            = or_insert(entry_wrap(&om, &def.key), &def.elem);
         check((d != NULL), true);
         check(d->key, i);
         check(d->val, i);
@@ -175,10 +175,10 @@ check_static_begin(adaptive_map_test_entry_api_functional)
         def.key = (int)i;
         def.val = (int)i;
         struct Val const *const d = or_insert(
-            adaptive_map_and_modify_w(entry_r(&om, &def.key), struct Val,
-                                      {
-                                          T->val++;
-                                      }),
+            adaptive_map_and_modify_with(entry_wrap(&om, &def.key), struct Val,
+                                         {
+                                             T->val++;
+                                         }),
             &def.elem);
         /* All values in the array should be odd now */
         check((d != NULL), true);
@@ -200,7 +200,7 @@ check_static_begin(adaptive_map_test_entry_api_functional)
     {
         def.key = (int)i;
         def.val = (int)i;
-        struct Val *const in = or_insert(entry_r(&om, &def.key), &def.elem);
+        struct Val *const in = or_insert(entry_wrap(&om, &def.key), &def.elem);
         in->val++;
         /* All values in the array should be odd now */
         check((in->val % 2 == 0), true);
@@ -225,7 +225,7 @@ check_static_begin(adaptive_map_test_insert_via_entry)
         def.key = (int)i;
         def.val = (int)i;
         struct Val const *const d
-            = insert_entry(entry_r(&om, &def.key), &def.elem);
+            = insert_entry(entry_wrap(&om, &def.key), &def.elem);
         check((d != NULL), true);
         check(d->key, i);
         check(d->val, i);
@@ -237,7 +237,7 @@ check_static_begin(adaptive_map_test_insert_via_entry)
         def.key = (int)i;
         def.val = (int)i + 1;
         struct Val const *const d
-            = insert_entry(entry_r(&om, &def.key), &def.elem);
+            = insert_entry(entry_wrap(&om, &def.key), &def.elem);
         /* All values in the array should be odd now */
         check((d != NULL), true);
         check(d->val, i + 1);
@@ -267,7 +267,7 @@ check_static_begin(adaptive_map_test_insert_via_entry_macros)
     for (size_t i = 0; i < size / 2; i += 2)
     {
         struct Val const *const d
-            = insert_entry(entry_r(&om, &i), &(struct Val){i, i, {}}.elem);
+            = insert_entry(entry_wrap(&om, &i), &(struct Val){i, i, {}}.elem);
         check((d != NULL), true);
         check(d->key, i);
         check(d->val, i);
@@ -276,8 +276,8 @@ check_static_begin(adaptive_map_test_insert_via_entry_macros)
     /* The default insertion should not occur every other element. */
     for (size_t i = 0; i < size / 2; ++i)
     {
-        struct Val const *const d
-            = insert_entry(entry_r(&om, &i), &(struct Val){i, i + 1, {}}.elem);
+        struct Val const *const d = insert_entry(
+            entry_wrap(&om, &i), &(struct Val){i, i + 1, {}}.elem);
         /* All values in the array should be odd now */
         check((d != NULL), true);
         check(d->val, i + 1);
@@ -308,8 +308,8 @@ check_static_begin(adaptive_map_test_entry_api_macros)
     {
         /* The macros support functions that will only execute if the or
            insert branch executes. */
-        struct Val const *const d = adaptive_map_or_insert_w(
-            entry_r(&om, &i), adaptive_map_create(i, i));
+        struct Val const *const d = adaptive_map_or_insert_with(
+            entry_wrap(&om, &i), adaptive_map_create(i, i));
         check((d != NULL), true);
         check(d->key, i);
         check(d->val, i);
@@ -318,8 +318,8 @@ check_static_begin(adaptive_map_test_entry_api_macros)
     /* The default insertion should not occur every other element. */
     for (int i = 0; i < size / 2; ++i)
     {
-        struct Val const *const d = adaptive_map_or_insert_w(
-            and_modify(entry_r(&om, &i), adaptive_map_modplus),
+        struct Val const *const d = adaptive_map_or_insert_with(
+            and_modify(entry_wrap(&om, &i), adaptive_map_modplus),
             adaptive_map_create(i, i));
         /* All values in the array should be odd now */
         check((d != NULL), true);
@@ -340,7 +340,7 @@ check_static_begin(adaptive_map_test_entry_api_macros)
     for (int i = 0; i < size / 2; ++i)
     {
         struct Val *v
-            = adaptive_map_or_insert_w(entry_r(&om, &i), (struct Val){});
+            = adaptive_map_or_insert_with(entry_wrap(&om, &i), (struct Val){});
         check(v != NULL, true);
         v->val++;
         /* All values in the array should be odd now */
@@ -360,7 +360,7 @@ check_static_begin(adaptive_map_test_two_sum)
     for (size_t i = 0; i < (size_t)(sizeof(addends) / sizeof(addends[0])); ++i)
     {
         struct Val const *const other_addend
-            = get_key_val(&om, &(int){target - addends[i]});
+            = get_key_value(&om, &(int){target - addends[i]});
         if (other_addend)
         {
             solution_indices[0] = (int)i;
@@ -387,7 +387,7 @@ check_static_begin(adaptive_map_test_resize)
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
         struct Val elem = {.key = shuffled_index, .val = i};
-        struct Val *v = insert_entry(entry_r(&om, &elem.key), &elem.elem);
+        struct Val *v = insert_entry(entry_wrap(&om, &elem.key), &elem.elem);
         check(v != NULL, true);
         check(v->key, shuffled_index);
         check(v->val, i);
@@ -399,7 +399,7 @@ check_static_begin(adaptive_map_test_resize)
     {
         struct Val swap_slot = {shuffled_index, shuffled_index, {}};
         struct Val const *const in_table
-            = insert_entry(entry_r(&om, &swap_slot.key), &swap_slot.elem);
+            = insert_entry(entry_wrap(&om, &swap_slot.key), &swap_slot.elem);
         check(in_table != NULL, true);
         check(in_table->val, shuffled_index);
     }
@@ -416,7 +416,7 @@ check_static_begin(adaptive_map_test_resize_macros)
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
-        struct Val *v = insert_entry(entry_r(&om, &shuffled_index),
+        struct Val *v = insert_entry(entry_wrap(&om, &shuffled_index),
                                      &(struct Val){shuffled_index, i, {}}.elem);
         check(v != NULL, true);
         check(v->key, shuffled_index);
@@ -426,19 +426,20 @@ check_static_begin(adaptive_map_test_resize_macros)
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
-        struct Val const *const in_table = adaptive_map_or_insert_w(
-            adaptive_map_and_modify_w(entry_r(&om, &shuffled_index), struct Val,
-                                      {
-                                          T->val = shuffled_index;
-                                      }),
+        struct Val const *const in_table = adaptive_map_or_insert_with(
+            adaptive_map_and_modify_with(entry_wrap(&om, &shuffled_index),
+                                         struct Val,
+                                         {
+                                             T->val = shuffled_index;
+                                         }),
             (struct Val){});
         check(in_table != NULL, true);
         check(in_table->val, shuffled_index);
-        struct Val *v = adaptive_map_or_insert_w(entry_r(&om, &shuffled_index),
-                                                 (struct Val){});
+        struct Val *v = adaptive_map_or_insert_with(
+            entry_wrap(&om, &shuffled_index), (struct Val){});
         check(v == NULL, false);
         v->val = i;
-        v = get_key_val(&om, &shuffled_index);
+        v = get_key_value(&om, &shuffled_index);
         check(v != NULL, true);
         check(v->val, i);
     }
@@ -456,7 +457,7 @@ check_static_begin(adaptive_map_test_resize_fadaptive_map_null)
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
         struct Val elem = {.key = shuffled_index, .val = i};
-        struct Val *v = insert_entry(entry_r(&om, &elem.key), &elem.elem);
+        struct Val *v = insert_entry(entry_wrap(&om, &elem.key), &elem.elem);
         check(v != NULL, true);
         check(v->key, shuffled_index);
         check(v->val, i);
@@ -467,7 +468,7 @@ check_static_begin(adaptive_map_test_resize_fadaptive_map_null)
     {
         struct Val swap_slot = {shuffled_index, shuffled_index, {}};
         struct Val const *const in_table
-            = insert_entry(entry_r(&om, &swap_slot.key), &swap_slot.elem);
+            = insert_entry(entry_wrap(&om, &swap_slot.key), &swap_slot.elem);
         check(in_table != NULL, true);
         check(in_table->val, shuffled_index);
     }
@@ -484,7 +485,7 @@ check_static_begin(adaptive_map_test_resize_fadaptive_map_null_macros)
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
-        struct Val *v = insert_entry(entry_r(&om, &shuffled_index),
+        struct Val *v = insert_entry(entry_wrap(&om, &shuffled_index),
                                      &(struct Val){shuffled_index, i, {}}.elem);
         check(v != NULL, true);
         check(v->key, shuffled_index);
@@ -494,19 +495,20 @@ check_static_begin(adaptive_map_test_resize_fadaptive_map_null_macros)
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
-        struct Val const *const in_table = adaptive_map_or_insert_w(
-            adaptive_map_and_modify_w(entry_r(&om, &shuffled_index), struct Val,
-                                      {
-                                          T->val = shuffled_index;
-                                      }),
+        struct Val const *const in_table = adaptive_map_or_insert_with(
+            adaptive_map_and_modify_with(entry_wrap(&om, &shuffled_index),
+                                         struct Val,
+                                         {
+                                             T->val = shuffled_index;
+                                         }),
             (struct Val){});
         check(in_table != NULL, true);
         check(in_table->val, shuffled_index);
-        struct Val *v = adaptive_map_or_insert_w(entry_r(&om, &shuffled_index),
-                                                 (struct Val){});
+        struct Val *v = adaptive_map_or_insert_with(
+            entry_wrap(&om, &shuffled_index), (struct Val){});
         check(v == NULL, false);
         v->val = i;
-        v = get_key_val(&om, &shuffled_index);
+        v = get_key_value(&om, &shuffled_index);
         check(v == NULL, false);
         check(v->val, i);
     }
@@ -536,13 +538,13 @@ check_static_begin(adaptive_map_test_insert_and_find)
     for (int i = 0; i < size; i += 2)
     {
         check(contains(&om, &i), true);
-        check(occupied(entry_r(&om, &i)), true);
+        check(occupied(entry_wrap(&om, &i)), true);
         check(validate(&om), true);
     }
     for (int i = 1; i < size; i += 2)
     {
         check(contains(&om, &i), false);
-        check(occupied(entry_r(&om, &i)), false);
+        check(occupied(entry_wrap(&om, &i)), false);
         check(validate(&om), true);
     }
     check_end(adaptive_map_clear(&om, NULL););

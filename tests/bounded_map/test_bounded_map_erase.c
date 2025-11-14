@@ -30,7 +30,7 @@ check_static_begin(bounded_map_test_insert_erase_shuffled)
     /* Now let's delete everything with no errors. */
     for (size_t i = 0; i < size; ++i)
     {
-        struct Val *v = unwrap(remove_r(&s, &vals[i].elem));
+        struct Val *v = unwrap(remove_wrap(&s, &vals[i].elem));
         check(v != NULL, true);
         check(v->key, vals[i].key);
         check(validate(&s), true);
@@ -68,7 +68,8 @@ check_static_begin(bounded_map_test_prime_shuffle)
     check(bounded_map_count(&s).count < size, true);
     for (size_t i = 0; i < size; ++i)
     {
-        check(occupied(remove_entry_r(entry_r(&s, &vals[i].key))) || repeats[i],
+        check(occupied(remove_entry_wrap(entry_wrap(&s, &vals[i].key)))
+                  || repeats[i],
               true);
         check(validate(&s), true);
     }

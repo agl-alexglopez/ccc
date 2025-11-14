@@ -55,7 +55,7 @@ check_static_begin(flat_hash_map_test_insert_then_iterate)
     for (int i = 0; i < size; i += 2)
     {
         check(contains(&fh, &i), true);
-        check(occupied(entry_r(&fh, &i)), true);
+        check(occupied(entry_wrap(&fh, &i)), true);
         check(validate(&fh), true);
         ++seen;
     }
@@ -81,7 +81,7 @@ check_static_begin(flat_hash_map_test_insert_allocate_clear_free)
     int const size = 32;
     for (int i = 0; i < size; ++i)
     {
-        CCC_Entry *e = flat_hash_map_try_insert_w(
+        CCC_Entry *e = flat_hash_map_try_insert_with(
             &fh, i, (struct Owner){.allocation = malloc(sizeof(size_t))});
         check(occupied(e), CCC_FALSE);
         struct Owner const *const o = unwrap(e);

@@ -407,10 +407,11 @@ build_encoding_priority_queue(FILE *const f, struct Huffman_tree *const tree)
         NULL, struct Character_frequency, ch, hash_char, char_order,
         std_allocate, NULL, 0);
     foreach_filechar(f, c, {
-        struct Character_frequency *const ins = or_insert(
-            flat_hash_map_and_modify_w(entry_r(&frequencies, c),
-                                       struct Character_frequency, ++T->freq;),
-            &(struct Character_frequency){.ch = *c, .freq = 1});
+        struct Character_frequency *const ins
+            = or_insert(flat_hash_map_and_modify_with(
+                            entry_wrap(&frequencies, c),
+                            struct Character_frequency, ++T->freq;),
+                        &(struct Character_frequency){.ch = *c, .freq = 1});
         check(ins);
     });
     size_t const leaves = count(&frequencies).count;
@@ -475,7 +476,7 @@ build_encoding_bitq(FILE *const f, struct Huffman_tree *const tree)
     CCC_Result r = reserve(&memo, tree->num_leaves, std_allocate);
     check(r == CCC_RESULT_OK);
     foreach_filechar(f, c, {
-        struct Path_memo const *path = get_key_val(&memo, c);
+        struct Path_memo const *path = get_key_value(&memo, c);
         if (path)
         {
             size_t const end = path->path_start_index + path->path_len;
@@ -505,7 +506,7 @@ memoize_path(struct Huffman_tree *const tree, Flat_hash_map *const fh,
              struct Bit_queue *const bq, char const c)
 {
     struct Path_memo *const path = insert_entry(
-        entry_r(fh, &c),
+        entry_wrap(fh, &c),
         &(struct Path_memo){.ch = c, .path_start_index = bitq_count(bq)});
     check(path);
     size_t cur = tree->root;

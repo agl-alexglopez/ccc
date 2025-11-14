@@ -186,17 +186,17 @@ struct Val
     int key;
 };
 Priority_queue priority_queue = build_rand_priority_queue();
-priority_queue_update_w(&priority_queue, get_rand_val(&priority_queue), { T->key
-= rand_key(); });
+priority_queue_update_with(&priority_queue, get_rand_val(&priority_queue), {
+T->key = rand_key(); });
 ```
 
 Note that this operation may incur unnecessary overhead if the user can't
 deduce if an increase or decrease is occurring. See the increase and decrease
 operations. O(1) best case, O(lgN) worst case. */
-#define CCC_priority_queue_update_w(priority_queue_pointer, type_pointer,      \
-                                    update_closure_over_T...)                  \
-    CCC_private_priority_queue_update_w(priority_queue_pointer, type_pointer,  \
-                                        update_closure_over_T)
+#define CCC_priority_queue_update_with(priority_queue_pointer, type_pointer,   \
+                                       update_closure_over_T...)               \
+    CCC_private_priority_queue_update_with(                                    \
+        priority_queue_pointer, type_pointer, update_closure_over_T)
 
 /** @brief Increases the priority of the type wrapping elem. O(1) or O(lgN)
 @param[in] priority_queue a pointer to the priority queue.
@@ -242,7 +242,7 @@ struct Val
     int key;
 };
 Priority_queue priority_queue = build_rand_priority_queue();
-priority_queue_increase_w(&priority_queue, get_rand_val(&priority_queue), {
+priority_queue_increase_with(&priority_queue, get_rand_val(&priority_queue), {
 T->key++; });
 ```
 
@@ -253,9 +253,9 @@ value. If this is a max heap O(1), otherwise O(lgN).
 While the best case operation is O(1) the impact of restructuring on future pops
 from the priority_queue creates an amortized o(lgN) runtime for this function.
 */
-#define CCC_priority_queue_increase_w(priority_queue_pointer, type_pointer,    \
-                                      increase_closure_over_T...)              \
-    CCC_private_priority_queue_increase_w(                                     \
+#define CCC_priority_queue_increase_with(priority_queue_pointer, type_pointer, \
+                                         increase_closure_over_T...)           \
+    CCC_private_priority_queue_increase_with(                                  \
         priority_queue_pointer, type_pointer, increase_closure_over_T)
 
 /** @brief Decreases the value of the type wrapping elem. O(1) or O(lgN)
@@ -300,7 +300,7 @@ struct Val
     int key;
 };
 Priority_queue priority_queue = build_rand_priority_queue();
-priority_queue_decrease_w(&priority_queue,
+priority_queue_decrease_with(&priority_queue,
 get_rand_priority_queue_node(&priority_queue), { T->key--; });
 ```
 
@@ -311,9 +311,9 @@ value. If this is a min heap O(1), otherwise O(lgN).
 While the best case operation is O(1) the impact of restructuring on future pops
 from the priority_queue creates an amortized o(lgN) runtime for this function.
 */
-#define CCC_priority_queue_decrease_w(priority_queue_pointer, type_pointer,    \
-                                      decrease_closure_over_T...)              \
-    CCC_private_priority_queue_decrease_w(                                     \
+#define CCC_priority_queue_decrease_with(priority_queue_pointer, type_pointer, \
+                                         decrease_closure_over_T...)           \
+    CCC_private_priority_queue_decrease_with(                                  \
         priority_queue_pointer, type_pointer, decrease_closure_over_T)
 
 /**@}*/
@@ -396,11 +396,12 @@ typedef CCC_Priority_queue Priority_queue;
 #    define priority_queue_update(args...) CCC_priority_queue_update(args)
 #    define priority_queue_increase(args...) CCC_priority_queue_increase(args)
 #    define priority_queue_decrease(args...) CCC_priority_queue_decrease(args)
-#    define priority_queue_update_w(args...) CCC_priority_queue_update_w(args)
-#    define priority_queue_increase_w(args...)                                 \
-        CCC_priority_queue_increase_w(args)
-#    define priority_queue_decrease_w(args...)                                 \
-        CCC_priority_queue_decrease_w(args)
+#    define priority_queue_update_with(args...)                                \
+        CCC_priority_queue_update_with(args)
+#    define priority_queue_increase_with(args...)                              \
+        CCC_priority_queue_increase_with(args)
+#    define priority_queue_decrease_with(args...)                              \
+        CCC_priority_queue_decrease_with(args)
 #    define priority_queue_order(args...) CCC_priority_queue_order(args)
 #    define priority_queue_clear(args...) CCC_priority_queue_clear(args)
 #    define priority_queue_validate(args...) CCC_priority_queue_validate(args)

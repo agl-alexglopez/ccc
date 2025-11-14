@@ -209,8 +209,8 @@ CCC_handle_adaptive_map_contains(CCC_Handle_adaptive_map *const map,
 }
 
 CCC_Handle_index
-CCC_handle_adaptive_map_get_key_val(CCC_Handle_adaptive_map *const map,
-                                    void const *const key)
+CCC_handle_adaptive_map_get_key_value(CCC_Handle_adaptive_map *const map,
+                                      void const *const key)
 {
     if (!map || !key)
     {

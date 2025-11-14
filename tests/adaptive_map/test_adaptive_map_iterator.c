@@ -255,7 +255,8 @@ check_static_begin(adaptive_map_test_iterate_remove_reinsert)
         {
             (void)remove(&s, &i->elem);
             i->key = new_unique_entry_val;
-            check(insert_entry(entry_r(&s, &i->key), &i->elem) != NULL, true);
+            check(insert_entry(entry_wrap(&s, &i->key), &i->elem) != NULL,
+                  true);
             check(validate(&s), true);
             ++new_unique_entry_val;
         }
@@ -282,14 +283,14 @@ check_static_begin(adaptive_map_test_valid_range)
     /* This should be the following range [6,44). 6 should raise to
        next value not less than 6, 10 and 44 should be the first
        value greater than 44, 45. */
-    check(check_range(&s, equal_range_r(&s, &(int){6}, &(int){44}), 8,
+    check(check_range(&s, equal_range_wrap(&s, &(int){6}, &(int){44}), 8,
                       (int[8]){10, 15, 20, 25, 30, 35, 40, 45}),
           CHECK_PASS);
     /* This should be the following range [119,84). 119 should be
        dropped to first value not greater than 119 and last should
        be dropped to first value less than 84. */
     check(check_range_reverse(
-              &s, equal_range_reverse_r(&s, &(int){119}, &(int){84}), 8,
+              &s, equal_range_reverse_wrap(&s, &(int){119}, &(int){84}), 8,
               (int[8]){115, 110, 105, 100, 95, 90, 85, 80}),
           CHECK_PASS);
     check_end();
@@ -310,11 +311,11 @@ check_static_begin(adaptive_map_test_valid_range_equals)
         (void)swap_entry(&s, &vals[i].elem, &(struct Val){}.elem);
         check(validate(&s), true);
     }
-    check(check_range(&s, equal_range_r(&s, &(int){10}, &(int){40}), 8,
+    check(check_range(&s, equal_range_wrap(&s, &(int){10}, &(int){40}), 8,
                       (int[8]){10, 15, 20, 25, 30, 35, 40, 45}),
           CHECK_PASS);
     check(check_range_reverse(
-              &s, equal_range_reverse_r(&s, &(int){115}, &(int){85}), 8,
+              &s, equal_range_reverse_wrap(&s, &(int){115}, &(int){85}), 8,
               (int[8]){115, 110, 105, 100, 95, 90, 85, 80}),
           CHECK_PASS);
     check_end();
@@ -337,14 +338,14 @@ check_static_begin(adaptive_map_test_invalid_range)
     /* This should be the following range [95,999). 95 should raise to
        next value not less than 95, 95 and 999 should be the first
        value greater than 999, none or the end. */
-    check(check_range(&s, equal_range_r(&s, &(int){95}, &(int){999}), 6,
+    check(check_range(&s, equal_range_wrap(&s, &(int){95}, &(int){999}), 6,
                       (int[6]){95, 100, 105, 110, 115, 120}),
           CHECK_PASS);
     /* This should be the following range [36,-999). 36 should be
        dropped to first value not greater than 36 and last should
        be dropped to first value less than -999 which is end. */
     check(check_range_reverse(
-              &s, equal_range_reverse_r(&s, &(int){36}, &(int){-999}), 8,
+              &s, equal_range_reverse_wrap(&s, &(int){36}, &(int){-999}), 8,
               (int[8]){35, 30, 25, 20, 15, 10, 5, 0}),
           CHECK_PASS);
     check_end();

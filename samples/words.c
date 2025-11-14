@@ -278,7 +278,7 @@ print_found(FILE *const f, SV_String_view w)
     if (!wc.error)
     {
         Word const *const found_w
-            = handle_adaptive_map_at(&map, get_key_val(&map, &wc));
+            = handle_adaptive_map_at(&map, get_key_value(&map, &wc));
         if (found_w)
         {
             printf("%s %d\n", string_arena_at(&a, &found_w->ofs),
@@ -430,10 +430,11 @@ create_frequency_map(struct String_arena *const a, FILE *const f)
             if (!cw.error)
             {
                 Handle_adaptive_map_handle const *e
-                    = handle_r(&handle_adaptive_map, &cw);
-                e = handle_adaptive_map_and_modify_w(e, Word, { T->freq++; });
+                    = handle_wrap(&handle_adaptive_map, &cw);
+                e = handle_adaptive_map_and_modify_with(e, Word,
+                                                        { T->freq++; });
                 Word const *const w = handle_adaptive_map_at(
-                    &handle_adaptive_map, handle_adaptive_map_or_insert_w(
+                    &handle_adaptive_map, handle_adaptive_map_or_insert_with(
                                               e, (Word){.ofs = cw, .freq = 1}));
                 check(w);
             }

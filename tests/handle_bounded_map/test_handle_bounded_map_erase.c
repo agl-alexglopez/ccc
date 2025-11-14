@@ -31,7 +31,8 @@ check_static_begin(handle_bounded_map_test_insert_erase_shuffled)
     /* Now let's delete everything with no errors. */
     for (size_t i = 0; i < size; ++i)
     {
-        CCC_Handle const *const h = remove_r(&s, &(struct Val){.id = (int)i});
+        CCC_Handle const *const h
+            = remove_wrap(&s, &(struct Val){.id = (int)i});
         check(occupied(h), true);
         check(validate(&s), true);
     }
@@ -55,8 +56,8 @@ check_static_begin(handle_bounded_map_test_prime_shuffle)
     for (size_t i = 0; i < size; ++i)
     {
         if (occupied(
-                try_insert_r(&s, &(struct Val){.id = (int)shuffled_index,
-                                               .val = (int)shuffled_index})))
+                try_insert_wrap(&s, &(struct Val){.id = (int)shuffled_index,
+                                                  .val = (int)shuffled_index})))
         {
             repeats[i] = true;
         }
@@ -66,7 +67,7 @@ check_static_begin(handle_bounded_map_test_prime_shuffle)
     check(handle_bounded_map_count(&s).count < size, true);
     for (size_t i = 0; i < size; ++i)
     {
-        CCC_Handle const *const e = remove_handle_r(handle_r(&s, &i));
+        CCC_Handle const *const e = remove_handle_wrap(handle_wrap(&s, &i));
         check(occupied(e) || repeats[i], true);
         check(validate(&s), true);
     }

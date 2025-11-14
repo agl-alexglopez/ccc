@@ -37,15 +37,16 @@ check_static_begin(flat_hash_map_test_static_initialize)
     struct Val def = {.key = 137, .val = 0};
 
     /* Returning a vacant entry is possible when modification is attempted. */
-    Flat_hash_map_entry *ent = and_modify(entry_r(&static_fh, &def.key), mod);
+    Flat_hash_map_entry *ent
+        = and_modify(entry_wrap(&static_fh, &def.key), mod);
     check(occupied(ent), false);
     check((unwrap(ent) == NULL), true);
 
     /* Inserting default value before an in place modification is possible. */
-    struct Val *v = or_insert(entry_r(&static_fh, &def.key), &def);
+    struct Val *v = or_insert(entry_wrap(&static_fh, &def.key), &def);
     check(v != NULL, true);
     v->val++;
-    struct Val const *const inserted = get_key_val(&static_fh, &def.key);
+    struct Val const *const inserted = get_key_value(&static_fh, &def.key);
     check((inserted != NULL), true);
     check(inserted->key, 137);
     check(inserted->val, 1);
@@ -53,7 +54,7 @@ check_static_begin(flat_hash_map_test_static_initialize)
     /* Modifying an existing value or inserting default is possible when no
        context input is needed. */
     struct Val *v2
-        = or_insert(and_modify(entry_r(&static_fh, &def.key), mod), &def);
+        = or_insert(and_modify(entry_wrap(&static_fh, &def.key), mod), &def);
     check((v2 != NULL), true);
     check(inserted->key, 137);
     check(v2->val, 6);
@@ -61,7 +62,7 @@ check_static_begin(flat_hash_map_test_static_initialize)
     /* Modifying an existing value that requires external input is also
        possible with slightly different signature. */
     struct Val *v3 = or_insert(
-        and_modify_context(entry_r(&static_fh, &def.key), modw, &def.key),
+        and_modify_context(entry_wrap(&static_fh, &def.key), modw, &def.key),
         &def);
     check((v3 != NULL), true);
     check(inserted->key, 137);

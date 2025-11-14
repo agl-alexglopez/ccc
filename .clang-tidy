@@ -34,6 +34,8 @@ CheckOptions:
    - { key: readability-identifier-naming.FunctionCase, value: lower_case }
    - { key: readability-identifier-naming.VariableCase, value: lower_case }
    - { key: readability-identifier-naming.MemberCase, value: lower_case }
+   - { key: readability-identifier-naming.StaticConstantPrevix, value: static_ }
+   - { key: readability-identifier-naming.StaticConstantCase, value: lower_case }
    - { key: readability-function-cognitive-complexity.IgnoreMacros, value: true }
    - { key: misc-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic, value: true }
 

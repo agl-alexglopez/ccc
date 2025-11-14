@@ -351,7 +351,7 @@ main(void)
     {
         int const n = nums[i];
         CCC_Entry const *const seen_n
-            = try_insert_r(&fh, &(struct Key_val){.key = n, .val = 1});
+            = try_insert_wrap(&fh, &(struct Key_val){.key = n, .val = 1});
         /* We have already connected this run as much as possible. */
         if (occupied(seen_n))
         {
@@ -361,9 +361,9 @@ main(void)
 
         /* There may or may not be runs already existing to left and right. */
         struct Key_val const *const connect_left
-            = get_key_val(&fh, &(int){n - 1});
+            = get_key_value(&fh, &(int){n - 1});
         struct Key_val const *const connect_right
-            = get_key_val(&fh, &(int){n + 1});
+            = get_key_value(&fh, &(int){n + 1});
         int const left_run = connect_left ? connect_left->val : 0;
         int const right_run = connect_right ? connect_right->val : 0;
         int const full_run = left_run + 1 + right_run;
@@ -373,9 +373,9 @@ main(void)
 
         /* Update the boundaries of the full run range. */
         ((struct Key_val *)unwrap(seen_n))->val = full_run;
-        CCC_Entry const *const run_min = insert_or_assign_r(
+        CCC_Entry const *const run_min = insert_or_assign_wrap(
             &fh, &(struct Key_val){.key = n - left_run, .val = full_run});
-        CCC_Entry const *const run_max = insert_or_assign_r(
+        CCC_Entry const *const run_max = insert_or_assign_wrap(
             &fh, &(struct Key_val){.key = n + right_run, .val = full_run});
         assert(occupied(run_min));
         assert(occupied(run_max));
@@ -703,7 +703,7 @@ main(void)
         struct Val const *const v = push(&priority_queue, &elems[i].elem);
         assert(v && v->val == elems[i].val);
     }
-    bool const decreased = priority_queue_decrease_w(&priority_queue, &elems[4].elem,
+    bool const decreased = priority_queue_decrease_with(&priority_queue, &elems[4].elem,
                                          { elems[4].val = -99; });
     assert(decreased);
     struct Val const *const v = front(&priority_queue);
@@ -841,7 +841,7 @@ main(void)
 - [Compile time initialization](#compile-time-initialization).
 - [No `container_of` macro required of the user to get to their type after a function call](#no-container-of-macros).
 - [Rust's Entry API for associative containers with C and C++ influences](#rusts-entry-interface).
-    - Opt-in macros for more succinct insertion and in place modifications (see "closures" in the [and_modify_w](https://agl-alexglopez.github.io/ccc/flat__hash__map_8h.html) interface for associative containers).
+    - Opt-in macros for more succinct insertion and in place modifications (see "closures" in the [and_modify_wth](https://agl-alexglopez.github.io/ccc/flat__hash__map_8h.html) interface for associative containers).
 - [Container Traits implemented with C `_Generic` capabilities](#traits).
 
 ### Intrusive and Non-Intrusive Containers
@@ -1083,11 +1083,11 @@ Rust has solid interfaces for associative containers, largely due to the Entry I
 - `CCC_insert_entry(entry_pointer, insert_entry_args)` - Invariantly insert a new key value, overwriting an Occupied entry if needed.
 - `CCC_remove_entry(entry_pointer)` - Remove an Occupied entry from the container or do nothing.
 
-Other Rust Interface functions like `get_key_val`, `insert`, and `remove` are included and can provide information about previous values stored in the container.
+Other Rust Interface functions like `get_key_value`, `insert`, and `remove` are included and can provide information about previous values stored in the container.
 
-Each container offers it's own C version of "closures" for the `and_modify_w` macro, short for and modify "with". Here is an example from the `samples/words.c` program.
+Each container offers it's own C version of "closures" for the `and_modify_with`. Here is an example from the `samples/words.c` program.
 
-- `and_modify_w(handle_adaptive_map_entry_pointer, type_name, closure_over_T...)` - Run code in `closure_over_T` on the stored user type `T`.
+- `and_modify_with(handle_adaptive_map_entry_pointer, type_name, closure_over_T...)` - Run code in `closure_over_T` on the stored user type `T`.
 
 ```c
 typedef struct
@@ -1097,8 +1097,8 @@ typedef struct
 } Word;
 /* Increment a found Word or insert a default count of 1. */
 CCC_Handle_index const h =
-handle_adaptive_map_or_insert_w(
-    handle_adaptive_map_and_modify_w(handle_r(&hom, &key_ofs), Word, { T->cnt++; }),
+handle_adaptive_map_or_insert_with(
+    handle_adaptive_map_and_modify_with(handle_wrap(&hom, &key_ofs), Word, { T->cnt++; }),
     (Word){.ofs = ofs, .cnt = 1}
 );
 ```
@@ -1129,7 +1129,7 @@ struct Prim_cell new = (struct Prim_cell){
     .cell = next,
     .cost = rand_range(0, 100),
 };
-struct Prim_cell *const cell = or_insert(entry_r(&cost_map, &next), &new);
+struct Prim_cell *const cell = or_insert(entry_wrap(&cost_map, &next), &new);
 ```
 
 The lazily evaluated macro version.
@@ -1139,8 +1139,8 @@ struct Point const next = {
     .r = c->cell.r + dir_offsets[i].r,
     .c = c->cell.c + dir_offsets[i].c,
 };
-struct Prim_cell const *const cell = flat_hash_map_or_insert_w(
-    entry_r(&cost_map, &next),
+struct Prim_cell const *const cell = flat_hash_map_or_insert_with(
+    entry_wrap(&cost_map, &next),
     (struct Prim_cell){
         .cell = next,
         .cost = rand_range(0, 100),
@@ -1172,7 +1172,7 @@ val(int val_arg)
     return (struct Val){.val = val_args};
 }
 
-CCC_Entry *e = om_try_insert_w(&om, 3, val(1));
+CCC_Entry *e = om_try_insert_with(&om, 3, val(1));
 ```
 
 This second version illustrates a few key points. R-values are provided directly as keys and values, not references to keys and values. Also, a function call to generate a value to be inserted is completely acceptable; the function is only called if insertion is required. Finally, the functions `try_insert_w` and `insert_or_assign_w` will ensure the key in the newly inserted value matches the key searched, saving the user some typing and ensuring they don't make a mistake in this regard.
@@ -1195,7 +1195,7 @@ typedef struct
 /* ... Elsewhere generate offset ofs as key. */
 Word default = {.ofs = ofs, .cnt = 1};
 CCC_Handle_index const h =
-    or_insert(and_modify(handle_r(&hom, &ofs), increment), &default);
+    or_insert(and_modify(handle_wrap(&hom, &ofs), increment), &default);
 ```
 
 Or the following.
@@ -1209,7 +1209,7 @@ typedef struct
 } Word;
 /* ... Elsewhere generate offset ofs as key. */
 Word default = {.ofs = ofs, .cnt = 1};
-handle_adaptive_map_handle *h = handle_r(&hom, &ofs);
+handle_adaptive_map_handle *h = handle_wrap(&hom, &ofs);
 h = and_modify(h, increment)
 Word *w = handle_adaptive_map_at(&hom, or_insert(h, &default));
 ```

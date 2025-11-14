@@ -185,7 +185,7 @@ is of a known fixed size defined at compile time, not just a pointer. */
 /*==================     Core Macro Implementations     =====================*/
 
 /** @internal */
-#define CCC_private_handle_adaptive_map_and_modify_w(                          \
+#define CCC_private_handle_adaptive_map_and_modify_with(                       \
     Handle_adaptive_map_handle_pointer, type_name, closure_over_T...)          \
     (__extension__({                                                           \
         __auto_type private_handle_adaptive_map_mod_hndl_pointer               \
@@ -213,7 +213,7 @@ is of a known fixed size defined at compile time, not just a pointer. */
     }))
 
 /** @internal */
-#define CCC_private_handle_adaptive_map_or_insert_w(                           \
+#define CCC_private_handle_adaptive_map_or_insert_with(                        \
     Handle_adaptive_map_handle_pointer, type_compound_literal...)              \
     (__extension__({                                                           \
         __auto_type private_handle_adaptive_map_or_ins_hndl_pointer            \
@@ -254,7 +254,7 @@ is of a known fixed size defined at compile time, not just a pointer. */
     }))
 
 /** @internal */
-#define CCC_private_handle_adaptive_map_insert_handle_w(                       \
+#define CCC_private_handle_adaptive_map_insert_handle_with(                    \
     Handle_adaptive_map_handle_pointer, type_compound_literal...)              \
     (__extension__({                                                           \
         __auto_type private_handle_adaptive_map_ins_hndl_pointer               \
@@ -303,7 +303,7 @@ is of a known fixed size defined at compile time, not just a pointer. */
     }))
 
 /** @internal */
-#define CCC_private_handle_adaptive_map_try_insert_w(                          \
+#define CCC_private_handle_adaptive_map_try_insert_with(                       \
     Handle_adaptive_map_pointer, key, type_compound_literal...)                \
     (__extension__({                                                           \
         __auto_type private_handle_adaptive_map_try_ins_map_pointer            \
@@ -364,7 +364,7 @@ is of a known fixed size defined at compile time, not just a pointer. */
     }))
 
 /** @internal */
-#define CCC_private_handle_adaptive_map_insert_or_assign_w(                          \
+#define CCC_private_handle_adaptive_map_insert_or_assign_with(                       \
     Handle_adaptive_map_pointer, key, type_compound_literal...)                      \
     (__extension__({                                                                 \
         __auto_type private_handle_adaptive_map_ins_or_assign_map_pointer            \

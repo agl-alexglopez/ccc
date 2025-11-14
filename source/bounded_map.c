@@ -186,8 +186,8 @@ CCC_bounded_map_contains(CCC_Bounded_map const *const map,
 }
 
 void *
-CCC_bounded_map_get_key_val(CCC_Bounded_map const *const map,
-                            void const *const key)
+CCC_bounded_map_get_key_value(CCC_Bounded_map const *const map,
+                              void const *const key)
 {
     if (!map || !key)
     {
@@ -512,13 +512,14 @@ CCC_bounded_map_begin(CCC_Bounded_map const *map)
 
 void *
 CCC_bounded_map_next(CCC_Bounded_map const *const map,
-                     CCC_Bounded_map_node const *const e)
+                     CCC_Bounded_map_node const *const iterator_intruder)
 {
-    if (!map || !e)
+    if (!map || !iterator_intruder)
     {
         return NULL;
     }
-    struct CCC_Bounded_map_node const *const n = next(map, e, INORDER);
+    struct CCC_Bounded_map_node const *const n
+        = next(map, iterator_intruder, INORDER);
     if (n == &map->end)
     {
         return NULL;
@@ -550,14 +551,16 @@ CCC_bounded_map_reverse_end(CCC_Bounded_map const *const)
 }
 
 void *
-CCC_bounded_map_reverse_next(CCC_Bounded_map const *const map,
-                             CCC_Bounded_map_node const *const e)
+CCC_bounded_map_reverse_next(
+    CCC_Bounded_map const *const map,
+    CCC_Bounded_map_node const *const iterator_intruder)
 {
-    if (!map || !e)
+    if (!map || !iterator_intruder)
     {
         return NULL;
     }
-    struct CCC_Bounded_map_node const *const n = next(map, e, R_INORDER);
+    struct CCC_Bounded_map_node const *const n
+        = next(map, iterator_intruder, R_INORDER);
     return (n == &map->end) ? NULL : struct_base(map, n);
 }
 

@@ -359,8 +359,8 @@ fixed size and has data or is dynamic and has not yet been given allocation. */
 /** @internal A fairly good approximation of closures given C23 capabilities.
 The user facing docs clarify that T is a correctly typed reference to the
 desired data if occupied. */
-#define CCC_private_flat_hash_map_and_modify_w(Flat_hash_map_entry_pointer,    \
-                                               type_name, closure_over_T...)   \
+#define CCC_private_flat_hash_map_and_modify_with(                             \
+    Flat_hash_map_entry_pointer, type_name, closure_over_T...)                 \
     (__extension__({                                                           \
         __auto_type private_flat_hash_map_mod_ent_pointer                      \
             = (Flat_hash_map_entry_pointer);                                   \
@@ -389,8 +389,8 @@ desired data if occupied. */
 reference to the inserted data rather than a entry with a status. This is
 because it should not fail. If NULL is returned the user knows there is a
 problem. */
-#define CCC_private_flat_hash_map_or_insert_w(Flat_hash_map_entry_pointer,     \
-                                              type_compound_literal...)        \
+#define CCC_private_flat_hash_map_or_insert_with(Flat_hash_map_entry_pointer,  \
+                                                 type_compound_literal...)     \
     (__extension__({                                                           \
         __auto_type private_flat_hash_map_or_ins_ent_pointer                   \
             = (Flat_hash_map_entry_pointer);                                   \
@@ -421,8 +421,8 @@ problem. */
 /** @internal Insert entry also should not fail and therefore returns a
 reference directly. This is similar to insert or assign where overwriting may
 occur. */
-#define CCC_private_flat_hash_map_insert_entry_w(Flat_hash_map_entry_pointer,  \
-                                                 type_compound_literal...)     \
+#define CCC_private_flat_hash_map_insert_entry_with(                           \
+    Flat_hash_map_entry_pointer, type_compound_literal...)                     \
     (__extension__({                                                           \
         __auto_type private_flat_hash_map_ins_ent_pointer                      \
             = (Flat_hash_map_entry_pointer);                                   \
@@ -452,8 +452,8 @@ occur. */
 /** @internal Because this function does not start with an entry it has the
 option to give user more information and therefore returns an entry.
 Importantly, this function makes sure the key is in sync with key in table. */
-#define CCC_private_flat_hash_map_try_insert_w(Flat_hash_map_pointer, key,     \
-                                               type_compound_literal...)       \
+#define CCC_private_flat_hash_map_try_insert_with(Flat_hash_map_pointer, key,  \
+                                                  type_compound_literal...)    \
     (__extension__({                                                           \
         struct CCC_Flat_hash_map *private_Flat_hash_map_pointer                \
             = (Flat_hash_map_pointer);                                         \
@@ -505,7 +505,7 @@ Importantly, this function makes sure the key is in sync with key in table. */
 option to give user more information and therefore returns an entry.
 Importantly, this function makes sure the key is in sync with key in table.
 Similar to insert entry this will overwrite. */
-#define CCC_private_flat_hash_map_insert_or_assign_w(                          \
+#define CCC_private_flat_hash_map_insert_or_assign_with(                       \
     Flat_hash_map_pointer, key, type_compound_literal...)                      \
     (__extension__({                                                           \
         struct CCC_Flat_hash_map *private_Flat_hash_map_pointer                \

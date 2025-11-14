@@ -32,8 +32,8 @@ check_static_begin(handle_adaptive_map_test_insert)
                                          id_order, NULL, NULL, SMALL_FIXED_CAP);
 
     /* Nothing was there before so nothing is in the handle. */
-    CCC_Handle *hndl = swap_handle_r(&handle_adaptive_map,
-                                     &(struct Val){.id = 137, .val = 99});
+    CCC_Handle *hndl = swap_handle_wrap(&handle_adaptive_map,
+                                        &(struct Val){.id = 137, .val = 99});
     check(occupied(hndl), false);
     check(count(&handle_adaptive_map).count, 1);
     check_end();
@@ -46,27 +46,27 @@ check_static_begin(handle_adaptive_map_test_insert_macros)
                                          id_order, NULL, NULL, SMALL_FIXED_CAP);
 
     struct Val const *ins = handle_adaptive_map_at(
-        &handle_adaptive_map, CCC_handle_adaptive_map_or_insert_w(
-                                  handle_r(&handle_adaptive_map, &(int){2}),
+        &handle_adaptive_map, CCC_handle_adaptive_map_or_insert_with(
+                                  handle_wrap(&handle_adaptive_map, &(int){2}),
                                   (struct Val){.id = 2, .val = 0}));
     check(ins != NULL, true);
     check(validate(&handle_adaptive_map), true);
     check(count(&handle_adaptive_map).count, 1);
-    ins = handle_adaptive_map_at(&handle_adaptive_map,
-                                 handle_adaptive_map_insert_handle_w(
-                                     handle_r(&handle_adaptive_map, &(int){2}),
-                                     (struct Val){.id = 2, .val = 0}));
+    ins = handle_adaptive_map_at(
+        &handle_adaptive_map, handle_adaptive_map_insert_handle_with(
+                                  handle_wrap(&handle_adaptive_map, &(int){2}),
+                                  (struct Val){.id = 2, .val = 0}));
     check(validate(&handle_adaptive_map), true);
     check(ins != NULL, true);
-    ins = handle_adaptive_map_at(&handle_adaptive_map,
-                                 handle_adaptive_map_insert_handle_w(
-                                     handle_r(&handle_adaptive_map, &(int){9}),
-                                     (struct Val){.id = 9, .val = 1}));
+    ins = handle_adaptive_map_at(
+        &handle_adaptive_map, handle_adaptive_map_insert_handle_with(
+                                  handle_wrap(&handle_adaptive_map, &(int){9}),
+                                  (struct Val){.id = 9, .val = 1}));
     check(validate(&handle_adaptive_map), true);
     check(ins != NULL, true);
     ins = handle_adaptive_map_at(
         &handle_adaptive_map,
-        unwrap(handle_adaptive_map_insert_or_assign_w(
+        unwrap(handle_adaptive_map_insert_or_assign_with(
             &handle_adaptive_map, 3, (struct Val){.val = 99})));
     check(validate(&handle_adaptive_map), true);
     check(ins == NULL, false);
@@ -75,7 +75,7 @@ check_static_begin(handle_adaptive_map_test_insert_macros)
     check(count(&handle_adaptive_map).count, 3);
     ins = handle_adaptive_map_at(
         &handle_adaptive_map,
-        CCC_handle_unwrap(handle_adaptive_map_insert_or_assign_w(
+        CCC_handle_unwrap(handle_adaptive_map_insert_or_assign_with(
             &handle_adaptive_map, 3, (struct Val){.val = 98})));
     check(validate(&handle_adaptive_map), true);
     check(ins == NULL, false);
@@ -83,15 +83,15 @@ check_static_begin(handle_adaptive_map_test_insert_macros)
     check(count(&handle_adaptive_map).count, 3);
     ins = handle_adaptive_map_at(
         &handle_adaptive_map,
-        unwrap(handle_adaptive_map_try_insert_w(&handle_adaptive_map, 3,
-                                                (struct Val){.val = 100})));
+        unwrap(handle_adaptive_map_try_insert_with(&handle_adaptive_map, 3,
+                                                   (struct Val){.val = 100})));
     check(ins == NULL, false);
     check(validate(&handle_adaptive_map), true);
     check(ins->val, 98);
     check(count(&handle_adaptive_map).count, 3);
     ins = handle_adaptive_map_at(
         &handle_adaptive_map,
-        CCC_handle_unwrap(handle_adaptive_map_try_insert_w(
+        CCC_handle_unwrap(handle_adaptive_map_try_insert_with(
             &handle_adaptive_map, 4, (struct Val){.val = 100})));
     check(ins == NULL, false);
     check(validate(&handle_adaptive_map), true);
@@ -111,7 +111,7 @@ check_static_begin(handle_adaptive_map_test_insert_overwrite)
     check(occupied(&hndl), false);
 
     struct Val const *v = handle_adaptive_map_at(
-        &handle_adaptive_map, unwrap(handle_r(&handle_adaptive_map, &q.id)));
+        &handle_adaptive_map, unwrap(handle_wrap(&handle_adaptive_map, &q.id)));
     check(v != NULL, true);
     check(v->val, 99);
 
@@ -128,8 +128,8 @@ check_static_begin(handle_adaptive_map_test_insert_overwrite)
     check(v != NULL, true);
     check(v->val, 100);
     check(q.val, 99);
-    v = handle_adaptive_map_at(&handle_adaptive_map,
-                               unwrap(handle_r(&handle_adaptive_map, &q.id)));
+    v = handle_adaptive_map_at(
+        &handle_adaptive_map, unwrap(handle_wrap(&handle_adaptive_map, &q.id)));
     check(v != NULL, true);
     check(v->val, 100);
     check_end();
@@ -144,7 +144,7 @@ check_static_begin(handle_adaptive_map_test_insert_then_bad_ideas)
     CCC_Handle hndl = swap_handle(&handle_adaptive_map, &q);
     check(occupied(&hndl), false);
     struct Val const *v = handle_adaptive_map_at(
-        &handle_adaptive_map, unwrap(handle_r(&handle_adaptive_map, &q.id)));
+        &handle_adaptive_map, unwrap(handle_wrap(&handle_adaptive_map, &q.id)));
     check(v != NULL, true);
     check(v->val, 99);
 
@@ -159,7 +159,7 @@ check_static_begin(handle_adaptive_map_test_insert_then_bad_ideas)
     q.val -= 9;
 
     v = handle_adaptive_map_at(&handle_adaptive_map,
-                               get_key_val(&handle_adaptive_map, &q.id));
+                               get_key_value(&handle_adaptive_map, &q.id));
     check(v != NULL, true);
     check(v->val, 100);
     check(q.val, 90);
@@ -185,7 +185,7 @@ check_static_begin(handle_adaptive_map_test_handle_api_functional)
         def.val = (int)i;
         struct Val const *const d = handle_adaptive_map_at(
             &handle_adaptive_map,
-            or_insert(handle_r(&handle_adaptive_map, &def.id), &def));
+            or_insert(handle_wrap(&handle_adaptive_map, &def.id), &def));
         check((d != NULL), true);
         check(d->id, i);
         check(d->val, i);
@@ -197,9 +197,9 @@ check_static_begin(handle_adaptive_map_test_handle_api_functional)
         def.id = (int)i;
         def.val = (int)i;
         CCC_Handle_index const h
-            = or_insert(handle_adaptive_map_and_modify_w(
-                            handle_r(&handle_adaptive_map, &def.id), struct Val,
-                            { T->val++; }),
+            = or_insert(handle_adaptive_map_and_modify_with(
+                            handle_wrap(&handle_adaptive_map, &def.id),
+                            struct Val, { T->val++; }),
                         &def);
         struct Val const *const d
             = handle_adaptive_map_at(&handle_adaptive_map, h);
@@ -225,7 +225,7 @@ check_static_begin(handle_adaptive_map_test_handle_api_functional)
         def.val = (int)i;
         struct Val *const in = handle_adaptive_map_at(
             &handle_adaptive_map,
-            or_insert(handle_r(&handle_adaptive_map, &def.id), &def));
+            or_insert(handle_wrap(&handle_adaptive_map, &def.id), &def));
         in->val++;
         /* All values in the array should be odd now */
         check((in->val % 2 == 0), true);
@@ -253,7 +253,7 @@ check_static_begin(handle_adaptive_map_test_insert_via_handle)
         def.val = (int)i;
         struct Val const *const d = handle_adaptive_map_at(
             &handle_adaptive_map,
-            insert_handle(handle_r(&handle_adaptive_map, &def.id), &def));
+            insert_handle(handle_wrap(&handle_adaptive_map, &def.id), &def));
         check((d != NULL), true);
         check(d->id, i);
         check(d->val, i);
@@ -266,7 +266,7 @@ check_static_begin(handle_adaptive_map_test_insert_via_handle)
         def.val = (int)i + 1;
         struct Val const *const d = handle_adaptive_map_at(
             &handle_adaptive_map,
-            insert_handle(handle_r(&handle_adaptive_map, &def.id), &def));
+            insert_handle(handle_wrap(&handle_adaptive_map, &def.id), &def));
         /* All values in the array should be odd now */
         check((d != NULL), true);
         check(d->val, i + 1);
@@ -299,7 +299,7 @@ check_static_begin(handle_adaptive_map_test_insert_via_handle_macros)
     {
         struct Val const *const d = handle_adaptive_map_at(
             &handle_adaptive_map,
-            insert_handle(handle_r(&handle_adaptive_map, &i),
+            insert_handle(handle_wrap(&handle_adaptive_map, &i),
                           &(struct Val){i, i}));
         check((d != NULL), true);
         check(d->id, i);
@@ -311,7 +311,7 @@ check_static_begin(handle_adaptive_map_test_insert_via_handle_macros)
     {
         struct Val const *const d = handle_adaptive_map_at(
             &handle_adaptive_map,
-            insert_handle(handle_r(&handle_adaptive_map, &i),
+            insert_handle(handle_wrap(&handle_adaptive_map, &i),
                           &(struct Val){i, i + 1}));
         /* All values in the array should be odd now */
         check((d != NULL), true);
@@ -346,9 +346,9 @@ check_static_begin(handle_adaptive_map_test_handle_api_macros)
         /* The macros support functions that will only execute if the or
            insert branch executes. */
         struct Val const *const d = handle_adaptive_map_at(
-            &handle_adaptive_map,
-            handle_adaptive_map_or_insert_w(handle_r(&handle_adaptive_map, &i),
-                                            handle_adaptive_map_create(i, i)));
+            &handle_adaptive_map, handle_adaptive_map_or_insert_with(
+                                      handle_wrap(&handle_adaptive_map, &i),
+                                      handle_adaptive_map_create(i, i)));
         check((d != NULL), true);
         check(d->id, i);
         check(d->val, i);
@@ -359,8 +359,8 @@ check_static_begin(handle_adaptive_map_test_handle_api_macros)
     {
         struct Val const *const d = handle_adaptive_map_at(
             &handle_adaptive_map,
-            handle_adaptive_map_or_insert_w(
-                and_modify(handle_r(&handle_adaptive_map, &i),
+            handle_adaptive_map_or_insert_with(
+                and_modify(handle_wrap(&handle_adaptive_map, &i),
                            handle_adaptive_map_modplus),
                 handle_adaptive_map_create(i, i)));
         /* All values in the array should be odd now */
@@ -383,8 +383,8 @@ check_static_begin(handle_adaptive_map_test_handle_api_macros)
     {
         struct Val *v = handle_adaptive_map_at(
             &handle_adaptive_map,
-            handle_adaptive_map_or_insert_w(handle_r(&handle_adaptive_map, &i),
-                                            (struct Val){}));
+            handle_adaptive_map_or_insert_with(
+                handle_wrap(&handle_adaptive_map, &i), (struct Val){}));
         check(v != NULL, true);
         v->val++;
         /* All values in the array should be odd now */
@@ -406,7 +406,7 @@ check_static_begin(handle_adaptive_map_test_two_sum)
     {
         struct Val const *const other_addend = handle_adaptive_map_at(
             &handle_adaptive_map,
-            get_key_val(&handle_adaptive_map, &(int){target - addends[i]}));
+            get_key_value(&handle_adaptive_map, &(int){target - addends[i]}));
         if (other_addend)
         {
             solution_indices[0] = (int)i;
@@ -435,7 +435,7 @@ check_static_begin(handle_adaptive_map_test_resize)
         struct Val elem = {.id = shuffled_index, .val = i};
         struct Val *v = handle_adaptive_map_at(
             &handle_adaptive_map,
-            insert_handle(handle_r(&handle_adaptive_map, &elem.id), &elem));
+            insert_handle(handle_wrap(&handle_adaptive_map, &elem.id), &elem));
         check(v != NULL, true);
         check(v->id, shuffled_index);
         check(v->val, i);
@@ -448,7 +448,7 @@ check_static_begin(handle_adaptive_map_test_resize)
         struct Val swap_slot = {shuffled_index, shuffled_index};
         struct Val const *const in_table = handle_adaptive_map_at(
             &handle_adaptive_map,
-            insert_handle(handle_r(&handle_adaptive_map, &swap_slot.id),
+            insert_handle(handle_wrap(&handle_adaptive_map, &swap_slot.id),
                           &swap_slot));
         check(in_table != NULL, true);
         check(in_table->val, shuffled_index);
@@ -473,7 +473,7 @@ check_static_begin(handle_adaptive_map_test_reserve)
         struct Val elem = {.id = shuffled_index, .val = i};
         struct Val *v = handle_adaptive_map_at(
             &handle_adaptive_map,
-            insert_handle(handle_r(&handle_adaptive_map, &elem.id), &elem));
+            insert_handle(handle_wrap(&handle_adaptive_map, &elem.id), &elem));
         check(v != NULL, true);
         check(v->id, shuffled_index);
         check(v->val, i);
@@ -486,7 +486,7 @@ check_static_begin(handle_adaptive_map_test_reserve)
         struct Val swap_slot = {shuffled_index, shuffled_index};
         struct Val const *const in_table = handle_adaptive_map_at(
             &handle_adaptive_map,
-            insert_handle(handle_r(&handle_adaptive_map, &swap_slot.id),
+            insert_handle(handle_wrap(&handle_adaptive_map, &swap_slot.id),
                           &swap_slot));
         check(in_table != NULL, true);
         check(in_table->val, shuffled_index);
@@ -507,7 +507,7 @@ check_static_begin(handle_adaptive_map_test_resize_macros)
     {
         struct Val *v = handle_adaptive_map_at(
             &handle_adaptive_map,
-            insert_handle(handle_r(&handle_adaptive_map, &shuffled_index),
+            insert_handle(handle_wrap(&handle_adaptive_map, &shuffled_index),
                           &(struct Val){shuffled_index, i}));
         check(v != NULL, true);
         check(v->id, shuffled_index);
@@ -517,9 +517,9 @@ check_static_begin(handle_adaptive_map_test_resize_macros)
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
-        CCC_Handle_index const h = handle_adaptive_map_or_insert_w(
-            handle_adaptive_map_and_modify_w(
-                handle_r(&handle_adaptive_map, &shuffled_index), struct Val,
+        CCC_Handle_index const h = handle_adaptive_map_or_insert_with(
+            handle_adaptive_map_and_modify_with(
+                handle_wrap(&handle_adaptive_map, &shuffled_index), struct Val,
                 { T->val = shuffled_index; }),
             (struct Val){});
         struct Val const *const in_table
@@ -528,14 +528,14 @@ check_static_begin(handle_adaptive_map_test_resize_macros)
         check(in_table->val, shuffled_index);
         struct Val *v = handle_adaptive_map_at(
             &handle_adaptive_map,
-            handle_adaptive_map_or_insert_w(
-                handle_r(&handle_adaptive_map, &shuffled_index),
+            handle_adaptive_map_or_insert_with(
+                handle_wrap(&handle_adaptive_map, &shuffled_index),
                 (struct Val){}));
         check(v == NULL, false);
         v->val = i;
         v = handle_adaptive_map_at(
             &handle_adaptive_map,
-            get_key_val(&handle_adaptive_map, &shuffled_index));
+            get_key_value(&handle_adaptive_map, &shuffled_index));
         check(v != NULL, true);
         check(v->val, i);
     }
@@ -556,7 +556,7 @@ check_static_begin(handle_adaptive_map_test_resize_from_null)
         struct Val elem = {.id = shuffled_index, .val = i};
         struct Val *v = handle_adaptive_map_at(
             &handle_adaptive_map,
-            insert_handle(handle_r(&handle_adaptive_map, &elem.id), &elem));
+            insert_handle(handle_wrap(&handle_adaptive_map, &elem.id), &elem));
         check(v != NULL, true);
         check(v->id, shuffled_index);
         check(v->val, i);
@@ -568,7 +568,7 @@ check_static_begin(handle_adaptive_map_test_resize_from_null)
         struct Val swap_slot = {shuffled_index, shuffled_index};
         struct Val const *const in_table = handle_adaptive_map_at(
             &handle_adaptive_map,
-            insert_handle(handle_r(&handle_adaptive_map, &swap_slot.id),
+            insert_handle(handle_wrap(&handle_adaptive_map, &swap_slot.id),
                           &swap_slot));
         check(in_table != NULL, true);
         check(in_table->val, shuffled_index);
@@ -589,7 +589,7 @@ check_static_begin(handle_adaptive_map_test_resize_from_null_macros)
     {
         struct Val *v = handle_adaptive_map_at(
             &handle_adaptive_map,
-            insert_handle(handle_r(&handle_adaptive_map, &shuffled_index),
+            insert_handle(handle_wrap(&handle_adaptive_map, &shuffled_index),
                           &(struct Val){shuffled_index, i}));
         check(v != NULL, true);
         check(v->id, shuffled_index);
@@ -599,9 +599,9 @@ check_static_begin(handle_adaptive_map_test_resize_from_null_macros)
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
-        CCC_Handle_index const h = handle_adaptive_map_or_insert_w(
-            handle_adaptive_map_and_modify_w(
-                handle_r(&handle_adaptive_map, &shuffled_index), struct Val,
+        CCC_Handle_index const h = handle_adaptive_map_or_insert_with(
+            handle_adaptive_map_and_modify_with(
+                handle_wrap(&handle_adaptive_map, &shuffled_index), struct Val,
                 { T->val = shuffled_index; }),
             (struct Val){});
         struct Val const *const in_table
@@ -610,14 +610,14 @@ check_static_begin(handle_adaptive_map_test_resize_from_null_macros)
         check(in_table->val, shuffled_index);
         struct Val *v = handle_adaptive_map_at(
             &handle_adaptive_map,
-            handle_adaptive_map_or_insert_w(
-                handle_r(&handle_adaptive_map, &shuffled_index),
+            handle_adaptive_map_or_insert_with(
+                handle_wrap(&handle_adaptive_map, &shuffled_index),
                 (struct Val){}));
         check(v == NULL, false);
         v->val = i;
         v = handle_adaptive_map_at(
             &handle_adaptive_map,
-            get_key_val(&handle_adaptive_map, &shuffled_index));
+            get_key_value(&handle_adaptive_map, &shuffled_index));
         check(v == NULL, false);
         check(v->val, i);
     }
@@ -640,7 +640,7 @@ check_static_begin(handle_adaptive_map_test_insert_limit)
     {
         struct Val *v = handle_adaptive_map_at(
             &handle_adaptive_map,
-            insert_handle(handle_r(&handle_adaptive_map, &shuffled_index),
+            insert_handle(handle_wrap(&handle_adaptive_map, &shuffled_index),
                           &(struct Val){shuffled_index, i}));
         if (!v)
         {
@@ -661,14 +661,14 @@ check_static_begin(handle_adaptive_map_test_insert_limit)
     v = (struct Val){.id = last_index, .val = -2};
     struct Val *in_table = handle_adaptive_map_at(
         &handle_adaptive_map,
-        insert_handle(handle_r(&handle_adaptive_map, &v.id), &v));
+        insert_handle(handle_wrap(&handle_adaptive_map, &v.id), &v));
     check(in_table != NULL, true);
     check(in_table->val, -2);
     check(count(&handle_adaptive_map).count, final_size);
 
     in_table = handle_adaptive_map_at(
         &handle_adaptive_map,
-        insert_handle(handle_r(&handle_adaptive_map, &last_index),
+        insert_handle(handle_wrap(&handle_adaptive_map, &last_index),
                       &(struct Val){.id = last_index, .val = -3}));
     check(in_table != NULL, true);
     check(in_table->val, -3);
@@ -678,13 +678,13 @@ check_static_begin(handle_adaptive_map_test_insert_limit)
     v = (struct Val){.id = shuffled_index, .val = -4};
     in_table = handle_adaptive_map_at(
         &handle_adaptive_map,
-        insert_handle(handle_r(&handle_adaptive_map, &v.id), &v));
+        insert_handle(handle_wrap(&handle_adaptive_map, &v.id), &v));
     check(in_table == NULL, true);
     check(count(&handle_adaptive_map).count, final_size);
 
     in_table = handle_adaptive_map_at(
         &handle_adaptive_map,
-        insert_handle(handle_r(&handle_adaptive_map, &shuffled_index),
+        insert_handle(handle_wrap(&handle_adaptive_map, &shuffled_index),
                       &(struct Val){.id = shuffled_index, .val = -4}));
     check(in_table == NULL, true);
     check(count(&handle_adaptive_map).count, final_size);
@@ -721,13 +721,13 @@ check_static_begin(handle_adaptive_map_test_insert_and_find)
     for (int i = 0; i < size; i += 2)
     {
         check(contains(&handle_adaptive_map, &i), true);
-        check(occupied(handle_r(&handle_adaptive_map, &i)), true);
+        check(occupied(handle_wrap(&handle_adaptive_map, &i)), true);
         check(validate(&handle_adaptive_map), true);
     }
     for (int i = 1; i < size; i += 2)
     {
         check(contains(&handle_adaptive_map, &i), false);
-        check(occupied(handle_r(&handle_adaptive_map, &i)), false);
+        check(occupied(handle_wrap(&handle_adaptive_map, &i)), false);
         check(validate(&handle_adaptive_map), true);
     }
     check_end();

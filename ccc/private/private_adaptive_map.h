@@ -206,8 +206,8 @@ void *CCC_private_adaptive_map_insert(struct CCC_Adaptive_map *,
 /*=====================     Core Macro Implementations     ==================*/
 
 /** @internal */
-#define CCC_private_adaptive_map_and_modify_w(adaptive_map_entry_pointer,      \
-                                              type_name, closure_over_T...)    \
+#define CCC_private_adaptive_map_and_modify_with(adaptive_map_entry_pointer,   \
+                                                 type_name, closure_over_T...) \
     (__extension__({                                                           \
         __auto_type private_adaptive_map_ent_pointer                           \
             = (adaptive_map_entry_pointer);                                    \
@@ -231,8 +231,8 @@ void *CCC_private_adaptive_map_insert(struct CCC_Adaptive_map *,
     }))
 
 /** @internal */
-#define CCC_private_adaptive_map_or_insert_w(adaptive_map_entry_pointer,       \
-                                             type_compound_literal...)         \
+#define CCC_private_adaptive_map_or_insert_with(adaptive_map_entry_pointer,    \
+                                                type_compound_literal...)      \
     (__extension__({                                                           \
         __auto_type private_or_ins_entry_pointer                               \
             = (adaptive_map_entry_pointer);                                    \
@@ -258,8 +258,8 @@ void *CCC_private_adaptive_map_insert(struct CCC_Adaptive_map *,
     }))
 
 /** @internal */
-#define CCC_private_adaptive_map_insert_entry_w(adaptive_map_entry_pointer,    \
-                                                type_compound_literal...)      \
+#define CCC_private_adaptive_map_insert_entry_with(adaptive_map_entry_pointer, \
+                                                   type_compound_literal...)   \
     (__extension__({                                                           \
         __auto_type private_ins_entry_pointer = (adaptive_map_entry_pointer);  \
         typeof(type_compound_literal) *private_adaptive_map_ins_ent_ret        \
@@ -298,8 +298,8 @@ void *CCC_private_adaptive_map_insert(struct CCC_Adaptive_map *,
     }))
 
 /** @internal */
-#define CCC_private_adaptive_map_try_insert_w(adaptive_map_pointer, key,       \
-                                              type_compound_literal...)        \
+#define CCC_private_adaptive_map_try_insert_with(adaptive_map_pointer, key,    \
+                                                 type_compound_literal...)     \
     (__extension__({                                                           \
         __auto_type private_try_ins_map_pointer = (adaptive_map_pointer);      \
         struct CCC_Entry private_adaptive_map_try_ins_ent_ret                  \
@@ -330,8 +330,8 @@ void *CCC_private_adaptive_map_insert(struct CCC_Adaptive_map *,
     }))
 
 /** @internal */
-#define CCC_private_adaptive_map_insert_or_assign_w(adaptive_map_pointer, key, \
-                                                    type_compound_literal...)  \
+#define CCC_private_adaptive_map_insert_or_assign_with(                        \
+    adaptive_map_pointer, key, type_compound_literal...)                       \
     (__extension__({                                                           \
         __auto_type private_ins_or_assign_map_pointer                          \
             = (adaptive_map_pointer);                                          \

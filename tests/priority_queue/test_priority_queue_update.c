@@ -127,8 +127,8 @@ check_static_begin(priority_queue_test_priority_update_with)
         int backoff = vals[val].val / 2;
         if (vals[val].val > limit)
         {
-            check(CCC_priority_queue_update_w(&priority_queue, &vals[val],
-                                              { T->val = backoff; })
+            check(CCC_priority_queue_update_with(&priority_queue, &vals[val],
+                                                 { T->val = backoff; })
                       != NULL,
                   true);
             check(validate(&priority_queue), true);
@@ -206,16 +206,16 @@ check_static_begin(priority_queue_test_priority_increase_with)
         int dec = (vals[val].val / 2) - 1;
         if (vals[val].val > limit && dec < vals[val].val)
         {
-            check(CCC_priority_queue_decrease_w(&priority_queue, &vals[val],
-                                                { T->val = dec; })
+            check(CCC_priority_queue_decrease_with(&priority_queue, &vals[val],
+                                                   { T->val = dec; })
                       != NULL,
                   true);
             check(validate(&priority_queue), true);
         }
         else if (vals[val].val < limit && inc > vals[val].val)
         {
-            check(CCC_priority_queue_increase_w(&priority_queue, &vals[val],
-                                                { T->val = inc; })
+            check(CCC_priority_queue_increase_with(&priority_queue, &vals[val],
+                                                   { T->val = inc; })
                       != NULL,
                   true);
             check(validate(&priority_queue), true);
@@ -293,16 +293,16 @@ check_static_begin(priority_queue_test_priority_decrease_with)
         int dec = (vals[val].val / 2) - 1;
         if (vals[val].val < limit && inc > vals[val].val)
         {
-            check(CCC_priority_queue_increase_w(&priority_queue, &vals[val],
-                                                { T->val = inc; })
+            check(CCC_priority_queue_increase_with(&priority_queue, &vals[val],
+                                                   { T->val = inc; })
                       != NULL,
                   true);
             check(validate(&priority_queue), true);
         }
         else if (vals[val].val > limit && dec < vals[val].val)
         {
-            check(CCC_priority_queue_decrease_w(&priority_queue, &vals[val],
-                                                { T->val = dec; })
+            check(CCC_priority_queue_decrease_with(&priority_queue, &vals[val],
+                                                   { T->val = dec; })
                       != NULL,
                   true);
             check(validate(&priority_queue), true);
