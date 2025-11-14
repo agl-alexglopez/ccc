@@ -168,9 +168,9 @@ void *CCC_private_adaptive_map_insert(struct CCC_Adaptive_map *,
 
 /** @private */
 #define CCC_private_adaptive_map_insert_and_copy_key(                          \
-    om_insert_entry, om_insert_entry_ret, key, lazy_value...)                  \
+    om_insert_entry, om_insert_entry_ret, key, type_compound_literal...)       \
     (__extension__({                                                           \
-        typeof(lazy_value) *private_adaptive_map_new_ins_base                  \
+        typeof(type_compound_literal) *private_adaptive_map_new_ins_base       \
             = CCC_private_adaptive_map_new((&om_insert_entry));                \
         om_insert_entry_ret = (struct CCC_Entry){                              \
             .type = private_adaptive_map_new_ins_base,                         \
@@ -178,8 +178,9 @@ void *CCC_private_adaptive_map_insert(struct CCC_Adaptive_map *,
         };                                                                     \
         if (private_adaptive_map_new_ins_base)                                 \
         {                                                                      \
-            *((typeof(lazy_value) *)private_adaptive_map_new_ins_base)         \
-                = lazy_value;                                                  \
+            *((typeof(type_compound_literal) *)                                \
+                  private_adaptive_map_new_ins_base)                           \
+                = type_compound_literal;                                       \
             *((typeof(key) *)CCC_private_adaptive_map_key_in_slot(             \
                 om_insert_entry.map, private_adaptive_map_new_ins_base))       \
                 = key;                                                         \
@@ -285,7 +286,7 @@ void *CCC_private_adaptive_map_insert(struct CCC_Adaptive_map *,
 
 /** @private */
 #define CCC_private_adaptive_map_try_insert_w(adaptive_map_pointer, key,       \
-                                              lazy_value...)                   \
+                                              type_compound_literal...)        \
     (__extension__({                                                           \
         __auto_type private_try_ins_map_pointer = (adaptive_map_pointer);      \
         struct CCC_Entry private_adaptive_map_try_ins_ent_ret                  \
@@ -303,7 +304,7 @@ void *CCC_private_adaptive_map_insert(struct CCC_Adaptive_map *,
                 CCC_private_adaptive_map_insert_and_copy_key(                  \
                     private_adaptive_map_try_ins_ent,                          \
                     private_adaptive_map_try_ins_ent_ret,                      \
-                    private_adaptive_map_key, lazy_value);                     \
+                    private_adaptive_map_key, type_compound_literal);          \
             }                                                                  \
             else if (private_adaptive_map_try_ins_ent.entry.status             \
                      == CCC_ENTRY_OCCUPIED)                                    \
@@ -317,7 +318,7 @@ void *CCC_private_adaptive_map_insert(struct CCC_Adaptive_map *,
 
 /** @private */
 #define CCC_private_adaptive_map_insert_or_assign_w(adaptive_map_pointer, key, \
-                                                    lazy_value...)             \
+                                                    type_compound_literal...)  \
     (__extension__({                                                           \
         __auto_type private_ins_or_assign_map_pointer                          \
             = (adaptive_map_pointer);                                          \
@@ -337,7 +338,7 @@ void *CCC_private_adaptive_map_insert(struct CCC_Adaptive_map *,
                 CCC_private_adaptive_map_insert_and_copy_key(                  \
                     private_adaptive_map_ins_or_assign_ent,                    \
                     private_adaptive_map_ins_or_assign_ent_ret,                \
-                    private_adaptive_map_key, lazy_value);                     \
+                    private_adaptive_map_key, type_compound_literal);          \
             }                                                                  \
             else if (private_adaptive_map_ins_or_assign_ent.entry.status       \
                      == CCC_ENTRY_OCCUPIED)                                    \
@@ -346,9 +347,9 @@ void *CCC_private_adaptive_map_insert(struct CCC_Adaptive_map *,
                     = *CCC_private_Adaptive_map_node_in_slot(                  \
                         private_adaptive_map_ins_or_assign_ent.map,            \
                         private_adaptive_map_ins_or_assign_ent.entry.type);    \
-                *((typeof(lazy_value) *)                                       \
+                *((typeof(type_compound_literal) *)                            \
                       private_adaptive_map_ins_or_assign_ent.entry.type)       \
-                    = lazy_value;                                              \
+                    = type_compound_literal;                                   \
                 *CCC_private_Adaptive_map_node_in_slot(                        \
                     private_adaptive_map_ins_or_assign_ent.map,                \
                     private_adaptive_map_ins_or_assign_ent.entry.type)         \

@@ -109,14 +109,17 @@ has been allocated with the appropriate lifetime for the user's needs. */
 
 /** @brief Write user type directly to a newly allocated priority queue elem.
 @param [in] Priority_queue_pointer a pointer to the priority queue.
-@param [in] lazy_value the compound literal to write to the allocation.
+@param [in] type_compound_literal the compound literal to write to the
+allocation.
 @return a reference to the successfully inserted element or NULL if allocation
 fails or is not allowed.
 
 Note that the priority queue must be initialized with allocation permission to
 use this macro. */
-#define CCC_priority_queue_emplace(Priority_queue_pointer, lazy_value...)      \
-    CCC_private_priority_queue_emplace(Priority_queue_pointer, lazy_value)
+#define CCC_priority_queue_emplace(Priority_queue_pointer,                     \
+                                   type_compound_literal...)                   \
+    CCC_private_priority_queue_emplace(Priority_queue_pointer,                 \
+                                       type_compound_literal)
 
 /** @brief Pops the front element from the priority queue. Amortized O(lgN).
 @param [in] priority_queue a pointer to the priority queue.

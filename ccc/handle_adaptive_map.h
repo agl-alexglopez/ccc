@@ -407,10 +407,11 @@ map. If more space is needed but allocation fails an insert error is set. */
             .private                                                           \
     }
 
-/** @brief lazily insert lazy_value into the map at key if key is absent.
+/** @brief lazily insert type_compound_literal into the map at key if key is
+absent.
 @param [in] map_pointer a pointer to the map.
 @param [in] key the direct key r-value.
-@param [in] lazy_value the compound literal specifying the value.
+@param [in] type_compound_literal the compound literal specifying the value.
 @return a compound literal reference to the handle of the existing or newly
 inserted value. Occupied indicates the key existed, Vacant indicates the key
 was absent. Unwrapping in any case provides the current value unless an error
@@ -419,11 +420,12 @@ occurs that prevents insertion. An insertion error will flag such a case.
 Note that for brevity and convenience the user need not write the key to the
 lazy value compound literal as well. This function ensures the key in the
 compound literal matches the searched key. */
-#define CCC_handle_adaptive_map_try_insert_w(map_pointer, key, lazy_value...)  \
+#define CCC_handle_adaptive_map_try_insert_w(map_pointer, key,                 \
+                                             type_compound_literal...)         \
     &(CCC_Handle)                                                              \
     {                                                                          \
         CCC_private_handle_adaptive_map_try_insert_w(map_pointer, key,         \
-                                                     lazy_value)               \
+                                                     type_compound_literal)    \
     }
 
 /** @brief Invariantly inserts or overwrites a user struct into the map.
@@ -441,7 +443,8 @@ CCC_handle_adaptive_map_insert_or_assign(CCC_Handle_adaptive_map *map,
 /** @brief Inserts a new key value pair or overwrites the existing handle.
 @param [in] map_pointer the pointer to the handle hash map.
 @param [in] key the key to be searched in the map.
-@param [in] lazy_value the compound literal to insert or use for overwrite.
+@param [in] type_compound_literal the compound literal to insert or use for
+overwrite.
 @return a compound literal reference to the handle of the existing or newly
 inserted value. Occupied indicates the key existed, Vacant indicates the key
 was absent. Unwrapping in any case provides the current value unless an error
@@ -451,11 +454,11 @@ Note that for brevity and convenience the user need not write the key to the
 lazy value compound literal as well. This function ensures the key in the
 compound literal matches the searched key. */
 #define CCC_handle_adaptive_map_insert_or_assign_w(map_pointer, key,           \
-                                                   lazy_value...)              \
+                                                   type_compound_literal...)   \
     &(CCC_Handle)                                                              \
     {                                                                          \
-        CCC_private_handle_adaptive_map_insert_or_assign_w(map_pointer, key,   \
-                                                           lazy_value)         \
+        CCC_private_handle_adaptive_map_insert_or_assign_w(                    \
+            map_pointer, key, type_compound_literal)                           \
     }
 
 /** @brief Removes the key value in the map storing the old value, if present,

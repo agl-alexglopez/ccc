@@ -154,9 +154,9 @@ CCC_adaptive_map_entry(CCC_Adaptive_map *const map, void const *const key)
 
 void *
 CCC_adaptive_map_insert_entry(CCC_Adaptive_map_entry const *const entry,
-                              CCC_Adaptive_map_node *const elem)
+                              CCC_Adaptive_map_node *const type_intruder)
 {
-    if (!entry || !elem)
+    if (!entry || !type_intruder)
     {
         return NULL;
     }
@@ -164,22 +164,22 @@ CCC_adaptive_map_insert_entry(CCC_Adaptive_map_entry const *const entry,
     {
         if (entry->private.entry.type)
         {
-            *elem
+            *type_intruder
                 = *elem_in_slot(entry->private.map, entry->private.entry.type);
             (void)memcpy(entry->private.entry.type,
-                         struct_base(entry->private.map, elem),
+                         struct_base(entry->private.map, type_intruder),
                          entry->private.map->sizeof_type);
         }
         return entry->private.entry.type;
     }
-    return allocate_insert(entry->private.map, elem);
+    return allocate_insert(entry->private.map, type_intruder);
 }
 
 void *
 CCC_adaptive_map_or_insert(CCC_Adaptive_map_entry const *const entry,
-                           CCC_Adaptive_map_node *const elem)
+                           CCC_Adaptive_map_node *const type_intruder)
 {
-    if (!entry || !elem)
+    if (!entry || !type_intruder)
     {
         return NULL;
     }
@@ -187,21 +187,21 @@ CCC_adaptive_map_or_insert(CCC_Adaptive_map_entry const *const entry,
     {
         return entry->private.entry.type;
     }
-    return allocate_insert(entry->private.map, elem);
+    return allocate_insert(entry->private.map, type_intruder);
 }
 
 CCC_Adaptive_map_entry *
 CCC_adaptive_map_and_modify(CCC_Adaptive_map_entry *const entry,
-                            CCC_Type_modifier *const fn)
+                            CCC_Type_modifier *const modify)
 {
     if (!entry)
     {
         return NULL;
     }
-    if (fn && entry->private.entry.status & CCC_ENTRY_OCCUPIED
+    if (modify && (entry->private.entry.status & CCC_ENTRY_OCCUPIED)
         && entry->private.entry.type)
     {
-        fn((CCC_Type_context){
+        modify((CCC_Type_context){
             .type = entry->private.entry.type,
             .context = NULL,
         });
@@ -227,31 +227,32 @@ CCC_adaptive_map_and_modify_context(CCC_Adaptive_map_entry *const entry,
 
 CCC_Entry
 CCC_adaptive_map_swap_entry(CCC_Adaptive_map *const map,
-                            CCC_Adaptive_map_node *const key_val_handle,
-                            CCC_Adaptive_map_node *const tmp)
+                            CCC_Adaptive_map_node *const type_intruder,
+                            CCC_Adaptive_map_node *const temp_intruder)
 {
-    if (!map || !key_val_handle || !tmp)
+    if (!map || !type_intruder || !temp_intruder)
     {
         return (CCC_Entry){{.status = CCC_ENTRY_ARGUMENT_ERROR}};
     }
-    void *const found = find(map, key_from_node(map, key_val_handle));
+    void *const found = find(map, key_from_node(map, type_intruder));
     if (found)
     {
         assert(map->root != &map->end);
-        *key_val_handle = *map->root;
-        void *const any_struct = struct_base(map, key_val_handle);
+        *type_intruder = *map->root;
+        void *const any_struct = struct_base(map, type_intruder);
         void *const in_tree = struct_base(map, map->root);
-        void *const old_val = struct_base(map, tmp);
+        void *const old_val = struct_base(map, temp_intruder);
         swap(old_val, in_tree, any_struct, map->sizeof_type);
-        key_val_handle->branch[L] = key_val_handle->branch[R]
-            = key_val_handle->parent = NULL;
-        tmp->branch[L] = tmp->branch[R] = tmp->parent = NULL;
+        type_intruder->branch[L] = type_intruder->branch[R]
+            = type_intruder->parent = NULL;
+        temp_intruder->branch[L] = temp_intruder->branch[R]
+            = temp_intruder->parent = NULL;
         return (CCC_Entry){{
             .type = old_val,
             .status = CCC_ENTRY_OCCUPIED,
         }};
     }
-    void *const inserted = allocate_insert(map, key_val_handle);
+    void *const inserted = allocate_insert(map, type_intruder);
     if (!inserted)
     {
         return (CCC_Entry){{
@@ -267,13 +268,13 @@ CCC_adaptive_map_swap_entry(CCC_Adaptive_map *const map,
 
 CCC_Entry
 CCC_adaptive_map_try_insert(CCC_Adaptive_map *const map,
-                            CCC_Adaptive_map_node *const key_val_handle)
+                            CCC_Adaptive_map_node *const type_intruder)
 {
-    if (!map || !key_val_handle)
+    if (!map || !type_intruder)
     {
         return (CCC_Entry){{.status = CCC_ENTRY_ARGUMENT_ERROR}};
     }
-    void *const found = find(map, key_from_node(map, key_val_handle));
+    void *const found = find(map, key_from_node(map, type_intruder));
     if (found)
     {
         assert(map->root != &map->end);
@@ -282,7 +283,7 @@ CCC_adaptive_map_try_insert(CCC_Adaptive_map *const map,
             .status = CCC_ENTRY_OCCUPIED,
         }};
     }
-    void *const inserted = allocate_insert(map, key_val_handle);
+    void *const inserted = allocate_insert(map, type_intruder);
     if (!inserted)
     {
         return (CCC_Entry){{
@@ -298,24 +299,24 @@ CCC_adaptive_map_try_insert(CCC_Adaptive_map *const map,
 
 CCC_Entry
 CCC_adaptive_map_insert_or_assign(CCC_Adaptive_map *const map,
-                                  CCC_Adaptive_map_node *const key_val_handle)
+                                  CCC_Adaptive_map_node *const type_intruder)
 {
-    if (!map || !key_val_handle)
+    if (!map || !type_intruder)
     {
         return (CCC_Entry){{.status = CCC_ENTRY_ARGUMENT_ERROR}};
     }
-    void *const found = find(map, key_from_node(map, key_val_handle));
+    void *const found = find(map, key_from_node(map, type_intruder));
     if (found)
     {
-        *key_val_handle = *elem_in_slot(map, found);
+        *type_intruder = *elem_in_slot(map, found);
         assert(map->root != &map->end);
-        memcpy(found, struct_base(map, key_val_handle), map->sizeof_type);
+        memcpy(found, struct_base(map, type_intruder), map->sizeof_type);
         return (CCC_Entry){{
             .type = found,
             .status = CCC_ENTRY_OCCUPIED,
         }};
     }
-    void *const inserted = allocate_insert(map, key_val_handle);
+    void *const inserted = allocate_insert(map, type_intruder);
     if (!inserted)
     {
         return (CCC_Entry){{
@@ -331,13 +332,13 @@ CCC_adaptive_map_insert_or_assign(CCC_Adaptive_map *const map,
 
 CCC_Entry
 CCC_adaptive_map_remove(CCC_Adaptive_map *const map,
-                        CCC_Adaptive_map_node *const out_handle)
+                        CCC_Adaptive_map_node *const type_output_intruder)
 {
-    if (!map || !out_handle)
+    if (!map || !type_output_intruder)
     {
         return (CCC_Entry){{.status = CCC_ENTRY_ARGUMENT_ERROR}};
     }
-    void *const n = erase(map, key_from_node(map, out_handle));
+    void *const n = erase(map, key_from_node(map, type_output_intruder));
     if (!n)
     {
         return (CCC_Entry){{
@@ -347,7 +348,7 @@ CCC_adaptive_map_remove(CCC_Adaptive_map *const map,
     }
     if (map->allocate)
     {
-        void *const any_struct = struct_base(map, out_handle);
+        void *const any_struct = struct_base(map, type_output_intruder);
         memcpy(any_struct, n, map->sizeof_type);
         map->allocate((CCC_Allocator_context){
             .input = n,

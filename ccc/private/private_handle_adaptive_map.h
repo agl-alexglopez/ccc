@@ -304,7 +304,7 @@ is of a known fixed size defined at compile time, not just a pointer. */
 
 /** @private */
 #define CCC_private_handle_adaptive_map_try_insert_w(                          \
-    Handle_adaptive_map_pointer, key, lazy_value...)                           \
+    Handle_adaptive_map_pointer, key, type_compound_literal...)                \
     (__extension__({                                                           \
         __auto_type private_handle_adaptive_map_try_ins_map_pointer            \
             = (Handle_adaptive_map_pointer);                                   \
@@ -330,12 +330,12 @@ is of a known fixed size defined at compile time, not just a pointer. */
                     };                                                         \
                 if (private_handle_adaptive_map_try_ins_hndl_ret.index)        \
                 {                                                              \
-                    *((typeof(lazy_value) *)                                   \
+                    *((typeof(type_compound_literal) *)                        \
                           CCC_private_handle_adaptive_map_data_at(             \
                               private_handle_adaptive_map_try_ins_map_pointer, \
                               private_handle_adaptive_map_try_ins_hndl_ret     \
                                   .index))                                     \
-                        = lazy_value;                                          \
+                        = type_compound_literal;                               \
                     *((typeof(private_handle_adaptive_map_key) *)              \
                           CCC_private_handle_adaptive_map_key_at(              \
                               private_handle_adaptive_map_try_ins_hndl.map,    \
@@ -365,7 +365,7 @@ is of a known fixed size defined at compile time, not just a pointer. */
 
 /** @private */
 #define CCC_private_handle_adaptive_map_insert_or_assign_w(                          \
-    Handle_adaptive_map_pointer, key, lazy_value...)                                 \
+    Handle_adaptive_map_pointer, key, type_compound_literal...)                      \
     (__extension__({                                                                 \
         __auto_type private_handle_adaptive_map_ins_or_assign_map_pointer            \
             = (Handle_adaptive_map_pointer);                                         \
@@ -392,11 +392,12 @@ is of a known fixed size defined at compile time, not just a pointer. */
                     };                                                               \
                 if (private_handle_adaptive_map_ins_or_assign_hndl_ret.index)        \
                 {                                                                    \
-                    *((typeof(lazy_value) *)CCC_private_handle_adaptive_map_data_at( \
-                        private_handle_adaptive_map_ins_or_assign_map_pointer,       \
-                        private_handle_adaptive_map_ins_or_assign_hndl_ret           \
-                            .index))                                                 \
-                        = lazy_value;                                                \
+                    *((typeof(type_compound_literal) *)                              \
+                          CCC_private_handle_adaptive_map_data_at(                   \
+                              private_handle_adaptive_map_ins_or_assign_map_pointer, \
+                              private_handle_adaptive_map_ins_or_assign_hndl_ret     \
+                                  .index))                                           \
+                        = type_compound_literal;                                     \
                     *((typeof(private_handle_adaptive_map_key) *)                    \
                           CCC_private_handle_adaptive_map_key_at(                    \
                               private_handle_adaptive_map_ins_or_assign_hndl         \
@@ -415,12 +416,12 @@ is of a known fixed size defined at compile time, not just a pointer. */
             else if (private_handle_adaptive_map_ins_or_assign_hndl.status           \
                      == CCC_ENTRY_OCCUPIED)                                          \
             {                                                                        \
-                *((typeof(lazy_value) *)                                             \
+                *((typeof(type_compound_literal) *)                                  \
                       CCC_private_handle_adaptive_map_data_at(                       \
                           private_handle_adaptive_map_ins_or_assign_hndl.map,        \
                           private_handle_adaptive_map_ins_or_assign_hndl             \
                               .index))                                               \
-                    = lazy_value;                                                    \
+                    = type_compound_literal;                                         \
                 private_handle_adaptive_map_ins_or_assign_hndl_ret                   \
                     = (struct CCC_Handle){                                           \
                         .index                                                       \

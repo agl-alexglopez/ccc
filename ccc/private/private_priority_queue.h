@@ -157,9 +157,9 @@ CCC_private_priority_queue_struct_base(struct CCC_Priority_queue const *,
 
 /** @private */
 #define CCC_private_priority_queue_emplace(priority_queue_pointer,             \
-                                           lazy_value...)                      \
+                                           type_compound_literal...)           \
     (__extension__({                                                           \
-        typeof(lazy_value) *private_priority_queue_res = NULL;                 \
+        typeof(type_compound_literal) *private_priority_queue_res = NULL;      \
         struct CCC_Priority_queue *private_priority_queue                      \
             = (priority_queue_pointer);                                        \
         if (private_priority_queue)                                            \
@@ -178,7 +178,7 @@ CCC_private_priority_queue_struct_base(struct CCC_Priority_queue const *,
                     });                                                        \
                 if (private_priority_queue_res)                                \
                 {                                                              \
-                    *private_priority_queue_res = lazy_value;                  \
+                    *private_priority_queue_res = type_compound_literal;       \
                     CCC_private_priority_queue_push(                           \
                         private_priority_queue,                                \
                         CCC_private_priority_queue_node_in(                    \

@@ -432,7 +432,7 @@ directly. This is similar to insert or assign where overwriting may occur. */
 option to give user more information and therefore returns an entry.
 Importantly, this function makes sure the key is in sync with key in table. */
 #define CCC_private_flat_hash_map_try_insert_w(Flat_hash_map_pointer, key,     \
-                                               lazy_value...)                  \
+                                               type_compound_literal...)       \
     (__extension__({                                                           \
         struct CCC_Flat_hash_map *private_Flat_hash_map_pointer                \
             = (Flat_hash_map_pointer);                                         \
@@ -465,9 +465,9 @@ Importantly, this function makes sure the key is in sync with key in table. */
                         private_flat_hash_map_try_ins_ent.index),              \
                     .status = CCC_ENTRY_VACANT,                                \
                 };                                                             \
-                *((typeof(lazy_value) *)                                       \
+                *((typeof(type_compound_literal) *)                            \
                       private_flat_hash_map_try_insert_res.type)               \
-                    = lazy_value;                                              \
+                    = type_compound_literal;                                   \
                 *((typeof(private_flat_hash_map_key) *)                        \
                       CCC_private_flat_hash_map_key_at(                        \
                           private_flat_hash_map_try_ins_ent.map,               \
@@ -484,8 +484,8 @@ Importantly, this function makes sure the key is in sync with key in table. */
 option to give user more information and therefore returns an entry.
 Importantly, this function makes sure the key is in sync with key in table.
 Similar to insert entry this will overwrite. */
-#define CCC_private_flat_hash_map_insert_or_assign_w(Flat_hash_map_pointer,    \
-                                                     key, lazy_value...)       \
+#define CCC_private_flat_hash_map_insert_or_assign_w(                          \
+    Flat_hash_map_pointer, key, type_compound_literal...)                      \
     (__extension__({                                                           \
         struct CCC_Flat_hash_map *private_Flat_hash_map_pointer                \
             = (Flat_hash_map_pointer);                                         \
@@ -512,9 +512,9 @@ Similar to insert entry this will overwrite. */
                         .status                                                \
                         = private_flat_hash_map_ins_or_assign_ent.status,      \
                     };                                                         \
-                *((typeof(lazy_value) *)                                       \
+                *((typeof(type_compound_literal) *)                            \
                       private_flat_hash_map_insert_or_assign_res.type)         \
-                    = lazy_value;                                              \
+                    = type_compound_literal;                                   \
                 *((typeof(private_flat_hash_map_key) *)                        \
                       CCC_private_flat_hash_map_key_at(                        \
                           private_flat_hash_map_ins_or_assign_ent.map,         \
