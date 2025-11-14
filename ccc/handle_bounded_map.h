@@ -317,7 +317,7 @@ Test membership or obtain references to stored user types directly. */
 /**@{*/
 
 /** @brief Returns a reference to the user data at the provided handle.
-@param[in] h a pointer to the map.
+@param[in] handle a pointer to the map.
 @param[in] index the stable handle obtained by the user.
 @return a pointer to the user type stored at the specified handle or NULL if
 an out of range handle or handle representing no data is provided.
@@ -326,8 +326,9 @@ handle represents a slot that has been taken by a new element because the old
 one has been removed that new element data will be returned.
 @warning do not try to access data in the table manually with a handle. Always
 use this provided interface function when a reference to data is needed. */
-[[nodiscard]] void *CCC_handle_bounded_map_at(CCC_Handle_bounded_map const *h,
-                                              CCC_Handle_index index);
+[[nodiscard]] void *
+CCC_handle_bounded_map_at(CCC_Handle_bounded_map const *handle,
+                          CCC_Handle_index index);
 
 /** @brief Returns a reference to the user type in the table at the handle.
 @param[in] Handle_bounded_map_pointer a pointer to the map.
@@ -553,8 +554,8 @@ to subsequent calls in the Handle Interface. */
     }
 
 /** @brief Modifies the provided handle if it is Occupied.
-@param[in] h the handle obtained from a handle function or macro.
-@param[in] fn an update function in which the context argument is unused.
+@param[in] handle the handle obtained from a handle function or macro.
+@param[in] modify an update function in which the context argument is unused.
 @return the updated handle if it was Occupied or the unmodified vacant handle.
 
 This function is intended to make the function chaining in the Handle Interface
@@ -562,23 +563,24 @@ more succinct if the handle will be modified in place based on its own value
 without the need of the context argument a CCC_Type_modifier can provide.
 */
 [[nodiscard]] CCC_Handle_bounded_map_handle *
-CCC_handle_bounded_map_and_modify(CCC_Handle_bounded_map_handle *h,
-                                  CCC_Type_modifier *fn);
+CCC_handle_bounded_map_and_modify(CCC_Handle_bounded_map_handle *handle,
+                                  CCC_Type_modifier *modify);
 
 /** @brief Modifies the provided handle if it is Occupied.
-@param[in] h the handle obtained from a handle function or macro.
-@param[in] fn an update function that requires context data.
+@param[in] handle the handle obtained from a handle function or macro.
+@param[in] modify an update function that requires context data.
 @param[in] context context data required for the update.
 @return the updated handle if it was Occupied or the unmodified vacant handle.
 
 This function makes full use of a CCC_Type_modifier capability, meaning a
 complete CCC_update object will be passed to the update function callback. */
 [[nodiscard]] CCC_Handle_bounded_map_handle *
-CCC_handle_bounded_map_and_modify_context(CCC_Handle_bounded_map_handle *h,
-                                          CCC_Type_modifier *fn, void *context);
+CCC_handle_bounded_map_and_modify_context(CCC_Handle_bounded_map_handle *handle,
+                                          CCC_Type_modifier *modify,
+                                          void *context);
 
 /** @brief Modify an Occupied handle with a closure over user type T.
-@param[in] Handle_bounded_map_handle_pointer a pointer to the obtained
+@param[in] map_handle_pointer a pointer to the obtained
 handle.
 @param[in] type_name the name of the user type stored in the container.
 @param[in] closure_over_T the code to be run on the reference to user type T,
@@ -602,16 +604,16 @@ handle_bounded_map_or_insert_w(handle_bounded_map_and_modify_w(handle_r(&handle_
 Note that any code written is only evaluated if the handle is Occupied and the
 container can deliver the user type T. This means any function calls are lazily
 evaluated in the closure scope. */
-#define CCC_handle_bounded_map_and_modify_w(Handle_bounded_map_handle_pointer, \
-                                            type_name, closure_over_T...)      \
+#define CCC_handle_bounded_map_and_modify_w(map_handle_pointer, type_name,     \
+                                            closure_over_T...)                 \
     &(CCC_Handle_bounded_map_handle)                                           \
     {                                                                          \
-        CCC_private_handle_bounded_map_and_modify_w(                           \
-            Handle_bounded_map_handle_pointer, type_name, closure_over_T)      \
+        CCC_private_handle_bounded_map_and_modify_w(map_handle_pointer,        \
+                                                    type_name, closure_over_T) \
     }
 
 /** @brief Inserts the provided user type if the handle is Vacant.
-@param[in] h the handle obtained via function or macro call.
+@param[in] handle the handle obtained via function or macro call.
 @param[in] type the type struct to be inserted to a Vacant handle.
 @return a pointer to handle in the map invariantly. NULL on error.
 
@@ -622,11 +624,11 @@ a user struct allocation failure.
 If no allocation is permitted, this function assumes the user struct wrapping
 elem has been allocated with the appropriate lifetime and scope by the user. */
 [[nodiscard]] CCC_Handle_index
-CCC_handle_bounded_map_or_insert(CCC_Handle_bounded_map_handle const *h,
+CCC_handle_bounded_map_or_insert(CCC_Handle_bounded_map_handle const *handle,
                                  void const *type);
 
 /** @brief Lazily insert the desired key value into the handle if it is Vacant.
-@param[in] Handle_bounded_map_handle_pointer a pointer to the obtained
+@param[in] map_handle_pointer a pointer to the obtained
 handle.
 @param[in] type_compound_literal the compound literal to construct in place if
 the handle is Vacant.
@@ -637,92 +639,89 @@ is not allowed.
 
 Note that if the compound literal uses any function calls to generate values
 or other data, such functions will not be called if the handle is Occupied. */
-#define CCC_handle_bounded_map_or_insert_w(Handle_bounded_map_handle_pointer,  \
+#define CCC_handle_bounded_map_or_insert_w(map_handle_pointer,                 \
                                            type_compound_literal...)           \
-    CCC_private_handle_bounded_map_or_insert_w(                                \
-        Handle_bounded_map_handle_pointer, type_compound_literal)
+    CCC_private_handle_bounded_map_or_insert_w(map_handle_pointer,             \
+                                               type_compound_literal)
 
 /** @brief Inserts the provided user type invariantly.
-@param[in] h the handle returned from a call obtaining a handle.
+@param[in] handle the handle returned from a call obtaining a handle.
 @param[in] type a type struct the user intends to insert.
 @return a pointer to the inserted element or NULL upon allocation failure.
 
 This method can be used when the old value in the map does not need to
 be preserved. See the regular insert method if the old value is of interest. */
-[[nodiscard]] CCC_Handle_index
-CCC_handle_bounded_map_insert_handle(CCC_Handle_bounded_map_handle const *h,
-                                     void const *type);
+[[nodiscard]] CCC_Handle_index CCC_handle_bounded_map_insert_handle(
+    CCC_Handle_bounded_map_handle const *handle, void const *type);
 
 /** @brief Write the contents of the compound literal type_compound_literal to a
 node.
-@param[in] Handle_bounded_map_handle_pointer a pointer to the obtained
+@param[in] map_handle_pointer a pointer to the obtained
 handle.
 @param[in] type_compound_literal the compound literal to write to a new slot.
 @return a reference to the newly inserted or overwritten user type. NULL is
 returned if allocation failed or is not allowed when required. */
-#define CCC_handle_bounded_map_insert_handle_w(                                \
-    Handle_bounded_map_handle_pointer, type_compound_literal...)               \
-    CCC_private_handle_bounded_map_insert_handle_w(                            \
-        Handle_bounded_map_handle_pointer, type_compound_literal)
+#define CCC_handle_bounded_map_insert_handle_w(map_handle_pointer,             \
+                                               type_compound_literal...)       \
+    CCC_private_handle_bounded_map_insert_handle_w(map_handle_pointer,         \
+                                                   type_compound_literal)
 
 /** @brief Remove the handle from the map if Occupied.
-@param[in] h a pointer to the map handle.
+@param[in] handle a pointer to the map handle.
 @return a handle containing NULL or a reference to the old handle. If Occupied
 a handle in the map existed and was removed. If Vacant, no prior handle existed
 to be removed.
 @warning the reference to the removed handle is invalidated upon any further
 insertions. */
-CCC_Handle
-CCC_handle_bounded_map_remove_handle(CCC_Handle_bounded_map_handle const *h);
+CCC_Handle CCC_handle_bounded_map_remove_handle(
+    CCC_Handle_bounded_map_handle const *handle);
 
 /** @brief Remove the handle from the map if Occupied.
-@param[in] Handle_bounded_map_handle_pointer a pointer to the map handle.
+@param[in] map_handle_pointer a pointer to the map handle.
 @return a compound literal reference to a handle containing NULL or a reference
 to the old handle. If Occupied a handle in the map existed and was removed. If
 Vacant, no prior handle existed to be removed.
 
 Note that the reference to the removed handle is invalidated upon any further
 insertions. */
-#define CCC_handle_bounded_map_remove_handle_r(                                \
-    Handle_bounded_map_handle_pointer)                                         \
+#define CCC_handle_bounded_map_remove_handle_r(map_handle_pointer)             \
     &(CCC_Handle)                                                              \
     {                                                                          \
-        CCC_handle_bounded_map_remove_handle(                                  \
-            (Handle_bounded_map_handle_pointer))                               \
-            .private                                                           \
+        CCC_handle_bounded_map_remove_handle((map_handle_pointer)).private     \
     }
 
 /** @brief Unwraps the provided handle to obtain a view into the map element.
-@param[in] h the handle from a query to the map via function or macro.
+@param[in] handle the handle from a query to the map via function or macro.
 @return a view into the table handle if one is present, or NULL. */
 [[nodiscard]] CCC_Handle_index
-CCC_handle_bounded_map_unwrap(CCC_Handle_bounded_map_handle const *h);
+CCC_handle_bounded_map_unwrap(CCC_Handle_bounded_map_handle const *handle);
 
 /** @brief Returns the Vacant or Occupied status of the handle.
-@param[in] h the handle from a query to the map via function or macro.
-@return true if the handle is occupied, false if not. Error if h is NULL. */
+@param[in] handle the handle from a query to the map via function or macro.
+@return true if the handle is occupied, false if not. Error if handle is NULL.
+*/
 [[nodiscard]] CCC_Tribool
-CCC_handle_bounded_map_occupied(CCC_Handle_bounded_map_handle const *h);
+CCC_handle_bounded_map_occupied(CCC_Handle_bounded_map_handle const *handle);
 
 /** @brief Provides the status of the handle should an insertion follow.
-@param[in] h the handle from a query to the table via function or macro.
+@param[in] handle the handle from a query to the table via function or macro.
 @return true if a handle obtained from an insertion attempt failed to insert
-due to an allocation failure when allocation success was expected. Error if h is
-NULL. */
-[[nodiscard]] CCC_Tribool
-CCC_handle_bounded_map_insert_error(CCC_Handle_bounded_map_handle const *h);
+due to an allocation failure when allocation success was expected. Error if
+handle is NULL. */
+[[nodiscard]] CCC_Tribool CCC_handle_bounded_map_insert_error(
+    CCC_Handle_bounded_map_handle const *handle);
 
 /** @brief Obtain the handle status from a container handle.
-@param[in] h a pointer to the handle.
+@param[in] handle a pointer to the handle.
 @return the status stored in the handle after the required action on the
-container completes. If h is NULL a handle input error is returned so ensure
-e is non-NULL to avoid an inaccurate status returned.
+container completes. If handle is NULL a handle input error is returned so
+ensure e is non-NULL to avoid an inaccurate status returned.
 
 Note that this function can be useful for debugging or if more detailed
 messages are needed for logging purposes. See CCC_handle_status_message() in
 ccc/types.h for more information on detailed handle statuses. */
-[[nodiscard]] CCC_Handle_status
-CCC_handle_bounded_map_handle_status(CCC_Handle_bounded_map_handle const *h);
+[[nodiscard]] CCC_Handle_status CCC_handle_bounded_map_handle_status(
+    CCC_Handle_bounded_map_handle const *handle);
 
 /**@}*/
 
@@ -732,17 +731,17 @@ Deallocate the container. */
 
 /** @brief Frees all slots in the map for use without affecting capacity.
 @param[in] map the map to be cleared.
-@param[in] fn the destructor for each element. NULL can be passed if no
+@param[in] destroy the destructor for each element. NULL can be passed if no
 maintenance is required on the elements in the map before their slots are
 forfeit.
 
 If NULL is passed as the destructor function time is O(1), else O(size). */
 CCC_Result CCC_handle_bounded_map_clear(CCC_Handle_bounded_map *map,
-                                        CCC_Type_destructor *fn);
+                                        CCC_Type_destructor *destroy);
 
 /** @brief Frees all slots in the map and frees the underlying buffer.
 @param[in] map the map to be cleared.
-@param[in] fn the destructor for each element. NULL can be passed if no
+@param[in] destroy the destructor for each element. NULL can be passed if no
 maintenance is required on the elements in the map before their slots are
 forfeit.
 @return the result of free operation. If no allocate function is provided it is
@@ -751,13 +750,13 @@ Otherwise, an OK result is returned.
 
 If NULL is passed as the destructor function time is O(1), else O(size). */
 CCC_Result CCC_handle_bounded_map_clear_and_free(CCC_Handle_bounded_map *map,
-                                                 CCC_Type_destructor *fn);
+                                                 CCC_Type_destructor *destroy);
 
 /** @brief Frees all slots in the map and frees the
 underlying Buffer that was previously dynamically reserved with the reserve
 function.
 @param[in] map the map to be cleared.
-@param[in] destructor the destructor for each element. NULL can be passed if no
+@param[in] destroy the destructor for each element. NULL can be passed if no
 maintenance is required on the elements in the handle_bounded_map
 before their slots are dropped.
 @param[in] allocate the required allocation function to provide to a
@@ -788,7 +787,7 @@ CCC_handle_bounded_map_clear_and_free is sufficient for that use case.
 */
 CCC_Result
 CCC_handle_bounded_map_clear_and_free_reserve(CCC_Handle_bounded_map *map,
-                                              CCC_Type_destructor *destructor,
+                                              CCC_Type_destructor *destroy,
                                               CCC_Allocator *allocate);
 
 /**@}*/
