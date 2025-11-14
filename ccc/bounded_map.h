@@ -16,7 +16,7 @@ limitations under the License.
 /** @file
 @brief The Bounded Map Interface
 
-A bounded map offers insertion, removal, and searching in a strict bound of
+A bounded map offers insertion, removal, and searching with a strict bound of
 `O(log(N))` time. The map is pointer stable. This map is suitable for realtime
 environments. Searching is a thread-safe read-only operation. Balancing
 modifications only occur upon insertion or removal.

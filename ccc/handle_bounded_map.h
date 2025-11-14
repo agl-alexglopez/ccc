@@ -16,10 +16,7 @@ limitations under the License.
 /** @file
 @brief The Handle Bounded Map Interface
 
-A handle bounded map offers storage and retrieval by key. This map is
-suitable for applications if resizing can be well controlled. Insert
-operations may cause resizing if allocation is allowed.
-A bounded map offers insertion, removal, and searching in a strict bound of
+A bounded map offers insertion, removal, and searching with a strict bound of
 `O(log(N))` time. The map is pointer stable. This map is suitable for realtime
 applications if resizing can be well controlled. Insert operations may cause
 resizing if allocation is allowed. Searching is a thread-safe read-only
