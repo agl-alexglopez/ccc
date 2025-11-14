@@ -927,7 +927,7 @@ container completes. If e is NULL an entry input error is returned so ensure
 e is non-NULL to avoid an inaccurate status returned.
 
 Note that this function can be useful for debugging or if more detailed
-messages are needed for logging purposes. See CCC_Entry_status_message() in
+messages are needed for logging purposes. See CCC_entry_status_message() in
 ccc/types.h for more information on detailed entry statuses. */
 [[nodiscard]] CCC_Entry_status
 CCC_flat_hash_map_entry_status(CCC_Flat_hash_map_entry const *e);

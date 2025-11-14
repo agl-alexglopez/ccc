@@ -149,19 +149,19 @@ add_priority_queue_test(test_priority_queue_erase)
 add_priority_queue_test(test_priority_queue_update)
 
 #############  Map  ##########################
-add_library(ordered_map_utility ordered_map/ordered_map_utility.h ordered_map/ordered_map_utility.c)
-target_link_libraries(ordered_map_utility
+add_library(adaptive_map_utility adaptive_map/adaptive_map_utility.h adaptive_map/adaptive_map_utility.c)
+target_link_libraries(adaptive_map_utility
   PRIVATE
     ccc
     checkers
 )
-add_dependencies(tests ordered_map_utility)
+add_dependencies(tests adaptive_map_utility)
 
-macro(add_ordered_map_test TEST_NAME)
-  add_executable(${TEST_NAME} ordered_map/${TEST_NAME}.c)
+macro(add_adaptive_map_test TEST_NAME)
+  add_executable(${TEST_NAME} adaptive_map/${TEST_NAME}.c)
   target_link_libraries(${TEST_NAME}
     PRIVATE
-      ordered_map_utility
+      adaptive_map_utility
       ccc
       checkers 
       allocate
@@ -174,27 +174,27 @@ macro(add_ordered_map_test TEST_NAME)
   add_dependencies(tests ${TEST_NAME})
 endmacro()
 
-add_ordered_map_test(test_ordered_map_construct)
-add_ordered_map_test(test_ordered_map_insert)
-add_ordered_map_test(test_ordered_map_erase)
-add_ordered_map_test(test_ordered_map_iter)
-add_ordered_map_test(test_ordered_map_entry)
-add_ordered_map_test(test_ordered_map_lru)
+add_adaptive_map_test(test_adaptive_map_construct)
+add_adaptive_map_test(test_adaptive_map_insert)
+add_adaptive_map_test(test_adaptive_map_erase)
+add_adaptive_map_test(test_adaptive_map_iter)
+add_adaptive_map_test(test_adaptive_map_entry)
+add_adaptive_map_test(test_adaptive_map_lru)
 
 #############  Handle Map  ##########################
-add_library(handle_ordered_map_utility handle_ordered_map/handle_ordered_map_utility.h handle_ordered_map/handle_ordered_map_utility.c)
-target_link_libraries(handle_ordered_map_utility
+add_library(handle_adaptive_map_utility handle_adaptive_map/handle_adaptive_map_utility.h handle_adaptive_map/handle_adaptive_map_utility.c)
+target_link_libraries(handle_adaptive_map_utility
   PRIVATE
     ccc
     checkers
 )
-add_dependencies(tests handle_ordered_map_utility)
+add_dependencies(tests handle_adaptive_map_utility)
 
-macro(add_handle_ordered_map_test TEST_NAME)
-  add_executable(${TEST_NAME} handle_ordered_map/${TEST_NAME}.c)
+macro(add_handle_adaptive_map_test TEST_NAME)
+  add_executable(${TEST_NAME} handle_adaptive_map/${TEST_NAME}.c)
   target_link_libraries(${TEST_NAME}
     PRIVATE
-      handle_ordered_map_utility
+      handle_adaptive_map_utility
       ccc
       checkers
       allocate
@@ -207,27 +207,27 @@ macro(add_handle_ordered_map_test TEST_NAME)
   add_dependencies(tests ${TEST_NAME})
 endmacro()
 
-add_handle_ordered_map_test(test_handle_ordered_map_construct)
-add_handle_ordered_map_test(test_handle_ordered_map_insert)
-add_handle_ordered_map_test(test_handle_ordered_map_erase)
-add_handle_ordered_map_test(test_handle_ordered_map_iter)
-add_handle_ordered_map_test(test_handle_ordered_map_entry)
-add_handle_ordered_map_test(test_handle_ordered_map_lru)
+add_handle_adaptive_map_test(test_handle_adaptive_map_construct)
+add_handle_adaptive_map_test(test_handle_adaptive_map_insert)
+add_handle_adaptive_map_test(test_handle_adaptive_map_erase)
+add_handle_adaptive_map_test(test_handle_adaptive_map_iter)
+add_handle_adaptive_map_test(test_handle_adaptive_map_entry)
+add_handle_adaptive_map_test(test_handle_adaptive_map_lru)
 
 #############  Realtime Map  ##########################
-add_library(realtime_ordered_map_utility realtime_ordered_map/realtime_ordered_map_utility.h realtime_ordered_map/realtime_ordered_map_utility.c)
-target_link_libraries(realtime_ordered_map_utility
+add_library(bounded_map_utility bounded_map/bounded_map_utility.h bounded_map/bounded_map_utility.c)
+target_link_libraries(bounded_map_utility
   PRIVATE
     ccc
     checkers
 )
-add_dependencies(tests realtime_ordered_map_utility)
+add_dependencies(tests bounded_map_utility)
 
-macro(add_realtime_ordered_map_test TEST_NAME)
-  add_executable(${TEST_NAME} realtime_ordered_map/${TEST_NAME}.c)
+macro(add_bounded_map_test TEST_NAME)
+  add_executable(${TEST_NAME} bounded_map/${TEST_NAME}.c)
   target_link_libraries(${TEST_NAME}
     PRIVATE
-      realtime_ordered_map_utility
+      bounded_map_utility
       checkers
       ccc
       allocate
@@ -240,27 +240,27 @@ macro(add_realtime_ordered_map_test TEST_NAME)
   add_dependencies(tests ${TEST_NAME})
 endmacro()
 
-add_realtime_ordered_map_test(test_realtime_ordered_map_construct)
-add_realtime_ordered_map_test(test_realtime_ordered_map_insert)
-add_realtime_ordered_map_test(test_realtime_ordered_map_erase)
-add_realtime_ordered_map_test(test_realtime_ordered_map_iter)
-add_realtime_ordered_map_test(test_realtime_ordered_map_entry)
-add_realtime_ordered_map_test(test_realtime_ordered_map_lru)
+add_bounded_map_test(test_bounded_map_construct)
+add_bounded_map_test(test_bounded_map_insert)
+add_bounded_map_test(test_bounded_map_erase)
+add_bounded_map_test(test_bounded_map_iter)
+add_bounded_map_test(test_bounded_map_entry)
+add_bounded_map_test(test_bounded_map_lru)
 
 #############  Handle Realtime Map  ##########################
-add_library(handle_realtime_ordered_map_utility handle_realtime_ordered_map/handle_realtime_ordered_map_utility.h handle_realtime_ordered_map/handle_realtime_ordered_map_utility.c)
-target_link_libraries(handle_realtime_ordered_map_utility
+add_library(handle_bounded_map_utility handle_bounded_map/handle_bounded_map_utility.h handle_bounded_map/handle_bounded_map_utility.c)
+target_link_libraries(handle_bounded_map_utility
   PRIVATE
     ccc
     checkers
 )
-add_dependencies(tests handle_realtime_ordered_map_utility)
+add_dependencies(tests handle_bounded_map_utility)
 
-macro(add_handle_realtime_ordered_map_test TEST_NAME)
-  add_executable(${TEST_NAME} handle_realtime_ordered_map/${TEST_NAME}.c)
+macro(add_handle_bounded_map_test TEST_NAME)
+  add_executable(${TEST_NAME} handle_bounded_map/${TEST_NAME}.c)
   target_link_libraries(${TEST_NAME}
     PRIVATE
-      handle_realtime_ordered_map_utility
+      handle_bounded_map_utility
       ccc
       checkers
       allocate
@@ -273,12 +273,12 @@ macro(add_handle_realtime_ordered_map_test TEST_NAME)
   add_dependencies(tests ${TEST_NAME})
 endmacro()
 
-add_handle_realtime_ordered_map_test(test_handle_realtime_ordered_map_construct)
-add_handle_realtime_ordered_map_test(test_handle_realtime_ordered_map_insert)
-add_handle_realtime_ordered_map_test(test_handle_realtime_ordered_map_erase)
-add_handle_realtime_ordered_map_test(test_handle_realtime_ordered_map_iter)
-add_handle_realtime_ordered_map_test(test_handle_realtime_ordered_map_handle)
-add_handle_realtime_ordered_map_test(test_handle_realtime_ordered_map_lru)
+add_handle_bounded_map_test(test_handle_bounded_map_construct)
+add_handle_bounded_map_test(test_handle_bounded_map_insert)
+add_handle_bounded_map_test(test_handle_bounded_map_erase)
+add_handle_bounded_map_test(test_handle_bounded_map_iter)
+add_handle_bounded_map_test(test_handle_bounded_map_handle)
+add_handle_bounded_map_test(test_handle_bounded_map_lru)
 
 #############  Flat Hash Map ##########################
 

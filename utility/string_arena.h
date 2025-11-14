@@ -9,8 +9,8 @@ means an error has occurred, simplifying error checking. */
 enum String_arena_result : uint8_t
 {
     STRING_ARENA_OK = 0,
-    STRING_ARENA_ARG_ERROR,
-    STRING_ARENA_ALLOC_FAIL,
+    STRING_ARENA_ARGUMENT_ERROR,
+    STRING_ARENA_ALLOCATION_FAIL,
     STRING_ARENA_INVALID,
 };
 

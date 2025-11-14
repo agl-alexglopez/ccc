@@ -66,7 +66,7 @@ To manage safe and efficient views into associative containers entries use
 status flags internally. The provided functions in the Entry Interface for
 each container are sufficient to obtain the needed status. However if more
 information is needed, the status can be passed to the
-CCC_Entry_status_message() function for detailed string messages regarding the
+CCC_entry_status_message() function for detailed string messages regarding the
 entry status. This may be helpful for debugging or logging. */
 typedef enum CCC_Entry_status CCC_Entry_status;
 
@@ -98,7 +98,7 @@ To manage safe and efficient views into associative containers entries use
 status flags internally. The provided functions in the Handle Interface for
 each container are sufficient to obtain the needed status. However if more
 information is needed, the status can be passed to the
-CCC_Entry_status_message() function for detailed string messages regarding the
+CCC_entry_status_message() function for detailed string messages regarding the
 handle status. This may be helpful for debugging or logging. */
 typedef enum CCC_Entry_status CCC_Handle_status;
 

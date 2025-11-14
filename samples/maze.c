@@ -587,7 +587,7 @@ help(void)
         stdout,
         "Maze Builder:\nBuilds a Perfect Maze with Prim's "
         "Algorithm to demonstrate usage of the priority "
-        "queue and ordered_map provided by this library.\nUsage:\n-r=N The "
+        "queue and adaptive_map provided by this library.\nUsage:\n-r=N The "
         "row flag lets you specify maze rows > 7.\n-c=N The col flag "
         "lets you specify maze cols > 7.\n-s=N The speed flag lets "
         "you specify the speed of the animation "

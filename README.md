@@ -440,16 +440,16 @@ main(void)
 </details>
 
 <details>
-<summary>handle_ordered_map.h (dropdown)</summary>
+<summary>handle_adaptive_map.h (dropdown)</summary>
 An ordered map implemented in array with an index based self-optimizing tree. Offers handle stability. Handles remain valid until an element is removed from a table regardless of other insertions, other deletions, or resizing of the array.
 
 ```c
 #include <assert.h>
 #include <stdbool.h>
-#define HANDLE_ORDERED_MAP_USING_NAMESPACE_CCC
+#define HANDLE_ADAPTIVE_MAP_USING_NAMESPACE_CCC
 #define TRAITS_USING_NAMESPACE_CCC
 #define TYPES_USING_NAMESPACE_CCC
-#include "ccc/handle_ordered_map.h"
+#include "ccc/handle_adaptive_map.h"
 #include "ccc/traits.h"
 
 struct Key_val
@@ -458,7 +458,7 @@ struct Key_val
     int val;
 };
 
-handle_ordered_map_declare_fixed_map(Key_val_fixed_map, struct Key_val, 26);
+handle_adaptive_map_declare_fixed_map(Key_val_fixed_map, struct Key_val, 26);
 
 static CCC_Order
 Key_val_cmp(CCC_Key_comparator_context const cmp)
@@ -474,14 +474,14 @@ main(void)
     /* stack array of 25 elements with one slot for sentinel, intrusive field
        named elem, key field named key, no allocation permission, key comparison
        function, no context data. */
-    Handle_ordered_map s = handle_ordered_map_initialize(
+    Handle_adaptive_map s = handle_adaptive_map_initialize(
         &(Key_val_fixed_map){},
         struct Key_val,
         key,
         Key_val_cmp,
         NULL,
         NULL,
-        handle_ordered_map_fixed_capacity(Key_val_fixed_map)
+        handle_adaptive_map_fixed_capacity(Key_val_fixed_map)
     );
     int const num_nodes = 25;
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
@@ -519,16 +519,16 @@ main(void)
 </details>
 
 <details>
-<summary>handle_realtime_ordered_map.h (dropdown)</summary>
+<summary>handle_bounded_map.h (dropdown)</summary>
 An ordered map with strict runtime bounds implemented in an array with indices tracking the tree structure. Offers handle stability. Handles remain valid until an element is removed from a table regardless of other insertions, other deletions, or resizing of the array.
 
 ```c
 #include <assert.h>
 #include <stdbool.h>
-#define HANDLE_REALTIME_ORDERED_MAP_USING_NAMESPACE_CCC
+#define HANDLE_BOUNDED_MAP_USING_NAMESPACE_CCC
 #define TRAITS_USING_NAMESPACE_CCC
 #define TYPES_USING_NAMESPACE_CCC
-#include "ccc/handle_realtime_ordered_map.h"
+#include "ccc/handle_bounded_map.h"
 #include "ccc/traits.h"
 
 struct Key_val
@@ -536,7 +536,7 @@ struct Key_val
     int key;
     int val;
 };
-CCC_handle_realtime_ordered_map_declare_fixed_map(Key_val_fixed_map, struct Val, 64);
+CCC_handle_bounded_map_declare_fixed_map(Key_val_fixed_map, struct Val, 64);
 
 static CCC_Order
 Key_val_cmp(CCC_Key_comparator_context const cmp)
@@ -551,14 +551,14 @@ main(void)
 {
     /* stack array, user defined type, key field named key, no allocation
        permission, key comparison function, no context data. */
-    Handle_realtime_ordered_map s = handle_realtime_ordered_map_initialize(
+    Handle_bounded_map s = handle_bounded_map_initialize(
         &(Key_val_fixed_map){},
         struct Val,
         key,
         hrmap_key_cmp,
         NULL,
         NULL,
-        handle_realtime_ordered_map_fixed_capacity(Key_val_fixed_map)
+        handle_bounded_map_fixed_capacity(Key_val_fixed_map)
     );
     int const num_nodes = 25;
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
@@ -597,20 +597,20 @@ main(void)
 </details>
 
 <details>
-<summary>ordered_map.h (dropdown)</summary>
+<summary>adaptive_map.h (dropdown)</summary>
 A pointer stable ordered map that stores unique keys, implemented with a self-optimizing tree structure.
 
 ```c
 #include <assert.h>
 #include <string.h>
-#define ORDERED_MAP_USING_NAMESPACE_CCC
+#define ADAPTIVE_MAP_USING_NAMESPACE_CCC
 #define TRAITS_USING_NAMESPACE_CCC
-#include "ccc/ordered_map.h"
+#include "ccc/adaptive_map.h"
 #include "ccc/traits.h"
 
 struct name
 {
-    Ordered_map_node e;
+    Adaptive_map_node e;
     char const *name;
 };
 
@@ -635,9 +635,9 @@ int
 main(void)
 {
     struct name nodes[5];
-    /* ordered_map named om, stores struct name, intrusive field e, key field
+    /* adaptive_map named om, stores struct name, intrusive field e, key field
        name, no allocation permission, comparison fn, no context */
-    ordered_map om = om_initialize(om, struct name, e, name, Key_val_cmp, NULL, NULL);
+    adaptive_map om = om_initialize(om, struct name, e, name, Key_val_cmp, NULL, NULL);
     char const *const sorted_names[5]
         = {"Ferris", "Glenda", "Rocky", "Tux", "Ziggy"};
     size_t const size = sizeof(sorted_names) / sizeof(sorted_names[0]);
@@ -715,20 +715,20 @@ main(void)
 </details>
 
 <details>
-<summary>realtime_ordered_map.h (dropdown)</summary>
+<summary>bounded_map.h (dropdown)</summary>
 A pointer stable ordered map meeting strict O(lg N) runtime bounds for realtime applications.
 
 ```c
 #include <assert.h>
-#define REALTIME_ORDERED_MAP_USING_NAMESPACE_CCC
+#define BOUNDED_MAP_USING_NAMESPACE_CCC
 #define TRAITS_USING_NAMESPACE_CCC
 #define TYPES_USING_NAMESPACE_CCC
-#include "ccc/realtime_ordered_map.h"
+#include "ccc/bounded_map.h"
 #include "ccc/traits.h"
 
 struct Key_val
 {
-    Realtime_ordered_map_node elem;
+    Bounded_map_node elem;
     int key;
     int val;
 };
@@ -748,7 +748,7 @@ main(void)
     /* stack array of 25 elements with one slot for sentinel, intrusive field
        named elem, key field named key, no allocation permission, key comparison
        function, no context data. */
-    Realtime_ordered_map s
+    Bounded_map s
         = rom_initialize(s, struct Key_val, elem, key, Key_val_cmp, NULL, NULL);
     int const num_nodes = 25;
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
@@ -1087,7 +1087,7 @@ Other Rust Interface functions like `get_key_val`, `insert`, and `remove` are in
 
 Each container offers it's own C version of "closures" for the `and_modify_w` macro, short for and modify "with". Here is an example from the `samples/words.c` program.
 
-- `and_modify_w(handle_ordered_map_entry_ptr, type_name, closure_over_T...)` - Run code in `closure_over_T` on the stored user type `T`.
+- `and_modify_w(handle_adaptive_map_entry_ptr, type_name, closure_over_T...)` - Run code in `closure_over_T` on the stored user type `T`.
 
 ```c
 typedef struct
@@ -1097,8 +1097,8 @@ typedef struct
 } Word;
 /* Increment a found Word or insert a default count of 1. */
 CCC_Handle_index const h =
-handle_ordered_map_or_insert_w(
-    handle_ordered_map_and_modify_w(handle_r(&hom, &key_ofs), Word, { T->cnt++; }),
+handle_adaptive_map_or_insert_w(
+    handle_adaptive_map_and_modify_w(handle_r(&hom, &key_ofs), Word, { T->cnt++; }),
     (Word){.ofs = ofs, .cnt = 1}
 );
 ```
@@ -1155,7 +1155,7 @@ Here is another example illustrating the difference between the two.
 ```c
 struct Val
 {
-    Ordered_map_node e;
+    Adaptive_map_node e;
     int key;
     int val;
 };
@@ -1209,9 +1209,9 @@ typedef struct
 } Word;
 /* ... Elsewhere generate offset ofs as key. */
 Word default = {.ofs = ofs, .cnt = 1};
-handle_ordered_map_handle *h = handle_r(&hom, &ofs);
+handle_adaptive_map_handle *h = handle_r(&hom, &ofs);
 h = and_modify(h, increment)
-Word *w = handle_ordered_map_at(&hom, or_insert(h, &default));
+Word *w = handle_adaptive_map_at(&hom, or_insert(h, &default));
 ```
 
 Using the first method in your code may expand the code evaluated in different `_Generic` cases greatly increasing compilation memory use and time (I have not yet measured the validity of these concerns). Such nesting concerns are not relevant if the container specific versions of these functions are used. Traits are completely opt-in by including the `traits.h` header.
@@ -1357,7 +1357,7 @@ A few containers are based off of important work by other data structure develop
 
 - Rust's hashbrown hash table was the basis for the `flat_hash_map.h` container.
     - https://github.com/rust-lang/hashbrown
-- Phil Vachon's implementation of a WAVL tree was the inspiration for the `realtime_ordered_map.h` containers.
+- Phil Vachon's implementation of a WAVL tree was the inspiration for the `bounded_map.h` containers.
     - https://github.com/pvachon/wavl_tree
-- Research by Daniel Sleator in implementations of Splay Trees helped shape the `ordered_map.h` containers.
+- Research by Daniel Sleator in implementations of Splay Trees helped shape the `adaptive_map.h` containers.
     - https://www.link.cs.cmu.edu/splay/

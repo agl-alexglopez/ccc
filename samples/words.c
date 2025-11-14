@@ -22,14 +22,14 @@ Please specify a command as follows:
 #include <string.h>
 
 #define BUFFER_USING_NAMESPACE_CCC
-#define HANDLE_ORDERED_MAP_USING_NAMESPACE_CCC
+#define HANDLE_ADAPTIVE_MAP_USING_NAMESPACE_CCC
 #define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
 #define TRAITS_USING_NAMESPACE_CCC
 #define TYPES_USING_NAMESPACE_CCC
 
 #include "ccc/buffer.h"
 #include "ccc/flat_priority_queue.h"
-#include "ccc/handle_ordered_map.h"
+#include "ccc/handle_adaptive_map.h"
 #include "ccc/traits.h"
 #include "ccc/types.h"
 #include "utility/allocate.h"
@@ -123,8 +123,8 @@ static void print_top_n(FILE *file, int n);
 static void print_last_n(FILE *file, int n);
 static void print_alpha_n(FILE *file, int n);
 static void print_ralpha_n(FILE *file, int n);
-static Buffer copy_frequencies(Handle_ordered_map const *map);
-static void print_n(Handle_ordered_map *, CCC_Order, struct String_arena *,
+static Buffer copy_frequencies(Handle_adaptive_map const *map);
+static void print_n(Handle_adaptive_map *, CCC_Order, struct String_arena *,
                     int n);
 static struct Int_conversion parse_n_ranks(SV_String_view arg);
 
@@ -133,7 +133,7 @@ static struct String_offset clean_word(struct String_arena *,
                                        SV_String_view wv);
 
 /* Container Functions */
-static Handle_ordered_map create_frequency_map(struct String_arena *, FILE *);
+static Handle_adaptive_map create_frequency_map(struct String_arena *, FILE *);
 static Order order_string_keys(Key_comparator_context);
 static Order order_words(Type_comparator_context);
 
@@ -272,13 +272,13 @@ print_found(FILE *const f, SV_String_view w)
 {
     struct String_arena a = string_arena_create(ARENA_START_CAP);
     check(a.arena);
-    Handle_ordered_map map = create_frequency_map(&a, f);
+    Handle_adaptive_map map = create_frequency_map(&a, f);
     check(!is_empty(&map));
     struct String_offset wc = clean_word(&a, w);
     if (!wc.error)
     {
         Word const *const found_w
-            = handle_ordered_map_at(&map, get_key_val(&map, &wc));
+            = handle_adaptive_map_at(&map, get_key_val(&map, &wc));
         if (found_w)
         {
             printf("%s %d\n", string_arena_at(&a, &found_w->ofs),
@@ -286,7 +286,7 @@ print_found(FILE *const f, SV_String_view w)
         }
     }
     string_arena_free(&a);
-    (void)handle_ordered_map_clear_and_free(&map, NULL);
+    (void)handle_adaptive_map_clear_and_free(&map, NULL);
 }
 
 static void
@@ -294,7 +294,7 @@ print_top_n(FILE *const f, int n)
 {
     struct String_arena a = string_arena_create(ARENA_START_CAP);
     check(a.arena);
-    Handle_ordered_map map = create_frequency_map(&a, f);
+    Handle_adaptive_map map = create_frequency_map(&a, f);
     check(!is_empty(&map));
     print_n(&map, CCC_ORDER_GREATER, &a, n);
     string_arena_free(&a);
@@ -306,7 +306,7 @@ print_last_n(FILE *const f, int n)
 {
     struct String_arena a = string_arena_create(ARENA_START_CAP);
     check(a.arena);
-    Handle_ordered_map map = create_frequency_map(&a, f);
+    Handle_adaptive_map map = create_frequency_map(&a, f);
     check(!is_empty(&map));
     print_n(&map, CCC_ORDER_LESSER, &a, n);
     string_arena_free(&a);
@@ -318,7 +318,7 @@ print_alpha_n(FILE *const f, int n)
 {
     struct String_arena a = string_arena_create(ARENA_START_CAP);
     check(a.arena);
-    Handle_ordered_map map = create_frequency_map(&a, f);
+    Handle_adaptive_map map = create_frequency_map(&a, f);
     check(!is_empty(&map));
     if (!n)
     {
@@ -339,7 +339,7 @@ print_ralpha_n(FILE *const f, int n)
 {
     struct String_arena a = string_arena_create(ARENA_START_CAP);
     check(a.arena);
-    Handle_ordered_map map = create_frequency_map(&a, f);
+    Handle_adaptive_map map = create_frequency_map(&a, f);
     check(!is_empty(&map));
     if (!n)
     {
@@ -357,7 +357,7 @@ print_ralpha_n(FILE *const f, int n)
 }
 
 static Buffer
-copy_frequencies(Handle_ordered_map const *const map)
+copy_frequencies(Handle_adaptive_map const *const map)
 {
     check(!is_empty(map));
     Buffer freqs = buffer_initialize(NULL, Word, std_allocate, NULL, 0);
@@ -375,7 +375,7 @@ copy_frequencies(Handle_ordered_map const *const map)
 }
 
 static void
-print_n(CCC_Handle_ordered_map *const map, CCC_Order const ord,
+print_n(CCC_Handle_adaptive_map *const map, CCC_Order const ord,
         struct String_arena *const a, int n)
 {
     Buffer freqs = copy_frequencies(map);
@@ -411,13 +411,13 @@ print_n(CCC_Handle_ordered_map *const map, CCC_Order const ord,
 
 /*=====================    Container Construction     =======================*/
 
-static Handle_ordered_map
+static Handle_adaptive_map
 create_frequency_map(struct String_arena *const a, FILE *const f)
 {
     char *lineptr = NULL;
     size_t len = 0;
     ptrdiff_t read = 0;
-    Handle_ordered_map handle_ordered_map = handle_ordered_map_initialize(
+    Handle_adaptive_map handle_adaptive_map = handle_adaptive_map_initialize(
         NULL, Word, ofs, order_string_keys, std_allocate, a, 0);
     while ((read = getline(&lineptr, &len, f)) > 0)
     {
@@ -429,18 +429,18 @@ create_frequency_map(struct String_arena *const a, FILE *const f)
             struct String_offset const cw = clean_word(a, word_view);
             if (!cw.error)
             {
-                Handle_ordered_map_handle const *e
-                    = handle_r(&handle_ordered_map, &cw);
-                e = handle_ordered_map_and_modify_w(e, Word, { T->freq++; });
-                Word const *const w = handle_ordered_map_at(
-                    &handle_ordered_map, handle_ordered_map_or_insert_w(
-                                             e, (Word){.ofs = cw, .freq = 1}));
+                Handle_adaptive_map_handle const *e
+                    = handle_r(&handle_adaptive_map, &cw);
+                e = handle_adaptive_map_and_modify_w(e, Word, { T->freq++; });
+                Word const *const w = handle_adaptive_map_at(
+                    &handle_adaptive_map, handle_adaptive_map_or_insert_w(
+                                              e, (Word){.ofs = cw, .freq = 1}));
                 check(w);
             }
         }
     }
     free(lineptr);
-    return handle_ordered_map;
+    return handle_adaptive_map;
 }
 
 static struct String_offset

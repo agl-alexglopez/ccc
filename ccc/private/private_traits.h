@@ -17,17 +17,17 @@ limitations under the License.
 #define CCC_PRIVATE_TRAITS_H
 
 /* NOLINTBEGIN */
+#include "../adaptive_map.h"
 #include "../bitset.h"
+#include "../bounded_map.h"
 #include "../buffer.h"
 #include "../doubly_linked_list.h"
 #include "../flat_double_ended_queue.h"
 #include "../flat_hash_map.h"
 #include "../flat_priority_queue.h"
-#include "../handle_ordered_map.h"
-#include "../handle_realtime_ordered_map.h"
-#include "../ordered_map.h"
+#include "../handle_adaptive_map.h"
+#include "../handle_bounded_map.h"
 #include "../priority_queue.h"
-#include "../realtime_ordered_map.h"
 #include "../singly_linked_list.h"
 #include "../types.h"
 /* NOLINTEND */
@@ -37,9 +37,9 @@ limitations under the License.
 #define CCC_private_swap_entry(container_ptr, swap_args...)                    \
     _Generic((container_ptr),                                                  \
         CCC_Flat_hash_map *: CCC_flat_hash_map_swap_entry,                     \
-        CCC_Ordered_map *: CCC_ordered_map_swap_entry,                         \
-        CCC_Realtime_ordered_map *: CCC_realtime_ordered_map_swap_entry)(      \
-        (container_ptr), swap_args)
+        CCC_Adaptive_map *: CCC_adaptive_map_swap_entry,                       \
+        CCC_Bounded_map *: CCC_bounded_map_swap_entry)((container_ptr),        \
+                                                       swap_args)
 
 #define CCC_private_swap_entry_r(container_ptr,                                \
                                  key_val_container_handle_ptr...)              \
@@ -51,10 +51,9 @@ limitations under the License.
 
 #define CCC_private_swap_handle(container_ptr, swap_args...)                   \
     _Generic((container_ptr),                                                  \
-        CCC_Handle_ordered_map *: CCC_handle_ordered_map_swap_handle,          \
-        CCC_Handle_realtime_ordered_map                                        \
-            *: CCC_handle_realtime_ordered_map_swap_handle)((container_ptr),   \
-                                                            swap_args)
+        CCC_Handle_adaptive_map *: CCC_handle_adaptive_map_swap_handle,        \
+        CCC_Handle_bounded_map *: CCC_handle_bounded_map_swap_handle)(         \
+        (container_ptr), swap_args)
 
 #define CCC_private_swap_handle_r(container_ptr,                               \
                                   key_val_container_handle_ptr...)             \
@@ -66,25 +65,23 @@ limitations under the License.
 
 #define CCC_private_try_insert(container_ptr, try_insert_args...)              \
     _Generic((container_ptr),                                                  \
-        CCC_Handle_ordered_map *: CCC_handle_ordered_map_try_insert,           \
-        CCC_Handle_realtime_ordered_map                                        \
-            *: CCC_handle_realtime_ordered_map_try_insert,                     \
+        CCC_Handle_adaptive_map *: CCC_handle_adaptive_map_try_insert,         \
+        CCC_Handle_bounded_map *: CCC_handle_bounded_map_try_insert,           \
         CCC_Flat_hash_map *: CCC_flat_hash_map_try_insert,                     \
-        CCC_Ordered_map *: CCC_ordered_map_try_insert,                         \
-        CCC_Realtime_ordered_map *: CCC_realtime_ordered_map_try_insert)(      \
-        (container_ptr), try_insert_args)
+        CCC_Adaptive_map *: CCC_adaptive_map_try_insert,                       \
+        CCC_Bounded_map *: CCC_bounded_map_try_insert)((container_ptr),        \
+                                                       try_insert_args)
 
 #define CCC_private_try_insert_r(container_ptr, try_insert_args...)            \
     _Generic((container_ptr),                                                  \
-        CCC_Handle_ordered_map *: &(                                           \
-                 CCC_Handle){CCC_handle_ordered_map_try_insert(                \
-                                 (CCC_Handle_ordered_map *)container_ptr,      \
+        CCC_Handle_adaptive_map *: &(                                          \
+                 CCC_Handle){CCC_handle_adaptive_map_try_insert(               \
+                                 (CCC_Handle_adaptive_map *)container_ptr,     \
                                  try_insert_args)                              \
                                  .private},                                    \
-        CCC_Handle_realtime_ordered_map *: &(                                  \
-                 CCC_Handle){CCC_handle_realtime_ordered_map_try_insert(       \
-                                 (CCC_Handle_realtime_ordered_map *)           \
-                                     container_ptr,                            \
+        CCC_Handle_bounded_map *: &(                                           \
+                 CCC_Handle){CCC_handle_bounded_map_try_insert(                \
+                                 (CCC_Handle_bounded_map *)container_ptr,      \
                                  try_insert_args)                              \
                                  .private},                                    \
         CCC_Flat_hash_map *: &(                                                \
@@ -92,40 +89,37 @@ limitations under the License.
                                 (CCC_Flat_hash_map *)container_ptr,            \
                                 try_insert_args)                               \
                                 .private},                                     \
-        CCC_Ordered_map *: &(                                                  \
-                 CCC_Entry){CCC_ordered_map_try_insert(                        \
-                                (CCC_Ordered_map *)container_ptr,              \
-                                (CCC_Ordered_map_node *)try_insert_args)       \
+        CCC_Adaptive_map *: &(                                                 \
+                 CCC_Entry){CCC_adaptive_map_try_insert(                       \
+                                (CCC_Adaptive_map *)container_ptr,             \
+                                (CCC_Adaptive_map_node *)try_insert_args)      \
                                 .private},                                     \
-        CCC_Realtime_ordered_map *: &(CCC_Entry){                              \
-            CCC_realtime_ordered_map_try_insert(                               \
-                (CCC_Realtime_ordered_map *)container_ptr,                     \
-                (CCC_Realtime_ordered_map_node *)try_insert_args)              \
+        CCC_Bounded_map *: &(CCC_Entry){                                       \
+            CCC_bounded_map_try_insert(                                        \
+                (CCC_Bounded_map *)container_ptr,                              \
+                (CCC_Bounded_map_node *)try_insert_args)                       \
                 .private})
 
 #define CCC_private_insert_or_assign(container_ptr, insert_or_assign_args...)  \
     _Generic((container_ptr),                                                  \
-        CCC_Handle_ordered_map *: CCC_handle_ordered_map_insert_or_assign,     \
-        CCC_Handle_realtime_ordered_map                                        \
-            *: CCC_handle_realtime_ordered_map_insert_or_assign,               \
+        CCC_Handle_adaptive_map *: CCC_handle_adaptive_map_insert_or_assign,   \
+        CCC_Handle_bounded_map *: CCC_handle_bounded_map_insert_or_assign,     \
         CCC_Flat_hash_map *: CCC_flat_hash_map_insert_or_assign,               \
-        CCC_Ordered_map *: CCC_ordered_map_insert_or_assign,                   \
-        CCC_Realtime_ordered_map                                               \
-            *: CCC_realtime_ordered_map_insert_or_assign)(                     \
+        CCC_Adaptive_map *: CCC_adaptive_map_insert_or_assign,                 \
+        CCC_Bounded_map *: CCC_bounded_map_insert_or_assign)(                  \
         (container_ptr), insert_or_assign_args)
 
 #define CCC_private_insert_or_assign_r(container_ptr,                          \
                                        insert_or_assign_args...)               \
     _Generic((container_ptr),                                                  \
-        CCC_Handle_ordered_map *: &(                                           \
-                 CCC_Handle){CCC_handle_ordered_map_insert_or_assign(          \
-                                 (CCC_Handle_ordered_map *)container_ptr,      \
+        CCC_Handle_adaptive_map *: &(                                          \
+                 CCC_Handle){CCC_handle_adaptive_map_insert_or_assign(         \
+                                 (CCC_Handle_adaptive_map *)container_ptr,     \
                                  insert_or_assign_args)                        \
                                  .private},                                    \
-        CCC_Handle_realtime_ordered_map *: &(                                  \
-                 CCC_Handle){CCC_handle_realtime_ordered_map_insert_or_assign( \
-                                 (CCC_Handle_realtime_ordered_map *)           \
-                                     container_ptr,                            \
+        CCC_Handle_bounded_map *: &(                                           \
+                 CCC_Handle){CCC_handle_bounded_map_insert_or_assign(          \
+                                 (CCC_Handle_bounded_map *)container_ptr,      \
                                  insert_or_assign_args)                        \
                                  .private},                                    \
         CCC_Flat_hash_map *: &(                                                \
@@ -133,38 +127,37 @@ limitations under the License.
                                 (CCC_Flat_hash_map *)container_ptr,            \
                                 insert_or_assign_args)                         \
                                 .private},                                     \
-        CCC_Ordered_map *: &(                                                  \
-                 CCC_Entry){CCC_ordered_map_insert_or_assign(                  \
-                                (CCC_Ordered_map *)container_ptr,              \
-                                (CCC_Ordered_map_node *)insert_or_assign_args) \
+        CCC_Adaptive_map *: &(                                                 \
+                 CCC_Entry){CCC_adaptive_map_insert_or_assign(                 \
+                                (CCC_Adaptive_map *)container_ptr,             \
+                                (CCC_Adaptive_map_node *)                      \
+                                    insert_or_assign_args)                     \
                                 .private},                                     \
-        CCC_Realtime_ordered_map *: &(CCC_Entry){                              \
-            CCC_realtime_ordered_map_insert_or_assign(                         \
-                (CCC_Realtime_ordered_map *)container_ptr,                     \
-                (CCC_Realtime_ordered_map_node *)insert_or_assign_args)        \
+        CCC_Bounded_map *: &(CCC_Entry){                                       \
+            CCC_bounded_map_insert_or_assign(                                  \
+                (CCC_Bounded_map *)container_ptr,                              \
+                (CCC_Bounded_map_node *)insert_or_assign_args)                 \
                 .private})
 
 #define CCC_private_remove(container_ptr, key_val_container_handle_ptr...)     \
     _Generic((container_ptr),                                                  \
-        CCC_Handle_ordered_map *: CCC_handle_ordered_map_remove,               \
-        CCC_Handle_realtime_ordered_map                                        \
-            *: CCC_handle_realtime_ordered_map_remove,                         \
+        CCC_Handle_adaptive_map *: CCC_handle_adaptive_map_remove,             \
+        CCC_Handle_bounded_map *: CCC_handle_bounded_map_remove,               \
         CCC_Flat_hash_map *: CCC_flat_hash_map_remove,                         \
-        CCC_Ordered_map *: CCC_ordered_map_remove,                             \
-        CCC_Realtime_ordered_map *: CCC_realtime_ordered_map_remove)(          \
+        CCC_Adaptive_map *: CCC_adaptive_map_remove,                           \
+        CCC_Bounded_map *: CCC_bounded_map_remove)(                            \
         (container_ptr), key_val_container_handle_ptr)
 
 #define CCC_private_remove_r(container_ptr, key_val_container_handle_ptr...)   \
     _Generic((container_ptr),                                                  \
-        CCC_Handle_ordered_map *: &(                                           \
-                 CCC_Handle){CCC_handle_ordered_map_remove(                    \
-                                 (CCC_Handle_ordered_map *)container_ptr,      \
+        CCC_Handle_adaptive_map *: &(                                          \
+                 CCC_Handle){CCC_handle_adaptive_map_remove(                   \
+                                 (CCC_Handle_adaptive_map *)container_ptr,     \
                                  key_val_container_handle_ptr)                 \
                                  .private},                                    \
-        CCC_Handle_realtime_ordered_map *: &(                                  \
-                 CCC_Handle){CCC_handle_realtime_ordered_map_remove(           \
-                                 (CCC_Handle_realtime_ordered_map *)           \
-                                     container_ptr,                            \
+        CCC_Handle_bounded_map *: &(                                           \
+                 CCC_Handle){CCC_handle_bounded_map_remove(                    \
+                                 (CCC_Handle_bounded_map *)container_ptr,      \
                                  key_val_container_handle_ptr)                 \
                                  .private},                                    \
         CCC_Flat_hash_map *: &(                                                \
@@ -172,27 +165,27 @@ limitations under the License.
                                 (CCC_Flat_hash_map *)container_ptr,            \
                                 key_val_container_handle_ptr)                  \
                                 .private},                                     \
-        CCC_Ordered_map *: &(CCC_Entry){CCC_ordered_map_remove(                \
-                                            (CCC_Ordered_map *)container_ptr,  \
-                                            (CCC_Ordered_map_node *)           \
-                                                key_val_container_handle_ptr)  \
-                                            .private},                         \
-        CCC_Realtime_ordered_map *: &(CCC_Entry){                              \
-            CCC_realtime_ordered_map_remove(                                   \
-                (CCC_Realtime_ordered_map *)container_ptr,                     \
-                (CCC_Realtime_ordered_map_node *)key_val_container_handle_ptr) \
+        CCC_Adaptive_map *: &(                                                 \
+                 CCC_Entry){CCC_adaptive_map_remove(                           \
+                                (CCC_Adaptive_map *)container_ptr,             \
+                                (CCC_Adaptive_map_node *)                      \
+                                    key_val_container_handle_ptr)              \
+                                .private},                                     \
+        CCC_Bounded_map *: &(CCC_Entry){                                       \
+            CCC_bounded_map_remove(                                            \
+                (CCC_Bounded_map *)container_ptr,                              \
+                (CCC_Bounded_map_node *)key_val_container_handle_ptr)          \
                 .private})
 
 #define CCC_private_remove_entry(container_entry_ptr)                          \
     _Generic((container_entry_ptr),                                            \
         CCC_Flat_hash_map_entry *: CCC_flat_hash_map_remove_entry,             \
-        CCC_Ordered_map_entry *: CCC_ordered_map_remove_entry,                 \
-        CCC_Realtime_ordered_map_entry                                         \
-            *: CCC_realtime_ordered_map_remove_entry,                          \
+        CCC_Adaptive_map_entry *: CCC_adaptive_map_remove_entry,               \
+        CCC_Bounded_map_entry *: CCC_bounded_map_remove_entry,                 \
         CCC_Flat_hash_map_entry const *: CCC_flat_hash_map_remove_entry,       \
-        CCC_Ordered_map_entry const *: CCC_ordered_map_remove_entry,           \
-        CCC_Realtime_ordered_map_entry const                                   \
-            *: CCC_realtime_ordered_map_remove_entry)((container_entry_ptr))
+        CCC_Adaptive_map_entry const *: CCC_adaptive_map_remove_entry,         \
+        CCC_Bounded_map_entry const *: CCC_bounded_map_remove_entry)(          \
+        (container_entry_ptr))
 
 #define CCC_private_remove_entry_r(container_entry_ptr)                        \
     &(CCC_Entry)                                                               \
@@ -202,14 +195,13 @@ limitations under the License.
 
 #define CCC_private_remove_handle(container_handle_ptr)                        \
     _Generic((container_handle_ptr),                                           \
-        CCC_Handle_ordered_map_handle *: CCC_handle_ordered_map_remove_handle, \
-        CCC_Handle_ordered_map_handle const                                    \
-            *: CCC_handle_ordered_map_remove_handle,                           \
-        CCC_Handle_realtime_ordered_map_handle                                 \
-            *: CCC_handle_realtime_ordered_map_remove_handle,                  \
-        CCC_Handle_realtime_ordered_map_handle const                           \
-            *: CCC_handle_realtime_ordered_map_remove_handle)(                 \
-        (container_handle_ptr))
+        CCC_Handle_adaptive_map_handle                                         \
+            *: CCC_handle_adaptive_map_remove_handle,                          \
+        CCC_Handle_adaptive_map_handle const                                   \
+            *: CCC_handle_adaptive_map_remove_handle,                          \
+        CCC_Handle_bounded_map_handle *: CCC_handle_bounded_map_remove_handle, \
+        CCC_Handle_bounded_map_handle const                                    \
+            *: CCC_handle_bounded_map_remove_handle)((container_handle_ptr))
 
 #define CCC_private_remove_handle_r(container_handle_ptr)                      \
     &(CCC_Handle)                                                              \
@@ -221,10 +213,10 @@ limitations under the License.
     _Generic((container_ptr),                                                  \
         CCC_Flat_hash_map *: CCC_flat_hash_map_entry,                          \
         CCC_Flat_hash_map const *: CCC_flat_hash_map_entry,                    \
-        CCC_Ordered_map *: CCC_ordered_map_entry,                              \
-        CCC_Realtime_ordered_map *: CCC_realtime_ordered_map_entry,            \
-        CCC_Realtime_ordered_map const *: CCC_realtime_ordered_map_entry)(     \
-        (container_ptr), key_ptr)
+        CCC_Adaptive_map *: CCC_adaptive_map_entry,                            \
+        CCC_Bounded_map *: CCC_bounded_map_entry,                              \
+        CCC_Bounded_map const *: CCC_bounded_map_entry)((container_ptr),       \
+                                                        key_ptr)
 
 #define CCC_private_entry_r(container_ptr, key_ptr...)                         \
     _Generic(                                                                  \
@@ -239,133 +231,120 @@ limitations under the License.
                                          (CCC_Flat_hash_map *)(container_ptr), \
                                          key_ptr)                              \
                                          .private},                            \
-        CCC_Ordered_map *: &(                                                  \
-            CCC_Ordered_map_entry){CCC_ordered_map_entry(                      \
-                                       (CCC_Ordered_map *)(container_ptr),     \
+        CCC_Adaptive_map *: &(                                                 \
+            CCC_Adaptive_map_entry){CCC_adaptive_map_entry(                    \
+                                        (CCC_Adaptive_map *)(container_ptr),   \
+                                        key_ptr)                               \
+                                        .private},                             \
+        CCC_Bounded_map *: &(                                                  \
+            CCC_Bounded_map_entry){CCC_bounded_map_entry(                      \
+                                       (CCC_Bounded_map *)(container_ptr),     \
                                        key_ptr)                                \
                                        .private},                              \
-        CCC_Realtime_ordered_map *: &(                                         \
-            CCC_Realtime_ordered_map_entry){CCC_realtime_ordered_map_entry(    \
-                                                (CCC_Realtime_ordered_map      \
-                                                     *)(container_ptr),        \
-                                                key_ptr)                       \
-                                                .private},                     \
-        CCC_Realtime_ordered_map const *: &(CCC_Realtime_ordered_map_entry){   \
-            CCC_realtime_ordered_map_entry(                                    \
-                (CCC_Realtime_ordered_map *)(container_ptr), key_ptr)          \
+        CCC_Bounded_map const *: &(CCC_Bounded_map_entry){                     \
+            CCC_bounded_map_entry((CCC_Bounded_map *)(container_ptr), key_ptr) \
                 .private})
 
 #define CCC_private_handle(container_ptr, key_ptr...)                          \
     _Generic((container_ptr),                                                  \
-        CCC_Handle_ordered_map *: CCC_handle_ordered_map_handle,               \
-        CCC_Handle_realtime_ordered_map                                        \
-            *: CCC_handle_realtime_ordered_map_handle,                         \
-        CCC_Handle_realtime_ordered_map const                                  \
-            *: CCC_handle_realtime_ordered_map_handle)((container_ptr),        \
-                                                       key_ptr)
+        CCC_Handle_adaptive_map *: CCC_handle_adaptive_map_handle,             \
+        CCC_Handle_bounded_map *: CCC_handle_bounded_map_handle,               \
+        CCC_Handle_bounded_map const *: CCC_handle_bounded_map_handle)(        \
+        (container_ptr), key_ptr)
 
-#define CCC_private_handle_r(container_ptr, key_ptr...)                                     \
-    _Generic(                                                                               \
-        (container_ptr),                                                                    \
-        CCC_Handle_ordered_map *: &(                                                        \
-            CCC_Handle_ordered_map_handle){CCC_handle_ordered_map_handle(                   \
-                                               (CCC_Handle_ordered_map                      \
-                                                    *)(container_ptr),                      \
-                                               key_ptr)                                     \
-                                               .private},                                   \
-        CCC_Handle_realtime_ordered_map *: &(                                               \
-            CCC_Handle_realtime_ordered_map_handle){CCC_handle_realtime_ordered_map_handle( \
-                                                        (CCC_Handle_realtime_ordered_map    \
-                                                             *)(container_ptr),             \
-                                                        key_ptr)                            \
-                                                        .private},                          \
-        CCC_Handle_realtime_ordered_map const *: &(                                         \
-            CCC_Handle_realtime_ordered_map_handle){                                        \
-            CCC_handle_realtime_ordered_map_handle(                                         \
-                (CCC_Handle_realtime_ordered_map *)(container_ptr), key_ptr)                \
+#define CCC_private_handle_r(container_ptr, key_ptr...)                        \
+    _Generic(                                                                  \
+        (container_ptr),                                                       \
+        CCC_Handle_adaptive_map *: &(                                          \
+            CCC_Handle_adaptive_map_handle){CCC_handle_adaptive_map_handle(    \
+                                                (CCC_Handle_adaptive_map       \
+                                                     *)(container_ptr),        \
+                                                key_ptr)                       \
+                                                .private},                     \
+        CCC_Handle_bounded_map *: &(                                           \
+            CCC_Handle_bounded_map_handle){CCC_handle_bounded_map_handle(      \
+                                               (CCC_Handle_bounded_map         \
+                                                    *)(container_ptr),         \
+                                               key_ptr)                        \
+                                               .private},                      \
+        CCC_Handle_bounded_map const *: &(CCC_Handle_bounded_map_handle){      \
+            CCC_handle_bounded_map_handle(                                     \
+                (CCC_Handle_bounded_map *)(container_ptr), key_ptr)            \
                 .private})
 
 #define CCC_private_and_modify(container_entry_ptr, mod_fn)                    \
     _Generic((container_entry_ptr),                                            \
         CCC_Flat_hash_map_entry *: CCC_flat_hash_map_and_modify,               \
-        CCC_Ordered_map_entry *: CCC_ordered_map_and_modify,                   \
-        CCC_Handle_ordered_map_handle *: CCC_handle_ordered_map_and_modify,    \
-        CCC_Realtime_ordered_map_entry *: CCC_realtime_ordered_map_and_modify, \
-        CCC_Handle_realtime_ordered_map_handle                                 \
-            *: CCC_handle_realtime_ordered_map_and_modify,                     \
+        CCC_Adaptive_map_entry *: CCC_adaptive_map_and_modify,                 \
+        CCC_Handle_adaptive_map_handle *: CCC_handle_adaptive_map_and_modify,  \
+        CCC_Bounded_map_entry *: CCC_bounded_map_and_modify,                   \
+        CCC_Handle_bounded_map_handle *: CCC_handle_bounded_map_and_modify,    \
         CCC_Flat_hash_map_entry const *: CCC_flat_hash_map_and_modify,         \
-        CCC_Handle_realtime_ordered_map_handle const                           \
-            *: CCC_handle_realtime_ordered_map_and_modify,                     \
-        CCC_Ordered_map_entry const *: CCC_ordered_map_and_modify,             \
-        CCC_Handle_ordered_map_handle const                                    \
-            *: CCC_handle_ordered_map_and_modify,                              \
-        CCC_Realtime_ordered_map_entry const                                   \
-            *: CCC_realtime_ordered_map_and_modify)((container_entry_ptr),     \
-                                                    (mod_fn))
+        CCC_Handle_bounded_map_handle const                                    \
+            *: CCC_handle_bounded_map_and_modify,                              \
+        CCC_Adaptive_map_entry const *: CCC_adaptive_map_and_modify,           \
+        CCC_Handle_adaptive_map_handle const                                   \
+            *: CCC_handle_adaptive_map_and_modify,                             \
+        CCC_Bounded_map_entry const *: CCC_bounded_map_and_modify)(            \
+        (container_entry_ptr), (mod_fn))
 
 #define CCC_private_and_modify_context(container_entry_ptr, mod_fn,            \
                                        context_data_ptr...)                    \
     _Generic((container_entry_ptr),                                            \
         CCC_Flat_hash_map_entry *: CCC_flat_hash_map_and_modify_context,       \
-        CCC_Ordered_map_entry *: CCC_ordered_map_and_modify_context,           \
-        CCC_Handle_ordered_map_handle                                          \
-            *: CCC_handle_ordered_map_and_modify_context,                      \
-        CCC_Handle_realtime_ordered_map_handle                                 \
-            *: CCC_handle_realtime_ordered_map_and_modify_context,             \
-        CCC_Realtime_ordered_map_entry                                         \
-            *: CCC_realtime_ordered_map_and_modify_context,                    \
+        CCC_Adaptive_map_entry *: CCC_adaptive_map_and_modify_context,         \
+        CCC_Handle_adaptive_map_handle                                         \
+            *: CCC_handle_adaptive_map_and_modify_context,                     \
+        CCC_Handle_bounded_map_handle                                          \
+            *: CCC_handle_bounded_map_and_modify_context,                      \
+        CCC_Bounded_map_entry *: CCC_bounded_map_and_modify_context,           \
         CCC_Flat_hash_map_entry const *: CCC_flat_hash_map_and_modify_context, \
-        CCC_Ordered_map_entry const *: CCC_ordered_map_and_modify_context,     \
-        CCC_Handle_realtime_ordered_map_handle const                           \
-            *: CCC_handle_realtime_ordered_map_and_modify_context,             \
-        CCC_Handle_ordered_map_handle const                                    \
-            *: CCC_handle_ordered_map_and_modify_context,                      \
-        CCC_Realtime_ordered_map_entry const                                   \
-            *: CCC_realtime_ordered_map_and_modify_context)(                   \
+        CCC_Adaptive_map_entry const *: CCC_adaptive_map_and_modify_context,   \
+        CCC_Handle_bounded_map_handle const                                    \
+            *: CCC_handle_bounded_map_and_modify_context,                      \
+        CCC_Handle_adaptive_map_handle const                                   \
+            *: CCC_handle_adaptive_map_and_modify_context,                     \
+        CCC_Bounded_map_entry const *: CCC_bounded_map_and_modify_context)(    \
         (container_entry_ptr), (mod_fn), context_data_ptr)
 
 #define CCC_private_insert_entry(container_entry_ptr,                          \
                                  key_val_container_handle_ptr...)              \
     _Generic((container_entry_ptr),                                            \
         CCC_Flat_hash_map_entry *: CCC_flat_hash_map_insert_entry,             \
-        CCC_Ordered_map_entry *: CCC_ordered_map_insert_entry,                 \
-        CCC_Realtime_ordered_map_entry                                         \
-            *: CCC_realtime_ordered_map_insert_entry,                          \
+        CCC_Adaptive_map_entry *: CCC_adaptive_map_insert_entry,               \
+        CCC_Bounded_map_entry *: CCC_bounded_map_insert_entry,                 \
         CCC_Flat_hash_map_entry const *: CCC_flat_hash_map_insert_entry,       \
-        CCC_Ordered_map_entry const *: CCC_ordered_map_insert_entry,           \
-        CCC_Realtime_ordered_map_entry const                                   \
-            *: CCC_realtime_ordered_map_insert_entry)(                         \
+        CCC_Adaptive_map_entry const *: CCC_adaptive_map_insert_entry,         \
+        CCC_Bounded_map_entry const *: CCC_bounded_map_insert_entry)(          \
         (container_entry_ptr), key_val_container_handle_ptr)
 
 #define CCC_private_insert_handle(container_handle_ptr,                        \
                                   key_val_container_handle_ptr...)             \
     _Generic((container_handle_ptr),                                           \
-        CCC_Handle_ordered_map_handle *: CCC_handle_ordered_map_insert_handle, \
-        CCC_Handle_ordered_map_handle const                                    \
-            *: CCC_handle_ordered_map_insert_handle,                           \
-        CCC_Handle_realtime_ordered_map_handle                                 \
-            *: CCC_handle_realtime_ordered_map_insert_handle,                  \
-        CCC_Handle_realtime_ordered_map_handle const                           \
-            *: CCC_handle_realtime_ordered_map_insert_handle)(                 \
+        CCC_Handle_adaptive_map_handle                                         \
+            *: CCC_handle_adaptive_map_insert_handle,                          \
+        CCC_Handle_adaptive_map_handle const                                   \
+            *: CCC_handle_adaptive_map_insert_handle,                          \
+        CCC_Handle_bounded_map_handle *: CCC_handle_bounded_map_insert_handle, \
+        CCC_Handle_bounded_map_handle const                                    \
+            *: CCC_handle_bounded_map_insert_handle)(                          \
         (container_handle_ptr), key_val_container_handle_ptr)
 
 #define CCC_private_or_insert(container_entry_ptr,                             \
                               key_val_container_handle_ptr...)                 \
     _Generic((container_entry_ptr),                                            \
         CCC_Flat_hash_map_entry *: CCC_flat_hash_map_or_insert,                \
-        CCC_Ordered_map_entry *: CCC_ordered_map_or_insert,                    \
-        CCC_Handle_ordered_map_handle *: CCC_handle_ordered_map_or_insert,     \
-        CCC_Realtime_ordered_map_entry *: CCC_realtime_ordered_map_or_insert,  \
-        CCC_Handle_realtime_ordered_map_handle                                 \
-            *: CCC_handle_realtime_ordered_map_or_insert,                      \
+        CCC_Adaptive_map_entry *: CCC_adaptive_map_or_insert,                  \
+        CCC_Handle_adaptive_map_handle *: CCC_handle_adaptive_map_or_insert,   \
+        CCC_Bounded_map_entry *: CCC_bounded_map_or_insert,                    \
+        CCC_Handle_bounded_map_handle *: CCC_handle_bounded_map_or_insert,     \
         CCC_Flat_hash_map_entry const *: CCC_flat_hash_map_or_insert,          \
-        CCC_Ordered_map_entry const *: CCC_ordered_map_or_insert,              \
-        CCC_Handle_realtime_ordered_map_handle const                           \
-            *: CCC_handle_realtime_ordered_map_or_insert,                      \
-        CCC_Handle_ordered_map_handle const                                    \
-            *: CCC_handle_ordered_map_or_insert,                               \
-        CCC_Realtime_ordered_map_entry const                                   \
-            *: CCC_realtime_ordered_map_or_insert)(                            \
+        CCC_Adaptive_map_entry const *: CCC_adaptive_map_or_insert,            \
+        CCC_Handle_bounded_map_handle const                                    \
+            *: CCC_handle_bounded_map_or_insert,                               \
+        CCC_Handle_adaptive_map_handle const                                   \
+            *: CCC_handle_adaptive_map_or_insert,                              \
+        CCC_Bounded_map_entry const *: CCC_bounded_map_or_insert)(             \
         (container_entry_ptr), key_val_container_handle_ptr)
 
 #define CCC_private_unwrap(container_entry_ptr)                                \
@@ -376,17 +355,16 @@ limitations under the License.
         CCC_Handle const *: CCC_handle_unwrap,                                 \
         CCC_Flat_hash_map_entry *: CCC_flat_hash_map_unwrap,                   \
         CCC_Flat_hash_map_entry const *: CCC_flat_hash_map_unwrap,             \
-        CCC_Ordered_map_entry *: CCC_ordered_map_unwrap,                       \
-        CCC_Ordered_map_entry const *: CCC_ordered_map_unwrap,                 \
-        CCC_Handle_ordered_map_handle *: CCC_handle_ordered_map_unwrap,        \
-        CCC_Handle_ordered_map_handle const *: CCC_handle_ordered_map_unwrap,  \
-        CCC_Handle_realtime_ordered_map_handle                                 \
-            *: CCC_handle_realtime_ordered_map_unwrap,                         \
-        CCC_Handle_realtime_ordered_map_handle const                           \
-            *: CCC_handle_realtime_ordered_map_unwrap,                         \
-        CCC_Realtime_ordered_map_entry *: CCC_realtime_ordered_map_unwrap,     \
-        CCC_Realtime_ordered_map_entry const                                   \
-            *: CCC_realtime_ordered_map_unwrap)((container_entry_ptr))
+        CCC_Adaptive_map_entry *: CCC_adaptive_map_unwrap,                     \
+        CCC_Adaptive_map_entry const *: CCC_adaptive_map_unwrap,               \
+        CCC_Handle_adaptive_map_handle *: CCC_handle_adaptive_map_unwrap,      \
+        CCC_Handle_adaptive_map_handle const                                   \
+            *: CCC_handle_adaptive_map_unwrap,                                 \
+        CCC_Handle_bounded_map_handle *: CCC_handle_bounded_map_unwrap,        \
+        CCC_Handle_bounded_map_handle const *: CCC_handle_bounded_map_unwrap,  \
+        CCC_Bounded_map_entry *: CCC_bounded_map_unwrap,                       \
+        CCC_Bounded_map_entry const *: CCC_bounded_map_unwrap)(                \
+        (container_entry_ptr))
 
 #define CCC_private_occupied(container_entry_ptr)                              \
     _Generic((container_entry_ptr),                                            \
@@ -396,18 +374,17 @@ limitations under the License.
         CCC_Handle const *: CCC_handle_occupied,                               \
         CCC_Flat_hash_map_entry *: CCC_flat_hash_map_occupied,                 \
         CCC_Flat_hash_map_entry const *: CCC_flat_hash_map_occupied,           \
-        CCC_Ordered_map_entry *: CCC_ordered_map_occupied,                     \
-        CCC_Ordered_map_entry const *: CCC_ordered_map_occupied,               \
-        CCC_Handle_ordered_map_handle *: CCC_handle_ordered_map_occupied,      \
-        CCC_Handle_ordered_map_handle const                                    \
-            *: CCC_handle_ordered_map_occupied,                                \
-        CCC_Handle_realtime_ordered_map_handle                                 \
-            *: CCC_handle_realtime_ordered_map_occupied,                       \
-        CCC_Handle_realtime_ordered_map_handle const                           \
-            *: CCC_handle_realtime_ordered_map_occupied,                       \
-        CCC_Realtime_ordered_map_entry *: CCC_realtime_ordered_map_occupied,   \
-        CCC_Realtime_ordered_map_entry const                                   \
-            *: CCC_realtime_ordered_map_occupied)((container_entry_ptr))
+        CCC_Adaptive_map_entry *: CCC_adaptive_map_occupied,                   \
+        CCC_Adaptive_map_entry const *: CCC_adaptive_map_occupied,             \
+        CCC_Handle_adaptive_map_handle *: CCC_handle_adaptive_map_occupied,    \
+        CCC_Handle_adaptive_map_handle const                                   \
+            *: CCC_handle_adaptive_map_occupied,                               \
+        CCC_Handle_bounded_map_handle *: CCC_handle_bounded_map_occupied,      \
+        CCC_Handle_bounded_map_handle const                                    \
+            *: CCC_handle_bounded_map_occupied,                                \
+        CCC_Bounded_map_entry *: CCC_bounded_map_occupied,                     \
+        CCC_Bounded_map_entry const *: CCC_bounded_map_occupied)(              \
+        (container_entry_ptr))
 
 #define CCC_private_insert_error(container_entry_ptr)                          \
     _Generic((container_entry_ptr),                                            \
@@ -417,19 +394,18 @@ limitations under the License.
         CCC_Handle const *: CCC_handle_insert_error,                           \
         CCC_Flat_hash_map_entry *: CCC_flat_hash_map_insert_error,             \
         CCC_Flat_hash_map_entry const *: CCC_flat_hash_map_insert_error,       \
-        CCC_Ordered_map_entry *: CCC_ordered_map_insert_error,                 \
-        CCC_Ordered_map_entry const *: CCC_ordered_map_insert_error,           \
-        CCC_Handle_ordered_map_handle *: CCC_handle_ordered_map_insert_error,  \
-        CCC_Handle_ordered_map_handle const                                    \
-            *: CCC_handle_ordered_map_insert_error,                            \
-        CCC_Handle_realtime_ordered_map_handle                                 \
-            *: CCC_handle_realtime_ordered_map_insert_error,                   \
-        CCC_Handle_realtime_ordered_map_handle const                           \
-            *: CCC_handle_realtime_ordered_map_insert_error,                   \
-        CCC_Realtime_ordered_map_entry                                         \
-            *: CCC_realtime_ordered_map_insert_error,                          \
-        CCC_Realtime_ordered_map_entry const                                   \
-            *: CCC_realtime_ordered_map_insert_error)((container_entry_ptr))
+        CCC_Adaptive_map_entry *: CCC_adaptive_map_insert_error,               \
+        CCC_Adaptive_map_entry const *: CCC_adaptive_map_insert_error,         \
+        CCC_Handle_adaptive_map_handle                                         \
+            *: CCC_handle_adaptive_map_insert_error,                           \
+        CCC_Handle_adaptive_map_handle const                                   \
+            *: CCC_handle_adaptive_map_insert_error,                           \
+        CCC_Handle_bounded_map_handle *: CCC_handle_bounded_map_insert_error,  \
+        CCC_Handle_bounded_map_handle const                                    \
+            *: CCC_handle_bounded_map_insert_error,                            \
+        CCC_Bounded_map_entry *: CCC_bounded_map_insert_error,                 \
+        CCC_Bounded_map_entry const *: CCC_bounded_map_insert_error)(          \
+        (container_entry_ptr))
 
 /*======================    Misc Search Interface ===========================*/
 
@@ -437,29 +413,25 @@ limitations under the License.
     _Generic((container_ptr),                                                  \
         CCC_Flat_hash_map *: CCC_flat_hash_map_get_key_val,                    \
         CCC_Flat_hash_map const *: CCC_flat_hash_map_get_key_val,              \
-        CCC_Ordered_map *: CCC_ordered_map_get_key_val,                        \
-        CCC_Handle_ordered_map *: CCC_handle_ordered_map_get_key_val,          \
-        CCC_Handle_realtime_ordered_map                                        \
-            *: CCC_handle_realtime_ordered_map_get_key_val,                    \
-        CCC_Handle_realtime_ordered_map const                                  \
-            *: CCC_handle_realtime_ordered_map_get_key_val,                    \
-        CCC_Realtime_ordered_map *: CCC_realtime_ordered_map_get_key_val,      \
-        CCC_Realtime_ordered_map const                                         \
-            *: CCC_realtime_ordered_map_get_key_val)((container_ptr), key_ptr)
+        CCC_Adaptive_map *: CCC_adaptive_map_get_key_val,                      \
+        CCC_Handle_adaptive_map *: CCC_handle_adaptive_map_get_key_val,        \
+        CCC_Handle_bounded_map *: CCC_handle_bounded_map_get_key_val,          \
+        CCC_Handle_bounded_map const *: CCC_handle_bounded_map_get_key_val,    \
+        CCC_Bounded_map *: CCC_bounded_map_get_key_val,                        \
+        CCC_Bounded_map const *: CCC_bounded_map_get_key_val)((container_ptr), \
+                                                              key_ptr)
 
 #define CCC_private_contains(container_ptr, key_ptr...)                        \
     _Generic((container_ptr),                                                  \
         CCC_Flat_hash_map *: CCC_flat_hash_map_contains,                       \
         CCC_Flat_hash_map const *: CCC_flat_hash_map_contains,                 \
-        CCC_Ordered_map *: CCC_ordered_map_contains,                           \
-        CCC_Handle_ordered_map *: CCC_handle_ordered_map_contains,             \
-        CCC_Handle_realtime_ordered_map                                        \
-            *: CCC_handle_realtime_ordered_map_contains,                       \
-        CCC_Handle_realtime_ordered_map const                                  \
-            *: CCC_handle_realtime_ordered_map_contains,                       \
-        CCC_Realtime_ordered_map *: CCC_realtime_ordered_map_contains,         \
-        CCC_Realtime_ordered_map const *: CCC_realtime_ordered_map_contains)(  \
-        (container_ptr), key_ptr)
+        CCC_Adaptive_map *: CCC_adaptive_map_contains,                         \
+        CCC_Handle_adaptive_map *: CCC_handle_adaptive_map_contains,           \
+        CCC_Handle_bounded_map *: CCC_handle_bounded_map_contains,             \
+        CCC_Handle_bounded_map const *: CCC_handle_bounded_map_contains,       \
+        CCC_Bounded_map *: CCC_bounded_map_contains,                           \
+        CCC_Bounded_map const *: CCC_bounded_map_contains)((container_ptr),    \
+                                                           key_ptr)
 
 /*================    Sequential Containers Interface   =====================*/
 
@@ -572,154 +544,136 @@ limitations under the License.
     _Generic((container_ptr),                                                  \
         CCC_Buffer *: CCC_buffer_begin,                                        \
         CCC_Flat_hash_map *: CCC_flat_hash_map_begin,                          \
-        CCC_Ordered_map *: CCC_ordered_map_begin,                              \
-        CCC_Handle_ordered_map *: CCC_handle_ordered_map_begin,                \
+        CCC_Adaptive_map *: CCC_adaptive_map_begin,                            \
+        CCC_Handle_adaptive_map *: CCC_handle_adaptive_map_begin,              \
         CCC_Flat_double_ended_queue *: CCC_flat_double_ended_queue_begin,      \
         CCC_Singly_linked_list *: CCC_singly_linked_list_begin,                \
         CCC_Doubly_linked_list *: CCC_doubly_linked_list_begin,                \
-        CCC_Realtime_ordered_map *: CCC_realtime_ordered_map_begin,            \
-        CCC_Handle_realtime_ordered_map                                        \
-            *: CCC_handle_realtime_ordered_map_begin,                          \
+        CCC_Bounded_map *: CCC_bounded_map_begin,                              \
+        CCC_Handle_bounded_map *: CCC_handle_bounded_map_begin,                \
         CCC_Buffer const *: CCC_buffer_begin,                                  \
         CCC_Flat_hash_map const *: CCC_flat_hash_map_begin,                    \
-        CCC_Ordered_map const *: CCC_ordered_map_begin,                        \
-        CCC_Handle_ordered_map const *: CCC_handle_ordered_map_begin,          \
+        CCC_Adaptive_map const *: CCC_adaptive_map_begin,                      \
+        CCC_Handle_adaptive_map const *: CCC_handle_adaptive_map_begin,        \
         CCC_Flat_double_ended_queue const                                      \
             *: CCC_flat_double_ended_queue_begin,                              \
         CCC_Singly_linked_list const *: CCC_singly_linked_list_begin,          \
         CCC_Doubly_linked_list const *: CCC_doubly_linked_list_begin,          \
-        CCC_Handle_realtime_ordered_map const                                  \
-            *: CCC_handle_realtime_ordered_map_begin,                          \
-        CCC_Realtime_ordered_map const *: CCC_realtime_ordered_map_begin)(     \
-        (container_ptr))
+        CCC_Handle_bounded_map const *: CCC_handle_bounded_map_begin,          \
+        CCC_Bounded_map const *: CCC_bounded_map_begin)((container_ptr))
 
 #define CCC_private_reverse_begin(container_ptr)                               \
     _Generic((container_ptr),                                                  \
         CCC_Buffer *: CCC_buffer_reverse_begin,                                \
-        CCC_Ordered_map *: CCC_ordered_map_reverse_begin,                      \
-        CCC_Handle_ordered_map *: CCC_handle_ordered_map_reverse_begin,        \
+        CCC_Adaptive_map *: CCC_adaptive_map_reverse_begin,                    \
+        CCC_Handle_adaptive_map *: CCC_handle_adaptive_map_reverse_begin,      \
         CCC_Flat_double_ended_queue                                            \
             *: CCC_flat_double_ended_queue_reverse_begin,                      \
         CCC_Doubly_linked_list *: CCC_doubly_linked_list_reverse_begin,        \
-        CCC_Realtime_ordered_map *: CCC_realtime_ordered_map_reverse_begin,    \
-        CCC_Handle_realtime_ordered_map                                        \
-            *: CCC_handle_realtime_ordered_map_reverse_begin,                  \
+        CCC_Bounded_map *: CCC_bounded_map_reverse_begin,                      \
+        CCC_Handle_bounded_map *: CCC_handle_bounded_map_reverse_begin,        \
         CCC_Buffer const *: CCC_buffer_reverse_begin,                          \
-        CCC_Ordered_map const *: CCC_ordered_map_reverse_begin,                \
-        CCC_Handle_ordered_map const *: CCC_handle_ordered_map_reverse_begin,  \
+        CCC_Adaptive_map const *: CCC_adaptive_map_reverse_begin,              \
+        CCC_Handle_adaptive_map const                                          \
+            *: CCC_handle_adaptive_map_reverse_begin,                          \
         CCC_Flat_double_ended_queue const                                      \
             *: CCC_flat_double_ended_queue_reverse_begin,                      \
         CCC_Doubly_linked_list const *: CCC_doubly_linked_list_reverse_begin,  \
-        CCC_Handle_realtime_ordered_map const                                  \
-            *: CCC_handle_realtime_ordered_map_reverse_begin,                  \
-        CCC_Realtime_ordered_map const                                         \
-            *: CCC_realtime_ordered_map_reverse_begin)((container_ptr))
+        CCC_Handle_bounded_map const *: CCC_handle_bounded_map_reverse_begin,  \
+        CCC_Bounded_map const *: CCC_bounded_map_reverse_begin)(               \
+        (container_ptr))
 
 #define CCC_private_next(container_ptr, void_iter_ptr)                         \
     _Generic((container_ptr),                                                  \
         CCC_Buffer *: CCC_buffer_next,                                         \
         CCC_Flat_hash_map *: CCC_flat_hash_map_next,                           \
-        CCC_Ordered_map *: CCC_ordered_map_next,                               \
-        CCC_Handle_ordered_map *: CCC_handle_ordered_map_next,                 \
+        CCC_Adaptive_map *: CCC_adaptive_map_next,                             \
+        CCC_Handle_adaptive_map *: CCC_handle_adaptive_map_next,               \
         CCC_Flat_double_ended_queue *: CCC_flat_double_ended_queue_next,       \
         CCC_Singly_linked_list *: CCC_singly_linked_list_next,                 \
         CCC_Doubly_linked_list *: CCC_doubly_linked_list_next,                 \
-        CCC_Realtime_ordered_map *: CCC_realtime_ordered_map_next,             \
-        CCC_Handle_realtime_ordered_map                                        \
-            *: CCC_handle_realtime_ordered_map_next,                           \
+        CCC_Bounded_map *: CCC_bounded_map_next,                               \
+        CCC_Handle_bounded_map *: CCC_handle_bounded_map_next,                 \
         CCC_Buffer const *: CCC_buffer_next,                                   \
         CCC_Flat_hash_map const *: CCC_flat_hash_map_next,                     \
-        CCC_Ordered_map const *: CCC_ordered_map_next,                         \
-        CCC_Handle_ordered_map const *: CCC_handle_ordered_map_next,           \
+        CCC_Adaptive_map const *: CCC_adaptive_map_next,                       \
+        CCC_Handle_adaptive_map const *: CCC_handle_adaptive_map_next,         \
         CCC_Flat_double_ended_queue const *: CCC_flat_double_ended_queue_next, \
         CCC_Singly_linked_list const *: CCC_singly_linked_list_next,           \
         CCC_Doubly_linked_list const *: CCC_doubly_linked_list_next,           \
-        CCC_Handle_realtime_ordered_map const                                  \
-            *: CCC_handle_realtime_ordered_map_next,                           \
-        CCC_Realtime_ordered_map const *: CCC_realtime_ordered_map_next)(      \
-        (container_ptr), (void_iter_ptr))
+        CCC_Handle_bounded_map const *: CCC_handle_bounded_map_next,           \
+        CCC_Bounded_map const *: CCC_bounded_map_next)((container_ptr),        \
+                                                       (void_iter_ptr))
 
 #define CCC_private_reverse_next(container_ptr, void_iter_ptr)                 \
     _Generic((container_ptr),                                                  \
         CCC_Buffer *: CCC_buffer_reverse_next,                                 \
-        CCC_Ordered_map *: CCC_ordered_map_reverse_next,                       \
-        CCC_Handle_ordered_map *: CCC_handle_ordered_map_reverse_next,         \
+        CCC_Adaptive_map *: CCC_adaptive_map_reverse_next,                     \
+        CCC_Handle_adaptive_map *: CCC_handle_adaptive_map_reverse_next,       \
         CCC_Flat_double_ended_queue                                            \
             *: CCC_flat_double_ended_queue_reverse_next,                       \
         CCC_Doubly_linked_list *: CCC_doubly_linked_list_reverse_next,         \
-        CCC_Realtime_ordered_map *: CCC_realtime_ordered_map_reverse_next,     \
-        CCC_Handle_realtime_ordered_map                                        \
-            *: CCC_handle_realtime_ordered_map_reverse_next,                   \
+        CCC_Bounded_map *: CCC_bounded_map_reverse_next,                       \
+        CCC_Handle_bounded_map *: CCC_handle_bounded_map_reverse_next,         \
         CCC_Buffer const *: CCC_buffer_reverse_next,                           \
-        CCC_Ordered_map const *: CCC_ordered_map_reverse_next,                 \
-        CCC_Handle_ordered_map const *: CCC_handle_ordered_map_reverse_next,   \
+        CCC_Adaptive_map const *: CCC_adaptive_map_reverse_next,               \
+        CCC_Handle_adaptive_map const *: CCC_handle_adaptive_map_reverse_next, \
         CCC_Flat_double_ended_queue const                                      \
             *: CCC_flat_double_ended_queue_reverse_next,                       \
         CCC_Doubly_linked_list const *: CCC_doubly_linked_list_reverse_next,   \
-        CCC_Handle_realtime_ordered_map const                                  \
-            *: CCC_handle_realtime_ordered_map_reverse_next,                   \
-        CCC_Realtime_ordered_map const                                         \
-            *: CCC_realtime_ordered_map_reverse_next)((container_ptr),         \
-                                                      (void_iter_ptr))
+        CCC_Handle_bounded_map const *: CCC_handle_bounded_map_reverse_next,   \
+        CCC_Bounded_map const *: CCC_bounded_map_reverse_next)(                \
+        (container_ptr), (void_iter_ptr))
 
 #define CCC_private_end(container_ptr)                                         \
     _Generic((container_ptr),                                                  \
         CCC_Buffer *: CCC_buffer_end,                                          \
         CCC_Flat_hash_map *: CCC_flat_hash_map_end,                            \
-        CCC_Ordered_map *: CCC_ordered_map_end,                                \
-        CCC_Handle_ordered_map *: CCC_handle_ordered_map_end,                  \
+        CCC_Adaptive_map *: CCC_adaptive_map_end,                              \
+        CCC_Handle_adaptive_map *: CCC_handle_adaptive_map_end,                \
         CCC_Flat_double_ended_queue *: CCC_flat_double_ended_queue_end,        \
         CCC_Singly_linked_list *: CCC_singly_linked_list_end,                  \
         CCC_Doubly_linked_list *: CCC_doubly_linked_list_end,                  \
-        CCC_Realtime_ordered_map *: CCC_realtime_ordered_map_end,              \
-        CCC_Handle_realtime_ordered_map                                        \
-            *: CCC_handle_realtime_ordered_map_end,                            \
+        CCC_Bounded_map *: CCC_bounded_map_end,                                \
+        CCC_Handle_bounded_map *: CCC_handle_bounded_map_end,                  \
         CCC_Buffer const *: CCC_buffer_end,                                    \
         CCC_Flat_hash_map const *: CCC_flat_hash_map_end,                      \
-        CCC_Ordered_map const *: CCC_ordered_map_end,                          \
-        CCC_Handle_ordered_map const *: CCC_handle_ordered_map_end,            \
+        CCC_Adaptive_map const *: CCC_adaptive_map_end,                        \
+        CCC_Handle_adaptive_map const *: CCC_handle_adaptive_map_end,          \
         CCC_Flat_double_ended_queue const *: CCC_flat_double_ended_queue_end,  \
         CCC_Singly_linked_list const *: CCC_singly_linked_list_end,            \
         CCC_Doubly_linked_list const *: CCC_doubly_linked_list_end,            \
-        CCC_Handle_realtime_ordered_map const                                  \
-            *: CCC_handle_realtime_ordered_map_end,                            \
-        CCC_Realtime_ordered_map const *: CCC_realtime_ordered_map_end)(       \
-        (container_ptr))
+        CCC_Handle_bounded_map const *: CCC_handle_bounded_map_end,            \
+        CCC_Bounded_map const *: CCC_bounded_map_end)((container_ptr))
 
 #define CCC_private_reverse_end(container_ptr)                                 \
     _Generic((container_ptr),                                                  \
         CCC_Buffer *: CCC_buffer_reverse_end,                                  \
-        CCC_Ordered_map *: CCC_ordered_map_reverse_end,                        \
-        CCC_Handle_ordered_map *: CCC_handle_ordered_map_reverse_end,          \
+        CCC_Adaptive_map *: CCC_adaptive_map_reverse_end,                      \
+        CCC_Handle_adaptive_map *: CCC_handle_adaptive_map_reverse_end,        \
         CCC_Flat_double_ended_queue                                            \
             *: CCC_flat_double_ended_queue_reverse_end,                        \
         CCC_Doubly_linked_list *: CCC_doubly_linked_list_reverse_end,          \
-        CCC_Realtime_ordered_map *: CCC_realtime_ordered_map_reverse_end,      \
-        CCC_Handle_realtime_ordered_map                                        \
-            *: CCC_handle_realtime_ordered_map_reverse_end,                    \
+        CCC_Bounded_map *: CCC_bounded_map_reverse_end,                        \
+        CCC_Handle_bounded_map *: CCC_handle_bounded_map_reverse_end,          \
         CCC_Buffer const *: CCC_buffer_reverse_end,                            \
-        CCC_Ordered_map const *: CCC_ordered_map_reverse_end,                  \
-        CCC_Handle_ordered_map const *: CCC_handle_ordered_map_reverse_end,    \
+        CCC_Adaptive_map const *: CCC_adaptive_map_reverse_end,                \
+        CCC_Handle_adaptive_map const *: CCC_handle_adaptive_map_reverse_end,  \
         CCC_Flat_double_ended_queue const                                      \
             *: CCC_flat_double_ended_queue_reverse_end,                        \
         CCC_Doubly_linked_list const *: CCC_doubly_linked_list_reverse_end,    \
-        CCC_Handle_realtime_ordered_map const                                  \
-            *: CCC_handle_realtime_ordered_map_reverse_end,                    \
-        CCC_Realtime_ordered_map const                                         \
-            *: CCC_realtime_ordered_map_reverse_end)((container_ptr))
+        CCC_Handle_bounded_map const *: CCC_handle_bounded_map_reverse_end,    \
+        CCC_Bounded_map const *: CCC_bounded_map_reverse_end)((container_ptr))
 
 #define CCC_private_equal_range(container_ptr, begin_and_end_key_ptr...)       \
     _Generic((container_ptr),                                                  \
-        CCC_Ordered_map *: CCC_ordered_map_equal_range,                        \
-        CCC_Handle_ordered_map *: CCC_handle_ordered_map_equal_range,          \
-        CCC_Handle_realtime_ordered_map                                        \
-            *: CCC_handle_realtime_ordered_map_equal_range,                    \
-        CCC_Handle_realtime_ordered_map const                                  \
-            *: CCC_handle_realtime_ordered_map_equal_range,                    \
-        CCC_Realtime_ordered_map *: CCC_realtime_ordered_map_equal_range,      \
-        CCC_Realtime_ordered_map const                                         \
-            *: CCC_realtime_ordered_map_equal_range)((container_ptr),          \
-                                                     begin_and_end_key_ptr)
+        CCC_Adaptive_map *: CCC_adaptive_map_equal_range,                      \
+        CCC_Handle_adaptive_map *: CCC_handle_adaptive_map_equal_range,        \
+        CCC_Handle_bounded_map *: CCC_handle_bounded_map_equal_range,          \
+        CCC_Handle_bounded_map const *: CCC_handle_bounded_map_equal_range,    \
+        CCC_Bounded_map *: CCC_bounded_map_equal_range,                        \
+        CCC_Bounded_map const *: CCC_bounded_map_equal_range)(                 \
+        (container_ptr), begin_and_end_key_ptr)
 
 #define CCC_private_equal_range_r(container_ptr, begin_and_end_key_ptr...)     \
     &(CCC_Range)                                                               \
@@ -730,16 +684,14 @@ limitations under the License.
 #define CCC_private_equal_range_reverse(                                       \
     container_ptr, reverse_begin_and_reverse_end_key_ptr...)                   \
     _Generic((container_ptr),                                                  \
-        CCC_Ordered_map *: CCC_ordered_map_equal_range_reverse,                \
-        CCC_Handle_ordered_map *: CCC_handle_ordered_map_equal_range_reverse,  \
-        CCC_Handle_realtime_ordered_map                                        \
-            *: CCC_handle_realtime_ordered_map_equal_range_reverse,            \
-        CCC_Handle_realtime_ordered_map const                                  \
-            *: CCC_handle_realtime_ordered_map_equal_range_reverse,            \
-        CCC_Realtime_ordered_map                                               \
-            *: CCC_realtime_ordered_map_equal_range_reverse,                   \
-        CCC_Realtime_ordered_map const                                         \
-            *: CCC_realtime_ordered_map_equal_range_reverse)(                  \
+        CCC_Adaptive_map *: CCC_adaptive_map_equal_range_reverse,              \
+        CCC_Handle_adaptive_map                                                \
+            *: CCC_handle_adaptive_map_equal_range_reverse,                    \
+        CCC_Handle_bounded_map *: CCC_handle_bounded_map_equal_range_reverse,  \
+        CCC_Handle_bounded_map const                                           \
+            *: CCC_handle_bounded_map_equal_range_reverse,                     \
+        CCC_Bounded_map *: CCC_bounded_map_equal_range_reverse,                \
+        CCC_Bounded_map const *: CCC_bounded_map_equal_range_reverse)(         \
         (container_ptr), reverse_begin_and_reverse_end_key_ptr)
 
 #define CCC_private_equal_range_reverse_r(                                     \
@@ -773,11 +725,10 @@ limitations under the License.
     _Generic((dst_container_ptr),                                              \
         CCC_Bitset *: CCC_bitset_copy,                                         \
         CCC_Flat_hash_map *: CCC_flat_hash_map_copy,                           \
-        CCC_Handle_ordered_map *: CCC_handle_ordered_map_copy,                 \
+        CCC_Handle_adaptive_map *: CCC_handle_adaptive_map_copy,               \
         CCC_Flat_priority_queue *: CCC_flat_priority_queue_copy,               \
         CCC_Flat_double_ended_queue *: CCC_flat_double_ended_queue_copy,       \
-        CCC_Handle_realtime_ordered_map                                        \
-            *: CCC_handle_realtime_ordered_map_copy)(                          \
+        CCC_Handle_bounded_map *: CCC_handle_bounded_map_copy)(                \
         (dst_container_ptr), (src_container_ptr), (allocate_ptr))
 
 #define CCC_private_reserve(container_ptr, n_to_add, allocate_ptr)             \
@@ -785,11 +736,10 @@ limitations under the License.
         CCC_Bitset *: CCC_bitset_reserve,                                      \
         CCC_Buffer *: CCC_buffer_reserve,                                      \
         CCC_Flat_hash_map *: CCC_flat_hash_map_reserve,                        \
-        CCC_Handle_ordered_map *: CCC_handle_ordered_map_reserve,              \
+        CCC_Handle_adaptive_map *: CCC_handle_adaptive_map_reserve,            \
         CCC_Flat_priority_queue *: CCC_flat_priority_queue_reserve,            \
         CCC_Flat_double_ended_queue *: CCC_flat_double_ended_queue_reserve,    \
-        CCC_Handle_realtime_ordered_map                                        \
-            *: CCC_handle_realtime_ordered_map_reserve)(                       \
+        CCC_Handle_bounded_map *: CCC_handle_bounded_map_reserve)(             \
         (container_ptr), (n_to_add), (allocate_ptr))
 
 #define CCC_private_clear(container_ptr, ...)                                  \
@@ -797,16 +747,15 @@ limitations under the License.
         CCC_Bitset *: CCC_bitset_clear,                                        \
         CCC_Buffer *: CCC_buffer_clear,                                        \
         CCC_Flat_hash_map *: CCC_flat_hash_map_clear,                          \
-        CCC_Handle_ordered_map *: CCC_handle_ordered_map_clear,                \
+        CCC_Handle_adaptive_map *: CCC_handle_adaptive_map_clear,              \
         CCC_Flat_priority_queue *: CCC_flat_priority_queue_clear,              \
         CCC_Flat_double_ended_queue *: CCC_flat_double_ended_queue_clear,      \
         CCC_Singly_linked_list *: CCC_singly_linked_list_clear,                \
         CCC_Doubly_linked_list *: CCC_doubly_linked_list_clear,                \
-        CCC_Ordered_map *: CCC_ordered_map_clear,                              \
+        CCC_Adaptive_map *: CCC_adaptive_map_clear,                            \
         CCC_Priority_queue *: CCC_priority_queue_clear,                        \
-        CCC_Realtime_ordered_map *: CCC_realtime_ordered_map_clear,            \
-        CCC_Handle_realtime_ordered_map                                        \
-            *: CCC_handle_realtime_ordered_map_clear)(                         \
+        CCC_Bounded_map *: CCC_bounded_map_clear,                              \
+        CCC_Handle_bounded_map *: CCC_handle_bounded_map_clear)(               \
         (container_ptr)__VA_OPT__(, __VA_ARGS__))
 
 #define CCC_private_clear_and_free(container_ptr, ...)                         \
@@ -814,12 +763,11 @@ limitations under the License.
         CCC_Bitset *: CCC_bitset_clear_and_free,                               \
         CCC_Buffer *: CCC_buffer_clear_and_free,                               \
         CCC_Flat_hash_map *: CCC_flat_hash_map_clear_and_free,                 \
-        CCC_Handle_ordered_map *: CCC_handle_ordered_map_clear_and_free,       \
+        CCC_Handle_adaptive_map *: CCC_handle_adaptive_map_clear_and_free,     \
         CCC_Flat_priority_queue *: CCC_flat_priority_queue_clear_and_free,     \
         CCC_Flat_double_ended_queue                                            \
             *: CCC_flat_double_ended_queue_clear_and_free,                     \
-        CCC_Handle_realtime_ordered_map                                        \
-            *: CCC_handle_realtime_ordered_map_clear_and_free)(                \
+        CCC_Handle_bounded_map *: CCC_handle_bounded_map_clear_and_free)(      \
         (container_ptr)__VA_OPT__(, __VA_ARGS__))
 
 #define CCC_private_clear_and_free_reserve(container_ptr,                      \
@@ -828,14 +776,14 @@ limitations under the License.
         CCC_Bitset *: CCC_bitset_clear_and_free_reserve,                       \
         CCC_Buffer *: CCC_buffer_clear_and_free_reserve,                       \
         CCC_Flat_hash_map *: CCC_flat_hash_map_clear_and_free_reserve,         \
-        CCC_Handle_ordered_map                                                 \
-            *: CCC_handle_ordered_map_clear_and_free_reserve,                  \
+        CCC_Handle_adaptive_map                                                \
+            *: CCC_handle_adaptive_map_clear_and_free_reserve,                 \
         CCC_Flat_priority_queue                                                \
             *: CCC_flat_priority_queue_clear_and_free_reserve,                 \
         CCC_Flat_double_ended_queue                                            \
             *: CCC_flat_double_ended_queue_clear_and_free_reserve,             \
-        CCC_Handle_realtime_ordered_map                                        \
-            *: CCC_handle_realtime_ordered_map_clear_and_free_reserve)(        \
+        CCC_Handle_bounded_map                                                 \
+            *: CCC_handle_bounded_map_clear_and_free_reserve)(                 \
         (container_ptr), destructor_and_free_args)
 
 /*===================    Standard Getters Interface   =======================*/
@@ -845,105 +793,95 @@ limitations under the License.
         CCC_Bitset *: CCC_bitset_count,                                        \
         CCC_Buffer *: CCC_buffer_count,                                        \
         CCC_Flat_hash_map *: CCC_flat_hash_map_count,                          \
-        CCC_Ordered_map *: CCC_ordered_map_count,                              \
-        CCC_Handle_ordered_map *: CCC_handle_ordered_map_count,                \
+        CCC_Adaptive_map *: CCC_adaptive_map_count,                            \
+        CCC_Handle_adaptive_map *: CCC_handle_adaptive_map_count,              \
         CCC_Flat_priority_queue *: CCC_flat_priority_queue_count,              \
         CCC_Flat_double_ended_queue *: CCC_flat_double_ended_queue_count,      \
         CCC_Priority_queue *: CCC_priority_queue_count,                        \
         CCC_Singly_linked_list *: CCC_singly_linked_list_count,                \
         CCC_Doubly_linked_list *: CCC_doubly_linked_list_count,                \
-        CCC_Realtime_ordered_map *: CCC_realtime_ordered_map_count,            \
-        CCC_Handle_realtime_ordered_map                                        \
-            *: CCC_handle_realtime_ordered_map_count,                          \
+        CCC_Bounded_map *: CCC_bounded_map_count,                              \
+        CCC_Handle_bounded_map *: CCC_handle_bounded_map_count,                \
         CCC_Buffer const *: CCC_buffer_count,                                  \
         CCC_Flat_hash_map const *: CCC_flat_hash_map_count,                    \
-        CCC_Ordered_map const *: CCC_ordered_map_count,                        \
-        CCC_Handle_ordered_map const *: CCC_handle_ordered_map_count,          \
+        CCC_Adaptive_map const *: CCC_adaptive_map_count,                      \
+        CCC_Handle_adaptive_map const *: CCC_handle_adaptive_map_count,        \
         CCC_Flat_priority_queue const *: CCC_flat_priority_queue_count,        \
         CCC_Flat_double_ended_queue const                                      \
             *: CCC_flat_double_ended_queue_count,                              \
         CCC_Priority_queue const *: CCC_priority_queue_count,                  \
         CCC_Singly_linked_list const *: CCC_singly_linked_list_count,          \
         CCC_Doubly_linked_list const *: CCC_doubly_linked_list_count,          \
-        CCC_Handle_realtime_ordered_map const                                  \
-            *: CCC_handle_realtime_ordered_map_count,                          \
-        CCC_Realtime_ordered_map const *: CCC_realtime_ordered_map_count)(     \
-        (container_ptr))
+        CCC_Handle_bounded_map const *: CCC_handle_bounded_map_count,          \
+        CCC_Bounded_map const *: CCC_bounded_map_count)((container_ptr))
 
 #define CCC_private_capacity(container_ptr)                                    \
     _Generic((container_ptr),                                                  \
         CCC_Bitset *: CCC_bitset_capacity,                                     \
         CCC_Buffer *: CCC_buffer_capacity,                                     \
         CCC_Flat_hash_map *: CCC_flat_hash_map_capacity,                       \
-        CCC_Handle_ordered_map *: CCC_handle_ordered_map_capacity,             \
+        CCC_Handle_adaptive_map *: CCC_handle_adaptive_map_capacity,           \
         CCC_Flat_priority_queue *: CCC_flat_priority_queue_capacity,           \
         CCC_Flat_double_ended_queue *: CCC_flat_double_ended_queue_capacity,   \
-        CCC_Handle_realtime_ordered_map                                        \
-            *: CCC_handle_realtime_ordered_map_capacity,                       \
+        CCC_Handle_bounded_map *: CCC_handle_bounded_map_capacity,             \
         CCC_Bitset const *: CCC_bitset_capacity,                               \
         CCC_Buffer const *: CCC_buffer_capacity,                               \
         CCC_Flat_hash_map const *: CCC_flat_hash_map_capacity,                 \
-        CCC_Handle_ordered_map const *: CCC_handle_ordered_map_capacity,       \
+        CCC_Handle_adaptive_map const *: CCC_handle_adaptive_map_capacity,     \
         CCC_Flat_priority_queue const *: CCC_flat_priority_queue_capacity,     \
         CCC_Flat_double_ended_queue const                                      \
             *: CCC_flat_double_ended_queue_capacity,                           \
-        CCC_Handle_realtime_ordered_map const                                  \
-            *: CCC_handle_realtime_ordered_map_capacity)((container_ptr))
+        CCC_Handle_bounded_map const *: CCC_handle_bounded_map_capacity)(      \
+        (container_ptr))
 
 #define CCC_private_is_empty(container_ptr)                                    \
     _Generic((container_ptr),                                                  \
         CCC_Buffer *: CCC_buffer_is_empty,                                     \
         CCC_Flat_hash_map *: CCC_flat_hash_map_is_empty,                       \
-        CCC_Ordered_map *: CCC_ordered_map_is_empty,                           \
-        CCC_Handle_ordered_map *: CCC_handle_ordered_map_is_empty,             \
+        CCC_Adaptive_map *: CCC_adaptive_map_is_empty,                         \
+        CCC_Handle_adaptive_map *: CCC_handle_adaptive_map_is_empty,           \
         CCC_Flat_priority_queue *: CCC_flat_priority_queue_is_empty,           \
         CCC_Flat_double_ended_queue *: CCC_flat_double_ended_queue_is_empty,   \
         CCC_Priority_queue *: CCC_priority_queue_is_empty,                     \
         CCC_Singly_linked_list *: CCC_singly_linked_list_is_empty,             \
         CCC_Doubly_linked_list *: CCC_doubly_linked_list_is_empty,             \
-        CCC_Realtime_ordered_map *: CCC_realtime_ordered_map_is_empty,         \
-        CCC_Handle_realtime_ordered_map                                        \
-            *: CCC_handle_realtime_ordered_map_is_empty,                       \
+        CCC_Bounded_map *: CCC_bounded_map_is_empty,                           \
+        CCC_Handle_bounded_map *: CCC_handle_bounded_map_is_empty,             \
         CCC_Buffer const *: CCC_buffer_is_empty,                               \
         CCC_Flat_hash_map const *: CCC_flat_hash_map_is_empty,                 \
-        CCC_Ordered_map const *: CCC_ordered_map_is_empty,                     \
-        CCC_Handle_ordered_map const *: CCC_handle_ordered_map_is_empty,       \
+        CCC_Adaptive_map const *: CCC_adaptive_map_is_empty,                   \
+        CCC_Handle_adaptive_map const *: CCC_handle_adaptive_map_is_empty,     \
         CCC_Flat_priority_queue const *: CCC_flat_priority_queue_is_empty,     \
         CCC_Flat_double_ended_queue const                                      \
             *: CCC_flat_double_ended_queue_is_empty,                           \
         CCC_Priority_queue const *: CCC_priority_queue_is_empty,               \
         CCC_Singly_linked_list const *: CCC_singly_linked_list_is_empty,       \
         CCC_Doubly_linked_list const *: CCC_doubly_linked_list_is_empty,       \
-        CCC_Handle_realtime_ordered_map const                                  \
-            *: CCC_handle_realtime_ordered_map_is_empty,                       \
-        CCC_Realtime_ordered_map const *: CCC_realtime_ordered_map_is_empty)(  \
-        (container_ptr))
+        CCC_Handle_bounded_map const *: CCC_handle_bounded_map_is_empty,       \
+        CCC_Bounded_map const *: CCC_bounded_map_is_empty)((container_ptr))
 
 #define CCC_private_validate(container_ptr)                                    \
     _Generic((container_ptr),                                                  \
         CCC_Flat_hash_map *: CCC_flat_hash_map_validate,                       \
-        CCC_Ordered_map *: CCC_ordered_map_validate,                           \
-        CCC_Handle_ordered_map *: CCC_handle_ordered_map_validate,             \
+        CCC_Adaptive_map *: CCC_adaptive_map_validate,                         \
+        CCC_Handle_adaptive_map *: CCC_handle_adaptive_map_validate,           \
         CCC_Flat_priority_queue *: CCC_flat_priority_queue_validate,           \
         CCC_Flat_double_ended_queue *: CCC_flat_double_ended_queue_validate,   \
         CCC_Priority_queue *: CCC_priority_queue_validate,                     \
         CCC_Singly_linked_list *: CCC_singly_linked_list_validate,             \
         CCC_Doubly_linked_list *: CCC_doubly_linked_list_validate,             \
-        CCC_Realtime_ordered_map *: CCC_realtime_ordered_map_validate,         \
-        CCC_Handle_realtime_ordered_map                                        \
-            *: CCC_handle_realtime_ordered_map_validate,                       \
+        CCC_Bounded_map *: CCC_bounded_map_validate,                           \
+        CCC_Handle_bounded_map *: CCC_handle_bounded_map_validate,             \
         CCC_Flat_hash_map const *: CCC_flat_hash_map_validate,                 \
-        CCC_Ordered_map const *: CCC_ordered_map_validate,                     \
-        CCC_Handle_ordered_map const *: CCC_handle_ordered_map_validate,       \
+        CCC_Adaptive_map const *: CCC_adaptive_map_validate,                   \
+        CCC_Handle_adaptive_map const *: CCC_handle_adaptive_map_validate,     \
         CCC_Flat_priority_queue const *: CCC_flat_priority_queue_validate,     \
         CCC_Flat_double_ended_queue const                                      \
             *: CCC_flat_double_ended_queue_validate,                           \
         CCC_Priority_queue const *: CCC_priority_queue_validate,               \
         CCC_Singly_linked_list const *: CCC_singly_linked_list_validate,       \
         CCC_Doubly_linked_list const *: CCC_doubly_linked_list_validate,       \
-        CCC_Handle_realtime_ordered_map const                                  \
-            *: CCC_handle_realtime_ordered_map_validate,                       \
-        CCC_Realtime_ordered_map const *: CCC_realtime_ordered_map_validate)(  \
-        (container_ptr))
+        CCC_Handle_bounded_map const *: CCC_handle_bounded_map_validate,       \
+        CCC_Bounded_map const *: CCC_bounded_map_validate)((container_ptr))
 
 #endif /* CCC_PRIVATE_TRAITS_H */
