@@ -86,14 +86,14 @@ Initialize the container with memory, callbacks, and permissions. */
 /**@{*/
 
 /** @brief Initialize a flat_priority_queue as a min or max heap.
-@param [in] mem_pointer a pointer to an array of user types or NULL.
-@param [in] any_type_name the name of the user type.
-@param [in] order_order CCC_ORDER_LESSER or CCC_ORDER_GREATER for min or max
+@param[in] mem_pointer a pointer to an array of user types or NULL.
+@param[in] any_type_name the name of the user type.
+@param[in] order_order CCC_ORDER_LESSER or CCC_ORDER_GREATER for min or max
 heap, respectively.
-@param [in] order_fn the user defined comarison function for user types.
-@param [in] allocate the allocation function or NULL if no allocation.
-@param [in] context_data any context data needed for destruction of elements.
-@param [in] capacity the capacity of contiguous elements at mem_pointer.
+@param[in] order_fn the user defined comarison function for user types.
+@param[in] allocate the allocation function or NULL if no allocation.
+@param[in] context_data any context data needed for destruction of elements.
+@param[in] capacity the capacity of contiguous elements at mem_pointer.
 @return the initialized priority queue on the right hand side of an equality
 operator. (i.e. CCC_Flat_priority_queue q =
 CCC_flat_priority_queue_initialize(...);). */
@@ -105,15 +105,15 @@ CCC_flat_priority_queue_initialize(...);). */
         context_data, capacity)
 
 /** @brief Partial order an array of elements as a min or max heap. O(N).
-@param [in] mem_pointer a pointer to an array of user types or NULL.
-@param [in] any_type_name the name of the user type.
-@param [in] order_order CCC_ORDER_LESSER or CCC_ORDER_GREATER for min or max
+@param[in] mem_pointer a pointer to an array of user types or NULL.
+@param[in] any_type_name the name of the user type.
+@param[in] order_order CCC_ORDER_LESSER or CCC_ORDER_GREATER for min or max
 heap, respectively.
-@param [in] order_fn the user defined comparison function for user types.
-@param [in] allocate the allocation function or NULL if no allocation.
-@param [in] context_data any context data needed for destruction of elements.
-@param [in] capacity the capacity of contiguous elements at mem_pointer.
-@param [in] size the size <= capacity.
+@param[in] order_fn the user defined comparison function for user types.
+@param[in] allocate the allocation function or NULL if no allocation.
+@param[in] context_data any context data needed for destruction of elements.
+@param[in] capacity the capacity of contiguous elements at mem_pointer.
+@param[in] size the size <= capacity.
 @return the initialized priority queue on the right hand side of an equality
 operator. (i.e. CCC_Flat_priority_queue q =
 CCC_flat_priority_queue_heapify_initialize(...);).
@@ -126,9 +126,9 @@ CCC_flat_priority_queue_heapify_initialize(...);).
         context_data, capacity, size)
 
 /** @brief Copy the flat_priority_queue from src to newly initialized dst.
-@param [in] dst the destination that will copy the source flat_priority_queue.
-@param [in] src the source of the flat_priority_queue.
-@param [in] fn the allocation function in case resizing of dst is needed.
+@param[in] dst the destination that will copy the source flat_priority_queue.
+@param[in] src the source of the flat_priority_queue.
+@param[in] fn the allocation function in case resizing of dst is needed.
 @return the result of the copy operation. If the destination capacity is less
 than the source capacity and no allocation function is provided an input error
 is returned. If resizing is required and resizing of dst fails a memory error
@@ -192,9 +192,9 @@ CCC_Result CCC_flat_priority_queue_copy(CCC_Flat_priority_queue *dst,
                                         CCC_Allocator *fn);
 
 /** @brief Reserves space for at least to_add more elements.
-@param [in] flat_priority_queue a pointer to the flat priority queue.
-@param [in] to_add the number of elements to add to the current size.
-@param [in] fn the allocation function to use to reserve memory.
+@param[in] flat_priority_queue a pointer to the flat priority queue.
+@param[in] to_add the number of elements to add to the current size.
+@param[in] fn the allocation function to use to reserve memory.
 @return the result of the reservation. OK if successful, otherwise an error
 status is returned.
 @note see the CCC_flat_priority_queue_clear_and_free_reserve function if this
@@ -220,8 +220,8 @@ Insert or remove elements from the flat priority queue. */
 /**@{*/
 
 /** @brief Write a type directly to a priority queue slot. O(lgN).
-@param [in] flat_priority_queue a pointer to the priority queue.
-@param [in] val_initializer the compound literal or direct scalar type.
+@param[in] flat_priority_queue a pointer to the priority queue.
+@param[in] val_initializer the compound literal or direct scalar type.
 @return a reference to the inserted element or NULL if allocation failed. */
 #define CCC_flat_priority_queue_emplace(flat_priority_queue,                   \
                                         val_initializer...)                    \
@@ -230,12 +230,12 @@ Insert or remove elements from the flat priority queue. */
 
 /** @brief Copy input array into the flat_priority_queue, organizing into heap.
 O(N).
-@param [in] flat_priority_queue a pointer to the priority queue.
-@param [in] tmp a pointer to an additional element of array type for swapping.
-@param [in] input_array an array of elements of the same size as the type used
+@param[in] flat_priority_queue a pointer to the priority queue.
+@param[in] tmp a pointer to an additional element of array type for swapping.
+@param[in] input_array an array of elements of the same size as the type used
 to initialize flat_priority_queue.
-@param [in] input_n the number of contiguous elements at input_array.
-@param [in] input_sizeof_type size of each element in input_array matching
+@param[in] input_n the number of contiguous elements at input_array.
+@param[in] input_sizeof_type size of each element in input_array matching
 element size of flat_priority_queue.
 @return OK if sorting was successful or an input error if bad input is
 provided. A permission error will occur if no allocation is allowed and the
@@ -255,9 +255,9 @@ CCC_flat_priority_queue_heapify(CCC_Flat_priority_queue *flat_priority_queue,
 
 /** @brief Order n elements of the underlying flat_priority_queue Buffer as an
 flat_priority_queue.
-@param [in] flat_priority_queue a pointer to the flat priority queue.
-@param [in] tmp a pointer to a dummy user type that will be used for swapping.
-@param [in] n the number n of elements where  0 < (n + 1) <= capacity.
+@param[in] flat_priority_queue a pointer to the flat priority queue.
+@param[in] tmp a pointer to a dummy user type that will be used for swapping.
+@param[in] n the number n of elements where  0 < (n + 1) <= capacity.
 @return the result of the heapify operation, ok if successful or an error if
 flat_priority_queue is NULL or n is larger than the initialized capacity of the
 flat_priority_queue.
@@ -272,10 +272,10 @@ CCC_Result CCC_flat_priority_queue_heapify_inplace(
     CCC_Flat_priority_queue *flat_priority_queue, void *tmp, size_t n);
 
 /** @brief Pushes element pointed to at e into flat_priority_queue. O(lgN).
-@param [in] flat_priority_queue a pointer to the priority queue.
-@param [in] elem a pointer to the user element of same type as in
+@param[in] flat_priority_queue a pointer to the priority queue.
+@param[in] elem a pointer to the user element of same type as in
 flat_priority_queue.
-@param [in] tmp a pointer to a dummy user type that will be used for swapping.
+@param[in] tmp a pointer to a dummy user type that will be used for swapping.
 @return a pointer to the inserted element or NULl if NULL args are provided or
 push required more memory and failed. Failure can occur if the
 flat_priority_queue is full and allocation is not allowed or a resize failed
@@ -289,8 +289,8 @@ CCC_flat_priority_queue_push(CCC_Flat_priority_queue *flat_priority_queue,
 
 /** @brief Pop the front element (min or max) element in the
 flat_priority_queue. O(lgN).
-@param [in] flat_priority_queue a pointer to the priority queue.
-@param [in] tmp a pointer to a dummy user type that will be used for swapping.
+@param[in] flat_priority_queue a pointer to the priority queue.
+@param[in] tmp a pointer to a dummy user type that will be used for swapping.
 @return OK if the pop succeeds or an input error if flat_priority_queue is NULL
 or empty.
 
@@ -302,10 +302,10 @@ CCC_flat_priority_queue_pop(CCC_Flat_priority_queue *flat_priority_queue,
 
 /** @brief Erase element e that is a handle to the stored flat_priority_queue
 element.
-@param [in] flat_priority_queue a pointer to the priority queue.
-@param [in] elem a pointer to the stored flat_priority_queue element. Must be in
+@param[in] flat_priority_queue a pointer to the priority queue.
+@param[in] elem a pointer to the stored flat_priority_queue element. Must be in
 the flat_priority_queue.
-@param [in] tmp a pointer to a dummy user type that will be used for swapping.
+@param[in] tmp a pointer to a dummy user type that will be used for swapping.
 @return OK if the erase is successful or an input error if NULL args are
 provided or the flat_priority_queue is empty.
 @warning the user must ensure e is in the flat_priority_queue.
@@ -320,12 +320,12 @@ CCC_flat_priority_queue_erase(CCC_Flat_priority_queue *flat_priority_queue,
 
 /** @brief Update e that is a handle to the stored flat_priority_queue element.
 O(lgN).
-@param [in] flat_priority_queue a pointer to the flat priority queue.
-@param [in] elem a pointer to the stored flat_priority_queue element. Must be in
+@param[in] flat_priority_queue a pointer to the flat priority queue.
+@param[in] elem a pointer to the stored flat_priority_queue element. Must be in
 the flat_priority_queue.
-@param [in] tmp a pointer to a dummy user type that will be used for swapping.
-@param [in] fn the update function to act on e.
-@param [in] context any context data needed for the update function.
+@param[in] tmp a pointer to a dummy user type that will be used for swapping.
+@param[in] fn the update function to act on e.
+@param[in] context any context data needed for the update function.
 @return a reference to the element at its new position in the
 flat_priority_queue on success, NULL if parameters are invalid or
 flat_priority_queue is empty.
@@ -339,9 +339,9 @@ CCC_flat_priority_queue_update(CCC_Flat_priority_queue *flat_priority_queue,
                                void *context);
 
 /** @brief Update the user type stored in the priority queue directly. O(lgN).
-@param [in] flat_priority_queue_pointer a pointer to the flat priority queue.
-@param [in] any_type_pointer a pointer to the user type being updated.
-@param [in] update_closure_over_T the semicolon separated statements to execute
+@param[in] flat_priority_queue_pointer a pointer to the flat priority queue.
+@param[in] any_type_pointer a pointer to the user type being updated.
+@param[in] update_closure_over_T the semicolon separated statements to execute
 on the user type at T (optionally wrapping {code here} in braces may help
 with formatting). This closure may safely modify the key used to track the user
 element's priority in the priority queue.
@@ -365,12 +365,12 @@ Note that whether the key increases or decreases does not affect runtime. */
 
 /** @brief Increase e that is a handle to the stored flat_priority_queue
 element. O(lgN).
-@param [in] flat_priority_queue a pointer to the flat priority queue.
-@param [in] elem a pointer to the stored flat_priority_queue element. Must be in
+@param[in] flat_priority_queue a pointer to the flat priority queue.
+@param[in] elem a pointer to the stored flat_priority_queue element. Must be in
 the flat_priority_queue.
-@param [in] tmp a pointer to a dummy user type that will be used for swapping.
-@param [in] fn the update function to act on e.
-@param [in] context any context data needed for the update function.
+@param[in] tmp a pointer to a dummy user type that will be used for swapping.
+@param[in] fn the update function to act on e.
+@param[in] context any context data needed for the update function.
 @return a reference to the element at its new position in the
 flat_priority_queue on success, NULL if parameters are invalid or
 flat_priority_queue is empty.
@@ -384,9 +384,9 @@ CCC_flat_priority_queue_increase(CCC_Flat_priority_queue *flat_priority_queue,
                                  void *context);
 
 /** @brief Increase the user type stored in the priority queue directly. O(lgN).
-@param [in] flat_priority_queue_pointer a pointer to the flat priority queue.
-@param [in] any_type_pointer a pointer to the user type being updated.
-@param [in] increase_closure_over_T the semicolon separated statements to
+@param[in] flat_priority_queue_pointer a pointer to the flat priority queue.
+@param[in] any_type_pointer a pointer to the user type being updated.
+@param[in] increase_closure_over_T the semicolon separated statements to
 execute on the user type at T (optionally wrapping {code here} in
 braces may help with formatting). This closure may safely modify the key used to
 track the user element's priority in the priority queue.
@@ -411,12 +411,12 @@ Note that if this priority queue is min or max, the runtime is the same. */
 
 /** @brief Decrease e that is a handle to the stored flat_priority_queue
 element. O(lgN).
-@param [in] flat_priority_queue a pointer to the flat priority queue.
-@param [in] elem a pointer to the stored flat_priority_queue element. Must be in
+@param[in] flat_priority_queue a pointer to the flat priority queue.
+@param[in] elem a pointer to the stored flat_priority_queue element. Must be in
 the flat_priority_queue.
-@param [in] tmp a pointer to a dummy user type that will be used for swapping.
-@param [in] fn the update function to act on e.
-@param [in] context any context data needed for the update function.
+@param[in] tmp a pointer to a dummy user type that will be used for swapping.
+@param[in] fn the update function to act on e.
+@param[in] context any context data needed for the update function.
 @return a reference to the element at its new position in the
 flat_priority_queue on success, NULL if parameters are invalid or
 flat_priority_queue is empty.
@@ -430,9 +430,9 @@ CCC_flat_priority_queue_decrease(CCC_Flat_priority_queue *flat_priority_queue,
                                  void *context);
 
 /** @brief Increase the user type stored in the priority queue directly. O(lgN).
-@param [in] flat_priority_queue_pointer a pointer to the flat priority queue.
-@param [in] any_type_pointer a pointer to the user type being updated.
-@param [in] decrease_closure_over_T the semicolon separated statements to
+@param[in] flat_priority_queue_pointer a pointer to the flat priority queue.
+@param[in] any_type_pointer a pointer to the user type being updated.
+@param[in] decrease_closure_over_T the semicolon separated statements to
 execute on the user type at T (optionally wrapping {code here} in
 braces may help with formatting). This closure may safely modify the key used to
 track the user element's priority in the priority queue.
@@ -464,9 +464,9 @@ Deallocate the container or destroy the heap invariants. */
 /** @brief Destroys the flat_priority_queue by sorting its data and returning
 the underlying buffer. The data is sorted in `O(N * log(N))` time and `O(1)`
 space.
-@param [in] flat_priority_queue the flat_priority_queue to be sorted and
+@param[in] flat_priority_queue the flat_priority_queue to be sorted and
 destroyed.
-@param [in] tmp a pointer to a dummy user type that will be used for swapping.
+@param[in] tmp a pointer to a dummy user type that will be used for swapping.
 @return a Buffer filled from the back to the front by the flat_priority_queue
 order. If the flat_priority_queue is initialized CCC_ORDER_LESSER the returned
 Buffer is sorted in non-increasing order from index [0, N). If the
@@ -495,8 +495,8 @@ CCC_flat_priority_queue_heapsort(CCC_Flat_priority_queue *flat_priority_queue,
 
 /** @brief Clears the flat_priority_queue calling fn on every element if
 provided. O(1)-O(N).
-@param [in] flat_priority_queue a pointer to the flat priority queue.
-@param [in] fn the destructor function or NULL if not needed.
+@param[in] flat_priority_queue a pointer to the flat priority queue.
+@param[in] fn the destructor function or NULL if not needed.
 @return OK if input is valid and clear succeeds, otherwise input error.
 
 Note that because the priority queue is flat there is no need to free
@@ -512,8 +512,8 @@ CCC_flat_priority_queue_clear(CCC_Flat_priority_queue *flat_priority_queue,
 
 /** @brief Clears the flat_priority_queue calling fn on every element if
 provided and frees the underlying buffer. O(1)-O(N).
-@param [in] flat_priority_queue a pointer to the flat priority queue.
-@param [in] fn the destructor function or NULL if not needed.
+@param[in] flat_priority_queue a pointer to the flat priority queue.
+@param[in] fn the destructor function or NULL if not needed.
 @return OK if input is valid and clear succeeds, otherwise input error. If the
 Buffer attempts to free but is not allowed a no allocate error is returned.
 
@@ -528,11 +528,11 @@ CCC_Result CCC_flat_priority_queue_clear_and_free(
 
 /** @brief Frees all slots in the flat_priority_queue and frees the underlying
 Buffer that was previously dynamically reserved with the reserve function.
-@param [in] flat_priority_queue the flat_priority_queue to be cleared.
-@param [in] destructor the destructor for each element. NULL can be passed if no
+@param[in] flat_priority_queue the flat_priority_queue to be cleared.
+@param[in] destructor the destructor for each element. NULL can be passed if no
 maintenance is required on the elements in the flat_priority_queue before their
 slots are dropped.
-@param [in] allocate the required allocation function to provide to a
+@param[in] allocate the required allocation function to provide to a
 dynamically reserved flat_priority_queue. Any context data provided upon
 initialization will be passed to the allocation function when called.
 @return the result of free operation. OK if success, or an error status to
@@ -568,21 +568,21 @@ Obtain state from the container. */
 
 /** @brief Return a pointer to the front (min or max) element in the
 flat_priority_queue. O(1).
-@param [in] flat_priority_queue a pointer to the priority queue.
+@param[in] flat_priority_queue a pointer to the priority queue.
 @return A pointer to the front element or NULL if empty or flat_priority_queue
 is NULL. */
 [[nodiscard]] void *CCC_flat_priority_queue_front(
     CCC_Flat_priority_queue const *flat_priority_queue);
 
 /** @brief Returns true if the flat_priority_queue is empty false if not. O(1).
-@param [in] flat_priority_queue a pointer to the flat priority queue.
+@param[in] flat_priority_queue a pointer to the flat priority queue.
 @return true if the size is 0, false if not empty. Error if flat_priority_queue
 is NULL. */
 [[nodiscard]] CCC_Tribool CCC_flat_priority_queue_is_empty(
     CCC_Flat_priority_queue const *flat_priority_queue);
 
 /** @brief Returns the count of the flat_priority_queue active slots.
-@param [in] flat_priority_queue a pointer to the flat priority queue.
+@param[in] flat_priority_queue a pointer to the flat priority queue.
 @return the size of the flat_priority_queue or an argument error is set if
 flat_priority_queue is NULL. */
 [[nodiscard]] CCC_Count CCC_flat_priority_queue_count(
@@ -590,14 +590,14 @@ flat_priority_queue is NULL. */
 
 /** @brief Returns the capacity of the flat_priority_queue representing total
 possible slots.
-@param [in] flat_priority_queue a pointer to the flat priority queue.
+@param[in] flat_priority_queue a pointer to the flat priority queue.
 @return the capacity of the flat_priority_queue or an argument error is set if
 flat_priority_queue is NULL. */
 [[nodiscard]] CCC_Count CCC_flat_priority_queue_capacity(
     CCC_Flat_priority_queue const *flat_priority_queue);
 
 /** @brief Return a pointer to the base of the backing array. O(1).
-@param [in] flat_priority_queue a pointer to the priority queue.
+@param[in] flat_priority_queue a pointer to the priority queue.
 @return A pointer to the base of the backing array or NULL if
 flat_priority_queue is NULL.
 @note this reference starts at index 0 of the backing array. All
@@ -609,14 +609,14 @@ within the capacity of the backing buffer. */
     CCC_Flat_priority_queue const *flat_priority_queue);
 
 /** @brief Verifies the internal invariants of the flat_priority_queue hold.
-@param [in] flat_priority_queue a pointer to the flat priority queue.
+@param[in] flat_priority_queue a pointer to the flat priority queue.
 @return true if the flat_priority_queue is valid false if invalid. Error if
 flat_priority_queue is NULL. */
 [[nodiscard]] CCC_Tribool CCC_flat_priority_queue_validate(
     CCC_Flat_priority_queue const *flat_priority_queue);
 
 /** @brief Return the order used to initialize the flat_priority_queue.
-@param [in] flat_priority_queue a pointer to the flat priority queue.
+@param[in] flat_priority_queue a pointer to the flat priority queue.
 @return LES or GRT ordering. Any other ordering is invalid. */
 [[nodiscard]] CCC_Order CCC_flat_priority_queue_order(
     CCC_Flat_priority_queue const *flat_priority_queue);

@@ -75,15 +75,15 @@ Initialize the container with memory, callbacks, and permissions. */
 /**@{*/
 
 /** @brief Initializes the bounded map at runtime or compile time.
-@param [in] bounded_map_name the name of the bounded map being
+@param[in] bounded_map_name the name of the bounded map being
 initialized.
-@param [in] struct_name the user type wrapping the intrusive element.
-@param [in] bounded_map_node_field the name of the intrusive map elem
+@param[in] struct_name the user type wrapping the intrusive element.
+@param[in] bounded_map_node_field the name of the intrusive map elem
 field.
-@param [in] key_node_field the name of the field in user type used as key.
-@param [in] key_order_fn the key comparison function (see types.h).
-@param [in] allocate the allocation function or NULL if allocation is banned.
-@param [in] context_data a pointer to any context data for comparison or
+@param[in] key_node_field the name of the field in user type used as key.
+@param[in] key_order_fn the key comparison function (see types.h).
+@param[in] allocate the allocation function or NULL if allocation is banned.
+@param[in] context_data a pointer to any context data for comparison or
 destruction.
 @return the struct initialized bounded map for direct assignment
 (i.e. CCC_Bounded_map m = CCC_bounded_map_initialize(...);).
@@ -102,16 +102,16 @@ Test membership or obtain references to stored user types directly. */
 /**@{*/
 
 /** @brief Searches the map for the presence of key.
-@param [in] map the map to be searched.
-@param [in] key pointer to the key matching the key type of the user struct.
+@param[in] map the map to be searched.
+@param[in] key pointer to the key matching the key type of the user struct.
 @return true if the struct containing key is stored, false if not. Error if map
 or key is NULL.*/
 [[nodiscard]] CCC_Tribool CCC_bounded_map_contains(CCC_Bounded_map const *map,
                                                    void const *key);
 
 /** @brief Returns a reference into the map at entry key.
-@param [in] map the bounded map to search.
-@param [in] key the key to search matching stored key type.
+@param[in] map the bounded map to search.
+@param[in] key the key to search matching stored key type.
 @return a view of the map entry if it is present, else NULL. */
 [[nodiscard]] void *CCC_bounded_map_get_key_val(CCC_Bounded_map const *map,
                                                 void const *key);
@@ -124,9 +124,9 @@ control flow is needed. */
 /**@{*/
 
 /** @brief Invariantly inserts the key value wrapping type_intruder.
-@param [in] map the pointer to the bounded map.
-@param [in] type_intruder the handle to the user type wrapping map elem.
-@param [in] temp_intruder handle to space for swapping in the old value, if
+@param[in] map the pointer to the bounded map.
+@param[in] type_intruder the handle to the user type wrapping map elem.
+@param[in] temp_intruder handle to space for swapping in the old value, if
 present. The same user type stored in the map should wrap temp_intruder.
 @return an entry. If Vacant, no prior element with key existed and the type
 wrapping temp_intruder remains unchanged. If Occupied the old value is written
@@ -141,10 +141,10 @@ CCC_bounded_map_swap_entry(CCC_Bounded_map *map,
                            CCC_Bounded_map_node *temp_intruder);
 
 /** @brief Invariantly inserts the key value wrapping type_intruder_pointer.
-@param [in] map_pointer the pointer to the bounded map.
-@param [in] type_intruder_pointer the handle to the user type wrapping map
+@param[in] map_pointer the pointer to the bounded map.
+@param[in] type_intruder_pointer the handle to the user type wrapping map
 elem.
-@param [in] temp_intruder_pointer handle to space for swapping in the old value,
+@param[in] temp_intruder_pointer handle to space for swapping in the old value,
 if present. The same user type stored in the map should wrap
 temp_intruder_pointer.
 @return a compound literal reference to an entry. If Vacant, no prior element
@@ -165,8 +165,8 @@ and wraps it in an entry to provide information about the old value. */
     }
 
 /** @brief Attempts to insert the key value wrapping type_intruder.
-@param [in] map the pointer to the map.
-@param [in] type_intruder the handle to the user type wrapping map elem.
+@param[in] map the pointer to the map.
+@param[in] type_intruder the handle to the user type wrapping map elem.
 @return an entry. If Occupied, the entry contains a reference to the key value
 user type in the map and may be unwrapped. If Vacant the entry contains a
 reference to the newly inserted entry in the map. If more space is needed but
@@ -176,8 +176,8 @@ CCC_bounded_map_try_insert(CCC_Bounded_map *map,
                            CCC_Bounded_map_node *type_intruder);
 
 /** @brief Attempts to insert the key value wrapping type_intruder.
-@param [in] map_pointer the pointer to the map.
-@param [in] type_intruder_pointer the handle to the user type wrapping map
+@param[in] map_pointer the pointer to the map.
+@param[in] type_intruder_pointer the handle to the user type wrapping map
 elem.
 @return a compound literal reference to an entry. If Occupied, the entry
 contains a reference to the key value user type in the map and may be unwrapped.
@@ -193,9 +193,9 @@ error is set. */
 
 /** @brief lazily insert type_compound_literal into the map at key if key is
 absent.
-@param [in] map_pointer a pointer to the map.
-@param [in] key the direct key r-value.
-@param [in] type_compound_literal the compound literal specifying the value.
+@param[in] map_pointer a pointer to the map.
+@param[in] key the direct key r-value.
+@param[in] type_compound_literal the compound literal specifying the value.
 @return a compound literal reference to the entry of the existing or newly
 inserted value. Occupied indicates the key existed, Vacant indicates the key
 was absent. Unwrapping in any case provides the current value unless an error
@@ -213,8 +213,8 @@ compound literal matches the searched key. */
     }
 
 /** @brief Invariantly inserts or overwrites a user struct into the map.
-@param [in] map a pointer to the flat hash map.
-@param [in] type_intruder the handle to the wrapping user struct key value.
+@param[in] map a pointer to the flat hash map.
+@param[in] type_intruder the handle to the wrapping user struct key value.
 @return an entry. If Occupied an entry was overwritten by the new key value. If
 Vacant no prior map entry existed.
 
@@ -225,9 +225,9 @@ CCC_bounded_map_insert_or_assign(CCC_Bounded_map *map,
                                  CCC_Bounded_map_node *type_intruder);
 
 /** @brief Inserts a new key value pair or overwrites the existing entry.
-@param [in] map_pointer the pointer to the flat hash map.
-@param [in] key the key to be searched in the map.
-@param [in] type_compound_literal the compound literal to insert or use for
+@param[in] map_pointer the pointer to the flat hash map.
+@param[in] key the key to be searched in the map.
+@param[in] type_compound_literal the compound literal to insert or use for
 overwrite.
 @return a compound literal reference to the entry of the existing or newly
 inserted value. Occupied indicates the key existed, Vacant indicates the key
@@ -247,8 +247,8 @@ compound literal matches the searched key. */
 
 /** @brief Removes the key value in the map storing the old value, if present,
 in the struct containing output_intruder provided by the user.
-@param [in] map the pointer to the bounded map.
-@param [out] output_intruder the handle to the user type wrapping map elem.
+@param[in] map the pointer to the bounded map.
+@param[out] output_intruder the handle to the user type wrapping map elem.
 @return the removed entry. If Occupied it may be unwrapped to obtain the old key
 value pair. If Vacant the key value pair was not stored in the map. If bad input
 is provided an input error is set.
@@ -266,8 +266,8 @@ CCC_bounded_map_remove(CCC_Bounded_map *map,
 
 /** @brief Removes the key value in the map storing the old value, if present,
 in the struct containing output_intruder_pointer provided by the user.
-@param [in] map_pointer the pointer to the bounded map.
-@param [out] output_intruder_pointer the handle to the user type wrapping map
+@param[in] map_pointer the pointer to the bounded map.
+@param[out] output_intruder_pointer the handle to the user type wrapping map
 elem.
 @return a compound literal reference to the removed entry. If Occupied it may be
 unwrapped to obtain the old key value pair. If Vacant the key value pair was not
@@ -288,8 +288,8 @@ their previously stored memory as they see fit. */
     }
 
 /** @brief Obtains an entry for the provided key in the map for future use.
-@param [in] map the map to be searched.
-@param [in] key the key used to search the map matching the stored key type.
+@param[in] map the map to be searched.
+@param[in] key the key used to search the map matching the stored key type.
 @return a specialized entry for use with other functions in the Entry Interface.
 @warning the contents of an entry should not be examined or modified. Use the
 provided functions, only.
@@ -305,8 +305,8 @@ to subsequent calls in the Entry Interface. */
 CCC_bounded_map_entry(CCC_Bounded_map const *map, void const *key);
 
 /** @brief Obtains an entry for the provided key in the map for future use.
-@param [in] map_pointer the map to be searched.
-@param [in] key_pointer the key used to search the map matching the stored key
+@param[in] map_pointer the map to be searched.
+@param[in] key_pointer the key used to search the map matching the stored key
 type.
 @return a compound literal reference to a specialized entry for use with other
 functions in the Entry Interface.
@@ -327,8 +327,8 @@ to subsequent calls in the Entry Interface. */
     }
 
 /** @brief Modifies the provided entry if it is Occupied.
-@param [in] entry the entry obtained from an entry function or macro.
-@param [in] fn an update function in which the context argument is unused.
+@param[in] entry the entry obtained from an entry function or macro.
+@param[in] fn an update function in which the context argument is unused.
 @return the updated entry if it was Occupied or the unmodified vacant entry.
 
 This function is intended to make the function chaining in the Entry Interface
@@ -339,9 +339,9 @@ without the need of the context argument a CCC_Type_modifier can provide.
 CCC_bounded_map_and_modify(CCC_Bounded_map_entry *entry, CCC_Type_modifier *fn);
 
 /** @brief Modifies the provided entry if it is Occupied.
-@param [in] entry the entry obtained from an entry function or macro.
-@param [in] fn an update function that requires context data.
-@param [in] context context data required for the update.
+@param[in] entry the entry obtained from an entry function or macro.
+@param[in] fn an update function that requires context data.
+@param[in] context context data required for the update.
 @return the updated entry if it was Occupied or the unmodified vacant entry.
 
 This function makes full use of a CCC_Type_modifier capability, meaning a
@@ -351,9 +351,9 @@ CCC_bounded_map_and_modify_context(CCC_Bounded_map_entry *entry,
                                    CCC_Type_modifier *fn, void *context);
 
 /** @brief Modify an Occupied entry with a closure over user type T.
-@param [in] map_pointer a pointer to the obtained entry.
-@param [in] type_name the name of the user type stored in the container.
-@param [in] closure_over_T the code to be run on the reference to user type T,
+@param[in] map_pointer a pointer to the obtained entry.
+@param[in] type_name the name of the user type stored in the container.
+@param[in] closure_over_T the code to be run on the reference to user type T,
 if Occupied. This may be a semicolon separated list of statements to execute on
 T or a section of code wrapped in braces {code here} which may be preferred
 for formatting.
@@ -386,8 +386,8 @@ evaluated in the closure scope. */
     }
 
 /** @brief Inserts the struct with handle type_intruder if the entry is Vacant.
-@param [in] entry the entry obtained via function or macro call.
-@param [in] type_intruder the handle to the struct to be inserted to a Vacant
+@param[in] entry the entry obtained via function or macro call.
+@param[in] type_intruder the handle to the struct to be inserted to a Vacant
 entry.
 @return a pointer to entry in the map invariantly. NULL on error.
 
@@ -402,8 +402,8 @@ CCC_bounded_map_or_insert(CCC_Bounded_map_entry const *entry,
                           CCC_Bounded_map_node *type_intruder);
 
 /** @brief Lazily insert the desired key value into the entry if it is Vacant.
-@param [in] map_pointer a pointer to the obtained entry.
-@param [in] type_compound_literal the compound literal to construct in place if
+@param[in] map_pointer a pointer to the obtained entry.
+@param[in] type_compound_literal the compound literal to construct in place if
 the entry is Vacant.
 @return a reference to the unwrapped user type in the entry, either the
 unmodified reference if the entry was Occupied or the newly inserted element
@@ -416,8 +416,8 @@ or other data, such functions will not be called if the entry is Occupied. */
     CCC_private_bounded_map_or_insert_w(map_pointer, type_compound_literal)
 
 /** @brief Inserts the provided entry invariantly.
-@param [in] entry the entry returned from a call obtaining an entry.
-@param [in] type_intruder a handle to the struct the user intends to insert.
+@param[in] entry the entry returned from a call obtaining an entry.
+@param[in] type_intruder a handle to the struct the user intends to insert.
 @return a pointer to the inserted element or NULL upon allocation failure.
 
 This method can be used when the old value in the map does not need to
@@ -428,15 +428,15 @@ CCC_bounded_map_insert_entry(CCC_Bounded_map_entry const *entry,
 
 /** @brief Write the contents of the compound literal type_compound_literal to a
 node.
-@param [in] map_pointer a pointer to the obtained entry.
-@param [in] type_compound_literal the compound literal to write to a new slot.
+@param[in] map_pointer a pointer to the obtained entry.
+@param[in] type_compound_literal the compound literal to write to a new slot.
 @return a reference to the newly inserted or overwritten user type. NULL is
 returned if allocation failed or is not allowed when required. */
 #define CCC_bounded_map_insert_entry_w(map_pointer, type_compound_literal...)  \
     CCC_private_bounded_map_insert_entry_w(map_pointer, type_compound_literal)
 
 /** @brief Remove the entry from the map if Occupied.
-@param [in] entry a pointer to the map entry.
+@param[in] entry a pointer to the map entry.
 @return an entry containing NULL or a reference to the old entry. If Occupied an
 entry in the map existed and was removed. If Vacant, no prior entry existed to
 be removed.
@@ -449,7 +449,7 @@ free or use as needed. */
 CCC_bounded_map_remove_entry(CCC_Bounded_map_entry const *entry);
 
 /** @brief Remove the entry from the map if Occupied.
-@param [in] map_pointer a pointer to the map entry.
+@param[in] map_pointer a pointer to the map entry.
 @return a compound literal reference to an entry containing NULL or a reference
 to the old entry. If Occupied an entry in the map existed and was removed. If
 Vacant, no prior entry existed to be removed.
@@ -465,18 +465,18 @@ free or use as needed. */
     }
 
 /** @brief Unwraps the provided entry to obtain a view into the map element.
-@param [in] entry the entry from a query to the map via function or macro.
+@param[in] entry the entry from a query to the map via function or macro.
 @return a view into the table entry if one is present, or NULL. */
 [[nodiscard]] void *CCC_bounded_map_unwrap(CCC_Bounded_map_entry const *entry);
 
 /** @brief Returns the Vacant or Occupied status of the entry.
-@param [in] entry the entry from a query to the map via function or macro.
+@param[in] entry the entry from a query to the map via function or macro.
 @return true if the entry is occupied, false if not. Error if entry is NULL. */
 [[nodiscard]] CCC_Tribool
 CCC_bounded_map_insert_error(CCC_Bounded_map_entry const *entry);
 
 /** @brief Provides the status of the entry should an insertion follow.
-@param [in] entry the entry from a query to the table via function or macro.
+@param[in] entry the entry from a query to the table via function or macro.
 @return true if an entry obtained from an insertion attempt failed to insert
 due to an allocation failure when allocation success was expected. Error if
 entry is NULL. */
@@ -484,7 +484,7 @@ entry is NULL. */
 CCC_bounded_map_occupied(CCC_Bounded_map_entry const *entry);
 
 /** @brief Obtain the entry status from a container entry.
-@param [in] entry a pointer to the entry.
+@param[in] entry a pointer to the entry.
 @return the status stored in the entry after the required action on the
 container completes. If entry is NULL an entry input error is returned so ensure
 e is non-NULL to avoid an inaccurate status returned.
@@ -503,8 +503,8 @@ Deallocate the container. */
 
 /** @brief Pops every element from the map calling destructor if destructor is
 non-NULL. O(N).
-@param [in] map a pointer to the map.
-@param [in] destructor a destructor function if required. NULL if unneeded.
+@param[in] map a pointer to the map.
+@param[in] destructor a destructor function if required. NULL if unneeded.
 @return an input error if map points to NULL otherwise OK.
 
 Note that if the map has been given permission to allocate, the destructor will
@@ -526,9 +526,9 @@ Obtain and manage iterators over the container. */
 
 /** @brief Return an iterable range of values from [begin_key, end_key).
 Amortized O(lg N).
-@param [in] map a pointer to the map.
-@param [in] begin_key a pointer to the key intended as the start of the range.
-@param [in] end_key a pointer to the key intended as the end of the range.
+@param[in] map a pointer to the map.
+@param[in] begin_key a pointer to the key intended as the start of the range.
+@param[in] end_key a pointer to the key intended as the end of the range.
 @return a range containing the first element NOT LESS than the begin_key and
 the first element GREATER than end_key.
 
@@ -548,8 +548,8 @@ map versus the end map sentinel. */
 
 /** @brief Returns a compound literal reference to the desired range. Amortized
 O(lg N).
-@param [in] map_pointer a pointer to the map.
-@param [in] begin_and_end_key_pointers two pointers, the first to the start of
+@param[in] map_pointer a pointer to the map.
+@param[in] begin_and_end_key_pointers two pointers, the first to the start of
 the range the second to the end of the range.
 @return a compound literal reference to the produced range associated with the
 enclosing scope. This reference is always non-NULL. */
@@ -564,10 +564,10 @@ enclosing scope. This reference is always non-NULL. */
 
 /** @brief Return an iterable range_reverse of values from [begin_key, end_key).
 Amortized O(lg N).
-@param [in] map a pointer to the map.
-@param [in] reverse_begin_key a pointer to the key intended as the start of the
+@param[in] map a pointer to the map.
+@param[in] reverse_begin_key a pointer to the key intended as the start of the
 range_reverse.
-@param [in] reverse_end_key a pointer to the key intended as the end of the
+@param[in] reverse_end_key a pointer to the key intended as the end of the
 range_reverse.
 @return a range_reverse containing the first element NOT GREATER than the
 begin_key and the first element LESS than reverse_end_key.
@@ -590,8 +590,8 @@ CCC_bounded_map_equal_range_reverse(CCC_Bounded_map const *map,
 
 /** @brief Returns a compound literal reference to the desired range_reverse.
 Amortized O(lg N).
-@param [in] map_pointer a pointer to the map.
-@param [in] reverse_begin_and_reverse_end_key_pointers two pointers, the first
+@param[in] map_pointer a pointer to the map.
+@param[in] reverse_begin_and_reverse_end_key_pointers two pointers, the first
 to the start of the range_reverse the second to the end of the range_reverse.
 @return a compound literal reference to the produced range_reverse associated
 with the enclosing scope. This reference is always non-NULL. */
@@ -606,19 +606,19 @@ with the enclosing scope. This reference is always non-NULL. */
 
 /** @brief Return the start of an inorder traversal of the map. Amortized
 O(lg N).
-@param [in] map a pointer to the map.
+@param[in] map a pointer to the map.
 @return the oldest minimum element of the map. */
 [[nodiscard]] void *CCC_bounded_map_begin(CCC_Bounded_map const *map);
 
 /** @brief Return the start of a reverse inorder traversal of the map.
 Amortized O(lg N).
-@param [in] map a pointer to the map.
+@param[in] map a pointer to the map.
 @return the oldest maximum element of the map. */
 [[nodiscard]] void *CCC_bounded_map_reverse_begin(CCC_Bounded_map const *map);
 
 /** @brief Return the next element in an inorder traversal of the map. O(1).
-@param [in] map a pointer to the map.
-@param [in] iterator_intruder a pointer to the intrusive map element of the
+@param[in] map a pointer to the map.
+@param[in] iterator_intruder a pointer to the intrusive map element of the
 current iterator.
 @return the next user type stored in the map in an inorder traversal. */
 [[nodiscard]] void *
@@ -627,8 +627,8 @@ CCC_bounded_map_next(CCC_Bounded_map const *map,
 
 /** @brief Return the reverse_next element in a reverse inorder traversal of the
 map. O(1).
-@param [in] map a pointer to the map.
-@param [in] iterator_intruder a pointer to the intrusive map element of the
+@param[in] map a pointer to the map.
+@param[in] iterator_intruder a pointer to the intrusive map element of the
 current iterator.
 @return the reverse_next user type stored in the map in a reverse inorder
 traversal. */
@@ -637,13 +637,13 @@ CCC_bounded_map_reverse_next(CCC_Bounded_map const *map,
                              CCC_Bounded_map_node const *iterator_intruder);
 
 /** @brief Return the end of an inorder traversal of the map. O(1).
-@param [in] map a pointer to the map.
+@param[in] map a pointer to the map.
 @return the newest maximum element of the map. */
 [[nodiscard]] void *CCC_bounded_map_end(CCC_Bounded_map const *map);
 
 /** @brief Return the reverse_end of a reverse inorder traversal of the map.
 O(1).
-@param [in] map a pointer to the map.
+@param[in] map a pointer to the map.
 @return the newest minimum element of the map. */
 [[nodiscard]] void *CCC_bounded_map_reverse_end(CCC_Bounded_map const *map);
 
@@ -654,17 +654,17 @@ Obtain the container state. */
 /**@{*/
 
 /** @brief Returns the count of map occupied nodes.
-@param [in] map the map.
+@param[in] map the map.
 @return the size or an argument is set if map is NULL. */
 [[nodiscard]] CCC_Count CCC_bounded_map_count(CCC_Bounded_map const *map);
 
 /** @brief Returns the size status of the map.
-@param [in] map the map.
+@param[in] map the map.
 @return true if empty else false. Error if map is NULL. */
 [[nodiscard]] CCC_Tribool CCC_bounded_map_is_empty(CCC_Bounded_map const *map);
 
 /** @brief Validation of invariants for the map.
-@param [in] map the map to validate.
+@param[in] map the map to validate.
 @return true if all invariants hold, false if corruption occurs. Error if map is
 NULL. */
 [[nodiscard]] CCC_Tribool CCC_bounded_map_validate(CCC_Bounded_map const *map);

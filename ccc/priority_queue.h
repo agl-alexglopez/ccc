@@ -69,14 +69,14 @@ Initialize the container with memory, callbacks, and permissions. */
 /**@{*/
 
 /** @brief Initialize a priority queue at runtime or compile time.
-@param [in] struct_name the name of the user type wrapping priority_queue elems.
-@param [in] priority_queue_node_field the name of the field for the
+@param[in] struct_name the name of the user type wrapping priority_queue elems.
+@param[in] priority_queue_node_field the name of the field for the
 priority_queue elem.
-@param [in] priority_queue_order CCC_ORDER_LESSER for a min priority_queue or
+@param[in] priority_queue_order CCC_ORDER_LESSER for a min priority_queue or
 CCC_ORDER_GREATER for a max priority_queue.
-@param [in] order_fn the function used to compare two user types.
-@param [in] allocate the allocation function or NULL if allocation is banned.
-@param [in] context_data context data needed for comparison or destruction.
+@param[in] order_fn the function used to compare two user types.
+@param[in] allocate the allocation function or NULL if allocation is banned.
+@param[in] context_data context data needed for comparison or destruction.
 @return the initialized priority_queue on the right side of an equality operator
 (e.g. CCC_Priority_queue priority_queue = CCC_priority_queue_initialize(...);)
 */
@@ -94,8 +94,8 @@ Insert and remove elements from the priority queue. */
 /**@{*/
 
 /** @brief Adds an element to the priority queue in correct total order. O(1).
-@param [in] priority_queue a pointer to the priority queue.
-@param [in] elem a pointer to the intrusive element in the user type.
+@param[in] priority_queue a pointer to the priority queue.
+@param[in] elem a pointer to the intrusive element in the user type.
 @return a reference to the newly inserted user type or NULL if NULL arguments
 are provided or allocation fails when permitted.
 
@@ -108,8 +108,8 @@ has been allocated with the appropriate lifetime for the user's needs. */
                                             CCC_Priority_queue_node *elem);
 
 /** @brief Write user type directly to a newly allocated priority queue elem.
-@param [in] Priority_queue_pointer a pointer to the priority queue.
-@param [in] type_compound_literal the compound literal to write to the
+@param[in] Priority_queue_pointer a pointer to the priority queue.
+@param[in] type_compound_literal the compound literal to write to the
 allocation.
 @return a reference to the successfully inserted element or NULL if allocation
 fails or is not allowed.
@@ -122,15 +122,15 @@ use this macro. */
                                        type_compound_literal)
 
 /** @brief Pops the front element from the priority queue. Amortized O(lgN).
-@param [in] priority_queue a pointer to the priority queue.
+@param[in] priority_queue a pointer to the priority queue.
 @return ok if pop was successful or an input error if priority_queue is NULL or
 empty. */
 CCC_Result CCC_priority_queue_pop(CCC_Priority_queue *priority_queue);
 
 /** Extract the element known to be in the priority_queue without freeing
 memory. Amortized O(lgN).
-@param [in] priority_queue a pointer to the priority queue.
-@param [in] elem a pointer to the intrusive element in the user type.
+@param[in] priority_queue a pointer to the priority queue.
+@param[in] elem a pointer to the intrusive element in the user type.
 @return a pointer to the extracted user type.
 
 Note that the user must ensure that elem is in the priority queue. */
@@ -139,8 +139,8 @@ CCC_priority_queue_extract(CCC_Priority_queue *priority_queue,
                            CCC_Priority_queue_node *elem);
 
 /** @brief Erase elem from the priority_queue. Amortized O(lgN).
-@param [in] priority_queue a pointer to the priority queue.
-@param [in] elem a pointer to the intrusive element in the user type.
+@param[in] priority_queue a pointer to the priority queue.
+@param[in] elem a pointer to the intrusive element in the user type.
 @return ok if erase was successful or an input error if priority_queue or elem
 is NULL or priority_queue is empty.
 
@@ -149,10 +149,10 @@ CCC_Result CCC_priority_queue_erase(CCC_Priority_queue *priority_queue,
                                     CCC_Priority_queue_node *elem);
 
 /** @brief Update the priority in the user type wrapping elem.
-@param [in] priority_queue a pointer to the priority queue.
-@param [in] elem a pointer to the intrusive element in the user type.
-@param [in] fn the update function to act on the type wrapping elem.
-@param [in] context any context data needed for the update function.
+@param[in] priority_queue a pointer to the priority queue.
+@param[in] elem a pointer to the intrusive element in the user type.
+@param[in] fn the update function to act on the type wrapping elem.
+@param[in] context any context data needed for the update function.
 @return a reference to the updated user type or NULL if update failed due to
 bad arguments provided.
 @warning the user must ensure elem is in the priority_queue.
@@ -165,10 +165,10 @@ void *CCC_priority_queue_update(CCC_Priority_queue *priority_queue,
                                 CCC_Type_modifier *fn, void *context);
 
 /** @brief Update the priority in the user type stored in the container.
-@param [in] priority_queue_pointer a pointer to the priority queue.
-@param [in] any_type_pointer a pointer to the user struct type in the
+@param[in] priority_queue_pointer a pointer to the priority queue.
+@param[in] any_type_pointer a pointer to the user struct type in the
 priority_queue.
-@param [in] update_closure_over_T a pointer to the user struct type T is made
+@param[in] update_closure_over_T a pointer to the user struct type T is made
 available. Use a semicolon separated statements to execute on the user type
 which wraps priority_queue_node_pointer (optionally wrapping {code here} in
 braces may help with formatting). This closure may safely modify the key used to
@@ -199,10 +199,10 @@ operations. O(1) best case, O(lgN) worst case. */
         priority_queue_pointer, any_type_pointer, update_closure_over_T)
 
 /** @brief Increases the priority of the type wrapping elem. O(1) or O(lgN)
-@param [in] priority_queue a pointer to the priority queue.
-@param [in] elem a pointer to the intrusive element in the user type.
-@param [in] fn the update function to act on the type wrapping elem.
-@param [in] context any context data needed for the update function.
+@param[in] priority_queue a pointer to the priority queue.
+@param[in] elem a pointer to the intrusive element in the user type.
+@param[in] fn the update function to act on the type wrapping elem.
+@param[in] context any context data needed for the update function.
 @return a reference to the updated user type or NULL if update failed due to
 bad arguments provided.
 @warning the data structure will be in an invalid state if the user decreases
@@ -220,10 +220,10 @@ void *CCC_priority_queue_increase(CCC_Priority_queue *priority_queue,
                                   CCC_Type_modifier *fn, void *context);
 
 /** @brief Increases the priority of the user type stored in the container.
-@param [in] priority_queue_pointer a pointer to the priority queue.
-@param [in] any_type_pointer a pointer to the user struct type in the
+@param[in] priority_queue_pointer a pointer to the priority queue.
+@param[in] any_type_pointer a pointer to the user struct type in the
 priority_queue.
-@param [in] increase_closure_over_T a pointer to the user struct type T is made
+@param[in] increase_closure_over_T a pointer to the user struct type T is made
 available. Use a semicolon separated statements to execute on the user type
 which wraps priority_queue_node_pointer (optionally wrapping {code here} in
 braces may help with formatting). This closure may safely modify the key used to
@@ -259,10 +259,10 @@ from the priority_queue creates an amortized o(lgN) runtime for this function.
         priority_queue_pointer, any_type_pointer, increase_closure_over_T)
 
 /** @brief Decreases the value of the type wrapping elem. O(1) or O(lgN)
-@param [in] priority_queue a pointer to the priority queue.
-@param [in] elem a pointer to the intrusive element in the user type.
-@param [in] fn the update function to act on the type wrapping elem.
-@param [in] context any context data needed for the update function.
+@param[in] priority_queue a pointer to the priority queue.
+@param[in] elem a pointer to the intrusive element in the user type.
+@param[in] fn the update function to act on the type wrapping elem.
+@param[in] context any context data needed for the update function.
 @return a reference to the updated user type or NULL if update failed due to
 bad arguments provided.
 
@@ -278,10 +278,10 @@ void *CCC_priority_queue_decrease(CCC_Priority_queue *priority_queue,
                                   CCC_Type_modifier *fn, void *context);
 
 /** @brief Decreases the priority of the user type stored in the container.
-@param [in] priority_queue_pointer a pointer to the priority queue.
-@param [in] any_type_pointer a pointer to the user struct type in the
+@param[in] priority_queue_pointer a pointer to the priority queue.
+@param[in] any_type_pointer a pointer to the user struct type in the
 priority_queue.
-@param [in] decrease_closure_over_T a pointer to the user struct type T is made
+@param[in] decrease_closure_over_T a pointer to the user struct type T is made
 available. Use a semicolon separated statements to execute on the user type
 which wraps priority_queue_node_pointer (optionally wrapping {code here} in
 braces may help with formatting). This closure may safely modify the key used to
@@ -323,8 +323,8 @@ Deallocate the container. */
 /**@{*/
 
 /** @brief Removes all elements from the priority_queue, freeing if needed.
-@param [in] priority_queue a pointer to the priority queue.
-@param [in] fn the destructor function or NULL if not needed.
+@param[in] priority_queue a pointer to the priority queue.
+@param[in] fn the destructor function or NULL if not needed.
 @return ok if the clear was successful or an input error for NULL args.
 
 Note that if allocation is allowed the container will free the user type
@@ -345,34 +345,34 @@ Obtain state from the container. */
 /**@{*/
 
 /** @brief Obtain a reference to the front of the priority queue. O(1).
-@param [in] priority_queue a pointer to the priority queue.
+@param[in] priority_queue a pointer to the priority queue.
 @return a reference to the front element in the priority_queue. */
 [[nodiscard]] void *
 CCC_priority_queue_front(CCC_Priority_queue const *priority_queue);
 
 /** @brief Returns true if the priority queue is empty false if not. O(1).
-@param [in] priority_queue a pointer to the priority queue.
+@param[in] priority_queue a pointer to the priority queue.
 @return true if the size is 0, false if not empty. Error if priority_queue is
 NULL. */
 [[nodiscard]] CCC_Tribool
 CCC_priority_queue_is_empty(CCC_Priority_queue const *priority_queue);
 
 /** @brief Returns the count of priority queue occupied nodes.
-@param [in] priority_queue a pointer to the priority queue.
+@param[in] priority_queue a pointer to the priority queue.
 @return the size of the priority_queue or an argument error is set if
 priority_queue is NULL. */
 [[nodiscard]] CCC_Count
 CCC_priority_queue_count(CCC_Priority_queue const *priority_queue);
 
 /** @brief Verifies the internal invariants of the priority_queue hold.
-@param [in] priority_queue a pointer to the priority queue.
+@param[in] priority_queue a pointer to the priority queue.
 @return true if the priority_queue is valid false if priority_queue is invalid.
 Error if priority_queue is NULL. */
 [[nodiscard]] CCC_Tribool
 CCC_priority_queue_validate(CCC_Priority_queue const *priority_queue);
 
 /** @brief Return the order used to initialize the priority_queue.
-@param [in] priority_queue a pointer to the priority queue.
+@param[in] priority_queue a pointer to the priority queue.
 @return LES or GRT ordering. Any other ordering is invalid. */
 [[nodiscard]] CCC_Order
 CCC_priority_queue_order(CCC_Priority_queue const *priority_queue);

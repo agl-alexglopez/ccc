@@ -307,25 +307,25 @@ CCC_handle_adaptive_map_or_insert(
 
 CCC_Handle
 CCC_handle_adaptive_map_swap_handle(CCC_Handle_adaptive_map *const map,
-                                    void *const key_val_output)
+                                    void *const type_output)
 {
-    if (!map || !key_val_output)
+    if (!map || !type_output)
     {
         return (CCC_Handle){{.status = CCC_ENTRY_ARGUMENT_ERROR}};
     }
-    size_t const found = find(map, key_in_slot(map, key_val_output));
+    size_t const found = find(map, key_in_slot(map, type_output));
     if (found)
     {
         assert(map->root);
         void *const ret = data_at(map, map->root);
         void *const tmp = data_at(map, 0);
-        swap(tmp, key_val_output, ret, map->sizeof_type);
+        swap(tmp, type_output, ret, map->sizeof_type);
         return (CCC_Handle){{
             .index = found,
             .status = CCC_ENTRY_OCCUPIED,
         }};
     }
-    size_t const inserted = maybe_allocate_insert(map, key_val_output);
+    size_t const inserted = maybe_allocate_insert(map, type_output);
     if (!inserted)
     {
         return (CCC_Handle){{
@@ -408,13 +408,13 @@ CCC_handle_adaptive_map_insert_or_assign(CCC_Handle_adaptive_map *const map,
 
 CCC_Handle
 CCC_handle_adaptive_map_remove(CCC_Handle_adaptive_map *const map,
-                               void *const key_val_output)
+                               void *const type_output)
 {
-    if (!map || !key_val_output)
+    if (!map || !type_output)
     {
         return (CCC_Handle){{.status = CCC_ENTRY_ARGUMENT_ERROR}};
     }
-    size_t const removed = erase(map, key_in_slot(map, key_val_output));
+    size_t const removed = erase(map, key_in_slot(map, type_output));
     if (!removed)
     {
         return (CCC_Handle){{
@@ -424,9 +424,9 @@ CCC_handle_adaptive_map_remove(CCC_Handle_adaptive_map *const map,
     }
     assert(removed);
     void const *const r = data_at(map, removed);
-    if (key_val_output != r)
+    if (type_output != r)
     {
-        (void)memcpy(key_val_output, r, map->sizeof_type);
+        (void)memcpy(type_output, r, map->sizeof_type);
     }
     return (CCC_Handle){{
         .index = 0,

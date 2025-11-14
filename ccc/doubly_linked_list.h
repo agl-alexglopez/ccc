@@ -79,16 +79,16 @@ Initialize the container with memory, callbacks, and permissions. */
 containing the Doubly_linked_list elems, the field of the doubly_linked_list
 elem, allocation function, compare function and any contextilliary data needed
 for comparison, printing, or destructors.
-@param [in] list_name the name of the list being initialized.
-@param [in] struct_name the type containing the intrusive doubly_linked_list
+@param[in] list_name the name of the list being initialized.
+@param[in] struct_name the type containing the intrusive doubly_linked_list
 element.
-@param [in] list_node_field name of the Doubly_linked_list element in the
+@param[in] list_node_field name of the Doubly_linked_list element in the
 containing type.
-@param [in] order_fn the CCC_Type_comparator used to compare list
+@param[in] order_fn the CCC_Type_comparator used to compare list
 elements.
-@param [in] context_data any contextilliary data that will be needed for
+@param[in] context_data any contextilliary data that will be needed for
 comparison, printing, or destruction of elements.
-@param [in] allocate the optional allocation function or NULL.
+@param[in] allocate the optional allocation function or NULL.
 @return the initialized list. Assign to the list directly on the right hand
 side of an equality operator. Initialization can occur at runtime or compile
 time (e.g. CCC_doubly_linked l = CCC_doubly_linked_list_initialize(...);). */
@@ -106,8 +106,8 @@ Add or remove elements from the doubly linked list. */
 
 /** @brief  writes contents of type initializer directly to allocated memory at
 the back of the list. O(1).
-@param [in] list_pointer the address of the doubly linked list.
-@param [in] type_initializer the r-value initializer of the type to be inserted
+@param[in] list_pointer the address of the doubly linked list.
+@param[in] type_initializer the r-value initializer of the type to be inserted
 in the list. This should match the type containing Doubly_linked_list elements
 as a struct member for this list.
 @return a reference to the inserted element or NULL if allocation is not
@@ -122,8 +122,8 @@ the user prior to any inserts into the list. */
 
 /** @brief  writes contents of type initializer directly to allocated memory at
 the front of the list. O(1).
-@param [in] list_pointer the address of the doubly linked list.
-@param [in] type_initializer the r-value initializer of the type to be inserted
+@param[in] list_pointer the address of the doubly linked list.
+@param[in] type_initializer the r-value initializer of the type to be inserted
 in the list. This should match the type containing Doubly_linked_list elements
 as a struct member for this list.
 @return a reference to the inserted element or NULL if allocation is not
@@ -138,8 +138,8 @@ the user prior to any inserts into the list. */
     CCC_private_doubly_linked_list_emplace_front(list_pointer, type_initializer)
 
 /** @brief Push user type wrapping elem to the front of the list. O(1).
-@param [in] l a pointer to the doubly linked list.
-@param [in] elem a pointer to the list element.
+@param[in] l a pointer to the doubly linked list.
+@param[in] elem a pointer to the list element.
 @return a pointer to the element inserted or NULL if bad input is provided
 or allocation fails. */
 [[nodiscard]] void *
@@ -147,8 +147,8 @@ CCC_doubly_linked_list_push_front(CCC_Doubly_linked_list *l,
                                   CCC_Doubly_linked_list_node *elem);
 
 /** @brief Push user type wrapping elem to the back of the list. O(1).
-@param [in] l a pointer to the doubly linked list.
-@param [in] elem a pointer to the list element.
+@param[in] l a pointer to the doubly linked list.
+@param[in] elem a pointer to the list element.
 @return a pointer to the element inserted or NULL if bad input is provided
 or allocation fails. */
 [[nodiscard]] void *
@@ -156,9 +156,9 @@ CCC_doubly_linked_list_push_back(CCC_Doubly_linked_list *l,
                                  CCC_Doubly_linked_list_node *elem);
 
 /** @brief Insert user type wrapping elem before pos_node. O(1).
-@param [in] l a pointer to the doubly linked list.
-@param [in] pos_node a pointer to the list element before which elem inserts.
-@param [in] elem a pointer to the list element.
+@param[in] l a pointer to the doubly linked list.
+@param[in] pos_node a pointer to the list element before which elem inserts.
+@param[in] elem a pointer to the list element.
 @return a pointer to the element inserted or NULL if bad input is provided
 or allocation fails. */
 [[nodiscard]] void *
@@ -167,13 +167,13 @@ CCC_doubly_linked_list_insert(CCC_Doubly_linked_list *l,
                               CCC_Doubly_linked_list_node *elem);
 
 /** @brief Pop the user type at the front of the list. O(1).
-@param [in] l a pointer to the doubly linked list.
+@param[in] l a pointer to the doubly linked list.
 @return an ok result if the pop was successful or an error if bad input is
 provided or the list is empty.*/
 CCC_Result CCC_doubly_linked_list_pop_front(CCC_Doubly_linked_list *l);
 
 /** @brief Pop the user type at the back of the list. O(1).
-@param [in] l a pointer to the doubly linked list.
+@param[in] l a pointer to the doubly linked list.
 @return an ok result if the pop was successful or an error if bad input is
 provided or the list is empty.*/
 CCC_Result CCC_doubly_linked_list_pop_back(CCC_Doubly_linked_list *l);
@@ -181,8 +181,8 @@ CCC_Result CCC_doubly_linked_list_pop_back(CCC_Doubly_linked_list *l);
 /** @brief Returns the element following an extracted element from the list
 without deallocating regardless of allocation permission provided to the
 container. O(1).
-@param [in] l a pointer to the doubly linked list.
-@param [in] elem the handle of an element known to be in the list.
+@param[in] l a pointer to the doubly linked list.
+@param[in] elem the handle of an element known to be in the list.
 @return a reference to the element in the list following elem or NULL if the
 element is the last. NULL is returned if bad input is provided or the elem is
 not in the list. */
@@ -190,8 +190,8 @@ void *CCC_doubly_linked_list_extract(CCC_Doubly_linked_list *l,
                                      CCC_Doubly_linked_list_node *elem);
 
 /** @brief Returns the element following an erased element from the list. O(1).
-@param [in] l a pointer to the doubly linked list.
-@param [in] elem the handle of an element known to be in the list.
+@param[in] l a pointer to the doubly linked list.
+@param[in] elem the handle of an element known to be in the list.
 @return a reference to the element in the list following elem or NULL if the
 element is the last. NULL is returned if bad input is provided or the elem is
 not in the list. */
@@ -200,10 +200,10 @@ void *CCC_doubly_linked_list_erase(CCC_Doubly_linked_list *l,
 
 /** @brief Returns the element following an extracted range of elements from the
 list. O(N).
-@param [in] l a pointer to the doubly linked list.
-@param [in] elem_begin the handle of an element known to be in the list at the
+@param[in] l a pointer to the doubly linked list.
+@param[in] elem_begin the handle of an element known to be in the list at the
 start of the range.
-@param [in] elem_end the handle of an element known to be in the list at the
+@param[in] elem_end the handle of an element known to be in the list at the
 end of the range following elem_begin.
 @return a reference to the element in the list following elem_end or NULL if the
 element is the last. NULL is returned if bad input is provided or the elem is
@@ -221,10 +221,10 @@ CCC_doubly_linked_list_erase_range(CCC_Doubly_linked_list *l,
 /** @brief Returns the element following an extracted range of elements from the
 list without deallocating regardless of allocation permission provided to the
 container. O(N).
-@param [in] l a pointer to the doubly linked list.
-@param [in] elem_begin the handle of an element known to be in the list at the
+@param[in] l a pointer to the doubly linked list.
+@param[in] elem_begin the handle of an element known to be in the list at the
 start of the range.
-@param [in] elem_end the handle of an element known to be in the list at the
+@param[in] elem_end the handle of an element known to be in the list at the
 end of the range following elem_begin.
 @return a reference to the element in the list following elem_end or NULL if the
 element is the last. NULL is returned if bad input is provided or the elem is
@@ -238,10 +238,10 @@ CCC_doubly_linked_list_extract_range(CCC_Doubly_linked_list *l,
                                      CCC_Doubly_linked_list_node *elem_end);
 
 /** @brief Repositions to_cut before pos. Only list pointers are modified. O(1).
-@param [in] pos_doubly_linked_list the list to which pos belongs.
-@param [in] pos the position before which to_cut will be moved.
-@param [in] to_cut_doubly_linked_list the list to which to_cut belongs.
-@param [in] to_cut the element to cut.
+@param[in] pos_doubly_linked_list the list to which pos belongs.
+@param[in] pos the position before which to_cut will be moved.
+@param[in] to_cut_doubly_linked_list the list to which to_cut belongs.
+@param[in] to_cut the element to cut.
 @return ok if the splice is successful or an error if bad input is provided. */
 CCC_Result
 CCC_doubly_linked_list_splice(CCC_Doubly_linked_list *pos_doubly_linked_list,
@@ -251,11 +251,11 @@ CCC_doubly_linked_list_splice(CCC_Doubly_linked_list *pos_doubly_linked_list,
 
 /** @brief Repositions begin to end before pos. Only list pointers are modified
 O(N).
-@param [in] pos_doubly_linked_list the list to which pos belongs.
-@param [in] pos the position before which to_cut will be moved.
-@param [in] to_cut_doubly_linked_list the list to which the range belongs.
-@param [in] begin the start of the list to splice.
-@param [in] end the end of the list to splice.
+@param[in] pos_doubly_linked_list the list to which pos belongs.
+@param[in] pos the position before which to_cut will be moved.
+@param[in] to_cut_doubly_linked_list the list to which the range belongs.
+@param[in] begin the start of the list to splice.
+@param[in] end the end of the list to splice.
 @return ok if the splice is successful or an error if bad input is provided. */
 CCC_Result CCC_doubly_linked_list_splice_range(
     CCC_Doubly_linked_list *pos_doubly_linked_list,
@@ -271,7 +271,7 @@ Sort the container. */
 
 /** @brief Sorts the doubly linked list in non-decreasing order as defined by
 the provided comparison function. `O(N * log(N))` time, `O(1)` space.
-@param [in] Doubly_linked_list a pointer to the doubly linked list to sort.
+@param[in] Doubly_linked_list a pointer to the doubly linked list to sort.
 @return the result of the sort, usually OK. An arg error if doubly_linked_list
 is null. */
 CCC_Result
@@ -279,8 +279,8 @@ CCC_doubly_linked_list_sort(CCC_Doubly_linked_list *doubly_linked_list);
 
 /** @brief Inserts e in sorted position according to the non-decreasing order
 of the list determined by the user provided comparison function. `O(1)`.
-@param [in] doubly_linked_list a pointer to the doubly linked list.
-@param [in] e a pointer to the element to be inserted in order.
+@param[in] doubly_linked_list a pointer to the doubly linked list.
+@param[in] e a pointer to the element to be inserted in order.
 @return a pointer to the element that has been inserted or NULL if allocation
 is required and has failed.
 @warning this function assumes the list is sorted.
@@ -295,7 +295,7 @@ CCC_doubly_linked_list_insert_sorted(CCC_Doubly_linked_list *doubly_linked_list,
 
 /** @brief Returns true if the list is sorted in non-decreasing order according
 to the user provided comparison function.
-@param [in] doubly_linked_list a pointer to the singly linked list.
+@param[in] doubly_linked_list a pointer to the singly linked list.
 @return CCC_TRUE if the list is sorted CCC_FALSE if not. Error if
 doubly_linked_list is NULL.
 
@@ -313,8 +313,8 @@ Deallocate the container. */
 
 /** @brief Clear the contents of the list freeing elements, if given allocation
 permission. O(N).
-@param [in] l a pointer to the doubly linked list.
-@param [in] fn a destructor function to run on each element.
+@param[in] l a pointer to the doubly linked list.
+@param[in] fn a destructor function to run on each element.
 @return ok if the clearing was a success or an input error if l or fn is NULL.
 
 Note that if the list is initialized with allocation permission it will free
@@ -336,21 +336,21 @@ Iterate through the doubly linked list. */
 /**@{*/
 
 /** @brief Return the user type at the start of the list or NULL if empty. O(1).
-@param [in] l a pointer to the doubly linked list.
+@param[in] l a pointer to the doubly linked list.
 @return a pointer to the user type or NULL if empty or bad input. */
 [[nodiscard]] void *
 CCC_doubly_linked_list_begin(CCC_Doubly_linked_list const *l);
 
 /** @brief Return the user type at the end of the list or NULL if empty. O(1).
-@param [in] l a pointer to the doubly linked list.
+@param[in] l a pointer to the doubly linked list.
 @return a pointer to the user type or NULL if empty or bad input. */
 [[nodiscard]] void *
 CCC_doubly_linked_list_reverse_begin(CCC_Doubly_linked_list const *l);
 
 /** @brief Return the user type following the element known to be in the list.
 O(1).
-@param [in] l a pointer to the doubly linked list.
-@param [in] elem a handle to the list element known to be in the list.
+@param[in] l a pointer to the doubly linked list.
+@param[in] elem a handle to the list element known to be in the list.
 @return a pointer to the element following elem or NULL if no elements follow
 or bad input is provided. */
 [[nodiscard]] void *
@@ -359,8 +359,8 @@ CCC_doubly_linked_list_next(CCC_Doubly_linked_list const *l,
 
 /** @brief Return the user type following the element known to be in the list
 moving from back to front. O(1).
-@param [in] l a pointer to the doubly linked list.
-@param [in] elem a handle to the list element known to be in the list.
+@param[in] l a pointer to the doubly linked list.
+@param[in] elem a handle to the list element known to be in the list.
 @return a pointer to the element following elem from back to front or NULL if no
 elements follow or bad input is provided. */
 [[nodiscard]] void *
@@ -368,12 +368,12 @@ CCC_doubly_linked_list_reverse_next(CCC_Doubly_linked_list const *l,
                                     CCC_Doubly_linked_list_node const *elem);
 
 /** @brief Return the end sentinel with no accessible fields. O(1).
-@param [in] l a pointer to the doubly linked list.
+@param[in] l a pointer to the doubly linked list.
 @return a pointer to the end sentinel with no accessible fields. */
 [[nodiscard]] void *CCC_doubly_linked_list_end(CCC_Doubly_linked_list const *l);
 
 /** @brief Return the start sentinel with no accessible fields. O(1).
-@param [in] l a pointer to the doubly linked list.
+@param[in] l a pointer to the doubly linked list.
 @return a pointer to the start sentinel with no accessible fields. */
 [[nodiscard]] void *
 CCC_doubly_linked_list_reverse_end(CCC_Doubly_linked_list const *l);
@@ -385,20 +385,20 @@ Obtain state from the doubly linked list. */
 /**@{*/
 
 /** @brief Returns the user type at the front of the list. O(1).
-@param [in] l a pointer to the doubly linked list.
+@param[in] l a pointer to the doubly linked list.
 @return a pointer to the user type at the front of the list. NULL if empty. */
 [[nodiscard]] void *
 CCC_doubly_linked_list_front(CCC_Doubly_linked_list const *l);
 
 /** @brief Returns the user type at the back of the list. O(1).
-@param [in] l a pointer to the doubly linked list.
+@param[in] l a pointer to the doubly linked list.
 @return a pointer to the user type at the back of the list. NULL if empty. */
 [[nodiscard]] void *
 CCC_doubly_linked_list_back(CCC_Doubly_linked_list const *l);
 
 /** @brief Return a handle to the list element at the front of the list which
 may be the sentinel. O(1).
-@param [in] l a pointer to the doubly linked list.
+@param[in] l a pointer to the doubly linked list.
 @return a pointer to the list element at the beginning of the list which may be
 the sentinel but will not be NULL unless a NULL pointer is provided as l. */
 [[nodiscard]] CCC_Doubly_linked_list_node *
@@ -406,14 +406,14 @@ CCC_doubly_linked_list_node_begin(CCC_Doubly_linked_list const *l);
 
 /** @brief Return a handle to the list element at the back of the list which
 may be the sentinel. O(1).
-@param [in] l a pointer to the doubly linked list.
+@param[in] l a pointer to the doubly linked list.
 @return a pointer to the list element at the end of the list which may be
 the sentinel but will not be NULL unless a NULL pointer is provided as l. */
 [[nodiscard]] CCC_Doubly_linked_list_node *
 CCC_doubly_linked_list_node_end(CCC_Doubly_linked_list const *l);
 
 /** @brief Return a pointer to the sentinel node at the back of the list.
-@param [in] l a pointer to the doubly linked list.
+@param[in] l a pointer to the doubly linked list.
 @return a pointer to the sentinel node that always points to the first and last
 elements or itself. It will not be NULL unless singly_linked_list pointer
 provided is NULL.
@@ -426,19 +426,19 @@ makes it possible to splice to the back of the list. */
 CCC_doubly_linked_list_sentinel_end(CCC_Doubly_linked_list const *l);
 
 /** @brief Return the count of elements in the list. O(1).
-@param [in] l a pointer to the doubly linked list.
+@param[in] l a pointer to the doubly linked list.
 @return the size of the list. An argument error is set if l is NULL. */
 [[nodiscard]] CCC_Count
 CCC_doubly_linked_list_count(CCC_Doubly_linked_list const *l);
 
 /** @brief Return if the size of the list is equal to 0. O(1).
-@param [in] l a pointer to the doubly linked list.
+@param[in] l a pointer to the doubly linked list.
 @return true if the size is 0, else false. Error if l is NULL. */
 [[nodiscard]] CCC_Tribool
 CCC_doubly_linked_list_is_empty(CCC_Doubly_linked_list const *l);
 
 /** @brief Validates internal state of the list.
-@param [in] l a pointer to the doubly linked list.
+@param[in] l a pointer to the doubly linked list.
 @return true if invariants hold, false if not. Error if l is NULL. */
 [[nodiscard]] CCC_Tribool
 CCC_doubly_linked_list_validate(CCC_Doubly_linked_list const *l);

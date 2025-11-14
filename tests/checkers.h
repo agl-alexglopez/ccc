@@ -63,8 +63,8 @@ typedef enum Check_result (*Tester)(void);
 
 /** @brief Define a static test function that has a name and optionally
 additional parameters that one may wish to define for a test function.
-@param [in] test_name the name of the static function.
-@param [in] ... any additional parameters required for the function.
+@param[in] test_name the name of the static function.
+@param[in] ... any additional parameters required for the function.
 @return see the end test macro. This will return a enum Check_result that is
 CHECK_PASS or CHECK_FAIL to be handled as the user sees fit.
 
@@ -110,8 +110,8 @@ check_static_begin(insert_shuffled, ccc_ordered_multimap *pq,
 
 /** @brief Define a test function that has a name and optionally
 additional parameters that one may wish to define a test function.
-@param [in] test_name the name of the function.
-@param [in] ... any additional parameters required for the function.
+@param[in] test_name the name of the function.
+@param[in] ... any additional parameters required for the function.
 @return see the end test macro. This will return a enum Check_result.
 
 It is possible to return early from a test before the end test macro, but it
@@ -123,9 +123,9 @@ a test fails. See begin static test for examples. */
         enum Check_result check_private_macro_res = CHECK_PASS;
 
 /** @brief execute a check within the context of a test.
-@param [in] test_result the result value of some action.
-@param [in] test_expected the expection of what the result is equal to.
-@param [in] ... any additional function call that should execute on failure
+@param[in] test_result the result value of some action.
+@param[in] test_expected the expection of what the result is equal to.
+@param[in] ... any additional function call that should execute on failure
 that cannot be performed by the end test macro.
 
 test_result and test_expected should be comparable with ==/!=. If a test
@@ -160,9 +160,9 @@ though the braces are not required. */
     while (0)
 
 /** @brief execute a check within the context of a test that sets an error.
-@param [in] test_result the result value of some action.
-@param [in] test_expected the expection of what the result is equal to.
-@param [in] ... any additional function call that should execute on failure
+@param[in] test_result the result value of some action.
+@param[in] test_expected the expection of what the result is equal to.
+@param[in] ... any additional function call that should execute on failure
 that cannot be performed by the end test macro.
 
 test_result and test_expected should be comparable with ==/!=. If a test
@@ -228,7 +228,7 @@ of the end test macros is sufficient. */
 #define CHECK_STATUS check_private_macro_res
 
 /** @brief End every test started with the end test macro.
-@param [in] ... optional code block with arbitrary cleanup code to be executed
+@param[in] ... optional code block with arbitrary cleanup code to be executed
 to clean up any allocated memory upon test completion.
 @return the test result from the currently executing test. CHECK_FAIL upon the
 first check failure or CHECK_PASS if all checks have passed.
@@ -250,7 +250,7 @@ please_use_at_least_one_check_and_a_check_end_macro:                           \
     }
 
 /** @brief End every test started with the end pass macro.
-@param [in] ... optional code block with arbitrary code to be executed only upon
+@param[in] ... optional code block with arbitrary code to be executed only upon
 all tests passing.
 @return the test result from the currently executing test. CHECK_FAIL upon the
 first check failure or CHECK_PASS if all checks have passed.
@@ -276,7 +276,7 @@ please_use_at_least_one_check_and_a_check_end_macro:                           \
     }
 
 /** @brief End every test started with the end fail macros.
-@param [in] ... optional code block with arbitrary cleanup code to be executed
+@param[in] ... optional code block with arbitrary cleanup code to be executed
 only upon the first test failure.
 @return the test result from the currently executing test. CHECK_FAIL upon the
 first check failure or CHECK_PASS if all checks have passed.
@@ -302,7 +302,7 @@ please_use_at_least_one_check_and_a_check_end_macro:                           \
     }
 
 /** @brief End every test started with the end error macro.
-@param [in] ... optional code block with arbitrary cleanup code to be executed
+@param[in] ... optional code block with arbitrary cleanup code to be executed
 only upon the first test failure.
 @return the test result from the currently executing test. CHECK_FAIL upon the
 first check failure or CHECK_PASS if all checks have passed.
@@ -328,7 +328,7 @@ please_use_at_least_one_check_and_a_check_end_macro:                           \
     }
 
 /** @brief Runs a list of test functions and returns the result.
-@param [in] test_fn_list all test functions to run in main.
+@param[in] test_fn_list all test functions to run in main.
 @return a passing test result if all tests pass or failing result if any fail.
 All tests to completion even if the overall result is a failure.
 

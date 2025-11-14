@@ -81,12 +81,12 @@ Initialize the container with memory, callbacks, and permissions. */
 
 /** @brief Initialize a contiguous Buffer of user a specified type, allocation
 policy, capacity, and optional starting size.
-@param [in] mem_pointer the pointer to existing memory or NULL.
-@param [in] any_type_name the name of the user type in the buffer.
-@param [in] allocate CCC_Allocator or NULL if no allocation is permitted.
-@param [in] context_data any context data needed for managing Buffer memory.
-@param [in] capacity the capacity of memory at mem_pointer.
-@param [in] optional_size optional starting size of the Buffer <= capacity.
+@param[in] mem_pointer the pointer to existing memory or NULL.
+@param[in] any_type_name the name of the user type in the buffer.
+@param[in] allocate CCC_Allocator or NULL if no allocation is permitted.
+@param[in] context_data any context data needed for managing Buffer memory.
+@param[in] capacity the capacity of memory at mem_pointer.
+@param[in] optional_size optional starting size of the Buffer <= capacity.
 @return the initialized buffer. Directly assign to Buffer on the right hand
 side of the equality operator (e.g. CCC_Buffer b = CCC_buffer_initialize(...);).
 
@@ -121,16 +121,16 @@ occurred with the provided allocation function. */
                                   context_data, capacity, optional_size)
 
 /** @brief Initialize a Buffer from a compound literal array initializer.
-@param [in] allocate CCC_Allocator or NULL if no allocation is permitted.
-@param [in] context_data any context data needed for managing Buffer memory.
-@param [in] optional_capacity optionally specify the capacity of the Buffer if
+@param[in] allocate CCC_Allocator or NULL if no allocation is permitted.
+@param[in] context_data any context data needed for managing Buffer memory.
+@param[in] optional_capacity optionally specify the capacity of the Buffer if
 different from the size of the compound literal array initializer. If the
 capacity is greater than the size of the compound literal array initializer, it
 is respected and the capacity is reserved. If the capacity is less than the size
 of the compound array initializer, the compound literal array initializer size
 is set as the capacity. Therefore, 0 is valid if one is not concerned with the
 underlying reservation.
-@param [in] compound_literal_array the initializer of the type stored in buffer.
+@param[in] compound_literal_array the initializer of the type stored in buffer.
 @return the initialized buffer. Directly assign to Buffer on the right hand
 side of the equality operator (e.g. CCC_Buffer b = CCC_buffer_from(...);).
 
@@ -171,9 +171,9 @@ CCC_buffer_initialize() macro. */
                             compound_literal_array)
 
 /** @brief Initialize a Buffer with a capacity.
-@param [in] allocate CCC_Allocator or NULL if no allocation is permitted.
-@param [in] context_data any context data needed for managing Buffer memory.
-@param [in] capacity the capacity of the Buffer to reserve.
+@param[in] allocate CCC_Allocator or NULL if no allocation is permitted.
+@param[in] context_data any context data needed for managing Buffer memory.
+@param[in] capacity the capacity of the Buffer to reserve.
 @return the initialized buffer. Directly assign to Buffer on the right hand
 side of the equality operator (e.g. CCC_Buffer b =
 CCC_buffer_with_capacity(...);).
@@ -199,9 +199,9 @@ CCC_buffer_initialize() macro. */
                                      capacity)
 
 /** @brief Reserves space for at least to_add more elements.
-@param [in] buf a pointer to the buffer.
-@param [in] to_add the number of elements to add to the current size.
-@param [in] fn the allocation function to use to reserve memory.
+@param[in] buf a pointer to the buffer.
+@param[in] to_add the number of elements to add to the current size.
+@param[in] fn the allocation function to use to reserve memory.
 @return the result of the reservation. OK if successful, otherwise an error
 status is returned.
 @note see the CCC_buffer_clear_and_free_reserve function if this function is
@@ -218,9 +218,9 @@ case see the CCC_buffer_clear_and_free_reserve function. */
                                             CCC_Allocator *fn);
 
 /** @brief Copy the buf from src to newly initialized dst.
-@param [in] dst the destination that will copy the source buf.
-@param [in] src the source of the buf.
-@param [in] fn the allocation function in case resizing of dst is needed.
+@param[in] dst the destination that will copy the source buf.
+@param[in] src the source of the buf.
+@param[in] fn the allocation function in case resizing of dst is needed.
 @return the result of the copy operation. If the destination capacity is less
 than the source capacity and no allocation function is provided an input error
 is returned. If resizing is required and resizing of dst fails a memory error
@@ -287,9 +287,9 @@ decrease size accordingly. */
 
 /** @brief allocates the Buffer to the specified size according to the user
 defined allocation function.
-@param [in] buf a pointer to the buffer.
-@param [in] capacity the newly desired capacity.
-@param [in] fn the allocation function defined by the user.
+@param[in] buf a pointer to the buffer.
+@param[in] capacity the newly desired capacity.
+@param[in] fn the allocation function defined by the user.
 @return the result of reallocation.
 
 This function takes the allocation function as an argument in case no
@@ -303,7 +303,7 @@ will reallocate more memory when necessary. */
 /** @brief allocates a new slot from the Buffer at the end of the contiguous
 array. A slot is equivalent to one of the element type specified when the
 Buffer is initialized.
-@param [in] buf a pointer to the buffer.
+@param[in] buf a pointer to the buffer.
 @return a pointer to the newly allocated memory or NULL if no Buffer is
 provided or the Buffer is unable to allocate more memory.
 @note this function modifies the size of the container.
@@ -315,8 +315,8 @@ higher level organizations. */
 
 /** @brief return the newly pushed data into the last slot of the buffer
 according to size.
-@param [in] buf the pointer to the buffer.
-@param [in] data the pointer to the data of element size.
+@param[in] buf the pointer to the buffer.
+@param[in] data the pointer to the data of element size.
 @return the pointer to the newly pushed element or NULL if no Buffer exists or
 resizing has failed due to memory exhuastion or no allocation allowed.
 @note this function modifies the size of the container.
@@ -329,8 +329,8 @@ exhausted. */
 
 /** @brief Pushes the user provided compound literal directly to back of buffer
 and increments the size to reflect the newly added element.
-@param [in] buffer_pointer a pointer to the buffer.
-@param [in] type_compound_literal the direct compound literal as provided.
+@param[in] buffer_pointer a pointer to the buffer.
+@param[in] type_compound_literal the direct compound literal as provided.
 @return a pointer to the inserted element or NULL if insertion failed.
 
 Any function calls that set fields of the compound literal will not be evaluated
@@ -341,9 +341,9 @@ if resizing fails or is prohibited. */
 
 /** @brief insert data at slot i according to size of the Buffer maintaining
 contiguous storage of elements between 0 and size.
-@param [in] buf the pointer to the buffer.
-@param [in] i the index at which to insert data.
-@param [in] data the data copied into the Buffer at index i of the same size
+@param[in] buf the pointer to the buffer.
+@param[in] i the index at which to insert data.
+@param[in] data the data copied into the Buffer at index i of the same size
 as elements stored in the buffer.
 @return the pointer to the inserted element or NULL if bad input is provided,
 the Buffer is full and no resizing is allowed, or resizing fails when resizing
@@ -357,15 +357,15 @@ to accommodate i will occur. */
                                       void const *data);
 
 /** @brief pop the back element from the Buffer according to size.
-@param [in] buf the pointer to the buffer.
+@param[in] buf the pointer to the buffer.
 @return the result of the attempted pop. CCC_RESULT_OK upon success or an input
 error if bad input is provided.
 @note this function modifies the size of the container. */
 CCC_Result CCC_buffer_pop_back(CCC_Buffer *buf);
 
 /** @brief pop n elements from the back of the Buffer according to size.
-@param [in] buf the pointer to the buffer.
-@param [in] n the number of elements to pop.
+@param[in] buf the pointer to the buffer.
+@param[in] n the number of elements to pop.
 @return the result of the attempted pop. CCC_RESULT_OK if the Buffer exists and
 n is within the bounds of size. If the Buffer does not exist an input error is
 returned. If n is greater than the size of the Buffer size is set to zero
@@ -375,8 +375,8 @@ CCC_Result CCC_buffer_pop_back_n(CCC_Buffer *buf, size_t n);
 
 /** @brief erase element at slot i according to size of the Buffer maintaining
 contiguous storage of elements between 0 and size.
-@param [in] buf the pointer to the buffer.
-@param [in] i the index of the element to be erased.
+@param[in] buf the pointer to the buffer.
+@param[in] i the index of the element to be erased.
 @return the result, CCC_RESULT_OK if the input is valid. If no Buffer exists or
 i is out of range of size then an input error is returned.
 @note this function modifies the size of the container.
@@ -395,8 +395,8 @@ at a higher level of abstraction. */
 /**@{*/
 
 /** @brief return the element at slot i in buf.
-@param [in] buf the pointer to the buffer.
-@param [in] i the index within capacity range of the buffer.
+@param[in] buf the pointer to the buffer.
+@param[in] i the index within capacity range of the buffer.
 @return a pointer to the element in the slot at position i or NULL if i is out
 of capacity range.
 
@@ -407,9 +407,9 @@ size of the buffer. */
 [[nodiscard]] void *CCC_buffer_at(CCC_Buffer const *buf, size_t i);
 
 /** @brief Access en element at the specified index as the stored type.
-@param [in] buffer_pointer the pointer to the buffer.
-@param [in] type_name the name of the stored type.
-@param [in] index the index within capacity range of the buffer.
+@param[in] buffer_pointer the pointer to the buffer.
+@param[in] type_name the name of the stored type.
+@param[in] index the index within capacity range of the buffer.
 @return a pointer to the element in the slot at position i or NULL if i is out
 of capacity range.
 
@@ -421,44 +421,44 @@ size of the buffer. */
     ((type_name *)CCC_buffer_at(buffer_pointer, index))
 
 /** @brief return the index of an element known to be in the buffer.
-@param [in] buf the pointer to the buffer.
-@param [in] slot the pointer to the element stored in the buffer.
+@param[in] buf the pointer to the buffer.
+@param[in] slot the pointer to the element stored in the buffer.
 @return the index if the slot provided is within the capacity range of the
 buffer, otherwise an argument error is set. */
 [[nodiscard]] CCC_Count CCC_buffer_i(CCC_Buffer const *buf, void const *slot);
 
 /** @brief return the final element in the Buffer according the current size.
-@param [in] buf the pointer to the buffer.
+@param[in] buf the pointer to the buffer.
 @return the pointer the final element in the Buffer according to the current
 size or NULL if the Buffer does not exist or is empty. */
 [[nodiscard]] void *CCC_buffer_back(CCC_Buffer const *buf);
 
 /** @brief return the final element in the Buffer according the current size.
-@param [in] buffer_pointer the pointer to the buffer.
-@param [in] type_name the name of the stored type.
+@param[in] buffer_pointer the pointer to the buffer.
+@param[in] type_name the name of the stored type.
 @return the pointer the final element in the Buffer according to the current
 size or NULL if the Buffer does not exist or is empty. */
 #define CCC_buffer_back_as(buffer_pointer, type_name)                          \
     ((type_name *)CCC_buffer_back(buffer_pointer))
 
 /** @brief return the first element in the Buffer at index 0.
-@param [in] buf the pointer to the buffer.
+@param[in] buf the pointer to the buffer.
 @return the pointer to the front element or NULL if the Buffer does not exist
 or is empty. */
 [[nodiscard]] void *CCC_buffer_front(CCC_Buffer const *buf);
 
 /** @brief return the first element in the Buffer at index 0.
-@param [in] buffer_pointer the pointer to the buffer.
-@param [in] type_name the name of the stored type.
+@param[in] buffer_pointer the pointer to the buffer.
+@param[in] type_name the name of the stored type.
 @return the pointer to the front element or NULL if the Buffer does not exist
 or is empty. */
 #define CCC_buffer_front_as(buffer_pointer, type_name)                         \
     ((type_name *)CCC_buffer_front(buffer_pointer))
 
 /** @brief Move data at index src to dst according to capacity.
-@param [in] buf the pointer to the buffer.
-@param [in] dst the index of destination within bounds of capacity.
-@param [in] src the index of source within bounds of capacity.
+@param[in] buf the pointer to the buffer.
+@param[in] dst the index of destination within bounds of capacity.
+@param[in] src the index of source within bounds of capacity.
 @return a pointer to the slot at dst or NULL if bad input is provided.
 @note this function does NOT modify the size of the container.
 
@@ -468,9 +468,9 @@ source are within the size bounds of the buffer, if required. */
 void *CCC_buffer_move(CCC_Buffer *buf, size_t dst, size_t src);
 
 /** @brief write data to Buffer at slot at index i according to capacity.
-@param [in] buf the pointer to the buffer.
-@param [in] i the index within bounds of capacity of the buffer.
-@param [in] data the data that will be written to slot at i.
+@param[in] buf the pointer to the buffer.
+@param[in] i the index within bounds of capacity of the buffer.
+@param[in] data the data that will be written to slot at i.
 @return the result of the write, CCC_RESULT_OK if success. If no Buffer or data
 exists input error is returned. If i is outside of the range of capacity
 input error is returned.
@@ -483,9 +483,9 @@ preserved meaning any data at i is overwritten. */
 CCC_Result CCC_buffer_write(CCC_Buffer *buf, size_t i, void const *data);
 
 /** @brief Writes a user provided compound literal directly to a Buffer slot.
-@param [in] buffer_pointer a pointer to the buffer.
-@param [in] index the desired index at which to insert an element.
-@param [in] type_compound_literal the direct compound literal as provided.
+@param[in] buffer_pointer a pointer to the buffer.
+@param[in] index the desired index at which to insert an element.
+@param[in] type_compound_literal the direct compound literal as provided.
 @return a pointer to the inserted element or NULL if insertion failed.
 @warning The index provided is only checked to be within capacity bounds so it
 is the user's responsibility to ensure the index is within the contiguous range
@@ -497,11 +497,11 @@ if the provided index is out of range of the Buffer capacity. */
     CCC_private_buffer_emplace(buffer_pointer, index, type_compound_literal)
 
 /** @brief swap elements at i and j according to capacity of the bufer.
-@param [in] buf the pointer to the buffer.
-@param [in] tmp the pointer to the temporary Buffer of the same size as an
+@param[in] buf the pointer to the buffer.
+@param[in] tmp the pointer to the temporary Buffer of the same size as an
 element stored in the buffer.
-@param [in] i the index of an element in the buffer.
-@param [in] j the index of an element in the buffer.
+@param[in] i the index of an element in the buffer.
+@param[in] j the index of an element in the buffer.
 @return the result of the swap, CCC_RESULT_OK if no error occurs. If no buffer
 exists, no tmp exists, i is out of capacity range, or j is out of capacity
 range, an input error is returned.
@@ -519,7 +519,7 @@ The following functions implement iterators over the buffer. */
 /**@{*/
 
 /** @brief obtain the base address of the Buffer in preparation for iteration.
-@param [in] buf the pointer to the buffer.
+@param[in] buf the pointer to the buffer.
 @return the base address of the buffer. This will be equivalent to the buffer
 end iterator if the Buffer size is 0. NULL is returned if a NULL argument is
 provided or the Buffer has not yet been allocated. */
@@ -527,14 +527,14 @@ provided or the Buffer has not yet been allocated. */
 
 /** @brief advance the iterator to the next slot in the Buffer according to
 size.
-@param [in] buf the pointer to the buffer.
-@param [in] iterator the pointer to the current slot of the buffer.
+@param[in] buf the pointer to the buffer.
+@param[in] iterator the pointer to the current slot of the buffer.
 @return the next iterator position according to size. */
 [[nodiscard]] void *CCC_buffer_next(CCC_Buffer const *buf,
                                     void const *iterator);
 
 /** @brief return the end position of the Buffer according to size.
-@param [in] buf the pointer to the buffer.
+@param[in] buf the pointer to the buffer.
 @return the address of the end position. It is undefined to access this
 position for any reason. NULL is returned if NULL is provided or Buffer has
 not yet been allocated.
@@ -543,7 +543,7 @@ Note that end is determined by the size of the Buffer dynamically. */
 [[nodiscard]] void *CCC_buffer_end(CCC_Buffer const *buf);
 
 /** @brief return the end position of the Buffer according to capacity.
-@param [in] buf the pointer to the buffer.
+@param[in] buf the pointer to the buffer.
 @return the address of the position one past capacity. It is undefined to
 access this position for any reason. NULL is returned if NULL is provided or
 Buffer has not yet been allocated.
@@ -554,7 +554,7 @@ until a resize has occured, if permitted. */
 
 /** @brief obtain the address of the last element in the Buffer in preparation
 for iteration according to size.
-@param [in] buf the pointer to the buffer.
+@param[in] buf the pointer to the buffer.
 @return the address of the last element buffer. This will be equivalent to the
 Buffer reverse_end iterator if the Buffer size is 0. NULL is returned if a NULL
 argument is provided or the Buffer has not yet been allocated. */
@@ -562,15 +562,15 @@ argument is provided or the Buffer has not yet been allocated. */
 
 /** @brief advance the iterator to the next slot in the Buffer according to size
 and in reverse order.
-@param [in] buf the pointer to the buffer.
-@param [in] iterator the pointer to the current slot of the buffer.
+@param[in] buf the pointer to the buffer.
+@param[in] iterator the pointer to the current slot of the buffer.
 @return the next iterator position according to size and in reverse order. NULL
 is returned if bad input is provided or the Buffer has not been allocated. */
 [[nodiscard]] void *CCC_buffer_reverse_next(CCC_Buffer const *buf,
                                             void const *iterator);
 
 /** @brief return the reverse_end position of the buffer.
-@param [in] buf the pointer to the buffer.
+@param[in] buf the pointer to the buffer.
 @return the address of the reverse_end position. It is undefined to access this
 position for any reason. NULL is returned if NULL is provided or Buffer has
 not yet been allocated. */
@@ -583,8 +583,8 @@ These functions help manage or obtain state of the buffer. */
 /**@{*/
 
 /** @brief add n to the size of the buffer.
-@param [in] buf the pointer to the buffer.
-@param [in] n the quantity to add to the current Buffer size.
+@param[in] buf the pointer to the buffer.
+@param[in] n the quantity to add to the current Buffer size.
 @return the result of resizing. CCC_RESULT_OK if no errors occur or an error
 indicating bad input has been provided.
 
@@ -593,8 +593,8 @@ capacity and the input error status is returned. */
 CCC_Result CCC_buffer_size_plus(CCC_Buffer *buf, size_t n);
 
 /** @brief Subtract n from the size of the buffer.
-@param [in] buf the pointer to the buffer.
-@param [in] n the quantity to subtract from the current Buffer size.
+@param[in] buf the pointer to the buffer.
+@param[in] n the quantity to subtract from the current Buffer size.
 @return the result of resizing. CCC_RESULT_OK if no errors occur or an error
 indicating bad input has been provided.
 
@@ -603,8 +603,8 @@ input error status is returned. */
 CCC_Result CCC_buffer_size_minus(CCC_Buffer *buf, size_t n);
 
 /** @brief Set the Buffer size to n.
-@param [in] buf the pointer to the buffer.
-@param [in] n the new size of the buffer.
+@param[in] buf the pointer to the buffer.
+@param[in] n the new size of the buffer.
 @return the result of setting the size. CCC_RESULT_OK if no errors occur or an
 error indicating bad input has been provided.
 
@@ -613,7 +613,7 @@ capacity and an error is returned. */
 CCC_Result CCC_buffer_size_set(CCC_Buffer *buf, size_t n);
 
 /** @brief obtain the count of Buffer active slots.
-@param [in] buf the pointer to the buffer.
+@param[in] buf the pointer to the buffer.
 @return the quantity of elements stored in the buffer. An argument error is set
 if buf is NULL.
 
@@ -621,21 +621,21 @@ Note that size must be less than or equal to capacity. */
 [[nodiscard]] CCC_Count CCC_buffer_count(CCC_Buffer const *buf);
 
 /** @brief Return the current capacity of total possible slots.
-@param [in] buf the pointer to the buffer.
+@param[in] buf the pointer to the buffer.
 @return the total number of elements the can be stored in the buffer. This
 value remains the same until a resize occurs. An argument error is set if buf is
 NULL. */
 [[nodiscard]] CCC_Count CCC_buffer_capacity(CCC_Buffer const *buf);
 
 /** @brief The size of the type being stored contiguously in the buffer.
-@param [in] buf the pointer to the buffer.
+@param[in] buf the pointer to the buffer.
 @return the size of the type being stored in the buffer. 0 if buf is NULL
 because a zero sized object is not possible for a buffer. */
 [[nodiscard]] CCC_Count CCC_buffer_sizeof_type(CCC_Buffer const *buf);
 
 /** @brief Return the bytes in the Buffer given the current count of active
 elements.
-@param [in] buf the pointer to the buffer.
+@param[in] buf the pointer to the buffer.
 @return the number of bytes occupied by the current count of elements.
 
 For total possible bytes that can be stored in the Buffer see
@@ -643,7 +643,7 @@ CCC_buffer_capacity_bytes. */
 [[nodiscard]] CCC_Count CCC_buffer_count_bytes(CCC_Buffer const *buf);
 
 /** @brief Return the bytes in the Buffer given the current capacity elements.
-@param [in] buf the pointer to the buffer.
+@param[in] buf the pointer to the buffer.
 @return the number of bytes occupied by the current capacity elements.
 
 For total possible bytes that can be stored in the Buffer given the current
@@ -651,12 +651,12 @@ element count see CCC_buffer_count_bytes. */
 [[nodiscard]] CCC_Count CCC_buffer_capacity_bytes(CCC_Buffer const *buf);
 
 /** @brief return true if the size of the Buffer is 0.
-@param [in] buf the pointer to the buffer.
+@param[in] buf the pointer to the buffer.
 @return true if the size is 0 false if not. Error if buf is NULL. */
 [[nodiscard]] CCC_Tribool CCC_buffer_is_empty(CCC_Buffer const *buf);
 
 /** @brief return true if the size of the Buffer equals capacity.
-@param [in] buf the pointer to the buffer.
+@param[in] buf the pointer to the buffer.
 @return true if the size equals the capacity. Error if buf is NULL. */
 [[nodiscard]] CCC_Tribool CCC_buffer_is_full(CCC_Buffer const *buf);
 
@@ -668,11 +668,11 @@ Free the elements of the container and the underlying buffer. */
 
 /** @brief Frees all slots in the buf and frees the underlying Buffer that was
 previously dynamically reserved with the reserve function.
-@param [in] buf the Buffer to be cleared.
-@param [in] destructor the destructor for each element. NULL can be passed if no
+@param[in] buf the Buffer to be cleared.
+@param[in] destructor the destructor for each element. NULL can be passed if no
 maintenance is required on the elements in the buf before their slots are
 dropped.
-@param [in] allocate the required allocation function to provide to a
+@param[in] allocate the required allocation function to provide to a
 dynamically reserved buf. Any context data provided upon initialization will be
 passed to the allocation function when called.
 @return the result of free operation. OK if success, or an error status to
@@ -700,8 +700,8 @@ CCC_Result CCC_buffer_clear_and_free_reserve(CCC_Buffer *buf,
 /** @brief Set size of buf to 0 and call destructor on each element if needed.
 Free the underlying Buffer setting the capacity to 0. O(1) if no destructor is
 provided, else O(N).
-@param [in] buf a pointer to the buf.
-@param [in] destructor the destructor if needed or NULL.
+@param[in] buf a pointer to the buf.
+@param[in] destructor the destructor if needed or NULL.
 
 Note that if destructor is non-NULL it will be called on each element in the
 buf. After all elements are processed the Buffer is freed and capacity is 0.
@@ -712,8 +712,8 @@ CCC_Result CCC_buffer_clear_and_free(CCC_Buffer *buf,
 
 /** @brief Set size of buf to 0 and call destructor on each element if needed.
 O(1) if no destructor is provided, else O(N).
-@param [in] buf a pointer to the buf.
-@param [in] destructor the destructor if needed or NULL.
+@param[in] buf a pointer to the buf.
+@param[in] destructor the destructor if needed or NULL.
 
 Note that if destructor is non-NULL it will be called on each element in the
 buf. However, the underlying Buffer for the buf is not freed. If the

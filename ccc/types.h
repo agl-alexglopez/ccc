@@ -382,13 +382,13 @@ The generic interface for associative container entries. */
 /**@{*/
 
 /** @brief Determine if an entry is Occupied in the container.
-@param [in] e the pointer to the entry obtained from a container.
+@param[in] e the pointer to the entry obtained from a container.
 @return true if Occupied false if Vacant. Error if e is NULL. */
 CCC_Tribool CCC_entry_occupied(CCC_Entry const *e);
 
 /** @brief Determine if an insertion error has occurred when a function that
 attempts to insert a value in a container is used.
-@param [in] e the pointer to the entry obtained from a container insert.
+@param[in] e the pointer to the entry obtained from a container insert.
 @return true if an insertion error occurred usually meaning a insertion should
 have occurred but the container did not have permission to allocate new memory
 or allocation failed. Error if e is NULL. */
@@ -396,14 +396,14 @@ CCC_Tribool CCC_entry_insert_error(CCC_Entry const *e);
 
 /** @brief Determine if an input error has occurred for a function that
 generates an entry.
-@param [in] e the pointer to the entry obtained from a container function.
+@param[in] e the pointer to the entry obtained from a container function.
 @return true if an input error occurred usually meaning an invalid argument such
 as a NULL pointer was provided to a function. Error if e is NULL. */
 CCC_Tribool CCC_entry_input_error(CCC_Entry const *e);
 
 /** @brief Unwraps the provided entry providing a reference to the user type
 obtained from the operation that provides the entry.
-@param [in] e the pointer to the entry obtained from an operation.
+@param[in] e the pointer to the entry obtained from an operation.
 @return a reference to the user type stored in the Occupied entry or NULL if
 the entry is Vacant or otherwise cannot be viewed.
 
@@ -414,13 +414,13 @@ entry is obtained. */
 void *CCC_entry_unwrap(CCC_Entry const *e);
 
 /** @brief Determine if an handle is Occupied in the container.
-@param [in] e the pointer to the handle obtained from a container.
+@param[in] e the pointer to the handle obtained from a container.
 @return true if Occupied false if Vacant. Error if e is NULL. */
 CCC_Tribool CCC_handle_occupied(CCC_Handle const *e);
 
 /** @brief Determine if an insertion error has occurred when a function that
 attempts to insert a value in a container is used.
-@param [in] e the pointer to the handle obtained from a container insert.
+@param[in] e the pointer to the handle obtained from a container insert.
 @return true if an insertion error occurred usually meaning a insertion should
 have occurred but the container did not have permission to allocate new memory
 or allocation failed. Error if e is NULL. */
@@ -428,14 +428,14 @@ CCC_Tribool CCC_handle_insert_error(CCC_Handle const *e);
 
 /** @brief Determine if an input error has occurred for a function that
 generates an handle.
-@param [in] e the pointer to the handle obtained from a container function.
+@param[in] e the pointer to the handle obtained from a container function.
 @return true if an input error occurred usually meaning an invalid argument such
 as a NULL pointer was provided to a function. Error if e is NULL. */
 CCC_Tribool CCC_handle_input_error(CCC_Handle const *e);
 
 /** @brief Unwraps the provided handle providing a reference to the user type
 obtained from the operation that provides the handle.
-@param [in] e the pointer to the handle obtained from an operation.
+@param[in] e the pointer to the handle obtained from an operation.
 @return a reference to the user type stored in the Occupied handle or NULL if
 the handle is Vacant or otherwise cannot be viewed.
 
@@ -453,7 +453,7 @@ The generic range interface for associative containers. */
 
 /** @brief Obtain a reference to the beginning user element stored in a
 container in the provided range.
-@param [in] r a pointer to the range.
+@param[in] r a pointer to the range.
 @return a reference to the user type stored in the container that serves as
 the beginning of the range.
 
@@ -462,7 +462,7 @@ void *CCC_range_begin(CCC_Range const *r);
 
 /** @brief Obtain a reference to the end user element stored in a
 container in the provided range.
-@param [in] r a pointer to the range.
+@param[in] r a pointer to the range.
 @return a reference to the user type stored in the container that serves as
 the end of the range.
 
@@ -473,7 +473,7 @@ void *CCC_range_end(CCC_Range const *r);
 
 /** @brief Obtain a reference to the reverse beginning user element stored in a
 container in the provided range.
-@param [in] r a pointer to the range.
+@param[in] r a pointer to the range.
 @return a reference to the user type stored in the container that serves as
 the reverse beginning of the range.
 
@@ -483,7 +483,7 @@ void *CCC_range_reverse_begin(CCC_Range_reverse const *r);
 
 /** @brief Obtain a reference to the reverse end user element stored in a
 container in the provided range.
-@param [in] r a pointer to the range.
+@param[in] r a pointer to the range.
 @return a reference to the user type stored in the container that serves as
 the reverse end of the range.
 
@@ -500,7 +500,7 @@ Functions for obtaining more descriptive status information. */
 
 /** @brief Obtain a string message with a description of the error returned
 from a container operation, possible causes, and possible fixes to such error.
-@param [in] res the result obtained from a container operation.
+@param[in] res the result obtained from a container operation.
 @return a string message of the result. A CCC_RESULT_OK result is an empty
 string, the falsey NULL terminator. All other results have a string message.
 
@@ -509,21 +509,21 @@ more information for why such a result might be obtained from a container. */
 char const *CCC_result_message(CCC_Result res);
 
 /** @brief Obtain the entry status from a generic entry.
-@param [in] e a pointer to the entry.
+@param[in] e a pointer to the entry.
 @return the status stored in the entry after the required action on the
 container completes. If e is NULL an entry input error is returned so ensure
 e is non-NULL to avoid an inaccurate status returned. */
 CCC_Entry_status CCC_get_entry_status(CCC_Entry const *e);
 
 /** @brief Obtain the handle status from a generic handle.
-@param [in] e a pointer to the handle.
+@param[in] e a pointer to the handle.
 @return the status stored in the handle after the required action on the
 container completes. If e is NULL an handle input error is returned so ensure
 e is non-NULL to avoid an inaccurate status returned. */
 CCC_Handle_status CCC_get_handle_status(CCC_Handle const *e);
 
 /** @brief Obtain a string message with a description of the entry status.
-@param [in] status the status obtained from an entry.
+@param[in] status the status obtained from an entry.
 @return a string message with more detailed information regarding the status.
 
 Note that status for an entry is relevant when it is first obtained and when
@@ -536,7 +536,7 @@ strings can be used when more details are required. */
 char const *CCC_entry_status_message(CCC_Entry_status status);
 
 /** @brief Obtain a string message with a description of the handle status.
-@param [in] status the status obtained from an handle.
+@param[in] status the status obtained from an handle.
 @return a string message with more detailed information regarding the status.
 
 Note that status for an handle is relevant when it is first obtained and when
