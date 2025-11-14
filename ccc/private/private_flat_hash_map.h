@@ -178,17 +178,16 @@ and debugging the macros easier. It also cuts down on repeated logic. */
 /*======================     Private Interface      =========================*/
 
 struct CCC_Flat_hash_map_entry
-CCC_private_flat_hash_map_entry(struct CCC_Flat_hash_map *h, void const *key);
-void CCC_private_flat_hash_map_insert(struct CCC_Flat_hash_map *h,
-                                      void const *key_val_type,
-                                      struct CCC_flat_hash_map_tag m, size_t i);
-void CCC_private_flat_hash_map_erase(struct CCC_Flat_hash_map *h, size_t i);
-void *CCC_private_flat_hash_map_data_at(struct CCC_Flat_hash_map const *h,
-                                        size_t i);
-void *CCC_private_flat_hash_map_key_at(struct CCC_Flat_hash_map const *h,
-                                       size_t i);
+CCC_private_flat_hash_map_entry(struct CCC_Flat_hash_map *, void const *);
+void CCC_private_flat_hash_map_insert(struct CCC_Flat_hash_map *, void const *,
+                                      struct CCC_flat_hash_map_tag, size_t);
+void CCC_private_flat_hash_map_erase(struct CCC_Flat_hash_map *, size_t);
+void *CCC_private_flat_hash_map_data_at(struct CCC_Flat_hash_map const *,
+                                        size_t);
+void *CCC_private_flat_hash_map_key_at(struct CCC_Flat_hash_map const *,
+                                       size_t);
 void
-CCC_private_flat_hash_map_set_insert(struct CCC_Flat_hash_map_entry const *e);
+CCC_private_flat_hash_map_set_insert(struct CCC_Flat_hash_map_entry const *);
 
 /*======================    Macro Implementations   =========================*/
 
