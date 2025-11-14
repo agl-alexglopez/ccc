@@ -679,8 +679,8 @@ CCC_flat_hash_map_or_insert(CCC_Flat_hash_map_entry const *entry,
 
 /** @brief lazily insert the desired key value into the entry if it is Vacant.
 @param [in] map_entry_pointer a pointer to the obtained entry.
-@param [in] lazy_key_value the compound literal to construct in place if the
-entry is Vacant.
+@param [in] type_compound_literal the compound literal to construct in place if
+the entry is Vacant.
 @return a reference to the unwrapped user type in the entry, either the
 unmodified reference if the entry was Occupied or the newly inserted element
 if the entry was Vacant. NULL is returned if resizing is required but fails or
@@ -688,8 +688,10 @@ is not allowed.
 
 Note that if the compound literal uses any function calls to generate values
 or other data, such functions will not be called if the entry is Occupied. */
-#define CCC_flat_hash_map_or_insert_w(map_entry_pointer, lazy_key_value...)    \
-    CCC_private_flat_hash_map_or_insert_w(map_entry_pointer, lazy_key_value)
+#define CCC_flat_hash_map_or_insert_w(map_entry_pointer,                       \
+                                      type_compound_literal...)                \
+    CCC_private_flat_hash_map_or_insert_w(map_entry_pointer,                   \
+                                          type_compound_literal)
 
 /** @brief Inserts the provided entry invariantly.
 @param [in] entry the entry returned from a call obtaining an entry.
@@ -706,13 +708,16 @@ or a search error NULL is returned. Otherwise insertion should not fail. */
 CCC_flat_hash_map_insert_entry(CCC_Flat_hash_map_entry const *entry,
                                void const *type);
 
-/** @brief write the contents of the compound literal lazy_key_value to a slot.
+/** @brief write the contents of the compound literal type_compound_literal to a
+slot.
 @param [in] map_entry_pointer a pointer to the obtained entry.
-@param [in] lazy_key_value the compound literal to write to a new slot.
+@param [in] type_compound_literal the compound literal to write to a new slot.
 @return a reference to the newly inserted or overwritten user type. NULL is
 returned if resizing is required but fails or is not allowed. */
-#define CCC_flat_hash_map_insert_entry_w(map_entry_pointer, lazy_key_value...) \
-    CCC_private_flat_hash_map_insert_entry_w(map_entry_pointer, lazy_key_value)
+#define CCC_flat_hash_map_insert_entry_w(map_entry_pointer,                    \
+                                         type_compound_literal...)             \
+    CCC_private_flat_hash_map_insert_entry_w(map_entry_pointer,                \
+                                             type_compound_literal)
 
 /** @brief Invariantly inserts the key value wrapping out_handle.
 @param [in] map the pointer to the flat hash map.

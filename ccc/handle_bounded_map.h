@@ -625,8 +625,8 @@ CCC_handle_bounded_map_or_insert(CCC_Handle_bounded_map_handle const *h,
 /** @brief Lazily insert the desired key value into the handle if it is Vacant.
 @param [in] Handle_bounded_map_handle_pointer a pointer to the obtained
 handle.
-@param [in] lazy_key_value the compound literal to construct in place if the
-handle is Vacant.
+@param [in] type_compound_literal the compound literal to construct in place if
+the handle is Vacant.
 @return a reference to the unwrapped user type in the handle, either the
 unmodified reference if the handle was Occupied or the newly inserted element
 if the handle was Vacant. NULL is returned if resizing is required but fails or
@@ -635,9 +635,9 @@ is not allowed.
 Note that if the compound literal uses any function calls to generate values
 or other data, such functions will not be called if the handle is Occupied. */
 #define CCC_handle_bounded_map_or_insert_w(Handle_bounded_map_handle_pointer,  \
-                                           lazy_key_value...)                  \
+                                           type_compound_literal...)           \
     CCC_private_handle_bounded_map_or_insert_w(                                \
-        Handle_bounded_map_handle_pointer, lazy_key_value)
+        Handle_bounded_map_handle_pointer, type_compound_literal)
 
 /** @brief Inserts the provided user type invariantly.
 @param [in] h the handle returned from a call obtaining a handle.
@@ -650,16 +650,17 @@ be preserved. See the regular insert method if the old value is of interest. */
 CCC_handle_bounded_map_insert_handle(CCC_Handle_bounded_map_handle const *h,
                                      void const *key_val_type);
 
-/** @brief Write the contents of the compound literal lazy_key_value to a node.
+/** @brief Write the contents of the compound literal type_compound_literal to a
+node.
 @param [in] Handle_bounded_map_handle_pointer a pointer to the obtained
 handle.
-@param [in] lazy_key_value the compound literal to write to a new slot.
+@param [in] type_compound_literal the compound literal to write to a new slot.
 @return a reference to the newly inserted or overwritten user type. NULL is
 returned if allocation failed or is not allowed when required. */
 #define CCC_handle_bounded_map_insert_handle_w(                                \
-    Handle_bounded_map_handle_pointer, lazy_key_value...)                      \
+    Handle_bounded_map_handle_pointer, type_compound_literal...)               \
     CCC_private_handle_bounded_map_insert_handle_w(                            \
-        Handle_bounded_map_handle_pointer, lazy_key_value)
+        Handle_bounded_map_handle_pointer, type_compound_literal)
 
 /** @brief Remove the handle from the map if Occupied.
 @param [in] h a pointer to the map handle.

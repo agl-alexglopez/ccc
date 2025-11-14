@@ -82,7 +82,7 @@ Initialize the container with memory, callbacks, and permissions. */
 /** @brief Declare a fixed size map type for use in the stack, heap, or data
 segment. Does not return a value.
 @param [in] fixed_map_type_name the user chosen name of the fixed sized map.
-@param [in] key_val_type_name the type the user plans to store in the map. It
+@param [in] type_name the type the user plans to store in the map. It
 may have a key and value field as well as any additional fields. For set-like
 behavior, wrap a field in a struct/union (e.g. `union int_node {int e;};`).
 @param [in] capacity the desired number of user accessible nodes.
@@ -145,9 +145,9 @@ This macro is not needed when a dynamic resizing map is needed. For dynamic
 maps, pass NULL and 0 capacity to the initialization macro along with the
 desired allocation function. */
 #define CCC_handle_adaptive_map_declare_fixed_map(fixed_map_type_name,         \
-                                                  key_val_type_name, capacity) \
-    CCC_private_handle_adaptive_map_declare_fixed_map(                         \
-        fixed_map_type_name, key_val_type_name, capacity)
+                                                  type_name, capacity)         \
+    CCC_private_handle_adaptive_map_declare_fixed_map(fixed_map_type_name,     \
+                                                      type_name, capacity)
 
 /** @brief Obtain the capacity previously chosen for the fixed size map type.
 @param [in] fixed_map_type_name the name of a previously declared map.
@@ -345,7 +345,7 @@ Obtain and operate on container handles for efficient queries when non-trivial
 control flow is needed. */
 /**@{*/
 
-/** @brief Invariantly inserts the key value wrapping key_val_type.
+/** @brief Invariantly inserts the key value wrapping type.
 @param [in] map the pointer to the adaptive map.
 @param [out] key_val_output the handle to the user type wrapping map elem.
 @return a handle. If Vacant, no prior element with key existed and the type
@@ -359,7 +359,7 @@ wraps it in a handle to provide information about the old value. */
 CCC_handle_adaptive_map_swap_handle(CCC_Handle_adaptive_map *map,
                                     void *key_val_output);
 
-/** @brief Invariantly inserts the key value wrapping key_val_type.
+/** @brief Invariantly inserts the key value wrapping type.
 @param [in] map_pointer the pointer to the adaptive map.
 @param [out] key_val_output_pointer the handle to the user type wrapping map
 elem.
@@ -380,30 +380,28 @@ wraps it in a handle to provide information about the old value. */
             .private                                                           \
     }
 
-/** @brief Attempts to insert the key value wrapping key_val_type.
+/** @brief Attempts to insert the key value wrapping type.
 @param [in] map the pointer to the map.
-@param [in] key_val_type the handle to the user type wrapping map elem.
+@param [in] type the handle to the user type wrapping map elem.
 @return a handle. If Occupied, the handle contains a reference to the key value
 user type in the map and may be unwrapped. If Vacant the handle contains a
 reference to the newly inserted handle in the map. If more space is needed but
 allocation fails, an insert error is set. */
 [[nodiscard]] CCC_Handle
 CCC_handle_adaptive_map_try_insert(CCC_Handle_adaptive_map *map,
-                                   void const *key_val_type);
+                                   void const *type);
 
-/** @brief Attempts to insert the key value wrapping key_val_type.
+/** @brief Attempts to insert the key value wrapping type.
 @param [in] map_pointer the pointer to the map.
-@param [in] key_val_type_pointer the handle to the user type wrapping map elem.
+@param [in] type_pointer the handle to the user type wrapping map elem.
 @return a compound literal reference to a handle. If Occupied, the handle
 contains a reference to the key value user type in the map and may be unwrapped.
 If Vacant the handle contains a reference to the newly inserted handle in the
 map. If more space is needed but allocation fails an insert error is set. */
-#define CCC_handle_adaptive_map_try_insert_r(map_pointer,                      \
-                                             key_val_type_pointer)             \
+#define CCC_handle_adaptive_map_try_insert_r(map_pointer, type_pointer)        \
     &(CCC_Handle)                                                              \
     {                                                                          \
-        CCC_handle_adaptive_map_try_insert((map_pointer),                      \
-                                           (key_val_type_pointer))             \
+        CCC_handle_adaptive_map_try_insert((map_pointer), (type_pointer))      \
             .private                                                           \
     }
 
@@ -430,7 +428,7 @@ compound literal matches the searched key. */
 
 /** @brief Invariantly inserts or overwrites a user struct into the map.
 @param [in] map a pointer to the handle hash map.
-@param [in] key_val_type the handle to the wrapping user struct key value.
+@param [in] type the handle to the wrapping user struct key value.
 @return a handle. If Occupied a handle was overwritten by the new key value.
 If Vacant no prior map handle existed.
 
@@ -438,7 +436,7 @@ Note that this function can be used when the old user type is not needed but
 the information regarding its presence is helpful. */
 [[nodiscard]] CCC_Handle
 CCC_handle_adaptive_map_insert_or_assign(CCC_Handle_adaptive_map *map,
-                                         void const *key_val_type);
+                                         void const *type);
 
 /** @brief Inserts a new key value pair or overwrites the existing handle.
 @param [in] map_pointer the pointer to the handle hash map.
@@ -599,7 +597,7 @@ evaluated in the closure scope. */
 
 /** @brief Inserts the struct with user type if the handle is Vacant.
 @param [in] handle the handle obtained via function or macro call.
-@param [in] key_val_type handle to the struct to be inserted to Vacant handle.
+@param [in] type handle to the struct to be inserted to Vacant handle.
 @return a pointer to handle in the map invariantly. NULL on error.
 
 Because this functions takes a handle and inserts if it is Vacant, the only
@@ -610,12 +608,12 @@ If no allocation is permitted, this function assumes the user struct wrapping
 elem has been allocated with the appropriate lifetime and scope by the user. */
 [[nodiscard]] CCC_Handle_index
 CCC_handle_adaptive_map_or_insert(CCC_Handle_adaptive_map_handle const *handle,
-                                  void const *key_val_type);
+                                  void const *type);
 
 /** @brief Lazily insert the desired key value into the handle if it is Vacant.
 @param [in] handle_pointer a pointer to the obtained handle.
-@param [in] lazy_key_value the compound literal to construct in place if the
-handle is Vacant.
+@param [in] type_compound_literal the compound literal to construct in place if
+the handle is Vacant.
 @return a reference to the unwrapped user type in the handle, either the
 unmodified reference if the handle was Occupied or the newly inserted element
 if the handle was Vacant. NULL is returned if resizing is required but fails or
@@ -623,28 +621,31 @@ is not allowed.
 
 Note that if the compound literal uses any function calls to generate values
 or other data, such functions will not be called if the handle is Occupied. */
-#define CCC_handle_adaptive_map_or_insert_w(handle_pointer, lazy_key_value...) \
-    CCC_private_handle_adaptive_map_or_insert_w(handle_pointer, lazy_key_value)
+#define CCC_handle_adaptive_map_or_insert_w(handle_pointer,                    \
+                                            type_compound_literal...)          \
+    CCC_private_handle_adaptive_map_or_insert_w(handle_pointer,                \
+                                                type_compound_literal)
 
 /** @brief Inserts the provided handle invariantly.
 @param [in] handle the handle returned from a call obtaining a handle.
-@param [in] key_val_type a handle to the struct the user intends to insert.
+@param [in] type a handle to the struct the user intends to insert.
 @return a pointer to the inserted element or NULL upon allocation failure.
 
 This method can be used when the old value in the map does not need to
 be preserved. See the regular insert method if the old value is of interest. */
 [[nodiscard]] CCC_Handle_index CCC_handle_adaptive_map_insert_handle(
-    CCC_Handle_adaptive_map_handle const *handle, void const *key_val_type);
+    CCC_Handle_adaptive_map_handle const *handle, void const *type);
 
-/** @brief Write the contents of the compound literal lazy_key_value to a node.
+/** @brief Write the contents of the compound literal type_compound_literal to a
+node.
 @param [in] handle_pointer a pointer to the obtained handle.
-@param [in] lazy_key_value the compound literal to write to a new slot.
+@param [in] type_compound_literal the compound literal to write to a new slot.
 @return a reference to the newly inserted or overwritten user type. NULL is
 returned if allocation failed or is not allowed when required. */
 #define CCC_handle_adaptive_map_insert_handle_w(handle_pointer,                \
-                                                lazy_key_value...)             \
+                                                type_compound_literal...)      \
     CCC_private_handle_adaptive_map_insert_handle_w(handle_pointer,            \
-                                                    lazy_key_value)
+                                                    type_compound_literal)
 
 /** @brief Remove the handle from the map if Occupied.
 @param [in] handle a pointer to the map handle.

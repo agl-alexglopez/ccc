@@ -371,11 +371,12 @@ reference to the inserted data rather than a entry with a status. This is
 because it should not fail. If NULL is returned the user knows there is a
 problem. */
 #define CCC_private_flat_hash_map_or_insert_w(Flat_hash_map_entry_pointer,     \
-                                              lazy_key_value...)               \
+                                              type_compound_literal...)        \
     (__extension__({                                                           \
         __auto_type private_flat_hash_map_or_ins_ent_pointer                   \
             = (Flat_hash_map_entry_pointer);                                   \
-        typeof(lazy_key_value) *private_flat_hash_map_or_ins_res = NULL;       \
+        typeof(type_compound_literal) *private_flat_hash_map_or_ins_res        \
+            = NULL;                                                            \
         if (private_flat_hash_map_or_ins_ent_pointer)                          \
         {                                                                      \
             if (!(private_flat_hash_map_or_ins_ent_pointer->private.status     \
@@ -389,7 +390,7 @@ problem. */
                 if (private_flat_hash_map_or_ins_ent_pointer->private.status   \
                     == CCC_ENTRY_VACANT)                                       \
                 {                                                              \
-                    *private_flat_hash_map_or_ins_res = lazy_key_value;        \
+                    *private_flat_hash_map_or_ins_res = type_compound_literal; \
                     CCC_private_flat_hash_map_set_insert(                      \
                         &private_flat_hash_map_or_ins_ent_pointer->private);   \
                 }                                                              \
@@ -401,11 +402,12 @@ problem. */
 /** @private Insert entry also should not fail and therefore returns a reference
 directly. This is similar to insert or assign where overwriting may occur. */
 #define CCC_private_flat_hash_map_insert_entry_w(Flat_hash_map_entry_pointer,  \
-                                                 lazy_key_value...)            \
+                                                 type_compound_literal...)     \
     (__extension__({                                                           \
         __auto_type private_flat_hash_map_ins_ent_pointer                      \
             = (Flat_hash_map_entry_pointer);                                   \
-        typeof(lazy_key_value) *private_flat_hash_map_ins_ent_res = NULL;      \
+        typeof(type_compound_literal) *private_flat_hash_map_ins_ent_res       \
+            = NULL;                                                            \
         if (private_flat_hash_map_ins_ent_pointer)                             \
         {                                                                      \
             if (!(private_flat_hash_map_ins_ent_pointer->private.status        \
@@ -415,7 +417,7 @@ directly. This is similar to insert or assign where overwriting may occur. */
                     = CCC_private_flat_hash_map_data_at(                       \
                         private_flat_hash_map_ins_ent_pointer->private.map,    \
                         private_flat_hash_map_ins_ent_pointer->private.index); \
-                *private_flat_hash_map_ins_ent_res = lazy_key_value;           \
+                *private_flat_hash_map_ins_ent_res = type_compound_literal;    \
                 if (private_flat_hash_map_ins_ent_pointer->private.status      \
                     == CCC_ENTRY_VACANT)                                       \
                 {                                                              \

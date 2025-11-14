@@ -157,11 +157,11 @@ void *CCC_private_bounded_map_insert(
 
 /** @private */
 #define CCC_private_bounded_map_insert_key_val(Bounded_map_entry, new_mem,     \
-                                               lazy_key_value...)              \
+                                               type_compound_literal...)       \
     (__extension__({                                                           \
         if (new_mem)                                                           \
         {                                                                      \
-            *new_mem = lazy_key_value;                                         \
+            *new_mem = type_compound_literal;                                  \
             new_mem = CCC_private_bounded_map_insert(                          \
                 (Bounded_map_entry)->map,                                      \
                 CCC_private_Bounded_map_node_in_slot(                          \
@@ -231,11 +231,11 @@ void *CCC_private_bounded_map_insert(
 
 /** @private */
 #define CCC_private_bounded_map_or_insert_w(Bounded_map_entry_pointer,         \
-                                            lazy_key_value...)                 \
+                                            type_compound_literal...)          \
     (__extension__({                                                           \
         __auto_type private_or_ins_entry_pointer                               \
             = (Bounded_map_entry_pointer);                                     \
-        typeof(lazy_key_value) *private_bounded_map_or_ins_ret = NULL;         \
+        typeof(type_compound_literal) *private_bounded_map_or_ins_ret = NULL;  \
         if (private_or_ins_entry_pointer)                                      \
         {                                                                      \
             if (private_or_ins_entry_pointer->private.entry.status             \
@@ -250,7 +250,7 @@ void *CCC_private_bounded_map_insert(
                     &private_or_ins_entry_pointer->private);                   \
                 CCC_private_bounded_map_insert_key_val(                        \
                     &private_or_ins_entry_pointer->private,                    \
-                    private_bounded_map_or_ins_ret, lazy_key_value);           \
+                    private_bounded_map_or_ins_ret, type_compound_literal);    \
             }                                                                  \
         }                                                                      \
         private_bounded_map_or_ins_ret;                                        \
@@ -258,10 +258,10 @@ void *CCC_private_bounded_map_insert(
 
 /** @private */
 #define CCC_private_bounded_map_insert_entry_w(Bounded_map_entry_pointer,      \
-                                               lazy_key_value...)              \
+                                               type_compound_literal...)       \
     (__extension__({                                                           \
         __auto_type private_ins_entry_pointer = (Bounded_map_entry_pointer);   \
-        typeof(lazy_key_value) *private_bounded_map_ins_ent_ret = NULL;        \
+        typeof(type_compound_literal) *private_bounded_map_ins_ent_ret = NULL; \
         if (private_ins_entry_pointer)                                         \
         {                                                                      \
             if (!(private_ins_entry_pointer->private.entry.status              \
@@ -271,7 +271,7 @@ void *CCC_private_bounded_map_insert(
                     &private_ins_entry_pointer->private);                      \
                 CCC_private_bounded_map_insert_key_val(                        \
                     &private_ins_entry_pointer->private,                       \
-                    private_bounded_map_ins_ent_ret, lazy_key_value);          \
+                    private_bounded_map_ins_ent_ret, type_compound_literal);   \
             }                                                                  \
             else if (private_ins_entry_pointer->private.entry.status           \
                      == CCC_ENTRY_OCCUPIED)                                    \
@@ -282,7 +282,7 @@ void *CCC_private_bounded_map_insert(
                         private_ins_entry_pointer->private.entry.type);        \
                 *((typeof(private_bounded_map_ins_ent_ret))                    \
                       private_ins_entry_pointer->private.entry.type)           \
-                    = lazy_key_value;                                          \
+                    = type_compound_literal;                                   \
                 *CCC_private_Bounded_map_node_in_slot(                         \
                     private_ins_entry_pointer->private.map,                    \
                     private_ins_entry_pointer->private.entry.type)             \

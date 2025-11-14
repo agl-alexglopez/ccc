@@ -281,7 +281,7 @@ runtime. */
 
 /** @private */
 #define CCC_private_handle_bounded_map_or_insert_w(                            \
-    Handle_bounded_map_handle_pointer, lazy_key_value...)                      \
+    Handle_bounded_map_handle_pointer, type_compound_literal...)               \
     (__extension__({                                                           \
         __auto_type private_or_ins_handle_pointer                              \
             = (Handle_bounded_map_handle_pointer);                             \
@@ -301,11 +301,11 @@ runtime. */
                         private_or_ins_handle_pointer->private.map);           \
                 if (private_handle_bounded_map_or_ins_ret)                     \
                 {                                                              \
-                    *((typeof(lazy_key_value) *)                               \
+                    *((typeof(type_compound_literal) *)                        \
                           CCC_private_handle_bounded_map_data_at(              \
                               private_or_ins_handle_pointer->private.map,      \
                               private_handle_bounded_map_or_ins_ret))          \
-                        = lazy_key_value;                                      \
+                        = type_compound_literal;                               \
                     CCC_private_handle_bounded_map_insert(                     \
                         private_or_ins_handle_pointer->private.map,            \
                         private_or_ins_handle_pointer->private.index,          \
@@ -319,7 +319,7 @@ runtime. */
 
 /** @private */
 #define CCC_private_handle_bounded_map_insert_handle_w(                        \
-    Handle_bounded_map_handle_pointer, lazy_key_value...)                      \
+    Handle_bounded_map_handle_pointer, type_compound_literal...)               \
     (__extension__({                                                           \
         __auto_type private_ins_handle_pointer                                 \
             = (Handle_bounded_map_handle_pointer);                             \
@@ -334,11 +334,11 @@ runtime. */
                         private_ins_handle_pointer->private.map);              \
                 if (private_handle_bounded_map_ins_hndl_ret)                   \
                 {                                                              \
-                    *((typeof(lazy_key_value) *)                               \
+                    *((typeof(type_compound_literal) *)                        \
                           CCC_private_handle_bounded_map_data_at(              \
                               private_ins_handle_pointer->private.map,         \
                               private_handle_bounded_map_ins_hndl_ret))        \
-                        = lazy_key_value;                                      \
+                        = type_compound_literal;                               \
                     CCC_private_handle_bounded_map_insert(                     \
                         private_ins_handle_pointer->private.map,               \
                         private_ins_handle_pointer->private.index,             \
@@ -351,11 +351,11 @@ runtime. */
             {                                                                  \
                 private_handle_bounded_map_ins_hndl_ret                        \
                     = private_ins_handle_pointer->private.index;               \
-                *((typeof(lazy_key_value) *)                                   \
+                *((typeof(type_compound_literal) *)                            \
                       CCC_private_handle_bounded_map_data_at(                  \
                           private_ins_handle_pointer->private.map,             \
                           private_handle_bounded_map_ins_hndl_ret))            \
-                    = lazy_key_value;                                          \
+                    = type_compound_literal;                                   \
             }                                                                  \
         }                                                                      \
         private_handle_bounded_map_ins_hndl_ret;                               \

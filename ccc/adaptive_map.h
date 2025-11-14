@@ -399,8 +399,8 @@ CCC_adaptive_map_or_insert(CCC_Adaptive_map_entry const *entry,
 
 /** @brief Lazily insert the desired key value into the entry if it is Vacant.
 @param [in] adaptive_map_entry_pointer a pointer to the obtained entry.
-@param [in] lazy_key_value the compound literal to construct in place if the
-entry is Vacant.
+@param [in] type_compound_literal the compound literal to construct in place if
+the entry is Vacant.
 @return a reference to the unwrapped user type in the entry, either the
 unmodified reference if the entry was Occupied or the newly inserted element
 if the entry was Vacant. NULL is returned if resizing is required but fails or
@@ -409,9 +409,9 @@ is not allowed.
 Note that if the compound literal uses any function calls to generate values
 or other data, such functions will not be called if the entry is Occupied. */
 #define CCC_adaptive_map_or_insert_w(adaptive_map_entry_pointer,               \
-                                     lazy_key_value...)                        \
+                                     type_compound_literal...)                 \
     CCC_private_adaptive_map_or_insert_w(adaptive_map_entry_pointer,           \
-                                         lazy_key_value)
+                                         type_compound_literal)
 
 /** @brief Inserts the provided entry invariantly.
 @param [in] entry the entry returned from a call obtaining an entry.
@@ -424,15 +424,16 @@ be preserved. See the regular insert method if the old value is of interest. */
 CCC_adaptive_map_insert_entry(CCC_Adaptive_map_entry const *entry,
                               CCC_Adaptive_map_node *type_intruder);
 
-/** @brief Write the contents of the compound literal lazy_key_value to a node.
+/** @brief Write the contents of the compound literal type_compound_literal to a
+node.
 @param [in] adaptive_map_entry_pointer a pointer to the obtained entry.
-@param [in] lazy_key_value the compound literal to write to a new slot.
+@param [in] type_compound_literal the compound literal to write to a new slot.
 @return a reference to the newly inserted or overwritten user type. NULL is
 returned if allocation failed or is not allowed when required. */
 #define CCC_adaptive_map_insert_entry_w(adaptive_map_entry_pointer,            \
-                                        lazy_key_value...)                     \
+                                        type_compound_literal...)              \
     CCC_private_adaptive_map_insert_entry_w(adaptive_map_entry_pointer,        \
-                                            lazy_key_value)
+                                            type_compound_literal)
 
 /** @brief Remove the entry from the map if Occupied.
 @param [in] entry a pointer to the map entry.

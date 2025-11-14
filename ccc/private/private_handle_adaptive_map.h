@@ -214,7 +214,7 @@ is of a known fixed size defined at compile time, not just a pointer. */
 
 /** @private */
 #define CCC_private_handle_adaptive_map_or_insert_w(                           \
-    Handle_adaptive_map_handle_pointer, lazy_key_value...)                     \
+    Handle_adaptive_map_handle_pointer, type_compound_literal...)              \
     (__extension__({                                                           \
         __auto_type private_handle_adaptive_map_or_ins_hndl_pointer            \
             = (Handle_adaptive_map_handle_pointer);                            \
@@ -237,12 +237,12 @@ is of a known fixed size defined at compile time, not just a pointer. */
                             ->private.map);                                    \
                 if (private_handle_adaptive_map_or_ins_ret)                    \
                 {                                                              \
-                    *((typeof(lazy_key_value) *)                               \
+                    *((typeof(type_compound_literal) *)                        \
                           CCC_private_handle_adaptive_map_data_at(             \
                               private_handle_adaptive_map_or_ins_hndl_pointer  \
                                   ->private.map,                               \
                               private_handle_adaptive_map_or_ins_ret))         \
-                        = lazy_key_value;                                      \
+                        = type_compound_literal;                               \
                     CCC_private_handle_adaptive_map_insert(                    \
                         private_handle_adaptive_map_or_ins_hndl_pointer        \
                             ->private.map,                                     \
@@ -255,7 +255,7 @@ is of a known fixed size defined at compile time, not just a pointer. */
 
 /** @private */
 #define CCC_private_handle_adaptive_map_insert_handle_w(                       \
-    Handle_adaptive_map_handle_pointer, lazy_key_value...)                     \
+    Handle_adaptive_map_handle_pointer, type_compound_literal...)              \
     (__extension__({                                                           \
         __auto_type private_handle_adaptive_map_ins_hndl_pointer               \
             = (Handle_adaptive_map_handle_pointer);                            \
@@ -271,12 +271,12 @@ is of a known fixed size defined at compile time, not just a pointer. */
                             .map);                                             \
                 if (private_handle_adaptive_map_ins_hndl_ret)                  \
                 {                                                              \
-                    *((typeof(lazy_key_value) *)                               \
+                    *((typeof(type_compound_literal) *)                        \
                           CCC_private_handle_adaptive_map_data_at(             \
                               private_handle_adaptive_map_ins_hndl_pointer     \
                                   ->private.map,                               \
                               private_handle_adaptive_map_ins_hndl_ret))       \
-                        = lazy_key_value;                                      \
+                        = type_compound_literal;                               \
                     CCC_private_handle_adaptive_map_insert(                    \
                         private_handle_adaptive_map_ins_hndl_pointer->private  \
                             .map,                                              \
@@ -287,13 +287,13 @@ is of a known fixed size defined at compile time, not just a pointer. */
                          .status                                               \
                      == CCC_ENTRY_OCCUPIED)                                    \
             {                                                                  \
-                *((typeof(lazy_key_value) *)                                   \
+                *((typeof(type_compound_literal) *)                            \
                       CCC_private_handle_adaptive_map_data_at(                 \
                           private_handle_adaptive_map_ins_hndl_pointer         \
                               ->private.map,                                   \
                           private_handle_adaptive_map_ins_hndl_pointer         \
                               ->private.index))                                \
-                    = lazy_key_value;                                          \
+                    = type_compound_literal;                                   \
                 private_handle_adaptive_map_ins_hndl_ret                       \
                     = private_handle_adaptive_map_ins_hndl_pointer->private    \
                           .index;                                              \
