@@ -141,12 +141,13 @@ check_static_begin(buffer_test_car_fleet)
     double slowest_time_to_target
         = ((double)(target - *buffer_as(&positions, int, 0)))
         / *buffer_as(&speeds, int, 0);
-    for (int const *iter = buffer_begin(&car_idx); iter != buffer_end(&car_idx);
-         iter = buffer_next(&car_idx, iter))
+    for (int const *iterator = buffer_begin(&car_idx);
+         iterator != buffer_end(&car_idx);
+         iterator = buffer_next(&car_idx, iterator))
     {
         double const time_of_closer_car
-            = ((double)(target - *buffer_as(&positions, int, *iter)))
-            / *buffer_as(&speeds, int, *iter);
+            = ((double)(target - *buffer_as(&positions, int, *iterator)))
+            / *buffer_as(&speeds, int, *iterator);
         if (time_of_closer_car > slowest_time_to_target)
         {
             ++fleets;

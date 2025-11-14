@@ -554,25 +554,25 @@ CCC_handle_adaptive_map_reverse_begin(CCC_Handle_adaptive_map const *const map)
 
 void *
 CCC_handle_adaptive_map_next(CCC_Handle_adaptive_map const *const map,
-                             void const *const iter)
+                             void const *const iterator)
 {
     if (!map || !map->capacity)
     {
         return NULL;
     }
-    size_t const n = next(map, index_of(map, iter), INORDER);
+    size_t const n = next(map, index_of(map, iterator), INORDER);
     return data_at(map, n);
 }
 
 void *
 CCC_handle_adaptive_map_reverse_next(CCC_Handle_adaptive_map const *const map,
-                                     void const *const iter)
+                                     void const *const iterator)
 {
-    if (!map || !iter || !map->capacity)
+    if (!map || !iterator || !map->capacity)
     {
         return NULL;
     }
-    size_t const n = next(map, index_of(map, iter), R_INORDER);
+    size_t const n = next(map, index_of(map, iterator), R_INORDER);
     return data_at(map, n);
 }
 

@@ -1016,12 +1016,12 @@ not obvious to the user, nor should any specific order be relied on. */
 
 /** @brief Advances the iterator to the next occupied table slot.
 @param [in] h the table being iterated upon.
-@param [in] key_val_type_iter the previous iterator.
+@param [in] key_val_type_iterator the previous iterator.
 @return a pointer that can be cast directly to the user type that is stored.
 @warning erasing or inserting during iteration may invalidate iterators if
 resizing occurs which would lead to undefined behavior. O(capacity). */
 [[nodiscard]] void *CCC_flat_hash_map_next(CCC_Flat_hash_map const *h,
-                                           void const *key_val_type_iter);
+                                           void const *key_val_type_iterator);
 
 /** @brief Check the current iterator against the end for loop termination.
 @param [in] h the table being iterated upon.

@@ -87,7 +87,7 @@ struct Huffman_node
     /** The leaf character if this node is a leaf. */
     char ch;
     /** The caching iterator to help emulate recursion with iteration. */
-    uint8_t iter;
+    uint8_t iterator;
 };
 
 /** Element intended for the flat priority queue during the tree building phase.
@@ -247,7 +247,7 @@ use it in the code block. Wrapping the code block in brackets is recommended for
 formatting, though not required.
 
 Do not return early or use goto out of this macro or memory will be leaked. */
-#define foreach_filechar(file_pointer, char_iter_name, codeblock...)           \
+#define foreach_filechar(file_pointer, char_iterator_name, codeblock...)       \
     do                                                                         \
     {                                                                          \
         check(fseek(file_pointer, 0L, SEEK_SET) >= 0);                         \
@@ -257,9 +257,9 @@ Do not return early or use goto out of this macro or memory will be leaked. */
         while ((read = getline(&linepointer, &len, f)) > 0)                    \
         {                                                                      \
             SV_String_view const line = {.s = linepointer, .len = read};       \
-            for (char const *char_iter_name = SV_begin(line);                  \
-                 char_iter_name != SV_end(line);                               \
-                 char_iter_name = SV_next(char_iter_name))                     \
+            for (char const *char_iterator_name = SV_begin(line);              \
+                 char_iterator_name != SV_end(line);                           \
+                 char_iterator_name = SV_next(char_iterator_name))             \
             {                                                                  \
                 codeblock                                                      \
             }                                                                  \
@@ -521,16 +521,16 @@ memoize_path(struct Huffman_tree *const tree, Flat_hash_map *const fh,
             break;
         }
         /* Wrong leaf or we have explored both subtrees of an internal node. */
-        if (!node->link[1] || node->iter >= ITER_END)
+        if (!node->link[1] || node->iterator >= ITER_END)
         {
-            node->iter = 0;
+            node->iterator = 0;
             cur = node->parent;
             bitq_pop_back(bq);
             continue;
         }
         /* Depth progression of depth first search. */
-        check(node->iter <= CCC_TRUE);
-        bitq_push_back(bq, node->iter);
+        check(node->iterator <= CCC_TRUE);
+        bitq_push_back(bq, node->iterator);
         /* During backtracking this helps us know which child subtree needs to
            be explored or if we are done and can continue backtracking. */
         cur = node->link[node->iter++];
@@ -538,7 +538,7 @@ memoize_path(struct Huffman_tree *const tree, Flat_hash_map *const fh,
     /* Cleanup because we now have the correct path. */
     for (; cur; cur = parent_i(tree, cur))
     {
-        node_at(tree, cur)->iter = 0;
+        node_at(tree, cur)->iterator = 0;
     }
     path->path_len = bitq_count(bq) - path->path_start_index;
 }
@@ -575,12 +575,12 @@ compress_tree(struct Huffman_tree *const tree)
                   == STRING_ARENA_OK);
             cur = node->parent;
         }
-        else if (node->iter < ITER_END)
+        else if (node->iterator < ITER_END)
         {
             /* We only push internal 1 nodes the first time on the way down. We
                still need to access the second child so don't push a bit when we
                are simply progressing to the next child subtree. */
-            if (node->iter == 0)
+            if (node->iterator == 0)
             {
                 bitq_push_back(&ret.tree_paths, CCC_TRUE);
             }
@@ -589,7 +589,7 @@ compress_tree(struct Huffman_tree *const tree)
         else
         {
             /* Both child subtrees have been explored, so cleanup/backtrack. */
-            node->iter = 0;
+            node->iterator = 0;
             cur = node->parent;
         }
     }
@@ -833,7 +833,7 @@ reconstruct_tree(struct Compressed_huffman_tree *const blueprint)
         }
         struct Huffman_node *const node_r = node_at(&ret, node);
         /* An internal node has further child subtrees to build. */
-        if (bit && node_r->iter < ITER_END)
+        if (bit && node_r->iterator < ITER_END)
         {
             parent = node;
             node = node_r->link[node_r->iter];

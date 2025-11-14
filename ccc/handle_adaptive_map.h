@@ -800,21 +800,21 @@ CCC_handle_adaptive_map_reverse_begin(CCC_Handle_adaptive_map const *map);
 
 /** @brief Return the next element in an inorder traversal of the map. O(1).
 @param [in] map a pointer to the map.
-@param [in] iter pointer to the current iterator user type.
+@param [in] iterator pointer to the current iterator user type.
 @return the next user type stored in the map in an inorder traversal. */
 [[nodiscard]] void *
 CCC_handle_adaptive_map_next(CCC_Handle_adaptive_map const *map,
-                             void const *iter);
+                             void const *iterator);
 
 /** @brief Return the reverse_next element in a reverse inorder traversal of the
 map. O(1).
 @param [in] map a pointer to the map.
-@param [in] iter pointer to the current iterator user type.
+@param [in] iterator pointer to the current iterator user type.
 @return the reverse_next user type stored in the map in a reverse inorder
 traversal. */
 [[nodiscard]] void *
 CCC_handle_adaptive_map_reverse_next(CCC_Handle_adaptive_map const *map,
-                                     void const *iter);
+                                     void const *iterator);
 
 /** @brief Return the end of an inorder traversal of the map. O(1).
 @param [in] map a pointer to the map.

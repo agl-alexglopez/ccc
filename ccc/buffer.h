@@ -525,11 +525,13 @@ end iterator if the Buffer size is 0. NULL is returned if a NULL argument is
 provided or the Buffer has not yet been allocated. */
 [[nodiscard]] void *CCC_buffer_begin(CCC_Buffer const *buf);
 
-/** @brief advance the iter to the next slot in the Buffer according to size.
+/** @brief advance the iterator to the next slot in the Buffer according to
+size.
 @param [in] buf the pointer to the buffer.
-@param [in] iter the pointer to the current slot of the buffer.
+@param [in] iterator the pointer to the current slot of the buffer.
 @return the next iterator position according to size. */
-[[nodiscard]] void *CCC_buffer_next(CCC_Buffer const *buf, void const *iter);
+[[nodiscard]] void *CCC_buffer_next(CCC_Buffer const *buf,
+                                    void const *iterator);
 
 /** @brief return the end position of the Buffer according to size.
 @param [in] buf the pointer to the buffer.
@@ -558,14 +560,14 @@ Buffer reverse_end iterator if the Buffer size is 0. NULL is returned if a NULL
 argument is provided or the Buffer has not yet been allocated. */
 [[nodiscard]] void *CCC_buffer_reverse_begin(CCC_Buffer const *buf);
 
-/** @brief advance the iter to the next slot in the Buffer according to size and
-in reverse order.
+/** @brief advance the iterator to the next slot in the Buffer according to size
+and in reverse order.
 @param [in] buf the pointer to the buffer.
-@param [in] iter the pointer to the current slot of the buffer.
+@param [in] iterator the pointer to the current slot of the buffer.
 @return the next iterator position according to size and in reverse order. NULL
 is returned if bad input is provided or the Buffer has not been allocated. */
 [[nodiscard]] void *CCC_buffer_reverse_next(CCC_Buffer const *buf,
-                                            void const *iter);
+                                            void const *iterator);
 
 /** @brief return the reverse_end position of the buffer.
 @param [in] buf the pointer to the buffer.

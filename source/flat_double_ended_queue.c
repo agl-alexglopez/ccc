@@ -277,11 +277,11 @@ CCC_flat_double_ended_queue_reverse_begin(
 void *
 CCC_flat_double_ended_queue_next(
     CCC_Flat_double_ended_queue const *const flat_double_ended_queue,
-    void const *const iter_pointer)
+    void const *const iterator_pointer)
 {
     size_t const next_i
         = increment(flat_double_ended_queue,
-                    index_of(flat_double_ended_queue, iter_pointer));
+                    index_of(flat_double_ended_queue, iterator_pointer));
     if (next_i == flat_double_ended_queue->front
         || distance(flat_double_ended_queue, next_i,
                     flat_double_ended_queue->front)
@@ -295,9 +295,9 @@ CCC_flat_double_ended_queue_next(
 void *
 CCC_flat_double_ended_queue_reverse_next(
     CCC_Flat_double_ended_queue const *const flat_double_ended_queue,
-    void const *const iter_pointer)
+    void const *const iterator_pointer)
 {
-    size_t const cur_i = index_of(flat_double_ended_queue, iter_pointer);
+    size_t const cur_i = index_of(flat_double_ended_queue, iterator_pointer);
     size_t const next_i = decrement(flat_double_ended_queue, cur_i);
     size_t const reverse_begin = last_node_index(flat_double_ended_queue);
     if (next_i == reverse_begin
@@ -510,15 +510,16 @@ CCC_flat_double_ended_queue_validate(
     {
         return CCC_TRUE;
     }
-    void *iter = CCC_flat_double_ended_queue_begin(flat_double_ended_queue);
-    if (CCC_buffer_i(&flat_double_ended_queue->buf, iter).count
+    void *iterator = CCC_flat_double_ended_queue_begin(flat_double_ended_queue);
+    if (CCC_buffer_i(&flat_double_ended_queue->buf, iterator).count
         != flat_double_ended_queue->front)
     {
         return CCC_FALSE;
     }
     size_t size = 0;
-    for (; iter != CCC_flat_double_ended_queue_end(flat_double_ended_queue);
-         iter = CCC_flat_double_ended_queue_next(flat_double_ended_queue, iter),
+    for (; iterator != CCC_flat_double_ended_queue_end(flat_double_ended_queue);
+         iterator
+         = CCC_flat_double_ended_queue_next(flat_double_ended_queue, iterator),
          ++size)
     {
         if (size
@@ -533,16 +534,17 @@ CCC_flat_double_ended_queue_validate(
         return CCC_FALSE;
     }
     size = 0;
-    iter = CCC_flat_double_ended_queue_reverse_begin(flat_double_ended_queue);
-    if (CCC_buffer_i(&flat_double_ended_queue->buf, iter).count
+    iterator
+        = CCC_flat_double_ended_queue_reverse_begin(flat_double_ended_queue);
+    if (CCC_buffer_i(&flat_double_ended_queue->buf, iterator).count
         != last_node_index(flat_double_ended_queue))
     {
         return CCC_FALSE;
     }
-    for (; iter
+    for (; iterator
            != CCC_flat_double_ended_queue_reverse_end(flat_double_ended_queue);
-         iter = CCC_flat_double_ended_queue_reverse_next(
-             flat_double_ended_queue, iter),
+         iterator = CCC_flat_double_ended_queue_reverse_next(
+             flat_double_ended_queue, iterator),
          ++size)
     {
         if (size
@@ -844,32 +846,32 @@ maybe_resize(struct CCC_Flat_double_ended_queue *const q,
     return CCC_RESULT_OK;
 }
 
-/** Returns the distance between the current iter position and the origin
+/** Returns the distance between the current iterator position and the origin
 position. Distance is calculated in ascending indices, meaning the result is
-the number of forward steps in the Buffer origin would need to take reach iter,
-possibly accounting for wrapping around the end of the buffer. */
+the number of forward steps in the Buffer origin would need to take reach
+iterator, possibly accounting for wrapping around the end of the buffer. */
 static inline size_t
 distance(
     struct CCC_Flat_double_ended_queue const *const flat_double_ended_queue,
-    size_t const iter, size_t const origin)
+    size_t const iterator, size_t const origin)
 {
-    return iter > origin
-             ? iter - origin
-             : (flat_double_ended_queue->buf.capacity - origin) + iter;
+    return iterator > origin
+             ? iterator - origin
+             : (flat_double_ended_queue->buf.capacity - origin) + iterator;
 }
 
-/** Returns the rdistance between the current iter position and the origin
+/** Returns the rdistance between the current iterator position and the origin
 position. Rdistance is calculated in descending indices, meaning the result is
 the number of backward steps in the Buffer origin would need to take to reach
-iter, possibly accounting for wrapping around the beginning of buffer. */
+iterator, possibly accounting for wrapping around the beginning of buffer. */
 static inline size_t
 rdistance(
     struct CCC_Flat_double_ended_queue const *const flat_double_ended_queue,
-    size_t const iter, size_t const origin)
+    size_t const iterator, size_t const origin)
 {
-    return iter > origin
-             ? (flat_double_ended_queue->buf.capacity - iter) + origin
-             : origin - iter;
+    return iterator > origin
+             ? (flat_double_ended_queue->buf.capacity - iterator) + origin
+             : origin - iterator;
 }
 
 static inline size_t

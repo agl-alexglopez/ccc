@@ -675,14 +675,14 @@ CCC_flat_hash_map_begin(CCC_Flat_hash_map const *const h)
 
 void *
 CCC_flat_hash_map_next(CCC_Flat_hash_map const *const h,
-                       void const *const key_val_type_iter)
+                       void const *const key_val_type_iterator)
 {
-    if (unlikely(!h || !key_val_type_iter || !h->mask || is_uninitialized(h)
+    if (unlikely(!h || !key_val_type_iterator || !h->mask || is_uninitialized(h)
                  || !h->count))
     {
         return NULL;
     }
-    CCC_Count i = data_i(h, key_val_type_iter);
+    CCC_Count i = data_i(h, key_val_type_iterator);
     if (i.error)
     {
         return NULL;

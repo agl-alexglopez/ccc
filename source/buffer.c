@@ -426,31 +426,31 @@ CCC_buffer_reverse_begin(CCC_Buffer const *const buf)
 }
 
 void *
-CCC_buffer_next(CCC_Buffer const *const buf, void const *const iter)
+CCC_buffer_next(CCC_Buffer const *const buf, void const *const iterator)
 {
     if (!buf || !buf->mem)
     {
         return NULL;
     }
-    if (iter >= CCC_buffer_capacity_end(buf))
+    if (iterator >= CCC_buffer_capacity_end(buf))
     {
         return CCC_buffer_end(buf);
     }
-    return (unsigned char *)iter + buf->sizeof_type;
+    return (unsigned char *)iterator + buf->sizeof_type;
 }
 
 void *
-CCC_buffer_reverse_next(CCC_Buffer const *const buf, void const *const iter)
+CCC_buffer_reverse_next(CCC_Buffer const *const buf, void const *const iterator)
 {
     if (!buf || !buf->mem)
     {
         return NULL;
     }
-    if (iter <= CCC_buffer_reverse_end(buf))
+    if (iterator <= CCC_buffer_reverse_end(buf))
     {
         return CCC_buffer_reverse_end(buf);
     }
-    return (char *)iter - buf->sizeof_type;
+    return (char *)iterator - buf->sizeof_type;
 }
 
 /** We accept that end may be the address past Buffer capacity. */

@@ -593,7 +593,7 @@ limitations under the License.
         CCC_Bounded_map const *: CCC_bounded_map_reverse_begin)(               \
         (container_pointer))
 
-#define CCC_private_next(container_pointer, void_iter_pointer)                 \
+#define CCC_private_next(container_pointer, void_iterator_pointer)             \
     _Generic((container_pointer),                                              \
         CCC_Buffer *: CCC_buffer_next,                                         \
         CCC_Flat_hash_map *: CCC_flat_hash_map_next,                           \
@@ -612,10 +612,10 @@ limitations under the License.
         CCC_Singly_linked_list const *: CCC_singly_linked_list_next,           \
         CCC_Doubly_linked_list const *: CCC_doubly_linked_list_next,           \
         CCC_Handle_bounded_map const *: CCC_handle_bounded_map_next,           \
-        CCC_Bounded_map const *: CCC_bounded_map_next)((container_pointer),    \
-                                                       (void_iter_pointer))
+        CCC_Bounded_map const *: CCC_bounded_map_next)(                        \
+        (container_pointer), (void_iterator_pointer))
 
-#define CCC_private_reverse_next(container_pointer, void_iter_pointer)         \
+#define CCC_private_reverse_next(container_pointer, void_iterator_pointer)     \
     _Generic((container_pointer),                                              \
         CCC_Buffer *: CCC_buffer_reverse_next,                                 \
         CCC_Adaptive_map *: CCC_adaptive_map_reverse_next,                     \
@@ -633,7 +633,7 @@ limitations under the License.
         CCC_Doubly_linked_list const *: CCC_doubly_linked_list_reverse_next,   \
         CCC_Handle_bounded_map const *: CCC_handle_bounded_map_reverse_next,   \
         CCC_Bounded_map const *: CCC_bounded_map_reverse_next)(                \
-        (container_pointer), (void_iter_pointer))
+        (container_pointer), (void_iterator_pointer))
 
 #define CCC_private_end(container_pointer)                                     \
     _Generic((container_pointer),                                              \

@@ -27,17 +27,17 @@ check_static_begin(check_range, Adaptive_map const *const rom,
         check(((struct Val *)range_end(r))->key, expect_range[n - 1]);
     }
     size_t index = 0;
-    struct Val *iter = range_begin(r);
-    for (; iter != range_end(r) && index < n;
-         iter = next(rom, &iter->elem), ++index)
+    struct Val *iterator = range_begin(r);
+    for (; iterator != range_end(r) && index < n;
+         iterator = next(rom, &iterator->elem), ++index)
     {
-        int const cur_id = iter->key;
+        int const cur_id = iterator->key;
         check(expect_range[index], cur_id);
     }
-    check(iter, range_end(r));
-    if (iter)
+    check(iterator, range_end(r));
+    if (iterator)
     {
-        check(((struct Val *)iter)->key, expect_range[n - 1]);
+        check(((struct Val *)iterator)->key, expect_range[n - 1]);
     }
     check_fail_end({
         (void)fprintf(stderr, "%sCHECK: (int[%zu]){", CHECK_GREEN, n);
@@ -48,28 +48,29 @@ check_static_begin(check_range, Adaptive_map const *const rom,
         (void)fprintf(stderr, "}\n%s", CHECK_NONE);
         (void)fprintf(stderr, "%sCHECK_ERROR:%s (int[%zu]){", CHECK_RED,
                       CHECK_GREEN, n);
-        iter = range_begin(r);
-        for (size_t j = 0; j < n && iter != range_end(r);
-             ++j, iter = next(rom, &iter->elem))
+        iterator = range_begin(r);
+        for (size_t j = 0; j < n && iterator != range_end(r);
+             ++j, iterator = next(rom, &iterator->elem))
         {
-            if (!iter)
+            if (!iterator)
             {
                 return CHECK_STATUS;
             }
-            if (expect_range[j] == iter->key)
+            if (expect_range[j] == iterator->key)
             {
                 (void)fprintf(stderr, "%s%d, %s", CHECK_GREEN, expect_range[j],
                               CHECK_NONE);
             }
             else
             {
-                (void)fprintf(stderr, "%s%d, %s", CHECK_RED, iter->key,
+                (void)fprintf(stderr, "%s%d, %s", CHECK_RED, iterator->key,
                               CHECK_NONE);
             }
         }
-        for (; iter != range_end(r); iter = next(rom, &iter->elem))
+        for (; iterator != range_end(r); iterator = next(rom, &iterator->elem))
         {
-            (void)fprintf(stderr, "%s%d, %s", CHECK_RED, iter->key, CHECK_NONE);
+            (void)fprintf(stderr, "%s%d, %s", CHECK_RED, iterator->key,
+                          CHECK_NONE);
         }
         (void)fprintf(stderr, "%s}\n%s", CHECK_GREEN, CHECK_NONE);
     });
@@ -89,18 +90,19 @@ check_static_begin(check_range_reverse, Adaptive_map const *const rom,
         check(((struct Val *)range_reverse_end(r))->key,
               expect_range_reverse[n - 1]);
     }
-    struct Val *iter = range_reverse_begin(r);
+    struct Val *iterator = range_reverse_begin(r);
     size_t index = 0;
-    for (; iter != range_reverse_end(r); iter = reverse_next(rom, &iter->elem))
+    for (; iterator != range_reverse_end(r);
+         iterator = reverse_next(rom, &iterator->elem))
     {
-        int const cur_id = iter->key;
+        int const cur_id = iterator->key;
         check(expect_range_reverse[index], cur_id);
         ++index;
     }
-    check(iter, range_reverse_end(r));
-    if (iter)
+    check(iterator, range_reverse_end(r));
+    if (iterator)
     {
-        check(((struct Val *)iter)->key, expect_range_reverse[n - 1]);
+        check(((struct Val *)iterator)->key, expect_range_reverse[n - 1]);
     }
     check_fail_end({
         (void)fprintf(stderr, "%sCHECK: (int[%zu]){", CHECK_GREEN, n);
@@ -112,29 +114,30 @@ check_static_begin(check_range_reverse, Adaptive_map const *const rom,
         (void)fprintf(stderr, "}\n%s", CHECK_NONE);
         (void)fprintf(stderr, "%sCHECK_ERROR:%s (int[%zu]){", CHECK_RED,
                       CHECK_GREEN, n);
-        iter = range_reverse_begin(r);
-        for (j = 0; j < n && iter != range_reverse_end(r);
-             ++j, iter = reverse_next(rom, &iter->elem))
+        iterator = range_reverse_begin(r);
+        for (j = 0; j < n && iterator != range_reverse_end(r);
+             ++j, iterator = reverse_next(rom, &iterator->elem))
         {
-            if (!iter)
+            if (!iterator)
             {
                 return CHECK_STATUS;
             }
-            if (expect_range_reverse[j] == iter->key)
+            if (expect_range_reverse[j] == iterator->key)
             {
                 (void)fprintf(stderr, "%s%d, %s", CHECK_GREEN,
                               expect_range_reverse[j], CHECK_NONE);
             }
             else
             {
-                (void)fprintf(stderr, "%s%d, %s", CHECK_RED, iter->key,
+                (void)fprintf(stderr, "%s%d, %s", CHECK_RED, iterator->key,
                               CHECK_NONE);
             }
         }
-        for (; iter != range_reverse_end(r);
-             iter = reverse_next(rom, &iter->elem))
+        for (; iterator != range_reverse_end(r);
+             iterator = reverse_next(rom, &iterator->elem))
         {
-            (void)fprintf(stderr, "%s%d, %s", CHECK_RED, iter->key, CHECK_NONE);
+            (void)fprintf(stderr, "%s%d, %s", CHECK_RED, iterator->key,
+                          CHECK_NONE);
         }
         (void)fprintf(stderr, "%s}\n%s", CHECK_GREEN, CHECK_NONE);
     });
@@ -143,25 +146,25 @@ check_static_begin(check_range_reverse, Adaptive_map const *const rom,
 check_static_begin(iterator_check, CCC_Adaptive_map *s)
 {
     size_t const size = count(s).count;
-    size_t iter_count = 0;
+    size_t iterator_count = 0;
     for (struct Val *e = begin(s); e != end(s); e = next(s, &e->elem))
     {
-        ++iter_count;
-        check(iter_count <= size, true);
+        ++iterator_count;
+        check(iterator_count <= size, true);
     }
-    check(iter_count, size);
-    iter_count = 0;
+    check(iterator_count, size);
+    iterator_count = 0;
     for (struct Val *e = reverse_begin(s); e != end(s);
          e = reverse_next(s, &e->elem))
     {
-        ++iter_count;
-        check(iter_count <= size, true);
+        ++iterator_count;
+        check(iterator_count <= size, true);
     }
-    check(iter_count, size);
+    check(iterator_count, size);
     check_end();
 }
 
-check_static_begin(adaptive_map_test_forward_iter)
+check_static_begin(adaptive_map_test_forward_iterator)
 {
     CCC_Adaptive_map s = CCC_adaptive_map_initialize(s, struct Val, elem, key,
                                                      id_order, NULL, NULL);
@@ -380,8 +383,9 @@ int
 main()
 {
     return check_run(
-        adaptive_map_test_forward_iter(), adaptive_map_test_iterate_removal(),
-        adaptive_map_test_valid_range(), adaptive_map_test_invalid_range(),
+        adaptive_map_test_forward_iterator(),
+        adaptive_map_test_iterate_removal(), adaptive_map_test_valid_range(),
+        adaptive_map_test_invalid_range(),
         adaptive_map_test_valid_range_equals(), adaptive_map_test_empty_range(),
         adaptive_map_test_iterate_remove_reinsert());
 }

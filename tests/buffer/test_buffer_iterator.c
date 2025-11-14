@@ -9,7 +9,7 @@
 #include "ccc/types.h"
 #include "checkers.h"
 
-check_static_begin(buffer_test_iter_forward)
+check_static_begin(buffer_test_iterator_forward)
 {
     Buffer const b = buffer_initialize(((int[6]){1, 2, 3, 4, 5, 6}), int, NULL,
                                        NULL, 6, 6);
@@ -26,7 +26,7 @@ check_static_begin(buffer_test_iter_forward)
     check_end();
 }
 
-check_static_begin(buffer_test_iter_reverse)
+check_static_begin(buffer_test_iterator_reverse)
 {
     Buffer const b = buffer_initialize(((int[6]){1, 2, 3, 4, 5, 6}), int, NULL,
                                        NULL, 6, 6);
@@ -115,7 +115,7 @@ check_static_begin(buffer_test_trap_rainwater_two_pointers)
 int
 main(void)
 {
-    return check_run(buffer_test_iter_forward(), buffer_test_iter_reverse(),
-                     buffer_test_reverse_buf(),
+    return check_run(buffer_test_iterator_forward(),
+                     buffer_test_iterator_reverse(), buffer_test_reverse_buf(),
                      buffer_test_trap_rainwater_two_pointers());
 }

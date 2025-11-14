@@ -411,20 +411,20 @@ NULL if empty. */
 /** @brief Return the next element in the flat_double_ended_queue moving front
 to back. O(1).
 @param [in] flat_double_ended_queue a pointer to the flat_double_ended_queue.
-@param [in] iter_pointer the current element in the flat_double_ended_queue.
-@return the element following iter_pointer or NULL if no elements follow. */
+@param [in] iterator_pointer the current element in the flat_double_ended_queue.
+@return the element following iterator_pointer or NULL if no elements follow. */
 [[nodiscard]] void *CCC_flat_double_ended_queue_next(
     CCC_Flat_double_ended_queue const *flat_double_ended_queue,
-    void const *iter_pointer);
+    void const *iterator_pointer);
 
 /** @brief Return the next element in the flat_double_ended_queue moving back to
 front. O(1).
 @param [in] flat_double_ended_queue a pointer to the flat_double_ended_queue.
-@param [in] iter_pointer the current element in the flat_double_ended_queue.
-@return the element preceding iter_pointer or NULL if no elements follow. */
+@param [in] iterator_pointer the current element in the flat_double_ended_queue.
+@return the element preceding iterator_pointer or NULL if no elements follow. */
 [[nodiscard]] void *CCC_flat_double_ended_queue_reverse_next(
     CCC_Flat_double_ended_queue const *flat_double_ended_queue,
-    void const *iter_pointer);
+    void const *iterator_pointer);
 
 /** @brief Return a pointer to the end element. It may not be accessed. O(1).
 @param [in] flat_double_ended_queue a pointer to the flat_double_ended_queue.

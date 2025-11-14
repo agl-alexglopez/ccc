@@ -693,32 +693,32 @@ CCC_handle_bounded_map_reverse_begin(
 void *
 CCC_handle_bounded_map_next(
     CCC_Handle_bounded_map const *const handle_bounded_map,
-    void const *const key_val_type_iter)
+    void const *const key_val_type_iterator)
 {
-    if (!handle_bounded_map || !key_val_type_iter
+    if (!handle_bounded_map || !key_val_type_iterator
         || !handle_bounded_map->capacity)
     {
         return NULL;
     }
     size_t const n
         = next(handle_bounded_map,
-               index_of(handle_bounded_map, key_val_type_iter), INORDER);
+               index_of(handle_bounded_map, key_val_type_iterator), INORDER);
     return data_at(handle_bounded_map, n);
 }
 
 void *
 CCC_handle_bounded_map_reverse_next(
     CCC_Handle_bounded_map const *const handle_bounded_map,
-    void const *const key_val_type_iter)
+    void const *const key_val_type_iterator)
 {
-    if (!handle_bounded_map || !key_val_type_iter
+    if (!handle_bounded_map || !key_val_type_iterator
         || !handle_bounded_map->capacity)
     {
         return NULL;
     }
     size_t const n
         = next(handle_bounded_map,
-               index_of(handle_bounded_map, key_val_type_iter), RINORDER);
+               index_of(handle_bounded_map, key_val_type_iterator), RINORDER);
     return data_at(handle_bounded_map, n);
 }
 

@@ -887,23 +887,23 @@ CCC_handle_bounded_map_begin(CCC_Handle_bounded_map const *handle_bounded_map);
 
 /** @brief Return the next element in an inorder traversal of the map. O(1).
 @param [in] handle_bounded_map a pointer to the map.
-@param [in] key_val_type_iter a pointer to the intrusive map element of the
+@param [in] key_val_type_iterator a pointer to the intrusive map element of the
 current iterator.
 @return the next user type stored in the map in an inorder traversal. */
 [[nodiscard]] void *
 CCC_handle_bounded_map_next(CCC_Handle_bounded_map const *handle_bounded_map,
-                            void const *key_val_type_iter);
+                            void const *key_val_type_iterator);
 
 /** @brief Return the reverse_next element in a reverse inorder traversal of the
 map. O(1).
 @param [in] handle_bounded_map a pointer to the map.
-@param [in] key_val_type_iter a pointer to the intrusive map element of the
+@param [in] key_val_type_iterator a pointer to the intrusive map element of the
 current iterator.
 @return the reverse_next user type stored in the map in a reverse inorder
 traversal. */
 [[nodiscard]] void *CCC_handle_bounded_map_reverse_next(
     CCC_Handle_bounded_map const *handle_bounded_map,
-    void const *key_val_type_iter);
+    void const *key_val_type_iterator);
 
 /** @brief Return the end of an inorder traversal of the map. O(1).
 @param [in] handle_bounded_map a pointer to the map.
