@@ -82,7 +82,7 @@ Initialize the container with memory, callbacks, and permissions. */
 /** @brief Initialize a contiguous Buffer of user a specified type, allocation
 policy, capacity, and optional starting size.
 @param[in] mem_pointer the pointer to existing memory or NULL.
-@param[in] any_type_name the name of the user type in the buffer.
+@param[in] type_name the name of the user type in the buffer.
 @param[in] allocate CCC_Allocator or NULL if no allocation is permitted.
 @param[in] context_data any context data needed for managing Buffer memory.
 @param[in] capacity the capacity of memory at mem_pointer.
@@ -115,9 +115,9 @@ provide an allocation function. If a dynamic Buffer is preferred, provide the
 allocation function as defined by the signature in types.h. If resizing is
 desired on memory that has already been allocated, ensure allocation has
 occurred with the provided allocation function. */
-#define CCC_buffer_initialize(mem_pointer, any_type_name, allocate,            \
-                              context_data, capacity, optional_size...)        \
-    CCC_private_buffer_initialize(mem_pointer, any_type_name, allocate,        \
+#define CCC_buffer_initialize(mem_pointer, type_name, allocate, context_data,  \
+                              capacity, optional_size...)                      \
+    CCC_private_buffer_initialize(mem_pointer, type_name, allocate,            \
                                   context_data, capacity, optional_size)
 
 /** @brief Initialize a Buffer from a compound literal array initializer.
@@ -171,6 +171,7 @@ CCC_buffer_initialize() macro. */
                             compound_literal_array)
 
 /** @brief Initialize a Buffer with a capacity.
+@param[in] type_name any user or language standard type name.
 @param[in] allocate CCC_Allocator or NULL if no allocation is permitted.
 @param[in] context_data any context data needed for managing Buffer memory.
 @param[in] capacity the capacity of the Buffer to reserve.
@@ -193,9 +194,8 @@ main(void)
 Only dynamic buffers may be initialized this way. For static or stack based
 initialization of fixed buffers with contents known at compile time, see the
 CCC_buffer_initialize() macro. */
-#define CCC_buffer_with_capacity(any_type_name, allocate, context_data,        \
-                                 capacity)                                     \
-    CCC_private_buffer_with_capacity(any_type_name, allocate, context_data,    \
+#define CCC_buffer_with_capacity(type_name, allocate, context_data, capacity)  \
+    CCC_private_buffer_with_capacity(type_name, allocate, context_data,        \
                                      capacity)
 
 /** @brief Reserves space for at least to_add more elements.

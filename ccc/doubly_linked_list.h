@@ -271,7 +271,7 @@ Sort the container. */
 
 /** @brief Sorts the doubly linked list in non-decreasing order as defined by
 the provided comparison function. `O(N * log(N))` time, `O(1)` space.
-@param[in] Doubly_linked_list a pointer to the doubly linked list to sort.
+@param[in] doubly_linked_list a pointer to the doubly linked list to sort.
 @return the result of the sort, usually OK. An arg error if doubly_linked_list
 is null. */
 CCC_Result

@@ -67,14 +67,14 @@ vector instructions we can try. */
 portable implementation. Consider exposing to user in header docs. */
 #ifdef CCC_HAS_X86_SIMD
 
-/** @private The 128 bit vector type for efficient SIMD group scanning. 16 one
+/** @internal The 128 bit vector type for efficient SIMD group scanning. 16 one
 byte large tags fit in this type. */
 struct Group
 {
     __m128i v;
 };
 
-/** @private Because we use 128 bit vectors over tags the results of various
+/** @internal Because we use 128 bit vectors over tags the results of various
 operations can be compressed into a 16 bit integer. */
 struct Match_mask
 {
@@ -83,103 +83,103 @@ struct Match_mask
 
 enum : typeof((struct Match_mask){}.v)
 {
-    /** @private MSB tag bit used for static assert. */
+    /** @internal MSB tag bit used for static assert. */
     MATCH_MASK_MSB = 0x8000,
-    /** @private All bits on in a mask except for the 0th tag bit. */
+    /** @internal All bits on in a mask except for the 0th tag bit. */
     MATCH_MASK_0TH_TAG_OFF = 0xFFFE,
 };
 
 #elifdef CCC_HAS_ARM_SIMD
 
-/** @private The 64 bit vector is used on NEON due to a lack of ability to
+/** @internal The 64 bit vector is used on NEON due to a lack of ability to
 compress a 128 bit vector to a smaller int efficiently. */
 struct Group
 {
-    /** @private NEON offers a specific type for 64 bit manipulations. */
+    /** @internal NEON offers a specific type for 64 bit manipulations. */
     uint8x8_t v;
 };
 
-/** @private The mask will consist of 8 bytes with the most significant bit of
+/** @internal The mask will consist of 8 bytes with the most significant bit of
 each byte on to indicate match statuses. */
 struct Match_mask
 {
-    /** @private NEON returns this type from various uint8x8_t operations. */
+    /** @internal NEON returns this type from various uint8x8_t operations. */
     uint64_t v;
 };
 
 enum : uint64_t
 {
-    /** @private MSB tag bit used for static assert. */
+    /** @internal MSB tag bit used for static assert. */
     MATCH_MASK_MSB = 0x8000000000000000,
-    /** @private MSB tag bits used for byte and word level masking. */
+    /** @internal MSB tag bits used for byte and word level masking. */
     MATCH_MASK_TAGS_MSBS = 0x8080808080808080,
-    /** @private LSB tag bits used for byte and word level masking. */
+    /** @internal LSB tag bits used for byte and word level masking. */
     MATCH_MASK_TAGS_LSBS = 0x101010101010101,
-    /** @private Debug mode check for bits that must be off in match. */
+    /** @internal Debug mode check for bits that must be off in match. */
     MATCH_MASK_TAGS_OFF_BITS = 0x7F7F7F7F7F7F7F7F,
-    /** @private The MSB of each byte on except 0th is 0x00. */
+    /** @internal The MSB of each byte on except 0th is 0x00. */
     MATCH_MASK_0TH_TAG_OFF = 0x8080808080808000,
 };
 
-enum : typeof((struct CCC_flat_hash_map_tag){}.v)
+enum : typeof((struct CCC_Flat_hash_map_tag){}.v)
 {
-    /** @private Bits in a tag used to help in creating a group of one tag. */
-    TAG_BITS = sizeof(struct CCC_flat_hash_map_tag) * CHAR_BIT,
+    /** @internal Bits in a tag used to help in creating a group of one tag. */
+    TAG_BITS = sizeof(struct CCC_Flat_hash_map_tag) * CHAR_BIT,
 };
 
 #else /* PORTABLE FALLBACK */
 
-/** @private The 8 byte word for managing multiple simultaneous equality checks.
-In contrast to SIMD this group size is the same as the match. */
+/** @internal The 8 byte word for managing multiple simultaneous equality
+checks. In contrast to SIMD this group size is the same as the match. */
 struct Group
 {
-    /** @private 64 bits allows 8 tags to be checked at once. */
+    /** @internal 64 bits allows 8 tags to be checked at once. */
     uint64_t v;
 };
 
-/** @private The match is the same size as the group because only the most
+/** @internal The match is the same size as the group because only the most
 significant bit in a byte within the mask will be on to indicate the result of
 various queries such as matching a tag, empty, or constant. */
 struct Match_mask
 {
-    /** @private The match is the same as a group with MSB on. */
+    /** @internal The match is the same as a group with MSB on. */
     typeof((struct Group){}.v) v;
 };
 
 enum : typeof((struct Group){}.v)
 {
-    /** @private MSB tag bit used for static assert. */
+    /** @internal MSB tag bit used for static assert. */
     MATCH_MASK_MSB = 0x8000000000000000,
-    /** @private MSB tag bits used for byte and word level masking. */
+    /** @internal MSB tag bits used for byte and word level masking. */
     MATCH_MASK_TAGS_MSBS = 0x8080808080808080,
-    /** @private The EMPTY special constant tag in every byte of the mask. */
+    /** @internal The EMPTY special constant tag in every byte of the mask. */
     MATCH_MASK_TAGS_EMPTY = 0x8080808080808080,
-    /** @private LSB tag bits used for byte and word level masking. */
+    /** @internal LSB tag bits used for byte and word level masking. */
     MATCH_MASK_TAGS_LSBS = 0x101010101010101,
-    /** @private Debug mode check for bits that must be off in match. */
+    /** @internal Debug mode check for bits that must be off in match. */
     MATCH_MASK_TAGS_OFF_BITS = 0x7F7F7F7F7F7F7F7F,
-    /** @private The MSB of each byte on except 0th is 0x00. */
+    /** @internal The MSB of each byte on except 0th is 0x00. */
     MATCH_MASK_0TH_TAG_OFF = 0x8080808080808000,
 };
 
-enum : typeof((struct CCC_flat_hash_map_tag){}.v)
+enum : typeof((struct CCC_Flat_hash_map_tag){}.v)
 {
-    /** @private Bits in a tag used to help in creating a group of one tag. */
-    TAG_BITS = sizeof(struct CCC_flat_hash_map_tag) * CHAR_BIT,
+    /** @internal Bits in a tag used to help in creating a group of one tag. */
+    TAG_BITS = sizeof(struct CCC_Flat_hash_map_tag) * CHAR_BIT,
 };
 
 #endif /* defined(CCC_HAS_X86_SIMD) */
 
 /*=======================   Data Alignment Test   ===========================*/
 
-/** @private A macro version of the runtime alignment operations we perform
+/** @internal A macro version of the runtime alignment operations we perform
 for calculating bytes. This way we can use in static asserts. */
 #define comptime_roundup(bytes_to_round)                                       \
     (((bytes_to_round) + CCC_FLAT_HASH_MAP_GROUP_SIZE - 1)                     \
      & ~(CCC_FLAT_HASH_MAP_GROUP_SIZE - 1))
 
-/** @private The following test should ensure some safety in assumptions we make
-when the user defines a fixed size map type. This is just a small type that
+/** @internal The following test should ensure some safety in assumptions we
+make when the user defines a fixed size map type. This is just a small type that
 will remain internal to this translation unit. The tag array is not given a
 replica group size at the end of its allocation because that wastes pointless
 space and has no impact on the following layout and pointer arithmetic tests.
@@ -193,7 +193,7 @@ struct Fixed_map_test_type
     {
         int i;
     } data[2 + 1];
-    alignas(CCC_FLAT_HASH_MAP_GROUP_SIZE) struct CCC_flat_hash_map_tag tag[2];
+    alignas(CCC_FLAT_HASH_MAP_GROUP_SIZE) struct CCC_Flat_hash_map_tag tag[2];
 };
 /** The type must actually get an allocation on the given platform to validate
 some memory layout assumptions. This should be sufficient and the assumptions
@@ -211,7 +211,7 @@ first byte of the struct with no padding BEFORE this first element. */
 static_assert(
     (char *)&data_tag_layout_test.tag[2] - (char *)&data_tag_layout_test.data[0]
         == (comptime_roundup((sizeof(data_tag_layout_test.data)))
-            + (sizeof(struct CCC_flat_hash_map_tag) * 2)),
+            + (sizeof(struct CCC_Flat_hash_map_tag) * 2)),
     "The size in bytes of the contiguous user data to tag array must be what "
     "we would expect with no padding that will interfere with pointer "
     "arithmetic.");
@@ -250,7 +250,7 @@ static_assert((offsetof(struct Fixed_map_test_type, tag)
 
 /*=======================    Special Constants    ===========================*/
 
-/** @private Range of constants specified as special for this hash table. Same
+/** @internal Range of constants specified as special for this hash table. Same
 general design as Rust Hashbrown table. Importantly, we know these are special
 constants because the most significant bit is on and then empty can be easily
 distinguished from deleted by the least significant bit.
@@ -261,24 +261,24 @@ enum value.
 TAG_FULL = 0b0???_????
 
 The most significant bit is off and the lower 7 make up the hash bits. */
-enum : typeof((struct CCC_flat_hash_map_tag){}.v)
+enum : typeof((struct CCC_Flat_hash_map_tag){}.v)
 {
-    /** @private Deleted is applied when a removed value in a group must signal
+    /** @internal Deleted is applied when a removed value in a group must signal
     to a probe sequence to continue searching for a match or empty to stop. */
     TAG_DELETED = 0x80,
-    /** @private Empty is the starting tag value and applied when other empties
+    /** @internal Empty is the starting tag value and applied when other empties
     are in a group upon removal. */
     TAG_EMPTY = 0xFF,
-    /** @private Used to verify if tag is constant or hash data. */
+    /** @internal Used to verify if tag is constant or hash data. */
     TAG_MSB = TAG_DELETED,
-    /** @private Used to create a one byte fingerprint of user hash. */
-    TAG_LOWER_7_MASK = (typeof((struct CCC_flat_hash_map_tag){}.v))~TAG_DELETED,
+    /** @internal Used to create a one byte fingerprint of user hash. */
+    TAG_LOWER_7_MASK = (typeof((struct CCC_Flat_hash_map_tag){}.v))~TAG_DELETED,
 };
-static_assert(sizeof(struct CCC_flat_hash_map_tag) == sizeof(uint8_t),
+static_assert(sizeof(struct CCC_Flat_hash_map_tag) == sizeof(uint8_t),
               "tag must wrap a byte in a struct without padding for better "
               "optimizations and no strict-aliasing exceptions.");
 static_assert(
-    (TAG_DELETED | TAG_EMPTY) == (typeof((struct CCC_flat_hash_map_tag){}.v))~0,
+    (TAG_DELETED | TAG_EMPTY) == (typeof((struct CCC_Flat_hash_map_tag){}.v))~0,
     "all bits must be accounted for across deleted and empty status.");
 static_assert(
     (TAG_DELETED ^ TAG_EMPTY) == 0x7F,
@@ -286,7 +286,7 @@ static_assert(
 
 /*=======================    Type Declarations    ===========================*/
 
-/** @private A triangular sequence of numbers is a probing sequence that will
+/** @internal A triangular sequence of numbers is a probing sequence that will
 visit every group in a power of 2 capacity hash table. Here is a popular proof:
 https://fgiesen.wordpress.com/2015/02/22/triangular-numbers-mod-2n/
 
@@ -294,13 +294,13 @@ See also Donald Knuth's The Art of Computer Programming Volume 3, Chapter 6.4,
 Answers to Exercises, problem 20, page 731 for another proof. */
 struct Probe_sequence
 {
-    /** @private The index this probe step has placed us on. */
+    /** @internal The index this probe step has placed us on. */
     size_t index;
-    /** @private Stride increases by group size on each iteration. */
+    /** @internal Stride increases by group size on each iteration. */
     size_t stride;
 };
 
-/** @private Helper type for obtaining a search result on the map. */
+/** @internal Helper type for obtaining a search result on the map. */
 struct Query
 {
     /** The slot in the table. */
@@ -329,7 +329,7 @@ static struct Match_mask find_first_full_group(struct CCC_Flat_hash_map const *,
 static CCC_Result maybe_rehash(struct CCC_Flat_hash_map *, size_t to_add,
                                CCC_Allocator);
 static void insert_and_copy(struct CCC_Flat_hash_map *, void const *type,
-                            struct CCC_flat_hash_map_tag m, size_t i);
+                            struct CCC_Flat_hash_map_tag m, size_t i);
 static void erase(struct CCC_Flat_hash_map *, size_t i);
 static CCC_Result check_initialize(struct CCC_Flat_hash_map *,
                                    size_t required_total_cap, CCC_Allocator *);
@@ -343,7 +343,7 @@ static CCC_Tribool is_equal(struct CCC_Flat_hash_map const *, void const *key,
 static uint64_t hash_fn(struct CCC_Flat_hash_map const *, void const *any_key);
 static void *key_at(struct CCC_Flat_hash_map const *, size_t i);
 static void *data_at(struct CCC_Flat_hash_map const *, size_t i);
-static struct CCC_flat_hash_map_tag *tag_pos(size_t sizeof_type,
+static struct CCC_Flat_hash_map_tag *tag_pos(size_t sizeof_type,
                                              void const *data, size_t mask);
 static void *key_in_slot(struct CCC_Flat_hash_map const *, void const *slot);
 static void *swap_slot(struct CCC_Flat_hash_map const *);
@@ -353,23 +353,23 @@ static size_t mask_to_total_bytes(size_t sizeof_type, size_t mask);
 static size_t mask_to_tag_bytes(size_t mask);
 static size_t mask_to_data_bytes(size_t sizeof_type, size_t mask);
 static void set_insert_tag(struct CCC_Flat_hash_map *,
-                           struct CCC_flat_hash_map_tag, size_t);
+                           struct CCC_Flat_hash_map_tag, size_t);
 static size_t mask_to_load_factor_cap(size_t);
 static size_t max(size_t, size_t);
-static void tag_set(struct CCC_Flat_hash_map *, struct CCC_flat_hash_map_tag,
+static void tag_set(struct CCC_Flat_hash_map *, struct CCC_Flat_hash_map_tag,
                     size_t);
 static CCC_Tribool match_has_one(struct Match_mask);
 static size_t match_trailing_one(struct Match_mask);
 static size_t match_leading_zeros(struct Match_mask);
 static size_t match_trailing_zeros(struct Match_mask);
 static size_t match_next_one(struct Match_mask *);
-static CCC_Tribool tag_full(struct CCC_flat_hash_map_tag);
-static CCC_Tribool tag_constant(struct CCC_flat_hash_map_tag);
-static struct CCC_flat_hash_map_tag tag_from(uint64_t);
-static struct Group group_loadu(struct CCC_flat_hash_map_tag const *);
-static struct Group group_loada(struct CCC_flat_hash_map_tag const *);
-static void group_storea(struct CCC_flat_hash_map_tag *dst, struct Group src);
-static struct Match_mask match_tag(struct Group, struct CCC_flat_hash_map_tag);
+static CCC_Tribool tag_full(struct CCC_Flat_hash_map_tag);
+static CCC_Tribool tag_constant(struct CCC_Flat_hash_map_tag);
+static struct CCC_Flat_hash_map_tag tag_from(uint64_t);
+static struct Group group_loadu(struct CCC_Flat_hash_map_tag const *);
+static struct Group group_loada(struct CCC_Flat_hash_map_tag const *);
+static void group_storea(struct CCC_Flat_hash_map_tag *dst, struct Group src);
+static struct Match_mask match_tag(struct Group, struct CCC_Flat_hash_map_tag);
 static struct Match_mask match_empty(struct Group);
 static struct Match_mask match_deleted(struct Group);
 static struct Match_mask match_empty_deleted(struct Group);
@@ -953,7 +953,7 @@ CCC_flat_hash_map_validate(CCC_Flat_hash_map const *const map)
     size_t deleted = 0;
     for (size_t i = 0; i < (map->mask + 1); ++i)
     {
-        struct CCC_flat_hash_map_tag const t = map->tag[i];
+        struct CCC_Flat_hash_map_tag const t = map->tag[i];
         /* If we are a special constant there are only two possible values. */
         if (tag_constant(t) && t.v != TAG_DELETED && t.v != TAG_EMPTY)
         {
@@ -1024,7 +1024,7 @@ CCC_private_flat_hash_map_entry(struct CCC_Flat_hash_map *const map,
 void
 CCC_private_flat_hash_map_insert(struct CCC_Flat_hash_map *map,
                                  void const *type,
-                                 struct CCC_flat_hash_map_tag m, size_t i)
+                                 struct CCC_Flat_hash_map_tag m, size_t i)
 {
     insert_and_copy(map, type, m, i);
 }
@@ -1111,7 +1111,7 @@ find(struct CCC_Flat_hash_map *const map, void const *const key,
 data slot. It is user's responsibility to ensure that the insert is valid. */
 static inline void
 insert_and_copy(struct CCC_Flat_hash_map *const map, void const *const type,
-                struct CCC_flat_hash_map_tag const m, size_t const i)
+                struct CCC_Flat_hash_map_tag const m, size_t const i)
 {
     set_insert_tag(map, m, i);
     (void)memcpy(data_at(map, i), type, map->sizeof_type);
@@ -1121,7 +1121,7 @@ insert_and_copy(struct CCC_Flat_hash_map *const map, void const *const type,
 the insert is valid. */
 static inline void
 set_insert_tag(struct CCC_Flat_hash_map *const map,
-               struct CCC_flat_hash_map_tag const m, size_t const i)
+               struct CCC_Flat_hash_map_tag const m, size_t const i)
 {
     assert(i <= map->mask);
     assert((m.v & TAG_MSB) == 0);
@@ -1164,11 +1164,11 @@ erase(struct CCC_Flat_hash_map *const map, size_t const i)
        covers is one in which the previous group is completely full of FULL or
        DELETED entries and this tag will be the first in the next group. This
        is an important case where we must mark our tag as deleted. */
-    struct CCC_flat_hash_map_tag const m
+    struct CCC_Flat_hash_map_tag const m
         = (match_leading_zeros(prev_empties) + match_trailing_zeros(empties)
            >= CCC_FLAT_HASH_MAP_GROUP_SIZE)
-            ? (struct CCC_flat_hash_map_tag){TAG_DELETED}
-            : (struct CCC_flat_hash_map_tag){TAG_EMPTY};
+            ? (struct CCC_Flat_hash_map_tag){TAG_DELETED}
+            : (struct CCC_Flat_hash_map_tag){TAG_EMPTY};
     map->remain += (TAG_EMPTY == m.v);
     --map->count;
     tag_set(map, m, i);
@@ -1182,7 +1182,7 @@ static struct Query
 find_key_or_slot(struct CCC_Flat_hash_map const *const map,
                  void const *const key, uint64_t const hash)
 {
-    struct CCC_flat_hash_map_tag const tag = tag_from(hash);
+    struct CCC_Flat_hash_map_tag const tag = tag_from(hash);
     size_t const mask = map->mask;
     struct Probe_sequence p = {
         .index = hash & mask,
@@ -1241,7 +1241,7 @@ static CCC_Count
 find_key_or_fail(struct CCC_Flat_hash_map const *const map,
                  void const *const key, uint64_t const hash)
 {
-    struct CCC_flat_hash_map_tag const tag = tag_from(hash);
+    struct CCC_Flat_hash_map_tag const tag = tag_from(hash);
     size_t const mask = map->mask;
     struct Probe_sequence p = {
         .index = hash & mask,
@@ -1453,7 +1453,7 @@ rehash_in_place(struct CCC_Flat_hash_map *const map)
             {
                 uint64_t const hash = hash_fn(map, key_at(map, tag_i));
                 size_t const new_i = find_slot_or_noreturn(map, hash);
-                struct CCC_flat_hash_map_tag const hash_tag = tag_from(hash);
+                struct CCC_Flat_hash_map_tag const hash_tag = tag_from(hash);
                 /* We analyze groups not slots. Do not move the element to
                    another slot in the same unaligned group load. The tag is in
                    the proper group for an unaligned load based on where the
@@ -1464,11 +1464,11 @@ rehash_in_place(struct CCC_Flat_hash_map *const map)
                     tag_set(map, hash_tag, tag_i);
                     break; /* continues outer loop */
                 }
-                struct CCC_flat_hash_map_tag const occupant = map->tag[new_i];
+                struct CCC_Flat_hash_map_tag const occupant = map->tag[new_i];
                 tag_set(map, hash_tag, new_i);
                 if (occupant.v == TAG_EMPTY)
                 {
-                    tag_set(map, (struct CCC_flat_hash_map_tag){TAG_EMPTY},
+                    tag_set(map, (struct CCC_Flat_hash_map_tag){TAG_EMPTY},
                             tag_i);
                     (void)memcpy(data_at(map, new_i), data_at(map, tag_i),
                                  map->sizeof_type);
@@ -1759,7 +1759,7 @@ Assumes the mask is non-zero. */
 static inline size_t
 mask_to_tag_bytes(size_t const mask)
 {
-    static_assert(sizeof(struct CCC_flat_hash_map_tag) == sizeof(uint8_t));
+    static_assert(sizeof(struct CCC_Flat_hash_map_tag) == sizeof(uint8_t));
     return mask + 1 + CCC_FLAT_HASH_MAP_GROUP_SIZE;
 }
 
@@ -1798,11 +1798,11 @@ mask_to_data_bytes(size_t const sizeof_type, size_t const mask)
 of the data array. This position is determined by the size of the type in the
 data array and the current mask being used for the hash map to which the data
 belongs. */
-static inline struct CCC_flat_hash_map_tag *
+static inline struct CCC_Flat_hash_map_tag *
 tag_pos(size_t const sizeof_type, void const *const data, size_t const mask)
 {
     /* Static assertions at top of file ensure this is correct. */
-    return (struct CCC_flat_hash_map_tag *)((char *)data
+    return (struct CCC_Flat_hash_map_tag *)((char *)data
                                             + mask_to_data_bytes(sizeof_type,
                                                                  mask));
 }
@@ -1845,7 +1845,7 @@ vector lanes for a single instruction. */
 group at the end of the tag array remains in sync with current tag if needed. */
 static inline void
 tag_set(struct CCC_Flat_hash_map *const map,
-        struct CCC_flat_hash_map_tag const m, size_t const i)
+        struct CCC_Flat_hash_map_tag const m, size_t const i)
 {
     size_t const replica_byte = ((i - CCC_FLAT_HASH_MAP_GROUP_SIZE) & map->mask)
                               + CCC_FLAT_HASH_MAP_GROUP_SIZE;
@@ -1855,7 +1855,7 @@ tag_set(struct CCC_Flat_hash_map *const map,
 
 /** Returns CCC_TRUE if the tag holds user hash bits, meaning it is occupied. */
 static inline CCC_Tribool
-tag_full(struct CCC_flat_hash_map_tag const m)
+tag_full(struct CCC_Flat_hash_map_tag const m)
 {
     return (m.v & TAG_MSB) == 0;
 }
@@ -1863,7 +1863,7 @@ tag_full(struct CCC_flat_hash_map_tag const m)
 /** Returns CCC_TRUE if the tag is one of the two special constants EMPTY or
 DELETED. */
 static inline CCC_Tribool
-tag_constant(struct CCC_flat_hash_map_tag const m)
+tag_constant(struct CCC_Flat_hash_map_tag const m)
 {
     return (m.v & TAG_MSB) != 0;
 }
@@ -1871,10 +1871,10 @@ tag_constant(struct CCC_flat_hash_map_tag const m)
 /** Converts a full hash code to a tag fingerprint. The tag consists of the top
 7 bits of the hash code. Therefore, hash functions with good entropy in the
 upper bits are desirable. */
-static inline struct CCC_flat_hash_map_tag
+static inline struct CCC_Flat_hash_map_tag
 tag_from(uint64_t const hash)
 {
-    return (struct CCC_flat_hash_map_tag){
+    return (struct CCC_Flat_hash_map_tag){
         (hash >> ((sizeof(hash) * CHAR_BIT) - 7)) & TAG_LOWER_7_MASK,
     };
 }
@@ -1966,7 +1966,7 @@ hashed data and the full comparison will evaluate to true. Note that this
 method inevitably forces a call to the comparison callback function on every
 match so an efficient comparison is beneficial. */
 static inline struct Match_mask
-match_tag(struct Group const g, struct CCC_flat_hash_map_tag const m)
+match_tag(struct Group const g, struct CCC_Flat_hash_map_tag const m)
 {
     return (struct Match_mask){
         _mm_movemask_epi8(_mm_cmpeq_epi8(g.v, _mm_set1_epi8((int8_t)m.v))),
@@ -1979,7 +1979,7 @@ based index in the context of the probe sequence. */
 static inline struct Match_mask
 match_empty(struct Group const g)
 {
-    return match_tag(g, (struct CCC_flat_hash_map_tag){TAG_EMPTY});
+    return match_tag(g, (struct CCC_Flat_hash_map_tag){TAG_EMPTY});
 }
 
 /** Returns 0 based match with every bit on representing those tags in
@@ -1988,7 +1988,7 @@ based index in the context of the probe sequence. */
 static inline struct Match_mask
 match_deleted(struct Group const g)
 {
-    return match_tag(g, (struct CCC_flat_hash_map_tag){TAG_DELETED});
+    return match_tag(g, (struct CCC_Flat_hash_map_tag){TAG_DELETED});
 }
 
 /** Returns a 0 based match with every bit on representing those tags
@@ -2032,7 +2032,7 @@ match_leading_full(struct Group const g, size_t const start_tag)
 load and the user must ensure the load will not go off then end of the tag
 array. */
 static inline struct Group
-group_loada(struct CCC_flat_hash_map_tag const *const src)
+group_loada(struct CCC_Flat_hash_map_tag const *const src)
 {
     return (struct Group){_mm_load_si128((__m128i *)src)};
 }
@@ -2040,7 +2040,7 @@ group_loada(struct CCC_flat_hash_map_tag const *const src)
 /** Stores the src group to dst. The store is aligned and the user must ensure
 the store will not go off the end of the tag array. */
 static inline void
-group_storea(struct CCC_flat_hash_map_tag *const dst, struct Group const src)
+group_storea(struct CCC_Flat_hash_map_tag *const dst, struct Group const src)
 {
     _mm_store_si128((__m128i *)dst, src.v);
 }
@@ -2049,7 +2049,7 @@ group_storea(struct CCC_flat_hash_map_tag *const dst, struct Group const src)
 load and the user must ensure the load will not go off then end of the tag
 array. */
 static inline struct Group
-group_loadu(struct CCC_flat_hash_map_tag const *const src)
+group_loadu(struct CCC_Flat_hash_map_tag const *const src)
 {
     return (struct Group){_mm_loadu_si128((__m128i *)src)};
 }
@@ -2100,7 +2100,7 @@ indicate if the byte in the group matched the mask to be searched. The only
 bit on shall be this most significant bit to ensure iterating through index
 masks is easier and counting bits make sense in the find loops. */
 static inline struct Match_mask
-match_tag(struct Group const g, struct CCC_flat_hash_map_tag const m)
+match_tag(struct Group const g, struct CCC_Flat_hash_map_tag const m)
 {
     struct Match_mask const res = {
         vget_lane_u64(vreinterpret_u64_u8(vceq_u8(g.v, vdup_n_u8(m.v))), 0)
@@ -2119,7 +2119,7 @@ based index in the context of the probe sequence. */
 static inline struct Match_mask
 match_empty(struct Group const g)
 {
-    return match_tag(g, (struct CCC_flat_hash_map_tag){TAG_EMPTY});
+    return match_tag(g, (struct CCC_Flat_hash_map_tag){TAG_EMPTY});
 }
 
 /** Returns 0 based struct Match_mask with every bit on representing those tags
@@ -2128,7 +2128,7 @@ based index in the context of the probe sequence. */
 static inline struct Match_mask
 match_deleted(struct Group const g)
 {
-    return match_tag(g, (struct CCC_flat_hash_map_tag){TAG_DELETED});
+    return match_tag(g, (struct CCC_Flat_hash_map_tag){TAG_DELETED});
 }
 
 /** Returns a 0 based match with every bit on representing those tags
@@ -2196,7 +2196,7 @@ match_leading_full(struct Group const g, size_t const start_tag)
 aligned load and the user must ensure the load will not go off then end of the
 tag array. */
 static inline struct Group
-group_loada(struct CCC_flat_hash_map_tag const *const src)
+group_loada(struct CCC_Flat_hash_map_tag const *const src)
 {
     return (struct Group){vld1_u8(&src->v)};
 }
@@ -2204,7 +2204,7 @@ group_loada(struct CCC_flat_hash_map_tag const *const src)
 /** Stores the src group to dst. The store is aligned and the user must ensure
 the store will not go off the end of the tag array. */
 static inline void
-group_storea(struct CCC_flat_hash_map_tag *const dst, struct Group const src)
+group_storea(struct CCC_Flat_hash_map_tag *const dst, struct Group const src)
 {
     vst1_u8(&dst->v, src.v);
 }
@@ -2213,7 +2213,7 @@ group_storea(struct CCC_flat_hash_map_tag *const dst, struct Group const src)
 unaligned load and the user must ensure the load will not go off then end of the
 tag array. */
 static inline struct Group
-group_loadu(struct CCC_flat_hash_map_tag const *const src)
+group_loadu(struct CCC_Flat_hash_map_tag const *const src)
 {
     return (struct Group){vld1_u8(&src->v)};
 }
@@ -2290,7 +2290,7 @@ from the searched value only in its lowest bit. This is fine because:
 This algorithm is derived from:
 https://graphics.stanford.edu/~seander/bithacks.html##ValueInWord */
 static inline struct Match_mask
-match_tag(struct Group g, struct CCC_flat_hash_map_tag const m)
+match_tag(struct Group g, struct CCC_Flat_hash_map_tag const m)
 {
     struct Group const cmp = {
         g.v
@@ -2407,7 +2407,7 @@ match_leading_full(struct Group const g, size_t const start_tag)
 
 /** Loads tags into a group without violating strict aliasing. */
 static inline struct Group
-group_loada(struct CCC_flat_hash_map_tag const *const src)
+group_loada(struct CCC_Flat_hash_map_tag const *const src)
 {
     struct Group g;
     (void)memcpy(&g, src, sizeof(g));
@@ -2416,14 +2416,14 @@ group_loada(struct CCC_flat_hash_map_tag const *const src)
 
 /** Stores a group back into the tag array without violating strict aliasing. */
 static inline void
-group_storea(struct CCC_flat_hash_map_tag *const dst, struct Group const src)
+group_storea(struct CCC_Flat_hash_map_tag *const dst, struct Group const src)
 {
     (void)memcpy(dst, &src, sizeof(src));
 }
 
 /** Loads tags into a group without violating strict aliasing. */
 static inline struct Group
-group_loadu(struct CCC_flat_hash_map_tag const *const src)
+group_loadu(struct CCC_Flat_hash_map_tag const *const src)
 {
     struct Group g;
     (void)memcpy(&g, src, sizeof(g));
@@ -2510,7 +2510,7 @@ clz_size_t(size_t const n)
 
 enum : size_t
 {
-    /** @private Most significant bit of size_t for bit counting. */
+    /** @internal Most significant bit of size_t for bit counting. */
     SIZE_T_MSB = 0x8000000000000000,
 };
 
@@ -2602,7 +2602,7 @@ clz_size_t(size_t const n)
 
 enum : size_t
 {
-    /** @private Most significant bit of size_t for bit counting. */
+    /** @internal Most significant bit of size_t for bit counting. */
     SIZE_T_MSB = 0x8000000000000000,
 };
 

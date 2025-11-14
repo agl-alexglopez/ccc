@@ -30,23 +30,23 @@ based operations over the set. */
 
 typedef typeof(*(struct CCC_Bitset){}.blocks) Bitblock;
 
-/** @private Used frequently so call the builtin just once. */
+/** @internal Used frequently so call the builtin just once. */
 enum : size_t
 {
-    /** @private Bytes of a bit block to help with byte calculations. */
+    /** @internal Bytes of a bit block to help with byte calculations. */
     SIZEOF_BLOCK = sizeof(Bitblock),
 };
 
-/** @private Various constants to support bit block size bit ops. */
+/** @internal Various constants to support bit block size bit ops. */
 enum : Bitblock
 {
-    /** @private A mask of a bit block with all bits on. */
+    /** @internal A mask of a bit block with all bits on. */
     BITBLOCK_ON = ((Bitblock)~0),
-    /** @private The Most Significant Bit of a bit block turned on to 1. */
+    /** @internal The Most Significant Bit of a bit block turned on to 1. */
     BITBLOCK_MSB = (((Bitblock)1) << (((SIZEOF_BLOCK * CHAR_BIT)) - 1)),
 };
 
-/** @private An index into the block array or count of bit blocks. The block
+/** @internal An index into the block array or count of bit blocks. The block
 array is bounded by the number of blocks required to support the current bit set
 capacity. Assume this index type has range [0, block count to support N bits].
 
@@ -55,7 +55,7 @@ to make it clear to the reader the index refers to a block not the given bit
 index the user has provided. */
 typedef size_t Block_count;
 
-/** @private A signed index into the block array. The block array is bounded by
+/** @internal A signed index into the block array. The block array is bounded by
 the number of blocks required to support the current bit set capacity. Assume
 this index type has range [-1, count of blocks needed to hold all bits in set].
 This makes reverse iteration problems easier.
@@ -69,7 +69,7 @@ to make it clear to the reader the index refers to a block not the given bit
 index the user has provided. */
 typedef ptrdiff_t Block_signed_count;
 
-/** @private An index within a block. A block is bounded to some number of bits
+/** @internal An index within a block. A block is bounded to some number of bits
 as determined by the type used for each block. This type is intended to count
 bits in a block and therefore cannot count up to arbitrary indices. Assume its
 range is `[0, BITBLOCK_BITS]`, for ease of use and clarity.
@@ -81,15 +81,15 @@ typedef uint8_t Bit_count;
 
 enum : Bit_count
 {
-    /** @private How many total bits that fit in a bit block. */
+    /** @internal How many total bits that fit in a bit block. */
     BITBLOCK_BITS = (SIZEOF_BLOCK * CHAR_BIT),
     U8BLOCK_MAX = UINT8_MAX,
 };
 static_assert((Bit_count)~0 >= 0, "Bit_count must be unsigned");
 static_assert(UINT8_MAX >= BITBLOCK_BITS, "Bit_count counts all block bits.");
 
-/** @private A signed index within a block. A block is bounded to some number of
-bits as determined by the type used for each block. This type is intended to
+/** @internal A signed index within a block. A block is bounded to some number
+of bits as determined by the type used for each block. This type is intended to
 count bits in a block and therefore cannot count up to arbitrary indices. Assume
 its range is `[-1, BITBLOCK_BITS]`, for ease of use and clarity.
 
@@ -105,7 +105,7 @@ static_assert((Bit_signed_count)~0 < 0, "Bit_signed_count must be signed");
 static_assert(INT16_MAX >= BITBLOCK_BITS,
               "Bit_signed_count counts all block bits");
 
-/** @private A helper to allow for an efficient linear scan for groups of 0's
+/** @internal A helper to allow for an efficient linear scan for groups of 0's
 or 1's in the set. */
 struct Group_count
 {
@@ -115,8 +115,8 @@ struct Group_count
     size_t count;
 };
 
-/** @private A signed helper to allow for an efficient linear scan for groups of
-0's or 1's in the set. Created to support -1 index return values for cleaner
+/** @internal A signed helper to allow for an efficient linear scan for groups
+of 0's or 1's in the set. Created to support -1 index return values for cleaner
 group scanning in reverse. */
 struct Group_signed_count
 {

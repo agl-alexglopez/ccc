@@ -200,7 +200,7 @@ restrictions. */
 
 /** @brief Initialize a map with a Buffer of types at compile time or runtime.
 @param[in] map_pointer a pointer to a fixed map allocation or NULL.
-@param[in] any_type_name the name of the user defined type stored in the map.
+@param[in] type_name the name of the user defined type stored in the map.
 @param[in] key_field the field of the struct used for key storage.
 @param[in] hash the CCC_Key_hasher function provided by the user.
 @param[in] compare the CCC_Key_comparator the user intends to
@@ -261,11 +261,11 @@ static Flat_hash_map static_map = flat_hash_map_initialize(
 
 Initialization at runtime is also possible. Stack-based or dynamic maps are
 identical to the provided examples. Omit `static` in a runtime context. */
-#define CCC_flat_hash_map_initialize(map_pointer, any_type_name, key_field,    \
-                                     hash, compare, allocate, context_data,    \
+#define CCC_flat_hash_map_initialize(map_pointer, type_name, key_field, hash,  \
+                                     compare, allocate, context_data,          \
                                      capacity)                                 \
-    CCC_private_flat_hash_map_initialize(map_pointer, any_type_name,           \
-                                         key_field, hash, compare, allocate,   \
+    CCC_private_flat_hash_map_initialize(map_pointer, type_name, key_field,    \
+                                         hash, compare, allocate,              \
                                          context_data, capacity)
 
 /** @brief Initialize a dynamic map at runtime from an initializer list.

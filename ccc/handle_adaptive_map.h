@@ -158,7 +158,7 @@ desired allocation function. */
 /** @brief Initializes the map at runtime or compile time.
 @param[in] memory_pointer a pointer to the contiguous user types or ((T
 *)NULL).
-@param[in] any_type_name the name of the user type stored in the map.
+@param[in] type_name the name of the user type stored in the map.
 @param[in] type_intruder_field the name of the field in user type used as key.
 @param[in] compare the key comparison function (see types.h).
 @param[in] allocate the allocation function or NULL if allocation is banned.
@@ -167,11 +167,11 @@ destruction.
 @param[in] capacity the capacity at mem_pointer or 0.
 @return the struct initialized adaptive map for direct assignment
 (i.e. CCC_Handle_adaptive_map m = CCC_handle_adaptive_map_initialize(...);). */
-#define CCC_handle_adaptive_map_initialize(memory_pointer, any_type_name,      \
+#define CCC_handle_adaptive_map_initialize(memory_pointer, type_name,          \
                                            type_intruder_field, compare,       \
                                            allocate, context_data, capacity)   \
     CCC_private_handle_adaptive_map_initialize(                                \
-        memory_pointer, any_type_name, type_intruder_field, compare, allocate, \
+        memory_pointer, type_name, type_intruder_field, compare, allocate,     \
         context_data, capacity)
 
 /** @brief Copy the map at source to destination.

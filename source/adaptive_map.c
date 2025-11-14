@@ -35,7 +35,7 @@ constant time queries for frequently accessed elements. */
 #include "private/private_types.h"
 #include "types.h"
 
-/** @private Instead of thinking about left and right consider only links
+/** @internal Instead of thinking about left and right consider only links
     in the abstract sense. Put them in an array and then flip
     this enum and left and right code paths can be united into one */
 enum Branch
@@ -977,10 +977,11 @@ link(struct CCC_Adaptive_map_node *const parent, enum Branch const dir,
 
 /* ======================        Debugging           ====================== */
 
-/** @private Validate binary tree invariants with ranges. Use a recursive method
-that does not rely upon the implementation of iterators or any other possibly
-buggy implementation. A pure functional range check will provide the most
-reliable check regardless of implementation changes throughout code base. */
+/** @internal Validate binary tree invariants with ranges. Use a recursive
+method that does not rely upon the implementation of iterators or any other
+possibly buggy implementation. A pure functional range check will provide the
+most reliable check regardless of implementation changes throughout code base.
+*/
 struct Tree_range
 {
     struct CCC_Adaptive_map_node const *low;
@@ -988,7 +989,7 @@ struct Tree_range
     struct CCC_Adaptive_map_node const *high;
 };
 
-/** @private */
+/** @internal */
 struct Parent_status
 {
     CCC_Tribool correct;

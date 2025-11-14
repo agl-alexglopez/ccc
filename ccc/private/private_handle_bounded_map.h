@@ -27,27 +27,27 @@ limitations under the License.
 
 /* NOLINTBEGIN(readability-identifier-naming) */
 
-/** @private Runs the standard WAVL tree algorithms with the addition of
+/** @internal Runs the standard WAVL tree algorithms with the addition of
 a free list. The parent field tracks the parent for an allocated node in the
 tree that the user has inserted into the array. When the user removes a node
 it is added to the front of a free list. The map will track the first free
 node. The list is push to front LIFO stack. */
 struct CCC_Handle_bounded_map_node
 {
-    /** @private Child nodes in array to unify Left and Right. */
+    /** @internal Child nodes in array to unify Left and Right. */
     size_t branch[2];
     union
     {
-        /** @private Parent of WAVL node when allocated. */
+        /** @internal Parent of WAVL node when allocated. */
         size_t parent;
-        /** @private Points to next free when not allocated. */
+        /** @internal Points to next free when not allocated. */
         size_t next_free;
     };
 };
 
-/** @private A handle realtime ordered map is a modified struct of arrays layout
-with the modification being that we may have the arrays as pointer offsets in
-a contiguous allocation if the user desires a dynamic map.
+/** @internal A handle realtime ordered map is a modified struct of arrays
+layout with the modification being that we may have the arrays as pointer
+offsets in a contiguous allocation if the user desires a dynamic map.
 
 The user data array comes first allowing the user to store any type they wish
 in the container contiguously with no intrusive element padding, saving space.
@@ -116,81 +116,82 @@ or slower than other approaches. However, the goal with this design is space
 efficiency first, speed second. */
 struct CCC_Handle_bounded_map
 {
-    /** @private The contiguous array of user data. */
+    /** @internal The contiguous array of user data. */
     void *data;
-    /** @private The contiguous array of WAVL tree meta data. */
+    /** @internal The contiguous array of WAVL tree meta data. */
     struct CCC_Handle_bounded_map_node *nodes;
-    /** @private The parity bit array corresponding to each node. */
+    /** @internal The parity bit array corresponding to each node. */
     unsigned *parity;
-    /** @private The current capacity. */
+    /** @internal The current capacity. */
     size_t capacity;
-    /** @private The current size. */
+    /** @internal The current size. */
     size_t count;
-    /** @private The root node of the WAVL tree. */
+    /** @internal The root node of the WAVL tree. */
     size_t root;
-    /** @private The start of the free singly linked list. */
+    /** @internal The start of the free singly linked list. */
     size_t free_list;
-    /** @private The size of the type stored in the map. */
+    /** @internal The size of the type stored in the map. */
     size_t sizeof_type;
-    /** @private Where user key can be found in type. */
+    /** @internal Where user key can be found in type. */
     size_t key_offset;
-    /** @private The provided key comparison function. */
+    /** @internal The provided key comparison function. */
     CCC_Key_comparator *compare;
-    /** @private The provided allocation function, if any. */
+    /** @internal The provided allocation function, if any. */
     CCC_Allocator *allocate;
-    /** @private The provided context data, if any. */
+    /** @internal The provided context data, if any. */
     void *context;
 };
 
-/** @private */
+/** @internal */
 struct CCC_Handle_bounded_map_handle
 {
-    /** @private Map associated with this handle. */
+    /** @internal Map associated with this handle. */
     struct CCC_Handle_bounded_map *map;
-    /** @private Current index of the handle. */
+    /** @internal Current index of the handle. */
     size_t index;
-    /** @private Saves last comparison direction. */
+    /** @internal Saves last comparison direction. */
     CCC_Order last_order;
-    /** @private The entry status flag. */
+    /** @internal The entry status flag. */
     CCC_Entry_status status;
 };
 
-/** @private Wrapper for return by pointer on the stack in C23. */
+/** @internal Wrapper for return by pointer on the stack in C23. */
 union CCC_Handle_bounded_map_handle_wrap
 {
-    /** @private Single field to enable return by compound literal reference. */
+    /** @internal Single field to enable return by compound literal reference.
+     */
     struct CCC_Handle_bounded_map_handle private;
 };
 
 /*========================  Private Interface  ==============================*/
 
-/** @private */
+/** @internal */
 void *
 CCC_private_handle_bounded_map_data_at(struct CCC_Handle_bounded_map const *,
                                        size_t slot);
-/** @private */
+/** @internal */
 void *
 CCC_private_handle_bounded_map_key_at(struct CCC_Handle_bounded_map const *,
                                       size_t slot);
-/** @private */
+/** @internal */
 struct CCC_Handle_bounded_map_node *
 CCC_private_handle_bounded_map_node_at(struct CCC_Handle_bounded_map const *,
                                        size_t i);
-/** @private */
+/** @internal */
 struct CCC_Handle_bounded_map_handle
 CCC_private_handle_bounded_map_handle(struct CCC_Handle_bounded_map const *,
                                       void const *key);
-/** @private */
+/** @internal */
 void CCC_private_handle_bounded_map_insert(struct CCC_Handle_bounded_map *,
                                            size_t parent_i,
                                            CCC_Order last_order, size_t elem_i);
-/** @private */
+/** @internal */
 size_t
 CCC_private_handle_bounded_map_allocate_slot(struct CCC_Handle_bounded_map *);
 
 /*=========================      Initialization     =========================*/
 
-/** @private Calculates the number of parity blocks needed to support the given
+/** @internal Calculates the number of parity blocks needed to support the given
 capacity. Provide the type used for the parity block array and the number of
 blocks needed to round up to will be returned. */
 #define CCC_private_handle_bounded_map_blocks(private_cap)                     \
@@ -198,7 +199,7 @@ blocks needed to round up to will be returned. */
       + ((sizeof(*(struct CCC_Handle_bounded_map){}.parity) * CHAR_BIT) - 1))  \
      / (sizeof(*(struct CCC_Handle_bounded_map){}.parity) * CHAR_BIT))
 
-/** @private The user can declare a fixed size realtime ordered map with the
+/** @internal The user can declare a fixed size realtime ordered map with the
 help of static asserts to ensure the layout is compatible with our internal
 metadata. */
 #define CCC_private_handle_bounded_map_declare_fixed_map(                      \
@@ -213,13 +214,13 @@ metadata. */
             parity[CCC_private_handle_bounded_map_blocks((private_capacity))]; \
     }(private_fixed_map_type_name)
 
-/** @private Taking the size of the array actually works here because the field
+/** @internal Taking the size of the array actually works here because the field
 is of a known fixed size defined at compile time, not just a pointer. */
 #define CCC_private_handle_bounded_map_fixed_capacity(fixed_map_type_name)     \
     (sizeof((fixed_map_type_name){}.nodes)                                     \
      / sizeof(struct CCC_Handle_bounded_map_node))
 
-/** @private Initialization only tracks pointers to support a variety of memory
+/** @internal Initialization only tracks pointers to support a variety of memory
 sources for both fixed and dynamic maps. The nodes and parity pointers will be
 lazily initialized upon the first runtime opportunity. This allows the initial
 memory provided to the data pointer to come from any source at compile or
@@ -243,7 +244,7 @@ runtime. */
         .context = (private_context_data),                                     \
     }
 
-/** @private */
+/** @internal */
 #define CCC_private_handle_bounded_map_as(Handle_bounded_map_pointer,          \
                                           type_name, handle...)                \
     ((type_name *)CCC_private_handle_bounded_map_data_at(                      \
@@ -251,7 +252,7 @@ runtime. */
 
 /*==================     Core Macro Implementations     =====================*/
 
-/** @private */
+/** @internal */
 #define CCC_private_handle_bounded_map_and_modify_w(                           \
     Handle_bounded_map_handle_pointer, type_name, closure_over_T...)           \
     (__extension__({                                                           \
@@ -279,7 +280,7 @@ runtime. */
         private_handle_bounded_map_mod_hndl;                                   \
     }))
 
-/** @private */
+/** @internal */
 #define CCC_private_handle_bounded_map_or_insert_w(                            \
     Handle_bounded_map_handle_pointer, type_compound_literal...)               \
     (__extension__({                                                           \
@@ -317,7 +318,7 @@ runtime. */
         private_handle_bounded_map_or_ins_ret;                                 \
     }))
 
-/** @private */
+/** @internal */
 #define CCC_private_handle_bounded_map_insert_handle_w(                        \
     Handle_bounded_map_handle_pointer, type_compound_literal...)               \
     (__extension__({                                                           \
@@ -361,7 +362,7 @@ runtime. */
         private_handle_bounded_map_ins_hndl_ret;                               \
     }))
 
-/** @private */
+/** @internal */
 #define CCC_private_handle_bounded_map_try_insert_w(                           \
     Handle_bounded_map_pointer, key, type_compound_literal...)                 \
     (__extension__({                                                           \
@@ -424,7 +425,7 @@ runtime. */
         private_handle_bounded_map_try_ins_hndl_ret;                           \
     }))
 
-/** @private */
+/** @internal */
 #define CCC_private_handle_bounded_map_insert_or_assign_w(                      \
     Handle_bounded_map_pointer, key, type_compound_literal...)                  \
     (__extension__({                                                            \

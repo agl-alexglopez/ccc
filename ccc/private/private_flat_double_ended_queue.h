@@ -24,7 +24,7 @@ limitations under the License.
 
 /* NOLINTBEGIN(readability-identifier-naming) */
 
-/** @private A flat doubled ended queue is a single Buffer with push and pop
+/** @internal A flat doubled ended queue is a single Buffer with push and pop
 at the front and back. If no allocation is permitted it is a ring buffer.
 Because the `CCC_Buffer` abstraction already exists, the flat_double_ended_queue
 can be implemented with a single additional field rather than a front and back
@@ -32,36 +32,37 @@ pointer. The back of the flat_double_ended_queue is always known if we know
 where the front is and how many elements are stored in the buffer. */
 struct CCC_Flat_double_ended_queue
 {
-    /** @private The helper Buffer abstraction the flat_double_ended_queue owns.
+    /** @internal The helper Buffer abstraction the flat_double_ended_queue
+     * owns.
      */
     CCC_Buffer buf;
-    /** @private The front of the flat_double_ended_queue. The back is implicit
+    /** @internal The front of the flat_double_ended_queue. The back is implicit
      * given the size. */
     size_t front;
 };
 
 /*=======================    Private Interface   ============================*/
-/** @private */
+/** @internal */
 void *CCC_private_flat_double_ended_queue_allocate_front(
     struct CCC_Flat_double_ended_queue *);
-/** @private */
+/** @internal */
 void *CCC_private_flat_double_ended_queue_allocate_back(
     struct CCC_Flat_double_ended_queue *);
 
 /*=======================  Macro Implementations   ==========================*/
 
-/** @private */
+/** @internal */
 #define CCC_private_flat_double_ended_queue_initialize(                        \
-    private_mem_pointer, private_any_type_name, private_allocate,              \
+    private_mem_pointer, private_type_name, private_allocate,                  \
     private_context_data, private_capacity, optional_size...)                  \
     {                                                                          \
-        .buf = CCC_buffer_initialize(                                          \
-            private_mem_pointer, private_any_type_name, private_allocate,      \
-            private_context_data, private_capacity, optional_size),            \
+        .buf = CCC_buffer_initialize(private_mem_pointer, private_type_name,   \
+                                     private_allocate, private_context_data,   \
+                                     private_capacity, optional_size),         \
         .front = 0,                                                            \
     }
 
-/** @private */
+/** @internal */
 #define CCC_private_flat_double_ended_queue_emplace_back(                      \
     flat_double_ended_queue_pointer, value...)                                 \
     (__extension__({                                                           \
@@ -83,7 +84,7 @@ void *CCC_private_flat_double_ended_queue_allocate_back(
         private_flat_double_ended_queue_emplace_ret;                           \
     }))
 
-/** @private */
+/** @internal */
 #define CCC_private_flat_double_ended_queue_emplace_front(                     \
     flat_double_ended_queue_pointer, value...)                                 \
     (__extension__({                                                           \

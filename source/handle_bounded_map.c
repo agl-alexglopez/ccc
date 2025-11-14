@@ -60,7 +60,7 @@ to that section in my opinion. */
 
 /*========================   Data Alignment Test   ==========================*/
 
-/** @private A macro version of the runtime alignment operations we perform
+/** @internal A macro version of the runtime alignment operations we perform
 for calculating bytes. This way we can use in static assert. The user data type
 may not be the same alignment as the nodes and therefore the nodes array must
 start at next aligned byte. Similarly the parity array may not be on an aligned
@@ -72,10 +72,10 @@ alignments in C. */
 
 enum : size_t
 {
-    /* @private Test capacity. */
+    /* @internal Test capacity. */
     TCAP = 3,
 };
-/** @private Use an int because that will force the nodes array to be wary of
+/** @internal Use an int because that will force the nodes array to be wary of
 where to start. The nodes are 8 byte aligned but an int is 4. This means the
 nodes need to start after a 4 byte Buffer of padding at end of data array. */
 struct Test_data_type
@@ -84,7 +84,7 @@ struct Test_data_type
 };
 CCC_handle_bounded_map_declare_fixed_map(fixed_map_test_type,
                                          struct Test_data_type, TCAP);
-/** @private This is a static fixed size map exclusive to this translation unit
+/** @internal This is a static fixed size map exclusive to this translation unit
 used to ensure assumptions about data layout are correct. The following static
 asserts must be true in order to support the Struct of Array style layout we
 use for the data, nodes, and parity arrays. It is important that in our user
@@ -139,14 +139,14 @@ static_assert(
 
 /*==========================  Type Declarations   ===========================*/
 
-/** @private */
+/** @internal */
 enum Branch
 {
     L = 0,
     R,
 };
 
-/** @private To make insertions and removals more efficient we can remember the
+/** @internal To make insertions and removals more efficient we can remember the
 last node encountered on the search for the requested node. It will either be
 the correct node or the parent of the missing node if it is not found. This
 means insertions will not need a second search of the tree and we can insert
@@ -174,12 +174,12 @@ enum
     SINGLE_TREE_NODE = 2,
 };
 
-/** @private A block of parity bits. */
+/** @internal A block of parity bits. */
 typedef typeof(*(struct CCC_Handle_bounded_map){}.parity) Parity_block;
 
 enum : size_t
 {
-    /** @private The number of bits in a block of parity bits. */
+    /** @internal The number of bits in a block of parity bits. */
     PARITY_BLOCK_BITS = sizeof(Parity_block) * CHAR_BIT,
 };
 
@@ -1879,7 +1879,7 @@ max(size_t const a, size_t const b)
 
 /* NOLINTBEGIN(*misc-no-recursion) */
 
-/** @private */
+/** @internal */
 struct Tree_range
 {
     size_t low;

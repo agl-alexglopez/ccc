@@ -25,17 +25,17 @@ limitations under the License.
 
 /* NOLINTBEGIN(readability-identifier-naming) */
 
-/** @private A recursive structure for tracking a user element in a singly
+/** @internal A recursive structure for tracking a user element in a singly
 linked list. Supports O(1) insert and delete at the front. Elements always have
 a valid element to point to in the list due to the user of a sentinel so these
 pointers are never NULL if an element is in the list. */
 struct CCC_Singly_linked_list_node
 {
-    /** @private The next element. Non-null if elem is in list. */
+    /** @internal The next element. Non-null if elem is in list. */
     struct CCC_Singly_linked_list_node *n;
 };
 
-/** @private A singly linked list is a good stack based abstraction for push
+/** @internal A singly linked list is a good stack based abstraction for push
 and pop to front operations. If the user pre-allocates all the nodes they will
 need in a buffer, and manages the slots, this can be an efficient data
 structure that can avoid annoyances with maintaining contiguity if one were to
@@ -46,32 +46,32 @@ list, either on top of or by hacking on the provided implementation
 (non-blocking linked list, concurrent hash table, etc). */
 struct CCC_Singly_linked_list
 {
-    /** @private The sentinel with storage in the actual list struct. */
+    /** @internal The sentinel with storage in the actual list struct. */
     struct CCC_Singly_linked_list_node nil;
-    /** @private The number of elements constantly tracked for O(1) check. */
+    /** @internal The number of elements constantly tracked for O(1) check. */
     size_t count;
-    /** @private The size in bytes of the type which wraps this handle. */
+    /** @internal The size in bytes of the type which wraps this handle. */
     size_t sizeof_type;
-    /** @private The offset in bytes of the intrusive element in user type. */
+    /** @internal The offset in bytes of the intrusive element in user type. */
     size_t singly_linked_list_node_offset;
-    /** @private The user provided comparison callback for sorting. */
+    /** @internal The user provided comparison callback for sorting. */
     CCC_Type_comparator *compare;
-    /** @private The user provided allocation function, if any. */
+    /** @internal The user provided allocation function, if any. */
     CCC_Allocator *allocate;
-    /** @private User provided context data, if any. */
+    /** @internal User provided context data, if any. */
     void *context;
 };
 
 /*=========================   Private Interface  ============================*/
 
-/** @private */
+/** @internal */
 void
 CCC_private_singly_linked_list_push_front(struct CCC_Singly_linked_list *,
                                           struct CCC_Singly_linked_list_node *);
 
 /*======================   Macro Implementations     ========================*/
 
-/** @private */
+/** @internal */
 #define CCC_private_singly_linked_list_initialize(                             \
     private_singly_linked_list_name, private_struct_name,                      \
     private_singly_linked_list_node_field, private_compare_fn,                 \
@@ -87,7 +87,7 @@ CCC_private_singly_linked_list_push_front(struct CCC_Singly_linked_list *,
         .context = (private_context_data),                                     \
     }
 
-/** @private */
+/** @internal */
 #define CCC_private_singly_linked_list_emplace_front(list_pointer,             \
                                                      struct_initializer...)    \
     (__extension__({                                                           \

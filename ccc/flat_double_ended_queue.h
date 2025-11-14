@@ -69,7 +69,7 @@ Initialize and create containers with memory, callbacks, and permissions. */
 /** @brief Initialize the flat_double_ended_queue with memory and allocation
 permission.
 @param[in] mem_pointer a pointer to existing memory or ((T *)NULL).
-@param[in] any_type_name the name of the user type.
+@param[in] type_name the name of the user type.
 @param[in] allocate the allocator function, if allocation is allowed.
 @param[in] context_data any context data needed for element destruction.
 @param[in] capacity the number of contiguous elements at mem_pointer
@@ -77,10 +77,10 @@ permission.
 @return the flat_double_ended_queue on the right hand side of an equality
 operator at runtime or compiletime (e.g. CCC_Flat_double_ended_queue q =
 CCC_flat_double_ended_queue_initialize(...);) */
-#define CCC_flat_double_ended_queue_initialize(mem_pointer, any_type_name,     \
+#define CCC_flat_double_ended_queue_initialize(mem_pointer, type_name,         \
                                                allocate, context_data,         \
                                                capacity, optional_size...)     \
-    CCC_private_flat_double_ended_queue_initialize(mem_pointer, any_type_name, \
+    CCC_private_flat_double_ended_queue_initialize(mem_pointer, type_name,     \
                                                    allocate, context_data,     \
                                                    capacity, optional_size)
 

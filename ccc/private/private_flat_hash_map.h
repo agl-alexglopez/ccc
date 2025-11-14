@@ -13,6 +13,23 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 @endcond */
+/** @internal
+@file
+@brief Private Flat Hash Map Interface
+
+This flat hash map is a C Container Collection friendly interpretation of the
+Rust Hashbrown hash table. This in turn is based on the Abseil flat hash table
+from Google in C++. I simplified and modified the implementation for maximum
+readability in one header and one file. Tracking how to manage different
+platform implementations of groups and metadata fingerprint masks should be
+much easier this way, rather than jumping across countless small implementation
+files.
+
+One key feature that is rigorously tested via static asserts is the ability
+to create a static data segment or stack based map. This is a key feature of
+the implementation but it requires significant set up ahead of time and lazy
+initialization support. The lazy initialization presents the map with the
+most complexity in the implementation. */
 #ifndef CCC_PRIVATE_FLAT_HASH_MAP_H
 #define CCC_PRIVATE_FLAT_HASH_MAP_H
 
@@ -28,16 +45,16 @@ limitations under the License.
 
 /* NOLINTBEGIN(readability-identifier-naming) */
 
-/** @private If we only make these complex checks once, it is easier to read
+/** @internal If we only make these complex checks once, it is easier to read
 and used the source code during all the platform based implementations. */
 #if defined(__x86_64) && defined(__SSE2__)                                     \
     && !defined(CCC_FLAT_HASH_MAP_PORTABLE)
-/** @private Internal container collection detection for SIMD instructions on
+/** @internal Internal container collection detection for SIMD instructions on
 the x86 architectures. This will be the most efficient version possible
 offering the widest group matching. */
 #    define CCC_HAS_X86_SIMD
 #elif defined(__ARM_NEON__) && !defined(CCC_FLAT_HASH_MAP_PORTABLE)
-/** @private Internal container collection detection for SIMD instructions on
+/** @internal Internal container collection detection for SIMD instructions on
 the NEON architecture. This implementation currently lacks some of the features
 of the x86 SIMD version but should still be fast. */
 #    define CCC_HAS_ARM_SIMD
@@ -45,7 +62,7 @@ of the x86 SIMD version but should still be fast. */
         */
 /** else we define nothing and the portable fallback will take effect. */
 
-/** @private An array of this byte will be in the tag array. Same idea as
+/** @internal An array of this byte will be in the tag array. Same idea as
 Rust's Hashbrown table. The only value not represented by constants is
 the following:
 
@@ -60,18 +77,18 @@ other state. Wrap a byte in a struct to avoid strict-aliasing exceptions that
 are granted to `uint8_t` (usually unsigned char) and `int8_t` (usually char)
 when passed to functions as pointers. Maybe nets performance gain but depends on
 aggressiveness of compiler. */
-struct CCC_flat_hash_map_tag
+struct CCC_Flat_hash_map_tag
 {
     /** Can be set to DELETED or EMPTY or an arbitrary hash 0b0???????. */
     uint8_t v;
 };
 
-/** @private Vectorized group scanning allows more parallel scans but a
+/** @internal Vectorized group scanning allows more parallel scans but a
 fallback of 8 is good for a portable implementation that will use the widest
 word on a platform for group scanning. Right now, this lib targets 64-bit so
 that means uint64_t is widest default integer widely supported. That width
 is still valid on 32-bit but probably very slow due to emulation. */
-enum : typeof((struct CCC_flat_hash_map_tag){}.v)
+enum : typeof((struct CCC_Flat_hash_map_tag){}.v)
 {
 #ifdef CCC_HAS_X86_SIMD
     /** A group of tags that can be loaded into a 128 bit vector. */
@@ -85,7 +102,7 @@ enum : typeof((struct CCC_flat_hash_map_tag){}.v)
 #endif /* defined(CCC_HAS_X86_SIMD) */
 };
 
-/** @private The layout of the map uses only pointers to account for the
+/** @internal The layout of the map uses only pointers to account for the
 possibility of memory provided from the data segment, stack, or heap. When the
 map is allowed to allocate it will take care of aligning pointers appropriately.
 In the fixed size case we rely on the user defining a fixed size type. In either
@@ -126,7 +143,7 @@ struct CCC_Flat_hash_map
     /** Reversed user type data array. */
     void *data;
     /** Tag array on byte following data(0). */
-    struct CCC_flat_hash_map_tag *tag;
+    struct CCC_Flat_hash_map_tag *tag;
     /** The number of user active slots. */
     size_t count;
     /** Track available slots given load factor constrains. When 0, rehash. */
@@ -147,7 +164,7 @@ struct CCC_Flat_hash_map
     void *context;
 };
 
-/** @private A struct for containing all relevant information for a query
+/** @internal A struct for containing all relevant information for a query
 into one object so that passing to future functions is cleaner. */
 struct CCC_Flat_hash_map_entry
 {
@@ -156,12 +173,12 @@ struct CCC_Flat_hash_map_entry
     /** The index in the data/tag array of this entry. */
     size_t index;
     /** The saved tag from the current query hash value. */
-    struct CCC_flat_hash_map_tag tag;
+    struct CCC_Flat_hash_map_tag tag;
     /** The status of this entry. */
     enum CCC_Entry_status status;
 };
 
-/** @private A simple wrapper for an entry that allows us to return a compound
+/** @internal A simple wrapper for an entry that allows us to return a compound
 literal reference. All interface functions accept pointers to entries and
 a functional chain of calls is not possible with return by value. The interface
 can then return `&(union
@@ -169,6 +186,7 @@ CCC_Flat_hash_map_entry_wrap){function_call(...).private}` which is a compound
 literal reference in C23. */
 union CCC_Flat_hash_map_entry_wrap
 {
+    /** @internal Wrapped type to make compound literal reference easy. */
     struct CCC_Flat_hash_map_entry private;
 };
 
@@ -180,7 +198,7 @@ and debugging the macros easier. It also cuts down on repeated logic. */
 struct CCC_Flat_hash_map_entry
 CCC_private_flat_hash_map_entry(struct CCC_Flat_hash_map *, void const *);
 void CCC_private_flat_hash_map_insert(struct CCC_Flat_hash_map *, void const *,
-                                      struct CCC_flat_hash_map_tag, size_t);
+                                      struct CCC_Flat_hash_map_tag, size_t);
 void CCC_private_flat_hash_map_erase(struct CCC_Flat_hash_map *, size_t);
 void *CCC_private_flat_hash_map_data_at(struct CCC_Flat_hash_map const *,
                                         size_t);
@@ -191,7 +209,7 @@ CCC_private_flat_hash_map_set_insert(struct CCC_Flat_hash_map_entry const *);
 
 /*======================    Macro Implementations   =========================*/
 
-/** @private Helps the user declare a type for a fixed size map. They can then
+/** @internal Helps the user declare a type for a fixed size map. They can then
 use this type when they want a hash map as global, static global, or stack
 local. They would need to define their fixed size type every time but that
 should be fine as they are likely to only declare one or two. They would likely
@@ -219,11 +237,11 @@ boundary to be able to perform aligned loads and stores. */
     typedef struct                                                             \
     {                                                                          \
         key_val_type_name data[(capacity) + 1];                                \
-        alignas(CCC_FLAT_HASH_MAP_GROUP_SIZE) struct CCC_flat_hash_map_tag     \
+        alignas(CCC_FLAT_HASH_MAP_GROUP_SIZE) struct CCC_Flat_hash_map_tag     \
             tag[(capacity) + CCC_FLAT_HASH_MAP_GROUP_SIZE];                    \
     }(fixed_map_type_name)
 
-/** @private If the user does not want to remember the capacity they chose
+/** @internal If the user does not want to remember the capacity they chose
 for their type or make mistakes this macro offers consistent calculation of
 total capacity (aka buckets) of the map. This is not the capacity that is
 limited by load factor.
@@ -236,7 +254,7 @@ call unsafe. */
 #define CCC_private_flat_hash_map_fixed_capacity(fixed_map_type_name)          \
     (sizeof((fixed_map_type_name){}.tag) - CCC_FLAT_HASH_MAP_GROUP_SIZE)
 
-/** @private Initialization is tricky but we simplify by only accepting a
+/** @internal Initialization is tricky but we simplify by only accepting a
 pointer to the map this pointer could be any of the following.
 
     - The address of a user defined fixed size map stored in data segment.
@@ -253,7 +271,7 @@ because we can't initialize the tag array at compile time. By setting the tag
 field to NULL we will be able to tell if our map is initialized whether it is
 fixed size and has data or is dynamic and has not yet been given allocation. */
 #define CCC_private_flat_hash_map_initialize(                                  \
-    private_fixed_map_pointer, private_any_type_name, private_key_field,       \
+    private_fixed_map_pointer, private_type_name, private_key_field,           \
     private_hash, private_key_order_fn, private_allocate,                      \
     private_context_data, private_capacity)                                    \
     {                                                                          \
@@ -264,15 +282,16 @@ fixed size and has data or is dynamic and has not yet been given allocation. */
         .mask                                                                  \
         = (((private_capacity) > (size_t)0) ? ((private_capacity) - (size_t)1) \
                                             : (size_t)0),                      \
-        .sizeof_type = sizeof(private_any_type_name),                          \
-        .key_offset = offsetof(private_any_type_name, private_key_field),      \
+        .sizeof_type = sizeof(private_type_name),                              \
+        .key_offset = offsetof(private_type_name, private_key_field),          \
         .compare = (private_key_order_fn),                                     \
         .hash = (private_hash),                                                \
         .allocate = (private_allocate),                                        \
         .context = (private_context_data),                                     \
     }
 
-/** @private Initialize a dynamic container with an initial compound literal. */
+/** @internal Initialize a dynamic container with an initial compound literal.
+ */
 #define CCC_private_flat_hash_map_from(                                        \
     private_key_field, private_hash, private_key_order_fn, private_allocate,   \
     private_context_data, private_optional_cap,                                \
@@ -320,7 +339,7 @@ fixed size and has data or is dynamic and has not yet been given allocation. */
         private_map;                                                           \
     }))
 
-/** @private Initializes the flat hash map with the specified capacity. */
+/** @internal Initializes the flat hash map with the specified capacity. */
 #define CCC_private_flat_hash_map_with_capacity(                               \
     private_type_name, private_key_field, private_hash, private_key_order_fn,  \
     private_allocate, private_context_data, private_cap)                       \
@@ -337,7 +356,7 @@ fixed size and has data or is dynamic and has not yet been given allocation. */
 
 /*========================    Construct In Place    =========================*/
 
-/** @private A fairly good approximation of closures given C23 capabilities.
+/** @internal A fairly good approximation of closures given C23 capabilities.
 The user facing docs clarify that T is a correctly typed reference to the
 desired data if occupied. */
 #define CCC_private_flat_hash_map_and_modify_w(Flat_hash_map_entry_pointer,    \
@@ -366,7 +385,7 @@ desired data if occupied. */
         private_flat_hash_map_mod_with_ent;                                    \
     }))
 
-/** @private The or insert method is unique in that it directly returns a
+/** @internal The or insert method is unique in that it directly returns a
 reference to the inserted data rather than a entry with a status. This is
 because it should not fail. If NULL is returned the user knows there is a
 problem. */
@@ -399,8 +418,9 @@ problem. */
         private_flat_hash_map_or_ins_res;                                      \
     }))
 
-/** @private Insert entry also should not fail and therefore returns a reference
-directly. This is similar to insert or assign where overwriting may occur. */
+/** @internal Insert entry also should not fail and therefore returns a
+reference directly. This is similar to insert or assign where overwriting may
+occur. */
 #define CCC_private_flat_hash_map_insert_entry_w(Flat_hash_map_entry_pointer,  \
                                                  type_compound_literal...)     \
     (__extension__({                                                           \
@@ -429,7 +449,7 @@ directly. This is similar to insert or assign where overwriting may occur. */
         private_flat_hash_map_ins_ent_res;                                     \
     }))
 
-/** @private Because this function does not start with an entry it has the
+/** @internal Because this function does not start with an entry it has the
 option to give user more information and therefore returns an entry.
 Importantly, this function makes sure the key is in sync with key in table. */
 #define CCC_private_flat_hash_map_try_insert_w(Flat_hash_map_pointer, key,     \
@@ -481,7 +501,7 @@ Importantly, this function makes sure the key is in sync with key in table. */
         private_flat_hash_map_try_insert_res;                                  \
     }))
 
-/** @private Because this function does not start with an entry it has the
+/** @internal Because this function does not start with an entry it has the
 option to give user more information and therefore returns an entry.
 Importantly, this function makes sure the key is in sync with key in table.
 Similar to insert entry this will overwrite. */

@@ -13,6 +13,18 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 @endcond */
+/** @internal
+@file
+@brief The Adaptive Map Private Interface
+
+The adaptive map is currently implemented as a Splay Tree. A Splay Tree is a
+self-optimizing data structure that "adapts" the usage pattern of the user
+by moving frequently accessed elements to the root. In the process, the trees
+height is also reduced through rotations.
+
+Adaptive, is the word used for this container because there are many
+self-optimizing data structures that could take over this implementation. It is
+best not to tie the naming to any one type of tree or data structure. */
 #ifndef CCC_PRIVATE_ADAPTIVE_MAP_H
 #define CCC_PRIVATE_ADAPTIVE_MAP_H
 
@@ -25,18 +37,18 @@ limitations under the License.
 
 /* NOLINTBEGIN(readability-identifier-naming) */
 
-/** @private An ordered map element in a splay tree requires no special fields.
+/** @internal An ordered map element in a splay tree requires no special fields.
 In fact the parent could be eliminated, but it is important in providing clean
 iterative traversals with the begin, end, next abstraction for the user. */
 struct CCC_Adaptive_map_node
 {
-    /** @private The child nodes in a array unite left and right cases. */
+    /** @internal The child nodes in a array unite left and right cases. */
     struct CCC_Adaptive_map_node *branch[2];
-    /** @private The parent is useful for iteration. Not required for splay. */
+    /** @internal The parent is useful for iteration. Not required for splay. */
     struct CCC_Adaptive_map_node *parent;
 };
 
-/** @private Runs the top down splay tree algorithm over a node based tree. A
+/** @internal Runs the top down splay tree algorithm over a node based tree. A
 Splay Tree offers amortized `O(log(N))` because it is a self-optimizing
 structure that operates on assumptions about usage patterns. Often, these
 assumptions result in frequently accessed elements remaining a constant distance
@@ -45,27 +57,27 @@ performance. The user should carefully consider if their data access pattern
 can benefit from a skewed distribution before choosing this container. */
 struct CCC_Adaptive_map
 {
-    /** @private The root of the splay tree. The "hot" node after a query. */
+    /** @internal The root of the splay tree. The "hot" node after a query. */
     struct CCC_Adaptive_map_node *root;
-    /** @private The sentinel used to eliminate branches. */
+    /** @internal The sentinel used to eliminate branches. */
     struct CCC_Adaptive_map_node end;
-    /** @private The number of stored tree nodes. */
+    /** @internal The number of stored tree nodes. */
     size_t size;
-    /** @private The size of the user type stored in the tree. */
+    /** @internal The size of the user type stored in the tree. */
     size_t sizeof_type;
-    /** @private The byte offset of the intrusive element. */
+    /** @internal The byte offset of the intrusive element. */
     size_t node_node_offset;
-    /** @private The byte offset of the user key in the user type. */
+    /** @internal The byte offset of the user key in the user type. */
     size_t key_offset;
-    /** @private The user defined comparison callback function. */
+    /** @internal The user defined comparison callback function. */
     CCC_Key_comparator *compare;
-    /** @private The user defined allocation function, if any. */
+    /** @internal The user defined allocation function, if any. */
     CCC_Allocator *allocate;
-    /** @private Auxiliary data, if any. */
+    /** @internal Auxiliary data, if any. */
     void *context;
 };
 
-/** @private An entry is a way to store a node or the information needed to
+/** @internal An entry is a way to store a node or the information needed to
 insert a node without a second query. The user can then take different actions
 depending on the Occupied or Vacant status of the entry.
 
@@ -81,41 +93,41 @@ operations unrelated this entry would also be considered an anti pattern of the
 Entry API. */
 struct CCC_Adaptive_map_entry
 {
-    /** @private The tree associated with this query. */
+    /** @internal The tree associated with this query. */
     struct CCC_Adaptive_map *map;
-    /** @private The stored node or empty if not found. */
+    /** @internal The stored node or empty if not found. */
     struct CCC_Entry entry;
 };
 
-/** @private Enable return by compound literal reference on the stack. Think
+/** @internal Enable return by compound literal reference on the stack. Think
 of this method as return by value but with the additional ability to pass by
 pointer in a functional style. `fnB(&(union
 CCC_Adaptive_map_entry){fnA().private});` */
 union CCC_Adaptive_map_entry_wrap
 {
-    /** @private The field containing the entry struct. */
+    /** @internal The field containing the entry struct. */
     struct CCC_Adaptive_map_entry private;
 };
 
 /*==========================  Private Interface  ============================*/
 
-/** @private */
+/** @internal */
 void *CCC_private_adaptive_map_key_in_slot(struct CCC_Adaptive_map const *,
                                            void const *slot);
-/** @private */
+/** @internal */
 struct CCC_Adaptive_map_node *
 CCC_private_Adaptive_map_node_in_slot(struct CCC_Adaptive_map const *,
                                       void const *slot);
-/** @private */
+/** @internal */
 struct CCC_Adaptive_map_entry
 CCC_private_adaptive_map_entry(struct CCC_Adaptive_map *, void const *key);
-/** @private */
+/** @internal */
 void *CCC_private_adaptive_map_insert(struct CCC_Adaptive_map *,
                                       struct CCC_Adaptive_map_node *);
 
 /*======================   Macro Implementations     ========================*/
 
-/** @private */
+/** @internal */
 #define CCC_private_adaptive_map_initialize(                                   \
     private_tree_name, private_struct_name, private_node_node_field,           \
     private_key_node_field, private_key_comparator, private_allocate,          \
@@ -135,7 +147,7 @@ void *CCC_private_adaptive_map_insert(struct CCC_Adaptive_map *,
         .key_offset = offsetof(private_struct_name, private_key_node_field),   \
     }
 
-/** @private */
+/** @internal */
 #define CCC_private_adaptive_map_new(adaptive_map_entry)                       \
     (__extension__({                                                           \
         void *private_adaptive_map_ins_allocate_ret = NULL;                    \
@@ -152,7 +164,7 @@ void *CCC_private_adaptive_map_insert(struct CCC_Adaptive_map *,
         private_adaptive_map_ins_allocate_ret;                                 \
     }))
 
-/** @private */
+/** @internal */
 #define CCC_private_adaptive_map_insert_key_val(adaptive_map_entry, new_mem,   \
                                                 type_compound_literal...)      \
     (__extension__({                                                           \
@@ -166,7 +178,7 @@ void *CCC_private_adaptive_map_insert(struct CCC_Adaptive_map *,
         }                                                                      \
     }))
 
-/** @private */
+/** @internal */
 #define CCC_private_adaptive_map_insert_and_copy_key(                          \
     om_insert_entry, om_insert_entry_ret, key, type_compound_literal...)       \
     (__extension__({                                                           \
@@ -193,7 +205,7 @@ void *CCC_private_adaptive_map_insert(struct CCC_Adaptive_map *,
 
 /*=====================     Core Macro Implementations     ==================*/
 
-/** @private */
+/** @internal */
 #define CCC_private_adaptive_map_and_modify_w(adaptive_map_entry_pointer,      \
                                               type_name, closure_over_T...)    \
     (__extension__({                                                           \
@@ -218,7 +230,7 @@ void *CCC_private_adaptive_map_insert(struct CCC_Adaptive_map *,
         private_adaptive_map_mod_ent;                                          \
     }))
 
-/** @private */
+/** @internal */
 #define CCC_private_adaptive_map_or_insert_w(adaptive_map_entry_pointer,       \
                                              type_compound_literal...)         \
     (__extension__({                                                           \
@@ -245,7 +257,7 @@ void *CCC_private_adaptive_map_insert(struct CCC_Adaptive_map *,
         private_or_ins_ret;                                                    \
     }))
 
-/** @private */
+/** @internal */
 #define CCC_private_adaptive_map_insert_entry_w(adaptive_map_entry_pointer,    \
                                                 type_compound_literal...)      \
     (__extension__({                                                           \
@@ -285,7 +297,7 @@ void *CCC_private_adaptive_map_insert(struct CCC_Adaptive_map *,
         private_adaptive_map_ins_ent_ret;                                      \
     }))
 
-/** @private */
+/** @internal */
 #define CCC_private_adaptive_map_try_insert_w(adaptive_map_pointer, key,       \
                                               type_compound_literal...)        \
     (__extension__({                                                           \
@@ -317,7 +329,7 @@ void *CCC_private_adaptive_map_insert(struct CCC_Adaptive_map *,
         private_adaptive_map_try_ins_ent_ret;                                  \
     }))
 
-/** @private */
+/** @internal */
 #define CCC_private_adaptive_map_insert_or_assign_w(adaptive_map_pointer, key, \
                                                     type_compound_literal...)  \
     (__extension__({                                                           \

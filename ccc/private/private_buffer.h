@@ -26,51 +26,51 @@ limitations under the License.
 
 /* NOLINTBEGIN(readability-identifier-naming) */
 
-/** @private A Buffer is a contiguous array of a uniform type. The user can
+/** @internal A Buffer is a contiguous array of a uniform type. The user can
 specify any type. The Buffer can be fixed size if no allocation permission is
 given or dynamic if allocation permission is granted. The Buffer can also be
 manually resized via the interface. */
 struct CCC_Buffer
 {
-    /** @private The contiguous memory of uniform type. */
+    /** @internal The contiguous memory of uniform type. */
     void *mem;
-    /** @private The current count of active Buffer slots. */
+    /** @internal The current count of active Buffer slots. */
     size_t count;
-    /** @private The total Buffer slots possible for this array. */
+    /** @internal The total Buffer slots possible for this array. */
     size_t capacity;
-    /** @private The size of the type the user stores in the buffer. */
+    /** @internal The size of the type the user stores in the buffer. */
     size_t sizeof_type;
-    /** @private An allocation function for resizing, if allowed. */
+    /** @internal An allocation function for resizing, if allowed. */
     CCC_Allocator *allocate;
-    /** @private Auxiliary data, if any. */
+    /** @internal Auxiliary data, if any. */
     void *context;
 };
 
-/** @private */
+/** @internal */
 #define CCC_private_buf_non_CCC_private_buf_default_size(...) __VA_ARGS__
-/** @private */
+/** @internal */
 #define CCC_private_buf_default_size(...) 0
-/** @private */
+/** @internal */
 #define CCC_private_buf_optional_size(...)                                     \
     __VA_OPT__(CCC_private_buf_non_)##CCC_private_buf_default_size(__VA_ARGS__)
 
-/** @private Initializes the Buffer with a default size of 0. However the user
+/** @internal Initializes the Buffer with a default size of 0. However the user
 can specify that the Buffer has some count of elements from index
 `[0, capacity - 1)` at initialization time. The Buffer assumes these elements
 are contiguous. */
-#define CCC_private_buffer_initialize(private_mem, private_any_type_name,      \
+#define CCC_private_buffer_initialize(private_mem, private_type_name,          \
                                       private_allocate, private_context_data,  \
                                       private_capacity, ...)                   \
     {                                                                          \
         .mem = (private_mem),                                                  \
-        .sizeof_type = sizeof(private_any_type_name),                          \
+        .sizeof_type = sizeof(private_type_name),                              \
         .count = CCC_private_buf_optional_size(__VA_ARGS__),                   \
         .capacity = (private_capacity),                                        \
         .allocate = (private_allocate),                                        \
         .context = (private_context_data),                                     \
     }
 
-/** @private For dynamic containers to perform the allocation and
+/** @internal For dynamic containers to perform the allocation and
 initialization in one convenient step for user. */
 #define CCC_private_buffer_from(private_allocate, private_context_data,        \
                                 private_optional_capacity,                     \
@@ -99,21 +99,21 @@ initialization in one convenient step for user. */
         private_buf;                                                           \
     }))
 
-/** @private For dynamic containers to perform initialization and reservation
+/** @internal For dynamic containers to perform initialization and reservation
 of memory in one step. */
-#define CCC_private_buffer_with_capacity(                                      \
-    private_any_type_name, private_allocate, private_context_data,             \
-    private_capacity)                                                          \
+#define CCC_private_buffer_with_capacity(private_type_name, private_allocate,  \
+                                         private_context_data,                 \
+                                         private_capacity)                     \
     (__extension__({                                                           \
         struct CCC_Buffer private_buf = CCC_private_buffer_initialize(         \
-            NULL, private_any_type_name, private_allocate,                     \
-            private_context_data, 0);                                          \
+            NULL, private_type_name, private_allocate, private_context_data,   \
+            0);                                                                \
         (void)CCC_buffer_reserve(&private_buf, (private_capacity),             \
                                  private_allocate);                            \
         private_buf;                                                           \
     }))
 
-/** @private */
+/** @internal */
 #define CCC_private_buffer_emplace(private_buffer_pointer, index,              \
                                    private_type_initializer...)                \
     (__extension__({                                                           \
@@ -129,7 +129,7 @@ of memory in one step. */
         private_buffer_res;                                                    \
     }))
 
-/** @private */
+/** @internal */
 #define CCC_private_buffer_emplace_back(private_buffer_pointer,                \
                                         private_type_initializer...)           \
     (__extension__({                                                           \

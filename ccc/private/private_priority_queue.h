@@ -24,7 +24,7 @@ limitations under the License.
 
 /* NOLINTBEGIN(readability-identifier-naming) */
 
-/** @private A node in the priority queue. The child is technically a left
+/** @internal A node in the priority queue. The child is technically a left
 child but the direction is not important. The next and prev pointers represent
 sibling nodes in a circular doubly linked list in the child ring. When a node
 loses a merge and is sent down to be another nodes child it joins this sibling
@@ -32,17 +32,17 @@ ring of nodes. The list is doubly linked and we have a parent pointer to keep
 operations like delete min, erase, and update fast. */
 struct CCC_Priority_queue_node
 {
-    /** @private The left child of this node. */
+    /** @internal The left child of this node. */
     struct CCC_Priority_queue_node *child;
-    /** @private The next sibling in the sibling ring or self. */
+    /** @internal The next sibling in the sibling ring or self. */
     struct CCC_Priority_queue_node *next;
-    /** @private The previous sibling in the sibling ring or self. */
+    /** @internal The previous sibling in the sibling ring or self. */
     struct CCC_Priority_queue_node *prev;
-    /** @private A parent or NULL if this is the root node. */
+    /** @internal A parent or NULL if this is the root node. */
     struct CCC_Priority_queue_node *parent;
 };
 
-/** @private A priority queue is a variation on a heap ordered tree aimed at
+/** @internal A priority queue is a variation on a heap ordered tree aimed at
 simple operations and run times that are very close to optimal. The root of
 the entire heap never has a next, prev, or parent because only a single heap
 root is allowed. Nodes can have a left child. The direction of the child does
@@ -85,60 +85,60 @@ binary flat priority queue in the C Container Collection across many operations
 with the trade-off being more memory consumed. */
 struct CCC_Priority_queue
 {
-    /** @private The node at the root of the heap. No parent. */
+    /** @internal The node at the root of the heap. No parent. */
     struct CCC_Priority_queue_node *root;
-    /** @private Quantity of nodes stored in heap for O(1) reporting. */
+    /** @internal Quantity of nodes stored in heap for O(1) reporting. */
     size_t count;
-    /** @private The byte offset of the intrusive node in user type. */
+    /** @internal The byte offset of the intrusive node in user type. */
     size_t priority_queue_node_offset;
-    /** @private The size of the type we are intruding upon. */
+    /** @internal The size of the type we are intruding upon. */
     size_t sizeof_type;
-    /** @private The order of this heap, `CCC_ORDER_LESSER` (min) or
+    /** @internal The order of this heap, `CCC_ORDER_LESSER` (min) or
      * `CCC_ORDER_GREATER` (max).*/
     CCC_Order order;
-    /** @private The comparison function to enforce ordering. */
+    /** @internal The comparison function to enforce ordering. */
     CCC_Type_comparator *compare;
-    /** @private The allocation function, if any. */
+    /** @internal The allocation function, if any. */
     CCC_Allocator *allocate;
-    /** @private Auxiliary data, if any. */
+    /** @internal Auxiliary data, if any. */
     void *context;
 };
 
 /*=========================  Private Interface     ==========================*/
 
-/** @private */
+/** @internal */
 void CCC_private_priority_queue_push(struct CCC_Priority_queue *,
                                      struct CCC_Priority_queue_node *);
-/** @private */
+/** @internal */
 struct CCC_Priority_queue_node *
 CCC_private_priority_queue_node_in(struct CCC_Priority_queue const *,
                                    void const *);
-/** @private */
+/** @internal */
 CCC_Order
 CCC_private_priority_queue_order(struct CCC_Priority_queue const *,
                                  struct CCC_Priority_queue_node const *,
                                  struct CCC_Priority_queue_node const *);
-/** @private */
+/** @internal */
 struct CCC_Priority_queue_node *
 CCC_private_priority_queue_merge(struct CCC_Priority_queue *,
                                  struct CCC_Priority_queue_node *old,
                                  struct CCC_Priority_queue_node *new);
-/** @private */
+/** @internal */
 void CCC_private_priority_queue_cut_child(struct CCC_Priority_queue_node *);
-/** @private */
+/** @internal */
 void CCC_private_priority_queue_init_node(struct CCC_Priority_queue_node *);
-/** @private */
+/** @internal */
 struct CCC_Priority_queue_node *
 CCC_private_priority_queue_delete_node(struct CCC_Priority_queue *,
                                        struct CCC_Priority_queue_node *);
-/** @private */
+/** @internal */
 void *
 CCC_private_priority_queue_struct_base(struct CCC_Priority_queue const *,
                                        struct CCC_Priority_queue_node const *);
 
 /*=========================  Macro Implementations     ======================*/
 
-/** @private */
+/** @internal */
 #define CCC_private_priority_queue_initialize(                                 \
     private_struct_name, private_priority_queue_node_field,                    \
     private_priority_queue_order, private_order_fn, private_allocate,          \
@@ -155,7 +155,7 @@ CCC_private_priority_queue_struct_base(struct CCC_Priority_queue const *,
         .context = (private_context_data),                                     \
     }
 
-/** @private */
+/** @internal */
 #define CCC_private_priority_queue_emplace(priority_queue_pointer,             \
                                            type_compound_literal...)           \
     (__extension__({                                                           \
@@ -190,13 +190,13 @@ CCC_private_priority_queue_struct_base(struct CCC_Priority_queue const *,
         private_priority_queue_res;                                            \
     }))
 
-/** @private */
+/** @internal */
 #define CCC_private_priority_queue_update_w(                                   \
-    priority_queue_pointer, any_type_pointer, update_closure_over_T...)        \
+    priority_queue_pointer, type_pointer, update_closure_over_T...)            \
     (__extension__({                                                           \
         struct CCC_Priority_queue *const private_priority_queue                \
             = (priority_queue_pointer);                                        \
-        typeof(*any_type_pointer) *T = (any_type_pointer);                     \
+        typeof(*type_pointer) *T = (type_pointer);                             \
         if (private_priority_queue && T)                                       \
         {                                                                      \
             struct CCC_Priority_queue_node *const                              \
@@ -234,13 +234,13 @@ CCC_private_priority_queue_struct_base(struct CCC_Priority_queue const *,
         T;                                                                     \
     }))
 
-/** @private */
+/** @internal */
 #define CCC_private_priority_queue_increase_w(                                 \
-    priority_queue_pointer, any_type_pointer, increase_closure_over_T...)      \
+    priority_queue_pointer, type_pointer, increase_closure_over_T...)          \
     (__extension__({                                                           \
         struct CCC_Priority_queue *const private_priority_queue                \
             = (priority_queue_pointer);                                        \
-        typeof(*any_type_pointer) *T = (any_type_pointer);                     \
+        typeof(*type_pointer) *T = (type_pointer);                             \
         if (private_priority_queue && T)                                       \
         {                                                                      \
             struct CCC_Priority_queue_node *const                              \
@@ -269,13 +269,13 @@ CCC_private_priority_queue_struct_base(struct CCC_Priority_queue const *,
         T;                                                                     \
     }))
 
-/** @private */
+/** @internal */
 #define CCC_private_priority_queue_decrease_w(                                 \
-    priority_queue_pointer, any_type_pointer, decrease_closure_over_T...)      \
+    priority_queue_pointer, type_pointer, decrease_closure_over_T...)          \
     (__extension__({                                                           \
         struct CCC_Priority_queue *const private_priority_queue                \
             = (priority_queue_pointer);                                        \
-        typeof(*any_type_pointer) *T = (any_type_pointer);                     \
+        typeof(*type_pointer) *T = (type_pointer);                             \
         if (private_priority_queue && T)                                       \
         {                                                                      \
             struct CCC_Priority_queue_node *const                              \

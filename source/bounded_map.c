@@ -54,7 +54,7 @@ is fine. */
 #include "private/private_types.h"
 #include "types.h"
 
-/** @private */
+/** @internal */
 enum Link
 {
     L = 0,
@@ -64,7 +64,7 @@ enum Link
 #define INORDER R
 #define R_INORDER L
 
-/** @private This will utilize safe type punning in C. Both union fields have
+/** @internal This will utilize safe type punning in C. Both union fields have
 the same type and when obtaining an entry we either have the desired element
 or its parent. Preserving the known parent is what makes the Entry Interface
 No further look ups are required for insertions, modification, or removal. */
@@ -1356,7 +1356,7 @@ sibling_of([[maybe_unused]] struct CCC_Bounded_map const *const map,
 
 /* NOLINTBEGIN(*misc-no-recursion) */
 
-/** @private */
+/** @internal */
 struct Tree_range
 {
     struct CCC_Bounded_map_node const *low;

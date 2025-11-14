@@ -16,7 +16,7 @@ limitations under the License. */
 #include "private/private_types.h"
 #include "types.h"
 
-/** @private */
+/** @internal */
 static char const *const result_messages[CCC_PRIVATE_RESULT_COUNT] = {
     [CCC_RESULT_OK] = "",
     [CCC_RESULT_FAIL]

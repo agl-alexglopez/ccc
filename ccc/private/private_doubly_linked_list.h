@@ -25,20 +25,20 @@ limitations under the License.
 
 /* NOLINTBEGIN(readability-identifier-naming) */
 
-/** @private A recursive structure for tracking a user element in a doubly
+/** @internal A recursive structure for tracking a user element in a doubly
 linked list. Supports O(1) insert and delete at the front, back, or any
 arbitrary position in the list. Elements always have a valid element to point
 to in the list due to the user of a sentinel so these pointers are never NULL
 if an element is in the list. */
 struct CCC_Doubly_linked_list_node
 {
-    /** @private The next element. Non-null if elem is in list. */
+    /** @internal The next element. Non-null if elem is in list. */
     struct CCC_Doubly_linked_list_node *n;
-    /** @private The previous element. Non-null if elem is in list. */
+    /** @internal The previous element. Non-null if elem is in list. */
     struct CCC_Doubly_linked_list_node *p;
 };
 
-/** @private A doubly linked list with a single sentinel for both head and
+/** @internal A doubly linked list with a single sentinel for both head and
 tail. The list offers O(1) push, pop, insert, and erase at arbitrary positions
 in the list. The sentinel (nil) operates as follows to ensure nodes in the list
 never point to NULL.
@@ -86,40 +86,40 @@ take with a head and tail nil. The only cost is slight care for certain
 cutting and node clearing steps to ensure the nil addresses remain valid */
 struct CCC_Doubly_linked_list
 {
-    /** @private The sentinel with storage in the actual list struct. */
+    /** @internal The sentinel with storage in the actual list struct. */
     struct CCC_Doubly_linked_list_node nil;
-    /** @private The number of elements constantly tracked for O(1) check. */
+    /** @internal The number of elements constantly tracked for O(1) check. */
     size_t count;
-    /** @private The size in bytes of the type which wraps this handle. */
+    /** @internal The size in bytes of the type which wraps this handle. */
     size_t sizeof_type;
-    /** @private The offset in bytes of the intrusive element in user type. */
+    /** @internal The offset in bytes of the intrusive element in user type. */
     size_t doubly_linked_list_node_offset;
-    /** @private The user provided comparison callback for sorting. */
+    /** @internal The user provided comparison callback for sorting. */
     CCC_Type_comparator *compare;
-    /** @private The user provided allocation function, if any. */
+    /** @internal The user provided allocation function, if any. */
     CCC_Allocator *allocate;
-    /** @private User provided context data, if any. */
+    /** @internal User provided context data, if any. */
     void *context;
 };
 
 /*=======================     Private Interface   ===========================*/
 
-/** @private */
+/** @internal */
 void
 CCC_private_doubly_linked_list_push_back(struct CCC_Doubly_linked_list *,
                                          struct CCC_Doubly_linked_list_node *);
-/** @private */
+/** @internal */
 void
 CCC_private_doubly_linked_list_push_front(struct CCC_Doubly_linked_list *,
                                           struct CCC_Doubly_linked_list_node *);
-/** @private */
+/** @internal */
 struct CCC_Doubly_linked_list_node *
 CCC_private_doubly_linked_list_node_in(struct CCC_Doubly_linked_list const *,
                                        void const *any_struct);
 
 /*=======================     Macro Implementations   =======================*/
 
-/** @private Initialization at compile time is allowed in C due to the provided
+/** @internal Initialization at compile time is allowed in C due to the provided
 name of the list being on the left hand side of the assignment operator. */
 #define CCC_private_doubly_linked_list_initialize(                             \
     private_doubly_linked_list_name, private_struct_name,                      \
@@ -137,7 +137,7 @@ name of the list being on the left hand side of the assignment operator. */
         .context = (private_context_data),                                     \
     }
 
-/** @private */
+/** @internal */
 #define CCC_private_doubly_linked_list_emplace_back(                           \
     doubly_linked_list_pointer, struct_initializer...)                         \
     (__extension__({                                                           \
@@ -171,7 +171,7 @@ name of the list being on the left hand side of the assignment operator. */
         private_doubly_linked_list_res;                                        \
     }))
 
-/** @private */
+/** @internal */
 #define CCC_private_doubly_linked_list_emplace_front(                          \
     doubly_linked_list_pointer, struct_initializer...)                         \
     (__extension__({                                                           \

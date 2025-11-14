@@ -26,19 +26,20 @@ limitations under the License.
 
 /* NOLINTBEGIN(readability-identifier-naming) */
 
-/** @private A WAVL node follows traditional balanced binary tree constructs
+/** @internal A WAVL node follows traditional balanced binary tree constructs
 except for the rank field which can be simplified to an even/odd parity. */
 struct CCC_Bounded_map_node
 {
-    /** @private Children in an array to unite left and right cases. */
+    /** @internal Children in an array to unite left and right cases. */
     struct CCC_Bounded_map_node *branch[2];
-    /** @private The parent node needed for iteration and rotation. */
+    /** @internal The parent node needed for iteration and rotation. */
     struct CCC_Bounded_map_node *parent;
-    /** @private The rank for rank difference calculations 1(odd) or 0(even). */
+    /** @internal The rank for rank difference calculations 1(odd) or 0(even).
+     */
     uint8_t parity;
 };
 
-/** @private The realtime ordered map offers strict `O(log(N))` searching,
+/** @internal The realtime ordered map offers strict `O(log(N))` searching,
 inserting, and deleting operations with the Weak AVL Tree Rank Balance
 framework. The number of rotations after an operation are kept to a maximum of
 two, which neither the Red-Black Tree or AVL tree are able to achieve. However,
@@ -52,71 +53,72 @@ shape, making it fast for searching while performing fewer rotations than the
 AVL tree. The implementation is also simpler than either of the other trees. */
 struct CCC_Bounded_map
 {
-    /** @private The root of the tree or the sentinel end if empty. */
+    /** @internal The root of the tree or the sentinel end if empty. */
     struct CCC_Bounded_map_node *root;
-    /** @private The end sentinel in the struct for fewer code branches. */
+    /** @internal The end sentinel in the struct for fewer code branches. */
     struct CCC_Bounded_map_node end;
-    /** @private The count of stored nodes in the tree. */
+    /** @internal The count of stored nodes in the tree. */
     size_t count;
-    /** @private The byte offset of the key in the user struct. */
+    /** @internal The byte offset of the key in the user struct. */
     size_t key_offset;
-    /** @private The byte offset of the intrusive element in the user struct. */
+    /** @internal The byte offset of the intrusive element in the user struct.
+     */
     size_t node_node_offset;
-    /** @private The size of the user struct holding the intruder. */
+    /** @internal The size of the user struct holding the intruder. */
     size_t sizeof_type;
-    /** @private The comparison function for three way comparison. */
+    /** @internal The comparison function for three way comparison. */
     CCC_Key_comparator *compare;
-    /** @private An allocation function, if any. */
+    /** @internal An allocation function, if any. */
     CCC_Allocator *allocate;
-    /** @private Auxiliary data, if any. */
+    /** @internal Auxiliary data, if any. */
     void *context;
 };
 
-/** @private An entry is a way to store a node or the information needed to
+/** @internal An entry is a way to store a node or the information needed to
 insert a node without a second query. The user can then take different actions
 depending on the Occupied or Vacant status of the entry. */
 struct CCC_Bounded_map_entry
 {
-    /** @private The tree associated with this query. */
+    /** @internal The tree associated with this query. */
     struct CCC_Bounded_map *map;
-    /** @private The result of the last comparison to find the user specified
+    /** @internal The result of the last comparison to find the user specified
     node. Equal if found or indicates the direction the node should be
     inserted from the parent we currently store in the entry. */
     CCC_Order last_order;
-    /** @private The stored node or it's parent if it does not exist. */
+    /** @internal The stored node or it's parent if it does not exist. */
     struct CCC_Entry entry;
 };
 
-/** @private Enable return by compound literal reference on the stack. Think
+/** @internal Enable return by compound literal reference on the stack. Think
 of this method as return by value but with the additional ability to pass by
 pointer in a functional style. `fnB(&(union
 CCC_Bounded_map_entry){fnA().private});` */
 union CCC_Bounded_map_entry_wrap
 {
-    /** @private The field containing the entry struct. */
+    /** @internal The field containing the entry struct. */
     struct CCC_Bounded_map_entry private;
 };
 
 /*=========================   Private Interface  ============================*/
 
-/** @private */
+/** @internal */
 void *CCC_private_bounded_map_key_in_slot(struct CCC_Bounded_map const *,
                                           void const *slot);
-/** @private */
+/** @internal */
 struct CCC_Bounded_map_node *
 CCC_private_Bounded_map_node_in_slot(struct CCC_Bounded_map const *,
                                      void const *slot);
-/** @private */
+/** @internal */
 struct CCC_Bounded_map_entry
 CCC_private_bounded_map_entry(struct CCC_Bounded_map const *, void const *key);
-/** @private */
+/** @internal */
 void *CCC_private_bounded_map_insert(
     struct CCC_Bounded_map *, struct CCC_Bounded_map_node *parent,
     CCC_Order last_order, struct CCC_Bounded_map_node *type_output_intruder);
 
 /*==========================   Initialization     ===========================*/
 
-/** @private */
+/** @internal */
 #define CCC_private_bounded_map_initialize(                                    \
     private_map_name, private_struct_name, private_node_node_field,            \
     private_key_node_field, private_key_order_fn, private_allocate,            \
@@ -138,7 +140,7 @@ void *CCC_private_bounded_map_insert(
 
 /*==================   Helper Macros for Repeated Logic     =================*/
 
-/** @private */
+/** @internal */
 #define CCC_private_bounded_map_new(Bounded_map_entry)                         \
     (__extension__({                                                           \
         void *private_bounded_map_ins_allocate_ret = NULL;                     \
@@ -155,7 +157,7 @@ void *CCC_private_bounded_map_insert(
         private_bounded_map_ins_allocate_ret;                                  \
     }))
 
-/** @private */
+/** @internal */
 #define CCC_private_bounded_map_insert_key_val(Bounded_map_entry, new_mem,     \
                                                type_compound_literal...)       \
     (__extension__({                                                           \
@@ -173,7 +175,7 @@ void *CCC_private_bounded_map_insert(
         }                                                                      \
     }))
 
-/** @private */
+/** @internal */
 #define CCC_private_bounded_map_insert_and_copy_key(                           \
     bounded_map_insert_entry, bounded_map_insert_entry_ret, key,               \
     type_compound_literal...)                                                  \
@@ -205,7 +207,7 @@ void *CCC_private_bounded_map_insert(
 
 /*==================     Core Macro Implementations     =====================*/
 
-/** @private */
+/** @internal */
 #define CCC_private_bounded_map_and_modify_w(Bounded_map_entry_pointer,        \
                                              type_name, closure_over_T...)     \
     (__extension__({                                                           \
@@ -229,7 +231,7 @@ void *CCC_private_bounded_map_insert(
         private_bounded_map_mod_ent;                                           \
     }))
 
-/** @private */
+/** @internal */
 #define CCC_private_bounded_map_or_insert_w(Bounded_map_entry_pointer,         \
                                             type_compound_literal...)          \
     (__extension__({                                                           \
@@ -256,7 +258,7 @@ void *CCC_private_bounded_map_insert(
         private_bounded_map_or_ins_ret;                                        \
     }))
 
-/** @private */
+/** @internal */
 #define CCC_private_bounded_map_insert_entry_w(Bounded_map_entry_pointer,      \
                                                type_compound_literal...)       \
     (__extension__({                                                           \
@@ -294,7 +296,7 @@ void *CCC_private_bounded_map_insert(
         private_bounded_map_ins_ent_ret;                                       \
     }))
 
-/** @private */
+/** @internal */
 #define CCC_private_bounded_map_try_insert_w(Bounded_map_pointer, key,         \
                                              type_compound_literal...)         \
     (__extension__({                                                           \
@@ -327,7 +329,7 @@ void *CCC_private_bounded_map_insert(
         private_bounded_map_try_ins_ent_ret;                                   \
     }))
 
-/** @private */
+/** @internal */
 #define CCC_private_bounded_map_insert_or_assign_w(Bounded_map_pointer, key,   \
                                                    type_compound_literal...)   \
     (__extension__({                                                           \

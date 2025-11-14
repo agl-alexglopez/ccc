@@ -25,25 +25,25 @@ limitations under the License.
 
 /* NOLINTBEGIN(readability-identifier-naming) */
 
-/** @private Runs the top down splay tree algorithm with the addition of a free
+/** @internal Runs the top down splay tree algorithm with the addition of a free
 list for providing new nodes within the buffer. The parent field normally
 tracks parent when in the tree for iteration purposes. When a node is removed
 from the tree it is added to the free singly linked list. The free list is a
 LIFO push to front stack. */
 struct CCC_Handle_adaptive_map_node
 {
-    /** @private Child nodes in array to unify Left and Right. */
+    /** @internal Child nodes in array to unify Left and Right. */
     size_t branch[2];
     union
     {
-        /** @private Parent of splay tree node when allocated. */
+        /** @internal Parent of splay tree node when allocated. */
         size_t parent;
-        /** @private Points to next free when not allocated. */
+        /** @internal Points to next free when not allocated. */
         size_t next_free;
     };
 };
 
-/** @private A handle ordered map is a modified struct of arrays layout
+/** @internal A handle ordered map is a modified struct of arrays layout
 with the modification being that we may have the arrays as pointer offsets in
 a contiguous allocation if the user desires a dynamic map.
 
@@ -68,78 +68,78 @@ goal of this implementation. Speed is a secondary goal to space for these
 implementations as the space savings can be significant. */
 struct CCC_Handle_adaptive_map
 {
-    /** @private The contiguous array of user data. */
+    /** @internal The contiguous array of user data. */
     void *data;
-    /** @private The contiguous array of WAVL tree meta data. */
+    /** @internal The contiguous array of WAVL tree meta data. */
     struct CCC_Handle_adaptive_map_node *nodes;
-    /** @private The current capacity. */
+    /** @internal The current capacity. */
     size_t capacity;
-    /** @private The current size. */
+    /** @internal The current size. */
     size_t count;
-    /** @private The root node of the Splay Tree. */
+    /** @internal The root node of the Splay Tree. */
     size_t root;
-    /** @private The start of the free singly linked list. */
+    /** @internal The start of the free singly linked list. */
     size_t free_list;
-    /** @private The size of the type stored in the map. */
+    /** @internal The size of the type stored in the map. */
     size_t sizeof_type;
-    /** @private Where user key can be found in type. */
+    /** @internal Where user key can be found in type. */
     size_t key_offset;
-    /** @private The provided key comparison function. */
+    /** @internal The provided key comparison function. */
     CCC_Key_comparator *order;
-    /** @private The provided allocation function, if any. */
+    /** @internal The provided allocation function, if any. */
     CCC_Allocator *allocate;
-    /** @private The provided context data, if any. */
+    /** @internal The provided context data, if any. */
     void *context;
 };
 
-/** @private A handle is like an entry but if the handle is Occupied, we can
+/** @internal A handle is like an entry but if the handle is Occupied, we can
 guarantee the user that their element will not move from the provided index. */
 struct CCC_Handle_adaptive_map_handle
 {
-    /** @private Map associated with this handle. */
+    /** @internal Map associated with this handle. */
     struct CCC_Handle_adaptive_map *map;
-    /** @private Current index of the handle. */
+    /** @internal Current index of the handle. */
     size_t index;
-    /** @private Saves last comparison direction. */
+    /** @internal Saves last comparison direction. */
     CCC_Order last_order;
-    /** @private The entry status flag. */
+    /** @internal The entry status flag. */
     CCC_Entry_status status;
 };
 
-/** @private Enable return by compound literal reference on the stack. Think
+/** @internal Enable return by compound literal reference on the stack. Think
 of this method as return by value but with the additional ability to pass by
 pointer in a functional style. `fnB(&(union
 CCC_Handle_adaptive_map_handle_wrap){fnA().private});` */
 union CCC_Handle_adaptive_map_handle_wrap
 {
-    /** @private The field containing the handle struct. */
+    /** @internal The field containing the handle struct. */
     struct CCC_Handle_adaptive_map_handle private;
 };
 
 /*===========================   Private Interface ===========================*/
 
-/** @private */
+/** @internal */
 void CCC_private_handle_adaptive_map_insert(struct CCC_Handle_adaptive_map *,
                                             size_t);
-/** @private */
+/** @internal */
 struct CCC_Handle_adaptive_map_handle
 CCC_private_handle_adaptive_map_handle(struct CCC_Handle_adaptive_map *,
                                        void const *key);
-/** @private */
+/** @internal */
 void *
 CCC_private_handle_adaptive_map_data_at(struct CCC_Handle_adaptive_map const *,
                                         size_t slot);
-/** @private */
+/** @internal */
 void *
 CCC_private_handle_adaptive_map_key_at(struct CCC_Handle_adaptive_map const *,
                                        size_t slot);
-/** @private */
+/** @internal */
 size_t
 CCC_private_handle_adaptive_map_allocate_slot(struct CCC_Handle_adaptive_map *);
 
 /*========================     Initialization       =========================*/
 
-/** @private The user can declare a fixed size ordered map with the help of
+/** @internal The user can declare a fixed size ordered map with the help of
 static asserts to ensure the layout is compatible with our internal metadata. */
 #define CCC_private_handle_adaptive_map_declare_fixed_map(                     \
     private_fixed_map_type_name, private_key_val_type_name, private_capacity)  \
@@ -151,13 +151,13 @@ static asserts to ensure the layout is compatible with our internal metadata. */
         struct CCC_Handle_adaptive_map_node nodes[(private_capacity)];         \
     }(private_fixed_map_type_name)
 
-/** @private Taking the size of the array actually works here because the field
+/** @internal Taking the size of the array actually works here because the field
 is of a known fixed size defined at compile time, not just a pointer. */
 #define CCC_private_handle_adaptive_map_fixed_capacity(fixed_map_type_name)    \
     (sizeof((fixed_map_type_name){}.nodes)                                     \
      / sizeof(struct CCC_Handle_adaptive_map_node))
 
-/** @private */
+/** @internal */
 #define CCC_private_handle_adaptive_map_initialize(                            \
     private_memory_pointer, private_type_name, private_key_node_field,         \
     private_key_order_fn, private_allocate, private_context_data,              \
@@ -176,7 +176,7 @@ is of a known fixed size defined at compile time, not just a pointer. */
         .context = (private_context_data),                                     \
     }
 
-/** @private */
+/** @internal */
 #define CCC_private_handle_adaptive_map_as(Handle_adaptive_map_pointer,        \
                                            type_name, handle...)               \
     ((type_name *)CCC_private_handle_adaptive_map_data_at(                     \
@@ -184,7 +184,7 @@ is of a known fixed size defined at compile time, not just a pointer. */
 
 /*==================     Core Macro Implementations     =====================*/
 
-/** @private */
+/** @internal */
 #define CCC_private_handle_adaptive_map_and_modify_w(                          \
     Handle_adaptive_map_handle_pointer, type_name, closure_over_T...)          \
     (__extension__({                                                           \
@@ -212,7 +212,7 @@ is of a known fixed size defined at compile time, not just a pointer. */
         private_handle_adaptive_map_mod_hndl;                                  \
     }))
 
-/** @private */
+/** @internal */
 #define CCC_private_handle_adaptive_map_or_insert_w(                           \
     Handle_adaptive_map_handle_pointer, type_compound_literal...)              \
     (__extension__({                                                           \
@@ -253,7 +253,7 @@ is of a known fixed size defined at compile time, not just a pointer. */
         private_handle_adaptive_map_or_ins_ret;                                \
     }))
 
-/** @private */
+/** @internal */
 #define CCC_private_handle_adaptive_map_insert_handle_w(                       \
     Handle_adaptive_map_handle_pointer, type_compound_literal...)              \
     (__extension__({                                                           \
@@ -302,7 +302,7 @@ is of a known fixed size defined at compile time, not just a pointer. */
         private_handle_adaptive_map_ins_hndl_ret;                              \
     }))
 
-/** @private */
+/** @internal */
 #define CCC_private_handle_adaptive_map_try_insert_w(                          \
     Handle_adaptive_map_pointer, key, type_compound_literal...)                \
     (__extension__({                                                           \
@@ -363,7 +363,7 @@ is of a known fixed size defined at compile time, not just a pointer. */
         private_handle_adaptive_map_try_ins_hndl_ret;                          \
     }))
 
-/** @private */
+/** @internal */
 #define CCC_private_handle_adaptive_map_insert_or_assign_w(                          \
     Handle_adaptive_map_pointer, key, type_compound_literal...)                      \
     (__extension__({                                                                 \
