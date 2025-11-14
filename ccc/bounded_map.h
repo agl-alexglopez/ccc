@@ -224,6 +224,26 @@ the information regarding its presence is helpful. */
 CCC_bounded_map_insert_or_assign(CCC_Bounded_map *map,
                                  CCC_Bounded_map_node *type_intruder);
 
+/** @brief Invariantly inserts or overwrites a user struct into the map.
+@param[in] map_pointer a pointer to the flat hash map.
+@param[in] type_intruder_pointer the handle to the wrapping user type.
+@return a compound literal reference to an entry. If Occupied an entry was
+overwritten by the new key value. If Vacant no prior map entry existed. An
+insert error is returned if insertion failed, in which case unwrapping yields
+NULL.
+
+Note that this function can be used when the old user type is not needed but
+the information regarding its presence is helpful. The compound literal
+reference resides in the automatic storage of the calling scope, like a normal
+return by value; the reference is returned to enable function chaining. */
+#define CCC_bounded_map_insert_or_assign_wrap(map_pointer,                     \
+                                              type_intruder_pointer...)        \
+    &(CCC_Entry)                                                               \
+    {                                                                          \
+        CCC_bounded_map_insert_or_assign((map_pointer), type_intruder_pointer) \
+            .private                                                           \
+    }
+
 /** @brief Inserts a new key value pair or overwrites the existing entry.
 @param[in] map_pointer the pointer to the flat hash map.
 @param[in] key the key to be searched in the map.
@@ -688,6 +708,10 @@ typedef CCC_Bounded_map_entry Bounded_map_entry;
         CCC_bounded_map_insert_entry_with(args)
 #    define bounded_map_try_insert_with(args...)                               \
         CCC_bounded_map_try_insert_with(args)
+#    define bounded_map_insert_or_assign(args...)                              \
+        CCC_bounded_map_insert_or_assign(args)
+#    define bounded_map_insert_or_assign_wrap(args...)                         \
+        CCC_bounded_map_insert_or_assign_wrap(args)
 #    define bounded_map_insert_or_assign_with(args...)                         \
         CCC_bounded_map_insert_or_assign_with(args)
 #    define bounded_map_swap_entry_wrap(args...)                               \

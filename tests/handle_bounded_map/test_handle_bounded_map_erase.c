@@ -51,8 +51,7 @@ check_static_begin(handle_bounded_map_test_prime_shuffle)
     /* We want the tree to have a smattering of duplicates so
        reduce the shuffle range so it will repeat some values. */
     size_t shuffled_index = prime % (size - less);
-    bool repeats[50];
-    memset(repeats, false, sizeof(bool) * size);
+    bool repeats[50] = {};
     for (size_t i = 0; i < size; ++i)
     {
         if (occupied(
@@ -82,9 +81,17 @@ check_static_begin(handle_bounded_map_test_weak_srand)
     srand(time(NULL)); /* NOLINT */
     int const num_nodes = 1000;
     int id_keys[1000];
+    bool repeats[1000] = {};
     for (int i = 0; i < num_nodes; ++i)
     {
         int const rand_i = rand(); /* NOLINT */
+        if (occupied(try_insert_wrap(&s, &(struct Val){
+                                             .id = rand_i,
+                                             .val = i,
+                                         })))
+        {
+            repeats[i] = true;
+        }
         (void)swap_handle(&s, &(struct Val){.id = rand_i, .val = i});
         id_keys[i] = rand_i;
         check(validate(&s), true);
@@ -92,7 +99,7 @@ check_static_begin(handle_bounded_map_test_weak_srand)
     for (int i = 0; i < num_nodes; ++i)
     {
         CCC_Handle const h = CCC_remove(&s, &(struct Val){.id = id_keys[i]});
-        check(occupied(&h), true);
+        check(occupied(&h) || repeats[i], true);
         check(validate(&s), true);
     }
     check(is_empty(&s), true);
@@ -107,17 +114,24 @@ check_static_begin(handle_bounded_map_test_insert_erase_cycles_no_allocate)
     srand(time(NULL)); /* NOLINT */
     int const num_nodes = 1000;
     int id_keys[1000];
+    bool repeats[1000] = {};
     for (int i = 0; i < num_nodes; ++i)
     {
         int const rand_i = rand(); /* NOLINT */
-        (void)insert_or_assign(&s, &(struct Val){.id = rand_i, .val = i});
+        if (occupied(insert_or_assign_wrap(&s, &(struct Val){
+                                                   .id = rand_i,
+                                                   .val = i,
+                                               })))
+        {
+            repeats[i] = true;
+        }
         id_keys[i] = rand_i;
         check(validate(&s), true);
     }
     for (int i = 0; i < num_nodes / 2; ++i)
     {
         CCC_Handle h = CCC_remove(&s, &(struct Val){.id = id_keys[i]});
-        check(occupied(&h), true);
+        check(occupied(&h) || repeats[i], true);
         check(validate(&s), true);
     }
     for (int i = 0; i < num_nodes / 2; ++i)
@@ -129,7 +143,7 @@ check_static_begin(handle_bounded_map_test_insert_erase_cycles_no_allocate)
     for (int i = 0; i < num_nodes; ++i)
     {
         CCC_Handle h = CCC_remove(&s, &(struct Val){.id = id_keys[i]});
-        check(occupied(&h), true);
+        check(occupied(&h) || repeats[i], true);
         check(validate(&s), true);
     }
     check(is_empty(&s), true);
@@ -143,17 +157,24 @@ check_static_begin(handle_bounded_map_test_insert_erase_cycles_allocate)
     srand(time(NULL)); /* NOLINT */
     int const num_nodes = 1000;
     int id_keys[1000];
+    bool repeats[1000] = {};
     for (int i = 0; i < num_nodes; ++i)
     {
         int const rand_i = rand(); /* NOLINT */
-        (void)insert_or_assign(&s, &(struct Val){.id = rand_i, .val = i});
+        if (occupied(insert_or_assign_wrap(&s, &(struct Val){
+                                                   .id = rand_i,
+                                                   .val = i,
+                                               })))
+        {
+            repeats[i] = true;
+        }
         id_keys[i] = rand_i;
         check(validate(&s), true);
     }
     for (int i = 0; i < num_nodes / 2; ++i)
     {
         CCC_Handle h = CCC_remove(&s, &(struct Val){.id = id_keys[i]});
-        check(occupied(&h), true);
+        check(occupied(&h) || repeats[i], true);
         check(validate(&s), true);
     }
     for (int i = 0; i < num_nodes / 2; ++i)
@@ -165,7 +186,7 @@ check_static_begin(handle_bounded_map_test_insert_erase_cycles_allocate)
     for (int i = 0; i < num_nodes; ++i)
     {
         CCC_Handle h = CCC_remove(&s, &(struct Val){.id = id_keys[i]});
-        check(occupied(&h), true);
+        check(occupied(&h) || repeats[i], true);
         check(validate(&s), true);
     }
     check(is_empty(&s), true);

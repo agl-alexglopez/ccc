@@ -264,6 +264,7 @@ macro(add_handle_bounded_map_test TEST_NAME)
       ccc
       checkers
       allocate
+      random
   )
   set_target_properties(${TEST_NAME} 
     PROPERTIES 
