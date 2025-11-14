@@ -88,12 +88,12 @@ CCC_private_singly_linked_list_push_front(struct CCC_Singly_linked_list *,
     }
 
 /** @private */
-#define CCC_private_singly_linked_list_emplace_front(list_ptr,                 \
+#define CCC_private_singly_linked_list_emplace_front(list_pointer,             \
                                                      struct_initializer...)    \
     (__extension__({                                                           \
         typeof(struct_initializer) *private_singly_linked_list_res = NULL;     \
         struct CCC_Singly_linked_list *private_singly_linked_list              \
-            = (list_ptr);                                                      \
+            = (list_pointer);                                                  \
         if (private_singly_linked_list)                                        \
         {                                                                      \
             if (!private_singly_linked_list->allocate)                         \

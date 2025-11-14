@@ -687,7 +687,7 @@ random_vertex_placement(struct Graph const *const graph)
 static void
 find_shortest_paths(struct Graph *const graph)
 {
-    char *lineptr = NULL;
+    char *linepointer = NULL;
     size_t len = 0;
     int total_cost = 0;
     for (;;)
@@ -704,20 +704,20 @@ find_shortest_paths(struct Graph *const graph)
         }
         SV_print(stdout, prompt_message);
         ssize_t read = 0;
-        while ((read = getline(&lineptr, &len, stdin)) > 0)
+        while ((read = getline(&linepointer, &len, stdin)) > 0)
         {
             struct Path_request pr = parse_path_request(
-                graph, (SV_String_view){.s = lineptr, .len = read - 1});
+                graph, (SV_String_view){.s = linepointer, .len = read - 1});
             if (pr.src == 'q')
             {
-                free(lineptr);
+                free(linepointer);
                 printf("Exiting now.\n");
                 return;
             }
             if (!pr.src)
             {
                 clear_line();
-                free(lineptr);
+                free(linepointer);
                 printf("Please provide any source and destination vertex "
                        "represented in the grid\nExamples: AB, A B, B-C, X->Y, "
                        "DtoF\nMost formats work but two capital vertices are "

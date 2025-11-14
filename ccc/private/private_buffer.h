@@ -114,14 +114,14 @@ of memory in one step. */
     }))
 
 /** @private */
-#define CCC_private_buffer_emplace(private_buffer_ptr, index,                  \
+#define CCC_private_buffer_emplace(private_buffer_pointer, index,              \
                                    private_type_initializer...)                \
     (__extension__({                                                           \
         typeof(private_type_initializer) *private_buffer_res = NULL;           \
         __auto_type private_i = (index);                                       \
-        __auto_type private_emplace_buff_ptr = (private_buffer_ptr);           \
+        __auto_type private_emplace_buff_pointer = (private_buffer_pointer);   \
         private_buffer_res                                                     \
-            = CCC_buffer_at(private_emplace_buff_ptr, private_i);              \
+            = CCC_buffer_at(private_emplace_buff_pointer, private_i);          \
         if (private_buffer_res)                                                \
         {                                                                      \
             *private_buffer_res = private_type_initializer;                    \
@@ -130,14 +130,14 @@ of memory in one step. */
     }))
 
 /** @private */
-#define CCC_private_buffer_emplace_back(private_buffer_ptr,                    \
+#define CCC_private_buffer_emplace_back(private_buffer_pointer,                \
                                         private_type_initializer...)           \
     (__extension__({                                                           \
         typeof(private_type_initializer) *private_buffer_res = NULL;           \
-        __auto_type private_emplace_back_private_buffer_ptr                    \
-            = (private_buffer_ptr);                                            \
+        __auto_type private_emplace_back_private_buffer_pointer                \
+            = (private_buffer_pointer);                                        \
         private_buffer_res = CCC_buffer_allocate_back(                         \
-            (private_emplace_back_private_buffer_ptr));                        \
+            (private_emplace_back_private_buffer_pointer));                    \
         if (private_buffer_res)                                                \
         {                                                                      \
             *private_buffer_res = private_type_initializer;                    \

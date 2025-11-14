@@ -90,13 +90,13 @@ main(int argc, char **argv)
 
 check_static_begin(run, SV_String_view const tests_dir)
 {
-    DIR *dir_ptr = open_test_dir(tests_dir);
-    check(dir_ptr != NULL, true);
+    DIR *dir_pointer = open_test_dir(tests_dir);
+    check(dir_pointer != NULL, true);
     char absolute_path[FILESYS_MAX_PATH];
     size_t tests_ran = 0;
     size_t tests_passed = 0;
     struct dirent const *d;
-    while ((d = readdir(dir_ptr)))
+    while ((d = readdir(dir_pointer)))
     {
         SV_String_view const entry = SV_sv(d->d_name);
         if (!SV_starts_with(entry, test_prefix))
@@ -131,7 +131,7 @@ check_static_begin(run, SV_String_view const tests_dir)
         ++tests_ran;
     }
     check(tests_passed, tests_ran);
-    check_end(closedir(dir_ptr););
+    check_end(closedir(dir_pointer););
 }
 
 check_static_begin(run_test_process, struct Path_bin pb)
@@ -174,13 +174,13 @@ open_test_dir(SV_String_view tests_folder)
                SV_begin(tests_folder));
         return NULL;
     }
-    DIR *dir_ptr = opendir(SV_begin(tests_folder));
-    if (!dir_ptr)
+    DIR *dir_pointer = opendir(SV_begin(tests_folder));
+    if (!dir_pointer)
     {
         logerr("Could not open directory %s\n", SV_begin(tests_folder));
         return NULL;
     }
-    return dir_ptr;
+    return dir_pointer;
 }
 
 static bool

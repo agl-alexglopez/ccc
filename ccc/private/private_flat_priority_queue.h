@@ -61,25 +61,25 @@ CCC_private_flat_priority_queue_update_fixup(struct CCC_Flat_priority_queue *,
 
 /** @private */
 #define CCC_private_flat_priority_queue_initialize(                            \
-    private_mem_ptr, private_any_type_name, private_order_order,               \
+    private_mem_pointer, private_any_type_name, private_order_order,           \
     private_order_fn, private_allocate, private_context_data,                  \
     private_capacity)                                                          \
     {                                                                          \
-        .buf = CCC_buffer_initialize(private_mem_ptr, private_any_type_name,   \
-                                     private_allocate, private_context_data,   \
-                                     private_capacity),                        \
+        .buf = CCC_buffer_initialize(private_mem_pointer,                      \
+                                     private_any_type_name, private_allocate,  \
+                                     private_context_data, private_capacity),  \
         .order = (private_order_order),                                        \
         .compare = (private_order_fn),                                         \
     }
 
 /** @private */
 #define CCC_private_flat_priority_queue_heapify_initialize(                    \
-    private_mem_ptr, private_any_type_name, private_order_order,               \
+    private_mem_pointer, private_any_type_name, private_order_order,           \
     private_order_fn, private_allocate, private_context_data,                  \
     private_capacity, private_size)                                            \
     (__extension__({                                                           \
         __auto_type private_flat_priority_queue_heapify_mem                    \
-            = (private_mem_ptr);                                               \
+            = (private_mem_pointer);                                           \
         struct CCC_Flat_priority_queue private_flat_priority_queue_heapify_res \
             = CCC_private_flat_priority_queue_initialize(                      \
                 private_flat_priority_queue_heapify_mem,                       \
@@ -125,32 +125,32 @@ CCC_private_flat_priority_queue_update_fixup(struct CCC_Flat_priority_queue *,
 /** @private Only one update fn is needed because there is no advantage to
    updates if it is known they are min/max increase/decrease etc. */
 #define CCC_private_flat_priority_queue_update_w(                              \
-    flat_priority_queue_ptr, T_ptr, update_closure_over_T...)                  \
+    flat_priority_queue_pointer, T_pointer, update_closure_over_T...)          \
     (__extension__({                                                           \
         struct CCC_Flat_priority_queue *const private_flat_priority_queue      \
-            = (flat_priority_queue_ptr);                                       \
-        typeof(*T_ptr) *T = (T_ptr);                                           \
+            = (flat_priority_queue_pointer);                                   \
+        typeof(*T_pointer) *T = (T_pointer);                                   \
         if (private_flat_priority_queue                                        \
             && !CCC_buffer_is_empty(&private_flat_priority_queue->buf) && T)   \
         {                                                                      \
             {update_closure_over_T} T                                          \
                 = CCC_private_flat_priority_queue_update_fixup(                \
-                    private_flat_priority_queue, T, &(typeof(*T_ptr)){0});     \
+                    private_flat_priority_queue, T, &(typeof(*T_pointer)){0}); \
         }                                                                      \
         T;                                                                     \
     }))
 
 /** @private */
 #define CCC_private_flat_priority_queue_increase_w(                            \
-    flat_priority_queue_ptr, T_ptr, increase_closure_over_T...)                \
-    CCC_private_flat_priority_queue_update_w(flat_priority_queue_ptr, T_ptr,   \
-                                             increase_closure_over_T)
+    flat_priority_queue_pointer, T_pointer, increase_closure_over_T...)        \
+    CCC_private_flat_priority_queue_update_w(                                  \
+        flat_priority_queue_pointer, T_pointer, increase_closure_over_T)
 
 /** @private */
 #define CCC_private_flat_priority_queue_decrease_w(                            \
-    flat_priority_queue_ptr, T_ptr, decrease_closure_over_T...)                \
-    CCC_private_flat_priority_queue_update_w(flat_priority_queue_ptr, T_ptr,   \
-                                             decrease_closure_over_T)
+    flat_priority_queue_pointer, T_pointer, decrease_closure_over_T...)        \
+    CCC_private_flat_priority_queue_update_w(                                  \
+        flat_priority_queue_pointer, T_pointer, decrease_closure_over_T)
 
 /* NOLINTEND(readability-identifier-naming) */
 

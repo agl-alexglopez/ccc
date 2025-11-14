@@ -254,11 +254,11 @@ because we can't initialize the tag array at compile time. By setting the tag
 field to NULL we will be able to tell if our map is initialized whether it is
 fixed size and has data or is dynamic and has not yet been given allocation. */
 #define CCC_private_flat_hash_map_initialize(                                  \
-    private_fixed_map_ptr, private_any_type_name, private_key_field,           \
+    private_fixed_map_pointer, private_any_type_name, private_key_field,       \
     private_hash, private_key_order_fn, private_allocate,                      \
     private_context_data, private_capacity)                                    \
     {                                                                          \
-        .data = (private_fixed_map_ptr),                                       \
+        .data = (private_fixed_map_pointer),                                   \
         .tag = NULL,                                                           \
         .count = 0,                                                            \
         .remain = (((private_capacity) / (size_t)8) * (size_t)7),              \
@@ -341,17 +341,17 @@ fixed size and has data or is dynamic and has not yet been given allocation. */
 /** @private A fairly good approximation of closures given C23 capabilities.
 The user facing docs clarify that T is a correctly typed reference to the
 desired data if occupied. */
-#define CCC_private_flat_hash_map_and_modify_w(Flat_hash_map_entry_ptr,        \
+#define CCC_private_flat_hash_map_and_modify_w(Flat_hash_map_entry_pointer,    \
                                                type_name, closure_over_T...)   \
     (__extension__({                                                           \
-        __auto_type private_flat_hash_map_mod_ent_ptr                          \
-            = (Flat_hash_map_entry_ptr);                                       \
+        __auto_type private_flat_hash_map_mod_ent_pointer                      \
+            = (Flat_hash_map_entry_pointer);                                   \
         struct CCC_Flat_hash_map_entry private_flat_hash_map_mod_with_ent      \
             = {.status = CCC_ENTRY_ARGUMENT_ERROR};                            \
-        if (private_flat_hash_map_mod_ent_ptr)                                 \
+        if (private_flat_hash_map_mod_ent_pointer)                             \
         {                                                                      \
             private_flat_hash_map_mod_with_ent                                 \
-                = private_flat_hash_map_mod_ent_ptr->private;                  \
+                = private_flat_hash_map_mod_ent_pointer->private;              \
             if (private_flat_hash_map_mod_with_ent.status                      \
                 & CCC_ENTRY_OCCUPIED)                                          \
             {                                                                  \
@@ -371,27 +371,28 @@ desired data if occupied. */
 reference to the inserted data rather than a entry with a status. This is
 because it should not fail. If NULL is returned the user knows there is a
 problem. */
-#define CCC_private_flat_hash_map_or_insert_w(Flat_hash_map_entry_ptr,         \
+#define CCC_private_flat_hash_map_or_insert_w(Flat_hash_map_entry_pointer,     \
                                               lazy_key_value...)               \
     (__extension__({                                                           \
-        __auto_type private_flat_hash_map_or_ins_ent_ptr                       \
-            = (Flat_hash_map_entry_ptr);                                       \
+        __auto_type private_flat_hash_map_or_ins_ent_pointer                   \
+            = (Flat_hash_map_entry_pointer);                                   \
         typeof(lazy_key_value) *private_flat_hash_map_or_ins_res = NULL;       \
-        if (private_flat_hash_map_or_ins_ent_ptr)                              \
+        if (private_flat_hash_map_or_ins_ent_pointer)                          \
         {                                                                      \
-            if (!(private_flat_hash_map_or_ins_ent_ptr->private.status         \
+            if (!(private_flat_hash_map_or_ins_ent_pointer->private.status     \
                   & CCC_ENTRY_INSERT_ERROR))                                   \
             {                                                                  \
                 private_flat_hash_map_or_ins_res                               \
                     = CCC_private_flat_hash_map_data_at(                       \
-                        private_flat_hash_map_or_ins_ent_ptr->private.map,     \
-                        private_flat_hash_map_or_ins_ent_ptr->private.index);  \
-                if (private_flat_hash_map_or_ins_ent_ptr->private.status       \
+                        private_flat_hash_map_or_ins_ent_pointer->private.map, \
+                        private_flat_hash_map_or_ins_ent_pointer->private      \
+                            .index);                                           \
+                if (private_flat_hash_map_or_ins_ent_pointer->private.status   \
                     == CCC_ENTRY_VACANT)                                       \
                 {                                                              \
                     *private_flat_hash_map_or_ins_res = lazy_key_value;        \
                     CCC_private_flat_hash_map_set_insert(                      \
-                        &private_flat_hash_map_or_ins_ent_ptr->private);       \
+                        &private_flat_hash_map_or_ins_ent_pointer->private);   \
                 }                                                              \
             }                                                                  \
         }                                                                      \
@@ -400,27 +401,27 @@ problem. */
 
 /** @private Insert entry also should not fail and therefore returns a reference
 directly. This is similar to insert or assign where overwriting may occur. */
-#define CCC_private_flat_hash_map_insert_entry_w(Flat_hash_map_entry_ptr,      \
+#define CCC_private_flat_hash_map_insert_entry_w(Flat_hash_map_entry_pointer,  \
                                                  lazy_key_value...)            \
     (__extension__({                                                           \
-        __auto_type private_flat_hash_map_ins_ent_ptr                          \
-            = (Flat_hash_map_entry_ptr);                                       \
+        __auto_type private_flat_hash_map_ins_ent_pointer                      \
+            = (Flat_hash_map_entry_pointer);                                   \
         typeof(lazy_key_value) *private_flat_hash_map_ins_ent_res = NULL;      \
-        if (private_flat_hash_map_ins_ent_ptr)                                 \
+        if (private_flat_hash_map_ins_ent_pointer)                             \
         {                                                                      \
-            if (!(private_flat_hash_map_ins_ent_ptr->private.status            \
+            if (!(private_flat_hash_map_ins_ent_pointer->private.status        \
                   & CCC_ENTRY_INSERT_ERROR))                                   \
             {                                                                  \
                 private_flat_hash_map_ins_ent_res                              \
                     = CCC_private_flat_hash_map_data_at(                       \
-                        private_flat_hash_map_ins_ent_ptr->private.map,        \
-                        private_flat_hash_map_ins_ent_ptr->private.index);     \
+                        private_flat_hash_map_ins_ent_pointer->private.map,    \
+                        private_flat_hash_map_ins_ent_pointer->private.index); \
                 *private_flat_hash_map_ins_ent_res = lazy_key_value;           \
-                if (private_flat_hash_map_ins_ent_ptr->private.status          \
+                if (private_flat_hash_map_ins_ent_pointer->private.status      \
                     == CCC_ENTRY_VACANT)                                       \
                 {                                                              \
                     CCC_private_flat_hash_map_set_insert(                      \
-                        &private_flat_hash_map_ins_ent_ptr->private);          \
+                        &private_flat_hash_map_ins_ent_pointer->private);      \
                 }                                                              \
             }                                                                  \
         }                                                                      \
@@ -430,19 +431,19 @@ directly. This is similar to insert or assign where overwriting may occur. */
 /** @private Because this function does not start with an entry it has the
 option to give user more information and therefore returns an entry.
 Importantly, this function makes sure the key is in sync with key in table. */
-#define CCC_private_flat_hash_map_try_insert_w(Flat_hash_map_ptr, key,         \
+#define CCC_private_flat_hash_map_try_insert_w(Flat_hash_map_pointer, key,     \
                                                lazy_value...)                  \
     (__extension__({                                                           \
-        struct CCC_Flat_hash_map *private_Flat_hash_map_ptr                    \
-            = (Flat_hash_map_ptr);                                             \
+        struct CCC_Flat_hash_map *private_Flat_hash_map_pointer                \
+            = (Flat_hash_map_pointer);                                         \
         struct CCC_Entry private_flat_hash_map_try_insert_res                  \
             = {.status = CCC_ENTRY_ARGUMENT_ERROR};                            \
-        if (private_Flat_hash_map_ptr)                                         \
+        if (private_Flat_hash_map_pointer)                                     \
         {                                                                      \
             __auto_type private_flat_hash_map_key = key;                       \
             struct CCC_Flat_hash_map_entry private_flat_hash_map_try_ins_ent   \
                 = CCC_private_flat_hash_map_entry(                             \
-                    private_Flat_hash_map_ptr,                                 \
+                    private_Flat_hash_map_pointer,                             \
                     (void *)&private_flat_hash_map_key);                       \
             if ((private_flat_hash_map_try_ins_ent.status                      \
                  & CCC_ENTRY_OCCUPIED)                                         \
@@ -483,14 +484,14 @@ Importantly, this function makes sure the key is in sync with key in table. */
 option to give user more information and therefore returns an entry.
 Importantly, this function makes sure the key is in sync with key in table.
 Similar to insert entry this will overwrite. */
-#define CCC_private_flat_hash_map_insert_or_assign_w(Flat_hash_map_ptr, key,   \
-                                                     lazy_value...)            \
+#define CCC_private_flat_hash_map_insert_or_assign_w(Flat_hash_map_pointer,    \
+                                                     key, lazy_value...)       \
     (__extension__({                                                           \
-        struct CCC_Flat_hash_map *private_Flat_hash_map_ptr                    \
-            = (Flat_hash_map_ptr);                                             \
+        struct CCC_Flat_hash_map *private_Flat_hash_map_pointer                \
+            = (Flat_hash_map_pointer);                                         \
         struct CCC_Entry private_flat_hash_map_insert_or_assign_res            \
             = {.status = CCC_ENTRY_ARGUMENT_ERROR};                            \
-        if (private_Flat_hash_map_ptr)                                         \
+        if (private_Flat_hash_map_pointer)                                     \
         {                                                                      \
             private_flat_hash_map_insert_or_assign_res.status                  \
                 = CCC_ENTRY_INSERT_ERROR;                                      \
@@ -498,7 +499,7 @@ Similar to insert entry this will overwrite. */
             struct CCC_Flat_hash_map_entry                                     \
                 private_flat_hash_map_ins_or_assign_ent                        \
                 = CCC_private_flat_hash_map_entry(                             \
-                    private_Flat_hash_map_ptr,                                 \
+                    private_Flat_hash_map_pointer,                             \
                     (void *)&private_flat_hash_map_key);                       \
             if (!(private_flat_hash_map_ins_or_assign_ent.status               \
                   & CCC_ENTRY_INSERT_ERROR))                                   \

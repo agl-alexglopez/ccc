@@ -93,15 +93,15 @@ check_static_begin(buffer_test_daily_temperatures)
                && *buffer_as(&temps, int, i) > *buffer_as(
                       &temps, int, *buffer_back_as(&idx_stack, int)))
         {
-            int const *const ptr
+            int const *const pointer
                 = buffer_emplace(&res, *buffer_back_as(&idx_stack, int),
                                  i - *buffer_back_as(&idx_stack, int));
-            check(ptr != NULL, CCC_TRUE);
+            check(pointer != NULL, CCC_TRUE);
             CCC_Result const r = buffer_pop_back(&idx_stack);
             check(r, CCC_RESULT_OK);
         }
-        int const *const ptr = buffer_push_back(&idx_stack, &i);
-        check(ptr != NULL, CCC_TRUE);
+        int const *const pointer = buffer_push_back(&idx_stack, &i);
+        check(pointer != NULL, CCC_TRUE);
     }
     check(memcmp(buffer_begin(&res), buffer_begin(&correct),
                  buffer_count_bytes(&correct).count),
@@ -185,8 +185,8 @@ check_static_begin(buffer_test_largest_rectangle_in_histogram)
                             : i - *buffer_back_as(&bar_indices, int) - 1;
             max_rectangle = maxint(max_rectangle, stack_top_height * w);
         }
-        int const *const ptr = buffer_push_back(&bar_indices, &i);
-        check(ptr != NULL, CCC_TRUE);
+        int const *const pointer = buffer_push_back(&bar_indices, &i);
+        check(pointer != NULL, CCC_TRUE);
     }
     check(max_rectangle, correct_max_rectangle);
     check_end();

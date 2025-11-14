@@ -225,11 +225,11 @@ lazily initialized upon the first runtime opportunity. This allows the initial
 memory provided to the data pointer to come from any source at compile or
 runtime. */
 #define CCC_private_handle_bounded_map_initialize(                             \
-    private_memory_ptr, private_type_name, private_key_node_field,             \
+    private_memory_pointer, private_type_name, private_key_node_field,         \
     private_key_comparator, private_allocate, private_context_data,            \
     private_capacity)                                                          \
     {                                                                          \
-        .data = (private_memory_ptr),                                          \
+        .data = (private_memory_pointer),                                      \
         .nodes = NULL,                                                         \
         .parity = NULL,                                                        \
         .capacity = (private_capacity),                                        \
@@ -244,26 +244,26 @@ runtime. */
     }
 
 /** @private */
-#define CCC_private_handle_bounded_map_as(Handle_bounded_map_ptr, type_name,   \
-                                          handle...)                           \
+#define CCC_private_handle_bounded_map_as(Handle_bounded_map_pointer,          \
+                                          type_name, handle...)                \
     ((type_name *)CCC_private_handle_bounded_map_data_at(                      \
-        (Handle_bounded_map_ptr), (handle)))
+        (Handle_bounded_map_pointer), (handle)))
 
 /*==================     Core Macro Implementations     =====================*/
 
 /** @private */
 #define CCC_private_handle_bounded_map_and_modify_w(                           \
-    Handle_bounded_map_handle_ptr, type_name, closure_over_T...)               \
+    Handle_bounded_map_handle_pointer, type_name, closure_over_T...)           \
     (__extension__({                                                           \
-        __auto_type private_handle_bounded_map_hndl_ptr                        \
-            = (Handle_bounded_map_handle_ptr);                                 \
+        __auto_type private_handle_bounded_map_hndl_pointer                    \
+            = (Handle_bounded_map_handle_pointer);                             \
         struct CCC_Handle_bounded_map_handle                                   \
             private_handle_bounded_map_mod_hndl                                \
             = {.status = CCC_ENTRY_ARGUMENT_ERROR};                            \
-        if (private_handle_bounded_map_hndl_ptr)                               \
+        if (private_handle_bounded_map_hndl_pointer)                           \
         {                                                                      \
             private_handle_bounded_map_mod_hndl                                \
-                = private_handle_bounded_map_hndl_ptr->private;                \
+                = private_handle_bounded_map_hndl_pointer->private;            \
             if (private_handle_bounded_map_mod_hndl.status                     \
                 & CCC_ENTRY_OCCUPIED)                                          \
             {                                                                  \
@@ -281,35 +281,35 @@ runtime. */
 
 /** @private */
 #define CCC_private_handle_bounded_map_or_insert_w(                            \
-    Handle_bounded_map_handle_ptr, lazy_key_value...)                          \
+    Handle_bounded_map_handle_pointer, lazy_key_value...)                      \
     (__extension__({                                                           \
-        __auto_type private_or_ins_handle_ptr                                  \
-            = (Handle_bounded_map_handle_ptr);                                 \
+        __auto_type private_or_ins_handle_pointer                              \
+            = (Handle_bounded_map_handle_pointer);                             \
         CCC_Handle_index private_handle_bounded_map_or_ins_ret = 0;            \
-        if (private_or_ins_handle_ptr)                                         \
+        if (private_or_ins_handle_pointer)                                     \
         {                                                                      \
-            if (private_or_ins_handle_ptr->private.status                      \
+            if (private_or_ins_handle_pointer->private.status                  \
                 == CCC_ENTRY_OCCUPIED)                                         \
             {                                                                  \
                 private_handle_bounded_map_or_ins_ret                          \
-                    = private_or_ins_handle_ptr->private.index;                \
+                    = private_or_ins_handle_pointer->private.index;            \
             }                                                                  \
             else                                                               \
             {                                                                  \
                 private_handle_bounded_map_or_ins_ret                          \
                     = CCC_private_handle_bounded_map_allocate_slot(            \
-                        private_or_ins_handle_ptr->private.map);               \
+                        private_or_ins_handle_pointer->private.map);           \
                 if (private_handle_bounded_map_or_ins_ret)                     \
                 {                                                              \
                     *((typeof(lazy_key_value) *)                               \
                           CCC_private_handle_bounded_map_data_at(              \
-                              private_or_ins_handle_ptr->private.map,          \
+                              private_or_ins_handle_pointer->private.map,      \
                               private_handle_bounded_map_or_ins_ret))          \
                         = lazy_key_value;                                      \
                     CCC_private_handle_bounded_map_insert(                     \
-                        private_or_ins_handle_ptr->private.map,                \
-                        private_or_ins_handle_ptr->private.index,              \
-                        private_or_ins_handle_ptr->private.last_order,         \
+                        private_or_ins_handle_pointer->private.map,            \
+                        private_or_ins_handle_pointer->private.index,          \
+                        private_or_ins_handle_pointer->private.last_order,     \
                         private_handle_bounded_map_or_ins_ret);                \
                 }                                                              \
             }                                                                  \
@@ -319,40 +319,41 @@ runtime. */
 
 /** @private */
 #define CCC_private_handle_bounded_map_insert_handle_w(                        \
-    Handle_bounded_map_handle_ptr, lazy_key_value...)                          \
+    Handle_bounded_map_handle_pointer, lazy_key_value...)                      \
     (__extension__({                                                           \
-        __auto_type private_ins_handle_ptr = (Handle_bounded_map_handle_ptr);  \
+        __auto_type private_ins_handle_pointer                                 \
+            = (Handle_bounded_map_handle_pointer);                             \
         CCC_Handle_index private_handle_bounded_map_ins_hndl_ret = 0;          \
-        if (private_ins_handle_ptr)                                            \
+        if (private_ins_handle_pointer)                                        \
         {                                                                      \
-            if (!(private_ins_handle_ptr->private.status                       \
+            if (!(private_ins_handle_pointer->private.status                   \
                   & CCC_ENTRY_OCCUPIED))                                       \
             {                                                                  \
                 private_handle_bounded_map_ins_hndl_ret                        \
                     = CCC_private_handle_bounded_map_allocate_slot(            \
-                        private_ins_handle_ptr->private.map);                  \
+                        private_ins_handle_pointer->private.map);              \
                 if (private_handle_bounded_map_ins_hndl_ret)                   \
                 {                                                              \
                     *((typeof(lazy_key_value) *)                               \
                           CCC_private_handle_bounded_map_data_at(              \
-                              private_ins_handle_ptr->private.map,             \
+                              private_ins_handle_pointer->private.map,         \
                               private_handle_bounded_map_ins_hndl_ret))        \
                         = lazy_key_value;                                      \
                     CCC_private_handle_bounded_map_insert(                     \
-                        private_ins_handle_ptr->private.map,                   \
-                        private_ins_handle_ptr->private.index,                 \
-                        private_ins_handle_ptr->private.last_order,            \
+                        private_ins_handle_pointer->private.map,               \
+                        private_ins_handle_pointer->private.index,             \
+                        private_ins_handle_pointer->private.last_order,        \
                         private_handle_bounded_map_ins_hndl_ret);              \
                 }                                                              \
             }                                                                  \
-            else if (private_ins_handle_ptr->private.status                    \
+            else if (private_ins_handle_pointer->private.status                \
                      == CCC_ENTRY_OCCUPIED)                                    \
             {                                                                  \
                 private_handle_bounded_map_ins_hndl_ret                        \
-                    = private_ins_handle_ptr->private.index;                   \
+                    = private_ins_handle_pointer->private.index;               \
                 *((typeof(lazy_key_value) *)                                   \
                       CCC_private_handle_bounded_map_data_at(                  \
-                          private_ins_handle_ptr->private.map,                 \
+                          private_ins_handle_pointer->private.map,             \
                           private_handle_bounded_map_ins_hndl_ret))            \
                     = lazy_key_value;                                          \
             }                                                                  \
@@ -361,19 +362,20 @@ runtime. */
     }))
 
 /** @private */
-#define CCC_private_handle_bounded_map_try_insert_w(Handle_bounded_map_ptr,    \
-                                                    key, lazy_value...)        \
+#define CCC_private_handle_bounded_map_try_insert_w(                           \
+    Handle_bounded_map_pointer, key, lazy_value...)                            \
     (__extension__({                                                           \
-        __auto_type private_try_ins_map_ptr = (Handle_bounded_map_ptr);        \
+        __auto_type private_try_ins_map_pointer                                \
+            = (Handle_bounded_map_pointer);                                    \
         struct CCC_Handle private_handle_bounded_map_try_ins_hndl_ret          \
             = {.status = CCC_ENTRY_ARGUMENT_ERROR};                            \
-        if (private_try_ins_map_ptr)                                           \
+        if (private_try_ins_map_pointer)                                       \
         {                                                                      \
             __auto_type private_handle_bounded_map_key = (key);                \
             struct CCC_Handle_bounded_map_handle                               \
                 private_handle_bounded_map_try_ins_hndl                        \
                 = CCC_private_handle_bounded_map_handle(                       \
-                    private_try_ins_map_ptr,                                   \
+                    private_try_ins_map_pointer,                               \
                     (void *)&private_handle_bounded_map_key);                  \
             if (!(private_handle_bounded_map_try_ins_hndl.status               \
                   & CCC_ENTRY_OCCUPIED))                                       \
@@ -388,13 +390,13 @@ runtime. */
                 {                                                              \
                     *((typeof(lazy_value) *)                                   \
                           CCC_private_handle_bounded_map_data_at(              \
-                              private_try_ins_map_ptr,                         \
+                              private_try_ins_map_pointer,                     \
                               private_handle_bounded_map_try_ins_hndl_ret      \
                                   .index))                                     \
                         = lazy_value;                                          \
                     *((typeof(private_handle_bounded_map_key) *)               \
                           CCC_private_handle_bounded_map_key_at(               \
-                              private_try_ins_map_ptr,                         \
+                              private_try_ins_map_pointer,                     \
                               private_handle_bounded_map_try_ins_hndl_ret      \
                                   .index))                                     \
                         = private_handle_bounded_map_key;                      \
@@ -424,18 +426,19 @@ runtime. */
 
 /** @private */
 #define CCC_private_handle_bounded_map_insert_or_assign_w(                      \
-    Handle_bounded_map_ptr, key, lazy_value...)                                 \
+    Handle_bounded_map_pointer, key, lazy_value...)                             \
     (__extension__({                                                            \
-        __auto_type private_ins_or_assign_map_ptr = (Handle_bounded_map_ptr);   \
+        __auto_type private_ins_or_assign_map_pointer                           \
+            = (Handle_bounded_map_pointer);                                     \
         struct CCC_Handle private_handle_bounded_map_ins_or_assign_hndl_ret     \
             = {.status = CCC_ENTRY_ARGUMENT_ERROR};                             \
-        if (private_ins_or_assign_map_ptr)                                      \
+        if (private_ins_or_assign_map_pointer)                                  \
         {                                                                       \
             __auto_type private_handle_bounded_map_key = (key);                 \
             struct CCC_Handle_bounded_map_handle                                \
                 private_handle_bounded_map_ins_or_assign_hndl                   \
                 = CCC_private_handle_bounded_map_handle(                        \
-                    private_ins_or_assign_map_ptr,                              \
+                    private_ins_or_assign_map_pointer,                          \
                     (void *)&private_handle_bounded_map_key);                   \
             if (!(private_handle_bounded_map_ins_or_assign_hndl.status          \
                   & CCC_ENTRY_OCCUPIED))                                        \

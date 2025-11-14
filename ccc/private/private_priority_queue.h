@@ -156,11 +156,12 @@ CCC_private_priority_queue_struct_base(struct CCC_Priority_queue const *,
     }
 
 /** @private */
-#define CCC_private_priority_queue_emplace(priority_queue_ptr, lazy_value...)  \
+#define CCC_private_priority_queue_emplace(priority_queue_pointer,             \
+                                           lazy_value...)                      \
     (__extension__({                                                           \
         typeof(lazy_value) *private_priority_queue_res = NULL;                 \
         struct CCC_Priority_queue *private_priority_queue                      \
-            = (priority_queue_ptr);                                            \
+            = (priority_queue_pointer);                                        \
         if (private_priority_queue)                                            \
         {                                                                      \
             if (!private_priority_queue->allocate)                             \
@@ -190,44 +191,44 @@ CCC_private_priority_queue_struct_base(struct CCC_Priority_queue const *,
     }))
 
 /** @private */
-#define CCC_private_priority_queue_update_w(priority_queue_ptr, any_type_ptr,  \
-                                            update_closure_over_T...)          \
+#define CCC_private_priority_queue_update_w(                                   \
+    priority_queue_pointer, any_type_pointer, update_closure_over_T...)        \
     (__extension__({                                                           \
         struct CCC_Priority_queue *const private_priority_queue                \
-            = (priority_queue_ptr);                                            \
-        typeof(*any_type_ptr) *T = (any_type_ptr);                             \
+            = (priority_queue_pointer);                                        \
+        typeof(*any_type_pointer) *T = (any_type_pointer);                     \
         if (private_priority_queue && T)                                       \
         {                                                                      \
             struct CCC_Priority_queue_node *const                              \
-                private_priority_queue_node_ptr                                \
+                private_priority_queue_node_pointer                            \
                 = CCC_private_priority_queue_node_in(private_priority_queue,   \
                                                      T);                       \
-            if (private_priority_queue_node_ptr->parent                        \
+            if (private_priority_queue_node_pointer->parent                    \
                 && CCC_private_priority_queue_order(                           \
                        private_priority_queue,                                 \
-                       private_priority_queue_node_ptr,                        \
-                       private_priority_queue_node_ptr->parent)                \
+                       private_priority_queue_node_pointer,                    \
+                       private_priority_queue_node_pointer->parent)            \
                        == private_priority_queue->order)                       \
             {                                                                  \
                 CCC_private_priority_queue_cut_child(                          \
-                    private_priority_queue_node_ptr);                          \
+                    private_priority_queue_node_pointer);                      \
                 {update_closure_over_T} private_priority_queue->root           \
                     = CCC_private_priority_queue_merge(                        \
                         private_priority_queue, private_priority_queue->root,  \
-                        private_priority_queue_node_ptr);                      \
+                        private_priority_queue_node_pointer);                  \
             }                                                                  \
             else                                                               \
             {                                                                  \
                 private_priority_queue->root                                   \
                     = CCC_private_priority_queue_delete_node(                  \
                         private_priority_queue,                                \
-                        private_priority_queue_node_ptr);                      \
+                        private_priority_queue_node_pointer);                  \
                 CCC_private_priority_queue_init_node(                          \
-                    private_priority_queue_node_ptr);                          \
+                    private_priority_queue_node_pointer);                      \
                 {update_closure_over_T} private_priority_queue->root           \
                     = CCC_private_priority_queue_merge(                        \
                         private_priority_queue, private_priority_queue->root,  \
-                        private_priority_queue_node_ptr);                      \
+                        private_priority_queue_node_pointer);                  \
             }                                                                  \
         }                                                                      \
         T;                                                                     \
@@ -235,70 +236,70 @@ CCC_private_priority_queue_struct_base(struct CCC_Priority_queue const *,
 
 /** @private */
 #define CCC_private_priority_queue_increase_w(                                 \
-    priority_queue_ptr, any_type_ptr, increase_closure_over_T...)              \
+    priority_queue_pointer, any_type_pointer, increase_closure_over_T...)      \
     (__extension__({                                                           \
         struct CCC_Priority_queue *const private_priority_queue                \
-            = (priority_queue_ptr);                                            \
-        typeof(*any_type_ptr) *T = (any_type_ptr);                             \
+            = (priority_queue_pointer);                                        \
+        typeof(*any_type_pointer) *T = (any_type_pointer);                     \
         if (private_priority_queue && T)                                       \
         {                                                                      \
             struct CCC_Priority_queue_node *const                              \
-                private_priority_queue_node_ptr                                \
+                private_priority_queue_node_pointer                            \
                 = CCC_private_priority_queue_node_in(private_priority_queue,   \
                                                      T);                       \
             if (private_priority_queue->order == CCC_ORDER_GREATER)            \
             {                                                                  \
                 CCC_private_priority_queue_cut_child(                          \
-                    private_priority_queue_node_ptr);                          \
+                    private_priority_queue_node_pointer);                      \
             }                                                                  \
             else                                                               \
             {                                                                  \
                 private_priority_queue->root                                   \
                     = CCC_private_priority_queue_delete_node(                  \
                         private_priority_queue,                                \
-                        private_priority_queue_node_ptr);                      \
+                        private_priority_queue_node_pointer);                  \
                 CCC_private_priority_queue_init_node(                          \
-                    private_priority_queue_node_ptr);                          \
+                    private_priority_queue_node_pointer);                      \
             }                                                                  \
             {increase_closure_over_T} private_priority_queue->root             \
                 = CCC_private_priority_queue_merge(                            \
                     private_priority_queue, private_priority_queue->root,      \
-                    private_priority_queue_node_ptr);                          \
+                    private_priority_queue_node_pointer);                      \
         }                                                                      \
         T;                                                                     \
     }))
 
 /** @private */
 #define CCC_private_priority_queue_decrease_w(                                 \
-    priority_queue_ptr, any_type_ptr, decrease_closure_over_T...)              \
+    priority_queue_pointer, any_type_pointer, decrease_closure_over_T...)      \
     (__extension__({                                                           \
         struct CCC_Priority_queue *const private_priority_queue                \
-            = (priority_queue_ptr);                                            \
-        typeof(*any_type_ptr) *T = (any_type_ptr);                             \
+            = (priority_queue_pointer);                                        \
+        typeof(*any_type_pointer) *T = (any_type_pointer);                     \
         if (private_priority_queue && T)                                       \
         {                                                                      \
             struct CCC_Priority_queue_node *const                              \
-                private_priority_queue_node_ptr                                \
+                private_priority_queue_node_pointer                            \
                 = CCC_private_priority_queue_node_in(private_priority_queue,   \
                                                      T);                       \
             if (private_priority_queue->order == CCC_ORDER_LESSER)             \
             {                                                                  \
                 CCC_private_priority_queue_cut_child(                          \
-                    private_priority_queue_node_ptr);                          \
+                    private_priority_queue_node_pointer);                      \
             }                                                                  \
             else                                                               \
             {                                                                  \
                 private_priority_queue->root                                   \
                     = CCC_private_priority_queue_delete_node(                  \
                         private_priority_queue,                                \
-                        private_priority_queue_node_ptr);                      \
+                        private_priority_queue_node_pointer);                  \
                 CCC_private_priority_queue_init_node(                          \
-                    private_priority_queue_node_ptr);                          \
+                    private_priority_queue_node_pointer);                      \
             }                                                                  \
             {decrease_closure_over_T} private_priority_queue->root             \
                 = CCC_private_priority_queue_merge(                            \
                     private_priority_queue, private_priority_queue->root,      \
-                    private_priority_queue_node_ptr);                          \
+                    private_priority_queue_node_pointer);                      \
         }                                                                      \
         T;                                                                     \
     }))

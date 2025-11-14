@@ -193,16 +193,17 @@ void *CCC_private_adaptive_map_insert(struct CCC_Adaptive_map *,
 /*=====================     Core Macro Implementations     ==================*/
 
 /** @private */
-#define CCC_private_adaptive_map_and_modify_w(adaptive_map_entry_ptr,          \
+#define CCC_private_adaptive_map_and_modify_w(adaptive_map_entry_pointer,      \
                                               type_name, closure_over_T...)    \
     (__extension__({                                                           \
-        __auto_type private_adaptive_map_ent_ptr = (adaptive_map_entry_ptr);   \
+        __auto_type private_adaptive_map_ent_pointer                           \
+            = (adaptive_map_entry_pointer);                                    \
         struct CCC_Adaptive_map_entry private_adaptive_map_mod_ent             \
             = {.entry = {.status = CCC_ENTRY_ARGUMENT_ERROR}};                 \
-        if (private_adaptive_map_ent_ptr)                                      \
+        if (private_adaptive_map_ent_pointer)                                  \
         {                                                                      \
             private_adaptive_map_mod_ent                                       \
-                = private_adaptive_map_ent_ptr->private;                       \
+                = private_adaptive_map_ent_pointer->private;                   \
             if (private_adaptive_map_mod_ent.entry.status                      \
                 & CCC_ENTRY_OCCUPIED)                                          \
             {                                                                  \
@@ -217,83 +218,84 @@ void *CCC_private_adaptive_map_insert(struct CCC_Adaptive_map *,
     }))
 
 /** @private */
-#define CCC_private_adaptive_map_or_insert_w(adaptive_map_entry_ptr,           \
+#define CCC_private_adaptive_map_or_insert_w(adaptive_map_entry_pointer,       \
                                              lazy_key_value...)                \
     (__extension__({                                                           \
-        __auto_type private_or_ins_entry_ptr = (adaptive_map_entry_ptr);       \
+        __auto_type private_or_ins_entry_pointer                               \
+            = (adaptive_map_entry_pointer);                                    \
         typeof(lazy_key_value) *private_or_ins_ret = NULL;                     \
-        if (private_or_ins_entry_ptr)                                          \
+        if (private_or_ins_entry_pointer)                                      \
         {                                                                      \
-            if (private_or_ins_entry_ptr->private.entry.status                 \
+            if (private_or_ins_entry_pointer->private.entry.status             \
                 == CCC_ENTRY_OCCUPIED)                                         \
             {                                                                  \
                 private_or_ins_ret                                             \
-                    = private_or_ins_entry_ptr->private.entry.type;            \
+                    = private_or_ins_entry_pointer->private.entry.type;        \
             }                                                                  \
             else                                                               \
             {                                                                  \
                 private_or_ins_ret = CCC_private_adaptive_map_new(             \
-                    &private_or_ins_entry_ptr->private);                       \
+                    &private_or_ins_entry_pointer->private);                   \
                 CCC_private_adaptive_map_insert_key_val(                       \
-                    &private_or_ins_entry_ptr->private, private_or_ins_ret,    \
-                    lazy_key_value);                                           \
+                    &private_or_ins_entry_pointer->private,                    \
+                    private_or_ins_ret, lazy_key_value);                       \
             }                                                                  \
         }                                                                      \
         private_or_ins_ret;                                                    \
     }))
 
 /** @private */
-#define CCC_private_adaptive_map_insert_entry_w(adaptive_map_entry_ptr,        \
+#define CCC_private_adaptive_map_insert_entry_w(adaptive_map_entry_pointer,    \
                                                 lazy_key_value...)             \
     (__extension__({                                                           \
-        __auto_type private_ins_entry_ptr = (adaptive_map_entry_ptr);          \
+        __auto_type private_ins_entry_pointer = (adaptive_map_entry_pointer);  \
         typeof(lazy_key_value) *private_adaptive_map_ins_ent_ret = NULL;       \
-        if (private_ins_entry_ptr)                                             \
+        if (private_ins_entry_pointer)                                         \
         {                                                                      \
-            if (!(private_ins_entry_ptr->private.entry.status                  \
+            if (!(private_ins_entry_pointer->private.entry.status              \
                   & CCC_ENTRY_OCCUPIED))                                       \
             {                                                                  \
                 private_adaptive_map_ins_ent_ret                               \
                     = CCC_private_adaptive_map_new(                            \
-                        &private_ins_entry_ptr->private);                      \
+                        &private_ins_entry_pointer->private);                  \
                 CCC_private_adaptive_map_insert_key_val(                       \
-                    &private_ins_entry_ptr->private,                           \
+                    &private_ins_entry_pointer->private,                       \
                     private_adaptive_map_ins_ent_ret, lazy_key_value);         \
             }                                                                  \
-            else if (private_ins_entry_ptr->private.entry.status               \
+            else if (private_ins_entry_pointer->private.entry.status           \
                      == CCC_ENTRY_OCCUPIED)                                    \
             {                                                                  \
                 struct CCC_Adaptive_map_node private_ins_ent_saved             \
                     = *CCC_private_Adaptive_map_node_in_slot(                  \
-                        private_ins_entry_ptr->private.map,                    \
-                        private_ins_entry_ptr->private.entry.type);            \
+                        private_ins_entry_pointer->private.map,                \
+                        private_ins_entry_pointer->private.entry.type);        \
                 *((typeof(lazy_key_value) *)                                   \
-                      private_ins_entry_ptr->private.entry.type)               \
+                      private_ins_entry_pointer->private.entry.type)           \
                     = lazy_key_value;                                          \
                 *CCC_private_Adaptive_map_node_in_slot(                        \
-                    private_ins_entry_ptr->private.map,                        \
-                    private_ins_entry_ptr->private.entry.type)                 \
+                    private_ins_entry_pointer->private.map,                    \
+                    private_ins_entry_pointer->private.entry.type)             \
                     = private_ins_ent_saved;                                   \
                 private_adaptive_map_ins_ent_ret                               \
-                    = private_ins_entry_ptr->private.entry.type;               \
+                    = private_ins_entry_pointer->private.entry.type;           \
             }                                                                  \
         }                                                                      \
         private_adaptive_map_ins_ent_ret;                                      \
     }))
 
 /** @private */
-#define CCC_private_adaptive_map_try_insert_w(adaptive_map_ptr, key,           \
+#define CCC_private_adaptive_map_try_insert_w(adaptive_map_pointer, key,       \
                                               lazy_value...)                   \
     (__extension__({                                                           \
-        __auto_type private_try_ins_map_ptr = (adaptive_map_ptr);              \
+        __auto_type private_try_ins_map_pointer = (adaptive_map_pointer);      \
         struct CCC_Entry private_adaptive_map_try_ins_ent_ret                  \
             = {.status = CCC_ENTRY_ARGUMENT_ERROR};                            \
-        if (private_try_ins_map_ptr)                                           \
+        if (private_try_ins_map_pointer)                                       \
         {                                                                      \
             __auto_type private_adaptive_map_key = (key);                      \
             struct CCC_Adaptive_map_entry private_adaptive_map_try_ins_ent     \
                 = CCC_private_adaptive_map_entry(                              \
-                    private_try_ins_map_ptr,                                   \
+                    private_try_ins_map_pointer,                               \
                     (void *)&private_adaptive_map_key);                        \
             if (!(private_adaptive_map_try_ins_ent.entry.status                \
                   & CCC_ENTRY_OCCUPIED))                                       \
@@ -314,19 +316,20 @@ void *CCC_private_adaptive_map_insert(struct CCC_Adaptive_map *,
     }))
 
 /** @private */
-#define CCC_private_adaptive_map_insert_or_assign_w(adaptive_map_ptr, key,     \
+#define CCC_private_adaptive_map_insert_or_assign_w(adaptive_map_pointer, key, \
                                                     lazy_value...)             \
     (__extension__({                                                           \
-        __auto_type private_ins_or_assign_map_ptr = (adaptive_map_ptr);        \
+        __auto_type private_ins_or_assign_map_pointer                          \
+            = (adaptive_map_pointer);                                          \
         struct CCC_Entry private_adaptive_map_ins_or_assign_ent_ret            \
             = {.status = CCC_ENTRY_ARGUMENT_ERROR};                            \
-        if (private_ins_or_assign_map_ptr)                                     \
+        if (private_ins_or_assign_map_pointer)                                 \
         {                                                                      \
             __auto_type private_adaptive_map_key = (key);                      \
             struct CCC_Adaptive_map_entry                                      \
                 private_adaptive_map_ins_or_assign_ent                         \
                 = CCC_private_adaptive_map_entry(                              \
-                    private_ins_or_assign_map_ptr,                             \
+                    private_ins_or_assign_map_pointer,                         \
                     (void *)&private_adaptive_map_key);                        \
             if (!(private_adaptive_map_ins_or_assign_ent.entry.status          \
                   & CCC_ENTRY_OCCUPIED))                                       \
@@ -354,7 +357,7 @@ void *CCC_private_adaptive_map_insert(struct CCC_Adaptive_map *,
                     = private_adaptive_map_ins_or_assign_ent.entry;            \
                 *((typeof(private_adaptive_map_key) *)                         \
                       CCC_private_adaptive_map_key_in_slot(                    \
-                          private_ins_or_assign_map_ptr,                       \
+                          private_ins_or_assign_map_pointer,                   \
                           private_adaptive_map_ins_or_assign_ent_ret.type))    \
                     = private_adaptive_map_key;                                \
             }                                                                  \

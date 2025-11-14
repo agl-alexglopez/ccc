@@ -867,8 +867,8 @@ void *CCC_priority_queue_push(CCC_Priority_queue *priority_queue, CCC_Priority_q
 Non-Intrusive containers exist when a flat container can operate without such help from the user. The `flat_priority_queue` is a good example of this. When initializing we give it the following information.
 
 ```c
-#define CCC_flat_priority_queue_initialize(mem_ptr, cmp_order, cmp_fn, allocate, context_data, capacity) \
-    CCC_impl_flat_priority_queue_initialize(mem_ptr, cmp_order, cmp_fn, allocate, context_data, capacity)
+#define CCC_flat_priority_queue_initialize(mem_pointer, cmp_order, cmp_fn, allocate, context_data, capacity) \
+    CCC_impl_flat_priority_queue_initialize(mem_pointer, cmp_order, cmp_fn, allocate, context_data, capacity)
 
 /* For example: */
 
@@ -1002,11 +1002,11 @@ Traditionally, intrusive containers provide the following macro.
 
 ```c
 /** list_entry - get the struct for this entry
-@ptr the &struct list_node pointer.
+@pointer the &struct list_node pointer.
 @type the type of the struct this is embedded in.
 @member	the name of the list_node within the struct. */
-#define list_entry(ptr, type, member) \
-	container_of(ptr, type, member)
+#define list_entry(pointer, type, member) \
+	container_of(pointer, type, member)
 
 /* A provided function by the container. */
 struct list_node *list_front(list *l);
@@ -1076,18 +1076,18 @@ Internally the containers will remember the offsets of the provided elements wit
 
 Rust has solid interfaces for associative containers, largely due to the Entry Interface. In the C Container Collection the core of all associative containers is inspired by the Entry Interface (these versions are found in `ccc/traits.h` but specific names, behaviors, and parameters can be read in each container's header).
 
-- `CCC_Entry(container_ptr, key_ptr...)` - Obtains an entry, a view into an Occupied or Vacant user type stored in the container.
-- `CCC_and_modify(entry_ptr, mod_fn)` - Modify an occupied entry with a callback.
-- `CCC_and_modify_context(entry_ptr, mod_fn, context_args)` - Modify an Occupied entry with a callback that requires context data.
-- `CCC_or_insert(entry_ptr, or_insert_args)` - Insert a default key value if Vacant or return the Occupied entry.
-- `CCC_insert_entry(entry_ptr, insert_entry_args)` - Invariantly insert a new key value, overwriting an Occupied entry if needed.
-- `CCC_remove_entry(entry_ptr)` - Remove an Occupied entry from the container or do nothing.
+- `CCC_Entry(container_pointer, key_pointer...)` - Obtains an entry, a view into an Occupied or Vacant user type stored in the container.
+- `CCC_and_modify(entry_pointer, mod_fn)` - Modify an occupied entry with a callback.
+- `CCC_and_modify_context(entry_pointer, mod_fn, context_args)` - Modify an Occupied entry with a callback that requires context data.
+- `CCC_or_insert(entry_pointer, or_insert_args)` - Insert a default key value if Vacant or return the Occupied entry.
+- `CCC_insert_entry(entry_pointer, insert_entry_args)` - Invariantly insert a new key value, overwriting an Occupied entry if needed.
+- `CCC_remove_entry(entry_pointer)` - Remove an Occupied entry from the container or do nothing.
 
 Other Rust Interface functions like `get_key_val`, `insert`, and `remove` are included and can provide information about previous values stored in the container.
 
 Each container offers it's own C version of "closures" for the `and_modify_w` macro, short for and modify "with". Here is an example from the `samples/words.c` program.
 
-- `and_modify_w(handle_adaptive_map_entry_ptr, type_name, closure_over_T...)` - Run code in `closure_over_T` on the stored user type `T`.
+- `and_modify_w(handle_adaptive_map_entry_pointer, type_name, closure_over_T...)` - Run code in `closure_over_T` on the stored user type `T`.
 
 ```c
 typedef struct
@@ -1107,8 +1107,8 @@ This is possible because of the details discussed in the previous section. Conta
 
 Some C++ associative container interfaces have also been adapted to the Entry Interface.
 
-- `CCC_try_insert(container_ptr, try_insert_args)` - Inserts a new element if none was present and reports if a previous entry existed.
-- `CCC_insert_or_assign(container_ptr, insert_or_assign_args)` - Inserts a new element invariantly and reports if a previous entry existed.
+- `CCC_try_insert(container_pointer, try_insert_args)` - Inserts a new element if none was present and reports if a previous entry existed.
+- `CCC_insert_or_assign(container_pointer, insert_or_assign_args)` - Inserts a new element invariantly and reports if a previous entry existed.
 
 Many other containers fall back to C++ style interfaces when it makes sense to do so.
 

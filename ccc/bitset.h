@@ -129,7 +129,7 @@ interface. */
     CCC_private_bitset_blocks(bit_cap, optional_storage_duration)
 
 /** @brief Initialize the bit set with memory and allocation permissions.
-@param [in] bitblock_ptr the pointer to existing blocks or NULL.
+@param [in] bitblock_pointer the pointer to existing blocks or NULL.
 @param [in] allocate the allocation function for a dynamic bit set or NULL.
 @param [in] context context data needed for allocation of the bit set.
 @param [in] cap the number of bits that will be stored in this bit set.
@@ -166,9 +166,9 @@ Bitset bs = bitset_initialize(NULL, std_allocate, NULL, 0);
 ```
 
 See types.h for more on allocation functions. */
-#define CCC_bitset_initialize(bitblock_ptr, allocate, context, cap,            \
+#define CCC_bitset_initialize(bitblock_pointer, allocate, context, cap,        \
                               optional_size...)                                \
-    CCC_private_bitset_initialize(bitblock_ptr, allocate, context, cap,        \
+    CCC_private_bitset_initialize(bitblock_pointer, allocate, context, cap,    \
                                   optional_size)
 
 /** @brief Initialize the bit set with a custom input string.

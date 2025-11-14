@@ -414,14 +414,14 @@ print_n(CCC_Handle_adaptive_map *const map, CCC_Order const ord,
 static Handle_adaptive_map
 create_frequency_map(struct String_arena *const a, FILE *const f)
 {
-    char *lineptr = NULL;
+    char *linepointer = NULL;
     size_t len = 0;
     ptrdiff_t read = 0;
     Handle_adaptive_map handle_adaptive_map = handle_adaptive_map_initialize(
         NULL, Word, ofs, order_string_keys, std_allocate, a, 0);
-    while ((read = getline(&lineptr, &len, f)) > 0)
+    while ((read = getline(&linepointer, &len, f)) > 0)
     {
-        SV_String_view const line = {.s = lineptr, .len = read - 1};
+        SV_String_view const line = {.s = linepointer, .len = read - 1};
         for (SV_String_view word_view = SV_begin_tok(line, space);
              !SV_end_tok(line, word_view);
              word_view = SV_next_tok(line, word_view, space))
@@ -439,7 +439,7 @@ create_frequency_map(struct String_arena *const a, FILE *const f)
             }
         }
     }
-    free(lineptr);
+    free(linepointer);
     return handle_adaptive_map;
 }
 

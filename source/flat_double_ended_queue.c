@@ -277,10 +277,11 @@ CCC_flat_double_ended_queue_reverse_begin(
 void *
 CCC_flat_double_ended_queue_next(
     CCC_Flat_double_ended_queue const *const flat_double_ended_queue,
-    void const *const iter_ptr)
+    void const *const iter_pointer)
 {
-    size_t const next_i = increment(
-        flat_double_ended_queue, index_of(flat_double_ended_queue, iter_ptr));
+    size_t const next_i
+        = increment(flat_double_ended_queue,
+                    index_of(flat_double_ended_queue, iter_pointer));
     if (next_i == flat_double_ended_queue->front
         || distance(flat_double_ended_queue, next_i,
                     flat_double_ended_queue->front)
@@ -294,9 +295,9 @@ CCC_flat_double_ended_queue_next(
 void *
 CCC_flat_double_ended_queue_reverse_next(
     CCC_Flat_double_ended_queue const *const flat_double_ended_queue,
-    void const *const iter_ptr)
+    void const *const iter_pointer)
 {
-    size_t const cur_i = index_of(flat_double_ended_queue, iter_ptr);
+    size_t const cur_i = index_of(flat_double_ended_queue, iter_pointer);
     size_t const next_i = decrement(flat_double_ended_queue, cur_i);
     size_t const reverse_begin = last_node_index(flat_double_ended_queue);
     if (next_i == reverse_begin

@@ -106,7 +106,7 @@ Add or remove elements from the doubly linked list. */
 
 /** @brief  writes contents of type initializer directly to allocated memory at
 the back of the list. O(1).
-@param [in] list_ptr the address of the doubly linked list.
+@param [in] list_pointer the address of the doubly linked list.
 @param [in] type_initializer the r-value initializer of the type to be inserted
 in the list. This should match the type containing Doubly_linked_list elements
 as a struct member for this list.
@@ -117,12 +117,12 @@ Note that it does not make sense to use this method if the list has been
 initialized without an allocation function. If the user does not allow
 allocation, the contents of new elements to be inserted has been determined by
 the user prior to any inserts into the list. */
-#define CCC_doubly_linked_list_emplace_back(list_ptr, type_initializer...)     \
-    CCC_private_doubly_linked_list_emplace_back(list_ptr, type_initializer)
+#define CCC_doubly_linked_list_emplace_back(list_pointer, type_initializer...) \
+    CCC_private_doubly_linked_list_emplace_back(list_pointer, type_initializer)
 
 /** @brief  writes contents of type initializer directly to allocated memory at
 the front of the list. O(1).
-@param [in] list_ptr the address of the doubly linked list.
+@param [in] list_pointer the address of the doubly linked list.
 @param [in] type_initializer the r-value initializer of the type to be inserted
 in the list. This should match the type containing Doubly_linked_list elements
 as a struct member for this list.
@@ -133,8 +133,9 @@ Note that it does not make sense to use this method if the list has been
 initialized without an allocation function. If the user does not allow
 allocation, the contents of new elements to be inserted has been determined by
 the user prior to any inserts into the list. */
-#define CCC_doubly_linked_list_emplace_front(list_ptr, type_initializer...)    \
-    CCC_private_doubly_linked_list_emplace_front(list_ptr, type_initializer)
+#define CCC_doubly_linked_list_emplace_front(list_pointer,                     \
+                                             type_initializer...)              \
+    CCC_private_doubly_linked_list_emplace_front(list_pointer, type_initializer)
 
 /** @brief Push user type wrapping elem to the front of the list. O(1).
 @param [in] l a pointer to the doubly linked list.

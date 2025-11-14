@@ -570,20 +570,25 @@ typedef CCC_Type_modifier Type_modifier;
 typedef CCC_Type_destructor Type_destructor;
 typedef CCC_Key_comparator Key_comparator;
 typedef CCC_Key_hasher Key_hasher;
-#    define entry_occupied(entry_ptr) CCC_entry_occupied(entry_ptr)
-#    define entry_insert_error(entry_ptr) CCC_entry_insert_error(entry_ptr)
-#    define entry_unwrap(entry_ptr) CCC_entry_unwrap(entry_ptr)
-#    define get_entry_status(entry_ptr) CCC_get_entry_status(entry_ptr)
+#    define entry_occupied(entry_pointer) CCC_entry_occupied(entry_pointer)
+#    define entry_insert_error(entry_pointer)                                  \
+        CCC_entry_insert_error(entry_pointer)
+#    define entry_unwrap(entry_pointer) CCC_entry_unwrap(entry_pointer)
+#    define get_entry_status(entry_pointer) CCC_get_entry_status(entry_pointer)
 #    define entry_status_message(status) CCC_entry_status_message(status)
-#    define handle_occupied(handle_ptr) CCC_handle_occupied(handle_ptr)
-#    define handle_insert_error(handle_ptr) CCC_handle_insert_error(handle_ptr)
-#    define handle_unwrap(handle_ptr) CCC_handle_unwrap(handle_ptr)
-#    define get_handle_status(handle_ptr) CCC_get_handle_status(handle_ptr)
+#    define handle_occupied(handle_pointer) CCC_handle_occupied(handle_pointer)
+#    define handle_insert_error(handle_pointer)                                \
+        CCC_handle_insert_error(handle_pointer)
+#    define handle_unwrap(handle_pointer) CCC_handle_unwrap(handle_pointer)
+#    define get_handle_status(handle_pointer)                                  \
+        CCC_get_handle_status(handle_pointer)
 #    define handle_status_message(status) CCC_handle_status_message(status)
-#    define range_begin(range_ptr) CCC_range_begin(range_ptr)
-#    define range_end(range_ptr) CCC_range_end(range_ptr)
-#    define range_reverse_begin(range_ptr) CCC_range_reverse_begin(range_ptr)
-#    define range_reverse_end(range_ptr) CCC_range_reverse_end(range_ptr)
+#    define range_begin(range_pointer) CCC_range_begin(range_pointer)
+#    define range_end(range_pointer) CCC_range_end(range_pointer)
+#    define range_reverse_begin(range_pointer)                                 \
+        CCC_range_reverse_begin(range_pointer)
+#    define range_reverse_end(range_pointer)                                   \
+        CCC_range_reverse_end(range_pointer)
 #    define result_message(res) CCC_result_message(res)
 #endif /* TYPES_USING_NAMESPACE_CCC */
 

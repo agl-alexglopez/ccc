@@ -159,11 +159,11 @@ is of a known fixed size defined at compile time, not just a pointer. */
 
 /** @private */
 #define CCC_private_handle_adaptive_map_initialize(                            \
-    private_memory_ptr, private_type_name, private_key_node_field,             \
+    private_memory_pointer, private_type_name, private_key_node_field,         \
     private_key_order_fn, private_allocate, private_context_data,              \
     private_capacity)                                                          \
     {                                                                          \
-        .data = (private_memory_ptr),                                          \
+        .data = (private_memory_pointer),                                      \
         .nodes = NULL,                                                         \
         .capacity = (private_capacity),                                        \
         .count = 0,                                                            \
@@ -177,26 +177,26 @@ is of a known fixed size defined at compile time, not just a pointer. */
     }
 
 /** @private */
-#define CCC_private_handle_adaptive_map_as(Handle_adaptive_map_ptr, type_name, \
-                                           handle...)                          \
+#define CCC_private_handle_adaptive_map_as(Handle_adaptive_map_pointer,        \
+                                           type_name, handle...)               \
     ((type_name *)CCC_private_handle_adaptive_map_data_at(                     \
-        (Handle_adaptive_map_ptr), (handle)))
+        (Handle_adaptive_map_pointer), (handle)))
 
 /*==================     Core Macro Implementations     =====================*/
 
 /** @private */
 #define CCC_private_handle_adaptive_map_and_modify_w(                          \
-    Handle_adaptive_map_handle_ptr, type_name, closure_over_T...)              \
+    Handle_adaptive_map_handle_pointer, type_name, closure_over_T...)          \
     (__extension__({                                                           \
-        __auto_type private_handle_adaptive_map_mod_hndl_ptr                   \
-            = (Handle_adaptive_map_handle_ptr);                                \
+        __auto_type private_handle_adaptive_map_mod_hndl_pointer               \
+            = (Handle_adaptive_map_handle_pointer);                            \
         struct CCC_Handle_adaptive_map_handle                                  \
             private_handle_adaptive_map_mod_hndl                               \
             = {.status = CCC_ENTRY_ARGUMENT_ERROR};                            \
-        if (private_handle_adaptive_map_mod_hndl_ptr)                          \
+        if (private_handle_adaptive_map_mod_hndl_pointer)                      \
         {                                                                      \
             private_handle_adaptive_map_mod_hndl                               \
-                = private_handle_adaptive_map_mod_hndl_ptr->private;           \
+                = private_handle_adaptive_map_mod_hndl_pointer->private;       \
             if (private_handle_adaptive_map_mod_hndl.status                    \
                 & CCC_ENTRY_OCCUPIED)                                          \
             {                                                                  \
@@ -214,37 +214,38 @@ is of a known fixed size defined at compile time, not just a pointer. */
 
 /** @private */
 #define CCC_private_handle_adaptive_map_or_insert_w(                           \
-    Handle_adaptive_map_handle_ptr, lazy_key_value...)                         \
+    Handle_adaptive_map_handle_pointer, lazy_key_value...)                     \
     (__extension__({                                                           \
-        __auto_type private_handle_adaptive_map_or_ins_hndl_ptr                \
-            = (Handle_adaptive_map_handle_ptr);                                \
+        __auto_type private_handle_adaptive_map_or_ins_hndl_pointer            \
+            = (Handle_adaptive_map_handle_pointer);                            \
         CCC_Handle_index private_handle_adaptive_map_or_ins_ret = 0;           \
-        if (private_handle_adaptive_map_or_ins_hndl_ptr)                       \
+        if (private_handle_adaptive_map_or_ins_hndl_pointer)                   \
         {                                                                      \
-            if (private_handle_adaptive_map_or_ins_hndl_ptr->private.status    \
+            if (private_handle_adaptive_map_or_ins_hndl_pointer->private       \
+                    .status                                                    \
                 == CCC_ENTRY_OCCUPIED)                                         \
             {                                                                  \
                 private_handle_adaptive_map_or_ins_ret                         \
-                    = private_handle_adaptive_map_or_ins_hndl_ptr->private     \
+                    = private_handle_adaptive_map_or_ins_hndl_pointer->private \
                           .index;                                              \
             }                                                                  \
             else                                                               \
             {                                                                  \
                 private_handle_adaptive_map_or_ins_ret                         \
                     = CCC_private_handle_adaptive_map_allocate_slot(           \
-                        private_handle_adaptive_map_or_ins_hndl_ptr->private   \
-                            .map);                                             \
+                        private_handle_adaptive_map_or_ins_hndl_pointer        \
+                            ->private.map);                                    \
                 if (private_handle_adaptive_map_or_ins_ret)                    \
                 {                                                              \
                     *((typeof(lazy_key_value) *)                               \
                           CCC_private_handle_adaptive_map_data_at(             \
-                              private_handle_adaptive_map_or_ins_hndl_ptr      \
+                              private_handle_adaptive_map_or_ins_hndl_pointer  \
                                   ->private.map,                               \
                               private_handle_adaptive_map_or_ins_ret))         \
                         = lazy_key_value;                                      \
                     CCC_private_handle_adaptive_map_insert(                    \
-                        private_handle_adaptive_map_or_ins_hndl_ptr->private   \
-                            .map,                                              \
+                        private_handle_adaptive_map_or_ins_hndl_pointer        \
+                            ->private.map,                                     \
                         private_handle_adaptive_map_or_ins_ret);               \
                 }                                                              \
             }                                                                  \
@@ -254,65 +255,68 @@ is of a known fixed size defined at compile time, not just a pointer. */
 
 /** @private */
 #define CCC_private_handle_adaptive_map_insert_handle_w(                       \
-    Handle_adaptive_map_handle_ptr, lazy_key_value...)                         \
+    Handle_adaptive_map_handle_pointer, lazy_key_value...)                     \
     (__extension__({                                                           \
-        __auto_type private_handle_adaptive_map_ins_hndl_ptr                   \
-            = (Handle_adaptive_map_handle_ptr);                                \
+        __auto_type private_handle_adaptive_map_ins_hndl_pointer               \
+            = (Handle_adaptive_map_handle_pointer);                            \
         CCC_Handle_index private_handle_adaptive_map_ins_hndl_ret = 0;         \
-        if (private_handle_adaptive_map_ins_hndl_ptr)                          \
+        if (private_handle_adaptive_map_ins_hndl_pointer)                      \
         {                                                                      \
-            if (!(private_handle_adaptive_map_ins_hndl_ptr->private.status     \
+            if (!(private_handle_adaptive_map_ins_hndl_pointer->private.status \
                   & CCC_ENTRY_OCCUPIED))                                       \
             {                                                                  \
                 private_handle_adaptive_map_ins_hndl_ret                       \
                     = CCC_private_handle_adaptive_map_allocate_slot(           \
-                        private_handle_adaptive_map_ins_hndl_ptr->private      \
+                        private_handle_adaptive_map_ins_hndl_pointer->private  \
                             .map);                                             \
                 if (private_handle_adaptive_map_ins_hndl_ret)                  \
                 {                                                              \
                     *((typeof(lazy_key_value) *)                               \
                           CCC_private_handle_adaptive_map_data_at(             \
-                              private_handle_adaptive_map_ins_hndl_ptr         \
+                              private_handle_adaptive_map_ins_hndl_pointer     \
                                   ->private.map,                               \
                               private_handle_adaptive_map_ins_hndl_ret))       \
                         = lazy_key_value;                                      \
                     CCC_private_handle_adaptive_map_insert(                    \
-                        private_handle_adaptive_map_ins_hndl_ptr->private.map, \
+                        private_handle_adaptive_map_ins_hndl_pointer->private  \
+                            .map,                                              \
                         private_handle_adaptive_map_ins_hndl_ret);             \
                 }                                                              \
             }                                                                  \
-            else if (private_handle_adaptive_map_ins_hndl_ptr->private.status  \
+            else if (private_handle_adaptive_map_ins_hndl_pointer->private     \
+                         .status                                               \
                      == CCC_ENTRY_OCCUPIED)                                    \
             {                                                                  \
                 *((typeof(lazy_key_value) *)                                   \
                       CCC_private_handle_adaptive_map_data_at(                 \
-                          private_handle_adaptive_map_ins_hndl_ptr->private    \
-                              .map,                                            \
-                          private_handle_adaptive_map_ins_hndl_ptr->private    \
-                              .index))                                         \
+                          private_handle_adaptive_map_ins_hndl_pointer         \
+                              ->private.map,                                   \
+                          private_handle_adaptive_map_ins_hndl_pointer         \
+                              ->private.index))                                \
                     = lazy_key_value;                                          \
                 private_handle_adaptive_map_ins_hndl_ret                       \
-                    = private_handle_adaptive_map_ins_hndl_ptr->private.index; \
+                    = private_handle_adaptive_map_ins_hndl_pointer->private    \
+                          .index;                                              \
             }                                                                  \
         }                                                                      \
         private_handle_adaptive_map_ins_hndl_ret;                              \
     }))
 
 /** @private */
-#define CCC_private_handle_adaptive_map_try_insert_w(Handle_adaptive_map_ptr,  \
-                                                     key, lazy_value...)       \
+#define CCC_private_handle_adaptive_map_try_insert_w(                          \
+    Handle_adaptive_map_pointer, key, lazy_value...)                           \
     (__extension__({                                                           \
-        __auto_type private_handle_adaptive_map_try_ins_map_ptr                \
-            = (Handle_adaptive_map_ptr);                                       \
+        __auto_type private_handle_adaptive_map_try_ins_map_pointer            \
+            = (Handle_adaptive_map_pointer);                                   \
         struct CCC_Handle private_handle_adaptive_map_try_ins_hndl_ret         \
             = {.status = CCC_ENTRY_ARGUMENT_ERROR};                            \
-        if (private_handle_adaptive_map_try_ins_map_ptr)                       \
+        if (private_handle_adaptive_map_try_ins_map_pointer)                   \
         {                                                                      \
             __auto_type private_handle_adaptive_map_key = (key);               \
             struct CCC_Handle_adaptive_map_handle                              \
                 private_handle_adaptive_map_try_ins_hndl                       \
                 = CCC_private_handle_adaptive_map_handle(                      \
-                    private_handle_adaptive_map_try_ins_map_ptr,               \
+                    private_handle_adaptive_map_try_ins_map_pointer,           \
                     (void *)&private_handle_adaptive_map_key);                 \
             if (!(private_handle_adaptive_map_try_ins_hndl.status              \
                   & CCC_ENTRY_OCCUPIED))                                       \
@@ -328,7 +332,7 @@ is of a known fixed size defined at compile time, not just a pointer. */
                 {                                                              \
                     *((typeof(lazy_value) *)                                   \
                           CCC_private_handle_adaptive_map_data_at(             \
-                              private_handle_adaptive_map_try_ins_map_ptr,     \
+                              private_handle_adaptive_map_try_ins_map_pointer, \
                               private_handle_adaptive_map_try_ins_hndl_ret     \
                                   .index))                                     \
                         = lazy_value;                                          \
@@ -360,82 +364,81 @@ is of a known fixed size defined at compile time, not just a pointer. */
     }))
 
 /** @private */
-#define CCC_private_handle_adaptive_map_insert_or_assign_w(                      \
-    Handle_adaptive_map_ptr, key, lazy_value...)                                 \
-    (__extension__({                                                             \
-        __auto_type private_handle_adaptive_map_ins_or_assign_map_ptr            \
-            = (Handle_adaptive_map_ptr);                                         \
-        struct CCC_Handle private_handle_adaptive_map_ins_or_assign_hndl_ret     \
-            = {.status = CCC_ENTRY_ARGUMENT_ERROR};                              \
-        if (private_handle_adaptive_map_ins_or_assign_map_ptr)                   \
-        {                                                                        \
-            __auto_type private_handle_adaptive_map_key = (key);                 \
-            struct CCC_Handle_adaptive_map_handle                                \
-                private_handle_adaptive_map_ins_or_assign_hndl                   \
-                = CCC_private_handle_adaptive_map_handle(                        \
-                    private_handle_adaptive_map_ins_or_assign_map_ptr,           \
-                    (void *)&private_handle_adaptive_map_key);                   \
-            if (!(private_handle_adaptive_map_ins_or_assign_hndl.status          \
-                  & CCC_ENTRY_OCCUPIED))                                         \
-            {                                                                    \
-                private_handle_adaptive_map_ins_or_assign_hndl_ret               \
-                    = (struct CCC_Handle){                                       \
-                        .index                                                   \
-                        = CCC_private_handle_adaptive_map_allocate_slot(         \
-                            private_handle_adaptive_map_ins_or_assign_hndl       \
-                                .map),                                           \
-                        .status = CCC_ENTRY_INSERT_ERROR,                        \
-                    };                                                           \
-                if (private_handle_adaptive_map_ins_or_assign_hndl_ret.index)    \
-                {                                                                \
-                    *((typeof(lazy_value) *)                                     \
-                          CCC_private_handle_adaptive_map_data_at(               \
-                              private_handle_adaptive_map_ins_or_assign_map_ptr, \
-                              private_handle_adaptive_map_ins_or_assign_hndl_ret \
-                                  .index))                                       \
-                        = lazy_value;                                            \
-                    *((typeof(private_handle_adaptive_map_key) *)                \
-                          CCC_private_handle_adaptive_map_key_at(                \
-                              private_handle_adaptive_map_ins_or_assign_hndl     \
-                                  .map,                                          \
-                              private_handle_adaptive_map_ins_or_assign_hndl_ret \
-                                  .index))                                       \
-                        = private_handle_adaptive_map_key;                       \
-                    CCC_private_handle_adaptive_map_insert(                      \
-                        private_handle_adaptive_map_ins_or_assign_hndl.map,      \
-                        private_handle_adaptive_map_ins_or_assign_hndl_ret       \
-                            .index);                                             \
-                    private_handle_adaptive_map_ins_or_assign_hndl_ret.status    \
-                        = CCC_ENTRY_VACANT;                                      \
-                }                                                                \
-            }                                                                    \
-            else if (private_handle_adaptive_map_ins_or_assign_hndl.status       \
-                     == CCC_ENTRY_OCCUPIED)                                      \
-            {                                                                    \
-                *((typeof(lazy_value) *)                                         \
-                      CCC_private_handle_adaptive_map_data_at(                   \
-                          private_handle_adaptive_map_ins_or_assign_hndl.map,    \
-                          private_handle_adaptive_map_ins_or_assign_hndl         \
-                              .index))                                           \
-                    = lazy_value;                                                \
-                private_handle_adaptive_map_ins_or_assign_hndl_ret               \
-                    = (struct CCC_Handle){                                       \
-                        .index                                                   \
-                        = private_handle_adaptive_map_ins_or_assign_hndl         \
-                              .index,                                            \
-                        .status                                                  \
-                        = private_handle_adaptive_map_ins_or_assign_hndl         \
-                              .status,                                           \
-                    };                                                           \
-                *((typeof(private_handle_adaptive_map_key) *)                    \
-                      CCC_private_handle_adaptive_map_key_at(                    \
-                          private_handle_adaptive_map_ins_or_assign_hndl.map,    \
-                          private_handle_adaptive_map_ins_or_assign_hndl         \
-                              .index))                                           \
-                    = private_handle_adaptive_map_key;                           \
-            }                                                                    \
-        }                                                                        \
-        private_handle_adaptive_map_ins_or_assign_hndl_ret;                      \
+#define CCC_private_handle_adaptive_map_insert_or_assign_w(                          \
+    Handle_adaptive_map_pointer, key, lazy_value...)                                 \
+    (__extension__({                                                                 \
+        __auto_type private_handle_adaptive_map_ins_or_assign_map_pointer            \
+            = (Handle_adaptive_map_pointer);                                         \
+        struct CCC_Handle private_handle_adaptive_map_ins_or_assign_hndl_ret         \
+            = {.status = CCC_ENTRY_ARGUMENT_ERROR};                                  \
+        if (private_handle_adaptive_map_ins_or_assign_map_pointer)                   \
+        {                                                                            \
+            __auto_type private_handle_adaptive_map_key = (key);                     \
+            struct CCC_Handle_adaptive_map_handle                                    \
+                private_handle_adaptive_map_ins_or_assign_hndl                       \
+                = CCC_private_handle_adaptive_map_handle(                            \
+                    private_handle_adaptive_map_ins_or_assign_map_pointer,           \
+                    (void *)&private_handle_adaptive_map_key);                       \
+            if (!(private_handle_adaptive_map_ins_or_assign_hndl.status              \
+                  & CCC_ENTRY_OCCUPIED))                                             \
+            {                                                                        \
+                private_handle_adaptive_map_ins_or_assign_hndl_ret                   \
+                    = (struct CCC_Handle){                                           \
+                        .index                                                       \
+                        = CCC_private_handle_adaptive_map_allocate_slot(             \
+                            private_handle_adaptive_map_ins_or_assign_hndl           \
+                                .map),                                               \
+                        .status = CCC_ENTRY_INSERT_ERROR,                            \
+                    };                                                               \
+                if (private_handle_adaptive_map_ins_or_assign_hndl_ret.index)        \
+                {                                                                    \
+                    *((typeof(lazy_value) *)CCC_private_handle_adaptive_map_data_at( \
+                        private_handle_adaptive_map_ins_or_assign_map_pointer,       \
+                        private_handle_adaptive_map_ins_or_assign_hndl_ret           \
+                            .index))                                                 \
+                        = lazy_value;                                                \
+                    *((typeof(private_handle_adaptive_map_key) *)                    \
+                          CCC_private_handle_adaptive_map_key_at(                    \
+                              private_handle_adaptive_map_ins_or_assign_hndl         \
+                                  .map,                                              \
+                              private_handle_adaptive_map_ins_or_assign_hndl_ret     \
+                                  .index))                                           \
+                        = private_handle_adaptive_map_key;                           \
+                    CCC_private_handle_adaptive_map_insert(                          \
+                        private_handle_adaptive_map_ins_or_assign_hndl.map,          \
+                        private_handle_adaptive_map_ins_or_assign_hndl_ret           \
+                            .index);                                                 \
+                    private_handle_adaptive_map_ins_or_assign_hndl_ret.status        \
+                        = CCC_ENTRY_VACANT;                                          \
+                }                                                                    \
+            }                                                                        \
+            else if (private_handle_adaptive_map_ins_or_assign_hndl.status           \
+                     == CCC_ENTRY_OCCUPIED)                                          \
+            {                                                                        \
+                *((typeof(lazy_value) *)                                             \
+                      CCC_private_handle_adaptive_map_data_at(                       \
+                          private_handle_adaptive_map_ins_or_assign_hndl.map,        \
+                          private_handle_adaptive_map_ins_or_assign_hndl             \
+                              .index))                                               \
+                    = lazy_value;                                                    \
+                private_handle_adaptive_map_ins_or_assign_hndl_ret                   \
+                    = (struct CCC_Handle){                                           \
+                        .index                                                       \
+                        = private_handle_adaptive_map_ins_or_assign_hndl             \
+                              .index,                                                \
+                        .status                                                      \
+                        = private_handle_adaptive_map_ins_or_assign_hndl             \
+                              .status,                                               \
+                    };                                                               \
+                *((typeof(private_handle_adaptive_map_key) *)                        \
+                      CCC_private_handle_adaptive_map_key_at(                        \
+                          private_handle_adaptive_map_ins_or_assign_hndl.map,        \
+                          private_handle_adaptive_map_ins_or_assign_hndl             \
+                              .index))                                               \
+                    = private_handle_adaptive_map_key;                               \
+            }                                                                        \
+        }                                                                            \
+        private_handle_adaptive_map_ins_or_assign_hndl_ret;                          \
     }))
 
 /* NOLINTEND(readability-identifier-naming) */

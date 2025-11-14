@@ -247,16 +247,16 @@ use it in the code block. Wrapping the code block in brackets is recommended for
 formatting, though not required.
 
 Do not return early or use goto out of this macro or memory will be leaked. */
-#define foreach_filechar(file_ptr, char_iter_name, codeblock...)               \
+#define foreach_filechar(file_pointer, char_iter_name, codeblock...)           \
     do                                                                         \
     {                                                                          \
-        check(fseek(file_ptr, 0L, SEEK_SET) >= 0);                             \
-        char *lineptr = NULL;                                                  \
+        check(fseek(file_pointer, 0L, SEEK_SET) >= 0);                         \
+        char *linepointer = NULL;                                              \
         size_t len = 0;                                                        \
         ptrdiff_t read = 0;                                                    \
-        while ((read = getline(&lineptr, &len, f)) > 0)                        \
+        while ((read = getline(&linepointer, &len, f)) > 0)                    \
         {                                                                      \
-            SV_String_view const line = {.s = lineptr, .len = read};           \
+            SV_String_view const line = {.s = linepointer, .len = read};       \
             for (char const *char_iter_name = SV_begin(line);                  \
                  char_iter_name != SV_end(line);                               \
                  char_iter_name = SV_next(char_iter_name))                     \
@@ -264,7 +264,7 @@ Do not return early or use goto out of this macro or memory will be leaked. */
                 codeblock                                                      \
             }                                                                  \
         }                                                                      \
-        free(lineptr);                                                         \
+        free(linepointer);                                                     \
     }                                                                          \
     while (0)
 

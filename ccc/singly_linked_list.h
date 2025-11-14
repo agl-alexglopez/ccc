@@ -114,7 +114,7 @@ CCC_singly_linked_list_push_front(CCC_Singly_linked_list *singly_linked_list,
 
 /** @brief Write a compound literal directly to allocated memory at the front.
 O(1).
-@param [in] list_ptr a pointer to the singly linked list.
+@param [in] list_pointer a pointer to the singly linked list.
 @param [in] struct_initializer a compound literal containing the elements to
 be written to a newly allocated node.
 @return a reference to the element pushed to the front or NULL if allocation
@@ -123,8 +123,10 @@ failed.
 Note that it only makes sense to use this method when the container is given
 allocation permission. Otherwise NULL is returned due to an inability for the
 container to allocate memory. */
-#define CCC_singly_linked_list_emplace_front(list_ptr, struct_initializer...)  \
-    CCC_private_singly_linked_list_emplace_front(list_ptr, struct_initializer)
+#define CCC_singly_linked_list_emplace_front(list_pointer,                     \
+                                             struct_initializer...)            \
+    CCC_private_singly_linked_list_emplace_front(list_pointer,                 \
+                                                 struct_initializer)
 
 /** @brief Pop the front element from the list. O(1).
 @param [in] singly_linked_list a pointer to the singly linked list.

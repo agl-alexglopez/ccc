@@ -86,44 +86,44 @@ Initialize the container with memory, callbacks, and permissions. */
 /**@{*/
 
 /** @brief Initialize a flat_priority_queue as a min or max heap.
-@param [in] mem_ptr a pointer to an array of user types or NULL.
+@param [in] mem_pointer a pointer to an array of user types or NULL.
 @param [in] any_type_name the name of the user type.
 @param [in] order_order CCC_ORDER_LESSER or CCC_ORDER_GREATER for min or max
 heap, respectively.
 @param [in] order_fn the user defined comarison function for user types.
 @param [in] allocate the allocation function or NULL if no allocation.
 @param [in] context_data any context data needed for destruction of elements.
-@param [in] capacity the capacity of contiguous elements at mem_ptr.
+@param [in] capacity the capacity of contiguous elements at mem_pointer.
 @return the initialized priority queue on the right hand side of an equality
 operator. (i.e. CCC_Flat_priority_queue q =
 CCC_flat_priority_queue_initialize(...);). */
-#define CCC_flat_priority_queue_initialize(mem_ptr, any_type_name,             \
+#define CCC_flat_priority_queue_initialize(mem_pointer, any_type_name,         \
                                            order_order, order_fn, allocate,    \
                                            context_data, capacity)             \
     CCC_private_flat_priority_queue_initialize(                                \
-        mem_ptr, any_type_name, order_order, order_fn, allocate, context_data, \
-        capacity)
+        mem_pointer, any_type_name, order_order, order_fn, allocate,           \
+        context_data, capacity)
 
 /** @brief Partial order an array of elements as a min or max heap. O(N).
-@param [in] mem_ptr a pointer to an array of user types or NULL.
+@param [in] mem_pointer a pointer to an array of user types or NULL.
 @param [in] any_type_name the name of the user type.
 @param [in] order_order CCC_ORDER_LESSER or CCC_ORDER_GREATER for min or max
 heap, respectively.
 @param [in] order_fn the user defined comparison function for user types.
 @param [in] allocate the allocation function or NULL if no allocation.
 @param [in] context_data any context data needed for destruction of elements.
-@param [in] capacity the capacity of contiguous elements at mem_ptr.
+@param [in] capacity the capacity of contiguous elements at mem_pointer.
 @param [in] size the size <= capacity.
 @return the initialized priority queue on the right hand side of an equality
 operator. (i.e. CCC_Flat_priority_queue q =
 CCC_flat_priority_queue_heapify_initialize(...);).
 */
 #define CCC_flat_priority_queue_heapify_initialize(                            \
-    mem_ptr, any_type_name, order_order, order_fn, allocate, context_data,     \
+    mem_pointer, any_type_name, order_order, order_fn, allocate, context_data, \
     capacity, size)                                                            \
     CCC_private_flat_priority_queue_heapify_initialize(                        \
-        mem_ptr, any_type_name, order_order, order_fn, allocate, context_data, \
-        capacity, size)
+        mem_pointer, any_type_name, order_order, order_fn, allocate,           \
+        context_data, capacity, size)
 
 /** @brief Copy the flat_priority_queue from src to newly initialized dst.
 @param [in] dst the destination that will copy the source flat_priority_queue.
@@ -339,8 +339,8 @@ CCC_flat_priority_queue_update(CCC_Flat_priority_queue *flat_priority_queue,
                                void *context);
 
 /** @brief Update the user type stored in the priority queue directly. O(lgN).
-@param [in] flat_priority_queue_ptr a pointer to the flat priority queue.
-@param [in] any_type_ptr a pointer to the user type being updated.
+@param [in] flat_priority_queue_pointer a pointer to the flat priority queue.
+@param [in] any_type_pointer a pointer to the user type being updated.
 @param [in] update_closure_over_T the semicolon separated statements to execute
 on the user type at T (optionally wrapping {code here} in braces may help
 with formatting). This closure may safely modify the key used to track the user
@@ -348,7 +348,7 @@ element's priority in the priority queue.
 @return a reference to the element at its new position in the
 flat_priority_queue on success, NULL if parameters are invalid or
 flat_priority_queue is empty.
-@warning the user must ensure any_type_ptr is in the flat_priority_queue.
+@warning the user must ensure any_type_pointer is in the flat_priority_queue.
 
 ```
 #define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
@@ -359,9 +359,9 @@ get_rand_flat_priority_queue_node(&flat_priority_queue), { *T = rand_key(); });
 
 Note that whether the key increases or decreases does not affect runtime. */
 #define CCC_flat_priority_queue_update_w(                                      \
-    flat_priority_queue_ptr, any_type_ptr, update_closure_over_T...)           \
+    flat_priority_queue_pointer, any_type_pointer, update_closure_over_T...)   \
     CCC_private_flat_priority_queue_update_w(                                  \
-        flat_priority_queue_ptr, any_type_ptr, update_closure_over_T)
+        flat_priority_queue_pointer, any_type_pointer, update_closure_over_T)
 
 /** @brief Increase e that is a handle to the stored flat_priority_queue
 element. O(lgN).
@@ -384,8 +384,8 @@ CCC_flat_priority_queue_increase(CCC_Flat_priority_queue *flat_priority_queue,
                                  void *context);
 
 /** @brief Increase the user type stored in the priority queue directly. O(lgN).
-@param [in] flat_priority_queue_ptr a pointer to the flat priority queue.
-@param [in] any_type_ptr a pointer to the user type being updated.
+@param [in] flat_priority_queue_pointer a pointer to the flat priority queue.
+@param [in] any_type_pointer a pointer to the user type being updated.
 @param [in] increase_closure_over_T the semicolon separated statements to
 execute on the user type at T (optionally wrapping {code here} in
 braces may help with formatting). This closure may safely modify the key used to
@@ -393,7 +393,7 @@ track the user element's priority in the priority queue.
 @return a reference to the element at its new position in the
 flat_priority_queue on success, NULL if parameters are invalid or
 flat_priority_queue is empty.
-@warning the user must ensure any_type_ptr is in the flat_priority_queue.
+@warning the user must ensure any_type_pointer is in the flat_priority_queue.
 
 ```
 #define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
@@ -404,9 +404,10 @@ get_rand_flat_priority_queue_node(&flat_priority_queue), { (*T)++; });
 
 Note that if this priority queue is min or max, the runtime is the same. */
 #define CCC_flat_priority_queue_increase_w(                                    \
-    flat_priority_queue_ptr, any_type_ptr, increase_closure_over_T...)         \
-    CCC_private_flat_priority_queue_increase_w(                                \
-        flat_priority_queue_ptr, any_type_ptr, increase_closure_over_T)
+    flat_priority_queue_pointer, any_type_pointer, increase_closure_over_T...) \
+    CCC_private_flat_priority_queue_increase_w(flat_priority_queue_pointer,    \
+                                               any_type_pointer,               \
+                                               increase_closure_over_T)
 
 /** @brief Decrease e that is a handle to the stored flat_priority_queue
 element. O(lgN).
@@ -429,8 +430,8 @@ CCC_flat_priority_queue_decrease(CCC_Flat_priority_queue *flat_priority_queue,
                                  void *context);
 
 /** @brief Increase the user type stored in the priority queue directly. O(lgN).
-@param [in] flat_priority_queue_ptr a pointer to the flat priority queue.
-@param [in] any_type_ptr a pointer to the user type being updated.
+@param [in] flat_priority_queue_pointer a pointer to the flat priority queue.
+@param [in] any_type_pointer a pointer to the user type being updated.
 @param [in] decrease_closure_over_T the semicolon separated statements to
 execute on the user type at T (optionally wrapping {code here} in
 braces may help with formatting). This closure may safely modify the key used to
@@ -438,7 +439,7 @@ track the user element's priority in the priority queue.
 @return a reference to the element at its new position in the
 flat_priority_queue on success, NULL if parameters are invalid or
 flat_priority_queue is empty.
-@warning the user must ensure any_type_ptr is in the flat_priority_queue.
+@warning the user must ensure any_type_pointer is in the flat_priority_queue.
 
 ```
 #define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
@@ -449,9 +450,10 @@ get_rand_flat_priority_queue_node(&flat_priority_queue), { (*T)--; });
 
 Note that if this priority queue is min or max, the runtime is the same. */
 #define CCC_flat_priority_queue_decrease_w(                                    \
-    flat_priority_queue_ptr, any_type_ptr, decrease_closure_over_T...)         \
-    CCC_private_flat_priority_queue_decrease_w(                                \
-        flat_priority_queue_ptr, any_type_ptr, decrease_closure_over_T)
+    flat_priority_queue_pointer, any_type_pointer, decrease_closure_over_T...) \
+    CCC_private_flat_priority_queue_decrease_w(flat_priority_queue_pointer,    \
+                                               any_type_pointer,               \
+                                               decrease_closure_over_T)
 
 /**@}*/
 

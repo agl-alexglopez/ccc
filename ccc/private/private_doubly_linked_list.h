@@ -138,12 +138,12 @@ name of the list being on the left hand side of the assignment operator. */
     }
 
 /** @private */
-#define CCC_private_doubly_linked_list_emplace_back(doubly_linked_list_ptr,    \
-                                                    struct_initializer...)     \
+#define CCC_private_doubly_linked_list_emplace_back(                           \
+    doubly_linked_list_pointer, struct_initializer...)                         \
     (__extension__({                                                           \
         typeof(struct_initializer) *private_doubly_linked_list_res = NULL;     \
         struct CCC_Doubly_linked_list *private_doubly_linked_list              \
-            = (doubly_linked_list_ptr);                                        \
+            = (doubly_linked_list_pointer);                                    \
         if (private_doubly_linked_list)                                        \
         {                                                                      \
             if (private_doubly_linked_list->allocate)                          \
@@ -172,12 +172,12 @@ name of the list being on the left hand side of the assignment operator. */
     }))
 
 /** @private */
-#define CCC_private_doubly_linked_list_emplace_front(doubly_linked_list_ptr,   \
-                                                     struct_initializer...)    \
+#define CCC_private_doubly_linked_list_emplace_front(                          \
+    doubly_linked_list_pointer, struct_initializer...)                         \
     (__extension__({                                                           \
         typeof(struct_initializer) *private_doubly_linked_list_res = NULL;     \
         struct CCC_Doubly_linked_list *private_doubly_linked_list              \
-            = (doubly_linked_list_ptr);                                        \
+            = (doubly_linked_list_pointer);                                    \
         if (!private_doubly_linked_list->allocate)                             \
         {                                                                      \
             private_doubly_linked_list_res = NULL;                             \

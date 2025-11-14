@@ -52,27 +52,27 @@ void *CCC_private_flat_double_ended_queue_allocate_back(
 
 /** @private */
 #define CCC_private_flat_double_ended_queue_initialize(                        \
-    private_mem_ptr, private_any_type_name, private_allocate,                  \
+    private_mem_pointer, private_any_type_name, private_allocate,              \
     private_context_data, private_capacity, optional_size...)                  \
     {                                                                          \
-        .buf = CCC_buffer_initialize(private_mem_ptr, private_any_type_name,   \
-                                     private_allocate, private_context_data,   \
-                                     private_capacity, optional_size),         \
+        .buf = CCC_buffer_initialize(                                          \
+            private_mem_pointer, private_any_type_name, private_allocate,      \
+            private_context_data, private_capacity, optional_size),            \
         .front = 0,                                                            \
     }
 
 /** @private */
 #define CCC_private_flat_double_ended_queue_emplace_back(                      \
-    flat_double_ended_queue_ptr, value...)                                     \
+    flat_double_ended_queue_pointer, value...)                                 \
     (__extension__({                                                           \
-        __auto_type private_flat_double_ended_queue_ptr                        \
-            = (flat_double_ended_queue_ptr);                                   \
+        __auto_type private_flat_double_ended_queue_pointer                    \
+            = (flat_double_ended_queue_pointer);                               \
         void *const private_flat_double_ended_queue_emplace_ret = NULL;        \
-        if (private_flat_double_ended_queue_ptr)                               \
+        if (private_flat_double_ended_queue_pointer)                           \
         {                                                                      \
             void *const private_flat_double_ended_queue_emplace_ret            \
                 = CCC_private_flat_double_ended_queue_allocate_back(           \
-                    private_flat_double_ended_queue_ptr);                      \
+                    private_flat_double_ended_queue_pointer);                  \
             if (private_flat_double_ended_queue_emplace_ret)                   \
             {                                                                  \
                 *((typeof(value) *)                                            \
@@ -85,16 +85,16 @@ void *CCC_private_flat_double_ended_queue_allocate_back(
 
 /** @private */
 #define CCC_private_flat_double_ended_queue_emplace_front(                     \
-    flat_double_ended_queue_ptr, value...)                                     \
+    flat_double_ended_queue_pointer, value...)                                 \
     (__extension__({                                                           \
-        __auto_type private_flat_double_ended_queue_ptr                        \
-            = (flat_double_ended_queue_ptr);                                   \
+        __auto_type private_flat_double_ended_queue_pointer                    \
+            = (flat_double_ended_queue_pointer);                               \
         void *const private_flat_double_ended_queue_emplace_ret = NULL;        \
-        if (private_flat_double_ended_queue_ptr)                               \
+        if (private_flat_double_ended_queue_pointer)                           \
         {                                                                      \
             void *const private_flat_double_ended_queue_emplace_ret            \
                 = CCC_private_flat_double_ended_queue_allocate_front(          \
-                    private_flat_double_ended_queue_ptr);                      \
+                    private_flat_double_ended_queue_pointer);                  \
             if (private_flat_double_ended_queue_emplace_ret)                   \
             {                                                                  \
                 *((typeof(value) *)                                            \

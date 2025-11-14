@@ -81,11 +81,11 @@ Initialize the container with memory, callbacks, and permissions. */
 
 /** @brief Initialize a contiguous Buffer of user a specified type, allocation
 policy, capacity, and optional starting size.
-@param [in] mem_ptr the pointer to existing memory or NULL.
+@param [in] mem_pointer the pointer to existing memory or NULL.
 @param [in] any_type_name the name of the user type in the buffer.
 @param [in] allocate CCC_Allocator or NULL if no allocation is permitted.
 @param [in] context_data any context data needed for managing Buffer memory.
-@param [in] capacity the capacity of memory at mem_ptr.
+@param [in] capacity the capacity of memory at mem_pointer.
 @param [in] optional_size optional starting size of the Buffer <= capacity.
 @return the initialized buffer. Directly assign to Buffer on the right hand
 side of the equality operator (e.g. CCC_Buffer b = CCC_buffer_initialize(...);).
@@ -115,9 +115,9 @@ provide an allocation function. If a dynamic Buffer is preferred, provide the
 allocation function as defined by the signature in types.h. If resizing is
 desired on memory that has already been allocated, ensure allocation has
 occurred with the provided allocation function. */
-#define CCC_buffer_initialize(mem_ptr, any_type_name, allocate, context_data,  \
-                              capacity, optional_size...)                      \
-    CCC_private_buffer_initialize(mem_ptr, any_type_name, allocate,            \
+#define CCC_buffer_initialize(mem_pointer, any_type_name, allocate,            \
+                              context_data, capacity, optional_size...)        \
+    CCC_private_buffer_initialize(mem_pointer, any_type_name, allocate,        \
                                   context_data, capacity, optional_size)
 
 /** @brief Initialize a Buffer from a compound literal array initializer.
@@ -329,15 +329,15 @@ exhausted. */
 
 /** @brief Pushes the user provided compound literal directly to back of buffer
 and increments the size to reflect the newly added element.
-@param [in] buffer_ptr a pointer to the buffer.
+@param [in] buffer_pointer a pointer to the buffer.
 @param [in] type_compound_literal the direct compound literal as provided.
 @return a pointer to the inserted element or NULL if insertion failed.
 
 Any function calls that set fields of the compound literal will not be evaluated
 if the Buffer fails to allocate a slot at the back of the buffer. This may occur
 if resizing fails or is prohibited. */
-#define CCC_buffer_emplace_back(buffer_ptr, type_compound_literal...)          \
-    CCC_private_buffer_emplace_back(buffer_ptr, type_compound_literal)
+#define CCC_buffer_emplace_back(buffer_pointer, type_compound_literal...)      \
+    CCC_private_buffer_emplace_back(buffer_pointer, type_compound_literal)
 
 /** @brief insert data at slot i according to size of the Buffer maintaining
 contiguous storage of elements between 0 and size.
@@ -407,7 +407,7 @@ size of the buffer. */
 [[nodiscard]] void *CCC_buffer_at(CCC_Buffer const *buf, size_t i);
 
 /** @brief Access en element at the specified index as the stored type.
-@param [in] buffer_ptr the pointer to the buffer.
+@param [in] buffer_pointer the pointer to the buffer.
 @param [in] type_name the name of the stored type.
 @param [in] index the index within capacity range of the buffer.
 @return a pointer to the element in the slot at position i or NULL if i is out
@@ -417,8 +417,8 @@ Note that as long as the index is valid within the capacity of the Buffer a
 valid pointer is returned, which may result in a slot of old or uninitialized
 data. It is up to the user to ensure the index provided is within the current
 size of the buffer. */
-#define CCC_buffer_as(buffer_ptr, type_name, index)                            \
-    ((type_name *)CCC_buffer_at(buffer_ptr, index))
+#define CCC_buffer_as(buffer_pointer, type_name, index)                        \
+    ((type_name *)CCC_buffer_at(buffer_pointer, index))
 
 /** @brief return the index of an element known to be in the buffer.
 @param [in] buf the pointer to the buffer.
@@ -434,12 +434,12 @@ size or NULL if the Buffer does not exist or is empty. */
 [[nodiscard]] void *CCC_buffer_back(CCC_Buffer const *buf);
 
 /** @brief return the final element in the Buffer according the current size.
-@param [in] buffer_ptr the pointer to the buffer.
+@param [in] buffer_pointer the pointer to the buffer.
 @param [in] type_name the name of the stored type.
 @return the pointer the final element in the Buffer according to the current
 size or NULL if the Buffer does not exist or is empty. */
-#define CCC_buffer_back_as(buffer_ptr, type_name)                              \
-    ((type_name *)CCC_buffer_back(buffer_ptr))
+#define CCC_buffer_back_as(buffer_pointer, type_name)                          \
+    ((type_name *)CCC_buffer_back(buffer_pointer))
 
 /** @brief return the first element in the Buffer at index 0.
 @param [in] buf the pointer to the buffer.
@@ -448,12 +448,12 @@ or is empty. */
 [[nodiscard]] void *CCC_buffer_front(CCC_Buffer const *buf);
 
 /** @brief return the first element in the Buffer at index 0.
-@param [in] buffer_ptr the pointer to the buffer.
+@param [in] buffer_pointer the pointer to the buffer.
 @param [in] type_name the name of the stored type.
 @return the pointer to the front element or NULL if the Buffer does not exist
 or is empty. */
-#define CCC_buffer_front_as(buffer_ptr, type_name)                             \
-    ((type_name *)CCC_buffer_front(buffer_ptr))
+#define CCC_buffer_front_as(buffer_pointer, type_name)                         \
+    ((type_name *)CCC_buffer_front(buffer_pointer))
 
 /** @brief Move data at index src to dst according to capacity.
 @param [in] buf the pointer to the buffer.
@@ -483,7 +483,7 @@ preserved meaning any data at i is overwritten. */
 CCC_Result CCC_buffer_write(CCC_Buffer *buf, size_t i, void const *data);
 
 /** @brief Writes a user provided compound literal directly to a Buffer slot.
-@param [in] buffer_ptr a pointer to the buffer.
+@param [in] buffer_pointer a pointer to the buffer.
 @param [in] index the desired index at which to insert an element.
 @param [in] type_compound_literal the direct compound literal as provided.
 @return a pointer to the inserted element or NULL if insertion failed.
@@ -493,8 +493,8 @@ of [0, size). This insert method does not increment the size of the buffer.
 
 Any function calls that set fields of the compound literal will not be evaluated
 if the provided index is out of range of the Buffer capacity. */
-#define CCC_buffer_emplace(buffer_ptr, index, type_compound_literal...)        \
-    CCC_private_buffer_emplace(buffer_ptr, index, type_compound_literal)
+#define CCC_buffer_emplace(buffer_pointer, index, type_compound_literal...)    \
+    CCC_private_buffer_emplace(buffer_pointer, index, type_compound_literal)
 
 /** @brief swap elements at i and j according to capacity of the bufer.
 @param [in] buf the pointer to the buffer.

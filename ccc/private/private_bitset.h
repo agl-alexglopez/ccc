@@ -93,10 +93,11 @@ specifiers which is a feature of C23. Not all compilers support this yet. */
 The optional size param defaults equal to capacity if not provided. This covers
 most common cases--fixed size bit set, 0 sized dynamic bit set--and when the
 user wants a fixed size dynamic bit set they provide 0 as size argument. */
-#define CCC_private_bitset_initialize(private_bitblock_ptr, private_allocate,  \
-                                      private_context, private_cap, ...)       \
+#define CCC_private_bitset_initialize(private_bitblock_pointer,                \
+                                      private_allocate, private_context,       \
+                                      private_cap, ...)                        \
     {                                                                          \
-        .blocks = (private_bitblock_ptr),                                      \
+        .blocks = (private_bitblock_pointer),                                  \
         .count = CCC_private_bitset_optional_size((private_cap), __VA_ARGS__), \
         .capacity = (private_cap),                                             \
         .allocate = (private_allocate),                                        \

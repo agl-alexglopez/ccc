@@ -68,19 +68,19 @@ Initialize and create containers with memory, callbacks, and permissions. */
 
 /** @brief Initialize the flat_double_ended_queue with memory and allocation
 permission.
-@param [in] mem_ptr a pointer to existing memory or ((T *)NULL).
+@param [in] mem_pointer a pointer to existing memory or ((T *)NULL).
 @param [in] any_type_name the name of the user type.
 @param [in] allocate the allocator function, if allocation is allowed.
 @param [in] context_data any context data needed for element destruction.
-@param [in] capacity the number of contiguous elements at mem_ptr
+@param [in] capacity the number of contiguous elements at mem_pointer
 @param [in] optional_size an optional initial size between 1 and capacity.
 @return the flat_double_ended_queue on the right hand side of an equality
 operator at runtime or compiletime (e.g. CCC_Flat_double_ended_queue q =
 CCC_flat_double_ended_queue_initialize(...);) */
-#define CCC_flat_double_ended_queue_initialize(mem_ptr, any_type_name,         \
+#define CCC_flat_double_ended_queue_initialize(mem_pointer, any_type_name,     \
                                                allocate, context_data,         \
                                                capacity, optional_size...)     \
-    CCC_private_flat_double_ended_queue_initialize(mem_ptr, any_type_name,     \
+    CCC_private_flat_double_ended_queue_initialize(mem_pointer, any_type_name, \
                                                    allocate, context_data,     \
                                                    capacity, optional_size)
 
@@ -184,30 +184,30 @@ Add or remove elements from the FDEQ. */
 /** @brief Write an element directly to the back slot of the
 flat_double_ended_queue. O(1) if no allocation permission amortized O(1) if
 allocation permission is given and a resize is required.
-@param [in] flat_double_ended_queue_ptr a pointer to the
+@param [in] flat_double_ended_queue_pointer a pointer to the
 flat_double_ended_queue.
 @param [in] value for integral types, the direct value. For structs and
 unions use compound literal syntax.
 @return a reference to the inserted element. If allocation is permitted and a
 resizing is required to insert the element but fails, NULL is returned. */
-#define CCC_flat_double_ended_queue_emplace_back(flat_double_ended_queue_ptr,  \
-                                                 value...)                     \
+#define CCC_flat_double_ended_queue_emplace_back(                              \
+    flat_double_ended_queue_pointer, value...)                                 \
     CCC_private_flat_double_ended_queue_emplace_back(                          \
-        flat_double_ended_queue_ptr, value)
+        flat_double_ended_queue_pointer, value)
 
 /** @brief Write an element directly to the front slot of the
 flat_double_ended_queue. O(1) if no allocation permission amortized O(1) if
 allocation permission is given and a resize is required.
-@param [in] flat_double_ended_queue_ptr a pointer to the
+@param [in] flat_double_ended_queue_pointer a pointer to the
 flat_double_ended_queue.
 @param [in] value for integral types, the direct value. For structs and
 unions use compound literal syntax.
 @return a reference to the inserted element. If allocation is permitted and a
 resizing is required to insert the element but fails, NULL is returned. */
-#define CCC_flat_double_ended_queue_emplace_front(flat_double_ended_queue_ptr, \
-                                                  value...)                    \
+#define CCC_flat_double_ended_queue_emplace_front(                             \
+    flat_double_ended_queue_pointer, value...)                                 \
     CCC_private_flat_double_ended_queue_emplace_front(                         \
-        flat_double_ended_queue_ptr, value)
+        flat_double_ended_queue_pointer, value)
 
 /** @brief Push the user type to the back of the flat_double_ended_queue. O(1)
 if no allocation permission amortized O(1) if allocation permission is given and
@@ -411,20 +411,20 @@ NULL if empty. */
 /** @brief Return the next element in the flat_double_ended_queue moving front
 to back. O(1).
 @param [in] flat_double_ended_queue a pointer to the flat_double_ended_queue.
-@param [in] iter_ptr the current element in the flat_double_ended_queue.
-@return the element following iter_ptr or NULL if no elements follow. */
+@param [in] iter_pointer the current element in the flat_double_ended_queue.
+@return the element following iter_pointer or NULL if no elements follow. */
 [[nodiscard]] void *CCC_flat_double_ended_queue_next(
     CCC_Flat_double_ended_queue const *flat_double_ended_queue,
-    void const *iter_ptr);
+    void const *iter_pointer);
 
 /** @brief Return the next element in the flat_double_ended_queue moving back to
 front. O(1).
 @param [in] flat_double_ended_queue a pointer to the flat_double_ended_queue.
-@param [in] iter_ptr the current element in the flat_double_ended_queue.
-@return the element preceding iter_ptr or NULL if no elements follow. */
+@param [in] iter_pointer the current element in the flat_double_ended_queue.
+@return the element preceding iter_pointer or NULL if no elements follow. */
 [[nodiscard]] void *CCC_flat_double_ended_queue_reverse_next(
     CCC_Flat_double_ended_queue const *flat_double_ended_queue,
-    void const *iter_ptr);
+    void const *iter_pointer);
 
 /** @brief Return a pointer to the end element. It may not be accessed. O(1).
 @param [in] flat_double_ended_queue a pointer to the flat_double_ended_queue.
