@@ -110,10 +110,9 @@ CCC_private_Bounded_map_node_in_slot(struct CCC_Bounded_map const *,
 struct CCC_Bounded_map_entry
 CCC_private_bounded_map_entry(struct CCC_Bounded_map const *, void const *key);
 /** @private */
-void *CCC_private_bounded_map_insert(struct CCC_Bounded_map *,
-                                     struct CCC_Bounded_map_node *parent,
-                                     CCC_Order last_order,
-                                     struct CCC_Bounded_map_node *out_handle);
+void *CCC_private_bounded_map_insert(
+    struct CCC_Bounded_map *, struct CCC_Bounded_map_node *parent,
+    CCC_Order last_order, struct CCC_Bounded_map_node *type_output_intruder);
 
 /*==========================   Initialization     ===========================*/
 
