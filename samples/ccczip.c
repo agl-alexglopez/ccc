@@ -533,7 +533,7 @@ memoize_path(struct Huffman_tree *const tree, Flat_hash_map *const fh,
         bitq_push_back(bq, node->iterator);
         /* During backtracking this helps us know which child subtree needs to
            be explored or if we are done and can continue backtracking. */
-        cur = node->link[node->iter++];
+        cur = node->link[node->iterator++];
     }
     /* Cleanup because we now have the correct path. */
     for (; cur; cur = parent_i(tree, cur))
@@ -584,7 +584,7 @@ compress_tree(struct Huffman_tree *const tree)
             {
                 bitq_push_back(&ret.tree_paths, CCC_TRUE);
             }
-            cur = node->link[node->iter++];
+            cur = node->link[node->iterator++];
         }
         else
         {
@@ -823,7 +823,7 @@ reconstruct_tree(struct Compressed_huffman_tree *const blueprint)
             struct Huffman_node *const pushed = push_back(
                 &ret.bump_arena, &(struct Huffman_node){.parent = parent});
             node = CCC_buffer_i(&ret.bump_arena, pushed).count;
-            parent_r->link[parent_r->iter++] = node;
+            parent_r->link[parent_r->iterator++] = node;
             if (!bit)
             {
                 pushed->ch = *leaves;
@@ -836,7 +836,7 @@ reconstruct_tree(struct Compressed_huffman_tree *const blueprint)
         if (bit && node_r->iterator < ITER_END)
         {
             parent = node;
-            node = node_r->link[node_r->iter];
+            node = node_r->link[node_r->iterator];
             continue;
         }
         /* Backtrack. A leaf or internal node with both children built. */
