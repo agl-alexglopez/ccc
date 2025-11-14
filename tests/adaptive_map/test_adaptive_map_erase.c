@@ -79,19 +79,64 @@ check_static_begin(adaptive_map_test_weak_srand)
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
-    struct Val vals[1000];
     int const num_nodes = 1000;
+    struct Val vals[1000];
+    bool repeats[1000] = {};
     for (int i = 0; i < num_nodes; ++i)
     {
-        vals[i].key = rand(); /* NOLINT */
+        vals[i].key = rand(); // NOLINT
         vals[i].val = i;
-        (void)swap_entry(&s, &vals[i].elem, &(struct Val){}.elem);
+        if (occupied(swap_entry_wrap(&s, &vals[i].elem, &(struct Val){}.elem)))
+        {
+            repeats[i] = true;
+        }
         check(validate(&s), true);
     }
     for (int i = 0; i < num_nodes; ++i)
     {
-        check(contains(&s, &vals[i].key), true);
-        (void)CCC_remove(&s, &vals[i].elem);
+        CCC_Entry entry = remove(&s, &vals[i].elem);
+        check(occupied(&entry) || repeats[i], true);
+        check(validate(&s), true);
+    }
+    check(is_empty(&s), true);
+    check_end();
+}
+
+check_static_begin(adaptive_map_test_insert_erase_cycles)
+{
+    CCC_Adaptive_map s = CCC_adaptive_map_initialize(s, struct Val, elem, key,
+                                                     id_order, NULL, NULL);
+    srand(time(NULL)); /* NOLINT */
+    int const num_nodes = 1000;
+    struct Val vals[1000];
+    bool repeats[1000] = {};
+    for (int i = 0; i < num_nodes; ++i)
+    {
+        int const rand_i = rand(); /* NOLINT */
+        vals[i].key = rand_i;
+        vals[i].val = i;
+        if (occupied(insert_or_assign_wrap(&s, &vals[i].elem)))
+        {
+            repeats[i] = true;
+        }
+        check(validate(&s), true);
+    }
+    for (int i = 0; i < num_nodes / 2; ++i)
+    {
+        CCC_Entry h = CCC_remove(&s, &vals[i].elem);
+        check(occupied(&h) || repeats[i], true);
+        check(validate(&s), true);
+    }
+    for (int i = 0; i < num_nodes / 2; ++i)
+    {
+        CCC_Entry entry = insert_or_assign(&s, &vals[i].elem);
+        check(occupied(&entry), false);
+        check(validate(&s), true);
+    }
+    for (int i = 0; i < num_nodes; ++i)
+    {
+        CCC_Entry entry = CCC_remove(&s, &vals[i].elem);
+        check(occupied(&entry) || repeats[i], true);
         check(validate(&s), true);
     }
     check(is_empty(&s), true);
@@ -103,5 +148,6 @@ main()
 {
     return check_run(adaptive_map_test_insert_erase_shuffled(),
                      adaptive_map_test_prime_shuffle(),
-                     adaptive_map_test_weak_srand());
+                     adaptive_map_test_weak_srand(),
+                     adaptive_map_test_insert_erase_cycles());
 }
