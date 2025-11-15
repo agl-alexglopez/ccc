@@ -37,137 +37,139 @@ static char const *const result_messages[CCC_PRIVATE_RESULT_COUNT] = {
 /*============================   Interface    ===============================*/
 
 CCC_Tribool
-CCC_entry_occupied(CCC_Entry const *const e)
+CCC_entry_occupied(CCC_Entry const *const entry)
 {
-    if (!e)
+    if (!entry)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    return (e->private.status & CCC_ENTRY_OCCUPIED) != 0;
+    return (entry->private.status & CCC_ENTRY_OCCUPIED) != 0;
 }
 
 CCC_Tribool
-CCC_entry_insert_error(CCC_Entry const *const e)
+CCC_entry_insert_error(CCC_Entry const *const entry)
 {
-    if (!e)
+    if (!entry)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    return (e->private.status & CCC_ENTRY_INSERT_ERROR) != 0;
+    return (entry->private.status & CCC_ENTRY_INSERT_ERROR) != 0;
 }
 
 CCC_Tribool
-CCC_entry_input_error(CCC_Entry const *const e)
+CCC_entry_input_error(CCC_Entry const *const entry)
 {
-    if (!e)
+    if (!entry)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    return (e->private.status & CCC_ENTRY_ARGUMENT_ERROR) != 0;
+    return (entry->private.status & CCC_ENTRY_ARGUMENT_ERROR) != 0;
 }
 
 void *
-CCC_entry_unwrap(CCC_Entry const *const e)
+CCC_entry_unwrap(CCC_Entry const *const entry)
 {
-    if (!e)
+    if (!entry)
     {
         return NULL;
     }
-    return e->private.status & CCC_ENTRY_NO_UNWRAP ? NULL : e->private.type;
+    return entry->private.status & CCC_ENTRY_NO_UNWRAP ? NULL
+                                                       : entry->private.type;
 }
 
 CCC_Tribool
-CCC_handle_occupied(CCC_Handle const *const e)
+CCC_handle_occupied(CCC_Handle const *const handle)
 {
-    if (!e)
+    if (!handle)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    return (e->private.status & CCC_ENTRY_OCCUPIED) != 0;
+    return (handle->private.status & CCC_ENTRY_OCCUPIED) != 0;
 }
 
 CCC_Tribool
-CCC_handle_insert_error(CCC_Handle const *const e)
+CCC_handle_insert_error(CCC_Handle const *const handle)
 {
-    if (!e)
+    if (!handle)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    return (e->private.status & CCC_ENTRY_INSERT_ERROR) != 0;
+    return (handle->private.status & CCC_ENTRY_INSERT_ERROR) != 0;
 }
 
 CCC_Tribool
-CCC_handle_input_error(CCC_Handle const *const e)
+CCC_handle_input_error(CCC_Handle const *const handle)
 {
-    if (!e)
+    if (!handle)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    return (e->private.status & CCC_ENTRY_ARGUMENT_ERROR) != 0;
+    return (handle->private.status & CCC_ENTRY_ARGUMENT_ERROR) != 0;
 }
 
 CCC_Handle_index
-CCC_handle_unwrap(CCC_Handle const *const e)
+CCC_handle_unwrap(CCC_Handle const *const handle)
 {
-    if (!e)
+    if (!handle)
     {
         return 0;
     }
-    return e->private.status & CCC_ENTRY_NO_UNWRAP ? 0 : e->private.index;
+    return handle->private.status & CCC_ENTRY_NO_UNWRAP ? 0
+                                                        : handle->private.index;
 }
 
 void *
-CCC_range_begin(CCC_Range const *const r)
+CCC_range_begin(CCC_Range const *const range)
 {
-    return r ? r->private.begin : NULL;
+    return range ? range->private.begin : NULL;
 }
 
 void *
-CCC_range_end(CCC_Range const *const r)
+CCC_range_end(CCC_Range const *const range)
 {
-    return r ? r->private.end : NULL;
+    return range ? range->private.end : NULL;
 }
 
 void *
-CCC_range_reverse_begin(CCC_Range_reverse const *const r)
+CCC_range_reverse_begin(CCC_Range_reverse const *const range)
 {
-    return r ? r->private.reverse_begin : NULL;
+    return range ? range->private.reverse_begin : NULL;
 }
 
 void *
-CCC_range_reverse_end(CCC_Range_reverse const *const r)
+CCC_range_reverse_end(CCC_Range_reverse const *const range)
 {
-    return r ? r->private.reverse_end : NULL;
+    return range ? range->private.reverse_end : NULL;
 }
 
 char const *
-CCC_result_message(CCC_Result const res)
+CCC_result_message(CCC_Result const result)
 {
-    if (res >= CCC_PRIVATE_RESULT_COUNT)
+    if (result >= CCC_PRIVATE_RESULT_COUNT)
     {
         return "error: invalid result provided no message exists";
     }
-    return result_messages[res];
+    return result_messages[result];
 }
 
 CCC_Entry_status
-CCC_get_entry_status(CCC_Entry const *e)
+CCC_get_entry_status(CCC_Entry const *entry)
 {
-    if (!e)
+    if (!entry)
     {
         return CCC_ENTRY_ARGUMENT_ERROR;
     }
-    return e->private.status;
+    return entry->private.status;
 }
 
 CCC_Handle_status
-CCC_get_handle_status(CCC_Handle const *e)
+CCC_get_handle_status(CCC_Handle const *handle)
 {
-    if (!e)
+    if (!handle)
     {
         return CCC_ENTRY_ARGUMENT_ERROR;
     }
-    return e->private.status;
+    return handle->private.status;
 }
 
 char const *
