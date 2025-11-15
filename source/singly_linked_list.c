@@ -44,7 +44,6 @@ before(struct CCC_Singly_linked_list const *,
        struct CCC_Singly_linked_list_node const *);
 static size_t len(struct CCC_Singly_linked_list_node const *,
                   struct CCC_Singly_linked_list_node const *);
-
 static void push_front(struct CCC_Singly_linked_list *,
                        struct CCC_Singly_linked_list_node *);
 static size_t extract_range(struct CCC_Singly_linked_list *,
@@ -528,10 +527,10 @@ merge(CCC_Singly_linked_list *const list, struct Link a_first,
         if (order(list, a_count_b_first.current, a_first.current)
             == CCC_ORDER_LESSER)
         {
-            /* The i element is the lesser element that must be spliced out.
-               However, a_count_b_first.prev is not updated because only i is
-               spliced out. Algorithm will continue with new i, but same prev.
-             */
+            /* The current element is the lesser element that must be spliced
+               out. However, a_count_b_first.previous is not updated because
+               only current is spliced out. Algorithm will continue with new
+               current, but same previous. */
             struct CCC_Singly_linked_list_node *const lesser
                 = a_count_b_first.current;
             a_count_b_first.current = lesser->n;

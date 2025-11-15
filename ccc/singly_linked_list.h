@@ -28,7 +28,8 @@ permitted to allocate all insertion code assumes that the user has allocated
 memory appropriately for the element to be inserted; it will not allocate or
 free in this case. If allocation is permitted upon initialization the container
 will manage the memory as expected on insert or erase operations as defined
-by the interface; memory is allocated for insertions and freed for removals.
+by the interface. In this case memory is allocated for insertions and freed for
+removals.
 
 To shorten names in the interface, define the following preprocessor directive
 at the top of your file.
