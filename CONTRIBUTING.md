@@ -182,7 +182,7 @@ Naming a type uses the prefix, any additional descriptors needed, and then the o
 
 > [!IMPORTANT]
 > Functions and function-like macros use `snake_case` and the following template.
-> `[prefix][container name][action or query]`
+> `[prefix][container name][action or query]`.
 
 This is the least visually invasive choice among a wide variety of code bases. It prioritizes readability. Function-like macros follow function style because they signal to the user that they must provide arguments. Also, any modern IDE or LSP configuration will trivially show the user that the macro is not a function.
 
