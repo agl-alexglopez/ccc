@@ -635,17 +635,15 @@ static inline void *
 struct_base(struct CCC_Priority_queue const *const priority_queue,
             struct CCC_Priority_queue_node const *const node)
 {
-    return ((char *)&(node->child))
-         - priority_queue->priority_queue_node_offset;
+    return ((char *)&(node->child)) - priority_queue->type_intruder_offset;
 }
 
 static inline struct CCC_Priority_queue_node *
 elem_in(struct CCC_Priority_queue const *const priority_queue,
         void const *const any_struct)
 {
-    return (
-        struct CCC_Priority_queue_node
-            *)((char *)any_struct + priority_queue->priority_queue_node_offset);
+    return (struct CCC_Priority_queue_node
+                *)((char *)any_struct + priority_queue->type_intruder_offset);
 }
 
 static inline void

@@ -66,7 +66,7 @@ struct CCC_Adaptive_map
     /** @internal The size of the user type stored in the tree. */
     size_t sizeof_type;
     /** @internal The byte offset of the intrusive element. */
-    size_t node_node_offset;
+    size_t type_intruder_offset;
     /** @internal The byte offset of the user key in the user type. */
     size_t key_offset;
     /** @internal The user defined comparison callback function. */
@@ -142,7 +142,7 @@ void *CCC_private_adaptive_map_insert(struct CCC_Adaptive_map *,
         .context = (private_context_data),                                     \
         .size = 0,                                                             \
         .sizeof_type = sizeof(private_struct_name),                            \
-        .node_node_offset                                                      \
+        .type_intruder_offset                                                  \
         = offsetof(private_struct_name, private_node_node_field),              \
         .key_offset = offsetof(private_struct_name, private_key_node_field),   \
     }

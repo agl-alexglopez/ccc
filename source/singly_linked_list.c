@@ -679,7 +679,7 @@ static inline void *
 struct_base(struct CCC_Singly_linked_list const *const list,
             struct CCC_Singly_linked_list_node const *const node)
 {
-    return ((char *)&node->n) - list->singly_linked_list_node_offset;
+    return ((char *)&node->n) - list->type_intruder_offset;
 }
 
 /** Given the user struct provides the address of intrusive elem. */
@@ -687,8 +687,8 @@ static inline struct CCC_Singly_linked_list_node *
 elem_in(struct CCC_Singly_linked_list const *const list,
         void const *const any_struct)
 {
-    return (struct CCC_Singly_linked_list_node
-                *)((char *)any_struct + list->singly_linked_list_node_offset);
+    return (struct CCC_Singly_linked_list_node *)((char *)any_struct
+                                                  + list->type_intruder_offset);
 }
 
 /** Calls the user provided three way comparison callback function on the user

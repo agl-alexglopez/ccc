@@ -863,15 +863,15 @@ static inline void *
 struct_base(struct CCC_Doubly_linked_list const *const list,
             struct CCC_Doubly_linked_list_node const *const node)
 {
-    return ((char *)&node->next) - list->doubly_linked_list_node_offset;
+    return ((char *)&node->next) - list->type_intruder_offset;
 }
 
 static inline struct CCC_Doubly_linked_list_node *
 type_intruder_in(struct CCC_Doubly_linked_list const *const list,
                  void const *const struct_base)
 {
-    return (struct CCC_Doubly_linked_list_node
-                *)((char *)struct_base + list->doubly_linked_list_node_offset);
+    return (struct CCC_Doubly_linked_list_node *)((char *)struct_base
+                                                  + list->type_intruder_offset);
 }
 
 /** Calls the user provided three way comparison callback function on the user

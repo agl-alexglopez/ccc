@@ -93,7 +93,7 @@ struct CCC_Doubly_linked_list
     /** @internal The size in bytes of the type which wraps this handle. */
     size_t sizeof_type;
     /** @internal The offset in bytes of the intrusive element in user type. */
-    size_t doubly_linked_list_node_offset;
+    size_t type_intruder_offset;
     /** @internal The user provided comparison callback for sorting. */
     CCC_Type_comparator *compare;
     /** @internal The user provided allocation function, if any. */
@@ -129,7 +129,7 @@ name of the list being on the left hand side of the assignment operator. */
         .nil.next = &(private_doubly_linked_list_name).nil,                    \
         .nil.previous = &(private_doubly_linked_list_name).nil,                \
         .sizeof_type = sizeof(private_struct_name),                            \
-        .doubly_linked_list_node_offset = offsetof(                            \
+        .type_intruder_offset = offsetof(                                      \
             private_struct_name, private_doubly_linked_list_node_field),       \
         .count = 0,                                                            \
         .allocate = (private_allocate),                                        \

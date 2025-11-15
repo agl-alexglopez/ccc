@@ -895,7 +895,7 @@ static inline void *
 struct_base(struct CCC_Bounded_map const *const map,
             struct CCC_Bounded_map_node const *const e)
 {
-    return ((char *)e->branch) - map->node_node_offset;
+    return ((char *)e->branch) - map->type_intruder_offset;
 }
 
 static inline void *
@@ -915,7 +915,7 @@ static inline struct CCC_Bounded_map_node *
 elem_in_slot(struct CCC_Bounded_map const *const map, void const *const slot)
 {
     return (struct CCC_Bounded_map_node *)((char *)slot
-                                           + map->node_node_offset);
+                                           + map->type_intruder_offset);
 }
 
 /*=======================   WAVL Tree Maintenance   =========================*/

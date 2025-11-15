@@ -654,7 +654,8 @@ static inline struct CCC_Adaptive_map_node *
 elem_in_slot(struct CCC_Adaptive_map const *const t, void const *const slot)
 {
 
-    return (struct CCC_Adaptive_map_node *)((char *)slot + t->node_node_offset);
+    return (struct CCC_Adaptive_map_node *)((char *)slot
+                                            + t->type_intruder_offset);
 }
 
 static inline void
@@ -942,7 +943,7 @@ struct_base(struct CCC_Adaptive_map const *const t,
     /* Link is the first field of the struct and is an array so no need to get
        pointer address of [0] element of array. That's the same as just the
        array field. */
-    return ((char *)n->branch) - t->node_node_offset;
+    return ((char *)n->branch) - t->type_intruder_offset;
 }
 
 static inline CCC_Order

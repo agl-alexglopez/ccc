@@ -90,7 +90,7 @@ struct CCC_Priority_queue
     /** @internal Quantity of nodes stored in heap for O(1) reporting. */
     size_t count;
     /** @internal The byte offset of the intrusive node in user type. */
-    size_t priority_queue_node_offset;
+    size_t type_intruder_offset;
     /** @internal The size of the type we are intruding upon. */
     size_t sizeof_type;
     /** @internal The order of this heap, `CCC_ORDER_LESSER` (min) or
@@ -146,7 +146,7 @@ CCC_private_priority_queue_struct_base(struct CCC_Priority_queue const *,
     {                                                                          \
         .root = NULL,                                                          \
         .count = 0,                                                            \
-        .priority_queue_node_offset                                            \
+        .type_intruder_offset                                                  \
         = offsetof(private_struct_name, private_priority_queue_node_field),    \
         .sizeof_type = sizeof(private_struct_name),                            \
         .order = (private_priority_queue_order),                               \

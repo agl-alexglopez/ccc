@@ -53,7 +53,7 @@ struct CCC_Singly_linked_list
     /** @internal The size in bytes of the type which wraps this handle. */
     size_t sizeof_type;
     /** @internal The offset in bytes of the intrusive element in user type. */
-    size_t singly_linked_list_node_offset;
+    size_t type_intruder_offset;
     /** @internal The user provided comparison callback for sorting. */
     CCC_Type_comparator *compare;
     /** @internal The user provided allocation function, if any. */
@@ -79,7 +79,7 @@ CCC_private_singly_linked_list_push_front(struct CCC_Singly_linked_list *,
     {                                                                          \
         .nil.n = &(private_singly_linked_list_name).nil,                       \
         .sizeof_type = sizeof(private_struct_name),                            \
-        .singly_linked_list_node_offset = offsetof(                            \
+        .type_intruder_offset = offsetof(                                      \
             private_struct_name, private_singly_linked_list_node_field),       \
         .count = 0,                                                            \
         .allocate = (private_allocate),                                        \

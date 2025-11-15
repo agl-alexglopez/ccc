@@ -63,7 +63,7 @@ struct CCC_Bounded_map
     size_t key_offset;
     /** @internal The byte offset of the intrusive element in the user struct.
      */
-    size_t node_node_offset;
+    size_t type_intruder_offset;
     /** @internal The size of the user struct holding the intruder. */
     size_t sizeof_type;
     /** @internal The comparison function for three way comparison. */
@@ -130,7 +130,7 @@ void *CCC_private_bounded_map_insert(
                 .branch = {&(private_map_name).end, &(private_map_name).end}}, \
         .count = 0,                                                            \
         .key_offset = offsetof(private_struct_name, private_key_node_field),   \
-        .node_node_offset                                                      \
+        .type_intruder_offset                                                  \
         = offsetof(private_struct_name, private_node_node_field),              \
         .sizeof_type = sizeof(private_struct_name),                            \
         .compare = (private_key_order_fn),                                     \
