@@ -20,9 +20,9 @@ struct Owner
 CCC_Order
 owners_eq(CCC_Key_comparator_context const order)
 {
-    int const *const lhs = order.key_lhs;
-    struct Owner const *const rhs = order.type_rhs;
-    return (*lhs > rhs->key) - (*lhs < rhs->key);
+    int const *const left = order.key_left;
+    struct Owner const *const right = order.type_right;
+    return (*left > right->key) - (*left < right->key);
 }
 
 void

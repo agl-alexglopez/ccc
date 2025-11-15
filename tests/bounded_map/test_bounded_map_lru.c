@@ -69,16 +69,16 @@ static bool const quiet = true;
 static CCC_Order
 order_by_key(CCC_Key_comparator_context const order)
 {
-    int const key_lhs = *(int *)order.key_lhs;
-    struct Lru_node const *const kv = order.type_rhs;
-    return (key_lhs > kv->key) - (key_lhs < kv->key);
+    int const key_left = *(int *)order.key_left;
+    struct Lru_node const *const kv = order.type_right;
+    return (key_left > kv->key) - (key_left < kv->key);
 }
 
 static CCC_Order
 order_list_nodes(CCC_Type_comparator_context const order)
 {
-    struct Lru_node const *const kv_a = order.type_lhs;
-    struct Lru_node const *const kv_b = order.type_rhs;
+    struct Lru_node const *const kv_a = order.type_left;
+    struct Lru_node const *const kv_b = order.type_right;
     return (kv_a->key > kv_b->key) - (kv_a->key < kv_b->key);
 }
 

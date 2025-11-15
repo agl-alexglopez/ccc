@@ -1642,8 +1642,8 @@ is_equal(struct CCC_Flat_hash_map const *const map, void const *const key,
          size_t const i)
 {
     return map->compare((CCC_Key_comparator_context){
-               .key_lhs = key,
-               .type_rhs = data_at(map, i),
+               .key_left = key,
+               .type_right = data_at(map, i),
                .context = map->context,
            })
         == CCC_ORDER_EQUAL;

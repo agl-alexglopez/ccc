@@ -625,8 +625,8 @@ order(struct CCC_Priority_queue const *const priority_queue,
       struct CCC_Priority_queue_node const *const right)
 {
     return priority_queue->compare((CCC_Type_comparator_context){
-        .type_lhs = struct_base(priority_queue, left),
-        .type_rhs = struct_base(priority_queue, right),
+        .type_left = struct_base(priority_queue, left),
+        .type_right = struct_base(priority_queue, right),
         .context = priority_queue->context,
     });
 }

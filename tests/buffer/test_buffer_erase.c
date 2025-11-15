@@ -113,12 +113,12 @@ static CCC_Order
 order_car_idx(CCC_Type_comparator_context const order)
 {
     Buffer const *const positions = order.context;
-    int const *const lhs_pos = buffer_at(positions, *(int *)order.type_lhs);
-    int const *const rhs_pos = buffer_at(positions, *(int *)order.type_rhs);
+    int const *const left_pos = buffer_at(positions, *(int *)order.type_left);
+    int const *const right_pos = buffer_at(positions, *(int *)order.type_right);
     /* Reversed sort. We want descending not ascending order. We ask how many
        car fleets there will be by starting at the cars furthest away that may
        catch up to those ahead. */
-    return (*lhs_pos < *rhs_pos) - (*lhs_pos > *rhs_pos);
+    return (*left_pos < *right_pos) - (*left_pos > *right_pos);
 }
 
 check_static_begin(buffer_test_car_fleet)

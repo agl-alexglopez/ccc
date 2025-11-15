@@ -17,8 +17,8 @@
 static CCC_Order
 int_order(CCC_Type_comparator_context const order)
 {
-    int a = *((int const *const)order.type_lhs);
-    int b = *((int const *const)order.type_rhs);
+    int a = *((int const *const)order.type_left);
+    int b = *((int const *const)order.type_right);
     return (a > b) - (a < b);
 }
 

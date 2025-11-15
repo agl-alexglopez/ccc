@@ -1132,15 +1132,15 @@ build_path_outline(struct Graph *graph)
 static CCC_Order
 order_parent_cells(Key_comparator_context const c)
 {
-    struct Point const *const lhs = c.key_lhs;
-    struct Path_backtrack_cell const *const rhs = c.type_rhs;
+    struct Point const *const left = c.key_left;
+    struct Path_backtrack_cell const *const right = c.type_right;
     CCC_Order const order
-        = ((lhs->r < rhs->current.r) - (lhs->r > rhs->current.r));
+        = ((left->r < right->current.r) - (left->r > right->current.r));
     if (order != CCC_ORDER_EQUAL)
     {
         return order;
     }
-    return ((lhs->c < rhs->current.c) - (lhs->c > rhs->current.c));
+    return ((left->c < right->current.c) - (left->c > right->current.c));
 }
 
 static uint64_t
@@ -1154,8 +1154,8 @@ hash_parent_cells(Key_context const point_struct)
 static Order
 order_priority_queue_costs(Type_comparator_context const cost_order)
 {
-    struct Cost const *const a = cost_order.type_lhs;
-    struct Cost const *const b = cost_order.type_rhs;
+    struct Cost const *const a = cost_order.type_left;
+    struct Cost const *const b = cost_order.type_right;
     return (a->cost > b->cost) - (a->cost < b->cost);
 }
 

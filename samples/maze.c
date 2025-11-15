@@ -321,14 +321,15 @@ animate_maze(struct Maze *maze)
 static CCC_Order
 prim_cell_order(Key_comparator_context const c)
 {
-    struct Point const *const lhs = c.key_lhs;
-    struct Prim_cell const *const rhs = c.type_rhs;
-    CCC_Order const order = (lhs->r < rhs->cell.r) - (lhs->r > rhs->cell.r);
+    struct Point const *const left = c.key_left;
+    struct Prim_cell const *const right = c.type_right;
+    CCC_Order const order
+        = (left->r < right->cell.r) - (left->r > right->cell.r);
     if (order != CCC_ORDER_EQUAL)
     {
         return order;
     }
-    return (lhs->c > rhs->cell.c) - (lhs->c < rhs->cell.c);
+    return (left->c > right->cell.c) - (left->c < right->cell.c);
 }
 
 static uint64_t
@@ -354,9 +355,9 @@ hash_64_bits(uint64_t x)
 static Order
 order_prim_cells(Type_comparator_context const order_cells)
 {
-    struct Prim_cell const *const lhs = order_cells.type_lhs;
-    struct Prim_cell const *const rhs = order_cells.type_rhs;
-    return (lhs->cost > rhs->cost) - (lhs->cost < rhs->cost);
+    struct Prim_cell const *const left = order_cells.type_left;
+    struct Prim_cell const *const right = order_cells.type_right;
+    return (left->cost > right->cost) - (left->cost < right->cost);
 }
 
 /*=========================   Maze Support Code   ===========================*/

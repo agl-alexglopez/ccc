@@ -885,8 +885,8 @@ order(struct CCC_Bounded_map const *const map, void const *const key,
       CCC_Key_comparator *const fn)
 {
     return fn((CCC_Key_comparator_context){
-        .key_lhs = key,
-        .type_rhs = struct_base(map, node),
+        .key_left = key,
+        .type_right = struct_base(map, node),
         .context = map->context,
     });
 }

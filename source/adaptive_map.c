@@ -951,8 +951,8 @@ order(struct CCC_Adaptive_map const *const t, void const *const key,
       CCC_Key_comparator *const fn)
 {
     return fn((CCC_Key_comparator_context){
-        .key_lhs = key,
-        .type_rhs = struct_base(t, node),
+        .key_left = key,
+        .type_right = struct_base(t, node),
         .context = t->context,
     });
 }

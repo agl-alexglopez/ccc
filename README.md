@@ -221,9 +221,9 @@ struct Int_node
 static CCC_Order
 int_cmp(CCC_Type_comparator_context const cmp)
 {
-    struct Int_node const *const lhs = cmp.type_lhs;
-    struct Int_node const *const rhs = cmp.type_rhs;
-    return (lhs->i > rhs->i) - (lhs->i < rhs->i);
+    struct Int_node const *const left = cmp.type_left;
+    struct Int_node const *const right = cmp.type_right;
+    return (left->i > right->i) - (left->i < right->i);
 }
 
 int
@@ -312,9 +312,9 @@ flat_hash_map_int_to_u64(CCC_any_key const k)
 CCC_Order
 flat_hash_map_id_cmp(CCC_Key_comparator_context const cmp)
 {
-    struct Key_val const *const rhs = cmp.type_rhs;
-    int const lhs = *((int *)cmp.any_key_lhs;
-    return (lhs > rhs->key) - (lhs < rhs->key);
+    struct Key_val const *const right = cmp.type_right;
+    int const left = *((int *)cmp.any_key_left;
+    return (left > right->key) - (left < right->key);
 }
 
 flat_hash_map_declare_fixed_map(Standard_fixed_map, struct Key_val, 1024);
@@ -404,9 +404,9 @@ main(void)
 CCC_Order
 int_cmp(CCC_Type_comparator_context const ints)
 {
-    int const lhs = *(int *)ints.type_lhs;
-    int const rhs = *(int *)ints.type_rhs;
-    return (lhs > rhs) - (lhs < rhs);
+    int const left = *(int *)ints.type_left;
+    int const right = *(int *)ints.type_right;
+    return (left > right) - (left < right);
 }
 
 /* In place O(N * log(N)) time O(1) space sort. */
@@ -463,9 +463,9 @@ handle_adaptive_map_declare_fixed_map(Key_val_fixed_map, struct Key_val, 26);
 static CCC_Order
 Key_val_cmp(CCC_Key_comparator_context const cmp)
 {
-    struct Key_val const *const rhs = cmp.type_rhs;
-    int const key_lhs = *((int *)cmp.any_key_lhs);
-    return (key_lhs > rhs->key) - (key_lhs < rhs->key);
+    struct Key_val const *const right = cmp.type_right;
+    int const key_left = *((int *)cmp.any_key_left);
+    return (key_left > right->key) - (key_left < right->key);
 }
 
 int
@@ -541,9 +541,9 @@ CCC_handle_bounded_map_declare_fixed_map(Key_val_fixed_map, struct Val, 64);
 static CCC_Order
 Key_val_cmp(CCC_Key_comparator_context const cmp)
 {
-    struct Key_val const *const rhs = cmp.type_rhs;
-    int const key_lhs = *((int *)cmp.any_key_lhs);
-    return (key_lhs > rhs->key) - (key_lhs < rhs->key);
+    struct Key_val const *const right = cmp.type_right;
+    int const key_left = *((int *)cmp.any_key_left);
+    return (key_left > right->key) - (key_left < right->key);
 }
 
 int
@@ -617,9 +617,9 @@ struct name
 CCC_Order
 Key_val_cmp(CCC_Key_comparator_context cmp)
 {
-    char const *const key = *(char **)cmp.any_key_lhs;
-    struct name const *const rhs = cmp.type_rhs;
-    int const res = strcmp(key, rhs->name);
+    char const *const key = *(char **)cmp.any_key_left;
+    struct name const *const right = cmp.type_right;
+    int const res = strcmp(key, right->name);
     if (res == 0)
     {
         return CCC_EQL;
@@ -687,9 +687,9 @@ struct Val
 static CCC_Order
 val_cmp(CCC_Type_comparator_context const cmp)
 {
-    struct Val const *const lhs = cmp.type_lhs;
-    struct Val const *const rhs = cmp.type_rhs;
-    return (lhs->val > rhs->val) - (lhs->val < rhs->val);
+    struct Val const *const left = cmp.type_left;
+    struct Val const *const right = cmp.type_right;
+    return (left->val > right->val) - (left->val < right->val);
 }
 
 int
@@ -736,9 +736,9 @@ struct Key_val
 static CCC_Order
 Key_val_cmp(CCC_Key_comparator_context const cmp)
 {
-    struct Key_val const *const rhs = cmp.type_rhs;
-    int const key_lhs = *((int *)cmp.any_key_lhs);
-    return (key_lhs > rhs->key) - (key_lhs < rhs->key);
+    struct Key_val const *const right = cmp.type_right;
+    int const key_left = *((int *)cmp.any_key_left);
+    return (key_left > right->key) - (key_left < right->key);
 }
 
 int
@@ -808,9 +808,9 @@ struct Int_node
 static CCC_Order
 int_cmp(CCC_Type_comparator_context const cmp)
 {
-    struct Int_node const *const lhs = cmp.type_lhs;
-    struct Int_node const *const rhs = cmp.type_rhs;
-    return (lhs->i > rhs->i) - (lhs->i < rhs->i);
+    struct Int_node const *const left = cmp.type_left;
+    struct Int_node const *const right = cmp.type_right;
+    return (left->i > right->i) - (left->i < right->i);
 }
 
 int
@@ -1053,9 +1053,9 @@ struct Id
 CCC_Order
 id_cmp(CCC_Type_comparator_context const cmp)
 {
-    struct Id const *const lhs = cmp.type_lhs;
-    struct Id const *const rhs = cmp.type_rhs;
-    return (lhs->id > rhs->id) - (lhs->id < rhs->id);
+    struct Id const *const left = cmp.type_left;
+    struct Id const *const right = cmp.type_right;
+    return (left->id > right->id) - (left->id < right->id);
 }
 
 int

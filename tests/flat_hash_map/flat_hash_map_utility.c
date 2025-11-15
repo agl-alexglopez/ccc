@@ -19,9 +19,9 @@ flat_hash_map_int_last_digit(CCC_Key_context const n)
 CCC_Order
 flat_hash_map_id_order(CCC_Key_comparator_context const order)
 {
-    struct Val const *const rhs = order.type_rhs;
-    int const lhs = *((int *)order.key_lhs);
-    return (lhs > rhs->key) - (lhs < rhs->key);
+    struct Val const *const right = order.type_right;
+    int const left = *((int *)order.key_left);
+    return (left > right->key) - (left < right->key);
 }
 
 uint64_t

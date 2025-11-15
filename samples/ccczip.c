@@ -1168,28 +1168,28 @@ hash_char(CCC_Key_context const to_hash)
 static CCC_Order
 char_order(CCC_Key_comparator_context const order)
 {
-    struct Character_frequency const *const rhs
-        = (struct Character_frequency *)order.type_rhs;
-    char const lhs = *(char *)order.key_lhs;
-    return (lhs > rhs->ch) - (lhs < rhs->ch);
+    struct Character_frequency const *const right
+        = (struct Character_frequency *)order.type_right;
+    char const left = *(char *)order.key_left;
+    return (left > right->ch) - (left < right->ch);
 }
 
 static CCC_Order
 order_freqs(CCC_Type_comparator_context const order)
 {
-    struct Flat_priority_queue_node const *const lhs
-        = (struct Flat_priority_queue_node *)order.type_lhs;
-    struct Flat_priority_queue_node const *const rhs
-        = (struct Flat_priority_queue_node *)order.type_rhs;
-    return (lhs->freq > rhs->freq) - (lhs->freq < rhs->freq);
+    struct Flat_priority_queue_node const *const left
+        = (struct Flat_priority_queue_node *)order.type_left;
+    struct Flat_priority_queue_node const *const right
+        = (struct Flat_priority_queue_node *)order.type_right;
+    return (left->freq > right->freq) - (left->freq < right->freq);
 }
 
 static CCC_Order
 path_memo_order(CCC_Key_comparator_context const order)
 {
-    struct Path_memo const *const rhs = (struct Path_memo *)order.type_rhs;
-    char const lhs = *(char *)order.key_lhs;
-    return (lhs > rhs->ch) - (lhs < rhs->ch);
+    struct Path_memo const *const right = (struct Path_memo *)order.type_right;
+    char const left = *(char *)order.key_left;
+    return (left > right->ch) - (left < right->ch);
 }
 
 /*=========================     Help Message      ===========================*/

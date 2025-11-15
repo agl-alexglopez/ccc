@@ -13,8 +13,8 @@
 CCC_Order
 val_order(CCC_Type_comparator_context const c)
 {
-    struct Val const *const a = c.type_lhs;
-    struct Val const *const b = c.type_rhs;
+    struct Val const *const a = c.type_left;
+    struct Val const *const b = c.type_right;
     return (a->val > b->val) - (a->val < b->val);
 }
 

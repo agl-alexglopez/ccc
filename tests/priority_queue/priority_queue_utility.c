@@ -11,9 +11,9 @@
 CCC_Order
 val_order(CCC_Type_comparator_context const order)
 {
-    struct Val const *const lhs = order.type_lhs;
-    struct Val const *const rhs = order.type_rhs;
-    return (lhs->val > rhs->val) - (lhs->val < rhs->val);
+    struct Val const *const left = order.type_left;
+    struct Val const *const right = order.type_right;
+    return (left->val > right->val) - (left->val < right->val);
 }
 
 void

@@ -1210,8 +1210,8 @@ order_nodes(struct CCC_Handle_adaptive_map const *const map,
             CCC_Key_comparator *const compare)
 {
     return compare((CCC_Key_comparator_context){
-        .key_lhs = key,
-        .type_rhs = data_at(map, node),
+        .key_left = key,
+        .type_right = data_at(map, node),
         .context = map->context,
     });
 }

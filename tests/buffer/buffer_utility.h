@@ -17,7 +17,8 @@ CCC_Result sort(CCC_Buffer *b, CCC_Type_comparator *fn, void *swap);
 /** Compares the Buffer contents as left hand side to the provided sequence of
 elements as the right hand side. The sequence type must match the type stored in
 the Buffer because that type will be used to iterate through the sequence. */
-CCC_Order buforder(CCC_Buffer const *lhs, size_t rhs_count, void const *rhs);
+CCC_Order buforder(CCC_Buffer const *left, size_t right_count,
+                   void const *right);
 
 /** Appends the provided range into the buffer. If the range will exceed
 capacity of a fixed size buffer, only those elements which fit will be pushed

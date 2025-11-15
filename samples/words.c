@@ -485,9 +485,9 @@ clean_word(struct String_arena *const a, SV_String_view wv)
 static Order
 order_string_keys(Key_comparator_context const c)
 {
-    Word const *const w = c.type_rhs;
+    Word const *const w = c.type_right;
     struct String_arena const *const a = c.context;
-    struct String_offset const *const id = c.key_lhs;
+    struct String_offset const *const id = c.key_left;
     char const *const key_word = string_arena_at(a, id);
     char const *const struct_word = string_arena_at(a, &w->ofs);
     check(key_word && struct_word);
@@ -499,18 +499,18 @@ order_string_keys(Key_comparator_context const c)
 static Order
 order_words(Type_comparator_context const c)
 {
-    Word const *const lhs = c.type_lhs;
-    Word const *const rhs = c.type_rhs;
-    Order freq_order = (lhs->freq > rhs->freq) - (lhs->freq < rhs->freq);
+    Word const *const left = c.type_left;
+    Word const *const right = c.type_right;
+    Order freq_order = (left->freq > right->freq) - (left->freq < right->freq);
     if (freq_order != CCC_ORDER_EQUAL)
     {
         return freq_order;
     }
     struct String_arena const *const arena = c.context;
-    char const *const lhs_word = string_arena_at(arena, &lhs->ofs);
-    char const *const rhs_word = string_arena_at(arena, &rhs->ofs);
-    check(lhs_word && rhs_word);
-    int const res = strcmp(lhs_word, rhs_word);
+    char const *const left_word = string_arena_at(arena, &left->ofs);
+    char const *const right_word = string_arena_at(arena, &right->ofs);
+    check(left_word && right_word);
+    int const res = strcmp(left_word, right_word);
     /* Looks like we have chosen wrong order to return but not so: greater
        lexicographic order is sorted first in a min priority queue or
        CCC_ORDER_LESSER in this case. */

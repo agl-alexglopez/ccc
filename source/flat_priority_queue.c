@@ -547,8 +547,8 @@ order(struct CCC_Flat_priority_queue const *const priority_queue, size_t left,
       size_t right)
 {
     return priority_queue->compare((CCC_Type_comparator_context){
-        .type_lhs = at(priority_queue, left),
-        .type_rhs = at(priority_queue, right),
+        .type_left = at(priority_queue, left),
+        .type_right = at(priority_queue, right),
         .context = priority_queue->buffer.context,
     });
 }

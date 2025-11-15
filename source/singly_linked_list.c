@@ -700,8 +700,8 @@ order(struct CCC_Singly_linked_list const *const list,
       struct CCC_Singly_linked_list_node const *const right)
 {
     return list->compare((CCC_Type_comparator_context){
-        .type_lhs = struct_base(list, left),
-        .type_rhs = struct_base(list, right),
+        .type_left = struct_base(list, left),
+        .type_right = struct_base(list, right),
         .context = list->context,
     });
 }

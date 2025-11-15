@@ -14,19 +14,19 @@
 #include "utility/random.h"
 
 static int
-std_order_ints(void const *const lhs, void const *const rhs)
+std_order_ints(void const *const left, void const *const right)
 {
-    int const lhs_int = *(int *)lhs;
-    int const rhs_int = *(int *)rhs;
-    return (lhs_int > rhs_int) - (lhs_int < rhs_int);
+    int const left_int = *(int *)left;
+    int const right_int = *(int *)right;
+    return (left_int > right_int) - (left_int < right_int);
 }
 
 static CCC_Order
 ccc_order_ints(CCC_Type_comparator_context const order)
 {
-    int const lhs_int = *(int *)order.type_lhs;
-    int const rhs_int = *(int *)order.type_rhs;
-    return (lhs_int > rhs_int) - (lhs_int < rhs_int);
+    int const left_int = *(int *)order.type_left;
+    int const right_int = *(int *)order.type_right;
+    return (left_int > right_int) - (left_int < right_int);
 }
 
 check_static_begin(buffer_test_push_fixed)
