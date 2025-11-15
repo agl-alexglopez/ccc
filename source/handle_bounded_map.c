@@ -765,14 +765,14 @@ CCC_handle_bounded_map_copy(CCC_Handle_bounded_map *const destination,
     {
         return CCC_RESULT_ARGUMENT_ERROR;
     }
-    void *const destination_mem = destination->data;
+    void *const destination_data = destination->data;
     struct CCC_Handle_bounded_map_node *const destination_nodes
         = destination->nodes;
     Parity_block *const destination_parity = destination->parity;
     size_t const destination_cap = destination->capacity;
     CCC_Allocator *const destination_allocate = destination->allocate;
     *destination = *source;
-    destination->data = destination_mem;
+    destination->data = destination_data;
     destination->nodes = destination_nodes;
     destination->parity = destination_parity;
     destination->capacity = destination_cap;

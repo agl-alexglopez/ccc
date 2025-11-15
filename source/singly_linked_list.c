@@ -339,17 +339,17 @@ CCC_singly_linked_list_clear(CCC_Singly_linked_list *const singly_linked_list,
     }
     while (!CCC_singly_linked_list_is_empty(singly_linked_list))
     {
-        void *const mem
+        void *const data
             = struct_base(singly_linked_list, pop_front(singly_linked_list));
         if (fn)
         {
-            fn((CCC_Type_context){.type = mem,
+            fn((CCC_Type_context){.type = data,
                                   .context = singly_linked_list->context});
         }
         if (singly_linked_list->allocate)
         {
             (void)singly_linked_list->allocate((CCC_Allocator_context){
-                .input = mem,
+                .input = data,
                 .bytes = 0,
                 .context = singly_linked_list->context,
             });

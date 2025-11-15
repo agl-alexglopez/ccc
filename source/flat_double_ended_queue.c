@@ -347,11 +347,11 @@ CCC_flat_double_ended_queue_copy(
        same as in destination initialization because that controls whether the
        flat_double_ended_queue is a ring Buffer or dynamic
        flat_double_ended_queue. */
-    void *const destination_mem = destination->buf.mem;
+    void *const destination_data = destination->buf.data;
     size_t const destination_cap = destination->buf.capacity;
     CCC_Allocator *const destination_allocate = destination->buf.allocate;
     *destination = *source;
-    destination->buf.mem = destination_mem;
+    destination->buf.data = destination_data;
     destination->buf.capacity = destination_cap;
     destination->buf.allocate = destination_allocate;
     /* Copying from an empty source is odd but supported. */
@@ -369,7 +369,7 @@ CCC_flat_double_ended_queue_copy(
         }
         destination->buf.capacity = source->buf.capacity;
     }
-    if (!destination->buf.mem || !source->buf.mem)
+    if (!destination->buf.data || !source->buf.data)
     {
         return CCC_RESULT_ARGUMENT_ERROR;
     }
@@ -377,21 +377,21 @@ CCC_flat_double_ended_queue_copy(
     {
         size_t const first_chunk
             = min(source->buf.count, source->buf.capacity - source->front);
-        (void)memcpy(destination->buf.mem,
+        (void)memcpy(destination->buf.data,
                      CCC_buffer_at(&source->buf, source->front),
                      source->buf.sizeof_type * first_chunk);
         if (first_chunk < source->buf.count)
         {
-            (void)memcpy((char *)destination->buf.mem
+            (void)memcpy((char *)destination->buf.data
                              + (source->buf.sizeof_type * first_chunk),
-                         source->buf.mem,
+                         source->buf.data,
                          source->buf.sizeof_type
                              * (source->buf.count - first_chunk));
         }
         destination->front = 0;
         return CCC_RESULT_OK;
     }
-    (void)memcpy(destination->buf.mem, source->buf.mem,
+    (void)memcpy(destination->buf.data, source->buf.data,
                  source->buf.capacity * source->buf.sizeof_type);
     return CCC_RESULT_OK;
 }
@@ -819,12 +819,12 @@ maybe_resize(struct CCC_Flat_double_ended_queue *const q,
     {
         required = q->buf.capacity * 2;
     }
-    void *const new_mem = fn((CCC_Allocator_context){
+    void *const new_data = fn((CCC_Allocator_context){
         .input = NULL,
         .bytes = sizeof_type * required,
         .context = q->buf.context,
     });
-    if (!new_mem)
+    if (!new_data)
     {
         return CCC_RESULT_ALLOCATOR_ERROR;
     }
@@ -832,17 +832,17 @@ maybe_resize(struct CCC_Flat_double_ended_queue *const q,
     {
         size_t const first_chunk
             = min(q->buf.count, q->buf.capacity - q->front);
-        (void)memcpy(new_mem, CCC_buffer_at(&q->buf, q->front),
+        (void)memcpy(new_data, CCC_buffer_at(&q->buf, q->front),
                      sizeof_type * first_chunk);
         if (first_chunk < q->buf.count)
         {
-            (void)memcpy((char *)new_mem + (sizeof_type * first_chunk),
+            (void)memcpy((char *)new_data + (sizeof_type * first_chunk),
                          CCC_buffer_begin(&q->buf),
                          sizeof_type * (q->buf.count - first_chunk));
         }
     }
     (void)CCC_buffer_allocate(&q->buf, 0, fn);
-    q->buf.mem = new_mem;
+    q->buf.data = new_data;
     q->front = 0;
     q->buf.capacity = required;
     return CCC_RESULT_OK;

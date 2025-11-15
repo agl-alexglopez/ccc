@@ -33,7 +33,7 @@ manually resized via the interface. */
 struct CCC_Buffer
 {
     /** @internal The contiguous memory of uniform type. */
-    void *mem;
+    void *data;
     /** @internal The current count of active Buffer slots. */
     size_t count;
     /** @internal The total Buffer slots possible for this array. */
@@ -58,11 +58,11 @@ struct CCC_Buffer
 can specify that the Buffer has some count of elements from index
 `[0, capacity - 1)` at initialization time. The Buffer assumes these elements
 are contiguous. */
-#define CCC_private_buffer_initialize(private_mem, private_type_name,          \
+#define CCC_private_buffer_initialize(private_data, private_type_name,         \
                                       private_allocate, private_context_data,  \
                                       private_capacity, ...)                   \
     {                                                                          \
-        .mem = (private_mem),                                                  \
+        .data = (private_data),                                                \
         .sizeof_type = sizeof(private_type_name),                              \
         .count = CCC_private_buf_optional_size(__VA_ARGS__),                   \
         .capacity = (private_capacity),                                        \
@@ -91,7 +91,7 @@ initialization in one convenient step for user. */
                 private_allocate)                                              \
             == CCC_RESULT_OK)                                                  \
         {                                                                      \
-            (void)memcpy(private_buf.mem, private_buffer_initializer_list,     \
+            (void)memcpy(private_buf.data, private_buffer_initializer_list,    \
                          private_n                                             \
                              * sizeof(*private_buffer_initializer_list));      \
             private_buf.count = private_n;                                     \

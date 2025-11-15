@@ -158,20 +158,20 @@ void *CCC_private_bounded_map_insert(
     }))
 
 /** @internal */
-#define CCC_private_bounded_map_insert_key_val(Bounded_map_entry, new_mem,     \
+#define CCC_private_bounded_map_insert_key_val(Bounded_map_entry, new_data,    \
                                                type_compound_literal...)       \
     (__extension__({                                                           \
-        if (new_mem)                                                           \
+        if (new_data)                                                          \
         {                                                                      \
-            *new_mem = type_compound_literal;                                  \
-            new_mem = CCC_private_bounded_map_insert(                          \
+            *new_data = type_compound_literal;                                 \
+            new_data = CCC_private_bounded_map_insert(                         \
                 (Bounded_map_entry)->map,                                      \
                 CCC_private_Bounded_map_node_in_slot(                          \
                     (Bounded_map_entry)->map,                                  \
                     (Bounded_map_entry)->entry.type),                          \
                 (Bounded_map_entry)->last_order,                               \
                 CCC_private_Bounded_map_node_in_slot((Bounded_map_entry)->map, \
-                                                     new_mem));                \
+                                                     new_data));               \
         }                                                                      \
     }))
 

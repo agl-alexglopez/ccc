@@ -997,11 +997,11 @@ CCC_bitset_copy(CCC_Bitset *const destination, CCC_Bitset const *const source,
     /* Whatever future changes we make to bit set members should not fall out
        of sync with this code so save what we need to restore and then copy
        over everything else as a catch all. */
-    Bitblock *const destination_mem = destination->blocks;
+    Bitblock *const destination_data = destination->blocks;
     size_t const destination_cap = destination->capacity;
     CCC_Allocator *const destination_allocate = destination->allocate;
     *destination = *source;
-    destination->blocks = destination_mem;
+    destination->blocks = destination_data;
     destination->capacity = destination_cap;
     destination->allocate = destination_allocate;
     if (!source->capacity)
@@ -1010,16 +1010,16 @@ CCC_bitset_copy(CCC_Bitset *const destination, CCC_Bitset const *const source,
     }
     if (destination->capacity < source->capacity)
     {
-        Bitblock *const new_mem = allocate((CCC_Allocator_context){
+        Bitblock *const new_data = allocate((CCC_Allocator_context){
             .input = destination->blocks,
             .bytes = block_count(source->capacity) * SIZEOF_BLOCK,
             .context = destination->context,
         });
-        if (!new_mem)
+        if (!new_data)
         {
             return CCC_RESULT_ALLOCATOR_ERROR;
         }
-        destination->blocks = new_mem;
+        destination->blocks = new_data;
         destination->capacity = source->capacity;
     }
     if (!source->blocks || !destination->blocks)
@@ -1121,18 +1121,18 @@ maybe_resize(struct CCC_Bitset *const bitset, size_t const to_add,
         = block_count(bits_needed - bitset->count) * SIZEOF_BLOCK;
     size_t const old_bytes
         = bitset->count ? block_count(bitset->count) * SIZEOF_BLOCK : 0;
-    Bitblock *const new_mem = fn((CCC_Allocator_context){
+    Bitblock *const new_data = fn((CCC_Allocator_context){
         .input = bitset->blocks,
         .bytes = block_count(bits_needed) * SIZEOF_BLOCK,
         .context = bitset->context,
     });
-    if (!new_mem)
+    if (!new_data)
     {
         return CCC_RESULT_ALLOCATOR_ERROR;
     }
-    (void)memset((char *)new_mem + old_bytes, 0, new_bytes);
+    (void)memset((char *)new_data + old_bytes, 0, new_bytes);
     bitset->capacity = bits_needed;
-    bitset->blocks = new_mem;
+    bitset->blocks = new_data;
     return CCC_RESULT_OK;
 }
 

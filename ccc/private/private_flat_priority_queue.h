@@ -78,11 +78,11 @@ CCC_private_flat_priority_queue_update_fixup(struct CCC_Flat_priority_queue *,
     private_order_fn, private_allocate, private_context_data,                  \
     private_capacity, private_size)                                            \
     (__extension__({                                                           \
-        __auto_type private_flat_priority_queue_heapify_mem                    \
+        __auto_type private_flat_priority_queue_heapify_data                   \
             = (private_mem_pointer);                                           \
         struct CCC_Flat_priority_queue private_flat_priority_queue_heapify_res \
             = CCC_private_flat_priority_queue_initialize(                      \
-                private_flat_priority_queue_heapify_mem, private_type_name,    \
+                private_flat_priority_queue_heapify_data, private_type_name,   \
                 private_order_order, private_order_fn, private_allocate,       \
                 private_context_data, private_capacity);                       \
         CCC_private_flat_priority_queue_in_place_heapify(                      \

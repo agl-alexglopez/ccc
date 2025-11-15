@@ -55,7 +55,7 @@ CCC_flat_priority_queue_heapify(
     void *const array, size_t const n, size_t const input_sizeof_type)
 {
     if (!flat_priority_queue || !array || !tmp
-        || array == flat_priority_queue->buf.mem
+        || array == flat_priority_queue->buf.data
         || input_sizeof_type != flat_priority_queue->buf.sizeof_type)
     {
         return CCC_RESULT_ARGUMENT_ERROR;
@@ -69,7 +69,7 @@ CCC_flat_priority_queue_heapify(
             return resize_res;
         }
     }
-    (void)memcpy(flat_priority_queue->buf.mem, array, n * input_sizeof_type);
+    (void)memcpy(flat_priority_queue->buf.data, array, n * input_sizeof_type);
     heapify(flat_priority_queue, n, tmp);
     return CCC_RESULT_OK;
 }
@@ -309,11 +309,11 @@ CCC_flat_priority_queue_copy(CCC_Flat_priority_queue *const destination,
        memory in case it has already been allocated. Alloc will remain the
        same as in destination initialization because that controls permission.
      */
-    void *const destination_mem = destination->buf.mem;
+    void *const destination_data = destination->buf.data;
     size_t const destination_cap = destination->buf.capacity;
     CCC_Allocator *const destination_allocate = destination->buf.allocate;
     *destination = *source;
-    destination->buf.mem = destination_mem;
+    destination->buf.data = destination_data;
     destination->buf.capacity = destination_cap;
     destination->buf.allocate = destination_allocate;
     if (!source->buf.count)
@@ -330,13 +330,13 @@ CCC_flat_priority_queue_copy(CCC_Flat_priority_queue *const destination,
         }
         destination->buf.capacity = source->buf.capacity;
     }
-    if (!source->buf.mem || !destination->buf.mem)
+    if (!source->buf.data || !destination->buf.data)
     {
         return CCC_RESULT_ARGUMENT_ERROR;
     }
     /* It is ok to only copy count elements because we know that all elements
        in a binary heap are contiguous from [0, C), where C is count. */
-    (void)memcpy(destination->buf.mem, source->buf.mem,
+    (void)memcpy(destination->buf.data, source->buf.data,
                  source->buf.count * source->buf.sizeof_type);
     return CCC_RESULT_OK;
 }
@@ -588,8 +588,8 @@ static inline size_t
 index_of(struct CCC_Flat_priority_queue const *const flat_priority_queue,
          void const *const slot)
 {
-    assert(slot >= flat_priority_queue->buf.mem);
-    size_t const i = ((char *)slot - (char *)flat_priority_queue->buf.mem)
+    assert(slot >= flat_priority_queue->buf.data);
+    size_t const i = ((char *)slot - (char *)flat_priority_queue->buf.data)
                    / flat_priority_queue->buf.sizeof_type;
     assert(i < flat_priority_queue->buf.count);
     return i;

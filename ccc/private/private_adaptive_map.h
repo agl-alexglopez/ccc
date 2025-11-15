@@ -165,16 +165,16 @@ void *CCC_private_adaptive_map_insert(struct CCC_Adaptive_map *,
     }))
 
 /** @internal */
-#define CCC_private_adaptive_map_insert_key_val(adaptive_map_entry, new_mem,   \
+#define CCC_private_adaptive_map_insert_key_val(adaptive_map_entry, new_data,  \
                                                 type_compound_literal...)      \
     (__extension__({                                                           \
-        if (new_mem)                                                           \
+        if (new_data)                                                          \
         {                                                                      \
-            *new_mem = type_compound_literal;                                  \
-            new_mem = CCC_private_adaptive_map_insert(                         \
+            *new_data = type_compound_literal;                                 \
+            new_data = CCC_private_adaptive_map_insert(                        \
                 (adaptive_map_entry)->map,                                     \
                 CCC_private_Adaptive_map_node_in_slot(                         \
-                    (adaptive_map_entry)->map, new_mem));                      \
+                    (adaptive_map_entry)->map, new_data));                     \
         }                                                                      \
     }))
 

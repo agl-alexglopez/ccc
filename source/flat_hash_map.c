@@ -872,17 +872,17 @@ CCC_flat_hash_map_copy(CCC_Flat_hash_map *const destination,
         = mask_to_total_bytes(source->sizeof_type, source->mask);
     if (destination->mask < source->mask)
     {
-        void *const new_mem = destination->allocate((CCC_Allocator_context){
+        void *const new_data = destination->allocate((CCC_Allocator_context){
             .input = destination->data,
             .bytes = source_bytes,
             .context = destination->context,
         });
-        if (!new_mem)
+        if (!new_data)
         {
             return CCC_RESULT_ALLOCATOR_ERROR;
         }
-        destination->data = new_mem;
-        destination->tag = tag_pos(source->sizeof_type, new_mem, source->mask);
+        destination->data = new_data;
+        destination->tag = tag_pos(source->sizeof_type, new_data, source->mask);
         destination->mask = source->mask;
     }
     if (!destination->data || !source->data)

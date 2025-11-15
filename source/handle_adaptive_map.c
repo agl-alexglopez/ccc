@@ -673,13 +673,13 @@ CCC_handle_adaptive_map_copy(CCC_Handle_adaptive_map *const destination,
     {
         return CCC_RESULT_ARGUMENT_ERROR;
     }
-    void *const destination_mem = destination->data;
+    void *const destination_data = destination->data;
     struct CCC_Handle_adaptive_map_node *const destination_nodes
         = destination->nodes;
     size_t const destination_cap = destination->capacity;
     CCC_Allocator *const destination_allocate = destination->allocate;
     *destination = *source;
-    destination->data = destination_mem;
+    destination->data = destination_data;
     destination->nodes = destination_nodes;
     destination->capacity = destination_cap;
     destination->allocate = destination_allocate;

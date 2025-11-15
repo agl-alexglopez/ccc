@@ -393,7 +393,7 @@ print_n(CCC_Handle_adaptive_map *const map, CCC_Order const ord,
        types like this. There is no opaque container in CCC. */
     Buffer const sorted_freqs
         = CCC_flat_priority_queue_heapsort(&flat_priority_queue, &(Word){});
-    check(!flat_priority_queue.buf.mem);
+    check(!flat_priority_queue.buf.data);
     int w = 0;
     /* Heap sort puts the root most nodes at the back of the buffer. */
     for (Word const *i = reverse_begin(&sorted_freqs);

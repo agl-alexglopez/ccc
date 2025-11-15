@@ -107,9 +107,9 @@ Manual memory management with no allocation function provided.
 ```
 #define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC
 flat_double_ended_queue source = flat_double_ended_queue_initialize((int[10]){},
-int, NULL, NULL, 10); int *new_mem = malloc(sizeof(int) *
+int, NULL, NULL, 10); int *new_data = malloc(sizeof(int) *
 flat_double_ended_queue_capacity(&source).count); flat_double_ended_queue
-destination = flat_double_ended_queue_initialize(new_mem, int, NULL, NULL,
+destination = flat_double_ended_queue_initialize(new_data, int, NULL, NULL,
 flat_double_ended_queue_capacity(&source).count); CCC_Result res =
 flat_double_ended_queue_copy(&destination, &source, NULL);
 ```
