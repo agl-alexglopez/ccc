@@ -30,9 +30,9 @@ elements remember their previous element for splicing and merging. */
 struct Link
 {
     /** The previous element of cur. Must manually update and manage. */
-    struct CCC_Singly_linked_list_node *prev;
+    struct CCC_Singly_linked_list_node *previous;
     /** The current element. Must manually manage and update. */
-    struct CCC_Singly_linked_list_node *i;
+    struct CCC_Singly_linked_list_node *current;
 };
 
 /*===========================    Prototypes     =============================*/
@@ -41,104 +41,94 @@ static void *struct_base(struct CCC_Singly_linked_list const *,
                          struct CCC_Singly_linked_list_node const *);
 static struct CCC_Singly_linked_list_node *
 before(struct CCC_Singly_linked_list const *,
-       struct CCC_Singly_linked_list_node const *to_find);
-static size_t len(struct CCC_Singly_linked_list_node const *begin,
-                  struct CCC_Singly_linked_list_node const *end);
+       struct CCC_Singly_linked_list_node const *);
+static size_t len(struct CCC_Singly_linked_list_node const *,
+                  struct CCC_Singly_linked_list_node const *);
 
-static void push_front(struct CCC_Singly_linked_list *singly_linked_list,
-                       struct CCC_Singly_linked_list_node *elem);
+static void push_front(struct CCC_Singly_linked_list *,
+                       struct CCC_Singly_linked_list_node *);
 static size_t extract_range(struct CCC_Singly_linked_list *,
-                            struct CCC_Singly_linked_list_node *begin,
-                            struct CCC_Singly_linked_list_node *end);
+                            struct CCC_Singly_linked_list_node *,
+                            struct CCC_Singly_linked_list_node *);
 static size_t erase_range(struct CCC_Singly_linked_list *,
-                          struct CCC_Singly_linked_list_node const *begin,
-                          struct CCC_Singly_linked_list_node *end);
+                          struct CCC_Singly_linked_list_node const *,
+                          struct CCC_Singly_linked_list_node *);
 static struct CCC_Singly_linked_list_node *
 pop_front(struct CCC_Singly_linked_list *);
 static struct CCC_Singly_linked_list_node *
-elem_in(struct CCC_Singly_linked_list const *, void const *any_struct);
+elem_in(struct CCC_Singly_linked_list const *, void const *);
 static struct Link merge(struct CCC_Singly_linked_list *, struct Link,
                          struct Link, struct Link);
 static struct Link first_less(struct CCC_Singly_linked_list const *,
                               struct Link);
-static CCC_Order order(struct CCC_Singly_linked_list const *singly_linked_list,
-                       struct CCC_Singly_linked_list_node const *lhs,
-                       struct CCC_Singly_linked_list_node const *rhs);
+static CCC_Order order(struct CCC_Singly_linked_list const *,
+                       struct CCC_Singly_linked_list_node const *,
+                       struct CCC_Singly_linked_list_node const *);
 
 /*===========================     Interface     =============================*/
 
 void *
-CCC_singly_linked_list_push_front(
-    CCC_Singly_linked_list *const singly_linked_list,
-    CCC_Singly_linked_list_node *elem)
+CCC_singly_linked_list_push_front(CCC_Singly_linked_list *const list,
+                                  CCC_Singly_linked_list_node *type_intruder)
 {
-    if (!singly_linked_list || !elem)
+    if (!list || !type_intruder)
     {
         return NULL;
     }
-    if (singly_linked_list->allocate)
+    if (list->allocate)
     {
-        void *const node = singly_linked_list->allocate((CCC_Allocator_context){
+        void *const node = list->allocate((CCC_Allocator_context){
             .input = NULL,
-            .bytes = singly_linked_list->sizeof_type,
-            .context = singly_linked_list->context,
+            .bytes = list->sizeof_type,
+            .context = list->context,
         });
         if (!node)
         {
             return NULL;
         }
-        (void)memcpy(node, struct_base(singly_linked_list, elem),
-                     singly_linked_list->sizeof_type);
-        elem = elem_in(singly_linked_list, node);
+        (void)memcpy(node, struct_base(list, type_intruder), list->sizeof_type);
+        type_intruder = elem_in(list, node);
     }
-    push_front(singly_linked_list, elem);
-    return struct_base(singly_linked_list, singly_linked_list->nil.n);
+    push_front(list, type_intruder);
+    return struct_base(list, list->nil.n);
 }
 
 void *
-CCC_singly_linked_list_front(
-    CCC_Singly_linked_list const *const singly_linked_list)
+CCC_singly_linked_list_front(CCC_Singly_linked_list const *const list)
 {
-    if (!singly_linked_list
-        || singly_linked_list->nil.n == &singly_linked_list->nil)
+    if (!list || list->nil.n == &list->nil)
     {
         return NULL;
     }
-    return struct_base(singly_linked_list, singly_linked_list->nil.n);
+    return struct_base(list, list->nil.n);
 }
 
 CCC_Singly_linked_list_node *
-CCC_singly_linked_list_node_begin(
-    CCC_Singly_linked_list const *const singly_linked_list)
+CCC_singly_linked_list_node_begin(CCC_Singly_linked_list const *const list)
 {
-    return singly_linked_list ? singly_linked_list->nil.n : NULL;
+    return list ? list->nil.n : NULL;
 }
 
 CCC_Singly_linked_list_node *
-CCC_singly_linked_list_sentinel_begin(
-    CCC_Singly_linked_list const *const singly_linked_list)
+CCC_singly_linked_list_sentinel_begin(CCC_Singly_linked_list const *const list)
 {
-    return singly_linked_list
-             ? (CCC_Singly_linked_list_node *)&singly_linked_list->nil
-             : NULL;
+    return list ? (CCC_Singly_linked_list_node *)&list->nil : NULL;
 }
 
 CCC_Result
-CCC_singly_linked_list_pop_front(
-    CCC_Singly_linked_list *const singly_linked_list)
+CCC_singly_linked_list_pop_front(CCC_Singly_linked_list *const list)
 {
-    if (!singly_linked_list || !singly_linked_list->count)
+    if (!list || !list->count)
     {
         return CCC_RESULT_ARGUMENT_ERROR;
     }
-    struct CCC_Singly_linked_list_node *const remove
-        = pop_front(singly_linked_list);
-    if (singly_linked_list->allocate)
+    struct CCC_Singly_linked_list_node *const remove = pop_front(list);
+    if (list->allocate)
     {
-        (void)singly_linked_list->allocate((CCC_Allocator_context){
-            .input = struct_base(singly_linked_list, remove),
+        (void)list->allocate((CCC_Allocator_context){
+            .input = struct_base(list, remove),
             .bytes = 0,
-            .context = singly_linked_list->context,
+            .context = list->context,
         });
     }
     return CCC_RESULT_OK;
@@ -146,169 +136,165 @@ CCC_singly_linked_list_pop_front(
 
 CCC_Result
 CCC_singly_linked_list_splice(
-    CCC_Singly_linked_list *const pos_singly_linked_list,
-    CCC_Singly_linked_list_node *const pos,
-    CCC_Singly_linked_list *const to_splice_singly_linked_list,
-    CCC_Singly_linked_list_node *const to_splice)
+    CCC_Singly_linked_list *const position_list,
+    CCC_Singly_linked_list_node *const type_intruder_position,
+    CCC_Singly_linked_list *const splice_list,
+    CCC_Singly_linked_list_node *const type_intruder_splice)
 {
-    if (!pos_singly_linked_list || !pos || !to_splice
-        || !to_splice_singly_linked_list)
+    if (!position_list || !type_intruder_position || !type_intruder_splice
+        || !splice_list)
     {
         return CCC_RESULT_ARGUMENT_ERROR;
     }
-    if (to_splice == pos || pos->n == to_splice)
+    if (type_intruder_splice == type_intruder_position
+        || type_intruder_position->n == type_intruder_splice)
     {
         return CCC_RESULT_OK;
     }
-    before(to_splice_singly_linked_list, to_splice)->n = to_splice->n;
-    to_splice->n = pos->n;
-    pos->n = to_splice;
-    if (pos_singly_linked_list != to_splice_singly_linked_list)
+    before(splice_list, type_intruder_splice)->n = type_intruder_splice->n;
+    type_intruder_splice->n = type_intruder_position->n;
+    type_intruder_position->n = type_intruder_splice;
+    if (position_list != splice_list)
     {
-        --to_splice_singly_linked_list->count;
-        ++pos_singly_linked_list->count;
+        --splice_list->count;
+        ++position_list->count;
     }
     return CCC_RESULT_OK;
 }
 
 CCC_Result
 CCC_singly_linked_list_splice_range(
-    CCC_Singly_linked_list *const pos_singly_linked_list,
-    CCC_Singly_linked_list_node *const pos,
-    CCC_Singly_linked_list *const splice_singly_linked_list,
-    CCC_Singly_linked_list_node *const begin,
-    CCC_Singly_linked_list_node *const end)
+    CCC_Singly_linked_list *const position_list,
+    CCC_Singly_linked_list_node *const type_intruder_position,
+    CCC_Singly_linked_list *const splice_list,
+    CCC_Singly_linked_list_node *const type_intruder_begin,
+    CCC_Singly_linked_list_node *const type_intruder_end)
 {
-    if (!pos_singly_linked_list || !pos || !begin || !end
-        || !splice_singly_linked_list)
+    if (!position_list || !type_intruder_position || !type_intruder_begin
+        || !type_intruder_end || !splice_list)
     {
         return CCC_RESULT_ARGUMENT_ERROR;
     }
-    if (begin == pos || end == pos || pos->n == begin)
+    if (type_intruder_begin == type_intruder_position
+        || type_intruder_end == type_intruder_position
+        || type_intruder_position->n == type_intruder_begin)
     {
         return CCC_RESULT_OK;
     }
-    if (begin == end)
+    if (type_intruder_begin == type_intruder_end)
     {
-        (void)CCC_singly_linked_list_splice(pos_singly_linked_list, pos,
-                                            splice_singly_linked_list, begin);
+        (void)CCC_singly_linked_list_splice(position_list,
+                                            type_intruder_position, splice_list,
+                                            type_intruder_begin);
         return CCC_RESULT_OK;
     }
     struct CCC_Singly_linked_list_node *const found
-        = before(splice_singly_linked_list, begin);
-    found->n = end->n;
+        = before(splice_list, type_intruder_begin);
+    found->n = type_intruder_end->n;
 
-    end->n = pos->n;
-    pos->n = begin;
-    if (pos_singly_linked_list != splice_singly_linked_list)
+    type_intruder_end->n = type_intruder_position->n;
+    type_intruder_position->n = type_intruder_begin;
+    if (position_list != splice_list)
     {
-        size_t const count = len(begin, end);
-        splice_singly_linked_list->count -= count;
-        pos_singly_linked_list->count += count;
+        size_t const count = len(type_intruder_begin, type_intruder_end);
+        splice_list->count -= count;
+        position_list->count += count;
     }
     return CCC_RESULT_OK;
 }
 
 void *
-CCC_singly_linked_list_erase(CCC_Singly_linked_list *const singly_linked_list,
-                             CCC_Singly_linked_list_node *const elem)
+CCC_singly_linked_list_erase(CCC_Singly_linked_list *const list,
+                             CCC_Singly_linked_list_node *const type_intruder)
 {
-    if (!singly_linked_list || !elem || !singly_linked_list->count
-        || elem == &singly_linked_list->nil)
+    if (!list || !type_intruder || !list->count || type_intruder == &list->nil)
     {
         return NULL;
     }
-    struct CCC_Singly_linked_list_node const *const ret = elem->n;
-    before(singly_linked_list, elem)->n = elem->n;
-    if (elem != &singly_linked_list->nil)
+    struct CCC_Singly_linked_list_node const *const ret = type_intruder->n;
+    before(list, type_intruder)->n = type_intruder->n;
+    if (type_intruder != &list->nil)
     {
-        elem->n = NULL;
+        type_intruder->n = NULL;
     }
-    if (singly_linked_list->allocate)
+    if (list->allocate)
     {
-        (void)singly_linked_list->allocate((CCC_Allocator_context){
-            .input = struct_base(singly_linked_list, elem),
+        (void)list->allocate((CCC_Allocator_context){
+            .input = struct_base(list, type_intruder),
             .bytes = 0,
-            .context = singly_linked_list->context,
+            .context = list->context,
         });
     }
-    --singly_linked_list->count;
-    return ret == &singly_linked_list->nil
-             ? NULL
-             : struct_base(singly_linked_list, ret);
+    --list->count;
+    return ret == &list->nil ? NULL : struct_base(list, ret);
 }
 
 void *
 CCC_singly_linked_list_erase_range(
-    CCC_Singly_linked_list *const singly_linked_list,
-    CCC_Singly_linked_list_node *const begin, CCC_Singly_linked_list_node *end)
+    CCC_Singly_linked_list *const list,
+    CCC_Singly_linked_list_node *const type_intruder_begin,
+    CCC_Singly_linked_list_node *type_intruder_end)
 {
-    if (!singly_linked_list || !begin || !end || !singly_linked_list->count
-        || begin == &singly_linked_list->nil || end == &singly_linked_list->nil)
+    if (!list || !type_intruder_begin || !type_intruder_end || !list->count
+        || type_intruder_begin == &list->nil || type_intruder_end == &list->nil)
     {
         return NULL;
     }
-    struct CCC_Singly_linked_list_node const *const ret = end->n;
-    before(singly_linked_list, begin)->n = end->n;
-    size_t const deleted = erase_range(singly_linked_list, begin, end);
-    assert(deleted <= singly_linked_list->count);
-    singly_linked_list->count -= deleted;
-    return ret == &singly_linked_list->nil
-             ? NULL
-             : struct_base(singly_linked_list, ret);
+    struct CCC_Singly_linked_list_node const *const ret = type_intruder_end->n;
+    before(list, type_intruder_begin)->n = type_intruder_end->n;
+    size_t const deleted
+        = erase_range(list, type_intruder_begin, type_intruder_end);
+    assert(deleted <= list->count);
+    list->count -= deleted;
+    return ret == &list->nil ? NULL : struct_base(list, ret);
 }
 
 void *
-CCC_singly_linked_list_extract(CCC_Singly_linked_list *const singly_linked_list,
-                               CCC_Singly_linked_list_node *const elem)
+CCC_singly_linked_list_extract(CCC_Singly_linked_list *const list,
+                               CCC_Singly_linked_list_node *const type_intruder)
 {
-    if (!singly_linked_list || !elem || !singly_linked_list->count
-        || elem == &singly_linked_list->nil)
+    if (!list || !type_intruder || !list->count || type_intruder == &list->nil)
     {
         return NULL;
     }
-    struct CCC_Singly_linked_list_node const *const ret = elem->n;
-    before(singly_linked_list, elem)->n = elem->n;
-    if (elem != &singly_linked_list->nil)
+    struct CCC_Singly_linked_list_node const *const ret = type_intruder->n;
+    before(list, type_intruder)->n = type_intruder->n;
+    if (type_intruder != &list->nil)
     {
-        elem->n = NULL;
+        type_intruder->n = NULL;
     }
-    --singly_linked_list->count;
-    return ret == &singly_linked_list->nil
-             ? NULL
-             : struct_base(singly_linked_list, ret);
+    --list->count;
+    return ret == &list->nil ? NULL : struct_base(list, ret);
 }
 
 void *
 CCC_singly_linked_list_extract_range(
-    CCC_Singly_linked_list *const singly_linked_list,
-    CCC_Singly_linked_list_node *const begin, CCC_Singly_linked_list_node *end)
+    CCC_Singly_linked_list *const list,
+    CCC_Singly_linked_list_node *const type_intruder_begin,
+    CCC_Singly_linked_list_node *type_intruder_end)
 {
-    if (!singly_linked_list || !begin || !end || !singly_linked_list->count
-        || begin == &singly_linked_list->nil || end == &singly_linked_list->nil)
+    if (!list || !type_intruder_begin || !type_intruder_end || !list->count
+        || type_intruder_begin == &list->nil || type_intruder_end == &list->nil)
     {
         return NULL;
     }
-    struct CCC_Singly_linked_list_node const *const ret = end->n;
-    before(singly_linked_list, begin)->n = end->n;
-    size_t const deleted = extract_range(singly_linked_list, begin, end);
-    assert(deleted <= singly_linked_list->count);
-    singly_linked_list->count -= deleted;
-    return ret == &singly_linked_list->nil
-             ? NULL
-             : struct_base(singly_linked_list, ret);
+    struct CCC_Singly_linked_list_node const *const ret = type_intruder_end->n;
+    before(list, type_intruder_begin)->n = type_intruder_end->n;
+    size_t const deleted
+        = extract_range(list, type_intruder_begin, type_intruder_end);
+    assert(deleted <= list->count);
+    list->count -= deleted;
+    return ret == &list->nil ? NULL : struct_base(list, ret);
 }
 
 void *
-CCC_singly_linked_list_begin(
-    CCC_Singly_linked_list const *const singly_linked_list)
+CCC_singly_linked_list_begin(CCC_Singly_linked_list const *const list)
 {
-    if (!singly_linked_list
-        || singly_linked_list->nil.n == &singly_linked_list->nil)
+    if (!list || list->nil.n == &list->nil)
     {
         return NULL;
     }
-    return struct_base(singly_linked_list, singly_linked_list->nil.n);
+    return struct_base(list, list->nil.n);
 }
 
 void *
@@ -319,39 +305,37 @@ CCC_singly_linked_list_end(CCC_Singly_linked_list const *const)
 
 void *
 CCC_singly_linked_list_next(
-    CCC_Singly_linked_list const *const singly_linked_list,
-    CCC_Singly_linked_list_node const *const elem)
+    CCC_Singly_linked_list const *const list,
+    CCC_Singly_linked_list_node const *const type_intruder)
 {
-    if (!singly_linked_list || !elem || elem->n == &singly_linked_list->nil)
+    if (!list || !type_intruder || type_intruder->n == &list->nil)
     {
         return NULL;
     }
-    return struct_base(singly_linked_list, elem->n);
+    return struct_base(list, type_intruder->n);
 }
 
 CCC_Result
-CCC_singly_linked_list_clear(CCC_Singly_linked_list *const singly_linked_list,
-                             CCC_Type_destructor *const fn)
+CCC_singly_linked_list_clear(CCC_Singly_linked_list *const list,
+                             CCC_Type_destructor *const destroy)
 {
-    if (!singly_linked_list)
+    if (!list)
     {
         return CCC_RESULT_ARGUMENT_ERROR;
     }
-    while (!CCC_singly_linked_list_is_empty(singly_linked_list))
+    while (!CCC_singly_linked_list_is_empty(list))
     {
-        void *const data
-            = struct_base(singly_linked_list, pop_front(singly_linked_list));
-        if (fn)
+        void *const data = struct_base(list, pop_front(list));
+        if (destroy)
         {
-            fn((CCC_Type_context){.type = data,
-                                  .context = singly_linked_list->context});
+            destroy((CCC_Type_context){.type = data, .context = list->context});
         }
-        if (singly_linked_list->allocate)
+        if (list->allocate)
         {
-            (void)singly_linked_list->allocate((CCC_Allocator_context){
+            (void)list->allocate((CCC_Allocator_context){
                 .input = data,
                 .bytes = 0,
-                .context = singly_linked_list->context,
+                .context = list->context,
             });
         }
     }
@@ -359,18 +343,17 @@ CCC_singly_linked_list_clear(CCC_Singly_linked_list *const singly_linked_list,
 }
 
 CCC_Tribool
-CCC_singly_linked_list_validate(
-    CCC_Singly_linked_list const *const singly_linked_list)
+CCC_singly_linked_list_validate(CCC_Singly_linked_list const *const list)
 {
-    if (!singly_linked_list)
+    if (!list)
     {
         return CCC_TRIBOOL_ERROR;
     }
     size_t size = 0;
-    for (struct CCC_Singly_linked_list_node *e = singly_linked_list->nil.n;
-         e != &singly_linked_list->nil; e = e->n, ++size)
+    for (struct CCC_Singly_linked_list_node *e = list->nil.n; e != &list->nil;
+         e = e->n, ++size)
     {
-        if (size >= singly_linked_list->count)
+        if (size >= list->count)
         {
             return CCC_FALSE;
         }
@@ -379,30 +362,28 @@ CCC_singly_linked_list_validate(
             return CCC_FALSE;
         }
     }
-    return size == singly_linked_list->count;
+    return size == list->count;
 }
 
 CCC_Count
-CCC_singly_linked_list_count(
-    CCC_Singly_linked_list const *const singly_linked_list)
+CCC_singly_linked_list_count(CCC_Singly_linked_list const *const list)
 {
 
-    if (!singly_linked_list)
+    if (!list)
     {
         return (CCC_Count){.error = CCC_RESULT_ARGUMENT_ERROR};
     }
-    return (CCC_Count){.count = singly_linked_list->count};
+    return (CCC_Count){.count = list->count};
 }
 
 CCC_Tribool
-CCC_singly_linked_list_is_empty(
-    CCC_Singly_linked_list const *const singly_linked_list)
+CCC_singly_linked_list_is_empty(CCC_Singly_linked_list const *const list)
 {
-    if (!singly_linked_list)
+    if (!list)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    return !singly_linked_list->count;
+    return !list->count;
 }
 
 /*==========================     Sorting     ================================*/
@@ -411,23 +392,21 @@ CCC_singly_linked_list_is_empty(
 flip the return values of their comparison function if they want a different
 order for elements.*/
 CCC_Tribool
-CCC_singly_linked_list_is_sorted(
-    CCC_Singly_linked_list const *const singly_linked_list)
+CCC_singly_linked_list_is_sorted(CCC_Singly_linked_list const *const list)
 {
-    if (!singly_linked_list)
+    if (!list)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    if (singly_linked_list->count <= 1)
+    if (list->count <= 1)
     {
         return CCC_TRUE;
     }
-    for (struct CCC_Singly_linked_list_node const *prev
-         = singly_linked_list->nil.n,
-         *cur = singly_linked_list->nil.n->n;
-         cur != &singly_linked_list->nil; prev = cur, cur = cur->n)
+    for (struct CCC_Singly_linked_list_node const *previous = list->nil.n,
+                                                  *current = list->nil.n->n;
+         current != &list->nil; previous = current, current = current->n)
     {
-        if (order(singly_linked_list, prev, cur) == CCC_ORDER_GREATER)
+        if (order(list, previous, current) == CCC_ORDER_GREATER)
         {
             return CCC_FALSE;
         }
@@ -439,38 +418,36 @@ CCC_singly_linked_list_is_sorted(
 to the end of a section of duplicate values which is good for round-robin style
 list use. */
 void *
-CCC_singly_linked_list_insert_sorted(CCC_Singly_linked_list *singly_linked_list,
-                                     CCC_Singly_linked_list_node *e)
+CCC_singly_linked_list_insert_sorted(CCC_Singly_linked_list *list,
+                                     CCC_Singly_linked_list_node *type_intruder)
 {
-    if (!singly_linked_list || !e)
+    if (!list || !type_intruder)
     {
         return NULL;
     }
-    if (singly_linked_list->allocate)
+    if (list->allocate)
     {
-        void *const node = singly_linked_list->allocate((CCC_Allocator_context){
+        void *const node = list->allocate((CCC_Allocator_context){
             .input = NULL,
-            .bytes = singly_linked_list->sizeof_type,
-            .context = singly_linked_list->context,
+            .bytes = list->sizeof_type,
+            .context = list->context,
         });
         if (!node)
         {
             return NULL;
         }
-        (void)memcpy(node, struct_base(singly_linked_list, e),
-                     singly_linked_list->sizeof_type);
-        e = elem_in(singly_linked_list, node);
+        (void)memcpy(node, struct_base(list, type_intruder), list->sizeof_type);
+        type_intruder = elem_in(list, node);
     }
-    struct CCC_Singly_linked_list_node *prev = &singly_linked_list->nil;
-    struct CCC_Singly_linked_list_node *i = singly_linked_list->nil.n;
-    for (; i != &singly_linked_list->nil
-           && order(singly_linked_list, e, i) != CCC_ORDER_LESSER;
+    struct CCC_Singly_linked_list_node *prev = &list->nil;
+    struct CCC_Singly_linked_list_node *i = list->nil.n;
+    for (; i != &list->nil && order(list, type_intruder, i) != CCC_ORDER_LESSER;
          prev = i, i = i->n)
     {}
-    e->n = i;
-    prev->n = e;
-    ++singly_linked_list->count;
-    return struct_base(singly_linked_list, e);
+    type_intruder->n = i;
+    prev->n = type_intruder;
+    ++list->count;
+    return struct_base(list, type_intruder);
 }
 
 /** Sorts the list in `O(N * log(N))` time with `O(1)` context space (no
@@ -499,9 +476,9 @@ each merge step. Therefore the number of times we must perform the merge step is
 `O(log(N))`. The most elements we would have to merge in the merge step is all
 `N` elements so together that gives us the runtime of `O(N * log(N))`. */
 CCC_Result
-CCC_singly_linked_list_sort(CCC_Singly_linked_list *const singly_linked_list)
+CCC_singly_linked_list_sort(CCC_Singly_linked_list *const list)
 {
-    if (!singly_linked_list)
+    if (!list)
     {
         return CCC_RESULT_ARGUMENT_ERROR;
     }
@@ -511,13 +488,12 @@ CCC_singly_linked_list_sort(CCC_Singly_linked_list *const singly_linked_list)
     {
         merging = CCC_FALSE;
         /* 0th index of the A list. The start of one list to merge. */
-        struct Link a_0 = {.prev = &singly_linked_list->nil,
-                           .i = singly_linked_list->nil.n};
-        while (a_0.i != &singly_linked_list->nil)
+        struct Link a_first = {.previous = &list->nil, .current = list->nil.n};
+        while (a_first.current != &list->nil)
         {
             /* The Nth index of list A (its size) aka 0th index of B list. */
-            struct Link a_n_b_0 = first_less(singly_linked_list, a_0);
-            if (a_n_b_0.i == &singly_linked_list->nil)
+            struct Link a_count_b_first = first_less(list, a_first);
+            if (a_count_b_first.current == &list->nil)
             {
                 break;
             }
@@ -525,8 +501,8 @@ CCC_singly_linked_list_sort(CCC_Singly_linked_list *const singly_linked_list)
                to progress the sorting algorithm with the next run that needs
                fixing. Merge returns the final B element to indicate it is the
                final sentinel that has not yet been examined. */
-            a_0 = merge(singly_linked_list, a_0, a_n_b_0,
-                        first_less(singly_linked_list, a_n_b_0));
+            a_first = merge(list, a_first, a_count_b_first,
+                            first_less(list, a_count_b_first));
             merging = CCC_TRUE;
         }
     }
@@ -534,44 +510,49 @@ CCC_singly_linked_list_sort(CCC_Singly_linked_list *const singly_linked_list)
     return CCC_RESULT_OK;
 }
 
-/** Merges lists `[a_0, a_n_b_0)` with `[a_n_b_0, b_n)` to form `[a_0, b_n)`.
-Returns the exclusive end of the range, `b_n`, once the merge sort is complete.
+/** Merges lists `[a_first, a_count_b_first)` with `[a_count_b_first, b_count)`
+to form `[a_first, b_count)`. Returns the exclusive end of the range, `b_count`,
+once the merge sort is complete.
 
 Notice that all ranges treat the end of their range as an exclusive sentinel for
 consistency. This function assumes the provided lists are already sorted
-separately. A list link must be returned because the `b_n` previous field may be
-updated due to arbitrary splices during comparison sorting. */
+separately. A list link must be returned because the `b_count` previous field
+may be updated due to arbitrary splices during comparison sorting. */
 static inline struct Link
-merge(CCC_Singly_linked_list *const singly_linked_list, struct Link a_0,
-      struct Link a_n_b_0, struct Link b_n)
+merge(CCC_Singly_linked_list *const list, struct Link a_first,
+      struct Link a_count_b_first, struct Link b_count)
 {
-    while (a_0.i != a_n_b_0.i && a_n_b_0.i != b_n.i)
+    while (a_first.current != a_count_b_first.current
+           && a_count_b_first.current != b_count.current)
     {
-        if (order(singly_linked_list, a_n_b_0.i, a_0.i) == CCC_ORDER_LESSER)
+        if (order(list, a_count_b_first.current, a_first.current)
+            == CCC_ORDER_LESSER)
         {
             /* The i element is the lesser element that must be spliced out.
-               However, a_n_b_0.prev is not updated because only i is spliced
-               out. Algorithm will continue with new i, but same prev. */
-            struct CCC_Singly_linked_list_node *const lesser = a_n_b_0.i;
-            a_n_b_0.i = lesser->n;
-            a_n_b_0.prev->n = lesser->n;
-            /* This is so we return an accurate b_n list link at the end. */
-            if (lesser == b_n.prev)
+               However, a_count_b_first.prev is not updated because only i is
+               spliced out. Algorithm will continue with new i, but same prev.
+             */
+            struct CCC_Singly_linked_list_node *const lesser
+                = a_count_b_first.current;
+            a_count_b_first.current = lesser->n;
+            a_count_b_first.previous->n = lesser->n;
+            /* This is so we return an accurate b_count list link at the end. */
+            if (lesser == b_count.previous)
             {
-                b_n.prev = a_n_b_0.prev;
+                b_count.previous = a_count_b_first.previous;
             }
-            a_0.prev->n = lesser;
-            lesser->n = a_0.i;
+            a_first.previous->n = lesser;
+            lesser->n = a_first.current;
             /* Another critical update reflected in our links, not the list. */
-            a_0.prev = lesser;
+            a_first.previous = lesser;
         }
         else
         {
-            a_0.prev = a_0.i;
-            a_0.i = a_0.i->n;
+            a_first.previous = a_first.current;
+            a_first.current = a_first.current->n;
         }
     }
-    return b_n;
+    return b_count;
 }
 
 /** Returns a pair of elements marking the first list elem that is smaller than
@@ -580,71 +561,69 @@ list_link returned will have the out of order element as cur and the last
 remaining in order element as prev. The cur element may be the sentinel if the
 run is sorted. */
 static inline struct Link
-first_less(CCC_Singly_linked_list const *const singly_linked_list,
-           struct Link k)
+first_less(CCC_Singly_linked_list const *const list, struct Link link)
 {
     do
     {
-        k.prev = k.i;
-        k.i = k.i->n;
+        link.previous = link.current;
+        link.current = link.current->n;
     }
-    while (k.i != &singly_linked_list->nil
-           && order(singly_linked_list, k.i, k.prev) != CCC_ORDER_LESSER);
-    return k;
+    while (link.current != &list->nil
+           && order(list, link.current, link.previous) != CCC_ORDER_LESSER);
+    return link;
 }
 
 /*=========================    Private Interface   ==========================*/
 
 void
 CCC_private_singly_linked_list_push_front(
-    struct CCC_Singly_linked_list *const singly_linked_list,
-    struct CCC_Singly_linked_list_node *const elem)
+    struct CCC_Singly_linked_list *const list,
+    struct CCC_Singly_linked_list_node *const type_intruder)
 {
-    push_front(singly_linked_list, elem);
+    push_front(list, type_intruder);
 }
 
 /*===========================  Static Helpers   =============================*/
 
 static inline void
-push_front(struct CCC_Singly_linked_list *const singly_linked_list,
-           struct CCC_Singly_linked_list_node *const elem)
+push_front(struct CCC_Singly_linked_list *const list,
+           struct CCC_Singly_linked_list_node *const node)
 {
-    elem->n = singly_linked_list->nil.n;
-    singly_linked_list->nil.n = elem;
-    ++singly_linked_list->count;
+    node->n = list->nil.n;
+    list->nil.n = node;
+    ++list->count;
 }
 
 static inline struct CCC_Singly_linked_list_node *
-pop_front(struct CCC_Singly_linked_list *const singly_linked_list)
+pop_front(struct CCC_Singly_linked_list *const list)
 {
-    struct CCC_Singly_linked_list_node *const remove
-        = singly_linked_list->nil.n;
-    singly_linked_list->nil.n = remove->n;
-    if (remove != &singly_linked_list->nil)
+    struct CCC_Singly_linked_list_node *const remove = list->nil.n;
+    list->nil.n = remove->n;
+    if (remove != &list->nil)
     {
         remove->n = NULL;
     }
-    --singly_linked_list->count;
+    --list->count;
     return remove;
 }
 
 static inline struct CCC_Singly_linked_list_node *
-before(struct CCC_Singly_linked_list const *const singly_linked_list,
+before(struct CCC_Singly_linked_list const *const list,
        struct CCC_Singly_linked_list_node const *const to_find)
 {
-    struct CCC_Singly_linked_list_node const *i = &singly_linked_list->nil;
+    struct CCC_Singly_linked_list_node const *i = &list->nil;
     for (; i->n != to_find; i = i->n)
     {}
     return (struct CCC_Singly_linked_list_node *)i;
 }
 
 static inline size_t
-extract_range(struct CCC_Singly_linked_list *const singly_linked_list,
+extract_range(struct CCC_Singly_linked_list *const list,
               struct CCC_Singly_linked_list_node *begin,
               struct CCC_Singly_linked_list_node *const end)
 {
     size_t const count = len(begin, end);
-    if (end != &singly_linked_list->nil)
+    if (end != &list->nil)
     {
         end->n = NULL;
     }
@@ -652,14 +631,14 @@ extract_range(struct CCC_Singly_linked_list *const singly_linked_list,
 }
 
 static size_t
-erase_range(struct CCC_Singly_linked_list *const singly_linked_list,
+erase_range(struct CCC_Singly_linked_list *const list,
             struct CCC_Singly_linked_list_node const *begin,
             struct CCC_Singly_linked_list_node *const end)
 {
-    if (!singly_linked_list->allocate)
+    if (!list->allocate)
     {
         size_t const count = len(begin, end);
-        if (end != &singly_linked_list->nil)
+        if (end != &list->nil)
         {
             end->n = NULL;
         }
@@ -669,18 +648,18 @@ erase_range(struct CCC_Singly_linked_list *const singly_linked_list,
     for (struct CCC_Singly_linked_list_node const *next = NULL; begin != end;
          begin = next, ++count)
     {
-        assert(count <= singly_linked_list->count);
+        assert(count <= list->count);
         next = begin->n;
-        (void)singly_linked_list->allocate((CCC_Allocator_context){
-            .input = struct_base(singly_linked_list, begin),
+        (void)list->allocate((CCC_Allocator_context){
+            .input = struct_base(list, begin),
             .bytes = 0,
-            .context = singly_linked_list->context,
+            .context = list->context,
         });
     }
-    (void)singly_linked_list->allocate((CCC_Allocator_context){
-        .input = struct_base(singly_linked_list, end),
+    (void)list->allocate((CCC_Allocator_context){
+        .input = struct_base(list, end),
         .bytes = 0,
-        .context = singly_linked_list->context,
+        .context = list->context,
     });
     return count;
 }
@@ -698,33 +677,32 @@ len(struct CCC_Singly_linked_list_node const *begin,
 
 /** Provides the base address of the user struct holding e. */
 static inline void *
-struct_base(struct CCC_Singly_linked_list const *const l,
-            struct CCC_Singly_linked_list_node const *const e)
+struct_base(struct CCC_Singly_linked_list const *const list,
+            struct CCC_Singly_linked_list_node const *const node)
 {
-    return ((char *)&e->n) - l->singly_linked_list_node_offset;
+    return ((char *)&node->n) - list->singly_linked_list_node_offset;
 }
 
 /** Given the user struct provides the address of intrusive elem. */
 static inline struct CCC_Singly_linked_list_node *
-elem_in(struct CCC_Singly_linked_list const *const singly_linked_list,
+elem_in(struct CCC_Singly_linked_list const *const list,
         void const *const any_struct)
 {
     return (struct CCC_Singly_linked_list_node
-                *)((char *)any_struct
-                   + singly_linked_list->singly_linked_list_node_offset);
+                *)((char *)any_struct + list->singly_linked_list_node_offset);
 }
 
 /** Calls the user provided three way comparison callback function on the user
 type wrapping the provided intrusive handles. Returns the three way comparison
 result value. */
 static inline CCC_Order
-order(struct CCC_Singly_linked_list const *const singly_linked_list,
-      struct CCC_Singly_linked_list_node const *const lhs,
-      struct CCC_Singly_linked_list_node const *const rhs)
+order(struct CCC_Singly_linked_list const *const list,
+      struct CCC_Singly_linked_list_node const *const left,
+      struct CCC_Singly_linked_list_node const *const right)
 {
-    return singly_linked_list->compare((CCC_Type_comparator_context){
-        .type_lhs = struct_base(singly_linked_list, lhs),
-        .type_rhs = struct_base(singly_linked_list, rhs),
-        .context = singly_linked_list->context,
+    return list->compare((CCC_Type_comparator_context){
+        .type_lhs = struct_base(list, left),
+        .type_rhs = struct_base(list, right),
+        .context = list->context,
     });
 }
