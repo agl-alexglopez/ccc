@@ -374,7 +374,7 @@ typedef CCC_Order CCC_Key_comparator(CCC_Key_comparator_context);
 
 A reference to any context data provided on initialization is also available.
 Return the complete hash value as determined by the user hashing algorithm. */
-typedef uint64_t CCC_Key_hasher(CCC_Key_context to_hash);
+typedef uint64_t CCC_Key_hasher(CCC_Key_context);
 
 /**@}*/
 
