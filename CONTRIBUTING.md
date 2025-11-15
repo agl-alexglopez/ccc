@@ -275,6 +275,34 @@ The handle version of the container is required to preserve the 0th slot in the 
 
 Variable length arrays are prohibited because they could cause hard to find bugs if the array caused a stack overflow in our library code for the user.
 
+### Avoid Compilation Bloat
+
+This library will never be as optimized as a C template-like library that generates type safe containers and in-lines all functions to interact with them. However, the benefit of this is that we will never bloat the user code with macro expansion every time they generate a new type container.
+
+We can still try to offer the user some performance benefits on key code paths via our container specialized macros. All macros that accept compound literal user types write the user specified data directly memory via casting instead of calling a generic copy function. The pseudo code for such an operation is roughly as follows.
+
+```c
+#define map_insert_or_assign_macro(container_pointer, key, compound_literal...)\
+    (__extension__({                                                           \
+        struct Entry entry = container_find_slot(container_pointer, key);      \
+        if (entry.status & OCCUPIED)                                           \
+        {                                                                      \
+            *((typeof(compound_literal) *) container_slot_at(&entry))          \
+                = compound_literal;                                            \
+        }                                                                      \
+        else                                                                   \
+        {                                                                      \
+            *((typeof(compound_literal) *) container_prepare_new_slot(&entry)) \
+                = compound_literal;                                            \
+        }                                                                      \
+        entry;                                                                 \
+    }))
+```
+
+Notice that there is minimal scaffolding around calls to the container interface functions. These calls generate the needed memory to write the user data directly. This allows the compiler to optimize the write freely while we do not generate any container machinery code at the call-site. This container specific code can be quite complex, depending on the container, so ensuring we do not duplicate that code is critical. The user is able to leverage an optimizing compiler without exploding their binary size or defining specialized containers throughout their code base.
+
+Therefore, when adding these macros, ensure core container machinery is contained within interface functions.
+
 ## To Do
 
 At least the following would need to happen before `v1.0`.

@@ -453,19 +453,19 @@ occur. */
 /** @internal Because this function does not start with an entry it has the
 option to give user more information and therefore returns an entry.
 Importantly, this function makes sure the key is in sync with key in table. */
-#define CCC_private_flat_hash_map_try_insert_with(Flat_hash_map_pointer, key,  \
+#define CCC_private_flat_hash_map_try_insert_with(flat_hash_map_pointer, key,  \
                                                   type_compound_literal...)    \
     (__extension__({                                                           \
-        struct CCC_Flat_hash_map *private_Flat_hash_map_pointer                \
-            = (Flat_hash_map_pointer);                                         \
+        struct CCC_Flat_hash_map *private_flat_hash_map_pointer                \
+            = (flat_hash_map_pointer);                                         \
         struct CCC_Entry private_flat_hash_map_try_insert_res                  \
             = {.status = CCC_ENTRY_ARGUMENT_ERROR};                            \
-        if (private_Flat_hash_map_pointer)                                     \
+        if (private_flat_hash_map_pointer)                                     \
         {                                                                      \
             __auto_type private_flat_hash_map_key = key;                       \
             struct CCC_Flat_hash_map_entry private_flat_hash_map_try_ins_ent   \
                 = CCC_private_flat_hash_map_entry(                             \
-                    private_Flat_hash_map_pointer,                             \
+                    private_flat_hash_map_pointer,                             \
                     (void *)&private_flat_hash_map_key);                       \
             if ((private_flat_hash_map_try_ins_ent.status                      \
                  & CCC_ENTRY_OCCUPIED)                                         \
@@ -507,13 +507,13 @@ option to give user more information and therefore returns an entry.
 Importantly, this function makes sure the key is in sync with key in table.
 Similar to insert entry this will overwrite. */
 #define CCC_private_flat_hash_map_insert_or_assign_with(                       \
-    Flat_hash_map_pointer, key, type_compound_literal...)                      \
+    flat_hash_map_pointer, key, type_compound_literal...)                      \
     (__extension__({                                                           \
-        struct CCC_Flat_hash_map *private_Flat_hash_map_pointer                \
-            = (Flat_hash_map_pointer);                                         \
+        struct CCC_Flat_hash_map *private_flat_hash_map_pointer                \
+            = (flat_hash_map_pointer);                                         \
         struct CCC_Entry private_flat_hash_map_insert_or_assign_res            \
             = {.status = CCC_ENTRY_ARGUMENT_ERROR};                            \
-        if (private_Flat_hash_map_pointer)                                     \
+        if (private_flat_hash_map_pointer)                                     \
         {                                                                      \
             private_flat_hash_map_insert_or_assign_res.status                  \
                 = CCC_ENTRY_INSERT_ERROR;                                      \
@@ -521,7 +521,7 @@ Similar to insert entry this will overwrite. */
             struct CCC_Flat_hash_map_entry                                     \
                 private_flat_hash_map_ins_or_assign_ent                        \
                 = CCC_private_flat_hash_map_entry(                             \
-                    private_Flat_hash_map_pointer,                             \
+                    private_flat_hash_map_pointer,                             \
                     (void *)&private_flat_hash_map_key);                       \
             if (!(private_flat_hash_map_ins_or_assign_ent.status               \
                   & CCC_ENTRY_INSERT_ERROR))                                   \
