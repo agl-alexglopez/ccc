@@ -311,7 +311,7 @@ struct Query
 
 /*===========================   Prototypes   ================================*/
 
-static void swap(void *tmp, void *, void *, size_t);
+static void swap(void *temp, void *, void *, size_t);
 static struct CCC_Flat_hash_map_entry
 container_entry(struct CCC_Flat_hash_map *, void const *key);
 static struct Query find(struct CCC_Flat_hash_map *, void const *key,
@@ -1683,15 +1683,15 @@ swap_slot(struct CCC_Flat_hash_map const *map)
 }
 
 static inline void
-swap(void *const tmp, void *const a, void *const b, size_t const ab_size)
+swap(void *const temp, void *const a, void *const b, size_t const ab_size)
 {
     if (unlikely(!a || !b || a == b))
     {
         return;
     }
-    (void)memcpy(tmp, a, ab_size);
+    (void)memcpy(temp, a, ab_size);
     (void)memcpy(a, b, ab_size);
-    (void)memcpy(b, tmp, ab_size);
+    (void)memcpy(b, temp, ab_size);
 }
 
 static inline void *

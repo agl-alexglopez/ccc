@@ -61,7 +61,7 @@ static struct CCC_Adaptive_map_entry container_entry(struct CCC_Adaptive_map *t,
 
 static void init_node(struct CCC_Adaptive_map *,
                       struct CCC_Adaptive_map_node *);
-static void swap(char tmp[const], void *, void *, size_t);
+static void swap(char temp[const], void *, void *, size_t);
 static void link(struct CCC_Adaptive_map_node *, enum Branch,
                  struct CCC_Adaptive_map_node *);
 
@@ -958,15 +958,15 @@ order(struct CCC_Adaptive_map const *const t, void const *const key,
 }
 
 static inline void
-swap(char tmp[const], void *const a, void *const b, size_t sizeof_type)
+swap(char temp[const], void *const a, void *const b, size_t sizeof_type)
 {
     if (a == b || !a || !b)
     {
         return;
     }
-    (void)memcpy(tmp, a, sizeof_type);
+    (void)memcpy(temp, a, sizeof_type);
     (void)memcpy(a, b, sizeof_type);
-    (void)memcpy(b, tmp, sizeof_type);
+    (void)memcpy(b, temp, sizeof_type);
 }
 
 static inline void

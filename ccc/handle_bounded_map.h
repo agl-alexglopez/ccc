@@ -176,7 +176,7 @@ desired allocation function. */
 @param[in] allocate the allocation function or NULL if allocation is banned.
 @param[in] context_data a pointer to any context data for comparison or
 destruction.
-@param[in] capacity the capacity at mem_pointer or 0.
+@param[in] capacity the capacity at data_pointer or 0.
 @return the struct initialized bounded map for direct assignment
 (i.e. CCC_Handle_bounded_map m =
 CCC_handle_bounded_map_initialize(...);). */

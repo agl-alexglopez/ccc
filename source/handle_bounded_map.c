@@ -283,7 +283,7 @@ static void rotate(struct CCC_Handle_bounded_map *, size_t z, size_t x,
 static void double_rotate(struct CCC_Handle_bounded_map *, size_t z, size_t x,
                           size_t y, enum Branch dir);
 /* Returning void as miscellaneous helpers. */
-static void swap(void *tmp, void *, void *, size_t sizeof_type);
+static void swap(void *temp, void *, void *, size_t sizeof_type);
 static size_t max(size_t, size_t);
 
 /*==============================  Interface    ==============================*/
@@ -334,8 +334,8 @@ CCC_handle_bounded_map_swap_handle(CCC_Handle_bounded_map *const map,
     if (CCC_ORDER_EQUAL == q.last_order)
     {
         void *const slot = data_at(map, q.found);
-        void *const tmp = data_at(map, 0);
-        swap(tmp, type_output, slot, map->sizeof_type);
+        void *const temp = data_at(map, 0);
+        swap(temp, type_output, slot, map->sizeof_type);
         return (CCC_Handle){{
             .index = q.found,
             .status = CCC_ENTRY_OCCUPIED,
@@ -1341,15 +1341,15 @@ init_node(struct CCC_Handle_bounded_map const *const map, size_t const node)
 }
 
 static inline void
-swap(void *const tmp, void *const a, void *const b, size_t const sizeof_type)
+swap(void *const temp, void *const a, void *const b, size_t const sizeof_type)
 {
     if (a == b || !a || !b)
     {
         return;
     }
-    (void)memcpy(tmp, a, sizeof_type);
+    (void)memcpy(temp, a, sizeof_type);
     (void)memcpy(a, b, sizeof_type);
-    (void)memcpy(b, tmp, sizeof_type);
+    (void)memcpy(b, temp, sizeof_type);
 }
 
 static inline struct CCC_Handle_bounded_map_node *

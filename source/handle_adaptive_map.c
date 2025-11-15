@@ -176,7 +176,7 @@ static CCC_Tribool validate(struct CCC_Handle_adaptive_map const *);
 
 /* Returning void as miscellaneous helpers. */
 static void init_node(struct CCC_Handle_adaptive_map const *, size_t node);
-static void swap(char tmp[const], void *a, void *b, size_t sizeof_type);
+static void swap(char temp[const], void *a, void *b, size_t sizeof_type);
 static void link(struct CCC_Handle_adaptive_map *, size_t parent,
                  enum Branch dir, size_t subtree);
 static size_t max(size_t, size_t);
@@ -318,8 +318,8 @@ CCC_handle_adaptive_map_swap_handle(CCC_Handle_adaptive_map *const map,
     {
         assert(map->root);
         void *const ret = data_at(map, map->root);
-        void *const tmp = data_at(map, 0);
-        swap(tmp, type_output, ret, map->sizeof_type);
+        void *const temp = data_at(map, 0);
+        swap(temp, type_output, ret, map->sizeof_type);
         return (CCC_Handle){{
             .index = found,
             .status = CCC_ENTRY_OCCUPIED,
@@ -1298,15 +1298,15 @@ copy_soa(struct CCC_Handle_adaptive_map const *const source,
 }
 
 static inline void
-swap(char tmp[const], void *const a, void *const b, size_t const sizeof_type)
+swap(char temp[const], void *const a, void *const b, size_t const sizeof_type)
 {
     if (a == b)
     {
         return;
     }
-    (void)memcpy(tmp, a, sizeof_type);
+    (void)memcpy(temp, a, sizeof_type);
     (void)memcpy(a, b, sizeof_type);
-    (void)memcpy(b, tmp, sizeof_type);
+    (void)memcpy(b, temp, sizeof_type);
 }
 
 static inline struct CCC_Handle_adaptive_map_node *

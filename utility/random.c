@@ -21,7 +21,7 @@ rand_range(int const min, int const max)
 
 void
 rand_shuffle(size_t const elem_size, void *const elems, size_t const n,
-             void *const tmp)
+             void *const temp)
 {
     if (n <= 1)
     {
@@ -34,9 +34,9 @@ rand_shuffle(size_t const elem_size, void *const elems, size_t const n,
         /* NOLINTNEXTLINE(cert-msc30-c, cert-msc50-cpp) */
         size_t const rnd = (size_t)rand();
         size_t const j = i + (rnd / (RAND_MAX / (n - i) + 1));
-        memcpy(tmp, elem_view + (j * step), elem_size);
+        memcpy(temp, elem_view + (j * step), elem_size);
         memcpy(elem_view + (j * step), elem_view + (i * step), elem_size);
-        memcpy(elem_view + (i * step), tmp, elem_size);
+        memcpy(elem_view + (i * step), temp, elem_size);
     }
 }
 

@@ -81,11 +81,11 @@ Initialize the container with memory, callbacks, and permissions. */
 
 /** @brief Initialize a contiguous Buffer of user a specified type, allocation
 policy, capacity, and optional starting size.
-@param[in] mem_pointer the pointer to existing memory or NULL.
+@param[in] data_pointer the pointer to existing memory or NULL.
 @param[in] type_name the name of the user type in the buffer.
 @param[in] allocate CCC_Allocator or NULL if no allocation is permitted.
 @param[in] context_data any context data needed for managing Buffer memory.
-@param[in] capacity the capacity of memory at mem_pointer.
+@param[in] capacity the capacity of memory at data_pointer.
 @param[in] optional_size optional starting size of the Buffer <= capacity.
 @return the initialized buffer. Directly assign to Buffer on the right hand
 side of the equality operator (e.g. CCC_Buffer b = CCC_buffer_initialize(...);).
@@ -115,9 +115,9 @@ provide an allocation function. If a dynamic Buffer is preferred, provide the
 allocation function as defined by the signature in types.h. If resizing is
 desired on memory that has already been allocated, ensure allocation has
 occurred with the provided allocation function. */
-#define CCC_buffer_initialize(mem_pointer, type_name, allocate, context_data,  \
+#define CCC_buffer_initialize(data_pointer, type_name, allocate, context_data, \
                               capacity, optional_size...)                      \
-    CCC_private_buffer_initialize(mem_pointer, type_name, allocate,            \
+    CCC_private_buffer_initialize(data_pointer, type_name, allocate,           \
                                   context_data, capacity, optional_size)
 
 /** @brief Initialize a Buffer from a compound literal array initializer.

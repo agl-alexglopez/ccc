@@ -121,8 +121,8 @@ CCC_private_priority_queue_order(struct CCC_Priority_queue const *,
 /** @internal */
 struct CCC_Priority_queue_node *
 CCC_private_priority_queue_merge(struct CCC_Priority_queue *,
-                                 struct CCC_Priority_queue_node *old,
-                                 struct CCC_Priority_queue_node *new);
+                                 struct CCC_Priority_queue_node *,
+                                 struct CCC_Priority_queue_node *);
 /** @internal */
 void CCC_private_priority_queue_cut_child(struct CCC_Priority_queue_node *);
 /** @internal */

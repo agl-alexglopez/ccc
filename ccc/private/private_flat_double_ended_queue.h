@@ -35,7 +35,7 @@ struct CCC_Flat_double_ended_queue
     /** @internal The helper Buffer abstraction the flat_double_ended_queue
      * owns.
      */
-    CCC_Buffer buf;
+    CCC_Buffer buffer;
     /** @internal The front of the flat_double_ended_queue. The back is implicit
      * given the size. */
     size_t front;
@@ -53,12 +53,12 @@ void *CCC_private_flat_double_ended_queue_allocate_back(
 
 /** @internal */
 #define CCC_private_flat_double_ended_queue_initialize(                        \
-    private_mem_pointer, private_type_name, private_allocate,                  \
+    private_data_pointer, private_type_name, private_allocate,                 \
     private_context_data, private_capacity, optional_size...)                  \
     {                                                                          \
-        .buf = CCC_buffer_initialize(private_mem_pointer, private_type_name,   \
-                                     private_allocate, private_context_data,   \
-                                     private_capacity, optional_size),         \
+        .buffer = CCC_buffer_initialize(                                       \
+            private_data_pointer, private_type_name, private_allocate,         \
+            private_context_data, private_capacity, optional_size),            \
         .front = 0,                                                            \
     }
 

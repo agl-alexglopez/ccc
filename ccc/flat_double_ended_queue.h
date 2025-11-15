@@ -218,18 +218,18 @@ resizing is required to insert the element but fails, NULL is returned. */
 if no allocation permission amortized O(1) if allocation permission is given and
 a resize is required.
 @param[in] queue a pointer to the flat_double_ended_queue.
-@param[in] elem a pointer to the user type to insert into the
+@param[in] type a pointer to the user type to insert into the
 flat_double_ended_queue.
 @return a reference to the inserted element. */
 [[nodiscard]] void *
 CCC_flat_double_ended_queue_push_back(CCC_Flat_double_ended_queue *queue,
-                                      void const *elem);
+                                      void const *type);
 
 /** @brief Push the range of user types to the back of the
 flat_double_ended_queue. O(N).
 @param[in] queue pointer to the flat_double_ended_queue.
-@param[in] count the number of user types in the elements range.
-@param[in] elements a pointer to the array of user types.
+@param[in] count the number of user types in the type_array range.
+@param[in] type_array a pointer to the array of user types.
 @return ok if insertion was successful. If allocation is permitted and a resize
 is needed but fails an error is returned. If bad input is provided an input
 error is returned.
@@ -237,26 +237,25 @@ error is returned.
 Note that if no allocation is permitted the queue behaves as a
 ring buffer. Therefore, pushing a range that will exceed capacity will overwrite
 elements at the beginning of the flat_double_ended_queue. */
-CCC_Result
-CCC_flat_double_ended_queue_push_back_range(CCC_Flat_double_ended_queue *queue,
-                                            size_t count, void const *elements);
+CCC_Result CCC_flat_double_ended_queue_push_back_range(
+    CCC_Flat_double_ended_queue *queue, size_t count, void const *type_array);
 
 /** @brief Push the user type to the front of the flat_double_ended_queue. O(1)
 if no allocation permission amortized O(1) if allocation permission is given and
 a resize is required.
 @param[in] queue a pointer to the flat_double_ended_queue.
-@param[in] elem a pointer to the user type to insert into the
+@param[in] type a pointer to the user type to insert into the
 flat_double_ended_queue.
 @return a reference to the inserted element. */
 [[nodiscard]] void *
 CCC_flat_double_ended_queue_push_front(CCC_Flat_double_ended_queue *queue,
-                                       void const *elem);
+                                       void const *type);
 
 /** @brief Push the range of user types to the front of the
 flat_double_ended_queue. O(N).
 @param[in] queue a pointer to the flat_double_ended_queue.
-@param[in] count the number of user types in the elements range.
-@param[in] elements a pointer to the array of user types.
+@param[in] count the number of user types in the type_array range.
+@param[in] type_array a pointer to the array of user types.
 @return ok if insertion was successful. If allocation is permitted and a resize
 is needed but fails an error is returned. If bad input is provided an input
 error is returned.
@@ -265,15 +264,15 @@ Note that if no allocation is permitted the queue behaves as a
 ring buffer. Therefore, pushing a range that will exceed capacity will overwrite
 elements at the back of the flat_double_ended_queue. */
 CCC_Result CCC_flat_double_ended_queue_push_front_range(
-    CCC_Flat_double_ended_queue *queue, size_t count, void const *elements);
+    CCC_Flat_double_ended_queue *queue, size_t count, void const *type_array);
 
 /** @brief Push the range of user types before position of the
 flat_double_ended_queue. O(N).
 @param[in] queue a pointer to the flat_double_ended_queue.
 @param[in] position the position in the queue before which to push
 the range.
-@param[in] count the number of user types in the elements range.
-@param[in] elements a pointer to the array of user types.
+@param[in] count the number of user types in the type_array range.
+@param[in] type_array a pointer to the array of user types.
 @return a pointer to the start of the inserted range or NULL if a resize was
 required and could not complete.
 
@@ -309,7 +308,7 @@ Notice that the start of the range, `{0,0,3,...}`, is overwritten. */
 [[nodiscard]] void *
 CCC_flat_double_ended_queue_insert_range(CCC_Flat_double_ended_queue *queue,
                                          void *position, size_t count,
-                                         void const *elements);
+                                         void const *type_array);
 
 /** @brief Pop an element from the front of the flat_double_ended_queue. O(1).
 @param[in] queue a pointer to the flat_double_ended_queue.

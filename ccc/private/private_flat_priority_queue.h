@@ -35,7 +35,7 @@ way comparison function. */
 struct CCC_Flat_priority_queue
 {
     /** @internal The underlying Buffer owned by the flat_priority_queue. */
-    CCC_Buffer buf;
+    CCC_Buffer buffer;
     /** @internal The order `CCC_ORDER_LESSER` (min) or `CCC_ORDER_GREATER`
      * (max) of the flat_priority_queue. */
     CCC_Order order;
@@ -51,35 +51,35 @@ CCC_private_flat_priority_queue_bubble_up(struct CCC_Flat_priority_queue *,
                                           void *, size_t);
 /** @internal */
 void CCC_private_flat_priority_queue_in_place_heapify(
-    struct CCC_Flat_priority_queue *, size_t n, void *tmp);
+    struct CCC_Flat_priority_queue *, size_t, void *);
 /** @internal */
 void *
 CCC_private_flat_priority_queue_update_fixup(struct CCC_Flat_priority_queue *,
-                                             void *, void *tmp);
+                                             void *, void *);
 
 /*======================    Macro Implementations    ========================*/
 
 /** @internal */
 #define CCC_private_flat_priority_queue_initialize(                            \
-    private_mem_pointer, private_type_name, private_order_order,               \
+    private_data_pointer, private_type_name, private_order_order,              \
     private_order_fn, private_allocate, private_context_data,                  \
     private_capacity)                                                          \
     {                                                                          \
-        .buf = CCC_buffer_initialize(private_mem_pointer, private_type_name,   \
-                                     private_allocate, private_context_data,   \
-                                     private_capacity),                        \
+        .buffer = CCC_buffer_initialize(                                       \
+            private_data_pointer, private_type_name, private_allocate,         \
+            private_context_data, private_capacity),                           \
         .order = (private_order_order),                                        \
         .compare = (private_order_fn),                                         \
     }
 
 /** @internal */
 #define CCC_private_flat_priority_queue_heapify_initialize(                    \
-    private_mem_pointer, private_type_name, private_order_order,               \
+    private_data_pointer, private_type_name, private_order_order,              \
     private_order_fn, private_allocate, private_context_data,                  \
     private_capacity, private_size)                                            \
     (__extension__({                                                           \
         __auto_type private_flat_priority_queue_heapify_data                   \
-            = (private_mem_pointer);                                           \
+            = (private_data_pointer);                                          \
         struct CCC_Flat_priority_queue private_flat_priority_queue_heapify_res \
             = CCC_private_flat_priority_queue_initialize(                      \
                 private_flat_priority_queue_heapify_data, private_type_name,   \
@@ -100,23 +100,23 @@ CCC_private_flat_priority_queue_update_fixup(struct CCC_Flat_priority_queue *,
         struct CCC_Flat_priority_queue *private_flat_priority_queue            \
             = (flat_priority_queue);                                           \
         typeof(type_initializer) *private_flat_priority_queue_res              \
-            = CCC_buffer_allocate_back(&private_flat_priority_queue->buf);     \
+            = CCC_buffer_allocate_back(&private_flat_priority_queue->buffer);  \
         if (private_flat_priority_queue_res)                                   \
         {                                                                      \
             *private_flat_priority_queue_res = type_initializer;               \
-            if (private_flat_priority_queue->buf.count > 1)                    \
+            if (private_flat_priority_queue->buffer.count > 1)                 \
             {                                                                  \
                 private_flat_priority_queue_res = CCC_buffer_at(               \
-                    &private_flat_priority_queue->buf,                         \
+                    &private_flat_priority_queue->buffer,                      \
                     CCC_private_flat_priority_queue_bubble_up(                 \
                         private_flat_priority_queue,                           \
                         &(typeof(type_initializer)){0},                        \
-                        private_flat_priority_queue->buf.count - 1));          \
+                        private_flat_priority_queue->buffer.count - 1));       \
             }                                                                  \
             else                                                               \
             {                                                                  \
                 private_flat_priority_queue_res                                \
-                    = CCC_buffer_at(&private_flat_priority_queue->buf, 0);     \
+                    = CCC_buffer_at(&private_flat_priority_queue->buffer, 0);  \
             }                                                                  \
         }                                                                      \
         private_flat_priority_queue_res;                                       \
@@ -131,7 +131,8 @@ CCC_private_flat_priority_queue_update_fixup(struct CCC_Flat_priority_queue *,
             = (flat_priority_queue_pointer);                                   \
         typeof(*T_pointer) *T = (T_pointer);                                   \
         if (private_flat_priority_queue                                        \
-            && !CCC_buffer_is_empty(&private_flat_priority_queue->buf) && T)   \
+            && !CCC_buffer_is_empty(&private_flat_priority_queue->buffer)      \
+            && T)                                                              \
         {                                                                      \
             {update_closure_over_T} T                                          \
                 = CCC_private_flat_priority_queue_update_fixup(                \

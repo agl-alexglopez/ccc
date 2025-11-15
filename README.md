@@ -867,8 +867,8 @@ void *CCC_priority_queue_push(CCC_Priority_queue *priority_queue, CCC_Priority_q
 Non-Intrusive containers exist when a flat container can operate without such help from the user. The `flat_priority_queue` is a good example of this. When initializing we give it the following information.
 
 ```c
-#define CCC_flat_priority_queue_initialize(mem_pointer, cmp_order, cmp_fn, allocate, context_data, capacity) \
-    CCC_impl_flat_priority_queue_initialize(mem_pointer, cmp_order, cmp_fn, allocate, context_data, capacity)
+#define CCC_flat_priority_queue_initialize(data_pointer, cmp_order, cmp_fn, allocate, context_data, capacity) \
+    CCC_impl_flat_priority_queue_initialize(data_pointer, cmp_order, cmp_fn, allocate, context_data, capacity)
 
 /* For example: */
 
@@ -887,10 +887,10 @@ CCC_Flat_priority_queue flat_priority_queue
 The interface then looks like this.
 
 ```c
-void *CCC_flat_priority_queue_push(CCC_Flat_priority_queue *flat_priority_queue, void const *e, void *tmp);
+void *CCC_flat_priority_queue_push(CCC_Flat_priority_queue *flat_priority_queue, void const *e, void *temp);
 ```
 
-The element `e` here is just a generic reference to whatever type the user stores in the container and `tmp` is a swap slot provided by the user.
+The element `e` here is just a generic reference to whatever type the user stores in the container and `temp` is a swap slot provided by the user.
 
 ### Non-Allocating Containers
 

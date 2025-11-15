@@ -22,16 +22,16 @@ limitations under the License. */
 
 static struct CCC_Priority_queue_node *
 elem_in(struct CCC_Priority_queue const *, void const *);
-static struct CCC_Priority_queue_node *
-merge(struct CCC_Priority_queue *, struct CCC_Priority_queue_node *old,
-      struct CCC_Priority_queue_node *new);
-static void link_child(struct CCC_Priority_queue_node *parent,
-                       struct CCC_Priority_queue_node *child);
+static struct CCC_Priority_queue_node *merge(struct CCC_Priority_queue *,
+                                             struct CCC_Priority_queue_node *,
+                                             struct CCC_Priority_queue_node *);
+static void link_child(struct CCC_Priority_queue_node *,
+                       struct CCC_Priority_queue_node *);
 static void init_node(struct CCC_Priority_queue_node *);
 static size_t traversal_count(struct CCC_Priority_queue_node const *);
 static CCC_Tribool has_valid_links(struct CCC_Priority_queue const *,
-                                   struct CCC_Priority_queue_node const *parent,
-                                   struct CCC_Priority_queue_node const *child);
+                                   struct CCC_Priority_queue_node const *,
+                                   struct CCC_Priority_queue_node const *);
 static struct CCC_Priority_queue_node *
 delete_node(struct CCC_Priority_queue *, struct CCC_Priority_queue_node *);
 static struct CCC_Priority_queue_node *
@@ -39,7 +39,7 @@ delete_min(struct CCC_Priority_queue *, struct CCC_Priority_queue_node *);
 static void clear_node(struct CCC_Priority_queue_node *);
 static void cut_child(struct CCC_Priority_queue_node *);
 static void *struct_base(struct CCC_Priority_queue const *,
-                         struct CCC_Priority_queue_node const *e);
+                         struct CCC_Priority_queue_node const *);
 static CCC_Order order(struct CCC_Priority_queue const *,
                        struct CCC_Priority_queue_node const *,
                        struct CCC_Priority_queue_node const *);
@@ -69,13 +69,13 @@ CCC_priority_queue_front(CCC_Priority_queue const *const priority_queue)
 
 void *
 CCC_priority_queue_push(CCC_Priority_queue *const priority_queue,
-                        CCC_Priority_queue_node *e)
+                        CCC_Priority_queue_node *type_intruder)
 {
-    if (!e || !priority_queue)
+    if (!type_intruder || !priority_queue)
     {
         return NULL;
     }
-    void *ret = struct_base(priority_queue, e);
+    void *ret = struct_base(priority_queue, type_intruder);
     if (priority_queue->allocate)
     {
         void *const node = priority_queue->allocate((CCC_Allocator_context){
@@ -89,10 +89,11 @@ CCC_priority_queue_push(CCC_Priority_queue *const priority_queue,
         }
         (void)memcpy(node, ret, priority_queue->sizeof_type);
         ret = node;
-        e = elem_in(priority_queue, ret);
+        type_intruder = elem_in(priority_queue, ret);
     }
-    init_node(e);
-    priority_queue->root = merge(priority_queue, priority_queue->root, e);
+    init_node(type_intruder);
+    priority_queue->root
+        = merge(priority_queue, priority_queue->root, type_intruder);
     ++priority_queue->count;
     return ret;
 }
@@ -121,32 +122,34 @@ CCC_priority_queue_pop(CCC_Priority_queue *const priority_queue)
 
 void *
 CCC_priority_queue_extract(CCC_Priority_queue *const priority_queue,
-                           CCC_Priority_queue_node *const e)
+                           CCC_Priority_queue_node *const type_intruder)
 {
-    if (!priority_queue || !e || !priority_queue->root || !e->next || !e->prev)
+    if (!priority_queue || !type_intruder || !priority_queue->root
+        || !type_intruder->next || !type_intruder->prev)
     {
         return NULL;
     }
-    priority_queue->root = delete_node(priority_queue, e);
+    priority_queue->root = delete_node(priority_queue, type_intruder);
     priority_queue->count--;
-    clear_node(e);
-    return struct_base(priority_queue, e);
+    clear_node(type_intruder);
+    return struct_base(priority_queue, type_intruder);
 }
 
 CCC_Result
 CCC_priority_queue_erase(CCC_Priority_queue *const priority_queue,
-                         CCC_Priority_queue_node *const e)
+                         CCC_Priority_queue_node *const type_intruder)
 {
-    if (!priority_queue || !e || !priority_queue->root || !e->next || !e->prev)
+    if (!priority_queue || !type_intruder || !priority_queue->root
+        || !type_intruder->next || !type_intruder->prev)
     {
         return CCC_RESULT_ARGUMENT_ERROR;
     }
-    priority_queue->root = delete_node(priority_queue, e);
+    priority_queue->root = delete_node(priority_queue, type_intruder);
     priority_queue->count--;
     if (priority_queue->allocate)
     {
         (void)priority_queue->allocate((CCC_Allocator_context){
-            .input = struct_base(priority_queue, e),
+            .input = struct_base(priority_queue, type_intruder),
             .bytes = 0,
             .context = priority_queue->context,
         });
@@ -160,7 +163,7 @@ current child list being considered. We are avoiding recursion or amortized
 O(log(N)) pops with this method. */
 CCC_Result
 CCC_priority_queue_clear(CCC_Priority_queue *const priority_queue,
-                         CCC_Type_destructor *const fn)
+                         CCC_Type_destructor *const destroy)
 {
     if (!priority_queue)
     {
@@ -195,9 +198,9 @@ CCC_priority_queue_clear(CCC_Priority_queue *const priority_queue,
         e->prev->next = e->next;
         e->parent = e->next = e->prev = e->child = NULL;
         void *const del = struct_base(priority_queue, e);
-        if (fn)
+        if (destroy)
         {
-            fn((CCC_Type_context){
+            destroy((CCC_Type_context){
                 .type = del,
                 .context = priority_queue->context,
             });
@@ -243,45 +246,50 @@ CCC_priority_queue_count(CCC_Priority_queue const *const priority_queue)
    left child value. */
 void *
 CCC_priority_queue_update(CCC_Priority_queue *const priority_queue,
-                          CCC_Priority_queue_node *const e,
-                          CCC_Type_modifier *const fn, void *const context)
+                          CCC_Priority_queue_node *const type_intruder,
+                          CCC_Type_modifier *const modify, void *const context)
 {
-    if (!priority_queue || !e || !fn || !e->next || !e->prev)
+    if (!priority_queue || !type_intruder || !modify || !type_intruder->next
+        || !type_intruder->prev)
     {
         return NULL;
     }
-    update_fixup(priority_queue, e, fn, context);
-    return struct_base(priority_queue, e);
+    update_fixup(priority_queue, type_intruder, modify, context);
+    return struct_base(priority_queue, type_intruder);
 }
 
 /* Preferable to use this function if it is known the value is increasing.
    Much more efficient. */
 void *
 CCC_priority_queue_increase(CCC_Priority_queue *const priority_queue,
-                            CCC_Priority_queue_node *const e,
-                            CCC_Type_modifier *const fn, void *const context)
+                            CCC_Priority_queue_node *const type_intruder,
+                            CCC_Type_modifier *const modify,
+                            void *const context)
 {
-    if (!priority_queue || !e || !fn || !e->next || !e->prev)
+    if (!priority_queue || !type_intruder || !modify || !type_intruder->next
+        || !type_intruder->prev)
     {
         return NULL;
     }
-    increase_fixup(priority_queue, e, fn, context);
-    return struct_base(priority_queue, e);
+    increase_fixup(priority_queue, type_intruder, modify, context);
+    return struct_base(priority_queue, type_intruder);
 }
 
 /* Preferable to use this function if it is known the value is decreasing.
    Much more efficient. */
 void *
 CCC_priority_queue_decrease(CCC_Priority_queue *const priority_queue,
-                            CCC_Priority_queue_node *const e,
-                            CCC_Type_modifier *const fn, void *const context)
+                            CCC_Priority_queue_node *const type_intruder,
+                            CCC_Type_modifier *const modify,
+                            void *const context)
 {
-    if (!priority_queue || !e || !fn || !e->next || !e->prev)
+    if (!priority_queue || !type_intruder || !modify || !type_intruder->next
+        || !type_intruder->prev)
     {
         return NULL;
     }
-    decrease_fixup(priority_queue, e, fn, context);
-    return struct_base(priority_queue, e);
+    decrease_fixup(priority_queue, type_intruder, modify, context);
+    return struct_base(priority_queue, type_intruder);
 }
 
 CCC_Tribool
@@ -313,9 +321,9 @@ CCC_priority_queue_order(CCC_Priority_queue const *const priority_queue)
 
 void
 CCC_private_priority_queue_push(struct CCC_Priority_queue *const priority_queue,
-                                struct CCC_Priority_queue_node *const e)
+                                struct CCC_Priority_queue_node *const node)
 {
-    (void)CCC_priority_queue_push(priority_queue, e);
+    (void)CCC_priority_queue_push(priority_queue, node);
 }
 
 struct CCC_Priority_queue_node *
@@ -329,10 +337,10 @@ CCC_private_priority_queue_node_in(
 CCC_Order
 CCC_private_priority_queue_order(
     struct CCC_Priority_queue const *const priority_queue,
-    struct CCC_Priority_queue_node const *const lhs,
-    struct CCC_Priority_queue_node const *const rhs)
+    struct CCC_Priority_queue_node const *const left,
+    struct CCC_Priority_queue_node const *const right)
 {
-    return order(priority_queue, lhs, rhs);
+    return order(priority_queue, left, right);
 }
 
 struct CCC_Priority_queue_node *
@@ -369,57 +377,58 @@ CCC_private_priority_queue_delete_node(
 void *
 CCC_private_priority_queue_struct_base(
     struct CCC_Priority_queue const *const priority_queue,
-    struct CCC_Priority_queue_node const *const e)
+    struct CCC_Priority_queue_node const *const node)
 {
-    return struct_base(priority_queue, e);
+    return struct_base(priority_queue, node);
 }
 
 /*========================   Static Helpers  ================================*/
 
 static void
 update_fixup(struct CCC_Priority_queue *const priority_queue,
-             struct CCC_Priority_queue_node *const e,
-             CCC_Type_modifier *const fn, void *context)
+             struct CCC_Priority_queue_node *const node,
+             CCC_Type_modifier *const modify, void *context)
 {
-    if (e->parent
-        && order(priority_queue, e, e->parent) == priority_queue->order)
+    if (node->parent
+        && order(priority_queue, node, node->parent) == priority_queue->order)
     {
-        cut_child(e);
-        fn((CCC_Type_context){
-            .type = struct_base(priority_queue, e),
+        cut_child(node);
+        modify((CCC_Type_context){
+            .type = struct_base(priority_queue, node),
             .context = context,
         });
-        priority_queue->root = merge(priority_queue, priority_queue->root, e);
+        priority_queue->root
+            = merge(priority_queue, priority_queue->root, node);
         return;
     }
-    priority_queue->root = delete_node(priority_queue, e);
-    init_node(e);
-    fn((CCC_Type_context){
-        .type = struct_base(priority_queue, e),
+    priority_queue->root = delete_node(priority_queue, node);
+    init_node(node);
+    modify((CCC_Type_context){
+        .type = struct_base(priority_queue, node),
         .context = context,
     });
-    priority_queue->root = merge(priority_queue, priority_queue->root, e);
+    priority_queue->root = merge(priority_queue, priority_queue->root, node);
 }
 
 static void
 increase_fixup(struct CCC_Priority_queue *const priority_queue,
-               struct CCC_Priority_queue_node *const e,
-               CCC_Type_modifier *const fn, void *context)
+               struct CCC_Priority_queue_node *const node,
+               CCC_Type_modifier *const modify, void *context)
 {
     if (priority_queue->order == CCC_ORDER_GREATER)
     {
-        cut_child(e);
+        cut_child(node);
     }
     else
     {
-        priority_queue->root = delete_node(priority_queue, e);
-        init_node(e);
+        priority_queue->root = delete_node(priority_queue, node);
+        init_node(node);
     }
-    fn((CCC_Type_context){
-        .type = struct_base(priority_queue, e),
+    modify((CCC_Type_context){
+        .type = struct_base(priority_queue, node),
         .context = context,
     });
-    priority_queue->root = merge(priority_queue, priority_queue->root, e);
+    priority_queue->root = merge(priority_queue, priority_queue->root, node);
 }
 
 static void
@@ -612,21 +621,22 @@ link_child(struct CCC_Priority_queue_node *const parent,
 
 static inline CCC_Order
 order(struct CCC_Priority_queue const *const priority_queue,
-      struct CCC_Priority_queue_node const *const lhs,
-      struct CCC_Priority_queue_node const *const rhs)
+      struct CCC_Priority_queue_node const *const left,
+      struct CCC_Priority_queue_node const *const right)
 {
     return priority_queue->compare((CCC_Type_comparator_context){
-        .type_lhs = struct_base(priority_queue, lhs),
-        .type_rhs = struct_base(priority_queue, rhs),
+        .type_lhs = struct_base(priority_queue, left),
+        .type_rhs = struct_base(priority_queue, right),
         .context = priority_queue->context,
     });
 }
 
 static inline void *
 struct_base(struct CCC_Priority_queue const *const priority_queue,
-            struct CCC_Priority_queue_node const *const e)
+            struct CCC_Priority_queue_node const *const node)
 {
-    return ((char *)&(e->child)) - priority_queue->priority_queue_node_offset;
+    return ((char *)&(node->child))
+         - priority_queue->priority_queue_node_offset;
 }
 
 static inline struct CCC_Priority_queue_node *
@@ -639,16 +649,16 @@ elem_in(struct CCC_Priority_queue const *const priority_queue,
 }
 
 static inline void
-init_node(struct CCC_Priority_queue_node *const e)
+init_node(struct CCC_Priority_queue_node *const node)
 {
-    e->child = e->parent = NULL;
-    e->next = e->prev = e;
+    node->child = node->parent = NULL;
+    node->next = node->prev = node;
 }
 
 static inline void
-clear_node(struct CCC_Priority_queue_node *const e)
+clear_node(struct CCC_Priority_queue_node *const node)
 {
-    e->child = e->next = e->prev = e->parent = NULL;
+    node->child = node->next = node->prev = node->parent = NULL;
 }
 
 /*========================     Validation ================================*/
@@ -681,7 +691,7 @@ has_valid_links(struct CCC_Priority_queue const *const priority_queue,
     {
         return CCC_TRUE;
     }
-    struct CCC_Priority_queue_node const *cur = child;
+    struct CCC_Priority_queue_node const *current = child;
     CCC_Order const wrong_order = priority_queue->order == CCC_ORDER_LESSER
                                     ? CCC_ORDER_GREATER
                                     : CCC_ORDER_LESSER;
@@ -689,7 +699,7 @@ has_valid_links(struct CCC_Priority_queue const *const priority_queue,
     {
         /* Reminder: Don't combine these if checks into one. Separating them
            makes it easier to find the problem when stepping through gdb. */
-        if (!cur)
+        if (!current)
         {
             return CCC_FALSE;
         }
@@ -705,16 +715,17 @@ has_valid_links(struct CCC_Priority_queue const *const priority_queue,
         {
             return CCC_FALSE;
         }
-        if (parent && (order(priority_queue, parent, cur) == wrong_order))
+        if (parent && (order(priority_queue, parent, current) == wrong_order))
         {
             return CCC_FALSE;
         }
-        if (!has_valid_links(priority_queue, cur, cur->child)) /* ! RECURSE ! */
+        if (!has_valid_links(priority_queue, current,
+                             current->child)) /* ! RECURSE ! */
         {
             return CCC_FALSE;
         }
     }
-    while ((cur = cur->next) != child);
+    while ((current = current->next) != child);
     return CCC_TRUE;
 }
 

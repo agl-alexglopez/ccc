@@ -8,13 +8,13 @@
 #include "ccc/types.h"
 
 static inline void
-swap(void *const tmp, void *const a, void *const b, size_t const absize)
+swap(void *const temp, void *const a, void *const b, size_t const absize)
 {
     if (a != b)
     {
-        (void)memcpy(tmp, a, absize);
+        (void)memcpy(temp, a, absize);
         (void)memcpy(a, b, absize);
-        (void)memcpy(b, tmp, absize);
+        (void)memcpy(b, temp, absize);
     }
 }
 
@@ -22,7 +22,7 @@ swap(void *const tmp, void *const a, void *const b, size_t const absize)
 fall prey to the O(N^2) worst case runtime more easily. With void and iterators
 it is complicated to select a randomized slot but it would still be possible.*/
 static int *
-partition(Buffer *const b, CCC_Type_comparator *const fn, void *const tmp,
+partition(Buffer *const b, CCC_Type_comparator *const fn, void *const temp,
           void *lo, void *hi)
 {
     void *const pivot_val = hi;
@@ -36,11 +36,11 @@ partition(Buffer *const b, CCC_Type_comparator *const fn, void *const tmp,
         });
         if (order != CCC_ORDER_GREATER)
         {
-            swap(tmp, i, j, b->sizeof_type);
+            swap(temp, i, j, b->sizeof_type);
             i = buffer_next(b, i);
         }
     }
-    swap(tmp, i, hi, b->sizeof_type);
+    swap(temp, i, hi, b->sizeof_type);
     return i;
 }
 
@@ -57,21 +57,21 @@ this is meant to test the Buffer container, it uses iterators only to swap and
 sort data. This is a fun way to test that part of the Buffer interface for
 correctness and turns out to be pretty nice and clean. */
 static void
-sort_rec(Buffer *const b, CCC_Type_comparator *const fn, void *const tmp,
+sort_rec(Buffer *const b, CCC_Type_comparator *const fn, void *const temp,
          void *lo, void *hi)
 {
     while (lo < hi)
     {
-        void const *const pivot_i = partition(b, fn, tmp, lo, hi);
+        void const *const pivot_i = partition(b, fn, temp, lo, hi);
         if ((char const *)pivot_i - (char const *)lo
             < (char const *)hi - (char const *)pivot_i)
         {
-            sort_rec(b, fn, tmp, lo, buffer_reverse_next(b, pivot_i));
+            sort_rec(b, fn, temp, lo, buffer_reverse_next(b, pivot_i));
             lo = buffer_next(b, pivot_i);
         }
         else
         {
-            sort_rec(b, fn, tmp, buffer_next(b, pivot_i), hi);
+            sort_rec(b, fn, temp, buffer_next(b, pivot_i), hi);
             hi = buffer_reverse_next(b, pivot_i);
         }
     }

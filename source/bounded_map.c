@@ -87,7 +87,7 @@ static CCC_Order order(struct CCC_Bounded_map const *, void const *key,
 static void *struct_base(struct CCC_Bounded_map const *,
                          struct CCC_Bounded_map_node const *);
 static struct Query find(struct CCC_Bounded_map const *, void const *key);
-static void swap(void *tmp, void *a, void *b, size_t sizeof_type);
+static void swap(void *temp, void *a, void *b, size_t sizeof_type);
 static void *maybe_allocate_insert(struct CCC_Bounded_map *,
                                    struct CCC_Bounded_map_node *parent,
                                    CCC_Order last_order,
@@ -868,15 +868,15 @@ init_node(struct CCC_Bounded_map *const map,
 }
 
 static inline void
-swap(void *const tmp, void *const a, void *const b, size_t const sizeof_type)
+swap(void *const temp, void *const a, void *const b, size_t const sizeof_type)
 {
     if (a == b || !a || !b)
     {
         return;
     }
-    (void)memcpy(tmp, a, sizeof_type);
+    (void)memcpy(temp, a, sizeof_type);
     (void)memcpy(a, b, sizeof_type);
-    (void)memcpy(b, tmp, sizeof_type);
+    (void)memcpy(b, temp, sizeof_type);
 }
 
 static inline CCC_Order
