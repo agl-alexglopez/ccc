@@ -535,17 +535,17 @@ See container documentation for specific behavior. */
 Manage underlying buffers for containers. */
 /**@{*/
 
-/** @brief Copy src containers memory to dst container.
-@param[in] dst_container_pointer a pointer to the destination container.
-@param[in] src_container_pointer a pointer to the source container.
+/** @brief Copy source containers memory to destination container.
+@param[in] destination_container_pointer a pointer to the destination container.
+@param[in] source_container_pointer a pointer to the source container.
 @param[in] allocate_pointer the allocation function to use for resizing if
 needed.
 @return the result of the operation.
 
 See container documentation for specific behavior. */
-#define CCC_copy(dst_container_pointer, src_container_pointer,                 \
+#define CCC_copy(destination_container_pointer, source_container_pointer,      \
                  allocate_pointer)                                             \
-    CCC_private_copy(dst_container_pointer, src_container_pointer,             \
+    CCC_private_copy(destination_container_pointer, source_container_pointer,  \
                      allocate_pointer)
 
 /** @brief Reserve capacity for n_to_add new elements to be inserted.

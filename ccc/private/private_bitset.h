@@ -52,10 +52,9 @@ enum : size_t
 
 /*=========================     Private Interface   =========================*/
 
-CCC_Result CCC_private_bitset_reserve(struct CCC_Bitset *, size_t to_add,
+CCC_Result CCC_private_bitset_reserve(struct CCC_Bitset *, size_t,
                                       CCC_Allocator *);
-CCC_Tribool CCC_private_bitset_set(struct CCC_Bitset *bs, size_t i,
-                                   CCC_Tribool b);
+CCC_Tribool CCC_private_bitset_set(struct CCC_Bitset *, size_t, CCC_Tribool);
 
 /*================================     Macros     ===========================*/
 

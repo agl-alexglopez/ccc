@@ -368,7 +368,8 @@ static CCC_Tribool tag_constant(struct CCC_Flat_hash_map_tag);
 static struct CCC_Flat_hash_map_tag tag_from(uint64_t);
 static struct Group group_loadu(struct CCC_Flat_hash_map_tag const *);
 static struct Group group_loada(struct CCC_Flat_hash_map_tag const *);
-static void group_storea(struct CCC_Flat_hash_map_tag *dst, struct Group src);
+static void group_storea(struct CCC_Flat_hash_map_tag *destination,
+                         struct Group source);
 static struct Match_mask match_tag(struct Group, struct CCC_Flat_hash_map_tag);
 static struct Match_mask match_empty(struct Group);
 static struct Match_mask match_deleted(struct Group);
@@ -831,83 +832,85 @@ CCC_flat_hash_map_entry_status(CCC_Flat_hash_map_entry const *const e)
 }
 
 CCC_Result
-CCC_flat_hash_map_copy(CCC_Flat_hash_map *const dst,
-                       CCC_Flat_hash_map const *const src,
+CCC_flat_hash_map_copy(CCC_Flat_hash_map *const destination,
+                       CCC_Flat_hash_map const *const source,
                        CCC_Allocator *const allocate)
 {
-    if (!dst || !src || src == dst
-        || (src->mask && !is_power_of_two(src->mask + 1)))
+    if (!destination || !source || source == destination
+        || (source->mask && !is_power_of_two(source->mask + 1)))
     {
         return CCC_RESULT_ARGUMENT_ERROR;
     }
-    if (dst->mask < src->mask && !allocate)
+    if (destination->mask < source->mask && !allocate)
     {
         return CCC_RESULT_NO_ALLOCATION_FUNCTION;
     }
-    CCC_Result check = check_initialize(dst, 0, allocate);
+    CCC_Result check = check_initialize(destination, 0, allocate);
     if (check != CCC_RESULT_OK)
     {
         return check;
     }
     /* The destination could be messed up in a variety of ways that make it
-       incompatible with src. Overwrite everything and save what we need from
-       dst for a smooth copy over. */
-    void *const dst_data = dst->data;
-    void *const dst_tag = dst->tag;
-    size_t const dst_mask = dst->mask;
-    size_t const dst_remain = dst->remain;
-    CCC_Allocator *const dst_allocate = dst->allocate;
-    *dst = *src;
-    dst->data = dst_data;
-    dst->tag = dst_tag;
-    dst->mask = dst_mask;
-    dst->remain = dst_remain;
-    dst->allocate = dst_allocate;
-    if (!src->mask || is_uninitialized(src))
+       incompatible with source. Overwrite everything and save what we need from
+       destination for a smooth copy over. */
+    void *const destination_data = destination->data;
+    void *const destination_tag = destination->tag;
+    size_t const destination_mask = destination->mask;
+    size_t const destination_remain = destination->remain;
+    CCC_Allocator *const destination_allocate = destination->allocate;
+    *destination = *source;
+    destination->data = destination_data;
+    destination->tag = destination_tag;
+    destination->mask = destination_mask;
+    destination->remain = destination_remain;
+    destination->allocate = destination_allocate;
+    if (!source->mask || is_uninitialized(source))
     {
         return CCC_RESULT_OK;
     }
-    size_t const src_bytes = mask_to_total_bytes(src->sizeof_type, src->mask);
-    if (dst->mask < src->mask)
+    size_t const source_bytes
+        = mask_to_total_bytes(source->sizeof_type, source->mask);
+    if (destination->mask < source->mask)
     {
-        void *const new_mem = dst->allocate((CCC_Allocator_context){
-            .input = dst->data,
-            .bytes = src_bytes,
-            .context = dst->context,
+        void *const new_mem = destination->allocate((CCC_Allocator_context){
+            .input = destination->data,
+            .bytes = source_bytes,
+            .context = destination->context,
         });
         if (!new_mem)
         {
             return CCC_RESULT_ALLOCATOR_ERROR;
         }
-        dst->data = new_mem;
-        dst->tag = tag_pos(src->sizeof_type, new_mem, src->mask);
-        dst->mask = src->mask;
+        destination->data = new_mem;
+        destination->tag = tag_pos(source->sizeof_type, new_mem, source->mask);
+        destination->mask = source->mask;
     }
-    if (!dst->data || !src->data)
+    if (!destination->data || !source->data)
     {
         return CCC_RESULT_ARGUMENT_ERROR;
     }
-    (void)memset(dst->tag, TAG_EMPTY, mask_to_tag_bytes(dst->mask));
-    dst->remain = mask_to_load_factor_cap(dst->mask);
-    dst->count = 0;
+    (void)memset(destination->tag, TAG_EMPTY,
+                 mask_to_tag_bytes(destination->mask));
+    destination->remain = mask_to_load_factor_cap(destination->mask);
+    destination->count = 0;
     size_t group_start = 0;
     struct Match_mask full = {};
-    while ((full = find_first_full_group(src, &group_start)).v)
+    while ((full = find_first_full_group(source, &group_start)).v)
     {
         size_t tag_i = 0;
         while ((tag_i = match_next_one(&full)) != CCC_FLAT_HASH_MAP_GROUP_SIZE)
         {
             tag_i += group_start;
-            uint64_t const hash = hash_fn(src, key_at(src, tag_i));
-            size_t const new_i = find_slot_or_noreturn(dst, hash);
-            tag_set(dst, tag_from(hash), new_i);
-            (void)memcpy(data_at(dst, new_i), data_at(src, tag_i),
-                         dst->sizeof_type);
+            uint64_t const hash = hash_fn(source, key_at(source, tag_i));
+            size_t const new_i = find_slot_or_noreturn(destination, hash);
+            tag_set(destination, tag_from(hash), new_i);
+            (void)memcpy(data_at(destination, new_i), data_at(source, tag_i),
+                         destination->sizeof_type);
         }
         group_start += CCC_FLAT_HASH_MAP_GROUP_SIZE;
     }
-    dst->remain -= src->count;
-    dst->count = src->count;
+    destination->remain -= source->count;
+    destination->count = source->count;
     return CCC_RESULT_OK;
 }
 
@@ -1832,12 +1835,12 @@ roundup(size_t const bytes)
 /** Below are the implementations of the SIMD or bitwise operations needed to
 run a search on multiple entries in the hash table simultaneously. For now,
 the only container that will use these operations is this one so there is no
-need to break out different headers and sources and clutter the src directory.
-x86 is the only platform that gets the full benefit of SIMD. Apple and all
-other platforms will get a portable implementation due to concerns over NEON
-speed of vectorized instructions. However, loading up groups into a uint64_t is
-still good and counts as simultaneous operations just not the type that uses CPU
-vector lanes for a single instruction. */
+need to break out different headers and sources and clutter the source
+directory. x86 is the only platform that gets the full benefit of SIMD. Apple
+and all other platforms will get a portable implementation due to concerns over
+NEON speed of vectorized instructions. However, loading up groups into a
+uint64_t is still good and counts as simultaneous operations just not the type
+that uses CPU vector lanes for a single instruction. */
 
 /*========================   Tag Implementations    =========================*/
 
@@ -2028,30 +2031,31 @@ match_leading_full(struct Group const g, size_t const start_tag)
 
 /*=========================  Group Implementations   ========================*/
 
-/** Loads a group starting at src into a 128 bit vector. This is a aligned
+/** Loads a group starting at source into a 128 bit vector. This is a aligned
 load and the user must ensure the load will not go off then end of the tag
 array. */
 static inline struct Group
-group_loada(struct CCC_Flat_hash_map_tag const *const src)
+group_loada(struct CCC_Flat_hash_map_tag const *const source)
 {
-    return (struct Group){_mm_load_si128((__m128i *)src)};
+    return (struct Group){_mm_load_si128((__m128i *)source)};
 }
 
-/** Stores the src group to dst. The store is aligned and the user must ensure
-the store will not go off the end of the tag array. */
+/** Stores the source group to destination. The store is aligned and the user
+must ensure the store will not go off the end of the tag array. */
 static inline void
-group_storea(struct CCC_Flat_hash_map_tag *const dst, struct Group const src)
+group_storea(struct CCC_Flat_hash_map_tag *const destination,
+             struct Group const source)
 {
-    _mm_store_si128((__m128i *)dst, src.v);
+    _mm_store_si128((__m128i *)destination, source.v);
 }
 
-/** Loads a group starting at src into a 128 bit vector. This is an unaligned
+/** Loads a group starting at source into a 128 bit vector. This is an unaligned
 load and the user must ensure the load will not go off then end of the tag
 array. */
 static inline struct Group
-group_loadu(struct CCC_Flat_hash_map_tag const *const src)
+group_loadu(struct CCC_Flat_hash_map_tag const *const source)
 {
-    return (struct Group){_mm_loadu_si128((__m128i *)src)};
+    return (struct Group){_mm_loadu_si128((__m128i *)source)};
 }
 
 /** Converts the empty and deleted constants all TAG_EMPTY and the full tags
@@ -2192,30 +2196,31 @@ match_leading_full(struct Group const g, size_t const start_tag)
 
 /*=========================  Group Implementations   ========================*/
 
-/** Loads a group starting at src into a 8x8 (64) bit vector. This is an
+/** Loads a group starting at source into a 8x8 (64) bit vector. This is an
 aligned load and the user must ensure the load will not go off then end of the
 tag array. */
 static inline struct Group
-group_loada(struct CCC_Flat_hash_map_tag const *const src)
+group_loada(struct CCC_Flat_hash_map_tag const *const source)
 {
-    return (struct Group){vld1_u8(&src->v)};
+    return (struct Group){vld1_u8(&source->v)};
 }
 
-/** Stores the src group to dst. The store is aligned and the user must ensure
-the store will not go off the end of the tag array. */
+/** Stores the source group to destination. The store is aligned and the user
+must ensure the store will not go off the end of the tag array. */
 static inline void
-group_storea(struct CCC_Flat_hash_map_tag *const dst, struct Group const src)
+group_storea(struct CCC_Flat_hash_map_tag *const destination,
+             struct Group const source)
 {
-    vst1_u8(&dst->v, src.v);
+    vst1_u8(&destination->v, source.v);
 }
 
-/** Loads a group starting at src into a 8x8 (64) bit vector. This is an
+/** Loads a group starting at source into a 8x8 (64) bit vector. This is an
 unaligned load and the user must ensure the load will not go off then end of the
 tag array. */
 static inline struct Group
-group_loadu(struct CCC_Flat_hash_map_tag const *const src)
+group_loadu(struct CCC_Flat_hash_map_tag const *const source)
 {
-    return (struct Group){vld1_u8(&src->v)};
+    return (struct Group){vld1_u8(&source->v)};
 }
 
 /** Converts the empty and deleted constants all TAG_EMPTY and the full tags
@@ -2407,26 +2412,27 @@ match_leading_full(struct Group const g, size_t const start_tag)
 
 /** Loads tags into a group without violating strict aliasing. */
 static inline struct Group
-group_loada(struct CCC_Flat_hash_map_tag const *const src)
+group_loada(struct CCC_Flat_hash_map_tag const *const source)
 {
     struct Group g;
-    (void)memcpy(&g, src, sizeof(g));
+    (void)memcpy(&g, source, sizeof(g));
     return g;
 }
 
 /** Stores a group back into the tag array without violating strict aliasing. */
 static inline void
-group_storea(struct CCC_Flat_hash_map_tag *const dst, struct Group const src)
+group_storea(struct CCC_Flat_hash_map_tag *const destination,
+             struct Group const source)
 {
-    (void)memcpy(dst, &src, sizeof(src));
+    (void)memcpy(destination, &source, sizeof(source));
 }
 
 /** Loads tags into a group without violating strict aliasing. */
 static inline struct Group
-group_loadu(struct CCC_Flat_hash_map_tag const *const src)
+group_loadu(struct CCC_Flat_hash_map_tag const *const source)
 {
     struct Group g;
-    (void)memcpy(&g, src, sizeof(g));
+    (void)memcpy(&g, source, sizeof(g));
     return g;
 }
 

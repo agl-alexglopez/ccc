@@ -858,195 +858,195 @@ check_static_begin(bitset_test_first_leading_zeros_fail)
 
 check_static_begin(bitset_test_or_same_size)
 {
-    Bitset src = bitset_initialize(bitset_blocks(512), NULL, NULL, 512);
-    Bitset dst = bitset_initialize(bitset_blocks(512), NULL, NULL, 512);
+    Bitset source = bitset_initialize(bitset_blocks(512), NULL, NULL, 512);
+    Bitset destination = bitset_initialize(bitset_blocks(512), NULL, NULL, 512);
     size_t const size = 512;
     for (size_t i = 0; i < size; i += 2)
     {
-        check(bitset_set(&dst, i, CCC_TRUE), CCC_FALSE);
+        check(bitset_set(&destination, i, CCC_TRUE), CCC_FALSE);
     }
     for (size_t i = 1; i < size; i += 2)
     {
-        check(bitset_set(&src, i, CCC_TRUE), CCC_FALSE);
+        check(bitset_set(&source, i, CCC_TRUE), CCC_FALSE);
     }
-    check(bitset_popcount(&src).count, size / 2);
-    check(bitset_popcount(&dst).count, size / 2);
-    check(bitset_or(&dst, &src), CCC_RESULT_OK);
-    check(bitset_popcount(&dst).count, size);
+    check(bitset_popcount(&source).count, size / 2);
+    check(bitset_popcount(&destination).count, size / 2);
+    check(bitset_or(&destination, &source), CCC_RESULT_OK);
+    check(bitset_popcount(&destination).count, size);
     check_end();
 }
 
 check_static_begin(bitset_test_or_diff_size)
 {
-    Bitset dst = bitset_initialize(bitset_blocks(512), NULL, NULL, 512);
+    Bitset destination = bitset_initialize(bitset_blocks(512), NULL, NULL, 512);
     /* Make it slightly harder by not ending on a perfect block boundary. */
-    Bitset src = bitset_initialize(bitset_blocks(244), NULL, NULL, 244);
-    check(bitset_set_all(&src, CCC_TRUE), CCC_RESULT_OK);
-    check(bitset_popcount(&src).count, 244);
-    check(bitset_popcount(&dst).count, 0);
-    check(bitset_or(&dst, &src), CCC_RESULT_OK);
-    check(bitset_popcount(&dst).count, 244);
+    Bitset source = bitset_initialize(bitset_blocks(244), NULL, NULL, 244);
+    check(bitset_set_all(&source, CCC_TRUE), CCC_RESULT_OK);
+    check(bitset_popcount(&source).count, 244);
+    check(bitset_popcount(&destination).count, 0);
+    check(bitset_or(&destination, &source), CCC_RESULT_OK);
+    check(bitset_popcount(&destination).count, 244);
     check_end();
 }
 
 check_static_begin(bitset_test_and_same_size)
 {
-    Bitset src = bitset_initialize(bitset_blocks(512), NULL, NULL, 512);
-    Bitset dst = bitset_initialize(bitset_blocks(512), NULL, NULL, 512);
+    Bitset source = bitset_initialize(bitset_blocks(512), NULL, NULL, 512);
+    Bitset destination = bitset_initialize(bitset_blocks(512), NULL, NULL, 512);
     size_t const size = 512;
     for (size_t i = 0; i < size; i += 2)
     {
-        check(bitset_set(&dst, i, CCC_TRUE), CCC_FALSE);
+        check(bitset_set(&destination, i, CCC_TRUE), CCC_FALSE);
     }
     for (size_t i = 1; i < size; i += 2)
     {
-        check(bitset_set(&src, i, CCC_TRUE), CCC_FALSE);
+        check(bitset_set(&source, i, CCC_TRUE), CCC_FALSE);
     }
-    check(bitset_popcount(&src).count, size / 2);
-    check(bitset_popcount(&dst).count, size / 2);
-    check(bitset_and(&dst, &src), CCC_RESULT_OK);
-    check(bitset_popcount(&dst).count, 0);
+    check(bitset_popcount(&source).count, size / 2);
+    check(bitset_popcount(&destination).count, size / 2);
+    check(bitset_and(&destination, &source), CCC_RESULT_OK);
+    check(bitset_popcount(&destination).count, 0);
     check_end();
 }
 
 check_static_begin(bitset_test_and_diff_size)
 {
-    Bitset dst = bitset_initialize(bitset_blocks(512), NULL, NULL, 512);
+    Bitset destination = bitset_initialize(bitset_blocks(512), NULL, NULL, 512);
     /* Make it slightly harder by not ending on a perfect block boundary. */
-    Bitset src = bitset_initialize(bitset_blocks(244), NULL, NULL, 244);
-    check(bitset_set_all(&dst, CCC_TRUE), CCC_RESULT_OK);
-    check(bitset_set_all(&src, CCC_TRUE), CCC_RESULT_OK);
-    check(bitset_popcount(&dst).count, 512);
-    check(bitset_popcount(&src).count, 244);
-    check(bitset_and(&dst, &src), CCC_RESULT_OK);
-    check(bitset_popcount(&dst).count, 244);
-    check(bitset_count(&dst).count, 512);
+    Bitset source = bitset_initialize(bitset_blocks(244), NULL, NULL, 244);
+    check(bitset_set_all(&destination, CCC_TRUE), CCC_RESULT_OK);
+    check(bitset_set_all(&source, CCC_TRUE), CCC_RESULT_OK);
+    check(bitset_popcount(&destination).count, 512);
+    check(bitset_popcount(&source).count, 244);
+    check(bitset_and(&destination, &source), CCC_RESULT_OK);
+    check(bitset_popcount(&destination).count, 244);
+    check(bitset_count(&destination).count, 512);
     check_end();
 }
 
 check_static_begin(bitset_test_xor_same_size)
 {
-    Bitset src = bitset_initialize(bitset_blocks(512), NULL, NULL, 512);
-    Bitset dst = bitset_initialize(bitset_blocks(512), NULL, NULL, 512);
+    Bitset source = bitset_initialize(bitset_blocks(512), NULL, NULL, 512);
+    Bitset destination = bitset_initialize(bitset_blocks(512), NULL, NULL, 512);
     size_t const size = 512;
     for (size_t i = 0; i < size; i += 2)
     {
-        check(bitset_set(&dst, i, CCC_TRUE), CCC_FALSE);
+        check(bitset_set(&destination, i, CCC_TRUE), CCC_FALSE);
     }
     for (size_t i = 1; i < size; i += 2)
     {
-        check(bitset_set(&src, i, CCC_TRUE), CCC_FALSE);
+        check(bitset_set(&source, i, CCC_TRUE), CCC_FALSE);
     }
-    check(bitset_popcount(&src).count, size / 2);
-    check(bitset_popcount(&dst).count, size / 2);
-    check(bitset_xor(&dst, &src), CCC_RESULT_OK);
-    check(bitset_popcount(&dst).count, size);
+    check(bitset_popcount(&source).count, size / 2);
+    check(bitset_popcount(&destination).count, size / 2);
+    check(bitset_xor(&destination, &source), CCC_RESULT_OK);
+    check(bitset_popcount(&destination).count, size);
     check_end();
 }
 
 check_static_begin(bitset_test_xor_diff_size)
 {
-    Bitset dst = bitset_initialize(bitset_blocks(512), NULL, NULL, 512);
+    Bitset destination = bitset_initialize(bitset_blocks(512), NULL, NULL, 512);
     /* Make it slightly harder by not ending on a perfect block boundary. */
-    Bitset src = bitset_initialize(bitset_blocks(244), NULL, NULL, 244);
-    check(bitset_set_all(&dst, CCC_TRUE), CCC_RESULT_OK);
-    check(bitset_set_all(&src, CCC_TRUE), CCC_RESULT_OK);
-    check(bitset_popcount(&dst).count, 512);
-    check(bitset_popcount(&src).count, 244);
-    check(bitset_xor(&dst, &src), CCC_RESULT_OK);
-    check(bitset_popcount(&dst).count, 512 - 244);
-    check(bitset_count(&dst).count, 512);
+    Bitset source = bitset_initialize(bitset_blocks(244), NULL, NULL, 244);
+    check(bitset_set_all(&destination, CCC_TRUE), CCC_RESULT_OK);
+    check(bitset_set_all(&source, CCC_TRUE), CCC_RESULT_OK);
+    check(bitset_popcount(&destination).count, 512);
+    check(bitset_popcount(&source).count, 244);
+    check(bitset_xor(&destination, &source), CCC_RESULT_OK);
+    check(bitset_popcount(&destination).count, 512 - 244);
+    check(bitset_count(&destination).count, 512);
     check_end();
 }
 
-check_static_begin(bitset_test_shiftl)
+check_static_begin(bitset_test_shift_left)
 {
     Bitset bs = bitset_initialize(bitset_blocks(512), NULL, NULL, 512);
     check(bitset_set_all(&bs, CCC_TRUE), CCC_RESULT_OK);
     check(bitset_popcount(&bs).count, 512);
-    check(bitset_shiftl(&bs, 512), CCC_RESULT_OK);
+    check(bitset_shift_left(&bs, 512), CCC_RESULT_OK);
     check(bitset_popcount(&bs).count, 0);
     check(bitset_set_all(&bs, CCC_TRUE), CCC_RESULT_OK);
     size_t ones = 512;
-    check(bitset_shiftl(&bs, BITSET_BLOCK_BITS), CCC_RESULT_OK);
+    check(bitset_shift_left(&bs, BITSET_BLOCK_BITS), CCC_RESULT_OK);
     check(bitset_popcount_range(&bs, 0, BITSET_BLOCK_BITS).count, 0);
     ones -= BITSET_BLOCK_BITS;
     check(bitset_popcount(&bs).count, ones);
-    check(bitset_shiftl(&bs, BITSET_BLOCK_BITS / 2), CCC_RESULT_OK);
+    check(bitset_shift_left(&bs, BITSET_BLOCK_BITS / 2), CCC_RESULT_OK);
     ones -= (BITSET_BLOCK_BITS / 2);
     check(bitset_popcount(&bs).count, ones);
-    check(bitset_shiftl(&bs, BITSET_BLOCK_BITS * 2), CCC_RESULT_OK);
+    check(bitset_shift_left(&bs, BITSET_BLOCK_BITS * 2), CCC_RESULT_OK);
     ones -= (BITSET_BLOCK_BITS * 2);
     check(bitset_popcount(&bs).count, ones);
-    check(bitset_shiftl(&bs, (BITSET_BLOCK_BITS - 3) * 3), CCC_RESULT_OK);
+    check(bitset_shift_left(&bs, (BITSET_BLOCK_BITS - 3) * 3), CCC_RESULT_OK);
     ones -= ((BITSET_BLOCK_BITS - 3) * 3);
     check(bitset_popcount(&bs).count, ones);
     check_end();
 }
 
-check_static_begin(bitset_test_shiftl_edgecase)
+check_static_begin(bitset_test_shift_left_edgecase)
 {
     Bitset bs = bitset_initialize(bitset_blocks(512), NULL, NULL, 512);
     check(bitset_set_all(&bs, CCC_TRUE), CCC_RESULT_OK);
     check(bitset_popcount(&bs).count, 512);
-    check(bitset_shiftl(&bs, 510), CCC_RESULT_OK);
+    check(bitset_shift_left(&bs, 510), CCC_RESULT_OK);
     check(bitset_popcount(&bs).count, 2);
     check_end();
 }
 
-check_static_begin(bitset_test_shiftl_edgecase_small)
+check_static_begin(bitset_test_shift_left_edgecase_small)
 {
     Bitset bs = bitset_initialize(bitset_blocks(8), NULL, NULL, 8);
     check(bitset_set_all(&bs, CCC_TRUE), CCC_RESULT_OK);
     check(bitset_popcount(&bs).count, 8);
-    check(bitset_shiftl(&bs, 7), CCC_RESULT_OK);
+    check(bitset_shift_left(&bs, 7), CCC_RESULT_OK);
     check(bitset_popcount(&bs).count, 1);
     check_end();
 }
 
-check_static_begin(bitset_test_shiftr)
+check_static_begin(bitset_test_shift_right)
 {
     Bitset bs = bitset_initialize(bitset_blocks(512), NULL, NULL, 512);
     check(bitset_set_all(&bs, CCC_TRUE), CCC_RESULT_OK);
     check(bitset_popcount(&bs).count, 512);
-    check(bitset_shiftr(&bs, 512), CCC_RESULT_OK);
+    check(bitset_shift_right(&bs, 512), CCC_RESULT_OK);
     check(bitset_popcount(&bs).count, 0);
     check(bitset_set_all(&bs, CCC_TRUE), CCC_RESULT_OK);
     size_t ones = 512;
-    check(bitset_shiftr(&bs, BITSET_BLOCK_BITS), CCC_RESULT_OK);
+    check(bitset_shift_right(&bs, BITSET_BLOCK_BITS), CCC_RESULT_OK);
     check(bitset_popcount_range(&bs, 512 - BITSET_BLOCK_BITS, BITSET_BLOCK_BITS)
               .count,
           0);
     ones -= BITSET_BLOCK_BITS;
     check(bitset_popcount(&bs).count, ones);
-    check(bitset_shiftr(&bs, BITSET_BLOCK_BITS / 2), CCC_RESULT_OK);
+    check(bitset_shift_right(&bs, BITSET_BLOCK_BITS / 2), CCC_RESULT_OK);
     ones -= (BITSET_BLOCK_BITS / 2);
     check(bitset_popcount(&bs).count, ones);
-    check(bitset_shiftr(&bs, BITSET_BLOCK_BITS * 2), CCC_RESULT_OK);
+    check(bitset_shift_right(&bs, BITSET_BLOCK_BITS * 2), CCC_RESULT_OK);
     ones -= (BITSET_BLOCK_BITS * 2);
     check(bitset_popcount(&bs).count, ones);
-    check(bitset_shiftr(&bs, (BITSET_BLOCK_BITS - 3) * 3), CCC_RESULT_OK);
+    check(bitset_shift_right(&bs, (BITSET_BLOCK_BITS - 3) * 3), CCC_RESULT_OK);
     ones -= ((BITSET_BLOCK_BITS - 3) * 3);
     check(bitset_popcount(&bs).count, ones);
     check_end();
 }
 
-check_static_begin(bitset_test_shiftr_edgecase)
+check_static_begin(bitset_test_shift_right_edgecase)
 {
     Bitset bs = bitset_initialize(bitset_blocks(512), NULL, NULL, 512);
     check(bitset_set_all(&bs, CCC_TRUE), CCC_RESULT_OK);
     check(bitset_popcount(&bs).count, 512);
-    check(bitset_shiftr(&bs, 510), CCC_RESULT_OK);
+    check(bitset_shift_right(&bs, 510), CCC_RESULT_OK);
     check(bitset_popcount(&bs).count, 2);
     check_end();
 }
 
-check_static_begin(bitset_test_shiftr_edgecase_small)
+check_static_begin(bitset_test_shift_right_edgecase_small)
 {
     Bitset bs = bitset_initialize(bitset_blocks(8), NULL, NULL, 8);
     check(bitset_set_all(&bs, CCC_TRUE), CCC_RESULT_OK);
     check(bitset_popcount(&bs).count, 8);
-    check(bitset_shiftr(&bs, 7), CCC_RESULT_OK);
+    check(bitset_shift_right(&bs, 7), CCC_RESULT_OK);
     check(bitset_popcount(&bs).count, 1);
     check_end();
 }
@@ -1239,10 +1239,11 @@ main(void)
         bitset_test_first_leading_zeros_fail(), bitset_test_or_same_size(),
         bitset_test_or_diff_size(), bitset_test_and_same_size(),
         bitset_test_and_diff_size(), bitset_test_xor_same_size(),
-        bitset_test_xor_diff_size(), bitset_test_shiftl(), bitset_test_shiftr(),
-        bitset_test_shiftl_edgecase(), bitset_test_shiftr_edgecase(),
-        bitset_test_shiftl_edgecase_small(),
-        bitset_test_shiftr_edgecase_small(), bitset_test_subset(),
+        bitset_test_xor_diff_size(), bitset_test_shift_left(),
+        bitset_test_shift_right(), bitset_test_shift_left_edgecase(),
+        bitset_test_shift_right_edgecase(),
+        bitset_test_shift_left_edgecase_small(),
+        bitset_test_shift_right_edgecase_small(), bitset_test_subset(),
         bitset_test_proper_subset(), bitset_test_valid_sudoku(),
         bitset_test_invalid_sudoku());
 }

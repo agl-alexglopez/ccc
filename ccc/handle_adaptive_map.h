@@ -175,15 +175,17 @@ destruction.
         context_data, capacity)
 
 /** @brief Copy the map at source to destination.
-@param[in] dst the initialized destination for the copy of the src map.
-@param[in] src the initialized source of the map.
-@param[in] allocate the allocation function to resize dst or NULL.
+@param[in] destination the initialized destination for the copy of the source
+map.
+@param[in] source the initialized source of the map.
+@param[in] allocate the allocation function to resize destination or NULL.
 @return the result of the copy operation. If the destination capacity is less
 than the source capacity and no allocation function is provided an input error
-is returned. If resizing is required and resizing of dst fails a memory error
-is returned.
-@note dst must have capacity greater than or equal to src. If dst capacity is
-less than src, an allocation function must be provided with the fn argument.
+is returned. If resizing is required and resizing of destination fails a memory
+error is returned.
+@note destination must have capacity greater than or equal to source. If
+destination capacity is less than source, an allocation function must be
+provided with the fn argument.
 
 Note that there are two ways to copy data from source to destination: provide
 sufficient memory and pass NULL as fn, or allow the copy function to take care
@@ -199,7 +201,7 @@ struct Val
     int val;
 };
 CCC_handle_adaptive_map_declare_fixed_map(small_fixed_map, struct Val, 64);
-static Handle_bounded_map src = handle_adaptive_map_initialize(
+static Handle_bounded_map source = handle_adaptive_map_initialize(
     &(static small_fixed_map){},
     struct Val,
     key,
@@ -208,8 +210,8 @@ static Handle_bounded_map src = handle_adaptive_map_initialize(
     NULL,
     handle_adaptive_map_fixed_capacity(small_fixed_map)
 );
-insert_rand_vals(&src);
-static Handle_bounded_map dst = handle_adaptive_map_initialize(
+insert_rand_vals(&source);
+static Handle_bounded_map destination = handle_adaptive_map_initialize(
     &(static small_fixed_map){},
     struct Val,
     key,
@@ -218,30 +220,11 @@ static Handle_bounded_map dst = handle_adaptive_map_initialize(
     NULL,
     handle_adaptive_map_fixed_capacity(small_fixed_map)
 );
-CCC_Result res = handle_adaptive_map_copy(&dst, &src, NULL);
+CCC_Result res = handle_adaptive_map_copy(&destination, &source, NULL);
 ```
 
-The above requires dst capacity be greater than or equal to src capacity. Here
-is memory management handed over to the copy function.
-
-```
-#define HANDLE_ADAPTIVE_MAP_USING_NAMESPACE_CCC
-struct Val
-{
-    int key;
-    int val;
-};
-static Handle_adaptive_map src
-    = handle_adaptive_map_initialize(NULL, struct Val, key, key_order,
-std_allocate, NULL, 0); insert_rand_vals(&src); static Handle_adaptive_map dst =
-handle_adaptive_map_initialize(NULL, struct Val, key, key_order, std_allocate,
-NULL, 0); CCC_Result res = handle_adaptive_map_copy(&dst, &src, std_allocate);
-```
-
-The above allows dst to have a capacity less than that of the src as long as
-copy has been provided an allocation function to resize dst. Note that this
-would still work if copying to a destination that the user wants as a fixed
-size map.
+The above requires destination capacity be greater than or equal to source
+capacity. Here is memory management handed over to the copy function.
 
 ```
 #define HANDLE_ADAPTIVE_MAP_USING_NAMESPACE_CCC
@@ -250,24 +233,46 @@ struct Val
     int key;
     int val;
 };
-static Handle_adaptive_map src
+static Handle_adaptive_map source
     = handle_adaptive_map_initialize(NULL, struct Val, key, key_order,
-std_allocate, NULL, 0); insert_rand_vals(&src); static Handle_adaptive_map dst =
-handle_adaptive_map_initialize(NULL, struct Val, key, key_order, NULL, NULL, 0);
-CCC_Result res = handle_adaptive_map_copy(&dst, &src, std_allocate);
+std_allocate, NULL, 0); insert_rand_vals(&source); static Handle_adaptive_map
+destination = handle_adaptive_map_initialize(NULL, struct Val, key, key_order,
+std_allocate, NULL, 0); CCC_Result res = handle_adaptive_map_copy(&destination,
+&source, std_allocate);
 ```
 
-The above sets up dst with fixed size while src is a dynamic map. Because an
-allocation function is provided, the dst is resized once for the copy and
-retains its fixed size after the copy is complete. This would require the user
-to manually free the underlying Buffer at dst eventually if this method is used.
-Usually it is better to allocate the memory explicitly before the copy if
-copying between maps without allocation permission.
+The above allows destination to have a capacity less than that of the source as
+long as copy has been provided an allocation function to resize destination.
+Note that this would still work if copying to a destination that the user wants
+as a fixed size map.
+
+```
+#define HANDLE_ADAPTIVE_MAP_USING_NAMESPACE_CCC
+struct Val
+{
+    int key;
+    int val;
+};
+static Handle_adaptive_map source
+    = handle_adaptive_map_initialize(NULL, struct Val, key, key_order,
+std_allocate, NULL, 0); insert_rand_vals(&source); static Handle_adaptive_map
+destination = handle_adaptive_map_initialize(NULL, struct Val, key, key_order,
+NULL, NULL, 0); CCC_Result res = handle_adaptive_map_copy(&destination, &source,
+std_allocate);
+```
+
+The above sets up destination with fixed size while source is a dynamic map.
+Because an allocation function is provided, the destination is resized once for
+the copy and retains its fixed size after the copy is complete. This would
+require the user to manually free the underlying Buffer at destination
+eventually if this method is used. Usually it is better to allocate the memory
+explicitly before the copy if copying between maps without allocation
+permission.
 
 These options allow users to stay consistent across containers with their
 memory management strategies. */
-CCC_Result CCC_handle_adaptive_map_copy(CCC_Handle_adaptive_map *dst,
-                                        CCC_Handle_adaptive_map const *src,
+CCC_Result CCC_handle_adaptive_map_copy(CCC_Handle_adaptive_map *destination,
+                                        CCC_Handle_adaptive_map const *source,
                                         CCC_Allocator *allocate);
 
 /** @brief Reserves space for at least to_add more elements.

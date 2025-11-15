@@ -13,7 +13,7 @@ option(BUILD_SHARED_LIBS "Building ccc as a shared library is available, but OFF
 # Required to help clarify and cleanup install in ccc/ and cmake/ cmake files.
 set(namespace "ccc")
 
-# For releases we only produce this and the src. No test or sample bloat.
+# For releases we only produce this and the source. No test or sample bloat.
 include_directories("${PROJECT_SOURCE_DIR}/${PROJECT_NAME}")
 add_subdirectory("${PROJECT_SOURCE_DIR}/${PROJECT_NAME}")
 

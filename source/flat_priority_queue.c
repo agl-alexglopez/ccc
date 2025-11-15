@@ -295,48 +295,49 @@ CCC_flat_priority_queue_reserve(
 }
 
 CCC_Result
-CCC_flat_priority_queue_copy(CCC_Flat_priority_queue *const dst,
-                             CCC_Flat_priority_queue const *const src,
+CCC_flat_priority_queue_copy(CCC_Flat_priority_queue *const destination,
+                             CCC_Flat_priority_queue const *const source,
                              CCC_Allocator *const fn)
 {
-    if (!dst || !src || src == dst
-        || (dst->buf.capacity < src->buf.capacity && !fn))
+    if (!destination || !source || source == destination
+        || (destination->buf.capacity < source->buf.capacity && !fn))
     {
         return CCC_RESULT_ARGUMENT_ERROR;
     }
     /* Copy everything so we don't worry about staying in sync with future
        changes to buf container. But we have to give back original destination
        memory in case it has already been allocated. Alloc will remain the
-       same as in dst initialization because that controls permission. */
-    void *const dst_mem = dst->buf.mem;
-    size_t const dst_cap = dst->buf.capacity;
-    CCC_Allocator *const dst_allocate = dst->buf.allocate;
-    *dst = *src;
-    dst->buf.mem = dst_mem;
-    dst->buf.capacity = dst_cap;
-    dst->buf.allocate = dst_allocate;
-    if (!src->buf.count)
+       same as in destination initialization because that controls permission.
+     */
+    void *const destination_mem = destination->buf.mem;
+    size_t const destination_cap = destination->buf.capacity;
+    CCC_Allocator *const destination_allocate = destination->buf.allocate;
+    *destination = *source;
+    destination->buf.mem = destination_mem;
+    destination->buf.capacity = destination_cap;
+    destination->buf.allocate = destination_allocate;
+    if (!source->buf.count)
     {
         return CCC_RESULT_OK;
     }
-    if (dst->buf.capacity < src->buf.capacity)
+    if (destination->buf.capacity < source->buf.capacity)
     {
         CCC_Result const r
-            = CCC_buffer_allocate(&dst->buf, src->buf.capacity, fn);
+            = CCC_buffer_allocate(&destination->buf, source->buf.capacity, fn);
         if (r != CCC_RESULT_OK)
         {
             return r;
         }
-        dst->buf.capacity = src->buf.capacity;
+        destination->buf.capacity = source->buf.capacity;
     }
-    if (!src->buf.mem || !dst->buf.mem)
+    if (!source->buf.mem || !destination->buf.mem)
     {
         return CCC_RESULT_ARGUMENT_ERROR;
     }
     /* It is ok to only copy count elements because we know that all elements
        in a binary heap are contiguous from [0, C), where C is count. */
-    (void)memcpy(dst->buf.mem, src->buf.mem,
-                 src->buf.count * src->buf.sizeof_type);
+    (void)memcpy(destination->buf.mem, source->buf.mem,
+                 source->buf.count * source->buf.sizeof_type);
     return CCC_RESULT_OK;
 }
 

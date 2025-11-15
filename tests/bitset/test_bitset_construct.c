@@ -20,86 +20,90 @@ check_static_begin(bitset_test_construct)
 
 check_static_begin(bitset_test_copy_no_allocate)
 {
-    CCC_Bitset src
+    CCC_Bitset source
         = CCC_bitset_initialize(CCC_bitset_blocks(512), NULL, NULL, 512, 0);
-    check(CCC_bitset_capacity(&src).count, 512);
-    check(CCC_bitset_count(&src).count, 0);
+    check(CCC_bitset_capacity(&source).count, 512);
+    check(CCC_bitset_count(&source).count, 0);
     CCC_Result push_status = CCC_RESULT_OK;
     for (size_t i = 0; push_status == CCC_RESULT_OK; ++i)
     {
         if (i % 2)
         {
-            push_status = CCC_bitset_push_back(&src, CCC_TRUE);
+            push_status = CCC_bitset_push_back(&source, CCC_TRUE);
         }
         else
         {
-            push_status = CCC_bitset_push_back(&src, CCC_FALSE);
+            push_status = CCC_bitset_push_back(&source, CCC_FALSE);
         }
     }
     check(push_status, CCC_RESULT_NO_ALLOCATION_FUNCTION);
-    CCC_Bitset dst
+    CCC_Bitset destination
         = CCC_bitset_initialize(CCC_bitset_blocks(513), NULL, NULL, 513, 0);
-    CCC_Result r = CCC_bitset_copy(&dst, &src, NULL);
+    CCC_Result r = CCC_bitset_copy(&destination, &source, NULL);
     check(r, CCC_RESULT_OK);
-    check(CCC_bitset_popcount(&src).count, CCC_bitset_popcount(&dst).count);
-    check(CCC_bitset_count(&src).count, CCC_bitset_count(&dst).count);
-    while (!CCC_bitset_empty(&src) && !CCC_bitset_empty(&dst))
+    check(CCC_bitset_popcount(&source).count,
+          CCC_bitset_popcount(&destination).count);
+    check(CCC_bitset_count(&source).count,
+          CCC_bitset_count(&destination).count);
+    while (!CCC_bitset_empty(&source) && !CCC_bitset_empty(&destination))
     {
-        CCC_Tribool const src_msb = CCC_bitset_pop_back(&src);
-        CCC_Tribool const dst_msb = CCC_bitset_pop_back(&dst);
-        if (CCC_bitset_count(&src).count % 2)
+        CCC_Tribool const source_msb = CCC_bitset_pop_back(&source);
+        CCC_Tribool const destination_msb = CCC_bitset_pop_back(&destination);
+        if (CCC_bitset_count(&source).count % 2)
         {
-            check(src_msb, CCC_TRUE);
-            check(src_msb, dst_msb);
+            check(source_msb, CCC_TRUE);
+            check(source_msb, destination_msb);
         }
         else
         {
-            check(src_msb, CCC_FALSE);
-            check(src_msb, dst_msb);
+            check(source_msb, CCC_FALSE);
+            check(source_msb, destination_msb);
         }
     }
-    check(CCC_bitset_empty(&src), CCC_bitset_empty(&dst));
+    check(CCC_bitset_empty(&source), CCC_bitset_empty(&destination));
     check_end();
 }
 
 check_static_begin(bitset_test_copy_allocate)
 {
-    CCC_Bitset src = CCC_bitset_initialize(NULL, std_allocate, NULL, 0);
+    CCC_Bitset source = CCC_bitset_initialize(NULL, std_allocate, NULL, 0);
     for (size_t i = 0; i < 512; ++i)
     {
         if (i % 2)
         {
-            check(CCC_bitset_push_back(&src, CCC_TRUE), CCC_RESULT_OK);
+            check(CCC_bitset_push_back(&source, CCC_TRUE), CCC_RESULT_OK);
         }
         else
         {
-            check(CCC_bitset_push_back(&src, CCC_FALSE), CCC_RESULT_OK);
+            check(CCC_bitset_push_back(&source, CCC_FALSE), CCC_RESULT_OK);
         }
     }
-    CCC_Bitset dst = CCC_bitset_initialize(NULL, std_allocate, NULL, 0);
-    CCC_Result r = CCC_bitset_copy(&dst, &src, std_allocate);
+    CCC_Bitset destination = CCC_bitset_initialize(NULL, std_allocate, NULL, 0);
+    CCC_Result r = CCC_bitset_copy(&destination, &source, std_allocate);
     check(r, CCC_RESULT_OK);
-    check(CCC_bitset_popcount(&src).count, CCC_bitset_popcount(&dst).count);
-    check(CCC_bitset_count(&src).count, CCC_bitset_count(&dst).count);
-    while (!CCC_bitset_empty(&src) && !CCC_bitset_empty(&dst))
+    check(CCC_bitset_popcount(&source).count,
+          CCC_bitset_popcount(&destination).count);
+    check(CCC_bitset_count(&source).count,
+          CCC_bitset_count(&destination).count);
+    while (!CCC_bitset_empty(&source) && !CCC_bitset_empty(&destination))
     {
-        CCC_Tribool const src_msb = CCC_bitset_pop_back(&src);
-        CCC_Tribool const dst_msb = CCC_bitset_pop_back(&dst);
-        if (CCC_bitset_count(&src).count % 2)
+        CCC_Tribool const source_msb = CCC_bitset_pop_back(&source);
+        CCC_Tribool const destination_msb = CCC_bitset_pop_back(&destination);
+        if (CCC_bitset_count(&source).count % 2)
         {
-            check(src_msb, CCC_TRUE);
-            check(src_msb, dst_msb);
+            check(source_msb, CCC_TRUE);
+            check(source_msb, destination_msb);
         }
         else
         {
-            check(src_msb, CCC_FALSE);
-            check(src_msb, dst_msb);
+            check(source_msb, CCC_FALSE);
+            check(source_msb, destination_msb);
         }
     }
-    check(CCC_bitset_empty(&src), CCC_bitset_empty(&dst));
+    check(CCC_bitset_empty(&source), CCC_bitset_empty(&destination));
     check_end({
-        (void)CCC_bitset_clear_and_free(&src);
-        (void)CCC_bitset_clear_and_free(&dst);
+        (void)CCC_bitset_clear_and_free(&source);
+        (void)CCC_bitset_clear_and_free(&destination);
     });
 }
 

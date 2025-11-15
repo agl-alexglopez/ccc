@@ -191,8 +191,9 @@ union CCC_Flat_hash_map_entry_wrap
 };
 
 /** While the private interface functions are not strictly necessary containing
-the logic of interacting with the map to the src implementation makes reasoning
-and debugging the macros easier. It also cuts down on repeated logic. */
+the logic of interacting with the map to the source implementation makes
+reasoning and debugging the macros easier. It also cuts down on repeated logic.
+*/
 /*======================     Private Interface      =========================*/
 
 struct CCC_Flat_hash_map_entry

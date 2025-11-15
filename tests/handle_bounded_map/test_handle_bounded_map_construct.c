@@ -22,99 +22,100 @@ check_static_begin(handle_bounded_map_test_empty)
 
 check_static_begin(handle_bounded_map_test_copy_no_allocate)
 {
-    Handle_bounded_map src
+    Handle_bounded_map source
         = handle_bounded_map_initialize(&(small_fixed_map){}, struct Val, id,
                                         id_order, NULL, NULL, SMALL_FIXED_CAP);
-    Handle_bounded_map dst
+    Handle_bounded_map destination
         = handle_bounded_map_initialize(&(small_fixed_map){}, struct Val, id,
                                         id_order, NULL, NULL, SMALL_FIXED_CAP);
-    (void)swap_handle(&src, &(struct Val){.id = 0});
-    (void)swap_handle(&src, &(struct Val){.id = 1, .val = 1});
-    (void)swap_handle(&src, &(struct Val){.id = 2, .val = 2});
-    check(count(&src).count, 3);
-    check(is_empty(&dst), true);
-    CCC_Result res = handle_bounded_map_copy(&dst, &src, NULL);
+    (void)swap_handle(&source, &(struct Val){.id = 0});
+    (void)swap_handle(&source, &(struct Val){.id = 1, .val = 1});
+    (void)swap_handle(&source, &(struct Val){.id = 2, .val = 2});
+    check(count(&source).count, 3);
+    check(is_empty(&destination), true);
+    CCC_Result res = handle_bounded_map_copy(&destination, &source, NULL);
     check(res, CCC_RESULT_OK);
-    check(count(&dst).count, count(&src).count);
+    check(count(&destination).count, count(&source).count);
     for (int i = 0; i < 3; ++i)
     {
-        struct Val src_v = {.id = i};
-        struct Val dst_v = {.id = i};
-        CCC_Handle src_e = CCC_remove(&src, &src_v);
-        CCC_Handle dst_e = CCC_remove(&dst, &dst_v);
-        check(occupied(&src_e), occupied(&dst_e));
-        check(src_v.id, dst_v.id);
-        check(src_v.val, dst_v.val);
+        struct Val source_v = {.id = i};
+        struct Val destination_v = {.id = i};
+        CCC_Handle source_e = CCC_remove(&source, &source_v);
+        CCC_Handle destination_e = CCC_remove(&destination, &destination_v);
+        check(occupied(&source_e), occupied(&destination_e));
+        check(source_v.id, destination_v.id);
+        check(source_v.val, destination_v.val);
     }
-    check(is_empty(&src), is_empty(&dst));
-    check(is_empty(&dst), true);
+    check(is_empty(&source), is_empty(&destination));
+    check(is_empty(&destination), true);
     check_end();
 }
 
 check_static_begin(handle_bounded_map_test_copy_no_allocate_fail)
 {
-    Handle_bounded_map src = handle_bounded_map_initialize(
+    Handle_bounded_map source = handle_bounded_map_initialize(
         &(standard_fixed_map){}, struct Val, id, id_order, NULL, NULL,
         STANDARD_FIXED_CAP);
-    Handle_bounded_map dst
+    Handle_bounded_map destination
         = handle_bounded_map_initialize(&(small_fixed_map){}, struct Val, id,
                                         id_order, NULL, NULL, SMALL_FIXED_CAP);
-    (void)swap_handle(&src, &(struct Val){.id = 0});
-    (void)swap_handle(&src, &(struct Val){.id = 1, .val = 1});
-    (void)swap_handle(&src, &(struct Val){.id = 2, .val = 2});
-    check(count(&src).count, 3);
-    check(is_empty(&dst), true);
-    CCC_Result res = handle_bounded_map_copy(&dst, &src, NULL);
+    (void)swap_handle(&source, &(struct Val){.id = 0});
+    (void)swap_handle(&source, &(struct Val){.id = 1, .val = 1});
+    (void)swap_handle(&source, &(struct Val){.id = 2, .val = 2});
+    check(count(&source).count, 3);
+    check(is_empty(&destination), true);
+    CCC_Result res = handle_bounded_map_copy(&destination, &source, NULL);
     check(res != CCC_RESULT_OK, true);
     check_end();
 }
 
 check_static_begin(handle_bounded_map_test_copy_allocate)
 {
-    Handle_bounded_map src = handle_bounded_map_initialize(
+    Handle_bounded_map source = handle_bounded_map_initialize(
         NULL, struct Val, id, id_order, std_allocate, NULL, 0);
-    Handle_bounded_map dst = handle_bounded_map_initialize(
+    Handle_bounded_map destination = handle_bounded_map_initialize(
         NULL, struct Val, id, id_order, std_allocate, NULL, 0);
-    (void)swap_handle(&src, &(struct Val){.id = 0});
-    (void)swap_handle(&src, &(struct Val){.id = 1, .val = 1});
-    (void)swap_handle(&src, &(struct Val){.id = 2, .val = 2});
-    check(count(&src).count, 3);
-    check(is_empty(&dst), true);
-    CCC_Result res = handle_bounded_map_copy(&dst, &src, std_allocate);
+    (void)swap_handle(&source, &(struct Val){.id = 0});
+    (void)swap_handle(&source, &(struct Val){.id = 1, .val = 1});
+    (void)swap_handle(&source, &(struct Val){.id = 2, .val = 2});
+    check(count(&source).count, 3);
+    check(is_empty(&destination), true);
+    CCC_Result res
+        = handle_bounded_map_copy(&destination, &source, std_allocate);
     check(res, CCC_RESULT_OK);
-    check(count(&dst).count, count(&src).count);
+    check(count(&destination).count, count(&source).count);
     for (int i = 0; i < 3; ++i)
     {
-        struct Val src_v = {.id = i};
-        struct Val dst_v = {.id = i};
-        CCC_Handle src_e = CCC_remove(&src, &src_v);
-        CCC_Handle dst_e = CCC_remove(&dst, &dst_v);
-        check(occupied(&src_e), occupied(&dst_e));
-        check(src_v.id, dst_v.id);
-        check(src_v.val, dst_v.val);
+        struct Val source_v = {.id = i};
+        struct Val destination_v = {.id = i};
+        CCC_Handle source_e = CCC_remove(&source, &source_v);
+        CCC_Handle destination_e = CCC_remove(&destination, &destination_v);
+        check(occupied(&source_e), occupied(&destination_e));
+        check(source_v.id, destination_v.id);
+        check(source_v.val, destination_v.val);
     }
-    check(is_empty(&src), is_empty(&dst));
-    check(is_empty(&dst), true);
+    check(is_empty(&source), is_empty(&destination));
+    check(is_empty(&destination), true);
     check_end({
-        (void)handle_bounded_map_clear_and_free(&src, NULL);
-        (void)handle_bounded_map_clear_and_free(&dst, NULL);
+        (void)handle_bounded_map_clear_and_free(&source, NULL);
+        (void)handle_bounded_map_clear_and_free(&destination, NULL);
     });
 }
 
 check_static_begin(handle_bounded_map_test_copy_allocate_fail)
 {
-    Handle_bounded_map src = handle_bounded_map_initialize(
+    Handle_bounded_map source = handle_bounded_map_initialize(
         NULL, struct Val, id, id_order, std_allocate, NULL, 0);
-    Handle_bounded_map dst = handle_bounded_map_initialize(
+    Handle_bounded_map destination = handle_bounded_map_initialize(
         NULL, struct Val, id, id_order, std_allocate, NULL, 0);
-    (void)swap_handle(&src, &(struct Val){.id = 0});
-    (void)swap_handle(&src, &(struct Val){.id = 1, .val = 1});
-    (void)swap_handle(&src, &(struct Val){.id = 2, .val = 2});
-    check(count(&src).count, 3);
-    check(is_empty(&dst), true);
-    CCC_Result res = handle_bounded_map_copy(&dst, &src, NULL);
+    (void)swap_handle(&source, &(struct Val){.id = 0});
+    (void)swap_handle(&source, &(struct Val){.id = 1, .val = 1});
+    (void)swap_handle(&source, &(struct Val){.id = 2, .val = 2});
+    check(count(&source).count, 3);
+    check(is_empty(&destination), true);
+    CCC_Result res = handle_bounded_map_copy(&destination, &source, NULL);
     check(res != CCC_RESULT_OK, true);
-    check_end({ (void)handle_bounded_map_clear_and_free(&src, NULL); });
+    check_end({ (void)handle_bounded_map_clear_and_free(&source, NULL); });
 }
 
 int

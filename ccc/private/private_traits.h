@@ -735,16 +735,17 @@ limitations under the License.
 
 /*===================         Memory Management       =======================*/
 
-#define CCC_private_copy(dst_container_pointer, src_container_pointer,         \
-                         allocate_pointer)                                     \
-    _Generic((dst_container_pointer),                                          \
+#define CCC_private_copy(destination_container_pointer,                        \
+                         source_container_pointer, allocate_pointer)           \
+    _Generic((destination_container_pointer),                                  \
         CCC_Bitset *: CCC_bitset_copy,                                         \
         CCC_Flat_hash_map *: CCC_flat_hash_map_copy,                           \
         CCC_Handle_adaptive_map *: CCC_handle_adaptive_map_copy,               \
         CCC_Flat_priority_queue *: CCC_flat_priority_queue_copy,               \
         CCC_Flat_double_ended_queue *: CCC_flat_double_ended_queue_copy,       \
         CCC_Handle_bounded_map *: CCC_handle_bounded_map_copy)(                \
-        (dst_container_pointer), (src_container_pointer), (allocate_pointer))
+        (destination_container_pointer), (source_container_pointer),           \
+        (allocate_pointer))
 
 #define CCC_private_reserve(container_pointer, n_to_add, allocate_pointer)     \
     _Generic((container_pointer),                                              \

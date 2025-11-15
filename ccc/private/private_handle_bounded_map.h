@@ -13,8 +13,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 @endcond */
-#ifndef PRIVATE_HANDLE_BOUNDED_MAP_H
-#define PRIVATE_HANDLE_BOUNDED_MAP_H
+#ifndef CCC_PRIVATE_HANDLE_BOUNDED_MAP_H
+#define CCC_PRIVATE_HANDLE_BOUNDED_MAP_H
 
 /** @cond */
 #include <limits.h>
@@ -508,4 +508,4 @@ runtime. */
 
 /* NOLINTEND(readability-identifier-naming) */
 
-#endif /* PRIVATE_HANDLE_BOUNDED_MAP_H */
+#endif /* CCC_PRIVATE_HANDLE_BOUNDED_MAP_H */

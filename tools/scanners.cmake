@@ -1,9 +1,9 @@
 file (GLOB PROJ_C_FILES 
   ${CMAKE_SOURCE_DIR}/ccc/*.c 
   ${CMAKE_SOURCE_DIR}/ccc/*.h 
-  ${CMAKE_SOURCE_DIR}/ccc/impl/*.h 
-  ${CMAKE_SOURCE_DIR}/src/*.c 
-  ${CMAKE_SOURCE_DIR}/src/*.h 
+  ${CMAKE_SOURCE_DIR}/ccc/private/*.h 
+  ${CMAKE_SOURCE_DIR}/source/*.c 
+  ${CMAKE_SOURCE_DIR}/source/*.h 
   ${CMAKE_SOURCE_DIR}/samples/*.c 
   ${CMAKE_SOURCE_DIR}/samples/*.h 
   ${CMAKE_SOURCE_DIR}/tests/*.c

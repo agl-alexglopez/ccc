@@ -125,16 +125,19 @@ CCC_flat_priority_queue_heapify_initialize(...);).
         mem_pointer, type_name, order_order, order_fn, allocate, context_data, \
         capacity, size)
 
-/** @brief Copy the flat_priority_queue from src to newly initialized dst.
-@param[in] dst the destination that will copy the source flat_priority_queue.
-@param[in] src the source of the flat_priority_queue.
-@param[in] fn the allocation function in case resizing of dst is needed.
+/** @brief Copy the flat_priority_queue from source to newly initialized
+destination.
+@param[in] destination the destination that will copy the source
+flat_priority_queue.
+@param[in] source the source of the flat_priority_queue.
+@param[in] fn the allocation function in case resizing of destination is needed.
 @return the result of the copy operation. If the destination capacity is less
 than the source capacity and no allocation function is provided an input error
-is returned. If resizing is required and resizing of dst fails a memory error
-is returned.
-@note dst must have capacity greater than or equal to src. If dst capacity is
-less than src, an allocation function must be provided with the fn argument.
+is returned. If resizing is required and resizing of destination fails a memory
+error is returned.
+@note destination must have capacity greater than or equal to source. If
+destination capacity is less than source, an allocation function must be
+provided with the fn argument.
 
 Note that there are two ways to copy data from source to destination: provide
 sufficient memory and pass NULL as fn, or allow the copy function to take care
@@ -144,51 +147,53 @@ Manual memory management with no allocation function provided.
 
 ```
 #define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
-Flat_priority_queue src
+Flat_priority_queue source
     = flat_priority_queue_initialize((int[10]){}, CCC_ORDER_LESSER, NULL,
-int_order, NULL, 10); push_rand_ints(&src); Flat_priority_queue dst =
+int_order, NULL, 10); push_rand_ints(&source); Flat_priority_queue destination =
 flat_priority_queue_initialize((int[11]){}, CCC_ORDER_LESSER, NULL, int_order,
-NULL, 11); CCC_Result res = flat_priority_queue_copy(&dst, &src, NULL);
+NULL, 11); CCC_Result res = flat_priority_queue_copy(&destination, &source,
+NULL);
 ```
 
-The above requires dst capacity be greater than or equal to src capacity. Here
-is memory management handed over to the copy function.
-
-```
-#define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
-Flat_priority_queue src
-    = flat_priority_queue_initialize((int *)NULL, CCC_ORDER_LESSER,
-std_allocate, int_order, NULL, 0); push_rand_ints(&src); Flat_priority_queue dst
-= flat_priority_queue_initialize((int *)NULL, CCC_ORDER_LESSER, std_allocate,
-int_order, NULL, 0); CCC_Result res = flat_priority_queue_copy(&dst, &src,
-std_allocate);
-```
-
-The above allows dst to have a capacity less than that of the src as long as
-copy has been provided an allocation function to resize dst. Note that this
-would still work if copying to a destination that the user wants as a fixed
-size flat_priority_queue.
+The above requires destination capacity be greater than or equal to source
+capacity. Here is memory management handed over to the copy function.
 
 ```
 #define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
-Flat_priority_queue src
+Flat_priority_queue source
     = flat_priority_queue_initialize((int *)NULL, CCC_ORDER_LESSER,
-std_allocate, int_order, NULL, 0); push_rand_ints(&src); Flat_priority_queue dst
-= flat_priority_queue_initialize((int *)NULL, CCC_ORDER_LESSER, NULL, int_order,
-NULL, 0); CCC_Result res = flat_priority_queue_copy(&dst, &src, std_allocate);
+std_allocate, int_order, NULL, 0); push_rand_ints(&source); Flat_priority_queue
+destination = flat_priority_queue_initialize((int *)NULL, CCC_ORDER_LESSER,
+std_allocate, int_order, NULL, 0); CCC_Result res =
+flat_priority_queue_copy(&destination, &source, std_allocate);
 ```
 
-The above sets up dst with fixed size while src is a dynamic
-flat_priority_queue. Because an allocation function is provided, the dst is
-resized once for the copy and retains its fixed size after the copy is complete.
-This would require the user to manually free the underlying Buffer at dst
-eventually if this method is used. Usually it is better to allocate the memory
-explicitly before the copy if copying between ring buffers.
+The above allows destination to have a capacity less than that of the source as
+long as copy has been provided an allocation function to resize destination.
+Note that this would still work if copying to a destination that the user wants
+as a fixed size flat_priority_queue.
+
+```
+#define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
+Flat_priority_queue source
+    = flat_priority_queue_initialize((int *)NULL, CCC_ORDER_LESSER,
+std_allocate, int_order, NULL, 0); push_rand_ints(&source); Flat_priority_queue
+destination = flat_priority_queue_initialize((int *)NULL, CCC_ORDER_LESSER,
+NULL, int_order, NULL, 0); CCC_Result res =
+flat_priority_queue_copy(&destination, &source, std_allocate);
+```
+
+The above sets up destination with fixed size while source is a dynamic
+flat_priority_queue. Because an allocation function is provided, the destination
+is resized once for the copy and retains its fixed size after the copy is
+complete. This would require the user to manually free the underlying Buffer at
+destination eventually if this method is used. Usually it is better to allocate
+the memory explicitly before the copy if copying between ring buffers.
 
 These options allow users to stay consistent across containers with their
 memory management strategies. */
-CCC_Result CCC_flat_priority_queue_copy(CCC_Flat_priority_queue *dst,
-                                        CCC_Flat_priority_queue const *src,
+CCC_Result CCC_flat_priority_queue_copy(CCC_Flat_priority_queue *destination,
+                                        CCC_Flat_priority_queue const *source,
                                         CCC_Allocator *fn);
 
 /** @brief Reserves space for at least to_add more elements.

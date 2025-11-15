@@ -6,10 +6,11 @@
 
 #define TRAITS_USING_NAMESPACE_CCC
 
-#include "adaptive_map.h"
 #include "adaptive_map_utility.h"
+#include "ccc/adaptive_map.h"
+#include "ccc/traits.h"
+#include "ccc/types.h"
 #include "checkers.h"
-#include "traits.h"
 
 check_static_begin(adaptive_map_test_prime_shuffle)
 {
@@ -94,7 +95,7 @@ check_static_begin(adaptive_map_test_weak_srand)
     }
     for (int i = 0; i < num_nodes; ++i)
     {
-        CCC_Entry entry = remove(&s, &vals[i].elem);
+        CCC_Entry entry = CCC_remove(&s, &vals[i].elem);
         check(occupied(&entry) || repeats[i], true);
         check(validate(&s), true);
     }

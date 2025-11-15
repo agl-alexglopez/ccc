@@ -259,17 +259,18 @@ CCC_buffer_swap(CCC_Buffer *const buf, void *const tmp, size_t const i,
 }
 
 void *
-CCC_buffer_move(CCC_Buffer *const buf, size_t const dst, size_t const src)
+CCC_buffer_move(CCC_Buffer *const buf, size_t const destination,
+                size_t const source)
 {
-    if (!buf || dst >= buf->capacity || src >= buf->capacity)
+    if (!buf || destination >= buf->capacity || source >= buf->capacity)
     {
         return NULL;
     }
-    if (dst == src)
+    if (destination == source)
     {
-        return at(buf, dst);
+        return at(buf, destination);
     }
-    return memcpy(at(buf, dst), at(buf, src), buf->sizeof_type);
+    return memcpy(at(buf, destination), at(buf, source), buf->sizeof_type);
 }
 
 CCC_Result
@@ -573,42 +574,46 @@ CCC_buffer_capacity_bytes(CCC_Buffer const *buf)
 }
 
 CCC_Result
-CCC_buffer_copy(CCC_Buffer *const dst, CCC_Buffer const *const src,
+CCC_buffer_copy(CCC_Buffer *const destination, CCC_Buffer const *const source,
                 CCC_Allocator *const fn)
 {
-    if (!dst || !src || src == dst || (dst->capacity < src->capacity && !fn))
+    if (!destination || !source || source == destination
+        || (destination->capacity < source->capacity && !fn))
     {
         return CCC_RESULT_ARGUMENT_ERROR;
     }
     /* Copy everything so we don't worry about staying in sync with future
        changes to buf container. But we have to give back original destination
        memory in case it has already been allocated. Alloc will remain the
-       same as in dst initialization because that controls permission. */
-    void *const dst_mem = dst->mem;
-    size_t const dst_cap = dst->capacity;
-    CCC_Allocator *const dst_allocate = dst->allocate;
-    *dst = *src;
-    dst->mem = dst_mem;
-    dst->capacity = dst_cap;
-    dst->allocate = dst_allocate;
-    if (!src->capacity)
+       same as in destination initialization because that controls permission.
+     */
+    void *const destination_mem = destination->mem;
+    size_t const destination_cap = destination->capacity;
+    CCC_Allocator *const destination_allocate = destination->allocate;
+    *destination = *source;
+    destination->mem = destination_mem;
+    destination->capacity = destination_cap;
+    destination->allocate = destination_allocate;
+    if (!source->capacity)
     {
         return CCC_RESULT_OK;
     }
-    if (dst->capacity < src->capacity)
+    if (destination->capacity < source->capacity)
     {
-        CCC_Result const r = CCC_buffer_allocate(dst, src->capacity, fn);
+        CCC_Result const r
+            = CCC_buffer_allocate(destination, source->capacity, fn);
         if (r != CCC_RESULT_OK)
         {
             return r;
         }
-        dst->capacity = src->capacity;
+        destination->capacity = source->capacity;
     }
-    if (!src->mem || !dst->mem)
+    if (!source->mem || !destination->mem)
     {
         return CCC_RESULT_ARGUMENT_ERROR;
     }
-    (void)memcpy(dst->mem, src->mem, src->capacity * src->sizeof_type);
+    (void)memcpy(destination->mem, source->mem,
+                 source->capacity * source->sizeof_type);
     return CCC_RESULT_OK;
 }
 

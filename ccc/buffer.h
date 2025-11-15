@@ -217,16 +217,17 @@ case see the CCC_buffer_clear_and_free_reserve function. */
 [[nodiscard]] CCC_Result CCC_buffer_reserve(CCC_Buffer *buf, size_t to_add,
                                             CCC_Allocator *fn);
 
-/** @brief Copy the buf from src to newly initialized dst.
-@param[in] dst the destination that will copy the source buf.
-@param[in] src the source of the buf.
-@param[in] fn the allocation function in case resizing of dst is needed.
+/** @brief Copy the buf from source to newly initialized destination.
+@param[in] destination the destination that will copy the source buf.
+@param[in] source the source of the buf.
+@param[in] fn the allocation function in case resizing of destination is needed.
 @return the result of the copy operation. If the destination capacity is less
 than the source capacity and no allocation function is provided an input error
-is returned. If resizing is required and resizing of dst fails a memory error
-is returned.
-@note dst must have capacity greater than or equal to src. If dst capacity is
-less than src, an allocation function must be provided with the fn argument.
+is returned. If resizing is required and resizing of destination fails a memory
+error is returned.
+@note destination must have capacity greater than or equal to source. If
+destination capacity is less than source, an allocation function must be
+provided with the fn argument.
 
 Note that there are two ways to copy data from source to destination: provide
 sufficient memory and pass NULL as fn, or allow the copy function to take care
@@ -236,46 +237,48 @@ Manual memory management with no allocation function provided.
 
 ```
 #define BUFFER_USING_NAMESPACE_CCC
-Buffer src = buffer_initialize((int[10]){}, int, NULL, NULL, 10);
-int *new_mem = malloc(sizeof(int) * buffer_capacity(&src).count);
-Buffer dst
-    = buffer_initialize(new_mem, int, NULL, NULL, buffer_capacity(&src).count);
-CCC_Result res = buffer_copy(&dst, &src, NULL);
+Buffer source = buffer_initialize((int[10]){}, int, NULL, NULL, 10);
+int *new_mem = malloc(sizeof(int) * buffer_capacity(&source).count);
+Buffer destination
+    = buffer_initialize(new_mem, int, NULL, NULL,
+buffer_capacity(&source).count); CCC_Result res = buffer_copy(&destination,
+&source, NULL);
 ```
 
-The above requires dst capacity be greater than or equal to src capacity. Here
-is memory management handed over to the copy function.
-
-```
-#define BUFFER_USING_NAMESPACE_CCC
-Buffer src = buffer_initialize(NULL, int, std_allocate, NULL, 0);
-(void)CCC_buffer_push_back_range(&src, 5, (int[5]){0,1,2,3,4});
-Buffer dst = buffer_initialize(NULL, int, std_allocate, NULL, 0);
-CCC_Result res = buffer_copy(&dst, &src, std_allocate);
-```
-
-The above allows dst to have a capacity less than that of the src as long as
-copy has been provided an allocation function to resize dst. Note that this
-would still work if copying to a destination that the user wants as a fixed
-size buf (ring buffer).
+The above requires destination capacity be greater than or equal to source
+capacity. Here is memory management handed over to the copy function.
 
 ```
 #define BUFFER_USING_NAMESPACE_CCC
-Buffer src = buffer_initialize(NULL, int, std_allocate, NULL, 0);
-(void)CCC_buffer_push_back_range(&src, 5, (int[5]){0,1,2,3,4});
-Buffer dst = buffer_initialize(NULL, int, NULL, NULL, 0);
-CCC_Result res = buffer_copy(&dst, &src, std_allocate);
+Buffer source = buffer_initialize(NULL, int, std_allocate, NULL, 0);
+(void)CCC_buffer_push_back_range(&source, 5, (int[5]){0,1,2,3,4});
+Buffer destination = buffer_initialize(NULL, int, std_allocate, NULL, 0);
+CCC_Result res = buffer_copy(&destination, &source, std_allocate);
 ```
 
-Because an allocation function is provided, the dst is resized once for the copy
-and retains its fixed size after the copy is complete. This would require the
-user to manually free the underlying Buffer at dst eventually if this method is
-used. Usually it is better to allocate the memory explicitly before the copy if
-copying between ring buffers.
+The above allows destination to have a capacity less than that of the source as
+long as copy has been provided an allocation function to resize destination.
+Note that this would still work if copying to a destination that the user wants
+as a fixed size buf (ring buffer).
+
+```
+#define BUFFER_USING_NAMESPACE_CCC
+Buffer source = buffer_initialize(NULL, int, std_allocate, NULL, 0);
+(void)CCC_buffer_push_back_range(&source, 5, (int[5]){0,1,2,3,4});
+Buffer destination = buffer_initialize(NULL, int, NULL, NULL, 0);
+CCC_Result res = buffer_copy(&destination, &source, std_allocate);
+```
+
+Because an allocation function is provided, the destination is resized once for
+the copy and retains its fixed size after the copy is complete. This would
+require the user to manually free the underlying Buffer at destination
+eventually if this method is used. Usually it is better to allocate the memory
+explicitly before the copy if copying between ring buffers.
 
 These options allow users to stay consistent across containers with their
 memory management strategies. */
-[[nodiscard]] CCC_Result CCC_buffer_copy(CCC_Buffer *dst, CCC_Buffer const *src,
+[[nodiscard]] CCC_Result CCC_buffer_copy(CCC_Buffer *destination,
+                                         CCC_Buffer const *source,
                                          CCC_Allocator *fn);
 
 /**@}*/
@@ -455,17 +458,17 @@ or is empty. */
 #define CCC_buffer_front_as(buffer_pointer, type_name)                         \
     ((type_name *)CCC_buffer_front(buffer_pointer))
 
-/** @brief Move data at index src to dst according to capacity.
+/** @brief Move data at index source to destination according to capacity.
 @param[in] buf the pointer to the buffer.
-@param[in] dst the index of destination within bounds of capacity.
-@param[in] src the index of source within bounds of capacity.
-@return a pointer to the slot at dst or NULL if bad input is provided.
+@param[in] destination the index of destination within bounds of capacity.
+@param[in] source the index of source within bounds of capacity.
+@return a pointer to the slot at destination or NULL if bad input is provided.
 @note this function does NOT modify the size of the container.
 
 Note that destination and source are only required to be valid within bounds
 of capacity of the buffer. It is up to the user to ensure destination and
 source are within the size bounds of the buffer, if required. */
-void *CCC_buffer_move(CCC_Buffer *buf, size_t dst, size_t src);
+void *CCC_buffer_move(CCC_Buffer *buf, size_t destination, size_t source);
 
 /** @brief write data to Buffer at slot at index i according to capacity.
 @param[in] buf the pointer to the buffer.

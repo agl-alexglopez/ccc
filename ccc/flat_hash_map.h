@@ -388,16 +388,17 @@ of initialization and reservation. */
         type_name, key_field, hash, compare, allocate, context_data, capacity)
 
 /** @brief Copy the map at source to destination.
-@param[in] dst the initialized destination for the copy of the src map.
-@param[in] src the initialized source of the map.
+@param[in] destination the initialized destination for the copy of the source
+map.
+@param[in] source the initialized source of the map.
 @param[in] allocate the optional allocation function if resizing is needed.
 @return the result of the copy operation. If the destination capacity is less
 than the source capacity and no allocation function is provided an input error
-is returned. If resizing is required and resizing of dst fails a memory error
-is returned.
-@note dst must have capacity greater than or equal to src. If dst capacity is
-less than src, an allocation function must be provided with the allocate
-argument.
+is returned. If resizing is required and resizing of destination fails a memory
+error is returned.
+@note destination must have capacity greater than or equal to source. If
+destination capacity is less than source, an allocation function must be
+provided with the allocate argument.
 
 Note that there are two ways to copy data from source to destination: provide
 sufficient memory and pass NULL as allocate, or allow the copy function to take
@@ -413,7 +414,7 @@ struct Val
     int val;
 };
 flat_hash_map_declare_fixed_map(small_fixed_map, struct Val, 64);
-Flat_hash_map src = flat_hash_map_initialize(
+Flat_hash_map source = flat_hash_map_initialize(
     &(static small_fixed_map){},
     struct Val,
     key,
@@ -423,8 +424,8 @@ Flat_hash_map src = flat_hash_map_initialize(
     NULL,
     CCC_flat_hash_map_fixed_capacity(small_fixed_map)
 );
-insert_rand_vals(&src);
-Flat_hash_map dst = flat_hash_map_initialize(
+insert_rand_vals(&source);
+Flat_hash_map destination = flat_hash_map_initialize(
     &(static small_fixed_map){},
     struct Val,
     key,
@@ -434,47 +435,11 @@ Flat_hash_map dst = flat_hash_map_initialize(
     NULL,
     CCC_flat_hash_map_fixed_capacity(small_fixed_map)
 );
-CCC_Result res = flat_hash_map_copy(&dst, &src, NULL);
+CCC_Result res = flat_hash_map_copy(&destination, &source, NULL);
 ```
 
-The above requires dst capacity be greater than or equal to src capacity. Here
-is memory management handed over to the copy function.
-
-```
-#define FLAT_HASH_MAP_USING_NAMESPACE_CCC
-struct Val
-{
-    int key;
-    int val;
-};
-Flat_hash_map src = flat_hash_map_initialize(
-    NULL,
-    struct Val,
-    key,
-    flat_hash_map_int_to_u64,
-    flat_hash_map_key_order,
-    std_allocate,
-    NULL,
-    0
-);
-insert_rand_vals(&src);
-Flat_hash_map dst = flat_hash_map_initialize(
-    NULL,
-    struct Val,
-    key,
-    flat_hash_map_int_to_u64,
-    flat_hash_map_key_order,
-    std_allocate,
-    NULL,
-    0
-);
-CCC_Result res = flat_hash_map_copy(&dst, &src, std_allocate);
-```
-
-The above allows dst to have a capacity less than that of the src as long as
-copy has been provided an allocation function to resize dst. Note that this
-would still work if copying to a destination that the user wants as a fixed
-size map.
+The above requires destination capacity be greater than or equal to source
+capacity. Here is memory management handed over to the copy function.
 
 ```
 #define FLAT_HASH_MAP_USING_NAMESPACE_CCC
@@ -483,7 +448,7 @@ struct Val
     int key;
     int val;
 };
-Flat_hash_map src = flat_hash_map_initialize(
+Flat_hash_map source = flat_hash_map_initialize(
     NULL,
     struct Val,
     key,
@@ -493,8 +458,44 @@ Flat_hash_map src = flat_hash_map_initialize(
     NULL,
     0
 );
-insert_rand_vals(&src);
-Flat_hash_map dst = flat_hash_map_initialize(
+insert_rand_vals(&source);
+Flat_hash_map destination = flat_hash_map_initialize(
+    NULL,
+    struct Val,
+    key,
+    flat_hash_map_int_to_u64,
+    flat_hash_map_key_order,
+    std_allocate,
+    NULL,
+    0
+);
+CCC_Result res = flat_hash_map_copy(&destination, &source, std_allocate);
+```
+
+The above allows destination to have a capacity less than that of the source as
+long as copy has been provided an allocation function to resize destination.
+Note that this would still work if copying to a destination that the user wants
+as a fixed size map.
+
+```
+#define FLAT_HASH_MAP_USING_NAMESPACE_CCC
+struct Val
+{
+    int key;
+    int val;
+};
+Flat_hash_map source = flat_hash_map_initialize(
+    NULL,
+    struct Val,
+    key,
+    flat_hash_map_int_to_u64,
+    flat_hash_map_key_order,
+    std_allocate,
+    NULL,
+    0
+);
+insert_rand_vals(&source);
+Flat_hash_map destination = flat_hash_map_initialize(
     NULL,
     struct Val,
     key,
@@ -504,20 +505,20 @@ Flat_hash_map dst = flat_hash_map_initialize(
     NULL,
     0
 );
-CCC_Result res = flat_hash_map_copy(&dst, &src, std_allocate);
+CCC_Result res = flat_hash_map_copy(&destination, &source, std_allocate);
 ```
 
-The above sets up dst with fixed size while src is a dynamic map. Because an
-allocation function is provided, the dst is resized once for the copy and
-retains its fixed size after the copy is complete. This would require the user
-to manually free the underlying Buffer at dst eventually if this method is used.
-Usually it is better to allocate the memory with the reserve function if fixed
-size dynamic maps are required.
+The above sets up destination with fixed size while source is a dynamic map.
+Because an allocation function is provided, the destination is resized once for
+the copy and retains its fixed size after the copy is complete. This would
+require the user to manually free the underlying Buffer at destination
+eventually if this method is used. Usually it is better to allocate the memory
+with the reserve function if fixed size dynamic maps are required.
 
 These options allow users to stay consistent across containers with their
 memory management strategies. */
-CCC_Result CCC_flat_hash_map_copy(CCC_Flat_hash_map *dst,
-                                  CCC_Flat_hash_map const *src,
+CCC_Result CCC_flat_hash_map_copy(CCC_Flat_hash_map *destination,
+                                  CCC_Flat_hash_map const *source,
                                   CCC_Allocator *allocate);
 
 /** @brief Reserve space required to add a specified number of elements to the

@@ -72,55 +72,56 @@ check_static_begin(flat_hash_map_test_static_initialize)
 
 check_static_begin(flat_hash_map_test_copy_no_allocate)
 {
-    Flat_hash_map src = flat_hash_map_initialize(
+    Flat_hash_map source = flat_hash_map_initialize(
         &(small_fixed_map){}, struct Val, key, flat_hash_map_int_zero,
         flat_hash_map_id_order, NULL, NULL, SMALL_FIXED_CAP);
-    Flat_hash_map dst = flat_hash_map_initialize(
+    Flat_hash_map destination = flat_hash_map_initialize(
         &(standard_fixed_map){}, struct Val, key, flat_hash_map_int_zero,
         flat_hash_map_id_order, NULL, NULL, STANDARD_FIXED_CAP);
-    (void)swap_entry(&src, &(struct Val){.key = 0});
-    (void)swap_entry(&src, &(struct Val){.key = 1, .val = 1});
-    (void)swap_entry(&src, &(struct Val){.key = 2, .val = 2});
-    check(count(&src).count, 3);
-    check(is_empty(&dst), true);
-    CCC_Result res = flat_hash_map_copy(&dst, &src, NULL);
+    (void)swap_entry(&source, &(struct Val){.key = 0});
+    (void)swap_entry(&source, &(struct Val){.key = 1, .val = 1});
+    (void)swap_entry(&source, &(struct Val){.key = 2, .val = 2});
+    check(count(&source).count, 3);
+    check(is_empty(&destination), true);
+    CCC_Result res = flat_hash_map_copy(&destination, &source, NULL);
     check(res, CCC_RESULT_OK);
-    check(count(&dst).count, count(&src).count);
+    check(count(&destination).count, count(&source).count);
     for (int i = 0; i < 3; ++i)
     {
-        CCC_Entry src_e = CCC_remove(&src, &(struct Val){.key = i});
-        CCC_Entry dst_e = CCC_remove(&dst, &(struct Val){.key = i});
-        check(occupied(&src_e), occupied(&dst_e));
+        CCC_Entry source_e = CCC_remove(&source, &(struct Val){.key = i});
+        CCC_Entry destination_e
+            = CCC_remove(&destination, &(struct Val){.key = i});
+        check(occupied(&source_e), occupied(&destination_e));
     }
-    check(is_empty(&src), is_empty(&dst));
-    check(is_empty(&dst), true);
+    check(is_empty(&source), is_empty(&destination));
+    check(is_empty(&destination), true);
     check_end();
 }
 
 check_static_begin(flat_hash_map_test_copy_no_allocate_fail)
 {
-    Flat_hash_map src = flat_hash_map_initialize(
+    Flat_hash_map source = flat_hash_map_initialize(
         &(standard_fixed_map){}, struct Val, key, flat_hash_map_int_zero,
         flat_hash_map_id_order, NULL, NULL, STANDARD_FIXED_CAP);
-    Flat_hash_map dst = flat_hash_map_initialize(
+    Flat_hash_map destination = flat_hash_map_initialize(
         &(small_fixed_map){}, struct Val, key, flat_hash_map_int_zero,
         flat_hash_map_id_order, NULL, NULL, SMALL_FIXED_CAP);
-    (void)swap_entry(&src, &(struct Val){.key = 0});
-    (void)swap_entry(&src, &(struct Val){.key = 1, .val = 1});
-    (void)swap_entry(&src, &(struct Val){.key = 2, .val = 2});
-    check(count(&src).count, 3);
-    check(is_empty(&dst), true);
-    CCC_Result res = flat_hash_map_copy(&dst, &src, NULL);
+    (void)swap_entry(&source, &(struct Val){.key = 0});
+    (void)swap_entry(&source, &(struct Val){.key = 1, .val = 1});
+    (void)swap_entry(&source, &(struct Val){.key = 2, .val = 2});
+    check(count(&source).count, 3);
+    check(is_empty(&destination), true);
+    CCC_Result res = flat_hash_map_copy(&destination, &source, NULL);
     check(res != CCC_RESULT_OK, true);
     check_end();
 }
 
 check_static_begin(flat_hash_map_test_copy_allocate)
 {
-    Flat_hash_map dst = flat_hash_map_initialize(
+    Flat_hash_map destination = flat_hash_map_initialize(
         NULL, struct Val, key, flat_hash_map_int_zero, flat_hash_map_id_order,
         std_allocate, NULL, 0);
-    Flat_hash_map src
+    Flat_hash_map source
         = flat_hash_map_from(key, flat_hash_map_int_zero,
                              flat_hash_map_id_order, std_allocate, NULL, 0,
                              (struct Val[]){
@@ -128,41 +129,42 @@ check_static_begin(flat_hash_map_test_copy_allocate)
                                  {.key = 1, .val = 1},
                                  {.key = 2, .val = 2},
                              });
-    check(count(&src).count, 3);
-    check(is_empty(&dst), true);
-    CCC_Result res = flat_hash_map_copy(&dst, &src, std_allocate);
+    check(count(&source).count, 3);
+    check(is_empty(&destination), true);
+    CCC_Result res = flat_hash_map_copy(&destination, &source, std_allocate);
     check(res, CCC_RESULT_OK);
-    check(count(&dst).count, count(&src).count);
+    check(count(&destination).count, count(&source).count);
     for (int i = 0; i < 3; ++i)
     {
-        CCC_Entry src_e = CCC_remove(&src, &(struct Val){.key = i});
-        CCC_Entry dst_e = CCC_remove(&dst, &(struct Val){.key = i});
-        check(occupied(&src_e), occupied(&dst_e));
+        CCC_Entry source_e = CCC_remove(&source, &(struct Val){.key = i});
+        CCC_Entry destination_e
+            = CCC_remove(&destination, &(struct Val){.key = i});
+        check(occupied(&source_e), occupied(&destination_e));
     }
-    check(is_empty(&src), is_empty(&dst));
-    check(is_empty(&dst), true);
+    check(is_empty(&source), is_empty(&destination));
+    check(is_empty(&destination), true);
     check_end({
-        (void)flat_hash_map_clear_and_free(&src, NULL);
-        (void)flat_hash_map_clear_and_free(&dst, NULL);
+        (void)flat_hash_map_clear_and_free(&source, NULL);
+        (void)flat_hash_map_clear_and_free(&destination, NULL);
     });
 }
 
 check_static_begin(flat_hash_map_test_copy_allocate_fail)
 {
-    Flat_hash_map src = flat_hash_map_initialize(
+    Flat_hash_map source = flat_hash_map_initialize(
         NULL, struct Val, key, flat_hash_map_int_zero, flat_hash_map_id_order,
         std_allocate, NULL, 0);
-    Flat_hash_map dst = flat_hash_map_initialize(
+    Flat_hash_map destination = flat_hash_map_initialize(
         NULL, struct Val, key, flat_hash_map_int_zero, flat_hash_map_id_order,
         std_allocate, NULL, 0);
-    (void)swap_entry(&src, &(struct Val){.key = 0});
-    (void)swap_entry(&src, &(struct Val){.key = 1, .val = 1});
-    (void)swap_entry(&src, &(struct Val){.key = 2, .val = 2});
-    check(count(&src).count, 3);
-    check(is_empty(&dst), true);
-    CCC_Result res = flat_hash_map_copy(&dst, &src, NULL);
+    (void)swap_entry(&source, &(struct Val){.key = 0});
+    (void)swap_entry(&source, &(struct Val){.key = 1, .val = 1});
+    (void)swap_entry(&source, &(struct Val){.key = 2, .val = 2});
+    check(count(&source).count, 3);
+    check(is_empty(&destination), true);
+    CCC_Result res = flat_hash_map_copy(&destination, &source, NULL);
     check(res != CCC_RESULT_OK, true);
-    check_end({ (void)flat_hash_map_clear_and_free(&src, NULL); });
+    check_end({ (void)flat_hash_map_clear_and_free(&source, NULL); });
 }
 
 check_static_begin(flat_hash_map_test_empty)

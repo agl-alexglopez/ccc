@@ -125,8 +125,8 @@ struct Cost
 
 struct Path_request
 {
-    char src;
-    char dst;
+    char source;
+    char destination;
 };
 
 /* Helper type for labelling costs for edges between vertices in the graph. */
@@ -263,14 +263,15 @@ static SV_String_view const quit_cmd = SV("q");
 
 static void build_graph(struct Graph *);
 static void find_shortest_paths(struct Graph *);
-static bool found_dst(struct Graph *, struct Vertex *);
+static bool found_destination(struct Graph *, struct Vertex *);
 static void edge_construct(struct Graph *g, Flat_hash_map *parent_map,
-                           struct Vertex *src, struct Vertex *dst);
-static int dijkstra_shortest_path(struct Graph *, char src, char dst);
+                           struct Vertex *source, struct Vertex *destination);
+static int dijkstra_shortest_path(struct Graph *, char source,
+                                  char destination);
 static void paint_edge(struct Graph *, char, char, char const *edge_color);
 static void add_edge_cost_label(struct Graph *, struct Vertex *,
                                 struct Edge const *);
-static Cell make_edge(char src, char dst);
+static Cell make_edge(char source, char destination);
 static void flush_at(struct Graph const *g, int r, int c,
                      char const *edge_color);
 
@@ -418,36 +419,37 @@ build_graph(struct Graph *const graph)
          vertex < graph->vertices; ++vertex, ++vertex_title)
     {
         char key = (char)vertex_title;
-        struct Vertex *const src = vertex_at(graph, key);
-        while (vertex_degree(src) < MAX_DEGREE && found_dst(graph, src))
+        struct Vertex *const source = vertex_at(graph, key);
+        while (vertex_degree(source) < MAX_DEGREE
+               && found_destination(graph, source))
         {}
     }
     clear_and_flush_graph(graph, MAG);
 }
 
 /* This function uses a breadth first search to find the closest vertex it has
-   not already formed an edge with. If the dst has an available out degree it
-   will form an edge with src. This creates graphs that require the later
-   Dijkstra's algorithm to be correct because there will likely be multiple
-   paths between vertices that may have small differences in distance. The
-   graphs also are more visually pleasing and make some sense because routes
+   not already formed an edge with. If the destination has an available out
+   degree it will form an edge with source. This creates graphs that require the
+   later Dijkstra's algorithm to be correct because there will likely be
+   multiple paths between vertices that may have small differences in distance.
+   The graphs also are more visually pleasing and make some sense because routes
    are formed efficiently due to the bfs. */
 static bool
-found_dst(struct Graph *const graph, struct Vertex *const src)
+found_destination(struct Graph *const graph, struct Vertex *const source)
 {
 
     Flat_hash_map parent_map = flat_hash_map_from(
         current, hash_parent_cells, order_parent_cells, std_allocate, NULL, 0,
         (struct Path_backtrack_cell[]){
             {
-                .current = src->pos,
+                .current = source->pos,
                 .parent = {-1, -1},
             },
         });
     Flat_double_ended_queue bfs = flat_double_ended_queue_initialize(
         NULL, struct Point, std_allocate, NULL, 0);
-    (void)push_back(&bfs, &src->pos);
-    bool dst_connection = false;
+    (void)push_back(&bfs, &source->pos);
+    bool destination_connection = false;
     while (!is_empty(&bfs))
     {
         struct Point cur = *((struct Point *)front(&bfs));
@@ -467,13 +469,13 @@ found_dst(struct Graph *const graph, struct Vertex *const src)
             {
                 struct Vertex *const nv
                     = vertex_at(graph, get_cell_vertex_title(next_cell));
-                if (src->name != nv->name && vertex_degree(nv) < MAX_DEGREE
-                    && !has_edge_with(src, nv->name))
+                if (source->name != nv->name && vertex_degree(nv) < MAX_DEGREE
+                    && !has_edge_with(source, nv->name))
                 {
                     Entry const in = insert_or_assign(&parent_map, &push);
                     check(!insert_error(&in));
-                    edge_construct(graph, &parent_map, src, nv);
-                    dst_connection = true;
+                    edge_construct(graph, &parent_map, source, nv);
+                    destination_connection = true;
                     goto done;
                 }
             }
@@ -488,26 +490,26 @@ found_dst(struct Graph *const graph, struct Vertex *const src)
 done:
     (void)clear_and_free(&bfs, NULL);
     (void)clear_and_free(&parent_map, NULL);
-    return dst_connection;
+    return destination_connection;
 }
 
-/* Assumes that src and dst have not already been connected in the graph or in
-   the terminal cells via edge ids. Creates the appropriate edge and updates the
-   edge lists of src and dst. */
+/* Assumes that source and destination have not already been connected in the
+   graph or in the terminal cells via edge ids. Creates the appropriate edge and
+   updates the edge lists of source and destination. */
 static void
 edge_construct(struct Graph *const g, Flat_hash_map *const parent_map,
-               struct Vertex *const src, struct Vertex *const dst)
+               struct Vertex *const source, struct Vertex *const destination)
 {
-    Cell const edge_id = make_edge(src->name, dst->name);
-    struct Point cur = dst->pos;
+    Cell const edge_id = make_edge(source->name, destination->name);
+    struct Point cur = destination->pos;
     struct Path_backtrack_cell const *c = get_key_value(parent_map, &cur);
     check(c);
     struct Edge edge = {
         .n = {
-            .name = dst->name,
+            .name = destination->name,
             .cost = 0,
         },
-        .pos = dst->pos,
+        .pos = destination->pos,
     };
     while (c->parent.r > 0)
     {
@@ -517,22 +519,22 @@ edge_construct(struct Graph *const g, Flat_hash_map *const parent_map,
         *grid_at_mut(g, c->current.r, c->current.c) |= edge_id;
         build_path_cell(g, c->current.r, c->current.c, edge_id);
     }
-    (void)add_edge(src, &edge);
-    edge.n.name = src->name;
-    edge.pos = src->pos;
-    (void)add_edge(dst, &edge);
-    add_edge_cost_label(g, dst, &edge);
+    (void)add_edge(source, &edge);
+    edge.n.name = source->name;
+    edge.pos = source->pos;
+    (void)add_edge(destination, &edge);
+    add_edge_cost_label(g, destination, &edge);
 }
 
 /* A edge cost label will only be added if there is sufficient space. For
    edges that are too small to fit a digit or two the line length can be
    easily counted with the mouse or by eye. */
 static void
-add_edge_cost_label(struct Graph *const g, struct Vertex *const src,
+add_edge_cost_label(struct Graph *const g, struct Vertex *const source,
                     struct Edge const *const e)
 {
-    struct Point cur = src->pos;
-    Cell const edge_id = make_edge(src->name, e->n.name);
+    struct Point cur = source->pos;
+    Cell const edge_id = make_edge(source->name, e->n.name);
     struct Point prev = cur;
     /* Add a two space Buffer to either side of the label so direction of lines
        is not lost to writing of digits. Otherwise it would be unclear which
@@ -708,13 +710,13 @@ find_shortest_paths(struct Graph *const graph)
         {
             struct Path_request pr = parse_path_request(
                 graph, (SV_String_view){.s = linepointer, .len = read - 1});
-            if (pr.src == 'q')
+            if (pr.source == 'q')
             {
                 free(linepointer);
                 printf("Exiting now.\n");
                 return;
             }
-            if (!pr.src)
+            if (!pr.source)
             {
                 clear_line();
                 free(linepointer);
@@ -724,15 +726,18 @@ find_shortest_paths(struct Graph *const graph)
                        "needed.\n");
                 return;
             }
-            total_cost = dijkstra_shortest_path(graph, pr.src, pr.dst);
+            total_cost
+                = dijkstra_shortest_path(graph, pr.source, pr.destination);
             if (total_cost == INT_MAX)
             {
-                struct Point const *const src = &vertex_at(graph, pr.src)->pos;
-                struct Point const *const dst = &vertex_at(graph, pr.dst)->pos;
-                set_cursor_position(src->r, src->c);
-                printf("%s%c", RED, pr.src);
-                set_cursor_position(dst->r, dst->c);
-                printf("%c%s", pr.dst, NIL);
+                struct Point const *const source
+                    = &vertex_at(graph, pr.source)->pos;
+                struct Point const *const destination
+                    = &vertex_at(graph, pr.destination)->pos;
+                set_cursor_position(source->r, source->c);
+                printf("%s%c", RED, pr.source);
+                set_cursor_position(destination->r, destination->c);
+                printf("%c%s", pr.destination, NIL);
                 (void)fflush(stdout);
             }
             break;
@@ -740,12 +745,13 @@ find_shortest_paths(struct Graph *const graph)
     }
 }
 
-/** Returns the distance of the shortest path from src to dst in the graph. If
-no route exists INT_MAX is returned which can be interpreted as INFINITY in this
-context. Assumes the graph is well formed without negative distances. */
+/** Returns the distance of the shortest path from source to destination in the
+graph. If no route exists INT_MAX is returned which can be interpreted as
+INFINITY in this context. Assumes the graph is well formed without negative
+distances. */
 static int
-dijkstra_shortest_path(struct Graph *const graph, char const src,
-                       char const dst)
+dijkstra_shortest_path(struct Graph *const graph, char const source,
+                       char const destination)
 {
     clear_paint(graph);
     clear_and_flush_graph(graph, NIL);
@@ -766,7 +772,7 @@ dijkstra_shortest_path(struct Graph *const graph, char const src,
         *map_priority_queue_at(map_priority_queue, (char)vx) = (struct Cost){
             .name = (char)vx,
             .from = '\0',
-            .cost = (char)vx == src ? 0 : INT_MAX,
+            .cost = (char)vx == source ? 0 : INT_MAX,
         };
         struct Cost const *const v
             = push(&costs, &map_priority_queue_at(map_priority_queue, (char)vx)
@@ -784,7 +790,7 @@ dijkstra_shortest_path(struct Graph *const graph, char const src,
         {
             return INT_MAX;
         }
-        if (u->name == dst)
+        if (u->name == destination)
         {
             return paint_shortest_path(graph, map_priority_queue, u);
         }
@@ -846,15 +852,15 @@ map_priority_queue_at(struct Cost const *const dj_arr, char const vertex)
    is passed as the edge color then the paint bit is removed and default path
    color will be flushed at the patch square location. */
 static void
-paint_edge(struct Graph *const g, char const src_name, char const dst_name,
-           char const *const edge_color)
+paint_edge(struct Graph *const g, char const source_name,
+           char const destination_name, char const *const edge_color)
 {
-    struct Vertex const *const src = vertex_at(g, src_name);
-    struct Vertex const *const dst = vertex_at(g, dst_name);
-    struct Point cur = src->pos;
-    Cell const edge_id = make_edge(src->name, dst->name);
+    struct Vertex const *const source = vertex_at(g, source_name);
+    struct Vertex const *const destination = vertex_at(g, destination_name);
+    struct Point cur = source->pos;
+    Cell const edge_id = make_edge(source->name, destination->name);
     struct Point prev = cur;
-    while (cur.r != dst->pos.r || cur.c != dst->pos.c)
+    while (cur.r != destination->pos.r || cur.c != destination->pos.c)
     {
         if (edge_color)
         {
@@ -873,7 +879,7 @@ paint_edge(struct Graph *const g, char const src_name, char const dst_name,
             };
             Cell const next_cell = grid_at(g, next.r, next.c);
             if ((next_cell & VERTEXT_BIT)
-                && get_cell_vertex_title(next_cell) == dst->name)
+                && get_cell_vertex_title(next_cell) == destination->name)
             {
                 return;
             }
@@ -924,9 +930,9 @@ vertex_degree(struct Vertex const *const v)
 }
 
 static inline Cell
-make_edge(char const src, char const dst)
+make_edge(char const source, char const destination)
 {
-    return sort_vertices(src, dst) << EDGE_ID_SHIFT;
+    return sort_vertices(source, destination) << EDGE_ID_SHIFT;
 }
 
 static inline Cell *
@@ -1164,9 +1170,9 @@ hash_64_bits(uint64_t x)
 
 /*===========================    Misc    ====================================*/
 
-/* Parses the path request. Returns the character 'q' as the src and dst if
-   the user has requested to quit. Otherwise tries to parse. If parsing
-   cannot be completed an empty path request with the null terminator is
+/* Parses the path request. Returns the character 'q' as the source and
+   destination if the user has requested to quit. Otherwise tries to parse. If
+   parsing cannot be completed an empty path request with the null terminator is
    returned. */
 static struct Path_request
 parse_path_request(struct Graph *const g, SV_String_view r)
@@ -1183,10 +1189,10 @@ parse_path_request(struct Graph *const g, SV_String_view r)
         {
             struct Vertex *v = vertex_at(g, *c);
             check(v);
-            res.src ? (res.dst = v->name) : (res.src = v->name);
+            res.source ? (res.destination = v->name) : (res.source = v->name);
         }
     }
-    return res.src && res.dst ? res : (struct Path_request){};
+    return res.source && res.destination ? res : (struct Path_request){};
 }
 
 static struct Int_conversion

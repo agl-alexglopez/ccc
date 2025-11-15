@@ -98,7 +98,7 @@ check_static_begin(bounded_map_test_weak_srand)
     }
     for (int i = 0; i < num_nodes; ++i)
     {
-        CCC_Entry entry = remove(&s, &vals[i].elem);
+        CCC_Entry entry = CCC_remove(&s, &vals[i].elem);
         check(occupied(&entry) || repeats[i], true);
         check(validate(&s), true);
     }

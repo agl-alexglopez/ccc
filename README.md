@@ -1353,7 +1353,7 @@ If these containers do not fit your needs, here are some excellent data structur
 
 ## Citations
 
-A few containers are based off of important work by other data structure developers and researchers. Here are the data structures that inspired some containers in this collection. Full citations and notices of changes can be read in the respective implementations in `src/` directory.
+A few containers are based off of important work by other data structure developers and researchers. Here are the data structures that inspired some containers in this collection. Full citations and notices of changes can be read in the respective implementations in `source/` directory.
 
 - Rust's hashbrown hash table was the basis for the `flat_hash_map.h` container.
     - https://github.com/rust-lang/hashbrown

@@ -332,65 +332,67 @@ CCC_flat_double_ended_queue_data(
 }
 
 CCC_Result
-CCC_flat_double_ended_queue_copy(CCC_Flat_double_ended_queue *const dst,
-                                 CCC_Flat_double_ended_queue const *const src,
-                                 CCC_Allocator *const fn)
+CCC_flat_double_ended_queue_copy(
+    CCC_Flat_double_ended_queue *const destination,
+    CCC_Flat_double_ended_queue const *const source, CCC_Allocator *const fn)
 {
-    if (!dst || !src || src == dst
-        || (dst->buf.capacity < src->buf.capacity && !fn))
+    if (!destination || !source || source == destination
+        || (destination->buf.capacity < source->buf.capacity && !fn))
     {
         return CCC_RESULT_ARGUMENT_ERROR;
     }
     /* Copy everything so we don't worry about staying in sync with future
        changes to buf container. But we have to give back original destination
        memory in case it has already been allocated. Alloc will remain the
-       same as in dst initialization because that controls whether the
+       same as in destination initialization because that controls whether the
        flat_double_ended_queue is a ring Buffer or dynamic
        flat_double_ended_queue. */
-    void *const dst_mem = dst->buf.mem;
-    size_t const dst_cap = dst->buf.capacity;
-    CCC_Allocator *const dst_allocate = dst->buf.allocate;
-    *dst = *src;
-    dst->buf.mem = dst_mem;
-    dst->buf.capacity = dst_cap;
-    dst->buf.allocate = dst_allocate;
+    void *const destination_mem = destination->buf.mem;
+    size_t const destination_cap = destination->buf.capacity;
+    CCC_Allocator *const destination_allocate = destination->buf.allocate;
+    *destination = *source;
+    destination->buf.mem = destination_mem;
+    destination->buf.capacity = destination_cap;
+    destination->buf.allocate = destination_allocate;
     /* Copying from an empty source is odd but supported. */
-    if (!src->buf.capacity)
+    if (!source->buf.capacity)
     {
         return CCC_RESULT_OK;
     }
-    if (dst->buf.capacity < src->buf.capacity)
+    if (destination->buf.capacity < source->buf.capacity)
     {
         CCC_Result resize_res
-            = CCC_buffer_allocate(&dst->buf, src->buf.capacity, fn);
+            = CCC_buffer_allocate(&destination->buf, source->buf.capacity, fn);
         if (resize_res != CCC_RESULT_OK)
         {
             return resize_res;
         }
-        dst->buf.capacity = src->buf.capacity;
+        destination->buf.capacity = source->buf.capacity;
     }
-    if (!dst->buf.mem || !src->buf.mem)
+    if (!destination->buf.mem || !source->buf.mem)
     {
         return CCC_RESULT_ARGUMENT_ERROR;
     }
-    if (dst->buf.capacity > src->buf.capacity)
+    if (destination->buf.capacity > source->buf.capacity)
     {
         size_t const first_chunk
-            = min(src->buf.count, src->buf.capacity - src->front);
-        (void)memcpy(dst->buf.mem, CCC_buffer_at(&src->buf, src->front),
-                     src->buf.sizeof_type * first_chunk);
-        if (first_chunk < src->buf.count)
+            = min(source->buf.count, source->buf.capacity - source->front);
+        (void)memcpy(destination->buf.mem,
+                     CCC_buffer_at(&source->buf, source->front),
+                     source->buf.sizeof_type * first_chunk);
+        if (first_chunk < source->buf.count)
         {
-            (void)memcpy((char *)dst->buf.mem
-                             + (src->buf.sizeof_type * first_chunk),
-                         src->buf.mem,
-                         src->buf.sizeof_type * (src->buf.count - first_chunk));
+            (void)memcpy((char *)destination->buf.mem
+                             + (source->buf.sizeof_type * first_chunk),
+                         source->buf.mem,
+                         source->buf.sizeof_type
+                             * (source->buf.count - first_chunk));
         }
-        dst->front = 0;
+        destination->front = 0;
         return CCC_RESULT_OK;
     }
-    (void)memcpy(dst->buf.mem, src->buf.mem,
-                 src->buf.capacity * src->buf.sizeof_type);
+    (void)memcpy(destination->buf.mem, source->buf.mem,
+                 source->buf.capacity * source->buf.sizeof_type);
     return CCC_RESULT_OK;
 }
 

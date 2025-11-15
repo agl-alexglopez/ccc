@@ -14,8 +14,8 @@ limitations under the License. */
 /* Citation:
 [1] See the sort methods for citations and change lists regarding the pintOS
 educational operating system natural merge sort algorithm used for linked lists.
-Code in the pintOS source is at  `src/lib/kernel.list.c`, but this may change if
-they refactor. */
+Code in the pintOS source is at  `source/lib/kernel.list.c`, but this may change
+if they refactor. */
 #include <assert.h>
 #include <stddef.h>
 #include <string.h>

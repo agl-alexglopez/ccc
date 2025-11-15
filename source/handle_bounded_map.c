@@ -190,8 +190,8 @@ static void insert(struct CCC_Handle_bounded_map *, size_t parent_i,
                    CCC_Order last_order, size_t elem_i);
 static CCC_Result resize(struct CCC_Handle_bounded_map *, size_t new_capacity,
                          CCC_Allocator *);
-static void copy_soa(struct CCC_Handle_bounded_map const *src,
-                     void *dst_data_base, size_t dst_capacity);
+static void copy_soa(struct CCC_Handle_bounded_map const *source,
+                     void *destination_data_base, size_t destination_capacity);
 static size_t data_bytes(size_t sizeof_type, size_t capacity);
 static size_t node_bytes(size_t capacity);
 static size_t parity_bytes(size_t capacity);
@@ -756,33 +756,34 @@ CCC_handle_bounded_map_reserve(CCC_Handle_bounded_map *const map,
 }
 
 CCC_Result
-CCC_handle_bounded_map_copy(CCC_Handle_bounded_map *const dst,
-                            CCC_Handle_bounded_map const *const src,
+CCC_handle_bounded_map_copy(CCC_Handle_bounded_map *const destination,
+                            CCC_Handle_bounded_map const *const source,
                             CCC_Allocator *const allocate)
 {
-    if (!dst || !src || src == dst
-        || (dst->capacity < src->capacity && !allocate))
+    if (!destination || !source || source == destination
+        || (destination->capacity < source->capacity && !allocate))
     {
         return CCC_RESULT_ARGUMENT_ERROR;
     }
-    void *const dst_mem = dst->data;
-    struct CCC_Handle_bounded_map_node *const dst_nodes = dst->nodes;
-    Parity_block *const dst_parity = dst->parity;
-    size_t const dst_cap = dst->capacity;
-    CCC_Allocator *const dst_allocate = dst->allocate;
-    *dst = *src;
-    dst->data = dst_mem;
-    dst->nodes = dst_nodes;
-    dst->parity = dst_parity;
-    dst->capacity = dst_cap;
-    dst->allocate = dst_allocate;
-    if (!src->capacity)
+    void *const destination_mem = destination->data;
+    struct CCC_Handle_bounded_map_node *const destination_nodes
+        = destination->nodes;
+    Parity_block *const destination_parity = destination->parity;
+    size_t const destination_cap = destination->capacity;
+    CCC_Allocator *const destination_allocate = destination->allocate;
+    *destination = *source;
+    destination->data = destination_mem;
+    destination->nodes = destination_nodes;
+    destination->parity = destination_parity;
+    destination->capacity = destination_cap;
+    destination->allocate = destination_allocate;
+    if (!source->capacity)
     {
         return CCC_RESULT_OK;
     }
-    if (dst->capacity < src->capacity)
+    if (destination->capacity < source->capacity)
     {
-        CCC_Result const r = resize(dst, src->capacity, allocate);
+        CCC_Result const r = resize(destination, source->capacity, allocate);
         if (r != CCC_RESULT_OK)
         {
             return r;
@@ -791,14 +792,16 @@ CCC_handle_bounded_map_copy(CCC_Handle_bounded_map *const dst,
     else
     {
         /* Might not be necessary but not worth finding out. Do every time. */
-        dst->nodes = node_pos(dst->sizeof_type, dst->data, dst->capacity);
-        dst->parity = parity_pos(dst->sizeof_type, dst->data, dst->capacity);
+        destination->nodes = node_pos(destination->sizeof_type,
+                                      destination->data, destination->capacity);
+        destination->parity = parity_pos(
+            destination->sizeof_type, destination->data, destination->capacity);
     }
-    if (!dst->data || !src->data)
+    if (!destination->data || !source->data)
     {
         return CCC_RESULT_ARGUMENT_ERROR;
     }
-    copy_soa(src, dst->data, dst->capacity);
+    copy_soa(source, destination->data, destination->capacity);
     return CCC_RESULT_OK;
 }
 
@@ -1306,25 +1309,27 @@ points to the base of an allocation that has been allocated with sufficient
 bytes to support the user data, nodes, and parity arrays for the provided new
 capacity. */
 static inline void
-copy_soa(struct CCC_Handle_bounded_map const *const src,
-         void *const dst_data_base, size_t const dst_capacity)
+copy_soa(struct CCC_Handle_bounded_map const *const source,
+         void *const destination_data_base, size_t const destination_capacity)
 {
-    if (!src->data)
+    if (!source->data)
     {
         return;
     }
-    assert(dst_capacity >= src->capacity);
-    size_t const sizeof_type = src->sizeof_type;
+    assert(destination_capacity >= source->capacity);
+    size_t const sizeof_type = source->sizeof_type;
     /* Each section of the allocation "grows" when we re-size so one copy would
        not work. Instead each component is copied over allowing each to grow. */
-    (void)memcpy(dst_data_base, src->data,
-                 data_bytes(sizeof_type, src->capacity));
-    (void)memcpy(node_pos(sizeof_type, dst_data_base, dst_capacity),
-                 node_pos(sizeof_type, src->data, src->capacity),
-                 node_bytes(src->capacity));
-    (void)memcpy(parity_pos(sizeof_type, dst_data_base, dst_capacity),
-                 parity_pos(sizeof_type, src->data, src->capacity),
-                 parity_bytes(src->capacity));
+    (void)memcpy(destination_data_base, source->data,
+                 data_bytes(sizeof_type, source->capacity));
+    (void)memcpy(
+        node_pos(sizeof_type, destination_data_base, destination_capacity),
+        node_pos(sizeof_type, source->data, source->capacity),
+        node_bytes(source->capacity));
+    (void)memcpy(
+        parity_pos(sizeof_type, destination_data_base, destination_capacity),
+        parity_pos(sizeof_type, source->data, source->capacity),
+        parity_bytes(source->capacity));
 }
 
 static inline void
