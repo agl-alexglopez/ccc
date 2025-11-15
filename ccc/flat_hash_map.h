@@ -308,7 +308,7 @@ struct Val
 int
 main(void)
 {
-    Flat_hash_map static_map = flat_hash_map_from(
+    Flat_hash_map map = flat_hash_map_from(
         key,
         flat_hash_map_int_to_u64,
         flat_hash_map_key_order,
@@ -367,7 +367,7 @@ struct Val
 int
 main(void)
 {
-    Flat_hash_map static_map = flat_hash_map_from(
+    Flat_hash_map map = flat_hash_map_with_capacity(
         struct Val,
         key,
         flat_hash_map_int_to_u64,

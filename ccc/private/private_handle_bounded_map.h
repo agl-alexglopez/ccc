@@ -168,26 +168,29 @@ union CCC_Handle_bounded_map_handle_wrap
 /** @internal */
 void *
 CCC_private_handle_bounded_map_data_at(struct CCC_Handle_bounded_map const *,
-                                       size_t slot);
+                                       size_t);
 /** @internal */
 void *
 CCC_private_handle_bounded_map_key_at(struct CCC_Handle_bounded_map const *,
-                                      size_t slot);
+                                      size_t);
 /** @internal */
 struct CCC_Handle_bounded_map_node *
 CCC_private_handle_bounded_map_node_at(struct CCC_Handle_bounded_map const *,
-                                       size_t i);
+                                       size_t);
 /** @internal */
 struct CCC_Handle_bounded_map_handle
 CCC_private_handle_bounded_map_handle(struct CCC_Handle_bounded_map const *,
-                                      void const *key);
+                                      void const *);
 /** @internal */
 void CCC_private_handle_bounded_map_insert(struct CCC_Handle_bounded_map *,
-                                           size_t parent_i,
-                                           CCC_Order last_order, size_t elem_i);
+                                           size_t, CCC_Order, size_t);
 /** @internal */
 size_t
 CCC_private_handle_bounded_map_allocate_slot(struct CCC_Handle_bounded_map *);
+/** @internal */
+CCC_Result
+CCC_private_handle_bounded_map_reserve(struct CCC_Handle_bounded_map *, size_t,
+                                       CCC_Allocator);
 
 /*=========================      Initialization     =========================*/
 
@@ -226,8 +229,8 @@ lazily initialized upon the first runtime opportunity. This allows the initial
 memory provided to the data pointer to come from any source at compile or
 runtime. */
 #define CCC_private_handle_bounded_map_initialize(                             \
-    private_memory_pointer, private_type_name, private_key_node_field,         \
-    private_key_comparator, private_allocate, private_context_data,            \
+    private_memory_pointer, private_type_name, private_key_field,              \
+    private_key_compare, private_allocate, private_context_data,               \
     private_capacity)                                                          \
     {                                                                          \
         .data = (private_memory_pointer),                                      \
@@ -238,11 +241,82 @@ runtime. */
         .root = 0,                                                             \
         .free_list = 0,                                                        \
         .sizeof_type = sizeof(private_type_name),                              \
-        .key_offset = offsetof(private_type_name, private_key_node_field),     \
-        .compare = (private_key_comparator),                                   \
+        .key_offset = offsetof(private_type_name, private_key_field),          \
+        .compare = (private_key_compare),                                      \
         .allocate = (private_allocate),                                        \
         .context = (private_context_data),                                     \
     }
+
+/** @internal Initialize a handle bounded map from user input list. */
+#define CCC_private_handle_bounded_map_from(                                   \
+    private_key_field, private_key_compare, private_allocate,                  \
+    private_context_data, private_optional_cap,                                \
+    private_array_compound_literal...)                                         \
+    (__extension__({                                                           \
+        typeof(*private_array_compound_literal)                                \
+            *private_handle_bounded_map_initializer_list                       \
+            = private_array_compound_literal;                                  \
+        struct CCC_Handle_bounded_map private_map                              \
+            = CCC_private_handle_bounded_map_initialize(                       \
+                NULL, typeof(*private_handle_bounded_map_initializer_list),    \
+                private_key_field, private_key_compare, private_allocate,      \
+                private_context_data, 0);                                      \
+        size_t const private_n                                                 \
+            = sizeof(private_array_compound_literal)                           \
+            / sizeof(*private_handle_bounded_map_initializer_list);            \
+        size_t const private_cap = private_optional_cap;                       \
+        if (CCC_handle_bounded_map_reserve(                                    \
+                &private_map,                                                  \
+                (private_n > private_cap ? private_n : private_cap),           \
+                private_allocate)                                              \
+            == CCC_RESULT_OK)                                                  \
+        {                                                                      \
+            for (size_t i = 0; i < private_n; ++i)                             \
+            {                                                                  \
+                struct CCC_Handle_bounded_map_handle private_ent               \
+                    = CCC_private_handle_bounded_map_handle(                   \
+                        &private_map,                                          \
+                        (void const                                            \
+                             *)&private_handle_bounded_map_initializer_list[i] \
+                            .private_key_field);                               \
+                if (!(private_ent.status & CCC_ENTRY_INSERT_ERROR))            \
+                {                                                              \
+                    CCC_Handle_index private_index = private_ent.index;        \
+                    if (!(private_ent.status & CCC_ENTRY_OCCUPIED))            \
+                    {                                                          \
+                        private_index                                          \
+                            = CCC_private_handle_bounded_map_allocate_slot(    \
+                                &private_map);                                 \
+                    }                                                          \
+                    *((typeof(*private_handle_bounded_map_initializer_list) *) \
+                          CCC_private_handle_bounded_map_data_at(              \
+                              private_ent.map, private_index))                 \
+                        = private_handle_bounded_map_initializer_list[i];      \
+                    if (!(private_ent.status & CCC_ENTRY_OCCUPIED))            \
+                    {                                                          \
+                        CCC_private_handle_bounded_map_insert(                 \
+                            private_ent.map, private_ent.index,                \
+                            private_ent.last_order, private_index);            \
+                    }                                                          \
+                }                                                              \
+            }                                                                  \
+        }                                                                      \
+        private_map;                                                           \
+    }))
+
+#define CCC_private_handle_bounded_map_with_capacity(                          \
+    private_type_name, private_key_field, private_key_compare,                 \
+    private_allocate, private_context_data, private_cap)                       \
+    (__extension__({                                                           \
+        struct CCC_Handle_bounded_map private_map                              \
+            = CCC_private_handle_bounded_map_initialize(                       \
+                NULL, private_type_name, private_key_field,                    \
+                private_key_compare, private_allocate, private_context_data,   \
+                0);                                                            \
+        (void)CCC_private_handle_bounded_map_reserve(                          \
+            &private_map, private_cap, private_allocate);                      \
+        private_map;                                                           \
+    }))
 
 /** @internal */
 #define CCC_private_handle_bounded_map_as(Handle_bounded_map_pointer,          \

@@ -171,7 +171,7 @@ desired allocation function. */
 @param[in] memory_pointer a pointer to the contiguous user types or ((T
 *)NULL).
 @param[in] type_name the name of the user type stored in the map.
-@param[in] type_intruder_field the name of the field in user type used as key.
+@param[in] type_key_field the name of the field in user type used as key.
 @param[in] compare the key comparison function (see types.h).
 @param[in] allocate the allocation function or NULL if allocation is banned.
 @param[in] context_data a pointer to any context data for comparison or
@@ -181,11 +181,124 @@ destruction.
 (i.e. CCC_Handle_bounded_map m =
 CCC_handle_bounded_map_initialize(...);). */
 #define CCC_handle_bounded_map_initialize(memory_pointer, type_name,           \
-                                          type_intruder_field, compare,        \
-                                          allocate, context_data, capacity)    \
+                                          type_key_field, compare, allocate,   \
+                                          context_data, capacity)              \
     CCC_private_handle_bounded_map_initialize(                                 \
-        memory_pointer, type_name, type_intruder_field, compare, allocate,     \
+        memory_pointer, type_name, type_key_field, compare, allocate,          \
         context_data, capacity)
+
+/** @brief Initialize a dynamic map at runtime from an initializer list.
+@param[in] key_field the field of the struct used for key storage.
+@param[in] compare the CCC_Key_comparator the user intends to use.
+@param[in] allocate the required allocation function.
+@param[in] context_data context data that is needed for hashing or comparison.
+@param[in] optional_capacity optionally specify the capacity of the map if
+different from the size of the compound literal array initializer. If the
+capacity is greater than the size of the compound literal array initializer, it
+is respected and the capacity is reserved. If the capacity is less than the size
+of the compound array initializer, the compound literal array initializer size
+is set as the capacity. Therefore, 0 is valid if one is not concerned with the
+size of the underlying reservation.
+@param[in] type_compound_literal_array a list of key value pairs of the type
+intended to be stored in the map, using array compound literal initialization
+syntax (e.g `(struct my_type[]){{.k = 0, .v 0}, {.k = 1, .v = 1}}`).
+@return the  map directly initialized on the right hand side of the equality
+operator (i.e. CCC_Handle_bounded_map map = CCC_handle_bounded_map_from(...);)
+@warning An allocation function is required. This initializer is only available
+for dynamic maps.
+@warning When duplicate keys appear in the initializer list, the last occurrence
+replaces earlier ones by value (all fields are overwritten).
+@warning If initialization fails all subsequent queries, insertions, or
+removals will indicate the error: either memory related or lack of an
+allocation function provided.
+
+Initialize a dynamic map at run time. This example requires no context data for
+initialization.
+
+```
+#define HANDLE_BOUNDED_MAP_USING_NAMESPACE_CCC
+struct Val
+{
+    int key;
+    int val;
+};
+int
+main(void)
+{
+    Handle_bounded_map static_map = handle_bounded_map_from(
+        key,
+        handle_bounded_map_key_order,
+        std_allocate,
+        NULL,
+        0,
+        (struct Val[]) {
+            {.key = 1, .val = 1},
+            {.key = 2, .val = 2},
+            {.key = 3, .val = 3},
+        },
+    );
+    return 0;
+}
+```
+
+Only dynamic maps may be initialized this way due the inability of the map
+map to protect its invariants from user error at compile time. */
+#define CCC_handle_bounded_map_from(type_key_field, compare, allocate,         \
+                                    context_data,                              \
+                                    type_compound_literal_array...)            \
+    CCC_private_handle_bounded_map_from(type_key_field, compare, allocate,     \
+                                        context_data,                          \
+                                        type_compound_literal_array)
+
+/** @brief Initialize a dynamic map at runtime with at least the specified
+capacity.
+@param[in] type_name the name of the type being stored in the map.
+@param[in] key_field the field of the struct used for key storage.
+@param[in] compare the CCC_Key_comparator the user intends to use.
+@param[in] allocate the required allocation function.
+@param[in] context_data context data that is needed for comparison.
+@param[in] capacity the desired capacity for the map. A capacity of 0 results
+in an argument error and is a no-op after the map is initialized empty.
+@return the map directly initialized on the right hand side of the equality
+operator (i.e. CCC_Handle_bounded_map map =
+CCC_handle_bounded_map_with_capacity(...);)
+@warning An allocation function is required. This initializer is only available
+for dynamic maps.
+@warning If initialization fails all subsequent queries, insertions, or
+removals will indicate the error: either memory related or lack of an
+allocation function provided.
+
+Initialize a dynamic map at run time. This example requires no context
+data for initialization.
+
+```
+#define HANDLE_BOUNDED_MAP_USING_NAMESPACE_CCC
+struct Val
+{
+    int key;
+    int val;
+};
+int
+main(void)
+{
+    Handle_bounded_map map = handle_bounded_map_with_capacity(
+        struct Val,
+        key,
+        handle_bounded_map_key_order,
+        std_allocate,
+        NULL,
+        4096
+    );
+    return 0;
+}
+```
+
+Only dynamic maps may be initialized this way as it simply combines the steps
+of initialization and reservation. */
+#define CCC_handle_bounded_map_with_capacity(                                  \
+    type_name, type_key_field, compare, allocate, context_data, capacity)      \
+    CCC_private_handle_bounded_map_with_capacity(                              \
+        type_name, type_key_field, compare, allocate, context_data, capacity)
 
 /** @brief Copy the map at source to destination.
 @param[in] destination the initialized destination for the copy of the source
@@ -971,6 +1084,9 @@ typedef CCC_Handle_bounded_map_handle Handle_bounded_map_handle;
         CCC_handle_bounded_map_declare_fixed_map(args)
 #    define handle_bounded_map_initialize(args...)                             \
         CCC_handle_bounded_map_initialize(args)
+#    define handle_bounded_map_from(args...) CCC_handle_bounded_map_from(args)
+#    define handle_bounded_map_with_capacity(args...)                          \
+        CCC_handle_bounded_map_with_capacity(args)
 #    define handle_bounded_map_fixed_capacity(args...)                         \
         CCC_handle_bounded_map_fixed_capacity(args)
 #    define handle_bounded_map_copy(args...) CCC_handle_bounded_map_copy(args)
@@ -1008,6 +1124,8 @@ typedef CCC_Handle_bounded_map_handle Handle_bounded_map_handle;
 #    define handle_bounded_map_is_empty(args...)                               \
         CCC_handle_bounded_map_is_empty(args)
 #    define handle_bounded_map_count(args...) CCC_handle_bounded_map_count(args)
+#    define handle_bounded_map_capacity(args...)                               \
+        CCC_handle_bounded_map_capacity(args)
 #    define handle_bounded_map_clear(args...) CCC_handle_bounded_map_clear(args)
 #    define handle_bounded_map_clear_and_free(args...)                         \
         CCC_handle_bounded_map_clear_and_free(args)

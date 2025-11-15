@@ -113,14 +113,14 @@ union CCC_Adaptive_map_entry_wrap
 
 /** @internal */
 void *CCC_private_adaptive_map_key_in_slot(struct CCC_Adaptive_map const *,
-                                           void const *slot);
+                                           void const *);
 /** @internal */
 struct CCC_Adaptive_map_node *
 CCC_private_Adaptive_map_node_in_slot(struct CCC_Adaptive_map const *,
-                                      void const *slot);
+                                      void const *);
 /** @internal */
 struct CCC_Adaptive_map_entry
-CCC_private_adaptive_map_entry(struct CCC_Adaptive_map *, void const *key);
+CCC_private_adaptive_map_entry(struct CCC_Adaptive_map *, void const *);
 /** @internal */
 void *CCC_private_adaptive_map_insert(struct CCC_Adaptive_map *,
                                       struct CCC_Adaptive_map_node *);

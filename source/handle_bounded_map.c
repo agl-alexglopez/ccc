@@ -718,7 +718,7 @@ CCC_handle_bounded_map_reserve(CCC_Handle_bounded_map *const map,
                                size_t const to_add,
                                CCC_Allocator *const allocate)
 {
-    if (!map || !allocate)
+    if (!map || !to_add || !allocate)
     {
         return CCC_RESULT_ARGUMENT_ERROR;
     }
@@ -949,6 +949,14 @@ CCC_private_handle_bounded_map_allocate_slot(
     struct CCC_Handle_bounded_map *const map)
 {
     return allocate_slot(map);
+}
+
+CCC_Result
+CCC_private_handle_bounded_map_reserve(struct CCC_Handle_bounded_map *const map,
+                                       size_t count,
+                                       CCC_Allocator *const allocate)
+{
+    return CCC_handle_bounded_map_reserve(map, count, allocate);
 }
 
 /*==========================  Static Helpers   ==============================*/
@@ -1970,6 +1978,10 @@ is_free_list_valid(struct CCC_Handle_bounded_map const *const map)
 static inline CCC_Tribool
 validate(struct CCC_Handle_bounded_map const *const map)
 {
+    if (!map->capacity)
+    {
+        return CCC_TRUE;
+    }
     /* If we haven't lazily initialized we should not check anything. */
     if (map->data && (!map->nodes || !map->parity))
     {

@@ -351,7 +351,7 @@ or CCC_FALSE).
 @param[in] index the index identifying the bit to set.
 @return the state of the bit, or CCC_TRIBOOL_ERROR if bitset is
 NULL or index is out of range. */
-CCC_Tribool CCC_bitset_test(CCC_Bitset const *bitset, size_t indexndex);
+CCC_Tribool CCC_bitset_test(CCC_Bitset const *bitset, size_t index);
 
 /**@}*/
 
@@ -368,8 +368,7 @@ CCC_FALSE).
 @return the state of the bit before the set operation, true if
 it was previously true, false if it was previously false, or
 error if bitset is NULL or index is out of range. */
-CCC_Tribool CCC_bitset_set(CCC_Bitset *bitset, size_t indexndex,
-                           CCC_Tribool bit);
+CCC_Tribool CCC_bitset_set(CCC_Bitset *bitset, size_t index, CCC_Tribool bit);
 
 /** @brief Set all the bits to the provided value (CCC_TRUE or
 CCC_FALSE).
@@ -393,8 +392,8 @@ count, or both.
 Note that a range is defined from index to index + count, where index +
 count is the exclusive end of the range. This is equivalent to
 moving from Least to Most Significant bit in an integer. */
-CCC_Result CCC_bitset_set_range(CCC_Bitset *bitset, size_t indexndex,
-                                size_t count, CCC_Tribool bit);
+CCC_Result CCC_bitset_set_range(CCC_Bitset *bitset, size_t index, size_t count,
+                                CCC_Tribool bit);
 
 /** @brief Set the bit at valid index index to boolean value b
 (true or false).
@@ -403,7 +402,7 @@ CCC_Result CCC_bitset_set_range(CCC_Bitset *bitset, size_t indexndex,
 @return the state of the bit before the set operation, true if
 it was previously true, false if it was previously false, or
 error if bitset is NULL or index is out of range. */
-CCC_Tribool CCC_bitset_reset(CCC_Bitset *bitset, size_t indexndex);
+CCC_Tribool CCC_bitset_reset(CCC_Bitset *bitset, size_t index);
 
 /** @brief Set all the bits to CCC_FALSE.
 @param[in] bitset a pointer to the bit set.
@@ -424,7 +423,7 @@ count, or both.
 Note that a range is defined from index to index + count, where index +
 count is the exclusive end of the range. This is equivalent to
 moving from Least to Most Significant bit in an integer. */
-CCC_Result CCC_bitset_reset_range(CCC_Bitset *bitset, size_t indexndex,
+CCC_Result CCC_bitset_reset_range(CCC_Bitset *bitset, size_t index,
                                   size_t count);
 
 /** @brief Toggle the bit at index i.
@@ -433,7 +432,7 @@ CCC_Result CCC_bitset_reset_range(CCC_Bitset *bitset, size_t indexndex,
 @return the state of the bit before the toggle operation, true
 if it was previously true, false if it was previously false, or
 error if bitset is NULL or index is out of range. */
-CCC_Tribool CCC_bitset_flip(CCC_Bitset *bitset, size_t indexndex);
+CCC_Tribool CCC_bitset_flip(CCC_Bitset *bitset, size_t index);
 
 /** @brief Toggle all of the bits to their opposing boolean
 value.

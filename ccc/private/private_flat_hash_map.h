@@ -273,8 +273,8 @@ field to NULL we will be able to tell if our map is initialized whether it is
 fixed size and has data or is dynamic and has not yet been given allocation. */
 #define CCC_private_flat_hash_map_initialize(                                  \
     private_fixed_map_pointer, private_type_name, private_key_field,           \
-    private_hash, private_key_order_fn, private_allocate,                      \
-    private_context_data, private_capacity)                                    \
+    private_hash, private_key_compare, private_allocate, private_context_data, \
+    private_capacity)                                                          \
     {                                                                          \
         .data = (private_fixed_map_pointer),                                   \
         .tag = NULL,                                                           \
@@ -285,16 +285,15 @@ fixed size and has data or is dynamic and has not yet been given allocation. */
                                             : (size_t)0),                      \
         .sizeof_type = sizeof(private_type_name),                              \
         .key_offset = offsetof(private_type_name, private_key_field),          \
-        .compare = (private_key_order_fn),                                     \
+        .compare = (private_key_compare),                                      \
         .hash = (private_hash),                                                \
         .allocate = (private_allocate),                                        \
         .context = (private_context_data),                                     \
     }
 
-/** @internal Initialize a dynamic container with an initial compound literal.
- */
+/** @internal Initialize  dynamic container with a compound literal array. */
 #define CCC_private_flat_hash_map_from(                                        \
-    private_key_field, private_hash, private_key_order_fn, private_allocate,   \
+    private_key_field, private_hash, private_key_compare, private_allocate,    \
     private_context_data, private_optional_cap,                                \
     private_array_compound_literal...)                                         \
     (__extension__({                                                           \
@@ -304,7 +303,7 @@ fixed size and has data or is dynamic and has not yet been given allocation. */
         struct CCC_Flat_hash_map private_map                                   \
             = CCC_private_flat_hash_map_initialize(                            \
                 NULL, typeof(*private_flat_hash_map_initializer_list),         \
-                private_key_field, private_hash, private_key_order_fn,         \
+                private_key_field, private_hash, private_key_compare,          \
                 private_allocate, private_context_data, 0);                    \
         size_t const private_n                                                 \
             = sizeof(private_array_compound_literal)                           \
@@ -342,13 +341,13 @@ fixed size and has data or is dynamic and has not yet been given allocation. */
 
 /** @internal Initializes the flat hash map with the specified capacity. */
 #define CCC_private_flat_hash_map_with_capacity(                               \
-    private_type_name, private_key_field, private_hash, private_key_order_fn,  \
+    private_type_name, private_key_field, private_hash, private_key_compare,   \
     private_allocate, private_context_data, private_cap)                       \
     (__extension__({                                                           \
         struct CCC_Flat_hash_map private_map                                   \
             = CCC_private_flat_hash_map_initialize(                            \
                 NULL, private_type_name, private_key_field, private_hash,      \
-                private_key_order_fn, private_allocate, private_context_data,  \
+                private_key_compare, private_allocate, private_context_data,   \
                 0);                                                            \
         (void)CCC_flat_hash_map_reserve(&private_map, private_cap,             \
                                         private_allocate);                     \
