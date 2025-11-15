@@ -133,9 +133,11 @@ Given these constraints we use the following naming conventions.
 > [!IMPORTANT]
 > Abbreviations in user facing headers included directly or transitively are prohibited.
 
-While line length was a valid concern in the early days of C, this is no longer the case with modern tooling. Any time the user spends decoding our abbreviations is time they are not spending using the collection to solve their own problems. We also do not assume the user is familiar with common programming or C jargon such as `deq`, `iter`, `ptr`, `i`, `ctx`, or `rbegin` to name a few. Therefore, the previous jargon becomes `double_ended_queue`, `iterator`, `pointer`, `index`, `context`, and `reverse_begin` in our headers. This style should continue through to the developer implementatios in `source/` files.
+While line length was a valid concern in the early days of C, this is no longer the case with modern tooling. Any time the user spends decoding our abbreviations is time they are not spending using the collection to solve their own problems. We also do not assume the user is familiar with common programming or C jargon such as `deq`, `iter`, `ptr`, `i`, `ctx`, or `rbegin` to name a few. Therefore, the previous jargon becomes `double_ended_queue`, `iterator`, `pointer`, `index`, `context`, and `reverse_begin` in our headers.
 
 This minimizes user processing time while reading code and ensures maximum understanding across a wide range of developer experience levels.
+
+Abbreviations may be used in the `source/` implementations at the developer's discretion, but explicit and clear naming is encouraged.
 
 > [!WARNING]
 > This is not enforceable with tooling.
@@ -145,7 +147,7 @@ This minimizes user processing time while reading code and ensures maximum under
 > [!IMPORTANT]
 > Prefix everything user facing with `CCC_`.
 
-All types, functions, and constants in headers that the user includes directly or transitively contain the `CCC_` prefix. This stands for `C_Container_Collection`. Many other libraries do something similar, such as SDL using the `SDL_` prefix. At this time, I am confident this is a unique prefix among the C library landscape.
+All types, functions, and constants in headers that the user includes directly or transitively contain the `CCC_` prefix. This stands for *C Container Collection*. Many other libraries do something similar, such as SDL using the `SDL_` prefix. At this time, I am confident this is a unique prefix among the C library landscape.
 
 Users may omit this prefix with name shortening on a per module basis. Every header allows the user to turn off the prefixing for that specific header's types, constants, and functions with the following definition, `#define [INTERFACE]_USING_NAMESPACE_CCC`. For example, here the user wants all fundamental types and the flat hash map interface to omit the `CCC_` prefix.
 
@@ -153,8 +155,10 @@ Users may omit this prefix with name shortening on a per module basis. Every hea
 #define TYPES_USING_NAMESPACE_CCC
 #define FLAT_HASH_MAP_USING_NAMESPACE_CCC
 #include "ccc/types.h"
-#include "ccc/flat_hash_map.c"
+#include "ccc/flat_hash_map.h"
 ```
+
+This toggle affects only the specified headers, not the global namespace.
 
 > [!NOTE]
 > This is enforced by clang tidy.
@@ -162,11 +166,12 @@ Users may omit this prefix with name shortening on a per module basis. Every hea
 #### Types
 
 > [!IMPORTANT]
-> Types use `Leading_upper_snake_case`. Member fields use `snake_case`. Logical naming follows `[prefix][adjective][noun]`.
+> Types use `Leading_upper_snake_case`. Member fields use `snake_case`. Use the following template.
+> `[prefix]_[descriptor(s)]_[object]`.
 
 Types, such as `struct`, `union`, and `enum`, that are defined by this library use `Leading_upper_snake_case`. While there are a few libraries in the C ecosystem that use `PascalCase` for types, see raylib or SDL, the pervasive style in C systems programming is `snake_case`. This library is intended for use in contexts such as kernels, compilers, or embedded environments. It should fit in to the best of its ability.
 
-However, C does not allow types and functions to have the same name. Consider the function to obtain an entry, following Rust's API design: `CCC_flat_hash_map_entry()`. The entry type cannot also be named `CCC_flat_hash_map_entry`. So, types simply capitalize the first letter to distinguish: `CCC_Flat_hash_map_entry`. This also improves code readability, grep-ability, and renaming via search and replace.
+However, C does not allow types and functions to have the same name. Consider the function to obtain an entry, following Rust's API design: `CCC_flat_hash_map_entry()`. The entry type cannot also be named `CCC_flat_hash_map_entry`. So, types simply capitalize the first letter to distinguish themselves: `CCC_Flat_hash_map_entry`. This also improves code readability, grep-ability, and renaming via search and replace.
 
 Naming a type uses the prefix, any additional descriptors needed, and then the object being declared. For example the `CCC_Flat_hash_map` has the `CCC_` prefix, describes the map as `Flat` because it is in an array, and that it is a `hash_map`.
 
@@ -176,9 +181,10 @@ Naming a type uses the prefix, any additional descriptors needed, and then the o
 #### Functions and Function-like Macros
 
 > [!IMPORTANT]
-> Functions and function-like macros use `snake_case`. Logical naming follows `[prefix][interface][state/action]`
+> Functions and function-like macros use `snake_case` and the following template.
+> `[prefix][container name][action or query]`
 
-This is the least visually invasive choice among a wide variety of code bases. It prioritizes readability. Function-like macros follow function style because they signal to the user that they must provide arguments. Also, any modern IDE or LSP configuration will trivially show the user that the macro is a macro not a function.
+This is the least visually invasive choice among a wide variety of code bases. It prioritizes readability. Function-like macros follow function style because they signal to the user that they must provide arguments. Also, any modern IDE or LSP configuration will trivially show the user that the macro is not a function.
 
 Consider the flat hash map function to unwrap or obtain status regarding an entry. We have `CCC_flat_hash_map_occupied()` and `CCC_flat_hash_map_unwrap()`. Notice that the former omits the filler word `is` because there is no ambiguity when using this adjective to describe the current state. The `is` addition is helpful when the function would otherwise be ambiguous, such as `container_is_empty()` being more clear than `container_empty()`. The latter may suggest the container elements are being freed from memory.
 
@@ -189,10 +195,12 @@ Use `get_`, `is_`, or `has_` only when the function would be ambiguous without t
 
 #### Constants
 
-> ![!IMPORTANT]
-> Constants from `#define` declarations or `enum` members are `UPPER_CASE`. Static translation unit constant variables are prefixed `static_`; prefer anonymous `enum` if possible. Global constants are not allowed.
+> [!IMPORTANT]
+> Constants from `#define` declarations or `enum` members are `UPPER_CASE`. Static translation unit constant variables are prefixed `static_`, only appearing in `source/` files. Prefer `enum` whenever possible.
 
-This is a clear signal that the value is hard coded and the constant value is placed directly where it appears by the compiler.
+An `enum` is preferred because in `C23` they can be type specified compile-time constants. They appear in debuggers, unlike `#define` constants. They also do not require space in the data segment, unlike static constants.
+
+The `static_` prefix makes it clear that we are working with a variable that occupies space in memory, unlike an `enum` or `#define`.
 
 > [!NOTE]
 > This is enforced by clang tidy.
