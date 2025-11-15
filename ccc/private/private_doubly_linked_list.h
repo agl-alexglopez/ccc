@@ -33,9 +33,9 @@ if an element is in the list. */
 struct CCC_Doubly_linked_list_node
 {
     /** @internal The next element. Non-null if elem is in list. */
-    struct CCC_Doubly_linked_list_node *n;
+    struct CCC_Doubly_linked_list_node *next;
     /** @internal The previous element. Non-null if elem is in list. */
-    struct CCC_Doubly_linked_list_node *p;
+    struct CCC_Doubly_linked_list_node *previous;
 };
 
 /** @internal A doubly linked list with a single sentinel for both head and
@@ -126,8 +126,8 @@ name of the list being on the left hand side of the assignment operator. */
     private_doubly_linked_list_node_field, private_compare_fn,                 \
     private_allocate, private_context_data)                                    \
     {                                                                          \
-        .nil.n = &(private_doubly_linked_list_name).nil,                       \
-        .nil.p = &(private_doubly_linked_list_name).nil,                       \
+        .nil.next = &(private_doubly_linked_list_name).nil,                    \
+        .nil.previous = &(private_doubly_linked_list_name).nil,                \
         .sizeof_type = sizeof(private_struct_name),                            \
         .doubly_linked_list_node_offset = offsetof(                            \
             private_struct_name, private_doubly_linked_list_node_field),       \

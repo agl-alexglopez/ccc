@@ -95,22 +95,22 @@ CCC_private_flat_priority_queue_update_fixup(struct CCC_Flat_priority_queue *,
    expressions. See documentation in the flat priority_queueueue header for
    usage. The ugly details of the macro are hidden here in the impl header. */
 #define CCC_private_flat_priority_queue_emplace(flat_priority_queue,           \
-                                                type_initializer...)           \
+                                                type_compound_literal...)      \
     (__extension__({                                                           \
         struct CCC_Flat_priority_queue *private_flat_priority_queue            \
             = (flat_priority_queue);                                           \
-        typeof(type_initializer) *private_flat_priority_queue_res              \
+        typeof(type_compound_literal) *private_flat_priority_queue_res         \
             = CCC_buffer_allocate_back(&private_flat_priority_queue->buffer);  \
         if (private_flat_priority_queue_res)                                   \
         {                                                                      \
-            *private_flat_priority_queue_res = type_initializer;               \
+            *private_flat_priority_queue_res = type_compound_literal;          \
             if (private_flat_priority_queue->buffer.count > 1)                 \
             {                                                                  \
                 private_flat_priority_queue_res = CCC_buffer_at(               \
                     &private_flat_priority_queue->buffer,                      \
                     CCC_private_flat_priority_queue_bubble_up(                 \
                         private_flat_priority_queue,                           \
-                        &(typeof(type_initializer)){0},                        \
+                        &(typeof(type_compound_literal)){0},                   \
                         private_flat_priority_queue->buffer.count - 1));       \
             }                                                                  \
             else                                                               \

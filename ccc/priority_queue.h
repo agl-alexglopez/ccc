@@ -72,7 +72,7 @@ Initialize the container with memory, callbacks, and permissions. */
 /** @brief Initialize a priority queue at runtime or compile time.
 @param[in] struct_name the name of the user type_intruder wrapping
 priority_queue elems.
-@param[in] priority_queue_node_field the name of the field for the
+@param[in] type_intruder_field the name of the field for the
 priority_queue elem.
 @param[in] order CCC_ORDER_LESSER for a min priority_queue or
 CCC_ORDER_GREATER for a max priority_queue.
@@ -82,11 +82,11 @@ CCC_ORDER_GREATER for a max priority_queue.
 @return the initialized priority_queue on the right side of an equality operator
 (e.g. CCC_Priority_queue priority_queue = CCC_priority_queue_initialize(...);)
 */
-#define CCC_priority_queue_initialize(struct_name, priority_queue_node_field,  \
-                                      order, compare, allocate, context_data)  \
-    CCC_private_priority_queue_initialize(struct_name,                         \
-                                          priority_queue_node_field, order,    \
-                                          compare, allocate, context_data)
+#define CCC_priority_queue_initialize(struct_name, type_intruder_field, order, \
+                                      compare, allocate, context_data)         \
+    CCC_private_priority_queue_initialize(struct_name, type_intruder_field,    \
+                                          order, compare, allocate,            \
+                                          context_data)
 
 /**@}*/
 
