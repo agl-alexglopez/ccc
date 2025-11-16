@@ -951,14 +951,6 @@ CCC_private_handle_bounded_map_allocate_slot(
     return allocate_slot(map);
 }
 
-CCC_Result
-CCC_private_handle_bounded_map_reserve(struct CCC_Handle_bounded_map *const map,
-                                       size_t count,
-                                       CCC_Allocator *const allocate)
-{
-    return CCC_handle_bounded_map_reserve(map, count, allocate);
-}
-
 /*==========================  Static Helpers   ==============================*/
 
 static size_t
