@@ -291,9 +291,9 @@ equality operator (i.e. CCC_Flat_hash_map map = CCC_flat_hash_map_from(...);)
 for dynamic maps.
 @warning When duplicate keys appear in the initializer list, the last occurrence
 replaces earlier ones by value (all fields are overwritten).
-@warning If initialization fails all subsequent queries, insertions, or
-removals will indicate the error: either memory related or lack of an
-allocation function provided.
+@warning If initialization fails, the map will be returned empty. All subsequent
+queries, insertions, or removals will indicate the error: either memory related
+or lack of an allocation function provided.
 
 Initialize a dynamic hash table at run time. This example requires no context
 data for initialization.

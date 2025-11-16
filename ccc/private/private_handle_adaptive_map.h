@@ -176,6 +176,80 @@ is of a known fixed size defined at compile time, not just a pointer. */
         .context = (private_context_data),                                     \
     }
 
+/** @internal Initialize a handle adaptive map from user input list. */
+#define CCC_private_handle_adaptive_map_from(                                  \
+    private_key_field, private_key_compare, private_allocate,                  \
+    private_context_data, private_optional_cap,                                \
+    private_array_compound_literal...)                                         \
+    (__extension__({                                                           \
+        typeof(*private_array_compound_literal)                                \
+            *private_handle_adaptive_map_initializer_list                      \
+            = private_array_compound_literal;                                  \
+        struct CCC_Handle_adaptive_map private_handle_adaptive_map             \
+            = CCC_private_handle_adaptive_map_initialize(                      \
+                NULL, typeof(*private_handle_adaptive_map_initializer_list),   \
+                private_key_field, private_key_compare, private_allocate,      \
+                private_context_data, 0);                                      \
+        size_t const private_handle_adaptive_n                                 \
+            = sizeof(private_array_compound_literal)                           \
+            / sizeof(*private_handle_adaptive_map_initializer_list);           \
+        size_t const private_cap = private_optional_cap;                       \
+        if (CCC_handle_adaptive_map_reserve(                                   \
+                &private_handle_adaptive_map,                                  \
+                (private_handle_adaptive_n > private_cap                       \
+                     ? private_handle_adaptive_n                               \
+                     : private_cap),                                           \
+                private_allocate)                                              \
+            == CCC_RESULT_OK)                                                  \
+        {                                                                      \
+            for (size_t i = 0; i < private_handle_adaptive_n; ++i)             \
+            {                                                                  \
+                struct CCC_Handle_adaptive_map_handle                          \
+                    private_handle_adaptive_entry                              \
+                    = CCC_private_handle_adaptive_map_handle(                  \
+                        &private_handle_adaptive_map,                          \
+                        (void const                                            \
+                             *)&private_handle_adaptive_map_initializer_list   \
+                            [i]                                                \
+                                .private_key_field);                           \
+                CCC_Handle_index private_index                                 \
+                    = private_handle_adaptive_entry.index;                     \
+                if (!(private_handle_adaptive_entry.status                     \
+                      & CCC_ENTRY_OCCUPIED))                                   \
+                {                                                              \
+                    private_index                                              \
+                        = CCC_private_handle_adaptive_map_allocate_slot(       \
+                            &private_handle_adaptive_map);                     \
+                }                                                              \
+                *((typeof(*private_handle_adaptive_map_initializer_list) *)    \
+                      CCC_private_handle_adaptive_map_data_at(                 \
+                          private_handle_adaptive_entry.map, private_index))   \
+                    = private_handle_adaptive_map_initializer_list[i];         \
+                if (!(private_handle_adaptive_entry.status                     \
+                      & CCC_ENTRY_OCCUPIED))                                   \
+                {                                                              \
+                    CCC_private_handle_adaptive_map_insert(                    \
+                        private_handle_adaptive_entry.map, private_index);     \
+                }                                                              \
+            }                                                                  \
+        }                                                                      \
+        private_handle_adaptive_map;                                           \
+    }))
+
+#define CCC_private_handle_adaptive_map_with_capacity(                         \
+    private_type_name, private_key_field, private_key_compare,                 \
+    private_allocate, private_context_data, private_cap)                       \
+    (__extension__({                                                           \
+        struct CCC_Handle_adaptive_map private_handle_adaptive_map             \
+            = CCC_private_handle_adaptive_map_initialize(                      \
+                NULL, private_type_name, private_key_field,                    \
+                private_key_compare, private_allocate, private_context_data,   \
+                0);                                                            \
+        (void)CCC_handle_adaptive_map_reserve(&private_handle_adaptive_map,    \
+                                              private_cap, private_allocate);  \
+        private_handle_adaptive_map;                                           \
+    }))
+
 /** @internal */
 #define CCC_private_handle_adaptive_map_as(Handle_adaptive_map_pointer,        \
                                            type_name, handle...)               \

@@ -323,16 +323,13 @@ fixed size and has data or is dynamic and has not yet been given allocation. */
                         (void const                                            \
                              *)&private_flat_hash_map_initializer_list[i]      \
                             .private_key_field);                               \
-                if (!(private_ent.status & CCC_ENTRY_INSERT_ERROR))            \
+                *((typeof(*private_flat_hash_map_initializer_list) *)          \
+                      CCC_private_flat_hash_map_data_at(private_ent.map,       \
+                                                        private_ent.index))    \
+                    = private_flat_hash_map_initializer_list[i];               \
+                if (private_ent.status == CCC_ENTRY_VACANT)                    \
                 {                                                              \
-                    *((typeof(*private_flat_hash_map_initializer_list) *)      \
-                          CCC_private_flat_hash_map_data_at(                   \
-                              private_ent.map, private_ent.index))             \
-                        = private_flat_hash_map_initializer_list[i];           \
-                    if (private_ent.status == CCC_ENTRY_VACANT)                \
-                    {                                                          \
-                        CCC_private_flat_hash_map_set_insert(&private_ent);    \
-                    }                                                          \
+                    CCC_private_flat_hash_map_set_insert(&private_ent);        \
                 }                                                              \
             }                                                                  \
         }                                                                      \

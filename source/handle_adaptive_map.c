@@ -627,7 +627,7 @@ CCC_handle_adaptive_map_reserve(CCC_Handle_adaptive_map *const map,
                                 size_t const to_add,
                                 CCC_Allocator *const allocate)
 {
-    if (!map || !allocate)
+    if (!map || !to_add || !allocate)
     {
         return CCC_RESULT_ARGUMENT_ERROR;
     }
