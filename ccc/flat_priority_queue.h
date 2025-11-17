@@ -732,6 +732,9 @@ flat priority queue container. Check for collisions before name shortening. */
 typedef CCC_Flat_priority_queue Flat_priority_queue;
 #    define flat_priority_queue_initialize(args...)                            \
         CCC_flat_priority_queue_initialize(args)
+#    define flat_priority_queue_from(args...) CCC_flat_priority_queue_from(args)
+#    define flat_priority_queue_with_capacity(args...)                         \
+        CCC_flat_priority_queue_with_capacity(args)
 #    define flat_priority_queue_heapify_initialize(args...)                    \
         CCC_flat_priority_queue_heapify_initialize(args)
 #    define flat_priority_queue_copy(args...) CCC_flat_priority_queue_copy(args)

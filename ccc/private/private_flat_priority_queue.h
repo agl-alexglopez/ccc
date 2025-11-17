@@ -102,7 +102,7 @@ CCC_private_flat_priority_queue_update_fixup(struct CCC_Flat_priority_queue *,
             .order = private_order,                                            \
             .compare = private_compare,                                        \
         };                                                                     \
-        if (private_flat_priority_queue.buffer.capacity)                       \
+        if (private_flat_priority_queue.buffer.count)                          \
         {                                                                      \
             CCC_private_flat_priority_queue_in_place_heapify(                  \
                 &private_flat_priority_queue,                                  \

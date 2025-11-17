@@ -253,27 +253,23 @@ animate_maze(struct Maze *maze)
     int const speed = speeds[maze->speed];
     fill_maze_with_walls(maze);
     clear_and_flush_maze(maze);
-    /* Test use case of reserve without reallocation permission. Guarantees
-       exactly the needed memory and no more over lifetime of program. */
-    Flat_hash_map cost_map = flat_hash_map_initialize(
-        NULL, struct Prim_cell, cell, prim_cell_hash_fn, prim_cell_order, NULL,
-        NULL, 0);
-    Result r
-        = reserve(&cost_map, ((maze->rows * maze->cols) / 2) + 1, std_allocate);
-    check(r == CCC_RESULT_OK);
+    size_t const capacity = ((maze->rows * maze->cols) / 2) + 1;
+    struct Prim_cell const start = (struct Prim_cell){
+        .cell = rand_point(maze),
+        .cost = rand_range(0, 100),
+    };
+    Flat_hash_map cost_map = CCC_flat_hash_map_from(
+        cell, prim_cell_hash_fn, prim_cell_order, std_allocate, NULL, capacity,
+        (struct Prim_cell[]){
+            start,
+        });
     /* Priority queue gets same reserve interface. */
-    Flat_priority_queue cell_priority_queue = flat_priority_queue_initialize(
-        NULL, struct Prim_cell, CCC_ORDER_LESSER, order_prim_cells, NULL, NULL,
-        0);
-    r = reserve(&cell_priority_queue, ((maze->rows * maze->cols) / 2) + 1,
-                std_allocate);
-    check(r == CCC_RESULT_OK);
-    struct Point s = rand_point(maze);
-    struct Prim_cell const *const first = flat_hash_map_insert_entry_with(
-        entry_wrap(&cost_map, &s),
-        (struct Prim_cell){.cell = s, .cost = rand_range(0, 100)});
-    check(first);
-    (void)push(&cell_priority_queue, first, &(struct Prim_cell){});
+    Flat_priority_queue cell_priority_queue = flat_priority_queue_from(
+        CCC_ORDER_LESSER, order_prim_cells, std_allocate, NULL, capacity,
+        (struct Prim_cell[]){
+            start,
+        });
+    check(!is_empty(&cell_priority_queue) && !is_empty(&cost_map));
     while (!is_empty(&cell_priority_queue))
     {
         struct Prim_cell const *const c = front(&cell_priority_queue);
@@ -283,15 +279,19 @@ animate_maze(struct Maze *maze)
         int min = INT_MAX;
         for (size_t i = 0; i < DIR_OFFSETS_SIZE; ++i)
         {
-            struct Point const n = {.r = c->cell.r + dir_offsets[i].r,
-                                    .c = c->cell.c + dir_offsets[i].c};
+            struct Point const n = {
+                .r = c->cell.r + dir_offsets[i].r,
+                .c = c->cell.c + dir_offsets[i].c,
+            };
             if (can_build_new_square(maze, n.r, n.c))
             {
                 struct Prim_cell const *const cell
                     = flat_hash_map_or_insert_with(
                         entry_wrap(&cost_map, &n),
-                        (struct Prim_cell){.cell = n,
-                                           .cost = rand_range(0, 100)});
+                        (struct Prim_cell){
+                            .cell = n,
+                            .cost = rand_range(0, 100),
+                        });
                 check(cell);
                 if (cell->cost < min)
                 {
@@ -310,10 +310,8 @@ animate_maze(struct Maze *maze)
             (void)pop(&cell_priority_queue, &(struct Prim_cell){});
         }
     }
-    /* If a container is reserved without allocation permission it has no way
-       to free itself. Give it the same allocation function used to reserve. */
-    (void)clear_and_free_reserve(&cost_map, NULL, std_allocate);
-    (void)clear_and_free_reserve(&cell_priority_queue, NULL, std_allocate);
+    (void)clear_and_free(&cost_map, NULL);
+    (void)clear_and_free(&cell_priority_queue, NULL);
 }
 
 /*===================     Container Support Code     ========================*/
