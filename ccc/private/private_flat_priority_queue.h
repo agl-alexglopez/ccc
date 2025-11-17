@@ -61,34 +61,70 @@ CCC_private_flat_priority_queue_update_fixup(struct CCC_Flat_priority_queue *,
 
 /** @internal */
 #define CCC_private_flat_priority_queue_initialize(                            \
-    private_data_pointer, private_type_name, private_order_order,              \
-    private_order_fn, private_allocate, private_context_data,                  \
-    private_capacity)                                                          \
+    private_data_pointer, private_type_name, private_order, private_compare,   \
+    private_allocate, private_context_data, private_capacity)                  \
     {                                                                          \
         .buffer = CCC_buffer_initialize(                                       \
             private_data_pointer, private_type_name, private_allocate,         \
             private_context_data, private_capacity),                           \
-        .order = (private_order_order),                                        \
-        .compare = (private_order_fn),                                         \
+        .order = (private_order),                                              \
+        .compare = (private_compare),                                          \
     }
 
 /** @internal */
 #define CCC_private_flat_priority_queue_heapify_initialize(                    \
-    private_data_pointer, private_type_name, private_order_order,              \
-    private_order_fn, private_allocate, private_context_data,                  \
-    private_capacity, private_size)                                            \
+    private_data_pointer, private_type_name, private_order, private_compare,   \
+    private_allocate, private_context_data, private_capacity, private_size)    \
     (__extension__({                                                           \
-        __auto_type private_flat_priority_queue_heapify_data                   \
+        typeof(*(                                                              \
+            private_data_pointer)) *private_flat_priority_queue_heapify_data   \
             = (private_data_pointer);                                          \
         struct CCC_Flat_priority_queue private_flat_priority_queue_heapify_res \
             = CCC_private_flat_priority_queue_initialize(                      \
                 private_flat_priority_queue_heapify_data, private_type_name,   \
-                private_order_order, private_order_fn, private_allocate,       \
+                private_order, private_compare, private_allocate,              \
                 private_context_data, private_capacity);                       \
         CCC_private_flat_priority_queue_in_place_heapify(                      \
             &private_flat_priority_queue_heapify_res, (private_size),          \
             &(private_type_name){0});                                          \
         private_flat_priority_queue_heapify_res;                               \
+    }))
+
+/** @internal */
+#define CCC_private_flat_priority_queue_from(                                  \
+    private_order, private_compare, private_allocate, private_context_data,    \
+    private_optional_capacity, private_compound_literal_array...)              \
+    (__extension__({                                                           \
+        struct CCC_Flat_priority_queue private_flat_priority_queue = {         \
+            .buffer = CCC_buffer_from(private_allocate, private_context_data,  \
+                                      private_optional_capacity,               \
+                                      private_compound_literal_array),         \
+            .order = private_order,                                            \
+            .compare = private_compare,                                        \
+        };                                                                     \
+        if (private_flat_priority_queue.buffer.capacity)                       \
+        {                                                                      \
+            CCC_private_flat_priority_queue_in_place_heapify(                  \
+                &private_flat_priority_queue,                                  \
+                private_flat_priority_queue.buffer.count,                      \
+                &(typeof(*private_compound_literal_array)){0});                \
+        }                                                                      \
+        private_flat_priority_queue;                                           \
+    }))
+
+/** @internal */
+#define CCC_private_flat_priority_queue_with_capacity(                         \
+    private_type_name, private_order, private_compare, private_allocate,       \
+    private_context_data, private_capacity)                                    \
+    (__extension__({                                                           \
+        struct CCC_Flat_priority_queue private_flat_priority_queue = {         \
+            .buffer = CCC_buffer_with_capacity(                                \
+                private_type_name, private_allocate, private_context_data,     \
+                private_capacity),                                             \
+            .order = (private_order),                                          \
+            .compare = (private_compare),                                      \
+        };                                                                     \
+        private_flat_priority_queue;                                           \
     }))
 
 /** @internal This macro "returns" a value thanks to clang and gcc statement

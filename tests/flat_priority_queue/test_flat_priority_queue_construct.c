@@ -1,3 +1,4 @@
+#include <limits.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdlib.h>
@@ -272,6 +273,70 @@ check_static_begin(flat_priority_queue_test_copy_allocate_fail)
     check_end({ (void)flat_priority_queue_clear_and_free(&source, NULL); });
 }
 
+check_static_begin(flat_priority_queue_test_init_from)
+{
+    CCC_Flat_priority_queue queue = CCC_flat_priority_queue_from(
+        CCC_ORDER_LESSER, int_order, std_allocate, NULL, 0,
+        (int[]){8, 6, 7, 5, 3, 0, 9});
+    int count = 0;
+    int prev = INT_MIN;
+    check(CCC_flat_priority_queue_count(&queue).count, 7);
+    while (!CCC_flat_priority_queue_is_empty(&queue))
+    {
+        int const front = *(int *)CCC_flat_priority_queue_front(&queue);
+        check(front > prev, true);
+        CCC_Result const pop = CCC_flat_priority_queue_pop(&queue, &(int){0});
+        check(pop, CCC_RESULT_OK);
+        ++count;
+    }
+    check(count, 7);
+    check(CCC_flat_priority_queue_capacity(&queue).count >= 7, true);
+    check_end((void)CCC_flat_priority_queue_clear_and_free(&queue, NULL););
+}
+
+check_static_begin(flat_priority_queue_test_init_from_fail)
+{
+    /* Whoops forgot allocation function. */
+    CCC_Flat_priority_queue queue
+        = CCC_flat_priority_queue_from(CCC_ORDER_LESSER, int_order, NULL, NULL,
+                                       0, (int[]){8, 6, 7, 5, 3, 0, 9});
+    int count = 0;
+    int prev = INT_MIN;
+    check(CCC_flat_priority_queue_count(&queue).count, 0);
+    while (!CCC_flat_priority_queue_is_empty(&queue))
+    {
+        int const front = *(int *)CCC_flat_priority_queue_front(&queue);
+        check(front > prev, true);
+        ++count;
+        CCC_Result const pop = CCC_flat_priority_queue_pop(&queue, &(int){0});
+        check(pop, CCC_RESULT_OK);
+    }
+    check(count, 0);
+    check(CCC_flat_priority_queue_capacity(&queue).count, 0);
+    check(CCC_flat_priority_queue_push(&queue, &(int){12}, &(int){0}), NULL);
+    check_end((void)CCC_flat_priority_queue_clear_and_free(&queue, NULL););
+}
+
+check_static_begin(flat_priority_queue_test_init_with_capacity)
+{
+    CCC_Flat_priority_queue queue = CCC_flat_priority_queue_with_capacity(
+        int, CCC_ORDER_LESSER, int_order, std_allocate, NULL, 8);
+    check(CCC_flat_priority_queue_capacity(&queue).count, 8);
+    check(CCC_flat_priority_queue_push(&queue, &(int){9}, &(int){0}) != NULL,
+          CCC_TRUE);
+    check_end(CCC_flat_priority_queue_clear_and_free(&queue, NULL););
+}
+
+check_static_begin(flat_priority_queue_test_init_with_capacity_fail)
+{
+    /* Forgot allocation function. */
+    CCC_Flat_priority_queue queue = CCC_flat_priority_queue_with_capacity(
+        int, CCC_ORDER_LESSER, int_order, NULL, NULL, 8);
+    check(CCC_flat_priority_queue_capacity(&queue).count, 0);
+    check(CCC_flat_priority_queue_push(&queue, &(int){9}, &(int){0}), NULL);
+    check_end(CCC_flat_priority_queue_clear_and_free(&queue, NULL););
+}
+
 int
 main()
 {
@@ -285,5 +350,9 @@ main()
         flat_priority_queue_test_copy_no_allocate_fail(),
         flat_priority_queue_test_copy_allocate(),
         flat_priority_queue_test_copy_allocate_fail(),
-        flat_priority_queue_test_heapsort());
+        flat_priority_queue_test_heapsort(),
+        flat_priority_queue_test_init_from(),
+        flat_priority_queue_test_init_from_fail(),
+        flat_priority_queue_test_init_with_capacity(),
+        flat_priority_queue_test_init_with_capacity_fail());
 }

@@ -115,14 +115,114 @@ heap, respectively.
 @param[in] size the size <= capacity.
 @return the initialized priority queue on the right hand side of an equality
 operator. (i.e. CCC_Flat_priority_queue q =
-CCC_flat_priority_queue_heapify_initialize(...);).
-*/
+CCC_flat_priority_queue_heapify_initialize(...);). */
 #define CCC_flat_priority_queue_heapify_initialize(                            \
     data_pointer, type_name, order, compare, allocate, context_data, capacity, \
     size)                                                                      \
     CCC_private_flat_priority_queue_heapify_initialize(                        \
         data_pointer, type_name, order, compare, allocate, context_data,       \
         capacity, size)
+
+/** @brief Partial order a compound literal array of elements as a min or max
+heap. O(N).
+@param[in] order CCC_ORDER_LESSER or CCC_ORDER_GREATER for min or max heap,
+respectively.
+@param[in] compare the user defined comparison function for user types.
+@param[in] allocate the allocation function or NULL if no allocation.
+@param[in] context_data any context data needed for destruction of elements.
+@param[in] optional_capacity the optional capacity larger than the input
+compound literal array array to reserve. If capacity provided is less than the
+size of the input compound literal array, the capacity is set to the size of the
+input compound literal array. If not needed, simply leave as zero.
+@return the initialized priority queue on the right hand side of an equality
+operator. (e.g. CCC_Flat_priority_queue q = CCC_flat_priority_queue_from(...);).
+
+Initialize a dynamic Flat_priority_queue with capacity equal to size.
+
+```
+#define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
+int
+main(void)
+{
+    Flat_priority_queue f = flat_priority_queue_from(
+        CCC_ORDER_LESSER,
+        compare_ints,
+        std_allocate,
+        NULL,
+        0,
+        (int[]){6, 99, 32, 44, 1, 0}
+    );
+    return 0;
+}
+```
+
+Initialize a dynamic Flat_priority_queue with a large capacity.
+
+```
+#define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
+int
+main(void)
+{
+    Flat_priority_queue f = flat_priority_queue_from(
+        CCC_ORDER_LESSER,
+        compare_ints,
+        std_allocate,
+        NULL,
+        4096,
+        (int[]){6, 99, 32, 44, 1, 0}
+    );
+    return 0;
+}
+```
+
+Only dynamic priority queues may be initialized this way. For static or stack
+based initialization of fixed buffers with contents known at compile time, see
+the CCC_flat_priority_queue_initialize() macro. */
+#define CCC_flat_priority_queue_from(order, compare, allocate, context_data,   \
+                                     optional_capacity,                        \
+                                     compound_literal_array...)                \
+    CCC_private_flat_priority_queue_from(order, compare, allocate,             \
+                                         context_data, optional_capacity,      \
+                                         compound_literal_array)
+
+/** @brief Initialize a Flat_priority_queue with a capacity.
+@param[in] type_name the name of the user type.
+@param[in] order CCC_ORDER_LESSER or CCC_ORDER_GREATER for min or max
+heap, respectively.
+@param[in] compare the user defined comparison function for user types.
+@param[in] allocate the allocation function or NULL if no allocation.
+@param[in] context_data any context data needed for destruction of elements.
+@param[in] capacity the capacity of contiguous elements at data_pointer.
+@return the initialized flat_priority_queue. Directly assign to
+Flat_priority_queue on the right hand side of the equality operator (e.g.
+CCC_Flat_priority_queue b = CCC_flat_priority_queue_with_capacity(...);).
+
+Initialize a dynamic Flat_priority_queue.
+
+```
+#define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
+int
+main(void)
+{
+    Flat_priority_queue f = flat_priority_queue_with_capacity(
+        int,
+        CCC_ORDER_LESSER,
+        compare_ints,
+        std_allocate,
+        NULL,
+        4096
+    );
+    return 0;
+}
+```
+
+Only dynamic Flat_priority_queues may be initialized this way. For static or
+stack based initialization of fixed flat_priority_queues with contents known at
+compile time, see the CCC_flat_priority_queue_initialize() macro. */
+#define CCC_flat_priority_queue_with_capacity(                                 \
+    type_name, order, compare, allocate, context_data, capacity)               \
+    CCC_private_flat_priority_queue_with_capacity(                             \
+        type_name, order, compare, allocate, context_data, capacity)
 
 /** @brief Copy the priority_queue from source to newly initialized
 destination.
