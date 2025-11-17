@@ -162,9 +162,10 @@ static size_t min_max_from(struct CCC_Handle_adaptive_map const *, size_t start,
                            enum Branch dir);
 static size_t next(struct CCC_Handle_adaptive_map const *, size_t n,
                    enum Branch traversal);
-static size_t branch_i(struct CCC_Handle_adaptive_map const *, size_t parent,
-                       enum Branch dir);
-static size_t parent_i(struct CCC_Handle_adaptive_map const *, size_t child);
+static size_t branch_index(struct CCC_Handle_adaptive_map const *,
+                           size_t parent, enum Branch dir);
+static size_t parent_index(struct CCC_Handle_adaptive_map const *,
+                           size_t child);
 static size_t index_of(struct CCC_Handle_adaptive_map const *,
                        void const *key_val_type);
 /* Returning references to index fields for tree nodes. */
@@ -1029,16 +1030,16 @@ erase(struct CCC_Handle_adaptive_map *const map, void const *const key)
 static size_t
 remove_from_tree(struct CCC_Handle_adaptive_map *const map, size_t const ret)
 {
-    if (!branch_i(map, ret, L))
+    if (!branch_index(map, ret, L))
     {
-        map->root = branch_i(map, ret, R);
+        map->root = branch_index(map, ret, R);
         link(map, 0, 0, map->root);
     }
     else
     {
-        map->root
-            = splay(map, branch_i(map, ret, L), key_at(map, ret), map->order);
-        link(map, map->root, R, branch_i(map, ret, R));
+        map->root = splay(map, branch_index(map, ret, L), key_at(map, ret),
+                          map->order);
+        link(map, map->root, R, branch_index(map, ret, R));
     }
     node_at(map, ret)->next_free = map->free_list;
     map->free_list = ret;
@@ -1051,7 +1052,7 @@ connect_new_root(struct CCC_Handle_adaptive_map *const map,
                  size_t const new_root, CCC_Order const order_result)
 {
     enum Branch const dir = CCC_ORDER_GREATER == order_result;
-    link(map, new_root, dir, branch_i(map, map->root, dir));
+    link(map, new_root, dir, branch_index(map, map->root, dir));
     link(map, new_root, !dir, map->root);
     *branch_ref(map, map->root, dir) = 0;
     map->root = new_root;
@@ -1087,32 +1088,34 @@ splay(struct CCC_Handle_adaptive_map *const map, size_t root,
     {
         CCC_Order const key_order = order_nodes(map, key, root, compare);
         enum Branch const child_link = CCC_ORDER_GREATER == key_order;
-        if (CCC_ORDER_EQUAL == key_order || !branch_i(map, root, child_link))
+        if (CCC_ORDER_EQUAL == key_order
+            || !branch_index(map, root, child_link))
         {
             break;
         }
-        CCC_Order const child_order
-            = order_nodes(map, key, branch_i(map, root, child_link), compare);
+        CCC_Order const child_order = order_nodes(
+            map, key, branch_index(map, root, child_link), compare);
         enum Branch const grandchild_link = CCC_ORDER_GREATER == child_order;
         /* A straight line has formed from root->child->grandchild. An
            opportunity to splay and heal the tree arises. */
         if (CCC_ORDER_EQUAL != child_order && child_link == grandchild_link)
         {
-            size_t const child_node = branch_i(map, root, child_link);
-            link(map, root, child_link, branch_i(map, child_node, !child_link));
+            size_t const child_node = branch_index(map, root, child_link);
+            link(map, root, child_link,
+                 branch_index(map, child_node, !child_link));
             link(map, child_node, !child_link, root);
             root = child_node;
-            if (!branch_i(map, root, child_link))
+            if (!branch_index(map, root, child_link))
             {
                 break;
             }
         }
         link(map, l_r_subtrees[!child_link], child_link, root);
         l_r_subtrees[!child_link] = root;
-        root = branch_i(map, root, child_link);
+        root = branch_index(map, root, child_link);
     }
-    link(map, l_r_subtrees[L], R, branch_i(map, root, L));
-    link(map, l_r_subtrees[R], L, branch_i(map, root, R));
+    link(map, l_r_subtrees[L], R, branch_index(map, root, L));
+    link(map, l_r_subtrees[R], L, branch_index(map, root, R));
     link(map, root, L, nil->branch[R]);
     link(map, root, R, nil->branch[L]);
     map->root = root;
@@ -1138,7 +1141,7 @@ min_max_from(struct CCC_Handle_adaptive_map const *const map, size_t start,
     {
         return 0;
     }
-    for (; branch_i(map, start, dir); start = branch_i(map, start, dir))
+    for (; branch_index(map, start, dir); start = branch_index(map, start, dir))
     {}
     return start;
 }
@@ -1151,19 +1154,21 @@ next(struct CCC_Handle_adaptive_map const *const map, size_t n,
     {
         return 0;
     }
-    assert(!parent_i(map, map->root));
+    assert(!parent_index(map, map->root));
     /* The node is an internal one that has a sub-tree to explore first. */
-    if (branch_i(map, n, traversal))
+    if (branch_index(map, n, traversal))
     {
         /* The goal is to get far left/right ASAP in any traversal. */
-        for (n = branch_i(map, n, traversal); branch_i(map, n, !traversal);
-             n = branch_i(map, n, !traversal))
+        for (n = branch_index(map, n, traversal);
+             branch_index(map, n, !traversal);
+             n = branch_index(map, n, !traversal))
         {}
         return n;
     }
     /* This is how to return internal nodes on the way back up from a leaf. */
-    size_t p = parent_i(map, n);
-    for (; p && branch_i(map, p, !traversal) != n; n = p, p = parent_i(map, p))
+    size_t p = parent_index(map, n);
+    for (; p && branch_index(map, p, !traversal) != n;
+         n = p, p = parent_index(map, p))
     {}
     return p;
 }
@@ -1322,14 +1327,15 @@ data_at(struct CCC_Handle_adaptive_map const *const map, size_t const i)
 }
 
 static inline size_t
-branch_i(struct CCC_Handle_adaptive_map const *const map, size_t const parent,
-         enum Branch const dir)
+branch_index(struct CCC_Handle_adaptive_map const *const map,
+             size_t const parent, enum Branch const dir)
 {
     return node_at(map, parent)->branch[dir];
 }
 
 static inline size_t
-parent_i(struct CCC_Handle_adaptive_map const *const map, size_t const child)
+parent_index(struct CCC_Handle_adaptive_map const *const map,
+             size_t const child)
 {
     return node_at(map, child)->parent;
 }
@@ -1395,8 +1401,8 @@ recursive_count(struct CCC_Handle_adaptive_map const *const map, size_t const r)
     {
         return 0;
     }
-    return 1 + recursive_count(map, branch_i(map, r, R))
-         + recursive_count(map, branch_i(map, r, L));
+    return 1 + recursive_count(map, branch_index(map, r, R))
+         + recursive_count(map, branch_index(map, r, L));
 }
 
 static CCC_Tribool
@@ -1421,11 +1427,11 @@ are_subtrees_valid(struct CCC_Handle_adaptive_map const *map,
     }
     return are_subtrees_valid(
                map, (struct Tree_range){.low = r.low,
-                                        .root = branch_i(map, r.root, L),
+                                        .root = branch_index(map, r.root, L),
                                         .high = r.root})
         && are_subtrees_valid(
                map, (struct Tree_range){.low = r.root,
-                                        .root = branch_i(map, r.root, R),
+                                        .root = branch_index(map, r.root, R),
                                         .high = r.high});
 }
 
@@ -1437,12 +1443,12 @@ is_storing_parent(struct CCC_Handle_adaptive_map const *const map,
     {
         return CCC_TRUE;
     }
-    if (parent_i(map, root) != p)
+    if (parent_index(map, root) != p)
     {
         return CCC_FALSE;
     }
-    return is_storing_parent(map, root, branch_i(map, root, L))
-        && is_storing_parent(map, root, branch_i(map, root, R));
+    return is_storing_parent(map, root, branch_index(map, root, L))
+        && is_storing_parent(map, root, branch_index(map, root, R));
 }
 
 static CCC_Tribool

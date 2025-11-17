@@ -347,8 +347,8 @@ static struct CCC_Flat_hash_map_tag *tag_pos(size_t sizeof_type,
                                              void const *data, size_t mask);
 static void *key_in_slot(struct CCC_Flat_hash_map const *, void const *slot);
 static void *swap_slot(struct CCC_Flat_hash_map const *);
-static CCC_Count data_i(struct CCC_Flat_hash_map const *,
-                        void const *data_slot);
+static CCC_Count data_index(struct CCC_Flat_hash_map const *,
+                            void const *data_slot);
 static size_t mask_to_total_bytes(size_t sizeof_type, size_t mask);
 static size_t mask_to_tag_bytes(size_t mask);
 static size_t mask_to_data_bytes(size_t sizeof_type, size_t mask);
@@ -678,7 +678,7 @@ CCC_flat_hash_map_next(CCC_Flat_hash_map const *const map,
     {
         return NULL;
     }
-    CCC_Count i = data_i(map, type_iterator);
+    CCC_Count i = data_index(map, type_iterator);
     if (i.error)
     {
         return NULL;
@@ -1663,7 +1663,8 @@ data_at(struct CCC_Flat_hash_map const *const h, size_t const i)
 }
 
 static inline CCC_Count
-data_i(struct CCC_Flat_hash_map const *const map, void const *const data_slot)
+data_index(struct CCC_Flat_hash_map const *const map,
+           void const *const data_slot)
 {
     if (unlikely((char *)data_slot
                      >= (char *)map->data + (map->sizeof_type * (map->mask + 1))

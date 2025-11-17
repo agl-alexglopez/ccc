@@ -477,7 +477,7 @@ CCC_flat_double_ended_queue_validate(
         return CCC_TRUE;
     }
     void *iterator = CCC_flat_double_ended_queue_begin(queue);
-    if (CCC_buffer_i(&queue->buffer, iterator).count != queue->front)
+    if (CCC_buffer_index(&queue->buffer, iterator).count != queue->front)
     {
         return CCC_FALSE;
     }
@@ -496,7 +496,8 @@ CCC_flat_double_ended_queue_validate(
     }
     size = 0;
     iterator = CCC_flat_double_ended_queue_reverse_begin(queue);
-    if (CCC_buffer_i(&queue->buffer, iterator).count != last_node_index(queue))
+    if (CCC_buffer_index(&queue->buffer, iterator).count
+        != last_node_index(queue))
     {
         return CCC_FALSE;
     }

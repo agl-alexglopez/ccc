@@ -430,8 +430,8 @@ size of the buffer. */
 @param[in] slot the pointer to the element stored in the buffer.
 @return the index if the slot provided is within the capacity range of the
 buffer, otherwise an argument error is set. */
-[[nodiscard]] CCC_Count CCC_buffer_i(CCC_Buffer const *buffer,
-                                     void const *slot);
+[[nodiscard]] CCC_Count CCC_buffer_index(CCC_Buffer const *buffer,
+                                         void const *slot);
 
 /** @brief return the final element in the Buffer according the current size.
 @param[in] buffer the pointer to the buffer.
@@ -753,7 +753,7 @@ typedef CCC_Buffer Buffer;
 #    define buffer_capacity(args...) CCC_buffer_capacity(args)
 #    define buffer_capacity_bytes(args...) CCC_buffer_capacity_bytes(args)
 #    define buffer_sizeof_type(args...) CCC_buffer_sizeof_type(args)
-#    define buffer_i(args...) CCC_buffer_i(args)
+#    define buffer_index(args...) CCC_buffer_index(args)
 #    define buffer_is_full(args...) CCC_buffer_is_full(args)
 #    define buffer_is_empty(args...) CCC_buffer_is_empty(args)
 #    define buffer_at(args...) CCC_buffer_at(args)

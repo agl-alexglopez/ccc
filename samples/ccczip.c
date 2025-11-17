@@ -214,9 +214,10 @@ reconstruct_tree(struct Compressed_huffman_tree *blueprint);
 static void reconstruct_text(FILE *f, struct Huffman_tree const *,
                              struct Bit_queue *);
 static void print_help(void);
-static size_t branch_i(struct Huffman_tree const *t, size_t node, uint8_t dir);
-static size_t parent_i(struct Huffman_tree const *t, size_t node);
-static char char_i(struct Huffman_tree const *t, size_t node);
+static size_t branch_index(struct Huffman_tree const *t, size_t node,
+                           uint8_t dir);
+static size_t parent_index(struct Huffman_tree const *t, size_t node);
+static char char_index(struct Huffman_tree const *t, size_t node);
 static struct Huffman_node *node_at(struct Huffman_tree const *t, size_t node);
 static void write_to_file(SV_String_view original_filepath,
                           size_t original_filesize, struct Huffman_encoding *);
@@ -372,7 +373,8 @@ build_encoding_tree(FILE *const f)
         struct Huffman_node *const internal_one
             = push_back(&ret.bump_arena,
                         &(struct Huffman_node){.link = {zero.node, one.node}});
-        size_t const new_root = buffer_i(&ret.bump_arena, internal_one).count;
+        size_t const new_root
+            = buffer_index(&ret.bump_arena, internal_one).count;
         check(internal_one);
         node_at(&ret, zero.node)->parent = new_root;
         node_at(&ret, one.node)->parent = new_root;
@@ -439,7 +441,7 @@ build_encoding_priority_queue(FILE *const f, struct Huffman_tree *const tree)
         struct Huffman_node const *const node
             = push_back(&tree->bump_arena, &(struct Huffman_node){.ch = i->ch});
         check(node);
-        size_t const node_i = buffer_i(&tree->bump_arena, node).count;
+        size_t const node_i = buffer_index(&tree->bump_arena, node).count;
         struct Flat_priority_queue_node const *const pushed = push_back(
             &flat_priority_queue_storage, &(struct Flat_priority_queue_node){
                                               .freq = i->freq, .node = node_i});
@@ -537,7 +539,7 @@ memoize_path(struct Huffman_tree *const tree, Flat_hash_map *const fh,
         cur = node->link[node->iterator++];
     }
     /* Cleanup because we now have the correct path. */
-    for (; cur; cur = parent_i(tree, cur))
+    for (; cur; cur = parent_index(tree, cur))
     {
         node_at(tree, cur)->iterator = 0;
     }
@@ -819,11 +821,13 @@ reconstruct_tree(struct Compressed_huffman_tree *const blueprint)
         CCC_Tribool bit = CCC_TRUE;
         if (!node)
         {
-            struct Huffman_node *const parent_r = node_at(&ret, parent);
             bit = bitq_pop_front(&blueprint->tree_paths);
             struct Huffman_node *const pushed = push_back(
                 &ret.bump_arena, &(struct Huffman_node){.parent = parent});
-            node = CCC_buffer_i(&ret.bump_arena, pushed).count;
+            node = CCC_buffer_index(&ret.bump_arena, pushed).count;
+            /* Get the parent reference after the buffer push in case the
+               buffer resized to accommodate push. */
+            struct Huffman_node *const parent_r = node_at(&ret, parent);
             parent_r->link[parent_r->iterator++] = node;
             if (!bit)
             {
@@ -842,7 +846,7 @@ reconstruct_tree(struct Compressed_huffman_tree *const blueprint)
         }
         /* Backtrack. A leaf or internal node with both children built. */
         node = parent;
-        parent = parent_i(&ret, parent);
+        parent = parent_index(&ret, parent);
     }
     return ret;
 }
@@ -861,10 +865,10 @@ reconstruct_text(FILE *const f, struct Huffman_tree const *const tree,
            first so popping is OK here. Root 1 node never was pushed to q. */
         CCC_Tribool const bit = bitq_pop_front(bq);
         check(bit != CCC_TRIBOOL_ERROR);
-        cur = branch_i(tree, cur, bit);
-        if (!branch_i(tree, cur, 1))
+        cur = branch_index(tree, cur, bit);
+        if (!branch_index(tree, cur, 1))
         {
-            char const c = char_i(tree, cur);
+            char const c = char_index(tree, cur);
             size_t const byte = writebytes(f, &c, sizeof(c));
             check(byte);
             cur = tree->root;
@@ -926,20 +930,20 @@ node_at(struct Huffman_tree const *const t, size_t const node)
 }
 
 static size_t
-branch_i(struct Huffman_tree const *const t, size_t const node,
-         uint8_t const dir)
+branch_index(struct Huffman_tree const *const t, size_t const node,
+             uint8_t const dir)
 {
     return ((struct Huffman_node *)buffer_at(&t->bump_arena, node))->link[dir];
 }
 
 static size_t
-parent_i(struct Huffman_tree const *const t, size_t node)
+parent_index(struct Huffman_tree const *const t, size_t node)
 {
     return ((struct Huffman_node *)buffer_at(&t->bump_arena, node))->parent;
 }
 
 static char
-char_i(struct Huffman_tree const *const t, size_t const node)
+char_index(struct Huffman_tree const *const t, size_t const node)
 {
     return ((struct Huffman_node *)buffer_at(&t->bump_arena, node))->ch;
 }
@@ -973,8 +977,8 @@ print_tree(struct Huffman_tree const *const tree, size_t const node)
         return;
     }
     print_node(tree, node);
-    print_inner_tree(tree, branch_i(tree, node, 1), BRANCH, "");
-    print_inner_tree(tree, branch_i(tree, node, 0), LEAF, "");
+    print_inner_tree(tree, branch_index(tree, node, 1), BRANCH, "");
+    print_inner_tree(tree, branch_index(tree, node, 0), LEAF, "");
 }
 
 [[maybe_unused]] static void
@@ -1022,7 +1026,7 @@ print_node(struct Huffman_tree const *const tree, size_t const node)
 {
     if (is_leaf(tree, node))
     {
-        switch (char_i(tree, node))
+        switch (char_index(tree, node))
         {
             case '\n':
                 printf("(\\n)\n");
@@ -1043,7 +1047,7 @@ print_node(struct Huffman_tree const *const tree, size_t const node)
                 printf("(\\b)\n");
                 break;
             default:
-                printf("(%c)\n", char_i(tree, node));
+                printf("(%c)\n", char_index(tree, node));
         }
     }
     else

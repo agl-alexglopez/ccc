@@ -57,8 +57,9 @@ check_static_begin(buffer_test_reverse_buf)
     for (int *l = buffer_begin(&b), *r = buffer_reverse_begin(&b); l < r;
          l = buffer_next(&b, l), r = buffer_reverse_next(&b, r))
     {
-        CCC_Result const res = buffer_swap(&b, &(int){0}, buffer_i(&b, l).count,
-                                           buffer_i(&b, r).count);
+        CCC_Result const res
+            = buffer_swap(&b, &(int){0}, buffer_index(&b, l).count,
+                          buffer_index(&b, r).count);
         check(res, CCC_RESULT_OK);
     }
     prev = 7;

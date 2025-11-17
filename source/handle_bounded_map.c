@@ -233,9 +233,9 @@ static size_t next(struct CCC_Handle_bounded_map const *, size_t n,
                    enum Branch traversal);
 static size_t min_max_from(struct CCC_Handle_bounded_map const *, size_t start,
                            enum Branch dir);
-static size_t branch_i(struct CCC_Handle_bounded_map const *, size_t parent,
-                       enum Branch dir);
-static size_t parent_i(struct CCC_Handle_bounded_map const *, size_t child);
+static size_t branch_index(struct CCC_Handle_bounded_map const *, size_t parent,
+                           enum Branch dir);
+static size_t parent_index(struct CCC_Handle_bounded_map const *, size_t child);
 static size_t index_of(struct CCC_Handle_bounded_map const *, void const *type);
 /* Returning references to index fields for tree nodes. */
 static size_t *branch_pointer(struct CCC_Handle_bounded_map const *,
@@ -1106,7 +1106,7 @@ find(struct CCC_Handle_bounded_map const *const map, void const *const key)
             return q;
         }
         parent = q.found;
-        q.found = branch_i(map, q.found, CCC_ORDER_GREATER == q.last_order);
+        q.found = branch_index(map, q.found, CCC_ORDER_GREATER == q.last_order);
     }
     /* Type punning here OK as both union members have same type and size. */
     q.parent = parent;
@@ -1121,19 +1121,21 @@ next(struct CCC_Handle_bounded_map const *const map, size_t n,
     {
         return 0;
     }
-    assert(!parent_i(map, map->root));
+    assert(!parent_index(map, map->root));
     /* The node is an internal one that has a sub-tree to explore first. */
-    if (branch_i(map, n, traversal))
+    if (branch_index(map, n, traversal))
     {
         /* The goal is to get far left/right ASAP in any traversal. */
-        for (n = branch_i(map, n, traversal); branch_i(map, n, !traversal);
-             n = branch_i(map, n, !traversal))
+        for (n = branch_index(map, n, traversal);
+             branch_index(map, n, !traversal);
+             n = branch_index(map, n, !traversal))
         {}
         return n;
     }
     /* This is how to return internal nodes on the way back up from a leaf. */
-    size_t p = parent_i(map, n);
-    for (; p && branch_i(map, p, !traversal) != n; n = p, p = parent_i(map, p))
+    size_t p = parent_index(map, n);
+    for (; p && branch_index(map, p, !traversal) != n;
+         n = p, p = parent_index(map, p))
     {}
     return p;
 }
@@ -1172,7 +1174,7 @@ min_max_from(struct CCC_Handle_bounded_map const *const map, size_t start,
     {
         return 0;
     }
-    for (; branch_i(map, start, dir); start = branch_i(map, start, dir))
+    for (; branch_index(map, start, dir); start = branch_index(map, start, dir))
     {}
     return start;
 }
@@ -1380,14 +1382,14 @@ bit_on(size_t const i)
 }
 
 static inline size_t
-branch_i(struct CCC_Handle_bounded_map const *const map, size_t const parent,
-         enum Branch const dir)
+branch_index(struct CCC_Handle_bounded_map const *const map,
+             size_t const parent, enum Branch const dir)
 {
     return node_at(map, parent)->branch[dir];
 }
 
 static inline size_t
-parent_i(struct CCC_Handle_bounded_map const *const map, size_t const child)
+parent_index(struct CCC_Handle_bounded_map const *const map, size_t const child)
 {
     return node_at(map, child)->parent;
 }
@@ -1463,7 +1465,7 @@ insert_fixup(struct CCC_Handle_bounded_map *const map, size_t z, size_t x)
     {
         promote(map, z);
         x = z;
-        z = parent_i(map, z);
+        z = parent_index(map, z);
         if (!z)
         {
             return;
@@ -1477,8 +1479,8 @@ insert_fixup(struct CCC_Handle_bounded_map *const map, size_t z, size_t x)
     }
     assert(x);
     assert(is_0_child(map, z, x));
-    enum Branch const p_to_x_dir = branch_i(map, z, R) == x;
-    size_t const y = branch_i(map, x, !p_to_x_dir);
+    enum Branch const p_to_x_dir = branch_index(map, z, R) == x;
+    size_t const y = branch_index(map, x, !p_to_x_dir);
     if (!y || is_2_child(map, z, y))
     {
         rotate(map, z, x, y, !p_to_x_dir);
@@ -1501,31 +1503,31 @@ remove_fixup(struct CCC_Handle_bounded_map *const map, size_t const remove)
     size_t x = 0;
     size_t p = 0;
     CCC_Tribool two_child = CCC_FALSE;
-    if (!branch_i(map, remove, R) || !branch_i(map, remove, L))
+    if (!branch_index(map, remove, R) || !branch_index(map, remove, L))
     {
         y = remove;
-        p = parent_i(map, y);
-        x = branch_i(map, y, !branch_i(map, y, L));
-        *parent_pointer(map, x) = parent_i(map, y);
+        p = parent_index(map, y);
+        x = branch_index(map, y, !branch_index(map, y, L));
+        *parent_pointer(map, x) = parent_index(map, y);
         if (!p)
         {
             map->root = x;
         }
         two_child = is_2_child(map, p, y);
-        *branch_pointer(map, p, branch_i(map, p, R) == y) = x;
+        *branch_pointer(map, p, branch_index(map, p, R) == y) = x;
     }
     else
     {
-        y = min_max_from(map, branch_i(map, remove, R), MINDIR);
-        p = parent_i(map, y);
-        x = branch_i(map, y, !branch_i(map, y, L));
-        *parent_pointer(map, x) = parent_i(map, y);
+        y = min_max_from(map, branch_index(map, remove, R), MINDIR);
+        p = parent_index(map, y);
+        x = branch_index(map, y, !branch_index(map, y, L));
+        *parent_pointer(map, x) = parent_index(map, y);
 
         /* Save if check and improve readability by assuming this is true. */
         assert(p);
 
         two_child = is_2_child(map, p, y);
-        *branch_pointer(map, p, branch_i(map, p, R) == y) = x;
+        *branch_pointer(map, p, branch_index(map, p, R) == y) = x;
         transplant(map, remove, y);
         if (remove == p)
         {
@@ -1540,15 +1542,15 @@ remove_fixup(struct CCC_Handle_bounded_map *const map, size_t const remove)
             assert(p);
             rebalance_3_child(map, p, x);
         }
-        else if (!x && branch_i(map, p, L) == branch_i(map, p, R))
+        else if (!x && branch_index(map, p, L) == branch_index(map, p, R))
         {
             assert(p);
             CCC_Tribool const demote_makes_3_child
-                = is_2_child(map, parent_i(map, p), p);
+                = is_2_child(map, parent_index(map, p), p);
             demote(map, p);
             if (demote_makes_3_child)
             {
-                rebalance_3_child(map, parent_i(map, p), p);
+                rebalance_3_child(map, parent_index(map, p), p);
             }
         }
         assert(!is_leaf(map, p) || !parity(map, p));
@@ -1565,15 +1567,16 @@ transplant(struct CCC_Handle_bounded_map *const map, size_t const remove,
 {
     assert(remove);
     assert(replacement);
-    *parent_pointer(map, replacement) = parent_i(map, remove);
-    if (!parent_i(map, remove))
+    *parent_pointer(map, replacement) = parent_index(map, remove);
+    if (!parent_index(map, remove))
     {
         map->root = replacement;
     }
     else
     {
-        size_t const p = parent_i(map, remove);
-        *branch_pointer(map, p, branch_i(map, p, R) == remove) = replacement;
+        size_t const p = parent_index(map, remove);
+        *branch_pointer(map, p, branch_index(map, p, R) == remove)
+            = replacement;
     }
     struct CCC_Handle_bounded_map_node *const remove_r = node_at(map, remove);
     struct CCC_Handle_bounded_map_node *const replace_r
@@ -1592,14 +1595,15 @@ rebalance_3_child(struct CCC_Handle_bounded_map *const map, size_t z, size_t x)
     CCC_Tribool made_3_child = CCC_FALSE;
     do
     {
-        size_t const g = parent_i(map, z);
-        size_t const y = branch_i(map, z, branch_i(map, z, L) == x);
+        size_t const g = parent_index(map, z);
+        size_t const y = branch_index(map, z, branch_index(map, z, L) == x);
         made_3_child = is_2_child(map, g, z);
         if (is_2_child(map, z, y))
         {
             demote(map, z);
         }
-        else if (is_22_parent(map, branch_i(map, y, L), y, branch_i(map, y, R)))
+        else if (is_22_parent(map, branch_index(map, y, L), y,
+                              branch_index(map, y, R)))
         {
             demote(map, z);
             demote(map, y);
@@ -1607,11 +1611,11 @@ rebalance_3_child(struct CCC_Handle_bounded_map *const map, size_t z, size_t x)
         else /* p(x) is 1,3, y is not a 2,2 parent, and x is 3-child.*/
         {
             assert(is_3_child(map, z, x));
-            enum Branch const z_to_x_dir = branch_i(map, z, R) == x;
-            size_t const w = branch_i(map, y, !z_to_x_dir);
+            enum Branch const z_to_x_dir = branch_index(map, z, R) == x;
+            size_t const w = branch_index(map, y, !z_to_x_dir);
             if (is_1_child(map, y, w))
             {
-                rotate(map, z, y, branch_i(map, y, z_to_x_dir), z_to_x_dir);
+                rotate(map, z, y, branch_index(map, y, z_to_x_dir), z_to_x_dir);
                 promote(map, y);
                 demote(map, z);
                 if (is_leaf(map, z))
@@ -1621,7 +1625,7 @@ rebalance_3_child(struct CCC_Handle_bounded_map *const map, size_t z, size_t x)
             }
             else /* w is a 2-child and v will be a 1-child. */
             {
-                size_t const v = branch_i(map, y, z_to_x_dir);
+                size_t const v = branch_index(map, y, z_to_x_dir);
                 assert(is_2_child(map, y, w));
                 assert(is_1_child(map, y, v));
                 double_rotate(map, z, y, v, !z_to_x_dir);
@@ -1636,14 +1640,14 @@ rebalance_3_child(struct CCC_Handle_bounded_map *const map, size_t z, size_t x)
                    paper but may not be worth doing. Rotations stay at 2 worst
                    case. Should revisit after more performance testing. */
                 if (!is_leaf(map, z)
-                    && is_11_parent(map, branch_i(map, z, L), z,
-                                    branch_i(map, z, R)))
+                    && is_11_parent(map, branch_index(map, z, L), z,
+                                    branch_index(map, z, R)))
                 {
                     promote(map, z);
                 }
                 else if (!is_leaf(map, y)
-                         && is_11_parent(map, branch_i(map, y, L), y,
-                                         branch_i(map, y, R)))
+                         && is_11_parent(map, branch_index(map, y, L), y,
+                                         branch_index(map, y, R)))
                 {
                     promote(map, y);
                 }
@@ -1672,7 +1676,7 @@ rotate(struct CCC_Handle_bounded_map *const map, size_t const z, size_t const x,
     assert(z);
     struct CCC_Handle_bounded_map_node *const z_r = node_at(map, z);
     struct CCC_Handle_bounded_map_node *const x_r = node_at(map, x);
-    size_t const g = parent_i(map, z);
+    size_t const g = parent_index(map, z);
     x_r->parent = g;
     if (!g)
     {
@@ -1863,16 +1867,16 @@ double_demote(struct CCC_Handle_bounded_map const *const, size_t const)
 static inline CCC_Tribool
 is_leaf(struct CCC_Handle_bounded_map const *const map, size_t const x)
 {
-    return !branch_i(map, x, L) && !branch_i(map, x, R);
+    return !branch_index(map, x, L) && !branch_index(map, x, R);
 }
 
 static inline size_t
 sibling_of(struct CCC_Handle_bounded_map const *const map, size_t const x)
 {
-    size_t const p = parent_i(map, x);
+    size_t const p = parent_index(map, x);
     assert(p);
     /* We want the sibling so we need the truthy value to be opposite of x. */
-    return node_at(map, p)->branch[branch_i(map, p, L) == x];
+    return node_at(map, p)->branch[branch_index(map, p, L) == x];
 }
 
 static inline size_t
@@ -1900,8 +1904,8 @@ recursive_count(struct CCC_Handle_bounded_map const *const map, size_t const r)
     {
         return 0;
     }
-    return 1 + recursive_count(map, branch_i(map, r, R))
-         + recursive_count(map, branch_i(map, r, L));
+    return 1 + recursive_count(map, branch_index(map, r, R))
+         + recursive_count(map, branch_index(map, r, L));
 }
 
 static CCC_Tribool
@@ -1927,12 +1931,12 @@ are_subtrees_valid(struct CCC_Handle_bounded_map const *t,
     return are_subtrees_valid(t,
                               (struct Tree_range){
                                   .low = r.low,
-                                  .root = branch_i(t, r.root, L),
+                                  .root = branch_index(t, r.root, L),
                                   .high = r.root,
                               })
         && are_subtrees_valid(t, (struct Tree_range){
                                      .low = r.root,
-                                     .root = branch_i(t, r.root, R),
+                                     .root = branch_index(t, r.root, R),
                                      .high = r.high,
                                  });
 }
@@ -1945,12 +1949,12 @@ is_storing_parent(struct CCC_Handle_bounded_map const *const map,
     {
         return CCC_TRUE;
     }
-    if (parent_i(map, root) != p)
+    if (parent_index(map, root) != p)
     {
         return CCC_FALSE;
     }
-    return is_storing_parent(map, root, branch_i(map, root, L))
-        && is_storing_parent(map, root, branch_i(map, root, R));
+    return is_storing_parent(map, root, branch_index(map, root, L))
+        && is_storing_parent(map, root, branch_index(map, root, R));
 }
 
 static CCC_Tribool

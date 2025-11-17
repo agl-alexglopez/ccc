@@ -503,7 +503,7 @@ CCC_buffer_capacity_end(CCC_Buffer const *const buffer)
 }
 
 CCC_Count
-CCC_buffer_i(CCC_Buffer const *const buffer, void const *const slot)
+CCC_buffer_index(CCC_Buffer const *const buffer, void const *const slot)
 {
     if (!buffer || !buffer->data || !slot || slot < buffer->data
         || (char *)slot >= ((char *)buffer->data
