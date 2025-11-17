@@ -536,7 +536,7 @@ allocate_front(struct CCC_Flat_double_ended_queue *const queue)
     CCC_Tribool const full
         = maybe_resize(queue, 1, queue->buffer.allocate) != CCC_RESULT_OK;
     /* Should have been able to resize. Bad error. */
-    if (queue->buffer.allocate && full)
+    if ((full && !queue->buffer.capacity) || (queue->buffer.allocate && full))
     {
         return NULL;
     }
@@ -555,7 +555,7 @@ allocate_back(struct CCC_Flat_double_ended_queue *const queue)
     CCC_Tribool const full
         = maybe_resize(queue, 1, queue->buffer.allocate) != CCC_RESULT_OK;
     /* Should have been able to resize. Bad error. */
-    if (queue->buffer.allocate && full)
+    if ((full && !queue->buffer.capacity) || (queue->buffer.allocate && full))
     {
         return NULL;
     }
@@ -580,7 +580,7 @@ push_back_range(struct CCC_Flat_double_ended_queue *const queue, size_t const n,
     CCC_Tribool const full
         = maybe_resize(queue, n, queue->buffer.allocate) != CCC_RESULT_OK;
     size_t const cap = queue->buffer.capacity;
-    if (queue->buffer.allocate && full)
+    if ((full && !queue->buffer.capacity) || (queue->buffer.allocate && full))
     {
         return CCC_RESULT_ALLOCATOR_ERROR;
     }
@@ -624,7 +624,7 @@ push_front_range(struct CCC_Flat_double_ended_queue *const queue,
     CCC_Tribool const full
         = maybe_resize(queue, n, queue->buffer.allocate) != CCC_RESULT_OK;
     size_t const cap = queue->buffer.capacity;
-    if (queue->buffer.allocate && full)
+    if ((full && !queue->buffer.capacity) || (queue->buffer.allocate && full))
     {
         return CCC_RESULT_ALLOCATOR_ERROR;
     }
@@ -664,7 +664,7 @@ push_range(struct CCC_Flat_double_ended_queue *const queue,
     size_t const sizeof_type = queue->buffer.sizeof_type;
     CCC_Tribool const full
         = maybe_resize(queue, count, queue->buffer.allocate) != CCC_RESULT_OK;
-    if (queue->buffer.allocate && full)
+    if ((full && !queue->buffer.capacity) || (queue->buffer.allocate && full))
     {
         return NULL;
     }

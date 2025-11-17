@@ -24,7 +24,7 @@ limitations under the License.
 
 /* NOLINTBEGIN(readability-identifier-naming) */
 
-/** @internal A flat doubled ended queue is a single Buffer with push and pop
+/** @internal A flat double ended queue is a single Buffer with push and pop
 at the front and back. If no allocation is permitted it is a ring buffer.
 Because the `CCC_Buffer` abstraction already exists, the flat_double_ended_queue
 can be implemented with a single additional field rather than a front and back
@@ -42,6 +42,7 @@ struct CCC_Flat_double_ended_queue
 };
 
 /*=======================    Private Interface   ============================*/
+
 /** @internal */
 void *CCC_private_flat_double_ended_queue_allocate_front(
     struct CCC_Flat_double_ended_queue *);
@@ -61,6 +62,33 @@ void *CCC_private_flat_double_ended_queue_allocate_back(
             private_context_data, private_capacity, optional_size),            \
         .front = 0,                                                            \
     }
+
+/** @internal Takes a compound literal array to initialize the buffer. */
+#define CCC_private_flat_double_ended_queue_from(                              \
+    private_allocate, private_context_data, private_optional_capacity,         \
+    private_compound_literal_array...)                                         \
+    (__extension__({                                                           \
+        struct CCC_Flat_double_ended_queue private_flat_double_ended_queue = { \
+            .buffer = CCC_buffer_from(private_allocate, private_context_data,  \
+                                      private_optional_capacity,               \
+                                      private_compound_literal_array),         \
+            .front = 0,                                                        \
+        };                                                                     \
+        private_flat_double_ended_queue;                                       \
+    }))
+
+#define CCC_private_flat_double_ended_queue_with_capacity(                     \
+    private_type_name, private_allocate, private_context_data,                 \
+    private_capacity)                                                          \
+    (__extension__({                                                           \
+        struct CCC_Flat_double_ended_queue private_flat_double_ended_queue = { \
+            .buffer = CCC_buffer_with_capacity(                                \
+                private_type_name, private_allocate, private_context_data,     \
+                private_capacity),                                             \
+            .front = 0,                                                        \
+        };                                                                     \
+        private_flat_double_ended_queue;                                       \
+    }))
 
 /** @internal */
 #define CCC_private_flat_double_ended_queue_emplace_back(                      \
