@@ -59,8 +59,6 @@ struct CCC_Adaptive_map
 {
     /** @internal The root of the splay tree. The "hot" node after a query. */
     struct CCC_Adaptive_map_node *root;
-    /** @internal The sentinel used to eliminate branches. */
-    struct CCC_Adaptive_map_node end;
     /** @internal The number of stored tree nodes. */
     size_t size;
     /** @internal The size of the user type stored in the tree. */
@@ -129,14 +127,10 @@ void *CCC_private_adaptive_map_insert(struct CCC_Adaptive_map *,
 
 /** @internal */
 #define CCC_private_adaptive_map_initialize(                                   \
-    private_tree_name, private_struct_name, private_node_node_field,           \
-    private_key_node_field, private_key_comparator, private_allocate,          \
-    private_context_data)                                                      \
+    private_struct_name, private_node_node_field, private_key_node_field,      \
+    private_key_comparator, private_allocate, private_context_data)            \
     {                                                                          \
-        .root = &(private_tree_name).end,                                      \
-        .end                                                                   \
-        = {.branch = {&(private_tree_name).end, &(private_tree_name).end},     \
-           .parent = &(private_tree_name).end},                                \
+        .root = NULL,                                                          \
         .allocate = (private_allocate),                                        \
         .compare = (private_key_comparator),                                   \
         .context = (private_context_data),                                     \

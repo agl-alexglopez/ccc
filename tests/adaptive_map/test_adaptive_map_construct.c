@@ -10,7 +10,7 @@
 
 check_static_begin(adaptive_map_test_empty)
 {
-    CCC_Adaptive_map s = CCC_adaptive_map_initialize(s, struct Val, elem, key,
+    CCC_Adaptive_map s = CCC_adaptive_map_initialize(struct Val, elem, key,
                                                      id_order, NULL, NULL);
     check(is_empty(&s), true);
     check_end();

@@ -166,7 +166,7 @@ check_static_begin(iterator_check, CCC_Adaptive_map *s)
 
 check_static_begin(adaptive_map_test_forward_iterator)
 {
-    CCC_Adaptive_map s = CCC_adaptive_map_initialize(s, struct Val, elem, key,
+    CCC_Adaptive_map s = CCC_adaptive_map_initialize(struct Val, elem, key,
                                                      id_order, NULL, NULL);
     /* We should have the expected behavior iteration over empty tree. */
     int j = 0;
@@ -198,7 +198,7 @@ check_static_begin(adaptive_map_test_forward_iterator)
 
 check_static_begin(adaptive_map_test_iterate_removal)
 {
-    CCC_Adaptive_map s = CCC_adaptive_map_initialize(s, struct Val, elem, key,
+    CCC_Adaptive_map s = CCC_adaptive_map_initialize(struct Val, elem, key,
                                                      id_order, NULL, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
@@ -229,7 +229,7 @@ check_static_begin(adaptive_map_test_iterate_removal)
 
 check_static_begin(adaptive_map_test_iterate_remove_reinsert)
 {
-    CCC_Adaptive_map s = CCC_adaptive_map_initialize(s, struct Val, elem, key,
+    CCC_Adaptive_map s = CCC_adaptive_map_initialize(struct Val, elem, key,
                                                      id_order, NULL, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
@@ -267,7 +267,7 @@ check_static_begin(adaptive_map_test_iterate_remove_reinsert)
 
 check_static_begin(adaptive_map_test_valid_range)
 {
-    CCC_Adaptive_map s = CCC_adaptive_map_initialize(s, struct Val, elem, key,
+    CCC_Adaptive_map s = CCC_adaptive_map_initialize(struct Val, elem, key,
                                                      id_order, NULL, NULL);
 
     int const num_nodes = 25;
@@ -298,7 +298,7 @@ check_static_begin(adaptive_map_test_valid_range)
 
 check_static_begin(adaptive_map_test_valid_range_equals)
 {
-    CCC_Adaptive_map s = CCC_adaptive_map_initialize(s, struct Val, elem, key,
+    CCC_Adaptive_map s = CCC_adaptive_map_initialize(struct Val, elem, key,
                                                      id_order, NULL, NULL);
 
     int const num_nodes = 25;
@@ -323,7 +323,7 @@ check_static_begin(adaptive_map_test_valid_range_equals)
 
 check_static_begin(adaptive_map_test_invalid_range)
 {
-    CCC_Adaptive_map s = CCC_adaptive_map_initialize(s, struct Val, elem, key,
+    CCC_Adaptive_map s = CCC_adaptive_map_initialize(struct Val, elem, key,
                                                      id_order, NULL, NULL);
     int const num_nodes = 25;
     struct Val vals[25];
@@ -353,7 +353,7 @@ check_static_begin(adaptive_map_test_invalid_range)
 
 check_static_begin(adaptive_map_test_empty_range)
 {
-    CCC_Adaptive_map s = CCC_adaptive_map_initialize(s, struct Val, elem, key,
+    CCC_Adaptive_map s = CCC_adaptive_map_initialize(struct Val, elem, key,
                                                      id_order, NULL, NULL);
     int const num_nodes = 25;
     struct Val vals[25];

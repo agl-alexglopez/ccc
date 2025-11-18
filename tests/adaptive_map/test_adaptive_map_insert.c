@@ -27,8 +27,8 @@ adaptive_map_modplus(CCC_Type_context const t)
 
 check_static_begin(adaptive_map_test_insert)
 {
-    CCC_Adaptive_map om = adaptive_map_initialize(om, struct Val, elem, key,
-                                                  id_order, NULL, NULL);
+    CCC_Adaptive_map om
+        = adaptive_map_initialize(struct Val, elem, key, id_order, NULL, NULL);
 
     /* Nothing was there before so nothing is in the entry. */
     CCC_Entry ent = swap_entry(&om, &(struct Val){.key = 137, .val = 99}.elem,
@@ -41,7 +41,7 @@ check_static_begin(adaptive_map_test_insert)
 
 check_static_begin(adaptive_map_test_insert_macros)
 {
-    CCC_Adaptive_map om = adaptive_map_initialize(om, struct Val, elem, key,
+    CCC_Adaptive_map om = adaptive_map_initialize(struct Val, elem, key,
                                                   id_order, std_allocate, NULL);
 
     struct Val const *ins = CCC_adaptive_map_or_insert_with(
@@ -87,8 +87,8 @@ check_static_begin(adaptive_map_test_insert_macros)
 
 check_static_begin(adaptive_map_test_insert_overwrite)
 {
-    CCC_Adaptive_map om = adaptive_map_initialize(om, struct Val, elem, key,
-                                                  id_order, NULL, NULL);
+    CCC_Adaptive_map om
+        = adaptive_map_initialize(struct Val, elem, key, id_order, NULL, NULL);
 
     struct Val q = {.key = 137, .val = 99};
     CCC_Entry ent = swap_entry(&om, &q.elem, &(struct Val){}.elem);
@@ -120,8 +120,8 @@ check_static_begin(adaptive_map_test_insert_overwrite)
 
 check_static_begin(adaptive_map_test_insert_then_bad_ideas)
 {
-    CCC_Adaptive_map om = adaptive_map_initialize(om, struct Val, elem, key,
-                                                  id_order, NULL, NULL);
+    CCC_Adaptive_map om
+        = adaptive_map_initialize(struct Val, elem, key, id_order, NULL, NULL);
     struct Val q = {.key = 137, .val = 99};
     CCC_Entry ent = swap_entry(&om, &q.elem, &(struct Val){}.elem);
     check(occupied(&ent), false);
@@ -150,7 +150,7 @@ check_static_begin(adaptive_map_test_insert_then_bad_ideas)
 check_static_begin(adaptive_map_test_entry_api_functional)
 {
     /* Over allocate size now because we don't want to worry about resizing. */
-    CCC_Adaptive_map om = adaptive_map_initialize(om, struct Val, elem, key,
+    CCC_Adaptive_map om = adaptive_map_initialize(struct Val, elem, key,
                                                   id_order, std_allocate, NULL);
     size_t const size = 200;
 
@@ -213,7 +213,7 @@ check_static_begin(adaptive_map_test_insert_via_entry)
 {
     /* Over allocate size now because we don't want to worry about resizing. */
     size_t const size = 200;
-    CCC_Adaptive_map om = adaptive_map_initialize(om, struct Val, elem, key,
+    CCC_Adaptive_map om = adaptive_map_initialize(struct Val, elem, key,
                                                   id_order, std_allocate, NULL);
 
     /* Test entry or insert with for all even values. Default should be
@@ -258,7 +258,7 @@ check_static_begin(adaptive_map_test_insert_via_entry_macros)
 {
     /* Over allocate size now because we don't want to worry about resizing. */
     size_t const size = 200;
-    CCC_Adaptive_map om = adaptive_map_initialize(om, struct Val, elem, key,
+    CCC_Adaptive_map om = adaptive_map_initialize(struct Val, elem, key,
                                                   id_order, std_allocate, NULL);
 
     /* Test entry or insert with for all even values. Default should be
@@ -298,7 +298,7 @@ check_static_begin(adaptive_map_test_entry_api_macros)
 {
     /* Over allocate size now because we don't want to worry about resizing. */
     int const size = 200;
-    CCC_Adaptive_map om = adaptive_map_initialize(om, struct Val, elem, key,
+    CCC_Adaptive_map om = adaptive_map_initialize(struct Val, elem, key,
                                                   id_order, std_allocate, NULL);
 
     /* Test entry or insert with for all even values. Default should be
@@ -352,7 +352,7 @@ check_static_begin(adaptive_map_test_entry_api_macros)
 
 check_static_begin(adaptive_map_test_two_sum)
 {
-    CCC_Adaptive_map om = adaptive_map_initialize(om, struct Val, elem, key,
+    CCC_Adaptive_map om = adaptive_map_initialize(struct Val, elem, key,
                                                   id_order, std_allocate, NULL);
     int const addends[10] = {1, 3, -980, 6, 7, 13, 44, 32, 995, -1};
     int const target = 15;
@@ -378,7 +378,7 @@ check_static_begin(adaptive_map_test_two_sum)
 
 check_static_begin(adaptive_map_test_resize)
 {
-    CCC_Adaptive_map om = adaptive_map_initialize(om, struct Val, elem, key,
+    CCC_Adaptive_map om = adaptive_map_initialize(struct Val, elem, key,
                                                   id_order, std_allocate, NULL);
 
     int const to_insert = 1000;
@@ -409,7 +409,7 @@ check_static_begin(adaptive_map_test_resize)
 
 check_static_begin(adaptive_map_test_resize_macros)
 {
-    CCC_Adaptive_map om = adaptive_map_initialize(om, struct Val, elem, key,
+    CCC_Adaptive_map om = adaptive_map_initialize(struct Val, elem, key,
                                                   id_order, std_allocate, NULL);
     int const to_insert = 1000;
     int const larger_prime = 1009;
@@ -449,7 +449,7 @@ check_static_begin(adaptive_map_test_resize_macros)
 
 check_static_begin(adaptive_map_test_resize_fadaptive_map_null)
 {
-    CCC_Adaptive_map om = adaptive_map_initialize(om, struct Val, elem, key,
+    CCC_Adaptive_map om = adaptive_map_initialize(struct Val, elem, key,
                                                   id_order, std_allocate, NULL);
     int const to_insert = 1000;
     int const larger_prime = 1009;
@@ -478,7 +478,7 @@ check_static_begin(adaptive_map_test_resize_fadaptive_map_null)
 
 check_static_begin(adaptive_map_test_resize_fadaptive_map_null_macros)
 {
-    CCC_Adaptive_map om = adaptive_map_initialize(om, struct Val, elem, key,
+    CCC_Adaptive_map om = adaptive_map_initialize(struct Val, elem, key,
                                                   id_order, std_allocate, NULL);
     int const to_insert = 1000;
     int const larger_prime = 1009;
@@ -519,7 +519,7 @@ check_static_begin(adaptive_map_test_resize_fadaptive_map_null_macros)
 check_static_begin(adaptive_map_test_insert_and_find)
 {
     int const size = 101;
-    CCC_Adaptive_map om = adaptive_map_initialize(om, struct Val, elem, key,
+    CCC_Adaptive_map om = adaptive_map_initialize(struct Val, elem, key,
                                                   id_order, std_allocate, NULL);
 
     for (int i = 0; i < size; i += 2)
@@ -553,8 +553,8 @@ check_static_begin(adaptive_map_test_insert_and_find)
 check_static_begin(adaptive_map_test_insert_shuffle)
 {
     size_t const size = 50;
-    CCC_Adaptive_map om = adaptive_map_initialize(om, struct Val, elem, key,
-                                                  id_order, NULL, NULL);
+    CCC_Adaptive_map om
+        = adaptive_map_initialize(struct Val, elem, key, id_order, NULL, NULL);
     struct Val vals[50] = {};
     check(size > 1, true);
     int const prime = 53;
@@ -571,7 +571,7 @@ check_static_begin(adaptive_map_test_insert_shuffle)
 check_static_begin(adaptive_map_test_insert_weak_srand)
 {
     int const num_nodes = 1000;
-    CCC_Adaptive_map om = adaptive_map_initialize(om, struct Val, elem, key,
+    CCC_Adaptive_map om = adaptive_map_initialize(struct Val, elem, key,
                                                   id_order, std_allocate, NULL);
     srand(time(NULL)); /* NOLINT */
     for (int i = 0; i < num_nodes; ++i)

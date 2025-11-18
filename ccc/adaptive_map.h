@@ -78,7 +78,6 @@ Initialize the container with memory, callbacks, and permissions. */
 /**@{*/
 
 /** @brief Initializes the adaptive map at runtime or compile time.
-@param[in] map_name the name of the adaptive map being initialized.
 @param[in] struct_name the user type wrapping the intrusive element.
 @param[in] type_intruder_field the name of the intrusive map element field.
 @param[in] key_node_field the name of the field in user type used as key.
@@ -87,12 +86,12 @@ Initialize the container with memory, callbacks, and permissions. */
 @param[in] context a pointer to any context data for comparison or destruction.
 @return the struct initialized adaptive map for direct assignment
 (i.e. CCC_Adaptive_map m = CCC_adaptive_map_initialize(...);). */
-#define CCC_adaptive_map_initialize(map_name, struct_name,                     \
-                                    type_intruder_field, key_node_field,       \
-                                    key_order, allocate, context)              \
-    CCC_private_adaptive_map_initialize(map_name, struct_name,                 \
-                                        type_intruder_field, key_node_field,   \
-                                        key_order, allocate, context)
+#define CCC_adaptive_map_initialize(struct_name, type_intruder_field,          \
+                                    key_node_field, key_order, allocate,       \
+                                    context)                                   \
+    CCC_private_adaptive_map_initialize(struct_name, type_intruder_field,      \
+                                        key_node_field, key_order, allocate,   \
+                                        context)
 
 /**@}*/
 
