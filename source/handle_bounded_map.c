@@ -140,7 +140,7 @@ static_assert(
 /*==========================  Type Declarations   ===========================*/
 
 /** @internal */
-enum Branch
+enum Link
 {
     L = 0,
     R,
@@ -222,7 +222,7 @@ static inline struct CCC_Handle_bounded_map_handle
 handle(struct CCC_Handle_bounded_map const *, void const *key);
 /* Returning a generic range that can be use for range or range_reverse. */
 static struct CCC_Range equal_range(struct CCC_Handle_bounded_map const *,
-                                    void const *, void const *, enum Branch);
+                                    void const *, void const *, enum Link);
 /* Returning threeway comparison with user callback. */
 static CCC_Order order_nodes(struct CCC_Handle_bounded_map const *,
                              void const *key, size_t node,
@@ -230,16 +230,16 @@ static CCC_Order order_nodes(struct CCC_Handle_bounded_map const *,
 /* Returning read only indices for tree nodes. */
 static size_t sibling_of(struct CCC_Handle_bounded_map const *, size_t x);
 static size_t next(struct CCC_Handle_bounded_map const *, size_t n,
-                   enum Branch traversal);
+                   enum Link traversal);
 static size_t min_max_from(struct CCC_Handle_bounded_map const *, size_t start,
-                           enum Branch dir);
+                           enum Link dir);
 static size_t branch_index(struct CCC_Handle_bounded_map const *, size_t parent,
-                           enum Branch dir);
+                           enum Link dir);
 static size_t parent_index(struct CCC_Handle_bounded_map const *, size_t child);
 static size_t index_of(struct CCC_Handle_bounded_map const *, void const *type);
 /* Returning references to index fields for tree nodes. */
 static size_t *branch_pointer(struct CCC_Handle_bounded_map const *,
-                              size_t node, enum Branch branch);
+                              size_t node, enum Link branch);
 static size_t *parent_pointer(struct CCC_Handle_bounded_map const *,
                               size_t node);
 /* Returning WAVL tree status. */
@@ -279,9 +279,9 @@ static void double_promote(struct CCC_Handle_bounded_map const *, size_t x);
 static void double_demote(struct CCC_Handle_bounded_map const *, size_t x);
 
 static void rotate(struct CCC_Handle_bounded_map *, size_t z, size_t x,
-                   size_t y, enum Branch dir);
+                   size_t y, enum Link dir);
 static void double_rotate(struct CCC_Handle_bounded_map *, size_t z, size_t x,
-                          size_t y, enum Branch dir);
+                          size_t y, enum Link dir);
 /* Returning void as miscellaneous helpers. */
 static void swap(void *temp, void *, void *, size_t sizeof_type);
 static size_t max(size_t, size_t);
@@ -1115,7 +1115,7 @@ find(struct CCC_Handle_bounded_map const *const map, void const *const key)
 
 static size_t
 next(struct CCC_Handle_bounded_map const *const map, size_t n,
-     enum Branch const traversal)
+     enum Link const traversal)
 {
     if (!n)
     {
@@ -1143,7 +1143,7 @@ next(struct CCC_Handle_bounded_map const *const map, size_t n,
 static struct CCC_Range
 equal_range(struct CCC_Handle_bounded_map const *const map,
             void const *const begin_key, void const *const end_key,
-            enum Branch const traversal)
+            enum Link const traversal)
 {
     if (CCC_handle_bounded_map_is_empty(map))
     {
@@ -1168,7 +1168,7 @@ equal_range(struct CCC_Handle_bounded_map const *const map,
 
 static size_t
 min_max_from(struct CCC_Handle_bounded_map const *const map, size_t start,
-             enum Branch const dir)
+             enum Link const dir)
 {
     if (!start)
     {
@@ -1383,7 +1383,7 @@ bit_on(size_t const i)
 
 static inline size_t
 branch_index(struct CCC_Handle_bounded_map const *const map,
-             size_t const parent, enum Branch const dir)
+             size_t const parent, enum Link const dir)
 {
     return node_at(map, parent)->branch[dir];
 }
@@ -1431,7 +1431,7 @@ block_count(size_t const node_count)
 
 static inline size_t *
 branch_pointer(struct CCC_Handle_bounded_map const *t, size_t const node,
-               enum Branch const branch)
+               enum Link const branch)
 {
     return &node_at(t, node)->branch[branch];
 }
@@ -1479,7 +1479,7 @@ insert_fixup(struct CCC_Handle_bounded_map *const map, size_t z, size_t x)
     }
     assert(x);
     assert(is_0_child(map, z, x));
-    enum Branch const p_to_x_dir = branch_index(map, z, R) == x;
+    enum Link const p_to_x_dir = branch_index(map, z, R) == x;
     size_t const y = branch_index(map, x, !p_to_x_dir);
     if (!y || is_2_child(map, z, y))
     {
@@ -1611,7 +1611,7 @@ rebalance_3_child(struct CCC_Handle_bounded_map *const map, size_t z, size_t x)
         else /* p(x) is 1,3, y is not a 2,2 parent, and x is 3-child.*/
         {
             assert(is_3_child(map, z, x));
-            enum Branch const z_to_x_dir = branch_index(map, z, R) == x;
+            enum Link const z_to_x_dir = branch_index(map, z, R) == x;
             size_t const w = branch_index(map, y, !z_to_x_dir);
             if (is_1_child(map, y, w))
             {
@@ -1671,7 +1671,7 @@ and uppercase are arbitrary subtrees.
        B              B */
 static void
 rotate(struct CCC_Handle_bounded_map *const map, size_t const z, size_t const x,
-       size_t const y, enum Branch const dir)
+       size_t const y, enum Link const dir)
 {
     assert(z);
     struct CCC_Handle_bounded_map_node *const z_r = node_at(map, z);
@@ -1706,7 +1706,7 @@ Lowercase are nodes and uppercase are arbitrary subtrees.
      B   C */
 static void
 double_rotate(struct CCC_Handle_bounded_map *const map, size_t const z,
-              size_t const x, size_t const y, enum Branch const dir)
+              size_t const x, size_t const y, enum Link const dir)
 {
     assert(z && x && y);
     struct CCC_Handle_bounded_map_node *const z_r = node_at(map, z);
