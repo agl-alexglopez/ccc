@@ -75,8 +75,6 @@ Initialize the container with memory, callbacks, and permissions. */
 /**@{*/
 
 /** @brief Initializes the bounded map at runtime or compile time.
-@param[in] bounded_map_name the name of the bounded map being
-initialized.
 @param[in] struct_name the user type wrapping the intrusive element.
 @param[in] bounded_map_node_field the name of the intrusive map elem
 field.
@@ -88,12 +86,12 @@ destruction.
 @return the struct initialized bounded map for direct assignment
 (i.e. CCC_Bounded_map m = CCC_bounded_map_initialize(...);).
 */
-#define CCC_bounded_map_initialize(bounded_map_name, struct_name,              \
-                                   bounded_map_node_field, key_node_field,     \
-                                   key_order_fn, allocate, context_data)       \
-    CCC_private_bounded_map_initialize(bounded_map_name, struct_name,          \
-                                       bounded_map_node_field, key_node_field, \
-                                       key_order_fn, allocate, context_data)
+#define CCC_bounded_map_initialize(struct_name, bounded_map_node_field,        \
+                                   key_node_field, key_order_fn, allocate,     \
+                                   context_data)                               \
+    CCC_private_bounded_map_initialize(struct_name, bounded_map_node_field,    \
+                                       key_node_field, key_order_fn, allocate, \
+                                       context_data)
 
 /**@}*/
 

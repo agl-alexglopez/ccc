@@ -100,50 +100,37 @@ static void insert_fixup(struct CCC_Bounded_map *,
 static void transplant(struct CCC_Bounded_map *,
                        struct CCC_Bounded_map_node *remove,
                        struct CCC_Bounded_map_node *replacement);
-static void rebalance_3_child(struct CCC_Bounded_map *map,
+static CCC_Tribool parity(struct CCC_Bounded_map_node const *);
+static void rebalance_3_child(struct CCC_Bounded_map *,
                               struct CCC_Bounded_map_node *z,
                               struct CCC_Bounded_map_node *x);
-static CCC_Tribool is_0_child(struct CCC_Bounded_map const *,
-                              struct CCC_Bounded_map_node const *p,
+static CCC_Tribool is_0_child(struct CCC_Bounded_map_node const *p,
                               struct CCC_Bounded_map_node const *x);
-static CCC_Tribool is_1_child(struct CCC_Bounded_map const *,
-                              struct CCC_Bounded_map_node const *p,
+static CCC_Tribool is_1_child(struct CCC_Bounded_map_node const *p,
                               struct CCC_Bounded_map_node const *x);
-static CCC_Tribool is_2_child(struct CCC_Bounded_map const *,
-                              struct CCC_Bounded_map_node const *p,
+static CCC_Tribool is_2_child(struct CCC_Bounded_map_node const *p,
                               struct CCC_Bounded_map_node const *x);
-static CCC_Tribool is_3_child(struct CCC_Bounded_map const *,
-                              struct CCC_Bounded_map_node const *p,
+static CCC_Tribool is_3_child(struct CCC_Bounded_map_node const *p,
                               struct CCC_Bounded_map_node const *x);
-static CCC_Tribool is_01_parent(struct CCC_Bounded_map const *,
-                                struct CCC_Bounded_map_node const *x,
+static CCC_Tribool is_01_parent(struct CCC_Bounded_map_node const *x,
                                 struct CCC_Bounded_map_node const *p,
                                 struct CCC_Bounded_map_node const *y);
-static CCC_Tribool is_11_parent(struct CCC_Bounded_map const *,
-                                struct CCC_Bounded_map_node const *x,
+static CCC_Tribool is_11_parent(struct CCC_Bounded_map_node const *x,
                                 struct CCC_Bounded_map_node const *p,
                                 struct CCC_Bounded_map_node const *y);
-static CCC_Tribool is_02_parent(struct CCC_Bounded_map const *,
-                                struct CCC_Bounded_map_node const *x,
+static CCC_Tribool is_02_parent(struct CCC_Bounded_map_node const *x,
                                 struct CCC_Bounded_map_node const *p,
                                 struct CCC_Bounded_map_node const *y);
-static CCC_Tribool is_22_parent(struct CCC_Bounded_map const *,
-                                struct CCC_Bounded_map_node const *x,
+static CCC_Tribool is_22_parent(struct CCC_Bounded_map_node const *x,
                                 struct CCC_Bounded_map_node const *p,
                                 struct CCC_Bounded_map_node const *y);
-static CCC_Tribool is_leaf(struct CCC_Bounded_map const *map,
-                           struct CCC_Bounded_map_node const *x);
+static CCC_Tribool is_leaf(struct CCC_Bounded_map_node const *x);
 static struct CCC_Bounded_map_node *
-sibling_of(struct CCC_Bounded_map const *map,
-           struct CCC_Bounded_map_node const *x);
-static void pmapote(struct CCC_Bounded_map const *map,
-                    struct CCC_Bounded_map_node *x);
-static void demote(struct CCC_Bounded_map const *map,
-                   struct CCC_Bounded_map_node *x);
-static void double_pmapote(struct CCC_Bounded_map const *map,
-                           struct CCC_Bounded_map_node *x);
-static void double_demote(struct CCC_Bounded_map const *map,
-                          struct CCC_Bounded_map_node *x);
+sibling_of(struct CCC_Bounded_map_node const *x);
+static void promote(struct CCC_Bounded_map_node *x);
+static void demote(struct CCC_Bounded_map_node *x);
+static void double_promote(struct CCC_Bounded_map_node *x);
+static void double_demote(struct CCC_Bounded_map_node *x);
 
 static void rotate(struct CCC_Bounded_map *map, struct CCC_Bounded_map_node *z,
                    struct CCC_Bounded_map_node *x,
@@ -157,8 +144,7 @@ static struct CCC_Bounded_map_node *next(struct CCC_Bounded_map const *,
                                          struct CCC_Bounded_map_node const *,
                                          enum Link);
 static struct CCC_Bounded_map_node *
-min_max_from(struct CCC_Bounded_map const *, struct CCC_Bounded_map_node *start,
-             enum Link);
+min_max_from(struct CCC_Bounded_map_node *start, enum Link);
 static struct CCC_Range equal_range(struct CCC_Bounded_map const *,
                                     void const *, void const *, enum Link);
 static struct CCC_Bounded_map_entry entry(struct CCC_Bounded_map const *map,
@@ -334,7 +320,7 @@ void *
 CCC_bounded_map_insert_entry(CCC_Bounded_map_entry const *const entry,
                              CCC_Bounded_map_node *const type_intruder)
 {
-    if (!entry || !type_intruder || !entry->private.entry.type)
+    if (!entry || !type_intruder)
     {
         return NULL;
     }
@@ -506,8 +492,8 @@ CCC_bounded_map_begin(CCC_Bounded_map const *map)
     {
         return NULL;
     }
-    struct CCC_Bounded_map_node *const m = min_max_from(map, map->root, L);
-    return m == &map->end ? NULL : struct_base(map, m);
+    struct CCC_Bounded_map_node *const m = min_max_from(map->root, L);
+    return m == NULL ? NULL : struct_base(map, m);
 }
 
 void *
@@ -520,7 +506,7 @@ CCC_bounded_map_next(CCC_Bounded_map const *const map,
     }
     struct CCC_Bounded_map_node const *const n
         = next(map, iterator_intruder, INORDER);
-    if (n == &map->end)
+    if (n == NULL)
     {
         return NULL;
     }
@@ -534,8 +520,8 @@ CCC_bounded_map_reverse_begin(CCC_Bounded_map const *const map)
     {
         return NULL;
     }
-    struct CCC_Bounded_map_node *const m = min_max_from(map, map->root, R);
-    return m == &map->end ? NULL : struct_base(map, m);
+    struct CCC_Bounded_map_node *const m = min_max_from(map->root, R);
+    return m == NULL ? NULL : struct_base(map, m);
 }
 
 void *
@@ -561,7 +547,7 @@ CCC_bounded_map_reverse_next(
     }
     struct CCC_Bounded_map_node const *const n
         = next(map, iterator_intruder, R_INORDER);
-    return (n == &map->end) ? NULL : struct_base(map, n);
+    return (n == NULL) ? NULL : struct_base(map, n);
 }
 
 CCC_Range
@@ -630,9 +616,9 @@ CCC_bounded_map_clear(CCC_Bounded_map *const map,
         return CCC_RESULT_ARGUMENT_ERROR;
     }
     struct CCC_Bounded_map_node *node = map->root;
-    while (node != &map->end)
+    while (node != NULL)
     {
-        if (node->branch[L] != &map->end)
+        if (node->branch[L] != NULL)
         {
             struct CCC_Bounded_map_node *const left = node->branch[L];
             node->branch[L] = left->branch[R];
@@ -699,14 +685,13 @@ CCC_private_Bounded_map_node_in_slot(struct CCC_Bounded_map const *const map,
 /*=========================    Static Helpers    ============================*/
 
 static struct CCC_Bounded_map_node *
-min_max_from(struct CCC_Bounded_map const *const map,
-             struct CCC_Bounded_map_node *start, enum Link const dir)
+min_max_from(struct CCC_Bounded_map_node *start, enum Link const dir)
 {
-    if (start == &map->end)
+    if (start == NULL)
     {
         return start;
     }
-    for (; start->branch[dir] != &map->end; start = start->branch[dir])
+    for (; start->branch[dir] != NULL; start = start->branch[dir])
     {}
     return start;
 }
@@ -772,9 +757,13 @@ insert(struct CCC_Bounded_map *const map,
         return struct_base(map, type_output_intruder);
     }
     assert(last_order == CCC_ORDER_GREATER || last_order == CCC_ORDER_LESSER);
-    CCC_Tribool const rank_rule_break
-        = parent->branch[L] == &map->end && parent->branch[R] == &map->end;
-    parent->branch[CCC_ORDER_GREATER == last_order] = type_output_intruder;
+    CCC_Tribool rank_rule_break = false;
+    if (parent)
+    {
+        rank_rule_break
+            = parent->branch[L] == NULL && parent->branch[R] == NULL;
+        parent->branch[CCC_ORDER_GREATER == last_order] = type_output_intruder;
+    }
     type_output_intruder->parent = parent;
     if (rank_rule_break)
     {
@@ -787,12 +776,12 @@ insert(struct CCC_Bounded_map *const map,
 static struct Query
 find(struct CCC_Bounded_map const *const map, void const *const key)
 {
-    struct CCC_Bounded_map_node const *parent = &map->end;
+    struct CCC_Bounded_map_node const *parent = NULL;
     struct Query q = {
         .last_order = CCC_ORDER_ERROR,
         .found = map->root,
     };
-    while (q.found != &map->end)
+    while (q.found != NULL)
     {
         q.last_order = order(map, key, q.found, map->compare);
         if (CCC_ORDER_EQUAL == q.last_order)
@@ -811,23 +800,28 @@ static struct CCC_Bounded_map_node *
 next(struct CCC_Bounded_map const *const map,
      struct CCC_Bounded_map_node const *n, enum Link const traversal)
 {
-    if (!n || n == &map->end)
+    if (!n || n == NULL)
     {
-        return (struct CCC_Bounded_map_node *)&map->end;
+        return (struct CCC_Bounded_map_node *)NULL;
     }
-    assert(map->root->parent == &map->end);
+    assert(map->root->parent == NULL);
+    struct CCC_Bounded_map_node nil;
+    nil.branch[!traversal] = map->root;
+    map->root->parent = &nil;
     /* The node is an internal one that has a sub-tree to explore first. */
-    if (n->branch[traversal] != &map->end)
+    if (n->branch[traversal] != NULL)
     {
         /* The goal is to get far left/right ASAP in any traversal. */
-        for (n = n->branch[traversal]; n->branch[!traversal] != &map->end;
+        for (n = n->branch[traversal]; n->branch[!traversal] != NULL;
              n = n->branch[!traversal])
         {}
+        map->root->parent = NULL;
         return (struct CCC_Bounded_map_node *)n;
     }
-    for (; n->parent != &map->end && n->parent->branch[!traversal] != n;
+    for (; n->parent != &nil && n->parent->branch[!traversal] != n;
          n = n->parent)
     {}
+    map->root->parent = NULL;
     return n->parent;
 }
 
@@ -852,8 +846,8 @@ equal_range(struct CCC_Bounded_map const *const map,
         e.found = next(map, e.found, traversal);
     }
     return (struct CCC_Range){
-        .begin = b.found == &map->end ? NULL : struct_base(map, b.found),
-        .end = e.found == &map->end ? NULL : struct_base(map, e.found),
+        .begin = b.found == NULL ? NULL : struct_base(map, b.found),
+        .end = e.found == NULL ? NULL : struct_base(map, e.found),
     };
 }
 
@@ -863,7 +857,7 @@ init_node(struct CCC_Bounded_map *const map,
 {
     assert(e != NULL);
     assert(map != NULL);
-    e->branch[L] = e->branch[R] = e->parent = &map->end;
+    e->branch[L] = e->branch[R] = e->parent = NULL;
     e->parity = 0;
 }
 
@@ -926,36 +920,36 @@ insert_fixup(struct CCC_Bounded_map *const map, struct CCC_Bounded_map_node *z,
 {
     do
     {
-        pmapote(map, z);
+        promote(z);
         x = z;
         z = z->parent;
-        if (z == &map->end)
+        if (z == NULL)
         {
             return;
         }
     }
-    while (is_01_parent(map, x, z, sibling_of(map, x)));
+    while (is_01_parent(x, z, sibling_of(x)));
 
-    if (!is_02_parent(map, x, z, sibling_of(map, x)))
+    if (!is_02_parent(x, z, sibling_of(x)))
     {
         return;
     }
-    assert(x != &map->end);
-    assert(is_0_child(map, z, x));
+    assert(x != NULL);
+    assert(is_0_child(z, x));
     enum Link const p_to_x_dir = z->branch[R] == x;
     struct CCC_Bounded_map_node *const y = x->branch[!p_to_x_dir];
-    if (y == &map->end || is_2_child(map, z, y))
+    if (y == NULL || is_2_child(z, y))
     {
         rotate(map, z, x, y, !p_to_x_dir);
-        demote(map, z);
+        demote(z);
     }
     else
     {
-        assert(is_1_child(map, z, y));
+        assert(is_1_child(z, y));
         double_rotate(map, z, x, y, p_to_x_dir);
-        pmapote(map, y);
-        demote(map, x);
-        demote(map, z);
+        promote(y);
+        demote(x);
+        demote(z);
     }
 }
 
@@ -963,35 +957,43 @@ static void *
 remove_fixup(struct CCC_Bounded_map *const map,
              struct CCC_Bounded_map_node *const remove)
 {
-    assert(remove->branch[R] && remove->branch[L]);
     struct CCC_Bounded_map_node *y = NULL;
     struct CCC_Bounded_map_node *x = NULL;
     struct CCC_Bounded_map_node *p_of_xy = NULL;
     CCC_Tribool two_child = CCC_FALSE;
-    if (remove->branch[L] == &map->end || remove->branch[R] == &map->end)
+    if (remove->branch[L] == NULL || remove->branch[R] == NULL)
     {
         y = remove;
         p_of_xy = y->parent;
-        x = y->branch[y->branch[L] == &map->end];
-        x->parent = y->parent;
-        if (p_of_xy == &map->end)
+        x = y->branch[y->branch[L] == NULL];
+        if (x)
+        {
+            x->parent = y->parent;
+        }
+        if (p_of_xy == NULL)
         {
             map->root = x;
         }
-        two_child = is_2_child(map, p_of_xy, y);
-        p_of_xy->branch[p_of_xy->branch[R] == y] = x;
+        else
+        {
+            p_of_xy->branch[p_of_xy->branch[R] == y] = x;
+        }
+        two_child = is_2_child(p_of_xy, y);
     }
     else
     {
-        y = min_max_from(map, remove->branch[R], L);
+        y = min_max_from(remove->branch[R], L);
         p_of_xy = y->parent;
-        x = y->branch[y->branch[L] == &map->end];
-        x->parent = y->parent;
+        x = y->branch[y->branch[L] == NULL];
+        if (x)
+        {
+            x->parent = y->parent;
+        }
 
         /* Save if check and improve readability by assuming this is true. */
-        assert(p_of_xy != &map->end);
+        assert(p_of_xy != NULL);
 
-        two_child = is_2_child(map, p_of_xy, y);
+        two_child = is_2_child(p_of_xy, y);
         p_of_xy->branch[p_of_xy->branch[R] == y] = x;
         transplant(map, remove, y);
         if (remove == p_of_xy)
@@ -1000,25 +1002,25 @@ remove_fixup(struct CCC_Bounded_map *const map,
         }
     }
 
-    if (p_of_xy != &map->end)
+    if (p_of_xy != NULL)
     {
         if (two_child)
         {
-            assert(p_of_xy != &map->end);
+            assert(p_of_xy != NULL);
             rebalance_3_child(map, p_of_xy, x);
         }
-        else if (x == &map->end && p_of_xy->branch[L] == p_of_xy->branch[R])
+        else if (x == NULL && p_of_xy->branch[L] == p_of_xy->branch[R])
         {
-            assert(p_of_xy != &map->end);
+            assert(p_of_xy != NULL);
             CCC_Tribool const demote_makes_3_child
-                = is_2_child(map, p_of_xy->parent, p_of_xy);
-            demote(map, p_of_xy);
+                = is_2_child(p_of_xy->parent, p_of_xy);
+            demote(p_of_xy);
             if (demote_makes_3_child)
             {
                 rebalance_3_child(map, p_of_xy->parent, p_of_xy);
             }
         }
-        assert(!is_leaf(map, p_of_xy) || !p_of_xy->parity);
+        assert(!is_leaf(p_of_xy) || !parity(p_of_xy));
     }
     remove->branch[L] = remove->branch[R] = remove->parent = NULL;
     remove->parity = 0;
@@ -1031,62 +1033,60 @@ rebalance_3_child(struct CCC_Bounded_map *const map,
                   struct CCC_Bounded_map_node *z,
                   struct CCC_Bounded_map_node *x)
 {
-    assert(z != &map->end);
-    CCC_Tribool made_3_child = CCC_FALSE;
-    do
+    CCC_Tribool made_3_child = CCC_TRUE;
+    while (z && made_3_child)
     {
         struct CCC_Bounded_map_node *const g = z->parent;
         struct CCC_Bounded_map_node *const y = z->branch[z->branch[L] == x];
-        made_3_child = is_2_child(map, g, z);
-        if (is_2_child(map, z, y))
+        made_3_child = is_2_child(g, z);
+        if (is_2_child(z, y))
         {
-            demote(map, z);
+            demote(z);
         }
-        else if (is_22_parent(map, y->branch[L], y, y->branch[R]))
+        else if (is_22_parent(y->branch[L], y, y->branch[R]))
         {
-            demote(map, z);
-            demote(map, y);
+            demote(z);
+            demote(y);
         }
         else /* parent of x is 1,3, y is not a 2,2 parent, and x is 3-child. */
         {
-            assert(is_3_child(map, z, x));
+            assert(is_3_child(z, x));
             enum Link const z_to_x_dir = z->branch[R] == x;
             struct CCC_Bounded_map_node *const w = y->branch[!z_to_x_dir];
-            if (is_1_child(map, y, w))
+            if (is_1_child(y, w))
             {
                 rotate(map, z, y, y->branch[z_to_x_dir], z_to_x_dir);
-                pmapote(map, y);
-                demote(map, z);
-                if (is_leaf(map, z))
+                promote(y);
+                demote(z);
+                if (is_leaf(z))
                 {
-                    demote(map, z);
+                    demote(z);
                 }
             }
             else /* w is a 2-child and v will be a 1-child. */
             {
                 struct CCC_Bounded_map_node *const v = y->branch[z_to_x_dir];
-                assert(is_2_child(map, y, w));
-                assert(is_1_child(map, y, v));
+                assert(is_2_child(y, w));
+                assert(is_1_child(y, v));
                 double_rotate(map, z, y, v, !z_to_x_dir);
-                double_pmapote(map, v);
-                demote(map, y);
-                double_demote(map, z);
-                /* Optional "Rebalancing with Pmapotion," defined as follows:
-                       if node z is a non-leaf 1,1 node, we pmapote it;
-                       otherwise, if y is a non-leaf 1,1 node, we pmapote it.
+                double_promote(v);
+                demote(y);
+                double_demote(z);
+                /* Optional "Rebalancing with Promotion," defined as follows:
+                       if node z is a non-leaf 1,1 node, we promote it;
+                       otherwise, if y is a non-leaf 1,1 node, we promote it.
                        (See Figure 4.) (Haeupler et. al. 2014, 17).
                    This reduces constants in some of theorems mentioned in the
                    paper but may not be worth doing. Rotations stay at 2 worst
                    case. Should revisit after more performance testing. */
-                if (!is_leaf(map, z)
-                    && is_11_parent(map, z->branch[L], z, z->branch[R]))
+                if (!is_leaf(z) && is_11_parent(z->branch[L], z, z->branch[R]))
                 {
-                    pmapote(map, z);
+                    promote(z);
                 }
-                else if (!is_leaf(map, y)
-                         && is_11_parent(map, y->branch[L], y, y->branch[R]))
+                else if (!is_leaf(y)
+                         && is_11_parent(y->branch[L], y, y->branch[R]))
                 {
-                    pmapote(map, y);
+                    promote(y);
                 }
             }
             return;
@@ -1094,7 +1094,6 @@ rebalance_3_child(struct CCC_Bounded_map *const map,
         x = z;
         z = g;
     }
-    while (z != &map->end && made_3_child);
 }
 
 static void
@@ -1102,10 +1101,10 @@ transplant(struct CCC_Bounded_map *const map,
            struct CCC_Bounded_map_node *const remove,
            struct CCC_Bounded_map_node *const replacement)
 {
-    assert(remove != &map->end);
-    assert(replacement != &map->end);
+    assert(remove != NULL);
+    assert(replacement != NULL);
     replacement->parent = remove->parent;
-    if (remove->parent == &map->end)
+    if (remove->parent == NULL)
     {
         map->root = replacement;
     }
@@ -1114,11 +1113,17 @@ transplant(struct CCC_Bounded_map *const map,
         remove->parent->branch[remove->parent->branch[R] == remove]
             = replacement;
     }
-    remove->branch[R]->parent = replacement;
-    remove->branch[L]->parent = replacement;
+    if (remove->branch[R])
+    {
+        remove->branch[R]->parent = replacement;
+    }
+    if (remove->branch[L])
+    {
+        remove->branch[L]->parent = replacement;
+    }
     replacement->branch[R] = remove->branch[R];
     replacement->branch[L] = remove->branch[L];
-    replacement->parity = remove->parity;
+    replacement->parity = parity(remove);
 }
 
 /** A single rotation is symmetric. Here is the right case. Lowercase are nodes
@@ -1135,10 +1140,10 @@ rotate(struct CCC_Bounded_map *const map, struct CCC_Bounded_map_node *const z,
        struct CCC_Bounded_map_node *const x,
        struct CCC_Bounded_map_node *const y, enum Link dir)
 {
-    assert(z != &map->end);
+    assert(z != NULL);
     struct CCC_Bounded_map_node *const g = z->parent;
     x->parent = g;
-    if (g == &map->end)
+    if (g == NULL)
     {
         map->root = x;
     }
@@ -1149,7 +1154,10 @@ rotate(struct CCC_Bounded_map *const map, struct CCC_Bounded_map_node *const z,
     x->branch[dir] = z;
     z->parent = x;
     z->branch[!dir] = y;
-    y->parent = z;
+    if (y)
+    {
+        y->parent = z;
+    }
 }
 
 /** A double rotation shouldn't actually be two calls to rotate because that
@@ -1169,12 +1177,12 @@ double_rotate(struct CCC_Bounded_map *const map,
               struct CCC_Bounded_map_node *const x,
               struct CCC_Bounded_map_node *const y, enum Link dir)
 {
-    assert(z != &map->end);
-    assert(x != &map->end);
-    assert(y != &map->end);
+    assert(z != NULL);
+    assert(x != NULL);
+    assert(y != NULL);
     struct CCC_Bounded_map_node *const g = z->parent;
     y->parent = g;
-    if (g == &map->end)
+    if (g == NULL)
     {
         map->root = y;
     }
@@ -1183,14 +1191,27 @@ double_rotate(struct CCC_Bounded_map *const map,
         g->branch[g->branch[R] == z] = y;
     }
     x->branch[!dir] = y->branch[dir];
-    y->branch[dir]->parent = x;
+    if (y->branch[dir])
+    {
+        y->branch[dir]->parent = x;
+    }
     y->branch[dir] = x;
     x->parent = y;
 
     z->branch[dir] = y->branch[!dir];
-    y->branch[!dir]->parent = z;
+    if (y->branch[!dir])
+    {
+        y->branch[!dir]->parent = z;
+    }
     y->branch[!dir] = z;
     z->parent = y;
+}
+
+/* Returns the parity of a node. A NULL node has a parity of 1 aka CCC_TRUE. */
+static inline CCC_Tribool
+parity(struct CCC_Bounded_map_node const *const x)
+{
+    return x ? x->parity : CCC_TRUE;
 }
 
 /* Returns true for rank difference 0 (rule break) between the parent and node.
@@ -1198,11 +1219,10 @@ double_rotate(struct CCC_Bounded_map *const map,
       1╭─╯
        x */
 [[maybe_unused]] static inline CCC_Tribool
-is_0_child(struct CCC_Bounded_map const *const map,
-           struct CCC_Bounded_map_node const *const p,
+is_0_child(struct CCC_Bounded_map_node const *const p,
            struct CCC_Bounded_map_node const *const x)
 {
-    return p != &map->end && p->parity == x->parity;
+    return parity(p) == parity(x);
 }
 
 /* Returns true for rank difference 1 between the parent and node.
@@ -1210,11 +1230,10 @@ is_0_child(struct CCC_Bounded_map const *const map,
        1/
        x*/
 static inline CCC_Tribool
-is_1_child(struct CCC_Bounded_map const *const map,
-           struct CCC_Bounded_map_node const *const p,
+is_1_child(struct CCC_Bounded_map_node const *const p,
            struct CCC_Bounded_map_node const *const x)
 {
-    return p != &map->end && p->parity != x->parity;
+    return parity(p) != parity(x);
 }
 
 /* Returns true for rank difference 2 between the parent and node.
@@ -1222,11 +1241,10 @@ is_1_child(struct CCC_Bounded_map const *const map,
       2╭─╯
        x */
 static inline CCC_Tribool
-is_2_child(struct CCC_Bounded_map const *const map,
-           struct CCC_Bounded_map_node const *const p,
+is_2_child(struct CCC_Bounded_map_node const *const p,
            struct CCC_Bounded_map_node const *const x)
 {
-    return p != &map->end && p->parity == x->parity;
+    return parity(p) == parity(x);
 }
 
 /* Returns true for rank difference 3 between the parent and node.
@@ -1234,11 +1252,10 @@ is_2_child(struct CCC_Bounded_map const *const map,
       3╭─╯
        x */
 [[maybe_unused]] static inline CCC_Tribool
-is_3_child(struct CCC_Bounded_map const *const map,
-           struct CCC_Bounded_map_node const *const p,
+is_3_child(struct CCC_Bounded_map_node const *const p,
            struct CCC_Bounded_map_node const *const x)
 {
-    return p != &map->end && p->parity != x->parity;
+    return parity(p) != parity(x);
 }
 
 /* Returns true if a parent is a 0,1 or 1,0 node, which is not allowed. Either
@@ -1247,14 +1264,12 @@ is_3_child(struct CCC_Bounded_map const *const map,
       0╭─┴─╮1
        x   y */
 static inline CCC_Tribool
-is_01_parent([[maybe_unused]] struct CCC_Bounded_map const *const map,
-             struct CCC_Bounded_map_node const *const x,
+is_01_parent(struct CCC_Bounded_map_node const *const x,
              struct CCC_Bounded_map_node const *const p,
              struct CCC_Bounded_map_node const *const y)
 {
-    assert(p != &map->end);
-    return (!x->parity && !p->parity && y->parity)
-        || (x->parity && p->parity && !y->parity);
+    return (!parity(x) && !parity(p) && parity(y))
+        || (parity(x) && parity(p) && !parity(y));
 }
 
 /* Returns true if a parent is a 1,1 node. Either child may be the sentinel
@@ -1263,14 +1278,12 @@ is_01_parent([[maybe_unused]] struct CCC_Bounded_map const *const map,
       1╭─┴─╮1
        x   y */
 static inline CCC_Tribool
-is_11_parent([[maybe_unused]] struct CCC_Bounded_map const *const map,
-             struct CCC_Bounded_map_node const *const x,
+is_11_parent(struct CCC_Bounded_map_node const *const x,
              struct CCC_Bounded_map_node const *const p,
              struct CCC_Bounded_map_node const *const y)
 {
-    assert(p != &map->end);
-    return (!x->parity && p->parity && !y->parity)
-        || (x->parity && !p->parity && y->parity);
+    return (!parity(x) && parity(p) && !parity(y))
+        || (parity(x) && !parity(p) && parity(y));
 }
 
 /* Returns true if a parent is a 0,2 or 2,0 node, which is not allowed. Either
@@ -1279,13 +1292,11 @@ is_11_parent([[maybe_unused]] struct CCC_Bounded_map const *const map,
       0╭─┴─╮2
        x   y */
 static inline CCC_Tribool
-is_02_parent([[maybe_unused]] struct CCC_Bounded_map const *const map,
-             struct CCC_Bounded_map_node const *const x,
+is_02_parent(struct CCC_Bounded_map_node const *const x,
              struct CCC_Bounded_map_node const *const p,
              struct CCC_Bounded_map_node const *const y)
 {
-    assert(p != &map->end);
-    return (x->parity == p->parity) && (p->parity == y->parity);
+    return (parity(x) == parity(p)) && (parity(p) == parity(y));
 }
 
 /* Returns true if a parent is a 2,2 or 2,2 node, which is allowed. 2,2 nodes
@@ -1297,60 +1308,55 @@ is_02_parent([[maybe_unused]] struct CCC_Bounded_map const *const map,
       2╭─┴─╮2
        x   y */
 static inline CCC_Tribool
-is_22_parent([[maybe_unused]] struct CCC_Bounded_map const *const map,
-             struct CCC_Bounded_map_node const *const x,
+is_22_parent(struct CCC_Bounded_map_node const *const x,
              struct CCC_Bounded_map_node const *const p,
              struct CCC_Bounded_map_node const *const y)
 {
-    assert(p != &map->end);
-    return (x->parity == p->parity) && (p->parity == y->parity);
+    return (parity(x) == parity(p)) && (parity(p) == parity(y));
 }
 
 static inline void
-pmapote(struct CCC_Bounded_map const *const map,
-        struct CCC_Bounded_map_node *const x)
+promote(struct CCC_Bounded_map_node *const x)
 {
-    if (x != &map->end)
+    if (x)
     {
         x->parity = !x->parity;
     }
 }
 
 static inline void
-demote(struct CCC_Bounded_map const *const map,
-       struct CCC_Bounded_map_node *const x)
+demote(struct CCC_Bounded_map_node *const x)
 {
-    pmapote(map, x);
+    promote(x);
 }
 
 /* One could imagine non-parity based rank tracking making this function
    meaningful, but two parity changes are the same as a no-op. Leave for
    clarity of what the code is meant to do through certain sections. */
 static inline void
-double_pmapote(struct CCC_Bounded_map const *const,
-               struct CCC_Bounded_map_node *const)
+double_promote(struct CCC_Bounded_map_node *const)
 {}
 
 /* One could imagine non-parity based rank tracking making this function
    meaningful, but two parity changes are the same as a no-op. Leave for
    clarity of what the code is meant to do through certain sections. */
 static inline void
-double_demote(struct CCC_Bounded_map const *const,
-              struct CCC_Bounded_map_node *const)
+double_demote(struct CCC_Bounded_map_node *const)
 {}
 
 static inline CCC_Tribool
-is_leaf(struct CCC_Bounded_map const *const map,
-        struct CCC_Bounded_map_node const *const x)
+is_leaf(struct CCC_Bounded_map_node const *const x)
 {
-    return x->branch[L] == &map->end && x->branch[R] == &map->end;
+    return x->branch[L] == NULL && x->branch[R] == NULL;
 }
 
 static inline struct CCC_Bounded_map_node *
-sibling_of([[maybe_unused]] struct CCC_Bounded_map const *const map,
-           struct CCC_Bounded_map_node const *const x)
+sibling_of(struct CCC_Bounded_map_node const *const x)
 {
-    assert(x->parent != &map->end);
+    if (x->parent == NULL)
+    {
+        return NULL;
+    }
     /* We want the sibling so we need the truthy value to be opposite of x. */
     return x->parent->branch[x->parent->branch[L] == x];
 }
@@ -1371,7 +1377,7 @@ static size_t
 recursive_count(struct CCC_Bounded_map const *const map,
                 struct CCC_Bounded_map_node const *const r)
 {
-    if (r == &map->end)
+    if (r == NULL)
     {
         return 0;
     }
@@ -1380,24 +1386,19 @@ recursive_count(struct CCC_Bounded_map const *const map,
 }
 
 static CCC_Tribool
-are_subtrees_valid(struct CCC_Bounded_map const *t, struct Tree_range const r,
-                   struct CCC_Bounded_map_node const *const nil)
+are_subtrees_valid(struct CCC_Bounded_map const *t, struct Tree_range const r)
 {
     if (!r.root)
     {
-        return CCC_FALSE;
-    }
-    if (r.root == nil)
-    {
         return CCC_TRUE;
     }
-    if (r.low != nil
+    if (r.low
         && order(t, key_from_node(t, r.low), r.root, t->compare)
                != CCC_ORDER_LESSER)
     {
         return CCC_FALSE;
     }
-    if (r.high != nil
+    if (r.high
         && order(t, key_from_node(t, r.high), r.root, t->compare)
                != CCC_ORDER_GREATER)
     {
@@ -1408,15 +1409,12 @@ are_subtrees_valid(struct CCC_Bounded_map const *t, struct Tree_range const r,
                                   .low = r.low,
                                   .root = r.root->branch[L],
                                   .high = r.root,
-                              },
-                              nil)
-        && are_subtrees_valid(t,
-                              (struct Tree_range){
-                                  .low = r.root,
-                                  .root = r.root->branch[R],
-                                  .high = r.high,
-                              },
-                              nil);
+                              })
+        && are_subtrees_valid(t, (struct Tree_range){
+                                     .low = r.root,
+                                     .root = r.root->branch[R],
+                                     .high = r.high,
+                                 });
 }
 
 static CCC_Tribool
@@ -1424,7 +1422,7 @@ is_storing_parent(struct CCC_Bounded_map const *const t,
                   struct CCC_Bounded_map_node const *const parent,
                   struct CCC_Bounded_map_node const *const root)
 {
-    if (root == &t->end)
+    if (root == NULL)
     {
         return CCC_TRUE;
     }
@@ -1439,17 +1437,11 @@ is_storing_parent(struct CCC_Bounded_map const *const t,
 static CCC_Tribool
 validate(struct CCC_Bounded_map const *const map)
 {
-    if (!map->end.parity)
-    {
-        return CCC_FALSE;
-    }
-    if (!are_subtrees_valid(map,
-                            (struct Tree_range){
-                                .low = &map->end,
-                                .root = map->root,
-                                .high = &map->end,
-                            },
-                            &map->end))
+    if (!are_subtrees_valid(map, (struct Tree_range){
+                                     .low = NULL,
+                                     .root = map->root,
+                                     .high = NULL,
+                                 }))
     {
         return CCC_FALSE;
     }
@@ -1457,7 +1449,7 @@ validate(struct CCC_Bounded_map const *const map)
     {
         return CCC_FALSE;
     }
-    if (!is_storing_parent(map, &map->end, map->root))
+    if (!is_storing_parent(map, NULL, map->root))
     {
         return CCC_FALSE;
     }

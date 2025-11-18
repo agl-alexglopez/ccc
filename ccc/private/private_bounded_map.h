@@ -55,8 +55,6 @@ struct CCC_Bounded_map
 {
     /** @internal The root of the tree or the sentinel end if empty. */
     struct CCC_Bounded_map_node *root;
-    /** @internal The end sentinel in the struct for fewer code branches. */
-    struct CCC_Bounded_map_node end;
     /** @internal The count of stored nodes in the tree. */
     size_t count;
     /** @internal The byte offset of the key in the user struct. */
@@ -120,14 +118,10 @@ void *CCC_private_bounded_map_insert(
 
 /** @internal */
 #define CCC_private_bounded_map_initialize(                                    \
-    private_map_name, private_struct_name, private_node_node_field,            \
-    private_key_node_field, private_key_order_fn, private_allocate,            \
-    private_context_data)                                                      \
+    private_struct_name, private_node_node_field, private_key_node_field,      \
+    private_key_order_fn, private_allocate, private_context_data)              \
     {                                                                          \
-        .root = &(private_map_name).end,                                       \
-        .end = {.parity = 1,                                                   \
-                .parent = &(private_map_name).end,                             \
-                .branch = {&(private_map_name).end, &(private_map_name).end}}, \
+        .root = NULL,                                                          \
         .count = 0,                                                            \
         .key_offset = offsetof(private_struct_name, private_key_node_field),   \
         .type_intruder_offset                                                  \

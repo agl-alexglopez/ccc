@@ -15,8 +15,8 @@
 
 check_static_begin(bounded_map_test_insert_erase_shuffled)
 {
-    CCC_Bounded_map s = bounded_map_initialize(s, struct Val, elem, key,
-                                               id_order, NULL, NULL);
+    CCC_Bounded_map s
+        = bounded_map_initialize(struct Val, elem, key, id_order, NULL, NULL);
     size_t const size = 50;
     int const prime = 53;
     struct Val vals[50];
@@ -41,8 +41,8 @@ check_static_begin(bounded_map_test_insert_erase_shuffled)
 
 check_static_begin(bounded_map_test_prime_shuffle)
 {
-    CCC_Bounded_map s = bounded_map_initialize(s, struct Val, elem, key,
-                                               id_order, NULL, NULL);
+    CCC_Bounded_map s
+        = bounded_map_initialize(struct Val, elem, key, id_order, NULL, NULL);
     size_t const size = 50;
     size_t const prime = 53;
     size_t const less = 10;
@@ -78,8 +78,8 @@ check_static_begin(bounded_map_test_prime_shuffle)
 
 check_static_begin(bounded_map_test_weak_srand)
 {
-    CCC_Bounded_map s = bounded_map_initialize(s, struct Val, elem, key,
-                                               id_order, NULL, NULL);
+    CCC_Bounded_map s
+        = bounded_map_initialize(struct Val, elem, key, id_order, NULL, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -108,8 +108,8 @@ check_static_begin(bounded_map_test_weak_srand)
 
 check_static_begin(bounded_map_test_insert_erase_cycles)
 {
-    CCC_Bounded_map s = bounded_map_initialize(s, struct Val, elem, key,
-                                               id_order, NULL, NULL);
+    CCC_Bounded_map s
+        = bounded_map_initialize(struct Val, elem, key, id_order, NULL, NULL);
     srand(time(NULL)); /* NOLINT */
     int const num_nodes = 1000;
     struct Val vals[1000];

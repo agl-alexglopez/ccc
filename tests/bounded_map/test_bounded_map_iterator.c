@@ -166,8 +166,8 @@ check_static_begin(iterator_check, Bounded_map *s)
 
 check_static_begin(bounded_map_test_forward_iterator)
 {
-    Bounded_map s = bounded_map_initialize(s, struct Val, elem, key, id_order,
-                                           NULL, NULL);
+    Bounded_map s
+        = bounded_map_initialize(struct Val, elem, key, id_order, NULL, NULL);
     /* We should have the expected behavior iteration over empty tree. */
     int j = 0;
     for (struct Val *e = begin(&s); e != end(&s); e = next(&s, &e->elem), ++j)
@@ -198,8 +198,8 @@ check_static_begin(bounded_map_test_forward_iterator)
 
 check_static_begin(bounded_map_test_iterate_removal)
 {
-    Bounded_map s = bounded_map_initialize(s, struct Val, elem, key, id_order,
-                                           NULL, NULL);
+    Bounded_map s
+        = bounded_map_initialize(struct Val, elem, key, id_order, NULL, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -229,8 +229,8 @@ check_static_begin(bounded_map_test_iterate_removal)
 
 check_static_begin(bounded_map_test_iterate_remove_reinsert)
 {
-    Bounded_map s = bounded_map_initialize(s, struct Val, elem, key, id_order,
-                                           NULL, NULL);
+    Bounded_map s
+        = bounded_map_initialize(struct Val, elem, key, id_order, NULL, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -267,8 +267,8 @@ check_static_begin(bounded_map_test_iterate_remove_reinsert)
 
 check_static_begin(bounded_map_test_valid_range)
 {
-    Bounded_map s = bounded_map_initialize(s, struct Val, elem, key, id_order,
-                                           NULL, NULL);
+    Bounded_map s
+        = bounded_map_initialize(struct Val, elem, key, id_order, NULL, NULL);
 
     int const num_nodes = 25;
     struct Val vals[25];
@@ -298,8 +298,8 @@ check_static_begin(bounded_map_test_valid_range)
 
 check_static_begin(bounded_map_test_valid_range_equals)
 {
-    Bounded_map s = bounded_map_initialize(s, struct Val, elem, key, id_order,
-                                           NULL, NULL);
+    Bounded_map s
+        = bounded_map_initialize(struct Val, elem, key, id_order, NULL, NULL);
 
     int const num_nodes = 25;
     struct Val vals[25];
@@ -328,8 +328,8 @@ check_static_begin(bounded_map_test_valid_range_equals)
 
 check_static_begin(bounded_map_test_invalid_range)
 {
-    Bounded_map s = bounded_map_initialize(s, struct Val, elem, key, id_order,
-                                           NULL, NULL);
+    Bounded_map s
+        = bounded_map_initialize(struct Val, elem, key, id_order, NULL, NULL);
     int const num_nodes = 25;
     struct Val vals[25];
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
@@ -358,8 +358,8 @@ check_static_begin(bounded_map_test_invalid_range)
 
 check_static_begin(bounded_map_test_empty_range)
 {
-    Bounded_map s = bounded_map_initialize(s, struct Val, elem, key, id_order,
-                                           NULL, NULL);
+    Bounded_map s
+        = bounded_map_initialize(struct Val, elem, key, id_order, NULL, NULL);
     int const num_nodes = 25;
     struct Val vals[25];
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
