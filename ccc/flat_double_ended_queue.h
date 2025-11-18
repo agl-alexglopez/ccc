@@ -613,6 +613,10 @@ name shortening. */
 typedef CCC_Flat_double_ended_queue Flat_double_ended_queue;
 #    define flat_double_ended_queue_initialize(args...)                        \
         CCC_flat_double_ended_queue_initialize(args)
+#    define flat_double_ended_queue_from(args...)                              \
+        CCC_flat_double_ended_queue_from(args)
+#    define flat_double_ended_queue_with_capacity(args...)                     \
+        CCC_flat_double_ended_queue_with_capacity(args)
 #    define flat_double_ended_queue_copy(args...)                              \
         CCC_flat_double_ended_queue_copy(args)
 #    define flat_double_ended_queue_reserve(args...)                           \

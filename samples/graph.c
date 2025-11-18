@@ -443,24 +443,26 @@ found_destination(struct Graph *const graph, struct Vertex *const source)
         (struct Path_backtrack_cell[]){
             {
                 .current = source->pos,
-                .parent = {-1, -1},
+                .parent = (struct Point){-1, -1},
             },
         });
-    Flat_double_ended_queue bfs = flat_double_ended_queue_initialize(
-        NULL, struct Point, std_allocate, NULL, 0);
-    (void)push_back(&bfs, &source->pos);
+    Flat_double_ended_queue bfs
+        = flat_double_ended_queue_from(std_allocate, NULL, 0,
+                                       (struct Point[]){
+                                           source->pos,
+                                       });
     bool destination_connection = false;
     while (!is_empty(&bfs))
     {
-        struct Point cur = *((struct Point *)front(&bfs));
+        struct Point const cur = *((struct Point *)front(&bfs));
         (void)pop_front(&bfs);
         for (size_t i = 0; i < DIRS_SIZE; ++i)
         {
-            struct Point next = {
+            struct Point const next = {
                 .r = cur.r + dirs[i].r,
                 .c = cur.c + dirs[i].c,
             };
-            struct Path_backtrack_cell push = {
+            struct Path_backtrack_cell const push = {
                 .current = next,
                 .parent = cur,
             };
@@ -784,7 +786,7 @@ dijkstra_shortest_path(struct Graph *const graph, char const source,
         /* The reference to u is valid after the pop because the pop does not
            deallocate any memory. The priority_queue has no allocation
            permissions. */
-        struct Cost const *u = front(&costs);
+        struct Cost const *const u = front(&costs);
         (void)pop(&costs);
         if (u->cost == INT_MAX)
         {
