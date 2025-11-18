@@ -38,7 +38,7 @@ constant time queries for frequently accessed elements. */
 /** @internal Instead of thinking about left and right consider only links
     in the abstract sense. Put them in an array and then flip
     this enum and left and right code paths can be united into one */
-enum Branch
+enum Link
 {
     L = 0,
     R,
@@ -61,7 +61,7 @@ static struct CCC_Adaptive_map_entry container_entry(struct CCC_Adaptive_map *t,
 
 static void init_node(struct CCC_Adaptive_map_node *);
 static void swap(char temp[const], void *, void *, size_t);
-static void link(struct CCC_Adaptive_map_node *, enum Branch,
+static void link(struct CCC_Adaptive_map_node *, enum Link,
                  struct CCC_Adaptive_map_node *);
 
 /* Boolean returns */
@@ -87,7 +87,7 @@ static void *key_in_slot(struct CCC_Adaptive_map const *t, void const *slot);
 static void *key_from_node(struct CCC_Adaptive_map const *,
                            CCC_Adaptive_map_node const *);
 static struct CCC_Range equal_range(struct CCC_Adaptive_map *, void const *,
-                                    void const *, enum Branch);
+                                    void const *, enum Link);
 
 /* Internal operations that take and return nodes for the tree. */
 
@@ -95,7 +95,7 @@ static struct CCC_Adaptive_map_node *
 remove_from_tree(struct CCC_Adaptive_map *, struct CCC_Adaptive_map_node *);
 static struct CCC_Adaptive_map_node const *
 next(struct CCC_Adaptive_map const *, struct CCC_Adaptive_map_node const *,
-     enum Branch);
+     enum Link);
 static struct CCC_Adaptive_map_node *splay(struct CCC_Adaptive_map *,
                                            struct CCC_Adaptive_map_node *,
                                            void const *key,
@@ -700,7 +700,7 @@ min(struct CCC_Adaptive_map const *t)
 
 static struct CCC_Adaptive_map_node const *
 next(struct CCC_Adaptive_map const *const t,
-     struct CCC_Adaptive_map_node const *n, enum Branch const traversal)
+     struct CCC_Adaptive_map_node const *n, enum Link const traversal)
 {
     if (!n)
     {
@@ -724,7 +724,7 @@ next(struct CCC_Adaptive_map const *const t,
 
 static struct CCC_Range
 equal_range(struct CCC_Adaptive_map *const t, void const *const begin_key,
-            void const *const end_key, enum Branch const traversal)
+            void const *const end_key, enum Link const traversal)
 {
     if (!t->size)
     {
@@ -842,7 +842,7 @@ connect_new_root(struct CCC_Adaptive_map *const t,
                  struct CCC_Adaptive_map_node *const new_root,
                  CCC_Order const order_result)
 {
-    enum Branch const dir = CCC_ORDER_GREATER == order_result;
+    enum Link const dir = CCC_ORDER_GREATER == order_result;
     link(new_root, dir, t->root->branch[dir]);
     link(new_root, !dir, t->root);
     t->root->branch[dir] = NULL;
@@ -892,41 +892,43 @@ static struct CCC_Adaptive_map_node *
 splay(struct CCC_Adaptive_map *const t, struct CCC_Adaptive_map_node *root,
       void const *const key, CCC_Key_comparator *const order_fn)
 {
-    /* Pointers in an array and we can use the symmetric enum and flip it to
-       choose the Left or Right subtree. Another benefit of our nil node: use it
-       as our helper tree because we don't need its Left Right fields. */
+    /* Splaying brings the key element up to the root. The zigzag fixes of
+       splaying repair the tree and we remember the roots of these changes in
+       this helper tree. At the end, we make the root pick up these modified
+       left and right helper. The nil node should NULL initialized to start. */
     struct CCC_Adaptive_map_node nil = {};
-    struct CCC_Adaptive_map_node *l_r_subtrees[LR] = {&nil, &nil};
+    struct CCC_Adaptive_map_node *left_right_subtrees[LR] = {&nil, &nil};
     for (;;)
     {
         CCC_Order const root_order = order(t, key, root, order_fn);
-        enum Branch const dir = CCC_ORDER_GREATER == root_order;
-        if (CCC_ORDER_EQUAL == root_order || root->branch[dir] == NULL)
+        enum Link const order_link = CCC_ORDER_GREATER == root_order;
+        if (CCC_ORDER_EQUAL == root_order || root->branch[order_link] == NULL)
         {
             break;
         }
         CCC_Order const child_order
-            = order(t, key, root->branch[dir], order_fn);
-        enum Branch const dir_from_child = CCC_ORDER_GREATER == child_order;
+            = order(t, key, root->branch[order_link], order_fn);
+        enum Link const dir_from_child = CCC_ORDER_GREATER == child_order;
         /* A straight line has formed from root->child->elem. An opportunity
            to splay and heal the tree arises. */
-        if (CCC_ORDER_EQUAL != child_order && dir == dir_from_child)
+        if (CCC_ORDER_EQUAL != child_order && order_link == dir_from_child)
         {
-            struct CCC_Adaptive_map_node *const pivot = root->branch[dir];
-            link(root, dir, pivot->branch[!dir]);
-            link(pivot, !dir, root);
+            struct CCC_Adaptive_map_node *const pivot
+                = root->branch[order_link];
+            link(root, order_link, pivot->branch[!order_link]);
+            link(pivot, !order_link, root);
             root = pivot;
-            if (root->branch[dir] == NULL)
+            if (root->branch[order_link] == NULL)
             {
                 break;
             }
         }
-        link(l_r_subtrees[!dir], dir, root);
-        l_r_subtrees[!dir] = root;
-        root = root->branch[dir];
+        link(left_right_subtrees[!order_link], order_link, root);
+        left_right_subtrees[!order_link] = root;
+        root = root->branch[order_link];
     }
-    link(l_r_subtrees[L], R, root->branch[L]);
-    link(l_r_subtrees[R], L, root->branch[R]);
+    link(left_right_subtrees[L], R, root->branch[L]);
+    link(left_right_subtrees[R], L, root->branch[R]);
     link(root, L, nil.branch[R]);
     link(root, R, nil.branch[L]);
     root->parent = NULL;
@@ -969,7 +971,7 @@ swap(char temp[const], void *const a, void *const b, size_t sizeof_type)
 }
 
 static inline void
-link(struct CCC_Adaptive_map_node *const parent, enum Branch const dir,
+link(struct CCC_Adaptive_map_node *const parent, enum Link const dir,
      struct CCC_Adaptive_map_node *const subtree)
 {
     if (parent)
