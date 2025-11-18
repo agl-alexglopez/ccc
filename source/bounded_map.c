@@ -302,7 +302,7 @@ void *
 CCC_bounded_map_or_insert(CCC_Bounded_map_entry const *const entry,
                           CCC_Bounded_map_node *const type_intruder)
 {
-    if (!entry || !type_intruder || !entry->private.entry.type)
+    if (!entry || !type_intruder)
     {
         return NULL;
     }
@@ -342,7 +342,7 @@ CCC_bounded_map_insert_entry(CCC_Bounded_map_entry const *const entry,
 CCC_Entry
 CCC_bounded_map_remove_entry(CCC_Bounded_map_entry const *const entry)
 {
-    if (!entry || !entry->private.entry.type)
+    if (!entry)
     {
         return (CCC_Entry){{.status = CCC_ENTRY_ARGUMENT_ERROR}};
     }
@@ -889,27 +889,28 @@ static inline void *
 struct_base(struct CCC_Bounded_map const *const map,
             struct CCC_Bounded_map_node const *const e)
 {
-    return ((char *)e->branch) - map->type_intruder_offset;
+    return e ? ((char *)e->branch) - map->type_intruder_offset : NULL;
 }
 
 static inline void *
 key_from_node(struct CCC_Bounded_map const *const map,
               struct CCC_Bounded_map_node const *const node)
 {
-    return (char *)struct_base(map, node) + map->key_offset;
+    return node ? (char *)struct_base(map, node) + map->key_offset : NULL;
 }
 
 static inline void *
 key_in_slot(struct CCC_Bounded_map const *const map, void const *const slot)
 {
-    return (char *)slot + map->key_offset;
+    return slot ? (char *)slot + map->key_offset : NULL;
 }
 
 static inline struct CCC_Bounded_map_node *
 elem_in_slot(struct CCC_Bounded_map const *const map, void const *const slot)
 {
-    return (struct CCC_Bounded_map_node *)((char *)slot
-                                           + map->type_intruder_offset);
+    return slot ? (struct CCC_Bounded_map_node *)((char *)slot
+                                                  + map->type_intruder_offset)
+                : NULL;
 }
 
 /*=======================   WAVL Tree Maintenance   =========================*/
