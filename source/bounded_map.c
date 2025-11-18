@@ -800,28 +800,21 @@ static struct CCC_Bounded_map_node *
 next(struct CCC_Bounded_map const *const map,
      struct CCC_Bounded_map_node const *n, enum Link const traversal)
 {
-    if (!n || n == NULL)
+    if (!n)
     {
-        return (struct CCC_Bounded_map_node *)NULL;
+        return NULL;
     }
     assert(map->root->parent == NULL);
-    struct CCC_Bounded_map_node nil;
-    nil.branch[!traversal] = map->root;
-    map->root->parent = &nil;
-    /* The node is an internal one that has a sub-tree to explore first. */
-    if (n->branch[traversal] != NULL)
+    if (n->branch[traversal])
     {
         /* The goal is to get far left/right ASAP in any traversal. */
-        for (n = n->branch[traversal]; n->branch[!traversal] != NULL;
+        for (n = n->branch[traversal]; n->branch[!traversal];
              n = n->branch[!traversal])
         {}
-        map->root->parent = NULL;
         return (struct CCC_Bounded_map_node *)n;
     }
-    for (; n->parent != &nil && n->parent->branch[!traversal] != n;
-         n = n->parent)
+    for (; n->parent && n->parent->branch[!traversal] != n; n = n->parent)
     {}
-    map->root->parent = NULL;
     return n->parent;
 }
 

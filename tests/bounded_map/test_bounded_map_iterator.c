@@ -1,3 +1,4 @@
+#include <limits.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -147,18 +148,24 @@ check_static_begin(iterator_check, Bounded_map *s)
 {
     size_t const size = count(s).count;
     size_t iterator_count = 0;
+    int prev_key = INT_MIN;
     for (struct Val *e = begin(s); e != end(s); e = next(s, &e->elem))
     {
         ++iterator_count;
+        check(prev_key < e->key, true);
         check(iterator_count <= size, true);
+        prev_key = e->key;
     }
     check(iterator_count, size);
+    prev_key = INT_MAX;
     iterator_count = 0;
     for (struct Val *e = reverse_begin(s); e != end(s);
          e = reverse_next(s, &e->elem))
     {
         ++iterator_count;
+        check(prev_key > e->key, true);
         check(iterator_count <= size, true);
+        prev_key = e->key;
     }
     check(iterator_count, size);
     check_end();
