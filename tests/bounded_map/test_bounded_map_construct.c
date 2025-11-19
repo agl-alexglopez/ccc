@@ -5,7 +5,7 @@
 #include "bounded_map_utility.h"
 #include "checkers.h"
 
-CCC_Bounded_map
+static CCC_Bounded_map
 construct_empty(void)
 {
     CCC_Bounded_map map = CCC_bounded_map_initialize(struct Val, elem, key,
