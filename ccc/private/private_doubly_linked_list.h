@@ -86,8 +86,8 @@ take with a head and tail nil. The only cost is slight care for certain
 cutting and node clearing steps to ensure the nil addresses remain valid */
 struct CCC_Doubly_linked_list
 {
-    /** @internal The sentinel with storage in the actual list struct. */
-    struct CCC_Doubly_linked_list_node nil;
+    struct CCC_Doubly_linked_list_node *head;
+    struct CCC_Doubly_linked_list_node *tail;
     /** @internal The number of elements constantly tracked for O(1) check. */
     size_t count;
     /** @internal The size in bytes of the type which wraps this handle. */
@@ -126,8 +126,8 @@ name of the list being on the left hand side of the assignment operator. */
     private_doubly_linked_list_node_field, private_compare_fn,                 \
     private_allocate, private_context_data)                                    \
     {                                                                          \
-        .nil.next = &(private_doubly_linked_list_name).nil,                    \
-        .nil.previous = &(private_doubly_linked_list_name).nil,                \
+        .head = NULL,                                                          \
+        .tail = NULL,                                                          \
         .sizeof_type = sizeof(private_struct_name),                            \
         .type_intruder_offset = offsetof(                                      \
             private_struct_name, private_doubly_linked_list_node_field),       \

@@ -417,27 +417,6 @@ the sentinel but will not be NULL unless a NULL pointer is provided as l. */
 [[nodiscard]] CCC_Doubly_linked_list_node *
 CCC_doubly_linked_list_node_begin(CCC_Doubly_linked_list const *list);
 
-/** @brief Return a handle to the list element at the back of the list which
-may be the sentinel. O(1).
-@param[in] list a pointer to the doubly linked list.
-@return a pointer to the list element at the end of the list which may be
-the sentinel but will not be NULL unless a NULL pointer is provided as l. */
-[[nodiscard]] CCC_Doubly_linked_list_node *
-CCC_doubly_linked_list_node_end(CCC_Doubly_linked_list const *list);
-
-/** @brief Return a pointer to the sentinel node at the back of the list.
-@param[in] list a pointer to the doubly linked list.
-@return a pointer to the sentinel node that always points to the first and last
-elements or itself. It will not be NULL unless singly_linked_list pointer
-provided is NULL.
-
-This function can be used when the user wishes to splice an element or range of
-elements to the back of the list. Because the interface only allows the user
-to splice an element or elements BEFORE a position having access to the sentinel
-makes it possible to splice to the back of the list. */
-[[nodiscard]] CCC_Doubly_linked_list_node *
-CCC_doubly_linked_list_sentinel_end(CCC_Doubly_linked_list const *list);
-
 /** @brief Return the count of elements in the list. O(1).
 @param[in] list a pointer to the doubly linked list.
 @return the size of the list. An argument error is set if list is NULL. */
@@ -503,16 +482,10 @@ typedef CCC_Doubly_linked_list Doubly_linked_list;
 #    define doubly_linked_list_reverse_next(args...)                           \
         CCC_doubly_linked_list_reverse_next(args)
 #    define doubly_linked_list_end(args...) CCC_doubly_linked_list_end(args)
-#    define doubly_linked_list_node_end(args...)                               \
-        CCC_doubly_linked_list_node_end(args)
 #    define doubly_linked_list_reverse_end(args...)                            \
         CCC_doubly_linked_list_reverse_end(args)
 #    define doubly_linked_list_node_begin(args...)                             \
         CCC_doubly_linked_list_node_begin(args)
-#    define doubly_linked_list_node_end(args...)                               \
-        CCC_doubly_linked_list_node_end(args)
-#    define doubly_linked_list_sentinel_end(args...)                           \
-        CCC_doubly_linked_list_sentinel_end(args)
 #    define doubly_linked_list_count(args...) CCC_doubly_linked_list_count(args)
 #    define doubly_linked_list_is_empty(args...)                               \
         CCC_doubly_linked_list_is_empty(args)

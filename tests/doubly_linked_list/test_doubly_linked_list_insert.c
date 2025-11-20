@@ -88,14 +88,14 @@ check_static_begin(doubly_linked_list_test_push_and_splice_range)
     check(splice_range(&doubly_linked_list,
                        doubly_linked_list_node_begin(&doubly_linked_list),
                        &doubly_linked_list, &vals[1].e,
-                       doubly_linked_list_sentinel_end(&doubly_linked_list)),
+                       doubly_linked_list_end(&doubly_linked_list)),
           CCC_RESULT_OK);
     check(validate(&doubly_linked_list), true);
     check(check_order(&doubly_linked_list, 4, (int[]){1, 2, 3, 0}), CHECK_PASS);
     check(splice_range(&doubly_linked_list,
                        doubly_linked_list_node_begin(&doubly_linked_list),
                        &doubly_linked_list, &vals[2].e,
-                       doubly_linked_list_sentinel_end(&doubly_linked_list)),
+                       doubly_linked_list_end(&doubly_linked_list)),
           CCC_RESULT_OK);
     check(validate(&doubly_linked_list), true);
     check(check_order(&doubly_linked_list, 4, (int[]){2, 3, 0, 1}), CHECK_PASS);
@@ -116,8 +116,7 @@ check_static_begin(doubly_linked_list_test_push_and_splice_no_ops)
         = create_list(&doubly_linked_list, UTIL_PUSH_BACK, 4, vals);
     check(t, CHECK_PASS);
     check(splice_range(&doubly_linked_list, &vals[0].e, &doubly_linked_list,
-                       &vals[0].e,
-                       doubly_linked_list_sentinel_end(&doubly_linked_list)),
+                       &vals[0].e, doubly_linked_list_end(&doubly_linked_list)),
           CCC_RESULT_OK);
     check(validate(&doubly_linked_list), true);
     check(check_order(&doubly_linked_list, 4, (int[]){0, 1, 2, 3}), CHECK_PASS);

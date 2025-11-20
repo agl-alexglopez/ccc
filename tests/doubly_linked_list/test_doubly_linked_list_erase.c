@@ -119,7 +119,7 @@ check_static_begin(doubly_linked_list_test_push_pop_middle_range)
     check(check_order(&doubly_linked_list, 2, (int[2]){0, 4}), CHECK_PASS);
     (void)doubly_linked_list_extract_range(
         &doubly_linked_list, &vals[0].e,
-        doubly_linked_list_sentinel_end(&doubly_linked_list));
+        doubly_linked_list_end(&doubly_linked_list));
     check(validate(&doubly_linked_list), true);
     check(count(&doubly_linked_list).count, 0);
     check_end();
@@ -140,8 +140,7 @@ check_static_begin(doubly_linked_list_test_splice_two_lists)
     t = create_list(&to_gain, UTIL_PUSH_BACK, 2, to_gain_vals);
     check(t, CHECK_PASS);
     check(check_order(&to_lose, 5, (int[5]){0, 1, 2, 3, 4}), CHECK_PASS);
-    check(doubly_linked_list_splice(&to_gain,
-                                    doubly_linked_list_sentinel_end(&to_gain),
+    check(doubly_linked_list_splice(&to_gain, doubly_linked_list_end(&to_gain),
                                     &to_lose, &to_lose_vals[0].e),
           CCC_RESULT_OK);
     check(validate(&to_gain), true);
@@ -151,9 +150,9 @@ check_static_begin(doubly_linked_list_test_splice_two_lists)
     check(check_order(&to_gain, 3, (int[3]){0, 1, 0}), CHECK_PASS);
     check(check_order(&to_lose, 4, (int[4]){1, 2, 3, 4}), CHECK_PASS);
     check(doubly_linked_list_splice_range(
-              &to_gain, doubly_linked_list_node_end(&to_gain), &to_lose,
+              &to_gain, doubly_linked_list_end(&to_gain), &to_lose,
               doubly_linked_list_node_begin(&to_lose),
-              doubly_linked_list_sentinel_end(&to_lose)),
+              doubly_linked_list_end(&to_lose)),
           CCC_RESULT_OK);
     check(validate(&to_gain), true);
     check(validate(&to_lose), true);
