@@ -158,7 +158,7 @@ check_static_begin(doubly_linked_list_test_splice_two_lists)
     check(validate(&to_lose), true);
     check(count(&to_gain).count, 7);
     check(count(&to_lose).count, 0);
-    check(check_order(&to_gain, 7, (int[7]){0, 1, 1, 2, 3, 4, 0}), CHECK_PASS);
+    check(check_order(&to_gain, 7, (int[7]){0, 1, 0, 1, 2, 3, 4}), CHECK_PASS);
     check_end();
 }
 

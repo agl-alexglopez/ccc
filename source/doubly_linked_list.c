@@ -437,6 +437,10 @@ CCC_doubly_linked_list_splice(
     {
         position_doubly_linked_list->head = to_cut;
     }
+    if (!position_doubly_linked_list->tail)
+    {
+        position_doubly_linked_list->tail = position;
+    }
 
 done:
     if (result == CCC_RESULT_OK
@@ -451,27 +455,27 @@ done:
 CCC_Result
 CCC_doubly_linked_list_splice_range(
     CCC_Doubly_linked_list *const position_doubly_linked_list,
-    CCC_Doubly_linked_list_node *type_intruder_position,
+    CCC_Doubly_linked_list_node *const type_intruder_position,
     CCC_Doubly_linked_list *const to_cut_doubly_linked_list,
-    CCC_Doubly_linked_list_node *type_intruder_to_cut_begin,
-    CCC_Doubly_linked_list_node *type_intruder_to_cut_end)
+    CCC_Doubly_linked_list_node *const type_intruder_to_cut_begin,
+    CCC_Doubly_linked_list_node *const type_intruder_to_cut_end)
 {
     if (!position_doubly_linked_list || !to_cut_doubly_linked_list
-        || !type_intruder_position || !type_intruder_to_cut_begin
-        || !type_intruder_to_cut_end)
+        || !type_intruder_to_cut_begin
+        || type_intruder_to_cut_begin == type_intruder_to_cut_end)
     {
         return CCC_RESULT_ARGUMENT_ERROR;
     }
 
-    if (type_intruder_to_cut_begin == type_intruder_to_cut_end)
+    CCC_Doubly_linked_list_node *const end_previous
+        = type_intruder_to_cut_end ? type_intruder_to_cut_end->previous
+                                   : to_cut_doubly_linked_list->tail;
+    if (type_intruder_to_cut_begin == end_previous)
     {
         return CCC_doubly_linked_list_splice(
             position_doubly_linked_list, type_intruder_position,
             to_cut_doubly_linked_list, type_intruder_to_cut_begin);
     }
-
-    CCC_Doubly_linked_list_node *end_previous
-        = type_intruder_to_cut_end->previous;
 
     size_t count = 0;
     CCC_Doubly_linked_list_node *iterator = type_intruder_to_cut_begin;
@@ -503,8 +507,13 @@ CCC_doubly_linked_list_splice_range(
         to_cut_doubly_linked_list->tail = to_cut_previous;
     }
     CCC_Doubly_linked_list_node *position_previous
-        = type_intruder_position->previous;
+        = type_intruder_position ? type_intruder_position->previous
+                                 : position_doubly_linked_list->tail;
 
+    if (position_previous == position_doubly_linked_list->tail)
+    {
+        position_doubly_linked_list->tail = end_previous;
+    }
     if (position_previous)
     {
         position_previous->next = type_intruder_to_cut_begin;
@@ -515,8 +524,16 @@ CCC_doubly_linked_list_splice_range(
     }
 
     type_intruder_to_cut_begin->previous = position_previous;
-    end_previous->next = type_intruder_position;
-    type_intruder_position->previous = end_previous;
+
+    if (end_previous)
+    {
+        end_previous->next = type_intruder_position;
+    }
+
+    if (type_intruder_position)
+    {
+        type_intruder_position->previous = end_previous;
+    }
 
     if (to_cut_doubly_linked_list != position_doubly_linked_list)
     {
@@ -600,18 +617,21 @@ CCC_doubly_linked_list_is_empty(CCC_Doubly_linked_list const *const list)
 
 CCC_Result
 CCC_doubly_linked_list_clear(CCC_Doubly_linked_list *const list,
-                             CCC_Type_destructor *destroy)
+                             CCC_Type_destructor *const destroy)
 {
     if (!list)
     {
         return CCC_RESULT_ARGUMENT_ERROR;
     }
-    while (!CCC_doubly_linked_list_is_empty(list))
+    while (list->head)
     {
         void *const node = struct_base(list, remove(list, list->head));
         if (destroy)
         {
-            destroy((CCC_Type_context){.type = node, .context = list->context});
+            destroy((CCC_Type_context){
+                .type = node,
+                .context = list->context,
+            });
         }
         if (list->allocate)
         {
@@ -622,6 +642,8 @@ CCC_doubly_linked_list_clear(CCC_Doubly_linked_list *const list,
             });
         }
     }
+    list->head = list->tail = NULL;
+    list->count = 0;
     return CCC_RESULT_OK;
 }
 
@@ -632,19 +654,42 @@ CCC_doubly_linked_list_validate(CCC_Doubly_linked_list const *const list)
     {
         return CCC_TRIBOOL_ERROR;
     }
+    if (!list->head && !list->tail)
+    {
+        if (list->count != 0)
+        {
+            return CCC_FALSE;
+        }
+        return CCC_TRUE;
+    }
+    if (!list->head || !list->tail)
+    {
+        return CCC_FALSE;
+    }
     size_t size = 0;
-    for (struct CCC_Doubly_linked_list_node const *e = list->head; e != NULL;
-         e = e->next, ++size)
+    struct CCC_Doubly_linked_list_node const *forward = list->head;
+    struct CCC_Doubly_linked_list_node const *reverse = list->tail;
+    while (forward && reverse && forward != list->tail && reverse != list->head)
     {
         if (size >= list->count)
         {
             return CCC_FALSE;
         }
-        if (!e || e->next == e || e->previous == e)
+        if (!forward || forward->next == forward
+            || forward->previous == forward)
         {
             return CCC_FALSE;
         }
+        if (!reverse || reverse->next == reverse
+            || reverse->previous == reverse)
+        {
+            return CCC_FALSE;
+        }
+        forward = forward->next;
+        reverse = reverse->previous;
+        ++size;
     }
+    size += (forward == list->tail && reverse == list->head);
     return size == list->count;
 }
 
@@ -704,10 +749,26 @@ CCC_doubly_linked_list_insert_sorted(CCC_Doubly_linked_list *const list,
     for (; pos != NULL && order(list, type_intruder, pos) != CCC_ORDER_LESSER;
          pos = pos->next)
     {}
+    struct CCC_Doubly_linked_list_node *const pos_previous
+        = pos ? pos->previous : list->tail;
     type_intruder->next = pos;
-    type_intruder->previous = pos->previous;
-    pos->previous->next = type_intruder;
-    pos->previous = type_intruder;
+    type_intruder->previous = pos_previous;
+    if (pos)
+    {
+        pos->previous = type_intruder;
+    }
+    if (pos_previous)
+    {
+        pos_previous->next = type_intruder;
+    }
+    else
+    {
+        list->head = type_intruder;
+    }
+    if (pos_previous == list->tail)
+    {
+        list->tail = type_intruder;
+    }
     ++list->count;
     return struct_base(list, type_intruder);
 }
@@ -785,18 +846,39 @@ merge(struct CCC_Doubly_linked_list *const list,
       struct CCC_Doubly_linked_list_node *a_count_b_first,
       struct CCC_Doubly_linked_list_node *const b_count)
 {
-    assert(list && a_first && a_count_b_first && b_count);
-    while (a_first != a_count_b_first && a_count_b_first != b_count)
+    while (a_first && a_first != a_count_b_first && a_count_b_first
+           && a_count_b_first != b_count)
     {
         if (order(list, a_count_b_first, a_first) == CCC_ORDER_LESSER)
         {
             struct CCC_Doubly_linked_list_node *const lesser = a_count_b_first;
             a_count_b_first = lesser->next;
-            lesser->next->previous = lesser->previous;
-            lesser->previous->next = lesser->next;
+            if (lesser->next)
+            {
+                lesser->next->previous = lesser->previous;
+            }
+            else
+            {
+                list->tail = lesser->previous;
+            }
+            if (lesser->previous)
+            {
+                lesser->previous->next = lesser->next;
+            }
+            else
+            {
+                list->head = lesser->next;
+            }
             lesser->previous = a_first->previous;
             lesser->next = a_first;
-            a_first->previous->next = lesser;
+            if (a_first->previous)
+            {
+                a_first->previous->next = lesser;
+            }
+            else
+            {
+                list->head = lesser;
+            }
             a_first->previous = lesser;
         }
         else
@@ -829,9 +911,10 @@ first_less(struct CCC_Doubly_linked_list const *const list,
 void
 CCC_private_doubly_linked_list_push_back(
     struct CCC_Doubly_linked_list *const list,
-    struct CCC_Doubly_linked_list_node *const type_intruder)
+    struct CCC_Doubly_linked_list_node *type_intruder)
 {
-    (void)CCC_doubly_linked_list_push_back(list, type_intruder);
+    (void)push_back(list, type_intruder);
+    ++list->count;
 }
 
 void
@@ -839,7 +922,8 @@ CCC_private_doubly_linked_list_push_front(
     struct CCC_Doubly_linked_list *const list,
     struct CCC_Doubly_linked_list_node *const type_intruder)
 {
-    (void)CCC_doubly_linked_list_push_front(list, type_intruder);
+    (void)push_front(list, type_intruder);
+    ++list->count;
 }
 
 struct CCC_Doubly_linked_list_node *
