@@ -26,19 +26,15 @@ if they refactor. */
 
 /*===========================   Prototypes    ===============================*/
 
-static struct CCC_Doubly_linked_list_node *
-push_back(struct CCC_Doubly_linked_list *,
-          struct CCC_Doubly_linked_list_node *);
-static struct CCC_Doubly_linked_list_node *
-push_front(struct CCC_Doubly_linked_list *,
-           struct CCC_Doubly_linked_list_node *);
-static struct CCC_Doubly_linked_list_node *
-remove_node(struct CCC_Doubly_linked_list *,
-            struct CCC_Doubly_linked_list_node *);
-static inline struct CCC_Doubly_linked_list_node *
-insert_node(struct CCC_Doubly_linked_list *,
-            struct CCC_Doubly_linked_list_node *,
-            struct CCC_Doubly_linked_list_node *);
+static void push_back(struct CCC_Doubly_linked_list *,
+                      struct CCC_Doubly_linked_list_node *);
+static void push_front(struct CCC_Doubly_linked_list *,
+                       struct CCC_Doubly_linked_list_node *);
+static void remove_node(struct CCC_Doubly_linked_list *,
+                        struct CCC_Doubly_linked_list_node *);
+static void insert_node(struct CCC_Doubly_linked_list *,
+                        struct CCC_Doubly_linked_list_node *,
+                        struct CCC_Doubly_linked_list_node *);
 static void *struct_base(struct CCC_Doubly_linked_list const *,
                          struct CCC_Doubly_linked_list_node const *);
 static size_t erase_range(struct CCC_Doubly_linked_list const *,
@@ -85,7 +81,7 @@ CCC_doubly_linked_list_push_front(CCC_Doubly_linked_list *const list,
         type_intruder = type_intruder_in(list, copy);
     }
 
-    type_intruder = push_front(list, type_intruder);
+    push_front(list, type_intruder);
     ++list->count;
     return struct_base(list, type_intruder);
 }
@@ -112,7 +108,7 @@ CCC_doubly_linked_list_push_back(CCC_Doubly_linked_list *const list,
         (void)memcpy(node, struct_base(list, type_intruder), list->sizeof_type);
         type_intruder = type_intruder_in(list, node);
     }
-    type_intruder = push_back(list, type_intruder);
+    push_back(list, type_intruder);
     ++list->count;
     return struct_base(list, type_intruder);
 }
@@ -144,7 +140,8 @@ CCC_doubly_linked_list_pop_front(CCC_Doubly_linked_list *const list)
     {
         return CCC_RESULT_ARGUMENT_ERROR;
     }
-    struct CCC_Doubly_linked_list_node *const r = remove_node(list, list->head);
+    struct CCC_Doubly_linked_list_node *const r = list->head;
+    remove_node(list, r);
     if (list->allocate)
     {
         assert(r);
@@ -165,7 +162,8 @@ CCC_doubly_linked_list_pop_back(CCC_Doubly_linked_list *const list)
     {
         return CCC_RESULT_ARGUMENT_ERROR;
     }
-    struct CCC_Doubly_linked_list_node *const r = remove_node(list, list->tail);
+    struct CCC_Doubly_linked_list_node *const r = list->tail;
+    remove_node(list, r);
     if (list->allocate)
     {
         (void)list->allocate((CCC_Allocator_context){
@@ -201,7 +199,7 @@ CCC_doubly_linked_list_insert(CCC_Doubly_linked_list *const list,
         (void)memcpy(node, struct_base(list, type_intruder), list->sizeof_type);
         type_intruder = type_intruder_in(list, node);
     }
-    type_intruder = insert_node(list, position, type_intruder);
+    insert_node(list, position, type_intruder);
     ++list->count;
     return struct_base(list, type_intruder);
 }
@@ -215,7 +213,7 @@ CCC_doubly_linked_list_erase(CCC_Doubly_linked_list *const list,
         return NULL;
     }
     void *const ret = struct_base(list, type_intruder->next);
-    type_intruder = remove_node(list, type_intruder);
+    remove_node(list, type_intruder);
     if (list->allocate)
     {
         (void)list->allocate((CCC_Allocator_context){
@@ -287,7 +285,7 @@ CCC_doubly_linked_list_extract(CCC_Doubly_linked_list *const list,
     {
         return NULL;
     }
-    type_intruder = remove_node(list, type_intruder);
+    remove_node(list, type_intruder);
     --list->count;
     return struct_base(list, type_intruder);
 }
@@ -310,7 +308,7 @@ CCC_doubly_linked_list_extract_range(
     }
     if (type_intruder_begin == type_intruder_end)
     {
-        type_intruder_begin = remove_node(list, type_intruder_begin);
+        remove_node(list, type_intruder_begin);
         --list->count;
         return struct_base(list, type_intruder_begin);
     }
@@ -370,8 +368,8 @@ CCC_doubly_linked_list_splice(
     {
         return CCC_RESULT_OK;
     }
-    to_cut = remove_node(to_cut_doubly_linked_list, to_cut);
-    (void)insert_node(position_doubly_linked_list, position, to_cut);
+    remove_node(to_cut_doubly_linked_list, to_cut);
+    insert_node(position_doubly_linked_list, position, to_cut);
     if (to_cut_doubly_linked_list != position_doubly_linked_list)
     {
         to_cut_doubly_linked_list->count--;
@@ -553,7 +551,9 @@ CCC_doubly_linked_list_clear(CCC_Doubly_linked_list *const list,
     }
     while (list->head)
     {
-        void *const node = struct_base(list, remove_node(list, list->head));
+        struct CCC_Doubly_linked_list_node *const removed = list->head;
+        remove_node(list, removed);
+        void *const node = struct_base(list, removed);
         if (destroy)
         {
             destroy((CCC_Type_context){
@@ -677,26 +677,7 @@ CCC_doubly_linked_list_insert_sorted(CCC_Doubly_linked_list *const list,
     for (; pos != NULL && order(list, type_intruder, pos) != CCC_ORDER_LESSER;
          pos = pos->next)
     {}
-    struct CCC_Doubly_linked_list_node *const pos_previous
-        = pos ? pos->previous : list->tail;
-    type_intruder->next = pos;
-    type_intruder->previous = pos_previous;
-    if (pos)
-    {
-        pos->previous = type_intruder;
-    }
-    if (pos_previous)
-    {
-        pos_previous->next = type_intruder;
-    }
-    else
-    {
-        list->head = type_intruder;
-    }
-    if (pos_previous == list->tail)
-    {
-        list->tail = type_intruder;
-    }
+    insert_node(list, pos, type_intruder);
     ++list->count;
     return struct_base(list, type_intruder);
 }
@@ -841,7 +822,7 @@ CCC_private_doubly_linked_list_push_back(
     struct CCC_Doubly_linked_list *const list,
     struct CCC_Doubly_linked_list_node *type_intruder)
 {
-    (void)push_back(list, type_intruder);
+    push_back(list, type_intruder);
     ++list->count;
 }
 
@@ -850,7 +831,7 @@ CCC_private_doubly_linked_list_push_front(
     struct CCC_Doubly_linked_list *const list,
     struct CCC_Doubly_linked_list_node *const type_intruder)
 {
-    (void)push_front(list, type_intruder);
+    push_front(list, type_intruder);
     ++list->count;
 }
 
@@ -864,7 +845,7 @@ CCC_private_doubly_linked_list_node_in(
 
 /*=======================       Static Helpers    ===========================*/
 
-static inline struct CCC_Doubly_linked_list_node *
+static inline void
 push_front(struct CCC_Doubly_linked_list *const list,
            struct CCC_Doubly_linked_list_node *const node)
 {
@@ -880,10 +861,9 @@ push_front(struct CCC_Doubly_linked_list *const list,
         list->tail = node;
     }
     list->head = node;
-    return node;
 }
 
-static inline struct CCC_Doubly_linked_list_node *
+static inline void
 push_back(struct CCC_Doubly_linked_list *const list,
           struct CCC_Doubly_linked_list_node *const node)
 {
@@ -900,10 +880,9 @@ push_back(struct CCC_Doubly_linked_list *const list,
     }
 
     list->tail = node;
-    return node;
 }
 
-static inline struct CCC_Doubly_linked_list_node *
+static inline void
 insert_node(struct CCC_Doubly_linked_list *const list,
             struct CCC_Doubly_linked_list_node *const position,
             struct CCC_Doubly_linked_list_node *const node)
@@ -924,10 +903,9 @@ insert_node(struct CCC_Doubly_linked_list *const list,
         list->head = node;
     }
     position->previous = node;
-    return node;
 }
 
-static inline struct CCC_Doubly_linked_list_node *
+static inline void
 remove_node(struct CCC_Doubly_linked_list *const list,
             struct CCC_Doubly_linked_list_node *const node)
 {
@@ -950,7 +928,6 @@ remove_node(struct CCC_Doubly_linked_list *const list,
     }
 
     node->next = node->previous = NULL;
-    return node;
 }
 
 static size_t
