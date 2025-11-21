@@ -33,7 +33,8 @@ static struct CCC_Doubly_linked_list_node *
 push_front(struct CCC_Doubly_linked_list *,
            struct CCC_Doubly_linked_list_node *);
 static struct CCC_Doubly_linked_list_node *
-remove(struct CCC_Doubly_linked_list *, struct CCC_Doubly_linked_list_node *);
+remove_node(struct CCC_Doubly_linked_list *,
+            struct CCC_Doubly_linked_list_node *);
 static void *struct_base(struct CCC_Doubly_linked_list const *,
                          struct CCC_Doubly_linked_list_node const *);
 static size_t erase_range(struct CCC_Doubly_linked_list const *,
@@ -139,7 +140,7 @@ CCC_doubly_linked_list_pop_front(CCC_Doubly_linked_list *const list)
     {
         return CCC_RESULT_ARGUMENT_ERROR;
     }
-    struct CCC_Doubly_linked_list_node *const r = remove(list, list->head);
+    struct CCC_Doubly_linked_list_node *const r = remove_node(list, list->head);
     if (list->allocate)
     {
         assert(r);
@@ -160,7 +161,7 @@ CCC_doubly_linked_list_pop_back(CCC_Doubly_linked_list *const list)
     {
         return CCC_RESULT_ARGUMENT_ERROR;
     }
-    struct CCC_Doubly_linked_list_node *const r = remove(list, list->tail);
+    struct CCC_Doubly_linked_list_node *const r = remove_node(list, list->tail);
     if (list->allocate)
     {
         (void)list->allocate((CCC_Allocator_context){
@@ -314,7 +315,7 @@ CCC_doubly_linked_list_extract(CCC_Doubly_linked_list *const list,
     {
         return NULL;
     }
-    type_intruder = remove(list, type_intruder);
+    type_intruder = remove_node(list, type_intruder);
     --list->count;
     return struct_base(list, type_intruder);
 }
@@ -395,8 +396,8 @@ CCC_doubly_linked_list_splice(
     }
     if (!position)
     {
-        to_cut = remove(to_cut_doubly_linked_list, to_cut);
-        to_cut = push_back(position_doubly_linked_list, to_cut);
+        (void)remove_node(to_cut_doubly_linked_list, to_cut);
+        (void)push_back(position_doubly_linked_list, to_cut);
         goto done;
     }
 
@@ -625,7 +626,7 @@ CCC_doubly_linked_list_clear(CCC_Doubly_linked_list *const list,
     }
     while (list->head)
     {
-        void *const node = struct_base(list, remove(list, list->head));
+        void *const node = struct_base(list, remove_node(list, list->head));
         if (destroy)
         {
             destroy((CCC_Type_context){
@@ -976,8 +977,8 @@ push_back(struct CCC_Doubly_linked_list *const list,
 }
 
 static inline struct CCC_Doubly_linked_list_node *
-remove(struct CCC_Doubly_linked_list *const list,
-       struct CCC_Doubly_linked_list_node *const node)
+remove_node(struct CCC_Doubly_linked_list *const list,
+            struct CCC_Doubly_linked_list_node *const node)
 {
     if (node->previous)
     {

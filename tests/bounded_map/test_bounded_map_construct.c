@@ -4,6 +4,7 @@
 #include "bounded_map.h"
 #include "bounded_map_utility.h"
 #include "checkers.h"
+#include "types.h"
 
 static CCC_Bounded_map
 construct_empty(void)

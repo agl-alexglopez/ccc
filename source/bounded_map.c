@@ -1032,17 +1032,17 @@ rebalance_3_child(struct CCC_Bounded_map *const map,
     {
         struct CCC_Bounded_map_node *const g = z->parent;
         struct CCC_Bounded_map_node *const y = z->branch[z->branch[L] == x];
-        made_3_child = is_2_child(g, z);
+        made_3_child = g != NULL && is_2_child(g, z);
         if (is_2_child(z, y))
         {
             demote(z);
         }
-        else if (is_22_parent(y->branch[L], y, y->branch[R]))
+        else if (y && is_22_parent(y->branch[L], y, y->branch[R]))
         {
             demote(z);
             demote(y);
         }
-        else /* parent of x is 1,3, y is not a 2,2 parent, and x is 3-child. */
+        else if (y) /* p of x is 1,3, y not a 2,2 parent, and x is 3-child. */
         {
             assert(is_3_child(z, x));
             enum Link const z_to_x_dir = z->branch[R] == x;

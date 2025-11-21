@@ -7,6 +7,7 @@
 #include "adaptive_map_utility.h"
 #include "checkers.h"
 #include "traits.h"
+#include "types.h"
 
 static CCC_Adaptive_map
 construct_empty(void)
