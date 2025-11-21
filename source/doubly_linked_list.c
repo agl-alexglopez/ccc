@@ -939,13 +939,13 @@ erase_range(struct CCC_Doubly_linked_list const *const list,
     for (;;)
     {
         assert(count < list->count);
-        CCC_Doubly_linked_list_node *next = node->next;
+        CCC_Doubly_linked_list_node *const next = node->next;
         list->allocate((CCC_Allocator_context){
             .input = struct_base(list, node),
             .bytes = 0,
             .context = list->context,
         });
-        count++;
+        ++count;
         if (node == end)
         {
             break;
