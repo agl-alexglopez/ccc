@@ -254,21 +254,22 @@ CCC_Result CCC_doubly_linked_list_splice(
     CCC_Doubly_linked_list *to_cut_doubly_linked_list,
     CCC_Doubly_linked_list_node *type_intruder_to_cut);
 
-/** @brief Repositions begin to end before pos. Only list pointers are modified
-O(N).
+/** @brief Splices the list to cut before the specified position. The range
+being cut is exclusive from [start, end), meaning the final element provided is
+not move. This is an O(N) operation.
 @param[in] position_doubly_linked_list the list to which position belongs.
-@param[in] type_intruder_position the position before which to_cut will be
-moved.
+@param[in] type_intruder_position the position before which the list is moved.
 @param[in] to_cut_doubly_linked_list the list to which the range belongs.
 @param[in] type_intruder_to_cut_begin the start of the list to splice.
-@param[in] type_intruder_to_cut_end the end of the list to splice.
-@return ok if the splice is successful or an error if bad input is provided. */
+@param[in] type_intruder_to_cut_exclusive_end the exclusive end of the list to
+splice, not included in the splice operation.
+@return OK if the splice is successful or an error if bad input is provided. */
 CCC_Result CCC_doubly_linked_list_splice_range(
     CCC_Doubly_linked_list *position_doubly_linked_list,
     CCC_Doubly_linked_list_node *type_intruder_position,
     CCC_Doubly_linked_list *to_cut_doubly_linked_list,
     CCC_Doubly_linked_list_node *type_intruder_to_cut_begin,
-    CCC_Doubly_linked_list_node *type_intruder_to_cut_end);
+    CCC_Doubly_linked_list_node *type_intruder_to_cut_exclusive_end);
 
 /**@}*/
 

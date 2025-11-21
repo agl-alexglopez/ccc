@@ -35,6 +35,10 @@ push_front(struct CCC_Doubly_linked_list *,
 static struct CCC_Doubly_linked_list_node *
 remove_node(struct CCC_Doubly_linked_list *,
             struct CCC_Doubly_linked_list_node *);
+static inline struct CCC_Doubly_linked_list_node *
+insert_node(struct CCC_Doubly_linked_list *,
+            struct CCC_Doubly_linked_list_node *,
+            struct CCC_Doubly_linked_list_node *);
 static void *struct_base(struct CCC_Doubly_linked_list const *,
                          struct CCC_Doubly_linked_list_node const *);
 static size_t erase_range(struct CCC_Doubly_linked_list const *,
@@ -197,52 +201,21 @@ CCC_doubly_linked_list_insert(CCC_Doubly_linked_list *const list,
         (void)memcpy(node, struct_base(list, type_intruder), list->sizeof_type);
         type_intruder = type_intruder_in(list, node);
     }
-    if (!position)
-    {
-        ++list->count;
-        return push_front(list, type_intruder);
-    }
-    type_intruder->next = position;
-    type_intruder->previous = position->previous;
-
-    if (position->previous)
-    {
-        position->previous->next = type_intruder;
-    }
-    else
-    {
-        list->head = type_intruder;
-    }
-    position->previous = type_intruder;
+    type_intruder = insert_node(list, position, type_intruder);
     ++list->count;
     return struct_base(list, type_intruder);
 }
 
 void *
 CCC_doubly_linked_list_erase(CCC_Doubly_linked_list *const list,
-                             CCC_Doubly_linked_list_node *const type_intruder)
+                             CCC_Doubly_linked_list_node *type_intruder)
 {
     if (!list || !type_intruder || !list->count)
     {
         return NULL;
     }
-    if (type_intruder->next)
-    {
-        type_intruder->next->previous = type_intruder->previous;
-    }
-    else
-    {
-        list->tail = type_intruder->previous;
-    }
-    if (type_intruder->previous)
-    {
-        type_intruder->previous->next = type_intruder->next;
-    }
-    else
-    {
-        list->head = type_intruder->next;
-    }
     void *const ret = struct_base(list, type_intruder->next);
+    type_intruder = remove_node(list, type_intruder);
     if (list->allocate)
     {
         (void)list->allocate((CCC_Allocator_context){
@@ -271,7 +244,6 @@ CCC_doubly_linked_list_erase_range(
         return CCC_doubly_linked_list_erase(list, type_intruder_begin);
     }
 
-    CCC_Doubly_linked_list_node *const return_this = type_intruder_end->next;
     CCC_Doubly_linked_list_node *const previous = type_intruder_begin->previous;
     CCC_Doubly_linked_list_node *const next = type_intruder_end->next;
 
@@ -298,7 +270,7 @@ CCC_doubly_linked_list_erase_range(
     assert(deleted <= list->count);
     list->count -= deleted;
 
-    return struct_base(list, return_this);
+    return struct_base(list, next);
 }
 
 CCC_Doubly_linked_list_node *
@@ -323,7 +295,7 @@ CCC_doubly_linked_list_extract(CCC_Doubly_linked_list *const list,
 void *
 CCC_doubly_linked_list_extract_range(
     CCC_Doubly_linked_list *const list,
-    CCC_Doubly_linked_list_node *const type_intruder_begin,
+    CCC_Doubly_linked_list_node *type_intruder_begin,
     CCC_Doubly_linked_list_node *type_intruder_end)
 {
     if (!list || !list->count || !type_intruder_begin
@@ -331,18 +303,20 @@ CCC_doubly_linked_list_extract_range(
     {
         return NULL;
     }
-
+    /* We extract exclusive ranges [start, end). Step back one. */
     if (type_intruder_end)
     {
         type_intruder_end = type_intruder_end->previous;
     }
     if (type_intruder_begin == type_intruder_end)
     {
-        return CCC_doubly_linked_list_extract(list, type_intruder_begin);
+        type_intruder_begin = remove_node(list, type_intruder_begin);
+        --list->count;
+        return struct_base(list, type_intruder_begin);
     }
 
-    CCC_Doubly_linked_list_node *previous = type_intruder_begin->previous;
-    CCC_Doubly_linked_list_node *next
+    CCC_Doubly_linked_list_node *const previous = type_intruder_begin->previous;
+    CCC_Doubly_linked_list_node *const next
         = type_intruder_end ? type_intruder_end->next : NULL;
 
     if (previous)
@@ -369,7 +343,6 @@ CCC_doubly_linked_list_extract_range(
         type_intruder_end->next = NULL;
     }
 
-    // Count removed nodes
     size_t removed = 1;
     CCC_Doubly_linked_list_node const *p = type_intruder_begin;
     while (p->next && p != type_intruder_end)
@@ -388,69 +361,23 @@ CCC_doubly_linked_list_splice(
     CCC_Doubly_linked_list *const to_cut_doubly_linked_list,
     CCC_Doubly_linked_list_node *to_cut)
 {
-    CCC_Result result = CCC_RESULT_OK;
     if (!position_doubly_linked_list || !to_cut_doubly_linked_list || !to_cut)
     {
-        result = CCC_RESULT_ARGUMENT_ERROR;
-        goto done;
+        return CCC_RESULT_ARGUMENT_ERROR;
     }
-    if (!position)
-    {
-        (void)remove_node(to_cut_doubly_linked_list, to_cut);
-        (void)push_back(position_doubly_linked_list, to_cut);
-        goto done;
-    }
-
     if ((to_cut_doubly_linked_list == position_doubly_linked_list)
         && (to_cut == position || to_cut->next == position))
     {
-        goto done;
+        return CCC_RESULT_OK;
     }
-    CCC_Doubly_linked_list_node *to_cut_previous = to_cut->previous;
-    CCC_Doubly_linked_list_node *to_cut_next = to_cut->next;
-    if (to_cut_previous)
-    {
-        to_cut_previous->next = to_cut_next;
-    }
-    else
-    {
-        to_cut_doubly_linked_list->head = to_cut_next;
-    }
-
-    if (to_cut_next)
-    {
-        to_cut_next->previous = to_cut_previous;
-    }
-    else
-    {
-        to_cut_doubly_linked_list->tail = to_cut_previous;
-    }
-    CCC_Doubly_linked_list_node *position_previous = position->previous;
-    to_cut->next = position;
-    to_cut->previous = position_previous;
-    position->previous = to_cut;
-
-    if (position_previous)
-    {
-        position_previous->next = to_cut;
-    }
-    else
-    {
-        position_doubly_linked_list->head = to_cut;
-    }
-    if (!position_doubly_linked_list->tail)
-    {
-        position_doubly_linked_list->tail = position;
-    }
-
-done:
-    if (result == CCC_RESULT_OK
-        && to_cut_doubly_linked_list != position_doubly_linked_list)
+    to_cut = remove_node(to_cut_doubly_linked_list, to_cut);
+    (void)insert_node(position_doubly_linked_list, position, to_cut);
+    if (to_cut_doubly_linked_list != position_doubly_linked_list)
     {
         to_cut_doubly_linked_list->count--;
         position_doubly_linked_list->count++;
     }
-    return result;
+    return CCC_RESULT_OK;
 }
 
 CCC_Result
@@ -459,19 +386,20 @@ CCC_doubly_linked_list_splice_range(
     CCC_Doubly_linked_list_node *const type_intruder_position,
     CCC_Doubly_linked_list *const to_cut_doubly_linked_list,
     CCC_Doubly_linked_list_node *const type_intruder_to_cut_begin,
-    CCC_Doubly_linked_list_node *const type_intruder_to_cut_end)
+    CCC_Doubly_linked_list_node *const type_intruder_to_cut_exclusive_end)
 {
     if (!position_doubly_linked_list || !to_cut_doubly_linked_list
         || !type_intruder_to_cut_begin
-        || type_intruder_to_cut_begin == type_intruder_to_cut_end)
+        || type_intruder_to_cut_begin == type_intruder_to_cut_exclusive_end)
     {
         return CCC_RESULT_ARGUMENT_ERROR;
     }
 
-    CCC_Doubly_linked_list_node *const end_previous
-        = type_intruder_to_cut_end ? type_intruder_to_cut_end->previous
-                                   : to_cut_doubly_linked_list->tail;
-    if (type_intruder_to_cut_begin == end_previous)
+    CCC_Doubly_linked_list_node *const to_cut_inclusive_end
+        = type_intruder_to_cut_exclusive_end
+            ? type_intruder_to_cut_exclusive_end->previous
+            : to_cut_doubly_linked_list->tail;
+    if (type_intruder_to_cut_begin == to_cut_inclusive_end)
     {
         return CCC_doubly_linked_list_splice(
             position_doubly_linked_list, type_intruder_position,
@@ -480,7 +408,7 @@ CCC_doubly_linked_list_splice_range(
 
     size_t count = 0;
     CCC_Doubly_linked_list_node *iterator = type_intruder_to_cut_begin;
-    while (iterator != type_intruder_to_cut_end)
+    while (iterator != type_intruder_to_cut_exclusive_end)
     {
         iterator = iterator->next;
         count++;
@@ -488,20 +416,19 @@ CCC_doubly_linked_list_splice_range(
 
     CCC_Doubly_linked_list_node *to_cut_previous
         = type_intruder_to_cut_begin->previous;
-    CCC_Doubly_linked_list_node *to_cut_next = type_intruder_to_cut_end;
 
     if (to_cut_previous)
     {
-        to_cut_previous->next = to_cut_next;
+        to_cut_previous->next = type_intruder_to_cut_exclusive_end;
     }
     else
     {
-        to_cut_doubly_linked_list->head = to_cut_next;
+        to_cut_doubly_linked_list->head = type_intruder_to_cut_exclusive_end;
     }
 
-    if (to_cut_next)
+    if (type_intruder_to_cut_exclusive_end)
     {
-        to_cut_next->previous = to_cut_previous;
+        type_intruder_to_cut_exclusive_end->previous = to_cut_previous;
     }
     else
     {
@@ -513,7 +440,7 @@ CCC_doubly_linked_list_splice_range(
 
     if (position_previous == position_doubly_linked_list->tail)
     {
-        position_doubly_linked_list->tail = end_previous;
+        position_doubly_linked_list->tail = to_cut_inclusive_end;
     }
     if (position_previous)
     {
@@ -526,14 +453,14 @@ CCC_doubly_linked_list_splice_range(
 
     type_intruder_to_cut_begin->previous = position_previous;
 
-    if (end_previous)
+    if (to_cut_inclusive_end)
     {
-        end_previous->next = type_intruder_position;
+        to_cut_inclusive_end->next = type_intruder_position;
     }
 
     if (type_intruder_position)
     {
-        type_intruder_position->previous = end_previous;
+        type_intruder_position->previous = to_cut_inclusive_end;
     }
 
     if (to_cut_doubly_linked_list != position_doubly_linked_list)
@@ -973,6 +900,30 @@ push_back(struct CCC_Doubly_linked_list *const list,
     }
 
     list->tail = node;
+    return node;
+}
+
+static inline struct CCC_Doubly_linked_list_node *
+insert_node(struct CCC_Doubly_linked_list *const list,
+            struct CCC_Doubly_linked_list_node *const position,
+            struct CCC_Doubly_linked_list_node *const node)
+{
+    if (!position)
+    {
+        return push_back(list, node);
+    }
+    node->next = position;
+    node->previous = position->previous;
+
+    if (position->previous)
+    {
+        position->previous->next = node;
+    }
+    else
+    {
+        list->head = node;
+    }
+    position->previous = node;
     return node;
 }
 
