@@ -342,11 +342,11 @@ CCC_doubly_linked_list_extract_range(
     }
 
     size_t removed = 1;
-    CCC_Doubly_linked_list_node const *p = type_intruder_begin;
-    while (p->next && p != type_intruder_end)
+    while (type_intruder_begin->next
+           && type_intruder_begin != type_intruder_end)
     {
         removed++;
-        p = p->next;
+        type_intruder_begin = type_intruder_begin->next;
     }
     list->count -= removed;
     return struct_base(list, next);
@@ -405,14 +405,14 @@ CCC_doubly_linked_list_splice_range(
     }
 
     size_t count = 0;
-    CCC_Doubly_linked_list_node *iterator = type_intruder_to_cut_begin;
+    CCC_Doubly_linked_list_node const *iterator = type_intruder_to_cut_begin;
     while (iterator != type_intruder_to_cut_exclusive_end)
     {
         iterator = iterator->next;
         count++;
     }
 
-    CCC_Doubly_linked_list_node *to_cut_previous
+    CCC_Doubly_linked_list_node *const to_cut_previous
         = type_intruder_to_cut_begin->previous;
 
     if (to_cut_previous)
@@ -432,7 +432,7 @@ CCC_doubly_linked_list_splice_range(
     {
         to_cut_doubly_linked_list->tail = to_cut_previous;
     }
-    CCC_Doubly_linked_list_node *position_previous
+    CCC_Doubly_linked_list_node *const position_previous
         = type_intruder_position ? type_intruder_position->previous
                                  : position_doubly_linked_list->tail;
 
