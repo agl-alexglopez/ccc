@@ -11,8 +11,8 @@
 check_static_begin(doubly_linked_list_test_construct)
 {
     struct Val val = {};
-    Doubly_linked_list doubly_linked_list = doubly_linked_list_initialize(
-        doubly_linked_list, struct Val, e, val_order, NULL, NULL);
+    Doubly_linked_list doubly_linked_list
+        = doubly_linked_list_initialize(struct Val, e, val_order, NULL, NULL);
     check(is_empty(&doubly_linked_list), true);
     check(doubly_linked_list_push_front(&doubly_linked_list, &val.e) != NULL,
           true);

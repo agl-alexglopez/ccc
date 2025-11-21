@@ -77,7 +77,7 @@ static struct Lru_cache lru_cache = {
     .map = handle_adaptive_map_initialize(
         &(lru_fixed_map){}, struct Lru_node, key, order_by_key, NULL, NULL,
         handle_adaptive_map_fixed_capacity(lru_fixed_map)),
-    .l = doubly_linked_list_initialize(lru_cache.l, struct Lru_node, list_node,
+    .l = doubly_linked_list_initialize(struct Lru_node, list_node,
                                        order_list_nodes, NULL, NULL),
     .cap = 3,
 };

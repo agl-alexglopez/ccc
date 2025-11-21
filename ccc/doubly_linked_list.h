@@ -79,7 +79,6 @@ Initialize the container with memory, callbacks, and permissions. */
 containing the Doubly_linked_list elems, the field of the doubly_linked_list
 elem, allocation function, compare function and any context data needed
 for comparison, printing, or destructors.
-@param[in] list_name the name of the list being initialized.
 @param[in] struct_name the type containing the intrusive doubly_linked_list
 element.
 @param[in] type_intruder_field name of the Doubly_linked_list element in the
@@ -92,12 +91,10 @@ comparison, printing, or destruction of elements.
 @return the initialized list. Assign to the list directly on the right hand
 side of an equality operator. Initialization can occur at runtime or compile
 time (e.g. CCC_doubly_linked list = CCC_doubly_linked_list_initialize(...);). */
-#define CCC_doubly_linked_list_initialize(list_name, struct_name,              \
-                                          type_intruder_field, compare,        \
-                                          allocate, context_data)              \
-    CCC_private_doubly_linked_list_initialize(list_name, struct_name,          \
-                                              type_intruder_field, compare,    \
-                                              allocate, context_data)
+#define CCC_doubly_linked_list_initialize(struct_name, type_intruder_field,    \
+                                          compare, allocate, context_data)     \
+    CCC_private_doubly_linked_list_initialize(                                 \
+        struct_name, type_intruder_field, compare, allocate, context_data)
 
 /**@}*/
 

@@ -104,8 +104,8 @@ static_assert(CAP * 1UL < SMALL_FIXED_CAP * 1UL);
    of the hash table and list. */
 static struct Lru_cache lru_cache = {
     .cap = CAP,
-    .l = doubly_linked_list_initialize(lru_cache.l, struct Key_val, list_node,
-                                       order_by_key, std_allocate, NULL),
+    .l = doubly_linked_list_initialize(struct Key_val, list_node, order_by_key,
+                                       std_allocate, NULL),
     .fh = flat_hash_map_initialize(&(small_fixed_map){}, struct Val, key,
                                    flat_hash_map_int_to_u64, lru_lookup_order,
                                    NULL, NULL, SMALL_FIXED_CAP),

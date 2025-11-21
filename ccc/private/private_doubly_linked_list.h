@@ -105,9 +105,8 @@ CCC_private_doubly_linked_list_node_in(struct CCC_Doubly_linked_list const *,
 /** @internal Initialization at compile time is allowed in C due to the provided
 name of the list being on the left hand side of the assignment operator. */
 #define CCC_private_doubly_linked_list_initialize(                             \
-    private_doubly_linked_list_name, private_struct_name,                      \
-    private_doubly_linked_list_node_field, private_compare_fn,                 \
-    private_allocate, private_context_data)                                    \
+    private_struct_name, private_doubly_linked_list_node_field,                \
+    private_compare_fn, private_allocate, private_context_data)                \
     {                                                                          \
         .head = NULL,                                                          \
         .tail = NULL,                                                          \

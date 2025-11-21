@@ -92,7 +92,7 @@ lru_head(struct Lru_cache *const lru)
    of the hash table and list. */
 static struct Lru_cache lru_cache = {
     .cap = 3,
-    .l = doubly_linked_list_initialize(lru_cache.l, struct Lru_node, list_node,
+    .l = doubly_linked_list_initialize(struct Lru_node, list_node,
                                        order_list_nodes, NULL, NULL),
     .map = bounded_map_initialize(struct Lru_node, map_node, key, order_by_key,
                                   std_allocate, NULL),
