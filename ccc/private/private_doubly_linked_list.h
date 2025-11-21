@@ -38,55 +38,38 @@ struct CCC_Doubly_linked_list_node
     struct CCC_Doubly_linked_list_node *previous;
 };
 
-/** @internal A doubly linked list with a single sentinel for both head and
-tail. The list offers O(1) push, pop, insert, and erase at arbitrary positions
-in the list. The sentinel (nil) operates as follows to ensure nodes in the list
-never point to NULL.
+/** @internal A doubly linked list storing head and tail pointers. The list
+supports O(1) push, pop, insert, and erase at arbitrary positions.
 
-An empty list.
+Sentinel-based lists are common in C++ and other languages, but they are
+problematic in standard C. A sentinel stored inside the list struct requires
+a stable address. However, by default C copies struct by value, and such copies
+would also copy the sentinel node. For example, if the user writes a simple
+helper function that initializes the list with some extra constructor-like
+actions and returns it to the caller a copy occurs. The sentinel next and
+previous pointers would then point into the old stack frame, producing immediate
+undefined behavior once the original struct goes out of scope.
 
-```
-    nil
-  ┌─────┐
-┌>│n=nil├──┐
-└─┤p=nil│<─┘
-  └─────┘
-```
+Because C has no constructors, destructors, or move semantics, the API
+cannot prevent users from copying the list structure. Therefore a sentinel
+embedded in the list cannot be used safely. To ensure correct behavior under
+normal C copy semantics, this implementation uses NULL head and tail pointers to
+represent an empty list, and performs the required NULL checks when modifying
+nodes.
 
-A list with one element.
+This design also improves composability in multithreaded programs. Because the
+list does not rely on a static global sentinel either, each thread may create
+its own independent list (e.g., inside a per-thread memory arena or thread
+stack frame) without hidden static state. The user can pass in context upon
+initialization for these more advanced use cases.
 
-```
-    ┌───────────┐
-    V           │
-   nil      A   │
- ┌─────┐ ┌─────┐│
- │n=A  ├>│n=nil├┘
-┌┤p=A  │<┤p=nil│
-│└─────┘ └─────┘
-│           ^
-└───────────┘
-```
-
-A list with three elements.
-
-```
-    ┌───────────────────────────┐
-    V                           │
-   nil      A       B       C   │
- ┌─────┐ ┌─────┐ ┌─────┐ ┌─────┐│
- │n=A  ├>│n=B  ├>│n=C  ├>│n=nil├┘
-┌┤p=C  │<┤p=nil│<┤p=A  │<┤p=B  │
-│└─────┘ └─────┘ └─────┘ └─────┘
-│                           ^
-└───────────────────────────┘
-```
-
-The single nil allows us to use two pointers instead of the four it would
-take with a head and tail nil. The only cost is slight care for certain
-cutting and node clearing steps to ensure the nil addresses remain valid */
+Note that the list itself is not thread-safe; external synchronization is still
+required if multiple threads access the same list instance. */
 struct CCC_Doubly_linked_list
 {
+    /** @internal Pointer to the head element or NULL if list empty. */
     struct CCC_Doubly_linked_list_node *head;
+    /** @internal Pointer to the tail element or NULL if list empty. */
     struct CCC_Doubly_linked_list_node *tail;
     /** @internal The number of elements constantly tracked for O(1) check. */
     size_t count;
@@ -157,9 +140,7 @@ name of the list being on the left hand side of the assignment operator. */
                         });                                                    \
                 if (private_doubly_linked_list_res)                            \
                 {                                                              \
-                    *private_doubly_linked_list_res                            \
-                        = (typeof(*private_doubly_linked_list_res))            \
-                            struct_initializer;                                \
+                    *private_doubly_linked_list_res = struct_initializer;      \
                     CCC_private_doubly_linked_list_push_back(                  \
                         private_doubly_linked_list,                            \
                         CCC_private_doubly_linked_list_node_in(                \
