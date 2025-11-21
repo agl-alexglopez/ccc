@@ -1588,29 +1588,36 @@ transplant(struct CCC_Handle_bounded_map *const map, size_t const remove,
     set_parity(map, replacement, parity(map, remove));
 }
 
+/** Follows the specification in the "Rank-Balanced Trees" paper by Haeupler,
+Sen, and Tarjan (Fig. 3. pg 8). */
 static void
 rebalance_3_child(struct CCC_Handle_bounded_map *const map, size_t z, size_t x)
 {
-    assert(z);
-    CCC_Tribool made_3_child = CCC_FALSE;
-    do
+    CCC_Tribool made_3_child = CCC_TRUE;
+    while (z && made_3_child)
     {
+        assert(branch_index(map, z, L) == x || branch_index(map, z, R) == x);
         size_t const g = parent_index(map, z);
         size_t const y = branch_index(map, z, branch_index(map, z, L) == x);
-        made_3_child = is_2_child(map, g, z);
+        made_3_child = g && is_2_child(map, g, z);
         if (is_2_child(map, z, y))
         {
             demote(map, z);
         }
-        else if (is_22_parent(map, branch_index(map, y, L), y,
-                              branch_index(map, y, R)))
+        else if (y
+                 && is_22_parent(map, branch_index(map, y, L), y,
+                                 branch_index(map, y, R)))
         {
             demote(map, z);
             demote(map, y);
         }
-        else /* p(x) is 1,3, y is not a 2,2 parent, and x is 3-child.*/
+        else if (y) /* p(x) is 1,3, y is not a 2,2 parent, and x is 3-child.*/
         {
+            assert(is_1_child(map, z, y));
             assert(is_3_child(map, z, x));
+            assert(!is_2_child(map, z, y));
+            assert(!is_22_parent(map, branch_index(map, y, L), y,
+                                 branch_index(map, y, R)));
             enum Link const z_to_x_dir = branch_index(map, z, R) == x;
             size_t const w = branch_index(map, y, !z_to_x_dir);
             if (is_1_child(map, y, w))
@@ -1652,12 +1659,12 @@ rebalance_3_child(struct CCC_Handle_bounded_map *const map, size_t z, size_t x)
                     promote(map, y);
                 }
             }
+            /* Returning here confirms O(1) rotations for re-balance. */
             return;
         }
         x = z;
         z = g;
     }
-    while (z && made_3_child);
 }
 
 /** A single rotation is symmetric. Here is the right case. Lowercase are nodes
