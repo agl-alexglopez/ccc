@@ -851,7 +851,6 @@ push_front(struct CCC_Doubly_linked_list *const list,
 {
     node->previous = NULL;
     node->next = list->head;
-
     if (list->head)
     {
         list->head->previous = node;
@@ -869,7 +868,6 @@ push_back(struct CCC_Doubly_linked_list *const list,
 {
     node->next = NULL;
     node->previous = list->tail;
-
     if (list->tail)
     {
         list->tail->next = node;
@@ -878,7 +876,6 @@ push_back(struct CCC_Doubly_linked_list *const list,
     {
         list->head = node;
     }
-
     list->tail = node;
 }
 
@@ -917,7 +914,6 @@ remove_node(struct CCC_Doubly_linked_list *const list,
     {
         list->head = node->next;
     }
-
     if (node->next)
     {
         node->next->previous = node->previous;
@@ -926,7 +922,6 @@ remove_node(struct CCC_Doubly_linked_list *const list,
     {
         list->tail = node->previous;
     }
-
     node->next = node->previous = NULL;
 }
 
