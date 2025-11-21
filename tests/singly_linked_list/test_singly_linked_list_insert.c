@@ -11,8 +11,8 @@
 
 check_static_begin(singly_linked_list_test_insert_three)
 {
-    Singly_linked_list singly_linked_list = singly_linked_list_initialize(
-        singly_linked_list, struct Val, e, val_order, NULL, NULL);
+    Singly_linked_list singly_linked_list
+        = singly_linked_list_initialize(struct Val, e, val_order, NULL, NULL);
     struct Val v0 = (struct Val){};
     check(push_front(&singly_linked_list, &v0.e) != NULL, true);
     struct Val *v = front(&singly_linked_list);
@@ -38,8 +38,8 @@ check_static_begin(singly_linked_list_test_insert_three)
 
 check_static_begin(singly_linked_list_test_push_and_splice)
 {
-    Singly_linked_list singly_linked_list = singly_linked_list_initialize(
-        singly_linked_list, struct Val, e, val_order, NULL, NULL);
+    Singly_linked_list singly_linked_list
+        = singly_linked_list_initialize(struct Val, e, val_order, NULL, NULL);
     struct Val vals[4] = {{.val = 0}, {.val = 1}, {.val = 2}, {.val = 3}};
     enum Check_result const t = create_list(&singly_linked_list, 4, vals);
     check(t, CHECK_PASS);
@@ -69,53 +69,55 @@ check_static_begin(singly_linked_list_test_push_and_splice)
 
 check_static_begin(singly_linked_list_test_push_and_splice_range)
 {
-    Singly_linked_list singly_linked_list = singly_linked_list_initialize(
-        singly_linked_list, struct Val, e, val_order, NULL, NULL);
+    Singly_linked_list singly_linked_list
+        = singly_linked_list_initialize(struct Val, e, val_order, NULL, NULL);
     struct Val vals[5]
         = {{.val = 0}, {.val = 1}, {.val = 2}, {.val = 3}, {.val = 4}};
     enum Check_result const t = create_list(&singly_linked_list, 5, vals);
     check(t, CHECK_PASS);
     check(check_order(&singly_linked_list, 5, (int[5]){4, 3, 2, 1, 0}),
           CHECK_PASS);
-    check(splice_range(&singly_linked_list,
-                       singly_linked_list_sentinel_begin(&singly_linked_list),
-                       &singly_linked_list, &vals[2].e, &vals[0].e),
-          CCC_RESULT_OK);
-    check(check_order(&singly_linked_list, 5, (int[5]){2, 1, 0, 4, 3}),
+    check(
+        splice_range(&singly_linked_list,
+                     singly_linked_list_node_before_begin(&singly_linked_list),
+                     &singly_linked_list, &vals[2].e, &vals[0].e),
+        CCC_RESULT_OK);
+    check(check_order(&singly_linked_list, 5, (int[5]){2, 1, 4, 3, 0}),
           CHECK_PASS);
     check(splice_range(&singly_linked_list, &vals[3].e, &singly_linked_list,
-                       &vals[2].e, &vals[0].e),
+                       &vals[2].e, &vals[4].e),
           CCC_RESULT_OK);
     check(check_order(&singly_linked_list, 5, (int[5]){4, 3, 2, 1, 0}),
           CHECK_PASS);
-    check(splice_range(&singly_linked_list,
-                       singly_linked_list_sentinel_begin(&singly_linked_list),
-                       &singly_linked_list, &vals[3].e, &vals[1].e),
-          CCC_RESULT_OK);
-    check(check_order(&singly_linked_list, 5, (int[5]){3, 2, 1, 4, 0}),
+    check(
+        splice_range(&singly_linked_list,
+                     singly_linked_list_node_before_begin(&singly_linked_list),
+                     &singly_linked_list, &vals[3].e, &vals[1].e),
+        CCC_RESULT_OK);
+    check(check_order(&singly_linked_list, 5, (int[5]){3, 2, 4, 1, 0}),
           CHECK_PASS);
     check(splice_range(&singly_linked_list, &vals[0].e, &singly_linked_list,
                        &vals[2].e, &vals[4].e),
           CCC_RESULT_OK);
-    check(check_order(&singly_linked_list, 5, (int[5]){3, 0, 2, 1, 4}),
+    check(check_order(&singly_linked_list, 5, (int[5]){3, 4, 1, 0, 2}),
           CHECK_PASS);
-    check(splice_range(&singly_linked_list, &vals[1].e, &singly_linked_list,
-                       &vals[0].e, &vals[2].e),
+    check(splice_range(&singly_linked_list, &vals[4].e, &singly_linked_list,
+                       &vals[0].e, singly_linked_list_end(&singly_linked_list)),
           CCC_RESULT_OK);
-    check(check_order(&singly_linked_list, 5, (int[5]){3, 1, 0, 2, 4}),
+    check(check_order(&singly_linked_list, 5, (int[5]){3, 4, 0, 2, 1}),
           CHECK_PASS);
     check(splice_range(&singly_linked_list, &vals[3].e, &singly_linked_list,
-                       &vals[0].e, &vals[2].e),
+                       &vals[0].e, &vals[1].e),
           CCC_RESULT_OK);
-    check(check_order(&singly_linked_list, 5, (int[5]){3, 0, 2, 1, 4}),
+    check(check_order(&singly_linked_list, 5, (int[5]){3, 0, 2, 4, 1}),
           CHECK_PASS);
     check_end();
 }
 
 check_static_begin(singly_linked_list_test_push_and_splice_range_no_ops)
 {
-    Singly_linked_list singly_linked_list = singly_linked_list_initialize(
-        singly_linked_list, struct Val, e, val_order, NULL, NULL);
+    Singly_linked_list singly_linked_list
+        = singly_linked_list_initialize(struct Val, e, val_order, NULL, NULL);
     struct Val vals[5]
         = {{.val = 0}, {.val = 1}, {.val = 2}, {.val = 3}, {.val = 4}};
     enum Check_result const t = create_list(&singly_linked_list, 5, vals);
@@ -147,8 +149,8 @@ check_static_begin(singly_linked_list_test_push_and_splice_range_no_ops)
 
 check_static_begin(singly_linked_list_test_sort_reverse)
 {
-    Singly_linked_list singly_linked_list = singly_linked_list_initialize(
-        singly_linked_list, struct Val, e, val_order, NULL, NULL);
+    Singly_linked_list singly_linked_list
+        = singly_linked_list_initialize(struct Val, e, val_order, NULL, NULL);
     struct Val vals[6] = {{.val = 0}, {.val = 1}, {.val = 2},
                           {.val = 3}, {.val = 4}, {.val = 5}};
     enum Check_result const t = create_list(&singly_linked_list, 6, vals);
@@ -167,8 +169,8 @@ check_static_begin(singly_linked_list_test_sort_reverse)
 
 check_static_begin(singly_linked_list_test_sort_even)
 {
-    Singly_linked_list singly_linked_list = singly_linked_list_initialize(
-        singly_linked_list, struct Val, e, val_order, NULL, NULL);
+    Singly_linked_list singly_linked_list
+        = singly_linked_list_initialize(struct Val, e, val_order, NULL, NULL);
     struct Val vals[8] = {
         [7] = {.val = 9}, [6] = {.val = 4},  [5] = {.val = 1},
         [4] = {.val = 3}, [3] = {.val = 99}, [2] = {.val = -55},
@@ -193,8 +195,8 @@ check_static_begin(singly_linked_list_test_sort_even)
 
 check_static_begin(singly_linked_list_test_sort_odd)
 {
-    Singly_linked_list singly_linked_list = singly_linked_list_initialize(
-        singly_linked_list, struct Val, e, val_order, NULL, NULL);
+    Singly_linked_list singly_linked_list
+        = singly_linked_list_initialize(struct Val, e, val_order, NULL, NULL);
     struct Val vals[9] = {
         [8] = {.val = 10},  [7] = {.val = 9}, [6] = {.val = 4},
         [5] = {.val = 1},   [4] = {.val = 1}, [3] = {.val = 99},
@@ -219,8 +221,8 @@ check_static_begin(singly_linked_list_test_sort_odd)
 
 check_static_begin(singly_linked_list_test_sort_runs)
 {
-    Singly_linked_list singly_linked_list = singly_linked_list_initialize(
-        singly_linked_list, struct Val, e, val_order, NULL, NULL);
+    Singly_linked_list singly_linked_list
+        = singly_linked_list_initialize(struct Val, e, val_order, NULL, NULL);
     struct Val vals[12]
         = {{.val = 99},  {.val = 101}, {.val = 103}, {.val = 4},
            {.val = 8},   {.val = 9},   {.val = -99}, {.val = -55},
@@ -244,8 +246,8 @@ check_static_begin(singly_linked_list_test_sort_runs)
 
 check_static_begin(singly_linked_list_test_sort_halves)
 {
-    Singly_linked_list singly_linked_list = singly_linked_list_initialize(
-        singly_linked_list, struct Val, e, val_order, NULL, NULL);
+    Singly_linked_list singly_linked_list
+        = singly_linked_list_initialize(struct Val, e, val_order, NULL, NULL);
     struct Val vals[12] = {{.val = 7},  {.val = 10}, {.val = 13}, {.val = 17},
                            {.val = 19}, {.val = 21}, {.val = 8},  {.val = 12},
                            {.val = 15}, {.val = 18}, {.val = 20}, {.val = 25}};
@@ -268,8 +270,8 @@ check_static_begin(singly_linked_list_test_sort_halves)
 
 check_static_begin(singly_linked_list_test_sort_insert)
 {
-    Singly_linked_list singly_linked_list = singly_linked_list_initialize(
-        singly_linked_list, struct Val, e, val_order, NULL, NULL);
+    Singly_linked_list singly_linked_list
+        = singly_linked_list_initialize(struct Val, e, val_order, NULL, NULL);
     struct Val *inserted = singly_linked_list_insert_sorted(
         &singly_linked_list, &(struct Val){.val = -99999}.e);
     check(inserted->val, -99999);

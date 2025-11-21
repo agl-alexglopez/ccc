@@ -11,8 +11,8 @@
 
 check_static_begin(singly_linked_list_test_pop_empty)
 {
-    Singly_linked_list singly_linked_list = singly_linked_list_initialize(
-        singly_linked_list, struct Val, e, val_order, NULL, NULL);
+    Singly_linked_list singly_linked_list
+        = singly_linked_list_initialize(struct Val, e, val_order, NULL, NULL);
     check(is_empty(&singly_linked_list), true);
     check(singly_linked_list_pop_front(&singly_linked_list),
           CCC_RESULT_ARGUMENT_ERROR);
@@ -24,8 +24,8 @@ check_static_begin(singly_linked_list_test_pop_empty)
 
 check_static_begin(singly_linked_list_test_push_pop_three)
 {
-    Singly_linked_list singly_linked_list = singly_linked_list_initialize(
-        singly_linked_list, struct Val, e, val_order, NULL, NULL);
+    Singly_linked_list singly_linked_list
+        = singly_linked_list_initialize(struct Val, e, val_order, NULL, NULL);
     struct Val vals[3] = {{.val = 0}, {.val = 1}, {.val = 2}};
     enum Check_result const t = create_list(&singly_linked_list, 3, vals);
     check(t, CHECK_PASS);
@@ -41,8 +41,8 @@ check_static_begin(singly_linked_list_test_push_pop_three)
 
 check_static_begin(singly_linked_list_test_push_extract_middle)
 {
-    Singly_linked_list singly_linked_list = singly_linked_list_initialize(
-        singly_linked_list, struct Val, e, val_order, NULL, NULL);
+    Singly_linked_list singly_linked_list
+        = singly_linked_list_initialize(struct Val, e, val_order, NULL, NULL);
     struct Val vals[3] = {{.val = 0}, {.val = 1}, {.val = 2}};
     enum Check_result const t = create_list(&singly_linked_list, 3, vals);
     check(t, CHECK_PASS);
@@ -61,8 +61,8 @@ check_static_begin(singly_linked_list_test_push_extract_middle)
 
 check_static_begin(singly_linked_list_test_push_extract_range)
 {
-    Singly_linked_list singly_linked_list = singly_linked_list_initialize(
-        singly_linked_list, struct Val, e, val_order, NULL, NULL);
+    Singly_linked_list singly_linked_list
+        = singly_linked_list_initialize(struct Val, e, val_order, NULL, NULL);
     struct Val vals[5]
         = {{.val = 0}, {.val = 1}, {.val = 2}, {.val = 3}, {.val = 4}};
     enum Check_result const t = create_list(&singly_linked_list, 5, vals);
@@ -71,29 +71,29 @@ check_static_begin(singly_linked_list_test_push_extract_range)
           CHECK_PASS);
     struct Val *after_extract
         = extract_range(&singly_linked_list, &vals[3].e, &vals[1].e);
-    check(count(&singly_linked_list).count, 2);
+    check(count(&singly_linked_list).count, 3);
     check(validate(&singly_linked_list), true);
     check(after_extract == NULL, false);
-    check(after_extract->val, 0);
-    check(check_order(&singly_linked_list, 2, (int[2]){4, 0}), CHECK_PASS);
+    check(after_extract->val, 1);
+    check(check_order(&singly_linked_list, 3, (int[3]){4, 1, 0}), CHECK_PASS);
     after_extract = extract_range(
         &singly_linked_list, singly_linked_list_node_begin(&singly_linked_list),
-        &vals[0].e);
-    check(after_extract, end(&singly_linked_list));
+        singly_linked_list_end(&singly_linked_list));
+    check(after_extract, singly_linked_list_end(&singly_linked_list));
     check(is_empty(&singly_linked_list), true);
     check_end();
 }
 
 check_static_begin(singly_linked_list_test_splice_two_lists)
 {
-    Singly_linked_list to_lose = singly_linked_list_initialize(
-        to_lose, struct Val, e, val_order, NULL, NULL);
+    Singly_linked_list to_lose
+        = singly_linked_list_initialize(struct Val, e, val_order, NULL, NULL);
     struct Val to_lose_vals[5]
         = {{.val = 0}, {.val = 1}, {.val = 2}, {.val = 3}, {.val = 4}};
     enum Check_result t = create_list(&to_lose, 5, to_lose_vals);
     check(t, CHECK_PASS);
-    Singly_linked_list to_gain = singly_linked_list_initialize(
-        to_gain, struct Val, e, val_order, NULL, NULL);
+    Singly_linked_list to_gain
+        = singly_linked_list_initialize(struct Val, e, val_order, NULL, NULL);
     struct Val to_gain_vals[2] = {{.val = 0}, {.val = 1}};
     t = create_list(&to_gain, 2, to_gain_vals);
     check(t, CHECK_PASS);
@@ -110,9 +110,9 @@ check_static_begin(singly_linked_list_test_splice_two_lists)
                        &to_lose, singly_linked_list_node_begin(&to_lose),
                        &to_lose_vals[0].e),
           CCC_RESULT_OK);
-    check(count(&to_gain).count, 7);
-    check(is_empty(&to_lose), true);
-    check(check_order(&to_gain, 7, (int[7]){1, 3, 2, 1, 0, 4, 0}), CHECK_PASS);
+    check(count(&to_gain).count, 6);
+    check(count(&to_lose).count, 1);
+    check(check_order(&to_gain, 6, (int[6]){1, 3, 2, 1, 4, 0}), CHECK_PASS);
     check_end();
 }
 

@@ -32,7 +32,7 @@ pointers are never NULL if an element is in the list. */
 struct CCC_Singly_linked_list_node
 {
     /** @internal The next element. Non-null if elem is in list. */
-    struct CCC_Singly_linked_list_node *n;
+    struct CCC_Singly_linked_list_node *next;
 };
 
 /** @internal A singly linked list is a good stack based abstraction for push
@@ -46,8 +46,8 @@ list, either on top of or by hacking on the provided implementation
 (non-blocking linked list, concurrent hash table, etc). */
 struct CCC_Singly_linked_list
 {
-    /** @internal The sentinel with storage in the actual list struct. */
-    struct CCC_Singly_linked_list_node nil;
+    /** @internal The pointer to the current head of the list. */
+    struct CCC_Singly_linked_list_node *head;
     /** @internal The number of elements constantly tracked for O(1) check. */
     size_t count;
     /** @internal The size in bytes of the type which wraps this handle. */
@@ -73,11 +73,10 @@ CCC_private_singly_linked_list_push_front(struct CCC_Singly_linked_list *,
 
 /** @internal */
 #define CCC_private_singly_linked_list_initialize(                             \
-    private_singly_linked_list_name, private_struct_name,                      \
-    private_singly_linked_list_node_field, private_compare_fn,                 \
-    private_allocate, private_context_data)                                    \
+    private_struct_name, private_singly_linked_list_node_field,                \
+    private_compare_fn, private_allocate, private_context_data)                \
     {                                                                          \
-        .nil.n = &(private_singly_linked_list_name).nil,                       \
+        .head = NULL,                                                          \
         .sizeof_type = sizeof(private_struct_name),                            \
         .type_intruder_offset = offsetof(                                      \
             private_struct_name, private_singly_linked_list_node_field),       \

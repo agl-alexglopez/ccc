@@ -77,7 +77,6 @@ Initialize the container with memory, callbacks, and permissions. */
 /**@{*/
 
 /** @brief Initialize a singly linked list at compile or runtime.
-@param[in] list_name the name the user has chosen for the list.
 @param[in] struct_name the user type wrapping the intrusive singly_linked_list
 elem.
 @param[in] type_intruder_field the name of the field in the user type storing
@@ -88,12 +87,10 @@ the intrusive list elem.
 destruction.
 @return a stuct initializer for the singly linked list to be assigned
 (e.g. CCC_Singly_linked_list l = CCC_singly_linked_list_initialize(...);). */
-#define CCC_singly_linked_list_initialize(list_name, struct_name,              \
-                                          type_intruder_field, compare,        \
-                                          allocate, context_data)              \
-    CCC_private_singly_linked_list_initialize(list_name, struct_name,          \
-                                              type_intruder_field, compare,    \
-                                              allocate, context_data)
+#define CCC_singly_linked_list_initialize(struct_name, type_intruder_field,    \
+                                          compare, allocate, context_data)     \
+    CCC_private_singly_linked_list_initialize(                                 \
+        struct_name, type_intruder_field, compare, allocate, context_data)
 
 /**@}*/
 
@@ -154,16 +151,16 @@ CCC_Result CCC_singly_linked_list_splice(
     CCC_Singly_linked_list *splice_list,
     CCC_Singly_linked_list_node *type_intruder_splice);
 
-/** @brief Inserts the `[begin, end]` of spliced elements after pos. `O(N)`.
+/** @brief Inserts the `[begin, end)` of spliced elements after pos. `O(N)`.
 @param[in] position_list the list to which position belongs.
 @param[in] type_intruder_position the position after which the range will be
 inserted.
-@param[in] splice_list the list to which the range belongs.
-@param[in] type_intruder_begin the start of the range.
-@param[in] type_intruder_end the inclusive end of the range.
+@param[in] to_cut_list the list to which the range belongs.
+@param[in] type_intruder_to_cut_begin the start of the range.
+@param[in] type_intruder_to_cut_exclusive_end the exclusive end of the range.
 @return OK if the operations is successful. An input error is provided if any
 input pointers are NULL.
-@warning position must not be inside of the range `[begin, end]` if
+@warning position must not be inside of the range `[begin, end)` if
 position_list is the same list as splice_singly_linked_list.
 
 Note that position_list and splice_singly_linked_list may be the
@@ -172,9 +169,9 @@ maintained by the function. */
 CCC_Result CCC_singly_linked_list_splice_range(
     CCC_Singly_linked_list *position_list,
     CCC_Singly_linked_list_node *type_intruder_position,
-    CCC_Singly_linked_list *splice_list,
-    CCC_Singly_linked_list_node *type_intruder_begin,
-    CCC_Singly_linked_list_node *type_intruder_end);
+    CCC_Singly_linked_list *to_cut_list,
+    CCC_Singly_linked_list_node *type_intruder_to_cut_begin,
+    CCC_Singly_linked_list_node *type_intruder_to_cut_exclusive_end);
 
 /** @brief Erases type_intruder from the list returning the following element.
 O(N).
@@ -308,6 +305,20 @@ NULL is returned if list is NULL. */
 [[nodiscard]] void *
 CCC_singly_linked_list_begin(CCC_Singly_linked_list const *list);
 
+/** @brief Return the list node type at the front of the list. O(1).
+@param[in] list a pointer to the singly linked list.
+@return a pointer to the list node type at the start of the list or NULL if
+empty. */
+[[nodiscard]] void *
+CCC_singly_linked_list_node_begin(CCC_Singly_linked_list const *list);
+
+/** @brief Return the list node type at the front of the list. O(1).
+@param[in] list a pointer to the singly linked list.
+@return a pointer to the list node type at the start of the list or NULL if
+empty. */
+[[nodiscard]] void *
+CCC_singly_linked_list_node_before_begin(CCC_Singly_linked_list const *list);
+
 /** @brief Return the sentinel at the end of the list. Do not access sentinel.
 O(1).
 @param[in] list a pointer to the singly linked list.
@@ -338,26 +349,6 @@ Obtain state from the doubly linked list. */
 is NULL. */
 [[nodiscard]] void *
 CCC_singly_linked_list_front(CCC_Singly_linked_list const *list);
-
-/** @brief Return a pointer to the first intrusive handle in the list. O(1).
-@param[in] list a pointer to the singly linked list.
-@return a pointer to the first handle to a user type in the list or NULL if
-empty. */
-[[nodiscard]] CCC_Singly_linked_list_node *
-CCC_singly_linked_list_node_begin(CCC_Singly_linked_list const *list);
-
-/** @brief Return a pointer to the sentinel node at the front of the list.
-@param[in] list a pointer to the singly linked list.
-@return a pointer to the sentinel node that always points to the first list
-element or itself. It will not be NULL unless the list pointer
-provided is NULL.
-
-This functions can be used when the user wishes to splice an element or range
-of elements to the front of the list. Because the interface only allows the user
-to splice an element or range AFTER a position having access to the sentinel
-makes it possible to splice to the front of the list. */
-[[nodiscard]] CCC_Singly_linked_list_node *
-CCC_singly_linked_list_sentinel_begin(CCC_Singly_linked_list const *list);
 
 /** @brief Return the count of nodes in the list. O(1).
 @param[in] list a pointer to the singly linked list.
@@ -412,12 +403,12 @@ typedef CCC_Singly_linked_list Singly_linked_list;
 #    define singly_linked_list_is_sorted(args...)                              \
         CCC_singly_linked_list_is_sorted(args)
 #    define singly_linked_list_begin(args...) CCC_singly_linked_list_begin(args)
-#    define singly_linked_list_end(args...) CCC_singly_linked_list_end(args)
-#    define singly_linked_list_next(args...) CCC_singly_linked_list_next(args)
 #    define singly_linked_list_node_begin(args...)                             \
         CCC_singly_linked_list_node_begin(args)
-#    define singly_linked_list_sentinel_begin(args...)                         \
-        CCC_singly_linked_list_sentinel_begin(args)
+#    define singly_linked_list_node_before_begin(args...)                      \
+        CCC_singly_linked_list_node_before_begin(args)
+#    define singly_linked_list_end(args...) CCC_singly_linked_list_end(args)
+#    define singly_linked_list_next(args...) CCC_singly_linked_list_next(args)
 #    define singly_linked_list_count(args...) CCC_singly_linked_list_count(args)
 #    define singly_linked_list_is_empty(args...)                               \
         CCC_singly_linked_list_is_empty(args)
