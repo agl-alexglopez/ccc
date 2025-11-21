@@ -1022,6 +1022,8 @@ remove_fixup(struct CCC_Bounded_map *const map,
     return struct_base(map, remove);
 }
 
+/** Follows the specification in the "Rank-Balanced Trees" paper by Haeupler,
+Sen, and Tarjan (Fig. 3. pg 8). */
 static void
 rebalance_3_child(struct CCC_Bounded_map *const map,
                   struct CCC_Bounded_map_node *z,
@@ -1030,6 +1032,7 @@ rebalance_3_child(struct CCC_Bounded_map *const map,
     CCC_Tribool made_3_child = CCC_TRUE;
     while (z && made_3_child)
     {
+        assert(z->branch[L] == x || z->branch[R] == x);
         struct CCC_Bounded_map_node *const g = z->parent;
         struct CCC_Bounded_map_node *const y = z->branch[z->branch[L] == x];
         made_3_child = g != NULL && is_2_child(g, z);
@@ -1042,9 +1045,12 @@ rebalance_3_child(struct CCC_Bounded_map *const map,
             demote(z);
             demote(y);
         }
-        else if (y) /* p of x is 1,3, y not a 2,2 parent, and x is 3-child. */
+        else if (y)
         {
+            assert(is_1_child(z, y));
             assert(is_3_child(z, x));
+            assert(!is_2_child(z, y));
+            assert(!is_22_parent(y->branch[L], y, y->branch[R]));
             enum Link const z_to_x_dir = z->branch[R] == x;
             struct CCC_Bounded_map_node *const w = y->branch[!z_to_x_dir];
             if (is_1_child(y, w))
@@ -1083,6 +1089,7 @@ rebalance_3_child(struct CCC_Bounded_map *const map,
                     promote(y);
                 }
             }
+            /* Returning here confirms O(1) rotations for re-balance. */
             return;
         }
         x = z;
