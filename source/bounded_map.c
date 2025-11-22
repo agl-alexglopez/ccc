@@ -1135,7 +1135,9 @@ and uppercase are arbitrary subtrees.
    ╭─┴─╮      ->      ╭─┴─╮
    A   y              y   C
        │              │
-       B              B*/
+       B              B
+
+Taking a link as input allows us to code both symmetrical cases at once. */
 static void
 rotate(struct CCC_Bounded_map *const map, struct CCC_Bounded_map_node *const z,
        struct CCC_Bounded_map_node *const x,
@@ -1171,7 +1173,9 @@ Lowercase are nodes and uppercase are arbitrary subtrees.
    ╭─┴─╮     -> ╭─┴─╮ ╭─┴─╮
    A   y        A   B C   D
      ╭─┴─╮
-     B   C */
+     B   C
+
+Taking a link as input allows us to code both symmetrical cases at once. */
 static void
 double_rotate(struct CCC_Bounded_map *const map,
               struct CCC_Bounded_map_node *const z,

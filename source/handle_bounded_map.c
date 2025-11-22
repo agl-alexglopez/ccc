@@ -1424,7 +1424,11 @@ set_parity(struct CCC_Handle_bounded_map const *const map, size_t const node,
 static inline size_t
 block_count(size_t const node_count)
 {
-    return (node_count + (PARITY_BLOCK_BITS - 1)) / PARITY_BLOCK_BITS;
+    static_assert((typeof(node_count))~((typeof(node_count))0)
+                      >= (typeof(node_count))0,
+                  "shifting to avoid division with power of 2 divisor is only "
+                  "defined for unsigned types");
+    return (node_count + (PARITY_BLOCK_BITS - 1)) >> PARITY_BLOCK_BITS_LOG2;
 }
 
 static inline size_t *
@@ -1511,8 +1515,8 @@ remove_fixup(struct CCC_Handle_bounded_map *const map, size_t const remove)
         {
             map->root = x;
         }
-        two_child = is_2_child(map, p, y);
         *branch_pointer(map, p, branch_index(map, p, R) == y) = x;
+        two_child = is_2_child(map, p, y);
     }
     else
     {
@@ -1708,7 +1712,9 @@ Lowercase are nodes and uppercase are arbitrary subtrees.
    ╭─┴─╮     -> ╭─┴─╮ ╭─┴─╮
    A   y        A   B C   D
      ╭─┴─╮
-     B   C */
+     B   C
+
+Taking a link as input allows us to code both symmetrical cases at once. */
 static void
 double_rotate(struct CCC_Handle_bounded_map *const map, size_t const z,
               size_t const x, size_t const y, enum Link const dir)
