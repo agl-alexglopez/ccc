@@ -829,12 +829,13 @@ Amortized O(lg N).
 the first element GREATER than end_key.
 
 Note that due to the variety of values that can be returned in the range, using
-the provided range iteration functions from types.h is recommended for example:
+the provided range iteration functions from types.h or traits.h is recommended
+for example:
 
 ```
-for (struct Val *i = range_begin(&range);
-     i != range_end(&range);
-     i = next(&map, i))
+for (CCC_Handle_index index = range_begin(&range);
+     index != range_end(&range);
+     index = next(&map, index))
 {}
 ```
 
@@ -872,12 +873,12 @@ begin_key and the first element LESS than reverse_end_key.
 
 Note that due to the variety of values that can be returned in the
 range_reverse, using the provided range_reverse iteration functions from types.h
-is recommended for example:
+or traits.h is recommended for example:
 
 ```
-for (struct Val *i = range_reverse_begin(&range_reverse);
-     i != range_reverse_end(&range_reverse);
-     i = reverse_next(&handle_adaptive_map, i))
+for (CCC_Handle_index index = range_reverse_begin(&range);
+     index != range_reverse_end(&range);
+     index = next(&map, index))
 {}
 ```
 
@@ -907,21 +908,22 @@ with the enclosing scope. This reference is always valid. */
 /** @brief Return the start of an inorder traversal of the map. Amortized
 O(lg N).
 @param[in] map a pointer to the map.
-@return the oldest minimum element of the map. */
+@return a handle for the minimum element of the map. */
 [[nodiscard]] CCC_Handle_index
 CCC_handle_adaptive_map_begin(CCC_Handle_adaptive_map const *map);
 
 /** @brief Return the start of a reverse inorder traversal of the map.
 Amortized O(lg N).
 @param[in] map a pointer to the map.
-@return the oldest maximum element of the map. */
+@return a handle for the maximum element of the map. */
 [[nodiscard]] CCC_Handle_index
 CCC_handle_adaptive_map_reverse_begin(CCC_Handle_adaptive_map const *map);
 
 /** @brief Return the next element in an inorder traversal of the map. O(1).
 @param[in] map a pointer to the map.
 @param[in] iterator pointer to the current iterator user type.
-@return the next user type stored in the map in an inorder traversal. */
+@return a handle for the next user type stored in the map in an inorder
+traversal. */
 [[nodiscard]] CCC_Handle_index
 CCC_handle_adaptive_map_next(CCC_Handle_adaptive_map const *map,
                              CCC_Handle_index iterator);
@@ -930,22 +932,22 @@ CCC_handle_adaptive_map_next(CCC_Handle_adaptive_map const *map,
 map. O(1).
 @param[in] map a pointer to the map.
 @param[in] iterator pointer to the current iterator user type.
-@return the reverse_next user type stored in the map in a reverse inorder
-traversal. */
+@return a handle for the reverse_next user type stored in the map in a reverse
+inorder traversal. */
 [[nodiscard]] CCC_Handle_index
 CCC_handle_adaptive_map_reverse_next(CCC_Handle_adaptive_map const *map,
                                      CCC_Handle_index iterator);
 
 /** @brief Return the end of an inorder traversal of the map. O(1).
 @param[in] map a pointer to the map.
-@return the newest maximum element of the map. */
+@return a handle for the maximum element of the map. */
 [[nodiscard]] CCC_Handle_index
 CCC_handle_adaptive_map_end(CCC_Handle_adaptive_map const *map);
 
 /** @brief Return the reverse_end of a reverse inorder traversal of the map.
 O(1).
 @param[in] map a pointer to the map.
-@return the newest minimum element of the map. */
+@return a handle for the minimum element of the map. */
 [[nodiscard]] CCC_Handle_index
 CCC_handle_adaptive_map_reverse_end(CCC_Handle_adaptive_map const *map);
 
