@@ -85,7 +85,8 @@ enum : Bit_count
     BITBLOCK_BITS = (SIZEOF_BLOCK * CHAR_BIT),
     U8BLOCK_MAX = UINT8_MAX,
 };
-static_assert((Bit_count)~0 >= 0, "Bit_count must be unsigned");
+static_assert((Bit_count) ~((Bit_count)0) >= (Bit_count)0,
+              "Bit_count must be unsigned");
 static_assert(UINT8_MAX >= BITBLOCK_BITS, "Bit_count counts all block bits.");
 
 /** @internal A signed index within a block. A block is bounded to some number
@@ -101,7 +102,8 @@ It also a wider type to avoid warnings or dangers when taking the value of a
 typedef int16_t Bit_signed_count;
 static_assert(sizeof(Bit_signed_count) > sizeof(Bit_count),
               "Bit_signed_count x = (Bit_signed_count)x_Bit_count; is safe");
-static_assert((Bit_signed_count)~0 < 0, "Bit_signed_count must be signed");
+static_assert((Bit_signed_count) ~((Bit_signed_count)0) < (Bit_signed_count)0,
+              "Bit_signed_count must be signed");
 static_assert(INT16_MAX >= BITBLOCK_BITS,
               "Bit_signed_count counts all block bits");
 

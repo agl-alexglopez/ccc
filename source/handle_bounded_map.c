@@ -181,7 +181,12 @@ enum : size_t
 {
     /** @internal The number of bits in a block of parity bits. */
     PARITY_BLOCK_BITS = sizeof(Parity_block) * CHAR_BIT,
+    /** @internal Hand calculated log2 of block bits for a fast shift rather
+        than division. No reasonable compile time calculation for this in C. */
+    PARITY_BLOCK_BITS_LOG2 = 5,
 };
+static_assert(PARITY_BLOCK_BITS >> PARITY_BLOCK_BITS_LOG2 == 1,
+              "hand coded log2 of parity block bits is always correct");
 
 /*==============================  Prototypes   ==============================*/
 
@@ -844,7 +849,10 @@ CCC_handle_bounded_map_clear_and_free(CCC_Handle_bounded_map *const map,
     map->root = 0;
     map->capacity = 0;
     (void)map->allocate((CCC_Allocator_context){
-        .input = map->data, .bytes = 0, .context = map->context});
+        .input = map->data,
+        .bytes = 0,
+        .context = map->context,
+    });
     map->data = NULL;
     map->nodes = NULL;
     map->parity = NULL;
@@ -1009,17 +1017,17 @@ allocate_slot(struct CCC_Handle_bounded_map *const map)
 
 static CCC_Result
 resize(struct CCC_Handle_bounded_map *const map, size_t const new_capacity,
-       CCC_Allocator *const fn)
+       CCC_Allocator *const allocate)
 {
     if (map->capacity && new_capacity <= map->capacity - 1)
     {
         return CCC_RESULT_OK;
     }
-    if (!fn)
+    if (!allocate)
     {
         return CCC_RESULT_NO_ALLOCATION_FUNCTION;
     }
-    void *const new_data = fn((CCC_Allocator_context){
+    void *const new_data = allocate((CCC_Allocator_context){
         .input = NULL,
         .bytes = total_bytes(map->sizeof_type, new_capacity),
         .context = map->context,
@@ -1031,7 +1039,7 @@ resize(struct CCC_Handle_bounded_map *const map, size_t const new_capacity,
     copy_soa(map, new_data, new_capacity);
     map->nodes = node_pos(map->sizeof_type, new_data, new_capacity);
     map->parity = parity_pos(map->sizeof_type, new_data, new_capacity);
-    fn((CCC_Allocator_context){
+    allocate((CCC_Allocator_context){
         .input = map->data,
         .bytes = 0,
         .context = map->context,
@@ -1053,10 +1061,13 @@ insert(struct CCC_Handle_bounded_map *const map, size_t const parent_i,
         return;
     }
     assert(last_order == CCC_ORDER_GREATER || last_order == CCC_ORDER_LESSER);
-    struct CCC_Handle_bounded_map_node *parent = node_at(map, parent_i);
-    CCC_Tribool const rank_rule_break
-        = !parent->branch[L] && !parent->branch[R];
-    parent->branch[CCC_ORDER_GREATER == last_order] = elem_i;
+    CCC_Tribool rank_rule_break = false;
+    if (parent_i)
+    {
+        struct CCC_Handle_bounded_map_node *parent = node_at(map, parent_i);
+        rank_rule_break = !parent->branch[L] && !parent->branch[R];
+        parent->branch[CCC_ORDER_GREATER == last_order] = elem_i;
+    }
     elem->parent = parent_i;
     if (rank_rule_break)
     {
@@ -1361,7 +1372,11 @@ data_at(struct CCC_Handle_bounded_map const *const map, size_t const i)
 static inline Parity_block *
 block_at(struct CCC_Handle_bounded_map const *const map, size_t const i)
 {
-    return &map->parity[i / PARITY_BLOCK_BITS];
+    static_assert((typeof(i))~((typeof(i))0) >= (typeof(i))0,
+                  "shifting to avoid division with power of 2 divisor is only "
+                  "defined for unsigned types");
+    /* Avoid division because why not? */
+    return &map->parity[i >> PARITY_BLOCK_BITS_LOG2];
 }
 
 static inline Parity_block
