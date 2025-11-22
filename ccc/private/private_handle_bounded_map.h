@@ -45,9 +45,9 @@ struct CCC_Handle_bounded_map_node
     };
 };
 
-/** @internal A handle realtime ordered map is a modified struct of arrays
-layout with the modification being that we may have the arrays as pointer
-offsets in a contiguous allocation if the user desires a dynamic map.
+/** @internal A handle bounded map is a modified struct of arrays layout with
+the modification being that we may have the arrays as pointer offsets in a
+contiguous allocation if the user desires a dynamic map.
 
 The user data array comes first allowing the user to store any type they wish
 in the container contiguously with no intrusive element padding, saving space.
@@ -76,7 +76,7 @@ Here is the layout in one contiguous array.
 Consider how this layout saves space. Here is a more traditional approach.
 
 ```
-struct CCC_Bounded_map_node
+struct Naive_node
 {
     size_t branch[2];
     union
@@ -94,17 +94,31 @@ this element were to intrude on a user element it would also force its 8 byte
 alignment on user data. This is more wasted space if the user wanted to simply
 use the map as a set for a smaller type such as an int.
 
-If the user wanted a simple set of 64 ints, this intrusive design would cost
-`64 * 40 = 2480` bytes, of which only `64 * (40 - 7 - 4) = 1856` bytes are in
-use leaving `2480 - 1856 = 624` bytes wasted.
+If the user wanted a simple set of 64 ints we have the following waste.
 
-In contrast the current struct of arrays design lays out data such that we use
-`(64 * 4) + 4 + (64 * 24) + 64 + B = 1860 + B` bytes where B is the number of
-unused bits in the last block of the parity bit array (in this case 0). That
-means there are only `4 + B` bytes wasted, 4 bytes of padding between the end of
-the user type array and the start of the nodes array and the unused bits at the
-end of the parity bit array. This also means it important to consider the
-alignment differences that may occur between the user type and the node type.
+```
+64 structs * 40 bytes = 2480 total bytes
+64 structs * (40 bytes - 7 bytes padding - 4 bytes padding) = 1856 usable bytes
+2480 - 1856 = 624 bytes wasted.
+```
+
+In contrast the current struct of arrays design lays out data as follows.
+
+```
+  (64 ints * 4 bytes per int)
++ (4 bytes padding)
++ (64 nodes * 24 bytes per node)
++ (64 bits)
++ (B padding bits in last word)
+--------------------------------
+= 1860 + B padding bits in last word (in this case 0)
+```
+
+That means there are only `4 bytes + B bits` wasted, 4 bytes of padding between
+the end of the user type array and the start of the nodes array and the unused
+bits at the end of the parity bit array. This also means it important to
+consider the alignment differences that may occur between the user type and the
+node type.
 
 This layout comes at the cost of consulting multiple arrays for many operations.
 However, once user data has been inserted or removed the tree fix up operations
@@ -122,14 +136,14 @@ struct CCC_Handle_bounded_map
     struct CCC_Handle_bounded_map_node *nodes;
     /** @internal The parity bit array corresponding to each node. */
     unsigned *parity;
-    /** @internal The current capacity. */
-    size_t capacity;
-    /** @internal The current size. */
-    size_t count;
     /** @internal The root node of the WAVL tree. */
     size_t root;
     /** @internal The start of the free singly linked list. */
     size_t free_list;
+    /** @internal The current capacity. */
+    size_t capacity;
+    /** @internal The current size. */
+    size_t count;
     /** @internal The size of the type stored in the map. */
     size_t sizeof_type;
     /** @internal Where user key can be found in type. */
