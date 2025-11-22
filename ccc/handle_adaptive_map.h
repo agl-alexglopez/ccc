@@ -693,7 +693,7 @@ non-NULL if the closure executes.
 Handle_adaptive_map_handle *e =
     handle_adaptive_map_and_modify_with(
         handle_wrap(&handle_adaptive_map, &k),
-        word,
+        Word,
         T->cnt++;
     );
 // Increment the count if found otherwise insert a default value.
@@ -701,7 +701,7 @@ Handle_index w =
     handle_adaptive_map_or_insert_with(
         handle_adaptive_map_and_modify_with(
             handle_wrap(&handle_adaptive_map, &k),
-            word,
+            Word,
             { T->cnt++; }
         ),
         (Word){.key = k, .cnt = 1}

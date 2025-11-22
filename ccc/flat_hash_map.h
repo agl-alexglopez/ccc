@@ -513,7 +513,8 @@ Because an allocation function is provided, the destination is resized once for
 the copy and retains its fixed size after the copy is complete. This would
 require the user to manually free the underlying Buffer at destination
 eventually if this method is used. Usually it is better to allocate the memory
-with the reserve function if fixed size dynamic maps are required.
+with the reserve function if maps with one-time allocation requirements are
+used.
 
 These options allow users to stay consistent across containers with their
 memory management strategies. */
