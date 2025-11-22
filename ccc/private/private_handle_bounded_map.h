@@ -172,8 +172,7 @@ struct CCC_Handle_bounded_map_handle
 /** @internal Wrapper for return by pointer on the stack in C23. */
 union CCC_Handle_bounded_map_handle_wrap
 {
-    /** @internal Single field to enable return by compound literal reference.
-     */
+    /** @internal Single field enables return by compound literal reference. */
     struct CCC_Handle_bounded_map_handle private;
 };
 
