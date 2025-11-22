@@ -689,15 +689,23 @@ non-NULL if the closure executes.
 
 ```
 #define HANDLE_ADAPTIVE_MAP_USING_NAMESPACE_CCC
-// Increment the key k if found otherwise do nothing.
-handle_adaptive_map_handle *e =
-handle_adaptive_map_and_modify_with(handle_wrap(&handle_adaptive_map, &k), word,
-T->cnt++;);
-
-// Increment the key k if found otherwise insert a default value.
-handle_index w =
-handle_adaptive_map_or_insert_with(handle_adaptive_map_and_modify_with(handle_wrap(&handle_adaptive_map,
-&k), word, { T->cnt++; }), (word){.key = k, .cnt = 1});
+// Increment the count if found otherwise do nothing.
+Handle_adaptive_map_handle *e =
+    handle_adaptive_map_and_modify_with(
+        handle_wrap(&handle_adaptive_map, &k),
+        word,
+        T->cnt++;
+    );
+// Increment the count if found otherwise insert a default value.
+Handle_index w =
+    handle_adaptive_map_or_insert_with(
+        handle_adaptive_map_and_modify_with(
+            handle_wrap(&handle_adaptive_map, &k),
+            word,
+            { T->cnt++; }
+        ),
+        (Word){.key = k, .cnt = 1}
+    );
 ```
 
 Note that any code written is only evaluated if the handle is Occupied and the

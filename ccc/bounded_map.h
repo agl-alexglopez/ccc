@@ -382,14 +382,23 @@ non-NULL if the closure executes.
 
 ```
 #define BOUNDED_MAP_USING_NAMESPACE_CCC
-// Increment the key k if found otherwise do nothing.
-bounded_map_entry *e = bounded_map_and_modify_with(entry_wrap(&map,
-&k), word, T->cnt++;);
-
-// Increment the key k if found otherwise insert a default value.
-word *w =
-bounded_map_or_insert_with(bounded_map_and_modify_with(entry_wrap(&map,
-&k), word, { T->cnt++; }), (word){.key = k, .cnt = 1});
+// Increment the count if found otherwise do nothing.
+Bounded_map_entry *e =
+    bounded_map_and_modify_with(
+        entry_wrap(&map, &k),
+        Word,
+        T->cnt++;
+    );
+// Increment the count if found otherwise insert a default value.
+Word *w =
+    bounded_map_or_insert_with(
+        bounded_map_and_modify_with(
+            entry_wrap(&map, &k),
+            Word,
+            { T->cnt++; }
+        ),
+        (Word){.key = k, .cnt = 1}
+    );
 ```
 
 Note that any code written is only evaluated if the entry is Occupied and the

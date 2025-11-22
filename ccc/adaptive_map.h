@@ -363,10 +363,23 @@ non-NULL if the closure executes.
 
 ```
 #define ADAPTIVE_MAP_USING_NAMESPACE_CCC
-map_entry *entry = adaptive_map_and_modify_with(entry_wrap(&map, &k), word,
-T->cnt++;); word *w =
-adaptive_map_or_insert_with(adaptive_map_and_modify_with(entry_wrap(&map, &k),
-word, { T->cnt++; }), (word){.key = k, .cnt = 1});
+// Increment the count if found otherwise do nothing.
+Adaptive_map_entry *entry =
+    adaptive_map_and_modify_with(
+        entry_wrap(&map, &k),
+        Word,
+        T->cnt++;
+    );
+// Increment the count if found otherwise insert a default value.
+Word *w =
+    adaptive_map_or_insert_with(
+        adaptive_map_and_modify_with(
+            entry_wrap(&map, &k),
+            Word,
+            { T->cnt++; }
+        ),
+        (Word){.key = k, .cnt = 1}
+    );
 ```
 
 Note that any code written is only evaluated if the entry is Occupied and the

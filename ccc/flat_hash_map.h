@@ -646,12 +646,23 @@ non-NULL if the closure executes.
 
 ```
 #define FLAT_HASH_MAP_USING_NAMESPACE_CCC
-flat_hash_map_entry *entry =
-flat_hash_map_and_modify_with(entry_wrap(&flat_hash_map, &k), word, T->cnt++;);
-
-word *w =
-flat_hash_map_or_insert_with(flat_hash_map_and_modify_with(entry_wrap(&flat_hash_map,
-&k), word, { T->cnt++; }), (word){.key = k, .cnt = 1});
+// Increment the count if found otherwise do nothing.
+Flat_hash_map_entry *entry =
+    flat_hash_map_and_modify_with(
+        entry_wrap(&map, &k),
+        Word,
+        T->cnt++;
+    );
+// Increment the count if found otherwise insert a default value.
+Word *w =
+    flat_hash_map_or_insert_with(
+        flat_hash_map_and_modify_with(
+            entry_wrap(&flat_hash_map, &k),
+            Word,
+            { T->cnt++; }
+        ),
+        (Word){.key = k, .cnt = 1}
+    );
 ```
 
 Note that any code written is only evaluated if the entry is Occupied and the

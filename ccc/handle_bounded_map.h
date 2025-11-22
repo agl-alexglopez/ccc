@@ -709,11 +709,23 @@ non-NULL if the closure executes.
 
 ```
 #define HANDLE_BOUNDED_MAP_USING_NAMESPACE_CCC
-handle_bounded_map_handle *e =
-handle_bounded_map_and_modify_with(handle_wrap(&handle_bounded_map,
-&k), word, T->cnt++;); Handle_i w =
-handle_bounded_map_or_insert_with(handle_bounded_map_and_modify_with(handle_wrap(&handle_bounded_map,
-&k), word, { T->cnt++; }), (word){.key = k, .cnt = 1});
+// Increment the count if found otherwise do nothing.
+Handle_bounded_map_handle *h =
+    handle_bounded_map_and_modify_with(
+        handle_wrap(&handle_bounded_map, &k),
+        Word,
+        T->cnt++;
+    );
+// Increment the count if found otherwise insert a default value.
+Handle_index w =
+    handle_bounded_map_or_insert_with(
+        handle_bounded_map_and_modify_with(
+            handle_wrap(&handle_bounded_map, &k),
+            Word,
+            { T->cnt++; }
+        ),
+        (Word){.key = k, .cnt = 1}
+    );
 ```
 
 Note that any code written is only evaluated if the handle is Occupied and the
