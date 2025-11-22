@@ -130,11 +130,12 @@ check_static_begin(handle_bounded_map_test_init_from)
     check(validate(&map_from_list), true);
     check(count(&map_from_list).count, 3);
     size_t seen = 0;
-    for (struct Val const *i = begin(&map_from_list); i != end(&map_from_list);
+    for (CCC_Handle_index i = begin(&map_from_list); i != end(&map_from_list);
          i = next(&map_from_list, i))
     {
-        check((i->id == 0 && i->val == 0) || (i->id == 1 && i->val == 1)
-                  || (i->id == 2 && i->val == 2),
+        struct Val const *const v = handle_bounded_map_at(&map_from_list, i);
+        check((v->id == 0 && v->val == 0) || (v->id == 1 && v->val == 1)
+                  || (v->id == 2 && v->val == 2),
               true);
         ++seen;
     }
@@ -154,11 +155,12 @@ check_static_begin(handle_bounded_map_test_init_from_overwrite)
     check(validate(&map_from_list), true);
     check(count(&map_from_list).count, 1);
     size_t seen = 0;
-    for (struct Val const *i = begin(&map_from_list); i != end(&map_from_list);
+    for (CCC_Handle_index i = begin(&map_from_list); i != end(&map_from_list);
          i = next(&map_from_list, i))
     {
-        check(i->id, 0);
-        check(i->val, 2);
+        struct Val const *const v = handle_bounded_map_at(&map_from_list, i);
+        check(v->id, 0);
+        check(v->val, 2);
         ++seen;
     }
     check(seen, 1);
@@ -178,11 +180,12 @@ check_static_begin(handle_bounded_map_test_init_from_fail)
     check(validate(&map_from_list), true);
     check(count(&map_from_list).count, 0);
     size_t seen = 0;
-    for (struct Val const *i = begin(&map_from_list); i != end(&map_from_list);
+    for (CCC_Handle_index i = begin(&map_from_list); i != end(&map_from_list);
          i = next(&map_from_list, i))
     {
-        check(i->id, 0);
-        check(i->val, 2);
+        struct Val const *const v = handle_bounded_map_at(&map_from_list, i);
+        check(v->id, 0);
+        check(v->val, 2);
         ++seen;
     }
     check(seen, 0);
@@ -207,11 +210,12 @@ check_static_begin(handle_bounded_map_test_init_with_capacity)
     }
     check(handle_bounded_map_count(&map).count, 10);
     size_t seen = 0;
-    for (struct Val const *i = begin(&map); i != end(&map); i = next(&map, i))
+    for (CCC_Handle_index i = begin(&map); i != end(&map); i = next(&map, i))
     {
-        check(i->id >= 0 && i->id < 10, true);
-        check(i->val >= 0 && i->val < 10, true);
-        check(i->val, i->id);
+        struct Val const *const v = handle_bounded_map_at(&map, i);
+        check(v->id >= 0 && v->id < 10, true);
+        check(v->val >= 0 && v->val < 10, true);
+        check(v->val, v->id);
         ++seen;
     }
     check(seen, 10);
@@ -232,9 +236,10 @@ check_static_begin(handle_bounded_map_test_init_with_capacity_no_op)
     check(handle_bounded_map_validate(&map), CCC_TRUE);
     check(handle_bounded_map_count(&map).count, 1);
     size_t seen = 0;
-    for (struct Val const *i = begin(&map); i != end(&map); i = next(&map, i))
+    for (CCC_Handle_index i = begin(&map); i != end(&map); i = next(&map, i))
     {
-        check(i->id, i->val);
+        struct Val const *const v = handle_bounded_map_at(&map, i);
+        check(v->id, v->val);
         ++seen;
     }
     check(handle_bounded_map_count(&map).count, 1);
@@ -256,9 +261,10 @@ check_static_begin(handle_bounded_map_test_init_with_capacity_fail)
     check(handle_bounded_map_validate(&map), CCC_TRUE);
     check(handle_bounded_map_count(&map).count, 0);
     size_t seen = 0;
-    for (struct Val const *i = begin(&map); i != end(&map); i = next(&map, i))
+    for (CCC_Handle_index i = begin(&map); i != end(&map); i = next(&map, i))
     {
-        check(i->id, i->val);
+        struct Val const *const v = handle_bounded_map_at(&map, i);
+        check(v->id, v->val);
         ++seen;
     }
     check(handle_bounded_map_count(&map).count, 0);

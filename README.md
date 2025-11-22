@@ -493,23 +493,25 @@ main(void)
        next value not less than 6, 10 and 44 should be the first
        value greater than 44, 45. */
     int range_keys[8] = {10, 15, 20, 25, 30, 35, 40, 45};
-    Range r = equal_range(&s, &(int){6}, &(int){44});
+    Handle_range r = equal_range(&s, &(int){6}, &(int){44});
     int index = 0;
-    for (struct Key_val *i = range_begin(&r); i != range_end(&r); i = next(&s, i))
+    for (Handle_index i = range_begin(&r); i != range_end(&r); i = next(&s, i))
     {
-        assert(i->key == range_keys[index]);
+        struct Key_val const *const kv = handle_adaptive_map_at(&s, i);
+        assert(kv->key == range_keys[index]);
         ++index;
     }
     /* This should be the following Range [119,84). 119 should be
        dropped to first value not greater than 119 and last should
        be dropped to first value less than 84. */
     int range_reverse_keys[8] = {115, 110, 105, 100, 95, 90, 85, 80};
-    Range_reverse rr = equal_range_reverse(&s, &(int){119}, &(int){84});
+    Handle_range_reverse rr = equal_range_reverse(&s, &(int){119}, &(int){84});
     index = 0;
-    for (struct Key_val *i = reverse_begin_range_reverse(&rr); i != reverse_end_range_reverse(&rr);
+    for (Handle_index i = range_reverse_begin(&rr); i != range_reverse_end(&rr);
          i = reverse_next(&s, i))
     {
-        assert(i->key == range_reverse_keys[index]);
+        struct Key_val const *const kv = handle_adaptive_map_at(&s, i);
+        assert(kv->key == range_reverse_keys[index]);
         ++index;
     }
     return 0;
@@ -570,24 +572,26 @@ main(void)
        next value not less than 6, 10 and 44 should be the first
        value greater than 44, 45. */
     int range_keys[8] = {10, 15, 20, 25, 30, 35, 40, 45};
-    Range r = equal_range(&s, &(int){6}, &(int){44});
+    Handle_range r = equal_range(&s, &(int){6}, &(int){44});
     int index = 0;
-    for (struct Key_val *i = range_begin(&r); i != range_end(&r);
+    for (Handle_index i = range_begin(&r); i != range_end(&r);
          i = next(&s, &i->elem))
     {
-        assert(i->key == range_keys[index]);
+        struct Key_val const *const kv = handle_bounded_map_at(&s, i);
+        assert(kv->key == range_keys[index]);
         ++index;
     }
     /* This should be the following Range [119,84). 119 should be
        dropped to first value not greater than 119 and last should
        be dropped to first value less than 84. */
     int range_reverse_keys[8] = {115, 110, 105, 100, 95, 90, 85, 80};
-    Range_reverse rr = equal_range_reverse(&s, &(int){119}, &(int){84});
+    Handle_range_reverse rr = equal_range_reverse(&s, &(int){119}, &(int){84});
     index = 0;
-    for (struct Key_val *i = reverse_begin_range_reverse(&rr); i != reverse_end_range_reverse(&rr);
+    for (Handle_index i = range_reverse_begin(&rr); i != range_reverse_end(&rr);
          i = reverse_next(&s, &i->elem))
     {
-        assert(i->key == range_reverse_keys[index]);
+        struct Key_val const *const kv = handle_bounded_map_at(&s, i);
+        assert(kv->key == range_reverse_keys[index]);
         ++index;
     }
     return 0;
@@ -637,7 +641,7 @@ main(void)
     struct name nodes[5];
     /* adaptive_map named om, stores struct name, intrusive field e, key field
        name, no allocation permission, comparison fn, no context */
-    adaptive_map om = om_initialize(om, struct name, e, name, Key_val_cmp, NULL, NULL);
+    adaptive_map om = adaptive_map_initialize(om, struct name, e, name, Key_val_cmp, NULL, NULL);
     char const *const sorted_names[5]
         = {"Ferris", "Glenda", "Rocky", "Tux", "Ziggy"};
     size_t const size = sizeof(sorted_names) / sizeof(sorted_names[0]);
@@ -749,7 +753,7 @@ main(void)
        named elem, key field named key, no allocation permission, key comparison
        function, no context data. */
     Bounded_map s
-        = rom_initialize(s, struct Key_val, elem, key, Key_val_cmp, NULL, NULL);
+        = bounded_map_initialize(s, struct Key_val, elem, key, Key_val_cmp, NULL, NULL);
     int const num_nodes = 25;
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
     for (int i = 0, id = 0; i < num_nodes; ++i, id += 5)
@@ -1160,7 +1164,7 @@ struct Val
     int val;
 };
 
-CCC_Entry e = om_try_insert(&om, &(struct Val){.key = 3, .val = 1}.e);
+CCC_Entry e = adaptive_map_try_insert(&om, &(struct Val){.key = 3, .val = 1}.e);
 ```
 
 The same insertion with the "with" variant.
@@ -1172,7 +1176,7 @@ val(int val_arg)
     return (struct Val){.val = val_args};
 }
 
-CCC_Entry *e = om_try_insert_with(&om, 3, val(1));
+CCC_Entry *e = adaptive_map_try_insert_with(&om, 3, val(1));
 ```
 
 This second version illustrates a few key points. R-values are provided directly as keys and values, not references to keys and values. Also, a function call to generate a value to be inserted is completely acceptable; the function is only called if insertion is required. Finally, the functions `try_insert_w` and `insert_or_assign_w` will ensure the key in the newly inserted value matches the key searched, saving the user some typing and ensuring they don't make a mistake in this regard.

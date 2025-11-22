@@ -529,6 +529,31 @@ See container documentation for specific behavior. */
 #define CCC_equal_range_reverse_wrap(container_pointer, range_reverse_args...) \
     CCC_private_equal_range_reverse_wrap(container_pointer, range_reverse_args)
 
+/** @brief Obtain the beginning of the range iterator.
+@param[in] range_pointer a pointer to the type of range.
+@return the iterator representing the beginning. May be equal to end. */
+#define CCC_range_begin(range_pointer) CCC_private_range_begin(range_pointer)
+
+/** @brief Obtain the end of the range iterator.
+@param[in] range_pointer a pointer to the type of range.
+@return the iterator representing the end.
+@warning Do not access the end. It is an exclusive end. */
+#define CCC_range_end(range_pointer) CCC_private_range_end(range_pointer)
+
+/** @brief Obtain the beginning of the reverse range iterator.
+@param[in] range_reverse_pointer a pointer to the type of reverse range.
+@return the iterator representing the reverse beginning. May be equal to reverse
+end. */
+#define CCC_range_reverse_begin(range_reverse_pointer)                         \
+    CCC_private_range_reverse_begin(range_reverse_pointer)
+
+/** @brief Obtain the end of the reverse range iterator.
+@param[in] range_reverse_pointer a pointer to the type of reverse range.
+@return the iterator representing the reverse end.
+@warning Do not access the end. It is an exclusive reverse end. */
+#define CCC_range_reverse_end(range_reverse_pointer)                           \
+    CCC_private_range_reverse_end(range_reverse_pointer)
+
 /**@}*/
 
 /** @name Memory Management Interface
@@ -687,6 +712,10 @@ See container documentation for specific behavior. */
 #    define equal_range_reverse(args...) CCC_equal_range_reverse(args)
 #    define equal_range_wrap(args...) CCC_equal_range_wrap(args)
 #    define equal_range_reverse_wrap(args...) CCC_equal_range_reverse_wrap(args)
+#    define range_begin(args...) CCC_range_begin(args)
+#    define range_end(args...) CCC_range_end(args)
+#    define range_reverse_begin(args...) CCC_range_reverse_begin(args)
+#    define range_reverse_end(args...) CCC_range_reverse_end(args)
 #    define splice(args...) CCC_splice(args)
 #    define splice_range(args...) CCC_splice_range(args)
 

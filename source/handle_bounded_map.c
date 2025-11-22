@@ -221,8 +221,9 @@ static struct Query find(struct CCC_Handle_bounded_map const *,
 static inline struct CCC_Handle_bounded_map_handle
 handle(struct CCC_Handle_bounded_map const *, void const *key);
 /* Returning a generic range that can be use for range or range_reverse. */
-static struct CCC_Range equal_range(struct CCC_Handle_bounded_map const *,
-                                    void const *, void const *, enum Link);
+static struct CCC_Handle_range
+equal_range(struct CCC_Handle_bounded_map const *, void const *, void const *,
+            enum Link);
 /* Returning threeway comparison with user callback. */
 static CCC_Order order_nodes(struct CCC_Handle_bounded_map const *,
                              void const *key, size_t node,
@@ -236,7 +237,6 @@ static size_t min_max_from(struct CCC_Handle_bounded_map const *, size_t start,
 static size_t branch_index(struct CCC_Handle_bounded_map const *, size_t parent,
                            enum Link dir);
 static size_t parent_index(struct CCC_Handle_bounded_map const *, size_t child);
-static size_t index_of(struct CCC_Handle_bounded_map const *, void const *type);
 /* Returning references to index fields for tree nodes. */
 static size_t *branch_pointer(struct CCC_Handle_bounded_map const *,
                               size_t node, enum Link branch);
@@ -549,28 +549,28 @@ CCC_handle_bounded_map_remove(CCC_Handle_bounded_map *const map,
     }};
 }
 
-CCC_Range
+CCC_Handle_range
 CCC_handle_bounded_map_equal_range(CCC_Handle_bounded_map const *const map,
                                    void const *const begin_key,
                                    void const *const end_key)
 {
     if (!map || !begin_key || !end_key)
     {
-        return (CCC_Range){};
+        return (CCC_Handle_range){};
     }
-    return (CCC_Range){equal_range(map, begin_key, end_key, INORDER)};
+    return (CCC_Handle_range){equal_range(map, begin_key, end_key, INORDER)};
 }
 
-CCC_Range_reverse
+CCC_Handle_range_reverse
 CCC_handle_bounded_map_equal_range_reverse(
     CCC_Handle_bounded_map const *const map,
     void const *const reverse_begin_key, void const *const reverse_end_key)
 {
     if (!map || !reverse_begin_key || !reverse_end_key)
     {
-        return (CCC_Range_reverse){};
+        return (CCC_Handle_range_reverse){};
     }
-    return (CCC_Range_reverse){
+    return (CCC_Handle_range_reverse){
         equal_range(map, reverse_begin_key, reverse_end_key, RINORDER)};
 }
 
@@ -647,70 +647,62 @@ CCC_handle_bounded_map_capacity(CCC_Handle_bounded_map const *const map)
     return (CCC_Count){.count = map->capacity};
 }
 
-void *
+CCC_Handle_index
 CCC_handle_bounded_map_begin(CCC_Handle_bounded_map const *const map)
 {
     if (!map || !map->capacity)
     {
-        return NULL;
+        return 0;
     }
     size_t const n = min_max_from(map, map->root, MINDIR);
-    return data_at(map, n);
+    return n;
 }
 
-void *
+CCC_Handle_index
 CCC_handle_bounded_map_reverse_begin(CCC_Handle_bounded_map const *const map)
 {
     if (!map || !map->capacity)
     {
-        return NULL;
+        return 0;
     }
     size_t const n = min_max_from(map, map->root, MAXDIR);
-    return data_at(map, n);
+    return n;
 }
 
-void *
+CCC_Handle_index
 CCC_handle_bounded_map_next(CCC_Handle_bounded_map const *const map,
-                            void const *const type_iterator)
+                            CCC_Handle_index iterator)
 {
-    if (!map || !type_iterator || !map->capacity)
+    if (!map || !iterator || !map->capacity)
     {
-        return NULL;
+        return 0;
     }
-    size_t const n = next(map, index_of(map, type_iterator), INORDER);
-    return data_at(map, n);
+    size_t const n = next(map, iterator, INORDER);
+    return n;
 }
 
-void *
+CCC_Handle_index
 CCC_handle_bounded_map_reverse_next(CCC_Handle_bounded_map const *const map,
-                                    void const *const type_iterator)
+                                    CCC_Handle_index iterator)
 {
-    if (!map || !type_iterator || !map->capacity)
+    if (!map || !iterator || !map->capacity)
     {
-        return NULL;
+        return 0;
     }
-    size_t const n = next(map, index_of(map, type_iterator), RINORDER);
-    return data_at(map, n);
+    size_t const n = next(map, iterator, RINORDER);
+    return n;
 }
 
-void *
-CCC_handle_bounded_map_end(CCC_Handle_bounded_map const *const map)
+CCC_Handle_index
+CCC_handle_bounded_map_end(CCC_Handle_bounded_map const *const)
 {
-    if (!map || !map->capacity)
-    {
-        return NULL;
-    }
-    return data_at(map, 0);
+    return 0;
 }
 
-void *
-CCC_handle_bounded_map_reverse_end(CCC_Handle_bounded_map const *const map)
+CCC_Handle_index
+CCC_handle_bounded_map_reverse_end(CCC_Handle_bounded_map const *const)
 {
-    if (!map || !map->capacity)
-    {
-        return NULL;
-    }
-    return data_at(map, 0);
+    return 0;
 }
 
 CCC_Result
@@ -1140,14 +1132,14 @@ next(struct CCC_Handle_bounded_map const *const map, size_t n,
     return p;
 }
 
-static struct CCC_Range
+static struct CCC_Handle_range
 equal_range(struct CCC_Handle_bounded_map const *const map,
             void const *const begin_key, void const *const end_key,
             enum Link const traversal)
 {
     if (CCC_handle_bounded_map_is_empty(map))
     {
-        return (struct CCC_Range){};
+        return (struct CCC_Handle_range){};
     }
     CCC_Order const les_or_grt[2] = {CCC_ORDER_LESSER, CCC_ORDER_GREATER};
     struct Query b = find(map, begin_key);
@@ -1160,9 +1152,9 @@ equal_range(struct CCC_Handle_bounded_map const *const map,
     {
         e.found = next(map, e.found, traversal);
     }
-    return (struct CCC_Range){
-        .begin = data_at(map, b.found),
-        .end = data_at(map, e.found),
+    return (struct CCC_Handle_range){
+        .begin = b.found,
+        .end = e.found,
     };
 }
 
@@ -1392,15 +1384,6 @@ static inline size_t
 parent_index(struct CCC_Handle_bounded_map const *const map, size_t const child)
 {
     return node_at(map, child)->parent;
-}
-
-static inline size_t
-index_of(struct CCC_Handle_bounded_map const *const map, void const *const type)
-{
-    assert(type >= map->data
-           && (char *)type
-                  < ((char *)map->data + (map->capacity * map->sizeof_type)));
-    return ((char *)type - (char *)map->data) / map->sizeof_type;
 }
 
 static inline CCC_Tribool

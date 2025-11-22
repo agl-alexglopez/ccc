@@ -40,9 +40,10 @@ inorder_fill(int vals[], size_t size, CCC_Handle_adaptive_map const *const m)
         return 0;
     }
     size_t i = 0;
-    for (struct Val *e = begin(m); e != end(m); e = next(m, e))
+    for (CCC_Handle_index e = begin(m); e != end(m); e = next(m, e))
     {
-        vals[i++] = e->id;
+        struct Val const *const v = CCC_handle_adaptive_map_at(m, e);
+        vals[i++] = v->id;
     }
     return i;
 }

@@ -147,9 +147,10 @@ static void *key_in_slot(struct CCC_Handle_adaptive_map const *,
                          void const *user_struct);
 static size_t allocate_slot(struct CCC_Handle_adaptive_map *);
 static size_t total_bytes(size_t sizeof_type, size_t capacity);
-static struct CCC_Range equal_range(struct CCC_Handle_adaptive_map *,
-                                    void const *begin_key, void const *end_key,
-                                    enum Branch traversal);
+static struct CCC_Handle_range equal_range(struct CCC_Handle_adaptive_map *,
+                                           void const *begin_key,
+                                           void const *end_key,
+                                           enum Branch traversal);
 /* Returning the user key with stored offsets. */
 static void *key_at(struct CCC_Handle_adaptive_map const *, size_t i);
 /* Returning threeway comparison with user callback. */
@@ -166,8 +167,6 @@ static size_t branch_index(struct CCC_Handle_adaptive_map const *,
                            size_t parent, enum Branch dir);
 static size_t parent_index(struct CCC_Handle_adaptive_map const *,
                            size_t child);
-static size_t index_of(struct CCC_Handle_adaptive_map const *,
-                       void const *key_val_type);
 /* Returning references to index fields for tree nodes. */
 static size_t *branch_ref(struct CCC_Handle_adaptive_map const *, size_t node,
                           enum Branch branch);
@@ -531,85 +530,77 @@ CCC_handle_adaptive_map_capacity(CCC_Handle_adaptive_map const *const map)
     return (CCC_Count){.count = map->capacity};
 }
 
-void *
+CCC_Handle_index
 CCC_handle_adaptive_map_begin(CCC_Handle_adaptive_map const *const map)
 {
     if (!map || !map->capacity)
     {
-        return NULL;
+        return 0;
     }
     size_t const n = min_max_from(map, map->root, L);
-    return data_at(map, n);
+    return n;
 }
 
-void *
+CCC_Handle_index
 CCC_handle_adaptive_map_reverse_begin(CCC_Handle_adaptive_map const *const map)
 {
     if (!map || !map->capacity)
     {
-        return NULL;
+        return 0;
     }
     size_t const n = min_max_from(map, map->root, R);
-    return data_at(map, n);
+    return n;
 }
 
-void *
+CCC_Handle_index
 CCC_handle_adaptive_map_next(CCC_Handle_adaptive_map const *const map,
-                             void const *const iterator)
+                             CCC_Handle_index const iterator)
 {
     if (!map || !map->capacity)
     {
-        return NULL;
+        return 0;
     }
-    size_t const n = next(map, index_of(map, iterator), INORDER);
-    return data_at(map, n);
+    size_t const n = next(map, iterator, INORDER);
+    return n;
 }
 
-void *
+CCC_Handle_index
 CCC_handle_adaptive_map_reverse_next(CCC_Handle_adaptive_map const *const map,
-                                     void const *const iterator)
+                                     CCC_Handle_index const iterator)
 {
     if (!map || !iterator || !map->capacity)
     {
-        return NULL;
+        return 0;
     }
-    size_t const n = next(map, index_of(map, iterator), R_INORDER);
-    return data_at(map, n);
+    size_t const n = next(map, iterator, R_INORDER);
+    return n;
 }
 
-void *
-CCC_handle_adaptive_map_end(CCC_Handle_adaptive_map const *const map)
+CCC_Handle_index
+CCC_handle_adaptive_map_end(CCC_Handle_adaptive_map const *const)
 {
-    if (!map || !map->capacity)
-    {
-        return NULL;
-    }
-    return data_at(map, 0);
+    return 0;
 }
 
-void *
-CCC_handle_adaptive_map_reverse_end(CCC_Handle_adaptive_map const *const map)
+CCC_Handle_index
+CCC_handle_adaptive_map_reverse_end(CCC_Handle_adaptive_map const *const)
 {
-    if (!map || !map->capacity)
-    {
-        return NULL;
-    }
-    return data_at(map, 0);
+    return 0;
 }
 
-CCC_Range
+CCC_Handle_range
 CCC_handle_adaptive_map_equal_range(CCC_Handle_adaptive_map *const map,
                                     void const *const begin_key,
                                     void const *const end_key)
 {
     if (!map || !begin_key || !end_key)
     {
-        return (CCC_Range){};
+        return (CCC_Handle_range){};
     }
-    return (CCC_Range){equal_range(map, begin_key, end_key, INORDER)};
+    return (CCC_Handle_range){equal_range(map, begin_key, end_key, INORDER)};
 }
 
-CCC_Range_reverse
+CCC_Handle_range_reverse
 CCC_handle_adaptive_map_equal_range_reverse(CCC_Handle_adaptive_map *const map,
                                             void const *const reverse_begin_key,
                                             void const *const reverse_end_key)
@@ -617,9 +608,9 @@ CCC_handle_adaptive_map_equal_range_reverse(CCC_Handle_adaptive_map *const map,
 {
     if (!map || !reverse_begin_key || !reverse_end_key)
     {
-        return (CCC_Range_reverse){};
+        return (CCC_Handle_range_reverse){};
     }
-    return (CCC_Range_reverse){
+    return (CCC_Handle_range_reverse){
         equal_range(map, reverse_begin_key, reverse_end_key, R_INORDER)};
 }
 
@@ -850,14 +841,14 @@ CCC_private_handle_adaptive_map_allocate_slot(
 
 /*===========================   Static Helpers    ===========================*/
 
-static struct CCC_Range
+static struct CCC_Handle_range
 equal_range(struct CCC_Handle_adaptive_map *const t,
             void const *const begin_key, void const *const end_key,
             enum Branch const traversal)
 {
     if (CCC_handle_adaptive_map_is_empty(t))
     {
-        return (struct CCC_Range){};
+        return (struct CCC_Handle_range){};
     }
     /* As with most BST code the cases are perfectly symmetrical. If we
        are seeking an increasing or decreasing range we need to make sure
@@ -875,9 +866,9 @@ equal_range(struct CCC_Handle_adaptive_map *const t,
     {
         e = next(t, e, traversal);
     }
-    return (struct CCC_Range){
-        .begin = data_at(t, b),
-        .end = data_at(t, e),
+    return (struct CCC_Handle_range){
+        .begin = b,
+        .end = e,
     };
 }
 
@@ -1338,16 +1329,6 @@ parent_index(struct CCC_Handle_adaptive_map const *const map,
              size_t const child)
 {
     return node_at(map, child)->parent;
-}
-
-static inline size_t
-index_of(struct CCC_Handle_adaptive_map const *const map,
-         void const *const key_val_type)
-{
-    assert(key_val_type >= map->data
-           && (char *)key_val_type
-                  < ((char *)map->data + (map->capacity * map->sizeof_type)));
-    return ((char *)key_val_type - (char *)map->data) / map->sizeof_type;
 }
 
 static inline size_t *

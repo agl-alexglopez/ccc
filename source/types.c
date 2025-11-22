@@ -142,6 +142,30 @@ CCC_range_reverse_end(CCC_Range_reverse const *const range)
     return range ? range->private.reverse_end : NULL;
 }
 
+CCC_Handle_index
+CCC_handle_range_begin(CCC_Handle_range const *const range)
+{
+    return range ? range->private.begin : 0;
+}
+
+CCC_Handle_index
+CCC_handle_range_end(CCC_Handle_range const *const range)
+{
+    return range ? range->private.end : 0;
+}
+
+CCC_Handle_index
+CCC_handle_range_reverse_begin(CCC_Handle_range_reverse const *const range)
+{
+    return range ? range->private.reverse_begin : 0;
+}
+
+CCC_Handle_index
+CCC_handle_range_reverse_end(CCC_Handle_range_reverse const *const range)
+{
+    return range ? range->private.reverse_end : 0;
+}
+
 char const *
 CCC_result_message(CCC_Result const result)
 {

@@ -326,8 +326,10 @@ print_alpha_n(FILE *const f, int n)
     }
     int i = 0;
     /* The ordered nature of the map comes in handy for alpha printing. */
-    for (Word *w = begin(&map); w != end(&map) && i < n; w = next(&map, w), ++i)
+    for (CCC_Handle_index iter = begin(&map); iter != end(&map) && i < n;
+         iter = next(&map, iter), ++i)
     {
+        Word const *const w = handle_adaptive_map_at(&map, iter);
         printf("%s %d\n", string_arena_at(&a, &w->ofs), w->freq);
     }
     string_arena_free(&a);
@@ -347,9 +349,11 @@ print_ralpha_n(FILE *const f, int n)
     }
     int i = 0;
     /* The ordered nature of the map comes in handy for reverse iteration. */
-    for (Word *w = reverse_begin(&map); w != reverse_end(&map) && i < n;
-         w = reverse_next(&map, w), ++i)
+    for (CCC_Handle_index iter = reverse_begin(&map);
+         iter != reverse_end(&map) && i < n;
+         iter = reverse_next(&map, iter), ++i)
     {
+        Word const *const w = handle_adaptive_map_at(&map, iter);
         printf("%s %d\n", string_arena_at(&a, &w->ofs), w->freq);
     }
     string_arena_free(&a);
@@ -365,9 +369,10 @@ copy_frequencies(Handle_adaptive_map const *const map)
     check(r == CCC_RESULT_OK);
     size_t const cap = capacity(&freqs).count;
     size_t i = 0;
-    for (Word const *w = begin(map); w != end(map) && i < cap;
-         w = next(map, w), ++i)
+    for (CCC_Handle_index iter = begin(map); iter != end(map) && i < cap;
+         iter = next(map, iter), ++i)
     {
+        Word const *const w = handle_adaptive_map_at(map, iter);
         Word const *const pushed = buffer_push_back(&freqs, w);
         check(pushed);
     }

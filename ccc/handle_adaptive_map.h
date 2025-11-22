@@ -840,7 +840,7 @@ for (struct Val *i = range_begin(&range);
 
 This avoids any possible errors in handling an end range element that is in the
 map versus the end map sentinel. */
-[[nodiscard]] CCC_Range
+[[nodiscard]] CCC_Handle_range
 CCC_handle_adaptive_map_equal_range(CCC_Handle_adaptive_map *map,
                                     void const *begin_key, void const *end_key);
 
@@ -853,7 +853,7 @@ range.
 enclosing scope. This reference is always be valid. */
 #define CCC_handle_adaptive_map_equal_range_wrap(                              \
     map_pointer, begin_and_end_key_pointers...)                                \
-    &(CCC_Range)                                                               \
+    &(CCC_Handle_range)                                                        \
     {                                                                          \
         CCC_handle_adaptive_map_equal_range(map_pointer,                       \
                                             begin_and_end_key_pointers)        \
@@ -883,7 +883,7 @@ for (struct Val *i = range_reverse_begin(&range_reverse);
 
 This avoids any possible errors in handling an reverse_end range_reverse element
 that is in the map versus the end map sentinel. */
-[[nodiscard]] CCC_Range_reverse
+[[nodiscard]] CCC_Handle_range_reverse
 CCC_handle_adaptive_map_equal_range_reverse(CCC_Handle_adaptive_map *map,
                                             void const *reverse_begin_key,
                                             void const *reverse_end_key);
@@ -897,7 +897,7 @@ reverse_begin and reverse_end of the range.
 with the enclosing scope. This reference is always valid. */
 #define CCC_handle_adaptive_map_equal_range_reverse_wrap(                      \
     map_pointer, reverse_begin_and_reverse_end_key_pointers...)                \
-    &(CCC_Range_reverse)                                                       \
+    &(CCC_Handle_range_reverse)                                                \
     {                                                                          \
         CCC_handle_adaptive_map_equal_range_reverse(                           \
             map_pointer, reverse_begin_and_reverse_end_key_pointers)           \
@@ -908,23 +908,23 @@ with the enclosing scope. This reference is always valid. */
 O(lg N).
 @param[in] map a pointer to the map.
 @return the oldest minimum element of the map. */
-[[nodiscard]] void *
+[[nodiscard]] CCC_Handle_index
 CCC_handle_adaptive_map_begin(CCC_Handle_adaptive_map const *map);
 
 /** @brief Return the start of a reverse inorder traversal of the map.
 Amortized O(lg N).
 @param[in] map a pointer to the map.
 @return the oldest maximum element of the map. */
-[[nodiscard]] void *
+[[nodiscard]] CCC_Handle_index
 CCC_handle_adaptive_map_reverse_begin(CCC_Handle_adaptive_map const *map);
 
 /** @brief Return the next element in an inorder traversal of the map. O(1).
 @param[in] map a pointer to the map.
 @param[in] iterator pointer to the current iterator user type.
 @return the next user type stored in the map in an inorder traversal. */
-[[nodiscard]] void *
+[[nodiscard]] CCC_Handle_index
 CCC_handle_adaptive_map_next(CCC_Handle_adaptive_map const *map,
-                             void const *iterator);
+                             CCC_Handle_index iterator);
 
 /** @brief Return the reverse_next element in a reverse inorder traversal of the
 map. O(1).
@@ -932,21 +932,21 @@ map. O(1).
 @param[in] iterator pointer to the current iterator user type.
 @return the reverse_next user type stored in the map in a reverse inorder
 traversal. */
-[[nodiscard]] void *
+[[nodiscard]] CCC_Handle_index
 CCC_handle_adaptive_map_reverse_next(CCC_Handle_adaptive_map const *map,
-                                     void const *iterator);
+                                     CCC_Handle_index iterator);
 
 /** @brief Return the end of an inorder traversal of the map. O(1).
 @param[in] map a pointer to the map.
 @return the newest maximum element of the map. */
-[[nodiscard]] void *
+[[nodiscard]] CCC_Handle_index
 CCC_handle_adaptive_map_end(CCC_Handle_adaptive_map const *map);
 
 /** @brief Return the reverse_end of a reverse inorder traversal of the map.
 O(1).
 @param[in] map a pointer to the map.
 @return the newest minimum element of the map. */
-[[nodiscard]] void *
+[[nodiscard]] CCC_Handle_index
 CCC_handle_adaptive_map_reverse_end(CCC_Handle_adaptive_map const *map);
 
 /**@}*/

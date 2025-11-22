@@ -14,23 +14,24 @@
 #include "traits.h"
 #include "types.h"
 
-check_static_begin(check_range,
-                   Handle_adaptive_map const *const handle_adaptive_map,
-                   Range const *const r, size_t const n,
+check_static_begin(check_range, Handle_adaptive_map const *const map,
+                   Handle_range const *const r, size_t const n,
                    int const expect_range[])
 {
     size_t index = 0;
-    struct Val *iterator = range_begin(r);
-    for (; iterator != range_end(r) && index < n;
-         iterator = next(handle_adaptive_map, iterator), ++index)
+    CCC_Handle_index iterator = handle_range_begin(r);
+    for (; iterator != handle_range_end(r) && index < n;
+         iterator = next(map, iterator), ++index)
     {
-        int const cur_id = iterator->id;
+        struct Val const *const v = handle_adaptive_map_at(map, iterator);
+        int const cur_id = v->id;
         check(expect_range[index], cur_id);
     }
-    check(iterator, range_end(r));
-    if (iterator != end(handle_adaptive_map))
+    check(iterator, handle_range_end(r));
+    if (iterator != end(map))
     {
-        check(((struct Val *)iterator)->id, expect_range[n - 1]);
+        struct Val const *const v = handle_adaptive_map_at(map, iterator);
+        check(v->id, expect_range[n - 1]);
     }
     check_fail_end({
         (void)fprintf(stderr, "%sCHECK: (int[%zu]){", CHECK_GREEN, n);
@@ -41,53 +42,53 @@ check_static_begin(check_range,
         (void)fprintf(stderr, "}\n%s", CHECK_NONE);
         (void)fprintf(stderr, "%sCHECK_ERROR:%s (int[%zu]){", CHECK_RED,
                       CHECK_GREEN, n);
-        iterator = range_begin(r);
-        for (size_t j = 0; j < n && iterator != range_end(r);
-             ++j, iterator = next(handle_adaptive_map, iterator))
+        iterator = handle_range_begin(r);
+        for (size_t j = 0; j < n && iterator != handle_range_end(r);
+             ++j, iterator = next(map, iterator))
         {
-            if (iterator == end(handle_adaptive_map) || !iterator)
+            struct Val const *const v = handle_adaptive_map_at(map, iterator);
+            if (iterator == end(map) || !iterator)
             {
                 return CHECK_STATUS;
             }
-            if (expect_range[j] == iterator->id)
+            if (expect_range[j] == v->id)
             {
                 (void)fprintf(stderr, "%s%d, %s", CHECK_GREEN, expect_range[j],
                               CHECK_NONE);
             }
             else
             {
-                (void)fprintf(stderr, "%s%d, %s", CHECK_RED, iterator->id,
-                              CHECK_NONE);
+                (void)fprintf(stderr, "%s%d, %s", CHECK_RED, v->id, CHECK_NONE);
             }
         }
-        for (; iterator != range_end(r);
-             iterator = next(handle_adaptive_map, iterator))
+        for (; iterator != handle_range_end(r); iterator = next(map, iterator))
         {
-            (void)fprintf(stderr, "%s%d, %s", CHECK_RED, iterator->id,
-                          CHECK_NONE);
+            struct Val const *const v = handle_adaptive_map_at(map, iterator);
+            (void)fprintf(stderr, "%s%d, %s", CHECK_RED, v->id, CHECK_NONE);
         }
         (void)fprintf(stderr, "%s}\n%s", CHECK_GREEN, CHECK_NONE);
     });
 }
 
-check_static_begin(check_range_reverse,
-                   Handle_adaptive_map const *const handle_adaptive_map,
-                   Range_reverse const *const r, size_t const n,
+check_static_begin(check_range_reverse, Handle_adaptive_map const *const map,
+                   Handle_range_reverse const *const r, size_t const n,
                    int const expect_range_reverse[])
 {
-    struct Val *iterator = range_reverse_begin(r);
+    CCC_Handle_index iterator = handle_range_reverse_begin(r);
     size_t index = 0;
-    for (; iterator != range_reverse_end(r);
-         iterator = reverse_next(handle_adaptive_map, iterator))
+    for (; iterator != handle_range_reverse_end(r);
+         iterator = reverse_next(map, iterator))
     {
-        int const cur_id = iterator->id;
+        struct Val const *const v = handle_adaptive_map_at(map, iterator);
+        int const cur_id = v->id;
         check(expect_range_reverse[index], cur_id);
         ++index;
     }
-    check(iterator, range_reverse_end(r));
-    if (iterator != reverse_end(handle_adaptive_map))
+    check(iterator, handle_range_reverse_end(r));
+    if (iterator != reverse_end(map))
     {
-        check(((struct Val *)iterator)->id, expect_range_reverse[n - 1]);
+        struct Val const *const v = handle_adaptive_map_at(map, iterator);
+        check(v->id, expect_range_reverse[n - 1]);
     }
     check_fail_end({
         (void)fprintf(stderr, "%sCHECK: (int[%zu]){", CHECK_GREEN, n);
@@ -99,30 +100,30 @@ check_static_begin(check_range_reverse,
         (void)fprintf(stderr, "}\n%s", CHECK_NONE);
         (void)fprintf(stderr, "%sCHECK_ERROR:%s (int[%zu]){", CHECK_RED,
                       CHECK_GREEN, n);
-        iterator = range_reverse_begin(r);
-        for (j = 0; j < n && iterator != range_reverse_end(r);
-             ++j, iterator = reverse_next(handle_adaptive_map, iterator))
+        iterator = handle_range_reverse_begin(r);
+        for (j = 0; j < n && iterator != handle_range_reverse_end(r);
+             ++j, iterator = reverse_next(map, iterator))
         {
-            if (iterator == reverse_end(handle_adaptive_map) || !iterator)
+            struct Val const *const v = handle_adaptive_map_at(map, iterator);
+            if (iterator == reverse_end(map) || !iterator)
             {
                 return CHECK_STATUS;
             }
-            if (expect_range_reverse[j] == iterator->id)
+            if (expect_range_reverse[j] == v->id)
             {
                 (void)fprintf(stderr, "%s%d, %s", CHECK_GREEN,
                               expect_range_reverse[j], CHECK_NONE);
             }
             else
             {
-                (void)fprintf(stderr, "%s%d, %s", CHECK_RED, iterator->id,
-                              CHECK_NONE);
+                (void)fprintf(stderr, "%s%d, %s", CHECK_RED, v->id, CHECK_NONE);
             }
         }
-        for (; iterator != range_reverse_end(r);
-             iterator = reverse_next(handle_adaptive_map, iterator))
+        for (; iterator != handle_range_reverse_end(r);
+             iterator = reverse_next(map, iterator))
         {
-            (void)fprintf(stderr, "%s%d, %s", CHECK_RED, iterator->id,
-                          CHECK_NONE);
+            struct Val const *const v = handle_adaptive_map_at(map, iterator);
+            (void)fprintf(stderr, "%s%d, %s", CHECK_RED, v->id, CHECK_NONE);
         }
         (void)fprintf(stderr, "%s}\n%s", CHECK_GREEN, CHECK_NONE);
     });
@@ -132,14 +133,15 @@ check_static_begin(iterator_check, Handle_adaptive_map *s)
 {
     size_t const size = count(s).count;
     size_t iterator_count = 0;
-    for (struct Val *e = begin(s); e != end(s); e = next(s, e))
+    for (CCC_Handle_index e = begin(s); e != end(s); e = next(s, e))
     {
         ++iterator_count;
         check(iterator_count <= size, true);
     }
     check(iterator_count, size);
     iterator_count = 0;
-    for (struct Val *e = reverse_begin(s); e != end(s); e = reverse_next(s, e))
+    for (CCC_Handle_index e = reverse_begin(s); e != end(s);
+         e = reverse_next(s, e))
     {
         ++iterator_count;
         check(iterator_count <= size, true);
@@ -155,7 +157,7 @@ check_static_begin(handle_adaptive_map_test_forward_iterator)
                                          id_order, NULL, NULL, SMALL_FIXED_CAP);
     /* We should have the expected behavior iteration over empty tree. */
     int j = 0;
-    for (struct Val *e = begin(&s); e != end(&s); e = next(&s, e), ++j)
+    for (CCC_Handle_index e = begin(&s); e != end(&s); e = next(&s, e), ++j)
     {}
     check(j, 0);
     int const num_nodes = 33;
@@ -171,10 +173,11 @@ check_static_begin(handle_adaptive_map_test_forward_iterator)
     int keys_inorder[33];
     check(inorder_fill(keys_inorder, num_nodes, &s), count(&s).count);
     j = 0;
-    for (struct Val *e = begin(&s); e != end(&s) && j < num_nodes;
+    for (CCC_Handle_index e = begin(&s); e != end(&s) && j < num_nodes;
          e = next(&s, e), ++j)
     {
-        check(e->id, keys_inorder[j]);
+        struct Val const *const v = handle_adaptive_map_at(&s, e);
+        check(v->id, keys_inorder[j]);
     }
     check_end();
 }
@@ -198,13 +201,14 @@ check_static_begin(handle_adaptive_map_test_iterate_removal)
     check(iterator_check(&s), CHECK_PASS);
     int const limit = 400;
     size_t cur_node = 0;
-    for (struct Val *i = begin(&s), *next = NULL;
+    for (CCC_Handle_index i = begin(&s), next = 0;
          i != end(&s) && cur_node < num_nodes; i = next, ++cur_node)
     {
         next = next(&s, i);
-        if (i->id > limit)
+        struct Val const *const v = handle_adaptive_map_at(&s, i);
+        if (v->id > limit)
         {
-            (void)remove(&s, &(struct Val){.id = i->id});
+            (void)remove(&s, &(struct Val){.id = v->id});
             check(validate(&s), true);
         }
     }
@@ -231,12 +235,13 @@ check_static_begin(handle_adaptive_map_test_iterate_remove_reinsert)
     size_t const old_size = count(&s).count;
     int const limit = 400;
     int new_unique_handle_id = 1001;
-    for (struct Val *i = begin(&s), *next = NULL; i != end(&s); i = next)
+    for (CCC_Handle_index i = begin(&s), next = 0; i != end(&s); i = next)
     {
         next = next(&s, i);
-        if (i->id < limit)
+        struct Val const *const v = handle_adaptive_map_at(&s, i);
+        if (v->id < limit)
         {
-            struct Val new_val = {.id = i->id};
+            struct Val new_val = {.id = v->id};
             (void)remove(&s, &new_val);
             new_val.id = new_unique_handle_id;
             CCC_Handle e = insert_or_assign(&s, &new_val);
@@ -349,16 +354,28 @@ check_static_begin(handle_adaptive_map_test_empty_range)
     /* Nonexistant range returns end [begin, end) in both positions.
        which may not be the end element but a value in the tree. However,
        Normal iteration patterns would consider this empty. */
-    CCC_Range const forward_range = equal_range(&s, &(int){-50}, &(int){-25});
-    check(((struct Val *)range_begin(&forward_range))->id, 0);
-    check(((struct Val *)range_end(&forward_range))->id, 0);
-    check(range_begin(&forward_range), range_end(&forward_range));
-    CCC_Range_reverse const rev_range
+    CCC_Handle_range const forward_range
+        = equal_range(&s, &(int){-50}, &(int){-25});
+    check(((struct Val *)handle_adaptive_map_at(
+               &s, handle_range_begin(&forward_range)))
+              ->id,
+          0);
+    check(((struct Val *)handle_adaptive_map_at(
+               &s, handle_range_end(&forward_range)))
+              ->id,
+          0);
+    check(handle_range_begin(&forward_range), handle_range_end(&forward_range));
+    CCC_Handle_range_reverse const rev_range
         = equal_range_reverse(&s, &(int){150}, &(int){999});
-    check(range_reverse_begin(&rev_range), range_reverse_end(&rev_range));
-    check(((struct Val *)range_reverse_begin(&rev_range))->id,
+    check(handle_range_reverse_begin(&rev_range),
+          handle_range_reverse_end(&rev_range));
+    check(((struct Val *)handle_adaptive_map_at(
+               &s, handle_range_reverse_begin(&rev_range)))
+              ->id,
           (num_nodes * step) - step);
-    check(((struct Val *)range_reverse_end(&rev_range))->id,
+    check(((struct Val *)handle_adaptive_map_at(
+               &s, handle_range_reverse_end(&rev_range)))
+              ->id,
           (num_nodes * step) - step);
     check_end();
 }

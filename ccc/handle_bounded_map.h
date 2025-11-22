@@ -922,7 +922,7 @@ Note that due to the variety of values that can be returned in the range, using
 the provided range iteration functions from types.h is recommended for example:
 
 ```
-for (struct Val *i = range_begin(&range);
+for (CCC_Handle_index index = range_begin(&range);
      index != range_end(&range);
      index = next(&handle_bounded_map, i))
 {}
@@ -930,7 +930,7 @@ for (struct Val *i = range_begin(&range);
 
 This avoids any possible errors in handling an end range element that is in the
 map versus the end map sentinel. */
-[[nodiscard]] CCC_Range
+[[nodiscard]] CCC_Handle_range
 CCC_handle_bounded_map_equal_range(CCC_Handle_bounded_map const *map,
                                    void const *begin_key, void const *end_key);
 
@@ -942,7 +942,7 @@ the range the second to the end of the range.
 enclosing scope. This reference is always non-NULL. */
 #define CCC_handle_bounded_map_equal_range_wrap(Handle_bounded_map_pointer,    \
                                                 begin_and_end_key_pointers...) \
-    &(CCC_Range)                                                               \
+    &(CCC_Handle_range)                                                        \
     {                                                                          \
         CCC_handle_bounded_map_equal_range((Handle_bounded_map_pointer),       \
                                            (begin_and_end_key_pointers))       \
@@ -972,7 +972,7 @@ for (struct Val *iterator = range_reverse_begin(&range_reverse);
 
 This avoids any possible errors in handling an reverse_end range_reverse element
 that is in the map versus the end map sentinel. */
-[[nodiscard]] CCC_Range_reverse
+[[nodiscard]] CCC_Handle_range_reverse
 CCC_handle_bounded_map_equal_range_reverse(CCC_Handle_bounded_map const *map,
                                            void const *reverse_begin_key,
                                            void const *reverse_end_key);
@@ -986,7 +986,7 @@ to the start of the range_reverse the second to the end of the range_reverse.
 with the enclosing scope. This reference is always non-NULL. */
 #define CCC_handle_bounded_map_equal_range_reverse_wrap(                       \
     Handle_bounded_map_pointer, reverse_begin_and_reverse_end_key_pointers...) \
-    &(CCC_Range_reverse)                                                       \
+    &(CCC_Handle_range_reverse)                                                \
     {                                                                          \
         CCC_handle_bounded_map_equal_range_reverse(                            \
             (Handle_bounded_map_pointer),                                      \
@@ -997,13 +997,13 @@ with the enclosing scope. This reference is always non-NULL. */
 /** @brief Return the start of an inorder traversal of the map. O(lg N).
 @param[in] map a pointer to the map.
 @return the oldest minimum element of the map. */
-[[nodiscard]] void *
+[[nodiscard]] CCC_Handle_index
 CCC_handle_bounded_map_begin(CCC_Handle_bounded_map const *map);
 
 /** @brief Return the start of a reverse inorder traversal of the map. O(lg N).
 @param[in] map a pointer to the map.
 @return the oldest maximum element of the map. */
-[[nodiscard]] void *
+[[nodiscard]] CCC_Handle_index
 CCC_handle_bounded_map_reverse_begin(CCC_Handle_bounded_map const *map);
 
 /** @brief Return the next element in an inorder traversal of the map. O(1).
@@ -1011,9 +1011,9 @@ CCC_handle_bounded_map_reverse_begin(CCC_Handle_bounded_map const *map);
 @param[in] type_iterator a pointer to the intrusive map element of the
 current iterator.
 @return the next user type stored in the map in an inorder traversal. */
-[[nodiscard]] void *
+[[nodiscard]] CCC_Handle_index
 CCC_handle_bounded_map_next(CCC_Handle_bounded_map const *map,
-                            void const *type_iterator);
+                            CCC_Handle_index iterator);
 
 /** @brief Return the reverse_next element in a reverse inorder traversal of the
 map. O(1).
@@ -1022,21 +1022,21 @@ map. O(1).
 current iterator.
 @return the reverse_next user type stored in the map in a reverse inorder
 traversal. */
-[[nodiscard]] void *
+[[nodiscard]] CCC_Handle_index
 CCC_handle_bounded_map_reverse_next(CCC_Handle_bounded_map const *map,
-                                    void const *type_iterator);
+                                    CCC_Handle_index iterator);
 
 /** @brief Return the end of an inorder traversal of the map. O(1).
 @param[in] map a pointer to the map.
 @return the newest maximum element of the map. */
-[[nodiscard]] void *
+[[nodiscard]] CCC_Handle_index
 CCC_handle_bounded_map_end(CCC_Handle_bounded_map const *map);
 
 /** @brief Return the reverse_end of a reverse inorder traversal of the map.
 O(1).
 @param[in] map a pointer to the map.
 @return the newest minimum element of the map. */
-[[nodiscard]] void *
+[[nodiscard]] CCC_Handle_index
 CCC_handle_bounded_map_reverse_end(CCC_Handle_bounded_map const *map);
 
 /**@}*/

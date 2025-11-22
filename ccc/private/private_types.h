@@ -162,4 +162,65 @@ union CCC_Range_reverse_wrap
     struct CCC_Range private;
 };
 
+/** @internal The single type used to handle both forward and reverse iteration
+through containers. The concept is the exact same due to how we always return
+the full user type during iteration, regardless of the container being intrusive
+or not. So we use a union for some clarity for the implementer.
+
+We will also wrap this in two different types so that the user has some help
+ensuring they pass the correct direction range to the correct function. */
+struct CCC_Handle_range
+{
+    union
+    {
+        /** @internal Start of forward iteration for a container. */
+        size_t begin;
+        /** @internal Start of reverse iteration for a container. */
+        size_t reverse_begin;
+    };
+    union
+    {
+        /** @internal End of forward iteration for a container. */
+        size_t end;
+        /** @internal End of reverse iteration for a container. */
+        size_t reverse_end;
+    };
+};
+
+/** @internal A helper type so that we may return ranges by compound literal
+reference to other functions for API consistency. The user interacts with this
+type in the API as follows but we typedef it so they don't care.
+
+```
+CCC_Handle_range *range
+    = &(CCC_Handle_range){function_returns_wrapper(arguments).private};
+```
+
+We can then wrap that returned compound literal reference in a macro. Union is
+used as the wrapping type as a reminder that this type should serve no other
+purpose and add no additional fields. */
+union CCC_Handle_range_wrap
+{
+    /** @internal Helper to return the compound literal reference. */
+    struct CCC_Handle_range private;
+};
+
+/** @internal A helper type so that we may return ranges by compound literal
+reference to other functions for API consistency. The user interacts with this
+type in the API as follows but we typedef it so they don't care.
+
+```
+CCC_Handle_range_reverse *range
+    = &(CCC_Handle_range){function_returns_wrapper(arguments).private};
+```
+
+We can then wrap that returned compound literal reference in a macro. Union is
+used as the wrapping type as a reminder that this type should serve no other
+purpose and add no additional fields. */
+union CCC_Handle_range_reverse_wrap
+{
+    /** @internal Helper to return the compound literal reference. */
+    struct CCC_Handle_range private;
+};
+
 #endif /* CCC_PRIVATE_TYPES_H */

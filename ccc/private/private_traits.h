@@ -689,11 +689,39 @@ limitations under the License.
 
 #define CCC_private_equal_range_wrap(container_pointer,                        \
                                      begin_and_end_key_pointer...)             \
-    &(CCC_Range)                                                               \
-    {                                                                          \
-        CCC_private_equal_range(container_pointer, begin_and_end_key_pointer)  \
-            .private                                                           \
-    }
+    _Generic((container_pointer),                                              \
+        CCC_Adaptive_map *: &(                                                 \
+                 CCC_Range){CCC_adaptive_map_equal_range(                      \
+                                (CCC_Adaptive_map *)(container_pointer),       \
+                                begin_and_end_key_pointer)                     \
+                                .private},                                     \
+        CCC_Bounded_map *: &(                                                  \
+                 CCC_Range){CCC_bounded_map_equal_range(                       \
+                                (CCC_Bounded_map *)(container_pointer),        \
+                                begin_and_end_key_pointer)                     \
+                                .private},                                     \
+        CCC_Bounded_map const *: &(                                            \
+                 CCC_Range){CCC_bounded_map_equal_range(                       \
+                                (CCC_Bounded_map const *)(container_pointer),  \
+                                begin_and_end_key_pointer)                     \
+                                .private},                                     \
+        CCC_Handle_bounded_map *: &(                                           \
+                 CCC_Handle_range){CCC_handle_bounded_map_equal_range(         \
+                                       (CCC_Handle_bounded_map                 \
+                                            *)(container_pointer),             \
+                                       begin_and_end_key_pointer)              \
+                                       .private},                              \
+        CCC_Handle_bounded_map const *: &(                                     \
+                 CCC_Handle_range){CCC_handle_bounded_map_equal_range(         \
+                                       (CCC_Handle_bounded_map const           \
+                                            *)(container_pointer),             \
+                                       begin_and_end_key_pointer)              \
+                                       .private},                              \
+        CCC_Handle_adaptive_map *: &(CCC_Handle_range){                        \
+            CCC_handle_adaptive_map_equal_range(                               \
+                (CCC_Handle_adaptive_map *)(container_pointer),                \
+                begin_and_end_key_pointer)                                     \
+                .private})
 
 #define CCC_private_equal_range_reverse(                                       \
     container_pointer, reverse_begin_and_reverse_end_key_pointer...)           \
@@ -708,14 +736,90 @@ limitations under the License.
         CCC_Bounded_map const *: CCC_bounded_map_equal_range_reverse)(         \
         (container_pointer), reverse_begin_and_reverse_end_key_pointer)
 
-#define CCC_private_equal_range_reverse_wrap(                                  \
-    container_pointer, reverse_begin_and_reverse_end_key_pointer...)           \
-    &(CCC_Range_reverse)                                                       \
-    {                                                                          \
-        CCC_private_equal_range_reverse(                                       \
-            container_pointer, reverse_begin_and_reverse_end_key_pointer)      \
-            .private                                                           \
-    }
+#define CCC_private_equal_range_reverse_wrap(container_pointer,                   \
+                                             begin_and_end_key_pointer...)        \
+    _Generic(                                                                     \
+        (container_pointer),                                                      \
+        CCC_Adaptive_map *: &(                                                    \
+            CCC_Range_reverse){CCC_adaptive_map_equal_range_reverse(              \
+                                   (CCC_Adaptive_map *)(container_pointer),       \
+                                   begin_and_end_key_pointer)                     \
+                                   .private},                                     \
+        CCC_Bounded_map *: &(                                                     \
+            CCC_Range_reverse){CCC_bounded_map_equal_range_reverse(               \
+                                   (CCC_Bounded_map *)(container_pointer),        \
+                                   begin_and_end_key_pointer)                     \
+                                   .private},                                     \
+        CCC_Bounded_map const *: &(                                               \
+            CCC_Range_reverse){CCC_bounded_map_equal_range_reverse(               \
+                                   (CCC_Bounded_map const                         \
+                                        *)(container_pointer),                    \
+                                   begin_and_end_key_pointer)                     \
+                                   .private},                                     \
+        CCC_Handle_bounded_map *: &(                                              \
+            CCC_Handle_range_reverse){CCC_handle_bounded_map_equal_range_reverse( \
+                                          (CCC_Handle_bounded_map                 \
+                                               *)(container_pointer),             \
+                                          begin_and_end_key_pointer)              \
+                                          .private},                              \
+        CCC_Handle_bounded_map const *: &(                                        \
+            CCC_Handle_range_reverse){CCC_handle_bounded_map_equal_range_reverse( \
+                                          (CCC_Handle_bounded_map const           \
+                                               *)(container_pointer),             \
+                                          begin_and_end_key_pointer)              \
+                                          .private},                              \
+        CCC_Handle_adaptive_map *: &(CCC_Handle_range_reverse){                   \
+            CCC_handle_adaptive_map_equal_range_reverse(                          \
+                (CCC_Handle_adaptive_map *)(container_pointer),                   \
+                begin_and_end_key_pointer)                                        \
+                .private})
+
+/** These generic macros will take precedence over any name shortening the user
+may have requested from the types.h file. The standard range name conflicts
+with these generic selectors. But if the user wants traits we should select
+the appropriate range from the selections. */
+#ifdef range_begin
+#    undef range_begin
+#endif
+#ifdef range_end
+#    undef range_end
+#endif
+#ifdef range_reverse_begin
+#    undef range_reverse_begin
+#endif
+#ifdef range_reverse_end
+#    undef range_reverse_end
+#endif
+
+#define CCC_private_range_begin(range_pointer)                                 \
+    _Generic((range_pointer),                                                  \
+        CCC_Range *: CCC_range_begin,                                          \
+        CCC_Range const *: CCC_range_begin,                                    \
+        CCC_Handle_range *: CCC_handle_range_begin,                            \
+        CCC_Handle_range const *: CCC_handle_range_begin)((range_pointer))
+
+#define CCC_private_range_end(range_pointer)                                   \
+    _Generic((range_pointer),                                                  \
+        CCC_Range *: CCC_range_end,                                            \
+        CCC_Range const *: CCC_range_end,                                      \
+        CCC_Handle_range *: CCC_handle_range_end,                              \
+        CCC_Handle_range const *: CCC_handle_range_end)((range_pointer))
+
+#define CCC_private_range_reverse_begin(range_reverse_pointer)                 \
+    _Generic((range_reverse_pointer),                                          \
+        CCC_Range_reverse *: CCC_range_reverse_begin,                          \
+        CCC_Range_reverse const *: CCC_range_reverse_begin,                    \
+        CCC_Handle_range_reverse *: CCC_handle_range_reverse_begin,            \
+        CCC_Handle_range_reverse const *: CCC_handle_range_reverse_begin)(     \
+        (range_reverse_pointer))
+
+#define CCC_private_range_reverse_end(range_reverse_pointer)                   \
+    _Generic((range_reverse_pointer),                                          \
+        CCC_Range_reverse *: CCC_range_reverse_end,                            \
+        CCC_Range_reverse const *: CCC_range_reverse_end,                      \
+        CCC_Handle_range_reverse *: CCC_handle_range_reverse_end,              \
+        CCC_Handle_range_reverse const *: CCC_handle_range_reverse_end)(       \
+        (range_reverse_pointer))
 
 #define CCC_private_splice(container_pointer, splice_args...)                  \
     _Generic((container_pointer),                                              \
