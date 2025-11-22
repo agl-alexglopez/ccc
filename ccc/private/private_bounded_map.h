@@ -34,8 +34,7 @@ struct CCC_Bounded_map_node
     struct CCC_Bounded_map_node *branch[2];
     /** @internal The parent node needed for iteration and rotation. */
     struct CCC_Bounded_map_node *parent;
-    /** @internal The rank for rank difference calculations 1(odd) or 0(even).
-     */
+    /** @internal The rank parity of a node 1(odd) or 0(even). */
     uint8_t parity;
 };
 
