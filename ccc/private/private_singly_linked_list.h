@@ -35,15 +35,33 @@ struct CCC_Singly_linked_list_node
     struct CCC_Singly_linked_list_node *next;
 };
 
-/** @internal A singly linked list is a good stack based abstraction for push
-and pop to front operations. If the user pre-allocates all the nodes they will
-need in a buffer, and manages the slots, this can be an efficient data
-structure that can avoid annoyances with maintaining contiguity if one were to
-push from the front of a C++ style vector. For a flat container that does
-support O(1) push and pop at the front see the flat double ended queue. However,
-there are some specific abstractions that someone could hack on top of this
-list, either on top of or by hacking on the provided implementation
-(non-blocking linked list, concurrent hash table, etc). */
+/** @internal A singly linked list storing head and tail pointers. The list
+supports O(1) push and pop at the front position.
+
+Sentinel-based lists are common in C++ and other languages, but they are
+problematic in standard C. A sentinel stored inside the list struct requires
+a stable address. However, by default C copies struct by value, and such copies
+would also copy the sentinel node. For example, if the user writes a simple
+helper function that initializes the list with some extra constructor-like
+actions and returns it to the caller a copy occurs. The sentinel next and
+previous pointers would then point into the old stack frame, producing immediate
+undefined behavior once the original struct goes out of scope.
+
+Because C has no constructors, destructors, or move semantics, the API
+cannot prevent users from copying the list structure. Therefore, a sentinel
+embedded in the list cannot be used safely. To ensure correct behavior under
+normal C copy semantics, this implementation uses a NULL head pointer to
+represent an empty list, and performs the required NULL checks when modifying
+nodes.
+
+This design also improves composability in multithreaded programs. Because the
+list does not rely on a static global sentinel either, each thread may create
+its own independent list (e.g., inside a per-thread memory arena or thread
+stack frame) without hidden static state. The user can pass in context upon
+initialization for these more advanced use cases.
+
+Note that the list itself is not thread-safe; external synchronization is still
+required if multiple threads access the same list. */
 struct CCC_Singly_linked_list
 {
     /** @internal The pointer to the current head of the list. */

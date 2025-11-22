@@ -133,25 +133,26 @@ container to allocate memory. */
 is returned if list is NULL or the list is empty. */
 CCC_Result CCC_singly_linked_list_pop_front(CCC_Singly_linked_list *list);
 
-/** @brief Inserts splice element after pos. O(N).
+/** @brief Inserts splice element after the provided position. O(N).
 @param[in] position_list the list to which position belongs.
 @param[in] type_intruder_position the position after which splice will be
 inserted.
 @param[in] splice_list the list to which splice belongs.
 @param[in] type_intruder_splice the element to be moved before pos.
-@return ok if the operations is successful. An input error is provided if any
+@return OK if the operations is successful. An input error is provided if any
 input pointers are NULL.
 
-Note that position_list and splice_singly_linked_list may be the
-same or different lists and the invariants of each or the same list will be
-maintained by the function. */
+Note that position_list and splice_singly_linked_list may be the same or
+different lists and the invariants of each or the same list will be maintained
+by the function. */
 CCC_Result CCC_singly_linked_list_splice(
     CCC_Singly_linked_list *position_list,
     CCC_Singly_linked_list_node *type_intruder_position,
     CCC_Singly_linked_list *splice_list,
     CCC_Singly_linked_list_node *type_intruder_splice);
 
-/** @brief Inserts the `[begin, end)` of spliced elements after pos. `O(N)`.
+/** @brief Inserts the `[begin, end)` of spliced elements after the provided
+position. `O(N)`.
 @param[in] position_list the list to which position belongs.
 @param[in] type_intruder_position the position after which the range will be
 inserted.
@@ -309,14 +310,14 @@ CCC_singly_linked_list_begin(CCC_Singly_linked_list const *list);
 @param[in] list a pointer to the singly linked list.
 @return a pointer to the list node type at the start of the list or NULL if
 empty. */
-[[nodiscard]] void *
+[[nodiscard]] CCC_Singly_linked_list_node *
 CCC_singly_linked_list_node_begin(CCC_Singly_linked_list const *list);
 
-/** @brief Return the list node type at the front of the list. O(1).
+/** @brief Return the list node type before the starting node. O(1).
 @param[in] list a pointer to the singly linked list.
 @return a pointer to the list node type at the start of the list or NULL if
 empty. */
-[[nodiscard]] void *
+[[nodiscard]] CCC_Singly_linked_list_node *
 CCC_singly_linked_list_node_before_begin(CCC_Singly_linked_list const *list);
 
 /** @brief Return the sentinel at the end of the list. Do not access sentinel.

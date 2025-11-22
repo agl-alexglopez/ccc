@@ -64,7 +64,7 @@ stack frame) without hidden static state. The user can pass in context upon
 initialization for these more advanced use cases.
 
 Note that the list itself is not thread-safe; external synchronization is still
-required if multiple threads access the same list instance. */
+required if multiple threads access the same list. */
 struct CCC_Doubly_linked_list
 {
     /** @internal Pointer to the head element or NULL if list empty. */

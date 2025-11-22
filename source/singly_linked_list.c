@@ -291,7 +291,7 @@ CCC_singly_linked_list_begin(CCC_Singly_linked_list const *const list)
     return struct_base(list, list->head);
 }
 
-void *
+CCC_Singly_linked_list_node *
 CCC_singly_linked_list_node_begin(CCC_Singly_linked_list const *const list)
 {
     if (!list)
@@ -301,7 +301,7 @@ CCC_singly_linked_list_node_begin(CCC_Singly_linked_list const *const list)
     return list->head;
 }
 
-void *
+CCC_Singly_linked_list_node *
 CCC_singly_linked_list_node_before_begin(CCC_Singly_linked_list const *const)
 {
     return NULL;
