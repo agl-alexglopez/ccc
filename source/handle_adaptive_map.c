@@ -709,13 +709,10 @@ CCC_handle_adaptive_map_clear(CCC_Handle_adaptive_map *const map,
     {
         return CCC_RESULT_ARGUMENT_ERROR;
     }
-    if (!destroy)
+    if (destroy)
     {
-        map->root = 0;
-        map->count = 1;
-        return CCC_RESULT_OK;
+        delete_nodes(map, destroy);
     }
-    delete_nodes(map, destroy);
     map->count = 1;
     map->root = 0;
     return CCC_RESULT_OK;
@@ -729,21 +726,10 @@ CCC_handle_adaptive_map_clear_and_free(CCC_Handle_adaptive_map *const map,
     {
         return CCC_RESULT_ARGUMENT_ERROR;
     }
-    if (!destroy)
+    if (destroy)
     {
-        map->root = 0;
-        map->count = 0;
-        map->capacity = 0;
-        (void)map->allocate((CCC_Allocator_context){
-            .input = map->data,
-            .bytes = 0,
-            .context = map->context,
-        });
-        map->data = NULL;
-        map->nodes = NULL;
-        return CCC_RESULT_OK;
+        delete_nodes(map, destroy);
     }
-    delete_nodes(map, destroy);
     map->root = 0;
     map->count = 0;
     map->capacity = 0;
@@ -766,20 +752,10 @@ CCC_handle_adaptive_map_clear_and_free_reserve(
     {
         return CCC_RESULT_ARGUMENT_ERROR;
     }
-    if (!destroy)
+    if (destroy)
     {
-        map->root = 0;
-        map->count = 0;
-        map->capacity = 0;
-        (void)allocate((CCC_Allocator_context){
-            .input = map->data,
-            .bytes = 0,
-            .context = map->context,
-        });
-        map->data = NULL;
-        return CCC_RESULT_OK;
+        delete_nodes(map, destroy);
     }
-    delete_nodes(map, destroy);
     map->root = 0;
     map->count = 0;
     map->capacity = 0;
