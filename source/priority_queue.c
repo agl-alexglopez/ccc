@@ -434,7 +434,7 @@ increase_fixup(struct CCC_Priority_queue *const priority_queue,
 static void
 decrease_fixup(struct CCC_Priority_queue *const priority_queue,
                struct CCC_Priority_queue_node *const e,
-               CCC_Type_modifier *const fn, void *context)
+               CCC_Type_modifier *const modify, void *const context)
 {
     if (priority_queue->order == CCC_ORDER_LESSER)
     {
@@ -445,7 +445,7 @@ decrease_fixup(struct CCC_Priority_queue *const priority_queue,
         priority_queue->root = delete_node(priority_queue, e);
         init_node(e);
     }
-    fn((CCC_Type_context){
+    modify((CCC_Type_context){
         .type = struct_base(priority_queue, e),
         .context = context,
     });

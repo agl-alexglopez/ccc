@@ -220,26 +220,30 @@ If an error can be checked and reported to the user in a meaningful way, there s
 Here is an examples from `buffer.h` (may not be in sync with current code).
 
 ```c
-ccc_result
-ccc_buf_alloc(ccc_buffer *const buf, size_t const capacity,
-              ccc_any_alloc_fn *const fn)
+CCC_Result
+ccc_buf_alloc(CCC_Buffer *const buf, size_t const capacity,
+              CCC_Allocator *const allocate)
 {
     if (!buf)
     {
-        return CCC_INPUT_ERR;
+        return CCC_RESULT_ARGUMENT_ERROR;
     }
-    if (!fn)
+    if (!allocate)
     {
-        return CCC_NO_ALLOC;
+        return CCC_RESULT_NO_ALLOCATION_FUNCTION;
     }
-    void *const new_mem = fn(buf->mem_, buf->elem_sz_ * capacity, buf->aux_);
+    void *const new_mem = allocate((CCC_Allocator_context){
+        .input = buf->data,
+        .bytes = buf->sizeof_type * capacity,
+        .context = buf->context,
+    });
     if (capacity && !new_mem)
     {
-        return CCC_MEM_ERR;
+        return CCC_RESULT_ALLOCATOR_ERROR;
     }
-    buf->mem_ = new_mem;
-    buf->capacity_ = capacity;
-    return CCC_OK;
+    buf->data = new_mem;
+    buf->capacity = capacity;
+    return CCC_RESULT_OK;
 }
 ```
 

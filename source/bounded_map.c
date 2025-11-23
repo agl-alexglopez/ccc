@@ -410,16 +410,16 @@ CCC_bounded_map_remove(CCC_Bounded_map *const map,
 }
 
 CCC_Bounded_map_entry *
-CCC_bounded_map_and_modify(CCC_Bounded_map_entry *e, CCC_Type_modifier *fn)
+CCC_bounded_map_and_modify(CCC_Bounded_map_entry *e, CCC_Type_modifier *modify)
 {
     if (!e)
     {
         return NULL;
     }
-    if (fn && e->private.entry.status & CCC_ENTRY_OCCUPIED
+    if (modify && e->private.entry.status & CCC_ENTRY_OCCUPIED
         && e->private.entry.type)
     {
-        fn((CCC_Type_context){
+        modify((CCC_Type_context){
             .type = e->private.entry.type,
             NULL,
         });
@@ -429,16 +429,16 @@ CCC_bounded_map_and_modify(CCC_Bounded_map_entry *e, CCC_Type_modifier *fn)
 
 CCC_Bounded_map_entry *
 CCC_bounded_map_and_modify_context(CCC_Bounded_map_entry *e,
-                                   CCC_Type_modifier *fn, void *context)
+                                   CCC_Type_modifier *modify, void *context)
 {
     if (!e)
     {
         return NULL;
     }
-    if (fn && e->private.entry.status & CCC_ENTRY_OCCUPIED
+    if (modify && e->private.entry.status & CCC_ENTRY_OCCUPIED
         && e->private.entry.type)
     {
-        fn((CCC_Type_context){
+        modify((CCC_Type_context){
             .type = e->private.entry.type,
             context,
         });
@@ -866,9 +866,9 @@ swap(void *const temp, void *const a, void *const b, size_t const sizeof_type)
 static inline CCC_Order
 order(struct CCC_Bounded_map const *const map, void const *const key,
       struct CCC_Bounded_map_node const *const node,
-      CCC_Key_comparator *const fn)
+      CCC_Key_comparator *const compare)
 {
-    return fn((CCC_Key_comparator_context){
+    return compare((CCC_Key_comparator_context){
         .key_left = key,
         .type_right = struct_base(map, node),
         .context = map->context,

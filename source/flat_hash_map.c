@@ -340,7 +340,7 @@ static CCC_Result rehash_resize(struct CCC_Flat_hash_map *, size_t to_add,
                                 CCC_Allocator);
 static CCC_Tribool is_equal(struct CCC_Flat_hash_map const *, void const *key,
                             size_t);
-static uint64_t hash_fn(struct CCC_Flat_hash_map const *, void const *any_key);
+static uint64_t hasher(struct CCC_Flat_hash_map const *, void const *any_key);
 static void *key_at(struct CCC_Flat_hash_map const *, size_t i);
 static void *data_at(struct CCC_Flat_hash_map const *, size_t i);
 static struct CCC_Flat_hash_map_tag *tag_pos(size_t sizeof_type,
@@ -432,7 +432,7 @@ CCC_flat_hash_map_contains(CCC_Flat_hash_map const *const map,
     {
         return CCC_FALSE;
     }
-    return !find_key_or_fail(map, key, hash_fn(map, key)).error;
+    return !find_key_or_fail(map, key, hasher(map, key)).error;
 }
 
 void *
@@ -443,7 +443,7 @@ CCC_flat_hash_map_get_key_value(CCC_Flat_hash_map const *const map,
     {
         return NULL;
     }
-    CCC_Count const i = find_key_or_fail(map, key, hash_fn(map, key));
+    CCC_Count const i = find_key_or_fail(map, key, hasher(map, key));
     if (i.error)
     {
         return NULL;
@@ -646,7 +646,7 @@ CCC_flat_hash_map_remove(CCC_Flat_hash_map *const map, void *const type_output)
         return (CCC_Entry){{.status = CCC_ENTRY_VACANT}};
     }
     void *const key = key_in_slot(map, type_output);
-    CCC_Count const index = find_key_or_fail(map, key, hash_fn(map, key));
+    CCC_Count const index = find_key_or_fail(map, key, hasher(map, key));
     if (index.error)
     {
         return (CCC_Entry){{.status = CCC_ENTRY_VACANT}};
@@ -901,7 +901,7 @@ CCC_flat_hash_map_copy(CCC_Flat_hash_map *const destination,
         while ((tag_i = match_next_one(&full)) != CCC_FLAT_HASH_MAP_GROUP_SIZE)
         {
             tag_i += group_start;
-            uint64_t const hash = hash_fn(source, key_at(source, tag_i));
+            uint64_t const hash = hasher(source, key_at(source, tag_i));
             size_t const new_i = find_slot_or_noreturn(destination, hash);
             tag_set(destination, tag_from(hash), new_i);
             (void)memcpy(data_at(destination, new_i), data_at(source, tag_i),
@@ -976,7 +976,7 @@ CCC_flat_hash_map_validate(CCC_Flat_hash_map const *const map)
             {
                 return CCC_FALSE;
             }
-            if (tag_from(hash_fn(map, data_at(map, i))).v != t.v)
+            if (tag_from(hasher(map, data_at(map, i))).v != t.v)
             {
                 return CCC_FALSE;
             }
@@ -1070,7 +1070,7 @@ flag in the handle field will indicate the error. */
 static struct CCC_Flat_hash_map_entry
 container_entry(struct CCC_Flat_hash_map *const map, void const *const key)
 {
-    uint64_t const hash = hash_fn(map, key);
+    uint64_t const hash = hasher(map, key);
     struct Query const e = find(map, key, hash);
     return (struct CCC_Flat_hash_map_entry){
         .map = (struct CCC_Flat_hash_map *)map,
@@ -1454,7 +1454,7 @@ rehash_in_place(struct CCC_Flat_hash_map *const map)
             }
             for (;;)
             {
-                uint64_t const hash = hash_fn(map, key_at(map, tag_i));
+                uint64_t const hash = hasher(map, key_at(map, tag_i));
                 size_t const new_i = find_slot_or_noreturn(map, hash);
                 struct CCC_Flat_hash_map_tag const hash_tag = tag_from(hash);
                 /* We analyze groups not slots. Do not move the element to
@@ -1546,7 +1546,7 @@ rehash_resize(struct CCC_Flat_hash_map *const map, size_t const to_add,
         while ((tag_i = match_next_one(&full)) != CCC_FLAT_HASH_MAP_GROUP_SIZE)
         {
             tag_i += group_start;
-            uint64_t const hash = hash_fn(map, key_at(map, tag_i));
+            uint64_t const hash = hasher(map, key_at(map, tag_i));
             size_t const new_i = find_slot_or_noreturn(&new_h, hash);
             tag_set(&new_h, tag_from(hash), new_i);
             (void)memcpy(data_at(&new_h, new_i), data_at(map, tag_i),
@@ -1629,7 +1629,7 @@ destory_each(struct CCC_Flat_hash_map *const map,
 }
 
 static inline uint64_t
-hash_fn(struct CCC_Flat_hash_map const *const map, void const *const any_key)
+hasher(struct CCC_Flat_hash_map const *const map, void const *const any_key)
 {
     return map->hash((CCC_Key_context){
         .key = any_key,

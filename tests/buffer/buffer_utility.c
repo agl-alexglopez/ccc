@@ -22,14 +22,14 @@ swap(void *const temp, void *const a, void *const b, size_t const absize)
 fall prey to the O(N^2) worst case runtime more easily. With void and iterators
 it is complicated to select a randomized slot but it would still be possible.*/
 static int *
-partition(Buffer *const b, CCC_Type_comparator *const fn, void *const temp,
+partition(Buffer *const b, CCC_Type_comparator *const compare, void *const temp,
           void *lo, void *hi)
 {
     void *const pivot_val = hi;
     void *i = lo;
     for (void *j = lo; j < hi; j = buffer_next(b, j))
     {
-        CCC_Order const order = fn((CCC_Type_comparator_context){
+        CCC_Order const order = compare((CCC_Type_comparator_context){
             .type_left = j,
             .type_right = pivot_val,
             .context = b->context,

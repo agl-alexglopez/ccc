@@ -1096,7 +1096,7 @@ is_subset_of(struct CCC_Bitset const *const set,
 
 static CCC_Result
 maybe_resize(struct CCC_Bitset *const bitset, size_t const to_add,
-             CCC_Allocator *const fn)
+             CCC_Allocator *const allocate)
 {
     size_t bits_needed = bitset->count + to_add;
     if (bits_needed < bitset->count)
@@ -1107,7 +1107,7 @@ maybe_resize(struct CCC_Bitset *const bitset, size_t const to_add,
     {
         return CCC_RESULT_OK;
     }
-    if (!fn)
+    if (!allocate)
     {
         return CCC_RESULT_NO_ALLOCATION_FUNCTION;
     }
@@ -1123,7 +1123,7 @@ maybe_resize(struct CCC_Bitset *const bitset, size_t const to_add,
         = block_count(bits_needed - bitset->count) * SIZEOF_BLOCK;
     size_t const old_bytes
         = bitset->count ? block_count(bitset->count) * SIZEOF_BLOCK : 0;
-    Bitblock *const new_data = fn((CCC_Allocator_context){
+    Bitblock *const new_data = allocate((CCC_Allocator_context){
         .input = bitset->blocks,
         .bytes = block_count(bits_needed) * SIZEOF_BLOCK,
         .context = bitset->context,

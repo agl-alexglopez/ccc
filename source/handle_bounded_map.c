@@ -1185,9 +1185,9 @@ delete_nodes(struct CCC_Handle_bounded_map *const map,
 static inline CCC_Order
 order_nodes(struct CCC_Handle_bounded_map const *const map,
             void const *const key, size_t const node,
-            CCC_Key_comparator *const fn)
+            CCC_Key_comparator *const compare)
 {
-    return fn((CCC_Key_comparator_context){
+    return compare((CCC_Key_comparator_context){
         .key_left = key,
         .type_right = data_at(map, node),
         .context = map->context,
