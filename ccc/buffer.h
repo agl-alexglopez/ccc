@@ -738,6 +738,8 @@ dropped with this directive if one is sure no namespace collisions occur. */
 #ifdef BUFFER_USING_NAMESPACE_CCC
 typedef CCC_Buffer Buffer;
 #    define buffer_initialize(args...) CCC_buffer_initialize(args)
+#    define buffer_with_capacity(args...) CCC_buffer_with_capacity(args)
+#    define buffer_from(args...) CCC_buffer_from(args)
 #    define buffer_allocate(args...) CCC_buffer_allocate(args)
 #    define buffer_reserve(args...) CCC_buffer_reserve(args)
 #    define buffer_copy(args...) CCC_buffer_copy(args)
