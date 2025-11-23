@@ -1429,7 +1429,15 @@ is_free_list_valid(struct CCC_Handle_adaptive_map const *const map)
         cur_free_index = node_at(map, cur_free_index)->next_free;
         ++list_count;
     }
-    return (list_count + map->count == map->capacity);
+    if (cur_free_index)
+    {
+        return CCC_FALSE;
+    }
+    if (list_count + map->count != map->capacity)
+    {
+        return CCC_FALSE;
+    }
+    return CCC_TRUE;
 }
 
 static CCC_Tribool
