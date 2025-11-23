@@ -76,8 +76,7 @@ Initialize the container with memory, callbacks, and permissions. */
 
 /** @brief Initializes the bounded map at runtime or compile time.
 @param[in] type_name the user type wrapping the intrusive element.
-@param[in] type_intruder_field_name the name of the intrusive map elem
-field.
+@param[in] type_intruder_field_name the name of the intrusive map elem field.
 @param[in] type_intruder_key_field_name the name of the field in user type used
 as key.
 @param[in] compare the key comparison function (see types.h).
@@ -85,8 +84,7 @@ as key.
 @param[in] context_data a pointer to any context data for comparison or
 destruction.
 @return the struct initialized bounded map for direct assignment
-(i.e. CCC_Bounded_map m = CCC_bounded_map_initialize(...);).
-*/
+(i.e. CCC_Bounded_map m = CCC_bounded_map_initialize(...);). */
 #define CCC_bounded_map_initialize(type_name, type_intruder_field_name,        \
                                    type_intruder_key_field_name, compare,      \
                                    allocate, context_data)                     \
@@ -94,6 +92,24 @@ destruction.
                                        type_intruder_key_field_name, compare,  \
                                        allocate, context_data)
 
+/** @brief Initializes a dynamic bounded map at runtime.
+@param[in] type_intruder_field_name the name of the intrusive map elem field.
+@param[in] type_intruder_key_field_name the name of the field in user type used
+as key.
+@param[in] compare the key comparison function (see types.h).
+@param[in] allocate the allocation function or NULL if allocation is banned.
+@param[in] destroy the destructor function used to act on every node in case
+initialization of new nodes fails and map is emptied in a failure state.
+@param[in] context_data a pointer to any context data for comparison or
+destruction.
+@return the struct initialized bounded map for direct assignment
+(e.g. CCC_Bounded_map m = CCC_bounded_map_from(...);) or an empty map if
+allocation fails.
+
+@warning If any node allocation fails while copying in the values in the
+compound literal array of user types, the map is cleared; if a destructor is
+provided, it is called on each node and they are freed using the provided
+allocate function. */
 #define CCC_bounded_map_from(type_intruder_field_name, type_key_field_name,    \
                              compare, allocate, destroy, context_data,         \
                              compound_literal_array...)                        \
