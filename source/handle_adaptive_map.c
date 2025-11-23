@@ -140,8 +140,8 @@ static size_t node_bytes(size_t capacity);
 static struct CCC_Handle_adaptive_map_node *
 node_pos(size_t sizeof_type, void const *data, size_t capacity);
 static size_t find(struct CCC_Handle_adaptive_map *, void const *key);
-static size_t connect_new_root(struct CCC_Handle_adaptive_map *,
-                               size_t new_root, CCC_Order order_result);
+static void connect_new_root(struct CCC_Handle_adaptive_map *, size_t new_root,
+                             CCC_Order order_result);
 static void insert(struct CCC_Handle_adaptive_map *, size_t n);
 static void *key_in_slot(struct CCC_Handle_adaptive_map const *,
                          void const *user_struct);
@@ -975,7 +975,19 @@ insert(struct CCC_Handle_adaptive_map *const map, size_t const n)
     {
         return;
     }
-    (void)connect_new_root(map, n, root_order);
+    connect_new_root(map, n, root_order);
+}
+
+static void
+connect_new_root(struct CCC_Handle_adaptive_map *const map,
+                 size_t const new_root, CCC_Order const order_result)
+{
+    enum Branch const dir = CCC_ORDER_GREATER == order_result;
+    link(map, new_root, dir, branch_index(map, map->root, dir));
+    link(map, new_root, !dir, map->root);
+    *branch_pointer(map, map->root, dir) = 0;
+    map->root = new_root;
+    *parent_pointer(map, map->root) = 0;
 }
 
 static size_t
@@ -985,14 +997,13 @@ erase(struct CCC_Handle_adaptive_map *const map, void const *const key)
     {
         return 0;
     }
-    size_t ret = splay(map, map->root, key, map->order);
+    size_t const ret = splay(map, map->root, key, map->order);
     CCC_Order const found = order_nodes(map, key, ret, map->order);
     if (found != CCC_ORDER_EQUAL)
     {
         return 0;
     }
-    ret = remove_from_tree(map, ret);
-    return ret;
+    return remove_from_tree(map, ret);
 }
 
 static size_t
@@ -1001,7 +1012,7 @@ remove_from_tree(struct CCC_Handle_adaptive_map *const map, size_t const ret)
     if (!branch_index(map, ret, L))
     {
         map->root = branch_index(map, ret, R);
-        link(map, 0, 0, map->root);
+        *parent_pointer(map, map->root) = 0;
     }
     else
     {
@@ -1013,20 +1024,6 @@ remove_from_tree(struct CCC_Handle_adaptive_map *const map, size_t const ret)
     map->free_list = ret;
     --map->count;
     return ret;
-}
-
-static size_t
-connect_new_root(struct CCC_Handle_adaptive_map *const map,
-                 size_t const new_root, CCC_Order const order_result)
-{
-    enum Branch const dir = CCC_ORDER_GREATER == order_result;
-    link(map, new_root, dir, branch_index(map, map->root, dir));
-    link(map, new_root, !dir, map->root);
-    *branch_pointer(map, map->root, dir) = 0;
-    map->root = new_root;
-    /* The direction from end node is arbitrary. Need root to update parent. */
-    link(map, 0, 0, map->root);
-    return new_root;
 }
 
 static size_t

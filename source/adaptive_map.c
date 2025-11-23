@@ -877,7 +877,10 @@ remove_from_tree(struct CCC_Adaptive_map *const t,
     if (ret->branch[L] == NULL)
     {
         t->root = ret->branch[R];
-        link(NULL, 0, t->root);
+        if (t->root)
+        {
+            t->root->parent = NULL;
+        }
     }
     else
     {
