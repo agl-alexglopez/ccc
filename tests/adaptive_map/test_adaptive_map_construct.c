@@ -8,6 +8,7 @@
 #include "checkers.h"
 #include "traits.h"
 #include "types.h"
+#include "utility/allocate.h"
 
 static CCC_Adaptive_map
 construct_empty(void)
@@ -43,8 +44,58 @@ check_static_begin(adaptive_map_test_construct)
     check(CCC_adaptive_map_count(&map).count, 1);
     check_end();
 }
+
+check_static_begin(adaptive_map_test_construct_from)
+{
+    CCC_Adaptive_map map
+        = CCC_adaptive_map_from(elem, key, id_order, std_allocate, NULL, NULL,
+                                (struct Val[]){
+                                    {.key = 0, .val = 0},
+                                    {.key = 1, .val = 1},
+                                    {.key = 2, .val = 2},
+                                });
+    check(CCC_adaptive_map_validate(&map), true);
+    check(CCC_adaptive_map_count(&map).count, 3);
+    check_end();
+}
+
+check_static_begin(adaptive_map_test_construct_from_overwrite)
+{
+    CCC_Adaptive_map map
+        = CCC_adaptive_map_from(elem, key, id_order, std_allocate, NULL, NULL,
+                                (struct Val[]){
+                                    {.key = 0, .val = 0},
+                                    {.key = 1, .val = 1},
+                                    {.key = 1, .val = 2},
+                                });
+    check(CCC_adaptive_map_validate(&map), true);
+    check(CCC_adaptive_map_count(&map).count, 2);
+    struct Val const *const v = CCC_adaptive_map_reverse_begin(&map);
+    check(v != NULL, true);
+    check(v->key, 1);
+    check(v->val, 2);
+    check_end();
+}
+
+check_static_begin(adaptive_map_test_construct_from_fail)
+{
+    CCC_Adaptive_map map
+        = CCC_adaptive_map_from(elem, key, id_order, NULL, NULL, NULL,
+                                (struct Val[]){
+                                    {.key = 0, .val = 0},
+                                    {.key = 1, .val = 1},
+                                    {.key = 2, .val = 2},
+                                });
+    check(CCC_adaptive_map_validate(&map), true);
+    check(CCC_adaptive_map_is_empty(&map), true);
+    check_end();
+}
+
 int
 main()
 {
-    return check_run(adaptive_map_test_empty(), adaptive_map_test_construct());
+    return check_run(adaptive_map_test_empty(), adaptive_map_test_construct(),
+                     adaptive_map_test_construct_from(),
+                     adaptive_map_test_construct_from_overwrite(),
+                     adaptive_map_test_construct_from_fail());
 }

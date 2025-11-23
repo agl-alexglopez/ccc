@@ -93,6 +93,31 @@ Initialize the container with memory, callbacks, and permissions. */
                                         key_node_field, key_order, allocate,   \
                                         context)
 
+/** @brief Initializes a dynamic adaptive map at runtime.
+@param[in] type_intruder_field_name the name of the intrusive map elem field.
+@param[in] type_intruder_key_field_name the name of the field in user type used
+as key.
+@param[in] compare the key comparison function (see types.h).
+@param[in] allocate the allocation function or NULL if allocation is banned.
+@param[in] destroy the destructor function used to act on every node in case
+initialization of new nodes fails and map is emptied in a failure state.
+@param[in] context_data a pointer to any context data for comparison or
+destruction.
+@return the struct initialized adaptive map for direct assignment
+(e.g. CCC_Adaptive_map m = CCC_adaptive_map_from(...);) or an empty map if
+allocation fails.
+
+@warning If any node allocation fails while copying in the values in the
+compound literal array of user types, the map is cleared; if a destructor is
+provided, it is called on each node and they are freed using the provided
+allocate function. */
+#define CCC_adaptive_map_from(type_intruder_field_name, type_key_field_name,   \
+                              compare, allocate, destroy, context_data,        \
+                              compound_literal_array...)                       \
+    CCC_private_adaptive_map_from(                                             \
+        type_intruder_field_name, type_key_field_name, compare, allocate,      \
+        destroy, context_data, compound_literal_array)
+
 /**@}*/
 
 /**@name Membership Interface
@@ -697,6 +722,7 @@ typedef CCC_Adaptive_map_node Adaptive_map_node;
 typedef CCC_Adaptive_map Adaptive_map;
 typedef CCC_Adaptive_map_entry Adaptive_map_entry;
 #    define adaptive_map_initialize(args...) CCC_adaptive_map_initialize(args)
+#    define adaptive_map_from(args...) CCC_adaptive_map_from(args)
 #    define adaptive_map_and_modify_with(args...)                              \
         CCC_adaptive_map_and_modify_with(args)
 #    define adaptive_map_or_insert_with(args...)                               \

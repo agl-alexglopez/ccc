@@ -604,10 +604,9 @@ CCC_private_adaptive_map_key_in_slot(struct CCC_Adaptive_map const *const t,
 }
 
 struct CCC_Adaptive_map_node *
-CCC_private_Adaptive_map_node_in_slot(struct CCC_Adaptive_map const *const t,
+CCC_private_adaptive_map_node_in_slot(struct CCC_Adaptive_map const *const t,
                                       void const *slot)
 {
-
     return elem_in_slot(t, slot);
 }
 
@@ -842,12 +841,12 @@ connect_new_root(struct CCC_Adaptive_map *const t,
                  struct CCC_Adaptive_map_node *const new_root,
                  CCC_Order const order_result)
 {
+    assert(new_root);
     enum Link const dir = CCC_ORDER_GREATER == order_result;
     link(new_root, dir, t->root->branch[dir]);
     link(new_root, !dir, t->root);
     t->root->branch[dir] = NULL;
     t->root = new_root;
-    /* The direction from end node is arbitrary. Need root to update parent. */
     t->root->parent = NULL;
     return struct_base(t, new_root);
 }
@@ -888,49 +887,78 @@ remove_from_tree(struct CCC_Adaptive_map *const t,
     return ret;
 }
 
+/** Adopts D. Sleator technique for splaying. Notable to this method is the
+general improvement to the tree that occurs because we always splay the key
+to the root, OR the next closest value to the key to the root. This has
+interesting performance implications for real data sets.
+
+This implementation has been modified to unite the left and right symmetries
+and manage the parent pointers. Parent pointers are not usual for splay trees
+but are necessary for a clean iteration API. */
 static struct CCC_Adaptive_map_node *
 splay(struct CCC_Adaptive_map *const t, struct CCC_Adaptive_map_node *root,
       void const *const key, CCC_Key_comparator *const order_fn)
 {
+    assert(root);
     /* Splaying brings the key element up to the root. The zigzag fixes of
        splaying repair the tree and we remember the roots of these changes in
-       this helper tree. At the end, we make the root pick up these modified
-       left and right helper. The nil node should NULL initialized to start. */
+       this helper tree. At the end, make the root pick up these modified left
+       and right helpers. The nil node should NULL initialized to start. */
     struct CCC_Adaptive_map_node nil = {};
     struct CCC_Adaptive_map_node *left_right_subtrees[LR] = {&nil, &nil};
     for (;;)
     {
         CCC_Order const root_order = order(t, key, root, order_fn);
         enum Link const order_link = CCC_ORDER_GREATER == root_order;
-        if (CCC_ORDER_EQUAL == root_order || root->branch[order_link] == NULL)
+        struct CCC_Adaptive_map_node *const child = root->branch[order_link];
+        if (CCC_ORDER_EQUAL == root_order || child == NULL)
         {
             break;
         }
-        CCC_Order const child_order
-            = order(t, key, root->branch[order_link], order_fn);
-        enum Link const dir_from_child = CCC_ORDER_GREATER == child_order;
-        /* A straight line has formed from root->child->elem. An opportunity
+        CCC_Order const child_order = order(t, key, child, order_fn);
+        enum Link const child_order_link = CCC_ORDER_GREATER == child_order;
+        /* A straight line would form from root->child->key. An opportunity
            to splay and heal the tree arises. */
-        if (CCC_ORDER_EQUAL != child_order && order_link == dir_from_child)
+        if (CCC_ORDER_EQUAL != child_order && order_link == child_order_link)
         {
-            struct CCC_Adaptive_map_node *const pivot
-                = root->branch[order_link];
-            link(root, order_link, pivot->branch[!order_link]);
-            link(pivot, !order_link, root);
-            root = pivot;
+            root->branch[order_link] = child->branch[!order_link];
+            if (child->branch[!order_link])
+            {
+                child->branch[!order_link]->parent = root;
+            }
+            child->branch[!order_link] = root;
+            root->parent = child;
+            root = child;
             if (root->branch[order_link] == NULL)
             {
                 break;
             }
         }
-        link(left_right_subtrees[!order_link], order_link, root);
+        left_right_subtrees[!order_link]->branch[order_link] = root;
+        root->parent = left_right_subtrees[!order_link];
         left_right_subtrees[!order_link] = root;
         root = root->branch[order_link];
     }
-    link(left_right_subtrees[L], R, root->branch[L]);
-    link(left_right_subtrees[R], L, root->branch[R]);
-    link(root, L, nil.branch[R]);
-    link(root, R, nil.branch[L]);
+    left_right_subtrees[L]->branch[R] = root->branch[L];
+    if (left_right_subtrees[L] != &nil && root->branch[L])
+    {
+        root->branch[L]->parent = left_right_subtrees[L];
+    }
+    left_right_subtrees[R]->branch[L] = root->branch[R];
+    if (left_right_subtrees[R] != &nil && root->branch[R])
+    {
+        root->branch[R]->parent = left_right_subtrees[R];
+    }
+    root->branch[L] = nil.branch[R];
+    if (nil.branch[R])
+    {
+        nil.branch[R]->parent = root;
+    }
+    root->branch[R] = nil.branch[L];
+    if (nil.branch[L])
+    {
+        nil.branch[L]->parent = root;
+    }
     root->parent = NULL;
     t->root = root;
     return root;

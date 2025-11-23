@@ -131,6 +131,7 @@ void *CCC_private_bounded_map_insert(
         .context = (private_context_data),                                     \
     }
 
+/** @internal */
 #define CCC_private_bounded_map_from(                                          \
     private_type_intruder_field_name, private_key_field_name, private_compare, \
     private_allocate, private_destroy, private_context_data,                   \

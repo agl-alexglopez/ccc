@@ -168,9 +168,10 @@ static size_t branch_index(struct CCC_Handle_adaptive_map const *,
 static size_t parent_index(struct CCC_Handle_adaptive_map const *,
                            size_t child);
 /* Returning references to index fields for tree nodes. */
-static size_t *branch_ref(struct CCC_Handle_adaptive_map const *, size_t node,
-                          enum Branch branch);
-static size_t *parent_ref(struct CCC_Handle_adaptive_map const *, size_t node);
+static size_t *branch_pointer(struct CCC_Handle_adaptive_map const *,
+                              size_t node, enum Branch branch);
+static size_t *parent_pointer(struct CCC_Handle_adaptive_map const *,
+                              size_t node);
 
 static CCC_Tribool validate(struct CCC_Handle_adaptive_map const *);
 
@@ -1021,7 +1022,7 @@ connect_new_root(struct CCC_Handle_adaptive_map *const map,
     enum Branch const dir = CCC_ORDER_GREATER == order_result;
     link(map, new_root, dir, branch_index(map, map->root, dir));
     link(map, new_root, !dir, map->root);
-    *branch_ref(map, map->root, dir) = 0;
+    *branch_pointer(map, map->root, dir) = 0;
     map->root = new_root;
     /* The direction from end node is arbitrary. Need root to update parent. */
     link(map, 0, 0, map->root);
@@ -1041,52 +1042,60 @@ find(struct CCC_Handle_adaptive_map *const map, void const *const key)
              : 0;
 }
 
+/** Adopts D. Sleator technique for splaying. Notable to this method is the
+general improvement to the tree that occurs because we always splay the key
+to the root, OR the next closest value to the key to the root. This has
+interesting performance implications for real data sets.
+
+This implementation has been modified to unite the left and right symmetries
+and manage the parent pointers. Parent pointers are not usual for splay trees
+but are necessary for a clean iteration API. */
 static size_t
 splay(struct CCC_Handle_adaptive_map *const map, size_t root,
       void const *const key, CCC_Key_comparator *const compare)
 {
-    /* Pointers in an array and we can use the symmetric enum and flip it to
-       choose the Left or Right subtree. Another benefit of our nil node: use it
-       as our helper tree because we don't need its Left Right fields. */
+    assert(root);
+    /* Splaying brings the key element up to the root. The zigzag fixes of
+       splaying repair the tree and we remember the roots of these changes in
+       this helper tree. At the end, make the root pick up these modified left
+       and right helpers. The nil node should NULL initialized to start. */
     struct CCC_Handle_adaptive_map_node *const nil = node_at(map, 0);
     nil->branch[L] = nil->branch[R] = nil->parent = 0;
-    size_t l_r_subtrees[LR] = {0, 0};
+    size_t left_right_subtrees[LR] = {0, 0};
     for (;;)
     {
-        CCC_Order const key_order = order_nodes(map, key, root, compare);
-        enum Branch const child_link = CCC_ORDER_GREATER == key_order;
-        if (CCC_ORDER_EQUAL == key_order
-            || !branch_index(map, root, child_link))
+        CCC_Order const root_order = order_nodes(map, key, root, compare);
+        enum Branch const order_link = CCC_ORDER_GREATER == root_order;
+        size_t const child = branch_index(map, root, order_link);
+        if (CCC_ORDER_EQUAL == root_order || !child)
         {
             break;
         }
         CCC_Order const child_order = order_nodes(
-            map, key, branch_index(map, root, child_link), compare);
-        enum Branch const grandchild_link = CCC_ORDER_GREATER == child_order;
+            map, key, branch_index(map, root, order_link), compare);
+        enum Branch const child_order_link = CCC_ORDER_GREATER == child_order;
         /* A straight line has formed from root->child->grandchild. An
            opportunity to splay and heal the tree arises. */
-        if (CCC_ORDER_EQUAL != child_order && child_link == grandchild_link)
+        if (CCC_ORDER_EQUAL != child_order && order_link == child_order_link)
         {
-            size_t const child_node = branch_index(map, root, child_link);
-            link(map, root, child_link,
-                 branch_index(map, child_node, !child_link));
-            link(map, child_node, !child_link, root);
-            root = child_node;
-            if (!branch_index(map, root, child_link))
+            link(map, root, order_link, branch_index(map, child, !order_link));
+            link(map, child, !order_link, root);
+            root = child;
+            if (!branch_index(map, root, order_link))
             {
                 break;
             }
         }
-        link(map, l_r_subtrees[!child_link], child_link, root);
-        l_r_subtrees[!child_link] = root;
-        root = branch_index(map, root, child_link);
+        link(map, left_right_subtrees[!order_link], order_link, root);
+        left_right_subtrees[!order_link] = root;
+        root = branch_index(map, root, order_link);
     }
-    link(map, l_r_subtrees[L], R, branch_index(map, root, L));
-    link(map, l_r_subtrees[R], L, branch_index(map, root, R));
+    link(map, left_right_subtrees[L], R, branch_index(map, root, L));
+    link(map, left_right_subtrees[R], L, branch_index(map, root, R));
     link(map, root, L, nil->branch[R]);
     link(map, root, R, nil->branch[L]);
     map->root = root;
-    link(map, 0, 0, map->root);
+    *parent_pointer(map, map->root) = 0;
     return root;
 }
 
@@ -1096,8 +1105,8 @@ static inline void
 link(struct CCC_Handle_adaptive_map *const map, size_t const parent,
      enum Branch const dir, size_t const subtree)
 {
-    *branch_ref(map, parent, dir) = subtree;
-    *parent_ref(map, subtree) = parent;
+    *branch_pointer(map, parent, dir) = subtree;
+    *parent_pointer(map, subtree) = parent;
 }
 
 static size_t
@@ -1308,14 +1317,15 @@ parent_index(struct CCC_Handle_adaptive_map const *const map,
 }
 
 static inline size_t *
-branch_ref(struct CCC_Handle_adaptive_map const *const map, size_t const node,
-           enum Branch const branch)
+branch_pointer(struct CCC_Handle_adaptive_map const *const map,
+               size_t const node, enum Branch const branch)
 {
     return &node_at(map, node)->branch[branch];
 }
 
 static inline size_t *
-parent_ref(struct CCC_Handle_adaptive_map const *const map, size_t const node)
+parent_pointer(struct CCC_Handle_adaptive_map const *const map,
+               size_t const node)
 {
     return &node_at(map, node)->parent;
 }
