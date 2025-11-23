@@ -81,82 +81,79 @@ struct Query
 /*==============================  Prototypes   ==============================*/
 
 static void init_node(struct CCC_Bounded_map *, struct CCC_Bounded_map_node *);
-static CCC_Order order(struct CCC_Bounded_map const *, void const *key,
-                       struct CCC_Bounded_map_node const *node,
+static CCC_Order order(struct CCC_Bounded_map const *, void const *,
+                       struct CCC_Bounded_map_node const *,
                        CCC_Key_comparator *);
 static void *struct_base(struct CCC_Bounded_map const *,
                          struct CCC_Bounded_map_node const *);
-static struct Query find(struct CCC_Bounded_map const *, void const *key);
-static void swap(void *temp, void *a, void *b, size_t sizeof_type);
+static struct Query find(struct CCC_Bounded_map const *, void const *);
+static void swap(void *, void *, void *, size_t);
 static void *maybe_allocate_insert(struct CCC_Bounded_map *,
-                                   struct CCC_Bounded_map_node *parent,
-                                   CCC_Order last_order,
+                                   struct CCC_Bounded_map_node *, CCC_Order,
                                    struct CCC_Bounded_map_node *);
 static void *remove_fixup(struct CCC_Bounded_map *,
                           struct CCC_Bounded_map_node *);
 static void insert_fixup(struct CCC_Bounded_map *,
-                         struct CCC_Bounded_map_node *z,
-                         struct CCC_Bounded_map_node *x);
-static void transplant(struct CCC_Bounded_map *,
-                       struct CCC_Bounded_map_node *remove,
-                       struct CCC_Bounded_map_node *replacement);
+                         struct CCC_Bounded_map_node *,
+                         struct CCC_Bounded_map_node *);
+static void transplant(struct CCC_Bounded_map *, struct CCC_Bounded_map_node *,
+                       struct CCC_Bounded_map_node *);
 static CCC_Tribool parity(struct CCC_Bounded_map_node const *);
 static void rebalance_3_child(struct CCC_Bounded_map *,
-                              struct CCC_Bounded_map_node *z,
-                              struct CCC_Bounded_map_node *x);
-static CCC_Tribool is_0_child(struct CCC_Bounded_map_node const *p,
-                              struct CCC_Bounded_map_node const *x);
-static CCC_Tribool is_1_child(struct CCC_Bounded_map_node const *p,
-                              struct CCC_Bounded_map_node const *x);
-static CCC_Tribool is_2_child(struct CCC_Bounded_map_node const *p,
-                              struct CCC_Bounded_map_node const *x);
-static CCC_Tribool is_3_child(struct CCC_Bounded_map_node const *p,
-                              struct CCC_Bounded_map_node const *x);
-static CCC_Tribool is_01_parent(struct CCC_Bounded_map_node const *x,
-                                struct CCC_Bounded_map_node const *p,
-                                struct CCC_Bounded_map_node const *y);
-static CCC_Tribool is_11_parent(struct CCC_Bounded_map_node const *x,
-                                struct CCC_Bounded_map_node const *p,
-                                struct CCC_Bounded_map_node const *y);
-static CCC_Tribool is_02_parent(struct CCC_Bounded_map_node const *x,
-                                struct CCC_Bounded_map_node const *p,
-                                struct CCC_Bounded_map_node const *y);
-static CCC_Tribool is_22_parent(struct CCC_Bounded_map_node const *x,
-                                struct CCC_Bounded_map_node const *p,
-                                struct CCC_Bounded_map_node const *y);
-static CCC_Tribool is_leaf(struct CCC_Bounded_map_node const *x);
+                              struct CCC_Bounded_map_node *,
+                              struct CCC_Bounded_map_node *);
+static CCC_Tribool is_0_child(struct CCC_Bounded_map_node const *,
+                              struct CCC_Bounded_map_node const *);
+static CCC_Tribool is_1_child(struct CCC_Bounded_map_node const *,
+                              struct CCC_Bounded_map_node const *);
+static CCC_Tribool is_2_child(struct CCC_Bounded_map_node const *,
+                              struct CCC_Bounded_map_node const *);
+static CCC_Tribool is_3_child(struct CCC_Bounded_map_node const *,
+                              struct CCC_Bounded_map_node const *);
+static CCC_Tribool is_01_parent(struct CCC_Bounded_map_node const *,
+                                struct CCC_Bounded_map_node const *,
+                                struct CCC_Bounded_map_node const *);
+static CCC_Tribool is_11_parent(struct CCC_Bounded_map_node const *,
+                                struct CCC_Bounded_map_node const *,
+                                struct CCC_Bounded_map_node const *);
+static CCC_Tribool is_02_parent(struct CCC_Bounded_map_node const *,
+                                struct CCC_Bounded_map_node const *,
+                                struct CCC_Bounded_map_node const *);
+static CCC_Tribool is_22_parent(struct CCC_Bounded_map_node const *,
+                                struct CCC_Bounded_map_node const *,
+                                struct CCC_Bounded_map_node const *);
+static CCC_Tribool is_leaf(struct CCC_Bounded_map_node const *);
 static struct CCC_Bounded_map_node *
-sibling_of(struct CCC_Bounded_map_node const *x);
-static void promote(struct CCC_Bounded_map_node *x);
-static void demote(struct CCC_Bounded_map_node *x);
-static void double_promote(struct CCC_Bounded_map_node *x);
-static void double_demote(struct CCC_Bounded_map_node *x);
+sibling_of(struct CCC_Bounded_map_node const *);
+static void promote(struct CCC_Bounded_map_node *);
+static void demote(struct CCC_Bounded_map_node *);
+static void double_promote(struct CCC_Bounded_map_node *);
+static void double_demote(struct CCC_Bounded_map_node *);
 
-static void rotate(struct CCC_Bounded_map *map, struct CCC_Bounded_map_node *z,
-                   struct CCC_Bounded_map_node *x,
-                   struct CCC_Bounded_map_node *y, enum Link dir);
-static void double_rotate(struct CCC_Bounded_map *map,
-                          struct CCC_Bounded_map_node *z,
-                          struct CCC_Bounded_map_node *x,
-                          struct CCC_Bounded_map_node *y, enum Link dir);
-static CCC_Tribool validate(struct CCC_Bounded_map const *map);
+static void rotate(struct CCC_Bounded_map *, struct CCC_Bounded_map_node *,
+                   struct CCC_Bounded_map_node *, struct CCC_Bounded_map_node *,
+                   enum Link);
+static void double_rotate(struct CCC_Bounded_map *,
+                          struct CCC_Bounded_map_node *,
+                          struct CCC_Bounded_map_node *,
+                          struct CCC_Bounded_map_node *, enum Link);
+static CCC_Tribool validate(struct CCC_Bounded_map const *);
 static struct CCC_Bounded_map_node *next(struct CCC_Bounded_map const *,
                                          struct CCC_Bounded_map_node const *,
                                          enum Link);
-static struct CCC_Bounded_map_node *
-min_max_from(struct CCC_Bounded_map_node *start, enum Link);
+static struct CCC_Bounded_map_node *min_max_from(struct CCC_Bounded_map_node *,
+                                                 enum Link);
 static struct CCC_Range equal_range(struct CCC_Bounded_map const *,
                                     void const *, void const *, enum Link);
-static struct CCC_Bounded_map_entry entry(struct CCC_Bounded_map const *map,
-                                          void const *key);
-static void *insert(struct CCC_Bounded_map *map,
-                    struct CCC_Bounded_map_node *parent, CCC_Order last_order,
-                    struct CCC_Bounded_map_node *type_output_intruder);
-static void *key_from_node(struct CCC_Bounded_map const *map,
-                           struct CCC_Bounded_map_node const *node);
-static void *key_in_slot(struct CCC_Bounded_map const *map, void const *slot);
-static struct CCC_Bounded_map_node *
-elem_in_slot(struct CCC_Bounded_map const *map, void const *slot);
+static struct CCC_Bounded_map_entry entry(struct CCC_Bounded_map const *,
+                                          void const *);
+static void *insert(struct CCC_Bounded_map *, struct CCC_Bounded_map_node *,
+                    CCC_Order, struct CCC_Bounded_map_node *);
+static void *key_from_node(struct CCC_Bounded_map const *,
+                           struct CCC_Bounded_map_node const *);
+static void *key_in_slot(struct CCC_Bounded_map const *, void const *);
+static struct CCC_Bounded_map_node *elem_in_slot(struct CCC_Bounded_map const *,
+                                                 void const *);
 
 /*==============================  Interface    ==============================*/
 

@@ -191,104 +191,93 @@ static_assert(PARITY_BLOCK_BITS >> PARITY_BLOCK_BITS_LOG2 == 1,
 /*==============================  Prototypes   ==============================*/
 
 /* Returning the user struct type with stored offsets. */
-static void insert(struct CCC_Handle_bounded_map *, size_t parent_i,
-                   CCC_Order last_order, size_t elem_i);
-static CCC_Result resize(struct CCC_Handle_bounded_map *, size_t new_capacity,
+static void insert(struct CCC_Handle_bounded_map *, size_t, CCC_Order, size_t);
+static CCC_Result resize(struct CCC_Handle_bounded_map *, size_t,
                          CCC_Allocator *);
-static void copy_soa(struct CCC_Handle_bounded_map const *source,
-                     void *destination_data_base, size_t destination_capacity);
-static size_t data_bytes(size_t sizeof_type, size_t capacity);
-static size_t node_bytes(size_t capacity);
-static size_t parity_bytes(size_t capacity);
-static struct CCC_Handle_bounded_map_node *
-node_pos(size_t sizeof_type, void const *data, size_t capacity);
-static Parity_block *parity_pos(size_t sizeof_type, void const *data,
-                                size_t capacity);
-static size_t maybe_allocate_insert(struct CCC_Handle_bounded_map *,
-                                    size_t parent, CCC_Order last_order,
-                                    void const *user_type);
-static size_t remove_fixup(struct CCC_Handle_bounded_map *, size_t remove);
+static void copy_soa(struct CCC_Handle_bounded_map const *, void *, size_t);
+static size_t data_bytes(size_t, size_t);
+static size_t node_bytes(size_t);
+static size_t parity_bytes(size_t);
+static struct CCC_Handle_bounded_map_node *node_pos(size_t, void const *,
+                                                    size_t);
+static Parity_block *parity_pos(size_t, void const *, size_t);
+static size_t maybe_allocate_insert(struct CCC_Handle_bounded_map *, size_t,
+                                    CCC_Order, void const *);
+static size_t remove_fixup(struct CCC_Handle_bounded_map *, size_t);
 static size_t allocate_slot(struct CCC_Handle_bounded_map *);
 static void delete_nodes(struct CCC_Handle_bounded_map *,
                          CCC_Type_destructor *);
 /* Returning the user key with stored offsets. */
-static void *key_at(struct CCC_Handle_bounded_map const *, size_t i);
-static void *key_in_slot(struct CCC_Handle_bounded_map const *,
-                         void const *user_struct);
+static void *key_at(struct CCC_Handle_bounded_map const *, size_t);
+static void *key_in_slot(struct CCC_Handle_bounded_map const *, void const *);
 /* Returning the internal elem type with stored offsets. */
 static struct CCC_Handle_bounded_map_node *
 node_at(struct CCC_Handle_bounded_map const *, size_t);
 static void *data_at(struct CCC_Handle_bounded_map const *, size_t);
 /* Returning the internal query helper to aid in handle handling. */
-static struct Query find(struct CCC_Handle_bounded_map const *,
-                         void const *key);
+static struct Query find(struct CCC_Handle_bounded_map const *, void const *);
 /* Returning the handle core to the Handle Interface. */
 static inline struct CCC_Handle_bounded_map_handle
-handle(struct CCC_Handle_bounded_map const *, void const *key);
+handle(struct CCC_Handle_bounded_map const *, void const *);
 /* Returning a generic range that can be use for range or range_reverse. */
 static struct CCC_Handle_range
 equal_range(struct CCC_Handle_bounded_map const *, void const *, void const *,
             enum Link);
 /* Returning threeway comparison with user callback. */
 static CCC_Order order_nodes(struct CCC_Handle_bounded_map const *,
-                             void const *key, size_t node,
-                             CCC_Key_comparator *);
+                             void const *, size_t, CCC_Key_comparator *);
 /* Returning read only indices for tree nodes. */
-static size_t sibling_of(struct CCC_Handle_bounded_map const *, size_t x);
-static size_t next(struct CCC_Handle_bounded_map const *, size_t n,
-                   enum Link traversal);
-static size_t min_max_from(struct CCC_Handle_bounded_map const *, size_t start,
-                           enum Link dir);
-static size_t branch_index(struct CCC_Handle_bounded_map const *, size_t parent,
-                           enum Link dir);
-static size_t parent_index(struct CCC_Handle_bounded_map const *, size_t child);
+static size_t sibling_of(struct CCC_Handle_bounded_map const *, size_t);
+static size_t next(struct CCC_Handle_bounded_map const *, size_t, enum Link);
+static size_t min_max_from(struct CCC_Handle_bounded_map const *, size_t,
+                           enum Link);
+static size_t branch_index(struct CCC_Handle_bounded_map const *, size_t,
+                           enum Link);
+static size_t parent_index(struct CCC_Handle_bounded_map const *, size_t);
 /* Returning references to index fields for tree nodes. */
-static size_t *branch_pointer(struct CCC_Handle_bounded_map const *,
-                              size_t node, enum Link branch);
-static size_t *parent_pointer(struct CCC_Handle_bounded_map const *,
-                              size_t node);
+static size_t *branch_pointer(struct CCC_Handle_bounded_map const *, size_t,
+                              enum Link);
+static size_t *parent_pointer(struct CCC_Handle_bounded_map const *, size_t);
 /* Returning WAVL tree status. */
-static CCC_Tribool is_0_child(struct CCC_Handle_bounded_map const *, size_t p,
-                              size_t x);
-static CCC_Tribool is_1_child(struct CCC_Handle_bounded_map const *, size_t p,
-                              size_t x);
-static CCC_Tribool is_2_child(struct CCC_Handle_bounded_map const *, size_t p,
-                              size_t x);
-static CCC_Tribool is_3_child(struct CCC_Handle_bounded_map const *, size_t p,
-                              size_t x);
-static CCC_Tribool is_01_parent(struct CCC_Handle_bounded_map const *, size_t x,
-                                size_t p, size_t y);
-static CCC_Tribool is_11_parent(struct CCC_Handle_bounded_map const *, size_t x,
-                                size_t p, size_t y);
-static CCC_Tribool is_02_parent(struct CCC_Handle_bounded_map const *, size_t x,
-                                size_t p, size_t y);
-static CCC_Tribool is_22_parent(struct CCC_Handle_bounded_map const *, size_t x,
-                                size_t p, size_t y);
-static CCC_Tribool is_leaf(struct CCC_Handle_bounded_map const *, size_t x);
-static CCC_Tribool parity(struct CCC_Handle_bounded_map const *, size_t node);
-static void set_parity(struct CCC_Handle_bounded_map const *, size_t node,
-                       CCC_Tribool status);
-static size_t total_bytes(size_t sizeof_type, size_t capacity);
-static size_t block_count(size_t node_count);
+static CCC_Tribool is_0_child(struct CCC_Handle_bounded_map const *, size_t,
+                              size_t);
+static CCC_Tribool is_1_child(struct CCC_Handle_bounded_map const *, size_t,
+                              size_t);
+static CCC_Tribool is_2_child(struct CCC_Handle_bounded_map const *, size_t,
+                              size_t);
+static CCC_Tribool is_3_child(struct CCC_Handle_bounded_map const *, size_t,
+                              size_t);
+static CCC_Tribool is_01_parent(struct CCC_Handle_bounded_map const *, size_t,
+                                size_t, size_t);
+static CCC_Tribool is_11_parent(struct CCC_Handle_bounded_map const *, size_t,
+                                size_t, size_t);
+static CCC_Tribool is_02_parent(struct CCC_Handle_bounded_map const *, size_t,
+                                size_t, size_t);
+static CCC_Tribool is_22_parent(struct CCC_Handle_bounded_map const *, size_t,
+                                size_t, size_t);
+static CCC_Tribool is_leaf(struct CCC_Handle_bounded_map const *, size_t);
+static CCC_Tribool parity(struct CCC_Handle_bounded_map const *, size_t);
+static void set_parity(struct CCC_Handle_bounded_map const *, size_t,
+                       CCC_Tribool);
+static size_t total_bytes(size_t, size_t);
+static size_t block_count(size_t);
 static CCC_Tribool validate(struct CCC_Handle_bounded_map const *);
 /* Returning void and maintaining the WAVL tree. */
-static void init_node(struct CCC_Handle_bounded_map const *, size_t node);
-static void insert_fixup(struct CCC_Handle_bounded_map *, size_t z, size_t x);
-static void rebalance_3_child(struct CCC_Handle_bounded_map *, size_t z,
-                              size_t x);
-static void transplant(struct CCC_Handle_bounded_map *, size_t remove,
-                       size_t replacement);
-static void promote(struct CCC_Handle_bounded_map const *, size_t x);
-static void demote(struct CCC_Handle_bounded_map const *, size_t x);
-static void double_promote(struct CCC_Handle_bounded_map const *, size_t x);
-static void double_demote(struct CCC_Handle_bounded_map const *, size_t x);
+static void init_node(struct CCC_Handle_bounded_map const *, size_t);
+static void insert_fixup(struct CCC_Handle_bounded_map *, size_t, size_t);
+static void rebalance_3_child(struct CCC_Handle_bounded_map *, size_t, size_t);
+static void transplant(struct CCC_Handle_bounded_map *, size_t, size_t);
+static void promote(struct CCC_Handle_bounded_map const *, size_t);
+static void demote(struct CCC_Handle_bounded_map const *, size_t);
+static void double_promote(struct CCC_Handle_bounded_map const *, size_t);
+static void double_demote(struct CCC_Handle_bounded_map const *, size_t);
 
-static void rotate(struct CCC_Handle_bounded_map *, size_t z, size_t x,
-                   size_t y, enum Link dir);
-static void double_rotate(struct CCC_Handle_bounded_map *, size_t z, size_t x,
-                          size_t y, enum Link dir);
+static void rotate(struct CCC_Handle_bounded_map *, size_t, size_t, size_t,
+                   enum Link);
+static void double_rotate(struct CCC_Handle_bounded_map *, size_t, size_t,
+                          size_t, enum Link);
 /* Returning void as miscellaneous helpers. */
-static void swap(void *temp, void *, void *, size_t sizeof_type);
+static void swap(void *, void *, void *, size_t);
 static size_t max(size_t, size_t);
 
 /*==============================  Interface    ==============================*/
