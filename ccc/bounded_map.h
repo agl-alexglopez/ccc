@@ -370,7 +370,7 @@ to subsequent calls in the Entry Interface. */
 
 /** @brief Modifies the provided entry if it is Occupied.
 @param[in] entry the entry obtained from an entry function or macro.
-@param[in] fn an update function in which the context argument is unused.
+@param[in] modify an update function in which the context argument is unused.
 @return the updated entry if it was Occupied or the unmodified vacant entry.
 
 This function is intended to make the function chaining in the Entry Interface
@@ -378,11 +378,12 @@ more succinct if the entry will be modified in place based on its own value
 without the need of the context argument a CCC_Type_modifier can provide.
 */
 [[nodiscard]] CCC_Bounded_map_entry *
-CCC_bounded_map_and_modify(CCC_Bounded_map_entry *entry, CCC_Type_modifier *fn);
+CCC_bounded_map_and_modify(CCC_Bounded_map_entry *entry,
+                           CCC_Type_modifier *modify);
 
 /** @brief Modifies the provided entry if it is Occupied.
 @param[in] entry the entry obtained from an entry function or macro.
-@param[in] fn an update function that requires context data.
+@param[in] modify an update function that requires context data.
 @param[in] context context data required for the update.
 @return the updated entry if it was Occupied or the unmodified vacant entry.
 
@@ -390,7 +391,7 @@ This function makes full use of a CCC_Type_modifier capability, meaning a
 complete CCC_update object will be passed to the update function callback. */
 [[nodiscard]] CCC_Bounded_map_entry *
 CCC_bounded_map_and_modify_context(CCC_Bounded_map_entry *entry,
-                                   CCC_Type_modifier *fn, void *context);
+                                   CCC_Type_modifier *modify, void *context);
 
 /** @brief Modify an Occupied entry with a closure over user type T.
 @param[in] map_pointer a pointer to the obtained entry.
