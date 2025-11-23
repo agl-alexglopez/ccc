@@ -533,7 +533,7 @@ Deallocate the container. */
 /** @brief Pops every element from the map calling destructor if destructor is
 non-NULL. O(N).
 @param[in] map a pointer to the map.
-@param[in] destructor a destructor function if required. NULL if unneeded.
+@param[in] destroy a destructor function if required. NULL if unneeded.
 @return an input error if map points to NULL otherwise OK.
 
 Note that if the map has been given permission to allocate, the destructor will
@@ -545,7 +545,7 @@ If the container has not been given allocation permission, then the destructor
 may free elements or not depending on how and when the user wishes to free
 elements of the map according to their own memory management schemes. */
 CCC_Result CCC_bounded_map_clear(CCC_Bounded_map *map,
-                                 CCC_Type_destructor *destructor);
+                                 CCC_Type_destructor *destroy);
 
 /**@}*/
 

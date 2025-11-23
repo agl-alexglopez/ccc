@@ -1180,10 +1180,10 @@ simply calls the destructor on each node and removes the nodes references to
 other tree elements. */
 static void
 delete_nodes(struct CCC_Handle_bounded_map *const map,
-             CCC_Type_destructor *const fn)
+             CCC_Type_destructor *const destroy)
 {
     assert(map);
-    assert(fn);
+    assert(destroy);
     size_t node = map->root;
     while (node)
     {
@@ -1199,7 +1199,7 @@ delete_nodes(struct CCC_Handle_bounded_map *const map,
         size_t const next = e->branch[R];
         e->branch[L] = e->branch[R] = 0;
         e->parent = 0;
-        fn((CCC_Type_context){
+        destroy((CCC_Type_context){
             .type = data_at(map, node),
             .context = map->context,
         });

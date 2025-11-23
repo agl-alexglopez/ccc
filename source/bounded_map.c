@@ -606,7 +606,7 @@ CCC_bounded_map_validate(CCC_Bounded_map const *map)
 rotations so element fields are modified during progression of deletes. */
 CCC_Result
 CCC_bounded_map_clear(CCC_Bounded_map *const map,
-                      CCC_Type_destructor *const destructor)
+                      CCC_Type_destructor *const destroy)
 {
     if (!map)
     {
@@ -626,18 +626,18 @@ CCC_bounded_map_clear(CCC_Bounded_map *const map,
         struct CCC_Bounded_map_node *const next = node->branch[R];
         node->branch[L] = node->branch[R] = NULL;
         node->parent = NULL;
-        void *const destroy = struct_base(map, node);
-        if (destructor)
+        void *const type = struct_base(map, node);
+        if (destroy)
         {
-            destructor((CCC_Type_context){
-                .type = destroy,
+            destroy((CCC_Type_context){
+                .type = type,
                 .context = map->context,
             });
         }
         if (map->allocate)
         {
             (void)map->allocate((CCC_Allocator_context){
-                .input = destroy,
+                .input = type,
                 .bytes = 0,
                 .context = map->context,
             });
