@@ -912,6 +912,7 @@ static void
 insert_fixup(struct CCC_Bounded_map *const map, struct CCC_Bounded_map_node *z,
              struct CCC_Bounded_map_node *x)
 {
+    assert(z);
     do
     {
         promote(z);

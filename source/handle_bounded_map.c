@@ -1463,6 +1463,7 @@ key_in_slot(struct CCC_Handle_bounded_map const *t,
 static void
 insert_fixup(struct CCC_Handle_bounded_map *const map, size_t z, size_t x)
 {
+    assert(z);
     do
     {
         promote(map, z);
