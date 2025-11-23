@@ -529,7 +529,7 @@ CCC_adaptive_map_equal_range_reverse(CCC_Adaptive_map *const map,
 rotations so element fields are modified during progression of deletes. */
 CCC_Result
 CCC_adaptive_map_clear(CCC_Adaptive_map *const map,
-                       CCC_Type_destructor *const destructor)
+                       CCC_Type_destructor *const destroy)
 {
     if (!map)
     {
@@ -550,9 +550,9 @@ CCC_adaptive_map_clear(CCC_Adaptive_map *const map,
         node->branch[L] = node->branch[R] = NULL;
         node->parent = NULL;
         void *const del = struct_base(map, node);
-        if (destructor)
+        if (destroy)
         {
-            destructor((CCC_Type_context){
+            destroy((CCC_Type_context){
                 .type = del,
                 .context = map->context,
             });
@@ -900,7 +900,7 @@ and manage the parent pointers. Parent pointers are not usual for splay trees
 but are necessary for a clean iteration API. */
 static struct CCC_Adaptive_map_node *
 splay(struct CCC_Adaptive_map *const t, struct CCC_Adaptive_map_node *root,
-      void const *const key, CCC_Key_comparator *const order_fn)
+      void const *const key, CCC_Key_comparator *const compare)
 {
     assert(root);
     /* Splaying brings the key element up to the root. The zigzag fixes of
@@ -911,14 +911,14 @@ splay(struct CCC_Adaptive_map *const t, struct CCC_Adaptive_map_node *root,
     struct CCC_Adaptive_map_node *left_right_subtrees[LR] = {&nil, &nil};
     for (;;)
     {
-        CCC_Order const root_order = order(t, key, root, order_fn);
+        CCC_Order const root_order = order(t, key, root, compare);
         enum Link const order_link = CCC_ORDER_GREATER == root_order;
         struct CCC_Adaptive_map_node *const child = root->branch[order_link];
         if (CCC_ORDER_EQUAL == root_order || child == NULL)
         {
             break;
         }
-        CCC_Order const child_order = order(t, key, child, order_fn);
+        CCC_Order const child_order = order(t, key, child, compare);
         enum Link const child_order_link = CCC_ORDER_GREATER == child_order;
         /* A straight line would form from root->child->key. An opportunity
            to splay and heal the tree arises. */
@@ -980,9 +980,9 @@ struct_base(struct CCC_Adaptive_map const *const t,
 static inline CCC_Order
 order(struct CCC_Adaptive_map const *const t, void const *const key,
       struct CCC_Adaptive_map_node const *const node,
-      CCC_Key_comparator *const fn)
+      CCC_Key_comparator *const compare)
 {
-    return fn((CCC_Key_comparator_context){
+    return compare((CCC_Key_comparator_context){
         .key_left = key,
         .type_right = struct_base(t, node),
         .context = t->context,

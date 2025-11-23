@@ -928,17 +928,17 @@ allocate_slot(struct CCC_Handle_adaptive_map *const map)
 
 static CCC_Result
 resize(struct CCC_Handle_adaptive_map *const map, size_t const new_capacity,
-       CCC_Allocator *const fn)
+       CCC_Allocator *const allocate)
 {
     if (map->capacity && new_capacity <= map->capacity - 1)
     {
         return CCC_RESULT_OK;
     }
-    if (!fn)
+    if (!allocate)
     {
         return CCC_RESULT_NO_ALLOCATION_FUNCTION;
     }
-    void *const new_data = fn((CCC_Allocator_context){
+    void *const new_data = allocate((CCC_Allocator_context){
         .input = NULL,
         .bytes = total_bytes(map->sizeof_type, new_capacity),
         .context = map->context,
@@ -949,7 +949,7 @@ resize(struct CCC_Handle_adaptive_map *const map, size_t const new_capacity,
     }
     copy_soa(map, new_data, new_capacity);
     map->nodes = node_pos(map->sizeof_type, new_data, new_capacity);
-    fn((CCC_Allocator_context){
+    allocate((CCC_Allocator_context){
         .input = map->data,
         .bytes = 0,
         .context = map->context,
@@ -1155,10 +1155,10 @@ simply calls the destructor on each node and removes the nodes references to
 other tree elements. */
 static void
 delete_nodes(struct CCC_Handle_adaptive_map *const map,
-             CCC_Type_destructor *const fn)
+             CCC_Type_destructor *const destroy)
 {
     assert(map);
-    assert(fn);
+    assert(destroy);
     size_t node = map->root;
     while (node)
     {
@@ -1174,7 +1174,7 @@ delete_nodes(struct CCC_Handle_adaptive_map *const map,
         size_t const next = e->branch[R];
         e->branch[L] = e->branch[R] = 0;
         e->parent = 0;
-        fn((CCC_Type_context){
+        destroy((CCC_Type_context){
             .type = data_at(map, node),
             .context = map->context,
         });

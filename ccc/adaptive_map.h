@@ -364,7 +364,7 @@ CCC_adaptive_map_and_modify(CCC_Adaptive_map_entry *entry,
 
 /** @brief Modifies the provided entry if it is Occupied.
 @param[in] entry the entry obtained from an entry function or macro.
-@param[in] fn an update function that requires context data.
+@param[in] modify an update function that requires context data.
 @param[in] context context data required for the update.
 @return the updated entry if it was Occupied or the unmodified vacant entry.
 
@@ -372,7 +372,7 @@ This function makes full use of a CCC_Type_modifier capability, meaning a
 complete CCC_update object will be passed to the update function callback. */
 [[nodiscard]] CCC_Adaptive_map_entry *
 CCC_adaptive_map_and_modify_context(CCC_Adaptive_map_entry *entry,
-                                    CCC_Type_modifier *fn, void *context);
+                                    CCC_Type_modifier *modify, void *context);
 
 /** @brief Modify an Occupied entry with a closure over user type T.
 @param[in] adaptive_map_entry_pointer a pointer to the obtained entry.
@@ -675,7 +675,7 @@ Destroy the container. */
 /** @brief Pops every element from the map calling destructor if destructor is
 non-NULL. O(N).
 @param[in] map a pointer to the map.
-@param[in] destructor a destructor function if required. NULL if unneeded.
+@param[in] destroy a destructor function if required. NULL if unneeded.
 @return an input error if map points to NULL otherwise OK.
 
 Note that if the map has been given permission to allocate, the destructor will
@@ -687,7 +687,7 @@ If the container has not been given allocation permission, then the destructor
 may free elements or not depending on how and when the user wishes to free
 elements of the map according to their own memory management schemes. */
 CCC_Result CCC_adaptive_map_clear(CCC_Adaptive_map *map,
-                                  CCC_Type_destructor *destructor);
+                                  CCC_Type_destructor *destroy);
 
 /**@}*/
 
