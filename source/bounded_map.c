@@ -908,6 +908,8 @@ elem_in_slot(struct CCC_Bounded_map const *const map, void const *const slot)
 
 /*=======================   WAVL Tree Maintenance   =========================*/
 
+/** Follows the specification in the "Rank-Balanced Trees" paper by Haeupler,
+Sen, and Tarjan (Fig. 2. pg 7). Assumes x's parent z is not null. */
 static void
 insert_fixup(struct CCC_Bounded_map *const map, struct CCC_Bounded_map_node *z,
              struct CCC_Bounded_map_node *x)

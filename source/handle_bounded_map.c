@@ -1460,6 +1460,8 @@ key_in_slot(struct CCC_Handle_bounded_map const *t,
 
 /*=======================   WAVL Tree Maintenance   =========================*/
 
+/** Follows the specification in the "Rank-Balanced Trees" paper by Haeupler,
+Sen, and Tarjan (Fig. 2. pg 7). Assumes x's parent z is not null. */
 static void
 insert_fixup(struct CCC_Handle_bounded_map *const map, size_t z, size_t x)
 {
