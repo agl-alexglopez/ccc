@@ -543,7 +543,9 @@ static struct Compressed_huffman_tree
 compress_tree(struct Huffman_tree *const tree)
 {
     struct Compressed_huffman_tree ret = {
-        .tree_paths = {.bs = bitset_initialize(NULL, std_allocate, NULL, 0)},
+        .tree_paths = {
+            .bs = bitset_initialize(NULL, std_allocate, NULL, 0),
+        },
         .arena = string_arena_create(START_STRING_ARENA_CAP),
     };
     check(ret.arena.arena);
@@ -748,10 +750,14 @@ read_from_file(SV_String_view const unzip)
     check(cccz, (void)fprintf(stderr, "%s", strerror(errno)););
     printf("Unzip %s (%zu bytes).\n", SV_begin(unzip), file_size(cccz));
     struct Huffman_encoding ret = {
-        .file_bits = {.bs = bitset_initialize(NULL, std_allocate, NULL, 0)},
+        .file_bits = {
+            .bs = bitset_initialize(NULL, std_allocate, NULL, 0),
+        },
         .blueprint = {
             .arena = string_arena_create(START_STRING_ARENA_CAP),
-            .tree_paths = {.bs = bitset_initialize(NULL, std_allocate, NULL, 0)},
+            .tree_paths = {
+                .bs = bitset_initialize(NULL, std_allocate, NULL, 0),
+            },
         },
     };
     size_t read = readbytes(cccz, &ret.magic, sizeof(ret.magic));
