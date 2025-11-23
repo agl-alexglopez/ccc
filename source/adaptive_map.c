@@ -210,13 +210,13 @@ CCC_adaptive_map_and_modify(CCC_Adaptive_map_entry *const entry,
 
 CCC_Adaptive_map_entry *
 CCC_adaptive_map_and_modify_context(CCC_Adaptive_map_entry *const entry,
-                                    CCC_Type_modifier *const fn,
+                                    CCC_Type_modifier *const modify,
                                     void *const context)
 {
-    if (entry && fn && entry->private.entry.status & CCC_ENTRY_OCCUPIED
+    if (entry && modify && entry->private.entry.status & CCC_ENTRY_OCCUPIED
         && entry->private.entry.type)
     {
-        fn((CCC_Type_context){
+        modify((CCC_Type_context){
             .type = entry->private.entry.type,
             .context = context,
         });
