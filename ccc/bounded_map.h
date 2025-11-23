@@ -75,23 +75,31 @@ Initialize the container with memory, callbacks, and permissions. */
 /**@{*/
 
 /** @brief Initializes the bounded map at runtime or compile time.
-@param[in] struct_name the user type wrapping the intrusive element.
-@param[in] bounded_map_node_field the name of the intrusive map elem
+@param[in] type_name the user type wrapping the intrusive element.
+@param[in] type_intruder_field_name the name of the intrusive map elem
 field.
-@param[in] key_node_field the name of the field in user type used as key.
-@param[in] key_order_fn the key comparison function (see types.h).
+@param[in] type_intruder_key_field_name the name of the field in user type used
+as key.
+@param[in] compare the key comparison function (see types.h).
 @param[in] allocate the allocation function or NULL if allocation is banned.
 @param[in] context_data a pointer to any context data for comparison or
 destruction.
 @return the struct initialized bounded map for direct assignment
 (i.e. CCC_Bounded_map m = CCC_bounded_map_initialize(...);).
 */
-#define CCC_bounded_map_initialize(struct_name, bounded_map_node_field,        \
-                                   key_node_field, key_order_fn, allocate,     \
-                                   context_data)                               \
-    CCC_private_bounded_map_initialize(struct_name, bounded_map_node_field,    \
-                                       key_node_field, key_order_fn, allocate, \
-                                       context_data)
+#define CCC_bounded_map_initialize(type_name, type_intruder_field_name,        \
+                                   type_intruder_key_field_name, compare,      \
+                                   allocate, context_data)                     \
+    CCC_private_bounded_map_initialize(type_name, type_intruder_field_name,    \
+                                       type_intruder_key_field_name, compare,  \
+                                       allocate, context_data)
+
+#define CCC_bounded_map_from(type_intruder_field_name, type_key_field_name,    \
+                             compare, allocate, destroy, context_data,         \
+                             compound_literal_array...)                        \
+    CCC_private_bounded_map_from(                                              \
+        type_intruder_field_name, type_key_field_name, compare, allocate,      \
+        destroy, context_data, compound_literal_array)
 
 /**@}*/
 
@@ -707,6 +715,7 @@ typedef CCC_Bounded_map_node Bounded_map_node;
 typedef CCC_Bounded_map Bounded_map;
 typedef CCC_Bounded_map_entry Bounded_map_entry;
 #    define bounded_map_initialize(args...) CCC_bounded_map_initialize(args)
+#    define bounded_map_from(args...) CCC_bounded_map_from(args)
 #    define bounded_map_and_modify_with(args...)                               \
         CCC_bounded_map_and_modify_with(args)
 #    define bounded_map_or_insert_with(args...)                                \

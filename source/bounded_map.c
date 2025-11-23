@@ -673,7 +673,7 @@ CCC_private_bounded_map_key_in_slot(struct CCC_Bounded_map const *const map,
 }
 
 struct CCC_Bounded_map_node *
-CCC_private_Bounded_map_node_in_slot(struct CCC_Bounded_map const *const map,
+CCC_private_bounded_map_node_in_slot(struct CCC_Bounded_map const *const map,
                                      void const *const slot)
 {
     return elem_in_slot(map, slot);
@@ -754,7 +754,7 @@ insert(struct CCC_Bounded_map *const map,
         return struct_base(map, type_output_intruder);
     }
     assert(last_order == CCC_ORDER_GREATER || last_order == CCC_ORDER_LESSER);
-    CCC_Tribool rank_rule_break = false;
+    CCC_Tribool rank_rule_break = CCC_FALSE;
     if (parent)
     {
         rank_rule_break

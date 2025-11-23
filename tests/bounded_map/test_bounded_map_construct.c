@@ -5,6 +5,7 @@
 #include "bounded_map_utility.h"
 #include "checkers.h"
 #include "types.h"
+#include "utility/allocate.h"
 
 static CCC_Bounded_map
 construct_empty(void)
@@ -41,8 +42,57 @@ check_static_begin(bounded_map_test_construct)
     check_end();
 }
 
+check_static_begin(bounded_map_test_construct_from)
+{
+    CCC_Bounded_map map
+        = CCC_bounded_map_from(elem, key, id_order, std_allocate, NULL, NULL,
+                               (struct Val[]){
+                                   {.key = 0, .val = 0},
+                                   {.key = 1, .val = 1},
+                                   {.key = 2, .val = 2},
+                               });
+    check(CCC_bounded_map_validate(&map), true);
+    check(CCC_bounded_map_count(&map).count, 3);
+    check_end();
+}
+
+check_static_begin(bounded_map_test_construct_from_overwrite)
+{
+    CCC_Bounded_map map
+        = CCC_bounded_map_from(elem, key, id_order, std_allocate, NULL, NULL,
+                               (struct Val[]){
+                                   {.key = 0, .val = 0},
+                                   {.key = 1, .val = 1},
+                                   {.key = 1, .val = 2},
+                               });
+    check(CCC_bounded_map_validate(&map), true);
+    check(CCC_bounded_map_count(&map).count, 2);
+    struct Val const *const v = CCC_bounded_map_reverse_begin(&map);
+    check(v != NULL, true);
+    check(v->key, 1);
+    check(v->val, 2);
+    check_end();
+}
+
+check_static_begin(bounded_map_test_construct_from_fail)
+{
+    CCC_Bounded_map map
+        = CCC_bounded_map_from(elem, key, id_order, NULL, NULL, NULL,
+                               (struct Val[]){
+                                   {.key = 0, .val = 0},
+                                   {.key = 1, .val = 1},
+                                   {.key = 2, .val = 2},
+                               });
+    check(CCC_bounded_map_validate(&map), true);
+    check(CCC_bounded_map_is_empty(&map), true);
+    check_end();
+}
+
 int
 main()
 {
-    return check_run(bounded_map_test_empty(), bounded_map_test_construct());
+    return check_run(bounded_map_test_empty(), bounded_map_test_construct(),
+                     bounded_map_test_construct_from(),
+                     bounded_map_test_construct_from_overwrite(),
+                     bounded_map_test_construct_from_fail());
 }

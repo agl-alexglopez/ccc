@@ -103,7 +103,7 @@ void *CCC_private_bounded_map_key_in_slot(struct CCC_Bounded_map const *,
                                           void const *slot);
 /** @internal */
 struct CCC_Bounded_map_node *
-CCC_private_Bounded_map_node_in_slot(struct CCC_Bounded_map const *,
+CCC_private_bounded_map_node_in_slot(struct CCC_Bounded_map const *,
                                      void const *slot);
 /** @internal */
 struct CCC_Bounded_map_entry
@@ -130,6 +130,75 @@ void *CCC_private_bounded_map_insert(
         .allocate = (private_allocate),                                        \
         .context = (private_context_data),                                     \
     }
+
+#define CCC_private_bounded_map_from(                                          \
+    private_type_intruder_field_name, private_key_field_name, private_compare, \
+    private_allocate, private_destroy, private_context_data,                   \
+    private_compound_literal_array...)                                         \
+    (__extension__({                                                           \
+        typeof(*private_compound_literal_array) *private_bounded_map_array     \
+            = private_compound_literal_array;                                  \
+        size_t const private_count = sizeof(private_compound_literal_array)    \
+                                   / sizeof(*private_bounded_map_array);       \
+        struct CCC_Bounded_map private_map                                     \
+            = CCC_private_bounded_map_initialize(                              \
+                typeof(*private_bounded_map_array),                            \
+                private_type_intruder_field_name, private_key_field_name,      \
+                private_compare, private_allocate, private_context_data);      \
+        CCC_Allocator *const private_new = private_allocate;                   \
+        CCC_Type_destructor *const private_delete = private_destroy;           \
+        if (private_new)                                                       \
+        {                                                                      \
+            for (size_t private_i = 0; private_i < private_count; ++private_i) \
+            {                                                                  \
+                struct CCC_Bounded_map_entry private_bounded_map_entry         \
+                    = CCC_private_bounded_map_entry(                           \
+                        &private_map,                                          \
+                        (void *)&private_bounded_map_array[private_i]          \
+                            .private_key_field_name);                          \
+                if (!(private_bounded_map_entry.entry.status                   \
+                      & CCC_ENTRY_OCCUPIED))                                   \
+                {                                                              \
+                    void *const private_new_slot                               \
+                        = private_new((CCC_Allocator_context){                 \
+                            .input = NULL,                                     \
+                            .bytes = private_map.sizeof_type,                  \
+                            .context = private_map.context,                    \
+                        });                                                    \
+                    if (!private_new_slot)                                     \
+                    {                                                          \
+                        (void)CCC_bounded_map_clear(&private_map,              \
+                                                    private_delete);           \
+                        break;                                                 \
+                    }                                                          \
+                    *((typeof(*private_bounded_map_array) *)private_new_slot)  \
+                        = private_bounded_map_array[private_i];                \
+                    CCC_private_bounded_map_insert(                            \
+                        &private_map,                                          \
+                        CCC_private_bounded_map_node_in_slot(                  \
+                            &private_map,                                      \
+                            private_bounded_map_entry.entry.type),             \
+                        private_bounded_map_entry.last_order,                  \
+                        CCC_private_bounded_map_node_in_slot(                  \
+                            &private_map, private_new_slot));                  \
+                }                                                              \
+                else                                                           \
+                {                                                              \
+                    struct CCC_Bounded_map_node private_node_saved             \
+                        = *CCC_private_bounded_map_node_in_slot(               \
+                            &private_map,                                      \
+                            private_bounded_map_entry.entry.type);             \
+                    *((typeof(*private_bounded_map_array) *)                   \
+                          private_bounded_map_entry.entry.type)                \
+                        = private_bounded_map_array[private_i];                \
+                    *CCC_private_bounded_map_node_in_slot(                     \
+                        &private_map, private_bounded_map_entry.entry.type)    \
+                        = private_node_saved;                                  \
+                }                                                              \
+            }                                                                  \
+        }                                                                      \
+        private_map;                                                           \
+    }))
 
 /*==================   Helper Macros for Repeated Logic     =================*/
 
@@ -159,11 +228,11 @@ void *CCC_private_bounded_map_insert(
             *new_data = type_compound_literal;                                 \
             new_data = CCC_private_bounded_map_insert(                         \
                 (Bounded_map_entry)->map,                                      \
-                CCC_private_Bounded_map_node_in_slot(                          \
+                CCC_private_bounded_map_node_in_slot(                          \
                     (Bounded_map_entry)->map,                                  \
                     (Bounded_map_entry)->entry.type),                          \
                 (Bounded_map_entry)->last_order,                               \
-                CCC_private_Bounded_map_node_in_slot((Bounded_map_entry)->map, \
+                CCC_private_bounded_map_node_in_slot((Bounded_map_entry)->map, \
                                                      new_data));               \
         }                                                                      \
     }))
@@ -188,11 +257,11 @@ void *CCC_private_bounded_map_insert(
                 = key;                                                         \
             (void)CCC_private_bounded_map_insert(                              \
                 bounded_map_insert_entry.map,                                  \
-                CCC_private_Bounded_map_node_in_slot(                          \
+                CCC_private_bounded_map_node_in_slot(                          \
                     bounded_map_insert_entry.map,                              \
                     bounded_map_insert_entry.entry.type),                      \
                 bounded_map_insert_entry.last_order,                           \
-                CCC_private_Bounded_map_node_in_slot(                          \
+                CCC_private_bounded_map_node_in_slot(                          \
                     bounded_map_insert_entry.map,                              \
                     private_bounded_map_new_ins_base));                        \
         }                                                                      \
@@ -272,13 +341,13 @@ void *CCC_private_bounded_map_insert(
                      == CCC_ENTRY_OCCUPIED)                                    \
             {                                                                  \
                 struct CCC_Bounded_map_node private_ins_ent_saved              \
-                    = *CCC_private_Bounded_map_node_in_slot(                   \
+                    = *CCC_private_bounded_map_node_in_slot(                   \
                         private_ins_entry_pointer->private.map,                \
                         private_ins_entry_pointer->private.entry.type);        \
                 *((typeof(private_bounded_map_ins_ent_ret))                    \
                       private_ins_entry_pointer->private.entry.type)           \
                     = type_compound_literal;                                   \
-                *CCC_private_Bounded_map_node_in_slot(                         \
+                *CCC_private_bounded_map_node_in_slot(                         \
                     private_ins_entry_pointer->private.map,                    \
                     private_ins_entry_pointer->private.entry.type)             \
                     = private_ins_ent_saved;                                   \
@@ -349,13 +418,13 @@ void *CCC_private_bounded_map_insert(
                      == CCC_ENTRY_OCCUPIED)                                    \
             {                                                                  \
                 struct CCC_Bounded_map_node private_ins_ent_saved              \
-                    = *CCC_private_Bounded_map_node_in_slot(                   \
+                    = *CCC_private_bounded_map_node_in_slot(                   \
                         private_bounded_map_ins_or_assign_ent.map,             \
                         private_bounded_map_ins_or_assign_ent.entry.type);     \
                 *((typeof(type_compound_literal) *)                            \
                       private_bounded_map_ins_or_assign_ent.entry.type)        \
                     = type_compound_literal;                                   \
-                *CCC_private_Bounded_map_node_in_slot(                         \
+                *CCC_private_bounded_map_node_in_slot(                         \
                     private_bounded_map_ins_or_assign_ent.map,                 \
                     private_bounded_map_ins_or_assign_ent.entry.type)          \
                     = private_ins_ent_saved;                                   \
