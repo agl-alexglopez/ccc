@@ -181,13 +181,13 @@ See container documentation for specific behavior. */
 
 /** @brief Modify an entry if Occupied.
 @param[in] entry_pointer a pointer to the container.
-@param[in] mod_fn a modification function.
+@param[in] modify a modification function.
 @param[in] context_args context data for mod_fn.
 @return a reference to the modified entry if Occupied or original if Vacant.
 
 See container documentation for specific behavior. */
-#define CCC_and_modify_context(entry_pointer, mod_fn, context_args...)         \
-    CCC_private_and_modify_context(entry_pointer, mod_fn, context_args)
+#define CCC_and_modify_context(entry_pointer, modify, context_args...)         \
+    CCC_private_and_modify_context(entry_pointer, modify, context_args)
 
 /** @brief Insert new element or overwrite old element.
 @param[in] entry_pointer a pointer to the container.
