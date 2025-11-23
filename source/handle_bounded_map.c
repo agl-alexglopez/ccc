@@ -1967,11 +1967,14 @@ is_free_list_valid(struct CCC_Handle_bounded_map const *const map)
     {
         return CCC_TRUE;
     }
-    size_t list_check = 0;
-    for (size_t cur = map->free_list; cur && list_check < map->capacity;
-         cur = node_at(map, cur)->next_free, ++list_check)
-    {}
-    return (list_check + map->count == map->capacity);
+    size_t list_count = 0;
+    size_t cur_free_index = map->free_list;
+    while (cur_free_index && list_count < map->capacity)
+    {
+        cur_free_index = node_at(map, cur_free_index)->next_free;
+        ++list_count;
+    }
+    return (list_count + map->count == map->capacity);
 }
 
 static inline CCC_Tribool
