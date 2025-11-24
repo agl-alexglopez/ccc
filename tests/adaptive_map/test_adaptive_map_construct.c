@@ -56,7 +56,7 @@ check_static_begin(adaptive_map_test_construct_from)
                                 });
     check(CCC_adaptive_map_validate(&map), true);
     check(CCC_adaptive_map_count(&map).count, 3);
-    check_end();
+    check_end((void)CCC_adaptive_map_clear(&map, NULL););
 }
 
 check_static_begin(adaptive_map_test_construct_from_overwrite)
@@ -74,7 +74,7 @@ check_static_begin(adaptive_map_test_construct_from_overwrite)
     check(v != NULL, true);
     check(v->key, 1);
     check(v->val, 2);
-    check_end();
+    check_end((void)CCC_adaptive_map_clear(&map, NULL););
 }
 
 check_static_begin(adaptive_map_test_construct_from_fail)
@@ -88,7 +88,7 @@ check_static_begin(adaptive_map_test_construct_from_fail)
                                 });
     check(CCC_adaptive_map_validate(&map), true);
     check(CCC_adaptive_map_is_empty(&map), true);
-    check_end();
+    check_end((void)CCC_adaptive_map_clear(&map, NULL););
 }
 
 int
