@@ -99,7 +99,7 @@ for a max priority queue.
 @param[in] compound_literal_array the array of user types to insert into the
 map (e.g. (struct My_type[]){ {.key = 1, .val = 1}, {.key = 2, .val = 2}}).
 @return the initialized priority_queue on the right side of an equality operator
-(e.g. CCC_Priority_queue priority_queue = CCC_priority_queue_initialize(...);)
+(e.g. CCC_Priority_queue priority_queue = CCC_priority_queue_from(...);)
 */
 #define CCC_priority_queue_from(type_intruder_field, order, compare, allocate, \
                                 destroy, context_data,                         \

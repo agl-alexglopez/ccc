@@ -7,6 +7,7 @@
 #include "doubly_linked_list.h"
 #include "doubly_linked_list_utility.h"
 #include "traits.h"
+#include "utility/allocate.h"
 
 static CCC_Doubly_linked_list
 construct_empty(void)
@@ -53,9 +54,42 @@ check_static_begin(doubly_linked_list_test_constructor_copy)
     check_end();
 }
 
+check_static_begin(doubly_linked_list_test_construct_from)
+{
+    CCC_Doubly_linked_list list
+        = CCC_doubly_linked_list_from(e, val_order, std_allocate, NULL, NULL,
+                                      (struct Val[]){
+                                          {.val = 0},
+                                          {.val = 1},
+                                          {.val = 2},
+                                      });
+    check(CCC_doubly_linked_list_validate(&list), true);
+    check(CCC_doubly_linked_list_count(&list).count, 3);
+    struct Val const *const v = CCC_doubly_linked_list_front(&list);
+    check(v != NULL, true);
+    check(v->val, 0);
+    check_end((void)CCC_doubly_linked_list_clear(&list, NULL););
+}
+
+check_static_begin(doubly_linked_list_test_construct_from_fail)
+{
+    CCC_Doubly_linked_list list
+        = CCC_doubly_linked_list_from(e, val_order, NULL, NULL, NULL,
+                                      (struct Val[]){
+                                          {.val = 0},
+                                          {.val = 1},
+                                          {.val = 2},
+                                      });
+    check(CCC_doubly_linked_list_validate(&list), true);
+    check(CCC_doubly_linked_list_is_empty(&list), true);
+    check_end((void)CCC_doubly_linked_list_clear(&list, NULL););
+}
+
 int
 main()
 {
     return check_run(doubly_linked_list_test_construct(),
-                     doubly_linked_list_test_constructor_copy());
+                     doubly_linked_list_test_constructor_copy(),
+                     doubly_linked_list_test_construct_from(),
+                     doubly_linked_list_test_construct_from_fail());
 }

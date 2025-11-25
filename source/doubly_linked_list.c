@@ -570,7 +570,7 @@ CCC_doubly_linked_list_clear(CCC_Doubly_linked_list *const list,
             });
         }
     }
-    list->head = list->tail = NULL;
+    list->tail = NULL;
     list->count = 0;
     return CCC_RESULT_OK;
 }

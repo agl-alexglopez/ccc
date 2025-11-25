@@ -333,7 +333,7 @@ CCC_singly_linked_list_clear(CCC_Singly_linked_list *const list,
     {
         return CCC_RESULT_ARGUMENT_ERROR;
     }
-    while (!CCC_singly_linked_list_is_empty(list))
+    while (list->head)
     {
         struct CCC_Singly_linked_list_node *const remove = list->head;
         remove_node(list, NULL, remove);
@@ -351,6 +351,7 @@ CCC_singly_linked_list_clear(CCC_Singly_linked_list *const list,
             });
         }
     }
+    list->count = 0;
     return CCC_RESULT_OK;
 }
 
@@ -607,6 +608,15 @@ CCC_private_singly_linked_list_push_front(
     struct CCC_Singly_linked_list_node *const type_intruder)
 {
     insert_node(list, NULL, type_intruder);
+    ++list->count;
+}
+
+struct CCC_Singly_linked_list_node *
+CCC_private_singly_linked_list_node_in(
+    struct CCC_Singly_linked_list const *const list,
+    void const *const user_struct)
+{
+    return elem_in(list, user_struct);
 }
 
 /*===========================  Static Helpers   =============================*/

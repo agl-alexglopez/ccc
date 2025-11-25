@@ -96,6 +96,27 @@ time (e.g. CCC_doubly_linked list = CCC_doubly_linked_list_initialize(...);). */
     CCC_private_doubly_linked_list_initialize(                                 \
         struct_name, type_intruder_field, compare, allocate, context_data)
 
+/** @brief Initialize a doubly linked list at runtime from a compound literal
+array.
+@param[in] type_intruder_field the name of the field intruding on user's type.
+@param[in] compare the comparison function for the user type.
+@param[in] allocate the allocation function required for construction.
+@param[in] destroy the optional destructor to run if insertion fails.
+@param[in] context_data context data needed for comparison or destruction.
+@param[in] compound_literal_array the array of user types to insert into the
+map (e.g. (struct My_type[]){ {.val = 1}, {.val = 2}}).
+@return the initialized doubly linked list on the right side of an equality
+operator (e.g. CCC_Doubly_linked_list list = CCC_doubly_linked_list_from(...);)
+@note Elements in the initializer list are pushed back into the list in the
+order they appear. Therefore, the order of the doubly linked list will mirror
+the order of the elements in the compound literal array. */
+#define CCC_doubly_linked_list_from(type_intruder_field, compare, allocate,    \
+                                    destroy, context_data,                     \
+                                    compound_literal_array...)                 \
+    CCC_private_doubly_linked_list_from(type_intruder_field, compare,          \
+                                        allocate, destroy, context_data,       \
+                                        compound_literal_array)
+
 /**@}*/
 
 /** @name Insert and Remove Interface

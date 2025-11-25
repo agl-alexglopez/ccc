@@ -86,13 +86,17 @@ struct CCC_Singly_linked_list
 void
 CCC_private_singly_linked_list_push_front(struct CCC_Singly_linked_list *,
                                           struct CCC_Singly_linked_list_node *);
+/** @internal */
+struct CCC_Singly_linked_list_node *
+CCC_private_singly_linked_list_node_in(struct CCC_Singly_linked_list const *,
+                                       void const *);
 
 /*======================   Macro Implementations     ========================*/
 
 /** @internal */
 #define CCC_private_singly_linked_list_initialize(                             \
     private_struct_name, private_singly_linked_list_node_field,                \
-    private_compare_fn, private_allocate, private_context_data)                \
+    private_compare, private_allocate, private_context_data)                   \
     {                                                                          \
         .head = NULL,                                                          \
         .sizeof_type = sizeof(private_struct_name),                            \
@@ -100,9 +104,54 @@ CCC_private_singly_linked_list_push_front(struct CCC_Singly_linked_list *,
             private_struct_name, private_singly_linked_list_node_field),       \
         .count = 0,                                                            \
         .allocate = (private_allocate),                                        \
-        .compare = (private_compare_fn),                                       \
+        .compare = (private_compare),                                          \
         .context = (private_context_data),                                     \
     }
+
+/** @internal */
+#define CCC_private_singly_linked_list_from(                                   \
+    private_type_intruder_field, private_compare, private_allocate,            \
+    private_destroy, private_context_data, private_compound_literal_array...)  \
+    (__extension__({                                                           \
+        typeof(*private_compound_literal_array)                                \
+            *private_singly_linked_list_type_array                             \
+            = private_compound_literal_array;                                  \
+        struct CCC_Singly_linked_list private_singly_linked_list               \
+            = CCC_private_singly_linked_list_initialize(                       \
+                typeof(*private_singly_linked_list_type_array),                \
+                private_type_intruder_field, private_compare,                  \
+                private_allocate, private_context_data);                       \
+        if (private_singly_linked_list.allocate)                               \
+        {                                                                      \
+            size_t const private_count                                         \
+                = sizeof(private_compound_literal_array)                       \
+                / sizeof(*private_singly_linked_list_type_array);              \
+            for (size_t private_i = 0; private_i < private_count; ++private_i) \
+            {                                                                  \
+                typeof(*private_singly_linked_list_type_array) *const          \
+                    private_new_node                                           \
+                    = private_singly_linked_list.allocate(                     \
+                        (CCC_Allocator_context){                               \
+                            .input = NULL,                                     \
+                            .bytes = private_singly_linked_list.sizeof_type,   \
+                            .context = private_singly_linked_list.context,     \
+                        });                                                    \
+                if (!private_new_node)                                         \
+                {                                                              \
+                    CCC_singly_linked_list_clear(&private_singly_linked_list,  \
+                                                 private_destroy);             \
+                    break;                                                     \
+                }                                                              \
+                *private_new_node                                              \
+                    = private_singly_linked_list_type_array[private_i];        \
+                CCC_private_singly_linked_list_push_front(                     \
+                    &private_singly_linked_list,                               \
+                    CCC_private_singly_linked_list_node_in(                    \
+                        &private_singly_linked_list, private_new_node));       \
+            }                                                                  \
+        }                                                                      \
+        private_singly_linked_list;                                            \
+    }))
 
 /** @internal */
 #define CCC_private_singly_linked_list_emplace_front(list_pointer,             \
@@ -131,7 +180,7 @@ CCC_private_singly_linked_list_push_front(struct CCC_Singly_linked_list *,
                     *private_singly_linked_list_res = struct_initializer;      \
                     CCC_private_singly_linked_list_push_front(                 \
                         private_singly_linked_list,                            \
-                        CCC_singly_linked_list_node_in(                        \
+                        CCC_private_singly_linked_list_node_in(                \
                             private_singly_linked_list,                        \
                             private_singly_linked_list_res));                  \
                 }                                                              \
