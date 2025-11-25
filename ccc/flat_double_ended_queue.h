@@ -195,12 +195,23 @@ Manual memory management with no allocation function provided.
 
 ```
 #define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC
-flat_double_ended_queue source = flat_double_ended_queue_initialize((int[10]){},
-int, NULL, NULL, 10); int *new_data = malloc(sizeof(int) *
-flat_double_ended_queue_capacity(&source).count); flat_double_ended_queue
-destination = flat_double_ended_queue_initialize(new_data, int, NULL, NULL,
-flat_double_ended_queue_capacity(&source).count); CCC_Result res =
-flat_double_ended_queue_copy(&destination, &source, NULL);
+Flat_double_ended_queue source = flat_double_ended_queue_initialize(
+    (int[10]){},
+    int,
+    NULL,
+    NULL,
+    10
+);
+int *new_data
+    = malloc(sizeof(int) * flat_double_ended_queue_capacity(&source).count);
+Flat_double_ended_queue destination = flat_double_ended_queue_initialize(
+    new_data,
+    int,
+    NULL,
+    NULL,
+    flat_double_ended_queue_capacity(&source).count
+);
+CCC_Result res = flat_double_ended_queue_copy(&destination, &source, NULL);
 ```
 
 The above requires destination capacity be greater than or equal to source
@@ -208,12 +219,30 @@ capacity. Here is memory management handed over to the copy function.
 
 ```
 #define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC
-flat_double_ended_queue source = flat_double_ended_queue_initialize(NULL, int,
-std_allocate, NULL, 0);
-(void)CCC_flat_double_ended_queue_push_back_range(&source, 5,
-(int[5]){0,1,2,3,4}); queue destination =
-flat_double_ended_queue_initialize(NULL, int, std_allocate, NULL, 0); CCC_Result
-res = flat_double_ended_queue_copy(&destination, &source, std_allocate);
+Flat_double_ended_queue source = flat_double_ended_queue_initialize(
+    NULL,
+    int,
+    std_allocate,
+    NULL,
+    0
+);
+(void)CCC_flat_double_ended_queue_push_back_range(
+    &source,
+    5,
+    (int[5]){0,1,2,3,4}
+);
+Flat_double_ended_queue destination = flat_double_ended_queue_initialize(
+    NULL,
+    int,
+    std_allocate,
+    NULL,
+    0
+);
+CCC_Result res = flat_double_ended_queue_copy(
+    &destination,
+    &source,
+    std_allocate
+);
 ```
 
 The above allows destination to have a capacity less than that of the source as
@@ -223,12 +252,30 @@ as a fixed size queue (ring buffer).
 
 ```
 #define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC
-flat_double_ended_queue source = flat_double_ended_queue_initialize(NULL, int,
-std_allocate, NULL, 0);
-(void)CCC_flat_double_ended_queue_push_back_range(&source, 5,
-(int[5]){0,1,2,3,4}); queue destination =
-flat_double_ended_queue_initialize(NULL, int, NULL, NULL, 0); CCC_Result res =
-flat_double_ended_queue_copy(&destination, &source, std_allocate);
+Flat_double_ended_queue source = flat_double_ended_queue_initialize(
+    NULL,
+    int,
+    std_allocate,
+    NULL,
+    0
+);
+(void)CCC_flat_double_ended_queue_push_back_range(
+    &source,
+    5,
+    (int[5]){0,1,2,3,4}
+);
+Flat_double_ended_queue destination = flat_double_ended_queue_initialize(
+    NULL,
+    int,
+    NULL,
+    NULL,
+    0
+);
+CCC_Result res = flat_double_ended_queue_copy(
+    &destination,
+    &source,
+    std_allocate
+);
 ```
 
 The above sets up destination as a ring Buffer while source is a dynamic

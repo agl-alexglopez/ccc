@@ -247,12 +247,26 @@ Manual memory management with no allocation function provided.
 
 ```
 #define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
-Flat_priority_queue source
-    = flat_priority_queue_initialize((int[10]){}, CCC_ORDER_LESSER, NULL,
-int_order, NULL, 10); push_rand_ints(&source); priority_queue destination =
-flat_priority_queue_initialize((int[11]){}, CCC_ORDER_LESSER, NULL, int_order,
-NULL, 11); CCC_Result res = flat_priority_queue_copy(&destination, &source,
-NULL);
+Flat_priority_queue source = flat_priority_queue_initialize(
+    (int[10]){},
+    int,
+    CCC_ORDER_LESSER,
+    int_order,
+    NULL,
+    NULL,
+    10
+);
+push_rand_ints(&source);
+Flat_priority_queue destination = flat_priority_queue_initialize(
+    (int[11]){},
+    int,
+    CCC_ORDER_LESSER,
+    int_order,
+    NULL,
+    NULL,
+    11
+);
+CCC_Result res = flat_priority_queue_copy(&destination, &source, NULL);
 ```
 
 The above requires destination capacity be greater than or equal to source
@@ -260,12 +274,26 @@ capacity. Here is memory management handed over to the copy function.
 
 ```
 #define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
-Flat_priority_queue source
-    = flat_priority_queue_initialize((int *)NULL, CCC_ORDER_LESSER,
-std_allocate, int_order, NULL, 0); push_rand_ints(&source); Flat_priority_queue
-destination = flat_priority_queue_initialize((int *)NULL, CCC_ORDER_LESSER,
-std_allocate, int_order, NULL, 0); CCC_Result res =
-flat_priority_queue_copy(&destination, &source, std_allocate);
+Flat_priority_queue source = flat_priority_queue_initialize(
+    NULL,
+    int,
+    CCC_ORDER_LESSER,
+    int_order,
+    std_allocate,
+    NULL,
+    0
+);
+push_rand_ints(&source);
+Flat_priority_queue destination = flat_priority_queue_initialize(
+    NULL,
+    int,
+    CCC_ORDER_LESSER,
+    int_order,
+    std_allocate,
+    NULL,
+    0
+);
+CCC_Result res = flat_priority_queue_copy(&destination, &source, std_allocate);
 ```
 
 The above allows destination to have a capacity less than that of the source as
@@ -275,12 +303,26 @@ as a fixed size flat_priority_queue.
 
 ```
 #define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
-Flat_priority_queue source
-    = flat_priority_queue_initialize((int *)NULL, CCC_ORDER_LESSER,
-std_allocate, int_order, NULL, 0); push_rand_ints(&source); Flat_priority_queue
-destination = flat_priority_queue_initialize((int *)NULL, CCC_ORDER_LESSER,
-NULL, int_order, NULL, 0); CCC_Result res =
-flat_priority_queue_copy(&destination, &source, std_allocate);
+Flat_priority_queue source = flat_priority_queue_initialize(
+    NULL,
+    int,
+    CCC_ORDER_LESSER,
+    int_order,
+    std_allocate,
+    NULL,
+    0
+);
+push_rand_ints(&source);
+Flat_priority_queue destination = flat_priority_queue_initialize(
+    NULL,
+    int,
+    CCC_ORDER_LESSER,
+    int_order,
+    NULL,
+    NULL,
+    0
+);
+CCC_Result res = flat_priority_queue_copy(&destination, &source, std_allocate);
 ```
 
 The above sets up destination with fixed size while source is a dynamic
