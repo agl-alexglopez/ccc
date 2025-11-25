@@ -168,8 +168,8 @@ static Bit_count clz(Bitblock);
 /*=======================   Public Interface   ==============================*/
 
 CCC_Tribool
-CCC_bitset_is_proper_subset(CCC_Bitset const *const set,
-                            CCC_Bitset const *const subset)
+CCC_bitset_is_proper_subset(CCC_Bitset const *const subset,
+                            CCC_Bitset const *const set)
 {
     if (!set || !subset)
     {
@@ -179,12 +179,12 @@ CCC_bitset_is_proper_subset(CCC_Bitset const *const set,
     {
         return CCC_FALSE;
     }
-    return is_subset_of(set, subset);
+    return is_subset_of(subset, set);
 }
 
 CCC_Tribool
-CCC_bitset_is_subset(CCC_Bitset const *const set,
-                     CCC_Bitset const *const subset)
+CCC_bitset_is_subset(CCC_Bitset const *const subset,
+                     CCC_Bitset const *const set)
 {
     if (!set || !subset)
     {
@@ -194,7 +194,7 @@ CCC_bitset_is_subset(CCC_Bitset const *const set,
     {
         return CCC_FALSE;
     }
-    return is_subset_of(set, subset);
+    return is_subset_of(subset, set);
 }
 
 CCC_Result
@@ -1045,17 +1045,18 @@ CCC_bitset_data(CCC_Bitset const *const bitset)
 }
 
 CCC_Tribool
-CCC_bitset_eq(CCC_Bitset const *const a, CCC_Bitset const *const b)
+CCC_bitset_is_equal(CCC_Bitset const *const left, CCC_Bitset const *const right)
 {
-    if (!a || !b)
+    if (!left || !right)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    if (a->count != b->count)
+    if (left->count != right->count)
     {
         return CCC_FALSE;
     }
-    return memcmp(a->blocks, b->blocks, block_count(a->count) * SIZEOF_BLOCK)
+    return memcmp(left->blocks, right->blocks,
+                  block_count(left->count) * SIZEOF_BLOCK)
         == 0;
 }
 
@@ -1077,16 +1078,16 @@ CCC_private_bitset_set(struct CCC_Bitset *const bitset, size_t const index,
 
 /*=======================    Static Helpers    ==============================*/
 
-/** Assumes set size is greater than or equal to subitsetet size. */
+/** Assumes set size is greater than or equal to subset size. */
 static CCC_Tribool
-is_subset_of(struct CCC_Bitset const *const set,
-             struct CCC_Bitset const *const subitsetet)
+is_subset_of(struct CCC_Bitset const *const subset,
+             struct CCC_Bitset const *const set)
 {
-    assert(set->count >= subitsetet->count);
-    for (Block_count i = 0, end = block_count(subitsetet->count); i < end; ++i)
+    assert(set->count >= subset->count);
+    for (Block_count i = 0, end = block_count(subset->count); i < end; ++i)
     {
         /* Invariant: the last N unused bits in a set are zero so this works. */
-        if ((set->blocks[i] & subitsetet->blocks[i]) != subitsetet->blocks[i])
+        if ((set->blocks[i] & subset->blocks[i]) != subset->blocks[i])
         {
             return CCC_FALSE;
         }

@@ -175,7 +175,7 @@ destruction.
         context_data, capacity)
 
 /** @brief Initialize a dynamic map at runtime from an initializer list.
-@param[in] key_field the field of the struct used for key storage.
+@param[in] type_key_field the field of the struct used for key storage.
 @param[in] compare the CCC_Key_comparator the user intends to use.
 @param[in] allocate the required allocation function.
 @param[in] context_data context data that is needed for hashing or comparison.
@@ -240,7 +240,7 @@ map to protect its invariants from user error at compile time. */
 /** @brief Initialize a dynamic map at runtime with at least the specified
 capacity.
 @param[in] type_name the name of the type being stored in the map.
-@param[in] key_field the field of the struct used for key storage.
+@param[in] type_key_field the field of the struct used for key storage.
 @param[in] compare the CCC_Key_comparator the user intends to use.
 @param[in] allocate the required allocation function.
 @param[in] context_data context data that is needed for comparison.

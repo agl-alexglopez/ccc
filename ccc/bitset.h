@@ -770,12 +770,13 @@ integer operation. */
 CCC_Result CCC_bitset_shift_right(CCC_Bitset *bitset, size_t right_shifts);
 
 /** @brief Checks two bit sets of the same size (not capacity) for equality.
-@param[in] a pointer to a bit set.
-@param[in] bit pointer to another bit set of equal size.
+@param[in] left pointer to a bit set.
+@param[in] right pointer to another bit set of equal size.
 @return true if the bit sets are of equal size with identical bit values at
 every position, false if the sets are different sizes or have mismatched bits. A
 bool error is returned if either pointer is NULL. */
-CCC_Tribool CCC_bitset_eq(CCC_Bitset const *a, CCC_Bitset const *b);
+CCC_Tribool CCC_bitset_is_equal(CCC_Bitset const *left,
+                                CCC_Bitset const *right);
 
 /**@}*/
 
@@ -784,8 +785,8 @@ Perform basic mathematical set operations on the bit set. */
 /**@{*/
 
 /** @brief Return CCC_TRUE if subset is a proper subset of set (subset ⊂ set).
-@param[set] the set to check subset against.
-@param[subset] the subset to confirm as a proper subset of set.
+@param[in] subset the subset to confirm as a proper subset of set.
+@param[in] set the set to check subset against.
 @return CCC_TRUE if all bit positions in subset share the same value--0 or 1--as
 the bit positions in set and set is of greater size than subset. A
 CCC_TRIBOOL_ERROR is returned if set or subset is NULL.
@@ -793,20 +794,20 @@ CCC_TRIBOOL_ERROR is returned if set or subset is NULL.
 If set is of size 0 the function returns CCC_FALSE regardless of the size of
 subset. If set is not of size 0 and subset is of size 0 the function returns
 CCC_TRUE. */
-CCC_Tribool CCC_bitset_is_proper_subset(CCC_Bitset const *set,
-                                        CCC_Bitset const *subset);
+CCC_Tribool CCC_bitset_is_proper_subset(CCC_Bitset const *subset,
+                                        CCC_Bitset const *set);
 
 /** @brief Return CCC_TRUE if subset is a subset of set (subset ⊆ set).
-@param[set] the set to check subset against.
-@param[subset] the subset to confirm as a subset of set.
+@param[in] the subset to confirm as a subset of set.
+@param[in] the set to check subset against.
 @return CCC_TRUE if all bit positions in subset share the same value--0 or 1--as
 the bit positions in set. A CCC_TRIBOOL_ERROR is returned if set or subset is
 NULL.
 
 If set is size zero subset must also be of size 0 to return CCC_TRUE. If subset
 is size 0 the function returns CCC_TRUE regardless of the size of set. */
-CCC_Tribool CCC_bitset_is_subset(CCC_Bitset const *set,
-                                 CCC_Bitset const *subset);
+CCC_Tribool CCC_bitset_is_subset(CCC_Bitset const *subset,
+                                 CCC_Bitset const *set);
 
 /**@}*/
 
@@ -1009,7 +1010,7 @@ typedef CCC_Bitset Bitset;
 #    define bitset_xor(args...) CCC_bitset_xor(args)
 #    define bitset_shift_left(args...) CCC_bitset_shift_left(args)
 #    define bitset_shift_right(args...) CCC_bitset_shift_right(args)
-#    define bitset_eq(args...) CCC_bitset_eq(args)
+#    define bitset_is_equal(args...) CCC_bitset_is_equal(args)
 #    define bitset_is_proper_subset(args...) CCC_bitset_is_proper_subset(args)
 #    define bitset_is_subset(args...) CCC_bitset_is_subset(args)
 #    define bitset_data(args...) CCC_bitset_data(args)

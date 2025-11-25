@@ -134,6 +134,8 @@ respectively.
 compound literal array array to reserve. If capacity provided is less than the
 size of the input compound literal array, the capacity is set to the size of the
 input compound literal array. If not needed, simply leave as zero.
+@param[in] compound_literal_array the initializer of the type stored in flat
+priority queue (e.g. `(int[]){1,2,3}`).
 @return the initialized priority queue on the right hand side of an equality
 operator. (e.g. CCC_Flat_priority_queue q = CCC_flat_priority_queue_from(...);).
 
@@ -367,12 +369,12 @@ Insert or remove elements from the flat priority queue. */
 /**@{*/
 
 /** @brief Write a type directly to a priority queue slot. O(lgN).
-@param[in] priority_queue a pointer to the priority queue.
+@param[in] priority_queue_pointer a pointer to the priority queue.
 @param[in] type_compound_literal the compound literal or direct scalar type.
 @return a reference to the inserted element or NULL if allocation failed. */
-#define CCC_flat_priority_queue_emplace(flat_priority_queue,                   \
+#define CCC_flat_priority_queue_emplace(priority_queue_pointer,                \
                                         type_compound_literal...)              \
-    CCC_private_flat_priority_queue_emplace(flat_priority_queue,               \
+    CCC_private_flat_priority_queue_emplace(priority_queue_pointer,            \
                                             type_compound_literal)
 
 /** @brief Copy input array into the flat_priority_queue, organizing into heap.
@@ -485,7 +487,7 @@ void *CCC_flat_priority_queue_update(CCC_Flat_priority_queue *priority_queue,
                                      CCC_Type_modifier *modify, void *context);
 
 /** @brief Update the user type stored in the priority queue directly. O(lgN).
-@param[in] flat_priority_queue_pointer a pointer to the flat priority queue.
+@param[in] priority_queue_pointer a pointer to the flat priority queue.
 @param[in] type_pointer a pointer to the user type being updated.
 @param[in] update_closure_over_T the semicolon separated statements to execute
 on the user type at T (optionally wrapping {code here} in braces may help
@@ -505,9 +507,9 @@ get_rand_flat_priority_queue_node(&flat_priority_queue), { *T = rand_key(); });
 
 Note that whether the key increases or decreases does not affect runtime. */
 #define CCC_flat_priority_queue_update_with(                                   \
-    flat_priority_queue_pointer, type_pointer, update_closure_over_T...)       \
+    priority_queue_pointer, type_pointer, update_closure_over_T...)            \
     CCC_private_flat_priority_queue_update_with(                               \
-        flat_priority_queue_pointer, type_pointer, update_closure_over_T)
+        priority_queue_pointer, type_pointer, update_closure_over_T)
 
 /** @brief Increase e that is a handle to the stored flat_priority_queue
 element. O(lgN).

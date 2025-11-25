@@ -196,15 +196,21 @@ reasoning and debugging the macros easier. It also cuts down on repeated logic.
 */
 /*======================     Private Interface      =========================*/
 
+/** @internal */
 struct CCC_Flat_hash_map_entry
 CCC_private_flat_hash_map_entry(struct CCC_Flat_hash_map *, void const *);
+/** @internal */
 void CCC_private_flat_hash_map_insert(struct CCC_Flat_hash_map *, void const *,
                                       struct CCC_Flat_hash_map_tag, size_t);
+/** @internal */
 void CCC_private_flat_hash_map_erase(struct CCC_Flat_hash_map *, size_t);
+/** @internal */
 void *CCC_private_flat_hash_map_data_at(struct CCC_Flat_hash_map const *,
                                         size_t);
+/** @internal */
 void *CCC_private_flat_hash_map_key_at(struct CCC_Flat_hash_map const *,
                                        size_t);
+/** @internal */
 void
 CCC_private_flat_hash_map_set_insert(struct CCC_Flat_hash_map_entry const *);
 

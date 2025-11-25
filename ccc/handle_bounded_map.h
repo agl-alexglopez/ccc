@@ -188,7 +188,7 @@ CCC_handle_bounded_map_initialize(...);). */
         context_data, capacity)
 
 /** @brief Initialize a dynamic map at runtime from an initializer list.
-@param[in] key_field the field of the struct used for key storage.
+@param[in] type_key_field the field of the struct used for key storage.
 @param[in] compare the CCC_Key_comparator the user intends to use.
 @param[in] allocate the required allocation function.
 @param[in] context_data context data that is needed for hashing or comparison.
@@ -244,16 +244,16 @@ main(void)
 Only dynamic maps may be initialized this way due the inability of the map
 map to protect its invariants from user error at compile time. */
 #define CCC_handle_bounded_map_from(type_key_field, compare, allocate,         \
-                                    context_data,                              \
+                                    context_data, optional_capacity,           \
                                     type_compound_literal_array...)            \
     CCC_private_handle_bounded_map_from(type_key_field, compare, allocate,     \
-                                        context_data,                          \
+                                        context_data, optional_capacity,       \
                                         type_compound_literal_array)
 
 /** @brief Initialize a dynamic map at runtime with at least the specified
 capacity.
 @param[in] type_name the name of the type being stored in the map.
-@param[in] key_field the field of the struct used for key storage.
+@param[in] type_key_field the field of the struct used for key storage.
 @param[in] compare the CCC_Key_comparator the user intends to use.
 @param[in] allocate the required allocation function.
 @param[in] context_data context data that is needed for comparison.
@@ -1048,8 +1048,8 @@ CCC_handle_bounded_map_reverse_begin(CCC_Handle_bounded_map const *map);
 
 /** @brief Return the next element in an inorder traversal of the map. O(1).
 @param[in] map a pointer to the map.
-@param[in] type_iterator a pointer to the intrusive map element of the
-current iterator.
+@param[in] iterator a pointer to the intrusive map element of the current
+iterator.
 @return a handle for the next user type stored in the map in an inorder
 traversal. */
 [[nodiscard]] CCC_Handle_index
@@ -1059,7 +1059,7 @@ CCC_handle_bounded_map_next(CCC_Handle_bounded_map const *map,
 /** @brief Return the reverse_next element in a reverse inorder traversal of the
 map. O(1).
 @param[in] map a pointer to the map.
-@param[in] type_iterator a pointer to the intrusive map element of the
+@param[in] iterator a pointer to the intrusive map element of the
 current iterator.
 @return a handle for the reverse_next user type stored in the map in a reverse
 inorder traversal. */

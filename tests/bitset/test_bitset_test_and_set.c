@@ -1065,8 +1065,8 @@ check_static_begin(bitset_test_subset)
     {
         check(bitset_set(&subset2, i, CCC_TRUE), CCC_FALSE);
     }
-    check(bitset_is_subset(&set, &subset1), CCC_TRUE);
-    check(bitset_is_subset(&set, &subset2), CCC_TRUE);
+    check(bitset_is_subset(&subset1, &set), CCC_TRUE);
+    check(bitset_is_subset(&subset2, &set), CCC_TRUE);
     check_end();
 }
 
@@ -1084,10 +1084,10 @@ check_static_begin(bitset_test_proper_subset)
     {
         check(bitset_set(&subset2, i, CCC_TRUE), CCC_FALSE);
     }
-    check(bitset_is_proper_subset(&set, &subset1), CCC_FALSE);
-    check(bitset_is_subset(&set, &subset1), CCC_TRUE);
-    check(bitset_is_subset(&set, &subset2), CCC_TRUE);
-    check(bitset_is_proper_subset(&set, &subset2), CCC_TRUE);
+    check(bitset_is_proper_subset(&subset1, &set), CCC_FALSE);
+    check(bitset_is_subset(&subset1, &set), CCC_TRUE);
+    check(bitset_is_subset(&subset2, &set), CCC_TRUE);
+    check(bitset_is_proper_subset(&subset2, &set), CCC_TRUE);
     check_end();
 }
 
