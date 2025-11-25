@@ -360,12 +360,26 @@ struct Val
     int key;
     int val;
 };
-static Handle_adaptive_map source
-    = handle_bounded_map_initialize(NULL, struct Val, key, key_order,
-std_allocate, NULL, 0); insert_rand_vals(&source); static Handle_adaptive_map
-destination = handle_bounded_map_initialize(NULL, struct Val, key, key_order,
-std_allocate, NULL, 0); CCC_Result res = handle_bounded_map_copy(&destination,
-&source, std_allocate);
+static Handle_adaptive_map source = handle_bounded_map_initialize(
+    NULL,
+    struct Val,
+    key,
+    key_order,
+    std_allocate,
+    NULL,
+    0
+);
+insert_rand_vals(&source);
+static Handle_adaptive_map destination = handle_bounded_map_initialize(
+    NULL,
+    struct Val,
+    key,
+    key_order,
+    std_allocate,
+    NULL,
+    0
+);
+CCC_Result res = handle_bounded_map_copy(&destination, &source, std_allocate);
 ```
 
 The above allows destination to have a capacity less than that of the source as
@@ -380,12 +394,26 @@ struct Val
     int key;
     int val;
 };
-static Handle_adaptive_map source
-    = handle_bounded_map_initialize(NULL, struct Val, key, key_order,
-std_allocate, NULL, 0); insert_rand_vals(&source); static Handle_adaptive_map
-destination = handle_bounded_map_initialize(NULL, struct Val, key, key_order,
-NULL, NULL, 0); CCC_Result res = handle_bounded_map_copy(&destination, &source,
-std_allocate);
+static Handle_adaptive_map source = handle_bounded_map_initialize(
+    NULL,
+    struct Val,
+    key,
+    key_order,
+    std_allocate,
+    NULL,
+    0
+);
+insert_rand_vals(&source);
+static Handle_adaptive_map destination = handle_bounded_map_initialize(
+    NULL,
+    struct Val,
+    key,
+    key_order,
+    NULL,
+    NULL,
+    0
+);
+CCC_Result res = handle_bounded_map_copy(&destination, &source, std_allocate);
 ```
 
 The above sets up destination with fixed size while source is a dynamic map.
