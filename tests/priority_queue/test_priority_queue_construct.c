@@ -50,6 +50,9 @@ check_static_begin(priority_queue_test_construct_from)
         });
     check(CCC_priority_queue_validate(&map), true);
     check(CCC_priority_queue_count(&map).count, 3);
+    struct Val const *const v = CCC_priority_queue_front(&map);
+    check(v != NULL, true);
+    check(v->val, 0);
     check_end((void)CCC_priority_queue_clear(&map, NULL););
 }
 
