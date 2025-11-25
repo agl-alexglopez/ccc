@@ -88,6 +88,26 @@ CCC_ORDER_GREATER for a max priority_queue.
                                           order, compare, allocate,            \
                                           context_data)
 
+/** @brief Initialize a priority queue at runtime from a compound literal array.
+@param[in] type_intruder_field the name of the field intruding on user's type.
+@param[in] order CCC_ORDER_LESSER for a min priority queue or CCC_ORDER_GREATER
+for a max priority queue.
+@param[in] compare the function used to compare two user types.
+@param[in] allocate the allocation function required for construction.
+@param[in] destroy the optional destructor to run if insertion fails.
+@param[in] context_data context data needed for comparison or destruction.
+@param[in] compound_literal_array the array of user types to insert into the
+map (e.g. (struct My_type[]){ {.key = 1, .val = 1}, {.key = 2, .val = 2}}).
+@return the initialized priority_queue on the right side of an equality operator
+(e.g. CCC_Priority_queue priority_queue = CCC_priority_queue_initialize(...);)
+*/
+#define CCC_priority_queue_from(type_intruder_field, order, compare, allocate, \
+                                destroy, context_data,                         \
+                                compound_literal_array...)                     \
+    CCC_private_priority_queue_from(type_intruder_field, order, compare,       \
+                                    allocate, destroy, context_data,           \
+                                    compound_literal_array)
+
 /**@}*/
 
 /** @name Insert and Remove Interface
@@ -398,6 +418,7 @@ typedef CCC_Priority_queue_node priority_queue_node;
 typedef CCC_Priority_queue Priority_queue;
 #    define priority_queue_initialize(args...)                                 \
         CCC_priority_queue_initialize(args)
+#    define priority_queue_from(args...) CCC_priority_queue_from(args)
 #    define priority_queue_front(args...) CCC_priority_queue_front(args)
 #    define priority_queue_push(args...) CCC_priority_queue_push(args)
 #    define priority_queue_emplace(args...) CCC_priority_queue_emplace(args)

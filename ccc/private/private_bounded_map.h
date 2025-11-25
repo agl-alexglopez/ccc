@@ -160,7 +160,8 @@ void *CCC_private_bounded_map_insert(
                 if (!(private_bounded_map_entry.entry.status                   \
                       & CCC_ENTRY_OCCUPIED))                                   \
                 {                                                              \
-                    void *const private_new_slot                               \
+                    typeof(*private_bounded_map_type_array) *const             \
+                        private_new_slot                                       \
                         = private_map.allocate((CCC_Allocator_context){        \
                             .input = NULL,                                     \
                             .bytes = private_map.sizeof_type,                  \
@@ -172,8 +173,7 @@ void *CCC_private_bounded_map_insert(
                                                     private_destroy);          \
                         break;                                                 \
                     }                                                          \
-                    *((typeof(*private_bounded_map_type_array) *)              \
-                          private_new_slot)                                    \
+                    *private_new_slot                                          \
                         = private_bounded_map_type_array[private_i];           \
                     CCC_private_bounded_map_insert(                            \
                         &private_map,                                          \

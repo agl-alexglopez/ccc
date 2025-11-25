@@ -284,7 +284,7 @@ is set as the capacity. Therefore, 0 is valid if one is not concerned with the
 size of the underlying reservation.
 @param[in] array_compound_literal a list of key value pairs of the type
 intended to be stored in the map, using array compound literal initialization
-syntax (e.g `(struct my_type[]){{.k = 0, .v 0}, {.k = 1, .v = 1}}`).
+syntax (e.g `(struct My_type[]){{.k = 0, .v 0}, {.k = 1, .v = 1}}`).
 @return the flat hash map directly initialized on the right hand side of the
 equality operator (i.e. CCC_Flat_hash_map map = CCC_flat_hash_map_from(...);)
 @warning An allocation function is required. This initializer is only available

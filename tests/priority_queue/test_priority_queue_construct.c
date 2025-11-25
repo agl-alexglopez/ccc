@@ -5,6 +5,15 @@
 #include "priority_queue.h"
 #include "priority_queue_utility.h"
 #include "types.h"
+#include "utility/allocate.h"
+
+static CCC_Priority_queue
+construct_empty(void)
+{
+    CCC_Priority_queue result = CCC_private_priority_queue_initialize(
+        struct Val, elem, CCC_ORDER_LESSER, val_order, NULL, NULL);
+    return result;
+}
 
 check_static_begin(priority_queue_test_empty)
 {
@@ -14,8 +23,55 @@ check_static_begin(priority_queue_test_empty)
     check_end();
 }
 
+/** If the user constructs a node style priority queue from a helper function,
+the priority queue cannot have any self referential fields, such as nil or
+sentinel nodes. If the priority queue is initialized on the stack those self
+referential fields will become invalidated after the constructing function ends.
+This leads to a dangling reference to stack memory that no longer exists.
+Disastrous. The solution is to never implement sentinels that refer to a memory
+address on the priority queue struct itself. */
+check_static_begin(priority_queue_test_construct)
+{
+    CCC_Priority_queue pq = construct_empty();
+    struct Val v = {};
+    check(CCC_priority_queue_push(&pq, &v.elem) != NULL, true);
+    check(CCC_priority_queue_validate(&pq), true);
+    check_end();
+}
+
+check_static_begin(priority_queue_test_construct_from)
+{
+    CCC_Priority_queue map = CCC_priority_queue_from(
+        elem, CCC_ORDER_LESSER, val_order, std_allocate, NULL, NULL,
+        (struct Val[]){
+            {.val = 0},
+            {.val = 1},
+            {.val = 2},
+        });
+    check(CCC_priority_queue_validate(&map), true);
+    check(CCC_priority_queue_count(&map).count, 3);
+    check_end((void)CCC_priority_queue_clear(&map, NULL););
+}
+
+check_static_begin(priority_queue_test_construct_from_fail)
+{
+    CCC_Priority_queue map = CCC_priority_queue_from(
+        elem, CCC_ORDER_LESSER, val_order, NULL, NULL, NULL,
+        (struct Val[]){
+            {.val = 0},
+            {.val = 1},
+            {.val = 2},
+        });
+    check(CCC_priority_queue_validate(&map), true);
+    check(CCC_priority_queue_is_empty(&map), true);
+    check_end((void)CCC_priority_queue_clear(&map, NULL););
+}
+
 int
 main()
 {
-    return check_run(priority_queue_test_empty());
+    return check_run(priority_queue_test_empty(),
+                     priority_queue_test_construct(),
+                     priority_queue_test_construct_from(),
+                     priority_queue_test_construct_from_fail());
 }

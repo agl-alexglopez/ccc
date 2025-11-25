@@ -169,52 +169,54 @@ CCC_priority_queue_clear(CCC_Priority_queue *const priority_queue,
     {
         return CCC_RESULT_ARGUMENT_ERROR;
     }
-    struct CCC_Priority_queue_node *e = priority_queue->root;
-    while (e)
+    struct CCC_Priority_queue_node *node = priority_queue->root;
+    while (node)
     {
         /* The child and its siblings cut to the front of the line and we start
            again as if the child is the first in this sibling list. */
-        if (e->child)
+        if (node->child)
         {
-            struct CCC_Priority_queue_node *const child = e->child;
-            struct CCC_Priority_queue_node *const e_end = e->next;
+            struct CCC_Priority_queue_node *const child = node->child;
+            struct CCC_Priority_queue_node *const node_end = node->next;
             /* Final element of e child list picks up child as head of list. */
-            e_end->prev = child;
+            node_end->prev = child;
             /* Now e picks up the last (wrapping) element of child list. */
-            e->next = child->next;
+            node->next = child->next;
             /* Child has a list so don't just set child's prev to e. */
-            child->next->prev = e;
+            child->next->prev = node;
             /* Child list wrapping element is now end of e list. */
-            child->next = e_end;
+            child->next = node_end;
             /* Our traversal now jumps to start of list we spliced in. */
-            e->child = NULL;
-            e = child;
+            node->child = NULL;
+            node = child;
             continue;
         }
         /* No more child lists to splice in so this node is done.  */
-        struct CCC_Priority_queue_node *const prev
-            = e->prev == e ? NULL : e->prev;
-        e->next->prev = e->prev;
-        e->prev->next = e->next;
-        e->parent = e->next = e->prev = e->child = NULL;
-        void *const del = struct_base(priority_queue, e);
+        struct CCC_Priority_queue_node *const prev_node
+            = node->prev == node ? NULL : node->prev;
+        node->next->prev = node->prev;
+        node->prev->next = node->next;
+        node->parent = node->next = node->prev = node->child = NULL;
+        void *const destroy_this = struct_base(priority_queue, node);
         if (destroy)
         {
             destroy((CCC_Type_context){
-                .type = del,
+                .type = destroy_this,
                 .context = priority_queue->context,
             });
         }
         if (priority_queue->allocate)
         {
             (void)priority_queue->allocate((CCC_Allocator_context){
-                .input = del,
+                .input = destroy_this,
                 .bytes = 0,
                 .context = priority_queue->context,
             });
         }
-        e = prev;
+        node = prev_node;
     }
+    priority_queue->count = 0;
+    priority_queue->root = NULL;
     return CCC_RESULT_OK;
 }
 
@@ -323,7 +325,9 @@ void
 CCC_private_priority_queue_push(struct CCC_Priority_queue *const priority_queue,
                                 struct CCC_Priority_queue_node *const node)
 {
-    (void)CCC_priority_queue_push(priority_queue, node);
+    init_node(node);
+    priority_queue->root = merge(priority_queue, priority_queue->root, node);
+    ++priority_queue->count;
 }
 
 struct CCC_Priority_queue_node *

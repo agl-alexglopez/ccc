@@ -103,6 +103,8 @@ as key.
 initialization of new nodes fails and map is emptied in a failure state.
 @param[in] context_data a pointer to any context data for comparison or
 destruction.
+@param[in] compound_literal_array the array of user types to insert into the
+map (e.g. (struct My_type[]){ {.key = 1, .val = 1}, {.key = 2, .val = 2}}).
 @return the struct initialized adaptive map for direct assignment
 (e.g. CCC_Adaptive_map m = CCC_adaptive_map_from(...);) or an empty map if
 allocation fails.

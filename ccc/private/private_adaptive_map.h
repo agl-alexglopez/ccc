@@ -170,7 +170,8 @@ void *CCC_private_adaptive_map_insert(struct CCC_Adaptive_map *,
                 if (!(private_adaptive_map_entry.entry.status                  \
                       & CCC_ENTRY_OCCUPIED))                                   \
                 {                                                              \
-                    void *const private_new_slot                               \
+                    typeof(*private_adaptive_map_type_array) *const            \
+                        private_new_slot                                       \
                         = private_map.allocate((CCC_Allocator_context){        \
                             .input = NULL,                                     \
                             .bytes = private_map.sizeof_type,                  \
@@ -182,8 +183,7 @@ void *CCC_private_adaptive_map_insert(struct CCC_Adaptive_map *,
                                                      private_destroy);         \
                         break;                                                 \
                     }                                                          \
-                    *((typeof(*private_adaptive_map_type_array) *)             \
-                          private_new_slot)                                    \
+                    *private_new_slot                                          \
                         = private_adaptive_map_type_array[private_i];          \
                     CCC_private_adaptive_map_insert(                           \
                         &private_map, CCC_private_adaptive_map_node_in_slot(   \
