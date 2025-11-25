@@ -77,7 +77,7 @@ Initialize the container with memory, callbacks, and permissions. */
 /** @brief Initializes the bounded map at runtime or compile time.
 @param[in] type_name the user type wrapping the intrusive element.
 @param[in] type_intruder_field_name the name of the intrusive map elem field.
-@param[in] type_intruder_key_field_name the name of the field in user type used
+@param[in] type_key_field_name the name of the field in user type used
 as key.
 @param[in] compare the key comparison function (see types.h).
 @param[in] allocate the allocation function or NULL if allocation is banned.
@@ -86,15 +86,15 @@ destruction.
 @return the struct initialized bounded map for direct assignment
 (i.e. CCC_Bounded_map m = CCC_bounded_map_initialize(...);). */
 #define CCC_bounded_map_initialize(type_name, type_intruder_field_name,        \
-                                   type_intruder_key_field_name, compare,      \
-                                   allocate, context_data)                     \
+                                   type_key_field_name, compare, allocate,     \
+                                   context_data)                               \
     CCC_private_bounded_map_initialize(type_name, type_intruder_field_name,    \
-                                       type_intruder_key_field_name, compare,  \
-                                       allocate, context_data)
+                                       type_key_field_name, compare, allocate, \
+                                       context_data)
 
 /** @brief Initializes a dynamic bounded map at runtime.
 @param[in] type_intruder_field_name the name of the intrusive map elem field.
-@param[in] type_intruder_key_field_name the name of the field in user type used
+@param[in] type_key_field_name the name of the field in user type used
 as key.
 @param[in] compare the key comparison function (see types.h).
 @param[in] allocate the allocation function or NULL if allocation is banned.

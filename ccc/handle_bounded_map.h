@@ -446,14 +446,14 @@ CCC_handle_bounded_map_at(CCC_Handle_bounded_map const *handle,
                           CCC_Handle_index index);
 
 /** @brief Returns a reference to the user type in the table at the handle.
-@param[in] Handle_bounded_map_pointer a pointer to the map.
+@param[in] handle_bounded_map_pointer a pointer to the map.
 @param[in] type_name name of the user type stored in each slot of the map.
 @param[in] handle_index the index handle obtained from previous map operations.
 @return a reference to the handle at handle in the map as the type the user has
 stored in the map. */
-#define CCC_handle_bounded_map_as(Handle_bounded_map_pointer, type_name,       \
+#define CCC_handle_bounded_map_as(handle_bounded_map_pointer, type_name,       \
                                   handle_index...)                             \
-    CCC_private_handle_bounded_map_as(Handle_bounded_map_pointer, type_name,   \
+    CCC_private_handle_bounded_map_as(handle_bounded_map_pointer, type_name,   \
                                       handle_index)
 
 /** @brief Searches the map for the presence of key.
@@ -494,7 +494,7 @@ CCC_handle_bounded_map_swap_handle(CCC_Handle_bounded_map *map,
                                    void *type_output);
 
 /** @brief Invariantly inserts the key value in type_output_pointer.
-@param[in] Handle_bounded_map_pointer the pointer to the bounded map.
+@param[in] handle_bounded_map_pointer the pointer to the bounded map.
 @param[out] type_output_pointer type user type map elem.
 @return a compound literal reference to a type element in the table. If
 Vacant, no prior element with key existed and the type key value type
@@ -503,11 +503,11 @@ key value type. If more space is needed but allocation fails or has been
 forbidden, an insert error is set.
 
 Note that this function may write to the provided user type struct. */
-#define CCC_handle_bounded_map_swap_handle_wrap(Handle_bounded_map_pointer,    \
+#define CCC_handle_bounded_map_swap_handle_wrap(handle_bounded_map_pointer,    \
                                                 type_output_pointer)           \
     &(CCC_Handle)                                                              \
     {                                                                          \
-        CCC_handle_bounded_map_swap_handle((Handle_bounded_map_pointer),       \
+        CCC_handle_bounded_map_swap_handle((handle_bounded_map_pointer),       \
                                            (type_output_pointer))              \
             .private                                                           \
     }
@@ -524,24 +524,24 @@ CCC_handle_bounded_map_try_insert(CCC_Handle_bounded_map *map,
                                   void const *type);
 
 /** @brief Attempts to insert the key value type_pointer.
-@param[in] Handle_bounded_map_pointer the pointer to the map.
+@param[in] handle_bounded_map_pointer the pointer to the map.
 @param[in] type_pointer the type user type map elem.
 @return a compound literal reference to a handle. If Occupied, the handle
 contains a reference to the key value user type in the map and may be unwrapped.
 If Vacant the handle contains a reference to the newly inserted handle in the
 map. If more space is needed but allocation fails an insert error is set. */
-#define CCC_handle_bounded_map_try_insert_wrap(Handle_bounded_map_pointer,     \
+#define CCC_handle_bounded_map_try_insert_wrap(handle_bounded_map_pointer,     \
                                                type_pointer)                   \
     &(CCC_Handle)                                                              \
     {                                                                          \
-        CCC_handle_bounded_map_try_insert((Handle_bounded_map_pointer),        \
+        CCC_handle_bounded_map_try_insert((handle_bounded_map_pointer),        \
                                           (type_pointer))                      \
             .private                                                           \
     }
 
 /** @brief lazily insert type_compound_literal into the map at key if key is
 absent.
-@param[in] Handle_bounded_map_pointer a pointer to the map.
+@param[in] handle_bounded_map_pointer a pointer to the map.
 @param[in] key the direct key r-value.
 @param[in] type_compound_literal the compound literal specifying the value.
 @return a compound literal reference to the handle of the existing or newly
@@ -552,12 +552,12 @@ occurs that prevents insertion. An insertion error will flag such a case.
 Note that for brevity and convenience the user need not write the key to the
 lazy value compound literal as well. This function ensures the key in the
 compound literal matches the searched key. */
-#define CCC_handle_bounded_map_try_insert_with(Handle_bounded_map_pointer,     \
+#define CCC_handle_bounded_map_try_insert_with(handle_bounded_map_pointer,     \
                                                key, type_compound_literal...)  \
     &(CCC_Handle)                                                              \
     {                                                                          \
         CCC_private_handle_bounded_map_try_insert_with(                        \
-            Handle_bounded_map_pointer, key, type_compound_literal)            \
+            handle_bounded_map_pointer, key, type_compound_literal)            \
     }
 
 /** @brief Invariantly inserts or overwrites a user struct into the map.
@@ -573,7 +573,7 @@ CCC_handle_bounded_map_insert_or_assign(CCC_Handle_bounded_map *map,
                                         void const *type);
 
 /** @brief Inserts a new key value pair or overwrites the existing handle.
-@param[in] Handle_bounded_map_pointer the pointer to the handle hash map.
+@param[in] handle_bounded_map_pointer the pointer to the handle hash map.
 @param[in] key the key to be searched in the map.
 @param[in] type_compound_literal the compound literal to insert or use for
 overwrite.
@@ -586,11 +586,11 @@ Note that for brevity and convenience the user need not write the key to the
 lazy value compound literal as well. This function ensures the key in the
 compound literal matches the searched key. */
 #define CCC_handle_bounded_map_insert_or_assign_with(                          \
-    Handle_bounded_map_pointer, key, type_compound_literal...)                 \
+    handle_bounded_map_pointer, key, type_compound_literal...)                 \
     &(CCC_Handle)                                                              \
     {                                                                          \
         CCC_private_handle_bounded_map_insert_or_assign_with(                  \
-            Handle_bounded_map_pointer, key, type_compound_literal)            \
+            handle_bounded_map_pointer, key, type_compound_literal)            \
     }
 
 /** @brief Removes the key value in the map storing the old value, if present,
@@ -607,7 +607,7 @@ CCC_handle_bounded_map_remove(CCC_Handle_bounded_map *map, void *type_output);
 
 /** @brief Removes the key value in the map storing the old value, if present,
 in the struct containing key value type provided by the user.
-@param[in] Handle_bounded_map_pointer the pointer to the bounded map.
+@param[in] handle_bounded_map_pointer the pointer to the bounded map.
 @param[out] type_output_pointer type user type map elem.
 @return a compound literal reference to the removed handle. If Occupied
 type_output_pointer holds the old key value pair.. If Vacant the key
@@ -615,11 +615,11 @@ value pair was not stored in the map. If bad input is provided an input error is
 set.
 
 Note that this function may write to the user type struct. */
-#define CCC_handle_bounded_map_remove_wrap(Handle_bounded_map_pointer,         \
+#define CCC_handle_bounded_map_remove_wrap(handle_bounded_map_pointer,         \
                                            type_output_pointer)                \
     &(CCC_Handle)                                                              \
     {                                                                          \
-        CCC_handle_bounded_map_remove((Handle_bounded_map_pointer),            \
+        CCC_handle_bounded_map_remove((handle_bounded_map_pointer),            \
                                       (type_output_pointer))                   \
             .private                                                           \
     }
@@ -644,7 +644,7 @@ CCC_handle_bounded_map_handle(CCC_Handle_bounded_map const *map,
                               void const *key);
 
 /** @brief Obtains a handle for the provided key in the map for future use.
-@param[in] Handle_bounded_map_pointer the map to be searched.
+@param[in] handle_bounded_map_pointer the map to be searched.
 @param[in] key_pointer the key used to search the map matching the stored key
 type.
 @return a compound literal reference to a specialized handle for use with other
@@ -659,11 +659,11 @@ where in the map such an element should be inserted.
 
 A handle is rarely useful on its own. It should be passed in a functional style
 to subsequent calls in the Handle Interface. */
-#define CCC_handle_bounded_map_handle_wrap(Handle_bounded_map_pointer,         \
+#define CCC_handle_bounded_map_handle_wrap(handle_bounded_map_pointer,         \
                                            key_pointer)                        \
     &(CCC_Handle_bounded_map_handle)                                           \
     {                                                                          \
-        CCC_handle_bounded_map_handle((Handle_bounded_map_pointer),            \
+        CCC_handle_bounded_map_handle((handle_bounded_map_pointer),            \
                                       (key_pointer))                           \
             .private                                                           \
     }
@@ -947,16 +947,16 @@ CCC_handle_bounded_map_equal_range(CCC_Handle_bounded_map const *map,
                                    void const *begin_key, void const *end_key);
 
 /** @brief Returns a compound literal reference to the desired range. O(lg N).
-@param[in] Handle_bounded_map_pointer a pointer to the map.
+@param[in] handle_bounded_map_pointer a pointer to the map.
 @param[in] begin_and_end_key_pointers two pointers, the first to the start of
 the range the second to the end of the range.
 @return a compound literal reference to the produced range associated with the
 enclosing scope. This reference is always non-NULL. */
-#define CCC_handle_bounded_map_equal_range_wrap(Handle_bounded_map_pointer,    \
+#define CCC_handle_bounded_map_equal_range_wrap(handle_bounded_map_pointer,    \
                                                 begin_and_end_key_pointers...) \
     &(CCC_Handle_range)                                                        \
     {                                                                          \
-        CCC_handle_bounded_map_equal_range((Handle_bounded_map_pointer),       \
+        CCC_handle_bounded_map_equal_range((handle_bounded_map_pointer),       \
                                            (begin_and_end_key_pointers))       \
             .private                                                           \
     }
@@ -991,17 +991,17 @@ CCC_handle_bounded_map_equal_range_reverse(CCC_Handle_bounded_map const *map,
 
 /** @brief Returns a compound literal reference to the desired range_reverse.
 O(lg N).
-@param[in] Handle_bounded_map_pointer a pointer to the map.
+@param[in] handle_bounded_map_pointer a pointer to the map.
 @param[in] reverse_begin_and_reverse_end_key_pointers two pointers, the first
 to the start of the range_reverse the second to the end of the range_reverse.
 @return a compound literal reference to the produced range_reverse associated
 with the enclosing scope. This reference is always non-NULL. */
 #define CCC_handle_bounded_map_equal_range_reverse_wrap(                       \
-    Handle_bounded_map_pointer, reverse_begin_and_reverse_end_key_pointers...) \
+    handle_bounded_map_pointer, reverse_begin_and_reverse_end_key_pointers...) \
     &(CCC_Handle_range_reverse)                                                \
     {                                                                          \
         CCC_handle_bounded_map_equal_range_reverse(                            \
-            (Handle_bounded_map_pointer),                                      \
+            (handle_bounded_map_pointer),                                      \
             (reverse_begin_and_reverse_end_key_pointers))                      \
             .private                                                           \
     }

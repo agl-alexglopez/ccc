@@ -333,19 +333,19 @@ runtime. */
     }))
 
 /** @internal */
-#define CCC_private_handle_bounded_map_as(Handle_bounded_map_pointer,          \
+#define CCC_private_handle_bounded_map_as(handle_bounded_map_pointer,          \
                                           type_name, handle...)                \
     ((type_name *)CCC_private_handle_bounded_map_data_at(                      \
-        (Handle_bounded_map_pointer), (handle)))
+        (handle_bounded_map_pointer), (handle)))
 
 /*==================     Core Macro Implementations     =====================*/
 
 /** @internal */
 #define CCC_private_handle_bounded_map_and_modify_with(                        \
-    Handle_bounded_map_handle_pointer, type_name, closure_over_T...)           \
+    handle_bounded_map_handle_pointer, type_name, closure_over_T...)           \
     (__extension__({                                                           \
         __auto_type private_handle_bounded_map_hndl_pointer                    \
-            = (Handle_bounded_map_handle_pointer);                             \
+            = (handle_bounded_map_handle_pointer);                             \
         struct CCC_Handle_bounded_map_handle                                   \
             private_handle_bounded_map_mod_hndl                                \
             = {.status = CCC_ENTRY_ARGUMENT_ERROR};                            \
@@ -370,10 +370,10 @@ runtime. */
 
 /** @internal */
 #define CCC_private_handle_bounded_map_or_insert_with(                         \
-    Handle_bounded_map_handle_pointer, type_compound_literal...)               \
+    handle_bounded_map_handle_pointer, type_compound_literal...)               \
     (__extension__({                                                           \
         __auto_type private_or_ins_handle_pointer                              \
-            = (Handle_bounded_map_handle_pointer);                             \
+            = (handle_bounded_map_handle_pointer);                             \
         CCC_Handle_index private_handle_bounded_map_or_ins_ret = 0;            \
         if (private_or_ins_handle_pointer)                                     \
         {                                                                      \
@@ -408,10 +408,10 @@ runtime. */
 
 /** @internal */
 #define CCC_private_handle_bounded_map_insert_handle_with(                     \
-    Handle_bounded_map_handle_pointer, type_compound_literal...)               \
+    handle_bounded_map_handle_pointer, type_compound_literal...)               \
     (__extension__({                                                           \
         __auto_type private_ins_handle_pointer                                 \
-            = (Handle_bounded_map_handle_pointer);                             \
+            = (handle_bounded_map_handle_pointer);                             \
         CCC_Handle_index private_handle_bounded_map_ins_hndl_ret = 0;          \
         if (private_ins_handle_pointer)                                        \
         {                                                                      \
@@ -452,10 +452,10 @@ runtime. */
 
 /** @internal */
 #define CCC_private_handle_bounded_map_try_insert_with(                        \
-    Handle_bounded_map_pointer, key, type_compound_literal...)                 \
+    handle_bounded_map_pointer, key, type_compound_literal...)                 \
     (__extension__({                                                           \
         __auto_type private_try_ins_map_pointer                                \
-            = (Handle_bounded_map_pointer);                                    \
+            = (handle_bounded_map_pointer);                                    \
         struct CCC_Handle private_handle_bounded_map_try_ins_hndl_ret          \
             = {.status = CCC_ENTRY_ARGUMENT_ERROR};                            \
         if (private_try_ins_map_pointer)                                       \
@@ -515,10 +515,10 @@ runtime. */
 
 /** @internal */
 #define CCC_private_handle_bounded_map_insert_or_assign_with(                   \
-    Handle_bounded_map_pointer, key, type_compound_literal...)                  \
+    handle_bounded_map_pointer, key, type_compound_literal...)                  \
     (__extension__({                                                            \
         __auto_type private_ins_or_assign_map_pointer                           \
-            = (Handle_bounded_map_pointer);                                     \
+            = (handle_bounded_map_pointer);                                     \
         struct CCC_Handle private_handle_bounded_map_ins_or_assign_hndl_ret     \
             = {.status = CCC_ENTRY_ARGUMENT_ERROR};                             \
         if (private_ins_or_assign_map_pointer)                                  \
