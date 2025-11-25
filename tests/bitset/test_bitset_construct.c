@@ -45,7 +45,7 @@ check_static_begin(bitset_test_copy_no_allocate)
           CCC_bitset_popcount(&destination).count);
     check(CCC_bitset_count(&source).count,
           CCC_bitset_count(&destination).count);
-    while (!CCC_bitset_empty(&source) && !CCC_bitset_empty(&destination))
+    while (!CCC_bitset_is_empty(&source) && !CCC_bitset_is_empty(&destination))
     {
         CCC_Tribool const source_msb = CCC_bitset_pop_back(&source);
         CCC_Tribool const destination_msb = CCC_bitset_pop_back(&destination);
@@ -60,7 +60,7 @@ check_static_begin(bitset_test_copy_no_allocate)
             check(source_msb, destination_msb);
         }
     }
-    check(CCC_bitset_empty(&source), CCC_bitset_empty(&destination));
+    check(CCC_bitset_is_empty(&source), CCC_bitset_is_empty(&destination));
     check_end();
 }
 
@@ -85,7 +85,7 @@ check_static_begin(bitset_test_copy_allocate)
           CCC_bitset_popcount(&destination).count);
     check(CCC_bitset_count(&source).count,
           CCC_bitset_count(&destination).count);
-    while (!CCC_bitset_empty(&source) && !CCC_bitset_empty(&destination))
+    while (!CCC_bitset_is_empty(&source) && !CCC_bitset_is_empty(&destination))
     {
         CCC_Tribool const source_msb = CCC_bitset_pop_back(&source);
         CCC_Tribool const destination_msb = CCC_bitset_pop_back(&destination);
@@ -100,7 +100,7 @@ check_static_begin(bitset_test_copy_allocate)
             check(source_msb, destination_msb);
         }
     }
-    check(CCC_bitset_empty(&source), CCC_bitset_empty(&destination));
+    check(CCC_bitset_is_empty(&source), CCC_bitset_is_empty(&destination));
     check_end({
         (void)CCC_bitset_clear_and_free(&source);
         (void)CCC_bitset_clear_and_free(&destination);

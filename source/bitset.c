@@ -664,7 +664,7 @@ CCC_bitset_blocks_count(CCC_Bitset const *const bitset)
 }
 
 CCC_Tribool
-CCC_bitset_empty(CCC_Bitset const *const bitset)
+CCC_bitset_is_empty(CCC_Bitset const *const bitset)
 {
     if (!bitset)
     {

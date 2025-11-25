@@ -27,7 +27,7 @@ check_static_begin(bitset_test_push_pop_back_no_reallocate)
     check(push_status, CCC_RESULT_NO_ALLOCATION_FUNCTION);
     check(CCC_bitset_count(&bs).count, 16);
     check(CCC_bitset_popcount(&bs).count, 16 / 2);
-    while (!CCC_bitset_empty(&bs))
+    while (!CCC_bitset_is_empty(&bs))
     {
         CCC_Tribool const msb = CCC_bitset_pop_back(&bs);
         if (CCC_bitset_count(&bs).count % 2)
@@ -68,7 +68,7 @@ check_static_begin(bitset_test_push_pop_back_allocate)
     }
     check(CCC_bitset_count(&bs).count, 16);
     check(CCC_bitset_popcount(&bs).count, 16 / 2);
-    while (!CCC_bitset_empty(&bs))
+    while (!CCC_bitset_is_empty(&bs))
     {
         CCC_Tribool const msb_was = CCC_bitset_pop_back(&bs);
         if (CCC_bitset_count(&bs).count % 2)

@@ -859,7 +859,7 @@ CCC_Count CCC_bitset_blocks_count(CCC_Bitset const *bitset);
 1 status, are tracked by the set. CCC_TRIBOOL_ERROR is returned if bitset is
 NULL.
 @warning if the number of bits set to 1 is desired see CCC_bitset_popcount(). */
-CCC_Tribool CCC_bitset_empty(CCC_Bitset const *bitset);
+CCC_Tribool CCC_bitset_is_empty(CCC_Bitset const *bitset);
 
 /** @brief Return the number of bits set to CCC_TRUE. O(n).
 @param[in] bitset a pointer to the bit set.
@@ -1018,7 +1018,7 @@ typedef CCC_Bitset Bitset;
 #    define bitset_blocks_capacity(args...) CCC_bitset_blocks_capacity(args)
 #    define bitset_count(args...) CCC_bitset_count(args)
 #    define bitset_blocks_count(args...) CCC_bitset_blocks_count(args)
-#    define bitset_empty(args...) CCC_bitset_empty(args)
+#    define bitset_is_empty(args...) CCC_bitset_is_empty(args)
 #    define bitset_popcount(args...) CCC_bitset_popcount(args)
 #    define bitset_popcount_range(args...) CCC_bitset_popcount_range(args)
 #    define bitset_clear(args...) CCC_bitset_clear(args)
