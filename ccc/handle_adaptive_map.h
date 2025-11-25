@@ -203,7 +203,7 @@ Initialize a dynamic map at run time. This example requires no context data for
 initialization.
 
 ```
-#define HANDLE_adaptive_MAP_USING_NAMESPACE_CCC
+#define HANDLE_ADAPTIVE_MAP_USING_NAMESPACE_CCC
 struct Val
 {
     int key;
@@ -259,7 +259,7 @@ Initialize a dynamic map at run time. This example requires no context
 data for initialization.
 
 ```
-#define HANDLE_adaptive_MAP_USING_NAMESPACE_CCC
+#define HANDLE_ADAPTIVE_MAP_USING_NAMESPACE_CCC
 struct Val
 {
     int key;
