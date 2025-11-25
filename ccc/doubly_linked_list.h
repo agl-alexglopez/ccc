@@ -107,9 +107,9 @@ array.
 map (e.g. (struct My_type[]){ {.val = 1}, {.val = 2}}).
 @return the initialized doubly linked list on the right side of an equality
 operator (e.g. CCC_Doubly_linked_list list = CCC_doubly_linked_list_from(...);)
-@note Elements in the initializer list are pushed back into the list in the
-order they appear. Therefore, the order of the doubly linked list will mirror
-the order of the elements in the compound literal array. */
+@note The list is constructed to mirror the compound literal array provided.
+The list will be constructed with the element at index 0 of the array as the
+front of the list and the final index element at the back of the list. */
 #define CCC_doubly_linked_list_from(type_intruder_field, compare, allocate,    \
                                     destroy, context_data,                     \
                                     compound_literal_array...)                 \

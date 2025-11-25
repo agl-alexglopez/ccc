@@ -58,7 +58,7 @@ check_static_begin(singly_linked_list_test_construct_from)
     check(CCC_singly_linked_list_count(&list).count, 3);
     struct Val const *const v = CCC_singly_linked_list_front(&list);
     check(v != NULL, true);
-    check(v->val, 2);
+    check(v->val, 0);
     check_end((void)CCC_singly_linked_list_clear(&list, NULL););
 }
 

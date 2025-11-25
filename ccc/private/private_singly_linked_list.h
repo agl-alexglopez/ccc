@@ -123,10 +123,10 @@ CCC_private_singly_linked_list_node_in(struct CCC_Singly_linked_list const *,
                 private_allocate, private_context_data);                       \
         if (private_singly_linked_list.allocate)                               \
         {                                                                      \
-            size_t const private_count                                         \
+            size_t private_count                                               \
                 = sizeof(private_compound_literal_array)                       \
                 / sizeof(*private_singly_linked_list_type_array);              \
-            for (size_t private_i = 0; private_i < private_count; ++private_i) \
+            while (private_count--)                                            \
             {                                                                  \
                 typeof(*private_singly_linked_list_type_array) *const          \
                     private_new_node                                           \
@@ -143,7 +143,7 @@ CCC_private_singly_linked_list_node_in(struct CCC_Singly_linked_list const *,
                     break;                                                     \
                 }                                                              \
                 *private_new_node                                              \
-                    = private_singly_linked_list_type_array[private_i];        \
+                    = private_singly_linked_list_type_array[private_count];    \
                 CCC_private_singly_linked_list_push_front(                     \
                     &private_singly_linked_list,                               \
                     CCC_private_singly_linked_list_node_in(                    \
