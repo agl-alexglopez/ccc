@@ -56,7 +56,11 @@ enum : Bitblock
     BITBLOCK_ON = ((Bitblock)~0),
     /** @internal The Most Significant Bit of a bit block turned on to 1. */
     BITBLOCK_MSB = (((Bitblock)1) << (((SIZEOF_BLOCK * CHAR_BIT)) - 1)),
+    /** @internal Hand coded log2 of block bits to avoid division. */
+    BITBLOCK_BITS_LOG2 = 5,
 };
+static_assert(CCC_BITSET_BLOCK_BITS >> BITBLOCK_BITS_LOG2 == 1,
+              "hand coded log2 of bitblock bits is always correct");
 
 /** @internal An index into the block array or count of bit blocks. The block
 array is bounded by the number of blocks required to support the current bit set
@@ -1723,7 +1727,11 @@ index resides which is in the range [0, block containing last in use bit). */
 static inline Block_count
 block_count_index(size_t const bitset_index)
 {
-    return bitset_index / BITBLOCK_BITS;
+    static_assert((typeof(bitset_index))~((typeof(bitset_index))0)
+                      >= (typeof(bitset_index))0,
+                  "shifting to avoid division with power of 2 divisor is only "
+                  "defined for unsigned types");
+    return bitset_index >> BITBLOCK_BITS_LOG2;
 }
 
 /** Returns the 0-based index within a block to which the given index belongs.
@@ -1742,9 +1750,16 @@ is non-zero. For any bits > 1 the block count is always less than bits.*/
 static inline Block_count
 block_count(size_t const set_bits)
 {
+    static_assert((typeof(set_bits))~((typeof(set_bits))0)
+                      >= (typeof(set_bits))0,
+                  "shifting to avoid division with power of 2 divisor is only "
+                  "defined for unsigned types");
+    static_assert((BITBLOCK_BITS & (BITBLOCK_BITS - 1)) == 0,
+                  "the number of bits in a block is always a power of two, "
+                  "avoiding division operations when possible.");
     static_assert(BITBLOCK_BITS);
     assert(set_bits);
-    return (set_bits + (BITBLOCK_BITS - 1)) / BITBLOCK_BITS;
+    return (set_bits + (BITBLOCK_BITS - 1)) >> BITBLOCK_BITS_LOG2;
 }
 
 /** Returns min of size_t arguments. Beware of conversions. */
