@@ -15,7 +15,18 @@ limitations under the License.
 This file implements a Bit Set using blocks of platform defined integers
 for speed and efficiency. The implementation aims for constant and linear time
 operations at all times, specifically when implementing more complicated range
-based operations over the set. */
+based operations over the set.
+
+It is also important to avoid modulo and division operations whenever possible.
+This is why much of the code revolves around obtaining indices by processing
+entire blocks at a time, rather than iterating over individual bits.
+
+Finally, the code is able to unite most functions for finding zeros or ones
+into a single function that accepts true or false as an additional argument.
+This is because every search for a zero can be solved by bitwise inverting a
+block and searching for a 1 instead. This elimination of identical functions
+costs a single branch in the function and is worth it to avoid code duplication
+and bug doubling. */
 #include <assert.h>
 #include <limits.h>
 #include <stddef.h>
