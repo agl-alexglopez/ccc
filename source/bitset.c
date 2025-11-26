@@ -56,11 +56,7 @@ enum : Bitblock
     BITBLOCK_ON = ((Bitblock)~0),
     /** @internal The Most Significant Bit of a bit block turned on to 1. */
     BITBLOCK_MSB = (((Bitblock)1) << (((SIZEOF_BLOCK * CHAR_BIT)) - 1)),
-    /** @internal Hand coded log2 of block bits to avoid division. */
-    BITBLOCK_BITS_LOG2 = 5,
 };
-static_assert(CCC_BITSET_BLOCK_BITS >> BITBLOCK_BITS_LOG2 == 1,
-              "hand coded log2 of bitblock bits is always correct");
 
 /** @internal An index into the block array or count of bit blocks. The block
 array is bounded by the number of blocks required to support the current bit set
@@ -99,8 +95,16 @@ enum : Bit_count
 {
     /** @internal How many total bits that fit in a bit block. */
     BITBLOCK_BITS = (SIZEOF_BLOCK * CHAR_BIT),
+    /** @internal Used for static assert clarity. */
     U8BLOCK_MAX = UINT8_MAX,
+    /** @internal Hand coded log2 of block bits to avoid division. */
+    BITBLOCK_BITS_LOG2 = 5,
 };
+static_assert((BITBLOCK_BITS & (BITBLOCK_BITS - 1)) == 0,
+              "the number of bits in a block is always a power of two, "
+              "helping avoid division and modulo operations when possible");
+static_assert(CCC_BITSET_BLOCK_BITS >> BITBLOCK_BITS_LOG2 == 1,
+              "hand coded log2 of bitblock bits is always correct");
 static_assert((Bit_count) ~((Bit_count)0) >= (Bit_count)0,
               "Bit_count must be unsigned");
 static_assert(UINT8_MAX >= BITBLOCK_BITS, "Bit_count counts all block bits.");
@@ -1739,9 +1743,6 @@ This index will always be between [0, BITBLOCK_BITS - 1). */
 static inline Bit_count
 bit_count_index(size_t const bitset_index)
 {
-    static_assert((BITBLOCK_BITS & (BITBLOCK_BITS - 1)) == 0,
-                  "the number of bits in a block is always a power of two, "
-                  "avoiding modulo operations when possible.");
     return bitset_index & (BITBLOCK_BITS - 1);
 }
 
@@ -1754,10 +1755,6 @@ block_count(size_t const set_bits)
                       >= (typeof(set_bits))0,
                   "shifting to avoid division with power of 2 divisor is only "
                   "defined for unsigned types");
-    static_assert((BITBLOCK_BITS & (BITBLOCK_BITS - 1)) == 0,
-                  "the number of bits in a block is always a power of two, "
-                  "avoiding division operations when possible.");
-    static_assert(BITBLOCK_BITS);
     assert(set_bits);
     return (set_bits + (BITBLOCK_BITS - 1)) >> BITBLOCK_BITS_LOG2;
 }
