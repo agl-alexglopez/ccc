@@ -4,6 +4,7 @@
 #include "ccc/types.h"
 #include "checkers.h"
 #include "utility/allocate.h"
+#include "utility/string_view/string_view.h"
 
 check_static_begin(bitset_test_construct)
 {
@@ -109,40 +110,40 @@ check_static_begin(bitset_test_copy_allocate)
 
 check_static_begin(bitset_test_init_from)
 {
-    char input[] = {'1', '1', '0', '1', '1', '0', '\0'};
-    CCC_Bitset b = CCC_bitset_from(std_allocate, NULL, 0, sizeof(input) - 1,
-                                   '1', "110110");
-    check(CCC_bitset_count(&b).count, sizeof(input) - 1);
-    check(CCC_bitset_capacity(&b).count, sizeof(input) - 1);
+    SV_String_view input = SV("110110");
+    CCC_Bitset b = CCC_bitset_from(std_allocate, NULL, 0, SV_len(input), '1',
+                                   SV_begin(input));
+    check(CCC_bitset_count(&b).count, SV_len(input));
+    check(CCC_bitset_capacity(&b).count, SV_len(input));
     check(CCC_bitset_popcount(&b).count, 4);
     check(CCC_bitset_test(&b, 0), CCC_TRUE);
-    check(CCC_bitset_test(&b, sizeof(input) - 2), CCC_FALSE);
+    check(CCC_bitset_test(&b, SV_len(input) - 1), CCC_FALSE);
     check_end(CCC_bitset_clear_and_free(&b););
 }
 
 check_static_begin(bitset_test_init_from_cap)
 {
-    char input[] = {'1', '1', '0', '1', '1', '0', '\0'};
-    CCC_Bitset b = CCC_bitset_from(std_allocate, NULL, 0, sizeof(input), '1',
-                                   input, (sizeof(input) - 1) * 2);
-    check(CCC_bitset_count(&b).count, sizeof(input) - 1);
-    check(CCC_bitset_capacity(&b).count, (sizeof(input) - 1) * 2);
+    SV_String_view input = SV("110110");
+    CCC_Bitset b = CCC_bitset_from(std_allocate, NULL, 0, SV_len(input), '1',
+                                   SV_begin(input), SV_len(input) * 2);
+    check(CCC_bitset_count(&b).count, SV_len(input));
+    check(CCC_bitset_capacity(&b).count, (SV_len(input)) * 2);
     check(CCC_bitset_popcount(&b).count, 4);
     check(CCC_bitset_test(&b, 0), CCC_TRUE);
-    check(CCC_bitset_test(&b, sizeof(input) - 2), CCC_FALSE);
-    check(CCC_TRIBOOL_ERROR, CCC_bitset_test(&b, sizeof(input) - 1));
+    check(CCC_bitset_test(&b, SV_len(input) - 1), CCC_FALSE);
+    check(CCC_TRIBOOL_ERROR, CCC_bitset_test(&b, SV_len(input)));
     check(CCC_bitset_push_back(&b, CCC_TRUE), CCC_RESULT_OK);
-    check(CCC_TRUE, CCC_bitset_test(&b, sizeof(input) - 1));
-    check(CCC_bitset_capacity(&b).count, (sizeof(input) - 1) * 2);
+    check(CCC_TRUE, CCC_bitset_test(&b, SV_len(input)));
+    check(CCC_bitset_capacity(&b).count, (SV_len(input)) * 2);
     check_end(CCC_bitset_clear_and_free(&b););
 }
 
 check_static_begin(bitset_test_init_from_fail)
 {
-    char input[] = {'1', '1', '0', '1', '1', '0', '\0'};
+    SV_String_view input = SV("110110");
     /* Forgot allocation function. */
     CCC_Bitset b
-        = CCC_bitset_from(NULL, NULL, 0, sizeof(input) - 1, '1', input);
+        = CCC_bitset_from(NULL, NULL, 0, SV_len(input), '1', SV_begin(input));
     check(CCC_bitset_count(&b).count, 0);
     check(CCC_bitset_capacity(&b).count, 0);
     check(CCC_bitset_popcount(&b).count, 0);
@@ -153,10 +154,10 @@ check_static_begin(bitset_test_init_from_fail)
 
 check_static_begin(bitset_test_init_from_cap_fail)
 {
-    char input[] = {'1', '1', '0', '1', '1', '0', '\0'};
+    SV_String_view input = SV("110110");
     /* Forgot allocation function. */
-    CCC_Bitset b
-        = CCC_bitset_from(NULL, NULL, 0, sizeof(input) - 1, '1', input, 99);
+    CCC_Bitset b = CCC_bitset_from(NULL, NULL, 0, SV_len(input), '1',
+                                   SV_begin(input), 99);
     check(CCC_bitset_count(&b).count, 0);
     check(CCC_bitset_capacity(&b).count, 0);
     check(CCC_bitset_popcount(&b).count, 0);

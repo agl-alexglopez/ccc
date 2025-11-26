@@ -40,6 +40,14 @@ find the first bits set to zero or one from either the trailing or leading
 direction. A bit set can also efficiently report if contiguous ranges of zeros
 or ones are available.
 
+All `*_range` functions interpret their range input argument parameters as
+`[index, index + count)`, a starting index and a positive forward length. This
+convention is consistent for all operations. The implementation automatically
+chooses the optimal scan direction, Least Significant Bit to Most Significant
+Bit for trailing scans, Most Significant Bit  to Least Significant Bit for
+leading scans. However, the user always specifies the range in the same way
+for consistency.
+
 To shorten names in the interface, define the following preprocessor directive
 at the top of your file.
 
@@ -48,8 +56,8 @@ at the top of your file.
 ```
 
 All types and functions can then be written without the `CCC_` prefix. */
-#ifndef CCC_BITSET
-#define CCC_BITSET
+#ifndef CCC_BITSET_H
+#define CCC_BITSET_H
 
 /** @cond */
 #include <stddef.h>
@@ -107,8 +115,12 @@ the scope it is created with any storage duration specifiers added.
 This method can be used for compile time initialization of bit set. For example:
 
 ```
-static CCC_Bitset bit = CCC_bitset_initialize(CCC_bitset_blocks(256, static),
-NULL, NULL, 256);
+static CCC_Bitset bit = CCC_bitset_initialize(
+    CCC_bitset_blocks(256, static),
+    NULL,
+    NULL,
+    256
+);
 ```
 
 The above example also illustrates the benefits of a static compound literal
@@ -117,8 +129,12 @@ If the compiler does not support storage duration of compound literals the more
 traditional example follows:
 
 ```
-static CCC_Bitset bit = CCC_bitset_initialize(CCC_bitset_blocks(256), NULL,
-NULL, 256);
+static CCC_Bitset bit = CCC_bitset_initialize(
+    CCC_bitset_blocks(256),
+    NULL,
+    NULL,
+    256
+);
 ```
 
 This macro is required for any initialization where the bit block memory comes
@@ -404,18 +420,17 @@ CCC_Result CCC_bitset_set_all(CCC_Bitset *bitset, CCC_Tribool bit);
 Significant Bit of the range and ending at the Most Significant Bit of the range
 (CCC_TRUE or CCC_FALSE).
 @param[in] bitset a pointer to the bit set.
+@param[in] range_start_index the starting index to set.
+@param[in] range_bit_count the count of bits starting at index to set.
 @param[in] bit the value to set (CCC_TRUE or CCC_FALSE).
-@param[in] index the starting index to set.
-@param[in] count the count of bits starting at index to set.
 @return the result of the operation. OK if successful, or an
 input error if bitset is NULL or the range is invalid by position, count, or
 both.
 
-Note that a range is defined from index to index + count, where `index + count`
-is the exclusive end of the range. This is equivalent to moving from Least to
-Most Significant bit in an integer. */
-CCC_Result CCC_bitset_set_range(CCC_Bitset *bitset, size_t index, size_t count,
-                                CCC_Tribool bit);
+Note that a range is defined from `[index, index + count)`. This is equivalent
+to moving from Least to Most Significant bit in an integer. */
+CCC_Result CCC_bitset_set_range(CCC_Bitset *bitset, size_t range_start_index,
+                                size_t range_bit_count, CCC_Tribool bit);
 
 /** @brief Set the bit at valid index index to boolean value b (true or false).
 @param[in] bitset a pointer to the bit set.
@@ -435,16 +450,15 @@ CCC_Result CCC_bitset_reset_all(CCC_Bitset *bitset);
 Significant Bit of the range and ending at the Most Significant Bit of the range
 to CCC_FALSE.
 @param[in] bitset a pointer to the bit set.
-@param[in] index the starting index to reset.
-@param[in] count the count of bits starting at index to reset.
+@param[in] range_start_index the starting index to reset.
+@param[in] range_bit_count the count of bits starting at index to reset.
 @return the result of the operation. OK if successful, or an input error if
 bitset is NULL or the range is invalid by position, count, or both.
 
-Note that a range is defined from index to index + count, where `index + count`
-is the exclusive end of the range. This is equivalent to moving from Least to
-Most Significant bit in an integer. */
-CCC_Result CCC_bitset_reset_range(CCC_Bitset *bitset, size_t index,
-                                  size_t count);
+Note that a range is defined from `[index, index + count)`. This is equivalent
+to moving from Least to Most Significant bit in an integer. */
+CCC_Result CCC_bitset_reset_range(CCC_Bitset *bitset, size_t range_start_index,
+                                  size_t range_bit_count);
 
 /** @brief Toggle the bit at index i.
 @param[in] bitset a pointer to the bit set.
@@ -463,16 +477,16 @@ CCC_Result CCC_bitset_flip_all(CCC_Bitset *bitset);
 /** @brief Flip all the bits in the range, starting at the Least Significant Bit
 in range and ending at the Most Significant Bit, to their opposite value.
 @param[in] bitset a pointer to the bit set.
-@param[in] index the starting index to reset.
-@param[in] count the count of bits starting at index to reset.
+@param[in] range_start_index the starting index to reset.
+@param[in] range_bit_count the count of bits starting at index to reset.
 @return the result of the operation. OK if successful, or an input error if
 bitset is NULL or the range is invalid by position, count, or both.
 
 Note that a range is defined from index to index + count, where `index + count`
 is the exclusive end of the range. This is equivalent to moving from Least to
 Most Significant Bit in an integer. */
-CCC_Result CCC_bitset_flip_range(CCC_Bitset *bitset, size_t index,
-                                 size_t count);
+CCC_Result CCC_bitset_flip_range(CCC_Bitset *bitset, size_t range_start_index,
+                                 size_t range_bit_count);
 
 /**@}*/
 
@@ -486,15 +500,16 @@ Find bits with a specific status. */
 CCC_TRIBOOL_ERROR if bitset is NULL. */
 CCC_Tribool CCC_bitset_any(CCC_Bitset const *bitset);
 
-/** @brief Return true if any bits are 1 in the specified range.
+/** @brief Return true if any bits are 1 in the range `[index, index + count)`.
 @param[in] bitset a pointer to the bit set.
-@param[in] index the starting position.
-@param[in] count the size of the range to check.
+@param[in] range_start_index the starting position.
+@param[in] range_bit_count the size of the range to check.
 @return CCC_TRUE if any bits are 1, CCC_FALSE if no bits are 1,
 CCC_TRIBOOL_ERROR if bitset is NULL, index is invalid, count is invalid, or both
 index and count are invalid. */
-CCC_Tribool CCC_bitset_any_range(CCC_Bitset const *bitset, size_t index,
-                                 size_t count);
+CCC_Tribool CCC_bitset_any_range(CCC_Bitset const *bitset,
+                                 size_t range_start_index,
+                                 size_t range_bit_count);
 
 /** @brief Return true if all bits are set to 0.
 @param[in] bitset a pointer to the bit set.
@@ -502,15 +517,16 @@ CCC_Tribool CCC_bitset_any_range(CCC_Bitset const *bitset, size_t index,
 CCC_TRIBOOL_ERROR if bitset is NULL. */
 CCC_Tribool CCC_bitset_none(CCC_Bitset const *bitset);
 
-/** @brief Return true if all bits are 0 in the specified range.
+/** @brief Return true if all bits are 0 in the range `[index, index + count)`.
 @param[in] bitset a pointer to the bit set.
-@param[in] index the starting position.
-@param[in] count the size of the range to check.
+@param[in] range_start_index the starting position.
+@param[in] range_bit_count the size of the range to check.
 @return CCC_TRUE if all bits are 0, CCC_FALSE if any bits are 1,
 CCC_TRIBOOL_ERROR if bitset is NULL, index is invalid, count is invalid, or both
 index and count are invalid. */
-CCC_Tribool CCC_bitset_none_range(CCC_Bitset const *bitset, size_t index,
-                                  size_t count);
+CCC_Tribool CCC_bitset_none_range(CCC_Bitset const *bitset,
+                                  size_t range_start_index,
+                                  size_t range_bit_count);
 
 /** @brief Return true if all bits in set are 1.
 @param[in] bitset a pointer to the bit set.
@@ -518,15 +534,17 @@ CCC_Tribool CCC_bitset_none_range(CCC_Bitset const *bitset, size_t index,
 CCC_TRIBOOL_ERROR if bitset is NULL. */
 CCC_Tribool CCC_bitset_all(CCC_Bitset const *bitset);
 
-/** @brief Return true if all bits are set to 1 in the specified range.
+/** @brief Return true if all bits are set to 1 in the range
+`[index, index + count)`.
 @param[in] bitset a pointer to the bit set.
-@param[in] index the starting position.
-@param[in] count the size of the range to check.
+@param[in] range_start_index the starting position.
+@param[in] range_bit_count the size of the range to check.
 @return CCC_TRUE if all bits are 1, CCC_FALSE if any bits are 0,
 CCC_TRIBOOL_ERROR if bitset is NULL, index is invalid, count is invalid, or both
 index and count are invalid. */
-CCC_Tribool CCC_bitset_all_range(CCC_Bitset const *bitset, size_t index,
-                                 size_t count);
+CCC_Tribool CCC_bitset_all_range(CCC_Bitset const *bitset,
+                                 size_t range_start_index,
+                                 size_t range_bit_count);
 
 /** @brief Return the index of the first trailing bit set to 1 in the set.
 @param[in] bitset a pointer to the bit set.
@@ -538,37 +556,39 @@ CCC_Count CCC_bitset_first_trailing_one(CCC_Bitset const *bitset);
 /** @brief Return the index of the first trailing bit set to 1 in the range
 `[i, index + count)`.
 @param[in] bitset a pointer to the bit set.
-@param[in] index the starting index to search.
-@param[in] count the size of the range to check.
+@param[in] range_start_index the starting index to search.
+@param[in] range_bit_count the size of the range to check.
 @return an OK(0) status and the index of the first trailing bit set to 1 or
 CCC_RESULT_FAIL if no 1 bit is found. Argument error is returned bitset is NULL,
 or the range is invalid. */
 CCC_Count CCC_bitset_first_trailing_one_range(CCC_Bitset const *bitset,
-                                              size_t index, size_t count);
+                                              size_t range_start_index,
+                                              size_t range_bit_count);
 
 /** @brief Returns the index of the start of the first trailing number of
 contiguous 1 bits.
 @param[in] bitset a pointer to the bit set.
-@param[in] num_ones the number of trailing contiguous 1 bits to find.
+@param[in] ones_count the number of trailing contiguous 1 bits to find.
 @return an OK(0) status and the index in a search starting from the Least
-Significant Bit of the set of the first 1 in a sequence of num_ones 1 bits. If
+Significant Bit of the set of the first 1 in a sequence of bit_count 1 bits. If
 such a sequence cannot be found CCC_RESULT_FAIL result error is set. If bitset
-is NULL or num_ones is too large an argument error is set. */
+is NULL or bit_count is too large an argument error is set. */
 CCC_Count CCC_bitset_first_trailing_ones(CCC_Bitset const *bitset,
-                                         size_t num_ones);
+                                         size_t ones_count);
 
 /** @brief Returns the index of the start of the first trailing number of
-contiguous 1 bits in the range `[i, index + count)`.
+contiguous 1 bits in the range `[index, index + count)`.
 @param[in] bitset a pointer to the bit set.
-@param[in] index the starting index to search.
-@param[in] count the size of the range to check.
-@param[in] num_ones the number of trailing contiguous 1 bits to find.
+@param[in] range_start_index the starting index to search.
+@param[in] range_bit_count the size of the range to check.
+@param[in] ones_count the number of trailing contiguous 1 bits to find.
 @return an OK(0) status and the starting index of the first 1 in a sequence of
-num_ones 1 bits. If no range is found CCC_RESULT_FAIL error is set. If bitset is
-NULL or arguments are out of range an argument error is set. */
+bit_count 1 bits. If no range is found CCC_RESULT_FAIL error is set. If bitset
+is NULL or arguments are out of range an argument error is set. */
 CCC_Count CCC_bitset_first_trailing_ones_range(CCC_Bitset const *bitset,
-                                               size_t index, size_t count,
-                                               size_t num_ones);
+                                               size_t range_start_index,
+                                               size_t range_bit_count,
+                                               size_t ones_count);
 
 /** @brief Return the index of the first bit set to 0 in the set.
 @param[in] bitset a pointer to the bit set.
@@ -580,37 +600,39 @@ CCC_Count CCC_bitset_first_trailing_zero(CCC_Bitset const *bitset);
 /** @brief Return the index of the first bit set to 0 in the range
 `[i, index + count)`.
 @param[in] bitset a pointer to the bit set.
-@param[in] index the starting index to search.
-@param[in] count the size of the range to check.
+@param[in] range_start_index the starting index to search.
+@param[in] range_bit_count the size of the range to check.
 @return an OK(0) status and the index of the first bit set to 0 or
 CCC_RESULT_FAIL if no 0 bit is found. If bitset is NULL, or the range is
 invalid, an argument error is set. */
 CCC_Count CCC_bitset_first_trailing_zero_range(CCC_Bitset const *bitset,
-                                               size_t index, size_t count);
+                                               size_t range_start_index,
+                                               size_t range_bit_count);
 
 /** @brief Returns the index of the start of the first trailing number of
 contiguous 0 bits in the set.
 @param[in] bitset a pointer to the bit set.
-@param[in] num_zeros the number of trailing contiguous 0 bits to find.
+@param[in] zeros_count the number of trailing contiguous 0 bits to find.
 @return an OK(0) status and the index in a search, starting from the Least
 Significant Bit of the set, of the first 0 in a sequence of num_zeros 0 bits. If
 such a sequence cannot be found CCC_RESULT_FAIL is returned. If bitset is NULL
 or num zeros is too large an argument error is set. */
 CCC_Count CCC_bitset_first_trailing_zeros(CCC_Bitset const *bitset,
-                                          size_t num_zeros);
+                                          size_t zeros_count);
 
 /** @brief Returns the index of the start of the first trailing num_zeros
 contiguous 0 bits in the range `[i, index + count)`.
 @param[in] bitset a pointer to the bit set.
-@param[in] index the starting index to search.
-@param[in] count the size of the range to check.
-@param[in] num_zeros the number of trailing contiguous 0 bits to find.
+@param[in] range_start_index the starting index to search.
+@param[in] range_bit_count the size of the range to check.
+@param[in] zeros_count the number of trailing contiguous 0 bits to find.
 @return the index in a search, starting from the Least Significant Bit of the
 range, of the first 0 in a sequence of num_zeros 0 bits. If the input is invalid
 or such a sequence cannot be found CCC_RESULT_FAIL is returned. */
 CCC_Count CCC_bitset_first_trailing_zeros_range(CCC_Bitset const *bitset,
-                                                size_t index, size_t count,
-                                                size_t num_zeros);
+                                                size_t range_start_index,
+                                                size_t range_bit_count,
+                                                size_t zeros_count);
 
 /** @brief Return the index of the first leading bit set to 1 in the set,
 starting from the Most Significant Bit at index size - 1.
@@ -620,7 +642,7 @@ bit is found or bitset in NULL. */
 CCC_Count CCC_bitset_first_leading_one(CCC_Bitset const *bitset);
 
 /** @brief Return the index of the first leading bit set to 1 in the range
-`[i, index - count)`.
+`[i, index + count)`.
 @param[in] bitset a pointer to the bit set.
 @param[in] index the starting index to search.
 @param[in] count the size of the range to check from index towards index 0.
@@ -629,29 +651,30 @@ bit is found, bitset is NULL, or the range is invalid. */
 CCC_Count CCC_bitset_first_leading_one_range(CCC_Bitset const *bitset,
                                              size_t index, size_t count);
 
-/** @brief Returns the index of the start of the first leading num_ones
+/** @brief Returns the index of the start of the first leading bit_count
 contiguous 1 bits.
 @param[in] bitset a pointer to the bit set.
-@param[in] num_ones the number of leading contiguous 1 bits to find.
+@param[in] ones_count the number of leading contiguous 1 bits to find.
 @return the index in a search starting from the Least Significant Bit of the set
-of the first 1 in a sequence of num_ones 1 bits. If the input is invalid or such
-a sequence cannot be found CCC_RESULT_FAIL is returned. */
+of the first 1 in a sequence of bit_count 1 bits. If the input is invalid or
+such a sequence cannot be found CCC_RESULT_FAIL is returned. */
 CCC_Count CCC_bitset_first_leading_ones(CCC_Bitset const *bitset,
-                                        size_t num_ones);
+                                        size_t ones_count);
 
-/** @brief Returns the index of the start of the first leading num_ones
-contiguous 1 bits in the range `[i, index - count)`.
+/** @brief Returns the index of the start of the first leading bit_count
+contiguous 1 bits in the range `[i, index + count)`.
 @param[in] bitset a pointer to the bit set.
-@param[in] index the starting index to search.
-@param[in] count the size of the range to check.
-@param[in] num_ones the number of leading contiguous 1 bits to find.
+@param[in] range_start_index the starting index to search.
+@param[in] range_bit_count the size of the range to check.
+@param[in] ones_count the number of leading contiguous 1 bits to find.
 @return an OK(0) status and the index in a search starting from the Most
-Significant Bit of the range of the first 1 in a sequence of num_ones 1 bits. If
-such a sequence cannot be found CCC_RESULT_FAIL is set. If bitset is NULL or any
-argument is out of range an argument error is set. */
+Significant Bit of the range of the first 1 in a sequence of bit_count 1 bits.
+If such a sequence cannot be found CCC_RESULT_FAIL is set. If bitset is NULL or
+any argument is out of range an argument error is set. */
 CCC_Count CCC_bitset_first_leading_ones_range(CCC_Bitset const *bitset,
-                                              size_t index, size_t count,
-                                              size_t num_ones);
+                                              size_t range_start_index,
+                                              size_t range_bit_count,
+                                              size_t ones_count);
 
 /** @brief Return the index of the first leading bit set to 0 in the set,
 starting from the Most Significant Bit at index size - 1.
@@ -662,15 +685,17 @@ set. */
 CCC_Count CCC_bitset_first_leading_zero(CCC_Bitset const *bitset);
 
 /** @brief Return the index of the first leading bit set to 0 in the range
-`[i, index - count)`.
+`[i, index + count)`.
 @param[in] bitset a pointer to the bit set.
-@param[in] index the starting index to search for a 0 bit.
-@param[in] count size to search from Most Significant Bit to Least in range.
+@param[in] range_start_index the starting index to search for a 0 bit.
+@param[in] range_bit_count size to search from Most Significant Bit to Least in
+range.
 @return an OK(0) status and the index of the first bit set to 0 in the specified
 range CCC_RESULT_FAIL if no 0 bit is found. If bs in NULL an argument error is
 set. */
 CCC_Count CCC_bitset_first_leading_zero_range(CCC_Bitset const *bitset,
-                                              size_t index, size_t count);
+                                              size_t range_start_index,
+                                              size_t range_bit_count);
 
 /** @brief Returns the index of the start of the first leading number of
 contiguous 0 bits.
@@ -684,18 +709,19 @@ CCC_Count CCC_bitset_first_leading_zeros(CCC_Bitset const *bitset,
                                          size_t num_zeros);
 
 /** @brief Returns the index of the start of the first leading number of
-contiguous 0 bits in the range `[i, index - count)`.
+contiguous 0 bits in the range `[i, index + count)`.
 @param[in] bitset a pointer to the bit set.
-@param[in] index the starting index to search.
-@param[in] count the size of the range to check.
-@param[in] num_zeros the number of leading contiguous 0 bits to find.
+@param[in] range_start_index the starting index to search.
+@param[in] range_bit_count the size of the range to check.
+@param[in] zeros_count the number of leading contiguous 0 bits to find.
 @return an OK(0) status and the index in a search, starting from the Most
-Significant Bit of the range, of the first 0 in a sequence of num_zeros 0 bits.
-If such a sequence cannot be found CCC_RESULT_FAIL is returned. If bitset is
-NULL or the arguments are out of range an argument error is set. */
+Significant Bit of the range, of the first 0 in a sequence of 0 bits. If such a
+sequence cannot be found CCC_RESULT_FAIL is returned. If bitset is NULL or the
+arguments are out of range an argument error is set. */
 CCC_Count CCC_bitset_first_leading_zeros_range(CCC_Bitset const *bitset,
-                                               size_t index, size_t count,
-                                               size_t num_zeros);
+                                               size_t range_start_index,
+                                               size_t range_bit_count,
+                                               size_t zeros_count);
 
 /**@}*/
 
@@ -869,13 +895,14 @@ CCC_Count CCC_bitset_popcount(CCC_Bitset const *bitset);
 
 /** @brief Return the number of bits set to CCC_TRUE in the range. O(n).
 @param[in] bitset a pointer to the bit set.
-@param[in] index the starting position.
-@param[in] count the size of the range to check.
+@param[in] range_start_index the starting position.
+@param[in] range_bit_count the size of the range to check.
 @return the total number of bits currently set in the range to CCC_TRUE. An
 argument error is set if bitset is NULL, index is invalid, count is invalid, or
 both index and count are invalid. */
-CCC_Count CCC_bitset_popcount_range(CCC_Bitset const *bitset, size_t index,
-                                    size_t count);
+CCC_Count CCC_bitset_popcount_range(CCC_Bitset const *bitset,
+                                    size_t range_start_index,
+                                    size_t range_bit_count);
 
 /**@}*/
 
@@ -1029,4 +1056,4 @@ typedef CCC_Bitset Bitset;
 #    define bitset_pop_back(args...) CCC_bitset_pop_back(args)
 #endif /* BITSET_USING_NAMESPACE_CCC */
 
-#endif /* CCC_BITSET */
+#endif /* CCC_BITSET_H */

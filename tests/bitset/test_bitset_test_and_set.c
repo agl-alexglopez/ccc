@@ -587,17 +587,43 @@ check_static_begin(bitset_test_first_leading_one)
 {
     Bitset bs = bitset_initialize(bitset_blocks(512), NULL, NULL, 512);
     check(bitset_set_all(&bs, CCC_TRUE), CCC_RESULT_OK);
-    size_t const last_i = 511;
     /* Start with an almost full range and reduce by moving start backwards. */
-    for (size_t i = last_i; i > 1; --i)
+    for (size_t i = 512; i-- > 1;)
     {
         check(bitset_set(&bs, i, CCC_FALSE), CCC_TRUE);
         check(bitset_first_leading_one(&bs).count, i - 1);
-        check(bitset_first_leading_one_range(&bs, last_i, 512 - i).error
+        check(bitset_first_leading_one_range(&bs, i, 512 - i + 1).error
                   != CCC_RESULT_OK,
               true);
-        check(bitset_first_leading_one_range(&bs, i, i + 1).count, i - 1);
+        check(bitset_first_leading_one_range(&bs, 0, i + 1).count, i - 1);
     }
+    check(bitset_first_leading_one(&bs).count, 0);
+    check(bitset_first_leading_one_range(&bs, 0, 1).count, 0);
+    check_end();
+}
+
+check_static_begin(bitset_test_first_leading_one_range)
+{
+    Bitset bs = bitset_initialize(bitset_blocks(32), NULL, NULL, 32);
+    size_t const bit_of_interest = 3;
+    check(bitset_set(&bs, bit_of_interest, CCC_TRUE), CCC_FALSE);
+    for (size_t i = 0; i < bit_of_interest; ++i)
+    {
+        /* Testing our code paths that include only a single block to read. */
+        check(bitset_first_leading_one_range(&bs, i, bit_of_interest - i).count,
+              bit_of_interest);
+    }
+    /* It is important that our bit set not report a false positive here. No
+       matter the block size, a single bit matching our query will be loaded
+       with the block. But the implementation must ensure that bit is not
+       a match if it is out of range. Here the bit is not in our searched range
+       so we do not find any bits matching our query. */
+    check(bitset_first_leading_one_range(&bs, bit_of_interest + 1,
+                                         bitset_count(&bs).count
+                                             - bit_of_interest + 1)
+                  .error
+              != CCC_RESULT_OK,
+          true);
     check_end();
 }
 
@@ -617,8 +643,12 @@ check_static_begin(bitset_test_first_leading_ones)
         check(bitset_first_leading_ones_range(&bs, 0, i, window).error
                   != CCC_RESULT_OK,
               true);
-        check(bitset_first_leading_ones_range(&bs, i, window, window).count, i);
-        check(bitset_first_leading_ones_range(&bs, i + 1, window, window).error
+        check(
+            bitset_first_leading_ones_range(&bs, i - window + 1, window, window)
+                .count,
+            i);
+        check(bitset_first_leading_ones_range(&bs, i - window, window, window)
+                      .error
                   != CCC_RESULT_OK,
               true);
         /* Cleanup behind as we go. */
@@ -638,8 +668,12 @@ check_static_begin(bitset_test_first_leading_ones)
         check(bitset_first_leading_ones_range(&bs, 0, i, window).error
                   != CCC_RESULT_OK,
               true);
-        check(bitset_first_leading_ones_range(&bs, i, window, window).count, i);
-        check(bitset_first_leading_ones_range(&bs, i + 1, window, window).error
+        check(
+            bitset_first_leading_ones_range(&bs, i - window + 1, window, window)
+                .count,
+            i);
+        check(bitset_first_leading_ones_range(&bs, i - window, window, window)
+                      .error
                   != CCC_RESULT_OK,
               true);
         /* Cleanup behind as we go. */
@@ -659,8 +693,12 @@ check_static_begin(bitset_test_first_leading_ones)
         check(bitset_first_leading_ones_range(&bs, 0, i, window).error
                   != CCC_RESULT_OK,
               true);
-        check(bitset_first_leading_ones_range(&bs, i, window, window).count, i);
-        check(bitset_first_leading_ones_range(&bs, i + 1, window, window).error
+        check(
+            bitset_first_leading_ones_range(&bs, i - window + 1, window, window)
+                .count,
+            i);
+        check(bitset_first_leading_ones_range(&bs, i - window, window, window)
+                      .error
                   != CCC_RESULT_OK,
               true);
         /* Cleanup behind as we go. */
@@ -677,8 +715,7 @@ check_static_begin(bitset_test_first_leading_ones_fail)
     /* We are going to search for a group of 17 which we will be very close
        to finding every time but it will be broken by an off bit before the
        17th in a group in every block. */
-    for (size_t block = bitset_block_count(512), i = 511; block--;
-         i -= BITSET_BLOCK_BITS)
+    for (size_t block = bitset_block_count(512); block--;)
     {
         check(bitset_set_range(&bs, (block * BITSET_BLOCK_BITS), first_half,
                                CCC_TRUE),
@@ -687,8 +724,8 @@ check_static_begin(bitset_test_first_leading_ones_fail)
                                (block * BITSET_BLOCK_BITS) + first_half + 1,
                                second_half, CCC_TRUE),
               CCC_RESULT_OK);
-        check(bitset_first_leading_ones_range(&bs, i, BITSET_BLOCK_BITS,
-                                              first_half + 1)
+        check(bitset_first_leading_ones_range(&bs, (block * BITSET_BLOCK_BITS),
+                                              BITSET_BLOCK_BITS, first_half + 1)
                       .error
                   != CCC_RESULT_OK,
               true);
@@ -708,8 +745,8 @@ check_static_begin(bitset_test_first_leading_ones_fail)
     (void)bitset_set_range(&bs, 512 - (BITSET_BLOCK_BITS * 3),
                            BITSET_BLOCK_BITS * 3, CCC_TRUE);
     check(bitset_set(&bs, 512 - first_half, CCC_FALSE), CCC_TRUE);
-    check(bitset_first_leading_ones_range(&bs, 511, BITSET_BLOCK_BITS,
-                                          BITSET_BLOCK_BITS)
+    check(bitset_first_leading_ones_range(&bs, 512 - BITSET_BLOCK_BITS,
+                                          BITSET_BLOCK_BITS, BITSET_BLOCK_BITS)
                   .error
               != CCC_RESULT_OK,
           true);
@@ -719,17 +756,45 @@ check_static_begin(bitset_test_first_leading_ones_fail)
 check_static_begin(bitset_test_first_leading_zero)
 {
     Bitset bs = bitset_initialize(bitset_blocks(512), NULL, NULL, 512);
-    size_t const last_i = 511;
     /* Start with an almost full range and reduce by moving start backwards. */
-    for (size_t i = last_i; i > 1; --i)
+    for (size_t i = 512; i-- > 1;)
     {
         check(bitset_set(&bs, i, CCC_TRUE), CCC_FALSE);
         check(bitset_first_leading_zero(&bs).count, i - 1);
-        CCC_Count const r
-            = bitset_first_leading_zero_range(&bs, last_i, 512 - i);
-        check(r.error != CCC_RESULT_OK, true);
-        check(bitset_first_leading_zero_range(&bs, i, i + 1).count, i - 1);
+        check(bitset_first_leading_zero_range(&bs, i, 512 - i + 1).error
+                  != CCC_RESULT_OK,
+              true);
+        check(bitset_first_leading_zero_range(&bs, 0, i + 1).count, i - 1);
     }
+    check(bitset_first_leading_zero(&bs).count, 0);
+    check(bitset_first_leading_zero_range(&bs, 0, 1).count, 0);
+    check_end();
+}
+
+check_static_begin(bitset_test_first_leading_zero_range)
+{
+    Bitset bs = bitset_initialize(bitset_blocks(32), NULL, NULL, 32);
+    (void)bitset_set_all(&bs, CCC_TRUE);
+    size_t const bit_of_interest = 3;
+    check(bitset_set(&bs, bit_of_interest, CCC_FALSE), CCC_TRUE);
+    for (size_t i = 0; i < bit_of_interest; ++i)
+    {
+        /* Testing our code paths that include only a single block to read. */
+        check(
+            bitset_first_leading_zero_range(&bs, i, bit_of_interest - i).count,
+            bit_of_interest);
+    }
+    /* It is important that our bit set not report a false positive here. No
+       matter the block size, a single bit matching our query will be loaded
+       with the block. But the implementation must ensure that bit is not
+       a match if it is out of range. Here the bit is not in our searched range
+       so we do not find any bits matching our query. */
+    check(bitset_first_leading_zero_range(&bs, bit_of_interest + 1,
+                                          bitset_count(&bs).count
+                                              - bit_of_interest + 1)
+                  .error
+              != CCC_RESULT_OK,
+          true);
     check_end();
 }
 
@@ -751,9 +816,12 @@ check_static_begin(bitset_test_first_leading_zeros)
         check(bitset_first_leading_zeros_range(&bs, 0, i, window).error
                   != CCC_RESULT_OK,
               true);
-        check(bitset_first_leading_zeros_range(&bs, i, window, window).count,
+        check(bitset_first_leading_zeros_range(&bs, i - window + 1, window,
+                                               window)
+                  .count,
               i);
-        check(bitset_first_leading_zeros_range(&bs, i + 1, window, window).error
+        check(bitset_first_leading_zeros_range(&bs, i - window, window, window)
+                      .error
                   != CCC_RESULT_OK,
               true);
         /* Cleanup behind as we go. */
@@ -774,9 +842,12 @@ check_static_begin(bitset_test_first_leading_zeros)
         check(bitset_first_leading_zeros_range(&bs, 0, i, window).error
                   != CCC_RESULT_OK,
               true);
-        check(bitset_first_leading_zeros_range(&bs, i, window, window).count,
+        check(bitset_first_leading_zeros_range(&bs, i - window + 1, window,
+                                               window)
+                  .count,
               i);
-        check(bitset_first_leading_zeros_range(&bs, i + 1, window, window).error
+        check(bitset_first_leading_zeros_range(&bs, i - window, window, window)
+                      .error
                   != CCC_RESULT_OK,
               true);
         /* Cleanup behind as we go. */
@@ -797,9 +868,12 @@ check_static_begin(bitset_test_first_leading_zeros)
         check(bitset_first_leading_zeros_range(&bs, 0, i, window).error
                   != CCC_RESULT_OK,
               true);
-        check(bitset_first_leading_zeros_range(&bs, i, window, window).count,
+        check(bitset_first_leading_zeros_range(&bs, i - window + 1, window,
+                                               window)
+                  .count,
               i);
-        check(bitset_first_leading_zeros_range(&bs, i + 1, window, window).error
+        check(bitset_first_leading_zeros_range(&bs, i - window, window, window)
+                      .error
                   != CCC_RESULT_OK,
               true);
         /* Cleanup behind as we go. */
@@ -817,8 +891,7 @@ check_static_begin(bitset_test_first_leading_zeros_fail)
     /* We are going to search for a group of 17 which we will be very close
        to finding every time but it will be broken by an off bit before the
        17th in a group in every block. */
-    for (size_t block = bitset_block_count(512), i = 511; block--;
-         i -= BITSET_BLOCK_BITS)
+    for (size_t block = bitset_block_count(512); block--;)
     {
         check(bitset_set_range(&bs, (block * BITSET_BLOCK_BITS), first_half,
                                CCC_FALSE),
@@ -827,7 +900,8 @@ check_static_begin(bitset_test_first_leading_zeros_fail)
                                (block * BITSET_BLOCK_BITS) + first_half + 1,
                                second_half, CCC_FALSE),
               CCC_RESULT_OK);
-        check(bitset_first_leading_zeros_range(&bs, i, BITSET_BLOCK_BITS,
+        check(bitset_first_leading_zeros_range(&bs, (block * BITSET_BLOCK_BITS),
+                                               BITSET_BLOCK_BITS,
                                                first_half + 1)
                       .error
                   != CCC_RESULT_OK,
@@ -848,8 +922,8 @@ check_static_begin(bitset_test_first_leading_zeros_fail)
     (void)bitset_set_range(&bs, 512 - (BITSET_BLOCK_BITS * 3),
                            BITSET_BLOCK_BITS * 3, CCC_FALSE);
     check(bitset_set(&bs, 512 - first_half, CCC_TRUE), CCC_FALSE);
-    check(bitset_first_leading_zeros_range(&bs, 511, BITSET_BLOCK_BITS,
-                                           BITSET_BLOCK_BITS)
+    check(bitset_first_leading_zeros_range(&bs, 512 - BITSET_BLOCK_BITS,
+                                           BITSET_BLOCK_BITS, BITSET_BLOCK_BITS)
                   .error
               != CCC_RESULT_OK,
           true);
@@ -1233,8 +1307,10 @@ main(void)
         bitset_test_first_trailing_ones_fail(),
         bitset_test_first_trailing_zero(), bitset_test_first_trailing_zeros(),
         bitset_test_first_trailing_zeros_fail(),
-        bitset_test_first_leading_one(), bitset_test_first_leading_ones(),
-        bitset_test_first_leading_ones_fail(), bitset_test_first_leading_zero(),
+        bitset_test_first_leading_one(), bitset_test_first_leading_one_range(),
+        bitset_test_first_leading_ones(), bitset_test_first_leading_ones_fail(),
+        bitset_test_first_leading_zero(),
+        bitset_test_first_leading_zero_range(),
         bitset_test_first_leading_zeros(),
         bitset_test_first_leading_zeros_fail(), bitset_test_or_same_size(),
         bitset_test_or_diff_size(), bitset_test_and_same_size(),
