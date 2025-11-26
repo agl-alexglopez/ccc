@@ -605,12 +605,13 @@ check_static_begin(bitset_test_first_leading_one)
 check_static_begin(bitset_test_first_leading_one_range)
 {
     Bitset bs = bitset_initialize(bitset_blocks(32), NULL, NULL, 32);
-    size_t const bit_of_interest = 3;
+    size_t const bit_of_interest = 4;
     check(bitset_set(&bs, bit_of_interest, CCC_TRUE), CCC_FALSE);
     for (size_t i = 0; i < bit_of_interest; ++i)
     {
         /* Testing our code paths that include only a single block to read. */
-        check(bitset_first_leading_one_range(&bs, i, bit_of_interest - i).count,
+        check(bitset_first_leading_one_range(&bs, i, (bit_of_interest - i) + 1)
+                  .count,
               bit_of_interest);
     }
     /* It is important that our bit set not report a false positive here. No
@@ -620,8 +621,11 @@ check_static_begin(bitset_test_first_leading_one_range)
        so we do not find any bits matching our query. */
     check(bitset_first_leading_one_range(&bs, bit_of_interest + 1,
                                          bitset_count(&bs).count
-                                             - bit_of_interest + 1)
+                                             - (bit_of_interest + 1))
                   .error
+              != CCC_RESULT_OK,
+          true);
+    check(bitset_first_leading_one_range(&bs, 0, bit_of_interest).error
               != CCC_RESULT_OK,
           true);
     check_end();
@@ -780,9 +784,9 @@ check_static_begin(bitset_test_first_leading_zero_range)
     for (size_t i = 0; i < bit_of_interest; ++i)
     {
         /* Testing our code paths that include only a single block to read. */
-        check(
-            bitset_first_leading_zero_range(&bs, i, bit_of_interest - i).count,
-            bit_of_interest);
+        check(bitset_first_leading_zero_range(&bs, i, (bit_of_interest - i) + 1)
+                  .count,
+              bit_of_interest);
     }
     /* It is important that our bit set not report a false positive here. No
        matter the block size, a single bit matching our query will be loaded
@@ -791,8 +795,11 @@ check_static_begin(bitset_test_first_leading_zero_range)
        so we do not find any bits matching our query. */
     check(bitset_first_leading_zero_range(&bs, bit_of_interest + 1,
                                           bitset_count(&bs).count
-                                              - bit_of_interest + 1)
+                                              - (bit_of_interest + 1))
                   .error
+              != CCC_RESULT_OK,
+          true);
+    check(bitset_first_leading_zero_range(&bs, 0, bit_of_interest).error
               != CCC_RESULT_OK,
           true);
     check_end();

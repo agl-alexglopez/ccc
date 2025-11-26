@@ -170,8 +170,8 @@ static Bit_count bit_count_index(size_t);
 static CCC_Tribool is_subset_of(struct CCC_Bitset const *,
                                 struct CCC_Bitset const *);
 static Bit_count popcount(Bitblock);
-static Bit_count ctz(Bitblock);
-static Bit_count clz(Bitblock);
+static Bit_count count_trailing_zeros(Bitblock);
+static Bit_count count_leading_zeros(Bitblock);
 
 /*=======================   Public Interface   ==============================*/
 
@@ -1197,11 +1197,15 @@ first_trailing_bit_range(struct CCC_Bitset const *const bitset, size_t const i,
     {
         first_block_on &= ~(BITBLOCK_ON << (start_bit + count));
     }
-    Bit_count tz = is_one ? ctz(first_block_on & bitset->blocks[start_block])
-                          : ctz(first_block_on & ~bitset->blocks[start_block]);
-    if (tz != BITBLOCK_BITS)
+    Bit_count trailing_zeros
+        = is_one
+            ? count_trailing_zeros(first_block_on & bitset->blocks[start_block])
+            : count_trailing_zeros(first_block_on
+                                   & ~bitset->blocks[start_block]);
+    if (trailing_zeros != BITBLOCK_BITS)
     {
-        return (CCC_Count){.count = (start_block * BITBLOCK_BITS) + tz};
+        return (CCC_Count){.count
+                           = (start_block * BITBLOCK_BITS) + trailing_zeros};
     }
     Block_count const end_block = block_count_index(end_i - 1);
     if (end_block == start_block)
@@ -1211,12 +1215,13 @@ first_trailing_bit_range(struct CCC_Bitset const *const bitset, size_t const i,
     /* Handle all values in between start and end in bulk. */
     for (++start_block; start_block < end_block; ++start_block)
     {
-        tz = is_one ? ctz(bitset->blocks[start_block])
-                    : ctz(~bitset->blocks[start_block]);
-        if (tz != BITBLOCK_BITS)
+        trailing_zeros = is_one
+                           ? count_trailing_zeros(bitset->blocks[start_block])
+                           : count_trailing_zeros(~bitset->blocks[start_block]);
+        if (trailing_zeros != BITBLOCK_BITS)
         {
             return (CCC_Count){
-                .count = (start_block * BITBLOCK_BITS) + tz,
+                .count = (start_block * BITBLOCK_BITS) + trailing_zeros,
             };
         }
     }
@@ -1224,11 +1229,14 @@ first_trailing_bit_range(struct CCC_Bitset const *const bitset, size_t const i,
     Bit_count const end_bit = bit_count_index(end_i - 1);
     Bitblock const last_block_on
         = BITBLOCK_ON >> ((BITBLOCK_BITS - end_bit) - 1);
-    tz = is_one ? ctz(last_block_on & bitset->blocks[end_block])
-                : ctz(last_block_on & ~bitset->blocks[end_block]);
-    if (tz != BITBLOCK_BITS)
+    trailing_zeros
+        = is_one
+            ? count_trailing_zeros(last_block_on & bitset->blocks[end_block])
+            : count_trailing_zeros(last_block_on & ~bitset->blocks[end_block]);
+    if (trailing_zeros != BITBLOCK_BITS)
     {
-        return (CCC_Count){.count = (end_block * BITBLOCK_BITS) + tz};
+        return (CCC_Count){.count
+                           = (end_block * BITBLOCK_BITS) + trailing_zeros};
     }
     return (CCC_Count){.error = CCC_RESULT_FAIL};
 }
@@ -1346,7 +1354,7 @@ max_trailing_ones(Bitblock const b, Bit_count const i_bit,
        MSB. The best we could have is a full block of 1's. Otherwise we need
        to find where to start our new search for contiguous 1's. This could be
        the next block if there are not 1's that continue all the way to MSB. */
-    Bit_count const leading_ones = clz(~b);
+    Bit_count const leading_ones = count_leading_zeros(~b);
     return (struct Group_count){
         .index = BITBLOCK_BITS - leading_ones,
         .count = leading_ones,
@@ -1378,39 +1386,47 @@ first_leading_bit_range(struct CCC_Bitset const *const bitset, size_t const i,
     {
         first_block_on &= (BITBLOCK_ON << end_bit);
     }
-    Bit_count lz = is_one ? clz(first_block_on & bitset->blocks[start_block])
-                          : clz(first_block_on & ~bitset->blocks[start_block]);
-    if (lz != BITBLOCK_BITS)
+    Bit_count leading_zeros
+        = is_one
+            ? count_leading_zeros(first_block_on & bitset->blocks[start_block])
+            : count_leading_zeros(first_block_on
+                                  & ~bitset->blocks[start_block]);
+    if (leading_zeros != BITBLOCK_BITS)
     {
         return (CCC_Count){
-            .count = (start_block * BITBLOCK_BITS) + (BITBLOCK_BITS - lz - 1),
+            .count = (start_block * BITBLOCK_BITS)
+                   + (BITBLOCK_BITS - leading_zeros - 1),
         };
     }
     Block_count const end_block = block_count_index(end_i);
-    /* Handle all values in between start and end in bulk. */
-    if (start_block)
+    if (start_block == end_block)
     {
-        while (--start_block > end_block)
+        return (CCC_Count){.error = CCC_RESULT_FAIL};
+    }
+    while (--start_block > end_block)
+    {
+        leading_zeros = is_one
+                          ? count_leading_zeros(bitset->blocks[start_block])
+                          : count_leading_zeros(~bitset->blocks[start_block]);
+        if (leading_zeros != BITBLOCK_BITS)
         {
-            lz = is_one ? clz(bitset->blocks[start_block])
-                        : clz(~bitset->blocks[start_block]);
-            if (lz != BITBLOCK_BITS)
-            {
-                return (CCC_Count){
-                    .count
-                    = (start_block * BITBLOCK_BITS) + (BITBLOCK_BITS - lz - 1),
-                };
-            }
+            return (CCC_Count){
+                .count = (start_block * BITBLOCK_BITS)
+                       + (BITBLOCK_BITS - leading_zeros - 1),
+            };
         }
     }
     /* Handle last block. */
     Bitblock const last_block_on = (BITBLOCK_ON << end_bit);
-    lz = is_one ? clz(last_block_on & bitset->blocks[end_block])
-                : clz(last_block_on & ~bitset->blocks[end_block]);
-    if (lz != BITBLOCK_BITS)
+    leading_zeros
+        = is_one
+            ? count_leading_zeros(last_block_on & bitset->blocks[end_block])
+            : count_leading_zeros(last_block_on & ~bitset->blocks[end_block]);
+    if (leading_zeros != BITBLOCK_BITS)
     {
         return (CCC_Count){
-            .count = (end_block * BITBLOCK_BITS) + (BITBLOCK_BITS - lz - 1),
+            .count
+            = (end_block * BITBLOCK_BITS) + (BITBLOCK_BITS - leading_zeros - 1),
         };
     }
     return (CCC_Count){.error = CCC_RESULT_FAIL};
@@ -1526,7 +1542,8 @@ max_leading_ones(Bitblock const b, Bit_signed_count const i_bit,
             }
         }
     }
-    Bit_signed_count const trailing_ones = (Bit_signed_count)ctz(~b);
+    Bit_signed_count const trailing_ones
+        = (Bit_signed_count)count_trailing_zeros(~b);
     return (struct Group_signed_count){
         /* May be -1 if no ones found. This make backward iteration easier. */
         .index = (Bit_signed_count)(trailing_ones - 1),
@@ -1767,7 +1784,7 @@ popcount(Bitblock const b)
 /** Counts the number of trailing zeros in a bit block starting from least
 significant bit. */
 static inline Bit_count
-ctz(Bitblock const b)
+count_trailing_zeros(Bitblock const b)
 {
     static_assert(__builtin_ctz(BITBLOCK_MSB) <= U8BLOCK_MAX);
     return b ? (Bit_count)__builtin_ctz(b) : BITBLOCK_BITS;
@@ -1776,7 +1793,7 @@ ctz(Bitblock const b)
 /** Counts the leading zeros in a bit block starting from the most significant
 bit. */
 static inline Bit_count
-clz(Bitblock const b)
+count_leading_zeros(Bitblock const b)
 {
     static_assert(__builtin_clz((Bitblock)1) <= U8BLOCK_MAX);
     return b ? (Bit_count)__builtin_clz(b) : BITBLOCK_BITS;
@@ -1798,7 +1815,7 @@ popcount(CCC_Bitblock b)
 /** Counts the number of trailing zeros in a bit block starting from least
 significant bit. */
 static inline Bit_count
-ctz(CCC_Bitblock b)
+count_trailing_zeros(CCC_Bitblock b)
 {
     if (!b)
     {
@@ -1813,7 +1830,7 @@ ctz(CCC_Bitblock b)
 /** Counts the leading zeros in a bit block starting from the most significant
 bit. */
 static inline Bit_count
-clz(CCC_Bitblock b)
+count_leading_zeros(CCC_Bitblock b)
 {
     if (!b)
     {
