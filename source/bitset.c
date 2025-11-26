@@ -282,7 +282,7 @@ CCC_bitset_and(CCC_Bitset *destination, CCC_Bitset const *source)
         return CCC_RESULT_OK;
     }
     /* The source widens to align with destination as integers would; same
-     * consequences. */
+       consequences. */
     Block_count const destination_blocks = block_count(destination->count);
     Block_count const remain = destination_blocks - end_block;
     (void)memset(destination->blocks + end_block, CCC_FALSE,
