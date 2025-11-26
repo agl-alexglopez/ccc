@@ -19,7 +19,8 @@ based operations over the set.
 
 It is also important to avoid modulo and division operations whenever possible.
 This is why much of the code revolves around obtaining indices by processing
-entire blocks at a time, rather than iterating over individual bits.
+entire blocks at a time, rather than using mathematical operations to
+conceptually iterate over individual bits.
 
 Finally, the code is able to unite most functions for finding zeros or ones
 into a single function that accepts true or false as an additional argument.
