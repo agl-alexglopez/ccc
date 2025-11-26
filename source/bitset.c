@@ -1743,6 +1743,13 @@ widths and counts. */
 static_assert(BITBLOCK_MSB < BITBLOCK_ON);
 static_assert(SIZEOF_BLOCK == sizeof(unsigned));
 
+/** Much of the code relies on the assumption that iterating over blocks at
+at a time is faster than using mathematical operations to conceptually iterate
+over bits. This assumptions mostly comes from the use of these built-ins to
+keep the processing time linear for range based queries, while avoiding division
+and modulo operations. I should test to see the performance implications when
+these built-ins are gone. However they are pretty ubiquitous these days. */
+
 /** Built-ins are common on Clang and GCC but we have portable fallback. */
 #if defined(__has_builtin) && __has_builtin(__builtin_ctz)                     \
     && __has_builtin(__builtin_clz) && __has_builtin(__builtin_popcount)
