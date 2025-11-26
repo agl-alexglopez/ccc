@@ -630,7 +630,7 @@ CCC_bitset_flip_range(CCC_Bitset *const bitset, size_t const range_start_index,
         fix_end(bitset);
         return CCC_RESULT_OK;
     }
-    for (++start_block; start_block < end_block; ++start_block)
+    while (++start_block < end_block)
     {
         bitset->blocks[start_block] = ~bitset->blocks[start_block];
     }
@@ -736,9 +736,10 @@ CCC_bitset_popcount_range(CCC_Bitset const *const bitset,
     {
         return (CCC_Count){.count = popped};
     }
-    for (++start_block; start_block < end_block;
-         popped += popcount(bitset->blocks[start_block++]))
-    {}
+    while (++start_block < end_block)
+    {
+        popped += popcount(bitset->blocks[start_block]);
+    }
     Bit_count const end_bit = bit_count_index(end_i - 1);
     Bitblock const last_block_on
         = BITBLOCK_ON >> ((BITBLOCK_BITS - end_bit) - 1);
@@ -1221,7 +1222,7 @@ first_trailing_bit_range(struct CCC_Bitset const *const bitset, size_t const i,
         return (CCC_Count){.error = CCC_RESULT_FAIL};
     }
     /* Handle all values in between start and end in bulk. */
-    for (++start_block; start_block < end_block; ++start_block)
+    while (++start_block < end_block)
     {
         trailing_zeros = is_one
                            ? count_trailing_zeros(bitset->blocks[start_block])
@@ -1636,7 +1637,7 @@ all_range(struct CCC_Bitset const *const bitset, size_t const i,
     {
         return CCC_TRUE;
     }
-    for (++start_block; start_block < end_block; ++start_block)
+    while (++start_block < end_block)
     {
         if (bitset->blocks[start_block] != BITBLOCK_ON)
         {
