@@ -103,7 +103,7 @@ enum : Bit_count
 static_assert((BITBLOCK_BITS & (BITBLOCK_BITS - 1)) == 0,
               "the number of bits in a block is always a power of two, "
               "helping avoid division and modulo operations when possible");
-static_assert(CCC_BITSET_BLOCK_BITS >> BITBLOCK_BITS_LOG2 == 1,
+static_assert(BITBLOCK_BITS >> BITBLOCK_BITS_LOG2 == 1,
               "hand coded log2 of bitblock bits is always correct");
 static_assert((Bit_count) ~((Bit_count)0) >= (Bit_count)0,
               "Bit_count must be unsigned");
