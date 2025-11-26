@@ -1213,8 +1213,9 @@ first_trailing_bit_range(struct CCC_Bitset const *const bitset, size_t const i,
                                    & ~bitset->blocks[start_block]);
     if (trailing_zeros != BITBLOCK_BITS)
     {
-        return (CCC_Count){.count
-                           = (start_block * BITBLOCK_BITS) + trailing_zeros};
+        return (CCC_Count){
+            .count = (start_block * BITBLOCK_BITS) + trailing_zeros,
+        };
     }
     Block_count const end_block = block_count_index(end_i - 1);
     if (end_block == start_block)
@@ -1244,8 +1245,9 @@ first_trailing_bit_range(struct CCC_Bitset const *const bitset, size_t const i,
             : count_trailing_zeros(last_block_on & ~bitset->blocks[end_block]);
     if (trailing_zeros != BITBLOCK_BITS)
     {
-        return (CCC_Count){.count
-                           = (end_block * BITBLOCK_BITS) + trailing_zeros};
+        return (CCC_Count){
+            .count = (end_block * BITBLOCK_BITS) + trailing_zeros,
+        };
     }
     return (CCC_Count){.error = CCC_RESULT_FAIL};
 }
