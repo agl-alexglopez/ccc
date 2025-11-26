@@ -779,7 +779,7 @@ check_static_begin(bitset_test_first_leading_zero_range)
 {
     Bitset bs = bitset_initialize(bitset_blocks(32), NULL, NULL, 32);
     (void)bitset_set_all(&bs, CCC_TRUE);
-    size_t const bit_of_interest = 3;
+    size_t const bit_of_interest = 4;
     check(bitset_set(&bs, bit_of_interest, CCC_FALSE), CCC_TRUE);
     for (size_t i = 0; i < bit_of_interest; ++i)
     {
