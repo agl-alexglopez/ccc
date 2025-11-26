@@ -481,6 +481,7 @@ limitations under the License.
 
 #define CCC_private_pop_back(container_pointer)                                \
     _Generic((container_pointer),                                              \
+        CCC_Bitset *: CCC_bitset_pop_back,                                     \
         CCC_Flat_double_ended_queue *: CCC_flat_double_ended_queue_pop_back,   \
         CCC_Doubly_linked_list *: CCC_doubly_linked_list_pop_back,             \
         CCC_Buffer *: CCC_buffer_pop_back)((container_pointer))
@@ -922,6 +923,7 @@ the appropriate range from the selections. */
         CCC_Doubly_linked_list *: CCC_doubly_linked_list_count,                \
         CCC_Bounded_map *: CCC_bounded_map_count,                              \
         CCC_Handle_bounded_map *: CCC_handle_bounded_map_count,                \
+        CCC_Bitset const *: CCC_bitset_count,                                  \
         CCC_Buffer const *: CCC_buffer_count,                                  \
         CCC_Flat_hash_map const *: CCC_flat_hash_map_count,                    \
         CCC_Adaptive_map const *: CCC_adaptive_map_count,                      \
@@ -956,6 +958,7 @@ the appropriate range from the selections. */
 
 #define CCC_private_is_empty(container_pointer)                                \
     _Generic((container_pointer),                                              \
+        CCC_Bitset *: CCC_bitset_is_empty,                                     \
         CCC_Buffer *: CCC_buffer_is_empty,                                     \
         CCC_Flat_hash_map *: CCC_flat_hash_map_is_empty,                       \
         CCC_Adaptive_map *: CCC_adaptive_map_is_empty,                         \
@@ -967,6 +970,7 @@ the appropriate range from the selections. */
         CCC_Doubly_linked_list *: CCC_doubly_linked_list_is_empty,             \
         CCC_Bounded_map *: CCC_bounded_map_is_empty,                           \
         CCC_Handle_bounded_map *: CCC_handle_bounded_map_is_empty,             \
+        CCC_Bitset const *: CCC_bitset_is_empty,                               \
         CCC_Buffer const *: CCC_buffer_is_empty,                               \
         CCC_Flat_hash_map const *: CCC_flat_hash_map_is_empty,                 \
         CCC_Adaptive_map const *: CCC_adaptive_map_is_empty,                   \
