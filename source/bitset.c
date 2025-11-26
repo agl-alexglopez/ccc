@@ -1341,12 +1341,12 @@ max_trailing_ones(Bitblock const b, Bit_count const i_bit,
     };
 }
 
-/** A leading one is the first bit in the range to be set to one withing a block
-starting the search from the Most Significant Bit of each block. This means that
-if the range is larger than a single block we iterate in descending order
-through the set of blocks starting at `i + count - 1` for the range of
-`[i, i + count)`. The search within a given block proceeds from Most Significant
-Bit toward Least Significant Bit. */
+/** A leading bit is the first bit in the range to be set to the indicated value
+within a block starting the search from the Most Significant Bit of each block.
+This means that if the range is larger than a single block we iterate in
+descending order through the set of blocks starting at `i + count - 1` for the
+range of `[i, i + count)`. The search within a given block proceeds from Most
+Significant Bit toward Least Significant Bit. */
 static CCC_Count
 first_leading_bit_range(struct CCC_Bitset const *const bitset, size_t const i,
                         size_t const count, CCC_Tribool const is_one)
