@@ -27,11 +27,6 @@ add_dependencies(tests run_tests)
 # depending on the build type. The run_tests program then runs all binaries.
 
 #############  Bit Set ##########################
-add_library(bitset_utility bitset/bitset_utility.h bitset/bitset_utility.c)
-target_link_libraries(bitset_utility
-  PRIVATE
-    ccc
-)
 macro(add_bitset_test TEST_NAME)
   add_executable(${TEST_NAME} bitset/${TEST_NAME}.c)
   target_link_libraries(${TEST_NAME}
@@ -40,7 +35,7 @@ macro(add_bitset_test TEST_NAME)
       checkers
       allocate
       string_view
-      bitset_utility
+      stack_allocator 
   )
   set_target_properties(${TEST_NAME} 
     PROPERTIES 
@@ -129,6 +124,7 @@ target_link_libraries(priority_queue_utility
   PRIVATE
     ccc
     checkers
+    stack_allocator
 )
 add_dependencies(tests priority_queue_utility)
 

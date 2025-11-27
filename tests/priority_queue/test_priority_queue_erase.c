@@ -1,3 +1,4 @@
+#include <limits.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdlib.h>
@@ -11,196 +12,223 @@
 #include "traits.h"
 #include "types.h"
 #include "utility/allocate.h"
+#include "utility/stack_allocator.h"
+
+enum : int
+{
+    STANDARD_CAP = 50,
+    LARGE_CAP = 99,
+    WEAK_SRAND_HEAP_CAP = 1000,
+};
 
 check_static_begin(priority_queue_test_insert_remove_four_dups)
 {
-    CCC_Priority_queue ppriority_queue = CCC_priority_queue_initialize(
-        struct Val, elem, CCC_ORDER_LESSER, val_order, NULL, NULL);
-    struct Val three_vals[4];
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 4);
+    CCC_Priority_queue priority_queue = CCC_priority_queue_initialize(
+        struct Val, elem, CCC_ORDER_LESSER, val_order, stack_allocator_allocate,
+        &allocator);
     for (int i = 0; i < 4; ++i)
     {
-        three_vals[i].val = 0;
-        check(push(&ppriority_queue, &three_vals[i].elem) != NULL, true);
-        check(validate(&ppriority_queue), true);
+        check(push(&priority_queue, &(struct Val){.val = 0}.elem) != NULL,
+              true);
+        check(validate(&priority_queue), true);
         size_t const size = i + 1;
-        check(CCC_priority_queue_count(&ppriority_queue).count, size);
+        check(CCC_priority_queue_count(&priority_queue).count, size);
     }
-    check(CCC_priority_queue_count(&ppriority_queue).count, (size_t)4);
+    check(CCC_priority_queue_count(&priority_queue).count, (size_t)4);
     for (int i = 0; i < 4; ++i)
     {
-        three_vals[i].val = 0;
-        check(pop(&ppriority_queue), CCC_RESULT_OK);
-        check(validate(&ppriority_queue), true);
+        check(pop(&priority_queue), CCC_RESULT_OK);
+        check(validate(&priority_queue), true);
     }
-    check(CCC_priority_queue_count(&ppriority_queue).count, (size_t)0);
+    check(CCC_priority_queue_count(&priority_queue).count, (size_t)0);
     check_end();
 }
 
 check_static_begin(priority_queue_test_insert_extract_shuffled)
 {
-    CCC_Priority_queue ppriority_queue = CCC_priority_queue_initialize(
-        struct Val, elem, CCC_ORDER_LESSER, val_order, NULL, NULL);
-    size_t const size = 50;
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, STANDARD_CAP);
+    CCC_Priority_queue queue = CCC_priority_queue_initialize(
+        struct Val, elem, CCC_ORDER_LESSER, val_order, stack_allocator_allocate,
+        &allocator);
     int const prime = 53;
-    struct Val vals[50];
-    check(insert_shuffled(&ppriority_queue, vals, size, prime), CHECK_PASS);
-    struct Val const *min = front(&ppriority_queue);
+    check(insert_shuffled(&queue, STANDARD_CAP, prime), CHECK_PASS);
+    struct Val const *min = front(&queue);
     check(min->val, 0);
-    int sorted_check[50];
-    check(inorder_fill(sorted_check, size, &ppriority_queue), CHECK_PASS);
+    check(check_inorder_fill(&queue, STANDARD_CAP), CHECK_PASS);
     /* Now let's delete everything with no errors. */
-    for (size_t i = 0; i < size; ++i)
+    struct Val const *const end
+        = (struct Val *)((char *)allocator.blocks
+                         + (sizeof(struct Val) * STANDARD_CAP));
+    for (struct Val *i = allocator.blocks; i != end; ++i)
     {
-        (void)CCC_priority_queue_extract(&ppriority_queue, &vals[i].elem);
-        check(validate(&ppriority_queue), true);
+        (void)CCC_priority_queue_extract(&queue, &i->elem);
+        check(validate(&queue), true);
     }
-    check(CCC_priority_queue_count(&ppriority_queue).count, (size_t)0);
+    check(CCC_priority_queue_count(&queue).count, (size_t)0);
     check_end();
 }
 
 check_static_begin(priority_queue_test_pop_max)
 {
-    CCC_Priority_queue ppriority_queue = CCC_priority_queue_initialize(
-        struct Val, elem, CCC_ORDER_LESSER, val_order, NULL, NULL);
-    size_t const size = 50;
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, STANDARD_CAP);
+    CCC_Priority_queue queue = CCC_priority_queue_initialize(
+        struct Val, elem, CCC_ORDER_LESSER, val_order, stack_allocator_allocate,
+        &allocator);
     int const prime = 53;
-    struct Val vals[50];
-    check(insert_shuffled(&ppriority_queue, vals, size, prime), CHECK_PASS);
-    struct Val const *min = front(&ppriority_queue);
+    check(insert_shuffled(&queue, STANDARD_CAP, prime), CHECK_PASS);
+    struct Val const *min = front(&queue);
     check(min->val, 0);
-    int sorted_check[50];
-    check(inorder_fill(sorted_check, size, &ppriority_queue), CHECK_PASS);
+    check(check_inorder_fill(&queue, STANDARD_CAP), CHECK_PASS);
     /* Now let's pop from the front of the queue until empty. */
-    for (size_t i = 0; i < size; ++i)
+    int prev_val = INT_MIN;
+    for (size_t i = 0; i < STANDARD_CAP; ++i)
     {
-        struct Val const *front = front(&ppriority_queue);
-        check(front->val, vals[i].val);
-        check(pop(&ppriority_queue), CCC_RESULT_OK);
+        struct Val const *front = front(&queue);
+        check(front->val > prev_val, true);
+        prev_val = front->val;
+        check(pop(&queue), CCC_RESULT_OK);
     }
-    check(CCC_priority_queue_is_empty(&ppriority_queue), true);
+    check(CCC_priority_queue_is_empty(&queue), true);
     check_end();
 }
 
 check_static_begin(priority_queue_test_pop_min)
 {
-    CCC_Priority_queue ppriority_queue = CCC_priority_queue_initialize(
-        struct Val, elem, CCC_ORDER_LESSER, val_order, NULL, NULL);
-    size_t const size = 50;
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, STANDARD_CAP);
+    CCC_Priority_queue queue = CCC_priority_queue_initialize(
+        struct Val, elem, CCC_ORDER_LESSER, val_order, stack_allocator_allocate,
+        &allocator);
     int const prime = 53;
-    struct Val vals[50];
-    check(insert_shuffled(&ppriority_queue, vals, size, prime), CHECK_PASS);
-    struct Val const *min = front(&ppriority_queue);
+    check(insert_shuffled(&queue, STANDARD_CAP, prime), CHECK_PASS);
+    struct Val const *min = front(&queue);
     check(min->val, 0);
-    int sorted_check[50];
-    check(inorder_fill(sorted_check, size, &ppriority_queue), CHECK_PASS);
+    check(check_inorder_fill(&queue, STANDARD_CAP), CHECK_PASS);
     /* Now let's pop from the front of the queue until empty. */
-    for (size_t i = 0; i < size; ++i)
+    int prev_val = INT_MIN;
+    for (size_t i = 0; i < STANDARD_CAP; ++i)
     {
-        struct Val const *front = front(&ppriority_queue);
-        check(front->val, vals[i].val);
-        check(pop(&ppriority_queue), CCC_RESULT_OK);
+        struct Val const *front = front(&queue);
+        check(front->val > prev_val, true);
+        prev_val = front->val;
+        check(pop(&queue), CCC_RESULT_OK);
     }
-    check(CCC_priority_queue_is_empty(&ppriority_queue), true);
+    check(CCC_priority_queue_is_empty(&queue), true);
     check_end();
 }
 
 check_static_begin(priority_queue_test_delete_prime_shuffle_duplicates)
 {
-    CCC_Priority_queue ppriority_queue = CCC_priority_queue_initialize(
-        struct Val, elem, CCC_ORDER_LESSER, val_order, NULL, NULL);
-    int const size = 99;
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, LARGE_CAP);
+    CCC_Priority_queue queue = CCC_priority_queue_initialize(
+        struct Val, elem, CCC_ORDER_LESSER, val_order, stack_allocator_allocate,
+        &allocator);
     int const prime = 101;
     /* Make the prime shuffle shorter than size for many duplicates. */
     int const less = 77;
-    struct Val vals[99];
-    int shuffled_index = prime % (size - less);
-    for (int i = 0; i < size; ++i)
+    int shuffled_index = prime % (LARGE_CAP - less);
+    for (int i = 0; i < LARGE_CAP; ++i)
     {
-        vals[i].val = shuffled_index;
-        vals[i].id = i;
-        check(push(&ppriority_queue, &vals[i].elem) != NULL, true);
-        check(validate(&ppriority_queue), true);
+        struct Val const *const pushed
+            = push(&queue, &(struct Val){.val = shuffled_index, .id = i}.elem);
+        check(pushed != NULL, true);
+        check(validate(&queue), true);
         size_t const s = i + 1;
-        check(CCC_priority_queue_count(&ppriority_queue).count, s);
+        check(CCC_priority_queue_count(&queue).count, s);
         /* Shuffle like this only on insertions to create more dups. */
-        shuffled_index = (shuffled_index + prime) % (size - less);
+        shuffled_index = (shuffled_index + prime) % (LARGE_CAP - less);
     }
 
-    shuffled_index = prime % (size - less);
-    size_t cur_size = size;
-    for (int i = 0; i < size; ++i)
+    shuffled_index = prime % (LARGE_CAP - less);
+    size_t cur_size = LARGE_CAP;
+    struct Val *const val_array = allocator.blocks;
+    for (int i = 0; i < LARGE_CAP; ++i)
     {
-        (void)CCC_priority_queue_extract(&ppriority_queue,
-                                         &vals[shuffled_index].elem);
-        check(validate(&ppriority_queue), true);
+        (void)CCC_priority_queue_extract(&queue,
+                                         &val_array[shuffled_index].elem);
+        check(validate(&queue), true);
         --cur_size;
-        check(CCC_priority_queue_count(&ppriority_queue).count, cur_size);
+        check(CCC_priority_queue_count(&queue).count, cur_size);
         /* Shuffle normally here so we only remove each elem once. */
-        shuffled_index = (shuffled_index + prime) % size;
+        shuffled_index = (shuffled_index + prime) % LARGE_CAP;
     }
     check_end();
 }
 
 check_static_begin(priority_queue_test_prime_shuffle)
 {
-    CCC_Priority_queue ppriority_queue = CCC_priority_queue_initialize(
-        struct Val, elem, CCC_ORDER_LESSER, val_order, NULL, NULL);
-    int const size = 50;
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, STANDARD_CAP);
+    CCC_Priority_queue queue = CCC_priority_queue_initialize(
+        struct Val, elem, CCC_ORDER_LESSER, val_order, stack_allocator_allocate,
+        &allocator);
     int const prime = 53;
     int const less = 10;
     /* We want the tree to have a smattering of duplicates so
        reduce the shuffle range so it will repeat some values. */
-    int shuffled_index = prime % (size - less);
-    struct Val vals[50];
-    for (int i = 0; i < size; ++i)
+    int shuffled_index = prime % (STANDARD_CAP - less);
+    for (int i = 0; i < STANDARD_CAP; ++i)
     {
-        vals[i].val = shuffled_index;
-        vals[i].id = shuffled_index;
-        check(push(&ppriority_queue, &vals[i].elem) != NULL, true);
-        check(validate(&ppriority_queue), true);
-        shuffled_index = (shuffled_index + prime) % (size - less);
+        struct Val const *const pushed = push(
+            &queue,
+            &(struct Val){.val = shuffled_index, .id = shuffled_index}.elem);
+        check(pushed != NULL, true);
+        check(validate(&queue), true);
+        shuffled_index = (shuffled_index + prime) % (STANDARD_CAP - less);
     }
     /* Now we go through and free all the elements in order but
        their positions in the tree will be somewhat random */
-    size_t cur_size = size;
-    for (int i = 0; i < size; ++i)
+    size_t cur_size = STANDARD_CAP;
+    struct Val *const val_array = allocator.blocks;
+    for (int i = 0; i < STANDARD_CAP; ++i)
     {
-        (void)CCC_priority_queue_extract(&ppriority_queue, &vals[i].elem);
-        check(validate(&ppriority_queue), true);
+        (void)CCC_priority_queue_extract(&queue, &val_array[i].elem);
+        check(validate(&queue), true);
         --cur_size;
-        check(CCC_priority_queue_count(&ppriority_queue).count, cur_size);
+        check(CCC_priority_queue_count(&queue).count, cur_size);
     }
     check_end();
 }
 
 check_static_begin(priority_queue_test_weak_srand)
 {
-    CCC_Priority_queue ppriority_queue = CCC_priority_queue_initialize(
-        struct Val, elem, CCC_ORDER_LESSER, val_order, NULL, NULL);
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, WEAK_SRAND_HEAP_CAP);
+    CCC_Priority_queue queue = CCC_priority_queue_initialize(
+        struct Val, elem, CCC_ORDER_LESSER, val_order, stack_allocator_allocate,
+        &allocator);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
-    int const num_heap_nodes = 1000;
-    struct Val vals[1000];
-    for (int i = 0; i < num_heap_nodes; ++i)
+    for (int i = 0; i < WEAK_SRAND_HEAP_CAP; ++i)
     {
-        vals[i].val = rand(); // NOLINT
-        vals[i].id = i;
-        check(push(&ppriority_queue, &vals[i].elem) != NULL, true);
-        check(validate(&ppriority_queue), true);
+        struct Val const *const pushed = push(&queue,
+                                              &(struct Val){
+                                                  .val = rand(), /* NOLINT */
+                                                  .id = i,
+                                              }
+                                                   .elem);
+        check(pushed != NULL, true);
+        check(validate(&queue), true);
     }
-    for (int i = 0; i < num_heap_nodes; ++i)
+    struct Val *const val_array = allocator.blocks;
+    for (int i = 0; i < WEAK_SRAND_HEAP_CAP; ++i)
     {
-        (void)CCC_priority_queue_extract(&ppriority_queue, &vals[i].elem);
-        check(validate(&ppriority_queue), true);
+        (void)CCC_priority_queue_extract(&queue, &val_array[i].elem);
+        check(validate(&queue), true);
     }
-    check(CCC_priority_queue_is_empty(&ppriority_queue), true);
+    check(CCC_priority_queue_is_empty(&queue), true);
     check_end();
 }
 
 check_static_begin(priority_queue_test_weak_srand_allocate)
 {
-    CCC_Priority_queue ppriority_queue = CCC_priority_queue_initialize(
+    CCC_Priority_queue queue = CCC_priority_queue_initialize(
         struct Val, elem, CCC_ORDER_LESSER, val_order, std_allocate, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
@@ -208,7 +236,7 @@ check_static_begin(priority_queue_test_weak_srand_allocate)
     int const num_heap_nodes = 100;
     for (int i = 0; i < num_heap_nodes; ++i)
     {
-        check(push(&ppriority_queue,
+        check(push(&queue,
                    &(struct Val){
                        .id = i,
                        .val = rand() /*NOLINT*/,
@@ -216,9 +244,9 @@ check_static_begin(priority_queue_test_weak_srand_allocate)
                         .elem)
                   != NULL,
               true);
-        check(validate(&ppriority_queue), true);
+        check(validate(&queue), true);
     }
-    check_end(CCC_priority_queue_clear(&ppriority_queue, NULL););
+    check_end(CCC_priority_queue_clear(&queue, NULL););
 }
 
 int

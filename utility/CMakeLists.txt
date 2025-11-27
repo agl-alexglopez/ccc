@@ -22,5 +22,10 @@ add_library(allocate allocate.h allocate.c)
 target_link_libraries(allocate ccc)
 add_dependencies(utility allocate)
 
+add_library(stack_allocator stack_allocator.h stack_allocator.c)
+target_link_libraries(stack_allocator ccc)
+add_dependencies(utility stack_allocator)
+
 add_library(string_arena string_arena.h string_arena.c)
 add_dependencies(utility string_arena)
+
