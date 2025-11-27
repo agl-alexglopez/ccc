@@ -704,10 +704,12 @@ CCC_bitset_popcount(CCC_Bitset const *const bitset)
         return (CCC_Count){.count = 0};
     }
     Block_count const end = block_count(bitset->count);
-    size_t cnt = 0;
-    for (Block_count i = 0; i < end; cnt += popcount(bitset->blocks[i++]))
-    {}
-    return (CCC_Count){.count = cnt};
+    size_t count = 0;
+    for (Block_count i = 0; i < end; ++i)
+    {
+        count += popcount(bitset->blocks[i]);
+    }
+    return (CCC_Count){.count = count};
 }
 
 CCC_Count
@@ -939,9 +941,9 @@ CCC_bitset_first_leading_zero(CCC_Bitset const *const bitset)
 
 CCC_Count
 CCC_bitset_first_leading_zeros(CCC_Bitset const *const bitset,
-                               size_t const num_zeros)
+                               size_t const zeros_count)
 {
-    return first_leading_bits_range(bitset, 0, bitset->count, num_zeros,
+    return first_leading_bits_range(bitset, 0, bitset->count, zeros_count,
                                     CCC_FALSE);
 }
 
@@ -1045,10 +1047,12 @@ CCC_bitset_copy(CCC_Bitset *const destination, CCC_Bitset const *const source,
     Bitblock *const destination_data = destination->blocks;
     size_t const destination_cap = destination->capacity;
     CCC_Allocator *const destination_allocate = destination->allocate;
+    void *const destination_context = destination->context;
     *destination = *source;
     destination->blocks = destination_data;
     destination->capacity = destination_cap;
     destination->allocate = destination_allocate;
+    destination->context = destination_context;
     if (!source->capacity)
     {
         return CCC_RESULT_OK;
@@ -1122,7 +1126,7 @@ CCC_private_bitset_set(struct CCC_Bitset *const bitset, size_t const index,
 /*=======================    Static Helpers    ==============================*/
 
 /** Assumes set size is greater than or equal to subset size. */
-static CCC_Tribool
+static inline CCC_Tribool
 is_subset_of(struct CCC_Bitset const *const subset,
              struct CCC_Bitset const *const set)
 {
@@ -1193,7 +1197,7 @@ static CCC_Count
 first_trailing_bit_range(struct CCC_Bitset const *const bitset, size_t const i,
                          size_t const count, CCC_Tribool const is_one)
 {
-    if (!bitset || i >= bitset->count || i + count < i
+    if (!bitset || !count || i >= bitset->count || i + count < i
         || i + count > bitset->count)
     {
         return (CCC_Count){.error = CCC_RESULT_ARGUMENT_ERROR};
@@ -1261,8 +1265,8 @@ first_trailing_bits_range(struct CCC_Bitset const *const bitset, size_t const i,
                           size_t const count, size_t const num_bits,
                           CCC_Tribool const is_one)
 {
-    if (!bitset || i >= bitset->count || num_bits > count || i + count < i
-        || i + count > bitset->count)
+    if (!bitset || !count || i >= bitset->count || num_bits > count
+        || i + count < i || i + count > bitset->count)
     {
         return (CCC_Count){.error = CCC_RESULT_ARGUMENT_ERROR};
     }
@@ -1329,34 +1333,48 @@ If no continuous group of ones exist that runs to the end of the block, the
 BLOCK_BITS index is returned with a group size of 0 meaning the search for ones
 will need to continue in the next block. This is helpful for the main search
 loop adding to its start index and number of ones found so far. */
-static struct Group_count
-max_trailing_ones(Bitblock const b, Bit_count const i_bit,
+static inline struct Group_count
+max_trailing_ones(Bitblock const block, Bit_count bit_index,
                   size_t const ones_remain)
 {
     /* Easy exit skip to the next block. Helps with sparse sets. */
-    if (!b)
+    if (!block)
     {
         return (struct Group_count){.index = BITBLOCK_BITS};
     }
     if (ones_remain <= BITBLOCK_BITS)
     {
-        assert(i_bit < BITBLOCK_BITS);
+        assert(bit_index < BITBLOCK_BITS);
         /* This branch must find a smaller group anywhere in this block which is
            the most work required in this algorithm. We have some tricks to tell
            when to give up on this as soon as possible. */
-        Bitblock b_check = b >> i_bit;
-        Bitblock const remain = BITBLOCK_ON >> (BITBLOCK_BITS - ones_remain);
-        /* Because of power of 2 rules we can stop early when the shifted
-           becomes impossible to match. */
-        for (Bit_count shifts = 0; b_check >= remain; b_check >>= 1, ++shifts)
+        Bitblock block_bits = block >> bit_index;
+        Bitblock const required_mask
+            = BITBLOCK_ON >> (BITBLOCK_BITS - ones_remain);
+        /* The loop continues only while our block is numerically greater than
+           the mask. Because unsigned integers are represented in base 2 we get
+           two automatic early exits here.
+
+               - If the block is missing a required high-order bit, it is
+                 numerically smaller than the mask and cannot match with further
+                 shifting.
+
+               - If the high bits match but some lower required bits are zero,
+                 the block is numerically smaller than the mask and cannot match
+                 with further shifting.
+
+           All early exits are accounted for and we do no wasted shifts. */
+        while (block_bits >= required_mask)
         {
-            if ((remain & b_check) == remain)
+            if ((required_mask & block_bits) == required_mask)
             {
                 return (struct Group_count){
-                    .index = i_bit + shifts,
+                    .index = bit_index,
                     .count = ones_remain,
                 };
             }
+            ++bit_index;
+            block_bits >>= 1;
         }
     }
     /* 2 cases covered: the ones remaining are greater than this block could
@@ -1365,7 +1383,7 @@ max_trailing_ones(Bitblock const b, Bit_count const i_bit,
        MSB. The best we could have is a full block of 1's. Otherwise we need
        to find where to start our new search for contiguous 1's. This could be
        the next block if there are not 1's that continue all the way to MSB. */
-    Bit_count const leading_ones = count_leading_zeros(~b);
+    Bit_count const leading_ones = count_leading_zeros(~block);
     return (struct Group_count){
         .index = BITBLOCK_BITS - leading_ones,
         .count = leading_ones,
@@ -1382,7 +1400,7 @@ static CCC_Count
 first_leading_bit_range(struct CCC_Bitset const *const bitset, size_t const i,
                         size_t const count, CCC_Tribool const is_one)
 {
-    if (!bitset || i >= bitset->count || i + count <= i
+    if (!bitset || !count || i >= bitset->count || i + count <= i
         || i + count > bitset->count)
     {
         return (CCC_Count){.error = CCC_RESULT_ARGUMENT_ERROR};
@@ -1459,7 +1477,7 @@ first_leading_bits_range(struct CCC_Bitset const *const bitset, size_t const i,
        difference possible, which this type provides. However, it is not
        required by the C standard so we are obligated to check. */
     ptrdiff_t const range_end = (ptrdiff_t)(i - 1);
-    if (!bitset || num_bits > PTRDIFF_MAX || i > PTRDIFF_MAX
+    if (!bitset || !count || num_bits > PTRDIFF_MAX || i > PTRDIFF_MAX
         || i >= bitset->count || !num_bits || num_bits > count
         || range_end < -1)
     {
@@ -1529,32 +1547,35 @@ loop adding to its start index and number of ones found so far. Adding -1 is
 just subtraction so this will correctly drop us to the top bit of the next Least
 Significant Block to continue the search. */
 static struct Group_signed_count
-max_leading_ones(Bitblock const b, Bit_signed_count const i_bit,
+max_leading_ones(Bitblock const block, Bit_signed_count bit_index,
                  size_t const ones_remaining)
 {
-    if (!b)
+    if (!block)
     {
         return (struct Group_signed_count){.index = -1};
     }
     if (ones_remaining <= BITBLOCK_BITS)
     {
-        assert(i_bit < BITBLOCK_BITS);
-        Bitblock b_check = b << (BITBLOCK_BITS - i_bit - 1);
-        Bitblock const required = BITBLOCK_ON
-                               << (BITBLOCK_BITS - ones_remaining);
-        for (Bit_signed_count shifts = 0; b_check; b_check <<= 1, ++shifts)
+        assert(bit_index < BITBLOCK_BITS);
+        Bitblock block_bits = block << (BITBLOCK_BITS - bit_index - 1);
+        Bitblock const required_mask = BITBLOCK_ON
+                                    << (BITBLOCK_BITS - ones_remaining);
+        Bit_signed_count const end = (Bit_signed_count)ones_remaining;
+        while (bit_index >= end)
         {
-            if ((required & b_check) == required)
+            if ((required_mask & block_bits) == required_mask)
             {
                 return (struct Group_signed_count){
-                    .index = (Bit_signed_count)(i_bit - shifts),
+                    .index = bit_index,
                     .count = ones_remaining,
                 };
             }
+            --bit_index;
+            block_bits <<= 1;
         }
     }
     Bit_signed_count const trailing_ones
-        = (Bit_signed_count)count_trailing_zeros(~b);
+        = (Bit_signed_count)count_trailing_zeros(~block);
     return (struct Group_signed_count){
         /* May be -1 if no ones found. This make backward iteration easier. */
         .index = (Bit_signed_count)(trailing_ones - 1),

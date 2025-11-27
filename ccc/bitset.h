@@ -614,21 +614,21 @@ contiguous 0 bits in the set.
 @param[in] bitset a pointer to the bit set.
 @param[in] zeros_count the number of trailing contiguous 0 bits to find.
 @return an OK(0) status and the index in a search, starting from the Least
-Significant Bit of the set, of the first 0 in a sequence of num_zeros 0 bits. If
-such a sequence cannot be found CCC_RESULT_FAIL is returned. If bitset is NULL
-or num zeros is too large an argument error is set. */
+Significant Bit of the set, of the first 0 in a sequence of zeros_count 0 bits.
+If such a sequence cannot be found CCC_RESULT_FAIL is returned. If bitset is
+NULL or num zeros is too large an argument error is set. */
 CCC_Count CCC_bitset_first_trailing_zeros(CCC_Bitset const *bitset,
                                           size_t zeros_count);
 
-/** @brief Returns the index of the start of the first trailing num_zeros
+/** @brief Returns the index of the start of the first trailing zeros_count
 contiguous 0 bits in the range `[i, index + count)`.
 @param[in] bitset a pointer to the bit set.
 @param[in] range_start_index the starting index to search.
 @param[in] range_bit_count the size of the range to check.
 @param[in] zeros_count the number of trailing contiguous 0 bits to find.
 @return the index in a search, starting from the Least Significant Bit of the
-range, of the first 0 in a sequence of num_zeros 0 bits. If the input is invalid
-or such a sequence cannot be found CCC_RESULT_FAIL is returned. */
+range, of the first 0 in a sequence of zeros_count 0 bits. If the input is
+invalid or such a sequence cannot be found CCC_RESULT_FAIL is returned. */
 CCC_Count CCC_bitset_first_trailing_zeros_range(CCC_Bitset const *bitset,
                                                 size_t range_start_index,
                                                 size_t range_bit_count,
@@ -655,9 +655,11 @@ CCC_Count CCC_bitset_first_leading_one_range(CCC_Bitset const *bitset,
 contiguous 1 bits.
 @param[in] bitset a pointer to the bit set.
 @param[in] ones_count the number of leading contiguous 1 bits to find.
-@return the index in a search starting from the Least Significant Bit of the set
-of the first 1 in a sequence of bit_count 1 bits. If the input is invalid or
-such a sequence cannot be found CCC_RESULT_FAIL is returned. */
+@return an OK(0) status and the starting index of the count of requested bits
+within the provided set. The returned index is the most significant bit in the
+range `[returned_index, returned_index - ones_count)`. If such a sequence cannot
+be found CCC_RESULT_FAIL is set. If bitset is NULL or any argument is out of
+range an argument error is set. */
 CCC_Count CCC_bitset_first_leading_ones(CCC_Bitset const *bitset,
                                         size_t ones_count);
 
@@ -667,10 +669,11 @@ contiguous 1 bits in the range `[i, index + count)`.
 @param[in] range_start_index the starting index to search.
 @param[in] range_bit_count the size of the range to check.
 @param[in] ones_count the number of leading contiguous 1 bits to find.
-@return an OK(0) status and the index in a search starting from the Most
-Significant Bit of the range of the first 1 in a sequence of bit_count 1 bits.
-If such a sequence cannot be found CCC_RESULT_FAIL is set. If bitset is NULL or
-any argument is out of range an argument error is set. */
+@return an OK(0) status and the starting index of the count of requested bits
+within the provided range. The returned index is the most significant bit in the
+range `[returned_index, returned_index - ones_count)`. If such a sequence cannot
+be found CCC_RESULT_FAIL is set. If bitset is NULL or any argument is out of
+range an argument error is set. */
 CCC_Count CCC_bitset_first_leading_ones_range(CCC_Bitset const *bitset,
                                               size_t range_start_index,
                                               size_t range_bit_count,
@@ -700,13 +703,14 @@ CCC_Count CCC_bitset_first_leading_zero_range(CCC_Bitset const *bitset,
 /** @brief Returns the index of the start of the first leading number of
 contiguous 0 bits.
 @param[in] bitset a pointer to the bit set.
-@param[in] num_zeros the number of leading contiguous 0 bits to find.
-@return an OK(0) status and the index in a search, starting from the Most
-Significant Bit of the set, of the first 0 in a sequence of num_zeros 0 bits. If
-such a sequence cannot be found CCC_RESULT_FAIL is set. If bitset is NULL or
-num_zeros is too large an argument error is set. */
+@param[in] zeros_count the number of leading contiguous 0 bits to find.
+@return an OK(0) status and the starting index of the count of requested bits
+within the provided set. The returned index is the most significant bit in the
+range `[returned_index, returned_index - zeros_count)`. If such a sequence
+cannot be found CCC_RESULT_FAIL is set. If bitset is NULL or any argument is out
+of range an argument error is set. */
 CCC_Count CCC_bitset_first_leading_zeros(CCC_Bitset const *bitset,
-                                         size_t num_zeros);
+                                         size_t zeros_count);
 
 /** @brief Returns the index of the start of the first leading number of
 contiguous 0 bits in the range `[i, index + count)`.
@@ -714,10 +718,11 @@ contiguous 0 bits in the range `[i, index + count)`.
 @param[in] range_start_index the starting index to search.
 @param[in] range_bit_count the size of the range to check.
 @param[in] zeros_count the number of leading contiguous 0 bits to find.
-@return an OK(0) status and the index in a search, starting from the Most
-Significant Bit of the range, of the first 0 in a sequence of 0 bits. If such a
-sequence cannot be found CCC_RESULT_FAIL is returned. If bitset is NULL or the
-arguments are out of range an argument error is set. */
+@return an OK(0) status and the starting index of the count of requested bits
+within the provided range. The returned index is the most significant bit in the
+range `[returned_index, returned_index - zeros_count)`. If such a sequence
+cannot be found CCC_RESULT_FAIL is set. If bitset is NULL or any argument is out
+of range an argument error is set. */
 CCC_Count CCC_bitset_first_leading_zeros_range(CCC_Bitset const *bitset,
                                                size_t range_start_index,
                                                size_t range_bit_count,
