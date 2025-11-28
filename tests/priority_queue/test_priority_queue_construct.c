@@ -10,7 +10,7 @@
 static CCC_Priority_queue
 construct_empty(void)
 {
-    CCC_Priority_queue result = CCC_private_priority_queue_initialize(
+    CCC_Priority_queue result = CCC_priority_queue_initialize(
         struct Val, elem, CCC_ORDER_LESSER, val_order, NULL, NULL);
     return result;
 }

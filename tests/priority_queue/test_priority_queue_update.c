@@ -10,6 +10,7 @@
 #include "priority_queue_utility.h"
 #include "traits.h"
 #include "types.h"
+#include "utility/stack_allocator.h"
 
 enum : int
 {
