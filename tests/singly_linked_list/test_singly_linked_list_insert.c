@@ -8,25 +8,27 @@
 #include "singly_linked_list_utility.h"
 #include "traits.h"
 #include "types.h"
+#include "utility/stack_allocator.h"
 
 check_static_begin(singly_linked_list_test_insert_three)
 {
-    Singly_linked_list singly_linked_list
-        = singly_linked_list_initialize(struct Val, e, val_order, NULL, NULL);
-    struct Val v0 = (struct Val){};
-    check(push_front(&singly_linked_list, &v0.e) != NULL, true);
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 3);
+    Singly_linked_list singly_linked_list = singly_linked_list_initialize(
+        struct Val, e, val_order, stack_allocator_allocate, &allocator);
+    check(push_front(&singly_linked_list, &(struct Val){}.e) != NULL, true);
     struct Val *v = front(&singly_linked_list);
     check(validate(&singly_linked_list), true);
     check(v == NULL, false);
     check(v->val, 0);
-    struct Val v1 = (struct Val){.val = 1};
-    check(push_front(&singly_linked_list, &v1.e) != NULL, true);
+    check(push_front(&singly_linked_list, &(struct Val){.val = 1}.e) != NULL,
+          true);
     check(validate(&singly_linked_list), true);
     v = front(&singly_linked_list);
     check(v == NULL, false);
     check(v->val, 1);
-    struct Val v2 = (struct Val){.val = 2};
-    check(push_front(&singly_linked_list, &v2.e) != NULL, true);
+    check(push_front(&singly_linked_list, &(struct Val){.val = 2}.e) != NULL,
+          true);
     check(validate(&singly_linked_list), true);
     v = front(&singly_linked_list);
     check(v == NULL, false);
@@ -41,7 +43,7 @@ check_static_begin(singly_linked_list_test_push_and_splice)
     Singly_linked_list singly_linked_list
         = singly_linked_list_initialize(struct Val, e, val_order, NULL, NULL);
     struct Val vals[4] = {{.val = 0}, {.val = 1}, {.val = 2}, {.val = 3}};
-    enum Check_result const t = create_list(&singly_linked_list, 4, vals);
+    enum Check_result const t = push_list(&singly_linked_list, 4, vals);
     check(t, CHECK_PASS);
     check(check_order(&singly_linked_list, 4, (int[4]){3, 2, 1, 0}),
           CHECK_PASS);
@@ -73,7 +75,7 @@ check_static_begin(singly_linked_list_test_push_and_splice_range)
         = singly_linked_list_initialize(struct Val, e, val_order, NULL, NULL);
     struct Val vals[5]
         = {{.val = 0}, {.val = 1}, {.val = 2}, {.val = 3}, {.val = 4}};
-    enum Check_result const t = create_list(&singly_linked_list, 5, vals);
+    enum Check_result const t = push_list(&singly_linked_list, 5, vals);
     check(t, CHECK_PASS);
     check(check_order(&singly_linked_list, 5, (int[5]){4, 3, 2, 1, 0}),
           CHECK_PASS);
@@ -120,7 +122,7 @@ check_static_begin(singly_linked_list_test_push_and_splice_range_no_ops)
         = singly_linked_list_initialize(struct Val, e, val_order, NULL, NULL);
     struct Val vals[5]
         = {{.val = 0}, {.val = 1}, {.val = 2}, {.val = 3}, {.val = 4}};
-    enum Check_result const t = create_list(&singly_linked_list, 5, vals);
+    enum Check_result const t = push_list(&singly_linked_list, 5, vals);
     check(t, CHECK_PASS);
     check(check_order(&singly_linked_list, 5, (int[5]){4, 3, 2, 1, 0}),
           CHECK_PASS);
@@ -149,12 +151,18 @@ check_static_begin(singly_linked_list_test_push_and_splice_range_no_ops)
 
 check_static_begin(singly_linked_list_test_sort_reverse)
 {
-    Singly_linked_list singly_linked_list
-        = singly_linked_list_initialize(struct Val, e, val_order, NULL, NULL);
-    struct Val vals[6] = {{.val = 0}, {.val = 1}, {.val = 2},
-                          {.val = 3}, {.val = 4}, {.val = 5}};
-    enum Check_result const t = create_list(&singly_linked_list, 6, vals);
-    check(t, CHECK_PASS);
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 6);
+    Singly_linked_list singly_linked_list = singly_linked_list_from(
+        e, val_order, stack_allocator_allocate, NULL, &allocator,
+        (struct Val[6]){
+            {.val = 5},
+            {.val = 4},
+            {.val = 3},
+            {.val = 2},
+            {.val = 1},
+            {.val = 0},
+        });
     check(check_order(&singly_linked_list, 6, (int[6]){5, 4, 3, 2, 1, 0}),
           CHECK_PASS);
     check(validate(&singly_linked_list), true);
@@ -169,15 +177,20 @@ check_static_begin(singly_linked_list_test_sort_reverse)
 
 check_static_begin(singly_linked_list_test_sort_even)
 {
-    Singly_linked_list singly_linked_list
-        = singly_linked_list_initialize(struct Val, e, val_order, NULL, NULL);
-    struct Val vals[8] = {
-        [7] = {.val = 9}, [6] = {.val = 4},  [5] = {.val = 1},
-        [4] = {.val = 3}, [3] = {.val = 99}, [2] = {.val = -55},
-        [1] = {.val = 5}, [0] = {.val = 2},
-    };
-    enum Check_result const t = create_list(&singly_linked_list, 8, vals);
-    check(t, CHECK_PASS);
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 8);
+    Singly_linked_list singly_linked_list = singly_linked_list_from(
+        e, val_order, stack_allocator_allocate, NULL, &allocator,
+        (struct Val[8]){
+            {.val = 9},
+            {.val = 4},
+            {.val = 1},
+            {.val = 3},
+            {.val = 99},
+            {.val = -55},
+            {.val = 5},
+            {.val = 2},
+        });
     check(validate(&singly_linked_list), true);
     check(check_order(&singly_linked_list, 8,
                       (int[8]){9, 4, 1, 3, 99, -55, 5, 2}),
@@ -195,15 +208,21 @@ check_static_begin(singly_linked_list_test_sort_even)
 
 check_static_begin(singly_linked_list_test_sort_odd)
 {
-    Singly_linked_list singly_linked_list
-        = singly_linked_list_initialize(struct Val, e, val_order, NULL, NULL);
-    struct Val vals[9] = {
-        [8] = {.val = 10},  [7] = {.val = 9}, [6] = {.val = 4},
-        [5] = {.val = 1},   [4] = {.val = 1}, [3] = {.val = 99},
-        [2] = {.val = -55}, [1] = {.val = 5}, [0] = {.val = 2},
-    };
-    enum Check_result const t = create_list(&singly_linked_list, 9, vals);
-    check(t, CHECK_PASS);
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 9);
+    Singly_linked_list singly_linked_list = singly_linked_list_from(
+        e, val_order, stack_allocator_allocate, NULL, &allocator,
+        (struct Val[9]){
+            {.val = 10},
+            {.val = 9},
+            {.val = 4},
+            {.val = 1},
+            {.val = 1},
+            {.val = 99},
+            {.val = -55},
+            {.val = 5},
+            {.val = 2},
+        });
     check(validate(&singly_linked_list), true);
     check(check_order(&singly_linked_list, 9,
                       (int[9]){10, 9, 4, 1, 1, 99, -55, 5, 2}),
@@ -221,17 +240,28 @@ check_static_begin(singly_linked_list_test_sort_odd)
 
 check_static_begin(singly_linked_list_test_sort_runs)
 {
-    Singly_linked_list singly_linked_list
-        = singly_linked_list_initialize(struct Val, e, val_order, NULL, NULL);
-    struct Val vals[12]
-        = {{.val = 99},  {.val = 101}, {.val = 103}, {.val = 4},
-           {.val = 8},   {.val = 9},   {.val = -99}, {.val = -55},
-           {.val = -55}, {.val = 3},   {.val = 7},   {.val = 10}};
-    enum Check_result t = create_list(&singly_linked_list, 12, vals);
-    check(t, CHECK_PASS);
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 12);
+    Singly_linked_list singly_linked_list = singly_linked_list_from(
+        e, val_order, stack_allocator_allocate, NULL, &allocator,
+        (struct Val[12]){
+            {.val = 10},
+            {.val = 7},
+            {.val = 3},
+            {.val = -55},
+            {.val = -55},
+            {.val = -99},
+            {.val = 9},
+            {.val = 8},
+            {.val = 4},
+            {.val = 103},
+            {.val = 101},
+            {.val = 99},
+        });
     check(validate(&singly_linked_list), true);
-    t = check_order(&singly_linked_list, 12,
-                    (int[12]){10, 7, 3, -55, -55, -99, 9, 8, 4, 103, 101, 99});
+    enum Check_result t = check_order(
+        &singly_linked_list, 12,
+        (int[12]){10, 7, 3, -55, -55, -99, 9, 8, 4, 103, 101, 99});
     check(t, CHECK_PASS);
     check(singly_linked_list_is_sorted(&singly_linked_list), false);
     CCC_Result const r = CCC_singly_linked_list_sort(&singly_linked_list);
@@ -246,16 +276,28 @@ check_static_begin(singly_linked_list_test_sort_runs)
 
 check_static_begin(singly_linked_list_test_sort_halves)
 {
-    Singly_linked_list singly_linked_list
-        = singly_linked_list_initialize(struct Val, e, val_order, NULL, NULL);
-    struct Val vals[12] = {{.val = 7},  {.val = 10}, {.val = 13}, {.val = 17},
-                           {.val = 19}, {.val = 21}, {.val = 8},  {.val = 12},
-                           {.val = 15}, {.val = 18}, {.val = 20}, {.val = 25}};
-    enum Check_result t = create_list(&singly_linked_list, 12, vals);
-    check(t, CHECK_PASS);
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 12);
+    Singly_linked_list singly_linked_list = singly_linked_list_from(
+        e, val_order, stack_allocator_allocate, NULL, &allocator,
+        (struct Val[12]){
+            {.val = 25},
+            {.val = 20},
+            {.val = 18},
+            {.val = 15},
+            {.val = 12},
+            {.val = 8},
+            {.val = 21},
+            {.val = 19},
+            {.val = 17},
+            {.val = 13},
+            {.val = 10},
+            {.val = 7},
+        });
     check(validate(&singly_linked_list), true);
-    t = check_order(&singly_linked_list, 12,
-                    (int[12]){25, 20, 18, 15, 12, 8, 21, 19, 17, 13, 10, 7});
+    enum Check_result t
+        = check_order(&singly_linked_list, 12,
+                      (int[12]){25, 20, 18, 15, 12, 8, 21, 19, 17, 13, 10, 7});
     check(t, CHECK_PASS);
     check(singly_linked_list_is_sorted(&singly_linked_list), false);
     CCC_Result const r = CCC_singly_linked_list_sort(&singly_linked_list);
@@ -283,7 +325,7 @@ check_static_begin(singly_linked_list_test_sort_insert)
         [5] = {.val = 1}, [4] = {.val = 99}, [3] = {.val = -55},
         [2] = {.val = 5}, [1] = {.val = 2},  [0] = {.val = -99},
     };
-    enum Check_result const t = create_list(&singly_linked_list, 9, vals);
+    enum Check_result const t = push_list(&singly_linked_list, 9, vals);
     check(t, CHECK_PASS);
     check(validate(&singly_linked_list), true);
     check(check_order(&singly_linked_list, 9,

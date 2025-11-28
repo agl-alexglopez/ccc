@@ -464,6 +464,7 @@ typedef CCC_Doubly_linked_list_node Doubly_linked_list_node;
 typedef CCC_Doubly_linked_list Doubly_linked_list;
 #    define doubly_linked_list_initialize(args...)                             \
         CCC_doubly_linked_list_initialize(args)
+#    define doubly_linked_list_from(args...) CCC_doubly_linked_list_from(args)
 #    define doubly_linked_list_emplace_back(args...)                           \
         CCC_doubly_linked_list_emplace_back(args)
 #    define doubly_linked_list_emplace_front(args...)                          \

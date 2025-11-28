@@ -8,6 +8,7 @@
 #include "doubly_linked_list_utility.h"
 #include "traits.h"
 #include "types.h"
+#include "utility/stack_allocator.h"
 
 check_static_begin(doubly_linked_list_test_pop_empty)
 {
@@ -28,12 +29,15 @@ check_static_begin(doubly_linked_list_test_pop_empty)
 
 check_static_begin(doubly_linked_list_test_push_pop_front)
 {
-    Doubly_linked_list doubly_linked_list
-        = doubly_linked_list_initialize(struct Val, e, val_order, NULL, NULL);
-    struct Val vals[3] = {{.val = 0}, {.val = 1}, {.val = 2}};
-    enum Check_result const t
-        = create_list(&doubly_linked_list, UTIL_PUSH_BACK, 3, vals);
-    check(t, CHECK_PASS);
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 12);
+    Doubly_linked_list doubly_linked_list = doubly_linked_list_from(
+        e, val_order, stack_allocator_allocate, NULL, &allocator,
+        (struct Val[3]){
+            {.val = 0},
+            {.val = 1},
+            {.val = 2},
+        });
     check(count(&doubly_linked_list).count, 3);
     struct Val *v = doubly_linked_list_front(&doubly_linked_list);
     check(v == NULL, false);
@@ -55,12 +59,15 @@ check_static_begin(doubly_linked_list_test_push_pop_front)
 
 check_static_begin(doubly_linked_list_test_push_pop_back)
 {
-    Doubly_linked_list doubly_linked_list
-        = doubly_linked_list_initialize(struct Val, e, val_order, NULL, NULL);
-    struct Val vals[3] = {{.val = 0}, {.val = 1}, {.val = 2}};
-    enum Check_result const t
-        = create_list(&doubly_linked_list, UTIL_PUSH_BACK, 3, vals);
-    check(t, CHECK_PASS);
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 12);
+    Doubly_linked_list doubly_linked_list = doubly_linked_list_from(
+        e, val_order, stack_allocator_allocate, NULL, &allocator,
+        (struct Val[3]){
+            {.val = 0},
+            {.val = 1},
+            {.val = 2},
+        });
     check(count(&doubly_linked_list).count, 3);
     struct Val *v = doubly_linked_list_back(&doubly_linked_list);
     check(v == NULL, false);
@@ -86,7 +93,7 @@ check_static_begin(doubly_linked_list_test_push_pop_middle)
         = doubly_linked_list_initialize(struct Val, e, val_order, NULL, NULL);
     struct Val vals[4] = {{.val = 0}, {.val = 1}, {.val = 2}, {.val = 3}};
     enum Check_result const t
-        = create_list(&doubly_linked_list, UTIL_PUSH_BACK, 4, vals);
+        = push_list(&doubly_linked_list, UTIL_PUSH_BACK, 4, vals);
     check(t, CHECK_PASS);
     check(extract(&doubly_linked_list, &vals[2].e) != NULL, true);
     check(validate(&doubly_linked_list), true);
@@ -110,7 +117,7 @@ check_static_begin(doubly_linked_list_test_push_pop_middle_range)
     struct Val vals[5]
         = {{.val = 0}, {.val = 1}, {.val = 2}, {.val = 3}, {.val = 4}};
     enum Check_result const t
-        = create_list(&doubly_linked_list, UTIL_PUSH_BACK, 5, vals);
+        = push_list(&doubly_linked_list, UTIL_PUSH_BACK, 5, vals);
     check(t, CHECK_PASS);
     (void)doubly_linked_list_extract_range(&doubly_linked_list, &vals[1].e,
                                            &vals[4].e);
@@ -131,13 +138,12 @@ check_static_begin(doubly_linked_list_test_splice_two_lists)
         = doubly_linked_list_initialize(struct Val, e, val_order, NULL, NULL);
     struct Val to_lose_vals[5]
         = {{.val = 0}, {.val = 1}, {.val = 2}, {.val = 3}, {.val = 4}};
-    enum Check_result t
-        = create_list(&to_lose, UTIL_PUSH_BACK, 5, to_lose_vals);
+    enum Check_result t = push_list(&to_lose, UTIL_PUSH_BACK, 5, to_lose_vals);
     check(t, CHECK_PASS);
     Doubly_linked_list to_gain
         = doubly_linked_list_initialize(struct Val, e, val_order, NULL, NULL);
     struct Val to_gain_vals[2] = {{.val = 0}, {.val = 1}};
-    t = create_list(&to_gain, UTIL_PUSH_BACK, 2, to_gain_vals);
+    t = push_list(&to_gain, UTIL_PUSH_BACK, 2, to_gain_vals);
     check(t, CHECK_PASS);
     check(check_order(&to_lose, 5, (int[5]){0, 1, 2, 3, 4}), CHECK_PASS);
     check(doubly_linked_list_splice(&to_gain, doubly_linked_list_end(&to_gain),

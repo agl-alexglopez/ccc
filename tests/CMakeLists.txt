@@ -334,6 +334,7 @@ macro(add_doubly_linked_list_test TEST_NAME)
       checkers
       doubly_linked_list_utility
       allocate
+      stack_allocator
   )
   set_target_properties(${TEST_NAME} 
     PROPERTIES 
@@ -363,6 +364,7 @@ macro(add_singly_linked_list_test TEST_NAME)
       checkers 
       singly_linked_list_utility
       allocate
+      stack_allocator
   )
   set_target_properties(${TEST_NAME} 
     PROPERTIES 

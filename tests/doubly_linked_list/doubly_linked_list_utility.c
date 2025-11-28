@@ -78,7 +78,7 @@ check_begin(check_order, Doubly_linked_list const *const doubly_linked_list,
     });
 }
 
-check_begin(create_list, CCC_Doubly_linked_list *const doubly_linked_list,
+check_begin(push_list, CCC_Doubly_linked_list *const doubly_linked_list,
             enum Push_direction const dir, size_t const n, struct Val vals[])
 {
     for (size_t i = 0; i < n; ++i)

@@ -67,7 +67,7 @@ check_begin(check_order, Singly_linked_list const *const singly_linked_list,
     });
 }
 
-check_begin(create_list, CCC_Singly_linked_list *const singly_linked_list,
+check_begin(push_list, CCC_Singly_linked_list *const singly_linked_list,
             size_t const n, struct Val vals[])
 {
     for (size_t i = 0; i < n; ++i)

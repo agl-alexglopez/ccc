@@ -401,6 +401,7 @@ typedef CCC_Singly_linked_list_node singly_linked_list_node;
 typedef CCC_Singly_linked_list Singly_linked_list;
 #    define singly_linked_list_initialize(args...)                             \
         CCC_singly_linked_list_initialize(args)
+#    define singly_linked_list_from(args...) CCC_singly_linked_list_from(args)
 #    define singly_linked_list_emplace_front(args...)                          \
         CCC_singly_linked_list_emplace_front(args)
 #    define singly_linked_list_push_front(args...)                             \
