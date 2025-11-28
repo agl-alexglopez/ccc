@@ -9,6 +9,10 @@ stack_allocator_allocate(CCC_Allocator_context const context)
         return NULL;
     }
     struct Stack_allocator *const allocator = context.context;
+    if (context.bytes % allocator->sizeof_type != 0)
+    {
+        return NULL;
+    }
     if (allocator->bytes_occupied + context.bytes > allocator->bytes_capacity)
     {
         return NULL;

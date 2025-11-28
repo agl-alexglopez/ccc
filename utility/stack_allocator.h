@@ -17,8 +17,13 @@ with the system heap allocator. As the test harness grows, this speed up is
 valuable. This should only be used for testing. */
 struct Stack_allocator
 {
+    /** The stack array of a compile time known capacity of user types. */
     void *blocks;
+    /** The size in bytes of the user type stored in this stack array. */
+    size_t sizeof_type;
+    /** The byte capacity of the compile time known array of user types. */
     size_t bytes_capacity;
+    /** The bytes occupied within this array. Multiple of type size. */
     size_t bytes_occupied;
 };
 
@@ -43,6 +48,7 @@ exist. */
         .bytes_capacity                                                        \
         = sizeof((type_name[type_compile_time_known_capacity]){}), /*NOLINT*/  \
         .bytes_occupied = 0,                                                   \
+        .sizeof_type = sizeof(type_name),                                      \
     }
 
 /** Implements a reduced allocator interface. Only allocates, does not resize
@@ -52,7 +58,12 @@ error message. Intended for testing.
 input is non-NULL, bytes is 0, or there is no context provided NULL is returned.
 Otherwise a bump allocation occurs.
 @return new memory for a new allocation request, NULL for resizing or free
-requests. */
+requests.
+@warning The byte input argument is expected to be a multiple of the underlying
+type size stored in the buffer. A stack allocator is not general purpose and
+expects the user to only request the type specified in the initialization
+argument. If a request that is not a multiple of type size is given NULL is
+returned. */
 void *stack_allocator_allocate(CCC_Allocator_context context);
 
 /** Resets a stack allocator into thinking it is empty. This is safe because
