@@ -1276,15 +1276,15 @@ first_trailing_bits_range(struct CCC_Bitset const *const bitset, size_t const i,
     Block_count cur_block = block_count_index(i);
     size_t cur_end = (cur_block * BITBLOCK_BITS) + BITBLOCK_BITS;
     Bit_count bit_i = bit_count_index(i);
-    do
+    for (;;)
     {
-        /* Clean up some edge cases for the helper function because we allow
-           the user to specify any range. What if our range ends before the
-           end of this block? What if it starts after index 0 of the first
-           block? Pretend out of range bits are zeros. */
-        Bitblock bits
-            = is_one ? bitset->blocks[cur_block] & (BITBLOCK_ON << bit_i)
-                     : (~bitset->blocks[cur_block]) & (BITBLOCK_ON << bit_i);
+        /* After the first iteration the bit index is always 0, so the
+           supplemental AND with the shifted expression returns the original
+           block. Makes code simpler to leave it. Test if this is costly (I
+           think probably not).*/
+        Bitblock bits = is_one
+                          ? bitset->blocks[cur_block] & (BITBLOCK_ON << bit_i)
+                          : ~bitset->blocks[cur_block] & (BITBLOCK_ON << bit_i);
         if (cur_end > range_end)
         {
             bits &= ~(BITBLOCK_ON << bit_count_index(range_end));
@@ -1315,12 +1315,14 @@ first_trailing_bits_range(struct CCC_Bitset const *const bitset, size_t const i,
             bits_start = (cur_block * BITBLOCK_BITS) + ones.index;
             num_found = ones.count;
         }
+        if (bits_start + num_bits > range_end)
+        {
+            return (CCC_Count){.error = CCC_RESULT_FAIL};
+        }
         bit_i = 0;
         ++cur_block;
         cur_end += BITBLOCK_BITS;
     }
-    while (bits_start + num_bits <= range_end);
-    return (CCC_Count){.error = CCC_RESULT_FAIL};
 }
 
 /** Returns the maximum group of consecutive ones in the bit block given. If the
@@ -1344,10 +1346,8 @@ max_trailing_ones(Bitblock const block, Bit_count bit_index,
     }
     if (ones_remain <= BITBLOCK_BITS)
     {
+        assert(ones_remain);
         assert(bit_index < BITBLOCK_BITS);
-        /* This branch must find a smaller group anywhere in this block which is
-           the most work required in this algorithm. We have some tricks to tell
-           when to give up on this as soon as possible. */
         Bitblock block_bits = block >> bit_index;
         Bitblock const required_mask
             = BITBLOCK_ON >> (BITBLOCK_BITS - ones_remain);
@@ -1355,15 +1355,17 @@ max_trailing_ones(Bitblock const block, Bit_count bit_index,
            the mask. Because unsigned integers are represented in base 2 we get
            two automatic early exits here.
 
-               - If the block is missing a required high-order bit, it is
-                 numerically smaller than the mask and cannot match with further
-                 shifting.
+               - If the block is missing a high-order bit in the required mask,
+                 it is numerically smaller than the mask and cannot match with
+                 further shifting.
 
-               - If the high bits match but some lower required bits are zero,
+               - If all high bits match but some lower required bits are zero,
                  the block is numerically smaller than the mask and cannot match
                  with further shifting.
 
-           All early exits are accounted for and we do no wasted shifts. */
+           If the block has high order bits not in the mask it is numerically
+           greater than the mask and we continue checking, which is correct.
+           This strategy optimizes out some useless shifts. */
         while (block_bits >= required_mask)
         {
             if ((required_mask & block_bits) == required_mask)
@@ -1490,20 +1492,24 @@ first_leading_bits_range(struct CCC_Bitset const *const bitset, size_t const i,
     Block_signed_count cur_block
         = (Block_signed_count)block_count_index(bits_start);
     ptrdiff_t cur_end = (ptrdiff_t)((cur_block * BITBLOCK_BITS) - 1);
-    Bit_signed_count i_bit = bit_count_index(bits_start);
-    do
+    Bit_signed_count bit_index = bit_count_index(bits_start);
+    for (;;)
     {
+        /* After the first iteration the bit index is always the Most
+           Significant bit of the block, so the supplemental AND with the
+           shifted expression returns the original block. Makes code simpler
+           to leave it. Test if this is costly (I think probably not).*/
         Bitblock bits
             = is_one ? bitset->blocks[cur_block]
-                           & (BITBLOCK_ON >> ((BITBLOCK_BITS - i_bit) - 1))
+                           & (BITBLOCK_ON >> ((BITBLOCK_BITS - bit_index) - 1))
                      : ~bitset->blocks[cur_block]
-                           & (BITBLOCK_ON >> ((BITBLOCK_BITS - i_bit) - 1));
+                           & (BITBLOCK_ON >> ((BITBLOCK_BITS - bit_index) - 1));
         if (cur_end < range_end)
         {
             bits &= (BITBLOCK_ON << bit_count_index(range_end + 1));
         }
         struct Group_signed_count const ones
-            = max_leading_ones(bits, i_bit, num_bits - num_found);
+            = max_leading_ones(bits, bit_index, num_bits - num_found);
         if (ones.count >= num_bits)
         {
             return (CCC_Count){
@@ -1512,26 +1518,30 @@ first_leading_bits_range(struct CCC_Bitset const *const bitset, size_t const i,
         }
         if (ones.index == BITBLOCK_BITS - 1)
         {
-            if (num_found + ones.count >= num_bits)
+            num_found += ones.count;
+            /* Continuation from prefix blocks has resulted in success. */
+            if (num_found >= num_bits)
             {
                 return (CCC_Count){.count = bits_start};
             }
-            num_found += ones.count;
         }
         else
         {
             /* If the new block start index is -1, then this addition bumps us
                to the next block's Most Significant Bit and is a simple
                subtraction by one to start search on next block.*/
-            bits_start = (ptrdiff_t)((cur_block * BITBLOCK_BITS) + ones.index);
+            bits_start
+                = (cur_block * (Bit_signed_count)BITBLOCK_BITS) + ones.index;
             num_found = ones.count;
         }
-        i_bit = BITBLOCK_BITS - 1;
+        if (bits_start < range_end + (ptrdiff_t)num_bits)
+        {
+            return (CCC_Count){.error = CCC_RESULT_FAIL};
+        }
+        bit_index = BITBLOCK_BITS - 1;
         --cur_block;
         cur_end -= BITBLOCK_BITS;
     }
-    while (bits_start >= range_end + (ptrdiff_t)num_bits);
-    return (CCC_Count){.error = CCC_RESULT_FAIL};
 }
 
 /** Returns the maximum group of consecutive ones in the bit block given. If the
@@ -1855,7 +1865,7 @@ count_trailing_zeros(CCC_Bitblock b)
 {
     if (!b)
     {
-        return BLOCK_BITS;
+        return BITBLOCK_BITS;
     }
     Bit_count cnt = 0;
     for (; (b & 1U) == 0; ++cnt, b >>= 1U)
@@ -1870,7 +1880,7 @@ count_leading_zeros(CCC_Bitblock b)
 {
     if (!b)
     {
-        return BLOCK_BITS;
+        return BITBLOCK_BITS;
     }
     Bit_count cnt = 0;
     for (; (b & BITBLOCK_MSB) == 0; ++cnt, b <<= 1U)
