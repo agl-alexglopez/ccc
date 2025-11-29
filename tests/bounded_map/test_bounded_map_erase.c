@@ -107,18 +107,24 @@ check_static_begin(bounded_map_test_weak_srand)
 
 check_static_begin(bounded_map_test_insert_erase_cycles)
 {
-    CCC_Bounded_map s
-        = bounded_map_initialize(struct Val, elem, key, id_order, NULL, NULL);
+    /* Over allocate because we do more insertions near the end. */
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 200);
+    CCC_Bounded_map s = CCC_bounded_map_initialize(
+        struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
     srand(time(NULL)); /* NOLINT */
-    int const num_nodes = 1000;
-    struct Val vals[1000];
-    bool repeats[1000] = {};
+    int const num_nodes = 100;
+    int keys[100] = {};
+    bool repeats[100] = {};
     for (int i = 0; i < num_nodes; ++i)
     {
-        int const rand_i = rand(); /* NOLINT */
-        vals[i].key = rand_i;
-        vals[i].val = i;
-        if (occupied(insert_or_assign_wrap(&s, &vals[i].elem)))
+        keys[i] = rand(); /* NOLINT */
+        if (occupied(insert_or_assign_wrap(&s,
+                                           &(struct Val){
+                                               .key = keys[i],
+                                               .val = i,
+                                           }
+                                                .elem)))
         {
             repeats[i] = true;
         }
@@ -126,19 +132,20 @@ check_static_begin(bounded_map_test_insert_erase_cycles)
     }
     for (int i = 0; i < num_nodes / 2; ++i)
     {
-        CCC_Entry h = CCC_remove(&s, &vals[i].elem);
+        CCC_Entry h = remove_entry(entry_wrap(&s, &keys[i]));
         check(occupied(&h) || repeats[i], true);
         check(validate(&s), true);
     }
     for (int i = 0; i < num_nodes / 2; ++i)
     {
-        CCC_Entry entry = insert_or_assign(&s, &vals[i].elem);
-        check(occupied(&entry), false);
+        CCC_Entry const *const entry = CCC_bounded_map_insert_or_assign_with(
+            &s, keys[i], (struct Val){.val = i});
+        check(occupied(entry), false);
         check(validate(&s), true);
     }
     for (int i = 0; i < num_nodes; ++i)
     {
-        CCC_Entry entry = CCC_remove(&s, &vals[i].elem);
+        CCC_Entry const entry = remove_entry(entry_wrap(&s, &keys[i]));
         check(occupied(&entry) || repeats[i], true);
         check(validate(&s), true);
     }

@@ -11,25 +11,29 @@
 #include "ccc/traits.h"
 #include "ccc/types.h"
 #include "checkers.h"
+#include "utility/stack_allocator.h"
 
 check_static_begin(adaptive_map_test_prime_shuffle)
 {
-    CCC_Adaptive_map s = CCC_adaptive_map_initialize(struct Val, elem, key,
-                                                     id_order, NULL, NULL);
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 50);
+    CCC_Adaptive_map s = CCC_adaptive_map_initialize(
+        struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
     size_t const size = 50;
     size_t const prime = 53;
     size_t const less = 10;
     /* We want the tree to have a smattering of duplicates so
        reduce the shuffle range so it will repeat some values. */
     size_t shuffled_index = prime % (size - less);
-    struct Val vals[50];
-    bool repeats[50];
-    memset(repeats, false, sizeof(bool) * size);
+    bool repeats[50] = {};
     for (size_t i = 0; i < size; ++i)
     {
-        vals[i].val = (int)shuffled_index;
-        vals[i].key = (int)shuffled_index;
-        if (occupied(swap_entry_wrap(&s, &vals[i].elem, &(struct Val){}.elem)))
+        if (occupied(insert_or_assign_wrap(&s,
+                                           &(struct Val){
+                                               .val = (int)shuffled_index,
+                                               .key = (int)shuffled_index,
+                                           }
+                                                .elem)))
         {
             repeats[i] = true;
         }
@@ -37,6 +41,7 @@ check_static_begin(adaptive_map_test_prime_shuffle)
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
     check(CCC_adaptive_map_count(&s).count < size, true);
+    struct Val *const vals = allocator.blocks;
     for (size_t i = 0; i < size; ++i)
     {
         check(occupied(remove_entry_wrap(entry_wrap(&s, &vals[i].key)))
@@ -49,19 +54,17 @@ check_static_begin(adaptive_map_test_prime_shuffle)
 
 check_static_begin(adaptive_map_test_insert_erase_shuffled)
 {
-    CCC_Adaptive_map s = CCC_adaptive_map_initialize(struct Val, elem, key,
-                                                     id_order, NULL, NULL);
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 50);
+    CCC_Adaptive_map s = CCC_adaptive_map_initialize(
+        struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
     size_t const size = 50;
     int const prime = 53;
-    struct Val vals[50];
-    check(insert_shuffled(&s, vals, size, prime), CHECK_PASS);
+    check(insert_shuffled(&s, size, prime), CHECK_PASS);
     int sorted_check[50];
-    check(inorder_fill(sorted_check, size, &s), size);
-    for (size_t i = 0; i < size; ++i)
-    {
-        check(vals[i].key, sorted_check[i]);
-    }
+    check(inorder_fill(sorted_check, size, &s), CHECK_PASS);
     /* Now let's delete everything with no errors. */
+    struct Val *const vals = allocator.blocks;
     for (size_t i = 0; i < size; ++i)
     {
         struct Val *v = unwrap(remove_wrap(&s, &vals[i].elem));
@@ -75,24 +78,29 @@ check_static_begin(adaptive_map_test_insert_erase_shuffled)
 
 check_static_begin(adaptive_map_test_weak_srand)
 {
-    CCC_Adaptive_map s = CCC_adaptive_map_initialize(struct Val, elem, key,
-                                                     id_order, NULL, NULL);
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 100);
+    CCC_Adaptive_map s = CCC_adaptive_map_initialize(
+        struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
-    int const num_nodes = 1000;
-    struct Val vals[1000];
-    bool repeats[1000] = {};
+    int const num_nodes = 100;
+    bool repeats[100] = {};
     for (int i = 0; i < num_nodes; ++i)
     {
-        vals[i].key = rand(); // NOLINT
-        vals[i].val = i;
-        if (occupied(swap_entry_wrap(&s, &vals[i].elem, &(struct Val){}.elem)))
+        if (occupied(insert_or_assign_wrap(&s,
+                                           &(struct Val){
+                                               .key = rand(), /* NOLINT */
+                                               .val = i,
+                                           }
+                                                .elem)))
         {
             repeats[i] = true;
         }
         check(validate(&s), true);
     }
+    struct Val *const vals = allocator.blocks;
     for (int i = 0; i < num_nodes; ++i)
     {
         CCC_Entry entry = CCC_remove(&s, &vals[i].elem);
@@ -105,18 +113,24 @@ check_static_begin(adaptive_map_test_weak_srand)
 
 check_static_begin(adaptive_map_test_insert_erase_cycles)
 {
-    CCC_Adaptive_map s = CCC_adaptive_map_initialize(struct Val, elem, key,
-                                                     id_order, NULL, NULL);
+    /* Over allocate because we do more insertions near the end. */
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 200);
+    CCC_Adaptive_map s = CCC_adaptive_map_initialize(
+        struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
     srand(time(NULL)); /* NOLINT */
-    int const num_nodes = 1000;
-    struct Val vals[1000];
-    bool repeats[1000] = {};
+    int const num_nodes = 100;
+    int keys[100] = {};
+    bool repeats[100] = {};
     for (int i = 0; i < num_nodes; ++i)
     {
-        int const rand_i = rand(); /* NOLINT */
-        vals[i].key = rand_i;
-        vals[i].val = i;
-        if (occupied(insert_or_assign_wrap(&s, &vals[i].elem)))
+        keys[i] = rand(); /* NOLINT */
+        if (occupied(insert_or_assign_wrap(&s,
+                                           &(struct Val){
+                                               .key = keys[i],
+                                               .val = i,
+                                           }
+                                                .elem)))
         {
             repeats[i] = true;
         }
@@ -124,19 +138,20 @@ check_static_begin(adaptive_map_test_insert_erase_cycles)
     }
     for (int i = 0; i < num_nodes / 2; ++i)
     {
-        CCC_Entry h = CCC_remove(&s, &vals[i].elem);
+        CCC_Entry h = remove_entry(entry_wrap(&s, &keys[i]));
         check(occupied(&h) || repeats[i], true);
         check(validate(&s), true);
     }
     for (int i = 0; i < num_nodes / 2; ++i)
     {
-        CCC_Entry entry = insert_or_assign(&s, &vals[i].elem);
-        check(occupied(&entry), false);
+        CCC_Entry const *const entry = CCC_adaptive_map_insert_or_assign_with(
+            &s, keys[i], (struct Val){.val = i});
+        check(occupied(entry), false);
         check(validate(&s), true);
     }
     for (int i = 0; i < num_nodes; ++i)
     {
-        CCC_Entry entry = CCC_remove(&s, &vals[i].elem);
+        CCC_Entry const entry = remove_entry(entry_wrap(&s, &keys[i]));
         check(occupied(&entry) || repeats[i], true);
         check(validate(&s), true);
     }

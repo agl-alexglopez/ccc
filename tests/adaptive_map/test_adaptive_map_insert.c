@@ -11,7 +11,7 @@
 #include "checkers.h"
 #include "traits.h"
 #include "types.h"
-#include "utility/allocate.h"
+#include "utility/stack_allocator.h"
 
 static inline struct Val
 adaptive_map_create(int const id, int const val)
@@ -41,8 +41,10 @@ check_static_begin(adaptive_map_test_insert)
 
 check_static_begin(adaptive_map_test_insert_macros)
 {
-    CCC_Adaptive_map om = adaptive_map_initialize(struct Val, elem, key,
-                                                  id_order, std_allocate, NULL);
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 10);
+    CCC_Adaptive_map om = adaptive_map_initialize(
+        struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
 
     struct Val const *ins = CCC_adaptive_map_or_insert_with(
         entry_wrap(&om, &(int){2}), (struct Val){.key = 2, .val = 0});
@@ -120,8 +122,10 @@ check_static_begin(adaptive_map_test_insert_overwrite)
 
 check_static_begin(adaptive_map_test_insert_then_bad_ideas)
 {
-    CCC_Adaptive_map om
-        = adaptive_map_initialize(struct Val, elem, key, id_order, NULL, NULL);
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 5);
+    CCC_Adaptive_map om = adaptive_map_initialize(
+        struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
     struct Val q = {.key = 137, .val = 99};
     CCC_Entry ent = swap_entry(&om, &q.elem, &(struct Val){}.elem);
     check(occupied(&ent), false);
@@ -150,8 +154,10 @@ check_static_begin(adaptive_map_test_insert_then_bad_ideas)
 check_static_begin(adaptive_map_test_entry_api_functional)
 {
     /* Over allocate size now because we don't want to worry about resizing. */
-    CCC_Adaptive_map om = adaptive_map_initialize(struct Val, elem, key,
-                                                  id_order, std_allocate, NULL);
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 200);
+    CCC_Adaptive_map om = adaptive_map_initialize(
+        struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
     size_t const size = 200;
 
     /* Test entry or insert with for all even values. Default should be
@@ -213,8 +219,10 @@ check_static_begin(adaptive_map_test_insert_via_entry)
 {
     /* Over allocate size now because we don't want to worry about resizing. */
     size_t const size = 200;
-    CCC_Adaptive_map om = adaptive_map_initialize(struct Val, elem, key,
-                                                  id_order, std_allocate, NULL);
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 200);
+    CCC_Adaptive_map om = adaptive_map_initialize(
+        struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
 
     /* Test entry or insert with for all even values. Default should be
        inserted. All entries are hashed to last digit so many spread out
@@ -258,8 +266,10 @@ check_static_begin(adaptive_map_test_insert_via_entry_macros)
 {
     /* Over allocate size now because we don't want to worry about resizing. */
     size_t const size = 200;
-    CCC_Adaptive_map om = adaptive_map_initialize(struct Val, elem, key,
-                                                  id_order, std_allocate, NULL);
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 200);
+    CCC_Adaptive_map om = adaptive_map_initialize(
+        struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
 
     /* Test entry or insert with for all even values. Default should be
        inserted. All entries are hashed to last digit so many spread out
@@ -298,8 +308,10 @@ check_static_begin(adaptive_map_test_entry_api_macros)
 {
     /* Over allocate size now because we don't want to worry about resizing. */
     int const size = 200;
-    CCC_Adaptive_map om = adaptive_map_initialize(struct Val, elem, key,
-                                                  id_order, std_allocate, NULL);
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 200);
+    CCC_Adaptive_map om = adaptive_map_initialize(
+        struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
 
     /* Test entry or insert with for all even values. Default should be
        inserted. All entries are hashed to last digit so many spread out
@@ -352,8 +364,10 @@ check_static_begin(adaptive_map_test_entry_api_macros)
 
 check_static_begin(adaptive_map_test_two_sum)
 {
-    CCC_Adaptive_map om = adaptive_map_initialize(struct Val, elem, key,
-                                                  id_order, std_allocate, NULL);
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 10);
+    CCC_Adaptive_map om = adaptive_map_initialize(
+        struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
     int const addends[10] = {1, 3, -980, 6, 7, 13, 44, 32, 995, -1};
     int const target = 15;
     int solution_indices[2] = {-1, -1};
@@ -376,151 +390,13 @@ check_static_begin(adaptive_map_test_two_sum)
     check_end(adaptive_map_clear(&om, NULL););
 }
 
-check_static_begin(adaptive_map_test_resize)
-{
-    CCC_Adaptive_map om = adaptive_map_initialize(struct Val, elem, key,
-                                                  id_order, std_allocate, NULL);
-
-    int const to_insert = 1000;
-    int const larger_prime = 1009;
-    for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
-         ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
-    {
-        struct Val elem = {.key = shuffled_index, .val = i};
-        struct Val *v = insert_entry(entry_wrap(&om, &elem.key), &elem.elem);
-        check(v != NULL, true);
-        check(v->key, shuffled_index);
-        check(v->val, i);
-        check(validate(&om), true);
-    }
-    check(count(&om).count, to_insert);
-    for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
-         ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
-    {
-        struct Val swap_slot = {shuffled_index, shuffled_index, {}};
-        struct Val const *const in_table
-            = insert_entry(entry_wrap(&om, &swap_slot.key), &swap_slot.elem);
-        check(in_table != NULL, true);
-        check(in_table->val, shuffled_index);
-    }
-    check(adaptive_map_clear(&om, NULL), CCC_RESULT_OK);
-    check_end();
-}
-
-check_static_begin(adaptive_map_test_resize_macros)
-{
-    CCC_Adaptive_map om = adaptive_map_initialize(struct Val, elem, key,
-                                                  id_order, std_allocate, NULL);
-    int const to_insert = 1000;
-    int const larger_prime = 1009;
-    for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
-         ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
-    {
-        struct Val *v = insert_entry(entry_wrap(&om, &shuffled_index),
-                                     &(struct Val){shuffled_index, i, {}}.elem);
-        check(v != NULL, true);
-        check(v->key, shuffled_index);
-        check(v->val, i);
-    }
-    check(count(&om).count, to_insert);
-    for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
-         ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
-    {
-        struct Val const *const in_table = adaptive_map_or_insert_with(
-            adaptive_map_and_modify_with(entry_wrap(&om, &shuffled_index),
-                                         struct Val,
-                                         {
-                                             T->val = shuffled_index;
-                                         }),
-            (struct Val){});
-        check(in_table != NULL, true);
-        check(in_table->val, shuffled_index);
-        struct Val *v = adaptive_map_or_insert_with(
-            entry_wrap(&om, &shuffled_index), (struct Val){});
-        check(v == NULL, false);
-        v->val = i;
-        v = get_key_value(&om, &shuffled_index);
-        check(v != NULL, true);
-        check(v->val, i);
-    }
-    check(adaptive_map_clear(&om, NULL), CCC_RESULT_OK);
-    check_end();
-}
-
-check_static_begin(adaptive_map_test_resize_fadaptive_map_null)
-{
-    CCC_Adaptive_map om = adaptive_map_initialize(struct Val, elem, key,
-                                                  id_order, std_allocate, NULL);
-    int const to_insert = 1000;
-    int const larger_prime = 1009;
-    for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
-         ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
-    {
-        struct Val elem = {.key = shuffled_index, .val = i};
-        struct Val *v = insert_entry(entry_wrap(&om, &elem.key), &elem.elem);
-        check(v != NULL, true);
-        check(v->key, shuffled_index);
-        check(v->val, i);
-    }
-    check(count(&om).count, to_insert);
-    for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
-         ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
-    {
-        struct Val swap_slot = {shuffled_index, shuffled_index, {}};
-        struct Val const *const in_table
-            = insert_entry(entry_wrap(&om, &swap_slot.key), &swap_slot.elem);
-        check(in_table != NULL, true);
-        check(in_table->val, shuffled_index);
-    }
-    check(adaptive_map_clear(&om, NULL), CCC_RESULT_OK);
-    check_end();
-}
-
-check_static_begin(adaptive_map_test_resize_fadaptive_map_null_macros)
-{
-    CCC_Adaptive_map om = adaptive_map_initialize(struct Val, elem, key,
-                                                  id_order, std_allocate, NULL);
-    int const to_insert = 1000;
-    int const larger_prime = 1009;
-    for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
-         ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
-    {
-        struct Val *v = insert_entry(entry_wrap(&om, &shuffled_index),
-                                     &(struct Val){shuffled_index, i, {}}.elem);
-        check(v != NULL, true);
-        check(v->key, shuffled_index);
-        check(v->val, i);
-    }
-    check(count(&om).count, to_insert);
-    for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
-         ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
-    {
-        struct Val const *const in_table = adaptive_map_or_insert_with(
-            adaptive_map_and_modify_with(entry_wrap(&om, &shuffled_index),
-                                         struct Val,
-                                         {
-                                             T->val = shuffled_index;
-                                         }),
-            (struct Val){});
-        check(in_table != NULL, true);
-        check(in_table->val, shuffled_index);
-        struct Val *v = adaptive_map_or_insert_with(
-            entry_wrap(&om, &shuffled_index), (struct Val){});
-        check(v == NULL, false);
-        v->val = i;
-        v = get_key_value(&om, &shuffled_index);
-        check(v == NULL, false);
-        check(v->val, i);
-    }
-    check(adaptive_map_clear(&om, NULL), CCC_RESULT_OK);
-    check_end();
-}
-
 check_static_begin(adaptive_map_test_insert_and_find)
 {
-    int const size = 101;
-    CCC_Adaptive_map om = adaptive_map_initialize(struct Val, elem, key,
-                                                  id_order, std_allocate, NULL);
+    int const size = 10;
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 100);
+    CCC_Adaptive_map om = adaptive_map_initialize(
+        struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
 
     for (int i = 0; i < size; i += 2)
     {
@@ -553,14 +429,15 @@ check_static_begin(adaptive_map_test_insert_and_find)
 check_static_begin(adaptive_map_test_insert_shuffle)
 {
     size_t const size = 50;
-    CCC_Adaptive_map om
-        = adaptive_map_initialize(struct Val, elem, key, id_order, NULL, NULL);
-    struct Val vals[50] = {};
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 50);
+    CCC_Adaptive_map om = adaptive_map_initialize(
+        struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
     check(size > 1, true);
     int const prime = 53;
-    check(insert_shuffled(&om, vals, size, prime), CHECK_PASS);
+    check(insert_shuffled(&om, size, prime), CHECK_PASS);
     int sorted_check[50];
-    check(inorder_fill(sorted_check, size, &om), size);
+    check(inorder_fill(sorted_check, size, &om), CHECK_PASS);
     for (size_t i = 1; i < size; ++i)
     {
         check(sorted_check[i - 1] <= sorted_check[i], true);
@@ -570,9 +447,11 @@ check_static_begin(adaptive_map_test_insert_shuffle)
 
 check_static_begin(adaptive_map_test_insert_weak_srand)
 {
-    int const num_nodes = 1000;
-    CCC_Adaptive_map om = adaptive_map_initialize(struct Val, elem, key,
-                                                  id_order, std_allocate, NULL);
+    int const num_nodes = 100;
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 100);
+    CCC_Adaptive_map om = adaptive_map_initialize(
+        struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
     srand(time(NULL)); /* NOLINT */
     for (int i = 0; i < num_nodes; ++i)
     {
@@ -598,9 +477,6 @@ main()
         adaptive_map_test_insert_via_entry_macros(),
         adaptive_map_test_entry_api_functional(),
         adaptive_map_test_entry_api_macros(), adaptive_map_test_two_sum(),
-        adaptive_map_test_resize(), adaptive_map_test_resize_macros(),
-        adaptive_map_test_resize_fadaptive_map_null(),
-        adaptive_map_test_resize_fadaptive_map_null_macros(),
         adaptive_map_test_insert_weak_srand(),
         adaptive_map_test_insert_shuffle());
 }

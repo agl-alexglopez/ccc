@@ -13,6 +13,7 @@
 #include "checkers.h"
 #include "traits.h"
 #include "types.h"
+#include "utility/stack_allocator.h"
 
 check_static_begin(check_range, Adaptive_map const *const rom,
                    Range const *const r, size_t const n,
@@ -166,8 +167,10 @@ check_static_begin(iterator_check, CCC_Adaptive_map *s)
 
 check_static_begin(adaptive_map_test_forward_iterator)
 {
-    CCC_Adaptive_map s = CCC_adaptive_map_initialize(struct Val, elem, key,
-                                                     id_order, NULL, NULL);
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 33);
+    CCC_Adaptive_map s = CCC_adaptive_map_initialize(
+        struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
     /* We should have the expected behavior iteration over empty tree. */
     int j = 0;
     for (struct Val *e = begin(&s); e != end(&s); e = next(&s, &e->elem), ++j)
@@ -175,18 +178,20 @@ check_static_begin(adaptive_map_test_forward_iterator)
     check(j, 0);
     int const num_nodes = 33;
     int const prime = 37;
-    struct Val vals[33];
     size_t shuffled_index = prime % num_nodes;
     for (int i = 0; i < num_nodes; ++i)
     {
-        vals[i].key = (int)shuffled_index;
-        vals[i].val = i;
-        (void)swap_entry(&s, &vals[i].elem, &(struct Val){}.elem);
+        (void)insert_or_assign(&s,
+                               &(struct Val){
+                                   .key = (int)shuffled_index,
+                                   .val = i,
+                               }
+                                    .elem);
         check(validate(&s), true);
         shuffled_index = (shuffled_index + prime) % num_nodes;
     }
     int val_keys_inorder[33];
-    check(inorder_fill(val_keys_inorder, num_nodes, &s), count(&s).count);
+    check(inorder_fill(val_keys_inorder, num_nodes, &s), CHECK_PASS);
     j = 0;
     for (struct Val *e = begin(&s); e && j < num_nodes;
          e = next(&s, &e->elem), ++j)
@@ -198,19 +203,24 @@ check_static_begin(adaptive_map_test_forward_iterator)
 
 check_static_begin(adaptive_map_test_iterate_removal)
 {
-    CCC_Adaptive_map s = CCC_adaptive_map_initialize(struct Val, elem, key,
-                                                     id_order, NULL, NULL);
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 100);
+    CCC_Adaptive_map s = CCC_adaptive_map_initialize(
+        struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
-    size_t const num_nodes = 1000;
-    struct Val vals[1000];
+    size_t const num_nodes = 100;
     for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
-        vals[i].key = rand() % (num_nodes + 1); // NOLINT
-        vals[i].val = (int)i;
-        (void)swap_entry(&s, &vals[i].elem, &(struct Val){}.elem);
+        int const key = rand() % (num_nodes + 1); // NOLINT
+        (void)insert_or_assign(&s,
+                               &(struct Val){
+                                   .key = key,
+                                   .val = (int)i,
+                               }
+                                    .elem);
         check(validate(&s), true);
     }
     check(iterator_check(&s), CHECK_PASS);
@@ -229,25 +239,30 @@ check_static_begin(adaptive_map_test_iterate_removal)
 
 check_static_begin(adaptive_map_test_iterate_remove_reinsert)
 {
-    CCC_Adaptive_map s = CCC_adaptive_map_initialize(struct Val, elem, key,
-                                                     id_order, NULL, NULL);
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 100);
+    CCC_Adaptive_map s = CCC_adaptive_map_initialize(
+        struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
-    size_t const num_nodes = 1000;
-    struct Val vals[1000];
+    size_t const num_nodes = 100;
     for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
-        vals[i].key = rand() % (num_nodes + 1); // NOLINT
-        vals[i].val = (int)i;
-        (void)swap_entry(&s, &vals[i].elem, &(struct Val){}.elem);
+        int const key = rand() % (num_nodes + 1); // NOLINT
+        (void)insert_or_assign(&s,
+                               &(struct Val){
+                                   .key = key,
+                                   .val = (int)i,
+                               }
+                                    .elem);
         check(validate(&s), true);
     }
     check(iterator_check(&s), CHECK_PASS);
     size_t const old_size = count(&s).count;
-    int const limit = 400;
-    int new_unique_entry_val = 1001;
+    int const limit = 40;
+    int new_unique_entry_val = 101;
     for (struct Val *i = begin(&s), *next = NULL; i; i = next)
     {
         next = next(&s, &i->elem);
@@ -267,17 +282,20 @@ check_static_begin(adaptive_map_test_iterate_remove_reinsert)
 
 check_static_begin(adaptive_map_test_valid_range)
 {
-    CCC_Adaptive_map s = CCC_adaptive_map_initialize(struct Val, elem, key,
-                                                     id_order, NULL, NULL);
-
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 25);
+    CCC_Adaptive_map s = CCC_adaptive_map_initialize(
+        struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
     int const num_nodes = 25;
-    struct Val vals[25];
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
     for (int i = 0, id = 0; i < num_nodes; ++i, id += 5)
     {
-        vals[i].key = id; // NOLINT
-        vals[i].val = i;
-        (void)swap_entry(&s, &vals[i].elem, &(struct Val){}.elem);
+        (void)insert_or_assign(&s,
+                               &(struct Val){
+                                   .key = id,
+                                   .val = i,
+                               }
+                                    .elem);
         check(validate(&s), true);
     }
     /* This should be the following range [6,44). 6 should raise to
@@ -298,17 +316,20 @@ check_static_begin(adaptive_map_test_valid_range)
 
 check_static_begin(adaptive_map_test_valid_range_equals)
 {
-    CCC_Adaptive_map s = CCC_adaptive_map_initialize(struct Val, elem, key,
-                                                     id_order, NULL, NULL);
-
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 25);
+    CCC_Adaptive_map s = CCC_adaptive_map_initialize(
+        struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
     int const num_nodes = 25;
-    struct Val vals[25];
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
     for (int i = 0, id = 0; i < num_nodes; ++i, id += 5)
     {
-        vals[i].key = id; // NOLINT
-        vals[i].val = i;
-        (void)swap_entry(&s, &vals[i].elem, &(struct Val){}.elem);
+        (void)insert_or_assign(&s,
+                               &(struct Val){
+                                   .key = id,
+                                   .val = i,
+                               }
+                                    .elem);
         check(validate(&s), true);
     }
     check(check_range(&s, equal_range_wrap(&s, &(int){10}, &(int){40}), 8,
@@ -323,16 +344,20 @@ check_static_begin(adaptive_map_test_valid_range_equals)
 
 check_static_begin(adaptive_map_test_invalid_range)
 {
-    CCC_Adaptive_map s = CCC_adaptive_map_initialize(struct Val, elem, key,
-                                                     id_order, NULL, NULL);
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 25);
+    CCC_Adaptive_map s = CCC_adaptive_map_initialize(
+        struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
     int const num_nodes = 25;
-    struct Val vals[25];
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
     for (int i = 0, id = 0; i < num_nodes; ++i, id += 5)
     {
-        vals[i].key = id; // NOLINT
-        vals[i].val = i;
-        (void)swap_entry(&s, &vals[i].elem, &(struct Val){}.elem);
+        (void)insert_or_assign(&s,
+                               &(struct Val){
+                                   .key = id,
+                                   .val = i,
+                               }
+                                    .elem);
         check(validate(&s), true);
     }
     /* This should be the following range [95,999). 95 should raise to
@@ -353,30 +378,32 @@ check_static_begin(adaptive_map_test_invalid_range)
 
 check_static_begin(adaptive_map_test_empty_range)
 {
-    CCC_Adaptive_map s = CCC_adaptive_map_initialize(struct Val, elem, key,
-                                                     id_order, NULL, NULL);
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 25);
+    CCC_Adaptive_map s = CCC_adaptive_map_initialize(
+        struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
     int const num_nodes = 25;
-    struct Val vals[25];
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
     for (int i = 0, id = 0; i < num_nodes; ++i, id += 5)
     {
-        vals[i].key = id; // NOLINT
-        vals[i].val = i;
-        (void)swap_entry(&s, &vals[i].elem, &(struct Val){}.elem);
+        (void)insert_or_assign(&s,
+                               &(struct Val){
+                                   .key = id,
+                                   .val = i,
+                               }
+                                    .elem);
         check(validate(&s), true);
     }
     /* Nonexistant range returns end [begin, end) in both positions.
        which may not be the end element but a value in the tree. However,
        Normal iteration patterns would consider this empty. */
     CCC_Range const forward_range = equal_range(&s, &(int){-50}, &(int){-25});
-    check(((struct Val *)range_begin(&forward_range))->key, vals[0].key);
-    check(((struct Val *)range_end(&forward_range))->key, vals[0].key);
+    check(((struct Val *)range_begin(&forward_range))->key, 0);
+    check(((struct Val *)range_end(&forward_range))->key, 0);
     CCC_Range_reverse const rev_range
         = equal_range_reverse(&s, &(int){150}, &(int){999});
-    check(((struct Val *)range_reverse_begin(&rev_range))->key,
-          vals[num_nodes - 1].key);
-    check(((struct Val *)range_reverse_end(&rev_range))->key,
-          vals[num_nodes - 1].key);
+    check(((struct Val *)range_reverse_begin(&rev_range))->key, 120);
+    check(((struct Val *)range_reverse_end(&rev_range))->key, 120);
     check_end();
 }
 

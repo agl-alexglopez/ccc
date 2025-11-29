@@ -18,61 +18,44 @@ id_order(CCC_Key_comparator_context const order)
     return (key > c->key) - (key < c->key);
 }
 
-check_begin(insert_shuffled, CCC_Adaptive_map *m, struct Val vals[],
-            size_t const size, int const larger_prime)
+check_begin(insert_shuffled, CCC_Adaptive_map *m, size_t const size,
+            int const larger_prime)
 {
     size_t shuffled_index = larger_prime % size;
     for (size_t i = 0; i < size; ++i)
     {
-        vals[shuffled_index].key = (int)shuffled_index;
-        (void)swap_entry(m, &vals[shuffled_index].elem, &(struct Val){}.elem);
-        check(count(m).count, i + 1);
+        (void)CCC_adaptive_map_swap_entry(m,
+                                          &(struct Val){
+                                              .key = (int)shuffled_index,
+                                              .val = (int)i,
+                                          }
+                                               .elem,
+                                          &(struct Val){}.elem);
         check(validate(m), true);
         shuffled_index = (shuffled_index + larger_prime) % size;
     }
-    check(count(m).count, size);
+    check(CCC_adaptive_map_count(m).count, size);
     check_end();
 }
 
 /* Iterative inorder traversal to check the heap is sorted. */
-size_t
-inorder_fill(int vals[], size_t size, CCC_Adaptive_map *m)
+check_begin(inorder_fill, int vals[], size_t size, CCC_Adaptive_map *const m)
 {
-    if (count(m).count != size)
+    check(CCC_adaptive_map_count(m).count, size);
+    struct Val const *prev = begin(m);
+    struct Val const *e = end(m);
+    if (prev)
     {
-        return 0;
+        vals[0] = prev->key;
+        e = next(m, &prev->elem);
     }
-    size_t i = 0;
-    for (struct Val *e = begin(m); e; e = next(m, &e->elem))
+    size_t i = 1;
+    while (e != end(m))
     {
+        check(prev->key < e->key, true);
         vals[i++] = e->key;
+        prev = e;
+        e = next(m, &e->elem);
     }
-    return i;
-}
-
-void *
-val_bump_allocate(CCC_Allocator_context const context)
-{
-    if (!context.input && !context.bytes)
-    {
-        return NULL;
-    }
-    if (!context.input)
-    {
-        assert(context.bytes == sizeof(struct Val)
-               && "stack allocator for struct Val only.");
-        struct Val_pool *vals = context.context;
-        if (vals->next_free >= vals->capacity)
-        {
-            return NULL;
-        }
-        return &vals->vals[vals->next_free++];
-    }
-    if (!context.bytes)
-    {
-        /* Don't do anything fancy on free, just bump forward so no op here. */
-        return NULL;
-    }
-    assert(!"Shouldn't attempt to reallocate in bump allocator.");
-    return NULL;
+    check_end();
 }
