@@ -119,25 +119,16 @@ CCC_buffer_clear_and_free(CCC_Buffer *const buffer,
     {
         return CCC_RESULT_ARGUMENT_ERROR;
     }
-    if (!destroy)
+    if (destroy)
     {
-        (void)buffer->allocate((CCC_Allocator_context){
-            .input = buffer->data,
-            .bytes = 0,
-            .context = buffer->context,
-        });
-        buffer->data = NULL;
-        buffer->count = 0;
-        buffer->capacity = 0;
-        return CCC_RESULT_OK;
-    }
-    for (void *i = CCC_buffer_begin(buffer); i != CCC_buffer_end(buffer);
-         i = CCC_buffer_next(buffer, i))
-    {
-        destroy((CCC_Type_context){
-            .type = i,
-            .context = buffer->context,
-        });
+        for (void *i = CCC_buffer_begin(buffer); i != CCC_buffer_end(buffer);
+             i = CCC_buffer_next(buffer, i))
+        {
+            destroy((CCC_Type_context){
+                .type = i,
+                .context = buffer->context,
+            });
+        }
     }
     (void)buffer->allocate((CCC_Allocator_context){
         .input = buffer->data,
@@ -159,25 +150,16 @@ CCC_buffer_clear_and_free_reserve(CCC_Buffer *const buffer,
     {
         return CCC_RESULT_ARGUMENT_ERROR;
     }
-    if (!destroy)
+    if (destroy)
     {
-        (void)allocate((CCC_Allocator_context){
-            .input = buffer->data,
-            .bytes = 0,
-            .context = buffer->context,
-        });
-        buffer->data = NULL;
-        buffer->count = 0;
-        buffer->capacity = 0;
-        return CCC_RESULT_OK;
-    }
-    for (void *i = CCC_buffer_begin(buffer); i != CCC_buffer_end(buffer);
-         i = CCC_buffer_next(buffer, i))
-    {
-        destroy((CCC_Type_context){
-            .type = i,
-            .context = buffer->context,
-        });
+        for (void *i = CCC_buffer_begin(buffer); i != CCC_buffer_end(buffer);
+             i = CCC_buffer_next(buffer, i))
+        {
+            destroy((CCC_Type_context){
+                .type = i,
+                .context = buffer->context,
+            });
+        }
     }
     (void)allocate((CCC_Allocator_context){
         .input = buffer->data,

@@ -92,13 +92,13 @@ enum : typeof((struct CCC_Flat_hash_map_tag){}.v)
 {
 #ifdef CCC_HAS_X86_SIMD
     /** A group of tags that can be loaded into a 128 bit vector. */
-    CCC_FLAT_HASH_MAP_GROUP_SIZE = 16,
+    CCC_FLAT_HASH_MAP_GROUP_COUNT = 16,
 #elifdef CCC_HAS_ARM_SIMD
     /** A group of tags that can be loded into a 64 bit integer. */
-    CCC_FLAT_HASH_MAP_GROUP_SIZE = 8,
+    CCC_FLAT_HASH_MAP_GROUP_COUNT = 8,
 #else  /* PORTABLE FALLBACK */
     /** A group of tags that can be loded into a 64 bit integer. */
-    CCC_FLAT_HASH_MAP_GROUP_SIZE = 8,
+    CCC_FLAT_HASH_MAP_GROUP_COUNT = 8,
 #endif /* defined(CCC_HAS_X86_SIMD) */
 };
 
@@ -235,8 +235,8 @@ boundary to be able to perform aligned loads and stores. */
     static_assert((capacity) > 0,                                              \
                   "fixed size map must have capacity greater than 0");         \
     static_assert(                                                             \
-        (capacity) >= CCC_FLAT_HASH_MAP_GROUP_SIZE,                            \
-        "fixed size map must have capacity >= CCC_FLAT_HASH_MAP_GROUP_SIZE "   \
+        (capacity) >= CCC_FLAT_HASH_MAP_GROUP_COUNT,                           \
+        "fixed size map must have capacity >= CCC_FLAT_HASH_MAP_GROUP_COUNT "  \
         "(8 or 16 depending on platform)");                                    \
     static_assert(((capacity) & ((capacity) - 1)) == 0,                        \
                   "fixed size map must be a power of 2 capacity (32, 64, "     \
@@ -244,8 +244,8 @@ boundary to be able to perform aligned loads and stores. */
     typedef struct                                                             \
     {                                                                          \
         key_val_type_name data[(capacity) + 1];                                \
-        alignas(CCC_FLAT_HASH_MAP_GROUP_SIZE) struct CCC_Flat_hash_map_tag     \
-            tag[(capacity) + CCC_FLAT_HASH_MAP_GROUP_SIZE];                    \
+        alignas(CCC_FLAT_HASH_MAP_GROUP_COUNT) struct CCC_Flat_hash_map_tag    \
+            tag[(capacity) + CCC_FLAT_HASH_MAP_GROUP_COUNT];                   \
     }(fixed_map_type_name)
 
 /** @internal If the user does not want to remember the capacity they chose
@@ -259,7 +259,7 @@ simple byte sized chunks so no division needed. See earlier static asserts for
 how we ensure no fixed size type is allowed to be defined in a way to make this
 call unsafe. */
 #define CCC_private_flat_hash_map_fixed_capacity(fixed_map_type_name)          \
-    (sizeof((fixed_map_type_name){}.tag) - CCC_FLAT_HASH_MAP_GROUP_SIZE)
+    (sizeof((fixed_map_type_name){}.tag) - CCC_FLAT_HASH_MAP_GROUP_COUNT)
 
 /** @internal Initialization is tricky but we simplify by only accepting a
 pointer to the map this pointer could be any of the following.
