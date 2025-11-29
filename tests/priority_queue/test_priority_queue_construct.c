@@ -5,7 +5,7 @@
 #include "priority_queue.h"
 #include "priority_queue_utility.h"
 #include "types.h"
-#include "utility/allocate.h"
+#include "utility/stack_allocator.h"
 
 static CCC_Priority_queue
 construct_empty(void)
@@ -41,13 +41,16 @@ check_static_begin(priority_queue_test_construct)
 
 check_static_begin(priority_queue_test_construct_from)
 {
-    CCC_Priority_queue pq = CCC_priority_queue_from(
-        elem, CCC_ORDER_LESSER, val_order, std_allocate, NULL, NULL,
-        (struct Val[]){
-            {.val = 0},
-            {.val = 1},
-            {.val = 2},
-        });
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 3);
+    CCC_Priority_queue pq
+        = CCC_priority_queue_from(elem, CCC_ORDER_LESSER, val_order,
+                                  stack_allocator_allocate, NULL, &allocator,
+                                  (struct Val[]){
+                                      {.val = 0},
+                                      {.val = 1},
+                                      {.val = 2},
+                                  });
     check(CCC_priority_queue_validate(&pq), true);
     check(CCC_priority_queue_count(&pq).count, 3);
     struct Val const *const v = CCC_priority_queue_front(&pq);

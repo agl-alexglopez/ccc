@@ -7,7 +7,7 @@
 #include "singly_linked_list.h"
 #include "singly_linked_list_utility.h"
 #include "traits.h"
-#include "utility/allocate.h"
+#include "utility/stack_allocator.h"
 
 static CCC_Singly_linked_list
 construct_empty(void)
@@ -47,13 +47,15 @@ check_static_begin(singly_linked_list_test_constructor_copy)
 
 check_static_begin(singly_linked_list_test_construct_from)
 {
-    CCC_Singly_linked_list list
-        = CCC_singly_linked_list_from(e, val_order, std_allocate, NULL, NULL,
-                                      (struct Val[]){
-                                          {.val = 0},
-                                          {.val = 1},
-                                          {.val = 2},
-                                      });
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 3);
+    CCC_Singly_linked_list list = CCC_singly_linked_list_from(
+        e, val_order, stack_allocator_allocate, NULL, &allocator,
+        (struct Val[]){
+            {.val = 0},
+            {.val = 1},
+            {.val = 2},
+        });
     check(CCC_singly_linked_list_validate(&list), true);
     check(CCC_singly_linked_list_count(&list).count, 3);
     struct Val const *const v = CCC_singly_linked_list_front(&list);

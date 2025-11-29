@@ -13,6 +13,7 @@ the entry functions. */
 #include "checkers.h"
 #include "traits.h"
 #include "types.h"
+#include "utility/stack_allocator.h"
 
 static inline struct Val
 val(int const val)
@@ -66,10 +67,10 @@ check_static_begin(fill_n, CCC_Bounded_map *const rom, size_t const n,
    the user on insert. Leave this test here to always catch this. */
 check_static_begin(romap_test_validate)
 {
-    struct Val_pool vals
-        = {.vals = (struct Val[3]){}, .next_free = 0, .capacity = 3};
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 3);
     CCC_Bounded_map rom = bounded_map_initialize(
-        struct Val, elem, key, id_order, val_bump_allocate, &vals);
+        struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
     CCC_Entry ent = swap_entry(&rom, &(struct Val){.key = -1, .val = -1}.elem,
                                &(struct Val){}.elem);
     check(validate(&rom), true);
@@ -90,10 +91,10 @@ check_static_begin(romap_test_validate)
 
 check_static_begin(romap_test_insert)
 {
-    struct Val_pool vals
-        = {.vals = (struct Val[35]){}, .next_free = 0, .capacity = 35};
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 35);
     CCC_Bounded_map rom = bounded_map_initialize(
-        struct Val, elem, key, id_order, val_bump_allocate, &vals);
+        struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
     int size = 30;
     CCC_Entry ent = swap_entry(&rom, &(struct Val){.key = -1, .val = -1}.elem,
                                &(struct Val){}.elem);
@@ -155,10 +156,10 @@ check_static_begin(romap_test_insert)
 
 check_static_begin(romap_test_remove)
 {
-    struct Val_pool vals
-        = {.vals = (struct Val[35]){}, .next_free = 0, .capacity = 35};
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 35);
     CCC_Bounded_map rom = bounded_map_initialize(
-        struct Val, elem, key, id_order, val_bump_allocate, &vals);
+        struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
     int size = 30;
     CCC_Entry ent = CCC_remove(&rom, &(struct Val){.key = -1, .val = -1}.elem);
     check(validate(&rom), true);
@@ -229,10 +230,10 @@ check_static_begin(romap_test_remove)
 
 check_static_begin(romap_test_try_insert)
 {
-    struct Val_pool vals
-        = {.vals = (struct Val[35]){}, .next_free = 0, .capacity = 35};
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 35);
     CCC_Bounded_map rom = bounded_map_initialize(
-        struct Val, elem, key, id_order, val_bump_allocate, &vals);
+        struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
     int size = 30;
     CCC_Entry ent = try_insert(&rom, &(struct Val){.key = -1, .val = -1}.elem);
     check(validate(&rom), true);
@@ -287,10 +288,10 @@ check_static_begin(romap_test_try_insert)
 
 check_static_begin(romap_test_try_insert_with)
 {
-    struct Val_pool vals
-        = {.vals = (struct Val[35]){}, .next_free = 0, .capacity = 35};
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 35);
     CCC_Bounded_map rom = bounded_map_initialize(
-        struct Val, elem, key, id_order, val_bump_allocate, &vals);
+        struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
     int size = 30;
     CCC_Entry *ent = bounded_map_try_insert_with(&rom, -1, val(-1));
     check(validate(&rom), true);
@@ -346,10 +347,10 @@ check_static_begin(romap_test_try_insert_with)
 
 check_static_begin(romap_test_insert_or_assign)
 {
-    struct Val_pool vals
-        = {.vals = (struct Val[35]){}, .next_free = 0, .capacity = 35};
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 35);
     CCC_Bounded_map rom = bounded_map_initialize(
-        struct Val, elem, key, id_order, val_bump_allocate, &vals);
+        struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
     int size = 30;
     CCC_Entry ent
         = insert_or_assign(&rom, &(struct Val){.key = -1, .val = -1}.elem);
@@ -405,10 +406,10 @@ check_static_begin(romap_test_insert_or_assign)
 
 check_static_begin(romap_test_insert_or_assign_with)
 {
-    struct Val_pool vals
-        = {.vals = (struct Val[35]){}, .next_free = 0, .capacity = 35};
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 35);
     CCC_Bounded_map rom = bounded_map_initialize(
-        struct Val, elem, key, id_order, val_bump_allocate, &vals);
+        struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
     int size = 30;
     CCC_Entry *ent = bounded_map_insert_or_assign_with(&rom, -1, val(-1));
     check(validate(&rom), true);
@@ -463,10 +464,10 @@ check_static_begin(romap_test_insert_or_assign_with)
 
 check_static_begin(romap_test_entry_and_modify)
 {
-    struct Val_pool vals
-        = {.vals = (struct Val[35]){}, .next_free = 0, .capacity = 35};
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 35);
     CCC_Bounded_map rom = bounded_map_initialize(
-        struct Val, elem, key, id_order, val_bump_allocate, &vals);
+        struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
     int size = 30;
     CCC_Bounded_map_entry *ent = entry_wrap(&rom, &(int){-1});
     check(validate(&rom), true);
@@ -534,10 +535,10 @@ check_static_begin(romap_test_entry_and_modify)
 
 check_static_begin(romap_test_entry_and_modify_context)
 {
-    struct Val_pool vals
-        = {.vals = (struct Val[35]){}, .next_free = 0, .capacity = 35};
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 35);
     CCC_Bounded_map rom = bounded_map_initialize(
-        struct Val, elem, key, id_order, val_bump_allocate, &vals);
+        struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
     int size = 30;
     int context = 1;
     CCC_Bounded_map_entry *ent = entry_wrap(&rom, &(int){-1});
@@ -602,10 +603,10 @@ check_static_begin(romap_test_entry_and_modify_context)
 
 check_static_begin(romap_test_entry_and_modify_with)
 {
-    struct Val_pool vals
-        = {.vals = (struct Val[35]){}, .next_free = 0, .capacity = 35};
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 35);
     CCC_Bounded_map rom = bounded_map_initialize(
-        struct Val, elem, key, id_order, val_bump_allocate, &vals);
+        struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
     int size = 30;
     CCC_Bounded_map_entry *ent = entry_wrap(&rom, &(int){-1});
     ent = bounded_map_and_modify_with(ent, struct Val, { T->val++; });
@@ -669,10 +670,10 @@ check_static_begin(romap_test_entry_and_modify_with)
 
 check_static_begin(romap_test_or_insert)
 {
-    struct Val_pool vals
-        = {.vals = (struct Val[35]){}, .next_free = 0, .capacity = 35};
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 35);
     CCC_Bounded_map rom = bounded_map_initialize(
-        struct Val, elem, key, id_order, val_bump_allocate, &vals);
+        struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
     int size = 30;
     struct Val *v = or_insert(entry_wrap(&rom, &(int){-1}),
                               &(struct Val){.key = -1, .val = -1}.elem);
@@ -726,10 +727,10 @@ check_static_begin(romap_test_or_insert)
 
 check_static_begin(romap_test_or_insert_with)
 {
-    struct Val_pool vals
-        = {.vals = (struct Val[35]){}, .next_free = 0, .capacity = 35};
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 35);
     CCC_Bounded_map rom = bounded_map_initialize(
-        struct Val, elem, key, id_order, val_bump_allocate, &vals);
+        struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
     int size = 30;
     struct Val *v = bounded_map_or_insert_with(entry_wrap(&rom, &(int){-1}),
                                                idval(-1, -1));
@@ -780,10 +781,10 @@ check_static_begin(romap_test_or_insert_with)
 
 check_static_begin(romap_test_insert_entry)
 {
-    struct Val_pool vals
-        = {.vals = (struct Val[35]){}, .next_free = 0, .capacity = 35};
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 35);
     CCC_Bounded_map rom = bounded_map_initialize(
-        struct Val, elem, key, id_order, val_bump_allocate, &vals);
+        struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
     int size = 30;
     struct Val *v = insert_entry(entry_wrap(&rom, &(int){-1}),
                                  &(struct Val){.key = -1, .val = -1}.elem);
@@ -839,10 +840,10 @@ check_static_begin(romap_test_insert_entry)
 
 check_static_begin(romap_test_insert_entry_with)
 {
-    struct Val_pool vals
-        = {.vals = (struct Val[35]){}, .next_free = 0, .capacity = 35};
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 35);
     CCC_Bounded_map rom = bounded_map_initialize(
-        struct Val, elem, key, id_order, val_bump_allocate, &vals);
+        struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
     int size = 30;
     struct Val *v = bounded_map_insert_entry_with(entry_wrap(&rom, &(int){-1}),
                                                   idval(-1, -1));
@@ -894,10 +895,10 @@ check_static_begin(romap_test_insert_entry_with)
 
 check_static_begin(romap_test_remove_entry)
 {
-    struct Val_pool vals
-        = {.vals = (struct Val[35]){}, .next_free = 0, .capacity = 35};
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 35);
     CCC_Bounded_map rom = bounded_map_initialize(
-        struct Val, elem, key, id_order, val_bump_allocate, &vals);
+        struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
     int size = 30;
     struct Val *v = or_insert(entry_wrap(&rom, &(int){-1}),
                               &(struct Val){.key = -1, .val = -1}.elem);

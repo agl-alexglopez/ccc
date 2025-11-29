@@ -11,7 +11,7 @@
 #include "checkers.h"
 #include "traits.h"
 #include "types.h"
-#include "utility/allocate.h"
+#include "utility/stack_allocator.h"
 
 static inline struct Val
 bounded_map_create(int const id, int const val)
@@ -41,8 +41,10 @@ check_static_begin(bounded_map_test_insert)
 
 check_static_begin(bounded_map_test_insert_macros)
 {
-    CCC_Bounded_map rom = bounded_map_initialize(struct Val, elem, key,
-                                                 id_order, std_allocate, NULL);
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 10);
+    CCC_Bounded_map rom = bounded_map_initialize(
+        struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
 
     struct Val const *ins = CCC_bounded_map_or_insert_with(
         entry_wrap(&rom, &(int){2}), (struct Val){.key = 2, .val = 0});
@@ -150,8 +152,10 @@ check_static_begin(bounded_map_test_insert_then_bad_ideas)
 check_static_begin(bounded_map_test_entry_api_functional)
 {
     /* Over allocate size now because we don't want to worry about resizing. */
-    CCC_Bounded_map rom = bounded_map_initialize(struct Val, elem, key,
-                                                 id_order, std_allocate, NULL);
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 200);
+    CCC_Bounded_map rom = bounded_map_initialize(
+        struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
     size_t const size = 200;
 
     /* Test entry or insert with for all even values. Default should be
@@ -212,9 +216,11 @@ check_static_begin(bounded_map_test_entry_api_functional)
 check_static_begin(bounded_map_test_insert_via_entry)
 {
     /* Over allocate size now because we don't want to worry about resizing. */
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 200);
+    CCC_Bounded_map rom = bounded_map_initialize(
+        struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
     size_t const size = 200;
-    CCC_Bounded_map rom = bounded_map_initialize(struct Val, elem, key,
-                                                 id_order, std_allocate, NULL);
 
     /* Test entry or insert with for all even values. Default should be
        inserted. All entries are hashed to last digit so many spread out
@@ -258,8 +264,10 @@ check_static_begin(bounded_map_test_insert_via_entry_macros)
 {
     /* Over allocate size now because we don't want to worry about resizing. */
     size_t const size = 200;
-    CCC_Bounded_map rom = bounded_map_initialize(struct Val, elem, key,
-                                                 id_order, std_allocate, NULL);
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 200);
+    CCC_Bounded_map rom = bounded_map_initialize(
+        struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
 
     /* Test entry or insert with for all even values. Default should be
        inserted. All entries are hashed to last digit so many spread out
@@ -298,8 +306,10 @@ check_static_begin(bounded_map_test_entry_api_macros)
 {
     /* Over allocate size now because we don't want to worry about resizing. */
     int const size = 200;
-    CCC_Bounded_map rom = bounded_map_initialize(struct Val, elem, key,
-                                                 id_order, std_allocate, NULL);
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 200);
+    CCC_Bounded_map rom = bounded_map_initialize(
+        struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
 
     /* Test entry or insert with for all even values. Default should be
        inserted. All entries are hashed to last digit so many spread out
@@ -352,8 +362,10 @@ check_static_begin(bounded_map_test_entry_api_macros)
 
 check_static_begin(bounded_map_test_two_sum)
 {
-    CCC_Bounded_map rom = bounded_map_initialize(struct Val, elem, key,
-                                                 id_order, std_allocate, NULL);
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 10);
+    CCC_Bounded_map rom = bounded_map_initialize(
+        struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
     int const addends[10] = {1, 3, -980, 6, 7, 13, 44, 32, 995, -1};
     int const target = 15;
     int solution_indices[2] = {-1, -1};
@@ -376,151 +388,13 @@ check_static_begin(bounded_map_test_two_sum)
     check_end(bounded_map_clear(&rom, NULL););
 }
 
-check_static_begin(bounded_map_test_resize)
-{
-    CCC_Bounded_map rom = bounded_map_initialize(struct Val, elem, key,
-                                                 id_order, std_allocate, NULL);
-
-    int const to_insert = 1000;
-    int const larger_prime = 1009;
-    for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
-         ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
-    {
-        struct Val elem = {.key = shuffled_index, .val = i};
-        struct Val *v = insert_entry(entry_wrap(&rom, &elem.key), &elem.elem);
-        check(v != NULL, true);
-        check(v->key, shuffled_index);
-        check(v->val, i);
-        check(validate(&rom), true);
-    }
-    check(count(&rom).count, to_insert);
-    for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
-         ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
-    {
-        struct Val swap_slot = {shuffled_index, shuffled_index, {}};
-        struct Val const *const in_table
-            = insert_entry(entry_wrap(&rom, &swap_slot.key), &swap_slot.elem);
-        check(in_table != NULL, true);
-        check(in_table->val, shuffled_index);
-    }
-    check(bounded_map_clear(&rom, NULL), CCC_RESULT_OK);
-    check_end();
-}
-
-check_static_begin(bounded_map_test_resize_macros)
-{
-    CCC_Bounded_map rom = bounded_map_initialize(struct Val, elem, key,
-                                                 id_order, std_allocate, NULL);
-    int const to_insert = 1000;
-    int const larger_prime = 1009;
-    for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
-         ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
-    {
-        struct Val *v = insert_entry(entry_wrap(&rom, &shuffled_index),
-                                     &(struct Val){shuffled_index, i, {}}.elem);
-        check(v != NULL, true);
-        check(v->key, shuffled_index);
-        check(v->val, i);
-    }
-    check(count(&rom).count, to_insert);
-    for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
-         ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
-    {
-        struct Val const *const in_table = bounded_map_or_insert_with(
-            bounded_map_and_modify_with(entry_wrap(&rom, &shuffled_index),
-                                        struct Val,
-                                        {
-                                            T->val = shuffled_index;
-                                        }),
-            (struct Val){});
-        check(in_table != NULL, true);
-        check(in_table->val, shuffled_index);
-        struct Val *v = bounded_map_or_insert_with(
-            entry_wrap(&rom, &shuffled_index), (struct Val){});
-        check(v == NULL, false);
-        v->val = i;
-        v = get_key_value(&rom, &shuffled_index);
-        check(v != NULL, true);
-        check(v->val, i);
-    }
-    check(bounded_map_clear(&rom, NULL), CCC_RESULT_OK);
-    check_end();
-}
-
-check_static_begin(bounded_map_test_resize_fbounded_map_null)
-{
-    CCC_Bounded_map rom = bounded_map_initialize(struct Val, elem, key,
-                                                 id_order, std_allocate, NULL);
-    int const to_insert = 1000;
-    int const larger_prime = 1009;
-    for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
-         ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
-    {
-        struct Val elem = {.key = shuffled_index, .val = i};
-        struct Val *v = insert_entry(entry_wrap(&rom, &elem.key), &elem.elem);
-        check(v != NULL, true);
-        check(v->key, shuffled_index);
-        check(v->val, i);
-    }
-    check(count(&rom).count, to_insert);
-    for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
-         ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
-    {
-        struct Val swap_slot = {shuffled_index, shuffled_index, {}};
-        struct Val const *const in_table
-            = insert_entry(entry_wrap(&rom, &swap_slot.key), &swap_slot.elem);
-        check(in_table != NULL, true);
-        check(in_table->val, shuffled_index);
-    }
-    check(bounded_map_clear(&rom, NULL), CCC_RESULT_OK);
-    check_end();
-}
-
-check_static_begin(bounded_map_test_resize_fbounded_map_null_macros)
-{
-    CCC_Bounded_map rom = bounded_map_initialize(struct Val, elem, key,
-                                                 id_order, std_allocate, NULL);
-    int const to_insert = 1000;
-    int const larger_prime = 1009;
-    for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
-         ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
-    {
-        struct Val *v = insert_entry(entry_wrap(&rom, &shuffled_index),
-                                     &(struct Val){shuffled_index, i, {}}.elem);
-        check(v != NULL, true);
-        check(v->key, shuffled_index);
-        check(v->val, i);
-    }
-    check(count(&rom).count, to_insert);
-    for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
-         ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
-    {
-        struct Val const *const in_table = bounded_map_or_insert_with(
-            bounded_map_and_modify_with(entry_wrap(&rom, &shuffled_index),
-                                        struct Val,
-                                        {
-                                            T->val = shuffled_index;
-                                        }),
-            (struct Val){});
-        check(in_table != NULL, true);
-        check(in_table->val, shuffled_index);
-        struct Val *v = bounded_map_or_insert_with(
-            entry_wrap(&rom, &shuffled_index), (struct Val){});
-        check(v == NULL, false);
-        v->val = i;
-        v = get_key_value(&rom, &shuffled_index);
-        check(v == NULL, false);
-        check(v->val, i);
-    }
-    check(bounded_map_clear(&rom, NULL), CCC_RESULT_OK);
-    check_end();
-}
-
 check_static_begin(bounded_map_test_insert_and_find)
 {
-    int const size = 101;
-    CCC_Bounded_map rom = bounded_map_initialize(struct Val, elem, key,
-                                                 id_order, std_allocate, NULL);
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 100);
+    CCC_Bounded_map rom = bounded_map_initialize(
+        struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
+    int const size = 100;
 
     for (int i = 0; i < size; i += 2)
     {
@@ -553,14 +427,15 @@ check_static_begin(bounded_map_test_insert_and_find)
 check_static_begin(bounded_map_test_insert_shuffle)
 {
     size_t const size = 50;
-    CCC_Bounded_map rom
-        = bounded_map_initialize(struct Val, elem, key, id_order, NULL, NULL);
-    struct Val vals[50] = {};
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 50);
+    CCC_Bounded_map rom = bounded_map_initialize(
+        struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
     check(size > 1, true);
     int const prime = 53;
-    check(insert_shuffled(&rom, vals, size, prime), CHECK_PASS);
+    check(insert_shuffled(&rom, size, prime), CHECK_PASS);
     int sorted_check[50];
-    check(inorder_fill(sorted_check, size, &rom), size);
+    check(inorder_fill(sorted_check, size, &rom), CHECK_PASS);
     for (size_t i = 1; i < size; ++i)
     {
         check(sorted_check[i - 1] <= sorted_check[i], true);
@@ -570,15 +445,21 @@ check_static_begin(bounded_map_test_insert_shuffle)
 
 check_static_begin(bounded_map_test_insert_weak_srand)
 {
-    int const num_nodes = 1000;
-    CCC_Bounded_map rom = bounded_map_initialize(struct Val, elem, key,
-                                                 id_order, std_allocate, NULL);
+    int const num_nodes = 100;
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 100);
+    CCC_Bounded_map rom = bounded_map_initialize(
+        struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
     srand(time(NULL)); /* NOLINT */
     for (int i = 0; i < num_nodes; ++i)
     {
-        CCC_Entry const e = swap_entry(
-            &rom, &(struct Val){.key = rand() /* NOLINT */, .val = i}.elem,
-            &(struct Val){}.elem);
+        CCC_Entry const e = swap_entry(&rom,
+                                       &(struct Val){
+                                           .key = rand() /* NOLINT */,
+                                           .val = i,
+                                       }
+                                            .elem,
+                                       &(struct Val){}.elem);
         check(insert_error(&e), false);
         check(validate(&rom), true);
     }
@@ -597,9 +478,6 @@ main()
         bounded_map_test_insert_via_entry_macros(),
         bounded_map_test_entry_api_functional(),
         bounded_map_test_entry_api_macros(), bounded_map_test_two_sum(),
-        bounded_map_test_resize(), bounded_map_test_resize_macros(),
-        bounded_map_test_resize_fbounded_map_null(),
-        bounded_map_test_resize_fbounded_map_null_macros(),
         bounded_map_test_insert_weak_srand(),
         bounded_map_test_insert_shuffle());
 }

@@ -5,7 +5,7 @@
 #include "bounded_map_utility.h"
 #include "checkers.h"
 #include "types.h"
-#include "utility/allocate.h"
+#include "utility/stack_allocator.h"
 
 static CCC_Bounded_map
 construct_empty(void)
@@ -44,13 +44,15 @@ check_static_begin(bounded_map_test_construct)
 
 check_static_begin(bounded_map_test_construct_from)
 {
-    CCC_Bounded_map map
-        = CCC_bounded_map_from(elem, key, id_order, std_allocate, NULL, NULL,
-                               (struct Val[]){
-                                   {.key = 0, .val = 0},
-                                   {.key = 1, .val = 1},
-                                   {.key = 2, .val = 2},
-                               });
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 3);
+    CCC_Bounded_map map = CCC_bounded_map_from(
+        elem, key, id_order, stack_allocator_allocate, NULL, &allocator,
+        (struct Val[]){
+            {.key = 0, .val = 0},
+            {.key = 1, .val = 1},
+            {.key = 2, .val = 2},
+        });
     check(CCC_bounded_map_validate(&map), true);
     check(CCC_bounded_map_count(&map).count, 3);
     check_end((void)CCC_bounded_map_clear(&map, NULL););
@@ -58,13 +60,15 @@ check_static_begin(bounded_map_test_construct_from)
 
 check_static_begin(bounded_map_test_construct_from_overwrite)
 {
-    CCC_Bounded_map map
-        = CCC_bounded_map_from(elem, key, id_order, std_allocate, NULL, NULL,
-                               (struct Val[]){
-                                   {.key = 0, .val = 0},
-                                   {.key = 1, .val = 1},
-                                   {.key = 1, .val = 2},
-                               });
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 3);
+    CCC_Bounded_map map = CCC_bounded_map_from(
+        elem, key, id_order, stack_allocator_allocate, NULL, &allocator,
+        (struct Val[]){
+            {.key = 0, .val = 0},
+            {.key = 1, .val = 1},
+            {.key = 1, .val = 2},
+        });
     check(CCC_bounded_map_validate(&map), true);
     check(CCC_bounded_map_count(&map).count, 2);
     struct Val const *const v = CCC_bounded_map_reverse_begin(&map);

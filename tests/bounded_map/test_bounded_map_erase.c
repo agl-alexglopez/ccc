@@ -12,21 +12,20 @@
 #include "checkers.h"
 #include "traits.h"
 #include "types.h"
+#include "utility/stack_allocator.h"
 
 check_static_begin(bounded_map_test_insert_erase_shuffled)
 {
-    CCC_Bounded_map s
-        = bounded_map_initialize(struct Val, elem, key, id_order, NULL, NULL);
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 50);
+    CCC_Bounded_map s = bounded_map_initialize(
+        struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
     size_t const size = 50;
     int const prime = 53;
-    struct Val vals[50];
-    check(insert_shuffled(&s, vals, size, prime), CHECK_PASS);
+    check(insert_shuffled(&s, size, prime), CHECK_PASS);
     int sorted_check[50];
-    check(inorder_fill(sorted_check, size, &s), size);
-    for (size_t i = 0; i < size; ++i)
-    {
-        check(vals[i].key, sorted_check[i]);
-    }
+    check(inorder_fill(sorted_check, size, &s), CHECK_PASS);
+    struct Val *const vals = allocator.blocks;
     /* Now let's delete everything with no errors. */
     for (size_t i = 0; i < size; ++i)
     {
