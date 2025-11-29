@@ -298,18 +298,6 @@ CCC_flat_priority_queue_copy(CCC_Flat_priority_queue *const destination,
     {
         return CCC_RESULT_ARGUMENT_ERROR;
     }
-    /* Copy everything so we don't worry about staying in sync with future
-       changes to buf container. But we have to give back original destination
-       memory in case it has already been allocated. Alloc will remain the
-       same as in destination initialization because that controls permission.
-     */
-    void *const destination_data = destination->buffer.data;
-    size_t const destination_cap = destination->buffer.capacity;
-    CCC_Allocator *const destination_allocate = destination->buffer.allocate;
-    *destination = *source;
-    destination->buffer.data = destination_data;
-    destination->buffer.capacity = destination_cap;
-    destination->buffer.allocate = destination_allocate;
     if (!source->buffer.count)
     {
         return CCC_RESULT_OK;
@@ -328,6 +316,7 @@ CCC_flat_priority_queue_copy(CCC_Flat_priority_queue *const destination,
     {
         return CCC_RESULT_ARGUMENT_ERROR;
     }
+    destination->buffer.count = source->buffer.count;
     /* It is ok to only copy count elements because we know that all elements
        in a binary heap are contiguous from [0, C), where C is count. */
     (void)memcpy(destination->buffer.data, source->buffer.data,

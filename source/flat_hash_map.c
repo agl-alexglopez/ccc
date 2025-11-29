@@ -850,20 +850,6 @@ CCC_flat_hash_map_copy(CCC_Flat_hash_map *const destination,
     {
         return check;
     }
-    /* The destination could be messed up in a variety of ways that make it
-       incompatible with source. Overwrite everything and save what we need from
-       destination for a smooth copy over. */
-    void *const destination_data = destination->data;
-    void *const destination_tag = destination->tag;
-    size_t const destination_mask = destination->mask;
-    size_t const destination_remain = destination->remain;
-    CCC_Allocator *const destination_allocate = destination->allocate;
-    *destination = *source;
-    destination->data = destination_data;
-    destination->tag = destination_tag;
-    destination->mask = destination_mask;
-    destination->remain = destination_remain;
-    destination->allocate = destination_allocate;
     if (!source->mask || is_uninitialized(source))
     {
         return CCC_RESULT_OK;

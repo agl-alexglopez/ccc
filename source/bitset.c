@@ -1041,18 +1041,6 @@ CCC_bitset_copy(CCC_Bitset *const destination, CCC_Bitset const *const source,
     {
         return CCC_RESULT_ARGUMENT_ERROR;
     }
-    /* Whatever future changes we make to bit set members should not fall out
-       of sync with this code so save what we need to restore and then copy
-       over everything else as a catch all. */
-    Bitblock *const destination_data = destination->blocks;
-    size_t const destination_cap = destination->capacity;
-    CCC_Allocator *const destination_allocate = destination->allocate;
-    void *const destination_context = destination->context;
-    *destination = *source;
-    destination->blocks = destination_data;
-    destination->capacity = destination_cap;
-    destination->allocate = destination_allocate;
-    destination->context = destination_context;
     if (!source->capacity)
     {
         return CCC_RESULT_OK;
@@ -1075,6 +1063,7 @@ CCC_bitset_copy(CCC_Bitset *const destination, CCC_Bitset const *const source,
     {
         return CCC_RESULT_ARGUMENT_ERROR;
     }
+    destination->count = source->count;
     (void)memcpy(destination->blocks, source->blocks,
                  block_count(source->capacity) * SIZEOF_BLOCK);
     fix_end(destination);

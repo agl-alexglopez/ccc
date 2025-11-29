@@ -35,7 +35,7 @@ rand_range(size_t const min, size_t const max)
 }
 
 check_begin(insert_shuffled, CCC_Flat_priority_queue *const priority_queue,
-            struct Val vals[const], size_t const size, int const larger_prime)
+            size_t const size, int const larger_prime)
 {
     /* Math magic ahead so that we iterate over every index
        eventually but in a shuffled order. Not necessarily
@@ -45,8 +45,13 @@ check_begin(insert_shuffled, CCC_Flat_priority_queue *const priority_queue,
     size_t shuffled_index = larger_prime % size;
     for (size_t i = 0; i < size; ++i)
     {
-        vals[i].id = vals[i].val = (int)shuffled_index;
-        check(push(priority_queue, &vals[i], &(struct Val){}) != NULL,
+        check(push(priority_queue,
+                   &(struct Val){
+                       .id = (int)shuffled_index,
+                       .val = (int)shuffled_index,
+                   },
+                   &(struct Val){})
+                  != NULL,
               CCC_TRUE);
         check(CCC_flat_priority_queue_count(priority_queue).count, i + 1);
         check(validate(priority_queue), true);

@@ -595,19 +595,6 @@ CCC_buffer_copy(CCC_Buffer *const destination, CCC_Buffer const *const source,
     {
         return CCC_RESULT_ARGUMENT_ERROR;
     }
-    /* Copy everything so we don't worry about staying in sync with future
-       changes to buffer container. But we have to give back original
-       destination memory in case it has already been allocated. Alloc will
-       remain the same as in destination initialization because that controls
-       permission.
-     */
-    void *const destination_data = destination->data;
-    size_t const destination_cap = destination->capacity;
-    CCC_Allocator *const destination_allocate = destination->allocate;
-    *destination = *source;
-    destination->data = destination_data;
-    destination->capacity = destination_cap;
-    destination->allocate = destination_allocate;
     if (!source->capacity)
     {
         return CCC_RESULT_OK;
@@ -626,6 +613,7 @@ CCC_buffer_copy(CCC_Buffer *const destination, CCC_Buffer const *const source,
     {
         return CCC_RESULT_ARGUMENT_ERROR;
     }
+    destination->count = source->count;
     (void)memcpy(destination->data, source->data,
                  source->capacity * source->sizeof_type);
     return CCC_RESULT_OK;

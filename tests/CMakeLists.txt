@@ -103,6 +103,7 @@ macro(add_flat_priority_queue_test TEST_NAME)
       ccc
       checkers
       allocate
+      stack_allocator
   )
   set_target_properties(${TEST_NAME} 
     PROPERTIES 
@@ -398,6 +399,7 @@ macro(add_flat_double_ended_queue_test TEST_NAME)
       checkers 
       flat_double_ended_queue_utility
       allocate
+      stack_allocator
   )
   set_target_properties(${TEST_NAME} 
     PROPERTIES 

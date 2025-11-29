@@ -14,6 +14,7 @@
 #include "traits.h"
 #include "types.h"
 #include "utility/allocate.h"
+#include "utility/stack_allocator.h"
 
 static CCC_Order
 int_order(CCC_Type_comparator_context const order)
@@ -128,9 +129,9 @@ check_static_begin(flat_priority_queue_test_heapify_copy)
     {
         HEAPIFY_COPY_CAP = 100,
     };
-    int heap[HEAPIFY_COPY_CAP] = {};
     Flat_priority_queue priority_queue = flat_priority_queue_initialize(
-        heap, int, CCC_ORDER_LESSER, int_order, NULL, NULL, HEAPIFY_COPY_CAP);
+        (int[HEAPIFY_COPY_CAP]){}, int, CCC_ORDER_LESSER, int_order, NULL, NULL,
+        HEAPIFY_COPY_CAP);
     int input[HEAPIFY_COPY_CAP] = {};
     for (size_t i = 0; i < HEAPIFY_COPY_CAP; ++i)
     {
@@ -229,17 +230,20 @@ check_static_begin(flat_priority_queue_test_copy_no_allocate_fail)
 
 check_static_begin(flat_priority_queue_test_copy_allocate)
 {
-    Flat_priority_queue source = flat_priority_queue_initialize(
-        NULL, int, CCC_ORDER_LESSER, int_order, std_allocate, NULL, 0);
+    struct Stack_allocator allocator = stack_allocator_initialize(int, 16);
+    Flat_priority_queue source = flat_priority_queue_with_capacity(
+        int, CCC_ORDER_LESSER, int_order, stack_allocator_allocate, &allocator,
+        8);
     Flat_priority_queue destination = flat_priority_queue_initialize(
-        NULL, int, CCC_ORDER_LESSER, int_order, std_allocate, NULL, 0);
+        NULL, int, CCC_ORDER_LESSER, int_order, stack_allocator_allocate,
+        &allocator, 0);
     (void)push(&source, &(int){0}, &(int){0});
     (void)push(&source, &(int){1}, &(int){0});
     (void)push(&source, &(int){2}, &(int){0});
     check(*(int *)front(&source), 0);
     check(is_empty(&destination), true);
-    CCC_Result res
-        = flat_priority_queue_copy(&destination, &source, std_allocate);
+    CCC_Result res = flat_priority_queue_copy(&destination, &source,
+                                              stack_allocator_allocate);
     check(res, CCC_RESULT_OK);
     check(count(&destination).count, 3);
     while (!is_empty(&source) && !is_empty(&destination))
@@ -259,10 +263,13 @@ check_static_begin(flat_priority_queue_test_copy_allocate)
 
 check_static_begin(flat_priority_queue_test_copy_allocate_fail)
 {
-    Flat_priority_queue source = flat_priority_queue_initialize(
-        NULL, int, CCC_ORDER_LESSER, int_order, std_allocate, NULL, 0);
+    struct Stack_allocator allocator = stack_allocator_initialize(int, 16);
+    Flat_priority_queue source = flat_priority_queue_with_capacity(
+        int, CCC_ORDER_LESSER, int_order, stack_allocator_allocate, &allocator,
+        8);
     Flat_priority_queue destination = flat_priority_queue_initialize(
-        NULL, int, CCC_ORDER_LESSER, int_order, std_allocate, NULL, 0);
+        NULL, int, CCC_ORDER_LESSER, int_order, stack_allocator_allocate,
+        &allocator, 0);
     (void)push(&source, &(int){0}, &(int){0});
     (void)push(&source, &(int){1}, &(int){0});
     (void)push(&source, &(int){2}, &(int){0});
@@ -275,9 +282,10 @@ check_static_begin(flat_priority_queue_test_copy_allocate_fail)
 
 check_static_begin(flat_priority_queue_test_init_from)
 {
+    struct Stack_allocator allocator = stack_allocator_initialize(int, 8);
     CCC_Flat_priority_queue queue = CCC_flat_priority_queue_from(
-        CCC_ORDER_LESSER, int_order, std_allocate, NULL, 0,
-        (int[]){8, 6, 7, 5, 3, 0, 9});
+        CCC_ORDER_LESSER, int_order, stack_allocator_allocate, &allocator, 8,
+        (int[7]){8, 6, 7, 5, 3, 0, 9});
     int count = 0;
     int prev = INT_MIN;
     check(CCC_flat_priority_queue_count(&queue).count, 7);
@@ -319,8 +327,10 @@ check_static_begin(flat_priority_queue_test_init_from_fail)
 
 check_static_begin(flat_priority_queue_test_init_with_capacity)
 {
+    struct Stack_allocator allocator = stack_allocator_initialize(int, 8);
     CCC_Flat_priority_queue queue = CCC_flat_priority_queue_with_capacity(
-        int, CCC_ORDER_LESSER, int_order, std_allocate, NULL, 8);
+        int, CCC_ORDER_LESSER, int_order, stack_allocator_allocate, &allocator,
+        8);
     check(CCC_flat_priority_queue_capacity(&queue).count, 8);
     check(CCC_flat_priority_queue_push(&queue, &(int){9}, &(int){0}) != NULL,
           CCC_TRUE);

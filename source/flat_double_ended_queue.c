@@ -312,19 +312,6 @@ CCC_flat_double_ended_queue_copy(
     {
         return CCC_RESULT_ARGUMENT_ERROR;
     }
-    /* Copy everything so we don't worry about staying in sync with future
-       changes to buf container. But we have to give back original destination
-       memory in case it has already been allocated. Alloc will remain the
-       same as in destination initialization because that controls whether the
-       double_ended_queue is a ring Buffer or dynamic
-       flat_double_ended_queue. */
-    void *const destination_data = destination->buffer.data;
-    size_t const destination_cap = destination->buffer.capacity;
-    CCC_Allocator *const destination_allocate = destination->buffer.allocate;
-    *destination = *source;
-    destination->buffer.data = destination_data;
-    destination->buffer.capacity = destination_cap;
-    destination->buffer.allocate = destination_allocate;
     /* Copying from an empty source is odd but supported. */
     if (!source->buffer.capacity)
     {
@@ -344,6 +331,7 @@ CCC_flat_double_ended_queue_copy(
     {
         return CCC_RESULT_ARGUMENT_ERROR;
     }
+    destination->buffer.count = source->buffer.count;
     if (destination->buffer.capacity > source->buffer.capacity)
     {
         size_t const first_chunk = min(source->buffer.count,
