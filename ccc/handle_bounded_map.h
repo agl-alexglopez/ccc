@@ -109,16 +109,16 @@ struct Val
     int key;
     int val;
 };
-CCC_handle_bounded_map_declare_fixed_map(small_fixed_map, struct Val,
+CCC_handle_bounded_map_declare_fixed_map(Small_fixed_map, struct Val,
 64); static map static_map =
 handle_bounded_map_initialize(
-    &(static small_fixed_map){},
+    &(static Small_fixed_map){},
     struct Val,
     key,
     handle_bounded_map_key_order,
     NULL,
     NULL,
-    handle_bounded_map_fixed_capacity(small_fixed_map)
+    handle_bounded_map_fixed_capacity(Small_fixed_map)
 );
 ```
 
@@ -130,18 +130,18 @@ struct Val
     int key;
     int val;
 };
-CCC_handle_bounded_map_declare_fixed_map(small_fixed_map, struct Val,
+CCC_handle_bounded_map_declare_fixed_map(Small_fixed_map, struct Val,
 64); int main(void)
 {
     map static_map =
 handle_bounded_map_initialize(
-        &(small_fixed_map){},
+        &(Small_fixed_map){},
         struct Val,
         key,
         handle_bounded_map_key_order,
         NULL,
         NULL,
-        handle_bounded_map_fixed_capacity(small_fixed_map)
+        handle_bounded_map_fixed_capacity(Small_fixed_map)
     );
     return 0;
 }
@@ -326,26 +326,26 @@ struct Val
     int key;
     int val;
 };
-CCC_handle_bounded_map_declare_fixed_map(small_fixed_map, struct Val,
+CCC_handle_bounded_map_declare_fixed_map(Small_fixed_map, struct Val,
 64); static map source =
 handle_bounded_map_initialize(
-    &(static small_fixed_map){},
+    &(static Small_fixed_map){},
     struct Val,
     key,
     handle_bounded_map_key_order,
     NULL,
     NULL,
-    handle_bounded_map_fixed_capacity(small_fixed_map)
+    handle_bounded_map_fixed_capacity(Small_fixed_map)
 );
 insert_rand_vals(&source);
 static map destination = handle_bounded_map_initialize(
-    &(static small_fixed_map){},
+    &(static Small_fixed_map){},
     struct Val,
     key,
     handle_bounded_map_key_order,
     NULL,
     NULL,
-    handle_bounded_map_fixed_capacity(small_fixed_map)
+    handle_bounded_map_fixed_capacity(Small_fixed_map)
 );
 CCC_Result res = handle_bounded_map_copy(&destination, &source, NULL);
 ```

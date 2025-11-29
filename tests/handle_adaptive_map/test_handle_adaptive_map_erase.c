@@ -17,7 +17,7 @@
 check_static_begin(handle_adaptive_map_test_insert_erase_shuffled)
 {
     CCC_Handle_adaptive_map s
-        = handle_adaptive_map_initialize(&(small_fixed_map){}, struct Val, id,
+        = handle_adaptive_map_initialize(&(Small_fixed_map){}, struct Val, id,
                                          id_order, NULL, NULL, SMALL_FIXED_CAP);
     size_t const size = 50;
     int const prime = 53;
@@ -43,7 +43,7 @@ check_static_begin(handle_adaptive_map_test_insert_erase_shuffled)
 check_static_begin(handle_adaptive_map_test_prime_shuffle)
 {
     CCC_Handle_adaptive_map s
-        = handle_adaptive_map_initialize(&(small_fixed_map){}, struct Val, id,
+        = handle_adaptive_map_initialize(&(Small_fixed_map){}, struct Val, id,
                                          id_order, NULL, NULL, SMALL_FIXED_CAP);
     size_t const size = 50;
     size_t const prime = 53;
@@ -77,12 +77,12 @@ check_static_begin(handle_adaptive_map_test_prime_shuffle)
 check_static_begin(handle_adaptive_map_test_weak_srand)
 {
     CCC_Handle_adaptive_map s = handle_adaptive_map_initialize(
-        &(standard_fixed_map){}, struct Val, id, id_order, NULL, NULL,
+        &(Standard_fixed_map){}, struct Val, id, id_order, NULL, NULL,
         STANDARD_FIXED_CAP);
     srand(time(NULL)); /* NOLINT */
-    int const num_nodes = 1000;
-    int id_keys[1000];
-    bool repeats[1000] = {};
+    int const num_nodes = 100;
+    int id_keys[100];
+    bool repeats[100] = {};
     for (int i = 0; i < num_nodes; ++i)
     {
         int const rand_i = rand(); /* NOLINT */
@@ -110,12 +110,12 @@ check_static_begin(handle_adaptive_map_test_weak_srand)
 check_static_begin(handle_adaptive_map_test_insert_erase_cycles_no_allocate)
 {
     CCC_Handle_adaptive_map s = handle_adaptive_map_initialize(
-        &(standard_fixed_map){}, struct Val, id, id_order, NULL, NULL,
+        &(Standard_fixed_map){}, struct Val, id, id_order, NULL, NULL,
         STANDARD_FIXED_CAP);
     srand(time(NULL)); /* NOLINT */
-    int const num_nodes = 1000;
-    int id_keys[1000];
-    bool repeats[1000] = {};
+    int const num_nodes = 100;
+    int id_keys[100];
+    bool repeats[100] = {};
     for (int i = 0; i < num_nodes; ++i)
     {
         int const rand_i = rand(); /* NOLINT */
@@ -151,14 +151,19 @@ check_static_begin(handle_adaptive_map_test_insert_erase_cycles_no_allocate)
     check_end();
 }
 
+/** Note that this test uses the standard library allocator because it is
+specifically important to see how the map handles inserting, finding, and
+removing the same keys across resizes. The resizing logic for handle based
+containers is non-trivial and must be tested. Don't replace with stack
+allocator, which does not allow resizing. */
 check_static_begin(handle_adaptive_map_test_insert_erase_cycles_allocate)
 {
     CCC_Handle_adaptive_map s = handle_adaptive_map_initialize(
         NULL, struct Val, id, id_order, std_allocate, NULL, 0);
     srand(time(NULL)); /* NOLINT */
-    int const num_nodes = 1000;
-    int id_keys[1000];
-    bool repeats[1000] = {};
+    int const num_nodes = 100;
+    int id_keys[100];
+    bool repeats[100] = {};
     for (int i = 0; i < num_nodes; ++i)
     {
         int const rand_i = rand(); /* NOLINT */

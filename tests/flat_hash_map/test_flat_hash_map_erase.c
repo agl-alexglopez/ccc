@@ -15,7 +15,7 @@
 check_static_begin(flat_hash_map_test_erase)
 {
     CCC_Flat_hash_map fh = flat_hash_map_initialize(
-        &(small_fixed_map){}, struct Val, key, flat_hash_map_int_zero,
+        &(Small_fixed_map){}, struct Val, key, flat_hash_map_int_zero,
         flat_hash_map_id_order, NULL, NULL, SMALL_FIXED_CAP);
     struct Val query = {.key = 137, .val = 99};
     /* Nothing was there before so nothing is in the entry. */
@@ -90,7 +90,7 @@ check_static_begin(flat_hash_map_test_shuffle_insert_erase)
 check_static_begin(flat_hash_map_test_shuffle_erase_fixed)
 {
     CCC_Flat_hash_map h = flat_hash_map_initialize(
-        &(standard_fixed_map){}, struct Val, key, flat_hash_map_int_to_u64,
+        &(Standard_fixed_map){}, struct Val, key, flat_hash_map_int_to_u64,
         flat_hash_map_id_order, NULL, NULL, STANDARD_FIXED_CAP);
     int to_insert[STANDARD_FIXED_CAP];
     iota(to_insert, STANDARD_FIXED_CAP, 0);

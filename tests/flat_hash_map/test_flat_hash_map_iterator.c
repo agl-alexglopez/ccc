@@ -35,7 +35,7 @@ destroy_owner_allocation(CCC_Type_context const t)
 check_static_begin(flat_hash_map_test_insert_then_iterate)
 {
     CCC_Flat_hash_map fh = flat_hash_map_initialize(
-        &(standard_fixed_map){}, struct Val, key, flat_hash_map_int_to_u64,
+        &(Standard_fixed_map){}, struct Val, key, flat_hash_map_int_to_u64,
         flat_hash_map_id_order, NULL, NULL, STANDARD_FIXED_CAP);
     int const size = STANDARD_FIXED_CAP;
     for (int i = 0; i < size; i += 2)

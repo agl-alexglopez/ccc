@@ -99,15 +99,15 @@ struct Val
     int key;
     int val;
 };
-CCC_handle_adaptive_map_declare_fixed_map(small_fixed_map, struct Val, 64);
+CCC_handle_adaptive_map_declare_fixed_map(Small_fixed_map, struct Val, 64);
 static Handle_adaptive_map static_map = handle_adaptive_map_initialize(
-    &(static small_fixed_map){},
+    &(static Small_fixed_map){},
     struct Val,
     key,
     handle_adaptive_map_key_order,
     NULL,
     NULL,
-    handle_adaptive_map_fixed_capacity(small_fixed_map)
+    handle_adaptive_map_fixed_capacity(Small_fixed_map)
 );
 ```
 
@@ -119,17 +119,17 @@ struct Val
     int key;
     int val;
 };
-CCC_handle_adaptive_map_declare_fixed_map(small_fixed_map, struct Val, 64);
+CCC_handle_adaptive_map_declare_fixed_map(Small_fixed_map, struct Val, 64);
 int main(void)
 {
     Handle_adaptive_map map = handle_adaptive_map_initialize(
-        &(small_fixed_map){},
+        &(Small_fixed_map){},
         struct Val,
         key,
         handle_adaptive_map_key_order,
         NULL,
         NULL,
-        handle_adaptive_map_fixed_capacity(small_fixed_map)
+        handle_adaptive_map_fixed_capacity(Small_fixed_map)
     );
     return 0;
 }
@@ -313,25 +313,25 @@ struct Val
     int key;
     int val;
 };
-CCC_handle_adaptive_map_declare_fixed_map(small_fixed_map, struct Val, 64);
+CCC_handle_adaptive_map_declare_fixed_map(Small_fixed_map, struct Val, 64);
 static Handle_bounded_map source = handle_adaptive_map_initialize(
-    &(static small_fixed_map){},
+    &(static Small_fixed_map){},
     struct Val,
     key,
     handle_adaptive_map_key_order,
     NULL,
     NULL,
-    handle_adaptive_map_fixed_capacity(small_fixed_map)
+    handle_adaptive_map_fixed_capacity(Small_fixed_map)
 );
 insert_rand_vals(&source);
 static Handle_bounded_map destination = handle_adaptive_map_initialize(
-    &(static small_fixed_map){},
+    &(static Small_fixed_map){},
     struct Val,
     key,
     handle_adaptive_map_key_order,
     NULL,
     NULL,
-    handle_adaptive_map_fixed_capacity(small_fixed_map)
+    handle_adaptive_map_fixed_capacity(Small_fixed_map)
 );
 CCC_Result res = handle_adaptive_map_copy(&destination, &source, NULL);
 ```

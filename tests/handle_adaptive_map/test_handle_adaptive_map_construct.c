@@ -9,12 +9,12 @@
 #include "handle_adaptive_map_utility.h"
 #include "traits.h"
 #include "types.h"
-#include "utility/allocate.h"
+#include "utility/stack_allocator.h"
 
 check_static_begin(handle_adaptive_map_test_empty)
 {
     Handle_adaptive_map s
-        = handle_adaptive_map_initialize(&(small_fixed_map){}, struct Val, id,
+        = handle_adaptive_map_initialize(&(Small_fixed_map){}, struct Val, id,
                                          id_order, NULL, NULL, SMALL_FIXED_CAP);
     check(is_empty(&s), true);
     check_end();
@@ -23,10 +23,10 @@ check_static_begin(handle_adaptive_map_test_empty)
 check_static_begin(handle_adaptive_map_test_copy_no_allocate)
 {
     Handle_adaptive_map source
-        = handle_adaptive_map_initialize(&(small_fixed_map){}, struct Val, id,
+        = handle_adaptive_map_initialize(&(Small_fixed_map){}, struct Val, id,
                                          id_order, NULL, NULL, SMALL_FIXED_CAP);
     Handle_adaptive_map destination
-        = handle_adaptive_map_initialize(&(small_fixed_map){}, struct Val, id,
+        = handle_adaptive_map_initialize(&(Small_fixed_map){}, struct Val, id,
                                          id_order, NULL, NULL, SMALL_FIXED_CAP);
     (void)swap_handle(&source, &(struct Val){.id = 0});
     (void)swap_handle(&source, &(struct Val){.id = 1, .val = 1});
@@ -54,10 +54,10 @@ check_static_begin(handle_adaptive_map_test_copy_no_allocate)
 check_static_begin(handle_adaptive_map_test_copy_no_allocate_fail)
 {
     Handle_adaptive_map source = handle_adaptive_map_initialize(
-        &(standard_fixed_map){}, struct Val, id, id_order, NULL, NULL,
+        &(Standard_fixed_map){}, struct Val, id, id_order, NULL, NULL,
         STANDARD_FIXED_CAP);
     Handle_adaptive_map destination
-        = handle_adaptive_map_initialize(&(small_fixed_map){}, struct Val, id,
+        = handle_adaptive_map_initialize(&(Small_fixed_map){}, struct Val, id,
                                          id_order, NULL, NULL, SMALL_FIXED_CAP);
     (void)swap_handle(&source, &(struct Val){.id = 0});
     (void)swap_handle(&source, &(struct Val){.id = 1, .val = 1});
@@ -71,17 +71,21 @@ check_static_begin(handle_adaptive_map_test_copy_no_allocate_fail)
 
 check_static_begin(handle_adaptive_map_test_copy_allocate)
 {
-    Handle_adaptive_map source = handle_adaptive_map_initialize(
-        NULL, struct Val, id, id_order, std_allocate, NULL, 0);
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(Small_fixed_map, 2);
+    Handle_adaptive_map source = handle_adaptive_map_with_capacity(
+        struct Val, id, id_order, stack_allocator_allocate, &allocator,
+        SMALL_FIXED_CAP - 1);
     Handle_adaptive_map destination = handle_adaptive_map_initialize(
-        NULL, struct Val, id, id_order, std_allocate, NULL, 0);
+        NULL, struct Val, id, id_order, stack_allocator_allocate, &allocator,
+        0);
     (void)swap_handle(&source, &(struct Val){.id = 0});
     (void)swap_handle(&source, &(struct Val){.id = 1, .val = 1});
     (void)swap_handle(&source, &(struct Val){.id = 2, .val = 2});
     check(count(&source).count, 3);
     check(is_empty(&destination), true);
-    CCC_Result res
-        = handle_adaptive_map_copy(&destination, &source, std_allocate);
+    CCC_Result res = handle_adaptive_map_copy(&destination, &source,
+                                              stack_allocator_allocate);
     check(res, CCC_RESULT_OK);
     check(count(&destination).count, count(&source).count);
     for (int i = 0; i < 3; ++i)
@@ -104,10 +108,13 @@ check_static_begin(handle_adaptive_map_test_copy_allocate)
 
 check_static_begin(handle_adaptive_map_test_copy_allocate_fail)
 {
-    Handle_adaptive_map source = handle_adaptive_map_initialize(
-        NULL, struct Val, id, id_order, std_allocate, NULL, 0);
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(Small_fixed_map, 2);
+    Handle_adaptive_map source = handle_adaptive_map_with_capacity(
+        struct Val, id, id_order, stack_allocator_allocate, &allocator,
+        SMALL_FIXED_CAP - 1);
     Handle_adaptive_map destination = handle_adaptive_map_initialize(
-        NULL, struct Val, id, id_order, std_allocate, NULL, 0);
+        NULL, struct Val, id, id_order, NULL, NULL, 0);
     (void)swap_handle(&source, &(struct Val){.id = 0});
     (void)swap_handle(&source, &(struct Val){.id = 1, .val = 1});
     (void)swap_handle(&source, &(struct Val){.id = 2, .val = 2});
@@ -120,13 +127,15 @@ check_static_begin(handle_adaptive_map_test_copy_allocate_fail)
 
 check_static_begin(handle_adaptive_map_test_init_from)
 {
-    Handle_adaptive_map map_from_list
-        = handle_adaptive_map_from(id, id_order, std_allocate, NULL, 0,
-                                   (struct Val[]){
-                                       {.id = 0, .val = 0},
-                                       {.id = 1, .val = 1},
-                                       {.id = 2, .val = 2},
-                                   });
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(Small_fixed_map, 1);
+    Handle_adaptive_map map_from_list = handle_adaptive_map_from(
+        id, id_order, stack_allocator_allocate, &allocator, SMALL_FIXED_CAP - 1,
+        (struct Val[]){
+            {.id = 0, .val = 0},
+            {.id = 1, .val = 1},
+            {.id = 2, .val = 2},
+        });
     check(validate(&map_from_list), true);
     check(count(&map_from_list).count, 3);
     size_t seen = 0;
@@ -145,13 +154,15 @@ check_static_begin(handle_adaptive_map_test_init_from)
 
 check_static_begin(handle_adaptive_map_test_init_from_overwrite)
 {
-    Handle_adaptive_map map_from_list
-        = handle_adaptive_map_from(id, id_order, std_allocate, NULL, 0,
-                                   (struct Val[]){
-                                       {.id = 0, .val = 0},
-                                       {.id = 0, .val = 1},
-                                       {.id = 0, .val = 2},
-                                   });
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(Small_fixed_map, 1);
+    Handle_adaptive_map map_from_list = handle_adaptive_map_from(
+        id, id_order, stack_allocator_allocate, &allocator, SMALL_FIXED_CAP - 1,
+        (struct Val[]){
+            {.id = 0, .val = 0},
+            {.id = 0, .val = 1},
+            {.id = 0, .val = 2},
+        });
     check(validate(&map_from_list), true);
     check(count(&map_from_list).count, 1);
     size_t seen = 0;
@@ -197,10 +208,14 @@ check_static_begin(handle_adaptive_map_test_init_from_fail)
 
 check_static_begin(handle_adaptive_map_test_init_with_capacity)
 {
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(Small_fixed_map, 1);
     Handle_adaptive_map map = handle_adaptive_map_with_capacity(
-        struct Val, id, id_order, std_allocate, NULL, 32);
+        struct Val, id, id_order, stack_allocator_allocate, &allocator,
+        SMALL_FIXED_CAP - 1);
     check(validate(&map), true);
-    check(handle_adaptive_map_capacity(&map).count >= 32, true);
+    check(handle_adaptive_map_capacity(&map).count >= SMALL_FIXED_CAP - 1,
+          true);
     for (int i = 0; i < 10; ++i)
     {
         CCC_Handle const h = CCC_handle_adaptive_map_insert_or_assign(
@@ -225,11 +240,16 @@ check_static_begin(handle_adaptive_map_test_init_with_capacity)
 check_static_begin(handle_adaptive_map_test_init_with_capacity_no_op)
 {
     /* Initialize with 0 cap is OK just does nothing. */
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(Small_fixed_map, 1);
     Handle_adaptive_map map = handle_adaptive_map_with_capacity(
-        struct Val, id, id_order, std_allocate, NULL, 0);
+        struct Val, id, id_order, stack_allocator_allocate, &allocator, 0);
     check(validate(&map), true);
     check(handle_adaptive_map_capacity(&map).count, 0);
     check(handle_adaptive_map_count(&map).count, 0);
+    check(handle_adaptive_map_reserve(&map, SMALL_FIXED_CAP - 1,
+                                      stack_allocator_allocate),
+          CCC_RESULT_OK);
     CCC_Handle const h = CCC_handle_adaptive_map_insert_or_assign(
         &map, &(struct Val){.id = 1, .val = 1});
     check(CCC_handle_insert_error(&h), CCC_FALSE);

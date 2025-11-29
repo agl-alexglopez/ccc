@@ -141,16 +141,16 @@ struct Val
     int key;
     int val;
 };
-CCC_flat_hash_map_declare_fixed_map(small_fixed_map, struct Val, 64);
+CCC_flat_hash_map_declare_fixed_map(Small_fixed_map, struct Val, 64);
 static Flat_hash_map static_map = flat_hash_map_initialize(
-    &(static small_fixed_map){},
+    &(static Small_fixed_map){},
     struct Val,
     key,
     Flat_hash_map_int_to_u64,
     flat_hash_map_id_order,
     NULL,
     NULL,
-    flat_hash_map_fixed_capacity(small_fixed_map)
+    flat_hash_map_fixed_capacity(Small_fixed_map)
 );
 ```
 
@@ -162,18 +162,18 @@ struct Val
     int key;
     int val;
 };
-CCC_flat_hash_map_declare_fixed_map(small_fixed_map, struct Val, 64);
+CCC_flat_hash_map_declare_fixed_map(Small_fixed_map, struct Val, 64);
 int main(void)
 {
     Flat_hash_map static_map = flat_hash_map_initialize(
-        &(small_fixed_map){},
+        &(Small_fixed_map){},
         struct Val,
         key,
         flat_hash_map_int_to_u64,
         flat_hash_map_id_order,
         NULL,
         NULL,
-        flat_hash_map_fixed_capacity(small_fixed_map)
+        flat_hash_map_fixed_capacity(Small_fixed_map)
     );
     return 0;
 }
@@ -224,16 +224,16 @@ struct Val
     int key;
     int val;
 };
-flat_hash_map_declare_fixed_map(small_fixed_map, struct Val, 64);
+flat_hash_map_declare_fixed_map(Small_fixed_map, struct Val, 64);
 static Flat_hash_map static_map = flat_hash_map_initialize(
-    &(static small_fixed_map){},
+    &(static Small_fixed_map){},
     struct Val,
     key,
     flat_hash_map_int_to_u64,
     flat_hash_map_key_order,
     NULL,
     NULL,
-    flat_hash_map_fixed_capacity(small_fixed_map)
+    flat_hash_map_fixed_capacity(Small_fixed_map)
 );
 ```
 
@@ -413,27 +413,27 @@ struct Val
     int key;
     int val;
 };
-flat_hash_map_declare_fixed_map(small_fixed_map, struct Val, 64);
+flat_hash_map_declare_fixed_map(Small_fixed_map, struct Val, 64);
 Flat_hash_map source = flat_hash_map_initialize(
-    &(static small_fixed_map){},
+    &(static Small_fixed_map){},
     struct Val,
     key,
     flat_hash_map_int_to_u64,
     flat_hash_map_key_order,
     NULL,
     NULL,
-    CCC_flat_hash_map_fixed_capacity(small_fixed_map)
+    CCC_flat_hash_map_fixed_capacity(Small_fixed_map)
 );
 insert_rand_vals(&source);
 Flat_hash_map destination = flat_hash_map_initialize(
-    &(static small_fixed_map){},
+    &(static Small_fixed_map){},
     struct Val,
     key,
     flat_hash_map_int_to_u64,
     flat_hash_map_key_order,
     NULL,
     NULL,
-    CCC_flat_hash_map_fixed_capacity(small_fixed_map)
+    CCC_flat_hash_map_fixed_capacity(Small_fixed_map)
 );
 CCC_Result res = flat_hash_map_copy(&destination, &source, NULL);
 ```

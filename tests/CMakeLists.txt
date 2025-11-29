@@ -203,6 +203,7 @@ macro(add_handle_adaptive_map_test TEST_NAME)
       ccc
       checkers
       allocate
+      stack_allocator
   )
   set_target_properties(${TEST_NAME} 
     PROPERTIES 
@@ -271,6 +272,7 @@ macro(add_handle_bounded_map_test TEST_NAME)
       checkers
       allocate
       random
+      stack_allocator
   )
   set_target_properties(${TEST_NAME} 
     PROPERTIES 

@@ -25,7 +25,7 @@ modw(CCC_Type_context const u)
 }
 
 static CCC_Flat_hash_map static_fh = flat_hash_map_initialize(
-    &(small_fixed_map){}, struct Val, key, flat_hash_map_int_to_u64,
+    &(Small_fixed_map){}, struct Val, key, flat_hash_map_int_to_u64,
     flat_hash_map_id_order, NULL, NULL, SMALL_FIXED_CAP);
 
 check_static_begin(flat_hash_map_test_static_initialize)
@@ -73,10 +73,10 @@ check_static_begin(flat_hash_map_test_static_initialize)
 check_static_begin(flat_hash_map_test_copy_no_allocate)
 {
     Flat_hash_map source = flat_hash_map_initialize(
-        &(small_fixed_map){}, struct Val, key, flat_hash_map_int_zero,
+        &(Small_fixed_map){}, struct Val, key, flat_hash_map_int_zero,
         flat_hash_map_id_order, NULL, NULL, SMALL_FIXED_CAP);
     Flat_hash_map destination = flat_hash_map_initialize(
-        &(standard_fixed_map){}, struct Val, key, flat_hash_map_int_zero,
+        &(Standard_fixed_map){}, struct Val, key, flat_hash_map_int_zero,
         flat_hash_map_id_order, NULL, NULL, STANDARD_FIXED_CAP);
     (void)swap_entry(&source, &(struct Val){.key = 0});
     (void)swap_entry(&source, &(struct Val){.key = 1, .val = 1});
@@ -101,10 +101,10 @@ check_static_begin(flat_hash_map_test_copy_no_allocate)
 check_static_begin(flat_hash_map_test_copy_no_allocate_fail)
 {
     Flat_hash_map source = flat_hash_map_initialize(
-        &(standard_fixed_map){}, struct Val, key, flat_hash_map_int_zero,
+        &(Standard_fixed_map){}, struct Val, key, flat_hash_map_int_zero,
         flat_hash_map_id_order, NULL, NULL, STANDARD_FIXED_CAP);
     Flat_hash_map destination = flat_hash_map_initialize(
-        &(small_fixed_map){}, struct Val, key, flat_hash_map_int_zero,
+        &(Small_fixed_map){}, struct Val, key, flat_hash_map_int_zero,
         flat_hash_map_id_order, NULL, NULL, SMALL_FIXED_CAP);
     (void)swap_entry(&source, &(struct Val){.key = 0});
     (void)swap_entry(&source, &(struct Val){.key = 1, .val = 1});
@@ -170,7 +170,7 @@ check_static_begin(flat_hash_map_test_copy_allocate_fail)
 check_static_begin(flat_hash_map_test_empty)
 {
     Flat_hash_map fh = flat_hash_map_initialize(
-        &(small_fixed_map){}, struct Val, key, flat_hash_map_int_zero,
+        &(Small_fixed_map){}, struct Val, key, flat_hash_map_int_zero,
         flat_hash_map_id_order, NULL, NULL, SMALL_FIXED_CAP);
     check(is_empty(&fh), true);
     check_end();

@@ -58,7 +58,7 @@ struct Lru_request
 
 /* Fixed map used for the lru storage. List piggy backs of this array for its
    memory. Map does not need to re-size for this small test. */
-handle_bounded_map_declare_fixed_map(lru_fixed_map, struct Lru_node, LRU_CAP);
+handle_bounded_map_declare_fixed_map(Lru_fixed_map, struct Lru_node, LRU_CAP);
 
 /*===========================   Prototypes   ================================*/
 
@@ -75,8 +75,8 @@ static enum Check_result run_lru_cache(void);
    of the hash table and list. */
 static struct Lru_cache lru_cache = {
     .map = handle_bounded_map_initialize(
-        &(lru_fixed_map){}, struct Lru_node, key, order_by_key, NULL, NULL,
-        handle_bounded_map_fixed_capacity(lru_fixed_map)),
+        &(Lru_fixed_map){}, struct Lru_node, key, order_by_key, NULL, NULL,
+        handle_bounded_map_fixed_capacity(Lru_fixed_map)),
     .l = doubly_linked_list_initialize(struct Lru_node, list_node,
                                        order_list_nodes, NULL, NULL),
     .cap = 3,

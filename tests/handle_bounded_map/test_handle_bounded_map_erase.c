@@ -17,7 +17,7 @@
 check_static_begin(handle_bounded_map_test_insert_erase_shuffled)
 {
     CCC_Handle_bounded_map s
-        = handle_bounded_map_initialize(&(small_fixed_map){}, struct Val, id,
+        = handle_bounded_map_initialize(&(Small_fixed_map){}, struct Val, id,
                                         id_order, NULL, NULL, SMALL_FIXED_CAP);
     size_t const size = 50;
     int const prime = 53;
@@ -43,7 +43,7 @@ check_static_begin(handle_bounded_map_test_insert_erase_shuffled)
 check_static_begin(handle_bounded_map_test_prime_shuffle)
 {
     CCC_Handle_bounded_map s
-        = handle_bounded_map_initialize(&(small_fixed_map){}, struct Val, id,
+        = handle_bounded_map_initialize(&(Small_fixed_map){}, struct Val, id,
                                         id_order, NULL, NULL, SMALL_FIXED_CAP);
     size_t const size = 50;
     size_t const prime = 53;
@@ -76,7 +76,7 @@ check_static_begin(handle_bounded_map_test_prime_shuffle)
 check_static_begin(handle_bounded_map_test_weak_srand)
 {
     CCC_Handle_bounded_map s = handle_bounded_map_initialize(
-        &(standard_fixed_map){}, struct Val, id, id_order, NULL, NULL,
+        &(Standard_fixed_map){}, struct Val, id, id_order, NULL, NULL,
         STANDARD_FIXED_CAP);
     srand(time(NULL)); /* NOLINT */
     int const num_nodes = 1000;
@@ -109,7 +109,7 @@ check_static_begin(handle_bounded_map_test_weak_srand)
 check_static_begin(handle_bounded_map_test_insert_erase_cycles_no_allocate)
 {
     CCC_Handle_bounded_map s = handle_bounded_map_initialize(
-        &(standard_fixed_map){}, struct Val, id, id_order, NULL, NULL,
+        &(Standard_fixed_map){}, struct Val, id, id_order, NULL, NULL,
         STANDARD_FIXED_CAP);
     srand(time(NULL)); /* NOLINT */
     int const num_nodes = 1000;
@@ -150,6 +150,8 @@ check_static_begin(handle_bounded_map_test_insert_erase_cycles_no_allocate)
     check_end();
 }
 
+/** Make sure this test uses standard library allocator. Resizing is important
+to test for handle maps. Stack allocator does not allow resizing. */
 check_static_begin(handle_bounded_map_test_insert_erase_cycles_allocate)
 {
     CCC_Handle_bounded_map s = handle_bounded_map_initialize(

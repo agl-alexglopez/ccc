@@ -13,14 +13,14 @@ struct Val
     int val;
 };
 
-CCC_handle_adaptive_map_declare_fixed_map(small_fixed_map, struct Val, 64);
-CCC_handle_adaptive_map_declare_fixed_map(standard_fixed_map, struct Val, 1024);
+CCC_handle_adaptive_map_declare_fixed_map(Small_fixed_map, struct Val, 64);
+CCC_handle_adaptive_map_declare_fixed_map(Standard_fixed_map, struct Val, 1024);
 
 enum : size_t
 {
-    SMALL_FIXED_CAP = CCC_handle_adaptive_map_fixed_capacity(small_fixed_map),
+    SMALL_FIXED_CAP = CCC_handle_adaptive_map_fixed_capacity(Small_fixed_map),
     STANDARD_FIXED_CAP
-        = CCC_handle_adaptive_map_fixed_capacity(standard_fixed_map),
+        = CCC_handle_adaptive_map_fixed_capacity(Standard_fixed_map),
 };
 
 CCC_Order id_order(CCC_Key_comparator_context);
