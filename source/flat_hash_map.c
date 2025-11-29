@@ -371,10 +371,10 @@ static size_t match_next_one(struct Match_mask *);
 static CCC_Tribool tag_full(struct CCC_Flat_hash_map_tag);
 static CCC_Tribool tag_constant(struct CCC_Flat_hash_map_tag);
 static struct CCC_Flat_hash_map_tag tag_from(uint64_t);
-static struct Group group_loadu(struct CCC_Flat_hash_map_tag const *);
-static struct Group group_loada(struct CCC_Flat_hash_map_tag const *);
-static void group_storea(struct CCC_Flat_hash_map_tag *destination,
-                         struct Group source);
+static struct Group group_load_unaligned(struct CCC_Flat_hash_map_tag const *);
+static struct Group group_load_aligned(struct CCC_Flat_hash_map_tag const *);
+static void group_store_aligned(struct CCC_Flat_hash_map_tag *destination,
+                                struct Group source);
 static struct Match_mask match_tag(struct Group, struct CCC_Flat_hash_map_tag);
 static struct Match_mask match_empty(struct Group);
 static struct Match_mask match_deleted(struct Group);
@@ -382,9 +382,9 @@ static struct Match_mask match_empty_deleted(struct Group);
 static struct Match_mask match_full(struct Group);
 static struct Match_mask match_leading_full(struct Group, size_t start_tag);
 static struct Group group_constant_to_empty_full_to_deleted(struct Group);
-static unsigned ctz(struct Match_mask);
-static unsigned clz(struct Match_mask);
-static unsigned clz_size_t(size_t);
+static unsigned count_trailing_zeros(struct Match_mask);
+static unsigned count_leading_zeros(struct Match_mask);
+static unsigned count_leading_zeros_size_t(size_t);
 static size_t next_power_of_two(size_t);
 static CCC_Tribool is_power_of_two(size_t);
 static size_t to_power_of_two(size_t);
@@ -691,7 +691,7 @@ CCC_flat_hash_map_next(CCC_Flat_hash_map const *const map,
     size_t const aligned_group_start
         = i.count & ~((typeof(i.count))(GROUP_COUNT - 1));
     struct Match_mask m
-        = match_leading_full(group_loada(&map->tag[aligned_group_start]),
+        = match_leading_full(group_load_aligned(&map->tag[aligned_group_start]),
                              i.count & (GROUP_COUNT - 1));
     size_t const bit = match_next_one(&m);
     if (bit != GROUP_COUNT)
@@ -1140,8 +1140,9 @@ erase(struct CCC_Flat_hash_map *const map, size_t const i)
     assert(i <= map->mask);
     size_t const prev_i = (i - GROUP_COUNT) & map->mask;
     struct Match_mask const prev_empties
-        = match_empty(group_loadu(&map->tag[prev_i]));
-    struct Match_mask const empties = match_empty(group_loadu(&map->tag[i]));
+        = match_empty(group_load_unaligned(&map->tag[prev_i]));
+    struct Match_mask const empties
+        = match_empty(group_load_unaligned(&map->tag[i]));
     /* Leading means start at most significant bit aka last group member.
        Trailing means start at the least significant bit aka first group member.
 
@@ -1190,7 +1191,7 @@ find_key_or_slot(struct CCC_Flat_hash_map const *const map,
     CCC_Count empty_deleted = {.error = CCC_RESULT_FAIL};
     for (;;)
     {
-        struct Group const g = group_loadu(&map->tag[p.index]);
+        struct Group const g = group_load_unaligned(&map->tag[p.index]);
         {
             size_t tag_i = 0;
             struct Match_mask m = match_tag(g, tag);
@@ -1250,7 +1251,7 @@ find_key_or_fail(struct CCC_Flat_hash_map const *const map,
     };
     for (;;)
     {
-        struct Group const g = group_loadu(&map->tag[p.index]);
+        struct Group const g = group_load_unaligned(&map->tag[p.index]);
         {
             size_t tag_i = 0;
             struct Match_mask m = match_tag(g, tag);
@@ -1288,7 +1289,7 @@ find_slot_or_noreturn(struct CCC_Flat_hash_map const *const map,
     for (;;)
     {
         size_t const i = match_trailing_one(
-            match_empty_deleted(group_loadu(&map->tag[p.index])));
+            match_empty_deleted(group_load_unaligned(&map->tag[p.index])));
         if (likely(i != GROUP_COUNT))
         {
             return (p.index + i) & mask;
@@ -1309,8 +1310,8 @@ find_first_full_slot(struct CCC_Flat_hash_map const *const map, size_t start)
     assert((start & ~((size_t)(GROUP_COUNT - 1))) == start);
     while (start < (map->mask + 1))
     {
-        size_t const full
-            = match_trailing_one(match_full(group_loada(&map->tag[start])));
+        size_t const full = match_trailing_one(
+            match_full(group_load_aligned(&map->tag[start])));
         if (full != GROUP_COUNT)
         {
             return data_at(map, start + full);
@@ -1335,7 +1336,7 @@ find_first_full_group(struct CCC_Flat_hash_map const *const map,
     while (*start < (map->mask + 1))
     {
         struct Match_mask const full
-            = match_full(group_loada(&map->tag[*start]));
+            = match_full(group_load_aligned(&map->tag[*start]));
         if (full.v)
         {
             return full;
@@ -1360,7 +1361,7 @@ find_first_deleted_group(struct CCC_Flat_hash_map const *const map,
     while (*start < (map->mask + 1))
     {
         struct Match_mask const deleted
-            = match_deleted(group_loada(&map->tag[*start]));
+            = match_deleted(group_load_aligned(&map->tag[*start]));
         if (deleted.v)
         {
             return deleted;
@@ -1424,8 +1425,9 @@ rehash_in_place(struct CCC_Flat_hash_map *const map)
     size_t const mask = map->mask;
     for (size_t i = 0; i < mask + 1; i += GROUP_COUNT)
     {
-        group_storea(&map->tag[i], group_constant_to_empty_full_to_deleted(
-                                       group_loada(&map->tag[i])));
+        group_store_aligned(&map->tag[i],
+                            group_constant_to_empty_full_to_deleted(
+                                group_load_aligned(&map->tag[i])));
     }
     (void)memcpy(map->tag + (mask + 1), map->tag, GROUP_COUNT);
     {
@@ -1731,7 +1733,7 @@ next_power_of_two(size_t const n)
     {
         return n + 1;
     }
-    unsigned const shifts = clz_size_t(n - 1);
+    unsigned const shifts = count_leading_zeros_size_t(n - 1);
     return shifts >= sizeof(size_t) * CHAR_BIT ? 0 : (SIZE_MAX >> shifts) + 1;
 }
 
@@ -1908,7 +1910,7 @@ has matched. Because 0 is a valid index the user must check the index against
 static inline size_t
 match_trailing_one(struct Match_mask const m)
 {
-    return ctz(m);
+    return count_trailing_zeros(m);
 }
 
 /** A function to aid in iterating over on bits/indices in a match. The
@@ -1929,7 +1931,7 @@ at the most significant bit. */
 static inline size_t
 match_leading_zeros(struct Match_mask const m)
 {
-    return clz(m);
+    return count_leading_zeros(m);
 }
 
 /** Counts the trailing zeros in a match. Trailing zeros are those
@@ -1937,7 +1939,7 @@ starting at the least significant bit. */
 static inline size_t
 match_trailing_zeros(struct Match_mask const m)
 {
-    return ctz(m);
+    return count_trailing_zeros(m);
 }
 
 /** We have abstracted at much as we can before this point. Now implementations
@@ -2044,7 +2046,7 @@ match_leading_full(struct Group const g, size_t const start_tag)
 load and the user must ensure the load will not go off then end of the tag
 array. */
 static inline struct Group
-group_loada(struct CCC_Flat_hash_map_tag const *const source)
+group_load_aligned(struct CCC_Flat_hash_map_tag const *const source)
 {
     return (struct Group){_mm_load_si128((__m128i *)source)};
 }
@@ -2052,8 +2054,8 @@ group_loada(struct CCC_Flat_hash_map_tag const *const source)
 /** Stores the source group to destination. The store is aligned and the user
 must ensure the store will not go off the end of the tag array. */
 static inline void
-group_storea(struct CCC_Flat_hash_map_tag *const destination,
-             struct Group const source)
+group_store_aligned(struct CCC_Flat_hash_map_tag *const destination,
+                    struct Group const source)
 {
     _mm_store_si128((__m128i *)destination, source.v);
 }
@@ -2062,7 +2064,7 @@ group_storea(struct CCC_Flat_hash_map_tag *const destination,
 load and the user must ensure the load will not go off then end of the tag
 array. */
 static inline struct Group
-group_loadu(struct CCC_Flat_hash_map_tag const *const source)
+group_load_unaligned(struct CCC_Flat_hash_map_tag const *const source)
 {
     return (struct Group){_mm_loadu_si128((__m128i *)source)};
 }
@@ -2209,7 +2211,7 @@ match_leading_full(struct Group const g, size_t const start_tag)
 aligned load and the user must ensure the load will not go off then end of the
 tag array. */
 static inline struct Group
-group_loada(struct CCC_Flat_hash_map_tag const *const source)
+group_load_aligned(struct CCC_Flat_hash_map_tag const *const source)
 {
     return (struct Group){vld1_u8(&source->v)};
 }
@@ -2217,8 +2219,8 @@ group_loada(struct CCC_Flat_hash_map_tag const *const source)
 /** Stores the source group to destination. The store is aligned and the user
 must ensure the store will not go off the end of the tag array. */
 static inline void
-group_storea(struct CCC_Flat_hash_map_tag *const destination,
-             struct Group const source)
+group_store_aligned(struct CCC_Flat_hash_map_tag *const destination,
+                    struct Group const source)
 {
     vst1_u8(&destination->v, source.v);
 }
@@ -2227,7 +2229,7 @@ group_storea(struct CCC_Flat_hash_map_tag *const destination,
 unaligned load and the user must ensure the load will not go off then end of the
 tag array. */
 static inline struct Group
-group_loadu(struct CCC_Flat_hash_map_tag const *const source)
+group_load_unaligned(struct CCC_Flat_hash_map_tag const *const source)
 {
     return (struct Group){vld1_u8(&source->v)};
 }
@@ -2421,7 +2423,7 @@ match_leading_full(struct Group const g, size_t const start_tag)
 
 /** Loads tags into a group without violating strict aliasing. */
 static inline struct Group
-group_loada(struct CCC_Flat_hash_map_tag const *const source)
+group_load_aligned(struct CCC_Flat_hash_map_tag const *const source)
 {
     struct Group g;
     (void)memcpy(&g, source, sizeof(g));
@@ -2430,15 +2432,15 @@ group_loada(struct CCC_Flat_hash_map_tag const *const source)
 
 /** Stores a group back into the tag array without violating strict aliasing. */
 static inline void
-group_storea(struct CCC_Flat_hash_map_tag *const destination,
-             struct Group const source)
+group_store_aligned(struct CCC_Flat_hash_map_tag *const destination,
+                    struct Group const source)
 {
     (void)memcpy(destination, &source, sizeof(source));
 }
 
 /** Loads tags into a group without violating strict aliasing. */
 static inline struct Group
-group_loadu(struct CCC_Flat_hash_map_tag const *const source)
+group_load_unaligned(struct CCC_Flat_hash_map_tag const *const source)
 {
     struct Group g;
     (void)memcpy(&g, source, sizeof(g));
@@ -2490,7 +2492,7 @@ static_assert(
     "available builtins on the given platform.");
 
 static inline unsigned
-ctz(struct Match_mask const m)
+count_trailing_zeros(struct Match_mask const m)
 {
     static_assert(
         __builtin_ctz(0x8000) == GROUP_COUNT - 1,
@@ -2501,7 +2503,7 @@ ctz(struct Match_mask const m)
 }
 
 static inline unsigned
-clz(struct Match_mask const m)
+count_leading_zeros(struct Match_mask const m)
 {
     static_assert(
         sizeof((struct Match_mask){}.v) * 2UL == sizeof(unsigned),
@@ -2511,7 +2513,7 @@ clz(struct Match_mask const m)
 }
 
 static inline unsigned
-clz_size_t(size_t const n)
+count_leading_zeros_size_t(size_t const n)
 {
     static_assert(sizeof(size_t) == sizeof(unsigned long),
                   "Ensure the available builtin works for the platform defined "
@@ -2529,7 +2531,7 @@ enum : size_t
 };
 
 static inline unsigned
-ctz(struct Match_mask m)
+count_trailing_zeros(struct Match_mask m)
 {
     if (!m.v)
     {
@@ -2542,7 +2544,7 @@ ctz(struct Match_mask m)
 }
 
 static inline unsigned
-clz(struct Match_mask m)
+count_leading_zeros(struct Match_mask m)
 {
     if (!m.v)
     {
@@ -2556,7 +2558,7 @@ clz(struct Match_mask m)
 }
 
 static inline unsigned
-clz_size_t(size_t n)
+count_leading_zeros_size_t(size_t n)
 {
     if (!n)
     {
@@ -2581,7 +2583,7 @@ static_assert(sizeof((struct Match_mask){}.v) == sizeof(long),
               "struct Match_mask");
 
 static inline unsigned
-ctz(struct Match_mask const m)
+count_trailing_zeros(struct Match_mask const m)
 {
     static_assert(__builtin_ctzl(MATCH_MASK_MSB) / GROUP_COUNT
                       == GROUP_COUNT - 1,
@@ -2591,7 +2593,7 @@ ctz(struct Match_mask const m)
 }
 
 static inline unsigned
-clz(struct Match_mask const m)
+count_leading_zeros(struct Match_mask const m)
 {
     static_assert(__builtin_clzl((typeof((struct Match_mask){}.v))0x1)
                           / GROUP_COUNT
@@ -2602,7 +2604,7 @@ clz(struct Match_mask const m)
 }
 
 static inline unsigned
-clz_size_t(size_t const n)
+count_leading_zeros_size_t(size_t const n)
 {
     static_assert(sizeof(size_t) == sizeof(unsigned long));
     return n ? __builtin_clzl(n) : sizeof(size_t) * CHAR_BIT;
@@ -2618,7 +2620,7 @@ enum : size_t
 };
 
 static inline unsigned
-ctz(struct Match_mask m)
+count_trailing_zeros(struct Match_mask m)
 {
     if (!m.v)
     {
@@ -2631,7 +2633,7 @@ ctz(struct Match_mask m)
 }
 
 static inline unsigned
-clz(struct Match_mask m)
+count_leading_zeros(struct Match_mask m)
 {
     if (!m.v)
     {
@@ -2644,7 +2646,7 @@ clz(struct Match_mask m)
 }
 
 static inline unsigned
-clz_size_t(size_t n)
+count_leading_zeros_size_t(size_t n)
 {
     if (!n)
     {
