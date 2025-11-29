@@ -341,14 +341,16 @@ CCC_doubly_linked_list_extract_range(
         type_intruder_end->next = NULL;
     }
 
-    size_t removed = 1;
-    while (type_intruder_begin->next
-           && type_intruder_begin != type_intruder_end)
     {
-        removed++;
-        type_intruder_begin = type_intruder_begin->next;
+        size_t removed = 1;
+        while (type_intruder_begin->next
+               && type_intruder_begin != type_intruder_end)
+        {
+            removed++;
+            type_intruder_begin = type_intruder_begin->next;
+        }
+        list->count -= removed;
     }
-    list->count -= removed;
     return struct_base(list, next);
 }
 
@@ -405,11 +407,14 @@ CCC_doubly_linked_list_splice_range(
     }
 
     size_t count = 0;
-    CCC_Doubly_linked_list_node const *iterator = type_intruder_to_cut_begin;
-    while (iterator != type_intruder_to_cut_exclusive_end)
     {
-        iterator = iterator->next;
-        count++;
+        CCC_Doubly_linked_list_node const *iterator
+            = type_intruder_to_cut_begin;
+        while (iterator != type_intruder_to_cut_exclusive_end)
+        {
+            iterator = iterator->next;
+            count++;
+        }
     }
 
     CCC_Doubly_linked_list_node *const to_cut_previous

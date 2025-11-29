@@ -1422,8 +1422,8 @@ is_free_list_valid(struct CCC_Handle_adaptive_map const *const map)
     {
         return CCC_TRUE;
     }
-    size_t list_count = 0;
     size_t cur_free_index = map->free_list;
+    size_t list_count = 0;
     while (cur_free_index && list_count < map->capacity)
     {
         cur_free_index = node_at(map, cur_free_index)->next_free;
