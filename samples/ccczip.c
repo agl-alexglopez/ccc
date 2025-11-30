@@ -400,11 +400,13 @@ build_encoding_priority_queue(FILE *const f, struct Huffman_tree *const tree)
         NULL, struct Character_frequency, ch, hash_char, char_order,
         std_allocate, NULL, 0);
     foreach_filechar(f, c, {
-        struct Character_frequency *const ins
-            = or_insert(flat_hash_map_and_modify_with(
-                            entry_wrap(&frequencies, c),
-                            struct Character_frequency, ++T->freq;),
-                        &(struct Character_frequency){.ch = *c, .freq = 1});
+        struct Character_frequency *const ins = or_insert(
+            flat_hash_map_and_modify_with(entry_wrap(&frequencies, c),
+                                          struct Character_frequency,
+                                          {
+                                              ++T->freq;
+                                          }),
+            &(struct Character_frequency){.ch = *c, .freq = 1});
         check(ins);
     });
     size_t const leaves = count(&frequencies).count;
