@@ -771,15 +771,15 @@ dijkstra_shortest_path(struct Graph *const graph, char const source,
         order_priority_queue_costs, NULL, NULL);
     for (int i = 0, vx = BEGIN_VERTICES; i < graph->vertices; ++i, ++vx)
     {
-        *map_priority_queue_at(map_priority_queue, (char)vx) = (struct Cost){
+        struct Cost *const v
+            = map_priority_queue_at(map_priority_queue, (char)vx);
+        *v = (struct Cost){
             .name = (char)vx,
             .from = '\0',
             .cost = (char)vx == source ? 0 : INT_MAX,
         };
-        struct Cost const *const v
-            = push(&costs, &map_priority_queue_at(map_priority_queue, (char)vx)
-                                ->priority_queue_node);
-        check(v);
+        struct Cost const *const c = push(&costs, &v->priority_queue_node);
+        check(c);
     }
     while (!is_empty(&costs))
     {
@@ -805,13 +805,10 @@ dijkstra_shortest_path(struct Graph *const graph, char const source,
             if (alt < v->cost)
             {
                 /* Build the map with the appropriate best candidate parent. */
-                struct Cost const *const relax
-                    = priority_queue_decrease_with(&costs, v,
-                                                   {
-                                                       T->cost = alt;
-                                                       T->from = u->name;
-                                                   });
-                check(relax == v);
+                (void)priority_queue_decrease_with(&costs, v, {
+                    T->cost = alt;
+                    T->from = u->name;
+                });
                 paint_edge(graph, u->name, v->name, MAG);
                 nanosleep(&graph->speed, NULL);
             }
@@ -950,7 +947,7 @@ grid_at(struct Graph const *const graph, int const r, int const c)
 }
 
 static inline uint16_t
-sort_vertices(char a, char b)
+sort_vertices(char const a, char const b)
 {
     return a < b ? (a << 8) | b : (b << 8) | a;
 }
@@ -962,7 +959,7 @@ get_cell_vertex_title(Cell const c)
 }
 
 static bool
-has_edge_with(struct Vertex const *const v, char vertex)
+has_edge_with(struct Vertex const *const v, char const vertex)
 {
     for (int i = 0; i < MAX_DEGREE && v->edges[i].name; ++i)
     {
@@ -1069,7 +1066,7 @@ print_cell(Cell const c, char const *const edge_color)
 }
 
 static bool
-is_edge_vertex(Cell const square, Cell edge_id)
+is_edge_vertex(Cell const square, Cell const edge_id)
 {
     char const vertex_name = get_cell_vertex_title(square);
     char const edge_vertex1
@@ -1087,7 +1084,8 @@ is_valid_edge_cell(Cell const square, Cell const edge_id)
 }
 
 static void
-build_path_cell(struct Graph *g, int const r, int const c, Cell const edge_id)
+build_path_cell(struct Graph *const g, int const r, int const c,
+                Cell const edge_id)
 {
     Cell path = PATH_BIT;
     if (r - 1 >= 0 && is_valid_edge_cell(grid_at(g, r - 1, c), edge_id))
@@ -1114,7 +1112,7 @@ build_path_cell(struct Graph *g, int const r, int const c, Cell const edge_id)
 }
 
 static void
-build_path_outline(struct Graph *graph)
+build_path_outline(struct Graph *const graph)
 {
     for (int row = 0; row < graph->rows; row++)
     {
@@ -1177,7 +1175,7 @@ hash_64_bits(uint64_t x)
    parsing cannot be completed an empty path request with the null terminator is
    returned. */
 static struct Path_request
-parse_path_request(struct Graph *const g, SV_String_view r)
+parse_path_request(struct Graph *const g, SV_String_view const r)
 {
     if (SV_contains(r, quit_cmd))
     {
