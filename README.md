@@ -299,9 +299,9 @@ struct Key_val
 };
 
 static uint64_t
-flat_hash_map_int_to_u64(CCC_any_key const k)
+flat_hash_map_int_to_u64(CCC_Key_context const k)
 {
-    int const key_int = *((int *)k.any_key);
+    int const key_int = *((int *)k.key);
     uint64_t x = key_int;
     x = (x ^ (x >> 30)) * UINT64_C(0xbf58476d1ce4e5b9);
     x = (x ^ (x >> 27)) * UINT64_C(0x94d049bb133111eb);
@@ -313,7 +313,7 @@ CCC_Order
 flat_hash_map_id_cmp(CCC_Key_comparator_context const cmp)
 {
     struct Key_val const *const right = cmp.type_right;
-    int const left = *((int *)cmp.any_key_left;
+    int const left = *((int *)cmp.key_left;
     return (left > right->key) - (left < right->key);
 }
 
@@ -464,7 +464,7 @@ static CCC_Order
 Key_val_cmp(CCC_Key_comparator_context const cmp)
 {
     struct Key_val const *const right = cmp.type_right;
-    int const key_left = *((int *)cmp.any_key_left);
+    int const key_left = *((int *)cmp.key_left);
     return (key_left > right->key) - (key_left < right->key);
 }
 
@@ -544,7 +544,7 @@ static CCC_Order
 Key_val_cmp(CCC_Key_comparator_context const cmp)
 {
     struct Key_val const *const right = cmp.type_right;
-    int const key_left = *((int *)cmp.any_key_left);
+    int const key_left = *((int *)cmp.key_left);
     return (key_left > right->key) - (key_left < right->key);
 }
 
@@ -621,7 +621,7 @@ struct name
 CCC_Order
 Key_val_cmp(CCC_Key_comparator_context cmp)
 {
-    char const *const key = *(char **)cmp.any_key_left;
+    char const *const key = *(char **)cmp.key_left;
     struct name const *const right = cmp.type_right;
     int const res = strcmp(key, right->name);
     if (res == 0)
@@ -741,7 +741,7 @@ static CCC_Order
 Key_val_cmp(CCC_Key_comparator_context const cmp)
 {
     struct Key_val const *const right = cmp.type_right;
-    int const key_left = *((int *)cmp.any_key_left);
+    int const key_left = *((int *)cmp.key_left);
     return (key_left > right->key) - (key_left < right->key);
 }
 
