@@ -34,7 +34,7 @@ non-allocating container. All left-right symmetric cases have been united
 into one and I chose to tackle rotations and deletions slightly differently,
 shortening the code significantly. A few other changes and improvements
 suggested by the authors of the original paper are implemented. Finally, the
-data structure has been placed into a Buffer with relative indices rather
+data structure has been placed into an array with relative indices rather
 than pointers. See the required license at the bottom of the file for
 BSD-2-Clause compliance.
 
@@ -45,7 +45,7 @@ and flexible in how it can be implemented.
 Sorry for the symbol heavy math variable terminology in the WAVL section. It
 is easiest to check work against the research paper if the variable names
 remain the same. Rotations change lineage so there is no less terse approach
-to that section in my opinion. */
+to that section, in my opinion. */
 #include <assert.h>
 #include <limits.h>
 #include <stdalign.h>
@@ -65,8 +65,8 @@ for calculating bytes. This way we can use in static assert. The user data type
 may not be the same alignment as the nodes and therefore the nodes array must
 start at next aligned byte. Similarly the parity array may not be on an aligned
 byte after the nodes array, though in the current implementation it is.
-Regardless we always ensure the position is correct with respect to power of two
-alignments in C. */
+Regardless, we always ensure the position is correct with respect to power of
+two alignments in C. */
 #define roundup(bytes_to_round, alignment)                                     \
     (((bytes_to_round) + (alignment) - 1) & ~((alignment) - 1))
 
@@ -80,7 +80,7 @@ where to start. The nodes are 8 byte aligned but an int is 4. This means the
 nodes need to start after a 4 byte Buffer of padding at end of data array. */
 struct Test_data_type
 {
-    int i;
+    int const i;
 };
 CCC_array_bounded_map_declare_fixed_map(Fixed_map_test_type,
                                         struct Test_data_type, TCAP);
@@ -91,15 +91,19 @@ use for the data, nodes, and parity arrays. It is important that in our user
 code when we set the positions of the nodes and parity pointers relative to the
 data pointer the positions are correct regardless of if our backing storage is
 a fixed map or heap allocation. */
-static Fixed_map_test_type static_data_nodes_parity_layout_test;
+static Fixed_map_test_type const static_data_nodes_parity_layout_test;
 /** Some assumptions in the code assume that parity array is last so ensure that
 is the case here. Also good to assume user data comes first. */
 static_assert(((char *)static_data_nodes_parity_layout_test.data
-               < (char *)static_data_nodes_parity_layout_test.nodes)
-                  && ((char *)static_data_nodes_parity_layout_test.nodes
-                      < (char *)static_data_nodes_parity_layout_test.parity)
-                  && ((char *)static_data_nodes_parity_layout_test.data
-                      < (char *)static_data_nodes_parity_layout_test.parity),
+               < (char *)static_data_nodes_parity_layout_test.nodes),
+              "The order of the arrays in a Struct of Arrays map is user data "
+              "first, nodes second.");
+static_assert(((char *)static_data_nodes_parity_layout_test.nodes
+               < (char *)static_data_nodes_parity_layout_test.parity),
+              "The order of the arrays in a Struct of Arrays map is internal "
+              "nodes second, parity third.");
+static_assert((char *)static_data_nodes_parity_layout_test.data
+                  < (char *)static_data_nodes_parity_layout_test.parity,
               "The order of the arrays in a Struct of Arrays map is data, then "
               "nodes, then parity.");
 /** We don't care about the alignment or padding after the parity array because

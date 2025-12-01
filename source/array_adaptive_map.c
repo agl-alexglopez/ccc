@@ -54,7 +54,7 @@ where to start. The nodes are 8 byte aligned but an int is 4. This means the
 nodes need to start after a 4 byte Buffer of padding at end of data array. */
 struct Test_data_type
 {
-    int i;
+    int const i;
 };
 CCC_array_adaptive_map_declare_fixed_map(Fixed_map_test_type,
                                          struct Test_data_type, TCAP);
@@ -64,7 +64,7 @@ asserts must be true in order to support the Struct of Array style layout we
 use for the data and nodes. It is important that in our user code when we set
 the positions of the node pointer relative to the data pointer the positions are
 correct regardless of backing storage as a fixed map or heap allocation. */
-static Fixed_map_test_type static_data_nodes_layout_test;
+static Fixed_map_test_type const static_data_nodes_layout_test;
 /** Some assumptions in the code assume that nodes array is last so ensure that
 is the case here. Also good to assume user data comes first. */
 static_assert((char *)static_data_nodes_layout_test.data
