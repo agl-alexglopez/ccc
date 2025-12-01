@@ -45,7 +45,7 @@ enum Link
 };
 
 #define INORDER R
-#define R_INORDER L
+#define INORDER_REVERSE L
 
 enum
 {
@@ -495,7 +495,7 @@ CCC_adaptive_map_reverse_next(
         return NULL;
     }
     struct CCC_Adaptive_map_node const *n
-        = next(map, iterator_intruder, R_INORDER);
+        = next(map, iterator_intruder, INORDER_REVERSE);
     return n == NULL ? NULL : struct_base(map, n);
 }
 
@@ -522,7 +522,7 @@ CCC_adaptive_map_equal_range_reverse(CCC_Adaptive_map *const map,
         return (CCC_Range_reverse){};
     }
     return (CCC_Range_reverse){
-        equal_range(map, reverse_begin_key, reverse_end_key, R_INORDER)};
+        equal_range(map, reverse_begin_key, reverse_end_key, INORDER_REVERSE)};
 }
 
 /** This is a linear time constant space deletion of tree nodes via left

@@ -62,7 +62,7 @@ enum Link
 };
 
 #define INORDER R
-#define R_INORDER L
+#define INORDER_REVERSE L
 
 /** @internal This will utilize safe type punning in C. Both union fields have
 the same type and when obtaining an entry we either have the desired element
@@ -543,7 +543,7 @@ CCC_bounded_map_reverse_next(
         return NULL;
     }
     struct CCC_Bounded_map_node const *const n
-        = next(map, iterator_intruder, R_INORDER);
+        = next(map, iterator_intruder, INORDER_REVERSE);
     return (n == NULL) ? NULL : struct_base(map, n);
 }
 
@@ -569,7 +569,7 @@ CCC_bounded_map_equal_range_reverse(CCC_Bounded_map const *const map,
         return (CCC_Range_reverse){};
     }
     return (CCC_Range_reverse){
-        equal_range(map, reverse_begin_key, reverse_end_key, R_INORDER)};
+        equal_range(map, reverse_begin_key, reverse_end_key, INORDER_REVERSE)};
 }
 
 CCC_Count

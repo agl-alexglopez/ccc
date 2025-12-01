@@ -114,11 +114,12 @@ enum Branch
 };
 
 #define INORDER R
-#define R_INORDER L
+#define INORDER_REVERSE L
 
 enum
 {
-    EMPTY_TREE = 2,
+    /** 0th slot is sentinel. Count will be 2 when inserting new root. */
+    INSERT_ROOT_NODE_COUNT = 2,
 };
 
 /* Buffer allocates before insert. "Empty" has nil 0th slot and one more. */
@@ -561,7 +562,7 @@ CCC_array_adaptive_map_reverse_next(CCC_Array_adaptive_map const *const map,
     {
         return 0;
     }
-    size_t const n = next(map, iterator, R_INORDER);
+    size_t const n = next(map, iterator, INORDER_REVERSE);
     return n;
 }
 
@@ -600,7 +601,7 @@ CCC_array_adaptive_map_equal_range_reverse(CCC_Array_adaptive_map *const map,
         return (CCC_Handle_range_reverse){};
     }
     return (CCC_Handle_range_reverse){
-        equal_range(map, reverse_begin_key, reverse_end_key, R_INORDER)};
+        equal_range(map, reverse_begin_key, reverse_end_key, INORDER_REVERSE)};
 }
 
 CCC_Result
@@ -950,7 +951,7 @@ static void
 insert(struct CCC_Array_adaptive_map *const map, size_t const n)
 {
     init_node(map, n);
-    if (map->count == EMPTY_TREE)
+    if (map->count == INSERT_ROOT_NODE_COUNT)
     {
         map->root = n;
         return;

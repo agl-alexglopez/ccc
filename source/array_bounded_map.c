@@ -177,13 +177,11 @@ struct Query
 };
 
 #define INORDER R
-#define RINORDER L
-#define MINDIR L
-#define MAXDIR R
+#define INORDER_REVERSE L
 
 enum
 {
-    SINGLE_TREE_NODE = 2,
+    INSERT_ROOT_COUNT = 2,
 };
 
 /** @internal A block of parity bits. */
@@ -575,7 +573,7 @@ CCC_array_bounded_map_equal_range_reverse(
         return (CCC_Handle_range_reverse){};
     }
     return (CCC_Handle_range_reverse){
-        equal_range(map, reverse_begin_key, reverse_end_key, RINORDER)};
+        equal_range(map, reverse_begin_key, reverse_end_key, INORDER_REVERSE)};
 }
 
 CCC_Handle_index
@@ -656,7 +654,7 @@ CCC_array_bounded_map_begin(CCC_Array_bounded_map const *const map)
     {
         return 0;
     }
-    size_t const n = min_max_from(map, map->root, MINDIR);
+    size_t const n = min_max_from(map, map->root, L);
     return n;
 }
 
@@ -667,7 +665,7 @@ CCC_array_bounded_map_reverse_begin(CCC_Array_bounded_map const *const map)
     {
         return 0;
     }
-    size_t const n = min_max_from(map, map->root, MAXDIR);
+    size_t const n = min_max_from(map, map->root, R);
     return n;
 }
 
@@ -691,7 +689,7 @@ CCC_array_bounded_map_reverse_next(CCC_Array_bounded_map const *const map,
     {
         return 0;
     }
-    size_t const n = next(map, iterator, RINORDER);
+    size_t const n = next(map, iterator, INORDER_REVERSE);
     return n;
 }
 
@@ -1027,7 +1025,7 @@ insert(struct CCC_Array_bounded_map *const map, size_t const parent_i,
 {
     struct CCC_Array_bounded_map_node *elem = node_at(map, elem_i);
     init_node(map, elem_i);
-    if (map->count == SINGLE_TREE_NODE)
+    if (map->count == INSERT_ROOT_COUNT)
     {
         map->root = elem_i;
         return;
@@ -1498,7 +1496,7 @@ remove_fixup(struct CCC_Array_bounded_map *const map, size_t const remove)
     }
     else
     {
-        y = min_max_from(map, branch_index(map, remove, R), MINDIR);
+        y = min_max_from(map, branch_index(map, remove, R), L);
         p = parent_index(map, y);
         x = branch_index(map, y, !branch_index(map, y, L));
         *parent_pointer(map, x) = parent_index(map, y);
