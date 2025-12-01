@@ -240,7 +240,7 @@ check_static_begin(adaptive_map_test_iterate_removal)
 check_static_begin(adaptive_map_test_iterate_remove_reinsert)
 {
     struct Stack_allocator allocator
-        = stack_allocator_initialize(struct Val, 100);
+        = stack_allocator_initialize(struct Val, 200);
     CCC_Adaptive_map s = CCC_adaptive_map_initialize(
         struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
     /* Seed the test with any integer for reproducible random test sequence

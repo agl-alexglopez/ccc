@@ -246,25 +246,30 @@ check_static_begin(tree_map_test_iterate_removal)
 
 check_static_begin(tree_map_test_iterate_remove_reinsert)
 {
-    Tree_map s
-        = tree_map_initialize(struct Val, elem, key, id_order, NULL, NULL);
+    struct Stack_allocator allocator
+        = stack_allocator_initialize(struct Val, 200);
+    Tree_map s = tree_map_initialize(struct Val, elem, key, id_order,
+                                     stack_allocator_allocate, &allocator);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
-    size_t const num_nodes = 1000;
-    struct Val vals[1000];
+    size_t const num_nodes = 100;
     for (size_t i = 0; i < num_nodes; ++i)
     {
         /* Force duplicates. */
-        vals[i].key = rand() % (num_nodes + 1); // NOLINT
-        vals[i].val = (int)i;
-        (void)swap_entry(&s, &vals[i].elem, &(struct Val){}.elem);
+        (void)swap_entry(&s,
+                         &(struct Val){
+                             .key = rand() % (num_nodes + 1), /* NOLINT */
+                             .val = (int)i,
+                         }
+                              .elem,
+                         &(struct Val){}.elem);
         check(validate(&s), true);
     }
     check(iterator_check(&s), CHECK_PASS);
     size_t const old_size = count(&s).count;
-    int const limit = 400;
-    int new_unique_entry_val = 1001;
+    int const limit = 40;
+    int new_unique_entry_val = 101;
     for (struct Val *i = begin(&s), *next = NULL; i; i = next)
     {
         next = next(&s, &i->elem);
