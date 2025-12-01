@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 @endcond */
 /** @file
-@brief The Handle Bounded Map Interface
+@brief The Array Bounded Map Interface
 
 A bounded map offers insertion, removal, and searching with a strict bound of
 `O(log(N))` time. The map is pointer stable. This map is suitable for realtime
@@ -65,11 +65,11 @@ All types and functions can then be written without the `CCC_` prefix. */
 Types available in the container interface. */
 /**@{*/
 
-/** @brief A handle bounded map offers O(lg N) search and erase, and
+/** @brief An array bounded map offers O(lg N) search and erase, and
 amortized O(lg N) insert.
 @warning it is undefined behavior to access an uninitialized container.
 
-A handle bounded map can be initialized on the stack, heap, or data
+An array bounded map can be initialized on the stack, heap, or data
 segment at runtime or compile time.*/
 typedef struct CCC_Array_bounded_map CCC_Array_bounded_map;
 
@@ -431,7 +431,7 @@ CCC_Result CCC_array_bounded_map_copy(CCC_Array_bounded_map *destination,
                                       CCC_Allocator *allocate);
 
 /** @brief Reserves space for at least to_add more elements.
-@param[in] map a pointer to the handle bounded map.
+@param[in] map a pointer to the array bounded map.
 @param[in] to_add the number of elements to add to the current size.
 @param[in] allocate the allocation function to use to reserve memory.
 @return the result of the reservation. OK if successful, otherwise an error

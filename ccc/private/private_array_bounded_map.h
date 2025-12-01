@@ -45,7 +45,7 @@ struct CCC_Array_bounded_map_node
     };
 };
 
-/** @internal A handle bounded map is a modified struct of arrays layout with
+/** @internal An array bounded map is a modified struct of arrays layout with
 the modification being that we may have the arrays as pointer offsets in a
 contiguous allocation if the user desires a dynamic map.
 
@@ -255,7 +255,7 @@ runtime. */
         .context = (private_context_data),                                     \
     }
 
-/** @internal Initialize a handle bounded map from user input list. */
+/** @internal Initialize an array bounded map from user input list. */
 #define CCC_private_array_bounded_map_from(                                    \
     private_key_field, private_key_compare, private_allocate,                  \
     private_context_data, private_optional_cap,                                \

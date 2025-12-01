@@ -62,7 +62,7 @@ Types available in the container interface. */
 insert, and erase.
 @warning it is undefined behavior to access an uninitialized container.
 
-A handle adaptive map can be initialized on the stack, heap, or data segment at
+An array adaptive map can be initialized on the stack, heap, or data segment at
 runtime or compile time.*/
 typedef struct CCC_Array_adaptive_map CCC_Array_adaptive_map;
 
@@ -417,7 +417,7 @@ CCC_Result CCC_array_adaptive_map_copy(CCC_Array_adaptive_map *destination,
                                        CCC_Allocator *allocate);
 
 /** @brief Reserves space for at least to_add more elements.
-@param[in] map a pointer to the handle adaptive map.
+@param[in] map a pointer to the array adaptive map.
 @param[in] to_add the number of elements to add to the current size.
 @param[in] allocate the allocation function to use to reserve memory.
 @return the result of the reservation. OK if successful, otherwise an error

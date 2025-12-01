@@ -176,7 +176,7 @@ is of a known fixed size defined at compile time, not just a pointer. */
         .context = (private_context_data),                                     \
     }
 
-/** @internal Initialize a handle adaptive map from user input list. */
+/** @internal Initialize an array adaptive map from user input list. */
 #define CCC_private_array_adaptive_map_from(                                   \
     private_key_field, private_key_compare, private_allocate,                  \
     private_context_data, private_optional_cap,                                \
