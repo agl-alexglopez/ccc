@@ -12,14 +12,18 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-This file contains my implementation of a handle realtime ordered map. The added
-realtime prefix is to indicate that this map meets specific run time bounds
+This file contains my implementation of an array bounded ordered map. The added
+bounded prefix is to indicate that this map meets specific run time bounds
 that can be relied upon consistently. This is may not be the case if a map
 is implemented with some self-optimizing data structure like a Splay Tree.
 
 This map, however, promises O(lg N) search, insert, and remove as a true
-upper bound, inclusive. This is achieved through a Weak AVL (WAVL) tree
-that is derived from the following two sources.
+upper bound, inclusive. This guarantee does not consider the cost of resizing
+the underlying Struct of Arrays layout. For the strict bound to be met the user
+should reserve space for the needed nodes through the API. Performance could
+still be strong with a more dynamic approach, however, The runtime bound is
+achieved through a Weak AVL (WAVL) tree that is derived from the following two
+sources.
 
 [1] Bernhard Haeupler, Siddhartha Sen, and Robert E. Tarjan, 2014.
 Rank-Balanced Trees, J.ACM Transactions on Algorithms 11, 4, Article 0

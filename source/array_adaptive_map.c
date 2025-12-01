@@ -25,7 +25,11 @@ based on the following source.
        code. https://www.link.cs.cmu.edu/splay/
 
 Because this is a self-optimizing data structure it may benefit from many
-constant time queries for frequently accessed elements. */
+constant time queries for frequently accessed elements. It is also in a Struct
+of Arrays layout to improve memory alignment and reduce wasted space. While
+it is recommended that the user reserve space for the needed nodes ahead of
+time, the amortized O(log(N)) run times of a Splay Tree remain the same in
+the dynamic resizing case. */
 #include <assert.h>
 #include <stddef.h>
 #include <string.h>
