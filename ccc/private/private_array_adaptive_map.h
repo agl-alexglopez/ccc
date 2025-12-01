@@ -109,8 +109,8 @@ struct CCC_Array_adaptive_map_handle
 /** @internal Enable return by compound literal reference on the stack. Think
 of this method as return by value but with the additional ability to pass by
 pointer in a functional style. `fnB(&(union
-CCC_Array_adaptive_map_array_wrap){fnA().private});` */
-union CCC_Array_adaptive_map_array_wrap
+CCC_Array_adaptive_map_handle_wrap){fnA().private});` */
+union CCC_Array_adaptive_map_handle_wrap
 {
     /** @internal The field containing the handle struct. */
     struct CCC_Array_adaptive_map_handle private;

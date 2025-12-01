@@ -435,7 +435,7 @@ create_frequency_map(struct String_arena *const a, FILE *const f)
             if (!cw.error)
             {
                 Array_adaptive_map_handle const *e
-                    = array_wrap(&array_adaptive_map, &cw);
+                    = handle_wrap(&array_adaptive_map, &cw);
                 e = array_adaptive_map_and_modify_with(e, Word, { T->freq++; });
                 Word const *const w = array_adaptive_map_at(
                     &array_adaptive_map, array_adaptive_map_or_insert_with(

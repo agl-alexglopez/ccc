@@ -165,7 +165,8 @@ check_static_begin(run_lru_cache)
 check_static_begin(lru_put, struct Lru_cache *const lru, int const key,
                    int const val)
 {
-    CCC_Array_bounded_map_handle const *const ent = array_wrap(&lru->map, &key);
+    CCC_Array_bounded_map_handle const *const ent
+        = handle_wrap(&lru->map, &key);
     if (occupied(ent))
     {
         struct Lru_node *const found
@@ -191,7 +192,7 @@ check_static_begin(lru_put, struct Lru_cache *const lru, int const key,
             check(to_drop == NULL, false);
             (void)pop_back(&lru->l);
             CCC_Handle const e
-                = remove_handle(array_wrap(&lru->map, &to_drop->key));
+                = remove_handle(handle_wrap(&lru->map, &to_drop->key));
             check(occupied(&e), true);
         }
     }

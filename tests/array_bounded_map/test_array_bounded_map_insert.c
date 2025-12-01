@@ -34,7 +34,7 @@ check_static_begin(array_bounded_map_test_insert)
 
     /* Nothing was there before so nothing is in the handle. */
     CCC_Handle *hndl
-        = swap_array_wrap(&map, &(struct Val){.id = 137, .val = 99});
+        = swap_handle_wrap(&map, &(struct Val){.id = 137, .val = 99});
     check(occupied(hndl), false);
     check(count(&map).count, 1);
     check_end();
@@ -48,18 +48,18 @@ check_static_begin(array_bounded_map_test_insert_macros)
 
     struct Val const *ins = array_bounded_map_at(
         &map,
-        CCC_array_bounded_map_or_insert_with(array_wrap(&map, &(int){2}),
+        CCC_array_bounded_map_or_insert_with(handle_wrap(&map, &(int){2}),
                                              (struct Val){.id = 2, .val = 0}));
     check(ins != NULL, true);
     check(validate(&map), true);
     check(count(&map).count, 1);
     ins = array_bounded_map_at(&map, array_bounded_map_insert_array_with(
-                                         array_wrap(&map, &(int){2}),
+                                         handle_wrap(&map, &(int){2}),
                                          (struct Val){.id = 2, .val = 0}));
     check(validate(&map), true);
     check(ins != NULL, true);
     ins = array_bounded_map_at(&map, array_bounded_map_insert_array_with(
-                                         array_wrap(&map, &(int){9}),
+                                         handle_wrap(&map, &(int){9}),
                                          (struct Val){.id = 9, .val = 1}));
     check(validate(&map), true);
     check(ins != NULL, true);
@@ -105,7 +105,7 @@ check_static_begin(array_bounded_map_test_insert_overwrite)
     check(occupied(&hndl), false);
 
     struct Val const *v
-        = array_bounded_map_at(&map, unwrap(array_wrap(&map, &q.id)));
+        = array_bounded_map_at(&map, unwrap(handle_wrap(&map, &q.id)));
     check(v != NULL, true);
     check(v->val, 99);
 
@@ -122,7 +122,7 @@ check_static_begin(array_bounded_map_test_insert_overwrite)
     check(v != NULL, true);
     check(v->val, 100);
     check(q.val, 99);
-    v = array_bounded_map_at(&map, unwrap(array_wrap(&map, &q.id)));
+    v = array_bounded_map_at(&map, unwrap(handle_wrap(&map, &q.id)));
     check(v != NULL, true);
     check(v->val, 100);
     check_end();
@@ -137,7 +137,7 @@ check_static_begin(array_bounded_map_test_insert_then_bad_ideas)
     CCC_Handle hndl = swap_handle(&map, &q);
     check(occupied(&hndl), false);
     struct Val const *v
-        = array_bounded_map_at(&map, unwrap(array_wrap(&map, &q.id)));
+        = array_bounded_map_at(&map, unwrap(handle_wrap(&map, &q.id)));
     check(v != NULL, true);
     check(v->val, 99);
 
@@ -175,7 +175,7 @@ check_static_begin(array_bounded_map_test_array_api_functional)
         def.id = (int)i;
         def.val = (int)i;
         struct Val const *const d = array_bounded_map_at(
-            &map, or_insert(array_wrap(&map, &def.id), &def));
+            &map, or_insert(handle_wrap(&map, &def.id), &def));
         check((d != NULL), true);
         check(d->id, i);
         check(d->val, i);
@@ -187,7 +187,7 @@ check_static_begin(array_bounded_map_test_array_api_functional)
         def.id = (int)i;
         def.val = (int)i;
         CCC_Handle_index const h = or_insert(
-            array_bounded_map_and_modify_with(array_wrap(&map, &def.id),
+            array_bounded_map_and_modify_with(handle_wrap(&map, &def.id),
                                               struct Val, { T->val++; }),
             &def);
         struct Val const *const d = array_bounded_map_at(&map, h);
@@ -212,7 +212,7 @@ check_static_begin(array_bounded_map_test_array_api_functional)
         def.id = (int)i;
         def.val = (int)i;
         struct Val *const in = array_bounded_map_at(
-            &map, or_insert(array_wrap(&map, &def.id), &def));
+            &map, or_insert(handle_wrap(&map, &def.id), &def));
         in->val++;
         /* All values in the array should be odd now */
         check((in->val % 2 == 0), true);
@@ -238,7 +238,7 @@ check_static_begin(array_bounded_map_test_insert_via_handle)
         def.id = (int)i;
         def.val = (int)i;
         struct Val const *const d = array_bounded_map_at(
-            &map, insert_handle(array_wrap(&map, &def.id), &def));
+            &map, insert_handle(handle_wrap(&map, &def.id), &def));
         check((d != NULL), true);
         check(d->id, i);
         check(d->val, i);
@@ -250,7 +250,7 @@ check_static_begin(array_bounded_map_test_insert_via_handle)
         def.id = (int)i;
         def.val = (int)i + 1;
         struct Val const *const d = array_bounded_map_at(
-            &map, insert_handle(array_wrap(&map, &def.id), &def));
+            &map, insert_handle(handle_wrap(&map, &def.id), &def));
         /* All values in the array should be odd now */
         check((d != NULL), true);
         check(d->val, i + 1);
@@ -281,7 +281,7 @@ check_static_begin(array_bounded_map_test_insert_via_array_macros)
     for (size_t i = 0; i < size / 2; i += 2)
     {
         struct Val const *const d = array_bounded_map_at(
-            &map, insert_handle(array_wrap(&map, &i), &(struct Val){i, i}));
+            &map, insert_handle(handle_wrap(&map, &i), &(struct Val){i, i}));
         check((d != NULL), true);
         check(d->id, i);
         check(d->val, i);
@@ -291,7 +291,8 @@ check_static_begin(array_bounded_map_test_insert_via_array_macros)
     for (size_t i = 0; i < size / 2; ++i)
     {
         struct Val const *const d = array_bounded_map_at(
-            &map, insert_handle(array_wrap(&map, &i), &(struct Val){i, i + 1}));
+            &map,
+            insert_handle(handle_wrap(&map, &i), &(struct Val){i, i + 1}));
         /* All values in the array should be odd now */
         check((d != NULL), true);
         check(d->val, i + 1);
@@ -325,7 +326,7 @@ check_static_begin(array_bounded_map_test_array_api_macros)
            insert branch executes. */
         struct Val const *const d = array_bounded_map_at(
             &map, array_bounded_map_or_insert_with(
-                      array_wrap(&map, &i), array_bounded_map_create(i, i)));
+                      handle_wrap(&map, &i), array_bounded_map_create(i, i)));
         check((d != NULL), true);
         check(d->id, i);
         check(d->val, i);
@@ -337,7 +338,7 @@ check_static_begin(array_bounded_map_test_array_api_macros)
         struct Val const *const d = array_bounded_map_at(
             &map,
             array_bounded_map_or_insert_with(
-                and_modify(array_wrap(&map, &i), array_bounded_map_modplus),
+                and_modify(handle_wrap(&map, &i), array_bounded_map_modplus),
                 array_bounded_map_create(i, i)));
         /* All values in the array should be odd now */
         check((d != NULL), true);
@@ -358,7 +359,7 @@ check_static_begin(array_bounded_map_test_array_api_macros)
     for (int i = 0; i < size / 2; ++i)
     {
         struct Val *v = array_bounded_map_at(
-            &map, array_bounded_map_or_insert_with(array_wrap(&map, &i),
+            &map, array_bounded_map_or_insert_with(handle_wrap(&map, &i),
                                                    (struct Val){}));
         check(v != NULL, true);
         v->val++;
@@ -407,7 +408,7 @@ check_static_begin(array_bounded_map_test_resize)
     {
         struct Val elem = {.id = shuffled_index, .val = i};
         struct Val *v = array_bounded_map_at(
-            &map, insert_handle(array_wrap(&map, &elem.id), &elem));
+            &map, insert_handle(handle_wrap(&map, &elem.id), &elem));
         check(v != NULL, true);
         check(v->id, shuffled_index);
         check(v->val, i);
@@ -419,7 +420,7 @@ check_static_begin(array_bounded_map_test_resize)
     {
         struct Val swap_slot = {shuffled_index, shuffled_index};
         struct Val const *const in_table = array_bounded_map_at(
-            &map, insert_handle(array_wrap(&map, &swap_slot.id), &swap_slot));
+            &map, insert_handle(handle_wrap(&map, &swap_slot.id), &swap_slot));
         check(in_table != NULL, true);
         check(in_table->val, shuffled_index);
     }
@@ -443,7 +444,7 @@ check_static_begin(array_bounded_map_test_reserve)
     {
         struct Val elem = {.id = shuffled_index, .val = i};
         struct Val *v = array_bounded_map_at(
-            &map, insert_handle(array_wrap(&map, &elem.id), &elem));
+            &map, insert_handle(handle_wrap(&map, &elem.id), &elem));
         check(v != NULL, true);
         check(v->id, shuffled_index);
         check(v->val, i);
@@ -455,7 +456,7 @@ check_static_begin(array_bounded_map_test_reserve)
     {
         struct Val swap_slot = {shuffled_index, shuffled_index};
         struct Val const *const in_table = array_bounded_map_at(
-            &map, insert_handle(array_wrap(&map, &swap_slot.id), &swap_slot));
+            &map, insert_handle(handle_wrap(&map, &swap_slot.id), &swap_slot));
         check(in_table != NULL, true);
         check(in_table->val, shuffled_index);
     }
@@ -472,7 +473,7 @@ check_static_begin(array_bounded_map_test_resize_macros)
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
         struct Val *v = array_bounded_map_at(
-            &map, insert_handle(array_wrap(&map, &shuffled_index),
+            &map, insert_handle(handle_wrap(&map, &shuffled_index),
                                 &(struct Val){shuffled_index, i}));
         check(v != NULL, true);
         check(v->id, shuffled_index);
@@ -483,16 +484,16 @@ check_static_begin(array_bounded_map_test_resize_macros)
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
         CCC_Handle_index const h = array_bounded_map_or_insert_with(
-            array_bounded_map_and_modify_with(array_wrap(&map, &shuffled_index),
-                                              struct Val,
-                                              { T->val = shuffled_index; }),
+            array_bounded_map_and_modify_with(
+                handle_wrap(&map, &shuffled_index), struct Val,
+                { T->val = shuffled_index; }),
             (struct Val){});
         struct Val const *const in_table = array_bounded_map_at(&map, h);
         check(in_table != NULL, true);
         check(in_table->val, shuffled_index);
         struct Val *v = array_bounded_map_at(
             &map, array_bounded_map_or_insert_with(
-                      array_wrap(&map, &shuffled_index), (struct Val){}));
+                      handle_wrap(&map, &shuffled_index), (struct Val){}));
         check(v == NULL, false);
         v->val = i;
         v = array_bounded_map_at(&map, get_key_value(&map, &shuffled_index));
@@ -514,7 +515,7 @@ check_static_begin(array_bounded_map_test_resize_from_null)
     {
         struct Val elem = {.id = shuffled_index, .val = i};
         struct Val *v = array_bounded_map_at(
-            &map, insert_handle(array_wrap(&map, &elem.id), &elem));
+            &map, insert_handle(handle_wrap(&map, &elem.id), &elem));
         check(v != NULL, true);
         check(v->id, shuffled_index);
         check(v->val, i);
@@ -525,7 +526,7 @@ check_static_begin(array_bounded_map_test_resize_from_null)
     {
         struct Val swap_slot = {shuffled_index, shuffled_index};
         struct Val const *const in_table = array_bounded_map_at(
-            &map, insert_handle(array_wrap(&map, &swap_slot.id), &swap_slot));
+            &map, insert_handle(handle_wrap(&map, &swap_slot.id), &swap_slot));
         check(in_table != NULL, true);
         check(in_table->val, shuffled_index);
     }
@@ -543,7 +544,7 @@ check_static_begin(array_bounded_map_test_resize_from_null_macros)
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
         struct Val *v = array_bounded_map_at(
-            &map, insert_handle(array_wrap(&map, &shuffled_index),
+            &map, insert_handle(handle_wrap(&map, &shuffled_index),
                                 &(struct Val){shuffled_index, i}));
         check(v != NULL, true);
         check(v->id, shuffled_index);
@@ -554,16 +555,16 @@ check_static_begin(array_bounded_map_test_resize_from_null_macros)
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
         CCC_Handle_index const h = array_bounded_map_or_insert_with(
-            array_bounded_map_and_modify_with(array_wrap(&map, &shuffled_index),
-                                              struct Val,
-                                              { T->val = shuffled_index; }),
+            array_bounded_map_and_modify_with(
+                handle_wrap(&map, &shuffled_index), struct Val,
+                { T->val = shuffled_index; }),
             (struct Val){});
         struct Val const *const in_table = array_bounded_map_at(&map, h);
         check(in_table != NULL, true);
         check(in_table->val, shuffled_index);
         struct Val *v = array_bounded_map_at(
             &map, array_bounded_map_or_insert_with(
-                      array_wrap(&map, &shuffled_index), (struct Val){}));
+                      handle_wrap(&map, &shuffled_index), (struct Val){}));
         check(v == NULL, false);
         v->val = i;
         v = array_bounded_map_at(&map, get_key_value(&map, &shuffled_index));
@@ -588,7 +589,7 @@ check_static_begin(array_bounded_map_test_insert_limit)
          ++i, shuffled_index = (shuffled_index + larger_prime) % size)
     {
         struct Val *v = array_bounded_map_at(
-            &map, insert_handle(array_wrap(&map, &shuffled_index),
+            &map, insert_handle(handle_wrap(&map, &shuffled_index),
                                 &(struct Val){shuffled_index, i}));
         if (!v)
         {
@@ -608,13 +609,13 @@ check_static_begin(array_bounded_map_test_insert_limit)
 
     v = (struct Val){.id = last_index, .val = -2};
     struct Val *in_table = array_bounded_map_at(
-        &map, insert_handle(array_wrap(&map, &v.id), &v));
+        &map, insert_handle(handle_wrap(&map, &v.id), &v));
     check(in_table != NULL, true);
     check(in_table->val, -2);
     check(count(&map).count, final_size);
 
     in_table = array_bounded_map_at(
-        &map, insert_handle(array_wrap(&map, &last_index),
+        &map, insert_handle(handle_wrap(&map, &last_index),
                             &(struct Val){.id = last_index, .val = -3}));
     check(in_table != NULL, true);
     check(in_table->val, -3);
@@ -622,13 +623,13 @@ check_static_begin(array_bounded_map_test_insert_limit)
 
     /* The shuffled index key that failed insertion should fail again. */
     v = (struct Val){.id = shuffled_index, .val = -4};
-    in_table = array_bounded_map_at(&map,
-                                    insert_handle(array_wrap(&map, &v.id), &v));
+    in_table = array_bounded_map_at(
+        &map, insert_handle(handle_wrap(&map, &v.id), &v));
     check(in_table == NULL, true);
     check(count(&map).count, final_size);
 
     in_table = array_bounded_map_at(
-        &map, insert_handle(array_wrap(&map, &shuffled_index),
+        &map, insert_handle(handle_wrap(&map, &shuffled_index),
                             &(struct Val){.id = shuffled_index, .val = -4}));
     check(in_table == NULL, true);
     check(count(&map).count, final_size);
@@ -663,13 +664,13 @@ check_static_begin(array_bounded_map_test_insert_and_find)
     for (int i = 0; i < size; i += 2)
     {
         check(contains(&map, &i), true);
-        check(occupied(array_wrap(&map, &i)), true);
+        check(occupied(handle_wrap(&map, &i)), true);
         check(validate(&map), true);
     }
     for (int i = 1; i < size; i += 2)
     {
         check(contains(&map, &i), false);
-        check(occupied(array_wrap(&map, &i)), false);
+        check(occupied(handle_wrap(&map, &i)), false);
         check(validate(&map), true);
     }
     check_end();

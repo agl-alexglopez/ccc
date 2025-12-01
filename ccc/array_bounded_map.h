@@ -81,7 +81,7 @@ or value update based on the needs of the user. Handles obtained via the Handle
 Interface are stable until the user removes the element at the provided handle.
 Insertions and deletions of other elements do not affect handle stability.
 Resizing of the table does not affect handle stability. */
-typedef union CCC_Array_bounded_map_array_wrap CCC_Array_bounded_map_handle;
+typedef union CCC_Array_bounded_map_handle_wrap CCC_Array_bounded_map_handle;
 
 /**@}*/
 
@@ -531,8 +531,8 @@ key value type. If more space is needed but allocation fails or has been
 forbidden, an insert error is set.
 
 Note that this function may write to the provided user type struct. */
-#define CCC_array_bounded_map_swap_array_wrap(array_bounded_map_pointer,       \
-                                              type_output_pointer)             \
+#define CCC_array_bounded_map_swap_handle_wrap(array_bounded_map_pointer,      \
+                                               type_output_pointer)            \
     &(CCC_Handle)                                                              \
     {                                                                          \
         CCC_array_bounded_map_swap_handle((array_bounded_map_pointer),         \
@@ -685,8 +685,8 @@ where in the map such an element should be inserted.
 
 A handle is rarely useful on its own. It should be passed in a functional style
 to subsequent calls in the Handle Interface. */
-#define CCC_array_bounded_map_array_wrap(array_bounded_map_pointer,            \
-                                         key_pointer)                          \
+#define CCC_array_bounded_map_handle_wrap(array_bounded_map_pointer,           \
+                                          key_pointer)                         \
     &(CCC_Array_bounded_map_handle)                                            \
     {                                                                          \
         CCC_array_bounded_map_handle((array_bounded_map_pointer),              \
@@ -738,7 +738,7 @@ non-NULL if the closure executes.
 // Increment the count if found otherwise do nothing.
 Array_bounded_map_handle *h =
     array_bounded_map_and_modify_with(
-        array_wrap(&array_bounded_map, &k),
+        handle_wrap(&array_bounded_map, &k),
         Word,
         T->cnt++;
     );
@@ -746,7 +746,7 @@ Array_bounded_map_handle *h =
 Handle_index w =
     array_bounded_map_or_insert_with(
         array_bounded_map_and_modify_with(
-            array_wrap(&array_bounded_map, &k),
+            handle_wrap(&array_bounded_map, &k),
             Word,
             { T->cnt++; }
         ),
@@ -838,7 +838,7 @@ Vacant, no prior handle existed to be removed.
 
 Note that the reference to the removed handle is invalidated upon any further
 insertions. */
-#define CCC_array_bounded_map_remove_array_wrap(map_array_pointer)             \
+#define CCC_array_bounded_map_remove_handle_wrap(map_array_pointer)            \
     &(CCC_Handle)                                                              \
     {                                                                          \
         CCC_array_bounded_map_remove_handle((map_array_pointer)).private       \
@@ -1150,8 +1150,8 @@ typedef CCC_Array_bounded_map_handle Array_bounded_map_handle;
         CCC_array_bounded_map_get_key_value(args)
 #    define array_bounded_map_swap_handle(args...)                             \
         CCC_array_bounded_map_swap_handle(args)
-#    define array_bounded_map_swap_array_wrap(args...)                         \
-        CCC_array_bounded_map_swap_array_wrap(args)
+#    define array_bounded_map_swap_handle_wrap(args...)                        \
+        CCC_array_bounded_map_swap_handle_wrap(args)
 #    define array_bounded_map_begin(args...) CCC_array_bounded_map_begin(args)
 #    define array_bounded_map_reverse_begin(args...)                           \
         CCC_array_bounded_map_reverse_begin(args)

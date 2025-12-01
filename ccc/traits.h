@@ -75,8 +75,8 @@ See container documentation for specific behavior. */
 @return a handle depending on container specific context.
 
 See container documentation for specific behavior. */
-#define CCC_swap_array_wrap(container_pointer, swap_args...)                   \
-    CCC_private_swap_array_wrap(container_pointer, swap_args)
+#define CCC_swap_handle_wrap(container_pointer, swap_args...)                  \
+    CCC_private_swap_handle_wrap(container_pointer, swap_args)
 
 /** @brief Insert an element if the entry is Vacant.
 @param[in] container_pointer a pointer to the container.
@@ -167,8 +167,8 @@ See container documentation for specific behavior. */
 context.
 
 See container documentation for specific behavior. */
-#define CCC_array_wrap(container_pointer, key_pointer...)                      \
-    CCC_private_array_wrap(container_pointer, key_pointer)
+#define CCC_handle_wrap(container_pointer, key_pointer...)                     \
+    CCC_private_handle_wrap(container_pointer, key_pointer)
 
 /** @brief Modify an entry if Occupied.
 @param[in] entry_pointer a pointer to the container.
@@ -244,8 +244,8 @@ See container documentation for specific behavior. */
 @return an handle depending on container specific context.
 
 See container documentation for specific behavior. */
-#define CCC_remove_array_wrap(array_pointer)                                   \
-    CCC_private_remove_array_wrap(array_pointer)
+#define CCC_remove_handle_wrap(array_pointer)                                  \
+    CCC_private_remove_handle_wrap(array_pointer)
 
 /** @brief Unwrap user type in entry.
 @param[in] entry_pointer a pointer to the container.
@@ -658,7 +658,7 @@ See container documentation for specific behavior. */
 #    define swap_entry(args...) CCC_swap_entry(args)
 #    define swap_entry_wrap(args...) CCC_swap_entry_wrap(args)
 #    define swap_handle(args...) CCC_swap_handle(args)
-#    define swap_array_wrap(args...) CCC_swap_array_wrap(args)
+#    define swap_handle_wrap(args...) CCC_swap_handle_wrap(args)
 #    define try_insert(args...) CCC_try_insert(args)
 #    define insert_or_assign(args...) CCC_insert_or_assign(args)
 #    define insert_or_assign_wrap(args...) CCC_insert_or_assign_wrap(args)
@@ -668,11 +668,11 @@ See container documentation for specific behavior. */
 #    define remove_entry(args...) CCC_remove_entry(args)
 #    define remove_entry_wrap(args...) CCC_remove_entry_wrap(args)
 #    define remove_handle(args...) CCC_remove_handle(args)
-#    define remove_array_wrap(args...) CCC_remove_array_wrap(args)
+#    define remove_handle_wrap(args...) CCC_remove_handle_wrap(args)
 #    define entry(args...) CCC_entry(args)
 #    define entry_wrap(args...) CCC_entry_wrap(args)
 #    define handle(args...) CCC_handle(args)
-#    define array_wrap(args...) CCC_array_wrap(args)
+#    define handle_wrap(args...) CCC_handle_wrap(args)
 #    define or_insert(args...) CCC_or_insert(args)
 #    define insert_entry(args...) CCC_insert_entry(args)
 #    define insert_handle(args...) CCC_insert_handle(args)

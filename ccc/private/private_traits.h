@@ -56,8 +56,8 @@ limitations under the License.
         CCC_Array_bounded_map *: CCC_array_bounded_map_swap_handle)(           \
         (container_pointer), swap_args)
 
-#define CCC_private_swap_array_wrap(container_pointer,                         \
-                                    key_val_container_array_pointer...)        \
+#define CCC_private_swap_handle_wrap(container_pointer,                        \
+                                     key_val_container_array_pointer...)       \
     &(CCC_Handle)                                                              \
     {                                                                          \
         CCC_private_swap_handle(container_pointer,                             \
@@ -207,7 +207,7 @@ limitations under the License.
         CCC_Array_bounded_map_handle const                                     \
             *: CCC_array_bounded_map_remove_handle)((container_array_pointer))
 
-#define CCC_private_remove_array_wrap(container_array_pointer)                 \
+#define CCC_private_remove_handle_wrap(container_array_pointer)                \
     &(CCC_Handle)                                                              \
     {                                                                          \
         CCC_private_remove_handle(container_array_pointer).private             \
@@ -260,7 +260,7 @@ limitations under the License.
         CCC_Array_bounded_map const *: CCC_array_bounded_map_handle)(          \
         (container_pointer), key_pointer)
 
-#define CCC_private_array_wrap(container_pointer, key_pointer...)              \
+#define CCC_private_handle_wrap(container_pointer, key_pointer...)             \
     _Generic(                                                                  \
         (container_pointer),                                                   \
         CCC_Array_adaptive_map *: &(                                           \

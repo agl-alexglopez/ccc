@@ -1102,7 +1102,7 @@ typedef struct
 /* Increment a found Word or insert a default count of 1. */
 CCC_Handle_index const h =
 array_adaptive_map_or_insert_with(
-    array_adaptive_map_and_modify_with(array_wrap(&hom, &key_ofs), Word, { T->cnt++; }),
+    array_adaptive_map_and_modify_with(handle_wrap(&hom, &key_ofs), Word, { T->cnt++; }),
     (Word){.ofs = ofs, .cnt = 1}
 );
 ```
@@ -1199,7 +1199,7 @@ typedef struct
 /* ... Elsewhere generate offset ofs as key. */
 Word default = {.ofs = ofs, .cnt = 1};
 CCC_Handle_index const h =
-    or_insert(and_modify(array_wrap(&hom, &ofs), increment), &default);
+    or_insert(and_modify(handle_wrap(&hom, &ofs), increment), &default);
 ```
 
 Or the following.
@@ -1213,7 +1213,7 @@ typedef struct
 } Word;
 /* ... Elsewhere generate offset ofs as key. */
 Word default = {.ofs = ofs, .cnt = 1};
-Array_adaptive_map_handle *h = array_wrap(&hom, &ofs);
+Array_adaptive_map_handle *h = handle_wrap(&hom, &ofs);
 h = and_modify(h, increment)
 Word *w = array_adaptive_map_at(&hom, or_insert(h, &default));
 ```

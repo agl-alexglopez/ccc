@@ -66,7 +66,7 @@ check_static_begin(array_bounded_map_test_prime_shuffle)
     check(array_bounded_map_count(&s).count < size, true);
     for (size_t i = 0; i < size; ++i)
     {
-        CCC_Handle const *const e = remove_array_wrap(array_wrap(&s, &i));
+        CCC_Handle const *const e = remove_handle_wrap(handle_wrap(&s, &i));
         check(occupied(e) || repeats[i], true);
         check(validate(&s), true);
     }

@@ -70,7 +70,7 @@ typedef struct CCC_Array_adaptive_map CCC_Array_adaptive_map;
 
 The Handle Interface offers efficient search and subsequent insertion, deletion,
 or value update based on the needs of the user. */
-typedef union CCC_Array_adaptive_map_array_wrap CCC_Array_adaptive_map_handle;
+typedef union CCC_Array_adaptive_map_handle_wrap CCC_Array_adaptive_map_handle;
 
 /**@}*/
 
@@ -516,8 +516,8 @@ forbidden, an insert error is set.
 
 Note that this function may write to the struct containing type_output and
 wraps it in a handle to provide information about the old value. */
-#define CCC_array_adaptive_map_swap_array_wrap(map_pointer,                    \
-                                               type_output_pointer)            \
+#define CCC_array_adaptive_map_swap_handle_wrap(map_pointer,                   \
+                                                type_output_pointer)           \
     &(CCC_Handle)                                                              \
     {                                                                          \
         CCC_array_adaptive_map_swap_handle((map_pointer),                      \
@@ -669,7 +669,7 @@ where in the map such an element should be inserted.
 
 A handle is rarely useful on its own. It should be passed in a functional style
 to subsequent calls in the Handle Interface. */
-#define CCC_array_adaptive_map_array_wrap(array_pointer, key_pointer)          \
+#define CCC_array_adaptive_map_handle_wrap(array_pointer, key_pointer)         \
     &(CCC_Array_adaptive_map_handle)                                           \
     {                                                                          \
         CCC_array_adaptive_map_handle((array_pointer), (key_pointer)).private  \
@@ -718,7 +718,7 @@ non-NULL if the closure executes.
 // Increment the count if found otherwise do nothing.
 Array_adaptive_map_handle *e =
     array_adaptive_map_and_modify_with(
-        array_wrap(&array_adaptive_map, &k),
+        handle_wrap(&array_adaptive_map, &k),
         Word,
         T->cnt++;
     );
@@ -726,7 +726,7 @@ Array_adaptive_map_handle *e =
 Handle_index w =
     array_adaptive_map_or_insert_with(
         array_adaptive_map_and_modify_with(
-            array_wrap(&array_adaptive_map, &k),
+            handle_wrap(&array_adaptive_map, &k),
             Word,
             { T->cnt++; }
         ),
@@ -810,7 +810,7 @@ CCC_array_adaptive_map_remove_handle(CCC_Array_adaptive_map_handle *handle);
 @return a compound literal reference containing no valid reference but
 information about the old handle. If Occupied a handle in the map existed and
 was removed. If Vacant, no prior handle existed to be removed. */
-#define CCC_array_adaptive_map_remove_array_wrap(array_pointer)                \
+#define CCC_array_adaptive_map_remove_handle_wrap(array_pointer)               \
     &(CCC_Handle)                                                              \
     {                                                                          \
         CCC_array_adaptive_map_remove_handle((array_pointer)).private          \
@@ -1117,14 +1117,14 @@ typedef CCC_Array_adaptive_map_handle Array_adaptive_map_handle;
         CCC_array_adaptive_map_contains(args)
 #    define array_adaptive_map_get_key_value(args...)                          \
         CCC_array_adaptive_map_get_key_value(args)
-#    define array_adaptive_map_swap_array_wrap(args...)                        \
-        CCC_array_adaptive_map_swap_array_wrap(args)
+#    define array_adaptive_map_swap_handle_wrap(args...)                       \
+        CCC_array_adaptive_map_swap_handle_wrap(args)
 #    define array_adaptive_map_try_insert_wrap(args...)                        \
         CCC_array_adaptive_map_try_insert_wrap(args)
 #    define array_adaptive_map_remove_wrap(args...)                            \
         CCC_array_adaptive_map_remove_wrap(args)
-#    define array_adaptive_map_remove_array_wrap(args...)                      \
-        CCC_array_adaptive_map_remove_array_wrap(args)
+#    define array_adaptive_map_remove_handle_wrap(args...)                     \
+        CCC_array_adaptive_map_remove_handle_wrap(args)
 #    define array_adaptive_map_swap_handle(args...)                            \
         CCC_array_adaptive_map_swap_handle(args)
 #    define array_adaptive_map_try_insert(args...)                             \
@@ -1135,8 +1135,8 @@ typedef CCC_Array_adaptive_map_handle Array_adaptive_map_handle;
         CCC_array_adaptive_map_remove(args)
 #    define array_adaptive_map_remove_handle(args...)                          \
         CCC_array_adaptive_map_remove_handle(args)
-#    define array_adaptive_map_array_wrap(args...)                             \
-        CCC_array_adaptive_map_array_wrap(args)
+#    define array_adaptive_map_handle_wrap(args...)                            \
+        CCC_array_adaptive_map_handle_wrap(args)
 #    define array_adaptive_map_handle(args...)                                 \
         CCC_array_adaptive_map_handle(args)
 #    define array_adaptive_map_and_modify(args...)                             \

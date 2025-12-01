@@ -441,7 +441,7 @@ check_static_begin(array_bounded_map_test_array_and_modify)
                                        id_order, NULL, NULL, SMALL_FIXED_CAP);
     int size = 30;
     CCC_Array_bounded_map_handle *hndl
-        = array_wrap(&array_bounded_map, &(int){-1});
+        = handle_wrap(&array_bounded_map, &(int){-1});
     check(validate(&array_bounded_map), true);
     check(occupied(hndl), false);
     check(count(&array_bounded_map).count, 0);
@@ -451,7 +451,7 @@ check_static_begin(array_bounded_map_test_array_and_modify)
     (void)array_bounded_map_insert_or_assign_with(&array_bounded_map, -1,
                                                   val(-1));
     check(validate(&array_bounded_map), true);
-    hndl = array_wrap(&array_bounded_map, &(int){-1});
+    hndl = handle_wrap(&array_bounded_map, &(int){-1});
     check(occupied(hndl), true);
     check(count(&array_bounded_map).count, 1);
     struct Val *v = array_bounded_map_at(&array_bounded_map, unwrap(hndl));
@@ -468,13 +468,13 @@ check_static_begin(array_bounded_map_test_array_and_modify)
     check(fill_n(&array_bounded_map, size / 2, i), CHECK_PASS);
 
     i += (size / 2);
-    hndl = array_wrap(&array_bounded_map, &i);
+    hndl = handle_wrap(&array_bounded_map, &i);
     check(occupied(hndl), false);
     check(count(&array_bounded_map).count, i + 1);
     (void)array_bounded_map_insert_or_assign_with(&array_bounded_map, i,
                                                   val(i));
     check(validate(&array_bounded_map), true);
-    hndl = array_wrap(&array_bounded_map, &i);
+    hndl = handle_wrap(&array_bounded_map, &i);
     check(occupied(hndl), true);
     check(count(&array_bounded_map).count, i + 2);
     hndl = and_modify(hndl, plus);
@@ -487,13 +487,13 @@ check_static_begin(array_bounded_map_test_array_and_modify)
     check(fill_n(&array_bounded_map, size - i, i), CHECK_PASS);
 
     i = size;
-    hndl = array_wrap(&array_bounded_map, &i);
+    hndl = handle_wrap(&array_bounded_map, &i);
     check(occupied(hndl), false);
     check(count(&array_bounded_map).count, i + 1);
     (void)array_bounded_map_insert_or_assign_with(&array_bounded_map, i,
                                                   val(i));
     check(validate(&array_bounded_map), true);
-    hndl = array_wrap(&array_bounded_map, &i);
+    hndl = handle_wrap(&array_bounded_map, &i);
     check(occupied(hndl), true);
     check(count(&array_bounded_map).count, i + 2);
     hndl = and_modify(hndl, plus);
@@ -512,14 +512,14 @@ check_static_begin(array_bounded_map_test_array_and_modify_context)
     int size = 30;
     int context = 1;
     CCC_Array_bounded_map_handle *hndl
-        = array_wrap(&array_bounded_map, &(int){-1});
+        = handle_wrap(&array_bounded_map, &(int){-1});
     hndl = and_modify_context(hndl, pluscontext, &context);
     check(occupied(hndl), false);
     check(count(&array_bounded_map).count, 0);
     (void)array_bounded_map_insert_or_assign_with(&array_bounded_map, -1,
                                                   val(-1));
     check(validate(&array_bounded_map), true);
-    hndl = array_wrap(&array_bounded_map, &(int){-1});
+    hndl = handle_wrap(&array_bounded_map, &(int){-1});
     check(occupied(hndl), true);
     check(count(&array_bounded_map).count, 1);
     struct Val *v = array_bounded_map_at(&array_bounded_map, unwrap(hndl));
@@ -536,14 +536,14 @@ check_static_begin(array_bounded_map_test_array_and_modify_context)
     check(fill_n(&array_bounded_map, size / 2, i), CHECK_PASS);
 
     i += (size / 2);
-    hndl = array_wrap(&array_bounded_map, &i);
+    hndl = handle_wrap(&array_bounded_map, &i);
     hndl = and_modify_context(hndl, pluscontext, &context);
     check(occupied(hndl), false);
     check(count(&array_bounded_map).count, i + 1);
     (void)array_bounded_map_insert_or_assign_with(&array_bounded_map, i,
                                                   val(i));
     check(validate(&array_bounded_map), true);
-    hndl = array_wrap(&array_bounded_map, &i);
+    hndl = handle_wrap(&array_bounded_map, &i);
     hndl = and_modify_context(hndl, pluscontext, &context);
     v = array_bounded_map_at(&array_bounded_map, unwrap(hndl));
     check(v != NULL, true);
@@ -555,14 +555,14 @@ check_static_begin(array_bounded_map_test_array_and_modify_context)
     check(fill_n(&array_bounded_map, size - i, i), CHECK_PASS);
 
     i = size;
-    hndl = array_wrap(&array_bounded_map, &i);
+    hndl = handle_wrap(&array_bounded_map, &i);
     hndl = and_modify_context(hndl, pluscontext, &context);
     check(occupied(hndl), false);
     check(count(&array_bounded_map).count, i + 1);
     (void)array_bounded_map_insert_or_assign_with(&array_bounded_map, i,
                                                   val(i));
     check(validate(&array_bounded_map), true);
-    hndl = array_wrap(&array_bounded_map, &i);
+    hndl = handle_wrap(&array_bounded_map, &i);
     hndl = and_modify_context(hndl, pluscontext, &context);
     v = array_bounded_map_at(&array_bounded_map, unwrap(hndl));
     check(v != NULL, true);
@@ -579,7 +579,7 @@ check_static_begin(array_bounded_map_test_array_and_modify_with)
                                        id_order, NULL, NULL, SMALL_FIXED_CAP);
     int size = 30;
     CCC_Array_bounded_map_handle *hndl
-        = array_wrap(&array_bounded_map, &(int){-1});
+        = handle_wrap(&array_bounded_map, &(int){-1});
     hndl = array_bounded_map_and_modify_with(hndl, struct Val, { T->val++; });
     check(count(&array_bounded_map).count, 0);
     check(occupied(hndl), false);
@@ -587,7 +587,7 @@ check_static_begin(array_bounded_map_test_array_and_modify_with)
     (void)array_bounded_map_insert_or_assign_with(&array_bounded_map, -1,
                                                   val(-1));
     check(validate(&array_bounded_map), true);
-    hndl = array_wrap(&array_bounded_map, &(int){-1});
+    hndl = handle_wrap(&array_bounded_map, &(int){-1});
     struct Val *v = array_bounded_map_at(&array_bounded_map, unwrap(hndl));
     check(v != NULL, true);
     check(v->val, -1);
@@ -603,14 +603,14 @@ check_static_begin(array_bounded_map_test_array_and_modify_with)
     check(fill_n(&array_bounded_map, size / 2, i), CHECK_PASS);
 
     i += (size / 2);
-    hndl = array_wrap(&array_bounded_map, &i);
+    hndl = handle_wrap(&array_bounded_map, &i);
     hndl = array_bounded_map_and_modify_with(hndl, struct Val, { T->val++; });
     check(occupied(hndl), false);
     check(count(&array_bounded_map).count, i + 1);
     (void)array_bounded_map_insert_or_assign_with(&array_bounded_map, i,
                                                   val(i));
     check(validate(&array_bounded_map), true);
-    hndl = array_wrap(&array_bounded_map, &i);
+    hndl = handle_wrap(&array_bounded_map, &i);
     hndl = array_bounded_map_and_modify_with(hndl, struct Val, { T->val++; });
     v = array_bounded_map_at(&array_bounded_map, unwrap(hndl));
     check(v != NULL, true);
@@ -622,14 +622,14 @@ check_static_begin(array_bounded_map_test_array_and_modify_with)
     check(fill_n(&array_bounded_map, size - i, i), CHECK_PASS);
 
     i = size;
-    hndl = array_wrap(&array_bounded_map, &i);
+    hndl = handle_wrap(&array_bounded_map, &i);
     hndl = array_bounded_map_and_modify_with(hndl, struct Val, { T->val++; });
     check(occupied(hndl), false);
     check(count(&array_bounded_map).count, i + 1);
     (void)array_bounded_map_insert_or_assign_with(&array_bounded_map, i,
                                                   val(i));
     check(validate(&array_bounded_map), true);
-    hndl = array_wrap(&array_bounded_map, &i);
+    hndl = handle_wrap(&array_bounded_map, &i);
     hndl = array_bounded_map_and_modify_with(hndl, struct Val, { T->val++; });
     v = array_bounded_map_at(&array_bounded_map, unwrap(hndl));
     check(v != NULL, true);
@@ -647,7 +647,7 @@ check_static_begin(array_bounded_map_test_or_insert)
     int size = 30;
     struct Val *v = array_bounded_map_at(
         &array_bounded_map,
-        or_insert(array_wrap(&array_bounded_map, &(int){-1}),
+        or_insert(handle_wrap(&array_bounded_map, &(int){-1}),
                   &(struct Val){.id = -1, .val = -1}));
     check(validate(&array_bounded_map), true);
     check(v != NULL, true);
@@ -656,7 +656,7 @@ check_static_begin(array_bounded_map_test_or_insert)
     check(count(&array_bounded_map).count, 1);
     v = array_bounded_map_at(
         &array_bounded_map,
-        or_insert(array_wrap(&array_bounded_map, &(int){-1}),
+        or_insert(handle_wrap(&array_bounded_map, &(int){-1}),
                   &(struct Val){.id = -1, .val = -2}));
     check(v != NULL, true);
     check(v->id, -1);
@@ -668,7 +668,7 @@ check_static_begin(array_bounded_map_test_or_insert)
 
     i += (size / 2);
     v = array_bounded_map_at(&array_bounded_map,
-                             or_insert(array_wrap(&array_bounded_map, &i),
+                             or_insert(handle_wrap(&array_bounded_map, &i),
                                        &(struct Val){.id = i, .val = i}));
     check(validate(&array_bounded_map), true);
     check(v != NULL, true);
@@ -676,7 +676,7 @@ check_static_begin(array_bounded_map_test_or_insert)
     check(v->val, i);
     check(count(&array_bounded_map).count, i + 2);
     v = array_bounded_map_at(&array_bounded_map,
-                             or_insert(array_wrap(&array_bounded_map, &i),
+                             or_insert(handle_wrap(&array_bounded_map, &i),
                                        &(struct Val){.id = i, .val = i + 1}));
     check(v != NULL, true);
     check(v->id, i);
@@ -688,7 +688,7 @@ check_static_begin(array_bounded_map_test_or_insert)
 
     i = size;
     v = array_bounded_map_at(&array_bounded_map,
-                             or_insert(array_wrap(&array_bounded_map, &i),
+                             or_insert(handle_wrap(&array_bounded_map, &i),
                                        &(struct Val){.id = i, .val = i}));
     check(validate(&array_bounded_map), true);
     check(v != NULL, true);
@@ -696,7 +696,7 @@ check_static_begin(array_bounded_map_test_or_insert)
     check(v->val, i);
     check(count(&array_bounded_map).count, i + 2);
     v = array_bounded_map_at(&array_bounded_map,
-                             or_insert(array_wrap(&array_bounded_map, &i),
+                             or_insert(handle_wrap(&array_bounded_map, &i),
                                        &(struct Val){.id = i, .val = i + 1}));
     check(v != NULL, true);
     check(v->id, i);
@@ -714,7 +714,7 @@ check_static_begin(array_bounded_map_test_or_insert_with)
     struct Val *v = array_bounded_map_at(
         &array_bounded_map,
         array_bounded_map_or_insert_with(
-            array_wrap(&array_bounded_map, &(int){-1}), idval(-1, -1)));
+            handle_wrap(&array_bounded_map, &(int){-1}), idval(-1, -1)));
     check(validate(&array_bounded_map), true);
     check(v != NULL, true);
     check(v->id, -1);
@@ -723,7 +723,7 @@ check_static_begin(array_bounded_map_test_or_insert_with)
     v = array_bounded_map_at(
         &array_bounded_map,
         array_bounded_map_or_insert_with(
-            array_wrap(&array_bounded_map, &(int){-1}), idval(-1, -2)));
+            handle_wrap(&array_bounded_map, &(int){-1}), idval(-1, -2)));
     check(v != NULL, true);
     check(v->id, -1);
     check(v->val, -1);
@@ -735,7 +735,7 @@ check_static_begin(array_bounded_map_test_or_insert_with)
     i += (size / 2);
     v = array_bounded_map_at(
         &array_bounded_map,
-        array_bounded_map_or_insert_with(array_wrap(&array_bounded_map, &i),
+        array_bounded_map_or_insert_with(handle_wrap(&array_bounded_map, &i),
                                          idval(i, i)));
     check(validate(&array_bounded_map), true);
     check(v != NULL, true);
@@ -744,7 +744,7 @@ check_static_begin(array_bounded_map_test_or_insert_with)
     check(count(&array_bounded_map).count, i + 2);
     v = array_bounded_map_at(
         &array_bounded_map,
-        array_bounded_map_or_insert_with(array_wrap(&array_bounded_map, &i),
+        array_bounded_map_or_insert_with(handle_wrap(&array_bounded_map, &i),
                                          idval(i, i + 1)));
     check(v != NULL, true);
     check(v->id, i);
@@ -757,7 +757,7 @@ check_static_begin(array_bounded_map_test_or_insert_with)
     i = size;
     v = array_bounded_map_at(
         &array_bounded_map,
-        array_bounded_map_or_insert_with(array_wrap(&array_bounded_map, &i),
+        array_bounded_map_or_insert_with(handle_wrap(&array_bounded_map, &i),
                                          idval(i, i)));
     check(validate(&array_bounded_map), true);
     check(v != NULL, true);
@@ -766,7 +766,7 @@ check_static_begin(array_bounded_map_test_or_insert_with)
     check(count(&array_bounded_map).count, i + 2);
     v = array_bounded_map_at(
         &array_bounded_map,
-        array_bounded_map_or_insert_with(array_wrap(&array_bounded_map, &i),
+        array_bounded_map_or_insert_with(handle_wrap(&array_bounded_map, &i),
                                          idval(i, i + 1)));
     check(v != NULL, true);
     check(v->id, i);
@@ -783,7 +783,7 @@ check_static_begin(array_bounded_map_test_insert_handle)
     int size = 30;
     struct Val *v = array_bounded_map_at(
         &array_bounded_map,
-        insert_handle(array_wrap(&array_bounded_map, &(int){-1}),
+        insert_handle(handle_wrap(&array_bounded_map, &(int){-1}),
                       &(struct Val){.id = -1, .val = -1}));
     check(validate(&array_bounded_map), true);
     check(v != NULL, true);
@@ -792,7 +792,7 @@ check_static_begin(array_bounded_map_test_insert_handle)
     check(count(&array_bounded_map).count, 1);
     v = array_bounded_map_at(
         &array_bounded_map,
-        insert_handle(array_wrap(&array_bounded_map, &(int){-1}),
+        insert_handle(handle_wrap(&array_bounded_map, &(int){-1}),
                       &(struct Val){.id = -1, .val = -2}));
     check(v != NULL, true);
     check(v->id, -1);
@@ -804,7 +804,7 @@ check_static_begin(array_bounded_map_test_insert_handle)
 
     i += (size / 2);
     v = array_bounded_map_at(&array_bounded_map,
-                             insert_handle(array_wrap(&array_bounded_map, &i),
+                             insert_handle(handle_wrap(&array_bounded_map, &i),
                                            &(struct Val){.id = i, .val = i}));
     check(validate(&array_bounded_map), true);
     check(v != NULL, true);
@@ -813,7 +813,7 @@ check_static_begin(array_bounded_map_test_insert_handle)
     check(count(&array_bounded_map).count, i + 2);
     v = array_bounded_map_at(
         &array_bounded_map,
-        insert_handle(array_wrap(&array_bounded_map, &i),
+        insert_handle(handle_wrap(&array_bounded_map, &i),
                       &(struct Val){.id = i, .val = i + 1}));
     check(v != NULL, true);
     check(v->id, i);
@@ -825,7 +825,7 @@ check_static_begin(array_bounded_map_test_insert_handle)
 
     i = size;
     v = array_bounded_map_at(&array_bounded_map,
-                             insert_handle(array_wrap(&array_bounded_map, &i),
+                             insert_handle(handle_wrap(&array_bounded_map, &i),
                                            &(struct Val){.id = i, .val = i}));
     check(validate(&array_bounded_map), true);
     check(v != NULL, true);
@@ -834,7 +834,7 @@ check_static_begin(array_bounded_map_test_insert_handle)
     check(count(&array_bounded_map).count, i + 2);
     v = array_bounded_map_at(
         &array_bounded_map,
-        insert_handle(array_wrap(&array_bounded_map, &i),
+        insert_handle(handle_wrap(&array_bounded_map, &i),
                       &(struct Val){.id = i, .val = i + 1}));
     check(v != NULL, true);
     check(v->id, i);
@@ -852,7 +852,7 @@ check_static_begin(array_bounded_map_test_insert_array_with)
     struct Val *v = array_bounded_map_at(
         &array_bounded_map,
         array_bounded_map_insert_array_with(
-            array_wrap(&array_bounded_map, &(int){-1}), idval(-1, -1)));
+            handle_wrap(&array_bounded_map, &(int){-1}), idval(-1, -1)));
     check(validate(&array_bounded_map), true);
     check(v != NULL, true);
     check(v->id, -1);
@@ -861,7 +861,7 @@ check_static_begin(array_bounded_map_test_insert_array_with)
     v = array_bounded_map_at(
         &array_bounded_map,
         array_bounded_map_insert_array_with(
-            array_wrap(&array_bounded_map, &(int){-1}), idval(-1, -2)));
+            handle_wrap(&array_bounded_map, &(int){-1}), idval(-1, -2)));
     check(v != NULL, true);
     check(v->id, -1);
     check(v->val, -2);
@@ -873,7 +873,7 @@ check_static_begin(array_bounded_map_test_insert_array_with)
     i += (size / 2);
     v = array_bounded_map_at(
         &array_bounded_map,
-        array_bounded_map_insert_array_with(array_wrap(&array_bounded_map, &i),
+        array_bounded_map_insert_array_with(handle_wrap(&array_bounded_map, &i),
                                             idval(i, i)));
     check(validate(&array_bounded_map), true);
     check(v != NULL, true);
@@ -882,7 +882,7 @@ check_static_begin(array_bounded_map_test_insert_array_with)
     check(count(&array_bounded_map).count, i + 2);
     v = array_bounded_map_at(
         &array_bounded_map,
-        array_bounded_map_insert_array_with(array_wrap(&array_bounded_map, &i),
+        array_bounded_map_insert_array_with(handle_wrap(&array_bounded_map, &i),
                                             idval(i, i + 1)));
     check(v != NULL, true);
     check(v->id, i);
@@ -895,7 +895,7 @@ check_static_begin(array_bounded_map_test_insert_array_with)
     i = size;
     v = array_bounded_map_at(
         &array_bounded_map,
-        array_bounded_map_insert_array_with(array_wrap(&array_bounded_map, &i),
+        array_bounded_map_insert_array_with(handle_wrap(&array_bounded_map, &i),
                                             idval(i, i)));
     check(validate(&array_bounded_map), true);
     check(v != NULL, true);
@@ -904,7 +904,7 @@ check_static_begin(array_bounded_map_test_insert_array_with)
     check(count(&array_bounded_map).count, i + 2);
     v = array_bounded_map_at(
         &array_bounded_map,
-        array_bounded_map_insert_array_with(array_wrap(&array_bounded_map, &i),
+        array_bounded_map_insert_array_with(handle_wrap(&array_bounded_map, &i),
                                             idval(i, i + 1)));
     check(v != NULL, true);
     check(v->id, i);
@@ -921,7 +921,7 @@ check_static_begin(array_bounded_map_test_remove_handle)
     int size = 30;
     struct Val *v = array_bounded_map_at(
         &array_bounded_map,
-        or_insert(array_wrap(&array_bounded_map, &(int){-1}),
+        or_insert(handle_wrap(&array_bounded_map, &(int){-1}),
                   &(struct Val){.id = -1, .val = -1}));
     check(validate(&array_bounded_map), true);
     check(v != NULL, true);
@@ -929,7 +929,7 @@ check_static_begin(array_bounded_map_test_remove_handle)
     check(v->val, -1);
     check(count(&array_bounded_map).count, 1);
     CCC_Handle *e
-        = remove_array_wrap(array_wrap(&array_bounded_map, &(int){-1}));
+        = remove_handle_wrap(handle_wrap(&array_bounded_map, &(int){-1}));
     check(validate(&array_bounded_map), true);
     check(occupied(e), true);
     v = array_bounded_map_at(&array_bounded_map, unwrap(e));
@@ -943,14 +943,14 @@ check_static_begin(array_bounded_map_test_remove_handle)
 
     i += (size / 2);
     v = array_bounded_map_at(&array_bounded_map,
-                             or_insert(array_wrap(&array_bounded_map, &i),
+                             or_insert(handle_wrap(&array_bounded_map, &i),
                                        &(struct Val){.id = i, .val = i}));
     check(validate(&array_bounded_map), true);
     check(v != NULL, true);
     check(v->id, i);
     check(v->val, i);
     check(count(&array_bounded_map).count, i + 1);
-    e = remove_array_wrap(array_wrap(&array_bounded_map, &i));
+    e = remove_handle_wrap(handle_wrap(&array_bounded_map, &i));
     check(validate(&array_bounded_map), true);
     check(occupied(e), true);
     v = array_bounded_map_at(&array_bounded_map, unwrap(e));
@@ -963,14 +963,14 @@ check_static_begin(array_bounded_map_test_remove_handle)
 
     i = size;
     v = array_bounded_map_at(&array_bounded_map,
-                             or_insert(array_wrap(&array_bounded_map, &i),
+                             or_insert(handle_wrap(&array_bounded_map, &i),
                                        &(struct Val){.id = i, .val = i}));
     check(validate(&array_bounded_map), true);
     check(v != NULL, true);
     check(v->id, i);
     check(v->val, i);
     check(count(&array_bounded_map).count, i + 1);
-    e = remove_array_wrap(array_wrap(&array_bounded_map, &i));
+    e = remove_handle_wrap(handle_wrap(&array_bounded_map, &i));
     check(validate(&array_bounded_map), true);
     check(occupied(e), true);
     v = array_bounded_map_at(&array_bounded_map, unwrap(e));
