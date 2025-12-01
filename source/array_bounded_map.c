@@ -94,16 +94,16 @@ a fixed map or heap allocation. */
 static Fixed_map_test_type const static_data_nodes_parity_layout_test;
 /** Some assumptions in the code assume that parity array is last so ensure that
 is the case here. Also good to assume user data comes first. */
-static_assert(((char *)static_data_nodes_parity_layout_test.data
-               < (char *)static_data_nodes_parity_layout_test.nodes),
+static_assert(((char const *)static_data_nodes_parity_layout_test.data
+               < (char const *)static_data_nodes_parity_layout_test.nodes),
               "The order of the arrays in a Struct of Arrays map is user data "
               "first, nodes second.");
-static_assert(((char *)static_data_nodes_parity_layout_test.nodes
-               < (char *)static_data_nodes_parity_layout_test.parity),
+static_assert(((char const *)static_data_nodes_parity_layout_test.nodes
+               < (char const *)static_data_nodes_parity_layout_test.parity),
               "The order of the arrays in a Struct of Arrays map is internal "
               "nodes second, parity third.");
-static_assert((char *)static_data_nodes_parity_layout_test.data
-                  < (char *)static_data_nodes_parity_layout_test.parity,
+static_assert((char const *)static_data_nodes_parity_layout_test.data
+                  < (char const *)static_data_nodes_parity_layout_test.parity,
               "The order of the arrays in a Struct of Arrays map is data, then "
               "nodes, then parity.");
 /** We don't care about the alignment or padding after the parity array because
@@ -112,9 +112,9 @@ important for the nodes and parity pointer to be set to the correct aligned
 positions and so that we allocate enough bytes for our single allocation if
 the map is dynamic and not a fixed type. */
 static_assert(
-    (char *)&static_data_nodes_parity_layout_test
+    (char const *)&static_data_nodes_parity_layout_test
                 .parity[CCC_private_array_bounded_map_blocks(TCAP)]
-            - (char *)&static_data_nodes_parity_layout_test.data[0]
+            - (char const *)&static_data_nodes_parity_layout_test.data[0]
         == roundup((sizeof(*static_data_nodes_parity_layout_test.data) * TCAP),
                    alignof(*static_data_nodes_parity_layout_test.nodes))
                + roundup((sizeof(*static_data_nodes_parity_layout_test.nodes)
@@ -126,16 +126,16 @@ static_assert(
     "of user data array must be the same as the total bytes we assume to be "
     "stored in that range. Alignment of user data must be considered.");
 static_assert(
-    (char *)&static_data_nodes_parity_layout_test.data
+    (char const *)&static_data_nodes_parity_layout_test.data
             + roundup((sizeof(*static_data_nodes_parity_layout_test.data)
                        * TCAP),
                       alignof(*static_data_nodes_parity_layout_test.nodes))
-        == (char *)&static_data_nodes_parity_layout_test.nodes,
+        == (char const *)&static_data_nodes_parity_layout_test.nodes,
     "The start of the nodes array must begin at the next aligned "
     "byte given alignment of a node.");
 static_assert(
-    (char *)&static_data_nodes_parity_layout_test.parity
-        == ((char *)&static_data_nodes_parity_layout_test.data
+    (char const *)&static_data_nodes_parity_layout_test.parity
+        == ((char const *)&static_data_nodes_parity_layout_test.data
             + roundup((sizeof(*static_data_nodes_parity_layout_test.data)
                        * TCAP),
                       alignof(*static_data_nodes_parity_layout_test.nodes))

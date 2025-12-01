@@ -67,8 +67,8 @@ correct regardless of backing storage as a fixed map or heap allocation. */
 static Fixed_map_test_type const static_data_nodes_layout_test;
 /** Some assumptions in the code assume that nodes array is last so ensure that
 is the case here. Also good to assume user data comes first. */
-static_assert((char *)static_data_nodes_layout_test.data
-                  < (char *)static_data_nodes_layout_test.nodes,
+static_assert((char const *)static_data_nodes_layout_test.data
+                  < (char const *)static_data_nodes_layout_test.nodes,
               "The order of the arrays in a Struct of Arrays map is data, then "
               "nodes.");
 /** We don't care about the alignment or padding after the nodes array because
@@ -77,19 +77,19 @@ important for the nodes pointer to be set to the correct aligned position and
 so that we allocate enough bytes for our single allocation if the map is dynamic
 and not a fixed type. */
 static_assert(
-    (char *)&static_data_nodes_layout_test.nodes[TCAP]
-            - (char *)&static_data_nodes_layout_test.data[0]
+    (char const *)&static_data_nodes_layout_test.nodes[TCAP]
+            - (char const *)&static_data_nodes_layout_test.data[0]
         == roundup((sizeof(*static_data_nodes_layout_test.data) * TCAP),
                    alignof(*static_data_nodes_layout_test.nodes))
                + (sizeof(*static_data_nodes_layout_test.nodes) * TCAP),
     "The pointer difference in bytes between end of the nodes array and start "
     "of user data array must be the same as the total bytes we assume to be "
     "stored in that range. Alignment of user data must be considered.");
-static_assert((char *)&static_data_nodes_layout_test.data
+static_assert((char const *)&static_data_nodes_layout_test.data
                       + roundup((sizeof(*static_data_nodes_layout_test.data)
                                  * TCAP),
                                 alignof(*static_data_nodes_layout_test.nodes))
-                  == (char *)&static_data_nodes_layout_test.nodes,
+                  == (char const *)&static_data_nodes_layout_test.nodes,
               "The start of the nodes array must begin at the next aligned "
               "byte given alignment of a node.");
 
