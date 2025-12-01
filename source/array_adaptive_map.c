@@ -125,13 +125,11 @@ enum
 
 /*==============================  Prototypes   ==============================*/
 
-/* Returning the internal elem type with stored offsets. */
 static size_t splay(struct CCC_Array_adaptive_map *, size_t, void const *,
                     CCC_Key_comparator *);
 static struct CCC_Array_adaptive_map_node *
 node_at(struct CCC_Array_adaptive_map const *, size_t);
 static void *data_at(struct CCC_Array_adaptive_map const *, size_t);
-/* Returning the user struct type with stored offsets. */
 static struct CCC_Array_adaptive_map_handle
 handle(struct CCC_Array_adaptive_map *, void const *);
 static size_t erase(struct CCC_Array_adaptive_map *, void const *);
@@ -154,12 +152,9 @@ static size_t total_bytes(size_t, size_t);
 static struct CCC_Handle_range equal_range(struct CCC_Array_adaptive_map *,
                                            void const *, void const *,
                                            enum Branch);
-/* Returning the user key with stored offsets. */
 static void *key_at(struct CCC_Array_adaptive_map const *, size_t);
-/* Returning threeway comparison with user callback. */
 static CCC_Order order_nodes(struct CCC_Array_adaptive_map const *,
                              void const *, size_t, CCC_Key_comparator *);
-/* Returning read only indices for tree nodes. */
 static size_t remove_from_tree(struct CCC_Array_adaptive_map *, size_t);
 static size_t min_max_from(struct CCC_Array_adaptive_map const *, size_t,
                            enum Branch);
@@ -167,14 +162,10 @@ static size_t next(struct CCC_Array_adaptive_map const *, size_t, enum Branch);
 static size_t branch_index(struct CCC_Array_adaptive_map const *, size_t,
                            enum Branch);
 static size_t parent_index(struct CCC_Array_adaptive_map const *, size_t);
-/* Returning references to index fields for tree nodes. */
 static size_t *branch_pointer(struct CCC_Array_adaptive_map const *, size_t,
                               enum Branch);
 static size_t *parent_pointer(struct CCC_Array_adaptive_map const *, size_t);
-
 static CCC_Tribool validate(struct CCC_Array_adaptive_map const *);
-
-/* Returning void as miscellaneous helpers. */
 static void init_node(struct CCC_Array_adaptive_map const *, size_t);
 static void swap(void *, void *, void *, size_t);
 static void link(struct CCC_Array_adaptive_map *, size_t, enum Branch, size_t);
