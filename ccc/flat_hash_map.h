@@ -795,7 +795,7 @@ any subsequent insertions or deletions invalidate this reference. */
 CCC_Entry CCC_flat_hash_map_try_insert(CCC_Flat_hash_map *map,
                                        void const *type);
 
-/** @brief Attempts to insert the key value wrapping key_val_handle_pointer.
+/** @brief Attempts to insert the key value wrapping key_val_array_pointer.
 @param[in] map_pointer the pointer to the flat hash map.
 @param[in] type_pointer the complete key and value type to be inserted.
 @return a compound literal reference to the entry. If Occupied, the entry
@@ -897,7 +897,7 @@ and wraps it in an entry to provide information about the old value. */
                                                  void *type_output);
 
 /** @brief Removes the key value in the map storing the old value, if present,
-in the struct containing out_handle_pointer provided by the user.
+in the struct containing out_array_pointer provided by the user.
 @param[in] map_pointer the pointer to the flat hash map.
 @param[out] type_output_pointer the complete key and value type to be
 removed

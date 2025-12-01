@@ -440,16 +440,16 @@ main(void)
 </details>
 
 <details>
-<summary>handle_adaptive_map.h (dropdown)</summary>
+<summary>array_adaptive_map.h (dropdown)</summary>
 An ordered map implemented in array with an index based self-optimizing tree. Offers handle stability. Handles remain valid until an element is removed from a table regardless of other insertions, other deletions, or resizing of the array.
 
 ```c
 #include <assert.h>
 #include <stdbool.h>
-#define HANDLE_ADAPTIVE_MAP_USING_NAMESPACE_CCC
+#define ARRAY_ADAPTIVE_MAP_USING_NAMESPACE_CCC
 #define TRAITS_USING_NAMESPACE_CCC
 #define TYPES_USING_NAMESPACE_CCC
-#include "ccc/handle_adaptive_map.h"
+#include "ccc/array_adaptive_map.h"
 #include "ccc/traits.h"
 
 struct Key_val
@@ -458,7 +458,7 @@ struct Key_val
     int val;
 };
 
-handle_adaptive_map_declare_fixed_map(Key_val_fixed_map, struct Key_val, 26);
+array_adaptive_map_declare_fixed_map(Key_val_fixed_map, struct Key_val, 26);
 
 static CCC_Order
 Key_val_cmp(CCC_Key_comparator_context const cmp)
@@ -474,14 +474,14 @@ main(void)
     /* stack array of 25 elements with one slot for sentinel, intrusive field
        named elem, key field named key, no allocation permission, key comparison
        function, no context data. */
-    Handle_adaptive_map s = handle_adaptive_map_initialize(
+    Array_adaptive_map s = array_adaptive_map_initialize(
         &(Key_val_fixed_map){},
         struct Key_val,
         key,
         Key_val_cmp,
         NULL,
         NULL,
-        handle_adaptive_map_fixed_capacity(Key_val_fixed_map)
+        array_adaptive_map_fixed_capacity(Key_val_fixed_map)
     );
     int const num_nodes = 25;
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
@@ -497,7 +497,7 @@ main(void)
     int index = 0;
     for (Handle_index i = range_begin(&r); i != range_end(&r); i = next(&s, i))
     {
-        struct Key_val const *const kv = handle_adaptive_map_at(&s, i);
+        struct Key_val const *const kv = array_adaptive_map_at(&s, i);
         assert(kv->key == range_keys[index]);
         ++index;
     }
@@ -510,7 +510,7 @@ main(void)
     for (Handle_index i = range_reverse_begin(&rr); i != range_reverse_end(&rr);
          i = reverse_next(&s, i))
     {
-        struct Key_val const *const kv = handle_adaptive_map_at(&s, i);
+        struct Key_val const *const kv = array_adaptive_map_at(&s, i);
         assert(kv->key == range_reverse_keys[index]);
         ++index;
     }
@@ -521,16 +521,16 @@ main(void)
 </details>
 
 <details>
-<summary>handle_bounded_map.h (dropdown)</summary>
+<summary>array_bounded_map.h (dropdown)</summary>
 An ordered map with strict runtime bounds implemented in an array with indices tracking the tree structure. Offers handle stability. Handles remain valid until an element is removed from a table regardless of other insertions, other deletions, or resizing of the array.
 
 ```c
 #include <assert.h>
 #include <stdbool.h>
-#define HANDLE_BOUNDED_MAP_USING_NAMESPACE_CCC
+#define ARRAY_BOUNDED_MAP_USING_NAMESPACE_CCC
 #define TRAITS_USING_NAMESPACE_CCC
 #define TYPES_USING_NAMESPACE_CCC
-#include "ccc/handle_bounded_map.h"
+#include "ccc/array_bounded_map.h"
 #include "ccc/traits.h"
 
 struct Key_val
@@ -538,7 +538,7 @@ struct Key_val
     int key;
     int val;
 };
-CCC_handle_bounded_map_declare_fixed_map(Key_val_fixed_map, struct Val, 64);
+CCC_array_bounded_map_declare_fixed_map(Key_val_fixed_map, struct Val, 64);
 
 static CCC_Order
 Key_val_cmp(CCC_Key_comparator_context const cmp)
@@ -553,14 +553,14 @@ main(void)
 {
     /* stack array, user defined type, key field named key, no allocation
        permission, key comparison function, no context data. */
-    Handle_bounded_map s = handle_bounded_map_initialize(
+    Array_bounded_map s = array_bounded_map_initialize(
         &(Key_val_fixed_map){},
         struct Val,
         key,
         hrmap_key_cmp,
         NULL,
         NULL,
-        handle_bounded_map_fixed_capacity(Key_val_fixed_map)
+        array_bounded_map_fixed_capacity(Key_val_fixed_map)
     );
     int const num_nodes = 25;
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
@@ -577,7 +577,7 @@ main(void)
     for (Handle_index i = range_begin(&r); i != range_end(&r);
          i = next(&s, &i->elem))
     {
-        struct Key_val const *const kv = handle_bounded_map_at(&s, i);
+        struct Key_val const *const kv = array_bounded_map_at(&s, i);
         assert(kv->key == range_keys[index]);
         ++index;
     }
@@ -590,7 +590,7 @@ main(void)
     for (Handle_index i = range_reverse_begin(&rr); i != range_reverse_end(&rr);
          i = reverse_next(&s, &i->elem))
     {
-        struct Key_val const *const kv = handle_bounded_map_at(&s, i);
+        struct Key_val const *const kv = array_bounded_map_at(&s, i);
         assert(kv->key == range_reverse_keys[index]);
         ++index;
     }
@@ -1091,7 +1091,7 @@ Other Rust Interface functions like `get_key_value`, `insert`, and `remove` are 
 
 Each container offers it's own C version of "closures" for the `and_modify_with`. Here is an example from the `samples/words.c` program.
 
-- `and_modify_with(handle_adaptive_map_entry_pointer, type_name, closure_over_T...)` - Run code in `closure_over_T` on the stored user type `T`.
+- `and_modify_with(array_adaptive_map_entry_pointer, type_name, closure_over_T...)` - Run code in `closure_over_T` on the stored user type `T`.
 
 ```c
 typedef struct
@@ -1101,8 +1101,8 @@ typedef struct
 } Word;
 /* Increment a found Word or insert a default count of 1. */
 CCC_Handle_index const h =
-handle_adaptive_map_or_insert_with(
-    handle_adaptive_map_and_modify_with(handle_wrap(&hom, &key_ofs), Word, { T->cnt++; }),
+array_adaptive_map_or_insert_with(
+    array_adaptive_map_and_modify_with(array_wrap(&hom, &key_ofs), Word, { T->cnt++; }),
     (Word){.ofs = ofs, .cnt = 1}
 );
 ```
@@ -1199,7 +1199,7 @@ typedef struct
 /* ... Elsewhere generate offset ofs as key. */
 Word default = {.ofs = ofs, .cnt = 1};
 CCC_Handle_index const h =
-    or_insert(and_modify(handle_wrap(&hom, &ofs), increment), &default);
+    or_insert(and_modify(array_wrap(&hom, &ofs), increment), &default);
 ```
 
 Or the following.
@@ -1213,9 +1213,9 @@ typedef struct
 } Word;
 /* ... Elsewhere generate offset ofs as key. */
 Word default = {.ofs = ofs, .cnt = 1};
-Handle_adaptive_map_handle *h = handle_wrap(&hom, &ofs);
+Array_adaptive_map_handle *h = array_wrap(&hom, &ofs);
 h = and_modify(h, increment)
-Word *w = handle_adaptive_map_at(&hom, or_insert(h, &default));
+Word *w = array_adaptive_map_at(&hom, or_insert(h, &default));
 ```
 
 Traits are completely opt-in by including the `traits.h` header.

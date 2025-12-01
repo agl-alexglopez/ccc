@@ -78,7 +78,7 @@ CCC_entry_unwrap(CCC_Entry const *const entry)
 }
 
 CCC_Tribool
-CCC_handle_occupied(CCC_Handle const *const handle)
+CCC_array_occupied(CCC_Handle const *const handle)
 {
     if (!handle)
     {
@@ -88,7 +88,7 @@ CCC_handle_occupied(CCC_Handle const *const handle)
 }
 
 CCC_Tribool
-CCC_handle_insert_error(CCC_Handle const *const handle)
+CCC_array_insert_error(CCC_Handle const *const handle)
 {
     if (!handle)
     {
@@ -98,7 +98,7 @@ CCC_handle_insert_error(CCC_Handle const *const handle)
 }
 
 CCC_Tribool
-CCC_handle_input_error(CCC_Handle const *const handle)
+CCC_array_input_error(CCC_Handle const *const handle)
 {
     if (!handle)
     {
@@ -108,7 +108,7 @@ CCC_handle_input_error(CCC_Handle const *const handle)
 }
 
 CCC_Handle_index
-CCC_handle_unwrap(CCC_Handle const *const handle)
+CCC_array_unwrap(CCC_Handle const *const handle)
 {
     if (!handle)
     {
@@ -143,25 +143,25 @@ CCC_range_reverse_end(CCC_Range_reverse const *const range)
 }
 
 CCC_Handle_index
-CCC_handle_range_begin(CCC_Handle_range const *const range)
+CCC_array_range_begin(CCC_Handle_range const *const range)
 {
     return range ? range->private.begin : 0;
 }
 
 CCC_Handle_index
-CCC_handle_range_end(CCC_Handle_range const *const range)
+CCC_array_range_end(CCC_Handle_range const *const range)
 {
     return range ? range->private.end : 0;
 }
 
 CCC_Handle_index
-CCC_handle_range_reverse_begin(CCC_Handle_range_reverse const *const range)
+CCC_array_range_reverse_begin(CCC_Handle_range_reverse const *const range)
 {
     return range ? range->private.reverse_begin : 0;
 }
 
 CCC_Handle_index
-CCC_handle_range_reverse_end(CCC_Handle_range_reverse const *const range)
+CCC_array_range_reverse_end(CCC_Handle_range_reverse const *const range)
 {
     return range ? range->private.reverse_end : 0;
 }

@@ -188,19 +188,19 @@ add_adaptive_map_test(test_adaptive_map_entry)
 add_adaptive_map_test(test_adaptive_map_lru)
 
 #############  Handle Map  ##########################
-add_library(handle_adaptive_map_utility handle_adaptive_map/handle_adaptive_map_utility.h handle_adaptive_map/handle_adaptive_map_utility.c)
-target_link_libraries(handle_adaptive_map_utility
+add_library(array_adaptive_map_utility array_adaptive_map/array_adaptive_map_utility.h array_adaptive_map/array_adaptive_map_utility.c)
+target_link_libraries(array_adaptive_map_utility
   PRIVATE
     ccc
     checkers
 )
-add_dependencies(tests handle_adaptive_map_utility)
+add_dependencies(tests array_adaptive_map_utility)
 
-macro(add_handle_adaptive_map_test TEST_NAME)
-  add_executable(${TEST_NAME} handle_adaptive_map/${TEST_NAME}.c)
+macro(add_array_adaptive_map_test TEST_NAME)
+  add_executable(${TEST_NAME} array_adaptive_map/${TEST_NAME}.c)
   target_link_libraries(${TEST_NAME}
     PRIVATE
-      handle_adaptive_map_utility
+      array_adaptive_map_utility
       ccc
       checkers
       allocate
@@ -214,12 +214,12 @@ macro(add_handle_adaptive_map_test TEST_NAME)
   add_dependencies(tests ${TEST_NAME})
 endmacro()
 
-add_handle_adaptive_map_test(test_handle_adaptive_map_construct)
-add_handle_adaptive_map_test(test_handle_adaptive_map_insert)
-add_handle_adaptive_map_test(test_handle_adaptive_map_erase)
-add_handle_adaptive_map_test(test_handle_adaptive_map_iterator)
-add_handle_adaptive_map_test(test_handle_adaptive_map_entry)
-add_handle_adaptive_map_test(test_handle_adaptive_map_lru)
+add_array_adaptive_map_test(test_array_adaptive_map_construct)
+add_array_adaptive_map_test(test_array_adaptive_map_insert)
+add_array_adaptive_map_test(test_array_adaptive_map_erase)
+add_array_adaptive_map_test(test_array_adaptive_map_iterator)
+add_array_adaptive_map_test(test_array_adaptive_map_handle)
+add_array_adaptive_map_test(test_array_adaptive_map_lru)
 
 #############  Realtime Map  ##########################
 add_library(bounded_map_utility bounded_map/bounded_map_utility.h bounded_map/bounded_map_utility.c)
@@ -256,19 +256,19 @@ add_bounded_map_test(test_bounded_map_entry)
 add_bounded_map_test(test_bounded_map_lru)
 
 #############  Handle Realtime Map  ##########################
-add_library(handle_bounded_map_utility handle_bounded_map/handle_bounded_map_utility.h handle_bounded_map/handle_bounded_map_utility.c)
-target_link_libraries(handle_bounded_map_utility
+add_library(array_bounded_map_utility array_bounded_map/array_bounded_map_utility.h array_bounded_map/array_bounded_map_utility.c)
+target_link_libraries(array_bounded_map_utility
   PRIVATE
     ccc
     checkers
 )
-add_dependencies(tests handle_bounded_map_utility)
+add_dependencies(tests array_bounded_map_utility)
 
-macro(add_handle_bounded_map_test TEST_NAME)
-  add_executable(${TEST_NAME} handle_bounded_map/${TEST_NAME}.c)
+macro(add_array_bounded_map_test TEST_NAME)
+  add_executable(${TEST_NAME} array_bounded_map/${TEST_NAME}.c)
   target_link_libraries(${TEST_NAME}
     PRIVATE
-      handle_bounded_map_utility
+      array_bounded_map_utility
       ccc
       checkers
       allocate
@@ -283,12 +283,12 @@ macro(add_handle_bounded_map_test TEST_NAME)
   add_dependencies(tests ${TEST_NAME})
 endmacro()
 
-add_handle_bounded_map_test(test_handle_bounded_map_construct)
-add_handle_bounded_map_test(test_handle_bounded_map_insert)
-add_handle_bounded_map_test(test_handle_bounded_map_erase)
-add_handle_bounded_map_test(test_handle_bounded_map_iterator)
-add_handle_bounded_map_test(test_handle_bounded_map_handle)
-add_handle_bounded_map_test(test_handle_bounded_map_lru)
+add_array_bounded_map_test(test_array_bounded_map_construct)
+add_array_bounded_map_test(test_array_bounded_map_insert)
+add_array_bounded_map_test(test_array_bounded_map_erase)
+add_array_bounded_map_test(test_array_bounded_map_iterator)
+add_array_bounded_map_test(test_array_bounded_map_handle)
+add_array_bounded_map_test(test_array_bounded_map_lru)
 
 #############  Flat Hash Map ##########################
 

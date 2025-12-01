@@ -433,7 +433,7 @@ void *CCC_entry_unwrap(CCC_Entry const *entry);
 /** @brief Determine if an handle is Occupied in the container.
 @param[in] handle the pointer to the handle obtained from a container.
 @return true if Occupied false if Vacant. Error if handle is NULL. */
-CCC_Tribool CCC_handle_occupied(CCC_Handle const *handle);
+CCC_Tribool CCC_array_occupied(CCC_Handle const *handle);
 
 /** @brief Determine if an insertion error has occurred when a function that
 attempts to insert a value in a container is used.
@@ -441,14 +441,14 @@ attempts to insert a value in a container is used.
 @return true if an insertion error occurred usually meaning a insertion should
 have occurred but the container did not have permission to allocate new memory
 or allocation failed. Error if handle is NULL. */
-CCC_Tribool CCC_handle_insert_error(CCC_Handle const *handle);
+CCC_Tribool CCC_array_insert_error(CCC_Handle const *handle);
 
 /** @brief Determine if an input error has occurred for a function that
 generates an handle.
 @param[in] handle the pointer to the handle obtained from a container function.
 @return true if an input error occurred usually meaning an invalid argument such
 as a NULL pointer was provided to a function. Error if handle is NULL. */
-CCC_Tribool CCC_handle_input_error(CCC_Handle const *handle);
+CCC_Tribool CCC_array_input_error(CCC_Handle const *handle);
 
 /** @brief Unwraps the provided handle providing a reference to the user type
 obtained from the operation that provides the handle.
@@ -460,7 +460,7 @@ The expected return value from unwrapping a value will change depending on the
 container from which the handle is obtained. Read the documentation for the
 container being used to understand what to expect from this function once an
 handle is obtained. */
-CCC_Handle_index CCC_handle_unwrap(CCC_Handle const *handle);
+CCC_Handle_index CCC_array_unwrap(CCC_Handle const *handle);
 
 /**@}*/
 
@@ -516,7 +516,7 @@ container in the provided range.
 the beginning of the range.
 
 Note the beginning of a range may be equivalent to the end or NULL. */
-CCC_Handle_index CCC_handle_range_begin(CCC_Handle_range const *range);
+CCC_Handle_index CCC_array_range_begin(CCC_Handle_range const *range);
 
 /** @brief Obtain a handle to the end user element stored in a
 container in the provided range.
@@ -527,7 +527,7 @@ the end of the range.
 Note the end of a range may be equivalent to the beginning or 0. Functions
 that obtain ranges treat the end as an exclusive bound and therefore it is
 undefined to access this element. */
-CCC_Handle_index CCC_handle_range_end(CCC_Handle_range const *range);
+CCC_Handle_index CCC_array_range_end(CCC_Handle_range const *range);
 
 /** @brief Obtain a handle to the reverse beginning user element stored in a
 container in the provided range.
@@ -538,7 +538,7 @@ the reverse beginning of the range.
 Note the reverse beginning of a range may be equivalent to the reverse end or
 0. */
 CCC_Handle_index
-CCC_handle_range_reverse_begin(CCC_Handle_range_reverse const *range);
+CCC_array_range_reverse_begin(CCC_Handle_range_reverse const *range);
 
 /** @brief Obtain a handle to the reverse end user element stored in a
 container in the provided range.
@@ -550,7 +550,7 @@ Note the reverse end of a range may be equivalent to the reverse beginning or
 0. Functions that obtain ranges treat the reverse end as an exclusive bound
 and therefore it is undefined to access this element. */
 CCC_Handle_index
-CCC_handle_range_reverse_end(CCC_Handle_range_reverse const *range);
+CCC_array_range_reverse_end(CCC_Handle_range_reverse const *range);
 
 /**@}*/
 
@@ -638,12 +638,12 @@ typedef CCC_Key_hasher Key_hasher;
 #    define entry_unwrap(entry_pointer) CCC_entry_unwrap(entry_pointer)
 #    define get_entry_status(entry_pointer) CCC_get_entry_status(entry_pointer)
 #    define entry_status_message(status) CCC_entry_status_message(status)
-#    define handle_occupied(handle_pointer) CCC_handle_occupied(handle_pointer)
-#    define handle_insert_error(handle_pointer)                                \
-        CCC_handle_insert_error(handle_pointer)
-#    define handle_unwrap(handle_pointer) CCC_handle_unwrap(handle_pointer)
-#    define get_handle_status(handle_pointer)                                  \
-        CCC_get_handle_status(handle_pointer)
+#    define array_occupied(array_pointer) CCC_array_occupied(array_pointer)
+#    define array_insert_error(array_pointer)                                  \
+        CCC_array_insert_error(array_pointer)
+#    define array_unwrap(array_pointer) CCC_array_unwrap(array_pointer)
+#    define get_handle_status(array_pointer)                                   \
+        CCC_get_handle_status(array_pointer)
 #    define handle_status_message(status) CCC_handle_status_message(status)
 #    ifndef range_begin
 #        define range_begin(range_pointer) CCC_range_begin(range_pointer)
@@ -659,14 +659,14 @@ typedef CCC_Key_hasher Key_hasher;
 #        define range_reverse_end(range_pointer)                               \
             CCC_range_reverse_end(range_pointer)
 #    endif
-#    define handle_range_begin(handle_range_pointer)                           \
-        CCC_handle_range_begin(handle_range_pointer)
-#    define handle_range_end(handle_range_pointer)                             \
-        CCC_handle_range_end(handle_range_pointer)
-#    define handle_range_reverse_begin(handle_range_pointer)                   \
-        CCC_handle_range_reverse_begin(handle_range_pointer)
-#    define handle_range_reverse_end(handle_range_pointer)                     \
-        CCC_handle_range_reverse_end(handle_range_pointer)
+#    define array_range_begin(array_range_pointer)                             \
+        CCC_array_range_begin(array_range_pointer)
+#    define array_range_end(array_range_pointer)                               \
+        CCC_array_range_end(array_range_pointer)
+#    define array_range_reverse_begin(array_range_pointer)                     \
+        CCC_array_range_reverse_begin(array_range_pointer)
+#    define array_range_reverse_end(array_range_pointer)                       \
+        CCC_array_range_reverse_end(array_range_pointer)
 #    define result_message(res) CCC_result_message(res)
 #endif /* TYPES_USING_NAMESPACE_CCC */
 

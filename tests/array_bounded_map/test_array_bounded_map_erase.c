@@ -4,21 +4,21 @@
 #include <string.h>
 #include <time.h>
 
-#define HANDLE_ADAPTIVE_MAP_USING_NAMESPACE_CCC
+#define ARRAY_BOUNDED_MAP_USING_NAMESPACE_CCC
 #define TRAITS_USING_NAMESPACE_CCC
 
+#include "array_bounded_map.h"
+#include "array_bounded_map_utility.h"
 #include "checkers.h"
-#include "handle_adaptive_map.h"
-#include "handle_adaptive_map_utility.h"
 #include "traits.h"
 #include "types.h"
 #include "utility/allocate.h"
 
-check_static_begin(handle_adaptive_map_test_insert_erase_shuffled)
+check_static_begin(array_bounded_map_test_insert_erase_shuffled)
 {
-    CCC_Handle_adaptive_map s
-        = handle_adaptive_map_initialize(&(Small_fixed_map){}, struct Val, id,
-                                         id_order, NULL, NULL, SMALL_FIXED_CAP);
+    CCC_Array_bounded_map s
+        = array_bounded_map_initialize(&(Small_fixed_map){}, struct Val, id,
+                                       id_order, NULL, NULL, SMALL_FIXED_CAP);
     size_t const size = 50;
     int const prime = 53;
     check(insert_shuffled(&s, size, prime), CHECK_PASS);
@@ -40,19 +40,18 @@ check_static_begin(handle_adaptive_map_test_insert_erase_shuffled)
     check_end();
 }
 
-check_static_begin(handle_adaptive_map_test_prime_shuffle)
+check_static_begin(array_bounded_map_test_prime_shuffle)
 {
-    CCC_Handle_adaptive_map s
-        = handle_adaptive_map_initialize(&(Small_fixed_map){}, struct Val, id,
-                                         id_order, NULL, NULL, SMALL_FIXED_CAP);
+    CCC_Array_bounded_map s
+        = array_bounded_map_initialize(&(Small_fixed_map){}, struct Val, id,
+                                       id_order, NULL, NULL, SMALL_FIXED_CAP);
     size_t const size = 50;
     size_t const prime = 53;
     size_t const less = 10;
     /* We want the tree to have a smattering of duplicates so
        reduce the shuffle range so it will repeat some values. */
     size_t shuffled_index = prime % (size - less);
-    bool repeats[50];
-    memset(repeats, false, sizeof(bool) * size);
+    bool repeats[50] = {};
     for (size_t i = 0; i < size; ++i)
     {
         if (occupied(
@@ -64,25 +63,25 @@ check_static_begin(handle_adaptive_map_test_prime_shuffle)
         check(validate(&s), true);
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
-    check(handle_adaptive_map_count(&s).count < size, true);
+    check(array_bounded_map_count(&s).count < size, true);
     for (size_t i = 0; i < size; ++i)
     {
-        CCC_Handle const *const e = remove_handle_wrap(handle_wrap(&s, &i));
+        CCC_Handle const *const e = remove_array_wrap(array_wrap(&s, &i));
         check(occupied(e) || repeats[i], true);
         check(validate(&s), true);
     }
     check_end();
 }
 
-check_static_begin(handle_adaptive_map_test_weak_srand)
+check_static_begin(array_bounded_map_test_weak_srand)
 {
-    CCC_Handle_adaptive_map s = handle_adaptive_map_initialize(
+    CCC_Array_bounded_map s = array_bounded_map_initialize(
         &(Standard_fixed_map){}, struct Val, id, id_order, NULL, NULL,
         STANDARD_FIXED_CAP);
     srand(time(NULL)); /* NOLINT */
-    int const num_nodes = 100;
-    int id_keys[100];
-    bool repeats[100] = {};
+    int const num_nodes = 1000;
+    int id_keys[1000];
+    bool repeats[1000] = {};
     for (int i = 0; i < num_nodes; ++i)
     {
         int const rand_i = rand(); /* NOLINT */
@@ -107,15 +106,15 @@ check_static_begin(handle_adaptive_map_test_weak_srand)
     check_end();
 }
 
-check_static_begin(handle_adaptive_map_test_insert_erase_cycles_no_allocate)
+check_static_begin(array_bounded_map_test_insert_erase_cycles_no_allocate)
 {
-    CCC_Handle_adaptive_map s = handle_adaptive_map_initialize(
+    CCC_Array_bounded_map s = array_bounded_map_initialize(
         &(Standard_fixed_map){}, struct Val, id, id_order, NULL, NULL,
         STANDARD_FIXED_CAP);
     srand(time(NULL)); /* NOLINT */
-    int const num_nodes = 100;
-    int id_keys[100];
-    bool repeats[100] = {};
+    int const num_nodes = 1000;
+    int id_keys[1000];
+    bool repeats[1000] = {};
     for (int i = 0; i < num_nodes; ++i)
     {
         int const rand_i = rand(); /* NOLINT */
@@ -151,19 +150,16 @@ check_static_begin(handle_adaptive_map_test_insert_erase_cycles_no_allocate)
     check_end();
 }
 
-/** Note that this test uses the standard library allocator because it is
-specifically important to see how the map handles inserting, finding, and
-removing the same keys across resizes. The resizing logic for handle based
-containers is non-trivial and must be tested. Don't replace with stack
-allocator, which does not allow resizing. */
-check_static_begin(handle_adaptive_map_test_insert_erase_cycles_allocate)
+/** Make sure this test uses standard library allocator. Resizing is important
+to test for handle maps. Stack allocator does not allow resizing. */
+check_static_begin(array_bounded_map_test_insert_erase_cycles_allocate)
 {
-    CCC_Handle_adaptive_map s = handle_adaptive_map_initialize(
+    CCC_Array_bounded_map s = array_bounded_map_initialize(
         NULL, struct Val, id, id_order, std_allocate, NULL, 0);
     srand(time(NULL)); /* NOLINT */
-    int const num_nodes = 100;
-    int id_keys[100];
-    bool repeats[100] = {};
+    int const num_nodes = 1000;
+    int id_keys[1000];
+    bool repeats[1000] = {};
     for (int i = 0; i < num_nodes; ++i)
     {
         int const rand_i = rand(); /* NOLINT */
@@ -196,15 +192,15 @@ check_static_begin(handle_adaptive_map_test_insert_erase_cycles_allocate)
         check(validate(&s), true);
     }
     check(is_empty(&s), true);
-    check_end(handle_adaptive_map_clear_and_free(&s, NULL););
+    check_end(array_bounded_map_clear_and_free(&s, NULL););
 }
 
 int
 main()
 {
-    return check_run(handle_adaptive_map_test_insert_erase_shuffled(),
-                     handle_adaptive_map_test_prime_shuffle(),
-                     handle_adaptive_map_test_weak_srand(),
-                     handle_adaptive_map_test_insert_erase_cycles_no_allocate(),
-                     handle_adaptive_map_test_insert_erase_cycles_allocate());
+    return check_run(array_bounded_map_test_insert_erase_shuffled(),
+                     array_bounded_map_test_prime_shuffle(),
+                     array_bounded_map_test_weak_srand(),
+                     array_bounded_map_test_insert_erase_cycles_no_allocate(),
+                     array_bounded_map_test_insert_erase_cycles_allocate());
 }

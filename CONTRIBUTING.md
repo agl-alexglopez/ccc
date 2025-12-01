@@ -271,7 +271,7 @@ Other containers may do the same or be able to avoid pushing this space requirem
 For the equivalent handle version of this container the space requirement is handled internally.
 
 ```c
-[[nodiscard]] ccc_handle ccc_hom_swap_handle(ccc_handle_ordered_map *hom,
+[[nodiscard]] ccc_handle ccc_hom_swap_handle(ccc_array_ordered_map *hom,
                                              void *key_val_output);
 ```
 

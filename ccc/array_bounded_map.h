@@ -47,18 +47,18 @@ To shorten names in the interface, define the following preprocessor directive
 at the top of your file.
 
 ```
-#define HANDLE_BOUNDED_MAP_USING_NAMESPACE_CCC
+#define ARRAY_BOUNDED_MAP_USING_NAMESPACE_CCC
 ```
 
 All types and functions can then be written without the `CCC_` prefix. */
-#ifndef CCC_HANDLE_BOUNDED_MAP_H
-#define CCC_HANDLE_BOUNDED_MAP_H
+#ifndef CCC_ARRAY_BOUNDED_MAP_H
+#define CCC_ARRAY_BOUNDED_MAP_H
 
 /** @cond */
 #include <stddef.h>
 /** @endcond */
 
-#include "private/private_handle_bounded_map.h"
+#include "private/private_array_bounded_map.h"
 #include "types.h"
 
 /** @name Container Types
@@ -71,7 +71,7 @@ amortized O(lg N) insert.
 
 A handle bounded map can be initialized on the stack, heap, or data
 segment at runtime or compile time.*/
-typedef struct CCC_Handle_bounded_map CCC_Handle_bounded_map;
+typedef struct CCC_Array_bounded_map CCC_Array_bounded_map;
 
 /** @brief A container specific handle used to implement the Handle Interface.
 @warning it is undefined behavior to access an uninitialized container.
@@ -81,7 +81,7 @@ or value update based on the needs of the user. Handles obtained via the Handle
 Interface are stable until the user removes the element at the provided handle.
 Insertions and deletions of other elements do not affect handle stability.
 Resizing of the table does not affect handle stability. */
-typedef union CCC_Handle_bounded_map_handle_wrap CCC_Handle_bounded_map_handle;
+typedef union CCC_Array_bounded_map_array_wrap CCC_Array_bounded_map_handle;
 
 /**@}*/
 
@@ -109,16 +109,16 @@ struct Val
     int key;
     int val;
 };
-CCC_handle_bounded_map_declare_fixed_map(Small_fixed_map, struct Val,
+CCC_array_bounded_map_declare_fixed_map(Small_fixed_map, struct Val,
 64); static map static_map =
-handle_bounded_map_initialize(
+array_bounded_map_initialize(
     &(static Small_fixed_map){},
     struct Val,
     key,
-    handle_bounded_map_key_order,
+    array_bounded_map_key_order,
     NULL,
     NULL,
-    handle_bounded_map_fixed_capacity(Small_fixed_map)
+    array_bounded_map_fixed_capacity(Small_fixed_map)
 );
 ```
 
@@ -130,42 +130,42 @@ struct Val
     int key;
     int val;
 };
-CCC_handle_bounded_map_declare_fixed_map(Small_fixed_map, struct Val,
+CCC_array_bounded_map_declare_fixed_map(Small_fixed_map, struct Val,
 64); int main(void)
 {
     map static_map =
-handle_bounded_map_initialize(
+array_bounded_map_initialize(
         &(Small_fixed_map){},
         struct Val,
         key,
-        handle_bounded_map_key_order,
+        array_bounded_map_key_order,
         NULL,
         NULL,
-        handle_bounded_map_fixed_capacity(Small_fixed_map)
+        array_bounded_map_fixed_capacity(Small_fixed_map)
     );
     return 0;
 }
 ```
 
-The CCC_handle_bounded_map_fixed_capacity macro can be used to obtain
+The CCC_array_bounded_map_fixed_capacity macro can be used to obtain
 the previously provided capacity when declaring the fixed map type. Finally, one
 could allocate a fixed size map on the heap; however, it is usually better to
-initialize a dynamic map and use the CCC_handle_bounded_map_reserve
+initialize a dynamic map and use the CCC_array_bounded_map_reserve
 function for such a use case.
 
 This macro is not needed when a dynamic resizing map is needed. For dynamic
 maps, simply pass NULL and 0 capacity to the initialization macro along with the
 desired allocation function. */
-#define CCC_handle_bounded_map_declare_fixed_map(fixed_map_type_name,          \
-                                                 type_name, capacity)          \
-    CCC_private_handle_bounded_map_declare_fixed_map(fixed_map_type_name,      \
-                                                     type_name, capacity)
+#define CCC_array_bounded_map_declare_fixed_map(fixed_map_type_name,           \
+                                                type_name, capacity)           \
+    CCC_private_array_bounded_map_declare_fixed_map(fixed_map_type_name,       \
+                                                    type_name, capacity)
 
 /** @brief Obtain the capacity previously chosen for the fixed size map type.
 @param[in] fixed_map_type_name the name of a previously declared map.
 @return the size_t capacity previously specified for this type by user. */
-#define CCC_handle_bounded_map_fixed_capacity(fixed_map_type_name)             \
-    CCC_private_handle_bounded_map_fixed_capacity(fixed_map_type_name)
+#define CCC_array_bounded_map_fixed_capacity(fixed_map_type_name)              \
+    CCC_private_array_bounded_map_fixed_capacity(fixed_map_type_name)
 
 /** @brief Initializes the map at runtime or compile time.
 @param[in] memory_pointer a pointer to the contiguous user types or ((T
@@ -178,14 +178,14 @@ desired allocation function. */
 destruction.
 @param[in] capacity the capacity at data_pointer or 0.
 @return the struct initialized bounded map for direct assignment
-(i.e. CCC_Handle_bounded_map m =
-CCC_handle_bounded_map_initialize(...);). */
-#define CCC_handle_bounded_map_initialize(memory_pointer, type_name,           \
-                                          type_key_field, compare, allocate,   \
-                                          context_data, capacity)              \
-    CCC_private_handle_bounded_map_initialize(                                 \
-        memory_pointer, type_name, type_key_field, compare, allocate,          \
-        context_data, capacity)
+(i.e. CCC_Array_bounded_map m =
+CCC_array_bounded_map_initialize(...);). */
+#define CCC_array_bounded_map_initialize(memory_pointer, type_name,            \
+                                         type_key_field, compare, allocate,    \
+                                         context_data, capacity)               \
+    CCC_private_array_bounded_map_initialize(memory_pointer, type_name,        \
+                                             type_key_field, compare,          \
+                                             allocate, context_data, capacity)
 
 /** @brief Initialize a dynamic map at runtime from an initializer list.
 @param[in] type_key_field the field of the struct used for key storage.
@@ -203,7 +203,7 @@ size of the underlying reservation.
 intended to be stored in the map, using array compound literal initialization
 syntax (e.g `(struct my_type[]){{.k = 0, .v 0}, {.k = 1, .v = 1}}`).
 @return the  map directly initialized on the right hand side of the equality
-operator (i.e. CCC_Handle_bounded_map map = CCC_handle_bounded_map_from(...);)
+operator (i.e. CCC_Array_bounded_map map = CCC_array_bounded_map_from(...);)
 @warning An allocation function is required. This initializer is only available
 for dynamic maps.
 @warning When duplicate keys appear in the initializer list, the last occurrence
@@ -216,7 +216,7 @@ Initialize a dynamic map at run time. This example requires no context data for
 initialization.
 
 ```
-#define HANDLE_BOUNDED_MAP_USING_NAMESPACE_CCC
+#define ARRAY_BOUNDED_MAP_USING_NAMESPACE_CCC
 struct Val
 {
     int key;
@@ -225,9 +225,9 @@ struct Val
 int
 main(void)
 {
-    Handle_bounded_map static_map = handle_bounded_map_from(
+    Array_bounded_map static_map = array_bounded_map_from(
         key,
-        handle_bounded_map_key_order,
+        array_bounded_map_key_order,
         std_allocate,
         NULL,
         0,
@@ -243,12 +243,12 @@ main(void)
 
 Only dynamic maps may be initialized this way due the inability of the map
 map to protect its invariants from user error at compile time. */
-#define CCC_handle_bounded_map_from(type_key_field, compare, allocate,         \
-                                    context_data, optional_capacity,           \
-                                    type_compound_literal_array...)            \
-    CCC_private_handle_bounded_map_from(type_key_field, compare, allocate,     \
-                                        context_data, optional_capacity,       \
-                                        type_compound_literal_array)
+#define CCC_array_bounded_map_from(type_key_field, compare, allocate,          \
+                                   context_data, optional_capacity,            \
+                                   type_compound_literal_array...)             \
+    CCC_private_array_bounded_map_from(type_key_field, compare, allocate,      \
+                                       context_data, optional_capacity,        \
+                                       type_compound_literal_array)
 
 /** @brief Initialize a dynamic map at runtime with at least the specified
 capacity.
@@ -260,8 +260,8 @@ capacity.
 @param[in] capacity the desired capacity for the map. A capacity of 0 results
 in an argument error and is a no-op after the map is initialized empty.
 @return the map directly initialized on the right hand side of the equality
-operator (i.e. CCC_Handle_bounded_map map =
-CCC_handle_bounded_map_with_capacity(...);)
+operator (i.e. CCC_Array_bounded_map map =
+CCC_array_bounded_map_with_capacity(...);)
 @warning An allocation function is required. This initializer is only available
 for dynamic maps.
 @warning If initialization fails all subsequent queries, insertions, or
@@ -272,7 +272,7 @@ Initialize a dynamic map at run time. This example requires no context
 data for initialization.
 
 ```
-#define HANDLE_BOUNDED_MAP_USING_NAMESPACE_CCC
+#define ARRAY_BOUNDED_MAP_USING_NAMESPACE_CCC
 struct Val
 {
     int key;
@@ -281,10 +281,10 @@ struct Val
 int
 main(void)
 {
-    Handle_bounded_map map = handle_bounded_map_with_capacity(
+    Array_bounded_map map = array_bounded_map_with_capacity(
         struct Val,
         key,
-        handle_bounded_map_key_order,
+        array_bounded_map_key_order,
         std_allocate,
         NULL,
         4096
@@ -295,9 +295,9 @@ main(void)
 
 Only dynamic maps may be initialized this way as it simply combines the steps
 of initialization and reservation. */
-#define CCC_handle_bounded_map_with_capacity(                                  \
+#define CCC_array_bounded_map_with_capacity(                                   \
     type_name, type_key_field, compare, allocate, context_data, capacity)      \
-    CCC_private_handle_bounded_map_with_capacity(                              \
+    CCC_private_array_bounded_map_with_capacity(                               \
         type_name, type_key_field, compare, allocate, context_data, capacity)
 
 /** @brief Copy the map at source to destination.
@@ -320,47 +320,47 @@ care of allocation for the copy.
 Manual memory management with no allocation function provided.
 
 ```
-#define HANDLE_BOUNDED_MAP_USING_NAMESPACE_CCC
+#define ARRAY_BOUNDED_MAP_USING_NAMESPACE_CCC
 struct Val
 {
     int key;
     int val;
 };
-CCC_handle_bounded_map_declare_fixed_map(Small_fixed_map, struct Val,
+CCC_array_bounded_map_declare_fixed_map(Small_fixed_map, struct Val,
 64); static map source =
-handle_bounded_map_initialize(
+array_bounded_map_initialize(
     &(static Small_fixed_map){},
     struct Val,
     key,
-    handle_bounded_map_key_order,
+    array_bounded_map_key_order,
     NULL,
     NULL,
-    handle_bounded_map_fixed_capacity(Small_fixed_map)
+    array_bounded_map_fixed_capacity(Small_fixed_map)
 );
 insert_rand_vals(&source);
-static map destination = handle_bounded_map_initialize(
+static map destination = array_bounded_map_initialize(
     &(static Small_fixed_map){},
     struct Val,
     key,
-    handle_bounded_map_key_order,
+    array_bounded_map_key_order,
     NULL,
     NULL,
-    handle_bounded_map_fixed_capacity(Small_fixed_map)
+    array_bounded_map_fixed_capacity(Small_fixed_map)
 );
-CCC_Result res = handle_bounded_map_copy(&destination, &source, NULL);
+CCC_Result res = array_bounded_map_copy(&destination, &source, NULL);
 ```
 
 The above requires destination capacity be greater than or equal to source
 capacity. Here is memory management handed over to the copy function.
 
 ```
-#define HANDLE_BOUNDED_MAP_USING_NAMESPACE_CCC
+#define ARRAY_BOUNDED_MAP_USING_NAMESPACE_CCC
 struct Val
 {
     int key;
     int val;
 };
-static Handle_adaptive_map source = handle_bounded_map_initialize(
+static Array_adaptive_map source = array_bounded_map_initialize(
     NULL,
     struct Val,
     key,
@@ -370,7 +370,7 @@ static Handle_adaptive_map source = handle_bounded_map_initialize(
     0
 );
 insert_rand_vals(&source);
-static Handle_adaptive_map destination = handle_bounded_map_initialize(
+static Array_adaptive_map destination = array_bounded_map_initialize(
     NULL,
     struct Val,
     key,
@@ -379,7 +379,7 @@ static Handle_adaptive_map destination = handle_bounded_map_initialize(
     NULL,
     0
 );
-CCC_Result res = handle_bounded_map_copy(&destination, &source, std_allocate);
+CCC_Result res = array_bounded_map_copy(&destination, &source, std_allocate);
 ```
 
 The above allows destination to have a capacity less than that of the source as
@@ -388,13 +388,13 @@ Note that this would still work if copying to a destination that the user wants
 as a fixed size map.
 
 ```
-#define HANDLE_BOUNDED_MAP_USING_NAMESPACE_CCC
+#define ARRAY_BOUNDED_MAP_USING_NAMESPACE_CCC
 struct Val
 {
     int key;
     int val;
 };
-static Handle_adaptive_map source = handle_bounded_map_initialize(
+static Array_adaptive_map source = array_bounded_map_initialize(
     NULL,
     struct Val,
     key,
@@ -404,7 +404,7 @@ static Handle_adaptive_map source = handle_bounded_map_initialize(
     0
 );
 insert_rand_vals(&source);
-static Handle_adaptive_map destination = handle_bounded_map_initialize(
+static Array_adaptive_map destination = array_bounded_map_initialize(
     NULL,
     struct Val,
     key,
@@ -413,7 +413,7 @@ static Handle_adaptive_map destination = handle_bounded_map_initialize(
     NULL,
     0
 );
-CCC_Result res = handle_bounded_map_copy(&destination, &source, std_allocate);
+CCC_Result res = array_bounded_map_copy(&destination, &source, std_allocate);
 ```
 
 The above sets up destination with fixed size while source is a dynamic map.
@@ -426,9 +426,9 @@ permission.
 
 These options allow users to stay consistent across containers with their
 memory management strategies. */
-CCC_Result CCC_handle_bounded_map_copy(CCC_Handle_bounded_map *destination,
-                                       CCC_Handle_bounded_map const *source,
-                                       CCC_Allocator *allocate);
+CCC_Result CCC_array_bounded_map_copy(CCC_Array_bounded_map *destination,
+                                      CCC_Array_bounded_map const *source,
+                                      CCC_Allocator *allocate);
 
 /** @brief Reserves space for at least to_add more elements.
 @param[in] map a pointer to the handle bounded map.
@@ -436,7 +436,7 @@ CCC_Result CCC_handle_bounded_map_copy(CCC_Handle_bounded_map *destination,
 @param[in] allocate the allocation function to use to reserve memory.
 @return the result of the reservation. OK if successful, otherwise an error
 status is returned.
-@note see the CCC_handle_bounded_map_clear_and_free_reserve function if
+@note see the CCC_array_bounded_map_clear_and_free_reserve function if
 this function is being used for a one-time dynamic reservation.
 
 This function can be used for a dynamic map with or
@@ -448,10 +448,10 @@ If the map has been initialized with no allocation
 permission and no memory this function can serve as a one-time reservation. This
 is helpful when a fixed size is needed but that size is only known dynamically
 at runtime. To free the map in such a case see the
-CCC_handle_bounded_map_clear_and_free_reserve function. */
-CCC_Result CCC_handle_bounded_map_reserve(CCC_Handle_bounded_map *map,
-                                          size_t to_add,
-                                          CCC_Allocator *allocate);
+CCC_array_bounded_map_clear_and_free_reserve function. */
+CCC_Result CCC_array_bounded_map_reserve(CCC_Array_bounded_map *map,
+                                         size_t to_add,
+                                         CCC_Allocator *allocate);
 
 /**@}*/
 
@@ -470,36 +470,36 @@ one has been removed that new element data will be returned.
 @warning do not try to access data in the table manually with a handle. Always
 use this provided interface function when a reference to data is needed. */
 [[nodiscard]] void *
-CCC_handle_bounded_map_at(CCC_Handle_bounded_map const *handle,
-                          CCC_Handle_index index);
+CCC_array_bounded_map_at(CCC_Array_bounded_map const *handle,
+                         CCC_Handle_index index);
 
 /** @brief Returns a reference to the user type in the table at the handle.
-@param[in] handle_bounded_map_pointer a pointer to the map.
+@param[in] array_bounded_map_pointer a pointer to the map.
 @param[in] type_name name of the user type stored in each slot of the map.
-@param[in] handle_index the index handle obtained from previous map operations.
+@param[in] array_index the index handle obtained from previous map operations.
 @return a reference to the handle at handle in the map as the type the user has
 stored in the map. */
-#define CCC_handle_bounded_map_as(handle_bounded_map_pointer, type_name,       \
-                                  handle_index...)                             \
-    CCC_private_handle_bounded_map_as(handle_bounded_map_pointer, type_name,   \
-                                      handle_index)
+#define CCC_array_bounded_map_as(array_bounded_map_pointer, type_name,         \
+                                 array_index...)                               \
+    CCC_private_array_bounded_map_as(array_bounded_map_pointer, type_name,     \
+                                     array_index)
 
 /** @brief Searches the map for the presence of key.
 @param[in] map the map to be searched.
 @param[in] key pointer to the key matching the key type of the user struct.
 @return true if the struct containing key is stored, false if not. Error if
-handle_bounded_map or key is NULL. */
+array_bounded_map or key is NULL. */
 [[nodiscard]] CCC_Tribool
-CCC_handle_bounded_map_contains(CCC_Handle_bounded_map const *map,
-                                void const *key);
+CCC_array_bounded_map_contains(CCC_Array_bounded_map const *map,
+                               void const *key);
 
 /** @brief Returns a reference into the map at handle key.
 @param[in] map the bounded map to search.
 @param[in] key the key to search matching stored key type.
 @return a view of the map handle if it is present, else NULL. */
 [[nodiscard]] CCC_Handle_index
-CCC_handle_bounded_map_get_key_value(CCC_Handle_bounded_map const *map,
-                                     void const *key);
+CCC_array_bounded_map_get_key_value(CCC_Array_bounded_map const *map,
+                                    void const *key);
 
 /**@}*/
 
@@ -518,11 +518,11 @@ but allocation fails or has been forbidden, an insert error is set.
 
 Note that this function may write to the provided user type struct. */
 [[nodiscard]] CCC_Handle
-CCC_handle_bounded_map_swap_handle(CCC_Handle_bounded_map *map,
-                                   void *type_output);
+CCC_array_bounded_map_swap_handle(CCC_Array_bounded_map *map,
+                                  void *type_output);
 
 /** @brief Invariantly inserts the key value in type_output_pointer.
-@param[in] handle_bounded_map_pointer the pointer to the bounded map.
+@param[in] array_bounded_map_pointer the pointer to the bounded map.
 @param[out] type_output_pointer type user type map elem.
 @return a compound literal reference to a type element in the table. If
 Vacant, no prior element with key existed and the type key value type
@@ -531,12 +531,12 @@ key value type. If more space is needed but allocation fails or has been
 forbidden, an insert error is set.
 
 Note that this function may write to the provided user type struct. */
-#define CCC_handle_bounded_map_swap_handle_wrap(handle_bounded_map_pointer,    \
-                                                type_output_pointer)           \
+#define CCC_array_bounded_map_swap_array_wrap(array_bounded_map_pointer,       \
+                                              type_output_pointer)             \
     &(CCC_Handle)                                                              \
     {                                                                          \
-        CCC_handle_bounded_map_swap_handle((handle_bounded_map_pointer),       \
-                                           (type_output_pointer))              \
+        CCC_array_bounded_map_swap_handle((array_bounded_map_pointer),         \
+                                          (type_output_pointer))               \
             .private                                                           \
     }
 
@@ -548,28 +548,27 @@ user type in the map and may be unwrapped. If Vacant the handle contains a
 reference to the newly inserted handle in the map. If more space is needed but
 allocation fails, an insert error is set. */
 [[nodiscard]] CCC_Handle
-CCC_handle_bounded_map_try_insert(CCC_Handle_bounded_map *map,
-                                  void const *type);
+CCC_array_bounded_map_try_insert(CCC_Array_bounded_map *map, void const *type);
 
 /** @brief Attempts to insert the key value type_pointer.
-@param[in] handle_bounded_map_pointer the pointer to the map.
+@param[in] array_bounded_map_pointer the pointer to the map.
 @param[in] type_pointer the type user type map elem.
 @return a compound literal reference to a handle. If Occupied, the handle
 contains a reference to the key value user type in the map and may be unwrapped.
 If Vacant the handle contains a reference to the newly inserted handle in the
 map. If more space is needed but allocation fails an insert error is set. */
-#define CCC_handle_bounded_map_try_insert_wrap(handle_bounded_map_pointer,     \
-                                               type_pointer)                   \
+#define CCC_array_bounded_map_try_insert_wrap(array_bounded_map_pointer,       \
+                                              type_pointer)                    \
     &(CCC_Handle)                                                              \
     {                                                                          \
-        CCC_handle_bounded_map_try_insert((handle_bounded_map_pointer),        \
-                                          (type_pointer))                      \
+        CCC_array_bounded_map_try_insert((array_bounded_map_pointer),          \
+                                         (type_pointer))                       \
             .private                                                           \
     }
 
 /** @brief lazily insert type_compound_literal into the map at key if key is
 absent.
-@param[in] handle_bounded_map_pointer a pointer to the map.
+@param[in] array_bounded_map_pointer a pointer to the map.
 @param[in] key the direct key r-value.
 @param[in] type_compound_literal the compound literal specifying the value.
 @return a compound literal reference to the handle of the existing or newly
@@ -580,12 +579,12 @@ occurs that prevents insertion. An insertion error will flag such a case.
 Note that for brevity and convenience the user need not write the key to the
 lazy value compound literal as well. This function ensures the key in the
 compound literal matches the searched key. */
-#define CCC_handle_bounded_map_try_insert_with(handle_bounded_map_pointer,     \
-                                               key, type_compound_literal...)  \
+#define CCC_array_bounded_map_try_insert_with(array_bounded_map_pointer, key,  \
+                                              type_compound_literal...)        \
     &(CCC_Handle)                                                              \
     {                                                                          \
-        CCC_private_handle_bounded_map_try_insert_with(                        \
-            handle_bounded_map_pointer, key, type_compound_literal)            \
+        CCC_private_array_bounded_map_try_insert_with(                         \
+            array_bounded_map_pointer, key, type_compound_literal)             \
     }
 
 /** @brief Invariantly inserts or overwrites a user struct into the map.
@@ -597,11 +596,11 @@ If Vacant no prior map handle existed.
 Note that this function can be used when the old user type is not needed but
 the information regarding its presence is helpful. */
 [[nodiscard]] CCC_Handle
-CCC_handle_bounded_map_insert_or_assign(CCC_Handle_bounded_map *map,
-                                        void const *type);
+CCC_array_bounded_map_insert_or_assign(CCC_Array_bounded_map *map,
+                                       void const *type);
 
 /** @brief Inserts a new key value pair or overwrites the existing handle.
-@param[in] handle_bounded_map_pointer the pointer to the handle hash map.
+@param[in] array_bounded_map_pointer the pointer to the handle hash map.
 @param[in] key the key to be searched in the map.
 @param[in] type_compound_literal the compound literal to insert or use for
 overwrite.
@@ -613,12 +612,12 @@ occurs that prevents insertion. An insertion error will flag such a case.
 Note that for brevity and convenience the user need not write the key to the
 lazy value compound literal as well. This function ensures the key in the
 compound literal matches the searched key. */
-#define CCC_handle_bounded_map_insert_or_assign_with(                          \
-    handle_bounded_map_pointer, key, type_compound_literal...)                 \
+#define CCC_array_bounded_map_insert_or_assign_with(                           \
+    array_bounded_map_pointer, key, type_compound_literal...)                  \
     &(CCC_Handle)                                                              \
     {                                                                          \
-        CCC_private_handle_bounded_map_insert_or_assign_with(                  \
-            handle_bounded_map_pointer, key, type_compound_literal)            \
+        CCC_private_array_bounded_map_insert_or_assign_with(                   \
+            array_bounded_map_pointer, key, type_compound_literal)             \
     }
 
 /** @brief Removes the key value in the map storing the old value, if present,
@@ -631,11 +630,11 @@ provided an input error is set.
 
 Note that this function may write to the user type struct. */
 [[nodiscard]] CCC_Handle
-CCC_handle_bounded_map_remove(CCC_Handle_bounded_map *map, void *type_output);
+CCC_array_bounded_map_remove(CCC_Array_bounded_map *map, void *type_output);
 
 /** @brief Removes the key value in the map storing the old value, if present,
 in the struct containing key value type provided by the user.
-@param[in] handle_bounded_map_pointer the pointer to the bounded map.
+@param[in] array_bounded_map_pointer the pointer to the bounded map.
 @param[out] type_output_pointer type user type map elem.
 @return a compound literal reference to the removed handle. If Occupied
 type_output_pointer holds the old key value pair.. If Vacant the key
@@ -643,12 +642,12 @@ value pair was not stored in the map. If bad input is provided an input error is
 set.
 
 Note that this function may write to the user type struct. */
-#define CCC_handle_bounded_map_remove_wrap(handle_bounded_map_pointer,         \
-                                           type_output_pointer)                \
+#define CCC_array_bounded_map_remove_wrap(array_bounded_map_pointer,           \
+                                          type_output_pointer)                 \
     &(CCC_Handle)                                                              \
     {                                                                          \
-        CCC_handle_bounded_map_remove((handle_bounded_map_pointer),            \
-                                      (type_output_pointer))                   \
+        CCC_array_bounded_map_remove((array_bounded_map_pointer),              \
+                                     (type_output_pointer))                    \
             .private                                                           \
     }
 
@@ -667,12 +666,11 @@ where in the map such an element should be inserted.
 
 A handle is rarely useful on its own. It should be passed in a functional style
 to subsequent calls in the Handle Interface. */
-[[nodiscard]] CCC_Handle_bounded_map_handle
-CCC_handle_bounded_map_handle(CCC_Handle_bounded_map const *map,
-                              void const *key);
+[[nodiscard]] CCC_Array_bounded_map_handle
+CCC_array_bounded_map_handle(CCC_Array_bounded_map const *map, void const *key);
 
 /** @brief Obtains a handle for the provided key in the map for future use.
-@param[in] handle_bounded_map_pointer the map to be searched.
+@param[in] array_bounded_map_pointer the map to be searched.
 @param[in] key_pointer the key used to search the map matching the stored key
 type.
 @return a compound literal reference to a specialized handle for use with other
@@ -687,12 +685,12 @@ where in the map such an element should be inserted.
 
 A handle is rarely useful on its own. It should be passed in a functional style
 to subsequent calls in the Handle Interface. */
-#define CCC_handle_bounded_map_handle_wrap(handle_bounded_map_pointer,         \
-                                           key_pointer)                        \
-    &(CCC_Handle_bounded_map_handle)                                           \
+#define CCC_array_bounded_map_array_wrap(array_bounded_map_pointer,            \
+                                         key_pointer)                          \
+    &(CCC_Array_bounded_map_handle)                                            \
     {                                                                          \
-        CCC_handle_bounded_map_handle((handle_bounded_map_pointer),            \
-                                      (key_pointer))                           \
+        CCC_array_bounded_map_handle((array_bounded_map_pointer),              \
+                                     (key_pointer))                            \
             .private                                                           \
     }
 
@@ -705,9 +703,9 @@ This function is intended to make the function chaining in the Handle Interface
 more succinct if the handle will be modified in place based on its own value
 without the need of the context argument a CCC_Type_modifier can provide.
 */
-[[nodiscard]] CCC_Handle_bounded_map_handle *
-CCC_handle_bounded_map_and_modify(CCC_Handle_bounded_map_handle *handle,
-                                  CCC_Type_modifier *modify);
+[[nodiscard]] CCC_Array_bounded_map_handle *
+CCC_array_bounded_map_and_modify(CCC_Array_bounded_map_handle *handle,
+                                 CCC_Type_modifier *modify);
 
 /** @brief Modifies the provided handle if it is Occupied.
 @param[in] handle the handle obtained from a handle function or macro.
@@ -717,13 +715,13 @@ CCC_handle_bounded_map_and_modify(CCC_Handle_bounded_map_handle *handle,
 
 This function makes full use of a CCC_Type_modifier capability, meaning a
 complete CCC_update object will be passed to the update function callback. */
-[[nodiscard]] CCC_Handle_bounded_map_handle *
-CCC_handle_bounded_map_and_modify_context(CCC_Handle_bounded_map_handle *handle,
-                                          CCC_Type_modifier *modify,
-                                          void *context);
+[[nodiscard]] CCC_Array_bounded_map_handle *
+CCC_array_bounded_map_and_modify_context(CCC_Array_bounded_map_handle *handle,
+                                         CCC_Type_modifier *modify,
+                                         void *context);
 
 /** @brief Modify an Occupied handle with a closure over user type T.
-@param[in] map_handle_pointer a pointer to the obtained
+@param[in] map_array_pointer a pointer to the obtained
 handle.
 @param[in] type_name the name of the user type stored in the container.
 @param[in] closure_over_T the code to be run on the reference to user type T,
@@ -736,19 +734,19 @@ or a vacant handle if it was vacant.
 non-NULL if the closure executes.
 
 ```
-#define HANDLE_BOUNDED_MAP_USING_NAMESPACE_CCC
+#define ARRAY_BOUNDED_MAP_USING_NAMESPACE_CCC
 // Increment the count if found otherwise do nothing.
-Handle_bounded_map_handle *h =
-    handle_bounded_map_and_modify_with(
-        handle_wrap(&handle_bounded_map, &k),
+Array_bounded_map_handle *h =
+    array_bounded_map_and_modify_with(
+        array_wrap(&array_bounded_map, &k),
         Word,
         T->cnt++;
     );
 // Increment the count if found otherwise insert a default value.
 Handle_index w =
-    handle_bounded_map_or_insert_with(
-        handle_bounded_map_and_modify_with(
-            handle_wrap(&handle_bounded_map, &k),
+    array_bounded_map_or_insert_with(
+        array_bounded_map_and_modify_with(
+            array_wrap(&array_bounded_map, &k),
             Word,
             { T->cnt++; }
         ),
@@ -759,12 +757,12 @@ Handle_index w =
 Note that any code written is only evaluated if the handle is Occupied and the
 container can deliver the user type T. This means any function calls are lazily
 evaluated in the closure scope. */
-#define CCC_handle_bounded_map_and_modify_with(map_handle_pointer, type_name,  \
-                                               closure_over_T...)              \
-    &(CCC_Handle_bounded_map_handle)                                           \
+#define CCC_array_bounded_map_and_modify_with(map_array_pointer, type_name,    \
+                                              closure_over_T...)               \
+    &(CCC_Array_bounded_map_handle)                                            \
     {                                                                          \
-        CCC_private_handle_bounded_map_and_modify_with(                        \
-            map_handle_pointer, type_name, closure_over_T)                     \
+        CCC_private_array_bounded_map_and_modify_with(                         \
+            map_array_pointer, type_name, closure_over_T)                      \
     }
 
 /** @brief Inserts the provided user type if the handle is Vacant.
@@ -779,11 +777,11 @@ a user struct allocation failure.
 If no allocation is permitted, this function assumes the user struct wrapping
 elem has been allocated with the appropriate lifetime and scope by the user. */
 [[nodiscard]] CCC_Handle_index
-CCC_handle_bounded_map_or_insert(CCC_Handle_bounded_map_handle const *handle,
-                                 void const *type);
+CCC_array_bounded_map_or_insert(CCC_Array_bounded_map_handle const *handle,
+                                void const *type);
 
 /** @brief Lazily insert the desired key value into the handle if it is Vacant.
-@param[in] map_handle_pointer a pointer to the obtained
+@param[in] map_array_pointer a pointer to the obtained
 handle.
 @param[in] type_compound_literal the compound literal to construct in place if
 the handle is Vacant.
@@ -794,10 +792,10 @@ is not allowed.
 
 Note that if the compound literal uses any function calls to generate values
 or other data, such functions will not be called if the handle is Occupied. */
-#define CCC_handle_bounded_map_or_insert_with(map_handle_pointer,              \
-                                              type_compound_literal...)        \
-    CCC_private_handle_bounded_map_or_insert_with(map_handle_pointer,          \
-                                                  type_compound_literal)
+#define CCC_array_bounded_map_or_insert_with(map_array_pointer,                \
+                                             type_compound_literal...)         \
+    CCC_private_array_bounded_map_or_insert_with(map_array_pointer,            \
+                                                 type_compound_literal)
 
 /** @brief Inserts the provided user type invariantly.
 @param[in] handle the handle returned from a call obtaining a handle.
@@ -806,20 +804,21 @@ or other data, such functions will not be called if the handle is Occupied. */
 
 This method can be used when the old value in the map does not need to
 be preserved. See the regular insert method if the old value is of interest. */
-[[nodiscard]] CCC_Handle_index CCC_handle_bounded_map_insert_handle(
-    CCC_Handle_bounded_map_handle const *handle, void const *type);
+[[nodiscard]] CCC_Handle_index
+CCC_array_bounded_map_insert_handle(CCC_Array_bounded_map_handle const *handle,
+                                    void const *type);
 
 /** @brief Write the contents of the compound literal type_compound_literal to a
 node.
-@param[in] map_handle_pointer a pointer to the obtained
+@param[in] map_array_pointer a pointer to the obtained
 handle.
 @param[in] type_compound_literal the compound literal to write to a new slot.
 @return a reference to the newly inserted or overwritten user type. NULL is
 returned if allocation failed or is not allowed when required. */
-#define CCC_handle_bounded_map_insert_handle_with(map_handle_pointer,          \
-                                                  type_compound_literal...)    \
-    CCC_private_handle_bounded_map_insert_handle_with(map_handle_pointer,      \
-                                                      type_compound_literal)
+#define CCC_array_bounded_map_insert_array_with(map_array_pointer,             \
+                                                type_compound_literal...)      \
+    CCC_private_array_bounded_map_insert_array_with(map_array_pointer,         \
+                                                    type_compound_literal)
 
 /** @brief Remove the handle from the map if Occupied.
 @param[in] handle a pointer to the map handle.
@@ -828,43 +827,43 @@ a handle in the map existed and was removed. If Vacant, no prior handle existed
 to be removed.
 @warning the reference to the removed handle is invalidated upon any further
 insertions. */
-CCC_Handle CCC_handle_bounded_map_remove_handle(
-    CCC_Handle_bounded_map_handle const *handle);
+CCC_Handle
+CCC_array_bounded_map_remove_handle(CCC_Array_bounded_map_handle const *handle);
 
 /** @brief Remove the handle from the map if Occupied.
-@param[in] map_handle_pointer a pointer to the map handle.
+@param[in] map_array_pointer a pointer to the map handle.
 @return a compound literal reference to a handle containing NULL or a reference
 to the old handle. If Occupied a handle in the map existed and was removed. If
 Vacant, no prior handle existed to be removed.
 
 Note that the reference to the removed handle is invalidated upon any further
 insertions. */
-#define CCC_handle_bounded_map_remove_handle_wrap(map_handle_pointer)          \
+#define CCC_array_bounded_map_remove_array_wrap(map_array_pointer)             \
     &(CCC_Handle)                                                              \
     {                                                                          \
-        CCC_handle_bounded_map_remove_handle((map_handle_pointer)).private     \
+        CCC_array_bounded_map_remove_handle((map_array_pointer)).private       \
     }
 
 /** @brief Unwraps the provided handle to obtain a view into the map element.
 @param[in] handle the handle from a query to the map via function or macro.
 @return a view into the table handle if one is present, or NULL. */
 [[nodiscard]] CCC_Handle_index
-CCC_handle_bounded_map_unwrap(CCC_Handle_bounded_map_handle const *handle);
+CCC_array_bounded_map_unwrap(CCC_Array_bounded_map_handle const *handle);
 
 /** @brief Returns the Vacant or Occupied status of the handle.
 @param[in] handle the handle from a query to the map via function or macro.
 @return true if the handle is occupied, false if not. Error if handle is NULL.
 */
 [[nodiscard]] CCC_Tribool
-CCC_handle_bounded_map_occupied(CCC_Handle_bounded_map_handle const *handle);
+CCC_array_bounded_map_occupied(CCC_Array_bounded_map_handle const *handle);
 
 /** @brief Provides the status of the handle should an insertion follow.
 @param[in] handle the handle from a query to the table via function or macro.
 @return true if a handle obtained from an insertion attempt failed to insert
 due to an allocation failure when allocation success was expected. Error if
 handle is NULL. */
-[[nodiscard]] CCC_Tribool CCC_handle_bounded_map_insert_error(
-    CCC_Handle_bounded_map_handle const *handle);
+[[nodiscard]] CCC_Tribool
+CCC_array_bounded_map_insert_error(CCC_Array_bounded_map_handle const *handle);
 
 /** @brief Obtain the handle status from a container handle.
 @param[in] handle a pointer to the handle.
@@ -875,8 +874,8 @@ ensure e is non-NULL to avoid an inaccurate status returned.
 Note that this function can be useful for debugging or if more detailed
 messages are needed for logging purposes. See CCC_handle_status_message() in
 ccc/types.h for more information on detailed handle statuses. */
-[[nodiscard]] CCC_Handle_status CCC_handle_bounded_map_handle_status(
-    CCC_Handle_bounded_map_handle const *handle);
+[[nodiscard]] CCC_Handle_status
+CCC_array_bounded_map_handle_status(CCC_Array_bounded_map_handle const *handle);
 
 /**@}*/
 
@@ -891,8 +890,8 @@ maintenance is required on the elements in the map before their slots are
 forfeit.
 
 If NULL is passed as the destructor function time is O(1), else O(size). */
-CCC_Result CCC_handle_bounded_map_clear(CCC_Handle_bounded_map *map,
-                                        CCC_Type_destructor *destroy);
+CCC_Result CCC_array_bounded_map_clear(CCC_Array_bounded_map *map,
+                                       CCC_Type_destructor *destroy);
 
 /** @brief Frees all slots in the map and frees the underlying buffer.
 @param[in] map the map to be cleared.
@@ -904,32 +903,32 @@ an error to attempt to free the Buffer and a memory error is returned.
 Otherwise, an OK result is returned.
 
 If NULL is passed as the destructor function time is O(1), else O(size). */
-CCC_Result CCC_handle_bounded_map_clear_and_free(CCC_Handle_bounded_map *map,
-                                                 CCC_Type_destructor *destroy);
+CCC_Result CCC_array_bounded_map_clear_and_free(CCC_Array_bounded_map *map,
+                                                CCC_Type_destructor *destroy);
 
 /** @brief Frees all slots in the map and frees the
 underlying Buffer that was previously dynamically reserved with the reserve
 function.
 @param[in] map the map to be cleared.
 @param[in] destroy the destructor for each element. NULL can be passed if no
-maintenance is required on the elements in the handle_bounded_map
+maintenance is required on the elements in the array_bounded_map
 before their slots are dropped.
 @param[in] allocate the required allocation function to provide to a
-dynamically reserved handle_bounded_map. Any context data provided upon
+dynamically reserved array_bounded_map. Any context data provided upon
 initialization will be passed to the allocation function when called.
 @return the result of free operation. OK if success, or an error status to
 indicate the error.
-@warning It is an error to call this function on a handle_bounded_map
+@warning It is an error to call this function on a array_bounded_map
 that was not reserved with the provided CCC_Allocator. The
-handle_bounded_map must have existing memory to free.
+array_bounded_map must have existing memory to free.
 
 This function covers the edge case of reserving a dynamic capacity for a
-handle_bounded_map at runtime but denying the
-handle_bounded_map allocation permission to resize. This can help
+array_bounded_map at runtime but denying the
+array_bounded_map allocation permission to resize. This can help
 prevent a map from growing unbounded. The user in this
 case knows the map does not have allocation permission
 and therefore no further memory will be dedicated to the
-handle_bounded_map.
+array_bounded_map.
 
 However, to free the map in such a case this function
 must be used because the map has no ability to free
@@ -938,12 +937,12 @@ it required to free memory.
 
 This function will work normally if called on a map with
 allocation permission however the normal
-CCC_handle_bounded_map_clear_and_free is sufficient for that use case.
+CCC_array_bounded_map_clear_and_free is sufficient for that use case.
 */
 CCC_Result
-CCC_handle_bounded_map_clear_and_free_reserve(CCC_Handle_bounded_map *map,
-                                              CCC_Type_destructor *destroy,
-                                              CCC_Allocator *allocate);
+CCC_array_bounded_map_clear_and_free_reserve(CCC_Array_bounded_map *map,
+                                             CCC_Type_destructor *destroy,
+                                             CCC_Allocator *allocate);
 
 /**@}*/
 
@@ -971,21 +970,21 @@ for (CCC_Handle_index index = range_begin(&range);
 This avoids any possible errors in handling an end range element that is in the
 map versus the end map sentinel. */
 [[nodiscard]] CCC_Handle_range
-CCC_handle_bounded_map_equal_range(CCC_Handle_bounded_map const *map,
-                                   void const *begin_key, void const *end_key);
+CCC_array_bounded_map_equal_range(CCC_Array_bounded_map const *map,
+                                  void const *begin_key, void const *end_key);
 
 /** @brief Returns a compound literal reference to the desired range. O(lg N).
-@param[in] handle_bounded_map_pointer a pointer to the map.
+@param[in] array_bounded_map_pointer a pointer to the map.
 @param[in] begin_and_end_key_pointers two pointers, the first to the start of
 the range the second to the end of the range.
 @return a compound literal reference to the produced range associated with the
 enclosing scope. This reference is always non-NULL. */
-#define CCC_handle_bounded_map_equal_range_wrap(handle_bounded_map_pointer,    \
-                                                begin_and_end_key_pointers...) \
+#define CCC_array_bounded_map_equal_range_wrap(array_bounded_map_pointer,      \
+                                               begin_and_end_key_pointers...)  \
     &(CCC_Handle_range)                                                        \
     {                                                                          \
-        CCC_handle_bounded_map_equal_range((handle_bounded_map_pointer),       \
-                                           (begin_and_end_key_pointers))       \
+        CCC_array_bounded_map_equal_range((array_bounded_map_pointer),         \
+                                          (begin_and_end_key_pointers))        \
             .private                                                           \
     }
 
@@ -1013,23 +1012,23 @@ for (CCC_Handle_index index = range_reverse_begin(&range);
 This avoids any possible errors in handling an reverse_end range_reverse element
 that is in the map versus the end map sentinel. */
 [[nodiscard]] CCC_Handle_range_reverse
-CCC_handle_bounded_map_equal_range_reverse(CCC_Handle_bounded_map const *map,
-                                           void const *reverse_begin_key,
-                                           void const *reverse_end_key);
+CCC_array_bounded_map_equal_range_reverse(CCC_Array_bounded_map const *map,
+                                          void const *reverse_begin_key,
+                                          void const *reverse_end_key);
 
 /** @brief Returns a compound literal reference to the desired range_reverse.
 O(lg N).
-@param[in] handle_bounded_map_pointer a pointer to the map.
+@param[in] array_bounded_map_pointer a pointer to the map.
 @param[in] reverse_begin_and_reverse_end_key_pointers two pointers, the first
 to the start of the range_reverse the second to the end of the range_reverse.
 @return a compound literal reference to the produced range_reverse associated
 with the enclosing scope. This reference is always non-NULL. */
-#define CCC_handle_bounded_map_equal_range_reverse_wrap(                       \
-    handle_bounded_map_pointer, reverse_begin_and_reverse_end_key_pointers...) \
+#define CCC_array_bounded_map_equal_range_reverse_wrap(                        \
+    array_bounded_map_pointer, reverse_begin_and_reverse_end_key_pointers...)  \
     &(CCC_Handle_range_reverse)                                                \
     {                                                                          \
-        CCC_handle_bounded_map_equal_range_reverse(                            \
-            (handle_bounded_map_pointer),                                      \
+        CCC_array_bounded_map_equal_range_reverse(                             \
+            (array_bounded_map_pointer),                                       \
             (reverse_begin_and_reverse_end_key_pointers))                      \
             .private                                                           \
     }
@@ -1038,13 +1037,13 @@ with the enclosing scope. This reference is always non-NULL. */
 @param[in] map a pointer to the map.
 @return a handle for the minimum element of the map. */
 [[nodiscard]] CCC_Handle_index
-CCC_handle_bounded_map_begin(CCC_Handle_bounded_map const *map);
+CCC_array_bounded_map_begin(CCC_Array_bounded_map const *map);
 
 /** @brief Return the start of a reverse inorder traversal of the map. O(lg N).
 @param[in] map a pointer to the map.
 @return a handle for the maximum element of the map. */
 [[nodiscard]] CCC_Handle_index
-CCC_handle_bounded_map_reverse_begin(CCC_Handle_bounded_map const *map);
+CCC_array_bounded_map_reverse_begin(CCC_Array_bounded_map const *map);
 
 /** @brief Return the next element in an inorder traversal of the map. O(1).
 @param[in] map a pointer to the map.
@@ -1053,8 +1052,8 @@ iterator.
 @return a handle for the next user type stored in the map in an inorder
 traversal. */
 [[nodiscard]] CCC_Handle_index
-CCC_handle_bounded_map_next(CCC_Handle_bounded_map const *map,
-                            CCC_Handle_index iterator);
+CCC_array_bounded_map_next(CCC_Array_bounded_map const *map,
+                           CCC_Handle_index iterator);
 
 /** @brief Return the reverse_next element in a reverse inorder traversal of the
 map. O(1).
@@ -1064,21 +1063,21 @@ current iterator.
 @return a handle for the reverse_next user type stored in the map in a reverse
 inorder traversal. */
 [[nodiscard]] CCC_Handle_index
-CCC_handle_bounded_map_reverse_next(CCC_Handle_bounded_map const *map,
-                                    CCC_Handle_index iterator);
+CCC_array_bounded_map_reverse_next(CCC_Array_bounded_map const *map,
+                                   CCC_Handle_index iterator);
 
 /** @brief Return the end of an inorder traversal of the map. O(1).
 @param[in] map a pointer to the map.
 @return a handle for the maximum element of the map. */
 [[nodiscard]] CCC_Handle_index
-CCC_handle_bounded_map_end(CCC_Handle_bounded_map const *map);
+CCC_array_bounded_map_end(CCC_Array_bounded_map const *map);
 
 /** @brief Return the reverse_end of a reverse inorder traversal of the map.
 O(1).
 @param[in] map a pointer to the map.
 @return a handle for the minimum element of the map. */
 [[nodiscard]] CCC_Handle_index
-CCC_handle_bounded_map_reverse_end(CCC_Handle_bounded_map const *map);
+CCC_array_bounded_map_reverse_end(CCC_Array_bounded_map const *map);
 
 /**@}*/
 
@@ -1091,89 +1090,89 @@ Obtain the container state. */
 @return true if empty else false. Error if map is NULL.
 */
 [[nodiscard]] CCC_Tribool
-CCC_handle_bounded_map_is_empty(CCC_Handle_bounded_map const *map);
+CCC_array_bounded_map_is_empty(CCC_Array_bounded_map const *map);
 
 /** @brief Returns the count of map occupied slots.
 @param[in] map the map.
 @return the size of the map or an argument error is set if
-handle_bounded_map is NULL. */
+array_bounded_map is NULL. */
 [[nodiscard]] CCC_Count
-CCC_handle_bounded_map_count(CCC_Handle_bounded_map const *map);
+CCC_array_bounded_map_count(CCC_Array_bounded_map const *map);
 
 /** @brief Returns the capacity of the map representing total available slots.
 @param[in] map the map.
-@return the capacity or an argument error is set if handle_bounded_map
+@return the capacity or an argument error is set if array_bounded_map
 is NULL. */
 [[nodiscard]] CCC_Count
-CCC_handle_bounded_map_capacity(CCC_Handle_bounded_map const *map);
+CCC_array_bounded_map_capacity(CCC_Array_bounded_map const *map);
 
 /** @brief Validation of invariants for the map.
 @param[in] map the map to validate.
 @return true if all invariants hold, false if corruption occurs. Error if
-handle_bounded_map is NULL. */
+array_bounded_map is NULL. */
 [[nodiscard]] CCC_Tribool
-CCC_handle_bounded_map_validate(CCC_Handle_bounded_map const *map);
+CCC_array_bounded_map_validate(CCC_Array_bounded_map const *map);
 
 /**@}*/
 
 /** Define this preprocessor directive if shorter names are helpful. Ensure
  no namespace clashes occur before shortening. */
-#ifdef HANDLE_BOUNDED_MAP_USING_NAMESPACE_CCC
-typedef CCC_Handle_bounded_map Handle_bounded_map;
-typedef CCC_Handle_bounded_map_handle Handle_bounded_map_handle;
-#    define handle_bounded_map_declare_fixed_map(args...)                      \
-        CCC_handle_bounded_map_declare_fixed_map(args)
-#    define handle_bounded_map_initialize(args...)                             \
-        CCC_handle_bounded_map_initialize(args)
-#    define handle_bounded_map_from(args...) CCC_handle_bounded_map_from(args)
-#    define handle_bounded_map_with_capacity(args...)                          \
-        CCC_handle_bounded_map_with_capacity(args)
-#    define handle_bounded_map_fixed_capacity(args...)                         \
-        CCC_handle_bounded_map_fixed_capacity(args)
-#    define handle_bounded_map_copy(args...) CCC_handle_bounded_map_copy(args)
-#    define handle_bounded_map_reserve(args...)                                \
-        CCC_handle_bounded_map_reserve(args)
-#    define handle_bounded_map_at(args...) CCC_handle_bounded_map_at(args)
-#    define handle_bounded_map_as(args...) CCC_handle_bounded_map_as(args)
-#    define handle_bounded_map_and_modify_with(args...)                        \
-        CCC_handle_bounded_map_and_modify_with(args)
-#    define handle_bounded_map_or_insert_with(args...)                         \
-        CCC_handle_bounded_map_or_insert_with(args)
-#    define handle_bounded_map_insert_handle_with(args...)                     \
-        CCC_handle_bounded_map_insert_handle_with(args)
-#    define handle_bounded_map_try_insert_with(args...)                        \
-        CCC_handle_bounded_map_try_insert_with(args)
-#    define handle_bounded_map_insert_or_assign_with(args...)                  \
-        CCC_handle_bounded_map_insert_or_assign_with(args)
-#    define handle_bounded_map_contains(args...)                               \
-        CCC_handle_bounded_map_contains(args)
-#    define handle_bounded_map_get_key_value(args...)                          \
-        CCC_handle_bounded_map_get_key_value(args)
-#    define handle_bounded_map_swap_handle(args...)                            \
-        CCC_handle_bounded_map_swap_handle(args)
-#    define handle_bounded_map_swap_handle_wrap(args...)                       \
-        CCC_handle_bounded_map_swap_handle_wrap(args)
-#    define handle_bounded_map_begin(args...) CCC_handle_bounded_map_begin(args)
-#    define handle_bounded_map_reverse_begin(args...)                          \
-        CCC_handle_bounded_map_reverse_begin(args)
-#    define handle_bounded_map_next(args...) CCC_handle_bounded_map_next(args)
-#    define handle_bounded_map_reverse_next(args...)                           \
-        CCC_handle_bounded_map_reverse_next(args)
-#    define handle_bounded_map_end(args...) CCC_handle_bounded_map_end(args)
-#    define handle_bounded_map_reverse_end(args...)                            \
-        CCC_handle_bounded_map_reverse_end(args)
-#    define handle_bounded_map_is_empty(args...)                               \
-        CCC_handle_bounded_map_is_empty(args)
-#    define handle_bounded_map_count(args...) CCC_handle_bounded_map_count(args)
-#    define handle_bounded_map_capacity(args...)                               \
-        CCC_handle_bounded_map_capacity(args)
-#    define handle_bounded_map_clear(args...) CCC_handle_bounded_map_clear(args)
-#    define handle_bounded_map_clear_and_free(args...)                         \
-        CCC_handle_bounded_map_clear_and_free(args)
-#    define handle_bounded_map_clear_and_free_reserve(args...)                 \
-        CCC_handle_bounded_map_clear_and_free_reserve(args)
-#    define handle_bounded_map_validate(args...)                               \
-        CCC_handle_bounded_map_validate(args)
-#endif /* HANDLE_BOUNDED_MAP_USING_NAMESPACE_CCC */
+#ifdef ARRAY_BOUNDED_MAP_USING_NAMESPACE_CCC
+typedef CCC_Array_bounded_map Array_bounded_map;
+typedef CCC_Array_bounded_map_handle Array_bounded_map_handle;
+#    define array_bounded_map_declare_fixed_map(args...)                       \
+        CCC_array_bounded_map_declare_fixed_map(args)
+#    define array_bounded_map_initialize(args...)                              \
+        CCC_array_bounded_map_initialize(args)
+#    define array_bounded_map_from(args...) CCC_array_bounded_map_from(args)
+#    define array_bounded_map_with_capacity(args...)                           \
+        CCC_array_bounded_map_with_capacity(args)
+#    define array_bounded_map_fixed_capacity(args...)                          \
+        CCC_array_bounded_map_fixed_capacity(args)
+#    define array_bounded_map_copy(args...) CCC_array_bounded_map_copy(args)
+#    define array_bounded_map_reserve(args...)                                 \
+        CCC_array_bounded_map_reserve(args)
+#    define array_bounded_map_at(args...) CCC_array_bounded_map_at(args)
+#    define array_bounded_map_as(args...) CCC_array_bounded_map_as(args)
+#    define array_bounded_map_and_modify_with(args...)                         \
+        CCC_array_bounded_map_and_modify_with(args)
+#    define array_bounded_map_or_insert_with(args...)                          \
+        CCC_array_bounded_map_or_insert_with(args)
+#    define array_bounded_map_insert_array_with(args...)                       \
+        CCC_array_bounded_map_insert_array_with(args)
+#    define array_bounded_map_try_insert_with(args...)                         \
+        CCC_array_bounded_map_try_insert_with(args)
+#    define array_bounded_map_insert_or_assign_with(args...)                   \
+        CCC_array_bounded_map_insert_or_assign_with(args)
+#    define array_bounded_map_contains(args...)                                \
+        CCC_array_bounded_map_contains(args)
+#    define array_bounded_map_get_key_value(args...)                           \
+        CCC_array_bounded_map_get_key_value(args)
+#    define array_bounded_map_swap_handle(args...)                             \
+        CCC_array_bounded_map_swap_handle(args)
+#    define array_bounded_map_swap_array_wrap(args...)                         \
+        CCC_array_bounded_map_swap_array_wrap(args)
+#    define array_bounded_map_begin(args...) CCC_array_bounded_map_begin(args)
+#    define array_bounded_map_reverse_begin(args...)                           \
+        CCC_array_bounded_map_reverse_begin(args)
+#    define array_bounded_map_next(args...) CCC_array_bounded_map_next(args)
+#    define array_bounded_map_reverse_next(args...)                            \
+        CCC_array_bounded_map_reverse_next(args)
+#    define array_bounded_map_end(args...) CCC_array_bounded_map_end(args)
+#    define array_bounded_map_reverse_end(args...)                             \
+        CCC_array_bounded_map_reverse_end(args)
+#    define array_bounded_map_is_empty(args...)                                \
+        CCC_array_bounded_map_is_empty(args)
+#    define array_bounded_map_count(args...) CCC_array_bounded_map_count(args)
+#    define array_bounded_map_capacity(args...)                                \
+        CCC_array_bounded_map_capacity(args)
+#    define array_bounded_map_clear(args...) CCC_array_bounded_map_clear(args)
+#    define array_bounded_map_clear_and_free(args...)                          \
+        CCC_array_bounded_map_clear_and_free(args)
+#    define array_bounded_map_clear_and_free_reserve(args...)                  \
+        CCC_array_bounded_map_clear_and_free_reserve(args)
+#    define array_bounded_map_validate(args...)                                \
+        CCC_array_bounded_map_validate(args)
+#endif /* ARRAY_BOUNDED_MAP_USING_NAMESPACE_CCC */
 
-#endif /* CCC_HANDLE_BOUNDED_MAP_H */
+#endif /* CCC_ARRAY_BOUNDED_MAP_H */

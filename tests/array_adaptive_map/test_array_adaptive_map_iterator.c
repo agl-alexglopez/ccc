@@ -5,32 +5,32 @@
 #include <time.h>
 
 #define TRAITS_USING_NAMESPACE_CCC
-#define HANDLE_BOUNDED_MAP_USING_NAMESPACE_CCC
+#define ARRAY_ADAPTIVE_MAP_USING_NAMESPACE_CCC
 #define TYPES_USING_NAMESPACE_CCC
 
+#include "array_adaptive_map.h"
+#include "array_adaptive_map_utility.h"
 #include "checkers.h"
-#include "handle_bounded_map.h"
-#include "handle_bounded_map_utility.h"
 #include "traits.h"
 #include "types.h"
 
-check_static_begin(check_range, Handle_bounded_map const *const map,
+check_static_begin(check_range, Array_adaptive_map const *const map,
                    Handle_range const *const r, size_t const n,
                    int const expect_range[])
 {
     size_t index = 0;
-    CCC_Handle_index iterator = range_begin(r);
-    for (; iterator != range_end(r) && index < n;
+    CCC_Handle_index iterator = array_range_begin(r);
+    for (; iterator != array_range_end(r) && index < n;
          iterator = next(map, iterator), ++index)
     {
-        struct Val const *const v = handle_bounded_map_at(map, iterator);
+        struct Val const *const v = array_adaptive_map_at(map, iterator);
         int const cur_id = v->id;
         check(expect_range[index], cur_id);
     }
-    check(iterator, range_end(r));
+    check(iterator, array_range_end(r));
     if (iterator != end(map))
     {
-        struct Val const *const v = handle_bounded_map_at(map, iterator);
+        struct Val const *const v = array_adaptive_map_at(map, iterator);
         check(v->id, expect_range[n - 1]);
     }
     check_fail_end({
@@ -42,11 +42,11 @@ check_static_begin(check_range, Handle_bounded_map const *const map,
         (void)fprintf(stderr, "}\n%s", CHECK_NONE);
         (void)fprintf(stderr, "%sCHECK_ERROR:%s (int[%zu]){", CHECK_RED,
                       CHECK_GREEN, n);
-        iterator = range_begin(r);
-        for (size_t j = 0; j < n && iterator != range_end(r);
+        iterator = array_range_begin(r);
+        for (size_t j = 0; j < n && iterator != array_range_end(r);
              ++j, iterator = next(map, iterator))
         {
-            struct Val const *const v = handle_bounded_map_at(map, iterator);
+            struct Val const *const v = array_adaptive_map_at(map, iterator);
             if (iterator == end(map) || !iterator)
             {
                 return CHECK_STATUS;
@@ -61,33 +61,33 @@ check_static_begin(check_range, Handle_bounded_map const *const map,
                 (void)fprintf(stderr, "%s%d, %s", CHECK_RED, v->id, CHECK_NONE);
             }
         }
-        for (; iterator != range_end(r); iterator = next(map, iterator))
+        for (; iterator != array_range_end(r); iterator = next(map, iterator))
         {
-            struct Val const *const v = handle_bounded_map_at(map, iterator);
+            struct Val const *const v = array_adaptive_map_at(map, iterator);
             (void)fprintf(stderr, "%s%d, %s", CHECK_RED, v->id, CHECK_NONE);
         }
         (void)fprintf(stderr, "%s}\n%s", CHECK_GREEN, CHECK_NONE);
     });
 }
 
-check_static_begin(check_range_reverse, Handle_bounded_map const *const map,
+check_static_begin(check_range_reverse, Array_adaptive_map const *const map,
                    Handle_range_reverse const *const r, size_t const n,
                    int const expect_range_reverse[])
 {
-    CCC_Handle_index iterator = range_reverse_begin(r);
+    CCC_Handle_index iterator = array_range_reverse_begin(r);
     size_t index = 0;
-    for (; iterator != range_reverse_end(r);
+    for (; iterator != array_range_reverse_end(r);
          iterator = reverse_next(map, iterator))
     {
-        struct Val const *const v = handle_bounded_map_at(map, iterator);
+        struct Val const *const v = array_adaptive_map_at(map, iterator);
         int const cur_id = v->id;
         check(expect_range_reverse[index], cur_id);
         ++index;
     }
-    check(iterator, range_reverse_end(r));
+    check(iterator, array_range_reverse_end(r));
     if (iterator != reverse_end(map))
     {
-        struct Val const *const v = handle_bounded_map_at(map, iterator);
+        struct Val const *const v = array_adaptive_map_at(map, iterator);
         check(v->id, expect_range_reverse[n - 1]);
     }
     check_fail_end({
@@ -100,11 +100,11 @@ check_static_begin(check_range_reverse, Handle_bounded_map const *const map,
         (void)fprintf(stderr, "}\n%s", CHECK_NONE);
         (void)fprintf(stderr, "%sCHECK_ERROR:%s (int[%zu]){", CHECK_RED,
                       CHECK_GREEN, n);
-        iterator = range_reverse_begin(r);
-        for (j = 0; j < n && iterator != range_reverse_end(r);
+        iterator = array_range_reverse_begin(r);
+        for (j = 0; j < n && iterator != array_range_reverse_end(r);
              ++j, iterator = reverse_next(map, iterator))
         {
-            struct Val const *const v = handle_bounded_map_at(map, iterator);
+            struct Val const *const v = array_adaptive_map_at(map, iterator);
             if (iterator == reverse_end(map) || !iterator)
             {
                 return CHECK_STATUS;
@@ -119,17 +119,17 @@ check_static_begin(check_range_reverse, Handle_bounded_map const *const map,
                 (void)fprintf(stderr, "%s%d, %s", CHECK_RED, v->id, CHECK_NONE);
             }
         }
-        for (; iterator != range_reverse_end(r);
+        for (; iterator != array_range_reverse_end(r);
              iterator = reverse_next(map, iterator))
         {
-            struct Val const *const v = handle_bounded_map_at(map, iterator);
+            struct Val const *const v = array_adaptive_map_at(map, iterator);
             (void)fprintf(stderr, "%s%d, %s", CHECK_RED, v->id, CHECK_NONE);
         }
         (void)fprintf(stderr, "%s}\n%s", CHECK_GREEN, CHECK_NONE);
     });
 }
 
-check_static_begin(iterator_check, Handle_bounded_map *s)
+check_static_begin(iterator_check, Array_adaptive_map *s)
 {
     size_t const size = count(s).count;
     size_t iterator_count = 0;
@@ -150,10 +150,10 @@ check_static_begin(iterator_check, Handle_bounded_map *s)
     check_end();
 }
 
-check_static_begin(handle_bounded_map_test_forward_iterator)
+check_static_begin(array_adaptive_map_test_forward_iterator)
 {
-    CCC_Handle_bounded_map s
-        = handle_bounded_map_initialize(&(Small_fixed_map){}, struct Val, id,
+    CCC_Array_adaptive_map s
+        = array_adaptive_map_initialize(&(Small_fixed_map){}, struct Val, id,
                                         id_order, NULL, NULL, SMALL_FIXED_CAP);
     /* We should have the expected behavior iteration over empty tree. */
     int j = 0;
@@ -176,15 +176,15 @@ check_static_begin(handle_bounded_map_test_forward_iterator)
     for (CCC_Handle_index e = begin(&s); e != end(&s) && j < num_nodes;
          e = next(&s, e), ++j)
     {
-        struct Val const *const v = handle_bounded_map_at(&s, e);
+        struct Val const *const v = array_adaptive_map_at(&s, e);
         check(v->id, keys_inorder[j]);
     }
     check_end();
 }
 
-check_static_begin(handle_bounded_map_test_iterate_removal)
+check_static_begin(array_adaptive_map_test_iterate_removal)
 {
-    CCC_Handle_bounded_map s = handle_bounded_map_initialize(
+    CCC_Array_adaptive_map s = array_adaptive_map_initialize(
         &(Standard_fixed_map){}, struct Val, id, id_order, NULL, NULL,
         STANDARD_FIXED_CAP);
     /* Seed the test with any integer for reproducible random test sequence
@@ -205,7 +205,7 @@ check_static_begin(handle_bounded_map_test_iterate_removal)
          i != end(&s) && cur_node < num_nodes; i = next, ++cur_node)
     {
         next = next(&s, i);
-        struct Val const *const v = handle_bounded_map_at(&s, i);
+        struct Val const *const v = array_adaptive_map_at(&s, i);
         if (v->id > limit)
         {
             (void)remove(&s, &(struct Val){.id = v->id});
@@ -215,9 +215,9 @@ check_static_begin(handle_bounded_map_test_iterate_removal)
     check_end();
 }
 
-check_static_begin(handle_bounded_map_test_iterate_remove_reinsert)
+check_static_begin(array_adaptive_map_test_iterate_remove_reinsert)
 {
-    CCC_Handle_bounded_map s = handle_bounded_map_initialize(
+    CCC_Array_adaptive_map s = array_adaptive_map_initialize(
         &(Standard_fixed_map){}, struct Val, id, id_order, NULL, NULL,
         STANDARD_FIXED_CAP);
     /* Seed the test with any integer for reproducible random test sequence
@@ -234,30 +234,30 @@ check_static_begin(handle_bounded_map_test_iterate_remove_reinsert)
     check(iterator_check(&s), CHECK_PASS);
     size_t const old_size = count(&s).count;
     int const limit = 400;
-    int new_unique_handle_id = 1001;
+    int new_unique_array_id = 1001;
     for (CCC_Handle_index i = begin(&s), next = 0; i != end(&s); i = next)
     {
         next = next(&s, i);
-        struct Val const *const v = handle_bounded_map_at(&s, i);
+        struct Val const *const v = array_adaptive_map_at(&s, i);
         if (v->id < limit)
         {
             struct Val new_val = {.id = v->id};
             (void)remove(&s, &new_val);
-            new_val.id = new_unique_handle_id;
+            new_val.id = new_unique_array_id;
             CCC_Handle e = insert_or_assign(&s, &new_val);
             check(unwrap(&e) != 0, true);
             check(validate(&s), true);
-            ++new_unique_handle_id;
+            ++new_unique_array_id;
         }
     }
     check(count(&s).count, old_size);
     check_end();
 }
 
-check_static_begin(handle_bounded_map_test_valid_range)
+check_static_begin(array_adaptive_map_test_valid_range)
 {
-    CCC_Handle_bounded_map s
-        = handle_bounded_map_initialize(&(Small_fixed_map){}, struct Val, id,
+    CCC_Array_adaptive_map s
+        = array_adaptive_map_initialize(&(Small_fixed_map){}, struct Val, id,
                                         id_order, NULL, NULL, SMALL_FIXED_CAP);
 
     int const num_nodes = 25;
@@ -283,10 +283,10 @@ check_static_begin(handle_bounded_map_test_valid_range)
     check_end();
 }
 
-check_static_begin(handle_bounded_map_test_valid_range_equals)
+check_static_begin(array_adaptive_map_test_valid_range_equals)
 {
-    CCC_Handle_bounded_map s
-        = handle_bounded_map_initialize(&(Small_fixed_map){}, struct Val, id,
+    CCC_Array_adaptive_map s
+        = array_adaptive_map_initialize(&(Small_fixed_map){}, struct Val, id,
                                         id_order, NULL, NULL, SMALL_FIXED_CAP);
     int const num_nodes = 25;
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
@@ -310,10 +310,10 @@ check_static_begin(handle_bounded_map_test_valid_range_equals)
     check_end();
 }
 
-check_static_begin(handle_bounded_map_test_invalid_range)
+check_static_begin(array_adaptive_map_test_invalid_range)
 {
-    CCC_Handle_bounded_map s
-        = handle_bounded_map_initialize(&(Small_fixed_map){}, struct Val, id,
+    CCC_Array_adaptive_map s
+        = array_adaptive_map_initialize(&(Small_fixed_map){}, struct Val, id,
                                         id_order, NULL, NULL, SMALL_FIXED_CAP);
     int const num_nodes = 25;
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
@@ -338,10 +338,10 @@ check_static_begin(handle_bounded_map_test_invalid_range)
     check_end();
 }
 
-check_static_begin(handle_bounded_map_test_empty_range)
+check_static_begin(array_adaptive_map_test_empty_range)
 {
-    CCC_Handle_bounded_map s
-        = handle_bounded_map_initialize(&(Small_fixed_map){}, struct Val, id,
+    CCC_Array_adaptive_map s
+        = array_adaptive_map_initialize(&(Small_fixed_map){}, struct Val, id,
                                         id_order, NULL, NULL, SMALL_FIXED_CAP);
     int const num_nodes = 25;
     int const step = 5;
@@ -356,35 +356,38 @@ check_static_begin(handle_bounded_map_test_empty_range)
        Normal iteration patterns would consider this empty. */
     CCC_Handle_range const forward_range
         = equal_range(&s, &(int){-50}, &(int){-25});
-    check(((struct Val *)handle_bounded_map_at(&s, range_begin(&forward_range)))
+    check(((struct Val *)array_adaptive_map_at(
+               &s, array_range_begin(&forward_range)))
               ->id,
           0);
-    check(((struct Val *)handle_bounded_map_at(&s, range_end(&forward_range)))
+    check(((struct Val *)array_adaptive_map_at(&s,
+                                               array_range_end(&forward_range)))
               ->id,
           0);
-    check(range_begin(&forward_range), range_end(&forward_range));
+    check(array_range_begin(&forward_range), array_range_end(&forward_range));
     CCC_Handle_range_reverse const rev_range
         = equal_range_reverse(&s, &(int){150}, &(int){999});
-    check(range_reverse_begin(&rev_range), range_reverse_end(&rev_range));
-    check(((struct Val *)handle_bounded_map_at(&s,
-                                               range_reverse_begin(&rev_range)))
+    check(array_range_reverse_begin(&rev_range),
+          array_range_reverse_end(&rev_range));
+    check(((struct Val *)array_adaptive_map_at(
+               &s, array_range_reverse_begin(&rev_range)))
               ->id,
           (num_nodes * step) - step);
-    check(
-        ((struct Val *)handle_bounded_map_at(&s, range_reverse_end(&rev_range)))
-            ->id,
-        (num_nodes * step) - step);
+    check(((struct Val *)array_adaptive_map_at(
+               &s, array_range_reverse_end(&rev_range)))
+              ->id,
+          (num_nodes * step) - step);
     check_end();
 }
 
 int
 main()
 {
-    return check_run(handle_bounded_map_test_forward_iterator(),
-                     handle_bounded_map_test_iterate_removal(),
-                     handle_bounded_map_test_valid_range(),
-                     handle_bounded_map_test_valid_range_equals(),
-                     handle_bounded_map_test_invalid_range(),
-                     handle_bounded_map_test_empty_range(),
-                     handle_bounded_map_test_iterate_remove_reinsert());
+    return check_run(array_adaptive_map_test_forward_iterator(),
+                     array_adaptive_map_test_iterate_removal(),
+                     array_adaptive_map_test_valid_range(),
+                     array_adaptive_map_test_valid_range_equals(),
+                     array_adaptive_map_test_invalid_range(),
+                     array_adaptive_map_test_empty_range(),
+                     array_adaptive_map_test_iterate_remove_reinsert());
 }
