@@ -31,6 +31,7 @@ it is recommended that the user reserve space for the needed nodes ahead of
 time, the amortized O(log(N)) run times of a Splay Tree remain the same in
 the dynamic resizing case. */
 #include <assert.h>
+#include <stdalign.h>
 #include <stddef.h>
 #include <string.h>
 
