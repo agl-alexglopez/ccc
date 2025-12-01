@@ -198,14 +198,14 @@ struct Fixed_map_test_type
 {
     struct
     {
-        int i;
-    } data[2 + 1];
-    alignas(GROUP_COUNT) struct CCC_Flat_hash_map_tag tag[2];
+        int const i;
+    } const data[2 + 1];
+    alignas(GROUP_COUNT) struct CCC_Flat_hash_map_tag const tag[2];
 };
 /** The type must actually get an allocation on the given platform to validate
 some memory layout assumptions. This should be sufficient and the assumptions
 will hold if the user happens to allocate a fixed size map on the stack. */
-static struct Fixed_map_test_type data_tag_layout_test;
+static struct Fixed_map_test_type const data_tag_layout_test;
 /** The size of the user data and tags should be what we expect. No hidden
 padding should violate our mental model of the bytes occupied by contiguous user
 data and metadata tags. We don't care about padding after the tag array which
@@ -216,7 +216,8 @@ Over index the tag array to get the end address for pointer differences. The
 0th element in an array at the start of a struct is guaranteed to start at the
 first byte of the struct with no padding BEFORE this first element. */
 static_assert(
-    (char *)&data_tag_layout_test.tag[2] - (char *)&data_tag_layout_test.data[0]
+    (char const *)&data_tag_layout_test.tag[2]
+            - (char const *)&data_tag_layout_test.data[0]
         == (comptime_roundup((sizeof(data_tag_layout_test.data)))
             + (sizeof(struct CCC_Flat_hash_map_tag) * 2)),
     "The size in bytes of the contiguous user data to tag array must be what "
@@ -230,16 +231,16 @@ array. The tags array 0th element is the shared base for both arrays.
 Data has decreasing indices and tags have ascending indices. Here we index too
 far for our type with padding to ensure the next assertion will hold when we
 index from the shared tags base address and subtract to find user data. */
-static_assert((char *)&data_tag_layout_test.data
+static_assert((char const *)&data_tag_layout_test.data
                       + comptime_roundup((sizeof(data_tag_layout_test.data)))
-                  == (char *)&data_tag_layout_test.tag,
+                  == (char const *)&data_tag_layout_test.tag,
               "The start of the tag array must align perfectly with the next "
               "byte past the final user data element.");
 /** Same as the above test but this is how the location of the tag array would
 be found in normal runtime code. */
 static_assert(
-    (char *)&data_tag_layout_test.tag
-        == (char *)&data_tag_layout_test.data
+    (char const *)&data_tag_layout_test.tag
+        == (char const *)&data_tag_layout_test.data
                + comptime_roundup((sizeof(data_tag_layout_test.data))),
     "Manual pointer arithmetic from the base of data array to find "
     "tag array should result in correct location.");
