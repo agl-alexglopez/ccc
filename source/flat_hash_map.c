@@ -317,47 +317,41 @@ struct Query
 
 /*===========================   Prototypes   ================================*/
 
-static void swap(void *temp, void *, void *, size_t);
+static void swap(void *, void *, void *, size_t);
 static struct CCC_Flat_hash_map_entry
-container_entry(struct CCC_Flat_hash_map *, void const *key);
-static struct Query find(struct CCC_Flat_hash_map *, void const *key,
-                         uint64_t hash);
+container_entry(struct CCC_Flat_hash_map *, void const *);
+static struct Query find(struct CCC_Flat_hash_map *, void const *, uint64_t);
 static struct Query find_key_or_slot(struct CCC_Flat_hash_map const *,
-                                     void const *key, uint64_t hash);
+                                     void const *, uint64_t);
 static CCC_Count find_key_or_fail(struct CCC_Flat_hash_map const *,
-                                  void const *key, uint64_t hash);
-static size_t find_slot_or_noreturn(struct CCC_Flat_hash_map const *,
-                                    uint64_t hash);
-static void *find_first_full_slot(struct CCC_Flat_hash_map const *,
-                                  size_t start);
+                                  void const *, uint64_t);
+static size_t find_slot_or_noreturn(struct CCC_Flat_hash_map const *, uint64_t);
+static void *find_first_full_slot(struct CCC_Flat_hash_map const *, size_t);
 static struct Match_mask find_first_full_group(struct CCC_Flat_hash_map const *,
-                                               size_t *start);
-static CCC_Result maybe_rehash(struct CCC_Flat_hash_map *, size_t to_add,
+                                               size_t *);
+static CCC_Result maybe_rehash(struct CCC_Flat_hash_map *, size_t,
                                CCC_Allocator);
-static void insert_and_copy(struct CCC_Flat_hash_map *, void const *type,
-                            struct CCC_Flat_hash_map_tag m, size_t i);
-static void erase(struct CCC_Flat_hash_map *, size_t i);
-static CCC_Result check_initialize(struct CCC_Flat_hash_map *,
-                                   size_t required_total_cap, CCC_Allocator *);
+static void insert_and_copy(struct CCC_Flat_hash_map *, void const *,
+                            struct CCC_Flat_hash_map_tag, size_t);
+static void erase(struct CCC_Flat_hash_map *, size_t);
+static CCC_Result check_initialize(struct CCC_Flat_hash_map *, size_t,
+                                   CCC_Allocator *);
 static void rehash_in_place(struct CCC_Flat_hash_map *);
-static CCC_Tribool is_same_group(size_t i, size_t new_i, uint64_t hash,
-                                 size_t mask);
-static CCC_Result rehash_resize(struct CCC_Flat_hash_map *, size_t to_add,
+static CCC_Tribool is_same_group(size_t, size_t, uint64_t, size_t);
+static CCC_Result rehash_resize(struct CCC_Flat_hash_map *, size_t,
                                 CCC_Allocator);
-static CCC_Tribool is_equal(struct CCC_Flat_hash_map const *, void const *key,
+static CCC_Tribool is_equal(struct CCC_Flat_hash_map const *, void const *,
                             size_t);
-static uint64_t hasher(struct CCC_Flat_hash_map const *, void const *any_key);
-static void *key_at(struct CCC_Flat_hash_map const *, size_t i);
-static void *data_at(struct CCC_Flat_hash_map const *, size_t i);
-static struct CCC_Flat_hash_map_tag *tag_pos(size_t sizeof_type,
-                                             void const *data, size_t mask);
-static void *key_in_slot(struct CCC_Flat_hash_map const *, void const *slot);
+static uint64_t hasher(struct CCC_Flat_hash_map const *, void const *);
+static void *key_at(struct CCC_Flat_hash_map const *, size_t);
+static void *data_at(struct CCC_Flat_hash_map const *, size_t);
+static struct CCC_Flat_hash_map_tag *tag_pos(size_t, void const *, size_t);
+static void *key_in_slot(struct CCC_Flat_hash_map const *, void const *);
 static void *swap_slot(struct CCC_Flat_hash_map const *);
-static CCC_Count data_index(struct CCC_Flat_hash_map const *,
-                            void const *data_slot);
-static size_t mask_to_total_bytes(size_t sizeof_type, size_t mask);
-static size_t mask_to_tag_bytes(size_t mask);
-static size_t mask_to_data_bytes(size_t sizeof_type, size_t mask);
+static CCC_Count data_index(struct CCC_Flat_hash_map const *, void const *);
+static size_t mask_to_total_bytes(size_t, size_t);
+static size_t mask_to_tag_bytes(size_t);
+static size_t mask_to_data_bytes(size_t, size_t);
 static void set_insert_tag(struct CCC_Flat_hash_map *,
                            struct CCC_Flat_hash_map_tag, size_t);
 static size_t mask_to_load_factor_cap(size_t);
@@ -374,14 +368,13 @@ static CCC_Tribool tag_constant(struct CCC_Flat_hash_map_tag);
 static struct CCC_Flat_hash_map_tag tag_from(uint64_t);
 static struct Group group_load_unaligned(struct CCC_Flat_hash_map_tag const *);
 static struct Group group_load_aligned(struct CCC_Flat_hash_map_tag const *);
-static void group_store_aligned(struct CCC_Flat_hash_map_tag *destination,
-                                struct Group source);
+static void group_store_aligned(struct CCC_Flat_hash_map_tag *, struct Group);
 static struct Match_mask match_tag(struct Group, struct CCC_Flat_hash_map_tag);
 static struct Match_mask match_empty(struct Group);
 static struct Match_mask match_deleted(struct Group);
 static struct Match_mask match_empty_deleted(struct Group);
 static struct Match_mask match_full(struct Group);
-static struct Match_mask match_leading_full(struct Group, size_t start_tag);
+static struct Match_mask match_leading_full(struct Group, size_t);
 static struct Group group_constant_to_empty_full_to_deleted(struct Group);
 static unsigned count_trailing_zeros(struct Match_mask);
 static unsigned count_leading_zeros(struct Match_mask);
