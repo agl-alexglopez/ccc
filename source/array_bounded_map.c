@@ -1068,7 +1068,10 @@ static struct Query
 find(struct CCC_Array_bounded_map const *const map, void const *const key)
 {
     size_t parent = 0;
-    struct Query q = {.last_order = CCC_ORDER_ERROR, .found = map->root};
+    struct Query q = {
+        .last_order = CCC_ORDER_ERROR,
+        .found = map->root,
+    };
     while (q.found)
     {
         q.last_order = order_nodes(map, key, q.found, map->compare);
