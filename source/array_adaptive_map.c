@@ -133,58 +133,51 @@ node_at(struct CCC_Array_adaptive_map const *, size_t);
 static void *data_at(struct CCC_Array_adaptive_map const *, size_t);
 /* Returning the user struct type with stored offsets. */
 static struct CCC_Array_adaptive_map_handle
-handle(struct CCC_Array_adaptive_map *, void const *key);
-static size_t erase(struct CCC_Array_adaptive_map *, void const *key);
+handle(struct CCC_Array_adaptive_map *, void const *);
+static size_t erase(struct CCC_Array_adaptive_map *, void const *);
 static size_t maybe_allocate_insert(struct CCC_Array_adaptive_map *,
-                                    void const *user_type);
-static CCC_Result resize(struct CCC_Array_adaptive_map *, size_t new_capacity,
+                                    void const *);
+static CCC_Result resize(struct CCC_Array_adaptive_map *, size_t,
                          CCC_Allocator *);
-static void copy_soa(struct CCC_Array_adaptive_map const *source,
-                     void *destination_data_base, size_t destination_capacity);
-static size_t data_bytes(size_t sizeof_type, size_t capacity);
-static size_t node_bytes(size_t capacity);
-static struct CCC_Array_adaptive_map_node *
-node_pos(size_t sizeof_type, void const *data, size_t capacity);
-static size_t find(struct CCC_Array_adaptive_map *, void const *key);
-static void connect_new_root(struct CCC_Array_adaptive_map *, size_t new_root,
-                             CCC_Order order_result);
+static void copy_soa(struct CCC_Array_adaptive_map const *, void *, size_t);
+static size_t data_bytes(size_t, size_t);
+static size_t node_bytes(size_t);
+static struct CCC_Array_adaptive_map_node *node_pos(size_t, void const *,
+                                                    size_t);
+static size_t find(struct CCC_Array_adaptive_map *, void const *);
+static void connect_new_root(struct CCC_Array_adaptive_map *, size_t,
+                             CCC_Order);
 static void insert(struct CCC_Array_adaptive_map *, size_t n);
-static void *key_in_slot(struct CCC_Array_adaptive_map const *,
-                         void const *user_struct);
+static void *key_in_slot(struct CCC_Array_adaptive_map const *, void const *);
 static size_t allocate_slot(struct CCC_Array_adaptive_map *);
-static size_t total_bytes(size_t sizeof_type, size_t capacity);
+static size_t total_bytes(size_t, size_t);
 static struct CCC_Handle_range equal_range(struct CCC_Array_adaptive_map *,
-                                           void const *begin_key,
-                                           void const *end_key,
-                                           enum Branch traversal);
+                                           void const *, void const *,
+                                           enum Branch);
 /* Returning the user key with stored offsets. */
-static void *key_at(struct CCC_Array_adaptive_map const *, size_t i);
+static void *key_at(struct CCC_Array_adaptive_map const *, size_t);
 /* Returning threeway comparison with user callback. */
 static CCC_Order order_nodes(struct CCC_Array_adaptive_map const *,
-                             void const *key, size_t node,
-                             CCC_Key_comparator *);
+                             void const *, size_t, CCC_Key_comparator *);
 /* Returning read only indices for tree nodes. */
-static size_t remove_from_tree(struct CCC_Array_adaptive_map *, size_t ret);
-static size_t min_max_from(struct CCC_Array_adaptive_map const *, size_t start,
-                           enum Branch dir);
-static size_t next(struct CCC_Array_adaptive_map const *, size_t n,
-                   enum Branch traversal);
-static size_t branch_index(struct CCC_Array_adaptive_map const *, size_t parent,
-                           enum Branch dir);
-static size_t parent_index(struct CCC_Array_adaptive_map const *, size_t child);
+static size_t remove_from_tree(struct CCC_Array_adaptive_map *, size_t);
+static size_t min_max_from(struct CCC_Array_adaptive_map const *, size_t,
+                           enum Branch);
+static size_t next(struct CCC_Array_adaptive_map const *, size_t, enum Branch);
+static size_t branch_index(struct CCC_Array_adaptive_map const *, size_t,
+                           enum Branch);
+static size_t parent_index(struct CCC_Array_adaptive_map const *, size_t);
 /* Returning references to index fields for tree nodes. */
-static size_t *branch_pointer(struct CCC_Array_adaptive_map const *,
-                              size_t node, enum Branch branch);
-static size_t *parent_pointer(struct CCC_Array_adaptive_map const *,
-                              size_t node);
+static size_t *branch_pointer(struct CCC_Array_adaptive_map const *, size_t,
+                              enum Branch);
+static size_t *parent_pointer(struct CCC_Array_adaptive_map const *, size_t);
 
 static CCC_Tribool validate(struct CCC_Array_adaptive_map const *);
 
 /* Returning void as miscellaneous helpers. */
-static void init_node(struct CCC_Array_adaptive_map const *, size_t node);
-static void swap(char temp[const], void *a, void *b, size_t sizeof_type);
-static void link(struct CCC_Array_adaptive_map *, size_t parent,
-                 enum Branch dir, size_t subtree);
+static void init_node(struct CCC_Array_adaptive_map const *, size_t);
+static void swap(void *, void *, void *, size_t);
+static void link(struct CCC_Array_adaptive_map *, size_t, enum Branch, size_t);
 static size_t max(size_t, size_t);
 static void delete_nodes(struct CCC_Array_adaptive_map *,
                          CCC_Type_destructor *);
@@ -1279,7 +1272,7 @@ copy_soa(struct CCC_Array_adaptive_map const *const source,
 }
 
 static inline void
-swap(char temp[const], void *const a, void *const b, size_t const sizeof_type)
+swap(void *const temp, void *const a, void *const b, size_t const sizeof_type)
 {
     if (a == b)
     {
