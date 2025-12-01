@@ -205,6 +205,31 @@ The `static_` prefix makes it clear that we are working with a variable that occ
 > [!NOTE]
 > This is enforced by clang tidy.
 
+### Container Naming Schemes
+
+#### Intrusive Containers
+
+> [!IMPORTANT]
+> Intrusive containers are the default and do not qualify their names with their memory layout. They offer pointer stability of the elements they allocate, or intrude upon if allocation is prohibited.
+
+For example, the `CCC_Doubly_linked_list`, `CCC_Priority_queue`, and `CCC_Bounded_map` all use the minimal words needed to qualify their data structure.
+
+#### Flat Containers
+
+> [!IMPORTANT]
+> Flat containers qualify that they are stored contiguously in memory. References to elements in a flat container are invalidated upon insertion, resizing, and in some cases removal.
+
+For example, the `CCC_Flat_hash_map`, `CCC_Flat_priority_queue`, and `CCC_Flat_double_ended_queue` all qualify their memory layout and use the `Flat_` prefix to distinguish their guarantees from the [`Array_`](#array-containers) containers.
+
+#### Array Containers
+
+> [!IMPORTANT]
+> Array containers qualify that they are stored contiguously in memory **and offer handle stability**. Handles remain valid until removed, regardless of insertion of other elements, removal of other elements, and resizing operations.
+
+For example, the `CCC_Array_bounded_map` and `CCC_Array_adaptive_map` qualify their contiguous memory layout and their use of the `CCC_Handle` interface. The guarantees of handle stability from `Array_` container are much stronger than what `Flat_` containers offer. The `Array_` containers offer the same stability as intrusive containers but use a stable index rather than pointer. For this reason it is important that the interface document that a `CCC_Handle` and `CCC_Handle_index` should be saved rather than a pointer.
+
+A benefit of handle stability is `O(1)` access to a user element referenced by a handle regardless of how the underlying storage moves in memory.
+
 ### Validate Parameters
 
 Because this is a 3rd party library, we are responsible for avoiding undefined behavior and mysterious crashes from the user's perspective. This means checking any inputs to the user facing interface functions as non-NULL and valid for the operations we must complete.
