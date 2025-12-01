@@ -52,30 +52,21 @@ enum
     LR = 2,
 };
 
-/* Container entry return value. */
+/*=======================        Prototypes       ===========================*/
 
-static struct CCC_Adaptive_map_entry container_entry(struct CCC_Adaptive_map *t,
-                                                     void const *key);
-
-/* No return value. */
-
+static struct CCC_Adaptive_map_entry container_entry(struct CCC_Adaptive_map *,
+                                                     void const *);
 static void init_node(struct CCC_Adaptive_map_node *);
-static void swap(void *temp, void *, void *, size_t);
+static void swap(void *, void *, void *, size_t);
 static void link(struct CCC_Adaptive_map_node *, enum Link,
                  struct CCC_Adaptive_map_node *);
-
-/* Boolean returns */
-
 static CCC_Tribool empty(struct CCC_Adaptive_map const *);
 static CCC_Tribool contains(struct CCC_Adaptive_map *, void const *);
 static CCC_Tribool validate(struct CCC_Adaptive_map const *);
-
-/* Returning the user type that is stored in data structure. */
-
 static void *struct_base(struct CCC_Adaptive_map const *,
                          struct CCC_Adaptive_map_node const *);
 static void *find(struct CCC_Adaptive_map *, void const *);
-static void *erase(struct CCC_Adaptive_map *, void const *key);
+static void *erase(struct CCC_Adaptive_map *, void const *);
 static void *allocate_insert(struct CCC_Adaptive_map *,
                              struct CCC_Adaptive_map_node *);
 static void *insert(struct CCC_Adaptive_map *, struct CCC_Adaptive_map_node *);
@@ -83,14 +74,11 @@ static void *connect_new_root(struct CCC_Adaptive_map *,
                               struct CCC_Adaptive_map_node *, CCC_Order);
 static void *max(struct CCC_Adaptive_map const *);
 static void *min(struct CCC_Adaptive_map const *);
-static void *key_in_slot(struct CCC_Adaptive_map const *t, void const *slot);
+static void *key_in_slot(struct CCC_Adaptive_map const *, void const *);
 static void *key_from_node(struct CCC_Adaptive_map const *,
                            CCC_Adaptive_map_node const *);
 static struct CCC_Range equal_range(struct CCC_Adaptive_map *, void const *,
                                     void const *, enum Link);
-
-/* Internal operations that take and return nodes for the tree. */
-
 static struct CCC_Adaptive_map_node *
 remove_from_tree(struct CCC_Adaptive_map *, struct CCC_Adaptive_map_node *);
 static struct CCC_Adaptive_map_node const *
@@ -98,17 +86,14 @@ next(struct CCC_Adaptive_map const *, struct CCC_Adaptive_map_node const *,
      enum Link);
 static struct CCC_Adaptive_map_node *splay(struct CCC_Adaptive_map *,
                                            struct CCC_Adaptive_map_node *,
-                                           void const *key,
-                                           CCC_Key_comparator *);
+                                           void const *, CCC_Key_comparator *);
 static struct CCC_Adaptive_map_node *
-elem_in_slot(struct CCC_Adaptive_map const *t, void const *slot);
-
-/* The key comes first. It is the "left hand side" of the comparison. */
-static CCC_Order order(struct CCC_Adaptive_map const *, void const *key,
+elem_in_slot(struct CCC_Adaptive_map const *, void const *);
+static CCC_Order order(struct CCC_Adaptive_map const *, void const *,
                        struct CCC_Adaptive_map_node const *,
                        CCC_Key_comparator *);
 
-/* ======================        Map Interface      ====================== */
+/*=======================        Map Interface      =========================*/
 
 CCC_Tribool
 CCC_adaptive_map_is_empty(CCC_Adaptive_map const *const map)

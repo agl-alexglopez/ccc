@@ -26,7 +26,7 @@ enum : size_t
 /*==========================   Prototypes    ================================*/
 
 static void *at(CCC_Buffer const *, size_t);
-static size_t max(size_t a, size_t b);
+static size_t max(size_t, size_t);
 
 /*==========================    Interface    ================================*/
 
