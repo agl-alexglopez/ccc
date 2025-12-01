@@ -2,8 +2,8 @@
 
 #define TRAITS_USING_NAMESPACE_CCC
 
-#include "array_bounded_map.h"
-#include "array_bounded_map_utility.h"
+#include "array_tree_map.h"
+#include "array_tree_map_utility.h"
 #include "checkers.h"
 #include "traits.h"
 #include "types.h"
@@ -16,7 +16,7 @@ id_order(CCC_Key_comparator_context const order)
     return (key > c->id) - (key < c->id);
 }
 
-check_begin(insert_shuffled, CCC_Array_bounded_map *m, size_t const size,
+check_begin(insert_shuffled, CCC_Array_tree_map *m, size_t const size,
             int const larger_prime)
 {
     size_t shuffled_index = larger_prime % size;
@@ -33,16 +33,16 @@ check_begin(insert_shuffled, CCC_Array_bounded_map *m, size_t const size,
 
 /* Iterative inorder traversal to check the heap is sorted. */
 size_t
-inorder_fill(int vals[], size_t size, CCC_Array_bounded_map const *const m)
+inorder_fill(int vals[], size_t size, CCC_Array_tree_map const *const m)
 {
-    if (CCC_array_bounded_map_count(m).count != size)
+    if (CCC_array_tree_map_count(m).count != size)
     {
         return 0;
     }
     size_t i = 0;
     for (CCC_Handle_index e = begin(m); e != end(m); e = next(m, e))
     {
-        struct Val const *const v = CCC_array_bounded_map_at(m, e);
+        struct Val const *const v = CCC_array_tree_map_at(m, e);
         vals[i++] = v->id;
     }
     return i;

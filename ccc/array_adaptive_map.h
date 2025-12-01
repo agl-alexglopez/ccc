@@ -313,7 +313,7 @@ struct Val
     int val;
 };
 CCC_array_adaptive_map_declare_fixed_map(Small_fixed_map, struct Val, 64);
-static Array_bounded_map source = array_adaptive_map_initialize(
+static Array_tree_map source = array_adaptive_map_initialize(
     &(static Small_fixed_map){},
     struct Val,
     key,
@@ -323,7 +323,7 @@ static Array_bounded_map source = array_adaptive_map_initialize(
     array_adaptive_map_fixed_capacity(Small_fixed_map)
 );
 insert_rand_vals(&source);
-static Array_bounded_map destination = array_adaptive_map_initialize(
+static Array_tree_map destination = array_adaptive_map_initialize(
     &(static Small_fixed_map){},
     struct Val,
     key,
@@ -1032,7 +1032,7 @@ existing memory to free.
 This function covers the edge case of reserving a dynamic capacity for a
 array_adaptive_map at runtime but denying the array_adaptive_map allocation
 permission to resize. This can help prevent a array_adaptive_map from growing
-unbounded. The user in this case knows the array_adaptive_map does not have
+untree. The user in this case knows the array_adaptive_map does not have
 allocation permission and therefore no further memory will be dedicated to the
 array_adaptive_map.
 

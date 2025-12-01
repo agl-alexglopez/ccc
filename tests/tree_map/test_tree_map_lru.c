@@ -4,14 +4,14 @@ The leetcode lru problem in C. */
 #include <stddef.h>
 #include <stdio.h>
 
-#define BOUNDED_MAP_USING_NAMESPACE_CCC
+#define TREE_MAP_USING_NAMESPACE_CCC
 #define DOUBLY_LINKED_LIST_USING_NAMESPACE_CCC
 #define TRAITS_USING_NAMESPACE_CCC
 
-#include "bounded_map.h"
 #include "checkers.h"
 #include "doubly_linked_list.h"
 #include "traits.h"
+#include "tree_map.h"
 #include "types.h"
 #include "utility/allocate.h"
 
@@ -19,7 +19,7 @@ The leetcode lru problem in C. */
 
 struct Lru_cache
 {
-    CCC_Bounded_map map;
+    CCC_Tree_map map;
     CCC_Doubly_linked_list l;
     size_t cap;
 };
@@ -28,7 +28,7 @@ struct Lru_cache
    in the same struct. */
 struct Lru_node
 {
-    CCC_Bounded_map_node map_node;
+    CCC_Tree_map_node map_node;
     Doubly_linked_list_node list_node;
     int key;
     int val;
@@ -94,14 +94,14 @@ static struct Lru_cache lru_cache = {
     .cap = 3,
     .l = doubly_linked_list_initialize(struct Lru_node, list_node,
                                        order_list_nodes, NULL, NULL),
-    .map = bounded_map_initialize(struct Lru_node, map_node, key, order_by_key,
-                                  std_allocate, NULL),
+    .map = tree_map_initialize(struct Lru_node, map_node, key, order_by_key,
+                               std_allocate, NULL),
 };
 
 check_static_begin(lru_put, struct Lru_cache *const lru, int const key,
                    int const val)
 {
-    CCC_Bounded_map_entry *const ent = entry_wrap(&lru->map, &key);
+    CCC_Tree_map_entry *const ent = entry_wrap(&lru->map, &key);
     if (occupied(ent))
     {
         struct Lru_node *const found = unwrap(ent);
@@ -209,7 +209,7 @@ check_static_begin(run_lru_cache)
                 break;
         }
     }
-    check_end({ (void)CCC_bounded_map_clear(&lru_cache.map, NULL); });
+    check_end({ (void)CCC_tree_map_clear(&lru_cache.map, NULL); });
 }
 
 int

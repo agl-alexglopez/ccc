@@ -690,7 +690,7 @@ with the provided CCC_Allocator. The buffer must have existing memory to free.
 
 This function covers the edge case of reserving a dynamic capacity for a buf
 at runtime but denying the buffer allocation permission to resize. This can help
-prevent a buffer from growing unbounded. The user in this case knows the buffer
+prevent a buffer from growing untree. The user in this case knows the buffer
 does not have allocation permission and therefore no further memory will be
 dedicated to the buf.
 

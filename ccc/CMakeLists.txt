@@ -14,8 +14,8 @@ target_sources(${PROJECT_NAME}
         ${PROJECT_SOURCE_DIR}/source/priority_queue.c
         ${PROJECT_SOURCE_DIR}/source/singly_linked_list.c
         ${PROJECT_SOURCE_DIR}/source/doubly_linked_list.c
-        ${PROJECT_SOURCE_DIR}/source/bounded_map.c
-        ${PROJECT_SOURCE_DIR}/source/array_bounded_map.c
+        ${PROJECT_SOURCE_DIR}/source/tree_map.c
+        ${PROJECT_SOURCE_DIR}/source/array_tree_map.c
         ${PROJECT_SOURCE_DIR}/source/bitset.c
     PUBLIC 
         FILE_SET public_headers
@@ -29,8 +29,8 @@ target_sources(${PROJECT_NAME}
               private/private_array_adaptive_map.h
               private/private_singly_linked_list.h
               private/private_doubly_linked_list.h
-              private/private_bounded_map.h
-              private/private_array_bounded_map.h
+              private/private_tree_map.h
+              private/private_array_tree_map.h
               private/private_traits.h
               private/private_flat_double_ended_queue.h
               private/private_flat_hash_map.h
@@ -44,8 +44,8 @@ target_sources(${PROJECT_NAME}
               flat_priority_queue.h
               adaptive_map.h
               array_adaptive_map.h
-              bounded_map.h
-              array_bounded_map.h
+              tree_map.h
+              array_tree_map.h
               priority_queue.h
               singly_linked_list.h
               doubly_linked_list.h

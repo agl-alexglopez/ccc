@@ -1000,7 +1000,7 @@ with the provided CCC_Allocator. The map must have existing memory to free.
 
 This function covers the edge case of reserving a dynamic capacity for a map
 at runtime but denying the map allocation permission to resize. This can help
-prevent a map from growing unbounded due to internal decisions about rehashes
+prevent a map from growing untree due to internal decisions about rehashes
 and resizing. The user in this case knows the map does not have allocation
 permission and therefore no further memory will be dedicated to the map.
 

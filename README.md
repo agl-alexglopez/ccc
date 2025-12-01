@@ -521,16 +521,16 @@ main(void)
 </details>
 
 <details>
-<summary>array_bounded_map.h (dropdown)</summary>
+<summary>array_tree_map.h (dropdown)</summary>
 An ordered map with strict runtime bounds implemented in an array with indices tracking the tree structure. Offers handle stability. Handles remain valid until an element is removed from a table regardless of other insertions, other deletions, or resizing of the array.
 
 ```c
 #include <assert.h>
 #include <stdbool.h>
-#define ARRAY_BOUNDED_MAP_USING_NAMESPACE_CCC
+#define ARRAY_TREE_MAP_USING_NAMESPACE_CCC
 #define TRAITS_USING_NAMESPACE_CCC
 #define TYPES_USING_NAMESPACE_CCC
-#include "ccc/array_bounded_map.h"
+#include "ccc/array_tree_map.h"
 #include "ccc/traits.h"
 
 struct Key_val
@@ -538,7 +538,7 @@ struct Key_val
     int key;
     int val;
 };
-CCC_array_bounded_map_declare_fixed_map(Key_val_fixed_map, struct Val, 64);
+CCC_array_tree_map_declare_fixed_map(Key_val_fixed_map, struct Val, 64);
 
 static CCC_Order
 Key_val_cmp(CCC_Key_comparator_context const cmp)
@@ -553,14 +553,14 @@ main(void)
 {
     /* stack array, user defined type, key field named key, no allocation
        permission, key comparison function, no context data. */
-    Array_bounded_map s = array_bounded_map_initialize(
+    Array_tree_map s = array_tree_map_initialize(
         &(Key_val_fixed_map){},
         struct Val,
         key,
         hrmap_key_cmp,
         NULL,
         NULL,
-        array_bounded_map_fixed_capacity(Key_val_fixed_map)
+        array_tree_map_fixed_capacity(Key_val_fixed_map)
     );
     int const num_nodes = 25;
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
@@ -577,7 +577,7 @@ main(void)
     for (Handle_index i = range_begin(&r); i != range_end(&r);
          i = next(&s, &i->elem))
     {
-        struct Key_val const *const kv = array_bounded_map_at(&s, i);
+        struct Key_val const *const kv = array_tree_map_at(&s, i);
         assert(kv->key == range_keys[index]);
         ++index;
     }
@@ -590,7 +590,7 @@ main(void)
     for (Handle_index i = range_reverse_begin(&rr); i != range_reverse_end(&rr);
          i = reverse_next(&s, &i->elem))
     {
-        struct Key_val const *const kv = array_bounded_map_at(&s, i);
+        struct Key_val const *const kv = array_tree_map_at(&s, i);
         assert(kv->key == range_reverse_keys[index]);
         ++index;
     }
@@ -719,20 +719,20 @@ main(void)
 </details>
 
 <details>
-<summary>bounded_map.h (dropdown)</summary>
+<summary>tree_map.h (dropdown)</summary>
 A pointer stable ordered map meeting strict O(lg N) runtime bounds for realtime applications.
 
 ```c
 #include <assert.h>
-#define BOUNDED_MAP_USING_NAMESPACE_CCC
+#define TREE_MAP_USING_NAMESPACE_CCC
 #define TRAITS_USING_NAMESPACE_CCC
 #define TYPES_USING_NAMESPACE_CCC
-#include "ccc/bounded_map.h"
+#include "ccc/tree_map.h"
 #include "ccc/traits.h"
 
 struct Key_val
 {
-    Bounded_map_node elem;
+    Tree_map_node elem;
     int key;
     int val;
 };
@@ -752,8 +752,8 @@ main(void)
     /* stack array of 25 elements with one slot for sentinel, intrusive field
        named elem, key field named key, no allocation permission, key comparison
        function, no context data. */
-    Bounded_map s
-        = bounded_map_initialize(s, struct Key_val, elem, key, Key_val_cmp, NULL, NULL);
+    Tree_map s
+        = tree_map_initialize(s, struct Key_val, elem, key, Key_val_cmp, NULL, NULL);
     int const num_nodes = 25;
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
     for (int i = 0, id = 0; i < num_nodes; ++i, id += 5)
@@ -1361,7 +1361,7 @@ A few containers are based off of important work by other data structure develop
 
 - Rust's hashbrown hash table was the basis for the `flat_hash_map.h` container.
     - https://github.com/rust-lang/hashbrown
-- Phil Vachon's implementation of a WAVL tree was the inspiration for the `bounded_map.h` containers.
+- Phil Vachon's implementation of a WAVL tree was the inspiration for the `tree_map.h` containers.
     - https://github.com/pvachon/wavl_tree
 - Research by Daniel Sleator in implementations of Splay Trees helped shape the `adaptive_map.h` containers.
     - https://www.link.cs.cmu.edu/splay/

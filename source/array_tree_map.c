@@ -12,8 +12,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-This file contains my implementation of an array bounded ordered map. The added
-bounded prefix is to indicate that this map meets specific run time bounds
+This file contains my implementation of an array tree ordered map. The added
+tree prefix is to indicate that this map meets specific run time bounds
 that can be relied upon consistently. This is may not be the case if a map
 is implemented with some self-optimizing data structure like a Splay Tree.
 
@@ -57,8 +57,8 @@ to that section, in my opinion. */
 #include <stdint.h>
 #include <string.h>
 
-#include "array_bounded_map.h"
-#include "private/private_array_bounded_map.h"
+#include "array_tree_map.h"
+#include "private/private_array_tree_map.h"
 #include "private/private_types.h"
 #include "types.h"
 
@@ -86,8 +86,8 @@ struct Test_data_type
 {
     int const i;
 };
-CCC_array_bounded_map_declare_fixed_map(Fixed_map_test_type,
-                                        struct Test_data_type, TCAP);
+CCC_array_tree_map_declare_fixed_map(Fixed_map_test_type, struct Test_data_type,
+                                     TCAP);
 /** @internal This is a static fixed size map exclusive to this translation unit
 used to ensure assumptions about data layout are correct. The following static
 asserts must be true in order to support the Struct of Array style layout we
@@ -117,7 +117,7 @@ positions and so that we allocate enough bytes for our single allocation if
 the map is dynamic and not a fixed type. */
 static_assert(
     (char const *)&static_data_nodes_parity_layout_test
-                .parity[CCC_private_array_bounded_map_blocks(TCAP)]
+                .parity[CCC_private_array_tree_map_blocks(TCAP)]
             - (char const *)&static_data_nodes_parity_layout_test.data[0]
         == roundup((sizeof(*static_data_nodes_parity_layout_test.data) * TCAP),
                    alignof(*static_data_nodes_parity_layout_test.nodes))
@@ -125,7 +125,7 @@ static_assert(
                           * TCAP),
                          alignof(*static_data_nodes_parity_layout_test.parity))
                + (sizeof(*static_data_nodes_parity_layout_test.parity)
-                  * CCC_private_array_bounded_map_blocks(TCAP)),
+                  * CCC_private_array_tree_map_blocks(TCAP)),
     "The pointer difference in bytes between end of parity bit array and start "
     "of user data array must be the same as the total bytes we assume to be "
     "stored in that range. Alignment of user data must be considered.");
@@ -185,7 +185,7 @@ enum
 };
 
 /** @internal A block of parity bits. */
-typedef typeof(*(struct CCC_Array_bounded_map){}.parity) Parity_block;
+typedef typeof(*(struct CCC_Array_tree_map){}.parity) Parity_block;
 
 enum : size_t
 {
@@ -201,90 +201,87 @@ static_assert(PARITY_BLOCK_BITS >> PARITY_BLOCK_BITS_LOG2 == 1,
 /*==============================  Prototypes   ==============================*/
 
 /* Returning the user struct type with stored offsets. */
-static void insert(struct CCC_Array_bounded_map *, size_t, CCC_Order, size_t);
-static CCC_Result resize(struct CCC_Array_bounded_map *, size_t,
-                         CCC_Allocator *);
-static void copy_soa(struct CCC_Array_bounded_map const *, void *, size_t);
+static void insert(struct CCC_Array_tree_map *, size_t, CCC_Order, size_t);
+static CCC_Result resize(struct CCC_Array_tree_map *, size_t, CCC_Allocator *);
+static void copy_soa(struct CCC_Array_tree_map const *, void *, size_t);
 static size_t data_bytes(size_t, size_t);
 static size_t node_bytes(size_t);
 static size_t parity_bytes(size_t);
-static struct CCC_Array_bounded_map_node *node_pos(size_t, void const *,
-                                                   size_t);
+static struct CCC_Array_tree_map_node *node_pos(size_t, void const *, size_t);
 static Parity_block *parity_pos(size_t, void const *, size_t);
-static size_t maybe_allocate_insert(struct CCC_Array_bounded_map *, size_t,
+static size_t maybe_allocate_insert(struct CCC_Array_tree_map *, size_t,
                                     CCC_Order, void const *);
-static size_t remove_fixup(struct CCC_Array_bounded_map *, size_t);
-static size_t allocate_slot(struct CCC_Array_bounded_map *);
-static void delete_nodes(struct CCC_Array_bounded_map *, CCC_Type_destructor *);
+static size_t remove_fixup(struct CCC_Array_tree_map *, size_t);
+static size_t allocate_slot(struct CCC_Array_tree_map *);
+static void delete_nodes(struct CCC_Array_tree_map *, CCC_Type_destructor *);
 /* Returning the user key with stored offsets. */
-static void *key_at(struct CCC_Array_bounded_map const *, size_t);
-static void *key_in_slot(struct CCC_Array_bounded_map const *, void const *);
+static void *key_at(struct CCC_Array_tree_map const *, size_t);
+static void *key_in_slot(struct CCC_Array_tree_map const *, void const *);
 /* Returning the internal elem type with stored offsets. */
-static struct CCC_Array_bounded_map_node *
-node_at(struct CCC_Array_bounded_map const *, size_t);
-static void *data_at(struct CCC_Array_bounded_map const *, size_t);
+static struct CCC_Array_tree_map_node *
+node_at(struct CCC_Array_tree_map const *, size_t);
+static void *data_at(struct CCC_Array_tree_map const *, size_t);
 /* Returning the internal query helper to aid in handle handling. */
-static struct Query find(struct CCC_Array_bounded_map const *, void const *);
+static struct Query find(struct CCC_Array_tree_map const *, void const *);
 /* Returning the handle core to the Handle Interface. */
-static inline struct CCC_Array_bounded_map_handle
-handle(struct CCC_Array_bounded_map const *, void const *);
+static inline struct CCC_Array_tree_map_handle
+handle(struct CCC_Array_tree_map const *, void const *);
 /* Returning a generic range that can be use for range or range_reverse. */
-static struct CCC_Handle_range equal_range(struct CCC_Array_bounded_map const *,
+static struct CCC_Handle_range equal_range(struct CCC_Array_tree_map const *,
                                            void const *, void const *,
                                            enum Link);
 /* Returning threeway comparison with user callback. */
-static CCC_Order order_nodes(struct CCC_Array_bounded_map const *, void const *,
+static CCC_Order order_nodes(struct CCC_Array_tree_map const *, void const *,
                              size_t, CCC_Key_comparator *);
 /* Returning read only indices for tree nodes. */
-static size_t sibling_of(struct CCC_Array_bounded_map const *, size_t);
-static size_t next(struct CCC_Array_bounded_map const *, size_t, enum Link);
-static size_t min_max_from(struct CCC_Array_bounded_map const *, size_t,
+static size_t sibling_of(struct CCC_Array_tree_map const *, size_t);
+static size_t next(struct CCC_Array_tree_map const *, size_t, enum Link);
+static size_t min_max_from(struct CCC_Array_tree_map const *, size_t,
                            enum Link);
-static size_t branch_index(struct CCC_Array_bounded_map const *, size_t,
+static size_t branch_index(struct CCC_Array_tree_map const *, size_t,
                            enum Link);
-static size_t parent_index(struct CCC_Array_bounded_map const *, size_t);
+static size_t parent_index(struct CCC_Array_tree_map const *, size_t);
 /* Returning references to index fields for tree nodes. */
-static size_t *branch_pointer(struct CCC_Array_bounded_map const *, size_t,
+static size_t *branch_pointer(struct CCC_Array_tree_map const *, size_t,
                               enum Link);
-static size_t *parent_pointer(struct CCC_Array_bounded_map const *, size_t);
+static size_t *parent_pointer(struct CCC_Array_tree_map const *, size_t);
 /* Returning WAVL tree status. */
-static CCC_Tribool is_0_child(struct CCC_Array_bounded_map const *, size_t,
+static CCC_Tribool is_0_child(struct CCC_Array_tree_map const *, size_t,
                               size_t);
-static CCC_Tribool is_1_child(struct CCC_Array_bounded_map const *, size_t,
+static CCC_Tribool is_1_child(struct CCC_Array_tree_map const *, size_t,
                               size_t);
-static CCC_Tribool is_2_child(struct CCC_Array_bounded_map const *, size_t,
+static CCC_Tribool is_2_child(struct CCC_Array_tree_map const *, size_t,
                               size_t);
-static CCC_Tribool is_3_child(struct CCC_Array_bounded_map const *, size_t,
+static CCC_Tribool is_3_child(struct CCC_Array_tree_map const *, size_t,
                               size_t);
-static CCC_Tribool is_01_parent(struct CCC_Array_bounded_map const *, size_t,
+static CCC_Tribool is_01_parent(struct CCC_Array_tree_map const *, size_t,
                                 size_t, size_t);
-static CCC_Tribool is_11_parent(struct CCC_Array_bounded_map const *, size_t,
+static CCC_Tribool is_11_parent(struct CCC_Array_tree_map const *, size_t,
                                 size_t, size_t);
-static CCC_Tribool is_02_parent(struct CCC_Array_bounded_map const *, size_t,
+static CCC_Tribool is_02_parent(struct CCC_Array_tree_map const *, size_t,
                                 size_t, size_t);
-static CCC_Tribool is_22_parent(struct CCC_Array_bounded_map const *, size_t,
+static CCC_Tribool is_22_parent(struct CCC_Array_tree_map const *, size_t,
                                 size_t, size_t);
-static CCC_Tribool is_leaf(struct CCC_Array_bounded_map const *, size_t);
-static CCC_Tribool parity(struct CCC_Array_bounded_map const *, size_t);
-static void set_parity(struct CCC_Array_bounded_map const *, size_t,
-                       CCC_Tribool);
+static CCC_Tribool is_leaf(struct CCC_Array_tree_map const *, size_t);
+static CCC_Tribool parity(struct CCC_Array_tree_map const *, size_t);
+static void set_parity(struct CCC_Array_tree_map const *, size_t, CCC_Tribool);
 static size_t total_bytes(size_t, size_t);
 static size_t block_count(size_t);
-static CCC_Tribool validate(struct CCC_Array_bounded_map const *);
+static CCC_Tribool validate(struct CCC_Array_tree_map const *);
 /* Returning void and maintaining the WAVL tree. */
-static void init_node(struct CCC_Array_bounded_map const *, size_t);
-static void insert_fixup(struct CCC_Array_bounded_map *, size_t, size_t);
-static void rebalance_3_child(struct CCC_Array_bounded_map *, size_t, size_t);
-static void transplant(struct CCC_Array_bounded_map *, size_t, size_t);
-static void promote(struct CCC_Array_bounded_map const *, size_t);
-static void demote(struct CCC_Array_bounded_map const *, size_t);
-static void double_promote(struct CCC_Array_bounded_map const *, size_t);
-static void double_demote(struct CCC_Array_bounded_map const *, size_t);
+static void init_node(struct CCC_Array_tree_map const *, size_t);
+static void insert_fixup(struct CCC_Array_tree_map *, size_t, size_t);
+static void rebalance_3_child(struct CCC_Array_tree_map *, size_t, size_t);
+static void transplant(struct CCC_Array_tree_map *, size_t, size_t);
+static void promote(struct CCC_Array_tree_map const *, size_t);
+static void demote(struct CCC_Array_tree_map const *, size_t);
+static void double_promote(struct CCC_Array_tree_map const *, size_t);
+static void double_demote(struct CCC_Array_tree_map const *, size_t);
 
-static void rotate(struct CCC_Array_bounded_map *, size_t, size_t, size_t,
+static void rotate(struct CCC_Array_tree_map *, size_t, size_t, size_t,
                    enum Link);
-static void double_rotate(struct CCC_Array_bounded_map *, size_t, size_t,
-                          size_t, enum Link);
+static void double_rotate(struct CCC_Array_tree_map *, size_t, size_t, size_t,
+                          enum Link);
 /* Returning void as miscellaneous helpers. */
 static void swap(void *, void *, void *, size_t);
 static size_t max(size_t, size_t);
@@ -292,8 +289,8 @@ static size_t max(size_t, size_t);
 /*==============================  Interface    ==============================*/
 
 void *
-CCC_array_bounded_map_at(CCC_Array_bounded_map const *const h,
-                         CCC_Handle_index const i)
+CCC_array_tree_map_at(CCC_Array_tree_map const *const h,
+                      CCC_Handle_index const i)
 {
     if (!h || !i)
     {
@@ -303,8 +300,8 @@ CCC_array_bounded_map_at(CCC_Array_bounded_map const *const h,
 }
 
 CCC_Tribool
-CCC_array_bounded_map_contains(CCC_Array_bounded_map const *const map,
-                               void const *const key)
+CCC_array_tree_map_contains(CCC_Array_tree_map const *const map,
+                            void const *const key)
 {
     if (!map || !key)
     {
@@ -314,8 +311,8 @@ CCC_array_bounded_map_contains(CCC_Array_bounded_map const *const map,
 }
 
 CCC_Handle_index
-CCC_array_bounded_map_get_key_value(CCC_Array_bounded_map const *const map,
-                                    void const *const key)
+CCC_array_tree_map_get_key_value(CCC_Array_tree_map const *const map,
+                                 void const *const key)
 {
     if (!map || !key)
     {
@@ -326,8 +323,8 @@ CCC_array_bounded_map_get_key_value(CCC_Array_bounded_map const *const map,
 }
 
 CCC_Handle
-CCC_array_bounded_map_swap_handle(CCC_Array_bounded_map *const map,
-                                  void *const type_output)
+CCC_array_tree_map_swap_handle(CCC_Array_tree_map *const map,
+                               void *const type_output)
 {
     if (!map || !type_output)
     {
@@ -360,8 +357,8 @@ CCC_array_bounded_map_swap_handle(CCC_Array_bounded_map *const map,
 }
 
 CCC_Handle
-CCC_array_bounded_map_try_insert(CCC_Array_bounded_map *const map,
-                                 void const *const type)
+CCC_array_tree_map_try_insert(CCC_Array_tree_map *const map,
+                              void const *const type)
 {
     if (!map || !type)
     {
@@ -390,8 +387,8 @@ CCC_array_bounded_map_try_insert(CCC_Array_bounded_map *const map,
 }
 
 CCC_Handle
-CCC_array_bounded_map_insert_or_assign(CCC_Array_bounded_map *const map,
-                                       void const *const type)
+CCC_array_tree_map_insert_or_assign(CCC_Array_tree_map *const map,
+                                    void const *const type)
 {
     if (!map || !type)
     {
@@ -421,9 +418,9 @@ CCC_array_bounded_map_insert_or_assign(CCC_Array_bounded_map *const map,
     }};
 }
 
-CCC_Array_bounded_map_handle *
-CCC_array_bounded_map_and_modify(CCC_Array_bounded_map_handle *const handle,
-                                 CCC_Type_modifier *const modify)
+CCC_Array_tree_map_handle *
+CCC_array_tree_map_and_modify(CCC_Array_tree_map_handle *const handle,
+                              CCC_Type_modifier *const modify)
 {
     if (handle && modify && handle->private.status & CCC_ENTRY_OCCUPIED
         && handle->private.index > 0)
@@ -436,10 +433,10 @@ CCC_array_bounded_map_and_modify(CCC_Array_bounded_map_handle *const handle,
     return handle;
 }
 
-CCC_Array_bounded_map_handle *
-CCC_array_bounded_map_and_modify_context(
-    CCC_Array_bounded_map_handle *const handle, CCC_Type_modifier *const modify,
-    void *const context)
+CCC_Array_tree_map_handle *
+CCC_array_tree_map_and_modify_context(CCC_Array_tree_map_handle *const handle,
+                                      CCC_Type_modifier *const modify,
+                                      void *const context)
 {
     if (handle && modify && handle->private.status & CCC_ENTRY_OCCUPIED
         && handle->private.status > 0)
@@ -453,8 +450,8 @@ CCC_array_bounded_map_and_modify_context(
 }
 
 CCC_Handle_index
-CCC_array_bounded_map_or_insert(CCC_Array_bounded_map_handle const *const h,
-                                void const *const type)
+CCC_array_tree_map_or_insert(CCC_Array_tree_map_handle const *const h,
+                             void const *const type)
 {
     if (!h || !type)
     {
@@ -469,8 +466,8 @@ CCC_array_bounded_map_or_insert(CCC_Array_bounded_map_handle const *const h,
 }
 
 CCC_Handle_index
-CCC_array_bounded_map_insert_handle(CCC_Array_bounded_map_handle const *const h,
-                                    void const *const type)
+CCC_array_tree_map_insert_handle(CCC_Array_tree_map_handle const *const h,
+                                 void const *const type)
 {
     if (!h || !type)
     {
@@ -489,20 +486,20 @@ CCC_array_bounded_map_insert_handle(CCC_Array_bounded_map_handle const *const h,
                                  h->private.last_order, type);
 }
 
-CCC_Array_bounded_map_handle
-CCC_array_bounded_map_handle(CCC_Array_bounded_map const *const map,
-                             void const *const key)
+CCC_Array_tree_map_handle
+CCC_array_tree_map_handle(CCC_Array_tree_map const *const map,
+                          void const *const key)
 {
     if (!map || !key)
     {
-        return (CCC_Array_bounded_map_handle){
+        return (CCC_Array_tree_map_handle){
             {.status = CCC_ENTRY_ARGUMENT_ERROR}};
     }
-    return (CCC_Array_bounded_map_handle){handle(map, key)};
+    return (CCC_Array_tree_map_handle){handle(map, key)};
 }
 
 CCC_Handle
-CCC_array_bounded_map_remove_handle(CCC_Array_bounded_map_handle const *const h)
+CCC_array_tree_map_remove_handle(CCC_Array_tree_map_handle const *const h)
 {
     if (!h)
     {
@@ -523,8 +520,8 @@ CCC_array_bounded_map_remove_handle(CCC_Array_bounded_map_handle const *const h)
 }
 
 CCC_Handle
-CCC_array_bounded_map_remove(CCC_Array_bounded_map *const map,
-                             void *const type_output)
+CCC_array_tree_map_remove(CCC_Array_tree_map *const map,
+                          void *const type_output)
 {
     if (!map || !type_output)
     {
@@ -552,9 +549,9 @@ CCC_array_bounded_map_remove(CCC_Array_bounded_map *const map,
 }
 
 CCC_Handle_range
-CCC_array_bounded_map_equal_range(CCC_Array_bounded_map const *const map,
-                                  void const *const begin_key,
-                                  void const *const end_key)
+CCC_array_tree_map_equal_range(CCC_Array_tree_map const *const map,
+                               void const *const begin_key,
+                               void const *const end_key)
 {
     if (!map || !begin_key || !end_key)
     {
@@ -564,9 +561,9 @@ CCC_array_bounded_map_equal_range(CCC_Array_bounded_map const *const map,
 }
 
 CCC_Handle_range_reverse
-CCC_array_bounded_map_equal_range_reverse(
-    CCC_Array_bounded_map const *const map, void const *const reverse_begin_key,
-    void const *const reverse_end_key)
+CCC_array_tree_map_equal_range_reverse(CCC_Array_tree_map const *const map,
+                                       void const *const reverse_begin_key,
+                                       void const *const reverse_end_key)
 {
     if (!map || !reverse_begin_key || !reverse_end_key)
     {
@@ -577,7 +574,7 @@ CCC_array_bounded_map_equal_range_reverse(
 }
 
 CCC_Handle_index
-CCC_array_bounded_map_unwrap(CCC_Array_bounded_map_handle const *const h)
+CCC_array_tree_map_unwrap(CCC_Array_tree_map_handle const *const h)
 {
     if (h && h->private.status & CCC_ENTRY_OCCUPIED && h->private.index > 0)
     {
@@ -587,7 +584,7 @@ CCC_array_bounded_map_unwrap(CCC_Array_bounded_map_handle const *const h)
 }
 
 CCC_Tribool
-CCC_array_bounded_map_insert_error(CCC_Array_bounded_map_handle const *const h)
+CCC_array_tree_map_insert_error(CCC_Array_tree_map_handle const *const h)
 {
     if (!h)
     {
@@ -597,7 +594,7 @@ CCC_array_bounded_map_insert_error(CCC_Array_bounded_map_handle const *const h)
 }
 
 CCC_Tribool
-CCC_array_bounded_map_occupied(CCC_Array_bounded_map_handle const *const h)
+CCC_array_tree_map_occupied(CCC_Array_tree_map_handle const *const h)
 {
     if (!h)
     {
@@ -607,23 +604,23 @@ CCC_array_bounded_map_occupied(CCC_Array_bounded_map_handle const *const h)
 }
 
 CCC_Handle_status
-CCC_array_bounded_map_handle_status(CCC_Array_bounded_map_handle const *const h)
+CCC_array_tree_map_handle_status(CCC_Array_tree_map_handle const *const h)
 {
     return h ? h->private.status : CCC_ENTRY_ARGUMENT_ERROR;
 }
 
 CCC_Tribool
-CCC_array_bounded_map_is_empty(CCC_Array_bounded_map const *const map)
+CCC_array_tree_map_is_empty(CCC_Array_tree_map const *const map)
 {
     if (!map)
     {
         return CCC_TRIBOOL_ERROR;
     }
-    return !CCC_array_bounded_map_count(map).count;
+    return !CCC_array_tree_map_count(map).count;
 }
 
 CCC_Count
-CCC_array_bounded_map_count(CCC_Array_bounded_map const *const map)
+CCC_array_tree_map_count(CCC_Array_tree_map const *const map)
 {
     if (!map)
     {
@@ -638,7 +635,7 @@ CCC_array_bounded_map_count(CCC_Array_bounded_map const *const map)
 }
 
 CCC_Count
-CCC_array_bounded_map_capacity(CCC_Array_bounded_map const *const map)
+CCC_array_tree_map_capacity(CCC_Array_tree_map const *const map)
 {
     if (!map)
     {
@@ -648,7 +645,7 @@ CCC_array_bounded_map_capacity(CCC_Array_bounded_map const *const map)
 }
 
 CCC_Handle_index
-CCC_array_bounded_map_begin(CCC_Array_bounded_map const *const map)
+CCC_array_tree_map_begin(CCC_Array_tree_map const *const map)
 {
     if (!map || !map->capacity)
     {
@@ -659,7 +656,7 @@ CCC_array_bounded_map_begin(CCC_Array_bounded_map const *const map)
 }
 
 CCC_Handle_index
-CCC_array_bounded_map_reverse_begin(CCC_Array_bounded_map const *const map)
+CCC_array_tree_map_reverse_begin(CCC_Array_tree_map const *const map)
 {
     if (!map || !map->capacity)
     {
@@ -670,8 +667,8 @@ CCC_array_bounded_map_reverse_begin(CCC_Array_bounded_map const *const map)
 }
 
 CCC_Handle_index
-CCC_array_bounded_map_next(CCC_Array_bounded_map const *const map,
-                           CCC_Handle_index iterator)
+CCC_array_tree_map_next(CCC_Array_tree_map const *const map,
+                        CCC_Handle_index iterator)
 {
     if (!map || !iterator || !map->capacity)
     {
@@ -682,8 +679,8 @@ CCC_array_bounded_map_next(CCC_Array_bounded_map const *const map,
 }
 
 CCC_Handle_index
-CCC_array_bounded_map_reverse_next(CCC_Array_bounded_map const *const map,
-                                   CCC_Handle_index iterator)
+CCC_array_tree_map_reverse_next(CCC_Array_tree_map const *const map,
+                                CCC_Handle_index iterator)
 {
     if (!map || !iterator || !map->capacity)
     {
@@ -694,21 +691,20 @@ CCC_array_bounded_map_reverse_next(CCC_Array_bounded_map const *const map,
 }
 
 CCC_Handle_index
-CCC_array_bounded_map_end(CCC_Array_bounded_map const *const)
+CCC_array_tree_map_end(CCC_Array_tree_map const *const)
 {
     return 0;
 }
 
 CCC_Handle_index
-CCC_array_bounded_map_reverse_end(CCC_Array_bounded_map const *const)
+CCC_array_tree_map_reverse_end(CCC_Array_tree_map const *const)
 {
     return 0;
 }
 
 CCC_Result
-CCC_array_bounded_map_reserve(CCC_Array_bounded_map *const map,
-                              size_t const to_add,
-                              CCC_Allocator *const allocate)
+CCC_array_tree_map_reserve(CCC_Array_tree_map *const map, size_t const to_add,
+                           CCC_Allocator *const allocate)
 {
     if (!map || !to_add || !allocate)
     {
@@ -748,9 +744,9 @@ CCC_array_bounded_map_reserve(CCC_Array_bounded_map *const map,
 }
 
 CCC_Result
-CCC_array_bounded_map_copy(CCC_Array_bounded_map *const destination,
-                           CCC_Array_bounded_map const *const source,
-                           CCC_Allocator *const allocate)
+CCC_array_tree_map_copy(CCC_Array_tree_map *const destination,
+                        CCC_Array_tree_map const *const source,
+                        CCC_Allocator *const allocate)
 {
     if (!destination || !source || source == destination
         || (destination->capacity < source->capacity && !allocate))
@@ -758,7 +754,7 @@ CCC_array_bounded_map_copy(CCC_Array_bounded_map *const destination,
         return CCC_RESULT_ARGUMENT_ERROR;
     }
     void *const destination_data = destination->data;
-    struct CCC_Array_bounded_map_node *const destination_nodes
+    struct CCC_Array_tree_map_node *const destination_nodes
         = destination->nodes;
     Parity_block *const destination_parity = destination->parity;
     size_t const destination_cap = destination->capacity;
@@ -798,8 +794,8 @@ CCC_array_bounded_map_copy(CCC_Array_bounded_map *const destination,
 }
 
 CCC_Result
-CCC_array_bounded_map_clear(CCC_Array_bounded_map *const map,
-                            CCC_Type_destructor *const destroy)
+CCC_array_tree_map_clear(CCC_Array_tree_map *const map,
+                         CCC_Type_destructor *const destroy)
 {
     if (!map)
     {
@@ -815,8 +811,8 @@ CCC_array_bounded_map_clear(CCC_Array_bounded_map *const map,
 }
 
 CCC_Result
-CCC_array_bounded_map_clear_and_free(CCC_Array_bounded_map *const map,
-                                     CCC_Type_destructor *const destroy)
+CCC_array_tree_map_clear_and_free(CCC_Array_tree_map *const map,
+                                  CCC_Type_destructor *const destroy)
 {
     if (!map || !map->allocate)
     {
@@ -840,9 +836,9 @@ CCC_array_bounded_map_clear_and_free(CCC_Array_bounded_map *const map,
 }
 
 CCC_Result
-CCC_array_bounded_map_clear_and_free_reserve(CCC_Array_bounded_map *const map,
-                                             CCC_Type_destructor *const destroy,
-                                             CCC_Allocator *const allocate)
+CCC_array_tree_map_clear_and_free_reserve(CCC_Array_tree_map *const map,
+                                          CCC_Type_destructor *const destroy,
+                                          CCC_Allocator *const allocate)
 {
     if (!map || !allocate)
     {
@@ -866,7 +862,7 @@ CCC_array_bounded_map_clear_and_free_reserve(CCC_Array_bounded_map *const map,
 }
 
 CCC_Tribool
-CCC_array_bounded_map_validate(CCC_Array_bounded_map const *const map)
+CCC_array_tree_map_validate(CCC_Array_tree_map const *const map)
 {
     if (!map)
     {
@@ -878,45 +874,44 @@ CCC_array_bounded_map_validate(CCC_Array_bounded_map const *const map)
 /*========================  Private Interface  ==============================*/
 
 void
-CCC_private_array_bounded_map_insert(struct CCC_Array_bounded_map *const map,
-                                     size_t const parent_i,
-                                     CCC_Order const last_order,
-                                     size_t const elem_i)
+CCC_private_array_tree_map_insert(struct CCC_Array_tree_map *const map,
+                                  size_t const parent_i,
+                                  CCC_Order const last_order,
+                                  size_t const elem_i)
 {
     insert(map, parent_i, last_order, elem_i);
 }
 
-struct CCC_Array_bounded_map_handle
-CCC_private_array_bounded_map_handle(
-    struct CCC_Array_bounded_map const *const map, void const *const key)
+struct CCC_Array_tree_map_handle
+CCC_private_array_tree_map_handle(struct CCC_Array_tree_map const *const map,
+                                  void const *const key)
 {
     return handle(map, key);
 }
 
 void *
-CCC_private_array_bounded_map_data_at(
-    struct CCC_Array_bounded_map const *const map, size_t const slot)
+CCC_private_array_tree_map_data_at(struct CCC_Array_tree_map const *const map,
+                                   size_t const slot)
 {
     return data_at(map, slot);
 }
 
 void *
-CCC_private_array_bounded_map_key_at(
-    struct CCC_Array_bounded_map const *const map, size_t const slot)
+CCC_private_array_tree_map_key_at(struct CCC_Array_tree_map const *const map,
+                                  size_t const slot)
 {
     return key_at(map, slot);
 }
 
-struct CCC_Array_bounded_map_node *
-CCC_private_array_bounded_map_node_at(struct CCC_Array_bounded_map const *map,
-                                      size_t const i)
+struct CCC_Array_tree_map_node *
+CCC_private_array_tree_map_node_at(struct CCC_Array_tree_map const *map,
+                                   size_t const i)
 {
     return node_at(map, i);
 }
 
 size_t
-CCC_private_array_bounded_map_allocate_slot(
-    struct CCC_Array_bounded_map *const map)
+CCC_private_array_tree_map_allocate_slot(struct CCC_Array_tree_map *const map)
 {
     return allocate_slot(map);
 }
@@ -924,9 +919,8 @@ CCC_private_array_bounded_map_allocate_slot(
 /*==========================  Static Helpers   ==============================*/
 
 static size_t
-maybe_allocate_insert(struct CCC_Array_bounded_map *const map,
-                      size_t const parent, CCC_Order const last_order,
-                      void const *const user_type)
+maybe_allocate_insert(struct CCC_Array_tree_map *const map, size_t const parent,
+                      CCC_Order const last_order, void const *const user_type)
 {
     /* The end sentinel node will always be at 0. This also means once
        initialized the internal size for implementer is always at least 1. */
@@ -941,7 +935,7 @@ maybe_allocate_insert(struct CCC_Array_bounded_map *const map,
 }
 
 static size_t
-allocate_slot(struct CCC_Array_bounded_map *const map)
+allocate_slot(struct CCC_Array_tree_map *const map)
 {
     /* The end sentinel node will always be at 0. This also means once
        initialized the internal size for implementer is always at least 1. */
@@ -986,7 +980,7 @@ allocate_slot(struct CCC_Array_bounded_map *const map)
 }
 
 static CCC_Result
-resize(struct CCC_Array_bounded_map *const map, size_t const new_capacity,
+resize(struct CCC_Array_tree_map *const map, size_t const new_capacity,
        CCC_Allocator *const allocate)
 {
     if (map->capacity && new_capacity <= map->capacity - 1)
@@ -1020,10 +1014,10 @@ resize(struct CCC_Array_bounded_map *const map, size_t const new_capacity,
 }
 
 static void
-insert(struct CCC_Array_bounded_map *const map, size_t const parent_i,
+insert(struct CCC_Array_tree_map *const map, size_t const parent_i,
        CCC_Order const last_order, size_t const elem_i)
 {
-    struct CCC_Array_bounded_map_node *elem = node_at(map, elem_i);
+    struct CCC_Array_tree_map_node *elem = node_at(map, elem_i);
     init_node(map, elem_i);
     if (map->count == INSERT_ROOT_COUNT)
     {
@@ -1034,7 +1028,7 @@ insert(struct CCC_Array_bounded_map *const map, size_t const parent_i,
     CCC_Tribool rank_rule_break = false;
     if (parent_i)
     {
-        struct CCC_Array_bounded_map_node *parent = node_at(map, parent_i);
+        struct CCC_Array_tree_map_node *parent = node_at(map, parent_i);
         rank_rule_break = !parent->branch[L] && !parent->branch[R];
         parent->branch[CCC_ORDER_GREATER == last_order] = elem_i;
     }
@@ -1045,21 +1039,21 @@ insert(struct CCC_Array_bounded_map *const map, size_t const parent_i,
     }
 }
 
-static struct CCC_Array_bounded_map_handle
-handle(struct CCC_Array_bounded_map const *const map, void const *const key)
+static struct CCC_Array_tree_map_handle
+handle(struct CCC_Array_tree_map const *const map, void const *const key)
 {
     struct Query const q = find(map, key);
     if (CCC_ORDER_EQUAL == q.last_order)
     {
-        return (struct CCC_Array_bounded_map_handle){
-            .map = (struct CCC_Array_bounded_map *)map,
+        return (struct CCC_Array_tree_map_handle){
+            .map = (struct CCC_Array_tree_map *)map,
             .last_order = q.last_order,
             .index = q.found,
             .status = CCC_ENTRY_OCCUPIED,
         };
     }
-    return (struct CCC_Array_bounded_map_handle){
-        .map = (struct CCC_Array_bounded_map *)map,
+    return (struct CCC_Array_tree_map_handle){
+        .map = (struct CCC_Array_tree_map *)map,
         .last_order = q.last_order,
         .index = q.parent,
         .status = CCC_ENTRY_NO_UNWRAP | CCC_ENTRY_VACANT,
@@ -1067,7 +1061,7 @@ handle(struct CCC_Array_bounded_map const *const map, void const *const key)
 }
 
 static struct Query
-find(struct CCC_Array_bounded_map const *const map, void const *const key)
+find(struct CCC_Array_tree_map const *const map, void const *const key)
 {
     size_t parent = 0;
     struct Query q = {
@@ -1090,7 +1084,7 @@ find(struct CCC_Array_bounded_map const *const map, void const *const key)
 }
 
 static size_t
-next(struct CCC_Array_bounded_map const *const map, size_t n,
+next(struct CCC_Array_tree_map const *const map, size_t n,
      enum Link const traversal)
 {
     if (!n)
@@ -1117,11 +1111,11 @@ next(struct CCC_Array_bounded_map const *const map, size_t n,
 }
 
 static struct CCC_Handle_range
-equal_range(struct CCC_Array_bounded_map const *const map,
+equal_range(struct CCC_Array_tree_map const *const map,
             void const *const begin_key, void const *const end_key,
             enum Link const traversal)
 {
-    if (CCC_array_bounded_map_is_empty(map))
+    if (CCC_array_tree_map_is_empty(map))
     {
         return (struct CCC_Handle_range){};
     }
@@ -1143,7 +1137,7 @@ equal_range(struct CCC_Array_bounded_map const *const map,
 }
 
 static size_t
-min_max_from(struct CCC_Array_bounded_map const *const map, size_t start,
+min_max_from(struct CCC_Array_tree_map const *const map, size_t start,
              enum Link const dir)
 {
     if (!start)
@@ -1163,7 +1157,7 @@ This function does not update any count or capacity fields of the map, it
 simply calls the destructor on each node and removes the nodes references to
 other tree elements. */
 static void
-delete_nodes(struct CCC_Array_bounded_map *const map,
+delete_nodes(struct CCC_Array_tree_map *const map,
              CCC_Type_destructor *const destroy)
 {
     assert(map);
@@ -1171,7 +1165,7 @@ delete_nodes(struct CCC_Array_bounded_map *const map,
     size_t node = map->root;
     while (node)
     {
-        struct CCC_Array_bounded_map_node *const e = node_at(map, node);
+        struct CCC_Array_tree_map_node *const e = node_at(map, node);
         if (e->branch[L])
         {
             size_t const left = e->branch[L];
@@ -1192,9 +1186,8 @@ delete_nodes(struct CCC_Array_bounded_map *const map,
 }
 
 static inline CCC_Order
-order_nodes(struct CCC_Array_bounded_map const *const map,
-            void const *const key, size_t const node,
-            CCC_Key_comparator *const compare)
+order_nodes(struct CCC_Array_tree_map const *const map, void const *const key,
+            size_t const node, CCC_Key_comparator *const compare)
 {
     return compare((CCC_Key_comparator_context){
         .key_left = key,
@@ -1212,8 +1205,8 @@ static inline size_t
 data_bytes(size_t const sizeof_type, size_t const capacity)
 {
     return ((sizeof_type * capacity)
-            + alignof(*(struct CCC_Array_bounded_map){}.nodes) - 1)
-         & ~(alignof(*(struct CCC_Array_bounded_map){}.nodes) - 1);
+            + alignof(*(struct CCC_Array_tree_map){}.nodes) - 1)
+         & ~(alignof(*(struct CCC_Array_tree_map){}.nodes) - 1);
 }
 
 /** Calculates the number of bytes needed for the nodes array INCLUDING any
@@ -1225,9 +1218,9 @@ occur. */
 static inline size_t
 node_bytes(size_t const capacity)
 {
-    return ((sizeof(*(struct CCC_Array_bounded_map){}.nodes) * capacity)
-            + alignof(*(struct CCC_Array_bounded_map){}.parity) - 1)
-         & ~(alignof(*(struct CCC_Array_bounded_map){}.parity) - 1);
+    return ((sizeof(*(struct CCC_Array_tree_map){}.nodes) * capacity)
+            + alignof(*(struct CCC_Array_tree_map){}.parity) - 1)
+         & ~(alignof(*(struct CCC_Array_tree_map){}.parity) - 1);
 }
 
 /** Calculates the number of bytes needed for the parity block bit array. No
@@ -1259,13 +1252,13 @@ total_bytes(size_t sizeof_type, size_t const capacity)
 positions is guaranteed to be the first aligned byte given the alignment of the
 node type after the data array. The data array has added any necessary padding
 after it to ensure that the base of the node array is aligned for its type. */
-static inline struct CCC_Array_bounded_map_node *
+static inline struct CCC_Array_tree_map_node *
 node_pos(size_t const sizeof_type, void const *const data,
          size_t const capacity)
 {
-    return (struct CCC_Array_bounded_map_node *)((char *)data
-                                                 + data_bytes(sizeof_type,
-                                                              capacity));
+    return (
+        struct CCC_Array_tree_map_node *)((char *)data
+                                          + data_bytes(sizeof_type, capacity));
 }
 
 /** Returns the base of the parity array relative to the data base pointer. This
@@ -1287,7 +1280,7 @@ points to the base of an allocation that has been allocated with sufficient
 bytes to support the user data, nodes, and parity arrays for the provided new
 capacity. */
 static inline void
-copy_soa(struct CCC_Array_bounded_map const *const source,
+copy_soa(struct CCC_Array_tree_map const *const source,
          void *const destination_data_base, size_t const destination_capacity)
 {
     if (!source->data)
@@ -1311,10 +1304,10 @@ copy_soa(struct CCC_Array_bounded_map const *const source,
 }
 
 static inline void
-init_node(struct CCC_Array_bounded_map const *const map, size_t const node)
+init_node(struct CCC_Array_tree_map const *const map, size_t const node)
 {
     set_parity(map, node, CCC_FALSE);
-    struct CCC_Array_bounded_map_node *const e = node_at(map, node);
+    struct CCC_Array_tree_map_node *const e = node_at(map, node);
     e->branch[L] = e->branch[R] = e->parent = 0;
 }
 
@@ -1330,20 +1323,20 @@ swap(void *const temp, void *const a, void *const b, size_t const sizeof_type)
     (void)memcpy(b, temp, sizeof_type);
 }
 
-static inline struct CCC_Array_bounded_map_node *
-node_at(struct CCC_Array_bounded_map const *const map, size_t const i)
+static inline struct CCC_Array_tree_map_node *
+node_at(struct CCC_Array_tree_map const *const map, size_t const i)
 {
     return &map->nodes[i];
 }
 
 static inline void *
-data_at(struct CCC_Array_bounded_map const *const map, size_t const i)
+data_at(struct CCC_Array_tree_map const *const map, size_t const i)
 {
     return (char *)map->data + (map->sizeof_type * i);
 }
 
 static inline Parity_block *
-block_at(struct CCC_Array_bounded_map const *const map, size_t const i)
+block_at(struct CCC_Array_tree_map const *const map, size_t const i)
 {
     static_assert((typeof(i))~((typeof(i))0) >= (typeof(i))0,
                   "shifting to avoid division with power of 2 divisor is only "
@@ -1362,26 +1355,26 @@ bit_on(size_t const i)
 }
 
 static inline size_t
-branch_index(struct CCC_Array_bounded_map const *const map, size_t const parent,
+branch_index(struct CCC_Array_tree_map const *const map, size_t const parent,
              enum Link const dir)
 {
     return node_at(map, parent)->branch[dir];
 }
 
 static inline size_t
-parent_index(struct CCC_Array_bounded_map const *const map, size_t const child)
+parent_index(struct CCC_Array_tree_map const *const map, size_t const child)
 {
     return node_at(map, child)->parent;
 }
 
 static inline CCC_Tribool
-parity(struct CCC_Array_bounded_map const *const map, size_t const node)
+parity(struct CCC_Array_tree_map const *const map, size_t const node)
 {
     return (*block_at(map, node) & bit_on(node)) != 0;
 }
 
 static inline void
-set_parity(struct CCC_Array_bounded_map const *const map, size_t const node,
+set_parity(struct CCC_Array_tree_map const *const map, size_t const node,
            CCC_Tribool const status)
 {
     if (status)
@@ -1405,28 +1398,27 @@ block_count(size_t const node_count)
 }
 
 static inline size_t *
-branch_pointer(struct CCC_Array_bounded_map const *t, size_t const node,
+branch_pointer(struct CCC_Array_tree_map const *t, size_t const node,
                enum Link const branch)
 {
     return &node_at(t, node)->branch[branch];
 }
 
 static inline size_t *
-parent_pointer(struct CCC_Array_bounded_map const *t, size_t const node)
+parent_pointer(struct CCC_Array_tree_map const *t, size_t const node)
 {
 
     return &node_at(t, node)->parent;
 }
 
 static inline void *
-key_at(struct CCC_Array_bounded_map const *const map, size_t const i)
+key_at(struct CCC_Array_tree_map const *const map, size_t const i)
 {
     return (char *)data_at(map, i) + map->key_offset;
 }
 
 static void *
-key_in_slot(struct CCC_Array_bounded_map const *t,
-            void const *const user_struct)
+key_in_slot(struct CCC_Array_tree_map const *t, void const *const user_struct)
 {
     return (char *)user_struct + t->key_offset;
 }
@@ -1436,7 +1428,7 @@ key_in_slot(struct CCC_Array_bounded_map const *t,
 /** Follows the specification in the "Rank-Balanced Trees" paper by Haeupler,
 Sen, and Tarjan (Fig. 2. pg 7). Assumes x's parent z is not null. */
 static void
-insert_fixup(struct CCC_Array_bounded_map *const map, size_t z, size_t x)
+insert_fixup(struct CCC_Array_tree_map *const map, size_t z, size_t x)
 {
     assert(z);
     do
@@ -1475,7 +1467,7 @@ insert_fixup(struct CCC_Array_bounded_map *const map, size_t z, size_t x)
 }
 
 static size_t
-remove_fixup(struct CCC_Array_bounded_map *const map, size_t const remove)
+remove_fixup(struct CCC_Array_tree_map *const map, size_t const remove)
 {
     size_t y = 0;
     size_t x = 0;
@@ -1540,7 +1532,7 @@ remove_fixup(struct CCC_Array_bounded_map *const map, size_t const remove)
 }
 
 static void
-transplant(struct CCC_Array_bounded_map *const map, size_t const remove,
+transplant(struct CCC_Array_tree_map *const map, size_t const remove,
            size_t const replacement)
 {
     assert(remove);
@@ -1556,9 +1548,8 @@ transplant(struct CCC_Array_bounded_map *const map, size_t const remove,
         *branch_pointer(map, p, branch_index(map, p, R) == remove)
             = replacement;
     }
-    struct CCC_Array_bounded_map_node *const remove_r = node_at(map, remove);
-    struct CCC_Array_bounded_map_node *const replace_r
-        = node_at(map, replacement);
+    struct CCC_Array_tree_map_node *const remove_r = node_at(map, remove);
+    struct CCC_Array_tree_map_node *const replace_r = node_at(map, replacement);
     *parent_pointer(map, remove_r->branch[R]) = replacement;
     *parent_pointer(map, remove_r->branch[L]) = replacement;
     replace_r->branch[R] = remove_r->branch[R];
@@ -1569,7 +1560,7 @@ transplant(struct CCC_Array_bounded_map *const map, size_t const remove,
 /** Follows the specification in the "Rank-Balanced Trees" paper by Haeupler,
 Sen, and Tarjan (Fig. 3. pg 8). */
 static void
-rebalance_3_child(struct CCC_Array_bounded_map *const map, size_t z, size_t x)
+rebalance_3_child(struct CCC_Array_tree_map *const map, size_t z, size_t x)
 {
     CCC_Tribool made_3_child = CCC_TRUE;
     while (z && made_3_child)
@@ -1655,12 +1646,12 @@ and uppercase are arbitrary subtrees.
        │              │
        B              B */
 static void
-rotate(struct CCC_Array_bounded_map *const map, size_t const z, size_t const x,
+rotate(struct CCC_Array_tree_map *const map, size_t const z, size_t const x,
        size_t const y, enum Link const dir)
 {
     assert(z);
-    struct CCC_Array_bounded_map_node *const z_r = node_at(map, z);
-    struct CCC_Array_bounded_map_node *const x_r = node_at(map, x);
+    struct CCC_Array_tree_map_node *const z_r = node_at(map, z);
+    struct CCC_Array_tree_map_node *const x_r = node_at(map, x);
     size_t const g = parent_index(map, z);
     x_r->parent = g;
     if (!g)
@@ -1669,7 +1660,7 @@ rotate(struct CCC_Array_bounded_map *const map, size_t const z, size_t const x,
     }
     else
     {
-        struct CCC_Array_bounded_map_node *const g_r = node_at(map, g);
+        struct CCC_Array_tree_map_node *const g_r = node_at(map, g);
         g_r->branch[g_r->branch[R] == z] = x;
     }
     x_r->branch[dir] = z;
@@ -1692,13 +1683,13 @@ Lowercase are nodes and uppercase are arbitrary subtrees.
 
 Taking a link as input allows us to code both symmetrical cases at once. */
 static void
-double_rotate(struct CCC_Array_bounded_map *const map, size_t const z,
+double_rotate(struct CCC_Array_tree_map *const map, size_t const z,
               size_t const x, size_t const y, enum Link const dir)
 {
     assert(z && x && y);
-    struct CCC_Array_bounded_map_node *const z_r = node_at(map, z);
-    struct CCC_Array_bounded_map_node *const x_r = node_at(map, x);
-    struct CCC_Array_bounded_map_node *const y_r = node_at(map, y);
+    struct CCC_Array_tree_map_node *const z_r = node_at(map, z);
+    struct CCC_Array_tree_map_node *const x_r = node_at(map, x);
+    struct CCC_Array_tree_map_node *const y_r = node_at(map, y);
     size_t const g = z_r->parent;
     y_r->parent = g;
     if (!g)
@@ -1707,7 +1698,7 @@ double_rotate(struct CCC_Array_bounded_map *const map, size_t const z,
     }
     else
     {
-        struct CCC_Array_bounded_map_node *const g_r = node_at(map, g);
+        struct CCC_Array_tree_map_node *const g_r = node_at(map, g);
         g_r->branch[g_r->branch[R] == z] = y;
     }
     x_r->branch[!dir] = y_r->branch[dir];
@@ -1726,7 +1717,7 @@ double_rotate(struct CCC_Array_bounded_map *const map, size_t const z,
       0╭─╯
        x */
 [[maybe_unused]] static inline CCC_Tribool
-is_0_child(struct CCC_Array_bounded_map const *const map, size_t const p,
+is_0_child(struct CCC_Array_tree_map const *const map, size_t const p,
            size_t const x)
 {
     return p && parity(map, p) == parity(map, x);
@@ -1737,7 +1728,7 @@ is_0_child(struct CCC_Array_bounded_map const *const map, size_t const p,
       1╭─╯
        x */
 static inline CCC_Tribool
-is_1_child(struct CCC_Array_bounded_map const *const map, size_t const p,
+is_1_child(struct CCC_Array_tree_map const *const map, size_t const p,
            size_t const x)
 {
     return p && parity(map, p) != parity(map, x);
@@ -1748,7 +1739,7 @@ is_1_child(struct CCC_Array_bounded_map const *const map, size_t const p,
       2╭─╯
        x */
 static inline CCC_Tribool
-is_2_child(struct CCC_Array_bounded_map const *const map, size_t const p,
+is_2_child(struct CCC_Array_tree_map const *const map, size_t const p,
            size_t const x)
 {
     return p && parity(map, p) == parity(map, x);
@@ -1759,7 +1750,7 @@ is_2_child(struct CCC_Array_bounded_map const *const map, size_t const p,
       3╭─╯
        x */
 [[maybe_unused]] static inline CCC_Tribool
-is_3_child(struct CCC_Array_bounded_map const *const map, size_t const p,
+is_3_child(struct CCC_Array_tree_map const *const map, size_t const p,
            size_t const x)
 {
     return p && parity(map, p) != parity(map, x);
@@ -1771,7 +1762,7 @@ is_3_child(struct CCC_Array_bounded_map const *const map, size_t const p,
       0╭─┴─╮1
        x   y */
 static inline CCC_Tribool
-is_01_parent(struct CCC_Array_bounded_map const *const map, size_t const x,
+is_01_parent(struct CCC_Array_tree_map const *const map, size_t const x,
              size_t const p, size_t const y)
 {
     assert(p);
@@ -1785,7 +1776,7 @@ is_01_parent(struct CCC_Array_bounded_map const *const map, size_t const x,
       1╭─┴─╮1
        x   y */
 static inline CCC_Tribool
-is_11_parent(struct CCC_Array_bounded_map const *const map, size_t const x,
+is_11_parent(struct CCC_Array_tree_map const *const map, size_t const x,
              size_t const p, size_t const y)
 {
     assert(p);
@@ -1799,7 +1790,7 @@ is_11_parent(struct CCC_Array_bounded_map const *const map, size_t const x,
       0╭─┴─╮2
        x   y */
 static inline CCC_Tribool
-is_02_parent(struct CCC_Array_bounded_map const *const map, size_t const x,
+is_02_parent(struct CCC_Array_tree_map const *const map, size_t const x,
              size_t const p, size_t const y)
 {
     assert(p);
@@ -1816,7 +1807,7 @@ is_02_parent(struct CCC_Array_bounded_map const *const map, size_t const x,
       2╭─┴─╮2
        x   y */
 static inline CCC_Tribool
-is_22_parent(struct CCC_Array_bounded_map const *const map, size_t const x,
+is_22_parent(struct CCC_Array_tree_map const *const map, size_t const x,
              size_t const p, size_t const y)
 {
     assert(p);
@@ -1825,7 +1816,7 @@ is_22_parent(struct CCC_Array_bounded_map const *const map, size_t const x,
 }
 
 static inline void
-promote(struct CCC_Array_bounded_map const *const map, size_t const x)
+promote(struct CCC_Array_tree_map const *const map, size_t const x)
 {
     if (x)
     {
@@ -1834,7 +1825,7 @@ promote(struct CCC_Array_bounded_map const *const map, size_t const x)
 }
 
 static inline void
-demote(struct CCC_Array_bounded_map const *const map, size_t const x)
+demote(struct CCC_Array_tree_map const *const map, size_t const x)
 {
     promote(map, x);
 }
@@ -1842,23 +1833,23 @@ demote(struct CCC_Array_bounded_map const *const map, size_t const x)
 /* Parity based ranks mean this is no-op but leave in case implementation ever
    changes. Also, makes clear what sections of code are trying to do. */
 static inline void
-double_promote(struct CCC_Array_bounded_map const *const, size_t const)
+double_promote(struct CCC_Array_tree_map const *const, size_t const)
 {}
 
 /* Parity based ranks mean this is no-op but leave in case implementation ever
    changes. Also, makes clear what sections of code are trying to do. */
 static inline void
-double_demote(struct CCC_Array_bounded_map const *const, size_t const)
+double_demote(struct CCC_Array_tree_map const *const, size_t const)
 {}
 
 static inline CCC_Tribool
-is_leaf(struct CCC_Array_bounded_map const *const map, size_t const x)
+is_leaf(struct CCC_Array_tree_map const *const map, size_t const x)
 {
     return !branch_index(map, x, L) && !branch_index(map, x, R);
 }
 
 static inline size_t
-sibling_of(struct CCC_Array_bounded_map const *const map, size_t const x)
+sibling_of(struct CCC_Array_tree_map const *const map, size_t const x)
 {
     size_t const p = parent_index(map, x);
     assert(p);
@@ -1885,7 +1876,7 @@ struct Tree_range
 };
 
 static size_t
-recursive_count(struct CCC_Array_bounded_map const *const map, size_t const r)
+recursive_count(struct CCC_Array_tree_map const *const map, size_t const r)
 {
     if (!r)
     {
@@ -1896,7 +1887,7 @@ recursive_count(struct CCC_Array_bounded_map const *const map, size_t const r)
 }
 
 static CCC_Tribool
-are_subtrees_valid(struct CCC_Array_bounded_map const *t,
+are_subtrees_valid(struct CCC_Array_tree_map const *t,
                    struct Tree_range const r)
 {
     if (!r.root)
@@ -1929,7 +1920,7 @@ are_subtrees_valid(struct CCC_Array_bounded_map const *t,
 }
 
 static CCC_Tribool
-is_storing_parent(struct CCC_Array_bounded_map const *const map, size_t const p,
+is_storing_parent(struct CCC_Array_tree_map const *const map, size_t const p,
                   size_t const root)
 {
     if (!root)
@@ -1945,7 +1936,7 @@ is_storing_parent(struct CCC_Array_bounded_map const *const map, size_t const p,
 }
 
 static CCC_Tribool
-is_free_list_valid(struct CCC_Array_bounded_map const *const map)
+is_free_list_valid(struct CCC_Array_tree_map const *const map)
 {
     if (!map->count)
     {
@@ -1970,7 +1961,7 @@ is_free_list_valid(struct CCC_Array_bounded_map const *const map)
 }
 
 static inline CCC_Tribool
-validate(struct CCC_Array_bounded_map const *const map)
+validate(struct CCC_Array_tree_map const *const map)
 {
     if (!map->capacity)
     {

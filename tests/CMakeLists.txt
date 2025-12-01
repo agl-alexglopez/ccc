@@ -222,19 +222,19 @@ add_array_adaptive_map_test(test_array_adaptive_map_handle)
 add_array_adaptive_map_test(test_array_adaptive_map_lru)
 
 #############  Realtime Map  ##########################
-add_library(bounded_map_utility bounded_map/bounded_map_utility.h bounded_map/bounded_map_utility.c)
-target_link_libraries(bounded_map_utility
+add_library(tree_map_utility tree_map/tree_map_utility.h tree_map/tree_map_utility.c)
+target_link_libraries(tree_map_utility
   PRIVATE
     ccc
     checkers
 )
-add_dependencies(tests bounded_map_utility)
+add_dependencies(tests tree_map_utility)
 
-macro(add_bounded_map_test TEST_NAME)
-  add_executable(${TEST_NAME} bounded_map/${TEST_NAME}.c)
+macro(add_tree_map_test TEST_NAME)
+  add_executable(${TEST_NAME} tree_map/${TEST_NAME}.c)
   target_link_libraries(${TEST_NAME}
     PRIVATE
-      bounded_map_utility
+      tree_map_utility
       checkers
       ccc
       allocate
@@ -248,27 +248,27 @@ macro(add_bounded_map_test TEST_NAME)
   add_dependencies(tests ${TEST_NAME})
 endmacro()
 
-add_bounded_map_test(test_bounded_map_construct)
-add_bounded_map_test(test_bounded_map_insert)
-add_bounded_map_test(test_bounded_map_erase)
-add_bounded_map_test(test_bounded_map_iterator)
-add_bounded_map_test(test_bounded_map_entry)
-add_bounded_map_test(test_bounded_map_lru)
+add_tree_map_test(test_tree_map_construct)
+add_tree_map_test(test_tree_map_insert)
+add_tree_map_test(test_tree_map_erase)
+add_tree_map_test(test_tree_map_iterator)
+add_tree_map_test(test_tree_map_entry)
+add_tree_map_test(test_tree_map_lru)
 
 #############  Handle Realtime Map  ##########################
-add_library(array_bounded_map_utility array_bounded_map/array_bounded_map_utility.h array_bounded_map/array_bounded_map_utility.c)
-target_link_libraries(array_bounded_map_utility
+add_library(array_tree_map_utility array_tree_map/array_tree_map_utility.h array_tree_map/array_tree_map_utility.c)
+target_link_libraries(array_tree_map_utility
   PRIVATE
     ccc
     checkers
 )
-add_dependencies(tests array_bounded_map_utility)
+add_dependencies(tests array_tree_map_utility)
 
-macro(add_array_bounded_map_test TEST_NAME)
-  add_executable(${TEST_NAME} array_bounded_map/${TEST_NAME}.c)
+macro(add_array_tree_map_test TEST_NAME)
+  add_executable(${TEST_NAME} array_tree_map/${TEST_NAME}.c)
   target_link_libraries(${TEST_NAME}
     PRIVATE
-      array_bounded_map_utility
+      array_tree_map_utility
       ccc
       checkers
       allocate
@@ -283,12 +283,12 @@ macro(add_array_bounded_map_test TEST_NAME)
   add_dependencies(tests ${TEST_NAME})
 endmacro()
 
-add_array_bounded_map_test(test_array_bounded_map_construct)
-add_array_bounded_map_test(test_array_bounded_map_insert)
-add_array_bounded_map_test(test_array_bounded_map_erase)
-add_array_bounded_map_test(test_array_bounded_map_iterator)
-add_array_bounded_map_test(test_array_bounded_map_handle)
-add_array_bounded_map_test(test_array_bounded_map_lru)
+add_array_tree_map_test(test_array_tree_map_construct)
+add_array_tree_map_test(test_array_tree_map_insert)
+add_array_tree_map_test(test_array_tree_map_erase)
+add_array_tree_map_test(test_array_tree_map_iterator)
+add_array_tree_map_test(test_array_tree_map_handle)
+add_array_tree_map_test(test_array_tree_map_lru)
 
 #############  Flat Hash Map ##########################
 

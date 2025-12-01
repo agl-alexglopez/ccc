@@ -5,16 +5,16 @@
 #include <time.h>
 
 #define TRAITS_USING_NAMESPACE_CCC
-#define ARRAY_BOUNDED_MAP_USING_NAMESPACE_CCC
+#define ARRAY_TREE_MAP_USING_NAMESPACE_CCC
 #define TYPES_USING_NAMESPACE_CCC
 
-#include "array_bounded_map.h"
-#include "array_bounded_map_utility.h"
+#include "array_tree_map.h"
+#include "array_tree_map_utility.h"
 #include "checkers.h"
 #include "traits.h"
 #include "types.h"
 
-check_static_begin(check_range, Array_bounded_map const *const map,
+check_static_begin(check_range, Array_tree_map const *const map,
                    Handle_range const *const r, size_t const n,
                    int const expect_range[])
 {
@@ -23,14 +23,14 @@ check_static_begin(check_range, Array_bounded_map const *const map,
     for (; iterator != range_end(r) && index < n;
          iterator = next(map, iterator), ++index)
     {
-        struct Val const *const v = array_bounded_map_at(map, iterator);
+        struct Val const *const v = array_tree_map_at(map, iterator);
         int const cur_id = v->id;
         check(expect_range[index], cur_id);
     }
     check(iterator, range_end(r));
     if (iterator != end(map))
     {
-        struct Val const *const v = array_bounded_map_at(map, iterator);
+        struct Val const *const v = array_tree_map_at(map, iterator);
         check(v->id, expect_range[n - 1]);
     }
     check_fail_end({
@@ -46,7 +46,7 @@ check_static_begin(check_range, Array_bounded_map const *const map,
         for (size_t j = 0; j < n && iterator != range_end(r);
              ++j, iterator = next(map, iterator))
         {
-            struct Val const *const v = array_bounded_map_at(map, iterator);
+            struct Val const *const v = array_tree_map_at(map, iterator);
             if (iterator == end(map) || !iterator)
             {
                 return CHECK_STATUS;
@@ -63,14 +63,14 @@ check_static_begin(check_range, Array_bounded_map const *const map,
         }
         for (; iterator != range_end(r); iterator = next(map, iterator))
         {
-            struct Val const *const v = array_bounded_map_at(map, iterator);
+            struct Val const *const v = array_tree_map_at(map, iterator);
             (void)fprintf(stderr, "%s%d, %s", CHECK_RED, v->id, CHECK_NONE);
         }
         (void)fprintf(stderr, "%s}\n%s", CHECK_GREEN, CHECK_NONE);
     });
 }
 
-check_static_begin(check_range_reverse, Array_bounded_map const *const map,
+check_static_begin(check_range_reverse, Array_tree_map const *const map,
                    Handle_range_reverse const *const r, size_t const n,
                    int const expect_range_reverse[])
 {
@@ -79,7 +79,7 @@ check_static_begin(check_range_reverse, Array_bounded_map const *const map,
     for (; iterator != range_reverse_end(r);
          iterator = reverse_next(map, iterator))
     {
-        struct Val const *const v = array_bounded_map_at(map, iterator);
+        struct Val const *const v = array_tree_map_at(map, iterator);
         int const cur_id = v->id;
         check(expect_range_reverse[index], cur_id);
         ++index;
@@ -87,7 +87,7 @@ check_static_begin(check_range_reverse, Array_bounded_map const *const map,
     check(iterator, range_reverse_end(r));
     if (iterator != reverse_end(map))
     {
-        struct Val const *const v = array_bounded_map_at(map, iterator);
+        struct Val const *const v = array_tree_map_at(map, iterator);
         check(v->id, expect_range_reverse[n - 1]);
     }
     check_fail_end({
@@ -104,7 +104,7 @@ check_static_begin(check_range_reverse, Array_bounded_map const *const map,
         for (j = 0; j < n && iterator != range_reverse_end(r);
              ++j, iterator = reverse_next(map, iterator))
         {
-            struct Val const *const v = array_bounded_map_at(map, iterator);
+            struct Val const *const v = array_tree_map_at(map, iterator);
             if (iterator == reverse_end(map) || !iterator)
             {
                 return CHECK_STATUS;
@@ -122,14 +122,14 @@ check_static_begin(check_range_reverse, Array_bounded_map const *const map,
         for (; iterator != range_reverse_end(r);
              iterator = reverse_next(map, iterator))
         {
-            struct Val const *const v = array_bounded_map_at(map, iterator);
+            struct Val const *const v = array_tree_map_at(map, iterator);
             (void)fprintf(stderr, "%s%d, %s", CHECK_RED, v->id, CHECK_NONE);
         }
         (void)fprintf(stderr, "%s}\n%s", CHECK_GREEN, CHECK_NONE);
     });
 }
 
-check_static_begin(iterator_check, Array_bounded_map *s)
+check_static_begin(iterator_check, Array_tree_map *s)
 {
     size_t const size = count(s).count;
     size_t iterator_count = 0;
@@ -150,11 +150,11 @@ check_static_begin(iterator_check, Array_bounded_map *s)
     check_end();
 }
 
-check_static_begin(array_bounded_map_test_forward_iterator)
+check_static_begin(array_tree_map_test_forward_iterator)
 {
-    CCC_Array_bounded_map s
-        = array_bounded_map_initialize(&(Small_fixed_map){}, struct Val, id,
-                                       id_order, NULL, NULL, SMALL_FIXED_CAP);
+    CCC_Array_tree_map s
+        = array_tree_map_initialize(&(Small_fixed_map){}, struct Val, id,
+                                    id_order, NULL, NULL, SMALL_FIXED_CAP);
     /* We should have the expected behavior iteration over empty tree. */
     int j = 0;
     for (CCC_Handle_index e = begin(&s); e != end(&s); e = next(&s, e), ++j)
@@ -176,17 +176,17 @@ check_static_begin(array_bounded_map_test_forward_iterator)
     for (CCC_Handle_index e = begin(&s); e != end(&s) && j < num_nodes;
          e = next(&s, e), ++j)
     {
-        struct Val const *const v = array_bounded_map_at(&s, e);
+        struct Val const *const v = array_tree_map_at(&s, e);
         check(v->id, keys_inorder[j]);
     }
     check_end();
 }
 
-check_static_begin(array_bounded_map_test_iterate_removal)
+check_static_begin(array_tree_map_test_iterate_removal)
 {
-    CCC_Array_bounded_map s = array_bounded_map_initialize(
-        &(Standard_fixed_map){}, struct Val, id, id_order, NULL, NULL,
-        STANDARD_FIXED_CAP);
+    CCC_Array_tree_map s
+        = array_tree_map_initialize(&(Standard_fixed_map){}, struct Val, id,
+                                    id_order, NULL, NULL, STANDARD_FIXED_CAP);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(1);
@@ -205,7 +205,7 @@ check_static_begin(array_bounded_map_test_iterate_removal)
          i != end(&s) && cur_node < num_nodes; i = next, ++cur_node)
     {
         next = next(&s, i);
-        struct Val const *const v = array_bounded_map_at(&s, i);
+        struct Val const *const v = array_tree_map_at(&s, i);
         if (v->id > limit)
         {
             (void)remove(&s, &(struct Val){.id = v->id});
@@ -215,11 +215,11 @@ check_static_begin(array_bounded_map_test_iterate_removal)
     check_end();
 }
 
-check_static_begin(array_bounded_map_test_iterate_remove_reinsert)
+check_static_begin(array_tree_map_test_iterate_remove_reinsert)
 {
-    CCC_Array_bounded_map s = array_bounded_map_initialize(
-        &(Standard_fixed_map){}, struct Val, id, id_order, NULL, NULL,
-        STANDARD_FIXED_CAP);
+    CCC_Array_tree_map s
+        = array_tree_map_initialize(&(Standard_fixed_map){}, struct Val, id,
+                                    id_order, NULL, NULL, STANDARD_FIXED_CAP);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -238,7 +238,7 @@ check_static_begin(array_bounded_map_test_iterate_remove_reinsert)
     for (CCC_Handle_index i = begin(&s), next = 0; i != end(&s); i = next)
     {
         next = next(&s, i);
-        struct Val const *const v = array_bounded_map_at(&s, i);
+        struct Val const *const v = array_tree_map_at(&s, i);
         if (v->id < limit)
         {
             struct Val new_val = {.id = v->id};
@@ -254,11 +254,11 @@ check_static_begin(array_bounded_map_test_iterate_remove_reinsert)
     check_end();
 }
 
-check_static_begin(array_bounded_map_test_valid_range)
+check_static_begin(array_tree_map_test_valid_range)
 {
-    CCC_Array_bounded_map s
-        = array_bounded_map_initialize(&(Small_fixed_map){}, struct Val, id,
-                                       id_order, NULL, NULL, SMALL_FIXED_CAP);
+    CCC_Array_tree_map s
+        = array_tree_map_initialize(&(Small_fixed_map){}, struct Val, id,
+                                    id_order, NULL, NULL, SMALL_FIXED_CAP);
 
     int const num_nodes = 25;
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
@@ -283,11 +283,11 @@ check_static_begin(array_bounded_map_test_valid_range)
     check_end();
 }
 
-check_static_begin(array_bounded_map_test_valid_range_equals)
+check_static_begin(array_tree_map_test_valid_range_equals)
 {
-    CCC_Array_bounded_map s
-        = array_bounded_map_initialize(&(Small_fixed_map){}, struct Val, id,
-                                       id_order, NULL, NULL, SMALL_FIXED_CAP);
+    CCC_Array_tree_map s
+        = array_tree_map_initialize(&(Small_fixed_map){}, struct Val, id,
+                                    id_order, NULL, NULL, SMALL_FIXED_CAP);
     int const num_nodes = 25;
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
     for (int i = 0, id = 0; i < num_nodes; ++i, id += 5)
@@ -310,11 +310,11 @@ check_static_begin(array_bounded_map_test_valid_range_equals)
     check_end();
 }
 
-check_static_begin(array_bounded_map_test_invalid_range)
+check_static_begin(array_tree_map_test_invalid_range)
 {
-    CCC_Array_bounded_map s
-        = array_bounded_map_initialize(&(Small_fixed_map){}, struct Val, id,
-                                       id_order, NULL, NULL, SMALL_FIXED_CAP);
+    CCC_Array_tree_map s
+        = array_tree_map_initialize(&(Small_fixed_map){}, struct Val, id,
+                                    id_order, NULL, NULL, SMALL_FIXED_CAP);
     int const num_nodes = 25;
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
     for (int i = 0, id = 0; i < num_nodes; ++i, id += 5)
@@ -338,11 +338,11 @@ check_static_begin(array_bounded_map_test_invalid_range)
     check_end();
 }
 
-check_static_begin(array_bounded_map_test_empty_range)
+check_static_begin(array_tree_map_test_empty_range)
 {
-    CCC_Array_bounded_map s
-        = array_bounded_map_initialize(&(Small_fixed_map){}, struct Val, id,
-                                       id_order, NULL, NULL, SMALL_FIXED_CAP);
+    CCC_Array_tree_map s
+        = array_tree_map_initialize(&(Small_fixed_map){}, struct Val, id,
+                                    id_order, NULL, NULL, SMALL_FIXED_CAP);
     int const num_nodes = 25;
     int const step = 5;
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
@@ -356,35 +356,32 @@ check_static_begin(array_bounded_map_test_empty_range)
        Normal iteration patterns would consider this empty. */
     CCC_Handle_range const forward_range
         = equal_range(&s, &(int){-50}, &(int){-25});
-    check(((struct Val *)array_bounded_map_at(&s, range_begin(&forward_range)))
-              ->id,
-          0);
     check(
-        ((struct Val *)array_bounded_map_at(&s, range_end(&forward_range)))->id,
+        ((struct Val *)array_tree_map_at(&s, range_begin(&forward_range)))->id,
         0);
+    check(((struct Val *)array_tree_map_at(&s, range_end(&forward_range)))->id,
+          0);
     check(range_begin(&forward_range), range_end(&forward_range));
     CCC_Handle_range_reverse const rev_range
         = equal_range_reverse(&s, &(int){150}, &(int){999});
     check(range_reverse_begin(&rev_range), range_reverse_end(&rev_range));
-    check(((struct Val *)array_bounded_map_at(&s,
-                                              range_reverse_begin(&rev_range)))
+    check(((struct Val *)array_tree_map_at(&s, range_reverse_begin(&rev_range)))
               ->id,
           (num_nodes * step) - step);
-    check(
-        ((struct Val *)array_bounded_map_at(&s, range_reverse_end(&rev_range)))
-            ->id,
-        (num_nodes * step) - step);
+    check(((struct Val *)array_tree_map_at(&s, range_reverse_end(&rev_range)))
+              ->id,
+          (num_nodes * step) - step);
     check_end();
 }
 
 int
 main()
 {
-    return check_run(array_bounded_map_test_forward_iterator(),
-                     array_bounded_map_test_iterate_removal(),
-                     array_bounded_map_test_valid_range(),
-                     array_bounded_map_test_valid_range_equals(),
-                     array_bounded_map_test_invalid_range(),
-                     array_bounded_map_test_empty_range(),
-                     array_bounded_map_test_iterate_remove_reinsert());
+    return check_run(array_tree_map_test_forward_iterator(),
+                     array_tree_map_test_iterate_removal(),
+                     array_tree_map_test_valid_range(),
+                     array_tree_map_test_valid_range_equals(),
+                     array_tree_map_test_invalid_range(),
+                     array_tree_map_test_empty_range(),
+                     array_tree_map_test_iterate_remove_reinsert());
 }

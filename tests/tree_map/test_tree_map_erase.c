@@ -4,22 +4,22 @@
 #include <string.h>
 #include <time.h>
 
-#define BOUNDED_MAP_USING_NAMESPACE_CCC
+#define TREE_MAP_USING_NAMESPACE_CCC
 #define TRAITS_USING_NAMESPACE_CCC
 
-#include "bounded_map.h"
-#include "bounded_map_utility.h"
 #include "checkers.h"
 #include "traits.h"
+#include "tree_map.h"
+#include "tree_map_utility.h"
 #include "types.h"
 #include "utility/stack_allocator.h"
 
-check_static_begin(bounded_map_test_insert_erase_shuffled)
+check_static_begin(tree_map_test_insert_erase_shuffled)
 {
     struct Stack_allocator allocator
         = stack_allocator_initialize(struct Val, 50);
-    CCC_Bounded_map s = bounded_map_initialize(
-        struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
+    CCC_Tree_map s = tree_map_initialize(struct Val, elem, key, id_order,
+                                         stack_allocator_allocate, &allocator);
     size_t const size = 50;
     int const prime = 53;
     check(insert_shuffled(&s, size, prime), CHECK_PASS);
@@ -38,10 +38,10 @@ check_static_begin(bounded_map_test_insert_erase_shuffled)
     check_end();
 }
 
-check_static_begin(bounded_map_test_prime_shuffle)
+check_static_begin(tree_map_test_prime_shuffle)
 {
-    CCC_Bounded_map s
-        = bounded_map_initialize(struct Val, elem, key, id_order, NULL, NULL);
+    CCC_Tree_map s
+        = tree_map_initialize(struct Val, elem, key, id_order, NULL, NULL);
     size_t const size = 50;
     size_t const prime = 53;
     size_t const less = 10;
@@ -64,7 +64,7 @@ check_static_begin(bounded_map_test_prime_shuffle)
         shuffled_index = (shuffled_index + prime) % (size - less);
     }
     /* One test can use our printer function as test output */
-    check(bounded_map_count(&s).count < size, true);
+    check(tree_map_count(&s).count < size, true);
     for (size_t i = 0; i < size; ++i)
     {
         check(occupied(remove_entry_wrap(entry_wrap(&s, &vals[i].key)))
@@ -75,10 +75,10 @@ check_static_begin(bounded_map_test_prime_shuffle)
     check_end();
 }
 
-check_static_begin(bounded_map_test_weak_srand)
+check_static_begin(tree_map_test_weak_srand)
 {
-    CCC_Bounded_map s
-        = bounded_map_initialize(struct Val, elem, key, id_order, NULL, NULL);
+    CCC_Tree_map s
+        = tree_map_initialize(struct Val, elem, key, id_order, NULL, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -105,12 +105,12 @@ check_static_begin(bounded_map_test_weak_srand)
     check_end();
 }
 
-check_static_begin(bounded_map_test_insert_erase_cycles)
+check_static_begin(tree_map_test_insert_erase_cycles)
 {
     /* Over allocate because we do more insertions near the end. */
     struct Stack_allocator allocator
         = stack_allocator_initialize(struct Val, 200);
-    CCC_Bounded_map s = CCC_bounded_map_initialize(
+    CCC_Tree_map s = CCC_tree_map_initialize(
         struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
     srand(time(NULL)); /* NOLINT */
     int const num_nodes = 100;
@@ -138,7 +138,7 @@ check_static_begin(bounded_map_test_insert_erase_cycles)
     }
     for (int i = 0; i < num_nodes / 2; ++i)
     {
-        CCC_Entry const *const entry = CCC_bounded_map_insert_or_assign_with(
+        CCC_Entry const *const entry = CCC_tree_map_insert_or_assign_with(
             &s, keys[i], (struct Val){.val = i});
         check(occupied(entry), false);
         check(validate(&s), true);
@@ -156,8 +156,7 @@ check_static_begin(bounded_map_test_insert_erase_cycles)
 int
 main()
 {
-    return check_run(bounded_map_test_insert_erase_shuffled(),
-                     bounded_map_test_prime_shuffle(),
-                     bounded_map_test_weak_srand(),
-                     bounded_map_test_insert_erase_cycles());
+    return check_run(tree_map_test_insert_erase_shuffled(),
+                     tree_map_test_prime_shuffle(), tree_map_test_weak_srand(),
+                     tree_map_test_insert_erase_cycles());
 }

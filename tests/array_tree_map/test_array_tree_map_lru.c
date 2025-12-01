@@ -4,11 +4,11 @@ The leetcode lru problem in C. */
 #include <stddef.h>
 #include <stdio.h>
 
-#define ARRAY_BOUNDED_MAP_USING_NAMESPACE_CCC
+#define ARRAY_TREE_MAP_USING_NAMESPACE_CCC
 #define DOUBLY_LINKED_LIST_USING_NAMESPACE_CCC
 #define TRAITS_USING_NAMESPACE_CCC
 
-#include "array_bounded_map.h"
+#include "array_tree_map.h"
 #include "checkers.h"
 #include "doubly_linked_list.h"
 #include "traits.h"
@@ -22,7 +22,7 @@ enum : size_t
 
 struct Lru_cache
 {
-    CCC_Array_bounded_map map;
+    CCC_Array_tree_map map;
     CCC_Doubly_linked_list l;
     size_t cap;
 };
@@ -58,7 +58,7 @@ struct Lru_request
 
 /* Fixed map used for the lru storage. List piggy backs of this array for its
    memory. Map does not need to re-size for this small test. */
-array_bounded_map_declare_fixed_map(Lru_fixed_map, struct Lru_node, LRU_CAP);
+array_tree_map_declare_fixed_map(Lru_fixed_map, struct Lru_node, LRU_CAP);
 
 /*===========================   Prototypes   ================================*/
 
@@ -74,9 +74,9 @@ static enum Check_result run_lru_cache(void);
 /* This is a good opportunity to test the static initialization capabilities
    of the hash table and list. */
 static struct Lru_cache lru_cache = {
-    .map = array_bounded_map_initialize(
+    .map = array_tree_map_initialize(
         &(Lru_fixed_map){}, struct Lru_node, key, order_by_key, NULL, NULL,
-        array_bounded_map_fixed_capacity(Lru_fixed_map)),
+        array_tree_map_fixed_capacity(Lru_fixed_map)),
     .l = doubly_linked_list_initialize(struct Lru_node, list_node,
                                        order_list_nodes, NULL, NULL),
     .cap = 3,
@@ -159,18 +159,17 @@ check_static_begin(run_lru_cache)
                 break;
         }
     }
-    check_end({ (void)CCC_array_bounded_map_clear(&lru_cache.map, NULL); });
+    check_end({ (void)CCC_array_tree_map_clear(&lru_cache.map, NULL); });
 }
 
 check_static_begin(lru_put, struct Lru_cache *const lru, int const key,
                    int const val)
 {
-    CCC_Array_bounded_map_handle const *const ent
-        = handle_wrap(&lru->map, &key);
+    CCC_Array_tree_map_handle const *const ent = handle_wrap(&lru->map, &key);
     if (occupied(ent))
     {
         struct Lru_node *const found
-            = array_bounded_map_at(&lru->map, unwrap(ent));
+            = array_tree_map_at(&lru->map, unwrap(ent));
         found->key = key;
         found->val = val;
         CCC_Result r = doubly_linked_list_splice(
@@ -180,7 +179,7 @@ check_static_begin(lru_put, struct Lru_cache *const lru, int const key,
     }
     else
     {
-        struct Lru_node *new = array_bounded_map_at(
+        struct Lru_node *new = array_tree_map_at(
             &lru->map,
             insert_handle(ent, &(struct Lru_node){.key = key, .val = val}));
         check(new == NULL, false);
@@ -204,7 +203,7 @@ check_static_begin(lru_get, struct Lru_cache *const lru, int const key,
 {
     check_error(val != NULL, true);
     struct Lru_node *const found
-        = array_bounded_map_at(&lru->map, get_key_value(&lru->map, &key));
+        = array_tree_map_at(&lru->map, get_key_value(&lru->map, &key));
     if (!found)
     {
         *val = -1;

@@ -13,8 +13,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 @endcond */
-#ifndef CCC_PRIVATE_BOUNDED_MAP_H
-#define CCC_PRIVATE_BOUNDED_MAP_H
+#ifndef CCC_PRIVATE_TREE_MAP_H
+#define CCC_PRIVATE_TREE_MAP_H
 
 /** @cond */
 #include <stddef.h>
@@ -28,12 +28,12 @@ limitations under the License.
 
 /** @internal A WAVL node follows traditional balanced binary tree constructs
 except for the rank field which can be simplified to an even/odd parity. */
-struct CCC_Bounded_map_node
+struct CCC_Tree_map_node
 {
     /** @internal Children in an array to unite left and right cases. */
-    struct CCC_Bounded_map_node *branch[2];
+    struct CCC_Tree_map_node *branch[2];
     /** @internal The parent node needed for iteration and rotation. */
-    struct CCC_Bounded_map_node *parent;
+    struct CCC_Tree_map_node *parent;
     /** @internal The rank parity of a node 1(odd) or 0(even). */
     uint8_t parity;
 };
@@ -50,10 +50,10 @@ maintenance of a Red-Black Tree. In fact, under a workload that is strictly
 insertions, the WAVL tree is identical to an AVL tree in terms of balance and
 shape, making it fast for searching while performing fewer rotations than the
 AVL tree. The implementation is also simpler than either of the other trees. */
-struct CCC_Bounded_map
+struct CCC_Tree_map
 {
     /** @internal The root of the tree or the sentinel end if empty. */
-    struct CCC_Bounded_map_node *root;
+    struct CCC_Tree_map_node *root;
     /** @internal The count of stored nodes in the tree. */
     size_t count;
     /** @internal The byte offset of the key in the user struct. */
@@ -74,10 +74,10 @@ struct CCC_Bounded_map
 /** @internal An entry is a way to store a node or the information needed to
 insert a node without a second query. The user can then take different actions
 depending on the Occupied or Vacant status of the entry. */
-struct CCC_Bounded_map_entry
+struct CCC_Tree_map_entry
 {
     /** @internal The tree associated with this query. */
-    struct CCC_Bounded_map *map;
+    struct CCC_Tree_map *map;
     /** @internal The result of the last comparison to find the user specified
     node. Equal if found or indicates the direction the node should be
     inserted from the parent we currently store in the entry. */
@@ -89,34 +89,34 @@ struct CCC_Bounded_map_entry
 /** @internal Enable return by compound literal reference on the stack. Think
 of this method as return by value but with the additional ability to pass by
 pointer in a functional style. `fnB(&(union
-CCC_Bounded_map_entry){fnA().private});` */
-union CCC_Bounded_map_entry_wrap
+CCC_Tree_map_entry){fnA().private});` */
+union CCC_Tree_map_entry_wrap
 {
     /** @internal The field containing the entry struct. */
-    struct CCC_Bounded_map_entry private;
+    struct CCC_Tree_map_entry private;
 };
 
 /*=========================   Private Interface  ============================*/
 
 /** @internal */
-void *CCC_private_bounded_map_key_in_slot(struct CCC_Bounded_map const *,
-                                          void const *slot);
+void *CCC_private_tree_map_key_in_slot(struct CCC_Tree_map const *,
+                                       void const *slot);
 /** @internal */
-struct CCC_Bounded_map_node *
-CCC_private_bounded_map_node_in_slot(struct CCC_Bounded_map const *,
-                                     void const *slot);
+struct CCC_Tree_map_node *
+CCC_private_tree_map_node_in_slot(struct CCC_Tree_map const *,
+                                  void const *slot);
 /** @internal */
-struct CCC_Bounded_map_entry
-CCC_private_bounded_map_entry(struct CCC_Bounded_map const *, void const *key);
+struct CCC_Tree_map_entry
+CCC_private_tree_map_entry(struct CCC_Tree_map const *, void const *key);
 /** @internal */
-void *CCC_private_bounded_map_insert(
-    struct CCC_Bounded_map *, struct CCC_Bounded_map_node *parent,
-    CCC_Order last_order, struct CCC_Bounded_map_node *type_output_intruder);
+void *CCC_private_tree_map_insert(
+    struct CCC_Tree_map *, struct CCC_Tree_map_node *parent,
+    CCC_Order last_order, struct CCC_Tree_map_node *type_output_intruder);
 
 /*==========================   Initialization     ===========================*/
 
 /** @internal */
-#define CCC_private_bounded_map_initialize(                                    \
+#define CCC_private_tree_map_initialize(                                       \
     private_struct_name, private_node_node_field, private_key_node_field,      \
     private_key_order_fn, private_allocate, private_context_data)              \
     {                                                                          \
@@ -132,35 +132,33 @@ void *CCC_private_bounded_map_insert(
     }
 
 /** @internal */
-#define CCC_private_bounded_map_from(                                          \
+#define CCC_private_tree_map_from(                                             \
     private_type_intruder_field_name, private_key_field_name, private_compare, \
     private_allocate, private_destroy, private_context_data,                   \
     private_compound_literal_array...)                                         \
     (__extension__({                                                           \
-        typeof(*private_compound_literal_array)                                \
-            *private_bounded_map_type_array                                    \
+        typeof(*private_compound_literal_array) *private_tree_map_type_array   \
             = private_compound_literal_array;                                  \
-        struct CCC_Bounded_map private_map                                     \
-            = CCC_private_bounded_map_initialize(                              \
-                typeof(*private_bounded_map_type_array),                       \
-                private_type_intruder_field_name, private_key_field_name,      \
-                private_compare, private_allocate, private_context_data);      \
+        struct CCC_Tree_map private_map = CCC_private_tree_map_initialize(     \
+            typeof(*private_tree_map_type_array),                              \
+            private_type_intruder_field_name, private_key_field_name,          \
+            private_compare, private_allocate, private_context_data);          \
         if (private_map.allocate)                                              \
         {                                                                      \
             size_t const private_count                                         \
                 = sizeof(private_compound_literal_array)                       \
-                / sizeof(*private_bounded_map_type_array);                     \
+                / sizeof(*private_tree_map_type_array);                        \
             for (size_t private_i = 0; private_i < private_count; ++private_i) \
             {                                                                  \
-                struct CCC_Bounded_map_entry private_bounded_map_entry         \
-                    = CCC_private_bounded_map_entry(                           \
+                struct CCC_Tree_map_entry private_tree_map_entry               \
+                    = CCC_private_tree_map_entry(                              \
                         &private_map,                                          \
-                        (void *)&private_bounded_map_type_array[private_i]     \
+                        (void *)&private_tree_map_type_array[private_i]        \
                             .private_key_field_name);                          \
-                if (!(private_bounded_map_entry.entry.status                   \
+                if (!(private_tree_map_entry.entry.status                      \
                       & CCC_ENTRY_OCCUPIED))                                   \
                 {                                                              \
-                    typeof(*private_bounded_map_type_array) *const             \
+                    typeof(*private_tree_map_type_array) *const                \
                         private_new_slot                                       \
                         = private_map.allocate((CCC_Allocator_context){        \
                             .input = NULL,                                     \
@@ -169,32 +167,30 @@ void *CCC_private_bounded_map_insert(
                         });                                                    \
                     if (!private_new_slot)                                     \
                     {                                                          \
-                        (void)CCC_bounded_map_clear(&private_map,              \
-                                                    private_destroy);          \
+                        (void)CCC_tree_map_clear(&private_map,                 \
+                                                 private_destroy);             \
                         break;                                                 \
                     }                                                          \
                     *private_new_slot                                          \
-                        = private_bounded_map_type_array[private_i];           \
-                    CCC_private_bounded_map_insert(                            \
+                        = private_tree_map_type_array[private_i];              \
+                    CCC_private_tree_map_insert(                               \
                         &private_map,                                          \
-                        CCC_private_bounded_map_node_in_slot(                  \
-                            &private_map,                                      \
-                            private_bounded_map_entry.entry.type),             \
-                        private_bounded_map_entry.last_order,                  \
-                        CCC_private_bounded_map_node_in_slot(                  \
-                            &private_map, private_new_slot));                  \
+                        CCC_private_tree_map_node_in_slot(                     \
+                            &private_map, private_tree_map_entry.entry.type),  \
+                        private_tree_map_entry.last_order,                     \
+                        CCC_private_tree_map_node_in_slot(&private_map,        \
+                                                          private_new_slot));  \
                 }                                                              \
                 else                                                           \
                 {                                                              \
-                    struct CCC_Bounded_map_node private_node_saved             \
-                        = *CCC_private_bounded_map_node_in_slot(               \
-                            &private_map,                                      \
-                            private_bounded_map_entry.entry.type);             \
-                    *((typeof(*private_bounded_map_type_array) *)              \
-                          private_bounded_map_entry.entry.type)                \
-                        = private_bounded_map_type_array[private_i];           \
-                    *CCC_private_bounded_map_node_in_slot(                     \
-                        &private_map, private_bounded_map_entry.entry.type)    \
+                    struct CCC_Tree_map_node private_node_saved                \
+                        = *CCC_private_tree_map_node_in_slot(                  \
+                            &private_map, private_tree_map_entry.entry.type);  \
+                    *((typeof(*private_tree_map_type_array) *)                 \
+                          private_tree_map_entry.entry.type)                   \
+                        = private_tree_map_type_array[private_i];              \
+                    *CCC_private_tree_map_node_in_slot(                        \
+                        &private_map, private_tree_map_entry.entry.type)       \
                         = private_node_saved;                                  \
                 }                                                              \
             }                                                                  \
@@ -205,241 +201,235 @@ void *CCC_private_bounded_map_insert(
 /*==================   Helper Macros for Repeated Logic     =================*/
 
 /** @internal */
-#define CCC_private_bounded_map_new(Bounded_map_entry)                         \
+#define CCC_private_tree_map_new(Tree_map_entry)                               \
     (__extension__({                                                           \
-        void *private_bounded_map_ins_allocate_ret = NULL;                     \
-        if ((Bounded_map_entry)->map->allocate)                                \
+        void *private_tree_map_ins_allocate_ret = NULL;                        \
+        if ((Tree_map_entry)->map->allocate)                                   \
         {                                                                      \
-            private_bounded_map_ins_allocate_ret                               \
-                = (Bounded_map_entry)                                          \
+            private_tree_map_ins_allocate_ret                                  \
+                = (Tree_map_entry)                                             \
                       ->map->allocate((CCC_Allocator_context){                 \
                           .input = NULL,                                       \
-                          .bytes = (Bounded_map_entry)->map->sizeof_type,      \
-                          .context = (Bounded_map_entry)->map->context,        \
+                          .bytes = (Tree_map_entry)->map->sizeof_type,         \
+                          .context = (Tree_map_entry)->map->context,           \
                       });                                                      \
         }                                                                      \
-        private_bounded_map_ins_allocate_ret;                                  \
+        private_tree_map_ins_allocate_ret;                                     \
     }))
 
 /** @internal */
-#define CCC_private_bounded_map_insert_key_val(Bounded_map_entry, new_data,    \
-                                               type_compound_literal...)       \
+#define CCC_private_tree_map_insert_key_val(Tree_map_entry, new_data,          \
+                                            type_compound_literal...)          \
     (__extension__({                                                           \
         if (new_data)                                                          \
         {                                                                      \
             *new_data = type_compound_literal;                                 \
-            new_data = CCC_private_bounded_map_insert(                         \
-                (Bounded_map_entry)->map,                                      \
-                CCC_private_bounded_map_node_in_slot(                          \
-                    (Bounded_map_entry)->map,                                  \
-                    (Bounded_map_entry)->entry.type),                          \
-                (Bounded_map_entry)->last_order,                               \
-                CCC_private_bounded_map_node_in_slot((Bounded_map_entry)->map, \
-                                                     new_data));               \
+            new_data = CCC_private_tree_map_insert(                            \
+                (Tree_map_entry)->map,                                         \
+                CCC_private_tree_map_node_in_slot(                             \
+                    (Tree_map_entry)->map, (Tree_map_entry)->entry.type),      \
+                (Tree_map_entry)->last_order,                                  \
+                CCC_private_tree_map_node_in_slot((Tree_map_entry)->map,       \
+                                                  new_data));                  \
         }                                                                      \
     }))
 
 /** @internal */
-#define CCC_private_bounded_map_insert_and_copy_key(                           \
-    bounded_map_insert_entry, bounded_map_insert_entry_ret, key,               \
+#define CCC_private_tree_map_insert_and_copy_key(                              \
+    tree_map_insert_entry, tree_map_insert_entry_ret, key,                     \
     type_compound_literal...)                                                  \
     (__extension__({                                                           \
-        typeof(type_compound_literal) *private_bounded_map_new_ins_base        \
-            = CCC_private_bounded_map_new((&bounded_map_insert_entry));        \
-        bounded_map_insert_entry_ret = (struct CCC_Entry){                     \
-            .type = private_bounded_map_new_ins_base,                          \
+        typeof(type_compound_literal) *private_tree_map_new_ins_base           \
+            = CCC_private_tree_map_new((&tree_map_insert_entry));              \
+        tree_map_insert_entry_ret = (struct CCC_Entry){                        \
+            .type = private_tree_map_new_ins_base,                             \
             .status = CCC_ENTRY_INSERT_ERROR,                                  \
         };                                                                     \
-        if (private_bounded_map_new_ins_base)                                  \
+        if (private_tree_map_new_ins_base)                                     \
         {                                                                      \
-            *private_bounded_map_new_ins_base = type_compound_literal;         \
-            *((typeof(key) *)CCC_private_bounded_map_key_in_slot(              \
-                bounded_map_insert_entry.map,                                  \
-                private_bounded_map_new_ins_base))                             \
+            *private_tree_map_new_ins_base = type_compound_literal;            \
+            *((typeof(key) *)CCC_private_tree_map_key_in_slot(                 \
+                tree_map_insert_entry.map, private_tree_map_new_ins_base))     \
                 = key;                                                         \
-            (void)CCC_private_bounded_map_insert(                              \
-                bounded_map_insert_entry.map,                                  \
-                CCC_private_bounded_map_node_in_slot(                          \
-                    bounded_map_insert_entry.map,                              \
-                    bounded_map_insert_entry.entry.type),                      \
-                bounded_map_insert_entry.last_order,                           \
-                CCC_private_bounded_map_node_in_slot(                          \
-                    bounded_map_insert_entry.map,                              \
-                    private_bounded_map_new_ins_base));                        \
+            (void)CCC_private_tree_map_insert(                                 \
+                tree_map_insert_entry.map,                                     \
+                CCC_private_tree_map_node_in_slot(                             \
+                    tree_map_insert_entry.map,                                 \
+                    tree_map_insert_entry.entry.type),                         \
+                tree_map_insert_entry.last_order,                              \
+                CCC_private_tree_map_node_in_slot(                             \
+                    tree_map_insert_entry.map,                                 \
+                    private_tree_map_new_ins_base));                           \
         }                                                                      \
     }))
 
 /*==================     Core Macro Implementations     =====================*/
 
 /** @internal */
-#define CCC_private_bounded_map_and_modify_with(Bounded_map_entry_pointer,     \
-                                                type_name, closure_over_T...)  \
+#define CCC_private_tree_map_and_modify_with(Tree_map_entry_pointer,           \
+                                             type_name, closure_over_T...)     \
     (__extension__({                                                           \
-        __auto_type private_bounded_map_ent_pointer                            \
-            = (Bounded_map_entry_pointer);                                     \
-        struct CCC_Bounded_map_entry private_bounded_map_mod_ent               \
+        __auto_type private_tree_map_ent_pointer = (Tree_map_entry_pointer);   \
+        struct CCC_Tree_map_entry private_tree_map_mod_ent                     \
             = {.entry = {.status = CCC_ENTRY_ARGUMENT_ERROR}};                 \
-        if (private_bounded_map_ent_pointer)                                   \
+        if (private_tree_map_ent_pointer)                                      \
         {                                                                      \
-            private_bounded_map_mod_ent                                        \
-                = private_bounded_map_ent_pointer->private;                    \
-            if (private_bounded_map_mod_ent.entry.status & CCC_ENTRY_OCCUPIED) \
+            private_tree_map_mod_ent = private_tree_map_ent_pointer->private;  \
+            if (private_tree_map_mod_ent.entry.status & CCC_ENTRY_OCCUPIED)    \
             {                                                                  \
-                type_name *const T = private_bounded_map_mod_ent.entry.type;   \
+                type_name *const T = private_tree_map_mod_ent.entry.type;      \
                 if (T)                                                         \
                 {                                                              \
                     closure_over_T                                             \
                 }                                                              \
             }                                                                  \
         }                                                                      \
-        private_bounded_map_mod_ent;                                           \
+        private_tree_map_mod_ent;                                              \
     }))
 
 /** @internal */
-#define CCC_private_bounded_map_or_insert_with(Bounded_map_entry_pointer,      \
-                                               type_compound_literal...)       \
+#define CCC_private_tree_map_or_insert_with(Tree_map_entry_pointer,            \
+                                            type_compound_literal...)          \
     (__extension__({                                                           \
-        __auto_type private_or_ins_entry_pointer                               \
-            = (Bounded_map_entry_pointer);                                     \
-        typeof(type_compound_literal) *private_bounded_map_or_ins_ret = NULL;  \
+        __auto_type private_or_ins_entry_pointer = (Tree_map_entry_pointer);   \
+        typeof(type_compound_literal) *private_tree_map_or_ins_ret = NULL;     \
         if (private_or_ins_entry_pointer)                                      \
         {                                                                      \
             if (private_or_ins_entry_pointer->private.entry.status             \
                 == CCC_ENTRY_OCCUPIED)                                         \
             {                                                                  \
-                private_bounded_map_or_ins_ret                                 \
+                private_tree_map_or_ins_ret                                    \
                     = private_or_ins_entry_pointer->private.entry.type;        \
             }                                                                  \
             else                                                               \
             {                                                                  \
-                private_bounded_map_or_ins_ret = CCC_private_bounded_map_new(  \
+                private_tree_map_or_ins_ret = CCC_private_tree_map_new(        \
                     &private_or_ins_entry_pointer->private);                   \
-                CCC_private_bounded_map_insert_key_val(                        \
+                CCC_private_tree_map_insert_key_val(                           \
                     &private_or_ins_entry_pointer->private,                    \
-                    private_bounded_map_or_ins_ret, type_compound_literal);    \
+                    private_tree_map_or_ins_ret, type_compound_literal);       \
             }                                                                  \
         }                                                                      \
-        private_bounded_map_or_ins_ret;                                        \
+        private_tree_map_or_ins_ret;                                           \
     }))
 
 /** @internal */
-#define CCC_private_bounded_map_insert_entry_with(Bounded_map_entry_pointer,   \
-                                                  type_compound_literal...)    \
+#define CCC_private_tree_map_insert_entry_with(Tree_map_entry_pointer,         \
+                                               type_compound_literal...)       \
     (__extension__({                                                           \
-        __auto_type private_ins_entry_pointer = (Bounded_map_entry_pointer);   \
-        typeof(type_compound_literal) *private_bounded_map_ins_ent_ret = NULL; \
+        __auto_type private_ins_entry_pointer = (Tree_map_entry_pointer);      \
+        typeof(type_compound_literal) *private_tree_map_ins_ent_ret = NULL;    \
         if (private_ins_entry_pointer)                                         \
         {                                                                      \
             if (!(private_ins_entry_pointer->private.entry.status              \
                   & CCC_ENTRY_OCCUPIED))                                       \
             {                                                                  \
-                private_bounded_map_ins_ent_ret = CCC_private_bounded_map_new( \
+                private_tree_map_ins_ent_ret = CCC_private_tree_map_new(       \
                     &private_ins_entry_pointer->private);                      \
-                CCC_private_bounded_map_insert_key_val(                        \
+                CCC_private_tree_map_insert_key_val(                           \
                     &private_ins_entry_pointer->private,                       \
-                    private_bounded_map_ins_ent_ret, type_compound_literal);   \
+                    private_tree_map_ins_ent_ret, type_compound_literal);      \
             }                                                                  \
             else if (private_ins_entry_pointer->private.entry.status           \
                      == CCC_ENTRY_OCCUPIED)                                    \
             {                                                                  \
-                struct CCC_Bounded_map_node private_ins_ent_saved              \
-                    = *CCC_private_bounded_map_node_in_slot(                   \
+                struct CCC_Tree_map_node private_ins_ent_saved                 \
+                    = *CCC_private_tree_map_node_in_slot(                      \
                         private_ins_entry_pointer->private.map,                \
                         private_ins_entry_pointer->private.entry.type);        \
-                *((typeof(private_bounded_map_ins_ent_ret))                    \
+                *((typeof(private_tree_map_ins_ent_ret))                       \
                       private_ins_entry_pointer->private.entry.type)           \
                     = type_compound_literal;                                   \
-                *CCC_private_bounded_map_node_in_slot(                         \
+                *CCC_private_tree_map_node_in_slot(                            \
                     private_ins_entry_pointer->private.map,                    \
                     private_ins_entry_pointer->private.entry.type)             \
                     = private_ins_ent_saved;                                   \
-                private_bounded_map_ins_ent_ret                                \
+                private_tree_map_ins_ent_ret                                   \
                     = private_ins_entry_pointer->private.entry.type;           \
             }                                                                  \
         }                                                                      \
-        private_bounded_map_ins_ent_ret;                                       \
+        private_tree_map_ins_ent_ret;                                          \
     }))
 
 /** @internal */
-#define CCC_private_bounded_map_try_insert_with(Bounded_map_pointer, key,      \
-                                                type_compound_literal...)      \
+#define CCC_private_tree_map_try_insert_with(Tree_map_pointer, key,            \
+                                             type_compound_literal...)         \
     (__extension__({                                                           \
-        struct CCC_Bounded_map *const private_try_ins_map_pointer              \
-            = (Bounded_map_pointer);                                           \
-        struct CCC_Entry private_bounded_map_try_ins_ent_ret                   \
+        struct CCC_Tree_map *const private_try_ins_map_pointer                 \
+            = (Tree_map_pointer);                                              \
+        struct CCC_Entry private_tree_map_try_ins_ent_ret                      \
             = {.status = CCC_ENTRY_ARGUMENT_ERROR};                            \
         if (private_try_ins_map_pointer)                                       \
         {                                                                      \
-            __auto_type private_bounded_map_key = (key);                       \
-            struct CCC_Bounded_map_entry private_bounded_map_try_ins_ent       \
-                = CCC_private_bounded_map_entry(                               \
-                    private_try_ins_map_pointer,                               \
-                    (void *)&private_bounded_map_key);                         \
-            if (!(private_bounded_map_try_ins_ent.entry.status                 \
+            __auto_type private_tree_map_key = (key);                          \
+            struct CCC_Tree_map_entry private_tree_map_try_ins_ent             \
+                = CCC_private_tree_map_entry(private_try_ins_map_pointer,      \
+                                             (void *)&private_tree_map_key);   \
+            if (!(private_tree_map_try_ins_ent.entry.status                    \
                   & CCC_ENTRY_OCCUPIED))                                       \
             {                                                                  \
-                CCC_private_bounded_map_insert_and_copy_key(                   \
-                    private_bounded_map_try_ins_ent,                           \
-                    private_bounded_map_try_ins_ent_ret,                       \
-                    private_bounded_map_key, type_compound_literal);           \
+                CCC_private_tree_map_insert_and_copy_key(                      \
+                    private_tree_map_try_ins_ent,                              \
+                    private_tree_map_try_ins_ent_ret, private_tree_map_key,    \
+                    type_compound_literal);                                    \
             }                                                                  \
-            else if (private_bounded_map_try_ins_ent.entry.status              \
+            else if (private_tree_map_try_ins_ent.entry.status                 \
                      == CCC_ENTRY_OCCUPIED)                                    \
             {                                                                  \
-                private_bounded_map_try_ins_ent_ret                            \
-                    = private_bounded_map_try_ins_ent.entry;                   \
+                private_tree_map_try_ins_ent_ret                               \
+                    = private_tree_map_try_ins_ent.entry;                      \
             }                                                                  \
         }                                                                      \
-        private_bounded_map_try_ins_ent_ret;                                   \
+        private_tree_map_try_ins_ent_ret;                                      \
     }))
 
 /** @internal */
-#define CCC_private_bounded_map_insert_or_assign_with(                         \
-    Bounded_map_pointer, key, type_compound_literal...)                        \
+#define CCC_private_tree_map_insert_or_assign_with(Tree_map_pointer, key,      \
+                                                   type_compound_literal...)   \
     (__extension__({                                                           \
-        struct CCC_Bounded_map *const private_ins_or_assign_map_pointer        \
-            = (Bounded_map_pointer);                                           \
-        struct CCC_Entry private_bounded_map_ins_or_assign_ent_ret             \
+        struct CCC_Tree_map *const private_ins_or_assign_map_pointer           \
+            = (Tree_map_pointer);                                              \
+        struct CCC_Entry private_tree_map_ins_or_assign_ent_ret                \
             = {.status = CCC_ENTRY_ARGUMENT_ERROR};                            \
         if (private_ins_or_assign_map_pointer)                                 \
         {                                                                      \
-            __auto_type private_bounded_map_key = (key);                       \
-            struct CCC_Bounded_map_entry private_bounded_map_ins_or_assign_ent \
-                = CCC_private_bounded_map_entry(                               \
+            __auto_type private_tree_map_key = (key);                          \
+            struct CCC_Tree_map_entry private_tree_map_ins_or_assign_ent       \
+                = CCC_private_tree_map_entry(                                  \
                     private_ins_or_assign_map_pointer,                         \
-                    (void *)&private_bounded_map_key);                         \
-            if (!(private_bounded_map_ins_or_assign_ent.entry.status           \
+                    (void *)&private_tree_map_key);                            \
+            if (!(private_tree_map_ins_or_assign_ent.entry.status              \
                   & CCC_ENTRY_OCCUPIED))                                       \
             {                                                                  \
-                CCC_private_bounded_map_insert_and_copy_key(                   \
-                    private_bounded_map_ins_or_assign_ent,                     \
-                    private_bounded_map_ins_or_assign_ent_ret,                 \
-                    private_bounded_map_key, type_compound_literal);           \
+                CCC_private_tree_map_insert_and_copy_key(                      \
+                    private_tree_map_ins_or_assign_ent,                        \
+                    private_tree_map_ins_or_assign_ent_ret,                    \
+                    private_tree_map_key, type_compound_literal);              \
             }                                                                  \
-            else if (private_bounded_map_ins_or_assign_ent.entry.status        \
+            else if (private_tree_map_ins_or_assign_ent.entry.status           \
                      == CCC_ENTRY_OCCUPIED)                                    \
             {                                                                  \
-                struct CCC_Bounded_map_node private_ins_ent_saved              \
-                    = *CCC_private_bounded_map_node_in_slot(                   \
-                        private_bounded_map_ins_or_assign_ent.map,             \
-                        private_bounded_map_ins_or_assign_ent.entry.type);     \
+                struct CCC_Tree_map_node private_ins_ent_saved                 \
+                    = *CCC_private_tree_map_node_in_slot(                      \
+                        private_tree_map_ins_or_assign_ent.map,                \
+                        private_tree_map_ins_or_assign_ent.entry.type);        \
                 *((typeof(type_compound_literal) *)                            \
-                      private_bounded_map_ins_or_assign_ent.entry.type)        \
+                      private_tree_map_ins_or_assign_ent.entry.type)           \
                     = type_compound_literal;                                   \
-                *CCC_private_bounded_map_node_in_slot(                         \
-                    private_bounded_map_ins_or_assign_ent.map,                 \
-                    private_bounded_map_ins_or_assign_ent.entry.type)          \
+                *CCC_private_tree_map_node_in_slot(                            \
+                    private_tree_map_ins_or_assign_ent.map,                    \
+                    private_tree_map_ins_or_assign_ent.entry.type)             \
                     = private_ins_ent_saved;                                   \
-                private_bounded_map_ins_or_assign_ent_ret                      \
-                    = private_bounded_map_ins_or_assign_ent.entry;             \
-                *((typeof(private_bounded_map_key) *)                          \
-                      CCC_private_bounded_map_key_in_slot(                     \
-                          private_bounded_map_ins_or_assign_ent.map,           \
-                          private_bounded_map_ins_or_assign_ent_ret.type))     \
-                    = private_bounded_map_key;                                 \
+                private_tree_map_ins_or_assign_ent_ret                         \
+                    = private_tree_map_ins_or_assign_ent.entry;                \
+                *((typeof(private_tree_map_key) *)                             \
+                      CCC_private_tree_map_key_in_slot(                        \
+                          private_tree_map_ins_or_assign_ent.map,              \
+                          private_tree_map_ins_or_assign_ent_ret.type))        \
+                    = private_tree_map_key;                                    \
             }                                                                  \
         }                                                                      \
-        private_bounded_map_ins_or_assign_ent_ret;                             \
+        private_tree_map_ins_or_assign_ent_ret;                                \
     }))
 
 /* NOLINTEND(readability-identifier-naming) */

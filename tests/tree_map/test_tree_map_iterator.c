@@ -6,19 +6,18 @@
 #include <time.h>
 
 #define TRAITS_USING_NAMESPACE_CCC
-#define BOUNDED_MAP_USING_NAMESPACE_CCC
+#define TREE_MAP_USING_NAMESPACE_CCC
 #define TYPES_USING_NAMESPACE_CCC
 
-#include "bounded_map.h"
-#include "bounded_map_utility.h"
 #include "checkers.h"
 #include "traits.h"
+#include "tree_map.h"
+#include "tree_map_utility.h"
 #include "types.h"
 #include "utility/stack_allocator.h"
 
-check_static_begin(check_range, Bounded_map const *const rom,
-                   Range const *const r, size_t const n,
-                   int const expect_range[])
+check_static_begin(check_range, Tree_map const *const rom, Range const *const r,
+                   size_t const n, int const expect_range[])
 {
     if (range_begin(r))
     {
@@ -78,7 +77,7 @@ check_static_begin(check_range, Bounded_map const *const rom,
     });
 }
 
-check_static_begin(check_range_reverse, Bounded_map const *const rom,
+check_static_begin(check_range_reverse, Tree_map const *const rom,
                    Range_reverse const *const r, size_t const n,
                    int const expect_range_reverse[])
 {
@@ -145,7 +144,7 @@ check_static_begin(check_range_reverse, Bounded_map const *const rom,
     });
 }
 
-check_static_begin(iterator_check, Bounded_map *s)
+check_static_begin(iterator_check, Tree_map *s)
 {
     size_t const size = count(s).count;
     size_t iterator_count = 0;
@@ -172,12 +171,12 @@ check_static_begin(iterator_check, Bounded_map *s)
     check_end();
 }
 
-check_static_begin(bounded_map_test_forward_iterator)
+check_static_begin(tree_map_test_forward_iterator)
 {
     struct Stack_allocator allocator
         = stack_allocator_initialize(struct Val, 33);
-    Bounded_map s = bounded_map_initialize(
-        struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
+    Tree_map s = tree_map_initialize(struct Val, elem, key, id_order,
+                                     stack_allocator_allocate, &allocator);
     /* We should have the expected behavior iteration over empty tree. */
     int j = 0;
     for (struct Val *e = begin(&s); e != end(&s); e = next(&s, &e->elem), ++j)
@@ -209,12 +208,12 @@ check_static_begin(bounded_map_test_forward_iterator)
     check_end();
 }
 
-check_static_begin(bounded_map_test_iterate_removal)
+check_static_begin(tree_map_test_iterate_removal)
 {
     struct Stack_allocator allocator
         = stack_allocator_initialize(struct Val, 100);
-    Bounded_map s = bounded_map_initialize(
-        struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
+    Tree_map s = tree_map_initialize(struct Val, elem, key, id_order,
+                                     stack_allocator_allocate, &allocator);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -245,10 +244,10 @@ check_static_begin(bounded_map_test_iterate_removal)
     check_end();
 }
 
-check_static_begin(bounded_map_test_iterate_remove_reinsert)
+check_static_begin(tree_map_test_iterate_remove_reinsert)
 {
-    Bounded_map s
-        = bounded_map_initialize(struct Val, elem, key, id_order, NULL, NULL);
+    Tree_map s
+        = tree_map_initialize(struct Val, elem, key, id_order, NULL, NULL);
     /* Seed the test with any integer for reproducible random test sequence
        currently this will change every test. NOLINTNEXTLINE */
     srand(time(NULL));
@@ -283,12 +282,12 @@ check_static_begin(bounded_map_test_iterate_remove_reinsert)
     check_end();
 }
 
-check_static_begin(bounded_map_test_valid_range)
+check_static_begin(tree_map_test_valid_range)
 {
     struct Stack_allocator allocator
         = stack_allocator_initialize(struct Val, 25);
-    Bounded_map s = bounded_map_initialize(
-        struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
+    Tree_map s = tree_map_initialize(struct Val, elem, key, id_order,
+                                     stack_allocator_allocate, &allocator);
 
     int const num_nodes = 25;
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
@@ -318,12 +317,12 @@ check_static_begin(bounded_map_test_valid_range)
     check_end();
 }
 
-check_static_begin(bounded_map_test_valid_range_equals)
+check_static_begin(tree_map_test_valid_range_equals)
 {
     struct Stack_allocator allocator
         = stack_allocator_initialize(struct Val, 25);
-    Bounded_map s = bounded_map_initialize(
-        struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
+    Tree_map s = tree_map_initialize(struct Val, elem, key, id_order,
+                                     stack_allocator_allocate, &allocator);
 
     int const num_nodes = 25;
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
@@ -352,12 +351,12 @@ check_static_begin(bounded_map_test_valid_range_equals)
     check_end();
 }
 
-check_static_begin(bounded_map_test_invalid_range)
+check_static_begin(tree_map_test_invalid_range)
 {
     struct Stack_allocator allocator
         = stack_allocator_initialize(struct Val, 25);
-    Bounded_map s = bounded_map_initialize(
-        struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
+    Tree_map s = tree_map_initialize(struct Val, elem, key, id_order,
+                                     stack_allocator_allocate, &allocator);
     int const num_nodes = 25;
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
     for (int i = 0, id = 0; i < num_nodes; ++i, id += 5)
@@ -386,12 +385,12 @@ check_static_begin(bounded_map_test_invalid_range)
     check_end();
 }
 
-check_static_begin(bounded_map_test_empty_range)
+check_static_begin(tree_map_test_empty_range)
 {
     struct Stack_allocator allocator
         = stack_allocator_initialize(struct Val, 25);
-    Bounded_map s = bounded_map_initialize(
-        struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
+    Tree_map s = tree_map_initialize(struct Val, elem, key, id_order,
+                                     stack_allocator_allocate, &allocator);
     int const num_nodes = 25;
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
     for (int i = 0, id = 0; i < num_nodes; ++i, id += 5)
@@ -421,8 +420,8 @@ int
 main()
 {
     return check_run(
-        bounded_map_test_forward_iterator(), bounded_map_test_iterate_removal(),
-        bounded_map_test_valid_range(), bounded_map_test_valid_range_equals(),
-        bounded_map_test_invalid_range(), bounded_map_test_empty_range(),
-        bounded_map_test_iterate_remove_reinsert());
+        tree_map_test_forward_iterator(), tree_map_test_iterate_removal(),
+        tree_map_test_valid_range(), tree_map_test_valid_range_equals(),
+        tree_map_test_invalid_range(), tree_map_test_empty_range(),
+        tree_map_test_iterate_remove_reinsert());
 }

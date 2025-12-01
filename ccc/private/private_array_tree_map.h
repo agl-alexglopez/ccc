@@ -13,8 +13,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 @endcond */
-#ifndef CCC_PRIVATE_ARRAY_BOUNDED_MAP_H
-#define CCC_PRIVATE_ARRAY_BOUNDED_MAP_H
+#ifndef CCC_PRIVATE_ARRAY_TREE_MAP_H
+#define CCC_PRIVATE_ARRAY_TREE_MAP_H
 
 /** @cond */
 #include <limits.h>
@@ -32,7 +32,7 @@ a free list. The parent field tracks the parent for an allocated node in the
 tree that the user has inserted into the array. When the user removes a node
 it is added to the front of a free list. The map will track the first free
 node. The list is push to front LIFO stack. */
-struct CCC_Array_bounded_map_node
+struct CCC_Array_tree_map_node
 {
     /** @internal Child nodes in array to unify Left and Right. */
     size_t branch[2];
@@ -45,7 +45,7 @@ struct CCC_Array_bounded_map_node
     };
 };
 
-/** @internal An array bounded map is a modified struct of arrays layout with
+/** @internal An array tree map is a modified struct of arrays layout with
 the modification being that we may have the arrays as pointer offsets in a
 contiguous allocation if the user desires a dynamic map.
 
@@ -128,12 +128,12 @@ arbitrarily sized or organized user data while we do operations on nodes and
 bits. Performance metrics still must be measured to say whether this is faster
 or slower than other approaches. However, the goal with this design is space
 efficiency first, speed second. */
-struct CCC_Array_bounded_map
+struct CCC_Array_tree_map
 {
     /** @internal The contiguous array of user data. */
     void *data;
     /** @internal The contiguous array of WAVL tree meta data. */
-    struct CCC_Array_bounded_map_node *nodes;
+    struct CCC_Array_tree_map_node *nodes;
     /** @internal The parity bit array corresponding to each node. */
     unsigned *parity;
     /** @internal The root node of the WAVL tree. */
@@ -157,10 +157,10 @@ struct CCC_Array_bounded_map
 };
 
 /** @internal */
-struct CCC_Array_bounded_map_handle
+struct CCC_Array_tree_map_handle
 {
     /** @internal Map associated with this handle. */
-    struct CCC_Array_bounded_map *map;
+    struct CCC_Array_tree_map *map;
     /** @internal Current index of the handle. */
     size_t index;
     /** @internal Saves last comparison direction. */
@@ -170,73 +170,70 @@ struct CCC_Array_bounded_map_handle
 };
 
 /** @internal Wrapper for return by pointer on the stack in C23. */
-union CCC_Array_bounded_map_handle_wrap
+union CCC_Array_tree_map_handle_wrap
 {
     /** @internal Single field enables return by compound literal reference. */
-    struct CCC_Array_bounded_map_handle private;
+    struct CCC_Array_tree_map_handle private;
 };
 
 /*========================  Private Interface  ==============================*/
 
 /** @internal */
-void *
-CCC_private_array_bounded_map_data_at(struct CCC_Array_bounded_map const *,
-                                      size_t);
+void *CCC_private_array_tree_map_data_at(struct CCC_Array_tree_map const *,
+                                         size_t);
 /** @internal */
-void *CCC_private_array_bounded_map_key_at(struct CCC_Array_bounded_map const *,
-                                           size_t);
+void *CCC_private_array_tree_map_key_at(struct CCC_Array_tree_map const *,
+                                        size_t);
 /** @internal */
-struct CCC_Array_bounded_map_node *
-CCC_private_array_bounded_map_node_at(struct CCC_Array_bounded_map const *,
-                                      size_t);
+struct CCC_Array_tree_map_node *
+CCC_private_array_tree_map_node_at(struct CCC_Array_tree_map const *, size_t);
 /** @internal */
-struct CCC_Array_bounded_map_handle
-CCC_private_array_bounded_map_handle(struct CCC_Array_bounded_map const *,
-                                     void const *);
+struct CCC_Array_tree_map_handle
+CCC_private_array_tree_map_handle(struct CCC_Array_tree_map const *,
+                                  void const *);
 /** @internal */
-void CCC_private_array_bounded_map_insert(struct CCC_Array_bounded_map *,
-                                          size_t, CCC_Order, size_t);
+void CCC_private_array_tree_map_insert(struct CCC_Array_tree_map *, size_t,
+                                       CCC_Order, size_t);
 /** @internal */
-size_t
-CCC_private_array_bounded_map_allocate_slot(struct CCC_Array_bounded_map *);
+size_t CCC_private_array_tree_map_allocate_slot(struct CCC_Array_tree_map *);
 
 /*=========================      Initialization     =========================*/
 
 /** @internal Calculates the number of parity blocks needed to support the given
 capacity. Provide the type used for the parity block array and the number of
 blocks needed to round up to will be returned. */
-#define CCC_private_array_bounded_map_blocks(private_cap)                      \
+#define CCC_private_array_tree_map_blocks(private_cap)                         \
     (((private_cap)                                                            \
-      + ((sizeof(*(struct CCC_Array_bounded_map){}.parity) * CHAR_BIT) - 1))   \
-     / (sizeof(*(struct CCC_Array_bounded_map){}.parity) * CHAR_BIT))
+      + ((sizeof(*(struct CCC_Array_tree_map){}.parity) * CHAR_BIT) - 1))      \
+     / (sizeof(*(struct CCC_Array_tree_map){}.parity) * CHAR_BIT))
 
 /** @internal The user can declare a fixed size realtime ordered map with the
 help of static asserts to ensure the layout is compatible with our internal
 metadata. */
-#define CCC_private_array_bounded_map_declare_fixed_map(                       \
+#define CCC_private_array_tree_map_declare_fixed_map(                          \
     private_fixed_map_type_name, private_key_val_type_name, private_capacity)  \
     static_assert((private_capacity) > 1,                                      \
                   "fixed size map must have capacity greater than 1");         \
     typedef struct                                                             \
     {                                                                          \
         private_key_val_type_name data[(private_capacity)];                    \
-        struct CCC_Array_bounded_map_node nodes[(private_capacity)];           \
-        typeof(*(struct CCC_Array_bounded_map){}.parity)                       \
-            parity[CCC_private_array_bounded_map_blocks((private_capacity))];  \
+        struct CCC_Array_tree_map_node nodes[(private_capacity)];              \
+        typeof(*(struct CCC_Array_tree_map){}.parity)                          \
+            parity[CCC_private_array_tree_map_blocks((private_capacity))];     \
     }(private_fixed_map_type_name)
 
 /** @internal Taking the size of the array actually works here because the field
 is of a known fixed size defined at compile time, not just a pointer. */
-#define CCC_private_array_bounded_map_fixed_capacity(fixed_map_type_name)      \
+#define CCC_private_array_tree_map_fixed_capacity(fixed_map_type_name)         \
     (sizeof((fixed_map_type_name){}.nodes)                                     \
-     / sizeof(struct CCC_Array_bounded_map_node))
+     / sizeof(struct CCC_Array_tree_map_node))
 
 /** @internal Initialization only tracks pointers to support a variety of memory
 sources for both fixed and dynamic maps. The nodes and parity pointers will be
 lazily initialized upon the first runtime opportunity. This allows the initial
 memory provided to the data pointer to come from any source at compile or
 runtime. */
-#define CCC_private_array_bounded_map_initialize(                              \
+#define CCC_private_array_tree_map_initialize(                                 \
     private_memory_pointer, private_type_name, private_key_field,              \
     private_key_compare, private_allocate, private_context_data,               \
     private_capacity)                                                          \
@@ -255,337 +252,321 @@ runtime. */
         .context = (private_context_data),                                     \
     }
 
-/** @internal Initialize an array bounded map from user input list. */
-#define CCC_private_array_bounded_map_from(                                    \
+/** @internal Initialize an array tree map from user input list. */
+#define CCC_private_array_tree_map_from(                                       \
     private_key_field, private_key_compare, private_allocate,                  \
     private_context_data, private_optional_cap,                                \
     private_array_compound_literal...)                                         \
     (__extension__({                                                           \
         typeof(*private_array_compound_literal)                                \
-            *private_array_bounded_map_initializer_list                        \
+            *private_array_tree_map_initializer_list                           \
             = private_array_compound_literal;                                  \
-        struct CCC_Array_bounded_map private_array_bounded_map                 \
-            = CCC_private_array_bounded_map_initialize(                        \
-                NULL, typeof(*private_array_bounded_map_initializer_list),     \
+        struct CCC_Array_tree_map private_array_tree_map                       \
+            = CCC_private_array_tree_map_initialize(                           \
+                NULL, typeof(*private_array_tree_map_initializer_list),        \
                 private_key_field, private_key_compare, private_allocate,      \
                 private_context_data, 0);                                      \
-        size_t const private_array_bounded_n                                   \
+        size_t const private_array_tree_n                                      \
             = sizeof(private_array_compound_literal)                           \
-            / sizeof(*private_array_bounded_map_initializer_list);             \
+            / sizeof(*private_array_tree_map_initializer_list);                \
         size_t const private_cap = private_optional_cap;                       \
-        if (CCC_array_bounded_map_reserve(                                     \
-                &private_array_bounded_map,                                    \
-                (private_array_bounded_n > private_cap                         \
-                     ? private_array_bounded_n                                 \
-                     : private_cap),                                           \
-                private_allocate)                                              \
+        if (CCC_array_tree_map_reserve(&private_array_tree_map,                \
+                                       (private_array_tree_n > private_cap     \
+                                            ? private_array_tree_n             \
+                                            : private_cap),                    \
+                                       private_allocate)                       \
             == CCC_RESULT_OK)                                                  \
         {                                                                      \
-            for (size_t i = 0; i < private_array_bounded_n; ++i)               \
+            for (size_t i = 0; i < private_array_tree_n; ++i)                  \
             {                                                                  \
-                struct CCC_Array_bounded_map_handle                            \
-                    private_array_bounded_entry                                \
-                    = CCC_private_array_bounded_map_handle(                    \
-                        &private_array_bounded_map,                            \
+                struct CCC_Array_tree_map_handle private_array_tree_entry      \
+                    = CCC_private_array_tree_map_handle(                       \
+                        &private_array_tree_map,                               \
                         (void const                                            \
-                             *)&private_array_bounded_map_initializer_list[i]  \
+                             *)&private_array_tree_map_initializer_list[i]     \
                             .private_key_field);                               \
                 CCC_Handle_index private_index                                 \
-                    = private_array_bounded_entry.index;                       \
-                if (!(private_array_bounded_entry.status                       \
-                      & CCC_ENTRY_OCCUPIED))                                   \
+                    = private_array_tree_entry.index;                          \
+                if (!(private_array_tree_entry.status & CCC_ENTRY_OCCUPIED))   \
                 {                                                              \
-                    private_index                                              \
-                        = CCC_private_array_bounded_map_allocate_slot(         \
-                            &private_array_bounded_map);                       \
+                    private_index = CCC_private_array_tree_map_allocate_slot(  \
+                        &private_array_tree_map);                              \
                 }                                                              \
-                *((typeof(*private_array_bounded_map_initializer_list) *)      \
-                      CCC_private_array_bounded_map_data_at(                   \
-                          private_array_bounded_entry.map, private_index))     \
-                    = private_array_bounded_map_initializer_list[i];           \
-                if (!(private_array_bounded_entry.status                       \
-                      & CCC_ENTRY_OCCUPIED))                                   \
+                *((typeof(*private_array_tree_map_initializer_list) *)         \
+                      CCC_private_array_tree_map_data_at(                      \
+                          private_array_tree_entry.map, private_index))        \
+                    = private_array_tree_map_initializer_list[i];              \
+                if (!(private_array_tree_entry.status & CCC_ENTRY_OCCUPIED))   \
                 {                                                              \
-                    CCC_private_array_bounded_map_insert(                      \
-                        private_array_bounded_entry.map,                       \
-                        private_array_bounded_entry.index,                     \
-                        private_array_bounded_entry.last_order,                \
-                        private_index);                                        \
+                    CCC_private_array_tree_map_insert(                         \
+                        private_array_tree_entry.map,                          \
+                        private_array_tree_entry.index,                        \
+                        private_array_tree_entry.last_order, private_index);   \
                 }                                                              \
             }                                                                  \
         }                                                                      \
-        private_array_bounded_map;                                             \
+        private_array_tree_map;                                                \
     }))
 
-#define CCC_private_array_bounded_map_with_capacity(                           \
+#define CCC_private_array_tree_map_with_capacity(                              \
     private_type_name, private_key_field, private_key_compare,                 \
     private_allocate, private_context_data, private_cap)                       \
     (__extension__({                                                           \
-        struct CCC_Array_bounded_map private_array_bounded_map                 \
-            = CCC_private_array_bounded_map_initialize(                        \
+        struct CCC_Array_tree_map private_array_tree_map                       \
+            = CCC_private_array_tree_map_initialize(                           \
                 NULL, private_type_name, private_key_field,                    \
                 private_key_compare, private_allocate, private_context_data,   \
                 0);                                                            \
-        (void)CCC_array_bounded_map_reserve(&private_array_bounded_map,        \
-                                            private_cap, private_allocate);    \
-        private_array_bounded_map;                                             \
+        (void)CCC_array_tree_map_reserve(&private_array_tree_map, private_cap, \
+                                         private_allocate);                    \
+        private_array_tree_map;                                                \
     }))
 
 /** @internal */
-#define CCC_private_array_bounded_map_as(array_bounded_map_pointer, type_name, \
-                                         handle...)                            \
-    ((type_name *)CCC_private_array_bounded_map_data_at(                       \
-        (array_bounded_map_pointer), (handle)))
+#define CCC_private_array_tree_map_as(array_tree_map_pointer, type_name,       \
+                                      handle...)                               \
+    ((type_name *)CCC_private_array_tree_map_data_at((array_tree_map_pointer), \
+                                                     (handle)))
 
 /*==================     Core Macro Implementations     =====================*/
 
 /** @internal */
-#define CCC_private_array_bounded_map_and_modify_with(                         \
-    array_bounded_map_array_pointer, type_name, closure_over_T...)             \
+#define CCC_private_array_tree_map_and_modify_with(                            \
+    array_tree_map_array_pointer, type_name, closure_over_T...)                \
     (__extension__({                                                           \
-        __auto_type private_array_bounded_map_hndl_pointer                     \
-            = (array_bounded_map_array_pointer);                               \
-        struct CCC_Array_bounded_map_handle private_array_bounded_map_mod_hndl \
+        __auto_type private_array_tree_map_hndl_pointer                        \
+            = (array_tree_map_array_pointer);                                  \
+        struct CCC_Array_tree_map_handle private_array_tree_map_mod_hndl       \
             = {.status = CCC_ENTRY_ARGUMENT_ERROR};                            \
-        if (private_array_bounded_map_hndl_pointer)                            \
+        if (private_array_tree_map_hndl_pointer)                               \
         {                                                                      \
-            private_array_bounded_map_mod_hndl                                 \
-                = private_array_bounded_map_hndl_pointer->private;             \
-            if (private_array_bounded_map_mod_hndl.status                      \
-                & CCC_ENTRY_OCCUPIED)                                          \
+            private_array_tree_map_mod_hndl                                    \
+                = private_array_tree_map_hndl_pointer->private;                \
+            if (private_array_tree_map_mod_hndl.status & CCC_ENTRY_OCCUPIED)   \
             {                                                                  \
-                type_name *const T = CCC_private_array_bounded_map_data_at(    \
-                    private_array_bounded_map_mod_hndl.map,                    \
-                    private_array_bounded_map_mod_hndl.index);                 \
+                type_name *const T = CCC_private_array_tree_map_data_at(       \
+                    private_array_tree_map_mod_hndl.map,                       \
+                    private_array_tree_map_mod_hndl.index);                    \
                 if (T)                                                         \
                 {                                                              \
                     closure_over_T                                             \
                 }                                                              \
             }                                                                  \
         }                                                                      \
-        private_array_bounded_map_mod_hndl;                                    \
+        private_array_tree_map_mod_hndl;                                       \
     }))
 
 /** @internal */
-#define CCC_private_array_bounded_map_or_insert_with(                          \
-    array_bounded_map_array_pointer, type_compound_literal...)                 \
+#define CCC_private_array_tree_map_or_insert_with(                             \
+    array_tree_map_array_pointer, type_compound_literal...)                    \
     (__extension__({                                                           \
         __auto_type private_or_ins_array_pointer                               \
-            = (array_bounded_map_array_pointer);                               \
-        CCC_Handle_index private_array_bounded_map_or_ins_ret = 0;             \
+            = (array_tree_map_array_pointer);                                  \
+        CCC_Handle_index private_array_tree_map_or_ins_ret = 0;                \
         if (private_or_ins_array_pointer)                                      \
         {                                                                      \
             if (private_or_ins_array_pointer->private.status                   \
                 == CCC_ENTRY_OCCUPIED)                                         \
             {                                                                  \
-                private_array_bounded_map_or_ins_ret                           \
+                private_array_tree_map_or_ins_ret                              \
                     = private_or_ins_array_pointer->private.index;             \
             }                                                                  \
             else                                                               \
             {                                                                  \
-                private_array_bounded_map_or_ins_ret                           \
-                    = CCC_private_array_bounded_map_allocate_slot(             \
+                private_array_tree_map_or_ins_ret                              \
+                    = CCC_private_array_tree_map_allocate_slot(                \
                         private_or_ins_array_pointer->private.map);            \
-                if (private_array_bounded_map_or_ins_ret)                      \
+                if (private_array_tree_map_or_ins_ret)                         \
                 {                                                              \
                     *((typeof(type_compound_literal) *)                        \
-                          CCC_private_array_bounded_map_data_at(               \
+                          CCC_private_array_tree_map_data_at(                  \
                               private_or_ins_array_pointer->private.map,       \
-                              private_array_bounded_map_or_ins_ret))           \
+                              private_array_tree_map_or_ins_ret))              \
                         = type_compound_literal;                               \
-                    CCC_private_array_bounded_map_insert(                      \
+                    CCC_private_array_tree_map_insert(                         \
                         private_or_ins_array_pointer->private.map,             \
                         private_or_ins_array_pointer->private.index,           \
                         private_or_ins_array_pointer->private.last_order,      \
-                        private_array_bounded_map_or_ins_ret);                 \
+                        private_array_tree_map_or_ins_ret);                    \
                 }                                                              \
             }                                                                  \
         }                                                                      \
-        private_array_bounded_map_or_ins_ret;                                  \
+        private_array_tree_map_or_ins_ret;                                     \
     }))
 
 /** @internal */
-#define CCC_private_array_bounded_map_insert_array_with(                       \
-    array_bounded_map_array_pointer, type_compound_literal...)                 \
+#define CCC_private_array_tree_map_insert_array_with(                          \
+    array_tree_map_array_pointer, type_compound_literal...)                    \
     (__extension__({                                                           \
         __auto_type private_ins_array_pointer                                  \
-            = (array_bounded_map_array_pointer);                               \
-        CCC_Handle_index private_array_bounded_map_ins_hndl_ret = 0;           \
+            = (array_tree_map_array_pointer);                                  \
+        CCC_Handle_index private_array_tree_map_ins_hndl_ret = 0;              \
         if (private_ins_array_pointer)                                         \
         {                                                                      \
             if (!(private_ins_array_pointer->private.status                    \
                   & CCC_ENTRY_OCCUPIED))                                       \
             {                                                                  \
-                private_array_bounded_map_ins_hndl_ret                         \
-                    = CCC_private_array_bounded_map_allocate_slot(             \
+                private_array_tree_map_ins_hndl_ret                            \
+                    = CCC_private_array_tree_map_allocate_slot(                \
                         private_ins_array_pointer->private.map);               \
-                if (private_array_bounded_map_ins_hndl_ret)                    \
+                if (private_array_tree_map_ins_hndl_ret)                       \
                 {                                                              \
                     *((typeof(type_compound_literal) *)                        \
-                          CCC_private_array_bounded_map_data_at(               \
+                          CCC_private_array_tree_map_data_at(                  \
                               private_ins_array_pointer->private.map,          \
-                              private_array_bounded_map_ins_hndl_ret))         \
+                              private_array_tree_map_ins_hndl_ret))            \
                         = type_compound_literal;                               \
-                    CCC_private_array_bounded_map_insert(                      \
+                    CCC_private_array_tree_map_insert(                         \
                         private_ins_array_pointer->private.map,                \
                         private_ins_array_pointer->private.index,              \
                         private_ins_array_pointer->private.last_order,         \
-                        private_array_bounded_map_ins_hndl_ret);               \
+                        private_array_tree_map_ins_hndl_ret);                  \
                 }                                                              \
             }                                                                  \
             else if (private_ins_array_pointer->private.status                 \
                      == CCC_ENTRY_OCCUPIED)                                    \
             {                                                                  \
-                private_array_bounded_map_ins_hndl_ret                         \
+                private_array_tree_map_ins_hndl_ret                            \
                     = private_ins_array_pointer->private.index;                \
                 *((typeof(type_compound_literal) *)                            \
-                      CCC_private_array_bounded_map_data_at(                   \
+                      CCC_private_array_tree_map_data_at(                      \
                           private_ins_array_pointer->private.map,              \
-                          private_array_bounded_map_ins_hndl_ret))             \
+                          private_array_tree_map_ins_hndl_ret))                \
                     = type_compound_literal;                                   \
             }                                                                  \
         }                                                                      \
-        private_array_bounded_map_ins_hndl_ret;                                \
+        private_array_tree_map_ins_hndl_ret;                                   \
     }))
 
 /** @internal */
-#define CCC_private_array_bounded_map_try_insert_with(                         \
-    array_bounded_map_pointer, key, type_compound_literal...)                  \
+#define CCC_private_array_tree_map_try_insert_with(                            \
+    array_tree_map_pointer, key, type_compound_literal...)                     \
     (__extension__({                                                           \
-        __auto_type private_try_ins_map_pointer = (array_bounded_map_pointer); \
-        struct CCC_Handle private_array_bounded_map_try_ins_hndl_ret           \
+        __auto_type private_try_ins_map_pointer = (array_tree_map_pointer);    \
+        struct CCC_Handle private_array_tree_map_try_ins_hndl_ret              \
             = {.status = CCC_ENTRY_ARGUMENT_ERROR};                            \
         if (private_try_ins_map_pointer)                                       \
         {                                                                      \
-            __auto_type private_array_bounded_map_key = (key);                 \
-            struct CCC_Array_bounded_map_handle                                \
-                private_array_bounded_map_try_ins_hndl                         \
-                = CCC_private_array_bounded_map_handle(                        \
+            __auto_type private_array_tree_map_key = (key);                    \
+            struct CCC_Array_tree_map_handle                                   \
+                private_array_tree_map_try_ins_hndl                            \
+                = CCC_private_array_tree_map_handle(                           \
                     private_try_ins_map_pointer,                               \
-                    (void *)&private_array_bounded_map_key);                   \
-            if (!(private_array_bounded_map_try_ins_hndl.status                \
+                    (void *)&private_array_tree_map_key);                      \
+            if (!(private_array_tree_map_try_ins_hndl.status                   \
                   & CCC_ENTRY_OCCUPIED))                                       \
             {                                                                  \
-                private_array_bounded_map_try_ins_hndl_ret                     \
-                    = (struct CCC_Handle){                                     \
-                        .index = CCC_private_array_bounded_map_allocate_slot(  \
-                            private_array_bounded_map_try_ins_hndl.map),       \
-                        .status = CCC_ENTRY_INSERT_ERROR,                      \
-                    };                                                         \
-                if (private_array_bounded_map_try_ins_hndl_ret.index)          \
+                private_array_tree_map_try_ins_hndl_ret = (struct CCC_Handle){ \
+                    .index = CCC_private_array_tree_map_allocate_slot(         \
+                        private_array_tree_map_try_ins_hndl.map),              \
+                    .status = CCC_ENTRY_INSERT_ERROR,                          \
+                };                                                             \
+                if (private_array_tree_map_try_ins_hndl_ret.index)             \
                 {                                                              \
                     *((typeof(type_compound_literal) *)                        \
-                          CCC_private_array_bounded_map_data_at(               \
+                          CCC_private_array_tree_map_data_at(                  \
                               private_try_ins_map_pointer,                     \
-                              private_array_bounded_map_try_ins_hndl_ret       \
-                                  .index))                                     \
+                              private_array_tree_map_try_ins_hndl_ret.index))  \
                         = type_compound_literal;                               \
-                    *((typeof(private_array_bounded_map_key) *)                \
-                          CCC_private_array_bounded_map_key_at(                \
+                    *((typeof(private_array_tree_map_key) *)                   \
+                          CCC_private_array_tree_map_key_at(                   \
                               private_try_ins_map_pointer,                     \
-                              private_array_bounded_map_try_ins_hndl_ret       \
-                                  .index))                                     \
-                        = private_array_bounded_map_key;                       \
-                    CCC_private_array_bounded_map_insert(                      \
-                        private_array_bounded_map_try_ins_hndl.map,            \
-                        private_array_bounded_map_try_ins_hndl.index,          \
-                        private_array_bounded_map_try_ins_hndl.last_order,     \
-                        private_array_bounded_map_try_ins_hndl_ret.index);     \
-                    private_array_bounded_map_try_ins_hndl_ret.status          \
+                              private_array_tree_map_try_ins_hndl_ret.index))  \
+                        = private_array_tree_map_key;                          \
+                    CCC_private_array_tree_map_insert(                         \
+                        private_array_tree_map_try_ins_hndl.map,               \
+                        private_array_tree_map_try_ins_hndl.index,             \
+                        private_array_tree_map_try_ins_hndl.last_order,        \
+                        private_array_tree_map_try_ins_hndl_ret.index);        \
+                    private_array_tree_map_try_ins_hndl_ret.status             \
                         = CCC_ENTRY_VACANT;                                    \
                 }                                                              \
             }                                                                  \
-            else if (private_array_bounded_map_try_ins_hndl.status             \
+            else if (private_array_tree_map_try_ins_hndl.status                \
                      == CCC_ENTRY_OCCUPIED)                                    \
             {                                                                  \
-                private_array_bounded_map_try_ins_hndl_ret                     \
-                    = (struct CCC_Handle){                                     \
-                        .index = private_array_bounded_map_try_ins_hndl.index, \
-                        .status                                                \
-                        = private_array_bounded_map_try_ins_hndl.status,       \
-                    };                                                         \
+                private_array_tree_map_try_ins_hndl_ret = (struct CCC_Handle){ \
+                    .index = private_array_tree_map_try_ins_hndl.index,        \
+                    .status = private_array_tree_map_try_ins_hndl.status,      \
+                };                                                             \
             }                                                                  \
         }                                                                      \
-        private_array_bounded_map_try_ins_hndl_ret;                            \
+        private_array_tree_map_try_ins_hndl_ret;                               \
     }))
 
 /** @internal */
-#define CCC_private_array_bounded_map_insert_or_assign_with(                   \
-    array_bounded_map_pointer, key, type_compound_literal...)                  \
+#define CCC_private_array_tree_map_insert_or_assign_with(                      \
+    array_tree_map_pointer, key, type_compound_literal...)                     \
     (__extension__({                                                           \
         __auto_type private_ins_or_assign_map_pointer                          \
-            = (array_bounded_map_pointer);                                     \
-        struct CCC_Handle private_array_bounded_map_ins_or_assign_hndl_ret     \
+            = (array_tree_map_pointer);                                        \
+        struct CCC_Handle private_array_tree_map_ins_or_assign_hndl_ret        \
             = {.status = CCC_ENTRY_ARGUMENT_ERROR};                            \
         if (private_ins_or_assign_map_pointer)                                 \
         {                                                                      \
-            __auto_type private_array_bounded_map_key = (key);                 \
-            struct CCC_Array_bounded_map_handle                                \
-                private_array_bounded_map_ins_or_assign_hndl                   \
-                = CCC_private_array_bounded_map_handle(                        \
+            __auto_type private_array_tree_map_key = (key);                    \
+            struct CCC_Array_tree_map_handle                                   \
+                private_array_tree_map_ins_or_assign_hndl                      \
+                = CCC_private_array_tree_map_handle(                           \
                     private_ins_or_assign_map_pointer,                         \
-                    (void *)&private_array_bounded_map_key);                   \
-            if (!(private_array_bounded_map_ins_or_assign_hndl.status          \
+                    (void *)&private_array_tree_map_key);                      \
+            if (!(private_array_tree_map_ins_or_assign_hndl.status             \
                   & CCC_ENTRY_OCCUPIED))                                       \
             {                                                                  \
-                private_array_bounded_map_ins_or_assign_hndl_ret               \
+                private_array_tree_map_ins_or_assign_hndl_ret                  \
                     = (struct CCC_Handle){                                     \
-                        .index = CCC_private_array_bounded_map_allocate_slot(  \
-                            private_array_bounded_map_ins_or_assign_hndl.map), \
+                        .index = CCC_private_array_tree_map_allocate_slot(     \
+                            private_array_tree_map_ins_or_assign_hndl.map),    \
                         .status = CCC_ENTRY_INSERT_ERROR,                      \
                     };                                                         \
-                if (private_array_bounded_map_ins_or_assign_hndl_ret.index)    \
+                if (private_array_tree_map_ins_or_assign_hndl_ret.index)       \
                 {                                                              \
                     *((typeof(type_compound_literal) *)                        \
-                          CCC_private_array_bounded_map_data_at(               \
-                              private_array_bounded_map_ins_or_assign_hndl     \
-                                  .map,                                        \
-                              private_array_bounded_map_ins_or_assign_hndl_ret \
+                          CCC_private_array_tree_map_data_at(                  \
+                              private_array_tree_map_ins_or_assign_hndl.map,   \
+                              private_array_tree_map_ins_or_assign_hndl_ret    \
                                   .index))                                     \
                         = type_compound_literal;                               \
-                    *((typeof(private_array_bounded_map_key) *)                \
-                          CCC_private_array_bounded_map_key_at(                \
-                              private_array_bounded_map_ins_or_assign_hndl     \
-                                  .map,                                        \
-                              private_array_bounded_map_ins_or_assign_hndl_ret \
+                    *((typeof(private_array_tree_map_key) *)                   \
+                          CCC_private_array_tree_map_key_at(                   \
+                              private_array_tree_map_ins_or_assign_hndl.map,   \
+                              private_array_tree_map_ins_or_assign_hndl_ret    \
                                   .index))                                     \
-                        = private_array_bounded_map_key;                       \
-                    CCC_private_array_bounded_map_insert(                      \
-                        private_array_bounded_map_ins_or_assign_hndl.map,      \
-                        private_array_bounded_map_ins_or_assign_hndl.index,    \
-                        private_array_bounded_map_ins_or_assign_hndl           \
-                            .last_order,                                       \
-                        private_array_bounded_map_ins_or_assign_hndl_ret       \
-                            .index);                                           \
-                    private_array_bounded_map_ins_or_assign_hndl_ret.status    \
+                        = private_array_tree_map_key;                          \
+                    CCC_private_array_tree_map_insert(                         \
+                        private_array_tree_map_ins_or_assign_hndl.map,         \
+                        private_array_tree_map_ins_or_assign_hndl.index,       \
+                        private_array_tree_map_ins_or_assign_hndl.last_order,  \
+                        private_array_tree_map_ins_or_assign_hndl_ret.index);  \
+                    private_array_tree_map_ins_or_assign_hndl_ret.status       \
                         = CCC_ENTRY_VACANT;                                    \
                 }                                                              \
             }                                                                  \
-            else if (private_array_bounded_map_ins_or_assign_hndl.status       \
+            else if (private_array_tree_map_ins_or_assign_hndl.status          \
                      == CCC_ENTRY_OCCUPIED)                                    \
             {                                                                  \
                 *((typeof(type_compound_literal) *)                            \
-                      CCC_private_array_bounded_map_data_at(                   \
-                          private_array_bounded_map_ins_or_assign_hndl.map,    \
-                          private_array_bounded_map_ins_or_assign_hndl.index)) \
+                      CCC_private_array_tree_map_data_at(                      \
+                          private_array_tree_map_ins_or_assign_hndl.map,       \
+                          private_array_tree_map_ins_or_assign_hndl.index))    \
                     = type_compound_literal;                                   \
-                private_array_bounded_map_ins_or_assign_hndl_ret               \
+                private_array_tree_map_ins_or_assign_hndl_ret                  \
                     = (struct CCC_Handle){                                     \
                         .index                                                 \
-                        = private_array_bounded_map_ins_or_assign_hndl.index,  \
+                        = private_array_tree_map_ins_or_assign_hndl.index,     \
                         .status                                                \
-                        = private_array_bounded_map_ins_or_assign_hndl.status, \
+                        = private_array_tree_map_ins_or_assign_hndl.status,    \
                     };                                                         \
-                *((typeof(private_array_bounded_map_key) *)                    \
-                      CCC_private_array_bounded_map_key_at(                    \
-                          private_array_bounded_map_ins_or_assign_hndl.map,    \
-                          private_array_bounded_map_ins_or_assign_hndl.index)) \
-                    = private_array_bounded_map_key;                           \
+                *((typeof(private_array_tree_map_key) *)                       \
+                      CCC_private_array_tree_map_key_at(                       \
+                          private_array_tree_map_ins_or_assign_hndl.map,       \
+                          private_array_tree_map_ins_or_assign_hndl.index))    \
+                    = private_array_tree_map_key;                              \
             }                                                                  \
         }                                                                      \
-        private_array_bounded_map_ins_or_assign_hndl_ret;                      \
+        private_array_tree_map_ins_or_assign_hndl_ret;                         \
     }))
 
 /* NOLINTEND(readability-identifier-naming) */
 
-#endif /* CCC_PRIVATE_ARRAY_BOUNDED_MAP_H */
+#endif /* CCC_PRIVATE_ARRAY_TREE_MAP_H */

@@ -59,7 +59,7 @@ enum : Bitblock
 };
 
 /** @internal An index into the block array or count of bit blocks. The block
-array is bounded by the number of blocks required to support the current bit set
+array is tree by the number of blocks required to support the current bit set
 capacity. Assume this index type has range [0, block count to support N bits].
 
 User input is given as a `size_t` so distinguish from that input with this type
@@ -67,7 +67,7 @@ to make it clear to the reader the index refers to a block not the given bit
 index the user has provided. */
 typedef size_t Block_count;
 
-/** @internal A signed index into the block array. The block array is bounded by
+/** @internal A signed index into the block array. The block array is tree by
 the number of blocks required to support the current bit set capacity. Assume
 this index type has range [-1, count of blocks needed to hold all bits in set].
 This makes reverse iteration problems easier.
@@ -81,7 +81,7 @@ to make it clear to the reader the index refers to a block not the given bit
 index the user has provided. */
 typedef ptrdiff_t Block_signed_count;
 
-/** @internal An index within a block. A block is bounded to some number of bits
+/** @internal An index within a block. A block is tree to some number of bits
 as determined by the type used for each block. This type is intended to count
 bits in a block and therefore cannot count up to arbitrary indices. Assume its
 range is `[0, BITBLOCK_BITS]`, for ease of use and clarity.
@@ -109,7 +109,7 @@ static_assert((Bit_count) ~((Bit_count)0) >= (Bit_count)0,
               "Bit_count must be unsigned");
 static_assert(UINT8_MAX >= BITBLOCK_BITS, "Bit_count counts all block bits.");
 
-/** @internal A signed index within a block. A block is bounded to some number
+/** @internal A signed index within a block. A block is tree to some number
 of bits as determined by the type used for each block. This type is intended to
 count bits in a block and therefore cannot count up to arbitrary indices. Assume
 its range is `[-1, BITBLOCK_BITS]`, for ease of use and clarity.

@@ -510,7 +510,7 @@ must have existing memory to free.
 This function covers the edge case of reserving a dynamic capacity for a
 flat_double_ended_queue at runtime but denying the flat_double_ended_queue
 allocation permission to resize. This can help prevent a flat_double_ended_queue
-from growing unbounded. The user in this case knows the flat_double_ended_queue
+from growing untree. The user in this case knows the flat_double_ended_queue
 does not have allocation permission and therefore no further memory will be
 dedicated to the flat_double_ended_queue.
 

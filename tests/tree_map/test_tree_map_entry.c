@@ -5,13 +5,13 @@ the entry functions. */
 #include <stddef.h>
 #include <stdlib.h>
 
-#define BOUNDED_MAP_USING_NAMESPACE_CCC
+#define TREE_MAP_USING_NAMESPACE_CCC
 #define TRAITS_USING_NAMESPACE_CCC
 
-#include "bounded_map.h"
-#include "bounded_map_utility.h"
 #include "checkers.h"
 #include "traits.h"
+#include "tree_map.h"
+#include "tree_map_utility.h"
 #include "types.h"
 #include "utility/stack_allocator.h"
 
@@ -48,7 +48,7 @@ pluscontext(CCC_Type_context const t)
 /* Fills the container with n elements with id and val starting at the provided
    value and incrementing by 1 until n is reached. Assumes id_and_val are
    not present by key in the table and all subsequent inserts are unique. */
-check_static_begin(fill_n, CCC_Bounded_map *const rom, size_t const n,
+check_static_begin(fill_n, CCC_Tree_map *const rom, size_t const n,
                    int id_and_val)
 {
     for (size_t i = 0; i < n; ++i, ++id_and_val)
@@ -69,7 +69,7 @@ check_static_begin(romap_test_validate)
 {
     struct Stack_allocator allocator
         = stack_allocator_initialize(struct Val, 3);
-    CCC_Bounded_map rom = bounded_map_initialize(
+    CCC_Tree_map rom = tree_map_initialize(
         struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
     CCC_Entry ent = swap_entry(&rom, &(struct Val){.key = -1, .val = -1}.elem,
                                &(struct Val){}.elem);
@@ -93,7 +93,7 @@ check_static_begin(romap_test_insert)
 {
     struct Stack_allocator allocator
         = stack_allocator_initialize(struct Val, 35);
-    CCC_Bounded_map rom = bounded_map_initialize(
+    CCC_Tree_map rom = tree_map_initialize(
         struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
     int size = 30;
     CCC_Entry ent = swap_entry(&rom, &(struct Val){.key = -1, .val = -1}.elem,
@@ -158,7 +158,7 @@ check_static_begin(romap_test_remove)
 {
     struct Stack_allocator allocator
         = stack_allocator_initialize(struct Val, 35);
-    CCC_Bounded_map rom = bounded_map_initialize(
+    CCC_Tree_map rom = tree_map_initialize(
         struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
     int size = 30;
     CCC_Entry ent = CCC_remove(&rom, &(struct Val){.key = -1, .val = -1}.elem);
@@ -232,7 +232,7 @@ check_static_begin(romap_test_try_insert)
 {
     struct Stack_allocator allocator
         = stack_allocator_initialize(struct Val, 35);
-    CCC_Bounded_map rom = bounded_map_initialize(
+    CCC_Tree_map rom = tree_map_initialize(
         struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
     int size = 30;
     CCC_Entry ent = try_insert(&rom, &(struct Val){.key = -1, .val = -1}.elem);
@@ -290,15 +290,15 @@ check_static_begin(romap_test_try_insert_with)
 {
     struct Stack_allocator allocator
         = stack_allocator_initialize(struct Val, 35);
-    CCC_Bounded_map rom = bounded_map_initialize(
+    CCC_Tree_map rom = tree_map_initialize(
         struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
     int size = 30;
-    CCC_Entry *ent = bounded_map_try_insert_with(&rom, -1, val(-1));
+    CCC_Entry *ent = tree_map_try_insert_with(&rom, -1, val(-1));
     check(validate(&rom), true);
     check(occupied(ent), false);
     check(unwrap(ent) != NULL, true);
     check(count(&rom).count, 1);
-    ent = bounded_map_try_insert_with(&rom, -1, val(-1));
+    ent = tree_map_try_insert_with(&rom, -1, val(-1));
     check(validate(&rom), true);
     check(occupied(ent), true);
     check(count(&rom).count, 1);
@@ -311,12 +311,12 @@ check_static_begin(romap_test_try_insert_with)
     check(fill_n(&rom, size / 2, i), CHECK_PASS);
 
     i += (size / 2);
-    ent = bounded_map_try_insert_with(&rom, i, val(i));
+    ent = tree_map_try_insert_with(&rom, i, val(i));
     check(validate(&rom), true);
     check(occupied(ent), false);
     check(unwrap(ent) != NULL, true);
     check(count(&rom).count, i + 2);
-    ent = bounded_map_try_insert_with(&rom, i, val(i));
+    ent = tree_map_try_insert_with(&rom, i, val(i));
     check(validate(&rom), true);
     check(occupied(ent), true);
     check(count(&rom).count, i + 2);
@@ -329,12 +329,12 @@ check_static_begin(romap_test_try_insert_with)
     check(fill_n(&rom, size - i, i), CHECK_PASS);
 
     i = size;
-    ent = bounded_map_try_insert_with(&rom, i, val(i));
+    ent = tree_map_try_insert_with(&rom, i, val(i));
     check(validate(&rom), true);
     check(occupied(ent), false);
     check(unwrap(ent) != NULL, true);
     check(count(&rom).count, i + 2);
-    ent = bounded_map_try_insert_with(&rom, i, val(i));
+    ent = tree_map_try_insert_with(&rom, i, val(i));
     check(validate(&rom), true);
     check(occupied(ent), true);
     check(count(&rom).count, i + 2);
@@ -349,7 +349,7 @@ check_static_begin(romap_test_insert_or_assign)
 {
     struct Stack_allocator allocator
         = stack_allocator_initialize(struct Val, 35);
-    CCC_Bounded_map rom = bounded_map_initialize(
+    CCC_Tree_map rom = tree_map_initialize(
         struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
     int size = 30;
     CCC_Entry ent
@@ -408,15 +408,15 @@ check_static_begin(romap_test_insert_or_assign_with)
 {
     struct Stack_allocator allocator
         = stack_allocator_initialize(struct Val, 35);
-    CCC_Bounded_map rom = bounded_map_initialize(
+    CCC_Tree_map rom = tree_map_initialize(
         struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
     int size = 30;
-    CCC_Entry *ent = bounded_map_insert_or_assign_with(&rom, -1, val(-1));
+    CCC_Entry *ent = tree_map_insert_or_assign_with(&rom, -1, val(-1));
     check(validate(&rom), true);
     check(occupied(ent), false);
     check(unwrap(ent) != NULL, true);
     check(count(&rom).count, 1);
-    ent = bounded_map_insert_or_assign_with(&rom, -1, val(-2));
+    ent = tree_map_insert_or_assign_with(&rom, -1, val(-2));
     check(validate(&rom), true);
     check(occupied(ent), true);
     check(count(&rom).count, 1);
@@ -429,12 +429,12 @@ check_static_begin(romap_test_insert_or_assign_with)
     check(fill_n(&rom, size / 2, i), CHECK_PASS);
 
     i += (size / 2);
-    ent = bounded_map_insert_or_assign_with(&rom, i, val(i));
+    ent = tree_map_insert_or_assign_with(&rom, i, val(i));
     check(validate(&rom), true);
     check(occupied(ent), false);
     check(unwrap(ent) != NULL, true);
     check(count(&rom).count, i + 2);
-    ent = bounded_map_insert_or_assign_with(&rom, i, val(i + 1));
+    ent = tree_map_insert_or_assign_with(&rom, i, val(i + 1));
     check(occupied(ent), true);
     check(count(&rom).count, i + 2);
     v = unwrap(ent);
@@ -446,12 +446,12 @@ check_static_begin(romap_test_insert_or_assign_with)
     check(fill_n(&rom, size - i, i), CHECK_PASS);
 
     i = size;
-    ent = bounded_map_insert_or_assign_with(&rom, i, val(i));
+    ent = tree_map_insert_or_assign_with(&rom, i, val(i));
     check(validate(&rom), true);
     check(occupied(ent), false);
     check(unwrap(ent) != NULL, true);
     check(count(&rom).count, i + 2);
-    ent = bounded_map_insert_or_assign_with(&rom, i, val(i + 1));
+    ent = tree_map_insert_or_assign_with(&rom, i, val(i + 1));
     check(validate(&rom), true);
     check(occupied(ent), true);
     check(count(&rom).count, i + 2);
@@ -466,10 +466,10 @@ check_static_begin(romap_test_entry_and_modify)
 {
     struct Stack_allocator allocator
         = stack_allocator_initialize(struct Val, 35);
-    CCC_Bounded_map rom = bounded_map_initialize(
+    CCC_Tree_map rom = tree_map_initialize(
         struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
     int size = 30;
-    CCC_Bounded_map_entry *ent = entry_wrap(&rom, &(int){-1});
+    CCC_Tree_map_entry *ent = entry_wrap(&rom, &(int){-1});
     check(validate(&rom), true);
     check(occupied(ent), false);
     check(unwrap(ent) == NULL, true);
@@ -478,7 +478,7 @@ check_static_begin(romap_test_entry_and_modify)
     check(occupied(ent), false);
     check(unwrap(ent) == NULL, true);
     check(count(&rom).count, 0);
-    (void)bounded_map_insert_or_assign_with(&rom, -1, val(-1));
+    (void)tree_map_insert_or_assign_with(&rom, -1, val(-1));
     check(validate(&rom), true);
     ent = entry_wrap(&rom, &(int){-1});
     check(occupied(ent), true);
@@ -501,7 +501,7 @@ check_static_begin(romap_test_entry_and_modify)
     check(occupied(ent), false);
     check(unwrap(ent) == NULL, true);
     check(count(&rom).count, i + 1);
-    (void)bounded_map_insert_or_assign_with(&rom, i, val(i));
+    (void)tree_map_insert_or_assign_with(&rom, i, val(i));
     check(validate(&rom), true);
     ent = entry_wrap(&rom, &i);
     check(occupied(ent), true);
@@ -520,7 +520,7 @@ check_static_begin(romap_test_entry_and_modify)
     check(occupied(ent), false);
     check(unwrap(ent) == NULL, true);
     check(count(&rom).count, i + 1);
-    (void)bounded_map_insert_or_assign_with(&rom, i, val(i));
+    (void)tree_map_insert_or_assign_with(&rom, i, val(i));
     check(validate(&rom), true);
     ent = entry_wrap(&rom, &i);
     check(occupied(ent), true);
@@ -537,16 +537,16 @@ check_static_begin(romap_test_entry_and_modify_context)
 {
     struct Stack_allocator allocator
         = stack_allocator_initialize(struct Val, 35);
-    CCC_Bounded_map rom = bounded_map_initialize(
+    CCC_Tree_map rom = tree_map_initialize(
         struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
     int size = 30;
     int context = 1;
-    CCC_Bounded_map_entry *ent = entry_wrap(&rom, &(int){-1});
+    CCC_Tree_map_entry *ent = entry_wrap(&rom, &(int){-1});
     ent = and_modify_context(ent, pluscontext, &context);
     check(occupied(ent), false);
     check(unwrap(ent) == NULL, true);
     check(count(&rom).count, 0);
-    (void)bounded_map_insert_or_assign_with(&rom, -1, val(-1));
+    (void)tree_map_insert_or_assign_with(&rom, -1, val(-1));
     check(validate(&rom), true);
     ent = entry_wrap(&rom, &(int){-1});
     check(occupied(ent), true);
@@ -570,7 +570,7 @@ check_static_begin(romap_test_entry_and_modify_context)
     check(occupied(ent), false);
     check(unwrap(ent) == NULL, true);
     check(count(&rom).count, i + 1);
-    (void)bounded_map_insert_or_assign_with(&rom, i, val(i));
+    (void)tree_map_insert_or_assign_with(&rom, i, val(i));
     check(validate(&rom), true);
     ent = entry_wrap(&rom, &i);
     ent = and_modify_context(ent, pluscontext, &context);
@@ -589,7 +589,7 @@ check_static_begin(romap_test_entry_and_modify_context)
     check(occupied(ent), false);
     check(unwrap(ent) == NULL, true);
     check(count(&rom).count, i + 1);
-    (void)bounded_map_insert_or_assign_with(&rom, i, val(i));
+    (void)tree_map_insert_or_assign_with(&rom, i, val(i));
     check(validate(&rom), true);
     ent = entry_wrap(&rom, &i);
     ent = and_modify_context(ent, pluscontext, &context);
@@ -605,23 +605,23 @@ check_static_begin(romap_test_entry_and_modify_with)
 {
     struct Stack_allocator allocator
         = stack_allocator_initialize(struct Val, 35);
-    CCC_Bounded_map rom = bounded_map_initialize(
+    CCC_Tree_map rom = tree_map_initialize(
         struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
     int size = 30;
-    CCC_Bounded_map_entry *ent = entry_wrap(&rom, &(int){-1});
-    ent = bounded_map_and_modify_with(ent, struct Val, { T->val++; });
+    CCC_Tree_map_entry *ent = entry_wrap(&rom, &(int){-1});
+    ent = tree_map_and_modify_with(ent, struct Val, { T->val++; });
     check(count(&rom).count, 0);
     check(occupied(ent), false);
     check(unwrap(ent) == NULL, true);
     check(count(&rom).count, 0);
-    (void)bounded_map_insert_or_assign_with(&rom, -1, val(-1));
+    (void)tree_map_insert_or_assign_with(&rom, -1, val(-1));
     check(validate(&rom), true);
     ent = entry_wrap(&rom, &(int){-1});
     struct Val *v = unwrap(ent);
     check(v != NULL, true);
     check(v->val, -1);
     check(v->key, -1);
-    ent = bounded_map_and_modify_with(ent, struct Val, { T->val++; });
+    ent = tree_map_and_modify_with(ent, struct Val, { T->val++; });
     v = unwrap(ent);
     check(v != NULL, true);
     check(v->key, -1);
@@ -633,14 +633,14 @@ check_static_begin(romap_test_entry_and_modify_with)
 
     i += (size / 2);
     ent = entry_wrap(&rom, &i);
-    ent = bounded_map_and_modify_with(ent, struct Val, { T->val++; });
+    ent = tree_map_and_modify_with(ent, struct Val, { T->val++; });
     check(occupied(ent), false);
     check(unwrap(ent) == NULL, true);
     check(count(&rom).count, i + 1);
-    (void)bounded_map_insert_or_assign_with(&rom, i, val(i));
+    (void)tree_map_insert_or_assign_with(&rom, i, val(i));
     check(validate(&rom), true);
     ent = entry_wrap(&rom, &i);
-    ent = bounded_map_and_modify_with(ent, struct Val, { T->val++; });
+    ent = tree_map_and_modify_with(ent, struct Val, { T->val++; });
     v = unwrap(ent);
     check(v != NULL, true);
     check(v->val, i + 1);
@@ -652,14 +652,14 @@ check_static_begin(romap_test_entry_and_modify_with)
 
     i = size;
     ent = entry_wrap(&rom, &i);
-    ent = bounded_map_and_modify_with(ent, struct Val, { T->val++; });
+    ent = tree_map_and_modify_with(ent, struct Val, { T->val++; });
     check(occupied(ent), false);
     check(unwrap(ent) == NULL, true);
     check(count(&rom).count, i + 1);
-    (void)bounded_map_insert_or_assign_with(&rom, i, val(i));
+    (void)tree_map_insert_or_assign_with(&rom, i, val(i));
     check(validate(&rom), true);
     ent = entry_wrap(&rom, &i);
-    ent = bounded_map_and_modify_with(ent, struct Val, { T->val++; });
+    ent = tree_map_and_modify_with(ent, struct Val, { T->val++; });
     v = unwrap(ent);
     check(v != NULL, true);
     check(v->val, i + 1);
@@ -672,7 +672,7 @@ check_static_begin(romap_test_or_insert)
 {
     struct Stack_allocator allocator
         = stack_allocator_initialize(struct Val, 35);
-    CCC_Bounded_map rom = bounded_map_initialize(
+    CCC_Tree_map rom = tree_map_initialize(
         struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
     int size = 30;
     struct Val *v = or_insert(entry_wrap(&rom, &(int){-1}),
@@ -729,17 +729,17 @@ check_static_begin(romap_test_or_insert_with)
 {
     struct Stack_allocator allocator
         = stack_allocator_initialize(struct Val, 35);
-    CCC_Bounded_map rom = bounded_map_initialize(
+    CCC_Tree_map rom = tree_map_initialize(
         struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
     int size = 30;
-    struct Val *v = bounded_map_or_insert_with(entry_wrap(&rom, &(int){-1}),
-                                               idval(-1, -1));
+    struct Val *v
+        = tree_map_or_insert_with(entry_wrap(&rom, &(int){-1}), idval(-1, -1));
     check(validate(&rom), true);
     check(v != NULL, true);
     check(v->key, -1);
     check(v->val, -1);
     check(count(&rom).count, 1);
-    v = bounded_map_or_insert_with(entry_wrap(&rom, &(int){-1}), idval(-1, -2));
+    v = tree_map_or_insert_with(entry_wrap(&rom, &(int){-1}), idval(-1, -2));
     check(v != NULL, true);
     check(v->key, -1);
     check(v->val, -1);
@@ -749,13 +749,13 @@ check_static_begin(romap_test_or_insert_with)
     check(fill_n(&rom, size / 2, i), CHECK_PASS);
 
     i += (size / 2);
-    v = bounded_map_or_insert_with(entry_wrap(&rom, &i), idval(i, i));
+    v = tree_map_or_insert_with(entry_wrap(&rom, &i), idval(i, i));
     check(validate(&rom), true);
     check(v != NULL, true);
     check(v->key, i);
     check(v->val, i);
     check(count(&rom).count, i + 2);
-    v = bounded_map_or_insert_with(entry_wrap(&rom, &i), idval(i, i + 1));
+    v = tree_map_or_insert_with(entry_wrap(&rom, &i), idval(i, i + 1));
     check(v != NULL, true);
     check(v->key, i);
     check(v->val, i);
@@ -765,13 +765,13 @@ check_static_begin(romap_test_or_insert_with)
     check(fill_n(&rom, size - i, i), CHECK_PASS);
 
     i = size;
-    v = bounded_map_or_insert_with(entry_wrap(&rom, &i), idval(i, i));
+    v = tree_map_or_insert_with(entry_wrap(&rom, &i), idval(i, i));
     check(validate(&rom), true);
     check(v != NULL, true);
     check(v->key, i);
     check(v->val, i);
     check(count(&rom).count, i + 2);
-    v = bounded_map_or_insert_with(entry_wrap(&rom, &i), idval(i, i + 1));
+    v = tree_map_or_insert_with(entry_wrap(&rom, &i), idval(i, i + 1));
     check(v != NULL, true);
     check(v->key, i);
     check(v->val, i);
@@ -783,7 +783,7 @@ check_static_begin(romap_test_insert_entry)
 {
     struct Stack_allocator allocator
         = stack_allocator_initialize(struct Val, 35);
-    CCC_Bounded_map rom = bounded_map_initialize(
+    CCC_Tree_map rom = tree_map_initialize(
         struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
     int size = 30;
     struct Val *v = insert_entry(entry_wrap(&rom, &(int){-1}),
@@ -842,18 +842,17 @@ check_static_begin(romap_test_insert_entry_with)
 {
     struct Stack_allocator allocator
         = stack_allocator_initialize(struct Val, 35);
-    CCC_Bounded_map rom = bounded_map_initialize(
+    CCC_Tree_map rom = tree_map_initialize(
         struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
     int size = 30;
-    struct Val *v = bounded_map_insert_entry_with(entry_wrap(&rom, &(int){-1}),
-                                                  idval(-1, -1));
+    struct Val *v = tree_map_insert_entry_with(entry_wrap(&rom, &(int){-1}),
+                                               idval(-1, -1));
     check(validate(&rom), true);
     check(v != NULL, true);
     check(v->key, -1);
     check(v->val, -1);
     check(count(&rom).count, 1);
-    v = bounded_map_insert_entry_with(entry_wrap(&rom, &(int){-1}),
-                                      idval(-1, -2));
+    v = tree_map_insert_entry_with(entry_wrap(&rom, &(int){-1}), idval(-1, -2));
     check(v != NULL, true);
     check(v->key, -1);
     check(v->val, -2);
@@ -863,13 +862,13 @@ check_static_begin(romap_test_insert_entry_with)
     check(fill_n(&rom, size / 2, i), CHECK_PASS);
 
     i += (size / 2);
-    v = bounded_map_insert_entry_with(entry_wrap(&rom, &i), idval(i, i));
+    v = tree_map_insert_entry_with(entry_wrap(&rom, &i), idval(i, i));
     check(validate(&rom), true);
     check(v != NULL, true);
     check(v->key, i);
     check(v->val, i);
     check(count(&rom).count, i + 2);
-    v = bounded_map_insert_entry_with(entry_wrap(&rom, &i), idval(i, i + 1));
+    v = tree_map_insert_entry_with(entry_wrap(&rom, &i), idval(i, i + 1));
     check(v != NULL, true);
     check(v->key, i);
     check(v->val, i + 1);
@@ -879,13 +878,13 @@ check_static_begin(romap_test_insert_entry_with)
     check(fill_n(&rom, size - i, i), CHECK_PASS);
 
     i = size;
-    v = bounded_map_insert_entry_with(entry_wrap(&rom, &i), idval(i, i));
+    v = tree_map_insert_entry_with(entry_wrap(&rom, &i), idval(i, i));
     check(validate(&rom), true);
     check(v != NULL, true);
     check(v->key, i);
     check(v->val, i);
     check(count(&rom).count, i + 2);
-    v = bounded_map_insert_entry_with(entry_wrap(&rom, &i), idval(i, i + 1));
+    v = tree_map_insert_entry_with(entry_wrap(&rom, &i), idval(i, i + 1));
     check(v != NULL, true);
     check(v->key, i);
     check(v->val, i + 1);
@@ -897,7 +896,7 @@ check_static_begin(romap_test_remove_entry)
 {
     struct Stack_allocator allocator
         = stack_allocator_initialize(struct Val, 35);
-    CCC_Bounded_map rom = bounded_map_initialize(
+    CCC_Tree_map rom = tree_map_initialize(
         struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
     int size = 30;
     struct Val *v = or_insert(entry_wrap(&rom, &(int){-1}),

@@ -212,7 +212,7 @@ The `static_` prefix makes it clear that we are working with a variable that occ
 > [!IMPORTANT]
 > Intrusive containers are the default and do not qualify their names with their memory layout. They offer pointer stability of the elements they allocate, or intrude upon if allocation is prohibited.
 
-For example, the `CCC_Doubly_linked_list`, `CCC_Priority_queue`, and `CCC_Bounded_map` all use the minimal words needed to qualify their data structure.
+For example, the `CCC_Doubly_linked_list`, `CCC_Priority_queue`, and `CCC_Tree_map` all use the minimal words needed to qualify their data structure.
 
 #### Flat Containers
 
@@ -226,7 +226,7 @@ For example, the `CCC_Flat_hash_map`, `CCC_Flat_priority_queue`, and `CCC_Flat_d
 > [!IMPORTANT]
 > Array containers qualify that they are stored contiguously in memory **and offer handle stability**. Handles remain valid until removed, regardless of insertion of other elements, removal of other elements, and resizing operations.
 
-For example, the `CCC_Array_bounded_map` and `CCC_Array_adaptive_map` qualify their contiguous memory layout and their use of the `CCC_Handle` interface. The guarantees of handle stability from `Array_` container are much stronger than what `Flat_` containers offer. The `Array_` containers offer the same stability as intrusive containers but use a stable index rather than pointer. For this reason it is important that the interface document that a `CCC_Handle` and `CCC_Handle_index` should be saved rather than a pointer.
+For example, the `CCC_Array_tree_map` and `CCC_Array_adaptive_map` qualify their contiguous memory layout and their use of the `CCC_Handle` interface. The guarantees of handle stability from `Array_` container are much stronger than what `Flat_` containers offer. The `Array_` containers offer the same stability as intrusive containers but use a stable index rather than pointer. For this reason it is important that the interface document that a `CCC_Handle` and `CCC_Handle_index` should be saved rather than a pointer.
 
 A benefit of handle stability is `O(1)` access to a user element referenced by a handle regardless of how the underlying storage moves in memory.
 
