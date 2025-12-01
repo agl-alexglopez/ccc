@@ -868,7 +868,7 @@ The interface may then ask for a handle to this type for certain operations. For
 void *CCC_priority_queue_push(CCC_Priority_queue *priority_queue, CCC_Priority_queue_node *elem);
 ```
 
-Non-Intrusive containers exist when a flat container can operate without such help from the user. The `flat_priority_queue` is a good example of this. When initializing we give it the following information.
+Non-Intrusive containers exist when a flat container can operate without such help from the user. The `Flat_priority_queue` is a good example of this. When initializing we give it the following information.
 
 ```c
 #define CCC_flat_priority_queue_initialize(data_pointer, cmp_order, cmp_fn, allocate, context_data, capacity) \
@@ -877,7 +877,7 @@ Non-Intrusive containers exist when a flat container can operate without such he
 /* For example: */
 
 CCC_Flat_priority_queue flat_priority_queue
-    = CCC_flat_priority_queue_initialize((int[40]){}, int, CCC_LES, int_cmp, NULL, NULL, 40);
+    = CCC_flat_priority_queue_initialize((int[40]){}, int, CCC_LESSER, int_cmp, NULL, NULL, 40);
 
 ```
 
@@ -885,7 +885,7 @@ Here a small min priority queue of integers with a maximum capacity of 40 has be
 
 ```c
 CCC_Flat_priority_queue flat_priority_queue
-    = CCC_flat_priority_queue_initialize(NULL, int, CCC_LES, int_cmp, std_allocate, NULL, 0);
+    = CCC_flat_priority_queue_initialize(NULL, int, CCC_LESSER, int_cmp, std_allocate, NULL, 0);
 ```
 
 The interface then looks like this.
@@ -1013,7 +1013,7 @@ Traditionally, intrusive containers provide the following macro.
 	container_of(pointer, type, member)
 
 /* A provided function by the container. */
-struct list_node *list_front(list *l);
+struct List_node *list_front(list *l);
 ```
 
 Then, the user code looks like this.
@@ -1187,7 +1187,7 @@ The lazy evaluation of the `_w` family of functions offer an expressive way to w
 
 Traits, found in `ccc/traits.h`, offer a more succinct way to use shared functionality across containers. Instead of calling `CCC_flat_hash_map_entry` when trying to obtain an entry from a flat hash map, one can simply call `entry`. Traits utilize `_Generic` in C to choose the correct container function based on parameters provided.
 
-Traits cost nothing at runtime but may increase compilation resources and time, though I have not been able to definitively measure a human noticeable difference in this regard. For example, consider two ways to use the entry interface.
+Traits cost nothing at runtime but may slightly increase compilation memory use.
 
 ```c
 #define TRAITS_USING_NAMESPACE_CCC
@@ -1213,12 +1213,12 @@ typedef struct
 } Word;
 /* ... Elsewhere generate offset ofs as key. */
 Word default = {.ofs = ofs, .cnt = 1};
-handle_adaptive_map_handle *h = handle_wrap(&hom, &ofs);
+Handle_adaptive_map_handle *h = handle_wrap(&hom, &ofs);
 h = and_modify(h, increment)
 Word *w = handle_adaptive_map_at(&hom, or_insert(h, &default));
 ```
 
-Using the first method in your code may expand the code evaluated in different `_Generic` cases greatly increasing compilation memory use and time (I have not yet measured the validity of these concerns). Such nesting concerns are not relevant if the container specific versions of these functions are used. Traits are completely opt-in by including the `traits.h` header.
+Traits are completely opt-in by including the `traits.h` header.
 
 ## Allocation
 
@@ -1267,7 +1267,7 @@ std_allocator(CCC_Allocator_context const context)
 }
 ```
 
-However, the above example is only useful if the standard library allocator is used. Any allocator that implements the required behavior is sufficient. For ideas of how to utilize the `context` parameter, see the sample programs. Using custom arena allocators or container compositions are cases when `context` is helpful in taming lifetimes and simplifying allocation.
+However, the above example is only useful if the standard library allocator is used. Any allocator that implements the required behavior is sufficient. For ideas of how to utilize the `context` parameter, see the sample programs. Using custom arena allocators or container compositions are cases when `context` is helpful in taming lifetimes and simplifying allocation. See the tests for extensive use of a minimal stack allocator that helps speed up tests by avoiding calls into the standard library heap allocator.
 
 ### Constructors
 

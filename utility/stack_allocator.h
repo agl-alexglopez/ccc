@@ -45,15 +45,15 @@ exist. */
                                    type_compile_time_known_capacity)           \
     {                                                                          \
         .blocks = (type_name[type_compile_time_known_capacity]){}, /*NOLINT*/  \
+        .sizeof_type = sizeof(type_name),                                      \
         .bytes_capacity                                                        \
         = sizeof((type_name[type_compile_time_known_capacity]){}), /*NOLINT*/  \
         .bytes_occupied = 0,                                                   \
-        .sizeof_type = sizeof(type_name),                                      \
     }
 
 /** Implements a reduced allocator interface. Only allocates, does not resize
-or free. If an attempt to resize or free occurs the program exits with an
-error message. Intended for testing.
+or free. If resizing or freeing is attempted, NULL is returned. Intended for
+testing.
 @param[in] context the input, bytes, and context fields for any request. If
 input is non-NULL, bytes is 0, or there is no context provided NULL is returned.
 Otherwise a bump allocation occurs.
@@ -62,8 +62,8 @@ requests.
 @warning The byte input argument is expected to be a multiple of the underlying
 type size stored in the buffer. A stack allocator is not general purpose and
 expects the user to only request the type specified in the initialization
-argument. If a request that is not a multiple of type size is given NULL is
-returned. */
+argument. Otherwise, a strict aliasing violation has occurred. If a request that
+is not a multiple of type size is given NULL is returned. */
 void *stack_allocator_allocate(CCC_Allocator_context context);
 
 /** Resets a stack allocator into thinking it is empty. This is safe because
