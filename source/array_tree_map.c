@@ -557,7 +557,9 @@ CCC_array_tree_map_equal_range(CCC_Array_tree_map const *const map,
     {
         return (CCC_Handle_range){};
     }
-    return (CCC_Handle_range){equal_range(map, begin_key, end_key, INORDER)};
+    return (CCC_Handle_range){
+        equal_range(map, begin_key, end_key, INORDER),
+    };
 }
 
 CCC_Handle_range_reverse
@@ -570,7 +572,8 @@ CCC_array_tree_map_equal_range_reverse(CCC_Array_tree_map const *const map,
         return (CCC_Handle_range_reverse){};
     }
     return (CCC_Handle_range_reverse){
-        equal_range(map, reverse_begin_key, reverse_end_key, INORDER_REVERSE)};
+        equal_range(map, reverse_begin_key, reverse_end_key, INORDER_REVERSE),
+    };
 }
 
 CCC_Handle_index
@@ -631,7 +634,9 @@ CCC_array_tree_map_count(CCC_Array_tree_map const *const map)
         return (CCC_Count){.count = 0};
     }
     /* The root slot is occupied at 0 but don't don't tell user. */
-    return (CCC_Count){.count = map->count - 1};
+    return (CCC_Count){
+        .count = map->count - 1,
+    };
 }
 
 CCC_Count
@@ -641,7 +646,9 @@ CCC_array_tree_map_capacity(CCC_Array_tree_map const *const map)
     {
         return (CCC_Count){.error = CCC_RESULT_ARGUMENT_ERROR};
     }
-    return (CCC_Count){.count = map->capacity};
+    return (CCC_Count){
+        .count = map->capacity,
+    };
 }
 
 CCC_Handle_index

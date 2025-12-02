@@ -565,7 +565,9 @@ CCC_buffer_capacity_bytes(CCC_Buffer const *buffer)
     {
         return (CCC_Count){.error = CCC_RESULT_ARGUMENT_ERROR};
     }
-    return (CCC_Count){.count = buffer->capacity * buffer->sizeof_type};
+    return (CCC_Count){
+        .count = buffer->capacity * buffer->sizeof_type,
+    };
 }
 
 CCC_Result

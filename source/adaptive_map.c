@@ -493,7 +493,9 @@ CCC_adaptive_map_equal_range(CCC_Adaptive_map *const map,
     {
         return (CCC_Range){};
     }
-    return (CCC_Range){equal_range(map, begin_key, end_key, INORDER)};
+    return (CCC_Range){
+        equal_range(map, begin_key, end_key, INORDER),
+    };
 }
 
 CCC_Range_reverse
@@ -507,7 +509,8 @@ CCC_adaptive_map_equal_range_reverse(CCC_Adaptive_map *const map,
         return (CCC_Range_reverse){};
     }
     return (CCC_Range_reverse){
-        equal_range(map, reverse_begin_key, reverse_end_key, INORDER_REVERSE)};
+        equal_range(map, reverse_begin_key, reverse_end_key, INORDER_REVERSE),
+    };
 }
 
 /** This is a linear time constant space deletion of tree nodes via left

@@ -507,7 +507,9 @@ CCC_array_adaptive_map_count(CCC_Array_adaptive_map const *const map)
     {
         return (CCC_Count){.error = CCC_RESULT_ARGUMENT_ERROR};
     }
-    return (CCC_Count){.count = map->count ? map->count - 1 : 0};
+    return (CCC_Count){
+        .count = map->count ? map->count - 1 : 0,
+    };
 }
 
 CCC_Count
@@ -587,7 +589,9 @@ CCC_array_adaptive_map_equal_range(CCC_Array_adaptive_map *const map,
     {
         return (CCC_Handle_range){};
     }
-    return (CCC_Handle_range){equal_range(map, begin_key, end_key, INORDER)};
+    return (CCC_Handle_range){
+        equal_range(map, begin_key, end_key, INORDER),
+    };
 }
 
 CCC_Handle_range_reverse
@@ -601,7 +605,8 @@ CCC_array_adaptive_map_equal_range_reverse(CCC_Array_adaptive_map *const map,
         return (CCC_Handle_range_reverse){};
     }
     return (CCC_Handle_range_reverse){
-        equal_range(map, reverse_begin_key, reverse_end_key, INORDER_REVERSE)};
+        equal_range(map, reverse_begin_key, reverse_end_key, INORDER_REVERSE),
+    };
 }
 
 CCC_Result
@@ -1376,14 +1381,17 @@ are_subtrees_valid(struct CCC_Array_adaptive_map const *map,
     {
         return CCC_FALSE;
     }
-    return are_subtrees_valid(
-               map, (struct Tree_range){.low = r.low,
-                                        .root = branch_index(map, r.root, L),
-                                        .high = r.root})
-        && are_subtrees_valid(
-               map, (struct Tree_range){.low = r.root,
-                                        .root = branch_index(map, r.root, R),
-                                        .high = r.high});
+    return are_subtrees_valid(map,
+                              (struct Tree_range){
+                                  .low = r.low,
+                                  .root = branch_index(map, r.root, L),
+                                  .high = r.root,
+                              })
+        && are_subtrees_valid(map, (struct Tree_range){
+                                       .low = r.root,
+                                       .root = branch_index(map, r.root, R),
+                                       .high = r.high,
+                                   });
 }
 
 static CCC_Tribool

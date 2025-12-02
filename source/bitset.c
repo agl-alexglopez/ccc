@@ -659,7 +659,9 @@ CCC_bitset_blocks_capacity(CCC_Bitset const *const bitset)
     {
         return (CCC_Count){.error = CCC_RESULT_ARGUMENT_ERROR};
     }
-    return (CCC_Count){.count = block_count(bitset->capacity)};
+    return (CCC_Count){
+        .count = block_count(bitset->capacity),
+    };
 }
 
 CCC_Count
@@ -679,7 +681,9 @@ CCC_bitset_blocks_count(CCC_Bitset const *const bitset)
     {
         return (CCC_Count){.error = CCC_RESULT_ARGUMENT_ERROR};
     }
-    return (CCC_Count){.count = block_count(bitset->count)};
+    return (CCC_Count){
+        .count = block_count(bitset->count),
+    };
 }
 
 CCC_Tribool
