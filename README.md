@@ -24,7 +24,7 @@ Currently, this library supports a `FetchContent` or manual installation via CMa
 ## Containers
 
 <details>
-<summary>Bitset.h (dropdown)</summary>
+<summary>bitset.h (dropdown)</summary>
 A fixed or dynamic contiguous array of bits for set operations.
 
 ```c
@@ -32,7 +32,7 @@ A fixed or dynamic contiguous array of bits for set operations.
 #include <stdbool.h>
 #include <stddef.h>
 
-#define Bitset_USING_NAMESPACE_CCC
+#define BITSET_USING_NAMESPACE_CCC
 #include "ccc/Bitset.h"
 #include "ccc/types.h"
 
