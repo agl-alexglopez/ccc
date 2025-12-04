@@ -21,7 +21,7 @@ can be tracked via an index. Both a fixed size and dynamic variant are possible
 depending on initialization options.
 
 Conceptually, the bit set can be thought of as an arbitrary length integer with
-index 0 being the Least Significant Bit and index N - 1 being the Most
+index `0` being the Least Significant Bit and index `N - 1` being the Most
 Significant Bit of the integer. Internally, this is implemented by populating
 each block of the bit set from Least Significant Bit to Most Significant Bit.
 Therefore, "trailing" means starting from the Least Significant Bit and
@@ -44,7 +44,7 @@ All `*_range` functions interpret their range input argument parameters as
 `[index, index + count)`, a starting index and a positive forward length. This
 convention is consistent for all operations. The implementation automatically
 chooses the optimal scan direction, Least Significant Bit to Most Significant
-Bit for trailing scans, Most Significant Bit  to Least Significant Bit for
+Bit for trailing scans, Most Significant Bit to Least Significant Bit for
 leading scans. However, the user always specifies the range in the same way
 for consistency.
 

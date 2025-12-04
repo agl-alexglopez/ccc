@@ -17,14 +17,16 @@ limitations under the License.
 @brief The Adaptive Map Interface
 
 An adaptive map offers storage and retrieval of elements sorted on the user
-specified key. Because the data structure is self-optimizing it is not a
-suitable map when strict sub-linear runtime bounds are needed. Also, searching
-the map is not a const thread-safe operation as indicated by the function
-signatures. The map is optimized upon every new search attempting to adapt to
-the usage pattern. In many cases the self-optimizing structure of the map can be
-beneficial when considering non-uniform access patterns. In the best case,
-repeated searches of the same value yield an O(1) access and many other
-frequently searched values will be obtained in constant time.
+specified key. Once allocated, this container will not move elements in memory
+making this container assume pointer stability. Because the data structure is
+self-optimizing it is not a suitable map when strict sub-linear runtime bounds
+are needed. Also, searching the map is not a const thread-safe operation as
+indicated by the function signatures. The map is optimized upon every new
+search, attempting to adapt to the usage pattern. In many cases the
+self-optimizing structure of the map can be beneficial when considering
+non-uniform access patterns. In the best case, repeated searches of the same
+value yield an `O(1)` access and many other frequently searched values will be
+obtained in constant time.
 
 To shorten names in the interface, define the following preprocessor directive
 at the top of your file.

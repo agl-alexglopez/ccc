@@ -17,9 +17,9 @@ limitations under the License.
 @brief The Flat Hash Map Interface
 
 A Flat Hash Map stores elements in a contiguous buffer and allows the user to
-retrieve them by key in amortized O(1). Elements in the table may be copied and
-moved, especially when rehashing occurs, so no pointer stability is available in
-this implementation.
+retrieve them by key in amortized `O(1)`. Elements in the table may be copied
+and moved, especially when rehashing occurs, so no pointer stability is
+available in this implementation.
 
 A flat hash map requires the user to provide a pointer to the map, a type, a key
 field, a hash function, and a key three way comparator function. The hasher
@@ -29,10 +29,11 @@ in faster performance. Currently, the flat hash map does not offer any default
 hash functions or hash strengthening algorithms so strong hash functions should
 be obtained by the user for the data set.
 
-The current implementation will seek to use the best platform specific SIMD or
-SRMD instructions available. However, if for any reason the user wishes to use
-the most portable Single Register Multiple Data fallback implementation, there
-are many options.
+The current implementation will seek to use the best platform specific Single
+Instruction Multiple Data (SIMD) or Single Register Multiple Data (SRMD)
+instructions available. However, if for any reason the user wishes to use the
+most portable Single Register Multiple Data fallback implementation, there are
+many options.
 
 If building this library separately to include it's library file, add the
 flag to the build (and read INSTALL.md for more details).
@@ -45,7 +46,7 @@ If an install location other than the release folder is desired don't forget
 to add the install prefix.
 
 ```
-cmake --preset=clang-release -DCCC_FLAT_HASH_MAP_PORTABLE
+cmake --preset=clang-release -DCCC_FLAT_HASH_MAP_PORTABLE \
 -DCMAKE_INSTALL_PREFIX=/my/path/
 ```
 

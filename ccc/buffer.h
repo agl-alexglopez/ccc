@@ -24,17 +24,16 @@ in this library that provide more specialized operations. A Buffer does not
 require the user accommodate any intrusive elements.
 
 A Buffer offers a more flexible interface than a standard C++ vector. There are
-functions that assume elements are stored contiguously from [0, N) where count
+functions that assume elements are stored contiguously from `[0, N)` where `N`
 is the count of elements. However, there are also functions that let the user
 access any Buffer slot that is within the bounds of Buffer capacity. This
 requires the user pay closer attention to Buffer usage but ultimately allows
-them to build a wider variety of abstractions on top of the buffer.
+a wider variety of abstractions on top of the buffer.
 
 Interface functions in the slot management section offer data movement and
 writing operations that do not affect the size of the container. If writing a
 more complex higher level container that does not need size management these
 functions offer more custom control over the buffer.
-
 
 A Buffer with allocation permission will re-size as required when a new element
 is inserted in a contiguous fashion. Interface functions in the allocation

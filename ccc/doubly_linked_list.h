@@ -17,7 +17,7 @@ limitations under the License.
 @brief The Doubly Linked List Interface
 
 A doubly linked list offers efficient push, pop, extract, and erase operations
-for elements stored in the list. Notably, for single elements the list can
+for elements stored in the list. For single elements, the list can
 offer O(1) push front/back, pop front/back, and removal of elements in
 arbitrary positions in the list. The cost of this efficiency is higher memory
 footprint.

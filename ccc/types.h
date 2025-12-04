@@ -20,7 +20,7 @@ All containers make use of the fundamental types defined here. The purpose of
 these types is to aid the user in writing correct callback functions, allow
 clear error handling, and present a consistent interface to users across
 containers. If allocation permission is given to containers be sure to review
-the allocation function interface. */
+the allocator function interface. */
 #ifndef CCC_TYPES_H
 #define CCC_TYPES_H
 
@@ -232,10 +232,9 @@ left hand side and the complete user type on the right hand side. This means the
 right hand side will need to manually access its key field.
 
 ```
-int const *const my_key_left = order.key_left;
-struct key_val const *const my_type_right  = order.type_right;
-return (*my_key_left > my_type_right->key) - (*my_key_left <
-my_type_right->key);
+int const *const key_left = order.key_left;
+struct Key_val const *const type_right  = order.type_right;
+return (*key_left > type_right->key) - (*key_left < type_right->key);
 ```
 
 Notice that the user type must access its key field of its struct. Comparison
@@ -248,8 +247,7 @@ typedef struct
     void const *const key_left;
     /** The complete user type stored in the container. */
     void const *const type_right;
-    /** A reference to context data provided to the container on initialization.
-     */
+    /** A reference to context provided to the container on initialization. */
     void *context;
 } CCC_Key_comparator_context;
 
@@ -261,8 +259,7 @@ typedef struct
 {
     /** The user type being stored in the container. */
     void *type;
-    /** A reference to context data provided to the container on initialization.
-     */
+    /** A reference to context provided to the container on initialization. */
     void *context;
 } CCC_Type_context;
 
@@ -275,8 +272,7 @@ typedef struct
 {
     /** A reference to the same type used for keys in the container. */
     void const *const key;
-    /** A reference to context data provided to the container on initialization.
-     */
+    /** A reference to context provided to the container on initialization. */
     void *context;
 } CCC_Key_context;
 

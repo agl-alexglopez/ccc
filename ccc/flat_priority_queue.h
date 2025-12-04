@@ -18,7 +18,7 @@ limitations under the License.
 
 A flat priority queue is a contiguous container storing elements in heap order.
 This offers tightly packed data for efficient push, pop, min/max operations in
-O(lg N) time.
+`O(lg N)` time.
 
 A flat priority queue can use memory sources from the stack, heap, or data
 segment and can be initialized at compile or runtime. The container offers
@@ -42,7 +42,7 @@ CCC_flat_priority_queue_pop(&priority_queue, &(int){0});
 Any user defined struct can also use this technique.
 
 ```
-CCC_flat_priority_queue_pop(&priority_queue, &(struct my_type){});
+CCC_flat_priority_queue_pop(&priority_queue, &(struct My_type){});
 ```
 
 This is the preferred method because the storage remains anonymous and

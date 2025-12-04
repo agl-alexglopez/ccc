@@ -23,18 +23,24 @@ Also, searching the map is not a const thread-safe operation as indicated by the
 function signatures. The map is optimized upon every new search in attempt to
 adapt to the usage pattern. In many cases the self-optimizing structure
 of the map may be beneficial when considering non-uniform access patterns. In
-the best case, repeated searches of the same value yield an O(1) access and many
-other frequently searched values will remain close to the root of the map.
+the best case, repeated searches of the same value yield an `O(1)` access and
+many other frequently searched values will remain close to the root of the map.
 
 The array version of the adaptive map promises contiguous storage and random
 access if needed. Handles remain valid until an element is removed even if other
 elements are inserted, other elements are removed, or resizing occurs. All
-elements in the map track their relationships via indices in the buffer.
-Therefore, this data structure can be relocated, copied, serialized, or written
-to disk and all internal data structure references will remain valid. Insertion
-may invoke an O(N) operation if resizing occurs. Finally, if allocation is
-prohibited upon initialization, and the user intends to store a fixed size N
-nodes in the map, N + 1 capacity is needed for the sentinel node in the buffer.
+elements in the map track their relationships to one another via indices in the
+array. Therefore, this data structure can be relocated, copied, serialized, or
+written to disk and all internal data structure references will remain valid.
+Insertion may invoke an O(N) operation if resizing occurs. Finally, if
+allocation is prohibited upon initialization, and the user provides a capacity
+of `N` upon initialization, `N + 1` nodes will be used. One slot is needed for
+the sentinel node.
+
+All interface functions accept `void *` references to either the key or the full
+type the user is storing in the map. Therefore, it is important for the user to
+be aware if they are passing a reference to the key or the full type depending
+on the function requirements.
 
 To shorten names in the interface, define the following preprocessor directive
 at the top of your file.

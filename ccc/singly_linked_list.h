@@ -19,16 +19,16 @@ limitations under the License.
 A singly linked list is well suited for list or stack structures that only need
 access to the front or most recently added elements. When compared to a doubly
 linked list, the memory overhead per node is smaller but some operations will
-have O(N) runtime implications when compared to a similar operation in a doubly
-linked list. Review function documentation when unsure of the runtime of an
-singly_linked_list operation.
+have `O(N)` runtime implications when compared to a similar operation in a
+doubly linked list. Review function documentation when unsure of the runtime of
+an singly linked list operation.
 
-This container offers pointer stability. Also, if the container is not
-permitted to allocate all insertion code assumes that the user has allocated
-memory appropriately for the element to be inserted; it will not allocate or
-free in this case. If allocation is permitted upon initialization the container
-will manage the memory as expected on insert or erase operations as defined
-by the interface. In this case memory is allocated for insertions and freed for
+This container offers pointer stability. Also, if the container is not permitted
+to allocate all insertion code assumes that the user has allocated memory
+appropriately for the element to be inserted; it will not allocate or free in
+this case. If allocation is permitted upon initialization the container will
+manage the memory as expected on insert or erase operations as defined by the
+interface. In this case memory is allocated for insertions and freed for
 removals.
 
 To shorten names in the interface, define the following preprocessor directive

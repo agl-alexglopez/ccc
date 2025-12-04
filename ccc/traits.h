@@ -18,10 +18,10 @@ limitations under the License.
 
 Many functionalities across containers are similar. These can be described as
 traits that each container implements (see Rust Traits for a more pure example
-of the topic). Only a selections of shared traits across containers are
+of the topic). Only a selection of shared traits across containers are
 represented here because some containers implement unique functionality that
 cannot be shared with other containers. These can simplify code greatly at a
-slightly higher compilation time cost. There is no runtime cost to using
+slightly higher compilation resource cost. There is no runtime cost to using
 traits.
 
 To shorten names in the interface, define the following preprocessor directive

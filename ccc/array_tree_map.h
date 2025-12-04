@@ -17,26 +17,27 @@ limitations under the License.
 @brief The Array Tree Map Interface
 
 A tree map offers insertion, removal, and searching with a strict bound of
-`O(log(N))` time. The map is pointer stable. This map is suitable for realtime
-applications if resizing can be well controlled. Insert operations may cause
-resizing if allocation is allowed. Searching is a thread-safe read-only
-operation. Balancing modifications only occur upon insertion or removal.
+`O(log(N))` time. This map is suitable for realtime applications if resizing can
+be well controlled. Insert operations may cause resizing if allocation is
+allowed. Searching is a thread-safe read-only operation. Balancing modifications
+only occur upon insertion or removal.
 
 The handle variant of the tree map promises contiguous storage and random
 access if needed. Handles are stable and the user can use them to refer to an
 element until that element is removed from the map. Handles remain valid even if
 resizing of the table, insertions of other elements, or removals of other
-elements occur. Active user elements may not be contiguous from index [0, N)
-where N is the size of map; there may be gaps between active elements in the
-Buffer and it is only guaranteed that N elements are stored between index [0,
-Capacity).
+elements occur. Active user elements may not be contiguous from index `[0, N)`
+where `N` is the size of map; there may be gaps between active elements in the
+array and it is only guaranteed that `N` elements are stored between index `[0,
+Capacity)`.
 
 All elements in the map track their relationships via indices in the buffer.
 Therefore, this data structure can be relocated, copied, serialized, or written
 to disk and all internal data structure references will remain valid. Insertion
-may invoke an O(N) operation if resizing occurs. Finally, if allocation is
-prohibited upon initialization and the user intends to store a fixed size N
-nodes in the map N + 1 capacity is needed for the sentinel node in the buffer.
+may invoke an `O(N)` operation if resizing occurs. Finally, if allocation is
+prohibited upon initialization, and the user provides a capacity of `N` upon
+initialization, `N + 1` nodes will be used. One slot is needed for the sentinel
+node.
 
 All interface functions accept `void *` references to either the key or the full
 type the user is storing in the map. Therefore, it is important for the user to
