@@ -11,9 +11,9 @@ Here is a description of the current repository organization.
 - `cmake` - Helper CMake files for installing the `ccc` library.
 - `docs` - Folder for generating Doxygen Documentation locally and hosting online on the `gh-pages` branch.
 - `tools` - The tools folder to make running `clang-format` and `clang-tidy` more convenient.
-- `samples` - The sample programs used to demonstrate library capabilities.
+- `samples` - The sample programs used to demonstrate library capabilities. Samples are not included in releases.
 - `source` - The implementations for the containers listed in the `ccc/` headers.
-- `tests` - Testing code. The `run_tests.c` test runner. Also the `checkers.h` testing framework is well-documented for writing test cases.
+- `tests` - Testing code. The `run_tests.c` test runner. Also the `checkers.h` testing framework is well-documented for writing test cases. Tests are not included in releases.
     - `tests/[container]` - The folder for the container specific tests.
 - `utility` - General helpers for the `tests` and `samples`. A `str_view` helper library is here to make `argc` and `argv` handling easier in the test runner and samples. Utilities for containers should not go here. If containers need to share utilities, they should find the header in `src`. The `utility` folder is removed from releases.
 
