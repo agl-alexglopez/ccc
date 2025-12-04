@@ -78,7 +78,7 @@ CCC_entry_unwrap(CCC_Entry const *const entry)
 }
 
 CCC_Tribool
-CCC_array_occupied(CCC_Handle const *const handle)
+CCC_handle_occupied(CCC_Handle const *const handle)
 {
     if (!handle)
     {
@@ -88,7 +88,7 @@ CCC_array_occupied(CCC_Handle const *const handle)
 }
 
 CCC_Tribool
-CCC_array_insert_error(CCC_Handle const *const handle)
+CCC_handle_insert_error(CCC_Handle const *const handle)
 {
     if (!handle)
     {
@@ -98,7 +98,7 @@ CCC_array_insert_error(CCC_Handle const *const handle)
 }
 
 CCC_Tribool
-CCC_array_input_error(CCC_Handle const *const handle)
+CCC_handle_input_error(CCC_Handle const *const handle)
 {
     if (!handle)
     {
@@ -108,7 +108,7 @@ CCC_array_input_error(CCC_Handle const *const handle)
 }
 
 CCC_Handle_index
-CCC_array_unwrap(CCC_Handle const *const handle)
+CCC_handle_unwrap(CCC_Handle const *const handle)
 {
     if (!handle)
     {

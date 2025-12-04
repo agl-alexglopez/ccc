@@ -76,7 +76,7 @@ check_static_begin(array_adaptive_map_test_insert_macros)
     check(count(&array_adaptive_map).count, 3);
     ins = array_adaptive_map_at(
         &array_adaptive_map,
-        CCC_array_unwrap(array_adaptive_map_insert_or_assign_with(
+        CCC_handle_unwrap(array_adaptive_map_insert_or_assign_with(
             &array_adaptive_map, 3, (struct Val){.val = 98})));
     check(validate(&array_adaptive_map), true);
     check(ins == NULL, false);
@@ -92,7 +92,7 @@ check_static_begin(array_adaptive_map_test_insert_macros)
     check(count(&array_adaptive_map).count, 3);
     ins = array_adaptive_map_at(
         &array_adaptive_map,
-        CCC_array_unwrap(array_adaptive_map_try_insert_with(
+        CCC_handle_unwrap(array_adaptive_map_try_insert_with(
             &array_adaptive_map, 4, (struct Val){.val = 100})));
     check(ins == NULL, false);
     check(validate(&array_adaptive_map), true);

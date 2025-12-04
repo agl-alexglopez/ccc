@@ -202,7 +202,7 @@ check_static_begin(array_adaptive_map_test_init_from_fail)
     check(seen, 0);
     CCC_Handle h = CCC_array_adaptive_map_insert_or_assign(
         &map_from_list, &(struct Val){.id = 1, .val = 1});
-    check(CCC_array_insert_error(&h), CCC_TRUE);
+    check(CCC_handle_insert_error(&h), CCC_TRUE);
     check_end(array_adaptive_map_clear_and_free(&map_from_list, NULL););
 }
 
@@ -219,7 +219,7 @@ check_static_begin(array_adaptive_map_test_init_with_capacity)
     {
         CCC_Handle const h = CCC_array_adaptive_map_insert_or_assign(
             &map, &(struct Val){.id = i, .val = i});
-        check(CCC_array_insert_error(&h), CCC_FALSE);
+        check(CCC_handle_insert_error(&h), CCC_FALSE);
         check(array_adaptive_map_validate(&map), CCC_TRUE);
     }
     check(array_adaptive_map_count(&map).count, 10);
@@ -251,7 +251,7 @@ check_static_begin(array_adaptive_map_test_init_with_capacity_no_op)
           CCC_RESULT_OK);
     CCC_Handle const h = CCC_array_adaptive_map_insert_or_assign(
         &map, &(struct Val){.id = 1, .val = 1});
-    check(CCC_array_insert_error(&h), CCC_FALSE);
+    check(CCC_handle_insert_error(&h), CCC_FALSE);
     check(array_adaptive_map_validate(&map), CCC_TRUE);
     check(array_adaptive_map_count(&map).count, 1);
     size_t seen = 0;
@@ -276,7 +276,7 @@ check_static_begin(array_adaptive_map_test_init_with_capacity_fail)
     check(array_adaptive_map_capacity(&map).count, 0);
     CCC_Handle const e = CCC_array_adaptive_map_insert_or_assign(
         &map, &(struct Val){.id = 1, .val = 1});
-    check(CCC_array_insert_error(&e), CCC_TRUE);
+    check(CCC_handle_insert_error(&e), CCC_TRUE);
     check(array_adaptive_map_validate(&map), CCC_TRUE);
     check(array_adaptive_map_count(&map).count, 0);
     size_t seen = 0;

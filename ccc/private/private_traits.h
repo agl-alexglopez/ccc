@@ -352,8 +352,8 @@ limitations under the License.
     _Generic((container_entry_pointer),                                        \
         CCC_Entry *: CCC_entry_unwrap,                                         \
         CCC_Entry const *: CCC_entry_unwrap,                                   \
-        CCC_Handle *: CCC_array_unwrap,                                        \
-        CCC_Handle const *: CCC_array_unwrap,                                  \
+        CCC_Handle *: CCC_handle_unwrap,                                       \
+        CCC_Handle const *: CCC_handle_unwrap,                                 \
         CCC_Flat_hash_map_entry *: CCC_flat_hash_map_unwrap,                   \
         CCC_Flat_hash_map_entry const *: CCC_flat_hash_map_unwrap,             \
         CCC_Adaptive_map_entry *: CCC_adaptive_map_unwrap,                     \
@@ -370,8 +370,8 @@ limitations under the License.
     _Generic((container_entry_pointer),                                        \
         CCC_Entry *: CCC_entry_occupied,                                       \
         CCC_Entry const *: CCC_entry_occupied,                                 \
-        CCC_Handle *: CCC_array_occupied,                                      \
-        CCC_Handle const *: CCC_array_occupied,                                \
+        CCC_Handle *: CCC_handle_occupied,                                     \
+        CCC_Handle const *: CCC_handle_occupied,                               \
         CCC_Flat_hash_map_entry *: CCC_flat_hash_map_occupied,                 \
         CCC_Flat_hash_map_entry const *: CCC_flat_hash_map_occupied,           \
         CCC_Adaptive_map_entry *: CCC_adaptive_map_occupied,                   \
@@ -389,8 +389,8 @@ limitations under the License.
     _Generic((container_entry_pointer),                                        \
         CCC_Entry *: CCC_entry_insert_error,                                   \
         CCC_Entry const *: CCC_entry_insert_error,                             \
-        CCC_Handle *: CCC_array_insert_error,                                  \
-        CCC_Handle const *: CCC_array_insert_error,                            \
+        CCC_Handle *: CCC_handle_insert_error,                                 \
+        CCC_Handle const *: CCC_handle_insert_error,                           \
         CCC_Flat_hash_map_entry *: CCC_flat_hash_map_insert_error,             \
         CCC_Flat_hash_map_entry const *: CCC_flat_hash_map_insert_error,       \
         CCC_Adaptive_map_entry *: CCC_adaptive_map_insert_error,               \

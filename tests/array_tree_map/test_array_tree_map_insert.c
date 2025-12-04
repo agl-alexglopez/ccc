@@ -71,7 +71,7 @@ check_static_begin(array_tree_map_test_insert_macros)
     check(ins->val, 99);
     check(count(&map).count, 3);
     ins = array_tree_map_at(
-        &map, CCC_array_unwrap(array_tree_map_insert_or_assign_with(
+        &map, CCC_handle_unwrap(array_tree_map_insert_or_assign_with(
                   &map, 3, (struct Val){.val = 98})));
     check(validate(&map), true);
     check(ins == NULL, false);
@@ -84,7 +84,7 @@ check_static_begin(array_tree_map_test_insert_macros)
     check(ins->val, 98);
     check(count(&map).count, 3);
     ins = array_tree_map_at(&map,
-                            CCC_array_unwrap(array_tree_map_try_insert_with(
+                            CCC_handle_unwrap(array_tree_map_try_insert_with(
                                 &map, 4, (struct Val){.val = 100})));
     check(ins == NULL, false);
     check(validate(&map), true);

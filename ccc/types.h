@@ -429,7 +429,7 @@ void *CCC_entry_unwrap(CCC_Entry const *entry);
 /** @brief Determine if an handle is Occupied in the container.
 @param[in] handle the pointer to the handle obtained from a container.
 @return true if Occupied false if Vacant. Error if handle is NULL. */
-CCC_Tribool CCC_array_occupied(CCC_Handle const *handle);
+CCC_Tribool CCC_handle_occupied(CCC_Handle const *handle);
 
 /** @brief Determine if an insertion error has occurred when a function that
 attempts to insert a value in a container is used.
@@ -437,14 +437,14 @@ attempts to insert a value in a container is used.
 @return true if an insertion error occurred usually meaning a insertion should
 have occurred but the container did not have permission to allocate new memory
 or allocation failed. Error if handle is NULL. */
-CCC_Tribool CCC_array_insert_error(CCC_Handle const *handle);
+CCC_Tribool CCC_handle_insert_error(CCC_Handle const *handle);
 
 /** @brief Determine if an input error has occurred for a function that
 generates an handle.
 @param[in] handle the pointer to the handle obtained from a container function.
 @return true if an input error occurred usually meaning an invalid argument such
 as a NULL pointer was provided to a function. Error if handle is NULL. */
-CCC_Tribool CCC_array_input_error(CCC_Handle const *handle);
+CCC_Tribool CCC_handle_input_error(CCC_Handle const *handle);
 
 /** @brief Unwraps the provided handle providing a reference to the user type
 obtained from the operation that provides the handle.
@@ -456,7 +456,7 @@ The expected return value from unwrapping a value will change depending on the
 container from which the handle is obtained. Read the documentation for the
 container being used to understand what to expect from this function once an
 handle is obtained. */
-CCC_Handle_index CCC_array_unwrap(CCC_Handle const *handle);
+CCC_Handle_index CCC_handle_unwrap(CCC_Handle const *handle);
 
 /**@}*/
 
@@ -634,10 +634,10 @@ typedef CCC_Key_hasher Key_hasher;
 #    define entry_unwrap(entry_pointer) CCC_entry_unwrap(entry_pointer)
 #    define get_entry_status(entry_pointer) CCC_get_entry_status(entry_pointer)
 #    define entry_status_message(status) CCC_entry_status_message(status)
-#    define array_occupied(array_pointer) CCC_array_occupied(array_pointer)
-#    define array_insert_error(array_pointer)                                  \
-        CCC_array_insert_error(array_pointer)
-#    define array_unwrap(array_pointer) CCC_array_unwrap(array_pointer)
+#    define handle_occupied(array_pointer) CCC_handle_occupied(array_pointer)
+#    define handle_insert_error(array_pointer)                                 \
+        CCC_handle_insert_error(array_pointer)
+#    define handle_unwrap(array_pointer) CCC_handle_unwrap(array_pointer)
 #    define get_handle_status(array_pointer)                                   \
         CCC_get_handle_status(array_pointer)
 #    define handle_status_message(status) CCC_handle_status_message(status)
