@@ -48,7 +48,7 @@ typedef enum Check_result (*Tester)(void);
         (void)fprintf(stderr, "%scheck: result( %s ) == expected( %s )%s\n",   \
                       CHECK_GREEN, result_string, expected_string,             \
                       CHECK_NONE);                                             \
-        (void)fprintf(stderr, "%sCHECK_ERROR: result( ", CHECK_RED);           \
+        (void)fprintf(stderr, "%serror: result( ", CHECK_RED);                 \
         (void)fprintf(stderr, check_private_format_string, result);            \
         (void)fprintf(stderr, " ) != expected( ");                             \
         (void)fprintf(stderr, check_private_format_string, expected);          \
