@@ -1,9 +1,7 @@
 var searchData=
 [
-  ['any_5fkey_0',['any_key',['../structccc__any__key.html#aafd66c76835e1fdf564ca25a39935d42',1,'ccc_any_key']]],
-  ['any_5fkey_5flhs_1',['any_key_lhs',['../structccc__any__key__cmp.html#a8807e0158db2b07d5114afec5a246ef7',1,'ccc_any_key_cmp']]],
-  ['any_5ftype_2',['any_type',['../structccc__any__type.html#ab3be252dc36f8eb090a5ddfc2ea33b10',1,'ccc_any_type']]],
-  ['any_5ftype_5flhs_3',['any_type_lhs',['../structccc__any__type__cmp.html#a010a19ed82a098d98bf13b0f2866a0bf',1,'ccc_any_type_cmp']]],
-  ['any_5ftype_5frhs_4',['any_type_rhs',['../structccc__any__type__cmp.html#a9b3fa2918edbae7b910dfd81493817e0',1,'ccc_any_type_cmp::any_type_rhs()'],['../structccc__any__key__cmp.html#ab2ea2359ce47472b625ef49401f268b5',1,'ccc_any_key_cmp::any_type_rhs()']]],
-  ['aux_5',['aux',['../structccc__any__type__cmp.html#ac59ddfd6f2de1a9e1533e171100ddff2',1,'ccc_any_type_cmp::aux()'],['../structccc__any__key__cmp.html#a524c37065549851e1685d4ce5b5e9e89',1,'ccc_any_key_cmp::aux()'],['../structccc__any__type.html#ac7b010a5520ce1131907255d7e323b79',1,'ccc_any_type::aux()'],['../structccc__any__key.html#ac21dfc748816768d647c7c0ef9c64696',1,'ccc_any_key::aux()']]]
+  ['adaptive_5fmap_2eh_0',['adaptive_map.h',['../adaptive__map_8h.html',1,'']]],
+  ['allocate_1',['allocate',['../structCCC__Adaptive__map.html#a9753b9a1b7b8541cfcb131afaa832add',1,'CCC_Adaptive_map::allocate()'],['../structCCC__Array__adaptive__map.html#af5398d6ac71cc4dd1e3717cb20ad57a4',1,'CCC_Array_adaptive_map::allocate()'],['../structCCC__Array__tree__map.html#a9ac8dcc6750a564b336942ef5d458955',1,'CCC_Array_tree_map::allocate()'],['../structCCC__Bitset.html#a7f1e93c7ae6efcdaffbb8ed7bef0d3bb',1,'CCC_Bitset::allocate()'],['../structCCC__Buffer.html#abdc2e24bd3b2b66e2488163b57ee8e8a',1,'CCC_Buffer::allocate()'],['../structCCC__Doubly__linked__list.html#aa04b4b343f1f4305a87110a630d25f97',1,'CCC_Doubly_linked_list::allocate()'],['../structCCC__Flat__hash__map.html#af187da4042352b19620063926a6a7407',1,'CCC_Flat_hash_map::allocate()'],['../structCCC__Priority__queue.html#a8b30700d12729778574c4ef059e8b4df',1,'CCC_Priority_queue::allocate()'],['../structCCC__Singly__linked__list.html#a0fb2023b6fe23fe15035e333de146427',1,'CCC_Singly_linked_list::allocate()'],['../structCCC__Tree__map.html#abeb8811a9e87632d8824e70c30be129e',1,'CCC_Tree_map::allocate()']]],
+  ['array_5fadaptive_5fmap_2eh_2',['array_adaptive_map.h',['../array__adaptive__map_8h.html',1,'']]],
+  ['array_5ftree_5fmap_2eh_3',['array_tree_map.h',['../array__tree__map_8h.html',1,'']]]
 ];

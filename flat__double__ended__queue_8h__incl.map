@@ -1,8 +1,8 @@
 <map id="ccc/flat_double_ended_queue.h" name="ccc/flat_double_ended_queue.h">
-<area shape="rect" id="node1" title="The Flat Double Ended Queue Interface." alt="" coords="91,5,257,45"/>
-<area shape="rect" id="node2" href="$impl__flat__double__ended__queue_8h_source.html" title=" " alt="" coords="34,93,197,133"/>
-<area shape="rect" id="node5" href="$types_8h.html" title="The C Container Collection Fundamental Types." alt="" coords="142,328,225,353"/>
-<area shape="rect" id="node3" href="$buffer_8h.html" title="The Buffer Interface." alt="" coords="74,181,157,207"/>
-<area shape="rect" id="node4" href="$impl__buffer_8h_source.html" title=" " alt="" coords="5,255,145,280"/>
-<area shape="rect" id="node6" href="$impl__types_8h_source.html" title=" " alt="" coords="114,401,253,427"/>
+<area shape="rect" id="node1" title="The Flat Double Ended Queue Interface." alt="" coords="121,5,288,45"/>
+<area shape="rect" id="node2" href="$private__flat__double__ended__queue_8h_source.html" title=" " alt="" coords="53,93,231,133"/>
+<area shape="rect" id="node5" href="$types_8h.html" title="The C Container Collection Fundamental Types." alt="" coords="177,328,259,353"/>
+<area shape="rect" id="node3" href="$buffer_8h.html" title="The Buffer Interface." alt="" coords="101,181,183,207"/>
+<area shape="rect" id="node4" href="$private__buffer_8h_source.html" title=" " alt="" coords="5,255,180,280"/>
+<area shape="rect" id="node6" href="$private__types_8h_source.html" title=" " alt="" coords="131,401,305,427"/>
 </map>

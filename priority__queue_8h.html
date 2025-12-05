@@ -96,17 +96,17 @@ $(document).ready(function(){initNavTree('priority__queue_8h.html',''); initResi
 
 <p>The Priority Queue Interface.  
 <a href="#details">More...</a></p>
-<div class="textblock"><code>#include &quot;impl/impl_priority_queue.h&quot;</code><br />
+<div class="textblock"><code>#include &quot;private/private_priority_queue.h&quot;</code><br />
 <code>#include &quot;<a class="el" href="types_8h_source.html">types.h</a>&quot;</code><br />
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for priority_queue.h:</div>
 <div class="dyncontent">
 <div class="center"><img src="priority__queue_8h__incl.png" border="0" usemap="#accc_2priority__queue_8h" alt=""/></div>
 <map name="accc_2priority__queue_8h" id="accc_2priority__queue_8h">
-<area shape="rect" title="The Priority Queue Interface." alt="" coords="51,5,205,31"/>
-<area shape="rect" href="impl__priority__queue_8h_source.html" title=" " alt="" coords="5,79,144,119"/>
-<area shape="rect" href="types_8h.html" title="The C Container Collection Fundamental Types." alt="" coords="87,167,169,192"/>
-<area shape="rect" href="impl__types_8h_source.html" title=" " alt="" coords="59,240,197,265"/>
+<area shape="rect" title="The Priority Queue Interface." alt="" coords="76,5,229,31"/>
+<area shape="rect" href="private__priority__queue_8h_source.html" title=" " alt="" coords="5,79,177,119"/>
+<area shape="rect" href="types_8h.html" title="The C Container Collection Fundamental Types." alt="" coords="111,167,194,192"/>
+<area shape="rect" href="private__types_8h_source.html" title=" " alt="" coords="66,240,239,265"/>
 </map>
 </div>
 </div><div class="textblock"><div class="dynheader">
@@ -114,119 +114,121 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="dyncontent">
 <div class="center"><img src="priority__queue_8h__dep__incl.png" border="0" usemap="#accc_2priority__queue_8hdep" alt=""/></div>
 <map name="accc_2priority__queue_8hdep" id="accc_2priority__queue_8hdep">
-<area shape="rect" title="The Priority Queue Interface." alt="" coords="10,5,163,31"/>
-<area shape="rect" href="impl__traits_8h_source.html" title=" " alt="" coords="5,79,168,104"/>
-<area shape="rect" href="traits_8h.html" title="The C Container Collection Traits Interface." alt="" coords="40,152,133,177"/>
+<area shape="rect" title="The Priority Queue Interface." alt="" coords="5,5,159,31"/>
+<area shape="rect" href="private__traits_8h_source.html" title=" " alt="" coords="11,79,153,119"/>
+<area shape="rect" href="traits_8h.html" title="The C Container Collection Traits Interface." alt="" coords="35,167,129,192"/>
 </map>
 </div>
 </div>
 <p><a href="priority__queue_8h_source.html">Go to the source code of this file.</a></p>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The Priority Queue Interface. </p>
-<p>A priority queue offers simple, fast, pointer stable management of a priority queue. Push is O(1). The cost to execute the increase key in a max heap and decrease key in a min heap is O(1). However, due to the restructuring this causes that increases the cost of later pops, the more accurate runtime is o(lg
-N). The cost of a pop operation is O(lg N).</p>
+<p>A priority queue offers simple, fast, pointer stable management of a priority queue. Push is <code>O(1)</code>. The cost to execute the increase key in a max heap and decrease key in a min heap is <code>O(1)</code>. However, due to the restructuring this causes that increases the cost of later pops, the more accurate runtime is <code>o(log(N))</code>. The cost of a pop operation is <code>O(log(N))</code>.</p>
 <p>To shorten names in the interface, define the following preprocessor directive at the top of your file.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define PRIORITY_QUEUE_USING_NAMESPACE_CCC</span></div>
-</div><!-- fragment --><p>All types and functions can then be written without the <code>ccc_</code> prefix. </p>
+</div><!-- fragment --><p>All types and functions can then be written without the <code>CCC_</code> prefix. </p>
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Initialization Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Initialize the container with memory, callbacks, and permissions. </p>
 </td></tr>
-<tr class="memitem:ac151ad453261b727302345e17c07ba3c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#ac151ad453261b727302345e17c07ba3c">ccc_pq_init</a>(struct_name,  pq_elem_field,  pq_order,  cmp_fn,  alloc_fn,  aux_data)</td></tr>
-<tr class="memdesc:ac151ad453261b727302345e17c07ba3c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a priority queue at runtime or compile time.  <br /></td></tr>
-<tr class="separator:ac151ad453261b727302345e17c07ba3c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a407e4d78734651a07030b563469a6fb5"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#a407e4d78734651a07030b563469a6fb5">CCC_priority_queue_initialize</a>(struct_name,  type_intruder_field,  order,  compare,  allocate,  context_data)</td></tr>
+<tr class="memdesc:a407e4d78734651a07030b563469a6fb5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a priority queue at runtime or compile time.  <br /></td></tr>
+<tr class="separator:a407e4d78734651a07030b563469a6fb5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afc163d507b3e8c638f7ae040b928be95"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#afc163d507b3e8c638f7ae040b928be95">CCC_priority_queue_from</a>(type_intruder_field,  order,  compare,  allocate,  destroy,  context_data,  compound_literal_array...)</td></tr>
+<tr class="memdesc:afc163d507b3e8c638f7ae040b928be95"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a priority queue at runtime from a compound literal array.  <br /></td></tr>
+<tr class="separator:afc163d507b3e8c638f7ae040b928be95"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Insert and Remove Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Insert and remove elements from the priority queue. </p>
 </td></tr>
-<tr class="memitem:ada85255159c46fcaf747cd9a60473ceb"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#ada85255159c46fcaf747cd9a60473ceb">ccc_pq_emplace</a>(priority_queue_ptr,  lazy_value...)&#160;&#160;&#160;    ccc_impl_pq_emplace(priority_queue_ptr, lazy_value)</td></tr>
-<tr class="memdesc:ada85255159c46fcaf747cd9a60473ceb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write user type directly to a newly allocated priority queue elem.  <br /></td></tr>
-<tr class="separator:ada85255159c46fcaf747cd9a60473ceb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a33f1f787d08551619b1ea40c3cc84dd4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#a33f1f787d08551619b1ea40c3cc84dd4">ccc_pq_update_w</a>(pq_ptr,  any_type_ptr,  update_closure_over_T...)&#160;&#160;&#160;    ccc_impl_pq_update_w(pq_ptr, any_type_ptr, update_closure_over_T)</td></tr>
-<tr class="memdesc:a33f1f787d08551619b1ea40c3cc84dd4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update the priority in the user type stored in the container.  <br /></td></tr>
-<tr class="separator:a33f1f787d08551619b1ea40c3cc84dd4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a51f7ef8cad204938beda04f7237d0cd9"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#a51f7ef8cad204938beda04f7237d0cd9">ccc_pq_increase_w</a>(pq_ptr,  any_type_ptr,  increase_closure_over_T...)&#160;&#160;&#160;    ccc_impl_pq_increase_w(pq_ptr, any_type_ptr, increase_closure_over_T)</td></tr>
-<tr class="memdesc:a51f7ef8cad204938beda04f7237d0cd9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Increases the priority of the user type stored in the container.  <br /></td></tr>
-<tr class="separator:a51f7ef8cad204938beda04f7237d0cd9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3213fb03aac69cbe43a732dcf29a899d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#a3213fb03aac69cbe43a732dcf29a899d">ccc_pq_decrease_w</a>(pq_ptr,  any_type_ptr,  decrease_closure_over_T...)&#160;&#160;&#160;    ccc_impl_pq_decrease_w(pq_ptr, any_type_ptr, decrease_closure_over_T)</td></tr>
-<tr class="memdesc:a3213fb03aac69cbe43a732dcf29a899d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decreases the priority of the user type stored in the container.  <br /></td></tr>
-<tr class="separator:a3213fb03aac69cbe43a732dcf29a899d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a17fc73bd17733632f5712e3220f3216a"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#a17fc73bd17733632f5712e3220f3216a">ccc_pq_push</a> (<a class="el" href="priority__queue_8h.html#a53a826a19b684827cc3cda7a5517406b">ccc_priority_queue</a> *pq, ccc_pq_elem *elem)</td></tr>
-<tr class="memdesc:a17fc73bd17733632f5712e3220f3216a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds an element to the priority queue in correct total order. O(1).  <br /></td></tr>
-<tr class="separator:a17fc73bd17733632f5712e3220f3216a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aed66e1a4ed0e9ed2de60147cda9394d8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#aed66e1a4ed0e9ed2de60147cda9394d8">ccc_pq_pop</a> (<a class="el" href="priority__queue_8h.html#a53a826a19b684827cc3cda7a5517406b">ccc_priority_queue</a> *pq)</td></tr>
-<tr class="memdesc:aed66e1a4ed0e9ed2de60147cda9394d8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pops the front element from the priority queue. Amortized O(lgN).  <br /></td></tr>
-<tr class="separator:aed66e1a4ed0e9ed2de60147cda9394d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a29cc715f304411cd2ee83568bcdc0c22"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#a29cc715f304411cd2ee83568bcdc0c22">ccc_pq_extract</a> (<a class="el" href="priority__queue_8h.html#a53a826a19b684827cc3cda7a5517406b">ccc_priority_queue</a> *pq, ccc_pq_elem *elem)</td></tr>
-<tr class="separator:a29cc715f304411cd2ee83568bcdc0c22"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a58950b81644cdc83ff6e6dc2df186630"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#a58950b81644cdc83ff6e6dc2df186630">ccc_pq_erase</a> (<a class="el" href="priority__queue_8h.html#a53a826a19b684827cc3cda7a5517406b">ccc_priority_queue</a> *pq, ccc_pq_elem *elem)</td></tr>
-<tr class="memdesc:a58950b81644cdc83ff6e6dc2df186630"><td class="mdescLeft">&#160;</td><td class="mdescRight">Erase elem from the pq. Amortized O(lgN).  <br /></td></tr>
-<tr class="separator:a58950b81644cdc83ff6e6dc2df186630"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a00be9b8276bedd5baa735f5caf350837"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#a00be9b8276bedd5baa735f5caf350837">ccc_pq_update</a> (<a class="el" href="priority__queue_8h.html#a53a826a19b684827cc3cda7a5517406b">ccc_priority_queue</a> *pq, ccc_pq_elem *elem, <a class="el" href="types_8h.html#ada79c0d2b3cfeee31b9990c23a187d12">ccc_any_type_update_fn</a> *fn, void *aux)</td></tr>
-<tr class="memdesc:a00be9b8276bedd5baa735f5caf350837"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update the priority in the user type wrapping elem.  <br /></td></tr>
-<tr class="separator:a00be9b8276bedd5baa735f5caf350837"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8c312ced807d9b9e413b7850848634c5"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#a8c312ced807d9b9e413b7850848634c5">ccc_pq_increase</a> (<a class="el" href="priority__queue_8h.html#a53a826a19b684827cc3cda7a5517406b">ccc_priority_queue</a> *pq, ccc_pq_elem *elem, <a class="el" href="types_8h.html#ada79c0d2b3cfeee31b9990c23a187d12">ccc_any_type_update_fn</a> *fn, void *aux)</td></tr>
-<tr class="memdesc:a8c312ced807d9b9e413b7850848634c5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Increases the priority of the type wrapping elem. O(1) or O(lgN)  <br /></td></tr>
-<tr class="separator:a8c312ced807d9b9e413b7850848634c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a17434c0141c85e588fd3758dfef32576"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#a17434c0141c85e588fd3758dfef32576">ccc_pq_decrease</a> (<a class="el" href="priority__queue_8h.html#a53a826a19b684827cc3cda7a5517406b">ccc_priority_queue</a> *pq, ccc_pq_elem *elem, <a class="el" href="types_8h.html#ada79c0d2b3cfeee31b9990c23a187d12">ccc_any_type_update_fn</a> *fn, void *aux)</td></tr>
-<tr class="memdesc:a17434c0141c85e588fd3758dfef32576"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decreases the value of the type wrapping elem. O(1) or O(lgN)  <br /></td></tr>
-<tr class="separator:a17434c0141c85e588fd3758dfef32576"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2107f9c1d0d7900dd8c0c55e55fd65ed"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#a2107f9c1d0d7900dd8c0c55e55fd65ed">CCC_priority_queue_emplace</a>(Priority_queue_pointer,  type_compound_literal...)</td></tr>
+<tr class="memdesc:a2107f9c1d0d7900dd8c0c55e55fd65ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write user type_intruder directly to a newly allocated priority queue elem.  <br /></td></tr>
+<tr class="separator:a2107f9c1d0d7900dd8c0c55e55fd65ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a72f0982e46150105d6ea515cf3e3b119"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#a72f0982e46150105d6ea515cf3e3b119">CCC_priority_queue_update_with</a>(priority_queue_pointer,  type_pointer,  update_closure_over_T...)</td></tr>
+<tr class="memdesc:a72f0982e46150105d6ea515cf3e3b119"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update the priority in the user type_intruder stored in the container.  <br /></td></tr>
+<tr class="separator:a72f0982e46150105d6ea515cf3e3b119"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acdb2ac70500fd1362fd687e6926491bc"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#acdb2ac70500fd1362fd687e6926491bc">CCC_priority_queue_increase_with</a>(priority_queue_pointer,  type_pointer,  increase_closure_over_T...)</td></tr>
+<tr class="memdesc:acdb2ac70500fd1362fd687e6926491bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Increases the priority of the user type_intruder stored in the container.  <br /></td></tr>
+<tr class="separator:acdb2ac70500fd1362fd687e6926491bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aac1b82804363de3b2385c26fc8e0f30d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#aac1b82804363de3b2385c26fc8e0f30d">CCC_priority_queue_decrease_with</a>(priority_queue_pointer,  type_pointer,  decrease_closure_over_T...)</td></tr>
+<tr class="memdesc:aac1b82804363de3b2385c26fc8e0f30d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decreases the priority of the user type_intruder stored in the container.  <br /></td></tr>
+<tr class="separator:aac1b82804363de3b2385c26fc8e0f30d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9bac3b0e5676023c0a3d11d216fa260c"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#a9bac3b0e5676023c0a3d11d216fa260c">CCC_priority_queue_push</a> (<a class="el" href="structCCC__Priority__queue.html">CCC_Priority_queue</a> *priority_queue, <a class="el" href="structCCC__Priority__queue__node.html">CCC_Priority_queue_node</a> *type_intruder)</td></tr>
+<tr class="memdesc:a9bac3b0e5676023c0a3d11d216fa260c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds an element to the priority queue in correct total order. O(1).  <br /></td></tr>
+<tr class="separator:a9bac3b0e5676023c0a3d11d216fa260c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abedb6914c804e5d0b671a80029bd3e45"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#aa1ded61d294b114942f11e711b331dcf">CCC_Result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#abedb6914c804e5d0b671a80029bd3e45">CCC_priority_queue_pop</a> (<a class="el" href="structCCC__Priority__queue.html">CCC_Priority_queue</a> *priority_queue)</td></tr>
+<tr class="memdesc:abedb6914c804e5d0b671a80029bd3e45"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pops the front element from the priority queue. Amortized O(lgN).  <br /></td></tr>
+<tr class="separator:abedb6914c804e5d0b671a80029bd3e45"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9c28b7207673d5b0b472b96ecbbf1103"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#a9c28b7207673d5b0b472b96ecbbf1103">CCC_priority_queue_extract</a> (<a class="el" href="structCCC__Priority__queue.html">CCC_Priority_queue</a> *priority_queue, <a class="el" href="structCCC__Priority__queue__node.html">CCC_Priority_queue_node</a> *type_intruder)</td></tr>
+<tr class="separator:a9c28b7207673d5b0b472b96ecbbf1103"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a725a83bf0418994b2bf862d1c37dba98"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#aa1ded61d294b114942f11e711b331dcf">CCC_Result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#a725a83bf0418994b2bf862d1c37dba98">CCC_priority_queue_erase</a> (<a class="el" href="structCCC__Priority__queue.html">CCC_Priority_queue</a> *priority_queue, <a class="el" href="structCCC__Priority__queue__node.html">CCC_Priority_queue_node</a> *type_intruder)</td></tr>
+<tr class="memdesc:a725a83bf0418994b2bf862d1c37dba98"><td class="mdescLeft">&#160;</td><td class="mdescRight">Erase type_intruder from the priority_queue. Amortized O(lgN).  <br /></td></tr>
+<tr class="separator:a725a83bf0418994b2bf862d1c37dba98"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa3293ea79bfafd4f2d5be22ebcddff02"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#aa3293ea79bfafd4f2d5be22ebcddff02">CCC_priority_queue_update</a> (<a class="el" href="structCCC__Priority__queue.html">CCC_Priority_queue</a> *priority_queue, <a class="el" href="structCCC__Priority__queue__node.html">CCC_Priority_queue_node</a> *type_intruder, <a class="el" href="types_8h.html#af3851f6fdc1c8255c6b1713c8ffc1bdd">CCC_Type_modifier</a> *modify, void *context)</td></tr>
+<tr class="memdesc:aa3293ea79bfafd4f2d5be22ebcddff02"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update the priority in the user type_intruder wrapping elem.  <br /></td></tr>
+<tr class="separator:aa3293ea79bfafd4f2d5be22ebcddff02"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a99454ae61dc9ef012bb7e807f9915d46"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#a99454ae61dc9ef012bb7e807f9915d46">CCC_priority_queue_increase</a> (<a class="el" href="structCCC__Priority__queue.html">CCC_Priority_queue</a> *priority_queue, <a class="el" href="structCCC__Priority__queue__node.html">CCC_Priority_queue_node</a> *type_intruder, <a class="el" href="types_8h.html#af3851f6fdc1c8255c6b1713c8ffc1bdd">CCC_Type_modifier</a> *modify, void *context)</td></tr>
+<tr class="memdesc:a99454ae61dc9ef012bb7e807f9915d46"><td class="mdescLeft">&#160;</td><td class="mdescRight">Increases the priority of the type_intruder wrapping elem. O(1) or O(lgN)  <br /></td></tr>
+<tr class="separator:a99454ae61dc9ef012bb7e807f9915d46"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acf82ef4eb3494548266e83d279fa6dfb"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#acf82ef4eb3494548266e83d279fa6dfb">CCC_priority_queue_decrease</a> (<a class="el" href="structCCC__Priority__queue.html">CCC_Priority_queue</a> *priority_queue, <a class="el" href="structCCC__Priority__queue__node.html">CCC_Priority_queue_node</a> *type_intruder, <a class="el" href="types_8h.html#af3851f6fdc1c8255c6b1713c8ffc1bdd">CCC_Type_modifier</a> *modify, void *context)</td></tr>
+<tr class="memdesc:acf82ef4eb3494548266e83d279fa6dfb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decreases the value of the type_intruder wrapping elem. O(1) or O(lgN)  <br /></td></tr>
+<tr class="separator:acf82ef4eb3494548266e83d279fa6dfb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Container Types</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Types available in the container interface. </p>
 </td></tr>
-<tr class="memitem:a53a826a19b684827cc3cda7a5517406b"><td class="memItemLeft" align="right" valign="top">typedef struct ccc_pq&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#a53a826a19b684827cc3cda7a5517406b">ccc_priority_queue</a></td></tr>
-<tr class="memdesc:a53a826a19b684827cc3cda7a5517406b"><td class="mdescLeft">&#160;</td><td class="mdescRight">A container for pointer stability and an O(1) push and amortized o(lg
+<tr class="memitem:aed789dbc832fef37638fccc3dc0a0d51"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structCCC__Priority__queue.html">CCC_Priority_queue</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#aed789dbc832fef37638fccc3dc0a0d51">CCC_Priority_queue</a></td></tr>
+<tr class="memdesc:aed789dbc832fef37638fccc3dc0a0d51"><td class="mdescLeft">&#160;</td><td class="mdescRight">A container for pointer stability and an O(1) push and amortized o(lg
 N) increase/decrease key.  <br /></td></tr>
-<tr class="separator:a53a826a19b684827cc3cda7a5517406b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adc48dcaac2fca30a260e319fe12c259c"><td class="memItemLeft" align="right" valign="top">typedef struct ccc_pq_elem&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#adc48dcaac2fca30a260e319fe12c259c">ccc_pq_elem</a></td></tr>
-<tr class="memdesc:adc48dcaac2fca30a260e319fe12c259c"><td class="mdescLeft">&#160;</td><td class="mdescRight">The embedded struct type for operation of the priority queue.  <br /></td></tr>
-<tr class="separator:adc48dcaac2fca30a260e319fe12c259c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:aed789dbc832fef37638fccc3dc0a0d51"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afffbf1fc160869cf917fe3e30f50b01c"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structCCC__Priority__queue__node.html">CCC_Priority_queue_node</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#afffbf1fc160869cf917fe3e30f50b01c">CCC_Priority_queue_node</a></td></tr>
+<tr class="memdesc:afffbf1fc160869cf917fe3e30f50b01c"><td class="mdescLeft">&#160;</td><td class="mdescRight">The embedded struct type_intruder for operation of the priority queue.  <br /></td></tr>
+<tr class="separator:afffbf1fc160869cf917fe3e30f50b01c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Deallocation Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Deallocate the container. </p>
 </td></tr>
-<tr class="memitem:a5769ba899672364e962e6ea290728307"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#a5769ba899672364e962e6ea290728307">ccc_pq_clear</a> (<a class="el" href="priority__queue_8h.html#a53a826a19b684827cc3cda7a5517406b">ccc_priority_queue</a> *pq, <a class="el" href="types_8h.html#a97f231bd3df31cb2730e3304d4cc1dd2">ccc_any_type_destructor_fn</a> *fn)</td></tr>
-<tr class="memdesc:a5769ba899672364e962e6ea290728307"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes all elements from the pq, freeing if needed.  <br /></td></tr>
-<tr class="separator:a5769ba899672364e962e6ea290728307"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a815cab3e758f559885efa2014f98e64a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#aa1ded61d294b114942f11e711b331dcf">CCC_Result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#a815cab3e758f559885efa2014f98e64a">CCC_priority_queue_clear</a> (<a class="el" href="structCCC__Priority__queue.html">CCC_Priority_queue</a> *priority_queue, <a class="el" href="types_8h.html#a93e9728dd87d940e8f171efea75ee8d2">CCC_Type_destructor</a> *destroy)</td></tr>
+<tr class="memdesc:a815cab3e758f559885efa2014f98e64a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes all elements from the priority_queue, freeing if needed.  <br /></td></tr>
+<tr class="separator:a815cab3e758f559885efa2014f98e64a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">State Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Obtain state from the container. </p>
 </td></tr>
-<tr class="memitem:a5cfb0c9461d07915f3026f29fff5007d"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#a5cfb0c9461d07915f3026f29fff5007d">ccc_pq_front</a> (<a class="el" href="priority__queue_8h.html#a53a826a19b684827cc3cda7a5517406b">ccc_priority_queue</a> const *pq)</td></tr>
-<tr class="memdesc:a5cfb0c9461d07915f3026f29fff5007d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain a reference to the front of the priority queue. O(1).  <br /></td></tr>
-<tr class="separator:a5cfb0c9461d07915f3026f29fff5007d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a901fa6f9f04367739484a733f888093b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#a901fa6f9f04367739484a733f888093b">ccc_pq_is_empty</a> (<a class="el" href="priority__queue_8h.html#a53a826a19b684827cc3cda7a5517406b">ccc_priority_queue</a> const *pq)</td></tr>
-<tr class="memdesc:a901fa6f9f04367739484a733f888093b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if the priority queue is empty false if not. O(1).  <br /></td></tr>
-<tr class="separator:a901fa6f9f04367739484a733f888093b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad4b5466c7be94b7cdcdd5bfb76356146"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#ad4b5466c7be94b7cdcdd5bfb76356146">ccc_pq_count</a> (<a class="el" href="priority__queue_8h.html#a53a826a19b684827cc3cda7a5517406b">ccc_priority_queue</a> const *pq)</td></tr>
-<tr class="memdesc:ad4b5466c7be94b7cdcdd5bfb76356146"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the count of priority queue occupied nodes.  <br /></td></tr>
-<tr class="separator:ad4b5466c7be94b7cdcdd5bfb76356146"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a832c4c57933999f1dd86887c337fd4a5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#a832c4c57933999f1dd86887c337fd4a5">ccc_pq_validate</a> (<a class="el" href="priority__queue_8h.html#a53a826a19b684827cc3cda7a5517406b">ccc_priority_queue</a> const *pq)</td></tr>
-<tr class="memdesc:a832c4c57933999f1dd86887c337fd4a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Verifies the internal invariants of the pq hold.  <br /></td></tr>
-<tr class="separator:a832c4c57933999f1dd86887c337fd4a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac93c8b051f2c6d02f706b7d71ce9bed5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#afa7f5d9756840807860490d28e345955">ccc_threeway_cmp</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#ac93c8b051f2c6d02f706b7d71ce9bed5">ccc_pq_order</a> (<a class="el" href="priority__queue_8h.html#a53a826a19b684827cc3cda7a5517406b">ccc_priority_queue</a> const *pq)</td></tr>
-<tr class="memdesc:ac93c8b051f2c6d02f706b7d71ce9bed5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the order used to initialize the pq.  <br /></td></tr>
-<tr class="separator:ac93c8b051f2c6d02f706b7d71ce9bed5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a87c18f6c098b3d1b9a0155ec9bda2f1c"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#a87c18f6c098b3d1b9a0155ec9bda2f1c">CCC_priority_queue_front</a> (<a class="el" href="structCCC__Priority__queue.html">CCC_Priority_queue</a> const *priority_queue)</td></tr>
+<tr class="memdesc:a87c18f6c098b3d1b9a0155ec9bda2f1c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain a reference to the front of the priority queue. O(1).  <br /></td></tr>
+<tr class="separator:a87c18f6c098b3d1b9a0155ec9bda2f1c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af14f9caabe9278bac0c1fb23b743054b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a8dbb03cfc2070934832841f50f146bcd">CCC_Tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#af14f9caabe9278bac0c1fb23b743054b">CCC_priority_queue_is_empty</a> (<a class="el" href="structCCC__Priority__queue.html">CCC_Priority_queue</a> const *priority_queue)</td></tr>
+<tr class="memdesc:af14f9caabe9278bac0c1fb23b743054b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if the priority queue is empty false if not. O(1).  <br /></td></tr>
+<tr class="separator:af14f9caabe9278bac0c1fb23b743054b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a379b56644b2bae099d609134d6c7beac"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structCCC__Count.html">CCC_Count</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#a379b56644b2bae099d609134d6c7beac">CCC_priority_queue_count</a> (<a class="el" href="structCCC__Priority__queue.html">CCC_Priority_queue</a> const *priority_queue)</td></tr>
+<tr class="memdesc:a379b56644b2bae099d609134d6c7beac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the count of priority queue occupied nodes.  <br /></td></tr>
+<tr class="separator:a379b56644b2bae099d609134d6c7beac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6e6d9ce9f2e6fff1a7b2e517327b6366"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a8dbb03cfc2070934832841f50f146bcd">CCC_Tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#a6e6d9ce9f2e6fff1a7b2e517327b6366">CCC_priority_queue_validate</a> (<a class="el" href="structCCC__Priority__queue.html">CCC_Priority_queue</a> const *priority_queue)</td></tr>
+<tr class="memdesc:a6e6d9ce9f2e6fff1a7b2e517327b6366"><td class="mdescLeft">&#160;</td><td class="mdescRight">Verifies the internal invariants of the priority_queue hold.  <br /></td></tr>
+<tr class="separator:a6e6d9ce9f2e6fff1a7b2e517327b6366"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afcf000133b3cfe37f851a480ae5b0181"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a5e471ae63519e1044855e361826fc355">CCC_Order</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="priority__queue_8h.html#afcf000133b3cfe37f851a480ae5b0181">CCC_priority_queue_order</a> (<a class="el" href="structCCC__Priority__queue.html">CCC_Priority_queue</a> const *priority_queue)</td></tr>
+<tr class="memdesc:afcf000133b3cfe37f851a480ae5b0181"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the order used to initialize the priority_queue.  <br /></td></tr>
+<tr class="separator:afcf000133b3cfe37f851a480ae5b0181"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="a3213fb03aac69cbe43a732dcf29a899d" name="a3213fb03aac69cbe43a732dcf29a899d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3213fb03aac69cbe43a732dcf29a899d">&#9670;&#160;</a></span>ccc_pq_decrease_w</h2>
+<a id="aac1b82804363de3b2385c26fc8e0f30d" name="aac1b82804363de3b2385c26fc8e0f30d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aac1b82804363de3b2385c26fc8e0f30d">&#9670;&#160;</a></span>CCC_priority_queue_decrease_with</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define ccc_pq_decrease_w</td>
+          <td class="memname">#define CCC_priority_queue_decrease_with</td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">pq_ptr, </td>
+          <td class="paramname">priority_queue_pointer, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">any_type_ptr, </td>
+          <td class="paramname">type_pointer, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -237,66 +239,71 @@ N) increase/decrease key.  <br /></td></tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td>&#160;&#160;&#160;    ccc_impl_pq_decrease_w(pq_ptr, any_type_ptr, decrease_closure_over_T)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>Decreases the priority of the user type stored in the container. </p>
+<b>Value:</b><div class="fragment"><div class="line">    CCC_private_priority_queue_decrease_with(                                  \</div>
+<div class="line">        priority_queue_pointer, type_pointer, decrease_closure_over_T)</div>
+</div><!-- fragment -->
+<p>Decreases the priority of the user type_intruder stored in the container. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">pq_ptr</td><td>a pointer to the priority queue. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">any_type_ptr</td><td>a pointer to the user struct type in the pq. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">decrease_closure_over_T</td><td>a pointer to the user struct type T is made available. Use a semicolon separated statements to execute on the user type which wraps pq_elem_ptr (optionally wrapping {code here} in braces may help with formatting). This closure may safely modify the key used to track the user element's priority in the priority queue. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">priority_queue_pointer</td><td>a pointer to the priority queue. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">type_pointer</td><td>a pointer to the user struct type_intruder in the priority_queue. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">decrease_closure_over_T</td><td>a pointer to the user struct type_intruder T is made available. Use a semicolon separated statements to execute on the user type which wraps priority_queue_node_pointer (optionally wrapping {code here} in braces may help with formatting). This closure may safely modify the key used to track the user element's priority in the priority queue. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>a reference to the updated user type or NULL if update failed due to bad arguments provided. </dd></dl>
-<dl class="section warning"><dt>Warning</dt><dd>the user must ensure the any_type_ptr is a reference to an instance of the type actively stored in the priority queue. The data structure will be in an invalid state if the user decreases the priority by mistake in this function.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>a reference to the updated user type_intruder or NULL if update failed due to bad arguments provided. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>the user must ensure the type_pointer is a reference to an instance of the type_intruder actively stored in the priority queue. The data structure will be in an invalid state if the user decreases the priority by mistake in this function.</dd></dl>
 <div class="fragment"><div class="line"><span class="preprocessor">#define PRIORITY_QUEUE_USING_NAMESPACE_CCC</span></div>
-<div class="line"><span class="keyword">struct </span>val</div>
+<div class="line"><span class="keyword">struct </span>Val</div>
 <div class="line">{</div>
-<div class="line">    pq_elem e;</div>
+<div class="line">    priority_queue_node e;</div>
 <div class="line">    <span class="keywordtype">int</span> key;</div>
 <div class="line">};</div>
-<div class="line">priority_queue pq = build_rand_pq();</div>
-<div class="line">pq_decrease_w(&amp;pq, get_rand_pq_elem(&amp;pq), { T-&gt;key--; });</div>
+<div class="line">Priority_queue priority_queue = build_rand_priority_queue();</div>
+<div class="line">priority_queue_decrease_with(&amp;priority_queue,</div>
+<div class="line">get_rand_priority_queue_node(&amp;priority_queue), { T-&gt;key--; });</div>
 </div><!-- fragment --><p>Note that this is optimal update technique if the priority queue has been initialized as a min queue and the new value is known to be less than the old value. If this is a min heap O(1), otherwise O(lgN).</p>
-<p>While the best case operation is O(1) the impact of restructuring on future pops from the pq creates an amortized o(lgN) runtime for this function. </p>
+<p>While the best case operation is O(1) the impact of restructuring on future pops from the priority_queue creates an amortized o(lgN) runtime for this function. </p>
 
 </div>
 </div>
-<a id="ada85255159c46fcaf747cd9a60473ceb" name="ada85255159c46fcaf747cd9a60473ceb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ada85255159c46fcaf747cd9a60473ceb">&#9670;&#160;</a></span>ccc_pq_emplace</h2>
+<a id="a2107f9c1d0d7900dd8c0c55e55fd65ed" name="a2107f9c1d0d7900dd8c0c55e55fd65ed"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2107f9c1d0d7900dd8c0c55e55fd65ed">&#9670;&#160;</a></span>CCC_priority_queue_emplace</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define ccc_pq_emplace</td>
+          <td class="memname">#define CCC_priority_queue_emplace</td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">priority_queue_ptr, </td>
+          <td class="paramname">Priority_queue_pointer, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">lazy_value...&#160;</td>
+          <td class="paramname">type_compound_literal...&#160;</td>
         </tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td>&#160;&#160;&#160;    ccc_impl_pq_emplace(priority_queue_ptr, lazy_value)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>Write user type directly to a newly allocated priority queue elem. </p>
+<b>Value:</b><div class="fragment"><div class="line">    CCC_private_priority_queue_emplace(Priority_queue_pointer,                 \</div>
+<div class="line">                                       type_compound_literal)</div>
+</div><!-- fragment -->
+<p>Write user type_intruder directly to a newly allocated priority queue elem. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">priority_queue_ptr</td><td>a pointer to the priority queue. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">lazy_value</td><td>the compound literal to write to the allocation. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">Priority_queue_pointer</td><td>a pointer to the priority queue. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">type_compound_literal</td><td>the compound literal to write to the allocation. </td></tr>
   </table>
   </dd>
 </dl>
@@ -305,23 +312,99 @@ N) increase/decrease key.  <br /></td></tr>
 
 </div>
 </div>
-<a id="a51f7ef8cad204938beda04f7237d0cd9" name="a51f7ef8cad204938beda04f7237d0cd9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a51f7ef8cad204938beda04f7237d0cd9">&#9670;&#160;</a></span>ccc_pq_increase_w</h2>
+<a id="afc163d507b3e8c638f7ae040b928be95" name="afc163d507b3e8c638f7ae040b928be95"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afc163d507b3e8c638f7ae040b928be95">&#9670;&#160;</a></span>CCC_priority_queue_from</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define ccc_pq_increase_w</td>
+          <td class="memname">#define CCC_priority_queue_from</td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">pq_ptr, </td>
+          <td class="paramname">type_intruder_field, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">any_type_ptr, </td>
+          <td class="paramname">order, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">compare, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">allocate, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">destroy, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">context_data, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">compound_literal_array...&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    CCC_private_priority_queue_from(type_intruder_field, order, compare,       \</div>
+<div class="line">                                    allocate, destroy, context_data,           \</div>
+<div class="line">                                    compound_literal_array)</div>
+</div><!-- fragment -->
+<p>Initialize a priority queue at runtime from a compound literal array. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">type_intruder_field</td><td>the name of the field intruding on user's type. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">order</td><td>CCC_ORDER_LESSER for a min priority queue or CCC_ORDER_GREATER for a max priority queue. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">compare</td><td>the function used to compare two user types. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">allocate</td><td>the allocation function required for construction. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">destroy</td><td>the optional destructor to run if insertion fails. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">context_data</td><td>context data needed for comparison or destruction. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">compound_literal_array</td><td>the array of user types to insert into the map (e.g. (struct My_type[]){ {.key = 1, .val = 1}, {.key = 2, .val = 2}}). </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the initialized priority_queue on the right side of an equality operator (e.g. <a class="el" href="structCCC__Priority__queue.html">CCC_Priority_queue</a> priority_queue = <a class="el" href="priority__queue_8h.html#afc163d507b3e8c638f7ae040b928be95" title="Initialize a priority queue at runtime from a compound literal array.">CCC_priority_queue_from(...)</a>;) </dd></dl>
+
+</div>
+</div>
+<a id="acdb2ac70500fd1362fd687e6926491bc" name="acdb2ac70500fd1362fd687e6926491bc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acdb2ac70500fd1362fd687e6926491bc">&#9670;&#160;</a></span>CCC_priority_queue_increase_with</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define CCC_priority_queue_increase_with</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">priority_queue_pointer, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">type_pointer, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -332,43 +415,46 @@ N) increase/decrease key.  <br /></td></tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td>&#160;&#160;&#160;    ccc_impl_pq_increase_w(pq_ptr, any_type_ptr, increase_closure_over_T)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>Increases the priority of the user type stored in the container. </p>
+<b>Value:</b><div class="fragment"><div class="line">    CCC_private_priority_queue_increase_with(                                  \</div>
+<div class="line">        priority_queue_pointer, type_pointer, increase_closure_over_T)</div>
+</div><!-- fragment -->
+<p>Increases the priority of the user type_intruder stored in the container. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">pq_ptr</td><td>a pointer to the priority queue. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">any_type_ptr</td><td>a pointer to the user struct type in the pq. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">increase_closure_over_T</td><td>a pointer to the user struct type T is made available. Use a semicolon separated statements to execute on the user type which wraps pq_elem_ptr (optionally wrapping {code here} in braces may help with formatting). This closure may safely modify the key used to track the user element's priority in the priority queue. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">priority_queue_pointer</td><td>a pointer to the priority queue. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">type_pointer</td><td>a pointer to the user struct type_intruder in the priority_queue. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">increase_closure_over_T</td><td>a pointer to the user struct type_intruder T is made available. Use a semicolon separated statements to execute on the user type which wraps priority_queue_node_pointer (optionally wrapping {code here} in braces may help with formatting). This closure may safely modify the key used to track the user element's priority in the priority queue. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>a reference to the updated user type or NULL if update failed due to bad arguments provided. </dd></dl>
-<dl class="section warning"><dt>Warning</dt><dd>the user must ensure the any_type_ptr is a reference to an instance of the type actively stored in the priority queue. The data structure will be in an invalid state if the user decreases the priority by mistake in this function.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>a reference to the updated user type_intruder or NULL if update failed due to bad arguments provided. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>the user must ensure the type_pointer is a reference to an instance of the type_intruder actively stored in the priority queue. The data structure will be in an invalid state if the user decreases the priority by mistake in this function.</dd></dl>
 <div class="fragment"><div class="line"><span class="preprocessor">#define PRIORITY_QUEUE_USING_NAMESPACE_CCC</span></div>
-<div class="line"><span class="keyword">struct </span>val</div>
+<div class="line"><span class="keyword">struct </span>Val</div>
 <div class="line">{</div>
-<div class="line">    pq_elem e;</div>
+<div class="line">    priority_queue_node e;</div>
 <div class="line">    <span class="keywordtype">int</span> key;</div>
 <div class="line">};</div>
-<div class="line">priority_queue pq = build_rand_pq();</div>
-<div class="line">pq_increase_w(&amp;pq, get_rand_val(&amp;pq), { T-&gt;key++; });</div>
+<div class="line">Priority_queue priority_queue = build_rand_priority_queue();</div>
+<div class="line">priority_queue_increase_with(&amp;priority_queue, get_rand_val(&amp;priority_queue), {</div>
+<div class="line">T-&gt;key++; });</div>
 </div><!-- fragment --><p>Note that this is optimal update technique if the priority queue has been initialized as a max queue and the new value is known to be greater than the old value. If this is a max heap O(1), otherwise O(lgN).</p>
-<p>While the best case operation is O(1) the impact of restructuring on future pops from the pq creates an amortized o(lgN) runtime for this function. </p>
+<p>While the best case operation is O(1) the impact of restructuring on future pops from the priority_queue creates an amortized o(lgN) runtime for this function. </p>
 
 </div>
 </div>
-<a id="ac151ad453261b727302345e17c07ba3c" name="ac151ad453261b727302345e17c07ba3c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac151ad453261b727302345e17c07ba3c">&#9670;&#160;</a></span>ccc_pq_init</h2>
+<a id="a407e4d78734651a07030b563469a6fb5" name="a407e4d78734651a07030b563469a6fb5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a407e4d78734651a07030b563469a6fb5">&#9670;&#160;</a></span>CCC_priority_queue_initialize</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define ccc_pq_init</td>
+          <td class="memname">#define CCC_priority_queue_initialize</td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
           <td class="paramname">struct_name, </td>
@@ -377,31 +463,31 @@ N) increase/decrease key.  <br /></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">pq_elem_field, </td>
+          <td class="paramname">type_intruder_field, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">pq_order, </td>
+          <td class="paramname">order, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">cmp_fn, </td>
+          <td class="paramname">compare, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">alloc_fn, </td>
+          <td class="paramname">allocate, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">aux_data&#160;</td>
+          <td class="paramname">context_data&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -410,42 +496,43 @@ N) increase/decrease key.  <br /></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    ccc_impl_pq_init(struct_name, pq_elem_field, pq_order, cmp_fn, alloc_fn,   \</div>
-<div class="line">                     aux_data)</div>
+<b>Value:</b><div class="fragment"><div class="line">    CCC_private_priority_queue_initialize(struct_name, type_intruder_field,    \</div>
+<div class="line">                                          order, compare, allocate,            \</div>
+<div class="line">                                          context_data)</div>
 </div><!-- fragment -->
 <p>Initialize a priority queue at runtime or compile time. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">struct_name</td><td>the name of the user type wrapping pq elems. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">pq_elem_field</td><td>the name of the field for the pq elem. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">pq_order</td><td>CCC_LES for a min pq or CCC_GRT for a max pq. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">cmp_fn</td><td>the function used to compare two user types. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">alloc_fn</td><td>the allocation function or NULL if allocation is banned. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">aux_data</td><td>auxiliary data needed for comparison or destruction. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">struct_name</td><td>the name of the user type_intruder wrapping priority_queue elems. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">type_intruder_field</td><td>the name of the field for the priority_queue elem. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">order</td><td>CCC_ORDER_LESSER for a min priority_queue or CCC_ORDER_GREATER for a max priority_queue. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">compare</td><td>the function used to compare two user types. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">allocate</td><td>the allocation function or NULL if allocation is banned. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">context_data</td><td>context data needed for comparison or destruction. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the initialized pq on the right side of an equality operator (e.g. ccc_priority_queue pq = <a class="el" href="priority__queue_8h.html#ac151ad453261b727302345e17c07ba3c" title="Initialize a priority queue at runtime or compile time.">ccc_pq_init(...)</a>;) </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the initialized priority_queue on the right side of an equality operator (e.g. <a class="el" href="structCCC__Priority__queue.html">CCC_Priority_queue</a> priority_queue = <a class="el" href="priority__queue_8h.html#a407e4d78734651a07030b563469a6fb5" title="Initialize a priority queue at runtime or compile time.">CCC_priority_queue_initialize(...)</a>;) </dd></dl>
 
 </div>
 </div>
-<a id="a33f1f787d08551619b1ea40c3cc84dd4" name="a33f1f787d08551619b1ea40c3cc84dd4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a33f1f787d08551619b1ea40c3cc84dd4">&#9670;&#160;</a></span>ccc_pq_update_w</h2>
+<a id="a72f0982e46150105d6ea515cf3e3b119" name="a72f0982e46150105d6ea515cf3e3b119"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a72f0982e46150105d6ea515cf3e3b119">&#9670;&#160;</a></span>CCC_priority_queue_update_with</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define ccc_pq_update_w</td>
+          <td class="memname">#define CCC_priority_queue_update_with</td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">pq_ptr, </td>
+          <td class="paramname">priority_queue_pointer, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">any_type_ptr, </td>
+          <td class="paramname">type_pointer, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -456,60 +543,46 @@ N) increase/decrease key.  <br /></td></tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td>&#160;&#160;&#160;    ccc_impl_pq_update_w(pq_ptr, any_type_ptr, update_closure_over_T)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>Update the priority in the user type stored in the container. </p>
+<b>Value:</b><div class="fragment"><div class="line">    CCC_private_priority_queue_update_with(                                    \</div>
+<div class="line">        priority_queue_pointer, type_pointer, update_closure_over_T)</div>
+</div><!-- fragment -->
+<p>Update the priority in the user type_intruder stored in the container. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">pq_ptr</td><td>a pointer to the priority queue. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">any_type_ptr</td><td>a pointer to the user struct type in the pq. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">update_closure_over_T</td><td>a pointer to the user struct type T is made available. Use a semicolon separated statements to execute on the user type which wraps pq_elem_ptr (optionally wrapping {code here} in braces may help with formatting). This closure may safely modify the key used to track the user element's priority in the priority queue. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">priority_queue_pointer</td><td>a pointer to the priority queue. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">type_pointer</td><td>a pointer to the user struct type_intruder in the priority_queue. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">update_closure_over_T</td><td>a pointer to the user struct type_intruder T is made available. Use a semicolon separated statements to execute on the user type which wraps priority_queue_node_pointer (optionally wrapping {code here} in braces may help with formatting). This closure may safely modify the key used to track the user element's priority in the priority queue. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>a reference to the updated user type or NULL if update failed due to bad arguments provided. </dd></dl>
-<dl class="section warning"><dt>Warning</dt><dd>the user must ensure the any_type_ptr is a reference to an instance of the type actively stored in the priority queue.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>a reference to the updated user type_intruder or NULL if update failed due to bad arguments provided. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>the user must ensure the type_pointer is a reference to an instance of the type_intruder actively stored in the priority queue.</dd></dl>
 <div class="fragment"><div class="line"><span class="preprocessor">#define PRIORITY_QUEUE_USING_NAMESPACE_CCC</span></div>
-<div class="line"><span class="keyword">struct </span>val</div>
+<div class="line"><span class="keyword">struct </span>Val</div>
 <div class="line">{</div>
-<div class="line">    pq_elem e;</div>
+<div class="line">    priority_queue_node e;</div>
 <div class="line">    <span class="keywordtype">int</span> key;</div>
 <div class="line">};</div>
-<div class="line">priority_queue pq = build_rand_pq();</div>
-<div class="line">pq_update_w(&amp;pq, get_rand_val(&amp;pq), { T-&gt;key = rand_key(); });</div>
+<div class="line">Priority_queue priority_queue = build_rand_priority_queue();</div>
+<div class="line">priority_queue_update_with(&amp;priority_queue, get_rand_val(&amp;priority_queue), {</div>
+<div class="line">T-&gt;key = rand_key(); });</div>
 </div><!-- fragment --><p>Note that this operation may incur unnecessary overhead if the user can't deduce if an increase or decrease is occurring. See the increase and decrease operations. O(1) best case, O(lgN) worst case. </p>
 
 </div>
 </div>
 <h2 class="groupheader">Typedef Documentation</h2>
-<a id="adc48dcaac2fca30a260e319fe12c259c" name="adc48dcaac2fca30a260e319fe12c259c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adc48dcaac2fca30a260e319fe12c259c">&#9670;&#160;</a></span>ccc_pq_elem</h2>
+<a id="aed789dbc832fef37638fccc3dc0a0d51" name="aed789dbc832fef37638fccc3dc0a0d51"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aed789dbc832fef37638fccc3dc0a0d51">&#9670;&#160;</a></span>CCC_Priority_queue</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef struct ccc_pq_elem ccc_pq_elem</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>The embedded struct type for operation of the priority queue. </p>
-<p>It can be used in an allocating or non allocating container. If allocation is prohibited the container assumes the element is wrapped in pre-allocated memory with the appropriate lifetime and scope for the user's needs; the container does not allocate or free in this case. If allocation is allowed the container will handle copying the data wrapping the element to allocations and deallocating when necessary. </p>
-
-</div>
-</div>
-<a id="a53a826a19b684827cc3cda7a5517406b" name="a53a826a19b684827cc3cda7a5517406b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a53a826a19b684827cc3cda7a5517406b">&#9670;&#160;</a></span>ccc_priority_queue</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef struct ccc_pq <a class="el" href="priority__queue_8h.html#a53a826a19b684827cc3cda7a5517406b">ccc_priority_queue</a></td>
+          <td class="memname">typedef struct <a class="el" href="structCCC__Priority__queue.html">CCC_Priority_queue</a> <a class="el" href="structCCC__Priority__queue.html">CCC_Priority_queue</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -521,24 +594,41 @@ N) increase/decrease key. </p>
 
 </div>
 </div>
-<h2 class="groupheader">Function Documentation</h2>
-<a id="a5769ba899672364e962e6ea290728307" name="a5769ba899672364e962e6ea290728307"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5769ba899672364e962e6ea290728307">&#9670;&#160;</a></span>ccc_pq_clear()</h2>
+<a id="afffbf1fc160869cf917fe3e30f50b01c" name="afffbf1fc160869cf917fe3e30f50b01c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afffbf1fc160869cf917fe3e30f50b01c">&#9670;&#160;</a></span>CCC_Priority_queue_node</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_pq_clear </td>
+          <td class="memname">typedef struct <a class="el" href="structCCC__Priority__queue__node.html">CCC_Priority_queue_node</a> <a class="el" href="structCCC__Priority__queue__node.html">CCC_Priority_queue_node</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The embedded struct type_intruder for operation of the priority queue. </p>
+<p>It can be used in an allocating or non allocating container. If allocation is prohibited the container assumes the element is wrapped in pre-allocated memory with the appropriate lifetime and scope for the user's needs; the container does not allocate or free in this case. If allocation is allowed the container will handle copying the data wrapping the element to allocations and deallocating when necessary. </p>
+
+</div>
+</div>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="a815cab3e758f559885efa2014f98e64a" name="a815cab3e758f559885efa2014f98e64a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a815cab3e758f559885efa2014f98e64a">&#9670;&#160;</a></span>CCC_priority_queue_clear()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#aa1ded61d294b114942f11e711b331dcf">CCC_Result</a> CCC_priority_queue_clear </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="priority__queue_8h.html#a53a826a19b684827cc3cda7a5517406b">ccc_priority_queue</a> *&#160;</td>
-          <td class="paramname"><em>pq</em>, </td>
+          <td class="paramtype"><a class="el" href="structCCC__Priority__queue.html">CCC_Priority_queue</a> *&#160;</td>
+          <td class="paramname"><em>priority_queue</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="types_8h.html#a97f231bd3df31cb2730e3304d4cc1dd2">ccc_any_type_destructor_fn</a> *&#160;</td>
-          <td class="paramname"><em>fn</em>&#160;</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a93e9728dd87d940e8f171efea75ee8d2">CCC_Type_destructor</a> *&#160;</td>
+          <td class="paramname"><em>destroy</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -548,31 +638,31 @@ N) increase/decrease key. </p>
       </table>
 </div><div class="memdoc">
 
-<p>Removes all elements from the pq, freeing if needed. </p>
+<p>Removes all elements from the priority_queue, freeing if needed. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">pq</td><td>a pointer to the priority queue. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">fn</td><td>the destructor function or NULL if not needed. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">priority_queue</td><td>a pointer to the priority queue. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">destroy</td><td>the destructor function or NULL if not needed. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>ok if the clear was successful or an input error for NULL args.</dd></dl>
-<p>Note that if allocation is allowed the container will free the user type wrapping each element in the pq. Therefore, the user should not free in the destructor function. Only perform auxiliary cleanup operations if needed.</p>
-<p>If allocation is not allowed, the user may free their stored types in the destructor function if they wish to do so. The container simply removes all the elements from the pq, calling fn on each user type if provided, and sets the size to zero. </p>
+<p>Note that if allocation is allowed the container will free the user type wrapping each element in the priority_queue. Therefore, the user should not free in the destructor function. Only perform context cleanup operations if needed.</p>
+<p>If allocation is not allowed, the user may free their stored types in the destructor function if they wish to do so. The container simply removes all the elements from the priority_queue, calling destroy on each user type_intruder if provided, and sets the size to zero. </p>
 
 </div>
 </div>
-<a id="ad4b5466c7be94b7cdcdd5bfb76356146" name="ad4b5466c7be94b7cdcdd5bfb76356146"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad4b5466c7be94b7cdcdd5bfb76356146">&#9670;&#160;</a></span>ccc_pq_count()</h2>
+<a id="a379b56644b2bae099d609134d6c7beac" name="a379b56644b2bae099d609134d6c7beac"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a379b56644b2bae099d609134d6c7beac">&#9670;&#160;</a></span>CCC_priority_queue_count()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_pq_count </td>
+          <td class="memname"><a class="el" href="structCCC__Count.html">CCC_Count</a> CCC_priority_queue_count </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="priority__queue_8h.html#a53a826a19b684827cc3cda7a5517406b">ccc_priority_queue</a> const *&#160;</td>
-          <td class="paramname"><em>pq</em></td><td>)</td>
+          <td class="paramtype"><a class="el" href="structCCC__Priority__queue.html">CCC_Priority_queue</a> const *&#160;</td>
+          <td class="paramname"><em>priority_queue</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -581,43 +671,43 @@ N) increase/decrease key. </p>
 <p>Returns the count of priority queue occupied nodes. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">pq</td><td>a pointer to the priority queue. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">priority_queue</td><td>a pointer to the priority queue. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the size of the pq or an argument error is set if pq is NULL. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the size of the priority_queue or an argument error is set if priority_queue is NULL. </dd></dl>
 
 </div>
 </div>
-<a id="a17434c0141c85e588fd3758dfef32576" name="a17434c0141c85e588fd3758dfef32576"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a17434c0141c85e588fd3758dfef32576">&#9670;&#160;</a></span>ccc_pq_decrease()</h2>
+<a id="acf82ef4eb3494548266e83d279fa6dfb" name="acf82ef4eb3494548266e83d279fa6dfb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acf82ef4eb3494548266e83d279fa6dfb">&#9670;&#160;</a></span>CCC_priority_queue_decrease()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void * ccc_pq_decrease </td>
+          <td class="memname">void * CCC_priority_queue_decrease </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="priority__queue_8h.html#a53a826a19b684827cc3cda7a5517406b">ccc_priority_queue</a> *&#160;</td>
-          <td class="paramname"><em>pq</em>, </td>
+          <td class="paramtype"><a class="el" href="structCCC__Priority__queue.html">CCC_Priority_queue</a> *&#160;</td>
+          <td class="paramname"><em>priority_queue</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">ccc_pq_elem *&#160;</td>
-          <td class="paramname"><em>elem</em>, </td>
+          <td class="paramtype"><a class="el" href="structCCC__Priority__queue__node.html">CCC_Priority_queue_node</a> *&#160;</td>
+          <td class="paramname"><em>type_intruder</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="types_8h.html#ada79c0d2b3cfeee31b9990c23a187d12">ccc_any_type_update_fn</a> *&#160;</td>
-          <td class="paramname"><em>fn</em>, </td>
+          <td class="paramtype"><a class="el" href="types_8h.html#af3851f6fdc1c8255c6b1713c8ffc1bdd">CCC_Type_modifier</a> *&#160;</td>
+          <td class="paramname"><em>modify</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>aux</em>&#160;</td>
+          <td class="paramname"><em>context</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -627,39 +717,39 @@ N) increase/decrease key. </p>
       </table>
 </div><div class="memdoc">
 
-<p>Decreases the value of the type wrapping elem. O(1) or O(lgN) </p>
+<p>Decreases the value of the type_intruder wrapping elem. O(1) or O(lgN) </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">pq</td><td>a pointer to the priority queue. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">elem</td><td>a pointer to the intrusive element in the user type. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">fn</td><td>the update function to act on the type wrapping elem. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">aux</td><td>any auxiliary data needed for the update function. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">priority_queue</td><td>a pointer to the priority queue. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">type_intruder</td><td>a pointer to the intrusive element in the user type. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">modify</td><td>the update function to act on the type_intruder wrapping elem. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">context</td><td>any context data needed for the update function. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>a reference to the updated user type or NULL if update failed due to bad arguments provided.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>a reference to the updated user type_intruder or NULL if update failed due to bad arguments provided.</dd></dl>
 <p>Note that this is optimal update technique if the priority queue has been initialized as a min queue and the new value is known to be less than the old value. If this is a min heap O(1), otherwise O(lgN).</p>
-<p>While the best case operation is O(1) the impact of restructuring on future pops from the pq creates an amortized o(lgN) runtime for this function. </p>
+<p>While the best case operation is O(1) the impact of restructuring on future pops from the priority_queue creates an amortized o(lgN) runtime for this function. </p>
 
 </div>
 </div>
-<a id="a58950b81644cdc83ff6e6dc2df186630" name="a58950b81644cdc83ff6e6dc2df186630"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a58950b81644cdc83ff6e6dc2df186630">&#9670;&#160;</a></span>ccc_pq_erase()</h2>
+<a id="a725a83bf0418994b2bf862d1c37dba98" name="a725a83bf0418994b2bf862d1c37dba98"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a725a83bf0418994b2bf862d1c37dba98">&#9670;&#160;</a></span>CCC_priority_queue_erase()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_pq_erase </td>
+          <td class="memname"><a class="el" href="types_8h.html#aa1ded61d294b114942f11e711b331dcf">CCC_Result</a> CCC_priority_queue_erase </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="priority__queue_8h.html#a53a826a19b684827cc3cda7a5517406b">ccc_priority_queue</a> *&#160;</td>
-          <td class="paramname"><em>pq</em>, </td>
+          <td class="paramtype"><a class="el" href="structCCC__Priority__queue.html">CCC_Priority_queue</a> *&#160;</td>
+          <td class="paramname"><em>priority_queue</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">ccc_pq_elem *&#160;</td>
-          <td class="paramname"><em>elem</em>&#160;</td>
+          <td class="paramtype"><a class="el" href="structCCC__Priority__queue__node.html">CCC_Priority_queue_node</a> *&#160;</td>
+          <td class="paramname"><em>type_intruder</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -669,36 +759,36 @@ N) increase/decrease key. </p>
       </table>
 </div><div class="memdoc">
 
-<p>Erase elem from the pq. Amortized O(lgN). </p>
+<p>Erase type_intruder from the priority_queue. Amortized O(lgN). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">pq</td><td>a pointer to the priority queue. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">elem</td><td>a pointer to the intrusive element in the user type. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">priority_queue</td><td>a pointer to the priority queue. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">type_intruder</td><td>a pointer to the intrusive element in the user type. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>ok if erase was successful or an input error if pq or elem is NULL or pq is empty.</dd></dl>
-<p>Note that the user must ensure that elem is in the priority queue. </p>
+<dl class="section return"><dt>Returns</dt><dd>ok if erase was successful or an input error if priority_queue or elem is NULL or priority_queue is empty.</dd></dl>
+<p>Note that the user must ensure that type_intruder is in the priority queue. </p>
 
 </div>
 </div>
-<a id="a29cc715f304411cd2ee83568bcdc0c22" name="a29cc715f304411cd2ee83568bcdc0c22"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a29cc715f304411cd2ee83568bcdc0c22">&#9670;&#160;</a></span>ccc_pq_extract()</h2>
+<a id="a9c28b7207673d5b0b472b96ecbbf1103" name="a9c28b7207673d5b0b472b96ecbbf1103"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9c28b7207673d5b0b472b96ecbbf1103">&#9670;&#160;</a></span>CCC_priority_queue_extract()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void * ccc_pq_extract </td>
+          <td class="memname">void * CCC_priority_queue_extract </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="priority__queue_8h.html#a53a826a19b684827cc3cda7a5517406b">ccc_priority_queue</a> *&#160;</td>
-          <td class="paramname"><em>pq</em>, </td>
+          <td class="paramtype"><a class="el" href="structCCC__Priority__queue.html">CCC_Priority_queue</a> *&#160;</td>
+          <td class="paramname"><em>priority_queue</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">ccc_pq_elem *&#160;</td>
-          <td class="paramname"><em>elem</em>&#160;</td>
+          <td class="paramtype"><a class="el" href="structCCC__Priority__queue__node.html">CCC_Priority_queue_node</a> *&#160;</td>
+          <td class="paramname"><em>type_intruder</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -707,29 +797,29 @@ N) increase/decrease key. </p>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Extract the element known to be in the pq without freeing memory. Amortized O(lgN). </p><dl class="params"><dt>Parameters</dt><dd>
+<p>Extract the element known to be in the priority_queue without freeing memory. Amortized O(lgN). </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">pq</td><td>a pointer to the priority queue. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">elem</td><td>a pointer to the intrusive element in the user type. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">priority_queue</td><td>a pointer to the priority queue. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">type_intruder</td><td>a pointer to the intrusive element in the user type. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>a pointer to the extracted user type.</dd></dl>
-<p>Note that the user must ensure that elem is in the priority queue. </p>
+<p>Note that the user must ensure that type_intruder is in the priority queue. </p>
 
 </div>
 </div>
-<a id="a5cfb0c9461d07915f3026f29fff5007d" name="a5cfb0c9461d07915f3026f29fff5007d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5cfb0c9461d07915f3026f29fff5007d">&#9670;&#160;</a></span>ccc_pq_front()</h2>
+<a id="a87c18f6c098b3d1b9a0155ec9bda2f1c" name="a87c18f6c098b3d1b9a0155ec9bda2f1c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a87c18f6c098b3d1b9a0155ec9bda2f1c">&#9670;&#160;</a></span>CCC_priority_queue_front()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void * ccc_pq_front </td>
+          <td class="memname">void * CCC_priority_queue_front </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="priority__queue_8h.html#a53a826a19b684827cc3cda7a5517406b">ccc_priority_queue</a> const *&#160;</td>
-          <td class="paramname"><em>pq</em></td><td>)</td>
+          <td class="paramtype"><a class="el" href="structCCC__Priority__queue.html">CCC_Priority_queue</a> const *&#160;</td>
+          <td class="paramname"><em>priority_queue</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -738,43 +828,43 @@ N) increase/decrease key. </p>
 <p>Obtain a reference to the front of the priority queue. O(1). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">pq</td><td>a pointer to the priority queue. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">priority_queue</td><td>a pointer to the priority queue. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>a reference to the front element in the pq. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>a reference to the front element in the priority_queue. </dd></dl>
 
 </div>
 </div>
-<a id="a8c312ced807d9b9e413b7850848634c5" name="a8c312ced807d9b9e413b7850848634c5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8c312ced807d9b9e413b7850848634c5">&#9670;&#160;</a></span>ccc_pq_increase()</h2>
+<a id="a99454ae61dc9ef012bb7e807f9915d46" name="a99454ae61dc9ef012bb7e807f9915d46"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a99454ae61dc9ef012bb7e807f9915d46">&#9670;&#160;</a></span>CCC_priority_queue_increase()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void * ccc_pq_increase </td>
+          <td class="memname">void * CCC_priority_queue_increase </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="priority__queue_8h.html#a53a826a19b684827cc3cda7a5517406b">ccc_priority_queue</a> *&#160;</td>
-          <td class="paramname"><em>pq</em>, </td>
+          <td class="paramtype"><a class="el" href="structCCC__Priority__queue.html">CCC_Priority_queue</a> *&#160;</td>
+          <td class="paramname"><em>priority_queue</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">ccc_pq_elem *&#160;</td>
-          <td class="paramname"><em>elem</em>, </td>
+          <td class="paramtype"><a class="el" href="structCCC__Priority__queue__node.html">CCC_Priority_queue_node</a> *&#160;</td>
+          <td class="paramname"><em>type_intruder</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="types_8h.html#ada79c0d2b3cfeee31b9990c23a187d12">ccc_any_type_update_fn</a> *&#160;</td>
-          <td class="paramname"><em>fn</em>, </td>
+          <td class="paramtype"><a class="el" href="types_8h.html#af3851f6fdc1c8255c6b1713c8ffc1bdd">CCC_Type_modifier</a> *&#160;</td>
+          <td class="paramname"><em>modify</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>aux</em>&#160;</td>
+          <td class="paramname"><em>context</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -784,34 +874,34 @@ N) increase/decrease key. </p>
       </table>
 </div><div class="memdoc">
 
-<p>Increases the priority of the type wrapping elem. O(1) or O(lgN) </p>
+<p>Increases the priority of the type_intruder wrapping elem. O(1) or O(lgN) </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">pq</td><td>a pointer to the priority queue. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">elem</td><td>a pointer to the intrusive element in the user type. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">fn</td><td>the update function to act on the type wrapping elem. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">aux</td><td>any auxiliary data needed for the update function. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">priority_queue</td><td>a pointer to the priority queue. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">type_intruder</td><td>a pointer to the intrusive element in the user type. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">modify</td><td>the update function to act on the type_intruder wrapping elem. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">context</td><td>any context data needed for the update function. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>a reference to the updated user type or NULL if update failed due to bad arguments provided. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>a reference to the updated user type_intruder or NULL if update failed due to bad arguments provided. </dd></dl>
 <dl class="section warning"><dt>Warning</dt><dd>the data structure will be in an invalid state if the user decreases the priority by mistake in this function.</dd></dl>
 <p>Note that this is optimal update technique if the priority queue has been initialized as a max queue and the new value is known to be greater than the old value. If this is a max heap O(1), otherwise O(lgN).</p>
-<p>While the best case operation is O(1) the impact of restructuring on future pops from the pq creates an amortized o(lgN) runtime for this function. </p>
+<p>While the best case operation is O(1) the impact of restructuring on future pops from the priority_queue creates an amortized o(lgN) runtime for this function. </p>
 
 </div>
 </div>
-<a id="a901fa6f9f04367739484a733f888093b" name="a901fa6f9f04367739484a733f888093b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a901fa6f9f04367739484a733f888093b">&#9670;&#160;</a></span>ccc_pq_is_empty()</h2>
+<a id="af14f9caabe9278bac0c1fb23b743054b" name="af14f9caabe9278bac0c1fb23b743054b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af14f9caabe9278bac0c1fb23b743054b">&#9670;&#160;</a></span>CCC_priority_queue_is_empty()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> ccc_pq_is_empty </td>
+          <td class="memname"><a class="el" href="types_8h.html#a8dbb03cfc2070934832841f50f146bcd">CCC_Tribool</a> CCC_priority_queue_is_empty </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="priority__queue_8h.html#a53a826a19b684827cc3cda7a5517406b">ccc_priority_queue</a> const *&#160;</td>
-          <td class="paramname"><em>pq</em></td><td>)</td>
+          <td class="paramtype"><a class="el" href="structCCC__Priority__queue.html">CCC_Priority_queue</a> const *&#160;</td>
+          <td class="paramname"><em>priority_queue</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -820,34 +910,34 @@ N) increase/decrease key. </p>
 <p>Returns true if the priority queue is empty false if not. O(1). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">pq</td><td>a pointer to the priority queue. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">priority_queue</td><td>a pointer to the priority queue. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>true if the size is 0, false if not empty. Error if pq is NULL. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>true if the size is 0, false if not empty. Error if priority_queue is NULL. </dd></dl>
 
 </div>
 </div>
-<a id="ac93c8b051f2c6d02f706b7d71ce9bed5" name="ac93c8b051f2c6d02f706b7d71ce9bed5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac93c8b051f2c6d02f706b7d71ce9bed5">&#9670;&#160;</a></span>ccc_pq_order()</h2>
+<a id="afcf000133b3cfe37f851a480ae5b0181" name="afcf000133b3cfe37f851a480ae5b0181"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afcf000133b3cfe37f851a480ae5b0181">&#9670;&#160;</a></span>CCC_priority_queue_order()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#afa7f5d9756840807860490d28e345955">ccc_threeway_cmp</a> ccc_pq_order </td>
+          <td class="memname"><a class="el" href="types_8h.html#a5e471ae63519e1044855e361826fc355">CCC_Order</a> CCC_priority_queue_order </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="priority__queue_8h.html#a53a826a19b684827cc3cda7a5517406b">ccc_priority_queue</a> const *&#160;</td>
-          <td class="paramname"><em>pq</em></td><td>)</td>
+          <td class="paramtype"><a class="el" href="structCCC__Priority__queue.html">CCC_Priority_queue</a> const *&#160;</td>
+          <td class="paramname"><em>priority_queue</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Return the order used to initialize the pq. </p>
+<p>Return the order used to initialize the priority_queue. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">pq</td><td>a pointer to the priority queue. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">priority_queue</td><td>a pointer to the priority queue. </td></tr>
   </table>
   </dd>
 </dl>
@@ -855,17 +945,17 @@ N) increase/decrease key. </p>
 
 </div>
 </div>
-<a id="aed66e1a4ed0e9ed2de60147cda9394d8" name="aed66e1a4ed0e9ed2de60147cda9394d8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aed66e1a4ed0e9ed2de60147cda9394d8">&#9670;&#160;</a></span>ccc_pq_pop()</h2>
+<a id="abedb6914c804e5d0b671a80029bd3e45" name="abedb6914c804e5d0b671a80029bd3e45"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abedb6914c804e5d0b671a80029bd3e45">&#9670;&#160;</a></span>CCC_priority_queue_pop()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_pq_pop </td>
+          <td class="memname"><a class="el" href="types_8h.html#aa1ded61d294b114942f11e711b331dcf">CCC_Result</a> CCC_priority_queue_pop </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="priority__queue_8h.html#a53a826a19b684827cc3cda7a5517406b">ccc_priority_queue</a> *&#160;</td>
-          <td class="paramname"><em>pq</em></td><td>)</td>
+          <td class="paramtype"><a class="el" href="structCCC__Priority__queue.html">CCC_Priority_queue</a> *&#160;</td>
+          <td class="paramname"><em>priority_queue</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -874,31 +964,31 @@ N) increase/decrease key. </p>
 <p>Pops the front element from the priority queue. Amortized O(lgN). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">pq</td><td>a pointer to the priority queue. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">priority_queue</td><td>a pointer to the priority queue. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>ok if pop was successful or an input error if pq is NULL or empty. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>ok if pop was successful or an input error if priority_queue is NULL or empty. </dd></dl>
 
 </div>
 </div>
-<a id="a17fc73bd17733632f5712e3220f3216a" name="a17fc73bd17733632f5712e3220f3216a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a17fc73bd17733632f5712e3220f3216a">&#9670;&#160;</a></span>ccc_pq_push()</h2>
+<a id="a9bac3b0e5676023c0a3d11d216fa260c" name="a9bac3b0e5676023c0a3d11d216fa260c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9bac3b0e5676023c0a3d11d216fa260c">&#9670;&#160;</a></span>CCC_priority_queue_push()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void * ccc_pq_push </td>
+          <td class="memname">void * CCC_priority_queue_push </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="priority__queue_8h.html#a53a826a19b684827cc3cda7a5517406b">ccc_priority_queue</a> *&#160;</td>
-          <td class="paramname"><em>pq</em>, </td>
+          <td class="paramtype"><a class="el" href="structCCC__Priority__queue.html">CCC_Priority_queue</a> *&#160;</td>
+          <td class="paramname"><em>priority_queue</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">ccc_pq_elem *&#160;</td>
-          <td class="paramname"><em>elem</em>&#160;</td>
+          <td class="paramtype"><a class="el" href="structCCC__Priority__queue__node.html">CCC_Priority_queue_node</a> *&#160;</td>
+          <td class="paramname"><em>type_intruder</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -911,46 +1001,46 @@ N) increase/decrease key. </p>
 <p>Adds an element to the priority queue in correct total order. O(1). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">pq</td><td>a pointer to the priority queue. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">elem</td><td>a pointer to the intrusive element in the user type. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">priority_queue</td><td>a pointer to the priority queue. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">type_intruder</td><td>a pointer to the intrusive element in the user type. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>a reference to the newly inserted user type or NULL if NULL arguments are provided or allocation fails when permitted.</dd></dl>
-<p>Note that if allocation is permitted the user type is copied into a newly allocated node.</p>
+<dl class="section return"><dt>Returns</dt><dd>a reference to the newly inserted user type_intruder or NULL if NULL arguments are provided or allocation fails when permitted.</dd></dl>
+<p>Note that if allocation is permitted the user type_intruder is copied into a newly allocated node.</p>
 <p>If allocation is not permitted this function assumes the memory wrapping elem has been allocated with the appropriate lifetime for the user's needs. </p>
 
 </div>
 </div>
-<a id="a00be9b8276bedd5baa735f5caf350837" name="a00be9b8276bedd5baa735f5caf350837"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a00be9b8276bedd5baa735f5caf350837">&#9670;&#160;</a></span>ccc_pq_update()</h2>
+<a id="aa3293ea79bfafd4f2d5be22ebcddff02" name="aa3293ea79bfafd4f2d5be22ebcddff02"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa3293ea79bfafd4f2d5be22ebcddff02">&#9670;&#160;</a></span>CCC_priority_queue_update()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void * ccc_pq_update </td>
+          <td class="memname">void * CCC_priority_queue_update </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="priority__queue_8h.html#a53a826a19b684827cc3cda7a5517406b">ccc_priority_queue</a> *&#160;</td>
-          <td class="paramname"><em>pq</em>, </td>
+          <td class="paramtype"><a class="el" href="structCCC__Priority__queue.html">CCC_Priority_queue</a> *&#160;</td>
+          <td class="paramname"><em>priority_queue</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">ccc_pq_elem *&#160;</td>
-          <td class="paramname"><em>elem</em>, </td>
+          <td class="paramtype"><a class="el" href="structCCC__Priority__queue__node.html">CCC_Priority_queue_node</a> *&#160;</td>
+          <td class="paramname"><em>type_intruder</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="types_8h.html#ada79c0d2b3cfeee31b9990c23a187d12">ccc_any_type_update_fn</a> *&#160;</td>
-          <td class="paramname"><em>fn</em>, </td>
+          <td class="paramtype"><a class="el" href="types_8h.html#af3851f6fdc1c8255c6b1713c8ffc1bdd">CCC_Type_modifier</a> *&#160;</td>
+          <td class="paramname"><em>modify</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>aux</em>&#160;</td>
+          <td class="paramname"><em>context</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -960,46 +1050,46 @@ N) increase/decrease key. </p>
       </table>
 </div><div class="memdoc">
 
-<p>Update the priority in the user type wrapping elem. </p>
+<p>Update the priority in the user type_intruder wrapping elem. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">pq</td><td>a pointer to the priority queue. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">elem</td><td>a pointer to the intrusive element in the user type. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">fn</td><td>the update function to act on the type wrapping elem. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">aux</td><td>any auxiliary data needed for the update function. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">priority_queue</td><td>a pointer to the priority queue. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">type_intruder</td><td>a pointer to the intrusive element in the user type. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">modify</td><td>the update function to act on the type_intruder wrapping elem. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">context</td><td>any context data needed for the update function. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>a reference to the updated user type or NULL if update failed due to bad arguments provided. </dd></dl>
-<dl class="section warning"><dt>Warning</dt><dd>the user must ensure elem is in the pq.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>a reference to the updated user type_intruder or NULL if update failed due to bad arguments provided. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>the user must ensure type_intruder is in the priority_queue.</dd></dl>
 <p>Note that this operation may incur unnecessary overhead if the user can't deduce if an increase or decrease is occurring. See the increase and decrease operations. O(1) best case, O(lgN) worst case. </p>
 
 </div>
 </div>
-<a id="a832c4c57933999f1dd86887c337fd4a5" name="a832c4c57933999f1dd86887c337fd4a5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a832c4c57933999f1dd86887c337fd4a5">&#9670;&#160;</a></span>ccc_pq_validate()</h2>
+<a id="a6e6d9ce9f2e6fff1a7b2e517327b6366" name="a6e6d9ce9f2e6fff1a7b2e517327b6366"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6e6d9ce9f2e6fff1a7b2e517327b6366">&#9670;&#160;</a></span>CCC_priority_queue_validate()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> ccc_pq_validate </td>
+          <td class="memname"><a class="el" href="types_8h.html#a8dbb03cfc2070934832841f50f146bcd">CCC_Tribool</a> CCC_priority_queue_validate </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="priority__queue_8h.html#a53a826a19b684827cc3cda7a5517406b">ccc_priority_queue</a> const *&#160;</td>
-          <td class="paramname"><em>pq</em></td><td>)</td>
+          <td class="paramtype"><a class="el" href="structCCC__Priority__queue.html">CCC_Priority_queue</a> const *&#160;</td>
+          <td class="paramname"><em>priority_queue</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Verifies the internal invariants of the pq hold. </p>
+<p>Verifies the internal invariants of the priority_queue hold. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">pq</td><td>a pointer to the priority queue. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">priority_queue</td><td>a pointer to the priority queue. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>true if the pq is valid false if pq is invalid. Error if pq is NULL. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>true if the priority_queue is valid false if priority_queue is invalid. Error if priority_queue is NULL. </dd></dl>
 
 </div>
 </div>

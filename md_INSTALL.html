@@ -170,11 +170,11 @@ Without Make</h2>
 <p>If your system does not support Makefiles or the <code>make</code> command here are the CMake commands one can run that will do the same.</p>
 <div class="fragment"><div class="line"># Configure the project cmake files.</div>
 <div class="line"># Replace this preset with your own if you&#39;d like.</div>
-<div class="line">cmake --preset=clang-rel -DCMAKE_INSTALL_PREFIX=[DESIRED/INSTALL/LOCATION]</div>
+<div class="line">cmake --preset=clang-release -DCMAKE_INSTALL_PREFIX=[DESIRED/INSTALL/LOCATION]</div>
 <div class="line">cmake --build build --target install</div>
 </div><!-- fragment --><h2><a class="anchor" id="autotoc_md8"></a>
 User Presets</h2>
-<p>If you do not like the default presets, create a <code>CMakeUserPresets.json</code> in this folder and place your preferred configuration in that file. Here is my preferred configuration to get you started. I like to use the newest version of gcc that I have installed.</p>
+<p>If you do not like the default presets, create a <code>CMakeUserPresets.json</code> in this folder and place your preferred configuration in that file. Here is my preferred configuration to get you started. I like to use the newest version of GCC that I have installed.</p>
 <div class="fragment"><div class="line">{</div>
 <div class="line">    &quot;version&quot;: 3,</div>
 <div class="line">    &quot;cmakeMinimumRequired&quot;: {</div>
@@ -184,40 +184,58 @@ User Presets</h2>
 <div class="line">    },</div>
 <div class="line">    &quot;configurePresets&quot;: [</div>
 <div class="line">        {</div>
-<div class="line">            &quot;name&quot;: &quot;deb&quot;,</div>
-<div class="line">            &quot;inherits&quot;: &quot;default-deb&quot;,</div>
+<div class="line">            &quot;name&quot;: &quot;my-gcc-debug&quot;,</div>
+<div class="line">            &quot;inherits&quot;: [&quot;default-debug&quot;],</div>
+<div class="line">            &quot;generator&quot;: &quot;Ninja&quot;,</div>
 <div class="line">            &quot;cacheVariables&quot;: {</div>
-<div class="line">                &quot;CMAKE_C_COMPILER&quot;: &quot;gcc-14.2&quot;</div>
+<div class="line">                &quot;CMAKE_C_COMPILER&quot;: &quot;gcc-15.1&quot;</div>
 <div class="line">            }</div>
 <div class="line">        },</div>
 <div class="line">        {</div>
-<div class="line">            &quot;name&quot;: &quot;rel&quot;,</div>
-<div class="line">            &quot;inherits&quot;: &quot;default-rel&quot;,</div>
+<div class="line">            &quot;name&quot;: &quot;my-gcc-release&quot;,</div>
+<div class="line">            &quot;inherits&quot;: [&quot;default-release&quot;],</div>
+<div class="line">            &quot;generator&quot;: &quot;Ninja&quot;,</div>
 <div class="line">            &quot;cacheVariables&quot;: {</div>
-<div class="line">                &quot;CMAKE_C_COMPILER&quot;: &quot;gcc-14.2&quot;</div>
+<div class="line">                &quot;CMAKE_C_COMPILER&quot;: &quot;gcc-15.1&quot;</div>
 <div class="line">            }</div>
 <div class="line">        },</div>
 <div class="line">        {</div>
-<div class="line">            &quot;name&quot;: &quot;cdeb&quot;,</div>
-<div class="line">            &quot;inherits&quot;: &quot;default-deb&quot;,</div>
+<div class="line">            &quot;name&quot;: &quot;my-clang-debug&quot;,</div>
+<div class="line">            &quot;inherits&quot;: [&quot;default-debug&quot;],</div>
 <div class="line">            &quot;generator&quot;: &quot;Ninja&quot;,</div>
 <div class="line">            &quot;cacheVariables&quot;: {</div>
 <div class="line">                &quot;CMAKE_C_COMPILER&quot;: &quot;clang&quot;</div>
 <div class="line">            }</div>
 <div class="line">        },</div>
 <div class="line">        {</div>
-<div class="line">            &quot;name&quot;: &quot;crel&quot;,</div>
-<div class="line">            &quot;inherits&quot;: &quot;default-rel&quot;,</div>
+<div class="line">            &quot;name&quot;: &quot;my-clang-release&quot;,</div>
+<div class="line">            &quot;inherits&quot;: [&quot;default-release&quot;],</div>
 <div class="line">            &quot;generator&quot;: &quot;Ninja&quot;,</div>
 <div class="line">            &quot;cacheVariables&quot;: {</div>
 <div class="line">                &quot;CMAKE_C_COMPILER&quot;: &quot;clang&quot;</div>
+<div class="line">            }</div>
+<div class="line">        },</div>
+<div class="line">        {</div>
+<div class="line">            &quot;name&quot;: &quot;my-sanitize-debug&quot;,</div>
+<div class="line">            &quot;inherits&quot;: [&quot;gcc-sanitize-debug&quot;],</div>
+<div class="line">            &quot;generator&quot;: &quot;Ninja&quot;,</div>
+<div class="line">            &quot;cacheVariables&quot;: {</div>
+<div class="line">                &quot;CMAKE_C_COMPILER&quot;: &quot;gcc-15.1&quot;</div>
+<div class="line">            }</div>
+<div class="line">        },</div>
+<div class="line">        {</div>
+<div class="line">            &quot;name&quot;: &quot;my-sanitize-release&quot;,</div>
+<div class="line">            &quot;inherits&quot;: [&quot;gcc-sanitize-release&quot;],</div>
+<div class="line">            &quot;generator&quot;: &quot;Ninja&quot;,</div>
+<div class="line">            &quot;cacheVariables&quot;: {</div>
+<div class="line">                &quot;CMAKE_C_COMPILER&quot;: &quot;gcc-15.1&quot;</div>
 <div class="line">            }</div>
 <div class="line">        }</div>
 <div class="line">    ]</div>
 <div class="line">}</div>
 </div><!-- fragment --><p>Then your preset can be invoked as follows:</p>
 <div class="fragment"><div class="line"># Your preferred preset with the same other steps as before.</div>
-<div class="line">cmake --preset=rel -DCMAKE_INSTALL_PREFIX=[DESIRED/INSTALL/LOCATION]</div>
+<div class="line">cmake --preset=my-clang-release -DCMAKE_INSTALL_PREFIX=[DESIRED/INSTALL/LOCATION]</div>
 <div class="line">cmake --build build --target install</div>
 </div><!-- fragment --><h1><a class="anchor" id="autotoc_md9"></a>
 Generate Documentation</h1>

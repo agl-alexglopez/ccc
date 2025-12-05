@@ -1,5 +1,5 @@
 <map id="ccc/priority_queue.h" name="ccc/priority_queue.h">
-<area shape="rect" id="node1" title="The Priority Queue Interface." alt="" coords="10,5,163,31"/>
-<area shape="rect" id="node2" href="$impl__traits_8h_source.html" title=" " alt="" coords="5,79,168,104"/>
-<area shape="rect" id="node3" href="$traits_8h.html" title="The C Container Collection Traits Interface." alt="" coords="40,152,133,177"/>
+<area shape="rect" id="node1" title="The Priority Queue Interface." alt="" coords="5,5,159,31"/>
+<area shape="rect" id="node2" href="$private__traits_8h_source.html" title=" " alt="" coords="11,79,153,119"/>
+<area shape="rect" id="node3" href="$traits_8h.html" title="The C Container Collection Traits Interface." alt="" coords="35,167,129,192"/>
 </map>

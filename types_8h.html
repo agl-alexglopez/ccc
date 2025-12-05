@@ -98,14 +98,14 @@ $(document).ready(function(){initNavTree('types_8h.html',''); initResizable(); }
 
 <p>The C Container Collection Fundamental Types.  
 <a href="#details">More...</a></p>
-<div class="textblock"><code>#include &quot;impl/impl_types.h&quot;</code><br />
+<div class="textblock"><code>#include &quot;private/private_types.h&quot;</code><br />
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for types.h:</div>
 <div class="dyncontent">
 <div class="center"><img src="types_8h__incl.png" border="0" usemap="#accc_2types_8h" alt=""/></div>
 <map name="accc_2types_8h" id="accc_2types_8h">
-<area shape="rect" title="The C Container Collection Fundamental Types." alt="" coords="27,5,122,31"/>
-<area shape="rect" href="impl__types_8h_source.html" title=" " alt="" coords="5,79,144,104"/>
+<area shape="rect" title="The C Container Collection Fundamental Types." alt="" coords="45,5,139,31"/>
+<area shape="rect" href="private__types_8h_source.html" title=" " alt="" coords="5,79,179,104"/>
 </map>
 </div>
 </div><div class="textblock"><div class="dynheader">
@@ -113,379 +113,318 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="dyncontent">
 <div class="center"><img src="types_8h__dep__incl.png" border="0" usemap="#accc_2types_8hdep" alt=""/></div>
 <map name="accc_2types_8hdep" id="accc_2types_8hdep">
-<area shape="rect" title="The C Container Collection Fundamental Types." alt="" coords="1019,5,1113,31"/>
-<area shape="rect" href="bitset_8h.html" title="The Bit Set Interface." alt="" coords="61,174,157,199"/>
-<area shape="rect" href="impl__traits_8h_source.html" title=" " alt="" coords="879,431,1042,456"/>
-<area shape="rect" href="buffer_8h.html" title="The Buffer Interface." alt="" coords="419,174,515,199"/>
-<area shape="rect" href="flat__priority__queue_8h.html" title="The Flat Priority Queue Interface." alt="" coords="643,350,825,375"/>
-<area shape="rect" href="flat__double__ended__queue_8h.html" title="The Flat Double Ended Queue Interface." alt="" coords="323,343,489,383"/>
-<area shape="rect" href="impl__flat__priority__queue_8h_source.html" title=" " alt="" coords="621,255,759,295"/>
-<area shape="rect" href="doubly__linked__list_8h.html" title="The Doubly Linked List Interface." alt="" coords="683,174,859,199"/>
-<area shape="rect" href="flat__hash__map_8h.html" title="The Flat Hash Map Interface." alt="" coords="883,174,1038,199"/>
-<area shape="rect" href="handle__ordered__map_8h.html" title="The Handle Ordered Map Interface." alt="" coords="1063,167,1211,207"/>
-<area shape="rect" href="handle__realtime__ordered__map_8h.html" title="The Handle Realtime Ordered Map Interface." alt="" coords="1277,167,1431,207"/>
-<area shape="rect" href="impl__bitset_8h_source.html" title=" " alt="" coords="26,86,191,111"/>
-<area shape="rect" href="impl__buffer_8h_source.html" title=" " alt="" coords="367,86,533,111"/>
-<area shape="rect" href="impl__doubly__linked__list_8h_source.html" title=" " alt="" coords="709,79,869,119"/>
-<area shape="rect" href="impl__flat__hash__map_8h_source.html" title=" " alt="" coords="944,79,1081,119"/>
-<area shape="rect" href="impl__handle__ordered__map_8h_source.html" title=" " alt="" coords="1157,79,1317,119"/>
-<area shape="rect" href="impl__handle__realtime__ordered__map_8h_source.html" title=" " alt="" coords="1391,79,1581,119"/>
-<area shape="rect" href="impl__ordered__map_8h_source.html" title=" " alt="" coords="1605,79,1772,119"/>
-<area shape="rect" href="ordered__map_8h.html" title="The Ordered Map Interface." alt="" coords="1616,174,1761,199"/>
-<area shape="rect" href="impl__priority__queue_8h_source.html" title=" " alt="" coords="1847,79,2010,119"/>
-<area shape="rect" href="priority__queue_8h.html" title="The Priority Queue Interface." alt="" coords="1852,174,2005,199"/>
-<area shape="rect" href="impl__realtime__ordered__map_8h_source.html" title=" " alt="" coords="2085,79,2255,119"/>
-<area shape="rect" href="realtime__ordered__map_8h.html" title="The Realtime Ordered Map Interface." alt="" coords="2091,167,2249,207"/>
-<area shape="rect" href="impl__singly__linked__list_8h_source.html" title=" " alt="" coords="2330,79,2485,119"/>
-<area shape="rect" href="singly__linked__list_8h.html" title="The Singly Linked List Interface." alt="" coords="2322,174,2493,199"/>
-<area shape="rect" href="traits_8h.html" title="The C Container Collection Traits Interface." alt="" coords="914,504,1007,529"/>
-<area shape="rect" href="impl__flat__double__ended__queue_8h_source.html" title=" " alt="" coords="317,255,495,295"/>
+<area shape="rect" title="The C Container Collection Fundamental Types." alt="" coords="1113,5,1208,31"/>
+<area shape="rect" href="adaptive__map_8h.html" title="The Adaptive Map Interface." alt="" coords="18,174,170,199"/>
+<area shape="rect" href="private__traits_8h_source.html" title=" " alt="" coords="981,431,1124,471"/>
+<area shape="rect" href="array__adaptive__map_8h.html" title="The Array Adaptive Map Interface." alt="" coords="311,167,456,207"/>
+<area shape="rect" href="array__tree__map_8h.html" title="The Array Tree Map Interface." alt="" coords="514,174,677,199"/>
+<area shape="rect" href="bitset_8h.html" title="The Bit Set Interface." alt="" coords="701,174,797,199"/>
+<area shape="rect" href="buffer_8h.html" title="The Buffer Interface." alt="" coords="1030,174,1126,199"/>
+<area shape="rect" href="flat__priority__queue_8h.html" title="The Flat Priority Queue Interface." alt="" coords="1111,350,1293,375"/>
+<area shape="rect" href="flat__double__ended__queue_8h.html" title="The Flat Double Ended Queue Interface." alt="" coords="828,343,995,383"/>
+<area shape="rect" href="private__flat__priority__queue_8h_source.html" title=" " alt="" coords="1141,255,1303,295"/>
+<area shape="rect" href="doubly__linked__list_8h.html" title="The Doubly Linked List Interface." alt="" coords="1303,174,1479,199"/>
+<area shape="rect" href="flat__hash__map_8h.html" title="The Flat Hash Map Interface." alt="" coords="1503,174,1658,199"/>
+<area shape="rect" href="priority__queue_8h.html" title="The Priority Queue Interface." alt="" coords="1693,174,1847,199"/>
+<area shape="rect" href="private__adaptive__map_8h.html" title="The Adaptive Map Private Interface." alt="" coords="27,79,169,119"/>
+<area shape="rect" href="private__array__adaptive__map_8h_source.html" title=" " alt="" coords="296,79,471,119"/>
+<area shape="rect" href="private__array__tree__map_8h_source.html" title=" " alt="" coords="546,79,690,119"/>
+<area shape="rect" href="private__bitset_8h_source.html" title=" " alt="" coords="765,79,908,119"/>
+<area shape="rect" href="private__buffer_8h_source.html" title=" " alt="" coords="1035,79,1177,119"/>
+<area shape="rect" href="private__doubly__linked__list_8h_source.html" title=" " alt="" coords="1355,79,1513,119"/>
+<area shape="rect" href="private__flat__hash__map_8h.html" title="Private Flat Hash Map Interface." alt="" coords="1589,79,1732,119"/>
+<area shape="rect" href="private__priority__queue_8h_source.html" title=" " alt="" coords="1808,79,1951,119"/>
+<area shape="rect" href="private__singly__linked__list_8h_source.html" title=" " alt="" coords="1975,79,2128,119"/>
+<area shape="rect" href="singly__linked__list_8h.html" title="The Singly Linked List Interface." alt="" coords="1966,174,2137,199"/>
+<area shape="rect" href="private__tree__map_8h_source.html" title=" " alt="" coords="2204,79,2347,119"/>
+<area shape="rect" href="tree__map_8h.html" title="The Tree Map Interface." alt="" coords="2215,174,2336,199"/>
+<area shape="rect" href="traits_8h.html" title="The C Container Collection Traits Interface." alt="" coords="1006,519,1099,544"/>
+<area shape="rect" href="private__flat__double__ended__queue_8h_source.html" title=" " alt="" coords="808,255,1015,295"/>
 </map>
 </div>
 </div>
 <p><a href="types_8h_source.html">Go to the source code of this file.</a></p>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The C Container Collection Fundamental Types. </p>
-<p>All containers make use of the fundamental types defined here. The purpose of these types is to aid the user in writing correct callback functions, allow clear error handling, and present a consistent interface to users across containers. If allocation permission is given to containers be sure to review the allocation function interface. </p>
+<p>All containers make use of the fundamental types defined here. The purpose of these types is to aid the user in writing correct callback functions, allow clear error handling, and present a consistent interface to users across containers. If allocation permission is given to containers be sure to review the allocator function interface. </p>
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Data Structures</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structccc__ucount.html">ccc_ucount</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A type for returning an unsigned integer from a container for counting. Intended to count sizes, capacities, and 0-based indices.  <a href="structccc__ucount.html#details">More...</a><br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structCCC__Count.html">CCC_Count</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A type for returning an unsigned integer from a container for counting. Intended to count sizes, capacities, and 0-based indices.  <a href="structCCC__Count.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structccc__any__type__cmp.html">ccc_any_type_cmp</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">An element comparison helper.  <a href="structccc__any__type__cmp.html#details">More...</a><br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structCCC__Type__comparator__context.html">CCC_Type_comparator_context</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">An element comparison helper.  <a href="structCCC__Type__comparator__context.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structccc__any__key__cmp.html">ccc_any_key_cmp</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A key comparison helper to avoid argument swapping.  <a href="structccc__any__key__cmp.html#details">More...</a><br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structCCC__Key__comparator__context.html">CCC_Key_comparator_context</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A key comparison helper to avoid argument swapping.  <a href="structCCC__Key__comparator__context.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structccc__any__type.html">ccc_any_type</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A reference to a user type within the container.  <a href="structccc__any__type.html#details">More...</a><br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structCCC__Type__context.html">CCC_Type_context</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A reference to a user type within the container.  <a href="structCCC__Type__context.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structccc__any__key.html">ccc_any_key</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A read only reference to a key type matching the key field type used for hash containers.  <a href="structccc__any__key.html#details">More...</a><br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structCCC__Key__context.html">CCC_Key_context</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A read only reference to a key type matching the key field type used for hash containers.  <a href="structCCC__Key__context.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structCCC__Allocator__context.html">CCC_Allocator_context</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A bundle of arguments to pass to the user-implemented Allocator function interface. This ensures clarity in inputs and expected outputs to an allocator function the user wishes to use for managing containers. Additional context can be provided for more complex allocation schemes.  <a href="structCCC__Allocator__context.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Container Types</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Types used across many containers. </p>
 </td></tr>
-<tr class="memitem:a80a7915df3bc36e01a3a0775eebc0938"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> : int8_t { <a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938a0623aa032ce1d7c2a903cbda6cd39187">CCC_TRIBOOL_ERROR</a> = -1
-, <a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938ae6c212c69cef1332b6d31d4783fb0110">CCC_FALSE</a>
-, <a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938a1340aa280a5752742fd74e8458f8d9b5">CCC_TRUE</a>
+<tr class="memitem:a8dbb03cfc2070934832841f50f146bcd"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a8dbb03cfc2070934832841f50f146bcd">CCC_Tribool</a> : int8_t { <a class="el" href="types_8h.html#a8dbb03cfc2070934832841f50f146bcda0623aa032ce1d7c2a903cbda6cd39187">CCC_TRIBOOL_ERROR</a> = -1
+, <a class="el" href="types_8h.html#a8dbb03cfc2070934832841f50f146bcdae6c212c69cef1332b6d31d4783fb0110">CCC_FALSE</a>
+, <a class="el" href="types_8h.html#a8dbb03cfc2070934832841f50f146bcda1340aa280a5752742fd74e8458f8d9b5">CCC_TRUE</a>
  }</td></tr>
-<tr class="memdesc:a80a7915df3bc36e01a3a0775eebc0938"><td class="mdescLeft">&#160;</td><td class="mdescRight">A three state boolean to allow for an error state. Error is -1, False is 0, and True is 1.  <a href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">More...</a><br /></td></tr>
-<tr class="separator:a80a7915df3bc36e01a3a0775eebc0938"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a51d6f078a83d667aff5016609d9146ef"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> : uint8_t { <br />
-&#160;&#160;<a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146efafbd97cad5eb71401d7341ce5039ceb55">CCC_RESULT_OK</a> = 0
-, <a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146efadf254e921f5ceb57b494b0ab2205602e">CCC_RESULT_FAIL</a>
-, <a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146efaffee78d55817c7a0d5106e55ab66107f">CCC_RESULT_NO_ALLOC</a>
-, <a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146efa162b1930618f98fd111ae5a46ddb6b29">CCC_RESULT_MEM_ERROR</a>
+<tr class="memdesc:a8dbb03cfc2070934832841f50f146bcd"><td class="mdescLeft">&#160;</td><td class="mdescRight">A three state boolean to allow for an error state. Error is -1, False is 0, and True is 1.  <a href="types_8h.html#a8dbb03cfc2070934832841f50f146bcd">More...</a><br /></td></tr>
+<tr class="separator:a8dbb03cfc2070934832841f50f146bcd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa1ded61d294b114942f11e711b331dcf"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#aa1ded61d294b114942f11e711b331dcf">CCC_Result</a> : uint8_t { <br />
+&#160;&#160;<a class="el" href="types_8h.html#aa1ded61d294b114942f11e711b331dcfafbd97cad5eb71401d7341ce5039ceb55">CCC_RESULT_OK</a> = 0
+, <a class="el" href="types_8h.html#aa1ded61d294b114942f11e711b331dcfadf254e921f5ceb57b494b0ab2205602e">CCC_RESULT_FAIL</a>
+, <a class="el" href="types_8h.html#aa1ded61d294b114942f11e711b331dcfa76b87337f134fe096efe23877e49ba27">CCC_RESULT_NO_ALLOCATION_FUNCTION</a>
+, <a class="el" href="types_8h.html#aa1ded61d294b114942f11e711b331dcfad516e7c24e7cd96c84dc1d171ac7dfde">CCC_RESULT_ALLOCATOR_ERROR</a>
 , <br />
-&#160;&#160;<a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146efa0b3ff9dd93c87ee61e2202f76d1c2ec3">CCC_RESULT_ARG_ERROR</a>
-, <a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146efaf7846fca6ae33199da92335f1d523eb8">CCC_RESULT_COUNT</a>
+&#160;&#160;<a class="el" href="types_8h.html#aa1ded61d294b114942f11e711b331dcfaa7106eeabd1f0748483c9f7a1503526e">CCC_RESULT_ARGUMENT_ERROR</a>
+, <a class="el" href="types_8h.html#aa1ded61d294b114942f11e711b331dcfa19f4f2e1db88e5b8cba4b6140724e40b">CCC_PRIVATE_RESULT_COUNT</a>
 <br />
  }</td></tr>
-<tr class="memdesc:a51d6f078a83d667aff5016609d9146ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">A result of actions on containers.  <a href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">More...</a><br /></td></tr>
-<tr class="separator:a51d6f078a83d667aff5016609d9146ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afa7f5d9756840807860490d28e345955"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#afa7f5d9756840807860490d28e345955">ccc_threeway_cmp</a> : int8_t { <a class="el" href="types_8h.html#afa7f5d9756840807860490d28e345955a813ea7b9e526748af7efa9a83da12ee8">CCC_LES</a> = -1
-, <a class="el" href="types_8h.html#afa7f5d9756840807860490d28e345955a0ab42c7e0b59a46006cbb959269db825">CCC_EQL</a>
-, <a class="el" href="types_8h.html#afa7f5d9756840807860490d28e345955a60a4aec1f589eaad4a9e922d90501dce">CCC_GRT</a>
-, <a class="el" href="types_8h.html#afa7f5d9756840807860490d28e345955aeb06615eaca93d73f4086fed1fcd524c">CCC_CMP_ERROR</a>
+<tr class="memdesc:aa1ded61d294b114942f11e711b331dcf"><td class="mdescLeft">&#160;</td><td class="mdescRight">A result of actions on containers.  <a href="types_8h.html#aa1ded61d294b114942f11e711b331dcf">More...</a><br /></td></tr>
+<tr class="separator:aa1ded61d294b114942f11e711b331dcf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5e471ae63519e1044855e361826fc355"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a5e471ae63519e1044855e361826fc355">CCC_Order</a> : int8_t { <a class="el" href="types_8h.html#a5e471ae63519e1044855e361826fc355a7d1c8b7831377b5625db94ca6eb5c323">CCC_ORDER_LESSER</a> = -1
+, <a class="el" href="types_8h.html#a5e471ae63519e1044855e361826fc355a256ef61d78338eb4594755d07cdbf603">CCC_ORDER_EQUAL</a>
+, <a class="el" href="types_8h.html#a5e471ae63519e1044855e361826fc355a810f13cbd85935f2abce2fc9a685743d">CCC_ORDER_GREATER</a>
+, <a class="el" href="types_8h.html#a5e471ae63519e1044855e361826fc355a102452b261a59d45697700c7226e88cf">CCC_ORDER_ERROR</a>
  }</td></tr>
-<tr class="memdesc:afa7f5d9756840807860490d28e345955"><td class="mdescLeft">&#160;</td><td class="mdescRight">A three-way comparison for comparison functions.  <a href="types_8h.html#afa7f5d9756840807860490d28e345955">More...</a><br /></td></tr>
-<tr class="separator:afa7f5d9756840807860490d28e345955"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a71b29cbbadff8355b8cea7bf0e63d723"><td class="memItemLeft" align="right" valign="top">typedef union ccc_range&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a71b29cbbadff8355b8cea7bf0e63d723">ccc_range</a></td></tr>
-<tr class="memdesc:a71b29cbbadff8355b8cea7bf0e63d723"><td class="mdescLeft">&#160;</td><td class="mdescRight">The result of a range query on iterable containers.  <br /></td></tr>
-<tr class="separator:a71b29cbbadff8355b8cea7bf0e63d723"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a78ee8022485deb3af2f434b614752e68"><td class="memItemLeft" align="right" valign="top">typedef union ccc_rrange&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a78ee8022485deb3af2f434b614752e68">ccc_rrange</a></td></tr>
-<tr class="memdesc:a78ee8022485deb3af2f434b614752e68"><td class="mdescLeft">&#160;</td><td class="mdescRight">The result of a rrange query on iterable containers.  <br /></td></tr>
-<tr class="separator:a78ee8022485deb3af2f434b614752e68"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa3c40fddcd1ec571a0b9a6d5d742805c"><td class="memItemLeft" align="right" valign="top">typedef union ccc_entry&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#aa3c40fddcd1ec571a0b9a6d5d742805c">ccc_entry</a></td></tr>
-<tr class="memdesc:aa3c40fddcd1ec571a0b9a6d5d742805c"><td class="mdescLeft">&#160;</td><td class="mdescRight">An Occupied or Vacant position in a searchable container.  <br /></td></tr>
-<tr class="separator:aa3c40fddcd1ec571a0b9a6d5d742805c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a940ee72ba6e382d0c9dab71690a4adcc"><td class="memItemLeft" align="right" valign="top">typedef enum ccc_entry_status&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a940ee72ba6e382d0c9dab71690a4adcc">ccc_entry_status</a></td></tr>
-<tr class="memdesc:a940ee72ba6e382d0c9dab71690a4adcc"><td class="mdescLeft">&#160;</td><td class="mdescRight">The status monitoring and entry state once it is obtained.  <br /></td></tr>
-<tr class="separator:a940ee72ba6e382d0c9dab71690a4adcc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6c6f8f8e707c4b4b2ed487015639c698"><td class="memItemLeft" align="right" valign="top">typedef union ccc_handle&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a6c6f8f8e707c4b4b2ed487015639c698">ccc_handle</a></td></tr>
-<tr class="memdesc:a6c6f8f8e707c4b4b2ed487015639c698"><td class="mdescLeft">&#160;</td><td class="mdescRight">An Occupied or Vacant handle to a flat searchable container entry.  <br /></td></tr>
-<tr class="separator:a6c6f8f8e707c4b4b2ed487015639c698"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a39d707127c6bb25cb76587203582743c"><td class="memItemLeft" align="right" valign="top">typedef size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a39d707127c6bb25cb76587203582743c">ccc_handle_i</a></td></tr>
-<tr class="memdesc:a39d707127c6bb25cb76587203582743c"><td class="mdescLeft">&#160;</td><td class="mdescRight">A stable index to user data in a container that uses a flat array as the underlying storage method.  <br /></td></tr>
-<tr class="separator:a39d707127c6bb25cb76587203582743c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4f5026f76fa43fe2d3e421467562f946"><td class="memItemLeft" align="right" valign="top">typedef enum ccc_entry_status&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a4f5026f76fa43fe2d3e421467562f946">ccc_handle_status</a></td></tr>
-<tr class="memdesc:a4f5026f76fa43fe2d3e421467562f946"><td class="mdescLeft">&#160;</td><td class="mdescRight">The status monitoring and handle state once it is obtained.  <br /></td></tr>
-<tr class="separator:a4f5026f76fa43fe2d3e421467562f946"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3e73202894869d2840fb21ff912bbd96"><td class="memItemLeft" align="right" valign="top">typedef void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a3e73202894869d2840fb21ff912bbd96">ccc_any_alloc_fn</a>(void *ptr, size_t size, void *aux)</td></tr>
-<tr class="memdesc:a3e73202894869d2840fb21ff912bbd96"><td class="mdescLeft">&#160;</td><td class="mdescRight">An allocation function at the core of all containers.  <br /></td></tr>
-<tr class="separator:a3e73202894869d2840fb21ff912bbd96"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a36055bd5f8a938ab6ffb246fa0fa8f6a"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="types_8h.html#afa7f5d9756840807860490d28e345955">ccc_threeway_cmp</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a36055bd5f8a938ab6ffb246fa0fa8f6a">ccc_any_type_cmp_fn</a>(<a class="el" href="structccc__any__type__cmp.html">ccc_any_type_cmp</a>)</td></tr>
-<tr class="memdesc:a36055bd5f8a938ab6ffb246fa0fa8f6a"><td class="mdescLeft">&#160;</td><td class="mdescRight">A callback function for comparing two elements in a container.  <br /></td></tr>
-<tr class="separator:a36055bd5f8a938ab6ffb246fa0fa8f6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ada79c0d2b3cfeee31b9990c23a187d12"><td class="memItemLeft" align="right" valign="top">typedef void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#ada79c0d2b3cfeee31b9990c23a187d12">ccc_any_type_update_fn</a>(<a class="el" href="structccc__any__type.html">ccc_any_type</a>)</td></tr>
-<tr class="memdesc:ada79c0d2b3cfeee31b9990c23a187d12"><td class="mdescLeft">&#160;</td><td class="mdescRight">A callback function for modifying an element in the container.  <br /></td></tr>
-<tr class="separator:ada79c0d2b3cfeee31b9990c23a187d12"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a97f231bd3df31cb2730e3304d4cc1dd2"><td class="memItemLeft" align="right" valign="top">typedef void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a97f231bd3df31cb2730e3304d4cc1dd2">ccc_any_type_destructor_fn</a>(<a class="el" href="structccc__any__type.html">ccc_any_type</a>)</td></tr>
-<tr class="memdesc:a97f231bd3df31cb2730e3304d4cc1dd2"><td class="mdescLeft">&#160;</td><td class="mdescRight">A callback function for destroying an element in the container.  <br /></td></tr>
-<tr class="separator:a97f231bd3df31cb2730e3304d4cc1dd2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac003168686163e58d4a0347ba027c536"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="types_8h.html#afa7f5d9756840807860490d28e345955">ccc_threeway_cmp</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#ac003168686163e58d4a0347ba027c536">ccc_any_key_cmp_fn</a>(<a class="el" href="structccc__any__key__cmp.html">ccc_any_key_cmp</a>)</td></tr>
-<tr class="memdesc:ac003168686163e58d4a0347ba027c536"><td class="mdescLeft">&#160;</td><td class="mdescRight">A callback function for three-way comparing two stored keys.  <br /></td></tr>
-<tr class="separator:ac003168686163e58d4a0347ba027c536"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac1cb788d8d6e0a1dcceb3485aa2aa37a"><td class="memItemLeft" align="right" valign="top">typedef uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#ac1cb788d8d6e0a1dcceb3485aa2aa37a">ccc_any_key_hash_fn</a>(<a class="el" href="structccc__any__key.html">ccc_any_key</a> to_hash)</td></tr>
-<tr class="memdesc:ac1cb788d8d6e0a1dcceb3485aa2aa37a"><td class="mdescLeft">&#160;</td><td class="mdescRight">A callback function to hash the key type used in a container.  <br /></td></tr>
-<tr class="separator:ac1cb788d8d6e0a1dcceb3485aa2aa37a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memdesc:a5e471ae63519e1044855e361826fc355"><td class="mdescLeft">&#160;</td><td class="mdescRight">A three-way comparison for comparison functions.  <a href="types_8h.html#a5e471ae63519e1044855e361826fc355">More...</a><br /></td></tr>
+<tr class="separator:a5e471ae63519e1044855e361826fc355"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1e99ea0c872f9400cf06d8995484fbf3"><td class="memItemLeft" align="right" valign="top">typedef union <a class="el" href="unionCCC__Range__wrap.html">CCC_Range_wrap</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a1e99ea0c872f9400cf06d8995484fbf3">CCC_Range</a></td></tr>
+<tr class="memdesc:a1e99ea0c872f9400cf06d8995484fbf3"><td class="mdescLeft">&#160;</td><td class="mdescRight">The result of a range query on iterable containers.  <br /></td></tr>
+<tr class="separator:a1e99ea0c872f9400cf06d8995484fbf3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a87bdc16619e9a0f9585a8102846c20a8"><td class="memItemLeft" align="right" valign="top">typedef union <a class="el" href="unionCCC__Range__reverse__wrap.html">CCC_Range_reverse_wrap</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a87bdc16619e9a0f9585a8102846c20a8">CCC_Range_reverse</a></td></tr>
+<tr class="memdesc:a87bdc16619e9a0f9585a8102846c20a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">The result of a range_reverse query on iterable containers.  <br /></td></tr>
+<tr class="separator:a87bdc16619e9a0f9585a8102846c20a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab4b775556af70e3f463f41998d135ce4"><td class="memItemLeft" align="right" valign="top">typedef union <a class="el" href="unionCCC__Handle__range__wrap.html">CCC_Handle_range_wrap</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#ab4b775556af70e3f463f41998d135ce4">CCC_Handle_range</a></td></tr>
+<tr class="memdesc:ab4b775556af70e3f463f41998d135ce4"><td class="mdescLeft">&#160;</td><td class="mdescRight">The result of a range query on iterable containers.  <br /></td></tr>
+<tr class="separator:ab4b775556af70e3f463f41998d135ce4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa24094a0fb5618980a629b4accdd37d7"><td class="memItemLeft" align="right" valign="top">typedef union <a class="el" href="unionCCC__Handle__range__reverse__wrap.html">CCC_Handle_range_reverse_wrap</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#aa24094a0fb5618980a629b4accdd37d7">CCC_Handle_range_reverse</a></td></tr>
+<tr class="memdesc:aa24094a0fb5618980a629b4accdd37d7"><td class="mdescLeft">&#160;</td><td class="mdescRight">The result of a range_reverse query on iterable containers.  <br /></td></tr>
+<tr class="separator:aa24094a0fb5618980a629b4accdd37d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a914565be90d98e7c827dd28262bd5a7c"><td class="memItemLeft" align="right" valign="top">typedef union <a class="el" href="unionCCC__Entry__wrap.html">CCC_Entry_wrap</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a914565be90d98e7c827dd28262bd5a7c">CCC_Entry</a></td></tr>
+<tr class="memdesc:a914565be90d98e7c827dd28262bd5a7c"><td class="mdescLeft">&#160;</td><td class="mdescRight">An Occupied or Vacant position in a searchable container.  <br /></td></tr>
+<tr class="separator:a914565be90d98e7c827dd28262bd5a7c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a195be6cf93cfca9030f0ccf520eeff9b"><td class="memItemLeft" align="right" valign="top">typedef enum CCC_Entry_status&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a195be6cf93cfca9030f0ccf520eeff9b">CCC_Entry_status</a></td></tr>
+<tr class="memdesc:a195be6cf93cfca9030f0ccf520eeff9b"><td class="mdescLeft">&#160;</td><td class="mdescRight">The status monitoring and entry state once it is obtained.  <br /></td></tr>
+<tr class="separator:a195be6cf93cfca9030f0ccf520eeff9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae578b710e7b66df183e1cc3d26f10278"><td class="memItemLeft" align="right" valign="top">typedef union <a class="el" href="unionCCC__Handle__wrap.html">CCC_Handle_wrap</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#ae578b710e7b66df183e1cc3d26f10278">CCC_Handle</a></td></tr>
+<tr class="memdesc:ae578b710e7b66df183e1cc3d26f10278"><td class="mdescLeft">&#160;</td><td class="mdescRight">An Occupied or Vacant handle to a flat searchable container entry.  <br /></td></tr>
+<tr class="separator:ae578b710e7b66df183e1cc3d26f10278"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4043390f03f4ec5162e3782152360be9"><td class="memItemLeft" align="right" valign="top">typedef size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a4043390f03f4ec5162e3782152360be9">CCC_Handle_index</a></td></tr>
+<tr class="memdesc:a4043390f03f4ec5162e3782152360be9"><td class="mdescLeft">&#160;</td><td class="mdescRight">A stable index to user data in a container that uses a flat array as the underlying storage method.  <br /></td></tr>
+<tr class="separator:a4043390f03f4ec5162e3782152360be9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a282e45f45cb2493ec1709942eb5d958d"><td class="memItemLeft" align="right" valign="top">typedef enum CCC_Entry_status&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a282e45f45cb2493ec1709942eb5d958d">CCC_Handle_status</a></td></tr>
+<tr class="memdesc:a282e45f45cb2493ec1709942eb5d958d"><td class="mdescLeft">&#160;</td><td class="mdescRight">The status monitoring and handle state once it is obtained.  <br /></td></tr>
+<tr class="separator:a282e45f45cb2493ec1709942eb5d958d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aac6280c471e14b9c0d50b1c5577394d3"><td class="memItemLeft" align="right" valign="top">typedef void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#aac6280c471e14b9c0d50b1c5577394d3">CCC_Allocator</a>(<a class="el" href="structCCC__Allocator__context.html">CCC_Allocator_context</a>)</td></tr>
+<tr class="memdesc:aac6280c471e14b9c0d50b1c5577394d3"><td class="mdescLeft">&#160;</td><td class="mdescRight">An allocation function at the core of all containers.  <br /></td></tr>
+<tr class="separator:aac6280c471e14b9c0d50b1c5577394d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa4b6dbfefd7f8ebd16d95dfafde4d9e4"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="types_8h.html#a5e471ae63519e1044855e361826fc355">CCC_Order</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#aa4b6dbfefd7f8ebd16d95dfafde4d9e4">CCC_Type_comparator</a>(<a class="el" href="structCCC__Type__comparator__context.html">CCC_Type_comparator_context</a>)</td></tr>
+<tr class="memdesc:aa4b6dbfefd7f8ebd16d95dfafde4d9e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">A callback function for comparing two elements in a container.  <br /></td></tr>
+<tr class="separator:aa4b6dbfefd7f8ebd16d95dfafde4d9e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af3851f6fdc1c8255c6b1713c8ffc1bdd"><td class="memItemLeft" align="right" valign="top">typedef void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#af3851f6fdc1c8255c6b1713c8ffc1bdd">CCC_Type_modifier</a>(<a class="el" href="structCCC__Type__context.html">CCC_Type_context</a>)</td></tr>
+<tr class="memdesc:af3851f6fdc1c8255c6b1713c8ffc1bdd"><td class="mdescLeft">&#160;</td><td class="mdescRight">A callback function for modifying an element in the container.  <br /></td></tr>
+<tr class="separator:af3851f6fdc1c8255c6b1713c8ffc1bdd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a93e9728dd87d940e8f171efea75ee8d2"><td class="memItemLeft" align="right" valign="top">typedef void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a93e9728dd87d940e8f171efea75ee8d2">CCC_Type_destructor</a>(<a class="el" href="structCCC__Type__context.html">CCC_Type_context</a>)</td></tr>
+<tr class="memdesc:a93e9728dd87d940e8f171efea75ee8d2"><td class="mdescLeft">&#160;</td><td class="mdescRight">A callback function for destroying an element in the container.  <br /></td></tr>
+<tr class="separator:a93e9728dd87d940e8f171efea75ee8d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a70073fb5defeba83308b92f2fff63fac"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="types_8h.html#a5e471ae63519e1044855e361826fc355">CCC_Order</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a70073fb5defeba83308b92f2fff63fac">CCC_Key_comparator</a>(<a class="el" href="structCCC__Key__comparator__context.html">CCC_Key_comparator_context</a>)</td></tr>
+<tr class="memdesc:a70073fb5defeba83308b92f2fff63fac"><td class="mdescLeft">&#160;</td><td class="mdescRight">A callback function for three-way comparing two stored keys.  <br /></td></tr>
+<tr class="separator:a70073fb5defeba83308b92f2fff63fac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac8ab9304af176b1e7c135e7464a7488f"><td class="memItemLeft" align="right" valign="top">typedef uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#ac8ab9304af176b1e7c135e7464a7488f">CCC_Key_hasher</a>(<a class="el" href="structCCC__Key__context.html">CCC_Key_context</a>)</td></tr>
+<tr class="memdesc:ac8ab9304af176b1e7c135e7464a7488f"><td class="mdescLeft">&#160;</td><td class="mdescRight">A callback function to hash the key type used in a container.  <br /></td></tr>
+<tr class="separator:ac8ab9304af176b1e7c135e7464a7488f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Entry Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>The generic interface for associative container entries. </p>
 </td></tr>
-<tr class="memitem:a0f097a692aef02acd9f71a70dee77ec7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a0f097a692aef02acd9f71a70dee77ec7">ccc_entry_occupied</a> (<a class="el" href="traits_8h.html#aa6dc7577080398fd18623d2c6a464723">ccc_entry</a> const *e)</td></tr>
-<tr class="memdesc:a0f097a692aef02acd9f71a70dee77ec7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determine if an entry is Occupied in the container.  <br /></td></tr>
-<tr class="separator:a0f097a692aef02acd9f71a70dee77ec7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac36a4a4eb542c0ad14813b3c0b42b013"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#ac36a4a4eb542c0ad14813b3c0b42b013">ccc_entry_insert_error</a> (<a class="el" href="traits_8h.html#aa6dc7577080398fd18623d2c6a464723">ccc_entry</a> const *e)</td></tr>
-<tr class="memdesc:ac36a4a4eb542c0ad14813b3c0b42b013"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determine if an insertion error has occurred when a function that attempts to insert a value in a container is used.  <br /></td></tr>
-<tr class="separator:ac36a4a4eb542c0ad14813b3c0b42b013"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7f54efc6d8b0301249ce2ff62714a439"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a7f54efc6d8b0301249ce2ff62714a439">ccc_entry_input_error</a> (<a class="el" href="traits_8h.html#aa6dc7577080398fd18623d2c6a464723">ccc_entry</a> const *e)</td></tr>
-<tr class="memdesc:a7f54efc6d8b0301249ce2ff62714a439"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determine if an input error has occurred for a function that generates an entry.  <br /></td></tr>
-<tr class="separator:a7f54efc6d8b0301249ce2ff62714a439"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a013507ec0883722ec0d986ce1f51ee37"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a013507ec0883722ec0d986ce1f51ee37">ccc_entry_unwrap</a> (<a class="el" href="traits_8h.html#aa6dc7577080398fd18623d2c6a464723">ccc_entry</a> const *e)</td></tr>
-<tr class="memdesc:a013507ec0883722ec0d986ce1f51ee37"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unwraps the provided entry providing a reference to the user type obtained from the operation that provides the entry.  <br /></td></tr>
-<tr class="separator:a013507ec0883722ec0d986ce1f51ee37"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad333a89e65d8cd738a79b24831b3406d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#ad333a89e65d8cd738a79b24831b3406d">ccc_handle_occupied</a> (<a class="el" href="traits_8h.html#ac028e04a12f65503490708cd1f5d69ba">ccc_handle</a> const *e)</td></tr>
-<tr class="memdesc:ad333a89e65d8cd738a79b24831b3406d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determine if an handle is Occupied in the container.  <br /></td></tr>
-<tr class="separator:ad333a89e65d8cd738a79b24831b3406d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a290f67e0bfc5e1ea0df7c533a2e0665f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a290f67e0bfc5e1ea0df7c533a2e0665f">ccc_handle_insert_error</a> (<a class="el" href="traits_8h.html#ac028e04a12f65503490708cd1f5d69ba">ccc_handle</a> const *e)</td></tr>
-<tr class="memdesc:a290f67e0bfc5e1ea0df7c533a2e0665f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determine if an insertion error has occurred when a function that attempts to insert a value in a container is used.  <br /></td></tr>
-<tr class="separator:a290f67e0bfc5e1ea0df7c533a2e0665f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a44a8e92eafb1e9f3e1b10827ccd89a36"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a44a8e92eafb1e9f3e1b10827ccd89a36">ccc_handle_input_error</a> (<a class="el" href="traits_8h.html#ac028e04a12f65503490708cd1f5d69ba">ccc_handle</a> const *e)</td></tr>
-<tr class="memdesc:a44a8e92eafb1e9f3e1b10827ccd89a36"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determine if an input error has occurred for a function that generates an handle.  <br /></td></tr>
-<tr class="separator:a44a8e92eafb1e9f3e1b10827ccd89a36"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a65515660962ba0e6e82a63a8b80eade9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a39d707127c6bb25cb76587203582743c">ccc_handle_i</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a65515660962ba0e6e82a63a8b80eade9">ccc_handle_unwrap</a> (<a class="el" href="traits_8h.html#ac028e04a12f65503490708cd1f5d69ba">ccc_handle</a> const *e)</td></tr>
-<tr class="memdesc:a65515660962ba0e6e82a63a8b80eade9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unwraps the provided handle providing a reference to the user type obtained from the operation that provides the handle.  <br /></td></tr>
-<tr class="separator:a65515660962ba0e6e82a63a8b80eade9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3a76d47b85a73b3dbd4cb05587b44026"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a8dbb03cfc2070934832841f50f146bcd">CCC_Tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a3a76d47b85a73b3dbd4cb05587b44026">CCC_entry_occupied</a> (<a class="el" href="structCCC__Entry.html">CCC_Entry</a> const *entry)</td></tr>
+<tr class="memdesc:a3a76d47b85a73b3dbd4cb05587b44026"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determine if an entry is Occupied in the container.  <br /></td></tr>
+<tr class="separator:a3a76d47b85a73b3dbd4cb05587b44026"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2942bf33acff93506a7a2dabb8b8b338"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a8dbb03cfc2070934832841f50f146bcd">CCC_Tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a2942bf33acff93506a7a2dabb8b8b338">CCC_entry_insert_error</a> (<a class="el" href="structCCC__Entry.html">CCC_Entry</a> const *entry)</td></tr>
+<tr class="memdesc:a2942bf33acff93506a7a2dabb8b8b338"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determine if an insertion error has occurred when a function that attempts to insert a value in a container is used.  <br /></td></tr>
+<tr class="separator:a2942bf33acff93506a7a2dabb8b8b338"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac12ea6260a654de83fd78d2ef109a1e5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a8dbb03cfc2070934832841f50f146bcd">CCC_Tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#ac12ea6260a654de83fd78d2ef109a1e5">CCC_entry_input_error</a> (<a class="el" href="structCCC__Entry.html">CCC_Entry</a> const *entry)</td></tr>
+<tr class="memdesc:ac12ea6260a654de83fd78d2ef109a1e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determine if an input error has occurred for a function that generates an entry.  <br /></td></tr>
+<tr class="separator:ac12ea6260a654de83fd78d2ef109a1e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a401e588d0fa4f1fcbd6a2f4ec233dc6a"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a401e588d0fa4f1fcbd6a2f4ec233dc6a">CCC_entry_unwrap</a> (<a class="el" href="structCCC__Entry.html">CCC_Entry</a> const *entry)</td></tr>
+<tr class="memdesc:a401e588d0fa4f1fcbd6a2f4ec233dc6a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unwraps the provided entry providing a reference to the user type obtained from the operation that provides the entry.  <br /></td></tr>
+<tr class="separator:a401e588d0fa4f1fcbd6a2f4ec233dc6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4ff222dfc20880817d8d8733536bd225"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a8dbb03cfc2070934832841f50f146bcd">CCC_Tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a4ff222dfc20880817d8d8733536bd225">CCC_handle_occupied</a> (<a class="el" href="structCCC__Handle.html">CCC_Handle</a> const *handle)</td></tr>
+<tr class="memdesc:a4ff222dfc20880817d8d8733536bd225"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determine if an handle is Occupied in the container.  <br /></td></tr>
+<tr class="separator:a4ff222dfc20880817d8d8733536bd225"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a804ff6745c321da3f09b850e19a402eb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a8dbb03cfc2070934832841f50f146bcd">CCC_Tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a804ff6745c321da3f09b850e19a402eb">CCC_handle_insert_error</a> (<a class="el" href="structCCC__Handle.html">CCC_Handle</a> const *handle)</td></tr>
+<tr class="memdesc:a804ff6745c321da3f09b850e19a402eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determine if an insertion error has occurred when a function that attempts to insert a value in a container is used.  <br /></td></tr>
+<tr class="separator:a804ff6745c321da3f09b850e19a402eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac15860a8a629f656a1b835450385fe54"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a8dbb03cfc2070934832841f50f146bcd">CCC_Tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#ac15860a8a629f656a1b835450385fe54">CCC_handle_input_error</a> (<a class="el" href="structCCC__Handle.html">CCC_Handle</a> const *handle)</td></tr>
+<tr class="memdesc:ac15860a8a629f656a1b835450385fe54"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determine if an input error has occurred for a function that generates an handle.  <br /></td></tr>
+<tr class="separator:ac15860a8a629f656a1b835450385fe54"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4e0d7df346b7077fbf7be73e3f77e5b9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a4043390f03f4ec5162e3782152360be9">CCC_Handle_index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a4e0d7df346b7077fbf7be73e3f77e5b9">CCC_handle_unwrap</a> (<a class="el" href="structCCC__Handle.html">CCC_Handle</a> const *handle)</td></tr>
+<tr class="memdesc:a4e0d7df346b7077fbf7be73e3f77e5b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unwraps the provided handle providing a reference to the user type obtained from the operation that provides the handle.  <br /></td></tr>
+<tr class="separator:a4e0d7df346b7077fbf7be73e3f77e5b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Range Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>The generic range interface for associative containers. </p>
 </td></tr>
-<tr class="memitem:a50bc0d800c2f2ae79c217e999b47f23a"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a50bc0d800c2f2ae79c217e999b47f23a">ccc_begin_range</a> (ccc_range const *r)</td></tr>
-<tr class="memdesc:a50bc0d800c2f2ae79c217e999b47f23a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain a reference to the beginning user element stored in a container in the provided range.  <br /></td></tr>
-<tr class="separator:a50bc0d800c2f2ae79c217e999b47f23a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a93883873561b893b366cc8a68e5bcba1"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a93883873561b893b366cc8a68e5bcba1">ccc_end_range</a> (ccc_range const *r)</td></tr>
-<tr class="memdesc:a93883873561b893b366cc8a68e5bcba1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain a reference to the end user element stored in a container in the provided range.  <br /></td></tr>
-<tr class="separator:a93883873561b893b366cc8a68e5bcba1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae9efbe3d5a2e7066add960fc334dab30"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#ae9efbe3d5a2e7066add960fc334dab30">ccc_rbegin_rrange</a> (ccc_rrange const *r)</td></tr>
-<tr class="memdesc:ae9efbe3d5a2e7066add960fc334dab30"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain a reference to the reverse beginning user element stored in a container in the provided range.  <br /></td></tr>
-<tr class="separator:ae9efbe3d5a2e7066add960fc334dab30"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a91dfac06c009f98de694c2d9fecfa36b"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a91dfac06c009f98de694c2d9fecfa36b">ccc_rend_rrange</a> (ccc_rrange const *r)</td></tr>
-<tr class="memdesc:a91dfac06c009f98de694c2d9fecfa36b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain a reference to the reverse end user element stored in a container in the provided range.  <br /></td></tr>
-<tr class="separator:a91dfac06c009f98de694c2d9fecfa36b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa54018033f64657b6022cbc294b6fffe"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#aa54018033f64657b6022cbc294b6fffe">CCC_range_begin</a> (<a class="el" href="structCCC__Range.html">CCC_Range</a> const *range)</td></tr>
+<tr class="memdesc:aa54018033f64657b6022cbc294b6fffe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain a reference to the beginning user element stored in a container in the provided range.  <br /></td></tr>
+<tr class="separator:aa54018033f64657b6022cbc294b6fffe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab953ca9399e1d32ac03dd9064c5104b8"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#ab953ca9399e1d32ac03dd9064c5104b8">CCC_range_end</a> (<a class="el" href="structCCC__Range.html">CCC_Range</a> const *range)</td></tr>
+<tr class="memdesc:ab953ca9399e1d32ac03dd9064c5104b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain a reference to the end user element stored in a container in the provided range.  <br /></td></tr>
+<tr class="separator:ab953ca9399e1d32ac03dd9064c5104b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac2fe62d569f3d0d3e2929802e6b330ba"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#ac2fe62d569f3d0d3e2929802e6b330ba">CCC_range_reverse_begin</a> (<a class="el" href="types_8h.html#a87bdc16619e9a0f9585a8102846c20a8">CCC_Range_reverse</a> const *range)</td></tr>
+<tr class="memdesc:ac2fe62d569f3d0d3e2929802e6b330ba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain a reference to the reverse beginning user element stored in a container in the provided range.  <br /></td></tr>
+<tr class="separator:ac2fe62d569f3d0d3e2929802e6b330ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa9efe2b995437dd964564b3df7a01e1f"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#aa9efe2b995437dd964564b3df7a01e1f">CCC_range_reverse_end</a> (<a class="el" href="types_8h.html#a87bdc16619e9a0f9585a8102846c20a8">CCC_Range_reverse</a> const *range)</td></tr>
+<tr class="memdesc:aa9efe2b995437dd964564b3df7a01e1f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain a reference to the reverse end user element stored in a container in the provided range.  <br /></td></tr>
+<tr class="separator:aa9efe2b995437dd964564b3df7a01e1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4318e3005ebc397c7f93eb2e20578856"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a4043390f03f4ec5162e3782152360be9">CCC_Handle_index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a4318e3005ebc397c7f93eb2e20578856">CCC_array_range_begin</a> (<a class="el" href="structCCC__Handle__range.html">CCC_Handle_range</a> const *range)</td></tr>
+<tr class="memdesc:a4318e3005ebc397c7f93eb2e20578856"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain a handle to the beginning user element stored in a container in the provided range.  <br /></td></tr>
+<tr class="separator:a4318e3005ebc397c7f93eb2e20578856"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5a386215091f8855dcf5942acc832191"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a4043390f03f4ec5162e3782152360be9">CCC_Handle_index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a5a386215091f8855dcf5942acc832191">CCC_array_range_end</a> (<a class="el" href="structCCC__Handle__range.html">CCC_Handle_range</a> const *range)</td></tr>
+<tr class="memdesc:a5a386215091f8855dcf5942acc832191"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain a handle to the end user element stored in a container in the provided range.  <br /></td></tr>
+<tr class="separator:a5a386215091f8855dcf5942acc832191"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0c9634e178e944438e96ed952f1a4dcb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a4043390f03f4ec5162e3782152360be9">CCC_Handle_index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a0c9634e178e944438e96ed952f1a4dcb">CCC_array_range_reverse_begin</a> (<a class="el" href="types_8h.html#aa24094a0fb5618980a629b4accdd37d7">CCC_Handle_range_reverse</a> const *range)</td></tr>
+<tr class="memdesc:a0c9634e178e944438e96ed952f1a4dcb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain a handle to the reverse beginning user element stored in a container in the provided range.  <br /></td></tr>
+<tr class="separator:a0c9634e178e944438e96ed952f1a4dcb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a14fb9b5fdb5c15f42a9ad9b4ab8ccf72"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a4043390f03f4ec5162e3782152360be9">CCC_Handle_index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a14fb9b5fdb5c15f42a9ad9b4ab8ccf72">CCC_array_range_reverse_end</a> (<a class="el" href="types_8h.html#aa24094a0fb5618980a629b4accdd37d7">CCC_Handle_range_reverse</a> const *range)</td></tr>
+<tr class="memdesc:a14fb9b5fdb5c15f42a9ad9b4ab8ccf72"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain a handle to the reverse end user element stored in a container in the provided range.  <br /></td></tr>
+<tr class="separator:a14fb9b5fdb5c15f42a9ad9b4ab8ccf72"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Status Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Functions for obtaining more descriptive status information. </p>
 </td></tr>
-<tr class="memitem:a0e9964d90c381797ba6ce9d76ad1f63a"><td class="memItemLeft" align="right" valign="top">char const *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a0e9964d90c381797ba6ce9d76ad1f63a">ccc_result_msg</a> (<a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> res)</td></tr>
-<tr class="memdesc:a0e9964d90c381797ba6ce9d76ad1f63a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain a string message with a description of the error returned from a container operation, possible causes, and possible fixes to such error.  <br /></td></tr>
-<tr class="separator:a0e9964d90c381797ba6ce9d76ad1f63a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae903680190e65b29c45401e76e9fcf85"><td class="memItemLeft" align="right" valign="top">ccc_entry_status&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#ae903680190e65b29c45401e76e9fcf85">ccc_get_entry_status</a> (<a class="el" href="traits_8h.html#aa6dc7577080398fd18623d2c6a464723">ccc_entry</a> const *e)</td></tr>
-<tr class="memdesc:ae903680190e65b29c45401e76e9fcf85"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain the entry status from a generic entry.  <br /></td></tr>
-<tr class="separator:ae903680190e65b29c45401e76e9fcf85"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a56893d41182640164a9edfd27aed445f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a4f5026f76fa43fe2d3e421467562f946">ccc_handle_status</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a56893d41182640164a9edfd27aed445f">ccc_get_handle_status</a> (<a class="el" href="traits_8h.html#ac028e04a12f65503490708cd1f5d69ba">ccc_handle</a> const *e)</td></tr>
-<tr class="memdesc:a56893d41182640164a9edfd27aed445f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain the handle status from a generic handle.  <br /></td></tr>
-<tr class="separator:a56893d41182640164a9edfd27aed445f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aafe7ba3aee377815856ab5581e0eac0e"><td class="memItemLeft" align="right" valign="top">char const *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#aafe7ba3aee377815856ab5581e0eac0e">ccc_entry_status_msg</a> (ccc_entry_status status)</td></tr>
-<tr class="memdesc:aafe7ba3aee377815856ab5581e0eac0e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain a string message with a description of the entry status.  <br /></td></tr>
-<tr class="separator:aafe7ba3aee377815856ab5581e0eac0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abc4f535e3a5cf5430bcea909c81af8f0"><td class="memItemLeft" align="right" valign="top">char const *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#abc4f535e3a5cf5430bcea909c81af8f0">ccc_handle_status_msg</a> (<a class="el" href="types_8h.html#a4f5026f76fa43fe2d3e421467562f946">ccc_handle_status</a> status)</td></tr>
-<tr class="memdesc:abc4f535e3a5cf5430bcea909c81af8f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain a string message with a description of the handle status.  <br /></td></tr>
-<tr class="separator:abc4f535e3a5cf5430bcea909c81af8f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1794bc34275723fd4bef32724a878179"><td class="memItemLeft" align="right" valign="top">char const *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a1794bc34275723fd4bef32724a878179">CCC_result_message</a> (<a class="el" href="types_8h.html#aa1ded61d294b114942f11e711b331dcf">CCC_Result</a> result)</td></tr>
+<tr class="memdesc:a1794bc34275723fd4bef32724a878179"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain a string message with a description of the error returned from a container operation, possible causes, and possible fixes to such error.  <br /></td></tr>
+<tr class="separator:a1794bc34275723fd4bef32724a878179"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a081723d0d40b19091479e191d9f950a8"><td class="memItemLeft" align="right" valign="top">CCC_Entry_status&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a081723d0d40b19091479e191d9f950a8">CCC_get_entry_status</a> (<a class="el" href="structCCC__Entry.html">CCC_Entry</a> const *entry)</td></tr>
+<tr class="memdesc:a081723d0d40b19091479e191d9f950a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain the entry status from a generic entry.  <br /></td></tr>
+<tr class="separator:a081723d0d40b19091479e191d9f950a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acf4813d40d5e048ac4f23ed91fd8b64a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a282e45f45cb2493ec1709942eb5d958d">CCC_Handle_status</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#acf4813d40d5e048ac4f23ed91fd8b64a">CCC_get_handle_status</a> (<a class="el" href="structCCC__Handle.html">CCC_Handle</a> const *handle)</td></tr>
+<tr class="memdesc:acf4813d40d5e048ac4f23ed91fd8b64a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain the handle status from a generic handle.  <br /></td></tr>
+<tr class="separator:acf4813d40d5e048ac4f23ed91fd8b64a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad07b2e77418d28789f9eb6723d2b59b7"><td class="memItemLeft" align="right" valign="top">char const *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#ad07b2e77418d28789f9eb6723d2b59b7">CCC_entry_status_message</a> (CCC_Entry_status status)</td></tr>
+<tr class="memdesc:ad07b2e77418d28789f9eb6723d2b59b7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain a string message with a description of the entry status.  <br /></td></tr>
+<tr class="separator:ad07b2e77418d28789f9eb6723d2b59b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af6a83e001fc3b4308832db6da69d8277"><td class="memItemLeft" align="right" valign="top">char const *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#af6a83e001fc3b4308832db6da69d8277">CCC_handle_status_message</a> (<a class="el" href="types_8h.html#a282e45f45cb2493ec1709942eb5d958d">CCC_Handle_status</a> status)</td></tr>
+<tr class="memdesc:af6a83e001fc3b4308832db6da69d8277"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain a string message with a description of the handle status.  <br /></td></tr>
+<tr class="separator:af6a83e001fc3b4308832db6da69d8277"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Typedef Documentation</h2>
-<a id="a3e73202894869d2840fb21ff912bbd96" name="a3e73202894869d2840fb21ff912bbd96"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3e73202894869d2840fb21ff912bbd96">&#9670;&#160;</a></span>ccc_any_alloc_fn</h2>
+<a id="aac6280c471e14b9c0d50b1c5577394d3" name="aac6280c471e14b9c0d50b1c5577394d3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aac6280c471e14b9c0d50b1c5577394d3">&#9670;&#160;</a></span>CCC_Allocator</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef void * ccc_any_alloc_fn(void *ptr, size_t size, void *aux)</td>
+          <td class="memname">typedef void * CCC_Allocator(<a class="el" href="structCCC__Allocator__context.html">CCC_Allocator_context</a>)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 <p>An allocation function at the core of all containers. </p>
-<p>An allocation function implements the following behavior, where ptr is pointer to memory, size is number of bytes to allocate, and aux is a reference to any supplementary information required for allocation, deallocation, or reallocation. Aux is passed to a container upon its initialization and the programmer may choose how to best utilize this reference (more on aux later).</p>
+<p>An allocation function implements the following behavior, when it has been passed an allocator context. Context is passed to a container upon its initialization and the programmer may choose how to best utilize this reference (more on context later).</p>
 <ul>
-<li>If NULL is provided with a size of 0, NULL is returned.</li>
-<li>If NULL is provided with a non-zero size, new memory is allocated/returned.</li>
-<li>If ptr is non-NULL it has been previously allocated by the alloc function.</li>
-<li>If ptr is non-NULL with non-zero size, ptr is resized to at least size size. The pointer returned is NULL if resizing fails. Upon success, the pointer returned might not be equal to the pointer provided.</li>
-<li>If ptr is non-NULL and size is 0, ptr is freed and NULL is returned.</li>
+<li>If input is NULL and bytes 0, NULL is returned.</li>
+<li>If input is NULL with non-zero bytes, new memory is allocated/returned.</li>
+<li>If input is non-NULL it has been previously allocated by the Allocator.</li>
+<li>If input is non-NULL with non-zero size, input is resized to at least bytes size. The pointer returned is NULL if resizing fails. Upon success, the pointer returned might not be equal to the pointer provided.</li>
+<li>If input is non-NULL and size is 0, input is freed and NULL is returned.</li>
 </ul>
-<p>One may be tempted to use realloc to check all of these boxes but realloc is implementation defined on some of these points. So, the aux parameter also discourages users from providing realloc. For example, one solution using the standard library allocator might be implemented as follows (aux is not needed):</p>
+<p>One may be tempted to use realloc to check all of these boxes but realloc is implementation defined on some of these points. So, the context parameter also discourages users from providing realloc. For example, one solution using the standard library allocator might be implemented as follows (context is not needed):</p>
 <div class="fragment"><div class="line"><span class="keywordtype">void</span> *</div>
-<div class="line">std_alloc(<span class="keywordtype">void</span> *<span class="keyword">const</span> ptr, <span class="keywordtype">size_t</span> <span class="keyword">const</span> size, <span class="keywordtype">void</span> *)</div>
+<div class="line">std_allocate(<a class="code hl_struct" href="structCCC__Allocator__context.html">CCC_Allocator_context</a> <span class="keyword">const</span> context)</div>
 <div class="line">{</div>
-<div class="line">    <span class="keywordflow">if</span> (!ptr &amp;&amp; !size)</div>
+<div class="line">    <span class="keywordflow">if</span> (!context.<a class="code hl_variable" href="structCCC__Allocator__context.html#a08a36defe443dc79c0b74b5fc8d02d17">input</a> &amp;&amp; !context.<a class="code hl_variable" href="structCCC__Allocator__context.html#a19f41f86d549a4cd98ede1d5a087769b">bytes</a>)</div>
 <div class="line">    {</div>
 <div class="line">        <span class="keywordflow">return</span> NULL;</div>
 <div class="line">    }</div>
-<div class="line">    <span class="keywordflow">if</span> (!ptr)</div>
+<div class="line">    <span class="keywordflow">if</span> (!context.<a class="code hl_variable" href="structCCC__Allocator__context.html#a08a36defe443dc79c0b74b5fc8d02d17">input</a>)</div>
 <div class="line">    {</div>
-<div class="line">        <span class="keywordflow">return</span> malloc(size);</div>
+<div class="line">        <span class="keywordflow">return</span> malloc(context.<a class="code hl_variable" href="structCCC__Allocator__context.html#a19f41f86d549a4cd98ede1d5a087769b">bytes</a>);</div>
 <div class="line">    }</div>
-<div class="line">    <span class="keywordflow">if</span> (!size)</div>
+<div class="line">    <span class="keywordflow">if</span> (!context.<a class="code hl_variable" href="structCCC__Allocator__context.html#a19f41f86d549a4cd98ede1d5a087769b">bytes</a>)</div>
 <div class="line">    {</div>
-<div class="line">        free(ptr);</div>
+<div class="line">        free(context.<a class="code hl_variable" href="structCCC__Allocator__context.html#a08a36defe443dc79c0b74b5fc8d02d17">input</a>);</div>
 <div class="line">        <span class="keywordflow">return</span> NULL;</div>
 <div class="line">    }</div>
-<div class="line">    <span class="keywordflow">return</span> realloc(ptr, size);</div>
+<div class="line">    <span class="keywordflow">return</span> realloc(context.<a class="code hl_variable" href="structCCC__Allocator__context.html#a08a36defe443dc79c0b74b5fc8d02d17">input</a>, context.<a class="code hl_variable" href="structCCC__Allocator__context.html#a19f41f86d549a4cd98ede1d5a087769b">bytes</a>);</div>
 <div class="line">}</div>
-</div><!-- fragment --><p>However, the above example is only useful if the standard library allocator is used. Any allocator that implements the required behavior is sufficient. For example programs that utilize the aux parameter, see the sample programs. Using custom arena allocators or container compositions are cases when aux is needed. </p>
+<div class="ttc" id="astructCCC__Allocator__context_html"><div class="ttname"><a href="structCCC__Allocator__context.html">CCC_Allocator_context</a></div><div class="ttdoc">A bundle of arguments to pass to the user-implemented Allocator function interface....</div><div class="ttdef"><b>Definition:</b> types.h:284</div></div>
+<div class="ttc" id="astructCCC__Allocator__context_html_a08a36defe443dc79c0b74b5fc8d02d17"><div class="ttname"><a href="structCCC__Allocator__context.html#a08a36defe443dc79c0b74b5fc8d02d17">CCC_Allocator_context::input</a></div><div class="ttdeci">void * input</div><div class="ttdef"><b>Definition:</b> types.h:286</div></div>
+<div class="ttc" id="astructCCC__Allocator__context_html_a19f41f86d549a4cd98ede1d5a087769b"><div class="ttname"><a href="structCCC__Allocator__context.html#a19f41f86d549a4cd98ede1d5a087769b">CCC_Allocator_context::bytes</a></div><div class="ttdeci">size_t bytes</div><div class="ttdef"><b>Definition:</b> types.h:288</div></div>
+</div><!-- fragment --><p>However, the above example is only useful if the standard library allocator is used. Any allocator that implements the required behavior is sufficient. For example programs that utilize the context parameter, see the sample programs. Using custom arena allocators or container compositions are cases when context is needed. </p>
 
 </div>
 </div>
-<a id="ac003168686163e58d4a0347ba027c536" name="ac003168686163e58d4a0347ba027c536"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac003168686163e58d4a0347ba027c536">&#9670;&#160;</a></span>ccc_any_key_cmp_fn</h2>
+<a id="a914565be90d98e7c827dd28262bd5a7c" name="a914565be90d98e7c827dd28262bd5a7c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a914565be90d98e7c827dd28262bd5a7c">&#9670;&#160;</a></span>CCC_Entry</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="types_8h.html#afa7f5d9756840807860490d28e345955">ccc_threeway_cmp</a> ccc_any_key_cmp_fn(<a class="el" href="structccc__any__key__cmp.html">ccc_any_key_cmp</a>)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>A callback function for three-way comparing two stored keys. </p>
-<p>The key is considered the left hand side of the comparison. The function should return CCC_LES if the key is less than the key in key field of user type, CCC_EQL if equal, and CCC_GRT if greater. </p>
-
-</div>
-</div>
-<a id="ac1cb788d8d6e0a1dcceb3485aa2aa37a" name="ac1cb788d8d6e0a1dcceb3485aa2aa37a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac1cb788d8d6e0a1dcceb3485aa2aa37a">&#9670;&#160;</a></span>ccc_any_key_hash_fn</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef uint64_t ccc_any_key_hash_fn(<a class="el" href="structccc__any__key.html">ccc_any_key</a> to_hash)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>A callback function to hash the key type used in a container. </p>
-<p>A reference to any aux data provided on initialization is also available. Return the complete hash value as determined by the user hashing algorithm. </p>
-
-</div>
-</div>
-<a id="a36055bd5f8a938ab6ffb246fa0fa8f6a" name="a36055bd5f8a938ab6ffb246fa0fa8f6a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a36055bd5f8a938ab6ffb246fa0fa8f6a">&#9670;&#160;</a></span>ccc_any_type_cmp_fn</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="types_8h.html#afa7f5d9756840807860490d28e345955">ccc_threeway_cmp</a> ccc_any_type_cmp_fn(<a class="el" href="structccc__any__type__cmp.html">ccc_any_type_cmp</a>)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>A callback function for comparing two elements in a container. </p>
-<p>A three-way comparison return value is expected and the two containers being compared are guaranteed to be non-NULL and pointing to the base of the user type stored in the container. Aux may be NULL if no aux is provided on initialization. </p>
-
-</div>
-</div>
-<a id="a97f231bd3df31cb2730e3304d4cc1dd2" name="a97f231bd3df31cb2730e3304d4cc1dd2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a97f231bd3df31cb2730e3304d4cc1dd2">&#9670;&#160;</a></span>ccc_any_type_destructor_fn</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef void ccc_any_type_destructor_fn(<a class="el" href="structccc__any__type.html">ccc_any_type</a>)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>A callback function for destroying an element in the container. </p>
-<p>A reference to the container type and any aux data provided on initialization is available. The container pointer points to the base of the user type and is not NULL. Aux may be NULL if no aux is provided on initialization. A destructor function is used to act on each element of the container when it is being emptied and destroyed. The function will be called on each type after it removed from the container and before it is freed by the container, if allocation permission is provided to the container. Therefore, if the user has given permission to the container to allocate memory they can assume the container will free each element with the provided allocation function; this function can be used for any other program state to be maintained before the container frees. If the user has not given permission to the container to allocate memory, this a good function in which to free each element, if desired; any program state can be maintained then the element can be freed by the user in this function as the final step. </p>
-
-</div>
-</div>
-<a id="ada79c0d2b3cfeee31b9990c23a187d12" name="ada79c0d2b3cfeee31b9990c23a187d12"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ada79c0d2b3cfeee31b9990c23a187d12">&#9670;&#160;</a></span>ccc_any_type_update_fn</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef void ccc_any_type_update_fn(<a class="el" href="structccc__any__type.html">ccc_any_type</a>)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>A callback function for modifying an element in the container. </p>
-<p>A reference to the container type and any aux data provided on initialization is available. The container pointer points to the base of the user type and is not NULL. Aux may be NULL if no aux is provided on initialization. An update function is used when a container Interface exposes functions to modify the key or value used to determine sorted order of elements in the container. </p>
-
-</div>
-</div>
-<a id="aa3c40fddcd1ec571a0b9a6d5d742805c" name="aa3c40fddcd1ec571a0b9a6d5d742805c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa3c40fddcd1ec571a0b9a6d5d742805c">&#9670;&#160;</a></span>ccc_entry</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef union ccc_entry ccc_entry</td>
+          <td class="memname">typedef union <a class="el" href="unionCCC__Entry__wrap.html">CCC_Entry_wrap</a> <a class="el" href="structCCC__Entry.html">CCC_Entry</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 <p>An Occupied or Vacant position in a searchable container. </p>
-<p>A entry is the basis for more complex container specific Entry Interface for all search-by-key containers. An entry is returned from various operations to provide both a reference to data and any auxiliary status that is important for the user. An entry can be Occupied or Vacant. See individual headers for containers that return this type for its meaning in context. </p>
+<p>A entry is the basis for more complex container specific Entry Interface for all search-by-key containers. An entry is returned from various operations to provide both a reference to data and any context status that is important for the user. An entry can be Occupied or Vacant. See individual headers for containers that return this type for its meaning in context. </p>
 
 </div>
 </div>
-<a id="a940ee72ba6e382d0c9dab71690a4adcc" name="a940ee72ba6e382d0c9dab71690a4adcc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a940ee72ba6e382d0c9dab71690a4adcc">&#9670;&#160;</a></span>ccc_entry_status</h2>
+<a id="a195be6cf93cfca9030f0ccf520eeff9b" name="a195be6cf93cfca9030f0ccf520eeff9b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a195be6cf93cfca9030f0ccf520eeff9b">&#9670;&#160;</a></span>CCC_Entry_status</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef enum ccc_entry_status ccc_entry_status</td>
+          <td class="memname">typedef enum CCC_Entry_status CCC_Entry_status</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 <p>The status monitoring and entry state once it is obtained. </p>
-<p>To manage safe and efficient views into associative containers entries use status flags internally. The provided functions in the Entry Interface for each container are sufficient to obtain the needed status. However if more information is needed, the status can be passed to the <a class="el" href="types_8h.html#aafe7ba3aee377815856ab5581e0eac0e" title="Obtain a string message with a description of the entry status.">ccc_entry_status_msg()</a> function for detailed string messages regarding the entry status. This may be helpful for debugging or logging. </p>
+<p>To manage safe and efficient views into associative containers entries use status flags internally. The provided functions in the Entry Interface for each container are sufficient to obtain the needed status. However if more information is needed, the status can be passed to the <a class="el" href="types_8h.html#ad07b2e77418d28789f9eb6723d2b59b7" title="Obtain a string message with a description of the entry status.">CCC_entry_status_message()</a> function for detailed string messages regarding the entry status. This may be helpful for debugging or logging. </p>
 
 </div>
 </div>
-<a id="a6c6f8f8e707c4b4b2ed487015639c698" name="a6c6f8f8e707c4b4b2ed487015639c698"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6c6f8f8e707c4b4b2ed487015639c698">&#9670;&#160;</a></span>ccc_handle</h2>
+<a id="ae578b710e7b66df183e1cc3d26f10278" name="ae578b710e7b66df183e1cc3d26f10278"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae578b710e7b66df183e1cc3d26f10278">&#9670;&#160;</a></span>CCC_Handle</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef union ccc_handle ccc_handle</td>
+          <td class="memname">typedef union <a class="el" href="unionCCC__Handle__wrap.html">CCC_Handle_wrap</a> <a class="el" href="structCCC__Handle.html">CCC_Handle</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 <p>An Occupied or Vacant handle to a flat searchable container entry. </p>
-<p>A handle uses the same semantics as an entry. However, the wrapped value is a ccc_handle_i index. When this type is returned the container interface is promising that this element will remain at the returned handle index until the element is removed by the user. This is similar to pointer stability but offers a stronger guarantee that will hold even if the underlying container is resized. </p>
+<p>A handle uses the same semantics as an entry. However, the wrapped value is a CCC_Handle_index index. When this type is returned the container interface is promising that this element will remain at the returned handle index until the element is removed by the user. This is similar to pointer stability but offers a stronger guarantee that will hold even if the underlying container is resized. </p>
 
 </div>
 </div>
-<a id="a39d707127c6bb25cb76587203582743c" name="a39d707127c6bb25cb76587203582743c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a39d707127c6bb25cb76587203582743c">&#9670;&#160;</a></span>ccc_handle_i</h2>
+<a id="a4043390f03f4ec5162e3782152360be9" name="a4043390f03f4ec5162e3782152360be9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4043390f03f4ec5162e3782152360be9">&#9670;&#160;</a></span>CCC_Handle_index</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef size_t <a class="el" href="types_8h.html#a39d707127c6bb25cb76587203582743c">ccc_handle_i</a></td>
+          <td class="memname">typedef size_t <a class="el" href="types_8h.html#a4043390f03f4ec5162e3782152360be9">CCC_Handle_index</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -496,31 +435,14 @@ Data Structures</h2></td></tr>
 
 </div>
 </div>
-<a id="a4f5026f76fa43fe2d3e421467562f946" name="a4f5026f76fa43fe2d3e421467562f946"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4f5026f76fa43fe2d3e421467562f946">&#9670;&#160;</a></span>ccc_handle_status</h2>
+<a id="ab4b775556af70e3f463f41998d135ce4" name="ab4b775556af70e3f463f41998d135ce4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab4b775556af70e3f463f41998d135ce4">&#9670;&#160;</a></span>CCC_Handle_range</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef enum ccc_entry_status <a class="el" href="types_8h.html#a4f5026f76fa43fe2d3e421467562f946">ccc_handle_status</a></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>The status monitoring and handle state once it is obtained. </p>
-<p>To manage safe and efficient views into associative containers entries use status flags internally. The provided functions in the Handle Interface for each container are sufficient to obtain the needed status. However if more information is needed, the status can be passed to the <a class="el" href="types_8h.html#aafe7ba3aee377815856ab5581e0eac0e" title="Obtain a string message with a description of the entry status.">ccc_entry_status_msg()</a> function for detailed string messages regarding the handle status. This may be helpful for debugging or logging. </p>
-
-</div>
-</div>
-<a id="a71b29cbbadff8355b8cea7bf0e63d723" name="a71b29cbbadff8355b8cea7bf0e63d723"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a71b29cbbadff8355b8cea7bf0e63d723">&#9670;&#160;</a></span>ccc_range</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef union ccc_range ccc_range</td>
+          <td class="memname">typedef union <a class="el" href="unionCCC__Handle__range__wrap.html">CCC_Handle_range_wrap</a> <a class="el" href="structCCC__Handle__range.html">CCC_Handle_range</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -530,32 +452,195 @@ Data Structures</h2></td></tr>
 
 </div>
 </div>
-<a id="a78ee8022485deb3af2f434b614752e68" name="a78ee8022485deb3af2f434b614752e68"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a78ee8022485deb3af2f434b614752e68">&#9670;&#160;</a></span>ccc_rrange</h2>
+<a id="aa24094a0fb5618980a629b4accdd37d7" name="aa24094a0fb5618980a629b4accdd37d7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa24094a0fb5618980a629b4accdd37d7">&#9670;&#160;</a></span>CCC_Handle_range_reverse</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef union ccc_rrange ccc_rrange</td>
+          <td class="memname">typedef union <a class="el" href="unionCCC__Handle__range__reverse__wrap.html">CCC_Handle_range_reverse_wrap</a> <a class="el" href="types_8h.html#aa24094a0fb5618980a629b4accdd37d7">CCC_Handle_range_reverse</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>The result of a rrange query on iterable containers. </p>
-<p>A rrange provides a view all elements that fit the equals rrange criteria of search-by-key containers. Use the provided range iteration functions in this header to iterate from beginning to end in reverse order relative to the containers default ordering. </p>
+<p>The result of a range_reverse query on iterable containers. </p>
+<p>A range_reverse provides a view all elements that fit the equals range_reverse criteria of search-by-key containers. Use the provided range iteration functions in this header to iterate from beginning to end in reverse order relative to the containers default ordering. </p>
 
 </div>
 </div>
-<h2 class="groupheader">Enumeration Type Documentation</h2>
-<a id="a51d6f078a83d667aff5016609d9146ef" name="a51d6f078a83d667aff5016609d9146ef"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a51d6f078a83d667aff5016609d9146ef">&#9670;&#160;</a></span>ccc_result</h2>
+<a id="a282e45f45cb2493ec1709942eb5d958d" name="a282e45f45cb2493ec1709942eb5d958d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a282e45f45cb2493ec1709942eb5d958d">&#9670;&#160;</a></span>CCC_Handle_status</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">enum <a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> : uint8_t</td>
+          <td class="memname">typedef enum CCC_Entry_status <a class="el" href="types_8h.html#a282e45f45cb2493ec1709942eb5d958d">CCC_Handle_status</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The status monitoring and handle state once it is obtained. </p>
+<p>To manage safe and efficient views into associative containers entries use status flags internally. The provided functions in the Handle Interface for each container are sufficient to obtain the needed status. However if more information is needed, the status can be passed to the <a class="el" href="types_8h.html#ad07b2e77418d28789f9eb6723d2b59b7" title="Obtain a string message with a description of the entry status.">CCC_entry_status_message()</a> function for detailed string messages regarding the handle status. This may be helpful for debugging or logging. </p>
+
+</div>
+</div>
+<a id="a70073fb5defeba83308b92f2fff63fac" name="a70073fb5defeba83308b92f2fff63fac"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a70073fb5defeba83308b92f2fff63fac">&#9670;&#160;</a></span>CCC_Key_comparator</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="types_8h.html#a5e471ae63519e1044855e361826fc355">CCC_Order</a> CCC_Key_comparator(<a class="el" href="structCCC__Key__comparator__context.html">CCC_Key_comparator_context</a>)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>A callback function for three-way comparing two stored keys. </p>
+<p>The key is considered the left hand side of the comparison. The function should return CCC_ORDER_LESSER if the key is less than the key in key field of user type, CCC_ORDER_EQUAL if equal, and CCC_ORDER_GREATER if greater. </p>
+
+</div>
+</div>
+<a id="ac8ab9304af176b1e7c135e7464a7488f" name="ac8ab9304af176b1e7c135e7464a7488f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac8ab9304af176b1e7c135e7464a7488f">&#9670;&#160;</a></span>CCC_Key_hasher</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef uint64_t CCC_Key_hasher(<a class="el" href="structCCC__Key__context.html">CCC_Key_context</a>)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>A callback function to hash the key type used in a container. </p>
+<p>A reference to any context data provided on initialization is also available. Return the complete hash value as determined by the user hashing algorithm. </p>
+
+</div>
+</div>
+<a id="a1e99ea0c872f9400cf06d8995484fbf3" name="a1e99ea0c872f9400cf06d8995484fbf3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1e99ea0c872f9400cf06d8995484fbf3">&#9670;&#160;</a></span>CCC_Range</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef union <a class="el" href="unionCCC__Range__wrap.html">CCC_Range_wrap</a> <a class="el" href="structCCC__Range.html">CCC_Range</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The result of a range query on iterable containers. </p>
+<p>A range provides a view all elements that fit the equals range criteria of search-by-key containers. Use the provided range iteration functions in this header to iterate from beginning to end in forward order relative to the containers default ordering. </p>
+
+</div>
+</div>
+<a id="a87bdc16619e9a0f9585a8102846c20a8" name="a87bdc16619e9a0f9585a8102846c20a8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a87bdc16619e9a0f9585a8102846c20a8">&#9670;&#160;</a></span>CCC_Range_reverse</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef union <a class="el" href="unionCCC__Range__reverse__wrap.html">CCC_Range_reverse_wrap</a> <a class="el" href="types_8h.html#a87bdc16619e9a0f9585a8102846c20a8">CCC_Range_reverse</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The result of a range_reverse query on iterable containers. </p>
+<p>A range_reverse provides a view all elements that fit the equals range_reverse criteria of search-by-key containers. Use the provided range iteration functions in this header to iterate from beginning to end in reverse order relative to the containers default ordering. </p>
+
+</div>
+</div>
+<a id="aa4b6dbfefd7f8ebd16d95dfafde4d9e4" name="aa4b6dbfefd7f8ebd16d95dfafde4d9e4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa4b6dbfefd7f8ebd16d95dfafde4d9e4">&#9670;&#160;</a></span>CCC_Type_comparator</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="types_8h.html#a5e471ae63519e1044855e361826fc355">CCC_Order</a> CCC_Type_comparator(<a class="el" href="structCCC__Type__comparator__context.html">CCC_Type_comparator_context</a>)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>A callback function for comparing two elements in a container. </p>
+<p>A three-way comparison return value is expected and the two containers being compared are guaranteed to be non-NULL and pointing to the base of the user type stored in the container. Context may be NULL if no context is provided on initialization. </p>
+
+</div>
+</div>
+<a id="a93e9728dd87d940e8f171efea75ee8d2" name="a93e9728dd87d940e8f171efea75ee8d2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a93e9728dd87d940e8f171efea75ee8d2">&#9670;&#160;</a></span>CCC_Type_destructor</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef void CCC_Type_destructor(<a class="el" href="structCCC__Type__context.html">CCC_Type_context</a>)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>A callback function for destroying an element in the container. </p>
+<p>A reference to the container type and any context data provided on initialization is available. The container pointer points to the base of the user type and is not NULL. Context may be NULL if no context is provided on initialization. A destructor function is used to act on each element of the container when it is being emptied and destroyed. The function will be called on each type after it removed from the container and before it is freed by the container, if allocation permission is provided to the container. Therefore, if the user has given permission to the container to allocate memory they can assume the container will free each element with the provided allocation function; this function can be used for any other program state to be maintained before the container frees. If the user has not given permission to the container to allocate memory, this a good function in which to free each element, if desired; any program state can be maintained then the element can be freed by the user in this function as the final step. </p>
+
+</div>
+</div>
+<a id="af3851f6fdc1c8255c6b1713c8ffc1bdd" name="af3851f6fdc1c8255c6b1713c8ffc1bdd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af3851f6fdc1c8255c6b1713c8ffc1bdd">&#9670;&#160;</a></span>CCC_Type_modifier</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef void CCC_Type_modifier(<a class="el" href="structCCC__Type__context.html">CCC_Type_context</a>)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>A callback function for modifying an element in the container. </p>
+<p>A reference to the container type and any context data provided on initialization is available. The container pointer points to the base of the user type and is not NULL. Context may be NULL if no context is provided on initialization. An update function is used when a container Interface exposes functions to modify the key or value used to determine sorted order of elements in the container. </p>
+
+</div>
+</div>
+<h2 class="groupheader">Enumeration Type Documentation</h2>
+<a id="a5e471ae63519e1044855e361826fc355" name="a5e471ae63519e1044855e361826fc355"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5e471ae63519e1044855e361826fc355">&#9670;&#160;</a></span>CCC_Order</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="types_8h.html#a5e471ae63519e1044855e361826fc355">CCC_Order</a> : int8_t</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>A three-way comparison for comparison functions. </p>
+<p>A C style three way comparison value (e.g. ((a &gt; b) - (a &lt; b))). CCC_ORDER_LESSER if left hand side is less than right hand side, CCC_ORDER_EQUAL if they are equal, and CCC_ORDER_GREATER if left hand side is greater than right hand side. </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a5e471ae63519e1044855e361826fc355a7d1c8b7831377b5625db94ca6eb5c323" name="a5e471ae63519e1044855e361826fc355a7d1c8b7831377b5625db94ca6eb5c323"></a>CCC_ORDER_LESSER&#160;</td><td class="fielddoc"><p>The left hand side is less than the right hand side. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a5e471ae63519e1044855e361826fc355a256ef61d78338eb4594755d07cdbf603" name="a5e471ae63519e1044855e361826fc355a256ef61d78338eb4594755d07cdbf603"></a>CCC_ORDER_EQUAL&#160;</td><td class="fielddoc"><p>The left hand side and right hand side are equal. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a5e471ae63519e1044855e361826fc355a810f13cbd85935f2abce2fc9a685743d" name="a5e471ae63519e1044855e361826fc355a810f13cbd85935f2abce2fc9a685743d"></a>CCC_ORDER_GREATER&#160;</td><td class="fielddoc"><p>The left hand side is greater than the right hand side. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a5e471ae63519e1044855e361826fc355a102452b261a59d45697700c7226e88cf" name="a5e471ae63519e1044855e361826fc355a102452b261a59d45697700c7226e88cf"></a>CCC_ORDER_ERROR&#160;</td><td class="fielddoc"><p>Comparison is not possible or other error has occurred. </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+<a id="aa1ded61d294b114942f11e711b331dcf" name="aa1ded61d294b114942f11e711b331dcf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa1ded61d294b114942f11e711b331dcf">&#9670;&#160;</a></span>CCC_Result</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="types_8h.html#aa1ded61d294b114942f11e711b331dcf">CCC_Result</a> : uint8_t</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -563,57 +648,30 @@ Data Structures</h2></td></tr>
 <p>A result of actions on containers. </p>
 <p>A result indicates the status of the requested operation. Each container provides status messages according to the result type returned from a operation that uses this type. </p>
 <table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a51d6f078a83d667aff5016609d9146efafbd97cad5eb71401d7341ce5039ceb55" name="a51d6f078a83d667aff5016609d9146efafbd97cad5eb71401d7341ce5039ceb55"></a>CCC_RESULT_OK&#160;</td><td class="fielddoc"><p>The operation has occurred successfully. </p>
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="aa1ded61d294b114942f11e711b331dcfafbd97cad5eb71401d7341ce5039ceb55" name="aa1ded61d294b114942f11e711b331dcfafbd97cad5eb71401d7341ce5039ceb55"></a>CCC_RESULT_OK&#160;</td><td class="fielddoc"><p>The operation has occurred successfully. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a51d6f078a83d667aff5016609d9146efadf254e921f5ceb57b494b0ab2205602e" name="a51d6f078a83d667aff5016609d9146efadf254e921f5ceb57b494b0ab2205602e"></a>CCC_RESULT_FAIL&#160;</td><td class="fielddoc"><p>An operation ran but could not return the intended result. </p>
+<tr><td class="fieldname"><a id="aa1ded61d294b114942f11e711b331dcfadf254e921f5ceb57b494b0ab2205602e" name="aa1ded61d294b114942f11e711b331dcfadf254e921f5ceb57b494b0ab2205602e"></a>CCC_RESULT_FAIL&#160;</td><td class="fielddoc"><p>An operation ran but could not return the intended result. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a51d6f078a83d667aff5016609d9146efaffee78d55817c7a0d5106e55ab66107f" name="a51d6f078a83d667aff5016609d9146efaffee78d55817c7a0d5106e55ab66107f"></a>CCC_RESULT_NO_ALLOC&#160;</td><td class="fielddoc"><p>Memory is needed but the container lacks allocation permission. </p>
+<tr><td class="fieldname"><a id="aa1ded61d294b114942f11e711b331dcfa76b87337f134fe096efe23877e49ba27" name="aa1ded61d294b114942f11e711b331dcfa76b87337f134fe096efe23877e49ba27"></a>CCC_RESULT_NO_ALLOCATION_FUNCTION&#160;</td><td class="fielddoc"><p>Memory is needed but the container lacks allocation permission. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a51d6f078a83d667aff5016609d9146efa162b1930618f98fd111ae5a46ddb6b29" name="a51d6f078a83d667aff5016609d9146efa162b1930618f98fd111ae5a46ddb6b29"></a>CCC_RESULT_MEM_ERROR&#160;</td><td class="fielddoc"><p>The container has allocation permission, but allocation failed. </p>
+<tr><td class="fieldname"><a id="aa1ded61d294b114942f11e711b331dcfad516e7c24e7cd96c84dc1d171ac7dfde" name="aa1ded61d294b114942f11e711b331dcfad516e7c24e7cd96c84dc1d171ac7dfde"></a>CCC_RESULT_ALLOCATOR_ERROR&#160;</td><td class="fielddoc"><p>The container has allocation permission, but allocation failed. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a51d6f078a83d667aff5016609d9146efa0b3ff9dd93c87ee61e2202f76d1c2ec3" name="a51d6f078a83d667aff5016609d9146efa0b3ff9dd93c87ee61e2202f76d1c2ec3"></a>CCC_RESULT_ARG_ERROR&#160;</td><td class="fielddoc"><p>Bad arguments have been provided and operation returned early. </p>
+<tr><td class="fieldname"><a id="aa1ded61d294b114942f11e711b331dcfaa7106eeabd1f0748483c9f7a1503526e" name="aa1ded61d294b114942f11e711b331dcfaa7106eeabd1f0748483c9f7a1503526e"></a>CCC_RESULT_ARGUMENT_ERROR&#160;</td><td class="fielddoc"><p>Bad arguments have been provided and operation returned early. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a51d6f078a83d667aff5016609d9146efaf7846fca6ae33199da92335f1d523eb8" name="a51d6f078a83d667aff5016609d9146efaf7846fca6ae33199da92335f1d523eb8"></a>CCC_RESULT_COUNT&#160;</td><td class="fielddoc"><p>Internal helper, never returned to user. Always last result. </p>
-</td></tr>
-</table>
-
-</div>
-</div>
-<a id="afa7f5d9756840807860490d28e345955" name="afa7f5d9756840807860490d28e345955"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afa7f5d9756840807860490d28e345955">&#9670;&#160;</a></span>ccc_threeway_cmp</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">enum <a class="el" href="types_8h.html#afa7f5d9756840807860490d28e345955">ccc_threeway_cmp</a> : int8_t</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>A three-way comparison for comparison functions. </p>
-<p>A C style three way comparison value (e.g. ((a &gt; b) - (a &lt; b))). CCC_LES if left hand side is less than right hand side, CCC_EQL if they are equal, and CCC_GRT if left hand side is greater than right hand side. </p>
-<table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="afa7f5d9756840807860490d28e345955a813ea7b9e526748af7efa9a83da12ee8" name="afa7f5d9756840807860490d28e345955a813ea7b9e526748af7efa9a83da12ee8"></a>CCC_LES&#160;</td><td class="fielddoc"><p>The left hand side is less than the right hand side. </p>
-</td></tr>
-<tr><td class="fieldname"><a id="afa7f5d9756840807860490d28e345955a0ab42c7e0b59a46006cbb959269db825" name="afa7f5d9756840807860490d28e345955a0ab42c7e0b59a46006cbb959269db825"></a>CCC_EQL&#160;</td><td class="fielddoc"><p>The left hand side and right hand side are equal. </p>
-</td></tr>
-<tr><td class="fieldname"><a id="afa7f5d9756840807860490d28e345955a60a4aec1f589eaad4a9e922d90501dce" name="afa7f5d9756840807860490d28e345955a60a4aec1f589eaad4a9e922d90501dce"></a>CCC_GRT&#160;</td><td class="fielddoc"><p>The left hand side is greater than the right hand side. </p>
-</td></tr>
-<tr><td class="fieldname"><a id="afa7f5d9756840807860490d28e345955aeb06615eaca93d73f4086fed1fcd524c" name="afa7f5d9756840807860490d28e345955aeb06615eaca93d73f4086fed1fcd524c"></a>CCC_CMP_ERROR&#160;</td><td class="fielddoc"><p>Comparison is not possible or other error has occurred. </p>
+<tr><td class="fieldname"><a id="aa1ded61d294b114942f11e711b331dcfa19f4f2e1db88e5b8cba4b6140724e40b" name="aa1ded61d294b114942f11e711b331dcfa19f4f2e1db88e5b8cba4b6140724e40b"></a>CCC_PRIVATE_RESULT_COUNT&#160;</td><td class="fielddoc"><p>Internal helper, never returned to user. Always last result. </p>
 </td></tr>
 </table>
 
 </div>
 </div>
-<a id="a80a7915df3bc36e01a3a0775eebc0938" name="a80a7915df3bc36e01a3a0775eebc0938"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a80a7915df3bc36e01a3a0775eebc0938">&#9670;&#160;</a></span>ccc_tribool</h2>
+<a id="a8dbb03cfc2070934832841f50f146bcd" name="a8dbb03cfc2070934832841f50f146bcd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8dbb03cfc2070934832841f50f146bcd">&#9670;&#160;</a></span>CCC_Tribool</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">enum <a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> : int8_t</td>
+          <td class="memname">enum <a class="el" href="types_8h.html#a8dbb03cfc2070934832841f50f146bcd">CCC_Tribool</a> : int8_t</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -622,84 +680,140 @@ Data Structures</h2></td></tr>
 <p>Some containers conceptually take or return a boolean value as part of their operations. However, booleans cannot indicate errors and this library offers no errno or C++ throw-like behavior. Therefore, a three state value can offer additional information while still maintaining the truthy and falsey bool behavior one would normally expect.</p>
 <p>A third branch can be added while otherwise using simple true(1) and false(0). <code>if (result == CCC_TRIBOOL_ERROR) {} else if (result) {} else {}</code>. </p>
 <table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a80a7915df3bc36e01a3a0775eebc0938a0623aa032ce1d7c2a903cbda6cd39187" name="a80a7915df3bc36e01a3a0775eebc0938a0623aa032ce1d7c2a903cbda6cd39187"></a>CCC_TRIBOOL_ERROR&#160;</td><td class="fielddoc"><p>Intended value if CCC_FALSE or CCC_TRUE could not be returned. </p>
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a8dbb03cfc2070934832841f50f146bcda0623aa032ce1d7c2a903cbda6cd39187" name="a8dbb03cfc2070934832841f50f146bcda0623aa032ce1d7c2a903cbda6cd39187"></a>CCC_TRIBOOL_ERROR&#160;</td><td class="fielddoc"><p>Intended value if CCC_FALSE or CCC_TRUE could not be returned. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a80a7915df3bc36e01a3a0775eebc0938ae6c212c69cef1332b6d31d4783fb0110" name="a80a7915df3bc36e01a3a0775eebc0938ae6c212c69cef1332b6d31d4783fb0110"></a>CCC_FALSE&#160;</td><td class="fielddoc"><p>Equivalent to boolean false, guaranteed to be falsey aka 0. </p>
+<tr><td class="fieldname"><a id="a8dbb03cfc2070934832841f50f146bcdae6c212c69cef1332b6d31d4783fb0110" name="a8dbb03cfc2070934832841f50f146bcdae6c212c69cef1332b6d31d4783fb0110"></a>CCC_FALSE&#160;</td><td class="fielddoc"><p>Equivalent to boolean false, guaranteed to be falsey aka 0. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a80a7915df3bc36e01a3a0775eebc0938a1340aa280a5752742fd74e8458f8d9b5" name="a80a7915df3bc36e01a3a0775eebc0938a1340aa280a5752742fd74e8458f8d9b5"></a>CCC_TRUE&#160;</td><td class="fielddoc"><p>Equivalent to boolean true, guaranteed to be truthy aka 1. </p>
+<tr><td class="fieldname"><a id="a8dbb03cfc2070934832841f50f146bcda1340aa280a5752742fd74e8458f8d9b5" name="a8dbb03cfc2070934832841f50f146bcda1340aa280a5752742fd74e8458f8d9b5"></a>CCC_TRUE&#160;</td><td class="fielddoc"><p>Equivalent to boolean true, guaranteed to be truthy aka 1. </p>
 </td></tr>
 </table>
 
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="a50bc0d800c2f2ae79c217e999b47f23a" name="a50bc0d800c2f2ae79c217e999b47f23a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a50bc0d800c2f2ae79c217e999b47f23a">&#9670;&#160;</a></span>ccc_begin_range()</h2>
+<a id="a4318e3005ebc397c7f93eb2e20578856" name="a4318e3005ebc397c7f93eb2e20578856"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4318e3005ebc397c7f93eb2e20578856">&#9670;&#160;</a></span>CCC_array_range_begin()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void * ccc_begin_range </td>
+          <td class="memname"><a class="el" href="types_8h.html#a4043390f03f4ec5162e3782152360be9">CCC_Handle_index</a> CCC_array_range_begin </td>
           <td>(</td>
-          <td class="paramtype">ccc_range const *&#160;</td>
-          <td class="paramname"><em>r</em></td><td>)</td>
+          <td class="paramtype"><a class="el" href="structCCC__Handle__range.html">CCC_Handle_range</a> const *&#160;</td>
+          <td class="paramname"><em>range</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Obtain a reference to the beginning user element stored in a container in the provided range. </p>
+<p>Obtain a handle to the beginning user element stored in a container in the provided range. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">r</td><td>a pointer to the range. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">range</td><td>a pointer to the range. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>a reference to the user type stored in the container that serves as the beginning of the range.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>a handle to the user type stored in the container that serves as the beginning of the range.</dd></dl>
 <p>Note the beginning of a range may be equivalent to the end or NULL. </p>
 
 </div>
 </div>
-<a id="a93883873561b893b366cc8a68e5bcba1" name="a93883873561b893b366cc8a68e5bcba1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a93883873561b893b366cc8a68e5bcba1">&#9670;&#160;</a></span>ccc_end_range()</h2>
+<a id="a5a386215091f8855dcf5942acc832191" name="a5a386215091f8855dcf5942acc832191"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5a386215091f8855dcf5942acc832191">&#9670;&#160;</a></span>CCC_array_range_end()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void * ccc_end_range </td>
+          <td class="memname"><a class="el" href="types_8h.html#a4043390f03f4ec5162e3782152360be9">CCC_Handle_index</a> CCC_array_range_end </td>
           <td>(</td>
-          <td class="paramtype">ccc_range const *&#160;</td>
-          <td class="paramname"><em>r</em></td><td>)</td>
+          <td class="paramtype"><a class="el" href="structCCC__Handle__range.html">CCC_Handle_range</a> const *&#160;</td>
+          <td class="paramname"><em>range</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Obtain a reference to the end user element stored in a container in the provided range. </p>
+<p>Obtain a handle to the end user element stored in a container in the provided range. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">r</td><td>a pointer to the range. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">range</td><td>a pointer to the range. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>a reference to the user type stored in the container that serves as the end of the range.</dd></dl>
-<p>Note the end of a range may be equivalent to the beginning or NULL. Functions that obtain ranges treat the end as an exclusive bound and therefore it is undefined to access this element. </p>
+<dl class="section return"><dt>Returns</dt><dd>a handle to the user type stored in the container that serves as the end of the range.</dd></dl>
+<p>Note the end of a range may be equivalent to the beginning or 0. Functions that obtain ranges treat the end as an exclusive bound and therefore it is undefined to access this element. </p>
 
 </div>
 </div>
-<a id="a7f54efc6d8b0301249ce2ff62714a439" name="a7f54efc6d8b0301249ce2ff62714a439"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7f54efc6d8b0301249ce2ff62714a439">&#9670;&#160;</a></span>ccc_entry_input_error()</h2>
+<a id="a0c9634e178e944438e96ed952f1a4dcb" name="a0c9634e178e944438e96ed952f1a4dcb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0c9634e178e944438e96ed952f1a4dcb">&#9670;&#160;</a></span>CCC_array_range_reverse_begin()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> ccc_entry_input_error </td>
+          <td class="memname"><a class="el" href="types_8h.html#a4043390f03f4ec5162e3782152360be9">CCC_Handle_index</a> CCC_array_range_reverse_begin </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="traits_8h.html#aa6dc7577080398fd18623d2c6a464723">ccc_entry</a> const *&#160;</td>
-          <td class="paramname"><em>e</em></td><td>)</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#aa24094a0fb5618980a629b4accdd37d7">CCC_Handle_range_reverse</a> const *&#160;</td>
+          <td class="paramname"><em>range</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Obtain a handle to the reverse beginning user element stored in a container in the provided range. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">range</td><td>a pointer to the range. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>a handle to the user type stored in the container that serves as the reverse beginning of the range.</dd></dl>
+<p>Note the reverse beginning of a range may be equivalent to the reverse end or 0. </p>
+
+</div>
+</div>
+<a id="a14fb9b5fdb5c15f42a9ad9b4ab8ccf72" name="a14fb9b5fdb5c15f42a9ad9b4ab8ccf72"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a14fb9b5fdb5c15f42a9ad9b4ab8ccf72">&#9670;&#160;</a></span>CCC_array_range_reverse_end()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#a4043390f03f4ec5162e3782152360be9">CCC_Handle_index</a> CCC_array_range_reverse_end </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#aa24094a0fb5618980a629b4accdd37d7">CCC_Handle_range_reverse</a> const *&#160;</td>
+          <td class="paramname"><em>range</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Obtain a handle to the reverse end user element stored in a container in the provided range. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">range</td><td>a pointer to the range. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>a handle to the user type stored in the container that serves as the reverse end of the range.</dd></dl>
+<p>Note the reverse end of a range may be equivalent to the reverse beginning or 0. Functions that obtain ranges treat the reverse end as an exclusive bound and therefore it is undefined to access this element. </p>
+
+</div>
+</div>
+<a id="ac12ea6260a654de83fd78d2ef109a1e5" name="ac12ea6260a654de83fd78d2ef109a1e5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac12ea6260a654de83fd78d2ef109a1e5">&#9670;&#160;</a></span>CCC_entry_input_error()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#a8dbb03cfc2070934832841f50f146bcd">CCC_Tribool</a> CCC_entry_input_error </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structCCC__Entry.html">CCC_Entry</a> const *&#160;</td>
+          <td class="paramname"><em>entry</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -708,25 +822,25 @@ Data Structures</h2></td></tr>
 <p>Determine if an input error has occurred for a function that generates an entry. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">e</td><td>the pointer to the entry obtained from a container function. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">entry</td><td>the pointer to the entry obtained from a container function. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>true if an input error occurred usually meaning an invalid argument such as a NULL pointer was provided to a function. Error if e is NULL. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>true if an input error occurred usually meaning an invalid argument such as a NULL pointer was provided to a function. Error if entry is NULL. </dd></dl>
 
 </div>
 </div>
-<a id="ac36a4a4eb542c0ad14813b3c0b42b013" name="ac36a4a4eb542c0ad14813b3c0b42b013"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac36a4a4eb542c0ad14813b3c0b42b013">&#9670;&#160;</a></span>ccc_entry_insert_error()</h2>
+<a id="a2942bf33acff93506a7a2dabb8b8b338" name="a2942bf33acff93506a7a2dabb8b8b338"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2942bf33acff93506a7a2dabb8b8b338">&#9670;&#160;</a></span>CCC_entry_insert_error()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> ccc_entry_insert_error </td>
+          <td class="memname"><a class="el" href="types_8h.html#a8dbb03cfc2070934832841f50f146bcd">CCC_Tribool</a> CCC_entry_insert_error </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="traits_8h.html#aa6dc7577080398fd18623d2c6a464723">ccc_entry</a> const *&#160;</td>
-          <td class="paramname"><em>e</em></td><td>)</td>
+          <td class="paramtype"><a class="el" href="structCCC__Entry.html">CCC_Entry</a> const *&#160;</td>
+          <td class="paramname"><em>entry</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -735,25 +849,25 @@ Data Structures</h2></td></tr>
 <p>Determine if an insertion error has occurred when a function that attempts to insert a value in a container is used. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">e</td><td>the pointer to the entry obtained from a container insert. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">entry</td><td>the pointer to the entry obtained from a container insert. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>true if an insertion error occurred usually meaning a insertion should have occurred but the container did not have permission to allocate new memory or allocation failed. Error if e is NULL. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>true if an insertion error occurred usually meaning a insertion should have occurred but the container did not have permission to allocate new memory or allocation failed. Error if entry is NULL. </dd></dl>
 
 </div>
 </div>
-<a id="a0f097a692aef02acd9f71a70dee77ec7" name="a0f097a692aef02acd9f71a70dee77ec7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0f097a692aef02acd9f71a70dee77ec7">&#9670;&#160;</a></span>ccc_entry_occupied()</h2>
+<a id="a3a76d47b85a73b3dbd4cb05587b44026" name="a3a76d47b85a73b3dbd4cb05587b44026"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3a76d47b85a73b3dbd4cb05587b44026">&#9670;&#160;</a></span>CCC_entry_occupied()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> ccc_entry_occupied </td>
+          <td class="memname"><a class="el" href="types_8h.html#a8dbb03cfc2070934832841f50f146bcd">CCC_Tribool</a> CCC_entry_occupied </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="traits_8h.html#aa6dc7577080398fd18623d2c6a464723">ccc_entry</a> const *&#160;</td>
-          <td class="paramname"><em>e</em></td><td>)</td>
+          <td class="paramtype"><a class="el" href="structCCC__Entry.html">CCC_Entry</a> const *&#160;</td>
+          <td class="paramname"><em>entry</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -762,24 +876,24 @@ Data Structures</h2></td></tr>
 <p>Determine if an entry is Occupied in the container. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">e</td><td>the pointer to the entry obtained from a container. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">entry</td><td>the pointer to the entry obtained from a container. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>true if Occupied false if Vacant. Error if e is NULL. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>true if Occupied false if Vacant. Error if entry is NULL. </dd></dl>
 
 </div>
 </div>
-<a id="aafe7ba3aee377815856ab5581e0eac0e" name="aafe7ba3aee377815856ab5581e0eac0e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aafe7ba3aee377815856ab5581e0eac0e">&#9670;&#160;</a></span>ccc_entry_status_msg()</h2>
+<a id="ad07b2e77418d28789f9eb6723d2b59b7" name="ad07b2e77418d28789f9eb6723d2b59b7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad07b2e77418d28789f9eb6723d2b59b7">&#9670;&#160;</a></span>CCC_entry_status_message()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">char const  * ccc_entry_status_msg </td>
+          <td class="memname">char const  * CCC_entry_status_message </td>
           <td>(</td>
-          <td class="paramtype">ccc_entry_status&#160;</td>
+          <td class="paramtype">CCC_Entry_status&#160;</td>
           <td class="paramname"><em>status</em></td><td>)</td>
           <td></td>
         </tr>
@@ -798,17 +912,17 @@ Data Structures</h2></td></tr>
 
 </div>
 </div>
-<a id="a013507ec0883722ec0d986ce1f51ee37" name="a013507ec0883722ec0d986ce1f51ee37"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a013507ec0883722ec0d986ce1f51ee37">&#9670;&#160;</a></span>ccc_entry_unwrap()</h2>
+<a id="a401e588d0fa4f1fcbd6a2f4ec233dc6a" name="a401e588d0fa4f1fcbd6a2f4ec233dc6a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a401e588d0fa4f1fcbd6a2f4ec233dc6a">&#9670;&#160;</a></span>CCC_entry_unwrap()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void * ccc_entry_unwrap </td>
+          <td class="memname">void * CCC_entry_unwrap </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="traits_8h.html#aa6dc7577080398fd18623d2c6a464723">ccc_entry</a> const *&#160;</td>
-          <td class="paramname"><em>e</em></td><td>)</td>
+          <td class="paramtype"><a class="el" href="structCCC__Entry.html">CCC_Entry</a> const *&#160;</td>
+          <td class="paramname"><em>entry</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -817,7 +931,7 @@ Data Structures</h2></td></tr>
 <p>Unwraps the provided entry providing a reference to the user type obtained from the operation that provides the entry. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">e</td><td>the pointer to the entry obtained from an operation. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">entry</td><td>the pointer to the entry obtained from an operation. </td></tr>
   </table>
   </dd>
 </dl>
@@ -826,17 +940,17 @@ Data Structures</h2></td></tr>
 
 </div>
 </div>
-<a id="ae903680190e65b29c45401e76e9fcf85" name="ae903680190e65b29c45401e76e9fcf85"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae903680190e65b29c45401e76e9fcf85">&#9670;&#160;</a></span>ccc_get_entry_status()</h2>
+<a id="a081723d0d40b19091479e191d9f950a8" name="a081723d0d40b19091479e191d9f950a8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a081723d0d40b19091479e191d9f950a8">&#9670;&#160;</a></span>CCC_get_entry_status()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">ccc_entry_status ccc_get_entry_status </td>
+          <td class="memname">CCC_Entry_status CCC_get_entry_status </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="traits_8h.html#aa6dc7577080398fd18623d2c6a464723">ccc_entry</a> const *&#160;</td>
-          <td class="paramname"><em>e</em></td><td>)</td>
+          <td class="paramtype"><a class="el" href="structCCC__Entry.html">CCC_Entry</a> const *&#160;</td>
+          <td class="paramname"><em>entry</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -845,25 +959,25 @@ Data Structures</h2></td></tr>
 <p>Obtain the entry status from a generic entry. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">e</td><td>a pointer to the entry. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">entry</td><td>a pointer to the entry. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the status stored in the entry after the required action on the container completes. If e is NULL an entry input error is returned so ensure e is non-NULL to avoid an inaccurate status returned. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the status stored in the entry after the required action on the container completes. If entry is NULL an entry input error is returned so ensure e is non-NULL to avoid an inaccurate status returned. </dd></dl>
 
 </div>
 </div>
-<a id="a56893d41182640164a9edfd27aed445f" name="a56893d41182640164a9edfd27aed445f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a56893d41182640164a9edfd27aed445f">&#9670;&#160;</a></span>ccc_get_handle_status()</h2>
+<a id="acf4813d40d5e048ac4f23ed91fd8b64a" name="acf4813d40d5e048ac4f23ed91fd8b64a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acf4813d40d5e048ac4f23ed91fd8b64a">&#9670;&#160;</a></span>CCC_get_handle_status()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a4f5026f76fa43fe2d3e421467562f946">ccc_handle_status</a> ccc_get_handle_status </td>
+          <td class="memname"><a class="el" href="types_8h.html#a282e45f45cb2493ec1709942eb5d958d">CCC_Handle_status</a> CCC_get_handle_status </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="traits_8h.html#ac028e04a12f65503490708cd1f5d69ba">ccc_handle</a> const *&#160;</td>
-          <td class="paramname"><em>e</em></td><td>)</td>
+          <td class="paramtype"><a class="el" href="structCCC__Handle.html">CCC_Handle</a> const *&#160;</td>
+          <td class="paramname"><em>handle</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -872,25 +986,25 @@ Data Structures</h2></td></tr>
 <p>Obtain the handle status from a generic handle. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">e</td><td>a pointer to the handle. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">handle</td><td>a pointer to the handle. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the status stored in the handle after the required action on the container completes. If e is NULL an handle input error is returned so ensure e is non-NULL to avoid an inaccurate status returned. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the status stored in the handle after the required action on the container completes. If handle is NULL an handle input error is returned so ensure e is non-NULL to avoid an inaccurate status returned. </dd></dl>
 
 </div>
 </div>
-<a id="a44a8e92eafb1e9f3e1b10827ccd89a36" name="a44a8e92eafb1e9f3e1b10827ccd89a36"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a44a8e92eafb1e9f3e1b10827ccd89a36">&#9670;&#160;</a></span>ccc_handle_input_error()</h2>
+<a id="ac15860a8a629f656a1b835450385fe54" name="ac15860a8a629f656a1b835450385fe54"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac15860a8a629f656a1b835450385fe54">&#9670;&#160;</a></span>CCC_handle_input_error()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> ccc_handle_input_error </td>
+          <td class="memname"><a class="el" href="types_8h.html#a8dbb03cfc2070934832841f50f146bcd">CCC_Tribool</a> CCC_handle_input_error </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="traits_8h.html#ac028e04a12f65503490708cd1f5d69ba">ccc_handle</a> const *&#160;</td>
-          <td class="paramname"><em>e</em></td><td>)</td>
+          <td class="paramtype"><a class="el" href="structCCC__Handle.html">CCC_Handle</a> const *&#160;</td>
+          <td class="paramname"><em>handle</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -899,25 +1013,25 @@ Data Structures</h2></td></tr>
 <p>Determine if an input error has occurred for a function that generates an handle. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">e</td><td>the pointer to the handle obtained from a container function. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">handle</td><td>the pointer to the handle obtained from a container function. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>true if an input error occurred usually meaning an invalid argument such as a NULL pointer was provided to a function. Error if e is NULL. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>true if an input error occurred usually meaning an invalid argument such as a NULL pointer was provided to a function. Error if handle is NULL. </dd></dl>
 
 </div>
 </div>
-<a id="a290f67e0bfc5e1ea0df7c533a2e0665f" name="a290f67e0bfc5e1ea0df7c533a2e0665f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a290f67e0bfc5e1ea0df7c533a2e0665f">&#9670;&#160;</a></span>ccc_handle_insert_error()</h2>
+<a id="a804ff6745c321da3f09b850e19a402eb" name="a804ff6745c321da3f09b850e19a402eb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a804ff6745c321da3f09b850e19a402eb">&#9670;&#160;</a></span>CCC_handle_insert_error()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> ccc_handle_insert_error </td>
+          <td class="memname"><a class="el" href="types_8h.html#a8dbb03cfc2070934832841f50f146bcd">CCC_Tribool</a> CCC_handle_insert_error </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="traits_8h.html#ac028e04a12f65503490708cd1f5d69ba">ccc_handle</a> const *&#160;</td>
-          <td class="paramname"><em>e</em></td><td>)</td>
+          <td class="paramtype"><a class="el" href="structCCC__Handle.html">CCC_Handle</a> const *&#160;</td>
+          <td class="paramname"><em>handle</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -926,25 +1040,25 @@ Data Structures</h2></td></tr>
 <p>Determine if an insertion error has occurred when a function that attempts to insert a value in a container is used. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">e</td><td>the pointer to the handle obtained from a container insert. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">handle</td><td>the pointer to the handle obtained from a container insert. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>true if an insertion error occurred usually meaning a insertion should have occurred but the container did not have permission to allocate new memory or allocation failed. Error if e is NULL. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>true if an insertion error occurred usually meaning a insertion should have occurred but the container did not have permission to allocate new memory or allocation failed. Error if handle is NULL. </dd></dl>
 
 </div>
 </div>
-<a id="ad333a89e65d8cd738a79b24831b3406d" name="ad333a89e65d8cd738a79b24831b3406d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad333a89e65d8cd738a79b24831b3406d">&#9670;&#160;</a></span>ccc_handle_occupied()</h2>
+<a id="a4ff222dfc20880817d8d8733536bd225" name="a4ff222dfc20880817d8d8733536bd225"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4ff222dfc20880817d8d8733536bd225">&#9670;&#160;</a></span>CCC_handle_occupied()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> ccc_handle_occupied </td>
+          <td class="memname"><a class="el" href="types_8h.html#a8dbb03cfc2070934832841f50f146bcd">CCC_Tribool</a> CCC_handle_occupied </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="traits_8h.html#ac028e04a12f65503490708cd1f5d69ba">ccc_handle</a> const *&#160;</td>
-          <td class="paramname"><em>e</em></td><td>)</td>
+          <td class="paramtype"><a class="el" href="structCCC__Handle.html">CCC_Handle</a> const *&#160;</td>
+          <td class="paramname"><em>handle</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -953,24 +1067,24 @@ Data Structures</h2></td></tr>
 <p>Determine if an handle is Occupied in the container. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">e</td><td>the pointer to the handle obtained from a container. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">handle</td><td>the pointer to the handle obtained from a container. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>true if Occupied false if Vacant. Error if e is NULL. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>true if Occupied false if Vacant. Error if handle is NULL. </dd></dl>
 
 </div>
 </div>
-<a id="abc4f535e3a5cf5430bcea909c81af8f0" name="abc4f535e3a5cf5430bcea909c81af8f0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abc4f535e3a5cf5430bcea909c81af8f0">&#9670;&#160;</a></span>ccc_handle_status_msg()</h2>
+<a id="af6a83e001fc3b4308832db6da69d8277" name="af6a83e001fc3b4308832db6da69d8277"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af6a83e001fc3b4308832db6da69d8277">&#9670;&#160;</a></span>CCC_handle_status_message()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">char const  * ccc_handle_status_msg </td>
+          <td class="memname">char const  * CCC_handle_status_message </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="types_8h.html#a4f5026f76fa43fe2d3e421467562f946">ccc_handle_status</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a282e45f45cb2493ec1709942eb5d958d">CCC_Handle_status</a>&#160;</td>
           <td class="paramname"><em>status</em></td><td>)</td>
           <td></td>
         </tr>
@@ -989,17 +1103,17 @@ Data Structures</h2></td></tr>
 
 </div>
 </div>
-<a id="a65515660962ba0e6e82a63a8b80eade9" name="a65515660962ba0e6e82a63a8b80eade9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a65515660962ba0e6e82a63a8b80eade9">&#9670;&#160;</a></span>ccc_handle_unwrap()</h2>
+<a id="a4e0d7df346b7077fbf7be73e3f77e5b9" name="a4e0d7df346b7077fbf7be73e3f77e5b9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4e0d7df346b7077fbf7be73e3f77e5b9">&#9670;&#160;</a></span>CCC_handle_unwrap()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a39d707127c6bb25cb76587203582743c">ccc_handle_i</a> ccc_handle_unwrap </td>
+          <td class="memname"><a class="el" href="types_8h.html#a4043390f03f4ec5162e3782152360be9">CCC_Handle_index</a> CCC_handle_unwrap </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="traits_8h.html#ac028e04a12f65503490708cd1f5d69ba">ccc_handle</a> const *&#160;</td>
-          <td class="paramname"><em>e</em></td><td>)</td>
+          <td class="paramtype"><a class="el" href="structCCC__Handle.html">CCC_Handle</a> const *&#160;</td>
+          <td class="paramname"><em>handle</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -1008,7 +1122,7 @@ Data Structures</h2></td></tr>
 <p>Unwraps the provided handle providing a reference to the user type obtained from the operation that provides the handle. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">e</td><td>the pointer to the handle obtained from an operation. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">handle</td><td>the pointer to the handle obtained from an operation. </td></tr>
   </table>
   </dd>
 </dl>
@@ -1017,17 +1131,73 @@ Data Structures</h2></td></tr>
 
 </div>
 </div>
-<a id="ae9efbe3d5a2e7066add960fc334dab30" name="ae9efbe3d5a2e7066add960fc334dab30"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae9efbe3d5a2e7066add960fc334dab30">&#9670;&#160;</a></span>ccc_rbegin_rrange()</h2>
+<a id="aa54018033f64657b6022cbc294b6fffe" name="aa54018033f64657b6022cbc294b6fffe"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa54018033f64657b6022cbc294b6fffe">&#9670;&#160;</a></span>CCC_range_begin()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void * ccc_rbegin_rrange </td>
+          <td class="memname">void * CCC_range_begin </td>
           <td>(</td>
-          <td class="paramtype">ccc_rrange const *&#160;</td>
-          <td class="paramname"><em>r</em></td><td>)</td>
+          <td class="paramtype"><a class="el" href="structCCC__Range.html">CCC_Range</a> const *&#160;</td>
+          <td class="paramname"><em>range</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Obtain a reference to the beginning user element stored in a container in the provided range. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">range</td><td>a pointer to the range. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>a reference to the user type stored in the container that serves as the beginning of the range.</dd></dl>
+<p>Note the beginning of a range may be equivalent to the end or NULL. </p>
+
+</div>
+</div>
+<a id="ab953ca9399e1d32ac03dd9064c5104b8" name="ab953ca9399e1d32ac03dd9064c5104b8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab953ca9399e1d32ac03dd9064c5104b8">&#9670;&#160;</a></span>CCC_range_end()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void * CCC_range_end </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structCCC__Range.html">CCC_Range</a> const *&#160;</td>
+          <td class="paramname"><em>range</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Obtain a reference to the end user element stored in a container in the provided range. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">range</td><td>a pointer to the range. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>a reference to the user type stored in the container that serves as the end of the range.</dd></dl>
+<p>Note the end of a range may be equivalent to the beginning or NULL. Functions that obtain ranges treat the end as an exclusive bound and therefore it is undefined to access this element. </p>
+
+</div>
+</div>
+<a id="ac2fe62d569f3d0d3e2929802e6b330ba" name="ac2fe62d569f3d0d3e2929802e6b330ba"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac2fe62d569f3d0d3e2929802e6b330ba">&#9670;&#160;</a></span>CCC_range_reverse_begin()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void * CCC_range_reverse_begin </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a87bdc16619e9a0f9585a8102846c20a8">CCC_Range_reverse</a> const *&#160;</td>
+          <td class="paramname"><em>range</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -1036,7 +1206,7 @@ Data Structures</h2></td></tr>
 <p>Obtain a reference to the reverse beginning user element stored in a container in the provided range. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">r</td><td>a pointer to the range. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">range</td><td>a pointer to the range. </td></tr>
   </table>
   </dd>
 </dl>
@@ -1045,17 +1215,17 @@ Data Structures</h2></td></tr>
 
 </div>
 </div>
-<a id="a91dfac06c009f98de694c2d9fecfa36b" name="a91dfac06c009f98de694c2d9fecfa36b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a91dfac06c009f98de694c2d9fecfa36b">&#9670;&#160;</a></span>ccc_rend_rrange()</h2>
+<a id="aa9efe2b995437dd964564b3df7a01e1f" name="aa9efe2b995437dd964564b3df7a01e1f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa9efe2b995437dd964564b3df7a01e1f">&#9670;&#160;</a></span>CCC_range_reverse_end()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void * ccc_rend_rrange </td>
+          <td class="memname">void * CCC_range_reverse_end </td>
           <td>(</td>
-          <td class="paramtype">ccc_rrange const *&#160;</td>
-          <td class="paramname"><em>r</em></td><td>)</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a87bdc16619e9a0f9585a8102846c20a8">CCC_Range_reverse</a> const *&#160;</td>
+          <td class="paramname"><em>range</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -1064,7 +1234,7 @@ Data Structures</h2></td></tr>
 <p>Obtain a reference to the reverse end user element stored in a container in the provided range. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">r</td><td>a pointer to the range. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">range</td><td>a pointer to the range. </td></tr>
   </table>
   </dd>
 </dl>
@@ -1073,17 +1243,17 @@ Data Structures</h2></td></tr>
 
 </div>
 </div>
-<a id="a0e9964d90c381797ba6ce9d76ad1f63a" name="a0e9964d90c381797ba6ce9d76ad1f63a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0e9964d90c381797ba6ce9d76ad1f63a">&#9670;&#160;</a></span>ccc_result_msg()</h2>
+<a id="a1794bc34275723fd4bef32724a878179" name="a1794bc34275723fd4bef32724a878179"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1794bc34275723fd4bef32724a878179">&#9670;&#160;</a></span>CCC_result_message()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">char const  * ccc_result_msg </td>
+          <td class="memname">char const  * CCC_result_message </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td>
-          <td class="paramname"><em>res</em></td><td>)</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#aa1ded61d294b114942f11e711b331dcf">CCC_Result</a>&#160;</td>
+          <td class="paramname"><em>result</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -1092,7 +1262,7 @@ Data Structures</h2></td></tr>
 <p>Obtain a string message with a description of the error returned from a container operation, possible causes, and possible fixes to such error. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">res</td><td>the result obtained from a container operation. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">result</td><td>the result obtained from a container operation. </td></tr>
   </table>
   </dd>
 </dl>

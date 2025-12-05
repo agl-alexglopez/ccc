@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['ccc_5fresult_0',['ccc_result',['../types_8h.html#a51d6f078a83d667aff5016609d9146ef',1,'types.h']]],
-  ['ccc_5fthreeway_5fcmp_1',['ccc_threeway_cmp',['../types_8h.html#afa7f5d9756840807860490d28e345955',1,'types.h']]],
-  ['ccc_5ftribool_2',['ccc_tribool',['../types_8h.html#a80a7915df3bc36e01a3a0775eebc0938',1,'types.h']]]
+  ['ccc_5forder_0',['CCC_Order',['../types_8h.html#a5e471ae63519e1044855e361826fc355',1,'types.h']]],
+  ['ccc_5fresult_1',['CCC_Result',['../types_8h.html#aa1ded61d294b114942f11e711b331dcf',1,'types.h']]],
+  ['ccc_5ftribool_2',['CCC_Tribool',['../types_8h.html#a8dbb03cfc2070934832841f50f146bcd',1,'types.h']]]
 ];

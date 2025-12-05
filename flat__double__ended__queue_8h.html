@@ -96,19 +96,19 @@ $(document).ready(function(){initNavTree('flat__double__ended__queue_8h.html',''
 
 <p>The Flat Double Ended Queue Interface.  
 <a href="#details">More...</a></p>
-<div class="textblock"><code>#include &quot;impl/impl_flat_double_ended_queue.h&quot;</code><br />
+<div class="textblock"><code>#include &quot;private/private_flat_double_ended_queue.h&quot;</code><br />
 <code>#include &quot;<a class="el" href="types_8h_source.html">types.h</a>&quot;</code><br />
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for flat_double_ended_queue.h:</div>
 <div class="dyncontent">
 <div class="center"><img src="flat__double__ended__queue_8h__incl.png" border="0" usemap="#accc_2flat__double__ended__queue_8h" alt=""/></div>
 <map name="accc_2flat__double__ended__queue_8h" id="accc_2flat__double__ended__queue_8h">
-<area shape="rect" title="The Flat Double Ended Queue Interface." alt="" coords="91,5,257,45"/>
-<area shape="rect" href="impl__flat__double__ended__queue_8h_source.html" title=" " alt="" coords="34,93,197,133"/>
-<area shape="rect" href="types_8h.html" title="The C Container Collection Fundamental Types." alt="" coords="142,328,225,353"/>
-<area shape="rect" href="buffer_8h.html" title="The Buffer Interface." alt="" coords="74,181,157,207"/>
-<area shape="rect" href="impl__buffer_8h_source.html" title=" " alt="" coords="5,255,145,280"/>
-<area shape="rect" href="impl__types_8h_source.html" title=" " alt="" coords="114,401,253,427"/>
+<area shape="rect" title="The Flat Double Ended Queue Interface." alt="" coords="121,5,288,45"/>
+<area shape="rect" href="private__flat__double__ended__queue_8h_source.html" title=" " alt="" coords="53,93,231,133"/>
+<area shape="rect" href="types_8h.html" title="The C Container Collection Fundamental Types." alt="" coords="177,328,259,353"/>
+<area shape="rect" href="buffer_8h.html" title="The Buffer Interface." alt="" coords="101,181,183,207"/>
+<area shape="rect" href="private__buffer_8h_source.html" title=" " alt="" coords="5,255,180,280"/>
+<area shape="rect" href="private__types_8h_source.html" title=" " alt="" coords="131,401,305,427"/>
 </map>
 </div>
 </div><div class="textblock"><div class="dynheader">
@@ -117,143 +117,149 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="center"><img src="flat__double__ended__queue_8h__dep__incl.png" border="0" usemap="#accc_2flat__double__ended__queue_8hdep" alt=""/></div>
 <map name="accc_2flat__double__ended__queue_8hdep" id="accc_2flat__double__ended__queue_8hdep">
 <area shape="rect" title="The Flat Double Ended Queue Interface." alt="" coords="5,5,172,45"/>
-<area shape="rect" href="impl__traits_8h_source.html" title=" " alt="" coords="7,93,170,119"/>
-<area shape="rect" href="traits_8h.html" title="The C Container Collection Traits Interface." alt="" coords="42,167,135,192"/>
+<area shape="rect" href="private__traits_8h_source.html" title=" " alt="" coords="17,93,160,133"/>
+<area shape="rect" href="traits_8h.html" title="The C Container Collection Traits Interface." alt="" coords="42,181,135,207"/>
 </map>
 </div>
 </div>
 <p><a href="flat__double__ended__queue_8h_source.html">Go to the source code of this file.</a></p>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The Flat Double Ended Queue Interface. </p>
-<p>An FDEQ offers contiguous storage and random access, push, and pop in constant time. The contiguous nature of the buffer makes it well-suited to dynamic or fixed size contexts where a double ended queue is needed.</p>
-<p>If the container is initialized with allocation permission it will resize when needed but support constant time push and pop to the front and back when resizing is not required, resulting in amortized O(1) operations.</p>
-<p>If the FDEQ is initialized without allocation permission its behavior is equivalent to a Ring Buffer. This is somewhat unique in that it does not fail to insert elements when size is equal to capacity. This means that push front, push back, pop front, and pop back are O(1) operations. However, if any push exceeds capacity an element where the push should occur is overwritten.</p>
+<p>An double ended queue offers contiguous storage and random access, push, and pop in constant time. The contiguous nature of the container makes it well-suited to dynamic or fixed size contexts where a double ended queue is needed.</p>
+<p>If the container is initialized with allocation permission it will resize when needed but support constant time push and pop to the front and back when resizing is not required, resulting in amortized <code>O(1)</code> operations.</p>
+<p>If the double ended queue is initialized without allocation permission its behavior is equivalent to a Ring Buffer. This is somewhat unique in that it does not fail to insert elements when size is equal to capacity. This means that push front, push back, pop front, and pop back are <code>O(1)</code> operations. However, if any push exceeds capacity an element where the push should occur is overwritten.</p>
 <p>To shorten names in the interface, define the following preprocessor directive at the top of your file.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC</span></div>
-</div><!-- fragment --><p>All types and functions can then be written without the <code>ccc_</code> prefix. </p>
+</div><!-- fragment --><p>All types and functions can then be written without the <code>CCC_</code> prefix. </p>
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Initialization Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Initialize and create containers with memory, callbacks, and permissions. </p>
 </td></tr>
-<tr class="memitem:a84c654bbd98a261f5204764a8714335e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a84c654bbd98a261f5204764a8714335e">ccc_fdeq_init</a>(mem_ptr,  any_type_name,  alloc_fn,  aux_data,  capacity,  optional_size...)</td></tr>
-<tr class="memdesc:a84c654bbd98a261f5204764a8714335e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the fdeq with memory and allocation permission.  <br /></td></tr>
-<tr class="separator:a84c654bbd98a261f5204764a8714335e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a65978652c26e3d1878e343a5c618e300"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a65978652c26e3d1878e343a5c618e300">ccc_fdeq_copy</a> (<a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> *dst, <a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> const *src, <a class="el" href="types_8h.html#a3e73202894869d2840fb21ff912bbd96">ccc_any_alloc_fn</a> *fn)</td></tr>
-<tr class="memdesc:a65978652c26e3d1878e343a5c618e300"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy the fdeq from src to newly initialized dst.  <br /></td></tr>
-<tr class="separator:a65978652c26e3d1878e343a5c618e300"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a59fca02b8832c42a1490244f9d291379"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a59fca02b8832c42a1490244f9d291379">ccc_fdeq_reserve</a> (<a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> *fdeq, size_t to_add, <a class="el" href="types_8h.html#a3e73202894869d2840fb21ff912bbd96">ccc_any_alloc_fn</a> *fn)</td></tr>
-<tr class="memdesc:a59fca02b8832c42a1490244f9d291379"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reserves space for at least to_add more elements.  <br /></td></tr>
-<tr class="separator:a59fca02b8832c42a1490244f9d291379"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9dbaedc50b61db379f5926f50bcdb09c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a9dbaedc50b61db379f5926f50bcdb09c">CCC_flat_double_ended_queue_initialize</a>(data_pointer,  type_name,  allocate,  context_data,  capacity,  optional_size...)</td></tr>
+<tr class="memdesc:a9dbaedc50b61db379f5926f50bcdb09c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the queue with memory and allocation permission.  <br /></td></tr>
+<tr class="separator:a9dbaedc50b61db379f5926f50bcdb09c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa872dd1e7f6dadfc13045874c4d3c282"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#aa872dd1e7f6dadfc13045874c4d3c282">CCC_flat_double_ended_queue_from</a>( allocate,  context_data,  optional_capacity,  compound_literal_array...)</td></tr>
+<tr class="memdesc:aa872dd1e7f6dadfc13045874c4d3c282"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a Flat_double_ended_queue from a compound literal array initializer.  <br /></td></tr>
+<tr class="separator:aa872dd1e7f6dadfc13045874c4d3c282"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9593a537945bfd8e6e739966f45f5d74"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a9593a537945bfd8e6e739966f45f5d74">CCC_flat_double_ended_queue_with_capacity</a>(type_name,  allocate,  context_data,  capacity)</td></tr>
+<tr class="memdesc:a9593a537945bfd8e6e739966f45f5d74"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a Flat_double_ended_queue with a capacity.  <br /></td></tr>
+<tr class="separator:a9593a537945bfd8e6e739966f45f5d74"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3cafa28e32a320297d373b89ed657a94"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#aa1ded61d294b114942f11e711b331dcf">CCC_Result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a3cafa28e32a320297d373b89ed657a94">CCC_flat_double_ended_queue_copy</a> (<a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> *destination, <a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> const *source, <a class="el" href="types_8h.html#aac6280c471e14b9c0d50b1c5577394d3">CCC_Allocator</a> *allocate)</td></tr>
+<tr class="memdesc:a3cafa28e32a320297d373b89ed657a94"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy the queue from source to newly initialized destination.  <br /></td></tr>
+<tr class="separator:a3cafa28e32a320297d373b89ed657a94"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6a454ba349f4ca25fd1c81e4671148d2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#aa1ded61d294b114942f11e711b331dcf">CCC_Result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a6a454ba349f4ca25fd1c81e4671148d2">CCC_flat_double_ended_queue_reserve</a> (<a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> *queue, size_t to_add, <a class="el" href="types_8h.html#aac6280c471e14b9c0d50b1c5577394d3">CCC_Allocator</a> *allocate)</td></tr>
+<tr class="memdesc:a6a454ba349f4ca25fd1c81e4671148d2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reserves space for at least to_add more elements.  <br /></td></tr>
+<tr class="separator:a6a454ba349f4ca25fd1c81e4671148d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Insert and Remove Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Add or remove elements from the FDEQ. </p>
 </td></tr>
-<tr class="memitem:a9ee4b94addf503252a94ee32a438b5e0"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a9ee4b94addf503252a94ee32a438b5e0">ccc_fdeq_emplace_back</a>(fdeq_ptr,  value...)&#160;&#160;&#160;    ccc_impl_fdeq_emplace_back(fdeq_ptr, value)</td></tr>
-<tr class="memdesc:a9ee4b94addf503252a94ee32a438b5e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write an element directly to the back slot of the fdeq. O(1) if no allocation permission amortized O(1) if allocation permission is given and a resize is required.  <br /></td></tr>
-<tr class="separator:a9ee4b94addf503252a94ee32a438b5e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a82291c88d3a1153d9370d57334bd1a1e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a82291c88d3a1153d9370d57334bd1a1e">ccc_fdeq_emplace_front</a>(fdeq_ptr,  value...)&#160;&#160;&#160;    ccc_impl_fdeq_emplace_front(fdeq_ptr, value)</td></tr>
-<tr class="memdesc:a82291c88d3a1153d9370d57334bd1a1e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write an element directly to the front slot of the fdeq. O(1) if no allocation permission amortized O(1) if allocation permission is given and a resize is required.  <br /></td></tr>
-<tr class="separator:a82291c88d3a1153d9370d57334bd1a1e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa352727365879daa6510133a768cc628"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#aa352727365879daa6510133a768cc628">ccc_fdeq_push_back</a> (<a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> *fdeq, void const *elem)</td></tr>
-<tr class="memdesc:aa352727365879daa6510133a768cc628"><td class="mdescLeft">&#160;</td><td class="mdescRight">Push the user type to the back of the fdeq. O(1) if no allocation permission amortized O(1) if allocation permission is given and a resize is required.  <br /></td></tr>
-<tr class="separator:aa352727365879daa6510133a768cc628"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2d8c8988041f24a63d46defee8db29bd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a2d8c8988041f24a63d46defee8db29bd">ccc_fdeq_push_back_range</a> (<a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> *fdeq, size_t n, void const *elems)</td></tr>
-<tr class="memdesc:a2d8c8988041f24a63d46defee8db29bd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Push the range of user types to the back of the fdeq. O(N).  <br /></td></tr>
-<tr class="separator:a2d8c8988041f24a63d46defee8db29bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6e8aa8edc1a18d945b8bdd664709e7a2"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a6e8aa8edc1a18d945b8bdd664709e7a2">ccc_fdeq_push_front</a> (<a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> *fdeq, void const *elem)</td></tr>
-<tr class="memdesc:a6e8aa8edc1a18d945b8bdd664709e7a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Push the user type to the front of the fdeq. O(1) if no allocation permission amortized O(1) if allocation permission is given and a resize is required.  <br /></td></tr>
-<tr class="separator:a6e8aa8edc1a18d945b8bdd664709e7a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5d271eca7745f9da989409b337afb5b7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a5d271eca7745f9da989409b337afb5b7">ccc_fdeq_push_front_range</a> (<a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> *fdeq, size_t n, void const *elems)</td></tr>
-<tr class="memdesc:a5d271eca7745f9da989409b337afb5b7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Push the range of user types to the front of the fdeq. O(N).  <br /></td></tr>
-<tr class="separator:a5d271eca7745f9da989409b337afb5b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3637efae168143b1068575dbf07cec8f"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a3637efae168143b1068575dbf07cec8f">ccc_fdeq_insert_range</a> (<a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> *fdeq, void *pos, size_t n, void const *elems)</td></tr>
-<tr class="memdesc:a3637efae168143b1068575dbf07cec8f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Push the range of user types before pos of the fdeq. O(N).  <br /></td></tr>
-<tr class="separator:a3637efae168143b1068575dbf07cec8f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae1122093b9e142bbc81f56d09e2d5331"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#ae1122093b9e142bbc81f56d09e2d5331">ccc_fdeq_pop_front</a> (<a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> *fdeq)</td></tr>
-<tr class="memdesc:ae1122093b9e142bbc81f56d09e2d5331"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pop an element from the front of the fdeq. O(1).  <br /></td></tr>
-<tr class="separator:ae1122093b9e142bbc81f56d09e2d5331"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a60e38bd6dacaf6204fa8de34c7732789"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a60e38bd6dacaf6204fa8de34c7732789">ccc_fdeq_pop_back</a> (<a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> *fdeq)</td></tr>
-<tr class="memdesc:a60e38bd6dacaf6204fa8de34c7732789"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pop an element from the back of the fdeq. O(1).  <br /></td></tr>
-<tr class="separator:a60e38bd6dacaf6204fa8de34c7732789"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:addce401e8ff660ec3e506f645ddce33c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#addce401e8ff660ec3e506f645ddce33c">CCC_flat_double_ended_queue_emplace_back</a>( flat_double_ended_queue_pointer,  value...)</td></tr>
+<tr class="memdesc:addce401e8ff660ec3e506f645ddce33c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write an element directly to the back slot of the flat_double_ended_queue. O(1) if no allocation permission amortized O(1) if allocation permission is given and a resize is required.  <br /></td></tr>
+<tr class="separator:addce401e8ff660ec3e506f645ddce33c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5a9b16a7dbffd6c7ab8f490cc3f01f76"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a5a9b16a7dbffd6c7ab8f490cc3f01f76">CCC_flat_double_ended_queue_emplace_front</a>( flat_double_ended_queue_pointer,  value...)</td></tr>
+<tr class="memdesc:a5a9b16a7dbffd6c7ab8f490cc3f01f76"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write an element directly to the front slot of the flat_double_ended_queue. O(1) if no allocation permission amortized O(1) if allocation permission is given and a resize is required.  <br /></td></tr>
+<tr class="separator:a5a9b16a7dbffd6c7ab8f490cc3f01f76"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa40492b8abb99dc287a89818809d313d"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#aa40492b8abb99dc287a89818809d313d">CCC_flat_double_ended_queue_push_back</a> (<a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> *queue, void const *type)</td></tr>
+<tr class="memdesc:aa40492b8abb99dc287a89818809d313d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Push the user type to the back of the flat_double_ended_queue. O(1) if no allocation permission amortized O(1) if allocation permission is given and a resize is required.  <br /></td></tr>
+<tr class="separator:aa40492b8abb99dc287a89818809d313d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a20277e235f60691783a0a1b33d3c4c90"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#aa1ded61d294b114942f11e711b331dcf">CCC_Result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a20277e235f60691783a0a1b33d3c4c90">CCC_flat_double_ended_queue_push_back_range</a> (<a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> *queue, size_t count, void const *type_array)</td></tr>
+<tr class="memdesc:a20277e235f60691783a0a1b33d3c4c90"><td class="mdescLeft">&#160;</td><td class="mdescRight">Push the range of user types to the back of the flat_double_ended_queue. O(N).  <br /></td></tr>
+<tr class="separator:a20277e235f60691783a0a1b33d3c4c90"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac0ae7535583a79ba314dcb6ccb0365d8"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#ac0ae7535583a79ba314dcb6ccb0365d8">CCC_flat_double_ended_queue_push_front</a> (<a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> *queue, void const *type)</td></tr>
+<tr class="memdesc:ac0ae7535583a79ba314dcb6ccb0365d8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Push the user type to the front of the flat_double_ended_queue. O(1) if no allocation permission amortized O(1) if allocation permission is given and a resize is required.  <br /></td></tr>
+<tr class="separator:ac0ae7535583a79ba314dcb6ccb0365d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5eb9ab609b056e8d31fcd80383a56417"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#aa1ded61d294b114942f11e711b331dcf">CCC_Result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a5eb9ab609b056e8d31fcd80383a56417">CCC_flat_double_ended_queue_push_front_range</a> (<a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> *queue, size_t count, void const *type_array)</td></tr>
+<tr class="memdesc:a5eb9ab609b056e8d31fcd80383a56417"><td class="mdescLeft">&#160;</td><td class="mdescRight">Push the range of user types to the front of the flat_double_ended_queue. O(N).  <br /></td></tr>
+<tr class="separator:a5eb9ab609b056e8d31fcd80383a56417"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aacec72c64e47adc6226eb46438067c20"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#aacec72c64e47adc6226eb46438067c20">CCC_flat_double_ended_queue_insert_range</a> (<a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> *queue, void *position, size_t count, void const *type_array)</td></tr>
+<tr class="memdesc:aacec72c64e47adc6226eb46438067c20"><td class="mdescLeft">&#160;</td><td class="mdescRight">Push the range of user types before position of the flat_double_ended_queue. O(N).  <br /></td></tr>
+<tr class="separator:aacec72c64e47adc6226eb46438067c20"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a909fc9a656817e0bbb1cc25aa39b4498"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#aa1ded61d294b114942f11e711b331dcf">CCC_Result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a909fc9a656817e0bbb1cc25aa39b4498">CCC_flat_double_ended_queue_pop_front</a> (<a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> *queue)</td></tr>
+<tr class="memdesc:a909fc9a656817e0bbb1cc25aa39b4498"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pop an element from the front of the flat_double_ended_queue. O(1).  <br /></td></tr>
+<tr class="separator:a909fc9a656817e0bbb1cc25aa39b4498"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2d0574114a214ff94c9026ce703c0f83"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#aa1ded61d294b114942f11e711b331dcf">CCC_Result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a2d0574114a214ff94c9026ce703c0f83">CCC_flat_double_ended_queue_pop_back</a> (<a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> *queue)</td></tr>
+<tr class="memdesc:a2d0574114a214ff94c9026ce703c0f83"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pop an element from the back of the flat_double_ended_queue. O(1).  <br /></td></tr>
+<tr class="separator:a2d0574114a214ff94c9026ce703c0f83"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Container Types</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Types available in the container interface. </p>
 </td></tr>
-<tr class="memitem:a2b038e1d7394666e5a07fa85c7db8191"><td class="memItemLeft" align="right" valign="top">typedef struct ccc_fdeq&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a></td></tr>
-<tr class="memdesc:a2b038e1d7394666e5a07fa85c7db8191"><td class="mdescLeft">&#160;</td><td class="mdescRight">A contiguous buffer for O(1) push and pop from front and back.  <br /></td></tr>
-<tr class="separator:a2b038e1d7394666e5a07fa85c7db8191"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af8818c73eeb55766feff55aa4840219d"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#af8818c73eeb55766feff55aa4840219d">CCC_Flat_double_ended_queue</a></td></tr>
+<tr class="memdesc:af8818c73eeb55766feff55aa4840219d"><td class="mdescLeft">&#160;</td><td class="mdescRight">A contiguous Buffer for O(1) push and pop from front and back.  <br /></td></tr>
+<tr class="separator:af8818c73eeb55766feff55aa4840219d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Deallocation Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Destroy the container. </p>
 </td></tr>
-<tr class="memitem:ac02436f10aafaa036ec0e967cfa1b3de"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#ac02436f10aafaa036ec0e967cfa1b3de">ccc_fdeq_clear</a> (<a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> *fdeq, <a class="el" href="types_8h.html#a97f231bd3df31cb2730e3304d4cc1dd2">ccc_any_type_destructor_fn</a> *destructor)</td></tr>
-<tr class="memdesc:ac02436f10aafaa036ec0e967cfa1b3de"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set size of fdeq to 0 and call destructor on each element if needed. O(1) if no destructor is provided, else O(N).  <br /></td></tr>
-<tr class="separator:ac02436f10aafaa036ec0e967cfa1b3de"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae6dc5380b47e494d209da744a4b5ae89"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#ae6dc5380b47e494d209da744a4b5ae89">ccc_fdeq_clear_and_free</a> (<a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> *fdeq, <a class="el" href="types_8h.html#a97f231bd3df31cb2730e3304d4cc1dd2">ccc_any_type_destructor_fn</a> *destructor)</td></tr>
-<tr class="memdesc:ae6dc5380b47e494d209da744a4b5ae89"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set size of fdeq to 0 and call destructor on each element if needed. Free the underlying buffer setting the capacity to 0. O(1) if no destructor is provided, else O(N).  <br /></td></tr>
-<tr class="separator:ae6dc5380b47e494d209da744a4b5ae89"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a50a041829849ec5380a61fb8d0c7f55f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a50a041829849ec5380a61fb8d0c7f55f">ccc_fdeq_clear_and_free_reserve</a> (<a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> *fdeq, <a class="el" href="types_8h.html#a97f231bd3df31cb2730e3304d4cc1dd2">ccc_any_type_destructor_fn</a> *destructor, <a class="el" href="types_8h.html#a3e73202894869d2840fb21ff912bbd96">ccc_any_alloc_fn</a> *alloc)</td></tr>
-<tr class="memdesc:a50a041829849ec5380a61fb8d0c7f55f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Frees all slots in the fdeq and frees the underlying buffer that was previously dynamically reserved with the reserve function.  <br /></td></tr>
-<tr class="separator:a50a041829849ec5380a61fb8d0c7f55f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aed9d25876fabd01e9939437ab870218e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#aa1ded61d294b114942f11e711b331dcf">CCC_Result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#aed9d25876fabd01e9939437ab870218e">CCC_flat_double_ended_queue_clear</a> (<a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> *queue, <a class="el" href="types_8h.html#a93e9728dd87d940e8f171efea75ee8d2">CCC_Type_destructor</a> *destructor)</td></tr>
+<tr class="memdesc:aed9d25876fabd01e9939437ab870218e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set size of queue to 0 and call destructor on each element if needed. O(1) if no destructor is provided, else O(N).  <br /></td></tr>
+<tr class="separator:aed9d25876fabd01e9939437ab870218e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaa4d2b2e22aefada60e6c01bdbea5a64"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#aa1ded61d294b114942f11e711b331dcf">CCC_Result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#aaa4d2b2e22aefada60e6c01bdbea5a64">CCC_flat_double_ended_queue_clear_and_free</a> (<a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> *queue, <a class="el" href="types_8h.html#a93e9728dd87d940e8f171efea75ee8d2">CCC_Type_destructor</a> *destructor)</td></tr>
+<tr class="memdesc:aaa4d2b2e22aefada60e6c01bdbea5a64"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set size of queue to 0 and call destructor on each element if needed. Free the underlying Buffer setting the capacity to 0. O(1) if no destructor is provided, else O(N).  <br /></td></tr>
+<tr class="separator:aaa4d2b2e22aefada60e6c01bdbea5a64"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad4d99e1faa11282acf1e6856fd030563"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#aa1ded61d294b114942f11e711b331dcf">CCC_Result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#ad4d99e1faa11282acf1e6856fd030563">CCC_flat_double_ended_queue_clear_and_free_reserve</a> (<a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> *queue, <a class="el" href="types_8h.html#a93e9728dd87d940e8f171efea75ee8d2">CCC_Type_destructor</a> *destructor, <a class="el" href="types_8h.html#aac6280c471e14b9c0d50b1c5577394d3">CCC_Allocator</a> *allocate)</td></tr>
+<tr class="memdesc:ad4d99e1faa11282acf1e6856fd030563"><td class="mdescLeft">&#160;</td><td class="mdescRight">Frees all slots in the queue and frees the underlying Buffer that was previously dynamically reserved with the reserve function.  <br /></td></tr>
+<tr class="separator:ad4d99e1faa11282acf1e6856fd030563"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">State Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Interact with the state of the FDEQ. </p>
 </td></tr>
-<tr class="memitem:ac78b94bd197607dce9b20ef4ed0894a9"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#ac78b94bd197607dce9b20ef4ed0894a9">ccc_fdeq_begin</a> (<a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> const *fdeq)</td></tr>
-<tr class="memdesc:ac78b94bd197607dce9b20ef4ed0894a9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a pointer to the front element of the fdeq. O(1).  <br /></td></tr>
-<tr class="separator:ac78b94bd197607dce9b20ef4ed0894a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a01d7a66b34eae3abf0557ed5656c4091"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a01d7a66b34eae3abf0557ed5656c4091">ccc_fdeq_rbegin</a> (<a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> const *fdeq)</td></tr>
-<tr class="memdesc:a01d7a66b34eae3abf0557ed5656c4091"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a pointer to the back element of the fdeq. O(1).  <br /></td></tr>
-<tr class="separator:a01d7a66b34eae3abf0557ed5656c4091"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1e152982e0102e279af6893a77d975de"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a1e152982e0102e279af6893a77d975de">ccc_fdeq_next</a> (<a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> const *fdeq, void const *iter_ptr)</td></tr>
-<tr class="memdesc:a1e152982e0102e279af6893a77d975de"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the next element in the fdeq moving front to back. O(1).  <br /></td></tr>
-<tr class="separator:a1e152982e0102e279af6893a77d975de"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af62103b1ef7d05fd9daa66c956c352bf"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#af62103b1ef7d05fd9daa66c956c352bf">ccc_fdeq_rnext</a> (<a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> const *fdeq, void const *iter_ptr)</td></tr>
-<tr class="memdesc:af62103b1ef7d05fd9daa66c956c352bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the next element in the fdeq moving back to front. O(1).  <br /></td></tr>
-<tr class="separator:af62103b1ef7d05fd9daa66c956c352bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9264ced538427697983cdaf42ff8ff27"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a9264ced538427697983cdaf42ff8ff27">ccc_fdeq_end</a> (<a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> const *fdeq)</td></tr>
-<tr class="memdesc:a9264ced538427697983cdaf42ff8ff27"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a pointer to the end element. It may not be accessed. O(1).  <br /></td></tr>
-<tr class="separator:a9264ced538427697983cdaf42ff8ff27"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a91d5c7871381b4bd11eae774ad999962"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a91d5c7871381b4bd11eae774ad999962">ccc_fdeq_rend</a> (<a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> const *fdeq)</td></tr>
-<tr class="memdesc:a91d5c7871381b4bd11eae774ad999962"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a pointer to the start element. It may not be accessed. O(1).  <br /></td></tr>
-<tr class="separator:a91d5c7871381b4bd11eae774ad999962"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4caa4193f1547f8cdf5289935aa2da6a"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a4caa4193f1547f8cdf5289935aa2da6a">ccc_fdeq_at</a> (<a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> const *fdeq, size_t i)</td></tr>
-<tr class="memdesc:a4caa4193f1547f8cdf5289935aa2da6a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a reference to the element at index position i. O(1).  <br /></td></tr>
-<tr class="separator:a4caa4193f1547f8cdf5289935aa2da6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a88d9f08549c2ce4edf9d575caccb3fb4"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a88d9f08549c2ce4edf9d575caccb3fb4">ccc_fdeq_front</a> (<a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> const *fdeq)</td></tr>
-<tr class="memdesc:a88d9f08549c2ce4edf9d575caccb3fb4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a reference to the front of the fdeq. O(1).  <br /></td></tr>
-<tr class="separator:a88d9f08549c2ce4edf9d575caccb3fb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9cd07edbd36d2c84bbb633e910a4d59a"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a9cd07edbd36d2c84bbb633e910a4d59a">ccc_fdeq_back</a> (<a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> const *fdeq)</td></tr>
-<tr class="memdesc:a9cd07edbd36d2c84bbb633e910a4d59a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a reference to the back of the fdeq. O(1).  <br /></td></tr>
-<tr class="separator:a9cd07edbd36d2c84bbb633e910a4d59a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a891865ef2a715297974c2def5671d5bb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a891865ef2a715297974c2def5671d5bb">ccc_fdeq_is_empty</a> (<a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> const *fdeq)</td></tr>
-<tr class="memdesc:a891865ef2a715297974c2def5671d5bb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return true if the size of the fdeq is 0. O(1).  <br /></td></tr>
-<tr class="separator:a891865ef2a715297974c2def5671d5bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af90f60ae10191ef5557994ec75d8a45a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#af90f60ae10191ef5557994ec75d8a45a">ccc_fdeq_count</a> (<a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> const *fdeq)</td></tr>
-<tr class="memdesc:af90f60ae10191ef5557994ec75d8a45a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the count of active fdeq slots. O(1).  <br /></td></tr>
-<tr class="separator:af90f60ae10191ef5557994ec75d8a45a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adadb60693f86fd0157f1b7795a948cbb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structccc__ucount.html">ccc_ucount</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#adadb60693f86fd0157f1b7795a948cbb">ccc_fdeq_capacity</a> (<a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> const *fdeq)</td></tr>
-<tr class="memdesc:adadb60693f86fd0157f1b7795a948cbb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the capacity representing total possible slots. O(1).  <br /></td></tr>
-<tr class="separator:adadb60693f86fd0157f1b7795a948cbb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab49f9096ecd1127d3f8501613ab45602"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#ab49f9096ecd1127d3f8501613ab45602">ccc_fdeq_data</a> (<a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> const *fdeq)</td></tr>
-<tr class="memdesc:ab49f9096ecd1127d3f8501613ab45602"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a reference to the base of backing array. O(1).  <br /></td></tr>
-<tr class="separator:ab49f9096ecd1127d3f8501613ab45602"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a996af112cdbfa57d1511a82489b0f074"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a996af112cdbfa57d1511a82489b0f074">ccc_fdeq_validate</a> (<a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> const *fdeq)</td></tr>
-<tr class="memdesc:a996af112cdbfa57d1511a82489b0f074"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return true if the internal invariants of the fdeq.  <br /></td></tr>
-<tr class="separator:a996af112cdbfa57d1511a82489b0f074"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac7555446e93baab082e6b7ea7cd959fa"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#ac7555446e93baab082e6b7ea7cd959fa">CCC_flat_double_ended_queue_begin</a> (<a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> const *queue)</td></tr>
+<tr class="memdesc:ac7555446e93baab082e6b7ea7cd959fa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a pointer to the front element of the flat_double_ended_queue. O(1).  <br /></td></tr>
+<tr class="separator:ac7555446e93baab082e6b7ea7cd959fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8ccf6dfe4d541b5fdced9187df1a425f"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a8ccf6dfe4d541b5fdced9187df1a425f">CCC_flat_double_ended_queue_reverse_begin</a> (<a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> const *queue)</td></tr>
+<tr class="memdesc:a8ccf6dfe4d541b5fdced9187df1a425f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a pointer to the back element of the flat_double_ended_queue. O(1).  <br /></td></tr>
+<tr class="separator:a8ccf6dfe4d541b5fdced9187df1a425f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a78cafede63b7fbc72ffc69bea4f4c21d"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a78cafede63b7fbc72ffc69bea4f4c21d">CCC_flat_double_ended_queue_next</a> (<a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> const *queue, void const *iterator_pointer)</td></tr>
+<tr class="memdesc:a78cafede63b7fbc72ffc69bea4f4c21d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the next element in the queue moving front to back. O(1).  <br /></td></tr>
+<tr class="separator:a78cafede63b7fbc72ffc69bea4f4c21d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae3f9ab61443ebac5dd9aac459c90d5ad"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#ae3f9ab61443ebac5dd9aac459c90d5ad">CCC_flat_double_ended_queue_reverse_next</a> (<a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> const *queue, void const *iterator_pointer)</td></tr>
+<tr class="memdesc:ae3f9ab61443ebac5dd9aac459c90d5ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the next element in the queue moving back to front. O(1).  <br /></td></tr>
+<tr class="separator:ae3f9ab61443ebac5dd9aac459c90d5ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae2eaf5182daa7d00da6cc0d46d06906b"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#ae2eaf5182daa7d00da6cc0d46d06906b">CCC_flat_double_ended_queue_end</a> (<a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> const *queue)</td></tr>
+<tr class="memdesc:ae2eaf5182daa7d00da6cc0d46d06906b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a pointer to the end element. It may not be accessed. O(1).  <br /></td></tr>
+<tr class="separator:ae2eaf5182daa7d00da6cc0d46d06906b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a42d477ac9fd7b3500ef03e84b2aed94c"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a42d477ac9fd7b3500ef03e84b2aed94c">CCC_flat_double_ended_queue_reverse_end</a> (<a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> const *queue)</td></tr>
+<tr class="memdesc:a42d477ac9fd7b3500ef03e84b2aed94c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a pointer to the start element. It may not be accessed. O(1).  <br /></td></tr>
+<tr class="separator:a42d477ac9fd7b3500ef03e84b2aed94c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a297fc549d6550c8c2ea381f9589c9438"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a297fc549d6550c8c2ea381f9589c9438">CCC_flat_double_ended_queue_at</a> (<a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> const *queue, size_t i)</td></tr>
+<tr class="memdesc:a297fc549d6550c8c2ea381f9589c9438"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a reference to the element at index position i. O(1).  <br /></td></tr>
+<tr class="separator:a297fc549d6550c8c2ea381f9589c9438"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6915b74d644465d8b21f43e9dfbee0ff"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a6915b74d644465d8b21f43e9dfbee0ff">CCC_flat_double_ended_queue_front</a> (<a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> const *queue)</td></tr>
+<tr class="memdesc:a6915b74d644465d8b21f43e9dfbee0ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a reference to the front of the flat_double_ended_queue. O(1).  <br /></td></tr>
+<tr class="separator:a6915b74d644465d8b21f43e9dfbee0ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a85f2b0f552ec9ba7ddf85f3a650c883a"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a85f2b0f552ec9ba7ddf85f3a650c883a">CCC_flat_double_ended_queue_back</a> (<a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> const *queue)</td></tr>
+<tr class="memdesc:a85f2b0f552ec9ba7ddf85f3a650c883a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a reference to the back of the flat_double_ended_queue. O(1).  <br /></td></tr>
+<tr class="separator:a85f2b0f552ec9ba7ddf85f3a650c883a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1b1f52151a52f38ab1a0f811b668cfde"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a8dbb03cfc2070934832841f50f146bcd">CCC_Tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a1b1f52151a52f38ab1a0f811b668cfde">CCC_flat_double_ended_queue_is_empty</a> (<a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> const *queue)</td></tr>
+<tr class="memdesc:a1b1f52151a52f38ab1a0f811b668cfde"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return true if the size of the queue is 0. O(1).  <br /></td></tr>
+<tr class="separator:a1b1f52151a52f38ab1a0f811b668cfde"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaa9445990daaae7a0893290e1811a601"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structCCC__Count.html">CCC_Count</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#aaa9445990daaae7a0893290e1811a601">CCC_flat_double_ended_queue_count</a> (<a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> const *queue)</td></tr>
+<tr class="memdesc:aaa9445990daaae7a0893290e1811a601"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the count of active queue slots. O(1).  <br /></td></tr>
+<tr class="separator:aaa9445990daaae7a0893290e1811a601"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9278b4d05190e05ed7ba1d26ef0133eb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structCCC__Count.html">CCC_Count</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a9278b4d05190e05ed7ba1d26ef0133eb">CCC_flat_double_ended_queue_capacity</a> (<a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> const *queue)</td></tr>
+<tr class="memdesc:a9278b4d05190e05ed7ba1d26ef0133eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the capacity representing total possible slots. O(1).  <br /></td></tr>
+<tr class="separator:a9278b4d05190e05ed7ba1d26ef0133eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad58407f94528520d72bae908506b6c8e"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#ad58407f94528520d72bae908506b6c8e">CCC_flat_double_ended_queue_data</a> (<a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> const *queue)</td></tr>
+<tr class="memdesc:ad58407f94528520d72bae908506b6c8e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a reference to the base of backing array. O(1).  <br /></td></tr>
+<tr class="separator:ad58407f94528520d72bae908506b6c8e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a36c31fda9def51d4d7a20ee1cf02b189"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a8dbb03cfc2070934832841f50f146bcd">CCC_Tribool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a36c31fda9def51d4d7a20ee1cf02b189">CCC_flat_double_ended_queue_validate</a> (<a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> const *queue)</td></tr>
+<tr class="memdesc:a36c31fda9def51d4d7a20ee1cf02b189"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return true if the internal invariants of the flat_double_ended_queue.  <br /></td></tr>
+<tr class="separator:a36c31fda9def51d4d7a20ee1cf02b189"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="a9ee4b94addf503252a94ee32a438b5e0" name="a9ee4b94addf503252a94ee32a438b5e0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9ee4b94addf503252a94ee32a438b5e0">&#9670;&#160;</a></span>ccc_fdeq_emplace_back</h2>
+<a id="addce401e8ff660ec3e506f645ddce33c" name="addce401e8ff660ec3e506f645ddce33c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#addce401e8ff660ec3e506f645ddce33c">&#9670;&#160;</a></span>CCC_flat_double_ended_queue_emplace_back</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define ccc_fdeq_emplace_back</td>
+          <td class="memname">#define CCC_flat_double_ended_queue_emplace_back</td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">fdeq_ptr, </td>
+          <td class="paramname">flat_double_ended_queue_pointer, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -264,15 +270,17 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td>&#160;&#160;&#160;    ccc_impl_fdeq_emplace_back(fdeq_ptr, value)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>Write an element directly to the back slot of the fdeq. O(1) if no allocation permission amortized O(1) if allocation permission is given and a resize is required. </p>
+<b>Value:</b><div class="fragment"><div class="line">    CCC_private_flat_double_ended_queue_emplace_back(                          \</div>
+<div class="line">        flat_double_ended_queue_pointer, value)</div>
+</div><!-- fragment -->
+<p>Write an element directly to the back slot of the flat_double_ended_queue. O(1) if no allocation permission amortized O(1) if allocation permission is given and a resize is required. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">fdeq_ptr</td><td>a pointer to the fdeq. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">flat_double_ended_queue_pointer</td><td>a pointer to the flat_double_ended_queue. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">value</td><td>for integral types, the direct value. For structs and unions use compound literal syntax. </td></tr>
   </table>
   </dd>
@@ -281,17 +289,17 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="a82291c88d3a1153d9370d57334bd1a1e" name="a82291c88d3a1153d9370d57334bd1a1e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a82291c88d3a1153d9370d57334bd1a1e">&#9670;&#160;</a></span>ccc_fdeq_emplace_front</h2>
+<a id="a5a9b16a7dbffd6c7ab8f490cc3f01f76" name="a5a9b16a7dbffd6c7ab8f490cc3f01f76"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5a9b16a7dbffd6c7ab8f490cc3f01f76">&#9670;&#160;</a></span>CCC_flat_double_ended_queue_emplace_front</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define ccc_fdeq_emplace_front</td>
+          <td class="memname">#define CCC_flat_double_ended_queue_emplace_front</td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">fdeq_ptr, </td>
+          <td class="paramname">flat_double_ended_queue_pointer, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -302,15 +310,17 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td>&#160;&#160;&#160;    ccc_impl_fdeq_emplace_front(fdeq_ptr, value)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>Write an element directly to the front slot of the fdeq. O(1) if no allocation permission amortized O(1) if allocation permission is given and a resize is required. </p>
+<b>Value:</b><div class="fragment"><div class="line">    CCC_private_flat_double_ended_queue_emplace_front(                         \</div>
+<div class="line">        flat_double_ended_queue_pointer, value)</div>
+</div><!-- fragment -->
+<p>Write an element directly to the front slot of the flat_double_ended_queue. O(1) if no allocation permission amortized O(1) if allocation permission is given and a resize is required. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">fdeq_ptr</td><td>a pointer to the fdeq. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">flat_double_ended_queue_pointer</td><td>a pointer to the flat_double_ended_queue. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">value</td><td>for integral types, the direct value. For structs and unions use compound literal syntax. </td></tr>
   </table>
   </dd>
@@ -319,35 +329,110 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="a84c654bbd98a261f5204764a8714335e" name="a84c654bbd98a261f5204764a8714335e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a84c654bbd98a261f5204764a8714335e">&#9670;&#160;</a></span>ccc_fdeq_init</h2>
+<a id="aa872dd1e7f6dadfc13045874c4d3c282" name="aa872dd1e7f6dadfc13045874c4d3c282"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa872dd1e7f6dadfc13045874c4d3c282">&#9670;&#160;</a></span>CCC_flat_double_ended_queue_from</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define ccc_fdeq_init</td>
+          <td class="memname">#define CCC_flat_double_ended_queue_from</td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">mem_ptr, </td>
+          <td class="paramname">allocate, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">any_type_name, </td>
+          <td class="paramname">context_data, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">alloc_fn, </td>
+          <td class="paramname">optional_capacity, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">aux_data, </td>
+          <td class="paramname">compound_literal_array...&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    CCC_private_flat_double_ended_queue_from(                                  \</div>
+<div class="line">        allocate, context_data, optional_capacity, compound_literal_array)</div>
+</div><!-- fragment -->
+<p>Initialize a Flat_double_ended_queue from a compound literal array initializer. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">allocate</td><td>CCC_Allocator or NULL if no allocation is permitted. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">context_data</td><td>any context data needed for managing Flat_double_ended_queue memory. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">optional_capacity</td><td>optionally specify the capacity of the Flat_double_ended_queue if different from the size of the compound literal array initializer. If the capacity is greater than the size of the compound literal array initializer, it is respected and the capacity is reserved. If the capacity is less than the size of the compound array initializer, the compound literal array initializer size is set as the capacity. Therefore, 0 is valid if one is not concerned with the underlying reservation. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">compound_literal_array</td><td>the initializer of the type stored in flat_double_ended_queue. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the initialized flat_double_ended_queue. Directly assign to Flat_double_ended_queue on the right hand side of the equality operator (e.g. <a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> b = <a class="el" href="flat__double__ended__queue_8h.html#aa872dd1e7f6dadfc13045874c4d3c282" title="Initialize a Flat_double_ended_queue from a compound literal array initializer.">CCC_flat_double_ended_queue_from(...)</a>;).</dd></dl>
+<p>Initialize a dynamic Flat_double_ended_queue with a compound literal array.</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="keywordtype">int</span></div>
+<div class="line">main(<span class="keywordtype">void</span>)</div>
+<div class="line">{</div>
+<div class="line">    Flat_double_ended_queue f</div>
+<div class="line">        = flat_double_ended_queue_from(std_allocate, NULL, 0,</div>
+<div class="line">            (<span class="keywordtype">int</span>[]){ 0, 1, 2, 3 });</div>
+<div class="line">    <span class="keywordflow">return</span> 0;</div>
+<div class="line">}</div>
+</div><!-- fragment --><p>Initialize a dynamic Flat_double_ended_queue with a compound literal array with capacity.</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="keywordtype">int</span></div>
+<div class="line">main(<span class="keywordtype">void</span>)</div>
+<div class="line">{</div>
+<div class="line">    Flat_double_ended_queue f</div>
+<div class="line">        = flat_double_ended_queue_from(std_allocate, NULL, 4096,</div>
+<div class="line">            (<span class="keywordtype">int</span>[]){ 0, 1, 2, 3 });</div>
+<div class="line">    <span class="keywordflow">return</span> 0;</div>
+<div class="line">}</div>
+</div><!-- fragment --><p>Only dynamic flat_double_ended_queues may be initialized this way. For static or stack based initialization of fixed flat_double_ended_queues with contents known at compile time, see the <a class="el" href="flat__double__ended__queue_8h.html#a9dbaedc50b61db379f5926f50bcdb09c" title="Initialize the queue with memory and allocation permission.">CCC_flat_double_ended_queue_initialize()</a> macro. </p>
+
+</div>
+</div>
+<a id="a9dbaedc50b61db379f5926f50bcdb09c" name="a9dbaedc50b61db379f5926f50bcdb09c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9dbaedc50b61db379f5926f50bcdb09c">&#9670;&#160;</a></span>CCC_flat_double_ended_queue_initialize</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define CCC_flat_double_ended_queue_initialize</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">data_pointer, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">type_name, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">allocate, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">context_data, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -368,56 +453,121 @@ This graph shows which files directly or indirectly include this file:</div>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    ccc_impl_fdeq_init(mem_ptr, any_type_name, alloc_fn, aux_data, capacity,   \</div>
-<div class="line">                       optional_size)</div>
+<b>Value:</b><div class="fragment"><div class="line">    CCC_private_flat_double_ended_queue_initialize(data_pointer, type_name,    \</div>
+<div class="line">                                                   allocate, context_data,     \</div>
+<div class="line">                                                   capacity, optional_size)</div>
 </div><!-- fragment -->
-<p>Initialize the fdeq with memory and allocation permission. </p>
+<p>Initialize the queue with memory and allocation permission. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">mem_ptr</td><td>a pointer to existing memory or ((T *)NULL). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">any_type_name</td><td>the name of the user type. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">alloc_fn</td><td>the allocator function, if allocation is allowed. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">aux_data</td><td>any auxiliary data needed for element destruction. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">capacity</td><td>the number of contiguous elements at mem_ptr </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">data_pointer</td><td>a pointer to existing memory or ((T *)NULL). </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">type_name</td><td>the name of the user type. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">allocate</td><td>the allocator function, if allocation is allowed. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">context_data</td><td>any context data needed for element destruction. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">capacity</td><td>the number of contiguous elements at data_pointer </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">optional_size</td><td>an optional initial size between 1 and capacity. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the fdeq on the right hand side of an equality operator at runtime or compiletime (e.g. ccc_flat_double_ended_queue q = <a class="el" href="flat__double__ended__queue_8h.html#a84c654bbd98a261f5204764a8714335e" title="Initialize the fdeq with memory and allocation permission.">ccc_fdeq_init(...)</a>;) </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the queue on the right hand side of an equality operator at runtime or compiletime (e.g. <a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> q = <a class="el" href="flat__double__ended__queue_8h.html#a9dbaedc50b61db379f5926f50bcdb09c" title="Initialize the queue with memory and allocation permission.">CCC_flat_double_ended_queue_initialize(...)</a>;) </dd></dl>
 
 </div>
 </div>
-<h2 class="groupheader">Typedef Documentation</h2>
-<a id="a2b038e1d7394666e5a07fa85c7db8191" name="a2b038e1d7394666e5a07fa85c7db8191"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2b038e1d7394666e5a07fa85c7db8191">&#9670;&#160;</a></span>ccc_flat_double_ended_queue</h2>
+<a id="a9593a537945bfd8e6e739966f45f5d74" name="a9593a537945bfd8e6e739966f45f5d74"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9593a537945bfd8e6e739966f45f5d74">&#9670;&#160;</a></span>CCC_flat_double_ended_queue_with_capacity</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef struct ccc_fdeq <a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a></td>
+          <td class="memname">#define CCC_flat_double_ended_queue_with_capacity</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">type_name, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">allocate, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">context_data, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">capacity&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    CCC_private_flat_double_ended_queue_with_capacity(type_name, allocate,     \</div>
+<div class="line">                                                      context_data, capacity)</div>
+</div><!-- fragment -->
+<p>Initialize a Flat_double_ended_queue with a capacity. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">type_name</td><td>any user or language standard type name. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">allocate</td><td>CCC_Allocator or NULL if no allocation is permitted. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">context_data</td><td>any context data needed for managing Flat_double_ended_queue memory. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">capacity</td><td>the capacity of the Flat_double_ended_queue to reserve. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the initialized flat_double_ended_queue. Directly assign to Flat_double_ended_queue on the right hand side of the equality operator (e.g. <a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> b = CCC_Flat_double_ended_queue_with_capacity(...);).</dd></dl>
+<p>Initialize a dynamic Flat_double_ended_queue.</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="keywordtype">int</span></div>
+<div class="line">main(<span class="keywordtype">void</span>)</div>
+<div class="line">{</div>
+<div class="line">    Flat_double_ended_queue f</div>
+<div class="line">        = flat_double_ended_queue_from(std_allocate, NULL, 4096);</div>
+<div class="line">    <span class="keywordflow">return</span> 0;</div>
+<div class="line">}</div>
+</div><!-- fragment --><p>Only dynamic flat_double_ended_queues may be initialized this way. For static or stack based initialization of fixed flat_double_ended_queues with contents known at compile time, see the <a class="el" href="flat__double__ended__queue_8h.html#a9dbaedc50b61db379f5926f50bcdb09c" title="Initialize the queue with memory and allocation permission.">CCC_flat_double_ended_queue_initialize()</a> macro. </p>
+
+</div>
+</div>
+<h2 class="groupheader">Typedef Documentation</h2>
+<a id="af8818c73eeb55766feff55aa4840219d" name="af8818c73eeb55766feff55aa4840219d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af8818c73eeb55766feff55aa4840219d">&#9670;&#160;</a></span>CCC_Flat_double_ended_queue</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef struct <a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> <a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>A contiguous buffer for O(1) push and pop from front and back. </p>
+<p>A contiguous Buffer for O(1) push and pop from front and back. </p>
 <dl class="section warning"><dt>Warning</dt><dd>it is undefined behavior to use an uninitialized flat double ended queue.</dd></dl>
 <p>A flat double ended queue can be initialized on the stack, heap, or data segment at compile time or runtime. </p>
 
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="a4caa4193f1547f8cdf5289935aa2da6a" name="a4caa4193f1547f8cdf5289935aa2da6a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4caa4193f1547f8cdf5289935aa2da6a">&#9670;&#160;</a></span>ccc_fdeq_at()</h2>
+<a id="a297fc549d6550c8c2ea381f9589c9438" name="a297fc549d6550c8c2ea381f9589c9438"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a297fc549d6550c8c2ea381f9589c9438">&#9670;&#160;</a></span>CCC_flat_double_ended_queue_at()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void * ccc_fdeq_at </td>
+          <td class="memname">void * CCC_flat_double_ended_queue_at </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> const *&#160;</td>
-          <td class="paramname"><em>fdeq</em>, </td>
+          <td class="paramtype"><a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> const *&#160;</td>
+          <td class="paramname"><em>queue</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -436,81 +586,81 @@ This graph shows which files directly or indirectly include this file:</div>
 <p>Return a reference to the element at index position i. O(1). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">fdeq</td><td>a pointer to the fdeq. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">i</td><td>the 0 based index in the fdeq. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">queue</td><td>a pointer to the flat_double_ended_queue. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">i</td><td>the 0 based index in the flat_double_ended_queue. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>a reference to the element at i if 0 &lt;= i &lt; capacity.</dd></dl>
-<p>Note that the front of the fdeq is considered index 0, so the user need not worry about where the front is for indexing purposes. </p>
+<p>Note that the front of the queue is considered index 0, so the user need not worry about where the front is for indexing purposes. </p>
 
 </div>
 </div>
-<a id="a9cd07edbd36d2c84bbb633e910a4d59a" name="a9cd07edbd36d2c84bbb633e910a4d59a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9cd07edbd36d2c84bbb633e910a4d59a">&#9670;&#160;</a></span>ccc_fdeq_back()</h2>
+<a id="a85f2b0f552ec9ba7ddf85f3a650c883a" name="a85f2b0f552ec9ba7ddf85f3a650c883a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a85f2b0f552ec9ba7ddf85f3a650c883a">&#9670;&#160;</a></span>CCC_flat_double_ended_queue_back()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void * ccc_fdeq_back </td>
+          <td class="memname">void * CCC_flat_double_ended_queue_back </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> const *&#160;</td>
-          <td class="paramname"><em>fdeq</em></td><td>)</td>
+          <td class="paramtype"><a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> const *&#160;</td>
+          <td class="paramname"><em>queue</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Return a reference to the back of the fdeq. O(1). </p>
+<p>Return a reference to the back of the flat_double_ended_queue. O(1). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">fdeq</td><td>a pointer to the fdeq. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">queue</td><td>a pointer to the flat_double_ended_queue. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>a reference to the back element or NULL if fdeq is NULL or the fdeq is empty. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>a reference to the back element or NULL if queue is NULL or the queue is empty. </dd></dl>
 
 </div>
 </div>
-<a id="ac78b94bd197607dce9b20ef4ed0894a9" name="ac78b94bd197607dce9b20ef4ed0894a9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac78b94bd197607dce9b20ef4ed0894a9">&#9670;&#160;</a></span>ccc_fdeq_begin()</h2>
+<a id="ac7555446e93baab082e6b7ea7cd959fa" name="ac7555446e93baab082e6b7ea7cd959fa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac7555446e93baab082e6b7ea7cd959fa">&#9670;&#160;</a></span>CCC_flat_double_ended_queue_begin()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void * ccc_fdeq_begin </td>
+          <td class="memname">void * CCC_flat_double_ended_queue_begin </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> const *&#160;</td>
-          <td class="paramname"><em>fdeq</em></td><td>)</td>
+          <td class="paramtype"><a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> const *&#160;</td>
+          <td class="paramname"><em>queue</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Return a pointer to the front element of the fdeq. O(1). </p>
+<p>Return a pointer to the front element of the flat_double_ended_queue. O(1). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">fdeq</td><td>a pointer to the fdeq. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">queue</td><td>a pointer to the flat_double_ended_queue. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>a pointer to the user type at the start of the fdeq. NULL if empty. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>a pointer to the user type at the start of the flat_double_ended_queue. NULL if empty. </dd></dl>
 
 </div>
 </div>
-<a id="adadb60693f86fd0157f1b7795a948cbb" name="adadb60693f86fd0157f1b7795a948cbb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adadb60693f86fd0157f1b7795a948cbb">&#9670;&#160;</a></span>ccc_fdeq_capacity()</h2>
+<a id="a9278b4d05190e05ed7ba1d26ef0133eb" name="a9278b4d05190e05ed7ba1d26ef0133eb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9278b4d05190e05ed7ba1d26ef0133eb">&#9670;&#160;</a></span>CCC_flat_double_ended_queue_capacity()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_fdeq_capacity </td>
+          <td class="memname"><a class="el" href="structCCC__Count.html">CCC_Count</a> CCC_flat_double_ended_queue_capacity </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> const *&#160;</td>
-          <td class="paramname"><em>fdeq</em></td><td>)</td>
+          <td class="paramtype"><a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> const *&#160;</td>
+          <td class="paramname"><em>queue</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -519,30 +669,30 @@ This graph shows which files directly or indirectly include this file:</div>
 <p>Return the capacity representing total possible slots. O(1). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">fdeq</td><td>a pointer to the fdeq. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">queue</td><td>a pointer to the flat_double_ended_queue. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the capacity of the fdeq or an argument error is set if fdeq is NULL. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the capacity of the queue or an argument error is set if queue is NULL. </dd></dl>
 
 </div>
 </div>
-<a id="ac02436f10aafaa036ec0e967cfa1b3de" name="ac02436f10aafaa036ec0e967cfa1b3de"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac02436f10aafaa036ec0e967cfa1b3de">&#9670;&#160;</a></span>ccc_fdeq_clear()</h2>
+<a id="aed9d25876fabd01e9939437ab870218e" name="aed9d25876fabd01e9939437ab870218e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aed9d25876fabd01e9939437ab870218e">&#9670;&#160;</a></span>CCC_flat_double_ended_queue_clear()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_fdeq_clear </td>
+          <td class="memname"><a class="el" href="types_8h.html#aa1ded61d294b114942f11e711b331dcf">CCC_Result</a> CCC_flat_double_ended_queue_clear </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> *&#160;</td>
-          <td class="paramname"><em>fdeq</em>, </td>
+          <td class="paramtype"><a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> *&#160;</td>
+          <td class="paramname"><em>queue</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="types_8h.html#a97f231bd3df31cb2730e3304d4cc1dd2">ccc_any_type_destructor_fn</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a93e9728dd87d940e8f171efea75ee8d2">CCC_Type_destructor</a> *&#160;</td>
           <td class="paramname"><em>destructor</em>&#160;</td>
         </tr>
         <tr>
@@ -553,34 +703,34 @@ This graph shows which files directly or indirectly include this file:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Set size of fdeq to 0 and call destructor on each element if needed. O(1) if no destructor is provided, else O(N). </p>
+<p>Set size of queue to 0 and call destructor on each element if needed. O(1) if no destructor is provided, else O(N). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">fdeq</td><td>a pointer to the fdeq. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">queue</td><td>a pointer to the flat_double_ended_queue. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">destructor</td><td>the destructor if needed or NULL.</td></tr>
   </table>
   </dd>
 </dl>
-<p>Note that if destructor is non-NULL it will be called on each element in the fdeq. However, the underlying buffer for the fdeq is not freed. If the destructor is NULL, setting the size to 0 is O(1). </p>
+<p>Note that if destructor is non-NULL it will be called on each element in the flat_double_ended_queue. However, the underlying Buffer for the flat_double_ended_queue is not freed. If the destructor is NULL, setting the size to 0 is O(1). </p>
 
 </div>
 </div>
-<a id="ae6dc5380b47e494d209da744a4b5ae89" name="ae6dc5380b47e494d209da744a4b5ae89"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae6dc5380b47e494d209da744a4b5ae89">&#9670;&#160;</a></span>ccc_fdeq_clear_and_free()</h2>
+<a id="aaa4d2b2e22aefada60e6c01bdbea5a64" name="aaa4d2b2e22aefada60e6c01bdbea5a64"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaa4d2b2e22aefada60e6c01bdbea5a64">&#9670;&#160;</a></span>CCC_flat_double_ended_queue_clear_and_free()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_fdeq_clear_and_free </td>
+          <td class="memname"><a class="el" href="types_8h.html#aa1ded61d294b114942f11e711b331dcf">CCC_Result</a> CCC_flat_double_ended_queue_clear_and_free </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> *&#160;</td>
-          <td class="paramname"><em>fdeq</em>, </td>
+          <td class="paramtype"><a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> *&#160;</td>
+          <td class="paramname"><em>queue</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="types_8h.html#a97f231bd3df31cb2730e3304d4cc1dd2">ccc_any_type_destructor_fn</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a93e9728dd87d940e8f171efea75ee8d2">CCC_Type_destructor</a> *&#160;</td>
           <td class="paramname"><em>destructor</em>&#160;</td>
         </tr>
         <tr>
@@ -591,41 +741,41 @@ This graph shows which files directly or indirectly include this file:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Set size of fdeq to 0 and call destructor on each element if needed. Free the underlying buffer setting the capacity to 0. O(1) if no destructor is provided, else O(N). </p>
+<p>Set size of queue to 0 and call destructor on each element if needed. Free the underlying Buffer setting the capacity to 0. O(1) if no destructor is provided, else O(N). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">fdeq</td><td>a pointer to the fdeq. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">queue</td><td>a pointer to the flat_double_ended_queue. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">destructor</td><td>the destructor if needed or NULL.</td></tr>
   </table>
   </dd>
 </dl>
-<p>Note that if destructor is non-NULL it will be called on each element in the fdeq. After all elements are processed the buffer is freed and capacity is 0. If destructor is NULL the buffer is freed directly and capacity is 0. </p>
+<p>Note that if destructor is non-NULL it will be called on each element in the flat_double_ended_queue. After all elements are processed the Buffer is freed and capacity is 0. If destructor is NULL the Buffer is freed directly and capacity is 0. </p>
 
 </div>
 </div>
-<a id="a50a041829849ec5380a61fb8d0c7f55f" name="a50a041829849ec5380a61fb8d0c7f55f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a50a041829849ec5380a61fb8d0c7f55f">&#9670;&#160;</a></span>ccc_fdeq_clear_and_free_reserve()</h2>
+<a id="ad4d99e1faa11282acf1e6856fd030563" name="ad4d99e1faa11282acf1e6856fd030563"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad4d99e1faa11282acf1e6856fd030563">&#9670;&#160;</a></span>CCC_flat_double_ended_queue_clear_and_free_reserve()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_fdeq_clear_and_free_reserve </td>
+          <td class="memname"><a class="el" href="types_8h.html#aa1ded61d294b114942f11e711b331dcf">CCC_Result</a> CCC_flat_double_ended_queue_clear_and_free_reserve </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> *&#160;</td>
-          <td class="paramname"><em>fdeq</em>, </td>
+          <td class="paramtype"><a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> *&#160;</td>
+          <td class="paramname"><em>queue</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="types_8h.html#a97f231bd3df31cb2730e3304d4cc1dd2">ccc_any_type_destructor_fn</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a93e9728dd87d940e8f171efea75ee8d2">CCC_Type_destructor</a> *&#160;</td>
           <td class="paramname"><em>destructor</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="types_8h.html#a3e73202894869d2840fb21ff912bbd96">ccc_any_alloc_fn</a> *&#160;</td>
-          <td class="paramname"><em>alloc</em>&#160;</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#aac6280c471e14b9c0d50b1c5577394d3">CCC_Allocator</a> *&#160;</td>
+          <td class="paramname"><em>allocate</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -635,46 +785,46 @@ This graph shows which files directly or indirectly include this file:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Frees all slots in the fdeq and frees the underlying buffer that was previously dynamically reserved with the reserve function. </p>
+<p>Frees all slots in the queue and frees the underlying Buffer that was previously dynamically reserved with the reserve function. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">fdeq</td><td>the fdeq to be cleared. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">destructor</td><td>the destructor for each element. NULL can be passed if no maintenance is required on the elements in the fdeq before their slots are dropped. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">alloc</td><td>the required allocation function to provide to a dynamically reserved fdeq. Any auxiliary data provided upon initialization will be passed to the allocation function when called. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">queue</td><td>the queue to be cleared. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">destructor</td><td>the destructor for each element. NULL can be passed if no maintenance is required on the elements in the queue before their slots are dropped. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">allocate</td><td>the required allocation function to provide to a dynamically reserved flat_double_ended_queue. Any context data provided upon initialization will be passed to the allocation function when called. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the result of free operation. OK if success, or an error status to indicate the error. </dd></dl>
-<dl class="section warning"><dt>Warning</dt><dd>It is an error to call this function on a fdeq that was not reserved with the provided ccc_any_alloc_fn. The fdeq must have existing memory to free.</dd></dl>
-<p>This function covers the edge case of reserving a dynamic capacity for a fdeq at runtime but denying the fdeq allocation permission to resize. This can help prevent a fdeq from growing unbounded. The user in this case knows the fdeq does not have allocation permission and therefore no further memory will be dedicated to the fdeq.</p>
-<p>However, to free the fdeq in such a case this function must be used because the fdeq has no ability to free itself. Just as the allocation function is required to reserve memory so to is it required to free memory.</p>
-<p>This function will work normally if called on a fdeq with allocation permission however the normal ccc_fdeq_clear_and_free is sufficient for that use case. </p>
+<dl class="section warning"><dt>Warning</dt><dd>It is an error to call this function on a queue that was not reserved with the provided CCC_Allocator. The flat_double_ended_queue must have existing memory to free.</dd></dl>
+<p>This function covers the edge case of reserving a dynamic capacity for a flat_double_ended_queue at runtime but denying the flat_double_ended_queue allocation permission to resize. This can help prevent a flat_double_ended_queue from growing untree. The user in this case knows the flat_double_ended_queue does not have allocation permission and therefore no further memory will be dedicated to the flat_double_ended_queue.</p>
+<p>However, to free the queue in such a case this function must be used because the queue has no ability to free itself. Just as the allocation function is required to reserve memory so to is it required to free memory.</p>
+<p>This function will work normally if called on a queue with allocation permission however the normal CCC_flat_double_ended_queue_clear_and_free is sufficient for that use case. </p>
 
 </div>
 </div>
-<a id="a65978652c26e3d1878e343a5c618e300" name="a65978652c26e3d1878e343a5c618e300"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a65978652c26e3d1878e343a5c618e300">&#9670;&#160;</a></span>ccc_fdeq_copy()</h2>
+<a id="a3cafa28e32a320297d373b89ed657a94" name="a3cafa28e32a320297d373b89ed657a94"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3cafa28e32a320297d373b89ed657a94">&#9670;&#160;</a></span>CCC_flat_double_ended_queue_copy()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_fdeq_copy </td>
+          <td class="memname"><a class="el" href="types_8h.html#aa1ded61d294b114942f11e711b331dcf">CCC_Result</a> CCC_flat_double_ended_queue_copy </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> *&#160;</td>
-          <td class="paramname"><em>dst</em>, </td>
+          <td class="paramtype"><a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> *&#160;</td>
+          <td class="paramname"><em>destination</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> const *&#160;</td>
-          <td class="paramname"><em>src</em>, </td>
+          <td class="paramtype"><a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> const *&#160;</td>
+          <td class="paramname"><em>source</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="types_8h.html#a3e73202894869d2840fb21ff912bbd96">ccc_any_alloc_fn</a> *&#160;</td>
-          <td class="paramname"><em>fn</em>&#160;</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#aac6280c471e14b9c0d50b1c5577394d3">CCC_Allocator</a> *&#160;</td>
+          <td class="paramname"><em>allocate</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -684,82 +834,134 @@ This graph shows which files directly or indirectly include this file:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Copy the fdeq from src to newly initialized dst. </p>
+<p>Copy the queue from source to newly initialized destination. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">dst</td><td>the destination that will copy the source fdeq. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">src</td><td>the source of the fdeq. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">fn</td><td>the allocation function in case resizing of dst is needed. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">destination</td><td>the destination that will copy the source flat_double_ended_queue. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">source</td><td>the source of the flat_double_ended_queue. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">allocate</td><td>the allocation function in case resizing of destination is needed. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the result of the copy operation. If the destination capacity is less than the source capacity and no allocation function is provided an input error is returned. If resizing is required and resizing of dst fails a memory error is returned. </dd></dl>
-<dl class="section note"><dt>Note</dt><dd>dst must have capacity greater than or equal to src. If dst capacity is less than src, an allocation function must be provided with the fn argument.</dd></dl>
-<p>Note that there are two ways to copy data from source to destination: provide sufficient memory and pass NULL as fn, or allow the copy function to take care of allocation for the copy.</p>
+<dl class="section return"><dt>Returns</dt><dd>the result of the copy operation. If the destination capacity is less than the source capacity and no allocation function is provided an input error is returned. If resizing is required and resizing of destination fails a memory error is returned. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>destination must have capacity greater than or equal to source. If destination capacity is less than source, an allocation function must be provided with the allocate argument.</dd></dl>
+<p>Note that there are two ways to copy data from source to destination: provide sufficient memory and pass NULL as allocate, or allow the copy function to take care of allocation for the copy.</p>
 <p>Manual memory management with no allocation function provided.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC</span></div>
-<div class="line">flat_double_ended_queue src = fdeq_init((<span class="keywordtype">int</span>[10]){}, int, NULL, NULL, 10);</div>
-<div class="line"><span class="keywordtype">int</span> *new_mem = malloc(<span class="keyword">sizeof</span>(<span class="keywordtype">int</span>) * fdeq_capacity(&amp;src).count);</div>
-<div class="line">flat_double_ended_queue dst</div>
-<div class="line">    = fdeq_init(new_mem, <span class="keywordtype">int</span>, NULL, NULL, fdeq_capacity(&amp;src).count);</div>
-<div class="line"><a class="code hl_enumeration" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> res = fdeq_copy(&amp;dst, &amp;src, NULL);</div>
-<div class="ttc" id="atypes_8h_html_a51d6f078a83d667aff5016609d9146ef"><div class="ttname"><a href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a></div><div class="ttdeci">ccc_result</div><div class="ttdoc">A result of actions on containers.</div><div class="ttdef"><b>Definition:</b> types.h:132</div></div>
-</div><!-- fragment --><p>The above requires dst capacity be greater than or equal to src capacity. Here is memory management handed over to the copy function.</p>
+<div class="line">Flat_double_ended_queue source = flat_double_ended_queue_initialize(</div>
+<div class="line">    (<span class="keywordtype">int</span>[10]){},</div>
+<div class="line">    int,</div>
+<div class="line">    NULL,</div>
+<div class="line">    NULL,</div>
+<div class="line">    10</div>
+<div class="line">);</div>
+<div class="line"><span class="keywordtype">int</span> *new_data</div>
+<div class="line">    = malloc(<span class="keyword">sizeof</span>(<span class="keywordtype">int</span>) * flat_double_ended_queue_capacity(&amp;source).count);</div>
+<div class="line">Flat_double_ended_queue destination = flat_double_ended_queue_initialize(</div>
+<div class="line">    new_data,</div>
+<div class="line">    <span class="keywordtype">int</span>,</div>
+<div class="line">    NULL,</div>
+<div class="line">    NULL,</div>
+<div class="line">    flat_double_ended_queue_capacity(&amp;source).count</div>
+<div class="line">);</div>
+<div class="line"><a class="code hl_enumeration" href="types_8h.html#aa1ded61d294b114942f11e711b331dcf">CCC_Result</a> res = flat_double_ended_queue_copy(&amp;destination, &amp;source, NULL);</div>
+<div class="ttc" id="atypes_8h_html_aa1ded61d294b114942f11e711b331dcf"><div class="ttname"><a href="types_8h.html#aa1ded61d294b114942f11e711b331dcf">CCC_Result</a></div><div class="ttdeci">CCC_Result</div><div class="ttdoc">A result of actions on containers.</div><div class="ttdef"><b>Definition:</b> types.h:148</div></div>
+</div><!-- fragment --><p>The above requires destination capacity be greater than or equal to source capacity. Here is memory management handed over to the copy function.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC</span></div>
-<div class="line">flat_double_ended_queue src = fdeq_init(NULL, <span class="keywordtype">int</span>, std_alloc, NULL, 0);</div>
-<div class="line">(void)<a class="code hl_function" href="flat__double__ended__queue_8h.html#a2d8c8988041f24a63d46defee8db29bd">ccc_fdeq_push_back_range</a>(&amp;src, 5, (<span class="keywordtype">int</span>[5]){0,1,2,3,4});</div>
-<div class="line">flat_double_ended_queue dst = fdeq_init(NULL, <span class="keywordtype">int</span>, std_alloc, NULL, 0);</div>
-<div class="line"><a class="code hl_enumeration" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> res = fdeq_copy(&amp;dst, &amp;src, std_alloc);</div>
-<div class="ttc" id="aflat__double__ended__queue_8h_html_a2d8c8988041f24a63d46defee8db29bd"><div class="ttname"><a href="flat__double__ended__queue_8h.html#a2d8c8988041f24a63d46defee8db29bd">ccc_fdeq_push_back_range</a></div><div class="ttdeci">ccc_result ccc_fdeq_push_back_range(ccc_flat_double_ended_queue *fdeq, size_t n, void const *elems)</div><div class="ttdoc">Push the range of user types to the back of the fdeq. O(N).</div></div>
-</div><!-- fragment --><p>The above allows dst to have a capacity less than that of the src as long as copy has been provided an allocation function to resize dst. Note that this would still work if copying to a destination that the user wants as a fixed size fdeq (ring buffer).</p>
+<div class="line">Flat_double_ended_queue source = flat_double_ended_queue_initialize(</div>
+<div class="line">    NULL,</div>
+<div class="line">    <span class="keywordtype">int</span>,</div>
+<div class="line">    std_allocate,</div>
+<div class="line">    NULL,</div>
+<div class="line">    0</div>
+<div class="line">);</div>
+<div class="line">(void)<a class="code hl_function" href="flat__double__ended__queue_8h.html#a20277e235f60691783a0a1b33d3c4c90">CCC_flat_double_ended_queue_push_back_range</a>(</div>
+<div class="line">    &amp;source,</div>
+<div class="line">    5,</div>
+<div class="line">    (<span class="keywordtype">int</span>[5]){0,1,2,3,4}</div>
+<div class="line">);</div>
+<div class="line">Flat_double_ended_queue destination = flat_double_ended_queue_initialize(</div>
+<div class="line">    NULL,</div>
+<div class="line">    <span class="keywordtype">int</span>,</div>
+<div class="line">    std_allocate,</div>
+<div class="line">    NULL,</div>
+<div class="line">    0</div>
+<div class="line">);</div>
+<div class="line"><a class="code hl_enumeration" href="types_8h.html#aa1ded61d294b114942f11e711b331dcf">CCC_Result</a> res = flat_double_ended_queue_copy(</div>
+<div class="line">    &amp;destination,</div>
+<div class="line">    &amp;source,</div>
+<div class="line">    std_allocate</div>
+<div class="line">);</div>
+<div class="ttc" id="aflat__double__ended__queue_8h_html_a20277e235f60691783a0a1b33d3c4c90"><div class="ttname"><a href="flat__double__ended__queue_8h.html#a20277e235f60691783a0a1b33d3c4c90">CCC_flat_double_ended_queue_push_back_range</a></div><div class="ttdeci">CCC_Result CCC_flat_double_ended_queue_push_back_range(CCC_Flat_double_ended_queue *queue, size_t count, void const *type_array)</div><div class="ttdoc">Push the range of user types to the back of the flat_double_ended_queue. O(N).</div></div>
+</div><!-- fragment --><p>The above allows destination to have a capacity less than that of the source as long as copy has been provided an allocation function to resize destination. Note that this would still work if copying to a destination that the user wants as a fixed size queue (ring buffer).</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define FLAT_DOUBLE_ENDED_QUEUE_USING_NAMESPACE_CCC</span></div>
-<div class="line">flat_double_ended_queue src = fdeq_init(NULL, <span class="keywordtype">int</span>, std_alloc, NULL, 0);</div>
-<div class="line">(void)<a class="code hl_function" href="flat__double__ended__queue_8h.html#a2d8c8988041f24a63d46defee8db29bd">ccc_fdeq_push_back_range</a>(&amp;src, 5, (<span class="keywordtype">int</span>[5]){0,1,2,3,4});</div>
-<div class="line">flat_double_ended_queue dst = fdeq_init(NULL, <span class="keywordtype">int</span>, NULL, NULL, 0);</div>
-<div class="line"><a class="code hl_enumeration" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> res = fdeq_copy(&amp;dst, &amp;src, std_alloc);</div>
-</div><!-- fragment --><p>The above sets up dst as a ring buffer while src is a dynamic fdeq. Because an allocation function is provided, the dst is resized once for the copy and retains its fixed size after the copy is complete. This would require the user to manually free the underlying buffer at dst eventually if this method is used. Usually it is better to allocate the memory explicitly before the copy if copying between ring buffers.</p>
+<div class="line">Flat_double_ended_queue source = flat_double_ended_queue_initialize(</div>
+<div class="line">    NULL,</div>
+<div class="line">    <span class="keywordtype">int</span>,</div>
+<div class="line">    std_allocate,</div>
+<div class="line">    NULL,</div>
+<div class="line">    0</div>
+<div class="line">);</div>
+<div class="line">(void)<a class="code hl_function" href="flat__double__ended__queue_8h.html#a20277e235f60691783a0a1b33d3c4c90">CCC_flat_double_ended_queue_push_back_range</a>(</div>
+<div class="line">    &amp;source,</div>
+<div class="line">    5,</div>
+<div class="line">    (<span class="keywordtype">int</span>[5]){0,1,2,3,4}</div>
+<div class="line">);</div>
+<div class="line">Flat_double_ended_queue destination = flat_double_ended_queue_initialize(</div>
+<div class="line">    NULL,</div>
+<div class="line">    <span class="keywordtype">int</span>,</div>
+<div class="line">    NULL,</div>
+<div class="line">    NULL,</div>
+<div class="line">    0</div>
+<div class="line">);</div>
+<div class="line"><a class="code hl_enumeration" href="types_8h.html#aa1ded61d294b114942f11e711b331dcf">CCC_Result</a> res = flat_double_ended_queue_copy(</div>
+<div class="line">    &amp;destination,</div>
+<div class="line">    &amp;source,</div>
+<div class="line">    std_allocate</div>
+<div class="line">);</div>
+</div><!-- fragment --><p>The above sets up destination as a ring Buffer while source is a dynamic flat_double_ended_queue. Because an allocation function is provided, the destination is resized once for the copy and retains its fixed size after the copy is complete. This would require the user to manually free the underlying Buffer at destination eventually if this method is used. Usually it is better to allocate the memory explicitly before the copy if copying between ring buffers.</p>
 <p>These options allow users to stay consistent across containers with their memory management strategies. </p>
 
 </div>
 </div>
-<a id="af90f60ae10191ef5557994ec75d8a45a" name="af90f60ae10191ef5557994ec75d8a45a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af90f60ae10191ef5557994ec75d8a45a">&#9670;&#160;</a></span>ccc_fdeq_count()</h2>
+<a id="aaa9445990daaae7a0893290e1811a601" name="aaa9445990daaae7a0893290e1811a601"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaa9445990daaae7a0893290e1811a601">&#9670;&#160;</a></span>CCC_flat_double_ended_queue_count()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structccc__ucount.html">ccc_ucount</a> ccc_fdeq_count </td>
+          <td class="memname"><a class="el" href="structCCC__Count.html">CCC_Count</a> CCC_flat_double_ended_queue_count </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> const *&#160;</td>
-          <td class="paramname"><em>fdeq</em></td><td>)</td>
+          <td class="paramtype"><a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> const *&#160;</td>
+          <td class="paramname"><em>queue</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Return the count of active fdeq slots. O(1). </p>
+<p>Return the count of active queue slots. O(1). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">fdeq</td><td>a pointer to the fdeq. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">queue</td><td>a pointer to the flat_double_ended_queue. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the size of the fdeq or an argument error is set if fdeq is NULL. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the size of the queue or an argument error is set if flat_double_ended_queue is NULL. </dd></dl>
 
 </div>
 </div>
-<a id="ab49f9096ecd1127d3f8501613ab45602" name="ab49f9096ecd1127d3f8501613ab45602"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab49f9096ecd1127d3f8501613ab45602">&#9670;&#160;</a></span>ccc_fdeq_data()</h2>
+<a id="ad58407f94528520d72bae908506b6c8e" name="ad58407f94528520d72bae908506b6c8e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad58407f94528520d72bae908506b6c8e">&#9670;&#160;</a></span>CCC_flat_double_ended_queue_data()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void * ccc_fdeq_data </td>
+          <td class="memname">void * CCC_flat_double_ended_queue_data </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> const *&#160;</td>
-          <td class="paramname"><em>fdeq</em></td><td>)</td>
+          <td class="paramtype"><a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> const *&#160;</td>
+          <td class="paramname"><em>queue</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -768,28 +970,28 @@ This graph shows which files directly or indirectly include this file:</div>
 <p>Return a reference to the base of backing array. O(1). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">fdeq</td><td>a pointer to the fdeq. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">queue</td><td>a pointer to the flat_double_ended_queue. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>a reference to the base of the backing array. </dd></dl>
-<dl class="section note"><dt>Note</dt><dd>the reference is to the base of the backing array at index 0 with no consideration to where the front index of the fdeq may be. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>the reference is to the base of the backing array at index 0 with no consideration to where the front index of the queue may be. </dd></dl>
 <dl class="section warning"><dt>Warning</dt><dd>it is the users responsibility to ensure that access to any data is within the capacity of the backing buffer.</dd></dl>
-<p>This method is exposed for serialization or writing purposes but the base of the array may not point to valid data in terms of organization of the fdeq. </p>
+<p>This method is exposed for serialization or writing purposes but the base of the array may not point to valid data in terms of organization of the flat_double_ended_queue. </p>
 
 </div>
 </div>
-<a id="a9264ced538427697983cdaf42ff8ff27" name="a9264ced538427697983cdaf42ff8ff27"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9264ced538427697983cdaf42ff8ff27">&#9670;&#160;</a></span>ccc_fdeq_end()</h2>
+<a id="ae2eaf5182daa7d00da6cc0d46d06906b" name="ae2eaf5182daa7d00da6cc0d46d06906b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae2eaf5182daa7d00da6cc0d46d06906b">&#9670;&#160;</a></span>CCC_flat_double_ended_queue_end()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void * ccc_fdeq_end </td>
+          <td class="memname">void * CCC_flat_double_ended_queue_end </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> const *&#160;</td>
-          <td class="paramname"><em>fdeq</em></td><td>)</td>
+          <td class="paramtype"><a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> const *&#160;</td>
+          <td class="paramname"><em>queue</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -798,7 +1000,7 @@ This graph shows which files directly or indirectly include this file:</div>
 <p>Return a pointer to the end element. It may not be accessed. O(1). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">fdeq</td><td>a pointer to the fdeq. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">queue</td><td>a pointer to the flat_double_ended_queue. </td></tr>
   </table>
   </dd>
 </dl>
@@ -806,62 +1008,62 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="a88d9f08549c2ce4edf9d575caccb3fb4" name="a88d9f08549c2ce4edf9d575caccb3fb4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a88d9f08549c2ce4edf9d575caccb3fb4">&#9670;&#160;</a></span>ccc_fdeq_front()</h2>
+<a id="a6915b74d644465d8b21f43e9dfbee0ff" name="a6915b74d644465d8b21f43e9dfbee0ff"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6915b74d644465d8b21f43e9dfbee0ff">&#9670;&#160;</a></span>CCC_flat_double_ended_queue_front()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void * ccc_fdeq_front </td>
+          <td class="memname">void * CCC_flat_double_ended_queue_front </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> const *&#160;</td>
-          <td class="paramname"><em>fdeq</em></td><td>)</td>
+          <td class="paramtype"><a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> const *&#160;</td>
+          <td class="paramname"><em>queue</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Return a reference to the front of the fdeq. O(1). </p>
+<p>Return a reference to the front of the flat_double_ended_queue. O(1). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">fdeq</td><td>a pointer to the fdeq. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">queue</td><td>a pointer to the flat_double_ended_queue. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>a reference to the front element or NULL if fdeq is NULL or the fdeq is empty. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>a reference to the front element or NULL if queue is NULL or the queue is empty. </dd></dl>
 
 </div>
 </div>
-<a id="a3637efae168143b1068575dbf07cec8f" name="a3637efae168143b1068575dbf07cec8f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3637efae168143b1068575dbf07cec8f">&#9670;&#160;</a></span>ccc_fdeq_insert_range()</h2>
+<a id="aacec72c64e47adc6226eb46438067c20" name="aacec72c64e47adc6226eb46438067c20"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aacec72c64e47adc6226eb46438067c20">&#9670;&#160;</a></span>CCC_flat_double_ended_queue_insert_range()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void * ccc_fdeq_insert_range </td>
+          <td class="memname">void * CCC_flat_double_ended_queue_insert_range </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> *&#160;</td>
-          <td class="paramname"><em>fdeq</em>, </td>
+          <td class="paramtype"><a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> *&#160;</td>
+          <td class="paramname"><em>queue</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>pos</em>, </td>
+          <td class="paramname"><em>position</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>n</em>, </td>
+          <td class="paramname"><em>count</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">void const *&#160;</td>
-          <td class="paramname"><em>elems</em>&#160;</td>
+          <td class="paramname"><em>type_array</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -871,25 +1073,25 @@ This graph shows which files directly or indirectly include this file:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Push the range of user types before pos of the fdeq. O(N). </p>
+<p>Push the range of user types before position of the flat_double_ended_queue. O(N). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">fdeq</td><td>a pointer to the fdeq. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">pos</td><td>the position in the fdeq before which to push the range. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">n</td><td>the number of user types in the elems range. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">elems</td><td>a pointer to the array of user types. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">queue</td><td>a pointer to the flat_double_ended_queue. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">position</td><td>the position in the queue before which to push the range. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">count</td><td>the number of user types in the type_array range. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">type_array</td><td>a pointer to the array of user types. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>a pointer to the start of the inserted range or NULL if a resize was required and could not complete.</dd></dl>
-<p>Note that if no allocation is permitted the fdeq behaves as a ring buffer. Therefore, pushing a range that will exceed capacity will overwrite elements at the start of the fdeq.</p>
-<p>Pushing a range of elements prioritizes the range and allows the range to overwrite elements instead of pushing those elements over the start of the range. For example, push a range <code>{3,4,5}</code> over a fdeq with capacity 5 before pos with value 6.</p>
-<div class="fragment"><div class="line"> front pos        front</div>
+<p>Note that if no allocation is permitted the queue behaves as a ring buffer. Therefore, pushing a range that will exceed capacity will overwrite elements at the start of the flat_double_ended_queue.</p>
+<p>Pushing a range of elements prioritizes the range and allows the range to overwrite elements instead of pushing those elements over the start of the range. For example, push a range <code>{3,4,5}</code> over a queue with capacity 5 before position with value 6.</p>
+<div class="fragment"><div class="line"> front position        front</div>
 <div class="line">┌─┬┴┬─┬┴┬─┐    ┌─┬─┬┴┬─┬─┐</div>
 <div class="line">│ │1│2│6│ │ -&gt; │5│6│2│3│4│</div>
 <div class="line">└─┴─┴─┴─┴─┘    └─┴─┴─┴─┴─┘</div>
-</div><!-- fragment --><p>Notice that 1 and 2 were NOT moved to overwrite the start of the range, the values 3 and 4. The only way the start of a range will be overwritten is if the range itself is too large for the capacity. For example, push a range <code>{0,0,3,3,4,4,5,5}</code> over the same fdeq.</p>
-<div class="fragment"><div class="line"> front pos    front</div>
+</div><!-- fragment --><p>Notice that 1 and 2 were NOT moved to overwrite the start of the range, the values 3 and 4. The only way the start of a range will be overwritten is if the range itself is too large for the capacity. For example, push a range <code>{0,0,3,3,4,4,5,5}</code> over the same flat_double_ended_queue.</p>
+<div class="fragment"><div class="line"> front position    front</div>
 <div class="line">┌─┬┴┬─┬┴┬─┐    ┌┴┬─┬─┬─┬─┐</div>
 <div class="line">│ │1│2│6│ │ -&gt; │3│4│4│5│5│</div>
 <div class="line">└─┴─┴─┴─┴─┘    └─┴─┴─┴─┴─┘</div>
@@ -897,50 +1099,50 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="a891865ef2a715297974c2def5671d5bb" name="a891865ef2a715297974c2def5671d5bb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a891865ef2a715297974c2def5671d5bb">&#9670;&#160;</a></span>ccc_fdeq_is_empty()</h2>
+<a id="a1b1f52151a52f38ab1a0f811b668cfde" name="a1b1f52151a52f38ab1a0f811b668cfde"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1b1f52151a52f38ab1a0f811b668cfde">&#9670;&#160;</a></span>CCC_flat_double_ended_queue_is_empty()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> ccc_fdeq_is_empty </td>
+          <td class="memname"><a class="el" href="types_8h.html#a8dbb03cfc2070934832841f50f146bcd">CCC_Tribool</a> CCC_flat_double_ended_queue_is_empty </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> const *&#160;</td>
-          <td class="paramname"><em>fdeq</em></td><td>)</td>
+          <td class="paramtype"><a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> const *&#160;</td>
+          <td class="paramname"><em>queue</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Return true if the size of the fdeq is 0. O(1). </p>
+<p>Return true if the size of the queue is 0. O(1). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">fdeq</td><td>a pointer to the fdeq. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">queue</td><td>a pointer to the flat_double_ended_queue. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>true if the size is 0 or false. Error if fdeq is NULL. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>true if the size is 0 or false. Error if queue is NULL. </dd></dl>
 
 </div>
 </div>
-<a id="a1e152982e0102e279af6893a77d975de" name="a1e152982e0102e279af6893a77d975de"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1e152982e0102e279af6893a77d975de">&#9670;&#160;</a></span>ccc_fdeq_next()</h2>
+<a id="a78cafede63b7fbc72ffc69bea4f4c21d" name="a78cafede63b7fbc72ffc69bea4f4c21d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a78cafede63b7fbc72ffc69bea4f4c21d">&#9670;&#160;</a></span>CCC_flat_double_ended_queue_next()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void * ccc_fdeq_next </td>
+          <td class="memname">void * CCC_flat_double_ended_queue_next </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> const *&#160;</td>
-          <td class="paramname"><em>fdeq</em>, </td>
+          <td class="paramtype"><a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> const *&#160;</td>
+          <td class="paramname"><em>queue</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">void const *&#160;</td>
-          <td class="paramname"><em>iter_ptr</em>&#160;</td>
+          <td class="paramname"><em>iterator_pointer</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -950,89 +1152,89 @@ This graph shows which files directly or indirectly include this file:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Return the next element in the fdeq moving front to back. O(1). </p>
+<p>Return the next element in the queue moving front to back. O(1). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">fdeq</td><td>a pointer to the fdeq. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">iter_ptr</td><td>the current element in the fdeq. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">queue</td><td>a pointer to the flat_double_ended_queue. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">iterator_pointer</td><td>the current element in the flat_double_ended_queue. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the element following iter_ptr or NULL if no elements follow. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the element following iterator_pointer or NULL if no elements follow. </dd></dl>
 
 </div>
 </div>
-<a id="a60e38bd6dacaf6204fa8de34c7732789" name="a60e38bd6dacaf6204fa8de34c7732789"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a60e38bd6dacaf6204fa8de34c7732789">&#9670;&#160;</a></span>ccc_fdeq_pop_back()</h2>
+<a id="a2d0574114a214ff94c9026ce703c0f83" name="a2d0574114a214ff94c9026ce703c0f83"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2d0574114a214ff94c9026ce703c0f83">&#9670;&#160;</a></span>CCC_flat_double_ended_queue_pop_back()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_fdeq_pop_back </td>
+          <td class="memname"><a class="el" href="types_8h.html#aa1ded61d294b114942f11e711b331dcf">CCC_Result</a> CCC_flat_double_ended_queue_pop_back </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> *&#160;</td>
-          <td class="paramname"><em>fdeq</em></td><td>)</td>
+          <td class="paramtype"><a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> *&#160;</td>
+          <td class="paramname"><em>queue</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Pop an element from the back of the fdeq. O(1). </p>
+<p>Pop an element from the back of the flat_double_ended_queue. O(1). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">fdeq</td><td>a pointer to the fdeq. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">queue</td><td>a pointer to the flat_double_ended_queue. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>ok if the pop was successful. If fdeq is NULL or the fdeq is empty an input error is returned. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>ok if the pop was successful. If queue is NULL or the flat_double_ended_queue is empty an input error is returned. </dd></dl>
 
 </div>
 </div>
-<a id="ae1122093b9e142bbc81f56d09e2d5331" name="ae1122093b9e142bbc81f56d09e2d5331"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae1122093b9e142bbc81f56d09e2d5331">&#9670;&#160;</a></span>ccc_fdeq_pop_front()</h2>
+<a id="a909fc9a656817e0bbb1cc25aa39b4498" name="a909fc9a656817e0bbb1cc25aa39b4498"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a909fc9a656817e0bbb1cc25aa39b4498">&#9670;&#160;</a></span>CCC_flat_double_ended_queue_pop_front()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_fdeq_pop_front </td>
+          <td class="memname"><a class="el" href="types_8h.html#aa1ded61d294b114942f11e711b331dcf">CCC_Result</a> CCC_flat_double_ended_queue_pop_front </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> *&#160;</td>
-          <td class="paramname"><em>fdeq</em></td><td>)</td>
+          <td class="paramtype"><a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> *&#160;</td>
+          <td class="paramname"><em>queue</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Pop an element from the front of the fdeq. O(1). </p>
+<p>Pop an element from the front of the flat_double_ended_queue. O(1). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">fdeq</td><td>a pointer to the fdeq. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">queue</td><td>a pointer to the flat_double_ended_queue. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>ok if the pop was successful. If fdeq is NULL or the fdeq is empty an input error is returned. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>ok if the pop was successful. If queue is NULL or the flat_double_ended_queue is empty an input error is returned. </dd></dl>
 
 </div>
 </div>
-<a id="aa352727365879daa6510133a768cc628" name="aa352727365879daa6510133a768cc628"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa352727365879daa6510133a768cc628">&#9670;&#160;</a></span>ccc_fdeq_push_back()</h2>
+<a id="aa40492b8abb99dc287a89818809d313d" name="aa40492b8abb99dc287a89818809d313d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa40492b8abb99dc287a89818809d313d">&#9670;&#160;</a></span>CCC_flat_double_ended_queue_push_back()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void * ccc_fdeq_push_back </td>
+          <td class="memname">void * CCC_flat_double_ended_queue_push_back </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> *&#160;</td>
-          <td class="paramname"><em>fdeq</em>, </td>
+          <td class="paramtype"><a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> *&#160;</td>
+          <td class="paramname"><em>queue</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">void const *&#160;</td>
-          <td class="paramname"><em>elem</em>&#160;</td>
+          <td class="paramname"><em>type</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1042,11 +1244,11 @@ This graph shows which files directly or indirectly include this file:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Push the user type to the back of the fdeq. O(1) if no allocation permission amortized O(1) if allocation permission is given and a resize is required. </p>
+<p>Push the user type to the back of the flat_double_ended_queue. O(1) if no allocation permission amortized O(1) if allocation permission is given and a resize is required. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">fdeq</td><td>a pointer to the fdeq. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">elem</td><td>a pointer to the user type to insert into the fdeq. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">queue</td><td>a pointer to the flat_double_ended_queue. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">type</td><td>a pointer to the user type to insert into the flat_double_ended_queue. </td></tr>
   </table>
   </dd>
 </dl>
@@ -1054,29 +1256,29 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="a2d8c8988041f24a63d46defee8db29bd" name="a2d8c8988041f24a63d46defee8db29bd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2d8c8988041f24a63d46defee8db29bd">&#9670;&#160;</a></span>ccc_fdeq_push_back_range()</h2>
+<a id="a20277e235f60691783a0a1b33d3c4c90" name="a20277e235f60691783a0a1b33d3c4c90"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a20277e235f60691783a0a1b33d3c4c90">&#9670;&#160;</a></span>CCC_flat_double_ended_queue_push_back_range()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_fdeq_push_back_range </td>
+          <td class="memname"><a class="el" href="types_8h.html#aa1ded61d294b114942f11e711b331dcf">CCC_Result</a> CCC_flat_double_ended_queue_push_back_range </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> *&#160;</td>
-          <td class="paramname"><em>fdeq</em>, </td>
+          <td class="paramtype"><a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> *&#160;</td>
+          <td class="paramname"><em>queue</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>n</em>, </td>
+          <td class="paramname"><em>count</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">void const *&#160;</td>
-          <td class="paramname"><em>elems</em>&#160;</td>
+          <td class="paramname"><em>type_array</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1086,37 +1288,37 @@ This graph shows which files directly or indirectly include this file:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Push the range of user types to the back of the fdeq. O(N). </p>
+<p>Push the range of user types to the back of the flat_double_ended_queue. O(N). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">fdeq</td><td>pointer to the fdeq. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">n</td><td>the number of user types in the elems range. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">elems</td><td>a pointer to the array of user types. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">queue</td><td>pointer to the flat_double_ended_queue. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">count</td><td>the number of user types in the type_array range. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">type_array</td><td>a pointer to the array of user types. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>ok if insertion was successful. If allocation is permitted and a resize is needed but fails an error is returned. If bad input is provided an input error is returned.</dd></dl>
-<p>Note that if no allocation is permitted the fdeq behaves as a ring buffer. Therefore, pushing a range that will exceed capacity will overwrite elements at the beginning of the fdeq. </p>
+<p>Note that if no allocation is permitted the queue behaves as a ring buffer. Therefore, pushing a range that will exceed capacity will overwrite elements at the beginning of the flat_double_ended_queue. </p>
 
 </div>
 </div>
-<a id="a6e8aa8edc1a18d945b8bdd664709e7a2" name="a6e8aa8edc1a18d945b8bdd664709e7a2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6e8aa8edc1a18d945b8bdd664709e7a2">&#9670;&#160;</a></span>ccc_fdeq_push_front()</h2>
+<a id="ac0ae7535583a79ba314dcb6ccb0365d8" name="ac0ae7535583a79ba314dcb6ccb0365d8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac0ae7535583a79ba314dcb6ccb0365d8">&#9670;&#160;</a></span>CCC_flat_double_ended_queue_push_front()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void * ccc_fdeq_push_front </td>
+          <td class="memname">void * CCC_flat_double_ended_queue_push_front </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> *&#160;</td>
-          <td class="paramname"><em>fdeq</em>, </td>
+          <td class="paramtype"><a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> *&#160;</td>
+          <td class="paramname"><em>queue</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">void const *&#160;</td>
-          <td class="paramname"><em>elem</em>&#160;</td>
+          <td class="paramname"><em>type</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1126,11 +1328,11 @@ This graph shows which files directly or indirectly include this file:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Push the user type to the front of the fdeq. O(1) if no allocation permission amortized O(1) if allocation permission is given and a resize is required. </p>
+<p>Push the user type to the front of the flat_double_ended_queue. O(1) if no allocation permission amortized O(1) if allocation permission is given and a resize is required. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">fdeq</td><td>a pointer to the fdeq. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">elem</td><td>a pointer to the user type to insert into the fdeq. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">queue</td><td>a pointer to the flat_double_ended_queue. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">type</td><td>a pointer to the user type to insert into the flat_double_ended_queue. </td></tr>
   </table>
   </dd>
 </dl>
@@ -1138,29 +1340,29 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="a5d271eca7745f9da989409b337afb5b7" name="a5d271eca7745f9da989409b337afb5b7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5d271eca7745f9da989409b337afb5b7">&#9670;&#160;</a></span>ccc_fdeq_push_front_range()</h2>
+<a id="a5eb9ab609b056e8d31fcd80383a56417" name="a5eb9ab609b056e8d31fcd80383a56417"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5eb9ab609b056e8d31fcd80383a56417">&#9670;&#160;</a></span>CCC_flat_double_ended_queue_push_front_range()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_fdeq_push_front_range </td>
+          <td class="memname"><a class="el" href="types_8h.html#aa1ded61d294b114942f11e711b331dcf">CCC_Result</a> CCC_flat_double_ended_queue_push_front_range </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> *&#160;</td>
-          <td class="paramname"><em>fdeq</em>, </td>
+          <td class="paramtype"><a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> *&#160;</td>
+          <td class="paramname"><em>queue</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>n</em>, </td>
+          <td class="paramname"><em>count</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">void const *&#160;</td>
-          <td class="paramname"><em>elems</em>&#160;</td>
+          <td class="paramname"><em>type_array</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1170,85 +1372,31 @@ This graph shows which files directly or indirectly include this file:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Push the range of user types to the front of the fdeq. O(N). </p>
+<p>Push the range of user types to the front of the flat_double_ended_queue. O(N). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">fdeq</td><td>a pointer to the fdeq. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">n</td><td>the number of user types in the elems range. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">elems</td><td>a pointer to the array of user types. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">queue</td><td>a pointer to the flat_double_ended_queue. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">count</td><td>the number of user types in the type_array range. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">type_array</td><td>a pointer to the array of user types. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>ok if insertion was successful. If allocation is permitted and a resize is needed but fails an error is returned. If bad input is provided an input error is returned.</dd></dl>
-<p>Note that if no allocation is permitted the fdeq behaves as a ring buffer. Therefore, pushing a range that will exceed capacity will overwrite elements at the back of the fdeq. </p>
+<p>Note that if no allocation is permitted the queue behaves as a ring buffer. Therefore, pushing a range that will exceed capacity will overwrite elements at the back of the flat_double_ended_queue. </p>
 
 </div>
 </div>
-<a id="a01d7a66b34eae3abf0557ed5656c4091" name="a01d7a66b34eae3abf0557ed5656c4091"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a01d7a66b34eae3abf0557ed5656c4091">&#9670;&#160;</a></span>ccc_fdeq_rbegin()</h2>
+<a id="a6a454ba349f4ca25fd1c81e4671148d2" name="a6a454ba349f4ca25fd1c81e4671148d2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6a454ba349f4ca25fd1c81e4671148d2">&#9670;&#160;</a></span>CCC_flat_double_ended_queue_reserve()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void * ccc_fdeq_rbegin </td>
+          <td class="memname"><a class="el" href="types_8h.html#aa1ded61d294b114942f11e711b331dcf">CCC_Result</a> CCC_flat_double_ended_queue_reserve </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> const *&#160;</td>
-          <td class="paramname"><em>fdeq</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Return a pointer to the back element of the fdeq. O(1). </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">fdeq</td><td>a pointer to the fdeq. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>a pointer to the user type at the back of the fdeq. NULL if empty. </dd></dl>
-
-</div>
-</div>
-<a id="a91d5c7871381b4bd11eae774ad999962" name="a91d5c7871381b4bd11eae774ad999962"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a91d5c7871381b4bd11eae774ad999962">&#9670;&#160;</a></span>ccc_fdeq_rend()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void * ccc_fdeq_rend </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> const *&#160;</td>
-          <td class="paramname"><em>fdeq</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Return a pointer to the start element. It may not be accessed. O(1). </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">fdeq</td><td>a pointer to the fdeq. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>a pointer to the start sentinel element that may not be accessed. </dd></dl>
-
-</div>
-</div>
-<a id="a59fca02b8832c42a1490244f9d291379" name="a59fca02b8832c42a1490244f9d291379"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a59fca02b8832c42a1490244f9d291379">&#9670;&#160;</a></span>ccc_fdeq_reserve()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a51d6f078a83d667aff5016609d9146ef">ccc_result</a> ccc_fdeq_reserve </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> *&#160;</td>
-          <td class="paramname"><em>fdeq</em>, </td>
+          <td class="paramtype"><a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> *&#160;</td>
+          <td class="paramname"><em>queue</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1259,8 +1407,8 @@ This graph shows which files directly or indirectly include this file:</div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="types_8h.html#a3e73202894869d2840fb21ff912bbd96">ccc_any_alloc_fn</a> *&#160;</td>
-          <td class="paramname"><em>fn</em>&#160;</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#aac6280c471e14b9c0d50b1c5577394d3">CCC_Allocator</a> *&#160;</td>
+          <td class="paramname"><em>allocate</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1273,36 +1421,90 @@ This graph shows which files directly or indirectly include this file:</div>
 <p>Reserves space for at least to_add more elements. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">fdeq</td><td>a pointer to the flat double ended queue. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">queue</td><td>a pointer to the flat double ended queue. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">to_add</td><td>the number of elements to add to the current size. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">fn</td><td>the allocation function to use to reserve memory. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">allocate</td><td>the allocation function to use to reserve memory. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the result of the reservation. OK if successful, otherwise an error status is returned. </dd></dl>
-<dl class="section note"><dt>Note</dt><dd>see the ccc_fdeq_clear_and_free_reserve function if this function is being used for a one-time dynamic reservation.</dd></dl>
-<p>This function can be used for a dynamic fdeq with or without allocation permission. If the fdeq has allocation permission, it will reserve the required space and later resize if more space is needed.</p>
-<p>If the fdeq has been initialized with no allocation permission and no memory this function can serve as a one-time reservation. The fdeq will then act as as ring buffer when space runs out. This is helpful when a fixed size is needed but that size is only known dynamically at runtime. To free the fdeq in such a case see the ccc_fdeq_clear_and_free_reserve function. </p>
+<dl class="section note"><dt>Note</dt><dd>see the CCC_flat_double_ended_queue_clear_and_free_reserve function if this function is being used for a one-time dynamic reservation.</dd></dl>
+<p>This function can be used for a dynamic queue with or without allocation permission. If the queue has allocation permission, it will reserve the required space and later resize if more space is needed.</p>
+<p>If the queue has been initialized with no allocation permission and no memory this function can serve as a one-time reservation. The flat_double_ended_queue will then act as as ring Buffer when space runs out. This is helpful when a fixed size is needed but that size is only known dynamically at runtime. To free the queue in such a case see the CCC_flat_double_ended_queue_clear_and_free_reserve function. </p>
 
 </div>
 </div>
-<a id="af62103b1ef7d05fd9daa66c956c352bf" name="af62103b1ef7d05fd9daa66c956c352bf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af62103b1ef7d05fd9daa66c956c352bf">&#9670;&#160;</a></span>ccc_fdeq_rnext()</h2>
+<a id="a8ccf6dfe4d541b5fdced9187df1a425f" name="a8ccf6dfe4d541b5fdced9187df1a425f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8ccf6dfe4d541b5fdced9187df1a425f">&#9670;&#160;</a></span>CCC_flat_double_ended_queue_reverse_begin()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void * ccc_fdeq_rnext </td>
+          <td class="memname">void * CCC_flat_double_ended_queue_reverse_begin </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> const *&#160;</td>
-          <td class="paramname"><em>fdeq</em>, </td>
+          <td class="paramtype"><a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> const *&#160;</td>
+          <td class="paramname"><em>queue</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Return a pointer to the back element of the flat_double_ended_queue. O(1). </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">queue</td><td>a pointer to the flat_double_ended_queue. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>a pointer to the user type at the back of the flat_double_ended_queue. NULL if empty. </dd></dl>
+
+</div>
+</div>
+<a id="a42d477ac9fd7b3500ef03e84b2aed94c" name="a42d477ac9fd7b3500ef03e84b2aed94c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a42d477ac9fd7b3500ef03e84b2aed94c">&#9670;&#160;</a></span>CCC_flat_double_ended_queue_reverse_end()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void * CCC_flat_double_ended_queue_reverse_end </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> const *&#160;</td>
+          <td class="paramname"><em>queue</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Return a pointer to the start element. It may not be accessed. O(1). </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">queue</td><td>a pointer to the flat_double_ended_queue. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>a pointer to the start sentinel element that may not be accessed. </dd></dl>
+
+</div>
+</div>
+<a id="ae3f9ab61443ebac5dd9aac459c90d5ad" name="ae3f9ab61443ebac5dd9aac459c90d5ad"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae3f9ab61443ebac5dd9aac459c90d5ad">&#9670;&#160;</a></span>CCC_flat_double_ended_queue_reverse_next()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void * CCC_flat_double_ended_queue_reverse_next </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> const *&#160;</td>
+          <td class="paramname"><em>queue</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">void const *&#160;</td>
-          <td class="paramname"><em>iter_ptr</em>&#160;</td>
+          <td class="paramname"><em>iterator_pointer</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1312,42 +1514,42 @@ This graph shows which files directly or indirectly include this file:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Return the next element in the fdeq moving back to front. O(1). </p>
+<p>Return the next element in the queue moving back to front. O(1). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">fdeq</td><td>a pointer to the fdeq. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">iter_ptr</td><td>the current element in the fdeq. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">queue</td><td>a pointer to the flat_double_ended_queue. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">iterator_pointer</td><td>the current element in the flat_double_ended_queue. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the element preceding iter_ptr or NULL if no elements follow. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the element preceding iterator_pointer or NULL if no elements follow. </dd></dl>
 
 </div>
 </div>
-<a id="a996af112cdbfa57d1511a82489b0f074" name="a996af112cdbfa57d1511a82489b0f074"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a996af112cdbfa57d1511a82489b0f074">&#9670;&#160;</a></span>ccc_fdeq_validate()</h2>
+<a id="a36c31fda9def51d4d7a20ee1cf02b189" name="a36c31fda9def51d4d7a20ee1cf02b189"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a36c31fda9def51d4d7a20ee1cf02b189">&#9670;&#160;</a></span>CCC_flat_double_ended_queue_validate()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a80a7915df3bc36e01a3a0775eebc0938">ccc_tribool</a> ccc_fdeq_validate </td>
+          <td class="memname"><a class="el" href="types_8h.html#a8dbb03cfc2070934832841f50f146bcd">CCC_Tribool</a> CCC_flat_double_ended_queue_validate </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="flat__double__ended__queue_8h.html#a2b038e1d7394666e5a07fa85c7db8191">ccc_flat_double_ended_queue</a> const *&#160;</td>
-          <td class="paramname"><em>fdeq</em></td><td>)</td>
+          <td class="paramtype"><a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> const *&#160;</td>
+          <td class="paramname"><em>queue</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Return true if the internal invariants of the fdeq. </p>
+<p>Return true if the internal invariants of the flat_double_ended_queue. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">fdeq</td><td>a pointer to the fdeq. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">queue</td><td>a pointer to the flat_double_ended_queue. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>true if the internal invariants of the fdeq are held, else false. Error if fdeq is NULL. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>true if the internal invariants of the queue are held, else false. Error if queue is NULL. </dd></dl>
 
 </div>
 </div>
