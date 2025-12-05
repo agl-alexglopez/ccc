@@ -124,7 +124,7 @@ Formatting should be taken care of by the tools. Clang tidy will settle some sma
 ### Naming
 
 > [!IMPORTANT]
-> Prioritize code reading over writing. Code for the user assumes little, simplifies usage, and minimizes implementation details. Code for the developer is documented, specifies trade offs, and maximizes available implementation details.
+> Prioritize code reading over writing. Code for the user assumes little, simplifies usage, and minimizes implementation details. Code for the developer is documented, specifies design rationale, and maximizes available implementation details.
 
 Given these constraints we use the following naming conventions.
 
@@ -281,23 +281,23 @@ Variable length arrays are strictly prohibited. All containers must be designed 
 For example, a flat priority queue is a binary heap that operates by swapping elements. To swap elements we need a temporary space the size of one of the elements in the heap. We are not a header only template-style library so we must find space across an interface boundary. To ensure the user can store exactly as many elements as they wish in the flat array all signatures for functions that require swapping internally ask for a swap slot. For example here is the pop operation signature.
 
 ```c
-ccc_result ccc_fpq_pop(ccc_flat_priority_queue *fpq, void *tmp);
+CCC_Result CCC_flat_priority_queue_pop(CCC_Flat_priority_queue *q, void *tmp);
 
 ```
 
 Other containers may do the same or be able to avoid pushing this space requirement to the user. Here is the ordered map swap entry operation that requires a swap slot.
 
 ```c
-[[nodiscard]] ccc_entry ccc_om_swap_entry(ccc_ordered_map *om,
-                                          ccc_omap_elem *key_val_output,
-                                          ccc_omap_elem *tmp);
+[[nodiscard]] CCC_Entry CCC_adaptive_map_swap_entry(CCC_Adaptive_map *m,
+                                                    CCC_Adaptive_map_node *key_val_output,
+                                                    CCC_Adaptive_map_node *tmp);
 ```
 
 For the equivalent handle version of this container the space requirement is handled internally.
 
 ```c
-[[nodiscard]] ccc_handle ccc_hom_swap_handle(ccc_array_ordered_map *hom,
-                                             void *key_val_output);
+[[nodiscard]] CCC_Handle CCC_Array_adaptive_swap_handle(CCC_Array_adaptive_map *m,
+                                                        void *key_val_output);
 ```
 
 The handle version of the container is required to preserve the 0th slot in the array as the nil node so it is able to swap when needed with this extra slot.
@@ -336,6 +336,5 @@ Therefore, when adding these macros, ensure core container machinery is containe
 
 At least the following would need to happen before `v1.0`.
 
-- More tests. I added a decent suite of tests to each container with most of the focus on the associative containers, but more thorough testing should be added throughout.
-    - A "bad user" test file should be added for every container in order to learn to what extent we can protect the user from their mistakes. If we cannot protect the user, the documentation must be obvious and clear regarding the critical error they can make.
+- A "bad user" test file should be added for every container in order to learn to what extent we can protect the user from their mistakes. If we cannot protect the user, the documentation must be obvious and clear regarding the critical error they can make.
 - Now that a much more efficient hash table has been implemented, an adaptation of Rust's Hashbrown Hash Table, it is time to start narrowing down changes and lock in interfaces for v1.0. Suggestions are welcome for this phase of refactoring.
