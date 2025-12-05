@@ -641,7 +641,7 @@ main(void)
     struct name nodes[5];
     /* adaptive_map named om, stores struct name, intrusive field e, key field
        name, no allocation permission, comparison fn, no context */
-    adaptive_map om = adaptive_map_initialize(om, struct name, e, name, Key_val_cmp, NULL, NULL);
+    Adaptive_map om = adaptive_map_initialize(struct name, e, name, Key_val_cmp, NULL, NULL);
     char const *const sorted_names[5]
         = {"Ferris", "Glenda", "Rocky", "Tux", "Ziggy"};
     size_t const size = sizeof(sorted_names) / sizeof(sorted_names[0]);
@@ -753,7 +753,7 @@ main(void)
        named elem, key field named key, no allocation permission, key comparison
        function, no context data. */
     Tree_map s
-        = tree_map_initialize(s, struct Key_val, elem, key, Key_val_cmp, NULL, NULL);
+        = tree_map_initialize(struct Key_val, elem, key, Key_val_cmp, NULL, NULL);
     int const num_nodes = 25;
     /* 0, 5, 10, 15, 20, 25, 30, 35,... 120 */
     for (int i = 0, id = 0; i < num_nodes; ++i, id += 5)
@@ -822,7 +822,8 @@ main(void)
 {
     /* singly linked list l, list elem field e, no allocation permission,
        comparing integers, no context data. */
-    Singly_linked_list l = singly_linked_list_initialize(l, struct Int_node, e, int_cmp, NULL, NULL);
+    Singly_linked_list l =
+        singly_linked_list_initialize(struct Int_node, e, int_cmp, NULL, NULL);
     struct Int_node elems[3] = {{.i = 3}, {.i = 2}, {.i = 1}};
     (void)push_front(&l, &elems[0].e);
     (void)push_front(&l, &elems[1].e);
@@ -877,15 +878,30 @@ Non-Intrusive containers exist when a flat container can operate without such he
 /* For example: */
 
 CCC_Flat_priority_queue flat_priority_queue
-    = CCC_flat_priority_queue_initialize((int[40]){}, int, CCC_LESSER, int_cmp, NULL, NULL, 40);
-
+    = CCC_flat_priority_queue_initialize(
+    (int[40]){},
+    int,
+    CCC_LESSER,
+    int_cmp,
+    NULL,
+    NULL,
+    40
+);
 ```
 
 Here a small min priority queue of integers with a maximum capacity of 40 has been allocated on the stack with no allocation permission and no context data needed. As long as the flat priority queue knows the type upon initialization no intrusive elements are needed. We could have also initialized this container as empty if we provide an allocation function (see [allocation](#allocation) for more on allocation permission).
 
 ```c
 CCC_Flat_priority_queue flat_priority_queue
-    = CCC_flat_priority_queue_initialize(NULL, int, CCC_LESSER, int_cmp, std_allocate, NULL, 0);
+    = CCC_flat_priority_queue_initialize(
+    NULL,
+    int,
+    CCC_LESSER,
+    int_cmp,
+    std_allocate,
+    NULL,
+    0
+);
 ```
 
 The interface then looks like this.
@@ -902,7 +918,15 @@ As was mentioned in the previous section, all containers can be forbidden from a
 
 ```c
 CCC_Flat_priority_queue flat_priority_queue
-    = CCC_flat_priority_queue_initialize((int[40]){}, int, CCC_LES, int_cmp, NULL, NULL, 40);
+    = CCC_flat_priority_queue_initialize(
+    (int[40]){},
+    int,
+    CCC_LES,
+    int_cmp,
+    NULL,
+    NULL,
+    40
+);
 ```
 
 For flat containers, fixed capacity is straightforward. Once space runs out, further insertion functions will fail and report that failure in different ways depending on the function used. If other behavior occurs when space runs out, such as ring Buffer behavior for the flat double ended queue, it will be documented in the header of that container.
@@ -918,7 +942,7 @@ struct Id_val
 };
 
 CCC_Doubly_linked_list dll
-    = CCC_doubly_linked_list_initialize(dll, struct Id_val, e, val_cmp, NULL, NULL);
+    = CCC_doubly_linked_list_initialize(struct Id_val, e, val_cmp, NULL, NULL);
 ```
 
 All interface functions now expect the memory containing the intrusive elements to exist with the appropriate scope and lifetime for the programmer's needs. Consider the following classic problem with scoping in C.
@@ -1066,7 +1090,7 @@ int
 main (void)
 {
     static CCC_Doubly_linked_list id_list
-        = CCC_doubly_linked_list_initialize(id_list, struct Id, id_node, id_cmp, NULL, NULL);
+        = CCC_doubly_linked_list_initialize(struct Id, id_node, id_cmp, NULL, NULL);
     /* ...fill list... */
     struct Id *front = CCC_doubly_linked_list_front(&id_list);
     struct Id *new_id = generate_id();
