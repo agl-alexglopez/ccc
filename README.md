@@ -1142,7 +1142,7 @@ Many other containers fall back to C++ style interfaces when it makes sense to d
 
 #### Lazy Evaluation
 
-Many of the above functions come with an optional macro variant. For example, the `or_insert` function for associative containers will come with an `or_insert_w` variant, short for or insert "with." The word "with" in this context means a direct r-value.
+Many of the above functions come with an optional macro variant. For example, the `or_insert` function for associative containers will come with an `or_insert_with` variant. The word "with" in this context means a direct r-value.
 
 Here is an example for generating a maze with Prim's algorithm in the `samples/maze.c` sample.
 
@@ -1203,9 +1203,9 @@ val(int val_arg)
 CCC_Entry *e = adaptive_map_try_insert_with(&om, 3, val(1));
 ```
 
-This second version illustrates a few key points. R-values are provided directly as keys and values, not references to keys and values. Also, a function call to generate a value to be inserted is completely acceptable; the function is only called if insertion is required. Finally, the functions `try_insert_w` and `insert_or_assign_w` will ensure the key in the newly inserted value matches the key searched, saving the user some typing and ensuring they don't make a mistake in this regard.
+This second version illustrates a few key points. R-values are provided directly as keys and values, not references to keys and values. Also, a function call to generate a value to be inserted is completely acceptable; the function is only called if insertion is required. Finally, the functions `try_insert_with` and `insert_or_assign_with` will ensure the key in the newly inserted value matches the key searched, saving the user some typing and ensuring they don't make a mistake in this regard.
 
-The lazy evaluation of the `_w` family of functions offer an expressive way to write C code when needed. See each container's header for more.
+The lazy evaluation of the `_with` family of functions offer an expressive way to write C code when needed. See each container's header for more.
 
 ### Traits
 
