@@ -7,7 +7,7 @@
     },
     "configurePresets": [
         {
-            "name": "default-deb",
+            "name": "default-debug",
             "binaryDir": "${sourceDir}/build",
             "installDir": "${sourceDir}/install",
             "hidden": true,
@@ -20,7 +20,7 @@
             }
         },
         {
-            "name": "default-rel",
+            "name": "default-release",
             "binaryDir": "${sourceDir}/build",
             "installDir": "${sourceDir}/install",
             "hidden": true,
@@ -33,36 +33,36 @@
             }
         },
         {
-            "name": "gcc-deb",
-            "inherits": "default-deb",
+            "name": "gcc-debug",
+            "inherits": "default-debug",
             "cacheVariables": {
                 "CMAKE_C_COMPILER": "gcc"
             }
         },
         {
-            "name": "gcc-rel",
-            "inherits": "default-rel",
+            "name": "gcc-release",
+            "inherits": "default-release",
             "cacheVariables": {
                 "CMAKE_C_COMPILER": "gcc"
             }
         },
         {
-            "name": "clang-deb",
-            "inherits": "default-deb",
+            "name": "clang-debug",
+            "inherits": "default-debug",
             "cacheVariables": {
                 "CMAKE_C_COMPILER": "clang"
             }
         },
         {
-            "name": "clang-rel",
-            "inherits": "default-rel",
+            "name": "clang-release",
+            "inherits": "default-release",
             "cacheVariables": {
                 "CMAKE_C_COMPILER": "clang"
             }
         },
         {
-            "name": "gcc-dsan",
-            "inherits": "default-deb",
+            "name": "gcc-sanitize-debug",
+            "inherits": "default-debug",
             "cacheVariables": {
                 "CMAKE_C_COMPILER": "gcc",
                 "CMAKE_C_FLAGS": "-g3 -Wall -Wextra -Wvla -fanalyzer -Wfloat-equal -Wtype-limits -Wpointer-arith -Wshadow -Winit-self -Wno-variadic-macros -Wno-gnu-alignof-expression -fno-diagnostics-show-option -fsanitize=address,leak,undefined,shift,shift-exponent,integer-divide-by-zero,unreachable,null,return,signed-integer-overflow,bounds,bounds-strict,alignment,object-size,float-divide-by-zero,float-cast-overflow,enum,pointer-overflow",
@@ -70,8 +70,8 @@
             }
         },
         {
-            "name": "gcc-rsan",
-            "inherits": "default-rel",
+            "name": "gcc-sanitize-release",
+            "inherits": "default-release",
             "cacheVariables": {
                 "CMAKE_C_COMPILER": "gcc",
                 "CMAKE_C_FLAGS": "-Wall -Wextra -Wvla -Wfloat-equal -Wtype-limits -Wpointer-arith -Wshadow -Winit-self -Wno-variadic-macros -Wno-gnu-alignof-expression -fno-diagnostics-show-option -fsanitize=address,leak,undefined,shift,shift-exponent,integer-divide-by-zero,unreachable,null,return,signed-integer-overflow,bounds,bounds-strict,alignment,object-size,float-divide-by-zero,float-cast-overflow,enum,pointer-overflow",

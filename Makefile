@@ -1,4 +1,4 @@
-.PHONY: gcc-ccc clang-ccc default build gcc-rel gcc-deb clang-rel clang-deb dsan rsan clean tests samples all-gcc-deb all-gcc-rel all-dsan all-rsan all-clang-deb all-clang-rel dtest rtest util tidy format fanalyze
+.PHONY: gcc-ccc clang-ccc default build gcc-release gcc-debug clang-release clang-debug sanitize-debug sanitize-release clean tests samples all-gcc-debug all-gcc-release all-sanitize-debug all-sanitize-release all-clang-debug all-clang-release dtest rtest utility tidy format fanalyze
 
 MAKE := $(MAKE)
 MAKEFLAGS += --no-print-directory
@@ -17,38 +17,38 @@ build:
 	cmake --build $(BUILD_DIR) $(JOBS)
 
 gcc-ccc:
-	cmake --preset=gcc-rel -DCMAKE_INSTALL_PREFIX=$(PREFIX)
+	cmake --preset=gcc-release -DCMAKE_INSTALL_PREFIX=$(PREFIX)
 	cmake --build $(BUILD_DIR) $(JOBS) --target install $(JOBS)
 
 clang-ccc:
-	cmake --preset=clang-rel -DCMAKE_INSTALL_PREFIX=$(PREFIX)
+	cmake --preset=clang-release -DCMAKE_INSTALL_PREFIX=$(PREFIX)
 	cmake --build $(BUILD_DIR) $(JOBS) --target install $(JOBS)
 
 install:
 	cmake --build $(BUILD_DIR) $(JOBS) --target install $(JOBS)
 
-gcc-rel:
-	cmake --preset=gcc-rel -DCMAKE_INSTALL_PREFIX=$(PREFIX)
+gcc-release:
+	cmake --preset=gcc-release -DCMAKE_INSTALL_PREFIX=$(PREFIX)
 	$(MAKE) build
 
-gcc-deb:
-	cmake --preset=gcc-deb -DCMAKE_INSTALL_PREFIX=$(PREFIX)
+gcc-debug:
+	cmake --preset=gcc-debug -DCMAKE_INSTALL_PREFIX=$(PREFIX)
 	$(MAKE) build
 
-clang-rel:
-	cmake --preset=clang-rel -DCMAKE_INSTALL_PREFIX=$(PREFIX)
+clang-release:
+	cmake --preset=clang-release -DCMAKE_INSTALL_PREFIX=$(PREFIX)
 	$(MAKE) build
 
-clang-deb:
-	cmake --preset=clang-deb -DCMAKE_INSTALL_PREFIX=$(PREFIX)
+clang-debug:
+	cmake --preset=clang-debug -DCMAKE_INSTALL_PREFIX=$(PREFIX)
 	$(MAKE) build
 
-rsan:
-	cmake --preset=gcc-rsan -DCMAKE_INSTALL_PREFIX=$(PREFIX)
+sanitize-release:
+	cmake --preset=gcc-sanitize-release -DCMAKE_INSTALL_PREFIX=$(PREFIX)
 	$(MAKE) build
 
-dsan:
-	cmake --preset=gcc-dsan -DCMAKE_INSTALL_PREFIX=$(PREFIX)
+sanitize-debug:
+	cmake --preset=gcc-sanitize-debug -DCMAKE_INSTALL_PREFIX=$(PREFIX)
 	$(MAKE) build
 
 format:
@@ -63,26 +63,26 @@ tests:
 samples:
 	cmake --build $(BUILD_DIR) $(JOBS) --target samples $(JOBS)
 
-util:
-	cmake --build $(BUILD_DIR) $(JOBS) --target util $(JOBS)
+utility:
+	cmake --build $(BUILD_DIR) $(JOBS) --target utility $(JOBS)
 
-all-gcc-deb:
-	cmake --preset=gcc-deb -DCMAKE_INSTALL_PREFIX=$(PREFIX) && cmake --build build $(JOBS) --target ccc tests samples
+all-gcc-debug:
+	cmake --preset=gcc-debug -DCMAKE_INSTALL_PREFIX=$(PREFIX) && cmake --build build $(JOBS) --target ccc tests samples
 
-all-gcc-rel:
-	cmake --preset=gcc-rel -DCMAKE_INSTALL_PREFIX=$(PREFIX) && cmake --build build $(JOBS) --target ccc tests samples
+all-gcc-release:
+	cmake --preset=gcc-release -DCMAKE_INSTALL_PREFIX=$(PREFIX) && cmake --build build $(JOBS) --target ccc tests samples
 
-all-dsan:
-	cmake --preset=gcc-dsan -DCMAKE_INSTALL_PREFIX=$(PREFIX) && cmake --build build $(JOBS) --target ccc tests samples
+all-sanitize-debug:
+	cmake --preset=gcc-sanitize-debug -DCMAKE_INSTALL_PREFIX=$(PREFIX) && cmake --build build $(JOBS) --target ccc tests samples
 
-all-rsan:
-	cmake --preset=gcc-rsan -DCMAKE_INSTALL_PREFIX=$(PREFIX) && cmake --build build $(JOBS) --target ccc tests samples
+all-sanitize-release:
+	cmake --preset=gcc-sanitize-release -DCMAKE_INSTALL_PREFIX=$(PREFIX) && cmake --build build $(JOBS) --target ccc tests samples
 
-all-clang-deb:
-	cmake --preset=clang-deb -DCMAKE_INSTALL_PREFIX=$(PREFIX) && cmake --build build $(JOBS) --target ccc tests samples
+all-clang-debug:
+	cmake --preset=clang-debug -DCMAKE_INSTALL_PREFIX=$(PREFIX) && cmake --build build $(JOBS) --target ccc tests samples
 
-all-clang-rel:
-	cmake --preset=clang-rel -DCMAKE_INSTALL_PREFIX=$(PREFIX) && cmake --build build $(JOBS) --target ccc tests samples
+all-clang-release:
+	cmake --preset=clang-release -DCMAKE_INSTALL_PREFIX=$(PREFIX) && cmake --build build $(JOBS) --target ccc tests samples
 
 dtest: tests
 	cmake --build build $(JOBS) --target tests

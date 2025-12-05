@@ -1,0 +1,48 @@
+---
+Checks: >
+   *,
+   -altera-*,
+   -llvmlibc-*,
+   -llvm-header-guard,
+   -google-*,
+   -abseil-*,
+   -fuchsia-*,
+   -android-*,
+   -modernize-*,
+   -hicpp*,
+   -cppcoreguidelines-*,
+   -readability-implicit-bool-conversion,
+   -readability-named-parameter,
+   -readability-identifier-length,
+   -*-non-private-member-variables-in-classes,
+   -*-magic-numbers,
+   -concurrency-*,
+   -Wvariadic-macros,
+   -Wgnu-alignof-expression,
+   -clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,
+   -bugprone-easily-swappable-parameters
+
+CheckOptions:
+   - { key: bugprone-unused-return-value.CheckedFunctions, value: ccc.* }
+   - { key: bugprone-unused-return-value.AllowCastToVoid, value: true }
+   - { key: hicpp-signed-bitwise.IgnorePositiveIntegerLiterals, value: true }
+   - { key: readability-identifier-naming.TypedefPrefix, value: CCC_ }
+   - { key: readability-identifier-naming.TypedefCase, value: Leading_upper_snake_case }
+   - { key: readability-identifier-naming.EnumConstantPrefix, value: CCC_ }
+   - { key: readability-identifier-naming.EnumConstantCase, value: UPPER_CASE }
+   - { key: readability-identifier-naming.EnumPrefix, value: CCC_ }
+   - { key: readability-identifier-naming.EnumCase, value: Leading_upper_snake_case }
+   - { key: readability-identifier-naming.StructPrefix, value: CCC_ }
+   - { key: readability-identifier-naming.StructCase, value: Leading_upper_snake_case }
+   - { key: readability-identifier-naming.UnionPrefix, value: CCC_ }
+   - { key: readability-identifier-naming.UnionCase, value: Leading_upper_snake_case }
+   - { key: readability-identifier-naming.FunctionPrefix, value: CCC_ }
+   - { key: readability-identifier-naming.FunctionCase, value: lower_case }
+   - { key: readability-identifier-naming.MacroDefinitionPrefix, value: CCC_ }
+   - { key: readability-identifier-naming.VariableCase, value: lower_case }
+   - { key: readability-identifier-naming.MemberCase, value: lower_case }
+   - { key: readability-function-cognitive-complexity.IgnoreMacros, value: true }
+   - { key: misc-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic, value: true }
+
+FormatStyle: file
+---

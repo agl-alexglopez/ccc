@@ -1,5 +1,5 @@
 tests/ export-ignore
 samples/ export-ignore
-util/ export-ignore
-etc/ export-ignore
+utility/ export-ignore
+tools/ export-ignore
 .github/ export-ignore

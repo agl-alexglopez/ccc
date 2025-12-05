@@ -1,5 +1,5 @@
 /** The words program is a simple word counter that aims to demonstrate
-the benefits of flexible memory layouts and auxiliary data.
+the benefits of flexible memory layouts and context data.
 
 Please specify a command as follows:
 ./build/[debug/]bin/words [flag] -f=[path/to/file]
@@ -22,49 +22,49 @@ Please specify a command as follows:
 #include <string.h>
 
 #define BUFFER_USING_NAMESPACE_CCC
-#define HANDLE_ORDERED_MAP_USING_NAMESPACE_CCC
+#define ARRAY_ADAPTIVE_MAP_USING_NAMESPACE_CCC
 #define FLAT_PRIORITY_QUEUE_USING_NAMESPACE_CCC
 #define TRAITS_USING_NAMESPACE_CCC
 #define TYPES_USING_NAMESPACE_CCC
 
+#include "ccc/array_adaptive_map.h"
 #include "ccc/buffer.h"
 #include "ccc/flat_priority_queue.h"
-#include "ccc/handle_ordered_map.h"
 #include "ccc/traits.h"
 #include "ccc/types.h"
-#include "util/alloc.h"
-#include "util/cli.h"
-#include "util/str_arena.h"
-#include "util/str_view.h"
+#include "utility/allocate.h"
+#include "utility/cli.h"
+#include "utility/string_arena.h"
+#include "utility/string_view/string_view.h"
 
-enum action_type
+enum Action_type
 {
     COUNT,
     FIND,
 };
 
-/* A word will be counted with a map and then sorted with a buffer and flat
+/* A word will be counted with a map and then sorted with a Buffer and flat
 priority queue. One type works well for both because they don't need intrusive
 elements to operate those containers. */
 typedef struct
 {
-    struct str_ofs ofs;
+    struct String_offset ofs;
     int freq;
-} word;
+} Word;
 
-struct action_pack
+struct Action_pack
 {
-    str_view file;
-    enum action_type type;
+    SV_String_view file;
+    enum Action_type type;
     union
     {
         int n;
-        str_view w;
+        SV_String_view w;
     };
     union
     {
         void (*freq_fn)(FILE *file, int n);
-        void (*find_fn)(FILE *file, str_view w);
+        void (*find_fn)(FILE *file, SV_String_view w);
     };
 };
 
@@ -80,8 +80,8 @@ enum : int
     ALL_FREQUENCIES = 0,
 };
 
-static str_view const space = SV(" ");
-static str_view const directions
+static SV_String_view const space = SV(" ");
+static SV_String_view const directions
     = SV("\nPlease specify a command as follows:\n"
          "./build/[debug/]bin/words [flag] -f=[path/to/file]\n"
          "[flag]:\n"
@@ -118,120 +118,121 @@ static str_view const directions
     }                                                                          \
     while (0)
 
-static void print_found(FILE *file, str_view w);
+static void print_found(FILE *file, SV_String_view w);
 static void print_top_n(FILE *file, int n);
 static void print_last_n(FILE *file, int n);
 static void print_alpha_n(FILE *file, int n);
 static void print_ralpha_n(FILE *file, int n);
-static buffer copy_frequencies(handle_ordered_map const *map);
-static void print_n(handle_ordered_map *, ccc_threeway_cmp, struct str_arena *,
+static Buffer copy_frequencies(Array_adaptive_map const *map);
+static void print_n(Array_adaptive_map *, CCC_Order, struct String_arena *,
                     int n);
-static struct int_conversion parse_n_ranks(str_view arg);
+static struct Int_conversion parse_n_ranks(SV_String_view arg);
 
 /* String Helper Functions */
-static struct str_ofs clean_word(struct str_arena *, str_view wv);
+static struct String_offset clean_word(struct String_arena *,
+                                       SV_String_view wv);
 
 /* Container Functions */
-static handle_ordered_map create_frequency_map(struct str_arena *, FILE *);
-static threeway_cmp cmp_string_keys(any_key_cmp);
-static threeway_cmp cmp_words(any_type_cmp);
+static Array_adaptive_map create_frequency_map(struct String_arena *, FILE *);
+static Order order_string_keys(Key_comparator_context);
+static Order order_words(Type_comparator_context);
 
 /* Misc. Functions */
-static FILE *open_file(str_view file);
+static FILE *open_file(SV_String_view file);
 
 /*=======================     Main         ==================================*/
 
 int
 main(int argc, char *argv[])
 {
-    if (argc == 2 && sv_starts_with(sv(argv[1]), SV("-h")))
+    if (argc == 2 && SV_starts_with(SV_sv(argv[1]), SV("-h")))
     {
-        sv_print(stdout, directions);
+        SV_print(stdout, directions);
         return 0;
     }
     if (argc < 3)
     {
         return 0;
     }
-    struct action_pack exe = {};
+    struct Action_pack exe = {};
     for (int arg = 1; arg < argc; ++arg)
     {
-        str_view const sv_arg = sv(argv[arg]);
-        if (sv_starts_with(sv_arg, SV("-c")))
+        SV_String_view const sv_arg = SV_sv(argv[arg]);
+        if (SV_starts_with(sv_arg, SV("-c")))
         {
             exe.type = COUNT;
             exe.freq_fn = print_top_n;
             exe.n = ALL_FREQUENCIES;
         }
-        else if (sv_starts_with(sv_arg, SV("-rc")))
+        else if (SV_starts_with(sv_arg, SV("-rc")))
         {
             exe.type = COUNT;
             exe.freq_fn = print_last_n;
             exe.n = ALL_FREQUENCIES;
         }
-        else if (sv_starts_with(sv_arg, SV("-top=")))
+        else if (SV_starts_with(sv_arg, SV("-top=")))
         {
             exe.type = COUNT;
             exe.freq_fn = print_top_n;
-            struct int_conversion c = parse_n_ranks(sv_arg);
+            struct Int_conversion c = parse_n_ranks(sv_arg);
             check(c.status != CONV_ER,
                   logerr("cannot convert -top= flag to int"););
             exe.n = c.conversion;
         }
-        else if (sv_starts_with(sv_arg, SV("-last=")))
+        else if (SV_starts_with(sv_arg, SV("-last=")))
         {
             exe.type = COUNT;
             exe.freq_fn = print_last_n;
-            struct int_conversion c = parse_n_ranks(sv_arg);
+            struct Int_conversion c = parse_n_ranks(sv_arg);
             check(c.status != CONV_ER,
                   logerr("cannot convert -last= flat to int"););
             exe.n = c.conversion;
         }
-        else if (sv_starts_with(sv_arg, SV("-alph=")))
+        else if (SV_starts_with(sv_arg, SV("-alph=")))
         {
             exe.type = COUNT;
             exe.freq_fn = print_alpha_n;
-            struct int_conversion c = parse_n_ranks(sv_arg);
+            struct Int_conversion c = parse_n_ranks(sv_arg);
             check(c.status != CONV_ER,
                   logerr("cannot convert -alph= flag to int"););
             exe.n = c.conversion;
         }
-        else if (sv_starts_with(sv_arg, SV("-ralph=")))
+        else if (SV_starts_with(sv_arg, SV("-ralph=")))
         {
             exe.type = COUNT;
             exe.freq_fn = print_ralpha_n;
-            struct int_conversion c = parse_n_ranks(sv_arg);
+            struct Int_conversion c = parse_n_ranks(sv_arg);
             check(c.status != CONV_ER,
                   logerr("cannot convert -ralph= flat to int"););
             exe.n = c.conversion;
         }
-        else if (sv_starts_with(sv_arg, SV("-find=")))
+        else if (SV_starts_with(sv_arg, SV("-find=")))
         {
-            str_view const raw_word = sv_substr(
-                sv_arg, sv_find(sv_arg, 0, SV("=")) + 1, sv_len(sv_arg));
-            check(!sv_empty(raw_word),
+            SV_String_view const raw_word = SV_substr(
+                sv_arg, SV_find(sv_arg, 0, SV("=")) + 1, SV_len(sv_arg));
+            check(!SV_empty(raw_word),
                   logerr("-find= flag has invalid entry"););
             exe.type = FIND;
             exe.find_fn = print_found;
             exe.w = raw_word;
         }
-        else if (sv_starts_with(sv_arg, SV("-f=")))
+        else if (SV_starts_with(sv_arg, SV("-f=")))
         {
-            str_view const raw_file = sv_substr(
-                sv_arg, sv_find(sv_arg, 0, SV("=")) + 1, sv_len(sv_arg));
-            check(!sv_empty(raw_file), logerr("file string is empty"););
+            SV_String_view const raw_file = SV_substr(
+                sv_arg, SV_find(sv_arg, 0, SV("=")) + 1, SV_len(sv_arg));
+            check(!SV_empty(raw_file), logerr("file string is empty"););
             exe.file = raw_file;
         }
-        else if (sv_starts_with(sv_arg, SV("-h")))
+        else if (SV_starts_with(sv_arg, SV("-h")))
         {
-            sv_print(stdout, directions);
+            SV_print(stdout, directions);
             return 0;
         }
         else
         {
-            if (sv_begin(sv_arg))
+            if (SV_begin(sv_arg))
             {
-                logerr("unrecognized argument: %s\n", sv_begin(sv_arg));
+                logerr("unrecognized argument: %s\n", SV_begin(sv_arg));
             }
             return 1;
         }
@@ -267,55 +268,57 @@ main(int argc, char *argv[])
 /*=======================   Static Impl    ==================================*/
 
 static void
-print_found(FILE *const f, str_view w)
+print_found(FILE *const f, SV_String_view w)
 {
-    struct str_arena a = str_arena_create(ARENA_START_CAP);
+    struct String_arena a = string_arena_create(ARENA_START_CAP);
     check(a.arena);
-    handle_ordered_map map = create_frequency_map(&a, f);
+    Array_adaptive_map map = create_frequency_map(&a, f);
     check(!is_empty(&map));
-    struct str_ofs wc = clean_word(&a, w);
+    struct String_offset wc = clean_word(&a, w);
     if (!wc.error)
     {
-        word const *const found_w = hom_at(&map, get_key_val(&map, &wc));
+        Word const *const found_w
+            = array_adaptive_map_at(&map, get_key_value(&map, &wc));
         if (found_w)
         {
-            printf("%s %d\n", str_arena_at(&a, &found_w->ofs), found_w->freq);
+            printf("%s %d\n", string_arena_at(&a, &found_w->ofs),
+                   found_w->freq);
         }
     }
-    str_arena_free(&a);
-    (void)hom_clear_and_free(&map, NULL);
+    string_arena_free(&a);
+    (void)array_adaptive_map_clear_and_free(&map, NULL);
 }
 
 static void
 print_top_n(FILE *const f, int n)
 {
-    struct str_arena a = str_arena_create(ARENA_START_CAP);
+    struct String_arena a = string_arena_create(ARENA_START_CAP);
     check(a.arena);
-    handle_ordered_map map = create_frequency_map(&a, f);
+    Array_adaptive_map map = create_frequency_map(&a, f);
     check(!is_empty(&map));
-    print_n(&map, CCC_GRT, &a, n);
-    str_arena_free(&a);
+    print_n(&map, CCC_ORDER_GREATER, &a, n);
+    string_arena_free(&a);
     (void)clear_and_free(&map, NULL);
 }
 
 static void
 print_last_n(FILE *const f, int n)
 {
-    struct str_arena a = str_arena_create(ARENA_START_CAP);
+    struct String_arena a = string_arena_create(ARENA_START_CAP);
     check(a.arena);
-    handle_ordered_map map = create_frequency_map(&a, f);
+    Array_adaptive_map map = create_frequency_map(&a, f);
     check(!is_empty(&map));
-    print_n(&map, CCC_LES, &a, n);
-    str_arena_free(&a);
+    print_n(&map, CCC_ORDER_LESSER, &a, n);
+    string_arena_free(&a);
     (void)clear_and_free(&map, NULL);
 }
 
 static void
 print_alpha_n(FILE *const f, int n)
 {
-    struct str_arena a = str_arena_create(ARENA_START_CAP);
+    struct String_arena a = string_arena_create(ARENA_START_CAP);
     check(a.arena);
-    handle_ordered_map map = create_frequency_map(&a, f);
+    Array_adaptive_map map = create_frequency_map(&a, f);
     check(!is_empty(&map));
     if (!n)
     {
@@ -323,20 +326,22 @@ print_alpha_n(FILE *const f, int n)
     }
     int i = 0;
     /* The ordered nature of the map comes in handy for alpha printing. */
-    for (word *w = begin(&map); w != end(&map) && i < n; w = next(&map, w), ++i)
+    for (CCC_Handle_index iter = begin(&map); iter != end(&map) && i < n;
+         iter = next(&map, iter), ++i)
     {
-        printf("%s %d\n", str_arena_at(&a, &w->ofs), w->freq);
+        Word const *const w = array_adaptive_map_at(&map, iter);
+        printf("%s %d\n", string_arena_at(&a, &w->ofs), w->freq);
     }
-    str_arena_free(&a);
+    string_arena_free(&a);
     (void)clear_and_free(&map, NULL);
 }
 
 static void
 print_ralpha_n(FILE *const f, int n)
 {
-    struct str_arena a = str_arena_create(ARENA_START_CAP);
+    struct String_arena a = string_arena_create(ARENA_START_CAP);
     check(a.arena);
-    handle_ordered_map map = create_frequency_map(&a, f);
+    Array_adaptive_map map = create_frequency_map(&a, f);
     check(!is_empty(&map));
     if (!n)
     {
@@ -344,57 +349,63 @@ print_ralpha_n(FILE *const f, int n)
     }
     int i = 0;
     /* The ordered nature of the map comes in handy for reverse iteration. */
-    for (word *w = rbegin(&map); w != rend(&map) && i < n;
-         w = rnext(&map, w), ++i)
+    for (CCC_Handle_index iter = reverse_begin(&map);
+         iter != reverse_end(&map) && i < n;
+         iter = reverse_next(&map, iter), ++i)
     {
-        printf("%s %d\n", str_arena_at(&a, &w->ofs), w->freq);
+        Word const *const w = array_adaptive_map_at(&map, iter);
+        printf("%s %d\n", string_arena_at(&a, &w->ofs), w->freq);
     }
-    str_arena_free(&a);
+    string_arena_free(&a);
     (void)clear_and_free(&map, NULL);
 }
 
-static buffer
-copy_frequencies(handle_ordered_map const *const map)
+static Buffer
+copy_frequencies(Array_adaptive_map const *const map)
 {
     check(!is_empty(map));
-    buffer freqs = buf_init(NULL, word, std_alloc, NULL, 0);
-    ccc_result const r = buf_reserve(&freqs, count(map).count, std_alloc);
+    Buffer freqs = buffer_initialize(NULL, Word, std_allocate, NULL, 0);
+    CCC_Result const r = buffer_reserve(&freqs, count(map).count, std_allocate);
     check(r == CCC_RESULT_OK);
     size_t const cap = capacity(&freqs).count;
     size_t i = 0;
-    for (word const *w = begin(map); w != end(map) && i < cap;
-         w = next(map, w), ++i)
+    for (CCC_Handle_index iter = begin(map); iter != end(map) && i < cap;
+         iter = next(map, iter), ++i)
     {
-        word const *const pushed = buf_push_back(&freqs, w);
+        Word const *const w = array_adaptive_map_at(map, iter);
+        Word const *const pushed = buffer_push_back(&freqs, w);
         check(pushed);
     }
     return freqs;
 }
 
 static void
-print_n(ccc_handle_ordered_map *const map, ccc_threeway_cmp const ord,
-        struct str_arena *const a, int n)
+print_n(CCC_Array_adaptive_map *const map, CCC_Order const ord,
+        struct String_arena *const a, int n)
 {
-    buffer freqs = copy_frequencies(map);
-    check(!buf_is_empty(&freqs));
-    flat_priority_queue fpq
-        = fpq_heapify_init(begin(&freqs), word, ord, cmp_words, NULL, a,
-                           capacity(&freqs).count, count(&freqs).count);
-    check(count(&fpq).count == count(&freqs).count);
+    Buffer freqs = copy_frequencies(map);
+    check(!buffer_is_empty(&freqs));
+    Flat_priority_queue flat_priority_queue
+        = flat_priority_queue_heapify_initialize(
+            begin(&freqs), Word, ord, order_words, NULL, a,
+            capacity(&freqs).count, count(&freqs).count);
+    check(count(&flat_priority_queue).count == count(&freqs).count);
     if (!n)
     {
-        n = count(&fpq).count;
+        n = count(&flat_priority_queue).count;
     }
     /* Because all CCC containers are complete they can be treated as copyable
        types like this. There is no opaque container in CCC. */
-    buffer const sorted_freqs = ccc_fpq_heapsort(&fpq, &(word){});
-    check(!fpq.buf.mem);
+    Buffer const sorted_freqs
+        = CCC_flat_priority_queue_heapsort(&flat_priority_queue, &(Word){});
+    check(!flat_priority_queue.buffer.data);
     int w = 0;
     /* Heap sort puts the root most nodes at the back of the buffer. */
-    for (word const *i = rbegin(&sorted_freqs);
-         i != rend(&sorted_freqs) && w < n; i = rnext(&sorted_freqs, i), ++w)
+    for (Word const *i = reverse_begin(&sorted_freqs);
+         i != reverse_end(&sorted_freqs) && w < n;
+         i = reverse_next(&sorted_freqs, i), ++w)
     {
-        char const *const arena_str = str_arena_at(a, &i->ofs);
+        char const *const arena_str = string_arena_at(a, &i->ofs);
         if (arena_str)
         {
             printf("%d. %s %d\n", w + 1, arena_str, i->freq);
@@ -405,141 +416,143 @@ print_n(ccc_handle_ordered_map *const map, ccc_threeway_cmp const ord,
 
 /*=====================    Container Construction     =======================*/
 
-static handle_ordered_map
-create_frequency_map(struct str_arena *const a, FILE *const f)
+static Array_adaptive_map
+create_frequency_map(struct String_arena *const a, FILE *const f)
 {
-    char *lineptr = NULL;
+    char *linepointer = NULL;
     size_t len = 0;
     ptrdiff_t read = 0;
-    handle_ordered_map hom
-        = hom_init(NULL, word, ofs, cmp_string_keys, std_alloc, a, 0);
-    while ((read = getline(&lineptr, &len, f)) > 0)
+    Array_adaptive_map array_adaptive_map = array_adaptive_map_initialize(
+        NULL, Word, ofs, order_string_keys, std_allocate, a, 0);
+    while ((read = getline(&linepointer, &len, f)) > 0)
     {
-        str_view const line = {.s = lineptr, .len = read - 1};
-        for (str_view word_view = sv_begin_tok(line, space);
-             !sv_end_tok(line, word_view);
-             word_view = sv_next_tok(line, word_view, space))
+        SV_String_view const line = {.s = linepointer, .len = read - 1};
+        for (SV_String_view word_view = SV_begin_tok(line, space);
+             !SV_end_tok(line, word_view);
+             word_view = SV_next_tok(line, word_view, space))
         {
-            struct str_ofs const cw = clean_word(a, word_view);
+            struct String_offset const cw = clean_word(a, word_view);
             if (!cw.error)
             {
-                homap_handle const *e = handle_r(&hom, &cw);
-                e = hom_and_modify_w(e, word, { T->freq++; });
-                word const *const w = hom_at(
-                    &hom, hom_or_insert_w(e, (word){.ofs = cw, .freq = 1}));
+                Array_adaptive_map_handle const *e
+                    = handle_wrap(&array_adaptive_map, &cw);
+                e = array_adaptive_map_and_modify_with(e, Word, { T->freq++; });
+                Word const *const w = array_adaptive_map_at(
+                    &array_adaptive_map, array_adaptive_map_or_insert_with(
+                                             e, (Word){.ofs = cw, .freq = 1}));
                 check(w);
             }
         }
     }
-    free(lineptr);
-    return hom;
+    free(linepointer);
+    return array_adaptive_map;
 }
 
-static struct str_ofs
-clean_word(struct str_arena *const a, str_view wv)
+static struct String_offset
+clean_word(struct String_arena *const a, SV_String_view wv)
 {
     /* It is hard to know how many characters will make it to a cleaned word
        and one pass is ideal so arena api allows push back on last alloc. */
-    struct str_ofs str = str_arena_alloc(a, 0);
+    struct String_offset str = string_arena_allocate(a, 0);
     if (str.error)
     {
         return str;
     }
-    for (char const *c = sv_begin(wv); c != sv_end(wv); c = sv_next(c))
+    for (char const *c = SV_begin(wv); c != SV_end(wv); c = SV_next(c))
     {
         if (!isalpha(*c) && *c != '-')
         {
-            str_arena_pop_str(a, &str);
-            return (struct str_ofs){.error = STR_ARENA_INVALID};
+            string_arena_pop_str(a, &str);
+            return (struct String_offset){.error = STRING_ARENA_INVALID};
         }
-        enum str_arena_result const pushed_char
-            = str_arena_push_back(a, &str, (char)tolower(*c));
-        check(pushed_char == STR_ARENA_OK);
+        enum String_arena_result const pushed_char
+            = string_arena_push_back(a, &str, (char)tolower(*c));
+        check(pushed_char == STRING_ARENA_OK);
     }
     if (!str.len)
     {
-        return (struct str_ofs){.error = STR_ARENA_INVALID};
+        return (struct String_offset){.error = STRING_ARENA_INVALID};
     }
-    char const *const w = str_arena_at(a, &str);
+    char const *const w = string_arena_at(a, &str);
     check(w);
     if (!isalpha(*w) || !isalpha(*(w + (str.len - 1))))
     {
-        enum str_arena_result const pop = str_arena_pop_str(a, &str);
-        check(pop == STR_ARENA_OK);
-        return (struct str_ofs){.error = STR_ARENA_INVALID};
+        enum String_arena_result const pop = string_arena_pop_str(a, &str);
+        check(pop == STRING_ARENA_OK);
+        return (struct String_offset){.error = STRING_ARENA_INVALID};
     }
     return str;
 }
 
 /*=======================   Container Helpers    ============================*/
 
-static threeway_cmp
-cmp_string_keys(any_key_cmp const c)
+static Order
+order_string_keys(Key_comparator_context const c)
 {
-    word const *const w = c.any_type_rhs;
-    struct str_arena const *const a = c.aux;
-    struct str_ofs const *const id = c.any_key_lhs;
-    char const *const key_word = str_arena_at(a, id);
-    char const *const struct_word = str_arena_at(a, &w->ofs);
+    Word const *const w = c.type_right;
+    struct String_arena const *const a = c.context;
+    struct String_offset const *const id = c.key_left;
+    char const *const key_word = string_arena_at(a, id);
+    char const *const struct_word = string_arena_at(a, &w->ofs);
     check(key_word && struct_word);
     int const res = strcmp(key_word, struct_word);
     return (res > 0) - (res < 0);
 }
 
 /* Sorts by frequency then alphabetic order if frequencies are tied. */
-static threeway_cmp
-cmp_words(any_type_cmp const c)
+static Order
+order_words(Type_comparator_context const c)
 {
-    word const *const lhs = c.any_type_lhs;
-    word const *const rhs = c.any_type_rhs;
-    threeway_cmp freq_cmp = (lhs->freq > rhs->freq) - (lhs->freq < rhs->freq);
-    if (freq_cmp != CCC_EQL)
+    Word const *const left = c.type_left;
+    Word const *const right = c.type_right;
+    Order freq_order = (left->freq > right->freq) - (left->freq < right->freq);
+    if (freq_order != CCC_ORDER_EQUAL)
     {
-        return freq_cmp;
+        return freq_order;
     }
-    struct str_arena const *const arena = c.aux;
-    char const *const lhs_word = str_arena_at(arena, &lhs->ofs);
-    char const *const rhs_word = str_arena_at(arena, &rhs->ofs);
-    check(lhs_word && rhs_word);
-    int const res = strcmp(lhs_word, rhs_word);
+    struct String_arena const *const arena = c.context;
+    char const *const left_word = string_arena_at(arena, &left->ofs);
+    char const *const right_word = string_arena_at(arena, &right->ofs);
+    check(left_word && right_word);
+    int const res = strcmp(left_word, right_word);
     /* Looks like we have chosen wrong order to return but not so: greater
-       lexicographic order is sorted first in a min priority queue or CCC_LES
-       in this case. */
+       lexicographic order is sorted first in a min priority queue or
+       CCC_ORDER_LESSER in this case. */
     return (res < 0) - (res > 0);
 }
 
 /*=======================   CLI Helpers    ==================================*/
 
-static struct int_conversion
-parse_n_ranks(str_view arg)
+static struct Int_conversion
+parse_n_ranks(SV_String_view arg)
 {
-    size_t const eql = sv_rfind(arg, sv_npos(arg), SV("="));
-    if (eql == sv_npos(arg))
+    size_t const eql = SV_rfind(arg, SV_npos(arg), SV("="));
+    if (eql == SV_npos(arg))
     {
-        return (struct int_conversion){.status = CONV_ER};
+        return (struct Int_conversion){.status = CONV_ER};
     }
-    arg = sv_substr(arg, eql + 1, ULLONG_MAX);
-    if (sv_empty(arg))
+    arg = SV_substr(arg, eql + 1, ULLONG_MAX);
+    if (SV_empty(arg))
     {
         (void)fprintf(stderr, "please specify word frequency range.\n");
-        return (struct int_conversion){.status = CONV_ER};
+        return (struct Int_conversion){.status = CONV_ER};
     }
-    return convert_to_int(sv_begin(arg));
+    return convert_to_int(SV_begin(arg));
 }
 
 static FILE *
-open_file(str_view file)
+open_file(SV_String_view file)
 {
-    if (sv_empty(file))
+    if (SV_empty(file))
     {
         return NULL;
     }
-    FILE *const f = fopen(sv_begin(file), "r");
+    FILE *const f = fopen(SV_begin(file), "r");
     if (!f)
     {
         (void)fprintf(stderr,
                       "Opening file [%s] failed with errno set to: %d\n",
-                      sv_begin(file), errno);
+                      SV_begin(file), errno);
     }
     return f;
 }

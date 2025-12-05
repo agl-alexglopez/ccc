@@ -26,8 +26,16 @@ CheckOptions:
    - { key: bugprone-unused-return-value.CheckedFunctions, value: ccc.* }
    - { key: bugprone-unused-return-value.AllowCastToVoid, value: true }
    - { key: hicpp-signed-bitwise.IgnorePositiveIntegerLiterals, value: true }
+   - { key: readability-identifier-naming.TypedefCase, value: Leading_upper_snake_case }
+   - { key: readability-identifier-naming.EnumConstantCase, value: UPPER_CASE }
+   - { key: readability-identifier-naming.EnumCase, value: Leading_upper_snake_case }
+   - { key: readability-identifier-naming.StructCase, value: Leading_upper_snake_case }
+   - { key: readability-identifier-naming.UnionCase, value: Leading_upper_snake_case }
    - { key: readability-identifier-naming.FunctionCase, value: lower_case }
    - { key: readability-identifier-naming.VariableCase, value: lower_case }
+   - { key: readability-identifier-naming.MemberCase, value: lower_case }
+   - { key: readability-identifier-naming.StaticConstantPrevix, value: static_ }
+   - { key: readability-identifier-naming.StaticConstantCase, value: lower_case }
    - { key: readability-function-cognitive-complexity.IgnoreMacros, value: true }
    - { key: misc-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic, value: true }
 

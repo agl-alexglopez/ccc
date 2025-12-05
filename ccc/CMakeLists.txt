@@ -4,54 +4,58 @@ add_library(${namespace}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 # File sets simplify install and allow isolation of only container files.
 target_sources(${PROJECT_NAME}
     PRIVATE
-        ${PROJECT_SOURCE_DIR}/src/types.c
-        ${PROJECT_SOURCE_DIR}/src/buffer.c
-        ${PROJECT_SOURCE_DIR}/src/flat_hash_map.c
-        ${PROJECT_SOURCE_DIR}/src/flat_double_ended_queue.c
-        ${PROJECT_SOURCE_DIR}/src/flat_priority_queue.c
-        ${PROJECT_SOURCE_DIR}/src/ordered_map.c
-        ${PROJECT_SOURCE_DIR}/src/handle_ordered_map.c
-        ${PROJECT_SOURCE_DIR}/src/priority_queue.c
-        ${PROJECT_SOURCE_DIR}/src/singly_linked_list.c
-        ${PROJECT_SOURCE_DIR}/src/doubly_linked_list.c
-        ${PROJECT_SOURCE_DIR}/src/realtime_ordered_map.c
-        ${PROJECT_SOURCE_DIR}/src/handle_realtime_ordered_map.c
-        ${PROJECT_SOURCE_DIR}/src/bitset.c
+        ${PROJECT_SOURCE_DIR}/source/types.c
+        ${PROJECT_SOURCE_DIR}/source/buffer.c
+        ${PROJECT_SOURCE_DIR}/source/flat_hash_map.c
+        ${PROJECT_SOURCE_DIR}/source/flat_double_ended_queue.c
+        ${PROJECT_SOURCE_DIR}/source/flat_priority_queue.c
+        ${PROJECT_SOURCE_DIR}/source/adaptive_map.c
+        ${PROJECT_SOURCE_DIR}/source/array_adaptive_map.c
+        ${PROJECT_SOURCE_DIR}/source/priority_queue.c
+        ${PROJECT_SOURCE_DIR}/source/singly_linked_list.c
+        ${PROJECT_SOURCE_DIR}/source/doubly_linked_list.c
+        ${PROJECT_SOURCE_DIR}/source/tree_map.c
+        ${PROJECT_SOURCE_DIR}/source/array_tree_map.c
+        ${PROJECT_SOURCE_DIR}/source/bitset.c
     PUBLIC 
         FILE_SET public_headers
             TYPE HEADERS
             BASE_DIRS ${PROJECT_SOURCE_DIR}
             FILES 
-              impl/impl_types.h
-              impl/impl_flat_priority_queue.h
-              impl/impl_priority_queue.h
-              impl/impl_ordered_map.h
-              impl/impl_handle_ordered_map.h
-              impl/impl_singly_linked_list.h
-              impl/impl_doubly_linked_list.h
-              impl/impl_realtime_ordered_map.h
-              impl/impl_handle_realtime_ordered_map.h
-              impl/impl_traits.h
-              impl/impl_flat_double_ended_queue.h
-              impl/impl_flat_hash_map.h
-              impl/impl_buffer.h
-              impl/impl_bitset.h
+              private/private_types.h
+              private/private_flat_priority_queue.h
+              private/private_priority_queue.h
+              private/private_adaptive_map.h
+              private/private_array_adaptive_map.h
+              private/private_singly_linked_list.h
+              private/private_doubly_linked_list.h
+              private/private_tree_map.h
+              private/private_array_tree_map.h
+              private/private_traits.h
+              private/private_flat_double_ended_queue.h
+              private/private_flat_hash_map.h
+              private/private_buffer.h
+              private/private_bitset.h
               types.h
               buffer.h
               bitset.h
               flat_hash_map.h
               flat_double_ended_queue.h
               flat_priority_queue.h
-              ordered_map.h
-              handle_ordered_map.h
-              realtime_ordered_map.h
-              handle_realtime_ordered_map.h
+              adaptive_map.h
+              array_adaptive_map.h
+              tree_map.h
+              array_tree_map.h
               priority_queue.h
               singly_linked_list.h
               doubly_linked_list.h
               traits.h
 )
 
+option(CCC_FLAT_HASH_MAP_PORTABLE "Fallback to portable implementation of flat hash map to improve cross platform compatibility while decreasing optimizations" OFF)
+if (CCC_FLAT_HASH_MAP_PORTABLE)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE CCC_FLAT_HASH_MAP_PORTABLE)
+endif()
 target_compile_features(${PROJECT_NAME} PUBLIC c_std_23)
 
 # set properties for the target. VERSION set the library version to the project

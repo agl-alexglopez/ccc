@@ -13,7 +13,7 @@ option(BUILD_SHARED_LIBS "Building ccc as a shared library is available, but OFF
 # Required to help clarify and cleanup install in ccc/ and cmake/ cmake files.
 set(namespace "ccc")
 
-# For releases we only produce this and the src. No test or sample bloat.
+# For releases we only produce this and the source. No test or sample bloat.
 include_directories("${PROJECT_SOURCE_DIR}/${PROJECT_NAME}")
 add_subdirectory("${PROJECT_SOURCE_DIR}/${PROJECT_NAME}")
 
@@ -27,12 +27,12 @@ if (EXISTS "${PROJECT_SOURCE_DIR}/tests")
     include_directories("${PROJECT_SOURCE_DIR}/tests")
     add_subdirectory("${PROJECT_SOURCE_DIR}/tests" EXCLUDE_FROM_ALL)
 endif()
-if (EXISTS "${PROJECT_SOURCE_DIR}/util")
-    include_directories("${PROJECT_SOURCE_DIR}/util")
-    add_subdirectory("${PROJECT_SOURCE_DIR}/util" EXCLUDE_FROM_ALL)
+if (EXISTS "${PROJECT_SOURCE_DIR}/utility")
+    include_directories("${PROJECT_SOURCE_DIR}/utility")
+    add_subdirectory("${PROJECT_SOURCE_DIR}/utility" EXCLUDE_FROM_ALL)
 endif()
-if (EXISTS "${PROJECT_SOURCE_DIR}/tests" AND EXISTS "${PROJECT_SOURCE_DIR}/samples" AND EXISTS "${PROJECT_SOURCE_DIR}/util")
-    include(etc/scanners.cmake)
+if (EXISTS "${PROJECT_SOURCE_DIR}/tests" AND EXISTS "${PROJECT_SOURCE_DIR}/samples" AND EXISTS "${PROJECT_SOURCE_DIR}/utility")
+    include(tools/scanners.cmake)
 endif()
 
 if (NOT CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
