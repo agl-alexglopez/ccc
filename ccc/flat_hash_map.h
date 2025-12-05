@@ -35,7 +35,7 @@ instructions available. However, if for any reason the user wishes to use the
 most portable Single Register Multiple Data fallback implementation, there are
 many options.
 
-If building this library separately to include it's library file, add the
+If building this library separately to include its library file, add the
 flag to the build (and read INSTALL.md for more details).
 
 ```
