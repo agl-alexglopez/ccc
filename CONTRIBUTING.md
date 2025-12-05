@@ -296,7 +296,7 @@ Other containers may do the same or be able to avoid pushing this space requirem
 For the equivalent handle version of this container the space requirement is handled internally.
 
 ```c
-[[nodiscard]] CCC_Handle CCC_Array_adaptive_swap_handle(CCC_Array_adaptive_map *m,
+[[nodiscard]] CCC_Handle CCC_array_adaptive_swap_handle(CCC_Array_adaptive_map *m,
                                                         void *key_val_output);
 ```
 
