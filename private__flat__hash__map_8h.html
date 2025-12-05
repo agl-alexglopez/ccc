@@ -717,7 +717,7 @@ Variables</h2></td></tr>
 <div class="line">        private_map;                                                           \</div>
 <div class="line">    }))</div>
 <div class="ttc" id="aflat__hash__map_8h_html_abde2c0903a9cb74a55ae6e22b58d0c80"><div class="ttname"><a href="flat__hash__map_8h.html#abde2c0903a9cb74a55ae6e22b58d0c80">CCC_flat_hash_map_reserve</a></div><div class="ttdeci">CCC_Result CCC_flat_hash_map_reserve(CCC_Flat_hash_map *map, size_t to_add, CCC_Allocator *allocate)</div><div class="ttdoc">Reserve space required to add a specified number of elements to the map. If the current capacity is s...</div></div>
-<div class="ttc" id="aprivate__flat__hash__map_8h_html_aa0ab2a47b824372a9509d90a899f1971"><div class="ttname"><a href="private__flat__hash__map_8h.html#aa0ab2a47b824372a9509d90a899f1971">CCC_private_flat_hash_map_initialize</a></div><div class="ttdeci">#define CCC_private_flat_hash_map_initialize( private_fixed_map_pointer, private_type_name, private_key_field, private_hash, private_key_compare, private_allocate, private_context_data, private_capacity)</div><div class="ttdef"><b>Definition:</b> private_flat_hash_map.h:280</div></div>
+<div class="ttc" id="aprivate__flat__hash__map_8h_html_aa0ab2a47b824372a9509d90a899f1971"><div class="ttname"><a href="private__flat__hash__map_8h.html#aa0ab2a47b824372a9509d90a899f1971">CCC_private_flat_hash_map_initialize</a></div><div class="ttdeci">#define CCC_private_flat_hash_map_initialize( private_fixed_map_pointer, private_type_name, private_key_field, private_hash, private_key_compare, private_allocate, private_context_data, private_capacity)</div><div class="ttdef"><b>Definition:</b> private_flat_hash_map.h:276</div></div>
 <div class="ttc" id="astructCCC__Flat__hash__map_html"><div class="ttname"><a href="structCCC__Flat__hash__map.html">CCC_Flat_hash_map</a></div><div class="ttdef"><b>Definition:</b> private_flat_hash_map.h:142</div></div>
 </div><!-- fragment --><p>Initializes the flat hash map with the specified capacity. </p>
 
@@ -793,7 +793,6 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>While the private interface functions are not strictly necessary containing the logic of interacting with the map to the source implementation makes reasoning and debugging the macros easier. It also cuts down on repeated logic. </p>
 
 </div>
 </div>
