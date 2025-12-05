@@ -36,8 +36,8 @@ Therefore, this data structure can be relocated, copied, serialized, or written
 to disk and all internal data structure references will remain valid. Insertion
 may invoke an `O(N)` operation if resizing occurs. Finally, if allocation is
 prohibited upon initialization, and the user provides a capacity of `N` upon
-initialization, `N + 1` nodes will be used. One slot is needed for the sentinel
-node.
+initialization, one slot will be used for a sentinel node. The user available
+capacity is `N - 1`.
 
 All interface functions accept `void *` references to either the key or the full
 type the user is storing in the map. Therefore, it is important for the user to
