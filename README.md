@@ -956,7 +956,7 @@ struct Val
     int val;
 };
 flat_hash_map_declare_fixed_map(Val_fixed_map, struct Val, 64);
-static flat_hash_map static_fh = flat_hash_map_initialize(
+static Flat_hash_map static_fh = flat_hash_map_initialize(
     &(static Val_fixed_map){},
     struct Val,
     key,
@@ -977,7 +977,7 @@ struct Val
     int key;
     int val;
 };
-static flat_hash_map static_fh = flat_hash_map_initialize(
+static Flat_hash_map static_fh = flat_hash_map_initialize(
     NULL,
     struct Val,
     key,
