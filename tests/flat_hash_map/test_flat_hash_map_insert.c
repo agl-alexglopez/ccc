@@ -13,7 +13,7 @@
 
 check_static_begin(flat_hash_map_test_insert)
 {
-    CCC_Flat_hash_map fh = flat_hash_map_initialize(
+    Flat_hash_map fh = flat_hash_map_initialize(
         &(Small_fixed_map){}, struct Val, key, flat_hash_map_int_zero,
         flat_hash_map_id_order, NULL, NULL, SMALL_FIXED_CAP);
 
@@ -27,11 +27,11 @@ check_static_begin(flat_hash_map_test_insert)
 
 check_static_begin(flat_hash_map_test_insert_macros)
 {
-    CCC_Flat_hash_map fh = CCC_flat_hash_map_initialize(
+    Flat_hash_map fh = flat_hash_map_initialize(
         &(Small_fixed_map){}, struct Val, key, flat_hash_map_int_zero,
         flat_hash_map_id_order, NULL, NULL, SMALL_FIXED_CAP);
 
-    struct Val const *ins = CCC_flat_hash_map_or_insert_with(
+    struct Val const *ins = flat_hash_map_or_insert_with(
         entry_wrap(&fh, &(int){2}), (struct Val){.key = 2, .val = 0});
     check(ins != NULL, true);
     check(validate(&fh), true);
@@ -74,7 +74,7 @@ check_static_begin(flat_hash_map_test_insert_macros)
 
 check_static_begin(flat_hash_map_test_insert_overwrite)
 {
-    CCC_Flat_hash_map fh = flat_hash_map_initialize(
+    Flat_hash_map fh = flat_hash_map_initialize(
         &(Small_fixed_map){}, struct Val, key, flat_hash_map_int_zero,
         flat_hash_map_id_order, NULL, NULL, SMALL_FIXED_CAP);
 
@@ -108,7 +108,7 @@ check_static_begin(flat_hash_map_test_insert_overwrite)
 
 check_static_begin(flat_hash_map_test_insert_then_bad_ideas)
 {
-    CCC_Flat_hash_map fh = flat_hash_map_initialize(
+    Flat_hash_map fh = flat_hash_map_initialize(
         &(Small_fixed_map){}, struct Val, key, flat_hash_map_int_zero,
         flat_hash_map_id_order, NULL, NULL, SMALL_FIXED_CAP);
     struct Val q = {.key = 137, .val = 99};
@@ -139,7 +139,7 @@ check_static_begin(flat_hash_map_test_insert_then_bad_ideas)
 check_static_begin(flat_hash_map_test_entry_api_functional)
 {
     /* Over allocate size now because we don't want to worry about resizing. */
-    CCC_Flat_hash_map fh = flat_hash_map_initialize(
+    Flat_hash_map fh = flat_hash_map_initialize(
         &(Standard_fixed_map){}, struct Val, key, flat_hash_map_int_last_digit,
         flat_hash_map_id_order, NULL, NULL, STANDARD_FIXED_CAP);
     size_t const size = 200;
@@ -198,7 +198,7 @@ check_static_begin(flat_hash_map_test_insert_via_entry)
 {
     /* Over allocate size now because we don't want to worry about resizing. */
     size_t const size = 200;
-    CCC_Flat_hash_map fh = flat_hash_map_initialize(
+    Flat_hash_map fh = flat_hash_map_initialize(
         &(Standard_fixed_map){}, struct Val, key, flat_hash_map_int_last_digit,
         flat_hash_map_id_order, NULL, NULL, STANDARD_FIXED_CAP);
 
@@ -244,7 +244,7 @@ check_static_begin(flat_hash_map_test_insert_via_entry_macros)
 {
     /* Over allocate size now because we don't want to worry about resizing. */
     size_t const size = 200;
-    CCC_Flat_hash_map fh = flat_hash_map_initialize(
+    Flat_hash_map fh = flat_hash_map_initialize(
         &(Standard_fixed_map){}, struct Val, key, flat_hash_map_int_last_digit,
         flat_hash_map_id_order, NULL, NULL, STANDARD_FIXED_CAP);
 
@@ -285,7 +285,7 @@ check_static_begin(flat_hash_map_test_entry_api_macros)
 {
     /* Over allocate size now because we don't want to worry about resizing. */
     int const size = 200;
-    CCC_Flat_hash_map fh = flat_hash_map_initialize(
+    Flat_hash_map fh = flat_hash_map_initialize(
         &(Standard_fixed_map){}, struct Val, key, flat_hash_map_int_last_digit,
         flat_hash_map_id_order, NULL, NULL, STANDARD_FIXED_CAP);
 
@@ -340,7 +340,7 @@ check_static_begin(flat_hash_map_test_entry_api_macros)
 
 check_static_begin(flat_hash_map_test_two_sum)
 {
-    CCC_Flat_hash_map fh = flat_hash_map_initialize(
+    Flat_hash_map fh = flat_hash_map_initialize(
         &(Small_fixed_map){}, struct Val, key, flat_hash_map_int_to_u64,
         flat_hash_map_id_order, NULL, NULL, SMALL_FIXED_CAP);
     int const addends[10] = {1, 3, -980, 6, 7, 13, 44, 32, 995, -1};
@@ -367,7 +367,7 @@ check_static_begin(flat_hash_map_test_two_sum)
 
 check_static_begin(flat_hash_map_test_longest_consecutive_sequence)
 {
-    CCC_Flat_hash_map fh = flat_hash_map_initialize(
+    Flat_hash_map fh = flat_hash_map_initialize(
         &(Standard_fixed_map){}, struct Val, key, flat_hash_map_int_to_u64,
         flat_hash_map_id_order, NULL, NULL, STANDARD_FIXED_CAP);
     /* Longest sequence is 1,2,3,4,5,6,7,8,9,10 of length 10. */
@@ -421,7 +421,7 @@ check_static_begin(flat_hash_map_test_longest_consecutive_sequence)
 
 check_static_begin(flat_hash_map_test_resize)
 {
-    CCC_Flat_hash_map fh = flat_hash_map_initialize(
+    Flat_hash_map fh = flat_hash_map_initialize(
         NULL, struct Val, key, flat_hash_map_int_to_u64, flat_hash_map_id_order,
         std_allocate, NULL, 0);
     int const to_insert = 1000;
@@ -453,7 +453,7 @@ check_static_begin(flat_hash_map_test_resize)
 
 check_static_begin(flat_hash_map_test_resize_macros)
 {
-    CCC_Flat_hash_map fh = flat_hash_map_initialize(
+    Flat_hash_map fh = flat_hash_map_initialize(
         NULL, struct Val, key, flat_hash_map_int_to_u64, flat_hash_map_id_order,
         std_allocate, NULL, 0);
     int const to_insert = 1000;
@@ -494,7 +494,7 @@ check_static_begin(flat_hash_map_test_resize_macros)
 
 check_static_begin(flat_hash_map_test_resize_from_null)
 {
-    CCC_Flat_hash_map fh = flat_hash_map_initialize(
+    Flat_hash_map fh = flat_hash_map_initialize(
         NULL, struct Val, key, flat_hash_map_int_to_u64, flat_hash_map_id_order,
         std_allocate, NULL, 0);
     int const to_insert = 1000;
@@ -524,7 +524,7 @@ check_static_begin(flat_hash_map_test_resize_from_null)
 
 check_static_begin(flat_hash_map_test_resize_from_null_macros)
 {
-    CCC_Flat_hash_map fh = flat_hash_map_initialize(
+    Flat_hash_map fh = flat_hash_map_initialize(
         NULL, struct Val, key, flat_hash_map_int_to_u64, flat_hash_map_id_order,
         std_allocate, NULL, 0);
     int const to_insert = 1000;
@@ -565,7 +565,7 @@ check_static_begin(flat_hash_map_test_resize_from_null_macros)
 
 check_static_begin(flat_hash_map_test_insert_limit)
 {
-    CCC_Flat_hash_map fh = flat_hash_map_initialize(
+    Flat_hash_map fh = flat_hash_map_initialize(
         &(Small_fixed_map){}, struct Val, key, flat_hash_map_int_to_u64,
         flat_hash_map_id_order, NULL, NULL, SMALL_FIXED_CAP);
 
@@ -626,7 +626,7 @@ check_static_begin(flat_hash_map_test_insert_limit)
 
 check_static_begin(flat_hash_map_test_insert_and_find)
 {
-    CCC_Flat_hash_map fh = flat_hash_map_initialize(
+    Flat_hash_map fh = flat_hash_map_initialize(
         &(Small_fixed_map){}, struct Val, key, flat_hash_map_int_to_u64,
         flat_hash_map_id_order, NULL, NULL, SMALL_FIXED_CAP);
     int const size = SMALL_FIXED_CAP;
@@ -661,15 +661,14 @@ check_static_begin(flat_hash_map_test_insert_and_find)
 
 check_static_begin(flat_hash_map_test_reserve_without_permissions)
 {
-    CCC_Flat_hash_map fh = flat_hash_map_initialize(
+    Flat_hash_map fh = flat_hash_map_initialize(
         NULL, struct Val, key, flat_hash_map_int_to_u64, flat_hash_map_id_order,
         NULL, NULL, 0);
     /* The map must insert all of the requested elements but has no permission
        to resize. This ensures the reserve function works as expected. */
     int const to_insert = 1000;
     int const larger_prime = 1009;
-    CCC_Result const res
-        = CCC_flat_hash_map_reserve(&fh, to_insert, std_allocate);
+    CCC_Result const res = flat_hash_map_reserve(&fh, to_insert, std_allocate);
     check(res, CCC_RESULT_OK);
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
