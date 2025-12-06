@@ -663,7 +663,7 @@ check_static_begin(flat_hash_map_test_reserve_without_permissions)
 {
     CCC_Flat_hash_map fh = flat_hash_map_initialize(
         NULL, struct Val, key, flat_hash_map_int_to_u64, flat_hash_map_id_order,
-        std_allocate, NULL, 0);
+        NULL, NULL, 0);
     /* The map must insert all of the requested elements but has no permission
        to resize. This ensures the reserve function works as expected. */
     int const to_insert = 1000;
