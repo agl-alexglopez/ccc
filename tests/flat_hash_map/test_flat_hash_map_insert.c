@@ -684,8 +684,8 @@ check_static_begin(flat_hash_map_test_reserve_without_permissions)
     for (int i = 0, shuffled_index = larger_prime % to_insert; i < to_insert;
          ++i, shuffled_index = (shuffled_index + larger_prime) % to_insert)
     {
-        CCC_Tribool const check = contains(&fh, &shuffled_index);
-        check(check, true);
+        CCC_Tribool const c = contains(&fh, &shuffled_index);
+        check(c, true);
     }
     check(count(&fh).count, to_insert);
     check_end(flat_hash_map_clear_and_free_reserve(&fh, NULL, std_allocate););
