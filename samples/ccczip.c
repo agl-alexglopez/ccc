@@ -713,7 +713,7 @@ unzip_file(SV_String_view unzip)
     char path[FILESYS_MAX_PATH];
     CCC_Tribool has_suf = SV_ends_with(unzip, cccz_suffix);
     check(has_suf);
-    unzip = SV_remove_key_value_suffix(unzip, SV_len(cccz_suffix));
+    unzip = SV_remove_suffix(unzip, SV_len(cccz_suffix));
     size_t const dir_delim = SV_rfind(unzip, SV_len(unzip), SV("/"));
     SV_String_view const raw_file
         = dir_delim == SV_npos(unzip)

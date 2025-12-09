@@ -577,7 +577,7 @@ parse_digits(SV_String_view arg)
         (void)fprintf(stderr, "please specify element to convert.\n");
         return (struct Int_conversion){.status = CONV_ER};
     }
-    arg = SV_remove_key_value_prefix(arg, 1);
+    arg = SV_remove_prefix(arg, 1);
     return convert_to_int(SV_begin(arg));
 }
 
