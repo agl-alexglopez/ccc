@@ -168,12 +168,12 @@ Include dependency graph for traits.h:</div>
 <tr class="memitem:abf35b886146ce60b1691dff771475f56"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="traits_8h.html#abf35b886146ce60b1691dff771475f56">CCC_insert_or_assign_wrap</a>(container_pointer,  insert_or_assign_args...)&#160;&#160;&#160;    CCC_private_insert_or_assign_wrap(container_pointer, insert_or_assign_args)</td></tr>
 <tr class="memdesc:abf35b886146ce60b1691dff771475f56"><td class="mdescLeft">&#160;</td><td class="mdescRight">Insert an element or overwrite the Occupied entry.  <br /></td></tr>
 <tr class="separator:abf35b886146ce60b1691dff771475f56"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3c8702b8ea781a2a4e1dbd4cb1712b81"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="traits_8h.html#a3c8702b8ea781a2a4e1dbd4cb1712b81">CCC_remove</a>(container_pointer,  remove_args...)&#160;&#160;&#160;    CCC_private_remove(container_pointer, remove_args)</td></tr>
-<tr class="memdesc:a3c8702b8ea781a2a4e1dbd4cb1712b81"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove an element and retain access to its value.  <br /></td></tr>
-<tr class="separator:a3c8702b8ea781a2a4e1dbd4cb1712b81"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aef3138aa9c181ce47b7708020d47d77d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="traits_8h.html#aef3138aa9c181ce47b7708020d47d77d">CCC_remove_wrap</a>(container_pointer,  remove_args...)&#160;&#160;&#160;    CCC_private_remove_wrap(container_pointer, remove_args)</td></tr>
-<tr class="memdesc:aef3138aa9c181ce47b7708020d47d77d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove an element and retain access to its value.  <br /></td></tr>
-<tr class="separator:aef3138aa9c181ce47b7708020d47d77d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0e6fb2903be6f9b91ff9c5e2960ca9ab"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="traits_8h.html#a0e6fb2903be6f9b91ff9c5e2960ca9ab">CCC_remove_key_value</a>(container_pointer,  remove_key_value_args...)&#160;&#160;&#160;    CCC_private_remove_key_value(container_pointer, remove_key_value_args)</td></tr>
+<tr class="memdesc:a0e6fb2903be6f9b91ff9c5e2960ca9ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove an element and retain access to its value.  <br /></td></tr>
+<tr class="separator:a0e6fb2903be6f9b91ff9c5e2960ca9ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a69ccd33dfe8d3d8281b0ff03e594eeff"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="traits_8h.html#a69ccd33dfe8d3d8281b0ff03e594eeff">CCC_remove_key_value_wrap</a>(container_pointer,  remove_key_value_args...)&#160;&#160;&#160;    CCC_private_remove_key_value_wrap(container_pointer, remove_key_value_args)</td></tr>
+<tr class="memdesc:a69ccd33dfe8d3d8281b0ff03e594eeff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove an element and retain access to its value.  <br /></td></tr>
+<tr class="separator:a69ccd33dfe8d3d8281b0ff03e594eeff"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2093b0d81c352dc0eb6e85a77a7ee54b"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="traits_8h.html#a2093b0d81c352dc0eb6e85a77a7ee54b">CCC_entry</a>(container_pointer,  key_pointer...)&#160;&#160;&#160;    CCC_private_entry(container_pointer, key_pointer)</td></tr>
 <tr class="memdesc:a2093b0d81c352dc0eb6e85a77a7ee54b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain a container specific entry for the Entry Interface.  <br /></td></tr>
 <tr class="separator:a2093b0d81c352dc0eb6e85a77a7ee54b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -2011,45 +2011,6 @@ Include dependency graph for traits.h:</div>
 
 </div>
 </div>
-<a id="a3c8702b8ea781a2a4e1dbd4cb1712b81" name="a3c8702b8ea781a2a4e1dbd4cb1712b81"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3c8702b8ea781a2a4e1dbd4cb1712b81">&#9670;&#160;</a></span>CCC_remove</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define CCC_remove</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">container_pointer, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">remove_args...&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td>&#160;&#160;&#160;    CCC_private_remove(container_pointer, remove_args)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Remove an element and retain access to its value. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">container_pointer</td><td>a pointer to the container. </td></tr>
-    <tr><td class="paramdir"></td><td class="paramname">remove_args</td><td>args depend on container. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>an entry depending on container specific context.</dd></dl>
-<p>See container documentation for specific behavior. </p>
-
-</div>
-</div>
 <a id="ac207035aea4cbe0c51d16589c2460db4" name="ac207035aea4cbe0c51d16589c2460db4"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac207035aea4cbe0c51d16589c2460db4">&#9670;&#160;</a></span>CCC_remove_entry</h2>
 
@@ -2162,14 +2123,14 @@ Include dependency graph for traits.h:</div>
 
 </div>
 </div>
-<a id="aef3138aa9c181ce47b7708020d47d77d" name="aef3138aa9c181ce47b7708020d47d77d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aef3138aa9c181ce47b7708020d47d77d">&#9670;&#160;</a></span>CCC_remove_wrap</h2>
+<a id="a0e6fb2903be6f9b91ff9c5e2960ca9ab" name="a0e6fb2903be6f9b91ff9c5e2960ca9ab"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0e6fb2903be6f9b91ff9c5e2960ca9ab">&#9670;&#160;</a></span>CCC_remove_key_value</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define CCC_remove_wrap</td>
+          <td class="memname">#define CCC_remove_key_value</td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
           <td class="paramname">container_pointer, </td>
@@ -2178,12 +2139,51 @@ Include dependency graph for traits.h:</div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">remove_args...&#160;</td>
+          <td class="paramname">remove_key_value_args...&#160;</td>
         </tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td>&#160;&#160;&#160;    CCC_private_remove_wrap(container_pointer, remove_args)</td>
+          <td></td><td>&#160;&#160;&#160;    CCC_private_remove_key_value(container_pointer, remove_key_value_args)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Remove an element and retain access to its value. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">container_pointer</td><td>a pointer to the container. </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">remove_args</td><td>args depend on container. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>an entry depending on container specific context.</dd></dl>
+<p>See container documentation for specific behavior. </p>
+
+</div>
+</div>
+<a id="a69ccd33dfe8d3d8281b0ff03e594eeff" name="a69ccd33dfe8d3d8281b0ff03e594eeff"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a69ccd33dfe8d3d8281b0ff03e594eeff">&#9670;&#160;</a></span>CCC_remove_key_value_wrap</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define CCC_remove_key_value_wrap</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">container_pointer, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">remove_key_value_args...&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;    CCC_private_remove_key_value_wrap(container_pointer, remove_key_value_args)</td>
         </tr>
       </table>
 </div><div class="memdoc">

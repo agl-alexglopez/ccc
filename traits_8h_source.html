@@ -123,11 +123,11 @@ $(document).ready(function(){initNavTree('traits_8h_source.html',''); initResiza
 <div class="line"><a id="l00114" name="l00114"></a><span class="lineno"><a class="line" href="traits_8h.html#abf35b886146ce60b1691dff771475f56">  114</a></span><span class="preprocessor">#define CCC_insert_or_assign_wrap(container_pointer, insert_or_assign_args...) \</span></div>
 <div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span><span class="preprocessor">    CCC_private_insert_or_assign_wrap(container_pointer, insert_or_assign_args)</span></div>
 <div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span> </div>
-<div class="line"><a id="l00123" name="l00123"></a><span class="lineno"><a class="line" href="traits_8h.html#a3c8702b8ea781a2a4e1dbd4cb1712b81">  123</a></span><span class="preprocessor">#define CCC_remove(container_pointer, remove_args...)                          \</span></div>
-<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span><span class="preprocessor">    CCC_private_remove(container_pointer, remove_args)</span></div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno"><a class="line" href="traits_8h.html#a0e6fb2903be6f9b91ff9c5e2960ca9ab">  123</a></span><span class="preprocessor">#define CCC_remove_key_value(container_pointer, remove_key_value_args...)      \</span></div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span><span class="preprocessor">    CCC_private_remove_key_value(container_pointer, remove_key_value_args)</span></div>
 <div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span> </div>
-<div class="line"><a id="l00132" name="l00132"></a><span class="lineno"><a class="line" href="traits_8h.html#aef3138aa9c181ce47b7708020d47d77d">  132</a></span><span class="preprocessor">#define CCC_remove_wrap(container_pointer, remove_args...)                     \</span></div>
-<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span><span class="preprocessor">    CCC_private_remove_wrap(container_pointer, remove_args)</span></div>
+<div class="line"><a id="l00132" name="l00132"></a><span class="lineno"><a class="line" href="traits_8h.html#a69ccd33dfe8d3d8281b0ff03e594eeff">  132</a></span><span class="preprocessor">#define CCC_remove_key_value_wrap(container_pointer, remove_key_value_args...) \</span></div>
+<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span><span class="preprocessor">    CCC_private_remove_key_value_wrap(container_pointer, remove_key_value_args)</span></div>
 <div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span> </div>
 <div class="line"><a id="l00141" name="l00141"></a><span class="lineno"><a class="line" href="traits_8h.html#a2093b0d81c352dc0eb6e85a77a7ee54b">  141</a></span><span class="preprocessor">#define CCC_entry(container_pointer, key_pointer...)                           \</span></div>
 <div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span><span class="preprocessor">    CCC_private_entry(container_pointer, key_pointer)</span></div>
@@ -298,8 +298,8 @@ $(document).ready(function(){initNavTree('traits_8h_source.html',''); initResiza
 <div class="line"><a id="l00663" name="l00663"></a><span class="lineno">  663</span><span class="preprocessor">#    define insert_or_assign(args...) CCC_insert_or_assign(args)</span></div>
 <div class="line"><a id="l00664" name="l00664"></a><span class="lineno">  664</span><span class="preprocessor">#    define insert_or_assign_wrap(args...) CCC_insert_or_assign_wrap(args)</span></div>
 <div class="line"><a id="l00665" name="l00665"></a><span class="lineno">  665</span><span class="preprocessor">#    define try_insert_wrap(args...) CCC_try_insert_wrap(args)</span></div>
-<div class="line"><a id="l00666" name="l00666"></a><span class="lineno">  666</span><span class="preprocessor">#    define remove(args...) CCC_remove(args)</span></div>
-<div class="line"><a id="l00667" name="l00667"></a><span class="lineno">  667</span><span class="preprocessor">#    define remove_wrap(args...) CCC_remove_wrap(args)</span></div>
+<div class="line"><a id="l00666" name="l00666"></a><span class="lineno">  666</span><span class="preprocessor">#    define remove_key_value(args...) CCC_remove_key_value(args)</span></div>
+<div class="line"><a id="l00667" name="l00667"></a><span class="lineno">  667</span><span class="preprocessor">#    define remove_key_value_wrap(args...) CCC_remove_key_value_wrap(args)</span></div>
 <div class="line"><a id="l00668" name="l00668"></a><span class="lineno">  668</span><span class="preprocessor">#    define remove_entry(args...) CCC_remove_entry(args)</span></div>
 <div class="line"><a id="l00669" name="l00669"></a><span class="lineno">  669</span><span class="preprocessor">#    define remove_entry_wrap(args...) CCC_remove_entry_wrap(args)</span></div>
 <div class="line"><a id="l00670" name="l00670"></a><span class="lineno">  670</span><span class="preprocessor">#    define remove_handle(args...) CCC_remove_handle(args)</span></div>
