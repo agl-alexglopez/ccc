@@ -398,8 +398,8 @@ CCC_array_adaptive_map_insert_or_assign(CCC_Array_adaptive_map *const map,
 }
 
 CCC_Handle
-CCC_array_adaptive_map_remove(CCC_Array_adaptive_map *const map,
-                              void *const type_output)
+CCC_array_adaptive_map_remove_key_value(CCC_Array_adaptive_map *const map,
+                                        void *const type_output)
 {
     if (!map || !type_output)
     {

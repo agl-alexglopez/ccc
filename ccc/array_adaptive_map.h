@@ -621,7 +621,8 @@ bad input is provided an input error is set.
 Note that this function may write to the struct containing the second parameter
 and wraps it in a handle to provide information about the old value. */
 [[nodiscard]] CCC_Handle
-CCC_array_adaptive_map_remove(CCC_Array_adaptive_map *map, void *type_output);
+CCC_array_adaptive_map_remove_key_value(CCC_Array_adaptive_map *map,
+                                        void *type_output);
 
 /** @brief Removes the key value in the map storing the old value, if present,
 in the struct containing type_output provided by the user.
@@ -634,10 +635,12 @@ not stored in the map. If bad input is provided an input error is set.
 
 Note that this function may write to the struct containing the second parameter
 and wraps it in a handle to provide information about the old value. */
-#define CCC_array_adaptive_map_remove_wrap(map_pointer, type_output_pointer)   \
+#define CCC_array_adaptive_map_remove_key_value_wrap(map_pointer,              \
+                                                     type_output_pointer)      \
     &(CCC_Handle)                                                              \
     {                                                                          \
-        CCC_array_adaptive_map_remove((map_pointer), (type_output_pointer))    \
+        CCC_array_adaptive_map_remove_key_value((map_pointer),                 \
+                                                (type_output_pointer))         \
             .private                                                           \
     }
 
@@ -1127,8 +1130,8 @@ typedef CCC_Array_adaptive_map_handle Array_adaptive_map_handle;
         CCC_array_adaptive_map_swap_handle_wrap(args)
 #    define array_adaptive_map_try_insert_wrap(args...)                        \
         CCC_array_adaptive_map_try_insert_wrap(args)
-#    define array_adaptive_map_remove_wrap(args...)                            \
-        CCC_array_adaptive_map_remove_wrap(args)
+#    define array_adaptive_map_remove_key_value_wrap(args...)                  \
+        CCC_array_adaptive_map_remove_key_value_wrap(args)
 #    define array_adaptive_map_remove_handle_wrap(args...)                     \
         CCC_array_adaptive_map_remove_handle_wrap(args)
 #    define array_adaptive_map_swap_handle(args...)                            \
@@ -1137,8 +1140,8 @@ typedef CCC_Array_adaptive_map_handle Array_adaptive_map_handle;
         CCC_array_adaptive_map_try_insert(args)
 #    define array_adaptive_map_insert_or_assign(args...)                       \
         CCC_array_adaptive_map_insert_or_assign(args)
-#    define array_adaptive_map_remove(args...)                                 \
-        CCC_array_adaptive_map_remove(args)
+#    define array_adaptive_map_remove_key_value(args...)                       \
+        CCC_array_adaptive_map_remove_key_value(args)
 #    define array_adaptive_map_remove_handle(args...)                          \
         CCC_array_adaptive_map_remove_handle(args)
 #    define array_adaptive_map_handle_wrap(args...)                            \

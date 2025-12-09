@@ -142,13 +142,14 @@ check_static_begin(flat_hash_map_test_insert)
     check_end();
 }
 
-check_static_begin(flat_hash_map_test_remove)
+check_static_begin(flat_hash_map_test_remove_key_value)
 {
     int const size = 30;
     CCC_Flat_hash_map fh = flat_hash_map_initialize(
         &(Small_fixed_map){}, struct Val, key, flat_hash_map_int_to_u64,
         flat_hash_map_id_order, NULL, NULL, SMALL_FIXED_CAP);
-    CCC_Entry ent = CCC_remove(&fh, &(struct Val){.key = -1, .val = -1});
+    CCC_Entry ent
+        = CCC_remove_key_value(&fh, &(struct Val){.key = -1, .val = -1});
     check(validate(&fh), true);
     check(occupied(&ent), false);
     check(unwrap(&ent), NULL);
@@ -158,7 +159,7 @@ check_static_begin(flat_hash_map_test_remove)
     check(occupied(&ent), false);
     check(unwrap(&ent) != NULL, true);
     check(count(&fh).count, 1);
-    ent = CCC_remove(&fh, &(struct Val){.key = -1, .val = -1});
+    ent = CCC_remove_key_value(&fh, &(struct Val){.key = -1, .val = -1});
     check(validate(&fh), true);
     check(occupied(&ent), true);
     check(count(&fh).count, 0);
@@ -171,7 +172,7 @@ check_static_begin(flat_hash_map_test_remove)
     check(fill_n(&fh, size / 2, i), CHECK_PASS);
 
     i += (size / 2);
-    ent = CCC_remove(&fh, &(struct Val){.key = i, .val = i});
+    ent = CCC_remove_key_value(&fh, &(struct Val){.key = i, .val = i});
     check(validate(&fh), true);
     check(occupied(&ent), false);
     check(count(&fh).count, i);
@@ -180,7 +181,7 @@ check_static_begin(flat_hash_map_test_remove)
     check(occupied(&ent), false);
     check(unwrap(&ent) != NULL, true);
     check(count(&fh).count, i + 1);
-    ent = CCC_remove(&fh, &(struct Val){.key = i, .val = i});
+    ent = CCC_remove_key_value(&fh, &(struct Val){.key = i, .val = i});
     check(validate(&fh), true);
     check(occupied(&ent), true);
     check(count(&fh).count, i);
@@ -192,7 +193,7 @@ check_static_begin(flat_hash_map_test_remove)
     check(fill_n(&fh, size - i, i), CHECK_PASS);
 
     i = size;
-    ent = CCC_remove(&fh, &(struct Val){.key = i, .val = i});
+    ent = CCC_remove_key_value(&fh, &(struct Val){.key = i, .val = i});
     check(validate(&fh), true);
     check(occupied(&ent), false);
     check(count(&fh).count, i);
@@ -201,7 +202,7 @@ check_static_begin(flat_hash_map_test_remove)
     check(occupied(&ent), false);
     check(unwrap(&ent) != NULL, true);
     check(count(&fh).count, i + 1);
-    ent = CCC_remove(&fh, &(struct Val){.key = i, .val = i});
+    ent = CCC_remove_key_value(&fh, &(struct Val){.key = i, .val = i});
     check(validate(&fh), true);
     check(occupied(&ent), true);
     check(count(&fh).count, i);
@@ -918,7 +919,7 @@ int
 main(void)
 {
     return check_run(
-        flat_hash_map_test_insert(), flat_hash_map_test_remove(),
+        flat_hash_map_test_insert(), flat_hash_map_test_remove_key_value(),
         flat_hash_map_test_validate(), flat_hash_map_test_try_insert(),
         flat_hash_map_test_try_insert_with(),
         flat_hash_map_test_insert_or_assign(),

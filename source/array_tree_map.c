@@ -520,8 +520,8 @@ CCC_array_tree_map_remove_handle(CCC_Array_tree_map_handle const *const h)
 }
 
 CCC_Handle
-CCC_array_tree_map_remove(CCC_Array_tree_map *const map,
-                          void *const type_output)
+CCC_array_tree_map_remove_key_value(CCC_Array_tree_map *const map,
+                                    void *const type_output)
 {
     if (!map || !type_output)
     {

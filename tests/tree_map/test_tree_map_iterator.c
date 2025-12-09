@@ -237,14 +237,14 @@ check_static_begin(tree_map_test_iterate_removal)
         next = next(&s, &i->elem);
         if (i->key > limit)
         {
-            (void)remove(&s, &i->elem);
+            (void)remove_key_value(&s, &i->elem);
             check(validate(&s), true);
         }
     }
     check_end();
 }
 
-check_static_begin(tree_map_test_iterate_remove_reinsert)
+check_static_begin(tree_map_test_iterate_remove_key_value_reinsert)
 {
     struct Stack_allocator allocator
         = stack_allocator_initialize(struct Val, 200);
@@ -275,7 +275,7 @@ check_static_begin(tree_map_test_iterate_remove_reinsert)
         next = next(&s, &i->elem);
         if (i->key < limit)
         {
-            (void)remove(&s, &i->elem);
+            (void)remove_key_value(&s, &i->elem);
             i->key = new_unique_entry_val;
             check(insert_entry(entry_wrap(&s, &i->key), &i->elem) != NULL,
                   true);
@@ -428,5 +428,5 @@ main()
         tree_map_test_forward_iterator(), tree_map_test_iterate_removal(),
         tree_map_test_valid_range(), tree_map_test_valid_range_equals(),
         tree_map_test_invalid_range(), tree_map_test_empty_range(),
-        tree_map_test_iterate_remove_reinsert());
+        tree_map_test_iterate_remove_key_value_reinsert());
 }

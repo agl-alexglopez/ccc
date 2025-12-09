@@ -88,9 +88,10 @@ check_static_begin(flat_hash_map_test_copy_no_allocate)
     check(count(&destination).count, count(&source).count);
     for (int i = 0; i < 3; ++i)
     {
-        CCC_Entry source_e = CCC_remove(&source, &(struct Val){.key = i});
+        CCC_Entry source_e
+            = CCC_remove_key_value(&source, &(struct Val){.key = i});
         CCC_Entry destination_e
-            = CCC_remove(&destination, &(struct Val){.key = i});
+            = CCC_remove_key_value(&destination, &(struct Val){.key = i});
         check(occupied(&source_e), occupied(&destination_e));
     }
     check(is_empty(&source), is_empty(&destination));
@@ -136,9 +137,10 @@ check_static_begin(flat_hash_map_test_copy_allocate)
     check(count(&destination).count, count(&source).count);
     for (int i = 0; i < 3; ++i)
     {
-        CCC_Entry source_e = CCC_remove(&source, &(struct Val){.key = i});
+        CCC_Entry source_e
+            = CCC_remove_key_value(&source, &(struct Val){.key = i});
         CCC_Entry destination_e
-            = CCC_remove(&destination, &(struct Val){.key = i});
+            = CCC_remove_key_value(&destination, &(struct Val){.key = i});
         check(occupied(&source_e), occupied(&destination_e));
     }
     check(is_empty(&source), is_empty(&destination));

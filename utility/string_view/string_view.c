@@ -592,7 +592,7 @@ SV_starts_with(SV_String_view const sv, SV_String_view const prefix)
 }
 
 SV_String_view
-SV_remove_prefix(SV_String_view const sv, size_t const n)
+SV_remove_key_value_prefix(SV_String_view const sv, size_t const n)
 {
     size_t const remove = SV_min(sv.len, n);
     return (SV_String_view){.s = sv.s + remove, .len = sv.len - remove};
@@ -610,7 +610,7 @@ SV_ends_with(SV_String_view const sv, SV_String_view const suffix)
 }
 
 SV_String_view
-SV_remove_suffix(SV_String_view const sv, size_t const n)
+SV_remove_key_value_suffix(SV_String_view const sv, size_t const n)
 {
     if (!sv.s)
     {

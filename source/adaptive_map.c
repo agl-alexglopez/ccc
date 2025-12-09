@@ -315,8 +315,9 @@ CCC_adaptive_map_insert_or_assign(CCC_Adaptive_map *const map,
 }
 
 CCC_Entry
-CCC_adaptive_map_remove(CCC_Adaptive_map *const map,
-                        CCC_Adaptive_map_node *const type_output_intruder)
+CCC_adaptive_map_remove_key_value(
+    CCC_Adaptive_map *const map,
+    CCC_Adaptive_map_node *const type_output_intruder)
 {
     if (!map || !type_output_intruder)
     {

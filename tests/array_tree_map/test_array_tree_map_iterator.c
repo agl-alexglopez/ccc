@@ -208,14 +208,14 @@ check_static_begin(array_tree_map_test_iterate_removal)
         struct Val const *const v = array_tree_map_at(&s, i);
         if (v->id > limit)
         {
-            (void)remove(&s, &(struct Val){.id = v->id});
+            (void)remove_key_value(&s, &(struct Val){.id = v->id});
             check(validate(&s), true);
         }
     }
     check_end();
 }
 
-check_static_begin(array_tree_map_test_iterate_remove_reinsert)
+check_static_begin(array_tree_map_test_iterate_remove_key_value_reinsert)
 {
     CCC_Array_tree_map s
         = array_tree_map_initialize(&(Standard_fixed_map){}, struct Val, id,
@@ -242,7 +242,7 @@ check_static_begin(array_tree_map_test_iterate_remove_reinsert)
         if (v->id < limit)
         {
             struct Val new_val = {.id = v->id};
-            (void)remove(&s, &new_val);
+            (void)remove_key_value(&s, &new_val);
             new_val.id = new_unique_array_id;
             CCC_Handle e = insert_or_assign(&s, &new_val);
             check(unwrap(&e) != 0, true);
@@ -383,5 +383,5 @@ main()
                      array_tree_map_test_valid_range_equals(),
                      array_tree_map_test_invalid_range(),
                      array_tree_map_test_empty_range(),
-                     array_tree_map_test_iterate_remove_reinsert());
+                     array_tree_map_test_iterate_remove_key_value_reinsert());
 }

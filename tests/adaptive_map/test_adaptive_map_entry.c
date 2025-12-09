@@ -154,14 +154,15 @@ check_static_begin(adaptive_map_test_insert)
     check_end();
 }
 
-check_static_begin(adaptive_map_test_remove)
+check_static_begin(adaptive_map_test_remove_key_value)
 {
     struct Stack_allocator allocator
         = stack_allocator_initialize(struct Val, 35);
     Adaptive_map om = adaptive_map_initialize(
         struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
     int size = 30;
-    CCC_Entry ent = CCC_remove(&om, &(struct Val){.key = -1, .val = -1}.elem);
+    CCC_Entry ent
+        = CCC_remove_key_value(&om, &(struct Val){.key = -1, .val = -1}.elem);
     check(validate(&om), true);
     check(occupied(&ent), false);
     check(unwrap(&ent), NULL);
@@ -172,7 +173,7 @@ check_static_begin(adaptive_map_test_remove)
     check(occupied(&ent), false);
     check(unwrap(&ent), NULL);
     check(count(&om).count, 1);
-    ent = CCC_remove(&om, &(struct Val){.key = -1, .val = -1}.elem);
+    ent = CCC_remove_key_value(&om, &(struct Val){.key = -1, .val = -1}.elem);
     check(validate(&om), true);
     check(occupied(&ent), true);
     check(count(&om).count, 0);
@@ -185,7 +186,7 @@ check_static_begin(adaptive_map_test_remove)
     check(fill_n(&om, size / 2, i), CHECK_PASS);
 
     i += (size / 2);
-    ent = CCC_remove(&om, &(struct Val){.key = i, .val = i}.elem);
+    ent = CCC_remove_key_value(&om, &(struct Val){.key = i, .val = i}.elem);
     check(validate(&om), true);
     check(occupied(&ent), false);
     check(count(&om).count, i);
@@ -195,7 +196,7 @@ check_static_begin(adaptive_map_test_remove)
     check(occupied(&ent), false);
     check(unwrap(&ent), NULL);
     check(count(&om).count, i + 1);
-    ent = CCC_remove(&om, &(struct Val){.key = i, .val = i}.elem);
+    ent = CCC_remove_key_value(&om, &(struct Val){.key = i, .val = i}.elem);
     check(validate(&om), true);
     check(occupied(&ent), true);
     check(count(&om).count, i);
@@ -207,7 +208,7 @@ check_static_begin(adaptive_map_test_remove)
     check(fill_n(&om, size - i, i), CHECK_PASS);
 
     i = size;
-    ent = CCC_remove(&om, &(struct Val){.key = i, .val = i}.elem);
+    ent = CCC_remove_key_value(&om, &(struct Val){.key = i, .val = i}.elem);
     check(validate(&om), true);
     check(occupied(&ent), false);
     check(count(&om).count, i);
@@ -217,7 +218,7 @@ check_static_begin(adaptive_map_test_remove)
     check(occupied(&ent), false);
     check(unwrap(&ent), NULL);
     check(count(&om).count, i + 1);
-    ent = CCC_remove(&om, &(struct Val){.key = i, .val = i}.elem);
+    ent = CCC_remove_key_value(&om, &(struct Val){.key = i, .val = i}.elem);
     check(validate(&om), true);
     check(occupied(&ent), true);
     check(count(&om).count, i);
@@ -947,7 +948,7 @@ int
 main(void)
 {
     return check_run(
-        adaptive_map_test_insert(), adaptive_map_test_remove(),
+        adaptive_map_test_insert(), adaptive_map_test_remove_key_value(),
         adaptive_map_test_validate(), adaptive_map_test_try_insert(),
         adaptive_map_test_try_insert_with(),
         adaptive_map_test_insert_or_assign(),

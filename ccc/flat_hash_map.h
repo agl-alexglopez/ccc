@@ -894,8 +894,8 @@ to the provided space.
 
 Note that this function may write to the struct containing the second parameter
 and wraps it in an entry to provide information about the old value. */
-[[nodiscard]] CCC_Entry CCC_flat_hash_map_remove(CCC_Flat_hash_map *map,
-                                                 void *type_output);
+[[nodiscard]] CCC_Entry
+CCC_flat_hash_map_remove_key_value(CCC_Flat_hash_map *map, void *type_output);
 
 /** @brief Removes the key value in the map storing the old value, if present,
 in the struct containing out_array_pointer provided by the user.
@@ -910,10 +910,12 @@ because the data has been written to the provided space.
 
 Note that this function may write to the struct containing the second parameter
 and wraps it in an entry to provide information about the old value. */
-#define CCC_flat_hash_map_remove_wrap(map_pointer, type_output_pointer)        \
+#define CCC_flat_hash_map_remove_key_value_wrap(map_pointer,                   \
+                                                type_output_pointer)           \
     &(CCC_Entry)                                                               \
     {                                                                          \
-        CCC_flat_hash_map_remove(map_pointer, type_output_pointer).private     \
+        CCC_flat_hash_map_remove_key_value(map_pointer, type_output_pointer)   \
+            .private                                                           \
     }
 
 /** @brief Unwraps the provided entry to obtain a view into the table element.
@@ -1108,8 +1110,8 @@ typedef CCC_Flat_hash_map_entry Flat_hash_map_entry;
 #    define flat_hash_map_contains(args...) CCC_flat_hash_map_contains(args)
 #    define flat_hash_map_get_key_value(args...)                               \
         CCC_flat_hash_map_get_key_value(args)
-#    define flat_hash_map_remove_wrap(args...)                                 \
-        CCC_flat_hash_map_remove_wrap(args)
+#    define flat_hash_map_remove_key_value_wrap(args...)                       \
+        CCC_flat_hash_map_remove_key_value_wrap(args)
 #    define flat_hash_map_swap_entry_wrap(args...)                             \
         CCC_flat_hash_map_swap_entry_wrap(args)
 #    define flat_hash_map_try_insert_wrap(args...)                             \
@@ -1118,7 +1120,8 @@ typedef CCC_Flat_hash_map_entry Flat_hash_map_entry;
         CCC_flat_hash_map_insert_or_assign_wrap(args)
 #    define flat_hash_map_remove_entry_wrap(args...)                           \
         CCC_flat_hash_map_remove_entry_wrap(args)
-#    define flat_hash_map_remove(args...) CCC_flat_hash_map_remove(args)
+#    define flat_hash_map_remove_key_value(args...)                            \
+        CCC_flat_hash_map_remove_key_value(args)
 #    define flat_hash_map_swap_entry(args...) CCC_flat_hash_map_swap_entry(args)
 #    define flat_hash_map_try_insert(args...) CCC_flat_hash_map_try_insert(args)
 #    define flat_hash_map_insert_or_assign(args...)                            \

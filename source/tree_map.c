@@ -364,8 +364,8 @@ CCC_tree_map_remove_entry(CCC_Tree_map_entry const *const entry)
 }
 
 CCC_Entry
-CCC_tree_map_remove(CCC_Tree_map *const map,
-                    CCC_Tree_map_node *const type_output_intruder)
+CCC_tree_map_remove_key_value(CCC_Tree_map *const map,
+                              CCC_Tree_map_node *const type_output_intruder)
 {
     if (!map || !type_output_intruder)
     {

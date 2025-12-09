@@ -634,7 +634,8 @@ CCC_flat_hash_map_insert_or_assign(CCC_Flat_hash_map *const map,
 }
 
 CCC_Entry
-CCC_flat_hash_map_remove(CCC_Flat_hash_map *const map, void *const type_output)
+CCC_flat_hash_map_remove_key_value(CCC_Flat_hash_map *const map,
+                                   void *const type_output)
 {
     if (unlikely(!map || !type_output))
     {
