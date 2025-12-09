@@ -120,8 +120,8 @@ See container documentation for specific behavior. */
 @return an entry depending on container specific context.
 
 See container documentation for specific behavior. */
-#define CCC_remove(container_pointer, remove_args...)                          \
-    CCC_private_remove(container_pointer, remove_args)
+#define CCC_remove_key_value(container_pointer, remove_key_value_args...)      \
+    CCC_private_remove_key_value(container_pointer, remove_key_value_args)
 
 /** @brief Remove an element and retain access to its value.
 @param[in] container_pointer a pointer to the container.
@@ -129,8 +129,8 @@ See container documentation for specific behavior. */
 @return an entry depending on container specific context.
 
 See container documentation for specific behavior. */
-#define CCC_remove_wrap(container_pointer, remove_args...)                     \
-    CCC_private_remove_wrap(container_pointer, remove_args)
+#define CCC_remove_key_value_wrap(container_pointer, remove_key_value_args...) \
+    CCC_private_remove_key_value_wrap(container_pointer, remove_key_value_args)
 
 /** @brief Obtain a container specific entry for the Entry Interface.
 @param[in] container_pointer a pointer to the container.
@@ -663,8 +663,8 @@ See container documentation for specific behavior. */
 #    define insert_or_assign(args...) CCC_insert_or_assign(args)
 #    define insert_or_assign_wrap(args...) CCC_insert_or_assign_wrap(args)
 #    define try_insert_wrap(args...) CCC_try_insert_wrap(args)
-#    define remove(args...) CCC_remove(args)
-#    define remove_wrap(args...) CCC_remove_wrap(args)
+#    define remove_key_value(args...) CCC_remove_key_value(args)
+#    define remove_key_value_wrap(args...) CCC_remove_key_value_wrap(args)
 #    define remove_entry(args...) CCC_remove_entry(args)
 #    define remove_entry_wrap(args...) CCC_remove_entry_wrap(args)
 #    define remove_handle(args...) CCC_remove_handle(args)

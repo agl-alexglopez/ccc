@@ -12,7 +12,7 @@
 #include "types.h"
 #include "utility/stack_allocator.h"
 
-check_static_begin(flat_priority_queue_test_insert_remove_four_dups)
+check_static_begin(flat_priority_queue_test_insert_remove_key_value_four_dups)
 {
     struct Stack_allocator allocator
         = stack_allocator_initialize(struct Val, 8);
@@ -266,11 +266,11 @@ check_static_begin(flat_priority_queue_test_weak_srand)
 int
 main()
 {
-    return check_run(flat_priority_queue_test_insert_remove_four_dups(),
-                     flat_priority_queue_test_insert_erase_shuffled(),
-                     flat_priority_queue_test_pop_max(),
-                     flat_priority_queue_test_pop_min(),
-                     flat_priority_queue_test_delete_prime_shuffle_duplicates(),
-                     flat_priority_queue_test_prime_shuffle(),
-                     flat_priority_queue_test_weak_srand());
+    return check_run(
+        flat_priority_queue_test_insert_remove_key_value_four_dups(),
+        flat_priority_queue_test_insert_erase_shuffled(),
+        flat_priority_queue_test_pop_max(), flat_priority_queue_test_pop_min(),
+        flat_priority_queue_test_delete_prime_shuffle_duplicates(),
+        flat_priority_queue_test_prime_shuffle(),
+        flat_priority_queue_test_weak_srand());
 }

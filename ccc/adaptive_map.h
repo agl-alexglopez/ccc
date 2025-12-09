@@ -288,8 +288,8 @@ contains the previously stored user type, if any, and nothing is written to
 the type_output_intruder. It is then the user's responsibility to manage their
 previously stored memory as they see fit. */
 [[nodiscard]] CCC_Entry
-CCC_adaptive_map_remove(CCC_Adaptive_map *map,
-                        CCC_Adaptive_map_node *type_output_intruder);
+CCC_adaptive_map_remove_key_value(CCC_Adaptive_map *map,
+                                  CCC_Adaptive_map_node *type_output_intruder);
 
 /** @brief Removes the key value in the map storing the old value, if present,
 in the struct containing type_output_intruder provided by the user.
@@ -307,11 +307,12 @@ If allocation has been prohibited upon initialization then the entry returned
 contains the previously stored user type, if any, and nothing is written to
 the type_output_intruder. It is then the user's responsibility to manage their
 previously stored memory as they see fit. */
-#define CCC_adaptive_map_remove_wrap(map_pointer,                              \
-                                     type_output_intruder_pointer)             \
+#define CCC_adaptive_map_remove_key_value_wrap(map_pointer,                    \
+                                               type_output_intruder_pointer)   \
     &(CCC_Entry)                                                               \
     {                                                                          \
-        CCC_adaptive_map_remove((map_pointer), (type_output_intruder_pointer)) \
+        CCC_adaptive_map_remove_key_value((map_pointer),                       \
+                                          (type_output_intruder_pointer))      \
             .private                                                           \
     }
 
@@ -740,7 +741,8 @@ typedef CCC_Adaptive_map_entry Adaptive_map_entry;
         CCC_adaptive_map_insert_or_assign_with(args)
 #    define adaptive_map_swap_entry_wrap(args...)                              \
         CCC_adaptive_map_swap_entry_wrap(args)
-#    define adaptive_map_remove_wrap(args...) CCC_adaptive_map_remove_wrap(args)
+#    define adaptive_map_remove_key_value_wrap(args...)                        \
+        CCC_adaptive_map_remove_key_value_wrap(args)
 #    define adaptive_map_remove_entry_wrap(args...)                            \
         CCC_adaptive_map_remove_entry_wrap(args)
 #    define adaptive_map_entry_wrap(args...) CCC_adaptive_map_entry_wrap(args)
@@ -753,7 +755,8 @@ typedef CCC_Adaptive_map_entry Adaptive_map_entry;
         CCC_adaptive_map_get_key_value(args)
 #    define adaptive_map_get_mut(args...) CCC_adaptive_map_get_mut(args)
 #    define adaptive_map_swap_entry(args...) CCC_adaptive_map_swap_entry(args)
-#    define adaptive_map_remove(args...) CCC_adaptive_map_remove(args)
+#    define adaptive_map_remove_key_value(args...)                             \
+        CCC_adaptive_map_remove_key_value(args)
 #    define adaptive_map_entry(args...) CCC_adaptive_map_entry(args)
 #    define adaptive_map_remove_entry(args...)                                 \
         CCC_adaptive_map_remove_entry(args)

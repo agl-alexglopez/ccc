@@ -21,7 +21,7 @@ enum : int
     WEAK_SRAND_HEAP_CAP = 1000,
 };
 
-check_static_begin(priority_queue_test_insert_remove_four_dups)
+check_static_begin(priority_queue_test_insert_remove_key_value_four_dups)
 {
     struct Stack_allocator allocator
         = stack_allocator_initialize(struct Val, 4);
@@ -253,7 +253,7 @@ int
 main()
 {
     return check_run(
-        priority_queue_test_insert_remove_four_dups(),
+        priority_queue_test_insert_remove_key_value_four_dups(),
         priority_queue_test_insert_extract_shuffled(),
         priority_queue_test_pop_max(), priority_queue_test_pop_min(),
         priority_queue_test_delete_prime_shuffle_duplicates(),

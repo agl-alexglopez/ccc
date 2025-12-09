@@ -23,7 +23,7 @@ check_static_begin(flat_hash_map_test_erase)
     check(occupied(&ent), false);
     check(unwrap(&ent) != NULL, true);
     check(count(&fh).count, 1);
-    ent = CCC_remove(&fh, &query);
+    ent = CCC_remove_key_value(&fh, &query);
     check(occupied(&ent), true);
     struct Val *v = unwrap(&ent);
     check(v != NULL, true);
@@ -31,7 +31,7 @@ check_static_begin(flat_hash_map_test_erase)
     check(v->val, 99);
     check(count(&fh).count, 0);
     query.key = 101;
-    ent = CCC_remove(&fh, &query);
+    ent = CCC_remove_key_value(&fh, &query);
     check(occupied(&ent), false);
     check(count(&fh).count, 0);
     CCC_flat_hash_map_insert_entry_with(entry_wrap(&fh, &(int){137}),
@@ -68,7 +68,7 @@ check_static_begin(flat_hash_map_test_shuffle_insert_erase)
         if (i % 2)
         {
             struct Val const *const old_val
-                = unwrap(remove_wrap(&h, &(struct Val){.key = i}));
+                = unwrap(remove_key_value_wrap(&h, &(struct Val){.key = i}));
             check(old_val != NULL, true);
             check(old_val->key, i);
         }
@@ -142,7 +142,7 @@ check_static_begin(flat_hash_map_test_shuffle_erase_fixed)
         if (i % 2)
         {
             struct Val const *const old_val
-                = unwrap(remove_wrap(&h, &(struct Val){.key = cur}));
+                = unwrap(remove_key_value_wrap(&h, &(struct Val){.key = cur}));
             check(old_val != NULL, true);
             check(old_val->key, to_insert[i]);
         }
@@ -224,7 +224,7 @@ check_static_begin(flat_hash_map_test_shuffle_erase_reserved)
         if (i % 2)
         {
             struct Val const *const old_val
-                = unwrap(remove_wrap(&h, &(struct Val){.key = cur}));
+                = unwrap(remove_key_value_wrap(&h, &(struct Val){.key = cur}));
             check(old_val != NULL, true);
             check(old_val->key, to_insert[i]);
         }
@@ -292,7 +292,7 @@ check_static_begin(flat_hash_map_test_shuffle_erase_dynamic)
         if (i % 2)
         {
             struct Val const *const old_val
-                = unwrap(remove_wrap(&h, &(struct Val){.key = cur}));
+                = unwrap(remove_key_value_wrap(&h, &(struct Val){.key = cur}));
             check(old_val != NULL, true);
             check(old_val->key, to_insert[i]);
         }

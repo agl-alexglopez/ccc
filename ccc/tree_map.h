@@ -302,8 +302,9 @@ If allocation has been prohibited upon initialization then the entry returned
 contains the previously stored user type, if any, and nothing is written to
 the output_intruder. It is then the user's responsibility to manage their
 previously stored memory as they see fit. */
-[[nodiscard]] CCC_Entry CCC_tree_map_remove(CCC_Tree_map *map,
-                                            CCC_Tree_map_node *output_intruder);
+[[nodiscard]] CCC_Entry
+CCC_tree_map_remove_key_value(CCC_Tree_map *map,
+                              CCC_Tree_map_node *output_intruder);
 
 /** @brief Removes the key value in the map storing the old value, if present,
 in the struct containing output_intruder_pointer provided by the user.
@@ -321,10 +322,13 @@ If allocation has been prohibited upon initialization then the entry returned
 contains the previously stored user type, if any, and nothing is written to
 the output_intruder_pointer. It is then the user's responsibility to manage
 their previously stored memory as they see fit. */
-#define CCC_tree_map_remove_wrap(map_pointer, output_intruder_pointer)         \
+#define CCC_tree_map_remove_key_value_wrap(map_pointer,                        \
+                                           output_intruder_pointer)            \
     &(CCC_Entry)                                                               \
     {                                                                          \
-        CCC_tree_map_remove((map_pointer), (output_intruder_pointer)).private  \
+        CCC_tree_map_remove_key_value((map_pointer),                           \
+                                      (output_intruder_pointer))               \
+            .private                                                           \
     }
 
 /** @brief Obtains an entry for the provided key in the map for future use.
@@ -736,7 +740,8 @@ typedef CCC_Tree_map_entry Tree_map_entry;
 #    define tree_map_insert_or_assign_with(args...)                            \
         CCC_tree_map_insert_or_assign_with(args)
 #    define tree_map_swap_entry_wrap(args...) CCC_tree_map_swap_entry_wrap(args)
-#    define tree_map_remove_wrap(args...) CCC_tree_map_remove_wrap(args)
+#    define tree_map_remove_key_value_wrap(args...)                            \
+        CCC_tree_map_remove_key_value_wrap(args)
 #    define tree_map_remove_entry_wrap(args...)                                \
         CCC_tree_map_remove_entry_wrap(args)
 #    define tree_map_entry_wrap(args...) CCC_tree_map_entry_wrap(args)
@@ -747,7 +752,8 @@ typedef CCC_Tree_map_entry Tree_map_entry;
 #    define tree_map_get_key_value(args...) CCC_tree_map_get_key_value(args)
 #    define tree_map_get_mut(args...) CCC_tree_map_get_mut(args)
 #    define tree_map_swap_entry(args...) CCC_tree_map_swap_entry(args)
-#    define tree_map_remove(args...) CCC_tree_map_remove(args)
+#    define tree_map_remove_key_value(args...)                                 \
+        CCC_tree_map_remove_key_value(args)
 #    define tree_map_entry(args...) CCC_tree_map_entry(args)
 #    define tree_map_remove_entry(args...) CCC_tree_map_remove_entry(args)
 #    define tree_map_or_insert(args...) CCC_tree_map_or_insert(args)

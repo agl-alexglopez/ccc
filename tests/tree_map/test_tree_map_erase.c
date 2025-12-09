@@ -29,7 +29,7 @@ check_static_begin(tree_map_test_insert_erase_shuffled)
     /* Now let's delete everything with no errors. */
     for (size_t i = 0; i < size; ++i)
     {
-        struct Val *v = unwrap(remove_wrap(&s, &vals[i].elem));
+        struct Val *v = unwrap(remove_key_value_wrap(&s, &vals[i].elem));
         check(v != NULL, true);
         check(v->key, vals[i].key);
         check(validate(&s), true);
@@ -97,7 +97,7 @@ check_static_begin(tree_map_test_weak_srand)
     }
     for (int i = 0; i < num_nodes; ++i)
     {
-        CCC_Entry entry = CCC_remove(&s, &vals[i].elem);
+        CCC_Entry entry = CCC_remove_key_value(&s, &vals[i].elem);
         check(occupied(&entry) || repeats[i], true);
         check(validate(&s), true);
     }

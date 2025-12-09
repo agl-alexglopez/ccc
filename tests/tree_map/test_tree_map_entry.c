@@ -154,14 +154,15 @@ check_static_begin(romap_test_insert)
     check_end();
 }
 
-check_static_begin(romap_test_remove)
+check_static_begin(romap_test_remove_key_value)
 {
     struct Stack_allocator allocator
         = stack_allocator_initialize(struct Val, 35);
     CCC_Tree_map rom = tree_map_initialize(
         struct Val, elem, key, id_order, stack_allocator_allocate, &allocator);
     int size = 30;
-    CCC_Entry ent = CCC_remove(&rom, &(struct Val){.key = -1, .val = -1}.elem);
+    CCC_Entry ent
+        = CCC_remove_key_value(&rom, &(struct Val){.key = -1, .val = -1}.elem);
     check(validate(&rom), true);
     check(occupied(&ent), false);
     check(unwrap(&ent), NULL);
@@ -172,7 +173,7 @@ check_static_begin(romap_test_remove)
     check(occupied(&ent), false);
     check(unwrap(&ent), NULL);
     check(count(&rom).count, 1);
-    ent = CCC_remove(&rom, &(struct Val){.key = -1, .val = -1}.elem);
+    ent = CCC_remove_key_value(&rom, &(struct Val){.key = -1, .val = -1}.elem);
     check(validate(&rom), true);
     check(occupied(&ent), true);
     check(count(&rom).count, 0);
@@ -185,7 +186,7 @@ check_static_begin(romap_test_remove)
     check(fill_n(&rom, size / 2, i), CHECK_PASS);
 
     i += (size / 2);
-    ent = CCC_remove(&rom, &(struct Val){.key = i, .val = i}.elem);
+    ent = CCC_remove_key_value(&rom, &(struct Val){.key = i, .val = i}.elem);
     check(validate(&rom), true);
     check(occupied(&ent), false);
     check(count(&rom).count, i);
@@ -195,7 +196,7 @@ check_static_begin(romap_test_remove)
     check(occupied(&ent), false);
     check(unwrap(&ent), NULL);
     check(count(&rom).count, i + 1);
-    ent = CCC_remove(&rom, &(struct Val){.key = i, .val = i}.elem);
+    ent = CCC_remove_key_value(&rom, &(struct Val){.key = i, .val = i}.elem);
     check(validate(&rom), true);
     check(occupied(&ent), true);
     check(count(&rom).count, i);
@@ -207,7 +208,7 @@ check_static_begin(romap_test_remove)
     check(fill_n(&rom, size - i, i), CHECK_PASS);
 
     i = size;
-    ent = CCC_remove(&rom, &(struct Val){.key = i, .val = i}.elem);
+    ent = CCC_remove_key_value(&rom, &(struct Val){.key = i, .val = i}.elem);
     check(validate(&rom), true);
     check(occupied(&ent), false);
     check(count(&rom).count, i);
@@ -217,7 +218,7 @@ check_static_begin(romap_test_remove)
     check(occupied(&ent), false);
     check(unwrap(&ent), NULL);
     check(count(&rom).count, i + 1);
-    ent = CCC_remove(&rom, &(struct Val){.key = i, .val = i}.elem);
+    ent = CCC_remove_key_value(&rom, &(struct Val){.key = i, .val = i}.elem);
     check(validate(&rom), true);
     check(occupied(&ent), true);
     check(count(&rom).count, i);
@@ -946,10 +947,11 @@ int
 main(void)
 {
     return check_run(
-        romap_test_insert(), romap_test_remove(), romap_test_validate(),
-        romap_test_try_insert(), romap_test_try_insert_with(),
-        romap_test_insert_or_assign(), romap_test_insert_or_assign_with(),
-        romap_test_entry_and_modify(), romap_test_entry_and_modify_context(),
+        romap_test_insert(), romap_test_remove_key_value(),
+        romap_test_validate(), romap_test_try_insert(),
+        romap_test_try_insert_with(), romap_test_insert_or_assign(),
+        romap_test_insert_or_assign_with(), romap_test_entry_and_modify(),
+        romap_test_entry_and_modify_context(),
         romap_test_entry_and_modify_with(), romap_test_or_insert(),
         romap_test_or_insert_with(), romap_test_insert_entry(),
         romap_test_insert_entry_with(), romap_test_remove_entry());

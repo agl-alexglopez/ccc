@@ -625,8 +625,8 @@ pair. If Vacant the key value pair was not stored in the map. If bad input is
 provided an input error is set.
 
 Note that this function may write to the user type struct. */
-[[nodiscard]] CCC_Handle CCC_array_tree_map_remove(CCC_Array_tree_map *map,
-                                                   void *type_output);
+[[nodiscard]] CCC_Handle
+CCC_array_tree_map_remove_key_value(CCC_Array_tree_map *map, void *type_output);
 
 /** @brief Removes the key value in the map storing the old value, if present,
 in the struct containing key value type provided by the user.
@@ -638,12 +638,12 @@ value pair was not stored in the map. If bad input is provided an input error is
 set.
 
 Note that this function may write to the user type struct. */
-#define CCC_array_tree_map_remove_wrap(array_tree_map_pointer,                 \
-                                       type_output_pointer)                    \
+#define CCC_array_tree_map_remove_key_value_wrap(array_tree_map_pointer,       \
+                                                 type_output_pointer)          \
     &(CCC_Handle)                                                              \
     {                                                                          \
-        CCC_array_tree_map_remove((array_tree_map_pointer),                    \
-                                  (type_output_pointer))                       \
+        CCC_array_tree_map_remove_key_value((array_tree_map_pointer),          \
+                                            (type_output_pointer))             \
             .private                                                           \
     }
 

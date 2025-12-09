@@ -40,8 +40,9 @@ check_static_begin(array_adaptive_map_test_copy_no_allocate)
     {
         struct Val source_v = {.id = i};
         struct Val destination_v = {.id = i};
-        CCC_Handle source_e = CCC_remove(&source, &source_v);
-        CCC_Handle destination_e = CCC_remove(&destination, &destination_v);
+        CCC_Handle source_e = CCC_remove_key_value(&source, &source_v);
+        CCC_Handle destination_e
+            = CCC_remove_key_value(&destination, &destination_v);
         check(occupied(&source_e), occupied(&destination_e));
         check(source_v.id, destination_v.id);
         check(source_v.val, destination_v.val);
@@ -92,8 +93,9 @@ check_static_begin(array_adaptive_map_test_copy_allocate)
     {
         struct Val source_v = {.id = i};
         struct Val destination_v = {.id = i};
-        CCC_Handle source_e = CCC_remove(&source, &source_v);
-        CCC_Handle destination_e = CCC_remove(&destination, &destination_v);
+        CCC_Handle source_e = CCC_remove_key_value(&source, &source_v);
+        CCC_Handle destination_e
+            = CCC_remove_key_value(&destination, &destination_v);
         check(occupied(&source_e), occupied(&destination_e));
         check(source_v.id, destination_v.id);
         check(source_v.val, destination_v.val);

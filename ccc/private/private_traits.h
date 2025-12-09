@@ -141,42 +141,42 @@ limitations under the License.
                 (CCC_Tree_map_node *)insert_or_assign_args)                    \
                 .private})
 
-#define CCC_private_remove(container_pointer,                                  \
-                           key_val_container_array_pointer...)                 \
+#define CCC_private_remove_key_value(container_pointer,                        \
+                                     key_val_container_array_pointer...)       \
     _Generic((container_pointer),                                              \
-        CCC_Array_adaptive_map *: CCC_array_adaptive_map_remove,               \
-        CCC_Array_tree_map *: CCC_array_tree_map_remove,                       \
-        CCC_Flat_hash_map *: CCC_flat_hash_map_remove,                         \
-        CCC_Adaptive_map *: CCC_adaptive_map_remove,                           \
-        CCC_Tree_map *: CCC_tree_map_remove)((container_pointer),              \
-                                             key_val_container_array_pointer)
+        CCC_Array_adaptive_map *: CCC_array_adaptive_map_remove_key_value,     \
+        CCC_Array_tree_map *: CCC_array_tree_map_remove_key_value,             \
+        CCC_Flat_hash_map *: CCC_flat_hash_map_remove_key_value,               \
+        CCC_Adaptive_map *: CCC_adaptive_map_remove_key_value,                 \
+        CCC_Tree_map *: CCC_tree_map_remove_key_value)(                        \
+        (container_pointer), key_val_container_array_pointer)
 
-#define CCC_private_remove_wrap(container_pointer,                             \
-                                key_val_container_array_pointer...)            \
+#define CCC_private_remove_key_value_wrap(container_pointer,                   \
+                                          key_val_container_array_pointer...)  \
     _Generic((container_pointer),                                              \
         CCC_Array_adaptive_map *: &(                                           \
-                 CCC_Handle){CCC_array_adaptive_map_remove(                    \
+                 CCC_Handle){CCC_array_adaptive_map_remove_key_value(          \
                                  (CCC_Array_adaptive_map *)container_pointer,  \
                                  key_val_container_array_pointer)              \
                                  .private},                                    \
         CCC_Array_tree_map *: &(                                               \
-                 CCC_Handle){CCC_array_tree_map_remove(                        \
+                 CCC_Handle){CCC_array_tree_map_remove_key_value(              \
                                  (CCC_Array_tree_map *)container_pointer,      \
                                  key_val_container_array_pointer)              \
                                  .private},                                    \
         CCC_Flat_hash_map *: &(                                                \
-                 CCC_Entry){CCC_flat_hash_map_remove(                          \
+                 CCC_Entry){CCC_flat_hash_map_remove_key_value(                \
                                 (CCC_Flat_hash_map *)container_pointer,        \
                                 key_val_container_array_pointer)               \
                                 .private},                                     \
         CCC_Adaptive_map *: &(                                                 \
-                 CCC_Entry){CCC_adaptive_map_remove(                           \
+                 CCC_Entry){CCC_adaptive_map_remove_key_value(                 \
                                 (CCC_Adaptive_map *)container_pointer,         \
                                 (CCC_Adaptive_map_node *)                      \
                                     key_val_container_array_pointer)           \
                                 .private},                                     \
         CCC_Tree_map *: &(CCC_Entry){                                          \
-            CCC_tree_map_remove(                                               \
+            CCC_tree_map_remove_key_value(                                     \
                 (CCC_Tree_map *)container_pointer,                             \
                 (CCC_Tree_map_node *)key_val_container_array_pointer)          \
                 .private})

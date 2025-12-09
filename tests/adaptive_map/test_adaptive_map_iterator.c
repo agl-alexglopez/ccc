@@ -230,14 +230,14 @@ check_static_begin(adaptive_map_test_iterate_removal)
         next = next(&s, &i->elem);
         if (i->key > limit)
         {
-            (void)remove(&s, &i->elem);
+            (void)remove_key_value(&s, &i->elem);
             check(validate(&s), true);
         }
     }
     check_end();
 }
 
-check_static_begin(adaptive_map_test_iterate_remove_reinsert)
+check_static_begin(adaptive_map_test_iterate_remove_key_value_reinsert)
 {
     struct Stack_allocator allocator
         = stack_allocator_initialize(struct Val, 200);
@@ -268,7 +268,7 @@ check_static_begin(adaptive_map_test_iterate_remove_reinsert)
         next = next(&s, &i->elem);
         if (i->key < limit)
         {
-            (void)remove(&s, &i->elem);
+            (void)remove_key_value(&s, &i->elem);
             i->key = new_unique_entry_val;
             check(insert_entry(entry_wrap(&s, &i->key), &i->elem) != NULL,
                   true);
@@ -415,5 +415,5 @@ main()
         adaptive_map_test_iterate_removal(), adaptive_map_test_valid_range(),
         adaptive_map_test_invalid_range(),
         adaptive_map_test_valid_range_equals(), adaptive_map_test_empty_range(),
-        adaptive_map_test_iterate_remove_reinsert());
+        adaptive_map_test_iterate_remove_key_value_reinsert());
 }

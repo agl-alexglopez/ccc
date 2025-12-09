@@ -32,7 +32,7 @@ check_static_begin(array_tree_map_test_insert_erase_shuffled)
     for (size_t i = 0; i < size; ++i)
     {
         CCC_Handle const *const h
-            = remove_wrap(&s, &(struct Val){.id = (int)i});
+            = remove_key_value_wrap(&s, &(struct Val){.id = (int)i});
         check(occupied(h), true);
         check(validate(&s), true);
     }
@@ -98,7 +98,8 @@ check_static_begin(array_tree_map_test_weak_srand)
     }
     for (int i = 0; i < num_nodes; ++i)
     {
-        CCC_Handle const h = CCC_remove(&s, &(struct Val){.id = id_keys[i]});
+        CCC_Handle const h
+            = CCC_remove_key_value(&s, &(struct Val){.id = id_keys[i]});
         check(occupied(&h) || repeats[i], true);
         check(validate(&s), true);
     }
@@ -130,7 +131,8 @@ check_static_begin(array_tree_map_test_insert_erase_cycles_no_allocate)
     }
     for (int i = 0; i < num_nodes / 2; ++i)
     {
-        CCC_Handle h = CCC_remove(&s, &(struct Val){.id = id_keys[i]});
+        CCC_Handle h
+            = CCC_remove_key_value(&s, &(struct Val){.id = id_keys[i]});
         check(occupied(&h) || repeats[i], true);
         check(validate(&s), true);
     }
@@ -142,7 +144,8 @@ check_static_begin(array_tree_map_test_insert_erase_cycles_no_allocate)
     }
     for (int i = 0; i < num_nodes; ++i)
     {
-        CCC_Handle h = CCC_remove(&s, &(struct Val){.id = id_keys[i]});
+        CCC_Handle h
+            = CCC_remove_key_value(&s, &(struct Val){.id = id_keys[i]});
         check(occupied(&h) || repeats[i], true);
         check(validate(&s), true);
     }
@@ -175,7 +178,8 @@ check_static_begin(array_tree_map_test_insert_erase_cycles_allocate)
     }
     for (int i = 0; i < num_nodes / 2; ++i)
     {
-        CCC_Handle h = CCC_remove(&s, &(struct Val){.id = id_keys[i]});
+        CCC_Handle h
+            = CCC_remove_key_value(&s, &(struct Val){.id = id_keys[i]});
         check(occupied(&h) || repeats[i], true);
         check(validate(&s), true);
     }
@@ -187,7 +191,8 @@ check_static_begin(array_tree_map_test_insert_erase_cycles_allocate)
     }
     for (int i = 0; i < num_nodes; ++i)
     {
-        CCC_Handle h = CCC_remove(&s, &(struct Val){.id = id_keys[i]});
+        CCC_Handle h
+            = CCC_remove_key_value(&s, &(struct Val){.id = id_keys[i]});
         check(occupied(&h) || repeats[i], true);
         check(validate(&s), true);
     }
