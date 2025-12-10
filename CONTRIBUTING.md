@@ -166,12 +166,14 @@ This toggle affects only the specified headers, not the global namespace.
 #### Types
 
 > [!IMPORTANT]
-> Types use `Leading_upper_snake_case`. Member fields use `snake_case`. Use the following template.
+> Types use `Leading_upper_snake_case`. Member fields use `snake_case`. We `typedef` types in user facing headers. Use the following template.
 > `[prefix]_[descriptor(s)]_[object]`.
 
 Types, such as `struct`, `union`, and `enum`, that are defined by this library use `Leading_upper_snake_case`. While there are a few libraries in the C ecosystem that use `PascalCase` for types, see raylib or SDL, the pervasive style in C systems programming is `snake_case`. This library is intended for use in contexts such as kernels, compilers, or embedded environments. It should fit in to the best of its ability.
 
 However, C does not allow types and functions to have the same name. Consider the function to obtain an entry, following Rust's API design: `CCC_flat_hash_map_entry()`. The entry type cannot also be named `CCC_flat_hash_map_entry`. So, types simply capitalize the first letter to distinguish themselves: `CCC_Flat_hash_map_entry`. This also improves code readability, grep-ability, and renaming via search and replace.
+
+The types in the user facing headers are `typedef` to encourage the user to use them through the provided interface. Whether they are passing a `union`, `struct`, or `enum` to an interface function should not be important to the user. Types in the `private/` headers and `source/` files are never `typedef` to encourage maximum information and readability for developers.
 
 Naming a type uses the prefix, any additional descriptors needed, and then the object being declared. For example the `CCC_Flat_hash_map` has the `CCC_` prefix, describes the map as `Flat` because it is in an array, and that it is a `hash_map`.
 
