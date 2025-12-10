@@ -11,14 +11,14 @@ The following are required for install:
 - CMake >= 3.23.
 - Read [INSTALL.md](INSTALL.md).
 
-Currently, this library supports a `FetchContent` or manual installation via CMake. The [INSTALL.md](INSTALL.md) file is included in all [Releases](https://github.com/agl-alexglopez/ccc/releases).
+Currently, this library supports a `FetchContent` or manual installation via CMake. The [INSTALL.md](INSTALL.md) file is included in all [Releases](https://github.com/skeletoss/ccc/releases).
 
 ## Quick Start
 
-- Read the [DOCS](https://agl-alexglopez.github.io/ccc).
-- Read [types.h](https://agl-alexglopez.github.io/ccc/types_8h.html) to understand the `CCC_Allocator` interface.
-- Read the [header](https://agl-alexglopez.github.io/ccc/files.html) for the desired container to understand its functionality.
-- Read about generic [traits.h](https://agl-alexglopez.github.io/ccc/traits_8h.html) shared across containers to make code more succinct.
+- Read the [DOCS](https://skeletoss.github.io/ccc).
+- Read [types.h](https://skeletoss.github.io/ccc/types_8h.html) to understand the `CCC_Allocator` interface.
+- Read the [header](https://skeletoss.github.io/ccc/files.html) for the desired container to understand its functionality.
+- Read about generic [traits.h](https://skeletoss.github.io/ccc/traits_8h.html) shared across containers to make code more succinct.
 - Read [CONTRIBUTING.md](CONTRIBUTING.md) if interested in project structure, tools, and todos.
 
 ## Containers
@@ -846,7 +846,7 @@ main(void)
 - [Compile time initialization](#compile-time-initialization).
 - [No `container_of` macro required of the user to get to their type after a function call](#no-container-of-macros).
 - [Rust's Entry API for associative containers with C and C++ influences](#rusts-entry-interface).
-    - Opt-in macros for more succinct insertion and in place modifications (see "closures" in the [and_modify_wth](https://agl-alexglopez.github.io/ccc/flat__hash__map_8h.html) interface for associative containers).
+    - Opt-in macros for more succinct insertion and in place modifications (see "closures" in the [and_modify_wth](https://skeletoss.github.io/ccc/flat__hash__map_8h.html) interface for associative containers).
 - [Container Traits implemented with C `_Generic` capabilities](#traits).
 
 ### Intrusive and Non-Intrusive Containers
