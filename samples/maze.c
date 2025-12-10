@@ -245,8 +245,7 @@ This style of data structure use can be comfortable and convenient in some
 cases.
 
 However, we can still be "C" about it by thinking about reserving exactly
-the memory we need dynamically and giving no ability to the container to re-size
-later. In this way we exercise exact control over memory use of our program. */
+the memory we need dynamically in the from initializer. */
 static void
 animate_maze(struct Maze *maze)
 {
