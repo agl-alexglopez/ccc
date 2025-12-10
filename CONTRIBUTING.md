@@ -43,14 +43,14 @@ Add a `CMakeUserPresets.json` file so that you can run the sanitizer presets fou
             "name": "my-gcc-debug",
             "inherits": ["default-debug"],
             "cacheVariables": {
-                "CMAKE_C_COMPILER": "gcc-14.2"
+                "CMAKE_C_COMPILER": "gcc-15.1"
             }
         },
         {
             "name": "my-gcc-release",
             "inherits": ["default-release"],
             "cacheVariables": {
-                "CMAKE_C_COMPILER": "gcc-14.2"
+                "CMAKE_C_COMPILER": "gcc-15.1"
             }
         },
         {
@@ -63,24 +63,24 @@ Add a `CMakeUserPresets.json` file so that you can run the sanitizer presets fou
         },
         {
             "name": "my-clang-release",
-            "inherits": ["default-rel"],
+            "inherits": ["default-release"],
             "generator": "Ninja",
             "cacheVariables": {
                 "CMAKE_C_COMPILER": "clang"
             }
         },
         {
-            "name": "my-sanitized-debug",
-            "inherits": ["gcc-dsan"],
+            "name": "my-sanitize-debug",
+            "inherits": ["gcc-sanitize-debug"],
             "cacheVariables": {
-                "CMAKE_C_COMPILER": "gcc-14.2"
+                "CMAKE_C_COMPILER": "gcc-15.1"
             }
         },
         {
-            "name": "my-sanitized-release",
-            "inherits": ["gcc-rsan"],
+            "name": "my-sanitize-release",
+            "inherits": ["gcc-sanitize-release"],
             "cacheVariables": {
-                "CMAKE_C_COMPILER": "gcc-14.2"
+                "CMAKE_C_COMPILER": "gcc-15.1"
             }
         }
     ]
