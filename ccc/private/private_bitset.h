@@ -104,42 +104,20 @@ argument. */
         .context = (private_context),                                          \
     }
 
-/** @internal Rare instance where we don't need typing or macro trickery and
-we get to use static inline for improved functionality. Once the macro learns
-whether the user wants a capacity we pass the functionality of parsing the
-input string to this function. */
-static inline struct CCC_Bitset
-CCC_private_bitset_from_fn(CCC_Allocator *const fn, void *const context,
-                           size_t i, size_t const count, size_t cap,
-                           char const on_char, char const *string)
-{
-    struct CCC_Bitset b = CCC_private_bitset_initialize(NULL, fn, context, 0);
-    if (CCC_private_bitset_reserve(&b, cap < count ? count : cap, fn)
-        != CCC_RESULT_OK)
-    {
-        return b;
-    }
-    b.count = count;
-    while (i < count && string[i])
-    {
-        (void)CCC_private_bitset_set(&b, i, string[i] == on_char);
-        ++i;
-    }
-    b.count = i;
-    return b;
-}
-
 /** @internal Returns a bit set with the memory reserved for the blocks and
 the size set. */
 static inline struct CCC_Bitset
-CCC_private_bitset_with_capacity_fn(CCC_Allocator *const fn,
-                                    void *const context, size_t const cap,
-                                    size_t const count)
+CCC_private_bitset_with_capacity_fn(CCC_Allocator *const private_allocate,
+                                    void *const private_context,
+                                    size_t const private_cap,
+                                    size_t const private_count)
 {
-    struct CCC_Bitset b = CCC_private_bitset_initialize(NULL, fn, context, 0);
-    if (CCC_private_bitset_reserve(&b, cap, fn) == CCC_RESULT_OK)
+    struct CCC_Bitset b = CCC_private_bitset_initialize(NULL, private_allocate,
+                                                        private_context, 0);
+    if (CCC_private_bitset_reserve(&b, private_cap, private_allocate)
+        == CCC_RESULT_OK)
     {
-        b.count = count;
+        b.count = private_count;
     }
     return b;
 }
@@ -149,16 +127,69 @@ to inline function for bit set construction. */
 #define CCC_private_bitset_from(private_allocate, private_context,             \
                                 private_start_index, private_count,            \
                                 private_on_char, private_string, ...)          \
-    CCC_private_bitset_from_fn(                                                \
-        private_allocate, private_context, private_start_index, private_count, \
-        CCC_private_bitset_optional_size((private_count), __VA_ARGS__),        \
-        private_on_char, private_string)
+    (__extension__({                                                           \
+        struct CCC_Bitset private_bitset = CCC_private_bitset_initialize(      \
+            NULL, private_allocate, private_context, 0);                       \
+        size_t const private_cap                                               \
+            = CCC_private_bitset_optional_size((private_count), __VA_ARGS__);  \
+        size_t private_index = (private_start_index);                          \
+        if (CCC_private_bitset_reserve(                                        \
+                &private_bitset,                                               \
+                private_cap < private_count ? private_count : private_cap,     \
+                private_allocate)                                              \
+            == CCC_RESULT_OK)                                                  \
+        {                                                                      \
+            private_bitset.count = private_count;                              \
+            while (private_index < private_count                               \
+                   && private_string[private_index])                           \
+            {                                                                  \
+                (void)CCC_private_bitset_set(&private_bitset, private_index,   \
+                                             private_string[private_index]     \
+                                                 == private_on_char);          \
+                ++private_index;                                               \
+            }                                                                  \
+            private_bitset.count = private_index;                              \
+        }                                                                      \
+        private_bitset;                                                        \
+    }))
 
 /** @internal Macro wrapper allowing user to optionally specify size. */
 #define CCC_private_bitset_with_capacity(private_allocate, private_context,    \
                                          private_cap, ...)                     \
-    CCC_private_bitset_with_capacity_fn(                                       \
-        private_allocate, private_context, private_cap,                        \
-        CCC_private_bitset_optional_size((private_cap), __VA_ARGS__))
+    (__extension__({                                                           \
+        struct CCC_Bitset private_bitset = CCC_private_bitset_initialize(      \
+            NULL, private_allocate, private_context, 0);                       \
+        size_t const private_count                                             \
+            = CCC_private_bitset_optional_size((private_cap), __VA_ARGS__);    \
+        if (CCC_private_bitset_reserve(&private_bitset, private_cap,           \
+                                       private_allocate)                       \
+            == CCC_RESULT_OK)                                                  \
+        {                                                                      \
+            private_bitset.count = private_count;                              \
+        }                                                                      \
+        private_bitset;                                                        \
+    }))
+
+/** @internal */
+#define CCC_private_bitset_with_compound_literal(                              \
+    private_count, private_compound_literal_array)                             \
+    {                                                                          \
+        .blocks = (private_compound_literal_array),                            \
+        .count = (private_count),                                              \
+        .capacity = sizeof(private_compound_literal_array) * CHAR_BIT,         \
+        .allocate = NULL,                                                      \
+        .context = NULL,                                                       \
+    }
+
+/** @internal */
+#define CCC_private_bitset_with_context_compound_literal(                      \
+    private_context, private_count, private_compound_literal_array)            \
+    {                                                                          \
+        .blocks = (private_compound_literal_array),                            \
+        .count = (private_count),                                              \
+        .capacity = sizeof(private_compound_literal_array) * CHAR_BIT,         \
+        .allocate = NULL,                                                      \
+        .context = (private_context),                                          \
+    }
 
 #endif /* CCC_PRIVATE_BITSET */
