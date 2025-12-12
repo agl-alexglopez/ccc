@@ -110,7 +110,7 @@ struct Val
     int key;
     int val;
 };
-CCC_array_tree_map_declare_fixed_map(Small_fixed_map, struct Val,
+CCC_array_tree_map_declare_fixed(Small_fixed_map, struct Val,
 64); static map static_map =
 array_tree_map_initialize(
     &(static Small_fixed_map){},
@@ -131,7 +131,7 @@ struct Val
     int key;
     int val;
 };
-CCC_array_tree_map_declare_fixed_map(Small_fixed_map, struct Val,
+CCC_array_tree_map_declare_fixed(Small_fixed_map, struct Val,
 64); int main(void)
 {
     map static_map =
@@ -157,10 +157,10 @@ function for such a use case.
 This macro is not needed when a dynamic resizing map is needed. For dynamic
 maps, simply pass NULL and 0 capacity to the initialization macro along with the
 desired allocation function. */
-#define CCC_array_tree_map_declare_fixed_map(fixed_map_type_name, type_name,   \
-                                             capacity)                         \
-    CCC_private_array_tree_map_declare_fixed_map(fixed_map_type_name,          \
-                                                 type_name, capacity)
+#define CCC_array_tree_map_declare_fixed(fixed_map_type_name, type_name,       \
+                                         capacity)                             \
+    CCC_private_array_tree_map_declare_fixed(fixed_map_type_name, type_name,   \
+                                             capacity)
 
 /** @brief Obtain the capacity previously chosen for the fixed size map type.
 @param[in] fixed_map_type_name the name of a previously declared map.
@@ -327,7 +327,7 @@ struct Val
     int key;
     int val;
 };
-CCC_array_tree_map_declare_fixed_map(Small_fixed_map, struct Val,
+CCC_array_tree_map_declare_fixed(Small_fixed_map, struct Val,
 64); static map source =
 array_tree_map_initialize(
     &(static Small_fixed_map){},
@@ -1112,8 +1112,8 @@ CCC_array_tree_map_validate(CCC_Array_tree_map const *map);
 #ifdef ARRAY_TREE_MAP_USING_NAMESPACE_CCC
 typedef CCC_Array_tree_map Array_tree_map;
 typedef CCC_Array_tree_map_handle Array_tree_map_handle;
-#    define array_tree_map_declare_fixed_map(args...)                          \
-        CCC_array_tree_map_declare_fixed_map(args)
+#    define array_tree_map_declare_fixed(args...)                              \
+        CCC_array_tree_map_declare_fixed(args)
 #    define array_tree_map_initialize(args...)                                 \
         CCC_array_tree_map_initialize(args)
 #    define array_tree_map_from(args...) CCC_array_tree_map_from(args)

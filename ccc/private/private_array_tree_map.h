@@ -210,7 +210,7 @@ blocks needed to round up to will be returned. */
 /** @internal The user can declare a fixed size realtime ordered map with the
 help of static asserts to ensure the layout is compatible with our internal
 metadata. */
-#define CCC_private_array_tree_map_declare_fixed_map(                          \
+#define CCC_private_array_tree_map_declare_fixed(                              \
     private_fixed_map_type_name, private_key_val_type_name, private_capacity)  \
     static_assert((private_capacity) > 1,                                      \
                   "fixed size map must have capacity greater than 1");         \

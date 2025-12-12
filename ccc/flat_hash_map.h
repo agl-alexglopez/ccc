@@ -142,7 +142,7 @@ struct Val
     int key;
     int val;
 };
-CCC_flat_hash_map_declare_fixed_map(Small_fixed_map, struct Val, 64);
+CCC_flat_hash_map_declare_fixed(Small_fixed_map, struct Val, 64);
 static Flat_hash_map static_map = flat_hash_map_initialize(
     &(static Small_fixed_map){},
     struct Val,
@@ -163,7 +163,7 @@ struct Val
     int key;
     int val;
 };
-CCC_flat_hash_map_declare_fixed_map(Small_fixed_map, struct Val, 64);
+CCC_flat_hash_map_declare_fixed(Small_fixed_map, struct Val, 64);
 int main(void)
 {
     Flat_hash_map static_map = flat_hash_map_initialize(
@@ -187,10 +187,10 @@ dynamic map and use the CCC_flat_hash_map_reserve function for such a use case.
 
 This macro is not needed when a dynamic resizing flat hash map is needed. For
 dynamic maps, simply pass NULL and 0 capacity to the initialization macro. */
-#define CCC_flat_hash_map_declare_fixed_map(fixed_map_type_name, type_name,    \
-                                            capacity)                          \
-    CCC_private_flat_hash_map_declare_fixed_map(fixed_map_type_name,           \
-                                                type_name, capacity)
+#define CCC_flat_hash_map_declare_fixed(fixed_map_type_name, type_name,        \
+                                        capacity)                              \
+    CCC_private_flat_hash_map_declare_fixed(fixed_map_type_name, type_name,    \
+                                            capacity)
 
 /** @brief Obtain the capacity previously chosen for the fixed size map type.
 @param[in] fixed_map_type_name the name of a previously declared map.
@@ -225,7 +225,7 @@ struct Val
     int key;
     int val;
 };
-flat_hash_map_declare_fixed_map(Small_fixed_map, struct Val, 64);
+flat_hash_map_declare_fixed(Small_fixed_map, struct Val, 64);
 static Flat_hash_map static_map = flat_hash_map_initialize(
     &(static Small_fixed_map){},
     struct Val,
@@ -414,7 +414,7 @@ struct Val
     int key;
     int val;
 };
-flat_hash_map_declare_fixed_map(Small_fixed_map, struct Val, 64);
+flat_hash_map_declare_fixed(Small_fixed_map, struct Val, 64);
 Flat_hash_map source = flat_hash_map_initialize(
     &(static Small_fixed_map){},
     struct Val,
@@ -1087,8 +1087,8 @@ CCC_flat_hash_map_validate(CCC_Flat_hash_map const *map);
 #ifdef FLAT_HASH_MAP_USING_NAMESPACE_CCC
 typedef CCC_Flat_hash_map Flat_hash_map;
 typedef CCC_Flat_hash_map_entry Flat_hash_map_entry;
-#    define flat_hash_map_declare_fixed_map(args...)                           \
-        CCC_flat_hash_map_declare_fixed_map(args)
+#    define flat_hash_map_declare_fixed(args...)                               \
+        CCC_flat_hash_map_declare_fixed(args)
 #    define flat_hash_map_fixed_capacity(args...)                              \
         CCC_flat_hash_map_fixed_capacity(args)
 #    define flat_hash_map_reserve(args...) CCC_flat_hash_map_reserve(args)

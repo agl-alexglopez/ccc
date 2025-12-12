@@ -86,8 +86,8 @@ struct Test_data_type
 {
     int const i;
 };
-CCC_array_tree_map_declare_fixed_map(Fixed_map_test_type, struct Test_data_type,
-                                     TCAP);
+CCC_array_tree_map_declare_fixed(Fixed_map_test_type, struct Test_data_type,
+                                 TCAP);
 /** @internal This is a static fixed size map exclusive to this translation unit
 used to ensure assumptions about data layout are correct. The following static
 asserts must be true in order to support the Struct of Array style layout we

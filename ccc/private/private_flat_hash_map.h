@@ -226,8 +226,8 @@ of tags at the end of the tag array for safer group loading.
 
 Finally, we must align the tag array to start on an aligned group size byte
 boundary to be able to perform aligned loads and stores. */
-#define CCC_private_flat_hash_map_declare_fixed_map(                           \
-    fixed_map_type_name, key_val_type_name, capacity)                          \
+#define CCC_private_flat_hash_map_declare_fixed(fixed_map_type_name,           \
+                                                key_val_type_name, capacity)   \
     static_assert((capacity) > 0,                                              \
                   "fixed size map must have capacity greater than 0");         \
     static_assert(                                                             \

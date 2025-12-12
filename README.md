@@ -317,7 +317,7 @@ flat_hash_map_id_cmp(CCC_Key_comparator_context const cmp)
     return (left > right->key) - (left < right->key);
 }
 
-flat_hash_map_declare_fixed_map(Standard_fixed_map, struct Key_val, 1024);
+flat_hash_map_declare_fixed(Standard_fixed_map, struct Key_val, 1024);
 
 enum : size_t
 {
@@ -458,7 +458,7 @@ struct Key_val
     int val;
 };
 
-array_adaptive_map_declare_fixed_map(Key_val_fixed_map, struct Key_val, 26);
+array_adaptive_map_declare_fixed(Key_val_fixed_map, struct Key_val, 26);
 
 static CCC_Order
 Key_val_cmp(CCC_Key_comparator_context const cmp)
@@ -538,7 +538,7 @@ struct Key_val
     int key;
     int val;
 };
-CCC_array_tree_map_declare_fixed_map(Key_val_fixed_map, struct Val, 64);
+CCC_array_tree_map_declare_fixed(Key_val_fixed_map, struct Val, 64);
 
 static CCC_Order
 Key_val_cmp(CCC_Key_comparator_context const cmp)
@@ -979,7 +979,7 @@ struct Val
     int key;
     int val;
 };
-flat_hash_map_declare_fixed_map(Val_fixed_map, struct Val, 64);
+flat_hash_map_declare_fixed(Val_fixed_map, struct Val, 64);
 static Flat_hash_map static_fh = flat_hash_map_initialize(
     &(static Val_fixed_map){},
     struct Val,

@@ -13,8 +13,8 @@ struct Val
     int val;
 };
 
-CCC_array_adaptive_map_declare_fixed_map(Small_fixed_map, struct Val, 64);
-CCC_array_adaptive_map_declare_fixed_map(Standard_fixed_map, struct Val, 1024);
+CCC_array_adaptive_map_declare_fixed(Small_fixed_map, struct Val, 64);
+CCC_array_adaptive_map_declare_fixed(Standard_fixed_map, struct Val, 1024);
 
 enum : size_t
 {

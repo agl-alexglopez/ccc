@@ -104,7 +104,7 @@ struct Val
     int key;
     int val;
 };
-CCC_array_adaptive_map_declare_fixed_map(Small_fixed_map, struct Val, 64);
+CCC_array_adaptive_map_declare_fixed(Small_fixed_map, struct Val, 64);
 static Array_adaptive_map static_map = array_adaptive_map_initialize(
     &(static Small_fixed_map){},
     struct Val,
@@ -124,7 +124,7 @@ struct Val
     int key;
     int val;
 };
-CCC_array_adaptive_map_declare_fixed_map(Small_fixed_map, struct Val, 64);
+CCC_array_adaptive_map_declare_fixed(Small_fixed_map, struct Val, 64);
 int main(void)
 {
     Array_adaptive_map map = array_adaptive_map_initialize(
@@ -149,10 +149,10 @@ for such a use case.
 This macro is not needed when a dynamic resizing map is needed. For dynamic
 maps, pass NULL and 0 capacity to the initialization macro along with the
 desired allocation function. */
-#define CCC_array_adaptive_map_declare_fixed_map(fixed_map_type_name,          \
-                                                 type_name, capacity)          \
-    CCC_private_array_adaptive_map_declare_fixed_map(fixed_map_type_name,      \
-                                                     type_name, capacity)
+#define CCC_array_adaptive_map_declare_fixed(fixed_map_type_name, type_name,   \
+                                             capacity)                         \
+    CCC_private_array_adaptive_map_declare_fixed(fixed_map_type_name,          \
+                                                 type_name, capacity)
 
 /** @brief Obtain the capacity previously chosen for the fixed size map type.
 @param[in] fixed_map_type_name the name of a previously declared map.
@@ -318,7 +318,7 @@ struct Val
     int key;
     int val;
 };
-CCC_array_adaptive_map_declare_fixed_map(Small_fixed_map, struct Val, 64);
+CCC_array_adaptive_map_declare_fixed(Small_fixed_map, struct Val, 64);
 static Array_tree_map source = array_adaptive_map_initialize(
     &(static Small_fixed_map){},
     struct Val,
@@ -1098,8 +1098,8 @@ CCC_array_adaptive_map_validate(CCC_Array_adaptive_map const *map);
 #ifdef ARRAY_ADAPTIVE_MAP_USING_NAMESPACE_CCC
 typedef CCC_Array_adaptive_map Array_adaptive_map;
 typedef CCC_Array_adaptive_map_handle Array_adaptive_map_handle;
-#    define array_adaptive_map_declare_fixed_map(args...)                      \
-        CCC_array_adaptive_map_declare_fixed_map(args)
+#    define array_adaptive_map_declare_fixed(args...)                          \
+        CCC_array_adaptive_map_declare_fixed(args)
 #    define array_adaptive_map_fixed_capacity(args...)                         \
         CCC_array_adaptive_map_fixed_capacity(args)
 #    define array_adaptive_map_initialize(args...)                             \

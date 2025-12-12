@@ -58,7 +58,7 @@ struct Lru_request
 
 /* Fixed map used for the lru storage. List piggy backs of this array for its
    memory. Map does not need to re-size for this small test. */
-array_tree_map_declare_fixed_map(Lru_fixed_map, struct Lru_node, LRU_CAP);
+array_tree_map_declare_fixed(Lru_fixed_map, struct Lru_node, LRU_CAP);
 
 /*===========================   Prototypes   ================================*/
 
