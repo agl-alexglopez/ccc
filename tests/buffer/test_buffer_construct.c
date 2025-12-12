@@ -18,10 +18,32 @@ check_static_begin(buffer_test_empty)
     check_end();
 }
 
+check_static_begin(buffer_test_fixed)
+{
+    Buffer b = buffer_with_compound_literal(0, (int[5]){});
+    check(buffer_count(&b).count, 0);
+    check(buffer_capacity(&b).count, 5);
+    int const *const i = buffer_at(&b, 0);
+    check(i != NULL, CCC_TRUE);
+    check(*i, 0);
+    check_end();
+}
+
 check_static_begin(buffer_test_full)
 {
     Buffer b
         = buffer_initialize(((int[5]){0, 1, 2, 3, 4}), int, NULL, NULL, 5, 5);
+    check(buffer_count(&b).count, 5);
+    check(buffer_capacity(&b).count, 5);
+    int const *const i = buffer_at(&b, 2);
+    check(i != NULL, CCC_TRUE);
+    check(*i, 2);
+    check_end();
+}
+
+check_static_begin(buffer_test_fixed_full)
+{
+    Buffer b = buffer_with_compound_literal(5, (int[5]){0, 1, 2, 3, 4});
     check(buffer_count(&b).count, 5);
     check(buffer_capacity(&b).count, 5);
     int const *const i = buffer_at(&b, 2);
@@ -179,7 +201,8 @@ int
 main(void)
 {
     return check_run(
-        buffer_test_empty(), buffer_test_full(), buffer_test_reserve(),
+        buffer_test_empty(), buffer_test_fixed(), buffer_test_fixed_full(),
+        buffer_test_full(), buffer_test_reserve(),
         buffer_test_copy_no_allocate(), buffer_test_copy_no_allocate_fail(),
         buffer_test_copy_allocate(), buffer_test_copy_allocate_fail(),
         buffer_test_init_from(), buffer_test_init_from_fail(),

@@ -113,6 +113,34 @@ of memory in one step. */
         private_buf;                                                           \
     }))
 
+/** @internal Initializes a fixed size buffer with no allocation or context. */
+#define CCC_private_buffer_with_compound_literal(                              \
+    private_count, private_compound_literal_array...)                          \
+                                                                               \
+    {                                                                          \
+        .data = (private_compound_literal_array),                              \
+        .sizeof_type = sizeof(*private_compound_literal_array),                \
+        .count = private_count,                                                \
+        .capacity = sizeof(private_compound_literal_array)                     \
+                  / sizeof(*private_compound_literal_array),                   \
+        .allocate = NULL,                                                      \
+        .context = NULL,                                                       \
+    }
+
+/** @internal Initializes a fixed size buffer with no allocation or context. */
+#define CCC_private_buffer_with_context_compound_literal(                      \
+    private_context, private_count, private_compound_literal_array...)         \
+                                                                               \
+    {                                                                          \
+        .data = (private_compound_literal_array),                              \
+        .sizeof_type = sizeof(*private_compound_literal_array),                \
+        .count = private_count,                                                \
+        .capacity = sizeof(private_compound_literal_array)                     \
+                  / sizeof(*private_compound_literal_array),                   \
+        .allocate = NULL,                                                      \
+        .context = (private_context),                                          \
+    }
+
 /** @internal */
 #define CCC_private_buffer_emplace(private_buffer_pointer, index,              \
                                    private_type_compound_literal...)           \

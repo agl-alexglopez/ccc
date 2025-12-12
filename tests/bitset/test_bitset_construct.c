@@ -24,6 +24,18 @@ check_static_begin(bitset_test_construct)
     check_end();
 }
 
+check_static_begin(bitset_test_construct_with_literal)
+{
+    CCC_Bitset bs = CCC_bitset_with_compound_literal(10, CCC_bitset_blocks(10));
+    check(CCC_bitset_popcount(&bs).count, 0);
+    for (size_t i = 0; i < CCC_bitset_count(&bs).count; ++i)
+    {
+        check(CCC_bitset_test(&bs, i), CCC_FALSE);
+        check(CCC_bitset_test(&bs, i), CCC_FALSE);
+    }
+    check_end();
+}
+
 check_static_begin(bitset_test_copy_no_allocate)
 {
     CCC_Bitset source
@@ -206,10 +218,11 @@ check_static_begin(bitset_test_init_with_capacity_fail)
 int
 main(void)
 {
-    return check_run(bitset_test_construct(), bitset_test_copy_no_allocate(),
-                     bitset_test_copy_allocate(), bitset_test_init_from(),
-                     bitset_test_init_from_cap(), bitset_test_init_from_fail(),
-                     bitset_test_init_from_cap_fail(),
-                     bitset_test_init_with_capacity(),
-                     bitset_test_init_with_capacity_fail());
+    return check_run(
+        bitset_test_construct(), bitset_test_construct_with_literal(),
+        bitset_test_copy_no_allocate(), bitset_test_copy_allocate(),
+        bitset_test_init_from(), bitset_test_init_from_cap(),
+        bitset_test_init_from_fail(), bitset_test_init_from_cap_fail(),
+        bitset_test_init_with_capacity(),
+        bitset_test_init_with_capacity_fail());
 }

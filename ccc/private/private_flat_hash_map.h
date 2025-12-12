@@ -226,8 +226,8 @@ of tags at the end of the tag array for safer group loading.
 
 Finally, we must align the tag array to start on an aligned group size byte
 boundary to be able to perform aligned loads and stores. */
-#define CCC_private_flat_hash_map_declare_fixed_map(                           \
-    fixed_map_type_name, key_val_type_name, capacity)                          \
+#define CCC_private_flat_hash_map_declare_fixed(fixed_map_type_name,           \
+                                                key_val_type_name, capacity)   \
     static_assert((capacity) > 0,                                              \
                   "fixed size map must have capacity greater than 0");         \
     static_assert(                                                             \
@@ -352,6 +352,64 @@ fixed size and has data or is dynamic and has not yet been given allocation. */
                                         private_allocate);                     \
         private_map;                                                           \
     }))
+
+/** @internal We can cut out boilerplate by assuming fixed size map. */
+#define CCC_private_flat_hash_map_with_compound_literal(                       \
+    private_key_field, private_hash, private_key_compare,                      \
+    private_compound_literal)                                                  \
+    {                                                                          \
+        .data = &(private_compound_literal),                                   \
+        .tag = NULL,                                                           \
+        .count = 0,                                                            \
+        .remain = ((CCC_private_flat_hash_map_fixed_capacity(                  \
+                        typeof(private_compound_literal))                      \
+                    / (size_t)8)                                               \
+                   * (size_t)7),                                               \
+        .mask = ((CCC_private_flat_hash_map_fixed_capacity(                    \
+                      typeof(private_compound_literal))                        \
+                  > (size_t)0)                                                 \
+                     ? (CCC_private_flat_hash_map_fixed_capacity(              \
+                            typeof(private_compound_literal))                  \
+                        - (size_t)1)                                           \
+                     : (size_t)0),                                             \
+        .sizeof_type = sizeof(*(private_compound_literal.data)), /*NOLINT*/    \
+        .key_offset                                                            \
+        = offsetof(typeof(*(private_compound_literal.data)), /*NOLINT*/        \
+                   private_key_field),                                         \
+        .compare = (private_key_compare),                                      \
+        .hash = (private_hash),                                                \
+        .allocate = NULL,                                                      \
+        .context = NULL,                                                       \
+    }
+
+/** @internal We can cut out boilerplate by assuming fixed size map. */
+#define CCC_private_flat_hash_map_with_context_compound_literal(               \
+    private_key_field, private_hash, private_key_compare, private_context,     \
+    private_compound_literal)                                                  \
+    {                                                                          \
+        .data = &(private_compound_literal),                                   \
+        .tag = NULL,                                                           \
+        .count = 0,                                                            \
+        .remain = ((CCC_private_flat_hash_map_fixed_capacity(                  \
+                        typeof(private_compound_literal))                      \
+                    / (size_t)8)                                               \
+                   * (size_t)7),                                               \
+        .mask = ((CCC_private_flat_hash_map_fixed_capacity(                    \
+                      typeof(private_compound_literal))                        \
+                  > (size_t)0)                                                 \
+                     ? (CCC_private_flat_hash_map_fixed_capacity(              \
+                            typeof(private_compound_literal))                  \
+                        - (size_t)1)                                           \
+                     : (size_t)0),                                             \
+        .sizeof_type = sizeof(*(private_compound_literal.data)), /*NOLINT*/    \
+        .key_offset                                                            \
+        = offsetof(typeof(*(private_compound_literal.data)), /*NOLINT*/        \
+                   private_key_field),                                         \
+        .compare = (private_key_compare),                                      \
+        .hash = (private_hash),                                                \
+        .allocate = NULL,                                                      \
+        .context = (private_context),                                          \
+    }
 
 /*========================    Construct In Place    =========================*/
 

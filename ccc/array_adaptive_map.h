@@ -104,7 +104,7 @@ struct Val
     int key;
     int val;
 };
-CCC_array_adaptive_map_declare_fixed_map(Small_fixed_map, struct Val, 64);
+CCC_array_adaptive_map_declare_fixed(Small_fixed_map, struct Val, 64);
 static Array_adaptive_map static_map = array_adaptive_map_initialize(
     &(static Small_fixed_map){},
     struct Val,
@@ -124,7 +124,7 @@ struct Val
     int key;
     int val;
 };
-CCC_array_adaptive_map_declare_fixed_map(Small_fixed_map, struct Val, 64);
+CCC_array_adaptive_map_declare_fixed(Small_fixed_map, struct Val, 64);
 int main(void)
 {
     Array_adaptive_map map = array_adaptive_map_initialize(
@@ -149,10 +149,10 @@ for such a use case.
 This macro is not needed when a dynamic resizing map is needed. For dynamic
 maps, pass NULL and 0 capacity to the initialization macro along with the
 desired allocation function. */
-#define CCC_array_adaptive_map_declare_fixed_map(fixed_map_type_name,          \
-                                                 type_name, capacity)          \
-    CCC_private_array_adaptive_map_declare_fixed_map(fixed_map_type_name,      \
-                                                     type_name, capacity)
+#define CCC_array_adaptive_map_declare_fixed(fixed_map_type_name, type_name,   \
+                                             capacity)                         \
+    CCC_private_array_adaptive_map_declare_fixed(fixed_map_type_name,          \
+                                                 type_name, capacity)
 
 /** @brief Obtain the capacity previously chosen for the fixed size map type.
 @param[in] fixed_map_type_name the name of a previously declared map.
@@ -161,8 +161,7 @@ desired allocation function. */
     CCC_private_array_adaptive_map_fixed_capacity(fixed_map_type_name)
 
 /** @brief Initializes the map at runtime or compile time.
-@param[in] memory_pointer a pointer to the contiguous user types or ((T
-*)NULL).
+@param[in] memory_pointer a pointer to the contiguous user types or NULL.
 @param[in] type_name the name of the user type stored in the map.
 @param[in] type_intruder_field the name of the field in user type used as key.
 @param[in] compare the key comparison function (see types.h).
@@ -292,6 +291,72 @@ of initialization and reservation. */
     CCC_private_array_adaptive_map_with_capacity(                              \
         type_name, type_key_field, compare, allocate, context_data, capacity)
 
+/** @brief Initialize a fixed map at compile or runtime from a previously
+declared fixed map type with no allocation permission or context.
+@param[in] type_key_field the field of the struct used for key storage.
+@param[in] compare the CCC_Key_comparator the user intends to use.
+@param[in] compound_literal the previously declared fixed map compound literal.
+@return the map directly initialized on the right hand side of the equality
+operator (e.g. CCC_Array_adaptive_map map =
+CCC_array_adaptive_map_with_compound_literal(...);)
+
+Initialize a fixed map.
+
+```
+#define ARRAY_ADAPTIVE_MAP_USING_NAMESPACE_CCC
+struct Val
+{
+    int key;
+    int val;
+};
+CCC_array_adaptive_map_declare_fixed(Small_fixed_map, struct Val, 64);
+static Array_adaptive_map map = array_adaptive_map_with_compound_literal(
+    key,
+    array_adaptive_map_key_order,
+    (Small_fixed_map){},
+);
+```
+
+This can help eliminate boilerplate in initializers. */
+#define CCC_array_adaptive_map_with_compound_literal(type_key_field, compare,  \
+                                                     compound_literal)         \
+    CCC_private_array_adaptive_map_with_compound_literal(                      \
+        type_key_field, compare, compound_literal)
+
+/** @brief Initialize a fixed map at compile or runtime from a previously
+declared fixed map type with no allocation permission.
+@param[in] type_key_field the field of the struct used for key storage.
+@param[in] compare the CCC_Key_comparator the user intends to use.
+@param[in] context context for the map.
+@param[in] compound_literal the previously declared fixed map compound literal.
+@return the map directly initialized on the right hand side of the equality
+operator (e.g. CCC_Array_adaptive_map map =
+CCC_array_adaptive_map_with_compound_literal(...);)
+
+Initialize a fixed map.
+
+```
+#define ARRAY_ADAPTIVE_MAP_USING_NAMESPACE_CCC
+struct Val
+{
+    int key;
+    int val;
+};
+CCC_array_adaptive_map_declare_fixed(Small_fixed_map, struct Val, 64);
+static Array_adaptive_map map = array_adaptive_map_with_compound_literal(
+    key,
+    array_adaptive_map_key_order,
+    &module_context,
+    (Small_fixed_map){},
+);
+```
+
+This can help eliminate boilerplate in initializers. */
+#define CCC_array_adaptive_map_with_context_compound_literal(                  \
+    type_key_field, compare, context, compound_literal)                        \
+    CCC_private_array_adaptive_map_with_context_compound_literal(              \
+        type_key_field, compare, context, compound_literal)
+
 /** @brief Copy the map at source to destination.
 @param[in] destination the initialized destination for the copy of the source
 map.
@@ -318,7 +383,7 @@ struct Val
     int key;
     int val;
 };
-CCC_array_adaptive_map_declare_fixed_map(Small_fixed_map, struct Val, 64);
+CCC_array_adaptive_map_declare_fixed(Small_fixed_map, struct Val, 64);
 static Array_tree_map source = array_adaptive_map_initialize(
     &(static Small_fixed_map){},
     struct Val,
@@ -1098,8 +1163,8 @@ CCC_array_adaptive_map_validate(CCC_Array_adaptive_map const *map);
 #ifdef ARRAY_ADAPTIVE_MAP_USING_NAMESPACE_CCC
 typedef CCC_Array_adaptive_map Array_adaptive_map;
 typedef CCC_Array_adaptive_map_handle Array_adaptive_map_handle;
-#    define array_adaptive_map_declare_fixed_map(args...)                      \
-        CCC_array_adaptive_map_declare_fixed_map(args)
+#    define array_adaptive_map_declare_fixed(args...)                          \
+        CCC_array_adaptive_map_declare_fixed(args)
 #    define array_adaptive_map_fixed_capacity(args...)                         \
         CCC_array_adaptive_map_fixed_capacity(args)
 #    define array_adaptive_map_initialize(args...)                             \
@@ -1107,6 +1172,10 @@ typedef CCC_Array_adaptive_map_handle Array_adaptive_map_handle;
 #    define array_adaptive_map_from(args...) CCC_array_adaptive_map_from(args)
 #    define array_adaptive_map_with_capacity(args...)                          \
         CCC_array_adaptive_map_with_capacity(args)
+#    define array_adaptive_map_with_compound_literal(args...)                  \
+        CCC_array_adaptive_map_with_compound_literal(args)
+#    define array_adaptive_map_with_context_compound_literal(args...)          \
+        CCC_array_adaptive_map_with_context_compound_literal(args)
 #    define array_adaptive_map_at(args...) CCC_array_adaptive_map_at(args)
 #    define array_adaptive_map_as(args...) CCC_array_adaptive_map_as(args)
 #    define array_adaptive_map_and_modify_with(args...)                        \

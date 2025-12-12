@@ -66,8 +66,7 @@ typedef struct CCC_Flat_double_ended_queue CCC_Flat_double_ended_queue;
 Initialize and create containers with memory, callbacks, and permissions. */
 /**@{*/
 
-/** @brief Initialize the queue with memory and allocation
-permission.
+/** @brief Initialize the queue with memory and allocation permission.
 @param[in] data_pointer a pointer to existing memory or ((T *)NULL).
 @param[in] type_name the name of the user type.
 @param[in] allocate the allocator function, if allocation is allowed.
@@ -171,6 +170,31 @@ at compile time, see the CCC_flat_double_ended_queue_initialize() macro. */
                                                   context_data, capacity)      \
     CCC_private_flat_double_ended_queue_with_capacity(type_name, allocate,     \
                                                       context_data, capacity)
+
+/** @brief Initialize the queue from a compound literal array with no allocation
+permissions or context data.
+@param[in] count the count of elements to start.
+@param[in] compound_literal_array the array of user types.
+@return the queue on the right hand side of an equality
+operator at runtime or compiletime (e.g. CCC_Flat_double_ended_queue q =
+CCC_flat_double_ended_queue_with_compound_literal(...);) */
+#define CCC_flat_double_ended_queue_with_compound_literal(                     \
+    count, compound_literal_array...)                                          \
+    CCC_private_flat_double_ended_queue_with_compound_literal(                 \
+        count, compound_literal_array)
+
+/** @brief Initialize the queue from a compound literal array with no allocation
+permissions.
+@param[in] context any context needed for the flat double ended queue.
+@param[in] count the count of elements to start.
+@param[in] compound_literal_array the array of user types.
+@return the queue on the right hand side of an equality
+operator at runtime or compiletime (e.g. CCC_Flat_double_ended_queue q =
+CCC_flat_double_ended_queue_with_context_compound_literal(...);) */
+#define CCC_flat_double_ended_queue_with_context_compound_literal(             \
+    count, compound_literal_array...)                                          \
+    CCC_private_flat_double_ended_queue_with_context_compound_literal(         \
+        count, compound_literal_array)
 
 /** @brief Copy the queue from source to newly initialized
 destination.

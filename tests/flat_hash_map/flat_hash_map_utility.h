@@ -16,12 +16,12 @@ struct Val
 /** A small fixed map is good when 64 is a desirable upper bound on capacity.
 Insertions can continue for about 87.5% of the capacity so about 56. Play it
 safe and avoid this limit unless testing insertion failure is important. */
-CCC_flat_hash_map_declare_fixed_map(Small_fixed_map, struct Val, 64);
+CCC_flat_hash_map_declare_fixed(Small_fixed_map, struct Val, 64);
 
 /** A standard fixed map is good when 1024 is a desirable upper bound on
 capacity. Insertions can continue for 87.5% of the capacity so about 896. Play
 it safe and avoid this limit unless testing insertion failure is important. */
-CCC_flat_hash_map_declare_fixed_map(Standard_fixed_map, struct Val, 1024);
+CCC_flat_hash_map_declare_fixed(Standard_fixed_map, struct Val, 1024);
 
 enum : size_t
 {
