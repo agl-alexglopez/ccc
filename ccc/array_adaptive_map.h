@@ -161,8 +161,7 @@ desired allocation function. */
     CCC_private_array_adaptive_map_fixed_capacity(fixed_map_type_name)
 
 /** @brief Initializes the map at runtime or compile time.
-@param[in] memory_pointer a pointer to the contiguous user types or ((T
-*)NULL).
+@param[in] memory_pointer a pointer to the contiguous user types or NULL.
 @param[in] type_name the name of the user type stored in the map.
 @param[in] type_intruder_field the name of the field in user type used as key.
 @param[in] compare the key comparison function (see types.h).
@@ -291,6 +290,72 @@ of initialization and reservation. */
     type_name, type_key_field, compare, allocate, context_data, capacity)      \
     CCC_private_array_adaptive_map_with_capacity(                              \
         type_name, type_key_field, compare, allocate, context_data, capacity)
+
+/** @brief Initialize a fixed map at compile or runtime from a previously
+declared fixed map type with no allocation permission or context.
+@param[in] type_key_field the field of the struct used for key storage.
+@param[in] compare the CCC_Key_comparator the user intends to use.
+@param[in] compound_literal the previously declared fixed map compound literal.
+@return the map directly initialized on the right hand side of the equality
+operator (e.g. CCC_Array_adaptive_map map =
+CCC_array_adaptive_map_with_compound_literal(...);)
+
+Initialize a fixed map.
+
+```
+#define ARRAY_ADAPTIVE_MAP_USING_NAMESPACE_CCC
+struct Val
+{
+    int key;
+    int val;
+};
+CCC_array_adaptive_map_declare_fixed(Small_fixed_map, struct Val, 64);
+static Array_adaptive_map map = array_adaptive_map_with_compound_literal(
+    key,
+    array_adaptive_map_key_order,
+    (Small_fixed_map){},
+);
+```
+
+This can help eliminate boilerplate in initializers. */
+#define CCC_array_adaptive_map_with_compound_literal(type_key_field, compare,  \
+                                                     compound_literal)         \
+    CCC_private_array_adaptive_map_with_compound_literal(                      \
+        type_key_field, compare, compound_literal)
+
+/** @brief Initialize a fixed map at compile or runtime from a previously
+declared fixed map type with no allocation permission.
+@param[in] type_key_field the field of the struct used for key storage.
+@param[in] compare the CCC_Key_comparator the user intends to use.
+@param[in] context context for the map.
+@param[in] compound_literal the previously declared fixed map compound literal.
+@return the map directly initialized on the right hand side of the equality
+operator (e.g. CCC_Array_adaptive_map map =
+CCC_array_adaptive_map_with_compound_literal(...);)
+
+Initialize a fixed map.
+
+```
+#define ARRAY_ADAPTIVE_MAP_USING_NAMESPACE_CCC
+struct Val
+{
+    int key;
+    int val;
+};
+CCC_array_adaptive_map_declare_fixed(Small_fixed_map, struct Val, 64);
+static Array_adaptive_map map = array_adaptive_map_with_compound_literal(
+    key,
+    array_adaptive_map_key_order,
+    &module_context,
+    (Small_fixed_map){},
+);
+```
+
+This can help eliminate boilerplate in initializers. */
+#define CCC_array_adaptive_map_with_context_compound_literal(                  \
+    type_key_field, compare, context, compound_literal)                        \
+    CCC_private_array_adaptive_map_with_context_compound_literal(              \
+        type_key_field, compare, context, compound_literal)
 
 /** @brief Copy the map at source to destination.
 @param[in] destination the initialized destination for the copy of the source
@@ -1107,6 +1172,10 @@ typedef CCC_Array_adaptive_map_handle Array_adaptive_map_handle;
 #    define array_adaptive_map_from(args...) CCC_array_adaptive_map_from(args)
 #    define array_adaptive_map_with_capacity(args...)                          \
         CCC_array_adaptive_map_with_capacity(args)
+#    define array_adaptive_map_with_compound_literal(args...)                  \
+        CCC_array_adaptive_map_with_compound_literal(args)
+#    define array_adaptive_map_with_context_compound_literal(args...)          \
+        CCC_array_adaptive_map_with_context_compound_literal(args)
 #    define array_adaptive_map_at(args...) CCC_array_adaptive_map_at(args)
 #    define array_adaptive_map_as(args...) CCC_array_adaptive_map_as(args)
 #    define array_adaptive_map_and_modify_with(args...)                        \

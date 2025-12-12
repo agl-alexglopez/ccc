@@ -301,6 +301,72 @@ of initialization and reservation. */
     CCC_private_array_tree_map_with_capacity(                                  \
         type_name, type_key_field, compare, allocate, context_data, capacity)
 
+/** @brief Initialize a fixed map at compile or runtime from a previously
+declared fixed map type with no allocation permission or context.
+@param[in] type_key_field the field of the struct used for key storage.
+@param[in] compare the CCC_Key_comparator the user intends to use.
+@param[in] compound_literal the previously declared fixed map compound literal.
+@return the map directly initialized on the right hand side of the equality
+operator (e.g. CCC_Array_tree_map map =
+CCC_array_tree_map_with_compound_literal(...);)
+
+Initialize a fixed map.
+
+```
+#define ARRAY_TREE_MAP_USING_NAMESPACE_CCC
+struct Val
+{
+    int key;
+    int val;
+};
+CCC_array_tree_map_declare_fixed(Small_fixed_map, struct Val, 64);
+static Array_tree_map map = array_tree_map_with_compound_literal(
+    key,
+    array_tree_map_key_order,
+    (Small_fixed_map){},
+);
+```
+
+This can help eliminate boilerplate in initializers. */
+#define CCC_array_tree_map_with_compound_literal(type_key_field, compare,      \
+                                                 compound_literal)             \
+    CCC_private_array_tree_map_with_compound_literal(type_key_field, compare,  \
+                                                     compound_literal)
+
+/** @brief Initialize a fixed map at compile or runtime from a previously
+declared fixed map type with no allocation permission.
+@param[in] type_key_field the field of the struct used for key storage.
+@param[in] compare the CCC_Key_comparator the user intends to use.
+@param[in] context context for the map.
+@param[in] compound_literal the previously declared fixed map compound literal.
+@return the map directly initialized on the right hand side of the equality
+operator (e.g. CCC_Array_tree_map map =
+CCC_array_tree_map_with_compound_literal(...);)
+
+Initialize a fixed map.
+
+```
+#define ARRAY_TREE_MAP_USING_NAMESPACE_CCC
+struct Val
+{
+    int key;
+    int val;
+};
+CCC_array_tree_map_declare_fixed(Small_fixed_map, struct Val, 64);
+static Array_tree_map map = array_tree_map_with_compound_literal(
+    key,
+    array_tree_map_key_order,
+    &module_context,
+    (Small_fixed_map){},
+);
+```
+
+This can help eliminate boilerplate in initializers. */
+#define CCC_array_tree_map_with_context_compound_literal(                      \
+    type_key_field, compare, context, compound_literal)                        \
+    CCC_private_array_tree_map_with_context_compound_literal(                  \
+        type_key_field, compare, context, compound_literal)
+
 /** @brief Copy the map at source to destination.
 @param[in] destination the initialized destination for the copy of the source
 map.
@@ -1119,6 +1185,10 @@ typedef CCC_Array_tree_map_handle Array_tree_map_handle;
 #    define array_tree_map_from(args...) CCC_array_tree_map_from(args)
 #    define array_tree_map_with_capacity(args...)                              \
         CCC_array_tree_map_with_capacity(args)
+#    define array_tree_map_with_compound_literal(args...)                      \
+        CCC_array_tree_map_with_compound_literal(args)
+#    define array_tree_map_with_context_compound_literal(args...)              \
+        CCC_array_tree_map_with_context_compound_literal(args)
 #    define array_tree_map_fixed_capacity(args...)                             \
         CCC_array_tree_map_fixed_capacity(args)
 #    define array_tree_map_copy(args...) CCC_array_tree_map_copy(args)

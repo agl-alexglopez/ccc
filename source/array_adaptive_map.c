@@ -195,8 +195,8 @@ CCC_array_adaptive_map_contains(CCC_Array_adaptive_map *const map,
     {
         return CCC_TRIBOOL_ERROR;
     }
-    map->root = splay(map, map->root, key, map->order);
-    return order_nodes(map, key, map->root, map->order) == CCC_ORDER_EQUAL;
+    map->root = splay(map, map->root, key, map->compare);
+    return order_nodes(map, key, map->root, map->compare) == CCC_ORDER_EQUAL;
 }
 
 CCC_Handle_index
@@ -826,13 +826,13 @@ equal_range(struct CCC_Array_adaptive_map *const t, void const *const begin_key,
        checking we don't need to progress to the next greatest or next
        lesser element depending on the direction we are traversing. */
     CCC_Order const les_or_grt[2] = {CCC_ORDER_LESSER, CCC_ORDER_GREATER};
-    size_t b = splay(t, t->root, begin_key, t->order);
-    if (order_nodes(t, begin_key, b, t->order) == les_or_grt[traversal])
+    size_t b = splay(t, t->root, begin_key, t->compare);
+    if (order_nodes(t, begin_key, b, t->compare) == les_or_grt[traversal])
     {
         b = next(t, b, traversal);
     }
-    size_t e = splay(t, t->root, end_key, t->order);
-    if (order_nodes(t, end_key, e, t->order) != les_or_grt[!traversal])
+    size_t e = splay(t, t->root, end_key, t->compare);
+    if (order_nodes(t, end_key, e, t->compare) != les_or_grt[!traversal])
     {
         e = next(t, e, traversal);
     }
@@ -962,8 +962,8 @@ insert(struct CCC_Array_adaptive_map *const map, size_t const n)
         return;
     }
     void const *const key = key_at(map, n);
-    map->root = splay(map, map->root, key, map->order);
-    CCC_Order const root_order = order_nodes(map, key, map->root, map->order);
+    map->root = splay(map, map->root, key, map->compare);
+    CCC_Order const root_order = order_nodes(map, key, map->root, map->compare);
     if (CCC_ORDER_EQUAL == root_order)
     {
         return;
@@ -990,8 +990,8 @@ erase(struct CCC_Array_adaptive_map *const map, void const *const key)
     {
         return 0;
     }
-    size_t const ret = splay(map, map->root, key, map->order);
-    CCC_Order const found = order_nodes(map, key, ret, map->order);
+    size_t const ret = splay(map, map->root, key, map->compare);
+    CCC_Order const found = order_nodes(map, key, ret, map->compare);
     if (found != CCC_ORDER_EQUAL)
     {
         return 0;
@@ -1010,7 +1010,7 @@ remove_from_tree(struct CCC_Array_adaptive_map *const map, size_t const ret)
     else
     {
         map->root = splay(map, branch_index(map, ret, L), key_at(map, ret),
-                          map->order);
+                          map->compare);
         link(map, map->root, R, branch_index(map, ret, R));
     }
     node_at(map, ret)->next_free = map->free_list;
@@ -1026,8 +1026,8 @@ find(struct CCC_Array_adaptive_map *const map, void const *const key)
     {
         return 0;
     }
-    map->root = splay(map, map->root, key, map->order);
-    return order_nodes(map, key, map->root, map->order) == CCC_ORDER_EQUAL
+    map->root = splay(map, map->root, key, map->compare);
+    return order_nodes(map, key, map->root, map->compare) == CCC_ORDER_EQUAL
              ? map->root
              : 0;
 }
@@ -1370,13 +1370,13 @@ are_subtrees_valid(struct CCC_Array_adaptive_map const *map,
         return CCC_TRUE;
     }
     if (r.low
-        && order_nodes(map, key_at(map, r.low), r.root, map->order)
+        && order_nodes(map, key_at(map, r.low), r.root, map->compare)
                != CCC_ORDER_LESSER)
     {
         return CCC_FALSE;
     }
     if (r.high
-        && order_nodes(map, key_at(map, r.high), r.root, map->order)
+        && order_nodes(map, key_at(map, r.high), r.root, map->compare)
                != CCC_ORDER_GREATER)
     {
         return CCC_FALSE;

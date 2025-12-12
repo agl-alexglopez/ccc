@@ -20,6 +20,16 @@ check_static_begin(array_adaptive_map_test_empty)
     check_end();
 }
 
+check_static_begin(array_adaptive_map_test_with_literal)
+{
+    Array_adaptive_map s = array_adaptive_map_with_compound_literal(
+        id, id_order, (Small_fixed_map){});
+    check(is_empty(&s), true);
+    check(capacity(&s).count,
+          array_adaptive_map_fixed_capacity(Small_fixed_map));
+    check_end();
+}
+
 check_static_begin(array_adaptive_map_test_copy_no_allocate)
 {
     Array_adaptive_map source
@@ -297,6 +307,7 @@ int
 main()
 {
     return check_run(array_adaptive_map_test_empty(),
+                     array_adaptive_map_test_with_literal(),
                      array_adaptive_map_test_copy_no_allocate(),
                      array_adaptive_map_test_copy_no_allocate_fail(),
                      array_adaptive_map_test_copy_allocate(),

@@ -323,6 +323,49 @@ runtime. */
     }))
 
 /** @internal */
+#define CCC_private_array_tree_map_with_compound_literal(                      \
+    private_key_node_field, private_key_order_fn, private_compound_literal)    \
+    {                                                                          \
+        .data = &(private_compound_literal),                                   \
+        .nodes = NULL,                                                         \
+        .parity = NULL,                                                        \
+        .capacity = CCC_private_array_tree_map_fixed_capacity(                 \
+            typeof(private_compound_literal)),                                 \
+        .count = 0,                                                            \
+        .root = 0,                                                             \
+        .free_list = 0,                                                        \
+        .sizeof_type = sizeof(*(private_compound_literal.data)) /*NOLINT*/,    \
+        .key_offset                                                            \
+        = offsetof(typeof(*(private_compound_literal.data)) /*NOLINT*/,        \
+                   private_key_node_field),                                    \
+        .compare = (private_key_order_fn),                                     \
+        .allocate = NULL,                                                      \
+        .context = NULL,                                                       \
+    }
+
+/** @internal */
+#define CCC_private_array_tree_map_with_context_compound_literal(              \
+    private_key_node_field, private_key_order_fn, private_context,             \
+    private_compound_literal)                                                  \
+    {                                                                          \
+        .data = &(private_compound_literal),                                   \
+        .nodes = NULL,                                                         \
+        .parity = NULL,                                                        \
+        .capacity = CCC_private_array_tree_map_fixed_capacity(                 \
+            typeof(private_compound_literal)),                                 \
+        .count = 0,                                                            \
+        .root = 0,                                                             \
+        .free_list = 0,                                                        \
+        .sizeof_type = sizeof(*(private_compound_literal.data)) /*NOLINT*/,    \
+        .key_offset                                                            \
+        = offsetof(typeof(*(private_compound_literal.data)) /*NOLINT*/,        \
+                   private_key_node_field),                                    \
+        .compare = (private_key_order_fn),                                     \
+        .allocate = NULL,                                                      \
+        .context = (private_context),                                          \
+    }
+
+/** @internal */
 #define CCC_private_array_tree_map_as(array_tree_map_pointer, type_name,       \
                                       handle...)                               \
     ((type_name *)CCC_private_array_tree_map_data_at((array_tree_map_pointer), \
