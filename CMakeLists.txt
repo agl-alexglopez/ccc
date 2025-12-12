@@ -1,7 +1,7 @@
 # This version gives us file sets which are great for library install.
 cmake_minimum_required(VERSION 3.23)
 project("ccc" 
-  VERSION 0.40.0
+  VERSION 0.51.0
   LANGUAGES C
   DESCRIPTION "The C Container Collection (ccc). A collection of containers written in C."
 )
