@@ -2,7 +2,7 @@ var array__tree__map_8h =
 [
     [ "CCC_array_tree_map_and_modify_with", "array__tree__map_8h.html#a1f46ef6376cbf27669dc24ac31b0d648", null ],
     [ "CCC_array_tree_map_as", "array__tree__map_8h.html#aead226eb94b8cbf7fa760c3bc5efe5f0", null ],
-    [ "CCC_array_tree_map_declare_fixed_map", "array__tree__map_8h.html#a16e9464ef2ab4028a2d0d367b0436ae6", null ],
+    [ "CCC_array_tree_map_declare_fixed", "array__tree__map_8h.html#a889e90409ac17a1052715f28eadac38e", null ],
     [ "CCC_array_tree_map_equal_range_reverse_wrap", "array__tree__map_8h.html#af899beb2bb44798b19195feabf0f0d5a", null ],
     [ "CCC_array_tree_map_equal_range_wrap", "array__tree__map_8h.html#a58881338feaf3df48b299aba89230675", null ],
     [ "CCC_array_tree_map_fixed_capacity", "array__tree__map_8h.html#aa4aae906f1cadcf47b40768875a2b8dc", null ],
@@ -18,6 +18,8 @@ var array__tree__map_8h =
     [ "CCC_array_tree_map_try_insert_with", "array__tree__map_8h.html#a7f8af8ef0bd2aeb6e6a7027633be44f5", null ],
     [ "CCC_array_tree_map_try_insert_wrap", "array__tree__map_8h.html#a89b3fd482e879885dac17a162d753cf0", null ],
     [ "CCC_array_tree_map_with_capacity", "array__tree__map_8h.html#a7f132dfa8ca19742f0457e350bbbb417", null ],
+    [ "CCC_array_tree_map_with_compound_literal", "array__tree__map_8h.html#a3c4fc737f83c91bf4ff0cee7067cf32c", null ],
+    [ "CCC_array_tree_map_with_context_compound_literal", "array__tree__map_8h.html#a76ad8cbe7d5b74354e2e69bf243583eb", null ],
     [ "CCC_Array_tree_map", "array__tree__map_8h.html#a749127f5a0f7dece409b12023958b75a", null ],
     [ "CCC_Array_tree_map_handle", "array__tree__map_8h.html#aed55ef4dcf4466a9ea1fc0f84e938422", null ],
     [ "CCC_array_tree_map_and_modify", "array__tree__map_8h.html#a3724d4cdb877a941005548620a54ab97", null ],

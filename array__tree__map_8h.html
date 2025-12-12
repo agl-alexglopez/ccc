@@ -134,9 +134,9 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Initialization Interface</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p>Initialize the container with memory, callbacks, and permissions. </p>
 </td></tr>
-<tr class="memitem:a16e9464ef2ab4028a2d0d367b0436ae6"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="array__tree__map_8h.html#a16e9464ef2ab4028a2d0d367b0436ae6">CCC_array_tree_map_declare_fixed_map</a>(fixed_map_type_name,  type_name,  capacity)</td></tr>
-<tr class="memdesc:a16e9464ef2ab4028a2d0d367b0436ae6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Declare a fixed size map type for use in the stack, heap, or data segment. Does not return a value.  <br /></td></tr>
-<tr class="separator:a16e9464ef2ab4028a2d0d367b0436ae6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a889e90409ac17a1052715f28eadac38e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="array__tree__map_8h.html#a889e90409ac17a1052715f28eadac38e">CCC_array_tree_map_declare_fixed</a>(fixed_map_type_name,  type_name,  capacity)</td></tr>
+<tr class="memdesc:a889e90409ac17a1052715f28eadac38e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Declare a fixed size map type for use in the stack, heap, or data segment. Does not return a value.  <br /></td></tr>
+<tr class="separator:a889e90409ac17a1052715f28eadac38e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa4aae906f1cadcf47b40768875a2b8dc"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="array__tree__map_8h.html#aa4aae906f1cadcf47b40768875a2b8dc">CCC_array_tree_map_fixed_capacity</a>(fixed_map_type_name)&#160;&#160;&#160;    CCC_private_array_tree_map_fixed_capacity(fixed_map_type_name)</td></tr>
 <tr class="memdesc:aa4aae906f1cadcf47b40768875a2b8dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain the capacity previously chosen for the fixed size map type.  <br /></td></tr>
 <tr class="separator:aa4aae906f1cadcf47b40768875a2b8dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -149,6 +149,12 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memitem:a7f132dfa8ca19742f0457e350bbbb417"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="array__tree__map_8h.html#a7f132dfa8ca19742f0457e350bbbb417">CCC_array_tree_map_with_capacity</a>(type_name,  type_key_field,  compare,  allocate,  context_data,  capacity)</td></tr>
 <tr class="memdesc:a7f132dfa8ca19742f0457e350bbbb417"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a dynamic map at runtime with at least the specified capacity.  <br /></td></tr>
 <tr class="separator:a7f132dfa8ca19742f0457e350bbbb417"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3c4fc737f83c91bf4ff0cee7067cf32c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="array__tree__map_8h.html#a3c4fc737f83c91bf4ff0cee7067cf32c">CCC_array_tree_map_with_compound_literal</a>(type_key_field,  compare,  compound_literal)</td></tr>
+<tr class="memdesc:a3c4fc737f83c91bf4ff0cee7067cf32c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a fixed map at compile or runtime from a previously declared fixed map type with no allocation permission or context.  <br /></td></tr>
+<tr class="separator:a3c4fc737f83c91bf4ff0cee7067cf32c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a76ad8cbe7d5b74354e2e69bf243583eb"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="array__tree__map_8h.html#a76ad8cbe7d5b74354e2e69bf243583eb">CCC_array_tree_map_with_context_compound_literal</a>( type_key_field,  compare,  context,  compound_literal)</td></tr>
+<tr class="memdesc:a76ad8cbe7d5b74354e2e69bf243583eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a fixed map at compile or runtime from a previously declared fixed map type with no allocation permission.  <br /></td></tr>
+<tr class="separator:a76ad8cbe7d5b74354e2e69bf243583eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2ab278b61356071071065d347df80abd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#aa1ded61d294b114942f11e711b331dcf">CCC_Result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="array__tree__map_8h.html#a2ab278b61356071071065d347df80abd">CCC_array_tree_map_copy</a> (<a class="el" href="structCCC__Array__tree__map.html">CCC_Array_tree_map</a> *destination, <a class="el" href="structCCC__Array__tree__map.html">CCC_Array_tree_map</a> const *source, <a class="el" href="types_8h.html#aac6280c471e14b9c0d50b1c5577394d3">CCC_Allocator</a> *allocate)</td></tr>
 <tr class="memdesc:a2ab278b61356071071065d347df80abd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy the map at source to destination.  <br /></td></tr>
 <tr class="separator:a2ab278b61356071071065d347df80abd"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -440,14 +446,14 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="a16e9464ef2ab4028a2d0d367b0436ae6" name="a16e9464ef2ab4028a2d0d367b0436ae6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a16e9464ef2ab4028a2d0d367b0436ae6">&#9670;&#160;</a></span>CCC_array_tree_map_declare_fixed_map</h2>
+<a id="a889e90409ac17a1052715f28eadac38e" name="a889e90409ac17a1052715f28eadac38e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a889e90409ac17a1052715f28eadac38e">&#9670;&#160;</a></span>CCC_array_tree_map_declare_fixed</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define CCC_array_tree_map_declare_fixed_map</td>
+          <td class="memname">#define CCC_array_tree_map_declare_fixed</td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
           <td class="paramname">fixed_map_type_name, </td>
@@ -471,8 +477,8 @@ This graph shows which files directly or indirectly include this file:</div>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    CCC_private_array_tree_map_declare_fixed_map(fixed_map_type_name,          \</div>
-<div class="line">                                                 type_name, capacity)</div>
+<b>Value:</b><div class="fragment"><div class="line">    CCC_private_array_tree_map_declare_fixed(fixed_map_type_name, type_name,   \</div>
+<div class="line">                                             capacity)</div>
 </div><!-- fragment -->
 <p>Declare a fixed size map type for use in the stack, heap, or data segment. Does not return a value. </p>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -490,7 +496,7 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="line">    <span class="keywordtype">int</span> key;</div>
 <div class="line">    <span class="keywordtype">int</span> val;</div>
 <div class="line">};</div>
-<div class="line"><a class="code hl_define" href="array__tree__map_8h.html#a16e9464ef2ab4028a2d0d367b0436ae6">CCC_array_tree_map_declare_fixed_map</a>(Small_fixed_map, <span class="keyword">struct</span> Val,</div>
+<div class="line"><a class="code hl_define" href="array__tree__map_8h.html#a889e90409ac17a1052715f28eadac38e">CCC_array_tree_map_declare_fixed</a>(Small_fixed_map, <span class="keyword">struct</span> Val,</div>
 <div class="line">64); <span class="keyword">static</span> map static_map =</div>
 <div class="line">array_tree_map_initialize(</div>
 <div class="line">    &amp;(<span class="keyword">static</span> Small_fixed_map){},</div>
@@ -501,14 +507,14 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="line">    NULL,</div>
 <div class="line">    array_tree_map_fixed_capacity(Small_fixed_map)</div>
 <div class="line">);</div>
-<div class="ttc" id="aarray__tree__map_8h_html_a16e9464ef2ab4028a2d0d367b0436ae6"><div class="ttname"><a href="array__tree__map_8h.html#a16e9464ef2ab4028a2d0d367b0436ae6">CCC_array_tree_map_declare_fixed_map</a></div><div class="ttdeci">#define CCC_array_tree_map_declare_fixed_map(fixed_map_type_name, type_name, capacity)</div><div class="ttdoc">Declare a fixed size map type for use in the stack, heap, or data segment. Does not return a value.</div><div class="ttdef"><b>Definition:</b> array_tree_map.h:160</div></div>
+<div class="ttc" id="aarray__tree__map_8h_html_a889e90409ac17a1052715f28eadac38e"><div class="ttname"><a href="array__tree__map_8h.html#a889e90409ac17a1052715f28eadac38e">CCC_array_tree_map_declare_fixed</a></div><div class="ttdeci">#define CCC_array_tree_map_declare_fixed(fixed_map_type_name, type_name, capacity)</div><div class="ttdoc">Declare a fixed size map type for use in the stack, heap, or data segment. Does not return a value.</div><div class="ttdef"><b>Definition:</b> array_tree_map.h:160</div></div>
 </div><!-- fragment --><p>Similarly, a fixed size map can be used on the stack.</p>
 <div class="fragment"><div class="line"><span class="keyword">struct </span>Val</div>
 <div class="line">{</div>
 <div class="line">    <span class="keywordtype">int</span> key;</div>
 <div class="line">    <span class="keywordtype">int</span> val;</div>
 <div class="line">};</div>
-<div class="line"><a class="code hl_define" href="array__tree__map_8h.html#a16e9464ef2ab4028a2d0d367b0436ae6">CCC_array_tree_map_declare_fixed_map</a>(Small_fixed_map, <span class="keyword">struct</span> Val,</div>
+<div class="line"><a class="code hl_define" href="array__tree__map_8h.html#a889e90409ac17a1052715f28eadac38e">CCC_array_tree_map_declare_fixed</a>(Small_fixed_map, <span class="keyword">struct</span> Val,</div>
 <div class="line">64); <span class="keywordtype">int</span> main(<span class="keywordtype">void</span>)</div>
 <div class="line">{</div>
 <div class="line">    map static_map =</div>
@@ -1309,6 +1315,136 @@ If initialization fails all subsequent queries, insertions, or removals will ind
 
 </div>
 </div>
+<a id="a3c4fc737f83c91bf4ff0cee7067cf32c" name="a3c4fc737f83c91bf4ff0cee7067cf32c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3c4fc737f83c91bf4ff0cee7067cf32c">&#9670;&#160;</a></span>CCC_array_tree_map_with_compound_literal</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define CCC_array_tree_map_with_compound_literal</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">type_key_field, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">compare, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">compound_literal&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    CCC_private_array_tree_map_with_compound_literal(type_key_field, compare,  \</div>
+<div class="line">                                                     compound_literal)</div>
+</div><!-- fragment -->
+<p>Initialize a fixed map at compile or runtime from a previously declared fixed map type with no allocation permission or context. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">type_key_field</td><td>the field of the struct used for key storage. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">compare</td><td>the CCC_Key_comparator the user intends to use. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">compound_literal</td><td>the previously declared fixed map compound literal. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the map directly initialized on the right hand side of the equality operator (e.g. <a class="el" href="structCCC__Array__tree__map.html">CCC_Array_tree_map</a> map = <a class="el" href="array__tree__map_8h.html#a3c4fc737f83c91bf4ff0cee7067cf32c" title="Initialize a fixed map at compile or runtime from a previously declared fixed map type with no alloca...">CCC_array_tree_map_with_compound_literal(...)</a>;)</dd></dl>
+<p>Initialize a fixed map.</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#define ARRAY_TREE_MAP_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="keyword">struct </span>Val</div>
+<div class="line">{</div>
+<div class="line">    <span class="keywordtype">int</span> key;</div>
+<div class="line">    <span class="keywordtype">int</span> val;</div>
+<div class="line">};</div>
+<div class="line"><a class="code hl_define" href="array__tree__map_8h.html#a889e90409ac17a1052715f28eadac38e">CCC_array_tree_map_declare_fixed</a>(Small_fixed_map, <span class="keyword">struct</span> Val, 64);</div>
+<div class="line"><span class="keyword">static</span> Array_tree_map map = array_tree_map_with_compound_literal(</div>
+<div class="line">    key,</div>
+<div class="line">    array_tree_map_key_order,</div>
+<div class="line">    (Small_fixed_map){},</div>
+<div class="line">);</div>
+</div><!-- fragment --><p>This can help eliminate boilerplate in initializers. </p>
+
+</div>
+</div>
+<a id="a76ad8cbe7d5b74354e2e69bf243583eb" name="a76ad8cbe7d5b74354e2e69bf243583eb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a76ad8cbe7d5b74354e2e69bf243583eb">&#9670;&#160;</a></span>CCC_array_tree_map_with_context_compound_literal</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define CCC_array_tree_map_with_context_compound_literal</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">type_key_field, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">compare, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">context, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">compound_literal&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    CCC_private_array_tree_map_with_context_compound_literal(                  \</div>
+<div class="line">        type_key_field, compare, context, compound_literal)</div>
+</div><!-- fragment -->
+<p>Initialize a fixed map at compile or runtime from a previously declared fixed map type with no allocation permission. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">type_key_field</td><td>the field of the struct used for key storage. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">compare</td><td>the CCC_Key_comparator the user intends to use. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">context</td><td>context for the map. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">compound_literal</td><td>the previously declared fixed map compound literal. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the map directly initialized on the right hand side of the equality operator (e.g. <a class="el" href="structCCC__Array__tree__map.html">CCC_Array_tree_map</a> map = <a class="el" href="array__tree__map_8h.html#a3c4fc737f83c91bf4ff0cee7067cf32c" title="Initialize a fixed map at compile or runtime from a previously declared fixed map type with no alloca...">CCC_array_tree_map_with_compound_literal(...)</a>;)</dd></dl>
+<p>Initialize a fixed map.</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#define ARRAY_TREE_MAP_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="keyword">struct </span>Val</div>
+<div class="line">{</div>
+<div class="line">    <span class="keywordtype">int</span> key;</div>
+<div class="line">    <span class="keywordtype">int</span> val;</div>
+<div class="line">};</div>
+<div class="line"><a class="code hl_define" href="array__tree__map_8h.html#a889e90409ac17a1052715f28eadac38e">CCC_array_tree_map_declare_fixed</a>(Small_fixed_map, <span class="keyword">struct</span> Val, 64);</div>
+<div class="line"><span class="keyword">static</span> Array_tree_map map = array_tree_map_with_compound_literal(</div>
+<div class="line">    key,</div>
+<div class="line">    array_tree_map_key_order,</div>
+<div class="line">    &amp;module_context,</div>
+<div class="line">    (Small_fixed_map){},</div>
+<div class="line">);</div>
+</div><!-- fragment --><p>This can help eliminate boilerplate in initializers. </p>
+
+</div>
+</div>
 <h2 class="groupheader">Typedef Documentation</h2>
 <a id="a749127f5a0f7dece409b12023958b75a" name="a749127f5a0f7dece409b12023958b75a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a749127f5a0f7dece409b12023958b75a">&#9670;&#160;</a></span>CCC_Array_tree_map</h2>
@@ -1742,7 +1878,7 @@ do not try to access data in the table manually with a handle. Always use this p
 <div class="line">    <span class="keywordtype">int</span> key;</div>
 <div class="line">    <span class="keywordtype">int</span> val;</div>
 <div class="line">};</div>
-<div class="line"><a class="code hl_define" href="array__tree__map_8h.html#a16e9464ef2ab4028a2d0d367b0436ae6">CCC_array_tree_map_declare_fixed_map</a>(Small_fixed_map, <span class="keyword">struct</span> Val,</div>
+<div class="line"><a class="code hl_define" href="array__tree__map_8h.html#a889e90409ac17a1052715f28eadac38e">CCC_array_tree_map_declare_fixed</a>(Small_fixed_map, <span class="keyword">struct</span> Val,</div>
 <div class="line">64); <span class="keyword">static</span> map source =</div>
 <div class="line">array_tree_map_initialize(</div>
 <div class="line">    &amp;(<span class="keyword">static</span> Small_fixed_map){},</div>

@@ -2,7 +2,7 @@ var array__adaptive__map_8h =
 [
     [ "CCC_array_adaptive_map_and_modify_with", "array__adaptive__map_8h.html#a3d9d55c908afc361a54596c0bb3d3be3", null ],
     [ "CCC_array_adaptive_map_as", "array__adaptive__map_8h.html#a7107f7852dada205ca4ddcdce669ef56", null ],
-    [ "CCC_array_adaptive_map_declare_fixed_map", "array__adaptive__map_8h.html#a411c1d286e78f2c5b2a26045aee802ce", null ],
+    [ "CCC_array_adaptive_map_declare_fixed", "array__adaptive__map_8h.html#aa5cd7d6e3b43cc6934c045378e3e3875", null ],
     [ "CCC_array_adaptive_map_equal_range_reverse_wrap", "array__adaptive__map_8h.html#a3cd82daf7a8cb0624eebefabb795d733", null ],
     [ "CCC_array_adaptive_map_equal_range_wrap", "array__adaptive__map_8h.html#ac6d689f62b1ae8bffbe5443dc65f3491", null ],
     [ "CCC_array_adaptive_map_fixed_capacity", "array__adaptive__map_8h.html#a89e80f373bb1e9b7f5893fc79b4791ab", null ],
@@ -18,6 +18,8 @@ var array__adaptive__map_8h =
     [ "CCC_array_adaptive_map_try_insert_with", "array__adaptive__map_8h.html#abe39139c57071844161f3bfdb9a38b14", null ],
     [ "CCC_array_adaptive_map_try_insert_wrap", "array__adaptive__map_8h.html#a69c9caa87fd345aeedb51f1a6bbd7051", null ],
     [ "CCC_array_adaptive_map_with_capacity", "array__adaptive__map_8h.html#afc2379e48c78cbcf77f9fcf8567d6b0d", null ],
+    [ "CCC_array_adaptive_map_with_compound_literal", "array__adaptive__map_8h.html#a51bcf371289fbd0a7a41a1066ffd7511", null ],
+    [ "CCC_array_adaptive_map_with_context_compound_literal", "array__adaptive__map_8h.html#a3016df8053c72b6ee45e73da580633e9", null ],
     [ "CCC_Array_adaptive_map", "array__adaptive__map_8h.html#a3383e02ece054e21edbc2a638d3567f9", null ],
     [ "CCC_Array_adaptive_map_handle", "array__adaptive__map_8h.html#a67ce76b9053351d5eabb334544cb2530", null ],
     [ "CCC_array_adaptive_map_and_modify", "array__adaptive__map_8h.html#a058ecd325865647858f89b14e6e6a9e3", null ],

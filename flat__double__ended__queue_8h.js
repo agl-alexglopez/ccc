@@ -5,6 +5,8 @@ var flat__double__ended__queue_8h =
     [ "CCC_flat_double_ended_queue_from", "flat__double__ended__queue_8h.html#aa872dd1e7f6dadfc13045874c4d3c282", null ],
     [ "CCC_flat_double_ended_queue_initialize", "flat__double__ended__queue_8h.html#a9dbaedc50b61db379f5926f50bcdb09c", null ],
     [ "CCC_flat_double_ended_queue_with_capacity", "flat__double__ended__queue_8h.html#a9593a537945bfd8e6e739966f45f5d74", null ],
+    [ "CCC_flat_double_ended_queue_with_compound_literal", "flat__double__ended__queue_8h.html#a549b65cc96b028f71f1b95e18079d1bf", null ],
+    [ "CCC_flat_double_ended_queue_with_context_compound_literal", "flat__double__ended__queue_8h.html#abddf58a81adf01de0904ab0e0abbb3af", null ],
     [ "CCC_Flat_double_ended_queue", "flat__double__ended__queue_8h.html#af8818c73eeb55766feff55aa4840219d", null ],
     [ "CCC_flat_double_ended_queue_at", "flat__double__ended__queue_8h.html#a297fc549d6550c8c2ea381f9589c9438", null ],
     [ "CCC_flat_double_ended_queue_back", "flat__double__ended__queue_8h.html#a85f2b0f552ec9ba7ddf85f3a650c883a", null ],

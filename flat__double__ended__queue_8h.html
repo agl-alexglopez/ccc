@@ -144,6 +144,12 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memitem:a9593a537945bfd8e6e739966f45f5d74"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a9593a537945bfd8e6e739966f45f5d74">CCC_flat_double_ended_queue_with_capacity</a>(type_name,  allocate,  context_data,  capacity)</td></tr>
 <tr class="memdesc:a9593a537945bfd8e6e739966f45f5d74"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a Flat_double_ended_queue with a capacity.  <br /></td></tr>
 <tr class="separator:a9593a537945bfd8e6e739966f45f5d74"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a549b65cc96b028f71f1b95e18079d1bf"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a549b65cc96b028f71f1b95e18079d1bf">CCC_flat_double_ended_queue_with_compound_literal</a>( count,  compound_literal_array...)</td></tr>
+<tr class="memdesc:a549b65cc96b028f71f1b95e18079d1bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the queue from a compound literal array with no allocation permissions or context data.  <br /></td></tr>
+<tr class="separator:a549b65cc96b028f71f1b95e18079d1bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abddf58a81adf01de0904ab0e0abbb3af"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#abddf58a81adf01de0904ab0e0abbb3af">CCC_flat_double_ended_queue_with_context_compound_literal</a>( count,  compound_literal_array...)</td></tr>
+<tr class="memdesc:abddf58a81adf01de0904ab0e0abbb3af"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the queue from a compound literal array with no allocation permissions.  <br /></td></tr>
+<tr class="separator:abddf58a81adf01de0904ab0e0abbb3af"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3cafa28e32a320297d373b89ed657a94"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#aa1ded61d294b114942f11e711b331dcf">CCC_Result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="flat__double__ended__queue_8h.html#a3cafa28e32a320297d373b89ed657a94">CCC_flat_double_ended_queue_copy</a> (<a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> *destination, <a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> const *source, <a class="el" href="types_8h.html#aac6280c471e14b9c0d50b1c5577394d3">CCC_Allocator</a> *allocate)</td></tr>
 <tr class="memdesc:a3cafa28e32a320297d373b89ed657a94"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy the queue from source to newly initialized destination.  <br /></td></tr>
 <tr class="separator:a3cafa28e32a320297d373b89ed657a94"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -534,6 +540,87 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="line">    <span class="keywordflow">return</span> 0;</div>
 <div class="line">}</div>
 </div><!-- fragment --><p>Only dynamic flat_double_ended_queues may be initialized this way. For static or stack based initialization of fixed flat_double_ended_queues with contents known at compile time, see the <a class="el" href="flat__double__ended__queue_8h.html#a9dbaedc50b61db379f5926f50bcdb09c" title="Initialize the queue with memory and allocation permission.">CCC_flat_double_ended_queue_initialize()</a> macro. </p>
+
+</div>
+</div>
+<a id="a549b65cc96b028f71f1b95e18079d1bf" name="a549b65cc96b028f71f1b95e18079d1bf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a549b65cc96b028f71f1b95e18079d1bf">&#9670;&#160;</a></span>CCC_flat_double_ended_queue_with_compound_literal</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define CCC_flat_double_ended_queue_with_compound_literal</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">count, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">compound_literal_array...&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    CCC_private_flat_double_ended_queue_with_compound_literal(                 \</div>
+<div class="line">        count, compound_literal_array)</div>
+</div><!-- fragment -->
+<p>Initialize the queue from a compound literal array with no allocation permissions or context data. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">count</td><td>the count of elements to start. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">compound_literal_array</td><td>the array of user types. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the queue on the right hand side of an equality operator at runtime or compiletime (e.g. <a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> q = <a class="el" href="flat__double__ended__queue_8h.html#a549b65cc96b028f71f1b95e18079d1bf" title="Initialize the queue from a compound literal array with no allocation permissions or context data.">CCC_flat_double_ended_queue_with_compound_literal(...)</a>;) </dd></dl>
+
+</div>
+</div>
+<a id="abddf58a81adf01de0904ab0e0abbb3af" name="abddf58a81adf01de0904ab0e0abbb3af"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abddf58a81adf01de0904ab0e0abbb3af">&#9670;&#160;</a></span>CCC_flat_double_ended_queue_with_context_compound_literal</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define CCC_flat_double_ended_queue_with_context_compound_literal</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">count, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">compound_literal_array...&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    CCC_private_flat_double_ended_queue_with_context_compound_literal(         \</div>
+<div class="line">        count, compound_literal_array)</div>
+</div><!-- fragment -->
+<p>Initialize the queue from a compound literal array with no allocation permissions. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">context</td><td>any context needed for the flat double ended queue. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">count</td><td>the count of elements to start. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">compound_literal_array</td><td>the array of user types. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the queue on the right hand side of an equality operator at runtime or compiletime (e.g. <a class="el" href="structCCC__Flat__double__ended__queue.html">CCC_Flat_double_ended_queue</a> q = <a class="el" href="flat__double__ended__queue_8h.html#abddf58a81adf01de0904ab0e0abbb3af" title="Initialize the queue from a compound literal array with no allocation permissions.">CCC_flat_double_ended_queue_with_context_compound_literal(...)</a>;) </dd></dl>
 
 </div>
 </div>

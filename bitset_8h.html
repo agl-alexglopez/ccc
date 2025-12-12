@@ -144,15 +144,21 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="memitem:a872da66828891cfed4872081d7f3a83f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a872da66828891cfed4872081d7f3a83f">CCC_bitset_blocks</a>(bit_cap,  optional_storage_duration...)&#160;&#160;&#160;    CCC_private_bitset_blocks(bit_cap, optional_storage_duration)</td></tr>
 <tr class="memdesc:a872da66828891cfed4872081d7f3a83f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocate the necessary number of blocks at compile or runtime on the stack or data segment.  <br /></td></tr>
 <tr class="separator:a872da66828891cfed4872081d7f3a83f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a311b7d842876da29c4d402b3bcae1424"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a311b7d842876da29c4d402b3bcae1424">CCC_bitset_initialize</a>(bitblock_pointer,  allocate,  context,  cap,  optional_size...)</td></tr>
-<tr class="memdesc:a311b7d842876da29c4d402b3bcae1424"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the bit set with memory and allocation permissions.  <br /></td></tr>
-<tr class="separator:a311b7d842876da29c4d402b3bcae1424"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9fb5907bb970fe865b8cba478308a95c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a9fb5907bb970fe865b8cba478308a95c">CCC_bitset_initialize</a>(bitblock_pointer,  allocate,  context,  cap,  optional_count...)</td></tr>
+<tr class="memdesc:a9fb5907bb970fe865b8cba478308a95c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the bit set with memory and allocation permissions.  <br /></td></tr>
+<tr class="separator:a9fb5907bb970fe865b8cba478308a95c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a492bd828d24d634c201c573ff373d732"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a492bd828d24d634c201c573ff373d732">CCC_bitset_from</a>(allocate,  context,  start_string_index,  count,  bit_on_char,  input_string,  optional_capacity...)</td></tr>
 <tr class="memdesc:a492bd828d24d634c201c573ff373d732"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the bit set with a custom input string.  <br /></td></tr>
 <tr class="separator:a492bd828d24d634c201c573ff373d732"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a51e05c298195b91b20d662e5ccef812a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#a51e05c298195b91b20d662e5ccef812a">CCC_bitset_with_capacity</a>(allocate,  context,  capacity,  optional_size...)&#160;&#160;&#160;    CCC_private_bitset_with_capacity(allocate, context, capacity, optional_size)</td></tr>
-<tr class="memdesc:a51e05c298195b91b20d662e5ccef812a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the bit set with a starting capacity and size at runtime.  <br /></td></tr>
-<tr class="separator:a51e05c298195b91b20d662e5ccef812a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeabf8c741a270d166c51a5eaa31d45b1"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#aeabf8c741a270d166c51a5eaa31d45b1">CCC_bitset_with_capacity</a>(allocate,  context,  capacity,  optional_count...)</td></tr>
+<tr class="memdesc:aeabf8c741a270d166c51a5eaa31d45b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the bit set with a starting capacity and size at runtime.  <br /></td></tr>
+<tr class="separator:aeabf8c741a270d166c51a5eaa31d45b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abc1aaa3bf1fa56eb68eb6ed821c8f1e6"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#abc1aaa3bf1fa56eb68eb6ed821c8f1e6">CCC_bitset_with_compound_literal</a>(count,  compound_literal_array)&#160;&#160;&#160;    CCC_private_bitset_with_compound_literal(count, compound_literal_array)</td></tr>
+<tr class="memdesc:abc1aaa3bf1fa56eb68eb6ed821c8f1e6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the bit set with a starting capacity and size at runtime or compile time with no allocation permissions or context from a compound literal of bitset blocks.  <br /></td></tr>
+<tr class="separator:abc1aaa3bf1fa56eb68eb6ed821c8f1e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abb4597e5558b2c24d7f95847e5b5eb7b"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitset_8h.html#abb4597e5558b2c24d7f95847e5b5eb7b">CCC_bitset_with_context_compound_literal</a>(count,  compound_literal_array)</td></tr>
+<tr class="memdesc:abb4597e5558b2c24d7f95847e5b5eb7b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the bit set with a starting capacity and size at runtime or compile time with no allocation permissions from a compound literal of bitset blocks.  <br /></td></tr>
+<tr class="separator:abb4597e5558b2c24d7f95847e5b5eb7b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a52c429148b439f77564a95b3edc3b452"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom">: size_t { <a class="el" href="bitset_8h.html#a52c429148b439f77564a95b3edc3b452a1caf09195736db544353b8098c3f5346">CCC_BITSET_BLOCK_BITS</a> = CCC_PRIVATE_BITSET_BLOCK_BITS
  }</td></tr>
 <tr class="separator:a52c429148b439f77564a95b3edc3b452"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -453,17 +459,17 @@ This graph shows which files directly or indirectly include this file:</div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>a compound literal array of the necessary bit block type allocated in the scope it is created with any storage duration specifiers added.</dd></dl>
 <p>This method can be used for compile time initialization of bit set. For example:</p>
-<div class="fragment"><div class="line"><span class="keyword">static</span> <a class="code hl_struct" href="structCCC__Bitset.html">CCC_Bitset</a> bit = <a class="code hl_define" href="bitset_8h.html#a311b7d842876da29c4d402b3bcae1424">CCC_bitset_initialize</a>(</div>
+<div class="fragment"><div class="line"><span class="keyword">static</span> <a class="code hl_struct" href="structCCC__Bitset.html">CCC_Bitset</a> bit = <a class="code hl_define" href="bitset_8h.html#a9fb5907bb970fe865b8cba478308a95c">CCC_bitset_initialize</a>(</div>
 <div class="line">    <a class="code hl_define" href="bitset_8h.html#a872da66828891cfed4872081d7f3a83f">CCC_bitset_blocks</a>(256, <span class="keyword">static</span>),</div>
 <div class="line">    NULL,</div>
 <div class="line">    NULL,</div>
 <div class="line">    256</div>
 <div class="line">);</div>
-<div class="ttc" id="abitset_8h_html_a311b7d842876da29c4d402b3bcae1424"><div class="ttname"><a href="bitset_8h.html#a311b7d842876da29c4d402b3bcae1424">CCC_bitset_initialize</a></div><div class="ttdeci">#define CCC_bitset_initialize(bitblock_pointer, allocate, context, cap, optional_size...)</div><div class="ttdoc">Initialize the bit set with memory and allocation permissions.</div><div class="ttdef"><b>Definition:</b> bitset.h:185</div></div>
 <div class="ttc" id="abitset_8h_html_a872da66828891cfed4872081d7f3a83f"><div class="ttname"><a href="bitset_8h.html#a872da66828891cfed4872081d7f3a83f">CCC_bitset_blocks</a></div><div class="ttdeci">#define CCC_bitset_blocks(bit_cap, optional_storage_duration...)</div><div class="ttdoc">Allocate the necessary number of blocks at compile or runtime on the stack or data segment.</div><div class="ttdef"><b>Definition:</b> bitset.h:144</div></div>
+<div class="ttc" id="abitset_8h_html_a9fb5907bb970fe865b8cba478308a95c"><div class="ttname"><a href="bitset_8h.html#a9fb5907bb970fe865b8cba478308a95c">CCC_bitset_initialize</a></div><div class="ttdeci">#define CCC_bitset_initialize(bitblock_pointer, allocate, context, cap, optional_count...)</div><div class="ttdoc">Initialize the bit set with memory and allocation permissions.</div><div class="ttdef"><b>Definition:</b> bitset.h:185</div></div>
 <div class="ttc" id="astructCCC__Bitset_html"><div class="ttname"><a href="structCCC__Bitset.html">CCC_Bitset</a></div><div class="ttdef"><b>Definition:</b> private_bitset.h:33</div></div>
 </div><!-- fragment --><p>The above example also illustrates the benefits of a static compound literal to encapsulate the bits within the bit set array to prevent dangling references. If the compiler does not support storage duration of compound literals the more traditional example follows:</p>
-<div class="fragment"><div class="line"><span class="keyword">static</span> <a class="code hl_struct" href="structCCC__Bitset.html">CCC_Bitset</a> bit = <a class="code hl_define" href="bitset_8h.html#a311b7d842876da29c4d402b3bcae1424">CCC_bitset_initialize</a>(</div>
+<div class="fragment"><div class="line"><span class="keyword">static</span> <a class="code hl_struct" href="structCCC__Bitset.html">CCC_Bitset</a> bit = <a class="code hl_define" href="bitset_8h.html#a9fb5907bb970fe865b8cba478308a95c">CCC_bitset_initialize</a>(</div>
 <div class="line">    <a class="code hl_define" href="bitset_8h.html#a872da66828891cfed4872081d7f3a83f">CCC_bitset_blocks</a>(256),</div>
 <div class="line">    NULL,</div>
 <div class="line">    NULL,</div>
@@ -556,8 +562,8 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="a311b7d842876da29c4d402b3bcae1424" name="a311b7d842876da29c4d402b3bcae1424"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a311b7d842876da29c4d402b3bcae1424">&#9670;&#160;</a></span>CCC_bitset_initialize</h2>
+<a id="a9fb5907bb970fe865b8cba478308a95c" name="a9fb5907bb970fe865b8cba478308a95c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9fb5907bb970fe865b8cba478308a95c">&#9670;&#160;</a></span>CCC_bitset_initialize</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -590,7 +596,7 @@ This graph shows which files directly or indirectly include this file:</div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">optional_size...&#160;</td>
+          <td class="paramname">optional_count...&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -600,7 +606,7 @@ This graph shows which files directly or indirectly include this file:</div>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">    CCC_private_bitset_initialize(bitblock_pointer, allocate, context, cap,    \</div>
-<div class="line">                                  optional_size)</div>
+<div class="line">                                  optional_count)</div>
 </div><!-- fragment -->
 <p>Initialize the bit set with memory and allocation permissions. </p>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -609,7 +615,7 @@ This graph shows which files directly or indirectly include this file:</div>
     <tr><td class="paramdir">[in]</td><td class="paramname">allocate</td><td>the allocation function for a dynamic bit set or NULL. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">context</td><td>context data needed for allocation of the bit set. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">cap</td><td>the number of bits that will be stored in this bit set. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">optional_size</td><td>an optional starting size &lt;= capacity. This value defaults to the same value as capacity which is appropriate for most cases. For any case where this is not desirable, set the size manually (for example, a fixed size bit set that is pushed to dynamically would have a non-zero capacity and 0 size). </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">optional_count</td><td>an optional starting size &lt;= capacity. This value defaults to the same value as capacity which is appropriate for most cases. For any case where this is not desirable, set the size manually (for example, a fixed size bit set that is pushed to dynamically would have a non-zero capacity and 0 size). </td></tr>
   </table>
   </dd>
 </dl>
@@ -628,8 +634,8 @@ This graph shows which files directly or indirectly include this file:</div>
 
 </div>
 </div>
-<a id="a51e05c298195b91b20d662e5ccef812a" name="a51e05c298195b91b20d662e5ccef812a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a51e05c298195b91b20d662e5ccef812a">&#9670;&#160;</a></span>CCC_bitset_with_capacity</h2>
+<a id="aeabf8c741a270d166c51a5eaa31d45b1" name="aeabf8c741a270d166c51a5eaa31d45b1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeabf8c741a270d166c51a5eaa31d45b1">&#9670;&#160;</a></span>CCC_bitset_with_capacity</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -656,23 +662,25 @@ This graph shows which files directly or indirectly include this file:</div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">optional_size...&#160;</td>
+          <td class="paramname">optional_count...&#160;</td>
         </tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td>&#160;&#160;&#160;    CCC_private_bitset_with_capacity(allocate, context, capacity, optional_size)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
-
+<b>Value:</b><div class="fragment"><div class="line">    CCC_private_bitset_with_capacity(allocate, context, capacity,              \</div>
+<div class="line">                                     optional_count)</div>
+</div><!-- fragment -->
 <p>Initialize the bit set with a starting capacity and size at runtime. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">allocate</td><td>the allocation function for a dynamic bit. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">context</td><td>context data needed for allocation of the bit set. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">capacity</td><td>the number of bits that will be stored in this bit set. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">optional_size</td><td>an optional starting size &lt;= capacity. This value defaults to the same value as capacity which is appropriate for most cases. For any case where this is not desirable, set the size manually (for example, a bit set that will push bits back would have a non-zero capacity and 0 size). </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">optional_count</td><td>an optional starting size &lt;= capacity. This value defaults to the same value as capacity which is appropriate for most cases. For any case where this is not desirable, set the size manually (for example, a bit set that will push bits back would have a non-zero capacity and 0 size). </td></tr>
   </table>
   </dd>
 </dl>
@@ -692,6 +700,102 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="line">    Bitset bitset = bitset_with_capacity(std_allocate, NULL, 4096, 0);</div>
 <div class="line">}</div>
 </div><!-- fragment --><p>This initialization can only be used at runtime. See the normal initializer for static and stack based initialization options. </p>
+
+</div>
+</div>
+<a id="abc1aaa3bf1fa56eb68eb6ed821c8f1e6" name="abc1aaa3bf1fa56eb68eb6ed821c8f1e6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abc1aaa3bf1fa56eb68eb6ed821c8f1e6">&#9670;&#160;</a></span>CCC_bitset_with_compound_literal</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define CCC_bitset_with_compound_literal</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">count, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">compound_literal_array&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;    CCC_private_bitset_with_compound_literal(count, compound_literal_array)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Initialize the bit set with a starting capacity and size at runtime or compile time with no allocation permissions or context from a compound literal of bitset blocks. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">count</td><td>the count of bits &lt;= capacity of this bit set. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">compound_literal_array</td><td>the compound literal of bitset blocks. Use the <a class="el" href="bitset_8h.html#a872da66828891cfed4872081d7f3a83f" title="Allocate the necessary number of blocks at compile or runtime on the stack or data segment.">CCC_bitset_blocks()</a> macro to help construct this. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the initialized bit set on the right hand side of an equality operator Capacity will be set to the full capacity available for the compound literal. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>Use the <a class="el" href="bitset_8h.html#a872da66828891cfed4872081d7f3a83f" title="Allocate the necessary number of blocks at compile or runtime on the stack or data segment.">CCC_bitset_blocks()</a> macro to help construct the compound literal array.</dd></dl>
+<p>A fixed size bit set.</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#define BITSET_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="keyword">static</span> Bitset bitset = bitset_with_compound_literal(</div>
+<div class="line">    4096,</div>
+<div class="line">    bitset_blocks(4096, <span class="keyword">static</span>)</div>
+<div class="line">);</div>
+</div><!-- fragment --><p>This saves some initialization boilerplate. </p>
+
+</div>
+</div>
+<a id="abb4597e5558b2c24d7f95847e5b5eb7b" name="abb4597e5558b2c24d7f95847e5b5eb7b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abb4597e5558b2c24d7f95847e5b5eb7b">&#9670;&#160;</a></span>CCC_bitset_with_context_compound_literal</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define CCC_bitset_with_context_compound_literal</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">count, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">compound_literal_array&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    CCC_private_bitset_with_context_compound_literal(count,                    \</div>
+<div class="line">                                                     compound_literal_array)</div>
+</div><!-- fragment -->
+<p>Initialize the bit set with a starting capacity and size at runtime or compile time with no allocation permissions from a compound literal of bitset blocks. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">context</td><td>context for the bitset. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">count</td><td>the count of bits &lt;= capacity of this bit set. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">compound_literal_array</td><td>the compound literal of bitset blocks. Use the <a class="el" href="bitset_8h.html#a872da66828891cfed4872081d7f3a83f" title="Allocate the necessary number of blocks at compile or runtime on the stack or data segment.">CCC_bitset_blocks()</a> macro to help construct this. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the initialized bit set on the right hand side of an equality operator. Capacity will be set to the full capacity available for the compound literal. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>Use the <a class="el" href="bitset_8h.html#a872da66828891cfed4872081d7f3a83f" title="Allocate the necessary number of blocks at compile or runtime on the stack or data segment.">CCC_bitset_blocks()</a> macro to help construct the compound literal array.</dd></dl>
+<p>A fixed size bit set.</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#define BITSET_USING_NAMESPACE_CCC</span></div>
+<div class="line"><span class="keyword">static</span> Bitset bitset = bitset_with_context_compound_literal(</div>
+<div class="line">    &amp;module_context,</div>
+<div class="line">    4096,</div>
+<div class="line">    bitset_blocks(4096, <span class="keyword">static</span>)</div>
+<div class="line">);</div>
+</div><!-- fragment --><p>This saves some initialization boilerplate. </p>
 
 </div>
 </div>

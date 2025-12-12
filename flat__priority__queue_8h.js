@@ -8,6 +8,8 @@ var flat__priority__queue_8h =
     [ "CCC_flat_priority_queue_initialize", "flat__priority__queue_8h.html#a5b6f187d231a3dc5e4b3f4f796672cbb", null ],
     [ "CCC_flat_priority_queue_update_with", "flat__priority__queue_8h.html#a5f9be1dc57a8ca39f388b8d4a4788828", null ],
     [ "CCC_flat_priority_queue_with_capacity", "flat__priority__queue_8h.html#a6ba15bf011e58e04ea510d81ee4fa067", null ],
+    [ "CCC_flat_priority_queue_with_compound_literal", "flat__priority__queue_8h.html#a37da3381445ba29b34db97c7942150f7", null ],
+    [ "CCC_flat_priority_queue_with_context_compound_literal", "flat__priority__queue_8h.html#a34f86c640de1c23ff5c5bb835b88eb43", null ],
     [ "CCC_Flat_priority_queue", "flat__priority__queue_8h.html#aa9aa8a0c9f7647e847984c7f089735ef", null ],
     [ "CCC_flat_priority_queue_capacity", "flat__priority__queue_8h.html#a0cb320b06114025649b10b27f4fb2a4d", null ],
     [ "CCC_flat_priority_queue_clear", "flat__priority__queue_8h.html#a534c11acc926be65d38bd4901f8cf729", null ],
