@@ -353,6 +353,64 @@ fixed size and has data or is dynamic and has not yet been given allocation. */
         private_map;                                                           \
     }))
 
+/** @internal We can cut out boilerplate by assuming fixed size map. */
+#define CCC_private_flat_hash_map_with_compound_literal(                       \
+    private_key_field, private_hash, private_key_compare,                      \
+    private_compound_literal)                                                  \
+    {                                                                          \
+        .data = &(private_compound_literal),                                   \
+        .tag = NULL,                                                           \
+        .count = 0,                                                            \
+        .remain = ((CCC_private_flat_hash_map_fixed_capacity(                  \
+                        typeof(private_compound_literal))                      \
+                    / (size_t)8)                                               \
+                   * (size_t)7),                                               \
+        .mask = ((CCC_private_flat_hash_map_fixed_capacity(                    \
+                      typeof(private_compound_literal))                        \
+                  > (size_t)0)                                                 \
+                     ? (CCC_private_flat_hash_map_fixed_capacity(              \
+                            typeof(private_compound_literal))                  \
+                        - (size_t)1)                                           \
+                     : (size_t)0),                                             \
+        .sizeof_type = sizeof(*(private_compound_literal.data)), /*NOLINT*/    \
+        .key_offset                                                            \
+        = offsetof(typeof(*(private_compound_literal.data)), /*NOLINT*/        \
+                   private_key_field),                                         \
+        .compare = (private_key_compare),                                      \
+        .hash = (private_hash),                                                \
+        .allocate = NULL,                                                      \
+        .context = NULL,                                                       \
+    }
+
+/** @internal We can cut out boilerplate by assuming fixed size map. */
+#define CCC_private_flat_hash_map_with_context_compound_literal(               \
+    private_key_field, private_hash, private_key_compare, private_context,     \
+    private_compound_literal)                                                  \
+    {                                                                          \
+        .data = &(private_compound_literal),                                   \
+        .tag = NULL,                                                           \
+        .count = 0,                                                            \
+        .remain = ((CCC_private_flat_hash_map_fixed_capacity(                  \
+                        typeof(private_compound_literal))                      \
+                    / (size_t)8)                                               \
+                   * (size_t)7),                                               \
+        .mask = ((CCC_private_flat_hash_map_fixed_capacity(                    \
+                      typeof(private_compound_literal))                        \
+                  > (size_t)0)                                                 \
+                     ? (CCC_private_flat_hash_map_fixed_capacity(              \
+                            typeof(private_compound_literal))                  \
+                        - (size_t)1)                                           \
+                     : (size_t)0),                                             \
+        .sizeof_type = sizeof(*(private_compound_literal.data)), /*NOLINT*/    \
+        .key_offset                                                            \
+        = offsetof(typeof(*(private_compound_literal.data)), /*NOLINT*/        \
+                   private_key_field),                                         \
+        .compare = (private_key_compare),                                      \
+        .hash = (private_hash),                                                \
+        .allocate = NULL,                                                      \
+        .context = (private_context),                                          \
+    }
+
 /*========================    Construct In Place    =========================*/
 
 /** @internal A fairly good approximation of closures given C23 capabilities.

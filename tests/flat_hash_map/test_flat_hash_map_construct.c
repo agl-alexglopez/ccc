@@ -70,11 +70,54 @@ check_static_begin(flat_hash_map_test_static_initialize)
     check_end();
 }
 
+check_static_begin(flat_hash_map_test_with_literal)
+{
+    Flat_hash_map fh = flat_hash_map_with_compound_literal(
+        key, flat_hash_map_int_to_u64, flat_hash_map_id_order,
+        (Small_fixed_map){});
+    check(flat_hash_map_capacity(&fh).count, SMALL_FIXED_CAP);
+    check(flat_hash_map_count(&fh).count, 0);
+    check(validate(&fh), true);
+    check(is_empty(&fh), true);
+    struct Val def = {.key = 137, .val = 0};
+
+    /* Returning a vacant entry is possible when modification is attempted. */
+    Flat_hash_map_entry *ent = and_modify(entry_wrap(&fh, &def.key), mod);
+    check(occupied(ent), false);
+    check((unwrap(ent) == NULL), true);
+
+    /* Inserting default value before an in place modification is possible. */
+    struct Val *v = or_insert(entry_wrap(&fh, &def.key), &def);
+    check(v != NULL, true);
+    v->val++;
+    struct Val const *const inserted = get_key_value(&fh, &def.key);
+    check((inserted != NULL), true);
+    check(inserted->key, 137);
+    check(inserted->val, 1);
+
+    /* Modifying an existing value or inserting default is possible when no
+       context input is needed. */
+    struct Val *v2
+        = or_insert(and_modify(entry_wrap(&fh, &def.key), mod), &def);
+    check((v2 != NULL), true);
+    check(inserted->key, 137);
+    check(v2->val, 6);
+
+    /* Modifying an existing value that requires external input is also
+       possible with slightly different signature. */
+    struct Val *v3 = or_insert(
+        and_modify_context(entry_wrap(&fh, &def.key), modw, &def.key), &def);
+    check((v3 != NULL), true);
+    check(inserted->key, 137);
+    check(v3->val, 137);
+    check_end();
+}
+
 check_static_begin(flat_hash_map_test_copy_no_allocate)
 {
-    Flat_hash_map source = flat_hash_map_initialize(
-        &(Small_fixed_map){}, struct Val, key, flat_hash_map_int_zero,
-        flat_hash_map_id_order, NULL, NULL, SMALL_FIXED_CAP);
+    Flat_hash_map source = flat_hash_map_with_compound_literal(
+        key, flat_hash_map_int_zero, flat_hash_map_id_order,
+        (Small_fixed_map){});
     Flat_hash_map destination = flat_hash_map_initialize(
         &(Standard_fixed_map){}, struct Val, key, flat_hash_map_int_zero,
         flat_hash_map_id_order, NULL, NULL, STANDARD_FIXED_CAP);
@@ -101,12 +144,12 @@ check_static_begin(flat_hash_map_test_copy_no_allocate)
 
 check_static_begin(flat_hash_map_test_copy_no_allocate_fail)
 {
-    Flat_hash_map source = flat_hash_map_initialize(
-        &(Standard_fixed_map){}, struct Val, key, flat_hash_map_int_zero,
-        flat_hash_map_id_order, NULL, NULL, STANDARD_FIXED_CAP);
-    Flat_hash_map destination = flat_hash_map_initialize(
-        &(Small_fixed_map){}, struct Val, key, flat_hash_map_int_zero,
-        flat_hash_map_id_order, NULL, NULL, SMALL_FIXED_CAP);
+    Flat_hash_map source = flat_hash_map_with_compound_literal(
+        key, flat_hash_map_int_zero, flat_hash_map_id_order,
+        (Standard_fixed_map){});
+    Flat_hash_map destination = flat_hash_map_with_compound_literal(
+        key, flat_hash_map_int_zero, flat_hash_map_id_order,
+        (Small_fixed_map){});
     (void)swap_entry(&source, &(struct Val){.key = 0});
     (void)swap_entry(&source, &(struct Val){.key = 1, .val = 1});
     (void)swap_entry(&source, &(struct Val){.key = 2, .val = 2});
@@ -335,6 +378,7 @@ int
 main()
 {
     return check_run(flat_hash_map_test_static_initialize(),
+                     flat_hash_map_test_with_literal(),
                      flat_hash_map_test_copy_no_allocate(),
                      flat_hash_map_test_copy_no_allocate_fail(),
                      flat_hash_map_test_copy_allocate(),

@@ -34,6 +34,16 @@ check_static_begin(flat_priority_queue_test_empty)
     check_end();
 }
 
+check_static_begin(flat_priority_queue_test_with_compound_literal)
+{
+    Flat_priority_queue priority_queue
+        = flat_priority_queue_with_compound_literal(CCC_ORDER_LESSER, val_order,
+                                                    (struct Val[3]){});
+    check(flat_priority_queue_is_empty(&priority_queue), true);
+    check(flat_priority_queue_capacity(&priority_queue).count, 3);
+    check_end();
+}
+
 check_static_begin(flat_priority_queue_test_macro)
 {
     struct Val vals[2] = {};
@@ -351,9 +361,10 @@ int
 main()
 {
     return check_run(
-        flat_priority_queue_test_empty(), flat_priority_queue_test_macro(),
-        flat_priority_queue_test_macro_grow(), flat_priority_queue_test_push(),
-        flat_priority_queue_test_raw_type(),
+        flat_priority_queue_test_empty(),
+        flat_priority_queue_test_with_compound_literal(),
+        flat_priority_queue_test_macro(), flat_priority_queue_test_macro_grow(),
+        flat_priority_queue_test_push(), flat_priority_queue_test_raw_type(),
         flat_priority_queue_test_heapify_initialize(),
         flat_priority_queue_test_heapify_copy(),
         flat_priority_queue_test_copy_no_allocate(),

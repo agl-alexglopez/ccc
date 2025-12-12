@@ -85,7 +85,7 @@ policy, capacity, and optional starting size.
 @param[in] allocate CCC_Allocator or NULL if no allocation is permitted.
 @param[in] context_data any context data needed for managing Buffer memory.
 @param[in] capacity the capacity of memory at data_pointer.
-@param[in] optional_size optional starting size of the Buffer <= capacity.
+@param[in] optional_count optional starting size of the Buffer <= capacity.
 @return the initialized buffer. Directly assign to Buffer on the right hand
 side of the equality operator (e.g. CCC_Buffer b = CCC_buffer_initialize(...);).
 
@@ -115,9 +115,9 @@ allocation function as defined by the signature in types.h. If resizing is
 desired on memory that has already been allocated, ensure allocation has
 occurred with the provided allocation function. */
 #define CCC_buffer_initialize(data_pointer, type_name, allocate, context_data, \
-                              capacity, optional_size...)                      \
+                              capacity, optional_count...)                     \
     CCC_private_buffer_initialize(data_pointer, type_name, allocate,           \
-                                  context_data, capacity, optional_size)
+                                  context_data, capacity, optional_count)
 
 /** @brief Initialize a Buffer from a compound literal array initializer.
 @param[in] allocate CCC_Allocator or NULL if no allocation is permitted.
@@ -196,6 +196,57 @@ CCC_buffer_initialize() macro. */
 #define CCC_buffer_with_capacity(type_name, allocate, context_data, capacity)  \
     CCC_private_buffer_with_capacity(type_name, allocate, context_data,        \
                                      capacity)
+
+/** @brief Initialize a contiguous Buffer of user a specified type of fixed
+capacity with no allocation permission or context.
+@param[in] count starting count of the Buffer <= capacity of input literal.
+@param[in] compound_literal_array the compound literal array of types.
+@return the initialized buffer. Directly assign to Buffer on the right hand
+side of the equality operator
+(e.g. CCC_Buffer b = CCC_buffer_with_compound_literal(...);).
+
+Initialization of a Buffer can occur at compile time or run time but always
+lacks any allocation permissions. The memory pointer should be
+of the same type one intends to store in the buffer.
+
+```
+#define BUFFER_USING_NAMESPACE_CCC
+static Buffer stack = buffer_with_compound_literal(0, (static int[4096]){});
+```
+
+Compile time creation of fixed capacity buffers can be a helpful use case when
+wrapping static or stack based arrays. */
+#define CCC_buffer_with_compound_literal(count, compound_literal_array...)     \
+    CCC_private_buffer_with_compound_literal(count, compound_literal_array)
+
+/** @brief Initialize a contiguous Buffer of user a specified type of fixed
+capacity with no allocation permission.
+@param[in] context a pointer to any context needed for each element.
+@param[in] count starting count of the Buffer <= capacity of input literal.
+@param[in] compound_literal_array the compound literal array of types.
+@return the initialized buffer. Directly assign to Buffer on the right hand
+side of the equality operator
+(e.g. CCC_Buffer b = CCC_buffer_with_context_compound_literal(...);).
+
+Initialization of a Buffer can occur at compile time or run time but always
+lacks any allocation permissions. The memory pointer should be
+of the same type one intends to store in the buffer.
+
+```
+#define BUFFER_USING_NAMESPACE_CCC
+static Buffer stack = buffer_with_context_compound_literal(
+    &module_context,
+    0,
+    (static int[5]){0, 1, 2, 3, 4}
+);
+```
+
+Compile time creation of fixed capacity buffers can be a helpful use case when
+wrapping static or stack based arrays. */
+#define CCC_buffer_with_context_compound_literal(context, count,               \
+                                                 compound_literal_array...)    \
+    CCC_private_buffer_with_context_compound_literal(context, count,           \
+                                                     compound_literal_array)
 
 /** @brief Reserves space for at least to_add more elements.
 @param[in] buffer a pointer to the buffer.
@@ -737,6 +788,10 @@ dropped with this directive if one is sure no namespace collisions occur. */
 #ifdef BUFFER_USING_NAMESPACE_CCC
 typedef CCC_Buffer Buffer;
 #    define buffer_initialize(args...) CCC_buffer_initialize(args)
+#    define buffer_with_compound_literal(args...)                              \
+        CCC_buffer_with_compound_literal(args)
+#    define buffer_with_context_compound_literal(args...)                      \
+        CCC_buffer_with_context_compound_literal(args)
 #    define buffer_with_capacity(args...) CCC_buffer_with_capacity(args)
 #    define buffer_from(args...) CCC_buffer_from(args)
 #    define buffer_allocate(args...) CCC_buffer_allocate(args)

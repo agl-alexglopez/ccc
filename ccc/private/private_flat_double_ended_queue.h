@@ -91,6 +91,24 @@ void *CCC_private_flat_double_ended_queue_allocate_back(
     }))
 
 /** @internal */
+#define CCC_private_flat_double_ended_with_compound_literal(                   \
+    private_count, private_compound_literal...)                                \
+    {                                                                          \
+        .buffer = CCC_buffer_with_compound_literal(private_count,              \
+                                                   private_compound_literal),  \
+        .front = 0,                                                            \
+    }
+
+/** @internal */
+#define CCC_private_flat_double_ended_with_context_compound_literal(           \
+    private_context, private_count, private_compound_literal...)               \
+    {                                                                          \
+        .buffer = CCC_buffer_with_context_compound_literal(                    \
+            private_context, private_count, private_compound_literal),         \
+        .front = 0,                                                            \
+    }
+
+/** @internal */
 #define CCC_private_flat_double_ended_queue_emplace_back(                      \
     flat_double_ended_queue_pointer, value...)                                 \
     (__extension__({                                                           \

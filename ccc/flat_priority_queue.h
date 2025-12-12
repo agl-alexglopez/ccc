@@ -226,6 +226,35 @@ compile time, see the CCC_flat_priority_queue_initialize() macro. */
     CCC_private_flat_priority_queue_with_capacity(                             \
         type_name, order, compare, allocate, context_data, capacity)
 
+/** @brief Initialize a priority_queue as a min or max heap with no allocation
+permission or context data.
+@param[in] order CCC_ORDER_LESSER or CCC_ORDER_GREATER for min or max heap,
+respectively.
+@param[in] compare the user defined comparison function for user types.
+@param[in] compound_literal_array the compound literal array of fixed capacity.
+@return the initialized priority queue on the right hand side of an equality
+operator. (i.e. CCC_Flat_priority_queue q =
+CCC_flat_priority_queue_with_compound_literal(...);). */
+#define CCC_flat_priority_queue_with_compound_literal(order, compare,          \
+                                                      compound_literal_array)  \
+    CCC_private_flat_priority_queue_with_compound_literal(                     \
+        order, compare, compound_literal_array)
+
+/** @brief Initialize a priority_queue as a min or max heap with no allocation
+permission or context data.
+@param[in] order CCC_ORDER_LESSER or CCC_ORDER_GREATER for min or max heap,
+respectively.
+@param[in] compare the user defined comparison function for user types.
+@param[in] context any context needed by the priority queue.
+@param[in] compound_literal_array the compound literal array of fixed capacity.
+@return the initialized priority queue on the right hand side of an equality
+operator. (i.e. CCC_Flat_priority_queue q =
+CCC_flat_priority_queue_with_compound_literal(...);). */
+#define CCC_flat_priority_queue_with_context_compound_literal(                 \
+    order, compare, context, compound_literal_array)                           \
+    CCC_private_flat_priority_queue_with_context_compound_literal(             \
+        order, compare, context, compound_literal_array)
+
 /** @brief Copy the priority_queue from source to newly initialized
 destination.
 @param[in] destination the destination that will copy the source
@@ -779,6 +808,10 @@ typedef CCC_Flat_priority_queue Flat_priority_queue;
 #    define flat_priority_queue_from(args...) CCC_flat_priority_queue_from(args)
 #    define flat_priority_queue_with_capacity(args...)                         \
         CCC_flat_priority_queue_with_capacity(args)
+#    define flat_priority_queue_with_compound_literal(args...)                 \
+        CCC_flat_priority_queue_with_compound_literal(args)
+#    define flat_priority_queue_with_context_compound_literal(args...)         \
+        CCC_flat_priority_queue_with_context_compound_literal(args)
 #    define flat_priority_queue_heapify_initialize(args...)                    \
         CCC_flat_priority_queue_heapify_initialize(args)
 #    define flat_priority_queue_copy(args...) CCC_flat_priority_queue_copy(args)
@@ -820,6 +853,8 @@ typedef CCC_Flat_priority_queue Flat_priority_queue;
         CCC_flat_priority_queue_is_empty(args)
 #    define flat_priority_queue_count(args...)                                 \
         CCC_flat_priority_queue_count(args)
+#    define flat_priority_queue_capacity(args...)                              \
+        CCC_flat_priority_queue_capacity(args)
 #    define flat_priority_queue_data(args...) CCC_flat_priority_queue_data(args)
 #    define flat_priority_queue_validate(args...)                              \
         CCC_flat_priority_queue_validate(args)
